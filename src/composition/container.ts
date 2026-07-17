@@ -56,6 +56,14 @@ import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository
 import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
 import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepository";
 
+import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
+import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepository";
+import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
+
+import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
+import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
+import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -71,6 +79,9 @@ import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
+import { AwardXP } from "@/usecases/AwardXP";
+import { AwardBadge } from "@/usecases/AwardBadge";
+import { ListUserBadges } from "@/usecases/ListUserBadges";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -94,6 +105,8 @@ export interface AppContainer {
   quizRepo: IQuizRepository;
   quizAttemptRepo: IQuizAttemptRepository;
   xpEventRepo: IXPEventRepository;
+  badgeRepo: IBadgeRepository;
+  badgeAwardRepo: IBadgeAwardRepository;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -105,6 +118,9 @@ export interface AppContainer {
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
   recordQuizAttempt: RecordQuizAttempt;
+  awardXp: AwardXP;
+  awardBadge: AwardBadge;
+  listUserBadges: ListUserBadges;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -121,6 +137,8 @@ function buildProductionContainer(): AppContainer {
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
   const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
   const xpEventRepo: IXPEventRepository = new PrismaXPEventRepository(prisma);
+  const badgeRepo: IBadgeRepository = new PrismaBadgeRepository(prisma);
+  const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -160,6 +178,8 @@ function buildProductionContainer(): AppContainer {
     quizRepo,
     quizAttemptRepo,
     xpEventRepo,
+    badgeRepo,
+    badgeAwardRepo,
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,
       quizAttemptRepo,
@@ -168,6 +188,14 @@ function buildProductionContainer(): AppContainer {
       idGen,
       clock,
     }),
+    awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+    awardBadge: new AwardBadge({
+      badgeRepo,
+      badgeAwardRepo,
+      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+      idGen,
+    }),
+    listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
   };
 }
 
@@ -182,6 +210,8 @@ export interface TestContainer extends AppContainer {
   quizRepo: InMemoryQuizRepository;
   quizAttemptRepo: InMemoryQuizAttemptRepository;
   xpEventRepo: InMemoryXPEventRepository;
+  badgeRepo: InMemoryBadgeRepository;
+  badgeAwardRepo: InMemoryBadgeAwardRepository;
   accessPolicy: StubAccessPolicy;
 }
 
@@ -196,6 +226,8 @@ export function buildTestContainer(): TestContainer {
   const quizRepo = new InMemoryQuizRepository();
   const quizAttemptRepo = new InMemoryQuizAttemptRepository();
   const xpEventRepo = new InMemoryXPEventRepository();
+  const badgeRepo = new InMemoryBadgeRepository();
+  const badgeAwardRepo = new InMemoryBadgeAwardRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
 
@@ -229,6 +261,8 @@ export function buildTestContainer(): TestContainer {
     quizRepo,
     quizAttemptRepo,
     xpEventRepo,
+    badgeRepo,
+    badgeAwardRepo,
     accessPolicy,
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,
@@ -238,6 +272,14 @@ export function buildTestContainer(): TestContainer {
       idGen,
       clock,
     }),
+    awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+    awardBadge: new AwardBadge({
+      badgeRepo,
+      badgeAwardRepo,
+      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+      idGen,
+    }),
+    listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
   };
 }
 
