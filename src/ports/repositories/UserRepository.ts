@@ -50,6 +50,11 @@ export interface UserRepository {
       lastName: string;
       avatarUrl: string;
       bio: string;
+      /**
+       * Replace the user's enrolled course IDs.
+       * Use appendEnrolledCourseId() in EnrollStudent to append without overwriting.
+       */
+      enrolledCourseIds: readonly string[];
     }>,
   ): Promise<Result<User, UserError>>;
 

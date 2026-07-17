@@ -14,6 +14,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { PayMongoAdapter } from "@/infra/payment/PayMongoAdapter";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
 import { Result } from "@/domain/shared/Result";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 
@@ -54,10 +56,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // ── 3. Wire dependencies ────────────────────────────────────
   // In production, these come from the DI container.
   // For the webhook (edge runtime), we instantiate directly.
-  // Wire up PrismaOrderRepository in composition/container.ts for the full app.
+  // TODO: wire PrismaEnrollmentRepository + PrismaUserRepository in STORY-023 follow-up
   const orderRepo = new InMemoryOrderRepository();
   const courseRepo = new InMemoryCourseRepository();
-  const enrollStudent = new EnrollStudent(courseRepo, () => crypto.randomUUID());
+  const userRepo = new InMemoryUserRepository();
+  const enrollmentRepo = new InMemoryEnrollmentRepository();
+  const enrollStudent = new EnrollStudent({
+    courseRepo,
+    userRepo,
+    enrollmentRepo,
+    idGen: { newId: () => crypto.randomUUID() },
+  });
 
   // ── 4. Find the order ──────────────────────────────────────
   const orderResult = await orderRepo.findByPaymongoPaymentId(sessionId);
@@ -83,8 +92,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   // ── 7. Auto-enroll the student ─────────────────────────────
   try {
-    const enrollResult = await enrollStudent.execute(order.userId, order.courseId);
-    if (!enrollResult.ok) {
+    const enrollResult = await enrollStudent.execute({
+      userId: order.userId,
+      courseId: order.courseId,
+    });
+    if (Result.isErr(enrollResult)) {
       console.warn(
         `[webhook] Enrollment failed for order ${order.id}:`,
         enrollResult.error,
