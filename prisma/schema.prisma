@@ -423,3 +423,28 @@ model QuizAttemptAnswer {
   @@unique([attemptId, questionId])
   @@map("quiz_attempt_answers")
 }
+
+// ── Badges ──────────────────────────────────────────────────────────────────
+
+model Badge {
+  slug        String       @id // e.g. "first-quiz-pass"
+  name        String
+  description String
+  iconName    String       // Phosphor icon name
+  xpReward   Int          @default(0)
+  awards     BadgeAward[]
+
+  @@map("badges")
+}
+
+model BadgeAward {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeSlug String
+  awardedAt DateTime @default(now())
+  badge     Badge    @relation(fields: [badgeSlug], references: [slug])
+
+  @@unique([userId, badgeSlug])
+  @@index([userId])
+  @@map("badge_awards")
+}
