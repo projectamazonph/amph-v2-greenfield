@@ -113,6 +113,19 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  async getPasswordHash(id: string): Promise<Result<string, UserError>> {
+    try {
+      const row = await this.db.user.findUnique({
+        where: { id },
+        select: { password: true },
+      });
+      if (!row) return Result.err({ kind: "not_found" });
+      return Result.ok(row.password);
+    } catch (err) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   // ── Private helpers ────────────────────────────────────────
 
   private mapRow(row: {

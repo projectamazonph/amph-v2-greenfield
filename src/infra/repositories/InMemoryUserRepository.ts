@@ -89,9 +89,11 @@ export class InMemoryUserRepository implements UserRepository {
     return Result.ok(this.emailIndex.has(email.toLowerCase()));
   }
 
-  /** Get the stored password hash for a user (used in tests). */
-  getPasswordHash(id: string): string | undefined {
-    return this.passwordHashes.get(id);
+  /** Get the stored password hash for a user. */
+  async getPasswordHash(id: string): Promise<Result<string, UserError>> {
+    const hash = this.passwordHashes.get(id);
+    if (!hash) return Result.err({ kind: "not_found" });
+    return Result.ok(hash);
   }
 
   /** Remove all users. Call between tests. */

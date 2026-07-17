@@ -57,4 +57,11 @@ export interface UserRepository {
    * Check if an email is already taken.
    */
   emailExists(email: string): Promise<Result<boolean, UserError>>;
+
+  /**
+   * Get the stored password hash for a user.
+   * Used by Login to verify the password.
+   * Returns not_found if the user does not exist.
+   */
+  getPasswordHash(userId: string): Promise<Result<string, UserError>>;
 }
