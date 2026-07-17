@@ -27,7 +27,10 @@ Docs: AGENTS.md → CLAUDE.md → docs/build-spec.md → docs/stories/ (story do
 | #35 | Badge system (Badge, BadgeAward, AwardBadge, ListUserBadges) | ✅ merged |
 | #36 | Simulator infrastructure (ports, entity, registry) | ✅ merged |
 | #37 | Bid Elevator simulator | ✅ merged |
-| #38 | *(next — see below)* | — |
+| #38 | STR Triage simulator | ✅ merged |
+| #39 | Campaign Builder simulator | ✅ merged |
+| #40 | Listing Audit + Keyword Research simulator | ✅ merged |
+| #41 | *(Sprint 9 — see docs/sprint-plan.md)* | — |
 
 **After any branch switch or `git pull`:** run `npx prisma migrate dev` if the schema has new models that need migration.
 
