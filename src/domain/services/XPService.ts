@@ -15,6 +15,9 @@ export class XPService {
   /** Bonus XP awarded when a course is completed */
   static readonly COURSE_COMPLETE_BONUS_XP = 50;
 
+  /** XP awarded when a quiz is passed */
+  static readonly QUIZ_PASSED_XP = 20;
+
   /** XP thresholds for each tier */
   private static readonly TIER_THRESHOLDS: readonly [number, string][] = [
     [0, "Newcomer"],
