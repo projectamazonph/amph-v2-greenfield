@@ -69,4 +69,10 @@ export interface UserRepository {
    * Returns not_found if the user does not exist.
    */
   getPasswordHash(userId: string): Promise<Result<string, UserError>>;
+
+  /**
+   * Update a user's total XP.
+   * Called by AwardXP use case after persisting an XPEvent.
+   */
+  updateTotalXp(userId: string, newTotalXp: number): Promise<Result<User, UserError>>;
 }

@@ -28,6 +28,8 @@ export interface User {
   /** Course IDs the user has directly enrolled in (paid or granted). */
   readonly enrolledCourseIds: readonly string[];
   readonly createdAt: Date;
+  /** Total XP earned by the user (mutable, updated via XPService). */
+  totalXp: number;
 }
 
 export interface CreateUserParams {
@@ -49,6 +51,7 @@ export function createUser(params: {
   verificationStatus?: VerificationStatus;
   enrolledCourseIds?: readonly string[];
   createdAt?: Date;
+  totalXp?: number;
 }): Result<User, { kind: "invalid_input"; message: string }> {
   if (!params.firstName.trim()) {
     return Result.err({ kind: "invalid_input", message: "First name is required." });
@@ -67,6 +70,7 @@ export function createUser(params: {
     verificationStatus: params.verificationStatus ?? "UNVERIFIED",
     enrolledCourseIds: Object.freeze([...(params.enrolledCourseIds ?? [])]),
     createdAt: params.createdAt ?? new Date(),
+    totalXp: params.totalXp ?? 0,
   }));
 }
 

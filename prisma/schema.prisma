@@ -67,6 +67,9 @@ model User {
   simulatorAccess SimulatorAccess @default(NONE)
   enrolledCourseIds String[]      @default([])
 
+  // XP (experience points)
+  totalXp     Int @default(0)
+
   // Security
   passwordChangedAt   DateTime?
   failedLoginCount    Int        @default(0)
@@ -309,6 +312,21 @@ model DiscountCode {
   createdAt  DateTime @default(now())
 
   @@map("discount_codes")
+}
+
+// ── STORY-028: XP Events ────────────────────────────────
+
+model XPEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  reason    String   // lesson_completed | course_completed | quiz_passed | streak_bonus
+  refId     String?  // lessonId, courseId, quizAttemptId, etc.
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("xp_events")
 }
 
 // ── STORY-027: Progress Events ────────────────────────────────

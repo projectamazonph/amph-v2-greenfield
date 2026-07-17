@@ -62,6 +62,7 @@ export class InMemoryUserRepository implements UserRepository {
       verificationStatus: "UNVERIFIED" as const,
       enrolledCourseIds: Object.freeze([]),
       createdAt: new Date(),
+      totalXp: 0,
     };
 
     // Use createUser entity (if available) or direct freeze
@@ -102,6 +103,14 @@ export class InMemoryUserRepository implements UserRepository {
     this.users.clear();
     this.emailIndex.clear();
     this.passwordHashes.clear();
+  }
+
+  async updateTotalXp(userId: string, newTotalXp: number): Promise<Result<User, UserError>> {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    const updated = { ...user, totalXp: newTotalXp };
+    this.users.set(userId, updated);
+    return Result.ok(updated);
   }
 
   /** Pre-load with a set of users (for integration test fixtures). */

@@ -129,6 +129,28 @@ export class PrismaUserRepository implements UserRepository {
 
   // ── Private helpers ────────────────────────────────────────
 
+  async updateTotalXp(userId: string, newTotalXp: number): Promise<Result<import("@/domain/entities/User").User, UserError>> {
+    try {
+      const row = await this.db.user.update({
+        where: { id: userId },
+        data: { totalXp: newTotalXp },
+      });
+      return Result.ok(this.mapRow(row));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  // ── Private helpers ────────────────────────────────────────
+
   private mapRow(row: {
     id: string;
     email: string;
@@ -139,6 +161,7 @@ export class PrismaUserRepository implements UserRepository {
     verificationStatus: "UNVERIFIED" | "VERIFIED" | "SUSPENDED";
     enrolledCourseIds: string[];
     createdAt: Date;
+    totalXp: number;
   }) {
     return Object.freeze({
       id: row.id,
@@ -150,6 +173,7 @@ export class PrismaUserRepository implements UserRepository {
       verificationStatus: row.verificationStatus,
       enrolledCourseIds: Object.freeze([...row.enrolledCourseIds]),
       createdAt: row.createdAt,
+      totalXp: row.totalXp,
     });
   }
 }
