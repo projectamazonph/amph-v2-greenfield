@@ -7,6 +7,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { Result } from "@/domain/shared/Result";
+import { Login } from "@/usecases/Login";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";

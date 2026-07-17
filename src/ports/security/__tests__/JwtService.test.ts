@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { JwtService } from "@/ports/security/JwtService";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 /** Minimal test implementation of JwtService using jose under the hood. */
 class JoseJwtService implements JwtService {

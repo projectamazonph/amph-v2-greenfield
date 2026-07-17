@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { NextRequest } from "next/server";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 const SECRET = "test-secret-at-least-32-characters-long!!";
 

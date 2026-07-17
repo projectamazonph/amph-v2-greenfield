@@ -7,7 +7,7 @@
  * ADR-014: Every port method returns Result. Never throw.
  */
 
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export interface JwtService {
   /**

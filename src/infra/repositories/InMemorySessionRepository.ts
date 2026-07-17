@@ -4,7 +4,7 @@
 
 import type { SessionRepository, SessionRecord } from "@/ports/repositories/SessionRepository";
 import type { SessionError } from "@/ports/repositories/SessionRepository";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export class InMemorySessionRepository implements SessionRepository {
   private sessions = new Map<string, SessionRecord>();

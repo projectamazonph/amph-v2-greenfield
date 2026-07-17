@@ -7,7 +7,7 @@
 
 import { SignJWT, jwtVerify } from "jose";
 import type { JwtService } from "@/ports/security/JwtService";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export class JoseJwtService implements JwtService {
   constructor(private readonly secret: string) {
