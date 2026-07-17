@@ -60,6 +60,7 @@ describe("EnrollStudent", () => {
       update: vi.fn(),
       emailExists: vi.fn(),
       getPasswordHash: vi.fn(),
+      updateTotalXp: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),

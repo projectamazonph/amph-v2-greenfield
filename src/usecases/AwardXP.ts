@@ -12,7 +12,7 @@
 
 import { Result } from "@/domain/shared/Result";
 import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
-import type { IUserRepository } from "@/ports/repositories/IUserRepository";
+import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { XPEvent, XPEventError } from "@/domain/entities/XPEvent";
@@ -34,16 +34,13 @@ export type AwardXPError =
   | { kind: "user_not_found" }
   | { kind: "db_error"; message: string };
 
-export type AwardXPResult = Result<
-  { xpEvent: XPEvent; totalXp: number },
-  AwardXPError
->;
+export type AwardXPResult = Result<{ xpEvent: XPEvent; totalXp: number }, AwardXPError>;
 
 // ── Dependencies ─────────────────────────────────────────────────────────────
 
 export interface AwardXPDeps {
   xpEventRepo: IXPEventRepository;
-  userRepo: IUserRepository;
+  userRepo: UserRepository;
   idGen: IdGenerator;
   clock: Clock;
 }
@@ -82,7 +79,14 @@ export class AwardXP {
     });
 
     if (!xpEventResult.ok) {
-      return xpEventResult; // already typed as XPEventError
+      // Map XPEventError variants to AwardXPError
+      const xpError = xpEventResult.error;
+      if (xpError.kind === "invalid_amount") {
+        return Result.err({ kind: "invalid_amount" });
+      }
+      // XP event creation is a precondition step — if it fails here
+      // despite validated inputs, treat as internal error
+      return Result.err({ kind: "db_error", message: "Failed to create XP event" });
     }
 
     const xpEvent = xpEventResult.value;

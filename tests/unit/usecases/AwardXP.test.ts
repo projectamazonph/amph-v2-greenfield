@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Result } from "@/domain/shared/Result";
 import { AwardXP } from "@/usecases/AwardXP";
 import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
-import type { IUserRepository } from "@/ports/repositories/IUserRepository";
+import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { XPEvent } from "@/domain/entities/XPEvent";
@@ -26,33 +26,51 @@ function makeXPEventRepo(): IXPEventRepository {
 
 function makeUser(
   totalXp: number = 0,
-): User & { updateTotalXp: (xp: number) => Promise<Result<User>> } {
+  overrides: Partial<User> = {},
+): User & {
+  updateTotalXp: (xp: number) => Promise<Result<User, { kind: string; message?: string }>>;
+} {
   return {
     id: USER_ID,
     email: "student@example.com",
-    name: "Test Student",
-    passwordHash: "hashed",
-    emailVerified: true,
-    verificationToken: null,
-    passwordResetToken: null,
-    passwordResetExpiry: null,
+    firstName: "Test",
+    lastName: "Student",
+    role: "STUDENT",
+    subscriptionTier: "FREE",
+    verificationStatus: "VERIFIED",
+    enrolledCourseIds: [],
     createdAt: NOW,
     totalXp,
+    ...overrides,
     updateTotalXp: vi.fn(async (xp: number) =>
-      Result.ok({ ...makeUser(totalXp + xp) }),
+      Result.ok(makeUser(totalXp + xp, overrides)),
     ) as never,
   };
 }
 
-function makeUserRepo(user: User | null): IUserRepository {
+function makeUserRepo(
+  user:
+    | (User & {
+        updateTotalXp: (xp: number) => Promise<Result<User, { kind: string; message?: string }>>;
+      })
+    | null,
+): UserRepository {
+  // Cast user to base User to match UserRepository interface
+  const baseUser: User | null = user;
   return {
     findById: vi.fn(async (id: string) =>
-      id === user?.id ? Result.ok(user) : Result.err({ kind: "not_found" }),
-    ) as IUserRepository["findById"],
+      id === user?.id ? Result.ok(baseUser as User) : Result.err({ kind: "not_found" as const }),
+    ),
     findByEmail: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
-    updateTotalXp: user?.updateTotalXp ?? vi.fn(),
+    emailExists: vi.fn(),
+    getPasswordHash: vi.fn(),
+    // updateTotalXp signature: (userId, newTotalXp) but our mock uses (xp)
+    updateTotalXp: user
+      ? (((uid: string, xp: number) =>
+          user.updateTotalXp(xp)) as unknown as UserRepository["updateTotalXp"])
+      : vi.fn(),
   };
 }
 
@@ -67,7 +85,11 @@ describe("AwardXP", () => {
     const userRepo = makeUserRepo(user);
 
     const useCase = new AwardXP({ xpEventRepo, userRepo, idGen: mockIdGen, clock: mockClock });
-    const result = await useCase.execute({ userId: USER_ID, amount: 10, reason: "lesson_completed" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      amount: 10,
+      reason: "lesson_completed",
+    });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -75,7 +97,9 @@ describe("AwardXP", () => {
     expect(result.value.xpEvent.reason).toBe("lesson_completed");
     expect(result.value.totalXp).toBe(10);
     expect(xpEventRepo.create).toHaveBeenCalledOnce();
-    expect((user.updateTotalXp as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(
+      (user.updateTotalXp as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("accumulates XP over multiple awards", async () => {
@@ -84,7 +108,11 @@ describe("AwardXP", () => {
     const userRepo = makeUserRepo(user);
 
     const useCase = new AwardXP({ xpEventRepo, userRepo, idGen: mockIdGen, clock: mockClock });
-    const result = await useCase.execute({ userId: USER_ID, amount: 10, reason: "lesson_completed" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      amount: 10,
+      reason: "lesson_completed",
+    });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -96,7 +124,11 @@ describe("AwardXP", () => {
     const userRepo = makeUserRepo(null);
 
     const useCase = new AwardXP({ xpEventRepo, userRepo, idGen: mockIdGen, clock: mockClock });
-    const result = await useCase.execute({ userId: "ghost_user", amount: 10, reason: "lesson_completed" });
+    const result = await useCase.execute({
+      userId: "ghost_user",
+      amount: 10,
+      reason: "lesson_completed",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -109,7 +141,11 @@ describe("AwardXP", () => {
     const userRepo = makeUserRepo(user);
 
     const useCase = new AwardXP({ xpEventRepo, userRepo, idGen: mockIdGen, clock: mockClock });
-    const result = await useCase.execute({ userId: USER_ID, amount: 0, reason: "lesson_completed" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      amount: 0,
+      reason: "lesson_completed",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -122,7 +158,11 @@ describe("AwardXP", () => {
     const userRepo = makeUserRepo(user);
 
     const useCase = new AwardXP({ xpEventRepo, userRepo, idGen: mockIdGen, clock: mockClock });
-    const result = await useCase.execute({ userId: USER_ID, amount: -5, reason: "lesson_completed" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      amount: -5,
+      reason: "lesson_completed",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -145,13 +185,17 @@ describe("AwardXP", () => {
   it("returns db_error when xpEventRepo.create fails", async () => {
     const user = makeUser(0);
     const xpEventRepo: IXPEventRepository = {
-      create: vi.fn(async () => Result.err({ kind: "db_error", message: "DB error" })),
+      create: vi.fn(async () => Result.err({ kind: "db_error" as const, message: "DB error" })),
       findByUserId: vi.fn(),
     };
     const userRepo = makeUserRepo(user);
 
     const useCase = new AwardXP({ xpEventRepo, userRepo, idGen: mockIdGen, clock: mockClock });
-    const result = await useCase.execute({ userId: USER_ID, amount: 10, reason: "lesson_completed" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      amount: 10,
+      reason: "lesson_completed",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -182,7 +226,12 @@ describe("AwardXP", () => {
     const userRepo = makeUserRepo(user);
 
     const useCase = new AwardXP({ xpEventRepo, userRepo, idGen: mockIdGen, clock: mockClock });
-    const result = await useCase.execute({ userId: USER_ID, amount: 50, reason: "course_completed", refId: "course_01" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      amount: 50,
+      reason: "course_completed",
+      refId: "course_01",
+    });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;

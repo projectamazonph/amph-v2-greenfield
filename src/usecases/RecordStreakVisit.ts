@@ -24,8 +24,7 @@ export interface RecordStreakVisitInput {
   visitDate: Date;
 }
 
-export type RecordStreakVisitError =
-  | { kind: "db_error"; message: string };
+export type RecordStreakVisitError = { kind: "db_error"; message: string };
 
 export type RecordStreakVisitResult = Result<
   {
@@ -40,9 +39,12 @@ export type RecordStreakVisitResult = Result<
 
 export interface RecordStreakVisitDeps {
   streakRepo: IUserStreakRepository;
-  awardXpExecute: (
-    params: { userId: string; amount: number; reason: "streak_bonus"; refId?: string }
-  ) => Promise<unknown>;
+  awardXpExecute: (params: {
+    userId: string;
+    amount: number;
+    reason: "streak_bonus";
+    refId?: string;
+  }) => Promise<unknown>;
   idGen: IdGenerator;
   clock: Clock;
 }
@@ -52,11 +54,7 @@ export interface RecordStreakVisitDeps {
 export class RecordStreakVisit {
   constructor(private readonly deps: RecordStreakVisitDeps) {}
 
-  async execute(input: RecordStreakVisitInput): Promise<{
-    currentStreak: number;
-    longestStreak: number;
-    milestoneHit: { streak: number; label: string; xpBonus: number } | null;
-  }> {
+  async execute(input: RecordStreakVisitInput): Promise<RecordStreakVisitResult> {
     // ── 1. Find existing streak ──────────────────────────────
     const existingResult = await this.deps.streakRepo.findByUserId(input.userId);
     if (!existingResult.ok) {
@@ -101,23 +99,27 @@ export class RecordStreakVisit {
 
     // ── 5. Award milestone XP (fire-and-forget) ───────────────
     if (milestoneHit) {
-      this.deps.awardXpExecute({
-        userId: input.userId,
-        amount: milestoneHit.xpBonus,
-        reason: "streak_bonus",
-      }).catch((err: unknown) => {
-        console.error("[RecordStreakVisit] Failed to award streak XP:", err);
-      });
+      this.deps
+        .awardXpExecute({
+          userId: input.userId,
+          amount: milestoneHit.xpBonus,
+          reason: "streak_bonus",
+        })
+        .catch((err: unknown) => {
+          console.error("[RecordStreakVisit] Failed to award streak XP:", err);
+        });
     }
 
     return Result.ok({
       currentStreak: newStreak,
       longestStreak: newLongest,
-      milestoneHit: milestoneHit ? {
-        streak: milestoneHit.streak,
-        label: milestoneHit.label,
-        xpBonus: milestoneHit.xpBonus,
-      } : null,
+      milestoneHit: milestoneHit
+        ? {
+            streak: milestoneHit.streak,
+            label: milestoneHit.label,
+            xpBonus: milestoneHit.xpBonus,
+          }
+        : null,
     });
   }
 }

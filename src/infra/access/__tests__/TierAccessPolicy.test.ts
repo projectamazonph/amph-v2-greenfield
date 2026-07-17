@@ -59,6 +59,7 @@ describe("TierAccessPolicy", () => {
       update: vi.fn(),
       emailExists: vi.fn(),
       getPasswordHash: vi.fn(),
+      updateTotalXp: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),
@@ -77,9 +78,7 @@ describe("TierAccessPolicy", () => {
   });
 
   it("DENIED_NOT_AUTHENTICATED when user not found", async () => {
-    vi.mocked(mockUserRepo.findById).mockResolvedValue(
-      Result.err({ kind: "not_found" }),
-    );
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.err({ kind: "not_found" }));
 
     const result = await policy.canAccess(USER_ID, COURSE_ID);
 
@@ -90,9 +89,7 @@ describe("TierAccessPolicy", () => {
 
   it("DENIED_NOT_AUTHENTICATED when course not found", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
-    vi.mocked(mockCourseRepo.findById).mockResolvedValue(
-      Result.err({ kind: "not_found" }),
-    );
+    vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.err({ kind: "not_found" }));
 
     const result = await policy.canAccess(USER_ID, COURSE_ID);
 
@@ -111,7 +108,9 @@ describe("TierAccessPolicy", () => {
   });
 
   it("DENIED_NOT_AUTHENTICATED when course is ARCHIVED", async () => {
-    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser({ subscriptionTier: "PRO" })));
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(
+      Result.ok(makeUser({ subscriptionTier: "PRO" })),
+    );
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(
       Result.ok(makeCourse({ status: "ARCHIVED" })),
     );
@@ -256,5 +255,4 @@ describe("TierAccessPolicy", () => {
       requiredTier: "STARTER",
     });
   });
-
 });

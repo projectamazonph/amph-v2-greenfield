@@ -27,11 +27,13 @@ function makeStreakRepo(streak: MockUserStreak | null): IUserStreakRepository {
   };
 }
 
-function makeStreak(overrides: Partial<{
-  currentStreak: number;
-  longestStreak: number;
-  lastVisitDate: Date | null;
-}> = {}): MockUserStreak {
+function makeStreak(
+  overrides: Partial<{
+    currentStreak: number;
+    longestStreak: number;
+    lastVisitDate: Date | null;
+  }> = {},
+): MockUserStreak {
   return {
     id: "streak_01",
     userId: USER_ID,
@@ -202,7 +204,7 @@ describe("RecordStreakVisit", () => {
     const streak = makeStreak({ currentStreak: 1, longestStreak: 1, lastVisitDate: yesterday });
     const streakRepo: IUserStreakRepository = {
       findByUserId: async () => Result.ok(streak),
-      upsert: vi.fn(async () => Result.err({ kind: "db_error", message: "DB error" })),
+      upsert: vi.fn(async () => Result.err({ kind: "db_error" as const, message: "DB error" })),
     };
     const useCase = new RecordStreakVisit({
       streakRepo,

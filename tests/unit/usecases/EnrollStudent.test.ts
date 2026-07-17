@@ -56,12 +56,17 @@ function makeEnrollment(overrides: Partial<Enrollment> = {}): Enrollment {
     completedLessonIds: [],
     lastLessonId: null,
     progressPercent: 0,
-    markLessonComplete: function (this: Enrollment, lessonId: string, courseLessonCount: number): void {
+    markLessonComplete: function (
+      this: Enrollment,
+      lessonId: string,
+      courseLessonCount: number,
+    ): void {
       if (!this.completedLessonIds.includes(lessonId)) {
         this.completedLessonIds.push(lessonId);
-        this.progressPercent = courseLessonCount > 0
-          ? Math.min(100, Math.round((this.completedLessonIds.length / courseLessonCount) * 100))
-          : 0;
+        this.progressPercent =
+          courseLessonCount > 0
+            ? Math.min(100, Math.round((this.completedLessonIds.length / courseLessonCount) * 100))
+            : 0;
       }
       this.lastLessonId = lessonId;
     },
@@ -88,6 +93,7 @@ describe("EnrollStudent", () => {
       update: vi.fn(),
       emailExists: vi.fn(),
       getPasswordHash: vi.fn(),
+      updateTotalXp: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),
@@ -121,9 +127,7 @@ describe("EnrollStudent", () => {
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(course));
     vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
     // Return whatever enrollment was passed (id comes from idGen)
-    vi.mocked(mockEnrollmentRepo.create).mockImplementation(
-      async (e: Enrollment) => Result.ok(e),
-    );
+    vi.mocked(mockEnrollmentRepo.create).mockImplementation(async (e: Enrollment) => Result.ok(e));
     vi.mocked(mockUserRepo.update).mockResolvedValue(Result.ok(user));
 
     const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
@@ -144,9 +148,7 @@ describe("EnrollStudent", () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(user));
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(course));
     vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
-    vi.mocked(mockEnrollmentRepo.create).mockImplementation(
-      async (e: Enrollment) => Result.ok(e),
-    );
+    vi.mocked(mockEnrollmentRepo.create).mockImplementation(async (e: Enrollment) => Result.ok(e));
     vi.mocked(mockUserRepo.update).mockResolvedValue(Result.ok(user));
 
     const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
@@ -164,9 +166,7 @@ describe("EnrollStudent", () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(user));
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(course));
     vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
-    vi.mocked(mockEnrollmentRepo.create).mockImplementation(
-      async (e: Enrollment) => Result.ok(e),
-    );
+    vi.mocked(mockEnrollmentRepo.create).mockImplementation(async (e: Enrollment) => Result.ok(e));
     vi.mocked(mockUserRepo.update).mockResolvedValue(Result.ok(user));
 
     const result = await useCase.execute({
@@ -236,9 +236,7 @@ describe("EnrollStudent", () => {
   it("returns already_enrolled when user already enrolled in course", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(makeCourse()));
-    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(
-      makeEnrollment(),
-    );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(makeEnrollment());
 
     const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
 

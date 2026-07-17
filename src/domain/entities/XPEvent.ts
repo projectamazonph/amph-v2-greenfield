@@ -17,11 +17,7 @@ export interface XPEvent {
   readonly createdAt: Date;
 }
 
-export type XPReason =
-  | "lesson_completed"
-  | "course_completed"
-  | "quiz_passed"
-  | "streak_bonus";
+export type XPReason = "lesson_completed" | "course_completed" | "quiz_passed" | "streak_bonus";
 
 export const VALID_XP_REASONS: readonly string[] = [
   "lesson_completed",
@@ -33,7 +29,8 @@ export const VALID_XP_REASONS: readonly string[] = [
 export type XPEventError =
   | { kind: "invalid_user_id" }
   | { kind: "invalid_amount" }
-  | { kind: "invalid_reason" };
+  | { kind: "invalid_reason" }
+  | { kind: "db_error"; message: string };
 
 export type CreateXPEventParams = {
   id: string;
