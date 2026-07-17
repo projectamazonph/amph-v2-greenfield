@@ -346,3 +346,18 @@ model ProgressEvent {
   @@index([createdAt])
   @@map("progress_events")
 }
+
+// ── STORY-029: User Streaks ────────────────────────────────────────────
+
+model UserStreak {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  currentStreak Int     @default(1)
+  longestStreak Int     @default(1)
+  lastVisitDate DateTime @default(now())
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("user_streaks")
+}
