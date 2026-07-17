@@ -11,6 +11,7 @@
 
 import { Result } from "@/domain/shared/Result";
 import { Money } from "@/domain/values/Money";
+import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
 
 export type CourseStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 export type LessonType = "VIDEO" | "TEXT" | "QUIZ";
@@ -45,6 +46,10 @@ export interface Course {
   readonly isFeatured: boolean;
   readonly displayOrder: number;
   readonly status: CourseStatus;
+  /** Access tier required for full access (enrollment or matching subscription). */
+  readonly courseTier: CourseAccessTier;
+  /** How many lessons are visible in preview mode (courseTier = PREVIEW). */
+  readonly previewLessonCount: number;
   readonly createdAt: Date;
 }
 
@@ -75,6 +80,8 @@ export function createCourse(params: {
   isFeatured?: boolean;
   displayOrder?: number;
   status?: CourseStatus;
+  courseTier?: CourseAccessTier;
+  previewLessonCount?: number;
   createdAt?: Date;
 }): Result<Course, CreateCourseError> {
   // Fail Fast: slug validation
@@ -104,6 +111,8 @@ export function createCourse(params: {
     isFeatured: params.isFeatured ?? false,
     displayOrder: params.displayOrder ?? 0,
     status: params.status ?? "DRAFT",
+    courseTier: params.courseTier ?? "STARTER",
+    previewLessonCount: params.previewLessonCount ?? 1,
     createdAt: params.createdAt ?? new Date(),
   });
 }

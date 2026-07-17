@@ -60,6 +60,7 @@ export class InMemoryUserRepository implements UserRepository {
       role: "STUDENT" as const,
       subscriptionTier: "FREE" as const,
       verificationStatus: "UNVERIFIED" as const,
+      enrolledCourseIds: Object.freeze([]),
       createdAt: new Date(),
     };
 
@@ -114,6 +115,20 @@ export class InMemoryUserRepository implements UserRepository {
     users.forEach((u) => {
       this.create(u); // sync in memory
     });
+  }
+
+  /**
+   * Add a course ID to a user's enrolledCourseIds.
+   * Used in tests to simulate enrollment.
+   */
+  addEnrollment(userId: string, courseId: string): void {
+    const user = this.users.get(userId);
+    if (!user) return;
+    const updated = Object.freeze({
+      ...user,
+      enrolledCourseIds: Object.freeze([...user.enrolledCourseIds, courseId]),
+    });
+    this.users.set(userId, updated);
   }
 
   /** Number of users stored. Use in tests. */

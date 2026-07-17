@@ -25,6 +25,8 @@ export interface User {
   readonly role: Role;
   readonly subscriptionTier: SubscriptionTier;
   readonly verificationStatus: VerificationStatus;
+  /** Course IDs the user has directly enrolled in (paid or granted). */
+  readonly enrolledCourseIds: readonly string[];
   readonly createdAt: Date;
 }
 
@@ -33,6 +35,7 @@ export interface CreateUserParams {
   passwordHash: string;
   firstName: string;
   lastName: string;
+  enrolledCourseIds?: readonly string[];
 }
 
 /** Domain-only constructor — creates a User from raw fields. */
@@ -44,6 +47,7 @@ export function createUser(params: {
   role?: Role;
   subscriptionTier?: SubscriptionTier;
   verificationStatus?: VerificationStatus;
+  enrolledCourseIds?: readonly string[];
   createdAt?: Date;
 }): Result<User, { kind: "invalid_input"; message: string }> {
   if (!params.firstName.trim()) {
@@ -61,6 +65,7 @@ export function createUser(params: {
     role: params.role ?? "STUDENT",
     subscriptionTier: params.subscriptionTier ?? "FREE",
     verificationStatus: params.verificationStatus ?? "UNVERIFIED",
+    enrolledCourseIds: Object.freeze([...(params.enrolledCourseIds ?? [])]),
     createdAt: params.createdAt ?? new Date(),
   }));
 }
