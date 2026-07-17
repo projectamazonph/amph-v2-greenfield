@@ -1,0 +1,44 @@
+/**
+ * buildSimulatorRegistry — creates a SimulatorRegistry with all 4 simulator stubs.
+ *
+ * STORY-036: Simulator infrastructure.
+ *
+ * Called by both the production and test containers.
+ * Real implementations (STORY-037+) replace individual stubs via the registry
+ * without changing this factory.
+ */
+
+import { InMemorySimulatorRegistry } from "@/infra/simulator/InMemorySimulatorRegistry";
+import { StubSimulator } from "@/infra/simulator/StubSimulator";
+import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
+
+export function buildSimulatorRegistry(): SimulatorRegistry {
+  const registry = new InMemorySimulatorRegistry();
+
+  registry.register(
+    new StubSimulator<unknown, unknown>({
+      simulatorId: "bid-elevator",
+      name: "Bid Elevator",
+    }),
+  );
+  registry.register(
+    new StubSimulator<unknown, unknown>({
+      simulatorId: "str-triage",
+      name: "STR Triage",
+    }),
+  );
+  registry.register(
+    new StubSimulator<unknown, unknown>({
+      simulatorId: "campaign-builder",
+      name: "Campaign Builder",
+    }),
+  );
+  registry.register(
+    new StubSimulator<unknown, unknown>({
+      simulatorId: "listing-audit",
+      name: "Listing Audit + Keyword Research",
+    }),
+  );
+
+  return registry;
+}

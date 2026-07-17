@@ -1,9 +1,8 @@
 /**
- * Container wiring tests — STORY-033.
+ * Container wiring tests — STORY-033 / STORY-036.
  *
- * Ensures RecordQuizAttempt is registered on both production and test
- * containers, and that the use case is actually wired to working deps
- * (an attempt reaches the quizAttemptRepo).
+ * Ensures RecordQuizAttempt and SimulatorRegistry are registered on both
+ * production and test containers.
  */
 
 import { describe, it, expect } from "vitest";
@@ -67,5 +66,28 @@ describe("container — recordQuizAttempt wiring", () => {
     expect(result.value.score).toBe(100);
     expect(result.value.passed).toBe(true);
     expect(result.value.attempt.status).toBe("completed");
+  });
+});
+
+// ── Simulator registry wiring (STORY-036) ──────────────────────
+
+import { describe as simDescribe, it as simIt, expect as simExpect, beforeEach } from "vitest";
+
+simDescribe("container — simulator registry wiring", () => {
+  simIt("test container exposes simulatorRegistry", () => {
+    const c = buildTestContainer();
+    simExpect(c.simulatorRegistry).toBeDefined();
+    simExpect(typeof c.simulatorRegistry.list).toBe("function");
+    simExpect(typeof c.simulatorRegistry.get).toBe("function");
+  });
+
+  simIt("test container has all 4 simulator stubs registered", () => {
+    const c = buildTestContainer();
+    const simulators = c.simulatorRegistry.list();
+    simExpect(simulators).toHaveLength(4);
+    simExpect(c.simulatorRegistry.get("bid-elevator")).not.toBeNull();
+    simExpect(c.simulatorRegistry.get("str-triage")).not.toBeNull();
+    simExpect(c.simulatorRegistry.get("campaign-builder")).not.toBeNull();
+    simExpect(c.simulatorRegistry.get("listing-audit")).not.toBeNull();
   });
 });
