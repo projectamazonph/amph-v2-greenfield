@@ -136,6 +136,7 @@ export class PrismaUserRepository implements UserRepository {
     role: Role;
     subscriptionTier: "FREE" | "STARTER" | "PRO";
     verificationStatus: "UNVERIFIED" | "VERIFIED" | "SUSPENDED";
+    enrolledCourseIds: string[];
     createdAt: Date;
   }) {
     return Object.freeze({
@@ -146,6 +147,7 @@ export class PrismaUserRepository implements UserRepository {
       role: row.role,
       subscriptionTier: row.subscriptionTier,
       verificationStatus: row.verificationStatus,
+      enrolledCourseIds: Object.freeze([...row.enrolledCourseIds]),
       createdAt: row.createdAt,
     });
   }

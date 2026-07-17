@@ -47,6 +47,13 @@ import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { SignUp } from "@/usecases/SignUp";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
+import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
+
+// ── Access policy ────────────────────────────────────────────
+
+import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
+import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
+import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
 
 // ── Container shape ─────────────────────────────────────────
 
@@ -66,6 +73,7 @@ export interface AppContainer {
   // Use cases
   signUp: SignUp;
   createPaymentIntent: CreatePaymentIntent;
+  checkCourseAccess: CheckCourseAccess;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -84,6 +92,7 @@ function buildProductionContainer(): AppContainer {
   );
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo);
 
   return {
     clock,
@@ -99,6 +108,7 @@ function buildProductionContainer(): AppContainer {
       paymentGateway,
       baseUrl,
     }),
+    checkCourseAccess: new CheckCourseAccess(accessPolicy),
   };
 }
 
@@ -108,6 +118,7 @@ export interface TestContainer extends AppContainer {
   userRepo: InMemoryUserRepository;
   courseRepo: InMemoryCourseRepository;
   orderRepo: InMemoryOrderRepository;
+  accessPolicy: StubAccessPolicy;
 }
 
 export function buildTestContainer(): TestContainer {
@@ -117,6 +128,7 @@ export function buildTestContainer(): TestContainer {
   const courseRepo = new InMemoryCourseRepository();
   const orderRepo = new InMemoryOrderRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
+  const accessPolicy = new StubAccessPolicy();
 
   return {
     clock,
@@ -132,6 +144,8 @@ export function buildTestContainer(): TestContainer {
       paymentGateway,
       baseUrl: "https://test.amph.example.com",
     }),
+    checkCourseAccess: new CheckCourseAccess(accessPolicy),
+    accessPolicy,
   };
 }
 

@@ -37,6 +37,17 @@ export class InMemoryCourseRepository implements CourseRepository {
     courses.forEach((c) => this.courses.set(c.id, c));
   }
 
+  /**
+   * Seed a course with sensible defaults for story-022 access-policy tests.
+   * Requires all Course fields including courseTier and previewLessonCount.
+   */
+  seedWithAccess(course: Omit<Course, "courseTier" | "previewLessonCount"> & {
+    courseTier: Course["courseTier"];
+    previewLessonCount: Course["previewLessonCount"];
+  }): void {
+    this.courses.set(course.id, course as Course);
+  }
+
   clear(): void {
     this.courses.clear();
   }
