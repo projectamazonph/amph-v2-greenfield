@@ -69,6 +69,70 @@ describe("container — recordQuizAttempt wiring", () => {
   });
 });
 
+// ── IssueCertificate wiring (STORY-041) ────────────────────────
+
+import { describe as certDescribe, it as certIt, expect as certExpect } from "vitest";
+import { createCourse } from "@/domain/entities/Course";
+import { createEnrollment } from "@/domain/entities/Enrollment";
+
+certDescribe("container — issueCertificate wiring", () => {
+  certIt("test container exposes issueCertificate", () => {
+    const c = buildTestContainer();
+    certExpect(c.issueCertificate).toBeDefined();
+    certExpect(typeof c.issueCertificate.execute).toBe("function");
+  });
+
+  certIt("test container exposes certificateRepo and certificateHashGen", () => {
+    const c = buildTestContainer();
+    certExpect(c.certificateRepo).toBeDefined();
+    certExpect(c.certificateHashGen).toBeDefined();
+  });
+
+  certIt("end-to-end: a completed enrollment produces a valid certificate via the test container", async () => {
+    const c = buildTestContainer();
+
+    // Seed a course
+    const courseResult = createCourse({
+      id: "course-1",
+      slug: "intro-to-amazon",
+      title: "Intro to Amazon",
+      tagline: "Learn the basics",
+      description: "A course about Amazon",
+      priceMinor: 0,
+      currency: "PHP",
+      curriculum: { sections: [{ id: "s1", title: "Section 1", lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }] }] },
+      courseTier: "STARTER",
+      previewLessonCount: 0,
+    });
+    if (!courseResult.ok) throw new Error("seed course failed");
+    c.courseRepo.seed([courseResult.value]);
+
+    // Seed an enrollment at 100% (status is "active" by default from factory)
+    const enrollmentResult = createEnrollment({
+      id: "enrollment-1",
+      userId: "user-1",
+      courseId: "course-1",
+    });
+    if (!enrollmentResult.ok) throw new Error("seed enrollment failed");
+    const enrollment = enrollmentResult.value;
+    enrollment.progressPercent = 100;
+    await c.enrollmentRepo.create(enrollment);
+
+    const result = await c.issueCertificate.execute({
+      userId: "user-1",
+      courseId: "course-1",
+    });
+
+    certExpect(result.ok).toBe(true);
+    if (!result.ok) return;
+    certExpect(result.value.certificate.userId).toBe("user-1");
+    certExpect(result.value.certificate.courseId).toBe("course-1");
+    certExpect(result.value.certificate.status).toBe("active");
+    certExpect(result.value.certificate.verificationHash).toMatch(/^[0-9a-f]{64}$/);
+    certExpect(result.value.isReissue).toBe(false);
+  });
+});
+
 // ── Simulator registry wiring (STORY-036) ──────────────────────
 
 import { describe as simDescribe, it as simIt, expect as simExpect, beforeEach } from "vitest";

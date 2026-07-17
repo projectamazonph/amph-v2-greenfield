@@ -15,7 +15,6 @@ export class PrismaBadgeRepository implements IBadgeRepository {
 
   async findBySlug(slug: BadgeSlug): Promise<Result<Badge | null, BadgeError>> {
     try {
-      // @ts-expect-error — badge model added in STORY-035; Prisma client regeneration pending
       const row = await this.db.badge.findUnique({ where: { slug } });
       if (!row) return Result.ok(null);
       return Result.ok(this.mapRow(row));
@@ -26,7 +25,6 @@ export class PrismaBadgeRepository implements IBadgeRepository {
 
   async findAll(): Promise<Result<readonly Badge[], BadgeError>> {
     try {
-      // @ts-expect-error — badge model added in STORY-035; Prisma client regeneration pending
       const rows: any[] = await this.db.badge.findMany();
       return Result.ok(rows.map((r) => this.mapRow(r)));
     } catch (err: unknown) {

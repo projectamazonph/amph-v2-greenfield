@@ -16,7 +16,6 @@ export class PrismaBadgeAwardRepository implements IBadgeAwardRepository {
 
   async create(award: BadgeAward): Promise<Result<BadgeAward, BadgeAwardError>> {
     try {
-      // @ts-expect-error — badgeAward model added in STORY-035; Prisma client regeneration pending
       const row = await this.db.badgeAward.create({
         data: {
           id: award.id,
@@ -41,7 +40,6 @@ export class PrismaBadgeAwardRepository implements IBadgeAwardRepository {
 
   async findByUserId(userId: string): Promise<Result<readonly BadgeAward[], BadgeAwardError>> {
     try {
-      // @ts-expect-error — badgeAward model added in STORY-035; Prisma client regeneration pending
       const rows: any[] = await this.db.badgeAward.findMany({
         where: { userId },
         orderBy: { awardedAt: "desc" },
@@ -54,7 +52,6 @@ export class PrismaBadgeAwardRepository implements IBadgeAwardRepository {
 
   async exists(userId: string, badgeSlug: BadgeSlug): Promise<Result<boolean, BadgeAwardError>> {
     try {
-      // @ts-expect-error — badgeAward model added in STORY-035; Prisma client regeneration pending
       const row = await this.db.badgeAward.findUnique({
         where: { userId_badgeSlug: { userId, badgeSlug } },
       });
