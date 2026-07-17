@@ -98,4 +98,12 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(bidElevator!.name).toBe("Bid Elevator");
     simExpect(bidElevator!.simulatorId).toBe("bid-elevator");
   });
+
+  simIt("str-triage simulator is the real StrTriageSimulator, not a stub", () => {
+    const c = buildTestContainer();
+    const strTriage = c.simulatorRegistry.get("str-triage");
+    simExpect(strTriage).not.toBeNull();
+    simExpect(strTriage!.name).toBe("STR Triage");
+    simExpect(strTriage!.simulatorId).toBe("str-triage");
+  });
 });
