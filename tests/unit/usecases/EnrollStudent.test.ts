@@ -44,7 +44,7 @@ function makeCourse(overrides: Partial<Course> = {}): Course {
 }
 
 function makeEnrollment(overrides: Partial<Enrollment> = {}): Enrollment {
-  return {
+  const enrollment: Enrollment = {
     id: "enroll_01",
     userId: "user_01",
     courseId: "course_01",
@@ -53,8 +53,21 @@ function makeEnrollment(overrides: Partial<Enrollment> = {}): Enrollment {
     couponCode: null,
     couponDiscount: null,
     createdAt: new Date(),
+    completedLessonIds: [],
+    lastLessonId: null,
+    progressPercent: 0,
+    markLessonComplete: function (this: Enrollment, lessonId: string, courseLessonCount: number): void {
+      if (!this.completedLessonIds.includes(lessonId)) {
+        this.completedLessonIds.push(lessonId);
+        this.progressPercent = courseLessonCount > 0
+          ? Math.min(100, Math.round((this.completedLessonIds.length / courseLessonCount) * 100))
+          : 0;
+      }
+      this.lastLessonId = lessonId;
+    },
     ...overrides,
-  } as Enrollment;
+  };
+  return enrollment;
 }
 
 describe("EnrollStudent", () => {
@@ -87,6 +100,7 @@ describe("EnrollStudent", () => {
       create: vi.fn(),
       findByUserId: vi.fn(),
       findById: vi.fn(),
+      update: vi.fn(),
     };
     useCase = new EnrollStudent({
       userRepo: mockUserRepo,

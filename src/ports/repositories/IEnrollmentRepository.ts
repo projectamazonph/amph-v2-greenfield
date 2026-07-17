@@ -39,4 +39,10 @@ export interface IEnrollmentRepository {
    * Returns already_enrolled if a record for (userId, courseId) already exists.
    */
   create(enrollment: Enrollment): Promise<Result<Enrollment, EnrollmentError>>;
+
+  /**
+   * Update an existing enrollment (e.g. progress fields).
+   * STORY-027: MarkLessonComplete uses this to persist completedLessonIds, etc.
+   */
+  update(enrollment: Enrollment): Promise<Result<Enrollment, EnrollmentError>>;
 }

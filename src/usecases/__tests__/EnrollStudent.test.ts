@@ -72,6 +72,7 @@ describe("EnrollStudent", () => {
       create: vi.fn(),
       findByUserId: vi.fn(),
       findById: vi.fn(),
+      update: vi.fn(),
     };
     useCase = new EnrollStudent({
       userRepo: mockUserRepo,
@@ -100,6 +101,10 @@ describe("EnrollStudent", () => {
         couponCode: null,
         couponDiscount: null,
         createdAt: new Date(),
+        completedLessonIds: [] as string[],
+        lastLessonId: null,
+        progressPercent: 0,
+        markLessonComplete: vi.fn(),
       }),
     );
     vi.mocked(mockUserRepo.update).mockResolvedValue(Result.ok(user));
@@ -130,6 +135,10 @@ describe("EnrollStudent", () => {
         couponCode: null,
         couponDiscount: null,
         createdAt: new Date(),
+        completedLessonIds: [] as string[],
+        lastLessonId: null,
+        progressPercent: 0,
+        markLessonComplete: vi.fn(),
       }),
     );
     vi.mocked(mockUserRepo.update).mockResolvedValue(Result.ok(user));
@@ -219,6 +228,10 @@ describe("EnrollStudent", () => {
       couponCode: null,
       couponDiscount: null,
       createdAt: new Date(),
+      completedLessonIds: [] as string[],
+      lastLessonId: null,
+      progressPercent: 0,
+      markLessonComplete: vi.fn(),
     });
 
     const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });

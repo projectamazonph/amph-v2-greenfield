@@ -310,3 +310,21 @@ model DiscountCode {
 
   @@map("discount_codes")
 }
+
+// ── STORY-027: Progress Events ────────────────────────────────
+
+model ProgressEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  lessonId  String?
+  type      String   // lesson_completed | course_started | course_completed
+  metadata  Json     @default("{}")
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([createdAt])
+  @@map("progress_events")
+}
