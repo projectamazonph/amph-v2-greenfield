@@ -1,0 +1,294 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note: In Prisma 7 the URL moved to prisma.config.ts.
+// The datasource url is configured there, not here.
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ───────────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  STARTER
+  PRO
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  VERIFIED
+  SUSPENDED
+}
+
+enum SimulatorAccess {
+  NONE
+  SELLER_CENTRAL
+  PPC
+  FULL
+}
+
+// ── Models ─────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      Role     @default(STUDENT)
+  avatarUrl String?
+  bio       String?
+
+  // Email verification
+  emailVerificationToken String?  @unique
+  emailVerifiedAt        DateTime?
+  verificationStatus     VerificationStatus @default(UNVERIFIED)
+
+  // Subscription
+  subscriptionTier SubscriptionTier @default(FREE)
+  subscriptionEndsAt          DateTime?
+  paymongoCustomerId           String?   @unique
+  paymongoDefaultPaymentMethod String?
+
+  // AMPH course access
+  simulatorAccess SimulatorAccess @default(NONE)
+  enrolledCourseIds String[]      @default([])
+
+  // Security
+  passwordChangedAt   DateTime?
+  failedLoginCount    Int        @default(0)
+  lockedUntil         DateTime?
+
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  sessions     Session[]
+  enrollments  Enrollment[]
+  orders       Order[]
+  auditLogs    AuditLog[]
+  ppcCampaigns PpcCampaign[]
+
+  @@index([email])
+  @@index([paymongoCustomerId])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenHash  String   @unique
+  userAgent  String?
+  ipAddress  String?
+  expiresAt  DateTime
+
+  // Rotation
+  rotatedFrom String?  @unique
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("sessions")
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  tagline     String
+  description String
+
+  // Pricing
+  priceMinor    Int
+  currency      String  @default("PHP")
+
+  // Content
+  curriculum  Json     // { sections: [{ title, lessons: [{ title, type, content }] }] }
+  coverImage   String?
+  previewVideo String?
+
+  // Meta
+  isPublished    Boolean @default(false)
+  isFeatured     Boolean @default(false)
+  displayOrder   Int     @default(0)
+
+  // PayMongo
+  paymongoPriceId String?
+
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  enrollments Enrollment[]
+  orders      Order[]
+
+  @@map("courses")
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  status     String   @default("active")  // active | cancelled | refunded | expired
+  source     String   @default("direct")  // direct | affiliate | simulator_trial
+
+  // Progress
+  completedLessonIds String[] @default([])
+  lastLessonId       String?
+  progressPercent     Int      @default(0)
+
+  // Coupon
+  couponCode   String?
+  couponDiscount Int?
+
+  // Audit
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("enrollments")
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+
+  // Money (always minor units)
+  subtotalMinor     Int
+  discountMinor     Int     @default(0)
+  platformFeeMinor  Int     @default(0)
+  totalMinor        Int
+  currency          String  @default("PHP")
+
+  // PayMongo
+  paymongoPaymentId  String?  @unique
+  paymongoCheckoutUrl String?
+  paymongoStatus     String?  // pending | paid | failed | expired | refunded | partially_refunded
+  paymongoPaidAt     DateTime?
+
+  // Manual override (e.g. affiliate free enrollment)
+  manuallySetBy     String?
+  manuallySetReason String?
+  manuallySetAt     DateTime?
+
+  // Refund
+  refundReason       String?
+  refundRequestedAt  DateTime?
+  refundProcessedAt  DateTime?
+  refundAmountMinor  Int?
+
+  // Receipt
+  receiptNumber String? @unique
+
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([paymongoPaymentId])
+  @@map("orders")
+}
+
+model PpcCampaign {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name      String
+  budgetMinor Int
+  currency  String   @default("PHP")
+
+  // Simulation state
+  dailySpendMinor  Int      @default(0)
+  impressions      Int      @default(0)
+  clicks           Int      @default(0)
+  conversions      Int      @default(0)
+  avgCpcMinor      Int      @default(0)
+
+  // Daily snapshot roll-up
+  dailySnapshots Json @default("[]")
+
+  status    String   @default("active")  // active | paused | exhausted | ended
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("ppc_campaigns")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Actor tracking
+  actorType  String   @default("user")  // user | system | admin
+  actorId    String?
+  ipAddress  String?
+
+  // What happened
+  action     String   // e.g. "order.created", "user.login_failed"
+  resource   String   // e.g. "order", "user"
+  resourceId String?
+
+  // Details
+  payload    Json     @default("{}")
+
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  from      String
+  subject   String
+  template  String
+  status    String   @default("queued")  // queued | sent | bounced | complained
+  messageId String?  @unique
+
+  // Resend API
+  resendId  String?  @unique
+
+  // Audit
+  createdAt DateTime @default(now())
+  sentAt    DateTime?
+
+  @@index([to])
+  @@index([status])
+  @@map("email_logs")
+}

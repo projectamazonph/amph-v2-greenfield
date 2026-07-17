@@ -1,0 +1,84 @@
+/**
+ * SignUp server action — Story 004.
+ *
+ * The only responsibility of this file is to:
+ * 1. Receive the raw form input from the React component
+ * 2. Call the use case
+ * 3. Return a serializable result (no class instances cross the RPC boundary)
+ *
+ * ADR-020: Server actions are the "thin shell" — no business logic here.
+ * The business logic lives in src/usecases/.
+ */
+
+"use server";
+
+import { SignUp } from "@/usecases/SignUp";
+import { buildContainer } from "@/composition/container";
+import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
+import { revalidatePath } from "next/cache";
+
+export type SignUpState =
+  | { status: "idle" }
+  | { status: "success"; email: string }
+  | {
+      status: "error";
+      error:
+        | { kind: "email_taken" }
+        | { kind: "weak_password"; score: number }
+        | { kind: "invalid_name"; field: "firstName" | "lastName" }
+        | { kind: "invalid_email" }
+        | { kind: "db_error"; message: string }
+        | { kind: "unexpected"; message: string };
+    };
+
+export async function signUpAction(
+  _prevState: SignUpState,
+  formData: FormData,
+): Promise<SignUpState> {
+  const input = {
+    email: formData.get("email") as string | null,
+    password: formData.get("password") as string | null,
+    firstName: formData.get("firstName") as string | null,
+    lastName: formData.get("lastName") as string | null,
+  };
+
+  // Basic null check before calling use case
+  if (!input.email || !input.password || !input.firstName || !input.lastName) {
+    return {
+      status: "error",
+      error: { kind: "invalid_email" }, // degenerate case — shouldn't reach here with proper form validation
+    };
+  }
+
+  try {
+    const container = buildContainer();
+    const useCase = new SignUp(
+      container.userRepo,
+      container.idGen,
+      container.clock,
+      new Argon2PasswordHasher(),
+    );
+
+    const result = await useCase.execute({
+      email: input.email,
+      password: input.password,
+      firstName: input.firstName,
+      lastName: input.lastName,
+    });
+
+    if (!result.ok) {
+      return { status: "error", error: result.error };
+    }
+
+    // Success — revalidate relevant pages and return
+    revalidatePath("/login");
+    return { status: "success", email: result.email };
+  } catch (err) {
+    // TODO: Sentry.captureException in production
+    console.error("[signUpAction] unexpected error:", err);
+    return {
+      status: "error",
+      error: { kind: "unexpected", message: "An unexpected error occurred." },
+    };
+  }
+}
