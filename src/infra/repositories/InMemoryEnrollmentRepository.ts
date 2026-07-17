@@ -50,6 +50,16 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
     return Result.ok(enrollment);
   }
 
+  async update(enrollment: Enrollment): Promise<Result<Enrollment, EnrollmentError>> {
+    if (!this.enrollments.has(enrollment.id)) {
+      return Result.err({ kind: "not_found" });
+    }
+    // Store as mutable copy so callers can mutate progress fields
+    const updated: Enrollment = { ...enrollment };
+    this.enrollments.set(enrollment.id, updated);
+    return Result.ok(updated);
+  }
+
   /** Remove all enrollments. Call between tests. */
   clear(): void {
     this.enrollments.clear();

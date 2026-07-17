@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { Result } from "@/domain/shared/Result";
 import {
   createEnrollment,
@@ -98,8 +98,13 @@ describe("Enrollment", () => {
         couponCode: null,
         couponDiscount: null,
         createdAt: new Date(),
+        completedLessonIds: [],
+        lastLessonId: null,
+        progressPercent: 0,
+        markLessonComplete: vi.fn(),
       };
       expect(enrollment.status).toBe("active");
+      expect(enrollment.progressPercent).toBe(0);
     });
   });
 });
