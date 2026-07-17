@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v4
         with:
@@ -80,7 +80,7 @@ jobs:
       SENTRY_DSN: ""
       EMAIL_VERIFICATION_SECRET: test-verification-secret
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v4
         with:
           version: 9
@@ -126,7 +126,7 @@ jobs:
       SENTRY_DSN: ""
       EMAIL_VERIFICATION_SECRET: test-verification-secret
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v4
         with:
           version: 9
@@ -158,7 +158,7 @@ jobs:
       RESEND_API_KEY: re_test_dummy
       SENTRY_DSN: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v4
         with:
           version: 9
