@@ -2,6 +2,7 @@
  * getLessonData — find a lesson within a course curriculum and compute navigation.
  *
  * STORY-026: Lesson page (RSC + MDX render).
+ * STORY-030: Add nextIncompleteLesson helper.
  */
 
 import type { Course, Lesson } from "@/domain/entities/Course";
@@ -60,6 +61,30 @@ export function getLessonData(course: Course, lessonId: string): LessonData | nu
           lessonIndex: li,
         };
       }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Find the next incomplete lesson after `currentLessonId`.
+ * Used for "Next Lesson" navigation that skips already-completed lessons.
+ *
+ * Returns null if no incomplete lessons remain (course is done).
+ */
+export function nextIncompleteLesson(
+  course: Course,
+  completedLessonIds: readonly string[],
+  currentLessonId: string,
+): Lesson | null {
+  const allLessons = course.curriculum.sections.flatMap((s) => s.lessons);
+  const currentIdx = allLessons.findIndex((l) => l.id === currentLessonId);
+
+  for (let i = currentIdx + 1; i < allLessons.length; i++) {
+    const lesson = allLessons[i]!;
+    if (!completedLessonIds.includes(lesson.id)) {
+      return lesson;
     }
   }
 

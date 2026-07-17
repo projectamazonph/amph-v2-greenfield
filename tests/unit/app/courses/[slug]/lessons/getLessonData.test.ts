@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { Course } from "@/domain/entities/Course";
-import { getLessonData } from "@/app/courses/[slug]/lessons/getLessonData";
+import { getLessonData, nextIncompleteLesson } from "@/app/courses/[slug]/lessons/getLessonData";
 
 /**
  * Tests for the getLessonData helper.
@@ -104,5 +104,50 @@ describe("getLessonData", () => {
     const course = makeCourse(["les_01", "les_02", "les_03", "les_04"]);
     expect(getLessonData(course, "les_01")!.lessonIndex).toBe(0);
     expect(getLessonData(course, "les_02")!.lessonIndex).toBe(1);
+  });
+});
+
+// ── nextIncompleteLesson ──────────────────────────────────────────
+
+describe("nextIncompleteLesson", () => {
+  it("returns first incomplete lesson when none are completed", () => {
+    // 4 IDs → 4 lessons (2 per section) to avoid undefined id on lessonIds[3]
+    const course = makeCourse(["les_01", "les_02", "les_03", "les_04"]);
+    const result = nextIncompleteLesson(course, [], "les_01");
+    expect(result!.id).toBe("les_02"); // next in curriculum after les_01
+  });
+
+  it("skips completed lessons", () => {
+    const course = makeCourse(["les_01", "les_02", "les_03", "les_04"]);
+    // les_01, les_02 are completed, current is les_01
+    const result = nextIncompleteLesson(course, ["les_01", "les_02"], "les_01");
+    expect(result!.id).toBe("les_03");
+  });
+
+  it("returns null when all lessons are complete", () => {
+    const course = makeCourse(["les_01", "les_02", "les_03", "les_04"]);
+    const result = nextIncompleteLesson(course, ["les_01", "les_02", "les_03", "les_04"], "les_01");
+    expect(result).toBeNull();
+  });
+
+  it("skips lessons before current lesson (only looks forward)", () => {
+    const course = makeCourse(["les_01", "les_02", "les_03", "les_04"]);
+    // les_01 is completed, but we're on les_02 — should find les_03
+    const result = nextIncompleteLesson(course, ["les_01"], "les_02");
+    expect(result!.id).toBe("les_03");
+  });
+
+  it("finds next incomplete in next section", () => {
+    const course = makeCourse(["les_01", "les_02", "les_03", "les_04"]);
+    // les_01 completed, current is les_02 (last in section 1)
+    const result = nextIncompleteLesson(course, ["les_01"], "les_02");
+    expect(result!.id).toBe("les_03"); // first incomplete in section 2
+  });
+
+  it("returns null when current lesson is last and no others incomplete", () => {
+    const course = makeCourse(["les_01", "les_02", "les_03", "les_04"]);
+    // les_01, les_02 completed, current is les_03 (last), no incomplete after
+    const result = nextIncompleteLesson(course, ["les_01", "les_02", "les_03", "les_04"], "les_04");
+    expect(result).toBeNull();
   });
 });
