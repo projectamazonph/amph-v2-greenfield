@@ -106,4 +106,12 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(strTriage!.name).toBe("STR Triage");
     simExpect(strTriage!.simulatorId).toBe("str-triage");
   });
+
+  simIt("campaign-builder simulator is the real CampaignBuilderSimulator, not a stub", () => {
+    const c = buildTestContainer();
+    const cb = c.simulatorRegistry.get("campaign-builder");
+    simExpect(cb).not.toBeNull();
+    simExpect(cb!.name).toBe("Campaign Builder");
+    simExpect(cb!.simulatorId).toBe("campaign-builder");
+  });
 });

@@ -12,6 +12,7 @@ import { InMemorySimulatorRegistry } from "@/infra/simulator/InMemorySimulatorRe
 import { StubSimulator } from "@/infra/simulator/StubSimulator";
 import { BidElevatorSimulator } from "@/domain/simulator/bid-elevator/BidElevatorSimulator";
 import { StrTriageSimulator } from "@/domain/simulator/str-triage/StrTriageSimulator";
+import { CampaignBuilderSimulator } from "@/domain/simulator/campaign-builder/CampaignBuilderSimulator";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 
 export function buildSimulatorRegistry(): SimulatorRegistry {
@@ -19,12 +20,7 @@ export function buildSimulatorRegistry(): SimulatorRegistry {
 
   registry.register(new BidElevatorSimulator());
   registry.register(new StrTriageSimulator());
-  registry.register(
-    new StubSimulator<unknown, unknown>({
-      simulatorId: "campaign-builder",
-      name: "Campaign Builder",
-    }),
-  );
+  registry.register(new CampaignBuilderSimulator());
   registry.register(
     new StubSimulator<unknown, unknown>({
       simulatorId: "listing-audit",
