@@ -53,7 +53,12 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
                 <span className="truncate">
                   {si + 1}. {section.title}
                 </span>
-                <span className="ml-auto text-[10px] opacity-60">{section.lessons.length}</span>
+                <span className="ml-auto text-[10px] opacity-60">
+                  {/* Module progress: completed / total */}
+                  {section.lessons.filter((l) => completedLessonIds.includes(l.id)).length}
+                  /
+                  {section.lessons.length}
+                </span>
               </button>
 
               {/* Lessons */}

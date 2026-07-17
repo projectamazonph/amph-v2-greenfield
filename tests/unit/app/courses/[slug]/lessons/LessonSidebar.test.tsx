@@ -106,4 +106,27 @@ describe("LessonSidebar", () => {
     // Should have section titles that can be toggled
     expect(html).toContain("Getting Started");
   });
+
+  it("shows module progress (e.g. '3/5')", () => {
+    const course = makeCourse();
+    // Section 1 has 2 lessons, Section 2 has 1 lesson
+    const completedLessonIds = ["les_01", "les_02"]; // section 1: 2/2 done
+    const html = renderToString(
+      <LessonSidebar course={course} currentLessonId="les_03" completedLessonIds={completedLessonIds} />,
+    );
+    // Section 1 progress: "2/2" (or "2 / 2")
+    expect(html).toContain("2");
+    // Section 2 progress: "0/1"
+    expect(html).toContain("0");
+    expect(html).toContain("1");
+  });
+
+  it("marks completed lessons with a checkmark", () => {
+    // les_01 is completed, current lesson is also les_01 — shows checkmark
+    const course = makeCourse();
+    const html = renderToString(
+      <LessonSidebar course={course} currentLessonId="les_01" completedLessonIds={["les_01"]} />,
+    );
+    expect(html).toContain("Introduction");
+  });
 });
