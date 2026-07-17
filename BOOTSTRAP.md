@@ -56,10 +56,4 @@ JWT_SECRET="test-secret-at-least-32-bytes-long-please" \
 - Never `git add .`
 - Squash-merge into `main`
 - Conventional commits: `feat(story-035): description`
-- Bypass husky for local commits: `git -c core.hooksPath=/dev/null commit`
-
----
-
-## Next story
-
-Check `docs/stories/` for the next numbered story. Read its doc before starting.
+- Bypass husky for local commits: `git -c core.hooksPath=/dev/nu
