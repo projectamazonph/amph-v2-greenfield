@@ -26,7 +26,8 @@ Docs: AGENTS.md → CLAUDE.md → docs/build-spec.md → docs/stories/ (story do
 | #33 | Quiz submission API + RecordQuizAttempt | ✅ merged |
 | #35 | Badge system (Badge, BadgeAward, AwardBadge, ListUserBadges) | ✅ merged |
 | #36 | Simulator infrastructure (ports, entity, registry) | ✅ merged |
-| #37 | *(next — see below)* | — |
+| #37 | Bid Elevator simulator | ✅ merged |
+| #38 | *(next — see below)* | — |
 
 **After any branch switch or `git pull`:** run `npx prisma migrate dev` if the schema has new models that need migration.
 
