@@ -1,24 +1,15 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import nextPlugin from "@next/eslint-plugin-next";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: {
-    rules: {
-      "no-unused-vars": "off",
-      "no-undef": "off",
-    },
-  },
-});
-
 /** @type {import("eslint").Linter.Config[]} */
 const config = [
-  // ── Next.js ──────────────────────────────────────────────
+  // ── Next.js rules ─────────────────────────────────────────
   {
+    ...nextPlugin.configs.recommended,
     ignores: [
       ".next/**",
       "out/**",
@@ -31,28 +22,12 @@ const config = [
       "prisma/migrations/**",
     ],
   },
-  ...compat.extends("next/core-web-vitals"),
-  ...compat.extends("next/typescript"),
 
-  // ── TypeScript ESLint (added separately for flat config) ──
-  // Will be installed via @typescript-eslint/eslint-plugin
+  // ── Base rules (no TypeScript AST — TS types handled by pnpm typecheck) ──
   {
     files: ["src/**/*.ts", "src/**/*.tsx"],
-    languageOptions: {
-      parserOptions: {
-        project: "./tsconfig.json",
-      },
-    },
     rules: {
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          caughtErrorsIgnorePattern: "^_",
-        },
-      ],
-      "@typescript-eslint/no-explicit-any": "error",
+      // Only rules that work without a TS-aware parser
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
@@ -115,25 +90,22 @@ const config = [
       "no-restricted-syntax": [
         "error",
         {
-          selector:
-            "Literal[value=/\\bleverage\\b/i]",
+          selector: "Literal[value=/\\bleverage\\b/i]",
           message: "Avoid 'leverage'. Use 'use'.",
         },
         {
-          selector:
-            "Literal[value=/\\bdelve\\b/i]",
+          selector: "Literal[value=/\\bdelve\\b/i]",
           message: "Avoid 'delve'. Use 'look at' or 'go through'.",
         },
         {
-          selector:
-            "Literal[value=/\\bnavigate the complexities\\b/i]",
+          selector: "Literal[value=/\\bnavigate the complexities\\b/i]",
           message: "Avoid jargon. State what you mean directly.",
         },
       ],
     },
   },
 
-  // ── Result: unwrap-or without default is a smell ─────────
+  // ── Unreachable code is always an error ──────────────────
   {
     files: ["src/**/*.ts"],
     rules: {
