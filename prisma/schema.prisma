@@ -361,3 +361,65 @@ model UserStreak {
 
   @@map("user_streaks")
 }
+
+// ── STORY-031: Quizzes ─────────────────────────────────────────────────────
+
+model Quiz {
+  id           String         @id @default(cuid())
+  courseId     String
+  title        String
+  passingScore Int            @default(70)
+  questions    QuizQuestion[]
+  createdAt    DateTime       @default(now())
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id           String       @id @default(cuid())
+  quizId       String
+  quiz         Quiz        @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionText String
+  options      QuizOption[]
+  order        Int          @default(0)
+
+  @@map("quiz_questions")
+}
+
+model QuizOption {
+  id         String        @id @default(cuid())
+  questionId String
+  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  optionText String
+  isCorrect  Boolean       @default(false)
+  order      Int           @default(0)
+
+  @@map("quiz_options")
+}
+
+model QuizAttempt {
+  id          String                @id @default(cuid())
+  userId      String
+  quizId      String
+  status      String                @default("in_progress")
+  score       Int?
+  passed      Boolean?
+  startedAt   DateTime              @default(now())
+  completedAt DateTime?
+  answers     QuizAttemptAnswer[]
+
+  @@index([userId, quizId])
+  @@index([quizId])
+  @@map("quiz_attempts")
+}
+
+model QuizAttemptAnswer {
+  id               String      @id @default(cuid())
+  attemptId        String
+  attempt          QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId       String
+  selectedOptionId String
+
+  @@unique([attemptId, questionId])
+  @@map("quiz_attempt_answers")
+}
