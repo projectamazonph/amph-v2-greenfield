@@ -40,6 +40,10 @@ import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepo
 import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
 import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
 
+import type { IDiscountCodeRepository } from "@/ports/repositories/IDiscountCodeRepository";
+import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
+import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscountCodeRepository";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -53,6 +57,7 @@ import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
+import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -72,6 +77,7 @@ export interface AppContainer {
   courseRepo: CourseRepository;
   orderRepo: IOrderRepository;
   enrollmentRepo: IEnrollmentRepository;
+  discountCodeRepo: IDiscountCodeRepository;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -81,6 +87,7 @@ export interface AppContainer {
   createPaymentIntent: CreatePaymentIntent;
   checkCourseAccess: CheckCourseAccess;
   enrollStudent: EnrollStudent;
+  applyDiscountCode: ApplyDiscountCode;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -93,6 +100,7 @@ function buildProductionContainer(): AppContainer {
   const courseRepo: CourseRepository = new InMemoryCourseRepository();
   const orderRepo: IOrderRepository = new InMemoryOrderRepository();
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
+  const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -124,6 +132,11 @@ function buildProductionContainer(): AppContainer {
       enrollmentRepo,
       idGen,
     }),
+    discountCodeRepo,
+    applyDiscountCode: new ApplyDiscountCode({
+      discountCodeRepo,
+      clock,
+    }),
   };
 }
 
@@ -134,6 +147,7 @@ export interface TestContainer extends AppContainer {
   courseRepo: InMemoryCourseRepository;
   orderRepo: InMemoryOrderRepository;
   enrollmentRepo: InMemoryEnrollmentRepository;
+  discountCodeRepo: InMemoryDiscountCodeRepository;
   accessPolicy: StubAccessPolicy;
 }
 
@@ -144,6 +158,7 @@ export function buildTestContainer(): TestContainer {
   const courseRepo = new InMemoryCourseRepository();
   const orderRepo = new InMemoryOrderRepository();
   const enrollmentRepo = new InMemoryEnrollmentRepository();
+  const discountCodeRepo = new InMemoryDiscountCodeRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
 
@@ -168,6 +183,11 @@ export function buildTestContainer(): TestContainer {
       courseRepo,
       enrollmentRepo,
       idGen,
+    }),
+    discountCodeRepo,
+    applyDiscountCode: new ApplyDiscountCode({
+      discountCodeRepo,
+      clock,
     }),
     accessPolicy,
   };

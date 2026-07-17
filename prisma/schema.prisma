@@ -292,3 +292,21 @@ model EmailLog {
   @@index([status])
   @@map("email_logs")
 }
+
+// ── STORY-024: Discount Codes ────────────────────────────────
+
+model DiscountCode {
+  id         String   @id @default(cuid())
+  code       String   @unique  // uppercase, e.g. "SAVE20"
+  type       String   // PERCENTAGE | FIXED
+  value      Int      // percentage (1-100) or minor units (e.g. 10000 = PHP 100.00)
+  maxUses    Int?     // null = unlimited
+  usedCount  Int      @default(0)
+  validFrom  DateTime?
+  validUntil DateTime?
+  courseIds  String[] @default([])  // empty = all courses; non-empty = applies only to these
+
+  createdAt  DateTime @default(now())
+
+  @@map("discount_codes")
+}
