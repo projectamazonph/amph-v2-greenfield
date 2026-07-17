@@ -90,4 +90,12 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(c.simulatorRegistry.get("campaign-builder")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("listing-audit")).not.toBeNull();
   });
+
+  simIt("bid-elevator simulator is the real BidElevatorSimulator, not a stub", () => {
+    const c = buildTestContainer();
+    const bidElevator = c.simulatorRegistry.get("bid-elevator");
+    simExpect(bidElevator).not.toBeNull();
+    simExpect(bidElevator!.name).toBe("Bid Elevator");
+    simExpect(bidElevator!.simulatorId).toBe("bid-elevator");
+  });
 });

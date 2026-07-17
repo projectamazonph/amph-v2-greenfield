@@ -10,17 +10,13 @@
 
 import { InMemorySimulatorRegistry } from "@/infra/simulator/InMemorySimulatorRegistry";
 import { StubSimulator } from "@/infra/simulator/StubSimulator";
+import { BidElevatorSimulator } from "@/domain/simulator/bid-elevator/BidElevatorSimulator";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 
 export function buildSimulatorRegistry(): SimulatorRegistry {
   const registry = new InMemorySimulatorRegistry();
 
-  registry.register(
-    new StubSimulator<unknown, unknown>({
-      simulatorId: "bid-elevator",
-      name: "Bid Elevator",
-    }),
-  );
+  registry.register(new BidElevatorSimulator());
   registry.register(
     new StubSimulator<unknown, unknown>({
       simulatorId: "str-triage",
