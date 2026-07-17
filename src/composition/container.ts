@@ -52,6 +52,18 @@ import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRe
 import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
 import { PrismaQuizAttemptRepository } from "@/infra/repositories/PrismaQuizAttemptRepository";
 
+import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
+import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
+import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepository";
+
+import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
+import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepository";
+
+import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
+import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
+import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
+import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -66,6 +78,9 @@ import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
+import { AwardXP } from "@/usecases/AwardXP";
+import { AwardBadge } from "@/usecases/AwardBadge";
+import { ListUserBadges } from "@/usecases/ListUserBadges";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -88,6 +103,9 @@ export interface AppContainer {
   discountCodeRepo: IDiscountCodeRepository;
   quizRepo: IQuizRepository;
   quizAttemptRepo: IQuizAttemptRepository;
+  xpEventRepo: IXPEventRepository;
+  badgeRepo: IBadgeRepository;
+  badgeAwardRepo: IBadgeAwardRepository;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -98,6 +116,9 @@ export interface AppContainer {
   checkCourseAccess: CheckCourseAccess;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
+  awardXp: AwardXP;
+  awardBadge: AwardBadge;
+  listUserBadges: ListUserBadges;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -113,6 +134,9 @@ function buildProductionContainer(): AppContainer {
   const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
   const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
+  const xpEventRepo: IXPEventRepository = new PrismaXPEventRepository(prisma);
+  const badgeRepo: IBadgeRepository = new PrismaBadgeRepository(prisma);
+  const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -151,6 +175,17 @@ function buildProductionContainer(): AppContainer {
     }),
     quizRepo,
     quizAttemptRepo,
+    xpEventRepo,
+    badgeRepo,
+    badgeAwardRepo,
+    awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+    awardBadge: new AwardBadge({
+      badgeRepo,
+      badgeAwardRepo,
+      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+      idGen,
+    }),
+    listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
   };
 }
 
@@ -164,6 +199,9 @@ export interface TestContainer extends AppContainer {
   discountCodeRepo: InMemoryDiscountCodeRepository;
   quizRepo: InMemoryQuizRepository;
   quizAttemptRepo: InMemoryQuizAttemptRepository;
+  xpEventRepo: InMemoryXPEventRepository;
+  badgeRepo: InMemoryBadgeRepository;
+  badgeAwardRepo: InMemoryBadgeAwardRepository;
   accessPolicy: StubAccessPolicy;
 }
 
@@ -177,6 +215,9 @@ export function buildTestContainer(): TestContainer {
   const discountCodeRepo = new InMemoryDiscountCodeRepository();
   const quizRepo = new InMemoryQuizRepository();
   const quizAttemptRepo = new InMemoryQuizAttemptRepository();
+  const xpEventRepo = new InMemoryXPEventRepository();
+  const badgeRepo = new InMemoryBadgeRepository();
+  const badgeAwardRepo = new InMemoryBadgeAwardRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
 
@@ -209,6 +250,17 @@ export function buildTestContainer(): TestContainer {
     }),
     quizRepo,
     quizAttemptRepo,
+    xpEventRepo,
+    badgeRepo,
+    badgeAwardRepo,
+    awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+    awardBadge: new AwardBadge({
+      badgeRepo,
+      badgeAwardRepo,
+      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+      idGen,
+    }),
+    listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
     accessPolicy,
   };
 }
@@ -227,7 +279,7 @@ export function getContainer(): AppContainer {
   if (!container) {
     throw new Error(
       "No container in scope. Are you calling getContainer() outside of a server action? " +
-      "All container access must go through runWithContainer().",
+        "All container access must go through runWithContainer().",
     );
   }
   return container;

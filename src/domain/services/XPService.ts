@@ -57,7 +57,8 @@ export class XPService {
       reason === "lesson_completed" ||
       reason === "course_completed" ||
       reason === "quiz_passed" ||
-      reason === "streak_bonus"
+      reason === "streak_bonus" ||
+      reason === "badge_awarded"
     );
   }
 }
