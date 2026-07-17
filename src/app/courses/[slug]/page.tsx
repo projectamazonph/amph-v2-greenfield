@@ -111,7 +111,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <span className="text-[var(--text-secondary)] text-sm group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <ul className="border-t border-[var(--border)]">
-                <LessonList lessons={section.lessons as readonly Lesson[]} />
+                <LessonList lessons={section.lessons as readonly Lesson[]} courseSlug={course.slug} />
               </ul>
             </details>
           ))}
@@ -137,7 +137,7 @@ function ClockIcon() {
   );
 }
 
-function LessonList({ lessons }: { lessons: readonly Lesson[] }) {
+function LessonList({ lessons, courseSlug }: { lessons: readonly Lesson[]; courseSlug: string }) {
   const items: React.ReactNode[] = [];
   for (let i = 0; i < lessons.length; i++) {
     const lessonItem = lessons[i];
@@ -151,7 +151,12 @@ function LessonList({ lessons }: { lessons: readonly Lesson[] }) {
         className="flex items-center gap-3 px-5 py-3 text-sm text-[var(--text-secondary)] border-b border-[var(--border)] last:border-0"
       >
         <LessonTypeIcon type={lessonItem.type} />
-        <span>{lessonItem.title}</span>
+        <Link
+          href={`/courses/${courseSlug}/lessons/${lessonItem.id}`}
+          className="flex-1 hover:text-[var(--text)] transition-colors"
+        >
+          {lessonItem.title}
+        </Link>
         {vid && <span className="ml-auto text-xs opacity-60">{vid}</span>}
       </li>,
     );
