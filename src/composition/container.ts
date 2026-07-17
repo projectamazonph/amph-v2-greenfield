@@ -63,6 +63,7 @@ import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepositor
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
 import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
+import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
 // ── Payment ports ────────────────────────────────────────────
 
@@ -81,6 +82,7 @@ import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
+import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 import { ListUserBadges } from "@/usecases/ListUserBadges";
 
 // ── Access policy ────────────────────────────────────────────
@@ -107,6 +109,7 @@ export interface AppContainer {
   xpEventRepo: IXPEventRepository;
   badgeRepo: IBadgeRepository;
   badgeAwardRepo: IBadgeAwardRepository;
+  simulatorRegistry: SimulatorRegistry;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -196,6 +199,7 @@ function buildProductionContainer(): AppContainer {
       idGen,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
+    simulatorRegistry: buildSimulatorRegistry(),
   };
 }
 
@@ -280,6 +284,7 @@ export function buildTestContainer(): TestContainer {
       idGen,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
+    simulatorRegistry: buildSimulatorRegistry(),
   };
 }
 
