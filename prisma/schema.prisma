@@ -86,6 +86,7 @@ model User {
   orders       Order[]
   auditLogs    AuditLog[]
   ppcCampaigns PpcCampaign[]
+  certificates Certificate[]
 
   @@index([email])
   @@index([paymongoCustomerId])
@@ -143,6 +144,7 @@ model Course {
   // Relations
   enrollments Enrollment[]
   orders      Order[]
+  certificates Certificate[]
 
   @@map("courses")
 }
@@ -447,4 +449,25 @@ model BadgeAward {
   @@unique([userId, badgeSlug])
   @@index([userId])
   @@map("badge_awards")
+}
+
+// ── Certificates ───────────────────────────────────────────────────────────
+
+model Certificate {
+  id               String   @id // ULID
+  userId           String
+  courseId         String
+  verificationHash String   @unique
+  issuedAt         DateTime @default(now())
+  revokedAt        DateTime?
+  revokedReason    String?
+  status           String   @default("active") // active | revoked
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId]) // one cert per (user, course)
+  @@index([userId])
+  @@index([verificationHash])
+  @@map("certificates")
 }

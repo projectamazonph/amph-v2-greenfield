@@ -35,7 +35,8 @@ export const VALID_XP_REASONS: readonly string[] = [
 export type XPEventError =
   | { kind: "invalid_user_id" }
   | { kind: "invalid_amount" }
-  | { kind: "invalid_reason" };
+  | { kind: "invalid_reason" }
+  | { kind: "db_error"; message: string };
 
 export type CreateXPEventParams = {
   id: string;

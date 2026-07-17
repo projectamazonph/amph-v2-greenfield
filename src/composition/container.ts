@@ -65,6 +65,13 @@ import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadge
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
+import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
+import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
+import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
+import type { CertificateHashGenerator } from "@/ports/security/CertificateHashGenerator";
+import { NodeCertificateHashGenerator } from "@/infra/security/NodeCertificateHashGenerator";
+import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHashGenerator";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -84,6 +91,7 @@ import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 import { ListUserBadges } from "@/usecases/ListUserBadges";
+import { IssueCertificate } from "@/usecases/IssueCertificate";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -109,10 +117,12 @@ export interface AppContainer {
   xpEventRepo: IXPEventRepository;
   badgeRepo: IBadgeRepository;
   badgeAwardRepo: IBadgeAwardRepository;
+  certificateRepo: ICertificateRepository;
   simulatorRegistry: SimulatorRegistry;
 
   // External services
   paymentGateway: IPaymentGateway;
+  certificateHashGen: CertificateHashGenerator;
 
   // Use cases
   signUp: SignUp;
@@ -124,6 +134,7 @@ export interface AppContainer {
   awardXp: AwardXP;
   awardBadge: AwardBadge;
   listUserBadges: ListUserBadges;
+  issueCertificate: IssueCertificate;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -142,6 +153,7 @@ function buildProductionContainer(): AppContainer {
   const xpEventRepo: IXPEventRepository = new PrismaXPEventRepository(prisma);
   const badgeRepo: IBadgeRepository = new PrismaBadgeRepository(prisma);
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
+  const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -150,6 +162,7 @@ function buildProductionContainer(): AppContainer {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo);
+  const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
 
   return {
     clock,
@@ -199,7 +212,17 @@ function buildProductionContainer(): AppContainer {
       idGen,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
+    certificateRepo,
+    certificateHashGen,
     simulatorRegistry: buildSimulatorRegistry(),
+    issueCertificate: new IssueCertificate({
+      enrollmentRepo,
+      courseRepo,
+      certificateRepo,
+      hashGen: certificateHashGen,
+      idGen,
+      clock,
+    }),
   };
 }
 
@@ -216,6 +239,7 @@ export interface TestContainer extends AppContainer {
   xpEventRepo: InMemoryXPEventRepository;
   badgeRepo: InMemoryBadgeRepository;
   badgeAwardRepo: InMemoryBadgeAwardRepository;
+  certificateRepo: InMemoryCertificateRepository;
   accessPolicy: StubAccessPolicy;
 }
 
@@ -232,8 +256,10 @@ export function buildTestContainer(): TestContainer {
   const xpEventRepo = new InMemoryXPEventRepository();
   const badgeRepo = new InMemoryBadgeRepository();
   const badgeAwardRepo = new InMemoryBadgeAwardRepository();
+  const certificateRepo = new InMemoryCertificateRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
+  const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
 
   return {
     clock,
@@ -267,6 +293,8 @@ export function buildTestContainer(): TestContainer {
     xpEventRepo,
     badgeRepo,
     badgeAwardRepo,
+    certificateRepo,
+    certificateHashGen,
     accessPolicy,
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,
@@ -284,6 +312,14 @@ export function buildTestContainer(): TestContainer {
       idGen,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
+    issueCertificate: new IssueCertificate({
+      enrollmentRepo,
+      courseRepo,
+      certificateRepo,
+      hashGen: certificateHashGen,
+      idGen,
+      clock,
+    }),
     simulatorRegistry: buildSimulatorRegistry(),
   };
 }
