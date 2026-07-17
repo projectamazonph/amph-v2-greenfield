@@ -1,5 +1,7 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
 import nextPlugin from "@next/eslint-plugin-next";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -7,6 +9,17 @@ const __dirname = dirname(__filename);
 
 /** @type {import("eslint").Linter.Config[]} */
 const config = [
+  // ── Ignore non-TypeScript files ────────────────────────────
+  {
+    ignores: [
+      "**/*.md",
+      "**/*.mdx",
+      "**/*.json",
+      "**/*.yaml",
+      "**/*.yml",
+    ],
+  },
+
   // ── Next.js rules ─────────────────────────────────────────
   {
     ...nextPlugin.configs.recommended,
@@ -23,12 +36,21 @@ const config = [
     ],
   },
 
-  // ── Base rules (no TypeScript AST — TS types handled by pnpm typecheck) ──
+  // ── TypeScript base rules ────────────────────────────────────
   {
     files: ["src/**/*.ts", "src/**/*.tsx"],
+    plugins: {
+      "@typescript-eslint": tsPlugin,
+    },
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: "./tsconfig.json",
+      },
+    },
     rules: {
-      // Only rules that work without a TS-aware parser
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "@typescript-eslint/no-explicit-any": "error",
+      "no-console": ["warn", { allow: ["warn", "error", "debug"] }],
     },
   },
 
