@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 
 type PasswordHasher = {

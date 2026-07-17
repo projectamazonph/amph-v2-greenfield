@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Result } from "../Result";
+import { Result } from "@/domain/shared/Result";
 
 /**
  * Exhaustive discriminated union tests.
@@ -63,8 +63,6 @@ describe("PaymentError discriminated union", () => {
         case "expired_card":
           return;
         default: {
-          // This const assignment proves exhaustiveness:
-          // If TypeScript compiles, all cases are handled.
           const _exhaustive: never = err;
           return _exhaustive;
         }

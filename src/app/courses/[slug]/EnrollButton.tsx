@@ -8,7 +8,7 @@
 import { useActionState } from "react";
 import { enrollStudent } from "@/app/actions/enroll";
 import type { EnrollStudentOutput } from "@/usecases/EnrollStudent";
-import { Money } from "@/lib/Money";
+import { Money } from "@/domain/values/Money";
 
 type EnrollState = EnrollStudentOutput | null;
 

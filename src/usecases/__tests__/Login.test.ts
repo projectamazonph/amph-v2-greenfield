@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";

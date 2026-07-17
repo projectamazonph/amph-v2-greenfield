@@ -10,7 +10,7 @@
  */
 
 import type { CourseRepository, CourseError } from "@/ports/repositories/CourseRepository";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export type EnrollStudentError =
   | CourseError

@@ -8,7 +8,7 @@
  */
 
 import type { User } from "@/domain/entities/User";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export type UserError =
   | { kind: "not_found" }

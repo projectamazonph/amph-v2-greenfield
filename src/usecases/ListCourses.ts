@@ -6,7 +6,7 @@
  */
 
 import type { CourseRepository, CourseError } from "@/ports/repositories/CourseRepository";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 import type { Course } from "@/domain/entities/Course";
 
 export type ListCoursesError = CourseError;

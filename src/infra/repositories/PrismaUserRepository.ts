@@ -6,7 +6,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 import type { UserRepository, UserError } from "@/ports/repositories/UserRepository";
 import type { Role } from "@/domain/entities/User";
 

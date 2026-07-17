@@ -5,7 +5,7 @@
  */
 
 import type { Course } from "@/domain/entities/Course";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export type CourseError =
   | { kind: "not_found" }

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { ListCourses } from "@/usecases/ListCourses";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createCourse, type Course } from "@/domain/entities/Course";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 function makeCourse(overrides: Partial<Parameters<typeof createCourse>[0]> = {}): Course {
   const r = createCourse({

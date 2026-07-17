@@ -7,7 +7,7 @@
  * ADR-014: Every port method returns Result. Never throws across layer boundaries.
  */
 
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export type HashError = { kind: "hash_error" };
 export type VerifyError = { kind: "verify_error" };

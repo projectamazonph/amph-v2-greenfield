@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Result } from "../Result";
+import { Result } from "@/domain/shared/Result";
 
 describe("Result", () => {
   describe("constructors", () => {
@@ -9,7 +9,7 @@ describe("Result", () => {
       if (r.ok) expect(r.value).toBe(42);
     });
 
-    it("err() wraps an error with ok=false", () => {
+    it("err() wraps a failure with ok=false", () => {
       const r = Result.err({ kind: "boom", message: "explode" });
       expect(r.ok).toBe(false);
       if (!r.ok) expect(r.error).toEqual({ kind: "boom", message: "explode" });
@@ -112,7 +112,6 @@ describe("Result", () => {
     it("isOk narrows correctly", () => {
       const r: Result<number, string> = Result.ok(1);
       if (Result.isOk(r)) {
-        // TypeScript should know r.value is number here
         const _n: number = r.value;
         expect(_n).toBe(1);
       } else {
@@ -123,7 +122,6 @@ describe("Result", () => {
     it("isErr narrows correctly", () => {
       const r: Result<number, string> = Result.err("nope");
       if (Result.isErr(r)) {
-        // TypeScript should know r.error is string here
         const _e: string = r.error;
         expect(_e).toBe("nope");
       } else {
@@ -144,7 +142,6 @@ describe("Result", () => {
     it("exhaustively handles all error kinds via switch", () => {
       const r = findUser("1");
       if (!r.ok) {
-        // Exhaustive switch on r.error.kind
         switch (r.error.kind) {
           case "not_found":
             throw new Error("not found");

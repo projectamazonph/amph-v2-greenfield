@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Money } from "../Money";
+import { Money } from "@/domain/values/Money";
 
 describe("Money", () => {
   describe("construction", () => {

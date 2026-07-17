@@ -4,7 +4,7 @@
 
 import type { Course } from "@/domain/entities/Course";
 import type { CourseRepository, CourseError } from "@/ports/repositories/CourseRepository";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export class InMemoryCourseRepository implements CourseRepository {
   private courses = new Map<string, Course>();

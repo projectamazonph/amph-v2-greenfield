@@ -10,7 +10,7 @@
  */
 
 import { createRequire } from "node:module";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 import type { PasswordHasher, HashError, VerifyError } from "@/ports/security/PasswordHasher";
 
 const require = createRequire(import.meta.url);

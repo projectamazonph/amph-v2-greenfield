@@ -12,7 +12,7 @@
  * Returns Result<T, E> — never throws across the layer boundary.
  */
 
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 import type { UserRepository, UserError } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";

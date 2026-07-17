@@ -8,7 +8,7 @@
  * No exceptions cross the layer boundary — Result<T, E> only.
  */
 
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 import type { UserRepository, UserError } from "@/ports/repositories/UserRepository";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { SessionRepository, SessionRecord } from "@/ports/repositories/SessionRepository";

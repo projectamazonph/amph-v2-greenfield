@@ -11,7 +11,7 @@
  * - Locked accounts cannot authenticate
  */
 
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 
 export type Role = "STUDENT" | "INSTRUCTOR" | "ADMIN";
 export type SubscriptionTier = "FREE" | "STARTER" | "PRO";

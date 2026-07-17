@@ -4,13 +4,13 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { Result } from "@/lib/Result";
+import { Result } from "@/domain/shared/Result";
 import { SignUp } from "../SignUp";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
-import { Result as R } from "@/lib/Result";
+import { Result as R } from "@/domain/shared/Result";
 
 /** Fast stub hasher for unit tests — no Argon2 overhead. */
 class StubHasher implements PasswordHasher {

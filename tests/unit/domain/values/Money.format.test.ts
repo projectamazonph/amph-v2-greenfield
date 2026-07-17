@@ -1,9 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { Money } from "../Money";
+import { Money } from "@/domain/values/Money";
 
 /**
- * Format helpers — these live here because they are pure formatters
- * with no side effects. No need to mock anything.
+ * Format helpers — pure formatters with no side effects.
  */
 
 describe("Money.format()", () => {

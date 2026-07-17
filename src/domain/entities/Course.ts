@@ -9,8 +9,8 @@
  * Fail Fast: Invalid states are rejected at construction.
  */
 
-import { Result } from "@/lib/Result";
-import { Money } from "@/lib/Money";
+import { Result } from "@/domain/shared/Result";
+import { Money } from "@/domain/values/Money";
 
 export type CourseStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 export type LessonType = "VIDEO" | "TEXT" | "QUIZ";
