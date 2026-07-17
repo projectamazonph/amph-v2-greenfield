@@ -116,6 +116,47 @@ function makeProgressEventRepo(): IProgressEventRepository {
   };
 }
 
+function makeUserRepo(): import("@/ports/repositories/UserRepository").UserRepository {
+  return {
+    findById: vi.fn(async () => Result.ok({
+      id: USER_ID,
+      email: "student@example.com",
+      firstName: "Test",
+      lastName: "Student",
+      role: "STUDENT" as const,
+      subscriptionTier: "PRO" as const,
+      verificationStatus: "VERIFIED" as const,
+      enrolledCourseIds: [],
+      createdAt: new Date(),
+      totalXp: 0,
+    })),
+    findByEmail: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    emailExists: vi.fn(),
+    getPasswordHash: vi.fn(),
+    updateTotalXp: vi.fn(async (id: string, xp: number) => Result.ok({
+      id: USER_ID,
+      email: "student@example.com",
+      firstName: "Test",
+      lastName: "Student",
+      role: "STUDENT" as const,
+      subscriptionTier: "PRO" as const,
+      verificationStatus: "VERIFIED" as const,
+      enrolledCourseIds: [],
+      createdAt: new Date(),
+      totalXp: xp,
+    })),
+  };
+}
+
+function makeXPEventRepo(): import("@/ports/repositories/IXPEventRepository").IXPEventRepository {
+  return {
+    create: vi.fn(async (e) => Result.ok(e)),
+    findByUserId: vi.fn(),
+  };
+}
+
 describe("MarkLessonComplete", () => {
   // ── happy path ───────────────────────────────────────────
 
@@ -126,6 +167,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(enrollment),
       courseRepo: makeCourseRepo(course),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -150,6 +193,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(enrollment),
       courseRepo: makeCourseRepo(course),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -169,6 +214,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: mockRepo,
       courseRepo: makeCourseRepo(course),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -186,6 +233,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(enrollment),
       courseRepo: makeCourseRepo(course),
       progressEventRepo: mockEventRepo,
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -196,6 +245,7 @@ describe("MarkLessonComplete", () => {
     if (!result.ok) return;
     expect(result.value.progressEvent.type).toBe("lesson_completed");
     expect(result.value.progressEvent.lessonId).toBe("les_01");
+    // progressEventRepo.create called once (lesson_completed); xpEventRepo.create called async
     expect(mockEventRepo.create).toHaveBeenCalledOnce();
   });
 
@@ -206,6 +256,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(enrollment),
       courseRepo: makeCourseRepo(course),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -226,6 +278,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(null),
       courseRepo: makeCourseRepo(makeCourse(["les_01"])),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -243,6 +297,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(enrollment),
       courseRepo: makeCourseRepo(makeCourse(["les_01"])),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -260,6 +316,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(enrollment),
       courseRepo: makeCourseRepo(null),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -278,6 +336,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(enrollment),
       courseRepo: makeCourseRepo(course),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
@@ -296,6 +356,8 @@ describe("MarkLessonComplete", () => {
       enrollmentRepo: makeEnrollmentRepo(enrollment),
       courseRepo: makeCourseRepo(course),
       progressEventRepo: makeProgressEventRepo(),
+      xpEventRepo: makeXPEventRepo(),
+      userRepo: makeUserRepo(),
       idGen: mockIdGen,
       clock: mockClock,
     });
