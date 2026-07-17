@@ -1,0 +1,36 @@
+# CODEOWNERS
+# Each line is a file pattern followed by one or more owners.
+# Order matters: later patterns override earlier ones.
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+*                               @projectamazonph
+
+# Documentation requires a docs-savvy reviewer
+/docs/                          @projectamazonph
+*.md                            @projectamazonph
+
+# Architecture-critical: domain and ports changes need explicit review
+/src/domain/                    @projectamazonph
+/src/ports/                     @projectamazonph
+
+# Use cases orchestrate; less surface for breakage but still architecture-critical
+/src/usecases/                  @projectamazonph
+
+# Infrastructure adapters (third-party SDKs, schemas) — explicit review
+/prisma/                        @projectamazonph
+/src/infra/                     @projectamazonph
+
+# Composition root wires the dependency graph — single owner
+/src/composition/               @projectamazonph
+
+# CI / infra
+/.github/                       @projectamazonph
+/package.json                   @projectamazonph
+/pnpm-lock.yaml                 @projectamazonph
+
+# Stories and sprint plans — sprint cadence review
+/docs/sprint-*/                 @projectamazonph
+/docs/stories/                  @projectamazonph
+/docs/sprint-plan.md            @projectamazonph
+/docs/decisions.md              @projectamazonph

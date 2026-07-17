@@ -1,0 +1,57 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Asia/Manila"
+    open-pull-requests-limit: 10
+    groups:
+      production-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "@prisma/*"
+          - "next"
+          - "react"
+          - "react-dom"
+          - "jose"
+          - "zod"
+          - "pino"
+          - "resend"
+          - "paymongo"
+          - "@phosphor-icons/react"
+          - "@sentry/nextjs"
+          - "@react-pdf/renderer"
+          - "clsx"
+          - "marked"
+      development-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "@playwright/*"
+          - "vitest"
+          - "@types/*"
+          - "eslint"
+          - "prettier"
+          - "husky"
+    ignore:
+      # Lesson learned from legacy amph-v2: do not bump these majors until
+      # the toolchain below them supports them. See SESSION-HANDOVER.md
+      # "Issue 4b" in the legacy repo for the full root-cause analysis.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

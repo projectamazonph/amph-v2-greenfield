@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-17 (greenfield documentation set, day 0)
+**Updated:** 2026-07-17 (greenfield documentation set + repo bootstrap, day 0)
 
 ---
 
@@ -8,24 +8,53 @@
 
 | Metric | Value |
 |--------|-------|
-| Phase | **Day 0 — greenfield scaffold + documentation** |
-| Repo state | Empty, ready for `pnpm create next-app` |
+| Phase | **Day 0 — greenfield repo bootstrapped, docs-first** |
+| Repo | `projectamazonph/amph-v2-greenfield` (public) |
+| Default branch | `main` (squash-merge only, branches auto-delete on merge) |
+| Topics | `amph`, `amazon-ppc`, `filipino-va`, `nextjs16`, `prisma7`, `paymongo`, `resend`, `solid`, `clean-architecture`, `hexagonal-architecture`, `domain-driven-design`, `typescript`, `vitest`, `playwright`, `sentry`, `documentation` |
+| Issues / Discussions | enabled; Projects + Wiki | disabled |
 | Architecture | SOLID five-layer (`domain/`, `ports/`, `usecases/`, `infra/`, `app/`, `composition/`) |
-| Documentation | Complete: `README.md`, `AGENTS.md`, `CLAUDE.md`, `FEATURES.md`, `CHANGELOG.md`, `docs/` (12 files) |
+| Documentation | Complete: 23 .md files in the root + `docs/` tree |
+| Repo hygiene | `LICENSE` (proprietary), `CODEOWNERS`, `CONTRIBUTING.md`, `.gitignore`, `.github/CODE_OF_CONDUCT.md`, `.github/SECURITY.md`, `.github/PULL_REQUEST_TEMPLATE.md`, 3 issue templates, `.github/workflows/ci.yml`, `.github/dependabot.yml` |
 | First sprint | Planned: `docs/sprint-1/PLAN.md` |
 | First story | STORY-001: foundation + Result + Money + Clock + IdGenerator + ESLint boundary |
-| Last commit | None yet (this is day 0) |
-| Lint | N/A |
+| Last commit | `bbb3b74` (docs) — `main` HEAD; next commit will be the repo-hygiene bundle above |
+| Lint | N/A (no code yet) |
 | Typecheck | N/A |
 | Tests | N/A |
 | Database | Not provisioned |
 | Production | Not deployed |
+| GitHub PAT | Stored as secret `GITHUB_TOKEN_PAT` for this session; recommend revoke + re-issue with fine-grained scope when convenient. |
 
 ---
 
 ## What Was Done This Session
 
-The user asked for the full documentation set to mirror the legacy `amph-v2` repo (`README.md`, `AGENTS.md`, `CLAUDE.md`, `FEATURES.md`, `CHANGELOG.md`, `docs/`) but for a greenfield, SOLID-layered build. No code yet — docs only.
+The user asked for the full documentation set to mirror the legacy `amph-v2` repo (`README.md`, `AGENTS.md`, `CLAUDE.md`, `FEATURES.md`, `CHANGELOG.md`, `docs/`) but for a greenfield, SOLID-layered build. No code yet — docs only. Then asked to create a new GitHub repo and push, then to "update everything on the repo."
+
+### Deliverables (this session, cumulative)
+
+- `README.md` — top-level, matches the legacy tone (hero, audience, what's inside, status table, command list, repo layout).
+- `AGENTS.md` — six rules (legacy's five plus the new "dependency direction is inward" rule), voice, design system, architecture, database, business layer, admin, curriculum, code style, testing, commits, branching, CI, file dependency chain, SOLID contract, don'ts, error protocol, feature recipe, Memoria protocol.
+- `CLAUDE.md` — what Claude Code needs to know: the five layers, the recipe for adding a feature, the boundary rules.
+- `FEATURES.md` — the full surface area, 13 sections, every feature described in user-facing language.
+- `CHANGELOG.md` — `[Unreleased]` section for the greenfield, with a reference pointer to the legacy changelog. Updated again to record the repo bootstrap.
+- `docs/product-brief.md` — what, why, audience, value, tiers, scope.
+- `docs/decisions.md` — ADRs 001 through 021. ADRs 013–019 are new for the SOLID architecture.
+- `docs/build-spec.md` — the engineering build spec, layer by layer.
+- `docs/business-layer.md` — pricing, checkout, refunds, receipts.
+- `docs/db-schema.md` — every Prisma model, every field, every index.
+- `docs/api-reference.md` — every port method, every use case I/O, every server action, every route.
+- `docs/admin-backend.md` — every admin route, every guard, every audit-log event.
+- `docs/voice-guide.md` — banned phrases, sentence-level rules.
+- `docs/design-brief.md` — the Field Manual direction.
+- `docs/ai-removal.md` — what AI used to do, what replaced it.
+- `docs/sprint-plan.md` — 12 sprints, story by story.
+- `docs/sprint-1/PLAN.md` — Sprint 1 detailed plan.
+- `docs/stories/STORY-001.md` through `STORY-010.md` — the first 10 stories.
+- `docs/security/tenant-isolation.md` — isolation guard table.
+- `docs/runbooks/README.md` — runbook index (runbooks themselves authored as their respective sprints ship).
+- `LICENSE` (proprietary), `CODEOWNERS`, `CONTRIBUTING.md`, `.gitignore`, `.github/CODE_OF_CONDUCT.md`, `.github/SECURITY.md`, `.github/PULL_REQUEST_TEMPLATE.md`, three issue templates, `.github/workflows/ci.yml`, `.github/dependabot.yml`.
 
 ### Deliverables
 
