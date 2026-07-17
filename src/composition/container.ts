@@ -44,6 +44,14 @@ import type { IDiscountCodeRepository } from "@/ports/repositories/IDiscountCode
 import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
 import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscountCodeRepository";
 
+import type { IQuizRepository } from "@/ports/repositories/IQuizRepository";
+import { InMemoryQuizRepository } from "@/infra/repositories/InMemoryQuizRepository";
+import { PrismaQuizRepository } from "@/infra/repositories/PrismaQuizRepository";
+
+import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRepository";
+import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
+import { PrismaQuizAttemptRepository } from "@/infra/repositories/PrismaQuizAttemptRepository";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -78,6 +86,8 @@ export interface AppContainer {
   orderRepo: IOrderRepository;
   enrollmentRepo: IEnrollmentRepository;
   discountCodeRepo: IDiscountCodeRepository;
+  quizRepo: IQuizRepository;
+  quizAttemptRepo: IQuizAttemptRepository;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -101,6 +111,8 @@ function buildProductionContainer(): AppContainer {
   const orderRepo: IOrderRepository = new InMemoryOrderRepository();
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
   const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
+  const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
+  const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -137,6 +149,8 @@ function buildProductionContainer(): AppContainer {
       discountCodeRepo,
       clock,
     }),
+    quizRepo,
+    quizAttemptRepo,
   };
 }
 
@@ -148,6 +162,8 @@ export interface TestContainer extends AppContainer {
   orderRepo: InMemoryOrderRepository;
   enrollmentRepo: InMemoryEnrollmentRepository;
   discountCodeRepo: InMemoryDiscountCodeRepository;
+  quizRepo: InMemoryQuizRepository;
+  quizAttemptRepo: InMemoryQuizAttemptRepository;
   accessPolicy: StubAccessPolicy;
 }
 
@@ -159,6 +175,8 @@ export function buildTestContainer(): TestContainer {
   const orderRepo = new InMemoryOrderRepository();
   const enrollmentRepo = new InMemoryEnrollmentRepository();
   const discountCodeRepo = new InMemoryDiscountCodeRepository();
+  const quizRepo = new InMemoryQuizRepository();
+  const quizAttemptRepo = new InMemoryQuizAttemptRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
 
@@ -189,6 +207,8 @@ export function buildTestContainer(): TestContainer {
       discountCodeRepo,
       clock,
     }),
+    quizRepo,
+    quizAttemptRepo,
     accessPolicy,
   };
 }
