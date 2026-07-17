@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-17 (greenfield documentation set + repo bootstrap, day 0)
+**Updated:** 2026-07-17 — Sprint 1 in progress. 5 PRs open. Check CI on each.
 
 ---
 
@@ -157,6 +157,43 @@ Other agents (Atlas on phone OpenClaw, Vader on phone Hermes) share the same mem
 
 ---
 
+## Open PRs
+
+| # | Branch | Stories | Tests |
+|---|--------|---------|-------|
+| [#6](https://github.com/projectamazonph/amph-v2-greenfield/pull/6) | `feature/story-001-006-foundation` | 001–006: foundation | 161 pass |
+| [#7](https://github.com/projectamazonph/amph-v2-greenfield/pull/7) | `feature/story-008` | 008: Course entity | deps on #6 |
+| [#8](https://github.com/projectprojectamazonph/amph-v2-greenfield/pull/8) | `feature/story-012` | 012: Login + Session | deps on #6+7 |
+| [#9](https://github.com/projectamazonph/amph-v2-greenfield/pull/9) | `feature/story-016-017` | 016–017: catalog + enrollment | deps on #6+7+8+10 |
+| [#10](https://github.com/projectamazonph/amph-v2-greenfield/pull/10) | `feature/story-013` | 013: JWT tokens + middleware | deps on #6+8 |
+
+> **TODO (next session):** Check CI status on all 5 PRs once builds complete. If any fail, fix and re-push on the respective branch. Merge order: #6 → #7 → #8 → #10 → #9.
+
 ## Daily Log
 
-(Empty. Add entries here as work progresses. Format: `### YYYY-MM-DD — <one-line summary>` followed by what was asked, what was done, what was explicitly not done, what the next agent should do. Mirror the legacy `amph-v2` SESSION-HANDOVER cadence.)
+### 2026-07-17 — Sprint 1: foundation + first 4 stories shipped as 5 PRs
+
+**Asked:** Full greenfield rebuild of AMPH Academy v2 with SOLID architecture, TDD, docs-first.
+
+**Done:**
+- Full documentation set (23 .md files, ADRs 001–021)
+- Repo bootstrapped (`projectamazonph/amph-v2-greenfield`, squash-only, auto-delete branches)
+- Stories 001–006: `Result<T,E>`, `Money`, `Clock`, `IdGenerator`, `User`, `SignUp`, `Argon2PasswordHasher`
+- Story 008: `Course` entity with fail-fast domain rules
+- Story 012: `Login` use case + `SessionRepository` port + `Session` entity
+- Stories 016–017: `ListCourses`, `GetCourse`, `EnrollStudent` + `/courses` catalog + `/courses/[slug]` detail + enrollment action
+- Story 013: `JwtService` port + `JoseJwtService` adapter + `Login` signs JWT + middleware verifies JWT on protected routes
+- 161 unit tests, 16 test files, 0 TypeScript errors
+- 5 PRs opened with `feature/*` branches
+
+**Not done:**
+- CI not yet verified on any PR
+- Database not provisioned
+- No real auth pages beyond `/signup`
+- `pnpm-lock.yaml` updated with `jose` dep
+
+**Next agent:**
+1. Check CI on PRs #6–#10. Fix any failures.
+2. Merge PRs in order: #6 → #7 → #8 → #10 → #9.
+3. After merging all PRs, confirm `main` has all stories. Run `pnpm test` + `pnpm typecheck` against `main`.
+4. Continue with STORY-021 (PayMongo checkout).

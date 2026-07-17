@@ -1,22 +1,24 @@
 /**
- * Next.js middleware — Story 004.
+ * Next.js middleware — Story 004 / 013.
  *
  * Runs on every request before it reaches the page or API route.
- * Responsibilities:
- * - Security headers
- * - Session token validation
- * - Route protection (redirect unauthenticated users from /dashboard, /admin)
  *
- * The session cookie is httpOnly, secure, sameSite=strict, and set by the
- * login flow (STORY-007). This middleware only validates it.
+ * Responsibilities:
+ * - Security headers (always)
+ * - Route protection (redirect unauthenticated users from /dashboard, /admin)
+ * - JWT session verification (Story 013)
+ *
+ * The session cookie is httpOnly, secure, sameSite=lax.
+ * JWT payload: { sub: userId, sessionId, role: string }
  */
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { JoseJwtService } from "@/infra/security/JoseJwtService";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/admin", "/enroll", "/order"];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Security headers ──────────────────────────────────────
@@ -46,9 +48,31 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // TODO (STORY-007): Validate the session token against the database.
-    // For now, any non-empty token grants access (framework scaffolding).
-    // Real implementation: decode JWT, check expiry, verify against Session table.
+    // Story 013: verify JWT
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      // Server misconfigured — deny all
+      return new NextResponse("Internal server error", { status: 500 });
+    }
+
+    const jwt = new JoseJwtService(secret);
+    const result = await jwt.verify(sessionToken);
+
+    if (!result.ok) {
+      // Token invalid or expired — redirect to login
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      const redirectRes = NextResponse.redirect(loginUrl);
+      // Clear the invalid cookie
+      redirectRes.cookies.delete("amph_session");
+      redirectRes.cookies.delete("__Secure-amph_session");
+      return redirectRes;
+    }
+
+    // Attach user context to request headers for downstream use
+    res.headers.set("x-amph-user-id", String(result.value.sub));
+    res.headers.set("x-amph-session-id", String(result.value.sessionId));
+    res.headers.set("x-amph-role", String(result.value.role ?? "STUDENT"));
   }
 
   // ── Redirect root to signup ───────────────────────────────
