@@ -80,6 +80,7 @@ export class PrismaUserRepository implements UserRepository {
       lastName: string;
       avatarUrl: string;
       bio: string;
+      enrolledCourseIds: string[];
     }>,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {

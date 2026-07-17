@@ -7,10 +7,10 @@
 
 import { useActionState } from "react";
 import { enrollStudent } from "@/app/actions/enroll";
-import type { EnrollStudentOutput } from "@/usecases/EnrollStudent";
+import type { EnrollStudentResult } from "@/usecases/EnrollStudent";
 import { Money } from "@/domain/values/Money";
 
-type EnrollState = EnrollStudentOutput | null;
+type EnrollState = EnrollStudentResult | null;
 
 export function EnrollButton({ courseId, priceMinor }: { courseId: string; priceMinor: number }) {
   const [state, formAction, isPending] = useActionState<EnrollState, FormData>(
@@ -22,7 +22,7 @@ export function EnrollButton({ courseId, priceMinor }: { courseId: string; price
 
   const isFree = priceMinor === 0;
 
-  if (state?.ok) {
+  if (state && state.ok) {
     return (
       <div className="flex items-center gap-2 text-green-600 font-medium">
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -35,7 +35,7 @@ export function EnrollButton({ courseId, priceMinor }: { courseId: string; price
 
   if (state && !state.ok) {
     const err = state.error;
-    if ("kind" in err && err.kind === "course_unpublished") {
+    if ("kind" in err && err.kind === "course_not_published") {
       return <p className="text-[var(--text-secondary)]">This course is not available.</p>;
     }
     return <p className="text-red-500">Unable to enroll. Please try again.</p>;

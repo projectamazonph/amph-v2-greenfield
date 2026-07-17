@@ -36,6 +36,10 @@ import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository
 
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
+import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
+import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -48,6 +52,7 @@ import { SignUp } from "@/usecases/SignUp";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
+import { EnrollStudent } from "@/usecases/EnrollStudent";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -66,6 +71,7 @@ export interface AppContainer {
   userRepo: UserRepository;
   courseRepo: CourseRepository;
   orderRepo: IOrderRepository;
+  enrollmentRepo: IEnrollmentRepository;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -74,6 +80,7 @@ export interface AppContainer {
   signUp: SignUp;
   createPaymentIntent: CreatePaymentIntent;
   checkCourseAccess: CheckCourseAccess;
+  enrollStudent: EnrollStudent;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -85,6 +92,7 @@ function buildProductionContainer(): AppContainer {
   const userRepo: UserRepository = new PrismaUserRepository(prisma);
   const courseRepo: CourseRepository = new InMemoryCourseRepository();
   const orderRepo: IOrderRepository = new InMemoryOrderRepository();
+  const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -100,6 +108,7 @@ function buildProductionContainer(): AppContainer {
     userRepo,
     courseRepo,
     orderRepo,
+    enrollmentRepo,
     paymentGateway,
     signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
     createPaymentIntent: new CreatePaymentIntent({
@@ -109,6 +118,12 @@ function buildProductionContainer(): AppContainer {
       baseUrl,
     }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
+    enrollStudent: new EnrollStudent({
+      userRepo,
+      courseRepo,
+      enrollmentRepo,
+      idGen,
+    }),
   };
 }
 
@@ -118,6 +133,7 @@ export interface TestContainer extends AppContainer {
   userRepo: InMemoryUserRepository;
   courseRepo: InMemoryCourseRepository;
   orderRepo: InMemoryOrderRepository;
+  enrollmentRepo: InMemoryEnrollmentRepository;
   accessPolicy: StubAccessPolicy;
 }
 
@@ -127,6 +143,7 @@ export function buildTestContainer(): TestContainer {
   const userRepo = new InMemoryUserRepository();
   const courseRepo = new InMemoryCourseRepository();
   const orderRepo = new InMemoryOrderRepository();
+  const enrollmentRepo = new InMemoryEnrollmentRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
 
@@ -136,6 +153,7 @@ export function buildTestContainer(): TestContainer {
     userRepo,
     courseRepo,
     orderRepo,
+    enrollmentRepo,
     paymentGateway,
     signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
     createPaymentIntent: new CreatePaymentIntent({
@@ -145,6 +163,12 @@ export function buildTestContainer(): TestContainer {
       baseUrl: "https://test.amph.example.com",
     }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
+    enrollStudent: new EnrollStudent({
+      userRepo,
+      courseRepo,
+      enrollmentRepo,
+      idGen,
+    }),
     accessPolicy,
   };
 }
