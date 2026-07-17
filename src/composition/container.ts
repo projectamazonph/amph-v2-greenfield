@@ -52,6 +52,10 @@ import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRe
 import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
 import { PrismaQuizAttemptRepository } from "@/infra/repositories/PrismaQuizAttemptRepository";
 
+import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
+import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
+import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepository";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -66,6 +70,7 @@ import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
+import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -88,6 +93,7 @@ export interface AppContainer {
   discountCodeRepo: IDiscountCodeRepository;
   quizRepo: IQuizRepository;
   quizAttemptRepo: IQuizAttemptRepository;
+  xpEventRepo: IXPEventRepository;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -98,6 +104,7 @@ export interface AppContainer {
   checkCourseAccess: CheckCourseAccess;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
+  recordQuizAttempt: RecordQuizAttempt;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -113,6 +120,7 @@ function buildProductionContainer(): AppContainer {
   const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
   const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
+  const xpEventRepo: IXPEventRepository = new PrismaXPEventRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -151,6 +159,15 @@ function buildProductionContainer(): AppContainer {
     }),
     quizRepo,
     quizAttemptRepo,
+    xpEventRepo,
+    recordQuizAttempt: new RecordQuizAttempt({
+      quizRepo,
+      quizAttemptRepo,
+      xpEventRepo,
+      userRepo,
+      idGen,
+      clock,
+    }),
   };
 }
 
@@ -164,6 +181,7 @@ export interface TestContainer extends AppContainer {
   discountCodeRepo: InMemoryDiscountCodeRepository;
   quizRepo: InMemoryQuizRepository;
   quizAttemptRepo: InMemoryQuizAttemptRepository;
+  xpEventRepo: InMemoryXPEventRepository;
   accessPolicy: StubAccessPolicy;
 }
 
@@ -177,6 +195,7 @@ export function buildTestContainer(): TestContainer {
   const discountCodeRepo = new InMemoryDiscountCodeRepository();
   const quizRepo = new InMemoryQuizRepository();
   const quizAttemptRepo = new InMemoryQuizAttemptRepository();
+  const xpEventRepo = new InMemoryXPEventRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
 
@@ -209,7 +228,16 @@ export function buildTestContainer(): TestContainer {
     }),
     quizRepo,
     quizAttemptRepo,
+    xpEventRepo,
     accessPolicy,
+    recordQuizAttempt: new RecordQuizAttempt({
+      quizRepo,
+      quizAttemptRepo,
+      xpEventRepo,
+      userRepo,
+      idGen,
+      clock,
+    }),
   };
 }
 
@@ -227,7 +255,7 @@ export function getContainer(): AppContainer {
   if (!container) {
     throw new Error(
       "No container in scope. Are you calling getContainer() outside of a server action? " +
-      "All container access must go through runWithContainer().",
+        "All container access must go through runWithContainer().",
     );
   }
   return container;
