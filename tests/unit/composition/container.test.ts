@@ -114,4 +114,12 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(cb!.name).toBe("Campaign Builder");
     simExpect(cb!.simulatorId).toBe("campaign-builder");
   });
+
+  simIt("listing-audit simulator is the real ListingAuditSimulator, not a stub", () => {
+    const c = buildTestContainer();
+    const la = c.simulatorRegistry.get("listing-audit");
+    simExpect(la).not.toBeNull();
+    simExpect(la!.name).toBe("Listing Audit + Keyword Research");
+    simExpect(la!.simulatorId).toBe("listing-audit");
+  });
 });
