@@ -341,6 +341,39 @@ revokeDescribe("container — revokeCertificate wiring", () => {
   });
 });
 
+// ── EmailSender wiring (STORY-045) ────────────────────────
+
+import { describe as emailDescribe, it as emailIt, expect as emailExpect } from "vitest";
+import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
+import { createElement } from "react";
+
+emailDescribe("container — emailSender wiring", () => {
+  emailIt("test container exposes emailSender", () => {
+    const c = buildTestContainer();
+    emailExpect(c.emailSender).toBeDefined();
+    emailExpect(typeof c.emailSender.send).toBe("function");
+  });
+
+  emailIt("test container uses InMemoryEmailSender (records sent messages)", async () => {
+    const c = buildTestContainer();
+    emailExpect(c.emailSender).toBeInstanceOf(InMemoryEmailSender);
+
+    const result = await c.emailSender.send({
+      to: "test@example.com",
+      subject: "Hello",
+      react: createElement("div", null, "Test content"),
+    });
+
+    emailExpect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // InMemoryEmailSender records into .sent; the test container shares the same instance
+    const fake = c.emailSender as InMemoryEmailSender;
+    emailExpect(fake.sent).toHaveLength(1);
+    emailExpect(fake.sent[0]!.to).toBe("test@example.com");
+    emailExpect(fake.sent[0]!.html).toContain("Test content");
+  });
+});
+
 // ── Simulator registry wiring (STORY-036) ──────────────────────
 
 import { describe as simDescribe, it as simIt, expect as simExpect, beforeEach } from "vitest";
