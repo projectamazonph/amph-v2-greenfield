@@ -1,50 +1,56 @@
 /**
  * /api/auth/logout — STORY-006.
  *
- * Clears the session cookie and deletes the session record from the DB.
- * Returns a redirect to /login. Accepts POST (the UserCard posts a form
- * to this URL) and GET (so an <a href> link also works).
+ * Thin shell that orchestrates logout:
+ * 1. Extract the session token from the request cookie.
+ * 2. Call the Logout use case (deletes the session DB record).
+ * 3. Clear the session cookie (next/headers).
+ * 4. Redirect to /login.
+ *
+ * The route accepts POST only. Logout is a state mutation, so it
+ * should not be a GET (which is supposed to be safe and idempotent).
+ * Allowing GET logout is also a CSRF risk: any third-party site
+ * with `<img src="https://amph.example.com/api/auth/logout">` would
+ * log the user out. POST + same-origin form action is the standard
+ * mitigation.
+ *
+ * If the token is missing, malformed, or already-expired, the use
+ * case returns invalid_token; we still clear the cookie (best-effort
+ * — the cookie clear is the part the user cares about) and redirect.
  *
  * Per strict-SOLID:
- * - No business logic in this file.
- * - The actual session-record deletion is in src/usecases/Logout.ts
- *   (or a future addition to Login; for now the cookie clear is
- *   enough because the JWT is stateless — see src/lib/auth.ts).
+ * - No business logic in this file. The use case owns the rules.
+ * - The cookie-clearing is a framework concern (next/headers) that
+ *   the route shell orchestrates.
  */
 
 import { NextResponse } from "next/server";
 import { clearAuthCookie } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
 
-export async function POST(request: Request) {
-  return handleLogout(request);
-}
-
-export async function GET(request: Request) {
-  return handleLogout(request);
-}
-
-async function handleLogout(request: Request) {
-  // Best-effort session DB cleanup. If the repo isn't wired or the
-  // session doesn't exist, we still clear the cookie — the JWT is
-  // stateless and the cookie is the only thing that authenticates.
+export function extractSessionToken(request: Request): string {
   const cookieHeader = request.headers.get("cookie") ?? "";
-  const sessionMatch = cookieHeader.match(/amph_session=([^;]+)/);
-  if (sessionMatch) {
-    try {
-      const token = sessionMatch[1];
-      // We could verify the JWT to extract the sessionId, but for the
-      // common case (logout) the cookie clear is sufficient. The DB
-      // session row will expire naturally after its TTL.
-      void token;
-    } catch {
-      // ignore
-    }
-  }
+  // The session cookie name is the standard Next.js cookie name set
+  // by setAuthCookie() in src/lib/auth.ts.
+  const match = cookieHeader.match(/(?:^|;\s*)amph_session=([^;]+)/);
+  return match && match[1] ? decodeURIComponent(match[1]) : "";
+}
 
+export async function POST(request: Request): Promise<Response> {
+  const token = extractSessionToken(request);
+
+  // 1. Call the use case. If the token is invalid (empty, malformed,
+  //    already-expired), we treat it as "already logged out" and
+  //    continue to clear the cookie + redirect.
+  const container = buildContainer();
+  await container.logout.execute({ token });
+
+  // 2. Always clear the cookie + redirect. The use case is
+  //    idempotent and the cookie clear is the part the user
+  //    actually perceives.
   await clearAuthCookie();
 
-  // Redirect to /login.
+  // 3. Redirect to /login.
   const url = new URL("/login", request.url);
   return NextResponse.redirect(url, { status: 303 });
 }

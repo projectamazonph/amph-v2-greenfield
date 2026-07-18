@@ -43,6 +43,7 @@ import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry
 
 import { SignUp } from "@/usecases/SignUp";
 import { Login } from "@/usecases/Login";
+import { Logout } from "@/usecases/Logout";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -115,7 +116,7 @@ export function buildTestContainer(): TestContainer {
     paymentGateway,
     jwt,
     passwordHasher,
-    signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
+    signUp: new SignUp(userRepo, idGen, clock, passwordHasher),
     login: new Login(
       userRepo,
       passwordHasher,
@@ -124,6 +125,7 @@ export function buildTestContainer(): TestContainer {
       clock,
       jwt,
     ),
+    logout: new Logout(sessionRepo, jwt),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       orderRepo,
