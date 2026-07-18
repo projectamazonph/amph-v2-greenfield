@@ -1,0 +1,29 @@
+/* Admin layout — fixed-left sidebar + flex content.
+   Per design spec §9.1: 240px sidebar, no overlap, no absolute stacking. */
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--surface-0);
+  font-family: var(--font-body);
+}
+
+.main {
+  flex: 1;
+  min-width: 0; /* prevent flex item from overflowing */
+  padding: var(--space-8) var(--space-12);
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 1023px) {
+  /* Below the desktop breakpoint, the sidebar collapses to a topbar.
+     For now, just stack the layout vertically. The full mobile
+     bottom-nav is a Sprint 9 carry-over and is out of scope. */
+  .shell {
+    flex-direction: column;
+  }
+  .main {
+    padding: var(--space-6) var(--side-pad);
+  }
+}

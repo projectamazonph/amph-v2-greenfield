@@ -106,6 +106,7 @@ import { IssueCertificate } from "@/usecases/IssueCertificate";
 import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
 import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 import { RevokeCertificate } from "@/usecases/RevokeCertificate";
+import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -156,6 +157,7 @@ export interface AppContainer {
   renderCertificatePdf: RenderCertificatePdf;
   verifyCertificate: VerifyCertificate;
   revokeCertificate: RevokeCertificate;
+  getAdminDashboardStats: GetAdminDashboardStats;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -273,6 +275,13 @@ function buildProductionContainer(): AppContainer {
     revokeCertificate: new RevokeCertificate({
       certificateRepo,
       clock,
+    }),
+    getAdminDashboardStats: new GetAdminDashboardStats({
+      userRepo,
+      courseRepo,
+      orderRepo,
+      enrollmentRepo,
+      certificateRepo,
     }),
   };
 }
@@ -396,6 +405,13 @@ export function buildTestContainer(): TestContainer {
     revokeCertificate: new RevokeCertificate({
       certificateRepo,
       clock,
+    }),
+    getAdminDashboardStats: new GetAdminDashboardStats({
+      userRepo,
+      courseRepo,
+      orderRepo,
+      enrollmentRepo,
+      certificateRepo,
     }),
     simulatorRegistry: buildSimulatorRegistry(),
   };

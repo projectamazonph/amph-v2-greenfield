@@ -135,6 +135,7 @@ function makeUserRepo(): import("@/ports/repositories/UserRepository").UserRepos
     update: vi.fn(),
     emailExists: vi.fn(),
     getPasswordHash: vi.fn(),
+    listAll: vi.fn(),
     updateTotalXp: vi.fn(async (id: string, xp: number) => Result.ok({
       id: USER_ID,
       email: "student@example.com",

@@ -1,0 +1,61 @@
+/* /admin page styles. */
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.statLabel {
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  margin-bottom: var(--space-2);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.statValue {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--ink-900);
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.lowerSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-4);
+  letter-spacing: -0.01em;
+}
+
+.emptyState {
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  margin: 0;
+}
+
+.error {
+  color: var(--danger);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .statGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .lowerSection {
+    grid-template-columns: 1fr;
+  }
+}

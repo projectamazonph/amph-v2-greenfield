@@ -23,6 +23,15 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  async listAll(): Promise<Result<readonly import("@/domain/entities/User").User[], UserError>> {
+    try {
+      const rows = await this.db.user.findMany({ orderBy: { createdAt: "desc" } });
+      return Result.ok(rows.map((r) => this.mapRow(r)));
+    } catch (err) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async findByEmail(email: string): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {
       const row = await this.db.user.findUnique({
