@@ -8,7 +8,8 @@
 
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { signUpAction, type SignUpState } from "../actions/signup.action";
 import Link from "next/link";
 
@@ -16,6 +17,19 @@ const INITIAL_STATE: SignUpState = { status: "idle" };
 
 export default function SignUpPage() {
   const [state, formAction, isPending] = useActionState(signUpAction, INITIAL_STATE);
+  const router = useRouter();
+
+  // On success, the cookie is set by the action and we navigate
+  // to the dashboard. A hard navigation (router.push) ensures the
+  // server components on /dashboard re-render with the new session.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (state.status === "success") {
+      router.push("/dashboard");
+    }
+  }, [state.status, state.status === "success" ? state.email : null]);
+
+  void router;
 
   return (
     <div style={styles.page}>

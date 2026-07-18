@@ -1,13 +1,17 @@
 /**
- * SignUp server action — Story 004.
+ * SignUp server action — Story 004 + STORY-006.
  *
  * The only responsibility of this file is to:
  * 1. Receive the raw form input from the React component
- * 2. Call the use case
- * 3. Return a serializable result (no class instances cross the RPC boundary)
+ * 2. Call the SignUp use case
+ * 3. On success, call the Login use case + setAuthCookie so the user
+ *    is auto-signed-in (no separate login step needed after signup)
+ * 4. Return a serializable result (no class instances cross the RPC boundary)
  *
  * ADR-020: Server actions are the "thin shell" — no business logic here.
- * The business logic lives in src/usecases/.
+ * The business logic lives in src/usecases/SignUp.ts and
+ * src/usecases/Login.ts. The cookie-setting is a side effect on the
+ * response (via next/headers), done by the helper in src/lib/auth.ts.
  */
 
 "use server";
@@ -15,7 +19,7 @@
 import { SignUp } from "@/usecases/SignUp";
 import { buildContainer } from "@/composition/container";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
-import { revalidatePath } from "next/cache";
+import { setAuthCookie } from "@/lib/auth";
 
 export type SignUpState =
   | { status: "idle" }
@@ -70,8 +74,21 @@ export async function signUpAction(
       return { status: "error", error: result.error };
     }
 
-    // Success — revalidate relevant pages and return
-    revalidatePath("/login");
+    // Auto-login: immediately create a session + set the cookie.
+    // This is the "no separate login step" UX. The user lands on the
+    // dashboard right after signing up.
+    const loginResult = await container.login.execute({
+      email: input.email,
+      password: input.password,
+    });
+    if (loginResult.ok) {
+      await setAuthCookie(loginResult.sessionToken, loginResult.expiresAt);
+    }
+    // If auto-login fails (very unlikely right after signup — the
+    // password is the one we just hashed), the user will see a
+    // success message and can manually log in. The success state
+    // still fires; we don't surface the auto-login failure.
+
     return { status: "success", email: result.email };
   } catch (err) {
     // TODO: Sentry.captureException in production
