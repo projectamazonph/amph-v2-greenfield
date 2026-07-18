@@ -31,6 +31,7 @@ import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventR
 import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepository";
 import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
+import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
 import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHashGenerator";
@@ -41,6 +42,7 @@ import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
 import { SignUp } from "@/usecases/SignUp";
+import { Login } from "@/usecases/Login";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -62,6 +64,7 @@ import type { AppContainer } from "./container";
 // like .users.set(...) or .seed() on the in-memory repos.
 export interface TestContainer extends AppContainer {
   userRepo: InMemoryUserRepository;
+  sessionRepo: InMemorySessionRepository;
   courseRepo: InMemoryCourseRepository;
   orderRepo: InMemoryOrderRepository;
   enrollmentRepo: InMemoryEnrollmentRepository;
@@ -90,6 +93,7 @@ export function buildTestContainer(): TestContainer {
   const badgeRepo = new InMemoryBadgeRepository();
   const badgeAwardRepo = new InMemoryBadgeAwardRepository();
   const certificateRepo = new InMemoryCertificateRepository();
+  const sessionRepo = new InMemorySessionRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
@@ -104,6 +108,7 @@ export function buildTestContainer(): TestContainer {
     clock,
     idGen,
     userRepo,
+    sessionRepo,
     courseRepo,
     orderRepo,
     enrollmentRepo,
@@ -111,6 +116,14 @@ export function buildTestContainer(): TestContainer {
     jwt,
     passwordHasher,
     signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
+    login: new Login(
+      userRepo,
+      passwordHasher,
+      sessionRepo,
+      idGen,
+      clock,
+      jwt,
+    ),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       orderRepo,

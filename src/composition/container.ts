@@ -46,12 +46,20 @@ import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository
 import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
 import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
+import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 
 // ── Production adapters (only the prod ones) ──────────────────
 
 import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
+import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
+// Note: SessionRepository is currently in-memory even in production
+// (PrismaSessionRepository is a future story). The session is also
+// embedded in the JWT cookie, so losing the DB row on process restart
+// does not invalidate active sessions — the JWT is still valid until
+// its expiry. The DB row is for admin visibility + revocation; when
+// revocation matters, ship the Prisma adapter.
 import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
 import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscountCodeRepository";
 import { PrismaQuizRepository } from "@/infra/repositories/PrismaQuizRepository";
@@ -86,6 +94,7 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 // ── Use cases ───────────────────────────────────────────────
 
 import { SignUp } from "@/usecases/SignUp";
+import { Login } from "@/usecases/Login";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -113,6 +122,7 @@ export interface AppContainer {
 
   // Repositories
   userRepo: UserRepository;
+  sessionRepo: SessionRepository;
   courseRepo: CourseRepository;
   orderRepo: IOrderRepository;
   enrollmentRepo: IEnrollmentRepository;
@@ -135,6 +145,7 @@ export interface AppContainer {
 
   // Use cases
   signUp: SignUp;
+  login: Login;
   createPaymentIntent: CreatePaymentIntent;
   checkCourseAccess: CheckCourseAccess;
   enrollStudent: EnrollStudent;
@@ -172,6 +183,7 @@ function buildProductionContainer(): AppContainer {
   const badgeRepo: IBadgeRepository = new PrismaBadgeRepository(prisma);
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
+  const sessionRepo: SessionRepository = new InMemorySessionRepository();
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -197,6 +209,7 @@ function buildProductionContainer(): AppContainer {
     clock,
     idGen,
     userRepo,
+    sessionRepo,
     courseRepo,
     orderRepo,
     enrollmentRepo,
@@ -204,6 +217,14 @@ function buildProductionContainer(): AppContainer {
     jwt,
     passwordHasher,
     signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
+    login: new Login(
+      userRepo,
+      passwordHasher,
+      sessionRepo,
+      idGen,
+      clock,
+      jwt,
+    ),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       orderRepo,
