@@ -97,6 +97,7 @@ import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 import { ListUserBadges } from "@/usecases/ListUserBadges";
 import { IssueCertificate } from "@/usecases/IssueCertificate";
 import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
+import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -142,6 +143,7 @@ export interface AppContainer {
   listUserBadges: ListUserBadges;
   issueCertificate: IssueCertificate;
   renderCertificatePdf: RenderCertificatePdf;
+  verifyCertificate: VerifyCertificate;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -237,6 +239,11 @@ function buildProductionContainer(): AppContainer {
       userRepo,
       courseRepo,
       renderer: certificateRenderer,
+    }),
+    verifyCertificate: new VerifyCertificate({
+      certificateRepo,
+      userRepo,
+      courseRepo,
     }),
   };
 }
@@ -343,6 +350,11 @@ export function buildTestContainer(): TestContainer {
       userRepo,
       courseRepo,
       renderer: certificateRenderer,
+    }),
+    verifyCertificate: new VerifyCertificate({
+      certificateRepo,
+      userRepo,
+      courseRepo,
     }),
     simulatorRegistry: buildSimulatorRegistry(),
   };

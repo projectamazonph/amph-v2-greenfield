@@ -199,6 +199,74 @@ pdfDescribe("container — renderCertificatePdf wiring", () => {
   });
 });
 
+// ── VerifyCertificate wiring (STORY-043) ────────────────────
+
+import { describe as verifyDescribe, it as verifyIt, expect as verifyExpect } from "vitest";
+
+verifyDescribe("container — verifyCertificate wiring", () => {
+  verifyIt("test container exposes verifyCertificate", () => {
+    const c = buildTestContainer();
+    verifyExpect(c.verifyCertificate).toBeDefined();
+    verifyExpect(typeof c.verifyCertificate.execute).toBe("function");
+  });
+
+  verifyIt("end-to-end: a valid hash returns cert + user + course via the test container", async () => {
+    const c = buildTestContainer();
+
+    // Seed a course
+    const courseResult = createCourse({
+      id: "course-verify-1",
+      slug: "verify-test",
+      title: "Verify Test Course",
+      tagline: "Testing verification",
+      description: "A course for testing verification",
+      priceMinor: 0,
+      currency: "PHP",
+      curriculum: { sections: [{ id: "s1", title: "Section 1", lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }] }] },
+      courseTier: "STARTER",
+      previewLessonCount: 0,
+    });
+    if (!courseResult.ok) throw new Error("seed course failed");
+    c.courseRepo.seed([courseResult.value]);
+
+    // Seed a user
+    await c.userRepo.create({
+      id: "user-verify-1",
+      email: "verify-test@example.com",
+      passwordHash: "$argon2id$test",
+      firstName: "Verify",
+      lastName: "User",
+    });
+
+    // Seed a cert
+    await c.certificateRepo.create({
+      id: "cert-verify-1",
+      userId: "user-verify-1",
+      courseId: "course-verify-1",
+      verificationHash: "c".repeat(64),
+      issuedAt: new Date("2026-07-01T00:00:00Z"),
+      revokedAt: null,
+      revokedReason: null,
+      status: "active",
+    });
+
+    const result = await c.verifyCertificate.execute({ verificationHash: "c".repeat(64) });
+
+    verifyExpect(result.ok).toBe(true);
+    if (!result.ok) return;
+    verifyExpect(result.value.certificate.id).toBe("cert-verify-1");
+    verifyExpect(result.value.user.firstName).toBe("Verify");
+    verifyExpect(result.value.user.lastName).toBe("User");
+    verifyExpect(result.value.course.title).toBe("Verify Test Course");
+  });
+
+  verifyIt("end-to-end: an unknown hash returns certificate_not_found via the test container", async () => {
+    const c = buildTestContainer();
+    const result = await c.verifyCertificate.execute({ verificationHash: "d".repeat(64) });
+    verifyExpect(result).toEqual({ ok: false, error: { kind: "certificate_not_found" } });
+  });
+});
+
 // ── Simulator registry wiring (STORY-036) ──────────────────────
 
 import { describe as simDescribe, it as simIt, expect as simExpect, beforeEach } from "vitest";
