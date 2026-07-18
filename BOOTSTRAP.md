@@ -11,12 +11,16 @@ Local: /workspace/amph-v2-greenfield/
 Tech: Next.js 16 + React 19 + TypeScript 7 + Prisma 7 + Argon2 + Vitest + Playwright + jose + Sentry
 Architecture: SOLID five-layer (domain/ → ports/ → usecases/ → infra/ → app/)
 
-Docs: AGENTS.md → CLAUDE.md → docs/build-spec.md → docs/stories/ (story docs live here)
+Docs: AGENTS.md → CLAUDE.md → OPERATING_GUIDELINES.md → SESSION-TDD-SOLID-AUDIT.md → SESSION-HANDOVER.md → docs/build-spec.md → docs/stories/ (story docs live here)
 ```
+
+**For new sessions, also read `NEXT-SESSION-PROMPT.md`** — it has the
+strict-TDD + strict-SOLID + git discipline + initial setup, plus what's
+still open (Tier B/C/D from the recent audit).
 
 ---
 
-## Status (2026-07-18)
+## Status (2026-07-19)
 
 **All stories merged. No open PRs.**
 

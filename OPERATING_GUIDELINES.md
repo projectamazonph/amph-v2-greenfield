@@ -177,3 +177,36 @@ pnpm prisma:migrate    # run migrations
 - Feature: use the feature request issue template  
 - Story work: open a draft PR referencing the story number
 
+---
+
+## Pre-Story Audit Checklist
+
+**Do not start a story until all open audit items are closed.** See
+`SESSION-TDD-SOLID-AUDIT.md` for the current open items (Tier B/C/D
+from the 2026-07-19 TDD+SOLID audit).
+
+The rule: **"we don't move a story until existing issues are
+addressed."** The audit found:
+
+- **Tier A (production bugs)**: ✅ closed in PR #66
+- **Tier B (TDD coverage gaps)**: ❌ open — 12 use cases + 11 repos
+  have no tests
+- **Tier C (SOLID hygiene)**: ❌ open — 8 `any` casts, 3 unused
+  eslint-disable, Middleware → Proxy migration
+- **Tier D (dead code)**: ❌ open — 3 use cases with no callers
+
+Before opening a new story branch, verify that none of these items
+affect the new code path. If they do, fix the audit item first.
+
+The audit established these patterns — **reuse them**:
+
+- **Pure-helper + thin-shell** for every server action
+- **Container as the only data-access path** (no `new InMemory*` in prod)
+- **Lazy initialization** for env-dependent adapters (don't throw at
+  module load)
+- **Per-call env reads** (don't capture at module load)
+- **Static-analysis regression guards** for cases where the unit-test
+  surface is limited (async server components, framework glue)
+
+See `SESSION-TDD-SOLID-AUDIT.md` for full examples.
+
