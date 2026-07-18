@@ -52,6 +52,7 @@ export interface EmailMessage {
 export type EmailSenderError =
   | { kind: "invalid_recipient" }
   | { kind: "invalid_subject" }
+  | { kind: "configuration_error"; message: string }
   | { kind: "send_error"; message: string };
 
 // ── Port ───────────────────────────────────────────────────────────────────

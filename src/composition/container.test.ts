@@ -57,6 +57,8 @@ import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
 import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 import { RevokeCertificate } from "@/usecases/RevokeCertificate";
 import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
+import { ListCourses } from "@/usecases/ListCourses";
+import { GetCourse } from "@/usecases/GetCourse";
 
 import type { AppContainer } from "./container";
 
@@ -200,6 +202,8 @@ export function buildTestContainer(): TestContainer {
       enrollmentRepo,
       certificateRepo,
     }),
+    listCourses: new ListCourses(courseRepo),
+    getCourse: new GetCourse(courseRepo),
     simulatorRegistry: buildSimulatorRegistry(),
   };
 }

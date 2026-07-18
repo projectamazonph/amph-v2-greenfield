@@ -168,4 +168,24 @@ describe("ResendEmailSender", () => {
     expect(call.attachments).toHaveLength(1);
     expect(call.attachments[0].filename).toBe("a.pdf");
   });
+
+  // ── Lazy init: the Resend SDK should only be touched on send() ──
+
+  it("does NOT throw in the constructor when apiKey is empty (lazy init)", () => {
+    // The previous implementation called `new Resend("")` in the
+    // constructor, which throws because the Resend SDK requires
+    // a non-empty key. With lazy init, the constructor is safe
+    // and only an actual send() reveals the missing key.
+    expect(() => new ResendEmailSender("", "noreply@amph.example.com")).not.toThrow();
+  });
+
+  it("returns a configuration_error when send() is called with an empty apiKey", async () => {
+    const sender = new ResendEmailSender("", "noreply@amph.example.com");
+    const result = await sender.send(makeMessage());
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("configuration_error");
+    // The Resend SDK was NOT called (we never even instantiated it)
+    expect(mocks.emailsSend).not.toHaveBeenCalled();
+  });
 });
