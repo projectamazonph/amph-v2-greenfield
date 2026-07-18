@@ -133,6 +133,72 @@ certDescribe("container — issueCertificate wiring", () => {
   });
 });
 
+// ── RenderCertificatePdf wiring (STORY-042) ─────────────────
+
+import { describe as pdfDescribe, it as pdfIt, expect as pdfExpect } from "vitest";
+
+pdfDescribe("container — renderCertificatePdf wiring", () => {
+  pdfIt("test container exposes renderCertificatePdf", () => {
+    const c = buildTestContainer();
+    pdfExpect(c.renderCertificatePdf).toBeDefined();
+    pdfExpect(typeof c.renderCertificatePdf.execute).toBe("function");
+  });
+
+  pdfIt("test container exposes certificateRenderer", () => {
+    const c = buildTestContainer();
+    pdfExpect(c.certificateRenderer).toBeDefined();
+  });
+
+  pdfIt("end-to-end: a certificate renders to a PDF buffer via the test container", async () => {
+    const c = buildTestContainer();
+
+    // Seed a course
+    const courseResult = createCourse({
+      id: "course-pdf-1",
+      slug: "pdf-test-course",
+      title: "PDF Test Course",
+      tagline: "Testing PDF rendering",
+      description: "A course for testing the PDF renderer",
+      priceMinor: 0,
+      currency: "PHP",
+      curriculum: { sections: [{ id: "s1", title: "Section 1", lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }] }] },
+      courseTier: "STARTER",
+      previewLessonCount: 0,
+    });
+    if (!courseResult.ok) throw new Error("seed course failed");
+    c.courseRepo.seed([courseResult.value]);
+
+    // Seed a user via the in-memory user repo's create method
+    await c.userRepo.create({
+      id: "user-pdf-1",
+      email: "pdf-test@example.com",
+      passwordHash: "$argon2id$test",
+      firstName: "Test",
+      lastName: "User",
+    });
+
+    // Seed a certificate
+    await c.certificateRepo.create({
+      id: "cert-pdf-1",
+      userId: "user-pdf-1",
+      courseId: "course-pdf-1",
+      verificationHash: "b".repeat(64),
+      issuedAt: new Date("2026-07-01T00:00:00Z"),
+      revokedAt: null,
+      revokedReason: null,
+      status: "active",
+    });
+
+    const result = await c.renderCertificatePdf.execute({ certificateId: "cert-pdf-1" });
+
+    pdfExpect(result.ok).toBe(true);
+    if (!result.ok) return;
+    pdfExpect(Buffer.isBuffer(result.value.buffer)).toBe(true);
+    pdfExpect(result.value.buffer.toString("utf8", 0, 5)).toBe("%PDF-");
+    pdfExpect(result.value.verificationHash).toBe("b".repeat(64));
+  });
+});
+
 // ── Simulator registry wiring (STORY-036) ──────────────────────
 
 import { describe as simDescribe, it as simIt, expect as simExpect, beforeEach } from "vitest";
