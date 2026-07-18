@@ -1,0 +1,102 @@
+/* Input.module.css — Field Manual form field. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-body);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink-700);
+  letter-spacing: 0.01em;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  background: var(--surface-1);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--ink-900);
+  font-family: var(--font-body);
+  outline: none;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.input::placeholder {
+  color: var(--ink-300);
+}
+
+.input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input:disabled {
+  background: var(--surface-2);
+  color: var(--ink-300);
+  cursor: not-allowed;
+}
+
+/* ── Sizes ──────────────────────────────────────────────────── */
+
+.sm {
+  height: 32px;
+  padding: 0 10px;
+  font-size: var(--text-sm);
+}
+
+.md {
+  height: 40px;
+  padding: 0 14px;
+  font-size: var(--text-base);
+}
+
+.lg {
+  height: 48px;
+  padding: 0 16px;
+  font-size: var(--text-base);
+}
+
+/* ── Error state ────────────────────────────────────────────── */
+
+.error {
+  border-color: var(--danger);
+}
+.error:focus-visible {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+}
+
+.errorText {
+  font-size: var(--text-xs);
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Adornment (e.g., show/hide password toggle) ─────────────── */
+
+.adornment {
+  position: absolute;
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+}
