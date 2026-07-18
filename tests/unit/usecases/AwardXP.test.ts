@@ -66,6 +66,7 @@ function makeUserRepo(
     update: vi.fn(),
     emailExists: vi.fn(),
     getPasswordHash: vi.fn(),
+    listAll: vi.fn(),
     // updateTotalXp signature: (userId, newTotalXp) but our mock uses (xp)
     updateTotalXp: user
       ? (((uid: string, xp: number) =>

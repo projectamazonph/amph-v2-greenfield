@@ -1,0 +1,50 @@
+/* TopBar.module.css — admin page header. */
+
+.header {
+  padding: var(--space-8) 0 var(--space-6);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-6);
+}
+
+.breadcrumb {
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  margin-bottom: var(--space-3);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.titleBlock {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  color: var(--ink-900);
+  letter-spacing: -0.01em;
+  line-height: var(--leading-tight);
+  margin: 0;
+}
+
+.subtitle {
+  margin-top: var(--space-2);
+  font-size: var(--text-base);
+  color: var(--ink-700);
+  line-height: var(--leading-normal);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}

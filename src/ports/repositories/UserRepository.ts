@@ -23,6 +23,13 @@ export interface UserRepository {
   findById(id: string): Promise<Result<User, UserError>>;
 
   /**
+   * List all users. Used by admin pages (e.g., the admin users list,
+   * the admin dashboard's "total students" stat). For a small admin
+   * app this is fine; at scale, add a paginated list() method.
+   */
+  listAll(): Promise<Result<readonly User[], UserError>>;
+
+  /**
    * Find a user by their email address.
    * Returns not_found if no user with that email exists.
    */

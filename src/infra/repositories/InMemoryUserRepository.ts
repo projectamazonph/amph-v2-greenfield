@@ -30,6 +30,10 @@ export class InMemoryUserRepository implements UserRepository {
     return Result.ok(user);
   }
 
+  async listAll(): Promise<Result<readonly User[], UserError>> {
+    return Result.ok(Array.from(this.users.values()));
+  }
+
   async findByEmail(email: string): Promise<Result<User, UserError>> {
     const id = this.emailIndex.get(email.toLowerCase());
     if (!id) return Result.err({ kind: "not_found" });
