@@ -147,11 +147,9 @@ const config = [
       },
     },
     rules: {
-      // Warn for now — the codebase has ~600 pre-existing violations
-      // that will be migrated in a separate story. New code should
-      // never add new violations; we'll promote this to "error" once
-      // the migration is complete.
-      "local/no-tailwind-classes": "warn",
+      // All known violations have been migrated (PR #64). New code
+      // MUST use the design system (CSS Modules + design tokens).
+      "local/no-tailwind-classes": "error",
     },
   },
 ];
