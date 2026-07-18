@@ -267,6 +267,80 @@ verifyDescribe("container — verifyCertificate wiring", () => {
   });
 });
 
+// ── RevokeCertificate wiring (STORY-044) ───────────────────
+
+import { describe as revokeDescribe, it as revokeIt, expect as revokeExpect } from "vitest";
+
+revokeDescribe("container — revokeCertificate wiring", () => {
+  revokeIt("test container exposes revokeCertificate", () => {
+    const c = buildTestContainer();
+    revokeExpect(c.revokeCertificate).toBeDefined();
+    revokeExpect(typeof c.revokeCertificate.execute).toBe("function");
+  });
+
+  revokeIt("end-to-end: revoking a cert transitions it to revoked via the test container", async () => {
+    const c = buildTestContainer();
+
+    await c.certificateRepo.create({
+      id: "cert-revoke-1",
+      userId: "user-revoke-1",
+      courseId: "course-revoke-1",
+      verificationHash: "e".repeat(64),
+      issuedAt: new Date("2026-07-01T00:00:00Z"),
+      revokedAt: null,
+      revokedReason: null,
+      status: "active",
+    });
+
+    const result = await c.revokeCertificate.execute({
+      certificateId: "cert-revoke-1",
+      reason: "test_refund",
+      revokedBy: "system",
+    });
+
+    revokeExpect(result.ok).toBe(true);
+    if (!result.ok) return;
+    revokeExpect(result.value.wasAlreadyRevoked).toBe(false);
+    revokeExpect(result.value.certificate.status).toBe("revoked");
+    revokeExpect(result.value.certificate.revokedReason).toBe("test_refund");
+  });
+
+  revokeIt("end-to-end: re-revoking an already-revoked cert is idempotent", async () => {
+    const c = buildTestContainer();
+
+    await c.certificateRepo.create({
+      id: "cert-revoke-2",
+      userId: "user-revoke-2",
+      courseId: "course-revoke-2",
+      verificationHash: "f".repeat(64),
+      issuedAt: new Date("2026-07-01T00:00:00Z"),
+      revokedAt: null,
+      revokedReason: null,
+      status: "active",
+    });
+
+    const first = await c.revokeCertificate.execute({
+      certificateId: "cert-revoke-2",
+      reason: "first_reason",
+      revokedBy: "admin_01",
+    });
+    revokeExpect(first.ok).toBe(true);
+    if (!first.ok) return;
+    revokeExpect(first.value.wasAlreadyRevoked).toBe(false);
+
+    const second = await c.revokeCertificate.execute({
+      certificateId: "cert-revoke-2",
+      reason: "second_reason",
+      revokedBy: "admin_02",
+    });
+    revokeExpect(second.ok).toBe(true);
+    if (!second.ok) return;
+    revokeExpect(second.value.wasAlreadyRevoked).toBe(true);
+    // Original reason preserved
+    revokeExpect(second.value.certificate.revokedReason).toBe("first_reason");
+  });
+});
+
 // ── Simulator registry wiring (STORY-036) ──────────────────────
 
 import { describe as simDescribe, it as simIt, expect as simExpect, beforeEach } from "vitest";
