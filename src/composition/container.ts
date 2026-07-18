@@ -95,6 +95,7 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 
 import { SignUp } from "@/usecases/SignUp";
 import { Login } from "@/usecases/Login";
+import { Logout } from "@/usecases/Logout";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -146,6 +147,7 @@ export interface AppContainer {
   // Use cases
   signUp: SignUp;
   login: Login;
+  logout: Logout;
   createPaymentIntent: CreatePaymentIntent;
   checkCourseAccess: CheckCourseAccess;
   enrollStudent: EnrollStudent;
@@ -216,7 +218,7 @@ function buildProductionContainer(): AppContainer {
     paymentGateway,
     jwt,
     passwordHasher,
-    signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
+    signUp: new SignUp(userRepo, idGen, clock, passwordHasher),
     login: new Login(
       userRepo,
       passwordHasher,
@@ -225,6 +227,7 @@ function buildProductionContainer(): AppContainer {
       clock,
       jwt,
     ),
+    logout: new Logout(sessionRepo, jwt),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       orderRepo,

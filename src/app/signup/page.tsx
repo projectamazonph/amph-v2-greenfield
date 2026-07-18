@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { signUpAction, type SignUpState } from "../actions/signup.action";
 import Link from "next/link";
 
-const INITIAL_STATE: SignUpState = { status: "idle" };
+const INITIAL_STATE: SignUpState = { kind: "invalid_input" };
 
 export default function SignUpPage() {
   const [state, formAction, isPending] = useActionState(signUpAction, INITIAL_STATE);
@@ -24,10 +24,10 @@ export default function SignUpPage() {
   // server components on /dashboard re-render with the new session.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (state.status === "success") {
+    if (state.kind === "success") {
       router.push("/dashboard");
     }
-  }, [state.status, state.status === "success" ? state.email : null]);
+  }, [state.kind, state.kind === "success" ? state.email : null]);
 
   void router;
 
@@ -44,29 +44,35 @@ export default function SignUpPage() {
         </div>
 
         {/* Error alert */}
-        {state.status === "error" && (
+        {state.kind !== "success" && (
           <div style={styles.alert}>
-            {state.error.kind === "email_taken" && (
+            {state.kind === "invalid_input" && (
+              <>Please fill in all fields.</>
+            )}
+            {state.kind === "email_taken" && (
               <>That email is already registered. Try{" "}
                 <Link href="/login" style={styles.link}>signing in</Link> instead.</>
             )}
-            {state.error.kind === "weak_password" && (
+            {state.kind === "weak_password" && (
               <>Password is too weak. Use 8+ characters with uppercase, numbers, and symbols.</>
             )}
-            {state.error.kind === "invalid_name" && (
-              <>{state.error.field === "firstName" ? "First" : "Last"} name is required.</>
+            {state.kind === "invalid_name" && (
+              <>{state.field === "firstName" ? "First" : "Last"} name is required.</>
             )}
-            {state.error.kind === "invalid_email" && (
+            {state.kind === "invalid_email" && (
               <>Please enter a valid email address.</>
             )}
-            {state.error.kind === "unexpected" && (
+            {state.kind === "db_error" && (
+              <>Could not create your account right now. Please try again.</>
+            )}
+            {state.kind === "unexpected" && (
               <>Something went wrong. Please try again.</>
             )}
           </div>
         )}
 
         {/* Success */}
-        {state.status === "success" && (
+        {state.kind === "success" && (
           <div style={{ ...styles.alert, background: "#ECFDF5", color: "#0E7C3A", borderColor: "#A7F3D0" }}>
             Account created for <strong>{state.email}</strong>!
             Check your email to verify your account.
