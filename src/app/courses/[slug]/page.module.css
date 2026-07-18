@@ -1,0 +1,259 @@
+/**
+ * /courses/[slug] — Course Detail page styles.
+ * Uses design tokens. No Tailwind classes.
+ */
+
+.page {
+  min-height: 100vh;
+  background: var(--surface-0);
+  font-family: var(--font-body);
+}
+
+/* Header */
+
+.header {
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+}
+
+.headerInner {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  text-decoration: none;
+  margin-bottom: var(--space-6);
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.backLink:hover {
+  color: var(--ink-900);
+}
+
+.headerGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+@media (min-width: 768px) {
+  .headerGrid {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.cover {
+  width: 100%;
+  height: 192px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .cover {
+    width: 288px;
+  }
+}
+
+.coverPlaceholder {
+  width: 100%;
+  height: 192px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .coverPlaceholder {
+    width: 288px;
+  }
+}
+
+.coverPlaceholderLetter {
+  color: var(--surface-1);
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  font-weight: 700;
+  opacity: 0.3;
+}
+
+.headerBody {
+  flex: 1;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-2) 0;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+}
+
+.tagline {
+  font-size: var(--text-lg);
+  color: var(--accent);
+  margin: 0 0 var(--space-3) 0;
+  line-height: var(--leading-snug);
+}
+
+.description {
+  font-size: var(--text-base);
+  color: var(--ink-700);
+  margin: 0 0 var(--space-6) 0;
+  line-height: var(--leading-relaxed);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  margin-bottom: var(--space-6);
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.metaIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink-900);
+  font-size: var(--text-lg);
+}
+
+/* Curriculum */
+
+.curriculumSection {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6);
+}
+
+.curriculumTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-6) 0;
+}
+
+.sectionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.section {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+.sectionSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: var(--space-4) var(--space-5);
+  list-style: none;
+  user-select: none;
+  transition: background-color var(--duration-base) var(--ease-out);
+}
+
+.sectionSummary::-webkit-details-marker {
+  display: none;
+}
+
+.sectionSummary:hover {
+  background: var(--surface-0);
+}
+
+.sectionTitle {
+  font-weight: 500;
+  color: var(--ink-900);
+}
+
+.sectionChevron {
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.section[open] .sectionChevron {
+  transform: rotate(180deg);
+}
+
+.lessonList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
+.lessonItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  border-bottom: 1px solid var(--border);
+}
+
+.lessonItem:last-child {
+  border-bottom: 0;
+}
+
+.lessonIcon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.lessonItem:last-child:not(:has(+ .lessonItem)) .lessonIcon {
+  color: var(--ink-500);
+}
+
+.lessonLink {
+  flex: 1;
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.lessonLink:hover {
+  color: var(--ink-900);
+}
+
+.lessonDuration {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  opacity: 0.6;
+}

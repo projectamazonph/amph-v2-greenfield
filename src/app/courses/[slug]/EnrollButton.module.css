@@ -1,0 +1,41 @@
+/**
+ * EnrollButton.module.css — local layout for the EnrollButton component.
+ *
+ * Uses the design tokens from globals.css (--accent, --success,
+ * --danger, --ink-*). No Tailwind classes — see eslint
+ * local/no-tailwind-classes.
+ */
+
+.fullWidth {
+  width: 100%;
+}
+
+.success {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--success);
+  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+}
+
+.successIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.notAvailable {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--ink-700);
+  margin: 0;
+}
+
+.error {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--danger);
+  margin: 0;
+}
