@@ -76,6 +76,10 @@ import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer"
 import { ReactPdfCertificateRenderer } from "@/infra/pdf/ReactPdfCertificateRenderer";
 import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer";
 
+import type { EmailSender } from "@/ports/email/EmailSender";
+import { ResendEmailSender } from "@/infra/email/ResendEmailSender";
+import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -131,6 +135,7 @@ export interface AppContainer {
   paymentGateway: IPaymentGateway;
   certificateHashGen: CertificateHashGenerator;
   certificateRenderer: CertificateRenderer;
+  emailSender: EmailSender;
 
   // Use cases
   signUp: SignUp;
@@ -175,6 +180,11 @@ function buildProductionContainer(): AppContainer {
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();
+
+  const emailSender: EmailSender = new ResendEmailSender(
+    process.env.RESEND_API_KEY ?? "",
+    process.env.EMAIL_FROM ?? "AMPH Academy <noreply@amph.example.com>",
+  );
 
   return {
     clock,
@@ -227,6 +237,7 @@ function buildProductionContainer(): AppContainer {
     certificateRepo,
     certificateHashGen,
     certificateRenderer,
+    emailSender,
     simulatorRegistry: buildSimulatorRegistry(),
     issueCertificate: new IssueCertificate({
       enrollmentRepo,
@@ -290,6 +301,7 @@ export function buildTestContainer(): TestContainer {
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new StaticCertificateRenderer();
+  const emailSender: EmailSender = new InMemoryEmailSender();
 
   return {
     clock,
@@ -326,6 +338,7 @@ export function buildTestContainer(): TestContainer {
     certificateRepo,
     certificateHashGen,
     certificateRenderer,
+    emailSender,
     accessPolicy,
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,
