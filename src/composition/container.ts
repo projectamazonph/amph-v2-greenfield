@@ -1,12 +1,26 @@
 /**
- * Composition root — the single place where all dependencies are wired together.
+ * src/composition/container.ts
  *
- * ADR-020: This is the only module in the codebase that knows about all layers.
- * Everything else receives its dependencies via constructor injection.
+ * Composition root for the production container.
  *
- * Two containers:
- * - buildContainer() — production: real infra adapters
- * - buildTestContainer() — test: in-memory fakes
+ * ADR-020: This is the only module in the codebase that knows about all
+ * production layers. Everything else receives its dependencies via
+ * constructor injection.
+ *
+ * Per SOLID dependency-inversion, the prod container depends on the
+ * port interfaces (UserRepository, etc.) and wires them to the prod
+ * adapters (PrismaUserRepository, ResendEmailSender, etc.).
+ *
+ * The test container lives in ./container.test.ts. It uses the same
+ * port interfaces but wires in-memory adapters (InMemoryUserRepository,
+ * InMemoryEmailSender, etc.). Splitting the two files keeps the
+ * in-memory test fakes (some of which import `react-dom/server` for
+ * rendering React Email templates) out of the production bundle.
+ * Turbopack would otherwise reject those imports at `next build` time.
+ *
+ * Test code imports `buildTestContainer` from "./container.test".
+ * Production code only ever imports `buildContainer` (or
+ * `runWithContainer` / `getContainer`) from this file.
  */
 
 import { AsyncLocalStorage } from "node:async_hooks";
@@ -19,81 +33,60 @@ import type { Clock } from "@/ports/system/Clock";
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
-import { FixedClock } from "@/ports/system/Clock";
-import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
-
-// ── Repository ports ────────────────────────────────────────
+// ── Repository ports (interfaces) ──────────────────────────────
 
 import type { UserRepository } from "@/ports/repositories/UserRepository";
-import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
-import { prisma } from "@/infra/database/prisma";
-
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
-import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
-
 import type { IOrderRepository } from "@/ports/repositories/OrderRepository";
-import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
-
-import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
-
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
-import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
-import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
-
 import type { IDiscountCodeRepository } from "@/ports/repositories/IDiscountCodeRepository";
-import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
-import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscountCodeRepository";
-
 import type { IQuizRepository } from "@/ports/repositories/IQuizRepository";
-import { InMemoryQuizRepository } from "@/infra/repositories/InMemoryQuizRepository";
-import { PrismaQuizRepository } from "@/infra/repositories/PrismaQuizRepository";
-
 import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRepository";
-import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
-import { PrismaQuizAttemptRepository } from "@/infra/repositories/PrismaQuizAttemptRepository";
-
 import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
-import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
-import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepository";
-
 import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
-import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepository";
-import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
-
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
-import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
+import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
+
+// ── Production adapters (only the prod ones) ──────────────────
+
+import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
+import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
+import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscountCodeRepository";
+import { PrismaQuizRepository } from "@/infra/repositories/PrismaQuizRepository";
+import { PrismaQuizAttemptRepository } from "@/infra/repositories/PrismaQuizAttemptRepository";
+import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepository";
+import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
+import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
+import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
-import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
-import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
-import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import type { CertificateHashGenerator } from "@/ports/security/CertificateHashGenerator";
 import { NodeCertificateHashGenerator } from "@/infra/security/NodeCertificateHashGenerator";
-import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHashGenerator";
 
 import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
 import { ReactPdfCertificateRenderer } from "@/infra/pdf/ReactPdfCertificateRenderer";
-import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer";
 
 import type { EmailSender } from "@/ports/email/EmailSender";
 import { ResendEmailSender } from "@/infra/email/ResendEmailSender";
-import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
-
-// ── Payment ports ────────────────────────────────────────────
+// InMemoryEmailSender is NOT imported here — it would pull in
+// react-dom/server and break `next build`. Test code uses it via
+// ./container.test.ts.
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import { PayMongoAdapter } from "@/infra/payment/PayMongoAdapter";
-import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
+
+import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
+import { JoseJwtService } from "@/infra/security/JoseJwtService";
+import type { JwtService } from "@/ports/security/JwtService";
+import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 
 // ── Use cases ───────────────────────────────────────────────
 
 import { SignUp } from "@/usecases/SignUp";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
-import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
-import { JoseJwtService } from "@/infra/security/JoseJwtService";
-import type { JwtService } from "@/ports/security/JwtService";
-import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
@@ -108,11 +101,8 @@ import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 import { RevokeCertificate } from "@/usecases/RevokeCertificate";
 import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
 
-// ── Access policy ────────────────────────────────────────────
-
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
-import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
 
 // ── Container shape ─────────────────────────────────────────
 
@@ -160,15 +150,20 @@ export interface AppContainer {
   getAdminDashboardStats: GetAdminDashboardStats;
 }
 
-// ── Production container ─────────────────────────────────────
+// ── Production container builder ─────────────────────────────
 
 function buildProductionContainer(): AppContainer {
   const clock: Clock = new SystemClock();
   const idGen: IdGenerator = new UlidGenerator();
 
   const userRepo: UserRepository = new PrismaUserRepository(prisma);
+  // Course and order repos are intentionally in-memory even in prod
+  // for now (see TODOs in STORY-013 / STORY-015). They will be moved
+  // to Prisma when the curriculum + orders data needs to survive
+  // process restarts.
   const courseRepo: CourseRepository = new InMemoryCourseRepository();
   const orderRepo: IOrderRepository = new InMemoryOrderRepository();
+
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
   const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
@@ -286,138 +281,7 @@ function buildProductionContainer(): AppContainer {
   };
 }
 
-// ── Test container ──────────────────────────────────────────
-
-export interface TestContainer extends AppContainer {
-  userRepo: InMemoryUserRepository;
-  courseRepo: InMemoryCourseRepository;
-  orderRepo: InMemoryOrderRepository;
-  enrollmentRepo: InMemoryEnrollmentRepository;
-  discountCodeRepo: InMemoryDiscountCodeRepository;
-  quizRepo: InMemoryQuizRepository;
-  quizAttemptRepo: InMemoryQuizAttemptRepository;
-  xpEventRepo: InMemoryXPEventRepository;
-  badgeRepo: InMemoryBadgeRepository;
-  badgeAwardRepo: InMemoryBadgeAwardRepository;
-  certificateRepo: InMemoryCertificateRepository;
-  certificateRenderer: StaticCertificateRenderer;
-  accessPolicy: StubAccessPolicy;
-}
-
-export function buildTestContainer(): TestContainer {
-  const clock = new FixedClock(new Date());
-  const idGen = new InMemoryIdGenerator();
-  const userRepo = new InMemoryUserRepository();
-  const courseRepo = new InMemoryCourseRepository();
-  const orderRepo = new InMemoryOrderRepository();
-  const enrollmentRepo = new InMemoryEnrollmentRepository();
-  const discountCodeRepo = new InMemoryDiscountCodeRepository();
-  const quizRepo = new InMemoryQuizRepository();
-  const quizAttemptRepo = new InMemoryQuizAttemptRepository();
-  const xpEventRepo = new InMemoryXPEventRepository();
-  const badgeRepo = new InMemoryBadgeRepository();
-  const badgeAwardRepo = new InMemoryBadgeAwardRepository();
-  const certificateRepo = new InMemoryCertificateRepository();
-  const paymentGateway: IPaymentGateway = new StubPaymentGateway();
-  const accessPolicy = new StubAccessPolicy();
-  const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
-  const certificateRenderer: CertificateRenderer = new StaticCertificateRenderer();
-  const emailSender: EmailSender = new InMemoryEmailSender();
-  const jwt: JwtService = new JoseJwtService(
-    process.env.JWT_SECRET ?? "test-secret-must-be-at-least-32-bytes-long-ok",
-  );
-  const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
-
-  return {
-    clock,
-    idGen,
-    userRepo,
-    courseRepo,
-    orderRepo,
-    enrollmentRepo,
-    paymentGateway,
-    jwt,
-    passwordHasher,
-    signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
-    createPaymentIntent: new CreatePaymentIntent({
-      courseRepo,
-      orderRepo,
-      paymentGateway,
-      baseUrl: "https://test.amph.example.com",
-    }),
-    checkCourseAccess: new CheckCourseAccess(accessPolicy),
-    enrollStudent: new EnrollStudent({
-      userRepo,
-      courseRepo,
-      enrollmentRepo,
-      idGen,
-    }),
-    discountCodeRepo,
-    applyDiscountCode: new ApplyDiscountCode({
-      discountCodeRepo,
-      clock,
-    }),
-    quizRepo,
-    quizAttemptRepo,
-    xpEventRepo,
-    badgeRepo,
-    badgeAwardRepo,
-    certificateRepo,
-    certificateHashGen,
-    certificateRenderer,
-    emailSender,
-    accessPolicy,
-    recordQuizAttempt: new RecordQuizAttempt({
-      quizRepo,
-      quizAttemptRepo,
-      xpEventRepo,
-      userRepo,
-      idGen,
-      clock,
-    }),
-    awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
-    awardBadge: new AwardBadge({
-      badgeRepo,
-      badgeAwardRepo,
-      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
-      idGen,
-    }),
-    listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
-    issueCertificate: new IssueCertificate({
-      enrollmentRepo,
-      courseRepo,
-      certificateRepo,
-      hashGen: certificateHashGen,
-      idGen,
-      clock,
-    }),
-    renderCertificatePdf: new RenderCertificatePdf({
-      certificateRepo,
-      userRepo,
-      courseRepo,
-      renderer: certificateRenderer,
-    }),
-    verifyCertificate: new VerifyCertificate({
-      certificateRepo,
-      userRepo,
-      courseRepo,
-    }),
-    revokeCertificate: new RevokeCertificate({
-      certificateRepo,
-      clock,
-    }),
-    getAdminDashboardStats: new GetAdminDashboardStats({
-      userRepo,
-      courseRepo,
-      orderRepo,
-      enrollmentRepo,
-      certificateRepo,
-    }),
-    simulatorRegistry: buildSimulatorRegistry(),
-  };
-}
-
-// ── Request-scoped storage ──────────────────────────────────
+// ── Request-scoped storage ─────────────────────────────────
 
 const containerStore = new AsyncLocalStorage<AppContainer>();
 
@@ -425,19 +289,20 @@ export function runWithContainer<T>(container: AppContainer, fn: () => T): T {
   return containerStore.run(container, fn);
 }
 
-/** Get the current request's container. Must be called inside a runWithContainer() context. */
 export function getContainer(): AppContainer {
-  const container = containerStore.getStore();
-  if (!container) {
+  const c = containerStore.getStore();
+  if (!c) {
     throw new Error(
-      "No container in scope. Are you calling getContainer() outside of a server action? " +
-        "All container access must go through runWithContainer().",
+      "getContainer() called outside a request scope with a container. " +
+        "Did you forget runWithContainer() in middleware, or are you " +
+        "calling this from a Server Component at the page level? " +
+        "Pages should call buildContainer() directly.",
     );
   }
-  return container;
+  return c;
 }
 
-// ── Cached singleton ─────────────────────────────────────────
+// ── Cached production singleton ──────────────────────────────
 
 let _productionContainer: AppContainer | null = null;
 
@@ -447,3 +312,13 @@ export function buildContainer(): AppContainer {
   }
   return _productionContainer;
 }
+
+// ── Re-exports for test code ─────────────────────────────────
+//
+// Test code imports `buildTestContainer` (and the TestContainer type)
+// directly from "./container.test" to make the dependency explicit.
+// We intentionally do NOT re-export from here — keeping the test
+// container in its own file is what keeps the in-memory adapters (and
+// their react-dom/server import) out of the production bundle.
+
+

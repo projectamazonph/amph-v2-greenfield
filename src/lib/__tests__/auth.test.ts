@@ -32,7 +32,7 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
-import { buildTestContainer } from "@/composition/container";
+import { buildTestContainer } from "@/composition/container.test";
 import { _testInternals } from "@/lib/auth";
 
 const SECRET = "test-secret-must-be-at-least-32-bytes-long-ok";
