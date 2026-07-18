@@ -24,13 +24,12 @@
  */
 
 import { useActionState } from "react";
-import { enrollStudent } from "@/app/actions/enroll";
-import type { EnrollStudentResult } from "@/usecases/EnrollStudent";
+import { enrollStudent, type EnrollStudentActionResult } from "@/app/actions/enroll";
 import { Money } from "@/domain/values/Money";
 import { Button } from "@/components/ui/Button";
 import styles from "./EnrollButton.module.css";
 
-type EnrollState = EnrollStudentResult | null;
+type EnrollState = EnrollStudentActionResult | null;
 
 export function EnrollButton({
   courseId,
@@ -74,6 +73,9 @@ export function EnrollButton({
     const err = state.error;
     if ("kind" in err && err.kind === "course_not_published") {
       return <p className={styles.notAvailable}>This course is not available.</p>;
+    }
+    if ("kind" in err && err.kind === "unauthorized") {
+      return <p className={styles.error}>Please sign in to enroll.</p>;
     }
     return <p className={styles.error}>Unable to enroll. Please try again.</p>;
   }

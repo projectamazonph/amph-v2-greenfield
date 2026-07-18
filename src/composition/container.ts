@@ -110,6 +110,8 @@ import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
 import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 import { RevokeCertificate } from "@/usecases/RevokeCertificate";
 import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
+import { ListCourses } from "@/usecases/ListCourses";
+import { GetCourse } from "@/usecases/GetCourse";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -161,6 +163,8 @@ export interface AppContainer {
   verifyCertificate: VerifyCertificate;
   revokeCertificate: RevokeCertificate;
   getAdminDashboardStats: GetAdminDashboardStats;
+  listCourses: ListCourses;
+  getCourse: GetCourse;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -302,6 +306,8 @@ function buildProductionContainer(): AppContainer {
       enrollmentRepo,
       certificateRepo,
     }),
+    listCourses: new ListCourses(courseRepo),
+    getCourse: new GetCourse(courseRepo),
   };
 }
 

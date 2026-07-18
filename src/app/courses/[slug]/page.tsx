@@ -3,13 +3,19 @@
  * Story 017
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
+ *
+ * Uses buildContainer() (the composition root) for the course
+ * repository + GetCourse use case. The page MUST NOT
+ * instantiate InMemory* adapters directly — that would be the
+ * "in-memory in production" anti-pattern (every course detail
+ * page would 404 because the fresh InMemoryCourseRepository
+ * starts empty).
  */
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { GetCourse } from "@/usecases/GetCourse";
-import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { buildContainer } from "@/composition/container";
 import { courseLessonCount, courseTotalDurationMinutes } from "@/domain/entities/Course";
 import type { Course, Section, Lesson } from "@/domain/entities/Course";
 import { EnrollButton } from "./EnrollButton";
@@ -21,9 +27,8 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const repo = new InMemoryCourseRepository();
-  const useCase = new GetCourse(repo);
-  const result = await useCase.execute(slug);
+  const container = buildContainer();
+  const result = await container.getCourse.execute(slug);
   if (!result.ok) return { title: "Course Not Found — AMPH Academy" };
   const course = result.course;
   return {
@@ -34,9 +39,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CourseDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const repo = new InMemoryCourseRepository();
-  const useCase = new GetCourse(repo);
-  const result = await useCase.execute(slug);
+  const container = buildContainer();
+  const result = await container.getCourse.execute(slug);
 
   if (!result.ok) notFound();
 

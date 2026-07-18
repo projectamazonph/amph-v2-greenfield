@@ -3,12 +3,17 @@
  * Story 016
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
+ *
+ * Uses buildContainer() (the composition root) for the course
+ * repository + ListCourses use case. The page MUST NOT
+ * instantiate InMemory* adapters directly — that would be the
+ * "in-memory in production" anti-pattern (the catalog would
+ * always be empty).
  */
 
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ListCourses } from "@/usecases/ListCourses";
-import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { buildContainer } from "@/composition/container";
 import { courseLessonCount, courseTotalDurationMinutes } from "@/domain/entities/Course";
 import type { Course } from "@/domain/entities/Course";
 import styles from "./page.module.css";
@@ -19,9 +24,8 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursesPage() {
-  const repo = new InMemoryCourseRepository();
-  const useCase = new ListCourses(repo);
-  const result = await useCase.execute();
+  const container = buildContainer();
+  const result = await container.listCourses.execute();
 
   if (!result.ok) {
     return (
