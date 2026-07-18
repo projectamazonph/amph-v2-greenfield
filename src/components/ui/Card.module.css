@@ -1,0 +1,57 @@
+/* Card.module.css — Field Manual card system.
+   Per design spec §5: border IS the elevation; never shadow by default. */
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  color: var(--ink-900);
+  font-family: var(--font-body);
+  /* Default border-radius: --radius-lg for marketing, --radius-md for data.
+     Variant=compact uses the smaller radius. */
+  border-radius: var(--radius-lg);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+/* ── Variants ───────────────────────────────────────────────── */
+
+.default {
+  /* Static card. No hover effect. */
+}
+
+.interactive {
+  cursor: pointer;
+}
+.interactive:hover {
+  border-color: var(--ink-300);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.interactive:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.interactive:active {
+  transform: translateY(0);
+}
+
+.compact {
+  border-radius: var(--radius-md);
+}
+
+/* ── Padding scale ──────────────────────────────────────────── */
+
+.tight {
+  padding: var(--space-3);
+}
+.default {
+  padding: var(--space-4);
+}
+.comfortable {
+  padding: var(--space-6);
+}
+.hero {
+  padding: var(--space-8);
+}

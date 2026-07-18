@@ -34,12 +34,16 @@
   /* ── Semantic ────────────────────────────────────────────── */
   --success: #0E7C3A;
   --success-soft: #DCFCE7;
+  --success-hover: #0A6630;
   --warning: #B45309;
   --warning-soft: #FEF3C7;
+  --warning-hover: #93420A;
   --danger: #B91C1C;
   --danger-soft: #FEE2E2;
+  --danger-hover: #991313;
   --info: #1E40AF;
   --info-soft: #DBEAFE;
+  --info-hover: #173296;
 
   /* ── Typography ──────────────────────────────────────────── */
   /* next/font provides --font-display (Space Grotesk) and --font-mono
