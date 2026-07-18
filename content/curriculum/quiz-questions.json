@@ -1,0 +1,459 @@
+{
+  "_meta": {
+    "description": "Quiz questions for AMPH Academy modules. Each quiz maps to a module's final lesson (knowledge check). Questions test PPC concepts covered in the preceding lessons.",
+    "version": "1.0.0",
+    "passThreshold": 70,
+    "xpRewardPerQuiz": 100
+  },
+  "quizzes": [
+    {
+      "moduleNumber": 0,
+      "title": "Onboarding Knowledge Check",
+      "description": "Test your understanding of the AMPH Academy platform and Amazon PPC basics covered in the Onboarding module.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "What does PPC stand for in the context of Amazon advertising?",
+          "optionA": "Pay Per Click",
+          "optionB": "Product Promotion Campaign",
+          "optionC": "Paid Product Catalog",
+          "optionD": "Performance Per Cost",
+          "correctAnswer": "A",
+          "explanation": "PPC stands for Pay Per Click — you only pay when a shopper clicks on your ad, not when it's displayed."
+        },
+        {
+          "order": 2,
+          "question": "Which Amazon ad type appears within search results and on product detail pages?",
+          "optionA": "Sponsored Brands",
+          "optionB": "Sponsored Display",
+          "optionC": "Sponsored Products",
+          "optionD": "Display Ads",
+          "correctAnswer": "C",
+          "explanation": "Sponsored Products are the most common ad type — they appear in search results and on product detail pages, promoting individual listings."
+        },
+        {
+          "order": 3,
+          "question": "What is the primary benefit of Amazon PPC for sellers?",
+          "optionA": "Free product listings on Amazon",
+          "optionB": "Increased organic search ranking guaranteed",
+          "optionC": "Getting products in front of shoppers who are actively searching",
+          "optionD": "Automatic review generation",
+          "correctAnswer": "C",
+          "explanation": "Amazon PPC puts your products in front of shoppers who are actively searching for related items, giving you visibility at the moment of purchase intent."
+        },
+        {
+          "order": 4,
+          "question": "What does your Amazon PPC bid actually control?",
+          "optionA": "The exact price you'll pay for every click",
+          "optionB": "A starting point that placement adjustments and your bid strategy then act on to set the real ceiling",
+          "optionC": "A price that never changes once the campaign is live",
+          "optionD": "A guaranteed discount of one cent below the next bidder",
+          "correctAnswer": "B",
+          "explanation": "Your entered bid is the base. Placement adjustments raise it for specific placements, and your bid strategy setting decides whether the result is a hard ceiling (Fixed Bids, Dynamic Down Only) or something Amazon can raise further for likely conversions (Dynamic Up and Down). The safe habit isn't memorizing an auction formula, it's setting a defensible maximum bid and then watching your realized CPC in the reports."
+        },
+        {
+          "order": 5,
+          "question": "What should you do before launching your first Amazon PPC campaign?",
+          "optionA": "Set the highest possible bids to win all auctions",
+          "optionB": "Make sure your product listing is optimized with good images and copy",
+          "optionC": "Wait until you have at least 100 reviews",
+          "optionD": "Only target the most expensive keywords",
+          "correctAnswer": "B",
+          "explanation": "Your product listing is the foundation of PPC success. Even the best ads can't convert if the listing is poor. Optimize images, title, bullets, and price before spending on ads."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 1,
+      "title": "PPC Foundations Knowledge Check",
+      "description": "Verify your mastery of the core PPC metrics — CPC, CTR, ACoS, TACoS, and RoAS — the building blocks of every Amazon advertising decision.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "If you spend $200 on a keyword and receive 160 clicks, what is your CPC?",
+          "optionA": "$0.80",
+          "optionB": "$1.25",
+          "optionC": "$1.60",
+          "optionD": "$3.20",
+          "correctAnswer": "B",
+          "explanation": "CPC = Total Spend / Total Clicks = $200 / 160 = $1.25. This is your average cost for each click received."
+        },
+        {
+          "order": 2,
+          "question": "Your ad receives 3,000 impressions and 90 clicks. What is the CTR?",
+          "optionA": "0.3%",
+          "optionB": "3.0%",
+          "optionC": "30%",
+          "optionD": "9.0%",
+          "correctAnswer": "B",
+          "explanation": "CTR = Clicks / Impressions = 90 / 3,000 = 0.03 = 3.0%. A 3% CTR is solid for exact match keywords on Amazon."
+        },
+        {
+          "order": 3,
+          "question": "What does ACoS measure?",
+          "optionA": "The percentage of clicks that result in a sale",
+          "optionB": "The ratio of ad spend to ad revenue",
+          "optionC": "The total advertising cost of your entire account",
+          "optionD": "The average cost per sale across all campaigns",
+          "correctAnswer": "B",
+          "explanation": "ACoS (Advertising Cost of Sales) = Ad Spend / Ad Revenue. It tells you what percentage of your ad revenue goes toward ad costs. A 25% ACoS means you spend $0.25 on ads for every $1 in ad revenue."
+        },
+        {
+          "order": 4,
+          "question": "How is TACoS different from ACoS?",
+          "optionA": "TACoS includes organic sales in the denominator, ACoS only uses ad revenue",
+          "optionB": "TACoS is always higher than ACoS",
+          "optionC": "They measure the same thing — TACoS is just the newer name",
+          "optionD": "TACoS measures click cost while ACoS measures revenue",
+          "correctAnswer": "A",
+          "explanation": "TACoS = Ad Spend / Total Revenue (organic + ads), while ACoS = Ad Spend / Ad Revenue only. TACoS gives you a holistic view of how ads impact your total business, not just the direct ad-attributed revenue."
+        },
+        {
+          "order": 5,
+          "question": "A keyword has an ACoS of 45% and your product profit margin is 30%. What should you consider?",
+          "optionA": "The keyword is performing well — keep it as-is",
+          "optionB": "You're likely losing money on this keyword since ACoS exceeds profit margin",
+          "optionC": "The profit margin doesn't matter for ACoS calculations",
+          "optionD": "You should double your bid to get more clicks",
+          "correctAnswer": "B",
+          "explanation": "When ACoS exceeds your profit margin, you're spending more on ads than you make in profit. A 45% ACoS on a 30% margin means you lose 15 percentage points on every ad-attributed sale. Consider lowering bids, adding negatives, or pausing."
+        },
+        {
+          "order": 6,
+          "question": "If your RoAS is 4.0x, what does that mean?",
+          "optionA": "You get 4 clicks for every dollar spent",
+          "optionB": "You earn $4 in total revenue for every $1 spent on ads",
+          "optionC": "You earn $4 in ad revenue for every $1 spent on ads",
+          "optionD": "Your ACoS is 4%",
+          "correctAnswer": "C",
+          "explanation": "RoAS = Ad Revenue / Ad Spend. A 4.0x RoAS means for every $1 in ad spend, you generate $4 in ad-attributed revenue. It's the inverse of ACoS: RoAS = 1 / ACoS."
+        },
+        {
+          "order": 7,
+          "question": "Why is it dangerous to evaluate CPC in isolation?",
+          "optionA": "CPC is not an important metric",
+          "optionB": "A low CPC on irrelevant keywords can still waste money if those clicks don't convert",
+          "optionC": "Amazon doesn't report CPC accurately",
+          "optionD": "CPC should always be as low as possible regardless of other metrics",
+          "correctAnswer": "B",
+          "explanation": "Cheap clicks from irrelevant search terms can have a low CPC but infinite effective cost if they never convert. Always evaluate CPC alongside CVR, ACoS, and relevance."
+        },
+        {
+          "order": 8,
+          "question": "What is the relationship between CTR and CPC in Amazon's advertising system?",
+          "optionA": "They are completely independent metrics",
+          "optionB": "Higher CTR can lead to lower CPC because Amazon rewards relevant ads",
+          "optionC": "Higher CTR always means higher CPC",
+          "optionD": "CTR only affects ad placement, not CPC",
+          "correctAnswer": "B",
+          "explanation": "Amazon's algorithm uses CTR as a quality signal. Higher CTR indicates relevance, which can lead to better placements at lower costs, creating a virtuous cycle of better performance."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 2,
+      "title": "Keyword Research Knowledge Check",
+      "description": "Test your understanding of match types, keyword research workflow, negative keywords, and keyword grouping.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "What's the main difference between broad match and exact match keywords?",
+          "optionA": "Broad match shows ads for a wide range of related searches; exact match shows ads only for the precise term or very close variants",
+          "optionB": "Broad match is always cheaper per click than exact match",
+          "optionC": "Exact match shows ads for related searches; broad match only matches the literal term",
+          "optionD": "There is no functional difference, only a naming difference",
+          "correctAnswer": "A",
+          "explanation": "Broad match casts the widest net and can trigger on related searches Amazon judges relevant. Exact match is the tightest control, showing your ad only for the precise term or very close variants."
+        },
+        {
+          "order": 2,
+          "question": "A search term surfacing under one of your broader keywords gets 200 clicks and $150 in ad spend, with $0 in sales. What's the right read?",
+          "optionA": "Its ACoS (advertising cost of sales, ad spend divided by ad sales) is 100%, which is acceptable",
+          "optionB": "It's a strong candidate to add as a negative keyword. With zero sales, ACoS is undefined, not a fixed percentage, and this spend is pure waste",
+          "optionC": "It should be given a higher bid to try to generate a sale",
+          "optionD": "Nothing needs to change since spend is under $200",
+          "correctAnswer": "B",
+          "explanation": "ACoS is spend divided by sales, which is undefined at $0 in sales, not 100%. 200 clicks and $150 spent with zero orders on this search term is a clear signal to add it as a negative so it stops draining budget under your broader keyword."
+        },
+        {
+          "order": 3,
+          "question": "Which two match types can you actually use for negative keywords on Amazon?",
+          "optionA": "Negative broad and negative phrase",
+          "optionB": "Negative exact and negative broad",
+          "optionC": "Negative phrase and negative exact",
+          "optionD": "Negative broad only",
+          "correctAnswer": "C",
+          "explanation": "Amazon supports negative phrase and negative exact match. There's no negative broad match, so you can't block an entire loose category of searches with a single negative the way broad match works for regular targeting."
+        },
+        {
+          "order": 4,
+          "question": "Your keyword research turns up 500 candidate keywords for one product. What should you do before adding them to a campaign?",
+          "optionA": "Add all 500 immediately. More keywords always means more sales",
+          "optionB": "Score and filter them for relevance and likely volume first, then launch with the strongest subset",
+          "optionC": "Only use the 5 most expensive keywords",
+          "optionD": "Wait until you have Brand Registry before adding any keywords",
+          "correctAnswer": "B",
+          "explanation": "Unfiltered keyword lists bring in irrelevant traffic and make performance data harder to read. Score candidates for relevance and volume, launch with the strongest set, then expand from real data."
+        },
+        {
+          "order": 5,
+          "question": "Why does it make sense to shift more budget toward exact-match keywords once you have performance data on them?",
+          "optionA": "Exact match keywords with a proven conversion history are your most predictable, lowest-risk spend",
+          "optionB": "Exact match is always required by Amazon once a campaign has run for 30 days",
+          "optionC": "Exact match keywords are always cheaper per click than broad or phrase",
+          "optionD": "Broad match keywords stop working after enough data accumulates",
+          "correctAnswer": "A",
+          "explanation": "Once an exact-match keyword has a real conversion track record, it's the most predictable place to invest further budget. Broad and phrase remain useful for discovering new terms, not for scaling proven ones."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 3,
+      "title": "Listing Optimization Knowledge Check",
+      "description": "Test your understanding of listing and ad relevance signals, listing anatomy, and A+ Content.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "Does Amazon expose a single named \"Listing Quality Score\" that a VA can look up directly?",
+          "optionA": "Yes, it's visible in Seller Central under Listing Quality",
+          "optionB": "No. Amazon doesn't publish a single inspectable score. CTR (click-through rate), CVR (conversion rate), and relevance are the observable signals instead",
+          "optionC": "Yes, but only for Brand Registry accounts",
+          "optionD": "No, because Amazon doesn't measure listing quality at all",
+          "correctAnswer": "B",
+          "explanation": "There's no single named, inspectable \"Quality Score.\" Treat CTR, CVR, and relevance signals as the observable proxies for how well a listing is converting paid traffic, not a score you can pull from a report."
+        },
+        {
+          "order": 2,
+          "question": "Two listings for the same product get the same clicks. Listing A has a CVR (conversion rate) of 12.5% and a $0.52 CPC (cost per click). Listing B has a 6.1% CVR and an $0.89 CPC. Which gets more sales per ad dollar, and roughly by how much?",
+          "optionA": "Listing B, by about 2x",
+          "optionB": "They perform about the same",
+          "optionC": "Listing A, by about 3.5x",
+          "optionD": "Listing B, by about 3.5x",
+          "correctAnswer": "C",
+          "explanation": "Sales per ad dollar scales with CVR divided by CPC. (0.125 / 0.52) divided by (0.061 / 0.89) is about 3.5. A weaker listing doesn't just convert worse, it multiplies the gap because it's also paying more per click for the same targeting."
+        },
+        {
+          "order": 3,
+          "question": "Which of these listing elements has the most direct effect on whether a relevant click converts into a sale?",
+          "optionA": "The seller's account age",
+          "optionB": "Main images, title clarity, and review strength",
+          "optionC": "The campaign's daily budget",
+          "optionD": "The number of keywords targeted",
+          "correctAnswer": "B",
+          "explanation": "Once a shopper clicks through, it's the listing itself, images, title, bullets, reviews, and price, that decides whether they buy. Budget and keyword count affect whether you get the click, not what happens after."
+        },
+        {
+          "order": 4,
+          "question": "What does an ASIN identify?",
+          "optionA": "A seller's advertising account",
+          "optionB": "A specific product on Amazon",
+          "optionC": "A campaign's daily budget",
+          "optionD": "A shopper's search history",
+          "correctAnswer": "B",
+          "explanation": "ASIN (Amazon Standard Identification Number) is Amazon's product ID. Every distinct product listing has one."
+        },
+        {
+          "order": 5,
+          "question": "A seller without Brand Registry asks why it's worth enrolling. What's an accurate answer?",
+          "optionA": "Brand Registry guarantees a #1 search ranking",
+          "optionB": "It unlocks A+ Content and Sponsored Brands, which are commonly associated with better conversion and more ad placements, though exact lift varies by listing",
+          "optionC": "It's required before you're allowed to run any Sponsored Products campaign",
+          "optionD": "It removes Amazon's referral fees",
+          "correctAnswer": "B",
+          "explanation": "Brand Registry unlocks A+ Content and Sponsored Brands campaigns, both commonly linked to better conversion and reach. It's not a ranking guarantee, not required for basic Sponsored Products, and has nothing to do with referral fees."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 4,
+      "title": "Campaign Architecture Knowledge Check",
+      "description": "Test your understanding of Sponsored Products, Sponsored Brands, Sponsored Display, and how to structure campaigns for maximum performance.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "Which Amazon ad type allows you to promote a portfolio of products with a custom headline and logo?",
+          "optionA": "Sponsored Products",
+          "optionB": "Sponsored Brands",
+          "optionC": "Sponsored Display",
+          "optionD": "Amazon DSP",
+          "correctAnswer": "B",
+          "explanation": "Sponsored Brands (formerly Headline Search Ads) feature your brand logo, a custom headline, and a collection of products. They appear at the top of search results and drive brand awareness."
+        },
+        {
+          "order": 2,
+          "question": "What is the primary advantage of a manual targeting campaign over auto campaigns?",
+          "optionA": "Manual campaigns are always cheaper",
+          "optionB": "Manual campaigns give you precise control over which keywords and match types you target",
+          "optionC": "Manual campaigns generate more impressions automatically",
+          "optionD": "Manual campaigns don't require any keyword research",
+          "correctAnswer": "B",
+          "explanation": "Manual targeting gives you explicit control over keyword selection and match types, allowing you to strategically bid on high-converting terms and exclude low-performers with precision."
+        },
+        {
+          "order": 3,
+          "question": "When should you use broad match keywords in your campaigns?",
+          "optionA": "When you want to discover new search terms that convert for your product",
+          "optionB": "When you want the most precise control over ad spend",
+          "optionC": "When you want to minimize irrelevant clicks",
+          "optionD": "Broad match should never be used in Amazon PPC",
+          "correctAnswer": "A",
+          "explanation": "Broad match is your discovery tool — it triggers your ad for variations and related searches, helping you find new converting search terms. Always monitor the search term report and convert high-performers to phrase or exact match."
+        },
+        {
+          "order": 4,
+          "question": "What is the recommended campaign structure for Sponsored Products?",
+          "optionA": "One campaign with all keywords in a single ad group",
+          "optionB": "Separate campaigns for auto, broad, phrase, and exact match types",
+          "optionC": "Only use auto campaigns — manual is too complicated",
+          "optionD": "One campaign per individual keyword",
+          "correctAnswer": "B",
+          "explanation": "Segmenting by match type (auto, broad, phrase, exact) into separate campaigns gives you granular budget and bid control at each stage of the keyword lifecycle — from discovery to optimization."
+        },
+        {
+          "order": 5,
+          "question": "Sponsored Display ads can target which of the following audiences?",
+          "optionA": "Only shoppers who searched for your exact keywords",
+          "optionB": "Views (shoppers who viewed your product) and Purchases (shoppers who bought your product)",
+          "optionC": "Only shoppers who added your product to cart",
+          "optionD": "Only shoppers on competing product detail pages",
+          "correctAnswer": "B",
+          "explanation": "Sponsored Display offers powerful remarketing: you can retarget shoppers who viewed your product (Views) or who purchased from you (Purchases) with different messaging strategies for each audience."
+        },
+        {
+          "order": 6,
+          "question": "What is a common mistake when setting daily budgets for multiple campaigns?",
+          "optionA": "Setting budgets too low, causing campaigns to pause mid-day and lose high-converting evening traffic",
+          "optionB": "Setting different budgets for different campaigns",
+          "optionC": "Using the same bid for all keywords in a campaign",
+          "optionD": "Running auto campaigns alongside manual campaigns",
+          "correctAnswer": "A",
+          "explanation": "Under-budgeting causes campaigns to stop running before the day ends. Amazon shoppers are active 24/7, and you may miss peak converting hours. Monitor spend patterns and set budgets that allow full-day coverage for proven campaigns."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 6,
+      "title": "Bidding Lab Knowledge Check",
+      "description": "Verify your understanding of bid strategies, placement adjustments, and how to optimize bids for profitability.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "What does 'Dynamic Bids - Down Only' do?",
+          "optionA": "Automatically increases your bid for placements likely to convert",
+          "optionB": "Automatically decreases your bid for placements unlikely to convert, but never raises it",
+          "optionC": "Sets all your bids to the same amount",
+          "optionD": "Dynamically adjusts bids based on time of day",
+          "correctAnswer": "B",
+          "explanation": "Dynamic Bids - Down Only tells Amazon to reduce your bid when the placement is unlikely to convert, saving you money on low-value clicks. It never raises your bid above your set amount, making it the most conservative strategy."
+        },
+        {
+          "order": 2,
+          "question": "You're running a campaign with 50% placement adjustment for 'Top of Search'. If your default bid is $1.00, what is your maximum bid for top of search?",
+          "optionA": "$1.00",
+          "optionB": "$1.50",
+          "optionC": "$2.00",
+          "optionD": "$0.50",
+          "correctAnswer": "B",
+          "explanation": "A 50% placement adjustment increases your bid by 50% for that placement: $1.00 + ($1.00 × 0.50) = $1.50 maximum bid for top of search positions."
+        },
+        {
+          "order": 3,
+          "question": "When should you use 'Dynamic Bids - Up and Down'?",
+          "optionA": "When you want to minimize ad spend at all costs",
+          "optionB": "When your campaigns are profitable and you want Amazon to increase bids for high-conversion opportunities",
+          "optionC": "Only for auto campaigns",
+          "optionD": "When launching a new campaign with no historical data",
+          "correctAnswer": "B",
+          "explanation": "Up and Down bidding works best on proven campaigns with good ACoS. Amazon will raise bids for placements likely to convert and lower them for poor ones. Avoid it on new or unprofitable campaigns."
+        },
+        {
+          "order": 4,
+          "question": "What is the risk of setting your default bid too high in a manual campaign?",
+          "optionA": "Your ads won't show at all",
+          "optionB": "You may win clicks for expensive, low-converting search terms and rapidly drain your budget",
+          "optionC": "Amazon will automatically lower your bid",
+          "optionD": "Your ACoS will decrease automatically",
+          "correctAnswer": "B",
+          "explanation": "Overbidding wins you more auctions — including low-quality ones. You'll burn through budget on expensive clicks from irrelevant or low-converting search terms, driving up ACoS and reducing overall profitability."
+        },
+        {
+          "order": 5,
+          "question": "Your keyword has a CPC of $2.50, CVR of 8%, and your product price is $30 with 30% profit margin. What is your approximate ACoS?",
+          "optionA": "8.3%",
+          "optionB": "62.5%",
+          "optionC": "1042%",
+          "optionD": "42.7%",
+          "correctAnswer": "B",
+          "explanation": "Cost per order = CPC / CVR = $2.50 / 0.08 = $31.25. ACoS = Ad Spend / Ad Revenue = $31.25 / $30 = 104.2%. Since this exceeds 100%, you're paying more per order than the product price — this keyword is extremely unprofitable."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 7,
+      "title": "Search Term Triage Knowledge Check",
+      "description": "Test your understanding of search term analysis, negative keywords, and how to optimize campaigns through strategic triage decisions.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "What is a search term in Amazon PPC?",
+          "optionA": "The keyword you bid on in your campaign",
+          "optionB": "The actual shopper query that triggered your ad",
+          "optionC": "The title of your product listing",
+          "optionD": "The search algorithm Amazon uses",
+          "correctAnswer": "B",
+          "explanation": "A search term is the actual query a shopper typed — which may differ from your keyword. For example, if you bid on the broad keyword 'water bottle', a search term might be 'insulated water bottle for gym'. This distinction is critical for optimization."
+        },
+        {
+          "order": 2,
+          "question": "When should you add a search term as an exact negative keyword?",
+          "optionA": "When the term has high spend and zero sales",
+          "optionB": "When the term has a high ACoS above your target",
+          "optionC": "When the term is completely irrelevant to your product",
+          "optionD": "All of the above are valid reasons",
+          "correctAnswer": "D",
+          "explanation": "All three scenarios justify adding an exact negative: high spend with zero sales is pure waste, ACoS above target means the term is unprofitable, and completely irrelevant terms waste budget and hurt CTR."
+        },
+        {
+          "order": 3,
+          "question": "What is the difference between negative exact and negative phrase match types?",
+          "optionA": "They work the same way for negatives",
+          "optionB": "Negative exact blocks only that specific search term; negative phrase blocks the term and any searches containing it",
+          "optionC": "Negative phrase is more restrictive than negative exact",
+          "optionD": "There is no phrase match option for negatives",
+          "correctAnswer": "B",
+          "explanation": "Negative exact match blocks your ad from showing for only that specific search term. Negative phrase match blocks your ad for any search that contains the term, which is broader. Use negative exact for precision and negative phrase to block entire categories of unwanted searches."
+        },
+        {
+          "order": 4,
+          "question": "A search term has 500 impressions, 2 clicks, and 0 orders with $3.50 spend. What triage action should you consider?",
+          "optionA": "Keep bidding — it might convert with more clicks",
+          "optionB": "Increase your bid to get more visibility",
+          "optionC": "Add as a negative keyword — the CTR is very low and it's spending without converting",
+          "optionD": "Do nothing — 2 clicks is not enough data",
+          "correctAnswer": "C",
+          "explanation": "CTR of 0.4% (2/500) is extremely low and the term has $3.50 spend with zero return. This indicates the search term is irrelevant to your product. Adding it as a negative prevents further waste."
+        },
+        {
+          "order": 5,
+          "question": "You find a high-converting search term in your broad match campaign. What is the recommended next step?",
+          "optionA": "Leave it in the broad campaign and increase the broad bid",
+          "optionB": "Add it as an exact match keyword in a separate exact campaign with a higher bid",
+          "optionC": "Remove it from the broad campaign immediately",
+          "optionD": "Add it as a negative keyword to prevent broad from triggering for it",
+          "correctAnswer": "B",
+          "explanation": "The best practice is to graduate high-converting search terms to an exact match campaign with a higher bid. This gives you precise control and ensures you win auctions for this proven term. Optionally, add it as a negative in the broad campaign to avoid competing with yourself."
+        },
+        {
+          "order": 6,
+          "question": "Why is regular search term analysis essential for PPC profitability?",
+          "optionA": "Amazon requires weekly reports to keep your account active",
+          "optionB": "It helps you discover irrelevant terms wasting budget and find new converting terms to target explicitly",
+          "optionC": "It automatically optimizes your bids for you",
+          "optionD": "It replaces the need for bid strategy adjustments",
+          "correctAnswer": "B",
+          "explanation": "Regular search term analysis is the single highest-ROI activity in PPC management. It lets you cut waste (irrelevant terms draining budget) and capture opportunity (converting terms you should bid on explicitly). This is the core loop: discover → triage → optimize → repeat."
+        }
+      ]
+    }
+  ]
+}

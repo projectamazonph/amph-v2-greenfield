@@ -1,0 +1,250 @@
+---
+title: "Budget Pacing & Daily Spend Management"
+slug: "5.2-budget-pacing"
+moduleNumber: 5
+lessonNumber: 2
+type: "reading"
+estimatedMinutes: 14
+xpReward: 100
+---
+
+# Budget Pacing & Daily Spend Management
+
+## What you can do after this lesson
+
+After this lesson, you can read a campaign's burn rate partway through the day and decide whether to raise the budget, adjust bids, or leave the campaign alone before that day's spend runs out.
+
+## The decision in one sentence
+
+If a campaign is on pace to hit 100% of its daily budget in the morning or early afternoon instead of by end of day, that's a signal to raise the budget or reallocate spend, not proof the account is broken.
+
+Your campaigns are running. Keywords are bidding. But are you spending your budget **efficiently**?
+
+Budget pacing is the art of making sure your daily ad spend is distributed evenly and strategically throughout the day, the week, and the month. Get this right and you'll never run out of budget at 3PM on a high-traffic day again.
+
+> **Analogy**: Budget pacing is like managing a daily food budget for your family. You could spend ₱1,000 on coffee and pastries in the morning and have nothing left for dinner. Or you could pace yourself: ₱200 breakfast, ₱300 lunch, ₱500 dinner, and eat well all day. Your ad budget works the same way.
+
+---
+
+## Amazon's Budget Rules
+
+First, understand the rules of the game:
+
+| Rule | What It Means | Impact on Pacing |
+|------|---------------|------------------|
+| **Daily budget, averaged over the calendar month** | Your daily budget is treated as an average across the month, not a hard per-day cap. Amazon lets a campaign spend above that average on high-traffic days, capped at either 25% or 100% over, a setting you (or your account) choose in the console. Total spend for the month still won't exceed your daily budget × the number of days in that month | A single day can legitimately show 125% or 200% of your daily budget on the dashboard, depending on which over-delivery setting is active. Check that setting so a big single day doesn't surprise you |
+| **Lifetime budget** | Not available for Sponsored Products | Only for Sponsored Brands campaigns with end dates |
+| **Portfolio budget** | Spend cap across campaigns, where eligible | Prevents single-campaign cap issues |
+| **Budget rule** | Increase/decrease based on performance triggers | Automate pacing adjustments |
+
+### What a week of spend might look like
+
+```
+Monday:    Budget ₱1,000 → Spent ₱1,200 (over-delivery day, within a 25% cap)
+Tuesday:   Budget ₱1,000 → Spent ₱800
+Wednesday: Budget ₱1,000 → Spent ₱1,000
+Thursday:  Budget ₱1,000 → Spent ₱900
+Friday:    Budget ₱1,000 → Spent ₱1,100
+Saturday:  Budget ₱1,000 → Spent ₱600
+Sunday:    Budget ₱1,000 → Spent ₱400
+────────────────────────────────────────────────
+Sum of daily budgets: ₱7,000. Sum of daily spend shown: ₱6,000.
+```
+
+This week spent less than its sum of daily budgets, which is normal: the averaging is calculated over the full calendar month, not week by week, so a slow week like this one leaves room for higher-traffic days elsewhere in the month without breaching the monthly total. Confirm whether your account's over-delivery setting is 25% or 100% in the console, since that decides how far above budget a single day can legitimately go.
+
+> **Tip**: If you're consistently hitting your daily budget by midday, consider increasing the daily budget. You're likely leaving sales on the table. A good pacing target is 80 to 90% of daily budget spent by end of day. If you're hitting 100% by lunch, that's a signal to raise the budget, not just a curiosity.
+
+---
+
+## The Burn Rate Calculation
+
+Your **burn rate** tells you how fast you're spending budget each hour. It's the single most useful metric for pacing.
+
+### The Formula
+
+```
+Hourly Burn Rate = Total Daily Spend ÷ Hours in Day
+                         (or hours since budget reset)
+```
+
+**Real example:**
+
+| Time | Spent | % of Budget | Remaining | Pace |
+|------|-------|-------------|-----------|------|
+| 12AM | ₱0 | 0% | ₱2,000 | Starting |
+| 6AM | ₱200 | 10% | ₱1,800 | Slow |
+| 9AM | ₱500 | 25% | ₱1,500 | Normal |
+| 12PM | ₱900 | 45% | ₱1,100 | Picking up |
+| 3PM | ₱1,400 | 70% | ₱600 | Fast |
+| 6PM | ₱1,700 | 85% | ₱300 | Almost done |
+| 9PM | ₱1,900 | 95% | ₱100 | Good |
+| 12AM | ₱2,000 | 100% | ₱0 | Perfect |
+
+### What Your Burn Rate Tells You
+
+| Burn Rate Pattern | Meaning | Action |
+|-------------------|---------|--------|
+| **Hits budget by midday** | Budget too low for demand | Raise budget 20-30% |
+| **Slow burn until evening** | Budget fine, but ad schedule may need adjustment | Check if prime hours are being captured |
+| **Unused budget at midnight** | Budget too high for demand | Lower budget 15-20% or improve targeting |
+| **Erratic spikes** | Auto-campaign going wild | Check search term report for junk traffic |
+
+> **Analogy**: Burn rate is like checking your gas gauge during a road trip. You know how much gas you have (budget), how far you need to go (month), and how fast you're burning (hourly spend). If you're burning too fast, you won't make it. If you're burning too slow, you're not driving enough.
+
+---
+
+## Budget Pacing by Day of Week
+
+Amazon traffic is not uniform. Here's a typical pattern:
+
+| Day | Traffic Level | Budget Strategy |
+|-----|---------------|-----------------|
+| **Monday** | Normal | Standard budget |
+| **Tuesday** | Normal | Standard budget |
+| **Wednesday** | Normal | Standard budget |
+| **Thursday** | Rising | Prepare for weekend ramp |
+| **Friday** | High | Ramp up, shoppers buying for weekend |
+| **Saturday** | Medium | Lower, leisure browsing |
+| **Sunday** | Low | Lowest, family time, less shopping |
+
+**Weekday vs. Weekend Budget Allocation:**
+
+| Day | Budget Factor | ₱1,000/Day Budget |
+|-----|---------------|-------------------|
+| Monday | 1.0x | ₱1,000 |
+| Tuesday | 1.0x | ₱1,000 |
+| Wednesday | 1.1x | ₱1,100 |
+| Thursday | 1.2x | ₱1,200 |
+| Friday | 1.3x | ₱1,300 |
+| Saturday | 0.7x | ₱700 |
+| Sunday | 0.5x | ₱500 |
+| **Weekly Total** | | **₱6,800** |
+
+Where your account has access to scheduled bidding or budget rules by time of day, use them to align spend with traffic patterns. This control isn't available or configured the same way on every account, so confirm it's there before you plan around it:
+
+- **Morning (6-9AM):** Increase bids 10-20%, commuters browsing on mobile
+- **Work hours (9AM-3PM):** Standard bids, office workers and parents
+- **Afternoon (3-6PM):** Decrease bids 10%, low conversion window
+- **Evening (7-11PM):** Increase bids 15-25%, peak shopping time
+- **Late night (11PM-6AM):** Decrease bids 30-50%, low conversion, wasted spend
+
+If your account doesn't have scheduled bid rules available, the fallback is manual: check performance by hour in your reports and adjust bids by hand at known peak and low-traffic windows.
+
+> **Tip**: For most Filipino VA-managed accounts (Philippine time, serving US market), the peak buying window is 8PM-12AM PHT (7AM-11AM EST). That's when US shoppers are at work and making purchase decisions. If you have schedule-based bidding available, put your highest bids in this window.
+
+---
+
+## What to Do When You Hit Budget Mid-Day
+
+This is the #1 pacing problem. Here's your playbook:
+
+```
+PROBLEM: Campaign hits daily budget at 1PM.
+         Losing 12 hours of potential traffic.
+
+OPTIONS:
+├── OPTION A: Increase daily budget (+20-30%)
+│   ├── Pros: Captures more traffic
+│   └── Cons: Total spend increases
+│
+├── OPTION B: Reduce bids 15% to slow spend
+│   ├── Pros: Spreads budget further
+│   └── Cons: May lose top-of-search placement
+│
+├── OPTION C: Pause low-performing keywords
+│   ├── Pros: Redirects budget to winners
+│   └── Cons: Time-consuming to analyze daily
+│
+└── OPTION D: Use portfolio budget pooling
+    ├── Pros: Flexible across campaigns
+    └── Cons: Need multiple campaigns in portfolio
+```
+
+**Recommendation:** Start with Option D (portfolios). If still hitting budget, do Option A + C together: raise the budget and trim the fat simultaneously.
+
+---
+
+## Monthly Budget Pacing Calendar
+
+| Week | Focus | Budget Action |
+|------|-------|---------------|
+| **Week 1** | Review previous month | Set baseline budget for current month |
+| **Week 2** | Monitor and adjust | +10% if performance is strong, -10% if ACoS (advertising cost of sales) is high |
+| **Week 3** | Optimize | Check burn rates, adjust bids, add negatives |
+| **Week 4** | Prepare for next month | Review trends, plan for upcoming seasonality |
+
+### The Budget Pacing Tracker
+
+| Date | Daily Budget | Actual Spend | % Used | Remaining (Monthly) | Notes |
+|------|-------------|--------------|--------|---------------------|-------|
+| Jul 1 | ₱2,000 | ₱1,850 | 92% | ₱58,150 | Good pacing |
+| Jul 2 | ₱2,000 | ₱2,100 | 105% | ₱56,050 | Slight over-delivery |
+| Jul 3 | ₱2,000 | ₱1,650 | 82% | ₱54,400 | Low traffic day |
+| Jul 4 | ₱2,000 | ₱1,200 | 60% | ₱53,200 | Holiday, low volume |
+
+Keep this tracker in a spreadsheet. Update daily. It takes 2 minutes and saves you from discovering mid-month that you're on track to blow your budget.
+
+> **Key Takeaways:**
+> - Amazon's daily budget is averaged over the calendar month, with over-delivery on any single day capped at 25% or 100% depending on your account's setting; confirm which one is active.
+> - **Burn rate** tells you how fast you're spending per hour. Check it daily.
+> - **Scheduled bid rules, where available,** align your bids with peak shopping hours (8PM-12AM PHT). Confirm the control exists on your account, and fall back to manual bid checks if it doesn't.
+> - If you hit budget by midday, **increase the budget or use portfolio pooling**.
+> - **Weekly patterns matter.** Friday may need 30% more budget than Sunday.
+> - Track daily pacing in a **simple spreadsheet**. Two minutes a day saves thousands.
+
+## Your turn
+
+Work this through before checking the answer.
+
+Your client's phone-case campaign has a ₱1,500 daily budget. It's 11AM and the dashboard already shows ₱1,200 spent, 80% of the day's budget. This is the third day in a row the campaign has paused by around 2PM. The client has a promo launching this Friday and doesn't want it shut out early. Before reading further: what does this burn rate pattern tell you, and what would you actually change before Friday?
+
+**Work it through:** A good pacing target is 80 to 90% of the daily budget spent by end of day. Hitting 80% by 11AM, three days running, is nowhere near that: this campaign is burning through its budget in a few hours and going dark for the rest of the day, which is the classic "budget too low for demand" pattern, not a one-off spike. The fix is to raise the daily budget, roughly 20 to 30% as a starting point, so it can run further into the evening instead of pausing at 2PM. Check pacing again after the change, and be ready to pair it with bid cuts or pausing low-performing keywords if it's still exhausting before the peak PHT evening window (8PM to 12AM). Do this before Friday, not on Friday: a promo day is when you most want the campaign live through that window, not paused since early afternoon.
+
+## Client language
+
+Use this when a client asks why their ads seem to "turn off" partway through the day:
+
+> "Your campaign is hitting its daily spend limit around 2PM, that's Amazon pausing the ads once the day's budget cap is reached, not a technical problem. We're raising the daily budget so it stays live through the evening instead of stopping early."
+
+## Quick check
+
+1. In the sample week, the sum of daily budgets was ₱7,000. What was the sum of daily spend shown on the dashboard?
+2. What's a good pacing target for the percentage of daily budget spent by end of day?
+3. In the weekday/weekend budget table, what's the Friday budget at a 1.3x factor on a ₱1,000/day baseline, and how does it compare to Sunday's?
+4. For a Filipino VA managing a US-market account, what PHT window lines up with peak US shopping activity?
+5. Over how long a period is your daily budget actually averaged, and what are the two possible over-delivery caps on a single day?
+
+**Answers:** (1) ₱6,000. (2) 80 to 90% of the daily budget spent by end of day. (3) Friday is ₱1,300, more than double Sunday's ₱500. (4) 8PM-12AM PHT. (5) A calendar month; a single day can over-deliver by up to 25% or up to 100% above the daily budget, depending on which setting your account uses.
+
+## What to read next
+
+Next up is 5.3, Seasonal Strategy & Promo Planning, where you'll apply these same pacing and budget skills to the swings of Q4, Prime Day, and other seasonal spikes.
+
+---
+
+## Amazon Ads Fact Card
+
+```text
+Product or feature: Daily budget over-delivery and reconciliation
+What the learner can do: Expect some days to show spend above the set daily budget, then check the account's actual billing statement rather than assuming a fixed averaging window or percentage cap
+Who can access it: Any Sponsored Products or Sponsored Brands advertiser; exact mechanics can change and should be verified in-console
+Retailer or marketplace scope: Amazon Advertising Console; do not assume parity across marketplaces
+Official source URL: https://advertising.amazon.com/help/GTGPQGUXNCTHE2DS
+Last verified: [content owner to fill in at rewrite time]
+Next review due: [content owner to fill in at rewrite time]
+Owner: [content owner]
+```
+
+## Amazon Ads Fact Card
+
+```text
+Product or feature: Scheduled bidding / dayparting-style budget and bid rules
+What the learner can do: Where available, schedule bid or budget changes by time of day to match traffic patterns
+Who can access it: Availability and exact controls vary by account and campaign type, verify in-console
+Retailer or marketplace scope: Amazon Advertising Console; do not assume parity across marketplaces
+Official source URL: https://advertising.amazon.com/help/GTGPQGUXNCTHE2DS
+Last verified: [content owner to fill in at rewrite time]
+Next review due: [content owner to fill in at rewrite time]
+Owner: [content owner]
+```

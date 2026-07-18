@@ -1,0 +1,178 @@
+---
+title: "Campaign Structure: The Filing Cabinet Method"
+slug: "4.3-campaign-structure"
+moduleNumber: 4
+lessonNumber: 3
+type: "reading"
+estimatedMinutes: 15
+xpReward: 100
+---
+
+# Campaign Structure: The Filing Cabinet Method
+
+## What you can do after this lesson
+
+After this lesson, you can design a campaign structure and naming convention for a new product launch so every campaign's purpose, match type, and bid logic is obvious at a glance.
+
+## The decision in one sentence
+
+Keywords with different conversion rates need different campaigns and bids, so never let a proven exact match term share an ad group, or a budget, with an unproven broad match term.
+
+A messy campaign structure is the number one reason sellers waste money on Amazon PPC. It's not about having the "right" keywords. It's about organizing them so you can control, measure, and optimize each group independently.
+
+> **Analogy**: Campaign structure is like organizing a filing cabinet. If every document is in one big pile, you'll never find what you need when you need it. But if you have labeled folders organized by topic, pulling up the right document takes two seconds. PPC works the same way. Organized campaigns let you find and fix problems fast.
+
+## The Hierarchy
+
+Amazon's campaign structure has three levels:
+
+```
+Account
+ └── Campaign (has a budget, targeting type, and bid strategy)
+      └── Ad Group (has a default bid)
+           └── Keywords (each has its own bid)
+```
+
+Each level serves a purpose:
+
+**Campaign**: Controls your daily budget and bidding strategy. This is your main organizational unit.
+**Ad Group**: Groups related keywords together. You can set different default bids per ad group.
+**Keywords**: The actual search terms you're targeting. Each can have its own bid.
+
+## Why Structure Matters: A Real Example
+
+Let's say you sell a $30 yoga block. Here's a **bad** structure:
+
+```
+Campaign: "Yoga Block"
+  Ad Group: "Keywords"
+    Keywords: "yoga block", "yoga blocks", "foam yoga block", "yoga block set",
+              "exercise block", "yoga prop", "yoga brick", "gym block",
+              "fitness block", "yoga accessories" (10 keywords, all in one group)
+```
+
+**The problem**: Even though each keyword can technically carry its own bid, dumping them all into one ad group makes that control hard to use well. "Yoga block" (high intent, converts at 15%) and "yoga accessories" (broad, converts at 3%) get lost in the same report, sharing one default bid you'd have to override keyword by keyword, with no clean way to see which theme is actually working. In practice, most sellers end up overpaying for the broad term or underbidding on the high-converting one, not because Amazon prevents separate bids, but because a messy structure makes it too hard to manage them properly.
+
+Now here's a **good** structure:
+
+```
+Campaign: "YB-Exact-Proven"
+  Ad Group: "Best Keywords"
+    Keywords: "yoga block" ($1.50 bid), "foam yoga block" ($1.20 bid)
+
+Campaign: "YB-Phrase-Discovery"
+  Ad Group: "Category Terms"
+    Keywords: "yoga block" ($0.80 bid), "exercise block" ($0.60 bid)
+
+Campaign: "YB-Broad-Research"
+  Ad Group: "Broad Terms"
+    Keywords: "yoga block" ($0.40 bid), "yoga prop" ($0.35 bid)
+
+Campaign: "YB-PAT-Competitors"
+  Ad Group: "Competitor ASINs"
+    Targets: (product targeting, competitor ASINs)
+```
+
+Now you can:
+- Spend more on proven keywords (exact match, highest bids)
+- Discover new terms cheaply (broad match, lowest bids)
+- See exactly which match type drives the most profitable traffic
+- Control daily budget per campaign type
+
+> **Tip**: A good naming convention makes your campaigns instantly recognizable. Use a system like: `[Product]-[MatchType]-[Purpose]`. Examples: `YB-Exact-Proven`, `YB-Phrase-Discovery`, `YB-Broad-Research`.
+
+## The Campaign Structure Template
+
+For a single product, here's the structure most PPC managers use:
+
+### Exact Match Campaign
+**Purpose**: Capture high-intent, proven keywords at maximum efficiency.
+- Contains only exact match keywords
+- Highest bids, these are your money-makers
+- Tight negative keyword list
+- Moderate daily budget
+
+### Phrase Match Campaign
+**Purpose**: Discover new search terms that might convert.
+- Contains phrase match keywords
+- Medium bids, you're exploring, not gambling
+- Review search term report weekly for new exact match opportunities
+- Moderate daily budget
+
+### Broad Match Campaign
+**Purpose**: Cast a wide net to find opportunities you haven't thought of.
+- Contains broad match keywords
+- Lowest bids, you're researching, not investing heavily
+- Aggressive negative keyword list to cut waste
+- Small daily budget
+
+### Product Targeting Campaign
+**Purpose**: Appear on competitor and complementary product pages.
+- Contains competitor ASINs and category targets
+- Medium bids
+- Review placement data to see which competitor pages convert best
+
+## Naming Conventions That Save Time
+
+A consistent naming system helps you:
+- Find campaigns fast in a long list
+- Understand campaign purpose at a glance
+- Filter and sort by product, match type, or purpose
+
+**Recommended format**: `[Abbreviated Product]-[Match Type]-[Purpose]`
+
+| Campaign Name | Product | Match | Purpose |
+|--------------|---------|-------|---------|
+| YB-Exact-Proven | Yoga Block | Exact | High-converting keywords |
+| YB-Phrase-Discovery | Yoga Block | Phrase | Finding new terms |
+| YB-Broad-Research | Yoga Block | Broad | Wide research |
+| YB-PAT-Competitors | Yoga Block | Product | Competitor targeting |
+| WB-Exact-Proven | Water Bottle | Exact | High-converting keywords |
+
+> **Watch out**: Don't use names like "Campaign 1" or "Test Campaign." When you have 15+ campaigns, meaningless names make management a nightmare.
+
+## Negative Keywords: The Unsung Hero
+
+Every campaign should have negative keywords. They prevent your ads from showing for irrelevant searches.
+
+**Campaign-level negatives**: Apply to all ad groups in the campaign. Use for universally irrelevant terms.
+
+**Cross-campaign negatives**: Add your exact match keywords as negatives in your broad match campaign. This prevents them from competing with each other.
+
+### Worked Example: Cross-Campaign Negatives
+
+Your exact match campaign targets "yoga block" at $1.50 bid.
+Your broad match campaign also targets "yoga block" at $0.40 bid.
+
+Without negatives, both campaigns might compete for the same "yoga block" search. The broad campaign could steal budget from the exact campaign, spending $0.40 on a click the exact campaign would have won anyway.
+
+**Fix**: Add "yoga block" as a negative exact keyword in the broad campaign. Now the exact campaign handles "yoga block" searches, and the broad campaign focuses on other terms.
+
+> **Key Takeaway**: Good campaign structure isn't about being organized for its own sake. It's about being able to control bids, measure performance, and optimize by segment. Separate your keywords by match type and purpose, name them clearly, and use negatives to prevent overlap.
+
+## Your turn
+
+Work this through before checking the answer.
+
+A client sells a $14.99 stainless steel garlic press. You've set up Campaign "GP-Exact-Proven" targeting exact match "garlic press" ($1.10 bid, 18% CVR, conversion rate) and "stainless steel garlic press" ($0.95 bid, 16% CVR), plus Campaign "GP-Broad-Research" targeting broad match "garlic press" ($0.35 bid) and "kitchen gadget" ($0.30 bid). After a week, the broad campaign's search term report shows it's picking up clicks on the search "garlic press" itself, the same term the exact campaign already owns. Before reading further: what's happening here, and what one fix stops the broad campaign from competing with your own exact campaign?
+
+**Work it through:** This is the cross-campaign negative problem this lesson describes. Broad match on "garlic press" naturally also matches the exact search "garlic press," so both of the client's own campaigns are eligible to serve that same search, and the auction could hand some of that traffic to the cheaper $0.35 broad bid instead of the $1.10 exact campaign that's already proven to convert at 18%. The fix: add "garlic press" as a negative exact keyword inside GP-Broad-Research. That stops the broad campaign from ever serving that specific search, so GP-Exact-Proven wins it every time, and GP-Broad-Research is left free to spend its budget finding genuinely new terms like "kitchen gadget."
+
+## Client language
+
+Use this when a client asks why they're bidding against themselves in the reports:
+
+> "Two of your own campaigns were set up to catch different kinds of searches, but one of them was also catching a search the other campaign already owns. We added a negative keyword so only the campaign built for that exact search can win it, and the other campaign is now free to spend its budget finding new search terms instead."
+
+## Quick check
+
+1. What are the three levels of Amazon's campaign hierarchy, from top to bottom?
+2. In the yoga block example, why does putting "yoga block" (15% conversion) and "yoga accessories" (3% conversion) in the same ad group cause problems?
+3. What's a cross-campaign negative, and why would you add "yoga block" as one inside a broad match campaign?
+4. What naming format does this lesson recommend for campaigns?
+
+**Answers:** (1) Campaign, then Ad Group, then Keywords. (2) You can technically set different bids for each keyword, but with them mixed into one ad group, reporting and default bids are shared, which makes it too easy to overpay on the broad term or underbid on the one that actually converts. Separate ad groups make the right bid on each obvious. (3) A negative keyword you add in one campaign to stop it from competing with a keyword you're already targeting in another campaign. Adding "yoga block" as a negative in the broad campaign stops it from stealing budget away from the exact match campaign, which should win that search anyway. (4) `[Abbreviated Product]-[Match Type]-[Purpose]`, for example `YB-Exact-Proven`.
+
+## What to read next
+
+Lesson 4.4 puts everything together: a practice exercise where you design a complete campaign structure for a real product in the Campaign Builder tool.
