@@ -72,6 +72,10 @@ import type { CertificateHashGenerator } from "@/ports/security/CertificateHashG
 import { NodeCertificateHashGenerator } from "@/infra/security/NodeCertificateHashGenerator";
 import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHashGenerator";
 
+import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
+import { ReactPdfCertificateRenderer } from "@/infra/pdf/ReactPdfCertificateRenderer";
+import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer";
+
 // ── Payment ports ────────────────────────────────────────────
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
@@ -92,6 +96,7 @@ import { AwardBadge } from "@/usecases/AwardBadge";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 import { ListUserBadges } from "@/usecases/ListUserBadges";
 import { IssueCertificate } from "@/usecases/IssueCertificate";
+import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
 
 // ── Access policy ────────────────────────────────────────────
 
@@ -123,6 +128,7 @@ export interface AppContainer {
   // External services
   paymentGateway: IPaymentGateway;
   certificateHashGen: CertificateHashGenerator;
+  certificateRenderer: CertificateRenderer;
 
   // Use cases
   signUp: SignUp;
@@ -135,6 +141,7 @@ export interface AppContainer {
   awardBadge: AwardBadge;
   listUserBadges: ListUserBadges;
   issueCertificate: IssueCertificate;
+  renderCertificatePdf: RenderCertificatePdf;
 }
 
 // ── Production container ─────────────────────────────────────
@@ -163,6 +170,7 @@ function buildProductionContainer(): AppContainer {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
+  const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();
 
   return {
     clock,
@@ -214,6 +222,7 @@ function buildProductionContainer(): AppContainer {
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
     certificateRepo,
     certificateHashGen,
+    certificateRenderer,
     simulatorRegistry: buildSimulatorRegistry(),
     issueCertificate: new IssueCertificate({
       enrollmentRepo,
@@ -222,6 +231,12 @@ function buildProductionContainer(): AppContainer {
       hashGen: certificateHashGen,
       idGen,
       clock,
+    }),
+    renderCertificatePdf: new RenderCertificatePdf({
+      certificateRepo,
+      userRepo,
+      courseRepo,
+      renderer: certificateRenderer,
     }),
   };
 }
@@ -240,6 +255,7 @@ export interface TestContainer extends AppContainer {
   badgeRepo: InMemoryBadgeRepository;
   badgeAwardRepo: InMemoryBadgeAwardRepository;
   certificateRepo: InMemoryCertificateRepository;
+  certificateRenderer: StaticCertificateRenderer;
   accessPolicy: StubAccessPolicy;
 }
 
@@ -260,6 +276,7 @@ export function buildTestContainer(): TestContainer {
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
+  const certificateRenderer: CertificateRenderer = new StaticCertificateRenderer();
 
   return {
     clock,
@@ -295,6 +312,7 @@ export function buildTestContainer(): TestContainer {
     badgeAwardRepo,
     certificateRepo,
     certificateHashGen,
+    certificateRenderer,
     accessPolicy,
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,
@@ -319,6 +337,12 @@ export function buildTestContainer(): TestContainer {
       hashGen: certificateHashGen,
       idGen,
       clock,
+    }),
+    renderCertificatePdf: new RenderCertificatePdf({
+      certificateRepo,
+      userRepo,
+      courseRepo,
+      renderer: certificateRenderer,
     }),
     simulatorRegistry: buildSimulatorRegistry(),
   };
