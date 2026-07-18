@@ -1,0 +1,225 @@
+---
+title: "Keyword Grouping for Campaign Structure"
+slug: "2.4-keyword-grouping"
+moduleNumber: 2
+lessonNumber: 4
+type: "reading"
+estimatedMinutes: 10
+xpReward: 75
+---
+
+# Keyword Grouping for Campaign Structure
+
+## What you can do after this lesson
+
+Group a keyword list into themed ad groups by shared shopper intent, and decide when a group needs to be split.
+
+## The decision in one sentence
+
+If every keyword in a group doesn't share one obvious shopper intent, split the group; one bid and one negative list should make sense for everything inside it.
+
+You've found 100+ keywords. You've filtered them down to 40 high-potential terms. Now what?
+
+This is where most sellers make their biggest mistake: **dumping all keywords into one ad group**. It works, briefly. But as you scale, it becomes a mess of conflicting data, vague optimization, and missed opportunities.
+
+The solution is **keyword grouping**: organizing keywords into tightly themed clusters that each get their own ad group with an appropriate bid and a clean read on performance. Sponsored Products ads don't use custom ad copy the way Sponsored Brands do (the ad is your product listing), so grouping isn't about writing different ads per theme. It's about bid control and reporting clarity.
+
+> **Analogy:** Keyword grouping is like organizing a hardware store. You could throw everything on one giant shelf (hammers next to nails next to paint). Customers (and employees) would find things eventually. Or you could organize by aisle: Tools, Hardware, Paint, Plumbing. Each aisle has a clear purpose. Everyone finds what they need faster.
+
+---
+
+## The Hierarchy
+
+```
+CAMPAIGN
+│
+├── AD GROUP: Organic & Natural
+│   ├── bamboo cutting board (broad)
+│   ├── organic cutting board (phrase)
+│   └── natural wood cutting board (broad)
+│
+├── AD GROUP: Size & Feature
+│   ├── large cutting board (broad)
+│   ├── cutting board with juice groove (phrase)
+│   └── extra large cutting board (broad)
+│
+└── AD GROUP: Use Case
+    ├── cutting board for meat (broad)
+    ├── cutting board for vegetables (phrase)
+    └── BBQ cutting board (broad)
+```
+
+Each ad group has **one theme**. Every keyword in that ad group is a variation of that theme. This matters because:
+
+1. **The theme signals a shared shopper intent.** A "Use Case" search and a "Gift" search for the same product are looking for different things, even though the product answering them is identical.
+2. **Bids can be optimized per theme.** If "Use Case" converts at 15% and "Size" converts at 8%, you bid accordingly.
+3. **Performance data is clean.** You know exactly which theme is working.
+
+---
+
+## The "One Theme Per Ad Group" Rule
+
+**A good ad group:** Every keyword in it reflects the same shopper intent, so one bid and one negative-keyword list make sense for the whole group.
+
+| Ad Group Theme | Keywords | Shared Intent |
+|----------------|----------|---------------------|
+| Organic/Natural | organic bamboo board, natural cutting board, untreated wood board | Shopper cares about material and chemical-free construction |
+| Large/Feature | large cutting board, extra large board, cutting board with juice groove | Shopper needs capacity or a specific functional feature |
+| Use Case | cutting board for meat, BBQ board, vegetable chopping board | Shopper is buying for a specific task |
+| Gift | cutting board gift, housewarming gift, wedding registry board | Shopper is buying for someone else, not themselves |
+| Material | teak cutting board, acacia board, walnut cutting board | Shopper has a specific wood preference |
+
+**A bad ad group:** Keywords reflecting different shopper intents mixed together.
+
+| Keyword | Intent | Problem |
+|---------|-------------|---------|
+| organic cutting board | Material and chemical-free | Fits the "Organic/Natural" theme |
+| large cutting board | Capacity | Belongs in "Size/Feature," not here |
+| cutting board gift | Buying for someone else | Belongs in "Gift," a completely different intent |
+| cheap cutting board | Price-sensitive | A price-driven shopper likely needs different bids, not a matching theme |
+
+> **Tip:** If the keywords in a group don't share one obvious shopper intent, split the group. This test alone eliminates 90% of grouping problems.
+
+---
+
+## Match Type Layering Within Ad Groups
+
+Should you put broad, phrase, and exact of the same keyword in the same ad group?
+
+**Short answer:** No. Use separate campaigns by match type.
+
+```
+CAMPAIGN LEVEL (by match type):
+├── SP (Sponsored Products) - Bamboo Board - Broad [Budget: 40%]
+│   └── Ad Group: Organic & Natural (broad keywords)
+│   └── Ad Group: Size & Feature (broad keywords)
+│
+├── SP - Bamboo Board - Phrase [Budget: 35%]
+│   └── Ad Group: Organic & Natural (phrase keywords)
+│   └── Ad Group: Size & Feature (phrase keywords)
+│
+└── SP - Bamboo Board - Exact [Budget: 25%]
+    └── Ad Group: Organic & Natural (exact keywords)
+    └── Ad Group: Size & Feature (exact keywords)
+```
+
+**Why separate campaigns?**
+- **Budget control.** Broad gets 40% budget, exact gets 25%.
+- **Bid independence.** You bid higher on exact (higher conversion) and lower on broad (discovery).
+- **Clean data.** You know exactly which match type performs for which theme.
+
+> **Analogy:** Match type layering is like having three separate teams for prospecting, nurturing, and closing. They work on the same leads but at different stages with different approaches. You'd never ask your closer to also prospect.
+
+---
+
+## Real Example: Building the Keyword Groups
+
+Let's start with 40 keywords for a **bamboo cutting board** and organize them:
+
+### Step 1: Find the Themes
+
+Scan your keywords and identify natural clusters:
+
+| Theme | Count | Example Keywords |
+|-------|-------|-----------------|
+| **Material** | 8 | bamboo cutting board, organic bamboo board, natural wood board |
+| **Size** | 10 | large cutting board, extra large board, 18x12 cutting board |
+| **Feature** | 7 | cutting board with juice groove, board with handles, non-slip board |
+| **Use Case** | 9 | cutting board for meat, vegetable cutting board, BBQ prep board |
+| **Gift** | 6 | cutting board gift, housewarming gift board, wedding registry board |
+
+### Step 2: Match to Campaign Structure
+
+```
+Sponsored Products - Bamboo Board - Broad
+├── Material (8 keywords)
+├── Size (10 keywords)
+├── Feature (7 keywords)
+├── Use Case (9 keywords)
+└── Gift (6 keywords)
+
+Sponsored Products - Bamboo Board - Phrase
+├── Material (5 keywords, high performers from broad)
+├── Size (6 keywords)
+├── Feature (4 keywords)
+└── Use Case (5 keywords)
+
+Sponsored Products - Bamboo Board - Exact
+├── Material (3 keywords, proven converters)
+├── Size (4 keywords)
+├── Feature (2 keywords)
+└── Gift (2 keywords)
+```
+
+### Step 3: Set Theme-Level Bids
+
+| Theme | Broad Bid | Phrase Bid | Exact Bid | Why |
+|-------|-----------|------------|-----------|-----|
+| Material | ₱6 | ₱8 | ₱12 | Core relevance, highest conversion |
+| Size | ₱5 | ₱7 | ₱10 | Strong purchase intent |
+| Feature | ₱5 | ₱7 | ₱10 | Differentiator keywords |
+| Use Case | ₱4 | ₱6 | ₱9 | Niche but targeted |
+| Gift | ₱3 | ₱5 | ₱8 | Seasonal, lower base bid |
+
+> **Tip:** Your "Material" keywords (the core product description) usually deserve the highest bids. Shoppers searching "bamboo cutting board" know what they want. Shoppers searching "cutting board gift" are still browsing.
+
+---
+
+## Common Keyword Grouping Mistakes
+
+| Mistake | Why It Hurts | Fix |
+|---------|-------------|-----|
+| Too many keywords per ad group | Diluted data, can't tell which keywords work | Max 15-20 keywords per ad group |
+| Mixing match types | Cannibalization, same keyword in broad and exact competing | Separate campaigns by match type |
+| No theme separation | Can't optimize ad copy or bids per theme | Reorganize by theme |
+| Ignoring search term data | Grouping by instinct, not data | Let 2-4 weeks of data guide your groups |
+| Never regrouping | Campaigns get stale as search behavior changes | Review grouping quarterly |
+
+---
+
+## The 80/20 Rule of Keyword Grouping
+
+You don't need to do this perfectly on day one. In fact, your first grouping will be wrong. That's fine.
+
+**Start simple:** 3-4 broad ad groups per product.
+
+**After 2-4 weeks:** Check the search term report, see which themes emerge, and split accordingly.
+
+**After 8 weeks:** You should have 5-8 tightly themed ad groups per product with clear performance data for each.
+
+> **Key Takeaways:**
+> - Group keywords by **theme.** Every ad group should have one clear purpose.
+> - Separate **match types into different campaigns** for clean budget and bid control.
+> - Aim for **15-20 keywords per ad group.** More than 20 dilutes your data.
+> - Keep each group's **shopper intent consistent.** Sponsored Products has no per-group ad copy, so tight theming is what gives you clean bids and clean data, not different ad text.
+> - Start simple (3-4 groups) and **refine with data** (eventually 5-8 groups).
+> - **Review quarterly.** Search behavior changes and your groups should too.
+
+## Your turn
+
+Work this through before checking the answer.
+
+You have five keywords for a $30 yoga mat: "yoga mat," "extra thick yoga mat," "yoga mat gift set," "eco friendly yoga mat," "yoga mat for beginners."
+
+Before reading further: which of these belong together in one ad group, and which need their own group?
+
+**Work it through:** "Yoga mat," "extra thick yoga mat," and "yoga mat for beginners" share the same general-shopper intent (buying one for themselves, based on product features), so they can sit together. "Yoga mat gift set" is a different shopper, buying for someone else, likely more price- and packaging-sensitive, and belongs in its own "Gift" group. "Eco friendly yoga mat" reflects a values-driven shopper who may deserve a different bid; even without per-group ad copy, that's a distinct enough theme to track separately rather than fold into the general group.
+
+## Client language
+
+Use this when a client asks why you're not putting all their keywords in one ad group:
+
+> "I've grouped your keywords by what the shopper is actually looking for, not just by product name. That way each group gets a bid that matches its real conversion behavior, and I can tell you exactly which shopper type is working, instead of one blended number."
+
+## Quick check
+
+1. What's the quick test for whether an ad group needs to be split into two?
+2. Why run broad, phrase, and exact match keywords in separate campaigns instead of the same ad group?
+3. Per the mistakes table, what's the maximum recommended number of keywords per ad group?
+4. How many themed ad groups should a product have after about 8 weeks?
+
+**Answers:** (1) If the keywords don't share one obvious shopper intent, split the group. (2) Separate campaigns give you budget control, independent bids per match type, and clean data. Mixing them in one ad group causes cannibalization, since the same keyword in broad and exact would compete against itself. (3) 15-20 keywords. (4) 5-8 tightly themed ad groups.
+
+## What to read next
+
+That's the end of Module 2, Keyword Research. Module 3, Listing Optimization, starts next with 3.1, Listing and Ad Relevance Signals, where the keywords you've grouped meet the listing they're driving traffic to.

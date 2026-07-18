@@ -1,0 +1,161 @@
+---
+title: "Read PPC Data Before You Change PPC Data"
+slug: "1.1-read-ppc-data-before-you-change-it"
+moduleNumber: 1
+lessonNumber: 1
+type: "reading"
+estimatedMinutes: 15
+xpReward: 75
+---
+
+# Read PPC Data Before You Change PPC Data
+
+## What you can do after this lesson
+
+Read the six core Amazon pay-per-click (PPC) metrics together, identify the likely performance problem, and choose the first question to investigate before changing anything.
+
+## The decision in one sentence
+
+Don't change a bid because one metric looks bad. First find out whether the issue is traffic, conversion, cost, budget, or the campaign's own objective.
+
+## Meet the Big Six
+
+The Big Six are the six calculated metrics that describe what happened between the search result and the sale. CPC, CTR, CVR, ACoS, and ROAS are standard ad-report numbers, available per campaign, per ad group, and per keyword:
+
+- **CPC, cost per click** (average advertising cost for one click): `CPC = ad spend ÷ clicks`.
+- **CTR, click-through rate** (the share of impressions that became clicks): `CTR = clicks ÷ impressions`.
+- **CVR, conversion rate** (the share of clicks that became orders): `CVR = orders ÷ clicks`.
+- **ACoS, advertising cost of sales** (advertising spend divided by ad-attributed sales): `ACoS = ad spend ÷ ad sales`.
+- **TACoS, total advertising cost of sales** (advertising spend divided by total sales, including organic sales): `TACoS = ad spend ÷ total sales`.
+- **ROAS, return on ad spend** (ad-attributed sales divided by advertising spend): `ROAS = ad sales ÷ ad spend`.
+
+Two more numbers feed these calculations without being part of the Big Six themselves: **impressions** (how often Amazon showed the ad) and **clicks** (how often a shopper selected it). CPC and CTR come straight from ad platform reports. TACoS is different: it needs total sales, including organic sales that happen with no ad involved, so it's a business-level number you calculate yourself, not a line in a standard ad report.
+
+## Start with one case
+
+Imagine you support a client selling a stainless-steel coffee grinder for $40.
+
+This week, one campaign produced:
+
+- 20,000 impressions.
+- 160 clicks.
+- $192 ad spend.
+- 8 orders.
+- $320 ad-attributed sales.
+- $800 total sales.
+
+Now calculate the metrics.
+
+- CPC is $192 divided by 160 clicks. CPC is **$1.20**.
+- CTR is 160 clicks divided by 20,000 impressions. CTR is **0.8%**.
+- CVR is 8 orders divided by 160 clicks. CVR is **5%**.
+- ACoS is $192 divided by $320. ACoS is **60%**.
+- TACoS is $192 divided by $800. TACoS is **24%**.
+- ROAS is $320 divided by $192. ROAS is **1.67x**.
+
+The ACoS is high. That's a signal. It isn't the decision yet.
+
+## Ask the questions in order
+
+### 1. What is the campaign trying to do?
+
+Check the objective before you judge the result.
+
+A launch campaign may accept a higher ACoS while it gathers search-term data. A mature exact-match campaign may need to stay close to a profitability target. A branded-defense campaign is measured differently again.
+
+Write the objective beside the data. Without it, you can't tell whether high cost is planned, temporary, or a real problem.
+
+### 2. Is there enough data?
+
+Eight orders give more information than zero orders, but they don't prove a trend will continue. Check the date range, spend, clicks, seasonality, price changes, stock, and recent campaign changes. Don't make a large change because of one noisy day.
+
+### 3. Is traffic the problem?
+
+The campaign received many impressions, but only 0.8% of shoppers clicked. Start with traffic relevance and search-result appeal.
+
+Check these items:
+
+- The actual search terms that triggered the ad.
+- Whether the target is too broad for the product.
+- The main image and the visible product promise.
+- Price, coupon, shipping, and featured-offer position.
+- Whether the product is in stock.
+
+If the search terms are unrelated, negative targeting or target refinement may be the right first action. If the terms are relevant but shoppers ignore the ad, inspect the listing and offer before making a large bid change.
+
+### 4. Is conversion the problem?
+
+The campaign produced 160 clicks and 8 orders. A 5% conversion rate may be acceptable or weak depending on category, price, traffic intent, and account history. Compare it with the product's normal conversion rate and similar campaign traffic.
+
+When CVR is weak, inspect the product detail page:
+
+- Is the product matched to the shopper's intent?
+- Is the title clear?
+- Do the images show the product and its use clearly?
+- Is the price competitive against the shopper's alternatives?
+- Are there review, variation, stock, or delivery issues?
+
+Don't call a relevant keyword "bad" before you check whether the listing can convert the shopper you paid to bring in.
+
+### 5. Is the click cost affordable?
+
+If the target ACoS is 30% and this campaign is at 60%, the cost per order is likely too high, conversion is too low, or both.
+
+Use maximum CPC to make the bid decision defensible.
+
+`maximum CPC = selling price × target ACoS × conversion rate`
+
+For this case, with a $40 price, 30% target ACoS, and 5% conversion rate:
+
+`$40 × 0.30 × 0.05 = $0.60`
+
+The maximum CPC is about **$0.60**. The actual CPC is $1.20. The campaign pays about twice the CPC this combination can support.
+
+Your next action could be to lower bids, reduce placement pressure, focus on more relevant targets, or improve conversion. The correct choice depends on what you found in the earlier questions, not on this number alone.
+
+## Read the pattern, not one number
+
+Use these quick patterns when you investigate:
+
+- **Low impressions:** check eligibility, stock, budget, targeting coverage, and bid.
+- **High impressions with low CTR:** check query relevance, main image, price, offer, and title.
+- **Clicks with low CVR:** check listing readiness and product-search fit.
+- **Good CVR with high CPC:** check maximum CPC, bids, and placement adjustments.
+- **High ACoS with a launch objective:** check the data plan, learning goal, and guardrails before cutting spend.
+- **TACoS rising while total sales are flat or falling:** look beyond direct ad efficiency and inspect the wider sales picture.
+
+## Your turn
+
+Work this second case before checking the answer.
+
+A keyword has 4,000 impressions, 120 clicks, 18 orders, $180 spend, and $900 in ad-attributed sales. The product sells for $50. The client's target is 25% ACoS.
+
+Answer these before reading further:
+
+- What is the CTR?
+- What is the CVR?
+- What is the ACoS?
+- Is traffic likely the first problem?
+- What extra information do you need before changing the bid?
+
+**Work it through:** CTR = 120 ÷ 4,000 = 3.0%. CVR = 18 ÷ 120 = 15%. ACoS = $180 ÷ $900 = 20%. Traffic isn't the first problem here: CTR is healthy and CVR is strong, and ACoS is already below the 25% target. Before touching the bid at all, you'd still want the campaign's objective and enough days of data to know this isn't one lucky week.
+
+Your written answer should name the campaign objective, the data window, the maximum-CPC or break-even logic, and the next review date, not just the four calculations.
+
+## Client language
+
+Use this structure when you explain a performance issue:
+
+> "This campaign spent more than the current target because clicks cost more than the product's current conversion rate can support. I'm checking the search terms and listing conversion before making a bid reduction. I'll document the action and review the result after the next data window."
+
+## Check
+
+1. Why shouldn't a single high ACoS reading trigger an immediate bid cut?
+2. A campaign has high impressions and a CTR of 0.3%. What's the first thing to check?
+3. A campaign has strong CTR and CVR, but ACoS is still high. What's the likely lever?
+4. What does maximum CPC tell you that ACoS alone doesn't?
+5. Why does a launch campaign's objective change how you read a high ACoS?
+
+## Key takeaway
+
+Metrics are a diagnostic system, not a scoreboard. Read the path from impression to order, confirm the objective, and choose the smallest safe action that fits the evidence.

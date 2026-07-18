@@ -1,0 +1,142 @@
+---
+title: "Is My Ad Worth Clicking? CPC and CTR"
+slug: "1.2-cpc-ctr"
+moduleNumber: 1
+lessonNumber: 2
+type: "reading"
+estimatedMinutes: 12
+xpReward: 75
+---
+
+# Is My Ad Worth Clicking? CPC and CTR
+
+## What you can do after this lesson
+
+Explain what drives CPC (cost per click) and CTR (click-through rate) up or down, and calculate the maximum CPC a target ACoS can support to judge whether a CPC is actually a problem.
+
+## The decision in one sentence
+
+A CPC number by itself is neither good nor bad. Compare it to the maximum CPC your target ACoS can support before you decide whether to act.
+
+## CPC: what's a click actually worth?
+
+CPC, cost per click, is what you pay each time a shopper clicks your ad: `CPC = ad spend ÷ clicks`.
+
+### What drives CPC up
+
+1. **High competition.** If many sellers bid on "wireless earbuds," the price to win that click rises.
+2. **Broad keywords.** Vague terms like "earbuds" cost more because more advertisers want them. Specific terms like "wireless earbuds for running" cost less.
+3. **Top-of-search placement.** The first few positions at the top of page one typically cost more than positions further down.
+4. **Dynamic bidding.** If you use Amazon's "Dynamic bids: up and down" strategy, Amazon can raise your realized CPC above your set bid for opportunities it predicts will convert.
+
+### What drives CPC down
+
+1. **High relevance.** When your ad closely matches the search term, you tend to pay less for the same placement than a less relevant competitor would.
+2. **A strong listing.** A product with clear photos, reviews, and price competitiveness performs better in the auction.
+3. **Long-tail keywords.** Specific phrases like "bamboo cutting board large kitchen" have fewer bidders, so CPC tends to be lower.
+4. **Off-peak timing.** Some categories see lower CPC on weekends or during slower seasons.
+
+### Worked example: two products, two CPCs
+
+| | Bamboo cutting board | Wireless earbuds |
+|---|---|---|
+| Keyword | "bamboo cutting board" | "wireless earbuds" |
+| Competition | Medium | Very high |
+| Typical CPC | $0.60 to $1.20 | $1.50 to $4.00 |
+| Average order value | $24.99 | $35.00 |
+| CVR (conversion rate) | 10% | 8% |
+| Target ACoS | 30% | 25% |
+| Maximum CPC at that target | $0.75 | $0.70 |
+
+A "cheap" CPC isn't automatically good. Paying $0.10 per click with a 1% conversion rate costs $10 per order. A $2.00 CPC with a 20% conversion rate also costs $10 per order. Same result, very different CPC.
+
+Always calculate the **maximum CPC** a target can support before judging whether a CPC is too high: `maximum CPC = average order value × CVR × target ACoS`. This is the most you can pay per click and still hit that target ACoS (advertising cost of sales). It's only your true break-even CPC if the target ACoS you used is also the product's actual break-even margin (Lesson 1.3 covers how to calculate that margin). Otherwise, treat it as the ceiling for the target you're working to, not a statement about profit.
+
+## CTR: are people clicking?
+
+CTR, click-through rate, measures relevance: `CTR = clicks ÷ impressions`. If your ad shows up for a search but nobody clicks, something about the match or the listing isn't landing, and it's costing you impressions without a return.
+
+### What drives CTR up
+
+1. **Relevant keywords.** The closer your keyword matches what the shopper searched, the higher your CTR tends to be.
+2. **A clear main image.** A clean, well-lit product photo beats a cluttered one.
+3. **A competitive price.** A price that reads as fair next to nearby results earns more clicks.
+4. **Strong reviews.** A 4.5-star rating with 500 reviews earns more clicks than a 3.8-star rating with 12 reviews.
+
+### What drives CTR down
+
+1. **Irrelevant targeting.** Showing a cutting-board ad for "wireless earbuds" searches wastes impressions.
+2. **A weak main image.** Blurry or dark photos get scrolled past.
+3. **A high price relative to competitors.** If your product is $39.99 next to $19.99 competitors, fewer people click.
+4. **No reviews.** A brand-new listing with zero reviews struggles to earn clicks regardless of targeting.
+
+### Worked example: improving CTR
+
+You sell a silicone baking mat for $19.99.
+
+| Metric | Current | Problem? |
+|---|---|---|
+| Impressions | 8,000/week | N/A |
+| Clicks | 40/week | Low |
+| CTR | 0.5% | Below what this category typically sees |
+
+**Investigate:** pull the search term report. You find "silicone baking mat" (relevant, 2.1% CTR), "baking supplies" (too broad, 0.2% CTR), and "kitchen accessories" (too broad, 0.1% CTR).
+
+**The fix:** the broad, low-relevance terms are dragging down the overall CTR. Move spend toward exact and phrase match on "silicone baking mat" and close variants, and add the broad, irrelevant terms as negatives.
+
+**After two weeks:**
+
+| Metric | Before | After | Change |
+|---|---|---|---|
+| Impressions | 8,000 | 3,200 | ↓ 60% (fewer irrelevant impressions) |
+| Clicks | 40 | 80 | ↑ 100% (more relevant clicks) |
+| CTR | 0.5% | 2.5% | ↑ 400% |
+
+Fewer but more relevant impressions, plus more clicks, means a better CTR. You don't want to be seen by everyone. You want to be seen by the shoppers who are actually looking for your product.
+
+## The CPC-CTR relationship
+
+Ad relevance signals connect CPC and CTR. Amazon doesn't publish a single inspectable "quality score" a VA can check, but the pattern is observable in your own reports:
+
+- **High CTR with relevant keywords** tends to come with a lower CPC for the same placement, since the ad is reading as relevant.
+- **Low CTR with loosely matched keywords** tends to come with a higher CPC for the same placement.
+
+When you see high CPC and low CTR together, the most common root cause is keyword relevance: the targeting is too broad for the product. Fix targeting first. Raising the bid to compensate for poor relevance usually just buys more of the same low-quality clicks.
+
+## Fact card
+
+```text
+Product or feature: Amazon's ad-relevance signal in the Sponsored Products auction
+What the learner can do: use CTR, CVR, and search-term relevance as observable proxies for how the auction is treating an ad
+Who can access it: any Sponsored Products advertiser, through standard performance reports
+Retailer or marketplace scope: Amazon Advertising, Sponsored Products (US marketplace examples used in this lesson)
+Official source URL: https://advertising.amazon.com/help/GCU2BUWJH2W3A8Z7
+Last verified: pending content-owner review
+Next review due: pending content-owner review
+Owner: Ryan Roland Dabao
+```
+
+Amazon does not publish a single named "Quality Score" that a VA can look up. Treat "relevance signals" as teaching shorthand for the observable inputs above, not a metric you'll find in the console.
+
+## Quick check
+
+1. Your product sells for $30, converts at 10%, and you target a 25% ACoS. What's the maximum CPC that target can support?
+2. You spend $150 on ads and get 200 clicks. What's your CPC? Is it above or below the maximum from question 1?
+3. Your ad gets 12,000 impressions and 180 clicks. What's your CTR?
+4. You see high CPC and low CTR on the same keyword. What do you check first, the bid or the targeting?
+
+**Answers:** (1) Maximum CPC = $30 × 0.10 × 0.25 = $0.75. (2) Actual CPC = $150 ÷ 200 = $0.75, right at that ceiling, so these clicks are only just meeting the 25% target with no room to spare. (3) CTR = 180 ÷ 12,000 = 1.5%. (4) Targeting first: high CPC with low CTR usually signals a relevance problem, and raising the bid without fixing that just pays more for the same weak match.
+
+## Client language
+
+Use this when a client asks why a keyword's CPC looks high:
+
+> "This keyword's CPC is high relative to its click-through rate, which usually means the targeting is broader than the product. I'm tightening the match type and adding negatives before considering a bid change."
+
+## Key takeaways
+
+- CPC is driven by competition, keyword specificity, placement, and relevance.
+- CTR is driven by keyword relevance, image quality, price, and reviews.
+- Always calculate the maximum CPC your target ACoS can support before judging whether a CPC is too high.
+- High CPC with low CTR usually means the keyword is too broad. Fix targeting before raising bids.
+- Amazon doesn't expose a single "quality score." Read CTR, CVR, and relevance as the observable signals instead.
