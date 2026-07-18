@@ -13,6 +13,7 @@ import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { courseIsAvailable } from "@/domain/entities/Course";
+import { getSessionUserId } from "@/lib/auth";
 import { getLessonData } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
 import { LessonSidebar } from "../LessonSidebar";
@@ -61,7 +62,7 @@ export default async function LessonPage({ params }: PageProps) {
   const { lesson, sectionTitle } = lessonData;
 
   // ── Access check + enrollment data ──────────────────────
-  const userId = await getCurrentUserId();
+  const userId = await getSessionUserId();
   const completedLessonIds: string[] = [];
 
   if (userId) {
@@ -179,14 +180,6 @@ function AccessDeniedPage({
       </div>
     </div>
   );
-}
-
-// ── Helpers ─────────────────────────────────────────────────
-
-/** Get the current authenticated user ID. Returns null if not authenticated. */
-async function getCurrentUserId(): Promise<string | null> {
-  // TODO (STORY-006): Wire in session/auth. Currently returns null (anonymous).
-  return null;
 }
 
 // ── Icons ───────────────────────────────────────────────────

@@ -91,6 +91,9 @@ import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { SignUp } from "@/usecases/SignUp";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
+import { JoseJwtService } from "@/infra/security/JoseJwtService";
+import type { JwtService } from "@/ports/security/JwtService";
+import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
@@ -136,6 +139,8 @@ export interface AppContainer {
   certificateHashGen: CertificateHashGenerator;
   certificateRenderer: CertificateRenderer;
   emailSender: EmailSender;
+  jwt: JwtService;
+  passwordHasher: PasswordHasher;
 
   // Use cases
   signUp: SignUp;
@@ -186,6 +191,11 @@ function buildProductionContainer(): AppContainer {
     process.env.EMAIL_FROM ?? "AMPH Academy <noreply@amph.example.com>",
   );
 
+  const jwt: JwtService = new JoseJwtService(
+    process.env.JWT_SECRET ?? "dev-only-secret-please-replace-with-32-bytes-min",
+  );
+  const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
+
   return {
     clock,
     idGen,
@@ -194,6 +204,8 @@ function buildProductionContainer(): AppContainer {
     orderRepo,
     enrollmentRepo,
     paymentGateway,
+    jwt,
+    passwordHasher,
     signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
@@ -302,6 +314,10 @@ export function buildTestContainer(): TestContainer {
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new StaticCertificateRenderer();
   const emailSender: EmailSender = new InMemoryEmailSender();
+  const jwt: JwtService = new JoseJwtService(
+    process.env.JWT_SECRET ?? "test-secret-must-be-at-least-32-bytes-long-ok",
+  );
+  const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
 
   return {
     clock,
@@ -311,6 +327,8 @@ export function buildTestContainer(): TestContainer {
     orderRepo,
     enrollmentRepo,
     paymentGateway,
+    jwt,
+    passwordHasher,
     signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
