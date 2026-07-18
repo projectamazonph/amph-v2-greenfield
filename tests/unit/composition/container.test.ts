@@ -7,7 +7,7 @@
 
 import { describe, it, expect } from "vitest";
 import { createQuiz } from "@/domain/entities/Quiz";
-import { buildTestContainer } from "@/composition/container";
+import { buildTestContainer } from "@/composition/container.test";
 
 describe("container — recordQuizAttempt wiring", () => {
   it("test container exposes recordQuizAttempt", () => {

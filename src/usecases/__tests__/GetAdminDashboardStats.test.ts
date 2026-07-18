@@ -18,6 +18,8 @@ import type { Enrollment } from "@/domain/entities/Enrollment";
 import type { Certificate } from "@/domain/entities/Certificate";
 import type { Course } from "@/domain/entities/Course";
 import type { User } from "@/domain/entities/User";
+// buildTestContainer is intentionally NOT used here — we instantiate
+// the in-memory repos directly so each test starts from a clean state.
 
 function buildDeps() {
   return {
