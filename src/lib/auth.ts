@@ -37,10 +37,23 @@ import { buildContainer } from "@/composition/container";
 
 const SESSION_COOKIE_DEV = "amph_session";
 const SESSION_COOKIE_PROD = "__Secure-amph_session";
-const SESSION_COOKIE =
-  process.env.NODE_ENV === "production"
+
+/**
+ * Read the session cookie name from the CURRENT env. This is a
+ * per-call function (not a module-level constant) so that flipping
+ * NODE_ENV after import takes effect immediately.
+ *
+ * Why not a constant: the previous implementation captured at
+ * module load, which locked the cookie name on first import. In
+ * tests that set NODE_ENV=production partway through, this was a
+ * silent bug. Reading at call time is cheap (one string compare)
+ * and matches the user's mental model.
+ */
+function getSessionCookieName(): string {
+  return process.env.NODE_ENV === "production"
     ? SESSION_COOKIE_PROD
     : SESSION_COOKIE_DEV;
+}
 
 /** 7 days — matches the Session entity's expected lifetime. */
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
@@ -65,7 +78,7 @@ export interface SessionClaims {
  * null otherwise. Never throws.
  */
 export async function getSessionUserId(): Promise<string | null> {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const token = (await cookies()).get(getSessionCookieName())?.value;
   if (!token) return null;
 
   const { jwt } = buildContainer();
@@ -143,7 +156,7 @@ export async function setAuthCookie(
   expiresAt: Date,
 ): Promise<void> {
   (await cookies()).set({
-    name: SESSION_COOKIE,
+    name: getSessionCookieName(),
     value: token,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -162,10 +175,12 @@ export async function setAuthCookie(
  */
 export async function clearAuthCookie(): Promise<void> {
   const jar = await cookies();
-  jar.delete(SESSION_COOKIE);
+  // Read the current env's cookie name at call time, not module load.
+  const currentName = getSessionCookieName();
+  jar.delete(currentName);
   // Also clear the alt name in case the user signed in under a different env
   const altName =
-    SESSION_COOKIE === SESSION_COOKIE_PROD
+    currentName === SESSION_COOKIE_PROD
       ? SESSION_COOKIE_DEV
       : SESSION_COOKIE_PROD;
   jar.delete(altName);
@@ -180,8 +195,9 @@ export async function clearAuthCookie(): Promise<void> {
  * `__Secure-amph_session` name.
  */
 export const _testInternals = {
-  SESSION_COOKIE,
   SESSION_COOKIE_DEV,
   SESSION_COOKIE_PROD,
   COOKIE_MAX_AGE_SECONDS,
+  /** The current env's cookie name (per-call, not module-load). */
+  getCurrentSessionCookieName: getSessionCookieName,
 } as const;
