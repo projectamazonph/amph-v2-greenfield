@@ -27,12 +27,15 @@ test.describe("Critical journeys", () => {
     await page.getByRole("button", { name: /create account/i }).click();
 
     await expect(page).toHaveURL(/dashboard/, { timeout: 15_000 });
-    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+    // The dashboard page shows "Welcome back, {firstName}." — the
+    // first-name part is dynamic, so we match the static prefix.
+    await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
   });
 
   test("journey 2: browse courses and view course detail", async ({ page }) => {
     await page.goto(`${BASE}/courses`);
-    await expect(page.getByRole("heading", { name: /courses/i })).toBeVisible();
+    // The catalog page shows "Course Catalog" as the h1.
+    await expect(page.getByRole("heading", { name: /course catalog/i })).toBeVisible();
 
     const firstCourse = page.getByRole("link").first();
     if (await firstCourse.isVisible().catch(() => false)) {
