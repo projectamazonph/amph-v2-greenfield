@@ -140,6 +140,11 @@ import { CreateLesson } from "@/usecases/CreateLesson";
 import { UpdateLesson } from "@/usecases/UpdateLesson";
 import { DeleteLesson } from "@/usecases/DeleteLesson";
 import { ReorderLessons } from "@/usecases/ReorderLessons";
+// STORY-049: admin payments + refunds + refund override
+import { AdminListPayments } from "@/usecases/AdminListPayments";
+import { AdminGetPayment } from "@/usecases/AdminGetPayment";
+import { ProcessRefund } from "@/usecases/ProcessRefund";
+import { RefundOverride } from "@/usecases/RefundOverride";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -217,6 +222,11 @@ export interface AppContainer {
   updateLesson: UpdateLesson;
   deleteLesson: DeleteLesson;
   reorderLessons: ReorderLessons;
+  // STORY-049: admin payments + refunds + refund override
+  adminListPayments: AdminListPayments;
+  adminGetPayment: AdminGetPayment;
+  processRefund: ProcessRefund;
+  refundOverride: RefundOverride;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -396,6 +406,11 @@ function buildProductionContainer(): AppContainer {
     updateLesson: new UpdateLesson({ lessonRepo, clock }),
     deleteLesson: new DeleteLesson({ lessonRepo }),
     reorderLessons: new ReorderLessons({ lessonRepo }),
+    // STORY-049: admin payments + refunds + refund override
+    adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
+    adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
+    processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
+    refundOverride: new RefundOverride({ orderRepo, paymentGateway }),
   };
 }
 

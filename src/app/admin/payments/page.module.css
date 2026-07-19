@@ -1,0 +1,125 @@
+/* /admin/payments page styles — Field Manual density. */
+
+.filters {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input,
+.select {
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--surface-0);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-width: 240px;
+}
+
+.applyButton {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--accent);
+  color: var(--surface-0);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  height: fit-content;
+}
+
+.applyButton:hover {
+  background: var(--accent-strong);
+}
+
+.clearButton {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface-0);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  height: fit-content;
+}
+
+.clearButton:hover {
+  background: var(--surface-2);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--surface-1);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover {
+  background: var(--surface-1);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.viewButton {
+  padding: var(--space-1) var(--space-3);
+  font-size: 12px;
+  background: var(--surface-0);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+.viewButton:hover {
+  background: var(--surface-2);
+}

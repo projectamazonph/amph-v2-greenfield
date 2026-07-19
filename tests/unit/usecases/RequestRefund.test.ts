@@ -17,6 +17,7 @@ function makeOrderRepo(findById: () => Result<Order, { kind: string }> | Promise
     findById: findById as IOrderRepository["findById"],
     findByPaymongoPaymentId: vi.fn(),
     findByUserId: vi.fn(),
+    listAll: vi.fn(),
     update: vi.fn(async (order: Order) => Result.ok(order)),
   };
 }
