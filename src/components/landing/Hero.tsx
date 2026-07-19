@@ -18,7 +18,7 @@ export function Hero() {
           ₱60k+/month.
         </h1>
         <p className={styles.subhead}>
-          Three courses, five practice simulators, certificates recognized in
+          Three courses, practice tools, certificates recognized in
           our hiring pipeline. One-time payment via PayMongo. No subscription.
         </p>
         <div className={styles.ctaRow}>

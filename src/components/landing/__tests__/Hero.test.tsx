@@ -20,6 +20,12 @@ describe("Hero", () => {
     expect(html).toContain("PayMongo");
   });
 
+  it("does not over-claim practice simulators (they're in development)", () => {
+    // Tripwire: the hero subhead should not promise 5 finished simulators.
+    const html = renderToString(createElement(Hero));
+    expect(html).not.toContain("five practice simulators");
+  });
+
   it("renders a primary CTA that links to the pricing section", () => {
     const html = renderToString(createElement(Hero));
     expect(html).toMatch(/href=["']#pricing["']/);

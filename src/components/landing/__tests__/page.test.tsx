@@ -15,7 +15,7 @@ describe("Landing page", () => {
       "The Amazon ads training built for Filipino VAs", // Hero
       "What the training gets you", // Numbers
       "Who this is for", // Audience
-      "just watch lessons", // Simulators
+      "just watch lessons", // Practice
       "Course structure", // Curriculum
       "Three tiers, one-time payment", // Pricing
       "Common questions", // FAQ
@@ -64,5 +64,15 @@ describe("Landing page", () => {
     const html = renderToString(createElement(HomePage));
     const h1s = html.match(/<h1[\s>]/g) ?? [];
     expect(h1s.length).toBe(1);
+  });
+
+  it("does not claim simulators are 'available now' or 'ready to use'", () => {
+    // Tripwire: this would have caught the misleading screenshot
+    // situation. If a future change adds back finished-product claims
+    // about the simulators, this test fails.
+    const html = renderToString(createElement(HomePage)).toLowerCase();
+    expect(html).not.toMatch(/simulators? (are|is) (available|ready|live|finished|complete)/);
+    expect(html).not.toContain("try the simulator");
+    expect(html).not.toContain("practice now");
   });
 });

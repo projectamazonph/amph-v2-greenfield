@@ -17,8 +17,8 @@ const STATS: ReadonlyArray<{
   },
   {
     figure: "5",
-    label: "simulators",
-    body: "Practice on the same tools we use on client accounts.",
+    label: "practice tools",
+    body: "Built; the student UI is in development.",
   },
   {
     figure: "~40h",
