@@ -1,23 +1,22 @@
-# Admin panel wiring — planned (Sprint 10, nothing built)
+# Admin panel wiring — implemented surface
 
-Layout per `docs/admin-backend.md` §"What Lives Where". No `src/app/admin` directory, no `requireAdmin()`, and no `AuditLogRepository`/`SettingsRepository` ports exist yet.
+Layout mirrors the current `src/app/admin/*` tree. Admin routes are server components gated by `requireAdmin()` in `src/app/admin/layout.tsx`, with defense-in-depth checks in action/page boundaries.
 
 ```mermaid
 flowchart LR
   BROWSER["Browser\n/admin/*"] --> LAYOUT["src/app/admin/layout.tsx\nrequireAdmin() gate"]
-  LAYOUT --> ROUTES["~40 routes\nusers · courses · payments · refunds\nsimulators · live-classes\ndiscount-codes · badges · audit-log · settings"]
-  ROUTES --> ADMINUC["Admin* use cases\nAdminIssueRefund, AdminExportAuditLog\nAdminImpersonate, AdminUpdateSettings"]
+  LAYOUT --> ROUTES["admin routes\nusers · courses · modules · lessons\npayments · simulators · live-classes\ndiscount-codes · badges · settings"]
+  ROUTES --> ACTIONS["Server actions\nsrc/app/actions/*"]
+  ACTIONS --> ADMINUC["Admin* use cases\nlist/get/create/update/archive\n+ refund override + impersonation"]
   ADMINUC --> AP["IAccessPolicy\nrole check"]
-  ADMINUC --> ALR["AuditLogRepository\nport not created"]
-  ADMINUC --> SR["SettingsRepository\nport not created"]
+  ADMINUC --> ALR["RecordAuditLog use case\nwrites audit entries"]
   AP --> TAP["TierAccessPolicy\nalready built, reused"]
-  ALR --> PALR["PrismaAuditLogRepository\nnot built -- AuditLog table\nexists in schema, unused"]
-  SR --> PSR["PrismaSettingsRepository\nnot built -- no Settings\nmodel in schema either"]
+  ALR --> IAL["InMemoryAuditLog\n(wired in production container)"]
 
   classDef built stroke:#FF6B35,stroke-width:2px,fill:none;
   classDef planned stroke:#D4D4D4,fill:none,stroke-dasharray: 4 3;
-  class TAP built
-  class LAYOUT,ROUTES,ADMINUC,ALR,SR,PALR,PSR planned
+  class LAYOUT,ROUTES,ACTIONS,ADMINUC,ALR,AP,TAP built
+  class IAL planned
 ```
 
-Solid orange = the one piece that already exists and gets reused as-is (**TierAccessPolicy**). Everything dashed is Sprint 10 scope per `docs/sprint-plan.md` — including a **SettingsRepository** port and **Settings** Prisma model that don't exist yet at all.
+Solid orange = implemented and wired. Dashed gray = remaining persistence gap. Admin audit writes are wired through `RecordAuditLog`, but the production container still uses `InMemoryAuditLog` rather than a Prisma-backed audit repository.

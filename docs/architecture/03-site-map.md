@@ -26,16 +26,16 @@ flowchart TD
   S5 --> T3["/tools/campaign-builder"]
   S5 --> T4["/tools/listing-audit"]
 
-  ROOT --> ADM["Admin -- Sprint 10, requireAdmin()"]
+  ROOT --> ADM["Admin (requireAdmin())"]
   ADM --> A1["/admin"]
-  ADM --> A2["/admin/users/[id]"]
-  ADM --> A3["/admin/courses/[id]"]
-  ADM --> A4["/admin/payments/[id]"]
+  ADM --> A2["/admin/users + /admin/users/[id]"]
+  ADM --> A3["/admin/courses/*"]
+  ADM --> A4["/admin/payments + /admin/payments/[id]"]
   ADM --> A5["/admin/refunds/[id]"]
-  ADM --> A6["/admin/simulators/[sim]"]
-  ADM --> A7["/admin/live-classes"]
-  ADM --> A8["/admin/discount-codes"]
-  ADM --> A9["/admin/badges"]
+  ADM --> A6["/admin/simulators/*"]
+  ADM --> A7["/admin/live-classes/*"]
+  ADM --> A8["/admin/discount-codes/*"]
+  ADM --> A9["/admin/badges/*"]
   ADM --> A10["/admin/audit-log"]
   ADM --> A11["/admin/settings"]
 
@@ -43,11 +43,10 @@ flowchart TD
   classDef ready stroke:#404040,stroke-width:1.5px,fill:none;
   classDef planned stroke:#D4D4D4,fill:none,stroke-dasharray: 3 3;
 
-  class P1,P3,P4,P5,P7,S2 built
-  class P2,P6,S1,S3,S4,S5,T1,T2,T3,T4 ready
-  class ADM,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11 planned
+  class P1,P3,P4,P5,P6,P7,S1,S2 built
+  class ADM,A1,A2,A3,A4,A6,A7,A8,A9,A11 built
+  class P2,S3,S4,S5,T1,T2,T3,T4,A5,A10 planned
 ```
 
-- **Built** (`src/app/page.tsx` exists): `/`, `/courses`, `/courses/[slug]`, `/courses/[slug]/lessons/[lessonId]`, `/signup`, `/certificates/[hash]` (+ its `/pdf` route).
-- **Backend-ready, no UI**: the use case exists (`Login`, `ListUserBadges`, the four `Simulator` classes, the quiz-attempt API route) but no page has been written.
-- **Planned**: the entire `/admin/*` tree — no directory, no `requireAdmin()`, nothing started (Sprint 10 in `docs/sprint-plan.md`).
+- **Built** (`page.tsx` exists): `/`, `/courses`, `/courses/[slug]`, `/courses/[slug]/lessons/[lessonId]`, `/signup`, `/login`, `/dashboard`, `/certificates/[hash]` (+ `/certificates/[hash]/pdf`), plus current admin pages (`/admin`, users, courses, payments, simulators, live classes, discount codes, badges, settings).
+- **Planned / not present as pages**: `/pricing`, `/profile`, `/tools/*`, `/courses/[slug]/lessons/[id]/quiz`, `/admin/refunds/[id]`, `/admin/audit-log`.

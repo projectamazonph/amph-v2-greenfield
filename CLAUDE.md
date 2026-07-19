@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Project Amazon PH Academy (AMPH) — an Amazon PPC training platform for Filipino virtual assistants. Next.js 16 modular monolith built on a SOLID five-layer architecture, solo-developer project, single Postgres database, single Vercel deploy. Three paid course tiers, five interactive PPC practice tools (simulators), gamification (XP/badges/certificates), and a planned admin panel.
+Project Amazon PH Academy (AMPH) — an Amazon PPC training platform for Filipino virtual assistants. Next.js 16 modular monolith built on a SOLID five-layer architecture, solo-developer project, single Postgres database, single Vercel deploy. Three paid course tiers, five interactive PPC practice tools (simulators), gamification (XP/badges/certificates), and an implemented admin panel.
 
 Read `AGENTS.md` first — it's the terse rules file this document expands on. `docs/decisions.md` has the ADRs behind every non-obvious architectural choice referenced below (e.g. "ADR-013" for the five-layer split, "ADR-016" for the ESLint boundary rule).
 
@@ -20,18 +20,17 @@ Read `AGENTS.md` first — it's the terse rules file this document expands on. `
 
 ## Known gaps (don't assume otherwise)
 
-- `src/lib/` does not exist yet, despite being referenced in `AGENTS.md`'s file-dependency chain. `Result` lives in `src/domain/shared/Result.ts` and `Money` lives in `src/domain/values/Money.ts` — import from there, not `src/lib/`.
-- `src/components/` does not exist yet.
-- No `content/curriculum/` directory and no `scripts/import-amph-content.ts` exist yet. Curriculum content and the docs describing it (e.g. a redesign doc, a content audit, lesson markdown files) are aspirational/planned, not present in this repo snapshot — don't point people at paths that aren't there.
-- No admin panel exists yet (no `src/app/admin`, no `requireAdmin()`). `AuditLog` is a real Prisma model and is documented in `docs/api-reference.md` / `docs/admin-backend.md`, but nothing writes to it yet — `src/usecases/SignUp.ts` has a `TODO (STORY-009): Inject AuditLogRepository and write the audit entry`. Treat "every admin action logs to AuditLog" as the target contract, not current behavior.
-- The production container (`buildProductionContainer()` in `src/composition/container.ts`) currently wires `courseRepo` to `InMemoryCourseRepository` and `orderRepo` to `InMemoryOrderRepository` — courses and orders are not actually persisted to Postgres in production yet, even though `PrismaCourseRepository`/`PrismaOrderRepository`-shaped work hasn't landed. Check `container.ts` directly before assuming a given repo is backed by Postgres.
-- `src/app/api/webhooks/paymongo/route.ts` does not go through the composition container at all — it instantiates `InMemoryOrderRepository`, `InMemoryCourseRepository`, `InMemoryUserRepository`, and `InMemoryEnrollmentRepository` directly per-request (there's a `TODO: wire Prisma* repos in STORY-023 follow-up` comment). This means the real PayMongo webhook currently cannot see orders created elsewhere in the app. Fix this by wiring the real container, not by patching around it.
-- Only one Prisma migration exists (`prisma/migrations/20260718000000_add_certificate_model`), and per `SESSION-HANDOVER.md` the database is "Not provisioned" and there's no production deploy yet.
+- `src/lib/` and `src/components/` exist now. Keep importing `Result` from `src/domain/shared/Result.ts` and `Money` from `src/domain/values/Money.ts` rather than inventing a second copy in `src/lib`.
+- `content/curriculum/` exists (`modules/` and `quiz-questions.json`) but `scripts/import-amph-content.ts` still does not exist. Keep curriculum paths repo-relative and verify scripts before referencing them.
+- The admin surface exists under `src/app/admin/*` and uses `requireAdmin()` gates (`src/lib/auth.ts`), but some persistence is still intentionally in-memory.
+- In the production container (`buildProductionContainer()`), `courseRepo` is Prisma-backed now, but `orderRepo`, `moduleRepo`, `lessonRepo`, `discountCodeRepo`, `liveClassRepo`, `scenarioRepo`, `sessionRepo`, and `auditLog` are still in-memory.
+- `src/app/api/webhooks/paymongo/route.ts` now goes through `buildContainer()` for data access and use case dispatch. It no longer instantiates per-request `InMemory*` repositories.
+- Prisma migrations are now bootstrapped by `prisma/migrations/20260719000000_baseline` (+ `migration_lock.toml`), but not every in-memory adapter has a Prisma table/adapter counterpart yet.
 - The `docs/build-spec.md` container example (`Container` type with `logger`, `tracer`, `events`, `pricing`, etc.) is the target design, not the current `AppContainer` shape — the real interface is smaller today; read `src/composition/container.ts` for ground truth.
 
 ## Curriculum and content
 
-Course/lesson content structure is still being planned in `docs/` (e.g. `docs/product-brief.md`, `docs/sprint-plan.md`); no curriculum content files or import script exist in this snapshot yet. Voice rules: `docs/voice-guide.md` (enforced in part by the `no-restricted-syntax` ESLint rule that bans "leverage", "delve", etc.).
+Curriculum content lives in `content/curriculum/modules/` with quiz fixtures in `content/curriculum/quiz-questions.json`. Voice rules: `docs/voice-guide.md` (enforced in part by the `no-restricted-syntax` ESLint rule that bans "leverage", "delve", etc.).
 
 ## Architecture in detail
 
