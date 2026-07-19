@@ -11,8 +11,8 @@ Local: /workspace/amph-v2-greenfield/
 Tech: Next.js 16 + React 19 + TypeScript 7 + Prisma 7 + Argon2 + Vitest + Playwright + jose + Sentry
 Architecture: SOLID five-layer (domain/ → ports/ → usecases/ → infra/ → app/)
 
-main HEAD: ee067f3
-Quality gate: 0 tsc errors, 932/932 tests, build succeeds WITHOUT dummy env vars
+main HEAD: bddd31f (after PR #70, 2026-07-19)
+Quality gate: 0 tsc errors, 970/970 tests, build succeeds WITHOUT dummy env vars
 
 Docs (read in this order):
   1. AGENTS.md              — six rules, voice, design system, architecture
@@ -30,47 +30,56 @@ Docs (read in this order):
 **The user's rule is "we don't move a story until existing issues are addressed."**
 
 **Tier A (production bugs):** ✅ closed in PR #66
-**Tier B (TDD coverage gaps):** ❌ NOT closed
-**Tier C (SOLID hygiene):** ❌ NOT closed
-**Tier D (dead code):** ❌ NOT closed
+**Tier B (TDD coverage gaps):** 🟡 PARTIALLY closed (2 of 12 use cases done in PRs #68 + #69)
+**Tier C (SOLID hygiene):** ✅ closed in PR #70
+**Tier D (dead code):** ❌ REMOVED — was a misread. See `SESSION-TDD-SOLID-AUDIT.md` Tier D section for the correction. Do NOT delete `MarkLessonComplete`/`RecordStreakVisit`/`RequestRefund` — they're pending stories in the sprint plan.
 
-### Tier B (12 use cases + 11 repos have no tests)
+### Tier B (10 use cases + 10 repos have no tests, after PRs #68 + #69)
 
-12 use cases with **zero tests**:
+10 use cases with **zero tests** (was 12):
 - `ApplyDiscountCode`, `AwardBadge`, `AwardXP`, `CheckCourseAccess`,
-  `CreatePaymentIntent`, `IssueCertificate`, `ListUserBadges`,
-  `MarkLessonComplete`, `RecordQuizAttempt`, `RecordStreakVisit`,
+  `CreatePaymentIntent`, `ListUserBadges`, `RecordQuizAttempt`,
   `RenderCertificatePdf`, `RequestRefund`, `VerifyCertificate`
+- Done: `IssueCertificate` (PR #68), `RevokeCertificate` (PR #69)
+- Pending stories (NOT dead): `MarkLessonComplete`, `RecordStreakVisit` (note: moved out of this list, they go under their parent stories)
 
-11 `InMemory*` repository adapters with **zero tests**:
+10 `InMemory*` repository adapters with **zero tests** (was 11):
 - `InMemoryBadgeAwardRepository`, `InMemoryBadgeRepository`,
   `InMemoryCertificateRepository`, `InMemoryCourseRepository`,
   `InMemoryDiscountCodeRepository`, `InMemoryEnrollmentRepository`,
-  `InMemoryProgressEventRepository`, `InMemoryUserRepository`,
-  `InMemoryUserStreakRepository`, `InMemoryXPEventRepository`
+  `InMemoryUserRepository`, `InMemoryXPEventRepository`
+- Part of dead-chain (will be tested when parent stories land): `InMemoryProgressEventRepository`, `InMemoryUserStreakRepository`
+- Done: `InMemoryQuizRepository`, `InMemoryQuizAttemptRepository`, `InMemorySessionRepository`
 
-### Tier C (SOLID hygiene)
+### Tier C (SOLID hygiene) — CLOSED in PR #70
 
-- 8 `any` casts in `PrismaBadgeAwardRepository.ts` + `PrismaBadgeRepository.ts` + `GetAdminDashboardStats.test.ts`
-- 3 unused `eslint-disable` directives in `src/app/certificates/[hash]/pdf/route.ts:45,53,69`
-- Middleware → Proxy migration (Next 16 deprecation; `src/middleware.ts` → `src/proxy.ts`)
+- ✅ Typed Prisma rows in `PrismaBadge*Repository.ts` (used `Prisma.XGetPayload<{}>`)
+- ✅ Removed 3 unused `eslint-disable no-console` in `src/app/certificates/[hash]/pdf/route.ts`
+- ✅ Middleware → Proxy migration (Next 16 deprecation; `src/middleware.ts` → `src/proxy.ts`)
 
-### Tier D (dead code)
+### Tier D — REMOVED (was a misread)
 
-3 use cases with **no callers in the app**:
-- `MarkLessonComplete`, `RecordStreakVisit`, `RequestRefund`
+- Original claim: `MarkLessonComplete`, `RecordStreakVisit`, `RequestRefund` are "dead use cases with no callers."
+- Correction: All three are **Pending stories** in the active sprint plan (STORY-025, STORY-027). `MarkLessonComplete` is load-bearing for `IssueCertificate` (STORY-041) — certificates can only be issued when `enrollment.progressPercent === 100`, which is set by `MarkLessonComplete`. **Do not delete these.**
+- The audit doc confused "not yet wired to a route" with "dead code."
 
 ---
 
 ## What To Do (in order)
 
-### Step 1: Pick the lowest-effort tier first
+### Step 1: Pick a story to work on
 
-**Recommended order:** Tier C → Tier D → Tier B (story-by-story).
+Tier C is closed. Tier D is removed (was a misread). The only remaining
+audit item is Tier B, which is best done as stories are touched.
 
-Tier C is ~30 minutes of work. Tier D is 5 minutes (delete dead code).
-Tier B should be done **as stories are touched** (each story's TDD cycle
-covers its own use case), not as a separate bulk effort.
+**Recommended order:**
+1. Pick a story from the sprint plan (see `docs/sprint-plan.md`).
+2. When the story touches a Tier B use case, write tests for it FIRST (TDD red-green-refactor).
+3. The test IS the Tier B closure for that use case.
+
+For example, STORY-042 (PDF renderer) touches `RenderCertificatePdf`.
+When you start STORY-042, write tests for `RenderCertificatePdf` first
+— that closes the Tier B item.
 
 ### Step 2: If you do Tier C+D as a single PR
 
@@ -249,12 +258,11 @@ container. Use `getSessionUserId()`.
 ## End of Prompt
 
 You have everything you need. The audit-and-fix session is closed;
-Tier A is closed; Tier B/C/D are documented and waiting for the next
-session to address them. **Don't move a story until Tier B/C/D are
-closed.** That's the rule.
+Tier A and Tier C are closed; Tier D was a misread and is removed;
+Tier B is the only remaining item, best addressed story-by-story.
+**Don't move a story until its Tier B use case has tests.**
 
 Start by:
-1. Running the quality gate to verify the current state.
+1. Running the quality gate to verify the current state (970 tests, tsc clean, build succeeds).
 2. Reading `SESSION-TDD-SOLID-AUDIT.md` to internalize the patterns.
-3. Picking Tier C (small, fast) → Tier D (delete dead code) → Tier B
-   (story-by-story).
+3. Picking a story from `docs/sprint-plan.md` and writing tests for any Tier B use case it touches.
