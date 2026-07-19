@@ -1,7 +1,9 @@
 /**
- * Next.js middleware — Story 004 / 013.
+ * Next.js proxy — Story 004 / 013.
  *
  * Runs on every request before it reaches the page or API route.
+ * (Renamed from middleware.ts per Next 16 — see
+ * https://nextjs.org/docs/messages/middleware-to-proxy.)
  *
  * Responsibilities:
  * - Security headers (always)
@@ -18,7 +20,7 @@ import { JoseJwtService } from "@/infra/security/JoseJwtService";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/admin", "/enroll", "/order"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Security headers ──────────────────────────────────────

@@ -4,7 +4,7 @@
  * STORY-035: Badge system.
  */
 
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
 import type { Badge, BadgeSlug } from "@/domain/entities/Badge";
@@ -15,7 +15,7 @@ export class PrismaBadgeRepository implements IBadgeRepository {
 
   async findBySlug(slug: BadgeSlug): Promise<Result<Badge | null, BadgeError>> {
     try {
-      const row = await this.db.badge.findUnique({ where: { slug } });
+      const row: Prisma.BadgeGetPayload<{}> | null = await this.db.badge.findUnique({ where: { slug } });
       if (!row) return Result.ok(null);
       return Result.ok(this.mapRow(row));
     } catch (err: unknown) {
@@ -25,15 +25,14 @@ export class PrismaBadgeRepository implements IBadgeRepository {
 
   async findAll(): Promise<Result<readonly Badge[], BadgeError>> {
     try {
-      const rows: any[] = await this.db.badge.findMany();
+      const rows = await this.db.badge.findMany();
       return Result.ok(rows.map((r) => this.mapRow(r)));
     } catch (err: unknown) {
       return Result.err({ kind: "db_error", message: String(err) });
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private mapRow(row: any): Badge {
+  private mapRow(row: Prisma.BadgeGetPayload<{}>): Badge {
     return {
       slug: row.slug as BadgeSlug,
       name: row.name,

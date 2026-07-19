@@ -4,7 +4,7 @@
  * STORY-035: Badge system.
  */
 
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
 import type { BadgeAward } from "@/domain/entities/BadgeAward";
@@ -40,7 +40,7 @@ export class PrismaBadgeAwardRepository implements IBadgeAwardRepository {
 
   async findByUserId(userId: string): Promise<Result<readonly BadgeAward[], BadgeAwardError>> {
     try {
-      const rows: any[] = await this.db.badgeAward.findMany({
+      const rows = await this.db.badgeAward.findMany({
         where: { userId },
         orderBy: { awardedAt: "desc" },
       });
@@ -61,8 +61,7 @@ export class PrismaBadgeAwardRepository implements IBadgeAwardRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private mapRow(row: any): BadgeAward {
+  private mapRow(row: Prisma.BadgeAwardGetPayload<{}>): BadgeAward {
     return {
       id: row.id,
       userId: row.userId,
