@@ -11,9 +11,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
-import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
 import { getLessonData } from "../getLessonData";
@@ -65,34 +63,21 @@ export default async function LessonPage({ params }: PageProps) {
   }
   const { lesson, sectionTitle } = lessonData;
 
-  // ── Access check + enrollment data ──────────────────────
+  // ── Access check (P0-5) ─────────────────────────────
+  // Single source of truth: AuthorizeLessonAccess decides per-lesson
+  // for every user state (anonymous, authed-preview, enrolled,
+  // refunded, admin). The page MUST NOT re-implement this logic.
   const userId = await getSessionUserId();
   const completedLessonIds: string[] = [];
 
-  if (userId) {
-    const accessResult = await container.checkCourseAccess.execute({
-      userId,
-      courseId: course.id,
-    });
+  const authResult = await container.authorizeLessonAccess.execute({
+    userId: userId ?? "",
+    courseId: course.id,
+    lessonId,
+  });
 
-    if (
-      Result.isErr(accessResult) ||
-      accessResult.value.kind === "denied_not_authenticated" ||
-      accessResult.value.kind === "denied_not_enrolled" ||
-      accessResult.value.kind === "denied_tier"
-    ) {
-      return <AccessDeniedPage courseSlug={slug} courseTitle={course.title} />;
-    }
-  } else {
-    const previewCount = course.previewLessonCount;
-    const allLessonIds = course.curriculum.sections.flatMap((s) =>
-      s.lessons.map((l) => l.id),
-    );
-    const lessonIndex = allLessonIds.indexOf(lessonId);
-
-    if (lessonIndex >= previewCount) {
-      return <AccessDeniedPage courseSlug={slug} courseTitle={course.title} />;
-    }
+  if (!authResult.ok || (authResult.ok && authResult.value.kind === "denied")) {
+    return <AccessDeniedPage courseSlug={slug} courseTitle={course.title} />;
   }
 
   return (
@@ -200,7 +185,3 @@ function LockIcon() {
     </svg>
   );
 }
-
-// Suppress unused-import warning (CheckCourseAccess is part of the
-// access-check contract; the executor is wired through the container).
-void CheckCourseAccess;
