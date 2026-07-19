@@ -44,6 +44,7 @@ describe("AdminCreateDiscountCode", () => {
     });
     useCase = new AdminCreateDiscountCode({
       discountCodeRepo: repo,
+      idGen: { newId: () => "disc_1", paymentRef: () => "x", receiptNumber: () => "x" },
       recordAuditLog,
     });
   });

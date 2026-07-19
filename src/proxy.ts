@@ -16,7 +16,7 @@
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { JoseJwtService } from "@/infra/security/JoseJwtService";
+import { buildContainer } from "@/composition/container";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/admin", "/enroll", "/order"];
 
@@ -57,7 +57,7 @@ export async function proxy(request: NextRequest) {
       return new NextResponse("Internal server error", { status: 500 });
     }
 
-    const jwt = new JoseJwtService(secret);
+    const jwt = buildContainer().jwt;
     const result = await jwt.verify(sessionToken);
 
     if (!result.ok) {

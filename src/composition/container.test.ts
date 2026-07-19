@@ -321,7 +321,7 @@ export function buildTestContainer(): TestContainer {
     // STORY-050d: admin discount code CRUD
     adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
     adminGetDiscountCode: new AdminGetDiscountCode({ discountCodeRepo }),
-    adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, recordAuditLog }),
+    adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, idGen, recordAuditLog }),
     adminUpdateDiscountCode: new AdminUpdateDiscountCode({ discountCodeRepo, recordAuditLog }),
     adminArchiveDiscountCode: new AdminArchiveDiscountCode({ discountCodeRepo, recordAuditLog }),
     // STORY-050e: admin badge CRUD

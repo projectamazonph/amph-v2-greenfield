@@ -12,8 +12,8 @@ import type {
   IDiscountCodeRepository,
   DiscountCodeRepositoryError,
 } from "@/ports/repositories/IDiscountCodeRepository";
+import type { IdGenerator } from "@/ports/system/IdGenerator";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
-import { UlidGenerator } from "@/infra/system/UlidGenerator";
 
 export interface AdminCreateDiscountCodeInput {
   code: string;
@@ -39,6 +39,7 @@ export class AdminCreateDiscountCode {
   constructor(
     private readonly deps: {
       discountCodeRepo: IDiscountCodeRepository;
+      idGen: IdGenerator;
       recordAuditLog: RecordAuditLog;
     },
   ) {}
@@ -46,7 +47,7 @@ export class AdminCreateDiscountCode {
   async execute(
     input: AdminCreateDiscountCodeInput,
   ): Promise<AdminCreateDiscountCodeResult> {
-    const id = new UlidGenerator().newId();
+    const id = this.deps.idGen.newId();
 
     const createResult = createDiscountCode({
       id,
