@@ -52,6 +52,7 @@ import { Logout } from "@/usecases/Logout";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
+import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
@@ -206,6 +207,12 @@ export function buildTestContainer(): TestContainer {
       baseUrl: "https://test.amph.example.com",
     }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
+    // P0-5: per-lesson access decision
+    authorizeLessonAccess: new AuthorizeLessonAccess({
+      userRepo,
+      courseRepo,
+      enrollmentRepo,
+    }),
     enrollStudent: new EnrollStudent({
       userRepo,
       courseRepo,

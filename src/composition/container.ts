@@ -110,6 +110,7 @@ import { Logout } from "@/usecases/Logout";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
+import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
 import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
@@ -217,6 +218,8 @@ export interface AppContainer {
   logout: Logout;
   createPaymentIntent: CreatePaymentIntent;
   checkCourseAccess: CheckCourseAccess;
+  // P0-5: per-lesson access decision (single source of truth)
+  authorizeLessonAccess: AuthorizeLessonAccess;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
   // STORY-050d: admin discount code CRUD
@@ -373,6 +376,12 @@ function buildProductionContainer(): AppContainer {
       baseUrl,
     }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
+    // P0-5: per-lesson access decision
+    authorizeLessonAccess: new AuthorizeLessonAccess({
+      userRepo,
+      courseRepo,
+      enrollmentRepo,
+    }),
     enrollStudent: new EnrollStudent({
       userRepo,
       courseRepo,
