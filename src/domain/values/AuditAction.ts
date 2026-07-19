@@ -33,6 +33,9 @@ export type AuditAction =
   | "discount_code.created"
   | "discount_code.updated"
   | "discount_code.archived"
+  | "discount_code.create_failed"
+  | "discount_code.update_failed"
+  | "discount_code.archive_failed"
   // Badge
   | "badge.created"
   | "badge.updated"

@@ -94,6 +94,11 @@ import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
+import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
+import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
+import { AdminUpdateDiscountCode } from "@/usecases/AdminUpdateDiscountCode";
+import { AdminArchiveDiscountCode } from "@/usecases/AdminArchiveDiscountCode";
 import { AdminListScenarios } from "@/usecases/AdminListScenarios";
 import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
@@ -300,6 +305,12 @@ export function buildTestContainer(): TestContainer {
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
     processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
     refundOverride: new RefundOverride({ orderRepo, paymentGateway, recordAuditLog }),
+    // STORY-050d: admin discount code CRUD
+    adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
+    adminGetDiscountCode: new AdminGetDiscountCode({ discountCodeRepo }),
+    adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, recordAuditLog }),
+    adminUpdateDiscountCode: new AdminUpdateDiscountCode({ discountCodeRepo, recordAuditLog }),
+    adminArchiveDiscountCode: new AdminArchiveDiscountCode({ discountCodeRepo, recordAuditLog }),
     simulatorRegistry: buildSimulatorRegistry(),
     auditLog,
     recordAuditLog,
