@@ -35,6 +35,9 @@ function buildBadgeRepo(fixedBadges: Badge[]): IBadgeRepository {
       value: map.get(slug) ?? null,
     })) as IBadgeRepository["findBySlug"],
     findAll: vi.fn(async () => ({ ok: true, value: fixedBadges })) as IBadgeRepository["findAll"],
+    create: vi.fn() as IBadgeRepository["create"],
+    update: vi.fn() as IBadgeRepository["update"],
+    archive: vi.fn() as IBadgeRepository["archive"],
   };
 }
 
