@@ -14,7 +14,7 @@ import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@/components/ui";
 import { updateCourseAction } from "@/app/actions/updateCourse.action";
-import type { UpdateCourseInput } from "@/usecases/UpdateCourse";
+import type { UpdateCoursePageInput } from "@/app/actions/updateCourse.action";
 import type { UpdateCoursePatch } from "@/domain/entities/Course";
 import styles from "./page.module.css";
 
@@ -61,7 +61,7 @@ export default async function EditCoursePage({ params }: PageProps) {
         | "PUBLISHED"
         | "ARCHIVED",
     };
-    const input: UpdateCourseInput = { courseId: id, patch };
+    const input: UpdateCoursePageInput = { courseId: id, patch };
     const r = await updateCourseAction(input);
     if (r.ok) {
       redirect(`/admin/courses/${id}`);

@@ -15,7 +15,7 @@ import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@/components/ui";
 import { createCourseAction } from "@/app/actions/createCourse.action";
-import type { CreateCourseInput } from "@/usecases/CreateCourse";
+import type { CreateCoursePageInput } from "@/app/actions/createCourse.action";
 import styles from "./page.module.css";
 
 export default async function NewCoursePage() {
@@ -23,7 +23,7 @@ export default async function NewCoursePage() {
 
   async function handleSubmit(formData: FormData) {
     "use server";
-    const input: CreateCourseInput = {
+    const input: CreateCoursePageInput = {
       id: String(formData.get("id") ?? "").trim(),
       slug: String(formData.get("slug") ?? "").trim(),
       title: String(formData.get("title") ?? "").trim(),

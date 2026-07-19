@@ -50,6 +50,7 @@ import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepo
 import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
+import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 
 // ── Production adapters (only the prod ones) ──────────────────
 
@@ -74,6 +75,7 @@ import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepositor
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
@@ -148,6 +150,11 @@ import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { AdminListScenarios } from "@/usecases/AdminListScenarios";
+import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
+import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
+import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
+import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -173,6 +180,7 @@ export interface AppContainer {
   badgeAwardRepo: IBadgeAwardRepository;
   certificateRepo: ICertificateRepository;
   auditLog: IAuditLog;
+  scenarioRepo: ISimulatorScenarioRepository;
   simulatorRegistry: SimulatorRegistry;
 
   // External services
@@ -233,6 +241,12 @@ export interface AppContainer {
   refundOverride: RefundOverride;
   // STORY-050a: audit log
   recordAuditLog: RecordAuditLog;
+  // STORY-050b: simulator scenario CRUD
+  adminListScenarios: AdminListScenarios;
+  getSimulatorScenario: GetSimulatorScenario;
+  createSimulatorScenario: CreateSimulatorScenario;
+  updateSimulatorScenario: UpdateSimulatorScenario;
+  archiveSimulatorScenario: ArchiveSimulatorScenario;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -267,6 +281,8 @@ function buildProductionContainer(): AppContainer {
   // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
   const auditLog: IAuditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)
+  const scenarioRepo: ISimulatorScenarioRepository = new InMemorySimulatorScenarioRepository();
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -422,6 +438,13 @@ function buildProductionContainer(): AppContainer {
     refundOverride: new RefundOverride({ orderRepo, paymentGateway, recordAuditLog }),
     auditLog,
     recordAuditLog,
+    scenarioRepo,
+    // STORY-050b: simulator scenario CRUD
+    adminListScenarios: new AdminListScenarios({ scenarioRepo }),
+    getSimulatorScenario: new GetSimulatorScenario({ scenarioRepo }),
+    createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
   };
 }
 
