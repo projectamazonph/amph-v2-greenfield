@@ -59,6 +59,10 @@ import { RevokeCertificate } from "@/usecases/RevokeCertificate";
 import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
 import { ListCourses } from "@/usecases/ListCourses";
 import { GetCourse } from "@/usecases/GetCourse";
+// STORY-047: admin users list + user detail + impersonate
+import { ListUsers } from "@/usecases/ListUsers";
+import { GetUserDetail } from "@/usecases/GetUserDetail";
+import { ImpersonateUser } from "@/usecases/ImpersonateUser";
 
 import type { AppContainer } from "./container";
 
@@ -204,6 +208,16 @@ export function buildTestContainer(): TestContainer {
     }),
     listCourses: new ListCourses(courseRepo),
     getCourse: new GetCourse(courseRepo),
+    // STORY-047: admin users list + user detail + impersonate
+    listUsers: new ListUsers({ userRepo }),
+    getUserDetail: new GetUserDetail({ userRepo, enrollmentRepo }),
+    impersonateUser: new ImpersonateUser({
+      userRepo,
+      sessionRepo,
+      jwt,
+      clock,
+      idGen,
+    }),
     simulatorRegistry: buildSimulatorRegistry(),
   };
 }
