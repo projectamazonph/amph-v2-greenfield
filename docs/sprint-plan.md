@@ -121,7 +121,7 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-050a | AuditLog port + InMemory adapter + write sites for refund override + admin course CRUD | 1 |
 | STORY-050b | Simulators (scenario CRUD) | 1 |
 | STORY-050c | Live classes (CRUD) | 1 |
-| STORY-050d | Discount codes (admin CRUD) | 1 |
+| STORY-050d | Discount codes (admin CRUD) | 1 | ✅
 | STORY-050e | Badges (admin CRUD) + settings | 1 |
 
 ## Sprint 11 — Observability + Tests (5 pts)
