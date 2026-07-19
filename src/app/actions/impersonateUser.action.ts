@@ -13,9 +13,10 @@
  *  5. Plants the admin's original token as the amph_admin_session cookie
  *  6. Returns success
  *
- * The page redirects to "/" after the action returns (the user's view
- * is "/courses" since "/dashboard" doesn't exist yet — see story
- * Pitfalls).
+ * The page redirects to "/" after the action returns. P0-4 added a real
+ * /dashboard route, so impersonated users could in principle land there
+ * — but the audit recommended keeping the landing on /courses for now
+ * (the canonical catalog view).
  *
  * The testable pure logic lives in `performImpersonateUser` (exported
  * below). The action wrapper is the thin shell that wires in the
