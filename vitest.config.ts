@@ -42,6 +42,10 @@ export default defineConfig({
         "src/infra/repositories/Prisma*.ts",
         "src/infra/payment/Prisma*.ts",
         "src/infra/database/prisma.ts",
+        // Architecture compliance tests — they enforce TDD + SOLID
+        // rules via static analysis, not runtime assertions. They
+        // should never count toward coverage thresholds.
+        "tests/architecture/**",
       ],
     },
   },
