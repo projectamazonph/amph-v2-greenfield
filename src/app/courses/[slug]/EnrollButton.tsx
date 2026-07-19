@@ -3,27 +3,24 @@
 /**
  * EnrollButton — client component for course enrollment action.
  * Story 017
+ * P0-1: paywall enforcement.
  *
- * Uses the @/components/ui Button instead of raw <button> with
- * inline classes, to keep the design system enforced.
+ * Free courses enroll via the server action.
+ * Paid courses show a "Buy now" button that links to /checkout?courseId=...
+ * The server decides based on the authoritative course.price; the
+ * `isFree` prop on the client is presentation-only and is NEVER trusted
+ * for the actual decision.
  *
- * The component shows one of three states:
- *  1. Idle: "Enroll for Free" or "Enroll — ₱X,XXX" button
- *  2. Pending: same button, disabled, with "Enrolling..." or "Processing..."
- *  3. Success: a check icon + "Enrolled! Check your dashboard."
- *  4. Error: an error message
- *
- * Migrated from Tailwind-style classes to the design-system
- * Button + CSS Modules + design tokens (no `local/no-tailwind-classes`
- * violations).
- *
- * The full-width styling is done via a CSS Module (`.fullWidth`)
- * rather than a `fullWidth` prop on Button — keeping the design
- * system primitive minimal (additive design-system changes belong
- * in their own prep story).
+ * The component shows one of these states:
+ *  1. Idle (free): "Enroll for Free" button
+ *  2. Idle (paid): "Buy now — ₱X,XXX" link to /checkout
+ *  3. Pending: button disabled with "Enrolling..." or "Processing..."
+ *  4. Success: a check icon + "Enrolled! Check your dashboard."
+ *  5. Error: an error message
  */
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { enrollStudent, type EnrollStudentActionResult } from "@/app/actions/enroll";
 import { Money } from "@/domain/values/Money";
 import { Button } from "@/components/ui/Button";
@@ -45,6 +42,7 @@ export function EnrollButton({
     null,
   );
 
+  // isFree is PRESENTATION-ONLY. The server does its own check.
   const isFree = priceMinor === 0;
 
   if (state && state.ok) {
@@ -77,9 +75,37 @@ export function EnrollButton({
     if ("kind" in err && err.kind === "unauthorized") {
       return <p className={styles.error}>Please sign in to enroll.</p>;
     }
+    if ("kind" in err && err.kind === "paid_checkout_required") {
+      // Should be unreachable because paid courses render the Buy button
+      // below; but if we ever land here, recover by linking to checkout.
+      return (
+        <Link href={`/checkout?courseId=${courseId}`} className={styles.fullWidth}>
+          <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
+            Continue to checkout
+          </Button>
+        </Link>
+      );
+    }
     return <p className={styles.error}>Unable to enroll. Please try again.</p>;
   }
 
+  // Paid courses: never call the enroll action. Always show the Buy button.
+  if (!isFree) {
+    return (
+      <Link href={`/checkout?courseId=${courseId}`} className={styles.fullWidth}>
+        <Button
+          type="button"
+          variant="primary"
+          size="lg"
+          className={styles.fullWidth}
+        >
+          Buy now — {Money.of(priceMinor, "PHP").format()}
+        </Button>
+      </Link>
+    );
+  }
+
+  // Free courses: enroll via the server action.
   return (
     <form action={formAction}>
       <Button
@@ -89,13 +115,7 @@ export function EnrollButton({
         className={styles.fullWidth}
         disabled={isPending}
       >
-        {isPending
-          ? isFree
-            ? "Enrolling..."
-            : "Processing..."
-          : isFree
-            ? "Enroll for Free"
-            : `Enroll — ${Money.of(priceMinor, "PHP").format()}`}
+        {isPending ? "Enrolling..." : "Enroll for Free"}
       </Button>
     </form>
   );

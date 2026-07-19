@@ -90,6 +90,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const enrollResult = await container.enrollStudent.execute({
       userId: order.userId,
       courseId: order.courseId,
+      // P0-1: webhook only fires after a successful payment, so we have
+      // an authoritative paid order on file. Use "order" entitlement.
+      entitlement: "order",
     });
     if (Result.isErr(enrollResult)) {
       console.warn(

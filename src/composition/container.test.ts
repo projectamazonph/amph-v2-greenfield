@@ -210,6 +210,7 @@ export function buildTestContainer(): TestContainer {
       userRepo,
       courseRepo,
       enrollmentRepo,
+      orderRepo,
       idGen,
     }),
     discountCodeRepo,

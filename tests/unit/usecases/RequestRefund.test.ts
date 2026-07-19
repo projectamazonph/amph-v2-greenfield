@@ -19,6 +19,7 @@ function makeOrderRepo(findById: () => Result<Order, { kind: string }> | Promise
     findByUserId: vi.fn(),
     listAll: vi.fn(),
     update: vi.fn(async (order: Order) => Result.ok(order)),
+    findPaidForUserAndCourse: vi.fn(async () => Result.ok(null)),
   };
 }
 
