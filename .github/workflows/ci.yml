@@ -24,7 +24,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # fetch-depth: 0 so the full history is present locally. This
+      # is required by gitleaks, which computes a diff range of
+      # `base^..head` for pull_request events and needs the base's
+      # parent commit to be resolvable. Without this, gitleaks errors
+      # with "fatal: ambiguous argument '<base>^': unknown revision".
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
