@@ -1,17 +1,19 @@
 /**
- * One-off: render a sample PDF to /workspace/sample-certificate.pdf.
- * Run with:  npx vitest run tests/unit/infra/pdf/render-sample.test.ts
+ * One-off: render a sample PDF for visual inspection.
+ * Run with: SAMPLE_OUTPUT_DIR=/some/path npx vitest run tests/unit/infra/pdf/render-sample.test.ts
  *
- * Not part of the regular suite — this file is committed so you can
- * regenerate a sample PDF anytime by running the command above.
+ * Writes sample-certificate.pdf to SAMPLE_OUTPUT_DIR. Not part of the
+ * regular suite — skipped in CI by the absence of SAMPLE_OUTPUT_DIR.
  */
 
-import { it } from "vitest";
+import { describe, it } from "vitest";
 import { writeFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { CertificateDocument } from "@/infra/pdf/CertificateDocument";
 import type { CertificateRenderInput } from "@/ports/rendering/CertificateRenderer";
+
+const SAMPLE_OUT = process.env.SAMPLE_OUTPUT_DIR;
 
 const INPUT: CertificateRenderInput = {
   certificate: {
@@ -35,13 +37,15 @@ const INPUT: CertificateRenderInput = {
   },
 };
 
-it("renders a sample certificate to /workspace/sample-certificate.pdf", async () => {
-  const element = createElement(CertificateDocument, { input: INPUT });
-  const buffer = await renderToBuffer(
-    element as Parameters<typeof renderToBuffer>[0],
-  );
-  const outPath = "/workspace/sample-certificate.pdf";
-  writeFileSync(outPath, buffer);
-  // eslint-disable-next-line no-console
-  console.log(`\n[render-sample] Wrote ${buffer.length} bytes to ${outPath}\n`);
+describe("renders a sample certificate for visual inspection (skipped unless SAMPLE_OUTPUT_DIR is set)", () => {
+  it.skipIf(!SAMPLE_OUT)("writes sample-certificate.pdf to SAMPLE_OUTPUT_DIR", async () => {
+    const element = createElement(CertificateDocument, { input: INPUT });
+    const buffer = await renderToBuffer(
+      element as Parameters<typeof renderToBuffer>[0],
+    );
+    const outPath = `${SAMPLE_OUT}/sample-certificate.pdf`;
+    writeFileSync(outPath, buffer);
+    // eslint-disable-next-line no-console
+    console.log(`\n[render-sample] Wrote ${buffer.length} bytes to ${outPath}\n`);
+  });
 });

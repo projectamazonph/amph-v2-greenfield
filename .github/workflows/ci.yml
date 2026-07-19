@@ -87,6 +87,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma migrate deploy
+      - run: pnpm prisma generate
       - run: pnpm test
       - run: pnpm test:coverage
       - uses: actions/upload-artifact@v4
