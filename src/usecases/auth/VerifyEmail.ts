@@ -101,7 +101,7 @@ export class VerifyEmail {
     const now = this.deps.clock.now();
     const userResult = await this.deps.users.update(record.userId, {
       emailVerifiedAt: now,
-    } as Parameters<UserRepository["update"]>[1]);
+    });
     if (!userResult.ok) {
       this.deps.logger.error("verify_email.user_update_failed", {
         userId: record.userId,
