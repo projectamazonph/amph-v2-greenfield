@@ -45,6 +45,7 @@ import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
+import { InMemoryRateLimiter } from "@/infra/security/InMemoryRateLimiter";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
 import { SignUp } from "@/usecases/SignUp";
@@ -124,6 +125,7 @@ import type { AppContainer } from "./container";
 // like .users.set(...) or .seed() on the in-memory repos.
 export interface TestContainer extends AppContainer {
   logger: TestLogger;
+  rateLimiter: InMemoryRateLimiter;
   userRepo: InMemoryUserRepository;
   sessionRepo: InMemorySessionRepository;
   courseRepo: InMemoryCourseRepository;
@@ -149,6 +151,7 @@ export function buildTestContainer(): TestContainer {
   const clock = new FixedClock(new Date());
   const idGen = new InMemoryIdGenerator();
   const logger = new TestLogger();
+  const rateLimiter = new InMemoryRateLimiter();
   const userRepo = new InMemoryUserRepository();
   const courseRepo = new InMemoryCourseRepository();
   const moduleRepo = new InMemoryModuleRepository();
@@ -184,6 +187,7 @@ export function buildTestContainer(): TestContainer {
     clock,
     idGen,
     logger,
+    rateLimiter,
     userRepo,
     sessionRepo,
     courseRepo,

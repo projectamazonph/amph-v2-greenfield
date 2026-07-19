@@ -107,6 +107,10 @@ import { JoseJwtService } from "@/infra/security/JoseJwtService";
 import type { JwtService } from "@/ports/security/JwtService";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 
+// STORY-054: rate limiting
+import type { RateLimiter } from "@/ports/security/RateLimiter";
+import { UpstashRateLimiter } from "@/infra/security/UpstashRateLimiter";
+
 // ── Use cases ───────────────────────────────────────────────
 
 import { SignUp } from "@/usecases/SignUp";
@@ -219,6 +223,9 @@ export interface AppContainer {
   emailSender: EmailSender;
   jwt: JwtService;
   passwordHasher: PasswordHasher;
+
+  // Security
+  rateLimiter: RateLimiter;
 
   // Use cases
   signUp: SignUp;
@@ -354,6 +361,10 @@ function buildProductionContainer(): AppContainer {
     process.env.JWT_SECRET ?? "dev-only-secret-please-replace-with-32-bytes-min",
   );
   const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
+  const rateLimiter: RateLimiter = new UpstashRateLimiter(
+    process.env.UPSTASH_REDIS_REST_URL ?? "",
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
+  );
 
   return {
     clock,
@@ -367,6 +378,7 @@ function buildProductionContainer(): AppContainer {
     paymentGateway,
     jwt,
     passwordHasher,
+    rateLimiter,
     signUp: new SignUp(userRepo, idGen, clock, passwordHasher),
     login: new Login(
       userRepo,
