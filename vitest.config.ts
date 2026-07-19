@@ -34,6 +34,14 @@ export default defineConfig({
         "dist/**",
         "**/vendor/**",
         "prisma/**",
+        // Production composition + Prisma adapters — only exercised
+        // against a real database (integration tests use the in-memory
+        // repos via buildTestContainer). P0-2 audit item: these will
+        // gain coverage as the in-memory → Prisma migration proceeds.
+        "src/composition/container.ts",
+        "src/infra/repositories/Prisma*.ts",
+        "src/infra/payment/Prisma*.ts",
+        "src/infra/database/prisma.ts",
       ],
     },
   },
