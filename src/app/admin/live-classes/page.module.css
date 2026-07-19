@@ -1,0 +1,107 @@
+/* STORY-050c */
+
+.addButton {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-accent);
+  color: white;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 0.15s;
+}
+
+.addButton:hover {
+  background-color: var(--color-accent-dark);
+}
+
+.empty {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 2rem 0;
+  margin: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.title {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.course {
+  color: var(--color-text-muted);
+  font-family: monospace;
+  font-size: 0.8125rem;
+}
+
+.date {
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.actions {
+  text-align: right;
+}
+
+.editLink {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.editLink:hover {
+  text-decoration: underline;
+}
+
+/* Status badges */
+.badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.scheduled {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.completed {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.cancelled {
+  background-color: #fee2e2;
+  color: #dc2626;
+}

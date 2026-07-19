@@ -1,0 +1,36 @@
+# Gitleaks config — reduce false positives on test fixtures.
+#
+# Without [extend] useDefault=true, gitleaks uses an empty rule set
+# which would be far too permissive. With it, we inherit all default
+# rules (e.g. generic-api-key, stripe-access-token) and just allowlist
+# the obvious test JWT secret value used in CI workflow + tests + docs.
+#
+# Why this exists:
+#   The `generic-api-key` rule has been flagging
+#   `test-secret-at-least-32-bytes-long-please` in:
+#     - .github/workflows/ci.yml (test CI env)
+#     - src/**/__tests__/*.test.ts (vitest fixtures)
+#     - docs/stories/*.md, NEXT-SESSION-PROMPT.md, SESSION-*.md
+#   These are not real secrets — they live in PUBLIC test fixtures
+#   meant to be readable.
+
+title = "amph-v2-greenfield gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow test/development secrets in fixtures and docs"
+regexes = [
+  '''test-secret-(at-least|must-be)-32-bytes-long[-a-z]*''',
+  '''test-verification-secret''',
+]
+paths = [
+  '''.github/workflows/ci\.yml''',
+  '''src/.*__tests__/.*\.test\.ts$''',
+  '''docs/.*\.md$''',
+  '''NEXT-SESSION-PROMPT\.md''',
+  '''SESSION-.*\.md$''',
+  '''CLAUDE\.md$''',
+  '''BOOTSTRAP\.md$''',
+]

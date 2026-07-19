@@ -143,6 +143,10 @@ function buildCourseRepo(
     listAll: vi.fn(async () => Result.ok([])),
     findById: vi.fn(async () => findByIdResult),
     findBySlug: vi.fn(async () => Result.ok({} as Course)),
+    // STORY-048a: admin CRUD methods (unused by this test)
+    create: vi.fn(),
+    update: vi.fn(),
+    archive: vi.fn(),
   };
 }
 

@@ -4,20 +4,22 @@
  *
  * Renders a lesson's content with a sidebar navigation.
  * Access: enrolled users get full access; preview tier gives limited access.
+ *
+ * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
-import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
 import { getLessonData } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
 import { LessonSidebar } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
+import { Button } from "@/components/ui/Button";
+import styles from "./page.module.css";
 
 interface PageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -61,39 +63,25 @@ export default async function LessonPage({ params }: PageProps) {
   }
   const { lesson, sectionTitle } = lessonData;
 
-  // ── Access check + enrollment data ──────────────────────
+  // ── Access check (P0-5) ─────────────────────────────
+  // Single source of truth: AuthorizeLessonAccess decides per-lesson
+  // for every user state (anonymous, authed-preview, enrolled,
+  // refunded, admin). The page MUST NOT re-implement this logic.
   const userId = await getSessionUserId();
   const completedLessonIds: string[] = [];
 
-  if (userId) {
-    // Check course access
-    const accessResult = await container.checkCourseAccess.execute({
-      userId,
-      courseId: course.id,
-    });
+  const authResult = await container.authorizeLessonAccess.execute({
+    userId: userId ?? "",
+    courseId: course.id,
+    lessonId,
+  });
 
-    if (Result.isErr(accessResult) || accessResult.value.kind === "denied_not_authenticated" ||
-        accessResult.value.kind === "denied_not_enrolled" ||
-        accessResult.value.kind === "denied_tier") {
-      return <AccessDeniedPage courseSlug={slug} courseTitle={course.title} />;
-    }
-
-    // Note: completedLessonIds tracking is STORY-027 (MarkLessonComplete)
-    // For now, completedLessonIds = [] — no checkmarks until progress is tracked
-  } else {
-    // Unauthenticated — preview only (first N lessons)
-    const previewCount = course.previewLessonCount;
-    const allLessonIds = course.curriculum.sections.flatMap((s) => s.lessons.map((l) => l.id));
-    const lessonIndex = allLessonIds.indexOf(lessonId);
-
-    if (lessonIndex >= previewCount) {
-      return <AccessDeniedPage courseSlug={slug} courseTitle={course.title} />;
-    }
-    // completedLessonIds = [] — progress tracking is STORY-027
+  if (!authResult.ok || (authResult.ok && authResult.value.kind === "denied")) {
+    return <AccessDeniedPage courseSlug={slug} courseTitle={course.title} />;
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg)]">
+    <div className={styles.layout}>
       {/* Sidebar navigation */}
       <LessonSidebar
         course={course}
@@ -102,43 +90,41 @@ export default async function LessonPage({ params }: PageProps) {
       />
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-6 py-8">
+      <main className={styles.main}>
+        <div className={styles.content}>
           {/* Breadcrumb */}
-          <nav className="mb-6 text-sm" aria-label="Breadcrumb">
-            <ol className="flex items-center gap-1.5 text-[var(--text-secondary)]">
+          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+            <ol className={styles.breadcrumbList}>
               <li>
-                <Link href="/courses" className="hover:text-[var(--text)] transition-colors">
+                <Link href="/courses" className={styles.breadcrumbLink}>
                   Courses
                 </Link>
               </li>
-              <li aria-hidden className="opacity-40">/</li>
+              <li aria-hidden className={styles.breadcrumbSeparator}>/</li>
               <li>
                 <Link
                   href={`/courses/${slug}`}
-                  className="hover:text-[var(--text)] transition-colors truncate max-w-[200px]"
+                  className={`${styles.breadcrumbLink} ${styles.breadcrumbTruncate}`}
                 >
                   {course.title}
                 </Link>
               </li>
-              <li aria-hidden className="opacity-40">/</li>
-              <li className="text-[var(--text)] truncate">{lesson.title}</li>
+              <li aria-hidden className={styles.breadcrumbSeparator}>/</li>
+              <li className={styles.breadcrumbCurrent}>{lesson.title}</li>
             </ol>
           </nav>
 
           {/* Lesson header */}
-          <div className="mb-8 pb-6 border-b border-[var(--border)]">
-            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--accent)] mb-1">
-              {sectionTitle}
-            </p>
-            <h1 className="text-2xl font-bold text-[var(--text)]">{lesson.title}</h1>
+          <div className={styles.lessonHeader}>
+            <p className={styles.sectionLabel}>{sectionTitle}</p>
+            <h1 className={styles.lessonTitle}>{lesson.title}</h1>
           </div>
 
           {/* Lesson body */}
           <LessonContent lesson={lesson} />
 
           {/* Prev / Next navigation */}
-          <div className="mt-12 pt-6 border-t border-[var(--border)]">
+          <div className={styles.navFooter}>
             <LessonNavButtons
               courseSlug={slug}
               prevLessonId={lessonData.prevLessonId}
@@ -161,21 +147,18 @@ function AccessDeniedPage({
   courseTitle: string;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-      <div className="text-center max-w-md px-6">
+    <div className={styles.accessDeniedPage}>
+      <div className={styles.accessDeniedCard}>
         <LockIcon />
-        <h1 className="mt-4 text-2xl font-bold text-[var(--text)]">
-          Enroll to Access This Lesson
-        </h1>
-        <p className="mt-2 text-[var(--text-secondary)]">
+        <h1 className={styles.accessDeniedTitle}>Enroll to Access This Lesson</h1>
+        <p className={styles.accessDeniedText}>
           This lesson is part of <strong>{courseTitle}</strong>. Enroll to unlock all lessons and
           materials.
         </p>
-        <Link
-          href={`/courses/${courseSlug}`}
-          className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--accent)] text-white font-medium hover:opacity-90 transition-opacity"
-        >
-          View Course & Enroll
+        <Link href={`/courses/${courseSlug}`}>
+          <Button variant="primary" size="md">
+            View Course & Enroll
+          </Button>
         </Link>
       </div>
     </div>
@@ -187,10 +170,11 @@ function AccessDeniedPage({
 function LockIcon() {
   return (
     <svg
-      className="w-16 h-16 mx-auto text-[var(--text-secondary)] opacity-25"
-      fill="none"
+      className={styles.lockIcon}
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
+      aria-hidden="true"
     >
       <path
         strokeLinecap="round"

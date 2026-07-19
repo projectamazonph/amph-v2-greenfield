@@ -33,6 +33,44 @@ export class InMemoryCourseRepository implements CourseRepository {
     return Result.err({ kind: "not_found" });
   }
 
+  // ── STORY-048a: Admin courses CRUD ──────────────────────
+
+  async create(course: Course): Promise<Result<Course, CourseError>> {
+    // Slug uniqueness (including ARCHIVED)
+    for (const existing of this.courses.values()) {
+      if (existing.slug === course.slug) {
+        return Result.err({ kind: "slug_taken" });
+      }
+    }
+    this.courses.set(course.id, course);
+    return Result.ok(course);
+  }
+
+  async update(course: Course): Promise<Result<Course, CourseError>> {
+    if (!this.courses.has(course.id)) {
+      return Result.err({ kind: "not_found" });
+    }
+    // Slug uniqueness (excluding the current course)
+    for (const existing of this.courses.values()) {
+      if (existing.id !== course.id && existing.slug === course.slug) {
+        return Result.err({ kind: "slug_taken" });
+      }
+    }
+    this.courses.set(course.id, course);
+    return Result.ok(course);
+  }
+
+  async archive(id: string): Promise<Result<Course, CourseError>> {
+    const existing = this.courses.get(id);
+    if (!existing) return Result.err({ kind: "not_found" });
+    if (existing.status === "ARCHIVED") {
+      return Result.ok(existing);
+    }
+    const archived: Course = { ...existing, status: "ARCHIVED" };
+    this.courses.set(id, archived);
+    return Result.ok(archived);
+  }
+
   seed(courses: Course[]): void {
     courses.forEach((c) => this.courses.set(c.id, c));
   }

@@ -68,6 +68,10 @@ describe("EnrollStudent", () => {
       findBySlug: vi.fn(),
       listPublished: vi.fn(),
       listAll: vi.fn(),
+      // STORY-048a: admin CRUD methods (unused by this test)
+      create: vi.fn(),
+      update: vi.fn(),
+      archive: vi.fn(),
     };
     mockEnrollmentRepo = {
       findByUserIdAndCourseId: vi.fn(),
@@ -80,6 +84,15 @@ describe("EnrollStudent", () => {
       userRepo: mockUserRepo,
       courseRepo: mockCourseRepo,
       enrollmentRepo: mockEnrollmentRepo,
+      orderRepo: {
+        create: vi.fn(),
+        findById: vi.fn(),
+        findByPaymongoPaymentId: vi.fn(),
+        findByUserId: vi.fn(),
+        listAll: vi.fn(),
+        update: vi.fn(),
+        findPaidForUserAndCourse: vi.fn(),
+      },
       idGen: { newId: () => `enrol_${++idCounter}` },
     });
   });
@@ -111,7 +124,7 @@ describe("EnrollStudent", () => {
     );
     vi.mocked(mockUserRepo.update).mockResolvedValue(Result.ok(user));
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, entitlement: "admin_grant" });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -149,6 +162,7 @@ describe("EnrollStudent", () => {
       userId: USER_ID,
       courseId: COURSE_ID,
       source: "affiliate",
+      entitlement: "admin_grant",
     });
 
     expect(result.ok).toBe(true);
@@ -161,7 +175,7 @@ describe("EnrollStudent", () => {
   it("returns user_not_found when user does not exist", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.err({ kind: "not_found" }));
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, entitlement: "admin_grant" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -172,7 +186,7 @@ describe("EnrollStudent", () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.err({ kind: "not_found" }));
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, entitlement: "admin_grant" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -185,7 +199,7 @@ describe("EnrollStudent", () => {
       Result.ok(makeCourse({ status: "DRAFT" })),
     );
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, entitlement: "admin_grant" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -198,7 +212,7 @@ describe("EnrollStudent", () => {
       Result.ok(makeCourse({ status: "ARCHIVED" })),
     );
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, entitlement: "admin_grant" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -211,7 +225,7 @@ describe("EnrollStudent", () => {
     );
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(makeCourse()));
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, entitlement: "admin_grant" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -236,7 +250,7 @@ describe("EnrollStudent", () => {
       markLessonComplete: vi.fn(),
     });
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, entitlement: "admin_grant" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -254,7 +268,7 @@ describe("EnrollStudent", () => {
       Result.err({ kind: "already_enrolled" }),
     );
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, entitlement: "admin_grant" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;

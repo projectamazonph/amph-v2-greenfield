@@ -6,18 +6,23 @@
  * Verifies the webhook signature, looks up the order by PayMongo session ID,
  * transitions the order to PAID, and auto-enrolls the student.
  *
- * Security: HMAC-SHA256 signature verification via PayMongoAdapter.
+ * Security: HMAC-SHA256 signature verification via the container's
+ * paymentGateway (PayMongoAdapter in prod).
  * Idempotency: If the order is already PAID, returns 200 without re-processing.
+ *
+ * SOLID notes:
+ * - The route uses buildContainer() for ALL data access. No
+ *   `new InMemory*()` instantiations in production code (that was
+ *   the Tier A bug — webhook would silently use empty in-memory
+ *   repos, so order lookups 404'd and enrollments never persisted).
+ * - The paymentGateway is wired through the container (so the
+ *   webhook secret and signature verification are config-driven).
+ * - The enrollStudent use case is dispatched via the container.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { PayMongoAdapter } from "@/infra/payment/PayMongoAdapter";
-import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
-import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
-import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
-import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
+import { buildContainer } from "@/composition/container";
 import { Result } from "@/domain/shared/Result";
-import { EnrollStudent } from "@/usecases/EnrollStudent";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const signature = req.headers.get("paymongo-signature") ?? "";
@@ -25,20 +30,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // Read raw body — needed for signature verification
   const rawBody = await req.text();
 
-  // ── 1. Verify webhook signature ─────────────────────────────
-  const paymongo = new PayMongoAdapter(
-    process.env.PAYMONGO_SECRET ?? "",
-    process.env.PAYMONGO_WEBHOOK_SECRET,
-  );
+  // ── 1. Build the container (composition root) ────────────
+  const container = buildContainer();
 
+  // ── 2. Verify webhook signature ─────────────────────────────
   try {
-    paymongo.verifyWebhookSignature(rawBody, signature);
+    // The paymentGateway's verifyWebhookSignature lives on the
+    // PayMongoAdapter concrete class (it's a PayMongo-specific
+    // method, not a port). We cast to access it. The container
+    // is the single source of truth for the gateway instance.
+    const gateway = container.paymentGateway as unknown as {
+      verifyWebhookSignature(body: string, signature: string): void;
+    };
+    gateway.verifyWebhookSignature(rawBody, signature);
   } catch {
     console.error("[webhook] Invalid signature");
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  // ── 2. Parse event ──────────────────────────────────────────
+  // ── 3. Parse event ──────────────────────────────────────────
   let event: { type: string; data: { id: string; attributes: Record<string, unknown> } };
   try {
     event = JSON.parse(rawBody);
@@ -53,23 +63,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const sessionId = event.data.id;
 
-  // ── 3. Wire dependencies ────────────────────────────────────
-  // In production, these come from the DI container.
-  // For the webhook (edge runtime), we instantiate directly.
-  // TODO: wire PrismaEnrollmentRepository + PrismaUserRepository in STORY-023 follow-up
-  const orderRepo = new InMemoryOrderRepository();
-  const courseRepo = new InMemoryCourseRepository();
-  const userRepo = new InMemoryUserRepository();
-  const enrollmentRepo = new InMemoryEnrollmentRepository();
-  const enrollStudent = new EnrollStudent({
-    courseRepo,
-    userRepo,
-    enrollmentRepo,
-    idGen: { newId: () => crypto.randomUUID() },
-  });
-
-  // ── 4. Find the order ──────────────────────────────────────
-  const orderResult = await orderRepo.findByPaymongoPaymentId(sessionId);
+  // ── 4. Find the order (via the container's orderRepo) ─────
+  const orderResult = await container.orderRepo.findByPaymongoPaymentId(sessionId);
   if (Result.isErr(orderResult)) {
     console.error(`[webhook] Order not found for session: ${sessionId}`);
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -81,20 +76,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ received: true });
   }
 
-  // ── 6. Mark order as paid ──────────────────────────────────
+  // ── 6. Mark order as paid (via the container's orderRepo) ──
   try {
     order.markPaid();
-    await orderRepo.update(order);
+    await container.orderRepo.update(order);
   } catch (err) {
     console.error(`[webhook] Failed to mark order ${order.id} as paid:`, err);
     return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
   }
 
-  // ── 7. Auto-enroll the student ─────────────────────────────
+  // ── 7. Auto-enroll the student (via the container's use case) ─
   try {
-    const enrollResult = await enrollStudent.execute({
+    const enrollResult = await container.enrollStudent.execute({
       userId: order.userId,
       courseId: order.courseId,
+      // P0-1: webhook only fires after a successful payment, so we have
+      // an authoritative paid order on file. Use "order" entitlement.
+      entitlement: "order",
     });
     if (Result.isErr(enrollResult)) {
       console.warn(

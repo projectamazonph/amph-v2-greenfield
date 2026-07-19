@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -31,7 +32,13 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {/* STORY-047: shown when an admin is impersonating another user.
+            Server component, reads the amph_admin_session cookie, returns
+            null when not impersonating. */}
+        <ImpersonationBanner />
+        {children}
+      </body>
     </html>
   );
 }

@@ -14,7 +14,7 @@ import styles from "./TopBar.module.css";
 
 export interface TopBarProps {
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   breadcrumb?: ReactNode;
   actions?: ReactNode;
 }

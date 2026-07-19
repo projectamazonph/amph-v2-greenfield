@@ -2,18 +2,29 @@
  * PrismaDiscountCodeRepository — production adapter for IDiscountCodeRepository.
  *
  * STORY-024: Discount code model + repository + apply in checkout.
+ * STORY-050d: stub for listAll, findById, update, archive.
  */
 
 import { PrismaClient } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import type {
   IDiscountCodeRepository,
-  DiscountCodeError,
+  DiscountCodeRepositoryError,
 } from "@/ports/repositories/IDiscountCodeRepository";
 import type { DiscountCode } from "@/domain/entities/DiscountCode";
 
 export class PrismaDiscountCodeRepository implements IDiscountCodeRepository {
   constructor(private readonly db: PrismaClient) {}
+
+  // STORY-050d: stub
+  async listAll(): Promise<Result<DiscountCode[], DiscountCodeRepositoryError>> {
+    throw new Error("Not implemented: PrismaDiscountCodeRepository.listAll");
+  }
+
+  // STORY-050d: stub
+  async findById(): Promise<Result<DiscountCode | null, DiscountCodeRepositoryError>> {
+    throw new Error("Not implemented: PrismaDiscountCodeRepository.findById");
+  }
 
   async findByCode(code: string): Promise<DiscountCode | null> {
     const row = await this.db.discountCode.findUnique({
@@ -23,7 +34,7 @@ export class PrismaDiscountCodeRepository implements IDiscountCodeRepository {
     return this.mapRow(row);
   }
 
-  async create(code: DiscountCode): Promise<Result<DiscountCode, DiscountCodeError>> {
+  async create(code: DiscountCode): Promise<Result<DiscountCode, DiscountCodeRepositoryError>> {
     try {
       const row = await this.db.discountCode.create({
         data: {
@@ -52,9 +63,19 @@ export class PrismaDiscountCodeRepository implements IDiscountCodeRepository {
     }
   }
 
+  // STORY-050d: stub
+  async update(): Promise<Result<void, DiscountCodeRepositoryError>> {
+    throw new Error("Not implemented: PrismaDiscountCodeRepository.update");
+  }
+
+  // STORY-050d: stub
+  async archive(): Promise<Result<void, DiscountCodeRepositoryError>> {
+    throw new Error("Not implemented: PrismaDiscountCodeRepository.archive");
+  }
+
   async incrementUsedCount(
     codeId: string,
-  ): Promise<Result<DiscountCode, DiscountCodeError>> {
+  ): Promise<Result<DiscountCode, DiscountCodeRepositoryError>> {
     try {
       const row = await this.db.discountCode.update({
         where: { id: codeId },

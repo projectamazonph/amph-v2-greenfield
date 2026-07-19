@@ -1,14 +1,22 @@
 /**
  * /courses — AMPH Course Catalog
  * Story 016
+ *
+ * Migrated to CSS Modules + design tokens (no Tailwind classes).
+ *
+ * Uses buildContainer() (the composition root) for the course
+ * repository + ListCourses use case. The page MUST NOT
+ * instantiate InMemory* adapters directly — that would be the
+ * "in-memory in production" anti-pattern (the catalog would
+ * always be empty).
  */
 
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ListCourses } from "@/usecases/ListCourses";
-import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { buildContainer } from "@/composition/container";
 import { courseLessonCount, courseTotalDurationMinutes } from "@/domain/entities/Course";
 import type { Course } from "@/domain/entities/Course";
+import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Courses — AMPH Academy",
@@ -16,14 +24,15 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursesPage() {
-  const repo = new InMemoryCourseRepository();
-  const useCase = new ListCourses(repo);
-  const result = await useCase.execute();
+  const container = buildContainer();
+  const result = await container.listCourses.execute();
 
   if (!result.ok) {
     return (
-      <main className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <p className="text-[var(--text-secondary)]">Unable to load courses. Please try again later.</p>
+      <main className={styles.errorPage}>
+        <p className={styles.errorText}>
+          Unable to load courses. Please try again later.
+        </p>
       </main>
     );
   }
@@ -31,23 +40,23 @@ export default async function CoursesPage() {
   const courses = result.courses;
 
   return (
-    <main className="min-h-screen bg-[var(--bg)]">
+    <main className={styles.page}>
       {/* Hero */}
-      <section className="bg-[var(--surface)] border-b border-[var(--border)] py-16 px-6 text-center">
-        <h1 className="text-4xl font-bold text-[var(--text)] mb-3">Course Catalog</h1>
-        <p className="text-lg text-[var(--text-secondary)] max-w-xl mx-auto">
+      <section className={styles.hero}>
+        <h1 className={styles.heroTitle}>Course Catalog</h1>
+        <p className={styles.heroSubtitle}>
           Expert-led Amazon FBA training, taught in Filipino. Learn at your own pace.
         </p>
       </section>
 
       {/* Grid */}
-      <section className="max-w-6xl mx-auto px-6 py-12">
+      <section className={styles.gridSection}>
         {courses.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-[var(--text-secondary)]">Courses coming soon.</p>
+          <div className={styles.emptyState}>
+            <p className={styles.emptyText}>Courses coming soon.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={styles.grid}>
             {courses.map((course: Course) => (
               <CourseCard key={course.id} course={course} />
             ))}
@@ -68,35 +77,31 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group block rounded-xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden hover:border-[var(--accent)] transition-colors duration-200"
+      className={styles.card}
     >
       {course.coverImage ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={course.coverImage} alt={course.title} className="w-full h-44 object-cover" />
+        <img src={course.coverImage} alt={course.title} className={styles.cardImage} />
       ) : (
-        <div className="w-full h-44 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-dark)] flex items-center justify-center">
-          <span className="text-white text-3xl font-bold opacity-30">{course.title[0]}</span>
+        <div className={styles.cardImagePlaceholder}>
+          <span className={styles.cardImagePlaceholderLetter}>{course.title[0]}</span>
         </div>
       )}
 
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <h2 className="font-semibold text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
-            {course.title}
-          </h2>
-          <span className="text-sm font-bold text-[var(--accent)] whitespace-nowrap">
-            {priceDisplay}
-          </span>
+      <div className={styles.cardBody}>
+        <div className={styles.cardHeader}>
+          <h2 className={styles.cardTitle}>{course.title}</h2>
+          <span className={styles.cardPrice}>{priceDisplay}</span>
         </div>
 
         {course.tagline && (
-          <p className="text-sm text-[var(--text-secondary)] mb-3 line-clamp-2">
-            {course.tagline}
-          </p>
+          <p className={styles.cardTagline}>{course.tagline}</p>
         )}
 
-        <div className="flex items-center gap-4 text-xs text-[var(--text-secondary)]">
-          <span>{lessonCount} lesson{lessonCount !== 1 ? "s" : ""}</span>
+        <div className={styles.cardMeta}>
+          <span>
+            {lessonCount} lesson{lessonCount !== 1 ? "s" : ""}
+          </span>
           {totalMinutes > 0 && (
             <span>
               {hours > 0 ? `${hours}h ` : ""}

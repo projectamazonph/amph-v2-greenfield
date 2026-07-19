@@ -5,7 +5,7 @@
 - **Story**: STORY-043
 - **Sprint**: 9 — Certificates + Email
 - **Points**: 1
-- **Status**: In Progress
+- **Status**: Done (commit 020973b)
 
 ## Overview
 

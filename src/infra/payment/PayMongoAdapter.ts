@@ -184,4 +184,26 @@ export class PayMongoAdapter implements IPaymentGateway {
       throw new Error("Webhook signature mismatch — possible tampering");
     }
   }
+
+  /**
+   * STORY-049: Issue a refund via PayMongo.
+   *
+   * STUB: throws "not yet wired". The real PayMongo Refunds API
+   * integration is STORY-049.5. The prod container falls back to
+   * throwing on refund until that lands.
+   */
+  async refund(_params: {
+    paymongoPaymentId: string;
+    amountMinor: number;
+    reason: string;
+  }): Promise<
+    Result<{ refundId: string; processedAt: Date }, PaymentGatewayError>
+  > {
+    return Result.err({
+      kind: "paymongo_error",
+      code: "not_implemented",
+      message:
+        "PayMongo refunds are not wired yet. See STORY-049.5. The use case must be tested against the stub gateway.",
+    });
+  }
 }

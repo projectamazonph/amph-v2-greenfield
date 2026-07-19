@@ -42,7 +42,6 @@ export async function GET(
     if (verifyResult.error.kind === "user_not_found" ||
         verifyResult.error.kind === "course_not_found") {
       // Data integrity issue — log and return 500
-      // eslint-disable-next-line no-console
       console.error("[certificates/pdf] data integrity error:", verifyResult.error);
       return NextResponse.json(
         { error: { kind: "internal_error", message: "Certificate data is corrupt" } },
@@ -50,7 +49,6 @@ export async function GET(
       );
     }
     // db_error
-    // eslint-disable-next-line no-console
     console.error("[certificates/pdf] db error:", verifyResult.error);
     return NextResponse.json(
       { error: { kind: "db_error", message: "Internal server error" } },
@@ -66,7 +64,6 @@ export async function GET(
   });
 
   if (!renderResult.ok) {
-    // eslint-disable-next-line no-console
     console.error("[certificates/pdf] render error:", renderResult.error);
     if (renderResult.error.kind === "render_error") {
       return NextResponse.json(

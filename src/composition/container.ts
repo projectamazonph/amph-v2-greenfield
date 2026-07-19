@@ -37,6 +37,8 @@ import type { IdGenerator } from "@/ports/system/IdGenerator";
 
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { IModuleRepository } from "@/ports/repositories/IModuleRepository";
+import type { ILessonRepository } from "@/ports/repositories/ILessonRepository";
 import type { IOrderRepository } from "@/ports/repositories/OrderRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { IDiscountCodeRepository } from "@/ports/repositories/IDiscountCodeRepository";
@@ -46,12 +48,25 @@ import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository
 import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
 import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
+import type { SessionRepository } from "@/ports/repositories/SessionRepository";
+import type { IAuditLog } from "@/ports/repositories/IAuditLog";
+import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
+import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 
 // ── Production adapters (only the prod ones) ──────────────────
 
 import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
-import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { PrismaCourseRepository } from "@/infra/repositories/PrismaCourseRepository";
+import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
+import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
+// Note: SessionRepository is currently in-memory even in production
+// (PrismaSessionRepository is a future story). The session is also
+// embedded in the JWT cookie, so losing the DB row on process restart
+// does not invalidate active sessions — the JWT is still valid until
+// its expiry. The DB row is for admin visibility + revocation; when
+// revocation matters, ship the Prisma adapter.
 import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
 import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscountCodeRepository";
 import { PrismaQuizRepository } from "@/infra/repositories/PrismaQuizRepository";
@@ -60,6 +75,10 @@ import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepos
 import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
+import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
+import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
@@ -86,10 +105,23 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 // ── Use cases ───────────────────────────────────────────────
 
 import { SignUp } from "@/usecases/SignUp";
+import { Login } from "@/usecases/Login";
+import { Logout } from "@/usecases/Logout";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
+import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
+import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
+import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
+import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
+import { AdminUpdateDiscountCode } from "@/usecases/AdminUpdateDiscountCode";
+import { AdminArchiveDiscountCode } from "@/usecases/AdminArchiveDiscountCode";
+import { AdminListBadges } from "@/usecases/AdminListBadges";
+import { AdminGetBadge } from "@/usecases/AdminGetBadge";
+import { AdminCreateBadge } from "@/usecases/AdminCreateBadge";
+import { AdminUpdateBadge } from "@/usecases/AdminUpdateBadge";
+import { AdminArchiveBadge } from "@/usecases/AdminArchiveBadge";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
@@ -100,6 +132,48 @@ import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
 import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 import { RevokeCertificate } from "@/usecases/RevokeCertificate";
 import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
+import { ListCourses } from "@/usecases/ListCourses";
+import { GetCourse } from "@/usecases/GetCourse";
+// STORY-047: admin users list + user detail + impersonate
+import { ListUsers } from "@/usecases/ListUsers";
+import { GetUserDetail } from "@/usecases/GetUserDetail";
+import { ImpersonateUser } from "@/usecases/ImpersonateUser";
+// STORY-048a: admin courses CRUD
+import { AdminListCourses } from "@/usecases/AdminListCourses";
+import { AdminGetCourse } from "@/usecases/AdminGetCourse";
+import { CreateCourse } from "@/usecases/CreateCourse";
+import { UpdateCourse } from "@/usecases/UpdateCourse";
+import { ArchiveCourse } from "@/usecases/ArchiveCourse";
+// STORY-048b: admin modules CRUD + reorder
+import { AdminListModules } from "@/usecases/AdminListModules";
+import { AdminGetModule } from "@/usecases/AdminGetModule";
+import { CreateModule } from "@/usecases/CreateModule";
+import { UpdateModule } from "@/usecases/UpdateModule";
+import { DeleteModule } from "@/usecases/DeleteModule";
+import { ReorderModules } from "@/usecases/ReorderModules";
+// STORY-048c: admin lessons CRUD + reorder
+import { AdminListLessons } from "@/usecases/AdminListLessons";
+import { AdminGetLesson } from "@/usecases/AdminGetLesson";
+import { CreateLesson } from "@/usecases/CreateLesson";
+import { UpdateLesson } from "@/usecases/UpdateLesson";
+import { DeleteLesson } from "@/usecases/DeleteLesson";
+import { ReorderLessons } from "@/usecases/ReorderLessons";
+// STORY-049: admin payments + refunds + refund override
+import { AdminListPayments } from "@/usecases/AdminListPayments";
+import { AdminGetPayment } from "@/usecases/AdminGetPayment";
+import { ProcessRefund } from "@/usecases/ProcessRefund";
+import { RefundOverride } from "@/usecases/RefundOverride";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { AdminListScenarios } from "@/usecases/AdminListScenarios";
+import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
+import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
+import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
+import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
+import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
+import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
+import { CreateLiveClass } from "@/usecases/CreateLiveClass";
+import { UpdateLiveClass } from "@/usecases/UpdateLiveClass";
+import { DeleteLiveClass } from "@/usecases/DeleteLiveClass";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -113,6 +187,7 @@ export interface AppContainer {
 
   // Repositories
   userRepo: UserRepository;
+  sessionRepo: SessionRepository;
   courseRepo: CourseRepository;
   orderRepo: IOrderRepository;
   enrollmentRepo: IEnrollmentRepository;
@@ -123,6 +198,10 @@ export interface AppContainer {
   badgeRepo: IBadgeRepository;
   badgeAwardRepo: IBadgeAwardRepository;
   certificateRepo: ICertificateRepository;
+  auditLog: IAuditLog;
+  scenarioRepo: ISimulatorScenarioRepository;
+  // STORY-050c: live class admin CRUD
+  liveClassRepo: ILiveClassRepository;
   simulatorRegistry: SimulatorRegistry;
 
   // External services
@@ -135,10 +214,26 @@ export interface AppContainer {
 
   // Use cases
   signUp: SignUp;
+  login: Login;
+  logout: Logout;
   createPaymentIntent: CreatePaymentIntent;
   checkCourseAccess: CheckCourseAccess;
+  // P0-5: per-lesson access decision (single source of truth)
+  authorizeLessonAccess: AuthorizeLessonAccess;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
+  // STORY-050d: admin discount code CRUD
+  adminListDiscountCodes: AdminListDiscountCodes;
+  adminGetDiscountCode: AdminGetDiscountCode;
+  adminCreateDiscountCode: AdminCreateDiscountCode;
+  adminUpdateDiscountCode: AdminUpdateDiscountCode;
+  adminArchiveDiscountCode: AdminArchiveDiscountCode;
+  // STORY-050e: admin badge CRUD
+  adminListBadges: AdminListBadges;
+  adminGetBadge: AdminGetBadge;
+  adminCreateBadge: AdminCreateBadge;
+  adminUpdateBadge: AdminUpdateBadge;
+  adminArchiveBadge: AdminArchiveBadge;
   recordQuizAttempt: RecordQuizAttempt;
   awardXp: AwardXP;
   awardBadge: AwardBadge;
@@ -148,6 +243,51 @@ export interface AppContainer {
   verifyCertificate: VerifyCertificate;
   revokeCertificate: RevokeCertificate;
   getAdminDashboardStats: GetAdminDashboardStats;
+  listCourses: ListCourses;
+  getCourse: GetCourse;
+  // STORY-047: admin users list + user detail + impersonate
+  listUsers: ListUsers;
+  getUserDetail: GetUserDetail;
+  impersonateUser: ImpersonateUser;
+  // STORY-048a: admin courses CRUD
+  adminListCourses: AdminListCourses;
+  adminGetCourse: AdminGetCourse;
+  createCourse: CreateCourse;
+  updateCourse: UpdateCourse;
+  archiveCourse: ArchiveCourse;
+  // STORY-048b: admin modules CRUD + reorder
+  adminListModules: AdminListModules;
+  adminGetModule: AdminGetModule;
+  createModule: CreateModule;
+  updateModule: UpdateModule;
+  deleteModule: DeleteModule;
+  reorderModules: ReorderModules;
+  // STORY-048c: admin lessons CRUD + reorder
+  adminListLessons: AdminListLessons;
+  adminGetLesson: AdminGetLesson;
+  createLesson: CreateLesson;
+  updateLesson: UpdateLesson;
+  deleteLesson: DeleteLesson;
+  reorderLessons: ReorderLessons;
+  // STORY-049: admin payments + refunds + refund override
+  adminListPayments: AdminListPayments;
+  adminGetPayment: AdminGetPayment;
+  processRefund: ProcessRefund;
+  refundOverride: RefundOverride;
+  // STORY-050a: audit log
+  recordAuditLog: RecordAuditLog;
+  // STORY-050b: simulator scenario CRUD
+  adminListScenarios: AdminListScenarios;
+  getSimulatorScenario: GetSimulatorScenario;
+  createSimulatorScenario: CreateSimulatorScenario;
+  updateSimulatorScenario: UpdateSimulatorScenario;
+  archiveSimulatorScenario: ArchiveSimulatorScenario;
+  // STORY-050c: live class admin CRUD
+  adminListLiveClasses: AdminListLiveClasses;
+  adminGetLiveClass: AdminGetLiveClass;
+  createLiveClass: CreateLiveClass;
+  updateLiveClass: UpdateLiveClass;
+  deleteLiveClass: DeleteLiveClass;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -157,21 +297,34 @@ function buildProductionContainer(): AppContainer {
   const idGen: IdGenerator = new UlidGenerator();
 
   const userRepo: UserRepository = new PrismaUserRepository(prisma);
-  // Course and order repos are intentionally in-memory even in prod
-  // for now (see TODOs in STORY-013 / STORY-015). They will be moved
-  // to Prisma when the curriculum + orders data needs to survive
-  // process restarts.
-  const courseRepo: CourseRepository = new InMemoryCourseRepository();
+  // P0-2: course data now persists to PostgreSQL. The catalog
+  // survives restarts and is shared across application instances.
+  const courseRepo: CourseRepository = new PrismaCourseRepository(prisma);
+  // STORY-048b: Module repo is also in-memory (no Prisma module table
+  // yet). The story's 'Prisma Module schema migration' out-of-scope
+  // item is the follow-up.
+  const moduleRepo: IModuleRepository = new InMemoryModuleRepository();
+  // STORY-048c: same in-memory fallback as Module.
+  const lessonRepo: ILessonRepository = new InMemoryLessonRepository();
   const orderRepo: IOrderRepository = new InMemoryOrderRepository();
 
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
-  const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
+  // STORY-050d: use in-memory discount code repo (Prisma schema is a follow-up)
+  const discountCodeRepo: IDiscountCodeRepository = new InMemoryDiscountCodeRepository();
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
   const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
   const xpEventRepo: IXPEventRepository = new PrismaXPEventRepository(prisma);
   const badgeRepo: IBadgeRepository = new PrismaBadgeRepository(prisma);
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
+  const sessionRepo: SessionRepository = new InMemorySessionRepository();
+  // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
+  const auditLog: IAuditLog = new InMemoryAuditLog();
+  const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)
+  const scenarioRepo: ISimulatorScenarioRepository = new InMemorySimulatorScenarioRepository();
+  // STORY-050c: in-memory live class repo (Prisma schema is a follow-up)
+  const liveClassRepo: ILiveClassRepository = new InMemoryLiveClassRepository();
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -197,13 +350,23 @@ function buildProductionContainer(): AppContainer {
     clock,
     idGen,
     userRepo,
+    sessionRepo,
     courseRepo,
     orderRepo,
     enrollmentRepo,
     paymentGateway,
     jwt,
     passwordHasher,
-    signUp: new SignUp(userRepo, idGen, clock, new Argon2PasswordHasher()),
+    signUp: new SignUp(userRepo, idGen, clock, passwordHasher),
+    login: new Login(
+      userRepo,
+      passwordHasher,
+      sessionRepo,
+      idGen,
+      clock,
+      jwt,
+    ),
+    logout: new Logout(sessionRepo, jwt),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       orderRepo,
@@ -211,10 +374,17 @@ function buildProductionContainer(): AppContainer {
       baseUrl,
     }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
+    // P0-5: per-lesson access decision
+    authorizeLessonAccess: new AuthorizeLessonAccess({
+      userRepo,
+      courseRepo,
+      enrollmentRepo,
+    }),
     enrollStudent: new EnrollStudent({
       userRepo,
       courseRepo,
       enrollmentRepo,
+      orderRepo,
       idGen,
     }),
     discountCodeRepo,
@@ -222,6 +392,18 @@ function buildProductionContainer(): AppContainer {
       discountCodeRepo,
       clock,
     }),
+    // STORY-050d: admin discount code CRUD
+    adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
+    adminGetDiscountCode: new AdminGetDiscountCode({ discountCodeRepo }),
+    adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, idGen, recordAuditLog }),
+    adminUpdateDiscountCode: new AdminUpdateDiscountCode({ discountCodeRepo, recordAuditLog }),
+    adminArchiveDiscountCode: new AdminArchiveDiscountCode({ discountCodeRepo, recordAuditLog }),
+    // STORY-050e: admin badge CRUD
+    adminListBadges: new AdminListBadges({ badgeRepo }),
+    adminGetBadge: new AdminGetBadge({ badgeRepo }),
+    adminCreateBadge: new AdminCreateBadge({ badgeRepo, recordAuditLog }),
+    adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
+    adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
     quizRepo,
     quizAttemptRepo,
     xpEventRepo,
@@ -278,6 +460,59 @@ function buildProductionContainer(): AppContainer {
       enrollmentRepo,
       certificateRepo,
     }),
+    listCourses: new ListCourses(courseRepo),
+    getCourse: new GetCourse(courseRepo),
+    // STORY-047: admin users list + user detail + impersonate
+    listUsers: new ListUsers({ userRepo }),
+    getUserDetail: new GetUserDetail({ userRepo, enrollmentRepo }),
+    impersonateUser: new ImpersonateUser({
+      userRepo,
+      sessionRepo,
+      jwt,
+      clock,
+      idGen,
+    }),
+    // STORY-048a: admin courses CRUD
+    adminListCourses: new AdminListCourses({ courseRepo }),
+    adminGetCourse: new AdminGetCourse({ courseRepo }),
+    createCourse: new CreateCourse({ courseRepo, recordAuditLog }),
+    updateCourse: new UpdateCourse({ courseRepo, recordAuditLog }),
+    archiveCourse: new ArchiveCourse({ courseRepo, recordAuditLog }),
+    // STORY-048b: admin modules CRUD + reorder
+    adminListModules: new AdminListModules({ moduleRepo }),
+    adminGetModule: new AdminGetModule({ moduleRepo }),
+    createModule: new CreateModule({ moduleRepo, idGen, clock }),
+    updateModule: new UpdateModule({ moduleRepo, clock }),
+    deleteModule: new DeleteModule({ moduleRepo }),
+    reorderModules: new ReorderModules({ moduleRepo }),
+    // STORY-048c: admin lessons CRUD + reorder
+    adminListLessons: new AdminListLessons({ lessonRepo }),
+    adminGetLesson: new AdminGetLesson({ lessonRepo }),
+    createLesson: new CreateLesson({ lessonRepo, idGen, clock }),
+    updateLesson: new UpdateLesson({ lessonRepo, clock }),
+    deleteLesson: new DeleteLesson({ lessonRepo }),
+    reorderLessons: new ReorderLessons({ lessonRepo }),
+    // STORY-049: admin payments + refunds + refund override
+    adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
+    adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
+    processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
+    refundOverride: new RefundOverride({ orderRepo, paymentGateway, recordAuditLog }),
+    auditLog,
+    recordAuditLog,
+    scenarioRepo,
+    // STORY-050b: simulator scenario CRUD
+    adminListScenarios: new AdminListScenarios({ scenarioRepo }),
+    getSimulatorScenario: new GetSimulatorScenario({ scenarioRepo }),
+    createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    // STORY-050c
+    liveClassRepo,
+    adminListLiveClasses: new AdminListLiveClasses({ liveClassRepo }),
+    adminGetLiveClass: new AdminGetLiveClass({ liveClassRepo }),
+    createLiveClass: new CreateLiveClass({ liveClassRepo, recordAuditLog }),
+    updateLiveClass: new UpdateLiveClass({ liveClassRepo, recordAuditLog }),
+    deleteLiveClass: new DeleteLiveClass({ liveClassRepo, recordAuditLog }),
   };
 }
 

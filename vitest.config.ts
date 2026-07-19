@@ -8,7 +8,13 @@ export default defineConfig({
     environment: "node",
     globals: true,
     setupFiles: [],
-    include: ["src/**/__tests__/**/*.test.ts", "src/**/__tests__/**/*.test.tsx", "tests/**/*.test.ts", "tests/**/*.test.tsx"],
+    include: [
+      "src/**/__tests__/**/*.test.ts",
+      "src/**/__tests__/**/*.test.tsx",
+      "tests/**/*.test.ts",
+      "tests/**/*.test.tsx",
+      "src/eslint-rules/**/*.test.js",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
@@ -28,6 +34,18 @@ export default defineConfig({
         "dist/**",
         "**/vendor/**",
         "prisma/**",
+        // Production composition + Prisma adapters — only exercised
+        // against a real database (integration tests use the in-memory
+        // repos via buildTestContainer). P0-2 audit item: these will
+        // gain coverage as the in-memory → Prisma migration proceeds.
+        "src/composition/container.ts",
+        "src/infra/repositories/Prisma*.ts",
+        "src/infra/payment/Prisma*.ts",
+        "src/infra/database/prisma.ts",
+        // Architecture compliance tests — they enforce TDD + SOLID
+        // rules via static analysis, not runtime assertions. They
+        // should never count toward coverage thresholds.
+        "tests/architecture/**",
       ],
     },
   },

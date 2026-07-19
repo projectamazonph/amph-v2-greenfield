@@ -32,6 +32,9 @@ function buildBadgeRepo(findBySlugResult: { ok: boolean; value: Badge | null }):
   return {
     findBySlug: vi.fn(async () => findBySlugResult) as IBadgeRepository["findBySlug"],
     findAll: vi.fn(async () => ({ ok: true, value: [] })) as IBadgeRepository["findAll"],
+    create: vi.fn() as IBadgeRepository["create"],
+    update: vi.fn() as IBadgeRepository["update"],
+    archive: vi.fn() as IBadgeRepository["archive"],
   };
 }
 

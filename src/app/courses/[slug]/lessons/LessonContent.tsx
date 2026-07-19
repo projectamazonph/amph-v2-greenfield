@@ -9,11 +9,14 @@
  *  - TEXT: Markdown body via react-markdown + remark-gfm
  *  - VIDEO: YouTube/Vimeo embed or native <video>
  *  - QUIZ: "Coming soon" placeholder
+ *
+ * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Lesson } from "@/domain/entities/Course";
+import styles from "./LessonContent.module.css";
 
 interface TextLessonContent {
   type: "TEXT";
@@ -32,8 +35,6 @@ interface QuizLessonContent {
   title: string;
 }
 
-type LessonContentData = TextLessonContent | VideoLessonContent | QuizLessonContent;
-
 function isTextContent(c: unknown): c is TextLessonContent {
   return typeof c === "object" && c !== null && (c as { type?: string }).type === "TEXT";
 }
@@ -47,10 +48,6 @@ function isQuizContent(c: unknown): c is QuizLessonContent {
 }
 
 function getYouTubeEmbedUrl(url: string): string | null {
-  // Handles:
-  // https://www.youtube.com/watch?v=VIDEO_ID
-  // https://youtu.be/VIDEO_ID
-  // https://www.youtube.com/embed/VIDEO_ID
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
   ];
@@ -71,7 +68,7 @@ function getVimeoEmbedUrl(url: string): string | null {
 
 function TextContent({ body }: { body: string }) {
   return (
-    <div className="prose prose-invert max-w-none">
+    <div className={styles.prose}>
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
     </div>
   );
@@ -82,11 +79,11 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
   const vimeoUrl = getVimeoEmbedUrl(content.videoUrl);
 
   return (
-    <div className="space-y-3">
+    <div className={styles.videoBlock}>
       {embedUrl ? (
-        <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+        <div className={styles.videoFrameWrap}>
           <iframe
-            className="absolute inset-0 w-full h-full rounded-xl"
+            className={styles.videoFrame}
             src={embedUrl}
             title="Lesson video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -94,9 +91,9 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
           />
         </div>
       ) : vimeoUrl ? (
-        <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+        <div className={styles.videoFrameWrap}>
           <iframe
-            className="absolute inset-0 w-full h-full rounded-xl"
+            className={styles.videoFrame}
             src={vimeoUrl}
             title="Lesson video"
             allow="autoplay; fullscreen; picture-in-picture"
@@ -104,25 +101,20 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
           />
         </div>
       ) : (
-        <video
-          className="w-full rounded-xl"
-          controls
-          src={content.videoUrl}
-          preload="metadata"
-        >
+        <video className={styles.video} controls src={content.videoUrl} preload="metadata">
           <track kind="captions" />
         </video>
       )}
-      <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+      <div className={styles.videoMeta}>
         <VideoIcon />
         <span>{content.durationMinutes}m</span>
       </div>
       {content.transcript && (
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm text-[var(--text-secondary)] hover:text-[var(--text)]">
+        <details className={styles.transcript}>
+          <summary className={styles.transcriptSummary}>
             Show transcript
           </summary>
-          <div className="mt-2 prose prose-sm prose-invert">
+          <div className={styles.transcriptBody}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content.transcript}</ReactMarkdown>
           </div>
         </details>
@@ -133,13 +125,11 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
 
 function QuizContent({ title }: { title: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-8 text-center rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface)]">
+    <div className={styles.quizPlaceholder}>
       <QuizIcon />
-      <h3 className="mt-4 text-lg font-semibold text-[var(--text)]">{title}</h3>
-      <p className="mt-2 text-sm text-[var(--text-secondary)]">
-        Interactive quiz — coming soon!
-      </p>
-      <p className="mt-1 text-xs text-[var(--text-secondary)] opacity-60">
+      <h3 className={styles.quizTitle}>{title}</h3>
+      <p className={styles.quizText}>Interactive quiz — coming soon!</p>
+      <p className={styles.quizHint}>
         Complete the quiz to test your understanding of this section.
       </p>
     </div>
@@ -150,17 +140,44 @@ function QuizContent({ title }: { title: string }) {
 
 function VideoIcon() {
   return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <svg
+      className={styles.iconSmall}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
     </svg>
   );
 }
 
 function QuizIcon() {
   return (
-    <svg className="w-12 h-12 text-[var(--accent)] opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+    <svg
+      className={styles.iconLarge}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+      />
     </svg>
   );
 }
@@ -182,9 +199,8 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
     return <QuizContent title={content.title} />;
   }
 
-  // Graceful fallback for unknown content types
   return (
-    <div className="py-8 text-center text-[var(--text-secondary)]">
+    <div className={styles.unavailable}>
       <p>Lesson content unavailable.</p>
     </div>
   );

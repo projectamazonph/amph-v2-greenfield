@@ -1,6 +1,7 @@
 import { Result } from "@/domain/shared/Result";
 import { Order, OrderCreateParams } from "@/domain/entities/Order";
 import type { IOrderRepository, OrderError } from "@/ports/repositories/OrderRepository";
+import type { PaymentStatus } from "@/domain/values/PaymentStatus";
 
 export class InMemoryOrderRepository implements IOrderRepository {
   /** Exposed for tests — do not use in production. */
@@ -31,9 +32,33 @@ export class InMemoryOrderRepository implements IOrderRepository {
     return Result.ok(orders);
   }
 
+  async listAll(filters?: {
+    status?: PaymentStatus;
+  }): Promise<Result<Order[], OrderError>> {
+    let orders = Array.from(this.orders.values());
+    if (filters?.status) {
+      orders = orders.filter((o) => o.status === filters.status);
+    }
+    orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return Result.ok(orders);
+  }
+
   async update(order: Order): Promise<Result<Order, OrderError>> {
     this.orders.set(order.id, order);
     return Result.ok(order);
+  }
+
+  // P0-1: paywall check
+  async findPaidForUserAndCourse(
+    userId: string,
+    courseId: string,
+  ): Promise<Result<Order | null, OrderError>> {
+    for (const order of this.orders.values()) {
+      if (order.userId === userId && order.courseId === courseId && order.status === "PAID") {
+        return Result.ok(order);
+      }
+    }
+    return Result.ok(null);
   }
 
   // ── Test helpers ──────────────────────────────────────────
@@ -51,16 +76,17 @@ export class InMemoryOrderRepository implements IOrderRepository {
     id: string;
     userId: string;
     courseId: string;
-    totalMinor: number;
+    totalMinor?: number;
     paymongoPaymentId?: string;
   }): Promise<void> {
+    const total = params.totalMinor ?? 299900;
     const order = Order.create({
       id: params.id,
       userId: params.userId,
       courseId: params.courseId,
-      subtotalMinor: params.totalMinor,
+      subtotalMinor: total,
       discountMinor: 0,
-      totalMinor: params.totalMinor,
+      totalMinor: total,
       currency: "PHP",
     });
     order.markPending(params.paymongoPaymentId ?? "cs_paid", "https://checkout.paymongo.com/cs_paid");

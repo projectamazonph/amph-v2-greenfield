@@ -4,6 +4,36 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-19 — TDD + SOLID audit and Tier A production-bug fixes
+
+- **PR #66** — `fix(catalog): close Tier A production bugs + lazy-init Resend`
+  - 4 production bugs fixed: `/courses` catalog always empty, `/courses/[slug]` always 404'd, `enroll` action never persisted, PayMongo webhook 404'd. All caused by `new InMemory*()` in production code.
+  - Lazy-init `ResendEmailSender` (was throwing at module load on empty `RESEND_API_KEY`; now defers to first `send()`)
+  - 15 new tests (was 917, now 932)
+- **PR #65** — `refactor(auth): eliminate hand-rolled JWT verify + module-load env capture`
+  - 3 SOLID violations fixed: `SESSION_COOKIE` captured at module load (now per-call), hand-rolled JWT verify in `revokeCertificate.action.ts` (now `getSessionUserId`), hand-rolled JWT verify in `quiz attempt/route.ts` (now `getSessionUserId`)
+  - 23 new tests
+- **PR #64** — `refactor(migration): migrate 11 files to @/components/ui + CSS Modules`
+  - 11 page/component files migrated from Tailwind-style classes to design system
+  - Promoted `local/no-tailwind-classes` from `warn` to `error`
+  - 3 new tests
+- **PR #63** — `feat(eslint): local/no-tailwind-classes rule`
+  - New custom ESLint rule banning Tailwind utility classes
+  - 25 new tests (the rule itself)
+- **PR #62** — `refactor(auth): strict TDD + strict SOLID for SignIn/SignOut`
+  - 39 new tests for `performSignUp`, `performLogout`, `performRevokeCertificate`
+  - Fixed try/catch bug in signup action that swallowed `navigate()` throw
+
+**Tier status at session end:**
+- Tier A (production bugs): ✅ closed
+- Tier B (TDD coverage gaps): ❌ open — 12 use cases + 11 repos have no tests
+- Tier C (SOLID hygiene): ❌ open — 8 `any` casts, 3 unused eslint-disable, Middleware → Proxy
+- Tier D (dead code): ❌ open — 3 use cases with no callers
+
+See `SESSION-TDD-SOLID-AUDIT.md` for full details and `NEXT-SESSION-PROMPT.md` for the next session's starting state.
+
+## [Unreleased]
+
 ### 2026-07-17 — Repo bootstrap on `projectamazonph/amph-v2-greenfield`
 - Created public repo `projectamazonph/amph-v2-greenfield` from the greenfield doc set.
 - Repo settings: description, homepage `https://github.com/projectamazonph/amph-v2`, 16 topics (`amph`, `amazon-ppc`, `filipino-va`, `nextjs16`, `prisma7`, `paymongo`, `resend`, `solid`, `clean-architecture`, `hexagonal-architecture`, `domain-driven-design`, `typescript`, `vitest`, `playwright`, `sentry`, `documentation`), squash-only merge, auto-delete branches on merge, issues + discussions on, wiki + projects off.

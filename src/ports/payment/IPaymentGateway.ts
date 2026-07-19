@@ -48,4 +48,26 @@ export interface IPaymentGateway {
    * @param signature  Value of the PayMongo-Signature header
    */
   verifyWebhookSignature(payload: string, signature: string): void;
+
+  /**
+   * STORY-049: Issue a refund for a paid PayMongo payment.
+   *
+   * The prod adapter (PayMongoAdapter) is currently a stub that throws
+   * "not yet wired" — the real PayMongo Refunds API is a follow-up
+   * (STORY-049.5). The StubPaymentGateway implements this for tests.
+   *
+   * @param params.paymongoPaymentId  The PayMongo payment ID (not the order ID)
+   * @param params.amountMinor        Amount to refund, in minor units (centavos)
+   * @param params.reason             Human-readable reason for the refund
+   */
+  refund(params: {
+    paymongoPaymentId: string;
+    amountMinor: number;
+    reason: string;
+  }): Promise<
+    Result<
+      { refundId: string; processedAt: Date },
+      PaymentGatewayError
+    >
+  >;
 }

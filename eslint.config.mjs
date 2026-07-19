@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 import tsParser from "@typescript-eslint/parser";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import nextPlugin from "@next/eslint-plugin-next";
+import noTailwindClasses from "./src/eslint-rules/no-tailwind-classes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,6 +18,14 @@ const config = [
       "**/*.json",
       "**/*.yaml",
       "**/*.yml",
+      ".next/**",
+      "out/**",
+      "build/**",
+      "dist/**",
+      "node_modules/**",
+      "coverage/**",
+      "playwright-report/**",
+      "test-results/**",
     ],
   },
 
@@ -132,6 +141,23 @@ const config = [
     files: ["src/**/*.ts"],
     rules: {
       "no-unreachable": "error",
+    },
+  },
+  // ── Local rules ─────────────────────────────────
+  {
+    files: ["src/**/*.{ts,tsx,js,jsx}"],
+    ignores: [".next/**", "node_modules/**", "build/**", "dist/**", "out/**", "coverage/**", "playwright-report/**", "test-results/**"],
+    plugins: {
+      local: {
+        rules: {
+          "no-tailwind-classes": noTailwindClasses,
+        },
+      },
+    },
+    rules: {
+      // All known violations have been migrated (PR #64). New code
+      // MUST use the design system (CSS Modules + design tokens).
+      "local/no-tailwind-classes": "error",
     },
   },
 ];
