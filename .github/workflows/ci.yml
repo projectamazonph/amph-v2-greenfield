@@ -202,11 +202,29 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma generate
       - run: pnpm build
+      - name: Verify .next/ exists before upload
+        # Diagnostic step: surface the build output presence so the
+        # upload step never silently produces an empty artifact.
+        run: |
+          if [ ! -d .next ]; then
+            echo "::error::.next/ directory is missing after pnpm build"
+            exit 1
+          fi
+          echo "Build output present:"
+          du -sh .next
+          ls -la .next | head -10
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: build
-          path: .next/
+          # include-hidden-files is required: .next/cache contains
+          # hidden files (.previewinfo, .rscinfo, .tsbuildinfo) that
+          # actions/upload-artifact@v4 skips by default. Without
+          # this flag, the upload step warns "No files were found"
+          # and the Lighthouse job downstream can't find the build.
+          # See https://github.com/actions/upload-artifact/issues/232
+          include-hidden-files: true
+          path: .next
 
   lighthouse:
     name: Lighthouse CI
@@ -225,6 +243,23 @@ jobs:
         with:
           name: build
           path: .next/
+      - name: Verify build artifact is present
+        # Diagnostic: if the artifact didn't upload, the build job's
+        # warning would have been easy to miss. Surface the state here
+        # so a Lighthouse failure is clearly attributable to a missing
+        # artifact, not a Lighthouse config bug.
+        run: |
+          if [ ! -d .next ]; then
+            echo "::error::.next/ directory is missing after download-artifact. The build job likely failed to upload."
+            exit 1
+          fi
+          if [ ! -f .next/BUILD_ID ]; then
+            echo "::error::.next/BUILD_ID is missing. The artifact is not a valid Next.js build."
+            exit 1
+          fi
+          echo "Build artifact verified:"
+          du -sh .next
+          cat .next/BUILD_ID
       - name: Run Lighthouse CI
         run: |
           pnpm dlx @lhci/cli@0.14.x autorun
