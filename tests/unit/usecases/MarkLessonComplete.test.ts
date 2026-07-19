@@ -129,6 +129,7 @@ function makeUserRepo(): import("@/ports/repositories/UserRepository").UserRepos
       enrolledCourseIds: [],
       createdAt: new Date(),
       totalXp: 0,
+      emailVerifiedAt: null,
     })),
     findByEmail: vi.fn(),
     create: vi.fn(),
@@ -147,6 +148,7 @@ function makeUserRepo(): import("@/ports/repositories/UserRepository").UserRepos
       enrolledCourseIds: [],
       createdAt: new Date(),
       totalXp: xp,
+      emailVerifiedAt: null,
     })),
   };
 }

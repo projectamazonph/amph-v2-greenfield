@@ -67,6 +67,7 @@ export class InMemoryUserRepository implements UserRepository {
       enrolledCourseIds: Object.freeze([]),
       createdAt: new Date(),
       totalXp: 0,
+      emailVerifiedAt: null,
     };
 
     // Use createUser entity (if available) or direct freeze
@@ -81,7 +82,14 @@ export class InMemoryUserRepository implements UserRepository {
 
   async update(
     id: string,
-    patch: Partial<{ firstName: string; lastName: string; avatarUrl: string; bio: string }>,
+    patch: Partial<{
+      firstName: string;
+      lastName: string;
+      avatarUrl: string;
+      bio: string;
+      enrolledCourseIds: readonly string[];
+      emailVerifiedAt: Date | null;
+    }>,
   ): Promise<Result<User, UserError>> {
     const user = this.users.get(id);
     if (!user) return Result.err({ kind: "not_found" });

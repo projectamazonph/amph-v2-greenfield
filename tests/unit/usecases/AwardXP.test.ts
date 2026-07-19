@@ -41,6 +41,7 @@ function makeUser(
     enrolledCourseIds: [],
     createdAt: NOW,
     totalXp,
+    emailVerifiedAt: null,
     ...overrides,
     updateTotalXp: vi.fn(async (xp: number) =>
       Result.ok(makeUser(totalXp + xp, overrides)),

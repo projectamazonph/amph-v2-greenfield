@@ -30,6 +30,14 @@ export interface User {
   readonly createdAt: Date;
   /** Total XP earned by the user (mutable, updated via XPService). */
   totalXp: number;
+  /**
+   * STORY-007: timestamp of when the user verified their email.
+   * Null until they click the verification link. The presence
+   * of this field is the source of truth for "is the user's
+   * email verified"; the `verificationStatus` field may be
+   * derived from it.
+   */
+  readonly emailVerifiedAt: Date | null;
 }
 
 export interface CreateUserParams {
@@ -52,6 +60,7 @@ export function createUser(params: {
   enrolledCourseIds?: readonly string[];
   createdAt?: Date;
   totalXp?: number;
+  emailVerifiedAt?: Date | null;
 }): Result<User, { kind: "invalid_input"; message: string }> {
   if (!params.firstName.trim()) {
     return Result.err({ kind: "invalid_input", message: "First name is required." });
@@ -71,6 +80,7 @@ export function createUser(params: {
     enrolledCourseIds: Object.freeze([...(params.enrolledCourseIds ?? [])]),
     createdAt: params.createdAt ?? new Date(),
     totalXp: params.totalXp ?? 0,
+    emailVerifiedAt: params.emailVerifiedAt ?? null,
   }));
 }
 

@@ -90,6 +90,7 @@ export class PrismaUserRepository implements UserRepository {
       avatarUrl: string;
       bio: string;
       enrolledCourseIds: string[];
+      emailVerifiedAt: Date | null;
     }>,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {
@@ -171,6 +172,7 @@ export class PrismaUserRepository implements UserRepository {
     enrolledCourseIds: string[];
     createdAt: Date;
     totalXp: number;
+    emailVerifiedAt: Date | null;
   }) {
     return Object.freeze({
       id: row.id,
@@ -183,6 +185,7 @@ export class PrismaUserRepository implements UserRepository {
       enrolledCourseIds: Object.freeze([...row.enrolledCourseIds]),
       createdAt: row.createdAt,
       totalXp: row.totalXp,
+      emailVerifiedAt: row.emailVerifiedAt,
     });
   }
 }
