@@ -273,14 +273,17 @@ jobs:
         # the require call finds it via the canonical pnpm path.
         # This is a known issue with Next.js 16 + Prisma 7
         # standalone builds in CI artifact flows.
+        #
+        # The artifact may already contain an empty .next/node_modules/.prisma
+        # directory, so we remove it first before creating the symlink.
         run: |
-          if [ ! -d .next/node_modules/.prisma ]; then
-            ln -s ../../node_modules/.prisma .next/node_modules/.prisma
-            echo "Symlinked .next/node_modules/.prisma -> ../../node_modules/.prisma"
-            ls -la .next/node_modules/.prisma
-          else
-            echo "Symlink already exists"
-          fi
+          rm -rf .next/node_modules/.prisma
+          ln -s ../../node_modules/.prisma .next/node_modules/.prisma
+          echo "Symlinked .next/node_modules/.prisma -> ../../node_modules/.prisma"
+          ls -la .next/node_modules/.prisma/
+          echo "---"
+          # Verify the symlink resolves to a real file
+          ls -la .next/node_modules/.prisma/client/default | head -5
       - name: Verify build artifact is present
         # Diagnostic: if the artifact didn't upload, the build job's
         # warning would have been easy to miss. Surface the state here
