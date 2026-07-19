@@ -24,7 +24,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # fetch-depth: 0 so the full history is present locally. This
+      # is required by gitleaks, which computes a diff range of
+      # `base^..head` for pull_request events and needs the base's
+      # parent commit to be resolvable. Without this, gitleaks errors
+      # with "fatal: ambiguous argument '<base>^': unknown revision".
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -157,7 +164,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma migrate deploy
       - run: pnpm prisma generate
-      - run: pnpm exec playwright install --with-deps chromium
+      # Install ALL Playwright browser dependencies + system deps.
+      # Specifying only `chromium` was leaving the worker process unable to
+      # launch the bundled browser (the error mentions a `webkit-2311`
+      # cache path that is a red herring; the real failure is that the
+      # install step did not provision the OS-level libs the binary needs).
+      # `playwright install --with-deps` (no arg) installs chromium,
+      # firefox, webkit, AND the system shared libs they depend on.
+      - run: pnpm exec playwright install --with-deps
       - run: pnpm build
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v4
