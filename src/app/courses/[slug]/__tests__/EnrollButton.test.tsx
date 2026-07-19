@@ -53,14 +53,17 @@ describe("EnrollButton (render)", () => {
     expect(html).not.toMatch(/bg-\[|text-\[|p-3|p-4|mt-2|mb-2|flex|hidden|rounded-/);
   });
 
-  it("renders the paid-enroll CTA with the formatted Money when priceMinor > 0", () => {
+  it("renders the paid Buy-now CTA with the formatted Money when priceMinor > 0 (P0-1)", () => {
     const html = renderToString(
       createElement(EnrollButton, { courseId: "c-2", priceMinor: 199900 }),
     );
-    // Money.of(199900, "PHP").format() → "₱1,999.00"
-    expect(html).toContain("Enroll —");
+    // P0-1: paid courses show a "Buy now" link to /checkout, not an
+    // enroll button (the server decides the path).
+    expect(html).toContain("Buy now —");
     expect(html).toContain("1,999");
-    expect(html).toMatch(/<button[^>]*type="submit"/);
+    expect(html).toMatch(/href="\/checkout\?courseId=c-2"/);
+    // No form (paid courses never call the enroll action).
+    expect(html).not.toMatch(/<form/);
   });
 
   it("uses the @/components/ui Button (no raw inline styling)", () => {

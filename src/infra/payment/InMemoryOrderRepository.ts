@@ -48,6 +48,19 @@ export class InMemoryOrderRepository implements IOrderRepository {
     return Result.ok(order);
   }
 
+  // P0-1: paywall check
+  async findPaidForUserAndCourse(
+    userId: string,
+    courseId: string,
+  ): Promise<Result<Order | null, OrderError>> {
+    for (const order of this.orders.values()) {
+      if (order.userId === userId && order.courseId === courseId && order.status === "PAID") {
+        return Result.ok(order);
+      }
+    }
+    return Result.ok(null);
+  }
+
   // ── Test helpers ──────────────────────────────────────────
 
   getAll(): Order[] {

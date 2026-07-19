@@ -377,6 +377,7 @@ function buildProductionContainer(): AppContainer {
       userRepo,
       courseRepo,
       enrollmentRepo,
+      orderRepo,
       idGen,
     }),
     discountCodeRepo,

@@ -37,4 +37,14 @@ export interface IOrderRepository {
 
   /** Persist changes to an existing order. */
   update(order: Order): Promise<Result<Order, OrderError>>;
+
+  /**
+   * STORY-P0-1 (paywall): find a PAID order for a given user + course.
+   * Returns null if no such order exists. Used by the enroll use case
+   * to verify that a paid course has actually been paid for.
+   */
+  findPaidForUserAndCourse(
+    userId: string,
+    courseId: string,
+  ): Promise<Result<Order | null, OrderError>>;
 }

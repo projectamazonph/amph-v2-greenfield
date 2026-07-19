@@ -63,9 +63,11 @@ vi.mock("@/usecases/EnrollStudent", () => ({
 // Mock the container. The action should call buildContainer() and
 // use its enrollStudent field. We assert the wiring.
 const mockEnrollStudentInstance = { execute: mockEnrollStudentExecute };
+const mockCourseRepoFindById = vi.fn();
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     enrollStudent: mockEnrollStudentInstance,
+    courseRepo: { findById: mockCourseRepoFindById },
   }),
 }));
 
@@ -74,6 +76,12 @@ import { enrollStudent } from "../enroll";
 beforeEach(() => {
   mockGetSessionUserId.mockClear();
   mockEnrollStudentExecute.mockClear();
+  mockCourseRepoFindById.mockReset();
+  // Default: a free course, so the action proceeds to call EnrollStudent
+  mockCourseRepoFindById.mockResolvedValue({
+    ok: true,
+    value: { id: "course-1", price: { minor: 0, currency: "PHP" } },
+  });
 });
 
 // ── Tests ───────────────────────────────────────────────────
@@ -129,6 +137,28 @@ describe("enrollStudent action", () => {
     });
     const result = await enrollStudent("course-1");
     expect(result).toEqual({ ok: false, error: { kind: "already_enrolled" } });
+  });
+
+  it("returns paid_checkout_required when the course has a non-zero price (P0-1)", async () => {
+    mockCourseRepoFindById.mockResolvedValueOnce({
+      ok: true,
+      value: { id: "course-1", price: { minor: 100000, currency: "PHP" } },
+    });
+    const result = await enrollStudent("course-1");
+    expect(result).toEqual({ ok: false, error: { kind: "paid_checkout_required" } });
+    expect(mockEnrollStudentExecute).not.toHaveBeenCalled();
+  });
+
+  it("forwards entitlement=free for a free course (P0-1)", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("u-from-session");
+    mockEnrollStudentExecute.mockResolvedValueOnce({
+      ok: true,
+      value: { id: "enrol-1", userId: "u-from-session", courseId: "course-1" },
+    });
+    await enrollStudent("course-1");
+    expect(mockEnrollStudentExecute).toHaveBeenCalledWith(
+      expect.objectContaining({ entitlement: "free" }),
+    );
   });
 
   it("does NOT instantiate InMemory* repositories directly (SOLID regression guard)", async () => {
