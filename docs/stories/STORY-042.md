@@ -5,7 +5,7 @@
 - **Story**: STORY-042
 - **Sprint**: 9 — Certificates + Email
 - **Points**: 1
-- **Status**: In Progress
+- **Status**: Done (PR #47, commit de17fc2)
 
 ## Overview
 

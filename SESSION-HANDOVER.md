@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-18 — Sprint 8 complete. All simulators done. Next: Sprint 9 (Certificates + Email).
+**Updated:** 2026-07-19 — Sprints 8 and 9 complete. Cert + email + simulators all shipped. Next: Sprint 10 (Admin panel).
 
 ---
 
@@ -8,11 +8,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Phase | **Sprint 8 complete** |
+| Phase | **Sprint 9 complete** (Sprint 10 next) |
 | Repo | `projectamazonph/amph-v2-greenfield` (public) |
 | Default branch | `main` (squash-merge only, branches auto-delete on merge) |
-| Tests | **601 unit tests, 59 test files, 0 TypeScript errors** |
-| `main` HEAD | `bdac2fe` — feat(story-040): Listing Audit + Keyword Research simulator |
+| Tests | **970 unit tests, 102 test files, 0 TypeScript errors** |
+| `main` HEAD | `90fa2b6` — docs(audit): correct Tier D misread in SESSION-TDD-SOLID-AUDIT.md |
 | Database | Not provisioned |
 | Production | Not deployed |
 
@@ -81,17 +81,19 @@ registry.register(new <Name>Simulator());
 
 ## Sprint 9 — Certificates + Email Templates (5 pts)
 
-Per `docs/sprint-plan.md`, Sprint 9 stories:
+**DONE.** All 5 stories merged to `main` (PRs #41, #47, and the cert/email commits 020973b, e692235, 9e5eb11).
 
-| ID | Title | Notes |
-|----|-------|-------|
-| STORY-041 | `Certificate` model + repo + `IssueCertificate` use case | Start here |
-| STORY-042 | `ReactPdfRenderer` port + adapter + certificate PDF | |
-| STORY-043 | `/certificates/[hash]` public view + `/pdf` route | |
-| STORY-044 | `RevokeCertificate` on refund + revocation badge | |
-| STORY-045 | `EmailSender` port consolidation + React Email templates | |
+| ID | Title | Status |
+|----|-------|--------|
+| STORY-041 | `Certificate` model + repo + `IssueCertificate` use case | ✅ merged |
+| STORY-042 | `ReactPdfRenderer` port + adapter + certificate PDF | ✅ merged (PR #47) |
+| STORY-043 | `/certificates/[hash]` public view + `/pdf` route | ✅ merged |
+| STORY-044 | `RevokeCertificate` on refund + revocation badge | ✅ merged |
+| STORY-045 | `EmailSender` port consolidation + React Email templates | ✅ merged |
 
-**Start with STORY-041.** Check `docs/stories/STORY-041.md` — it may already exist.
+Use case test coverage: `IssueCertificate` (17 tests, PR #68), `RevokeCertificate` (21 tests, PR #69), `RenderCertificatePdf` (12 tests in PR #47, plus end-to-end container test).
+
+**Next sprint:** Sprint 10 (Admin panel). Start with STORY-046.
 
 ---
 
@@ -156,6 +158,21 @@ Copy-paste from `BOOTSTRAP.md` — it has the full prompt.
 
 ## Daily Log
 
+### 2026-07-19 — Sprint 9 closure + Tier B/C/D audit corrections
+
+**Done:**
+- Confirmed all 5 Sprint 9 stories (041, 042, 043, 044, 045) are merged to `main`. Status flipped from "In Progress" to "Done" in each story doc.
+- BOOTSTRAP.md: sprint table now shows Sprints 8 + 9 complete; fixed truncated git-rules section; added Sprint 10 (admin) as next.
+- SESSION-HANDOVER.md: refreshed to "Sprint 9 complete"; 970 tests / 102 files; HEAD 90fa2b6; "Next agent" now points to STORY-046.
+- SESSION-TDD-SOLID-AUDIT.md + NEXT-SESSION-PROMPT.md (PR #71): corrected the Tier D misread (MarkLessonComplete is load-bearing for IssueCertificate; the listed use cases are Pending stories, not dead code).
+- Tier B progress: 2 of 12 use cases now tested (IssueCertificate in PR #68, RevokeCertificate in PR #69).
+- Tier C closed in PR #70: typed Prisma rows (Prisma.XGetPayload<{}>), dropped 3 unused eslint-disable, middleware → proxy migration.
+- No code changes this session — docs only.
+
+**Next agent:**
+- See the updated "Next agent" section above.
+- Tier B is the only remaining open audit item (10 use cases + 10 in-memory repos). Best done story-by-story.
+
 ### 2026-07-18 — Sprint 8: complete
 
 **Done:**
@@ -177,11 +194,11 @@ Copy-paste from `BOOTSTRAP.md` — it has the full prompt.
 - `Simulator<TIn,TOut>` is the correct generic — `<TIn, TOut>` (in → out), not `<T>`. Confirmed via existing `BidElevatorSimulator` usage.
 
 **Next agent:**
-1. Read `docs/stories/STORY-041.md` (if it exists) or write it.
-2. Implement STORY-041: `Certificate` model + repo + `IssueCertificate` use case.
-3. Wire into registry if needed (unlikely — certs don't go through the simulator registry).
-4. Run tests → commit → PR → merge.
-5. Continue with STORY-042 (PDF renderer), STORY-043 (cert view), STORY-044 (revocation), STORY-045 (email templates).
+1. Read `docs/stories/STORY-046.md` for the admin panel entry point.
+2. Check `STORY-046-prep-1.md`, `-prep-2.md`, `-prep-3.md` for the prep work that must land first.
+3. Implement STORY-046: `/admin/*` route group with the NavSidebar + TopBar shell + 6-tile stat dashboard.
+4. Follow the established patterns (container-only data access, pure-helper + thin-shell server actions, static-analysis regression guards for server components).
+5. Tier B use cases to also test if STORY-046 touches them (likely `GetAdminDashboardStats` — already has tests, but verify coverage of the 6 stats).
 
 ---
 
