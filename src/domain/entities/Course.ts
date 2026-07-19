@@ -163,3 +163,61 @@ export function courseTotalDurationMinutes(course: Course): number {
 export function courseIsAvailable(course: Course): boolean {
   return course.status === "PUBLISHED";
 }
+
+// ── Update factory ─────────────────────────────────────────────────
+
+/**
+ * Patch type for `updateCourse`. Every field except `id`, `createdAt`,
+ * and `curriculum` is mutable. (Curriculum editing is a separate story
+ * — STORY-048b/c.)
+ */
+export interface UpdateCoursePatch {
+  slug?: string;
+  title?: string;
+  tagline?: string;
+  description?: string;
+  priceMinor?: number;
+  currency?: string;
+  coverImage?: string | null;
+  isFeatured?: boolean;
+  displayOrder?: number;
+  status?: CourseStatus;
+  courseTier?: CourseAccessTier;
+  previewLessonCount?: number;
+}
+
+/**
+ * Apply a patch to an existing course. Returns a new Course with the
+ * patched fields, re-validating the resulting course (slug, price).
+ * Idempotent: applying an empty patch returns the same course.
+ *
+ * Curriculum is intentionally NOT patchable here — module/lesson
+ * editing is in STORY-048b/c.
+ */
+export function updateCourse(
+  course: Course,
+  patch: UpdateCoursePatch,
+): Result<Course, CreateCourseError> {
+  const merged = {
+    id: course.id,
+    slug: patch.slug ?? course.slug,
+    title: patch.title ?? course.title,
+    tagline: patch.tagline ?? course.tagline,
+    description: patch.description ?? course.description,
+    priceMinor: patch.priceMinor ?? course.price.minor,
+    currency: patch.currency ?? course.price.currency,
+    curriculum: course.curriculum,
+    coverImage: patch.coverImage !== undefined ? patch.coverImage : course.coverImage,
+    isFeatured: patch.isFeatured !== undefined ? patch.isFeatured : course.isFeatured,
+    displayOrder: patch.displayOrder !== undefined ? patch.displayOrder : course.displayOrder,
+    status: patch.status ?? course.status,
+    courseTier: patch.courseTier ?? course.courseTier,
+    previewLessonCount:
+      patch.previewLessonCount !== undefined
+        ? patch.previewLessonCount
+        : course.previewLessonCount,
+    createdAt: course.createdAt,
+  };
+
+  return createCourse(merged);
+}

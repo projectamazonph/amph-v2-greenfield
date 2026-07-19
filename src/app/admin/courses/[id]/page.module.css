@@ -1,0 +1,131 @@
+/* /admin/courses/[id] page styles — Field Manual density. */
+
+.backLink {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.backLink:hover {
+  color: var(--accent);
+}
+
+.badges {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-left: var(--space-3);
+  vertical-align: middle;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.editButton {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface-1);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.editButton:hover {
+  background: var(--surface-2);
+}
+
+.archiveButton {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface-1);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.archiveButton:hover {
+  background: var(--danger);
+  color: var(--surface-0);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  max-width: 1100px;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--space-4) 0;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--space-3) var(--space-4);
+  font-size: 13px;
+}
+
+.details dt {
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.details dd {
+  color: var(--text);
+  margin: 0;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.muted {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.placeholder {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.placeholder strong {
+  color: var(--text);
+}
+
+.error {
+  color: var(--danger);
+  font-size: 14px;
+}

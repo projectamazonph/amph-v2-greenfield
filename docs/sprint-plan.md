@@ -114,7 +114,9 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 |----|-------|-----|
 | STORY-046 | Admin layout + `requireAdmin()` + admin dashboard | 1 |
 | STORY-047 | Admin users list + user detail + impersonate | 1 |
-| STORY-048 | Admin courses (CRUD) + modules (CRUD + reorder) + lessons (CRUD + MDX editor) | 1 |
+| STORY-048a | Admin courses CRUD (no modules/lessons editing yet) | 1 |
+| STORY-048b | Module domain + admin modules CRUD + reorder | 1 |
+| STORY-048c | Lesson domain + admin lessons CRUD + MDX editor | 1 |
 | STORY-049 | Admin payments + refunds + refund override | 1 |
 | STORY-050 | Admin simulators (scenario CRUD) + live classes (CRUD) + discount codes + badges + audit log + settings | 1 |
 

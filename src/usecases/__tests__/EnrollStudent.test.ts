@@ -68,6 +68,10 @@ describe("EnrollStudent", () => {
       findBySlug: vi.fn(),
       listPublished: vi.fn(),
       listAll: vi.fn(),
+      // STORY-048a: admin CRUD methods (unused by this test)
+      create: vi.fn(),
+      update: vi.fn(),
+      archive: vi.fn(),
     };
     mockEnrollmentRepo = {
       findByUserIdAndCourseId: vi.fn(),
