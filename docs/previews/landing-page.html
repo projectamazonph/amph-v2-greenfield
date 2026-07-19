@@ -302,6 +302,34 @@
     font-size: var(--text-sm); color: var(--ink-500);
     margin: 0; max-width: 48ch; margin-left: auto; margin-right: auto;
   }
+  .practice-list {
+    list-style: none; margin: 0; padding: 0;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface-1); overflow: hidden;
+  }
+  .practice-row {
+    display: grid; grid-template-columns: 1fr auto; gap: var(--space-4);
+    align-items: center; padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--border);
+  }
+  .practice-row:last-child { border-bottom: 0; }
+  @media (min-width: 768px) { .practice-row { padding: var(--space-4) var(--space-6); } }
+  .practice-main { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+  .practice-name { font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 600; color: var(--ink-900); }
+  .practice-body { font-size: var(--text-sm); color: var(--ink-700); line-height: 1.5; }
+  .practice-badge {
+    display: inline-flex; align-items: center;
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
+    color: var(--ink-500); background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: var(--space-1) var(--space-3); border-radius: 3px;
+    letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
+  }
+  .practice-note {
+    font-size: var(--text-sm); color: var(--ink-500);
+    margin: var(--space-6) 0 0; text-align: center;
+  }
+  .preview-banner {
   .preview-banner {
     position: fixed; bottom: 16px; right: 16px;
     background: var(--ink-900); color: var(--ink-inverse);
@@ -323,7 +351,7 @@
         ₱60k+/month.
       </h1>
       <p class="subhead">
-        Three courses, five practice simulators, certificates recognized in
+        Three courses, practice tools, certificates recognized in
         our hiring pipeline. One-time payment via PayMongo. No subscription.
       </p>
       <div class="ctaRow">
@@ -344,8 +372,8 @@
         </li>
         <li class="stat-card">
           <div class="stat-figure">5</div>
-          <div class="stat-label">simulators</div>
-          <p class="stat-body">Practice on the same tools we use on client accounts.</p>
+          <div class="stat-label">practice tools</div>
+          <p class="stat-body">Built; the student UI is in development.</p>
         </li>
         <li class="stat-card">
           <div class="stat-figure">~40h</div>
@@ -415,219 +443,52 @@
     </div>
   </section>
 
-  <section class="section section--simulators" aria-labelledby="sims-heading">
+  <section class="section section--simulators" aria-labelledby="practice-heading">
     <div class="inner">
-      <h2 id="sims-heading" class="h2">You don&#x27;t just watch lessons.</h2>
+      <h2 id="practice-heading" class="h2">You don&#x27;t just watch lessons.</h2>
       <p class="section-subhead">
-        You practice with the same tools we use on client accounts. Five
-        simulators. Each one matches a module in the course.
+        The course includes practice tools — the same kind we use on
+        client accounts. The student-facing UI is in development; the
+        domain logic behind each tool is built and tested.
       </p>
-      <ul class="sims-grid">
-
-        <li class="sim-card">
-          <div class="mockup-frame">
-            <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Campaign Builder simulator screenshot">
-              <rect x="0" y="0" width="360" height="220" fill="#FFFFFF" stroke="#E5E5E0" />
-              <rect x="0" y="0" width="360" height="28" fill="#F4F3EE" />
-              <line x1="0" y1="28" x2="360" y2="28" stroke="#E5E5E0" />
-              <text x="12" y="18" font-family="JetBrains Mono, monospace" font-size="10" fill="#404040">Campaign Builder</text>
-              <circle cx="340" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="328" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="316" cy="14" r="3" fill="#D4D4D4" />
-              <text x="14" y="50" font-family="Space Grotesk" font-size="9" fill="#737373">Campaign name</text>
-              <rect x="14" y="56" width="160" height="20" fill="#FFFFFF" stroke="#E5E5E0" />
-              <text x="20" y="70" font-family="Space Grotesk" font-size="9" fill="#171717">SP — Running Shoes</text>
-              <text x="14" y="92" font-family="Space Grotesk" font-size="9" fill="#737373">Daily budget</text>
-              <rect x="14" y="98" width="80" height="20" fill="#FFFFFF" stroke="#E5E5E0" />
-              <text x="20" y="112" font-family="JetBrains Mono" font-size="9" fill="#171717">₱1,500</text>
-              <text x="106" y="92" font-family="Space Grotesk" font-size="9" fill="#737373">Bid</text>
-              <rect x="106" y="98" width="80" height="20" fill="#FFFFFF" stroke="#E5E5E0" />
-              <text x="112" y="112" font-family="JetBrains Mono" font-size="9" fill="#171717">₱0.85</text>
-              <text x="14" y="140" font-family="Space Grotesk" font-size="9" font-weight="600" fill="#737373">AD GROUPS</text>
-              <line x1="14" y1="146" x2="346" y2="146" stroke="#E5E5E0" />
-              <text x="14" y="160" font-family="Space Grotesk" font-size="9" fill="#171717">Brand defense</text>
-              <text x="120" y="160" font-family="JetBrains Mono" font-size="9" fill="#737373">12 kw</text>
-              <text x="180" y="160" font-family="JetBrains Mono" font-size="9" fill="#737373">₱0.95</text>
-              <rect x="280" y="152" width="60" height="14" fill="#DCFCE7" />
-              <text x="287" y="162" font-family="Space Grotesk" font-size="8" font-weight="600" fill="#0E7C3A">HEALTHY</text>
-              <line x1="14" y1="172" x2="346" y2="172" stroke="#E5E5E0" />
-              <text x="14" y="186" font-family="Space Grotesk" font-size="9" fill="#171717">Category</text>
-              <text x="120" y="186" font-family="JetBrains Mono" font-size="9" fill="#737373">24 kw</text>
-              <text x="180" y="186" font-family="JetBrains Mono" font-size="9" fill="#737373">₱0.70</text>
-              <rect x="280" y="178" width="60" height="14" fill="#FEF3C7" />
-              <text x="287" y="188" font-family="Space Grotesk" font-size="8" font-weight="600" fill="#B45309">REVIEW</text>
-              <line x1="14" y1="198" x2="346" y2="198" stroke="#E5E5E0" />
-              <text x="14" y="212" font-family="Space Grotesk" font-size="9" fill="#171717">Competitor</text>
-              <text x="120" y="212" font-family="JetBrains Mono" font-size="9" fill="#737373">8 kw</text>
-              <text x="180" y="212" font-family="JetBrains Mono" font-size="9" fill="#737373">₱1.10</text>
-              <rect x="280" y="204" width="60" height="14" fill="#FEE2E2" />
-              <text x="287" y="214" font-family="Space Grotesk" font-size="8" font-weight="600" fill="#B91C1C">OVERBID</text>
-            </svg>
+      <ul class="practice-list">
+        <li class="practice-row">
+          <div class="practice-main">
+            <h3 class="practice-name">Bid Elevator</h3>
+            <p class="practice-body">Move a slider, see how bid changes shift ACoS and sales in real time.</p>
           </div>
-          <h3 class="sim-name">Campaign Builder</h3>
-          <p class="sim-blurb">Build a Sponsored Products structure from a brief.</p>
-          <p class="sim-youwill"><span class="sim-youwill-label">You will:</span> Set budgets, pick bids, group keywords, see where you&#x27;d over-spend before launch.</p>
+          <span class="practice-badge" aria-label="In development">In development</span>
         </li>
-
-        <li class="sim-card">
-          <div class="mockup-frame">
-            <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bid Elevator simulator screenshot">
-              <rect x="0" y="0" width="360" height="220" fill="#FFFFFF" stroke="#E5E5E0" />
-              <rect x="0" y="0" width="360" height="28" fill="#F4F3EE" />
-              <line x1="0" y1="28" x2="360" y2="28" stroke="#E5E5E0" />
-              <text x="12" y="18" font-family="JetBrains Mono, monospace" font-size="10" fill="#404040">Bid Elevator</text>
-              <circle cx="340" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="328" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="316" cy="14" r="3" fill="#D4D4D4" />
-              <text x="14" y="50" font-family="Space Grotesk" font-size="9" fill="#737373">Target ACoS</text>
-              <text x="330" y="50" font-family="JetBrains Mono" font-size="9" fill="#171717" text-anchor="end">25%</text>
-              <line x1="14" y1="68" x2="346" y2="68" stroke="#D4D4D4" />
-              <circle cx="100" cy="68" r="5" fill="#FF6B35" />
-              <text x="14" y="86" font-family="Space Grotesk" font-size="8" fill="#737373">Lower</text>
-              <text x="332" y="86" font-family="Space Grotesk" font-size="8" fill="#737373" text-anchor="end">Higher</text>
-              <rect x="14" y="100" width="332" height="48" fill="#F4F3EE" />
-              <text x="22" y="116" font-family="Space Grotesk" font-size="9" fill="#737373">Projected ACoS</text>
-              <text x="22" y="138" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#171717">24.3%</text>
-              <text x="180" y="116" font-family="Space Grotesk" font-size="9" fill="#737373">Daily spend</text>
-              <text x="180" y="138" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#171717">₱1,420</text>
-              <text x="280" y="116" font-family="Space Grotesk" font-size="9" fill="#737373">Sales/day</text>
-              <text x="280" y="138" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#171717">₱5,840</text>
-              <rect x="14" y="162" width="332" height="32" fill="#FF6B35" />
-              <text x="180" y="183" font-family="Space Grotesk" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle">Apply bid change</text>
-              <text x="14" y="210" font-family="Space Grotesk" font-size="8" fill="#737373">Recommendation: lower 3 keywords by ₱0.10</text>
-            </svg>
+        <li class="practice-row">
+          <div class="practice-main">
+            <h3 class="practice-name">Campaign Builder</h3>
+            <p class="practice-body">Build a Sponsored Products structure from a brief. Catch over-bids before launch.</p>
           </div>
-          <h3 class="sim-name">Bid Elevator</h3>
-          <p class="sim-blurb">Practice bid changes on a live-ish account.</p>
-          <p class="sim-youwill"><span class="sim-youwill-label">You will:</span> Move a slider, see the projected ACoS, sales, and spend update in real time.</p>
+          <span class="practice-badge" aria-label="In development">In development</span>
         </li>
-
-        <li class="sim-card">
-          <div class="mockup-frame">
-            <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="STR Triage simulator screenshot">
-              <rect x="0" y="0" width="360" height="220" fill="#FFFFFF" stroke="#E5E5E0" />
-              <rect x="0" y="0" width="360" height="28" fill="#F4F3EE" />
-              <line x1="0" y1="28" x2="360" y2="28" stroke="#E5E5E0" />
-              <text x="12" y="18" font-family="JetBrains Mono, monospace" font-size="10" fill="#404040">STR Triage</text>
-              <circle cx="340" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="328" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="316" cy="14" r="3" fill="#D4D4D4" />
-              <text x="14" y="50" font-family="Space Grotesk" font-size="9" font-weight="600" fill="#737373">SEARCH TERM REPORT</text>
-              <line x1="14" y1="56" x2="346" y2="56" stroke="#E5E5E0" />
-              <text x="14" y="70" font-family="Space Grotesk" font-size="9" fill="#171717">nike running shoes</text>
-              <text x="180" y="70" font-family="JetBrains Mono" font-size="9" fill="#737373">184</text>
-              <text x="230" y="70" font-family="JetBrains Mono" font-size="9" fill="#171717">12%</text>
-              <rect x="270" y="61" width="68" height="14" fill="#0E7C3A22" />
-              <text x="277" y="71" font-family="Space Grotesk" font-size="8" font-weight="600" fill="#0E7C3A">EXACT</text>
-              <line x1="14" y1="78" x2="346" y2="78" stroke="#E5E5E0" />
-              <text x="14" y="102" font-family="Space Grotesk" font-size="9" fill="#171717">cheap sneakers</text>
-              <text x="180" y="102" font-family="JetBrains Mono" font-size="9" fill="#737373">92</text>
-              <text x="230" y="102" font-family="JetBrains Mono" font-size="9" fill="#171717">47%</text>
-              <rect x="270" y="93" width="68" height="14" fill="#B91C1C22" />
-              <text x="277" y="103" font-family="Space Grotesk" font-size="8" font-weight="600" fill="#B91C1C">NEGATE</text>
-              <line x1="14" y1="110" x2="346" y2="110" stroke="#E5E5E0" />
-              <text x="14" y="134" font-family="Space Grotesk" font-size="9" fill="#171717">athletic shoes men</text>
-              <text x="180" y="134" font-family="JetBrains Mono" font-size="9" fill="#737373">61</text>
-              <text x="230" y="134" font-family="JetBrains Mono" font-size="9" fill="#171717">31%</text>
-              <rect x="270" y="125" width="68" height="14" fill="#0E7C3A22" />
-              <text x="277" y="135" font-family="Space Grotesk" font-size="8" font-weight="600" fill="#0E7C3A">EXACT</text>
-              <line x1="14" y1="142" x2="346" y2="142" stroke="#E5E5E0" />
-              <text x="14" y="166" font-family="Space Grotesk" font-size="9" fill="#171717">best jogging shoes</text>
-              <text x="180" y="166" font-family="JetBrains Mono" font-size="9" fill="#737373">44</text>
-              <text x="230" y="166" font-family="JetBrains Mono" font-size="9" fill="#171717">28%</text>
-              <rect x="270" y="157" width="68" height="14" fill="#B4530922" />
-              <text x="277" y="167" font-family="Space Grotesk" font-size="8" font-weight="600" fill="#B45309">REVIEW</text>
-              <line x1="14" y1="174" x2="346" y2="174" stroke="#E5E5E0" />
-              <text x="14" y="208" font-family="Space Grotesk" font-size="8" fill="#737373">4 of 28 search terms shown</text>
-            </svg>
+        <li class="practice-row">
+          <div class="practice-main">
+            <h3 class="practice-name">Search Term Triage</h3>
+            <p class="practice-body">Sort through a real search-term report. Mark EXACT or NEGATE. Write the rationale.</p>
           </div>
-          <h3 class="sim-name">STR Triage</h3>
-          <p class="sim-blurb">Triage a search-term report like a real audit.</p>
-          <p class="sim-youwill"><span class="sim-youwill-label">You will:</span> Sort 28+ terms, mark EXACT or NEGATE, and write the rationale for the harder ones.</p>
+          <span class="practice-badge" aria-label="In development">In development</span>
         </li>
-
-        <li class="sim-card">
-          <div class="mockup-frame">
-            <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Listing Audit simulator screenshot">
-              <rect x="0" y="0" width="360" height="220" fill="#FFFFFF" stroke="#E5E5E0" />
-              <rect x="0" y="0" width="360" height="28" fill="#F4F3EE" />
-              <line x1="0" y1="28" x2="360" y2="28" stroke="#E5E5E0" />
-              <text x="12" y="18" font-family="JetBrains Mono, monospace" font-size="10" fill="#404040">Listing Audit</text>
-              <circle cx="340" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="328" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="316" cy="14" r="3" fill="#D4D4D4" />
-              <text x="14" y="50" font-family="Space Grotesk" font-size="9" fill="#737373">OVERALL</text>
-              <text x="14" y="76" font-family="JetBrains Mono" font-size="22" font-weight="600" fill="#171717">68/100</text>
-              <rect x="14" y="86" width="332" height="4" fill="#D4D4D4" />
-              <rect x="14" y="86" width="225" height="4" fill="#FF6B35" />
-              <text x="14" y="110" font-family="Space Grotesk" font-size="8" fill="#404040">Title</text>
-              <rect x="120" y="103" width="200" height="6" fill="#D4D4D4" />
-              <rect x="120" y="103" width="160" height="6" fill="#0E7C3A" />
-              <text x="334" y="110" font-family="JetBrains Mono" font-size="8" fill="#171717" text-anchor="end">8/10</text>
-              <text x="14" y="128" font-family="Space Grotesk" font-size="8" fill="#404040">Bullet points</text>
-              <rect x="120" y="121" width="200" height="6" fill="#D4D4D4" />
-              <rect x="120" y="121" width="120" height="6" fill="#B45309" />
-              <text x="334" y="128" font-family="JetBrains Mono" font-size="8" fill="#171717" text-anchor="end">6/10</text>
-              <text x="14" y="146" font-family="Space Grotesk" font-size="8" fill="#404040">Backend keywords</text>
-              <rect x="120" y="139" width="200" height="6" fill="#D4D4D4" />
-              <rect x="120" y="139" width="60" height="6" fill="#B91C1C" />
-              <text x="334" y="146" font-family="JetBrains Mono" font-size="8" fill="#171717" text-anchor="end">3/10</text>
-              <text x="14" y="164" font-family="Space Grotesk" font-size="8" fill="#404040">Images (&ge;7)</text>
-              <rect x="120" y="157" width="200" height="6" fill="#D4D4D4" />
-              <rect x="120" y="157" width="140" height="6" fill="#B45309" />
-              <text x="334" y="164" font-family="JetBrains Mono" font-size="8" fill="#171717" text-anchor="end">7/10</text>
-              <text x="14" y="182" font-family="Space Grotesk" font-size="8" fill="#404040">A+ content</text>
-              <rect x="120" y="175" width="200" height="6" fill="#D4D4D4" />
-              <rect x="120" y="175" width="200" height="6" fill="#0E7C3A" />
-              <text x="334" y="182" font-family="JetBrains Mono" font-size="8" fill="#171717" text-anchor="end">10/10</text>
-            </svg>
+        <li class="practice-row">
+          <div class="practice-main">
+            <h3 class="practice-name">Listing Audit</h3>
+            <p class="practice-body">Score a listing against the same checklist our team uses. Walk away with the fixes.</p>
           </div>
-          <h3 class="sim-name">Listing Audit</h3>
-          <p class="sim-blurb">Score a listing against the same checklist our team uses.</p>
-          <p class="sim-youwill"><span class="sim-youwill-label">You will:</span> Title, bullets, backend keywords, A+ content. Walk away with a score and the fixes.</p>
+          <span class="practice-badge" aria-label="In development">In development</span>
         </li>
-
-        <li class="sim-card">
-          <div class="mockup-frame">
-            <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Keyword Research simulator screenshot">
-              <rect x="0" y="0" width="360" height="220" fill="#FFFFFF" stroke="#E5E5E0" />
-              <rect x="0" y="0" width="360" height="28" fill="#F4F3EE" />
-              <line x1="0" y1="28" x2="360" y2="28" stroke="#E5E5E0" />
-              <text x="12" y="18" font-family="JetBrains Mono, monospace" font-size="10" fill="#404040">Keyword Research</text>
-              <circle cx="340" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="328" cy="14" r="3" fill="#D4D4D4" />
-              <circle cx="316" cy="14" r="3" fill="#D4D4D4" />
-              <text x="14" y="50" font-family="Space Grotesk" font-size="9" fill="#737373">Seed</text>
-              <rect x="14" y="56" width="120" height="20" fill="#FFFFFF" stroke="#E5E5E0" />
-              <text x="20" y="70" font-family="Space Grotesk" font-size="9" fill="#171717">running shoes</text>
-              <rect x="140" y="56" width="60" height="20" fill="#FF6B35" />
-              <text x="170" y="70" font-family="Space Grotesk" font-size="9" font-weight="600" fill="#FFFFFF" text-anchor="middle">Expand</text>
-              <text x="14" y="98" font-family="Space Grotesk" font-size="9" font-weight="600" fill="#737373">EXPANDED TERMS</text>
-              <line x1="14" y1="104" x2="346" y2="104" stroke="#E5E5E0" />
-              <text x="14" y="120" font-family="Space Grotesk" font-size="9" fill="#171717">running shoes for men</text>
-              <text x="240" y="120" font-family="JetBrains Mono" font-size="9" fill="#404040">48k</text>
-              <text x="296" y="120" font-family="JetBrains Mono" font-size="9" fill="#404040">₱8.40</text>
-              <line x1="14" y1="126" x2="346" y2="126" stroke="#E5E5E0" />
-              <text x="14" y="142" font-family="Space Grotesk" font-size="9" fill="#171717">lightweight running shoes</text>
-              <text x="240" y="142" font-family="JetBrains Mono" font-size="9" fill="#404040">12k</text>
-              <text x="296" y="142" font-family="JetBrains Mono" font-size="9" fill="#404040">₱6.20</text>
-              <line x1="14" y1="148" x2="346" y2="148" stroke="#E5E5E0" />
-              <text x="14" y="164" font-family="Space Grotesk" font-size="9" fill="#171717">running shoes wide feet</text>
-              <text x="240" y="164" font-family="JetBrains Mono" font-size="9" fill="#404040">8k</text>
-              <text x="296" y="164" font-family="JetBrains Mono" font-size="9" fill="#404040">₱5.10</text>
-              <line x1="14" y1="170" x2="346" y2="170" stroke="#E5E5E0" />
-              <text x="14" y="186" font-family="Space Grotesk" font-size="9" fill="#171717">trail running shoes</text>
-              <text x="240" y="186" font-family="JetBrains Mono" font-size="9" fill="#404040">22k</text>
-              <text x="296" y="186" font-family="JetBrains Mono" font-size="9" fill="#404040">₱7.80</text>
-              <line x1="14" y1="192" x2="346" y2="192" stroke="#E5E5E0" />
-            </svg>
+        <li class="practice-row">
+          <div class="practice-main">
+            <h3 class="practice-name">Keyword Research</h3>
+            <p class="practice-body">Expand a seed term into a working keyword set. Filter by volume, CPC, and intent.</p>
           </div>
-          <h3 class="sim-name">Keyword Research</h3>
-          <p class="sim-blurb">Expand a seed term into a working keyword set.</p>
-          <p class="sim-youwill"><span class="sim-youwill-label">You will:</span> Type a seed, see volume and CPC, pick the ones that match a real campaign structure.</p>
+          <span class="practice-badge" aria-label="In development">In development</span>
         </li>
-
       </ul>
+      <p class="practice-note">Sign up to the waitlist below to get notified when the first simulator ships.</p>
     </div>
   </section>
 
