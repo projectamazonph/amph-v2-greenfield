@@ -275,8 +275,42 @@ jobs:
           echo "Build artifact verified:"
           du -sh .next
           cat .next/BUILD_ID
+      - name: Start Next.js server in background
+        # Start the production server on port 3000 in the background
+        # so Lighthouse has something to audit. We do this manually
+        # instead of relying on lhci's startServerCommand config
+        # because that path requires a working `staticDistDir` setup
+        # for our Next.js standalone build, and we've already split
+        # build + lighthouse into two jobs (so the server has to be
+        # started by this job, not by lhci's parent context).
+        # We redirect logs to a file so we can grep them on failure.
+        run: |
+          nohup pnpm start > /tmp/next-server.log 2>&1 &
+          echo "Server PID: $!"
+          # Wait up to 60s for the server to be ready
+          for i in {1..60}; do
+            if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
+              echo "Server is ready after ${i}s"
+              curl -s http://localhost:3000/api/health
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::Server failed to start within 60s. Logs:"
+          cat /tmp/next-server.log
+          exit 1
       - name: Run Lighthouse CI
+        # Now that the server is up, run lighthouse against it. The
+        # config no longer needs startServerCommand (the server is
+        # already running, lhci just hits the URLs).
         run: |
           pnpm dlx @lhci/cli@0.14.x autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+      - name: Stop Next.js server
+        # Always stop the server, even on failure, to avoid leaving
+        # orphan processes. The 'if: always()' ensures this runs.
+        if: always()
+        run: |
+          pkill -f "next-server" || true
+          pkill -f "next start" || true
