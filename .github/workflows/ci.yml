@@ -267,29 +267,49 @@ jobs:
         with:
           name: build
           path: .next/
-      - name: Verify Prisma client is at the expected pnpm store path
-        # Diagnostic: confirm that the prisma generate produced a
-        # client at the path where .next/ expects to find it.
+      - name: Copy Prisma client into .next/node_modules for the bundled module
+        # The .next/ artifact contains a bundled module at
+        #   .next/node_modules/@prisma/client-<hash>/default.js
+        # which does `require('.prisma/client/default')` relative
+        # to its own directory. The .next/ artifact also has a
+        # symlink for that directory pointing to a pnpm-store path,
+        # but pnpm's content-hash means the symlink target may not
+        # exist after a fresh pnpm install in this job.
+        #
+        # Simplest reliable fix: put the generated .prisma/client/
+        # directory right next to the bundled @prisma/client module
+        # in .next/node_modules/. We do that by copying the generated
+        # client from wherever prisma generate put it (the pnpm
+        # store) into a sibling .prisma/ directory of the bundled
+        # module. After this, the require resolves to:
+        #   .next/node_modules/@prisma/client-<hash>/.prisma/client/default.js
         run: |
           set -e
-          # Find the @prisma/client-<hash> directory in .next/
-          HASH_DIR=$(ls -d .next/node_modules/@prisma/client-* 2>/dev/null | head -1 || true)
+          # Find the bundled module directory
+          HASH_DIR=$(ls -d .next/node_modules/@prisma/client-* 2>/dev/null | head -1)
           if [ -z "$HASH_DIR" ]; then
             echo "::error::No @prisma/client-<hash> directory in .next/node_modules/"
             exit 1
           fi
-          echo "Bundled client directory: $HASH_DIR"
-          # Resolve the symlink to the real path inside the pnpm store
-          REAL_PATH=$(readlink -f "$HASH_DIR")
-          echo "Real path: $REAL_PATH"
-          # Check that the generated client exists at <REAL_PATH>/.prisma/client/default
-          if [ ! -f "$REAL_PATH/.prisma/client/default.js" ]; then
-            echo "::error::Generated Prisma client not found at: $REAL_PATH/.prisma/client/default.js"
-            echo "Looking for it..."
-            find node_modules -path "*.prisma/client/default.js" 2>&1 | head -5
+          echo "Bundled module dir: $HASH_DIR"
+          # Find where prisma generate put the client (in the pnpm store)
+          GENERATED=$(find node_modules -path "*/.prisma/client/default.js" 2>/dev/null | head -1)
+          if [ -z "$GENERATED" ]; then
+            echo "::error::No generated Prisma client found in node_modules/"
             exit 1
           fi
-          echo "✓ Prisma client found at expected path"
+          # GENERATED is e.g. node_modules/.pnpm/@prisma+client@HASH/node_modules/.prisma/client/default.js
+          # We need to copy node_modules/.pnpm/@prisma+client@HASH/node_modules/.prisma/ to
+          # <HASH_DIR>/.prisma/
+          GENERATED_DIR=$(dirname "$GENERATED")
+          # Walk up from default.js to find the .prisma directory
+          PRISMA_PARENT=$(dirname $(dirname "$GENERATED"))
+          echo "Generated .prisma dir: $PRISMA_PARENT/.prisma"
+          # Copy into the bundled module's directory
+          rm -rf "$HASH_DIR/.prisma"
+          cp -r "$PRISMA_PARENT/.prisma" "$HASH_DIR/.prisma"
+          echo "✓ Copied .prisma client to $HASH_DIR/.prisma/"
+          ls -la "$HASH_DIR/.prisma/client/" | head -5
       - name: Verify build artifact is present
         # Diagnostic: if the artifact didn't upload, the build job's
         # warning would have been easy to miss. Surface the state here
