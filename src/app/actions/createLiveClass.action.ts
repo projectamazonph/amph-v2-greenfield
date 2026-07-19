@@ -6,7 +6,6 @@
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { CreateLiveClassInput_ } from "@/usecases/CreateLiveClass";
 
 export type CreateLiveClassPageInput = Omit<
@@ -32,7 +31,7 @@ export async function createLiveClassAction(
   const session = await requireAdmin();
   const container = buildContainer();
 
-  const idResult = new UlidGenerator().newId();
+  const idResult = container.idGen.newId();
   const result = await container.createLiveClass.execute({
     ...input,
     id: idResult,
