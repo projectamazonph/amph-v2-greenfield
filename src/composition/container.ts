@@ -38,6 +38,7 @@ import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IModuleRepository } from "@/ports/repositories/IModuleRepository";
+import type { ILessonRepository } from "@/ports/repositories/ILessonRepository";
 import type { IOrderRepository } from "@/ports/repositories/OrderRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { IDiscountCodeRepository } from "@/ports/repositories/IDiscountCodeRepository";
@@ -54,6 +55,7 @@ import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 // Note: SessionRepository is currently in-memory even in production
@@ -131,6 +133,13 @@ import { CreateModule } from "@/usecases/CreateModule";
 import { UpdateModule } from "@/usecases/UpdateModule";
 import { DeleteModule } from "@/usecases/DeleteModule";
 import { ReorderModules } from "@/usecases/ReorderModules";
+// STORY-048c: admin lessons CRUD + reorder
+import { AdminListLessons } from "@/usecases/AdminListLessons";
+import { AdminGetLesson } from "@/usecases/AdminGetLesson";
+import { CreateLesson } from "@/usecases/CreateLesson";
+import { UpdateLesson } from "@/usecases/UpdateLesson";
+import { DeleteLesson } from "@/usecases/DeleteLesson";
+import { ReorderLessons } from "@/usecases/ReorderLessons";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -201,6 +210,13 @@ export interface AppContainer {
   updateModule: UpdateModule;
   deleteModule: DeleteModule;
   reorderModules: ReorderModules;
+  // STORY-048c: admin lessons CRUD + reorder
+  adminListLessons: AdminListLessons;
+  adminGetLesson: AdminGetLesson;
+  createLesson: CreateLesson;
+  updateLesson: UpdateLesson;
+  deleteLesson: DeleteLesson;
+  reorderLessons: ReorderLessons;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -219,6 +235,8 @@ function buildProductionContainer(): AppContainer {
   // yet). The story's 'Prisma Module schema migration' out-of-scope
   // item is the follow-up.
   const moduleRepo: IModuleRepository = new InMemoryModuleRepository();
+  // STORY-048c: same in-memory fallback as Module.
+  const lessonRepo: ILessonRepository = new InMemoryLessonRepository();
   const orderRepo: IOrderRepository = new InMemoryOrderRepository();
 
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
@@ -371,6 +389,13 @@ function buildProductionContainer(): AppContainer {
     updateModule: new UpdateModule({ moduleRepo, clock }),
     deleteModule: new DeleteModule({ moduleRepo }),
     reorderModules: new ReorderModules({ moduleRepo }),
+    // STORY-048c: admin lessons CRUD + reorder
+    adminListLessons: new AdminListLessons({ lessonRepo }),
+    adminGetLesson: new AdminGetLesson({ lessonRepo }),
+    createLesson: new CreateLesson({ lessonRepo, idGen, clock }),
+    updateLesson: new UpdateLesson({ lessonRepo, clock }),
+    deleteLesson: new DeleteLesson({ lessonRepo }),
+    reorderLessons: new ReorderLessons({ lessonRepo }),
   };
 }
 
