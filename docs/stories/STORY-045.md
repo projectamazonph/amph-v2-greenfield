@@ -5,7 +5,7 @@
 - **Story**: STORY-045
 - **Sprint**: 9 — Certificates + Email
 - **Points**: 1
-- **Status**: In Progress
+- **Status**: Done (commit 9e5eb11)
 
 ## Overview
 

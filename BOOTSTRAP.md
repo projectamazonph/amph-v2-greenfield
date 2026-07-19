@@ -22,7 +22,7 @@ still open (Tier B/C/D from the recent audit).
 
 ## Status (2026-07-19)
 
-**All stories merged. No open PRs.**
+**Sprints 8 and 9 complete. No open PRs.**
 
 | # | Story | Status |
 |---|-------|--------|
@@ -34,7 +34,13 @@ still open (Tier B/C/D from the recent audit).
 | #38 | STR Triage simulator | ✅ merged |
 | #39 | Campaign Builder simulator | ✅ merged |
 | #40 | Listing Audit + Keyword Research simulator | ✅ merged |
-| #41 | *(Sprint 9 — see docs/sprint-plan.md)* | — |
+| #41 | Certificate model + repo + IssueCertificate use case | ✅ merged (PR #41) |
+| #42 | React PDF renderer port + certificate PDF | ✅ merged (PR #47) |
+| #43 | /certificates/[hash] public view + /pdf route | ✅ merged (commit 020973b) |
+| #44 | RevokeCertificate on refund + revocation badge | ✅ merged (commit e692235) |
+| #45 | EmailSender port + React Email templates | ✅ merged (commit 9e5eb11) |
+
+**Test counters:** 970/970 passing, 0 tsc errors. Recent PRs: #68 (IssueCertificate Tier B, +17), #69 (RevokeCertificate Tier B, +21), #70 (Tier C cleanup), #71 (audit doc correction).
 
 **After any branch switch or `git pull`:** run `npx prisma migrate dev` if the schema has new models that need migration.
 
@@ -64,4 +70,19 @@ JWT_SECRET="test-secret-at-least-32-bytes-long-please" \
 - Never `git add .`
 - Squash-merge into `main`
 - Conventional commits: `feat(story-035): description`
-- Bypass husky for local commits: `git -c core.hooksPath=/dev/nu
+- Bypass husky for local commits: `git -c core.hooksPath=/dev/null commit`
+- Direct push to `main` blocked by GH repo rules — all commits go through PRs
+
+## Sprint roadmap
+
+See `docs/sprint-plan.md` for the full 12-sprint, 60-story plan.
+
+| Sprint | Theme | Status |
+|--------|-------|--------|
+| 1-7 | Foundation (auth, enrollment, payments, access policy) | ✅ done |
+| 8 | Simulators (4 PPC simulators) | ✅ done |
+| 9 | Certificates + Email | ✅ done |
+| 10 | Admin panel (STORY-046+ prep-1/2/3 + dashboard) | next |
+| 11-12 | (TBD) | pending |
+
+**Next story to pick up:** STORY-046 (Admin layout + dashboard). Depends on STORY-046-prep-1/2/3 which should be checked first — see the story doc.

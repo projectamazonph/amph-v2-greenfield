@@ -5,7 +5,7 @@
 - **Story**: STORY-044
 - **Sprint**: 9 — Certificates + Email
 - **Points**: 1
-- **Status**: In Progress
+- **Status**: Done (commit e692235). RevokeCertificate use case also got Tier B test coverage in PR #69.
 
 ## Overview
 
