@@ -85,6 +85,11 @@ import { CreateLesson } from "@/usecases/CreateLesson";
 import { UpdateLesson } from "@/usecases/UpdateLesson";
 import { DeleteLesson } from "@/usecases/DeleteLesson";
 import { ReorderLessons } from "@/usecases/ReorderLessons";
+// STORY-049: admin payments + refunds + refund override
+import { AdminListPayments } from "@/usecases/AdminListPayments";
+import { AdminGetPayment } from "@/usecases/AdminGetPayment";
+import { ProcessRefund } from "@/usecases/ProcessRefund";
+import { RefundOverride } from "@/usecases/RefundOverride";
 
 import type { AppContainer } from "./container";
 
@@ -266,6 +271,11 @@ export function buildTestContainer(): TestContainer {
     updateLesson: new UpdateLesson({ lessonRepo, clock }),
     deleteLesson: new DeleteLesson({ lessonRepo }),
     reorderLessons: new ReorderLessons({ lessonRepo }),
+    // STORY-049: admin payments + refunds + refund override
+    adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
+    adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
+    processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
+    refundOverride: new RefundOverride({ orderRepo, paymentGateway }),
     simulatorRegistry: buildSimulatorRegistry(),
   };
 }

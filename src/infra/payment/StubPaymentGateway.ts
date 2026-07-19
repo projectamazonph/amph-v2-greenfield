@@ -48,6 +48,40 @@ export class StubPaymentGateway implements IPaymentGateway {
     // Stub always passes — override in specific tests to test rejection
   }
 
+  // ── STORY-049: refund support ─────────────────────────────────
+
+  /** All refund calls. */
+  refundCalls: {
+    paymongoPaymentId: string;
+    amountMinor: number;
+    reason: string;
+  }[] = [];
+
+  /** If set, refund() will return this error instead of success. */
+  refundShouldFail: PaymentGatewayError | null = null;
+
+  private _refundCounter = 0;
+
+  async refund(params: {
+    paymongoPaymentId: string;
+    amountMinor: number;
+    reason: string;
+  }): Promise<
+    Result<{ refundId: string; processedAt: Date }, PaymentGatewayError>
+  > {
+    this.refundCalls.push({ ...params });
+
+    if (this.refundShouldFail) {
+      return Result.err(this.refundShouldFail);
+    }
+
+    this._refundCounter += 1;
+    return Result.ok({
+      refundId: `re_test_${this._refundCounter}`,
+      processedAt: new Date(),
+    });
+  }
+
   /** Simulate a webhook event being processed */
   simulateWebhook(orderId: string, sessionId: string, eventType: string): object {
     return {
