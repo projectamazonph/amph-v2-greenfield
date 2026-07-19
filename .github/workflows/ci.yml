@@ -298,17 +298,16 @@ jobs:
             echo "::error::No generated Prisma client found in node_modules/"
             exit 1
           fi
-          # GENERATED is e.g. node_modules/.pnpm/@prisma+client@HASH/node_modules/.prisma/client/default.js
-          # We need to copy node_modules/.pnpm/@prisma+client@HASH/node_modules/.prisma/ to
-          # <HASH_DIR>/.prisma/
-          GENERATED_DIR=$(dirname "$GENERATED")
-          # Walk up from default.js to find the .prisma directory
-          PRISMA_PARENT=$(dirname $(dirname "$GENERATED"))
-          echo "Generated .prisma dir: $PRISMA_PARENT/.prisma"
-          # Copy into the bundled module's directory
+          echo "Generated client: $GENERATED"
+          # GENERATED is e.g.
+          #   node_modules/.pnpm/@prisma+client@HASH/node_modules/.prisma/client/default.js
+          # dirname x2: node_modules/.pnpm/@prisma+client@HASH/node_modules/.prisma
+          PRISMA_DIR=$(dirname "$(dirname "$GENERATED")")
+          echo "Prisma source dir: $PRISMA_DIR"
+          # Copy the .prisma/ directory into the bundled module's directory
           rm -rf "$HASH_DIR/.prisma"
-          cp -r "$PRISMA_PARENT/.prisma" "$HASH_DIR/.prisma"
-          echo "✓ Copied .prisma client to $HASH_DIR/.prisma/"
+          cp -r "$PRISMA_DIR" "$HASH_DIR/.prisma"
+          echo "✓ Copied $PRISMA_DIR to $HASH_DIR/.prisma/"
           ls -la "$HASH_DIR/.prisma/client/" | head -5
       - name: Verify build artifact is present
         # Diagnostic: if the artifact didn't upload, the build job's
