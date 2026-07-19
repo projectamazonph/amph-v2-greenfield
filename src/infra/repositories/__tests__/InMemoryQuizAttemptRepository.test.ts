@@ -61,11 +61,11 @@ describe("InMemoryQuizAttemptRepository", () => {
       expect(result.value.passed).toBe(true);
     });
 
-    it("upserts when attempt does not exist", async () => {
+    it("returns not_found when attempt does not exist (P0-6 contract)", async () => {
       const result = await repo.update(makeAttempt({ id: "new-attempt" }));
-      expect(result.ok).toBe(true);
-      if (!result.ok) return;
-      expect(result.value.id).toBe("new-attempt");
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.kind).toBe("not_found");
     });
   });
 
