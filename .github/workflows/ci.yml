@@ -256,34 +256,40 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma generate
         # The .next/ artifact references a hashed Prisma client
-        # (e.g. @prisma/client-<hash>) that lives in node_modules.
+        # (e.g. @prisma/client-<hash>) that lives in the pnpm store.
         # The build job generated it, but the artifact only contains
         # .next/. We need to regenerate it in this job so the
-        # server can find the client at runtime.
+        # server can find the client at runtime. pnpm + Prisma 7
+        # places the generated client at:
+        #   node_modules/.pnpm/@prisma+client@<hash>/node_modules/@prisma/client/.prisma/client/default
+        # which is where Next.js's bundled module expects it.
       - uses: actions/download-artifact@v4
         with:
           name: build
           path: .next/
-      - name: Make Prisma client resolvable from .next/node_modules
-        # Next.js 16 bundles the Prisma client into .next/ but the
-        # generated client lives in node_modules/.prisma/client.
-        # The bundled module's require('.../default') call can't
-        # resolve it from inside the .next/ directory tree. We
-        # symlink node_modules/.prisma into .next/node_modules so
-        # the require call finds it via the canonical pnpm path.
-        # This is a known issue with Next.js 16 + Prisma 7
-        # standalone builds in CI artifact flows.
-        #
-        # The artifact may already contain an empty .next/node_modules/.prisma
-        # directory, so we remove it first before creating the symlink.
+      - name: Verify Prisma client is at the expected pnpm store path
+        # Diagnostic: confirm that the prisma generate produced a
+        # client at the path where .next/ expects to find it.
         run: |
-          rm -rf .next/node_modules/.prisma
-          ln -s ../../node_modules/.prisma .next/node_modules/.prisma
-          echo "Symlinked .next/node_modules/.prisma -> ../../node_modules/.prisma"
-          ls -la .next/node_modules/.prisma/
-          echo "---"
-          # Verify the symlink resolves to a real file
-          ls -la .next/node_modules/.prisma/client/default | head -5
+          set -e
+          # Find the @prisma/client-<hash> directory in .next/
+          HASH_DIR=$(ls -d .next/node_modules/@prisma/client-* 2>/dev/null | head -1 || true)
+          if [ -z "$HASH_DIR" ]; then
+            echo "::error::No @prisma/client-<hash> directory in .next/node_modules/"
+            exit 1
+          fi
+          echo "Bundled client directory: $HASH_DIR"
+          # Resolve the symlink to the real path inside the pnpm store
+          REAL_PATH=$(readlink -f "$HASH_DIR")
+          echo "Real path: $REAL_PATH"
+          # Check that the generated client exists at <REAL_PATH>/.prisma/client/default
+          if [ ! -f "$REAL_PATH/.prisma/client/default.js" ]; then
+            echo "::error::Generated Prisma client not found at: $REAL_PATH/.prisma/client/default.js"
+            echo "Looking for it..."
+            find node_modules -path "*.prisma/client/default.js" 2>&1 | head -5
+            exit 1
+          fi
+          echo "✓ Prisma client found at expected path"
       - name: Verify build artifact is present
         # Diagnostic: if the artifact didn't upload, the build job's
         # warning would have been easy to miss. Surface the state here
