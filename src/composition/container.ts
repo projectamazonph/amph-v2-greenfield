@@ -56,7 +56,7 @@ import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassReposi
 // ── Production adapters (only the prod ones) ──────────────────
 
 import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
-import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { PrismaCourseRepository } from "@/infra/repositories/PrismaCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
@@ -297,11 +297,9 @@ function buildProductionContainer(): AppContainer {
   const idGen: IdGenerator = new UlidGenerator();
 
   const userRepo: UserRepository = new PrismaUserRepository(prisma);
-  // Course and order repos are intentionally in-memory even in prod
-  // for now (see TODOs in STORY-013 / STORY-015). They will be moved
-  // to Prisma when the curriculum + orders data needs to survive
-  // process restarts.
-  const courseRepo: CourseRepository = new InMemoryCourseRepository();
+  // P0-2: course data now persists to PostgreSQL. The catalog
+  // survives restarts and is shared across application instances.
+  const courseRepo: CourseRepository = new PrismaCourseRepository(prisma);
   // STORY-048b: Module repo is also in-memory (no Prisma module table
   // yet). The story's 'Prisma Module schema migration' out-of-scope
   // item is the follow-up.
