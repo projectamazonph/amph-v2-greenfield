@@ -37,6 +37,7 @@ import type { IdGenerator } from "@/ports/system/IdGenerator";
 
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { IModuleRepository } from "@/ports/repositories/IModuleRepository";
 import type { IOrderRepository } from "@/ports/repositories/OrderRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { IDiscountCodeRepository } from "@/ports/repositories/IDiscountCodeRepository";
@@ -52,6 +53,7 @@ import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 
 import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 // Note: SessionRepository is currently in-memory even in production
@@ -122,6 +124,13 @@ import { AdminGetCourse } from "@/usecases/AdminGetCourse";
 import { CreateCourse } from "@/usecases/CreateCourse";
 import { UpdateCourse } from "@/usecases/UpdateCourse";
 import { ArchiveCourse } from "@/usecases/ArchiveCourse";
+// STORY-048b: admin modules CRUD + reorder
+import { AdminListModules } from "@/usecases/AdminListModules";
+import { AdminGetModule } from "@/usecases/AdminGetModule";
+import { CreateModule } from "@/usecases/CreateModule";
+import { UpdateModule } from "@/usecases/UpdateModule";
+import { DeleteModule } from "@/usecases/DeleteModule";
+import { ReorderModules } from "@/usecases/ReorderModules";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -185,6 +194,13 @@ export interface AppContainer {
   createCourse: CreateCourse;
   updateCourse: UpdateCourse;
   archiveCourse: ArchiveCourse;
+  // STORY-048b: admin modules CRUD + reorder
+  adminListModules: AdminListModules;
+  adminGetModule: AdminGetModule;
+  createModule: CreateModule;
+  updateModule: UpdateModule;
+  deleteModule: DeleteModule;
+  reorderModules: ReorderModules;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -199,6 +215,10 @@ function buildProductionContainer(): AppContainer {
   // to Prisma when the curriculum + orders data needs to survive
   // process restarts.
   const courseRepo: CourseRepository = new InMemoryCourseRepository();
+  // STORY-048b: Module repo is also in-memory (no Prisma module table
+  // yet). The story's 'Prisma Module schema migration' out-of-scope
+  // item is the follow-up.
+  const moduleRepo: IModuleRepository = new InMemoryModuleRepository();
   const orderRepo: IOrderRepository = new InMemoryOrderRepository();
 
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
@@ -344,6 +364,13 @@ function buildProductionContainer(): AppContainer {
     createCourse: new CreateCourse({ courseRepo }),
     updateCourse: new UpdateCourse({ courseRepo }),
     archiveCourse: new ArchiveCourse({ courseRepo }),
+    // STORY-048b: admin modules CRUD + reorder
+    adminListModules: new AdminListModules({ moduleRepo }),
+    adminGetModule: new AdminGetModule({ moduleRepo }),
+    createModule: new CreateModule({ moduleRepo, idGen, clock }),
+    updateModule: new UpdateModule({ moduleRepo, clock }),
+    deleteModule: new DeleteModule({ moduleRepo }),
+    reorderModules: new ReorderModules({ moduleRepo }),
   };
 }
 
