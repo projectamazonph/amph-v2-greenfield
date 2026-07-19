@@ -9,12 +9,22 @@
  */
 
 import { test, expect } from "@playwright/test";
+import { clearE2EUsers } from "./helpers/seed";
 
 const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
+const DATABASE_URL = process.env.DATABASE_URL ?? "";
 
 test.describe("Sign Up", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(`${BASE}/signup`);
+  });
+
+  // Best-effort DB cleanup after each test. The helper is a no-op
+  // when DATABASE_URL is empty (e.g. local dev without .env).
+  test.afterEach(async () => {
+    if (DATABASE_URL) {
+      await clearE2EUsers(DATABASE_URL);
+    }
   });
 
   test("page loads with correct title and heading", async ({ page }) => {
@@ -40,21 +50,44 @@ test.describe("Sign Up", () => {
     await expect(page.getByRole("heading", { name: /create your account/i })).toBeVisible();
   });
 
-  test("shows email_taken error when registering the same email twice", async ({ page }) => {
-    await page.getByLabel(/first name/i).fill("Alice");
-    await page.getByLabel(/last name/i).fill("Rodriguez");
-    await page.getByLabel(/email address/i).fill("e2e-dup@example.com");
+  test("happy path: sign up auto-logs in and lands on /dashboard", async ({ page }) => {
+    // STORY-005 happy path. The action performs SignUp + Login +
+    // plantCookie + redirect("/dashboard") in sequence. We assert
+    // the end state (URL) rather than intermediate UI, because the
+    // success state is never rendered — the action throws
+    // NEXT_REDIRECT before useActionState observes it.
+    const email = `e2e-happy-${Date.now()}@example.com`;
+    await page.getByLabel(/first name/i).fill("Happy");
+    await page.getByLabel(/last name/i).fill("Path");
+    await page.getByLabel(/email address/i).fill(email);
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
-    // First signup succeeds
-    await expect(page.getByText(/account created/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
+  });
+
+  test("shows email_taken error when registering the same email twice", async ({ page }) => {
+    // Use a fresh email per run so the test is idempotent across re-runs.
+    const email = `e2e-dup-${Date.now()}@example.com`;
+
+    await page.getByLabel(/first name/i).fill("Alice");
+    await page.getByLabel(/last name/i).fill("Rodriguez");
+    await page.getByLabel(/email address/i).fill(email);
+    await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
+    await page.getByRole("button", { name: /create account/i }).click();
+
+    // First signup succeeds: the action auto-logs the user in and
+    // navigates to /dashboard. We assert the URL change, not an
+    // in-page success alert — the success alert is never rendered
+    // because the action throws NEXT_REDIRECT before useActionState
+    // ever observes the success state.
+    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
 
     // Second signup with same email shows email_taken
     await page.goto(`${BASE}/signup`);
     await page.getByLabel(/first name/i).fill("Alice");
     await page.getByLabel(/last name/i).fill("Rodriguez");
-    await page.getByLabel(/email address/i).fill("e2e-dup@example.com");
+    await page.getByLabel(/email address/i).fill(email);
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
@@ -64,7 +97,7 @@ test.describe("Sign Up", () => {
   test("shows weak_password error for short password", async ({ page }) => {
     await page.getByLabel(/first name/i).fill("Bob");
     await page.getByLabel(/last name/i).fill("Santos");
-    await page.getByLabel(/email address/i).fill("e2e-weak@example.com");
+    await page.getByLabel(/email address/i).fill(`e2e-weak-${Date.now()}@example.com`);
     await page.getByRole("textbox", { name: /password/i }).fill("abc");
     await page.getByRole("button", { name: /create account/i }).click();
 

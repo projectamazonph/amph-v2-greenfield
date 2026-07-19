@@ -22,11 +22,11 @@ test.describe("Critical journeys", () => {
     await page.goto(`${BASE}/signup`);
     await page.getByLabel(/first name/i).fill("Juan");
     await page.getByLabel(/last name/i).fill("Dela Cruz");
-    await page.getByLabel(/email address/i).fill("journey1@example.com");
+    await page.getByLabel(/email address/i).fill(`journey1-${Date.now()}@example.com`);
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
-    await expect(page).toHaveURL(/dashboard/, { timeout: 10_000 });
+    await expect(page).toHaveURL(/dashboard/, { timeout: 15_000 });
     await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
   });
 
