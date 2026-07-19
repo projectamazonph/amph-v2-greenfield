@@ -40,6 +40,9 @@ export type AuditAction =
   | "badge.created"
   | "badge.updated"
   | "badge.archived"
+  | "badge.create_failed"
+  | "badge.update_failed"
+  | "badge.archive_failed"
   // Simulator / Live class
   | "simulator.created"
   | "simulator.updated"

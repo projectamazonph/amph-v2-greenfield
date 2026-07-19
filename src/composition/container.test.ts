@@ -99,6 +99,11 @@ import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
 import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
 import { AdminUpdateDiscountCode } from "@/usecases/AdminUpdateDiscountCode";
 import { AdminArchiveDiscountCode } from "@/usecases/AdminArchiveDiscountCode";
+import { AdminListBadges } from "@/usecases/AdminListBadges";
+import { AdminGetBadge } from "@/usecases/AdminGetBadge";
+import { AdminCreateBadge } from "@/usecases/AdminCreateBadge";
+import { AdminUpdateBadge } from "@/usecases/AdminUpdateBadge";
+import { AdminArchiveBadge } from "@/usecases/AdminArchiveBadge";
 import { AdminListScenarios } from "@/usecases/AdminListScenarios";
 import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
@@ -311,6 +316,12 @@ export function buildTestContainer(): TestContainer {
     adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, recordAuditLog }),
     adminUpdateDiscountCode: new AdminUpdateDiscountCode({ discountCodeRepo, recordAuditLog }),
     adminArchiveDiscountCode: new AdminArchiveDiscountCode({ discountCodeRepo, recordAuditLog }),
+    // STORY-050e: admin badge CRUD
+    adminListBadges: new AdminListBadges({ badgeRepo }),
+    adminGetBadge: new AdminGetBadge({ badgeRepo }),
+    adminCreateBadge: new AdminCreateBadge({ badgeRepo, recordAuditLog }),
+    adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
+    adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
     simulatorRegistry: buildSimulatorRegistry(),
     auditLog,
     recordAuditLog,

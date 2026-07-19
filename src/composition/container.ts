@@ -116,6 +116,11 @@ import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
 import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
 import { AdminUpdateDiscountCode } from "@/usecases/AdminUpdateDiscountCode";
 import { AdminArchiveDiscountCode } from "@/usecases/AdminArchiveDiscountCode";
+import { AdminListBadges } from "@/usecases/AdminListBadges";
+import { AdminGetBadge } from "@/usecases/AdminGetBadge";
+import { AdminCreateBadge } from "@/usecases/AdminCreateBadge";
+import { AdminUpdateBadge } from "@/usecases/AdminUpdateBadge";
+import { AdminArchiveBadge } from "@/usecases/AdminArchiveBadge";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
@@ -220,6 +225,12 @@ export interface AppContainer {
   adminCreateDiscountCode: AdminCreateDiscountCode;
   adminUpdateDiscountCode: AdminUpdateDiscountCode;
   adminArchiveDiscountCode: AdminArchiveDiscountCode;
+  // STORY-050e: admin badge CRUD
+  adminListBadges: AdminListBadges;
+  adminGetBadge: AdminGetBadge;
+  adminCreateBadge: AdminCreateBadge;
+  adminUpdateBadge: AdminUpdateBadge;
+  adminArchiveBadge: AdminArchiveBadge;
   recordQuizAttempt: RecordQuizAttempt;
   awardXp: AwardXP;
   awardBadge: AwardBadge;
@@ -379,6 +390,12 @@ function buildProductionContainer(): AppContainer {
     adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, recordAuditLog }),
     adminUpdateDiscountCode: new AdminUpdateDiscountCode({ discountCodeRepo, recordAuditLog }),
     adminArchiveDiscountCode: new AdminArchiveDiscountCode({ discountCodeRepo, recordAuditLog }),
+    // STORY-050e: admin badge CRUD
+    adminListBadges: new AdminListBadges({ badgeRepo }),
+    adminGetBadge: new AdminGetBadge({ badgeRepo }),
+    adminCreateBadge: new AdminCreateBadge({ badgeRepo, recordAuditLog }),
+    adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
+    adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
     quizRepo,
     quizAttemptRepo,
     xpEventRepo,
