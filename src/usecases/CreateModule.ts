@@ -73,10 +73,10 @@ export class CreateModule {
     if (!buildResult.ok) {
       return Result.err({ kind: "invalid_title" });
     }
-    const module = buildResult.value;
+    const created = buildResult.value;
 
     // 3. Persist
-    const persistResult = await this.deps.moduleRepo.create(module);
+    const persistResult = await this.deps.moduleRepo.create(created);
     if (!persistResult.ok) {
       return Result.err(persistResult.error);
     }

@@ -22,7 +22,6 @@ export default function SignUpPage() {
   // On success, the cookie is set by the action and we navigate
   // to the dashboard. A hard navigation (router.push) ensures the
   // server components on /dashboard re-render with the new session.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (state.kind === "success") {
       router.push("/dashboard");

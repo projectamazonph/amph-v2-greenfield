@@ -26,8 +26,8 @@ export default async function EditModulePage({ params }: PageProps) {
   if (!result.ok) {
     notFound();
   }
-  const module = result.value.module;
-  if (module.courseId !== courseId) {
+  const moduleEntity = result.value.module;
+  if (moduleEntity.courseId !== courseId) {
     notFound();
   }
 
@@ -66,7 +66,7 @@ export default async function EditModulePage({ params }: PageProps) {
         ← Back to module
       </Link>
 
-      <TopBar title={`Edit "${module.title}"`} />
+      <TopBar title={`Edit "${moduleEntity.title}"`} />
 
       <Card padding="comfortable">
         <form action={handleSubmit} className={styles.form}>
@@ -78,7 +78,7 @@ export default async function EditModulePage({ params }: PageProps) {
               required
               maxLength={120}
               autoFocus
-              defaultValue={module.title}
+              defaultValue={moduleEntity.title}
               className={styles.input}
             />
           </label>
