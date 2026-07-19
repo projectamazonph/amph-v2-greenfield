@@ -1,0 +1,103 @@
+.hero {
+  padding: var(--space-16) 0 var(--space-12);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-0);
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink-500);
+  text-transform: uppercase;
+  margin-bottom: var(--space-6);
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: var(--ink-900);
+  max-width: 24ch;
+  margin: 0 0 var(--space-6);
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 1024px) {
+  .headline {
+    font-size: 44px;
+  }
+}
+
+.subhead {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  color: var(--ink-700);
+  max-width: 56ch;
+  margin: 0 0 var(--space-8);
+}
+
+.ctaRow {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 var(--space-6);
+  background: var(--accent);
+  color: var(--ink-inverse);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  transition: background 120ms ease-out;
+}
+
+.ctaPrimary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 var(--space-6);
+  background: transparent;
+  color: var(--ink-700);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  border: 1px solid var(--border-strong);
+  transition: background 120ms ease-out;
+}
+
+.ctaSecondary:hover {
+  background: var(--surface-2);
+  color: var(--ink-900);
+}
