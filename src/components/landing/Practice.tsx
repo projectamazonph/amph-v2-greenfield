@@ -1,9 +1,16 @@
 /**
- * Practice — landing page section 4 (replaces the old Simulators section).
+ * Practice — landing page section 4.
  *
- * Honest version. The domain simulator logic exists (700 LOC across
- * 4 simulators) but the student-facing UI is in development. We
- * promise the tools; we don't pretend they're done.
+ * Honest + specific. The simulator UIs are not built yet, but the
+ * design specs are real (see docs/ui-specs/STITCH-PROMPTS.md §19-24
+ * and docs/ui-specs/wireframes/tools/*.html). Each tool listed here
+ * uses the actual scenario title from the design — not invented copy.
+ *
+ * Domain logic is also real: ~700 LOC across 4 simulators in
+ * src/domain/simulator/. The student-facing pages are what's missing.
+ *
+ * The wireframes gallery preview at docs/previews/wireframes.html
+ * shows all 5 tool UIs as Stitch outputs with placeholder content.
  */
 
 import styles from "./Practice.module.css";
@@ -11,33 +18,57 @@ import styles from "./Practice.module.css";
 interface Tool {
   name: string;
   whatItDoes: string;
+  /** Scenario title from the Stitch spec — keeps copy sourced. */
+  scenario: string;
+  /** Where the wireframe is in the repo. */
+  wireframeHref: string;
   status: "in_development";
 }
 
 const TOOLS: ReadonlyArray<Tool> = [
   {
     name: "Bid Elevator",
-    whatItDoes: "Move a slider, see how bid changes shift ACoS and sales in real time.",
+    whatItDoes:
+      "Adjust bids on a real campaign. See projected ACoS, sales, and spend update live.",
+    scenario:
+      "Reduce ACoS on a high-spend electronics campaign. 8–10 keyword rows, real bid data.",
+    wireframeHref: "/docs/previews/wireframes.html#public",
     status: "in_development",
   },
   {
     name: "Campaign Builder",
-    whatItDoes: "Build a Sponsored Products structure from a brief. Catch over-bids before launch.",
+    whatItDoes:
+      "5-step wizard to build a Sponsored Products campaign from a brief.",
+    scenario:
+      "Launch an SP campaign for wireless earbuds. Manual targeting, exact + phrase keywords, ₱500/day budget.",
+    wireframeHref: "/docs/previews/wireframes.html#public",
     status: "in_development",
   },
   {
     name: "Search Term Triage",
-    whatItDoes: "Sort through a real search-term report. Mark EXACT or NEGATE. Write the rationale.",
+    whatItDoes:
+      "Triage 20 search terms from a real report. Mark keep, optimize, pause, or negate.",
+    scenario:
+      "Clean up a broad match campaign for kitchen products getting irrelevant clicks.",
+    wireframeHref: "/docs/previews/wireframes.html#public",
     status: "in_development",
   },
   {
     name: "Listing Audit",
-    whatItDoes: "Score a listing against the same checklist our team uses. Walk away with the fixes.",
+    whatItDoes:
+      "Two steps: flag the issues, then revise the listing. Real product data.",
+    scenario:
+      "Bamboo Cutting Board — Premium Kitchen Essential. ASIN B08N5WRWNW, AOV ₱1,200.",
+    wireframeHref: "/docs/previews/wireframes.html#public",
     status: "in_development",
   },
   {
     name: "Keyword Research",
-    whatItDoes: "Expand a seed term into a working keyword set. Filter by volume, CPC, and intent.",
+    whatItDoes:
+      "Categorize a generated keyword list by intent. Filter, rank, export.",
+    scenario:
+      "Same bamboo cutting board niche. 25 seed terms, expand, categorize, ship to a campaign.",
+    wireframeHref: "/docs/previews/wireframes.html#public",
     status: "in_development",
   },
 ];
@@ -47,29 +78,48 @@ export function Practice() {
     <section className={styles.section} aria-labelledby="practice-heading">
       <div className={styles.inner}>
         <h2 id="practice-heading" className={styles.heading}>
-          You don't just watch lessons.
+          You don&apos;t just watch lessons.
         </h2>
         <p className={styles.subhead}>
-          The course includes practice tools — the same kind we use on
+          The course includes 5 practice tools — the same kind we use on
           client accounts. The student-facing UI is in development; the
-          domain logic behind each tool is built and tested.
+          domain logic behind each tool is built and tested, and the
+          screen designs are specified.
         </p>
         <ul className={styles.list}>
           {TOOLS.map((tool) => (
             <li key={tool.name} className={styles.row}>
               <div className={styles.rowMain}>
-                <h3 className={styles.toolName}>{tool.name}</h3>
+                <div className={styles.nameRow}>
+                  <h3 className={styles.toolName}>{tool.name}</h3>
+                  <span
+                    className={styles.badge}
+                    aria-label="In development"
+                  >
+                    In development
+                  </span>
+                </div>
                 <p className={styles.toolBody}>{tool.whatItDoes}</p>
+                <p className={styles.scenario}>
+                  <span className={styles.scenarioLabel}>Sample scenario:</span>{" "}
+                  {tool.scenario}
+                </p>
               </div>
-              <span className={styles.badge} aria-label="In development">
-                In development
-              </span>
+              <a
+                href="/docs/previews/wireframes.html"
+                className={styles.previewLink}
+                rel="noopener"
+              >
+                See wireframe
+                <span aria-hidden="true"> →</span>
+              </a>
             </li>
           ))}
         </ul>
         <p className={styles.note}>
-          Sign up to the waitlist below to get notified when the first
-          simulator ships.
+          Each tool has a domain simulator (~700 LOC total) and a detailed
+          design spec. Sign up to the waitlist to get notified when the
+          first ships.
         </p>
       </div>
     </section>
