@@ -34,7 +34,7 @@ describe("ApplyDiscountCode", () => {
   const SUBTOTAL_MINOR = 10000;
 
   beforeEach(() => {
-    mockRepo = { findByCode: vi.fn(), create: vi.fn(), incrementUsedCount: vi.fn() };
+    mockRepo = { findByCode: vi.fn(), create: vi.fn(), incrementUsedCount: vi.fn(), listAll: vi.fn(), findById: vi.fn(), update: vi.fn(), archive: vi.fn() };
     mockClock = { now: vi.fn(() => NOW) };
     useCase = new ApplyDiscountCode({ discountCodeRepo: mockRepo, clock: mockClock });
   });

@@ -77,6 +77,7 @@ import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwar
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
+import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
@@ -110,6 +111,11 @@ import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
+import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
+import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
+import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
+import { AdminUpdateDiscountCode } from "@/usecases/AdminUpdateDiscountCode";
+import { AdminArchiveDiscountCode } from "@/usecases/AdminArchiveDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
@@ -208,6 +214,12 @@ export interface AppContainer {
   checkCourseAccess: CheckCourseAccess;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
+  // STORY-050d: admin discount code CRUD
+  adminListDiscountCodes: AdminListDiscountCodes;
+  adminGetDiscountCode: AdminGetDiscountCode;
+  adminCreateDiscountCode: AdminCreateDiscountCode;
+  adminUpdateDiscountCode: AdminUpdateDiscountCode;
+  adminArchiveDiscountCode: AdminArchiveDiscountCode;
   recordQuizAttempt: RecordQuizAttempt;
   awardXp: AwardXP;
   awardBadge: AwardBadge;
@@ -285,7 +297,8 @@ function buildProductionContainer(): AppContainer {
   const orderRepo: IOrderRepository = new InMemoryOrderRepository();
 
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
-  const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
+  // STORY-050d: use in-memory discount code repo (Prisma schema is a follow-up)
+  const discountCodeRepo: IDiscountCodeRepository = new InMemoryDiscountCodeRepository();
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
   const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
   const xpEventRepo: IXPEventRepository = new PrismaXPEventRepository(prisma);
@@ -360,6 +373,12 @@ function buildProductionContainer(): AppContainer {
       discountCodeRepo,
       clock,
     }),
+    // STORY-050d: admin discount code CRUD
+    adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
+    adminGetDiscountCode: new AdminGetDiscountCode({ discountCodeRepo }),
+    adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, recordAuditLog }),
+    adminUpdateDiscountCode: new AdminUpdateDiscountCode({ discountCodeRepo, recordAuditLog }),
+    adminArchiveDiscountCode: new AdminArchiveDiscountCode({ discountCodeRepo, recordAuditLog }),
     quizRepo,
     quizAttemptRepo,
     xpEventRepo,

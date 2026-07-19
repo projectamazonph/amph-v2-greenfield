@@ -107,6 +107,64 @@ export function createDiscountCode(params: {
   });
 }
 
+export type UpdateDiscountCodeError =
+  | { kind: "invalid_code"; message: string }
+  | { kind: "invalid_value" }
+  | { kind: "invalid_max_uses" };
+
+export type UpdateDiscountCodePatch = Partial<
+  Pick<
+    DiscountCode,
+    "code" | "type" | "value" | "maxUses" | "validFrom" | "validUntil" | "courseIds"
+  >
+> & { maxUses?: number | null; validFrom?: Date | null; validUntil?: Date | null };
+
+/**
+ * Update an existing DiscountCode (immutable — returns a new instance).
+ */
+export function updateDiscountCode(
+  original: DiscountCode,
+  patch: UpdateDiscountCodePatch,
+): Result<DiscountCode, UpdateDiscountCodeError> {
+  const errors: UpdateDiscountCodeError[] = [];
+
+  const code = patch.code !== undefined ? patch.code.trim().toUpperCase() : original.code;
+  if (!code) {
+    errors.push({ kind: "invalid_code", message: "Code cannot be empty." });
+  } else if (!VALID_CODE.test(code)) {
+    errors.push({ kind: "invalid_code", message: "Code may only contain letters, numbers, dashes, and underscores." });
+  }
+
+  const type = patch.type ?? original.type;
+  const value = patch.value ?? original.value;
+  if (type === "PERCENTAGE" && (value < 1 || value > 100)) {
+    errors.push({ kind: "invalid_value" });
+  } else if (type === "FIXED" && value <= 0) {
+    errors.push({ kind: "invalid_value" });
+  }
+
+  const maxUses = patch.maxUses !== undefined ? patch.maxUses ?? null : original.maxUses;
+  if (maxUses !== null && maxUses < 0) {
+    errors.push({ kind: "invalid_max_uses" });
+  }
+
+  if (errors.length > 0) return { ok: false, error: errors[0]! };
+
+  return {
+    ok: true,
+    value: Object.freeze({
+      ...original,
+      code,
+      type,
+      value,
+      maxUses,
+      validFrom: patch.validFrom !== undefined ? (patch.validFrom ?? null) : original.validFrom,
+      validUntil: patch.validUntil !== undefined ? (patch.validUntil ?? null) : original.validUntil,
+      courseIds: Object.freeze([...(patch.courseIds ?? original.courseIds)]),
+    }),
+  };
+}
+
 /**
  * Is a discount code currently valid for use?
  *
