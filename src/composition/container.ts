@@ -33,6 +33,11 @@ import type { Clock } from "@/ports/system/Clock";
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
+// ── Observability ports ────────────────────────────────────────
+
+import type { Logger } from "@/ports/observability/Logger";
+import { PinoLogger } from "@/infra/observability/PinoLogger";
+
 // ── Repository ports (interfaces) ──────────────────────────────
 
 import type { UserRepository } from "@/ports/repositories/UserRepository";
@@ -101,6 +106,10 @@ import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
 import type { JwtService } from "@/ports/security/JwtService";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
+
+// STORY-054: rate limiting
+import type { RateLimiter } from "@/ports/security/RateLimiter";
+import { UpstashRateLimiter } from "@/infra/security/UpstashRateLimiter";
 
 // ── Use cases ───────────────────────────────────────────────
 
@@ -185,6 +194,9 @@ export interface AppContainer {
   clock: Clock;
   idGen: IdGenerator;
 
+  // Observability
+  logger: Logger;
+
   // Repositories
   userRepo: UserRepository;
   sessionRepo: SessionRepository;
@@ -211,6 +223,9 @@ export interface AppContainer {
   emailSender: EmailSender;
   jwt: JwtService;
   passwordHasher: PasswordHasher;
+
+  // Security
+  rateLimiter: RateLimiter;
 
   // Use cases
   signUp: SignUp;
@@ -295,6 +310,7 @@ export interface AppContainer {
 function buildProductionContainer(): AppContainer {
   const clock: Clock = new SystemClock();
   const idGen: IdGenerator = new UlidGenerator();
+  const logger: Logger = new PinoLogger(process.env.LOG_LEVEL);
 
   const userRepo: UserRepository = new PrismaUserRepository(prisma);
   // P0-2: course data now persists to PostgreSQL. The catalog
@@ -345,10 +361,15 @@ function buildProductionContainer(): AppContainer {
     process.env.JWT_SECRET ?? "dev-only-secret-please-replace-with-32-bytes-min",
   );
   const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
+  const rateLimiter: RateLimiter = new UpstashRateLimiter(
+    process.env.UPSTASH_REDIS_REST_URL ?? "",
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
+  );
 
   return {
     clock,
     idGen,
+    logger,
     userRepo,
     sessionRepo,
     courseRepo,
@@ -357,6 +378,7 @@ function buildProductionContainer(): AppContainer {
     paymentGateway,
     jwt,
     passwordHasher,
+    rateLimiter,
     signUp: new SignUp(userRepo, idGen, clock, passwordHasher),
     login: new Login(
       userRepo,

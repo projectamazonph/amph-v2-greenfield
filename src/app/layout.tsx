@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
+import { WebVitalsReporter } from "./WebVitalsReporter";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -37,6 +38,7 @@ export default function RootLayout({
             Server component, reads the amph_admin_session cookie, returns
             null when not impersonating. */}
         <ImpersonationBanner />
+        <WebVitalsReporter />
         {children}
       </body>
     </html>

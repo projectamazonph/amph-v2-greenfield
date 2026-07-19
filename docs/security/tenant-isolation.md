@@ -185,6 +185,15 @@ Every admin mutation, every auth event, every payment event, every refund event 
 - **Every new admin mutation.** Audit-log coverage must be added in the same PR.
 - **Quarterly.** Full audit pass with two reviewers (Ryan + one external reviewer if available).
 
+## Sprint 11 Update
+
+- Added `RateLimiter` guard (STORY-054): auth and payment actions now rate-limit by caller key, preventing brute-force enumeration of user-owned resources.
+- Added Sentry `onRequestError` instrumentation (STORY-051): errors are captured without exposing `userId` or PII in event titles.
+- Added structured logging redaction (STORY-052): `password`, `token`, `secret`, `cookie`, `authorization`, `apiKey`, and nested variants are redacted before any log leaves the process.
+- E2E critical-journey coverage added (STORY-055): signup→dashboard, course browse, and placeholder admin journeys. Admin journeys require seeded admin users before they can run unsuspended.
+
 ## Open Issues
 
-(Empty. The day-0 design has no open tenant-isolation issues. Issues found during the sprint or in production are added here with their resolution.)
+1. **Admin E2E journeys need seeded admin users.** `tests/e2e/critical-journeys.spec.ts` journeys 3–6 are skipped until a deterministic admin seed helper is available. This is tracked as a follow-up to STORY-055.
+2. **Pre-release CSP nonce.** The checklist item "CSP nonce is generated per request" is still pending; the current `next.config.ts` does not set security headers. Address in a follow-up security hardening story.
+3. **Rate limits are not yet wired into actions.** The `RateLimiter` port and adapters are in place; wiring `signUpAction`, `loginAction`, and payment actions to call `rateLimiter.check()` is deferred to the first story that touches those actions (STORY-006 follow-up or P0-7).
