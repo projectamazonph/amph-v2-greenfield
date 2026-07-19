@@ -231,6 +231,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: build
+    env:
+      # Next.js needs a real DATABASE_URL to start the server. The
+      # lighthouse job doesn't have access to the test Postgres
+      # service, so we point at a dummy URL — the server will start
+      # (Next.js only connects lazily on the first DB-touching page)
+      # and the public pages we test (/, /courses, /signup) don't
+      # hit the DB on the request path. If the server fails to start
+      # because of this, the diagnostic verify step will catch it.
+      DATABASE_URL: postgresql://test:test@localhost:5432/amph_test
+      JWT_SECRET: test-secret-at-least-32-bytes-long-please
+      PAYMONGO_SECRET: sk_test_dummy
+      PAYMONGO_WEBHOOK_SECRET: whsec_test_dummy
+      RESEND_API_KEY: re_test_dummy
+      SENTRY_DSN: ""
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
