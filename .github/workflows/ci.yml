@@ -52,6 +52,30 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml
 
+  architecture:
+    name: Architecture (TDD + SOLID compliance)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Run architecture compliance suite
+        # Enforces 8 rules: use case coverage, entity coverage,
+        # domain purity, dependency direction, single responsibility,
+        # dependency inversion, port segregation, no circular deps.
+        # See tests/architecture/*.test.ts for the full rule list.
+        run: pnpm test:arch
+
   unit:
     name: Unit + integration
     runs-on: ubuntu-latest
