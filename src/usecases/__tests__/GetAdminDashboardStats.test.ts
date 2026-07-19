@@ -21,6 +21,14 @@ import type { User } from "@/domain/entities/User";
 // buildTestContainer is intentionally NOT used here — we instantiate
 // the in-memory repos directly so each test starts from a clean state.
 
+// Internal-mutation helper: in-memory repos expose a private Map for
+// tests to seed without going through the create/list contract. Typed
+// via `unknown` to keep `@typescript-eslint/no-explicit-any` off the
+// test file — see audit P0 lint pass.
+function seedMap<T>(repo: object, field: string): Map<string, T> {
+  return (repo as unknown as Record<string, Map<string, T>>)[field]!;
+}
+
 function buildDeps() {
   return {
     userRepo: new InMemoryUserRepository(),
@@ -140,10 +148,9 @@ describe("GetAdminDashboardStats", () => {
     const u1: User = { ...makeUser("u1", "STUDENT") };
     const u2: User = { ...makeUser("u2", "STUDENT") };
     const u3: User = { ...makeUser("u3", "ADMIN") };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (deps.userRepo as any).users.set(u1.id, u1);
-    (deps.userRepo as any).users.set(u2.id, u2);
-    (deps.userRepo as any).users.set(u3.id, u3);
+    seedMap<User>(deps.userRepo, "users").set(u1.id, u1);
+    seedMap<User>(deps.userRepo, "users").set(u2.id, u2);
+    seedMap<User>(deps.userRepo, "users").set(u3.id, u3);
 
     const uc = new GetAdminDashboardStats(deps);
     const result = await uc.execute();
@@ -154,10 +161,9 @@ describe("GetAdminDashboardStats", () => {
 
   it("counts courses via listAll", async () => {
     const deps = buildDeps();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (deps.courseRepo as any).courses.set("c1", makeCourse("c1"));
-    (deps.courseRepo as any).courses.set("c2", makeCourse("c2"));
-    (deps.courseRepo as any).courses.set("c3", makeCourse("c3"));
+    seedMap<Course>(deps.courseRepo, "courses").set("c1", makeCourse("c1"));
+    seedMap<Course>(deps.courseRepo, "courses").set("c2", makeCourse("c2"));
+    seedMap<Course>(deps.courseRepo, "courses").set("c3", makeCourse("c3"));
 
     const uc = new GetAdminDashboardStats(deps);
     const result = await uc.execute();
@@ -169,8 +175,7 @@ describe("GetAdminDashboardStats", () => {
   it("sums paid order totals into totalRevenuePhp (PHP, not centavos)", async () => {
     const deps = buildDeps();
     const u1 = makeUser("u1");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (deps.userRepo as any).users.set(u1.id, u1);
+    seedMap<User>(deps.userRepo, "users").set(u1.id, u1);
     const o1 = makePaidOrder("o1", "u1", "c1", 50000); // ₱500.00
     const o2 = makePaidOrder("o2", "u1", "c1", 12500); // ₱125.00
     await deps.orderRepo.create(o1);
@@ -186,8 +191,7 @@ describe("GetAdminDashboardStats", () => {
   it("does not count unpaid orders toward revenue", async () => {
     const deps = buildDeps();
     const u1 = makeUser("u1");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (deps.userRepo as any).users.set(u1.id, u1);
+    seedMap<User>(deps.userRepo, "users").set(u1.id, u1);
     // Create an unpaid order (still in PENDING status)
     const order = Order.create({
       id: "o1",
@@ -210,8 +214,7 @@ describe("GetAdminDashboardStats", () => {
   it("counts only non-revoked certificates in certificatesIssued", async () => {
     const deps = buildDeps();
     const u1 = makeUser("u1");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (deps.userRepo as any).users.set(u1.id, u1);
+    seedMap<User>(deps.userRepo, "users").set(u1.id, u1);
     await deps.certificateRepo.create(makeCertificate("cert1", "u1", "c1", false));
     await deps.certificateRepo.create(makeCertificate("cert2", "u1", "c1", true));
 
@@ -226,9 +229,8 @@ describe("GetAdminDashboardStats", () => {
     const deps = buildDeps();
     const u1 = makeUser("u1");
     const u2 = makeUser("u2");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (deps.userRepo as any).users.set(u1.id, u1);
-    (deps.userRepo as any).users.set(u2.id, u2);
+    seedMap<User>(deps.userRepo, "users").set(u1.id, u1);
+    seedMap<User>(deps.userRepo, "users").set(u2.id, u2);
     await deps.enrollmentRepo.create(makeEnrollment("e1", "u1", "c1"));
     await deps.enrollmentRepo.create(makeEnrollment("e2", "u1", "c2"));
     await deps.enrollmentRepo.create(makeEnrollment("e3", "u2", "c1"));
