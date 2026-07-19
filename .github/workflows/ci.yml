@@ -267,23 +267,19 @@ jobs:
         with:
           name: build
           path: .next/
-      - name: Replace broken @prisma/client symlink with real directory
-        # The .next/ artifact has a symlink at
-        #   .next/node_modules/@prisma/client-<hash>
-        # pointing to a pnpm-store path that may not exist after a
-        # fresh pnpm install in this job (pnpm content-hashes the
-        # store path, and the hash may differ).
+      - name: Copy generated Prisma client into the bundled module directory
+        # The .next/ artifact has a @prisma/client-<hash> directory
+        # (which is a symlink locally, but a real directory in CI
+        # because actions/upload-artifact resolves symlinks before
+        # upload). Inside that directory, default.js does:
+        #   require('.prisma/client/default')
+        # Node resolves this relative to the directory containing
+        # default.js, so the .prisma/client/ subdirectory must be
+        # in the same directory as default.js.
         #
-        # Node, when resolving require('.prisma/client/default') from
-        # inside that symlinked module, follows the symlink and uses
-        # the REAL path for the require lookup. So the .prisma/
-        # client must be reachable from the real path, not the
-        # symlinked path.
-        #
-        # Fix: replace the broken symlink with a real directory
-        # containing the @prisma/client module + the generated
-        # .prisma/client/ subdirectory. The require then resolves
-        # to the real path we just created.
+        # The pnpm install in this job regenerates the .prisma/client
+        # but puts it in node_modules/.pnpm/.../node_modules/.prisma/,
+        # not in the .next/ directory tree. So we copy it across.
         run: |
           set -e
           HASH_DIR=$(ls -d .next/node_modules/@prisma/client-* 2>/dev/null | head -1)
@@ -291,31 +287,23 @@ jobs:
             echo "::error::No @prisma/client-<hash> directory in .next/node_modules/"
             exit 1
           fi
-          HASH_NAME=$(basename "$HASH_DIR")
-          echo "Bundled module: $HASH_NAME"
-          # Remove the symlink
-          rm -f "$HASH_DIR"
-          # Create a real directory
-          mkdir -p "$HASH_DIR"
-          # Find the @prisma/client contents (in pnpm store) and the generated client
-          PRISMA_CLIENT_SRC=$(find node_modules/.pnpm -path "*@prisma/client/index.js" 2>/dev/null | head -1 | xargs -I {} dirname {} | xargs -I {} dirname {})
+          echo "Bundled module dir: $HASH_DIR"
+          # Find where prisma generate put the client
           GENERATED=$(find node_modules -path "*/.prisma/client/default.js" 2>/dev/null | head -1)
-          if [ -z "$PRISMA_CLIENT_SRC" ] || [ -z "$GENERATED" ]; then
-            echo "::error::Could not locate Prisma client sources"
-            echo "PRISMA_CLIENT_SRC=$PRISMA_CLIENT_SRC"
-            echo "GENERATED=$GENERATED"
+          if [ -z "$GENERATED" ]; then
+            echo "::error::No generated Prisma client found in node_modules/"
             exit 1
           fi
-          echo "Prisma client source: $PRISMA_CLIENT_SRC"
           echo "Generated client: $GENERATED"
-          # Copy the @prisma/client module contents into the real dir
-          cp -r "$PRISMA_CLIENT_SRC/." "$HASH_DIR/"
-          # Copy the generated .prisma/client/ into a sibling directory
+          # GENERATED is e.g.
+          #   node_modules/.pnpm/@prisma+client@HASH/node_modules/.prisma/client/default.js
+          # Walk up two levels to get the .prisma/ directory itself
           PRISMA_DIR=$(dirname "$(dirname "$GENERATED")")
+          echo "Prisma source dir: $PRISMA_DIR"
+          # Copy .prisma/ as a sibling of default.js (inside HASH_DIR)
+          rm -rf "$HASH_DIR/.prisma"
           cp -r "$PRISMA_DIR" "$HASH_DIR/.prisma"
-          echo "✓ Replaced symlink with real dir at $HASH_DIR"
-          ls -la "$HASH_DIR/" | head -10
-          echo "---"
+          echo "✓ Copied $PRISMA_DIR to $HASH_DIR/.prisma/"
           ls -la "$HASH_DIR/.prisma/client/" | head -5
       - name: Verify build artifact is present
         # Diagnostic: if the artifact didn't upload, the build job's
