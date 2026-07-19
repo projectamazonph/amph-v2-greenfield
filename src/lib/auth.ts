@@ -12,11 +12,12 @@
  *    same in test).
  * 3. Optionally load the full `User` entity via `userRepo.findById()`.
  *
- * The middleware (`src/middleware.ts`) also verifies the JWT for routing
- * decisions (redirecting unauthenticated requests away from `/dashboard`,
- * `/admin`, etc.). Pages verify again here. This is the standard Next
- * pattern: middleware for routing, page for data access. The duplication
- * is by design and is cheap (signed cookie + Web Crypto verify).
+ * The proxy (`src/proxy.ts`, formerly `src/middleware.ts` before Next 16)
+ * also verifies the JWT for routing decisions (redirecting unauthenticated
+ * requests away from `/dashboard`, `/admin`, etc.). Pages verify again
+ * here. This is the standard Next pattern: proxy/middleware for routing,
+ * page for data access. The duplication is by design and is cheap
+ * (signed cookie + Web Crypto verify).
  *
  * `import "server-only"` at the top ensures these helpers cannot be
  * imported from a client component — they would throw at build time.
@@ -63,7 +64,8 @@ const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
  * Decoded from the session cookie.
  *
  * Must include `sub` (user ID) at minimum. `sessionId` is optional but
- * used by the middleware to attach a request-level session identifier.
+ * used by the proxy (formerly middleware) to attach a request-level
+ * session identifier.
  */
 export interface SessionClaims {
   sub: string;

@@ -5,7 +5,7 @@
  * at the bottom. Active state has 2px --accent left border. Hover
  * washes bg to --surface-2.
  *
- * Server component. Takes the current pathname (from middleware
+ * Server component. Takes the current pathname (from proxy/middleware
  * x-pathname header) to compute active state.
  *
  * SOLID: this is a pure presentational component. It receives the
