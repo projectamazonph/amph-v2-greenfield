@@ -39,6 +39,9 @@ export interface RecordAuditLogDeps {
 export class RecordAuditLog {
   constructor(private readonly deps: RecordAuditLogDeps) {}
 
+  /** Exposed for tests only. Do not use in production. */
+  get _auditLog() { return this.deps.auditLog; }
+
   async execute(input: RecordAuditLogInput): Promise<RecordAuditLogResult> {
     const id = this.deps.idGen.newId();
     const occurredAt = this.deps.clock.now();

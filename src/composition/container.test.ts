@@ -34,6 +34,7 @@ import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepos
 import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
+import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
@@ -92,6 +93,11 @@ import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { AdminListScenarios } from "@/usecases/AdminListScenarios";
+import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
+import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
+import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
+import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
 
 import type { AppContainer } from "./container";
 
@@ -116,6 +122,7 @@ export interface TestContainer extends AppContainer {
   certificateRenderer: StaticCertificateRenderer;
   accessPolicy: StubAccessPolicy;
   auditLog: InMemoryAuditLog;
+  scenarioRepo: InMemorySimulatorScenarioRepository;
 }
 
 export function buildTestContainer(): TestContainer {
@@ -147,6 +154,8 @@ export function buildTestContainer(): TestContainer {
   // STORY-050a: audit log
   const auditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  // STORY-050b: simulator scenario repo
+  const scenarioRepo = new InMemorySimulatorScenarioRepository();
 
   return {
     clock,
@@ -285,5 +294,12 @@ export function buildTestContainer(): TestContainer {
     simulatorRegistry: buildSimulatorRegistry(),
     auditLog,
     recordAuditLog,
+    scenarioRepo,
+    // STORY-050b: simulator scenario CRUD
+    adminListScenarios: new AdminListScenarios({ scenarioRepo }),
+    getSimulatorScenario: new GetSimulatorScenario({ scenarioRepo }),
+    createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
   };
 }
