@@ -152,15 +152,14 @@ export class RecordQuizAttempt {
     }
 
     // ── 6. Persist ───────────────────────────────────────────────────────
-    if (attempt.status === "completed") {
-      const updateResult = await quizAttemptRepo.update(attempt);
-      if (!updateResult.ok) return updateResult;
-      attempt = updateResult.value;
-    } else {
-      const createResult = await quizAttemptRepo.create(attempt);
-      if (!createResult.ok) return createResult;
-      attempt = createResult.value;
-    }
+    // P0-6 fix: RecordQuizAttempt ALWAYS creates a fresh attempt
+    // (startQuizAttempt generates a new id). It is never an update.
+    // The previous code called `update` for completed attempts,
+    // which worked against the in-memory fake (which upserted) but
+    // failed against Prisma (which requires the row to exist).
+    const createResult = await quizAttemptRepo.create(attempt);
+    if (!createResult.ok) return createResult;
+    attempt = createResult.value;
 
     return Result.ok({ attempt, score, passed, xpAwarded });
   }
