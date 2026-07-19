@@ -1,0 +1,5 @@
+# Prisma migration lock file
+# Controls which migration engine can be used.
+# See https://www.prisma.io/docs/orm/prisma-migrate/understanding-prisma-migrate/migration-lock-file
+
+provider = "postgresql"
