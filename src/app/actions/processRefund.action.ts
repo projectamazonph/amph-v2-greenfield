@@ -47,6 +47,7 @@ export async function performProcessRefund(
   if (input.override) {
     const r = await container.refundOverride.execute({
       orderId: input.orderId,
+      actorId: adminId,
       amountMinor: input.amountMinor,
       reason: input.reason,
       overrideReason: input.overrideReason,

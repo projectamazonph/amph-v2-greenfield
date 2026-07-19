@@ -17,6 +17,9 @@ import type {
   UpdateCourseInput,
   UpdateCourseError,
 } from "@/usecases/UpdateCourse";
+
+/** Input type the page/form provides — no actorId (the action injects it from the session). */
+export type UpdateCoursePageInput = Omit<UpdateCourseInput, "actorId">;
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
 export type UpdateCourseActionResult = Result<
@@ -26,7 +29,7 @@ export type UpdateCourseActionResult = Result<
 
 export async function performUpdateCourse(
   container: { userRepo: UserRepository; updateCourse: UpdateCourse },
-  input: UpdateCourseInput,
+  input: UpdateCoursePageInput,
   getCurrentAdminId: (
     container: { userRepo: UserRepository },
   ) => Promise<string | null>,
@@ -36,7 +39,7 @@ export async function performUpdateCourse(
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.updateCourse.execute(input);
+  const result = await container.updateCourse.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -55,7 +58,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function updateCourseAction(
-  input: UpdateCourseInput,
+  input: UpdateCoursePageInput,
 ): Promise<UpdateCourseActionResult> {
   const container = buildContainer();
   return performUpdateCourse(container, input, defaultGetCurrentAdminId);

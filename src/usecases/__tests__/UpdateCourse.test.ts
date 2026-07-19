@@ -8,6 +8,9 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { UpdateCourse } from "@/usecases/UpdateCourse";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { FixedClock } from "@/ports/system/Clock";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createCourse, type Course } from "@/domain/entities/Course";
 
@@ -26,19 +29,30 @@ function makeCourse(overrides: Partial<Course> = {}): Course {
   return r.value;
 }
 
+
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`, paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
 describe("UpdateCourse", () => {
   let courseRepo: InMemoryCourseRepository;
   let useCase: UpdateCourse;
 
   beforeEach(() => {
     courseRepo = new InMemoryCourseRepository();
-    useCase = new UpdateCourse({ courseRepo });
+    useCase = new UpdateCourse({ courseRepo, recordAuditLog: makeRecordAuditLog() });
   });
 
   it("updates a course on the happy path (title only)", async () => {
     await courseRepo.create(makeCourse());
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { title: "Updated Title" },
     });
@@ -55,6 +69,8 @@ describe("UpdateCourse", () => {
     await courseRepo.create(makeCourse());
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { title: "New Title", priceMinor: 2000, isFeatured: true },
     });
@@ -70,6 +86,8 @@ describe("UpdateCourse", () => {
     await courseRepo.create(makeCourse());
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { slug: "new-slug" },
     });
@@ -83,6 +101,8 @@ describe("UpdateCourse", () => {
     await courseRepo.create(makeCourse());
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { slug: "test-course", title: "Updated" },
     });
@@ -92,6 +112,8 @@ describe("UpdateCourse", () => {
 
   it("returns course_not_found when the course does not exist", async () => {
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "missing",
       patch: { title: "X" },
     });
@@ -106,6 +128,8 @@ describe("UpdateCourse", () => {
     await courseRepo.create(makeCourse({ id: "c2", slug: "slug-b" }));
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "c1",
       patch: { slug: "slug-b" },
     });
@@ -119,6 +143,8 @@ describe("UpdateCourse", () => {
     await courseRepo.create(makeCourse());
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { slug: "Has Spaces" },
     });
@@ -132,6 +158,8 @@ describe("UpdateCourse", () => {
     await courseRepo.create(makeCourse());
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { priceMinor: -100 },
     });
@@ -147,9 +175,11 @@ describe("UpdateCourse", () => {
       ok: false,
       error: { kind: "db_error", message: "find failed" },
     });
-    useCase = new UpdateCourse({ courseRepo: repo });
+    useCase = new UpdateCourse({ courseRepo: repo, recordAuditLog: makeRecordAuditLog() });
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { title: "X" },
     });
@@ -166,9 +196,11 @@ describe("UpdateCourse", () => {
       ok: false,
       error: { kind: "db_error", message: "update failed" },
     });
-    useCase = new UpdateCourse({ courseRepo: repo });
+    useCase = new UpdateCourse({ courseRepo: repo, recordAuditLog: makeRecordAuditLog() });
 
     const result = await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { title: "X" },
     });
@@ -181,6 +213,8 @@ describe("UpdateCourse", () => {
   it("persists the updated course in the repo", async () => {
     await courseRepo.create(makeCourse());
     await useCase.execute({
+      actorId: "admin_1",
+      
       courseId: "course_01",
       patch: { title: "Persisted" },
     });

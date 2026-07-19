@@ -8,6 +8,9 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { ArchiveCourse } from "@/usecases/ArchiveCourse";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { FixedClock } from "@/ports/system/Clock";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createCourse, type Course } from "@/domain/entities/Course";
 import { Result } from "@/domain/shared/Result";
@@ -35,19 +38,30 @@ function makeCourse(overrides: Partial<Course> = {}): Course {
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 
+
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`, paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
 describe("ArchiveCourse", () => {
   let courseRepo: InMemoryCourseRepository;
   let useCase: ArchiveCourse;
 
   beforeEach(() => {
     courseRepo = new InMemoryCourseRepository();
-    useCase = new ArchiveCourse({ courseRepo });
+    useCase = new ArchiveCourse({ courseRepo, recordAuditLog: makeRecordAuditLog() });
   });
 
   it("archives a DRAFT course on the happy path", async () => {
     await courseRepo.create(makeCourse({ status: "DRAFT" }));
 
-    const result = await useCase.execute({ courseId: "course_01" });
+    const result = await useCase.execute({
+      actorId: "admin_1",
+       courseId: "course_01" });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -58,7 +72,9 @@ describe("ArchiveCourse", () => {
   it("archives a PUBLISHED course on the happy path", async () => {
     await courseRepo.create(makeCourse({ status: "PUBLISHED" }));
 
-    const result = await useCase.execute({ courseId: "course_01" });
+    const result = await useCase.execute({
+      actorId: "admin_1",
+       courseId: "course_01" });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -69,7 +85,9 @@ describe("ArchiveCourse", () => {
   it("is idempotent on an already-ARCHIVED course (returns wasAlreadyArchived=true)", async () => {
     await courseRepo.create(makeCourse({ status: "ARCHIVED" }));
 
-    const result = await useCase.execute({ courseId: "course_01" });
+    const result = await useCase.execute({
+      actorId: "admin_1",
+       courseId: "course_01" });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -78,7 +96,9 @@ describe("ArchiveCourse", () => {
   });
 
   it("returns course_not_found when the course does not exist", async () => {
-    const result = await useCase.execute({ courseId: "missing" });
+    const result = await useCase.execute({
+      actorId: "admin_1",
+       courseId: "missing" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -88,7 +108,9 @@ describe("ArchiveCourse", () => {
   it("persists the archived status in the repo", async () => {
     await courseRepo.create(makeCourse({ status: "PUBLISHED" }));
 
-    await useCase.execute({ courseId: "course_01" });
+    await useCase.execute({
+      actorId: "admin_1",
+       courseId: "course_01" });
 
     const persisted = await courseRepo.findById("course_01");
     expect(persisted.ok).toBe(true);
@@ -105,9 +127,11 @@ describe("ArchiveCourse", () => {
       ok: false,
       error: { kind: "db_error", message: "simulated" },
     });
-    useCase = new ArchiveCourse({ courseRepo: repo });
+    useCase = new ArchiveCourse({ courseRepo: repo, recordAuditLog: makeRecordAuditLog() });
 
-    const result = await useCase.execute({ courseId: "course_01" });
+    const result = await useCase.execute({
+      actorId: "admin_1",
+       courseId: "course_01" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -122,9 +146,11 @@ describe("ArchiveCourse", () => {
       ok: false,
       error: { kind: "db_error", message: "find failed" },
     });
-    useCase = new ArchiveCourse({ courseRepo: repo });
+    useCase = new ArchiveCourse({ courseRepo: repo, recordAuditLog: makeRecordAuditLog() });
 
-    const result = await useCase.execute({ courseId: "course_01" });
+    const result = await useCase.execute({
+      actorId: "admin_1",
+       courseId: "course_01" });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;

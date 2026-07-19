@@ -49,6 +49,7 @@ import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
 import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
+import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 
 // ── Production adapters (only the prod ones) ──────────────────
 
@@ -72,6 +73,7 @@ import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepos
 import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
@@ -145,6 +147,7 @@ import { AdminListPayments } from "@/usecases/AdminListPayments";
 import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -169,6 +172,7 @@ export interface AppContainer {
   badgeRepo: IBadgeRepository;
   badgeAwardRepo: IBadgeAwardRepository;
   certificateRepo: ICertificateRepository;
+  auditLog: IAuditLog;
   simulatorRegistry: SimulatorRegistry;
 
   // External services
@@ -227,6 +231,8 @@ export interface AppContainer {
   adminGetPayment: AdminGetPayment;
   processRefund: ProcessRefund;
   refundOverride: RefundOverride;
+  // STORY-050a: audit log
+  recordAuditLog: RecordAuditLog;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -258,6 +264,9 @@ function buildProductionContainer(): AppContainer {
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
   const sessionRepo: SessionRepository = new InMemorySessionRepository();
+  // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
+  const auditLog: IAuditLog = new InMemoryAuditLog();
+  const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -389,9 +398,9 @@ function buildProductionContainer(): AppContainer {
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
     adminGetCourse: new AdminGetCourse({ courseRepo }),
-    createCourse: new CreateCourse({ courseRepo }),
-    updateCourse: new UpdateCourse({ courseRepo }),
-    archiveCourse: new ArchiveCourse({ courseRepo }),
+    createCourse: new CreateCourse({ courseRepo, recordAuditLog }),
+    updateCourse: new UpdateCourse({ courseRepo, recordAuditLog }),
+    archiveCourse: new ArchiveCourse({ courseRepo, recordAuditLog }),
     // STORY-048b: admin modules CRUD + reorder
     adminListModules: new AdminListModules({ moduleRepo }),
     adminGetModule: new AdminGetModule({ moduleRepo }),
@@ -410,7 +419,9 @@ function buildProductionContainer(): AppContainer {
     adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
     processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
-    refundOverride: new RefundOverride({ orderRepo, paymentGateway }),
+    refundOverride: new RefundOverride({ orderRepo, paymentGateway, recordAuditLog }),
+    auditLog,
+    recordAuditLog,
   };
 }
 

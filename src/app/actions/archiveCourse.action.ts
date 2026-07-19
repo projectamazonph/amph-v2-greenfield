@@ -12,6 +12,9 @@ import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { ArchiveCourse, ArchiveCourseInput, ArchiveCourseError } from "@/usecases/ArchiveCourse";
+
+/** Input type the page/form provides — no actorId (the action injects it from the session). */
+export type ArchiveCoursePageInput = Omit<ArchiveCourseInput, "actorId">;
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
 export type ArchiveCourseActionResult = Result<
@@ -21,7 +24,7 @@ export type ArchiveCourseActionResult = Result<
 
 export async function performArchiveCourse(
   container: { userRepo: UserRepository; archiveCourse: ArchiveCourse },
-  input: ArchiveCourseInput,
+  input: ArchiveCoursePageInput,
   getCurrentAdminId: (
     container: { userRepo: UserRepository },
   ) => Promise<string | null>,
@@ -31,7 +34,7 @@ export async function performArchiveCourse(
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.archiveCourse.execute(input);
+  const result = await container.archiveCourse.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -53,7 +56,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function archiveCourseAction(
-  input: ArchiveCourseInput,
+  input: ArchiveCoursePageInput,
 ): Promise<ArchiveCourseActionResult> {
   const container = buildContainer();
   return performArchiveCourse(container, input, defaultGetCurrentAdminId);

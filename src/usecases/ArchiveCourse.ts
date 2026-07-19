@@ -20,11 +20,13 @@
 import { Result } from "@/domain/shared/Result";
 import type { Course } from "@/domain/entities/Course";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 // ── Input / Output types ───────────────────────────────────────────────────
 
 export interface ArchiveCourseInput {
   courseId: string;
+  actorId: string;
 }
 
 export type ArchiveCourseError =
@@ -40,6 +42,7 @@ export type ArchiveCourseResult = Result<
 
 export interface ArchiveCourseDeps {
   courseRepo: CourseRepository;
+  recordAuditLog: RecordAuditLog;
 }
 
 // ── Use Case ───────────────────────────────────────────────────────────────
@@ -63,6 +66,14 @@ export class ArchiveCourse {
 
     // ── 2. Idempotent: already archived ──────────────────
     if (existing.status === "ARCHIVED") {
+      // Still log the attempt even if it was a no-op.
+      await this.deps.recordAuditLog.execute({
+        actorId: input.actorId,
+        action: "course.archived",
+        targetType: "course",
+        targetId: existing.id,
+        metadata: { wasAlreadyArchived: true },
+      });
       return Result.ok({ course: existing, wasAlreadyArchived: true });
     }
 
@@ -77,6 +88,15 @@ export class ArchiveCourse {
       }
       return Result.err({ kind: "db_error", message: "Failed to archive course" });
     }
+    // Audit log — best-effort. RecordAuditLog swallows errors.
+    await this.deps.recordAuditLog.execute({
+      actorId: input.actorId,
+      action: "course.archived",
+      targetType: "course",
+      targetId: archiveResult.value.id,
+      metadata: { wasAlreadyArchived: false },
+    });
+
     return Result.ok({ course: archiveResult.value, wasAlreadyArchived: false });
   }
 }
