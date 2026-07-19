@@ -23,6 +23,7 @@ import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
 import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
 import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
@@ -77,6 +78,13 @@ import { CreateModule } from "@/usecases/CreateModule";
 import { UpdateModule } from "@/usecases/UpdateModule";
 import { DeleteModule } from "@/usecases/DeleteModule";
 import { ReorderModules } from "@/usecases/ReorderModules";
+// STORY-048c: admin lessons CRUD + reorder
+import { AdminListLessons } from "@/usecases/AdminListLessons";
+import { AdminGetLesson } from "@/usecases/AdminGetLesson";
+import { CreateLesson } from "@/usecases/CreateLesson";
+import { UpdateLesson } from "@/usecases/UpdateLesson";
+import { DeleteLesson } from "@/usecases/DeleteLesson";
+import { ReorderLessons } from "@/usecases/ReorderLessons";
 
 import type { AppContainer } from "./container";
 
@@ -88,6 +96,7 @@ export interface TestContainer extends AppContainer {
   sessionRepo: InMemorySessionRepository;
   courseRepo: InMemoryCourseRepository;
   moduleRepo: InMemoryModuleRepository;
+  lessonRepo: InMemoryLessonRepository;
   orderRepo: InMemoryOrderRepository;
   enrollmentRepo: InMemoryEnrollmentRepository;
   discountCodeRepo: InMemoryDiscountCodeRepository;
@@ -107,6 +116,7 @@ export function buildTestContainer(): TestContainer {
   const userRepo = new InMemoryUserRepository();
   const courseRepo = new InMemoryCourseRepository();
   const moduleRepo = new InMemoryModuleRepository();
+  const lessonRepo = new InMemoryLessonRepository();
   const orderRepo = new InMemoryOrderRepository();
   const enrollmentRepo = new InMemoryEnrollmentRepository();
   const discountCodeRepo = new InMemoryDiscountCodeRepository();
@@ -134,6 +144,7 @@ export function buildTestContainer(): TestContainer {
     sessionRepo,
     courseRepo,
     moduleRepo,
+    lessonRepo,
     orderRepo,
     enrollmentRepo,
     paymentGateway,
@@ -248,6 +259,13 @@ export function buildTestContainer(): TestContainer {
     updateModule: new UpdateModule({ moduleRepo, clock }),
     deleteModule: new DeleteModule({ moduleRepo }),
     reorderModules: new ReorderModules({ moduleRepo }),
+    // STORY-048c: admin lessons CRUD + reorder
+    adminListLessons: new AdminListLessons({ lessonRepo }),
+    adminGetLesson: new AdminGetLesson({ lessonRepo }),
+    createLesson: new CreateLesson({ lessonRepo, idGen, clock }),
+    updateLesson: new UpdateLesson({ lessonRepo, clock }),
+    deleteLesson: new DeleteLesson({ lessonRepo }),
+    reorderLessons: new ReorderLessons({ lessonRepo }),
     simulatorRegistry: buildSimulatorRegistry(),
   };
 }
