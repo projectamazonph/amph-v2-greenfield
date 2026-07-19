@@ -19,6 +19,7 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 
 import { FixedClock } from "@/ports/system/Clock";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
+import { TestLogger } from "@/infra/observability/TestLogger";
 
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
@@ -122,6 +123,7 @@ import type { AppContainer } from "./container";
 // in-memory adapters. Tests need this so they can call test-only methods
 // like .users.set(...) or .seed() on the in-memory repos.
 export interface TestContainer extends AppContainer {
+  logger: TestLogger;
   userRepo: InMemoryUserRepository;
   sessionRepo: InMemorySessionRepository;
   courseRepo: InMemoryCourseRepository;
@@ -146,6 +148,7 @@ export interface TestContainer extends AppContainer {
 export function buildTestContainer(): TestContainer {
   const clock = new FixedClock(new Date());
   const idGen = new InMemoryIdGenerator();
+  const logger = new TestLogger();
   const userRepo = new InMemoryUserRepository();
   const courseRepo = new InMemoryCourseRepository();
   const moduleRepo = new InMemoryModuleRepository();
@@ -180,6 +183,7 @@ export function buildTestContainer(): TestContainer {
   return {
     clock,
     idGen,
+    logger,
     userRepo,
     sessionRepo,
     courseRepo,

@@ -33,6 +33,11 @@ import type { Clock } from "@/ports/system/Clock";
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
+// ── Observability ports ────────────────────────────────────────
+
+import type { Logger } from "@/ports/observability/Logger";
+import { PinoLogger } from "@/infra/observability/PinoLogger";
+
 // ── Repository ports (interfaces) ──────────────────────────────
 
 import type { UserRepository } from "@/ports/repositories/UserRepository";
@@ -185,6 +190,9 @@ export interface AppContainer {
   clock: Clock;
   idGen: IdGenerator;
 
+  // Observability
+  logger: Logger;
+
   // Repositories
   userRepo: UserRepository;
   sessionRepo: SessionRepository;
@@ -295,6 +303,7 @@ export interface AppContainer {
 function buildProductionContainer(): AppContainer {
   const clock: Clock = new SystemClock();
   const idGen: IdGenerator = new UlidGenerator();
+  const logger: Logger = new PinoLogger(process.env.LOG_LEVEL);
 
   const userRepo: UserRepository = new PrismaUserRepository(prisma);
   // P0-2: course data now persists to PostgreSQL. The catalog
@@ -349,6 +358,7 @@ function buildProductionContainer(): AppContainer {
   return {
     clock,
     idGen,
+    logger,
     userRepo,
     sessionRepo,
     courseRepo,
