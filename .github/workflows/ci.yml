@@ -304,6 +304,14 @@ jobs:
           rm -rf "$HASH_DIR/.prisma"
           cp -r "$PRISMA_DIR" "$HASH_DIR/.prisma"
           echo "✓ Copied $PRISMA_DIR to $HASH_DIR/.prisma/"
+          # Verify the require chain end-to-end
+          echo "---"
+          echo "Sanity checks:"
+          echo "  - default.js exists: $([ -f $HASH_DIR/default.js ] && echo yes || echo NO)"
+          echo "  - .prisma/client/default.js exists: $([ -f $HASH_DIR/.prisma/client/default.js ] && echo yes || echo NO)"
+          echo "  - Test the require:"
+          cd "$HASH_DIR" && node -e "try { require('./default.js'); console.log('  ✓ require resolved OK'); } catch (e) { console.log('  ✗ require FAILED:', e.message); }"
+          echo "---"
           ls -la "$HASH_DIR/.prisma/client/" | head -5
       - name: Verify build artifact is present
         # Diagnostic: if the artifact didn't upload, the build job's
