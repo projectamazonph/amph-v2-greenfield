@@ -264,6 +264,23 @@ jobs:
         with:
           name: build
           path: .next/
+      - name: Make Prisma client resolvable from .next/node_modules
+        # Next.js 16 bundles the Prisma client into .next/ but the
+        # generated client lives in node_modules/.prisma/client.
+        # The bundled module's require('.../default') call can't
+        # resolve it from inside the .next/ directory tree. We
+        # symlink node_modules/.prisma into .next/node_modules so
+        # the require call finds it via the canonical pnpm path.
+        # This is a known issue with Next.js 16 + Prisma 7
+        # standalone builds in CI artifact flows.
+        run: |
+          if [ ! -d .next/node_modules/.prisma ]; then
+            ln -s ../../node_modules/.prisma .next/node_modules/.prisma
+            echo "Symlinked .next/node_modules/.prisma -> ../../node_modules/.prisma"
+            ls -la .next/node_modules/.prisma
+          else
+            echo "Symlink already exists"
+          fi
       - name: Verify build artifact is present
         # Diagnostic: if the artifact didn't upload, the build job's
         # warning would have been easy to miss. Surface the state here
