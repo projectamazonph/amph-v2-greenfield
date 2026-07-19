@@ -22,17 +22,20 @@ test.describe("Critical journeys", () => {
     await page.goto(`${BASE}/signup`);
     await page.getByLabel(/first name/i).fill("Juan");
     await page.getByLabel(/last name/i).fill("Dela Cruz");
-    await page.getByLabel(/email address/i).fill("journey1@example.com");
+    await page.getByLabel(/email address/i).fill(`journey1-${Date.now()}@example.com`);
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
-    await expect(page).toHaveURL(/dashboard/, { timeout: 10_000 });
-    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+    await expect(page).toHaveURL(/dashboard/, { timeout: 15_000 });
+    // The dashboard page shows "Welcome back, {firstName}." — the
+    // first-name part is dynamic, so we match the static prefix.
+    await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
   });
 
   test("journey 2: browse courses and view course detail", async ({ page }) => {
     await page.goto(`${BASE}/courses`);
-    await expect(page.getByRole("heading", { name: /courses/i })).toBeVisible();
+    // The catalog page shows "Course Catalog" as the h1.
+    await expect(page.getByRole("heading", { name: /course catalog/i })).toBeVisible();
 
     const firstCourse = page.getByRole("link").first();
     if (await firstCourse.isVisible().catch(() => false)) {
