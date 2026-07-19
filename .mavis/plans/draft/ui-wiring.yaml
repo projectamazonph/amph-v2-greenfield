@@ -1,0 +1,373 @@
+version: 1
+plan:
+  name: 'UI wiring — 14 student-facing pages'
+  max_concurrency: 4
+  max_consecutive_failures: 2
+  max_cycles: 12
+  auto_reject_retries: 1
+
+tasks:
+  # ─────────────────────────────────────────────────────────────
+  # Track A — 4 simulator tools pages (Bid Elevator, STR Triage,
+  # Campaign Builder, Listing Audit). Highest priority. Same
+  # pattern: page = breadcrumb + scenario header + form +
+  # submit + result panel. Share helpers via src/components/tools/.
+  # ─────────────────────────────────────────────────────────────
+  - id: track-a-tools-pages
+    title: 'Build 4 simulator tools pages (Bid Elevator, STR Triage, Campaign Builder, Listing Audit)'
+    prompt: |
+      Build 4 student-facing tool pages in the amph-v2-greenfield repo.
+
+      CONTEXT — read these first:
+      - docs/sprint-11/UI-WIRING-PLAN.md (the full wiring plan)
+      - docs/ui-specs/wireframes/tools/ (5 wireframe HTML files)
+      - docs/ui-specs/STITCH-PROMPTS.md §19-24 (full UI specs)
+      - src/domain/simulator/ (4 real simulators with input/output types)
+      - src/infra/simulator/buildSimulatorRegistry.ts (registry of 4)
+      - src/composition/container.ts (DI container — simulatorRegistry is in test container; you need to add it to prod container too)
+      - src/composition/container.test.ts (test container)
+      - docs/ui-specs/wireframes/assets/tokens.css (Field Manual design system)
+
+      ENVIRONMENT:
+      - Work in a worktree: `git worktree add .worktrees/feat-tools-pages -b feat/tools-pages origin/feat/ui-wiring`
+      - cd into the worktree, run `pnpm install` if needed
+      - The DI container uses ports + adapters; you can read but not modify the simulators
+
+      DELIVERABLES (in this order):
+
+      1. Add `simulatorRegistry` to the PROD container (src/composition/container.ts) by
+         calling `buildSimulatorRegistry()` and exposing it on AppContainer. Verify
+         the test container still has it too. Run `pnpm typecheck`.
+
+      2. Build a `/tools` index page at src/app/tools/page.tsx that lists the 4
+         simulators with name, blurb, and a link to each. Use the wireframe at
+         docs/ui-specs/wireframes/tools/tools-index.html as a layout reference.
+
+      3. Build `/tools/bid-elevator` at src/app/tools/bid-elevator/page.tsx:
+         - Server component that reads a hardcoded scenario from the Stitch spec
+           (BidElevatorInput with 8-10 keywords, budget, targetRoas).
+         - Form (client component) lets the user tweak bids per keyword.
+         - On submit (server action), call `simulatorRegistry.get('bid-elevator').run(input)`.
+         - Result panel shows the score (0-100) + per-keyword recommendations.
+         - The page should be RE-RUNNABLE: each submit re-runs the simulator
+           with the new input. Use a form action that re-renders the page.
+
+      4. Build `/tools/str-triage`, `/tools/campaign-builder`, `/tools/listing-audit`
+         the same way. Reuse the form/result pattern. For listing-audit the input
+         is a ListingAuditInput (the simulator handles both audit and keyword
+         research — see STITCH-PROMPTS §22-23).
+
+      5. Extract reusable helpers into src/components/tools/:
+         - `FormField.tsx` (label + input wrapper using design tokens)
+         - `ResultPanel.tsx` (white card with header)
+         - `ScoreBadge.tsx` (mono numeric score with color)
+         - `KeywordTable.tsx` (reusable table used by bid-elevator and str-triage)
+         - `Breadcrumb.tsx` (← Tools / [tool name])
+
+      6. Tests for each page. Use renderToString on the page (server component
+         tests). At least 3 tests per page:
+         - renders the page with the hardcoded scenario
+         - renders the simulator output for the seeded input (call run() in the test)
+         - does not contain banned marketing phrases
+
+      7. Update docs/sprint-11/UI-WIRING-PLAN.md to check off the 4 boxes under
+         "Tools" once each page is verified working.
+
+      ARCHITECTURE RULES (from tests/architecture/):
+      - Port-based DI only; never `new` a use case or domain object inline in a page
+      - No direct imports from src/infra/ in src/app/ or src/components/
+      - Use Result<T, E> across boundaries
+      - CSS Modules only, with design tokens (no Tailwind, no inline hex colors)
+      - No hardcoded mock data in domain code; the page can hardcode the scenario
+
+      VERIFICATION BEFORE EXIT:
+      - `pnpm typecheck` — clean
+      - `pnpm test` — all passing (with DATABASE_URL=postgresql://test:test@localhost:5432/test_db if your tests need it)
+      - `pnpm vitest run tests/architecture/` — 398/398 still passing
+      - Open one of the wireframes (e.g. bid-elevator.html) in your browser, then
+        run the dev server and visit your page — they should look structurally similar
+
+      DELIVERABLE FILE: docs/sprint-11/deliverable-track-a.md with:
+      - List of files created
+      - Test count delta (X new tests, all passing)
+      - Commit hash(es) on the feat/tools-pages branch
+      - Any caveats
+
+      Push the branch: `git push -u origin feat/tools-pages`
+
+      DO NOT poll CI or PRs. Write deliverable.md and exit.
+    assigned_to: Coder
+    verified_by: Verifier
+    verify_prompt: |
+      Read-only verification of the 4 tools pages built in this task.
+
+      Re-derive:
+      - cd into the worker's branch and `pnpm install` if needed
+      - Run `pnpm typecheck` independently
+      - Run `pnpm vitest run tests/architecture/` — must be 398/398
+      - Run `pnpm test` with DATABASE_URL — all tests passing, count should be higher
+      - Open docs/ui-specs/wireframes/tools/bid-elevator.html in a browser via the
+        worker's local file (or read the HTML), then start `pnpm dev` (in background)
+        and curl http://localhost:3000/tools/bid-elevator to confirm the page renders
+        with a real form + result panel
+
+      Adversarial checks:
+      - Does src/app/tools/bid-elevator/page.tsx import from src/infra/? (should NOT)
+      - Does it `new` a simulator inline? (should NOT — must go through container)
+      - Does the page use Tailwind classes? grep for common Tailwind class patterns
+      - Does the page use hardcoded hex colors? grep for #FF / #ff / #FF6B35
+      - Are the 4 pages wired to call the real BidElevatorSimulator etc., or are they
+        returning hardcoded fake results? (look for the .run() call in the page)
+
+      Read the worker's deliverable.md but do not trust it. Re-run everything.
+
+      PASS if: typecheck clean, architecture 398/398, all new tests pass, all 4 pages
+      use the real simulator via DI, no Tailwind, no hex colors, no inline `new`.
+      FAIL otherwise; list the exact issue.
+    timeout_ms: 1800000
+
+  # ─────────────────────────────────────────────────────────────
+  # Track B — Tools index already covered by Track A. So this
+  # track is: pricing page (/pricing) only. Read-only, no use case.
+  # ─────────────────────────────────────────────────────────────
+  - id: track-b-pricing-page
+    title: 'Build /pricing public page'
+    prompt: |
+      Build the /pricing page in the amph-v2-greenfield repo.
+
+      CONTEXT — read these first:
+      - docs/sprint-11/UI-WIRING-PLAN.md
+      - docs/ui-specs/wireframes/public/pricing.html (wireframe)
+      - src/app/page.tsx (existing landing page; the Pricing section is here for reference)
+      - src/components/landing/Pricing.tsx (the pricing card component used on the landing)
+
+      ENVIRONMENT:
+      - Work in a worktree: `git worktree add .worktrees/feat-pricing-page -b feat/pricing-page origin/feat/ui-wiring`
+      - cd in, `pnpm install` if needed
+
+      DELIVERABLES:
+
+      1. Build `/pricing` at src/app/pricing/page.tsx as a server component.
+         - Shows the 3 pricing tiers (Foundations ₱2,999 / Mastery ₱5,999 / Ultimate ₱9,999)
+         - Use the same design as the landing page's Pricing section, but expanded to
+           a full page (longer feature lists, comparison table at the bottom)
+         - Each tier card has a "Start" CTA that links to `/signup?tier=...`
+         - Below the cards: a "Money-back guarantee" + "One-time payment, lifetime access"
+           trust block, sourced from the existing FAQ copy
+         - Page is read-only — no use case needed; no DI needed
+         - Use the existing `src/components/landing/Pricing.tsx` if it works on its own,
+           or extract a shared `src/components/pricing/TierCard.tsx` if it doesn't
+         - DO NOT duplicate the marketing copy from the landing page's "Practice" section
+           or the "Numbers" section; this page is about pricing only
+
+      2. Tests for the page (renderToString on the page). At least 3:
+         - renders all 3 tier names
+         - renders all 3 prices
+         - each tier's CTA links to /signup?tier=...
+         - does not contain banned marketing phrases
+
+      3. Update the landing page's `<a href="#pricing">` link behavior (or just leave it
+         — the new /pricing page exists, but the in-page anchor still works for the
+         landing page's own pricing section). Don't break the existing landing page.
+
+      VERIFICATION BEFORE EXIT:
+      - `pnpm typecheck` clean
+      - `pnpm test` all passing
+      - `pnpm vitest run tests/architecture/` 398/398
+      - Visit /pricing locally and confirm it renders
+
+      DELIVERABLE FILE: docs/sprint-11/deliverable-track-b.md with files, tests, commit hash.
+
+      Push: `git push -u origin feat/pricing-page`
+
+      DO NOT poll CI or PRs. Write deliverable.md and exit.
+    assigned_to: Coder
+    verified_by: Verifier
+    verify_prompt: |
+      Read-only verification of /pricing.
+
+      Re-derive:
+      - cd into the branch, install, run `pnpm typecheck`
+      - Run `pnpm vitest run tests/architecture/` — 398/398
+      - Run `pnpm test` with DATABASE_URL — passing, count higher
+      - Open the new /pricing page in a browser via `pnpm dev` + curl
+      - Compare the structure to docs/ui-specs/wireframes/public/pricing.html
+        (the wireframe is the design target; the implementation can deviate, but
+        should be structurally similar)
+
+      Adversarial:
+      - No Tailwind, no hex colors
+      - No direct adapter imports in src/app/pricing/
+      - The 3 prices must match the brand (₱2,999 / ₱5,999 / ₱9,999)
+      - CTAs must point to /signup?tier=foundations|mastery|ultimate
+
+      PASS if all checks pass. FAIL with specific issue.
+    timeout_ms: 1200000
+
+  # ─────────────────────────────────────────────────────────────
+  # Track C — 3 student pages (Dashboard, Profile, Quiz)
+  # ─────────────────────────────────────────────────────────────
+  - id: track-c-student-pages
+    title: 'Build 3 student pages (Dashboard, Profile, Quiz)'
+    prompt: |
+      Build 3 student-facing pages in the amph-v2-greenfield repo.
+
+      CONTEXT — read these first:
+      - docs/sprint-11/UI-WIRING-PLAN.md
+      - docs/ui-specs/wireframes/student/ (5 wireframe HTML files for student)
+      - src/app/dashboard/page.tsx (existing placeholder — REPLACE its contents)
+      - src/composition/container.test.ts (TestContainer has listUserBadges,
+        listEnrollments, etc. — those are the use cases you'll call)
+      - src/composition/container.ts (prod container — has the same use cases wired)
+      - For quiz: src/usecases/RecordQuizAttempt.ts (the use case you'll call)
+
+      ENVIRONMENT:
+      - Work in a worktree: `git worktree add .worktrees/feat-student-pages -b feat/student-pages origin/feat/ui-wiring`
+      - cd in, `pnpm install` if needed
+
+      DELIVERABLES:
+
+      1. REPLACE /dashboard at src/app/dashboard/page.tsx:
+         - Server component, requires authenticated user (use a hardcoded
+           "user-1" lookup via getContainer() for now; auth middleware is a follow-up)
+         - Top: 4 stat tiles (enrolled courses, XP total, badges earned, certificates)
+         - Middle: "Continue learning" list of in-progress enrollments (use
+           listEnrollments use case — look in container.test.ts to see if it exists;
+           if not, fall back to a hardcoded list with TODO)
+         - Bottom: "Recent badges" grid (use listUserBadges)
+         - Sidebar nav with: Home / Courses / Tools / Profile (matches wireframe)
+
+      2. Build /profile at src/app/profile/page.tsx:
+         - Server component
+         - Profile fields: name, email, bio, avatarUrl (from getContainer().userRepo)
+         - Badges grid below (use listUserBadges)
+         - "Public certificate" link if any (use the certificate hash from
+           getContainer().certificateRepo or skip if no records)
+         - "Edit profile" button (no-op for now; just shows the form would open)
+
+      3. Build /courses/[slug]/lessons/[lessonId]/quiz at the corresponding path:
+         - Server component that loads the quiz (use getContainer().quizRepo
+           or fall back to hardcoded for now)
+         - Renders questions, multiple-choice options
+         - Client component for form state (selected answers)
+         - On submit, calls RecordQuizAttempt use case
+         - Shows the score and pass/fail
+         - If passed, the use case should also award XP (it does — see the use case)
+
+      4. Tests for each page. At least 3 per page using renderToString or
+         @testing-library/react for the quiz form.
+
+      5. Update docs/sprint-11/UI-WIRING-PLAN.md to check off the 3 boxes
+         under "Student".
+
+      ARCHITECTURE RULES:
+      - Port-based DI only; never `new` a use case inline
+      - No direct adapter imports in src/app/
+      - CSS Modules + design tokens
+      - Result<T, E> across boundaries
+
+      VERIFICATION BEFORE EXIT:
+      - `pnpm typecheck` clean
+      - `pnpm test` all passing
+      - `pnpm vitest run tests/architecture/` 398/398
+      - Visit /dashboard, /profile, /quiz locally
+
+      DELIVERABLE FILE: docs/sprint-11/deliverable-track-c.md with files, tests, commit hash.
+
+      Push: `git push -u origin feat/student-pages`
+
+      DO NOT poll CI or PRs. Write deliverable.md and exit.
+    assigned_to: Coder
+    verified_by: Verifier
+    verify_prompt: |
+      Read-only verification of the 3 student pages.
+
+      Re-derive:
+      - cd into the branch, install, run `pnpm typecheck`
+      - Run `pnpm vitest run tests/architecture/` — 398/398
+      - Run `pnpm test` with DATABASE_URL — passing
+      - Open the 3 pages locally with `pnpm dev` + curl; check that they render
+        meaningful content (not just placeholders)
+
+      Adversarial:
+      - No Tailwind, no hex colors
+      - No direct adapter imports in src/app/student/
+      - The 3 pages must call use cases via the container, not inline `new`s
+      - The quiz page must call RecordQuizAttempt on submit, not fake the result
+
+      PASS if all checks pass. FAIL with specific issue.
+    timeout_ms: 1800000
+
+  # ─────────────────────────────────────────────────────────────
+  # Track D — Integration gate. After all 3 tracks land on
+  # feat/ui-wiring, verify the whole thing works as one.
+  # ─────────────────────────────────────────────────────────────
+  - id: track-d-integration
+    title: 'Integration check across all 3 workstreams'
+    prompt: |
+      The 3 parallel tracks have completed (Track A: tools pages, Track B:
+      /pricing, Track C: student pages). Their branches are pushed:
+      - feat/tools-pages
+      - feat/pricing-page
+      - feat/student-pages
+
+      Your job: integrate them into feat/ui-wiring and verify nothing broke.
+
+      CONTEXT — read these first:
+      - docs/sprint-11/UI-WIRING-PLAN.md
+      - All 3 deliverable-*.md files
+      - All 3 branches' git log
+
+      STEPS:
+
+      1. cd back to the main worktree on feat/ui-wiring.
+      2. Merge each branch in order: feat/pricing-page (smallest), then
+         feat/student-pages, then feat/tools-pages. Resolve any conflicts;
+         the files should mostly not conflict (each track owns different paths).
+      3. Run `pnpm typecheck` and fix any cross-track type issues.
+      4. Run `pnpm test` with DATABASE_URL=postgresql://test:test@localhost:5432/test_db
+         and confirm all tests pass.
+      5. Run `pnpm vitest run tests/architecture/` — must be 398/398 or higher.
+      6. Run `pnpm build` and confirm it succeeds (production build, no TS errors).
+      7. Start `pnpm dev` in background; curl each new page and confirm 200 + content:
+         - /tools
+         - /tools/bid-elevator
+         - /tools/str-triage
+         - /tools/campaign-builder
+         - /tools/listing-audit
+         - /pricing
+         - /dashboard
+         - /profile
+         - /courses/any-slug/lessons/any-id/quiz
+      8. Update docs/sprint-11/UI-WIRING-PLAN.md to mark all 14 boxes checked
+         and add a "Status: shipped" line at the top.
+      9. Commit the merges + doc update to feat/ui-wiring.
+      10. Push: `git push -u origin feat/ui-wiring`
+
+      DELIVERABLE FILE: docs/sprint-11/deliverable-integration.md with:
+      - Merge log
+      - Final test count
+      - Final architecture count
+      - Commit hash on feat/ui-wiring
+      - List of pages now live
+      - Any deviations from the plan
+
+      DO NOT open PRs or poll CI. Write deliverable.md and exit.
+    assigned_to: Coder
+    depends_on: [track-a-tools-pages, track-b-pricing-page, track-c-student-pages]
+    verified_by: Verifier
+    verify_prompt: |
+      Verify the integration of all 3 workstreams.
+
+      Re-derive:
+      - cd into feat/ui-wiring
+      - `pnpm install` if needed
+      - `pnpm typecheck` — clean
+      - `pnpm vitest run tests/architecture/` — 398/398 or higher
+      - `pnpm test` with DATABASE_URL — passing, count > 1900
+      - `pnpm build` — succeeds
+      - `pnpm dev` in background; curl all 9 listed pages; each must return 200 + non-empty content
+      - git log on feat/ui-wiring shows the 3 merges + the doc commit
+
+      PASS if everything works. FAIL with specific issue.
+    timeout_ms: 1500000
