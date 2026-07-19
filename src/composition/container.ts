@@ -51,6 +51,7 @@ import type { ICertificateRepository } from "@/ports/repositories/ICertificateRe
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
+import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 
 // ── Production adapters (only the prod ones) ──────────────────
 
@@ -76,6 +77,7 @@ import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwar
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
+import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
@@ -155,6 +157,11 @@ import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
 import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
 import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
+import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
+import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
+import { CreateLiveClass } from "@/usecases/CreateLiveClass";
+import { UpdateLiveClass } from "@/usecases/UpdateLiveClass";
+import { DeleteLiveClass } from "@/usecases/DeleteLiveClass";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -181,6 +188,8 @@ export interface AppContainer {
   certificateRepo: ICertificateRepository;
   auditLog: IAuditLog;
   scenarioRepo: ISimulatorScenarioRepository;
+  // STORY-050c: live class admin CRUD
+  liveClassRepo: ILiveClassRepository;
   simulatorRegistry: SimulatorRegistry;
 
   // External services
@@ -247,6 +256,12 @@ export interface AppContainer {
   createSimulatorScenario: CreateSimulatorScenario;
   updateSimulatorScenario: UpdateSimulatorScenario;
   archiveSimulatorScenario: ArchiveSimulatorScenario;
+  // STORY-050c: live class admin CRUD
+  adminListLiveClasses: AdminListLiveClasses;
+  adminGetLiveClass: AdminGetLiveClass;
+  createLiveClass: CreateLiveClass;
+  updateLiveClass: UpdateLiveClass;
+  deleteLiveClass: DeleteLiveClass;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -283,6 +298,8 @@ function buildProductionContainer(): AppContainer {
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)
   const scenarioRepo: ISimulatorScenarioRepository = new InMemorySimulatorScenarioRepository();
+  // STORY-050c: in-memory live class repo (Prisma schema is a follow-up)
+  const liveClassRepo: ILiveClassRepository = new InMemoryLiveClassRepository();
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -445,6 +462,13 @@ function buildProductionContainer(): AppContainer {
     createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    // STORY-050c
+    liveClassRepo,
+    adminListLiveClasses: new AdminListLiveClasses({ liveClassRepo }),
+    adminGetLiveClass: new AdminGetLiveClass({ liveClassRepo }),
+    createLiveClass: new CreateLiveClass({ liveClassRepo, recordAuditLog }),
+    updateLiveClass: new UpdateLiveClass({ liveClassRepo, recordAuditLog }),
+    deleteLiveClass: new DeleteLiveClass({ liveClassRepo, recordAuditLog }),
   };
 }
 

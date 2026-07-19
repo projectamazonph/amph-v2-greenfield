@@ -43,4 +43,7 @@ export type AuditAction =
   | "simulator.archived"
   | "live_class.created"
   | "live_class.updated"
-  | "live_class.deleted";
+  | "live_class.deleted"
+  | "live_class.create_failed"
+  | "live_class.update_failed"
+  | "live_class.delete_failed";
