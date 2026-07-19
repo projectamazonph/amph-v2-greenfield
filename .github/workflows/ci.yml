@@ -254,6 +254,12 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma generate
+        # The .next/ artifact references a hashed Prisma client
+        # (e.g. @prisma/client-<hash>) that lives in node_modules.
+        # The build job generated it, but the artifact only contains
+        # .next/. We need to regenerate it in this job so the
+        # server can find the client at runtime.
       - uses: actions/download-artifact@v4
         with:
           name: build
