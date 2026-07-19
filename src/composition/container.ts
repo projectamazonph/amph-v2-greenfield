@@ -112,6 +112,10 @@ import { RevokeCertificate } from "@/usecases/RevokeCertificate";
 import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
 import { ListCourses } from "@/usecases/ListCourses";
 import { GetCourse } from "@/usecases/GetCourse";
+// STORY-047: admin users list + user detail + impersonate
+import { ListUsers } from "@/usecases/ListUsers";
+import { GetUserDetail } from "@/usecases/GetUserDetail";
+import { ImpersonateUser } from "@/usecases/ImpersonateUser";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -165,6 +169,10 @@ export interface AppContainer {
   getAdminDashboardStats: GetAdminDashboardStats;
   listCourses: ListCourses;
   getCourse: GetCourse;
+  // STORY-047: admin users list + user detail + impersonate
+  listUsers: ListUsers;
+  getUserDetail: GetUserDetail;
+  impersonateUser: ImpersonateUser;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -308,6 +316,16 @@ function buildProductionContainer(): AppContainer {
     }),
     listCourses: new ListCourses(courseRepo),
     getCourse: new GetCourse(courseRepo),
+    // STORY-047: admin users list + user detail + impersonate
+    listUsers: new ListUsers({ userRepo }),
+    getUserDetail: new GetUserDetail({ userRepo, enrollmentRepo }),
+    impersonateUser: new ImpersonateUser({
+      userRepo,
+      sessionRepo,
+      jwt,
+      clock,
+      idGen,
+    }),
   };
 }
 
