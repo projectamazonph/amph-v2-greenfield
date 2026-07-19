@@ -116,6 +116,12 @@ import { GetCourse } from "@/usecases/GetCourse";
 import { ListUsers } from "@/usecases/ListUsers";
 import { GetUserDetail } from "@/usecases/GetUserDetail";
 import { ImpersonateUser } from "@/usecases/ImpersonateUser";
+// STORY-048a: admin courses CRUD
+import { AdminListCourses } from "@/usecases/AdminListCourses";
+import { AdminGetCourse } from "@/usecases/AdminGetCourse";
+import { CreateCourse } from "@/usecases/CreateCourse";
+import { UpdateCourse } from "@/usecases/UpdateCourse";
+import { ArchiveCourse } from "@/usecases/ArchiveCourse";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -173,6 +179,12 @@ export interface AppContainer {
   listUsers: ListUsers;
   getUserDetail: GetUserDetail;
   impersonateUser: ImpersonateUser;
+  // STORY-048a: admin courses CRUD
+  adminListCourses: AdminListCourses;
+  adminGetCourse: AdminGetCourse;
+  createCourse: CreateCourse;
+  updateCourse: UpdateCourse;
+  archiveCourse: ArchiveCourse;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -326,6 +338,12 @@ function buildProductionContainer(): AppContainer {
       clock,
       idGen,
     }),
+    // STORY-048a: admin courses CRUD
+    adminListCourses: new AdminListCourses({ courseRepo }),
+    adminGetCourse: new AdminGetCourse({ courseRepo }),
+    createCourse: new CreateCourse({ courseRepo }),
+    updateCourse: new UpdateCourse({ courseRepo }),
+    archiveCourse: new ArchiveCourse({ courseRepo }),
   };
 }
 
