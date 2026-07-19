@@ -267,27 +267,29 @@ jobs:
         with:
           name: build
           path: .next/
-      - name: Copy generated Prisma client into the bundled module directory
-        # The .next/ artifact has a @prisma/client-<hash> directory
-        # (which is a symlink locally, but a real directory in CI
-        # because actions/upload-artifact resolves symlinks before
-        # upload). Inside that directory, default.js does:
+      - name: Place .prisma/ as sibling of @prisma/ in .next/node_modules
+        # The .next/ artifact's bundled @prisma/client-<hash> module
+        # has a default.js that does:
         #   require('.prisma/client/default')
-        # Node resolves this relative to the directory containing
-        # default.js, so the .prisma/client/ subdirectory must be
-        # in the same directory as default.js.
+        # Node's CommonJS resolution walks UP the directory tree
+        # looking for `.prisma/client/default.js`. In the pnpm store
+        # layout, `.prisma/` and `@prisma/` are siblings under
+        # `node_modules/.pnpm/.../node_modules/`, so the require
+        # succeeds (Node finds `.prisma/client/default.js` at the
+        # `node_modules/.pnpm/.../node_modules/.prisma/` path).
         #
-        # The pnpm install in this job regenerates the .prisma/client
-        # but puts it in node_modules/.pnpm/.../node_modules/.prisma/,
-        # not in the .next/ directory tree. So we copy it across.
+        # In the .next/ artifact, the layout is similar except the
+        # bundled module is at `.next/node_modules/@prisma/client-<hash>/`
+        # and there's no `.prisma/` sibling under `.next/node_modules/`.
+        # Node walks up from the bundled module and never finds
+        # `.prisma/`.
+        #
+        # Fix: copy the generated .prisma/ directory to
+        # `.next/node_modules/.prisma/`, so Node's upward walk from
+        # the bundled module finds it after traversing
+        # `client-<hash>/` → `@prisma/` → `node_modules/.prisma/`.
         run: |
           set -e
-          HASH_DIR=$(ls -d .next/node_modules/@prisma/client-* 2>/dev/null | head -1)
-          if [ -z "$HASH_DIR" ]; then
-            echo "::error::No @prisma/client-<hash> directory in .next/node_modules/"
-            exit 1
-          fi
-          echo "Bundled module dir: $HASH_DIR"
           # Find where prisma generate put the client
           GENERATED=$(find node_modules -path "*/.prisma/client/default.js" 2>/dev/null | head -1)
           if [ -z "$GENERATED" ]; then
@@ -295,24 +297,22 @@ jobs:
             exit 1
           fi
           echo "Generated client: $GENERATED"
-          # GENERATED is e.g.
-          #   node_modules/.pnpm/@prisma+client@HASH/node_modules/.prisma/client/default.js
           # Walk up two levels to get the .prisma/ directory itself
           PRISMA_DIR=$(dirname "$(dirname "$GENERATED")")
           echo "Prisma source dir: $PRISMA_DIR"
-          # Copy .prisma/ as a sibling of default.js (inside HASH_DIR)
-          rm -rf "$HASH_DIR/.prisma"
-          cp -r "$PRISMA_DIR" "$HASH_DIR/.prisma"
-          echo "✓ Copied $PRISMA_DIR to $HASH_DIR/.prisma/"
-          # Verify the require chain end-to-end
+          # Copy .prisma/ as a sibling of @prisma/ in .next/node_modules
+          rm -rf .next/node_modules/.prisma
+          cp -r "$PRISMA_DIR" .next/node_modules/.prisma
+          echo "✓ Copied $PRISMA_DIR to .next/node_modules/.prisma/"
+          # Sanity-check: the require from inside the bundled module
+          HASH_DIR=$(ls -d .next/node_modules/@prisma/client-* 2>/dev/null | head -1)
+          if [ -n "$HASH_DIR" ]; then
+            echo "---"
+            echo "Sanity: resolving the require from inside $HASH_DIR"
+            cd "$HASH_DIR" && node -e "try { require('./default.js'); console.log('  ✓ require resolved OK'); } catch (e) { console.log('  ✗ require FAILED:', e.message); }"
+          fi
           echo "---"
-          echo "Sanity checks:"
-          echo "  - default.js exists: $([ -f $HASH_DIR/default.js ] && echo yes || echo NO)"
-          echo "  - .prisma/client/default.js exists: $([ -f $HASH_DIR/.prisma/client/default.js ] && echo yes || echo NO)"
-          echo "  - Test the require:"
-          cd "$HASH_DIR" && node -e "try { require('./default.js'); console.log('  ✓ require resolved OK'); } catch (e) { console.log('  ✗ require FAILED:', e.message); }"
-          echo "---"
-          ls -la "$HASH_DIR/.prisma/client/" | head -5
+          ls -la .next/node_modules/.prisma/client/ | head -5
       - name: Verify build artifact is present
         # Diagnostic: if the artifact didn't upload, the build job's
         # warning would have been easy to miss. Surface the state here
