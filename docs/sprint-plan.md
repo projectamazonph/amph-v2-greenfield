@@ -122,7 +122,9 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-050b | Simulators (scenario CRUD) | 1 |
 | STORY-050c | Live classes (CRUD) | 1 |
 | STORY-050d | Discount codes (admin CRUD) | 1 | ✅
-| STORY-050e | Badges (admin CRUD) + settings | 1 |
+| STORY-050e | Badges (admin CRUD) + settings | 1 | ✅
+
+**Sprint 10 closed: 11/11 stories merged.**
 
 ## Sprint 11 — Observability + Tests (5 pts)
 
