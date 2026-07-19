@@ -35,6 +35,7 @@ import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadge
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
+import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
@@ -98,6 +99,11 @@ import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
 import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
 import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
+import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
+import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
+import { CreateLiveClass } from "@/usecases/CreateLiveClass";
+import { UpdateLiveClass } from "@/usecases/UpdateLiveClass";
+import { DeleteLiveClass } from "@/usecases/DeleteLiveClass";
 
 import type { AppContainer } from "./container";
 
@@ -123,6 +129,7 @@ export interface TestContainer extends AppContainer {
   accessPolicy: StubAccessPolicy;
   auditLog: InMemoryAuditLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
+  liveClassRepo: InMemoryLiveClassRepository;
 }
 
 export function buildTestContainer(): TestContainer {
@@ -156,6 +163,8 @@ export function buildTestContainer(): TestContainer {
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   // STORY-050b: simulator scenario repo
   const scenarioRepo = new InMemorySimulatorScenarioRepository();
+  // STORY-050c: live class repo
+  const liveClassRepo = new InMemoryLiveClassRepository();
 
   return {
     clock,
@@ -301,5 +310,12 @@ export function buildTestContainer(): TestContainer {
     createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    // STORY-050c
+    liveClassRepo,
+    adminListLiveClasses: new AdminListLiveClasses({ liveClassRepo }),
+    adminGetLiveClass: new AdminGetLiveClass({ liveClassRepo }),
+    createLiveClass: new CreateLiveClass({ liveClassRepo, recordAuditLog }),
+    updateLiveClass: new UpdateLiveClass({ liveClassRepo, recordAuditLog }),
+    deleteLiveClass: new DeleteLiveClass({ liveClassRepo, recordAuditLog }),
   };
 }
