@@ -46,8 +46,14 @@ class SilentLogger implements Logger {
 
 class FixedIdGenerator implements IdGenerator {
   constructor(private readonly value: string) {}
-  generate(): string {
+  newId(): string {
     return this.value;
+  }
+  paymentRef(): string {
+    return `AMPH-${this.value}`;
+  }
+  receiptNumber(): string {
+    return `AMPH-2026-${this.value}`;
   }
 }
 
@@ -55,11 +61,7 @@ class StubEmailSender implements EmailSender {
   public sent: Array<{ to: string; subject: string; react: unknown }> = [];
   async send(args: Parameters<EmailSender["send"]>[0]) {
     this.sent.push({ to: args.to, subject: args.subject, react: args.react });
-    return Result.ok({ id: "email-1" } as Awaited<ReturnType<EmailSender["send"]>> extends infer R
-      ? R extends { ok: true; value: infer V }
-        ? V
-        : never
-      : never);
+    return Result.ok({ messageId: "email-1" } as never);
   }
 }
 
@@ -184,7 +186,7 @@ describe("ResendVerification", () => {
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.error.kind).toBe("rate_limited");
+    if (result.error.kind !== "rate_limited") throw new Error("expected rate_limited");
     expect(result.error.retryAfter).toBeInstanceOf(Date);
     // No email sent
     expect(emailSender.sent).toHaveLength(0);
