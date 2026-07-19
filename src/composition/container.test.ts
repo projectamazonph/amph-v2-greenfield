@@ -22,6 +22,7 @@ import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
 import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
 import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
@@ -69,6 +70,13 @@ import { AdminGetCourse } from "@/usecases/AdminGetCourse";
 import { CreateCourse } from "@/usecases/CreateCourse";
 import { UpdateCourse } from "@/usecases/UpdateCourse";
 import { ArchiveCourse } from "@/usecases/ArchiveCourse";
+// STORY-048b: admin modules CRUD + reorder
+import { AdminListModules } from "@/usecases/AdminListModules";
+import { AdminGetModule } from "@/usecases/AdminGetModule";
+import { CreateModule } from "@/usecases/CreateModule";
+import { UpdateModule } from "@/usecases/UpdateModule";
+import { DeleteModule } from "@/usecases/DeleteModule";
+import { ReorderModules } from "@/usecases/ReorderModules";
 
 import type { AppContainer } from "./container";
 
@@ -79,6 +87,7 @@ export interface TestContainer extends AppContainer {
   userRepo: InMemoryUserRepository;
   sessionRepo: InMemorySessionRepository;
   courseRepo: InMemoryCourseRepository;
+  moduleRepo: InMemoryModuleRepository;
   orderRepo: InMemoryOrderRepository;
   enrollmentRepo: InMemoryEnrollmentRepository;
   discountCodeRepo: InMemoryDiscountCodeRepository;
@@ -97,6 +106,7 @@ export function buildTestContainer(): TestContainer {
   const idGen = new InMemoryIdGenerator();
   const userRepo = new InMemoryUserRepository();
   const courseRepo = new InMemoryCourseRepository();
+  const moduleRepo = new InMemoryModuleRepository();
   const orderRepo = new InMemoryOrderRepository();
   const enrollmentRepo = new InMemoryEnrollmentRepository();
   const discountCodeRepo = new InMemoryDiscountCodeRepository();
@@ -123,6 +133,7 @@ export function buildTestContainer(): TestContainer {
     userRepo,
     sessionRepo,
     courseRepo,
+    moduleRepo,
     orderRepo,
     enrollmentRepo,
     paymentGateway,
@@ -230,6 +241,13 @@ export function buildTestContainer(): TestContainer {
     createCourse: new CreateCourse({ courseRepo }),
     updateCourse: new UpdateCourse({ courseRepo }),
     archiveCourse: new ArchiveCourse({ courseRepo }),
+    // STORY-048b: admin modules CRUD + reorder
+    adminListModules: new AdminListModules({ moduleRepo }),
+    adminGetModule: new AdminGetModule({ moduleRepo }),
+    createModule: new CreateModule({ moduleRepo, idGen, clock }),
+    updateModule: new UpdateModule({ moduleRepo, clock }),
+    deleteModule: new DeleteModule({ moduleRepo }),
+    reorderModules: new ReorderModules({ moduleRepo }),
     simulatorRegistry: buildSimulatorRegistry(),
   };
 }
