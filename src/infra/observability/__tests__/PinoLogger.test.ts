@@ -6,17 +6,16 @@ import { describe, it, expect } from "vitest";
 import { PinoLogger } from "../PinoLogger";
 
 function captureStdout(fn: () => void): string {
-  const original = process.stdout.write.bind(process.stdout);
+  type StdoutWrite = (chunk: string) => boolean;
+  const original = process.stdout.write.bind(process.stdout) as StdoutWrite;
   let output = "";
-  // @ts-expect-error — mocking stdout.write for the test
-  process.stdout.write = (chunk: string) => {
+  (process.stdout.write as StdoutWrite) = (chunk: string) => {
     output += chunk;
     return true;
   };
   try {
     fn();
   } finally {
-    // @ts-expect-error — restoring stdout.write
     process.stdout.write = original;
   }
   return output;

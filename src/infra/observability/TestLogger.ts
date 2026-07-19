@@ -32,7 +32,7 @@ export class TestLogger implements Logger {
     this.entries.push({ level: "error", message, context });
   }
 
-  child(): Logger {
+  child(_bindings?: LogContext): Logger {
     return this;
   }
 

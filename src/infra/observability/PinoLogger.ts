@@ -10,11 +10,12 @@ import type { Logger, LogContext } from "@/ports/observability/Logger";
 
 // Pino is imported lazily to keep the module loadable during `next build`
 // even if LOG_LEVEL or other runtime env vars are unset.
+type PinoLogFn = (ctx: Record<string, unknown>, msg: string) => void;
 type PinoInstance = {
-  debug: (msg: string, ctx?: Record<string, unknown>) => void;
-  info: (msg: string, ctx?: Record<string, unknown>) => void;
-  warn: (msg: string, ctx?: Record<string, unknown>) => void;
-  error: (msg: string, ctx?: Record<string, unknown>) => void;
+  debug: PinoLogFn;
+  info: PinoLogFn;
+  warn: PinoLogFn;
+  error: PinoLogFn;
   child: (bindings: Record<string, unknown>) => PinoInstance;
 };
 
