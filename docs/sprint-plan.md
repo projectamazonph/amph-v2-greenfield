@@ -118,7 +118,11 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-048b | Module domain + admin modules CRUD + reorder | 1 |
 | STORY-048c | Lesson domain + admin lessons CRUD + MDX editor | 1 |
 | STORY-049 | Admin payments + refunds + refund override | 1 |
-| STORY-050 | Admin simulators (scenario CRUD) + live classes (CRUD) + discount codes + badges + audit log + settings | 1 |
+| STORY-050a | AuditLog port + InMemory adapter + write sites for refund override + admin course CRUD | 1 |
+| STORY-050b | Simulators (scenario CRUD) | 1 |
+| STORY-050c | Live classes (CRUD) | 1 |
+| STORY-050d | Discount codes (admin CRUD) | 1 |
+| STORY-050e | Badges (admin CRUD) + settings | 1 |
 
 ## Sprint 11 — Observability + Tests (5 pts)
 
@@ -155,12 +159,12 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | S7 | 5 | Quizzes + badges (5 × 1pt) |
 | S8 | 5 | Simulators (5 × 1pt; STORY-040 packs 2) |
 | S9 | 5 | Certificates + email (5 × 1pt) |
-| S10 | 5 | Admin (5 × 1pt; STORY-050 packs 5 admin areas) |
+| S10 | 5 | Admin (STORY-046, 047, 048a, 048b, 048c, 049, 050a, 050b, 050c, 050d, 050e = 11 × 1pt; STORY-048 split into a/b/c, STORY-050 split into a/b/c/d/e) |
 | S11 | 5 | Observability + tests (5 × 1pt) |
 | S12 | 5 | Launch (5 × 1pt) |
 | **Total** | **60** | |
 
-Per-sprint velocity: 5 points. The pack-stories (STORY-040, STORY-050) are honest about the larger scope; if they prove too big, split during planning.
+Per-sprint velocity: 5 points. The pack-stories (STORY-040, STORY-050) are honest about the larger scope; if they prove too big, split during planning. STORY-048 and STORY-050 were both split into multiple 1-pt stories to keep each PR within budget.
 
 ## Definition of Done (per story)
 

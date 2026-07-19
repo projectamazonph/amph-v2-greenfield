@@ -16,6 +16,9 @@ import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { CreateCourse, CreateCourseInput, CreateCourseError } from "@/usecases/CreateCourse";
+
+/** Input type the page/form provides — no actorId (the action injects it from the session). */
+export type CreateCoursePageInput = Omit<CreateCourseInput, "actorId">;
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
 export type CreateCourseActionResult = Result<
@@ -28,7 +31,7 @@ export type CreateCourseActionResult = Result<
  */
 export async function performCreateCourse(
   container: { userRepo: UserRepository; createCourse: CreateCourse },
-  input: CreateCourseInput,
+  input: CreateCoursePageInput,
   getCurrentAdminId: (
     container: { userRepo: UserRepository },
   ) => Promise<string | null>,
@@ -38,7 +41,7 @@ export async function performCreateCourse(
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.createCourse.execute(input);
+  const result = await container.createCourse.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -57,7 +60,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function createCourseAction(
-  input: CreateCourseInput,
+  input: CreateCoursePageInput,
 ): Promise<CreateCourseActionResult> {
   const container = buildContainer();
   return performCreateCourse(container, input, defaultGetCurrentAdminId);

@@ -21,8 +21,11 @@ import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 
 // ── Input / Output types ───────────────────────────────────────────────────
 
+import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
+
 export interface UpdateCourseInput {
   courseId: string;
+  actorId: string;
   patch: UpdateCoursePatch;
 }
 
@@ -43,6 +46,7 @@ export type UpdateCourseResult = Result<
 
 export interface UpdateCourseDeps {
   courseRepo: CourseRepository;
+  recordAuditLog: RecordAuditLog;
 }
 
 // ── Use Case ───────────────────────────────────────────────────────────────
@@ -94,6 +98,18 @@ export class UpdateCourse {
       }
       return Result.err({ kind: "db_error", message: "Failed to persist update" });
     }
+    // Audit log — best-effort. RecordAuditLog swallows errors.
+    const diff = Object.fromEntries(
+      Object.entries(input.patch).map(([k, v]) => [k, typeof v === "string" ? v.slice(0, 80) : v]),
+    );
+    await this.deps.recordAuditLog.execute({
+      actorId: input.actorId,
+      action: "course.updated",
+      targetType: "course",
+      targetId: updated.id,
+      metadata: { patch: diff },
+    });
+
     return Result.ok({ course: persistResult.value });
   }
 }

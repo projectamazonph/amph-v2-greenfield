@@ -32,6 +32,7 @@ import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
 
 export interface CreateCourseInput {
   id: string;
+  actorId: string;
   slug: string;
   title: string;
   tagline: string;
@@ -63,8 +64,13 @@ export type CreateCourseResult = Result<
 
 // ── Dependencies ───────────────────────────────────────────────────────────
 
+import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
+
+// ── Dependencies ───────────────────────────────────────────────────────────
+
 export interface CreateCourseDeps {
   courseRepo: CourseRepository;
+  recordAuditLog: RecordAuditLog;
 }
 
 // ── Use Case ───────────────────────────────────────────────────────────────
@@ -133,6 +139,16 @@ export class CreateCourse {
       }
       return Result.err({ kind: "db_error", message: "Failed to persist course" });
     }
+
+    // Audit log — best-effort. RecordAuditLog swallows errors.
+    await this.deps.recordAuditLog.execute({
+      actorId: input.actorId,
+      action: "course.created",
+      targetType: "course",
+      targetId: course.id,
+      metadata: { title: course.title, slug: course.slug },
+    });
+
     return Result.ok({ course: persistResult.value });
   }
 }

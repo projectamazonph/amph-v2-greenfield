@@ -7,6 +7,8 @@ import { RefundOverride } from "@/usecases/RefundOverride";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { SystemClock } from "@/ports/system/Clock";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 describe("RefundOverride", () => {
   let orderRepo: InMemoryOrderRepository;
@@ -16,7 +18,9 @@ describe("RefundOverride", () => {
   beforeEach(() => {
     orderRepo = new InMemoryOrderRepository();
     paymentGateway = new StubPaymentGateway();
-    useCase = new RefundOverride({ orderRepo, paymentGateway });
+    const auditLog = new InMemoryAuditLog();
+    const recordAuditLog = new RecordAuditLog({ auditLog, idGen: { newId: () => `ale_${Date.now()}`, paymentRef: () => "x", receiptNumber: () => "x" }, clock: new SystemClock() });
+    useCase = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
     // Ensure clock exists (used by ProcessRefund, not RefundOverride — for type compat only)
     void new SystemClock();
   });
@@ -32,6 +36,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 1000,
       reason: "Goodwill",
       overrideReason: "Customer escalated; support approved",
@@ -65,6 +70,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 1000,
       reason: "Goodwill",
       overrideReason: "Old order, customer dispute",
@@ -86,6 +92,7 @@ describe("RefundOverride", () => {
 
     await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 1000,
       reason: "Goodwill",
       overrideReason: "Customer escalated",
@@ -109,6 +116,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 1000,
       reason: "x",
       overrideReason: "   ",
@@ -121,6 +129,7 @@ describe("RefundOverride", () => {
   it("returns order_not_found when the order doesn't exist", async () => {
     const r = await useCase.execute({
       orderId: "missing",
+      actorId: "admin_1",
       amountMinor: 100,
       reason: "x",
       overrideReason: "y",
@@ -141,6 +150,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 100,
       reason: "x",
       overrideReason: "y",
@@ -161,12 +171,14 @@ describe("RefundOverride", () => {
 
     await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 1000,
       reason: "x",
       overrideReason: "y",
     });
     const r = await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 1000,
       reason: "x",
       overrideReason: "y",
@@ -187,6 +199,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 2000,
       reason: "x",
       overrideReason: "y",
@@ -211,6 +224,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
+      actorId: "admin_1",
       amountMinor: 1000,
       reason: "x",
       overrideReason: "y",

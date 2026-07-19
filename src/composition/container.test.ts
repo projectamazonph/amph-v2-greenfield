@@ -34,6 +34,7 @@ import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepos
 import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
 import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHashGenerator";
@@ -90,6 +91,7 @@ import { AdminListPayments } from "@/usecases/AdminListPayments";
 import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 import type { AppContainer } from "./container";
 
@@ -113,6 +115,7 @@ export interface TestContainer extends AppContainer {
   certificateRepo: InMemoryCertificateRepository;
   certificateRenderer: StaticCertificateRenderer;
   accessPolicy: StubAccessPolicy;
+  auditLog: InMemoryAuditLog;
 }
 
 export function buildTestContainer(): TestContainer {
@@ -141,6 +144,9 @@ export function buildTestContainer(): TestContainer {
     process.env.JWT_SECRET ?? "test-secret-must-be-at-least-32-bytes-long-ok",
   );
   const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
+  // STORY-050a: audit log
+  const auditLog = new InMemoryAuditLog();
+  const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
 
   return {
     clock,
@@ -254,9 +260,9 @@ export function buildTestContainer(): TestContainer {
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
     adminGetCourse: new AdminGetCourse({ courseRepo }),
-    createCourse: new CreateCourse({ courseRepo }),
-    updateCourse: new UpdateCourse({ courseRepo }),
-    archiveCourse: new ArchiveCourse({ courseRepo }),
+    createCourse: new CreateCourse({ courseRepo, recordAuditLog }),
+    updateCourse: new UpdateCourse({ courseRepo, recordAuditLog }),
+    archiveCourse: new ArchiveCourse({ courseRepo, recordAuditLog }),
     // STORY-048b: admin modules CRUD + reorder
     adminListModules: new AdminListModules({ moduleRepo }),
     adminGetModule: new AdminGetModule({ moduleRepo }),
@@ -275,7 +281,9 @@ export function buildTestContainer(): TestContainer {
     adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
     processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
-    refundOverride: new RefundOverride({ orderRepo, paymentGateway }),
+    refundOverride: new RefundOverride({ orderRepo, paymentGateway, recordAuditLog }),
     simulatorRegistry: buildSimulatorRegistry(),
+    auditLog,
+    recordAuditLog,
   };
 }

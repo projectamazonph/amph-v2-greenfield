@@ -8,12 +8,16 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { CreateCourse, type CreateCourseInput } from "@/usecases/CreateCourse";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { FixedClock } from "@/ports/system/Clock";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createCourse, type Course } from "@/domain/entities/Course";
 
 function makeInput(overrides: Partial<CreateCourseInput> = {}) {
   return {
     id: "course_new",
+    actorId: "admin_1",
     slug: "new-course",
     title: "New Course",
     tagline: "Tagline",
@@ -44,13 +48,22 @@ function makeExistingCourse(): Course {
   return r.value;
 }
 
+
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`, paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
 describe("CreateCourse", () => {
   let courseRepo: InMemoryCourseRepository;
   let useCase: CreateCourse;
 
   beforeEach(() => {
     courseRepo = new InMemoryCourseRepository();
-    useCase = new CreateCourse({ courseRepo });
+    useCase = new CreateCourse({ courseRepo, recordAuditLog: makeRecordAuditLog() });
   });
 
   it("creates a course on the happy path with the default curriculum", async () => {
@@ -128,7 +141,7 @@ describe("CreateCourse", () => {
       ok: false,
       error: { kind: "db_error", message: "create failed" },
     });
-    useCase = new CreateCourse({ courseRepo: repo });
+    useCase = new CreateCourse({ courseRepo: repo, recordAuditLog: makeRecordAuditLog() });
 
     const result = await useCase.execute(makeInput());
 

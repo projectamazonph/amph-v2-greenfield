@@ -15,20 +15,20 @@
  *     is stored separately — see line ~85)
  *  5. Persist
  *
- * TODO: when AuditLog port is added, log the override with both
- * the user-facing reason and the override reason.
  */
 
 import { Result } from "@/domain/shared/Result";
 import type { Order } from "@/domain/entities/Order";
 import type { IOrderRepository, OrderError } from "@/ports/repositories/OrderRepository";
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
+import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 export interface RefundOverrideInput {
   orderId: string;
+  actorId: string;         // admin user id from the session
   amountMinor: number;
-  reason: string;          // user-facing reason (the same field ProcessRefund uses)
-  overrideReason: string;  // internal reason (required, stored for audit)
+  reason: string;           // user-facing reason (the same field ProcessRefund uses)
+  overrideReason: string;   // internal reason (required, stored for audit)
 }
 
 export type RefundOverrideError =
@@ -50,6 +50,7 @@ export type RefundOverrideResult = Result<
 export interface RefundOverrideDeps {
   orderRepo: IOrderRepository;
   paymentGateway: IPaymentGateway;
+  recordAuditLog: RecordAuditLog;
 }
 
 export class RefundOverride {
@@ -105,6 +106,19 @@ export class RefundOverride {
     if (!persistResult.ok) {
       return Result.err(persistResult.error);
     }
+
+    // Audit log — best-effort. RecordAuditLog.useCase swallows errors.
+    await this.deps.recordAuditLog.execute({
+      actorId: input.actorId,
+      action: "refund.overridden",
+      targetType: "order",
+      targetId: order.id,
+      metadata: {
+        overrideReason: input.overrideReason,
+        amountMinor: input.amountMinor,
+        reason: input.reason,
+      },
+    });
 
     return Result.ok({
       order: persistResult.value,
