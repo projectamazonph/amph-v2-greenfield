@@ -2,11 +2,19 @@
 
 **Status:** Accepted (workaround) — 2026-07-20
 **Status:** Updated (fix landed) — 2026-07-20
+**Status:** Tightened (multi-URL, thresholded) — 2026-07-21
 **Context:** Lighthouse CI job was failing in the GitHub Actions runner.
 **Decision:** Disable the Lighthouse CI job and document the root cause. Fix properly in a follow-up using Next.js's `output: 'standalone'` configuration.
 **Supersedes:** None
 **Superseded by:** None
-**Fix:** PR #116 (`feat(ci): re-enable Lighthouse CI via output: 'standalone' (STORY-0026 fix)`) on 2026-07-20 added `output: 'standalone'` to `next.config.ts`, switched the build artifact to `.next/standalone`, and re-enabled the lighthouse job. Verified the standalone server boots cleanly with `node .next/standalone/server.js` and responds 200 on `/api/health`. The lighthouse job is currently a soft-pass (logs results, doesn't block); tighten the thresholds once a stable baseline exists.
+**Fix (PR #116):** added `output: 'standalone'` to `next.config.ts`, switched the build artifact to `.next/standalone`, and re-enabled the lighthouse job. Verified the standalone server boots cleanly with `node .next/standalone/server.js` and responds 200 on `/api/health`.
+
+**Tightening (PR #123):** the original job scored only the root URL with `|| true` (soft-pass at the wrapper level). The job's 404 result was silently masked by the soft-pass — so a real bug landed unnoticed: the `proxy.ts` placeholder from the greenfield bootstrap was redirecting `/` to `/signup`, making the marketing landing page (PR #110) unreachable. Tightening forced that bug into the open. The fix:
+  - New `.lighthouserc.json` with 4 canonical URLs (`/`, `/courses`, `/pricing`, `/login`), real assertion thresholds (a11y + SEO hard-error, perf + best-practices warning), and median aggregation.
+  - `src/proxy.ts`: removed the `/` → `/signup` redirect; the landing page is now reachable for unauthenticated visitors.
+  - Tripwire tests in `src/__tests__/proxy.test.ts` and `src/__tests__/lighthouserc.test.ts` so the change sticks.
+
+The wrapper still has `|| true` (a soft-pass at the shell level) so a regression on a new URL doesn't block the build on the first run; the assertion results still surface in the GitHub Actions summary. Tighten to a hard-fail (drop `|| true`) once the baseline is stable.
 
 ---
 

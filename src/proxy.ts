@@ -10,6 +10,13 @@
  * - Route protection (redirect unauthenticated users from /dashboard, /admin)
  * - JWT session verification (Story 013)
  *
+ * Note: `/` is the public marketing landing page (PR #110). It must
+ * render for unauthenticated visitors — the proxy never redirects
+ * the root. Earlier versions of this file did redirect `/` to
+ * `/signup`, which made the landing page unreachable and broke
+ * Lighthouse. The landing page itself includes sign-up CTAs; the
+ * proxy must not pre-empt that decision.
+ *
  * The session cookie is httpOnly, secure, sameSite=lax.
  * JWT payload: { sub: userId, sessionId, role: string }
  */
@@ -77,10 +84,8 @@ export async function proxy(request: NextRequest) {
     res.headers.set("x-amph-role", String(result.value.role ?? "STUDENT"));
   }
 
-  // ── Redirect root to signup ───────────────────────────────
-  if (pathname === "/") {
-    return NextResponse.redirect(new URL("/signup", request.url));
-  }
+  // No root redirect: `/` is the public marketing landing page
+  // and must render for unauthenticated visitors.
 
   return res;
 }
