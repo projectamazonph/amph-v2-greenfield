@@ -217,15 +217,42 @@ jobs:
       # generated client). Without this the lighthouse job's server
       # boots but immediately fails with "Could not find a production
       # build in the './.next' directory".
+      - name: Copy static assets into standalone bundle
+        # The standalone server reads static files from
+        # `.next/standalone/.next/static/` and `.next/standalone/public/`,
+        # NOT from the project root. Without this copy, every
+        # CSS chunk, font, and favicon 404s in production —
+        # including in the Lighthouse job, which surfaces as
+        # `errors-in-console` failures.
+        #
+        # Two follow-up paths:
+        #  (a) use `outputFileTracingIncludes` to bundle them
+        #      into the standalone output at build time
+        #  (b) move the copy into a `pnpm build:prod` script
+        # For now, an explicit cp is the simplest correct fix.
+        #
+        # public/ is optional (the repo doesn't currently ship
+        # one); we mkdir it as an empty dir so the server's
+        # static file route doesn't 404 on favicon.ico (Next.js
+        # still serves a default favicon, but having an empty
+        # public/ keeps the standalone bundle's expectations
+        # aligned with the docs).
+        run: |
+          mkdir -p .next/standalone/.next
+          cp -r .next/static .next/standalone/.next/static
+          mkdir -p .next/standalone/public
+          if [ -d public ]; then cp -r public/. .next/standalone/public/; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: build
           include-hidden-files: true
-          path: |
-            .next/standalone
-            .next/static
-            public
+          # `actions/upload-artifact@v4` zips the directory's
+          # CONTENTS (not the dir itself). The lighthouse job
+          # downloads the artifact and copies the contents into
+          # `.next/standalone/` where the server expects them
+          # (see the matching step in the lighthouse job).
+          path: .next/standalone
 
   # Lighthouse CI re-enabled (STORY-0026 follow-up).
   #
@@ -257,7 +284,29 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build
-          path: ./
+          # Download to a fresh dir, then move the standalone
+          # bundle contents into `.next/standalone/`. The reason
+          # this is structured this way:
+          #
+          #   - `actions/upload-artifact@v4` with `path: .next/standalone/`
+          #     zips the directory's CONTENTS (server.js, node_modules/, etc.)
+          #     into the artifact.
+          #   - `actions/download-artifact@v4` with `path: .next/`
+          #     extracts those contents to `.next/`, losing the dir name.
+          #   - We need the files at `.next/standalone/server.js` and
+          #     `.next/standalone/node_modules/...` for the server to boot
+          #     (the server's `opts.dir` is `.next/standalone/`).
+          #
+          # Downloading to a fresh dir, then `cp -r` the contents into
+          # the right place, is simpler and more reliable than trying to
+          # thread the trailing-slash semantics through both actions.
+          path: _artifact/
+
+      - name: Place standalone bundle in the expected location
+        run: |
+          mkdir -p .next
+          cp -r _artifact/. .next/standalone/
+          ls -la .next/standalone/ | head -10
 
       - name: Start standalone Next.js server
         run: |
