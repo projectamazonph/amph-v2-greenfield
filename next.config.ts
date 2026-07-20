@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
   // so the lighthouse job (and any other consumer) can start the
   // server without the broken pnpm-store symlinks in .next/.
   output: 'standalone',
+  // The generated Prisma client (query compiler WASM + generated JS)
+  // lives in node_modules/.prisma/client, a dot-prefixed directory that
+  // @prisma/client requires via a computed path rather than a literal
+  // string. @vercel/nft's static trace never sees it, so it's silently
+  // dropped from .next/standalone unless explicitly included here.
+  outputFileTracingIncludes: {
+    "/**": ["./node_modules/.prisma/client/**/*"],
+  },
 };
 
 export default withSentryConfig(nextConfig, {
