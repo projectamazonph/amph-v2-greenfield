@@ -92,6 +92,7 @@ function makeEnrollmentRepo(enrollment: Enrollment | null): IEnrollmentRepositor
     create: vi.fn(),
     findById: vi.fn(),
     findByUserId: vi.fn(),
+    findByCourseId: vi.fn(async () => Result.ok([])),
     findByUserIdAndCourseId: vi.fn(async () => enrollment),
     update: vi.fn(async (e: Enrollment) => Result.ok(e)),
   };

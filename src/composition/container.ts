@@ -122,6 +122,7 @@ import type { EmailVerificationRepository } from "@/ports/repositories/EmailVeri
 import { PrismaEmailVerificationRepository } from "@/infra/repositories/PrismaEmailVerificationRepository";
 import { PrismaPasswordResetRepository } from "@/infra/repositories/PrismaPasswordResetRepository";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
+import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
 import { ResetPassword } from "@/usecases/auth/ResetPassword";
 import type { PasswordResetRepository } from "@/ports/repositories/PasswordResetRepository";
@@ -192,6 +193,7 @@ import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
 import { UpdateLiveClass } from "@/usecases/UpdateLiveClass";
 import { DeleteLiveClass } from "@/usecases/DeleteLiveClass";
+import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -318,6 +320,8 @@ export interface AppContainer {
   // STORY-008: password reset
   requestPasswordReset: RequestPasswordReset;
   resetPassword: ResetPassword;
+  // P0-7: live class reminders (cron entry point)
+  sendLiveClassReminders: SendLiveClassReminders;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -352,6 +356,7 @@ function buildProductionContainer(): AppContainer {
   const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(prisma);
   const passwordResetRepo: PasswordResetRepository = new PrismaPasswordResetRepository(prisma);
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
+  const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
   // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
   const auditLog: IAuditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
@@ -588,6 +593,16 @@ function buildProductionContainer(): AppContainer {
       logger,
       email: emailSender,
       hasher: passwordHasher,
+    }),
+    // P0-7: live class reminders
+    sendLiveClassReminders: new SendLiveClassReminders({
+      liveClassRepo,
+      enrollmentRepo,
+      userRepo,
+      email: emailSender,
+      clock,
+      logger,
+      renderer: liveClassReminderRenderer,
     }),
   };
 }

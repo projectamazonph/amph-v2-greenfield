@@ -90,6 +90,7 @@ function buildEnrollmentRepo(
   return {
     findByUserIdAndCourseId: vi.fn(async () => enrollment),
     findByUserId: vi.fn(async () => Result.ok(enrollment ? [enrollment] : [])),
+    findByCourseId: vi.fn(async () => Result.ok([])),
     findById: vi.fn(async (): Promise<Result<Enrollment, { kind: "not_found" }>> =>
       enrollment
         ? Result.ok(enrollment)

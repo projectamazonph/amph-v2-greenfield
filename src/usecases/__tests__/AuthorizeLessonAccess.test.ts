@@ -138,6 +138,7 @@ describe("AuthorizeLessonAccess (P0-5: preview-leak fix)", () => {
       findByUserIdAndCourseId: vi.fn(),
       create: vi.fn(),
       findByUserId: vi.fn(),
+      findByCourseId: vi.fn(),
       findById: vi.fn(),
       update: vi.fn(),
     };
