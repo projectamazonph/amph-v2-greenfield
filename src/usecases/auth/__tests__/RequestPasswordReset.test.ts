@@ -164,4 +164,51 @@ describe("RequestPasswordReset", () => {
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_failed");
   });
+
+  // ── additional error paths (STORY-010) ─────────────────
+
+  it("returns rate_limited when the IP rate limit is hit (not the email)", async () => {
+    // Block the IP key, not the email key.
+    rateLimiter.blockKey("ip:9.9.9.9");
+    const result = await useCase.execute({
+      email: "alice@example.com",
+      ip: "9.9.9.9",
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("rate_limited");
+    if (result.error.kind === "rate_limited") {
+      expect(result.error.resetAt).toBeInstanceOf(Date);
+    }
+  });
+
+  it("returns sent: true when the token create fails (DB down) — don't leak the error", async () => {
+    // The use case intentionally maps a token-create failure to
+    // sent: true to prevent email enumeration. The user gets the
+    // same response whether or not their account exists.
+    const flakyRepo = new (class extends InMemoryPasswordResetRepository {
+      override async create() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
+      }
+    })();
+    const failingUseCase = new RequestPasswordReset({
+      users,
+      passwordResets: flakyRepo,
+      email: emailSender,
+      rateLimiter,
+      clock,
+      ids: idGen,
+      logger: new SilentLogger(),
+    });
+    await seedUser();
+    const result = await failingUseCase.execute({
+      email: "alice@example.com",
+      ip: "1.2.3.4",
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.sent).toBe(true);
+    // No email was sent because the create failed
+    expect(emailSender.sent).toHaveLength(0);
+  });
 });

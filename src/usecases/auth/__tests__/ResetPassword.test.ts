@@ -163,4 +163,83 @@ describe("ResetPassword", () => {
     if (result.ok) return;
     expect(result.error.kind).toBe("weak_password");
   });
+
+  // ── additional error paths (STORY-010) ─────────────────
+
+  it("returns weak_password when the new password is long enough but doesn't meet the score threshold", async () => {
+    // Length 12 but only one of: uppercase, digit, symbol.
+    // "onlylowercase" has length >= 12, but no uppercase/digit/symbol,
+    // so score is 1 (length>=8 + length>=12 = 2... actually 2 < 3).
+    // Let's try something more carefully tuned:
+    // "longlowercase" (13 chars, no upper, no digit, no symbol) →
+    //   score = +1 (>=8) +1 (>=12) = 2 < 3 → weak_password via the
+    //   score branch (not the length branch).
+    const { rawToken } = await seedUserAndToken();
+    const result = await useCase.execute({
+      token: rawToken,
+      newPassword: "longlowercase", // 13 chars, no upper, no digit, no symbol
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("weak_password");
+    if (result.error.kind === "weak_password") {
+      expect(result.error.score).toBeLessThan(3);
+    }
+  });
+
+  it("returns db_error when the hasher fails (defensive branch)", async () => {
+    const { rawToken } = await seedUserAndToken();
+    const failingHasher = new (class extends StubPasswordHasher {
+      override async hash() {
+        return Result.err(new Error("argon2 OOM") as never);
+      }
+    })();
+    const failingUseCase = new ResetPassword({
+      users,
+      passwordResets,
+      sessions: new InMemorySessionRepository(),
+      clock,
+      logger: new SilentLogger(),
+      email: emailSender,
+      hasher: failingHasher,
+    });
+    const result = await failingUseCase.execute({
+      token: rawToken,
+      newPassword: "newSecret123",
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("db_error");
+    if (result.error.kind === "db_error") {
+      expect(result.error.message).toMatch(/hash/i);
+    }
+  });
+
+  it("returns db_error when users.update fails (defensive branch)", async () => {
+    const { rawToken } = await seedUserAndToken();
+    const flakyUsers = new (class extends InMemoryUserRepository {
+      override async update() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
+      }
+    })();
+    const failingUseCase = new ResetPassword({
+      users: flakyUsers,
+      passwordResets,
+      sessions: new InMemorySessionRepository(),
+      clock,
+      logger: new SilentLogger(),
+      email: emailSender,
+      hasher,
+    });
+    const result = await failingUseCase.execute({
+      token: rawToken,
+      newPassword: "newSecret123",
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("db_error");
+    if (result.error.kind === "db_error") {
+      expect(result.error.message).toMatch(/update/i);
+    }
+  });
 });
