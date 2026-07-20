@@ -5,7 +5,7 @@
 - **Story**: STORY-026
 - **Sprint**: 6 — Lesson Delivery + Progress
 - **Points**: 1
-- **Status**: Pending
+**Status:** ✅ Done (PR #26, commit `9b0d0d6` — `feat(story-026): Lesson page (RSC + MDX render)`)
 
 ## Overview
 

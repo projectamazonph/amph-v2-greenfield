@@ -5,7 +5,7 @@
 - **Story**: STORY-025
 - **Sprint**: 5 — Enrollment + Access Policy
 - **Points**: 1
-- **Status**: Pending
+**Status:** ✅ Done (PR #25, commit `88017d8` — `feat(story-025): RequestRefund use case`; note: the `/api/refunds` route from the spec title is not yet wired — admin processing is in STORY-031/049)
 
 ## Overview
 

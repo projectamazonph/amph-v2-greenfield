@@ -5,6 +5,7 @@
 **Epic:** Admin panel
 **Depends on:** STORY-046 (admin shell), STORY-047 (admin users list pattern)
 **Blocks:** STORY-048b (modules CRUD + reorder), STORY-048c (lessons CRUD + MDX editor)
+**Status:** ✅ Done (PR #048a, commit `0a038f9` — `feat(admin): STORY-048a admin courses CRUD (no modules/lessons editing yet)`; `src/app/admin/courses/` lives)
 
 ## Goal
 

@@ -11,7 +11,7 @@
 - **Story**: STORY-049
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-- **Status**: Pending (detailed acceptance criteria below)
+**Status:** ✅ Done (PR #049, commit `4235d5d` — `feat(admin): STORY-049 admin payments + refunds + refund override`)
 
 ## Goal
 

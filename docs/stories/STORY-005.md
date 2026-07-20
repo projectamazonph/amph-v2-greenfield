@@ -5,6 +5,7 @@
 **Epic:** Test infrastructure
 **Owner:** Ryan
 **Dependencies:** STORY-004
+**Status:** ✅ Done (shipped in initial greenfield bootstrap; Playwright signup happy-path test lives at `tests/e2e/signup.spec.ts`)
 
 ## Goal
 

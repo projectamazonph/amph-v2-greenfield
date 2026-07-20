@@ -5,6 +5,7 @@
 **Epic:** Foundation
 **Owner:** Ryan
 **Dependencies:** none
+**Status:** ✅ Done (shipped in initial greenfield bootstrap; see `docs/sprint-1/PLAN.md` for the commit list)
 
 ## Goal
 

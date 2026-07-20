@@ -5,6 +5,7 @@
 **Epic:** Auth
 **Owner:** Ryan
 **Dependencies:** STORY-006
+**Status:** ✅ Done (PR #107, commit `df775ba` — `feat(auth): STORY-007 email verification + STORY-008 password reset`; `VerifyEmail` + `ResendVerification` use cases + `/verify-email` + `/verify-email/sent` pages)
 
 ## Goal
 

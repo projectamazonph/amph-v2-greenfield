@@ -5,6 +5,7 @@
 **Epic:** Auth
 **Owner:** Ryan
 **Dependencies:** STORY-002
+**Status:** ✅ Done (shipped in initial greenfield bootstrap; `SignUp` use case lives at `src/usecases/SignUp.ts` with 16 tests)
 
 ## Goal
 

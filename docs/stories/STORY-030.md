@@ -5,7 +5,7 @@
 - **Story**: STORY-030
 - **Sprint**: 6 — Lesson Delivery + Progress
 - **Points**: 1
-- **Status**: In Progress
+**Status:** ✅ Done (PR #30, commit `0a52922` — `feat(story-030): Module progress + next-lesson nav + CourseCompleteView`)
 
 ## Overview
 

@@ -5,6 +5,7 @@
 **Epic:** Admin panel
 **Depends on:** STORY-046-prep-1 (tokens), STORY-046-prep-2 (`requireAdmin`), STORY-046-prep-3 (component library)
 **Blocks:** STORY-047, STORY-048, STORY-049, STORY-050 (all admin pages)
+**Status:** ✅ Done (PR #046, commit `b2592cd` — `feat(admin): STORY-046 admin layout + dashboard`; `src/app/admin/layout.tsx` + `src/app/admin/page.tsx` live)
 
 ## Goal
 

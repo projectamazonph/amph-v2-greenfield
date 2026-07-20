@@ -2,6 +2,9 @@
 
 ## Story
 
+
+**Status:** ✅ Done (PR #100, commit `49b5bb1` — same PR; `src/lib/withActionTracing.ts` + `PinoLogger` in `src/infra/observability/` + `TestLogger` in the test container)
+
 As an operator, I want structured, redacted logs from every server action and use case, so I can debug production issues without leaking PII or credentials.
 
 ## Acceptance criteria

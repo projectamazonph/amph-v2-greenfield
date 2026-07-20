@@ -11,7 +11,7 @@
 - **Story**: STORY-050e
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-- **Status**: Pending (split from original STORY-050)
+**Status:** ✅ Done (PR #050e, commit `982c67f` — `feat(admin): STORY-050e — badge admin CRUD + settings`)
 
 ## Why split
 

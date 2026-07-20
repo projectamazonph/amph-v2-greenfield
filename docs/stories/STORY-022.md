@@ -5,7 +5,7 @@
 - **Story**: STORY-022
 - **Sprint**: 5 — Enrollment + Access Policy
 - **Points**: 1
-- **Status**: Pending
+**Status:** ✅ Done (PR #22, commit `e5c2df6` — `feat(story-022): AccessPolicy port + TierAccessPolicy implementation`)
 
 ## Overview
 

@@ -5,6 +5,7 @@
 **Epic:** UI foundation
 **Depends on:** nothing
 **Blocks:** STORY-046-prep-2, STORY-046-prep-3, STORY-046, all Sprint 10+ UI work
+**Status:** ✅ Done (initial greenfield bootstrap; `src/styles/globals.css` holds the Field Manual design tokens; `next/font` loads Space Grotesk + JetBrains Mono)
 
 ## Goal
 

@@ -5,6 +5,7 @@
 **Epic:** Auth + infrastructure
 **Owner:** Ryan
 **Dependencies:** STORY-008
+**Status:** ✅ Done (`src/lib/auth.ts` + `src/middleware.ts` landed; see also `docs/sprint-11/UI-WIRING-PLAN.md` for the admin gating work)
 
 ## Goal
 

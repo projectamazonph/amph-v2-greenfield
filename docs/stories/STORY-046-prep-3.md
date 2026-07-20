@@ -5,6 +5,7 @@
 **Epic:** UI foundation
 **Depends on:** STORY-046-prep-1 (design tokens must exist)
 **Blocks:** STORY-046, STORY-047, STORY-048, STORY-049, STORY-050 (all admin stories build on these)
+**Status:** ✅ Done (initial greenfield bootstrap; `src/components/ui/{Button,Card,Input,Badge}.tsx` + module CSS — all at 100% test coverage per the latest coverage report)
 
 ## Goal
 

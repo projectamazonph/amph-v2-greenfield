@@ -2,6 +2,9 @@
 
 ## Story
 
+
+**Status:** ✅ Done (PR #116, commit `afd4984` — `fix(ci): re-enable Lighthouse CI via output: 'standalone' (STORY-0026 fix)`; the lighthouse job now runs on every PR, currently soft-pass — hard-fail toggle tracked as a follow-up)
+
 As a product owner, I want Lighthouse CI to run on every PR and Web Vitals to be reported in production, so we catch performance regressions before launch.
 
 ## Acceptance criteria

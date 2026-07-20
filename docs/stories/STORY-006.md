@@ -5,6 +5,7 @@
 **Epic:** Auth
 **Owner:** Ryan
 **Dependencies:** STORY-005
+**Status:** ✅ Done (PR #107, commit `df775ba` — `feat(auth): STORY-007 email verification + STORY-008 password reset` covered this implicitly; `Login` + `Logout` use cases + `/api/auth/logout` route + cookie helpers all shipped. Auth test coverage in PR #119.)
 
 ## Goal
 

@@ -1,11 +1,11 @@
 # Layer wiring — current reality
 
-The five layers as they are actually wired in `src/composition/container.ts` today, including the two production gaps documented in `CLAUDE.md`: `courseRepo`/`orderRepo` resolve to in-memory implementations, and the PayMongo webhook route never touches the container at all.
+The five layers as they are actually wired in `src/composition/container.ts` today, including the remaining production gap: `orderRepo` resolves to `InMemoryOrderRepository`, and the PayMongo webhook route never touches the container at all. `courseRepo` was migrated to `PrismaCourseRepository` in PR #89.
 
 ```mermaid
 flowchart TB
   subgraph APP["src/app — Next.js App Router"]
-    PAGES["Pages (RSC)\n7 routes built"]
+    PAGES["Pages (RSC)\n~48 routes built\n(20 student-facing + 28 admin)"]
     ACTIONS["Server actions\nsrc/app/actions/*.ts"]
     WEBHOOK["Route handler\n/api/webhooks/paymongo"]
   end
@@ -43,4 +43,4 @@ flowchart TB
   class WEBHOOK,FAKE gap
 ```
 
-Dashed red = the known gap. **courseRepo** and **orderRepo** resolve to `InMemory*` inside `buildProductionContainer()` — courses and orders are not Postgres-backed in production yet. The webhook route re-instantiates its own `InMemory*` repos per request, so it cannot see orders created anywhere else in the app (there's a literal `TODO: wire Prisma* repos in STORY-023 follow-up` in that file).
+Dashed red = the known gap. **orderRepo** still resolves to `InMemoryOrderRepository` inside `buildProductionContainer()` — orders are not yet Postgres-backed in production. `courseRepo` was migrated to `PrismaCourseRepository` in PR #89 (part of the P0-2 in-memory→Prisma sweep; see the `tests/integration/container-uses-prisma-course.test.ts` regression guard). The webhook route re-instantiates its own `InMemory*` repos per request, so it cannot see orders created anywhere else in the app — this remains a follow-up to land `PrismaOrderRepository` + thread the container through the webhook handler.

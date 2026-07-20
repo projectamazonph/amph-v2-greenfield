@@ -5,7 +5,7 @@
 - **Story**: STORY-028
 - **Sprint**: 6 — Lesson Delivery + Progress
 - **Points**: 1
-- **Status**: In Progress
+**Status:** ✅ Done (PR #28, commit `63fa4c7` — `feat(story-028): XPService + AwardXP use case`)
 
 ## Overview
 
