@@ -5,7 +5,7 @@
 - **Story**: STORY-029
 - **Sprint**: 6 — Lesson Delivery + Progress
 - **Points**: 1
-- **Status**: In Progress
+**Status:** ✅ Done (PR #29, commit `2a1d7c9` — `feat(story-029): StreakService + RecordStreakVisit use case`)
 
 ## Overview
 

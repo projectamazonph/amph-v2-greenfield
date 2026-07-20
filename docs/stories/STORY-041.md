@@ -5,7 +5,7 @@
 - **Story**: STORY-041
 - **Sprint**: 9 — Certificates + Email
 - **Points**: 1
-- **Status**: In Progress
+**Status:** ✅ Done (PR #41, commit `650cccd` — `feat(story-041): Certificate model + repo + IssueCertificate use case`)
 
 ## Overview
 

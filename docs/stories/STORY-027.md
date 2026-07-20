@@ -5,7 +5,7 @@
 - **Story**: STORY-027
 - **Sprint**: 6 — Lesson Delivery + Progress
 - **Points**: 1
-- **Status**: Pending
+**Status:** ✅ Done (PR #27, commit `5a7a9e2` — `feat(story-027): MarkLessonComplete use case + ProgressEvent log`)
 
 ## Overview
 

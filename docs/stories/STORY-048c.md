@@ -11,7 +11,7 @@
 - **Story**: STORY-048c
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-- **Status**: Pending (placeholder doc; detailed acceptance criteria below)
+**Status:** ✅ Done (PR #048c, commit `2a940f8` — `feat(admin): STORY-048c admin lessons CRUD + JSON content editor`)
 
 ## Goal
 

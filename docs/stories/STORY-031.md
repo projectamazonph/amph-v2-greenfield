@@ -5,7 +5,7 @@
 - **Story**: STORY-031
 - **Sprint**: 7 — Quizzes + Gamification
 - **Points**: 2
-- **Status**: In Progress
+**Status:** ✅ Done (PR #31, commit `6dc82df` — `feat(story-031): Quiz + QuizAttempt models + repositories`)
 
 ## Overview
 

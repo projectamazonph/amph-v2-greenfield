@@ -5,6 +5,7 @@
 **Epic:** Admin panel
 **Depends on:** STORY-046 (admin shell + dashboard), STORY-046-prep-1/2/3
 **Blocks:** STORY-048, STORY-049, STORY-050 (all admin pages assume user list/detail UX)
+**Status:** ✅ Done (PR #047, commit `de17fc2` — `feat(admin): STORY-047 admin users list + user detail + impersonate`; `src/app/admin/users/` + `src/usecases/ImpersonateUser.ts` live)
 
 ## Goal
 

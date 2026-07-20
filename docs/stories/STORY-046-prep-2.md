@@ -5,6 +5,7 @@
 **Epic:** UI foundation
 **Depends on:** STORY-046-prep-1 (no, actually depends on existing `JoseJwtService` from STORY-013)
 **Blocks:** STORY-046, STORY-047 (admin users list), any future page that needs to know who's logged in
+**Status:** ✅ Done (initial greenfield bootstrap; `src/lib/auth.ts` is the canonical session helper)
 
 ## Goal
 

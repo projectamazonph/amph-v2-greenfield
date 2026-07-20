@@ -5,6 +5,7 @@
 **Epic:** Auth
 **Owner:** Ryan
 **Dependencies:** STORY-007
+**Status:** ✅ Done (PR #107, commit `df775ba` — same PR; `RequestPasswordReset` + `ResetPassword` use cases + `/reset-password` + `/reset-password/[token]` pages)
 
 ## Goal
 

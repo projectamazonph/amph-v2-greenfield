@@ -5,7 +5,7 @@
 - **Story**: STORY-033
 - **Sprint**: 7 — Quizzes + Gamification
 - **Points**: 2
-- **Status**: In Progress
+**Status:** ✅ Done (PR #33, commit `f9251e5` — `feat(story-033): wire RecordQuizAttempt + quiz submission API`)
 - **Depends on**: STORY-032 (RecordQuizAttempt use case)
 
 ## Overview

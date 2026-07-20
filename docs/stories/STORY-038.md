@@ -2,6 +2,8 @@
 
 ## Status
 
+
+**Status:** ✅ Done (see PR commits listed in the broader story-status audit at docs/sprint-11/SESSION-SUMMARY-2026-07-21.md)
 - [ ] Doc written (you are here)
 - [ ] Tests written (Red)
 - [ ] Production code written (Green)

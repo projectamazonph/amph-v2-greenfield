@@ -5,7 +5,7 @@
 - **Story**: STORY-035
 - **Sprint**: 8 — Gamification / Badges + Certificates
 - **Points**: 2
-- **Status**: In Progress
+**Status:** ✅ Done (PR #35, commit `7abf074` — `feat(story-035): badge system — domain, use cases, wiring`)
 
 ## Overview
 

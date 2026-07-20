@@ -11,7 +11,7 @@
 - **Story**: STORY-050c
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-- **Status**: Pending (split from original STORY-050)
+**Status:** ✅ Done (PR #050c, commit `3ad1b60` — `feat(admin): STORY-050c live class CRUD`)
 
 ## Why split
 

@@ -11,7 +11,7 @@
 - **Story**: STORY-050a
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-- **Status**: Pending (split from original STORY-050 per the plan's "When a Story Splits" rule)
+**Status:** ✅ Done (PR #050a, commit `e9b5caa` — `feat(admin): STORY-050a audit log port + write sites`)
 
 ## Why split STORY-050
 

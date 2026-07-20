@@ -5,6 +5,7 @@
 **Epic:** Auth
 **Owner:** Ryan
 **Dependencies:** STORY-003
+**Status:** ✅ Done (shipped in initial greenfield bootstrap; `src/app/actions/signup.action.ts` + `src/app/signup/page.tsx`)
 
 ## Goal
 

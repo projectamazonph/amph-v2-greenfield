@@ -11,7 +11,7 @@
 - **Story**: STORY-048b
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-- **Status**: Pending (placeholder doc; detailed acceptance criteria below)
+**Status:** ✅ Done (PR #048b, commit `4c3102a` — `feat(admin): STORY-048b admin modules CRUD + reorder`)
 
 ## Goal
 

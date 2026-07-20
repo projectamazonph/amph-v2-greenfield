@@ -5,7 +5,7 @@
 - **Story**: STORY-034
 - **Sprint**: 8 — Maintenance / Tech Debt
 - **Points**: 1
-- **Status**: In Progress
+**Status:** ✅ Done (no separate PR; the listed errors in AwardXP.ts, RecordStreakVisit.ts, PrismaXPEventRepository.ts are gone as of the present typecheck, which is clean)
 
 ## Overview
 

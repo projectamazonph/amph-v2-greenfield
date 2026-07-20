@@ -11,7 +11,7 @@
 - **Story**: STORY-050b
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-- **Status**: In progress (split from original STORY-050)
+**Status:** ✅ Done (PR #050b, commit `26bfeaa` — `feat(admin): STORY-050b simulator scenarios CRUD`)
 
 ## Goal
 

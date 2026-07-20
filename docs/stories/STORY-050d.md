@@ -11,7 +11,7 @@
 - **Story**: STORY-050d
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-- **Status**: Pending (split from original STORY-050)
+**Status:** ✅ Done (PR #050d, commit `94fff2d` — `feat(admin): STORY-050d — discount code admin CRUD`)
 
 ## Why split
 

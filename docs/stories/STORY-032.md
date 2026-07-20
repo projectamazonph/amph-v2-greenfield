@@ -5,7 +5,7 @@
 - **Story**: STORY-032
 - **Sprint**: 7 — Quizzes + Gamification
 - **Points**: 2
-- **Status**: In Progress
+**Status:** ✅ Done (PR #32, commit `6321d5e` — `feat(story-032): RecordQuizAttempt use case`)
 
 ## Overview
 

@@ -5,6 +5,7 @@
 **Epic:** Foundation
 **Owner:** Ryan
 **Dependencies:** STORY-001
+**Status:** ✅ Done (shipped in initial greenfield bootstrap; `prisma/schema.prisma` + `UserRepository` + `InMemoryUserRepository` all landed)
 
 ## Goal
 

@@ -2,6 +2,9 @@
 
 ## Story
 
+
+**Status:** ✅ Done (PR #100, commit `49b5bb1` — `Sprint 11: observability, rate limiting, and critical-journey coverage`; `src/sentry.{client,server,edge}.config.ts` + `instrumentation.ts` + `withSentryConfig` wiring in `next.config.ts` all landed; lazy/no-op when DSN is empty so local + CI builds still succeed)
+
 As an operator, I want errors in production to be captured by Sentry with source maps, so I can diagnose issues without asking users to reproduce them.
 
 ## Acceptance criteria

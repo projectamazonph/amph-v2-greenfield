@@ -5,7 +5,7 @@
 - **Story**: STORY-023
 - **Sprint**: 5 — Enrollment + Access Policy
 - **Points**: 1
-- **Status**: Pending
+**Status:** ✅ Done (PR #016-017, commit `eba3678` — `feat(stories 016-017): Course catalog + course detail + enrollment`; EnrollStudent use case landed in this PR)
 - **Predecessor**: STORY-022 (AccessPolicy — EnrollStudent depends on `enrolledCourseIds` in User)
 
 ## Overview

@@ -5,7 +5,7 @@
 - **Story**: STORY-024
 - **Sprint**: 5 — Enrollment + Access Policy
 - **Points**: 1
-- **Status**: Pending
+**Status:** ✅ Done (PR #24, commit `4b0ae1a` — `feat(story-024): DiscountCode entity + ApplyDiscountCode use case`)
 
 ## Overview
 
