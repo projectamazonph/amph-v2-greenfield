@@ -82,10 +82,11 @@ describe("JoseJwtService (integration)", () => {
     expect(sign.ok).toBe(true);
     if (!sign.ok) return;
     const parts = sign.value.split(".");
-    // Flip the last character of the signature.
-    const lastChar = parts[2]!.slice(-1);
-    const flipped = lastChar === "A" ? "B" : "A";
-    const tampered = `${parts[0]}.${parts[1]}.${parts[2]!.slice(0, -1)}${flipped}`;
+    // Replace the entire signature with a different (definitely
+    // invalid) base64url string. Flipping a single character was
+    // flaky because by rare chance the new char could decode to a
+    // valid (but different) signature.
+    const tampered = `${parts[0]}.${parts[1]}.${"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}`;
 
     const verify = await svc.verify(tampered);
     expect(verify.ok).toBe(false);
