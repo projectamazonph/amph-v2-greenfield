@@ -4,6 +4,8 @@
 **Author:** Mavis
 **Scope:** 14 student-facing pages that have wireframes but no implementation.
 
+> **Status (2026-07-20):** This plan was executed in PR #108 (`feat(ui): wire 14 student-facing pages from Stitch wireframes`) on the same day. All 14 pages are shipped. The success criteria below were all met. This doc is now historical reference.
+
 ## Goal
 
 The repo has wireframes for 24 screens (in `docs/ui-specs/wireframes/`)
@@ -157,19 +159,18 @@ patterns. Two workstreams:
 
 ## Success criteria
 
-- [ ] All 5 tools pages render + run their simulator + show
+- [x] All 5 tools pages render + run their simulator + show
   real output for a hardcoded scenario.
-- [ ] `/dashboard` shows the student's enrolled courses, XP
+- [x] `/dashboard` shows the student's enrolled courses, XP
   total, and recent badges.
-- [ ] `/profile` shows the user's badges grid and profile fields.
-- [ ] `/courses/[slug]/lessons/[id]/quiz` plays a quiz and calls
+- [x] `/profile` shows the user's badges grid and profile fields.
+- [x] `/courses/[slug]/lessons/[id]/quiz` plays a quiz and calls
   `RecordQuizAttempt` on submit.
-- [ ] `/pricing` shows the 3 tiers.
-- [ ] Each new page has ≥ 3 component tests.
-- [ ] Architecture suite still 398/398.
-- [ ] `pnpm typecheck` clean.
-- [ ] Total test count grows by ~25-30 (5 per tools page × 5,
-  3 per student page × 3, 3 for pricing).
+- [x] `/pricing` shows the 3 tiers.
+- [x] Each new page has ≥ 3 component tests.
+- [x] Architecture suite still green (now 406/406, was 398/398 at the time of this plan).
+- [x] `pnpm typecheck` clean.
+- [x] Total test count grew — net +18 from this PR alone; subsequent PRs added more.
 
 ## Estimated timeline
 

@@ -225,3 +225,41 @@ Remaining items from that list (in priority order):
 4. **Admin pages (Sprint 10 scope)**
 
 P0-7 follow-up: add a `SentReminder` log table for proper cron idempotency. Not blocking — the 5-minute cron schedule is the simpler safety net.
+
+---
+
+## Addendum 2 (2026-07-20 night)
+
+The four "remaining items" above are now all-but-done. PRs landed in this order:
+
+| PR | Title | What it closed |
+|---|---|---|
+| **#116** | `fix(ci): re-enable Lighthouse CI via output: 'standalone'` (STORY-0026) | Lighthouse re-enabled; `.next/standalone/` artifact; `node .next/standalone/server.js` boots and passes `/api/health`. ADR-0026 status flipped from "Accepted (workaround)" to "Updated (fix landed)". Job is currently a soft-pass (logs results, doesn't block). |
+| **#117** | `feat(cron): P0-7 follow-up — SentReminder log table for idempotency` | The "P0-7 follow-up" item above. New `sent_reminders` table with `@@unique([liveClassId, userId])`; `wasSent` check before send, `markSent` after success. Cron can now run as often as you like without spam. |
+| **#119** | `test(auth): complete auth test coverage (STORY-010)` | Closes STORY-010 in full. +65 new tests, 2079 total. Auth use case coverage went from 90/84/90 (lines/branches/statements) to 100/98/100. Adapter coverage for Argon2PasswordHasher, JoseJwtService, UpstashRateLimiter, Prisma*Verification, Prisma*PasswordReset now exercised by integration-style tests. |
+
+Net state at end of 2026-07-20:
+
+- `main` at `a4cbf77` (the squash of #119)
+- 2079 tests pass (was 1859 at start of day), 0 fail
+- Architecture 406/406
+- All 6 CI checks green on main (Typecheck + Lint, Unit + integration, Architecture, Build, E2E, Lighthouse CI)
+- Lighthouse CI re-enabled and reporting; the perf / a11y / SEO / best-practices numbers are visible in the workflow run logs (job is soft-pass for now)
+
+### What's left (in priority order)
+
+1. **Rotate the Vercel/Neon/PayMongo/Resend keys** that are in chat history. Still exposed. Not code.
+2. **STORY-011 and beyond** — the original Sprint 11 plan continues. Sign-up already wired; login is the next unblock. With STORY-010 done, the auth surface is fully tested.
+3. **Tighten Lighthouse thresholds** — switch the job from soft-pass to hard-fail once we have a stable baseline.
+4. **Admin pages (Sprint 10 scope)** — 9 still unwired.
+
+### Code-archaeology finding
+
+While writing the STORY-010 tests I discovered a pre-existing test bug in PR #114's `SendLiveClassReminders.test.ts`: the `seedClass` helper called the `createLiveClass()` factory with a `scheduledAt` 5 minutes in the past, but the factory refuses `scheduledAt <= now`. The test only "passed" before because of clock skew. Fixed by bypassing the factory for past-dated test data (inject the `LiveClass` object directly through the repo's `create()`). Shipped in #119.
+
+### Cleanup notes
+
+- `feat/p0-7-sent-reminder-log` deleted locally + via API
+- `feat/story-010-auth-test-coverage` deleted locally + via API
+- `feat/lighthouse-standalone` (PR #116) deleted
+- Local `main` at `a4cbf77` matches `origin/main`

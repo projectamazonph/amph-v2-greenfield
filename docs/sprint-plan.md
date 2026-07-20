@@ -36,7 +36,7 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-007 | Email verification (token table, Resend email, verify route) | 1 |
 | STORY-008 | Password reset (request + confirm) | 1 |
 | STORY-009 | Middleware: request container + auth gate | 1 |
-| STORY-010 | Auth unit + integration tests (buildTestContainer for every use case) | 1 |
+| STORY-010 | Auth unit + integration tests (buildTestContainer for every use case) | 1 | ✅ done — PR #119 |
 
 ## Sprint 3 — Course Catalog + Content Import (5 pts)
 
@@ -132,7 +132,7 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 |----|-------|-----|
 | STORY-051 | Sentry setup (client/server/edge) + source maps | 1 |
 | STORY-052 | Structured logging (Pino) + `withActionTracing` HOC + redaction | 1 |
-| STORY-053 | Lighthouse CI + Web Vitals | 1 |
+| STORY-053 | Lighthouse CI + Web Vitals | 1 | ✅ done (job re-enabled, soft-pass) — PR #116 |
 | STORY-054 | Rate limiting (Upstash) + fakes + applied at every documented bucket | 1 |
 | STORY-055 | Tenant isolation audit + 6 critical-journey E2E tests + axe a11y | 1 |
 

@@ -213,16 +213,25 @@ app/         → usecases/ → ports/ ← infra/
 
 ---
 
-## ADR-022: Lighthouse CI — Diagnose and Document (Workaround: Disabled)
+## ADR-022: Lighthouse CI — Diagnose, Document, and Re-enable
 
 **Status:** Accepted (workaround) — 2026-07-20
+**Status:** Implemented (fix landed) — 2026-07-20
 **See:** [`docs/adr/0026-lighthouse-ci-disabled.md`](adr/0026-lighthouse-ci-disabled.md) for the full diagnosis.
 
 **Context:** Lighthouse CI was failing in CI due to a Next.js 16 + Turbopack bundler artifact issue (broken symlinks in `.next/node_modules/@*/client-<hash>` pointing to pnpm-store paths outside the artifact). Eight fix attempts did not make progress.
 
-**Decision:** Disable the Lighthouse CI job. Re-enable it once `next.config.ts` is updated to use `output: 'standalone'`, which produces a self-contained artifact that doesn't rely on pnpm-store symlinks.
+**Decision (initial, 2026-07-20):** Disable the Lighthouse CI job. Re-enable it once `next.config.ts` is updated to use `output: 'standalone'`, which produces a self-contained artifact that doesn't rely on pnpm-store symlinks.
 
-**Consequences:**
-- Lighthouse checks don't run on every PR. Performance and a11y regressions are caught by manual runs against the Vercel deployment.
-- The handoff is unblocked. PR #101 (E2E fix) merges cleanly.
-- The fix is small and tracked in the ADR.
+**Decision (implemented, 2026-07-20 evening):** Added `output: 'standalone'` to `next.config.ts`. Updated the build job to upload `.next/standalone + .next/static + public`. Updated the lighthouse job to download the artifact, start `node .next/standalone/server.js`, wait for `/api/health`, and run `lhci autorun`. The job is currently a soft-pass (logs results, doesn't fail the build) until we have a stable baseline; tighten to hard-fail once the numbers stabilize.
+
+**Consequences (initial):**
+- Lighthouse checks didn't run on every PR. Performance and a11y regressions were caught by manual runs against the Vercel deployment.
+- The handoff was unblocked. PR #101 (E2E fix) merged cleanly.
+
+**Consequences (after fix):**
+- Lighthouse checks now run on every PR. Perf / a11y / SEO / best-practices regressions are caught automatically.
+- The CI artifact (`.next/standalone/`) is the same shape Vercel uses in production, so what we measure locally is what users see.
+- The job is soft-pass for now — false positives on a hard-fail job would be worse than no check. Once a baseline exists, the thresholds can be tightened.
+
+**PR:** #116 (`fix(ci): re-enable Lighthouse CI via output: 'standalone' (STORY-0026 fix)`).
