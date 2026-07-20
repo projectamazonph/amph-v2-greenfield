@@ -89,13 +89,18 @@ export class InMemoryUserRepository implements UserRepository {
       bio: string;
       enrolledCourseIds: readonly string[];
       emailVerifiedAt: Date | null;
+      passwordHash: string;
     }>,
   ): Promise<Result<User, UserError>> {
     const user = this.users.get(id);
     if (!user) return Result.err({ kind: "not_found" });
 
-    const updated = Object.freeze({ ...user, ...patch });
+    const { passwordHash, ...userPatch } = patch;
+    const updated = Object.freeze({ ...user, ...userPatch });
     this.users.set(id, updated);
+    if (passwordHash) {
+      this.passwordHashes.set(id, passwordHash);
+    }
     return Result.ok(updated);
   }
 

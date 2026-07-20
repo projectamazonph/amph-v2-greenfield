@@ -91,12 +91,17 @@ export class PrismaUserRepository implements UserRepository {
       bio: string;
       enrolledCourseIds: string[];
       emailVerifiedAt: Date | null;
+      passwordHash: string;
     }>,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {
+      // Map the passwordHash patch field to Prisma's `password` column.
+      const { passwordHash, ...rest } = patch;
+      const data: Record<string, unknown> = { ...rest };
+      if (passwordHash !== undefined) data["password"] = passwordHash;
       const row = await this.db.user.update({
         where: { id },
-        data: patch,
+        data,
       });
       return Result.ok(this.mapRow(row));
     } catch (err: unknown) {

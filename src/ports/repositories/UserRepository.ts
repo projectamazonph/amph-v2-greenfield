@@ -67,6 +67,11 @@ export interface UserRepository {
        * VerifyEmail use case after a successful token exchange.
        */
       emailVerifiedAt: Date | null;
+      /**
+       * STORY-008: replace the password hash. Set by the
+       * ResetPassword use case after a successful token exchange.
+       */
+      passwordHash: string;
     }>,
   ): Promise<Result<User, UserError>>;
 

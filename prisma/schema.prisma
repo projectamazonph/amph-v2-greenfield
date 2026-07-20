@@ -88,6 +88,7 @@ model User {
   ppcCampaigns PpcCampaign[]
   certificates Certificate[]
   emailVerifications EmailVerification[]
+  passwordResets PasswordReset[]
 
   @@index([email])
   @@index([paymongoCustomerId])
@@ -488,4 +489,20 @@ model EmailVerification {
   @@index([userId])
   @@index([tokenHash])
   @@map("email_verifications")
+}
+
+// ── Password reset (STORY-008) ───────────────────────────────────
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_resets")
 }

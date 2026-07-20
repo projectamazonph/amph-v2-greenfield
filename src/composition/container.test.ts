@@ -23,6 +23,7 @@ import { TestLogger } from "@/infra/observability/TestLogger";
 
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryEmailVerificationRepository } from "@/infra/db/inmemory/InMemoryEmailVerificationRepository";
+import { InMemoryPasswordResetRepository } from "@/infra/db/inmemory/InMemoryPasswordResetRepository";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
@@ -121,6 +122,8 @@ import { UpdateLiveClass } from "@/usecases/UpdateLiveClass";
 import { DeleteLiveClass } from "@/usecases/DeleteLiveClass";
 import { VerifyEmail } from "@/usecases/auth/VerifyEmail";
 import { ResendVerification } from "@/usecases/auth/ResendVerification";
+import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
+import { ResetPassword } from "@/usecases/auth/ResetPassword";
 
 import type { AppContainer } from "./container";
 
@@ -150,6 +153,7 @@ export interface TestContainer extends AppContainer {
   scenarioRepo: InMemorySimulatorScenarioRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   emailVerificationRepo: InMemoryEmailVerificationRepository;
+  passwordResetRepo: InMemoryPasswordResetRepository;
 }
 
 export function buildTestContainer(): TestContainer {
@@ -172,6 +176,7 @@ export function buildTestContainer(): TestContainer {
   const certificateRepo = new InMemoryCertificateRepository();
   const sessionRepo = new InMemorySessionRepository();
   const emailVerificationRepo = new InMemoryEmailVerificationRepository();
+  const passwordResetRepo = new InMemoryPasswordResetRepository();
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
@@ -194,6 +199,7 @@ export function buildTestContainer(): TestContainer {
     clock,
     idGen,
     emailVerificationRepo,
+    passwordResetRepo,
     logger,
     rateLimiter,
     userRepo,
@@ -379,6 +385,25 @@ export function buildTestContainer(): TestContainer {
       verificationEmailRenderer,
       rateLimiter,
       idGen,
+    }),
+    // STORY-008: password reset
+    requestPasswordReset: new RequestPasswordReset({
+      users: userRepo,
+      passwordResets: passwordResetRepo,
+      email: emailSender,
+      rateLimiter,
+      clock,
+      ids: idGen,
+      logger,
+    }),
+    resetPassword: new ResetPassword({
+      users: userRepo,
+      passwordResets: passwordResetRepo,
+      sessions: sessionRepo,
+      clock,
+      logger,
+      email: emailSender,
+      hasher: passwordHasher,
     }),
   };
 }
