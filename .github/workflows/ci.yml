@@ -208,10 +208,20 @@ jobs:
       # lighthouse job downloads this and starts `node server.js`.
       # .next/static/ is symlinked into the standalone output by
       # next build itself, but we also copy public/ for completeness.
+      #
+      # include-hidden-files: true is required — the default (false)
+      # silently strips every dot-prefixed path from the archive,
+      # which includes .next/standalone/.next/ itself (the actual
+      # build output server.js needs: BUILD_ID, required-server-files
+      # .json, server/) and node_modules/.prisma/client/ (Prisma's
+      # generated client). Without this the lighthouse job's server
+      # boots but immediately fails with "Could not find a production
+      # build in the './.next' directory".
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: build
+          include-hidden-files: true
           path: |
             .next/standalone
             .next/static
