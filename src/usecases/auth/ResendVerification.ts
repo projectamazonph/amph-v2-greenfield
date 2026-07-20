@@ -32,6 +32,7 @@ import type {
 import type { Clock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
+import type { EmailVerificationRenderer } from "@/ports/email/EmailVerificationRenderer";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
@@ -48,6 +49,7 @@ export interface ResendVerificationDeps {
   clock: Clock;
   logger: Logger;
   emailSender: EmailSender;
+  verificationEmailRenderer: EmailVerificationRenderer;
   rateLimiter: RateLimiter;
   idGen: IdGenerator;
 }
@@ -116,16 +118,15 @@ export class ResendVerification {
 
     // Send the email. Build the verification URL using the raw token.
     const verifyUrl = this.buildVerifyUrl(rawToken);
-    // Email rendering is a follow-up; the spec mentions a React Email
-    // template. For now we pass a placeholder string; the wiring
-    // tests in the architecture suite will catch a non-React payload
-    // only if we tighten the port.
     await this.deps.emailSender.send({
       to: user.email,
       subject: "Verify your Project Amazon PH Academy email",
-      react: null as unknown as never, // placeholder; replaced by the
-      // email-templating follow-up that wires a real React element
-    } as Parameters<EmailSender["send"]>[0]);
+      react: this.deps.verificationEmailRenderer.render({
+        firstName: user.firstName,
+        verificationUrl: verifyUrl,
+        expiresInHours: TOKEN_TTL_HOURS,
+      }),
+    });
 
     this.deps.logger.info("resend_verification.success", {
       userId: user.id,

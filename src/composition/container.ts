@@ -120,6 +120,7 @@ import { VerifyEmail } from "@/usecases/auth/VerifyEmail";
 import { ResendVerification } from "@/usecases/auth/ResendVerification";
 import type { EmailVerificationRepository } from "@/ports/repositories/EmailVerificationRepository";
 import { PrismaEmailVerificationRepository } from "@/infra/repositories/PrismaEmailVerificationRepository";
+import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -342,6 +343,7 @@ function buildProductionContainer(): AppContainer {
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
   const sessionRepo: SessionRepository = new InMemorySessionRepository();
   const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(prisma);
+  const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
   const auditLog: IAuditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
@@ -556,6 +558,7 @@ function buildProductionContainer(): AppContainer {
       clock,
       logger,
       emailSender,
+      verificationEmailRenderer,
       rateLimiter,
       idGen,
     }),

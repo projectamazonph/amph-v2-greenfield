@@ -31,6 +31,7 @@ import { InMemoryEmailVerificationRepository } from "@/infra/db/inmemory/InMemor
 import { FixedClock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
+import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import type { RateLimiter, RateLimitResult } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
@@ -114,6 +115,7 @@ describe("ResendVerification", () => {
       clock,
       logger,
       emailSender,
+      verificationEmailRenderer: new EmailVerificationTemplateRenderer(),
       rateLimiter,
       idGen,
     });
@@ -152,6 +154,19 @@ describe("ResendVerification", () => {
     // Email was sent to the right user
     expect(emailSender.sent).toHaveLength(1);
     expect(emailSender.sent[0]!.to).toBe("alice@example.com");
+
+    // The email carries a real React element (not the old
+    // `null` placeholder). The element should reference the user
+    // and a verification URL that includes the raw token.
+    const react = emailSender.sent[0]!.react;
+    expect(react).not.toBeNull();
+    expect(react).toBeDefined();
+    // Render and check the URL ends up in the markup.
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const html = renderToStaticMarkup(react as React.ReactElement);
+    expect(html).toContain("Alice");
+    expect(html).toContain("/verify-email?token=raw-token-fixed-for-tests");
+    expect(html).toContain("24 hours");
 
     // A token record was persisted (hashed)
     expect(rateLimiter.calls).toHaveLength(1);

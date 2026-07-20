@@ -23,6 +23,7 @@ import { TestLogger } from "@/infra/observability/TestLogger";
 
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryEmailVerificationRepository } from "@/infra/db/inmemory/InMemoryEmailVerificationRepository";
+import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
@@ -171,6 +172,7 @@ export function buildTestContainer(): TestContainer {
   const certificateRepo = new InMemoryCertificateRepository();
   const sessionRepo = new InMemorySessionRepository();
   const emailVerificationRepo = new InMemoryEmailVerificationRepository();
+  const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
@@ -374,6 +376,7 @@ export function buildTestContainer(): TestContainer {
       clock,
       logger,
       emailSender,
+      verificationEmailRenderer,
       rateLimiter,
       idGen,
     }),
