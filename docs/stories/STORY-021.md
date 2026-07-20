@@ -4,7 +4,7 @@
 **Points:** 3
 **Epic:** Payments
 **Dependencies:** STORY-008 (Course entity), STORY-016-017 (Enrollment), STORY-013 (JWT auth)
-**Status:** ⚠️ Partially Done — the PayMongo side is in place (`CreatePaymentIntent` use case, `src/app/api/webhooks/paymongo/route.ts` handler, `RefundOverride` use case, `ProcessRefund` use case) but the **`/checkout` page** that redirects to the hosted checkout is **not yet built**. Without it, the user-facing flow that the spec describes (click "Enroll → Pay" → redirect to PayMongo → return) is not reachable. The closest existing path is `src/app/admin/simulators/new/page.tsx` (admin) — there is no student-facing checkout. Treat this as the next pay-priority feature work.
+**Status:** ✅ Done (PR #122, commit TBD — `feat(story-021): /checkout page closes the student-facing flow`; `CreatePaymentIntent` use case, `PayMongoAdapter`, and webhook handler all already landed; this PR adds the missing `/checkout` page (with `/checkout/success` and `/checkout/failed` return pages) and the `startCheckout` server action that bridges the EnrollButton to the PayMongo-hosted checkout.)
 
 ---
 
