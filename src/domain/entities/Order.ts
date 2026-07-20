@@ -44,6 +44,14 @@ export class Order {
   public refundProcessedAt: Date | null = null;
   public refundAmountMinor: number | null = null;
 
+  // ── Manual override fields ─────────────────────────────────
+  public manuallySetBy: string | null = null;
+  public manuallySetReason: string | null = null;
+  public manuallySetAt: Date | null = null;
+
+  // ── Receipt ────────────────────────────────────────────────
+  public receiptNumber: string | null = null;
+
   // ── Audit ──────────────────────────────────────────────────
   public readonly createdAt: Date;
   public updatedAt: Date;
@@ -156,10 +164,10 @@ export class Order {
 
   canTransitionTo(next: PaymentStatus): boolean {
     if (this.status === "DRAFT" && next === "PENDING") return true;
-    if (this.status === "PENDING" && next === "PAID")    return true;
-    if (this.status === "PENDING" && next === "FAILED")  return true;
-    if (this.status === "PENDING" && next === "EXPIRED")  return true;
-    if (this.status === "PAID"    && next === "REFUNDED") return true;
+    if (this.status === "PENDING" && next === "PAID") return true;
+    if (this.status === "PENDING" && next === "FAILED") return true;
+    if (this.status === "PENDING" && next === "EXPIRED") return true;
+    if (this.status === "PAID" && next === "REFUNDED") return true;
     return false;
   }
 }
