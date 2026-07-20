@@ -281,21 +281,24 @@ jobs:
           exit 1
 
       - name: Run Lighthouse CI
-        # Use a throwaway LHCI config inline so we don't have to ship
-        # a separate .lighthouserc.json. Targets the public landing
-        # page (`/`) which is the canonical SEO/perf surface.
+        # Uses .lighthouserc.json at the repo root. The config
+        # collects scores on the four canonical public URLs (the
+        # marketing landing, the catalog, the pricing page, and the
+        # login) and asserts accessibility + SEO as hard errors
+        # (these should never regress) and performance +
+        # best-practices as warnings (so a new PR doesn't fail the
+        # build on the first performance blip).
+        #
+        # The wrapper `|| true` is a soft-pass: the assertion
+        # results still surface in the GitHub Actions summary, so
+        # a regression is visible even when the job stays green.
+        # Tighten to a hard-fail (drop `|| true`) once we have a
+        # stable baseline that meets all four thresholds
+        # consistently.
         run: |
           npx --yes @lhci/cli@0.14.x autorun \
-            --collect.staticDistDir=./public \
-            --collect.url=http://localhost:3000/ \
-            --collect.numberOfRuns=1 \
-            --upload.target=temporary-public-storage \
+            --config=./.lighthouserc.json \
             || true
-          # `|| true` is a soft-pass: the autorun result is logged in
-          # the GH Actions summary. The job is non-blocking on
-          # performance regressions; raise the threshold once we have
-          # a stable baseline.
-
       - name: Stop server
         if: always()
         run: pkill -f "server.js" || true
