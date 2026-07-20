@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * Practice — 6 contract tests.
  * The version with sourced copy from the Stitch wireframes.

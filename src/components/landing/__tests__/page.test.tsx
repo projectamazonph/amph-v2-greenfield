@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * Landing page — wire-up test.
  * The src/app/page.tsx should render all 8 sections in order.
