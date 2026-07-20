@@ -42,6 +42,10 @@ Course/lesson content structure is still being planned in `docs/` (e.g. `docs/pr
 - `docs/security/tenant-isolation.md` — who can read what, per query.
 - `docs/business-layer.md`, `docs/admin-backend.md`, `docs/design-brief.md`, `docs/product-brief.md` — business rules, planned admin panel, visual design system, product framing.
 
+## Design Context
+
+`PRODUCT.md` (register, users, positioning, brand personality, anti-references) and `DESIGN.md` (colors, typography, elevation, components, do's/don'ts) at the repo root are the machine-readable design context consumed by the `impeccable` skill (`/impeccable craft`, `critique`, `audit`, `polish`, `live`, etc.) — read them before any design/UI task. Register is `product` for the whole app, with `src/app/page.tsx` (the landing page) noted as the one brand-register exception. `.impeccable/design.json` is a sidecar with tonal ramps and rendered component snippets; `.impeccable/live/config.json` configures `/impeccable live`'s in-browser variant mode.
+
 ## Simulators
 
 Four of the five planned simulators exist under `src/domain/simulator/<name>/` (input type, output type, a class implementing the `Simulator<TIn, TOut>` port with an async `run()`, score 0–100): `bid-elevator`, `campaign-builder`, `listing-audit` (also covers keyword research), `str-triage`. They're registered in `src/infra/simulator/buildSimulatorRegistry.ts` against `SimulatorRegistry`; unregistered simulator slots use `StubSimulator`. When adding a new one, mirror the existing four exactly (see `SESSION-HANDOVER.md` for the established pattern) — don't edit the tools page or access policy to wire it in.

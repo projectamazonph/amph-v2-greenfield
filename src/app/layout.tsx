@@ -23,16 +23,9 @@ export const metadata: Metadata = {
   description: "Master Amazon PPC and seller central — built for Filipino VAs.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
-    >
+    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body>
         {/* STORY-047: shown when an admin is impersonating another user.
             Server component, reads the amph_admin_session cookie, returns
@@ -40,6 +33,9 @@ export default function RootLayout({
         <ImpersonationBanner />
         <WebVitalsReporter />
         {children}
+        {/* impeccable-live-start */}
+        <script src="http://localhost:8400/live.js"></script>
+        {/* impeccable-live-end */}
       </body>
     </html>
   );

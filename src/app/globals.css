@@ -231,6 +231,17 @@ video {
   color: var(--ink-300);
 }
 
+/* Grows to fit the value (up to the row's full width) instead of
+   staying fixed-width — opts out of .form-group's flex-stretch so
+   field-sizing can take over. Picked via /impeccable live on the
+   signup last-name field to handle long/compound surnames. */
+.form-input-grow {
+  field-sizing: content;
+  align-self: flex-start;
+  min-width: 120px;
+  max-width: 100%;
+}
+
 .form-error {
   font-size: 12px;
   color: var(--danger);
