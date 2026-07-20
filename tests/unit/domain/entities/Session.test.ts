@@ -44,9 +44,18 @@ describe("Session entity", () => {
 
   describe("sessionDaysUntilExpiry", () => {
     it("returns a positive number for future sessions", () => {
+      // Use a value safely in the middle of a day, then assert
+      // the result is close to 7 (not exactly 7) — the day
+      // boundary can tick over during the test, and the function
+      // floors on date components, so 7d - 1ms could legitimately
+      // return 6.
       const future = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       const session = makeSession(future);
-      expect(sessionDaysUntilExpiry(session, new Date())).toBe(7);
+      const days = sessionDaysUntilExpiry(session, new Date());
+      // Tolerance window of ±1 day — anything beyond means the
+      // function is broken, not flaky.
+      expect(days).toBeGreaterThanOrEqual(6);
+      expect(days).toBeLessThanOrEqual(7);
     });
 
     it("returns 0 for sessions expiring in <24h", () => {
@@ -56,9 +65,14 @@ describe("Session entity", () => {
     });
 
     it("returns a negative number for expired sessions", () => {
+      // Use 2 full days in the past, then assert the result is
+      // at most -2. The floor-on-date-components means anything
+      // between -2 and -3 is legitimate.
       const past = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
       const session = makeSession(past);
-      expect(sessionDaysUntilExpiry(session, new Date())).toBeLessThan(0);
+      const days = sessionDaysUntilExpiry(session, new Date());
+      expect(days).toBeLessThanOrEqual(-2);
+      expect(days).toBeGreaterThanOrEqual(-3);
     });
   });
 });
