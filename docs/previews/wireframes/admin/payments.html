@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payments — list + detail — AMPH Wireframe</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+</head>
+<body>
+<div class="page-shell">
+  <p class="page-kicker"><a href="../README.md">← wireframes index</a></p>
+  <h1 class="page-title">Payments — list + detail</h1>
+  <p class="page-route">/admin/payments · /admin/payments/[id]</p>
+  <div class="wf-card span2">
+        <div class="wf-card__head">
+          <div class="wf-card__id"><span class="wf-card__name">Payments — list + detail</span><span class="wf-card__route">/admin/payments · /admin/payments/[id]</span></div>
+          <span class="chip planned">Planned</span>
+        </div>
+        <div class="wf-canvas">
+          <div class="wf-split">
+            <div>
+              <div class="wf-table">
+                <div class="wf-trow head"><span>User</span><span>Amount</span><span>Method</span><span>Status</span></div>
+                <div class="wf-trow"><span class="cell"><div class="wf-line w70"></div></span><span class="cell"><div class="wf-line w40"></div></span><span class="cell"><div class="wf-line w40"></div></span><span class="cell"><span class="chip built" style="padding:1px 5px;">paid</span></span></div>
+                <div class="wf-trow"><span class="cell"><div class="wf-line w60"></div></span><span class="cell"><div class="wf-line w40"></div></span><span class="cell"><div class="wf-line w40"></div></span><span class="cell"><span class="chip planned" style="padding:1px 5px;">flagged</span></span></div>
+              </div>
+            </div>
+            <div class="wf-vdivider"></div>
+            <div>
+              <p class="wf-cap">Detail actions</p>
+              <div class="wf-col"><span class="wf-navitem">Mark as fraud</span><span class="wf-navitem">Issue refund override</span><span class="wf-navitem">Resend receipt</span><span class="wf-navitem">Re-fetch from PayMongo</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+</body>
+</html>
