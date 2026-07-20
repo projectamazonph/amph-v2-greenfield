@@ -34,9 +34,13 @@ describe("ci.yml — standalone build contract", () => {
     expect(ci).toMatch(/cp -r \.next\/static \.next\/standalone\/\.next\/static/);
   });
 
-  it("copies public into .next/standalone/public", async () => {
+  it("ensures .next/standalone/public exists (or the repo's public/ is copied into it)", async () => {
+    // The repo currently has no public/ dir, so the copy step
+    // must be defensive: mkdir the target, then copy only if
+    // public/ exists. The tripwire pins the defensive form.
     const ci = await loadCI();
-    expect(ci).toMatch(/cp -r public \.next\/standalone\/public/);
+    expect(ci).toMatch(/mkdir -p \.next\/standalone\/public/);
+    expect(ci).toMatch(/if \[ -d public \]; then cp -r public\/\. \.next\/standalone\/public/);
   });
 
   it("uploads only .next/standalone (the bundled artifact)", async () => {

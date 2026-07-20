@@ -230,10 +230,18 @@ jobs:
         #      into the standalone output at build time
         #  (b) move the copy into a `pnpm build:prod` script
         # For now, an explicit cp is the simplest correct fix.
+        #
+        # public/ is optional (the repo doesn't currently ship
+        # one); we mkdir it as an empty dir so the server's
+        # static file route doesn't 404 on favicon.ico (Next.js
+        # still serves a default favicon, but having an empty
+        # public/ keeps the standalone bundle's expectations
+        # aligned with the docs).
         run: |
           mkdir -p .next/standalone/.next
           cp -r .next/static .next/standalone/.next/static
-          cp -r public .next/standalone/public
+          mkdir -p .next/standalone/public
+          if [ -d public ]; then cp -r public/. .next/standalone/public/; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

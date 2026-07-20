@@ -14,6 +14,11 @@
   - `src/proxy.ts`: removed the `/` → `/signup` redirect; the landing page is now reachable for unauthenticated visitors.
   - Tripwire tests in `src/__tests__/proxy.test.ts` and `src/__tests__/lighthouserc.test.ts` so the change sticks.
 
+**Bundling fix (PR #124):** the first PR-#123 run surfaced a deeper bug: 14 of 14 Lighthouse runs scored 0 on `errors-in-console` because every CSS chunk, font, and favicon was 404ing. The standalone `server.js` reads static files from `.next/standalone/.next/static/` and `.next/standalone/public/` — not from the project root. The CI workflow was uploading `.next/standalone`, `.next/static`, and `public/` as separate paths and relying on relative resolution that doesn't actually work. Fix:
+  - Added a `Copy static assets into standalone bundle` step to the build job: `cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public`.
+  - Reduced the upload path to `.next/standalone` (the bundle is now self-contained).
+  - Added `src/__tests__/ci-workflow.test.ts` with 6 tripwire tests that pin the contract (the copy steps must run, the upload path must be just `.next/standalone`, the server must boot from `.next/standalone/server.js`, the lhci command must read the config file).
+
 The wrapper still has `|| true` (a soft-pass at the shell level) so a regression on a new URL doesn't block the build on the first run; the assertion results still surface in the GitHub Actions summary. Tighten to a hard-fail (drop `|| true`) once the baseline is stable.
 
 ---
