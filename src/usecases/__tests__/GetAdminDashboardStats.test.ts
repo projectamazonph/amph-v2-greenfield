@@ -51,6 +51,7 @@ function makeUser(id: string, role: User["role"] = "STUDENT"): User {
     enrolledCourseIds: [],
     createdAt: new Date(),
     totalXp: 0,
+    emailVerifiedAt: null,
   };
 }
 

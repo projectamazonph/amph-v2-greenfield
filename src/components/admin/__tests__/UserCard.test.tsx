@@ -19,6 +19,7 @@ const ADMIN: User = {
   enrolledCourseIds: [],
   createdAt: new Date(),
   totalXp: 0,
+  emailVerifiedAt: null,
 };
 
 const SINGLE_NAME: User = { ...ADMIN, firstName: "Cher", lastName: "" };

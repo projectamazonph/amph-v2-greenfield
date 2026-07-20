@@ -62,6 +62,16 @@ export interface UserRepository {
        * Use appendEnrolledCourseId() in EnrollStudent to append without overwriting.
        */
       enrolledCourseIds: readonly string[];
+      /**
+       * STORY-007: stamp the user's email as verified. Set by the
+       * VerifyEmail use case after a successful token exchange.
+       */
+      emailVerifiedAt: Date | null;
+      /**
+       * STORY-008: replace the password hash. Set by the
+       * ResetPassword use case after a successful token exchange.
+       */
+      passwordHash: string;
     }>,
   ): Promise<Result<User, UserError>>;
 

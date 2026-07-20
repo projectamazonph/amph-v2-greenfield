@@ -116,6 +116,15 @@ import { UpstashRateLimiter } from "@/infra/security/UpstashRateLimiter";
 import { SignUp } from "@/usecases/SignUp";
 import { Login } from "@/usecases/Login";
 import { Logout } from "@/usecases/Logout";
+import { VerifyEmail } from "@/usecases/auth/VerifyEmail";
+import { ResendVerification } from "@/usecases/auth/ResendVerification";
+import type { EmailVerificationRepository } from "@/ports/repositories/EmailVerificationRepository";
+import { PrismaEmailVerificationRepository } from "@/infra/repositories/PrismaEmailVerificationRepository";
+import { PrismaPasswordResetRepository } from "@/infra/repositories/PrismaPasswordResetRepository";
+import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
+import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
+import { ResetPassword } from "@/usecases/auth/ResetPassword";
+import type { PasswordResetRepository } from "@/ports/repositories/PasswordResetRepository";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -303,6 +312,12 @@ export interface AppContainer {
   createLiveClass: CreateLiveClass;
   updateLiveClass: UpdateLiveClass;
   deleteLiveClass: DeleteLiveClass;
+  // STORY-007: email verification
+  verifyEmail: VerifyEmail;
+  resendVerification: ResendVerification;
+  // STORY-008: password reset
+  requestPasswordReset: RequestPasswordReset;
+  resetPassword: ResetPassword;
 }
 
 // ── Production container builder ─────────────────────────────
@@ -334,6 +349,9 @@ function buildProductionContainer(): AppContainer {
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
   const sessionRepo: SessionRepository = new InMemorySessionRepository();
+  const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(prisma);
+  const passwordResetRepo: PasswordResetRepository = new PrismaPasswordResetRepository(prisma);
+  const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
   const auditLog: IAuditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
@@ -535,6 +553,42 @@ function buildProductionContainer(): AppContainer {
     createLiveClass: new CreateLiveClass({ liveClassRepo, recordAuditLog }),
     updateLiveClass: new UpdateLiveClass({ liveClassRepo, recordAuditLog }),
     deleteLiveClass: new DeleteLiveClass({ liveClassRepo, recordAuditLog }),
+    // STORY-007: email verification
+    verifyEmail: new VerifyEmail({
+      emailVerifications: emailVerificationRepo,
+      users: userRepo,
+      clock,
+      logger,
+    }),
+    resendVerification: new ResendVerification({
+      users: userRepo,
+      emailVerifications: emailVerificationRepo,
+      clock,
+      logger,
+      emailSender,
+      verificationEmailRenderer,
+      rateLimiter,
+      idGen,
+    }),
+    // STORY-008: password reset
+    requestPasswordReset: new RequestPasswordReset({
+      users: userRepo,
+      passwordResets: passwordResetRepo,
+      email: emailSender,
+      rateLimiter,
+      clock,
+      ids: idGen,
+      logger,
+    }),
+    resetPassword: new ResetPassword({
+      users: userRepo,
+      passwordResets: passwordResetRepo,
+      sessions: sessionRepo,
+      clock,
+      logger,
+      email: emailSender,
+      hasher: passwordHasher,
+    }),
   };
 }
 

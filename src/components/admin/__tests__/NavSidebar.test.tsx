@@ -19,6 +19,7 @@ const TEST_USER: User = {
   enrolledCourseIds: [],
   createdAt: new Date(),
   totalXp: 0,
+  emailVerifiedAt: null,
 };
 
 function render(props: { currentPath?: string } = {}) {
