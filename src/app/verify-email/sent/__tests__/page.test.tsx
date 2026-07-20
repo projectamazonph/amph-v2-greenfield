@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * /verify-email/sent — page contract tests.
  */
