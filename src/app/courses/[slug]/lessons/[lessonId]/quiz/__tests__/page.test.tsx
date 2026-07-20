@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * /courses/[slug]/lessons/[lessonId]/quiz — page contract tests.
  */

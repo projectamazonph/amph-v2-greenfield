@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * /profile — page contract tests.
  *

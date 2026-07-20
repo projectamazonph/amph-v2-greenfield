@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * /pricing — page contract tests.
  */

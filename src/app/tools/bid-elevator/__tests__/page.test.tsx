@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * /tools/bid-elevator — page contract tests.
  *

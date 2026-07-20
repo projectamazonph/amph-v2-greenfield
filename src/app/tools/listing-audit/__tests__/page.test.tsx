@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * /tools/listing-audit — page contract tests.
  */

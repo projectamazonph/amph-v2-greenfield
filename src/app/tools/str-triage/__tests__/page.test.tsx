@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * /tools/str-triage — page contract tests.
  *

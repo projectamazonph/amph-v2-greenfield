@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * /tools/campaign-builder — page contract tests.
  */
