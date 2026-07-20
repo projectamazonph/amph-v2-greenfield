@@ -24,6 +24,7 @@ import { TestLogger } from "@/infra/observability/TestLogger";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryEmailVerificationRepository } from "@/infra/db/inmemory/InMemoryEmailVerificationRepository";
 import { InMemoryPasswordResetRepository } from "@/infra/db/inmemory/InMemoryPasswordResetRepository";
+import { InMemorySentReminderRepository } from "@/infra/db/inmemory/InMemorySentReminderRepository";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
@@ -154,6 +155,7 @@ export interface TestContainer extends AppContainer {
   auditLog: InMemoryAuditLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
   liveClassRepo: InMemoryLiveClassRepository;
+  sentReminderRepo: InMemorySentReminderRepository;
   emailVerificationRepo: InMemoryEmailVerificationRepository;
   passwordResetRepo: InMemoryPasswordResetRepository;
 }
@@ -179,6 +181,7 @@ export function buildTestContainer(): TestContainer {
   const sessionRepo = new InMemorySessionRepository();
   const emailVerificationRepo = new InMemoryEmailVerificationRepository();
   const passwordResetRepo = new InMemoryPasswordResetRepository();
+  const sentReminderRepo = new InMemorySentReminderRepository();
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
@@ -367,6 +370,7 @@ export function buildTestContainer(): TestContainer {
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
     // STORY-050c
     liveClassRepo,
+    sentReminderRepo,
     adminListLiveClasses: new AdminListLiveClasses({ liveClassRepo }),
     adminGetLiveClass: new AdminGetLiveClass({ liveClassRepo }),
     createLiveClass: new CreateLiveClass({ liveClassRepo, recordAuditLog }),
@@ -413,6 +417,7 @@ export function buildTestContainer(): TestContainer {
       liveClassRepo,
       enrollmentRepo,
       userRepo,
+      sentReminders: sentReminderRepo,
       email: emailSender,
       clock,
       logger,
