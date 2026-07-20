@@ -205,3 +205,23 @@ All production env vars are in the Vercel project (`prj_3tEN1Akupoosai3OAGc1t50r
 - [x] This handoff doc written
 
 End of session.
+
+---
+
+## Addendum (2026-07-20 evening)
+
+PR #114 (P0-7 live class reminders) merged after the closeout handoff was written. Net effect:
+
+- +14 tests (1996 total, up from 1977)
+- Architecture 405/405 (up from 400)
+- Live class reminder emails now flow from cron to enrolled students
+- The full priority item #1 from the "What's NOT done" list is done
+
+Remaining items from that list (in priority order):
+
+1. **Re-enable Lighthouse CI properly** — `output: 'standalone'` per ADR-0026
+2. **Rotate the Vercel/Neon/PayMongo/Resend keys** that are in chat history
+3. **STORY-010 (login) and beyond**
+4. **Admin pages (Sprint 10 scope)**
+
+P0-7 follow-up: add a `SentReminder` log table for proper cron idempotency. Not blocking — the 5-minute cron schedule is the simpler safety net.
