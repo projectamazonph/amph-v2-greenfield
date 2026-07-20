@@ -49,6 +49,28 @@ function generateKeywords(niche: string): KeywordSuggestion[] {
   }));
 }
 
+// ── Naming helpers ─────────────────────────────────────────────────────────
+
+/** Format daily budget as Philippine peso string. */
+function formatBudget(amount: number): string {
+  return `₱${Math.round(amount)}`;
+}
+
+/** Short campaign name: "SP | Exact | wireless earbuds | ₱300/d" */
+function campaignName(
+  campaignType: "SP" | "SB" | "SD",
+  matchType: string,
+  niche: string,
+  dailyBudget: number,
+): string {
+  return `${campaignType} | ${matchType} | ${niche} | ${formatBudget(dailyBudget)}/d`;
+}
+
+/** Ad group name: "Brand Terms" or "Exact Match - wireless earbuds" */
+function adGroupName(matchType: string, niche: string, purpose: string): string {
+  return `${purpose} - ${matchType} - ${niche}`;
+}
+
 // ── Ad group factory ───────────────────────────────────────────────────────
 
 function buildAdGroup(name: string, keywords: KeywordSuggestion[]): AdGroup {
@@ -92,29 +114,40 @@ export class CampaignBuilderSimulator implements Simulator<
 
     const campaigns: CampaignStructure[] = [];
 
-    // ── Always: Sponsored Products (manual targeting) ──────────
+    // ── Sponsored Products: manual targeting ──────────────────
     if (targetingStrategy === "manual" || targetingStrategy === "hybrid") {
       campaigns.push(
-        buildCampaign(`${productCategory} — Manual`, "sponsored-products", dailyBudget * 0.6, [
-          buildAdGroup(`${productNiche} — Core`, keywords.slice(0, 3)),
-          buildAdGroup(`${productNiche} — Long-tail`, keywords.slice(3)),
-        ]),
+        buildCampaign(
+          campaignName("SP", "Manual", productNiche, dailyBudget * 0.6),
+          "sponsored-products",
+          dailyBudget * 0.6,
+          [
+            buildAdGroup(adGroupName("Exact", productNiche, "Core"), keywords.slice(0, 3)),
+            buildAdGroup(adGroupName("Phrase", productNiche, "Discovery"), keywords.slice(3)),
+          ],
+        ),
       );
     }
 
-    // ── Auto campaign: all strategies ─────────────────────────
+    // ── Sponsored Products: auto targeting ────────────────────
     campaigns.push(
-      buildCampaign(`${productCategory} — Auto`, "sponsored-products", dailyBudget * 0.25, [
-        buildAdGroup(`${productNiche} — Auto`, []),
-      ]),
+      buildCampaign(
+        campaignName("SP", "Auto", productNiche, dailyBudget * 0.25),
+        "sponsored-products",
+        dailyBudget * 0.25,
+        [buildAdGroup(adGroupName("Auto", productNiche, "Catch-all"), [])],
+      ),
     );
 
-    // ── Sponsored Brands: only for larger budgets ───────────────
+    // ── Sponsored Brands: only for larger budgets ─────────────
     if (monthlyBudget >= 500) {
       campaigns.push(
-        buildCampaign(`${productCategory} — Brands`, "sponsored-brands", dailyBudget * 0.15, [
-          buildAdGroup(`${productNiche} — Brand`, []),
-        ]),
+        buildCampaign(
+          campaignName("SB", "Brand", productNiche, dailyBudget * 0.15),
+          "sponsored-brands",
+          dailyBudget * 0.15,
+          [buildAdGroup(adGroupName("Brand", productNiche, "Headlines"), [])],
+        ),
       );
     }
 

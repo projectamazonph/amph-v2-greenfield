@@ -1,38 +1,39 @@
-/* STORY-050e — admin settings */
+/* STORY-050e — admin settings — Field Manual tokens */
 
 .sectionTitle {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
   font-weight: 600;
-  margin: 0 0 0.25rem 0;
-  color: var(--color-text);
+  margin: 0 0 var(--space-1) 0;
+  color: var(--ink-900);
 }
 
 .help {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  margin: 0 0 1rem 0;
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  margin: 0 0 var(--space-4) 0;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .table th {
   text-align: left;
-  padding: 0.625rem 1rem;
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
   font-weight: 600;
-  color: var(--color-text-muted);
-  font-size: 0.75rem;
+  color: var(--ink-500);
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
@@ -41,61 +42,62 @@
 }
 
 .key {
-  font-family: monospace;
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   font-weight: 600;
+  color: var(--ink-900);
 }
 
 .description {
-  color: var(--color-text-muted);
+  color: var(--ink-500);
 }
 
 .statusBadge {
   display: inline-block;
-  padding: 0.125rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
   font-weight: 600;
 }
 
 .set {
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: var(--success-soft);
+  color: var(--success);
 }
 
 .unset {
-  background-color: #fee2e2;
-  color: #991b1b;
+  background-color: var(--danger-soft);
+  color: var(--danger);
 }
 
 .dl {
   display: grid;
   grid-template-columns: 12rem auto;
-  row-gap: 0.5rem;
-  column-gap: 1rem;
-  font-size: 0.875rem;
+  row-gap: var(--space-2);
+  column-gap: var(--space-4);
+  font-size: var(--text-sm);
   margin: 0;
 }
 
 .dl dt {
-  color: var(--color-text-muted);
+  color: var(--ink-500);
   font-weight: 500;
 }
 
 .dl dd {
   margin: 0;
-  color: var(--color-text);
+  color: var(--ink-900);
 }
 
 .mono {
-  font-family: monospace;
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 
 .list {
   margin: 0;
-  padding-left: 1.25rem;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
+  padding-left: var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--ink-500);
   line-height: 1.6;
 }

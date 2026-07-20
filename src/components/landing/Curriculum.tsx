@@ -33,15 +33,15 @@ export function Curriculum() {
               Course structure
             </h2>
             <p className={styles.subhead}>
-              Eight modules in order. Modules 1–5 are Foundations. Modules
-              6–8 are Mastery. No jumping around, no "advanced" surprises.
+              Eight modules in order. Modules 1–5 are Foundations. Modules 6–8 are Mastery. No
+              jumping around, no "advanced" surprises.
             </p>
           </div>
           <div>
             <h3 className={styles.timeHeading}>How long does it take?</h3>
             <p className={styles.timeBody}>
-              Most students finish Foundations in 4–6 weeks at 5–8 hours a
-              week. Mastery adds another 2–3 weeks on top.
+              Most students finish Foundations in 4–6 weeks at 5–8 hours a week. Mastery adds
+              another 2–3 weeks on top.
             </p>
           </div>
         </div>
@@ -49,10 +49,18 @@ export function Curriculum() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th className={styles.thNum}>#</th>
-                <th className={styles.thModule}>Module</th>
-                <th className={styles.thTier}>Tier</th>
-                <th className={styles.thDuration}>Time</th>
+                <th scope="col" className={styles.thNum}>
+                  #
+                </th>
+                <th scope="col" className={styles.thModule}>
+                  Module
+                </th>
+                <th scope="col" className={styles.thTier}>
+                  Tier
+                </th>
+                <th scope="col" className={styles.thDuration}>
+                  Time
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -64,9 +72,7 @@ export function Curriculum() {
                   <td className={styles.tdModule}>{m.title}</td>
                   <td className={styles.tdTier}>
                     <span
-                      className={
-                        m.tier === "mastery" ? styles.tierMastery : styles.tierFoundations
-                      }
+                      className={m.tier === "mastery" ? styles.tierMastery : styles.tierFoundations}
                     >
                       {m.tier === "mastery" ? "Mastery" : "Foundations"}
                     </span>

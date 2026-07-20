@@ -149,28 +149,12 @@
   border-top: 1px solid var(--border);
 }
 
-.submit {
-  height: 40px;
-  padding: 0 var(--space-5);
-  background: var(--accent);
-  color: var(--ink-inverse);
-  border: 1px solid var(--accent);
-  border-radius: 6px;
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.submit:hover:not(:disabled) {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.submit:disabled { opacity: 0.6; cursor: not-allowed; }
-
 .score {
   font-family: var(--font-mono);
   font-size: var(--text-lg);
   font-weight: 600;
 }
+
+.scoreSuccess { color: var(--success); }
+.scoreWarning { color: var(--warning); }
+.scoreDanger { color: var(--danger); }

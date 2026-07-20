@@ -1,45 +1,50 @@
-/* P0-4: dashboard page */
+/* P0-4: dashboard page — Field Manual tokens */
 
 .page {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
+  width: 100%;
+  padding: var(--space-10) var(--side-pad) var(--space-16);
+  box-sizing: border-box;
 }
 
 .hero {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--space-10);
 }
 
 .heroTitle {
-  font-size: 1.875rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, var(--text-2xl));
   font-weight: 700;
-  color: var(--color-text);
-  margin: 0 0 0.5rem 0;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-2) 0;
   letter-spacing: -0.02em;
 }
 
 .heroSubtitle {
-  font-size: 1rem;
-  color: var(--color-text-muted);
+  font-size: clamp(0.875rem, 2.5vw, var(--text-base));
+  color: var(--ink-700);
   margin: 0;
 }
 
 .section {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--space-10);
 }
 
 .sectionHeader {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
 .sectionTitle {
-  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 3vw, var(--text-xl));
   font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 1rem 0;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-4) 0;
+  letter-spacing: -0.01em;
 }
 
 .sectionHeader .sectionTitle {
@@ -47,115 +52,127 @@
 }
 
 .browseLink {
-  font-size: 0.875rem;
-  color: var(--color-accent);
+  font-size: var(--text-sm);
+  color: var(--accent);
   text-decoration: none;
   font-weight: 500;
+  transition: color var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .browseLink:hover {
+  color: var(--accent-hover);
   text-decoration: underline;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: var(--space-4);
 }
 
 .card {
   display: block;
-  padding: 1.25rem;
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+  padding: var(--space-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  min-width: 0;
 }
 
 .card:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-color: var(--ink-300);
+  box-shadow: var(--shadow-sm);
 }
 
 .cardTitle {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(0.875rem, 2vw, var(--text-base));
   font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 0.25rem 0;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-1) 0;
+  min-width: 0;
 }
 
 .cardTagline {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  margin: 0 0 1rem 0;
-  line-height: 1.4;
+  font-size: clamp(0.75rem, 1.8vw, var(--text-sm));
+  color: var(--ink-700);
+  margin: 0 0 var(--space-4) 0;
+  line-height: 1.5;
+  min-width: 0;
 }
 
 .progressBar {
   height: 6px;
-  background: var(--color-bg-muted);
-  border-radius: 999px;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
 }
 
 .progressFill {
   height: 100%;
-  background: var(--color-accent);
-  border-radius: 999px;
-  transition: width 0.2s;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-base) var(--ease-out);
 }
 
 .progressLabel {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+  font-size: clamp(0.625rem, 1.2vw, var(--text-xs));
+  color: var(--ink-500);
   margin: 0;
   font-weight: 500;
 }
 
 .emptyState {
   text-align: center;
-  padding: 2.5rem 1rem;
-  background: var(--color-bg-muted);
-  border: 1px dashed var(--color-border);
-  border-radius: 0.5rem;
+  padding: var(--space-10) var(--space-4);
+  background: var(--surface-2);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .emptyText {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  margin: 0 0 1.25rem 0;
+  color: var(--ink-500);
+  font-size: clamp(0.75rem, 1.8vw, var(--text-sm));
+  margin: 0 0 var(--space-5) 0;
 }
 
 .browseButton {
   display: inline-block;
-  padding: 0.5rem 1.25rem;
-  background: var(--color-accent);
-  color: white;
-  border-radius: 0.375rem;
+  padding: var(--space-2) var(--space-5);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius-md);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1.8vw, var(--text-sm));
   font-weight: 600;
-  transition: background-color 0.15s;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .browseButton:hover {
-  background: var(--color-accent-dark);
+  background: var(--accent-hover);
 }
 
 .list {
   list-style: none;
   padding: 0;
   margin: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .listItem {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border);
 }
 
 .listItem:last-child {
@@ -166,69 +183,79 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
+  padding: var(--space-4) var(--space-5);
   text-decoration: none;
   color: inherit;
-  transition: background-color 0.15s;
+  transition: background var(--duration-fast) var(--ease-out);
+  gap: var(--space-4);
+  min-width: 0;
 }
 
 .listLink:hover {
-  background: var(--color-bg-muted);
+  background: var(--surface-2);
 }
 
 .listMain {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-1);
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .listTitle {
-  font-size: 0.9375rem;
+  font-size: clamp(0.8125rem, 2vw, var(--text-sm));
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--ink-900);
+  min-width: 0;
 }
 
 .listTagline {
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  color: var(--ink-500);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
 
 .listMeta {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .listProgress {
-  font-size: 0.8125rem;
+  font-size: clamp(0.6875rem, 1.5vw, var(--text-xs));
   font-weight: 600;
-  color: var(--color-accent);
-  font-family: monospace;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .completedBadge {
   display: inline-block;
-  padding: 0.125rem 0.5rem;
-  background: #d1fae5;
-  color: #065f46;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  padding: var(--space-1) var(--space-2);
+  background: var(--success-soft);
+  color: var(--success);
+  border-radius: var(--radius-full);
+  font-size: clamp(0.625rem, 1.2vw, var(--text-xs));
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .mutedLink {
   display: inline-block;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--ink-500);
   text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .mutedLink:hover {
-  color: var(--color-text);
+  color: var(--ink-900);
   text-decoration: underline;
 }

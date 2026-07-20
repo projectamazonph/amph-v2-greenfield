@@ -1,79 +1,79 @@
-/* STORY-050b */
+/* STORY-050b — Field Manual tokens */
 
 .filters {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
   flex-wrap: wrap;
 }
 
 .filterLabel {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  color: var(--ink-500);
 }
 
 .filterChip {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  border: 1px solid var(--color-border);
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  font-size: var(--text-xs);
+  color: var(--ink-500);
   text-decoration: none;
-  transition: background-color 0.15s, border-color 0.15s;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .filterChip:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .filterChipActive {
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
-  color: white;
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
   font-weight: 600;
 }
 
 .addButton {
   display: inline-flex;
   align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: var(--color-accent);
-  color: white;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   font-weight: 600;
   text-decoration: none;
-  transition: background-color 0.15s;
+  transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .addButton:hover {
-  background-color: var(--color-accent-dark);
+  background-color: var(--accent-hover);
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .table th {
   text-align: left;
-  padding: 0.5rem 0.75rem;
-  color: var(--color-text-muted);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink-500);
   font-weight: 600;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .table td {
-  padding: 0.75rem 0.75rem;
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-3);
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
@@ -82,37 +82,39 @@
 }
 
 .table tr:hover td {
-  background-color: var(--color-bg-subtle);
+  background-color: var(--surface-2);
 }
 
 .mono {
-  font-family: monospace;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-500);
 }
 
 .simulatorTag {
-  font-family: monospace;
-  font-size: 0.75rem;
-  padding: 0.125rem 0.375rem;
-  background-color: var(--color-bg-muted);
-  border-radius: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-1);
+  background-color: var(--surface-2);
+  border-radius: var(--radius-sm);
 }
 
 .editLink {
-  color: var(--color-accent);
+  color: var(--accent);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .editLink:hover {
+  color: var(--accent-hover);
   text-decoration: underline;
 }
 
 .empty {
   text-align: center;
-  color: var(--color-text-muted);
-  padding: 2rem;
-  font-size: 0.875rem;
+  color: var(--ink-500);
+  padding: var(--space-8);
+  font-size: var(--text-sm);
 }

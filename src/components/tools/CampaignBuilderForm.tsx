@@ -9,11 +9,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/Button";
 import styles from "./CampaignBuilderForm.module.css";
-import {
-  buildCampaign,
-  type BuildCampaignResult,
-} from "@/app/tools/campaign-builder/actions";
+import { buildCampaign, type BuildCampaignResult } from "@/app/tools/campaign-builder/actions";
 
 interface Props {
   productCategory: string;
@@ -29,11 +27,7 @@ const TARGETING: ReadonlyArray<{ value: Targeting; label: string; blurb: string 
   { value: "hybrid", label: "Hybrid", blurb: "Auto with manual overrides" },
 ];
 
-export function CampaignBuilderForm({
-  productCategory,
-  productNiche,
-  monthlyBudget,
-}: Props) {
+export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudget }: Props) {
   const [category, setCategory] = useState(productCategory);
   const [niche, setNiche] = useState(productNiche);
   const [budget, setBudget] = useState(monthlyBudget);
@@ -126,20 +120,18 @@ export function CampaignBuilderForm({
       </div>
       {error ? <p className={styles.error}>{error}</p> : null}
       <div className={styles.footer}>
-        <button type="submit" className={styles.submit} disabled={pending}>
+        <Button type="submit" variant="primary" disabled={pending}>
           {pending ? "Building…" : "Build campaign"}
-        </button>
+        </Button>
         {result && result.ok ? (
           <div
-            className={styles.score}
-            style={{
-              color:
-                result.value.score >= 80
-                  ? "var(--success)"
-                  : result.value.score >= 50
-                    ? "var(--warning)"
-                    : "var(--danger)",
-            }}
+            className={`${styles.score} ${
+              result.value.score >= 80
+                ? styles.scoreSuccess
+                : result.value.score >= 50
+                  ? styles.scoreWarning
+                  : styles.scoreDanger
+            }`}
           >
             Score: {result.value.score}%
           </div>
