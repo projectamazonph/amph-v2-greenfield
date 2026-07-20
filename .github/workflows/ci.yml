@@ -217,15 +217,29 @@ jobs:
       # generated client). Without this the lighthouse job's server
       # boots but immediately fails with "Could not find a production
       # build in the './.next' directory".
+      - name: Copy static assets into standalone bundle
+        # The standalone server reads static files from
+        # `.next/standalone/.next/static/` and `.next/standalone/public/`,
+        # NOT from the project root. Without this copy, every
+        # CSS chunk, font, and favicon 404s in production —
+        # including in the Lighthouse job, which surfaces as
+        # `errors-in-console` failures.
+        #
+        # Two follow-up paths:
+        #  (a) use `outputFileTracingIncludes` to bundle them
+        #      into the standalone output at build time
+        #  (b) move the copy into a `pnpm build:prod` script
+        # For now, an explicit cp is the simplest correct fix.
+        run: |
+          mkdir -p .next/standalone/.next
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: build
           include-hidden-files: true
-          path: |
-            .next/standalone
-            .next/static
-            public
+          path: .next/standalone
 
   # Lighthouse CI re-enabled (STORY-0026 follow-up).
   #
