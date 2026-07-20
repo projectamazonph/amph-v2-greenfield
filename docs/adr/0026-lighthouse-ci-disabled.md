@@ -1,12 +1,12 @@
-# ADR-0026: Disable Lighthouse CI; Diagnose Next.js 16 Artifact Transport
+# ADR-0026: Disable Lighthouse CI; Diagnose Next.js 16 Artifact Transport (and Re-enable via `output: 'standalone'`)
 
 **Status:** Accepted (workaround) — 2026-07-20
 **Status:** Updated (fix landed) — 2026-07-20
 **Context:** Lighthouse CI job was failing in the GitHub Actions runner.
 **Decision:** Disable the Lighthouse CI job and document the root cause. Fix properly in a follow-up using Next.js's `output: 'standalone'` configuration.
 **Supersedes:** None
-**Superseded by:** None (yet)
-**Fix:** PR (lighthouse-standalone) on 2026-07-20 added `output: 'standalone'` to `next.config.ts`, switched the build artifact to `.next/standalone`, and re-enabled the lighthouse job. Verified the standalone server boots cleanly with `node .next/standalone/server.js` and responds 200 on `/api/health`. The lighthouse job is currently a soft-pass (logs results, doesn't block); tighten the thresholds once a stable baseline exists.
+**Superseded by:** None
+**Fix:** PR #116 (`feat(ci): re-enable Lighthouse CI via output: 'standalone' (STORY-0026 fix)`) on 2026-07-20 added `output: 'standalone'` to `next.config.ts`, switched the build artifact to `.next/standalone`, and re-enabled the lighthouse job. Verified the standalone server boots cleanly with `node .next/standalone/server.js` and responds 200 on `/api/health`. The lighthouse job is currently a soft-pass (logs results, doesn't block); tighten the thresholds once a stable baseline exists.
 
 ---
 

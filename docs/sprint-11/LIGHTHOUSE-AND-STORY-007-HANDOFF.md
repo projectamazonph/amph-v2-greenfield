@@ -5,6 +5,8 @@
 **Branch:** `feat/story-007-email-verification` (pushed, 5 commits, no PR yet)
 **Related PRs:** #101 (E2E fix, merged), #103 (Lighthouse disable, merged)
 
+> **Status (2026-07-20 evening):** This doc is now historical. STORY-007 landed in PR #107 (squash-merged into `main`). The Lighthouse CI proper fix landed in PR #116 (also squash-merged; see ADR-0026 / `docs/decisions.md` ADR-022 for the current state). The "remaining items" list at the bottom of this doc is out of date — see `docs/sprint-11/SPRINT-11-CLOSE-HANDOFF.md` (addendum 2) for what's actually still pending.
+
 This doc captures the current state and the next steps for two
 workstreams: (1) the Lighthouse CI fix and (2) the STORY-007
 email-verification implementation.
