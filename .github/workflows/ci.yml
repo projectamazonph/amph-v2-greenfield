@@ -247,7 +247,13 @@ jobs:
         with:
           name: build
           include-hidden-files: true
-          path: .next/standalone
+          # The trailing slash on `.next/standalone/` is
+          # load-bearing: actions/upload-artifact@v4 with a bare
+          # directory path zips the directory's CONTENTS (not the
+          # dir itself), so on download the files end up at the
+          # root of the destination and `.next/standalone/server.js`
+          # is missing. Adding the slash preserves the dir name.
+          path: .next/standalone/
 
   # Lighthouse CI re-enabled (STORY-0026 follow-up).
   #
@@ -279,7 +285,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build
-          path: ./
+          # Path must be `.next/` (not `./`) so the directory
+          # name is preserved on download — see the matching
+          # comment in the build job's upload step.
+          path: .next/
 
       - name: Start standalone Next.js server
         run: |

@@ -43,14 +43,20 @@ describe("ci.yml — standalone build contract", () => {
     expect(ci).toMatch(/if \[ -d public \]; then cp -r public\/\. \.next\/standalone\/public/);
   });
 
-  it("uploads only .next/standalone (the bundled artifact)", async () => {
+  it("uploads only .next/standalone/ (with trailing slash, the bundled artifact)", async () => {
     // Once static + public are copied INTO the standalone bundle,
     // uploading them at the project root is redundant and risky
     // (the lighthouse job could pick the wrong path).
+    //
+    // The trailing slash is load-bearing: actions/upload-artifact@v4
+    // with a bare directory path zips the directory's CONTENTS
+    // (not the dir itself), so on download the files end up at
+    // the root of the destination and `.next/standalone/server.js`
+    // is missing. Adding the slash preserves the dir name.
     const ci = await loadCI();
-    // The build-job upload path block should be just the standalone dir.
+    // The build-job upload path block should be `.next/standalone/`.
     const uploadSection = ci.match(/name: build[\s\S]+?path: ([^\n]+)/);
-    expect(uploadSection?.[1]?.trim()).toBe(".next/standalone");
+    expect(uploadSection?.[1]?.trim()).toBe(".next/standalone/");
   });
 
   it("starts the server from .next/standalone/server.js", async () => {
