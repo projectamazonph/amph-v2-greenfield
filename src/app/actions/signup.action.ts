@@ -70,6 +70,7 @@ export async function performSignUp(
     idGen: IdGenerator;
     clock: Clock;
     login: Login;
+    resendVerification: import("@/usecases/auth/ResendVerification").ResendVerification;
   },
   input: SignUpInput,
   deps: {
@@ -110,8 +111,17 @@ export async function performSignUp(
   // From here on, signUpResult is narrowed to the success branch.
   // Extract the user data now so the rest of the function doesn't
   // need to keep narrowing.
-  const { userId: _userId, email: signedUpEmail } = signUpResult;
-  void _userId;
+  const { userId, email: signedUpEmail } = signUpResult;
+
+  // Issue the verification token + send the email. Fire-and-forget
+  // from the user's perspective — if it fails (rate limit, email
+  // provider down), signup still succeeds. The user can request
+  // a new email from /verify-email/sent.
+  try {
+    await container.resendVerification.execute({ userId });
+  } catch (err) {
+    console.error("[performSignUp] resend verification failed:", err);
+  }
 
   // 3. Auto-login (best-effort). If it fails, still return success.
   //

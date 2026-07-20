@@ -22,6 +22,7 @@ import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { TestLogger } from "@/infra/observability/TestLogger";
 
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { InMemoryEmailVerificationRepository } from "@/infra/db/inmemory/InMemoryEmailVerificationRepository";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
@@ -117,6 +118,8 @@ import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
 import { UpdateLiveClass } from "@/usecases/UpdateLiveClass";
 import { DeleteLiveClass } from "@/usecases/DeleteLiveClass";
+import { VerifyEmail } from "@/usecases/auth/VerifyEmail";
+import { ResendVerification } from "@/usecases/auth/ResendVerification";
 
 import type { AppContainer } from "./container";
 
@@ -145,6 +148,7 @@ export interface TestContainer extends AppContainer {
   auditLog: InMemoryAuditLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
   liveClassRepo: InMemoryLiveClassRepository;
+  emailVerificationRepo: InMemoryEmailVerificationRepository;
 }
 
 export function buildTestContainer(): TestContainer {
@@ -166,6 +170,7 @@ export function buildTestContainer(): TestContainer {
   const badgeAwardRepo = new InMemoryBadgeAwardRepository();
   const certificateRepo = new InMemoryCertificateRepository();
   const sessionRepo = new InMemorySessionRepository();
+  const emailVerificationRepo = new InMemoryEmailVerificationRepository();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
@@ -186,6 +191,7 @@ export function buildTestContainer(): TestContainer {
   return {
     clock,
     idGen,
+    emailVerificationRepo,
     logger,
     rateLimiter,
     userRepo,
@@ -355,5 +361,21 @@ export function buildTestContainer(): TestContainer {
     createLiveClass: new CreateLiveClass({ liveClassRepo, recordAuditLog }),
     updateLiveClass: new UpdateLiveClass({ liveClassRepo, recordAuditLog }),
     deleteLiveClass: new DeleteLiveClass({ liveClassRepo, recordAuditLog }),
+    // STORY-007: email verification
+    verifyEmail: new VerifyEmail({
+      emailVerifications: emailVerificationRepo,
+      users: userRepo,
+      clock,
+      logger,
+    }),
+    resendVerification: new ResendVerification({
+      users: userRepo,
+      emailVerifications: emailVerificationRepo,
+      clock,
+      logger,
+      emailSender,
+      rateLimiter,
+      idGen,
+    }),
   };
 }

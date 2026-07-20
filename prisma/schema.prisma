@@ -87,6 +87,7 @@ model User {
   auditLogs    AuditLog[]
   ppcCampaigns PpcCampaign[]
   certificates Certificate[]
+  emailVerifications EmailVerification[]
 
   @@index([email])
   @@index([paymongoCustomerId])
@@ -470,4 +471,21 @@ model Certificate {
   @@index([userId])
   @@index([verificationHash])
   @@map("certificates")
+}
+
+// ── Email verification (STORY-007) ─────────────────────────────────────────
+
+model EmailVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("email_verifications")
 }
