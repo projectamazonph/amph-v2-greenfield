@@ -22,11 +22,11 @@
  *     userRepo) failed
  *
  * Idempotency:
- *   This use case is NOT idempotent. If the cron runs twice in the
- *   same window, students get duplicate emails. The proper fix is a
- *   `SentReminder` log table keyed on (liveClassId, userId) — track
- *   that as a follow-up. For P0-7 we accept the simplicity; the
- *   product team is aware.
+ *   Each (liveClassId, userId) pair is tracked in the
+ *   sent_reminders table. The use case checks `wasSent` before
+ *   sending and `markSent` after a successful delivery. The unique
+ *   constraint on (liveClassId, userId) is the source of truth.
+ *   Cron can run as often as you like — no duplicate emails.
  *
  * Output:
  *   `{ emailsSent, classesProcessed }` — useful for cron logging.
@@ -36,6 +36,7 @@ import { Result } from "@/domain/shared/Result";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
+import type { SentReminderRepository } from "@/ports/repositories/SentReminderRepository";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { LiveClassReminderRenderer } from "@/ports/email/LiveClassReminderRenderer";
 import type { Clock } from "@/ports/system/Clock";
@@ -61,6 +62,7 @@ export interface SendLiveClassRemindersDeps {
   liveClassRepo: ILiveClassRepository;
   enrollmentRepo: IEnrollmentRepository;
   userRepo: UserRepository;
+  sentReminders: SentReminderRepository;
   email: EmailSender;
   clock: Clock;
   logger: Logger;
@@ -116,11 +118,21 @@ export class SendLiveClassReminders {
       }
 
       classesProcessed += 1;
-      const minutesUntilStart = Math.round(
-        (cls.scheduledAt.getTime() - now.getTime()) / 60_000,
-      );
+      const minutesUntilStart = Math.round((cls.scheduledAt.getTime() - now.getTime()) / 60_000);
 
       for (const studentId of studentIds) {
+        // 4. Idempotency: skip if we already sent a reminder for this
+        // (liveClassId, userId) pair. The unique constraint in the
+        // sent_reminders table is the source of truth; this check
+        // is a fast-path to avoid the email-send round trip.
+        const alreadySent = await this.deps.sentReminders.wasSent({
+          liveClassId: cls.id,
+          userId: studentId,
+        });
+        if (alreadySent) {
+          continue;
+        }
+
         const userResult = await this.deps.userRepo.findById(studentId);
         if (!userResult.ok) {
           this.deps.logger.error("send_live_class_reminders.user_not_found", {
@@ -145,6 +157,19 @@ export class SendLiveClassReminders {
           react,
         });
         if (sendResult.ok) {
+          // 5. Mark as sent only after a successful delivery. If the
+          // send fails, the next cron run will retry.
+          const markResult = await this.deps.sentReminders.markSent({
+            liveClassId: cls.id,
+            userId: studentId,
+          });
+          if (!markResult.ok && markResult.error.kind !== "already_sent") {
+            this.deps.logger.error("send_live_class_reminders.mark_sent_failed", {
+              liveClassId: cls.id,
+              userId: studentId,
+              error: markResult.error,
+            });
+          }
           emailsSent += 1;
         } else {
           this.deps.logger.error("send_live_class_reminders.email_send_failed", {
