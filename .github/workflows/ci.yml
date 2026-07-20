@@ -247,13 +247,12 @@ jobs:
         with:
           name: build
           include-hidden-files: true
-          # The trailing slash on `.next/standalone/` is
-          # load-bearing: actions/upload-artifact@v4 with a bare
-          # directory path zips the directory's CONTENTS (not the
-          # dir itself), so on download the files end up at the
-          # root of the destination and `.next/standalone/server.js`
-          # is missing. Adding the slash preserves the dir name.
-          path: .next/standalone/
+          # `actions/upload-artifact@v4` zips the directory's
+          # CONTENTS (not the dir itself). The lighthouse job
+          # downloads the artifact and copies the contents into
+          # `.next/standalone/` where the server expects them
+          # (see the matching step in the lighthouse job).
+          path: .next/standalone
 
   # Lighthouse CI re-enabled (STORY-0026 follow-up).
   #
@@ -285,10 +284,29 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build
-          # Path must be `.next/` (not `./`) so the directory
-          # name is preserved on download — see the matching
-          # comment in the build job's upload step.
-          path: .next/
+          # Download to a fresh dir, then move the standalone
+          # bundle contents into `.next/standalone/`. The reason
+          # this is structured this way:
+          #
+          #   - `actions/upload-artifact@v4` with `path: .next/standalone/`
+          #     zips the directory's CONTENTS (server.js, node_modules/, etc.)
+          #     into the artifact.
+          #   - `actions/download-artifact@v4` with `path: .next/`
+          #     extracts those contents to `.next/`, losing the dir name.
+          #   - We need the files at `.next/standalone/server.js` and
+          #     `.next/standalone/node_modules/...` for the server to boot
+          #     (the server's `opts.dir` is `.next/standalone/`).
+          #
+          # Downloading to a fresh dir, then `cp -r` the contents into
+          # the right place, is simpler and more reliable than trying to
+          # thread the trailing-slash semantics through both actions.
+          path: _artifact/
+
+      - name: Place standalone bundle in the expected location
+        run: |
+          mkdir -p .next
+          cp -r _artifact/. .next/standalone/
+          ls -la .next/standalone/ | head -10
 
       - name: Start standalone Next.js server
         run: |
