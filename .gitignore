@@ -57,3 +57,9 @@ prisma/migrations/dev.db*
 .cache/
 .turbo/
 *.pem
+
+# agent skills lock
+skills-lock.json
+.agents/
+.claude/
+agent/

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**
  * FAQ — 4 contract tests.
  */
