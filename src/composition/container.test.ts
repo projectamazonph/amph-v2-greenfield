@@ -25,6 +25,7 @@ import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserReposit
 import { InMemoryEmailVerificationRepository } from "@/infra/db/inmemory/InMemoryEmailVerificationRepository";
 import { InMemoryPasswordResetRepository } from "@/infra/db/inmemory/InMemoryPasswordResetRepository";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
+import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
@@ -124,6 +125,7 @@ import { VerifyEmail } from "@/usecases/auth/VerifyEmail";
 import { ResendVerification } from "@/usecases/auth/ResendVerification";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
 import { ResetPassword } from "@/usecases/auth/ResetPassword";
+import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
 
 import type { AppContainer } from "./container";
 
@@ -178,6 +180,7 @@ export function buildTestContainer(): TestContainer {
   const emailVerificationRepo = new InMemoryEmailVerificationRepository();
   const passwordResetRepo = new InMemoryPasswordResetRepository();
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
+  const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
@@ -404,6 +407,16 @@ export function buildTestContainer(): TestContainer {
       logger,
       email: emailSender,
       hasher: passwordHasher,
+    }),
+    // P0-7: live class reminders
+    sendLiveClassReminders: new SendLiveClassReminders({
+      liveClassRepo,
+      enrollmentRepo,
+      userRepo,
+      email: emailSender,
+      clock,
+      logger,
+      renderer: liveClassReminderRenderer,
     }),
   };
 }

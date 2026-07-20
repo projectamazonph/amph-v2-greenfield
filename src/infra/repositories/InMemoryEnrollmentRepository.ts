@@ -40,6 +40,15 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
     return Result.ok(all);
   }
 
+  async findByCourseId(
+    courseId: string,
+  ): Promise<Result<readonly Enrollment[], EnrollmentError>> {
+    const all = Array.from(this.enrollments.values()).filter(
+      (e) => e.courseId === courseId,
+    );
+    return Result.ok(all);
+  }
+
   async create(enrollment: Enrollment): Promise<Result<Enrollment, EnrollmentError>> {
     const key = `${enrollment.userId}:${enrollment.courseId}`;
     if (this.userCourseIndex.has(key)) {

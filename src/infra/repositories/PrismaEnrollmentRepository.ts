@@ -47,6 +47,17 @@ export class PrismaEnrollmentRepository implements IEnrollmentRepository {
     }
   }
 
+  async findByCourseId(
+    courseId: string,
+  ): Promise<Result<readonly Enrollment[], EnrollmentError>> {
+    try {
+      const rows = await this.db.enrollment.findMany({ where: { courseId } });
+      return Result.ok(rows.map((r) => this.mapRow(r)));
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async create(enrollment: Enrollment): Promise<Result<Enrollment, EnrollmentError>> {
     try {
       const row = await this.db.enrollment.create({

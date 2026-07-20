@@ -30,6 +30,13 @@ export interface IEnrollmentRepository {
   findByUserId(userId: string): Promise<Result<readonly Enrollment[], EnrollmentError>>;
 
   /**
+   * Find all enrollments for a course.
+   * Used by the live class reminder use case to fan out reminder
+   * emails to every student enrolled in the course.
+   */
+  findByCourseId(courseId: string): Promise<Result<readonly Enrollment[], EnrollmentError>>;
+
+  /**
    * Find an enrollment by its ID.
    */
   findById(id: string): Promise<Result<Enrollment, EnrollmentError>>;
