@@ -133,4 +133,146 @@ describe("Login", () => {
     expect(r1.sessionToken).not.toBe(r2.sessionToken);
     expect(sessionRepo.size()).toBe(2);
   });
+
+  // ── input validation ─────────────────────────────────────
+
+  it("returns user_not_found for a malformed email (no @)", async () => {
+    const result = await useCase.execute({ email: "not-an-email", password: "Str0ngP@ss!" });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "user_not_found" });
+  });
+
+  // ── db_error on find user ──────────────────────────────
+
+  it("returns db_error when the user repo findByEmail fails", async () => {
+    const flakyRepo = new (class extends InMemoryUserRepository {
+      override async findByEmail() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
+      }
+    })();
+    const failingUseCase = new Login(flakyRepo, hasher, sessionRepo, idGen, clock, {
+      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
+      async verify() { return { ok: true, value: {} } as const; },
+    });
+    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "db_error", message: "find user failed" });
+  });
+
+  // ── account_suspended ───────────────────────────────────
+
+  it("returns account_suspended when the user is SUSPENDED", async () => {
+    // Stub the user repo to return a SUSPENDED user. The InMemory repo
+    // doesn't let us set verificationStatus via create(), so we wrap it.
+    const suspendedRepo = new InMemoryUserRepository();
+    const failingUseCase = new Login(suspendedRepo, hasher, sessionRepo, idGen, clock, {
+      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
+      async verify() { return { ok: true, value: {} } as const; },
+    });
+    // Patch findByEmail to return a suspended user
+    (suspendedRepo as { findByEmail: typeof suspendedRepo.findByEmail }).findByEmail =
+      (async () => ({
+        ok: true,
+        value: {
+          id: "user-2",
+          email: "suspended@example.com",
+          firstName: "S",
+          lastName: "S",
+          role: "student",
+          subscriptionTier: "FREE",
+          verificationStatus: "SUSPENDED",
+          enrolledCourseIds: [],
+          createdAt: clock.now(),
+          totalXp: 0,
+          emailVerifiedAt: null,
+        },
+      })) as never;
+
+    const result = await failingUseCase.execute({ email: "suspended@example.com", password: "Str0ngP@ss!" });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "account_suspended" });
+  });
+
+  // ── db_error on getPasswordHash ─────────────────────────
+
+  it("returns wrong_password when the user repo getPasswordHash fails", async () => {
+    // The use case defensively returns wrong_password on a getPasswordHash
+    // failure — the same code path as a wrong password. A getPasswordHash
+    // error means we can't verify, so we deny auth.
+    // Wrap the existing seeded repo (alice is in it) to override getPasswordHash.
+    const flakyRepo = new (class extends InMemoryUserRepository {
+      override async getPasswordHash() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
+      }
+    })();
+    await flakyRepo.create({
+      id: "user-1",
+      email: "alice@example.com",
+      passwordHash: "stubbed:Str0ngP@ss!",
+      firstName: "Alice",
+      lastName: "Rodriguez",
+    });
+    const failingUseCase = new Login(flakyRepo, hasher, sessionRepo, idGen, clock, {
+      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
+      async verify() { return { ok: true, value: {} } as const; },
+    });
+    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "wrong_password" });
+  });
+
+  // ── hasher returns false ────────────────────────────────
+
+  it("returns wrong_password when the hasher verify returns false", async () => {
+    const denyHasher = new (class extends StubHasher {
+      override async verify() { return { ok: true, value: false } as const; }
+    })();
+    const failingUseCase = new Login(userRepo, denyHasher, sessionRepo, idGen, clock, {
+      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
+      async verify() { return { ok: true, value: {} } as const; },
+    });
+    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "wrong_password" });
+    expect(sessionRepo.size()).toBe(0);
+  });
+
+  // ── session create fails ────────────────────────────────
+
+  it("returns db_error when the session repo create fails", async () => {
+    const flakySessionRepo = new (class extends InMemorySessionRepository {
+      override async create() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
+      }
+    })();
+    const failingUseCase = new Login(userRepo, hasher, flakySessionRepo, idGen, clock, {
+      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
+      async verify() { return { ok: true, value: {} } as const; },
+    });
+    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "db_error", message: "session create failed" });
+  });
+
+  // ── jwt sign fails ──────────────────────────────────────
+
+  it("returns token_error when the jwt sign fails", async () => {
+    const failingUseCase = new Login(userRepo, hasher, sessionRepo, idGen, clock, {
+      async sign() { return { ok: false, error: new Error("HS256 fail") } as const; },
+      async verify() { return { ok: true, value: {} } as const; },
+    });
+    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "token_error", message: "jwt sign failed" });
+    // Session was created but the token couldn't be signed. The
+    // orphaned session is a known limitation (story STORY-013 follow-up).
+    expect(sessionRepo.size()).toBe(1);
+  });
 });

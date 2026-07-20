@@ -187,4 +187,67 @@ describe("VerifyEmail", () => {
     expect(seen).toEqual([sha256(token)]);
     expect(seen[0]).not.toBe(token); // sanity: the raw token was NOT used
   });
+
+  // ── additional error paths (STORY-010) ─────────────────
+
+  it("returns invalid_token when markUsed fails (defensive, e.g. DB down)", async () => {
+    const token = "tok-markfail";
+    await emailVerifications.create({
+      userId: "user-1",
+      tokenHash: sha256(token),
+      expiresAt: new Date(T0.getTime() + 24 * 60 * 60 * 1000),
+    });
+    // Spy that succeeds findByTokenHash but fails markUsed.
+    const spy = {
+      async create(args: Parameters<typeof emailVerifications.create>[0]) {
+        return emailVerifications.create(args);
+      },
+      async findByTokenHash(tokenHash: string) {
+        return emailVerifications.findByTokenHash(tokenHash);
+      },
+      async markUsed() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as const;
+      },
+    };
+    const useCaseWithSpy = new VerifyEmail({
+      emailVerifications: spy,
+      users,
+      clock,
+      logger,
+    });
+    const result = await useCaseWithSpy.execute({ token });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("invalid_token");
+  });
+
+  it("returns invalid_token when userRepo.update fails after marking the token used", async () => {
+    const token = "tok-userupdate-fail";
+    await emailVerifications.create({
+      userId: "user-1",
+      tokenHash: sha256(token),
+      expiresAt: new Date(T0.getTime() + 24 * 60 * 60 * 1000),
+    });
+    const flakyUsers = new (class extends InMemoryUserRepository {
+      override async update() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
+      }
+    })();
+    const useCaseWithFlaky = new VerifyEmail({
+      emailVerifications,
+      users: flakyUsers,
+      clock,
+      logger,
+    });
+    const result = await useCaseWithFlaky.execute({ token });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("invalid_token");
+    // The token is still burned (markUsed succeeded) so the user can't
+    // replay it; they must request a new verification email.
+    const replay = await useCase.execute({ token });
+    expect(replay.ok).toBe(false);
+    if (replay.ok) return;
+    expect(replay.error.kind).toBe("token_already_used");
+  });
 });

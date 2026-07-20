@@ -113,6 +113,31 @@ describe("SendLiveClassReminders", () => {
     status?: "scheduled" | "cancelled" | "completed";
   }) {
     const scheduledAt = new Date(NOW.getTime() + opts.minutesFromNow * 60_000);
+
+    // The createLiveClass factory refuses past dates by design. For
+    // the "skips classes that have already started" tests, we need
+    // to seed a class with a past scheduledAt. Build the LiveClass
+    // object directly and inject it via the repo's create() (which
+    // doesn't enforce factory-level rules).
+    const status = opts.status ?? "scheduled";
+    if (scheduledAt <= new Date()) {
+      const lc = {
+        id: opts.id,
+        courseId: opts.courseId,
+        title: opts.title,
+        scheduledAt,
+        durationMinutes: 60,
+        instructorId: "instr-1",
+        meetingUrl: "https://zoom.us/j/1234567890",
+        status,
+        createdAt: NOW,
+        updatedAt: NOW,
+      } as const;
+      const r = await liveClassRepo.create(lc as never);
+      if (!r.ok) throw new Error("seed class failed");
+      return lc as never;
+    }
+
     const created = createLiveClass({
       id: opts.id,
       courseId: opts.courseId,
@@ -121,7 +146,7 @@ describe("SendLiveClassReminders", () => {
       durationMinutes: 60,
       instructorId: "instr-1",
       meetingUrl: "https://zoom.us/j/1234567890",
-      status: opts.status ?? "scheduled",
+      status,
     });
     if (!created.ok) throw new Error("createLiveClass failed");
     const r = await liveClassRepo.create(created.value);

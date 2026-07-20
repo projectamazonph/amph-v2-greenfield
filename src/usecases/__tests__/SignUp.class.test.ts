@@ -123,5 +123,84 @@ describe("SignUp (class)", () => {
       // Hash is NOT the plaintext password
       expect(hash).not.toBe(validInput.password);
     });
+
+    // ── additional error paths (STORY-010) ─────────────────
+
+    it("returns email_taken when emailExists reports a duplicate", async () => {
+      // Pre-seed the user repo to simulate someone else having
+      // signed up with the same email. The use case checks
+      // emailExists *before* create, so a pre-seeded user
+      // surfaces this branch.
+      await userRepo.create({
+        id: "preexisting",
+        email: "alice@example.com",
+        passwordHash: "stubbed:PreExistingP@ss!",
+        firstName: "P",
+        lastName: "X",
+      });
+
+      const result = await signUp.execute(validInput);
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "email_taken" });
+    });
+
+    it("returns db_error when emailExists fails", async () => {
+      const flakyRepo = new (class extends InMemoryUserRepository {
+        override async emailExists() {
+          return R.err({ kind: "db_error", message: "pg down" } as never);
+        }
+      })();
+      const failingSignUp = new SignUp(flakyRepo, idGen, clock, new StubHasher());
+      const result = await failingSignUp.execute(validInput);
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "db_error", message: "email check failed" });
+    });
+
+    it("returns email_taken when create() fails on a race (passed emailExists but DB INSERT failed)", async () => {
+      // Simulate the race: emailExists says "no", but a concurrent
+      // transaction created the user first. The DB unique constraint
+      // kicks in and create() returns email_taken.
+      const racingRepo = new (class extends InMemoryUserRepository {
+        override async emailExists() {
+          return R.ok(false); // looks free
+        }
+        override async create() {
+          return R.err({ kind: "email_taken" } as never); // but create fails
+        }
+      })();
+      const racingSignUp = new SignUp(racingRepo, idGen, clock, new StubHasher());
+      const result = await racingSignUp.execute(validInput);
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "email_taken" });
+    });
+
+    it("returns db_error when create() fails on a non-email-taken error", async () => {
+      const racingRepo = new (class extends InMemoryUserRepository {
+        override async create() {
+          return R.err({ kind: "db_error", message: "fk violation" } as never);
+        }
+      })();
+      const failingSignUp = new SignUp(racingRepo, idGen, clock, new StubHasher());
+      const result = await failingSignUp.execute(validInput);
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "db_error", message: "create user failed" });
+    });
+
+    it("throws when the hasher returns an error (defensive branch — should not happen in prod)", async () => {
+      // The use case has a private hashPassword that throws if
+      // the hasher returns Result.err. We use a failing hasher to
+      // hit that defensive branch.
+      const failingHasher = new (class extends StubHasher {
+        override async hash() {
+          return R.err(new Error("argon2 out of memory") as never);
+        }
+      })();
+      const failingSignUp = new SignUp(userRepo, idGen, clock, failingHasher);
+      await expect(failingSignUp.execute(validInput)).rejects.toThrow(/Password hashing failed/);
+    });
   });
 });

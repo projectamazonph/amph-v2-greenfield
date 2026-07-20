@@ -121,4 +121,46 @@ describe("Logout use case", () => {
     const r2 = await useCase.execute({ token: sign.value });
     expect(r2.ok).toBe(true);
   });
+
+  // ── additional edge cases ─────────────────────────────
+
+  it("returns invalid_token when the JWT is valid but carries no sessionId claim", async () => {
+    // The Logout use case requires sessionId in the JWT payload —
+    // otherwise it's not our session. We mint a JWT via the same
+    // secret but with no sessionId in the payload.
+    const useCase = new Logout(container.sessionRepo, container.jwt);
+    const sign = await container.jwt.sign(
+      { sub: "u-test", role: "student" }, // no sessionId
+      "1h",
+    );
+    expect(sign.ok).toBe(true);
+    if (!sign.ok) return;
+    const result = await useCase.execute({ token: sign.value });
+    expect(result).toEqual({ ok: false, error: { kind: "invalid_token" } });
+  });
+
+  it("returns db_error when the session repo deleteById fails", async () => {
+    // Wrap the in-memory session repo to force a deleteById error.
+    // The InMemorySessionRepository always returns ok from deleteById
+    // (idempotent), so we need a different repo that returns a real
+    // db_error. We extend the InMemorySessionRepository and override.
+    const { InMemorySessionRepository } = await import(
+      "@/infra/repositories/InMemorySessionRepository"
+    );
+    class FlakySessionRepo extends InMemorySessionRepository {
+      override async deleteById() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as const;
+      }
+    }
+    const flakyRepo = new FlakySessionRepo();
+    const useCase = new Logout(flakyRepo, container.jwt);
+    const sign = await container.jwt.sign(
+      { sub: "u-test", sessionId: "sess-1", role: "student" },
+      "1h",
+    );
+    expect(sign.ok).toBe(true);
+    if (!sign.ok) return;
+    const result = await useCase.execute({ token: sign.value });
+    expect(result).toEqual({ ok: false, error: { kind: "db_error", message: "pg down" } });
+  });
 });

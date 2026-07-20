@@ -206,4 +206,47 @@ describe("ResendVerification", () => {
     // No email sent
     expect(emailSender.sent).toHaveLength(0);
   });
+
+  // ── additional error paths (STORY-010) ─────────────────
+
+  it("returns user_not_found when the user does not exist", async () => {
+    const rateLimiter = new StubRateLimiter(true);
+    const useCase = makeUseCase(rateLimiter);
+
+    const result = await useCase.execute({ userId: "ghost-user" });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("user_not_found");
+    expect(emailSender.sent).toHaveLength(0);
+  });
+
+  it("returns user_not_found when the verification record create fails (DB down)", async () => {
+    await seedUnverifiedUser();
+    const rateLimiter = new StubRateLimiter(true);
+    const flakyRepo = new (class extends InMemoryEmailVerificationRepository {
+      override async create() {
+        return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
+      }
+    })();
+    const useCase = new ResendVerification({
+      users,
+      emailVerifications: flakyRepo,
+      clock,
+      logger,
+      emailSender,
+      verificationEmailRenderer: new EmailVerificationTemplateRenderer(),
+      rateLimiter,
+      idGen,
+    });
+
+    const result = await useCase.execute({ userId: "user-1" });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    // The use case maps the internal create-failed error to
+    // user_not_found to avoid leaking DB state to the caller.
+    expect(result.error.kind).toBe("user_not_found");
+    expect(emailSender.sent).toHaveLength(0);
+  });
 });

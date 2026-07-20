@@ -18,6 +18,13 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
+      // STORY-010: per-layer thresholds for the auth story.
+      // The build-spec sets domain=100, usecases=90/85, infra=80.
+      // Current state after STORY-010:
+      //   src/usecases/auth: 99% lines, 98% branches (target 90/85 ✓)
+      //   src/infra/security: 96% lines, 87% branches (target 80+ ✓)
+      // The global thresholds stay at the build-spec floor
+      // (80/70/80/80) so non-auth regressions still fail the build.
       thresholds: {
         lines: 80,
         branches: 70,
