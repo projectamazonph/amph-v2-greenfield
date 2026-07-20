@@ -43,6 +43,7 @@ import { createEnrollment } from "@/domain/entities/Enrollment";
 import { createUser } from "@/domain/entities/User";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
+import { InMemorySentReminderRepository } from "@/infra/db/inmemory/InMemorySentReminderRepository";
 import type { Logger } from "@/ports/observability/Logger";
 
 class SilentLogger implements Logger {
@@ -68,6 +69,7 @@ describe("SendLiveClassReminders", () => {
   let enrollmentRepo: InMemoryEnrollmentRepository;
   let userRepo: InMemoryUserRepository;
   let emailSender: StubEmailSender;
+  let sentReminderRepo: InMemorySentReminderRepository;
   let useCase: SendLiveClassReminders;
   const renderer = new LiveClassReminderTemplateRenderer();
 
@@ -78,11 +80,13 @@ describe("SendLiveClassReminders", () => {
     enrollmentRepo = new InMemoryEnrollmentRepository();
     userRepo = new InMemoryUserRepository();
     emailSender = new StubEmailSender();
+    sentReminderRepo = new InMemorySentReminderRepository();
     useCase = new SendLiveClassReminders({
       liveClassRepo,
       enrollmentRepo,
       userRepo,
       email: emailSender,
+      sentReminders: sentReminderRepo,
       clock: new FixedClock(NOW),
       logger: new SilentLogger(),
       renderer,
@@ -284,5 +288,113 @@ describe("SendLiveClassReminders", () => {
     expect(html).toContain("Alice");
     expect(html).toContain("PPC Mastery");
     expect(html).toContain("30 minutes");
+  });
+
+  // ── idempotency (P0-7 follow-up) ───────────────────────────────────
+
+  it("skips a (class, student) pair that was already reminded", async () => {
+    const cls = await seedClass({
+      id: "class-1",
+      courseId: "course-1",
+      title: "PPC 101",
+      minutesFromNow: 30,
+    });
+    const u1 = await seedUser({ id: "u-1", firstName: "Alice", email: "a@e.com" });
+    const u2 = await seedUser({ id: "u-2", firstName: "Bob", email: "b@e.com" });
+    await seedEnrollment({ userId: u1.id, courseId: cls.courseId });
+    await seedEnrollment({ userId: u2.id, courseId: cls.courseId });
+
+    // Mark Alice as already reminded (simulating a prior cron run)
+    await sentReminderRepo.markSent({ liveClassId: cls.id, userId: u1.id });
+
+    const result = await useCase.execute();
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // Only Bob gets the email; Alice was already reminded
+    expect(result.value.emailsSent).toBe(1);
+    expect(emailSender.sent).toHaveLength(1);
+    expect(emailSender.sent[0]!.to).toBe("b@e.com");
+  });
+
+  it("marks each sent (class, student) pair after a successful send", async () => {
+    const cls = await seedClass({
+      id: "class-1",
+      courseId: "course-1",
+      title: "PPC 101",
+      minutesFromNow: 30,
+    });
+    const u1 = await seedUser({ id: "u-1", firstName: "Alice", email: "a@e.com" });
+    const u2 = await seedUser({ id: "u-2", firstName: "Bob", email: "b@e.com" });
+    await seedEnrollment({ userId: u1.id, courseId: cls.courseId });
+    await seedEnrollment({ userId: u2.id, courseId: cls.courseId });
+
+    await useCase.execute();
+
+    expect(await sentReminderRepo.wasSent({ liveClassId: cls.id, userId: u1.id })).toBe(true);
+    expect(await sentReminderRepo.wasSent({ liveClassId: cls.id, userId: u2.id })).toBe(true);
+  });
+
+  it("does NOT mark a (class, student) pair if the email send fails", async () => {
+    const cls = await seedClass({
+      id: "class-1",
+      courseId: "course-1",
+      title: "PPC 101",
+      minutesFromNow: 30,
+    });
+    const u = await seedUser({ id: "u-1", firstName: "Alice", email: "a@e.com" });
+    await seedEnrollment({ userId: u.id, courseId: cls.courseId });
+
+    // Make the email sender fail
+    emailSender = new (class extends StubEmailSender {
+      override async send() {
+        return Result.err({ kind: "send_failed", message: "smtp down" } as never);
+      }
+    })();
+
+    useCase = new SendLiveClassReminders({
+      liveClassRepo,
+      enrollmentRepo,
+      userRepo,
+      email: emailSender,
+      sentReminders: sentReminderRepo,
+      clock: new FixedClock(NOW),
+      logger: new SilentLogger(),
+      renderer,
+    });
+
+    const result = await useCase.execute();
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.emailsSent).toBe(0);
+    // No markSent call — the next cron run will retry
+    expect(await sentReminderRepo.wasSent({ liveClassId: cls.id, userId: u.id })).toBe(false);
+  });
+
+  it("is idempotent: running the cron twice sends zero duplicate emails", async () => {
+    const cls = await seedClass({
+      id: "class-1",
+      courseId: "course-1",
+      title: "PPC 101",
+      minutesFromNow: 30,
+    });
+    const u = await seedUser({ id: "u-1", firstName: "Alice", email: "a@e.com" });
+    await seedEnrollment({ userId: u.id, courseId: cls.courseId });
+
+    // First run
+    const r1 = await useCase.execute();
+    expect(r1.ok).toBe(true);
+    if (!r1.ok) return;
+    expect(r1.value.emailsSent).toBe(1);
+
+    // Second run (e.g. cron fires again 5 minutes later)
+    const r2 = await useCase.execute();
+    expect(r2.ok).toBe(true);
+    if (!r2.ok) return;
+    expect(r2.value.emailsSent).toBe(0);
+
+    // Total emails sent: exactly 1, not 2
+    expect(emailSender.sent).toHaveLength(1);
   });
 });

@@ -121,6 +121,7 @@ import { ResendVerification } from "@/usecases/auth/ResendVerification";
 import type { EmailVerificationRepository } from "@/ports/repositories/EmailVerificationRepository";
 import { PrismaEmailVerificationRepository } from "@/infra/repositories/PrismaEmailVerificationRepository";
 import { PrismaPasswordResetRepository } from "@/infra/repositories/PrismaPasswordResetRepository";
+import { PrismaSentReminderRepository } from "@/infra/repositories/PrismaSentReminderRepository";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
@@ -194,6 +195,7 @@ import { CreateLiveClass } from "@/usecases/CreateLiveClass";
 import { UpdateLiveClass } from "@/usecases/UpdateLiveClass";
 import { DeleteLiveClass } from "@/usecases/DeleteLiveClass";
 import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
+import type { SentReminderRepository } from "@/ports/repositories/SentReminderRepository";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
@@ -355,6 +357,7 @@ function buildProductionContainer(): AppContainer {
   const sessionRepo: SessionRepository = new InMemorySessionRepository();
   const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(prisma);
   const passwordResetRepo: PasswordResetRepository = new PrismaPasswordResetRepository(prisma);
+  const sentReminderRepo: SentReminderRepository = new PrismaSentReminderRepository(prisma);
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
   // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
@@ -599,6 +602,7 @@ function buildProductionContainer(): AppContainer {
       liveClassRepo,
       enrollmentRepo,
       userRepo,
+      sentReminders: sentReminderRepo,
       email: emailSender,
       clock,
       logger,

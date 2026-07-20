@@ -506,3 +506,20 @@ model PasswordReset {
   @@index([userId])
   @@map("password_resets")
 }
+
+// ── Live class reminder log (P0-7 follow-up) ───────────────────────
+
+model SentReminder {
+  id           String   @id @default(cuid())
+  liveClassId  String
+  userId       String
+  sentAt       DateTime @default(now())
+
+  // Unique on the (liveClassId, userId) pair so the database itself
+  // enforces "you can't send the same reminder twice". The use case
+  // treats a unique violation as success (the row already exists,
+  // so the email was already sent on a prior cron run).
+  @@unique([liveClassId, userId])
+  @@index([liveClassId])
+  @@map("sent_reminders")
+}
