@@ -4,6 +4,16 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-22: Module/Lesson admin CRUD now writes to the audit trail
+
+- `fix(admin): wire RecordAuditLog into the 8 Module/Lesson use cases`
+  - Every other admin resource (`Course`, `LiveClass`, `DiscountCode`, `Badge`, `SimulatorScenario`) calls `RecordAuditLog` on create/update/delete/archive; `Module`/`Lesson` never did, a gap every PR in the P0-2 series left unchecked in its own "Architecture" checklist. `AuditAction` already reserved `module.*`/`lesson.*` success actions (STORY-050a) but no use case used them.
+  - Added `module.*_failed`/`lesson.*_failed` to `AuditAction` (matching the `discount_code.*`/`badge.*`/`live_class.*` convention).
+  - `CreateModule`, `UpdateModule`, `DeleteModule`, `ReorderModules`, `CreateLesson`, `UpdateLesson`, `DeleteLesson`, `ReorderLessons`: added `actorId` to `Input`, `recordAuditLog` to `Deps`, and a `recordAuditLog.execute()` call on every success and failure path, mirroring `CreateLiveClass`/`UpdateLiveClass`/`DeleteLiveClass`.
+  - Threaded `actorId` (already resolved via `getCurrentAdminId()`) through the 8 corresponding server actions; added `*PageInput = Omit<*Input, "actorId">` types where the action's exported input was the raw use-case input, so pages can't (and don't need to) pass `actorId` themselves.
+  - Wired `recordAuditLog` into all 8 use case constructors in both `buildProductionContainer()` and `buildTestContainer()`.
+  - 16 new tests (2 per use case: audit entry recorded on success, audit entry recorded on failure) across the 8 existing use-case test files. Full suite: 2258 passed, 2 skipped (was 2242). `pnpm tsc --noEmit`, `pnpm lint`, `pnpm build` all clean.
+
 ### 2026-07-22: E2E cleanup helper fix, `fix(test): construct clearE2EUsers' PrismaClient with a driver adapter`
 
 - `tests/e2e/helpers/seed.ts`'s `clearE2EUsers()` constructed `new PrismaClient()` with no arguments. This codebase runs Prisma 7 with driver adapters (`prisma/schema.prisma`'s `datasource` has no `url`; the real connection is supplied via `PrismaPg` + `pg.Pool`, see `src/infra/database/prisma.ts`), so the bare constructor always threw `PrismaClientInitializationError`, on every run, regardless of `DATABASE_URL`. The helper's own try/catch (written to tolerate a missing `DATABASE_URL` in CI workers without failing `afterEach`) silently swallowed this too, so the E2E user cleanup between runs never actually happened.

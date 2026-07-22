@@ -12,6 +12,8 @@ import { getSessionUserId } from "@/lib/auth";
 import type { CreateModule, CreateModuleInput, CreateModuleError } from "@/usecases/CreateModule";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
+export type CreateModulePageInput = Omit<CreateModuleInput, "actorId">;
+
 export type CreateModuleActionResult = Result<
   { moduleId: string },
   CreateModuleError | { kind: "unauthorized" }
@@ -19,17 +21,15 @@ export type CreateModuleActionResult = Result<
 
 export async function performCreateModule(
   container: { userRepo: UserRepository; createModule: CreateModule },
-  input: CreateModuleInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  input: CreateModulePageInput,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<CreateModuleActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.createModule.execute(input);
+  const result = await container.createModule.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -48,7 +48,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function createModuleAction(
-  input: CreateModuleInput,
+  input: CreateModulePageInput,
 ): Promise<CreateModuleActionResult> {
   const container = buildContainer();
   return performCreateModule(container, input, defaultGetCurrentAdminId);

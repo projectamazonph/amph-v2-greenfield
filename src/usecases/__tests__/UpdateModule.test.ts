@@ -7,8 +7,21 @@ import { UpdateModule } from "@/usecases/UpdateModule";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { createModule, type Module } from "@/domain/entities/Module";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 
-async function seedModule(repo: InMemoryModuleRepository, overrides: Partial<Module> = {}): Promise<Module> {
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
+async function seedModule(
+  repo: InMemoryModuleRepository,
+  overrides: Partial<Module> = {},
+): Promise<Module> {
   const r = createModule({
     id: "m1",
     courseId: "course_01",
@@ -23,13 +36,16 @@ async function seedModule(repo: InMemoryModuleRepository, overrides: Partial<Mod
 
 describe("UpdateModule", () => {
   let moduleRepo: InMemoryModuleRepository;
+  let recordAuditLog: RecordAuditLog;
   let useCase: UpdateModule;
 
   beforeEach(() => {
     moduleRepo = new InMemoryModuleRepository();
+    recordAuditLog = makeRecordAuditLog();
     useCase = new UpdateModule({
       moduleRepo,
       clock: new FixedClock(new Date("2026-07-19T12:00:00Z")),
+      recordAuditLog,
     });
   });
 
@@ -39,6 +55,7 @@ describe("UpdateModule", () => {
     const r = await useCase.execute({
       moduleId: "m1",
       patch: { title: "New Title" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -52,6 +69,7 @@ describe("UpdateModule", () => {
     const r = await useCase.execute({
       moduleId: "m1",
       patch: { title: "New" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -62,7 +80,7 @@ describe("UpdateModule", () => {
   it("bumps updatedAt to the injected clock", async () => {
     const t0 = new Date("2026-07-19T12:00:00Z");
     const clock = new FixedClock(t0);
-    useCase = new UpdateModule({ moduleRepo, clock });
+    useCase = new UpdateModule({ moduleRepo, clock, recordAuditLog });
     const seeded = await seedModule(moduleRepo, {
       updatedAt: new Date("2025-01-01T00:00:00Z"),
     });
@@ -70,6 +88,7 @@ describe("UpdateModule", () => {
     const r = await useCase.execute({
       moduleId: "m1",
       patch: { title: "New" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -85,6 +104,7 @@ describe("UpdateModule", () => {
     const r = await useCase.execute({
       moduleId: "m1",
       patch: { title: "New" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -96,6 +116,7 @@ describe("UpdateModule", () => {
     const r = await useCase.execute({
       moduleId: "missing",
       patch: { title: "X" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -109,6 +130,7 @@ describe("UpdateModule", () => {
     const r = await useCase.execute({
       moduleId: "m1",
       patch: { title: "   " },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -125,6 +147,7 @@ describe("UpdateModule", () => {
     const r = await useCase.execute({
       moduleId: "m1",
       patch: { title: "X" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -142,6 +165,7 @@ describe("UpdateModule", () => {
     const r = await useCase.execute({
       moduleId: "m1",
       patch: { title: "X" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -151,11 +175,26 @@ describe("UpdateModule", () => {
 
   it("persists the updated module", async () => {
     await seedModule(moduleRepo);
-    await useCase.execute({ moduleId: "m1", patch: { title: "New" } });
+    await useCase.execute({ moduleId: "m1", patch: { title: "New" }, actorId: "admin_1" });
 
     const persisted = await moduleRepo.findById("m1");
     expect(persisted.ok).toBe(true);
     if (!persisted.ok) return;
     expect(persisted.value.title).toBe("New");
+  });
+
+  it("records an audit log entry on success", async () => {
+    await seedModule(moduleRepo);
+    await useCase.execute({ moduleId: "m1", patch: { title: "New" }, actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "module.updated")).toBe(true);
+  });
+
+  it("records an audit log entry on failure", async () => {
+    await useCase.execute({ moduleId: "missing", patch: { title: "X" }, actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "module.update_failed")).toBe(true);
   });
 });

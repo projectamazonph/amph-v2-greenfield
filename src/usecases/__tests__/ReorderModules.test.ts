@@ -6,8 +6,22 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { ReorderModules } from "@/usecases/ReorderModules";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { createModule, type Module } from "@/domain/entities/Module";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { FixedClock } from "@/ports/system/Clock";
 
-async function seedModule(repo: InMemoryModuleRepository, overrides: Partial<Module> = {}): Promise<Module> {
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
+async function seedModule(
+  repo: InMemoryModuleRepository,
+  overrides: Partial<Module> = {},
+): Promise<Module> {
   const r = createModule({
     id: `m_${Math.random().toString(36).slice(2, 6)}`,
     courseId: "course_01",
@@ -22,11 +36,13 @@ async function seedModule(repo: InMemoryModuleRepository, overrides: Partial<Mod
 
 describe("ReorderModules", () => {
   let moduleRepo: InMemoryModuleRepository;
+  let recordAuditLog: RecordAuditLog;
   let useCase: ReorderModules;
 
   beforeEach(() => {
     moduleRepo = new InMemoryModuleRepository();
-    useCase = new ReorderModules({ moduleRepo });
+    recordAuditLog = makeRecordAuditLog();
+    useCase = new ReorderModules({ moduleRepo, recordAuditLog });
   });
 
   it("reorders modules in the requested order", async () => {
@@ -37,6 +53,7 @@ describe("ReorderModules", () => {
     const r = await useCase.execute({
       courseId: "course_01",
       moduleIds: ["m3", "m1", "m2"],
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -53,6 +70,7 @@ describe("ReorderModules", () => {
     const r = await useCase.execute({
       courseId: "course_01",
       moduleIds: ["m3", "m1", "m2"],
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -68,6 +86,7 @@ describe("ReorderModules", () => {
     const r = await useCase.execute({
       courseId: "course_01",
       moduleIds: ["m1"],
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -81,6 +100,7 @@ describe("ReorderModules", () => {
     const r = await useCase.execute({
       courseId: "course_01",
       moduleIds: ["m1", "m2"],
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -95,6 +115,7 @@ describe("ReorderModules", () => {
     const r = await useCase.execute({
       courseId: "course_01",
       moduleIds: ["m1", "m2"],
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -106,6 +127,7 @@ describe("ReorderModules", () => {
     const r = await useCase.execute({
       courseId: "course_01",
       moduleIds: [],
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -120,11 +142,28 @@ describe("ReorderModules", () => {
     await useCase.execute({
       courseId: "course_01",
       moduleIds: ["m3", "m1", "m2"],
+      actorId: "admin_1",
     });
 
     const list = await moduleRepo.findByCourseId("course_01");
     expect(list.ok).toBe(true);
     if (!list.ok) return;
     expect(list.value.map((m) => m.id)).toEqual(["m3", "m1", "m2"]);
+  });
+
+  it("records an audit log entry on success", async () => {
+    await seedModule(moduleRepo, { id: "m1" });
+    await useCase.execute({ courseId: "course_01", moduleIds: ["m1"], actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "module.reordered")).toBe(true);
+  });
+
+  it("records an audit log entry on failure", async () => {
+    await seedModule(moduleRepo, { id: "m1" });
+    await useCase.execute({ courseId: "course_01", moduleIds: [], actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "module.reorder_failed")).toBe(true);
   });
 });

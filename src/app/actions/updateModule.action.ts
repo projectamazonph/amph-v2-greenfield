@@ -12,6 +12,8 @@ import { getSessionUserId } from "@/lib/auth";
 import type { UpdateModule, UpdateModuleInput, UpdateModuleError } from "@/usecases/UpdateModule";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
+export type UpdateModulePageInput = Omit<UpdateModuleInput, "actorId">;
+
 export type UpdateModuleActionResult = Result<
   { moduleId: string },
   UpdateModuleError | { kind: "unauthorized" }
@@ -19,17 +21,15 @@ export type UpdateModuleActionResult = Result<
 
 export async function performUpdateModule(
   container: { userRepo: UserRepository; updateModule: UpdateModule },
-  input: UpdateModuleInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  input: UpdateModulePageInput,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<UpdateModuleActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.updateModule.execute(input);
+  const result = await container.updateModule.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -48,7 +48,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function updateModuleAction(
-  input: UpdateModuleInput,
+  input: UpdateModulePageInput,
 ): Promise<UpdateModuleActionResult> {
   const container = buildContainer();
   return performUpdateModule(container, input, defaultGetCurrentAdminId);

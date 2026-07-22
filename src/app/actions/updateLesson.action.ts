@@ -21,17 +21,13 @@ export interface UpdateLessonFormInput {
 
 export type UpdateLessonActionResult = Result<
   { lessonId: string },
-  UpdateLessonError
-  | { kind: "unauthorized" }
-  | { kind: "invalid_content_json"; message: string }
+  UpdateLessonError | { kind: "unauthorized" } | { kind: "invalid_content_json"; message: string }
 >;
 
 export async function performUpdateLesson(
   container: { userRepo: UserRepository; updateLesson: UpdateLesson },
   input: UpdateLessonFormInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<UpdateLessonActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
@@ -49,7 +45,12 @@ export async function performUpdateLesson(
       const msg = e instanceof Error ? e.message : "invalid JSON";
       return Result.err({ kind: "invalid_content_json", message: msg });
     }
-    if (input.type === "VIDEO" && parsed && typeof parsed === "object" && "durationMinutes" in parsed) {
+    if (
+      input.type === "VIDEO" &&
+      parsed &&
+      typeof parsed === "object" &&
+      "durationMinutes" in parsed
+    ) {
       const obj = parsed as Record<string, unknown>;
       const n = Number(obj.durationMinutes);
       if (Number.isFinite(n)) {
@@ -62,6 +63,7 @@ export async function performUpdateLesson(
   const result = await container.updateLesson.execute({
     lessonId: input.lessonId,
     patch,
+    actorId: adminId,
   });
   if (!result.ok) {
     return Result.err(result.error);

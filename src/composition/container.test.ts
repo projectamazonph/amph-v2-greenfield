@@ -219,14 +219,7 @@ export function buildTestContainer(): TestContainer {
     jwt,
     passwordHasher,
     signUp: new SignUp(userRepo, idGen, clock, passwordHasher),
-    login: new Login(
-      userRepo,
-      passwordHasher,
-      sessionRepo,
-      idGen,
-      clock,
-      jwt,
-    ),
+    login: new Login(userRepo, passwordHasher, sessionRepo, idGen, clock, jwt),
     logout: new Logout(sessionRepo, jwt),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
@@ -330,17 +323,17 @@ export function buildTestContainer(): TestContainer {
     // STORY-048b: admin modules CRUD + reorder
     adminListModules: new AdminListModules({ moduleRepo }),
     adminGetModule: new AdminGetModule({ moduleRepo }),
-    createModule: new CreateModule({ moduleRepo, idGen, clock }),
-    updateModule: new UpdateModule({ moduleRepo, clock }),
-    deleteModule: new DeleteModule({ moduleRepo }),
-    reorderModules: new ReorderModules({ moduleRepo }),
+    createModule: new CreateModule({ moduleRepo, idGen, clock, recordAuditLog }),
+    updateModule: new UpdateModule({ moduleRepo, clock, recordAuditLog }),
+    deleteModule: new DeleteModule({ moduleRepo, recordAuditLog }),
+    reorderModules: new ReorderModules({ moduleRepo, recordAuditLog }),
     // STORY-048c: admin lessons CRUD + reorder
     adminListLessons: new AdminListLessons({ lessonRepo }),
     adminGetLesson: new AdminGetLesson({ lessonRepo }),
-    createLesson: new CreateLesson({ lessonRepo, idGen, clock }),
-    updateLesson: new UpdateLesson({ lessonRepo, clock }),
-    deleteLesson: new DeleteLesson({ lessonRepo }),
-    reorderLessons: new ReorderLessons({ lessonRepo }),
+    createLesson: new CreateLesson({ lessonRepo, idGen, clock, recordAuditLog }),
+    updateLesson: new UpdateLesson({ lessonRepo, clock, recordAuditLog }),
+    deleteLesson: new DeleteLesson({ lessonRepo, recordAuditLog }),
+    reorderLessons: new ReorderLessons({ lessonRepo, recordAuditLog }),
     // STORY-049: admin payments + refunds + refund override
     adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
@@ -349,7 +342,11 @@ export function buildTestContainer(): TestContainer {
     // STORY-050d: admin discount code CRUD
     adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
     adminGetDiscountCode: new AdminGetDiscountCode({ discountCodeRepo }),
-    adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, idGen, recordAuditLog }),
+    adminCreateDiscountCode: new AdminCreateDiscountCode({
+      discountCodeRepo,
+      idGen,
+      recordAuditLog,
+    }),
     adminUpdateDiscountCode: new AdminUpdateDiscountCode({ discountCodeRepo, recordAuditLog }),
     adminArchiveDiscountCode: new AdminArchiveDiscountCode({ discountCodeRepo, recordAuditLog }),
     // STORY-050e: admin badge CRUD

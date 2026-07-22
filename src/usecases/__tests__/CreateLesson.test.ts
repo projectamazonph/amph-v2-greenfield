@@ -7,6 +7,8 @@ import { CreateLesson } from "@/usecases/CreateLesson";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 
 function makeIdGen(): IdGenerator {
   let n = 0;
@@ -17,16 +19,27 @@ function makeIdGen(): IdGenerator {
   };
 }
 
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
 describe("CreateLesson", () => {
   let lessonRepo: InMemoryLessonRepository;
+  let recordAuditLog: RecordAuditLog;
   let useCase: CreateLesson;
 
   beforeEach(() => {
     lessonRepo = new InMemoryLessonRepository();
+    recordAuditLog = makeRecordAuditLog();
     useCase = new CreateLesson({
       lessonRepo,
       idGen: makeIdGen(),
       clock: new FixedClock(new Date("2026-07-19T00:00:00Z")),
+      recordAuditLog,
     });
   });
 
@@ -36,6 +49,7 @@ describe("CreateLesson", () => {
       title: "L1",
       type: "TEXT",
       content: { body: "hello" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -51,6 +65,7 @@ describe("CreateLesson", () => {
       title: "V1",
       type: "VIDEO",
       content: { durationMinutes: 5 },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -73,6 +88,7 @@ describe("CreateLesson", () => {
           },
         ],
       },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -86,6 +102,7 @@ describe("CreateLesson", () => {
       title: "V1",
       type: "VIDEO",
       content: { durationMinutes: 0 },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -99,6 +116,7 @@ describe("CreateLesson", () => {
       title: "L1",
       type: "TEXT",
       content: { body: "   " },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -112,6 +130,7 @@ describe("CreateLesson", () => {
       title: "Q1",
       type: "QUIZ",
       content: { questions: [] },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -125,12 +144,14 @@ describe("CreateLesson", () => {
       title: "L1",
       type: "TEXT",
       content: { body: "a" },
+      actorId: "admin_1",
     });
     const r = await useCase.execute({
       moduleId: "mod_01",
       title: "L2",
       type: "TEXT",
       content: { body: "b" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -145,13 +166,19 @@ describe("CreateLesson", () => {
       paymentRef: () => "AMPH-x",
       receiptNumber: () => "AMPH-2026-x",
     };
-    useCase = new CreateLesson({ lessonRepo, idGen, clock: new FixedClock(new Date()) });
+    useCase = new CreateLesson({
+      lessonRepo,
+      idGen,
+      clock: new FixedClock(new Date()),
+      recordAuditLog,
+    });
 
     const r = await useCase.execute({
       moduleId: "mod_01",
       title: "L1",
       type: "TEXT",
       content: { body: "a" },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -164,6 +191,7 @@ describe("CreateLesson", () => {
       lessonRepo,
       idGen: makeIdGen(),
       clock: new FixedClock(t0),
+      recordAuditLog,
     });
 
     const r = await useCase.execute({
@@ -171,6 +199,7 @@ describe("CreateLesson", () => {
       title: "L1",
       type: "TEXT",
       content: { body: "a" },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -184,6 +213,7 @@ describe("CreateLesson", () => {
       title: "",
       type: "TEXT",
       content: { body: "a" },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(false);
     if (r.ok) return;
@@ -201,6 +231,7 @@ describe("CreateLesson", () => {
       title: "L1",
       type: "TEXT",
       content: { body: "a" },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(false);
     if (r.ok) return;
@@ -218,9 +249,36 @@ describe("CreateLesson", () => {
       title: "L1",
       type: "TEXT",
       content: { body: "a" },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("db_error");
+  });
+
+  it("records an audit log entry on success", async () => {
+    await useCase.execute({
+      moduleId: "mod_01",
+      title: "L1",
+      type: "TEXT",
+      content: { body: "a" },
+      actorId: "admin_1",
+    });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "lesson.created")).toBe(true);
+  });
+
+  it("records an audit log entry on failure", async () => {
+    await useCase.execute({
+      moduleId: "mod_01",
+      title: "",
+      type: "TEXT",
+      content: { body: "a" },
+      actorId: "admin_1",
+    });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "lesson.create_failed")).toBe(true);
   });
 });

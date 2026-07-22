@@ -12,6 +12,8 @@ import { getSessionUserId } from "@/lib/auth";
 import type { DeleteLesson, DeleteLessonInput, DeleteLessonError } from "@/usecases/DeleteLesson";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
+export type DeleteLessonPageInput = Omit<DeleteLessonInput, "actorId">;
+
 export type DeleteLessonActionResult = Result<
   { deleted: true },
   DeleteLessonError | { kind: "unauthorized" }
@@ -19,17 +21,15 @@ export type DeleteLessonActionResult = Result<
 
 export async function performDeleteLesson(
   container: { userRepo: UserRepository; deleteLesson: DeleteLesson },
-  input: DeleteLessonInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  input: DeleteLessonPageInput,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<DeleteLessonActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.deleteLesson.execute(input);
+  const result = await container.deleteLesson.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -48,7 +48,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function deleteLessonAction(
-  input: DeleteLessonInput,
+  input: DeleteLessonPageInput,
 ): Promise<DeleteLessonActionResult> {
   const container = buildContainer();
   return performDeleteLesson(container, input, defaultGetCurrentAdminId);
