@@ -57,6 +57,7 @@ import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
+import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 
 // ── Production adapters (only the prod ones) ──────────────────
 
@@ -77,6 +78,7 @@ import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertific
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
+import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
@@ -220,6 +222,8 @@ export interface AppContainer {
   scenarioRepo: ISimulatorScenarioRepository;
   // STORY-050c: live class admin CRUD
   liveClassRepo: ILiveClassRepository;
+  // STORY-011: pricing tier repo
+  pricingTierRepo: IPricingTierRepository;
   simulatorRegistry: SimulatorRegistry;
 
   // External services
@@ -356,6 +360,8 @@ function buildProductionContainer(): AppContainer {
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   const scenarioRepo: ISimulatorScenarioRepository = new PrismaSimulatorScenarioRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
+  // STORY-011: pricing tier repo
+  const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -534,6 +540,8 @@ function buildProductionContainer(): AppContainer {
     auditLog,
     recordAuditLog,
     scenarioRepo,
+    // STORY-011: pricing tier repo
+    pricingTierRepo,
     // STORY-050b: simulator scenario CRUD
     adminListScenarios: new AdminListScenarios({ scenarioRepo }),
     getSimulatorScenario: new GetSimulatorScenario({ scenarioRepo }),

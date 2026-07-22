@@ -50,7 +50,9 @@ const ROOT_FILES: Record<string, Layer> = {
 };
 
 function layerOf(file: string): Layer {
-  const rel = relative(SRC_ROOT, file);
+  // Normalize Windows backslashes to forward slashes so split("/") works
+  // on all platforms. `path.relative()` on Windows returns backslashes.
+  const rel = relative(SRC_ROOT, file).replace(/\\/g, "/");
   if (!rel.includes("/")) {
     return ROOT_FILES[rel] ?? "app";
   }
@@ -172,9 +174,7 @@ function resolveLayerTarget(fromFile: string, spec: string): Layer | null {
   if (spec.startsWith("@/")) {
     const rest = spec.slice(2);
     const top = rest.split("/")[0] as Layer;
-    if (
-      ["usecases", "infra", "ports", "composition", "app", "domain", "lib"].includes(top)
-    ) {
+    if (["usecases", "infra", "ports", "composition", "app", "domain", "lib"].includes(top)) {
       return top;
     }
     return null;
@@ -184,14 +184,13 @@ function resolveLayerTarget(fromFile: string, spec: string): Layer | null {
     const fromDir = join(fromFile, "..");
     const abs = join(fromDir, spec);
     // Find the first segment after src/
-    const rel = relative(SRC_ROOT, abs);
+    // Normalize Windows backslashes so split("/") works on all platforms.
+    const rel = relative(SRC_ROOT, abs).replace(/\\/g, "/");
     if (!rel.includes("/")) {
       return ROOT_FILES[rel] ?? null;
     }
     const top = rel.split("/")[0] as Layer;
-    if (
-      ["usecases", "infra", "ports", "composition", "app", "domain", "lib"].includes(top)
-    ) {
+    if (["usecases", "infra", "ports", "composition", "app", "domain", "lib"].includes(top)) {
       return top;
     }
   }

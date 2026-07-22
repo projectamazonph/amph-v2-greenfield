@@ -153,6 +153,29 @@ model Course {
   @@map("courses")
 }
 
+// ── STORY-011: Pricing Tiers ─────────────────────────────
+
+model PricingTier {
+  id          String  @id @default(cuid())
+  slug        String  @unique // "foundations", "mastery", "ultimate", "all-access"
+  name        String
+  priceMinor  Int
+  currency    String  @default("PHP")
+
+  // Lifecycle: DRAFT (admin only) -> ACTIVE (visible on /pricing) -> ARCHIVED.
+  // Follows the Course.status / LiveClass.status convention, not the
+  // DiscountCode.archivedAt / SimulatorScenario.archivedAt convention.
+  status        String  @default("DRAFT") // DRAFT | ACTIVE | ARCHIVED
+
+  displayOrder  Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, displayOrder])
+  @@map("pricing_tiers")
+}
+
 // ── STORY-048b/048c / P0-2 follow-up: Modules + Lessons ──
 
 model Module {
