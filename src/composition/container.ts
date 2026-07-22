@@ -88,6 +88,10 @@ import { NodeCertificateHashGenerator } from "@/infra/security/NodeCertificateHa
 import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
 import { ReactPdfCertificateRenderer } from "@/infra/pdf/ReactPdfCertificateRenderer";
 
+// STORY-012: MDX content renderer port + adapter
+import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
+import { NextMdxRenderer } from "@/infra/rendering/NextMdxRenderer";
+
 import type { EmailSender } from "@/ports/email/EmailSender";
 import { ResendEmailSender } from "@/infra/email/ResendEmailSender";
 // InMemoryEmailSender is NOT imported here — it would pull in
@@ -230,6 +234,8 @@ export interface AppContainer {
   paymentGateway: IPaymentGateway;
   certificateHashGen: CertificateHashGenerator;
   certificateRenderer: CertificateRenderer;
+  // STORY-012: MDX content renderer (port-adapter: NextMdxRenderer)
+  mdxRenderer: IMdxContentRenderer;
   emailSender: EmailSender;
   jwt: JwtService;
   passwordHasher: PasswordHasher;
@@ -372,6 +378,11 @@ function buildProductionContainer(): AppContainer {
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();
+  // STORY-012: bounded LRU cache (default 500 entries). Each entry
+  // is a React element + frontmatter + HTML; 500 is a generous
+  // upper bound for the AMPH catalog (9 modules * ~5 lessons = 45
+  // distinct MDX strings today, will grow to maybe 200 max).
+  const mdxRenderer: IMdxContentRenderer = new NextMdxRenderer();
 
   const emailSender: EmailSender = new ResendEmailSender(
     process.env.RESEND_API_KEY ?? "",
@@ -468,6 +479,7 @@ function buildProductionContainer(): AppContainer {
     certificateRepo,
     certificateHashGen,
     certificateRenderer,
+    mdxRenderer,
     emailSender,
     simulatorRegistry: buildSimulatorRegistry(),
     issueCertificate: new IssueCertificate({

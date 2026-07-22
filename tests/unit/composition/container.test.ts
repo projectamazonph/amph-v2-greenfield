@@ -5,7 +5,14 @@
  * production and test containers.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+// STORY-012: NextMdxRenderer imports `server-only` (server-only
+// marker package). vitest doesn't apply the `react-server` export
+// condition, so the import resolves to the throwing `index.js`.
+// Same workaround as src/lib/__tests__/*: mock to an empty module.
+vi.mock("server-only", () => ({}));
+
 import { createQuiz } from "@/domain/entities/Quiz";
 import { buildTestContainer } from "@/composition/container.test";
 
@@ -88,49 +95,60 @@ certDescribe("container — issueCertificate wiring", () => {
     certExpect(c.certificateHashGen).toBeDefined();
   });
 
-  certIt("end-to-end: a completed enrollment produces a valid certificate via the test container", async () => {
-    const c = buildTestContainer();
+  certIt(
+    "end-to-end: a completed enrollment produces a valid certificate via the test container",
+    async () => {
+      const c = buildTestContainer();
 
-    // Seed a course
-    const courseResult = createCourse({
-      id: "course-1",
-      slug: "intro-to-amazon",
-      title: "Intro to Amazon",
-      tagline: "Learn the basics",
-      description: "A course about Amazon",
-      priceMinor: 0,
-      currency: "PHP",
-      curriculum: { sections: [{ id: "s1", title: "Section 1", lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }] }] },
-      courseTier: "STARTER",
-      previewLessonCount: 0,
-    });
-    if (!courseResult.ok) throw new Error("seed course failed");
-    c.courseRepo.seed([courseResult.value]);
+      // Seed a course
+      const courseResult = createCourse({
+        id: "course-1",
+        slug: "intro-to-amazon",
+        title: "Intro to Amazon",
+        tagline: "Learn the basics",
+        description: "A course about Amazon",
+        priceMinor: 0,
+        currency: "PHP",
+        curriculum: {
+          sections: [
+            {
+              id: "s1",
+              title: "Section 1",
+              lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }],
+            },
+          ],
+        },
+        courseTier: "STARTER",
+        previewLessonCount: 0,
+      });
+      if (!courseResult.ok) throw new Error("seed course failed");
+      c.courseRepo.seed([courseResult.value]);
 
-    // Seed an enrollment at 100% (status is "active" by default from factory)
-    const enrollmentResult = createEnrollment({
-      id: "enrollment-1",
-      userId: "user-1",
-      courseId: "course-1",
-    });
-    if (!enrollmentResult.ok) throw new Error("seed enrollment failed");
-    const enrollment = enrollmentResult.value;
-    enrollment.progressPercent = 100;
-    await c.enrollmentRepo.create(enrollment);
+      // Seed an enrollment at 100% (status is "active" by default from factory)
+      const enrollmentResult = createEnrollment({
+        id: "enrollment-1",
+        userId: "user-1",
+        courseId: "course-1",
+      });
+      if (!enrollmentResult.ok) throw new Error("seed enrollment failed");
+      const enrollment = enrollmentResult.value;
+      enrollment.progressPercent = 100;
+      await c.enrollmentRepo.create(enrollment);
 
-    const result = await c.issueCertificate.execute({
-      userId: "user-1",
-      courseId: "course-1",
-    });
+      const result = await c.issueCertificate.execute({
+        userId: "user-1",
+        courseId: "course-1",
+      });
 
-    certExpect(result.ok).toBe(true);
-    if (!result.ok) return;
-    certExpect(result.value.certificate.userId).toBe("user-1");
-    certExpect(result.value.certificate.courseId).toBe("course-1");
-    certExpect(result.value.certificate.status).toBe("active");
-    certExpect(result.value.certificate.verificationHash).toMatch(/^[0-9a-f]{64}$/);
-    certExpect(result.value.isReissue).toBe(false);
-  });
+      certExpect(result.ok).toBe(true);
+      if (!result.ok) return;
+      certExpect(result.value.certificate.userId).toBe("user-1");
+      certExpect(result.value.certificate.courseId).toBe("course-1");
+      certExpect(result.value.certificate.status).toBe("active");
+      certExpect(result.value.certificate.verificationHash).toMatch(/^[0-9a-f]{64}$/);
+      certExpect(result.value.isReissue).toBe(false);
+    },
+  );
 });
 
 // ── RenderCertificatePdf wiring (STORY-042) ─────────────────
@@ -161,7 +179,15 @@ pdfDescribe("container — renderCertificatePdf wiring", () => {
       description: "A course for testing the PDF renderer",
       priceMinor: 0,
       currency: "PHP",
-      curriculum: { sections: [{ id: "s1", title: "Section 1", lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }] }] },
+      curriculum: {
+        sections: [
+          {
+            id: "s1",
+            title: "Section 1",
+            lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }],
+          },
+        ],
+      },
       courseTier: "STARTER",
       previewLessonCount: 0,
     });
@@ -210,61 +236,75 @@ verifyDescribe("container — verifyCertificate wiring", () => {
     verifyExpect(typeof c.verifyCertificate.execute).toBe("function");
   });
 
-  verifyIt("end-to-end: a valid hash returns cert + user + course via the test container", async () => {
-    const c = buildTestContainer();
+  verifyIt(
+    "end-to-end: a valid hash returns cert + user + course via the test container",
+    async () => {
+      const c = buildTestContainer();
 
-    // Seed a course
-    const courseResult = createCourse({
-      id: "course-verify-1",
-      slug: "verify-test",
-      title: "Verify Test Course",
-      tagline: "Testing verification",
-      description: "A course for testing verification",
-      priceMinor: 0,
-      currency: "PHP",
-      curriculum: { sections: [{ id: "s1", title: "Section 1", lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }] }] },
-      courseTier: "STARTER",
-      previewLessonCount: 0,
-    });
-    if (!courseResult.ok) throw new Error("seed course failed");
-    c.courseRepo.seed([courseResult.value]);
+      // Seed a course
+      const courseResult = createCourse({
+        id: "course-verify-1",
+        slug: "verify-test",
+        title: "Verify Test Course",
+        tagline: "Testing verification",
+        description: "A course for testing verification",
+        priceMinor: 0,
+        currency: "PHP",
+        curriculum: {
+          sections: [
+            {
+              id: "s1",
+              title: "Section 1",
+              lessons: [{ id: "l1", title: "Lesson 1", type: "VIDEO", content: "" }],
+            },
+          ],
+        },
+        courseTier: "STARTER",
+        previewLessonCount: 0,
+      });
+      if (!courseResult.ok) throw new Error("seed course failed");
+      c.courseRepo.seed([courseResult.value]);
 
-    // Seed a user
-    await c.userRepo.create({
-      id: "user-verify-1",
-      email: "verify-test@example.com",
-      passwordHash: "$argon2id$test",
-      firstName: "Verify",
-      lastName: "User",
-    });
+      // Seed a user
+      await c.userRepo.create({
+        id: "user-verify-1",
+        email: "verify-test@example.com",
+        passwordHash: "$argon2id$test",
+        firstName: "Verify",
+        lastName: "User",
+      });
 
-    // Seed a cert
-    await c.certificateRepo.create({
-      id: "cert-verify-1",
-      userId: "user-verify-1",
-      courseId: "course-verify-1",
-      verificationHash: "c".repeat(64),
-      issuedAt: new Date("2026-07-01T00:00:00Z"),
-      revokedAt: null,
-      revokedReason: null,
-      status: "active",
-    });
+      // Seed a cert
+      await c.certificateRepo.create({
+        id: "cert-verify-1",
+        userId: "user-verify-1",
+        courseId: "course-verify-1",
+        verificationHash: "c".repeat(64),
+        issuedAt: new Date("2026-07-01T00:00:00Z"),
+        revokedAt: null,
+        revokedReason: null,
+        status: "active",
+      });
 
-    const result = await c.verifyCertificate.execute({ verificationHash: "c".repeat(64) });
+      const result = await c.verifyCertificate.execute({ verificationHash: "c".repeat(64) });
 
-    verifyExpect(result.ok).toBe(true);
-    if (!result.ok) return;
-    verifyExpect(result.value.certificate.id).toBe("cert-verify-1");
-    verifyExpect(result.value.user.firstName).toBe("Verify");
-    verifyExpect(result.value.user.lastName).toBe("User");
-    verifyExpect(result.value.course.title).toBe("Verify Test Course");
-  });
+      verifyExpect(result.ok).toBe(true);
+      if (!result.ok) return;
+      verifyExpect(result.value.certificate.id).toBe("cert-verify-1");
+      verifyExpect(result.value.user.firstName).toBe("Verify");
+      verifyExpect(result.value.user.lastName).toBe("User");
+      verifyExpect(result.value.course.title).toBe("Verify Test Course");
+    },
+  );
 
-  verifyIt("end-to-end: an unknown hash returns certificate_not_found via the test container", async () => {
-    const c = buildTestContainer();
-    const result = await c.verifyCertificate.execute({ verificationHash: "d".repeat(64) });
-    verifyExpect(result).toEqual({ ok: false, error: { kind: "certificate_not_found" } });
-  });
+  verifyIt(
+    "end-to-end: an unknown hash returns certificate_not_found via the test container",
+    async () => {
+      const c = buildTestContainer();
+      const result = await c.verifyCertificate.execute({ verificationHash: "d".repeat(64) });
+      verifyExpect(result).toEqual({ ok: false, error: { kind: "certificate_not_found" } });
+    },
+  );
 });
 
 // ── RevokeCertificate wiring (STORY-044) ───────────────────
@@ -278,32 +318,35 @@ revokeDescribe("container — revokeCertificate wiring", () => {
     revokeExpect(typeof c.revokeCertificate.execute).toBe("function");
   });
 
-  revokeIt("end-to-end: revoking a cert transitions it to revoked via the test container", async () => {
-    const c = buildTestContainer();
+  revokeIt(
+    "end-to-end: revoking a cert transitions it to revoked via the test container",
+    async () => {
+      const c = buildTestContainer();
 
-    await c.certificateRepo.create({
-      id: "cert-revoke-1",
-      userId: "user-revoke-1",
-      courseId: "course-revoke-1",
-      verificationHash: "e".repeat(64),
-      issuedAt: new Date("2026-07-01T00:00:00Z"),
-      revokedAt: null,
-      revokedReason: null,
-      status: "active",
-    });
+      await c.certificateRepo.create({
+        id: "cert-revoke-1",
+        userId: "user-revoke-1",
+        courseId: "course-revoke-1",
+        verificationHash: "e".repeat(64),
+        issuedAt: new Date("2026-07-01T00:00:00Z"),
+        revokedAt: null,
+        revokedReason: null,
+        status: "active",
+      });
 
-    const result = await c.revokeCertificate.execute({
-      certificateId: "cert-revoke-1",
-      reason: "test_refund",
-      revokedBy: "system",
-    });
+      const result = await c.revokeCertificate.execute({
+        certificateId: "cert-revoke-1",
+        reason: "test_refund",
+        revokedBy: "system",
+      });
 
-    revokeExpect(result.ok).toBe(true);
-    if (!result.ok) return;
-    revokeExpect(result.value.wasAlreadyRevoked).toBe(false);
-    revokeExpect(result.value.certificate.status).toBe("revoked");
-    revokeExpect(result.value.certificate.revokedReason).toBe("test_refund");
-  });
+      revokeExpect(result.ok).toBe(true);
+      if (!result.ok) return;
+      revokeExpect(result.value.wasAlreadyRevoked).toBe(false);
+      revokeExpect(result.value.certificate.status).toBe("revoked");
+      revokeExpect(result.value.certificate.revokedReason).toBe("test_refund");
+    },
+  );
 
   revokeIt("end-to-end: re-revoking an already-revoked cert is idempotent", async () => {
     const c = buildTestContainer();
