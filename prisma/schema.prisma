@@ -317,8 +317,13 @@ model DiscountCode {
   validUntil DateTime?
   courseIds  String[] @default([])  // empty = all courses; non-empty = applies only to these
 
+  // STORY-050d: soft-delete. Null = active. Archived codes are hidden from
+  // listAll()/findById() but still findByCode()-able (matches InMemoryDiscountCodeRepository).
+  archivedAt DateTime?
+
   createdAt  DateTime @default(now())
 
+  @@index([archivedAt])
   @@map("discount_codes")
 }
 

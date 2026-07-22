@@ -6,7 +6,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ### 2026-07-22: PrismaOrderRepository + PrismaAuditLog + PrismaSessionRepository close three P0-2 legs
 
-- **PR #125**: `fix(payment): persist orders to Postgres via PrismaOrderRepository (P0-2)`
+- **PR #125** (merged as `f075fff`): `fix(payment): persist orders to Postgres via PrismaOrderRepository (P0-2)`
   - Orders were still wired to `InMemoryOrderRepository` in the production container, a real production bug: orders vanish on every cold start / redeploy, and a webhook hitting a different serverless instance could never find the order it needed to mark PAID
   - Added a `status` column to the `orders` table (migration `20260722000000_order_status`) carrying the domain `PaymentStatus` state machine. Previously only `paymongoStatus` existed, which has no DRAFT equivalent
   - Added `Order.hydrate()` to reconstruct entities from persisted rows without routing through the `mark*()` state-transition guards
@@ -23,6 +23,16 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
   - Implemented `PrismaSessionRepository` and wired it into `buildProductionContainer()`; `deleteById`/`deleteAllForUser` use `deleteMany` to preserve the port's documented idempotent-delete contract
   - 11 new tests
   - Unit + integration suite (all three fixes): 2156 passed / 2 skipped; architecture compliance suite: 406 passed. E2E not re-run this session (see `SESSION-HANDOVER.md` for its last known status)
+
+### 2026-07-22: PrismaDiscountCodeRepository admin CRUD closes the DiscountCode leg of P0-2
+
+- `fix(admin): implement PrismaDiscountCodeRepository admin CRUD (P0-2 / STORY-050d)`
+  - `listAll`/`findById`/`update`/`archive` were stubs, so `buildProductionContainer()` fell back to `InMemoryDiscountCodeRepository` for the entire repo even though `findByCode`/`create`/`incrementUsedCount` were already real
+  - Added a nullable `archivedAt` column to `discount_codes` (migration `20260722010000_discount_code_archived_at` + a separate `CREATE INDEX CONCURRENTLY` migration, applying the lock-avoidance lesson from PR #125's review proactively this time)
+  - Implemented the four stub methods matching `InMemoryDiscountCodeRepository`'s exact contract: `findById`/`listAll` hide archived codes, `findByCode` intentionally does not filter on `archivedAt`, `update` maps a duplicate-code conflict to `code_taken`
+  - Wired `PrismaDiscountCodeRepository` into `buildProductionContainer()`
+  - 24 new tests. Unit + integration suite: 2175 passed / 2 skipped; architecture compliance suite: 406 passed
+  - CodeRabbit review response (2 rounds): skipped a request to add `deletedAt`/`createdById`/`updatedById` to `DiscountCode` (22 of 23 models in the real schema lack these fields; `docs/db-schema.md`'s "every mutable table" rule was never actually implemented, so this isn't a live rule this PR broke, and fixing it repo-wide is a separate story) and a repeated request to rewrite `CHANGELOG.md`/`SESSION-HANDOVER.md` in VA-friendly plain language (the voice guide scopes that rule to user-facing copy, not internal engineering docs; the org-level dashboard rule CodeRabbit cited on round 2 isn't checked into this repo). Fixed a genuinely stale "remaining P0-2 items" snapshot in `SESSION-HANDOVER.md` left over from before the DiscountCode work landed. Details in `SESSION-HANDOVER.md`
 
 ### 2026-07-19 — TDD + SOLID audit and Tier A production-bug fixes
 

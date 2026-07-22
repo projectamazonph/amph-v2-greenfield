@@ -76,7 +76,6 @@ import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwar
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
-import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
@@ -340,8 +339,7 @@ function buildProductionContainer(): AppContainer {
   const orderRepo: IOrderRepository = new PrismaOrderRepository(prisma);
 
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
-  // STORY-050d: use in-memory discount code repo (Prisma schema is a follow-up)
-  const discountCodeRepo: IDiscountCodeRepository = new InMemoryDiscountCodeRepository();
+  const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
   const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
   const xpEventRepo: IXPEventRepository = new PrismaXPEventRepository(prisma);
