@@ -7,16 +7,36 @@
 
 /** All possible payment states for an Order. */
 export type PaymentStatus =
-  | "DRAFT"    // Order created locally, not yet sent to PayMongo
-  | "PENDING"   // Checkout session created, waiting for payment
-  | "PAID"      // Payment confirmed by PayMongo webhook
-  | "FAILED"   // Payment attempt failed (card declined, etc.)
-  | "EXPIRED"  // Checkout session timed out (PayMongo: 24h default)
+  | "DRAFT" // Order created locally, not yet sent to PayMongo
+  | "PENDING" // Checkout session created, waiting for payment
+  | "PAID" // Payment confirmed by PayMongo webhook
+  | "FAILED" // Payment attempt failed (card declined, etc.)
+  | "EXPIRED" // Checkout session timed out (PayMongo: 24h default)
   | "REFUNDED"; // Full refund issued
+
+const ALL_STATUSES: readonly PaymentStatus[] = [
+  "DRAFT",
+  "PENDING",
+  "PAID",
+  "FAILED",
+  "EXPIRED",
+  "REFUNDED",
+];
 
 export const PaymentStatus = {
   isPaid(s: PaymentStatus): boolean {
     return s === "PAID";
+  },
+
+  /**
+   * Type guard for a value read back from persistence. A repository
+   * adapter should call this before trusting a stored string as a
+   * `PaymentStatus`. A corrupt or legacy row must not silently
+   * hydrate an impossible state that bypasses the entity's
+   * transition guards.
+   */
+  isValid(s: string): s is PaymentStatus {
+    return (ALL_STATUSES as readonly string[]).includes(s);
   },
 
   isFinal(s: PaymentStatus): boolean {
@@ -33,10 +53,14 @@ export const PaymentStatus = {
    */
   fromPaymongo(paymongoStatus: string): PaymentStatus {
     switch (paymongoStatus) {
-      case "paid":    return "PAID";
-      case "expired": return "EXPIRED";
-      case "failed":  return "FAILED";
-      default:        return "PENDING";
+      case "paid":
+        return "PAID";
+      case "expired":
+        return "EXPIRED";
+      case "failed":
+        return "FAILED";
+      default:
+        return "PENDING";
     }
   },
 } as const;
