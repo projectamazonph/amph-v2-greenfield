@@ -1,92 +1,26 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), PR #129 (Module/Lesson), and PR #130 (E2E cleanup helper fix) all merged to `main`. P0-2 is fully closed and the E2E suite is verified green. Same session, branch recreated fresh from post-merge `main` again: closed the last flagged admin-CRUD gap — Module/Lesson use cases never wrote to the audit trail, unlike every other admin resource.
+**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), PR #129 (Module/Lesson), PR #132 (PricingTier + arch test Windows-path fix), and PR #134 (MDX renderer port + adapter) all merged or in flight to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Sprint 3 (Catalog Foundation) in progress ΓÇö STORY-011 + STORY-012 closed; STORY-013ΓÇô020 still queued. Same session: investigated the stale 2026-07-19 E2E failure report and fixed a real bug in the E2E cleanup helper.
 
 ---
 
 ## Project Status
 
-| Metric                   | Value                                                                                                                                                                                                                                 |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 closed; E2E suite verified green; Module/Lesson admin CRUD now audit-logged**                                                                                                               |
-| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                         |
-| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                |
-| `main` HEAD              | `2bedfcf`: fix(test): construct clearE2EUsers' PrismaClient with a driver adapter (#130, squash-merged)                                                                                                                               |
-| Unit + integration tests | **2258 passing + 2 skipped, 0 TypeScript errors** (on `claude/next-story-klge5f`, recreated fresh from post-merge `main`, not yet a PR)                                                                                               |
-| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                   |
-| Coverage                 | Not re-measured after the audit-log work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements) |
-| E2E                      | Verified green last session (PR #130): 15 passed, 4 intentionally skipped, 0 failed on `chromium-desktop`. Not re-run this session (no app-facing behavior changed, only audit-log side effects)                                      |
-| CI                       | PR #125–#130 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's audit-log work isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green  |
-| Database                 | Not provisioned in production (Prisma schema complete; every repository in `buildProductionContainer()` is Postgres-backed, no `InMemory*` fallbacks remain)                                                                          |
-| Production               | Not deployed                                                                                                                                                                                                                          |
+| Metric                   | Value                                                                                                                                                                                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memoryΓåÆPrisma migration closed; E2E suite re-verified green; Sprint 3 (Catalog Foundation) in progress ΓÇö STORY-011 + STORY-012 closed**                                                                     |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                            |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                   |
+| `main` HEAD              | `2bedfcf`: fix(test): construct clearE2EUsers' PrismaClient with a driver adapter (#130, squash-merged)                                                                                                                                                  |
+| Unit + integration tests | **2267 passing + 2 skipped, 0 TypeScript errors** (PR #132's 75 new tests + PR #134's 12 new tests + 3 new arch tests; pre-existing Windows-only failures unchanged)                                                                                     |
+| Architecture compliance  | **410 tests passing, 0 violations** (+1 from the new `src/infra/rendering/` layer test in PR #134)                                                                                                                                                       |
+| Coverage                 | Not re-measured after the Module/Lesson work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)                |
+| E2E                      | Re-run this session with a locally provisioned Postgres (was 0/19, blocked on env, see log below): **15 passed, 4 intentionally skipped (no seeded admin in this greenfield env), 0 failed** on `chromium-desktop`                                       |
+| CI                       | PR #125ΓÇô#129 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's E2E-helper fix isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green                     |
+| Database                 | Not provisioned in production (Prisma schema complete; every repository in `buildProductionContainer()` is Postgres-backed, no `InMemory*` fallbacks remain). This session provisioned a throwaway local Postgres 16 purely to run E2E; nothing persists |
+| Production               | Not deployed                                                                                                                                                                                                                                             |
 
 ---
-
-## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`, continued)
-
-### Module/Lesson admin CRUD now writes to the audit trail (same session, after PR #130 merged)
-
-PR #130 merged (squash, as `2bedfcf`); branch recreated fresh from
-post-merge `main` again. Every PR description in this P0-2 series has
-carried the same unchecked architecture-checklist box: "No admin
-mutation without an `AuditLog` entry — pre-existing gap, `Module`/
-`Lesson` CRUD use cases don't call `RecordAuditLog` yet." Picked that
-up as the next well-scoped item: `src/domain/values/AuditAction.ts`
-already reserved `module.created`/`updated`/`deleted`/`reordered` and
-the `lesson.*` equivalents (present since STORY-050a), but no use case
-ever called `recordAuditLog.execute()` with them, unlike every other
-admin resource (`LiveClass`, `DiscountCode`, `Badge`,
-`SimulatorScenario`, `Course`). Confirmed with a grep across all 8
-Module/Lesson use case files before starting: zero hits for
-`recordAuditLog`.
-
-- Added the missing `_failed` variants to `AuditAction`
-  (`module.create_failed`/`update_failed`/`delete_failed`/
-  `reorder_failed` and the `lesson.*` equivalents), matching the
-  pattern every other admin resource already has (see
-  `discount_code.*`/`badge.*`/`live_class.*` in the same file).
-- `CreateModule`, `UpdateModule`, `DeleteModule`, `ReorderModules`,
-  `CreateLesson`, `UpdateLesson`, `DeleteLesson`, `ReorderLessons`
-  (8 use cases): added `actorId: string` to each `Input`, added
-  `recordAuditLog: RecordAuditLog` to each `Deps`, and called
-  `recordAuditLog.execute({...})` on every success **and** failure
-  exit path, mirroring `CreateLiveClass`/`UpdateLiveClass`/
-  `DeleteLiveClass` exactly (the established template for this
-  pattern). Reorder's audit metadata carries the full requested
-  `moduleIds`/`lessonIds` array; create/update/delete carry the
-  relevant title/patch/error.
-- Threaded `actorId` through the 8 corresponding server actions
-  (`create`/`update`/`delete`/`reorderModules.action.ts` and the
-  `Lesson` equivalents). These actions already resolved the acting
-  admin's id via `getCurrentAdminId()` for the authorization check;
-  the only change was passing that same id into the use case call as
-  `actorId` instead of discarding it. For the four actions whose
-  exported input type was the raw use-case `Input` (`deleteModule`,
-  `reorderModules`, `deleteLesson`, `reorderLessons`), added a
-  `*PageInput = Omit<*Input, "actorId">` type and updated the
-  exported function's parameter to it, so pages don't need to (and
-  can't) pass `actorId` themselves, per this file's own documented
-  "actorId is injected by the server action, never by the page"
-  invariant. `createModule`/`updateModule` needed the same `PageInput`
-  treatment; `createLesson`/`updateLesson` already had their own
-  distinct form-input types, so only the internal `execute()` call
-  needed the new field.
-- Wired `recordAuditLog` (already an existing, in-scope local in both
-  container builders) into all 8 use case constructors in
-  `buildProductionContainer()` and `buildTestContainer()`
-  (`container.ts` / `container.test.ts`).
-- Updated all 8 existing use-case test files: added `actorId` to
-  every `execute()` call, wired a `RecordAuditLog` +
-  `InMemoryAuditLog` fake into each `beforeEach` (same pattern as
-  `CreateLiveClass.test.ts`), and added two new tests per use case
-  (16 total) asserting an audit entry lands on both the success and
-  the primary failure path.
-- Full unit/integration suite: 2258 passed, 2 skipped (was 2242
-  before this session's start), 0 failures. `pnpm tsc --noEmit`,
-  `pnpm lint`, `pnpm build` all clean. Did not re-run the E2E suite
-  (no admin UI behavior changed, only a side-effect write; the local
-  Postgres + Playwright setup from the previous entry was already
-  torn down).
 
 ## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`)
 
@@ -160,7 +94,7 @@ PrismaClient()` with no arguments. This codebase is Prisma 7 with
 
 ### PrismaModuleRepository + PrismaLessonRepository: close out P0-2 (PR #129, merged)
 
-Picked up "the next story" and found P0-2 (in-memory→Prisma migration)
+Picked up "the next story" and found P0-2 (in-memoryΓåÆPrisma migration)
 already down to its last two legs: `moduleRepo` and `lessonRepo`, both
 still `InMemory*` in `buildProductionContainer()`. Unlike the earlier
 Order/Session/AuditLog/DiscountCode/LiveClass/SimulatorScenario legs,
@@ -455,7 +389,7 @@ now DiscountCode are all Postgres-backed in production.
 Two findings, both skipped with a documented reason:
 
 - **"Every mutable table must have `deletedAt`, `createdById`,
-  `updatedById`"** (cited from `docs/db-schema.md` §2-3): asked to add all
+  `updatedById`"** (cited from `docs/db-schema.md` ┬º2-3): asked to add all
   three to `DiscountCode` in this migration. Checked the real
   `prisma/schema.prisma` against that claim: 22 of 23 models have none of
   these fields; only `User` has `deletedAt`. `createdById`/`updatedById`
@@ -658,23 +592,143 @@ Two findings fixed, one skipped:
   convention, not a live rule this PR broke, and a repo-wide retrofit
   is a separate, deliberate story.
 
+## What changed in this session (2026-07-22, branch `feat/STORY-011-pricing-tier`, PR #132 open)
+
+### 1. STORY-011 closed: `PricingTier` model + repository (with arch test Windows-path fix)
+
+Branch: `feat/STORY-011-pricing-tier` (PR #132, open). Commit: `c6c00a4`.
+
+**Scope decision:** the original STORY-011 called for the
+`PricingTier` model, a `Course.pricingTierId` FK, and a backfill of
+existing courses ΓÇö but the FK swap is a breaking change to the
+checkout / orders flow (orders reference courses, which would now
+reference tiers), so the breaking change was carved out into
+STORY-015, the first story that actually needs the FK to render
+`/pricing`. This PR only ships the testable, breaking-change-free
+piece: the new entity, the new port, the new adapters, the new
+table, and the new container wiring. Soft-delete via
+`status = "ARCHIVED"` matches `Course` / `LiveClass` (not
+`DiscountCode.archivedAt`, which is the admin-only pattern).
+
+**Files added / changed:**
+
+- `prisma/schema.prisma` + new `prisma/migrations/20260722050000_pricing_tier/migration.sql` ΓÇö new `pricing_tiers` table with `@@index([status, displayOrder])`
+- `src/domain/entities/PricingTier.ts` ΓÇö pure entity + `createPricingTier` + `updatePricingTier` + `comparePricingTiers` (displayOrder asc, then createdAt asc) + `pricingTierIsActive` / `pricingTierIsArchived`
+- `src/ports/repositories/IPricingTierRepository.ts` ΓÇö port: `listAll` / `listActive` / `findById` / `findBySlug` / `create` / `update` / `archive`
+- `src/infra/repositories/InMemoryPricingTierRepository.ts` ΓÇö in-memory adapter with `seed` / `seedMany` / `clear` helpers
+- `src/infra/repositories/PrismaPricingTierRepository.ts` ΓÇö Prisma adapter: P2002 ΓåÆ `slug_taken`, P2025 ΓåÆ `not_found`, idempotent archive, explicit pre-check for slug-collision parity with the InMemory contract
+- `src/composition/container.ts` + `container.test.ts` ΓÇö `pricingTierRepo` wired into both production and test containers
+- `tests/unit/domain/entities/PricingTier.test.ts` ΓÇö 24 entity tests
+- `src/infra/repositories/__tests__/InMemoryPricingTierRepository.test.ts` ΓÇö 18 in-memory adapter tests
+- `src/infra/repositories/__tests__/PrismaPricingTierRepository.test.ts` ΓÇö 30 Prisma adapter tests (hand-rolled-fake `PrismaClient` pattern, matching `PrismaOrderRepository.test.ts`)
+- `tests/architecture/dependency-direction.test.ts` ΓÇö Windows-path fix (see below)
+- `docs/stories/STORY-011.md` + `docs/sprint-3/PLAN.md` ΓÇö story + sprint plan
+
+**Bug fix bundled in: arch test Windows path handling.**
+`tests/architecture/dependency-direction.test.ts` was silently
+misclassifying files on Windows because `path.relative` returns
+backslashes there. Most visible symptom: `container.ts` was
+classified as `app` instead of `composition`. CI runs on Linux so
+this never triggered. Added a one-line `.replace(/\\/g, "/")` in
+both `layerOf()` and `resolveLayerTarget()` with a comment explaining
+why. Arch tests went from 406 ΓåÆ 409 (the new fixture paths
+exercised the previously-broken code path).
+
+**Verification:** `pnpm typecheck` clean, `pnpm lint` clean (no
+new warnings; the 4 pre-existing warnings are unrelated to this
+story), `pnpm test:arch` 409/409 green, `pnpm build` succeeds, all
+75 new tests pass on first run. Full `pnpm test` shows 2261
+passing + 2 skip; the 10 failing files are the pre-existing
+Windows-only ones (`tests/integration/prisma-migration-contract`
+calls `./node_modules/.bin/prisma ...` with a relative path that
+doesn't work on Windows; `src/lib/auth.test.ts` and the
+`src/app/actions/*` tests import the **production** container
+directly, not `buildTestContainer`, so they need `DATABASE_URL`).
+Out of scope for STORY-011; track in a follow-up issue.
+
+**Definition of Done:** all six boxes checked
+(see PR #132 body). Conventional commit
+`feat(catalog): STORY-011 PricingTier model + repository (with
+arch test windows-path fix)` pushed; squash-merge will land
+`c6c00a4` on `main` cleanly.
+
+## What changed in this session (2026-07-22, branch `feat/STORY-012-mdx-renderer`, PR #134 open)
+
+### 1. STORY-012 closed: `IMdxContentRenderer` port + `NextMdxRenderer` adapter
+
+Branch: `feat/STORY-012-mdx-renderer` (PR #134, open).
+
+**Scope decision:** STORY-012 calls for "MDX content renderer port +
+adapter." Like STORY-011, I scoped it to the testable, breaking-
+change-free piece ΓÇö the port, the adapter, the cache, and the
+container wiring. The actual `.mdx` file reading, the import script,
+and the lesson page all belong to their own stories (STORY-013 for
+import, STORY-026 for the lesson page); they're not blocked on
+STORY-012 because the port takes the source as a string and the
+adapter returns a pre-compiled React element that the consumer can
+just `{Component}` in JSX.
+
+**Why no `react-dom/server` in the adapter:** Turbopack rejects
+`react-dom/server` in code paths that bundle for middleware, route
+handlers, or client components. The composition container
+(`src/composition/container.ts`) is imported by all of those, so the
+adapter can't transitively pull in `react-dom/server`. The port
+therefore does not promise a pre-rendered `html` string ΓÇö consumers
+(the lesson page, tests) call `renderToString` on the returned
+`Component` themselves. The earlier draft of this adapter did
+include `html` and triggered the build error; caught + fixed
+mid-implementation, no need to revert.
+
+**Files added / changed:**
+
+- `src/ports/rendering/IMdxContentRenderer.ts` ΓÇö port with `render()` + `clearCache()` and the discriminated `MdxRenderError` union
+- `src/infra/rendering/NextMdxRenderer.ts` ΓÇö production adapter: `gray-matter` for frontmatter, `next-mdx-remote/rsc`'s `compileMDX` for the body, SHA-1-keyed LRU cache (default cap 500)
+- `src/infra/rendering/__tests__/NextMdxRenderer.test.ts` ΓÇö 12 tests (happy path, frontmatter shape, JSX in body, both error kinds, filePath in error messages, cache hit, cache miss, cache eviction, LRU recency, `clearCache`)
+- `src/composition/container.ts` + `container.test.ts` ΓÇö `mdxRenderer` wired into both production and test containers
+- `tests/unit/composition/container.test.ts` ΓÇö `vi.mock("server-only", ...)` (same workaround as `src/lib/__tests__/*`; `server-only`'s `react-server` condition isn't applied by vitest's default resolution)
+- `docs/stories/STORY-012.md` ΓÇö story
+- `package.json` + `pnpm-lock.yaml` ΓÇö `next-mdx-remote@^6.0.0`, `gray-matter@^4.0.3` (installed via `pnpm add -w`)
+
+**Source content found in `D:\Web Project\amph-v2\content\curriculum\modules/`:**
+
+- 9 module directories (0-onboarding through 8-competitive-intelligence)
+- 31 MDX lesson files with frontmatter (`title`, `slug`, `moduleNumber`, `lessonNumber`, `type`, `estimatedMinutes`, `xpReward`)
+- A `quiz-questions.json` fixture
+- The plan's hypothetical `content/curriculum/<course-slug>/module-N-*.mdx` layout was wrong; the actual layout is `content/curriculum/modules/<module-slug>/<lesson-slug>.mdx`. STORY-013's import script will need to use the real layout. Source files exist and are ready to be symlinked / vendored into v2-greenfield at STORY-013 time.
+
+**Verification:** `pnpm typecheck` clean, `pnpm lint` clean (no new
+warnings; the 4 pre-existing warnings are unrelated), `pnpm
+test:arch` 410/410 green, `pnpm build` succeeds, all 12 new tests
+pass on first run after the type-shape fix. Full `pnpm test` shows
+2267 passing + 2 skip; the 10-11 failing files are the pre-existing
+Windows-only ones, unchanged. (Note: I also had to run
+`pnpm prisma:generate` to pick up the `pricingTier`, `sentReminder`,
+and `simulatorScenario` model additions from PRs #125/#127/#132 ΓÇö
+the Prisma client was stale, the typecheck failure cascade on
+`Prisma*` repos was a downstream symptom.)
+
+**Definition of Done:** all boxes checked
+(see PR #134 body). Conventional commit
+`feat(catalog): STORY-012 MDX content renderer port + adapter`
+pushed.
+
 ## What changed in this session (2026-07-19)
 
-### 1. Audit P0 remediation — all 7 P0 items closed (PRs #77–#89)
+### 1. Audit P0 remediation ΓÇö all 7 P0 items closed (PRs #77ΓÇô#89)
 
 | #    | Finding                                                                    | PR                | Fix                                                                                                                                                                                                     |
 | ---- | -------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0-1 | Paywall bypass — EnrollStudent accepted any course                         | #84               | Entitlement gate: paid courses require `order` (with PAID order) or `admin_grant`; `EntitlementSource` type; `findPaidForUserAndCourse` on `IOrderRepository`; checkout redirect for paid; "Buy now" UI |
+| P0-1 | Paywall bypass ΓÇö EnrollStudent accepted any course                         | #84               | Entitlement gate: paid courses require `order` (with PAID order) or `admin_grant`; `EntitlementSource` type; `findPaidForUserAndCourse` on `IOrderRepository`; checkout redirect for paid; "Buy now" UI |
 | P0-2 | In-memory adapters running in production                                   | #89 (1 of 9 done) | `PrismaCourseRepository` is the template; 8 others queued (Order, Session, AuditLog, DiscountCode, Scenario, LiveClass, plus Module/Lesson blocked on schema evolution)                                 |
 | P0-3 | Broken baseline Prisma migration (only created `certificates`)             | #88               | Replaced with `20260719000000_baseline` creating all 20 models; `migration_lock.toml` pinned; 6 migration contract tests                                                                                |
 | P0-4 | Post-auth 404 (`/dashboard` didn't exist)                                  | #85               | New `/dashboard` server component with enrollments, "Continue learning", "My courses", sign-out; `force-dynamic`                                                                                        |
-| P0-5 | Preview leak — lesson access not single-source-of-truth                    | #86               | New `AuthorizeLessonAccess` use case; 5 user states (anonymous, authed-preview, enrolled, refunded, admin); refunded = not enrolled                                                                     |
+| P0-5 | Preview leak ΓÇö lesson access not single-source-of-truth                    | #86               | New `AuthorizeLessonAccess` use case; 5 user states (anonymous, authed-preview, enrolled, refunded, admin); refunded = not enrolled                                                                     |
 | P0-6 | Quiz attempt contract mismatch (adapters called `update` for new attempts) | #87               | Port contract: `create` returns `already_exists` on dup, `update` returns `not_found` if missing; `InMemoryQuizAttemptRepository` conforms; `RecordQuizAttempt` always calls `create`                   |
 | P0-7 | Payment flow unreachable (PayMongo wiring + `/checkout`)                   | (queued)          | Largest remaining item; needs full PR with PayMongo + checkout page; see Sprint 11 follow-ups                                                                                                           |
 
-**Test delta: 1339 → 1403** (+64 across 6 audit PRs).
+**Test delta: 1339 ΓåÆ 1403** (+64 across 6 audit PRs).
 
-### 2. CI restoration — green on typecheck, unit, build, architecture (PRs #90–#96)
+### 2. CI restoration ΓÇö green on typecheck, unit, build, architecture (PRs #90ΓÇô#96)
 
 A 7-PR chain to repair the CI pipeline:
 
@@ -686,9 +740,9 @@ A 7-PR chain to repair the CI pipeline:
 | #93 | Resolve lint errors + drop `shadowDatabaseUrl` from `prisma.config.ts` when env var unset (Prisma 7)              |
 | #94 | Drop stdout pollution from baseline migration + add `.gitleaks.toml` allowlist for test secrets                   |
 | #95 | Add `pnpm prisma generate` to unit job + skip sample-render tests in CI (gated on `SAMPLE_OUTPUT_DIR`)            |
-| #96 | Exclude Prisma adapters + production container from coverage (placeholders until P0-2 in-memory→Prisma migration) |
+| #96 | Exclude Prisma adapters + production container from coverage (placeholders until P0-2 in-memoryΓåÆPrisma migration) |
 
-### 3. 100% TDD + SOLID compliance suite — live in CI (PRs #97, #98)
+### 3. 100% TDD + SOLID compliance suite ΓÇö live in CI (PRs #97, #98)
 
 **`pnpm test:arch`** runs 8 static-analysis rules in ~3 seconds and fails CI on any violation. Wired as a separate `Architecture (TDD + SOLID compliance)` CI job (~10s, no services).
 
@@ -713,10 +767,10 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 **The suite also flagged 4 entities without tests** (PR #98 added 36 tests):
 
-- `User.test.ts` — 13 tests (createUser, userFullName, userInitials, isAdmin, isInstructor)
-- `Module.test.ts` — 10 tests (createModule, updateModule invariants)
-- `ProgressEvent.test.ts` — 7 tests (factory + metadata freeze)
-- `Session.test.ts` — 6 tests (sessionIsValid, sessionDaysUntilExpiry)
+- `User.test.ts` ΓÇö 13 tests (createUser, userFullName, userInitials, isAdmin, isInstructor)
+- `Module.test.ts` ΓÇö 10 tests (createModule, updateModule invariants)
+- `ProgressEvent.test.ts` ΓÇö 7 tests (factory + metadata freeze)
+- `Session.test.ts` ΓÇö 6 tests (sessionIsValid, sessionDaysUntilExpiry)
 
 **Total: 1806 unit + integration + 369 architecture = 2175 tests, 0 failures.**
 
@@ -724,29 +778,30 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ## Open Work (for the next session)
 
-**Note (2026-07-22, updated by the Module/Lesson + E2E sessions):** the
-table below is a stale snapshot from the 2026-07-19 close (it predates
-PR `#100`, PRs `#125` through `#129`, and this session's E2E work).
-Sprint 11 (051–055), P0-2, and the E2E suite (section B) are all done
-as of this session; see "Project Status" at the top of this file and
-the 2026-07-22 log entries for the current state. Left in place rather
-than deleted, since rewriting history that was accurate at the time
-isn't this file's convention (see the "Stale P0-2 items snapshot"
-CodeRabbit response further down). **What's actually next: Sprint 12
-(Launch, STORY-056–060, none started, no story docs written yet)** —
-production deploy runbook, DB backup/restore drill, pre-launch
-security audit, the actual deploy, and launch comms. All five of those
-involve real infrastructure/business decisions (buying a domain,
-deploying to production, sending external communications) that need
-explicit operator sign-off, not something to run through
-autonomously end-to-end.
+**Note (2026-07-22, updated by the STORY-011 session):** the table
+below is a stale snapshot from the 2026-07-19 close (it predates
+PR `#100`, PRs `#125` through `#129`, this session's E2E work,
+and PR #132 / STORY-011). Sprint 11 (051ΓÇô055), P0-2, the E2E suite
+(section B), and STORY-011 are all done as of this session; see
+"Project Status" at the top of this file and the 2026-07-22 log
+entries for the current state. Left in place rather than deleted,
+since rewriting history that was accurate at the time isn't this
+file's convention (see the "Stale P0-2 items snapshot" CodeRabbit
+response further down). **What's actually next: pick up Sprint 3
+at STORY-012 (the next in the catalog foundation sequence, see
+`docs/sprint-3/PLAN.md`)**. STORY-012ΓÇô020 and STORY-022ΓÇô045 are
+the meat of catalog + checkout + the four simulators. The
+remaining launch work (Sprint 12, STORY-056ΓÇô060 ΓÇö production
+deploy runbook, DB backup/restore drill, pre-launch security
+audit, the actual deploy, launch comms) still needs explicit
+operator sign-off, not autonomous execution.
 
-### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories) — STALE, see note above
+### A. Sprint 11 ΓÇö Observability + Tests (P0-2, P0-7 + the 5 sprint stories) ΓÇö STALE, see note above
 
 | ID  | Title                                                    | Status                                                                                                                                                                                                                                |
 | --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| —   | P0-2 in-memory→Prisma migration (4 adapters remaining)   | Order + AuditLog + Session (PR #125, merged) + DiscountCode (this session) done. PR #89 established the Course pattern; still queued: Module, Lesson, Scenario, LiveClass, all four blocked on schema migrations that don't exist yet |
-| —   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                                                               |
+| ΓÇö   | P0-2 in-memoryΓåÆPrisma migration (4 adapters remaining)   | Order + AuditLog + Session (PR #125, merged) + DiscountCode (this session) done. PR #89 established the Course pattern; still queued: Module, Lesson, Scenario, LiveClass, all four blocked on schema migrations that don't exist yet |
+| ΓÇö   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                                                               |
 | 051 | Sentry setup                                             | Not started                                                                                                                                                                                                                           |
 | 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                                                                           |
 | 053 | Lighthouse CI                                            | Not started                                                                                                                                                                                                                           |
@@ -765,11 +820,11 @@ Closed. See the "PrismaModuleRepository + PrismaLessonRepository" entry at the t
 
 ## Architecture: Key Patterns Established
 
-### Admin CRUD pattern (universal — use for any future admin resource)
+### Admin CRUD pattern (universal ΓÇö use for any future admin resource)
 
 ```
-1. Entity factory      src/domain/entities/<Name>.ts         — create<X>, update<X>
-2. Repository port     src/ports/repositories/I<X>Repository.ts  — add admin methods
+1. Entity factory      src/domain/entities/<Name>.ts         ΓÇö create<X>, update<X>
+2. Repository port     src/ports/repositories/I<X>Repository.ts  ΓÇö add admin methods
 3. Use cases (5)       src/usecases/Admin{List,Get,Create,Update,Archive}<X>.ts
 4. Server actions (3)  src/app/actions/{create,update,archive}<X>.action.ts
 5. Pages (3)           src/app/admin/<plural>/{page,new,edit}.tsx
@@ -784,29 +839,29 @@ Use case invariants:
 
 ### Audit log invariants
 
-- `RecordAuditLog` **never** fails the business operation — catches errors, logs to `console.error`, returns `{ recorded: false }`
+- `RecordAuditLog` **never** fails the business operation ΓÇö catches errors, logs to `console.error`, returns `{ recorded: false }`
 - `RecordAuditLog` is a class **instance** with `.execute()`, NOT a callable
-- `import { RecordAuditLog }` (value), NOT `import type` — `isolatedModules: true` erases the latter at runtime
-- `RecordAuditLogDeps = { auditLog, idGen, clock }` — all three required
+- `import { RecordAuditLog }` (value), NOT `import type` ΓÇö `isolatedModules: true` erases the latter at runtime
+- `RecordAuditLogDeps = { auditLog, idGen, clock }` ΓÇö all three required
 - Use case deps: `{ xRepo, recordAuditLog: RecordAuditLog }`
 
 ### Layer / Port / Adapter (enforced by `pnpm test:arch`)
 
 ```
-app → usecases → domain
-                   ↑
-       infra → ports ─┘
+app ΓåÆ usecases ΓåÆ domain
+                   Γåæ
+       infra ΓåÆ ports ΓöÇΓöÿ
 ```
 
-- Domain never imports from outer layers (enforced — tested)
-- Use cases depend on `/ports` interfaces, not concrete `/infra` classes (enforced — tested)
+- Domain never imports from outer layers (enforced ΓÇö tested)
+- Use cases depend on `/ports` interfaces, not concrete `/infra` classes (enforced ΓÇö tested)
 - Infra implements ports. Container (`src/composition/container.ts`) is the only place that wires concrete adapters
 - `prisma.config.ts` only sets `shadowDatabaseUrl` when `SHADOW_DATABASE_URL` env var is explicitly set (Prisma 7 requires this)
 
 ### Container pattern
 
-- Production container: `src/composition/container.ts` — `Prisma*` adapters (some are stubs awaiting P0-2 work)
-- Test container: `src/composition/container.test.ts` — `InMemory*` adapters; `buildTestContainer()` returns `TestContainer extends AppContainer`
+- Production container: `src/composition/container.ts` ΓÇö `Prisma*` adapters (some are stubs awaiting P0-2 work)
+- Test container: `src/composition/container.test.ts` ΓÇö `InMemory*` adapters; `buildTestContainer()` returns `TestContainer extends AppContainer`
 - For each new use case, add the property in **three** places: imports, `AppContainer` interface, return statement (both files)
 
 ### Page-level patterns
@@ -826,10 +881,10 @@ app → usecases → domain
 
 - `error.kind` must be narrowed before accessing `.message` on error union
 - Literal unions (`BadgeSlug`, `SimulatorId`, `Difficulty`) need `as const` in test inputs
-- `Parameters<MyUseCase.prototype.execute>` fails with TS2702 — use explicit `MakeInput` interface
+- `Parameters<MyUseCase.prototype.execute>` fails with TS2702 ΓÇö use explicit `MakeInput` interface
 - `Partial<T>` with `= {}` default returns `{}`; add explicit return type or inline interface
 - `as Date | null | undefined` cast needed for `validFrom`/`validUntil` in update action ternary
-- `import type { X }` is erased at runtime under `isolatedModules: true` — use value imports for class instances
+- `import type { X }` is erased at runtime under `isolatedModules: true` ΓÇö use value imports for class instances
 
 ---
 
@@ -854,27 +909,27 @@ pnpm test:coverage  # + v8 coverage, threshold gate
 
 ### Granting an exemption
 
-- `port-segregation.test.ts` has a `MAX_METHODS_EXEMPT` set — add a port file with a justifying comment
+- `port-segregation.test.ts` has a `MAX_METHODS_EXEMPT` set ΓÇö add a port file with a justifying comment
 - Other rules have inline allow-lists at the top of each file
-- Exemptions should be reviewed in code review — they're a smell, not a permanent feature
+- Exemptions should be reviewed in code review ΓÇö they're a smell, not a permanent feature
 
 ### What the suite does NOT check
 
-- **Open/Closed Principle** (O) — not auto-enforceable in TypeScript without a lot of AST work. Reviewed in code review instead
-- **Line coverage of use cases** — covered by `pnpm test:coverage` (87.36% lines)
-- **Behavioral correctness** — the architecture suite enforces _structure_, not _semantics_. Domain correctness comes from the per-use-case tests
-- **Stylistic preferences** — naming, formatting, file size limits. Use ESLint + Prettier for those
+- **Open/Closed Principle** (O) ΓÇö not auto-enforceable in TypeScript without a lot of AST work. Reviewed in code review instead
+- **Line coverage of use cases** ΓÇö covered by `pnpm test:coverage` (87.36% lines)
+- **Behavioral correctness** ΓÇö the architecture suite enforces _structure_, not _semantics_. Domain correctness comes from the per-use-case tests
+- **Stylistic preferences** ΓÇö naming, formatting, file size limits. Use ESLint + Prettier for those
 
 ---
 
 ## Tooling Notes
 
-- `pnpm` lives at `/usr/local/lib/node_modules/corepack/shims/pnpm` — not on `$PATH`
+- `pnpm` lives at `/usr/local/lib/node_modules/corepack/shims/pnpm` ΓÇö not on `$PATH`
 - `GITHUB_TOKEN_PAT` is the env var; pre-commit husky hook fails on `pnpm not found`, so use `git commit --no-verify`
 - For GitHub API: `curl -H "Authorization: token $GITHUB_TOKEN_PAT" https://api.github.com/...`
 - For git push: `git -c "credential.helper=!f() { echo username=x-access-token; echo password=$GITHUB_TOKEN_PAT; }; f" push origin <branch>`
 - After PR merge: `git fetch origin main && git checkout main && git reset --hard origin/main && git branch -D <branch>`
-- `pnpm build` reverts `tsconfig.json` — `git checkout -- tsconfig.json` after every build
+- `pnpm build` reverts `tsconfig.json` ΓÇö `git checkout -- tsconfig.json` after every build
 - Auth tests need `DATABASE_URL=postgresql://...` and `JWT_SECRET=...` env vars; without them they fail with "DATABASE_URL not set"
 - E2E tests need `SAMPLE_OUTPUT_DIR` set to write sample-render artifacts; tests are skipped when unset
 - The `prisma generate` step in CI depends on `prisma/schema.prisma` being present; if you delete the schema, gate the step with `if: hashFiles('prisma/schema.prisma') != ''`
@@ -885,21 +940,21 @@ pnpm test:coverage  # + v8 coverage, threshold gate
 
 ```
 push to main
-   ↓
-┌──────────────────┬──────────────────────┬──────────────────┬──────────────┬────────────┐
-│ Typecheck + Lint │ Unit + integration   │ Architecture     │ Build        │ E2E        │
-│ ~30s             │ ~75s (needs Postgres)│ ~10s             │ ~45s         │ ~2.2m      │
-│ ✅ passing       │ ✅ 1806 passing      │ ✅ 369 passing   │ ✅ passing   │ ❌ 17 fail │
-└──────────────────┴──────────────────────┴──────────────────┴──────────────┴────────────┘
+   Γåô
+ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+Γöé Typecheck + Lint Γöé Unit + integration   Γöé Architecture     Γöé Build        Γöé E2E        Γöé
+Γöé ~30s             Γöé ~75s (needs Postgres)Γöé ~10s             Γöé ~45s         Γöé ~2.2m      Γöé
+Γöé Γ£à passing       Γöé Γ£à 1806 passing      Γöé Γ£à 369 passing   Γöé Γ£à passing   Γöé Γ¥î 17 fail Γöé
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
 ```
 
 E2E failures: signup flow can't reach post-submit state. `expect(locator).toBeVisible()` failing on `email_taken` / `weak_password` redirect targets. Spec at `tests/e2e/signup.spec.ts`.
 
 ---
 
-## Sprints 8–10 (already done before this session)
+## Sprints 8ΓÇô10 (already done before this session)
 
 - **Sprint 8:** All five simulators (Bid Elevator, STR Triage, Campaign Builder, Listing Audit, Keyword Research)
 - **Sprint 9:** Certificates (Issue/Revoke/Verify) + React PDF renderer + Email templates (receipt, cert, refund, verification, reset, live class)
-- **Sprint 10:** Admin Panel — 11/11 stories (PRs #77–#82)
+- **Sprint 10:** Admin Panel ΓÇö 11/11 stories (PRs #77ΓÇô#82)
 - **Sprint 10 closeout:** P0 audit remediation + CI restoration + 100% compliance suite
