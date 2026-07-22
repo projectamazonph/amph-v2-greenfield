@@ -35,11 +35,19 @@ export async function clearE2EUsers(databaseUrl: string): Promise<void> {
   // Only mutate process.env.DATABASE_URL when we have a real value.
   process.env.DATABASE_URL = databaseUrl;
   let prisma: import("@prisma/client").PrismaClient | undefined;
+  let pool: import("pg").Pool | undefined;
   try {
     const { PrismaClient } = await import("@prisma/client");
     const { PrismaPg } = await import("@prisma/adapter-pg");
     const { Pool } = await import("pg");
-    const pool = new Pool({ connectionString: databaseUrl });
+    // Finite timeouts so an unreachable/misconfigured DB fails fast into
+    // the catch below instead of hanging the caller's afterEach.
+    pool = new Pool({
+      connectionString: databaseUrl,
+      connectionTimeoutMillis: 5000,
+      query_timeout: 5000,
+      statement_timeout: 5000,
+    });
     const adapter = new PrismaPg(pool);
     prisma = new PrismaClient({ adapter });
     await prisma.user.deleteMany({
@@ -54,6 +62,16 @@ export async function clearE2EUsers(databaseUrl: string): Promise<void> {
         await prisma.$disconnect();
       } catch {
         // ignore disconnect errors
+      }
+    }
+    // PrismaPg does not close an externally supplied pool on
+    // $disconnect() by default; close it ourselves so repeated afterEach
+    // calls don't pile up idle connections.
+    if (pool) {
+      try {
+        await pool.end();
+      } catch {
+        // ignore pool shutdown errors
       }
     }
   }
