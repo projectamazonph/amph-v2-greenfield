@@ -12,7 +12,11 @@ import { ImportAmphContent } from "@/usecases/ImportAmphContent";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
-import type { IAmphContentReader, MdxFile } from "@/domain/ports/content/IAmphContentReader";
+import type {
+  IAmphContentReader,
+  MdxFile,
+  ContentReadError,
+} from "@/domain/ports/content/IAmphContentReader";
 import { Result } from "@/domain/shared/Result";
 import type { ContentIdGenerator } from "@/ports/system/ContentIdGenerator";
 import type { Module } from "@/domain/entities/Module";
@@ -23,7 +27,6 @@ import type { Lesson } from "@/domain/entities/Lesson";
 /** Deterministic ContentIdGenerator for testing. */
 const fakeIdGen: ContentIdGenerator = {
   generateId(...parts: string[]): string {
-    // Simple stable string ID — same inputs → same output
     return parts.join("__");
   },
 };
@@ -31,24 +34,20 @@ const fakeIdGen: ContentIdGenerator = {
 /** Configurable content reader for tests. */
 class FakeContentReader implements IAmphContentReader {
   private files: readonly { courseSlug: string; files: readonly MdxFile[] }[] = [];
-  private error: { kind: "read_error" | "parse_error"; message: string } | null = null;
+  private error: ContentReadError | null = null;
 
   setFiles(files: readonly { courseSlug: string; files: readonly MdxFile[] }[]): void {
     this.files = files;
     this.error = null;
   }
 
-  setError(err: { kind: "read_error" | "parse_error"; message: string }): void {
+  setError(err: ContentReadError): void {
     this.error = err;
   }
 
   async readAll() {
     if (this.error) {
-      return Result.err({
-        kind: this.error.kind,
-        message: this.error.message,
-        ...(this.error.kind === "parse_error" ? { file: "test.mdx" } : {}),
-      });
+      return Result.err(this.error);
     }
     return Result.ok(this.files);
   }
