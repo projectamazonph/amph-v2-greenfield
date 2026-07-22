@@ -18,6 +18,12 @@
  * PrismaClientInitializationError, which caused afterEach to fail,
  * which made the entire critical-journeys suite red even when the
  * test bodies had passed.
+ *
+ * Prisma 7 note: `prisma/schema.prisma`'s datasource has no `url`,
+ * connections are supplied via a driver adapter (see
+ * `src/infra/database/prisma.ts`). A bare `new PrismaClient()` with
+ * no adapter always throws PrismaClientInitializationError regardless
+ * of DATABASE_URL, which silently no-op'd this cleanup on every run.
  */
 
 export async function clearE2EUsers(databaseUrl: string): Promise<void> {
@@ -31,7 +37,11 @@ export async function clearE2EUsers(databaseUrl: string): Promise<void> {
   let prisma: import("@prisma/client").PrismaClient | undefined;
   try {
     const { PrismaClient } = await import("@prisma/client");
-    prisma = new PrismaClient();
+    const { PrismaPg } = await import("@prisma/adapter-pg");
+    const { Pool } = await import("pg");
+    const pool = new Pool({ connectionString: databaseUrl });
+    const adapter = new PrismaPg(pool);
+    prisma = new PrismaClient({ adapter });
     await prisma.user.deleteMany({
       where: { email: { contains: "@example.com" } },
     });

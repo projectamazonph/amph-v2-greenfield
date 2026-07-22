@@ -1,29 +1,98 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), and PR #128 (SimulatorScenario) all merged to `main`. Module + Lesson (this session, branch `claude/next-story-klge5f`) close out P0-2: every repository in `buildProductionContainer()` is now Postgres-backed.
+**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), and PR #129 (Module/Lesson) all merged to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Same session, same branch (recreated fresh from post-merge `main`): investigated the stale 2026-07-19 E2E failure report and fixed a real bug in the E2E cleanup helper.
 
 ---
 
 ## Project Status
 
-| Metric                   | Value                                                                                                                                                                                                                                                     |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration closed (this session)**                                                                                                                                                              |
-| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                             |
-| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                    |
-| `main` HEAD              | `e7e15dd`: fix(admin): implement PrismaSimulatorScenarioRepository (P0-2 / STORY-050b) (#128, squash-merged)                                                                                                                                              |
-| Unit + integration tests | **2242 passing + 2 skipped, 0 TypeScript errors** (on `claude/next-story-klge5f`, not yet a PR)                                                                                                                                                           |
-| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                                       |
-| Coverage                 | Not re-measured after the Module/Lesson work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)                 |
-| CI                       | PR #125, #126, #127, and #128 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's Module/Lesson work isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green |
-| Database                 | Not provisioned (Prisma schema complete; every repository in `buildProductionContainer()` is now Postgres-backed, no `InMemory*` fallbacks remain)                                                                                                        |
-| Production               | Not deployed                                                                                                                                                                                                                                              |
+| Metric                   | Value                                                                                                                                                                                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration closed; E2E suite re-verified green**                                                                                                                                               |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                            |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                   |
+| `main` HEAD              | `621ed1d`: fix(admin): implement PrismaModuleRepository + PrismaLessonRepository (P0-2 / STORY-048b / STORY-048c) (#129, squash-merged)                                                                                                                  |
+| Unit + integration tests | **2242 passing + 2 skipped, 0 TypeScript errors** (on `claude/next-story-klge5f`, recreated fresh from post-merge `main`, not yet a PR)                                                                                                                  |
+| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                                      |
+| Coverage                 | Not re-measured after the Module/Lesson work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)                |
+| E2E                      | Re-run this session with a locally provisioned Postgres (was 0/19, blocked on env, see log below): **15 passed, 4 intentionally skipped (no seeded admin in this greenfield env), 0 failed** on `chromium-desktop`                                       |
+| CI                       | PR #125–#129 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's E2E-helper fix isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green                     |
+| Database                 | Not provisioned in production (Prisma schema complete; every repository in `buildProductionContainer()` is Postgres-backed, no `InMemory*` fallbacks remain). This session provisioned a throwaway local Postgres 16 purely to run E2E; nothing persists |
+| Production               | Not deployed                                                                                                                                                                                                                                             |
 
 ---
 
 ## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`)
 
-### PrismaModuleRepository + PrismaLessonRepository: close out P0-2
+### E2E suite re-verified green + a real bug fixed in the cleanup helper (same session, after PR #129 merged)
+
+PR #129 merged (squash, as `621ed1d`); branch recreated fresh from
+post-merge `main` per this session's instructions, then moved to the
+next flagged item: `SESSION-HANDOVER.md`'s own "Open Work" note
+pointed at the E2E failures in section B below, last measured
+**17 failed, 7 passed** on 2026-07-19, three sessions and a lot of
+shipped work ago (STORY-021's `/checkout` page in particular). Nothing
+had re-run it since, so the number was unverified.
+
+- This sandbox had no live database (`DATABASE_URL` unset, matches
+  documented "Not provisioned" state) and no browser matching the
+  pinned Playwright version, so the suite could not run at all,
+  regardless of app correctness. Provisioned a throwaway local
+  Postgres 16 (already installed in the image, just not running:
+  `service postgresql start`, `createdb amph_test`), applied all 11
+  migrations cleanly via `prisma migrate deploy` (including this
+  session's own `20260722040000_module_lesson`, a useful sanity check
+  on that migration in isolation).
+- The pinned Playwright Chromium build (`chromium_headless_shell-1228`)
+  wasn't present; only an older pre-installed build
+  (`chromium-1194`) was. Added an opt-in `PLAYWRIGHT_CHROMIUM_PATH` env
+  var to `playwright.config.ts` (`launchOptions.executablePath`,
+  `undefined` when unset): zero effect on CI, which downloads its own
+  correct browser version; lets a sandboxed environment without
+  outbound network access for browser downloads point at whatever
+  Chromium happens to be on disk.
+- With both blockers cleared, ran the full suite. **Real bug found**:
+  `tests/e2e/helpers/seed.ts`'s `clearE2EUsers()` did `new
+PrismaClient()` with no arguments. This codebase is Prisma 7 with
+  driver adapters (`prisma/schema.prisma`'s `datasource` block has no
+  `url`; connections are supplied via `PrismaPg` + `pg.Pool`, see
+  `src/infra/database/prisma.ts`), so a bare `new PrismaClient()`
+  always throws `PrismaClientInitializationError`, on every run,
+  regardless of whether `DATABASE_URL` is set or valid. The helper's
+  own try/catch was written to swallow exactly this class of error (by
+  design, so a missing `DATABASE_URL` in a CI worker doesn't fail
+  `afterEach`), which meant the cleanup silently never ran, on any E2E
+  run, ever, since the helper was written. Fixed by constructing the
+  client the same way `src/infra/database/prisma.ts` does
+  (`PrismaPg` + `Pool`, adapter passed into `PrismaClient`). Confirmed
+  the fix didn't break the locked-in contract in
+  `tests/unit/e2e-helpers/clearE2EUsers.test.ts` (empty/malformed URL
+  must still no-op, not throw): still 4/4 passing.
+- Full `chromium-desktop` run after the fix: **15 passed, 4 skipped
+  (journeys 3-6 in `critical-journeys.spec.ts`, intentionally
+  `test.skip()`'d with a comment: "greenfield test environment without
+  seeded admins"), 0 failed.** The 2026-07-19 "17 failed" number is
+  stale: real signup-flow bugs from that era were already fixed by
+  later work (confirmed by re-reading `signup.spec.ts` against the
+  current `/signup` page and server action; nothing there needed a
+  change this session), and the rest of that failure count was very
+  likely the same browser-launch problem this session hit first
+  (`browserType.launch: Executable doesn't exist`), which produces a
+  failure for every single test regardless of app behavior. Also
+  spot-checked `a11y.spec.ts`: passes (soft-check pattern, same as
+  Lighthouse; logs `color-contrast`/`landmark-one-main`/`region`
+  violations to the console without failing the test, consistent with
+  STORY-055's "axe a11y" being an audit tool, not a hard gate).
+- Did not run `chromium-mobile`/`chromium-tablet` projects (time
+  budget; `chromium-desktop` is the project this file's own history
+  called out as "the real failure surface").
+- `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test` (2242 passed, 2
+  skipped) all clean after the fix. Local-only cleanup: dropped the
+  throwaway `amph_test` database and stopped the local Postgres
+  service before finishing (this sandbox's Postgres is not the app's
+  production database and holds no real data either way).
+
+### PrismaModuleRepository + PrismaLessonRepository: close out P0-2 (PR #129, merged)
 
 Picked up "the next story" and found P0-2 (in-memory→Prisma migration)
 already down to its last two legs: `moduleRepo` and `lessonRepo`, both
@@ -589,18 +658,22 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ## Open Work (for the next session)
 
-**Note (2026-07-22, updated by the Module/Lesson session):** the table
-below is a stale snapshot from the 2026-07-19 close (it predates
-PR `#100`, PRs `#125` through `#128`, and this session's Module/Lesson work). Sprint 11
-(051–055) and P0-2 are both fully done as of this session; see
-"Project Status" at the top of this file and the 2026-07-22 log
-entries for the current state. Left in place rather than deleted,
-since rewriting history that was accurate at the time isn't this
-file's convention (see the "Stale P0-2 items snapshot" CodeRabbit
-response further down). **What's actually next: Sprint 12 (Launch,
-STORY-056–060, none started, no story docs written yet) and the E2E
-failures in section B below**, which nothing in this log has revisited
-since 2026-07-19.
+**Note (2026-07-22, updated by the Module/Lesson + E2E sessions):** the
+table below is a stale snapshot from the 2026-07-19 close (it predates
+PR `#100`, PRs `#125` through `#129`, and this session's E2E work).
+Sprint 11 (051–055), P0-2, and the E2E suite (section B) are all done
+as of this session; see "Project Status" at the top of this file and
+the 2026-07-22 log entries for the current state. Left in place rather
+than deleted, since rewriting history that was accurate at the time
+isn't this file's convention (see the "Stale P0-2 items snapshot"
+CodeRabbit response further down). **What's actually next: Sprint 12
+(Launch, STORY-056–060, none started, no story docs written yet)** —
+production deploy runbook, DB backup/restore drill, pre-launch
+security audit, the actual deploy, and launch comms. All five of those
+involve real infrastructure/business decisions (buying a domain,
+deploying to production, sending external communications) that need
+explicit operator sign-off, not something to run through
+autonomously end-to-end.
 
 ### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories) — STALE, see note above
 
@@ -614,9 +687,9 @@ since 2026-07-19.
 | 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                                                                           |
 | 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                                                                           |
 
-### B. E2E failures (separate from compliance, ready for follow-up)
+### B. E2E failures: RESOLVED (this session, 2026-07-22, branch `claude/next-story-klge5f`, after PR #129 merged)
 
-Last run: **17 failed, 7 passed** in 2.2m. Real failure mode: signup flow tests can't reach the post-submit state (likely the `email_taken` and `weak_password` redirect handlers — `expect(locator).toBeVisible()` failing). The webkit errors I saw initially were a Playwright retry artifact; chromium-desktop is the real failure surface. The signup spec lives at `tests/e2e/signup.spec.ts`. Not re-run since 2026-07-19; may already be stale given how much has landed since (STORY-021's `/checkout` page in particular).
+Was stale (last run 2026-07-19, 17 failed / 7 passed). Re-run this session with a locally provisioned Postgres + the pre-installed Chromium binary: **15 passed, 4 intentionally skipped, 0 failed** on `chromium-desktop`. One real bug found and fixed along the way: `clearE2EUsers()` in `tests/e2e/helpers/seed.ts` was constructing `new PrismaClient()` with no driver adapter, which always throws under this codebase's Prisma 7 + driver-adapter setup, silently no-op'ing the cleanup on every run since the helper was written. See the "E2E suite re-verified green" entry at the top of this session's log for the full writeup. `chromium-mobile`/`chromium-tablet` projects were not re-run (time budget).
 
 ### C. Module / Lesson Prisma adapters: DONE (this session, 2026-07-22, branch `claude/next-story-klge5f`)
 
