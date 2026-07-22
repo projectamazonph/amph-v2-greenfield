@@ -24,6 +24,7 @@
     "prisma:format": "prisma format",
     "prisma:validate": "prisma validate",
     "gen:secret": "node scripts/gen-secret.js",
+    "import:content": "tsx scripts/import-amph-content.ts",
     "format": "prettier --write .",
     "prepare": "husky"
   },
@@ -57,6 +58,10 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cobusgreyling/loop-audit": "^1.7.0",
+    "@cobusgreyling/loop-context": "^1.5.0",
+    "@cobusgreyling/loop-cost": "^1.2.0",
+    "@cobusgreyling/loop-sync": "^1.0.0",
     "@eslint/eslintrc": "3",
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
@@ -74,6 +79,7 @@
     "lint-staged": "^17.1.0",
     "prettier": "^3.9.5",
     "prisma": "^7.8.0",
+    "tsx": "^4.23.1",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.10"
