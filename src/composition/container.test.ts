@@ -42,6 +42,7 @@ import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCert
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
+import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
@@ -155,6 +156,7 @@ export interface TestContainer extends AppContainer {
   auditLog: InMemoryAuditLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
   liveClassRepo: InMemoryLiveClassRepository;
+  pricingTierRepo: InMemoryPricingTierRepository;
   sentReminderRepo: InMemorySentReminderRepository;
   emailVerificationRepo: InMemoryEmailVerificationRepository;
   passwordResetRepo: InMemoryPasswordResetRepository;
@@ -200,6 +202,8 @@ export function buildTestContainer(): TestContainer {
   const scenarioRepo = new InMemorySimulatorScenarioRepository();
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
+  // STORY-011: pricing tier repo
+  const pricingTierRepo = new InMemoryPricingTierRepository();
 
   return {
     clock,
@@ -367,6 +371,7 @@ export function buildTestContainer(): TestContainer {
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
     // STORY-050c
     liveClassRepo,
+    pricingTierRepo,
     sentReminderRepo,
     adminListLiveClasses: new AdminListLiveClasses({ liveClassRepo }),
     adminGetLiveClass: new AdminGetLiveClass({ liveClassRepo }),
