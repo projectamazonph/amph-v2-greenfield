@@ -254,6 +254,38 @@ genuinely blocked on schema migrations (no `Module`/`Lesson`/
 `"schema migration"` errors on every call). Order, AuditLog, Session, and
 now DiscountCode are all Postgres-backed in production.
 
+### CodeRabbit review response on PR #126 (same session)
+
+Two findings, both skipped with a documented reason:
+
+- **"Every mutable table must have `deletedAt`, `createdById`,
+  `updatedById`"** (cited from `docs/db-schema.md` §2-3): asked to add all
+  three to `DiscountCode` in this migration. Checked the real
+  `prisma/schema.prisma` against that claim: 22 of 23 models have none of
+  these fields; only `User` has `deletedAt`. `createdById`/`updatedById`
+  appear nowhere in the actual schema at all. `docs/db-schema.md`
+  documents a target convention that was never implemented, not a live
+  rule this PR broke. Retrofitting it onto just `DiscountCode` would
+  single out one table out of 22 others in the same state, and it's a
+  heavier lift than a migration: the domain entity, the
+  `IDiscountCodeRepository` port, and both admin use cases would need to
+  start threading an actor id through create/update, none of which do
+  today. Also: this port's existing vocabulary is "archive"
+  (`archive()`, `{ kind: "archived" }`, `discount_code.archived` audit
+  action), not "delete", so adopting `deletedAt` here specifically would
+  read inconsistently against the rest of this vertical's own naming.
+  A repo-wide retrofit is a real gap worth its own story, not a
+  single-table review-comment fix.
+- **"Use plain language for the Filipino VA audience"** (cited from
+  `docs/voice-guide.md`), applied to `CHANGELOG.md` and
+  `SESSION-HANDOVER.md`: `docs/voice-guide.md` itself scopes this rule to
+  "UI copy, lessons, error messages, marketing pages," for VAs reading
+  the platform. These two files are internal engineering handoff docs,
+  read by the next session picking up this work, not by a student.
+  Rewriting "P0-2," "migration," "P2002," or "cold start" into
+  VA-friendly prose would make this documentation less useful to its
+  actual audience, not more.
+
 ## What changed in this session (2026-07-19)
 
 ### 1. Audit P0 remediation — all 7 P0 items closed (PRs #77–#89)
