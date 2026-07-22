@@ -178,6 +178,17 @@ describe("PrismaLiveClassRepository", () => {
     expect(found.value?.title).toBe("New Title");
   });
 
+  it("update persists a changed instructorId", async () => {
+    await repo.create(makeLiveClass({ id: "lc_1", instructorId: "instructor_1" }));
+    const result = await repo.update(makeLiveClass({ id: "lc_1", instructorId: "instructor_2" }));
+    expect(result.ok).toBe(true);
+
+    const found = await repo.findById("lc_1");
+    expect(found.ok).toBe(true);
+    if (!found.ok) return;
+    expect(found.value?.instructorId).toBe("instructor_2");
+  });
+
   it("update returns not_found when the live class does not exist", async () => {
     const result = await repo.update(makeLiveClass({ id: "never-created" }));
     expect(result.ok).toBe(false);
@@ -254,6 +265,28 @@ describe("PrismaLiveClassRepository", () => {
     await repo.create(makeLiveClass({ id: "lc_1" }));
     db.failNextUpdate = true;
     const result = await repo.delete("lc_1");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("db_error");
+  });
+
+  // ── defensive status validation (corrupt/legacy rows) ──────
+
+  it("findById returns db_error instead of hydrating a row with an invalid status", async () => {
+    db.rows.push({
+      id: "corrupt-1",
+      courseId: "course_1",
+      title: "Bad Row",
+      scheduledAt: new Date(1),
+      durationMinutes: 60,
+      instructorId: "instructor_1",
+      meetingUrl: "https://meet.example.com/abc",
+      status: "SOME_LEGACY_VALUE",
+      createdAt: new Date(1),
+      updatedAt: new Date(1),
+    });
+
+    const result = await repo.findById("corrupt-1");
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("db_error");

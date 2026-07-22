@@ -359,7 +359,6 @@ function buildProductionContainer(): AppContainer {
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)
   const scenarioRepo: ISimulatorScenarioRepository = new InMemorySimulatorScenarioRepository();
-  // STORY-050c: in-memory live class repo (Prisma schema is a follow-up)
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(

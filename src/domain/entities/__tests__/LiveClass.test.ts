@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createLiveClass, updateLiveClass } from "../LiveClass";
+import { createLiveClass, updateLiveClass, isValidLiveClassStatus } from "../LiveClass";
 
 describe("LiveClass entity", () => {
   const baseInput = {
@@ -107,7 +107,9 @@ describe("LiveClass entity", () => {
       expect(updated.value.courseId).toBe(original.courseId);
       expect(updated.value.id).toBe(original.id);
       expect(updated.value.scheduledAt.getTime()).toBe(original.scheduledAt.getTime());
-      expect(updated.value.updatedAt.getTime()).toBeGreaterThanOrEqual(original.updatedAt.getTime());
+      expect(updated.value.updatedAt.getTime()).toBeGreaterThanOrEqual(
+        original.updatedAt.getTime(),
+      );
     });
 
     it("fails when updated scheduledAt is in the past", () => {
@@ -132,6 +134,20 @@ describe("LiveClass entity", () => {
       expect(updated.ok).toBe(false);
       if (updated.ok) return;
       expect(updated.error.kind).toBe("invalid_title");
+    });
+  });
+
+  describe("isValidLiveClassStatus()", () => {
+    it.each(["scheduled", "cancelled", "completed"])("returns true for %s", (status) => {
+      expect(isValidLiveClassStatus(status)).toBe(true);
+    });
+
+    it("returns false for a legacy or corrupt value", () => {
+      expect(isValidLiveClassStatus("SOME_LEGACY_VALUE")).toBe(false);
+    });
+
+    it("returns false for an empty string", () => {
+      expect(isValidLiveClassStatus("")).toBe(false);
     });
   });
 });

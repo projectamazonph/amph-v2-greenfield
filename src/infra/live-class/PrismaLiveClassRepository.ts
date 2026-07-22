@@ -19,7 +19,8 @@ import type {
   ILiveClassRepository,
   LiveClassRepositoryError,
 } from "@/ports/repositories/ILiveClassRepository";
-import type { LiveClass, LiveClassStatus } from "@/domain/entities/LiveClass";
+import { isValidLiveClassStatus } from "@/domain/entities/LiveClass";
+import type { LiveClass } from "@/domain/entities/LiveClass";
 
 interface LiveClassRow {
   id: string;
@@ -91,6 +92,7 @@ export class PrismaLiveClassRepository implements ILiveClassRepository {
           title: liveClass.title,
           scheduledAt: liveClass.scheduledAt,
           durationMinutes: liveClass.durationMinutes,
+          instructorId: liveClass.instructorId,
           meetingUrl: liveClass.meetingUrl,
           status: liveClass.status,
         },
@@ -130,6 +132,12 @@ export class PrismaLiveClassRepository implements ILiveClassRepository {
   }
 
   private mapRow(row: LiveClassRow): LiveClass {
+    if (!isValidLiveClassStatus(row.status)) {
+      // Caught by the surrounding try/catch in every caller and turned
+      // into a db_error. A corrupt or legacy status value must not
+      // silently hydrate an invalid LiveClass.
+      throw new Error(`LiveClass ${row.id} has an invalid persisted status: "${row.status}"`);
+    }
     return {
       id: row.id,
       courseId: row.courseId,
@@ -138,7 +146,7 @@ export class PrismaLiveClassRepository implements ILiveClassRepository {
       durationMinutes: row.durationMinutes,
       instructorId: row.instructorId,
       meetingUrl: row.meetingUrl,
-      status: row.status as LiveClassStatus,
+      status: row.status,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

@@ -351,6 +351,43 @@ rows, per the audit's P1-7 finding).
   suite: 2189 passed, 2 skipped, 0 failures. `pnpm tsc --noEmit` and
   `pnpm lint` clean. `pnpm build` succeeds.
 
+### CodeRabbit review response on PR #127 (same session)
+
+Three findings addressed, one skipped (same reasoning as before, this
+is the third time it's come up on this branch, see the "plain
+language" entries under PR #126's response above for the full
+argument):
+
+- **Stale comment**: `container.ts`'s `liveClassRepo` line still had
+  its old "STORY-050c: in-memory live class repo (Prisma schema is a
+  follow-up)" comment above the now-Prisma-backed assignment, a
+  leftover from editing the line below it but not the comment above it.
+  Removed.
+- **`update()` silently dropped `instructorId`**: the Prisma `update()`
+  call omitted `instructorId` from its `data` object. `UpdateLiveClassPatch`
+  doesn't currently expose `instructorId` for editing (so no live call
+  path actually triggers this today), but `update()` takes a full
+  `LiveClass` entity and `InMemoryLiveClassRepository` does a full
+  object replace, so any future caller passing a changed `instructorId`
+  directly would have it silently discarded by the Prisma adapter while
+  the in-memory one would persist it. Fixed for contract parity; added
+  a test.
+- **Unvalidated status cast in `mapRow()`**: same class of fix as
+  `PaymentStatus.isValid()` on PR #125. Added
+  `isValidLiveClassStatus()` to `src/domain/entities/LiveClass.ts` and
+  used it in `mapRow()`: a corrupt/legacy persisted status now surfaces
+  as `db_error` instead of silently hydrating an invalid `LiveClass`.
+  Did **not** convert `status` to a native Postgres enum (same
+  reasoning as the `Order.status` decision on PR #125: every other
+  lifecycle status column in this schema, `LiveClass.status` included
+  now, is a plain `String` with a comment; a schema-wide enum
+  conversion is a separate, deliberate decision, not a single-table
+  review-comment fix).
+- **"Use plain language for the Filipino VA audience"** (skipped,
+  third time): same rule, same scope argument as documented under PR
+  #126's response two sections up. Not repeating the full argument
+  here; it applies identically to this PR's new files.
+
 **Remaining P0-2 items**: `moduleRepo`, `lessonRepo`, `scenarioRepo`,
 still in-memory. `scenarioRepo` (`SimulatorScenario`) is schema-blocked
 the same way `LiveClass` was (no Prisma model exists) and is the next

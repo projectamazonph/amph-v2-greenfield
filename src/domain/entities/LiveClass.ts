@@ -9,6 +9,18 @@ import { Result } from "@/domain/shared/Result";
 
 export type LiveClassStatus = "scheduled" | "cancelled" | "completed";
 
+const ALL_LIVE_CLASS_STATUSES: readonly LiveClassStatus[] = ["scheduled", "cancelled", "completed"];
+
+/**
+ * Type guard for a value read back from persistence. A repository
+ * adapter should call this before trusting a stored string as a
+ * `LiveClassStatus`. A corrupt or legacy row must not silently
+ * hydrate an invalid status.
+ */
+export function isValidLiveClassStatus(s: string): s is LiveClassStatus {
+  return (ALL_LIVE_CLASS_STATUSES as readonly string[]).includes(s);
+}
+
 export interface LiveClass {
   readonly id: string;
   readonly courseId: string;
@@ -38,14 +50,7 @@ export interface CreateLiveClassInput {
 }
 
 export type UpdateLiveClassPatch = Partial<
-  Pick<
-    LiveClass,
-    | "title"
-    | "scheduledAt"
-    | "durationMinutes"
-    | "meetingUrl"
-    | "status"
-  >
+  Pick<LiveClass, "title" | "scheduledAt" | "durationMinutes" | "meetingUrl" | "status">
 >;
 
 // ---------------------------------------------------------------------------
@@ -64,9 +69,7 @@ export type LiveClassError =
 // Factory
 // ---------------------------------------------------------------------------
 
-export function createLiveClass(
-  input: CreateLiveClassInput,
-): Result<LiveClass, LiveClassError> {
+export function createLiveClass(input: CreateLiveClassInput): Result<LiveClass, LiveClassError> {
   const errors: LiveClassError[] = [];
 
   if (!input.id.trim()) {
@@ -117,8 +120,7 @@ export function updateLiveClass(
   const title = patch.title !== undefined ? patch.title.trim() : original.title;
   if (!title) errors.push({ kind: "invalid_title" });
 
-  const scheduledAt =
-    patch.scheduledAt !== undefined ? patch.scheduledAt : original.scheduledAt;
+  const scheduledAt = patch.scheduledAt !== undefined ? patch.scheduledAt : original.scheduledAt;
   if (scheduledAt <= new Date()) {
     // Allow past dates only if transitioning to "completed" (backfill)
     if (patch.status !== "completed") {
@@ -127,17 +129,13 @@ export function updateLiveClass(
   }
 
   const durationMinutes =
-    patch.durationMinutes !== undefined
-      ? patch.durationMinutes
-      : original.durationMinutes;
+    patch.durationMinutes !== undefined ? patch.durationMinutes : original.durationMinutes;
   if (durationMinutes <= 0) errors.push({ kind: "invalid_duration" });
 
-  const meetingUrl =
-    patch.meetingUrl !== undefined ? patch.meetingUrl : original.meetingUrl;
+  const meetingUrl = patch.meetingUrl !== undefined ? patch.meetingUrl : original.meetingUrl;
   if (!isValidUrl(meetingUrl)) errors.push({ kind: "invalid_meeting_url" });
 
-  const status =
-    patch.status !== undefined ? patch.status : original.status;
+  const status = patch.status !== undefined ? patch.status : original.status;
   if (!["scheduled", "cancelled", "completed"].includes(status)) {
     errors.push({ kind: "invalid_status" });
   }
