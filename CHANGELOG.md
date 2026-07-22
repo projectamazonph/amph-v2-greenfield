@@ -17,7 +17,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
   - The `AuditLog` Prisma model already existed; only the adapter was a stub with a stale "table doesn't exist yet" comment
   - Implemented `PrismaAuditLog` mapping the domain `AuditLogEntry` onto the `audit_logs` table and wired it into `buildProductionContainer()`
   - 4 new tests
-  - Full suite (both PRs): 2135 passed / 2 skipped, architecture compliance suite 406 passed
+  - Unit + integration suite (both PRs): 2135 passed / 2 skipped; architecture compliance suite: 406 passed. E2E not re-run this session (see `SESSION-HANDOVER.md` for its last known status)
 
 ### 2026-07-19 — TDD + SOLID audit and Tier A production-bug fixes
 

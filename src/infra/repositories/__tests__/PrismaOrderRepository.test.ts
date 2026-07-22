@@ -318,4 +318,34 @@ describe("PrismaOrderRepository", () => {
     if (result.ok) return;
     expect(result.error.kind).toBe("db_error");
   });
+
+  // ── defensive status validation (corrupt/legacy rows) ──────
+
+  it("findById returns db_error instead of hydrating a row with an invalid status", async () => {
+    db.rows.push({
+      id: "corrupt-1",
+      userId: "user_01",
+      courseId: "course_01",
+      status: "SOME_LEGACY_VALUE",
+      subtotalMinor: 100,
+      discountMinor: 0,
+      totalMinor: 100,
+      currency: "PHP",
+      paymongoPaymentId: null,
+      paymongoCheckoutUrl: null,
+      paymongoStatus: null,
+      paymongoPaidAt: null,
+      refundReason: null,
+      refundRequestedAt: null,
+      refundProcessedAt: null,
+      refundAmountMinor: null,
+      createdAt: new Date(1),
+      updatedAt: new Date(1),
+    });
+
+    const result = await repo.findById("corrupt-1");
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("db_error");
+  });
 });

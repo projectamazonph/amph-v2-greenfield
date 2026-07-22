@@ -1,23 +1,23 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-19 — Audit P0 remediation + CI green + 100% TDD/SOLID compliance suite live.
+**Updated:** 2026-07-22 — PrismaOrderRepository + PrismaAuditLog close two P0-2 legs (PR #125, branch `claude/unfinished-stories-ivl2fw`, not yet merged to `main`).
 
 ---
 
 ## Project Status
 
-| Metric                   | Value                                                                                                                       |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 ready to start**                                                                             |
-| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                               |
-| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                      |
-| `main` HEAD              | `c94eaf1` — chore(arch): TDD + SOLID compliance suite (8 rules) + missing entity tests (squash)                             |
-| Unit + integration tests | **1806 passing + 2 skipped, 172 files, 0 TypeScript errors**                                                                |
-| Architecture compliance  | **369 tests passing (8 files, 8 rules), 0 violations**                                                                      |
-| Coverage                 | Lines 87.36% · Functions 90.92% · Statements 87.75% · Branches 81.63% (all above thresholds)                                |
-| CI                       | ✅ Typecheck+Lint · ✅ Unit+integration · ✅ Architecture · ✅ Build · ❌ E2E (pre-existing functional failures, see below) |
-| Database                 | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters)                                              |
-| Production               | Not deployed                                                                                                                |
+| Metric                        | Value                                                                                                                                                                                                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                         | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress (branch `claude/unfinished-stories-ivl2fw`)**                                                                                                                          |
+| Repo                          | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                           |
+| Default branch                | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                  |
+| `main` HEAD (at branch point) | `a2c69cc` — fix(ci): copy static assets into standalone bundle + correct artifact paths (#124)                                                                                                                                                          |
+| Unit + integration tests      | **2135 passing + 2 skipped, 0 TypeScript errors** (on `claude/unfinished-stories-ivl2fw`, not yet merged)                                                                                                                                               |
+| Architecture compliance       | **406 tests passing, 0 violations** (on `claude/unfinished-stories-ivl2fw`)                                                                                                                                                                             |
+| Coverage                      | Lines 86.3% · Functions 87.59% · Statements 85.8% · Branches 78.12% (all above the configured `vitest.config.ts` thresholds — 80/70/80/80)                                                                                                              |
+| CI (this branch, PR #125)     | ✅ Typecheck+Lint · ✅ Architecture · Unit+integration and Build not independently re-verified via CI at doc time (local runs above are green) · E2E status not re-checked this session (last known state: pre-existing functional failures, see below) |
+| Database                      | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                                  |
+| Production                    | Not deployed                                                                                                                                                                                                                                            |
 
 ---
 
@@ -79,6 +79,42 @@ exist yet") was stale, not blocked.
   skipped, 0 failures. `pnpm tsc --noEmit` and `pnpm lint` clean. `pnpm build`
   succeeds.
 
+### CodeRabbit review response on PR #125 (same session)
+
+Three of four actionable findings addressed, one deferred (see the
+"Known follow-up" note above):
+
+- **Doc drift** — this file's top "Project Status" table still showed
+  1806/369 while the session log below said 2135/406. Reconciled; also
+  fixed `CHANGELOG.md` wording that called the unit/integration run a
+  "full suite" while E2E status was unverified.
+- **Index lock risk** — `CREATE INDEX "orders_status_idx"` in the
+  `order_status` migration would hold a write lock on `orders` for the
+  build duration under Prisma's default transactional migration wrapper.
+  Split into a second migration
+  (`20260722000001_order_status_index_concurrently`) using
+  `CREATE INDEX CONCURRENTLY` with the `-- prisma-migrate-disable-next-transaction`
+  directive.
+- **Blind status cast** — `PrismaOrderRepository.mapRow()` cast
+  `row.status as PaymentStatus` without validating it. Added
+  `PaymentStatus.isValid()` (a proper type guard, not just a cast) and
+  used it in `mapRow()`: an unrecognized persisted value now throws,
+  which the surrounding try/catch in every caller converts to
+  `db_error` instead of silently hydrating an `Order` that bypasses the
+  `mark*()` transition guards.
+- **Postgres enum for `Order.status`** (suggested) — skipped. Every
+  other lifecycle `status` column in this schema
+  (`Enrollment.status`, `PpcCampaign.status`, `EmailLog.status`,
+  `QuizAttempt.status`, `Certificate.status`) is a plain `String` with
+  an inline comment documenting the valid values; `Role`/
+  `SubscriptionTier`/`VerificationStatus`/`SimulatorAccess` are the
+  only native Postgres enums in the schema, reserved for
+  non-lifecycle classification fields. Converting just `Order.status`
+  to an enum would be inconsistent with that established convention
+  and out of scope for this fix; the `isValid()` guard above addresses
+  the actual correctness concern (untrusted data bypassing guards)
+  without it.
+
 **Remaining P0-2 items** (still in-memory in `buildProductionContainer()`):
 `sessionRepo`, `discountCodeRepo` (partial — `findByCode`/`create`/
 `incrementUsedCount` are real, but `listAll`/`findById`/`update`/`archive`
@@ -89,6 +125,20 @@ Prisma models yet; their `Prisma*Repository` files exist as documented
 stubs that throw `"schema migration"` errors on every call). `sessionRepo`
 is not schema-blocked (the `Session` Prisma model already exists) — it's
 next up.
+
+**Known follow-up (deferred, not blocking):** `PrismaOrderRepository.update()`
+matches by `id` only. Two concurrent writers (e.g. a delayed PayMongo
+webhook retry racing an admin refund) could theoretically let a stale
+write overwrite a newer state — the webhook already no-ops on an
+already-PAID order, which covers the common case, but the underlying
+TOCTOU window exists. Explicitly deferred rather than fixed under
+review-comment pressure: the DB isn't provisioned yet (zero production
+traffic), and no other repository in this codebase does optimistic
+locking, so bolting it onto just `Order` would be a new, inconsistent
+pattern. If picked up, the design question is where the "expected prior
+status" comes from for the `update()` predicate — the `Order` entity
+doesn't currently track its pre-mutation status separately from the
+mutated one.
 
 ## What changed in this session (2026-07-19)
 

@@ -68,33 +68,48 @@ describe("PaymentStatus", () => {
     });
   });
 
+  describe("isValid()", () => {
+    it.each(["DRAFT", "PENDING", "PAID", "FAILED", "EXPIRED", "REFUNDED"])(
+      "returns true for %s",
+      (status) => {
+        expect(PaymentStatus.isValid(status)).toBe(true);
+      },
+    );
+
+    it("returns false for a legacy or corrupt value", () => {
+      expect(PaymentStatus.isValid("SOME_LEGACY_VALUE")).toBe(false);
+    });
+
+    it("returns false for a lowercase variant (case-sensitive)", () => {
+      expect(PaymentStatus.isValid("paid")).toBe(false);
+    });
+
+    it("returns false for an empty string", () => {
+      expect(PaymentStatus.isValid("")).toBe(false);
+    });
+  });
+
   describe("type coverage — all states are handled", () => {
     // TypeScript would error if a state is added without updating the helpers.
     // This is a compile-time exhaustiveness check expressed as a runtime test.
-    const allStatuses: PaymentStatus[] = [
-      "PENDING",
-      "PAID",
-      "FAILED",
-      "EXPIRED",
-      "REFUNDED",
-    ];
+    const allStatuses: PaymentStatus[] = ["PENDING", "PAID", "FAILED", "EXPIRED", "REFUNDED"];
 
     it("each status has a deterministic isPaid result", () => {
-      allStatuses.forEach(s => {
+      allStatuses.forEach((s) => {
         const result = PaymentStatus.isPaid(s);
         expect(typeof result).toBe("boolean");
       });
     });
 
     it("each status has a deterministic isFinal result", () => {
-      allStatuses.forEach(s => {
+      allStatuses.forEach((s) => {
         const result = PaymentStatus.isFinal(s);
         expect(typeof result).toBe("boolean");
       });
     });
 
     it("each status has a deterministic isActive result", () => {
-      allStatuses.forEach(s => {
+      allStatuses.forEach((s) => {
         const result = PaymentStatus.isActive(s);
         expect(typeof result).toBe("boolean");
       });

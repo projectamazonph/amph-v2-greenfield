@@ -19,7 +19,7 @@ import { PrismaClient } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import { Order } from "@/domain/entities/Order";
 import type { IOrderRepository, OrderError } from "@/ports/repositories/OrderRepository";
-import type { PaymentStatus } from "@/domain/values/PaymentStatus";
+import { PaymentStatus } from "@/domain/values/PaymentStatus";
 
 interface PrismaOrderRow {
   id: string;
@@ -159,11 +159,18 @@ export class PrismaOrderRepository implements IOrderRepository {
   }
 
   private mapRow(row: PrismaOrderRow): Order {
+    if (!PaymentStatus.isValid(row.status)) {
+      // Caught by the surrounding try/catch in every caller and
+      // turned into a db_error — a corrupt or legacy status value
+      // must not silently hydrate an Order that bypasses the
+      // entity's mark*() transition guards.
+      throw new Error(`Order ${row.id} has an invalid persisted status: "${row.status}"`);
+    }
     return Order.hydrate({
       id: row.id,
       userId: row.userId,
       courseId: row.courseId,
-      status: row.status as PaymentStatus,
+      status: row.status,
       subtotalMinor: row.subtotalMinor,
       discountMinor: row.discountMinor,
       totalMinor: row.totalMinor,

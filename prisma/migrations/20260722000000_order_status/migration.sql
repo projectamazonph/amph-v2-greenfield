@@ -10,4 +10,10 @@
 
 ALTER TABLE "orders" ADD COLUMN "status" TEXT NOT NULL DEFAULT 'DRAFT';
 
-CREATE INDEX "orders_status_idx" ON "orders"("status");
+-- The index is built in a separate migration
+-- (20260722000001_order_status_index_concurrently) using
+-- CREATE INDEX CONCURRENTLY, since Prisma wraps this file in a
+-- transaction and Postgres refuses CONCURRENTLY inside one. A plain
+-- CREATE INDEX here would hold a write lock on `orders` for the
+-- build duration — acceptable against an empty/unprovisioned table,
+-- not against one taking live checkout/webhook traffic.
