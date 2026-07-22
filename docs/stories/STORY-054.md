@@ -8,13 +8,13 @@ As a platform operator, I want rate limits on authentication, signup, and paymen
 
 ## Acceptance criteria
 
-- [x] `RateLimiter` port exists in `src/ports/security/RateLimiter.ts` with `check(key, limit)` returning `Result<{ allowed: boolean; remaining: number }, RateLimitError>`.
+- [x] `RateLimiter` port exists in `src/ports/security/RateLimiter.ts` with `check(input: RateLimitInput)` returning `Promise<Result<RateLimitResult, RateLimitError>>`.
 - [x] `UpstashRateLimiter` adapter exists in `src/infra/security/UpstashRateLimiter.ts` using `@upstash/redis` + `@upstash/ratelimit` (lazy init).
 - [x] `InMemoryRateLimiter` fake exists in `src/infra/security/InMemoryRateLimiter.ts` for tests.
 - [x] `buildProductionContainer()` wires `UpstashRateLimiter` from `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 - [x] `buildTestContainer()` wires `InMemoryRateLimiter`.
 - [x] `AppContainer` exposes `rateLimiter`.
-- [x] `signUpAction`, `loginAction`, and `createPaymentIntentAction` (or their perform helpers) call `rateLimiter.check()` and return `{ kind: "rate_limited" }` when not allowed. (Closed 2026-07-22 — see status note above.)
+- [x] `signUpAction`, `loginAndRedirect`, and `startCheckout` (or their `perform*` helpers) call `rateLimiter.check()` and return `{ kind: "rate_limited" }` when not allowed. (Closed 2026-07-22 — see status note above.)
 - [x] Architecture tests assert: only `infra/security/` imports `@upstash/*`; domain/usecases/ports never import it. (`tests/architecture/rate-limit-wiring.test.ts` now also asserts each of the three actions calls `rateLimiter.check(`.)
 
 ## Code shape

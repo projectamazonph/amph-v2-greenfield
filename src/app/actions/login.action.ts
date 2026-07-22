@@ -83,7 +83,7 @@ export async function performLogin(
     return { kind: "rate_limited" };
   }
 
-  // Reject open redirects — only allow relative paths starting with
+  // Reject open redirects: only allow relative paths starting with
   // a single `/` (defense against `//evil.com` protocol-relative
   // trickery AND `https://evil.com` absolute URLs).
   const safeRedirect =
