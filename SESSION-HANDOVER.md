@@ -140,7 +140,10 @@ Prisma model already existed: nothing was blocking this either.
   2156 passed, 2 skipped, 0 failures. `pnpm tsc --noEmit` and `pnpm lint`
   clean. `pnpm build` succeeds.
 
-**Remaining P0-2 items** (still in-memory in `buildProductionContainer()`):
+**Remaining P0-2 items as of this point in the session** (superseded a few
+sections down, once `discountCodeRepo` was finished later the same day;
+see the "Remaining P0-2 items" note under the DiscountCode entry below
+for the current state):
 `discountCodeRepo` (partial: `findByCode`/`create`/`incrementUsedCount`
 are real, but `listAll`/`findById`/`update`/`archive` are stubs pending
 STORY-050d admin CRUD), `moduleRepo`, `lessonRepo`, `scenarioRepo`,
@@ -284,7 +287,19 @@ Two findings, both skipped with a documented reason:
   read by the next session picking up this work, not by a student.
   Rewriting "P0-2," "migration," "P2002," or "cold start" into
   VA-friendly prose would make this documentation less useful to its
-  actual audience, not more.
+  actual audience, not more. CodeRabbit re-raised this on the next round
+  citing an org-level dashboard rule matching `**/*.{ts,tsx,md,mdx}`. That
+  config isn't checked into this repo (no `.coderabbit.yaml` exists), so
+  it's broader than what `docs/voice-guide.md`, the actual source of
+  truth, specifies. Same decision stands.
+- **Stale "Remaining P0-2 items" snapshot**: an earlier callout in this
+  same session log (right after the Session-repo entry, before
+  DiscountCode was done) still listed `discountCodeRepo` as stub-pending.
+  Chronological log entries naturally go stale as later entries in the
+  same file supersede them, but this one read as a live contradiction
+  rather than an obviously-dated snapshot. Added a note pointing forward
+  to the current state instead of rewriting history that wasn't true at
+  the time it was written.
 
 ## What changed in this session (2026-07-19)
 
