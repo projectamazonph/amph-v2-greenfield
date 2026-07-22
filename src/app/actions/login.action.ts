@@ -63,9 +63,11 @@ export async function performLogin(
     return { kind: "invalid_input" };
   }
 
-  // Rate limit by email AND by IP (STORY-054). Fails open (allowed)
-  // if the limiter itself errors, matching RequestPasswordReset.
-  const ip = input.ip ?? "0.0.0.0";
+  // Rate limit by email AND by IP (STORY-054). The IP check is
+  // skipped when no IP is resolvable, rather than collapsing every
+  // such caller into a shared "0.0.0.0" bucket, which would let one
+  // caller block unrelated ones. Fails open (allowed) if the limiter
+  // itself errors, matching RequestPasswordReset.
   const emailRL = await container.rateLimiter.check({
     key: `login:email:${input.email.toLowerCase()}`,
     limit: LOGIN_EMAIL_LIMIT,
@@ -74,13 +76,16 @@ export async function performLogin(
   if (emailRL.ok && !emailRL.value.allowed) {
     return { kind: "rate_limited" };
   }
-  const ipRL = await container.rateLimiter.check({
-    key: `login:ip:${ip}`,
-    limit: LOGIN_IP_LIMIT,
-    windowSeconds: LOGIN_IP_WINDOW_SECONDS,
-  });
-  if (ipRL.ok && !ipRL.value.allowed) {
-    return { kind: "rate_limited" };
+  const ip = input.ip?.trim();
+  if (ip) {
+    const ipRL = await container.rateLimiter.check({
+      key: `login:ip:${ip}`,
+      limit: LOGIN_IP_LIMIT,
+      windowSeconds: LOGIN_IP_WINDOW_SECONDS,
+    });
+    if (ipRL.ok && !ipRL.value.allowed) {
+      return { kind: "rate_limited" };
+    }
   }
 
   // Reject open redirects: only allow relative paths starting with
@@ -118,7 +123,7 @@ export async function loginAndRedirect(formData: FormData): Promise<void> {
 
   const hdrs = await headers();
   const ip =
-    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "0.0.0.0";
+    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() || hdrs.get("x-real-ip") || undefined;
 
   const container = buildContainer();
 

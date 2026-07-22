@@ -214,6 +214,22 @@ describe("performLogin", () => {
     expect(result).toEqual({ kind: "rate_limited" });
   });
 
+  it("skips the IP rate-limit check (does not fall back to a shared bucket) when no IP is provided", async () => {
+    const container = freshContainer();
+    await seedUser(container, "u@test.example.com", "correct-password");
+    const checkSpy = vi.spyOn(container.rateLimiter, "check");
+    const deps = makeDeps();
+    await expect(
+      performLogin(
+        container,
+        { email: "u@test.example.com", password: "correct-password", redirectTo: "/x" },
+        deps,
+      ),
+    ).rejects.toThrow("NEXT_REDIRECT");
+    const ipCalls = checkSpy.mock.calls.filter((call) => call[0]?.key.startsWith("login:ip:"));
+    expect(ipCalls).toEqual([]);
+  });
+
   it("rejects //evil.com protocol-relative URLs", async () => {
     const container = freshContainer();
     await seedUser(container, "u@test.example.com", "correct-password");

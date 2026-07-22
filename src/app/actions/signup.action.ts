@@ -59,7 +59,7 @@ export interface SignUpInput {
   password: string;
   firstName: string;
   lastName: string;
-  /** Client IP for rate limiting (STORY-054). Defaults to "0.0.0.0" if omitted. */
+  /** Client IP for rate limiting (STORY-054). When omitted, the IP check is skipped rather than sharing a "0.0.0.0" bucket across every caller with no resolvable IP. */
   ip?: string;
 }
 
@@ -99,17 +99,22 @@ export async function performSignUp(
     return { kind: "invalid_input" };
   }
 
-  // 1b. Rate limit by IP (STORY-054). Fails open (allowed) if the
-  // limiter itself errors — matches RequestPasswordReset's pattern,
-  // and keeps signup working when Upstash env vars aren't configured.
-  const ip = input.ip ?? "0.0.0.0";
-  const rl = await container.rateLimiter.check({
-    key: `signup:ip:${ip}`,
-    limit: SIGNUP_IP_LIMIT,
-    windowSeconds: SIGNUP_IP_WINDOW_SECONDS,
-  });
-  if (rl.ok && !rl.value.allowed) {
-    return { kind: "rate_limited" };
+  // 1b. Rate limit by IP (STORY-054), skipped when no IP is resolvable
+  // rather than collapsing every such caller into a shared "0.0.0.0"
+  // bucket, which would let one caller block unrelated ones. Fails
+  // open (allowed) if the limiter itself errors, matches
+  // RequestPasswordReset's pattern, and keeps signup working when
+  // Upstash env vars aren't configured.
+  const ip = input.ip?.trim();
+  if (ip) {
+    const rl = await container.rateLimiter.check({
+      key: `signup:ip:${ip}`,
+      limit: SIGNUP_IP_LIMIT,
+      windowSeconds: SIGNUP_IP_WINDOW_SECONDS,
+    });
+    if (rl.ok && !rl.value.allowed) {
+      return { kind: "rate_limited" };
+    }
   }
 
   // 2. Call the SignUp use case
@@ -205,7 +210,7 @@ export async function signUpAction(
 ): Promise<SignUpState> {
   const hdrs = await headers();
   const ip =
-    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "0.0.0.0";
+    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() || hdrs.get("x-real-ip") || undefined;
 
   const input: SignUpInput = {
     email: (formData.get("email") as string) ?? "",

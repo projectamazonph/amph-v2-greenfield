@@ -303,6 +303,26 @@ describe("performSignUp", () => {
     expect(deps.navigate).not.toHaveBeenCalled();
   });
 
+  it("skips the IP rate-limit check (does not fall back to a shared bucket) when no IP is provided", async () => {
+    const container = freshContainer();
+    const checkSpy = vi.spyOn(container.rateLimiter, "check");
+    const deps = makeDeps();
+    await expect(
+      performSignUp(
+        container,
+        {
+          email: "no-ip@test.example.com",
+          password: "validPassword123",
+          firstName: "Test",
+          lastName: "User",
+        },
+        asProdDeps(deps),
+      ),
+    ).rejects.toThrow("NEXT_REDIRECT");
+    const ipCalls = checkSpy.mock.calls.filter((call) => call[0]?.key.startsWith("signup:ip:"));
+    expect(ipCalls).toEqual([]);
+  });
+
   it("returns unexpected error if the use case throws", async () => {
     const container = freshContainer();
     const deps = makeDeps();
