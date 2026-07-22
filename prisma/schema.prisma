@@ -152,6 +152,32 @@ model Course {
   @@map("courses")
 }
 
+// ── STORY-050b: Simulator scenarios ─────────────────────
+
+model SimulatorScenario {
+  id          String @id @default(cuid())
+  simulatorId String // bid-elevator | str-triage | campaign-builder | listing-audit
+  name        String
+  description String
+
+  inputSchema  Json
+  outputSchema Json
+
+  difficulty       String // beginner | intermediate | advanced
+  estimatedMinutes Int
+
+  // Soft-delete. Null = active. Matches the discount_codes.archivedAt
+  // convention (P0-2 follow-up).
+  archivedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([simulatorId])
+  @@index([archivedAt])
+  @@map("simulator_scenarios")
+}
+
 // ── STORY-050c: Live classes ────────────────────────────
 
 model LiveClass {

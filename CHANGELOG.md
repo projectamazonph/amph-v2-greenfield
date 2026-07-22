@@ -36,13 +36,23 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ### 2026-07-22: PrismaLiveClassRepository closes the LiveClass leg of P0-2
 
-- `fix(admin): implement PrismaLiveClassRepository (P0-2 / STORY-050c)`
+- **PR #127** (merged as `18166e7`): `fix(admin): implement PrismaLiveClassRepository (P0-2 / STORY-050c)`
   - No `LiveClass` Prisma model existed at all, so `buildProductionContainer()` fell back to `InMemoryLiveClassRepository`: every admin-scheduled live class vanished on cold start / redeploy, and the `SendLiveClassReminders` cron pipeline (already backed by a real `sent_reminders` idempotency table) had nothing to iterate over
   - Added a `LiveClass` Prisma model + `Course.liveClasses` back-relation (migration `20260722020000_live_class`); brand-new table, so a plain `CREATE INDEX` is correct (no existing traffic to lock)
   - Implemented `PrismaLiveClassRepository` matching `InMemoryLiveClassRepository`'s exact contract: `listAll` excludes `cancelled` and sorts by `scheduledAt` ascending, `delete` is a soft status transition to `cancelled`, not a real row delete
   - Wired `PrismaLiveClassRepository` into `buildProductionContainer()`
   - 20 new tests. Unit + integration suite: 2189 passed / 2 skipped; architecture compliance suite: 406 passed
   - CodeRabbit review response: fixed a stale in-memory comment left over in `container.ts`; fixed `update()` silently dropping `instructorId` on a full-entity update (no live call path triggers it today, but it broke contract parity with `InMemoryLiveClassRepository`); added `isValidLiveClassStatus()` and used it in `mapRow()` instead of blindly casting a persisted status (same pattern as `PaymentStatus.isValid()` on PR #125). Skipped a third repeat of the "plain language for VAs" request. Details in `SESSION-HANDOVER.md`
+
+### 2026-07-22: PrismaSimulatorScenarioRepository closes the SimulatorScenario leg of P0-2
+
+- **PR #128** (open, under review): `fix(admin): implement PrismaSimulatorScenarioRepository (P0-2 / STORY-050b)`
+  - Same shape as the LiveClass fix: no `SimulatorScenario` Prisma model existed, so `buildProductionContainer()` fell back to `InMemorySimulatorScenarioRepository`: every admin-created practice scenario vanished on cold start / redeploy
+  - Added a `SimulatorScenario` Prisma model + nullable `archivedAt` column (migration `20260722030000_simulator_scenario`); brand-new table, plain `CREATE INDEX` is correct
+  - Implemented `PrismaSimulatorScenarioRepository`; `mapRow()` reuses the existing `createSimulatorScenario()` domain factory (which already validates `simulatorId`/`difficulty`) instead of adding a third near-identical validator, so a corrupt/legacy row throws and surfaces as `db_error`
+  - Wired `PrismaSimulatorScenarioRepository` into `buildProductionContainer()`
+  - 24 new tests. Unit + integration suite: 2213 passed / 2 skipped; architecture compliance suite: 406 passed
+  - CodeRabbit review response: fixed a stale in-memory comment left over in `container.ts`; synced this changelog entry and `SESSION-HANDOVER.md`'s header with the actual PR #128 number/status. Skipped a request to add `deletedAt`/`createdById`/`updatedById` to `SimulatorScenario` (same reasoning as `DiscountCode` on PR #126: 24 of 25 models in the real schema now lack these fields, so this is a repo-wide gap, not a live rule this PR broke). Details in `SESSION-HANDOVER.md`
 
 ### 2026-07-19 — TDD + SOLID audit and Tier A production-bug fixes
 
