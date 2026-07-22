@@ -76,7 +76,7 @@ import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwar
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
-import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
+import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
@@ -360,7 +360,7 @@ function buildProductionContainer(): AppContainer {
   // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)
   const scenarioRepo: ISimulatorScenarioRepository = new InMemorySimulatorScenarioRepository();
   // STORY-050c: in-memory live class repo (Prisma schema is a follow-up)
-  const liveClassRepo: ILiveClassRepository = new InMemoryLiveClassRepository();
+  const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
