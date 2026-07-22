@@ -57,6 +57,7 @@ import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
+import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 
 // ── Production adapters (only the prod ones) ──────────────────
 
@@ -77,6 +78,7 @@ import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertific
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
+import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
@@ -85,6 +87,10 @@ import { NodeCertificateHashGenerator } from "@/infra/security/NodeCertificateHa
 
 import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
 import { ReactPdfCertificateRenderer } from "@/infra/pdf/ReactPdfCertificateRenderer";
+
+// STORY-012: MDX content renderer port + adapter
+import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
+import { NextMdxRenderer } from "@/infra/rendering/NextMdxRenderer";
 
 import type { EmailSender } from "@/ports/email/EmailSender";
 import { ResendEmailSender } from "@/infra/email/ResendEmailSender";
@@ -220,12 +226,16 @@ export interface AppContainer {
   scenarioRepo: ISimulatorScenarioRepository;
   // STORY-050c: live class admin CRUD
   liveClassRepo: ILiveClassRepository;
+  // STORY-011: pricing tier repo
+  pricingTierRepo: IPricingTierRepository;
   simulatorRegistry: SimulatorRegistry;
 
   // External services
   paymentGateway: IPaymentGateway;
   certificateHashGen: CertificateHashGenerator;
   certificateRenderer: CertificateRenderer;
+  // STORY-012: MDX content renderer (port-adapter: NextMdxRenderer)
+  mdxRenderer: IMdxContentRenderer;
   emailSender: EmailSender;
   jwt: JwtService;
   passwordHasher: PasswordHasher;
@@ -356,6 +366,8 @@ function buildProductionContainer(): AppContainer {
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   const scenarioRepo: ISimulatorScenarioRepository = new PrismaSimulatorScenarioRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
+  // STORY-011: pricing tier repo
+  const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -366,6 +378,11 @@ function buildProductionContainer(): AppContainer {
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();
+  // STORY-012: bounded LRU cache (default 500 entries). Each entry
+  // is a React element + frontmatter + HTML; 500 is a generous
+  // upper bound for the AMPH catalog (9 modules * ~5 lessons = 45
+  // distinct MDX strings today, will grow to maybe 200 max).
+  const mdxRenderer: IMdxContentRenderer = new NextMdxRenderer();
 
   const emailSender: EmailSender = new ResendEmailSender(
     process.env.RESEND_API_KEY ?? "",
@@ -462,6 +479,7 @@ function buildProductionContainer(): AppContainer {
     certificateRepo,
     certificateHashGen,
     certificateRenderer,
+    mdxRenderer,
     emailSender,
     simulatorRegistry: buildSimulatorRegistry(),
     issueCertificate: new IssueCertificate({
@@ -534,6 +552,8 @@ function buildProductionContainer(): AppContainer {
     auditLog,
     recordAuditLog,
     scenarioRepo,
+    // STORY-011: pricing tier repo
+    pricingTierRepo,
     // STORY-050b: simulator scenario CRUD
     adminListScenarios: new AdminListScenarios({ scenarioRepo }),
     getSimulatorScenario: new GetSimulatorScenario({ scenarioRepo }),

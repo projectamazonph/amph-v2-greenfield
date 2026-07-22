@@ -10,9 +10,26 @@
  * code never imports this file.
  */
 
+import { vi } from "vitest";
+
+// STORY-012: NextMdxRenderer imports `server-only` (server-only
+// marker package). vitest doesn't apply the `react-server` export
+// condition, so the import resolves to the throwing `index.js`.
+// Same workaround as `tests/unit/composition/container.test.ts` and
+// `src/lib/__tests__/*`: mock to an empty module so the import
+// resolves cleanly under vitest, where every test that pulls in the
+// composition container (e.g. `src/usecases/__tests__/Logout.test.ts`)
+// would otherwise fail at import time.
+vi.mock("server-only", () => ({}));
+
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import type { CertificateHashGenerator } from "@/ports/security/CertificateHashGenerator";
 import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
+// STORY-012: MDX renderer. The test container uses the same
+// NextMdxRenderer as production because the renderer has no IO
+// and is fast in-process — no need for a separate test double.
+import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
+import { NextMdxRenderer } from "@/infra/rendering/NextMdxRenderer";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { JwtService } from "@/ports/security/JwtService";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
@@ -42,6 +59,7 @@ import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCert
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
+import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
@@ -151,10 +169,13 @@ export interface TestContainer extends AppContainer {
   badgeAwardRepo: InMemoryBadgeAwardRepository;
   certificateRepo: InMemoryCertificateRepository;
   certificateRenderer: StaticCertificateRenderer;
+  // STORY-012: tests share NextMdxRenderer with production.
+  mdxRenderer: IMdxContentRenderer;
   accessPolicy: StubAccessPolicy;
   auditLog: InMemoryAuditLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
   liveClassRepo: InMemoryLiveClassRepository;
+  pricingTierRepo: InMemoryPricingTierRepository;
   sentReminderRepo: InMemorySentReminderRepository;
   emailVerificationRepo: InMemoryEmailVerificationRepository;
   passwordResetRepo: InMemoryPasswordResetRepository;
@@ -188,6 +209,10 @@ export function buildTestContainer(): TestContainer {
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new StaticCertificateRenderer();
+  // STORY-012: same NextMdxRenderer as production. No IO, no
+  // stub needed — the test container just hands every test a
+  // shared, fresh instance with no state leaking between suites.
+  const mdxRenderer: IMdxContentRenderer = new NextMdxRenderer();
   const emailSender: EmailSender = new InMemoryEmailSender();
   const jwt: JwtService = new JoseJwtService(
     process.env.JWT_SECRET ?? "test-secret-must-be-at-least-32-bytes-long-ok",
@@ -200,6 +225,8 @@ export function buildTestContainer(): TestContainer {
   const scenarioRepo = new InMemorySimulatorScenarioRepository();
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
+  // STORY-011: pricing tier repo
+  const pricingTierRepo = new InMemoryPricingTierRepository();
 
   return {
     clock,
@@ -254,6 +281,7 @@ export function buildTestContainer(): TestContainer {
     certificateRepo,
     certificateHashGen,
     certificateRenderer,
+    mdxRenderer,
     emailSender,
     accessPolicy,
     recordQuizAttempt: new RecordQuizAttempt({
@@ -367,6 +395,7 @@ export function buildTestContainer(): TestContainer {
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
     // STORY-050c
     liveClassRepo,
+    pricingTierRepo,
     sentReminderRepo,
     adminListLiveClasses: new AdminListLiveClasses({ liveClassRepo }),
     adminGetLiveClass: new AdminGetLiveClass({ liveClassRepo }),
