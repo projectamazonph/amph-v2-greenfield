@@ -53,14 +53,42 @@ instance can never find the order it needs to mark PAID.
     `PrismaPasswordResetRepository.test.ts`). Full suite: 2131 passed, 2 skipped,
     0 failures. `pnpm tsc --noEmit` and `pnpm lint` clean. `pnpm build` succeeds.
 
+### PrismaAuditLog — closes the AuditLog leg of P0-2 (same session, same branch)
+
+Every admin write (course/module/lesson CRUD, refund overrides, discount
+codes, badges, simulator scenarios, live classes, impersonation) calls
+`RecordAuditLog`, which was silently writing to `InMemoryAuditLog` in
+production — the entire admin audit trail vanished on every cold start /
+redeploy. `RecordAuditLog` never fails the business operation on a write
+error by design, so this was invisible until someone went looking for a
+trail that wasn't there. Unlike the Module/Lesson/Scenario/LiveClass
+adapters, the `AuditLog` Prisma model already existed in the schema — the
+`PrismaAuditLog.ts` stub's own comment ("the Prisma AuditLog table doesn't
+exist yet") was stale, not blocked.
+
+- Implemented `src/infra/repositories/PrismaAuditLog.ts` (real, not a
+  stub) mapping the domain `AuditLogEntry` (`actorId`, `action`,
+  `targetType`, `targetId`, `metadata`, `occurredAt`) onto the `audit_logs`
+  table (`userId`, `action`, `resource`, `resourceId`, `payload`,
+  `createdAt`). `actorType`/`ipAddress` have no domain-model source yet, so
+  they're left at schema defaults — same documented-limitation pattern as
+  `PrismaCourseRepository`.
+- Wired it into `buildProductionContainer()` in place of `InMemoryAuditLog`.
+- 4 new tests (`src/infra/repositories/__tests__/PrismaAuditLog.test.ts`,
+  same hand-rolled-fake-PrismaClient pattern). Full suite: 2135 passed, 2
+  skipped, 0 failures. `pnpm tsc --noEmit` and `pnpm lint` clean. `pnpm build`
+  succeeds.
+
 **Remaining P0-2 items** (still in-memory in `buildProductionContainer()`):
-`sessionRepo`, `auditLog`, `discountCodeRepo` (partial — `findByCode`/
-`create`/`incrementUsedCount` are real, but `listAll`/`findById`/`update`/
-`archive` are stubs pending STORY-050d admin CRUD), `moduleRepo`,
-`lessonRepo`, `scenarioRepo`, `liveClassRepo` — the last four are blocked
-on schema migrations (no `Module`/`Lesson`/`SimulatorScenario`/`LiveClass`
+`sessionRepo`, `discountCodeRepo` (partial — `findByCode`/`create`/
+`incrementUsedCount` are real, but `listAll`/`findById`/`update`/`archive`
+are stubs pending STORY-050d admin CRUD), `moduleRepo`, `lessonRepo`,
+`scenarioRepo`, `liveClassRepo` — the last four are genuinely blocked on
+schema migrations (no `Module`/`Lesson`/`SimulatorScenario`/`LiveClass`
 Prisma models yet; their `Prisma*Repository` files exist as documented
-stubs that throw `"schema migration"` errors on every call).
+stubs that throw `"schema migration"` errors on every call). `sessionRepo`
+is not schema-blocked (the `Session` Prisma model already exists) — it's
+next up.
 
 ## What changed in this session (2026-07-19)
 
@@ -130,15 +158,15 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories)
 
-| ID  | Title                                                    | Status                                                                                                                                                                                |
-| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| —   | P0-2 in-memory→Prisma migration (7 adapters remaining)   | Order done (2026-07-22, this session). PR #89 established the Course pattern; still queued: Session, AuditLog, DiscountCode (admin CRUD methods), Module, Lesson, Scenario, LiveClass |
-| —   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                               |
-| 051 | Sentry setup                                             | Not started                                                                                                                                                                           |
-| 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                           |
-| 053 | Lighthouse CI                                            | Not started                                                                                                                                                                           |
-| 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                           |
-| 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                           |
+| ID  | Title                                                    | Status                                                                                                                                                                                          |
+| --- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| —   | P0-2 in-memory→Prisma migration (6 adapters remaining)   | Order + AuditLog done (2026-07-22, this session, PR #125). PR #89 established the Course pattern; still queued: Session, DiscountCode (admin CRUD methods), Module, Lesson, Scenario, LiveClass |
+| —   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                         |
+| 051 | Sentry setup                                             | Not started                                                                                                                                                                                     |
+| 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                                     |
+| 053 | Lighthouse CI                                            | Not started                                                                                                                                                                                     |
+| 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                                     |
+| 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                                     |
 
 ### B. E2E failures (separate from compliance, ready for follow-up)
 

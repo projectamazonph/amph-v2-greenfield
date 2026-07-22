@@ -80,7 +80,7 @@ import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepos
 import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
-import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
@@ -363,7 +363,7 @@ function buildProductionContainer(): AppContainer {
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
   // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
-  const auditLog: IAuditLog = new InMemoryAuditLog();
+  const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)
   const scenarioRepo: ISimulatorScenarioRepository = new InMemorySimulatorScenarioRepository();

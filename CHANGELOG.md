@@ -4,14 +4,20 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
-### 2026-07-22 — PrismaOrderRepository closes the Order leg of P0-2
+### 2026-07-22 — PrismaOrderRepository + PrismaAuditLog close two P0-2 legs
 
-- **PR TBD** — `fix(payment): persist orders to Postgres via PrismaOrderRepository (P0-2)`
+- **PR #125** — `fix(payment): persist orders to Postgres via PrismaOrderRepository (P0-2)`
   - Orders were still wired to `InMemoryOrderRepository` in the production container — a real production bug: orders vanish on every cold start / redeploy, and a webhook hitting a different serverless instance could never find the order it needed to mark PAID
   - Added a `status` column to the `orders` table (migration `20260722000000_order_status`) carrying the domain `PaymentStatus` state machine — previously only `paymongoStatus` existed, which has no DRAFT equivalent
   - Added `Order.hydrate()` to reconstruct entities from persisted rows without routing through the `mark*()` state-transition guards
   - Implemented `PrismaOrderRepository` (all `IOrderRepository` methods, no stubs) and wired it into `buildProductionContainer()`; the PayMongo webhook route already resolves `orderRepo` through `buildContainer()`, so it picks this up with no separate change
-  - 41 new tests (`Order.hydrate()` + `PrismaOrderRepository`), full suite 2131 passed / 2 skipped, architecture compliance suite 406 passed
+  - 41 new tests (`Order.hydrate()` + `PrismaOrderRepository`)
+- **PR #125** — `fix(admin): persist the audit trail via PrismaAuditLog (P0-2)`
+  - Every admin write (course/module/lesson CRUD, refunds, discount codes, badges, simulators, live classes, impersonation) calls `RecordAuditLog`, which was silently writing to `InMemoryAuditLog` in production — the entire audit trail vanished on every redeploy, invisibly, since a failed audit write never fails the business operation by design
+  - The `AuditLog` Prisma model already existed; only the adapter was a stub with a stale "table doesn't exist yet" comment
+  - Implemented `PrismaAuditLog` mapping the domain `AuditLogEntry` onto the `audit_logs` table and wired it into `buildProductionContainer()`
+  - 4 new tests
+  - Full suite (both PRs): 2135 passed / 2 skipped, architecture compliance suite 406 passed
 
 ### 2026-07-19 — TDD + SOLID audit and Tier A production-bug fixes
 
