@@ -10,6 +10,18 @@
  * code never imports this file.
  */
 
+import { vi } from "vitest";
+
+// STORY-012: NextMdxRenderer imports `server-only` (server-only
+// marker package). vitest doesn't apply the `react-server` export
+// condition, so the import resolves to the throwing `index.js`.
+// Same workaround as `tests/unit/composition/container.test.ts` and
+// `src/lib/__tests__/*`: mock to an empty module so the import
+// resolves cleanly under vitest, where every test that pulls in the
+// composition container (e.g. `src/usecases/__tests__/Logout.test.ts`)
+// would otherwise fail at import time.
+vi.mock("server-only", () => ({}));
+
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import type { CertificateHashGenerator } from "@/ports/security/CertificateHashGenerator";
 import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
