@@ -12,22 +12,20 @@
 
 import { Result } from "@/domain/shared/Result";
 import type { IModuleRepository, ModuleError } from "@/ports/repositories/IModuleRepository";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 export interface DeleteModuleInput {
   moduleId: string;
+  actorId: string;
 }
 
-export type DeleteModuleError =
-  | { kind: "module_not_found" }
-  | ModuleError;
+export type DeleteModuleError = { kind: "module_not_found" } | ModuleError;
 
-export type DeleteModuleResult = Result<
-  { deleted: true },
-  DeleteModuleError
->;
+export type DeleteModuleResult = Result<{ deleted: true }, DeleteModuleError>;
 
 export interface DeleteModuleDeps {
   moduleRepo: IModuleRepository;
+  recordAuditLog: RecordAuditLog;
 }
 
 export class DeleteModule {
@@ -36,11 +34,26 @@ export class DeleteModule {
   async execute(input: DeleteModuleInput): Promise<DeleteModuleResult> {
     const r = await this.deps.moduleRepo.delete(input.moduleId);
     if (!r.ok) {
-      if (r.error.kind === "not_found") {
-        return Result.err({ kind: "module_not_found" });
-      }
-      return Result.err(r.error);
+      const error: DeleteModuleError =
+        r.error.kind === "not_found" ? { kind: "module_not_found" } : r.error;
+      void this.deps.recordAuditLog.execute({
+        actorId: input.actorId,
+        action: "module.delete_failed",
+        targetId: input.moduleId,
+        targetType: "module",
+        metadata: { error: error.kind },
+      });
+      return Result.err(error);
     }
+
+    void this.deps.recordAuditLog.execute({
+      actorId: input.actorId,
+      action: "module.deleted",
+      targetId: input.moduleId,
+      targetType: "module",
+      metadata: {},
+    });
+
     return Result.ok({ deleted: true });
   }
 }

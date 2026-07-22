@@ -12,6 +12,8 @@ import { getSessionUserId } from "@/lib/auth";
 import type { DeleteModule, DeleteModuleInput, DeleteModuleError } from "@/usecases/DeleteModule";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
+export type DeleteModulePageInput = Omit<DeleteModuleInput, "actorId">;
+
 export type DeleteModuleActionResult = Result<
   { deleted: true },
   DeleteModuleError | { kind: "unauthorized" }
@@ -19,17 +21,15 @@ export type DeleteModuleActionResult = Result<
 
 export async function performDeleteModule(
   container: { userRepo: UserRepository; deleteModule: DeleteModule },
-  input: DeleteModuleInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  input: DeleteModulePageInput,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<DeleteModuleActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.deleteModule.execute(input);
+  const result = await container.deleteModule.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -48,7 +48,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function deleteModuleAction(
-  input: DeleteModuleInput,
+  input: DeleteModulePageInput,
 ): Promise<DeleteModuleActionResult> {
   const container = buildContainer();
   return performDeleteModule(container, input, defaultGetCurrentAdminId);

@@ -6,8 +6,14 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { ReorderLessons } from "@/usecases/ReorderLessons";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { createLesson, type Lesson } from "@/domain/entities/Lesson";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { FixedClock } from "@/ports/system/Clock";
 
-async function seedLesson(repo: InMemoryLessonRepository, overrides: Partial<Lesson> = {}): Promise<Lesson> {
+async function seedLesson(
+  repo: InMemoryLessonRepository,
+  overrides: Partial<Lesson> = {},
+): Promise<Lesson> {
   const r = createLesson({
     id: `l_${Math.random().toString(36).slice(2, 6)}`,
     moduleId: "mod_01",
@@ -22,13 +28,23 @@ async function seedLesson(repo: InMemoryLessonRepository, overrides: Partial<Les
   return r.value;
 }
 
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
 describe("ReorderLessons", () => {
   let lessonRepo: InMemoryLessonRepository;
+  let recordAuditLog: RecordAuditLog;
   let useCase: ReorderLessons;
 
   beforeEach(() => {
     lessonRepo = new InMemoryLessonRepository();
-    useCase = new ReorderLessons({ lessonRepo });
+    recordAuditLog = makeRecordAuditLog();
+    useCase = new ReorderLessons({ lessonRepo, recordAuditLog });
   });
 
   it("reorders lessons in the requested order", async () => {
@@ -39,6 +55,7 @@ describe("ReorderLessons", () => {
     const r = await useCase.execute({
       moduleId: "mod_01",
       lessonIds: ["l3", "l1", "l2"],
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -54,6 +71,7 @@ describe("ReorderLessons", () => {
     const r = await useCase.execute({
       moduleId: "mod_01",
       lessonIds: ["l1"],
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -68,6 +86,7 @@ describe("ReorderLessons", () => {
     const r = await useCase.execute({
       moduleId: "mod_01",
       lessonIds: ["l1", "l2"],
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -79,6 +98,7 @@ describe("ReorderLessons", () => {
     const r = await useCase.execute({
       moduleId: "mod_01",
       lessonIds: [],
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -93,11 +113,28 @@ describe("ReorderLessons", () => {
     await useCase.execute({
       moduleId: "mod_01",
       lessonIds: ["l3", "l1", "l2"],
+      actorId: "admin_1",
     });
 
     const list = await lessonRepo.findByModuleId("mod_01");
     expect(list.ok).toBe(true);
     if (!list.ok) return;
     expect(list.value.map((l) => l.id)).toEqual(["l3", "l1", "l2"]);
+  });
+
+  it("records an audit log entry on success", async () => {
+    await seedLesson(lessonRepo, { id: "l1" });
+    await useCase.execute({ moduleId: "mod_01", lessonIds: ["l1"], actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "lesson.reordered")).toBe(true);
+  });
+
+  it("records an audit log entry on failure", async () => {
+    await seedLesson(lessonRepo, { id: "l1" });
+    await useCase.execute({ moduleId: "mod_01", lessonIds: [], actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "lesson.reorder_failed")).toBe(true);
   });
 });

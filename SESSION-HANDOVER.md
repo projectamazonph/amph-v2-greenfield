@@ -1,26 +1,92 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), and PR #129 (Module/Lesson) all merged to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Same session, same branch (recreated fresh from post-merge `main`): investigated the stale 2026-07-19 E2E failure report and fixed a real bug in the E2E cleanup helper.
+**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), PR #129 (Module/Lesson), and PR #130 (E2E cleanup helper fix) all merged to `main`. P0-2 is fully closed and the E2E suite is verified green. Same session, branch recreated fresh from post-merge `main` again: closed the last flagged admin-CRUD gap — Module/Lesson use cases never wrote to the audit trail, unlike every other admin resource.
 
 ---
 
 ## Project Status
 
-| Metric                   | Value                                                                                                                                                                                                                                                    |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration closed; E2E suite re-verified green**                                                                                                                                               |
-| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                            |
-| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                   |
-| `main` HEAD              | `621ed1d`: fix(admin): implement PrismaModuleRepository + PrismaLessonRepository (P0-2 / STORY-048b / STORY-048c) (#129, squash-merged)                                                                                                                  |
-| Unit + integration tests | **2242 passing + 2 skipped, 0 TypeScript errors** (on `claude/next-story-klge5f`, recreated fresh from post-merge `main`, not yet a PR)                                                                                                                  |
-| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                                      |
-| Coverage                 | Not re-measured after the Module/Lesson work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)                |
-| E2E                      | Re-run this session with a locally provisioned Postgres (was 0/19, blocked on env, see log below): **15 passed, 4 intentionally skipped (no seeded admin in this greenfield env), 0 failed** on `chromium-desktop`                                       |
-| CI                       | PR #125–#129 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's E2E-helper fix isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green                     |
-| Database                 | Not provisioned in production (Prisma schema complete; every repository in `buildProductionContainer()` is Postgres-backed, no `InMemory*` fallbacks remain). This session provisioned a throwaway local Postgres 16 purely to run E2E; nothing persists |
-| Production               | Not deployed                                                                                                                                                                                                                                             |
+| Metric                   | Value                                                                                                                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 closed; E2E suite verified green; Module/Lesson admin CRUD now audit-logged**                                                                                                               |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                         |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                |
+| `main` HEAD              | `2bedfcf`: fix(test): construct clearE2EUsers' PrismaClient with a driver adapter (#130, squash-merged)                                                                                                                               |
+| Unit + integration tests | **2258 passing + 2 skipped, 0 TypeScript errors** (on `claude/next-story-klge5f`, recreated fresh from post-merge `main`, not yet a PR)                                                                                               |
+| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                   |
+| Coverage                 | Not re-measured after the audit-log work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements) |
+| E2E                      | Verified green last session (PR #130): 15 passed, 4 intentionally skipped, 0 failed on `chromium-desktop`. Not re-run this session (no app-facing behavior changed, only audit-log side effects)                                      |
+| CI                       | PR #125–#130 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's audit-log work isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green  |
+| Database                 | Not provisioned in production (Prisma schema complete; every repository in `buildProductionContainer()` is Postgres-backed, no `InMemory*` fallbacks remain)                                                                          |
+| Production               | Not deployed                                                                                                                                                                                                                          |
 
 ---
+
+## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`, continued)
+
+### Module/Lesson admin CRUD now writes to the audit trail (same session, after PR #130 merged)
+
+PR #130 merged (squash, as `2bedfcf`); branch recreated fresh from
+post-merge `main` again. Every PR description in this P0-2 series has
+carried the same unchecked architecture-checklist box: "No admin
+mutation without an `AuditLog` entry — pre-existing gap, `Module`/
+`Lesson` CRUD use cases don't call `RecordAuditLog` yet." Picked that
+up as the next well-scoped item: `src/domain/values/AuditAction.ts`
+already reserved `module.created`/`updated`/`deleted`/`reordered` and
+the `lesson.*` equivalents (present since STORY-050a), but no use case
+ever called `recordAuditLog.execute()` with them, unlike every other
+admin resource (`LiveClass`, `DiscountCode`, `Badge`,
+`SimulatorScenario`, `Course`). Confirmed with a grep across all 8
+Module/Lesson use case files before starting: zero hits for
+`recordAuditLog`.
+
+- Added the missing `_failed` variants to `AuditAction`
+  (`module.create_failed`/`update_failed`/`delete_failed`/
+  `reorder_failed` and the `lesson.*` equivalents), matching the
+  pattern every other admin resource already has (see
+  `discount_code.*`/`badge.*`/`live_class.*` in the same file).
+- `CreateModule`, `UpdateModule`, `DeleteModule`, `ReorderModules`,
+  `CreateLesson`, `UpdateLesson`, `DeleteLesson`, `ReorderLessons`
+  (8 use cases): added `actorId: string` to each `Input`, added
+  `recordAuditLog: RecordAuditLog` to each `Deps`, and called
+  `recordAuditLog.execute({...})` on every success **and** failure
+  exit path, mirroring `CreateLiveClass`/`UpdateLiveClass`/
+  `DeleteLiveClass` exactly (the established template for this
+  pattern). Reorder's audit metadata carries the full requested
+  `moduleIds`/`lessonIds` array; create/update/delete carry the
+  relevant title/patch/error.
+- Threaded `actorId` through the 8 corresponding server actions
+  (`create`/`update`/`delete`/`reorderModules.action.ts` and the
+  `Lesson` equivalents). These actions already resolved the acting
+  admin's id via `getCurrentAdminId()` for the authorization check;
+  the only change was passing that same id into the use case call as
+  `actorId` instead of discarding it. For the four actions whose
+  exported input type was the raw use-case `Input` (`deleteModule`,
+  `reorderModules`, `deleteLesson`, `reorderLessons`), added a
+  `*PageInput = Omit<*Input, "actorId">` type and updated the
+  exported function's parameter to it, so pages don't need to (and
+  can't) pass `actorId` themselves, per this file's own documented
+  "actorId is injected by the server action, never by the page"
+  invariant. `createModule`/`updateModule` needed the same `PageInput`
+  treatment; `createLesson`/`updateLesson` already had their own
+  distinct form-input types, so only the internal `execute()` call
+  needed the new field.
+- Wired `recordAuditLog` (already an existing, in-scope local in both
+  container builders) into all 8 use case constructors in
+  `buildProductionContainer()` and `buildTestContainer()`
+  (`container.ts` / `container.test.ts`).
+- Updated all 8 existing use-case test files: added `actorId` to
+  every `execute()` call, wired a `RecordAuditLog` +
+  `InMemoryAuditLog` fake into each `beforeEach` (same pattern as
+  `CreateLiveClass.test.ts`), and added two new tests per use case
+  (16 total) asserting an audit entry lands on both the success and
+  the primary failure path.
+- Full unit/integration suite: 2258 passed, 2 skipped (was 2242
+  before this session's start), 0 failures. `pnpm tsc --noEmit`,
+  `pnpm lint`, `pnpm build` all clean. Did not re-run the E2E suite
+  (no admin UI behavior changed, only a side-effect write; the local
+  Postgres + Playwright setup from the previous entry was already
+  torn down).
 
 ## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`)
 

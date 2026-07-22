@@ -6,8 +6,22 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { DeleteModule } from "@/usecases/DeleteModule";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { createModule, type Module } from "@/domain/entities/Module";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { FixedClock } from "@/ports/system/Clock";
 
-async function seedModule(repo: InMemoryModuleRepository, overrides: Partial<Module> = {}): Promise<Module> {
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
+async function seedModule(
+  repo: InMemoryModuleRepository,
+  overrides: Partial<Module> = {},
+): Promise<Module> {
   const r = createModule({
     id: "m1",
     courseId: "course_01",
@@ -22,17 +36,19 @@ async function seedModule(repo: InMemoryModuleRepository, overrides: Partial<Mod
 
 describe("DeleteModule", () => {
   let moduleRepo: InMemoryModuleRepository;
+  let recordAuditLog: RecordAuditLog;
   let useCase: DeleteModule;
 
   beforeEach(() => {
     moduleRepo = new InMemoryModuleRepository();
-    useCase = new DeleteModule({ moduleRepo });
+    recordAuditLog = makeRecordAuditLog();
+    useCase = new DeleteModule({ moduleRepo, recordAuditLog });
   });
 
   it("deletes the module on the happy path", async () => {
     await seedModule(moduleRepo);
 
-    const r = await useCase.execute({ moduleId: "m1" });
+    const r = await useCase.execute({ moduleId: "m1", actorId: "admin_1" });
 
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -43,7 +59,7 @@ describe("DeleteModule", () => {
   });
 
   it("returns module_not_found when the id doesn't exist", async () => {
-    const r = await useCase.execute({ moduleId: "missing" });
+    const r = await useCase.execute({ moduleId: "missing", actorId: "admin_1" });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("module_not_found");
@@ -53,7 +69,7 @@ describe("DeleteModule", () => {
     await seedModule(moduleRepo, { id: "m1", displayOrder: 1 });
     await seedModule(moduleRepo, { id: "m2", displayOrder: 2 });
 
-    await useCase.execute({ moduleId: "m1" });
+    await useCase.execute({ moduleId: "m1", actorId: "admin_1" });
 
     const list = await moduleRepo.findByCourseId("course_01");
     expect(list.ok).toBe(true);
@@ -69,9 +85,24 @@ describe("DeleteModule", () => {
       error: { kind: "db_error", message: "delete failed" },
     });
 
-    const r = await useCase.execute({ moduleId: "m1" });
+    const r = await useCase.execute({ moduleId: "m1", actorId: "admin_1" });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("db_error");
+  });
+
+  it("records an audit log entry on success", async () => {
+    await seedModule(moduleRepo);
+    await useCase.execute({ moduleId: "m1", actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "module.deleted")).toBe(true);
+  });
+
+  it("records an audit log entry on failure", async () => {
+    await useCase.execute({ moduleId: "missing", actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "module.delete_failed")).toBe(true);
   });
 });

@@ -22,25 +22,23 @@ import { createModule, type Module } from "@/domain/entities/Module";
 import type { IModuleRepository, ModuleError } from "@/ports/repositories/IModuleRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 export interface CreateModuleInput {
   courseId: string;
   title: string;
+  actorId: string;
 }
 
-export type CreateModuleError =
-  | { kind: "invalid_title" }
-  | ModuleError;
+export type CreateModuleError = { kind: "invalid_title" } | ModuleError;
 
-export type CreateModuleResult = Result<
-  { module: Module },
-  CreateModuleError
->;
+export type CreateModuleResult = Result<{ module: Module }, CreateModuleError>;
 
 export interface CreateModuleDeps {
   moduleRepo: IModuleRepository;
   idGen: IdGenerator;
   clock: Clock;
+  recordAuditLog: RecordAuditLog;
 }
 
 export class CreateModule {
@@ -49,17 +47,29 @@ export class CreateModule {
   async execute(input: CreateModuleInput): Promise<CreateModuleResult> {
     // Validate title via the entity factory (it'll catch empty/whitespace)
     if (!input.title.trim()) {
+      void this.deps.recordAuditLog.execute({
+        actorId: input.actorId,
+        action: "module.create_failed",
+        targetId: input.courseId,
+        targetType: "module",
+        metadata: { error: "invalid_title" },
+      });
       return Result.err({ kind: "invalid_title" });
     }
 
-    // 1. Count existing modules
     const existing = await this.deps.moduleRepo.findByCourseId(input.courseId);
     if (!existing.ok) {
+      void this.deps.recordAuditLog.execute({
+        actorId: input.actorId,
+        action: "module.create_failed",
+        targetId: input.courseId,
+        targetType: "module",
+        metadata: { error: existing.error.kind },
+      });
       return Result.err(existing.error);
     }
     const nextOrder = existing.value.length + 1;
 
-    // 2. Build the module entity
     const id = this.deps.idGen.newId();
     const now = this.deps.clock.now();
     const buildResult = createModule({
@@ -71,15 +81,37 @@ export class CreateModule {
       updatedAt: now,
     });
     if (!buildResult.ok) {
+      void this.deps.recordAuditLog.execute({
+        actorId: input.actorId,
+        action: "module.create_failed",
+        targetId: id,
+        targetType: "module",
+        metadata: { error: "invalid_title" },
+      });
       return Result.err({ kind: "invalid_title" });
     }
     const created = buildResult.value;
 
-    // 3. Persist
     const persistResult = await this.deps.moduleRepo.create(created);
     if (!persistResult.ok) {
+      void this.deps.recordAuditLog.execute({
+        actorId: input.actorId,
+        action: "module.create_failed",
+        targetId: id,
+        targetType: "module",
+        metadata: { error: persistResult.error.kind },
+      });
       return Result.err(persistResult.error);
     }
+
+    void this.deps.recordAuditLog.execute({
+      actorId: input.actorId,
+      action: "module.created",
+      targetId: persistResult.value.id,
+      targetType: "module",
+      metadata: { courseId: input.courseId, title: input.title },
+    });
+
     return Result.ok({ module: persistResult.value });
   }
 }

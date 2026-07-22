@@ -13,6 +13,8 @@ import type { ReorderLessons, ReorderLessonsInput } from "@/usecases/ReorderLess
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { LessonError } from "@/ports/repositories/ILessonRepository";
 
+export type ReorderLessonsPageInput = Omit<ReorderLessonsInput, "actorId">;
+
 export type ReorderLessonsActionResult = Result<
   { lessons: readonly { id: string }[] },
   LessonError | { kind: "unauthorized" }
@@ -20,17 +22,15 @@ export type ReorderLessonsActionResult = Result<
 
 export async function performReorderLessons(
   container: { userRepo: UserRepository; reorderLessons: ReorderLessons },
-  input: ReorderLessonsInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  input: ReorderLessonsPageInput,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<ReorderLessonsActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.reorderLessons.execute(input);
+  const result = await container.reorderLessons.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -49,7 +49,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function reorderLessonsAction(
-  input: ReorderLessonsInput,
+  input: ReorderLessonsPageInput,
 ): Promise<ReorderLessonsActionResult> {
   const container = buildContainer();
   return performReorderLessons(container, input, defaultGetCurrentAdminId);

@@ -52,9 +52,7 @@ function parseContent(
 export async function performCreateLesson(
   container: { userRepo: UserRepository; createLesson: CreateLesson },
   input: CreateLessonFormInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<CreateLessonActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
@@ -71,6 +69,7 @@ export async function performCreateLesson(
     title: input.title,
     type: input.type,
     content: parseResult.value as never,
+    actorId: adminId,
   });
   if (!result.ok) {
     return Result.err(result.error);

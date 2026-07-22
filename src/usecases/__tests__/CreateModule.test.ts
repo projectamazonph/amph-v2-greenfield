@@ -8,6 +8,8 @@ import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRep
 import { FixedClock } from "@/ports/system/Clock";
 import { Result } from "@/domain/shared/Result";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 
 function makeIdGen(): IdGenerator {
   let n = 0;
@@ -18,21 +20,36 @@ function makeIdGen(): IdGenerator {
   };
 }
 
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
 describe("CreateModule", () => {
   let moduleRepo: InMemoryModuleRepository;
+  let recordAuditLog: RecordAuditLog;
   let useCase: CreateModule;
 
   beforeEach(() => {
     moduleRepo = new InMemoryModuleRepository();
+    recordAuditLog = makeRecordAuditLog();
     useCase = new CreateModule({
       moduleRepo,
       idGen: makeIdGen(),
       clock: new FixedClock(new Date("2026-07-19T00:00:00Z")),
+      recordAuditLog,
     });
   });
 
   it("creates the first module with displayOrder=1", async () => {
-    const r = await useCase.execute({ courseId: "course_01", title: "Module 1" });
+    const r = await useCase.execute({
+      courseId: "course_01",
+      title: "Module 1",
+      actorId: "admin_1",
+    });
 
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -42,8 +59,12 @@ describe("CreateModule", () => {
   });
 
   it("creates the second module with displayOrder=2", async () => {
-    await useCase.execute({ courseId: "course_01", title: "Module 1" });
-    const r = await useCase.execute({ courseId: "course_01", title: "Module 2" });
+    await useCase.execute({ courseId: "course_01", title: "Module 1", actorId: "admin_1" });
+    const r = await useCase.execute({
+      courseId: "course_01",
+      title: "Module 2",
+      actorId: "admin_1",
+    });
 
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -57,23 +78,28 @@ describe("CreateModule", () => {
       paymentRef: () => "AMPH-x",
       receiptNumber: () => "AMPH-2026-x",
     };
-    useCase = new CreateModule({ moduleRepo, idGen, clock: new FixedClock(new Date()) });
+    useCase = new CreateModule({
+      moduleRepo,
+      idGen,
+      clock: new FixedClock(new Date()),
+      recordAuditLog,
+    });
 
-    const r = await useCase.execute({ courseId: "course_01", title: "M1" });
+    const r = await useCase.execute({ courseId: "course_01", title: "M1", actorId: "admin_1" });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.value.module.id).toBe("mod_1");
   });
 
   it("returns invalid_title for empty title", async () => {
-    const r = await useCase.execute({ courseId: "course_01", title: "" });
+    const r = await useCase.execute({ courseId: "course_01", title: "", actorId: "admin_1" });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("invalid_title");
   });
 
   it("returns invalid_title for whitespace-only title", async () => {
-    const r = await useCase.execute({ courseId: "course_01", title: "   " });
+    const r = await useCase.execute({ courseId: "course_01", title: "   ", actorId: "admin_1" });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(resultError(r));
@@ -89,7 +115,7 @@ describe("CreateModule", () => {
       error: { kind: "db_error", message: "list failed" },
     });
 
-    const r = await useCase.execute({ courseId: "course_01", title: "M1" });
+    const r = await useCase.execute({ courseId: "course_01", title: "M1", actorId: "admin_1" });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("db_error");
@@ -101,7 +127,7 @@ describe("CreateModule", () => {
       error: { kind: "db_error", message: "create failed" },
     });
 
-    const r = await useCase.execute({ courseId: "course_01", title: "M1" });
+    const r = await useCase.execute({ courseId: "course_01", title: "M1", actorId: "admin_1" });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("db_error");
@@ -113,9 +139,10 @@ describe("CreateModule", () => {
       moduleRepo,
       idGen: makeIdGen(),
       clock: new FixedClock(t0),
+      recordAuditLog,
     });
 
-    const r = await useCase.execute({ courseId: "course_01", title: "M1" });
+    const r = await useCase.execute({ courseId: "course_01", title: "M1", actorId: "admin_1" });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.value.module.createdAt).toEqual(t0);
@@ -123,13 +150,27 @@ describe("CreateModule", () => {
   });
 
   it("persists the module so subsequent calls see it", async () => {
-    await useCase.execute({ courseId: "course_01", title: "M1" });
-    await useCase.execute({ courseId: "course_01", title: "M2" });
+    await useCase.execute({ courseId: "course_01", title: "M1", actorId: "admin_1" });
+    await useCase.execute({ courseId: "course_01", title: "M2", actorId: "admin_1" });
 
     const list = await moduleRepo.findByCourseId("course_01");
     expect(list.ok).toBe(true);
     if (!list.ok) return;
     expect(list.value.length).toBe(2);
     expect(list.value.map((m) => m.title)).toEqual(["M1", "M2"]);
+  });
+
+  it("records an audit log entry on success", async () => {
+    await useCase.execute({ courseId: "course_01", title: "M1", actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "module.created")).toBe(true);
+  });
+
+  it("records an audit log entry on failure", async () => {
+    await useCase.execute({ courseId: "course_01", title: "   ", actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "module.create_failed")).toBe(true);
   });
 });

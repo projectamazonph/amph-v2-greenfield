@@ -7,8 +7,13 @@ import { UpdateLesson } from "@/usecases/UpdateLesson";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { createLesson, type Lesson } from "@/domain/entities/Lesson";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 
-async function seedLesson(repo: InMemoryLessonRepository, overrides: Partial<Lesson> = {}): Promise<Lesson> {
+async function seedLesson(
+  repo: InMemoryLessonRepository,
+  overrides: Partial<Lesson> = {},
+): Promise<Lesson> {
   const r = createLesson({
     id: "l1",
     moduleId: "mod_01",
@@ -23,15 +28,26 @@ async function seedLesson(repo: InMemoryLessonRepository, overrides: Partial<Les
   return r.value;
 }
 
+function makeRecordAuditLog(): RecordAuditLog {
+  return new RecordAuditLog({
+    auditLog: new InMemoryAuditLog(),
+    idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
+    clock: new FixedClock(new Date()),
+  });
+}
+
 describe("UpdateLesson", () => {
   let lessonRepo: InMemoryLessonRepository;
+  let recordAuditLog: RecordAuditLog;
   let useCase: UpdateLesson;
 
   beforeEach(() => {
     lessonRepo = new InMemoryLessonRepository();
+    recordAuditLog = makeRecordAuditLog();
     useCase = new UpdateLesson({
       lessonRepo,
       clock: new FixedClock(new Date("2026-07-19T12:00:00Z")),
+      recordAuditLog,
     });
   });
 
@@ -41,6 +57,7 @@ describe("UpdateLesson", () => {
     const r = await useCase.execute({
       lessonId: "l1",
       patch: { title: "New Title" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -54,6 +71,7 @@ describe("UpdateLesson", () => {
     const r = await useCase.execute({
       lessonId: "l1",
       patch: { content: { body: "new" } },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -72,6 +90,7 @@ describe("UpdateLesson", () => {
         type: "VIDEO",
         content: { durationMinutes: -1 },
       },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(false);
@@ -88,6 +107,7 @@ describe("UpdateLesson", () => {
         type: "VIDEO",
         content: { durationMinutes: 10 },
       },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -101,6 +121,7 @@ describe("UpdateLesson", () => {
     const r = await useCase.execute({
       lessonId: "l1",
       patch: { title: "New" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -110,12 +131,13 @@ describe("UpdateLesson", () => {
 
   it("bumps updatedAt to the injected clock", async () => {
     const t0 = new Date("2026-07-19T12:00:00Z");
-    useCase = new UpdateLesson({ lessonRepo, clock: new FixedClock(t0) });
+    useCase = new UpdateLesson({ lessonRepo, clock: new FixedClock(t0), recordAuditLog });
     await seedLesson(lessonRepo, { updatedAt: new Date("2025-01-01T00:00:00Z") });
 
     const r = await useCase.execute({
       lessonId: "l1",
       patch: { title: "New" },
+      actorId: "admin_1",
     });
 
     expect(r.ok).toBe(true);
@@ -127,6 +149,7 @@ describe("UpdateLesson", () => {
     const r = await useCase.execute({
       lessonId: "missing",
       patch: { title: "X" },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(false);
     if (r.ok) return;
@@ -139,6 +162,7 @@ describe("UpdateLesson", () => {
     const r = await useCase.execute({
       lessonId: "l1",
       patch: { title: "   " },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(false);
     if (r.ok) return;
@@ -154,6 +178,7 @@ describe("UpdateLesson", () => {
     const r = await useCase.execute({
       lessonId: "l1",
       patch: { title: "X" },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(false);
     if (r.ok) return;
@@ -170,9 +195,25 @@ describe("UpdateLesson", () => {
     const r = await useCase.execute({
       lessonId: "l1",
       patch: { title: "X" },
+      actorId: "admin_1",
     });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("db_error");
+  });
+
+  it("records an audit log entry on success", async () => {
+    await seedLesson(lessonRepo);
+    await useCase.execute({ lessonId: "l1", patch: { title: "New" }, actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "lesson.updated")).toBe(true);
+  });
+
+  it("records an audit log entry on failure", async () => {
+    await useCase.execute({ lessonId: "missing", patch: { title: "X" }, actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const entries = auditLog.getAll();
+    expect(entries.some((e) => e.action === "lesson.update_failed")).toBe(true);
   });
 });

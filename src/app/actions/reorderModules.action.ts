@@ -13,6 +13,8 @@ import type { ReorderModules, ReorderModulesInput } from "@/usecases/ReorderModu
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { ModuleError } from "@/ports/repositories/IModuleRepository";
 
+export type ReorderModulesPageInput = Omit<ReorderModulesInput, "actorId">;
+
 export type ReorderModulesActionResult = Result<
   { modules: readonly { id: string }[] },
   ModuleError | { kind: "unauthorized" }
@@ -20,17 +22,15 @@ export type ReorderModulesActionResult = Result<
 
 export async function performReorderModules(
   container: { userRepo: UserRepository; reorderModules: ReorderModules },
-  input: ReorderModulesInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  input: ReorderModulesPageInput,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<ReorderModulesActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
     return Result.err({ kind: "unauthorized" });
   }
 
-  const result = await container.reorderModules.execute(input);
+  const result = await container.reorderModules.execute({ ...input, actorId: adminId });
   if (!result.ok) {
     return Result.err(result.error);
   }
@@ -49,7 +49,7 @@ async function defaultGetCurrentAdminId(container: {
 }
 
 export async function reorderModulesAction(
-  input: ReorderModulesInput,
+  input: ReorderModulesPageInput,
 ): Promise<ReorderModulesActionResult> {
   const container = buildContainer();
   return performReorderModules(container, input, defaultGetCurrentAdminId);
