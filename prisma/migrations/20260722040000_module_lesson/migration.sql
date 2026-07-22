@@ -7,7 +7,7 @@
 -- entities, ports, use cases, and admin UI (STORY-048b/048c) were already
 -- built against these ports; only the Postgres tables and adapters were
 -- missing. This does not touch Course.curriculum (still the JSON blob
--- read by the public catalog pages) — that migration is a separate,
+-- read by the public catalog pages): that migration is a separate,
 -- larger refactor per the STORY-048b/048c "out of scope" notes.
 
 CREATE TABLE "modules" (

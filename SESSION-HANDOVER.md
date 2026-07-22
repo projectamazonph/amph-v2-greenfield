@@ -590,8 +590,8 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 ## Open Work (for the next session)
 
 **Note (2026-07-22, updated by the Module/Lesson session):** the table
-below is a stale snapshot from the 2026-07-19 close (it predates PRs
-#100, #125–#128, and this session's Module/Lesson work). Sprint 11
+below is a stale snapshot from the 2026-07-19 close (it predates
+PR `#100`, PRs `#125` through `#128`, and this session's Module/Lesson work). Sprint 11
 (051–055) and P0-2 are both fully done as of this session; see
 "Project Status" at the top of this file and the 2026-07-22 log
 entries for the current state. Left in place rather than deleted,
@@ -618,7 +618,7 @@ since 2026-07-19.
 
 Last run: **17 failed, 7 passed** in 2.2m. Real failure mode: signup flow tests can't reach the post-submit state (likely the `email_taken` and `weak_password` redirect handlers — `expect(locator).toBeVisible()` failing). The webkit errors I saw initially were a Playwright retry artifact; chromium-desktop is the real failure surface. The signup spec lives at `tests/e2e/signup.spec.ts`. Not re-run since 2026-07-19; may already be stale given how much has landed since (STORY-021's `/checkout` page in particular).
 
-### C. Module / Lesson Prisma adapters — DONE (this session, 2026-07-22, branch `claude/next-story-klge5f`)
+### C. Module / Lesson Prisma adapters: DONE (this session, 2026-07-22, branch `claude/next-story-klge5f`)
 
 Closed. See the "PrismaModuleRepository + PrismaLessonRepository" entry at the top of the session log.
 
