@@ -75,7 +75,7 @@ import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepositor
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
-import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
+import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
@@ -358,7 +358,7 @@ function buildProductionContainer(): AppContainer {
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)
-  const scenarioRepo: ISimulatorScenarioRepository = new InMemorySimulatorScenarioRepository();
+  const scenarioRepo: ISimulatorScenarioRepository = new PrismaSimulatorScenarioRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(

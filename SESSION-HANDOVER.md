@@ -1,23 +1,23 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session) and PR #126 (DiscountCode) both merged to `main`. PrismaLiveClassRepository in progress on a fresh `claude/unfinished-stories-ivl2fw` (restarted from `main` post-merge, not yet a PR).
+**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), and PR #127 (LiveClass) all merged to `main`. PrismaSimulatorScenarioRepository in progress on a fresh `claude/unfinished-stories-ivl2fw` (restarted from `main` post-merge, not yet a PR).
 
 ---
 
 ## Project Status
 
-| Metric                   | Value                                                                                                                                                                                                                                       |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress**                                                                                                                                                          |
-| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                               |
-| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                      |
-| `main` HEAD              | `c819b38`: fix(admin): implement PrismaDiscountCodeRepository admin CRUD (P0-2 / STORY-050d) (#126, squash-merged)                                                                                                                          |
-| Unit + integration tests | **2189 passing + 2 skipped, 0 TypeScript errors** (local, on `claude/unfinished-stories-ivl2fw` rebased on the post-#126 `main`, not yet a PR)                                                                                              |
-| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                         |
-| Coverage                 | Not re-measured after the LiveClass work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)       |
-| CI                       | PR #125 and #126 both ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. The LiveClass work has only been run locally so far (`pnpm typecheck`/`lint`/`test`/`build` all green) |
-| Database                 | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                      |
-| Production               | Not deployed                                                                                                                                                                                                                                |
+| Metric                   | Value                                                                                                                                                                                                                                                     |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress**                                                                                                                                                                        |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                             |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                    |
+| `main` HEAD              | `18166e7`: fix(admin): implement PrismaLiveClassRepository (P0-2 / STORY-050c) (#127, squash-merged)                                                                                                                                                      |
+| Unit + integration tests | **2213 passing + 2 skipped, 0 TypeScript errors** (local, on `claude/unfinished-stories-ivl2fw` rebased on the post-#127 `main`, not yet a PR)                                                                                                            |
+| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                                       |
+| Coverage                 | Not re-measured after the SimulatorScenario work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)             |
+| CI                       | PR #125, #126, and #127 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. The SimulatorScenario work has only been run locally so far (`pnpm typecheck`/`lint`/`test`/`build` all green) |
+| Database                 | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                                    |
+| Production               | Not deployed                                                                                                                                                                                                                                              |
 
 ---
 
@@ -388,13 +388,62 @@ argument):
   #126's response two sections up. Not repeating the full argument
   here; it applies identically to this PR's new files.
 
-**Remaining P0-2 items**: `moduleRepo`, `lessonRepo`, `scenarioRepo`,
+**Remaining P0-2 items as of this point in the session** (superseded
+further down, once `scenarioRepo` was finished later the same day; see
+the "Remaining P0-2 items" note under the SimulatorScenario entry below
+for the current state): `moduleRepo`, `lessonRepo`, `scenarioRepo`,
 still in-memory. `scenarioRepo` (`SimulatorScenario`) is schema-blocked
 the same way `LiveClass` was (no Prisma model exists) and is the next
 candidate, same "brand-new table, no design decision needed" shape as
 this fix. `moduleRepo`/`lessonRepo` are the harder ones: splitting
 `Module`/`Lesson` out of `Course.curriculum`'s JSON blob into first-class
 tables is a real schema redesign, not just "add a table."
+
+### PR #127 merged (same session)
+
+Squash-merged as `18166e7`. All 6 CI jobs green; 2 rounds of CodeRabbit
+review, final round clean (3 findings fixed: stale comment, dropped
+`instructorId` on update, unvalidated status cast; 1 finding skipped,
+third repeat of the plain-language request). Local branch and the
+already auto-deleted remote branch both cleaned up;
+`claude/unfinished-stories-ivl2fw` recreated fresh from the post-merge
+`main` to continue P0-2 work.
+
+### PrismaSimulatorScenarioRepository: closes the SimulatorScenario leg of P0-2 (new branch, same session)
+
+Same shape as the LiveClass fix: no Prisma model existed for
+`SimulatorScenario`, so `buildProductionContainer()` fell back to
+`InMemorySimulatorScenarioRepository`. Every admin-created practice
+scenario (`/admin/simulators`) vanished on cold start / redeploy.
+
+- Added a `SimulatorScenario` Prisma model
+  (`prisma/migrations/20260722030000_simulator_scenario/`) matching the
+  domain entity 1:1, plus a nullable `archivedAt` column for soft-delete
+  (same convention as `discount_codes.archivedAt`). Brand-new table, so
+  a plain `CREATE INDEX` is correct, no lock-avoidance concern.
+- Implemented `PrismaSimulatorScenarioRepository` (real, not a stub).
+  `mapRow()` reuses the existing domain factory
+  (`createSimulatorScenario()`, which already validates `simulatorId`
+  and `difficulty`) instead of duplicating that validation with a new
+  guard function: a corrupt/legacy row now throws inside `mapRow()`,
+  caught by the surrounding try/catch and turned into `db_error`, same
+  outcome as `PaymentStatus.isValid()` / `isValidLiveClassStatus()` on
+  the prior two PRs but without adding a third near-identical validator.
+- Wired `PrismaSimulatorScenarioRepository` into
+  `buildProductionContainer()` in place of
+  `InMemorySimulatorScenarioRepository`.
+- 24 new tests
+  (`src/infra/simulator/__tests__/PrismaSimulatorScenarioRepository.test.ts`,
+  same hand-rolled-fake-PrismaClient pattern). Full unit/integration
+  suite: 2213 passed, 2 skipped, 0 failures. `pnpm tsc --noEmit` and
+  `pnpm lint` clean. `pnpm build` succeeds.
+
+**Remaining P0-2 items**: `moduleRepo`, `lessonRepo`, still in-memory.
+Both require splitting `Module`/`Lesson` out of `Course.curriculum`'s
+JSON blob into first-class tables, a real schema redesign per the
+audit's P1-7 finding, not a drop-in "add a table" fix like the last
+four PRs. Order, AuditLog, Session, DiscountCode, LiveClass, and now
+SimulatorScenario are all Postgres-backed in production.
 
 ## What changed in this session (2026-07-19)
 
