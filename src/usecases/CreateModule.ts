@@ -57,7 +57,6 @@ export class CreateModule {
       return Result.err({ kind: "invalid_title" });
     }
 
-    // 1. Count existing modules
     const existing = await this.deps.moduleRepo.findByCourseId(input.courseId);
     if (!existing.ok) {
       void this.deps.recordAuditLog.execute({
@@ -71,7 +70,6 @@ export class CreateModule {
     }
     const nextOrder = existing.value.length + 1;
 
-    // 2. Build the module entity
     const id = this.deps.idGen.newId();
     const now = this.deps.clock.now();
     const buildResult = createModule({
@@ -94,7 +92,6 @@ export class CreateModule {
     }
     const created = buildResult.value;
 
-    // 3. Persist
     const persistResult = await this.deps.moduleRepo.create(created);
     if (!persistResult.ok) {
       void this.deps.recordAuditLog.execute({

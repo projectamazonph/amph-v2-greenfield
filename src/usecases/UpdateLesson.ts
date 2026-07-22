@@ -84,7 +84,11 @@ export class UpdateLesson {
       action: "lesson.updated",
       targetId: input.lessonId,
       targetType: "lesson",
-      metadata: { patch: input.patch },
+      // Log which fields changed, not the raw patch: `content` is
+      // typed `unknown` and can carry an arbitrary-size video/quiz
+      // payload, matching CreateLesson's success metadata (which also
+      // excludes `content`).
+      metadata: { patchedFields: Object.keys(input.patch) },
     });
 
     return Result.ok({ lesson: persistResult.value });
