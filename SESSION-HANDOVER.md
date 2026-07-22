@@ -994,7 +994,6 @@ open, roughly in priority order:
 17. Assorted missing test files that stories' own acceptance criteria required: STORY-035 (badge container-wiring test), STORY-002 (`PrismaUserRepository`/`InMemoryUserRepository`/`User` tests), STORY-001 (ESLint-boundary canary test), STORY-046 (admin dashboard test), STORY-047 (admin users-page tests), STORY-049 (payment-gateway infra tests).
 18. (Flagged by CodeRabbit on PR #133, out of scope there since it targets already-merged PR #131 code) All 8 Module/Lesson use cases (`CreateModule`, `CreateLesson`, `DeleteModule`, `DeleteLesson`, `ReorderModules`, `ReorderLessons`, `UpdateModule`, `UpdateLesson`) call `recordAuditLog.execute()` with `void` instead of `await`. Since use cases can't import framework `after()`/`waitUntil()` (ESLint boundary rule), a serverless function invocation torn down right after the response is sent could silently drop a pending audit write. Fix is mechanical (swap `void` for `await` at each call site, matching what `CreateLiveClass`/`UpdateLiveClass`/`DeleteLiveClass` already do) but touches 8 files' worth of call sites plus their tests, so it's its own well-scoped PR.
 
-
 ---
 
 ## Architecture: Key Patterns Established
