@@ -357,7 +357,6 @@ function buildProductionContainer(): AppContainer {
   // STORY-050a: audit log (Postgres-backed in production via PrismaAuditLog)
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
-  // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)
   const scenarioRepo: ISimulatorScenarioRepository = new PrismaSimulatorScenarioRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
 

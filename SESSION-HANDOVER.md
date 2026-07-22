@@ -1,23 +1,23 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), and PR #127 (LiveClass) all merged to `main`. PrismaSimulatorScenarioRepository in progress on a fresh `claude/unfinished-stories-ivl2fw` (restarted from `main` post-merge, not yet a PR).
+**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), and PR #127 (LiveClass) all merged to `main`. PR #128 (PrismaSimulatorScenarioRepository) open, under review.
 
 ---
 
 ## Project Status
 
-| Metric                   | Value                                                                                                                                                                                                                                                     |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress**                                                                                                                                                                        |
-| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                             |
-| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                    |
-| `main` HEAD              | `18166e7`: fix(admin): implement PrismaLiveClassRepository (P0-2 / STORY-050c) (#127, squash-merged)                                                                                                                                                      |
-| Unit + integration tests | **2213 passing + 2 skipped, 0 TypeScript errors** (local, on `claude/unfinished-stories-ivl2fw` rebased on the post-#127 `main`, not yet a PR)                                                                                                            |
-| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                                       |
-| Coverage                 | Not re-measured after the SimulatorScenario work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)             |
-| CI                       | PR #125, #126, and #127 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. The SimulatorScenario work has only been run locally so far (`pnpm typecheck`/`lint`/`test`/`build` all green) |
-| Database                 | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                                    |
-| Production               | Not deployed                                                                                                                                                                                                                                              |
+| Metric                   | Value                                                                                                                                                                                                                                         |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress**                                                                                                                                                            |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                 |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                        |
+| `main` HEAD              | `18166e7`: fix(admin): implement PrismaLiveClassRepository (P0-2 / STORY-050c) (#127, squash-merged)                                                                                                                                          |
+| Unit + integration tests | **2213 passing + 2 skipped, 0 TypeScript errors** (on `claude/unfinished-stories-ivl2fw`, PR #128)                                                                                                                                            |
+| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                           |
+| Coverage                 | Not re-measured after the SimulatorScenario work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements) |
+| CI                       | PR #125, #126, and #127 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. PR #128 CI in progress; local `pnpm typecheck`/`lint`/`test`/`build` all green                     |
+| Database                 | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                        |
+| Production               | Not deployed                                                                                                                                                                                                                                  |
 
 ---
 
@@ -444,6 +444,28 @@ JSON blob into first-class tables, a real schema redesign per the
 audit's P1-7 finding, not a drop-in "add a table" fix like the last
 four PRs. Order, AuditLog, Session, DiscountCode, LiveClass, and now
 SimulatorScenario are all Postgres-backed in production.
+
+### CodeRabbit review response on PR #128 (same session)
+
+Two findings fixed, one skipped:
+
+- **Stale comment**: `container.ts`'s `scenarioRepo` line still had
+  its old "STORY-050b: simulator scenario repo (in-memory in prod
+  until Prisma schema lands)" comment above the now-Prisma-backed
+  assignment, the same leftover-comment mistake as PR #127's
+  `liveClassRepo` line. Removed.
+- **PR number/status drift between this file and `CHANGELOG.md`**:
+  both still said "not yet a PR" / left the entry unnumbered after PR
+  #128 was actually opened. Synced both to say PR #128, open, under
+  review.
+- **"Every mutable table must have `deletedAt`, `createdById`,
+  `updatedById`"** (skipped, third time): re-checked the real
+  `prisma/schema.prisma` count now that `LiveClass` and
+  `SimulatorScenario` both exist. 24 of 25 models lack these fields
+  entirely; only `User` has `deletedAt`. Same reasoning as PR #126's
+  response: this is a documented-but-never-implemented target
+  convention, not a live rule this PR broke, and a repo-wide retrofit
+  is a separate, deliberate story.
 
 ## What changed in this session (2026-07-19)
 

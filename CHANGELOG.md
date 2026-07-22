@@ -46,12 +46,13 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ### 2026-07-22: PrismaSimulatorScenarioRepository closes the SimulatorScenario leg of P0-2
 
-- `fix(admin): implement PrismaSimulatorScenarioRepository (P0-2 / STORY-050b)`
+- **PR #128** (open, under review): `fix(admin): implement PrismaSimulatorScenarioRepository (P0-2 / STORY-050b)`
   - Same shape as the LiveClass fix: no `SimulatorScenario` Prisma model existed, so `buildProductionContainer()` fell back to `InMemorySimulatorScenarioRepository`: every admin-created practice scenario vanished on cold start / redeploy
   - Added a `SimulatorScenario` Prisma model + nullable `archivedAt` column (migration `20260722030000_simulator_scenario`); brand-new table, plain `CREATE INDEX` is correct
   - Implemented `PrismaSimulatorScenarioRepository`; `mapRow()` reuses the existing `createSimulatorScenario()` domain factory (which already validates `simulatorId`/`difficulty`) instead of adding a third near-identical validator, so a corrupt/legacy row throws and surfaces as `db_error`
   - Wired `PrismaSimulatorScenarioRepository` into `buildProductionContainer()`
   - 24 new tests. Unit + integration suite: 2213 passed / 2 skipped; architecture compliance suite: 406 passed
+  - CodeRabbit review response: fixed a stale in-memory comment left over in `container.ts`; synced this changelog entry and `SESSION-HANDOVER.md`'s header with the actual PR #128 number/status. Skipped a request to add `deletedAt`/`createdById`/`updatedById` to `SimulatorScenario` (same reasoning as `DiscountCode` on PR #126: 24 of 25 models in the real schema now lack these fields, so this is a repo-wide gap, not a live rule this PR broke). Details in `SESSION-HANDOVER.md`
 
 ### 2026-07-19 — TDD + SOLID audit and Tier A production-bug fixes
 
