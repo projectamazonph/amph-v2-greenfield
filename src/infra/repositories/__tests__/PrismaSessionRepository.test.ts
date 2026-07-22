@@ -1,5 +1,5 @@
 /**
- * PrismaSessionRepository adapter test — P0-2 follow-up.
+ * PrismaSessionRepository adapter test, P0-2 follow-up.
  *
  * Uses a hand-rolled in-memory PrismaClient fake so the test stays
  * fast and DB-free, following the pattern established by
@@ -119,7 +119,7 @@ describe("PrismaSessionRepository", () => {
     expect(findResult.ok).toBe(false);
   });
 
-  it("deleteById is idempotent — deleting an unknown id is not an error", async () => {
+  it("deleteById is idempotent: deleting an unknown id is not an error", async () => {
     const result = await repo.deleteById("never-existed");
     expect(result.ok).toBe(true);
   });

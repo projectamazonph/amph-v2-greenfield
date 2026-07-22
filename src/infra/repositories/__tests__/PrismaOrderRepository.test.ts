@@ -1,5 +1,5 @@
 /**
- * PrismaOrderRepository adapter test — P0-2 follow-up.
+ * PrismaOrderRepository adapter test, P0-2 follow-up.
  *
  * Uses a hand-rolled in-memory PrismaClient fake so the test stays
  * fast and DB-free. The fake implements the same surface the adapter

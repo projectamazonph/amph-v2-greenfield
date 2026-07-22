@@ -1,16 +1,16 @@
 /**
- * PrismaAuditLog — production Prisma adapter for IAuditLog.
+ * PrismaAuditLog, production Prisma adapter for IAuditLog.
  *
  * P0-2 follow-up: every admin write (course/module/lesson CRUD, refund
  * overrides, discount codes, badges, simulator scenarios, live classes,
  * impersonation) calls `RecordAuditLog`, which was silently writing to
- * `InMemoryAuditLog` in production — the entire audit trail vanished on
+ * `InMemoryAuditLog` in production. The entire audit trail vanished on
  * every cold start / redeploy. `RecordAuditLog` never fails the business
  * operation on a write error, so this was invisible until someone went
  * looking for a trail that wasn't there.
  *
- * The domain `AuditLogEntry` doesn't carry `actorType` or `ipAddress` —
- * those columns exist on the Prisma model for future use but have no
+ * The domain `AuditLogEntry` doesn't carry `actorType` or `ipAddress`.
+ * Those columns exist on the Prisma model for future use but have no
  * source in the current domain model, so they're left at the schema
  * default / null here, same limitation pattern as `PrismaCourseRepository`
  * documents for `curriculum`/`status`.

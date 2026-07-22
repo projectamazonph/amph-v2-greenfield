@@ -1,5 +1,5 @@
 /**
- * PrismaAuditLog adapter test — P0-2 follow-up.
+ * PrismaAuditLog adapter test, P0-2 follow-up.
  *
  * Uses a hand-rolled in-memory PrismaClient fake so the test stays
  * fast and DB-free, following the pattern established by

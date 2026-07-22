@@ -216,7 +216,7 @@ describe("Order — guards", () => {
   });
 });
 
-describe("Order — hydrate() (reconstruction from persistence)", () => {
+describe("Order: hydrate() (reconstruction from persistence)", () => {
   function makeHydrateParams(overrides: Partial<OrderHydrateParams> = {}): OrderHydrateParams {
     return {
       id: "order_01",

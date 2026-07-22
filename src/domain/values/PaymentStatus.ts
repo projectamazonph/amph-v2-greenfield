@@ -31,7 +31,7 @@ export const PaymentStatus = {
   /**
    * Type guard for a value read back from persistence. A repository
    * adapter should call this before trusting a stored string as a
-   * `PaymentStatus` — a corrupt or legacy row must not silently
+   * `PaymentStatus`. A corrupt or legacy row must not silently
    * hydrate an impossible state that bypasses the entity's
    * transition guards.
    */

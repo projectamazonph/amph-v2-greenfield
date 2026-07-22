@@ -1,5 +1,5 @@
 /**
- * PrismaOrderRepository — production adapter for IOrderRepository.
+ * PrismaOrderRepository, production adapter for IOrderRepository.
  *
  * P0-2 follow-up: orders (and the money that flows through them) were
  * previously in-process only (InMemoryOrderRepository), so every order
@@ -9,7 +9,7 @@
  * webhook, and refunds all observe the same order state.
  *
  * The `status` column (added in migration 20260722000000_order_status)
- * carries the domain `PaymentStatus` state machine directly — it is
+ * carries the domain `PaymentStatus` state machine directly. It is
  * distinct from `paymongoStatus`, which is PayMongo's own vocabulary and
  * has no "DRAFT" equivalent (an order is DRAFT before a checkout session
  * exists at all).
@@ -161,7 +161,7 @@ export class PrismaOrderRepository implements IOrderRepository {
   private mapRow(row: PrismaOrderRow): Order {
     if (!PaymentStatus.isValid(row.status)) {
       // Caught by the surrounding try/catch in every caller and
-      // turned into a db_error — a corrupt or legacy status value
+      // turned into a db_error. A corrupt or legacy status value
       // must not silently hydrate an Order that bypasses the
       // entity's mark*() transition guards.
       throw new Error(`Order ${row.id} has an invalid persisted status: "${row.status}"`);

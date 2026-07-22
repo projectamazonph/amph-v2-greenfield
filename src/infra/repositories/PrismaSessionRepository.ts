@@ -1,10 +1,10 @@
 /**
- * PrismaSessionRepository — production adapter for SessionRepository.
+ * PrismaSessionRepository, production adapter for SessionRepository.
  *
  * P0-2 follow-up: sessions were still on `InMemorySessionRepository` in
  * production. Per-request auth is stateless JWT verification (the signed
  * cookie survives a redeploy on its own), so this gap didn't log anyone
- * out — but "logout everywhere" (`deleteAllForUser`) silently lost its
+ * out. "Logout everywhere" (`deleteAllForUser`), though, silently lost its
  * record set on every cold start, and any future server-side session
  * listing/revocation feature would have read from an empty store. The
  * `Session` Prisma model already existed; nothing was blocking this.

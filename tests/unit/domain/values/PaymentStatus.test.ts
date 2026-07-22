@@ -89,10 +89,17 @@ describe("PaymentStatus", () => {
     });
   });
 
-  describe("type coverage — all states are handled", () => {
+  describe("type coverage: all states are handled", () => {
     // TypeScript would error if a state is added without updating the helpers.
     // This is a compile-time exhaustiveness check expressed as a runtime test.
-    const allStatuses: PaymentStatus[] = ["PENDING", "PAID", "FAILED", "EXPIRED", "REFUNDED"];
+    const allStatuses: PaymentStatus[] = [
+      "DRAFT",
+      "PENDING",
+      "PAID",
+      "FAILED",
+      "EXPIRED",
+      "REFUNDED",
+    ];
 
     it("each status has a deterministic isPaid result", () => {
       allStatuses.forEach((s) => {
@@ -113,6 +120,12 @@ describe("PaymentStatus", () => {
         const result = PaymentStatus.isActive(s);
         expect(typeof result).toBe("boolean");
       });
+    });
+
+    it("DRAFT is not paid, final, or active", () => {
+      expect(PaymentStatus.isPaid("DRAFT")).toBe(false);
+      expect(PaymentStatus.isFinal("DRAFT")).toBe(false);
+      expect(PaymentStatus.isActive("DRAFT")).toBe(false);
     });
   });
 });

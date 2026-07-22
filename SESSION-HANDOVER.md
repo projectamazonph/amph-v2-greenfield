@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22 — PrismaOrderRepository + PrismaAuditLog close two P0-2 legs (PR #125, branch `claude/unfinished-stories-ivl2fw`, not yet merged to `main`).
+**Updated:** 2026-07-22. PrismaOrderRepository + PrismaAuditLog + PrismaSessionRepository close three P0-2 legs (PR #125, branch `claude/unfinished-stories-ivl2fw`, not yet merged to `main`).
 
 ---
 
@@ -11,10 +11,10 @@
 | Phase                         | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress (branch `claude/unfinished-stories-ivl2fw`)**                                                                                                                          |
 | Repo                          | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                           |
 | Default branch                | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                  |
-| `main` HEAD (at branch point) | `a2c69cc` — fix(ci): copy static assets into standalone bundle + correct artifact paths (#124)                                                                                                                                                          |
-| Unit + integration tests      | **2135 passing + 2 skipped, 0 TypeScript errors** (on `claude/unfinished-stories-ivl2fw`, not yet merged)                                                                                                                                               |
+| `main` HEAD (at branch point) | `a2c69cc`: fix(ci): copy static assets into standalone bundle + correct artifact paths (#124)                                                                                                                                                           |
+| Unit + integration tests      | **2156 passing + 2 skipped, 0 TypeScript errors** (on `claude/unfinished-stories-ivl2fw`, not yet merged)                                                                                                                                               |
 | Architecture compliance       | **406 tests passing, 0 violations** (on `claude/unfinished-stories-ivl2fw`)                                                                                                                                                                             |
-| Coverage                      | Lines 86.3% · Functions 87.59% · Statements 85.8% · Branches 78.12% (all above the configured `vitest.config.ts` thresholds — 80/70/80/80)                                                                                                              |
+| Coverage                      | Lines 86.3% (threshold 80%) · Functions 87.59% (threshold 80%) · Statements 85.8% (threshold 80%) · Branches 78.12% (threshold 70%). All four meet their own `vitest.config.ts` gate (the gate is not a uniform 80% across metrics; branches is 70%)    |
 | CI (this branch, PR #125)     | ✅ Typecheck+Lint · ✅ Architecture · Unit+integration and Build not independently re-verified via CI at doc time (local runs above are green) · E2E status not re-checked this session (last known state: pre-existing functional failures, see below) |
 | Database                      | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                                  |
 | Production                    | Not deployed                                                                                                                                                                                                                                            |
@@ -23,29 +23,29 @@
 
 ## What changed in this session (2026-07-22)
 
-### PrismaOrderRepository — closes the Order leg of P0-2 (branch `claude/unfinished-stories-ivl2fw`)
+### PrismaOrderRepository: closes the Order leg of P0-2 (branch `claude/unfinished-stories-ivl2fw`)
 
 Orders (and therefore every dollar that flows through checkout, the PayMongo
 webhook, and refunds) were still on `InMemoryOrderRepository` in
-`buildProductionContainer()` — a real production bug: orders vanish on
+`buildProductionContainer()`: a real production bug: orders vanish on
 every cold start / redeploy, and a webhook hitting a different serverless
 instance can never find the order it needs to mark PAID.
 
 - Added a `status` column to the `orders` table
   (`prisma/migrations/20260722000000_order_status/`) carrying the domain
   `PaymentStatus` state machine (`DRAFT | PENDING | PAID | FAILED | EXPIRED | REFUNDED`).
-  It didn't exist before — only `paymongoStatus` did, which is PayMongo's
+  It didn't exist before: only `paymongoStatus` did, which is PayMongo's
   own vocabulary and has no DRAFT equivalent.
-- Added `Order.hydrate()` — a reconstruction factory (distinct from
+- Added `Order.hydrate()`: a reconstruction factory (distinct from
   `Order.create()`) so a repository adapter can rebuild an `Order` instance
   from a DB row without routing through the `mark*()` state-transition
   guards, which are for callers that don't yet know the full history.
 - Implemented `src/infra/repositories/PrismaOrderRepository.ts` (real,
-  not a stub — every `IOrderRepository` method is Postgres-backed) and
+  not a stub: every `IOrderRepository` method is Postgres-backed) and
   wired it into `buildProductionContainer()` in place of
   `InMemoryOrderRepository`. The PayMongo webhook route
   (`src/app/api/webhooks/paymongo/route.ts`) already goes through
-  `buildContainer()`, so it picks this up automatically — no separate fix
+  `buildContainer()`, so it picks this up automatically: no separate fix
   needed there.
 - 41 new tests (`Order.hydrate()` in `tests/unit/domain/entities/Order.test.ts`
   - `src/infra/repositories/__tests__/PrismaOrderRepository.test.ts`, following
@@ -53,16 +53,16 @@ instance can never find the order it needs to mark PAID.
     `PrismaPasswordResetRepository.test.ts`). Full suite: 2131 passed, 2 skipped,
     0 failures. `pnpm tsc --noEmit` and `pnpm lint` clean. `pnpm build` succeeds.
 
-### PrismaAuditLog — closes the AuditLog leg of P0-2 (same session, same branch)
+### PrismaAuditLog: closes the AuditLog leg of P0-2 (same session, same branch)
 
 Every admin write (course/module/lesson CRUD, refund overrides, discount
 codes, badges, simulator scenarios, live classes, impersonation) calls
 `RecordAuditLog`, which was silently writing to `InMemoryAuditLog` in
-production — the entire admin audit trail vanished on every cold start /
+production: the entire admin audit trail vanished on every cold start /
 redeploy. `RecordAuditLog` never fails the business operation on a write
 error by design, so this was invisible until someone went looking for a
 trail that wasn't there. Unlike the Module/Lesson/Scenario/LiveClass
-adapters, the `AuditLog` Prisma model already existed in the schema — the
+adapters, the `AuditLog` Prisma model already existed in the schema: the
 `PrismaAuditLog.ts` stub's own comment ("the Prisma AuditLog table doesn't
 exist yet") was stale, not blocked.
 
@@ -71,7 +71,7 @@ exist yet") was stale, not blocked.
   `targetType`, `targetId`, `metadata`, `occurredAt`) onto the `audit_logs`
   table (`userId`, `action`, `resource`, `resourceId`, `payload`,
   `createdAt`). `actorType`/`ipAddress` have no domain-model source yet, so
-  they're left at schema defaults — same documented-limitation pattern as
+  they're left at schema defaults: same documented-limitation pattern as
   `PrismaCourseRepository`.
 - Wired it into `buildProductionContainer()` in place of `InMemoryAuditLog`.
 - 4 new tests (`src/infra/repositories/__tests__/PrismaAuditLog.test.ts`,
@@ -84,25 +84,25 @@ exist yet") was stale, not blocked.
 Three of four actionable findings addressed, one deferred (see the
 "Known follow-up" note above):
 
-- **Doc drift** — this file's top "Project Status" table still showed
+- **Doc drift**: this file's top "Project Status" table still showed
   1806/369 while the session log below said 2135/406. Reconciled; also
   fixed `CHANGELOG.md` wording that called the unit/integration run a
   "full suite" while E2E status was unverified.
-- **Index lock risk** — `CREATE INDEX "orders_status_idx"` in the
+- **Index lock risk**: `CREATE INDEX "orders_status_idx"` in the
   `order_status` migration would hold a write lock on `orders` for the
   build duration under Prisma's default transactional migration wrapper.
   Split into a second migration
   (`20260722000001_order_status_index_concurrently`) using
   `CREATE INDEX CONCURRENTLY` with the `-- prisma-migrate-disable-next-transaction`
   directive.
-- **Blind status cast** — `PrismaOrderRepository.mapRow()` cast
+- **Blind status cast**: `PrismaOrderRepository.mapRow()` cast
   `row.status as PaymentStatus` without validating it. Added
   `PaymentStatus.isValid()` (a proper type guard, not just a cast) and
   used it in `mapRow()`: an unrecognized persisted value now throws,
   which the surrounding try/catch in every caller converts to
   `db_error` instead of silently hydrating an `Order` that bypasses the
   `mark*()` transition guards.
-- **Postgres enum for `Order.status`** (suggested) — skipped. Every
+- **Postgres enum for `Order.status`** (suggested): skipped. Every
   other lifecycle `status` column in this schema
   (`Enrollment.status`, `PpcCampaign.status`, `EmailLog.status`,
   `QuizAttempt.status`, `Certificate.status`) is a plain `String` with
@@ -115,22 +115,22 @@ Three of four actionable findings addressed, one deferred (see the
   the actual correctness concern (untrusted data bypassing guards)
   without it.
 
-### PrismaSessionRepository — closes the Session leg of P0-2 (same session, same branch)
+### PrismaSessionRepository: closes the Session leg of P0-2 (same session, same branch)
 
 `sessionRepo` was on `InMemorySessionRepository` in production. Per-request
 auth is stateless JWT verification (the signed cookie survives a redeploy
-on its own — confirmed by grepping `src/middleware.ts` / `src/lib/auth.ts`
+on its own: confirmed by grepping `src/middleware.ts` / `src/lib/auth.ts`
 for `sessionRepo`, no hits), so this gap never logged anyone out. What it
-did break: `deleteAllForUser` — called from `ResetPassword` to invalidate
-every existing session once a user's password is reset — silently lost
+did break: `deleteAllForUser`, called from `ResetPassword` to invalidate
+every existing session once a user's password is reset: silently lost
 its record set on every cold start, and any future server-side session
 listing/revocation UI would read from an empty store. The `Session`
-Prisma model already existed — nothing was blocking this either.
+Prisma model already existed: nothing was blocking this either.
 
 - Implemented `src/infra/repositories/PrismaSessionRepository.ts` (real,
   not a stub). `deleteById`/`deleteAllForUser` use `deleteMany` rather
   than `delete`, matching `SessionRepository`'s documented contract that
-  `deleteById` is idempotent (Logout depends on this — see
+  `deleteById` is idempotent (Logout depends on this: see
   `src/usecases/Logout.ts`'s comment on the port's contract).
 - Wired it into `buildProductionContainer()` in place of
   `InMemorySessionRepository`; removed the now-stale comment explaining
@@ -141,10 +141,10 @@ Prisma model already existed — nothing was blocking this either.
   clean. `pnpm build` succeeds.
 
 **Remaining P0-2 items** (still in-memory in `buildProductionContainer()`):
-`discountCodeRepo` (partial — `findByCode`/`create`/`incrementUsedCount`
+`discountCodeRepo` (partial: `findByCode`/`create`/`incrementUsedCount`
 are real, but `listAll`/`findById`/`update`/`archive` are stubs pending
 STORY-050d admin CRUD), `moduleRepo`, `lessonRepo`, `scenarioRepo`,
-`liveClassRepo` — all four genuinely blocked on schema migrations (no
+`liveClassRepo`: all four genuinely blocked on schema migrations (no
 `Module`/`Lesson`/`SimulatorScenario`/`LiveClass` Prisma models yet; their
 `Prisma*Repository` files exist as documented stubs that throw
 `"schema migration"` errors on every call). Order, AuditLog, and Session
@@ -153,16 +153,54 @@ are now Postgres-backed in production.
 **Known follow-up (deferred, not blocking):** `PrismaOrderRepository.update()`
 matches by `id` only. Two concurrent writers (e.g. a delayed PayMongo
 webhook retry racing an admin refund) could theoretically let a stale
-write overwrite a newer state — the webhook already no-ops on an
+write overwrite a newer state: the webhook already no-ops on an
 already-PAID order, which covers the common case, but the underlying
 TOCTOU window exists. Explicitly deferred rather than fixed under
 review-comment pressure: the DB isn't provisioned yet (zero production
 traffic), and no other repository in this codebase does optimistic
 locking, so bolting it onto just `Order` would be a new, inconsistent
 pattern. If picked up, the design question is where the "expected prior
-status" comes from for the `update()` predicate — the `Order` entity
+status" comes from for the `update()` predicate: the `Order` entity
 doesn't currently track its pre-mutation status separately from the
 mutated one.
+
+### CodeRabbit review response, round 2 (same session)
+
+Ran again after the round-1 fix commit and the Session-repo commit. Three
+of four actionable findings addressed, one skipped with a documented
+reason:
+
+- **Em-dashes** in the round-1 diff (`CHANGELOG.md`, both migration
+  files, `PrismaAuditLog.ts`, its test header). `AGENTS.md` bans them
+  ("Don't use em-dashes. Use periods, commas, parentheses.") and this PR
+  had violated it throughout its own new content. Swept every file
+  touched this session for em-dashes and reworded them; left pre-existing
+  repo content (older `CHANGELOG.md`/`SESSION-HANDOVER.md` history,
+  `Order.test.ts` `describe()` blocks that predate this session) alone,
+  since a full-repo sweep is a separate, much larger cleanup.
+- **Coverage-threshold table**: the round-1 fix wrote
+  "78.12% (all above the configured thresholds, 80/70/80/80)", which
+  read as branches needing 80% when the real per-metric gate (per
+  `vitest.config.ts`, also documented in `CLAUDE.md`) is 80% lines / 70%
+  branches / 80% functions / 80% statements. The 78.12% branch figure
+  was always passing; only the table's wording was ambiguous. Reworded
+  to state each metric's own threshold explicitly.
+- **`DRAFT` missing from the `PaymentStatus` exhaustiveness test**: the
+  pre-existing `allStatuses` array in
+  `tests/unit/domain/values/PaymentStatus.test.ts` (not something this
+  session introduced, but a real gap now that `DRAFT` participates more
+  directly via `hydrate()`) only checked `typeof result === "boolean"`
+  for 5 of the 6 states and never asserted the actual value. Added
+  `DRAFT` to the array and a dedicated test asserting `isPaid`/`isFinal`/
+  `isActive` are all `false` for it.
+- **Colocate `PaymentStatus.test.ts` under `src/domain/values/__tests__/`**
+  (skipped). The suggestion cites "keep tests next to the code they
+  test," but `CLAUDE.md` explicitly documents two valid test locations
+  for this repo: colocated `__tests__/` folders and a mirrored tree under
+  `tests/unit/` (this file's actual, pre-existing location), both picked
+  up by `vitest.config.ts`. Moving a file I didn't create, to satisfy a
+  guideline this repo's own source of truth contradicts, is out of scope
+  for a review-comment fix.
 
 ## What changed in this session (2026-07-19)
 
