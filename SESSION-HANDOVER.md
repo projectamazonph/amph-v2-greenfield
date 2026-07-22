@@ -1,23 +1,23 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PrismaOrderRepository + PrismaAuditLog + PrismaSessionRepository close three P0-2 legs (PR #125, branch `claude/unfinished-stories-ivl2fw`, not yet merged to `main`).
+**Updated:** 2026-07-22. PR #125 (PrismaOrderRepository + PrismaAuditLog + PrismaSessionRepository) merged to `main`. PrismaDiscountCodeRepository admin CRUD in progress on a fresh `claude/unfinished-stories-ivl2fw` (restarted from `main` post-merge, not yet a PR).
 
 ---
 
 ## Project Status
 
-| Metric                        | Value                                                                                                                                                                                                                                                   |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                         | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress (branch `claude/unfinished-stories-ivl2fw`)**                                                                                                                          |
-| Repo                          | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                           |
-| Default branch                | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                  |
-| `main` HEAD (at branch point) | `a2c69cc`: fix(ci): copy static assets into standalone bundle + correct artifact paths (#124)                                                                                                                                                           |
-| Unit + integration tests      | **2156 passing + 2 skipped, 0 TypeScript errors** (on `claude/unfinished-stories-ivl2fw`, not yet merged)                                                                                                                                               |
-| Architecture compliance       | **406 tests passing, 0 violations** (on `claude/unfinished-stories-ivl2fw`)                                                                                                                                                                             |
-| Coverage                      | Lines 86.3% (threshold 80%) · Functions 87.59% (threshold 80%) · Statements 85.8% (threshold 80%) · Branches 78.12% (threshold 70%). All four meet their own `vitest.config.ts` gate (the gate is not a uniform 80% across metrics; branches is 70%)    |
-| CI (this branch, PR #125)     | ✅ Typecheck+Lint · ✅ Architecture · Unit+integration and Build not independently re-verified via CI at doc time (local runs above are green) · E2E status not re-checked this session (last known state: pre-existing functional failures, see below) |
-| Database                      | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                                  |
-| Production                    | Not deployed                                                                                                                                                                                                                                            |
+| Metric                   | Value                                                                                                                                                                                                                                              |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress**                                                                                                                                                                 |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                      |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                             |
+| `main` HEAD              | `f075fff`: fix(persistence): Order, AuditLog, Session move off in-memory adapters in production (P0-2) (#125, squash-merged)                                                                                                                       |
+| Unit + integration tests | **2175 passing + 2 skipped, 0 TypeScript errors** (local, on `claude/unfinished-stories-ivl2fw` rebased on the post-#125 `main`, not yet a PR)                                                                                                     |
+| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                                |
+| Coverage                 | Not re-measured after the DiscountCode work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, all above their own `vitest.config.ts` thresholds (80/70/80/80 in that per-metric order, branches is 70%, not 80%) |
+| CI                       | PR #125's CI ran and was green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. The DiscountCode work has only been run locally so far (`pnpm typecheck`/`lint`/`test`/`build` all green)      |
+| Database                 | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                             |
+| Production               | Not deployed                                                                                                                                                                                                                                       |
 
 ---
 
@@ -202,6 +202,58 @@ reason:
   guideline this repo's own source of truth contradicts, is out of scope
   for a review-comment fix.
 
+### PR #125 merged (same session)
+
+Squash-merged as `f075fff`. All 6 CI jobs green (Typecheck+Lint,
+Unit+integration, Architecture, Build, E2E, Lighthouse); 4 rounds of
+CodeRabbit review, final round clean. Local branch and the already
+auto-deleted remote branch both cleaned up; `claude/unfinished-stories-ivl2fw`
+recreated fresh from the post-merge `main` to continue P0-2 work.
+
+### PrismaDiscountCodeRepository admin CRUD: closes the DiscountCode leg of P0-2 (new branch, same session)
+
+`listAll`/`findById`/`update`/`archive` were stubs on
+`PrismaDiscountCodeRepository` (`findByCode`/`create`/`incrementUsedCount`
+were already real), so `buildProductionContainer()` fell back to
+`InMemoryDiscountCodeRepository` for the _entire_ discount-code repo, not
+just the stubbed methods. The `PrismaDiscountCodeRepository.ts` stub
+comments never claimed a schema blocker (unlike the Module/Lesson/Scenario/
+LiveClass stubs): `DiscountCode` already had a full Prisma model. The
+missing piece was "archived," which `InMemoryDiscountCodeRepository` tracks
+with a separate in-process `Set` that has no Postgres equivalent.
+
+- Added a nullable `archivedAt` column to `discount_codes`
+  (`prisma/migrations/20260722010000_discount_code_archived_at/`): null
+  means active, a timestamp means archived. Built its index with
+  `CREATE INDEX CONCURRENTLY` in a separate migration
+  (`..._index_concurrently`) proactively this time, applying the lesson
+  from PR #125's CodeRabbit review instead of waiting to be told:
+  `discount_codes` takes writes during checkout (`incrementUsedCount`), so
+  a plain `CREATE INDEX` would hold a write lock on it.
+- Implemented the four stub methods for real, matching
+  `InMemoryDiscountCodeRepository`'s exact contract: `findById` and
+  `listAll` hide archived codes (`findById` returns `null`, not an error,
+  for both "not found" and "archived": matches the existing InMemory
+  behavior), `findByCode` intentionally does _not_ filter on `archivedAt`
+  (also matching InMemory, unchanged), `update` maps a `P2002` (the `code`
+  string is patchable and unique) to `code_taken` the same way `create`
+  already does.
+- Wired `PrismaDiscountCodeRepository` into `buildProductionContainer()`
+  in place of `InMemoryDiscountCodeRepository`.
+- 24 new tests
+  (`src/infra/repositories/__tests__/PrismaDiscountCodeRepository.test.ts`,
+  same hand-rolled-fake-PrismaClient pattern). Full unit/integration suite:
+  2175 passed, 2 skipped, 0 failures. `pnpm tsc --noEmit` and `pnpm lint`
+  clean. `pnpm build` succeeds.
+
+**Remaining P0-2 items** (still in-memory in `buildProductionContainer()`):
+`moduleRepo`, `lessonRepo`, `scenarioRepo`, `liveClassRepo`, all four
+genuinely blocked on schema migrations (no `Module`/`Lesson`/
+`SimulatorScenario`/`LiveClass` Prisma models yet; their
+`Prisma*Repository` files exist as documented stubs that throw
+`"schema migration"` errors on every call). Order, AuditLog, Session, and
+now DiscountCode are all Postgres-backed in production.
+
 ## What changed in this session (2026-07-19)
 
 ### 1. Audit P0 remediation — all 7 P0 items closed (PRs #77–#89)
@@ -270,15 +322,15 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories)
 
-| ID  | Title                                                    | Status                                                                                                                                                                                           |
-| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| —   | P0-2 in-memory→Prisma migration (5 adapters remaining)   | Order + AuditLog + Session done (2026-07-22, this session, PR #125). PR #89 established the Course pattern; still queued: DiscountCode (admin CRUD methods), Module, Lesson, Scenario, LiveClass |
-| —   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                          |
-| 051 | Sentry setup                                             | Not started                                                                                                                                                                                      |
-| 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                                      |
-| 053 | Lighthouse CI                                            | Not started                                                                                                                                                                                      |
-| 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                                      |
-| 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                                      |
+| ID  | Title                                                    | Status                                                                                                                                                                                                                                |
+| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| —   | P0-2 in-memory→Prisma migration (4 adapters remaining)   | Order + AuditLog + Session (PR #125, merged) + DiscountCode (this session) done. PR #89 established the Course pattern; still queued: Module, Lesson, Scenario, LiveClass, all four blocked on schema migrations that don't exist yet |
+| —   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                                                               |
+| 051 | Sentry setup                                             | Not started                                                                                                                                                                                                                           |
+| 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                                                                           |
+| 053 | Lighthouse CI                                            | Not started                                                                                                                                                                                                                           |
+| 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                                                                           |
+| 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                                                                           |
 
 ### B. E2E failures (separate from compliance, ready for follow-up)
 

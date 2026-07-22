@@ -1,8 +1,14 @@
 /**
- * PrismaDiscountCodeRepository — production adapter for IDiscountCodeRepository.
+ * PrismaDiscountCodeRepository, production adapter for IDiscountCodeRepository.
  *
  * STORY-024: Discount code model + repository + apply in checkout.
- * STORY-050d: stub for listAll, findById, update, archive.
+ * STORY-050d / P0-2 follow-up: listAll/findById/update/archive were stubs
+ * because the discount_codes table had no way to represent "archived"
+ * (InMemoryDiscountCodeRepository tracks it with a separate in-process
+ * Set). Migration 20260722010000_discount_code_archived_at adds a
+ * nullable archivedAt column: null means active, a timestamp means
+ * archived. findByCode() intentionally does not filter on archivedAt,
+ * matching InMemoryDiscountCodeRepository's existing contract.
  */
 
 import { PrismaClient } from "@prisma/client";
@@ -16,14 +22,25 @@ import type { DiscountCode } from "@/domain/entities/DiscountCode";
 export class PrismaDiscountCodeRepository implements IDiscountCodeRepository {
   constructor(private readonly db: PrismaClient) {}
 
-  // STORY-050d: stub
   async listAll(): Promise<Result<DiscountCode[], DiscountCodeRepositoryError>> {
-    throw new Error("Not implemented: PrismaDiscountCodeRepository.listAll");
+    try {
+      const rows = await this.db.discountCode.findMany({
+        where: { archivedAt: null },
+      });
+      return Result.ok(rows.map((r) => this.mapRow(r)));
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
   }
 
-  // STORY-050d: stub
-  async findById(): Promise<Result<DiscountCode | null, DiscountCodeRepositoryError>> {
-    throw new Error("Not implemented: PrismaDiscountCodeRepository.findById");
+  async findById(id: string): Promise<Result<DiscountCode | null, DiscountCodeRepositoryError>> {
+    try {
+      const row = await this.db.discountCode.findUnique({ where: { id } });
+      if (!row || row.archivedAt !== null) return Result.ok(null);
+      return Result.ok(this.mapRow(row));
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
   }
 
   async findByCode(code: string): Promise<DiscountCode | null> {
@@ -63,14 +80,60 @@ export class PrismaDiscountCodeRepository implements IDiscountCodeRepository {
     }
   }
 
-  // STORY-050d: stub
-  async update(): Promise<Result<void, DiscountCodeRepositoryError>> {
-    throw new Error("Not implemented: PrismaDiscountCodeRepository.update");
+  async update(code: DiscountCode): Promise<Result<void, DiscountCodeRepositoryError>> {
+    try {
+      await this.db.discountCode.update({
+        where: { id: code.id },
+        data: {
+          code: code.code,
+          type: code.type,
+          value: code.value,
+          maxUses: code.maxUses,
+          validFrom: code.validFrom,
+          validUntil: code.validUntil,
+          courseIds: [...code.courseIds],
+        },
+      });
+      return Result.ok(undefined);
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2002"
+      ) {
+        return Result.err({ kind: "code_taken" });
+      }
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
   }
 
-  // STORY-050d: stub
-  async archive(): Promise<Result<void, DiscountCodeRepositoryError>> {
-    throw new Error("Not implemented: PrismaDiscountCodeRepository.archive");
+  async archive(id: string): Promise<Result<void, DiscountCodeRepositoryError>> {
+    try {
+      await this.db.discountCode.update({
+        where: { id },
+        data: { archivedAt: new Date() },
+      });
+      return Result.ok(undefined);
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
   }
 
   async incrementUsedCount(
