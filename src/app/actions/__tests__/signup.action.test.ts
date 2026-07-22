@@ -34,10 +34,12 @@ import { buildTestContainer } from "@/composition/container.test";
 type MockPlantCookie = Mock<(token: string, expiresAt: Date) => Promise<void>>;
 type MockNavigate = Mock<(url: string) => never>;
 
-function makeDeps(overrides: {
-  plantCookie?: MockPlantCookie;
-  navigate?: MockNavigate;
-} = {}): {
+function makeDeps(
+  overrides: {
+    plantCookie?: MockPlantCookie;
+    navigate?: MockNavigate;
+  } = {},
+): {
   plantCookie: MockPlantCookie;
   navigate: MockNavigate;
 } {
@@ -265,6 +267,40 @@ describe("performSignUp", () => {
     // The plantCookie was attempted though
     expect(failingDeps.plantCookie).toHaveBeenCalledTimes(1);
     void deps;
+  });
+
+  it("returns rate_limited when the IP bucket is exhausted", async () => {
+    const container = freshContainer();
+    const deps = makeDeps();
+    // Limit is 10/hour/IP (SIGNUP_IP_LIMIT). Exhaust it with 10 calls
+    // (each a distinct email so they don't fail on email_taken first),
+    // then confirm the 11th is rejected before reaching SignUp.
+    for (let i = 0; i < 10; i++) {
+      await performSignUp(
+        container,
+        {
+          email: `bucket-${i}@test.example.com`,
+          password: "validPassword123",
+          firstName: "Test",
+          lastName: "User",
+          ip: "1.2.3.4",
+        },
+        asProdDeps(makeDeps()),
+      ).catch(() => undefined); // some of these redirect (throw NEXT_REDIRECT)
+    }
+    const result = await performSignUp(
+      container,
+      {
+        email: "overflow@test.example.com",
+        password: "validPassword123",
+        firstName: "Test",
+        lastName: "User",
+        ip: "1.2.3.4",
+      },
+      asProdDeps(deps),
+    );
+    expect(result).toEqual({ kind: "rate_limited" });
+    expect(deps.navigate).not.toHaveBeenCalled();
   });
 
   it("returns unexpected error if the use case throws", async () => {

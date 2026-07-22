@@ -29,6 +29,12 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { CreatePaymentIntentError } from "@/usecases/CreatePaymentIntent";
 
+// STORY-054: guards against a single account hammering checkout-session
+// creation (each call round-trips to PayMongo). Generous enough that a
+// student retrying a failed payment a few times never hits it.
+const CHECKOUT_USER_LIMIT = 10;
+const CHECKOUT_USER_WINDOW_SECONDS = 3600;
+
 export type CheckoutActionState =
   | { kind: "idle" }
   | { kind: "unauthorized" }
@@ -37,6 +43,7 @@ export type CheckoutActionState =
   | { kind: "course_not_published" }
   | { kind: "already_enrolled" }
   | { kind: "payment_error"; message: string }
+  | { kind: "rate_limited" }
   | { kind: "redirect"; checkoutUrl: string; orderId: string };
 
 const INITIAL: CheckoutActionState = { kind: "idle" };
@@ -63,6 +70,18 @@ export async function startCheckout(
   }
 
   const container = buildContainer();
+
+  // Rate limit by user (STORY-054). Fails open if the limiter errors,
+  // matching RequestPasswordReset's pattern.
+  const rl = await container.rateLimiter.check({
+    key: `checkout:user:${userId}`,
+    limit: CHECKOUT_USER_LIMIT,
+    windowSeconds: CHECKOUT_USER_WINDOW_SECONDS,
+  });
+  if (rl.ok && !rl.value.allowed) {
+    return { kind: "rate_limited" };
+  }
+
   const result = await container.createPaymentIntent.execute({
     userId,
     courseSlug: slug,

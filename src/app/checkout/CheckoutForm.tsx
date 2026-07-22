@@ -193,8 +193,8 @@ export default function CheckoutForm() {
           <div style={PAGE_STYLES.logo}>AMPH</div>
           <h1 style={PAGE_STYLES.title}>Confirm your purchase</h1>
           <p style={PAGE_STYLES.subtitle}>
-            You'll be redirected to PayMongo to complete payment. We accept
-            cards, GCash, and GrabPay.
+            You'll be redirected to PayMongo to complete payment. We accept cards, GCash, and
+            GrabPay.
           </p>
         </div>
 
@@ -232,8 +232,13 @@ export default function CheckoutForm() {
         )}
         {state.kind === "payment_error" && (
           <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
-            Could not start checkout: {state.message}. Please try again, or
-            contact support if the problem persists.
+            Could not start checkout: {state.message}. Please try again, or contact support if the
+            problem persists.
+          </div>
+        )}
+        {state.kind === "rate_limited" && (
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+            Too many checkout attempts. Please wait a bit and try again.
           </div>
         )}
 
@@ -256,8 +261,8 @@ export default function CheckoutForm() {
         </div>
 
         <p style={PAGE_STYLES.hint}>
-          The exact price (including any active discount codes) is shown on the
-          PayMongo checkout page. We never store your card details.
+          The exact price (including any active discount codes) is shown on the PayMongo checkout
+          page. We never store your card details.
         </p>
 
         <form action={formAction} style={PAGE_STYLES.form}>

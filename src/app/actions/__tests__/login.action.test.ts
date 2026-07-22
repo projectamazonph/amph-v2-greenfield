@@ -55,10 +55,12 @@ async function seedUser(
 type MockPlantCookie = Mock<(token: string, expiresAt: Date) => Promise<void>>;
 type MockNavigate = Mock<(url: string) => never>;
 
-function makeDeps(overrides: {
-  plantCookie?: MockPlantCookie;
-  navigate?: MockNavigate;
-} = {}): {
+function makeDeps(
+  overrides: {
+    plantCookie?: MockPlantCookie;
+    navigate?: MockNavigate;
+  } = {},
+): {
   plantCookie: MockPlantCookie;
   navigate: MockNavigate;
 } {
@@ -189,6 +191,27 @@ describe("performLogin", () => {
       ),
     ).rejects.toThrow("NEXT_REDIRECT");
     expect(navigate).toHaveBeenCalledWith("/courses");
+  });
+
+  it("returns rate_limited when the email bucket is exhausted", async () => {
+    const container = freshContainer();
+    await seedUser(container, "u@test.example.com", "correct-password");
+    // Exhaust the email bucket (limit 5) with wrong-password attempts,
+    // then confirm the 6th attempt is rejected before reaching Login.
+    const deps = makeDeps();
+    for (let i = 0; i < 5; i++) {
+      await performLogin(
+        container,
+        { email: "u@test.example.com", password: "wrong", redirectTo: "/x" },
+        deps,
+      );
+    }
+    const result = await performLogin(
+      container,
+      { email: "u@test.example.com", password: "correct-password", redirectTo: "/x" },
+      deps,
+    );
+    expect(result).toEqual({ kind: "rate_limited" });
   });
 
   it("rejects //evil.com protocol-relative URLs", async () => {

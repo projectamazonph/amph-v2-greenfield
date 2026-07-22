@@ -23,6 +23,7 @@
 
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { setAuthCookie } from "@/lib/auth";
@@ -32,20 +33,34 @@ import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
+import type { RateLimiter } from "@/ports/security/RateLimiter";
+
+// STORY-054: signup is a common automated-abuse vector (fake account
+// farming, email enumeration via email_taken). 10/hour/IP is generous
+// for shared IPs (offices, schools) but blocks scripted abuse.
+const SIGNUP_IP_LIMIT = 10;
+const SIGNUP_IP_WINDOW_SECONDS = 3600;
 
 /**
  * The discriminated union returned to the action wrapper (and to the
  * page via useActionState). Mirrors the error variants of the SignUp
  * use case + adds `invalid_input` for the action's own null checks +
- * `unexpected` for caught exceptions.
+ * `rate_limited` for STORY-054 + `unexpected` for caught exceptions.
  */
-export type SignUpResult = { kind: "success"; email: string } | SignUpError | { kind: "invalid_input" } | { kind: "unexpected"; message: string };
+export type SignUpResult =
+  | { kind: "success"; email: string }
+  | SignUpError
+  | { kind: "invalid_input" }
+  | { kind: "rate_limited" }
+  | { kind: "unexpected"; message: string };
 
 export interface SignUpInput {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
+  /** Client IP for rate limiting (STORY-054). Defaults to "0.0.0.0" if omitted. */
+  ip?: string;
 }
 
 /**
@@ -71,6 +86,7 @@ export async function performSignUp(
     clock: Clock;
     login: Login;
     resendVerification: import("@/usecases/auth/ResendVerification").ResendVerification;
+    rateLimiter: RateLimiter;
   },
   input: SignUpInput,
   deps: {
@@ -81,6 +97,19 @@ export async function performSignUp(
   // 1. Input validation
   if (!input.email || !input.password || !input.firstName || !input.lastName) {
     return { kind: "invalid_input" };
+  }
+
+  // 1b. Rate limit by IP (STORY-054). Fails open (allowed) if the
+  // limiter itself errors — matches RequestPasswordReset's pattern,
+  // and keeps signup working when Upstash env vars aren't configured.
+  const ip = input.ip ?? "0.0.0.0";
+  const rl = await container.rateLimiter.check({
+    key: `signup:ip:${ip}`,
+    limit: SIGNUP_IP_LIMIT,
+    windowSeconds: SIGNUP_IP_WINDOW_SECONDS,
+  });
+  if (rl.ok && !rl.value.allowed) {
+    return { kind: "rate_limited" };
   }
 
   // 2. Call the SignUp use case
@@ -174,11 +203,16 @@ export async function signUpAction(
   _prevState: SignUpState,
   formData: FormData,
 ): Promise<SignUpState> {
+  const hdrs = await headers();
+  const ip =
+    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "0.0.0.0";
+
   const input: SignUpInput = {
     email: (formData.get("email") as string) ?? "",
     password: (formData.get("password") as string) ?? "",
     firstName: (formData.get("firstName") as string) ?? "",
     lastName: (formData.get("lastName") as string) ?? "",
+    ip,
   };
 
   try {

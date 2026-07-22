@@ -32,12 +32,21 @@ export function LoginForm() {
           <div style={styles.alert}>
             {errorFromQuery === "wrong_password" && "Incorrect email or password."}
             {errorFromQuery === "user_not_found" && "No account with that email."}
-            {errorFromQuery === "account_suspended" && "This account has been suspended. Contact support."}
-            {errorFromQuery === "account_locked" && "This account is locked. Reset your password to unlock."}
+            {errorFromQuery === "account_suspended" &&
+              "This account has been suspended. Contact support."}
+            {errorFromQuery === "account_locked" &&
+              "This account is locked. Reset your password to unlock."}
             {errorFromQuery === "invalid_input" && "Please enter your email and password."}
-            {!["wrong_password", "user_not_found", "account_suspended", "account_locked", "invalid_input"].includes(
-              errorFromQuery,
-            ) && "Sign-in failed. Please try again."}
+            {errorFromQuery === "rate_limited" &&
+              "Too many sign-in attempts. Please wait a bit and try again."}
+            {![
+              "wrong_password",
+              "user_not_found",
+              "account_suspended",
+              "account_locked",
+              "invalid_input",
+              "rate_limited",
+            ].includes(errorFromQuery) && "Sign-in failed. Please try again."}
           </div>
         )}
 

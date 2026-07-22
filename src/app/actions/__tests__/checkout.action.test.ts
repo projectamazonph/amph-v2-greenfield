@@ -27,9 +27,11 @@ vi.mock("@/lib/auth", () => ({
 
 // Mock buildContainer so we control the CreatePaymentIntent output.
 const mockCreatePaymentIntent = vi.fn();
+const mockRateLimiterCheck = vi.fn();
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     createPaymentIntent: { execute: mockCreatePaymentIntent },
+    rateLimiter: { check: mockRateLimiterCheck },
   }),
 }));
 
@@ -48,6 +50,11 @@ describe("startCheckout (server action)", () => {
   beforeEach(() => {
     mockGetSessionUserId.mockReset();
     mockCreatePaymentIntent.mockReset();
+    mockRateLimiterCheck.mockReset();
+    mockRateLimiterCheck.mockResolvedValue({
+      ok: true,
+      value: { allowed: true, remaining: 9, resetSeconds: 3600 },
+    });
   });
 
   it("exports an initial state of kind: idle", () => {
@@ -55,10 +62,7 @@ describe("startCheckout (server action)", () => {
   });
 
   it("returns invalid_input when courseSlug is empty", async () => {
-    const result = await startCheckout(
-      { kind: "idle" },
-      makeFormData({ courseSlug: "" }),
-    );
+    const result = await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "" }));
     expect(result.kind).toBe("invalid_input");
     if (result.kind === "invalid_input") {
       expect(result.message).toMatch(/missing course/i);
@@ -68,19 +72,13 @@ describe("startCheckout (server action)", () => {
   });
 
   it("returns invalid_input when courseSlug is missing from the form", async () => {
-    const result = await startCheckout(
-      { kind: "idle" },
-      makeFormData({}),
-    );
+    const result = await startCheckout({ kind: "idle" }, makeFormData({}));
     expect(result.kind).toBe("invalid_input");
   });
 
   it("returns unauthorized when no session is present", async () => {
     mockGetSessionUserId.mockResolvedValueOnce(null);
-    const result = await startCheckout(
-      { kind: "idle" },
-      makeFormData({ courseSlug: "ppc-101" }),
-    );
+    const result = await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
     expect(result.kind).toBe("unauthorized");
     expect(mockCreatePaymentIntent).not.toHaveBeenCalled();
   });
@@ -92,10 +90,7 @@ describe("startCheckout (server action)", () => {
       checkoutUrl: "https://paymongo.com/cs_test_abc",
       orderId: "ord_1",
     });
-    const result = await startCheckout(
-      { kind: "idle" },
-      makeFormData({ courseSlug: "ppc-101" }),
-    );
+    const result = await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
     expect(result.kind).toBe("redirect");
     if (result.kind === "redirect") {
       expect(result.checkoutUrl).toBe("https://paymongo.com/cs_test_abc");
@@ -113,10 +108,7 @@ describe("startCheckout (server action)", () => {
       ok: false,
       error: { kind: "course_not_found" },
     });
-    const result = await startCheckout(
-      { kind: "idle" },
-      makeFormData({ courseSlug: "missing" }),
-    );
+    const result = await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "missing" }));
     expect(result.kind).toBe("course_not_found");
   });
 
@@ -139,10 +131,7 @@ describe("startCheckout (server action)", () => {
       ok: false,
       error: { kind: "already_enrolled" },
     });
-    const result = await startCheckout(
-      { kind: "idle" },
-      makeFormData({ courseSlug: "ppc-101" }),
-    );
+    const result = await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
     expect(result.kind).toBe("already_enrolled");
   });
 
@@ -152,14 +141,35 @@ describe("startCheckout (server action)", () => {
       ok: false,
       error: { kind: "payment_error", message: "PayMongo down" },
     });
-    const result = await startCheckout(
-      { kind: "idle" },
-      makeFormData({ courseSlug: "ppc-101" }),
-    );
+    const result = await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
     expect(result.kind).toBe("payment_error");
     if (result.kind === "payment_error") {
       expect(result.message).toBe("PayMongo down");
     }
+  });
+
+  it("returns rate_limited and skips CreatePaymentIntent when the limiter denies the request", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    mockRateLimiterCheck.mockResolvedValueOnce({
+      ok: true,
+      value: { allowed: false, remaining: 0, resetSeconds: 3600 },
+    });
+    const result = await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
+    expect(result.kind).toBe("rate_limited");
+    expect(mockCreatePaymentIntent).not.toHaveBeenCalled();
+  });
+
+  it("calls the rate limiter with a user-scoped key", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    mockCreatePaymentIntent.mockResolvedValueOnce({
+      ok: true,
+      checkoutUrl: "https://paymongo.com/cs_test_abc",
+      orderId: "ord_1",
+    });
+    await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
+    expect(mockRateLimiterCheck).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "checkout:user:user-1" }),
+    );
   });
 
   it("trims whitespace from the courseSlug before passing it on", async () => {
@@ -169,10 +179,7 @@ describe("startCheckout (server action)", () => {
       checkoutUrl: "https://paymongo.com/cs_test",
       orderId: "ord_1",
     });
-    await startCheckout(
-      { kind: "idle" },
-      makeFormData({ courseSlug: "  ppc-101  " }),
-    );
+    await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "  ppc-101  " }));
     expect(mockCreatePaymentIntent).toHaveBeenCalledWith({
       userId: "user-1",
       courseSlug: "ppc-101",

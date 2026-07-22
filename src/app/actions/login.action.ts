@@ -21,11 +21,20 @@
 
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { setAuthCookie } from "@/lib/auth";
 import { Login, type LoginOutput } from "@/usecases/Login";
 import type { Result } from "@/domain/shared/Result";
+import type { RateLimiter } from "@/ports/security/RateLimiter";
+
+// STORY-054: standard brute-force protection buckets, mirroring
+// RequestPasswordReset's email+IP two-tier pattern.
+const LOGIN_EMAIL_LIMIT = 5;
+const LOGIN_EMAIL_WINDOW_SECONDS = 900;
+const LOGIN_IP_LIMIT = 20;
+const LOGIN_IP_WINDOW_SECONDS = 900;
 
 /**
  * Pure login helper. Takes the container (so tests can pass
@@ -39,11 +48,12 @@ import type { Result } from "@/domain/shared/Result";
 export type LoginResult =
   | { kind: "success"; redirectTo: string }
   | { kind: "redirect_to_login"; errorKind: string }
-  | { kind: "invalid_input" };
+  | { kind: "invalid_input" }
+  | { kind: "rate_limited" };
 
 export async function performLogin(
-  container: { login: Login },
-  input: { email: string; password: string; redirectTo: string },
+  container: { login: Login; rateLimiter: RateLimiter },
+  input: { email: string; password: string; redirectTo: string; ip?: string },
   deps: {
     plantCookie: (token: string, expiresAt: Date) => Promise<void>;
     navigate: (url: string) => never;
@@ -53,12 +63,31 @@ export async function performLogin(
     return { kind: "invalid_input" };
   }
 
+  // Rate limit by email AND by IP (STORY-054). Fails open (allowed)
+  // if the limiter itself errors, matching RequestPasswordReset.
+  const ip = input.ip ?? "0.0.0.0";
+  const emailRL = await container.rateLimiter.check({
+    key: `login:email:${input.email.toLowerCase()}`,
+    limit: LOGIN_EMAIL_LIMIT,
+    windowSeconds: LOGIN_EMAIL_WINDOW_SECONDS,
+  });
+  if (emailRL.ok && !emailRL.value.allowed) {
+    return { kind: "rate_limited" };
+  }
+  const ipRL = await container.rateLimiter.check({
+    key: `login:ip:${ip}`,
+    limit: LOGIN_IP_LIMIT,
+    windowSeconds: LOGIN_IP_WINDOW_SECONDS,
+  });
+  if (ipRL.ok && !ipRL.value.allowed) {
+    return { kind: "rate_limited" };
+  }
+
   // Reject open redirects — only allow relative paths starting with
   // a single `/` (defense against `//evil.com` protocol-relative
   // trickery AND `https://evil.com` absolute URLs).
   const safeRedirect =
-    input.redirectTo.startsWith("/") &&
-    !input.redirectTo.startsWith("//")
+    input.redirectTo.startsWith("/") && !input.redirectTo.startsWith("//")
       ? input.redirectTo
       : "/courses";
 
@@ -85,14 +114,17 @@ export async function performLogin(
 export async function loginAndRedirect(formData: FormData): Promise<void> {
   const email = formData.get("email") as string | null;
   const password = formData.get("password") as string | null;
-  const redirectTo =
-    (formData.get("redirectTo") as string | null) ?? "/courses";
+  const redirectTo = (formData.get("redirectTo") as string | null) ?? "/courses";
+
+  const hdrs = await headers();
+  const ip =
+    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "0.0.0.0";
 
   const container = buildContainer();
 
   const outcome = await performLogin(
     container,
-    { email: email ?? "", password: password ?? "", redirectTo },
+    { email: email ?? "", password: password ?? "", redirectTo, ip },
     {
       plantCookie: setAuthCookie,
       navigate: (url) => redirect(url),
@@ -101,6 +133,9 @@ export async function loginAndRedirect(formData: FormData): Promise<void> {
 
   if (outcome.kind === "invalid_input") {
     redirect("/login?error=invalid_input");
+  }
+  if (outcome.kind === "rate_limited") {
+    redirect("/login?error=rate_limited");
   }
   if (outcome.kind === "redirect_to_login") {
     redirect(`/login?error=${outcome.errorKind}`);

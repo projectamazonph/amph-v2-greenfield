@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-23. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), PR #129 (Module/Lesson), PR #132 (PricingTier + arch test Windows-path fix), and PR #134 (MDX renderer port + adapter) all merged or in flight to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Sprint 3 (Catalog Foundation) in progress ΓÇö STORY-011 + STORY-012 closed; STORY-013ΓÇô020 still queued. Same session: investigated the stale 2026-07-19 E2E failure report and fixed a real bug in the E2E cleanup helper.
+**Updated:** 2026-07-23. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), PR #129 (Module/Lesson), PR #131 (Module/Lesson audit-log wiring), PR #132 (PricingTier + arch test Windows-path fix), PR #133 (rate limiting actually wired into signup/login/checkout), and PR #134 (MDX renderer port + adapter) all merged to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Sprint 3 (Catalog Foundation) in progress: STORY-011 + STORY-012 closed; STORY-013 through 020 still queued. This entry also folds in a separate session's work: a full story-by-story gap audit of every "Done" story (see the "Full story-by-story gap audit" log entry below) and the rate-limiting fix from PR #133, rebased onto this branch's history after the PricingTier/MDX-renderer work landed in parallel.
 
 ---
 
@@ -21,6 +21,159 @@
 | Production               | Not deployed                                                                                                                                                                                                                                             |
 
 ---
+
+## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`, continued further)
+
+### Full story-by-story gap audit + rate-limiting closed (same session, after PR #131 merged)
+
+PR #131 merged (squash, as `df1fda0`). Every `docs/stories/STORY-XXX.md` file
+claims "✅ Done," so instead of trusting that, ran five parallel research
+agents to independently verify every story (001–055) against the actual
+running code: does the claimed file/export exist, does the acceptance
+criteria actually hold, are there TODOs/stubs/dead code contradicting the
+"Done" status. Found ~20 real gaps. Highlights (full detail in each
+agent's report, summarized in chat):
+
+- **Security-relevant:** `Login` has no rate limiting and no
+  email-verification gate (unverified accounts can sign in); `SignUp`
+  has no rate limiting; `RateLimiter`/`UpstashRateLimiter` are fully
+  built but were never wired into `signUpAction`/`loginAndRedirect`/
+  `startCheckout` at all (STORY-054's own goal statement names exactly
+  these three flows); password reset deletes `SessionRepository` rows
+  but nothing in the JWT-verification path (`src/lib/auth.ts`,
+  `src/proxy.ts`) ever checks `SessionRepository`, so a still-valid JWT
+  survives a password reset.
+- **Features that look wired but aren't:** `PrismaCourseRepository`
+  hardcodes every course to `courseTier: "STARTER"` (tier gating can't
+  work in production); discount codes can be created by admins but
+  `CreatePaymentIntent`/checkout UI have no way to apply one; student
+  `RequestRefund` is dead code (never wired to an action/route);
+  `course_completed` `ProgressEvent` never fires on last-lesson
+  completion; no XP display anywhere in the UI; `RecordStreakVisit`
+  never called from the app; lesson page hardcodes
+  `completedLessonIds = []` so module-progress/next-lesson-nav/
+  `CourseCompleteView` never actually render real state;
+  `withActionTracing` is applied to zero of the 34 real server
+  actions; Web Vitals silently no-op in production (logger never
+  passed); `critical-journeys.spec.ts` has 4 of 6 scenarios stubbed
+  with `test.skip()`; `docs/security/tenant-isolation.md` cites file
+  paths that don't exist anywhere in the repo.
+- **Admin audit-trail:** `ImpersonateUser.ts` still only
+  `console.log()`s with a stale `TODO` instead of calling
+  `RecordAuditLog` (the port has existed since STORY-050a);
+  `ProcessRefund`'s standard (non-override) path still has no audit
+  logging (disclosed as out-of-scope by two stories, never closed).
+- **Test-coverage gaps:** STORY-035 (badge container-wiring test),
+  STORY-002 (no `PrismaUserRepository`/`InMemoryUserRepository`/`User`
+  tests), STORY-001 (missing ESLint-boundary canary test), STORY-046
+  (no admin dashboard test), STORY-047 (no admin users-page tests),
+  STORY-049 (missing payment-gateway infra tests).
+- **Good news:** CLAUDE.md's "Known gaps" claims about `courseRepo`/
+  `orderRepo` being in-memory and the PayMongo webhook bypassing the
+  container are both **stale** — confirmed both are properly
+  Prisma/container-wired now. The four simulators (STORY-036–040) are
+  genuinely done; only their status-line doc pointer is wrong.
+
+Picked off the highest-priority item first: **rate limiting was fully
+built (port, Upstash adapter, in-memory fake, container wiring) but
+never actually called anywhere**, per `tests/architecture/
+rate-limit-wiring.test.ts` only checking file existence, never real
+usage. Fixed per STORY-054's own (previously unchecked) acceptance
+criterion — wire the check into the actions, not the use cases:
+
+- `src/app/actions/signup.action.ts`: `performSignUp` now rate-limits
+  by IP (10/hour) before calling `SignUp`. `signUpAction` extracts the
+  client IP from `x-forwarded-for`/`x-real-ip`, matching
+  `RequestPasswordReset`'s existing pattern exactly.
+- `src/app/actions/login.action.ts`: `performLogin` now rate-limits by
+  email (5/15min) AND IP (20/15min), mirroring `RequestPasswordReset`'s
+  two-tier check. `loginAndRedirect` redirects to
+  `/login?error=rate_limited` on denial.
+- `src/app/actions/checkout.action.ts`: `startCheckout` rate-limits by
+  authenticated user (10/hour) before calling `CreatePaymentIntent`.
+- All three fail open (allow) if `rateLimiter.check()` itself errors —
+  same as `RequestPasswordReset`, and consistent with Upstash's lazy
+  no-op when its env vars are unset, so local/CI builds and a
+  not-yet-configured production deploy both keep working.
+- Added `rate_limited` copy to the login, signup, and checkout forms.
+- Strengthened `tests/architecture/rate-limit-wiring.test.ts`: it
+  previously only asserted the port/adapter files exist, not that
+  anything actually called `.check()` — added 3 assertions that each
+  of the three actions' source contains `rateLimiter.check(`.
+- 7 new tests (bucket-exhaustion tests for login/signup, rate-limited +
+  key-shape tests for checkout, 3 new architecture assertions). Full
+  suite: 2265 passed, 2 skipped (was 2258). `pnpm tsc --noEmit`,
+  `pnpm lint`, `pnpm build` all clean.
+- Did NOT touch: the email-verification gate on `Login`, the
+  session-revocation-on-password-reset gap, or any of the other ~15
+  gaps found by the audit — each is a separate, independently-scoped
+  fix. See "Open Work" below for the prioritized list.
+
+## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`, continued)
+
+### Module/Lesson admin CRUD now writes to the audit trail (same session, after PR #130 merged)
+
+PR #130 merged (squash, as `2bedfcf`); branch recreated fresh from
+post-merge `main` again. Every PR description in this P0-2 series has
+carried the same unchecked architecture-checklist box: "No admin
+mutation without an `AuditLog` entry — pre-existing gap, `Module`/
+`Lesson` CRUD use cases don't call `RecordAuditLog` yet." Picked that
+up as the next well-scoped item: `src/domain/values/AuditAction.ts`
+already reserved `module.created`/`updated`/`deleted`/`reordered` and
+the `lesson.*` equivalents (present since STORY-050a), but no use case
+ever called `recordAuditLog.execute()` with them, unlike every other
+admin resource (`LiveClass`, `DiscountCode`, `Badge`,
+`SimulatorScenario`, `Course`). Confirmed with a grep across all 8
+Module/Lesson use case files before starting: zero hits for
+`recordAuditLog`.
+
+- Added the missing `_failed` variants to `AuditAction`
+  (`module.create_failed`/`update_failed`/`delete_failed`/
+  `reorder_failed` and the `lesson.*` equivalents), matching the
+  pattern every other admin resource already has (see
+  `discount_code.*`/`badge.*`/`live_class.*` in the same file).
+- `CreateModule`, `UpdateModule`, `DeleteModule`, `ReorderModules`,
+  `CreateLesson`, `UpdateLesson`, `DeleteLesson`, `ReorderLessons`
+  (8 use cases): added `actorId: string` to each `Input`, added
+  `recordAuditLog: RecordAuditLog` to each `Deps`, and called
+  `recordAuditLog.execute({...})` on every success **and** failure
+  exit path, mirroring `CreateLiveClass`/`UpdateLiveClass`/
+  `DeleteLiveClass` exactly (the established template for this
+  pattern). Reorder's audit metadata carries the full requested
+  `moduleIds`/`lessonIds` array; create/update/delete carry the
+  relevant title/patch/error.
+- Threaded `actorId` through the 8 corresponding server actions
+  (`create`/`update`/`delete`/`reorderModules.action.ts` and the
+  `Lesson` equivalents). These actions already resolved the acting
+  admin's id via `getCurrentAdminId()` for the authorization check;
+  the only change was passing that same id into the use case call as
+  `actorId` instead of discarding it. For the four actions whose
+  exported input type was the raw use-case `Input` (`deleteModule`,
+  `reorderModules`, `deleteLesson`, `reorderLessons`), added a
+  `*PageInput = Omit<*Input, "actorId">` type and updated the
+  exported function's parameter to it, so pages don't need to (and
+  can't) pass `actorId` themselves, per this file's own documented
+  "actorId is injected by the server action, never by the page"
+  invariant. `createModule`/`updateModule` needed the same `PageInput`
+  treatment; `createLesson`/`updateLesson` already had their own
+  distinct form-input types, so only the internal `execute()` call
+  needed the new field.
+- Wired `recordAuditLog` (already an existing, in-scope local in both
+  container builders) into all 8 use case constructors in
+  `buildProductionContainer()` and `buildTestContainer()`
+  (`container.ts` / `container.test.ts`).
+- Updated all 8 existing use-case test files: added `actorId` to
+  every `execute()` call, wired a `RecordAuditLog` +
+  `InMemoryAuditLog` fake into each `beforeEach` (same pattern as
+  `CreateLiveClass.test.ts`), and added two new tests per use case
+  (16 total) asserting an audit entry lands on both the success and
+  the primary failure path.
+- Full unit/integration suite: 2258 passed, 2 skipped (was 2242
+  before this session's start), 0 failures. `pnpm tsc --noEmit`,
+  `pnpm lint`, `pnpm build` all clean. Did not re-run the E2E suite
+  (no admin UI behavior changed, only a side-effect write; the local
+  Postgres + Playwright setup from the previous entry was already
+  torn down).
 
 ## What changed in this session (2026-07-23, branch `claude/next-story-klge5f`)
 
@@ -815,6 +968,32 @@ Was stale (last run 2026-07-19, 17 failed / 7 passed). Re-run this session with 
 ### C. Module / Lesson Prisma adapters: DONE (this session, 2026-07-23, branch `claude/next-story-klge5f`)
 
 Closed. See the "PrismaModuleRepository + PrismaLessonRepository" entry at the top of the session log.
+
+### D. Story-by-story gap audit (2026-07-22): what's fixed vs. still open
+
+Full audit findings are in the "Full story-by-story gap audit" log entry
+above. Rate limiting (item 1 below) is closed. Everything else is still
+open, roughly in priority order:
+
+1. ~~Rate limiting not wired into signup/login/checkout~~ — **DONE** this session.
+2. `Login` has no email-verification gate (`emailVerifiedAt` never checked) — unverified accounts can sign in.
+3. Password reset doesn't actually revoke sessions — `src/lib/auth.ts`/`src/proxy.ts` never consult `SessionRepository` during JWT verification, so a still-valid JWT survives a reset. Architecturally significant (touches every authenticated request) — think through the performance tradeoff (DB check per request vs. a cache) before implementing.
+4. `PrismaCourseRepository` hardcodes every course to `courseTier: "STARTER"` — tier-based access gating can't function in production. Needs a schema migration to add `courseTier`/`previewLessonCount` columns.
+5. Discount codes can be created by admins but never applied at checkout — `CreatePaymentIntent` has no discount-code input, checkout UI has no field.
+6. Student `RequestRefund` use case is dead code, never wired to any action/route.
+7. `course_completed` `ProgressEvent` never fires when a student finishes the last lesson.
+8. No XP display anywhere in the UI (`AwardXP`/`XPService` work, but nothing surfaces `totalXp`).
+9. `RecordStreakVisit` never wired into the container or called from the app.
+10. Lesson page hardcodes `completedLessonIds = []`; `nextIncompleteLesson()` and `CourseCompleteView` are built + tested but never actually wired into the live page.
+11. `ImpersonateUser.ts` still only `console.log()`s instead of calling `RecordAuditLog` — the most sensitive admin action has no audit trail.
+12. `ProcessRefund`'s standard (non-override) path still has no audit logging.
+13. `withActionTracing` (structured logging wrapper) is applied to zero of the 34 real server actions.
+14. `WebVitalsReporter` never actually passes a logger, so Core Web Vitals silently no-op in production.
+15. `critical-journeys.spec.ts` has 4 of its 6 required journeys stubbed with `test.skip()`.
+16. `docs/security/tenant-isolation.md` cites file paths that don't exist anywhere in the repo — needs a rewrite against the actual flat-file convention.
+17. Assorted missing test files that stories' own acceptance criteria required: STORY-035 (badge container-wiring test), STORY-002 (`PrismaUserRepository`/`InMemoryUserRepository`/`User` tests), STORY-001 (ESLint-boundary canary test), STORY-046 (admin dashboard test), STORY-047 (admin users-page tests), STORY-049 (payment-gateway infra tests).
+18. (Flagged by CodeRabbit on PR #133, out of scope there since it targets already-merged PR #131 code) All 8 Module/Lesson use cases (`CreateModule`, `CreateLesson`, `DeleteModule`, `DeleteLesson`, `ReorderModules`, `ReorderLessons`, `UpdateModule`, `UpdateLesson`) call `recordAuditLog.execute()` with `void` instead of `await`. Since use cases can't import framework `after()`/`waitUntil()` (ESLint boundary rule), a serverless function invocation torn down right after the response is sent could silently drop a pending audit write. Fix is mechanical (swap `void` for `await` at each call site, matching what `CreateLiveClass`/`UpdateLiveClass`/`DeleteLiveClass` already do) but touches 8 files' worth of call sites plus their tests, so it's its own well-scoped PR.
+
 
 ---
 

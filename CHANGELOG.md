@@ -4,6 +4,19 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-22: Rate limiting actually wired into signup, login, and checkout
+
+- `fix(security): wire RateLimiter into signup/login/checkout actions (STORY-054)`
+  - A full story-by-story audit against the running code (not just the story docs' Status lines) found `RateLimiter`/`UpstashRateLimiter`/`InMemoryRateLimiter` fully built and correctly wired into the container, but never actually called by `signUpAction`, `loginAndRedirect`, or `startCheckout` — the exact three flows STORY-054's own goal statement names. Confirmed via `tests/architecture/rate-limit-wiring.test.ts`, which only asserted file existence, never real usage — so nothing caught the gap. `Login`/`SignUp` had no rate limiting at all; only `ResendVerification`/`RequestPasswordReset` used the port.
+  - `performSignUp` (`src/app/actions/signup.action.ts`): rate-limits by IP (10/hour), returns `{ kind: "rate_limited" }` before calling `SignUp`. `signUpAction` extracts the client IP from `x-forwarded-for`/`x-real-ip` headers, matching `RequestPasswordReset`'s existing pattern.
+  - `performLogin` (`src/app/actions/login.action.ts`): two-tier rate limit by email (5/15min) and IP (20/15min), mirroring `RequestPasswordReset`'s email+IP pattern exactly. `loginAndRedirect` redirects to `/login?error=rate_limited` on denial.
+  - `startCheckout` (`src/app/actions/checkout.action.ts`): rate-limits by authenticated user (10/hour) before calling `CreatePaymentIntent`, since checkout is already gated on a session.
+  - All three fail open (treat a limiter error as "allowed") on `rateLimiter.check()` returning `Result.err`, consistent with `RequestPasswordReset` and with Upstash's lazy no-op when its env vars are unset.
+  - Added friendly `rate_limited` copy to the login, signup, and checkout forms.
+  - Strengthened `tests/architecture/rate-limit-wiring.test.ts` to assert each of the three actions actually calls `rateLimiter.check(`, not just that the port/adapter files exist.
+  - 7 new tests (login: bucket-exhaustion test; signup: bucket-exhaustion test; checkout: rate-limited + key-shape tests; architecture: 3 new wiring assertions). Full suite: 2265 passed, 2 skipped (was 2258). `pnpm tsc --noEmit`, `pnpm lint`, `pnpm build` all clean.
+  - Ticked off STORY-054's previously-unchecked "actions call `rateLimiter.check()`" acceptance criterion, which had been sitting unchecked under a "✅ Done" status line since the story was first written.
+
 ### 2026-07-22: Module/Lesson admin CRUD now writes to the audit trail
 
 - `fix(admin): wire RecordAuditLog into the 8 Module/Lesson use cases`

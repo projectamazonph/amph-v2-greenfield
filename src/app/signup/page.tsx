@@ -65,6 +65,9 @@ export default function SignUpPage() {
             {state.kind === "db_error" && (
               <>Could not create your account right now. Please try again.</>
             )}
+            {state.kind === "rate_limited" && (
+              <>Too many signup attempts. Please wait a bit and try again.</>
+            )}
             {state.kind === "unexpected" && <>Something went wrong. Please try again.</>}
           </div>
         )}
