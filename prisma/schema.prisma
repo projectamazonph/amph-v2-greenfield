@@ -147,8 +147,32 @@ model Course {
   enrollments Enrollment[]
   orders      Order[]
   certificates Certificate[]
+  liveClasses  LiveClass[]
 
   @@map("courses")
+}
+
+// ── STORY-050c: Live classes ────────────────────────────
+
+model LiveClass {
+  id       String @id @default(cuid())
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  title           String
+  scheduledAt     DateTime
+  durationMinutes Int
+  instructorId    String
+  meetingUrl      String
+  status          String   @default("scheduled") // scheduled | cancelled | completed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("live_classes")
 }
 
 model Enrollment {

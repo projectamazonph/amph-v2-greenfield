@@ -26,13 +26,23 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ### 2026-07-22: PrismaDiscountCodeRepository admin CRUD closes the DiscountCode leg of P0-2
 
-- `fix(admin): implement PrismaDiscountCodeRepository admin CRUD (P0-2 / STORY-050d)`
+- **PR #126** (merged as `c819b38`): `fix(admin): implement PrismaDiscountCodeRepository admin CRUD (P0-2 / STORY-050d)`
   - `listAll`/`findById`/`update`/`archive` were stubs, so `buildProductionContainer()` fell back to `InMemoryDiscountCodeRepository` for the entire repo even though `findByCode`/`create`/`incrementUsedCount` were already real
   - Added a nullable `archivedAt` column to `discount_codes` (migration `20260722010000_discount_code_archived_at` + a separate `CREATE INDEX CONCURRENTLY` migration, applying the lock-avoidance lesson from PR #125's review proactively this time)
   - Implemented the four stub methods matching `InMemoryDiscountCodeRepository`'s exact contract: `findById`/`listAll` hide archived codes, `findByCode` intentionally does not filter on `archivedAt`, `update` maps a duplicate-code conflict to `code_taken`
   - Wired `PrismaDiscountCodeRepository` into `buildProductionContainer()`
   - 24 new tests. Unit + integration suite: 2175 passed / 2 skipped; architecture compliance suite: 406 passed
   - CodeRabbit review response (2 rounds): skipped a request to add `deletedAt`/`createdById`/`updatedById` to `DiscountCode` (22 of 23 models in the real schema lack these fields; `docs/db-schema.md`'s "every mutable table" rule was never actually implemented, so this isn't a live rule this PR broke, and fixing it repo-wide is a separate story) and a repeated request to rewrite `CHANGELOG.md`/`SESSION-HANDOVER.md` in VA-friendly plain language (the voice guide scopes that rule to user-facing copy, not internal engineering docs; the org-level dashboard rule CodeRabbit cited on round 2 isn't checked into this repo). Fixed a genuinely stale "remaining P0-2 items" snapshot in `SESSION-HANDOVER.md` left over from before the DiscountCode work landed. Details in `SESSION-HANDOVER.md`
+
+### 2026-07-22: PrismaLiveClassRepository closes the LiveClass leg of P0-2
+
+- `fix(admin): implement PrismaLiveClassRepository (P0-2 / STORY-050c)`
+  - No `LiveClass` Prisma model existed at all, so `buildProductionContainer()` fell back to `InMemoryLiveClassRepository`: every admin-scheduled live class vanished on cold start / redeploy, and the `SendLiveClassReminders` cron pipeline (already backed by a real `sent_reminders` idempotency table) had nothing to iterate over
+  - Added a `LiveClass` Prisma model + `Course.liveClasses` back-relation (migration `20260722020000_live_class`); brand-new table, so a plain `CREATE INDEX` is correct (no existing traffic to lock)
+  - Implemented `PrismaLiveClassRepository` matching `InMemoryLiveClassRepository`'s exact contract: `listAll` excludes `cancelled` and sorts by `scheduledAt` ascending, `delete` is a soft status transition to `cancelled`, not a real row delete
+  - Wired `PrismaLiveClassRepository` into `buildProductionContainer()`
+  - 20 new tests. Unit + integration suite: 2189 passed / 2 skipped; architecture compliance suite: 406 passed
+  - CodeRabbit review response: fixed a stale in-memory comment left over in `container.ts`; fixed `update()` silently dropping `instructorId` on a full-entity update (no live call path triggers it today, but it broke contract parity with `InMemoryLiveClassRepository`); added `isValidLiveClassStatus()` and used it in `mapRow()` instead of blindly casting a persisted status (same pattern as `PaymentStatus.isValid()` on PR #125). Skipped a third repeat of the "plain language for VAs" request. Details in `SESSION-HANDOVER.md`
 
 ### 2026-07-19 — TDD + SOLID audit and Tier A production-bug fixes
 
