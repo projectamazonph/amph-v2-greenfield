@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), and PR #129 (Module/Lesson) all merged to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Same session, same branch (recreated fresh from post-merge `main`): investigated the stale 2026-07-19 E2E failure report and fixed a real bug in the E2E cleanup helper.
+**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), PR #129 (Module/Lesson), and PR #132 (PricingTier model + repo, with arch test Windows-path fix) all merged or in flight to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Sprint 3 (Catalog Foundation) kicked off — STORY-011 closed; STORY-015–020 still queued. Same session: investigated the stale 2026-07-19 E2E failure report and fixed a real bug in the E2E cleanup helper.
 
 ---
 
@@ -8,12 +8,12 @@
 
 | Metric                   | Value                                                                                                                                                                                                                                                    |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration closed; E2E suite re-verified green**                                                                                                                                               |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration closed; E2E suite re-verified green; Sprint 3 (Catalog Foundation) kicked off — STORY-011 closed**                                                                                  |
 | Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                            |
 | Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                   |
-| `main` HEAD              | `621ed1d`: fix(admin): implement PrismaModuleRepository + PrismaLessonRepository (P0-2 / STORY-048b / STORY-048c) (#129, squash-merged)                                                                                                                  |
-| Unit + integration tests | **2242 passing + 2 skipped, 0 TypeScript errors** (on `claude/next-story-klge5f`, recreated fresh from post-merge `main`, not yet a PR)                                                                                                                  |
-| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                                      |
+| `main` HEAD              | `2bedfcf`: fix(test): construct clearE2EUsers' PrismaClient with a driver adapter (#130, squash-merged)                                                                                                                                                  |
+| Unit + integration tests | **2261 passing + 2 skipped, 0 TypeScript errors** (on `feat/STORY-011-pricing-tier`, PR #132 open: 75 new tests — 24 entity + 18 InMemory + 30 Prisma adapter + 3 container updates)                                                                     |
+| Architecture compliance  | **409 tests passing, 0 violations** (+3 from the dep-direction `layerOf` / `resolveLayerTarget` Windows-path fix)                                                                                                                                        |
 | Coverage                 | Not re-measured after the Module/Lesson work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)                |
 | E2E                      | Re-run this session with a locally provisioned Postgres (was 0/19, blocked on env, see log below): **15 passed, 4 intentionally skipped (no seeded admin in this greenfield env), 0 failed** on `chromium-desktop`                                       |
 | CI                       | PR #125–#129 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's E2E-helper fix isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green                     |
@@ -592,6 +592,66 @@ Two findings fixed, one skipped:
   convention, not a live rule this PR broke, and a repo-wide retrofit
   is a separate, deliberate story.
 
+## What changed in this session (2026-07-22, branch `feat/STORY-011-pricing-tier`, PR #132 open)
+
+### 1. STORY-011 closed: `PricingTier` model + repository (with arch test Windows-path fix)
+
+Branch: `feat/STORY-011-pricing-tier` (PR #132, open). Commit: `c6c00a4`.
+
+**Scope decision:** the original STORY-011 called for the
+`PricingTier` model, a `Course.pricingTierId` FK, and a backfill of
+existing courses — but the FK swap is a breaking change to the
+checkout / orders flow (orders reference courses, which would now
+reference tiers), so the breaking change was carved out into
+STORY-015, the first story that actually needs the FK to render
+`/pricing`. This PR only ships the testable, breaking-change-free
+piece: the new entity, the new port, the new adapters, the new
+table, and the new container wiring. Soft-delete via
+`status = "ARCHIVED"` matches `Course` / `LiveClass` (not
+`DiscountCode.archivedAt`, which is the admin-only pattern).
+
+**Files added / changed:**
+
+- `prisma/schema.prisma` + new `prisma/migrations/20260722050000_pricing_tier/migration.sql` — new `pricing_tiers` table with `@@index([status, displayOrder])`
+- `src/domain/entities/PricingTier.ts` — pure entity + `createPricingTier` + `updatePricingTier` + `comparePricingTiers` (displayOrder asc, then createdAt asc) + `pricingTierIsActive` / `pricingTierIsArchived`
+- `src/ports/repositories/IPricingTierRepository.ts` — port: `listAll` / `listActive` / `findById` / `findBySlug` / `create` / `update` / `archive`
+- `src/infra/repositories/InMemoryPricingTierRepository.ts` — in-memory adapter with `seed` / `seedMany` / `clear` helpers
+- `src/infra/repositories/PrismaPricingTierRepository.ts` — Prisma adapter: P2002 → `slug_taken`, P2025 → `not_found`, idempotent archive, explicit pre-check for slug-collision parity with the InMemory contract
+- `src/composition/container.ts` + `container.test.ts` — `pricingTierRepo` wired into both production and test containers
+- `tests/unit/domain/entities/PricingTier.test.ts` — 24 entity tests
+- `src/infra/repositories/__tests__/InMemoryPricingTierRepository.test.ts` — 18 in-memory adapter tests
+- `src/infra/repositories/__tests__/PrismaPricingTierRepository.test.ts` — 30 Prisma adapter tests (hand-rolled-fake `PrismaClient` pattern, matching `PrismaOrderRepository.test.ts`)
+- `tests/architecture/dependency-direction.test.ts` — Windows-path fix (see below)
+- `docs/stories/STORY-011.md` + `docs/sprint-3/PLAN.md` — story + sprint plan
+
+**Bug fix bundled in: arch test Windows path handling.**
+`tests/architecture/dependency-direction.test.ts` was silently
+misclassifying files on Windows because `path.relative` returns
+backslashes there. Most visible symptom: `container.ts` was
+classified as `app` instead of `composition`. CI runs on Linux so
+this never triggered. Added a one-line `.replace(/\\/g, "/")` in
+both `layerOf()` and `resolveLayerTarget()` with a comment explaining
+why. Arch tests went from 406 → 409 (the new fixture paths
+exercised the previously-broken code path).
+
+**Verification:** `pnpm typecheck` clean, `pnpm lint` clean (no
+new warnings; the 4 pre-existing warnings are unrelated to this
+story), `pnpm test:arch` 409/409 green, `pnpm build` succeeds, all
+75 new tests pass on first run. Full `pnpm test` shows 2261
+passing + 2 skip; the 10 failing files are the pre-existing
+Windows-only ones (`tests/integration/prisma-migration-contract`
+calls `./node_modules/.bin/prisma ...` with a relative path that
+doesn't work on Windows; `src/lib/auth.test.ts` and the
+`src/app/actions/*` tests import the **production** container
+directly, not `buildTestContainer`, so they need `DATABASE_URL`).
+Out of scope for STORY-011; track in a follow-up issue.
+
+**Definition of Done:** all six boxes checked
+(see PR #132 body). Conventional commit
+`feat(catalog): STORY-011 PricingTier model + repository (with
+arch test windows-path fix)` pushed; squash-merge will land
+`c6c00a4` on `main` cleanly.
+
 ## What changed in this session (2026-07-19)
 
 ### 1. Audit P0 remediation — all 7 P0 items closed (PRs #77–#89)
@@ -658,22 +718,23 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ## Open Work (for the next session)
 
-**Note (2026-07-22, updated by the Module/Lesson + E2E sessions):** the
-table below is a stale snapshot from the 2026-07-19 close (it predates
-PR `#100`, PRs `#125` through `#129`, and this session's E2E work).
-Sprint 11 (051–055), P0-2, and the E2E suite (section B) are all done
-as of this session; see "Project Status" at the top of this file and
-the 2026-07-22 log entries for the current state. Left in place rather
-than deleted, since rewriting history that was accurate at the time
-isn't this file's convention (see the "Stale P0-2 items snapshot"
-CodeRabbit response further down). **What's actually next: Sprint 12
-(Launch, STORY-056–060, none started, no story docs written yet)** —
-production deploy runbook, DB backup/restore drill, pre-launch
-security audit, the actual deploy, and launch comms. All five of those
-involve real infrastructure/business decisions (buying a domain,
-deploying to production, sending external communications) that need
-explicit operator sign-off, not something to run through
-autonomously end-to-end.
+**Note (2026-07-22, updated by the STORY-011 session):** the table
+below is a stale snapshot from the 2026-07-19 close (it predates
+PR `#100`, PRs `#125` through `#129`, this session's E2E work,
+and PR #132 / STORY-011). Sprint 11 (051–055), P0-2, the E2E suite
+(section B), and STORY-011 are all done as of this session; see
+"Project Status" at the top of this file and the 2026-07-22 log
+entries for the current state. Left in place rather than deleted,
+since rewriting history that was accurate at the time isn't this
+file's convention (see the "Stale P0-2 items snapshot" CodeRabbit
+response further down). **What's actually next: pick up Sprint 3
+at STORY-012 (the next in the catalog foundation sequence, see
+`docs/sprint-3/PLAN.md`)**. STORY-012–020 and STORY-022–045 are
+the meat of catalog + checkout + the four simulators. The
+remaining launch work (Sprint 12, STORY-056–060 — production
+deploy runbook, DB backup/restore drill, pre-launch security
+audit, the actual deploy, launch comms) still needs explicit
+operator sign-off, not autonomous execution.
 
 ### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories) — STALE, see note above
 
