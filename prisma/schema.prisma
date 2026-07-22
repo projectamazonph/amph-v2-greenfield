@@ -188,6 +188,9 @@ model Order {
   courseId  String
   course    Course   @relation(fields: [courseId], references: [id])
 
+  // Domain state machine: DRAFT | PENDING | PAID | FAILED | EXPIRED | REFUNDED
+  status    String   @default("DRAFT")
+
   // Money (always minor units)
   subtotalMinor     Int
   discountMinor     Int     @default(0)
@@ -222,6 +225,7 @@ model Order {
   @@index([userId])
   @@index([courseId])
   @@index([paymongoPaymentId])
+  @@index([status])
   @@map("orders")
 }
 

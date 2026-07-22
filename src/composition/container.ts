@@ -64,7 +64,7 @@ import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository"
 import { PrismaCourseRepository } from "@/infra/repositories/PrismaCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
-import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
+import { PrismaOrderRepository } from "@/infra/repositories/PrismaOrderRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 // Note: SessionRepository is currently in-memory even in production
 // (PrismaSessionRepository is a future story). The session is also
@@ -343,7 +343,7 @@ function buildProductionContainer(): AppContainer {
   const moduleRepo: IModuleRepository = new InMemoryModuleRepository();
   // STORY-048c: same in-memory fallback as Module.
   const lessonRepo: ILessonRepository = new InMemoryLessonRepository();
-  const orderRepo: IOrderRepository = new InMemoryOrderRepository();
+  const orderRepo: IOrderRepository = new PrismaOrderRepository(prisma);
 
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
   // STORY-050d: use in-memory discount code repo (Prisma schema is a follow-up)
@@ -355,7 +355,9 @@ function buildProductionContainer(): AppContainer {
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
   const sessionRepo: SessionRepository = new InMemorySessionRepository();
-  const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(prisma);
+  const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(
+    prisma,
+  );
   const passwordResetRepo: PasswordResetRepository = new PrismaPasswordResetRepository(prisma);
   const sentReminderRepo: SentReminderRepository = new PrismaSentReminderRepository(prisma);
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
@@ -406,14 +408,7 @@ function buildProductionContainer(): AppContainer {
     passwordHasher,
     rateLimiter,
     signUp: new SignUp(userRepo, idGen, clock, passwordHasher),
-    login: new Login(
-      userRepo,
-      passwordHasher,
-      sessionRepo,
-      idGen,
-      clock,
-      jwt,
-    ),
+    login: new Login(userRepo, passwordHasher, sessionRepo, idGen, clock, jwt),
     logout: new Logout(sessionRepo, jwt),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
@@ -443,7 +438,11 @@ function buildProductionContainer(): AppContainer {
     // STORY-050d: admin discount code CRUD
     adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
     adminGetDiscountCode: new AdminGetDiscountCode({ discountCodeRepo }),
-    adminCreateDiscountCode: new AdminCreateDiscountCode({ discountCodeRepo, idGen, recordAuditLog }),
+    adminCreateDiscountCode: new AdminCreateDiscountCode({
+      discountCodeRepo,
+      idGen,
+      recordAuditLog,
+    }),
     adminUpdateDiscountCode: new AdminUpdateDiscountCode({ discountCodeRepo, recordAuditLog }),
     adminArchiveDiscountCode: new AdminArchiveDiscountCode({ discountCodeRepo, recordAuditLog }),
     // STORY-050e: admin badge CRUD
@@ -650,5 +649,3 @@ export function buildContainer(): AppContainer {
 // We intentionally do NOT re-export from here — keeping the test
 // container in its own file is what keeps the in-memory adapters (and
 // their react-dom/server import) out of the production bundle.
-
-

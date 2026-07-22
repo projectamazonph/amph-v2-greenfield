@@ -6,34 +6,75 @@
 
 ## Project Status
 
-| Metric | Value |
-|--------|-------|
-| Phase | **Audit P0 complete; Sprint 11 ready to start** |
-| Repo | `projectamazonph/amph-v2-greenfield` (public) |
-| Default branch | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked) |
-| `main` HEAD | `c94eaf1` — chore(arch): TDD + SOLID compliance suite (8 rules) + missing entity tests (squash) |
-| Unit + integration tests | **1806 passing + 2 skipped, 172 files, 0 TypeScript errors** |
-| Architecture compliance | **369 tests passing (8 files, 8 rules), 0 violations** |
-| Coverage | Lines 87.36% · Functions 90.92% · Statements 87.75% · Branches 81.63% (all above thresholds) |
-| CI | ✅ Typecheck+Lint · ✅ Unit+integration · ✅ Architecture · ✅ Build · ❌ E2E (pre-existing functional failures, see below) |
-| Database | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters) |
-| Production | Not deployed |
+| Metric                   | Value                                                                                                                       |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Audit P0 complete; Sprint 11 ready to start**                                                                             |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                               |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                      |
+| `main` HEAD              | `c94eaf1` — chore(arch): TDD + SOLID compliance suite (8 rules) + missing entity tests (squash)                             |
+| Unit + integration tests | **1806 passing + 2 skipped, 172 files, 0 TypeScript errors**                                                                |
+| Architecture compliance  | **369 tests passing (8 files, 8 rules), 0 violations**                                                                      |
+| Coverage                 | Lines 87.36% · Functions 90.92% · Statements 87.75% · Branches 81.63% (all above thresholds)                                |
+| CI                       | ✅ Typecheck+Lint · ✅ Unit+integration · ✅ Architecture · ✅ Build · ❌ E2E (pre-existing functional failures, see below) |
+| Database                 | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters)                                              |
+| Production               | Not deployed                                                                                                                |
 
 ---
+
+## What changed in this session (2026-07-22)
+
+### PrismaOrderRepository — closes the Order leg of P0-2 (branch `claude/unfinished-stories-ivl2fw`)
+
+Orders (and therefore every dollar that flows through checkout, the PayMongo
+webhook, and refunds) were still on `InMemoryOrderRepository` in
+`buildProductionContainer()` — a real production bug: orders vanish on
+every cold start / redeploy, and a webhook hitting a different serverless
+instance can never find the order it needs to mark PAID.
+
+- Added a `status` column to the `orders` table
+  (`prisma/migrations/20260722000000_order_status/`) carrying the domain
+  `PaymentStatus` state machine (`DRAFT | PENDING | PAID | FAILED | EXPIRED | REFUNDED`).
+  It didn't exist before — only `paymongoStatus` did, which is PayMongo's
+  own vocabulary and has no DRAFT equivalent.
+- Added `Order.hydrate()` — a reconstruction factory (distinct from
+  `Order.create()`) so a repository adapter can rebuild an `Order` instance
+  from a DB row without routing through the `mark*()` state-transition
+  guards, which are for callers that don't yet know the full history.
+- Implemented `src/infra/repositories/PrismaOrderRepository.ts` (real,
+  not a stub — every `IOrderRepository` method is Postgres-backed) and
+  wired it into `buildProductionContainer()` in place of
+  `InMemoryOrderRepository`. The PayMongo webhook route
+  (`src/app/api/webhooks/paymongo/route.ts`) already goes through
+  `buildContainer()`, so it picks this up automatically — no separate fix
+  needed there.
+- 41 new tests (`Order.hydrate()` in `tests/unit/domain/entities/Order.test.ts`
+  - `src/infra/repositories/__tests__/PrismaOrderRepository.test.ts`, following
+    the hand-rolled-fake-PrismaClient pattern used by
+    `PrismaPasswordResetRepository.test.ts`). Full suite: 2131 passed, 2 skipped,
+    0 failures. `pnpm tsc --noEmit` and `pnpm lint` clean. `pnpm build` succeeds.
+
+**Remaining P0-2 items** (still in-memory in `buildProductionContainer()`):
+`sessionRepo`, `auditLog`, `discountCodeRepo` (partial — `findByCode`/
+`create`/`incrementUsedCount` are real, but `listAll`/`findById`/`update`/
+`archive` are stubs pending STORY-050d admin CRUD), `moduleRepo`,
+`lessonRepo`, `scenarioRepo`, `liveClassRepo` — the last four are blocked
+on schema migrations (no `Module`/`Lesson`/`SimulatorScenario`/`LiveClass`
+Prisma models yet; their `Prisma*Repository` files exist as documented
+stubs that throw `"schema migration"` errors on every call).
 
 ## What changed in this session (2026-07-19)
 
 ### 1. Audit P0 remediation — all 7 P0 items closed (PRs #77–#89)
 
-| # | Finding | PR | Fix |
-|---|---------|----|----|
-| P0-1 | Paywall bypass — EnrollStudent accepted any course | #84 | Entitlement gate: paid courses require `order` (with PAID order) or `admin_grant`; `EntitlementSource` type; `findPaidForUserAndCourse` on `IOrderRepository`; checkout redirect for paid; "Buy now" UI |
-| P0-2 | In-memory adapters running in production | #89 (1 of 9 done) | `PrismaCourseRepository` is the template; 8 others queued (Order, Session, AuditLog, DiscountCode, Scenario, LiveClass, plus Module/Lesson blocked on schema evolution) |
-| P0-3 | Broken baseline Prisma migration (only created `certificates`) | #88 | Replaced with `20260719000000_baseline` creating all 20 models; `migration_lock.toml` pinned; 6 migration contract tests |
-| P0-4 | Post-auth 404 (`/dashboard` didn't exist) | #85 | New `/dashboard` server component with enrollments, "Continue learning", "My courses", sign-out; `force-dynamic` |
-| P0-5 | Preview leak — lesson access not single-source-of-truth | #86 | New `AuthorizeLessonAccess` use case; 5 user states (anonymous, authed-preview, enrolled, refunded, admin); refunded = not enrolled |
-| P0-6 | Quiz attempt contract mismatch (adapters called `update` for new attempts) | #87 | Port contract: `create` returns `already_exists` on dup, `update` returns `not_found` if missing; `InMemoryQuizAttemptRepository` conforms; `RecordQuizAttempt` always calls `create` |
-| P0-7 | Payment flow unreachable (PayMongo wiring + `/checkout`) | (queued) | Largest remaining item; needs full PR with PayMongo + checkout page; see Sprint 11 follow-ups |
+| #    | Finding                                                                    | PR                | Fix                                                                                                                                                                                                     |
+| ---- | -------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0-1 | Paywall bypass — EnrollStudent accepted any course                         | #84               | Entitlement gate: paid courses require `order` (with PAID order) or `admin_grant`; `EntitlementSource` type; `findPaidForUserAndCourse` on `IOrderRepository`; checkout redirect for paid; "Buy now" UI |
+| P0-2 | In-memory adapters running in production                                   | #89 (1 of 9 done) | `PrismaCourseRepository` is the template; 8 others queued (Order, Session, AuditLog, DiscountCode, Scenario, LiveClass, plus Module/Lesson blocked on schema evolution)                                 |
+| P0-3 | Broken baseline Prisma migration (only created `certificates`)             | #88               | Replaced with `20260719000000_baseline` creating all 20 models; `migration_lock.toml` pinned; 6 migration contract tests                                                                                |
+| P0-4 | Post-auth 404 (`/dashboard` didn't exist)                                  | #85               | New `/dashboard` server component with enrollments, "Continue learning", "My courses", sign-out; `force-dynamic`                                                                                        |
+| P0-5 | Preview leak — lesson access not single-source-of-truth                    | #86               | New `AuthorizeLessonAccess` use case; 5 user states (anonymous, authed-preview, enrolled, refunded, admin); refunded = not enrolled                                                                     |
+| P0-6 | Quiz attempt contract mismatch (adapters called `update` for new attempts) | #87               | Port contract: `create` returns `already_exists` on dup, `update` returns `not_found` if missing; `InMemoryQuizAttemptRepository` conforms; `RecordQuizAttempt` always calls `create`                   |
+| P0-7 | Payment flow unreachable (PayMongo wiring + `/checkout`)                   | (queued)          | Largest remaining item; needs full PR with PayMongo + checkout page; see Sprint 11 follow-ups                                                                                                           |
 
 **Test delta: 1339 → 1403** (+64 across 6 audit PRs).
 
@@ -41,32 +82,33 @@
 
 A 7-PR chain to repair the CI pipeline:
 
-| PR | Fix |
-|----|----|
-| #90 | Pin pnpm version via `packageManager` field (attempted) |
-| #91 | Remove duplicate `version: 9` from `pnpm/action-setup@v4` (action was confused by conflict) |
-| #92 | Add `packages: ['.']` to `pnpm-workspace.yaml` (pnpm 9.15.9 requires it) |
-| #93 | Resolve lint errors + drop `shadowDatabaseUrl` from `prisma.config.ts` when env var unset (Prisma 7) |
-| #94 | Drop stdout pollution from baseline migration + add `.gitleaks.toml` allowlist for test secrets |
-| #95 | Add `pnpm prisma generate` to unit job + skip sample-render tests in CI (gated on `SAMPLE_OUTPUT_DIR`) |
+| PR  | Fix                                                                                                               |
+| --- | ----------------------------------------------------------------------------------------------------------------- |
+| #90 | Pin pnpm version via `packageManager` field (attempted)                                                           |
+| #91 | Remove duplicate `version: 9` from `pnpm/action-setup@v4` (action was confused by conflict)                       |
+| #92 | Add `packages: ['.']` to `pnpm-workspace.yaml` (pnpm 9.15.9 requires it)                                          |
+| #93 | Resolve lint errors + drop `shadowDatabaseUrl` from `prisma.config.ts` when env var unset (Prisma 7)              |
+| #94 | Drop stdout pollution from baseline migration + add `.gitleaks.toml` allowlist for test secrets                   |
+| #95 | Add `pnpm prisma generate` to unit job + skip sample-render tests in CI (gated on `SAMPLE_OUTPUT_DIR`)            |
 | #96 | Exclude Prisma adapters + production container from coverage (placeholders until P0-2 in-memory→Prisma migration) |
 
 ### 3. 100% TDD + SOLID compliance suite — live in CI (PRs #97, #98)
 
 **`pnpm test:arch`** runs 8 static-analysis rules in ~3 seconds and fails CI on any violation. Wired as a separate `Architecture (TDD + SOLID compliance)` CI job (~10s, no services).
 
-| # | File | Rule | What it catches |
-|---|------|------|-----------------|
-| 1 | `use-case-coverage.test.ts` | Every use case has a real test (not stubs) | TDD drops during refactors |
-| 2 | `entity-coverage.test.ts` | Every domain entity has a real test | Factory invariants unchecked |
-| 3 | `domain-purity.test.ts` | `src/domain/` never value-imports from outer layers | Domain coupling to infra/app |
-| 4 | `dependency-direction.test.ts` | Hexagonal layer matrix enforced | Cross-layer leaks |
-| 5 | `single-responsibility.test.ts` | One exported class per use case file, has `execute()` | God classes, multi-UC files |
-| 6 | `dependency-inversion.test.ts` | Use case Deps resolve to `/ports`, not `/infra` | The bug class behind P0-2 |
-| 7 | `port-segregation.test.ts` | No god-ports (>12 methods per interface) | ISP violations |
-| 8 | `no-circular-deps.test.ts` | Kahn's algorithm + SCC on `src/` graph | Tangled responsibilities |
+| #   | File                            | Rule                                                  | What it catches              |
+| --- | ------------------------------- | ----------------------------------------------------- | ---------------------------- |
+| 1   | `use-case-coverage.test.ts`     | Every use case has a real test (not stubs)            | TDD drops during refactors   |
+| 2   | `entity-coverage.test.ts`       | Every domain entity has a real test                   | Factory invariants unchecked |
+| 3   | `domain-purity.test.ts`         | `src/domain/` never value-imports from outer layers   | Domain coupling to infra/app |
+| 4   | `dependency-direction.test.ts`  | Hexagonal layer matrix enforced                       | Cross-layer leaks            |
+| 5   | `single-responsibility.test.ts` | One exported class per use case file, has `execute()` | God classes, multi-UC files  |
+| 6   | `dependency-inversion.test.ts`  | Use case Deps resolve to `/ports`, not `/infra`       | The bug class behind P0-2    |
+| 7   | `port-segregation.test.ts`      | No god-ports (>12 methods per interface)              | ISP violations               |
+| 8   | `no-circular-deps.test.ts`      | Kahn's algorithm + SCC on `src/` graph                | Tangled responsibilities     |
 
 **The suite caught 3 real DIP violations in a fresh scan** (PR #97 fixed them):
+
 - `AdminCreateDiscountCode` imported `UlidGenerator` directly from `@/infra/system/`
 - `createLiveClassAction` imported `UlidGenerator` directly
 - `proxy.ts` imported `JoseJwtService` directly (Next.js middleware)
@@ -74,6 +116,7 @@ A 7-PR chain to repair the CI pipeline:
 All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 **The suite also flagged 4 entities without tests** (PR #98 added 36 tests):
+
 - `User.test.ts` — 13 tests (createUser, userFullName, userInitials, isAdmin, isInstructor)
 - `Module.test.ts` — 10 tests (createModule, updateModule invariants)
 - `ProgressEvent.test.ts` — 7 tests (factory + metadata freeze)
@@ -87,15 +130,15 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories)
 
-| ID | Title | Status |
-|----|-------|--------|
-| — | P0-2 in-memory→Prisma migration (8 adapters remaining) | Queued. PR #89 established the Course pattern; apply to Order, Session, AuditLog, DiscountCode, Scenario, LiveClass |
-| — | P0-7 PayMongo payment flow + `/checkout` | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page |
-| 051 | Sentry setup | Not started |
-| 052 | Structured logging (Pino) | Not started |
-| 053 | Lighthouse CI | Not started |
-| 054 | Rate limiting (Upstash) | Not started |
-| 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started |
+| ID  | Title                                                    | Status                                                                                                                                                                                |
+| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| —   | P0-2 in-memory→Prisma migration (7 adapters remaining)   | Order done (2026-07-22, this session). PR #89 established the Course pattern; still queued: Session, AuditLog, DiscountCode (admin CRUD methods), Module, Lesson, Scenario, LiveClass |
+| —   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                               |
+| 051 | Sentry setup                                             | Not started                                                                                                                                                                           |
+| 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                           |
+| 053 | Lighthouse CI                                            | Not started                                                                                                                                                                           |
+| 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                           |
+| 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                           |
 
 ### B. E2E failures (separate from compliance, ready for follow-up)
 
@@ -120,6 +163,7 @@ Audit P1-7 flagged that `Module` and `Lesson` have no Prisma models — curricul
 ```
 
 Use case invariants:
+
 - `actorId` is **injected by the server action**, never by the page
 - Page-input types are `Omit<Input, "actorId">` (re-exported as `*PageInput` from the action)
 - All write use cases call `recordAuditLog.execute({...})` on success AND on failure (with `_failed` suffix)
@@ -205,7 +249,7 @@ pnpm test:coverage  # + v8 coverage, threshold gate
 
 - **Open/Closed Principle** (O) — not auto-enforceable in TypeScript without a lot of AST work. Reviewed in code review instead
 - **Line coverage of use cases** — covered by `pnpm test:coverage` (87.36% lines)
-- **Behavioral correctness** — the architecture suite enforces *structure*, not *semantics*. Domain correctness comes from the per-use-case tests
+- **Behavioral correctness** — the architecture suite enforces _structure_, not _semantics_. Domain correctness comes from the per-use-case tests
 - **Stylistic preferences** — naming, formatting, file size limits. Use ESLint + Prettier for those
 
 ---
