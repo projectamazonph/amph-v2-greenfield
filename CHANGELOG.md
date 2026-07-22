@@ -4,7 +4,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
-### 2026-07-22 — PrismaOrderRepository + PrismaAuditLog close two P0-2 legs
+### 2026-07-22 — PrismaOrderRepository + PrismaAuditLog + PrismaSessionRepository close three P0-2 legs
 
 - **PR #125** — `fix(payment): persist orders to Postgres via PrismaOrderRepository (P0-2)`
   - Orders were still wired to `InMemoryOrderRepository` in the production container — a real production bug: orders vanish on every cold start / redeploy, and a webhook hitting a different serverless instance could never find the order it needed to mark PAID
@@ -12,12 +12,17 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
   - Added `Order.hydrate()` to reconstruct entities from persisted rows without routing through the `mark*()` state-transition guards
   - Implemented `PrismaOrderRepository` (all `IOrderRepository` methods, no stubs) and wired it into `buildProductionContainer()`; the PayMongo webhook route already resolves `orderRepo` through `buildContainer()`, so it picks this up with no separate change
   - 41 new tests (`Order.hydrate()` + `PrismaOrderRepository`)
+  - CodeRabbit review response: built the `orders.status` index with `CREATE INDEX CONCURRENTLY` in a separate, non-transactional migration instead of a lock-holding plain `CREATE INDEX`; added `PaymentStatus.isValid()` so `PrismaOrderRepository.mapRow()` rejects a corrupt/legacy persisted status instead of blindly casting it; reconciled stale test-count numbers in `SESSION-HANDOVER.md`. Optimistic locking on `update()` explicitly deferred — see `SESSION-HANDOVER.md`
 - **PR #125** — `fix(admin): persist the audit trail via PrismaAuditLog (P0-2)`
   - Every admin write (course/module/lesson CRUD, refunds, discount codes, badges, simulators, live classes, impersonation) calls `RecordAuditLog`, which was silently writing to `InMemoryAuditLog` in production — the entire audit trail vanished on every redeploy, invisibly, since a failed audit write never fails the business operation by design
   - The `AuditLog` Prisma model already existed; only the adapter was a stub with a stale "table doesn't exist yet" comment
   - Implemented `PrismaAuditLog` mapping the domain `AuditLogEntry` onto the `audit_logs` table and wired it into `buildProductionContainer()`
   - 4 new tests
-  - Unit + integration suite (both PRs): 2135 passed / 2 skipped; architecture compliance suite: 406 passed. E2E not re-run this session (see `SESSION-HANDOVER.md` for its last known status)
+- **PR #125** — `fix(auth): persist sessions to Postgres via PrismaSessionRepository (P0-2)`
+  - `sessionRepo` was still `InMemorySessionRepository` in production. Auth itself is unaffected (JWT verification is stateless), but `ResetPassword`'s "invalidate every session" call silently no-oped against an empty store after any redeploy
+  - Implemented `PrismaSessionRepository` and wired it into `buildProductionContainer()`; `deleteById`/`deleteAllForUser` use `deleteMany` to preserve the port's documented idempotent-delete contract
+  - 11 new tests
+  - Unit + integration suite (all three fixes): 2156 passed / 2 skipped; architecture compliance suite: 406 passed. E2E not re-run this session (see `SESSION-HANDOVER.md` for its last known status)
 
 ### 2026-07-19 — TDD + SOLID audit and Tier A production-bug fixes
 

@@ -115,16 +115,40 @@ Three of four actionable findings addressed, one deferred (see the
   the actual correctness concern (untrusted data bypassing guards)
   without it.
 
+### PrismaSessionRepository — closes the Session leg of P0-2 (same session, same branch)
+
+`sessionRepo` was on `InMemorySessionRepository` in production. Per-request
+auth is stateless JWT verification (the signed cookie survives a redeploy
+on its own — confirmed by grepping `src/middleware.ts` / `src/lib/auth.ts`
+for `sessionRepo`, no hits), so this gap never logged anyone out. What it
+did break: `deleteAllForUser` — called from `ResetPassword` to invalidate
+every existing session once a user's password is reset — silently lost
+its record set on every cold start, and any future server-side session
+listing/revocation UI would read from an empty store. The `Session`
+Prisma model already existed — nothing was blocking this either.
+
+- Implemented `src/infra/repositories/PrismaSessionRepository.ts` (real,
+  not a stub). `deleteById`/`deleteAllForUser` use `deleteMany` rather
+  than `delete`, matching `SessionRepository`'s documented contract that
+  `deleteById` is idempotent (Logout depends on this — see
+  `src/usecases/Logout.ts`'s comment on the port's contract).
+- Wired it into `buildProductionContainer()` in place of
+  `InMemorySessionRepository`; removed the now-stale comment explaining
+  why sessions were in-memory.
+- 11 new tests (`src/infra/repositories/__tests__/PrismaSessionRepository.test.ts`,
+  same hand-rolled-fake-PrismaClient pattern). Full unit/integration suite:
+  2156 passed, 2 skipped, 0 failures. `pnpm tsc --noEmit` and `pnpm lint`
+  clean. `pnpm build` succeeds.
+
 **Remaining P0-2 items** (still in-memory in `buildProductionContainer()`):
-`sessionRepo`, `discountCodeRepo` (partial — `findByCode`/`create`/
-`incrementUsedCount` are real, but `listAll`/`findById`/`update`/`archive`
-are stubs pending STORY-050d admin CRUD), `moduleRepo`, `lessonRepo`,
-`scenarioRepo`, `liveClassRepo` — the last four are genuinely blocked on
-schema migrations (no `Module`/`Lesson`/`SimulatorScenario`/`LiveClass`
-Prisma models yet; their `Prisma*Repository` files exist as documented
-stubs that throw `"schema migration"` errors on every call). `sessionRepo`
-is not schema-blocked (the `Session` Prisma model already exists) — it's
-next up.
+`discountCodeRepo` (partial — `findByCode`/`create`/`incrementUsedCount`
+are real, but `listAll`/`findById`/`update`/`archive` are stubs pending
+STORY-050d admin CRUD), `moduleRepo`, `lessonRepo`, `scenarioRepo`,
+`liveClassRepo` — all four genuinely blocked on schema migrations (no
+`Module`/`Lesson`/`SimulatorScenario`/`LiveClass` Prisma models yet; their
+`Prisma*Repository` files exist as documented stubs that throw
+`"schema migration"` errors on every call). Order, AuditLog, and Session
+are now Postgres-backed in production.
 
 **Known follow-up (deferred, not blocking):** `PrismaOrderRepository.update()`
 matches by `id` only. Two concurrent writers (e.g. a delayed PayMongo

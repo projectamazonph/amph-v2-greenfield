@@ -65,13 +65,7 @@ import { PrismaCourseRepository } from "@/infra/repositories/PrismaCourseReposit
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { PrismaOrderRepository } from "@/infra/repositories/PrismaOrderRepository";
-import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
-// Note: SessionRepository is currently in-memory even in production
-// (PrismaSessionRepository is a future story). The session is also
-// embedded in the JWT cookie, so losing the DB row on process restart
-// does not invalidate active sessions — the JWT is still valid until
-// its expiry. The DB row is for admin visibility + revocation; when
-// revocation matters, ship the Prisma adapter.
+import { PrismaSessionRepository } from "@/infra/repositories/PrismaSessionRepository";
 import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
 import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscountCodeRepository";
 import { PrismaQuizRepository } from "@/infra/repositories/PrismaQuizRepository";
@@ -354,7 +348,7 @@ function buildProductionContainer(): AppContainer {
   const badgeRepo: IBadgeRepository = new PrismaBadgeRepository(prisma);
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
-  const sessionRepo: SessionRepository = new InMemorySessionRepository();
+  const sessionRepo: SessionRepository = new PrismaSessionRepository(prisma);
   const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(
     prisma,
   );
