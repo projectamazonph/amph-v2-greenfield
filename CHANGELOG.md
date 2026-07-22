@@ -4,6 +4,13 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-22: E2E cleanup helper fix, `fix(test): construct clearE2EUsers' PrismaClient with a driver adapter`
+
+- `tests/e2e/helpers/seed.ts`'s `clearE2EUsers()` constructed `new PrismaClient()` with no arguments. This codebase runs Prisma 7 with driver adapters (`prisma/schema.prisma`'s `datasource` has no `url`; the real connection is supplied via `PrismaPg` + `pg.Pool`, see `src/infra/database/prisma.ts`), so the bare constructor always threw `PrismaClientInitializationError`, on every run, regardless of `DATABASE_URL`. The helper's own try/catch (written to tolerate a missing `DATABASE_URL` in CI workers without failing `afterEach`) silently swallowed this too, so the E2E user cleanup between runs never actually happened.
+- Fixed by building the client the same way the production singleton does. Verified against the locked-in contract in `tests/unit/e2e-helpers/clearE2EUsers.test.ts` (empty/malformed URL still no-ops, doesn't throw): still 4/4 passing.
+- Also added an opt-in `PLAYWRIGHT_CHROMIUM_PATH` env var to `playwright.config.ts` (`undefined` when unset, zero effect on CI) so a sandboxed environment without network access for the pinned Playwright browser download can point at whatever Chromium is already on disk.
+- Re-ran the full `chromium-desktop` E2E suite (stale since 2026-07-19, last measured 17 failed / 7 passed) against a freshly provisioned local Postgres: **15 passed, 4 intentionally skipped, 0 failed**. `pnpm typecheck`/`lint`/`test` all clean.
+
 ### 2026-07-22: PrismaOrderRepository + PrismaAuditLog + PrismaSessionRepository close three P0-2 legs
 
 - **PR #125** (merged as `f075fff`): `fix(payment): persist orders to Postgres via PrismaOrderRepository (P0-2)`
