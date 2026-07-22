@@ -11,7 +11,7 @@
 - **Story**: STORY-048c
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-**Status:** ✅ Done (PR #048c, commit `2a940f8` — `feat(admin): STORY-048c admin lessons CRUD + JSON content editor`)
+  **Status:** ✅ Done (PR #048c, commit `2a940f8` — `feat(admin): STORY-048c admin lessons CRUD + JSON content editor`)
 
 ## Goal
 
@@ -194,7 +194,7 @@ src/app/admin/courses/[id]/modules/[moduleId]/lessons/
 - **Type-change validation in UpdateLesson** — if the patch changes `type`, the `content` must be re-validated. The use case rebuilds the lesson via the entity factory (which is the single source of truth for validation).
 - **"Atomic reorder"** — same as modules. Input must contain exactly the current lessons for the module.
 - **MDX editor is a placeholder** — TEXT content is a raw textarea. Real MDX editor (with preview, components) is a follow-up story.
-- **No Prisma Lesson table** — prod container uses in-memory adapter (same as Module).
+- ~~**No Prisma Lesson table**~~ — done as a P0-2 follow-up: `PrismaLessonRepository` is now Postgres-backed in production (migration `20260722040000_module_lesson`), same as Module.
 - **No AuditLog** — same as 048a/048b.
 - **Display order is per-module** — displayOrder=1 is the first lesson in that module, not in the course. Lessons across modules don't share the counter.
 
@@ -209,6 +209,7 @@ pnpm build
 ```
 
 Manual smoke:
+
 - Sign in as admin
 - Visit a course's module detail — see Lessons section
 - Add a VIDEO lesson with durationMinutes=5 — see it in the list
@@ -222,7 +223,7 @@ Manual smoke:
 ## Out of scope (separate stories)
 
 - **MDX editor with preview** (STORY-048c.5)
-- **Prisma Lesson schema + PrismaLessonRepository**
+- ~~**Prisma Lesson schema + PrismaLessonRepository**~~ — done, see the Pitfalls note above
 - **Migration of `Course.curriculum` → Module+Lesson** in the public catalog
 - **Lesson analytics** (completion rate per lesson)
 - **Lesson prerequisites**
