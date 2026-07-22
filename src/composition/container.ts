@@ -62,8 +62,8 @@ import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassReposi
 
 import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
 import { PrismaCourseRepository } from "@/infra/repositories/PrismaCourseRepository";
-import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
-import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
+import { PrismaModuleRepository } from "@/infra/repositories/PrismaModuleRepository";
+import { PrismaLessonRepository } from "@/infra/repositories/PrismaLessonRepository";
 import { PrismaOrderRepository } from "@/infra/repositories/PrismaOrderRepository";
 import { PrismaSessionRepository } from "@/infra/repositories/PrismaSessionRepository";
 import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
@@ -330,12 +330,9 @@ function buildProductionContainer(): AppContainer {
   // P0-2: course data now persists to PostgreSQL. The catalog
   // survives restarts and is shared across application instances.
   const courseRepo: CourseRepository = new PrismaCourseRepository(prisma);
-  // STORY-048b: Module repo is also in-memory (no Prisma module table
-  // yet). The story's 'Prisma Module schema migration' out-of-scope
-  // item is the follow-up.
-  const moduleRepo: IModuleRepository = new InMemoryModuleRepository();
-  // STORY-048c: same in-memory fallback as Module.
-  const lessonRepo: ILessonRepository = new InMemoryLessonRepository();
+  // P0-2 follow-up: module/lesson data now persists to PostgreSQL.
+  const moduleRepo: IModuleRepository = new PrismaModuleRepository(prisma);
+  const lessonRepo: ILessonRepository = new PrismaLessonRepository(prisma);
   const orderRepo: IOrderRepository = new PrismaOrderRepository(prisma);
 
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);

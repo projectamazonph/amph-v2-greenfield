@@ -1,25 +1,81 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), and PR #127 (LiveClass) all merged to `main`. PR #128 (PrismaSimulatorScenarioRepository) open, under review.
+**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), and PR #128 (SimulatorScenario) all merged to `main`. Module + Lesson (this session, branch `claude/next-story-klge5f`) close out P0-2: every repository in `buildProductionContainer()` is now Postgres-backed.
 
 ---
 
 ## Project Status
 
-| Metric                   | Value                                                                                                                                                                                                                                         |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration in progress**                                                                                                                                                            |
-| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                 |
-| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                        |
-| `main` HEAD              | `18166e7`: fix(admin): implement PrismaLiveClassRepository (P0-2 / STORY-050c) (#127, squash-merged)                                                                                                                                          |
-| Unit + integration tests | **2213 passing + 2 skipped, 0 TypeScript errors** (on `claude/unfinished-stories-ivl2fw`, PR #128)                                                                                                                                            |
-| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                           |
-| Coverage                 | Not re-measured after the SimulatorScenario work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements) |
-| CI                       | PR #125, #126, and #127 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. PR #128 CI in progress; local `pnpm typecheck`/`lint`/`test`/`build` all green                     |
-| Database                 | Not provisioned (Prisma schema complete; production uses `InMemory*` adapters for the items listed under "Remaining P0-2 items" below)                                                                                                        |
-| Production               | Not deployed                                                                                                                                                                                                                                  |
+| Metric                   | Value                                                                                                                                                                                                                                                     |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memory→Prisma migration closed (this session)**                                                                                                                                                              |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                             |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                    |
+| `main` HEAD              | `e7e15dd`: fix(admin): implement PrismaSimulatorScenarioRepository (P0-2 / STORY-050b) (#128, squash-merged)                                                                                                                                              |
+| Unit + integration tests | **2242 passing + 2 skipped, 0 TypeScript errors** (on `claude/next-story-klge5f`, not yet a PR)                                                                                                                                                           |
+| Architecture compliance  | **406 tests passing, 0 violations**                                                                                                                                                                                                                       |
+| Coverage                 | Not re-measured after the Module/Lesson work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)                 |
+| CI                       | PR #125, #126, #127, and #128 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's Module/Lesson work isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green |
+| Database                 | Not provisioned (Prisma schema complete; every repository in `buildProductionContainer()` is now Postgres-backed, no `InMemory*` fallbacks remain)                                                                                                        |
+| Production               | Not deployed                                                                                                                                                                                                                                              |
 
 ---
+
+## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`)
+
+### PrismaModuleRepository + PrismaLessonRepository: close out P0-2
+
+Picked up "the next story" and found P0-2 (in-memory→Prisma migration)
+already down to its last two legs: `moduleRepo` and `lessonRepo`, both
+still `InMemory*` in `buildProductionContainer()`. Unlike the earlier
+Order/Session/AuditLog/DiscountCode/LiveClass/SimulatorScenario legs,
+this pair wasn't blocked on a design decision, the domain entities,
+`IModuleRepository`/`ILessonRepository` ports, use cases, and admin UI
+all shipped in STORY-048b/048c; only the Postgres tables and the two
+adapters were missing (`PrismaLessonRepository` existed as a
+throw-on-every-method stub, `PrismaModuleRepository` didn't exist at
+all). Every module/lesson created through the admin curriculum editor
+was vanishing on cold start / redeploy.
+
+- Added `Module` and `Lesson` Prisma models
+  (`prisma/migrations/20260722040000_module_lesson/`): `Module` has a
+  `courseId` FK (cascade delete) and a `Course.modules` back-relation;
+  `Lesson` has a `moduleId` FK (cascade delete). Brand-new tables, so
+  plain `CREATE INDEX` is correct, no existing traffic to lock. This
+  does **not** touch `Course.curriculum` (still the JSON blob the
+  public catalog pages read); migrating the catalog to read from
+  Module+Lesson remains the separate, larger refactor both stories
+  flagged as out of scope.
+- Implemented `src/infra/repositories/PrismaModuleRepository.ts` (new)
+  and rewrote `src/infra/repositories/PrismaLessonRepository.ts` (was
+  a stub), both matching their `InMemory*` counterparts' exact
+  contract, including the atomic `reorder()`: validate the input id
+  set matches the current rows for the course/module before applying
+  the new `displayOrder` via `db.$transaction(...)`. `mapRow()` on
+  both reuses the existing `createModule()`/`createLesson()` domain
+  factories (the latter also re-validates the `type`/`content` shape)
+  instead of adding new validators, so a corrupt/legacy row throws and
+  the surrounding try/catch turns it into `db_error`, same pattern as
+  the SimulatorScenario/LiveClass fixes.
+- Wired both into `buildProductionContainer()`, replacing the
+  `InMemoryModuleRepository`/`InMemoryLessonRepository` fallbacks and
+  removing the stale "in-memory until the schema migration lands"
+  comments.
+- Updated `docs/stories/STORY-048b.md` and `STORY-048c.md`'s
+  "out of scope" / "Pitfalls" bullets that called out the missing
+  Prisma adapters, struck through now that they're done.
+- 29 new tests
+  (`src/infra/repositories/__tests__/{PrismaModuleRepository,PrismaLessonRepository}.test.ts`,
+  same hand-rolled-fake-PrismaClient pattern as every other P0-2 fix
+  this sprint). Full unit/integration suite: 2242 passed, 2 skipped, 0
+  failures. Architecture compliance suite: 406 passed. `pnpm tsc
+--noEmit`, `pnpm lint`, and `pnpm build` all clean.
+- **This closes P0-2**: every repository in `buildProductionContainer()`
+  is now Postgres-backed; no `InMemory*` fallback remains in
+  production.
+
+Not yet opened as a PR (no explicit request to do so this session);
+committed and pushed to `claude/next-story-klge5f`.
 
 ## What changed in this session (2026-07-22)
 
@@ -533,7 +589,20 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ## Open Work (for the next session)
 
-### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories)
+**Note (2026-07-22, updated by the Module/Lesson session):** the table
+below is a stale snapshot from the 2026-07-19 close (it predates PRs
+#100, #125–#128, and this session's Module/Lesson work). Sprint 11
+(051–055) and P0-2 are both fully done as of this session; see
+"Project Status" at the top of this file and the 2026-07-22 log
+entries for the current state. Left in place rather than deleted,
+since rewriting history that was accurate at the time isn't this
+file's convention (see the "Stale P0-2 items snapshot" CodeRabbit
+response further down). **What's actually next: Sprint 12 (Launch,
+STORY-056–060, none started, no story docs written yet) and the E2E
+failures in section B below**, which nothing in this log has revisited
+since 2026-07-19.
+
+### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories) — STALE, see note above
 
 | ID  | Title                                                    | Status                                                                                                                                                                                                                                |
 | --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -547,11 +616,11 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ### B. E2E failures (separate from compliance, ready for follow-up)
 
-Last run: **17 failed, 7 passed** in 2.2m. Real failure mode: signup flow tests can't reach the post-submit state (likely the `email_taken` and `weak_password` redirect handlers — `expect(locator).toBeVisible()` failing). The webkit errors I saw initially were a Playwright retry artifact; chromium-desktop is the real failure surface. The signup spec lives at `tests/e2e/signup.spec.ts`.
+Last run: **17 failed, 7 passed** in 2.2m. Real failure mode: signup flow tests can't reach the post-submit state (likely the `email_taken` and `weak_password` redirect handlers — `expect(locator).toBeVisible()` failing). The webkit errors I saw initially were a Playwright retry artifact; chromium-desktop is the real failure surface. The signup spec lives at `tests/e2e/signup.spec.ts`. Not re-run since 2026-07-19; may already be stale given how much has landed since (STORY-021's `/checkout` page in particular).
 
-### C. Module / Lesson Prisma adapters (blocked on schema evolution)
+### C. Module / Lesson Prisma adapters — DONE (this session, 2026-07-22, branch `claude/next-story-klge5f`)
 
-Audit P1-7 flagged that `Module` and `Lesson` have no Prisma models — curriculum is currently `Course.curriculum: Json`. P0-2 in-memory→Prisma migration is blocked on this schema split. Will require a separate story to evolve the schema, write a migration, then add the adapters.
+Closed. See the "PrismaModuleRepository + PrismaLessonRepository" entry at the top of the session log.
 
 ---
 

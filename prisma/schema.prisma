@@ -148,8 +148,45 @@ model Course {
   orders      Order[]
   certificates Certificate[]
   liveClasses  LiveClass[]
+  modules      Module[]
 
   @@map("courses")
+}
+
+// ── STORY-048b/048c / P0-2 follow-up: Modules + Lessons ──
+
+model Module {
+  id       String @id @default(cuid())
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  title        String
+  displayOrder Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lessons Lesson[]
+
+  @@index([courseId])
+  @@map("modules")
+}
+
+model Lesson {
+  id       String @id @default(cuid())
+  moduleId String
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  title        String
+  type         String // VIDEO | TEXT | QUIZ
+  content      Json
+  displayOrder Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([moduleId])
+  @@map("lessons")
 }
 
 // ── STORY-050b: Simulator scenarios ─────────────────────

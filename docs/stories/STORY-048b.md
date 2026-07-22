@@ -11,7 +11,7 @@
 - **Story**: STORY-048b
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-**Status:** ✅ Done (PR #048b, commit `4c3102a` — `feat(admin): STORY-048b admin modules CRUD + reorder`)
+  **Status:** ✅ Done (PR #048b, commit `4c3102a` — `feat(admin): STORY-048b admin modules CRUD + reorder`)
 
 ## Goal
 
@@ -199,6 +199,7 @@ pnpm build
 ```
 
 Manual smoke:
+
 - Sign in as admin
 - Visit `/admin/courses/[id]` — see Modules section with any existing modules (or empty)
 - Click "Add module" — fill the form — submit
@@ -216,5 +217,5 @@ Manual smoke:
 - **Module-level access policy** (some modules are preview-only, some are paid)
 - **Module analytics** (completion rate per module)
 - **Bulk reorder** (drag-and-drop across many modules at once) — out of scope for v1
-- **Prisma Module schema migration** — may need a separate follow-up if the schema change is non-trivial
+- ~~**Prisma Module schema migration**~~ — done as a P0-2 follow-up: `PrismaModuleRepository` is now wired into `buildProductionContainer()` (migration `20260722040000_module_lesson`)
 - **AuditLog** for module CRUD actions
