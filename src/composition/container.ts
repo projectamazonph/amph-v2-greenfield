@@ -356,7 +356,7 @@ function buildProductionContainer(): AppContainer {
   const sentReminderRepo: SentReminderRepository = new PrismaSentReminderRepository(prisma);
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
-  // STORY-050a: audit log (in-memory in prod until the Prisma schema lands)
+  // STORY-050a: audit log (Postgres-backed in production via PrismaAuditLog)
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   // STORY-050b: simulator scenario repo (in-memory in prod until Prisma schema lands)

@@ -270,15 +270,15 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ### A. Sprint 11 — Observability + Tests (P0-2, P0-7 + the 5 sprint stories)
 
-| ID  | Title                                                    | Status                                                                                                                                                                                          |
-| --- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| —   | P0-2 in-memory→Prisma migration (6 adapters remaining)   | Order + AuditLog done (2026-07-22, this session, PR #125). PR #89 established the Course pattern; still queued: Session, DiscountCode (admin CRUD methods), Module, Lesson, Scenario, LiveClass |
-| —   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                         |
-| 051 | Sentry setup                                             | Not started                                                                                                                                                                                     |
-| 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                                     |
-| 053 | Lighthouse CI                                            | Not started                                                                                                                                                                                     |
-| 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                                     |
-| 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                                     |
+| ID  | Title                                                    | Status                                                                                                                                                                                           |
+| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| —   | P0-2 in-memory→Prisma migration (5 adapters remaining)   | Order + AuditLog + Session done (2026-07-22, this session, PR #125). PR #89 established the Course pattern; still queued: DiscountCode (admin CRUD methods), Module, Lesson, Scenario, LiveClass |
+| —   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                          |
+| 051 | Sentry setup                                             | Not started                                                                                                                                                                                      |
+| 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                                      |
+| 053 | Lighthouse CI                                            | Not started                                                                                                                                                                                      |
+| 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                                      |
+| 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                                      |
 
 ### B. E2E failures (separate from compliance, ready for follow-up)
 
