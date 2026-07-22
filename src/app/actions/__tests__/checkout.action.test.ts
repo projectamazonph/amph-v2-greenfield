@@ -159,7 +159,7 @@ describe("startCheckout (server action)", () => {
     expect(mockCreatePaymentIntent).not.toHaveBeenCalled();
   });
 
-  it("calls the rate limiter with a user-scoped key", async () => {
+  it("calls the rate limiter with the documented user-scoped bucket (10/hour)", async () => {
     mockGetSessionUserId.mockResolvedValueOnce("user-1");
     mockCreatePaymentIntent.mockResolvedValueOnce({
       ok: true,
@@ -167,9 +167,28 @@ describe("startCheckout (server action)", () => {
       orderId: "ord_1",
     });
     await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
-    expect(mockRateLimiterCheck).toHaveBeenCalledWith(
-      expect.objectContaining({ key: "checkout:user:user-1" }),
-    );
+    expect(mockRateLimiterCheck).toHaveBeenCalledTimes(1);
+    expect(mockRateLimiterCheck).toHaveBeenCalledWith({
+      key: "checkout:user:user-1",
+      limit: 10,
+      windowSeconds: 3600,
+    });
+  });
+
+  it("fails open (still calls CreatePaymentIntent) when the limiter itself errors", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    mockRateLimiterCheck.mockResolvedValueOnce({
+      ok: false,
+      error: { kind: "rate_limiter_error", message: "Upstash unreachable" },
+    });
+    mockCreatePaymentIntent.mockResolvedValueOnce({
+      ok: true,
+      checkoutUrl: "https://paymongo.com/cs_test_abc",
+      orderId: "ord_1",
+    });
+    const result = await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
+    expect(result.kind).toBe("redirect");
+    expect(mockCreatePaymentIntent).toHaveBeenCalledTimes(1);
   });
 
   it("trims whitespace from the courseSlug before passing it on", async () => {
