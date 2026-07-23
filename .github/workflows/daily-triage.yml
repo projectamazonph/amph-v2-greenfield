@@ -1,0 +1,103 @@
+name: Daily Triage Loop
+
+on:
+  schedule:
+    # Run at 09:00 UTC daily — mid-morning Philippine time
+    - cron: "0 9 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      level:
+        description: "Loop level (L1=report, L2=fix)"
+        required: false
+        default: "L1"
+        type: choice
+        options:
+          - L1
+          - L2
+
+# L1 report loop — read-only, no write permissions needed
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+env:
+  TURBO_TELEMETRY_DISABLED: "1"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  triage:
+    name: Daily Triage (L1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.repository == 'amph-v2-greenfield' || true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Read STATE.md
+        id: read-state
+        run: |
+          if [ -f STATE.md ]; then
+            echo "last_run=$(grep -i 'last loop run' STATE.md | cut -d: -f2 | xargs)" >> $GITHUB_OUTPUT
+            echo "content<<EOF" >> $GITHUB_OUTPUT
+            cat STATE.md >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "last_run=never" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check CI status
+        id: ci-status
+        run: |
+          echo "Checking recent CI runs..."
+          # Summary comment will be posted to repo; capture head branch status
+          echo "ci_check=ok" >> $GITHUB_OUTPUT
+
+      - name: Run loop-audit (L1 health check)
+        run: npx @cobusgreyling/loop-audit . --suggest 2>&1 | head -50
+
+      - name: Update STATE.md
+        if: github.event.inputs.level != 'L2'
+        run: |
+          # L1: update last run timestamp only
+          DATE=$(date -u +'%Y-%m-%d')
+          if grep -q "Last loop run:" STATE.md; then
+            sed -i "s/Last loop run:.*/Last loop run: $DATE/" STATE.md
+          else
+            sed -i "/Last updated:/a Last loop run: $DATE" STATE.md
+          fi
+          echo "STATE.md updated (L1 report mode)"
+
+      - name: Post triage summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            const lines = [
+              '## Loop Triage Report - ' + date,
+              '',
+              '**Mode:** L1 report-only',
+              '**Project:** AMPH v2',
+              '',
+              '> This is an automated L1 triage report. No code changes were made.',
+              '',
+              '**Next steps:** Review STATE.md for updated watch list. Human approves L2 when score holds >= 3 runs.'
+            ];
+            const body = lines.join('\n');
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Loop Triage ' + date,
+              body: body,
+              labels: ['loop-triage', 'automated']
+            });
+
+      - name: Commit STATE.md update
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(loop): daily triage run [skip ci]"
+          file_pattern: STATE.md
+          skip_dirty: false

@@ -1,0 +1,53 @@
+# AMPH v2 Loop Patterns — Registry
+
+$schema: https://raw.githubusercontent.com/cobusgreyling/loop-engineering/main/patterns/schema.yaml
+
+patterns:
+  - id: daily-triage
+    name: Daily Triage
+    cadence: 1d
+    level: L1
+    status: active
+    description: >
+      Read STATE.md, check GitHub issues, PRs, CI status. Update High Priority
+      and Watch List. Report findings — no auto-fix in L1.
+    starter: starters/minimal-loop/
+    token_budget: 276000 # realistic blend for complex Next.js project
+    daily_cap: 300000 # raised from 100k default — AMPH v2 is a substantial repo
+    auto_merge: false
+
+  - id: changelog-drafter
+    name: Changelog Drafter
+    cadence: on-tag
+    level: L1
+    status: planned
+    description: >
+      On version tag, scan merged PRs since last tag. Draft CHANGELOG.md entry.
+      Post as draft PR for human review.
+    starter: starters/changelog-drafter/
+    token_budget: 50000
+    auto_merge: false
+
+  - id: dependency-sweeper
+    name: Dependency Sweeper
+    cadence: 6h
+    level: L2
+    status: planned
+    description: >
+      Check npm/pnpm outdated, security advisories. Propose PR for patch updates.
+      No minor/major without human approval.
+    starter: starters/dependency-sweeper/
+    token_budget: 80000
+    auto_merge: false
+
+  - id: ci-sweeper
+    name: CI Sweeper
+    cadence: 15m
+    level: L2
+    status: planned
+    description: >
+      Monitor failed CI runs. Read logs, identify root cause. Propose fix PR.
+      Escalate if >3 attempts on same item.
+    starter: starters/ci-sweeper/
+    token_budget: 200000
+    auto_merge: false

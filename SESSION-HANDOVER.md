@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-22. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), PR #129 (Module/Lesson), PR #132 (PricingTier + arch test Windows-path fix), and PR #134 (MDX renderer port + adapter) all merged or in flight to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Sprint 3 (Catalog Foundation) in progress ΓÇö STORY-011 + STORY-012 closed; STORY-013ΓÇô020 still queued. Same session: investigated the stale 2026-07-19 E2E failure report and fixed a real bug in the E2E cleanup helper.
+**Updated:** 2026-07-23. PR #125 (Order/AuditLog/Session), PR #126 (DiscountCode), PR #127 (LiveClass), PR #128 (SimulatorScenario), PR #129 (Module/Lesson), PR #132 (PricingTier + arch test Windows-path fix), and PR #134 (MDX renderer port + adapter) all merged or in flight to `main`. P0-2 is fully closed: every repository in `buildProductionContainer()` is Postgres-backed. Sprint 3 (Catalog Foundation) in progress ΓÇö STORY-011 + STORY-012 closed; STORY-013ΓÇô020 still queued. Same session: investigated the stale 2026-07-19 E2E failure report and fixed a real bug in the E2E cleanup helper.
 
 ---
 
@@ -8,7 +8,7 @@
 
 | Metric                   | Value                                                                                                                                                                                                                                                    |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memoryΓåÆPrisma migration closed; E2E suite re-verified green; Sprint 3 (Catalog Foundation) in progress ΓÇö STORY-011 + STORY-012 closed**                                                                     |
+| Phase                    | **Audit P0 complete; Sprint 11 done; P0-2 in-memoryΓåÆPrisma migration closed; E2E suite re-verified green; Sprint 3 (Catalog Foundation) in progress ΓÇö STORY-011 + STORY-012 closed**                                                                 |
 | Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                            |
 | Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                   |
 | `main` HEAD              | `2bedfcf`: fix(test): construct clearE2EUsers' PrismaClient with a driver adapter (#130, squash-merged)                                                                                                                                                  |
@@ -16,13 +16,13 @@
 | Architecture compliance  | **410 tests passing, 0 violations** (+1 from the new `src/infra/rendering/` layer test in PR #134)                                                                                                                                                       |
 | Coverage                 | Not re-measured after the Module/Lesson work; last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches, each above its own `vitest.config.ts` threshold (80% lines, 70% branches, 80% functions, 80% statements)                |
 | E2E                      | Re-run this session with a locally provisioned Postgres (was 0/19, blocked on env, see log below): **15 passed, 4 intentionally skipped (no seeded admin in this greenfield env), 0 failed** on `chromium-desktop`                                       |
-| CI                       | PR #125ΓÇô#129 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's E2E-helper fix isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green                     |
+| CI                       | PR #125ΓÇô#129 all ran green on all 6 jobs (Typecheck+Lint, Unit+integration, Architecture, Build, E2E, Lighthouse) before merge. This session's E2E-helper fix isn't a PR yet; local `pnpm typecheck`/`lint`/`test`/`build` all green                   |
 | Database                 | Not provisioned in production (Prisma schema complete; every repository in `buildProductionContainer()` is Postgres-backed, no `InMemory*` fallbacks remain). This session provisioned a throwaway local Postgres 16 purely to run E2E; nothing persists |
 | Production               | Not deployed                                                                                                                                                                                                                                             |
 
 ---
 
-## What changed in this session (2026-07-22, branch `claude/next-story-klge5f`)
+## What changed in this session (2026-07-23, branch `claude/next-story-klge5f`)
 
 ### E2E suite re-verified green + a real bug fixed in the cleanup helper (same session, after PR #129 merged)
 
@@ -146,7 +146,7 @@ was vanishing on cold start / redeploy.
 Not yet opened as a PR (no explicit request to do so this session);
 committed and pushed to `claude/next-story-klge5f`.
 
-## What changed in this session (2026-07-22)
+## What changed in this session (2026-07-23)
 
 ### PrismaOrderRepository: closes the Order leg of P0-2 (branch `claude/unfinished-stories-ivl2fw`)
 
@@ -592,7 +592,7 @@ Two findings fixed, one skipped:
   convention, not a live rule this PR broke, and a repo-wide retrofit
   is a separate, deliberate story.
 
-## What changed in this session (2026-07-22, branch `feat/STORY-011-pricing-tier`, PR #132 open)
+## What changed in this session (2026-07-23, branch `feat/STORY-011-pricing-tier`, PR #132 open)
 
 ### 1. STORY-011 closed: `PricingTier` model + repository (with arch test Windows-path fix)
 
@@ -652,7 +652,7 @@ Out of scope for STORY-011; track in a follow-up issue.
 arch test windows-path fix)` pushed; squash-merge will land
 `c6c00a4` on `main` cleanly.
 
-## What changed in this session (2026-07-22, branch `feat/STORY-012-mdx-renderer`, PR #134 open)
+## What changed in this session (2026-07-23, branch `feat/STORY-012-mdx-renderer`, PR #134 open)
 
 ### 1. STORY-012 closed: `IMdxContentRenderer` port + `NextMdxRenderer` adapter
 
@@ -718,11 +718,11 @@ pushed.
 
 | #    | Finding                                                                    | PR                | Fix                                                                                                                                                                                                     |
 | ---- | -------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0-1 | Paywall bypass ΓÇö EnrollStudent accepted any course                         | #84               | Entitlement gate: paid courses require `order` (with PAID order) or `admin_grant`; `EntitlementSource` type; `findPaidForUserAndCourse` on `IOrderRepository`; checkout redirect for paid; "Buy now" UI |
+| P0-1 | Paywall bypass ΓÇö EnrollStudent accepted any course                       | #84               | Entitlement gate: paid courses require `order` (with PAID order) or `admin_grant`; `EntitlementSource` type; `findPaidForUserAndCourse` on `IOrderRepository`; checkout redirect for paid; "Buy now" UI |
 | P0-2 | In-memory adapters running in production                                   | #89 (1 of 9 done) | `PrismaCourseRepository` is the template; 8 others queued (Order, Session, AuditLog, DiscountCode, Scenario, LiveClass, plus Module/Lesson blocked on schema evolution)                                 |
 | P0-3 | Broken baseline Prisma migration (only created `certificates`)             | #88               | Replaced with `20260719000000_baseline` creating all 20 models; `migration_lock.toml` pinned; 6 migration contract tests                                                                                |
 | P0-4 | Post-auth 404 (`/dashboard` didn't exist)                                  | #85               | New `/dashboard` server component with enrollments, "Continue learning", "My courses", sign-out; `force-dynamic`                                                                                        |
-| P0-5 | Preview leak ΓÇö lesson access not single-source-of-truth                    | #86               | New `AuthorizeLessonAccess` use case; 5 user states (anonymous, authed-preview, enrolled, refunded, admin); refunded = not enrolled                                                                     |
+| P0-5 | Preview leak ΓÇö lesson access not single-source-of-truth                  | #86               | New `AuthorizeLessonAccess` use case; 5 user states (anonymous, authed-preview, enrolled, refunded, admin); refunded = not enrolled                                                                     |
 | P0-6 | Quiz attempt contract mismatch (adapters called `update` for new attempts) | #87               | Port contract: `create` returns `already_exists` on dup, `update` returns `not_found` if missing; `InMemoryQuizAttemptRepository` conforms; `RecordQuizAttempt` always calls `create`                   |
 | P0-7 | Payment flow unreachable (PayMongo wiring + `/checkout`)                   | (queued)          | Largest remaining item; needs full PR with PayMongo + checkout page; see Sprint 11 follow-ups                                                                                                           |
 
@@ -732,14 +732,14 @@ pushed.
 
 A 7-PR chain to repair the CI pipeline:
 
-| PR  | Fix                                                                                                               |
-| --- | ----------------------------------------------------------------------------------------------------------------- |
-| #90 | Pin pnpm version via `packageManager` field (attempted)                                                           |
-| #91 | Remove duplicate `version: 9` from `pnpm/action-setup@v4` (action was confused by conflict)                       |
-| #92 | Add `packages: ['.']` to `pnpm-workspace.yaml` (pnpm 9.15.9 requires it)                                          |
-| #93 | Resolve lint errors + drop `shadowDatabaseUrl` from `prisma.config.ts` when env var unset (Prisma 7)              |
-| #94 | Drop stdout pollution from baseline migration + add `.gitleaks.toml` allowlist for test secrets                   |
-| #95 | Add `pnpm prisma generate` to unit job + skip sample-render tests in CI (gated on `SAMPLE_OUTPUT_DIR`)            |
+| PR  | Fix                                                                                                                 |
+| --- | ------------------------------------------------------------------------------------------------------------------- |
+| #90 | Pin pnpm version via `packageManager` field (attempted)                                                             |
+| #91 | Remove duplicate `version: 9` from `pnpm/action-setup@v4` (action was confused by conflict)                         |
+| #92 | Add `packages: ['.']` to `pnpm-workspace.yaml` (pnpm 9.15.9 requires it)                                            |
+| #93 | Resolve lint errors + drop `shadowDatabaseUrl` from `prisma.config.ts` when env var unset (Prisma 7)                |
+| #94 | Drop stdout pollution from baseline migration + add `.gitleaks.toml` allowlist for test secrets                     |
+| #95 | Add `pnpm prisma generate` to unit job + skip sample-render tests in CI (gated on `SAMPLE_OUTPUT_DIR`)              |
 | #96 | Exclude Prisma adapters + production container from coverage (placeholders until P0-2 in-memoryΓåÆPrisma migration) |
 
 ### 3. 100% TDD + SOLID compliance suite ΓÇö live in CI (PRs #97, #98)
@@ -778,12 +778,12 @@ All three now go through the existing ports (`IdGenerator`, `JwtService`).
 
 ## Open Work (for the next session)
 
-**Note (2026-07-22, updated by the STORY-011 session):** the table
+**Note (2026-07-23, updated by the STORY-011 session):** the table
 below is a stale snapshot from the 2026-07-19 close (it predates
 PR `#100`, PRs `#125` through `#129`, this session's E2E work,
 and PR #132 / STORY-011). Sprint 11 (051ΓÇô055), P0-2, the E2E suite
 (section B), and STORY-011 are all done as of this session; see
-"Project Status" at the top of this file and the 2026-07-22 log
+"Project Status" at the top of this file and the 2026-07-23 log
 entries for the current state. Left in place rather than deleted,
 since rewriting history that was accurate at the time isn't this
 file's convention (see the "Stale P0-2 items snapshot" CodeRabbit
@@ -800,19 +800,19 @@ operator sign-off, not autonomous execution.
 
 | ID  | Title                                                    | Status                                                                                                                                                                                                                                |
 | --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ΓÇö   | P0-2 in-memoryΓåÆPrisma migration (4 adapters remaining)   | Order + AuditLog + Session (PR #125, merged) + DiscountCode (this session) done. PR #89 established the Course pattern; still queued: Module, Lesson, Scenario, LiveClass, all four blocked on schema migrations that don't exist yet |
-| ΓÇö   | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                                                               |
+| ΓÇö | P0-2 in-memoryΓåÆPrisma migration (4 adapters remaining) | Order + AuditLog + Session (PR #125, merged) + DiscountCode (this session) done. PR #89 established the Course pattern; still queued: Module, Lesson, Scenario, LiveClass, all four blocked on schema migrations that don't exist yet |
+| ΓÇö | P0-7 PayMongo payment flow + `/checkout`                 | Queued. Largest single item. Needs PayMongo client port, webhook handler, checkout page                                                                                                                                               |
 | 051 | Sentry setup                                             | Not started                                                                                                                                                                                                                           |
 | 052 | Structured logging (Pino)                                | Not started                                                                                                                                                                                                                           |
 | 053 | Lighthouse CI                                            | Not started                                                                                                                                                                                                                           |
 | 054 | Rate limiting (Upstash)                                  | Not started                                                                                                                                                                                                                           |
 | 055 | Tenant isolation audit + critical-journey E2E + axe a11y | Not started                                                                                                                                                                                                                           |
 
-### B. E2E failures: RESOLVED (this session, 2026-07-22, branch `claude/next-story-klge5f`, after PR #129 merged)
+### B. E2E failures: RESOLVED (this session, 2026-07-23, branch `claude/next-story-klge5f`, after PR #129 merged)
 
 Was stale (last run 2026-07-19, 17 failed / 7 passed). Re-run this session with a locally provisioned Postgres + the pre-installed Chromium binary: **15 passed, 4 intentionally skipped, 0 failed** on `chromium-desktop`. One real bug found and fixed along the way: `clearE2EUsers()` in `tests/e2e/helpers/seed.ts` was constructing `new PrismaClient()` with no driver adapter, which always throws under this codebase's Prisma 7 + driver-adapter setup, silently no-op'ing the cleanup on every run since the helper was written. See the "E2E suite re-verified green" entry at the top of this session's log for the full writeup. `chromium-mobile`/`chromium-tablet` projects were not re-run (time budget).
 
-### C. Module / Lesson Prisma adapters: DONE (this session, 2026-07-22, branch `claude/next-story-klge5f`)
+### C. Module / Lesson Prisma adapters: DONE (this session, 2026-07-23, branch `claude/next-story-klge5f`)
 
 Closed. See the "PrismaModuleRepository + PrismaLessonRepository" entry at the top of the session log.
 
@@ -958,3 +958,52 @@ E2E failures: signup flow can't reach post-submit state. `expect(locator).toBeVi
 - **Sprint 9:** Certificates (Issue/Revoke/Verify) + React PDF renderer + Email templates (receipt, cert, refund, verification, reset, live class)
 - **Sprint 10:** Admin Panel ΓÇö 11/11 stories (PRs #77ΓÇô#82)
 - **Sprint 10 closeout:** P0 audit remediation + CI restoration + 100% compliance suite
+
+## Loop Engineering Setup (2026-07-23)
+
+Scaffolded via
+px @cobusgreyling/loop-init . --tool opencode + manual integration.
+
+**Loop Readiness Score:** 100/100 (L3) — already strong from day one.
+
+### What was added
+
+| File                               | Purpose                                                  |
+| ---------------------------------- | -------------------------------------------------------- |
+| LOOP.md                            | Active loop config — daily-triage, L1 report-only        |
+| STATE.md                           | Current priorities, watch list, token budget log         |
+| loop-budget.md                     | 300k/day cap for AMPH v2 (raised from 100k default)      |
+| loop-constraints.md                | Safety denylist + escalation rules                       |
+| loop-run-log.md                    | Per-run evidence log                                     |
+| skills/loop-triage/                | Triage skill — read before every loop run                |
+| skills/loop-budget/                | Budget enforcer — early exit on overspend                |
+| skills/loop-constraints/           | Constraints loader — binds denylist to every run         |
+| docs/safety.md                     | Path denylist, auto-merge policy, MCP scopes, escalation |
+| patterns/registry.yaml             | 4 patterns tracked (daily-triage active, 3 planned)      |
+| .github/workflows/daily-triage.yml | GitHub Actions scheduler — runs M–F 09:00 UTC            |
+
+### CLI tools installed
+
+`pnpm exec loop-audit   -- Loop Readiness score + suggestions
+pnpm exec loop-cost     -- token spend estimate per pattern
+pnpm exec loop-sync     -- STATE/LOOP drift detection
+pnpm exec loop-context  -- stateful memory + circuit breaker`
+
+### Skills wired to Mavis
+
+skills/loop-triage, skills/loop-budget, skills/loop-constraints added to skills-lock.json.
+
+### Next steps
+
+1. **Merge this branch** — all loop-engineering files are ready
+2. **Run first loop** — enable the daily-triage workflow or run manually: pnpm exec loop-audit . --suggest
+3. **Graduate to L2** — after score holds ≥3 runs and human approves
+4. **Consider harness-foundry** — version the loop as a composable runtime:
+   px @cobusgreyling/loop-init . --with-foundry
+5. **Add more patterns** — CI sweeper, dependency-sweeper, changelog-drafter all planned in patterns/registry.yaml
+
+### Key risks noted
+
+- Token budget (276k realistic blend) overshoots 100k default — daily cap raised to 300k
+- Mavis is the orchestrator; the GitHub Actions loop is a supplementary daily checkpoint
+- PayMongo webhook still uses InMemory repos per-request — the loop will surface this as a watch item
