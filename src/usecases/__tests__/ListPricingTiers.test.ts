@@ -256,7 +256,9 @@ describe("ListPricingTiers", () => {
     expect(foundations.originalPrice).toBeNull();
 
     expect(mastery.isEarlyBird).toBe(true);
-    expect(mastery.earlyBirdMinutesRemaining).toBe(60);
+    // Allow for a few seconds of clock skew between test setup and use case execution.
+    expect(mastery.earlyBirdMinutesRemaining).toBeGreaterThanOrEqual(59);
+    expect(mastery.earlyBirdMinutesRemaining).toBeLessThanOrEqual(60);
     expect(mastery.displayPrice.minor).toBe(499900);
 
     expect(ultimate.isEarlyBird).toBe(false);
