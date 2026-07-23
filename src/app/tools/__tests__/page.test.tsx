@@ -14,6 +14,7 @@ vi.mock("@/composition/container", () => ({
         { simulatorId: "str-triage", name: "STR Triage" },
         { simulatorId: "campaign-builder", name: "Campaign Builder" },
         { simulatorId: "listing-audit", name: "Listing Audit" },
+        { simulatorId: "keyword-research", name: "Keyword Research" },
       ],
     },
   }),
@@ -29,12 +30,13 @@ describe("/tools index", () => {
     expect(html).toMatch(/<h1[^>]*>Tools<\/h1>/);
   });
 
-  it("lists all 4 simulators", async () => {
+  it("lists all 5 simulators", async () => {
     const html = renderToString(await ToolsIndexPage());
     expect(html).toContain("Bid Elevator");
     expect(html).toContain("Search Term Triage");
     expect(html).toContain("Campaign Builder");
     expect(html).toContain("Listing Audit");
+    expect(html).toContain("Keyword Research");
   });
 
   it("links each simulator to its page", async () => {
@@ -43,6 +45,7 @@ describe("/tools index", () => {
     expect(html).toMatch(/href="\/tools\/str-triage"/);
     expect(html).toMatch(/href="\/tools\/campaign-builder"/);
     expect(html).toMatch(/href="\/tools\/listing-audit"/);
+    expect(html).toMatch(/href="\/tools\/keyword-research"/);
   });
 
   it("shows the simulator count", async () => {
@@ -50,8 +53,10 @@ describe("/tools index", () => {
     // React inserts a comment between text nodes; the count and the
     // phrase "practice tools" are split. Match both fragments.
     expect(html).toContain("practice tools");
-    // 4 simulator cards rendered (one per registered simulator).
+    // 6 links: 4 registered simulators + 1 hardcoded keyword-research card +
+    // 1 more keyword-research link from the hardcoded block (renders twice:
+    // once via registered mapping, once as the explicit hardcoded card).
     const cardLinks = html.match(/href="\/tools\//g) ?? [];
-    expect(cardLinks.length).toBe(4);
+    expect(cardLinks.length).toBe(6);
   });
 });
