@@ -58,6 +58,10 @@ prisma/migrations/dev.db*
 .turbo/
 *.pem
 
+# self-referencing project copy (some local tools create this)
+# Safe to delete locally if it appears.
+amph-v2-greenfield/
+
 # agent skills lock
 skills-lock.json
 .agents/
