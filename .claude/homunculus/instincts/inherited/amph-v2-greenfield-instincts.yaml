@@ -1,0 +1,300 @@
+# Instincts generated from https://github.com/projectamazonph/amph-v2-greenfield
+# Generated: 2026-07-23T19:33:17.790Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: amph-v2-greenfield-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: docs
+
+## Evidence
+
+- 1 commits analyzed
+- Detected conventional commit pattern
+- Examples: docs: update PR references for STORY-054/055 and add CHANGELOG entries for PRs #145-147
+
+---
+id: amph-v2-greenfield-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Commit Length
+
+## Action
+
+Write moderate-length commit messages (~87 characters)
+
+## Evidence
+
+- Average commit message length: 87 chars
+- Based on 1 commits
+
+---
+id: amph-v2-greenfield-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Naming Files
+
+## Action
+
+Use kebab-case naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: kebab-case
+
+---
+id: amph-v2-greenfield-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: amph-v2-greenfield-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: amph-v2-greenfield-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: amph-v2-greenfield-instinct-file-naming
+trigger: "When creating a new file"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct File Naming
+
+## Action
+
+Name the file using kebab-case
+
+## Evidence
+
+- Pattern in namingConventions.files: kebab-case
+
+---
+id: amph-v2-greenfield-instinct-function-naming
+trigger: "When defining a function"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct Function Naming
+
+## Action
+
+Name the function using camelCase
+
+## Evidence
+
+- Pattern in namingConventions.functions: camelCase
+
+---
+id: amph-v2-greenfield-instinct-class-naming
+trigger: "When defining a class"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct Class Naming
+
+## Action
+
+Name the class using PascalCase
+
+## Evidence
+
+- Pattern in namingConventions.classes: PascalCase
+
+---
+id: amph-v2-greenfield-instinct-constant-naming
+trigger: "When defining a constant"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct Constant Naming
+
+## Action
+
+Name the constant using SCREAMING_SNAKE_CASE
+
+## Evidence
+
+- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+
+---
+id: amph-v2-greenfield-instinct-import-style
+trigger: "When importing modules"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct Import Style
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern in importStyle: relative
+
+---
+id: amph-v2-greenfield-instinct-export-style
+trigger: "When exporting from a module"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct Export Style
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in exportStyle: named
+
+---
+id: amph-v2-greenfield-instinct-test-location
+trigger: "When adding tests for code in src"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct Test Location
+
+## Action
+
+Place test files in a separate test folder
+
+## Evidence
+
+- Pattern in architecture.folderStructure.testLocation: separate
+
+---
+id: amph-v2-greenfield-instinct-git-commit-prefix
+trigger: "When writing a commit message for documentation changes"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct Git Commit Prefix
+
+## Action
+
+Prefix the commit message with 'docs:'
+
+## Evidence
+
+- Pattern in commits.prefixes: docs
+- Example: docs: update PR references for STORY-054/055 and add CHANGELOG entries for PRs #145-147
+
+---
+id: amph-v2-greenfield-instinct-git-commit-format
+trigger: "When writing any commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: projectamazonph/amph-v2-greenfield
+---
+
+# Amph V2 Greenfield Instinct Git Commit Format
+
+## Action
+
+Follow the conventional commit format: <type>: <description>
+
+## Evidence
+
+- Pattern in commits.type: conventional
+- Example: docs: update PR references for STORY-054/055 and add CHANGELOG entries for PRs #145-147
+
