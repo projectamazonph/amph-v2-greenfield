@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { WebVitalsReporter } from "./WebVitalsReporter";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -32,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             null when not impersonating. */}
         <ImpersonationBanner />
         <WebVitalsReporter />
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

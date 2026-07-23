@@ -21,6 +21,24 @@ Direct, plain-spoken, Filipino VA audience. No jargon without definition. No AI-
 
 Field Manual. Dense, scannable, utilitarian. Off-white surface. Orange accent (#FF6B35). Type-led hierarchy. No glassmorphism, no gradient orbs, no decorative blurs. See `docs/design-brief.md`.
 
+## UI Components — Astryx
+
+Complex components (Table, Dialog, Toolbar, SideNav, TopNav, Select, Typeahead, Pagination, MultiSelector, DatePicker, Toast, Skeleton) come from Astryx (`@astryxdesign/core`). Brand wrappers live in `src/components/ui/`. Rule of thumb: if AMPH does not have it, build it on Astryx; if AMPH already has it, use the AMPH component.
+
+```tsx
+// Check what's available in the AMPH component library first
+import { Button, Card, Input, Badge } from "@/components/ui";
+
+// Only reach for Astryx for components AMPH does not have
+import { Table } from "@astryxdesign/core/Table";
+```
+
+The AMPH Astryx theme is in `src/themes/amph-theme.ts`. It extends `neutralTheme` with Waybill Orange (#FF6B35), Space Grotesk + JetBrains Mono, the AMPH surface/ink/semantic token ramp, and flat-shadow overrides. Theme is applied via `<Providers>` in `src/app/layout.tsx` — every page gets it automatically.
+
+Before writing new UI, run `pnpm exec astryx build "<idea>"` for a composition kit, then `pnpm exec astryx component <Name>` for the full API. Never swizzle an Astryx component unless a brand requirement cannot be achieved via theme override.
+
+**Token guardrail**: valid `defineTheme tokens:` keys are `--color-*` (accent, background, text, border, success/error/warning), `--spacing-0` through `--spacing-12`, `--shadow-low/med/high`, `--radius-*`. Do NOT use `--shadow-sm/md/lg`, `--spacing-16/20`, or `--color-info` — TypeScript will reject them.
+
 ## The Architecture
 
 Five layers, dependency direction always inward:
@@ -62,8 +80,8 @@ Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/c
 - No `console.log` in committed code. Use the structured logger (`src/infra/observability/PinoLogger.ts`).
 - No comments that restate the code. Comment the why, not the what.
 - File names: `kebab-case.ts` for non-component files, `PascalCase.tsx` for components.
-- Money is never a `number`. Use the `Money` value object (`src/lib/Money.ts`).
-- Errors cross boundaries as `Result<T, E>`, not thrown exceptions. Throw only for programmer errors (invariant violations).
+- Money is never a `number`. Use the `Money` value object (`src/domain/values/Money.ts`).
+- Errors cross boundaries as `Result<T, E>`, not thrown exceptions. Throw only for programmer errors (invariant violations). `Result` lives at `src/domain/shared/Result.ts`.
 - Every port has at least one fake implementation for tests. No mocking the real adapter.
 
 ## Testing
@@ -118,7 +136,8 @@ src/composition/ ← DI container. Wires infra into usecases.
    ↑
 src/app/         ← Next.js routes + server actions. Thin.
    ↑
-src/components/  ← UI primitives. Depend on app, lib.
+src/components/ui/    ← AMPH brand UI primitives (Button, Card, Input, Badge). Depend on app, lib.
+src/components/astryx/ ← Astryx-based components (Table, Dialog, Toolbar, etc.). Depend on ui, app, lib.
 ```
 
 Lower layers must not import from higher layers. The ESLint boundary rule blocks this at lint time. ADR-016.
@@ -175,8 +194,43 @@ When something breaks:
 ## Memoria Protocol
 
 This repo uses Memoria for cross-agent context. Tag memories with:
+
 - `project:amph-v2`
 - `phase:1` (analysis), `2` (planning), `3` (solutioning), `4` (implementation), `5` (enrichment)
 - `agent:dusk` (this instance)
 
 Other agents (Atlas on phone OpenClaw, Vader on phone Hermes) share the same memoria server. Leave notes for them on handoffs.
+
+<!-- ASTRYX:START -->
+
+Astryx v0.1.8 · 153 components
+CLI: run every command as `pnpm exec astryx <cmd>` (shown below as `astryx ...`).
+
+SETUP (once, in your app entry e.g. main.tsx) — without these, components render unstyled:
+import "@astryxdesign/core/reset.css";
+import "@astryxdesign/core/astryx.css";
+
+WORKFLOW — discover, don't guess. Before writing UI:
+
+1. `astryx build "<idea>"` — START HERE: returns a kit (closest [page] + [block]s + [component]s). No args = full playbook.
+2. `astryx template <name> [--skeleton]` — scaffold the [page]/[block]s it named, or study their layout. Templates are reference code.
+3. `astryx component <Name>` — props + examples for every component you use.
+
+RULES:
+
+- No <div> — components do all layout/spacing. Full page → AppShell; sidebar nav → SideNav.
+- Frame first: pick the shell (AppShell / Layout+LayoutPanel) and budget regions in px BEFORE writing content (`astryx docs layout`).
+- Dense data = rows (Table, List/Item) edge-to-edge — never Card-wrapped list items. Card = dashboard widgets, galleries, settings groups only.
+- Status → StatusDot/Token; Badge only for counts and enumerated states, never decoration.
+- Custom styling: component props first; else style/className with tokens — var(--color-_|--spacing-_|--radius-*). No raw hex/px. (No StyleX/Tailwind compiler here — don't use xstyle/utility classes.)
+- Tokens for every value (`astryx docs tokens`). Brand/accent via `astryx theme` — never override --color-* in :root.
+- SELF-CHECK before you finish: re-read the file and replace any raw <div>/<span> layout, imported .css/@apply, or hardcoded value (#hex, 16px) with the component or a token (var(--color-_|--spacing-_|…)). If unsure a component/prop exists, run `astryx component <Name>` / `astryx search "<thing>"`; don't hand-roll CSS.
+
+MORE CLI:
+search "<query>" find any component / hook / doc / template / block
+component --list 153 components by category
+template --list page + block recipes
+docs <topic> color, elevation, icons, illustrations, internationalization, layout, migration, motion, principles, shape, spacing, styling, theme, tokens, typography
+swizzle <Name> eject component source for deep customization
+upgrade --apply run after any @astryxdesign/core bump
+<!-- ASTRYX:END -->

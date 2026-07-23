@@ -1,0 +1,76 @@
+/* LoginForm.module.css — AMPH design system */
+
+.page {
+  min-height: 100vh;
+  background: var(--surface-0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  font-family: var(--font-body);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.logo {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink-900);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--ink-700);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.submit {
+  width: 100%;
+  margin-top: var(--space-1);
+}
+
+.altPrompt {
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-700);
+  margin: 0;
+}
+
+.altLink {
+  color: var(--accent);
+  font-weight: 500;
+}

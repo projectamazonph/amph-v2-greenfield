@@ -8,9 +8,9 @@ import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card, Badge } from "@/components/ui";
-import { formatPhp } from "@/app/admin/_lib/formatPhp";
+import { Card } from "@/components/ui";
 import type { PaymentStatus } from "@/domain/values/PaymentStatus";
+import { AdminPaymentsTable, type PaymentRow } from "@/components/astryx/AdminPaymentsTable";
 import styles from "./page.module.css";
 
 const STATUSES: { value: PaymentStatus | ""; label: string }[] = [
@@ -34,6 +34,7 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
   const container = buildContainer();
   const status = (params.status || undefined) as PaymentStatus | undefined;
   const email = params.email || undefined;
+
   const result = await container.adminListPayments.execute({
     status,
     userEmailSearch: email,
@@ -52,6 +53,17 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
 
   const { orders, users } = result.value;
 
+  // Map domain Order[] → PaymentRow[] (plain serializable data for client component)
+  const rows: PaymentRow[] = orders.map((o) => ({
+    id: o.id,
+    userId: o.userId,
+    userEmail: users.get(o.userId)?.email ?? o.userId,
+    courseId: o.courseId,
+    totalMinor: o.totalMinor,
+    status: o.status,
+    createdAt: o.createdAt,
+  }));
+
   return (
     <div>
       <TopBar
@@ -59,12 +71,15 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
         subtitle={`${orders.length} order${orders.length === 1 ? "" : "s"}`}
       />
 
+      {/* Filter form — GET submission updates URL params */}
       <form method="get" className={styles.filters}>
         <label>
           <span>Status</span>
           <select name="status" defaultValue={params.status ?? ""} className={styles.select}>
             {STATUSES.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
             ))}
           </select>
         </label>
@@ -78,62 +93,17 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
             className={styles.input}
           />
         </label>
-        <button type="submit" className={styles.applyButton}>Apply</button>
-        <Link href="/admin/payments" className={styles.clearButton}>Clear</Link>
+        <button type="submit" className={styles.applyButton}>
+          Apply
+        </button>
+        <Link href="/admin/payments" className={styles.clearButton}>
+          Clear
+        </Link>
       </form>
 
+      {/* Table — client component handles renderCell (function props) */}
       <Card padding="comfortable">
-        {orders.length === 0 ? (
-          <p className={styles.muted}>No orders match the current filters.</p>
-        ) : (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>User</th>
-                <th>Course</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((o) => {
-                const u = users.get(o.userId);
-                return (
-                  <tr key={o.id}>
-                    <td className={styles.mono}>{o.id}</td>
-                    <td>{u ? u.email : o.userId}</td>
-                    <td className={styles.mono}>{o.courseId}</td>
-                    <td className={styles.mono}>{formatPhp(o.totalMinor)}</td>
-                    <td>
-                      <Badge
-                        variant={
-                          o.status === "PAID" ? "accent" :
-                          o.status === "REFUNDED" ? "neutral" :
-                          o.status === "PENDING" ? "warning" :
-                          o.status === "FAILED" || o.status === "EXPIRED" ? "danger" :
-                          "neutral"
-                        }
-                      >
-                        {o.status}
-                      </Badge>
-                    </td>
-                    <td className={styles.mono}>
-                      {o.createdAt.toLocaleDateString("en-US", { dateStyle: "medium" })}
-                    </td>
-                    <td>
-                      <Link href={`/admin/payments/${o.id}`} className={styles.viewButton}>
-                        View
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+        <AdminPaymentsTable payments={rows} filters={{ status, email }} />
       </Card>
     </div>
   );

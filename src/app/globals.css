@@ -121,6 +121,14 @@
 }
 
 /* =========================================================================
+   Astryx base styles — load after AMPH tokens so AMPH overrides apply.
+   Import order: reset → astryx → AMPH tokens (already above)
+   ========================================================================= */
+
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+
+/* =========================================================================
    Dark mode — placeholder until the dark-mode-toggle story lands.
    The selector exists so the token system is dark-mode-ready.
    ========================================================================= */

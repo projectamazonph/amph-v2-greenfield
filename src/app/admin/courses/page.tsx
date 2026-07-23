@@ -11,10 +11,10 @@
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card, Badge } from "@/components/ui";
-import { formatPhp } from "@/app/admin/_lib/formatPhp";
+import { Card } from "@/components/ui";
 import { courseLessonCount } from "@/domain/entities/Course";
 import type { CourseStatus } from "@/domain/entities/Course";
+import { AdminCoursesTable, type CourseRow } from "@/components/astryx/AdminCoursesTable";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -55,24 +55,24 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
       <div>
         <TopBar title="Courses" subtitle="Manage all courses" />
         <Card padding="comfortable">
-          <p className={styles.error}>
-            Failed to load courses: {result.error.message}
-          </p>
+          <p className={styles.error}>Failed to load courses: {result.error.message}</p>
         </Card>
       </div>
     );
   }
 
   const { courses, totalCount, pageSize } = result.value;
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
-  function buildPageHref(targetPage: number): string {
-    const url = new URL("http://x/admin/courses");
-    if (search) url.searchParams.set("search", search);
-    if (status) url.searchParams.set("status", status);
-    url.searchParams.set("page", String(targetPage));
-    return url.pathname + url.search;
-  }
+  // Map domain Course[] → CourseRow[] (plain serializable data for client component)
+  const rows: CourseRow[] = courses.map((c) => ({
+    id: c.id,
+    title: c.title,
+    slug: c.slug,
+    status: c.status,
+    priceMinor: c.price.minor,
+    lessonCount: courseLessonCount(c),
+    createdAt: c.createdAt,
+  }));
 
   return (
     <div>
@@ -86,6 +86,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
         }
       />
 
+      {/* Filter form — GET submission updates URL params */}
       <form className={styles.filters} method="get">
         <input
           type="text"
@@ -105,77 +106,16 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
         </button>
       </form>
 
+      {/* Table — client component handles renderCell (function props) */}
       <Card padding="comfortable">
-        {courses.length === 0 ? (
-          <p className={styles.emptyState}>
-            No courses match the current filters.{" "}
-            <Link href="/admin/courses/new">Add a course</Link> to get started.
-          </p>
-        ) : (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th className={styles.th}>Title</th>
-                <th className={styles.th}>Slug</th>
-                <th className={styles.th}>Status</th>
-                <th className={styles.th}>Price</th>
-                <th className={styles.th}>Lessons</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((c) => (
-                <tr key={c.id}>
-                  <td className={styles.td}>
-                    <Link href={`/admin/courses/${c.id}`} className={styles.courseLink}>
-                      {c.title}
-                    </Link>
-                  </td>
-                  <td className={styles.td}>
-                    <code className={styles.slug}>{c.slug}</code>
-                  </td>
-                  <td className={styles.td}>
-                    <Badge
-                      variant={
-                        c.status === "PUBLISHED"
-                          ? "accent"
-                          : c.status === "ARCHIVED"
-                            ? "neutral"
-                            : "warning"
-                      }
-                    >
-                      {c.status}
-                    </Badge>
-                  </td>
-                  <td className={styles.td}>{formatPhp(c.price.minor)}</td>
-                  <td className={styles.td}>{courseLessonCount(c)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <AdminCoursesTable
+          courses={rows}
+          totalCount={totalCount}
+          page={page}
+          pageSize={pageSize}
+          filters={{ search, status }}
+        />
       </Card>
-
-      {totalPages > 1 && (
-        <nav className={styles.pagination} aria-label="Pagination">
-          {page > 1 ? (
-            <Link href={buildPageHref(page - 1)} className={styles.pageLink}>
-              ← Prev
-            </Link>
-          ) : (
-            <span className={styles.pageLinkDisabled}>← Prev</span>
-          )}
-          <span className={styles.pageInfo}>
-            Page {page} of {totalPages}
-          </span>
-          {page < totalPages ? (
-            <Link href={buildPageHref(page + 1)} className={styles.pageLink}>
-              Next →
-            </Link>
-          ) : (
-            <span className={styles.pageLinkDisabled}>Next →</span>
-          )}
-        </nav>
-      )}
     </div>
   );
 }
