@@ -1,24 +1,72 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-24 (docs update + CSS token fix PR merged). All of Sprints 1–11 shipped. Sprint 12 (STORY-056–060, launch) is operator-owned and not yet started. This is the final state before launch.
+**Updated:** 2026-07-24 (Sprint 12 launch in progress — production deployed, pricing tiers seeded, all CI green on `main` @ `9aca555` / `285491e`). Sprints 1–11 fully shipped. STORY-056 (deploy runbook) and STORY-059 (production deploy) effectively executed; STORY-057/058/060 still operator-owned.
 
 ---
 
 ## Project Status
 
-| Metric                   | Value                                                                                                                                                                                             |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Sprints 1–11 complete. Sprint 12 (launch) not yet started — operator-owned.**                                                                                                                   |
-| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                     |
-| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                            |
-| `main` HEAD              | `75d2709`: fix(ui): replace undefined CSS variable references with correct AMPH token names (#147)                                                                                                  |
-| Unit + integration tests | **2347 passing + 2 skipped, 0 TypeScript errors** (this session: checkout action tests updated with rateLimiter mock + new rate_limited branch test; 1 new arch test assertion)                   |
-| Architecture compliance  | **419 tests passing, 0 violations** (rate-limit-wiring.test.ts expanded to 9 assertions)                                                                                                          |
-| Coverage                 | Last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches — all above configured thresholds (80/70/80/80).                                                                |
-| E2E                      | 15 passed, 4 intentionally skipped (journeys 3–6 need seeded admin data), 0 failed on `chromium-desktop`. a11y.spec.ts soft-passes (axe violations logged, not failed).                           |
-| CI                       | All 6 jobs green on every PR this session (PRs #125–#142).                                                                                                                                        |
-| Database                 | Not yet provisioned in production. Schema complete (11 migrations). Every repository in `buildProductionContainer()` is Postgres-backed. Local throwaway Postgres used for E2E verification only. |
-| Production               | Not deployed. Sprint 12 is operator-owned launch work — not autonomous execution.                                                                                                                 |
+| Metric                   | Value                                                                                                                                                                                                                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                    | **Sprints 1–11 shipped. Sprint 12 (launch) in progress — production is live, pricing tiers seeded, operator sign-off items remaining (PayMongo webhook, custom domain, admin user, launch comms).**                                                                                                         |
+| Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                                                                               |
+| Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                                                                      |
+| `main` HEAD              | `285491e` (merge commit) / `9aca555` (PR #150 squash): `fix: construct proper PricingTier entity in seed script (use Money.of)`                                                                                                                                                                             |
+| Production URL           | `https://amph-v2-greenfield.vercel.app` — live, all 4 key routes returning expected status (`/`, `/signup`, `/login` → 200; `/dashboard` → 307 to login when unauthenticated)                                                                                                                               |
+| Vercel project           | `prj_3tEN1Akupoosai3OAGc1t50ru5QG` (`amph-v2-greenfield`), org `team_wIkEXZCToZvRHmrgFFhpsgkV`                                                                                                                                                                                                              |
+| Database                 | **Neon Postgres** (production). `prisma migrate deploy` applied all 12 migrations (added `pricing_tier` + `pricing_tier_early_bird_course_link` last). All four pricing tiers seeded (foundations ₱2,999, mastery ₱5,999 with 7-day early-bird, ultimate ₱9,999 with 3-day early-bird, all-access ₱14,999). |
+| Environment              | `DATABASE_URL`, `SHADOW_DATABASE_URL`, `JWT_SECRET`, `PAYMONGO_SECRET` (live), `PAYMONGO_WEBHOOK_SECRET`, `RESEND_API_KEY`, `SENTRY_DSN`, `NEXT_PUBLIC_APP_URL` pulled from Vercel and mirrored into local `.env` / `.env.local` for script execution                                                       |
+| Unit + integration tests | **2347 passing + 2 skipped, 0 TypeScript errors**                                                                                                                                                                                                                                                           |
+| Architecture compliance  | **419 tests passing, 0 violations**                                                                                                                                                                                                                                                                         |
+| Coverage                 | 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches — all above configured thresholds (80/70/80/80).                                                                                                                                                                                        |
+| E2E                      | 15 passed, 4 intentionally skipped, 0 failed on `chromium-desktop`. a11y.spec.ts soft-passes.                                                                                                                                                                                                               |
+| CI                       | All 6 jobs green on every PR this session (PRs #145–#150).                                                                                                                                                                                                                                                  |
+
+---
+
+## What changed this session (2026-07-24, Sprint 12 launch)
+
+### Production deploy — `https://amph-v2-greenfield.vercel.app` is live
+
+Sprint 12 is in motion. Production is no longer "not deployed" — Vercel auto-deployed the latest `main` after the PR #150 merge.
+
+**What got done:**
+
+- **Vercel project linked** to `amph-v2-greenfield` (`prj_3tEN1Akupoosai3OAGc1t50ru5QG`, team `team_wIkEXZCToZvRHmrgFFhpsgkV`).
+- **Environment variables** pulled from Vercel into local `.env.local` and `.env` so the same DATABASE_URL / JWT_SECRET / PayMongo live keys / Resend / Sentry env vars are available to both the Next.js app and one-off scripts (the Prisma seed script reads `.env` directly, the Next.js app reads `.env.local`).
+- **Prisma migrations deployed** to Neon Postgres: `pnpm prisma migrate deploy` applied all 12 migrations, including the latest `20260723000000_pricing_tier_early_bird_course_link` that STORY-015's checkout flow needs.
+- **Pricing tiers seeded** into Neon: `pnpm db:seed:tiers` upserted all four tiers (`tier-foundations` ₱2,999, `tier-mastery` ₱5,999 with 7-day early-bird ₱4,999, `tier-ultimate` ₱9,999 with 3-day early-bird ₱7,999, `tier-all-access` ₱14,999). The `--with-courses` flag was intentionally not used yet — courses still need to be created via the admin panel or another seed before linking to tiers.
+- **Production deploy**: Vercel auto-deployed the `main` HEAD (PR #150 squash) via the Git integration. All four smoke-tested routes respond correctly.
+
+**What got fixed in passing:**
+
+- **Seed script bug (PR #150)**: `scripts/seed-pricing-tiers.ts` was passing flat `{ priceMinor: 299900 }` objects to `repo.create()`, but `PrismaPricingTierRepository.mapData()` reads `tier.price.minor` — the domain entity has `price: Money`, not a flat `priceMinor` field. The first attempt failed with `TypeError: Cannot read properties of undefined (reading 'minor')`. Fixed by constructing a proper `PricingTier` entity with `Money.of(priceMinor, "PHP")` in both create and update paths.
+- **Phantom CSS `@import` error**: the dev server was throwing `Parsing CSS source code failed` at `globals.css:128:8`, but `globals.css` had the Astryx `@import` statements correctly placed at lines 5-6 (the top of the file, as CSS spec requires). The error was from an old cached `.next` build artifact; clearing it and a clean restart had the dev server compiling with no errors.
+- **Stale Prisma client types**: `pnpm prisma migrate deploy` succeeded but `prisma:generate` had not been re-run after the early-bird pricing migration (`20260722050000_pricing_tier`) added the `earlyBirdPriceMinor` / `earlyBirdEndsAt` fields. The seed script's first attempt to write to those columns failed with `Unknown argument 'earlyBirdPriceMinor'`. `pnpm prisma:generate` fixed it permanently.
+- **`pnpm-lock.yaml` corruption**: a previous session's `ERR_PNPM_INVALID_DEPENDENCY_NAME` (with `""` as the key) was caused by a stale/corrupted lock file. Deleted via `mavis-trash` and regenerated with `pnpm install`; the new lock is clean and reproducible.
+
+**Verification of the live site:**
+
+```
+GET https://amph-v2-greenfield.vercel.app/         → 200 (landing page renders)
+GET https://amph-v2-greenfield.vercel.app/signup   → 200
+GET https://amph-v2-greenfield.vercel.app/login    → 200
+GET https://amph-v2-greenfield.vercel.app/dashboard → 307 (redirect to login, unauthenticated — correct)
+```
+
+**Remaining Sprint 12 work (operator-owned):**
+
+1. **PayMongo webhook** — add the endpoint `https://amph-v2-greenfield.vercel.app/api/webhooks/paymongo` in the PayMongo dashboard, pointing at the `PAYMONGO_WEBHOOK_SECRET` already in Vercel env. Without this, a successful checkout will not auto-enroll the student (STORY-019 has the use case, the route exists at `src/app/api/webhooks/paymongo/route.ts`, but the live PayMongo account doesn't yet know where to POST).
+2. **Admin user** — no `User` with `role = ADMIN` exists yet. Open `pnpm prisma:studio`, create a user with `role = "ADMIN"`, or write a tiny one-off `createAdmin.ts` script.
+3. **Custom domain** (optional but recommended) — Vercel → Settings → Domains → add `amph.projectamazonph.com` (or the final domain). Update `NEXT_PUBLIC_APP_URL` after.
+4. **Smoke test the full flow** — signup → login → choose tier → checkout → PayMongo test card → verify webhook fires → student gets enrolled. Run from a real browser, not just curl, to catch any client-side runtime errors.
+5. **STORY-057 (DB backup + restore drill)** and **STORY-058 (pre-launch security audit)** are still operator-owned. Both have runbooks but no autonomous execution.
+6. **STORY-060 (launch communications)** — Facebook, LinkedIn, Resend broadcast to existing waitlist, internal Slack. Not in scope for code changes.
+
+**Branch and PR #150 status:**
+
+- Branch: `fix/seed-pricing-tiers` (auto-deleted on merge).
+- PR: #150 — squash-merged as `9aca555`. All 6 CI jobs green.
 
 ---
 
@@ -29,6 +77,7 @@
 Found and fixed 18 files with undefined `var(--color-*)` CSS variable references during an audit of the Astryx migration.
 
 **What changed:**
+
 - 18 files affected: admin form pages (`admin/simulators/new`, `admin/simulators/[id]/edit`, `admin/discount-codes/new`, `admin/discount-codes/[id]/edit`, `admin/badges/new`, `admin/badges/[slug]/edit`, `admin/live-classes/new`, `admin/live-classes/[id]/edit`), 7 `Admin*Table` Astryx components, and 2 CSS module files.
 - Token mapping applied: `var(--color-accent)` → `var(--accent)`, `var(--color-danger)` → `var(--danger)`, `var(--color-text-primary)` → `var(--ink-900)`, `var(--color-text-secondary)` → `var(--ink-700)`, `var(--color-text-muted)` → `var(--ink-500)`, `var(--color-text-disabled)` → `var(--ink-300)`, `var(--color-border)` → `var(--border)`, `var(--color-background-muted)` / `var(--color-bg-muted)` → `var(--surface-2)`, `var(--color-on-accent)` → `var(--accent-ink)`, `var(--color-accent-dark)` → `var(--accent-hover)`.
 - These were pre-existing bugs from the original Astryx installation commit, not introduced by the migration PRs.

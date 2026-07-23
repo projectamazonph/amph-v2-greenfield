@@ -6,6 +6,8 @@
 
 Three courses. One outcome: become the Amazon ads specialist clients retain.
 
+**Live:** [https://amph-v2-greenfield.vercel.app](https://amph-v2-greenfield.vercel.app) (Vercel · Neon Postgres · deployed 2026-07-24)
+
 ![Landing Page](docs/screenshots/landing.png)
 
 ---
@@ -24,11 +26,11 @@ You learn by doing. Interactive simulators let you practice with real campaign s
 
 Three tiered courses, each building on the last:
 
-| Course | What You Learn | Price |
-|--------|---------------|-------|
-| **PPC Foundations** | Amazon advertising basics, Sponsored Products, campaign structure, keyword research, bid management | ₱2,999 |
-| **Accelerated Mastery** | Everything in Foundations + advanced strategies, Sponsored Brands, Sponsored Display, optimization frameworks | ₱5,999 |
-| **Ultimate Transformation** | Everything in both courses + live classes, 1-on-1 support, portfolio-ready projects, job placement guidance | ₱9,999 |
+| Course                      | What You Learn                                                                                                | Price  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------- | ------ |
+| **PPC Foundations**         | Amazon advertising basics, Sponsored Products, campaign structure, keyword research, bid management           | ₱2,999 |
+| **Accelerated Mastery**     | Everything in Foundations + advanced strategies, Sponsored Brands, Sponsored Display, optimization frameworks | ₱5,999 |
+| **Ultimate Transformation** | Everything in both courses + live classes, 1-on-1 support, portfolio-ready projects, job placement guidance   | ₱9,999 |
 
 **Early bird deal:** First 30 enrollees pay only ₱499 — full access, not a deposit.
 
@@ -86,32 +88,32 @@ Generate keyword ideas from a seed term. Get match-type recommendations, estimat
 
 ## Pricing Snapshot
 
-| Item | Price |
-|------|-------|
-| PPC Foundations | ₱2,999 (one-time) |
-| Accelerated Mastery | ₱5,999 (one-time) |
-| Ultimate Transformation | ₱9,999 (one-time) |
-| All-access pass | ₱12,999 (saves vs buying separately) |
-| Early bird (first 30) | ₱499 any tier |
-| Refund window | 7 days, full refund |
-| Live classes | Ultimate tier only, weekly |
-| Certificate | Free on course completion, verified by hash |
+| Item                    | Price                                       |
+| ----------------------- | ------------------------------------------- |
+| PPC Foundations         | ₱2,999 (one-time)                           |
+| Accelerated Mastery     | ₱5,999 (one-time)                           |
+| Ultimate Transformation | ₱9,999 (one-time)                           |
+| All-access pass         | ₱12,999 (saves vs buying separately)        |
+| Early bird (first 30)   | ₱499 any tier                               |
+| Refund window           | 7 days, full refund                         |
+| Live classes            | Ultimate tier only, weekly                  |
+| Certificate             | Free on course completion, verified by hash |
 
 ---
 
 ## Status
 
-| Metric | Value |
-|--------|-------|
-| Architecture | Greenfield, SOLID-layered modular monolith |
-| Tech stack | Next.js 16 App Router + TypeScript strict + Prisma 7 + PostgreSQL |
-| Payment | PayMongo (PHP, GCash / Maya / card / bank) |
-| Email | Resend (React Email) |
-| Repo layout | `src/{domain,ports,usecases,infra,app,components,composition,lib}` |
-| Test stack | Vitest (unit + integration) + Playwright (e2e) |
-| First deploy | Pending — see `docs/sprint-1/PLAN.md` |
-| Documentation | This file + `AGENTS.md` + `CLAUDE.md` + `FEATURES.md` + `docs/` |
-| Last updated | 2026-07-24 |
+| Metric        | Value                                                              |
+| ------------- | ------------------------------------------------------------------ |
+| Architecture  | Greenfield, SOLID-layered modular monolith                         |
+| Tech stack    | Next.js 16 App Router + TypeScript strict + Prisma 7 + PostgreSQL  |
+| Payment       | PayMongo (PHP, GCash / Maya / card / bank)                         |
+| Email         | Resend (React Email)                                               |
+| Repo layout   | `src/{domain,ports,usecases,infra,app,components,composition,lib}` |
+| Test stack    | Vitest (unit + integration) + Playwright (e2e)                     |
+| First deploy  | Pending — see `docs/sprint-1/PLAN.md`                              |
+| Documentation | This file + `AGENTS.md` + `CLAUDE.md` + `FEATURES.md` + `docs/`    |
+| Last updated  | 2026-07-24                                                         |
 
 ---
 
