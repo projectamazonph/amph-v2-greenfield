@@ -1,4 +1,11 @@
 /* =========================================================================
+   Astryx base — must be first per CSS spec; AMPH tokens below override.
+   ========================================================================= */
+
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+
+/* =========================================================================
    Design tokens — Field Manual system
    Source: docs/ui-specs/DESIGN-SPEC.md §1–§4
    STORY-046-prep-1
@@ -119,14 +126,6 @@
         via CSS vars; @media is the only way to use these) ── */
   /* --bp-sm: 640px; --bp-md: 768px; --bp-lg: 1024px; --bp-xl: 1280px; --bp-2xl: 1536px; */
 }
-
-/* =========================================================================
-   Astryx base styles — load after AMPH tokens so AMPH overrides apply.
-   Import order: reset → astryx → AMPH tokens (already above)
-   ========================================================================= */
-
-@import '@astryxdesign/core/reset.css';
-@import '@astryxdesign/core/astryx.css';
 
 /* =========================================================================
    Dark mode — placeholder until the dark-mode-toggle story lands.
