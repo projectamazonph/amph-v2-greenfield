@@ -33,13 +33,18 @@ import { buildTestContainer } from "@/composition/container.test";
 
 type MockPlantCookie = Mock<(token: string, expiresAt: Date) => Promise<void>>;
 type MockNavigate = Mock<(url: string) => never>;
+type MockGetClientIp = Mock<() => Promise<string>>;
 
-function makeDeps(overrides: {
-  plantCookie?: MockPlantCookie;
-  navigate?: MockNavigate;
-} = {}): {
+function makeDeps(
+  overrides: {
+    plantCookie?: MockPlantCookie;
+    navigate?: MockNavigate;
+    getClientIp?: MockGetClientIp;
+  } = {},
+): {
   plantCookie: MockPlantCookie;
   navigate: MockNavigate;
+  getClientIp: MockGetClientIp;
 } {
   const plantCookie = overrides.plantCookie ?? vi.fn(async () => undefined);
   const navigate =
@@ -47,7 +52,8 @@ function makeDeps(overrides: {
     vi.fn((_url: string): never => {
       throw new Error("NEXT_REDIRECT");
     });
-  return { plantCookie, navigate };
+  const getClientIp = overrides.getClientIp ?? vi.fn(async () => "127.0.0.1");
+  return { plantCookie, navigate, getClientIp };
 }
 
 type LoginDeps = ReturnType<typeof makeDeps>;

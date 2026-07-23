@@ -54,13 +54,18 @@ async function seedUser(
 
 type MockPlantCookie = Mock<(token: string, expiresAt: Date) => Promise<void>>;
 type MockNavigate = Mock<(url: string) => never>;
+type MockGetClientIp = Mock<() => Promise<string>>;
 
-function makeDeps(overrides: {
-  plantCookie?: MockPlantCookie;
-  navigate?: MockNavigate;
-} = {}): {
+function makeDeps(
+  overrides: {
+    plantCookie?: MockPlantCookie;
+    navigate?: MockNavigate;
+    getClientIp?: MockGetClientIp;
+  } = {},
+): {
   plantCookie: MockPlantCookie;
   navigate: MockNavigate;
+  getClientIp: MockGetClientIp;
 } {
   const plantCookie = overrides.plantCookie ?? vi.fn(async () => undefined);
   const navigate =
@@ -68,7 +73,8 @@ function makeDeps(overrides: {
     vi.fn((_url: string): never => {
       throw new Error("NEXT_REDIRECT");
     });
-  return { plantCookie, navigate };
+  const getClientIp = overrides.getClientIp ?? vi.fn(async () => "127.0.0.1");
+  return { plantCookie, navigate, getClientIp };
 }
 
 type LoginDeps = ReturnType<typeof makeDeps>;
@@ -185,7 +191,7 @@ describe("performLogin", () => {
           password: "correct-password",
           redirectTo: "https://evil.example.com/steal",
         },
-        { plantCookie: vi.fn(), navigate },
+        { plantCookie: vi.fn(), navigate, getClientIp: async () => "127.0.0.1" },
       ),
     ).rejects.toThrow("NEXT_REDIRECT");
     expect(navigate).toHaveBeenCalledWith("/courses");
@@ -205,7 +211,7 @@ describe("performLogin", () => {
           password: "correct-password",
           redirectTo: "//evil.example.com/steal",
         },
-        { plantCookie: vi.fn(), navigate },
+        { plantCookie: vi.fn(), navigate, getClientIp: async () => "127.0.0.1" },
       ),
     ).rejects.toThrow("NEXT_REDIRECT");
     // //evil.com starts with /, so it would pass the startsWith("/")

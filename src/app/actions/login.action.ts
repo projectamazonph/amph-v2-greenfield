@@ -41,7 +41,7 @@ async function clientIp(): Promise<string> {
 /**
  * Pure login helper. Takes the container (so tests can pass
  * buildTestContainer), the email + password + redirectTo, and the
- * side-effect functions (plantCookie, navigate) as dependencies.
+ * side-effect functions (plantCookie, navigate, getClientIp) as dependencies.
  *
  * Returns a discriminated union the caller maps to a redirect.
  * The side-effect functions are injected so the helper is unit-testable
@@ -59,6 +59,7 @@ export async function performLogin(
   deps: {
     plantCookie: (token: string, expiresAt: Date) => Promise<void>;
     navigate: (url: string) => never;
+    getClientIp: () => Promise<string>;
   },
 ): Promise<LoginResult> {
   if (!input.email || !input.password) {
@@ -66,7 +67,7 @@ export async function performLogin(
   }
 
   // Rate limit by client IP
-  const ip = await clientIp();
+  const ip = await deps.getClientIp();
   const limitResult = await container.rateLimiter.check({
     key: `login:${ip}`,
     ...LOGIN_RATE_LIMIT,
@@ -119,6 +120,7 @@ export async function loginAndRedirect(formData: FormData): Promise<void> {
     {
       plantCookie: setAuthCookie,
       navigate: (url) => redirect(url),
+      getClientIp: clientIp,
     },
   );
 

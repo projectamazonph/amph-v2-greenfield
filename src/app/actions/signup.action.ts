@@ -78,7 +78,7 @@ export interface SignUpInput {
  *    the user's account exists; they can manually log in.
  *
  * The `deps` object carries the side-effect functions (plantCookie,
- * navigate) so this helper is unit-testable.
+ * navigate, getClientIp) so this helper is unit-testable.
  */
 export async function performSignUp(
   container: {
@@ -94,6 +94,7 @@ export async function performSignUp(
   deps: {
     plantCookie: (token: string, expiresAt: Date) => Promise<void>;
     navigate: (url: string) => never;
+    getClientIp: () => Promise<string>;
   },
 ): Promise<SignUpResult> {
   // 1. Input validation
@@ -102,7 +103,7 @@ export async function performSignUp(
   }
 
   // 2. Rate limit by client IP
-  const ip = await clientIp();
+  const ip = await deps.getClientIp();
   const limitResult = await container.rateLimiter.check({
     key: `signup:${ip}`,
     ...SIGNUP_RATE_LIMIT,
@@ -222,6 +223,7 @@ export async function signUpAction(
     const result = await performSignUp(container, input, {
       plantCookie: setAuthCookie,
       navigate: (url) => redirect(url),
+      getClientIp: clientIp,
     });
     return result;
   } catch (err) {
