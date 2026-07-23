@@ -13,7 +13,7 @@ import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { createCourseAction } from "@/app/actions/createCourse.action";
 import type { CreateCoursePageInput } from "@/app/actions/createCourse.action";
 import styles from "./page.module.css";
@@ -30,25 +30,16 @@ export default async function NewCoursePage() {
       tagline: String(formData.get("tagline") ?? "").trim(),
       description: String(formData.get("description") ?? "").trim(),
       priceMinor: parseInt(String(formData.get("priceMinor") ?? "0"), 10) || 0,
-      courseTier: (String(formData.get("courseTier") ?? "STARTER")) as
-        | "STARTER"
-        | "PRO"
-        | "PREVIEW",
-      previewLessonCount:
-        parseInt(String(formData.get("previewLessonCount") ?? "1"), 10) || 1,
+      courseTier: String(formData.get("courseTier") ?? "STARTER") as "STARTER" | "PRO" | "PREVIEW",
+      previewLessonCount: parseInt(String(formData.get("previewLessonCount") ?? "1"), 10) || 1,
       isFeatured: formData.get("isFeatured") === "on",
       displayOrder: parseInt(String(formData.get("displayOrder") ?? "0"), 10) || 0,
       coverImage: String(formData.get("coverImage") ?? "").trim() || null,
-      status: (String(formData.get("status") ?? "DRAFT")) as
-        | "DRAFT"
-        | "PUBLISHED"
-        | "ARCHIVED",
+      status: String(formData.get("status") ?? "DRAFT") as "DRAFT" | "PUBLISHED" | "ARCHIVED",
       defaultCurriculum: {
         sectionTitle:
-          String(formData.get("sectionTitle") ?? "Getting Started").trim() ||
-          "Getting Started",
-        lessonTitle:
-          String(formData.get("lessonTitle") ?? "Welcome").trim() || "Welcome",
+          String(formData.get("sectionTitle") ?? "Getting Started").trim() || "Getting Started",
+        lessonTitle: String(formData.get("lessonTitle") ?? "Welcome").trim() || "Welcome",
       },
     };
 
@@ -68,7 +59,7 @@ export default async function NewCoursePage() {
       <TopBar title="Add course" subtitle="Create a new course (DRAFT by default)" />
 
       <form action={handleSubmit} className={styles.form}>
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Basics</h2>
           <div className={styles.grid}>
             <label className={styles.field}>
@@ -81,9 +72,7 @@ export default async function NewCoursePage() {
                 className={styles.input}
                 placeholder="course_01J3X..."
               />
-              <span className={styles.help}>
-                Unique identifier. Use a ULID or similar.
-              </span>
+              <span className={styles.help}>Unique identifier. Use a ULID or similar.</span>
             </label>
 
             <label className={styles.field}>
@@ -134,7 +123,7 @@ export default async function NewCoursePage() {
           </div>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Pricing & access</h2>
           <div className={styles.grid}>
             <label className={styles.field}>
@@ -148,9 +137,7 @@ export default async function NewCoursePage() {
                 defaultValue="0"
                 className={styles.input}
               />
-              <span className={styles.help}>
-                100 = ₱1.00. Use 0 for free courses.
-              </span>
+              <span className={styles.help}>100 = ₱1.00. Use 0 for free courses.</span>
             </label>
 
             <label className={styles.field}>
@@ -172,9 +159,7 @@ export default async function NewCoursePage() {
                 defaultValue="1"
                 className={styles.input}
               />
-              <span className={styles.help}>
-                How many lessons non-enrolled users can preview.
-              </span>
+              <span className={styles.help}>How many lessons non-enrolled users can preview.</span>
             </label>
 
             <label className={styles.field}>
@@ -190,12 +175,11 @@ export default async function NewCoursePage() {
           </div>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Default curriculum (placeholder)</h2>
           <p className={styles.help}>
-            A real curriculum editor lands in STORY-048b/c. For now, the
-            course is created with one section and one lesson using the
-            titles below — the admin can replace them later.
+            A real curriculum editor lands in STORY-048b/c. For now, the course is created with one
+            section and one lesson using the titles below — the admin can replace them later.
           </p>
           <div className={styles.grid}>
             <label className={styles.field}>
@@ -220,7 +204,7 @@ export default async function NewCoursePage() {
           </div>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Publishing</h2>
           <div className={styles.grid}>
             <label className={styles.field}>

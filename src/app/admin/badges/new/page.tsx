@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { createBadgeAction } from "@/app/actions/createBadge.action";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -53,12 +53,12 @@ export default async function NewBadgePage({ searchParams }: PageProps) {
       <TopBar title="Add badge" subtitle="Create a new badge template" />
 
       {errorMsg && (
-        <Card padding="comfortable" style={{ marginBottom: "1rem" }}>
+        <Card padding={6} style={{ marginBottom: "1rem" }}>
           <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleSubmit} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Slug *</span>
@@ -72,7 +72,9 @@ export default async function NewBadgePage({ searchParams }: PageProps) {
                 </option>
               ))}
             </select>
-            <span className={styles.hint}>Slugs are immutable once created. They map to award criteria.</span>
+            <span className={styles.hint}>
+              Slugs are immutable once created. They map to award criteria.
+            </span>
           </label>
 
           <label className={styles.field}>
@@ -108,7 +110,9 @@ export default async function NewBadgePage({ searchParams }: PageProps) {
               className={styles.input}
               placeholder="Phosphor icon name, e.g. Trophy, Fire, Star"
             />
-            <span className={styles.hint}>Any Phosphor icon name. Browse at phosphoricons.com.</span>
+            <span className={styles.hint}>
+              Any Phosphor icon name. Browse at phosphoricons.com.
+            </span>
           </label>
 
           <label className={styles.field}>

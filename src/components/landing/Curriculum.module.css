@@ -64,11 +64,19 @@
 .tableWrap {
   border: 1px solid var(--border);
   border-radius: 8px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tableWrap:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .table {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   font-family: var(--font-body);
   font-size: var(--text-sm);

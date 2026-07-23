@@ -8,7 +8,7 @@ import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import type { DiscountCode } from "@/domain/entities/DiscountCode";
 import {
   AdminDiscountCodesTable,
@@ -46,7 +46,7 @@ export default async function DiscountCodesPage() {
         }
       />
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <AdminDiscountCodesTable codes={rows} />
       </Card>
     </div>

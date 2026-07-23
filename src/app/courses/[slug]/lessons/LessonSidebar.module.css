@@ -156,3 +156,12 @@
 .iconMuted {
   color: var(--ink-500);
 }
+
+@media (max-width: 767px) {
+  .sidebar {
+    width: 100%;
+    max-height: 40vh;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+}

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import type { Badge as DomainBadge } from "@/domain/entities/Badge";
 import { AdminBadgesTable, type BadgeRow } from "@/components/astryx/AdminBadgesTable";
 import styles from "./page.module.css";
@@ -43,7 +43,7 @@ export default async function BadgesPage() {
       />
 
       {/* Table — client component handles renderCell (function props) */}
-      <Card padding="comfortable">
+      <Card padding={6}>
         <AdminBadgesTable badges={rows} />
       </Card>
     </div>

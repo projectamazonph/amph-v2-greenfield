@@ -8,7 +8,7 @@ import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import type { LiveClassStatus } from "@/domain/entities/LiveClass";
 import {
   AdminLiveClassesTable,
@@ -50,7 +50,7 @@ export default async function LiveClassesPage({ searchParams }: PageProps) {
         }
       />
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <AdminLiveClassesTable liveClasses={rows} />
       </Card>
     </div>

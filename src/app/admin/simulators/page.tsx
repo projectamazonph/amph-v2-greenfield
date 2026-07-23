@@ -8,7 +8,7 @@ import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
 import { AdminSimulatorsTable, type ScenarioRow } from "@/components/astryx/AdminSimulatorsTable";
 import styles from "./page.module.css";
@@ -58,7 +58,7 @@ export default async function AdminSimulatorsPage({ searchParams }: PageProps) {
         }
       />
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <AdminSimulatorsTable scenarios={rows} currentSimulatorId={filter.simulatorId} />
       </Card>
     </div>

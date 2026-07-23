@@ -25,6 +25,7 @@
   font-size: var(--text-sm);
   color: var(--ink-500);
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .grid {
@@ -75,6 +76,7 @@
   font-size: var(--text-base);
   color: var(--ink-900);
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .fieldMono {
@@ -112,6 +114,7 @@
   font-size: var(--text-sm);
   color: var(--ink-700);
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .empty {

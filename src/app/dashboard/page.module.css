@@ -17,6 +17,7 @@
   color: var(--ink-900);
   margin: 0 0 var(--space-2) 0;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 .heroSubtitle {
@@ -96,6 +97,7 @@
   color: var(--ink-900);
   margin: 0 0 var(--space-1) 0;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .cardTagline {
@@ -104,6 +106,7 @@
   margin: 0 0 var(--space-4) 0;
   line-height: 1.5;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .progressBar {
@@ -209,6 +212,7 @@
   font-weight: 600;
   color: var(--ink-900);
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .listTagline {

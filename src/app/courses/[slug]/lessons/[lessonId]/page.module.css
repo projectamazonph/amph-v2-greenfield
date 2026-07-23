@@ -12,6 +12,7 @@
 
 .main {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
 }
 
@@ -95,6 +96,7 @@
   margin: 0;
   letter-spacing: -0.02em;
   line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
 }
 
 /* Footer */
@@ -147,4 +149,20 @@
   margin: var(--space-2) 0 0 0;
   color: var(--ink-500);
   line-height: var(--leading-normal);
+}
+
+/* A fixed desktop sidebar plus a reading column would squeeze the lesson to
+   an unusable width on a phone. Stack them instead. */
+@media (max-width: 767px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .main {
+    overflow-y: visible;
+  }
+
+  .content {
+    padding: var(--space-6) var(--space-4);
+  }
 }

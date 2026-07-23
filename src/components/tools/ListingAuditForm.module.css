@@ -84,6 +84,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
   padding-top: var(--space-3);
   border-top: 1px solid var(--border);
 }
@@ -161,4 +163,11 @@
   text-transform: uppercase;
 }
 
-.findingMessage { color: var(--ink-700); }
+.findingMessage { color: var(--ink-700); overflow-wrap: anywhere; }
+
+@media (max-width: 479px) {
+  .finding {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+}

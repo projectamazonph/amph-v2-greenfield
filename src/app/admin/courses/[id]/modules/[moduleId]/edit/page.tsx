@@ -9,7 +9,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { updateModuleAction } from "@/app/actions/updateModule.action";
 import styles from "../../../../../courses.module.css";
 
@@ -35,9 +35,7 @@ export default async function EditModulePage({ params }: PageProps) {
     "use server";
     const title = String(formData.get("title") ?? "").trim();
     if (!title) {
-      redirect(
-        `/admin/courses/${courseId}/modules/${moduleId}/edit?error=missing_title`,
-      );
+      redirect(`/admin/courses/${courseId}/modules/${moduleId}/edit?error=missing_title`);
     }
     const r = await updateModuleAction({
       moduleId,
@@ -52,23 +50,18 @@ export default async function EditModulePage({ params }: PageProps) {
         : r.error.kind === "module_not_found"
           ? "not_found"
           : "server_error";
-    redirect(
-      `/admin/courses/${courseId}/modules/${moduleId}/edit?error=${kind}`,
-    );
+    redirect(`/admin/courses/${courseId}/modules/${moduleId}/edit?error=${kind}`);
   }
 
   return (
     <div>
-      <Link
-        href={`/admin/courses/${courseId}/modules/${moduleId}`}
-        className={styles.backLink}
-      >
+      <Link href={`/admin/courses/${courseId}/modules/${moduleId}`} className={styles.backLink}>
         ← Back to module
       </Link>
 
       <TopBar title={`Edit "${moduleEntity.title}"`} />
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleSubmit} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Title</span>

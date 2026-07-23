@@ -9,7 +9,8 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card, Badge } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
+import { Badge } from "@astryxdesign/core";
 import { deleteLessonAction } from "@/app/actions/deleteLesson.action";
 import styles from "../../../../../../courses.module.css";
 
@@ -39,7 +40,14 @@ function renderContentSummary(lesson: {
     ];
   }
   // QUIZ
-  const c = lesson.content as { questions?: { id: string; prompt: string; options: readonly string[]; correctOptionIndex: number }[] };
+  const c = lesson.content as {
+    questions?: {
+      id: string;
+      prompt: string;
+      options: readonly string[];
+      correctOptionIndex: number;
+    }[];
+  };
   return [
     { label: "Type", value: "QUIZ" },
     { label: "Questions", value: String(c.questions?.length ?? 0) },
@@ -79,10 +87,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
   return (
     <div>
-      <Link
-        href={`/admin/courses/${courseId}/modules/${moduleId}`}
-        className={styles.backLink}
-      >
+      <Link href={`/admin/courses/${courseId}/modules/${moduleId}`} className={styles.backLink}>
         ← Back to module
       </Link>
 
@@ -90,8 +95,8 @@ export default async function LessonDetailPage({ params }: PageProps) {
         title={lesson.title}
         subtitle={
           <span className={styles.badges}>
-            <Badge variant="neutral">Order {lesson.displayOrder}</Badge>
-            <Badge variant="accent">{lesson.type}</Badge>
+            <Badge variant="neutral" label={"Order " + lesson.displayOrder} />
+            <Badge variant="orange" label={lesson.type} />
           </span>
         }
         actions={
@@ -111,7 +116,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
         }
       />
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <dl className={styles.details}>
           <dt>ID</dt>
           <dd className={styles.mono}>{lesson.id}</dd>
@@ -134,8 +139,8 @@ export default async function LessonDetailPage({ params }: PageProps) {
         </dl>
 
         <p className={styles.placeholder}>
-          The full content JSON is shown on the edit page. The MDX/text
-          editor for TEXT lessons lands in <strong>STORY-048c.5</strong>.
+          The full content JSON is shown on the edit page. The MDX/text editor for TEXT lessons
+          lands in <strong>STORY-048c.5</strong>.
         </p>
       </Card>
     </div>

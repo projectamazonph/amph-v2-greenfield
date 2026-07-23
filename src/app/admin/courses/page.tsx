@@ -11,7 +11,7 @@
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { courseLessonCount } from "@/domain/entities/Course";
 import type { CourseStatus } from "@/domain/entities/Course";
 import { AdminCoursesTable, type CourseRow } from "@/components/astryx/AdminCoursesTable";
@@ -54,7 +54,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     return (
       <div>
         <TopBar title="Courses" subtitle="Manage all courses" />
-        <Card padding="comfortable">
+        <Card padding={6}>
           <p className={styles.error}>Failed to load courses: {result.error.message}</p>
         </Card>
       </div>
@@ -107,7 +107,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
       </form>
 
       {/* Table — client component handles renderCell (function props) */}
-      <Card padding="comfortable">
+      <Card padding={6}>
         <AdminCoursesTable
           courses={rows}
           totalCount={totalCount}

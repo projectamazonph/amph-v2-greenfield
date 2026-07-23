@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { createLiveClassAction } from "@/app/actions/createLiveClass.action";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import styles from "./page.module.css";
 import pageStyles from "../page.module.css";
 
@@ -36,18 +36,15 @@ export default async function NewLiveClassPage({ searchParams }: PageProps) {
         ← Back to live classes
       </Link>
 
-      <TopBar
-        title="Add live class"
-        subtitle="Schedule a new live class session"
-      />
+      <TopBar title="Add live class" subtitle="Schedule a new live class session" />
 
       {errorMsg && (
-        <Card padding="comfortable" style={{ marginBottom: "1rem" }}>
+        <Card padding={6} style={{ marginBottom: "1rem" }}>
           <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleSubmit} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Course ID *</span>

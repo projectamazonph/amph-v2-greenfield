@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { createDiscountCodeAction } from "@/app/actions/createDiscountCode.action";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import styles from "../new/page.module.css";
 import pageStyles from "../page.module.css";
 
@@ -35,18 +35,15 @@ export default async function NewDiscountCodePage({ searchParams }: PageProps) {
         ← Back to discount codes
       </Link>
 
-      <TopBar
-        title="Add discount code"
-        subtitle="Create a new promotional discount code"
-      />
+      <TopBar title="Add discount code" subtitle="Create a new promotional discount code" />
 
       {errorMsg && (
-        <Card padding="comfortable" style={{ marginBottom: "1rem" }}>
+        <Card padding={6} style={{ marginBottom: "1rem" }}>
           <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleSubmit} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Code *</span>
@@ -59,7 +56,9 @@ export default async function NewDiscountCodePage({ searchParams }: PageProps) {
               placeholder="e.g. SAVE20, HOLIDAY2026"
               style={{ textTransform: "uppercase" }}
             />
-            <span className={styles.hint}>Letters, numbers, dashes, underscores. Auto-uppercased.</span>
+            <span className={styles.hint}>
+              Letters, numbers, dashes, underscores. Auto-uppercased.
+            </span>
           </label>
 
           <label className={styles.field}>
@@ -82,7 +81,9 @@ export default async function NewDiscountCodePage({ searchParams }: PageProps) {
               className={styles.input}
               style={{ width: "8rem" }}
             />
-            <span className={styles.hint}>For percentage: 1–100. For fixed: minor units (e.g. 2000 = ₱20.00).</span>
+            <span className={styles.hint}>
+              For percentage: 1–100. For fixed: minor units (e.g. 2000 = ₱20.00).
+            </span>
           </label>
 
           <label className={styles.field}>
@@ -134,7 +135,9 @@ export default async function NewDiscountCodePage({ searchParams }: PageProps) {
 async function handleSubmit(formData: FormData) {
   "use server";
 
-  const code = String(formData.get("code") ?? "").trim().toUpperCase();
+  const code = String(formData.get("code") ?? "")
+    .trim()
+    .toUpperCase();
   const type = String(formData.get("type") ?? "PERCENTAGE") as "PERCENTAGE" | "FIXED";
   const value = parseInt(String(formData.get("value") ?? "0"), 10);
   const maxUsesRaw = String(formData.get("maxUses") ?? "").trim();

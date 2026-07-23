@@ -8,7 +8,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { updateBadgeAction } from "@/app/actions/updateBadge.action";
 import { archiveBadgeAction } from "@/app/actions/archiveBadge.action";
 import type { BadgeSlug } from "@/domain/entities/Badge";
@@ -59,12 +59,12 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
       <TopBar title={`Edit: ${b.name}`} subtitle={b.slug} />
 
       {errorMsg && (
-        <Card padding="comfortable" style={{ marginBottom: "1rem" }}>
+        <Card padding={6} style={{ marginBottom: "1rem" }}>
           <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleUpdate(slug)} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Slug (read-only)</span>
@@ -140,11 +140,20 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
 
       {/* Archive section */}
       {!b.archived && (
-        <Card padding="comfortable" style={{ marginTop: "1.5rem" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 0.75rem 0", color: "var(--color-danger)" }}>
+        <Card padding={6} style={{ marginTop: "1.5rem" }}>
+          <h2
+            style={{
+              fontSize: "1rem",
+              fontWeight: 600,
+              margin: "0 0 0.75rem 0",
+              color: "var(--color-danger)",
+            }}
+          >
             Danger zone
           </h2>
-          <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", margin: "0 0 1rem 0" }}>
+          <p
+            style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", margin: "0 0 1rem 0" }}
+          >
             Archiving hides this badge from new awards. Existing BadgeAward records are unaffected.
           </p>
           <form action={handleArchive(slug)}>

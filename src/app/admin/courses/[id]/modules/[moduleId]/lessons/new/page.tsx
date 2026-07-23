@@ -18,7 +18,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { createLessonAction } from "@/app/actions/createLesson.action";
 import styles from "../../../../../../courses.module.css";
 
@@ -46,9 +46,7 @@ export default async function NewLessonPage({ params }: PageProps) {
     const type = String(formData.get("type") ?? "TEXT") as "VIDEO" | "TEXT" | "QUIZ";
     const contentJson = String(formData.get("contentJson") ?? "{}");
     if (!title) {
-      redirect(
-        `/admin/courses/${courseId}/modules/${moduleId}/lessons/new?error=missing_title`,
-      );
+      redirect(`/admin/courses/${courseId}/modules/${moduleId}/lessons/new?error=missing_title`);
     }
     const r = await createLessonAction({
       moduleId,
@@ -65,9 +63,7 @@ export default async function NewLessonPage({ params }: PageProps) {
         : r.error.kind === "invalid_input"
           ? "invalid_input"
           : "server_error";
-    redirect(
-      `/admin/courses/${courseId}/modules/${moduleId}/lessons/new?error=${kind}`,
-    );
+    redirect(`/admin/courses/${courseId}/modules/${moduleId}/lessons/new?error=${kind}`);
   }
 
   const defaultVideo = JSON.stringify({ durationMinutes: 5 }, null, 2);
@@ -89,10 +85,7 @@ export default async function NewLessonPage({ params }: PageProps) {
 
   return (
     <div>
-      <Link
-        href={`/admin/courses/${courseId}/modules/${moduleId}`}
-        className={styles.backLink}
-      >
+      <Link href={`/admin/courses/${courseId}/modules/${moduleId}`} className={styles.backLink}>
         ← Back to module
       </Link>
 
@@ -101,7 +94,7 @@ export default async function NewLessonPage({ params }: PageProps) {
         subtitle="Pick a type and fill in the content (sent as JSON)."
       />
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleSubmit} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Title</span>
@@ -119,8 +112,7 @@ export default async function NewLessonPage({ params }: PageProps) {
           <fieldset className={styles.field}>
             <legend className={styles.label}>Type</legend>
             <label>
-              <input type="radio" name="type" value="VIDEO" defaultChecked />{" "}
-              Video
+              <input type="radio" name="type" value="VIDEO" defaultChecked /> Video
             </label>
             <label>
               <input type="radio" name="type" value="TEXT" /> Text
@@ -131,13 +123,10 @@ export default async function NewLessonPage({ params }: PageProps) {
           </fieldset>
 
           <label className={styles.field}>
-            <span className={styles.label}>
-              Content (JSON)
-            </span>
+            <span className={styles.label}>Content (JSON)</span>
             <span className={styles.hint}>
               VIDEO: <code>{`{ "durationMinutes": 5 }`}</code> · TEXT:{" "}
-              <code>{`{ "body": "..." }`}</code> · QUIZ:{" "}
-              <code>{`{ "questions": [...] }`}</code>
+              <code>{`{ "body": "..." }`}</code> · QUIZ: <code>{`{ "questions": [...] }`}</code>
             </span>
             <textarea
               name="contentJson"

@@ -13,16 +13,13 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card, Badge } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
+import { Badge } from "@astryxdesign/core";
 import { formatPhp } from "@/app/admin/_lib/formatPhp";
 import { courseLessonCount, courseTotalDurationMinutes } from "@/domain/entities/Course";
 import { archiveCourseAction } from "@/app/actions/archiveCourse.action";
-import {
-  deleteModuleAction,
-} from "@/app/actions/deleteModule.action";
-import {
-  reorderModulesAction,
-} from "@/app/actions/reorderModules.action";
+import { deleteModuleAction } from "@/app/actions/deleteModule.action";
+import { reorderModulesAction } from "@/app/actions/reorderModules.action";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -44,18 +41,15 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
     return (
       <div>
         <TopBar title="Error" />
-        <Card padding="comfortable">
-          <p className={styles.error}>
-            Failed to load course: {courseResult.error.message}
-          </p>
+        <Card padding={6}>
+          <p className={styles.error}>Failed to load course: {courseResult.error.message}</p>
         </Card>
       </div>
     );
   }
 
   const course = courseResult.value.course;
-  const modules =
-    modulesResult.ok ? modulesResult.value.modules : [];
+  const modules = modulesResult.ok ? modulesResult.value.modules : [];
 
   const createdDate = course.createdAt.toLocaleDateString("en-US", {
     year: "numeric",
@@ -105,18 +99,18 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
             <Badge
               variant={
                 course.status === "PUBLISHED"
-                  ? "accent"
+                  ? "orange"
                   : course.status === "ARCHIVED"
                     ? "neutral"
                     : "warning"
               }
-            >
-              {course.status}
-            </Badge>
-            <Badge variant={course.courseTier === "PRO" ? "accent" : "neutral"}>
-              {course.courseTier}
-            </Badge>
-            {course.isFeatured && <Badge variant="warning">Featured</Badge>}
+              label={course.status}
+            />
+            <Badge
+              variant={course.courseTier === "PRO" ? "orange" : "neutral"}
+              label={course.courseTier}
+            />
+            {course.isFeatured && <Badge variant="warning" label="Featured" />}
           </span>
         }
         actions={
@@ -136,7 +130,7 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
       />
 
       <div className={styles.grid}>
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Basics</h2>
           <dl className={styles.details}>
             <dt>Slug</dt>
@@ -150,7 +144,7 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
           </dl>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Pricing & access</h2>
           <dl className={styles.details}>
             <dt>Price</dt>
@@ -174,7 +168,7 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
           </dl>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Curriculum (legacy)</h2>
           <dl className={styles.details}>
             <dt>Sections</dt>
@@ -182,31 +176,24 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
             <dt>Lessons</dt>
             <dd className={styles.mono}>{courseLessonCount(course)}</dd>
             <dt>Video duration</dt>
-            <dd className={styles.mono}>
-              {courseTotalDurationMinutes(course)} min
-            </dd>
+            <dd className={styles.mono}>{courseTotalDurationMinutes(course)} min</dd>
           </dl>
           <p className={styles.placeholder}>
-            The legacy <code>Course.curriculum</code> JSON blob is still
-            shown for backward compat. The <strong>Modules</strong>{" "}
-            section below is the new admin surface (STORY-048b).
+            The legacy <code>Course.curriculum</code> JSON blob is still shown for backward compat.
+            The <strong>Modules</strong> section below is the new admin surface (STORY-048b).
           </p>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <div className={styles.modulesHeader}>
             <h2 className={styles.sectionTitle}>Modules</h2>
-            <Link
-              href={`/admin/courses/${course.id}/modules/new`}
-              className={styles.addButton}
-            >
+            <Link href={`/admin/courses/${course.id}/modules/new`} className={styles.addButton}>
               + Add module
             </Link>
           </div>
           {modules.length === 0 ? (
             <p className={styles.muted}>
-              No modules yet. Add the first module to start building the
-              curriculum.
+              No modules yet. Add the first module to start building the curriculum.
             </p>
           ) : (
             <ul className={styles.moduleList}>
@@ -215,9 +202,7 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
                 .map((m, idx, arr) => (
                   <li key={m.id} className={styles.moduleItem}>
                     <div className={styles.moduleRow}>
-                      <span className={styles.moduleOrder}>
-                        {m.displayOrder}.
-                      </span>
+                      <span className={styles.moduleOrder}>{m.displayOrder}.</span>
                       <Link
                         href={`/admin/courses/${course.id}/modules/${m.id}`}
                         className={styles.moduleTitle}

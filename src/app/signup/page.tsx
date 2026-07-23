@@ -15,7 +15,7 @@ import { Button } from "@/components/ui";
 import { Input } from "@/components/ui";
 import styles from "./signup.module.css";
 
-const INITIAL_STATE: SignUpState = { kind: "invalid_input" };
+const INITIAL_STATE: SignUpState = { kind: "idle" };
 
 export default function SignUpPage() {
   const [state, formAction, isPending] = useActionState(signUpAction, INITIAL_STATE);
@@ -33,7 +33,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Error / success alerts */}
-        {state.kind !== "success" && (
+        {state.kind !== "idle" && state.kind !== "success" && (
           <div className="alert alert-error">
             {state.kind === "invalid_input" && <>Please fill in all fields.</>}
             {state.kind === "email_taken" && (

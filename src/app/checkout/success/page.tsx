@@ -34,11 +34,12 @@ const STYLES: Record<string, React.CSSProperties> = {
     background: "white",
     border: "1px solid var(--border)",
     borderRadius: 8,
-    padding: "40px 40px 32px",
+    padding: "clamp(24px, 8vw, 40px) clamp(20px, 8vw, 40px) 32px",
     display: "flex",
     flexDirection: "column",
     gap: 24,
     textAlign: "center",
+    overflowWrap: "anywhere",
   },
   logo: {
     fontFamily: "var(--font-mono)",
@@ -101,18 +102,12 @@ export default function CheckoutSuccessPage({
           stroke="currentColor"
           aria-hidden="true"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
         <h1 style={STYLES.title}>Payment received</h1>
         <p style={STYLES.body}>
-          Thanks for your purchase. We're confirming your enrollment — it
-          usually takes a few seconds. Head to your dashboard to start
-          learning.
+          Thanks for your purchase. We're confirming your enrollment — it usually takes a few
+          seconds. Head to your dashboard to start learning.
         </p>
         <div style={STYLES.cta}>
           <Link
@@ -126,9 +121,7 @@ export default function CheckoutSuccessPage({
             Back to catalog
           </Link>
         </div>
-        {orderId && (
-          <p style={STYLES.orderId}>Order reference: {orderId}</p>
-        )}
+        {orderId && <p style={STYLES.orderId}>Order reference: {orderId}</p>}
       </div>
     </div>
   );

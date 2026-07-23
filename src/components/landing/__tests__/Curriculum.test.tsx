@@ -5,6 +5,7 @@
 import { describe, it, expect } from "vitest";
 import { renderToString } from "react-dom/server";
 import { createElement } from "react";
+import { readFileSync } from "node:fs";
 import { Curriculum } from "../Curriculum";
 
 describe("Curriculum", () => {
@@ -34,5 +35,16 @@ describe("Curriculum", () => {
     const html = renderToString(createElement(Curriculum));
     expect(html).toContain("How long does it take?");
     expect(html).toMatch(/4.6 weeks/);
+  });
+
+  it("keeps its dense table in a keyboard-reachable scroll region", () => {
+    const html = renderToString(createElement(Curriculum));
+
+    expect(html).toMatch(/role="region"[^>]+aria-label="Curriculum modules"/);
+    expect(html).toMatch(/aria-label="Curriculum modules"[^>]+tabindex="0"/);
+
+    const css = readFileSync(new URL("../Curriculum.module.css", import.meta.url), "utf8");
+    expect(css).toMatch(/\.tableWrap\s*\{[\s\S]*?overflow-x:\s*auto;/);
+    expect(css).toMatch(/\.table\s*\{[\s\S]*?min-width:\s*560px;/);
   });
 });

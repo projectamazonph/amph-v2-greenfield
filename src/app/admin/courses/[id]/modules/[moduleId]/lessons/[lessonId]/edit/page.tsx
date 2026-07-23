@@ -9,7 +9,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { updateLessonAction } from "@/app/actions/updateLesson.action";
 import styles from "../../../../../../../courses.module.css";
 
@@ -50,9 +50,7 @@ export default async function EditLessonPage({ params }: PageProps) {
       contentJson,
     });
     if (r.ok) {
-      redirect(
-        `/admin/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`,
-      );
+      redirect(`/admin/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`);
     }
     const kind =
       r.error.kind === "invalid_content_json"
@@ -78,7 +76,7 @@ export default async function EditLessonPage({ params }: PageProps) {
 
       <TopBar title={`Edit "${lesson.title}"`} />
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleSubmit} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Title</span>
@@ -126,9 +124,7 @@ export default async function EditLessonPage({ params }: PageProps) {
 
           <label className={styles.field}>
             <span className={styles.label}>Content (JSON)</span>
-            <span className={styles.hint}>
-              Switching the type re-validates the JSON shape.
-            </span>
+            <span className={styles.hint}>Switching the type re-validates the JSON shape.</span>
             <textarea
               name="contentJson"
               required

@@ -12,7 +12,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { updateCourseAction } from "@/app/actions/updateCourse.action";
 import type { UpdateCoursePageInput } from "@/app/actions/updateCourse.action";
 import type { UpdateCoursePatch } from "@/domain/entities/Course";
@@ -43,23 +43,15 @@ export default async function EditCoursePage({ params }: PageProps) {
       title: String(formData.get("title") ?? "").trim() || undefined,
       tagline: String(formData.get("tagline") ?? "").trim() || undefined,
       description: String(formData.get("description") ?? "").trim() || undefined,
-      priceMinor:
-        parseInt(String(formData.get("priceMinor") ?? "0"), 10) || undefined,
-      courseTier: (String(formData.get("courseTier") ?? course.courseTier)) as
-        | "STARTER"
-        | "PRO"
-        | "PREVIEW",
+      priceMinor: parseInt(String(formData.get("priceMinor") ?? "0"), 10) || undefined,
+      courseTier: String(formData.get("courseTier") ?? course.courseTier) as
+        "STARTER" | "PRO" | "PREVIEW",
       previewLessonCount:
         parseInt(String(formData.get("previewLessonCount") ?? "1"), 10) || undefined,
       isFeatured: formData.get("isFeatured") === "on" ? true : undefined,
-      displayOrder:
-        parseInt(String(formData.get("displayOrder") ?? "0"), 10) || undefined,
-      coverImage:
-        String(formData.get("coverImage") ?? "").trim() || undefined,
-      status: (String(formData.get("status") ?? course.status)) as
-        | "DRAFT"
-        | "PUBLISHED"
-        | "ARCHIVED",
+      displayOrder: parseInt(String(formData.get("displayOrder") ?? "0"), 10) || undefined,
+      coverImage: String(formData.get("coverImage") ?? "").trim() || undefined,
+      status: String(formData.get("status") ?? course.status) as "DRAFT" | "PUBLISHED" | "ARCHIVED",
     };
     const input: UpdateCoursePageInput = { courseId: id, patch };
     const r = await updateCourseAction(input);
@@ -77,7 +69,7 @@ export default async function EditCoursePage({ params }: PageProps) {
       <TopBar title={`Edit: ${course.title}`} subtitle={course.slug} />
 
       <form action={handleSubmit} className={styles.form}>
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Basics</h2>
           <div className={styles.grid}>
             <label className={styles.field}>
@@ -125,7 +117,7 @@ export default async function EditCoursePage({ params }: PageProps) {
           </div>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Pricing & access</h2>
           <div className={styles.grid}>
             <label className={styles.field}>
@@ -143,11 +135,7 @@ export default async function EditCoursePage({ params }: PageProps) {
 
             <label className={styles.field}>
               <span className={styles.label}>Course tier</span>
-              <select
-                name="courseTier"
-                defaultValue={course.courseTier}
-                className={styles.input}
-              >
+              <select name="courseTier" defaultValue={course.courseTier} className={styles.input}>
                 <option value="STARTER">Starter</option>
                 <option value="PRO">Pro</option>
                 <option value="PREVIEW">Preview only</option>
@@ -179,31 +167,22 @@ export default async function EditCoursePage({ params }: PageProps) {
           </div>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Modules & lessons (placeholder)</h2>
           <p className={styles.placeholder}>
-            The curriculum editor lands in <strong>STORY-048b</strong>{" "}
-            (modules) and <strong>STORY-048c</strong> (lessons + MDX). The
-            course currently has {course.curriculum.sections.length}{" "}
-            section(s) and{" "}
-            {course.curriculum.sections.reduce(
-              (n, s) => n + s.lessons.length,
-              0,
-            )}{" "}
-            lesson(s).
+            The curriculum editor lands in <strong>STORY-048b</strong> (modules) and{" "}
+            <strong>STORY-048c</strong> (lessons + MDX). The course currently has{" "}
+            {course.curriculum.sections.length} section(s) and{" "}
+            {course.curriculum.sections.reduce((n, s) => n + s.lessons.length, 0)} lesson(s).
           </p>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Publishing</h2>
           <div className={styles.grid}>
             <label className={styles.field}>
               <span className={styles.label}>Status</span>
-              <select
-                name="status"
-                defaultValue={course.status}
-                className={styles.input}
-              >
+              <select name="status" defaultValue={course.status} className={styles.input}>
                 <option value="DRAFT">Draft</option>
                 <option value="PUBLISHED">Published</option>
                 <option value="ARCHIVED">Archived</option>
@@ -221,11 +200,7 @@ export default async function EditCoursePage({ params }: PageProps) {
             </label>
 
             <label className={`${styles.field} ${styles.checkboxField}`}>
-              <input
-                name="isFeatured"
-                type="checkbox"
-                defaultChecked={course.isFeatured}
-              />
+              <input name="isFeatured" type="checkbox" defaultChecked={course.isFeatured} />
               <span>Feature on the homepage</span>
             </label>
           </div>

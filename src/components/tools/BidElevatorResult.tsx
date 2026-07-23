@@ -26,10 +26,7 @@ export function BidElevatorResult({ result, targetRoas }: Props) {
         <h2 id="bid-result-heading" className={styles.heading}>
           Result
         </h2>
-        <div
-          className={styles.score}
-          style={{ color: scoreColor(result.score) }}
-        >
+        <div className={styles.score} style={{ color: scoreColor(result.score) }}>
           {result.score}
           <span className={styles.scoreSuffix}>/100</span>
         </div>
@@ -37,18 +34,14 @@ export function BidElevatorResult({ result, targetRoas }: Props) {
       <div className={styles.metaRow}>
         <div className={styles.metaItem}>
           <span className={styles.metaLabel}>Projected daily spend</span>
-          <span className={styles.metaValue}>
-            ₱{result.estimatedSpend.toFixed(2)}
-          </span>
+          <span className={styles.metaValue}>₱{result.estimatedSpend.toFixed(2)}</span>
         </div>
         <div className={styles.metaItem}>
           <span className={styles.metaLabel}>Projected ROAS</span>
           <span
             className={styles.metaValue}
             style={{
-              color: result.estimatedRoas >= targetRoas
-                ? "var(--success)"
-                : "var(--danger)",
+              color: result.estimatedRoas >= targetRoas ? "var(--success)" : "var(--danger)",
             }}
           >
             {result.estimatedRoas.toFixed(2)}×
@@ -59,43 +52,51 @@ export function BidElevatorResult({ result, targetRoas }: Props) {
           <span className={styles.metaValue}>{targetRoas.toFixed(1)}×</span>
         </div>
       </div>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Keyword</th>
-            <th className={styles.thNum}>Volume</th>
-            <th className={styles.thNum}>Current</th>
-            <th className={styles.thNum}>Suggested</th>
-            <th className={styles.thNum}>Δ</th>
-          </tr>
-        </thead>
-        <tbody>
-          {result.bids.map((b) => {
-            const delta = b.suggestedBid - b.currentBid;
-            return (
-              <tr key={b.keyword}>
-                <td className={styles.tdKw}>{b.keyword}</td>
-                <td className={styles.tdNum}>{b.volume.toLocaleString()}</td>
-                <td className={styles.tdNum}>₱{b.currentBid.toFixed(2)}</td>
-                <td className={styles.tdNumStrong}>₱{b.suggestedBid.toFixed(2)}</td>
-                <td
-                  className={styles.tdNum}
-                  style={{
-                    color: delta > 0
-                      ? "var(--success)"
-                      : delta < 0
-                        ? "var(--danger)"
-                        : "var(--ink-500)",
-                  }}
-                >
-                  {delta > 0 ? "+" : ""}
-                  {delta.toFixed(2)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div
+        className={styles.tableScroll}
+        role="region"
+        aria-label="Bid recommendations"
+        tabIndex={0}
+      >
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Keyword</th>
+              <th className={styles.thNum}>Volume</th>
+              <th className={styles.thNum}>Current</th>
+              <th className={styles.thNum}>Suggested</th>
+              <th className={styles.thNum}>Δ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {result.bids.map((b) => {
+              const delta = b.suggestedBid - b.currentBid;
+              return (
+                <tr key={b.keyword}>
+                  <td className={styles.tdKw}>{b.keyword}</td>
+                  <td className={styles.tdNum}>{b.volume.toLocaleString()}</td>
+                  <td className={styles.tdNum}>₱{b.currentBid.toFixed(2)}</td>
+                  <td className={styles.tdNumStrong}>₱{b.suggestedBid.toFixed(2)}</td>
+                  <td
+                    className={styles.tdNum}
+                    style={{
+                      color:
+                        delta > 0
+                          ? "var(--success)"
+                          : delta < 0
+                            ? "var(--danger)"
+                            : "var(--ink-500)",
+                    }}
+                  >
+                    {delta > 0 ? "+" : ""}
+                    {delta.toFixed(2)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
