@@ -42,31 +42,31 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 
 | ID        | Title                                                                                       | Pts |
 | --------- | ------------------------------------------------------------------------------------------- | --- |
-| STORY-011 | Course + Module + Lesson + PricingTier models + repos                                       | 1   | ⏳ open PR #132   |
+| STORY-011 | Course + Module + Lesson + PricingTier models + repos                                       | 1   | ✅ done — PR #132 |
 | STORY-012 | MDX content renderer port + adapter                                                         | 1   | ✅ done — PR #134 |
 | STORY-013 | Content import script (`scripts/import-amph-content.ts`) reading from `content/curriculum/` | 1   | ✅ done — PR #135 |
 | STORY-014 | RSC catalog page (`/courses`) + course detail page                                          | 1   | ✅ done — PR #137 |
-| STORY-015 | Pricing page (`/pricing`) with all-access pass + early-bird logic                           | 1   |
+| STORY-015 | Pricing page (`/pricing`) with all-access pass + early-bird logic                           | 1   | ✅ done — PR #139 |
 
 ## Sprint 4 — PayMongo + Checkout (5 pts)
 
 | ID        | Title                                                                     | Pts |
 | --------- | ------------------------------------------------------------------------- | --- |
-| STORY-016 | `PaymentGateway` port + `PayMongoGateway` adapter + `FakePayMongoGateway` | 1   |
-| STORY-017 | `Checkout` + `Payment` models + repos                                     | 1   |
-| STORY-018 | `StartCheckout` use case + checkout server action + checkout page         | 1   |
-| STORY-019 | `HandlePaymentWebhook` use case + `/api/paymongo/webhook` route           | 1   |
-| STORY-020 | Receipt model + `IssueReceipt` use case + Resend email + PDF render       | 1   |
+| STORY-016 | `PaymentGateway` port + `PayMongoGateway` adapter + `FakePayMongoGateway` | 1   | ✅ done (main, PR #140 wiring fix) |
+| STORY-017 | `Checkout` + `Payment` models + repos                                     | 1   | ✅ done (main)                     |
+| STORY-018 | `StartCheckout` use case + checkout server action + checkout page         | 1   | ✅ done (main)                     |
+| STORY-019 | `HandlePaymentWebhook` use case + `/api/paymongo/webhook` route           | 1   | ✅ done (main)                     |
+| STORY-020 | Receipt model + `IssueReceipt` use case + Resend email + PDF render       | 1   | ✅ done (main)                     |
 
 ## Sprint 5 — Enrollment + Access Policy (5 pts)
 
 | ID        | Title                                                         | Pts |
 | --------- | ------------------------------------------------------------- | --- |
-| STORY-021 | `Enrollment` model + repo                                     | 1   |
-| STORY-022 | `AccessPolicy` port + `TierAccessPolicy` impl                 | 1   |
-| STORY-023 | `EnrollStudent` use case (called from webhook)                | 1   |
-| STORY-024 | Discount code model + repo + admin create + apply in checkout | 1   |
-| STORY-025 | `RequestRefund` use case + `/api/refunds` (in-window)         | 1   |
+| STORY-021 | `Enrollment` model + repo                                     | 1   | ✅ done (main) |
+| STORY-022 | `AccessPolicy` port + `TierAccessPolicy` impl                 | 1   | ✅ done (main) |
+| STORY-023 | `EnrollStudent` use case (called from webhook)                | 1   | ✅ done (main) |
+| STORY-024 | Discount code model + repo + admin create + apply in checkout | 1   | ✅ done (main) |
+| STORY-025 | `RequestRefund` use case + `/api/refunds` (in-window)         | 1   | ✅ done (main) |
 
 ## Sprint 6 — Lesson Delivery + Progress (5 pts)
 
@@ -92,11 +92,11 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 
 | ID        | Title                                                                                  | Pts |
 | --------- | -------------------------------------------------------------------------------------- | --- |
-| STORY-036 | `Simulator<TIn,TOut>` interface + `SimulatorRegistry` port + `SimulatorScenario` model | 1   |
-| STORY-037 | Bid Elevator (domain function + scenario JSON + UI + use case)                         | 1   |
-| STORY-038 | STR Triage                                                                             | 1   |
-| STORY-039 | Campaign Builder                                                                       | 1   |
-| STORY-040 | Listing Audit + Keyword Research (both in one story)                                   | 1   |
+| STORY-036 | `Simulator<TIn,TOut>` interface + `SimulatorRegistry` port + `SimulatorScenario` model | 1   | ✅ done (main) |
+| STORY-037 | Bid Elevator (domain function + scenario JSON + UI + use case)                         | 1   | ✅ done (main) |
+| STORY-038 | STR Triage                                                                             | 1   | ✅ done (main) |
+| STORY-039 | Campaign Builder                                                                       | 1   | ✅ done (main) |
+| STORY-040 | Listing Audit + Keyword Research (both in one story)                                   | 1   | ✅ done (main) |
 
 ## Sprint 9 — Certificates + Email Templates (5 pts)
 
