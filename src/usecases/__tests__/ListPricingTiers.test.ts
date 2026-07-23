@@ -106,7 +106,9 @@ describe("ListPricingTiers", () => {
 
     const t = result.value.tiers[0]!;
     expect(t.isEarlyBird).toBe(true);
-    expect(t.earlyBirdMinutesRemaining).toBe(90);
+    // Allow for clock skew between test setup and use case execution (~1–2 s drift).
+    expect(t.earlyBirdMinutesRemaining).toBeGreaterThanOrEqual(89);
+    expect(t.earlyBirdMinutesRemaining).toBeLessThanOrEqual(90);
     // displayPrice is the early-bird price
     expect(t.displayPrice.minor).toBe(499900);
     // originalPrice is the regular price
