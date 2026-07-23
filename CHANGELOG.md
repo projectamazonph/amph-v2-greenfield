@@ -4,6 +4,15 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-24: Vercel Hobby cron schedule fix
+
+- **PR #153** (merged as `72896f4`): `fix(vercel): change live-class-reminders cron to once daily (Hobby plan limit)`
+  - Vercel Hobby plan only allows one cron job per day. The previous schedule `0/5 * * * *` (every 5 minutes) was being rejected at deploy time with: "Hobby accounts are limited to daily cron jobs. This cron expression (0/5 * * * *) would run more than once per day."
+  - Changed to `0 8 * * *` (8 AM UTC = 4 PM PHT, daily). Once-daily at 4 PM PHT is the right cadence for T-24h-style live class reminders (reminder the afternoon before a next-morning class).
+  - If finer cadence is needed later, the cron can be moved to GitHub Actions (a working schedule already exists in `.github/workflows/daily-triage.yml` at `0 9 * * 1-5`).
+  - 1 file changed, 1 insertion / 1 deletion.
+- Also added `amph-v2-greenfield/` to `.gitignore`. A self-referencing copy of the project has been appearing in the workspace root, polluting `git status`. Not in git and not affecting production, but the ignore rule prevents accidental commits.
+
 ### 2026-07-24: Pricing tier seed script fix + production deploy
 
 - **PR #150** (merged as `9aca555`): `fix: construct proper PricingTier entity in seed script (use Money.of)`
