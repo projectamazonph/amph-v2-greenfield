@@ -133,7 +133,7 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-051 | Sentry setup (client/server/edge) + source maps                      | 1   |
 | STORY-052 | Structured logging (Pino) + `withActionTracing` HOC + redaction      | 1   |
 | STORY-053 | Lighthouse CI + Web Vitals                                           | 1   | ✅ done (job re-enabled, soft-pass) — PR #116 |
-| STORY-054 | Rate limiting (Upstash) + fakes + applied at every documented bucket | 1   |
+| STORY-054 | Rate limiting (Upstash) + fakes + applied at every documented bucket | 1   | ✅ done — PR #141                             |
 | STORY-055 | Tenant isolation audit + 6 critical-journey E2E tests + axe a11y     | 1   |
 
 ## Sprint 12 — Launch (5 pts)
