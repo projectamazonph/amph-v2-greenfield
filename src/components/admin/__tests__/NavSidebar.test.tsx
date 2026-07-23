@@ -23,17 +23,13 @@ const TEST_USER: User = {
 };
 
 function render(props: { currentPath?: string } = {}) {
-  return renderToString(
-    createElement(NavSidebar, { user: TEST_USER, ...props }),
-  );
+  return renderToString(createElement(NavSidebar, { user: TEST_USER, ...props }));
 }
 
 function hasActiveClass(html: string, href: string): boolean {
   // Find the <a ...> tag and check if it has a class containing 'active'.
   // The href may appear before or after the class in the rendered HTML.
-  const pattern = new RegExp(
-    `<a[^>]*?href="${href.replace(/[/]/g, "\\/")}"[^>]*>`,
-  );
+  const pattern = new RegExp(`<a[^>]*?href="${href.replace(/[/]/g, "\\/")}"[^>]*>`);
   const m = html.match(pattern);
   if (!m || !m[0]) return false;
   const clsMatch = m[0].match(/class="([^"]+)"/);
@@ -44,7 +40,7 @@ function hasActiveClass(html: string, href: string): boolean {
 describe("NavSidebar", () => {
   it("renders the brand + Admin badge", () => {
     const html = render();
-    expect(html).toContain("AMPH Academy");
+    expect(html).toContain("Project Amazon PH Academy");
     expect(html).toContain("Admin");
   });
 
@@ -89,9 +85,7 @@ describe("NavSidebar", () => {
     const html = render();
     // No link should have the "active" class. We test that no href has
     // a className containing "active".
-    const linkClasses = Array.from(
-      html.matchAll(/<a[^>]*class="([^"]+)"/g),
-    ).map((m) => m[1]);
+    const linkClasses = Array.from(html.matchAll(/<a[^>]*class="([^"]+)"/g)).map((m) => m[1]);
     expect(linkClasses.length).toBeGreaterThan(0);
     for (const cls of linkClasses) {
       expect(cls).not.toContain("active");

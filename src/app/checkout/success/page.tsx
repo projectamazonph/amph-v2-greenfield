@@ -94,7 +94,7 @@ export default function CheckoutSuccessPage({
   return (
     <div style={STYLES.page}>
       <div style={STYLES.card}>
-        <div style={STYLES.logo}>AMPH</div>
+        <div style={STYLES.logo}>Project Amazon PH Academy</div>
         <svg
           style={STYLES.checkmark}
           viewBox="0 0 24 24"

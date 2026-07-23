@@ -2,6 +2,7 @@
  * Sign up page — Story 004.
  *
  * Migrated from inline React.CSSProperties styles to AMPH components.
+ * User-facing brand name: Project Amazon PH Academy.
  * Uses React's `useActionState` (formerly useFormState) with a server action
  * for progressive enhancement — works without JavaScript.
  */
@@ -25,7 +26,7 @@ export default function SignUpPage() {
       <div className={styles.card}>
         {/* Header */}
         <div className={styles.header}>
-          <div className={styles.logo}>AMPH</div>
+          <div className={styles.logo}>Project Amazon PH Academy</div>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.subtitle}>
             Master Amazon PPC and Seller Central — built for Filipino VAs.

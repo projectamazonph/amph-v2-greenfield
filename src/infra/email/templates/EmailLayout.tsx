@@ -1,10 +1,10 @@
 /**
- * EmailLayout — shared shell for all AMPH transactional emails.
+ * EmailLayout — shared shell for all Project Amazon PH Academy transactional emails.
  *
  * STORY-045: EmailSender port + React Email templates.
  *
  * Provides:
- *  - AMPH Academy header (logo placeholder, brand name)
+ *  - Project Amazon PH Academy header (logo placeholder, brand name)
  *  - Centered content slot
  *  - Footer with company info + copyright
  *
@@ -79,7 +79,12 @@ export interface EmailLayoutProps {
   homeUrl?: string;
 }
 
-export function EmailLayout({ preview, eyebrow, children, homeUrl = "https://amph.example.com" }: EmailLayoutProps) {
+export function EmailLayout({
+  preview,
+  eyebrow,
+  children,
+  homeUrl = "https://amph.example.com",
+}: EmailLayoutProps) {
   return (
     <Html>
       <Head />
@@ -88,7 +93,9 @@ export function EmailLayout({ preview, eyebrow, children, homeUrl = "https://amp
         <Container style={styles.container}>
           <Section style={styles.header}>
             {eyebrow ? (
-              <Text style={{ ...styles.brand, fontSize: "11px", marginBottom: "4px", opacity: 0.8 }}>
+              <Text
+                style={{ ...styles.brand, fontSize: "11px", marginBottom: "4px", opacity: 0.8 }}
+              >
                 {eyebrow}
               </Text>
             ) : null}
@@ -102,7 +109,7 @@ export function EmailLayout({ preview, eyebrow, children, homeUrl = "https://amp
               </a>
             </Text>
             <Text style={{ margin: 0 }}>
-              You received this email because you have an account with AMPH Academy.
+              You received this email because you have an account with Project Amazon PH Academy.
             </Text>
           </Section>
         </Container>

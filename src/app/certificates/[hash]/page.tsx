@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!result.ok) {
     return {
-      title: "Certificate Not Found — AMPH Academy",
+      title: "Certificate Not Found — Project Amazon PH Academy",
       description: "This certificate could not be verified.",
     };
   }
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const fullName = `${user.firstName} ${user.lastName}`.trim();
 
   return {
-    title: `${fullName} — ${course.title} Certificate | AMPH Academy`,
+    title: `${fullName} — ${course.title} Certificate | Project Amazon PH Academy`,
     description: `Certificate of completion for ${course.title}, awarded to ${fullName}.`,
     robots: { index: true, follow: true },
   };
@@ -132,9 +132,7 @@ export default async function CertificatePage({ params }: PageProps) {
             {isRevoked && certificate.revokedReason ? (
               <div className={styles.certFooter}>
                 <p className={styles.certFooterLabel}>Revocation reason</p>
-                <p className={styles.certRevokedReason}>
-                  {certificate.revokedReason}
-                </p>
+                <p className={styles.certRevokedReason}>{certificate.revokedReason}</p>
                 {certificate.revokedAt ? (
                   <p className={styles.certRevokedDate}>
                     Revoked on{" "}
@@ -185,8 +183,8 @@ export default async function CertificatePage({ params }: PageProps) {
         {/* Verification footer */}
         <p className={styles.hashLine}>Verification hash: {truncatedHash}</p>
         <p className={styles.hashNote}>
-          Anyone with this URL can verify this certificate. The hash is a stable fingerprint of
-          the issuance event.
+          Anyone with this URL can verify this certificate. The hash is a stable fingerprint of the
+          issuance event.
         </p>
       </div>
     </main>

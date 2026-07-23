@@ -47,7 +47,7 @@ export function NavSidebar({ user, currentPath }: NavSidebarProps) {
   return (
     <aside className={styles.sidebar} aria-label="Admin navigation">
       <div className={styles.brand}>
-        <span className={styles.brandName}>AMPH Academy</span>
+        <span className={styles.brandName}>Project Amazon PH Academy</span>
         <span className={styles.adminBadge}>Admin</span>
       </div>
 
@@ -60,12 +60,7 @@ export function NavSidebar({ user, currentPath }: NavSidebarProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={[
-                styles.item,
-                isActive ? styles.active : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
+              className={[styles.item, isActive ? styles.active : ""].filter(Boolean).join(" ")}
               aria-current={isActive ? "page" : undefined}
             >
               <span className={styles.icon} aria-hidden>

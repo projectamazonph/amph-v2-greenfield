@@ -13,22 +13,23 @@ export interface PasswordResetEmailProps {
   expiresInMinutes: number;
 }
 
-export function PasswordResetEmail({ firstName, resetUrl, expiresInMinutes }: PasswordResetEmailProps) {
+export function PasswordResetEmail({
+  firstName,
+  resetUrl,
+  expiresInMinutes,
+}: PasswordResetEmailProps) {
   return (
-    <EmailLayout
-      preview="Reset your AMPH Academy password"
-      eyebrow="Password reset"
-    >
+    <EmailLayout preview="Reset your Project Amazon PH Academy password" eyebrow="Password reset">
       <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
         Reset your password
       </Heading>
       <Text style={{ margin: "0 0 8px 0", color: "#404040" }}>
-        Hi {firstName}, we received a request to reset the password for your AMPH
+        Hi {firstName}, we received a request to reset the password for your Project Amazon PH
         Academy account.
       </Text>
       <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
-        Click the button below to choose a new password. If you didn't request this, you
-        can safely ignore this email.
+        Click the button below to choose a new password. If you didn't request this, you can safely
+        ignore this email.
       </Text>
 
       <Button
@@ -51,8 +52,8 @@ export function PasswordResetEmail({ firstName, resetUrl, expiresInMinutes }: Pa
         This link expires in {expiresInMinutes} minutes.
       </Text>
       <Text style={{ margin: 0, color: "#737373", fontSize: "13px" }}>
-        For your security, this link can only be used once. If it expires, request a new
-        one from the login page.
+        For your security, this link can only be used once. If it expires, request a new one from
+        the login page.
       </Text>
     </EmailLayout>
   );

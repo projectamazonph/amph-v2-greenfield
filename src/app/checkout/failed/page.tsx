@@ -88,7 +88,7 @@ export default function CheckoutFailedPage({
   return (
     <div style={STYLES.page}>
       <div style={STYLES.card}>
-        <div style={STYLES.logo}>AMPH</div>
+        <div style={STYLES.logo}>Project Amazon PH Academy</div>
         <h1 style={STYLES.title}>Payment not completed</h1>
         <p style={STYLES.body}>
           Your payment was cancelled or didn't go through. You haven't been charged. Try again

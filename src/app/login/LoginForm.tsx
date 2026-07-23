@@ -6,6 +6,7 @@
  * consumes useSearchParams during static prerender).
  *
  * STORY-006. Migrated from inline React.CSSProperties to AMPH components.
+ * User-facing brand name: Project Amazon PH Academy.
  */
 
 "use client";
@@ -44,7 +45,7 @@ export function LoginForm() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <div className={styles.logo}>AMPH</div>
+          <div className={styles.logo}>Project Amazon PH Academy</div>
           <h1 className={styles.title}>Welcome back</h1>
           <p className={styles.subtitle}>Sign in to continue your training.</p>
         </div>
@@ -84,7 +85,7 @@ export function LoginForm() {
         </form>
 
         <p className={styles.altPrompt}>
-          New to AMPH Academy?{" "}
+          New to Project Amazon PH Academy?{" "}
           <Link href="/signup" className={styles.altLink}>
             Create an account
           </Link>

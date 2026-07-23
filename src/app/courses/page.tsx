@@ -1,5 +1,5 @@
 /**
- * /courses — AMPH Course Catalog
+ * /courses — Course Catalog
  * STORY-014
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
@@ -17,7 +17,7 @@ import type { CatalogCourse } from "@/usecases/ListCatalogCourses";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Courses — AMPH Academy",
+  title: "Courses — Project Amazon PH Academy",
   description: "Expert-led Amazon FBA courses taught in Filipino.",
 };
 
