@@ -64,7 +64,7 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
         style={{
           fontFamily: "var(--font-family-code)",
           fontSize: 12,
-          background: "var(--color-background-muted)",
+          background: "var(--surface-2)",
           padding: "2px 6px",
           borderRadius: 3,
         }}
@@ -105,7 +105,7 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
       <Link
         href={`/admin/simulators/${row.id}/edit`}
         style={{
-          color: "var(--color-accent)",
+          color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
           fontSize: "var(--font-size-sm)",
@@ -135,7 +135,7 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
         <span
           style={{
             fontSize: "var(--font-size-sm)",
-            color: "var(--color-text-secondary)",
+            color: "var(--ink-700)",
             fontWeight: 500,
           }}
         >
@@ -149,10 +149,8 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
             fontSize: "var(--font-size-sm)",
             fontFamily: "var(--font-family-code)",
             textDecoration: "none",
-            background: !currentSimulatorId
-              ? "var(--color-accent)"
-              : "var(--color-background-muted)",
-            color: !currentSimulatorId ? "var(--color-on-accent)" : "var(--color-text-primary)",
+            background: !currentSimulatorId ? "var(--accent)" : "var(--surface-2)",
+            color: !currentSimulatorId ? "var(--accent-ink)" : "var(--ink-900)",
             fontWeight: !currentSimulatorId ? 600 : 400,
             transition: "background 120ms",
           }}
@@ -169,10 +167,8 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
               fontSize: "var(--font-size-sm)",
               fontFamily: "var(--font-family-code)",
               textDecoration: "none",
-              background:
-                currentSimulatorId === id ? "var(--color-accent)" : "var(--color-background-muted)",
-              color:
-                currentSimulatorId === id ? "var(--color-on-accent)" : "var(--color-text-primary)",
+              background: currentSimulatorId === id ? "var(--accent)" : "var(--surface-2)",
+              color: currentSimulatorId === id ? "var(--accent-ink)" : "var(--ink-900)",
               fontWeight: currentSimulatorId === id ? 600 : 400,
               transition: "background 120ms",
             }}
@@ -196,7 +192,7 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
           style={{
             padding: "var(--spacing-8)",
             textAlign: "center",
-            color: "var(--color-text-secondary)",
+            color: "var(--ink-700)",
             fontSize: "var(--font-size-sm)",
           }}
         >

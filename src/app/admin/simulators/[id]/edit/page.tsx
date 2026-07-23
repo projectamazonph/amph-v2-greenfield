@@ -60,7 +60,7 @@ export default async function EditScenarioPage({ params, searchParams }: PagePro
 
       {errorMsg && (
         <Card padding={6}>
-          <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
+          <p style={{ color: "var(--danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
@@ -187,12 +187,12 @@ export default async function EditScenarioPage({ params, searchParams }: PagePro
             fontSize: "1rem",
             fontWeight: 600,
             margin: "0 0 0.75rem 0",
-            color: "var(--color-danger)",
+            color: "var(--danger)",
           }}
         >
           Danger zone
         </h2>
-        <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", margin: "0 0 1rem 0" }}>
+        <p style={{ fontSize: "0.875rem", color: "var(--ink-500)", margin: "0 0 1rem 0" }}>
           Archiving a scenario removes it from the admin list. Existing simulator sessions using
           this scenario are unaffected.
         </p>
@@ -201,7 +201,7 @@ export default async function EditScenarioPage({ params, searchParams }: PagePro
             type="submit"
             style={{
               padding: "0.5rem 1rem",
-              backgroundColor: "var(--color-danger)",
+              backgroundColor: "var(--danger)",
               color: "white",
               border: "none",
               borderRadius: "0.375rem",

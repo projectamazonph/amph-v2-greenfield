@@ -60,7 +60,7 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>
-          <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
+          <p style={{ color: "var(--danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
@@ -73,7 +73,7 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
               disabled
               defaultValue={b.slug}
               className={styles.input}
-              style={{ fontFamily: "monospace", backgroundColor: "var(--color-bg-muted)" }}
+              style={{ fontFamily: "monospace", backgroundColor: "var(--surface-2)" }}
             />
             <span className={styles.hint}>Slugs cannot be changed once created.</span>
           </label>
@@ -146,14 +146,12 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
               fontSize: "1rem",
               fontWeight: 600,
               margin: "0 0 0.75rem 0",
-              color: "var(--color-danger)",
+              color: "var(--danger)",
             }}
           >
             Danger zone
           </h2>
-          <p
-            style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", margin: "0 0 1rem 0" }}
-          >
+          <p style={{ fontSize: "0.875rem", color: "var(--ink-500)", margin: "0 0 1rem 0" }}>
             Archiving hides this badge from new awards. Existing BadgeAward records are unaffected.
           </p>
           <form action={handleArchive(slug)}>
@@ -161,7 +159,7 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
               type="submit"
               style={{
                 padding: "0.5rem 1rem",
-                backgroundColor: "var(--color-danger)",
+                backgroundColor: "var(--danger)",
                 color: "white",
                 border: "none",
                 borderRadius: "0.375rem",

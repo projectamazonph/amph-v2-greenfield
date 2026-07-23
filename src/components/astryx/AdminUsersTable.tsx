@@ -94,7 +94,7 @@ const COLUMNS: TableColumn<UserRow>[] = [
           alignItems: "center",
           gap: "var(--spacing-3)",
           textDecoration: "none",
-          color: "var(--color-text-primary)",
+          color: "var(--ink-900)",
         }}
       >
         <span
@@ -105,8 +105,8 @@ const COLUMNS: TableColumn<UserRow>[] = [
             width: 32,
             height: 32,
             borderRadius: "50%",
-            background: "var(--color-background-muted)",
-            color: "var(--color-text-primary)",
+            background: "var(--surface-2)",
+            color: "var(--ink-900)",
             fontSize: 11,
             fontWeight: 600,
             fontFamily: "var(--font-family-code)",
@@ -200,13 +200,13 @@ export function AdminUsersTable({
             gap: "var(--spacing-6)",
             marginTop: "var(--spacing-6)",
             fontSize: "var(--font-size-sm)",
-            color: "var(--color-text-secondary)",
+            color: "var(--ink-700)",
           }}
         >
           <Link
             href={buildPageHref(Math.max(1, page - 1), filters)}
             style={{
-              color: page > 1 ? "var(--color-accent)" : "var(--color-text-disabled)",
+              color: page > 1 ? "var(--accent)" : "var(--ink-300)",
               textDecoration: "none",
               fontWeight: 500,
               cursor: page > 1 ? "pointer" : "default",
@@ -225,7 +225,7 @@ export function AdminUsersTable({
           <Link
             href={buildPageHref(Math.min(totalPages, page + 1), filters)}
             style={{
-              color: page < totalPages ? "var(--color-accent)" : "var(--color-text-disabled)",
+              color: page < totalPages ? "var(--accent)" : "var(--ink-300)",
               textDecoration: "none",
               fontWeight: 500,
               cursor: page < totalPages ? "pointer" : "default",

@@ -46,7 +46,7 @@ const COLUMNS: TableColumn<BadgeRow>[] = [
     header: "Description",
     width: { type: "proportional", value: 2 },
     renderCell: (row) => (
-      <span style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-sm)" }}>
+      <span style={{ color: "var(--ink-700)", fontSize: "var(--font-size-sm)" }}>
         {row.description}
       </span>
     ),
@@ -87,7 +87,7 @@ const COLUMNS: TableColumn<BadgeRow>[] = [
       <Link
         href={`/admin/badges/${row.slug}/edit`}
         style={{
-          color: "var(--color-accent)",
+          color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
           fontSize: "var(--font-size-sm)",
@@ -117,7 +117,7 @@ export function AdminBadgesTable({ badges }: AdminBadgesTableProps) {
           style={{
             padding: "var(--spacing-8)",
             textAlign: "center",
-            color: "var(--color-text-secondary)",
+            color: "var(--ink-700)",
             fontSize: "var(--font-size-sm)",
           }}
         >

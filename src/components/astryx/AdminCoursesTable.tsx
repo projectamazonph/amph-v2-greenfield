@@ -74,7 +74,7 @@ const COLUMNS: TableColumn<CourseRow>[] = [
       <Link
         href={`/admin/courses/${row.id}`}
         style={{
-          color: "var(--color-text-primary)",
+          color: "var(--ink-900)",
           textDecoration: "none",
           fontWeight: 500,
         }}
@@ -166,7 +166,7 @@ export function AdminCoursesTable({
           style={{
             padding: "var(--spacing-8)",
             textAlign: "center",
-            color: "var(--color-text-secondary)",
+            color: "var(--ink-700)",
             fontSize: "var(--font-size-sm)",
           }}
         >
@@ -184,13 +184,13 @@ export function AdminCoursesTable({
             gap: "var(--spacing-6)",
             marginTop: "var(--spacing-6)",
             fontSize: "var(--font-size-sm)",
-            color: "var(--color-text-secondary)",
+            color: "var(--ink-700)",
           }}
         >
           <Link
             href={buildPageHref(Math.max(1, page - 1), filters)}
             style={{
-              color: page > 1 ? "var(--color-accent)" : "var(--color-text-disabled)",
+              color: page > 1 ? "var(--accent)" : "var(--ink-300)",
               textDecoration: "none",
               fontWeight: 500,
               cursor: page > 1 ? "pointer" : "default",
@@ -204,7 +204,7 @@ export function AdminCoursesTable({
           <Link
             href={buildPageHref(Math.min(totalPages, page + 1), filters)}
             style={{
-              color: page < totalPages ? "var(--color-accent)" : "var(--color-text-disabled)",
+              color: page < totalPages ? "var(--accent)" : "var(--ink-300)",
               textDecoration: "none",
               fontWeight: 500,
               cursor: page < totalPages ? "pointer" : "default",
