@@ -35,14 +35,13 @@ import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 
-const SIGNUP_RATE_LIMIT = { limit: 5, windowSeconds: 900 }; // 5 per 15 min
+const SIGNUP_RATE_LIMIT = { limit: 10, windowSeconds: 3600 }; // 10 per hour
 
-async function clientIp(): Promise<string> {
+async function clientIp(): Promise<string | undefined> {
   const h = await headers();
   const forwarded = h.get("x-forwarded-for");
   if (forwarded) return (forwarded.split(",")[0] ?? forwarded).trim();
-  const realIp = h.get("x-real-ip");
-  return realIp ?? "unknown";
+  return h.get("x-real-ip")?.trim() || undefined;
 }
 
 /**
@@ -94,7 +93,7 @@ export async function performSignUp(
   deps: {
     plantCookie: (token: string, expiresAt: Date) => Promise<void>;
     navigate: (url: string) => never;
-    getClientIp: () => Promise<string>;
+    getClientIp: () => Promise<string | undefined>;
   },
 ): Promise<SignUpResult> {
   // 1. Input validation
@@ -102,22 +101,25 @@ export async function performSignUp(
     return { kind: "invalid_input" };
   }
 
-  // 2. Rate limit by client IP
+  // 2. Rate limit by client IP. Skip the IP bucket if the proxy did not
+  // provide one, rather than grouping unrelated requests under a fallback.
   const ip = await deps.getClientIp();
-  const limitResult = await container.rateLimiter.check({
-    key: `signup:${ip}`,
-    ...SIGNUP_RATE_LIMIT,
-  });
-  if (limitResult.ok && !limitResult.value.allowed) {
-    return {
-      kind: "rate_limited",
-      retryAfterSeconds: limitResult.value.resetSeconds,
-    };
-  }
-  if (!limitResult.ok) {
-    // Rate limiter failed (Redis down, misconfig) — fail open so real users
-    // aren't blocked by infrastructure. Log it.
-    console.error("[performSignUp] rate limiter error:", limitResult.error.message);
+  if (ip) {
+    const limitResult = await container.rateLimiter.check({
+      key: `signup:ip:${ip}`,
+      ...SIGNUP_RATE_LIMIT,
+    });
+    if (limitResult.ok && !limitResult.value.allowed) {
+      return {
+        kind: "rate_limited",
+        retryAfterSeconds: limitResult.value.resetSeconds,
+      };
+    }
+    if (!limitResult.ok) {
+      // Rate limiter failed (Redis down, misconfig) — fail open so real users
+      // aren't blocked by infrastructure. Log it.
+      console.error("[performSignUp] rate limiter error:", limitResult.error.message);
+    }
   }
 
   // 3. Call the SignUp use case

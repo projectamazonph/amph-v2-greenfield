@@ -28,14 +28,14 @@ import { setAuthCookie } from "@/lib/auth";
 import { Login, type LoginOutput } from "@/usecases/Login";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 
-const LOGIN_RATE_LIMIT = { limit: 10, windowSeconds: 900 }; // 10 per 15 min
+const LOGIN_EMAIL_RATE_LIMIT = { limit: 5, windowSeconds: 900 }; // 5 per 15 min
+const LOGIN_IP_RATE_LIMIT = { limit: 20, windowSeconds: 900 }; // 20 per 15 min
 
-async function clientIp(): Promise<string> {
+async function clientIp(): Promise<string | undefined> {
   const h = await headers();
   const forwarded = h.get("x-forwarded-for");
   if (forwarded) return (forwarded.split(",")[0] ?? forwarded).trim();
-  const realIp = h.get("x-real-ip");
-  return realIp ?? "unknown";
+  return h.get("x-real-ip")?.trim() || undefined;
 }
 
 /**
@@ -59,24 +59,38 @@ export async function performLogin(
   deps: {
     plantCookie: (token: string, expiresAt: Date) => Promise<void>;
     navigate: (url: string) => never;
-    getClientIp: () => Promise<string>;
+    getClientIp: () => Promise<string | undefined>;
   },
 ): Promise<LoginResult> {
   if (!input.email || !input.password) {
     return { kind: "invalid_input" };
   }
 
-  // Rate limit by client IP
-  const ip = await deps.getClientIp();
-  const limitResult = await container.rateLimiter.check({
-    key: `login:${ip}`,
-    ...LOGIN_RATE_LIMIT,
+  // Rate limit every login by normalized email, then apply the broader IP
+  // bucket when the request has a trusted client IP.
+  const emailLimitResult = await container.rateLimiter.check({
+    key: `login:email:${input.email.toLowerCase()}`,
+    ...LOGIN_EMAIL_RATE_LIMIT,
   });
-  if (limitResult.ok && !limitResult.value.allowed) {
-    return { kind: "rate_limited", retryAfterSeconds: limitResult.value.resetSeconds };
+  if (emailLimitResult.ok && !emailLimitResult.value.allowed) {
+    return { kind: "rate_limited", retryAfterSeconds: emailLimitResult.value.resetSeconds };
   }
-  if (!limitResult.ok) {
-    console.error("[performLogin] rate limiter error:", limitResult.error.message);
+  if (!emailLimitResult.ok) {
+    console.error("[performLogin] email rate limiter error:", emailLimitResult.error.message);
+  }
+
+  const ip = await deps.getClientIp();
+  if (ip) {
+    const ipLimitResult = await container.rateLimiter.check({
+      key: `login:ip:${ip}`,
+      ...LOGIN_IP_RATE_LIMIT,
+    });
+    if (ipLimitResult.ok && !ipLimitResult.value.allowed) {
+      return { kind: "rate_limited", retryAfterSeconds: ipLimitResult.value.resetSeconds };
+    }
+    if (!ipLimitResult.ok) {
+      console.error("[performLogin] IP rate limiter error:", ipLimitResult.error.message);
+    }
   }
 
   // Reject open redirects — only allow relative paths starting with

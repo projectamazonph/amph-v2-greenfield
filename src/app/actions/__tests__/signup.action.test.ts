@@ -33,7 +33,7 @@ import { buildTestContainer } from "@/composition/container.test";
 
 type MockPlantCookie = Mock<(token: string, expiresAt: Date) => Promise<void>>;
 type MockNavigate = Mock<(url: string) => never>;
-type MockGetClientIp = Mock<() => Promise<string>>;
+type MockGetClientIp = Mock<() => Promise<string | undefined>>;
 
 function makeDeps(
   overrides: {
@@ -163,6 +163,60 @@ describe("performSignUp", () => {
     expect(result).toMatchObject({ kind: "email_taken" });
     expect(deps.plantCookie).not.toHaveBeenCalled();
     expect(deps.navigate).not.toHaveBeenCalled();
+  });
+
+  it("uses the documented 10-per-hour IP bucket and returns rate_limited when denied", async () => {
+    const container = freshContainer();
+    const check = vi.spyOn(container.rateLimiter, "check").mockResolvedValue({
+      ok: true,
+      value: { allowed: false, remaining: 0, resetSeconds: 600 },
+    });
+    const deps = makeDeps({ getClientIp: vi.fn(async () => "203.0.113.20") });
+
+    const result = await performSignUp(
+      container,
+      {
+        email: "rate-limited@test.example.com",
+        password: "validPassword123",
+        firstName: "Rate",
+        lastName: "Limited",
+      },
+      asProdDeps(deps),
+    );
+
+    expect(result).toEqual({ kind: "rate_limited", retryAfterSeconds: 600 });
+    expect(check).toHaveBeenCalledWith({
+      key: "signup:ip:203.0.113.20",
+      limit: 10,
+      windowSeconds: 3600,
+    });
+  });
+
+  it("skips the IP bucket when the request has no trusted client IP", async () => {
+    const container = freshContainer();
+    await container.userRepo.create({
+      id: "existing-without-ip",
+      email: "without-ip@test.example.com",
+      passwordHash: "already-hashed",
+      firstName: "Existing",
+      lastName: "User",
+    });
+    const check = vi.spyOn(container.rateLimiter, "check");
+    const deps = makeDeps({ getClientIp: vi.fn(async () => undefined) });
+
+    const result = await performSignUp(
+      container,
+      {
+        email: "without-ip@test.example.com",
+        password: "validPassword123",
+        firstName: "No",
+        lastName: "Ip",
+      },
+      asProdDeps(deps),
+    );
+
+    expect(result).toMatchObject({ kind: "email_taken" });
+    expect(check).not.toHaveBeenCalled();
   });
 
   it("creates the user, auto-logs-in, plants cookie, and navigates on success", async () => {
