@@ -54,7 +54,7 @@ async function seedUser(
 
 type MockPlantCookie = Mock<(token: string, expiresAt: Date) => Promise<void>>;
 type MockNavigate = Mock<(url: string) => never>;
-type MockGetClientIp = Mock<() => Promise<string>>;
+type MockGetClientIp = Mock<() => Promise<string | undefined>>;
 
 function makeDeps(
   overrides: {
@@ -221,5 +221,57 @@ describe("performLogin", () => {
     // paths via this routing. We test that the navigate was called
     // with /courses.
     expect(navigate).toHaveBeenCalledWith("/courses");
+  });
+
+  it("uses separate documented email and IP buckets before attempting login", async () => {
+    const container = freshContainer();
+    const check = vi.spyOn(container.rateLimiter, "check");
+    const deps = makeDeps({ getClientIp: vi.fn(async () => "203.0.113.21") });
+
+    const result = await performLogin(
+      container,
+      {
+        email: "Student@Example.com",
+        password: "any-password",
+        redirectTo: "/courses",
+      },
+      asProdDeps(deps),
+    );
+
+    expect(result).toEqual({ kind: "redirect_to_login", errorKind: "user_not_found" });
+    expect(check).toHaveBeenNthCalledWith(1, {
+      key: "login:email:student@example.com",
+      limit: 5,
+      windowSeconds: 900,
+    });
+    expect(check).toHaveBeenNthCalledWith(2, {
+      key: "login:ip:203.0.113.21",
+      limit: 20,
+      windowSeconds: 900,
+    });
+  });
+
+  it("does not create a shared IP bucket when no client IP is available", async () => {
+    const container = freshContainer();
+    const check = vi.spyOn(container.rateLimiter, "check");
+    const deps = makeDeps({ getClientIp: vi.fn(async () => undefined) });
+
+    const result = await performLogin(
+      container,
+      {
+        email: "no-ip@example.com",
+        password: "any-password",
+        redirectTo: "/courses",
+      },
+      asProdDeps(deps),
+    );
+
+    expect(result).toEqual({ kind: "redirect_to_login", errorKind: "user_not_found" });
+    expect(check).toHaveBeenCalledTimes(1);
+    expect(check).toHaveBeenCalledWith({
+      key: "login:email:no-ip@example.com",
+      limit: 5,
+      windowSeconds: 900,
+    });
   });
 });

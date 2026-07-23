@@ -100,6 +100,23 @@ describe("startCheckout (server action)", () => {
     expect(mockCreatePaymentIntent).not.toHaveBeenCalled();
   });
 
+  it("uses the documented user-scoped checkout bucket", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    mockCreatePaymentIntent.mockResolvedValueOnce({
+      ok: true,
+      checkoutUrl: "https://paymongo.com/cs_test_abc",
+      orderId: "ord_1",
+    });
+
+    await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
+
+    expect(mockRateLimiter).toHaveBeenCalledWith({
+      key: "checkout:user:user-1",
+      limit: 10,
+      windowSeconds: 3600,
+    });
+  });
+
   it("returns redirect with the PayMongo URL on success", async () => {
     mockGetSessionUserId.mockResolvedValueOnce("user-1");
     mockCreatePaymentIntent.mockResolvedValueOnce({

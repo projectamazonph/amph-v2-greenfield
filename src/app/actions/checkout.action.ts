@@ -69,7 +69,7 @@ export async function startCheckout(
 
   // Rate limit checkout attempts per authenticated user
   const limitResult = await container.rateLimiter.check({
-    key: `checkout:${userId}`,
+    key: `checkout:user:${userId}`,
     ...CHECKOUT_RATE_LIMIT,
   });
   if (limitResult.ok && !limitResult.value.allowed) {
