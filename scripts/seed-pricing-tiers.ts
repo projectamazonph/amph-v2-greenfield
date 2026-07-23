@@ -21,6 +21,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { prisma } from "@/infra/database/prisma";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
+import { Money } from "@/domain/values/Money";
 
 // ── .env loader ──────────────────────────────────────────────────────────────
 
@@ -125,11 +126,11 @@ async function upsertTier(def: TierDef): Promise<void> {
   const existing = await repo.findById(def.id);
 
   if (existing.ok && existing.value !== null) {
-    // Update existing tier
+    // Update existing tier — rebuild price from Money factory
     const updated = {
       ...existing.value,
       name: def.name,
-      priceMinor: def.priceMinor,
+      price: Money.of(def.priceMinor, "PHP"),
       earlyBirdPriceMinor: def.earlyBirdPriceMinor,
       earlyBirdEndsAt: def.earlyBirdEndsAt ? new Date(def.earlyBirdEndsAt) : undefined,
     };
@@ -140,19 +141,20 @@ async function upsertTier(def: TierDef): Promise<void> {
     }
     console.log(`  [UPDATE] "${def.slug}" → ₱${def.priceMinor / 100} (${def.name})`);
   } else {
-    // Create new tier
-    const result = await repo.create({
+    // Create new tier — construct proper PricingTier entity with Money
+    const tier = {
       id: def.id,
       slug: def.slug,
       name: def.name,
-      priceMinor: def.priceMinor,
-      status: "ACTIVE",
+      price: Money.of(def.priceMinor, "PHP"),
+      status: "ACTIVE" as const,
       displayOrder: def.displayOrder,
       earlyBirdPriceMinor: def.earlyBirdPriceMinor,
       earlyBirdEndsAt: def.earlyBirdEndsAt ? new Date(def.earlyBirdEndsAt) : undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+    };
+    const result = await repo.create(tier);
     if (!result.ok) {
       console.error(`  [ERROR] Failed to create tier "${def.slug}":`, result.error);
       return;
