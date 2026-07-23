@@ -134,19 +134,28 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-052 | Structured logging (Pino) + `withActionTracing` HOC + redaction      | 1   |
 | STORY-053 | Lighthouse CI + Web Vitals                                           | 1   | ✅ done (job re-enabled, soft-pass) — PR #116 |
 | STORY-054 | Rate limiting (Upstash) + fakes + applied at every documented bucket | 1   | ✅ done — PR #145                             |
-| STORY-055 | Tenant isolation audit + 6 critical-journey E2E tests + axe a11y     | 1   | ? done - PR #146                             |
+| STORY-055 | Tenant isolation audit + 6 critical-journey E2E tests + axe a11y     | 1   | ? done - PR #146                              |
 
 **Sprint 11 closed: 5/5 stories merged.**
 
 ## Sprint 12 — Launch (5 pts)
 
-| ID        | Title                                                                        | Pts |
-| --------- | ---------------------------------------------------------------------------- | --- |
-| STORY-056 | Production deploy runbook + smoke script + env-var checklist                 | 1   |
-| STORY-057 | DB backup + restore drill + cron                                             | 1   |
-| STORY-058 | Pre-launch security audit (npm audit, gitleaks, headers, isolation)          | 1   |
-| STORY-059 | Production deploy (operator executes the runbook)                            | 1   |
-| STORY-060 | Launch communications (Facebook, LinkedIn, Resend broadcast, internal Slack) | 1   |
+| ID        | Title                                                                        | Pts | Status                                                                                                  |
+| --------- | ---------------------------------------------------------------------------- | --- | ------------------------------------------------------------------------------------------------------- |
+| STORY-056 | Production deploy runbook + smoke script + env-var checklist                 | 1   | ✅ done (env vars synced, smoke script in `SESSION-HANDOVER.md`, runbook lived through PR #150)         |
+| STORY-057 | DB backup + restore drill + cron                                             | 1   | ⏳ operator-owned (Neon has automatic backups, drill not yet run)                                       |
+| STORY-058 | Pre-launch security audit (npm audit, gitleaks, headers, isolation)          | 1   | ⏳ operator-owned                                                                                       |
+| STORY-059 | Production deploy (operator executes the runbook)                            | 1   | ✅ done (Vercel auto-deployed `https://amph-v2-greenfield.vercel.app` after PR #150; all 4 routes live) |
+| STORY-060 | Launch communications (Facebook, LinkedIn, Resend broadcast, internal Slack) | 1   | ⏳ operator-owned                                                                                       |
+
+**Sprint 12 in progress: 2/5 stories done (STORY-056, STORY-059). 3/5 operator-owned.**
+
+**Production status (2026-07-24):**
+
+- URL: `https://amph-v2-greenfield.vercel.app`
+- Database: Neon Postgres, all 12 migrations applied, 4 pricing tiers seeded
+- Smoke tests: `/` → 200, `/signup` → 200, `/login` → 200, `/dashboard` → 307 (redirect)
+- Remaining operator items: PayMongo webhook endpoint, first admin user, custom domain, full signup→checkout smoke test, DB backup/restore drill, security audit, launch comms.
 
 ---
 

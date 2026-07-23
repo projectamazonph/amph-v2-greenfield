@@ -4,6 +4,27 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-24: Pricing tier seed script fix + production deploy
+
+- **PR #150** (merged as `9aca555`): `fix: construct proper PricingTier entity in seed script (use Money.of)`
+  - `scripts/seed-pricing-tiers.ts` was passing flat `{ priceMinor: 299900 }` objects to `repo.create()`, but `PrismaPricingTierRepository.mapData()` reads `tier.price.minor` — the domain entity has `price: Money`, not a flat `priceMinor` field. The repository's first call threw `TypeError: Cannot read properties of undefined (reading 'minor')`.
+  - Fixed by importing `Money` from `@/domain/values/Money` and constructing a proper `PricingTier` entity with `price: Money.of(priceMinor, "PHP")` in both the create and update paths.
+  - Regenerated Prisma client (`pnpm prisma:generate`) after the early-bird migration (`20260722050000_pricing_tier`) added the `earlyBirdPriceMinor` / `earlyBirdEndsAt` fields — the seed script's first attempt failed with `Unknown argument 'earlyBirdPriceMinor'` because the generated client was stale.
+  - All 4 pricing tiers now seed cleanly: foundations (₱2,999), mastery (₱5,999, early-bird ₱4,999 for 7 days), ultimate (₱9,999, early-bird ₱7,999 for 3 days), all-access (₱14,999).
+  - 1 file changed, 9 insertions / 7 deletions. All 6 CI checks green.
+
+- **Production deploy: `https://amph-v2-greenfield.vercel.app` is live**
+  - Vercel project linked to `amph-v2-greenfield` (`prj_3tEN1Akupoosai3OAGc1t50ru5QG`).
+  - All required environment variables synced from Vercel to local `.env.local` and `.env`: `DATABASE_URL` (Neon Postgres), `SHADOW_DATABASE_URL`, `JWT_SECRET`, `PAYMONGO_SECRET` (live key), `PAYMONGO_WEBHOOK_SECRET`, `RESEND_API_KEY`, `SENTRY_DSN`, `NEXT_PUBLIC_APP_URL`.
+  - `pnpm prisma migrate deploy` applied all 12 migrations to the production Neon database.
+  - `pnpm db:seed:tiers` seeded all 4 pricing tiers.
+  - Vercel auto-deployed the latest `main` HEAD via the Git integration. Smoke-tested routes:
+    - `GET /` → 200 (landing page renders all sections)
+    - `GET /signup` → 200
+    - `GET /login` → 200
+    - `GET /dashboard` → 307 (redirects to login when unauthenticated, correct behavior)
+  - Remaining operator-owned launch items: configure PayMongo webhook endpoint at the live URL, create first admin user, add custom domain (optional), smoke test the full signup → checkout → enrollment flow, run STORY-057/058/060.
+
 ### 2026-07-24: CSS variable token fixes — 18 files, 106 insertions
 
 - **PR #147** (merged as `75d2709`): `fix(ui): replace undefined CSS variable references with correct AMPH token names`
