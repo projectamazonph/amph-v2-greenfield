@@ -2,15 +2,15 @@
  * courses-page.test.ts — SOLID regression guard for the /courses page.
  *
  * The /courses page is an async React Server Component that fetches
- * course data via buildContainer().listCourses.execute(). We can't
- * use react-dom/server.renderToString directly because async server
+ * course data via buildContainer().listCatalogCourses.execute() (STORY-014).
+ * We can't use react-dom/server.renderToString directly because async server
  * components need React's special SSR pipeline (not a sync string
  * render). The meaningful test surface for the page is:
  *
- * 1. **Use case behavior** (ListCourses): covered in
- *    src/usecases/__tests__/ListCourses.test.ts
+ * 1. **Use case behavior** (ListCatalogCourses): covered in
+ *    src/usecases/__tests__/ListCatalogCourses.test.ts
  * 2. **Container wiring**: covered in
- *    src/composition/__tests__/container.test.ts (TBD)
+ *    src/composition/container.test.ts
  * 3. **SOLID regression guard**: this file
  *
  * The regression guard ensures the page NEVER instantiates
@@ -41,6 +41,6 @@ describe("/courses page — SOLID regression guard", () => {
     // The page must consult the composition root
     expect(source).toMatch(/buildContainer/);
     // And the use case is dispatched through the container
-    expect(source).toMatch(/listCourses\.execute/);
+    expect(source).toMatch(/listCatalogCourses\.execute/);
   });
 });
