@@ -88,7 +88,7 @@ const COLUMNS: TableColumn<LiveClassRow>[] = [
       <Link
         href={`/admin/live-classes/${row.id}/edit`}
         style={{
-          color: "var(--color-accent)",
+          color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
           fontSize: "var(--font-size-sm)",
@@ -118,7 +118,7 @@ export function AdminLiveClassesTable({ liveClasses }: AdminLiveClassesTableProp
           style={{
             padding: "var(--spacing-8)",
             textAlign: "center",
-            color: "var(--color-text-secondary)",
+            color: "var(--ink-700)",
             fontSize: "var(--font-size-sm)",
           }}
         >

@@ -1,0 +1,31 @@
+## What
+
+Migrates 30 admin pages and 2 student pages from `@/components/ui` to `@astryxdesign/core` components, plus applies the student UI hardening patch.
+
+## Changes
+
+### Admin pages — Astryx migration
+- `Card`: `padding="comfortable"` → `padding={6}` (24px)
+- `Badge`: children → `label` prop; `variant="danger"` → `variant="error"`; `variant="accent"` → `variant="orange"`; JSX expression children fixed with `label={...}` form
+- 4 manual fixes for multiline ternary badge tags that were self-closing without `/>`
+
+### Login / signup — reverted to @/components/ui
+Astryx has no `Input` component; `Button` uses `label` prop (not `children`) and `isDisabled` (not `disabled`). Kept `@/components/ui` for both.
+
+### Student hardening patch (26 of 29 hunks applied cleanly)
+- Tables: `overflow-x: auto` scroll regions with `min-width` and focus outlines on curriculum, bid-elevator, campaign-builder, listing-audit, STR triage
+- Lesson nav: column stack on phone widths
+- Checkout: `clamp()` padding, `overflow-wrap: anywhere`
+- Signup: one name field per row on narrow phones; idle state prevents first-render validation flash
+
+### New tests
+- `src/app/signup/__tests__/page.test.tsx`: idle-state contract
+- `src/components/tools/__tests__/responsive-tables.test.ts`: keyboard-reachable scroll regions
+
+### signUpAction type
+Added `{ kind: "idle" }` to `SignUpState` so the page distinguishes pre-submission from validation errors.
+
+## Verification
+- TypeScript: ✅ 0 errors
+- ESLint: ✅ 0 errors (4 pre-existing warnings)
+- Vitest: ✅ SignUp + GetCatalogCourse spot-check passed

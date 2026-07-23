@@ -40,7 +40,7 @@ export default async function NewLiveClassPage({ searchParams }: PageProps) {
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>
-          <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
+          <p style={{ color: "var(--danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
