@@ -90,6 +90,9 @@ import { RevokeCertificate } from "@/usecases/RevokeCertificate";
 import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
 import { ListCourses } from "@/usecases/ListCourses";
 import { GetCourse } from "@/usecases/GetCourse";
+// STORY-014: public catalog wired to Module+Lesson tables
+import { ListCatalogCourses } from "@/usecases/ListCatalogCourses";
+import { GetCatalogCourse } from "@/usecases/GetCatalogCourse";
 // STORY-047: admin users list + user detail + impersonate
 import { ListUsers } from "@/usecases/ListUsers";
 import { GetUserDetail } from "@/usecases/GetUserDetail";
@@ -332,6 +335,17 @@ export function buildTestContainer(): TestContainer {
     }),
     listCourses: new ListCourses(courseRepo),
     getCourse: new GetCourse(courseRepo),
+    // STORY-014: public catalog wired to Module+Lesson tables
+    listCatalogCourses: new ListCatalogCourses({
+      courseRepo,
+      moduleRepo,
+      lessonRepo,
+    }),
+    getCatalogCourse: new GetCatalogCourse({
+      courseRepo,
+      moduleRepo,
+      lessonRepo,
+    }),
     // STORY-047: admin users list + user detail + impersonate
     listUsers: new ListUsers({ userRepo }),
     getUserDetail: new GetUserDetail({ userRepo, enrollmentRepo }),

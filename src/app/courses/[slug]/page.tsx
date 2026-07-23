@@ -1,23 +1,20 @@
 /**
  * /courses/[slug] — AMPH Course Detail
- * Story 017
+ * STORY-014
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  *
- * Uses buildContainer() (the composition root) for the course
- * repository + GetCourse use case. The page MUST NOT
- * instantiate InMemory* adapters directly — that would be the
- * "in-memory in production" anti-pattern (every course detail
- * page would 404 because the fresh InMemoryCourseRepository
- * starts empty).
+ * Uses buildContainer() with the GetCatalogCourse use case, which
+ * fetches the course from the Course table and enriches it with
+ * module+lesson data from the Module+Lesson tables (populated by
+ * the STORY-013 import script).
  */
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
-import { courseLessonCount, courseTotalDurationMinutes } from "@/domain/entities/Course";
-import type { Course, Section, Lesson } from "@/domain/entities/Course";
+import type { CatalogCourseDetail } from "@/usecases/GetCatalogCourse";
 import { EnrollButton } from "./EnrollButton";
 import styles from "./page.module.css";
 
@@ -28,28 +25,28 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const container = buildContainer();
-  const result = await container.getCourse.execute(slug);
+  const result = await container.getCatalogCourse.execute(slug);
   if (!result.ok) return { title: "Course Not Found — AMPH Academy" };
-  const course = result.course;
+  const detail = result.value;
   return {
-    title: `${course.title} — AMPH Academy`,
-    description: course.tagline || course.description.slice(0, 160),
+    title: `${detail.title} — AMPH Academy`,
+    description: detail.tagline || detail.description.slice(0, 160),
   };
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const container = buildContainer();
-  const result = await container.getCourse.execute(slug);
+  const result = await container.getCatalogCourse.execute(slug);
 
   if (!result.ok) notFound();
 
-  const course = result.course;
-  const lessonCount = courseLessonCount(course);
-  const totalMinutes = courseTotalDurationMinutes(course);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  const priceDisplay = course.price.minor === 0 ? "FREE" : course.price.format();
+  const detail = result.value;
+  const { totalLessonCount, totalEstimatedMinutes, modules } = detail;
+  const hours = Math.floor(totalEstimatedMinutes / 60);
+  const minutes = totalEstimatedMinutes % 60;
+  const priceDisplay =
+    detail.priceMinor === 0 ? "FREE" : `₱${(detail.priceMinor / 100).toFixed(2)}`;
 
   return (
     <main className={styles.page}>
@@ -62,31 +59,25 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
           <div className={styles.headerGrid}>
             {/* Cover */}
-            {course.coverImage ? (
+            {detail.coverImage ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={course.coverImage}
-                alt={course.title}
-                className={styles.cover}
-              />
+              <img src={detail.coverImage} alt={detail.title} className={styles.cover} />
             ) : (
               <div className={styles.coverPlaceholder}>
-                <span className={styles.coverPlaceholderLetter}>{course.title[0]}</span>
+                <span className={styles.coverPlaceholderLetter}>{detail.title[0]}</span>
               </div>
             )}
 
             <div className={styles.headerBody}>
-              <h1 className={styles.title}>{course.title}</h1>
-              {course.tagline && (
-                <p className={styles.tagline}>{course.tagline}</p>
-              )}
-              <p className={styles.description}>{course.description}</p>
+              <h1 className={styles.title}>{detail.title}</h1>
+              {detail.tagline && <p className={styles.tagline}>{detail.tagline}</p>}
+              <p className={styles.description}>{detail.description}</p>
 
               <div className={styles.meta}>
                 <span className={styles.metaItem}>
-                  <BookIcon /> {lessonCount} lesson{lessonCount !== 1 ? "s" : ""}
+                  <BookIcon /> {totalLessonCount} lesson{totalLessonCount !== 1 ? "s" : ""}
                 </span>
-                {totalMinutes > 0 && (
+                {totalEstimatedMinutes > 0 && (
                   <span className={styles.metaItem}>
                     <ClockIcon /> {hours > 0 ? `${hours}h ` : ""}
                     {minutes}m video
@@ -95,7 +86,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <span className={styles.price}>{priceDisplay}</span>
               </div>
 
-              <EnrollButton courseId={course.id} priceMinor={course.price.minor} />
+              <EnrollButton courseId={detail.courseId} priceMinor={detail.priceMinor} />
             </div>
           </div>
         </div>
@@ -105,23 +96,30 @@ export default async function CourseDetailPage({ params }: PageProps) {
       <div className={styles.curriculumSection}>
         <h2 className={styles.curriculumTitle}>Curriculum</h2>
         <div className={styles.sectionList}>
-          {course.curriculum.sections.map((section: Section, si: number) => (
-            <details
-              key={section.id}
-              className={styles.section}
-              open={si === 0}
-            >
+          {modules.map((mod, si) => (
+            <details key={mod.id} className={styles.section} open={si === 0}>
               <summary className={styles.sectionSummary}>
                 <span className={styles.sectionTitle}>
-                  Section {si + 1}: {section.title}
+                  Section {si + 1}: {mod.title}
                 </span>
                 <span className={styles.sectionChevron}>▼</span>
               </summary>
               <ul className={styles.lessonList}>
-                <LessonList
-                  lessons={section.lessons as readonly Lesson[]}
-                  courseSlug={course.slug}
-                />
+                {mod.lessons.map((lesson) => {
+                  const vid = lesson.estimatedMinutes > 0 ? `${lesson.estimatedMinutes}m` : null;
+                  return (
+                    <li key={lesson.id} className={styles.lessonItem}>
+                      <LessonTypeIcon type={lesson.type} />
+                      <Link
+                        href={`/courses/${detail.slug}/lessons/${lesson.id}`}
+                        className={styles.lessonLink}
+                      >
+                        {lesson.title}
+                      </Link>
+                      {vid && <span className={styles.lessonDuration}>{vid}</span>}
+                    </li>
+                  );
+                })}
               </ul>
             </details>
           ))}
@@ -167,40 +165,6 @@ function ClockIcon() {
       />
     </svg>
   );
-}
-
-function LessonList({
-  lessons,
-  courseSlug,
-}: {
-  lessons: readonly Lesson[];
-  courseSlug: string;
-}) {
-  const items: React.ReactNode[] = [];
-  for (let i = 0; i < lessons.length; i++) {
-    const lessonItem = lessons[i];
-    if (!lessonItem) continue;
-    const vid =
-      lessonItem.type === "VIDEO" &&
-      lessonItem.content &&
-      typeof lessonItem.content === "object" &&
-      "durationMinutes" in lessonItem.content
-        ? String((lessonItem.content as { durationMinutes: number }).durationMinutes) + "m"
-        : null;
-    items.push(
-      <li key={lessonItem.id} className={styles.lessonItem}>
-        <LessonTypeIcon type={lessonItem.type} />
-        <Link
-          href={`/courses/${courseSlug}/lessons/${lessonItem.id}`}
-          className={styles.lessonLink}
-        >
-          {lessonItem.title}
-        </Link>
-        {vid && <span className={styles.lessonDuration}>{vid}</span>}
-      </li>,
-    );
-  }
-  return <>{items}</>;
 }
 
 function LessonTypeIcon({ type }: { type: string }) {
