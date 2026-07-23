@@ -123,8 +123,10 @@ model Course {
   description String
 
   // Pricing
-  priceMinor    Int
-  currency      String  @default("PHP")
+  priceMinor      Int
+  currency        String  @default("PHP")
+  pricingTierId   String?
+  pricingTier     PricingTier? @relation(fields: [pricingTierId], references: [id])
 
   // Content
   curriculum  Json     // { sections: [{ title, lessons: [{ title, type, content }] }] }
@@ -168,6 +170,14 @@ model PricingTier {
   status        String  @default("DRAFT") // DRAFT | ACTIVE | ARCHIVED
 
   displayOrder  Int     @default(0)
+
+  // Early-bird pricing: time-windowed discount shown on /pricing.
+  // STORY-015.
+  earlyBirdPriceMinor Int?
+  earlyBirdEndsAt     DateTime?
+
+  // Relations
+  courses Course[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

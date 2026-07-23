@@ -156,6 +156,8 @@ import { GetCourse } from "@/usecases/GetCourse";
 // STORY-014: public catalog pages wired to Module+Lesson tables
 import { ListCatalogCourses } from "@/usecases/ListCatalogCourses";
 import { GetCatalogCourse } from "@/usecases/GetCatalogCourse";
+// STORY-015: public pricing page wired to PricingTier rows
+import { ListPricingTiers } from "@/usecases/ListPricingTiers";
 // STORY-047: admin users list + user detail + impersonate
 import { ListUsers } from "@/usecases/ListUsers";
 import { GetUserDetail } from "@/usecases/GetUserDetail";
@@ -285,6 +287,8 @@ export interface AppContainer {
   // STORY-014: public catalog wired to Module+Lesson tables
   listCatalogCourses: ListCatalogCourses;
   getCatalogCourse: GetCatalogCourse;
+  // STORY-015: public pricing page wired to PricingTier rows
+  listPricingTiers: ListPricingTiers;
   // STORY-047: admin users list + user detail + impersonate
   listUsers: ListUsers;
   getUserDetail: GetUserDetail;
@@ -534,6 +538,8 @@ function buildProductionContainer(): AppContainer {
       moduleRepo,
       lessonRepo,
     }),
+    // STORY-015: public pricing page wired to PricingTier rows
+    listPricingTiers: new ListPricingTiers({ pricingTierRepo }),
     // STORY-047: admin users list + user detail + impersonate
     listUsers: new ListUsers({ userRepo }),
     getUserDetail: new GetUserDetail({ userRepo, enrollmentRepo }),

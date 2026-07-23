@@ -1,7 +1,7 @@
 /**
  * PricingTier — a first-class pricing bucket for the course catalog.
  *
- * STORY-011.
+ * STORY-011 + STORY-015.
  *
  * Pricing is on the tier, not the course. The all-access pass points
  * to a special tier. A course is associated with a tier (FK added in
@@ -10,6 +10,11 @@
  *
  * Lifecycle: DRAFT (admin only) -> ACTIVE (visible on /pricing) ->
  * ARCHIVED (hidden everywhere except admin list).
+ *
+ * Early-bird pricing (STORY-015): a time-windowed discount shown on
+ * /pricing. Use `effectivePrice(tier, now)` to resolve the price
+ * shown to the user — early-bird price if the window is open, otherwise
+ * the regular price.
  *
  * ADR-013: this is a pure domain object. No imports from outer layers.
  */
@@ -44,6 +49,13 @@ export interface PricingTier {
   readonly price: Money;
   readonly status: PricingTierStatus;
   readonly displayOrder: number;
+  /**
+   * Early-bird discount price. Shown on /pricing when
+   * `earlyBirdEndsAt` is in the future.
+   */
+  readonly earlyBirdPriceMinor: number | undefined;
+  /** When the early-bird price expires. */
+  readonly earlyBirdEndsAt: Date | undefined;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -71,6 +83,8 @@ export function createPricingTier(params: {
   currency?: "PHP" | "USD";
   status?: PricingTierStatus;
   displayOrder?: number;
+  earlyBirdPriceMinor?: number;
+  earlyBirdEndsAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }): Result<PricingTier, CreatePricingTierError> {
@@ -90,6 +104,19 @@ export function createPricingTier(params: {
     return Result.err({ kind: "invalid_price" });
   }
 
+  // Fail Fast: early-bird price must be non-negative if set
+  if (
+    params.earlyBirdPriceMinor !== undefined &&
+    (!Number.isInteger(params.earlyBirdPriceMinor) || params.earlyBirdPriceMinor < 0)
+  ) {
+    return Result.err({ kind: "invalid_price" });
+  }
+
+  // Fail Fast: early-bird price must not exceed regular price
+  if (params.earlyBirdPriceMinor !== undefined && params.earlyBirdPriceMinor > params.priceMinor) {
+    return Result.err({ kind: "invalid_price" });
+  }
+
   const now = params.updatedAt ?? params.createdAt ?? new Date();
   return Result.ok({
     id: params.id,
@@ -98,6 +125,8 @@ export function createPricingTier(params: {
     price: Money.of(params.priceMinor, params.currency ?? "PHP"),
     status: params.status ?? "DRAFT",
     displayOrder: params.displayOrder ?? 0,
+    earlyBirdPriceMinor: params.earlyBirdPriceMinor,
+    earlyBirdEndsAt: params.earlyBirdEndsAt,
     createdAt: params.createdAt ?? new Date(),
     updatedAt: now,
   });
@@ -123,6 +152,44 @@ export function pricingTierIsArchived(tier: PricingTier): boolean {
   return tier.status === "ARCHIVED";
 }
 
+/**
+ * The price to display on /pricing for this tier.
+ * Returns the early-bird price if the window is still open at `now`,
+ * otherwise the regular price.
+ */
+export function effectivePrice(tier: PricingTier, now: Date = new Date()): Money {
+  if (
+    tier.earlyBirdEndsAt &&
+    tier.earlyBirdPriceMinor !== undefined &&
+    tier.earlyBirdEndsAt > now
+  ) {
+    return Money.of(tier.earlyBirdPriceMinor, tier.price.currency);
+  }
+  return tier.price;
+}
+
+/**
+ * Is the early-bird window currently open?
+ * Returns false if no early-bird is set or if it has expired.
+ */
+export function earlyBirdIsActive(tier: PricingTier, now: Date = new Date()): boolean {
+  return (
+    tier.earlyBirdEndsAt !== undefined &&
+    tier.earlyBirdPriceMinor !== undefined &&
+    tier.earlyBirdEndsAt > now
+  );
+}
+
+/**
+ * How many minutes remain in the early-bird window.
+ * Returns 0 if the window is closed or not set.
+ */
+export function earlyBirdMinutesRemaining(tier: PricingTier, now: Date = new Date()): number {
+  if (!earlyBirdIsActive(tier, now)) return 0;
+  const diff = tier.earlyBirdEndsAt!.getTime() - now.getTime();
+  return Math.max(0, Math.floor(diff / 60_000));
+}
+
 /** Sort key: `displayOrder` ascending, then `createdAt` ascending. */
 export function comparePricingTiers(a: PricingTier, b: PricingTier): number {
   if (a.displayOrder !== b.displayOrder) {
@@ -144,6 +211,8 @@ export interface UpdatePricingTierPatch {
   currency?: "PHP" | "USD";
   status?: PricingTierStatus;
   displayOrder?: number;
+  earlyBirdPriceMinor?: number | null; // null = clear early-bird
+  earlyBirdEndsAt?: Date | null; // null = clear early-bird
 }
 
 /**
@@ -157,6 +226,21 @@ export function updatePricingTier(
   patch: UpdatePricingTierPatch,
   now: Date = new Date(),
 ): Result<PricingTier, CreatePricingTierError> {
+  // Resolve early-bird: null = clear, undefined = keep existing, value = set
+  const earlyBirdPriceMinor =
+    patch.earlyBirdPriceMinor === null
+      ? undefined
+      : patch.earlyBirdPriceMinor !== undefined
+        ? patch.earlyBirdPriceMinor
+        : tier.earlyBirdPriceMinor;
+
+  const earlyBirdEndsAt =
+    patch.earlyBirdEndsAt === null
+      ? undefined
+      : patch.earlyBirdEndsAt !== undefined
+        ? patch.earlyBirdEndsAt
+        : tier.earlyBirdEndsAt;
+
   const merged = {
     id: tier.id,
     slug: patch.slug ?? tier.slug,
@@ -165,6 +249,8 @@ export function updatePricingTier(
     currency: patch.currency ?? tier.price.currency,
     status: patch.status ?? tier.status,
     displayOrder: patch.displayOrder ?? tier.displayOrder,
+    earlyBirdPriceMinor,
+    earlyBirdEndsAt,
     createdAt: tier.createdAt,
     updatedAt: now,
   };

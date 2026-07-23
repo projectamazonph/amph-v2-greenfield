@@ -131,6 +131,8 @@ export class InMemoryPricingTierRepository implements IPricingTierRepository {
   /** Pre-seed a tier (test-only helper). */
   seed(tier: PricingTier): void {
     this.tiers.set(tier.id, Object.freeze({ ...tier }));
+    // Clear archived flag on re-seed
+    this.archived.delete(tier.id);
   }
 
   /** Pre-seed several tiers. */

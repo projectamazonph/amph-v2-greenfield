@@ -1,78 +1,44 @@
 /**
  * /pricing — public pricing page.
  *
- * Read-only marketing page with the 3 tiers and a comparison
- * table. Mirrors the landing-page pricing card style; no use case
- * or DI needed.
+ * Fetches ACTIVE pricing tiers from the database and renders tier cards.
+ * Early-bird pricing is resolved server-side so the correct price and
+ * countdown timer are visible on first render.
+ *
+ * STORY-015.
  */
 
+import { buildContainer } from "@/composition/container";
+import { ListPricingTiers } from "@/usecases/ListPricingTiers";
 import styles from "./page.module.css";
 
-export const dynamic = "force-static";
+// ── Helpers ─────────────────────────────────────────────────────────────────
 
-interface Tier {
-  id: string;
-  name: string;
-  price: string;
-  blurb: string;
-  features: ReadonlyArray<string>;
-  cta: string;
-  ctaHref: string;
-  highlighted: boolean;
+/** Format minutes as "X days Y hrs Z min" or just "X min" if < 60 min. */
+function formatCountdown(minutes: number): string {
+  if (minutes <= 0) return "";
+  if (minutes < 60) return `${minutes} min`;
+  const days = Math.floor(minutes / 1440);
+  const hrs = Math.floor((minutes % 1440) / 60);
+  const mins = minutes % 60;
+  if (days > 0) {
+    return `${days}d ${hrs}h ${mins}m`;
+  }
+  return `${hrs}h ${mins}m`;
 }
 
-const TIERS: ReadonlyArray<Tier> = [
-  {
-    id: "foundations",
-    name: "PPC Foundations",
-    price: "₱2,999",
-    blurb: "5 core modules. The full Amazon ads workflow, end to end.",
-    features: [
-      "5 modules, ~20 hours of content",
-      "Campaign Builder, Bid Elevator, STR Triage simulators",
-      "Quizzes and badges",
-      "Certificate on completion",
-      "Community access",
-    ],
-    cta: "Start Foundations",
-    ctaHref: "/signup?tier=foundations",
-    highlighted: false,
-  },
-  {
-    id: "mastery",
-    name: "Accelerated Mastery",
-    price: "₱5,999",
-    blurb: "Everything in Foundations + advanced modules + all simulators.",
-    features: [
-      "8 modules, ~40 hours of content",
-      "All 5 simulators (incl. Listing Audit + Keyword Research)",
-      "Scenario packs and downloadable templates",
-      "Live class recordings",
-      "Certificate with priority review",
-    ],
-    cta: "Start Mastery",
-    ctaHref: "/signup?tier=mastery",
-    highlighted: true,
-  },
-  {
-    id: "ultimate",
-    name: "Ultimate Transformation",
-    price: "₱9,999",
-    blurb: "Everything in Mastery + weekly live classes with Ryan + 1-on-1 review.",
-    features: [
-      "Everything in Mastery",
-      "Weekly live classes with Ryan",
-      "1-on-1 portfolio review (once)",
-      "Private community channel",
-      "Direct line to the team for Q&A",
-    ],
-    cta: "Start Ultimate",
-    ctaHref: "/signup?tier=ultimate",
-    highlighted: false,
-  },
-];
+// ── Page ────────────────────────────────────────────────────────────────────
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const container = buildContainer();
+  const useCase = new ListPricingTiers({ pricingTierRepo: container.pricingTierRepo });
+
+  const result = await useCase.execute();
+
+  // If DB is unavailable, render a graceful fallback (no crash).
+  // This keeps the page SSR-safe even before migrations are applied.
+  const tiers = result.ok ? result.value.tiers : [];
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -82,41 +48,63 @@ export default function PricingPage() {
           Pay once, get the content forever. No subscription, no upsells later.
         </p>
       </header>
-      <ul className={styles.grid}>
-        {TIERS.map((tier) => (
-          <li
-            key={tier.id}
-            className={`${styles.card} ${tier.highlighted ? styles.cardHighlighted : ""}`}
-          >
-            {tier.highlighted ? (
-              <span className={styles.ribbon}>Most students pick this</span>
-            ) : null}
-            <h2 className={styles.tierName}>{tier.name}</h2>
-            <div className={styles.priceRow}>
-              <span className={styles.price}>{tier.price}</span>
-              <span className={styles.priceSuffix}>one-time</span>
-            </div>
-            <p className={styles.blurb}>{tier.blurb}</p>
-            <ul className={styles.features}>
-              {tier.features.map((f) => (
-                <li key={f} className={styles.feature}>
-                  <span className={styles.plus} aria-hidden="true">+</span>
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <a
-              href={tier.ctaHref}
-              className={`${styles.cta} ${tier.highlighted ? styles.ctaPrimary : styles.ctaSecondary}`}
+
+      {tiers.length === 0 ? (
+        <p className={styles.note}>Pricing tiers coming soon.</p>
+      ) : (
+        <ul className={styles.grid}>
+          {tiers.map((tier) => (
+            <li
+              key={tier.id}
+              className={`${styles.card} ${tier.slug === "mastery" ? styles.cardHighlighted : ""}`}
             >
-              {tier.cta}
-            </a>
-          </li>
-        ))}
-      </ul>
+              {tier.slug === "mastery" ? (
+                <span className={styles.ribbon}>Most students pick this</span>
+              ) : null}
+
+              {/* Early-bird badge */}
+              {tier.isEarlyBird && (
+                <span className={styles.earlyBirdBadge}>
+                  Early Bird · {formatCountdown(tier.earlyBirdMinutesRemaining)} left
+                </span>
+              )}
+
+              <h2 className={styles.tierName}>{tier.name}</h2>
+
+              <div className={styles.priceRow}>
+                {tier.isEarlyBird && tier.originalPrice ? (
+                  <>
+                    <span className={styles.price}>{tier.displayPrice.format()}</span>
+                    <span className={styles.originalPrice}>{tier.originalPrice.format()}</span>
+                  </>
+                ) : (
+                  <span className={styles.price}>{tier.displayPrice.format()}</span>
+                )}
+                <span className={styles.priceSuffix}>one-time</span>
+              </div>
+
+              {/* Countdown timer for early-bird tiers */}
+              {tier.isEarlyBird && tier.earlyBirdMinutesRemaining > 0 && (
+                <p className={styles.countdown}>
+                  Early-bird ends in{" "}
+                  <strong>{formatCountdown(tier.earlyBirdMinutesRemaining)}</strong>
+                </p>
+              )}
+
+              <a
+                href={`/signup?tier=${tier.slug}`}
+                className={`${styles.cta} ${tier.slug === "mastery" ? styles.ctaPrimary : styles.ctaSecondary}`}
+              >
+                Enroll in {tier.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <p className={styles.note}>
-        Payment via PayMongo. Card and GCash accepted. 7-day money-back
-        guarantee on less than 25% course completion.
+        Payment via PayMongo. Card and GCash accepted. 7-day money-back guarantee on less than 25%
+        course completion.
       </p>
     </main>
   );
