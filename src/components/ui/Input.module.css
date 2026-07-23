@@ -5,6 +5,8 @@
   flex-direction: column;
   gap: 6px;
   font-family: var(--font-body);
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .label {
