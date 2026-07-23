@@ -1,8 +1,8 @@
 # Loop State — AMPH v2
 
 **Project:** Amazon PH Academy v2
-**Last updated:** 2026-07-22
-**Last loop run:** never
+**Last updated:** 2026-07-23
+**Last loop run:** 2026-07-23
 
 ## Sprint Focus (current)
 
@@ -15,7 +15,7 @@ Shipping the core AMPH v2 features to production:
 
 ## High Priority (loop is acting or waiting on human)
 
-_(empty — start of loop)_
+_(empty)_
 
 ## Watch List
 
@@ -25,25 +25,26 @@ _(empty — start of loop)_
 | Prisma wiring    | partial     | courseRepo + orderRepo still InMemory in production container       |
 | PayMongo webhook | broken      | Webhook handler uses InMemory repos per-request — needs real wiring |
 | Admin panel      | not started | No `src/app/admin` yet                                              |
+| harness-foundry  | planned     | L2+ milestone — version loop as composable runtime                  |
 
 ## Recent Noise (ignored this run)
 
-_(none)_
+- Loop-sync structural mismatch between STATE.md and LOOP.md — expected, different doc types
 
 ## Loop Run Log
 
-| Date                  | Level | Findings | Actions Taken |
-| --------------------- | ----- | -------- | ------------- |
-| _(first run pending)_ |       |          |               |
+| Date       | Level | Score   | Findings                                                    | Actions Taken           |
+| ---------- | ----- | ------- | ----------------------------------------------------------- | ----------------------- |
+| 2026-07-23 | L1    | 100/100 | 3 watch items flagged (DB, Prisma wiring, PayMongo webhook) | First run — report only |
 
 ## Token Budget (this week)
 
-| Day | Spend | Cap  | Notes |
-| --- | ----- | ---- | ----- |
-| Mon | —     | 300k |       |
-| Tue | —     | 300k |       |
-| Wed | —     | 300k |       |
-| Thu | —     | 300k |       |
-| Fri | —     | 300k |       |
-| Sat | —     | 300k |       |
-| Sun | —     | 300k |       |
+| Day      | Spend | Cap  | Notes           |
+| -------- | ----- | ---- | --------------- |
+| Mon 7/20 | —     | 300k |                 |
+| Tue 7/21 | —     | 300k |                 |
+| Wed 7/22 | —     | 300k |                 |
+| Thu 7/23 | ~5k   | 300k | First audit run |
+| Fri 7/24 | —     | 300k |                 |
+| Sat 7/25 | —     | 300k |                 |
+| Sun 7/26 | —     | 300k |                 |
