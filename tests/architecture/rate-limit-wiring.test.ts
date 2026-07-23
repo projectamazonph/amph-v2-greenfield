@@ -52,6 +52,21 @@ describe("STORY-054 rate limiting wiring", () => {
     expect(body).toMatch(/rateLimiter:\s*InMemoryRateLimiter/);
   });
 
+  it("signup action calls rateLimiter.check()", () => {
+    const body = readFileSync(join(SRC, "app/actions/signup.action.ts"), "utf8");
+    expect(body).toMatch(/rateLimiter\.check/);
+  });
+
+  it("login action calls rateLimiter.check()", () => {
+    const body = readFileSync(join(SRC, "app/actions/login.action.ts"), "utf8");
+    expect(body).toMatch(/rateLimiter\.check/);
+  });
+
+  it("checkout action calls rateLimiter.check()", () => {
+    const body = readFileSync(join(SRC, "app/actions/checkout.action.ts"), "utf8");
+    expect(body).toMatch(/rateLimiter\.check/);
+  });
+
   it("does NOT import @upstash/* outside infra/security", () => {
     const allowed = ["src/infra/security"];
     const violations: string[] = [];

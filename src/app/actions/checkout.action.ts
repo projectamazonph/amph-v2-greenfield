@@ -37,7 +37,10 @@ export type CheckoutActionState =
   | { kind: "course_not_published" }
   | { kind: "already_enrolled" }
   | { kind: "payment_error"; message: string }
+  | { kind: "rate_limited"; retryAfterSeconds: number }
   | { kind: "redirect"; checkoutUrl: string; orderId: string };
+
+const CHECKOUT_RATE_LIMIT = { limit: 10, windowSeconds: 3600 }; // 10 per hour
 
 const INITIAL: CheckoutActionState = { kind: "idle" };
 export const CHECKOUT_INITIAL_STATE = INITIAL;
@@ -63,6 +66,18 @@ export async function startCheckout(
   }
 
   const container = buildContainer();
+
+  // Rate limit checkout attempts per authenticated user
+  const limitResult = await container.rateLimiter.check({
+    key: `checkout:${userId}`,
+    ...CHECKOUT_RATE_LIMIT,
+  });
+  if (limitResult.ok && !limitResult.value.allowed) {
+    return { kind: "rate_limited", retryAfterSeconds: limitResult.value.resetSeconds };
+  }
+  if (!limitResult.ok) {
+    console.error("[startCheckout] rate limiter error:", limitResult.error.message);
+  }
   const result = await container.createPaymentIntent.execute({
     userId,
     courseSlug: slug,

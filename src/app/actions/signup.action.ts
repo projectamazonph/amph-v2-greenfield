@@ -24,6 +24,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { buildContainer } from "@/composition/container";
 import { setAuthCookie } from "@/lib/auth";
 import { SignUp, type SignUpOutput, type SignUpError } from "@/usecases/SignUp";
@@ -32,6 +33,17 @@ import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
+import type { RateLimiter } from "@/ports/security/RateLimiter";
+
+const SIGNUP_RATE_LIMIT = { limit: 5, windowSeconds: 900 }; // 5 per 15 min
+
+async function clientIp(): Promise<string> {
+  const h = await headers();
+  const forwarded = h.get("x-forwarded-for");
+  if (forwarded) return (forwarded.split(",")[0] ?? forwarded).trim();
+  const realIp = h.get("x-real-ip");
+  return realIp ?? "unknown";
+}
 
 /**
  * The discriminated union returned to the action wrapper (and to the
@@ -39,7 +51,12 @@ import type { Clock } from "@/ports/system/Clock";
  * use case + adds `invalid_input` for the action's own null checks +
  * `unexpected` for caught exceptions.
  */
-export type SignUpResult = { kind: "success"; email: string } | SignUpError | { kind: "invalid_input" } | { kind: "unexpected"; message: string };
+export type SignUpResult =
+  | { kind: "success"; email: string }
+  | SignUpError
+  | { kind: "invalid_input" }
+  | { kind: "rate_limited"; retryAfterSeconds: number }
+  | { kind: "unexpected"; message: string };
 
 export interface SignUpInput {
   email: string;
@@ -70,6 +87,7 @@ export async function performSignUp(
     idGen: IdGenerator;
     clock: Clock;
     login: Login;
+    rateLimiter: RateLimiter;
     resendVerification: import("@/usecases/auth/ResendVerification").ResendVerification;
   },
   input: SignUpInput,
@@ -83,7 +101,25 @@ export async function performSignUp(
     return { kind: "invalid_input" };
   }
 
-  // 2. Call the SignUp use case
+  // 2. Rate limit by client IP
+  const ip = await clientIp();
+  const limitResult = await container.rateLimiter.check({
+    key: `signup:${ip}`,
+    ...SIGNUP_RATE_LIMIT,
+  });
+  if (limitResult.ok && !limitResult.value.allowed) {
+    return {
+      kind: "rate_limited",
+      retryAfterSeconds: limitResult.value.resetSeconds,
+    };
+  }
+  if (!limitResult.ok) {
+    // Rate limiter failed (Redis down, misconfig) — fail open so real users
+    // aren't blocked by infrastructure. Log it.
+    console.error("[performSignUp] rate limiter error:", limitResult.error.message);
+  }
+
+  // 3. Call the SignUp use case
   let signUpResult: SignUpOutput;
 
   try {
@@ -123,7 +159,7 @@ export async function performSignUp(
     console.error("[performSignUp] resend verification failed:", err);
   }
 
-  // 3. Auto-login (best-effort). If it fails, still return success.
+  // 4. Auto-login (best-effort). If it fails, still return success.
   //
   // IMPORTANT: do NOT wrap the navigate() call in try/catch. The
   // navigate() mock (and Next's real redirect()) throw a
