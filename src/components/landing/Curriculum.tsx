@@ -45,7 +45,12 @@ export function Curriculum() {
             </p>
           </div>
         </div>
-        <div className={styles.tableWrap}>
+        <div
+          className={styles.tableWrap}
+          role="region"
+          aria-label="Curriculum modules"
+          tabIndex={0}
+        >
           <table className={styles.table}>
             <thead>
               <tr>

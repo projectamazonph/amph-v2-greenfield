@@ -9,7 +9,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { updateSimulatorScenarioAction } from "@/app/actions/updateSimulatorScenario.action";
 import { archiveSimulatorScenarioAction } from "@/app/actions/archiveSimulatorScenario.action";
 import type { SimulatorId, Difficulty } from "@/domain/entities/SimulatorScenario";
@@ -29,10 +29,7 @@ interface PageProps {
   searchParams: Promise<{ error?: string }>;
 }
 
-export default async function EditScenarioPage({
-  params,
-  searchParams,
-}: PageProps) {
+export default async function EditScenarioPage({ params, searchParams }: PageProps) {
   const { id } = await params;
   const sp = await searchParams;
   await requireAdmin();
@@ -62,12 +59,12 @@ export default async function EditScenarioPage({
       <TopBar title={`Edit: ${scenario.name}`} subtitle={scenario.id} />
 
       {errorMsg && (
-        <Card padding="comfortable">
+        <Card padding={6}>
           <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleUpdate(id)} className={formStyles.form}>
           <label className={formStyles.field}>
             <span className={formStyles.label}>Scenario ID</span>
@@ -83,9 +80,16 @@ export default async function EditScenarioPage({
 
           <label className={formStyles.field}>
             <span className={formStyles.label}>Simulator *</span>
-            <select name="simulatorId" required defaultValue={scenario.simulatorId} className={formStyles.select}>
+            <select
+              name="simulatorId"
+              required
+              defaultValue={scenario.simulatorId}
+              className={formStyles.select}
+            >
               {SIMULATOR_IDS.map((sid) => (
-                <option key={sid} value={sid}>{sid}</option>
+                <option key={sid} value={sid}>
+                  {sid}
+                </option>
               ))}
             </select>
           </label>
@@ -115,9 +119,16 @@ export default async function EditScenarioPage({
 
           <label className={formStyles.field}>
             <span className={formStyles.label}>Difficulty *</span>
-            <select name="difficulty" required defaultValue={scenario.difficulty} className={formStyles.select}>
+            <select
+              name="difficulty"
+              required
+              defaultValue={scenario.difficulty}
+              className={formStyles.select}
+            >
               {DIFFICULTIES.map((d) => (
-                <option key={d} value={d}>{d}</option>
+                <option key={d} value={d}>
+                  {d}
+                </option>
               ))}
             </select>
           </label>
@@ -170,12 +181,20 @@ export default async function EditScenarioPage({
       </Card>
 
       {/* Archive section */}
-      <Card padding="comfortable" style={{ marginTop: "1.5rem" }}>
-        <h2 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 0.75rem 0", color: "var(--color-danger)" }}>
+      <Card padding={6} style={{ marginTop: "1.5rem" }}>
+        <h2
+          style={{
+            fontSize: "1rem",
+            fontWeight: 600,
+            margin: "0 0 0.75rem 0",
+            color: "var(--color-danger)",
+          }}
+        >
           Danger zone
         </h2>
         <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", margin: "0 0 1rem 0" }}>
-          Archiving a scenario removes it from the admin list. Existing simulator sessions using this scenario are unaffected.
+          Archiving a scenario removes it from the admin list. Existing simulator sessions using
+          this scenario are unaffected.
         </p>
         <form action={handleArchive(id)}>
           <button

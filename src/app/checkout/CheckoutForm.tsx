@@ -59,7 +59,7 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
     background: "white",
     border: "1px solid var(--border)",
     borderRadius: 8,
-    padding: "40px 40px 32px",
+    padding: "clamp(24px, 8vw, 40px) clamp(20px, 8vw, 40px) 32px",
     display: "flex",
     flexDirection: "column",
     gap: 24,
@@ -96,15 +96,22 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     gap: 8,
+    minWidth: 0,
   },
   summaryRow: {
     display: "flex",
     justifyContent: "space-between",
+    flexWrap: "wrap",
+    columnGap: 12,
+    rowGap: 4,
     fontSize: 14,
   },
   summaryTotal: {
     display: "flex",
     justifyContent: "space-between",
+    flexWrap: "wrap",
+    columnGap: 12,
+    rowGap: 4,
     fontSize: 18,
     fontWeight: 700,
     marginTop: 8,
@@ -246,7 +253,16 @@ export default function CheckoutForm() {
         <div style={PAGE_STYLES.summary}>
           <div style={PAGE_STYLES.summaryRow}>
             <span>Course</span>
-            <span style={{ color: "var(--ink-500)", fontFamily: "var(--font-mono)", fontSize: 12 }}>
+            <span
+              style={{
+                color: "var(--ink-500)",
+                fontFamily: "var(--font-mono)",
+                fontSize: 12,
+                minWidth: 0,
+                overflowWrap: "anywhere",
+                textAlign: "right",
+              }}
+            >
               {courseSlug}
             </span>
           </div>

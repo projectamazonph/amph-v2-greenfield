@@ -29,11 +29,12 @@ const STYLES: Record<string, React.CSSProperties> = {
     background: "white",
     border: "1px solid var(--border)",
     borderRadius: 8,
-    padding: "40px 40px 32px",
+    padding: "clamp(24px, 8vw, 40px) clamp(20px, 8vw, 40px) 32px",
     display: "flex",
     flexDirection: "column",
     gap: 24,
     textAlign: "center",
+    overflowWrap: "anywhere",
   },
   logo: {
     fontFamily: "var(--font-mono)",
@@ -90,9 +91,8 @@ export default function CheckoutFailedPage({
         <div style={STYLES.logo}>AMPH</div>
         <h1 style={STYLES.title}>Payment not completed</h1>
         <p style={STYLES.body}>
-          Your payment was cancelled or didn't go through. You haven't been
-          charged. Try again whenever you're ready — your spot in the catalog
-          is still open.
+          Your payment was cancelled or didn't go through. You haven't been charged. Try again
+          whenever you're ready — your spot in the catalog is still open.
         </p>
         <div style={STYLES.cta}>
           <Link
@@ -106,9 +106,7 @@ export default function CheckoutFailedPage({
             Back to catalog
           </Link>
         </div>
-        {orderId && (
-          <p style={STYLES.orderId}>Order reference: {orderId}</p>
-        )}
+        {orderId && <p style={STYLES.orderId}>Order reference: {orderId}</p>}
       </div>
     </div>
   );

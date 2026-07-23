@@ -19,7 +19,7 @@
 import { requireAdmin } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { formatPhp } from "./_lib/formatPhp";
 import styles from "./page.module.css";
 
@@ -35,11 +35,8 @@ export default async function AdminDashboardPage() {
     // be a proper error boundary.
     return (
       <div>
-        <TopBar
-          title="Admin Dashboard"
-          subtitle={`Welcome, ${user.firstName}`}
-        />
-        <Card padding="comfortable">
+        <TopBar title="Admin Dashboard" subtitle={`Welcome, ${user.firstName}`} />
+        <Card padding={6}>
           <p className={styles.error}>
             Failed to load dashboard stats: {statsResult.error.message}
           </p>
@@ -52,54 +49,27 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <TopBar
-        title="Admin Dashboard"
-        subtitle={`Welcome back, ${user.firstName}`}
-      />
+      <TopBar title="Admin Dashboard" subtitle={`Welcome back, ${user.firstName}`} />
 
-      <section
-        className={styles.statGrid}
-        aria-label="Platform statistics"
-      >
-        <StatTile
-          label="Total Students"
-          value={stats.totalStudents.toString()}
-        />
-        <StatTile
-          label="Total Courses"
-          value={stats.totalCourses.toString()}
-        />
-        <StatTile
-          label="Active Enrollments"
-          value={stats.activeEnrollments.toString()}
-        />
-        <StatTile
-          label="Total Revenue"
-          value={formatPhp(stats.totalRevenuePhp)}
-        />
-        <StatTile
-          label="Certificates Issued"
-          value={stats.certificatesIssued.toString()}
-        />
-        <StatTile
-          label="Pending Refunds"
-          value={stats.pendingRefunds.toString()}
-        />
+      <section className={styles.statGrid} aria-label="Platform statistics">
+        <StatTile label="Total Students" value={stats.totalStudents.toString()} />
+        <StatTile label="Total Courses" value={stats.totalCourses.toString()} />
+        <StatTile label="Active Enrollments" value={stats.activeEnrollments.toString()} />
+        <StatTile label="Total Revenue" value={formatPhp(stats.totalRevenuePhp)} />
+        <StatTile label="Certificates Issued" value={stats.certificatesIssued.toString()} />
+        <StatTile label="Pending Refunds" value={stats.pendingRefunds.toString()} />
       </section>
 
       <section className={styles.lowerSection}>
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Recent activity</h2>
-          <p className={styles.emptyState}>
-            Activity log coming in a future story.
-          </p>
+          <p className={styles.emptyState}>Activity log coming in a future story.</p>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Pending actions</h2>
           <p className={styles.emptyState}>
-            No pending actions. Refund requests and flagged items will
-            appear here.
+            No pending actions. Refund requests and flagged items will appear here.
           </p>
         </Card>
       </section>
@@ -109,7 +79,7 @@ export default async function AdminDashboardPage() {
 
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
-    <Card padding="comfortable">
+    <Card padding={6}>
       <div className={styles.statLabel}>{label}</div>
       <div className={styles.statValue}>{value}</div>
     </Card>

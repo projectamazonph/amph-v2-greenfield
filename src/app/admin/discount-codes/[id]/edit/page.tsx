@@ -8,7 +8,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { updateDiscountCodeAction } from "@/app/actions/updateDiscountCode.action";
 import { archiveDiscountCodeAction } from "@/app/actions/archiveDiscountCode.action";
 import styles from "../../new/page.module.css";
@@ -18,10 +18,7 @@ interface PageProps {
   searchParams: Promise<{ error?: string }>;
 }
 
-export default async function EditDiscountCodePage({
-  params,
-  searchParams,
-}: PageProps) {
+export default async function EditDiscountCodePage({ params, searchParams }: PageProps) {
   const { id } = await params;
   const sp = await searchParams;
   await requireAdmin();
@@ -43,12 +40,8 @@ export default async function EditDiscountCodePage({
       }[sp.error]
     : null;
 
-  const defaultValidFrom = dc.validFrom
-    ? new Date(dc.validFrom).toISOString().slice(0, 16)
-    : "";
-  const defaultValidUntil = dc.validUntil
-    ? new Date(dc.validUntil).toISOString().slice(0, 16)
-    : "";
+  const defaultValidFrom = dc.validFrom ? new Date(dc.validFrom).toISOString().slice(0, 16) : "";
+  const defaultValidUntil = dc.validUntil ? new Date(dc.validUntil).toISOString().slice(0, 16) : "";
 
   return (
     <div>
@@ -59,12 +52,12 @@ export default async function EditDiscountCodePage({
       <TopBar title={`Edit: ${dc.code}`} subtitle={dc.id} />
 
       {errorMsg && (
-        <Card padding="comfortable" style={{ marginBottom: "1rem" }}>
+        <Card padding={6} style={{ marginBottom: "1rem" }}>
           <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleUpdate(id)} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Code</span>
@@ -77,7 +70,9 @@ export default async function EditDiscountCodePage({
               className={styles.input}
               style={{ textTransform: "uppercase" }}
             />
-            <span className={styles.hint}>Letters, numbers, dashes, underscores. Auto-uppercased.</span>
+            <span className={styles.hint}>
+              Letters, numbers, dashes, underscores. Auto-uppercased.
+            </span>
           </label>
 
           <label className={styles.field}>
@@ -149,12 +144,20 @@ export default async function EditDiscountCodePage({
       </Card>
 
       {/* Archive section */}
-      <Card padding="comfortable" style={{ marginTop: "1.5rem" }}>
-        <h2 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 0.75rem 0", color: "var(--color-danger)" }}>
+      <Card padding={6} style={{ marginTop: "1.5rem" }}>
+        <h2
+          style={{
+            fontSize: "1rem",
+            fontWeight: 600,
+            margin: "0 0 0.75rem 0",
+            color: "var(--color-danger)",
+          }}
+        >
           Danger zone
         </h2>
         <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", margin: "0 0 1rem 0" }}>
-          Archiving a discount code prevents new uses. Existing orders using this code are unaffected.
+          Archiving a discount code prevents new uses. Existing orders using this code are
+          unaffected.
         </p>
         <form action={handleArchive(id)}>
           <button
@@ -182,7 +185,9 @@ function handleUpdate(id: string) {
   return async function (formData: FormData) {
     "use server";
 
-    const code = String(formData.get("code") ?? "").trim().toUpperCase();
+    const code = String(formData.get("code") ?? "")
+      .trim()
+      .toUpperCase();
     const type = String(formData.get("type") ?? "PERCENTAGE") as "PERCENTAGE" | "FIXED";
     const value = parseInt(String(formData.get("value") ?? "0"), 10);
     const maxUsesRaw = String(formData.get("maxUses") ?? "").trim();

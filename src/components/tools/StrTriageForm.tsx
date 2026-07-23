@@ -37,7 +37,9 @@ const ACTIONS: ReadonlyArray<{ value: Action; label: string }> = [
   { value: "pause", label: "Pause" },
 ];
 
-function actionColor(a: Action): "var(--success)" | "var(--warning)" | "var(--danger)" | "var(--ink-500)" {
+function actionColor(
+  a: Action,
+): "var(--success)" | "var(--warning)" | "var(--danger)" | "var(--ink-500)" {
   if (a === "keep" || a === "add_as_exact" || a === "add_as_phrase") return "var(--success)";
   return "var(--danger)";
 }
@@ -73,54 +75,60 @@ export function StrTriageForm({ targetRoas, initialRows }: Props) {
 
   return (
     <form className={styles.form} onSubmit={onSubmit}>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Search term</th>
-            <th className={styles.thNum}>Spend</th>
-            <th className={styles.thNum}>Revenue</th>
-            <th className={styles.thNum}>ROAS</th>
-            <th className={styles.thAction}>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {initialRows.map((r) => {
-            const roas = r.spend === 0 ? 0 : r.revenue / r.spend;
-            const a = actions[r.keyword] ?? "keep";
-            return (
-              <tr key={r.keyword}>
-                <td className={styles.tdKw}>{r.keyword}</td>
-                <td className={styles.tdNum}>₱{r.spend.toFixed(0)}</td>
-                <td className={styles.tdNum}>₱{r.revenue.toFixed(0)}</td>
-                <td
-                  className={styles.tdNum}
-                  style={{
-                    color:
-                      roas >= targetRoas ? "var(--success)" : "var(--danger)",
-                  }}
-                >
-                  {roas.toFixed(2)}×
-                </td>
-                <td className={styles.tdAction}>
-                  <select
-                    value={a}
-                    onChange={(e) => setAction(r.keyword, e.target.value as Action)}
-                    className={styles.select}
-                    style={{ color: actionColor(a) }}
-                    aria-label={`Action for ${r.keyword}`}
+      <div
+        className={styles.tableScroll}
+        role="region"
+        aria-label="Search term triage"
+        tabIndex={0}
+      >
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Search term</th>
+              <th className={styles.thNum}>Spend</th>
+              <th className={styles.thNum}>Revenue</th>
+              <th className={styles.thNum}>ROAS</th>
+              <th className={styles.thAction}>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {initialRows.map((r) => {
+              const roas = r.spend === 0 ? 0 : r.revenue / r.spend;
+              const a = actions[r.keyword] ?? "keep";
+              return (
+                <tr key={r.keyword}>
+                  <td className={styles.tdKw}>{r.keyword}</td>
+                  <td className={styles.tdNum}>₱{r.spend.toFixed(0)}</td>
+                  <td className={styles.tdNum}>₱{r.revenue.toFixed(0)}</td>
+                  <td
+                    className={styles.tdNum}
+                    style={{
+                      color: roas >= targetRoas ? "var(--success)" : "var(--danger)",
+                    }}
                   >
-                    {ACTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                    {roas.toFixed(2)}×
+                  </td>
+                  <td className={styles.tdAction}>
+                    <select
+                      value={a}
+                      onChange={(e) => setAction(r.keyword, e.target.value as Action)}
+                      className={styles.select}
+                      style={{ color: actionColor(a) }}
+                      aria-label={`Action for ${r.keyword}`}
+                    >
+                      {ACTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       {error ? <p className={styles.error}>{error}</p> : null}
       <div className={styles.footer}>
         <button type="submit" className={styles.submit} disabled={pending}>

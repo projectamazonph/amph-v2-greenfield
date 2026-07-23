@@ -9,7 +9,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { createModuleAction } from "@/app/actions/createModule.action";
 import styles from "../../../../courses.module.css";
 
@@ -53,7 +53,7 @@ export default async function NewModulePage({ params }: PageProps) {
         subtitle="Modules organize the curriculum. Each module will hold lessons (added in STORY-048c)."
       />
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleSubmit} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Title</span>

@@ -6,7 +6,7 @@
  */
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import styles from "./page.module.css";
 
 export default async function SettingsPage() {
@@ -39,12 +39,9 @@ export default async function SettingsPage() {
 
   return (
     <div>
-      <TopBar
-        title="Settings"
-        subtitle="System configuration and operational status"
-      />
+      <TopBar title="Settings" subtitle="System configuration and operational status" />
 
-      <Card padding="comfortable" style={{ marginBottom: "1rem" }}>
+      <Card padding={6} style={{ marginBottom: "1rem" }}>
         <h2 className={styles.sectionTitle}>Environment</h2>
         <p className={styles.help}>
           The current values of required environment variables. Values are never displayed.
@@ -75,7 +72,7 @@ export default async function SettingsPage() {
         </table>
       </Card>
 
-      <Card padding="comfortable" style={{ marginBottom: "1rem" }}>
+      <Card padding={6} style={{ marginBottom: "1rem" }}>
         <h2 className={styles.sectionTitle}>Actor</h2>
         <dl className={styles.dl}>
           <dt>Signed-in admin</dt>
@@ -87,7 +84,7 @@ export default async function SettingsPage() {
         </dl>
       </Card>
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <h2 className={styles.sectionTitle}>Coming soon</h2>
         <ul className={styles.list}>
           <li>Edit site name + tagline (Sprint 11+)</li>

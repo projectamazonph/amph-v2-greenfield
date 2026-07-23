@@ -10,7 +10,8 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card, Badge } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
+import { Badge } from "@astryxdesign/core";
 import { formatPhp } from "@/app/admin/_lib/formatPhp";
 import { processRefundAction } from "@/app/actions/processRefund.action";
 import styles from "./page.module.css";
@@ -35,10 +36,8 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
     return (
       <div>
         <TopBar title="Error" />
-        <Card padding="comfortable">
-          <p className={styles.error}>
-            Failed to load payment: {result.error.kind}
-          </p>
+        <Card padding={6}>
+          <p className={styles.error}>Failed to load payment: {result.error.kind}</p>
         </Card>
       </div>
     );
@@ -90,20 +89,22 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
           <span className={styles.badges}>
             <Badge
               variant={
-                order.status === "PAID" ? "accent" :
-                order.status === "REFUNDED" ? "neutral" :
-                order.status === "PENDING" ? "warning" :
-                "danger"
+                order.status === "PAID"
+                  ? "orange"
+                  : order.status === "REFUNDED"
+                    ? "neutral"
+                    : order.status === "PENDING"
+                      ? "warning"
+                      : "error"
               }
-            >
-              {order.status}
-            </Badge>
+              label={order.status}
+            />
           </span>
         }
       />
 
       {sp.error && (
-        <Card padding="comfortable">
+        <Card padding={6}>
           <p className={styles.error}>
             <strong>Error:</strong> {sp.error}
           </p>
@@ -111,7 +112,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
       )}
 
       {sp.refundId && (
-        <Card padding="comfortable">
+        <Card padding={6}>
           <p className={styles.success}>
             <strong>Refund issued:</strong> {sp.refundId}
           </p>
@@ -119,7 +120,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
       )}
 
       <div className={styles.grid}>
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Order</h2>
           <dl className={styles.details}>
             <dt>ID</dt>
@@ -142,7 +143,10 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
               <>
                 <dt>Paid at</dt>
                 <dd className={styles.mono}>
-                  {order.paymongoPaidAt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
+                  {order.paymongoPaidAt.toLocaleString("en-US", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
                 </dd>
               </>
             )}
@@ -150,7 +154,10 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
               <>
                 <dt>Refunded at</dt>
                 <dd className={styles.mono}>
-                  {order.refundProcessedAt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
+                  {order.refundProcessedAt.toLocaleString("en-US", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
                 </dd>
               </>
             )}
@@ -169,7 +176,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
           </dl>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>User</h2>
           <dl className={styles.details}>
             <dt>ID</dt>
@@ -177,7 +184,9 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
             <dt>Email</dt>
             <dd>{user.email}</dd>
             <dt>Name</dt>
-            <dd>{user.firstName} {user.lastName}</dd>
+            <dd>
+              {user.firstName} {user.lastName}
+            </dd>
             <dt>Role</dt>
             <dd>{user.role}</dd>
             <dt>Total XP</dt>
@@ -185,7 +194,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
           </dl>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Course</h2>
           <dl className={styles.details}>
             <dt>ID</dt>
@@ -203,7 +212,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
           </dl>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>PayMongo</h2>
           <dl className={styles.details}>
             <dt>Payment ID</dt>
@@ -224,7 +233,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
         </Card>
 
         {isPaid && (
-          <Card padding="comfortable">
+          <Card padding={6}>
             <h2 className={styles.sectionTitle}>Process refund</h2>
             <form action={handleRefund} className={styles.form}>
               <label className={styles.field}>
@@ -272,7 +281,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
         )}
 
         {isRefunded && (
-          <Card padding="comfortable">
+          <Card padding={6}>
             <h2 className={styles.sectionTitle}>Refund</h2>
             <p className={styles.muted}>
               This order has been refunded. The amount is{" "}

@@ -87,3 +87,19 @@
 .link:hover {
   text-decoration: underline;
 }
+
+/* Keep names and inputs legible on narrow phones instead of forcing two
+   cramped columns inside the account card. */
+@media (max-width: 420px) {
+  .page {
+    align-items: flex-start;
+  }
+
+  .card {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -21,7 +21,8 @@ import { notFound } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card, Badge } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
+import { Badge } from "@astryxdesign/core";
 import { impersonateUserAction } from "@/app/actions/impersonateUser.action";
 import { userFullName, userInitials } from "@/domain/entities/User";
 import styles from "./page.module.css";
@@ -46,10 +47,8 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
     return (
       <div>
         <TopBar title="User not found" />
-        <Card padding="comfortable">
-          <p className={styles.error}>
-            Failed to load user: {result.error.message}
-          </p>
+        <Card padding={6}>
+          <p className={styles.error}>Failed to load user: {result.error.message}</p>
         </Card>
       </div>
     );
@@ -85,24 +84,20 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
           <span className={styles.badges}>
             <Badge
               variant={
-                user.role === "ADMIN"
-                  ? "danger"
-                  : user.role === "INSTRUCTOR"
-                    ? "warning"
-                    : "neutral"
+                user.role === "ADMIN" ? "error" : user.role === "INSTRUCTOR" ? "warning" : "neutral"
               }
-            >
-              {user.role}
-            </Badge>
-            <Badge variant={user.subscriptionTier === "PRO" ? "accent" : "neutral"}>
-              {user.subscriptionTier}
-            </Badge>
+              label={user.role}
+            />
+            <Badge
+              variant={user.subscriptionTier === "PRO" ? "orange" : "neutral"}
+              label={user.subscriptionTier}
+            />
           </span>
         }
       />
 
       <div className={styles.grid}>
-        <Card padding="comfortable" className={styles.profileCard}>
+        <Card padding={6} className={styles.profileCard}>
           <div className={styles.profileHeader}>
             <span className={styles.avatar}>{initials}</span>
             <div>
@@ -129,16 +124,13 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                 Impersonate {user.firstName}
               </button>
               <p className={styles.impersonateHelp}>
-                You will be signed in as this user. The admin session
-                is preserved so you can return via the &ldquo;Stop
-                impersonating&rdquo; banner.
+                You will be signed in as this user. The admin session is preserved so you can return
+                via the &ldquo;Stop impersonating&rdquo; banner.
               </p>
             </form>
           )}
           {user.role === "ADMIN" && (
-            <p className={styles.impersonateDisabled}>
-              Admins cannot impersonate other admins.
-            </p>
+            <p className={styles.impersonateDisabled}>Admins cannot impersonate other admins.</p>
           )}
         </Card>
       </div>

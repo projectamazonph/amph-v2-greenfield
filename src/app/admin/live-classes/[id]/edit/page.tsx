@@ -8,7 +8,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { updateLiveClassAction } from "@/app/actions/updateLiveClass.action";
 import { deleteLiveClassAction } from "@/app/actions/deleteLiveClass.action";
 import type { LiveClassStatus } from "@/domain/entities/LiveClass";
@@ -21,10 +21,7 @@ interface PageProps {
   searchParams: Promise<{ error?: string }>;
 }
 
-export default async function EditLiveClassPage({
-  params,
-  searchParams,
-}: PageProps) {
+export default async function EditLiveClassPage({ params, searchParams }: PageProps) {
   const { id } = await params;
   const sp = await searchParams;
   await requireAdmin();
@@ -47,9 +44,7 @@ export default async function EditLiveClassPage({
       }[sp.error]
     : null;
 
-  const defaultScheduledAt = lc.scheduledAt
-    .toISOString()
-    .slice(0, 16);
+  const defaultScheduledAt = lc.scheduledAt.toISOString().slice(0, 16);
 
   return (
     <div>
@@ -60,12 +55,12 @@ export default async function EditLiveClassPage({
       <TopBar title={`Edit: ${lc.title}`} subtitle={lc.id} />
 
       {errorMsg && (
-        <Card padding="comfortable" style={{ marginBottom: "1rem" }}>
+        <Card padding={6} style={{ marginBottom: "1rem" }}>
           <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleUpdate(id)} className={styles.form}>
           <label className={styles.field}>
             <span className={styles.label}>Live Class ID</span>
@@ -158,7 +153,9 @@ export default async function EditLiveClassPage({
             <span className={styles.label}>Status *</span>
             <select name="status" required defaultValue={lc.status} className={styles.input}>
               {STATUSES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
           </label>
@@ -175,8 +172,15 @@ export default async function EditLiveClassPage({
       </Card>
 
       {/* Archive section */}
-      <Card padding="comfortable" style={{ marginTop: "1.5rem" }}>
-        <h2 style={{ fontSize: "1rem", fontWeight: 600, margin: "0 0 0.75rem 0", color: "var(--color-danger)" }}>
+      <Card padding={6} style={{ marginTop: "1.5rem" }}>
+        <h2
+          style={{
+            fontSize: "1rem",
+            fontWeight: 600,
+            margin: "0 0 0.75rem 0",
+            color: "var(--color-danger)",
+          }}
+        >
           Danger zone
         </h2>
         <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", margin: "0 0 1rem 0" }}>

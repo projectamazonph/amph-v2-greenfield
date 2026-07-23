@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderToString } from "react-dom/server";
+import { readFileSync } from "node:fs";
 import type { Course } from "@/domain/entities/Course";
 import { LessonSidebar } from "@/app/courses/[slug]/lessons/LessonSidebar";
 
@@ -17,8 +18,18 @@ function makeCourse(): Course {
           id: "section_01",
           title: "Getting Started",
           lessons: [
-            { id: "les_01", title: "Introduction", type: "TEXT", content: { type: "TEXT", body: "" } },
-            { id: "les_02", title: "Setup", type: "VIDEO", content: { type: "VIDEO", videoUrl: "", durationMinutes: 5 } },
+            {
+              id: "les_01",
+              title: "Introduction",
+              type: "TEXT",
+              content: { type: "TEXT", body: "" },
+            },
+            {
+              id: "les_02",
+              title: "Setup",
+              type: "VIDEO",
+              content: { type: "VIDEO", videoUrl: "", durationMinutes: 5 },
+            },
           ],
         },
         {
@@ -112,7 +123,11 @@ describe("LessonSidebar", () => {
     // Section 1 has 2 lessons, Section 2 has 1 lesson
     const completedLessonIds = ["les_01", "les_02"]; // section 1: 2/2 done
     const html = renderToString(
-      <LessonSidebar course={course} currentLessonId="les_03" completedLessonIds={completedLessonIds} />,
+      <LessonSidebar
+        course={course}
+        currentLessonId="les_03"
+        completedLessonIds={completedLessonIds}
+      />,
     );
     // Section 1 progress: "2/2" (or "2 / 2")
     expect(html).toContain("2");
@@ -128,5 +143,30 @@ describe("LessonSidebar", () => {
       <LessonSidebar course={course} currentLessonId="les_01" completedLessonIds={["les_01"]} />,
     );
     expect(html).toContain("Introduction");
+  });
+
+  it("stacks the lesson navigation above content on phone-width screens", () => {
+    const pageCss = readFileSync(
+      new URL(
+        "../../../../../../src/app/courses/[slug]/lessons/[lessonId]/page.module.css",
+        import.meta.url,
+      ),
+      "utf8",
+    );
+    const sidebarCss = readFileSync(
+      new URL(
+        "../../../../../../src/app/courses/[slug]/lessons/LessonSidebar.module.css",
+        import.meta.url,
+      ),
+      "utf8",
+    );
+
+    expect(pageCss).toMatch(
+      /@media\s*\(max-width:\s*767px\)[\s\S]*?\.layout\s*\{[\s\S]*?flex-direction:\s*column;/,
+    );
+    expect(pageCss).toMatch(/\.main\s*\{[\s\S]*?min-width:\s*0;/);
+    expect(sidebarCss).toMatch(
+      /@media\s*\(max-width:\s*767px\)[\s\S]*?\.sidebar\s*\{[\s\S]*?width:\s*100%;/,
+    );
   });
 });

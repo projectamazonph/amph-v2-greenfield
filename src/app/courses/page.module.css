@@ -140,6 +140,7 @@
   justify-content: space-between;
   gap: var(--space-2);
   margin-bottom: var(--space-2);
+  min-width: 0;
 }
 
 .cardTitle {
@@ -150,6 +151,8 @@
   margin: 0;
   line-height: var(--leading-snug);
   transition: color var(--duration-base) var(--ease-out);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .card:hover .cardTitle {
@@ -179,6 +182,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  flex-wrap: wrap;
   font-size: var(--text-xs);
   color: var(--ink-500);
 }

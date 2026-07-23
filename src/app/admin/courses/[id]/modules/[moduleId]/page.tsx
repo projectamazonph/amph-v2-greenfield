@@ -12,7 +12,8 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card, Badge } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
+import { Badge } from "@astryxdesign/core";
 import { deleteModuleAction } from "@/app/actions/deleteModule.action";
 import { reorderModulesAction } from "@/app/actions/reorderModules.action";
 import { deleteLessonAction } from "@/app/actions/deleteLesson.action";
@@ -88,7 +89,7 @@ export default async function ModuleDetailPage({ params }: PageProps) {
         title={mod.title}
         subtitle={
           <span className={styles.badges}>
-            <Badge variant="neutral">Order {mod.displayOrder}</Badge>
+            <Badge variant="neutral" label={"Order " + mod.displayOrder} />
           </span>
         }
         actions={
@@ -109,7 +110,7 @@ export default async function ModuleDetailPage({ params }: PageProps) {
       />
 
       <div className={styles.grid}>
-        <Card padding="comfortable">
+        <Card padding={6}>
           <h2 className={styles.sectionTitle}>Basics</h2>
           <dl className={styles.details}>
             <dt>ID</dt>
@@ -125,7 +126,7 @@ export default async function ModuleDetailPage({ params }: PageProps) {
           </dl>
         </Card>
 
-        <Card padding="comfortable">
+        <Card padding={6}>
           <div className={styles.modulesHeader}>
             <h2 className={styles.sectionTitle}>Lessons</h2>
             <Link
@@ -137,8 +138,7 @@ export default async function ModuleDetailPage({ params }: PageProps) {
           </div>
           {lessons.length === 0 ? (
             <p className={styles.muted}>
-              No lessons yet. Add the first lesson to start building the
-              module.
+              No lessons yet. Add the first lesson to start building the module.
             </p>
           ) : (
             <ul className={styles.moduleList}>
@@ -147,16 +147,14 @@ export default async function ModuleDetailPage({ params }: PageProps) {
                 .map((l, idx, arr) => (
                   <li key={l.id} className={styles.moduleItem}>
                     <div className={styles.moduleRow}>
-                      <span className={styles.moduleOrder}>
-                        {l.displayOrder}.
-                      </span>
+                      <span className={styles.moduleOrder}>{l.displayOrder}.</span>
                       <Link
                         href={`/admin/courses/${courseId}/modules/${mod.id}/lessons/${l.id}`}
                         className={styles.moduleTitle}
                       >
                         {l.title}
                       </Link>
-                      <Badge variant="accent">{l.type}</Badge>
+                      <Badge variant="orange" label={l.type} />
                       <div className={styles.moduleActions}>
                         <form action={handleMoveLesson.bind(null, l.id, "up")}>
                           <button

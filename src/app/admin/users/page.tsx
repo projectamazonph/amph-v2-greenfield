@@ -16,7 +16,7 @@
 
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { ListUsers } from "@/usecases/ListUsers";
 import type { Role, SubscriptionTier } from "@/domain/entities/User";
 import { AdminUsersTable, type UserRow } from "@/components/astryx/AdminUsersTable";
@@ -67,7 +67,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
     return (
       <div>
         <TopBar title="Users" subtitle="Search and manage all users" />
-        <Card padding="comfortable">
+        <Card padding={6}>
           <p className={styles.error}>Failed to load users: {result.error.message}</p>
         </Card>
       </div>
@@ -118,7 +118,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
       </form>
 
       {/* Table — client component handles renderCell (function props) */}
-      <Card padding="comfortable">
+      <Card padding={6}>
         <AdminUsersTable
           users={rows}
           totalCount={totalCount}

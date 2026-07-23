@@ -62,10 +62,7 @@ export function BidElevatorForm({ budget, targetRoas, initialKeywords }: Props) 
       // Stash the result in sessionStorage for the page to read
       // (a clean re-fetch pattern would be a real route param;
       // this works without adding another route segment).
-      sessionStorage.setItem(
-        "bid-elevator:result",
-        JSON.stringify(result.value),
-      );
+      sessionStorage.setItem("bid-elevator:result", JSON.stringify(result.value));
       router.refresh();
     });
   };
@@ -82,47 +79,43 @@ export function BidElevatorForm({ budget, targetRoas, initialKeywords }: Props) 
           <span className={styles.metaValue}>{targetRoas.toFixed(1)}×</span>
         </span>
       </div>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Keyword</th>
-            <th className={styles.thNum}>Volume</th>
-            <th className={styles.thNum}>Est. CPC</th>
-            <th className={styles.thNum}>Your bid</th>
-          </tr>
-        </thead>
-        <tbody>
-          {initialKeywords.map((k) => (
-            <tr key={k.keyword}>
-              <td className={styles.tdKw}>{k.keyword}</td>
-              <td className={styles.tdNum}>{k.volume.toLocaleString()}</td>
-              <td className={styles.tdNum}>₱{k.currentCpc.toFixed(2)}</td>
-              <td className={styles.tdNum}>
-                <span className={styles.inputWrap}>
-                  <span className={styles.inputPrefix}>₱</span>
-                  <input
-                    type="number"
-                    step="0.10"
-                    min="0"
-                    className={styles.input}
-                    value={bids[k.keyword] ?? k.currentBid}
-                    onChange={(e) =>
-                      onChange(k.keyword, Number(e.target.value))
-                    }
-                    aria-label={`Bid for ${k.keyword}`}
-                  />
-                </span>
-              </td>
+      <div className={styles.tableScroll} role="region" aria-label="Bid inputs" tabIndex={0}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Keyword</th>
+              <th className={styles.thNum}>Volume</th>
+              <th className={styles.thNum}>Est. CPC</th>
+              <th className={styles.thNum}>Your bid</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {initialKeywords.map((k) => (
+              <tr key={k.keyword}>
+                <td className={styles.tdKw}>{k.keyword}</td>
+                <td className={styles.tdNum}>{k.volume.toLocaleString()}</td>
+                <td className={styles.tdNum}>₱{k.currentCpc.toFixed(2)}</td>
+                <td className={styles.tdNum}>
+                  <span className={styles.inputWrap}>
+                    <span className={styles.inputPrefix}>₱</span>
+                    <input
+                      type="number"
+                      step="0.10"
+                      min="0"
+                      className={styles.input}
+                      value={bids[k.keyword] ?? k.currentBid}
+                      onChange={(e) => onChange(k.keyword, Number(e.target.value))}
+                      aria-label={`Bid for ${k.keyword}`}
+                    />
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {error ? <p className={styles.error}>{error}</p> : null}
-      <button
-        type="submit"
-        className={styles.submit}
-        disabled={pending}
-      >
+      <button type="submit" className={styles.submit} disabled={pending}>
         {pending ? "Running…" : "Run simulation"}
       </button>
     </form>

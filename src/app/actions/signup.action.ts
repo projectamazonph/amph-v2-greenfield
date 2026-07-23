@@ -236,5 +236,7 @@ export async function signUpAction(
   }
 }
 
-// Re-export for the page (which uses useActionState)
-export type SignUpState = SignUpResult;
+// `idle` is a presentation-only state used before the student submits the
+// form. Keeping it out of SignUpResult preserves the action's result contract
+// while preventing the first render from masquerading as a validation error.
+export type SignUpState = SignUpResult | { kind: "idle" };

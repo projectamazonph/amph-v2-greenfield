@@ -8,7 +8,7 @@ import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import type { PaymentStatus } from "@/domain/values/PaymentStatus";
 import { AdminPaymentsTable, type PaymentRow } from "@/components/astryx/AdminPaymentsTable";
 import styles from "./page.module.css";
@@ -44,7 +44,7 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
     return (
       <div>
         <TopBar title="Payments" />
-        <Card padding="comfortable">
+        <Card padding={6}>
           <p className={styles.error}>Failed to load: {String(result.error.kind)}</p>
         </Card>
       </div>
@@ -102,7 +102,7 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
       </form>
 
       {/* Table — client component handles renderCell (function props) */}
-      <Card padding="comfortable">
+      <Card padding={6}>
         <AdminPaymentsTable payments={rows} filters={{ status, email }} />
       </Card>
     </div>

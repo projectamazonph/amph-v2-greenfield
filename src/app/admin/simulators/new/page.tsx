@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@/components/ui";
+import { Card } from "@astryxdesign/core";
 import { createSimulatorScenarioAction } from "@/app/actions/createSimulatorScenario.action";
 import type { SimulatorId, Difficulty } from "@/domain/entities/SimulatorScenario";
 import styles from "../page.module.css";
@@ -33,7 +33,11 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
   await requireAdmin();
 
   const errorMsg = sp.error
-    ? { id_conflict: "A scenario with this ID already exists.", invalid_simulator_id: "Invalid simulator.", invalid_difficulty: "Invalid difficulty." }[sp.error]
+    ? {
+        id_conflict: "A scenario with this ID already exists.",
+        invalid_simulator_id: "Invalid simulator.",
+        invalid_difficulty: "Invalid difficulty.",
+      }[sp.error]
     : null;
 
   return (
@@ -45,12 +49,12 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
       <TopBar title="Add scenario" subtitle="Create a new simulator scenario" />
 
       {errorMsg && (
-        <Card padding="comfortable">
+        <Card padding={6}>
           <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMsg}</p>
         </Card>
       )}
 
-      <Card padding="comfortable">
+      <Card padding={6}>
         <form action={handleSubmit} className={formStyles.form}>
           <label className={formStyles.field}>
             <span className={formStyles.label}>Scenario ID *</span>
@@ -63,7 +67,9 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
               className={formStyles.input}
               placeholder="e.g. bid-elevator-scenario-1"
             />
-            <span className={formStyles.hint}>Lowercase letters, numbers, and hyphens only. Cannot be changed later.</span>
+            <span className={formStyles.hint}>
+              Lowercase letters, numbers, and hyphens only. Cannot be changed later.
+            </span>
           </label>
 
           <label className={formStyles.field}>
@@ -71,7 +77,9 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
             <select name="simulatorId" required className={formStyles.select}>
               <option value="">— Select simulator —</option>
               {SIMULATOR_IDS.map((id) => (
-                <option key={id} value={id}>{id}</option>
+                <option key={id} value={id}>
+                  {id}
+                </option>
               ))}
             </select>
           </label>
@@ -104,7 +112,9 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
             <select name="difficulty" required className={formStyles.select}>
               <option value="">— Select difficulty —</option>
               {DIFFICULTIES.map((d) => (
-                <option key={d} value={d}>{d}</option>
+                <option key={d} value={d}>
+                  {d}
+                </option>
               ))}
             </select>
           </label>
