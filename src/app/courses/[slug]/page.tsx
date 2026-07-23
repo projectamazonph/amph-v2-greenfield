@@ -1,5 +1,5 @@
 /**
- * /courses/[slug] — AMPH Course Detail
+ * /courses/[slug] — Course Detail
  * STORY-014
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
@@ -26,10 +26,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const container = buildContainer();
   const result = await container.getCatalogCourse.execute(slug);
-  if (!result.ok) return { title: "Course Not Found — AMPH Academy" };
+  if (!result.ok) return { title: "Course Not Found — Project Amazon PH Academy" };
   const detail = result.value;
   return {
-    title: `${detail.title} — AMPH Academy`,
+    title: `${detail.title} — Project Amazon PH Academy`,
     description: detail.tagline || detail.description.slice(0, 160),
   };
 }

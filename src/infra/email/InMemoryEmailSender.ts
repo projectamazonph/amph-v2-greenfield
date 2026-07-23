@@ -31,7 +31,7 @@ export interface SentEmail {
   readonly sentAt: Date;
 }
 
-const DEFAULT_FROM = "AMPH Academy <noreply@amph.example.com>";
+const DEFAULT_FROM = "Project Amazon PH Academy <noreply@amph.example.com>";
 
 export class InMemoryEmailSender implements EmailSender {
   public readonly sent: SentEmail[] = [];

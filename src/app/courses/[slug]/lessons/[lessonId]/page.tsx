@@ -1,5 +1,5 @@
 /**
- * /courses/[slug]/lessons/[lessonId] — AMPH Lesson Page
+ * /courses/[slug]/lessons/[lessonId] — Lesson Page
  * Story 026
  *
  * Renders a lesson's content with a sidebar navigation.
@@ -31,16 +31,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const course = await container.courseRepo.findBySlug(slug);
 
   if (!course.ok || !courseIsAvailable(course.value)) {
-    return { title: "Course Not Found — AMPH Academy" };
+    return { title: "Course Not Found — Project Amazon PH Academy" };
   }
 
   const lessonData = getLessonData(course.value, lessonId);
   if (!lessonData) {
-    return { title: "Lesson Not Found — AMPH Academy" };
+    return { title: "Lesson Not Found — Project Amazon PH Academy" };
   }
 
   return {
-    title: `${lessonData.lesson.title} — ${course.value.title} | AMPH Academy`,
+    title: `${lessonData.lesson.title} — ${course.value.title} | Project Amazon PH Academy`,
     description: `${lessonData.sectionTitle}: ${lessonData.lesson.title}`,
   };
 }
@@ -100,7 +100,9 @@ export default async function LessonPage({ params }: PageProps) {
                   Courses
                 </Link>
               </li>
-              <li aria-hidden className={styles.breadcrumbSeparator}>/</li>
+              <li aria-hidden className={styles.breadcrumbSeparator}>
+                /
+              </li>
               <li>
                 <Link
                   href={`/courses/${slug}`}
@@ -109,7 +111,9 @@ export default async function LessonPage({ params }: PageProps) {
                   {course.title}
                 </Link>
               </li>
-              <li aria-hidden className={styles.breadcrumbSeparator}>/</li>
+              <li aria-hidden className={styles.breadcrumbSeparator}>
+                /
+              </li>
               <li className={styles.breadcrumbCurrent}>{lesson.title}</li>
             </ol>
           </nav>

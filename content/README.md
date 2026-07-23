@@ -1,6 +1,6 @@
 # Content — Curriculum Source
 
-This directory holds the curriculum content (lesson MDX files and quiz fixture) for the AMPH Academy platform. It is the **source of truth** that the future `scripts/import-amph-content.ts` (Sprint 3 / STORY-013) will read from to populate the database.
+This directory holds the curriculum content (lesson MDX files and quiz fixture) for the Project Amazon PH Academy platform. It is the **source of truth** that the future `scripts/import-amph-content.ts` (Sprint 3 / STORY-013) will read from to populate the database.
 
 ## Layout
 
@@ -39,9 +39,9 @@ The content was **migrated from the original `amph-v2` repo** (`content/curricul
 
 ## Where the content comes from (per file)
 
-| Path in this repo | Source commit in `projectamazonph/amph-v2` |
-|---|---|
-| `content/curriculum/modules/*` | scrubbed + fact-card-augmented content, fetched 2026-07-18 |
+| Path in this repo                        | Source commit in `projectamazonph/amph-v2`                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `content/curriculum/modules/*`           | scrubbed + fact-card-augmented content, fetched 2026-07-18                                              |
 | `content/curriculum/quiz-questions.json` | original v1 `project/fixtures/quiz-questions.json` (unchanged — quiz text was never the legacy problem) |
 
 ## Why migrate now, before STORY-013?

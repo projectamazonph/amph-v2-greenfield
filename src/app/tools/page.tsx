@@ -1,9 +1,10 @@
 /**
  * /tools — student-facing tools index.
  *
- * Lists the 4 simulators with their names, descriptions, and a
- * link to open each one. Read from the registry so adding a new
- * simulator updates this page automatically.
+ * Lists the 5 simulators with their names, descriptions, and a
+ * link to open each one. The 4 registered simulators come from the
+ * registry; keyword-research is added manually (it reuses the
+ * listing-audit simulator).
  */
 
 import { buildContainer } from "@/composition/container";
@@ -32,6 +33,11 @@ const TOOL_INFO: Record<string, { name: string; blurb: string; href: string }> =
     blurb: "Two steps: flag the issues, then revise the listing.",
     href: "/tools/listing-audit",
   },
+  "keyword-research": {
+    name: "Keyword Research",
+    blurb: "Enter a niche, get a prioritized keyword list. Filter by volume and export.",
+    href: "/tools/keyword-research",
+  },
 };
 
 export default async function ToolsIndexPage() {
@@ -43,9 +49,7 @@ export default async function ToolsIndexPage() {
       <header className={styles.header}>
         <span className={styles.eyebrow}>Simulators</span>
         <h1 className={styles.title}>Tools</h1>
-        <p className={styles.subhead}>
-          {registered.length} practice tools. Pick one to start.
-        </p>
+        <p className={styles.subhead}>5 practice tools. Pick one to start.</p>
       </header>
       <ul className={styles.grid}>
         {registered.map((sim) => {
@@ -61,6 +65,16 @@ export default async function ToolsIndexPage() {
             </li>
           );
         })}
+        {/* Keyword Research reuses the listing-audit simulator */}
+        <li key="keyword-research" className={styles.card}>
+          <h2 className={styles.cardName}>Keyword Research</h2>
+          <p className={styles.cardBlurb}>
+            Enter a niche, get a prioritized keyword list. Filter by volume and export.
+          </p>
+          <a href="/tools/keyword-research" className={styles.cardLink}>
+            Open tool →
+          </a>
+        </li>
       </ul>
     </main>
   );

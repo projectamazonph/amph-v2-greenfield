@@ -20,15 +20,15 @@ export function EmailVerificationEmail({
 }: EmailVerificationEmailProps) {
   return (
     <EmailLayout
-      preview="Verify your AMPH Academy email address"
-      eyebrow="Welcome to AMPH Academy"
+      preview="Verify your Project Amazon PH Academy email address"
+      eyebrow="Welcome to Project Amazon PH Academy"
     >
       <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
         Welcome, {firstName}!
       </Heading>
       <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
-        Thanks for signing up for Project Amazon PH Academy. To get started, please
-        verify your email address by clicking the button below.
+        Thanks for signing up for Project Amazon PH Academy. To get started, please verify your
+        email address by clicking the button below.
       </Text>
 
       <Button
@@ -48,8 +48,8 @@ export function EmailVerificationEmail({
       </Button>
 
       <Text style={{ margin: "24px 0 8px 0", color: "#737373", fontSize: "13px" }}>
-        This link expires in {expiresInHours} hours. If it expires, you can request a
-        new verification email from the login page.
+        This link expires in {expiresInHours} hours. If it expires, you can request a new
+        verification email from the login page.
       </Text>
       <Text style={{ margin: 0, color: "#737373", fontSize: "13px" }}>
         If the button doesn't work, copy and paste this link into your browser:

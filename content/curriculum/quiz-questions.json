@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Quiz questions for AMPH Academy modules. Each quiz maps to a module's final lesson (knowledge check). Questions test PPC concepts covered in the preceding lessons.",
+    "description": "Quiz questions for Project Amazon PH Academy modules. Each quiz maps to a module's final lesson (knowledge check). Questions test PPC concepts covered in the preceding lessons.",
     "version": "1.0.0",
     "passThreshold": 70,
     "xpRewardPerQuiz": 100
@@ -9,7 +9,7 @@
     {
       "moduleNumber": 0,
       "title": "Onboarding Knowledge Check",
-      "description": "Test your understanding of the AMPH Academy platform and Amazon PPC basics covered in the Onboarding module.",
+      "description": "Test your understanding of the Project Amazon PH Academy platform and Amazon PPC basics covered in the Onboarding module.",
       "questions": [
         {
           "order": 1,

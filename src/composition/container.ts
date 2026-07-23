@@ -399,7 +399,7 @@ function buildProductionContainer(): AppContainer {
 
   const emailSender: EmailSender = new ResendEmailSender(
     process.env.RESEND_API_KEY ?? "",
-    process.env.EMAIL_FROM ?? "AMPH Academy <noreply@amph.example.com>",
+    process.env.EMAIL_FROM ?? "Project Amazon PH Academy <noreply@amph.example.com>",
   );
 
   const jwt: JwtService = new JoseJwtService(
