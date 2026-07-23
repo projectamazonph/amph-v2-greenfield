@@ -3,7 +3,7 @@
 ## Story
 
 
-**Status:** ✅ Done (PR #100, commit `49b5bb1` — `Sprint 11: observability, rate limiting, and critical-journey coverage`; `src/infra/security/{UpstashRateLimiter,InMemoryRateLimiter}.ts` live; `RateLimiter` port is used by the auth use cases in STORY-007/008)
+**Status:** ✅ Done (PR #145, commit `49b5bb1` — `Sprint 11: observability, rate limiting, and critical-journey coverage`; `src/infra/security/{UpstashRateLimiter,InMemoryRateLimiter}.ts` live; `RateLimiter` port is used by the auth use cases in STORY-007/008)
 
 As a platform operator, I want rate limits on authentication, signup, and payment actions so brute-force and abuse attempts are slowed without hurting real users.
 

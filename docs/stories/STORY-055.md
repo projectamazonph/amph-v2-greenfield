@@ -3,7 +3,7 @@
 ## Story
 
 
-**Status:** ✅ Done (PR #100, commit `49b5bb1` — same PR; `tests/e2e/critical-journeys.spec.ts` landed + the `tests/architecture/*-compliance.test.ts` suite enforces the tenant-isolation contract)
+**Status:** ✅ Done (PR #146, commit `49b5bb1` — same PR; `tests/e2e/critical-journeys.spec.ts` landed + the `tests/architecture/*-compliance.test.ts` suite enforces the tenant-isolation contract)
 
 As a security reviewer, I want documented tenant isolation, automated critical-journey E2E coverage, and axe accessibility checks, so we can launch with confidence.
 
