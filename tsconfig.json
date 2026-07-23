@@ -17,6 +17,7 @@
     "incremental": true,
     "paths": {
       "@/*": ["./src/*"],
+      "@/components/astryx": ["./src/components/astryx"],
       "@domain/*": ["./src/domain/*"],
       "@ports/*": ["./src/ports/*"],
       "@usecases/*": ["./src/usecases/*"],

@@ -23,6 +23,7 @@
     "prisma:studio": "prisma studio",
     "prisma:format": "prisma format",
     "prisma:validate": "prisma validate",
+    "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs",
     "gen:secret": "node scripts/gen-secret.js",
     "import:content": "tsx scripts/import-amph-content.ts",
     "db:seed:tiers": "tsx scripts/seed-pricing-tiers.ts",
@@ -30,6 +31,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@astryxdesign/core": "^0.1.8",
+    "@astryxdesign/theme-neutral": "^0.1.8",
     "@axe-core/playwright": "^4.12.1",
     "@next/env": "16.2.10",
     "@phosphor-icons/react": "^2.1.10",
@@ -59,6 +62,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@astryxdesign/cli": "^0.1.8",
     "@cobusgreyling/loop-audit": "^1.7.0",
     "@cobusgreyling/loop-context": "^1.5.0",
     "@cobusgreyling/loop-cost": "^1.2.0",
