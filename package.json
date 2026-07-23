@@ -28,7 +28,8 @@
     "import:content": "tsx scripts/import-amph-content.ts",
     "db:seed:tiers": "tsx scripts/seed-pricing-tiers.ts",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.1.8",
