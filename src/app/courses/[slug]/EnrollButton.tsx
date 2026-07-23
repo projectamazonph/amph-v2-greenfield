@@ -2,18 +2,20 @@
 
 /**
  * EnrollButton — client component for course enrollment action.
- * Story 017
- * P0-1: paywall enforcement.
+ * STORY-017
  *
- * Free courses enroll via the server action.
- * Paid courses show a "Buy now" button that links to /checkout?courseId=...
- * The server decides based on the authoritative course.price; the
- * `isFree` prop on the client is presentation-only and is NEVER trusted
- * for the actual decision.
+ * Renders a buy/enroll CTA for a course. The authoritative price
+ * comes from the course's linked PricingTier (via the catalog API).
+ *
+ * - Free courses (priceMinor === 0): direct enroll via server action.
+ * - Paid courses: redirect to /checkout?courseSlug=...
+ *
+ * The client-side `isFree` check is PRESENTATION ONLY. The server
+ * always re-validates price before enrolling or creating a checkout.
  *
  * The component shows one of these states:
- *  1. Idle (free): "Enroll for Free" button
- *  2. Idle (paid): "Buy now — ₱X,XXX" link to /checkout
+ *  1. Idle (paid): "Buy now — ₱X,XXX" link to /checkout
+ *  2. Idle (free): "Enroll for Free" form button
  *  3. Pending: button disabled with "Enrolling..." or "Processing..."
  *  4. Success: a check icon + "Enrolled! Check your dashboard."
  *  5. Error: an error message
@@ -30,9 +32,14 @@ type EnrollState = EnrollStudentActionResult | null;
 
 export function EnrollButton({
   courseId,
+  courseSlug,
   priceMinor,
 }: {
+  /** The course's UUID — used for free-course enroll action. */
   courseId: string;
+  /** The course's URL slug — used for checkout redirect. */
+  courseSlug: string;
+  /** Effective price in minor PHP units from the PricingTier. */
   priceMinor: number;
 }) {
   const [state, formAction, isPending] = useActionState<EnrollState, FormData>(
@@ -55,12 +62,7 @@ export function EnrollButton({
           stroke="currentColor"
           aria-hidden="true"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
         Enrolled! Check your dashboard.
       </div>
@@ -76,10 +78,8 @@ export function EnrollButton({
       return <p className={styles.error}>Please sign in to enroll.</p>;
     }
     if ("kind" in err && err.kind === "paid_checkout_required") {
-      // Should be unreachable because paid courses render the Buy button
-      // below; but if we ever land here, recover by linking to checkout.
       return (
-        <Link href={`/checkout?courseId=${courseId}`} className={styles.fullWidth}>
+        <Link href={`/checkout?courseSlug=${courseSlug}`} className={styles.fullWidth}>
           <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
             Continue to checkout
           </Button>
@@ -89,16 +89,11 @@ export function EnrollButton({
     return <p className={styles.error}>Unable to enroll. Please try again.</p>;
   }
 
-  // Paid courses: never call the enroll action. Always show the Buy button.
+  // Paid courses: redirect to checkout.
   if (!isFree) {
     return (
-      <Link href={`/checkout?courseId=${courseId}`} className={styles.fullWidth}>
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          className={styles.fullWidth}
-        >
+      <Link href={`/checkout?courseSlug=${courseSlug}`} className={styles.fullWidth}>
+        <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
           Buy now — {Money.of(priceMinor, "PHP").format()}
         </Button>
       </Link>
