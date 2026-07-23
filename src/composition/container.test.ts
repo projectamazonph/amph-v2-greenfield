@@ -93,6 +93,7 @@ import { GetCourse } from "@/usecases/GetCourse";
 // STORY-014: public catalog wired to Module+Lesson tables
 import { ListCatalogCourses } from "@/usecases/ListCatalogCourses";
 import { GetCatalogCourse } from "@/usecases/GetCatalogCourse";
+import { ListPricingTiers } from "@/usecases/ListPricingTiers";
 // STORY-047: admin users list + user detail + impersonate
 import { ListUsers } from "@/usecases/ListUsers";
 import { GetUserDetail } from "@/usecases/GetUserDetail";
@@ -346,6 +347,8 @@ export function buildTestContainer(): TestContainer {
       moduleRepo,
       lessonRepo,
     }),
+    // STORY-015: public pricing page wired to PricingTier rows
+    listPricingTiers: new ListPricingTiers({ pricingTierRepo }),
     // STORY-047: admin users list + user detail + impersonate
     listUsers: new ListUsers({ userRepo }),
     getUserDetail: new GetUserDetail({ userRepo, enrollmentRepo }),

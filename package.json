@@ -25,6 +25,7 @@
     "prisma:validate": "prisma validate",
     "gen:secret": "node scripts/gen-secret.js",
     "import:content": "tsx scripts/import-amph-content.ts",
+    "db:seed:tiers": "tsx scripts/seed-pricing-tiers.ts",
     "format": "prettier --write .",
     "prepare": "husky"
   },

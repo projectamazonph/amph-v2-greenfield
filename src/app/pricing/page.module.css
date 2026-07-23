@@ -87,6 +87,28 @@
   text-transform: uppercase;
 }
 
+.earlyBirdBadge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 3px;
+  width: fit-content;
+}
+
+.countdown {
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
 .tierName {
   font-family: var(--font-display);
   font-size: var(--text-lg);
@@ -110,6 +132,15 @@
   color: var(--ink-900);
   line-height: 1;
   letter-spacing: -0.02em;
+}
+
+.originalPrice {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 400;
+  color: var(--ink-400);
+  text-decoration: line-through;
+  line-height: 1;
 }
 
 .priceSuffix {
