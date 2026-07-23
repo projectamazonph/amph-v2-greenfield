@@ -17,7 +17,6 @@
   color: var(--ink-900);
   margin: 0 0 var(--space-3);
   letter-spacing: -0.01em;
-  max-width: 30ch;
 }
 
 .subhead {
@@ -29,124 +28,98 @@
   line-height: 1.5;
 }
 
-.list {
+.grid {
   list-style: none;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface-1);
-  overflow: hidden;
-}
-
-.row {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid var(--border);
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-6);
 }
 
-@media (min-width: 768px) {
-  .row {
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    gap: var(--space-6);
-  }
+.card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-1);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
 }
 
-.row:last-child {
-  border-bottom: 0;
+.card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
-.rowMain {
+.screenshotWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.screenshot {
+  object-position: top;
+}
+
+.cardBody {
+  padding: var(--space-4) var(--space-5) var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  min-width: 0;
+  flex: 1;
 }
 
 .nameRow {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
 .toolName {
   font-family: var(--font-mono);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--ink-900);
   margin: 0;
-}
-
-.toolBody {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--ink-700);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.scenario {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--ink-500);
-  line-height: 1.5;
-  margin: var(--space-1) 0 0;
-  padding: var(--space-3);
-  background: var(--surface-2);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 4px 4px 0;
-}
-
-.scenarioLabel {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--ink-700);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--ink-500);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  padding: 2px var(--space-2);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-inverse);
+  background: var(--accent);
+  padding: 2px 6px;
   border-radius: 3px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
-.previewLink {
+.toolBody {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--ink-600);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+.cardLink {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--accent);
   text-decoration: none;
-  padding: var(--space-2) 0;
-  align-self: end;
+  margin-top: var(--space-2);
 }
 
-.previewLink:hover {
+.cardLink:hover {
   text-decoration: underline;
-}
-
-.note {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--ink-500);
-  margin: var(--space-6) 0 0;
-  text-align: center;
 }
