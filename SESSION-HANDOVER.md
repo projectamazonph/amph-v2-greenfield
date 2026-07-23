@@ -68,6 +68,18 @@ GET https://amph-v2-greenfield.vercel.app/dashboard → 307 (redirect to login, 
 - Branch: `fix/seed-pricing-tiers` (auto-deleted on merge).
 - PR: #150 — squash-merged as `9aca555`. All 6 CI jobs green.
 
+### Vercel Hobby cron limit — fixed (PR #153)
+
+Hit a Vercel-side block on the first deploy attempt after the `vercel.json` change:
+`Hobby accounts are limited to daily cron jobs. This cron expression (0/5 * * * *) would run more than once per day.`
+
+The previous `vercel.json` had `live-class-reminders` on `0/5 * * * *` (every 5 min). Changed to `0 8 * * *` (8 AM UTC = 4 PM PHT, daily). Once-daily at 4 PM PHT is the right cadence for T-24h-style nudges (reminder the afternoon before a next-morning class). If finer cadence is needed later, move the cron to GitHub Actions (we already have a working `daily-triage.yml` schedule at `0 9 * * 1-5`).
+
+Also added `amph-v2-greenfield/` to `.gitignore` — some local tool has been creating a self-referencing copy of the project in the workspace root, polluting `git status`. Not in git, not affecting production, but adding the ignore prevents accidental commits and removes the noise. Trashed the existing local copy.
+
+- Branch: `fix/vercel-cron-hobby-limit` (auto-deleted on merge).
+- PR: #153 — squash-merged as `72896f4`. 2 files changed (+5/-1).
+
 ---
 
 ## What changed this session (2026-07-24)
