@@ -22,10 +22,21 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { buildContainer } from "@/composition/container";
 import { setAuthCookie } from "@/lib/auth";
 import { Login, type LoginOutput } from "@/usecases/Login";
-import type { Result } from "@/domain/shared/Result";
+import type { RateLimiter } from "@/ports/security/RateLimiter";
+
+const LOGIN_RATE_LIMIT = { limit: 10, windowSeconds: 900 }; // 10 per 15 min
+
+async function clientIp(): Promise<string> {
+  const h = await headers();
+  const forwarded = h.get("x-forwarded-for");
+  if (forwarded) return (forwarded.split(",")[0] ?? forwarded).trim();
+  const realIp = h.get("x-real-ip");
+  return realIp ?? "unknown";
+}
 
 /**
  * Pure login helper. Takes the container (so tests can pass
@@ -39,10 +50,11 @@ import type { Result } from "@/domain/shared/Result";
 export type LoginResult =
   | { kind: "success"; redirectTo: string }
   | { kind: "redirect_to_login"; errorKind: string }
-  | { kind: "invalid_input" };
+  | { kind: "invalid_input" }
+  | { kind: "rate_limited"; retryAfterSeconds: number };
 
 export async function performLogin(
-  container: { login: Login },
+  container: { login: Login; rateLimiter: RateLimiter },
   input: { email: string; password: string; redirectTo: string },
   deps: {
     plantCookie: (token: string, expiresAt: Date) => Promise<void>;
@@ -53,12 +65,24 @@ export async function performLogin(
     return { kind: "invalid_input" };
   }
 
+  // Rate limit by client IP
+  const ip = await clientIp();
+  const limitResult = await container.rateLimiter.check({
+    key: `login:${ip}`,
+    ...LOGIN_RATE_LIMIT,
+  });
+  if (limitResult.ok && !limitResult.value.allowed) {
+    return { kind: "rate_limited", retryAfterSeconds: limitResult.value.resetSeconds };
+  }
+  if (!limitResult.ok) {
+    console.error("[performLogin] rate limiter error:", limitResult.error.message);
+  }
+
   // Reject open redirects — only allow relative paths starting with
   // a single `/` (defense against `//evil.com` protocol-relative
   // trickery AND `https://evil.com` absolute URLs).
   const safeRedirect =
-    input.redirectTo.startsWith("/") &&
-    !input.redirectTo.startsWith("//")
+    input.redirectTo.startsWith("/") && !input.redirectTo.startsWith("//")
       ? input.redirectTo
       : "/courses";
 
@@ -85,8 +109,7 @@ export async function performLogin(
 export async function loginAndRedirect(formData: FormData): Promise<void> {
   const email = formData.get("email") as string | null;
   const password = formData.get("password") as string | null;
-  const redirectTo =
-    (formData.get("redirectTo") as string | null) ?? "/courses";
+  const redirectTo = (formData.get("redirectTo") as string | null) ?? "/courses";
 
   const container = buildContainer();
 
@@ -101,6 +124,9 @@ export async function loginAndRedirect(formData: FormData): Promise<void> {
 
   if (outcome.kind === "invalid_input") {
     redirect("/login?error=invalid_input");
+  }
+  if (outcome.kind === "rate_limited") {
+    redirect("/login?error=rate_limited");
   }
   if (outcome.kind === "redirect_to_login") {
     redirect(`/login?error=${outcome.errorKind}`);
