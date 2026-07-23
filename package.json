@@ -26,6 +26,7 @@
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs",
     "gen:secret": "node scripts/gen-secret.js",
     "import:content": "tsx scripts/import-amph-content.ts",
+    "db:seed:admin": "node scripts/seed-admin-user.mjs",
     "db:seed:tiers": "tsx scripts/seed-pricing-tiers.ts",
     "format": "prettier --write .",
     "prepare": "husky",
