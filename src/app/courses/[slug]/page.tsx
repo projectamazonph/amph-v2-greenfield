@@ -86,7 +86,11 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <span className={styles.price}>{priceDisplay}</span>
               </div>
 
-              <EnrollButton courseId={detail.courseId} priceMinor={detail.priceMinor} />
+              <EnrollButton
+                courseId={detail.courseId}
+                courseSlug={detail.slug}
+                priceMinor={detail.priceMinor}
+              />
             </div>
           </div>
         </div>

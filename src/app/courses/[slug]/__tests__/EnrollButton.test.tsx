@@ -40,7 +40,7 @@ import { EnrollButton } from "../EnrollButton";
 describe("EnrollButton (render)", () => {
   it("renders the free-enroll CTA when priceMinor === 0", () => {
     const html = renderToString(
-      createElement(EnrollButton, { courseId: "c-1", priceMinor: 0 }),
+      createElement(EnrollButton, { courseId: "c-1", courseSlug: "free-course", priceMinor: 0 }),
     );
     expect(html).toContain("Enroll for Free");
     // The form action posts to the server action — verify the form is wired
@@ -55,13 +55,17 @@ describe("EnrollButton (render)", () => {
 
   it("renders the paid Buy-now CTA with the formatted Money when priceMinor > 0 (P0-1)", () => {
     const html = renderToString(
-      createElement(EnrollButton, { courseId: "c-2", priceMinor: 199900 }),
+      createElement(EnrollButton, {
+        courseId: "c-2",
+        courseSlug: "paid-course",
+        priceMinor: 199900,
+      }),
     );
     // P0-1: paid courses show a "Buy now" link to /checkout, not an
     // enroll button (the server decides the path).
     expect(html).toContain("Buy now —");
     expect(html).toContain("1,999");
-    expect(html).toMatch(/href="\/checkout\?courseId=c-2"/);
+    expect(html).toMatch(/href="\/checkout\?courseSlug=paid-course"/);
     // No form (paid courses never call the enroll action).
     expect(html).not.toMatch(/<form/);
   });
@@ -72,7 +76,7 @@ describe("EnrollButton (render)", () => {
     // Tailwind, this test will start failing because the new
     // component uses <Button variant="primary" size="lg">.
     const html = renderToString(
-      createElement(EnrollButton, { courseId: "c-3", priceMinor: 0 }),
+      createElement(EnrollButton, { courseId: "c-3", courseSlug: "another-course", priceMinor: 0 }),
     );
     // The renderToString output should contain a button with a
     // CSS Module-hashed class (not a Tailwind utility class).
