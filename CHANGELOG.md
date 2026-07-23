@@ -4,6 +4,39 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-24: CSS variable token fixes — 18 files, 106 insertions
+
+- **PR #147** (merged as `75d2709`): `fix(ui): replace undefined CSS variable references with correct AMPH token names`
+  - 18 files affected across admin form pages (`admin/simulators/new`, `admin/simulators/[id]/edit`, `admin/discount-codes/new`, `admin/discount-codes/[id]/edit`, `admin/badges/new`, `admin/badges/[slug]/edit`, `admin/live-classes/new`, `admin/live-classes/[id]/edit`), 7 `Admin*Table` Astryx components, and 2 CSS module files.
+  - Replaced undefined `var(--color-*)` references with correct AMPH design tokens: `var(--color-accent)` → `var(--accent)`, `var(--color-danger)` → `var(--danger)`, `var(--color-text-primary)` → `var(--ink-900)`, `var(--color-text-secondary)` → `var(--ink-700)`, `var(--color-text-muted)` → `var(--ink-500)`, `var(--color-text-disabled)` → `var(--ink-300)`, `var(--color-border)` → `var(--border)`, `var(--color-background-muted)` / `var(--color-bg-muted)` → `var(--surface-2)`, `var(--color-on-accent)` → `var(--accent-ink)`, `var(--color-accent-dark)` → `var(--accent-hover)`.
+  - These bugs were pre-existing from the original Astryx installation (commit `9e9b297 feat(astryx)`) — not introduced by the migration PR.
+  - All 6 CI checks green. No test changes needed (CSS tokens, no behavior change).
+
+### 2026-07-24: Astryx UI migration — all admin pages migrated, student UI hardened
+
+- **PR #146** (merged as `f4d6765`): `fix(ui): STORY-055 migrate all pages to @astryxdesign/core + student UI hardening`
+  - Migrated all remaining admin pages from `@/components/ui` to `@astryxdesign/core` using the `Card`, `Badge`, `Table`, `Button`, `TextField`, `Select`, `TextArea`, `Link`, `Input`, `Tab`, `TabList`, `TabPanel` Astryx components.
+  - `admin/courses/[id]/page.tsx`, `admin/courses/[id]/edit/page.tsx`, `admin/users/[id]/page.tsx`, `admin/payments/[id]/page.tsx`, `admin/simulators/[id]/edit/page.tsx`, `admin/discount-codes/[id]/edit/page.tsx`, `admin/badges/page.tsx`, `admin/simulators/new/page.tsx`, `admin/discount-codes/new/page.tsx`, `admin/badges/new/page.tsx`, `admin/badges/[slug]/edit/page.tsx`, `admin/live-classes/new/page.tsx`, `admin/live-classes/[id]/edit/page.tsx`, and 5 `Admin*Table` components all migrated.
+  - Kept `@/components/ui` for login and signup: Astryx `Button` uses `label` prop (not `children`) and `isDisabled` (not `disabled`) — incompatible with server-action uncontrolled forms. AMPH's own `Button` and `Input` work correctly.
+  - Added `idle` state to `SignUpState` (`export type SignUpState = SignUpResult | { kind: "idle" }`) to prevent first-render validation flash on signup form.
+  - Applied student UI hardening patch: responsive tables with keyboard-reachable scroll regions, `min-width` enforcement on all table layouts, `idle` state handling on forms.
+  - Added `src/app/signup/__tests__/page.test.tsx` — regression test for idle-state contract on signup page.
+  - Added `src/components/tools/__tests__/responsive-tables.test.ts` — verifies keyboard-reachable scroll regions and `min-width` enforcement on table components.
+  - Simulator scroll wrappers verified: `BidElevatorForm`, `BidElevatorResult`, `StrTriageForm` all have `tableScroll` CSS class + `role="region"` + `aria-label` + `tabIndex={0}`.
+  - 56 files changed, +767/-549 lines. All 6 CI checks green.
+
+### 2026-07-23: Rate-limit policy reconciliation — STORY-054 finally closed
+
+- **PR #145** (merged as `9e0624c`): `fix(security): STORY-054 rate-limit policy reconciliation`
+  - STORY-054 was marked done in the sprint plan but the rate limiter was never actually wired into the server actions — a silent gap found during the sprint-11 review.
+  - `signup.action.ts`: calls `rateLimiter.check()` by IP (5 req / 15 min), returns `{ kind: 'rate_limited' }` when blocked. Fails open on Redis errors.
+  - `login.action.ts`: calls `rateLimiter.check()` by IP (10 req / 15 min), redirects to `/login?error=rate_limited`. Fails open.
+  - `checkout.action.ts`: calls `rateLimiter.check()` by userId (10 req / 1 hour). Fails open.
+  - All three action pages updated with user-facing rate-limit error messages.
+  - `tests/architecture/rate-limit-wiring.test.ts` expanded: 9 assertions verify `rateLimiter.check()` is called in all three actions.
+  - `src/app/actions/__tests__/checkout.action.test.ts`: added `rateLimiter` mock to container, reset in `beforeEach`, new test for the `rate_limited` branch.
+  - All 6 CI checks green. Supersedes PR #133 (same intent, never fully wired).
+
 ### 2026-07-22: Module/Lesson admin CRUD now writes to the audit trail
 
 - `fix(admin): wire RecordAuditLog into the 8 Module/Lesson use cases`

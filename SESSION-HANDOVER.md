@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-23 (rate limiter wiring session). All of Sprints 1–11 shipped. Sprint 12 (STORY-056–060, launch) is operator-owned and not yet started. This is the final state before launch.
+**Updated:** 2026-07-24 (docs update + CSS token fix PR merged). All of Sprints 1–11 shipped. Sprint 12 (STORY-056–060, launch) is operator-owned and not yet started. This is the final state before launch.
 
 ---
 
@@ -11,7 +11,7 @@
 | Phase                    | **Sprints 1–11 complete. Sprint 12 (launch) not yet started — operator-owned.**                                                                                                                   |
 | Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                     |
 | Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                            |
-| `main` HEAD              | `103103d`: docs: mark STORY-054 done in sprint plan (PR #142)                                                                                                                                     |
+| `main` HEAD              | `75d2709`: fix(ui): replace undefined CSS variable references with correct AMPH token names (#147)                                                                                                  |
 | Unit + integration tests | **2347 passing + 2 skipped, 0 TypeScript errors** (this session: checkout action tests updated with rateLimiter mock + new rate_limited branch test; 1 new arch test assertion)                   |
 | Architecture compliance  | **419 tests passing, 0 violations** (rate-limit-wiring.test.ts expanded to 9 assertions)                                                                                                          |
 | Coverage                 | Last measured 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches — all above configured thresholds (80/70/80/80).                                                                |
@@ -19,6 +19,32 @@
 | CI                       | All 6 jobs green on every PR this session (PRs #125–#142).                                                                                                                                        |
 | Database                 | Not yet provisioned in production. Schema complete (11 migrations). Every repository in `buildProductionContainer()` is Postgres-backed. Local throwaway Postgres used for E2E verification only. |
 | Production               | Not deployed. Sprint 12 is operator-owned launch work — not autonomous execution.                                                                                                                 |
+
+---
+
+## What changed this session (2026-07-24)
+
+### CSS variable token fixes — PR #147 merged
+
+Found and fixed 18 files with undefined `var(--color-*)` CSS variable references during an audit of the Astryx migration.
+
+**What changed:**
+- 18 files affected: admin form pages (`admin/simulators/new`, `admin/simulators/[id]/edit`, `admin/discount-codes/new`, `admin/discount-codes/[id]/edit`, `admin/badges/new`, `admin/badges/[slug]/edit`, `admin/live-classes/new`, `admin/live-classes/[id]/edit`), 7 `Admin*Table` Astryx components, and 2 CSS module files.
+- Token mapping applied: `var(--color-accent)` → `var(--accent)`, `var(--color-danger)` → `var(--danger)`, `var(--color-text-primary)` → `var(--ink-900)`, `var(--color-text-secondary)` → `var(--ink-700)`, `var(--color-text-muted)` → `var(--ink-500)`, `var(--color-text-disabled)` → `var(--ink-300)`, `var(--color-border)` → `var(--border)`, `var(--color-background-muted)` / `var(--color-bg-muted)` → `var(--surface-2)`, `var(--color-on-accent)` → `var(--accent-ink)`, `var(--color-accent-dark)` → `var(--accent-hover)`.
+- These were pre-existing bugs from the original Astryx installation commit, not introduced by the migration PRs.
+- All 6 CI checks green. Squash-merged as PR #147 (`75d2709`).
+
+### Astryx UI migration — PR #146 merged (2026-07-23)
+
+All remaining admin pages migrated from `@/components/ui` to `@astryxdesign/core`. `admin/courses/[id]/page.tsx`, `admin/courses/[id]/edit/page.tsx`, `admin/users/[id]/page.tsx`, `admin/payments/[id]/page.tsx`, `admin/simulators/[id]/edit/page.tsx`, `admin/discount-codes/[id]/edit/page.tsx`, `admin/badges/page.tsx`, and 5 `Admin*Table` components all migrated. Login and signup kept on `@/components/ui` (Astryx `Button` uses `label` prop and `isDisabled`, incompatible with server-action forms). Added idle-state handling to signup form to prevent first-render validation flash. Student UI hardening patch applied. Added regression tests for signup idle-state and responsive tables. 56 files changed, +767/-549 lines. All 6 CI checks green.
+
+### Rate-limit policy reconciliation — PR #145 merged (2026-07-23)
+
+STORY-054 was marked done in the sprint plan but the rate limiter was never wired into the server actions. Found and fixed the gap: `signup.action.ts`, `login.action.ts`, and `checkout.action.ts` now call `rateLimiter.check()` with appropriate buckets. All 6 CI checks green. Supersedes PR #133. Sprint plan updated (PR #145 confirmed as the merged PR number in docs).
+
+### Stale PRs closed
+
+PR #133 (rate-limit wiring, superseded by #145), PR #132 (PricingTier, superseded by #144), and PR #118 (order repo, stale) all closed with comments noting their replacement.
 
 ---
 

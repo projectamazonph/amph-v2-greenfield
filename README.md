@@ -111,7 +111,7 @@ Generate keyword ideas from a seed term. Get match-type recommendations, estimat
 | Test stack | Vitest (unit + integration) + Playwright (e2e) |
 | First deploy | Pending — see `docs/sprint-1/PLAN.md` |
 | Documentation | This file + `AGENTS.md` + `CLAUDE.md` + `FEATURES.md` + `docs/` |
-| Last updated | 2026-07-17 |
+| Last updated | 2026-07-24 |
 
 ---
 

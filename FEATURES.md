@@ -2,7 +2,7 @@
 
 The full surface area of the product, in user-facing language. Every feature listed here is implemented, tested, and reachable from the running app.
 
-Last reviewed: 2026-07-17. Sources: `docs/product-brief.md`, `docs/build-spec.md`, `docs/api-reference.md`, and the running codebase.
+Last reviewed: 2026-07-24. Sources: `docs/product-brief.md`, `docs/build-spec.md`, `docs/api-reference.md`, and the running codebase.
 
 ---
 
