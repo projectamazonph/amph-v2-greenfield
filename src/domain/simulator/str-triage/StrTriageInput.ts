@@ -1,8 +1,10 @@
 /**
  * StrTriageInput — input types for the STR Triage simulator.
  *
- * STORY-038: STR Triage simulator.
+ * STORY-067: STR Triage Rebuild (Scoring Engine Integration).
  */
+
+import type { TriageAction } from "./StrTriageOutput";
 
 export interface KeywordPerfRow {
   readonly keyword: string;
@@ -13,5 +15,12 @@ export interface KeywordPerfRow {
 
 export interface StrTriageInput {
   readonly rows: readonly KeywordPerfRow[];
-  readonly targetRoas: number; // e.g. 3.0 = 3x ROAS target
+  /** Target ROAS for classification (e.g. 3.0 = 3× ROAS target) */
+  readonly targetRoas: number;
+  /**
+   * User's submitted classifications — keyed by keyword.
+   * When provided, the simulator computes per-dimension scores.
+   * When absent, returns ground truth only (preview mode).
+   */
+  readonly userClassifications?: Readonly<Record<string, TriageAction>>;
 }
