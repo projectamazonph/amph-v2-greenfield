@@ -194,6 +194,8 @@ import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { ListAuditLogs } from "@/usecases/ListAuditLogs";
+import { ExportAuditLogs } from "@/usecases/ExportAuditLogs";
 import { AdminListScenarios } from "@/usecases/AdminListScenarios";
 import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
@@ -337,6 +339,9 @@ export interface AppContainer {
   refundOverride: RefundOverride;
   // STORY-050a: audit log
   recordAuditLog: RecordAuditLog;
+  // STORY-061: audit log viewer + CSV export
+  listAuditLogs: ListAuditLogs;
+  exportAuditLogs: ExportAuditLogs;
   // STORY-050b: simulator scenario CRUD
   adminListScenarios: AdminListScenarios;
   getSimulatorScenario: GetSimulatorScenario;
@@ -401,6 +406,8 @@ function buildProductionContainer(): AppContainer {
   // STORY-050a: audit log (Postgres-backed in production via PrismaAuditLog)
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  const listAuditLogs = new ListAuditLogs({ auditLog });
+  const exportAuditLogs = new ExportAuditLogs({ auditLog });
   const scenarioRepo: ISimulatorScenarioRepository = new PrismaSimulatorScenarioRepository(prisma);
   // STORY-064: simulator attempt infrastructure
   const simulatorAttemptRepo: ISimulatorAttemptRepository = new PrismaSimulatorAttemptRepository(
@@ -609,6 +616,8 @@ function buildProductionContainer(): AppContainer {
     refundOverride: new RefundOverride({ orderRepo, paymentGateway, recordAuditLog }),
     auditLog,
     recordAuditLog,
+    listAuditLogs,
+    exportAuditLogs,
     scenarioRepo,
     simulatorAttemptRepo,
     scorePolicyRepo,

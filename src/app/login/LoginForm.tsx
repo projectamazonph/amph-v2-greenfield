@@ -40,7 +40,7 @@ export function LoginForm({
   redirectTo: string;
   errorKind: string | null;
 }) {
-  const errorText = errorKind ? errorMessage[errorKind] ?? null : null;
+  const errorText = errorKind ? (errorMessage[errorKind] ?? null) : null;
 
   return (
     <div className={styles.page}>
@@ -51,9 +51,7 @@ export function LoginForm({
           <p className={styles.subtitle}>Sign in to continue your training.</p>
         </div>
 
-        {errorText && (
-          <div className="alert alert-error">{errorText}</div>
-        )}
+        {errorText && <div className="alert alert-error">{errorText}</div>}
 
         <form method="POST" action="/api/auth/login" className={styles.form}>
           <input type="hidden" name="redirectTo" value={redirectTo} />

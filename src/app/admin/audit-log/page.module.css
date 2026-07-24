@@ -1,0 +1,97 @@
+/* /admin/audit-log page styles — Field Manual density. */
+
+.filters {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input,
+.select {
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--surface-0);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-width: 140px;
+}
+
+.applyButton {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--accent);
+  color: var(--surface-0);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  height: fit-content;
+}
+
+.applyButton:hover {
+  background: var(--accent-hover);
+}
+
+.clearButton {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface-0);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  height: fit-content;
+}
+
+.clearButton:hover {
+  background: var(--surface-2);
+}
+
+.error {
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.exportButton {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface-0);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  height: fit-content;
+  margin-left: auto;
+}
+
+.exportButton:hover {
+  background: var(--accent);
+  color: var(--surface-0);
+}
+
+.filterRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}

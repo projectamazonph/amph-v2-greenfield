@@ -28,7 +28,7 @@ const errorMessage: Record<string, string> = {
 };
 
 export function SignupForm({ errorKind }: { errorKind: string | null }) {
-  const errorText = errorKind ? errorMessage[errorKind] ?? null : null;
+  const errorText = errorKind ? (errorMessage[errorKind] ?? null) : null;
 
   return (
     <div className={styles.page}>
