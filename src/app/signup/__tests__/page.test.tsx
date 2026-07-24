@@ -21,8 +21,9 @@ import { describe, expect, it, vi } from "vitest";
 
 // Spy on the form so we can assert on the props the page passes
 // (which is the page's only job: turn the URL into props).
-const signupFormSpy = vi.fn(() =>
-  createElement("div", null, createElement("h1", null, "Create your account")),
+const signupFormSpy = vi.fn(
+  (_props: { errorKind: string | null }) =>
+    createElement("div", null, createElement("h1", null, "Create your account")),
 );
 
 vi.mock("../SignupForm", () => ({
