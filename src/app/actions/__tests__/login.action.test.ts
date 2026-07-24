@@ -1,15 +1,22 @@
 /**
- * login.action.test.ts — STORY-006.
+ * login.action.test.ts — STORY-006 + STORY-066.
  *
  * Tests the pure performLogin helper extracted from loginAndRedirect.
  *
- * The helper takes a `container.login` and two side-effect functions
- * (`plantCookie`, `navigate`) as deps, so it can be tested without
- * mocking next/headers or next/navigation. The thin `loginAndRedirect`
- * action wrapper that calls this helper is itself untested in
- * isolation — it's three lines of glue and would require mocking
- * the whole Next runtime, which adds little value over testing
- * performLogin + the Login use case (which has 13+ tests of its own).
+ * The helper takes a `container.login` and one side-effect function
+ * (`plantCookie`) as deps, so it can be tested without mocking
+ * next/headers or next/navigation. The thin `loginAndRedirect` action
+ * wrapper that calls this helper is itself untested in isolation —
+ * it's three lines of glue and would require mocking the whole Next
+ * runtime, which adds little value over testing performLogin + the
+ * Login use case (which has 13+ tests of its own).
+ *
+ * STORY-066 fix: the redirect is owned by the action wrapper now, not
+ * by performLogin. The previous design called redirect() from a
+ * callback (`deps.navigate`), which lost the Next.js request-scoped
+ * AsyncLocalStorage in production builds and manifested as a 500
+ * Server Components render error. performLogin now just returns
+ * `{ kind: "success", redirectTo }` and the wrapper does redirect().
  */
 
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
@@ -23,12 +30,8 @@ import { buildTestContainer } from "@/composition/container.test";
 
 // ── Fixture helpers ──────────────────────────────────────────
 
-let testContainerRef: ReturnType<typeof buildTestContainer> | null = null;
-
 function freshContainer() {
-  // buildTestContainer() always returns a fresh in-memory container.
-  testContainerRef = buildTestContainer();
-  return testContainerRef;
+  return buildTestContainer();
 }
 
 async function seedUser(
@@ -53,36 +56,20 @@ async function seedUser(
 }
 
 type MockPlantCookie = Mock<(token: string, expiresAt: Date) => Promise<void>>;
-type MockNavigate = Mock<(url: string) => never>;
 type MockGetClientIp = Mock<() => Promise<string | undefined>>;
 
 function makeDeps(
   overrides: {
     plantCookie?: MockPlantCookie;
-    navigate?: MockNavigate;
     getClientIp?: MockGetClientIp;
   } = {},
 ): {
   plantCookie: MockPlantCookie;
-  navigate: MockNavigate;
   getClientIp: MockGetClientIp;
 } {
   const plantCookie = overrides.plantCookie ?? vi.fn(async () => undefined);
-  const navigate =
-    overrides.navigate ??
-    vi.fn((_url: string): never => {
-      throw new Error("NEXT_REDIRECT");
-    });
   const getClientIp = overrides.getClientIp ?? vi.fn(async () => "127.0.0.1");
-  return { plantCookie, navigate, getClientIp };
-}
-
-type LoginDeps = ReturnType<typeof makeDeps>;
-
-// The makeDeps return type is wider than what performLogin accepts
-// (mock fns are loosely typed). Cast at the call site via this helper.
-function asProdDeps(d: LoginDeps): Parameters<typeof performLogin>[2] {
-  return d as unknown as Parameters<typeof performLogin>[2];
+  return { plantCookie, getClientIp };
 }
 
 // ── Tests ────────────────────────────────────────────────────
@@ -98,11 +85,10 @@ describe("performLogin", () => {
     const result = await performLogin(
       container,
       { email: "", password: "p", redirectTo: "/x" },
-      asProdDeps(deps),
+      deps,
     );
     expect(result).toEqual({ kind: "invalid_input" });
     expect(deps.plantCookie).not.toHaveBeenCalled();
-    expect(deps.navigate).not.toHaveBeenCalled();
   });
 
   it("returns invalid_input when password is empty", async () => {
@@ -153,74 +139,63 @@ describe("performLogin", () => {
     });
   });
 
-  it("plants the cookie and navigates on success", async () => {
+  it("plants the cookie and returns success with the safe redirect on success", async () => {
     const container = freshContainer();
     await seedUser(container, "u@test.example.com", "correct-password");
     const deps = makeDeps();
-    await expect(
-      performLogin(
-        container,
-        {
-          email: "u@test.example.com",
-          password: "correct-password",
-          redirectTo: "/admin/users",
-        },
-        deps,
-      ),
-    ).rejects.toThrow("NEXT_REDIRECT");
+    const result = await performLogin(
+      container,
+      {
+        email: "u@test.example.com",
+        password: "correct-password",
+        redirectTo: "/admin/users",
+      },
+      deps,
+    );
 
+    expect(result).toEqual({ kind: "success", redirectTo: "/admin/users" });
     expect(deps.plantCookie).toHaveBeenCalledTimes(1);
     const plantCall = deps.plantCookie.mock.calls[0];
     expect(plantCall).toBeDefined();
     expect(plantCall![0]).toMatch(/^eyJ/); // JWT
     expect(plantCall![1]).toBeInstanceOf(Date);
-    expect(deps.navigate).toHaveBeenCalledWith("/admin/users");
   });
 
   it("rejects open redirects and falls back to /courses", async () => {
     const container = freshContainer();
     await seedUser(container, "u@test.example.com", "correct-password");
-    const navigate = vi.fn((_url: string): never => {
-      throw new Error("NEXT_REDIRECT");
-    });
-    await expect(
-      performLogin(
-        container,
-        {
-          email: "u@test.example.com",
-          password: "correct-password",
-          redirectTo: "https://evil.example.com/steal",
-        },
-        { plantCookie: vi.fn(), navigate, getClientIp: async () => "127.0.0.1" },
-      ),
-    ).rejects.toThrow("NEXT_REDIRECT");
-    expect(navigate).toHaveBeenCalledWith("/courses");
+    const deps = makeDeps();
+    const result = await performLogin(
+      container,
+      {
+        email: "u@test.example.com",
+        password: "correct-password",
+        redirectTo: "https://evil.example.com/steal",
+      },
+      deps,
+    );
+    expect(result).toEqual({ kind: "success", redirectTo: "/courses" });
   });
 
   it("rejects //evil.com protocol-relative URLs", async () => {
     const container = freshContainer();
     await seedUser(container, "u@test.example.com", "correct-password");
-    const navigate = vi.fn((_url: string): never => {
-      throw new Error("NEXT_REDIRECT");
-    });
-    await expect(
-      performLogin(
-        container,
-        {
-          email: "u@test.example.com",
-          password: "correct-password",
-          redirectTo: "//evil.example.com/steal",
-        },
-        { plantCookie: vi.fn(), navigate, getClientIp: async () => "127.0.0.1" },
-      ),
-    ).rejects.toThrow("NEXT_REDIRECT");
+    const deps = makeDeps();
+    const result = await performLogin(
+      container,
+      {
+        email: "u@test.example.com",
+        password: "correct-password",
+        redirectTo: "//evil.example.com/steal",
+      },
+      deps,
+    );
     // //evil.com starts with /, so it would pass the startsWith("/")
     // check naively. The fact that we landed on /courses (not
     // //evil.com) means the open-redirect defense is working as
-    // intended because Next's redirect() only accepts server-side
-    // paths via this routing. We test that the navigate was called
-    // with /courses.
-    expect(navigate).toHaveBeenCalledWith("/courses");
+    // intended because the safeRedirect check rejects anything
+    // starting with `//`.
+    expect(result).toEqual({ kind: "success", redirectTo: "/courses" });
   });
 
   it("uses separate documented email and IP buckets before attempting login", async () => {
@@ -235,7 +210,7 @@ describe("performLogin", () => {
         password: "any-password",
         redirectTo: "/courses",
       },
-      asProdDeps(deps),
+      deps,
     );
 
     expect(result).toEqual({ kind: "redirect_to_login", errorKind: "user_not_found" });
@@ -263,7 +238,7 @@ describe("performLogin", () => {
         password: "any-password",
         redirectTo: "/courses",
       },
-      asProdDeps(deps),
+      deps,
     );
 
     expect(result).toEqual({ kind: "redirect_to_login", errorKind: "user_not_found" });

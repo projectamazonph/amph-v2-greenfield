@@ -41,11 +41,19 @@ async function clientIp(): Promise<string | undefined> {
 /**
  * Pure login helper. Takes the container (so tests can pass
  * buildTestContainer), the email + password + redirectTo, and the
- * side-effect functions (plantCookie, navigate, getClientIp) as dependencies.
+ * side-effect functions (plantCookie, getClientIp) as dependencies.
  *
- * Returns a discriminated union the caller maps to a redirect.
- * The side-effect functions are injected so the helper is unit-testable
- * without Next's cookies() or redirect() in scope.
+ * Returns a discriminated union the caller maps to a Next.js redirect().
+ * The cookie-setting is a side effect on the response (via next/headers),
+ * done by the helper in src/lib/auth.ts.
+ *
+ * STORY-066 fix: the redirect is owned by the action wrapper
+ * (`loginAndRedirect`), not by this helper. Calling `redirect()` from
+ * inside a callback (`deps.navigate`) loses the Next.js request-scoped
+ * AsyncLocalStorage in production builds, which manifests as a
+ * "Server Components render" 500 with a hashed digest. The signup
+ * wrapper (`signUpAndRedirect`) already follows this pattern — login
+ * just hadn't been migrated.
  */
 export type LoginResult =
   | { kind: "success"; redirectTo: string }
@@ -58,7 +66,6 @@ export async function performLogin(
   input: { email: string; password: string; redirectTo: string },
   deps: {
     plantCookie: (token: string, expiresAt: Date) => Promise<void>;
-    navigate: (url: string) => never;
     getClientIp: () => Promise<string | undefined>;
   },
 ): Promise<LoginResult> {
@@ -111,9 +118,6 @@ export async function performLogin(
   }
 
   await deps.plantCookie(result.sessionToken, result.expiresAt);
-  deps.navigate(safeRedirect);
-
-  // Unreachable — navigate() throws.
   return { kind: "success", redirectTo: safeRedirect };
 }
 
@@ -127,13 +131,11 @@ export async function loginAndRedirect(formData: FormData): Promise<void> {
   const redirectTo = (formData.get("redirectTo") as string | null) ?? "/courses";
 
   const container = buildContainer();
-
   const outcome = await performLogin(
     container,
     { email: email ?? "", password: password ?? "", redirectTo },
     {
       plantCookie: setAuthCookie,
-      navigate: (url) => redirect(url),
       getClientIp: clientIp,
     },
   );
@@ -147,7 +149,9 @@ export async function loginAndRedirect(formData: FormData): Promise<void> {
   if (outcome.kind === "redirect_to_login") {
     redirect(`/login?error=${outcome.errorKind}`);
   }
-  // outcome.kind === "success" — performLogin already navigated.
+  if (outcome.kind === "success") {
+    redirect(outcome.redirectTo);
+  }
 }
 
 // Re-exported for test convenience. The non-pure side effects are
