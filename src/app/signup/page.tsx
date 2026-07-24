@@ -1,15 +1,16 @@
 /**
- * Sign up page — Story 004.
+ * Sign up page - Story 004.
  *
- * Migrated from inline React.CSSProperties styles to AMPH components.
- * User-facing brand name: Project Amazon PH Academy.
- * Uses React's `useActionState` (formerly useFormState) with a server action
- * for progressive enhancement — works without JavaScript.
+ * STORY-046 fix: the server action returns { kind: "success", redirectTo }
+ * instead of calling redirect(). This page handles navigation client-side
+ * via useEffect + router.push() to avoid the NEXT_REDIRECT / React 19
+ * useActionState conflict that caused a client-side crash.
  */
 
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { signUpAction, type SignUpState } from "../actions/signup.action";
 import Link from "next/link";
 import { Button } from "@/components/ui";
@@ -20,6 +21,17 @@ const INITIAL_STATE: SignUpState = { kind: "idle" };
 
 export default function SignUpPage() {
   const [state, formAction, isPending] = useActionState(signUpAction, INITIAL_STATE);
+  const router = useRouter();
+
+  // Navigate client-side when the action returns a redirect URL.
+  // We avoid Next redirect() in server actions because React 19
+  // useActionState does not catch thrown NEXT_REDIRECT - it
+  // propagates as an unhandled exception and crashes the client.
+  useEffect(() => {
+    if (state.kind === "success" && state.redirectTo) {
+      router.push(state.redirectTo);
+    }
+  }, [state, router]);
 
   return (
     <div className={styles.page}>
@@ -29,7 +41,7 @@ export default function SignUpPage() {
           <div className={styles.logo}>Project Amazon PH Academy</div>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.subtitle}>
-            Master Amazon PPC and Seller Central — built for Filipino VAs.
+            Master Amazon PPC and Seller Central - built for Filipino VAs.
           </p>
         </div>
 
@@ -63,7 +75,8 @@ export default function SignUpPage() {
           </div>
         )}
 
-        {state.kind === "success" && (
+        {/* Only show check your email when auto-login did not succeed */}
+        {state.kind === "success" && !state.redirectTo && (
           <div className="alert alert-success">
             Account created for <strong>{state.email}</strong>! Check your email to verify your
             account.
@@ -122,7 +135,7 @@ export default function SignUpPage() {
             disabled={isPending}
             style={{ width: "100%" }}
           >
-            {isPending ? "Creating account…" : "Create account"}
+            {isPending ? "Creating account..." : "Create account"}
           </Button>
         </form>
 
