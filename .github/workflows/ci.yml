@@ -54,7 +54,7 @@ jobs:
         run: pnpm lint
 
       - name: gitleaks
-        uses: gitleaks/gitleaks-action@v1.6.0
+        uses: gitleaks/gitleaks-action@v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml
