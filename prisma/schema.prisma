@@ -652,3 +652,42 @@ model SentReminder {
   @@index([liveClassId])
   @@map("sent_reminders")
 }
+
+// ── STORY-064: Simulator Attempts ─────────────────────────────────
+
+model SimulatorAttempt {
+  id               String   @id
+  attemptId        String   @unique // human-readable, e.g. "ATT-A1B2C3"
+  userId           String
+  simulatorId       String
+  scenarioId       String
+  scenarioVersion  Int      @default(1)
+  difficulty       String   // beginner | intermediate | advanced
+  mode             String   @default("practice")
+  status           String   @default("in_progress") // in_progress | submitted | graded | expired
+  seed             String?
+  score            Int?
+  scoreDimensions  Json?
+  startedAt        DateTime @default(now())
+  submittedAt      DateTime?
+  gradedAt         DateTime?
+  decisions        SimulatorDecision[]
+
+  @@index([userId])
+  @@index([simulatorId])
+  @@index([status])
+  @@index([userId, simulatorId, status])
+  @@map("simulator_attempts")
+}
+
+model SimulatorDecision {
+  id           String   @id
+  attemptId    String
+  attempt      SimulatorAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  revision     Int      @default(1)
+  decisionData Json
+  submittedAt  DateTime @default(now())
+
+  @@unique([attemptId, revision])
+  @@map("simulator_decisions")
+}

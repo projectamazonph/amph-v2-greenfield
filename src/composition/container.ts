@@ -56,6 +56,7 @@ import type { ICertificateRepository } from "@/ports/repositories/ICertificateRe
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
+import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 
@@ -77,6 +78,7 @@ import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwar
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
+import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSimulatorAttemptRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { prisma } from "@/infra/database/prisma";
@@ -193,6 +195,9 @@ import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
 import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
 import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
+import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
+import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
+import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
 import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
@@ -229,6 +234,8 @@ export interface AppContainer {
   certificateRepo: ICertificateRepository;
   auditLog: IAuditLog;
   scenarioRepo: ISimulatorScenarioRepository;
+  // STORY-064: simulator attempt infrastructure
+  simulatorAttemptRepo: ISimulatorAttemptRepository;
   // STORY-050c: live class admin CRUD
   liveClassRepo: ILiveClassRepository;
   // STORY-011: pricing tier repo
@@ -326,6 +333,10 @@ export interface AppContainer {
   createSimulatorScenario: CreateSimulatorScenario;
   updateSimulatorScenario: UpdateSimulatorScenario;
   archiveSimulatorScenario: ArchiveSimulatorScenario;
+  // STORY-064: simulator attempt lifecycle
+  startSimulatorAttempt: StartSimulatorAttempt;
+  saveSimulatorDecision: SaveSimulatorDecision;
+  submitSimulatorAttempt: SubmitSimulatorAttempt;
   // STORY-050c: live class admin CRUD
   adminListLiveClasses: AdminListLiveClasses;
   adminGetLiveClass: AdminGetLiveClass;
@@ -378,6 +389,10 @@ function buildProductionContainer(): AppContainer {
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
   const scenarioRepo: ISimulatorScenarioRepository = new PrismaSimulatorScenarioRepository(prisma);
+  // STORY-064: simulator attempt infrastructure
+  const simulatorAttemptRepo: ISimulatorAttemptRepository = new PrismaSimulatorAttemptRepository(
+    prisma,
+  );
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
   // STORY-011: pricing tier repo
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
@@ -578,6 +593,17 @@ function buildProductionContainer(): AppContainer {
     auditLog,
     recordAuditLog,
     scenarioRepo,
+    simulatorAttemptRepo,
+    // STORY-064: simulator attempt lifecycle
+    startSimulatorAttempt: new StartSimulatorAttempt({
+      attemptRepo: simulatorAttemptRepo,
+      scenarioRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    saveSimulatorDecision: new SaveSimulatorDecision({ attemptRepo: simulatorAttemptRepo }),
+    submitSimulatorAttempt: new SubmitSimulatorAttempt({ attemptRepo: simulatorAttemptRepo }),
     // STORY-011: pricing tier repo
     pricingTierRepo,
     // STORY-048b/c: module + lesson repos (also used by public catalog)
