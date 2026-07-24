@@ -13,7 +13,7 @@ Ship the admin shell and the admin dashboard. After this story:
 
 - `/admin/*` is the admin route group, server-rendered, requires `ADMIN` role
 - The `/admin` index renders a 6-tile stat dashboard + recent activity + pending actions
-- The admin layout is the **NavSidebar pattern from design spec §9.1** — 240px fixed-left, brand + nav + user card, with the AMPH logotype and "Admin" badge
+- The admin layout is the **NavSidebar pattern from design spec §9.1** — 240px fixed-left, brand + nav + user card, with the Project Amazon PH Academy logotype and "Admin" badge
 - Every admin page (this story + STORY-047+048+049+050) uses the same shell
 - The user card in the sidebar bottom shows the admin's name, role, and a logout button
 
@@ -29,7 +29,7 @@ Sprint 10 is the admin panel. The first story of a UI sprint always lands the sh
   - No `<html>`/`<body>` (the root layout owns those)
 - [ ] `src/app/admin/layout.module.css` — the 240px-sidebar + flex-content layout
 - [ ] `src/components/admin/NavSidebar.tsx` + `NavSidebar.module.css` (server component):
-  - Brand logotype "AMPH Academy" + "Admin" badge (`--danger-soft` bg, `--danger` text, 11px)
+  - Brand logotype "Project Amazon PH Academy" + "Admin" badge (`--danger-soft` bg, `--danger` text, 11px)
   - 10 nav items per design spec §9.1: Dashboard, Users, Courses, Content, Payments, Refunds, Live Classes, Simulators, Badges, Settings
   - Each item: icon (20px), label, 12px vertical padding, hover `--surface-2` bg, active has 2px `--accent` left border
   - Bottom: user card (avatar with first letter, name, "ADMIN" role, logout button)
@@ -125,13 +125,15 @@ export interface AdminDashboardStats {
 export type GetAdminDashboardStatsError = { kind: "db_error"; message: string };
 
 export class GetAdminDashboardStats {
-  constructor(private readonly deps: {
-    userRepo: UserRepository;
-    courseRepo: CourseRepository;
-    orderRepo: IOrderRepository;
-    enrollmentRepo: IEnrollmentRepository;
-    certificateRepo: ICertificateRepository;
-  }) {}
+  constructor(
+    private readonly deps: {
+      userRepo: UserRepository;
+      courseRepo: CourseRepository;
+      orderRepo: IOrderRepository;
+      enrollmentRepo: IEnrollmentRepository;
+      certificateRepo: ICertificateRepository;
+    },
+  ) {}
 
   async execute(): Promise<Result<AdminDashboardStats, GetAdminDashboardStatsError>> {
     // Query each repo, build the stats object, return Result.ok
@@ -196,6 +198,7 @@ DATABASE_URL="postgresql://test:test@localhost:5432/amph_test" \
 ```
 
 Manual smoke (in a follow-up, not this PR):
+
 - Manually set the `amph_session` cookie to a valid JWT in DevTools
 - Visit `/admin` in a browser
 - Confirm: sidebar renders, dashboard tiles render with real numbers, layout doesn't break at 1024px or 1280px

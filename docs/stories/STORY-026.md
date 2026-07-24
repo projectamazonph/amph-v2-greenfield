@@ -5,7 +5,7 @@
 - **Story**: STORY-026
 - **Sprint**: 6 — Lesson Delivery + Progress
 - **Points**: 1
-**Status:** ✅ Done (PR #26, commit `9b0d0d6` — `feat(story-026): Lesson page (RSC + MDX render)`)
+  **Status:** ✅ Done (PR #26, commit `9b0d0d6` — `feat(story-026): Lesson page (RSC + MDX render)`)
 
 ## Overview
 
@@ -22,6 +22,7 @@ Nested under the course detail page. Uses the course slug for SEO-friendly URLs.
 ## Lesson Page (RSC)
 
 The lesson page is a React Server Component. It:
+
 1. Fetches the course by slug
 2. Finds the lesson by ID within the course's curriculum
 3. Checks course access (reuses `CheckCourseAccess` — STORY-022)
@@ -31,39 +32,45 @@ The lesson page is a React Server Component. It:
 ### Content Types
 
 **TEXT lessons** (`content.type === "TEXT"`):
+
 ```typescript
 interface TextLessonContent {
   type: "TEXT";
   body: string; // markdown string
 }
 ```
+
 Rendered using `react-markdown` + `remark-gfm` (GitHub-flavored markdown: tables, strikethrough, task lists, etc.)
 
 **VIDEO lessons** (`content.type === "VIDEO"`):
+
 ```typescript
 interface VideoLessonContent {
   type: "VIDEO";
-  videoUrl: string;   // YouTube, Vimeo, or direct MP4 URL
+  videoUrl: string; // YouTube, Vimeo, or direct MP4 URL
   durationMinutes: number;
   transcript?: string; // optional markdown transcript
 }
 ```
+
 Rendered as an embedded video player. YouTube/Vimeo URLs are detected and rendered as `<iframe>`. Direct URLs render as `<video>`.
 
 **QUIZ lessons** (`content.type === "QUIZ"`):
+
 ```typescript
 interface QuizLessonContent {
   type: "QUIZ";
   title: string;
 }
 ```
+
 Rendered as a "Quiz coming soon" placeholder card. Quiz interaction is STORY-032.
 
 ### Layout
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  AMPH Header                                          │
+│  Project Amazon PH Academy Header                            │
 ├──────────────┬────────────────────────────────────────┤
 │              │  ← Back to Course                      │
 │  Lesson      │  ────────────────────────────────────  │
@@ -103,7 +110,7 @@ Rendered as a "Quiz coming soon" placeholder card. Quiz interaction is STORY-032
 
 ```typescript
 export async function generateMetadata({ params }): Promise<Metadata> {
-  // Returns title: "[Lesson Title] — [Course Title] | AMPH Academy"
+  // Returns title: "[Lesson Title] — [Course Title] | Project Amazon PH Academy"
 }
 ```
 

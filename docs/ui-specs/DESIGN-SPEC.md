@@ -34,51 +34,51 @@ This document captures the **design only** — layout structures, component patt
 
 ### Surface
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--surface-0` | `#FAFAF7` | App background (warm off-white, never pure white) |
-| `--surface-1` | `#FFFFFF` | Cards, panels, elevated content |
+| Token         | Value     | Use                                                 |
+| ------------- | --------- | --------------------------------------------------- |
+| `--surface-0` | `#FAFAF7` | App background (warm off-white, never pure white)   |
+| `--surface-1` | `#FFFFFF` | Cards, panels, elevated content                     |
 | `--surface-2` | `#F4F3EE` | Subtle differentiation, hover washes, table headers |
-| `--surface-3` | `#1A1A1A` | Dark mode background / inverted sections |
+| `--surface-3` | `#1A1A1A` | Dark mode background / inverted sections            |
 
 ### Ink (text)
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--ink-900` | `#171717` | Primary text |
-| `--ink-700` | `#404040` | Secondary text |
-| `--ink-500` | `#737373` | Tertiary text, metadata, captions |
-| `--ink-300` | `#D4D4D4` | Disabled, empty/pending states |
-| `--ink-inverse` | `#FAFAF7` | Text on dark backgrounds |
+| Token           | Value     | Use                               |
+| --------------- | --------- | --------------------------------- |
+| `--ink-900`     | `#171717` | Primary text                      |
+| `--ink-700`     | `#404040` | Secondary text                    |
+| `--ink-500`     | `#737373` | Tertiary text, metadata, captions |
+| `--ink-300`     | `#D4D4D4` | Disabled, empty/pending states    |
+| `--ink-inverse` | `#FAFAF7` | Text on dark backgrounds          |
 
 ### Border
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--border` | `#E5E5E0` | Default 1px border |
+| Token             | Value     | Use                            |
+| ----------------- | --------- | ------------------------------ |
+| `--border`        | `#E5E5E0` | Default 1px border             |
 | `--border-strong` | `#A3A3A3` | Heavy dividers, focus outlines |
 
 ### Brand
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--accent` | `#FF6B35` | Primary CTAs, active states, brand color |
-| `--accent-hover` | `#E55A2B` | Primary button hover |
-| `--accent-soft` | `#FFE5D9` | Selected state backgrounds, hover washes |
-| `--accent-ink` | `#1A1A2E` | Text on `--accent` (6.0:1 contrast — white on accent is 2.83:1, fails AA) |
+| Token            | Value     | Use                                                                       |
+| ---------------- | --------- | ------------------------------------------------------------------------- |
+| `--accent`       | `#FF6B35` | Primary CTAs, active states, brand color                                  |
+| `--accent-hover` | `#E55A2B` | Primary button hover                                                      |
+| `--accent-soft`  | `#FFE5D9` | Selected state backgrounds, hover washes                                  |
+| `--accent-ink`   | `#1A1A2E` | Text on `--accent` (6.0:1 contrast — white on accent is 2.83:1, fails AA) |
 
 ### Semantic
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--success` | `#0E7C3A` | Completed states, correct answers, "Keep" decisions |
-| `--success-soft` | `#DCFCE7` | Success backgrounds |
-| `--warning` | `#B45309` | Pending, attention needed |
-| `--warning-soft` | `#FEF3C7` | Warning backgrounds |
-| `--danger` | `#B91C1C` | Errors, destructive actions, wrong answers |
-| `--danger-soft` | `#FEE2E2` | Error backgrounds |
-| `--info` | `#1E40AF` | "Most popular" badge, info accents |
-| `--info-soft` | `#DBEAFE` | Info backgrounds |
+| Token            | Value     | Use                                                 |
+| ---------------- | --------- | --------------------------------------------------- |
+| `--success`      | `#0E7C3A` | Completed states, correct answers, "Keep" decisions |
+| `--success-soft` | `#DCFCE7` | Success backgrounds                                 |
+| `--warning`      | `#B45309` | Pending, attention needed                           |
+| `--warning-soft` | `#FEF3C7` | Warning backgrounds                                 |
+| `--danger`       | `#B91C1C` | Errors, destructive actions, wrong answers          |
+| `--danger-soft`  | `#FEE2E2` | Error backgrounds                                   |
+| `--info`         | `#1E40AF` | "Most popular" badge, info accents                  |
+| `--info-soft`    | `#DBEAFE` | Info backgrounds                                    |
 
 ### Color rule
 
@@ -90,24 +90,24 @@ This document captures the **design only** — layout structures, component patt
 
 ### Families
 
-| Use | Family | Weights |
-|-----|--------|---------|
-| Display + headings | Space Grotesk | 500, 600, 700 |
-| Body + UI labels | Space Grotesk | 400, 500 |
-| Numbers, code, technical data | JetBrains Mono | 400, 500 |
+| Use                           | Family         | Weights       |
+| ----------------------------- | -------------- | ------------- |
+| Display + headings            | Space Grotesk  | 500, 600, 700 |
+| Body + UI labels              | Space Grotesk  | 400, 500      |
+| Numbers, code, technical data | JetBrains Mono | 400, 500      |
 
 ### Scale
 
-| Token | Size | Use |
-|-------|------|-----|
-| `--text-xs` | 0.75rem (12px) | Eyebrow text, badges |
-| `--text-sm` | 0.875rem (14px) | Secondary body, captions |
-| `--text-base` | 1rem (16px) | Default body, form fields |
-| `--text-lg` | 1.125rem (18px) | Lesson body, intro paragraphs |
-| `--text-xl` | 1.375rem (22px) | h3, sub-section titles |
-| `--text-2xl` | 1.75rem (28px) | h2, section titles |
-| `--text-3xl` | 2.25rem (36px) | h1, page titles |
-| `--text-4xl` | 3rem (48px) | Marketing hero only (one per page) |
+| Token         | Size            | Use                                |
+| ------------- | --------------- | ---------------------------------- |
+| `--text-xs`   | 0.75rem (12px)  | Eyebrow text, badges               |
+| `--text-sm`   | 0.875rem (14px) | Secondary body, captions           |
+| `--text-base` | 1rem (16px)     | Default body, form fields          |
+| `--text-lg`   | 1.125rem (18px) | Lesson body, intro paragraphs      |
+| `--text-xl`   | 1.375rem (22px) | h3, sub-section titles             |
+| `--text-2xl`  | 1.75rem (28px)  | h2, section titles                 |
+| `--text-3xl`  | 2.25rem (36px)  | h1, page titles                    |
+| `--text-4xl`  | 3rem (48px)     | Marketing hero only (one per page) |
 
 ### Line height
 
@@ -128,19 +128,19 @@ This document captures the **design only** — layout structures, component patt
 
 4px base unit. Scale: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128`.
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--space-1` | 4px | Inline gaps |
-| `--space-2` | 8px | Tight padding |
-| `--space-3` | 12px | Default padding |
-| `--space-4` | 16px | Card padding, form field gap |
-| `--space-5` | 20px | (reserved) |
-| `--space-6` | 24px | Section gaps, table cell padding |
-| `--space-8` | 32px | Major section gaps, page header padding |
-| `--space-10` | 40px | (reserved) |
-| `--space-12` | 48px | Page top/bottom on desktop |
-| `--space-16` | 64px | Hero gaps, dark CTA section padding |
-| `--space-20` | 80px | Marketing hero top padding |
+| Token        | Value | Use                                     |
+| ------------ | ----- | --------------------------------------- |
+| `--space-1`  | 4px   | Inline gaps                             |
+| `--space-2`  | 8px   | Tight padding                           |
+| `--space-3`  | 12px  | Default padding                         |
+| `--space-4`  | 16px  | Card padding, form field gap            |
+| `--space-5`  | 20px  | (reserved)                              |
+| `--space-6`  | 24px  | Section gaps, table cell padding        |
+| `--space-8`  | 32px  | Major section gaps, page header padding |
+| `--space-10` | 40px  | (reserved)                              |
+| `--space-12` | 48px  | Page top/bottom on desktop              |
+| `--space-16` | 64px  | Hero gaps, dark CTA section padding     |
+| `--space-20` | 80px  | Marketing hero top padding              |
 
 ---
 
@@ -172,6 +172,7 @@ No sidebar. Bottom nav (4 slots: Home, Courses, Tools, Profile). Hamburger menu 
 ### Page header pattern
 
 Every authenticated page has a consistent header:
+
 - H1 (`--text-3xl`)
 - Optional subtitle (`--ink-700`, `--text-base`)
 - Right-aligned action buttons
@@ -283,6 +284,7 @@ Three motions only:
 3. **Color transition** — 120ms, `ease-out`. For hover, focus, active states.
 
 Tokens:
+
 - `--duration-fast: 120ms`
 - `--duration-base: 220ms`
 - `--duration-slow: 400ms`
@@ -312,6 +314,7 @@ Tokens:
 - Sizes: 16px (inline), 20px (button), 24px (nav), 32px (hero)
 
 Common icon mappings (Phosphor name → use):
+
 - `House` — dashboard / home
 - `Books` — courses
 - `Toolbox` — simulators
@@ -464,7 +467,7 @@ FAQ: 3-5 accordion items, --border bottom, --space-4 vertical padding
 ### 9.1 Admin sidebar (240px, --surface-1, --border-right)
 
 ```
-Top: "AMPH Academy" logotype + "Admin" badge (--danger, 11px, --danger-soft bg)
+Top: "Project Amazon PH Academy" logotype + "Admin" badge (--danger, 11px, --danger-soft bg)
 Nav items (in order):
   - Dashboard (House)
   - Users (Users)
@@ -610,6 +613,7 @@ Missing tokens that the design spec requires:
 ### Components to build
 
 `src/components/ui/`:
+
 - `Button.tsx` + `Button.module.css` (primary/secondary/ghost/danger variants, sm/md/lg sizes)
 - `Card.tsx` + `Card.module.css` (default, interactive variants)
 - `Input.tsx` + `Input.module.css` (with label, hint, error)
@@ -637,6 +641,7 @@ Missing tokens that the design spec requires:
 ### ESLint additions
 
 Add to `eslint.config.mjs`:
+
 - `local/no-tailwind-classes` — block Tailwind classes (currently many pages use `className="bg-[var(--surface)]"` etc.)
 - `local/use-design-tokens` — warn on hardcoded hex colors
 
@@ -659,10 +664,10 @@ Steps 1-3 are pure UI prep with no business logic. Step 4 is the route-group ref
 
 ## 15. Files
 
-| File | Purpose |
-|---|---|
-| `docs/ui-specs/DESIGN-SPEC.md` | This document |
-| `docs/ui-specs/STITCH-PROMPTS.md` | The original 1555-line Stitch prompt reference (kept for archive; contains copy) |
-| `docs/ui-specs/refs/` | Reference React/TS files pulled from the parent `amph-v2` repo (admin/users, dashboard, home page) for code patterns |
+| File                              | Purpose                                                                                                              |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `docs/ui-specs/DESIGN-SPEC.md`    | This document                                                                                                        |
+| `docs/ui-specs/STITCH-PROMPTS.md` | The original 1555-line Stitch prompt reference (kept for archive; contains copy)                                     |
+| `docs/ui-specs/refs/`             | Reference React/TS files pulled from the parent `amph-v2` repo (admin/users, dashboard, home page) for code patterns |
 
 The Stitch prompts are kept as a reference but **should not be used directly** as page text — they were written for a different brand. Use them for layout and component patterns only.

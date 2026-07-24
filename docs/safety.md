@@ -1,4 +1,4 @@
-# Safety — AMPH v2 Loop
+# Safety — Project Amazon PH Academy v2 Loop
 
 ## Path Denylist
 

@@ -25,26 +25,26 @@ In an early prototype, the team floated the following AI features:
 
 ## Why They Were Removed
 
-| Reason | Detail |
-|--------|--------|
-| Cost | Per-call API costs make unit economics hostile at our price point. A single chat-heavy user could exceed the ₱2,999 course price in API spend within a week. |
-| Reliability | LLM outputs are not deterministic. A "personalized answer" that contradicts a senior PPC review teaches the wrong thing. |
-| Latency | Chat and vision APIs add 2–8s latency. The 2am rule says: a student waiting 6s for a hint is a student who closes the tab. |
-| Privacy | Course content + user inputs would be sent to third parties. Some inputs are real client data (campaign screenshots). Out of scope for our privacy posture. |
-| Quality control | AMPH teaches a specific way to do PPC. AI outputs would drift, mix in outdated or wrong advice, and confuse students. |
-| Audience trust | Filipino VAs are rightly skeptical of AI marketing. "AI-powered" reads as a red flag, not a feature. |
-| Compliance | Sending user data to LLM providers creates data-residency questions. We don't need the question. |
+| Reason          | Detail                                                                                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Cost            | Per-call API costs make unit economics hostile at our price point. A single chat-heavy user could exceed the ₱2,999 course price in API spend within a week. |
+| Reliability     | LLM outputs are not deterministic. A "personalized answer" that contradicts a senior PPC review teaches the wrong thing.                                     |
+| Latency         | Chat and vision APIs add 2–8s latency. The 2am rule says: a student waiting 6s for a hint is a student who closes the tab.                                   |
+| Privacy         | Course content + user inputs would be sent to third parties. Some inputs are real client data (campaign screenshots). Out of scope for our privacy posture.  |
+| Quality control | Project Amazon PH Academy teaches a specific way to do PPC. AI outputs would drift, mix in outdated or wrong advice, and confuse students.                   |
+| Audience trust  | Filipino VAs are rightly skeptical of AI marketing. "AI-powered" reads as a red flag, not a feature.                                                         |
+| Compliance      | Sending user data to LLM providers creates data-residency questions. We don't need the question.                                                             |
 
 ## What Replaced Each Feature
 
-| Removed feature | Replacement |
-|------------------|-------------|
-| AI mentor chat | (Not replaced. Students ask in Discord, where Ryan and senior VAs answer.) |
-| AI mistake analysis | The 5 simulators. Each gives a deterministic, explainable score with per-check reasons. You can see exactly which rule you broke and why. |
-| AI ad copy generator | The Campaign Builder simulator. Teaches the structure first. Students write the copy in their own portfolio work. |
-| AI listing optimizer | The Listing Audit simulator. Same shape as the mistake-analysis replacement: deterministic checklist, per-section score, concrete fixes. |
+| Removed feature       | Replacement                                                                                                                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| AI mentor chat        | (Not replaced. Students ask in Discord, where Ryan and senior VAs answer.)                                                                      |
+| AI mistake analysis   | The 5 simulators. Each gives a deterministic, explainable score with per-check reasons. You can see exactly which rule you broke and why.       |
+| AI ad copy generator  | The Campaign Builder simulator. Teaches the structure first. Students write the copy in their own portfolio work.                               |
+| AI listing optimizer  | The Listing Audit simulator. Same shape as the mistake-analysis replacement: deterministic checklist, per-section score, concrete fixes.        |
 | AI scenario generator | Admins (Ryan + co-admins) hand-author scenarios. The scenario authoring is part of the curriculum design work. Encoded as JSON in the database. |
-| AI quiz explainer | Each quiz question has a hand-written `explanation` field. Wrong answers route the student to the relevant lesson section. |
+| AI quiz explainer     | Each quiz question has a hand-written `explanation` field. Wrong answers route the student to the relevant lesson section.                      |
 
 ## What This Means in Code
 
@@ -60,6 +60,7 @@ The ESLint rule `local/no-ai-packages` blocks these from `package.json`:
 - Any package whose description contains "LLM" or "language model"
 
 If a future contributor wants to add a real AI feature, they need to:
+
 1. Open a new ADR explaining why the deterministic replacement is insufficient.
 2. Get product sign-off.
 3. Add a `AIFeature` interface in `src/ports/services/AIFeature.ts` (an "AI" port, ironically). Implement with whatever provider.

@@ -5,7 +5,7 @@
 - **Story**: STORY-045
 - **Sprint**: 9 — Certificates + Email
 - **Points**: 1
-**Status:** Done (commit 9e5eb11)
+  **Status:** Done (commit 9e5eb11)
 
 ## Overview
 
@@ -52,16 +52,16 @@ adapter is Resend, SendGrid, or a console-logging fake.
 export interface EmailAttachment {
   filename: string;
   content: Buffer;
-  contentType: string;  // e.g. "application/pdf"
+  contentType: string; // e.g. "application/pdf"
 }
 
 export interface EmailMessage {
-  to: string;                              // recipient email
-  from?: string;                           // override default sender
+  to: string; // recipient email
+  from?: string; // override default sender
   subject: string;
   /** React element rendered server-side by the adapter. */
   react: React.ReactElement;
-  text?: string;                           // optional plain-text fallback
+  text?: string; // optional plain-text fallback
   attachments?: readonly EmailAttachment[];
   tags?: readonly { name: string; value: string }[];
 }
@@ -127,11 +127,13 @@ export class ResendEmailSender implements EmailSender {
         subject: message.subject,
         html,
         text: message.text,
-        attachments: message.attachments?.map(a => ({
+        attachments: message.attachments?.map((a) => ({
           filename: a.filename,
           content: a.content,
         })),
-        tags: message.tags ? Object.fromEntries(message.tags.map(t => [t.name, t.value])) : undefined,
+        tags: message.tags
+          ? Object.fromEntries(message.tags.map((t) => [t.name, t.value]))
+          : undefined,
       });
       if (result.error) {
         return Result.err({ kind: "send_error", message: result.error.message });
@@ -188,19 +190,19 @@ All 6 templates live in `src/infra/email/templates/`. Each is a
 React component that takes a typed props interface.
 
 The shared shell (`EmailLayout`) provides consistent header/footer,
-the AMPH Academy brand, and a center column.
+the Project Amazon PH Academy brand, and a center column.
 
 ### 3.1 `ReceiptEmail`
 
 ```typescript
 export interface ReceiptEmailProps {
   firstName: string;
-  orderNumber: string;     // e.g. "AMPH-2026-000123"
+  orderNumber: string; // e.g. "AMPH-2026-000123"
   courseTitle: string;
   amountMinor: number;
-  currency: string;        // "PHP"
+  currency: string; // "PHP"
   paidAt: Date;
-  receiptUrl: string;      // full URL to the receipt page
+  receiptUrl: string; // full URL to the receipt page
 }
 ```
 
@@ -211,8 +213,8 @@ export interface CertificateEmailProps {
   firstName: string;
   courseTitle: string;
   verificationHash: string;
-  verifyUrl: string;        // e.g. https://amph.example.com/certificates/{hash}
-  pdfBuffer: Buffer;       // attached as application/pdf
+  verifyUrl: string; // e.g. https://amph.example.com/certificates/{hash}
+  pdfBuffer: Buffer; // attached as application/pdf
 }
 ```
 
@@ -248,7 +250,7 @@ export interface EmailVerificationEmailProps {
 ```typescript
 export interface PasswordResetEmailProps {
   firstName: string;
-  resetUrl: string;        // includes token
+  resetUrl: string; // includes token
   expiresInMinutes: number;
 }
 ```
@@ -259,7 +261,7 @@ export interface PasswordResetEmailProps {
 export interface LiveClassReminderEmailProps {
   firstName: string;
   classTitle: string;
-  startsAt: Date;          // local time, formatted in template
+  startsAt: Date; // local time, formatted in template
   joinUrl: string;
   minutesUntilStart: number; // 60, 30, 15, etc.
 }
@@ -272,7 +274,7 @@ export interface LiveClassReminderEmailProps {
 emailSender: EmailSender;
 ```
 
-- **prod:** `new ResendEmailSender(process.env.RESEND_API_KEY, "AMPH Academy <noreply@amph.example.com>")`
+- **prod:** `new ResendEmailSender(process.env.RESEND_API_KEY, "Project Amazon PH Academy <noreply@amph.example.com>")`
 - **test:** `new InMemoryEmailSender()`
 
 Both expose `emailSender` on the container.
@@ -283,6 +285,7 @@ Both expose `emailSender` on the container.
 
 Run the same test suite against both adapters to prove they both
 satisfy the `EmailSender` contract. Pattern:
+
 - sends successfully
 - returns invalid_recipient for bad email
 - returns invalid_subject for empty subject
@@ -302,30 +305,30 @@ that the template doesn't crash and includes the key info.
 
 ## 6. Files
 
-| File | Change |
-|---|---|
-| `docs/stories/STORY-045.md` | New — this doc |
-| `package.json` | Add `@react-email/components` |
-| `src/ports/email/EmailSender.ts` | New — port |
-| `src/infra/email/ResendEmailSender.ts` | New — prod adapter |
-| `src/infra/email/InMemoryEmailSender.ts` | New — test fake |
-| `src/infra/email/templates/EmailLayout.tsx` | New — shared shell |
-| `src/infra/email/templates/ReceiptEmail.tsx` | New |
-| `src/infra/email/templates/CertificateEmail.tsx` | New |
-| `src/infra/email/templates/RefundEmail.tsx` | New |
-| `src/infra/email/templates/EmailVerificationEmail.tsx` | New |
-| `src/infra/email/templates/PasswordResetEmail.tsx` | New |
-| `src/infra/email/templates/LiveClassReminderEmail.tsx` | New |
-| `src/composition/container.ts` | Wire `emailSender` |
-| `tests/unit/email/InMemoryEmailSender.test.ts` | New — port contract |
-| `tests/unit/email/ResendEmailSender.test.ts` | New — port contract |
-| `tests/unit/email/templates/ReceiptEmail.test.ts` | New — render test |
-| `tests/unit/email/templates/CertificateEmail.test.ts` | New — render test |
-| `tests/unit/email/templates/RefundEmail.test.ts` | New — render test |
-| `tests/unit/email/templates/EmailVerificationEmail.test.ts` | New — render test |
-| `tests/unit/email/templates/PasswordResetEmail.test.ts` | New — render test |
-| `tests/unit/email/templates/LiveClassReminderEmail.test.ts` | New — render test |
-| `tests/unit/composition/container.test.ts` | Add wiring test |
+| File                                                        | Change                        |
+| ----------------------------------------------------------- | ----------------------------- |
+| `docs/stories/STORY-045.md`                                 | New — this doc                |
+| `package.json`                                              | Add `@react-email/components` |
+| `src/ports/email/EmailSender.ts`                            | New — port                    |
+| `src/infra/email/ResendEmailSender.ts`                      | New — prod adapter            |
+| `src/infra/email/InMemoryEmailSender.ts`                    | New — test fake               |
+| `src/infra/email/templates/EmailLayout.tsx`                 | New — shared shell            |
+| `src/infra/email/templates/ReceiptEmail.tsx`                | New                           |
+| `src/infra/email/templates/CertificateEmail.tsx`            | New                           |
+| `src/infra/email/templates/RefundEmail.tsx`                 | New                           |
+| `src/infra/email/templates/EmailVerificationEmail.tsx`      | New                           |
+| `src/infra/email/templates/PasswordResetEmail.tsx`          | New                           |
+| `src/infra/email/templates/LiveClassReminderEmail.tsx`      | New                           |
+| `src/composition/container.ts`                              | Wire `emailSender`            |
+| `tests/unit/email/InMemoryEmailSender.test.ts`              | New — port contract           |
+| `tests/unit/email/ResendEmailSender.test.ts`                | New — port contract           |
+| `tests/unit/email/templates/ReceiptEmail.test.ts`           | New — render test             |
+| `tests/unit/email/templates/CertificateEmail.test.ts`       | New — render test             |
+| `tests/unit/email/templates/RefundEmail.test.ts`            | New — render test             |
+| `tests/unit/email/templates/EmailVerificationEmail.test.ts` | New — render test             |
+| `tests/unit/email/templates/PasswordResetEmail.test.ts`     | New — render test             |
+| `tests/unit/email/templates/LiveClassReminderEmail.test.ts` | New — render test             |
+| `tests/unit/composition/container.test.ts`                  | Add wiring test               |
 
 ## 7. Design Decisions
 
@@ -345,7 +348,7 @@ that the template doesn't crash and includes the key info.
   setup, deferrable. Dev can call `InMemoryEmailSender` (which is
   what the test container uses) and inspect the `.sent` array.
 - **Shared `EmailLayout` template** — consistent header/footer/brand
-  across all 6 emails. AMPH navy + accent orange, matching the
+  across all 6 emails. Project Amazon PH Academy navy + accent orange, matching the
   certificate design.
 - **Validation is the adapter's job** — `invalid_recipient` and
   `invalid_subject` are caught before calling the provider. This

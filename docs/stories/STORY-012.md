@@ -111,10 +111,10 @@ checks, and `generateMetadata` for SEO.
 - **File I/O** — STORY-013's import script + the future lesson page
   read `.mdx` files from disk and pass the source to the renderer.
 - **Custom MDX components** (e.g. a `<Callout>` component that
-  renders with AMPH branding) — the renderer accepts a `components`
+  renders with Project Amazon PH Academy branding) — the renderer accepts a `components`
   prop, but the actual component map is a lesson-page concern.
 - **Frontmatter validation** — the renderer parses YAML but does not
-  validate it against the AMPH lesson schema. STORY-013 will validate
+  validate it against the Project Amazon PH Academy lesson schema. STORY-013 will validate
   in the import script.
 
 ## Definition of Done
