@@ -652,3 +652,82 @@ model SentReminder {
   @@index([liveClassId])
   @@map("sent_reminders")
 }
+
+// ── STORY-064: Simulator Attempts ─────────────────────────────────
+
+model SimulatorAttempt {
+  id               String   @id
+  attemptId        String   @unique // human-readable, e.g. "ATT-A1B2C3"
+  userId           String
+  simulatorId       String
+  scenarioId       String
+  scenarioVersion  Int      @default(1)
+  difficulty       String   // beginner | intermediate | advanced
+  mode             String   @default("practice")
+  status           String   @default("in_progress") // in_progress | submitted | graded | expired
+  seed             String?
+  score            Int?
+  scoreDimensions  Json?
+  startedAt        DateTime @default(now())
+  submittedAt      DateTime?
+  gradedAt         DateTime?
+  decisions        SimulatorDecision[]
+
+  @@index([userId])
+  @@index([simulatorId])
+  @@index([status])
+  @@index([userId, simulatorId, status])
+  @@map("simulator_attempts")
+}
+
+model SimulatorDecision {
+  id           String   @id
+  attemptId    String
+  attempt      SimulatorAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  revision     Int      @default(1)
+  decisionData Json
+  submittedAt  DateTime @default(now())
+
+  @@unique([attemptId, revision])
+  @@map("simulator_decisions")
+}
+
+
+// ── STORY-065: Scoring Engine ───────────────────────────────────────────
+
+model ScorePolicy {
+  id              String   @id @default(cuid())
+  simulatorId     String
+  difficulty      String
+  mode            String
+  /** JSON: Record<string, { weight: number; passingThreshold: number }> */
+  dimensionConfig Json
+  passingScore    Int      @default(70)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([simulatorId, difficulty, mode])
+  @@index([simulatorId])
+  @@map("score_policies")
+}
+
+// ── STORY-066: Feedback Composer ─────────────────────────────────────────────
+
+model AttemptFeedback {
+  id               String   @id @default(cuid())
+  attemptId        String   @unique
+  userId           String
+  simulatorId      String
+  scenarioId       String
+  difficulty       String
+  mode             String
+  overallScore     Int
+  passed           Boolean
+  overallComment   String
+  remediationLinks Json
+  dimensionFeedback Json
+  completedAt      DateTime @default(now())
+
+  @@index([userId])
+  @@map("attempt_feedbacks")
+}

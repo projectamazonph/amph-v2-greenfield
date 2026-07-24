@@ -1,26 +1,17 @@
 /**
- * SignupForm — the client component for the /signup page.
+ * SignupForm — pure HTML form that POSTs to /api/auth/signup.
  *
- * Lives in its own file so the parent page (a server component) can
- * wrap it in <Suspense> (required for any client component that
- * consumes useSearchParams during static prerender).
+ * STORY-066 refactor: see LoginForm for the rationale. The previous
+ * implementation used useActionState + useRouter + useEffect, which
+ * had a Next.js 16 / React 19 NEXT_REDIRECT pitfall. Now it's a plain
+ * HTML form pointing at a Route Handler — the browser handles the
+ * 303 redirect, no client state machine required.
  *
- * Mirrors src/app/login/LoginForm.tsx in shape.
- *
- * STORY-046 follow-up: the form posts to `signUpAndRedirect`, a
- * server action that calls Next's `redirect()` directly on both
- * success (to /dashboard) and failure (back to /signup?error=...).
- * This client component does NOT use useActionState, useEffect, or
- * useRouter. Those broke the SSR unit test (useRouter isn't mounted
- * under renderToString) and the E2E test (client-side router.push
- * didn't carry the auth cookie to /dashboard).
+ * Pure presentational. Receives `errorKind` (from the parent server
+ * component's searchParams) as a prop.
  */
 
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { signUpAndRedirect } from "../actions/signup.action";
 import { Button } from "@/components/ui";
 import { Input } from "@/components/ui";
 import styles from "./signup.module.css";
@@ -36,15 +27,12 @@ const errorMessage: Record<string, string> = {
   rate_limited: "Too many attempts. Please wait a few minutes before trying again.",
 };
 
-export function SignupForm() {
-  const params = useSearchParams();
-  const errorKind = params.get("error");
+export function SignupForm({ errorKind }: { errorKind: string | null }) {
   const errorText = errorKind ? (errorMessage[errorKind] ?? null) : null;
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        {/* Header */}
         <div className={styles.header}>
           <div className={styles.logo}>Project Amazon PH Academy</div>
           <h1 className={styles.title}>Create your account</h1>
@@ -53,7 +41,6 @@ export function SignupForm() {
           </p>
         </div>
 
-        {/* Error alert — only when the server action redirected back with ?error=... */}
         {errorText && (
           <div className="alert alert-error">
             {errorKind === "email_taken" ? (
@@ -70,8 +57,7 @@ export function SignupForm() {
           </div>
         )}
 
-        {/* Form */}
-        <form action={signUpAndRedirect} className={styles.form}>
+        <form method="POST" action="/api/auth/signup" className={styles.form}>
           <div className={styles.row}>
             <Input
               name="firstName"
@@ -120,7 +106,6 @@ export function SignupForm() {
           </Button>
         </form>
 
-        {/* Footer */}
         <p className={styles.footer}>
           Already have an account?{" "}
           <Link href="/login" className={styles.link}>

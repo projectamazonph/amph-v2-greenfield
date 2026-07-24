@@ -59,6 +59,8 @@ import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCert
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
+import { InMemoryScorePolicyRepository } from "@/infra/repositories/InMemoryScorePolicyRepository";
+import { InMemoryAttemptFeedbackRepository } from "@/infra/repositories/InMemoryAttemptFeedbackRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
@@ -142,10 +144,11 @@ import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
 import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
 import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
-// STORY-064: simulator attempt use cases
 import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
+import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
+import { ComposeAttemptFeedback } from "@/usecases/ComposeAttemptFeedback";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
 import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
@@ -185,8 +188,9 @@ export interface TestContainer extends AppContainer {
   accessPolicy: StubAccessPolicy;
   auditLog: InMemoryAuditLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
-  // STORY-064: simulator attempt repo
   simulatorAttemptRepo: InMemorySimulatorAttemptRepository;
+  scorePolicyRepo: InMemoryScorePolicyRepository;
+  feedbackRepo: InMemoryAttemptFeedbackRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   pricingTierRepo: InMemoryPricingTierRepository;
   sentReminderRepo: InMemorySentReminderRepository;
@@ -241,6 +245,10 @@ export function buildTestContainer(): TestContainer {
   const scenarioRepo = new InMemorySimulatorScenarioRepository();
   // STORY-064: simulator attempt repo
   const simulatorAttemptRepo = new InMemorySimulatorAttemptRepository();
+  // STORY-065: scoring engine
+  const scorePolicyRepo = new InMemoryScorePolicyRepository();
+  // STORY-066: feedback composer
+  const feedbackRepo = new InMemoryAttemptFeedbackRepository();
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
   // STORY-011: pricing tier repo
@@ -420,14 +428,16 @@ export function buildTestContainer(): TestContainer {
     listAuditLogs,
     exportAuditLogs,
     scenarioRepo,
+    simulatorAttemptRepo,
+    scorePolicyRepo,
+    feedbackRepo,
     // STORY-050b: simulator scenario CRUD
     adminListScenarios: new AdminListScenarios({ scenarioRepo }),
     getSimulatorScenario: new GetSimulatorScenario({ scenarioRepo }),
     createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
-    // STORY-064: simulator attempt use cases
-    simulatorAttemptRepo,
+    // STORY-064: simulator attempt lifecycle
     startSimulatorAttempt: new StartSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
       scenarioRepo,
@@ -435,11 +445,16 @@ export function buildTestContainer(): TestContainer {
       clock,
       recordAuditLog,
     }),
-    saveSimulatorDecision: new SaveSimulatorDecision({
+    saveSimulatorDecision: new SaveSimulatorDecision({ attemptRepo: simulatorAttemptRepo }),
+    submitSimulatorAttempt: new SubmitSimulatorAttempt({ attemptRepo: simulatorAttemptRepo }),
+    gradeSimulatorAttempt: new GradeSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
     }),
-    submitSimulatorAttempt: new SubmitSimulatorAttempt({
+    composeAttemptFeedback: new ComposeAttemptFeedback({
       attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
+      feedbackRepo,
     }),
     // STORY-050c
     liveClassRepo,

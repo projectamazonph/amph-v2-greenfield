@@ -1,37 +1,73 @@
 /**
- * /signup — initial render contract.
+ * /signup — page render contract.
  *
- * A visitor has not submitted the form yet, so the first paint must not
- * present a validation error. This prevents a confusing, visually noisy
- * alert at the top of the account-creation card.
+ * A visitor who has not submitted the form must not see a validation
+ * error on first paint. The page also must pass `?error=...` through
+ * to <SignupForm /> so the form can render the right alert.
  *
- * STORY-046 follow-up: the page is now a thin server component that
- * renders <Suspense><SignupForm /></Suspense>. The SignupForm client
- * component is mocked here because (a) it calls useSearchParams (which
- * throws under renderToString without the Next router context) and
- * (b) the form's submit behavior is fully covered by the E2E test
- * (tests/e2e/signup.spec.ts) and the action's unit tests
- * (src/app/actions/__tests__/signup.action.test.ts).
+ * STORY-066 follow-up: the page is now a server component that reads
+ * `?error=...` from searchParams (server-side) and passes it to
+ * `<SignupForm />` as a prop. The form is a client component, but
+ * we mock it here because (a) it's the form's job to render the
+ * alert, not the page's, and (b) the form's submit behavior is
+ * fully covered by the E2E test (tests/e2e/signup.spec.ts).
+ *
+ * We render via `renderToReadableStream` (React 19 async SSR).
  */
 
 import { createElement } from "react";
-import { renderToString } from "react-dom/server";
+import { renderToReadableStream } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-// Mock the form so renderToString doesn't trip on useSearchParams
-// (which requires the Next.js router context, unavailable in node:test).
+// Spy on the form so we can assert on the props the page passes
+// (which is the page's only job: turn the URL into props).
+const signupFormSpy = vi.fn((_props: { errorKind: string | null }) =>
+  createElement("div", null, createElement("h1", null, "Create your account")),
+);
+
 vi.mock("../SignupForm", () => ({
-  SignupForm: () => createElement("div", null, createElement("h1", null, "Create your account")),
+  SignupForm: (props: { errorKind: string | null }) => {
+    signupFormSpy(props);
+    return createElement("div", null, createElement("h1", null, "Create your account"));
+  },
 }));
 
 import SignUpPage from "../page";
 
+async function renderPage(searchParams: Record<string, string> = {}) {
+  signupFormSpy.mockClear();
+  const element = createElement(SignUpPage, { searchParams: Promise.resolve(searchParams) });
+  const stream = await renderToReadableStream(element);
+  const reader = stream.getReader();
+  let html = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    html += new TextDecoder().decode(value);
+  }
+  return html;
+}
+
 describe("/signup", () => {
-  it("does not show a validation error before the student submits", () => {
-    const html = renderToString(createElement(SignUpPage));
+  it("does not show a validation error on first paint", async () => {
+    const html = await renderPage();
 
     expect(html).toContain("Create your account");
     expect(html).not.toContain("Please fill in all fields.");
     expect(html).not.toContain("alert-error");
+  });
+
+  it("passes ?error= through to SignupForm as errorKind", async () => {
+    await renderPage({ error: "email_taken" });
+
+    expect(signupFormSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ errorKind: "email_taken" }),
+    );
+  });
+
+  it("passes errorKind=null when no error is set", async () => {
+    await renderPage();
+
+    expect(signupFormSpy).toHaveBeenCalledWith(expect.objectContaining({ errorKind: null }));
   });
 });
