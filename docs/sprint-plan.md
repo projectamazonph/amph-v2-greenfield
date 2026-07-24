@@ -157,25 +157,34 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 - Smoke tests: `/` → 200, `/signup` → 200, `/login` → 200, `/dashboard` → 307 (redirect)
 - Remaining operator items: PayMongo webhook endpoint, first admin user, custom domain, full signup→checkout smoke test, DB backup/restore drill, security audit, launch comms.
 
+## Sprint 13 — Admin Panel Round 2 (5 pts)
+
+| ID        | Title                                | Pts | Status     |
+| --------- | ------------------------------------ | --- | ---------- |
+| STORY-061 | Admin audit log viewer + CSV export  | 1   | ⏳ Planned |
+| STORY-062 | Admin refund requests list + process | 1   | ⏳ Planned |
+| STORY-063 | Admin email templates                | 1   | ⏳ Planned |
+| STORY-064 | (to be added)                        | 1   | ⏳ Planned |
+| STORY-065 | (to be added)                        | 1   | ⏳ Planned |
+
 ---
 
-## Capacity & Velocity Context
-
-| Sprint    | Pts    | Story pattern                                                                                                                                      |
-| --------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| S1        | 5      | Foundation + first vertical slice (5 × 1pt)                                                                                                        |
-| S2        | 5      | Auth (5 × 1pt)                                                                                                                                     |
-| S3        | 5      | Catalog + content (5 × 1pt)                                                                                                                        |
-| S4        | 5      | PayMongo + checkout (5 × 1pt)                                                                                                                      |
-| S5        | 5      | Enrollment + access + refund (5 × 1pt)                                                                                                             |
-| S6        | 5      | Lessons + progress (5 × 1pt)                                                                                                                       |
-| S7        | 5      | Quizzes + badges (5 × 1pt)                                                                                                                         |
-| S8        | 5      | Simulators (5 × 1pt; STORY-040 packs 2)                                                                                                            |
-| S9        | 5      | Certificates + email (5 × 1pt)                                                                                                                     |
-| S10       | 5      | Admin (STORY-046, 047, 048a, 048b, 048c, 049, 050a, 050b, 050c, 050d, 050e = 11 × 1pt; STORY-048 split into a/b/c, STORY-050 split into a/b/c/d/e) |
-| S11       | 5      | Observability + tests (5 × 1pt)                                                                                                                    |
-| S12       | 5      | Launch (5 × 1pt)                                                                                                                                   |
-| **Total** | **60** |                                                                                                                                                    |
+| Sprint    | Pts     | Story pattern                                                                                                                                      |
+| --------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S1        | 5       | Foundation + first vertical slice (5 × 1pt)                                                                                                        |
+| S2        | 5       | Auth (5 × 1pt)                                                                                                                                     |
+| S3        | 5       | Catalog + content (5 × 1pt)                                                                                                                        |
+| S4        | 5       | PayMongo + checkout (5 × 1pt)                                                                                                                      |
+| S5        | 5       | Enrollment + access + refund (5 × 1pt)                                                                                                             |
+| S6        | 5       | Lessons + progress (5 × 1pt)                                                                                                                       |
+| S7        | 5       | Quizzes + badges (5 × 1pt)                                                                                                                         |
+| S8        | 5       | Simulators (5 × 1pt; STORY-040 packs 2)                                                                                                            |
+| S9        | 5       | Certificates + email (5 × 1pt)                                                                                                                     |
+| S10       | 5       | Admin (STORY-046, 047, 048a, 048b, 048c, 049, 050a, 050b, 050c, 050d, 050e = 11 × 1pt; STORY-048 split into a/b/c, STORY-050 split into a/b/c/d/e) |
+| S11       | 5       | Observability + tests (5 × 1pt)                                                                                                                    |
+| S12       | 5       | Launch (5 × 1pt)                                                                                                                                   |
+| S13       | 5       | Admin panel round 2 (STORY-061, 062, 063 = 3 × 1pt; add more stories as planned)                                                                   |
+| **Total** | **60+** |                                                                                                                                                    |
 
 Per-sprint velocity: 5 points. The pack-stories (STORY-040, STORY-050) are honest about the larger scope; if they prove too big, split during planning. STORY-048 and STORY-050 were both split into multiple 1-pt stories to keep each PR within budget.
 
