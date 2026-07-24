@@ -70,13 +70,13 @@ export function BidElevatorResult({ result, targetRoas }: Props) {
           </thead>
           <tbody>
             {result.bids.map((b) => {
-              const delta = b.suggestedBid - b.currentBid;
+              const delta = b.groundTruth - b.currentBid;
               return (
                 <tr key={b.keyword}>
                   <td className={styles.tdKw}>{b.keyword}</td>
                   <td className={styles.tdNum}>{b.volume.toLocaleString()}</td>
                   <td className={styles.tdNum}>₱{b.currentBid.toFixed(2)}</td>
-                  <td className={styles.tdNumStrong}>₱{b.suggestedBid.toFixed(2)}</td>
+                  <td className={styles.tdNumStrong}>₱{b.groundTruth.toFixed(2)}</td>
                   <td
                     className={styles.tdNum}
                     style={{
