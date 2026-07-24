@@ -166,17 +166,18 @@ const POLICIES: PolicyDef[] = [
   },
 
   // ── Campaign Builder ──────────────────────────────────────────────────
+  // Dimensions: structureQuality (40%), budgetAllocation (30%), keywordRelevance (20%), explanation (10%)
   {
     id: "policy-campaign-builder-beginner-practice",
     simulatorId: "campaign-builder",
     difficulty: "beginner",
     mode: "practice",
     dimensionConfig: {
-      direction: { weight: 0.35, passingThreshold: 70 },
-      profitability: { weight: 0.35, passingThreshold: 70 },
-      dataSufficiency: { weight: 0.3, passingThreshold: 70 },
+      structureQuality: { weight: 0.4, passingThreshold: 50 },
+      budgetAllocation: { weight: 0.3, passingThreshold: 50 },
+      keywordRelevance: { weight: 0.2, passingThreshold: 50 },
     },
-    passingScore: 70,
+    passingScore: 50,
   },
   {
     id: "policy-campaign-builder-intermediate-practice",
@@ -184,12 +185,11 @@ const POLICIES: PolicyDef[] = [
     difficulty: "intermediate",
     mode: "practice",
     dimensionConfig: {
-      direction: { weight: 0.3, passingThreshold: 72 },
-      profitability: { weight: 0.4, passingThreshold: 72 },
-      dataSufficiency: { weight: 0.2, passingThreshold: 72 },
-      explanation: { weight: 0.1, passingThreshold: 70 },
+      structureQuality: { weight: 0.4, passingThreshold: 65 },
+      budgetAllocation: { weight: 0.3, passingThreshold: 65 },
+      keywordRelevance: { weight: 0.2, passingThreshold: 65 },
     },
-    passingScore: 72,
+    passingScore: 65,
   },
   {
     id: "policy-campaign-builder-advanced-practice",
@@ -197,12 +197,12 @@ const POLICIES: PolicyDef[] = [
     difficulty: "advanced",
     mode: "practice",
     dimensionConfig: {
-      direction: { weight: 0.25, passingThreshold: 75 },
-      profitability: { weight: 0.35, passingThreshold: 75 },
-      dataSufficiency: { weight: 0.2, passingThreshold: 72 },
-      explanation: { weight: 0.2, passingThreshold: 72 },
+      structureQuality: { weight: 0.4, passingThreshold: 80 },
+      budgetAllocation: { weight: 0.3, passingThreshold: 80 },
+      keywordRelevance: { weight: 0.2, passingThreshold: 80 },
+      explanation: { weight: 0.1, passingThreshold: 70 },
     },
-    passingScore: 75,
+    passingScore: 80,
   },
 
   // ── Listing Audit ─────────────────────────────────────────────────────
