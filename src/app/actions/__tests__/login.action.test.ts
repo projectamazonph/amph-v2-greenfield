@@ -153,7 +153,11 @@ describe("performLogin", () => {
       deps,
     );
 
-    expect(result).toEqual({ kind: "success", redirectTo: "/admin/users" });
+    expect(result).toEqual({
+      kind: "success",
+      redirectTo: "/admin/users",
+      userId: "u-u@test.example.com",
+    });
     expect(deps.plantCookie).toHaveBeenCalledTimes(1);
     const plantCall = deps.plantCookie.mock.calls[0];
     expect(plantCall).toBeDefined();
@@ -174,7 +178,11 @@ describe("performLogin", () => {
       },
       deps,
     );
-    expect(result).toEqual({ kind: "success", redirectTo: "/courses" });
+    expect(result).toEqual({
+      kind: "success",
+      redirectTo: "/courses",
+      userId: "u-u@test.example.com",
+    });
   });
 
   it("rejects //evil.com protocol-relative URLs", async () => {
@@ -195,7 +203,11 @@ describe("performLogin", () => {
     // //evil.com) means the open-redirect defense is working as
     // intended because the safeRedirect check rejects anything
     // starting with `//`.
-    expect(result).toEqual({ kind: "success", redirectTo: "/courses" });
+    expect(result).toEqual({
+      kind: "success",
+      redirectTo: "/courses",
+      userId: "u-u@test.example.com",
+    });
   });
 
   it("uses separate documented email and IP buckets before attempting login", async () => {

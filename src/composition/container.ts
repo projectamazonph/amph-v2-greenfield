@@ -193,6 +193,9 @@ import { AdminListPayments } from "@/usecases/AdminListPayments";
 import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
+// STORY-062: refund request list + process
+import { ListRefundRequests } from "@/usecases/ListRefundRequests";
+import { AdminProcessRefund } from "@/usecases/AdminProcessRefund";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { ListAuditLogs } from "@/usecases/ListAuditLogs";
 import { ExportAuditLogs } from "@/usecases/ExportAuditLogs";
@@ -337,6 +340,9 @@ export interface AppContainer {
   adminGetPayment: AdminGetPayment;
   processRefund: ProcessRefund;
   refundOverride: RefundOverride;
+  // STORY-062: admin refund request list + process
+  listRefundRequests: ListRefundRequests;
+  adminProcessRefund: AdminProcessRefund;
   // STORY-050a: audit log
   recordAuditLog: RecordAuditLog;
   // STORY-061: audit log viewer + CSV export
@@ -449,6 +455,13 @@ function buildProductionContainer(): AppContainer {
     process.env.UPSTASH_REDIS_REST_URL ?? "",
     process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
   );
+
+  // STORY-049 + STORY-062: build RefundOverride once. Both the
+  // `refundOverride` container entry and `adminProcessRefund` (which
+  // delegates to it) share the same instance — that keeps a single
+  // audit-log context and avoids two RefundOverride objects racing
+  // over the same recordAuditLog port.
+  const refundOverride = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
 
   return {
     clock,
@@ -613,7 +626,10 @@ function buildProductionContainer(): AppContainer {
     adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
     processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
-    refundOverride: new RefundOverride({ orderRepo, paymentGateway, recordAuditLog }),
+    refundOverride,
+    // STORY-062: admin refund request list + process
+    listRefundRequests: new ListRefundRequests({ orderRepo, userRepo }),
+    adminProcessRefund: new AdminProcessRefund({ orderRepo, refundOverride }),
     auditLog,
     recordAuditLog,
     listAuditLogs,

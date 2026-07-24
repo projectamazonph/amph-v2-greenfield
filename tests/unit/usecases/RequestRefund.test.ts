@@ -11,13 +11,17 @@ const OTHER_USER_ID = "user_02";
 const ORDER_ID = "ord_test";
 const REASON = "Course didn't meet expectations";
 
-function makeOrderRepo(findById: () => Result<Order, { kind: string }> | Promise<Result<Order, { kind: string }>>): IOrderRepository {
+function makeOrderRepo(
+  findById: () => Result<Order, { kind: string }> | Promise<Result<Order, { kind: string }>>,
+): IOrderRepository {
   return {
     create: vi.fn(),
     findById: findById as IOrderRepository["findById"],
     findByPaymongoPaymentId: vi.fn(),
     findByUserId: vi.fn(),
     listAll: vi.fn(),
+    // STORY-062: refund request list
+    listRefundRequests: vi.fn(),
     update: vi.fn(async (order: Order) => Result.ok(order)),
     findPaidForUserAndCourse: vi.fn(async () => Result.ok(null)),
   };

@@ -63,7 +63,7 @@ async function clientIp(): Promise<string | undefined> {
  * just hadn't been migrated.
  */
 export type LoginResult =
-  | { kind: "success"; redirectTo: string }
+  | { kind: "success"; redirectTo: string; userId: string }
   | { kind: "redirect_to_login"; errorKind: string }
   | { kind: "invalid_input" }
   | { kind: "rate_limited"; retryAfterSeconds: number };
@@ -125,7 +125,7 @@ export async function performLogin(
   }
 
   await deps.plantCookie(result.sessionToken, result.expiresAt);
-  return { kind: "success", redirectTo: safeRedirect };
+  return { kind: "success", redirectTo: safeRedirect, userId: result.userId };
 }
 
 /**

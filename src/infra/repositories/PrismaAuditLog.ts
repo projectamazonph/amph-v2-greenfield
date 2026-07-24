@@ -64,6 +64,12 @@ export class PrismaAuditLog implements IAuditLog {
 
     // Decode cursor: "{occurredAt.toISOString()}::{id}"
     // (double-colon separator avoids collision with ISO timestamp colons)
+    // The AuditLog model only has `id` as a unique field, so Prisma's
+    // built-in cursor mechanism can't be used for the (createdAt desc,
+    // id desc) compound sort. Instead we translate the cursor into a
+    // where-clause filter: "give me rows that sort strictly before the
+    // cursor position" — this is the standard pattern for keyset
+    // pagination when only one of the sort columns is unique.
     let cursorId: string | undefined;
     let cursorCreatedAt: Date | undefined;
     if (filters.cursor) {
@@ -75,11 +81,17 @@ export class PrismaAuditLog implements IAuditLog {
       }
     }
 
-    const cursor =
-      cursorId && cursorCreatedAt
-        ? { id_createdAt: { id: cursorId, createdAt: cursorCreatedAt } }
-        : undefined;
-    const skip = cursor ? 1 : undefined;
+    if (cursorId && cursorCreatedAt && !Number.isNaN(cursorCreatedAt.getTime())) {
+      // Compound (createdAt desc, id desc): "strictly before" means
+      // either an earlier createdAt, OR the same createdAt with a
+      // lexicographically smaller id.
+      where.OR = [
+        { createdAt: { lt: cursorCreatedAt } },
+        {
+          AND: [{ createdAt: cursorCreatedAt }, { id: { lt: cursorId } }],
+        },
+      ];
+    }
 
     try {
       // Run findMany + count in parallel
@@ -88,8 +100,6 @@ export class PrismaAuditLog implements IAuditLog {
           where,
           orderBy: [{ createdAt: "desc" }, { id: "desc" }],
           take: limit,
-          skip,
-          cursor,
         }),
         this.db.auditLog.count({ where }),
       ]);

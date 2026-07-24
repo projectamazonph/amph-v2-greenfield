@@ -711,6 +711,21 @@ model ScorePolicy {
   @@map("score_policies")
 }
 
+// ── STORY-063: Email Templates ──────────────────────────────────────────────
+
+model EmailTemplate {
+  id         String   @id @default(cuid())
+  type       String   @unique  // EmailTemplateType discriminator (one row per type)
+  subject    String
+  headline   String
+  introBody  String
+  ctaLabel   String
+  updatedAt  DateTime @updatedAt
+  updatedById String
+
+  @@map("email_templates")
+}
+
 // ── STORY-066: Feedback Composer ─────────────────────────────────────────────
 
 model AttemptFeedback {

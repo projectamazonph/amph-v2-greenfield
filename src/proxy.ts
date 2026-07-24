@@ -25,7 +25,22 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { buildContainer } from "@/composition/container";
 
-const PROTECTED_PREFIXES = ["/dashboard", "/admin", "/enroll", "/order"];
+const PROTECTED_PREFIXES = ["/dashboard/", "/admin/", "/enroll/", "/order/"];
+const PROTECTED_EXACT = ["/dashboard", "/enroll", "/order"];
+
+/** Paths that look like /admin but are the admin login page itself. */
+const ADMIN_LOGIN_PREFIXES = ["/admin-login", "/api/auth/admin-login"];
+
+function isProtectedPath(pathname: string): boolean {
+  if (PROTECTED_EXACT.includes(pathname)) return true;
+  if (pathname === "/admin") return true; // bare /admin → admin login
+  if (PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) return true;
+  return false;
+}
+
+function isAdminLoginPath(pathname: string): boolean {
+  return ADMIN_LOGIN_PREFIXES.some((p) => pathname.startsWith(p));
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -36,15 +51,10 @@ export async function proxy(request: NextRequest) {
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=()",
-  );
+  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
 
   // ── Route protection ─────────────────────────────────────
-  const isProtected = PROTECTED_PREFIXES.some((p) =>
-    pathname.startsWith(p),
-  );
+  const isProtected = isProtectedPath(pathname) && !isAdminLoginPath(pathname);
 
   if (isProtected) {
     const sessionToken =
@@ -52,8 +62,12 @@ export async function proxy(request: NextRequest) {
       request.cookies.get("__Secure-amph_session")?.value;
 
     if (!sessionToken) {
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("redirect", pathname);
+      // Admin routes → admin login. Other routes → regular login.
+      const loginPath = pathname.startsWith("/admin") ? "/admin-login" : "/login";
+      const loginUrl = new URL(loginPath, request.url);
+      if (loginPath === "/login") {
+        loginUrl.searchParams.set("redirect", pathname);
+      }
       return NextResponse.redirect(loginUrl);
     }
 
@@ -68,11 +82,10 @@ export async function proxy(request: NextRequest) {
     const result = await jwt.verify(sessionToken);
 
     if (!result.ok) {
-      // Token invalid or expired — redirect to login
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("redirect", pathname);
+      // Token invalid or expired — clear cookie + redirect
+      const loginPath = pathname.startsWith("/admin") ? "/admin-login" : "/login";
+      const loginUrl = new URL(loginPath, request.url);
       const redirectRes = NextResponse.redirect(loginUrl);
-      // Clear the invalid cookie
       redirectRes.cookies.delete("amph_session");
       redirectRes.cookies.delete("__Secure-amph_session");
       return redirectRes;

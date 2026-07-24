@@ -7,6 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
+import type { AuditLogPage } from "@/ports/repositories/IAuditLog";
 
 function makeMockPrisma(overrides: Record<string, unknown> = {}) {
   return {
@@ -23,6 +24,11 @@ function makeMockPrisma(overrides: Record<string, unknown> = {}) {
   };
 }
 
+function getOk(r: { ok: true; value: AuditLogPage } | { ok: false; error: unknown }): AuditLogPage {
+  if (!r.ok) throw new Error("Unexpected error: " + String(r.error));
+  return r.value;
+}
+
 describe("PrismaAuditLog.list", () => {
   it("returns empty page when no rows match", async () => {
     const mockDb = makeMockPrisma();
@@ -33,9 +39,10 @@ describe("PrismaAuditLog.list", () => {
     const r = await repo.list({});
 
     expect(r.ok).toBe(true);
-    expect(r.value.entries).toHaveLength(0);
-    expect(r.value.total).toBe(0);
-    expect(r.value.nextCursor).toBeNull();
+    const page = getOk(r);
+    expect(page.entries).toHaveLength(0);
+    expect(page.total).toBe(0);
+    expect(page.nextCursor).toBeNull();
   });
 
   it("maps Prisma rows to AuditLogEntry and sorts by createdAt desc", async () => {
@@ -66,16 +73,17 @@ describe("PrismaAuditLog.list", () => {
     const r = await repo.list({});
 
     expect(r.ok).toBe(true);
-    expect(r.value.entries).toHaveLength(2);
-    expect(r.value.entries[0]).toMatchObject({
+    const page = getOk(r);
+    expect(page.entries).toHaveLength(2);
+    expect(page.entries[0]).toMatchObject({
       id: "ale_b",
       actorId: "admin_1",
       action: "course.updated",
       targetType: "course",
       targetId: "c1",
     });
-    expect(r.value.entries[1].id).toBe("ale_a");
-    expect(r.value.total).toBe(2);
+    expect(page.entries[1]?.id).toBe("ale_a");
+    expect(page.total).toBe(2);
   });
 
   it("passes actorId filter as userId where clause", async () => {
@@ -185,21 +193,25 @@ describe("PrismaAuditLog.list", () => {
     expect(mockDb.auditLog.findMany).toHaveBeenCalledWith(expect.objectContaining({ take: 50 }));
   });
 
-  it("applies cursor as (id, createdAt) compound skip", async () => {
+  it("applies cursor as where-clause keyset filter (compound OR)", async () => {
     const mockDb = makeMockPrisma();
     mockDb.auditLog.findMany.mockResolvedValue([]);
     mockDb.auditLog.count.mockResolvedValue(0);
 
     const repo = new PrismaAuditLog(mockDb as never);
-    const cursor = "2026-07-05T10:00:00.000Z:ale_xyz";
+    const cursor = "2026-07-05T10:00:00.000Z::ale_xyz";
+    const cursorTs = new Date("2026-07-05T10:00:00.000Z");
     await repo.list({ limit: 50, cursor });
 
     expect(mockDb.auditLog.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        skip: 1,
-        cursor: {
-          id_createdAt: { id: "ale_xyz", createdAt: new Date("2026-07-05T10:00:00.000Z") },
-        },
+        take: 50,
+        where: expect.objectContaining({
+          OR: [
+            { createdAt: { lt: cursorTs } },
+            { AND: [{ createdAt: cursorTs }, { id: { lt: "ale_xyz" } }] },
+          ],
+        }),
       }),
     );
   });
