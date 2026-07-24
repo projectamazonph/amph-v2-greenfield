@@ -58,6 +58,7 @@ import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadge
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
+import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
@@ -124,6 +125,8 @@ import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { ListAuditLogs } from "@/usecases/ListAuditLogs";
+import { ExportAuditLogs } from "@/usecases/ExportAuditLogs";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
 import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
 import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
@@ -139,6 +142,10 @@ import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
 import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
 import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
+// STORY-064: simulator attempt use cases
+import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
+import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
+import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
 import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
@@ -178,6 +185,8 @@ export interface TestContainer extends AppContainer {
   accessPolicy: StubAccessPolicy;
   auditLog: InMemoryAuditLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
+  // STORY-064: simulator attempt repo
+  simulatorAttemptRepo: InMemorySimulatorAttemptRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   pricingTierRepo: InMemoryPricingTierRepository;
   sentReminderRepo: InMemorySentReminderRepository;
@@ -225,8 +234,13 @@ export function buildTestContainer(): TestContainer {
   // STORY-050a: audit log
   const auditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  // STORY-061: audit log viewer + CSV export
+  const listAuditLogs = new ListAuditLogs({ auditLog });
+  const exportAuditLogs = new ExportAuditLogs({ auditLog });
   // STORY-050b: simulator scenario repo
   const scenarioRepo = new InMemorySimulatorScenarioRepository();
+  // STORY-064: simulator attempt repo
+  const simulatorAttemptRepo = new InMemorySimulatorAttemptRepository();
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
   // STORY-011: pricing tier repo
@@ -403,6 +417,8 @@ export function buildTestContainer(): TestContainer {
     simulatorRegistry: buildSimulatorRegistry(),
     auditLog,
     recordAuditLog,
+    listAuditLogs,
+    exportAuditLogs,
     scenarioRepo,
     // STORY-050b: simulator scenario CRUD
     adminListScenarios: new AdminListScenarios({ scenarioRepo }),
@@ -410,6 +426,21 @@ export function buildTestContainer(): TestContainer {
     createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    // STORY-064: simulator attempt use cases
+    simulatorAttemptRepo,
+    startSimulatorAttempt: new StartSimulatorAttempt({
+      attemptRepo: simulatorAttemptRepo,
+      scenarioRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    saveSimulatorDecision: new SaveSimulatorDecision({
+      attemptRepo: simulatorAttemptRepo,
+    }),
+    submitSimulatorAttempt: new SubmitSimulatorAttempt({
+      attemptRepo: simulatorAttemptRepo,
+    }),
     // STORY-050c
     liveClassRepo,
     pricingTierRepo,
