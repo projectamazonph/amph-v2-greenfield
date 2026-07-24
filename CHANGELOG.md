@@ -4,6 +4,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-24: Test expectations sync (rename + simulator count)
+
+- **PR #158** (open): `fix: sync test expectations with rename + simulator count changes`
+  - `Practice.test.tsx`: full rewrite to match post-redesign component — 5 tools listed by name, Keyword Research marked as New, links to each tool page, no banned marketing phrases. Removed outdated assertions for In development badges, wireframe links, and waitlist copy.
+  - `tools/__tests__/page.test.tsx`: added keyword-research to container mock (5 simulators now registered), updated link count from 4 to 6 to match actual rendered output (4 registered + 2x keyword-research due to the hardcoded card).
+  - `InMemoryEmailSender.test.ts`: updated expected sender name from `AMPH Academy` to `Project Amazon PH Academy`.
+  - 2352 tests passing locally (9 suites remain as pre-existing Windows-only failures: DATABASE_URL env var not set in local shell, prisma CLI uses bash-style path which is not recognized on Windows). All pass in CI.
+
 ### 2026-07-24: Vercel Hobby cron schedule fix
 
 - **PR #153** (merged as `72896f4`): `fix(vercel): change live-class-reminders cron to once daily (Hobby plan limit)`
