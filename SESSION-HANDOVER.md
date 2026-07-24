@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-24 (v0.1.0 released — production live, all 12 sprints shipped, Sprint 13 stories ready to plan. `main` @ `022952f`). Sprint 12 fully closed. Operator-owned items: PayMongo webhook, admin user, launch comms.
+**Updated:** 2026-07-24 (v0.1.0 released — production live, all 12 sprints shipped, Sprint 13 stories ready to plan. `main` @ `da96d64`). Sprint 12 fully closed. Operator-owned items: PayMongo webhook, admin user, launch comms.
 
 ---
 
@@ -11,7 +11,7 @@
 | Phase                    | **Sprints 1–12 fully shipped. v0.1.0 released. Sprint 13 planned (STORY-061/062/063 written). Production live. Operator items: PayMongo webhook, admin user, launch comms.**                                                                                                                                |
 | Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                                                                               |
 | Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                                                                      |
-| `main` HEAD              | `022952f` (PR #160): `fix(landing): regenerate screenshots in light theme to match app design`                                                                                                                                                                                                              |
+| `main` HEAD              | `da96d64` (PR #159 squash): `docs: update CHANGELOG for test sync PR and add Sprint 13`                                                                                                                                                                                                                     |
 | Production URL           | `https://amph-v2-greenfield.vercel.app` — live, all 4 key routes returning expected status (`/`, `/signup`, `/login` → 200; `/dashboard` → 307 to login when unauthenticated)                                                                                                                               |
 | Vercel project           | `prj_3tEN1Akupoosai3OAGc1t50ru5QG` (`amph-v2-greenfield`), org `team_wIkEXZCToZvRHmrgFFhpsgkV`                                                                                                                                                                                                              |
 | Database                 | **Neon Postgres** (production). `prisma migrate deploy` applied all 12 migrations (added `pricing_tier` + `pricing_tier_early_bird_course_link` last). All four pricing tiers seeded (foundations ₱2,999, mastery ₱5,999 with 7-day early-bird, ultimate ₱9,999 with 3-day early-bird, all-access ₱14,999). |
@@ -29,7 +29,7 @@
 
 ### v0.1.0 — first release shipped
 
-**`main` HEAD: `022952f` | PRs merged this session: #156, #157, #158, #159, #160**
+**`main` HEAD: `da96d64` | PRs merged this session: #156, #157, #158, #159**
 
 - **PR #156** (squash-merged as `513f7a9`): `refactor: rename AMPH Academy to Project Amazon PH Academy in user-facing copy`
   - Renamed app from "AMPH Academy" to "Project Amazon PH Academy" across all user-facing pages, components, and doc files.
@@ -48,10 +48,7 @@
   - Added PR #158 entry to CHANGELOG. Added Sprint 13 section to sprint plan (STORY-061 audit log viewer, STORY-062 refund requests, STORY-063 email templates + placeholders for 064/065).
 
 - **PR #160** (merged as `022952f`): `fix(landing): regenerate screenshots in light theme to match app design`
-
-- **v0.1.0 GitHub release created** — https://github.com/projectamazonph/amph-v2-greenfield/releases/tag/v0.1.0
-
-**Remaining operator items (Sprint 12 closure):**
+  **Remaining operator items (Sprint 12 closure):**
 
 1. PayMongo webhook endpoint — add `https://amph-v2-greenfield.vercel.app/api/webhooks/paymongo` in PayMongo dashboard
 2. First admin user — `pnpm db:seed:admin`
