@@ -126,6 +126,9 @@ import { AdminListPayments } from "@/usecases/AdminListPayments";
 import { AdminGetPayment } from "@/usecases/AdminGetPayment";
 import { ProcessRefund } from "@/usecases/ProcessRefund";
 import { RefundOverride } from "@/usecases/RefundOverride";
+// STORY-062: refund request list + process
+import { ListRefundRequests } from "@/usecases/ListRefundRequests";
+import { AdminProcessRefund } from "@/usecases/AdminProcessRefund";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { ListAuditLogs } from "@/usecases/ListAuditLogs";
 import { ExportAuditLogs } from "@/usecases/ExportAuditLogs";
@@ -253,6 +256,11 @@ export function buildTestContainer(): TestContainer {
   const liveClassRepo = new InMemoryLiveClassRepository();
   // STORY-011: pricing tier repo
   const pricingTierRepo = new InMemoryPricingTierRepository();
+
+  // STORY-049 + STORY-062: build RefundOverride once. The
+  // `refundOverride` container entry and `adminProcessRefund` share
+  // the same instance — matches the production container's wiring.
+  const refundOverride = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
 
   return {
     clock,
@@ -405,7 +413,10 @@ export function buildTestContainer(): TestContainer {
     adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
     processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
-    refundOverride: new RefundOverride({ orderRepo, paymentGateway, recordAuditLog }),
+    refundOverride,
+    // STORY-062: admin refund request list + process
+    listRefundRequests: new ListRefundRequests({ orderRepo, userRepo }),
+    adminProcessRefund: new AdminProcessRefund({ orderRepo, refundOverride }),
     // STORY-050d: admin discount code CRUD
     adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
     adminGetDiscountCode: new AdminGetDiscountCode({ discountCodeRepo }),

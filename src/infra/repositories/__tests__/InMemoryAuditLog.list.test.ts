@@ -147,12 +147,13 @@ describe("InMemoryAuditLog.list", () => {
     expect(r.ok).toBe(true);
     const page = getOk(r);
     expect(page.entries).toHaveLength(2);
-    expect(page.entries[0].id).toBe("c");
-    expect(page.entries[1].id).toBe("b");
+    expect(page.entries[0]?.id).toBe("c");
+    expect(page.entries[1]?.id).toBe("b");
     expect(page.total).toBe(3);
     expect(page.nextCursor).not.toBeNull();
-    // Cursor encodes the last item's occurredAt and id
-    expect(page.nextCursor).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z:b$/);
+    // Cursor encodes the last item's occurredAt and id with "::"
+    // (double colon — single ":" collides with the ISO timestamp colons).
+    expect(page.nextCursor).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z::b$/);
   });
 
   it("returns nextCursor null when limit >= total", async () => {

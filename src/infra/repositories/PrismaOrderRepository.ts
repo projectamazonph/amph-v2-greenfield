@@ -114,6 +114,93 @@ export class PrismaOrderRepository implements IOrderRepository {
     }
   }
 
+  // STORY-062: admin list of refund requests. A refund request is any
+  // order with refundRequestedAt IS NOT NULL. Filter by `status` to
+  // distinguish pending (no refundProcessedAt) from processed
+  // (refundProcessedAt IS NOT NULL). Cursor pagination uses a
+  // compound {refundRequestedAt, id} cursor so paginating through
+  // requests with identical timestamps is still stable.
+  async listRefundRequests(filters: {
+    status?: "pending" | "processed";
+    cursor?: string;
+    limit?: number;
+  }): Promise<
+    Result<{ orders: readonly Order[]; nextCursor: string | null; total: number }, OrderError>
+  > {
+    const limit = Math.min(filters.limit ?? 50, 100);
+
+    // Build the Prisma where clause. We always require
+    // refundRequestedAt: { not: null } because the entire concept of
+    // a "refund request" depends on that field being set.
+    const where: Record<string, unknown> = {
+      refundRequestedAt: { not: null },
+    };
+    if (filters.status === "pending") {
+      where.refundProcessedAt = null;
+    } else if (filters.status === "processed") {
+      where.refundProcessedAt = { not: null };
+    }
+
+    // Decode cursor: "{refundRequestedAt.toISOString()}::{id}"
+    let cursorId: string | undefined;
+    let cursorRequestedAt: Date | undefined;
+    if (filters.cursor) {
+      const sepIdx = filters.cursor.indexOf("::");
+      if (sepIdx > 0) {
+        const ts = filters.cursor.slice(0, sepIdx);
+        cursorId = filters.cursor.slice(sepIdx + 2);
+        cursorRequestedAt = new Date(ts);
+      }
+    }
+
+    // Prisma's compound-cursor syntax mirrors the audit-log pattern.
+    // skip: 1 is required to avoid re-returning the cursor row itself.
+    // The compound-cursor field name `id_refundRequestedAt` follows the
+    // same pattern used by PrismaAuditLog (`id_createdAt`) and is the
+    // standard Prisma compound-cursor syntax; the Prisma type generator
+    // doesn't know about cursor field combinations for non-unique
+    // compound indexes, so we cast.
+    const cursor =
+      cursorId && cursorRequestedAt
+        ? ({
+            id_refundRequestedAt: {
+              id: cursorId,
+              refundRequestedAt: cursorRequestedAt,
+            },
+          } as unknown as { id: string })
+        : undefined;
+    const skip = cursor ? 1 : undefined;
+
+    try {
+      const [rows, total] = await Promise.all([
+        this.db.order.findMany({
+          where,
+          orderBy: [{ refundRequestedAt: "desc" }, { id: "desc" }],
+          take: limit,
+          skip,
+          cursor,
+        }),
+        this.db.order.count({ where }),
+      ]);
+
+      const orders = rows
+        .filter((row): row is NonNullable<typeof row> => row !== null)
+        .map((r) => this.mapRow(r));
+
+      let nextCursor: string | null = null;
+      if (rows.length === limit && rows.length > 0) {
+        const last = rows[rows.length - 1];
+        if (last && last.refundRequestedAt) {
+          nextCursor = `${last.refundRequestedAt.toISOString()}::${last.id}`;
+        }
+      }
+
+      return Result.ok({ orders, nextCursor, total });
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async update(order: Order): Promise<Result<Order, OrderError>> {
     try {
       const row = await this.db.order.update({

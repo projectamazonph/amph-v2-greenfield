@@ -21,7 +21,7 @@ export interface AuditLogFilters {
   targetId?: string;
   from?: Date;
   to?: Date;
-  /** Cursor from previous page: "{occurredAt.toISOString()}:{id}" */
+  /** Cursor from previous page: "{occurredAt.toISOString()}::{id}" */
   cursor?: string;
   /** Default 50, max 100 */
   limit?: number;
