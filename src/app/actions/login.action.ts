@@ -126,20 +126,40 @@ export async function performLogin(
  * Delegates to performLogin, then maps the result to a Next.js redirect().
  */
 export async function loginAndRedirect(formData: FormData): Promise<void> {
+  // DIAGNOSTIC STORY-066: log every step of the action to find where the 500 comes from.
+  // Will revert once root cause is found.
+  const log = (msg: string, extra?: unknown) =>
+    console.log("[loginAndRedirect]", msg, extra ?? "");
+
   const email = formData.get("email") as string | null;
   const password = formData.get("password") as string | null;
   const redirectTo = (formData.get("redirectTo") as string | null) ?? "/courses";
+  log("start", { email, redirectTo, hasPassword: !!password });
 
-  const container = buildContainer();
-  const outcome = await performLogin(
-    container,
-    { email: email ?? "", password: password ?? "", redirectTo },
-    {
-      plantCookie: setAuthCookie,
-      getClientIp: clientIp,
-    },
-  );
+  let outcome: LoginResult;
+  try {
+    const container = buildContainer();
+    log("container built");
+    outcome = await performLogin(
+      container,
+      { email: email ?? "", password: password ?? "", redirectTo },
+      {
+        plantCookie: setAuthCookie,
+        getClientIp: clientIp,
+      },
+    );
+    log("performLogin returned", outcome);
+  } catch (err) {
+    log("performLogin THREW", {
+      name: err instanceof Error ? err.name : "unknown",
+      message: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack?.split("\n").slice(0, 5) : undefined,
+      digest: (err as { digest?: string })?.digest,
+    });
+    throw err;
+  }
 
+  log("dispatching redirect for outcome.kind", outcome.kind);
   if (outcome.kind === "invalid_input") {
     redirect("/login?error=invalid_input");
   }
@@ -150,8 +170,20 @@ export async function loginAndRedirect(formData: FormData): Promise<void> {
     redirect(`/login?error=${outcome.errorKind}`);
   }
   if (outcome.kind === "success") {
-    redirect(outcome.redirectTo);
+    log("about to call redirect", outcome.redirectTo);
+    try {
+      redirect(outcome.redirectTo);
+    } catch (err) {
+      log("redirect THREW (expected for NEXT_REDIRECT)", {
+        name: err instanceof Error ? err.name : "unknown",
+        message: err instanceof Error ? err.message : String(err),
+        digest: (err as { digest?: string })?.digest,
+      });
+      throw err;
+    }
+    log("redirect returned without throwing — UNEXPECTED");
   }
+  log("end (no redirect called)");
 }
 
 // Re-exported for test convenience. The non-pure side effects are
