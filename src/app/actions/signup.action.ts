@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { setAuthCookie } from "@/lib/auth";
 import { SignUp, type SignUpOutput, type SignUpError } from "@/usecases/SignUp";
@@ -20,9 +21,18 @@ async function clientIp(): Promise<string | undefined> {
   return h.get("x-real-ip")?.trim() || undefined;
 }
 
+/**
+ * Pure signup helper. Returns a discriminated union — never calls
+ * redirect() itself, so it's unit-testable without Next.js in scope.
+ *
+ * STORY-046 follow-up: the success variant no longer carries a
+ * `redirectTo` field. The `signUpAndRedirect` server action below
+ * owns the navigation, mirroring the `loginAndRedirect` pattern
+ * (src/app/actions/login.action.ts).
+ */
 export type SignUpResult =
-  | { kind: "success"; email: string; redirectTo?: string }
   | SignUpError
+  | { kind: "success"; email: string }
   | { kind: "invalid_input" }
   | { kind: "rate_limited"; retryAfterSeconds: number }
   | { kind: "unexpected"; message: string };
@@ -86,46 +96,46 @@ export async function performSignUp(
   } catch (err) {
     console.error("[performSignUp] resend verification failed:", err);
   }
-  let loginResult: Awaited<ReturnType<Login["execute"]>>;
   try {
-    loginResult = await container.login.execute({ email: input.email, password: input.password });
+    const loginResult = await container.login.execute({
+      email: input.email,
+      password: input.password,
+    });
+    if (loginResult.ok) {
+      await deps.plantCookie(loginResult.sessionToken, loginResult.expiresAt);
+    }
   } catch (err) {
     console.error("[performSignUp] auto-login failed:", err);
-    return { kind: "success", email: signedUpEmail };
   }
-  if (!loginResult.ok) return { kind: "success", email: signedUpEmail };
-  try {
-    await deps.plantCookie(loginResult.sessionToken, loginResult.expiresAt);
-  } catch (err) {
-    console.error("[performSignUp] plantCookie failed:", err);
-    return { kind: "success", email: signedUpEmail };
-  }
-  return { kind: "success", email: signedUpEmail, redirectTo: "/dashboard" };
+  return { kind: "success", email: signedUpEmail };
 }
 
-export async function signUpAction(
-  _prevState: SignUpState,
-  formData: FormData,
-): Promise<SignUpState> {
+/**
+ * Server action for the /signup form. Called by the form's `action={...}`.
+ * Mirrors `loginAndRedirect` (src/app/actions/login.action.ts):
+ * - calls `performSignUp`
+ * - maps the result to a Next.js `redirect()` (success) or
+ *   `redirect("/signup?error=...")` (failure)
+ * - never returns normally — `redirect()` throws
+ */
+export async function signUpAndRedirect(formData: FormData): Promise<void> {
   const input: SignUpInput = {
     email: (formData.get("email") as string) ?? "",
     password: (formData.get("password") as string) ?? "",
     firstName: (formData.get("firstName") as string) ?? "",
     lastName: (formData.get("lastName") as string) ?? "",
   };
-  try {
-    const container = buildContainer();
-    return await performSignUp(container, input, {
-      plantCookie: setAuthCookie,
-      getClientIp: clientIp,
-    });
-  } catch (err) {
-    console.error("[signUpAction] unexpected error:", err);
-    return {
-      kind: "unexpected",
-      message: err instanceof Error ? err.message : "Unknown error",
-    } as const;
-  }
-}
 
-export type SignUpState = SignUpResult | { kind: "idle" };
+  const container = buildContainer();
+  const outcome = await performSignUp(container, input, {
+    plantCookie: setAuthCookie,
+    getClientIp: clientIp,
+  });
+
+  if (outcome.kind === "success") {
+    redirect("/dashboard");
+  }
+  // All failure paths land back on /signup with an `?error=...` query
+  // param that SignupForm reads via useSearchParams to render an alert.
+  redirect(`/signup?error=${outcome.kind}`);
+}

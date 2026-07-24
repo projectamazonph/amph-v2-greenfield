@@ -1,0 +1,74 @@
+{
+  "team": "amph-v2-signup-redirect-fix",
+  "project": "AMPH v2 greenfield",
+  "archetypes": ["software"],
+  "scope": "Fix the broken signup redirect flow that was partially patched in PR #163. The current code uses useActionState + useEffect + router.push(), which breaks the SSR unit test (useRouter not mounted under renderToString) and the E2E test (client-side push lands at /login because middleware doesn't see the cookie).",
+  "members": [
+    {
+      "name": "architect",
+      "role_type": "design",
+      "model": "opus",
+      "effort": "high",
+      "phase_scope": ["shape", "review"],
+      "owns": ["docs/decisions signup-redirect-decision"],
+      "reviews": [
+        {
+          "artifact_type": "code",
+          "criteria": [
+            "mirrors existing loginAndRedirect pattern",
+            "no NEXT_REDIRECT escape into React 19 useActionState",
+            "SSR-renderable page (no useRouter at page level)",
+            "client-side form action that does server-side 303 to /dashboard"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "senior-dev",
+      "role_type": "implement",
+      "model": "sonnet",
+      "effort": "medium",
+      "phase_scope": ["execute"],
+      "owns": [
+        { "artifact_type": "code", "paths": ["src/app/actions/signup.action.ts"] },
+        { "artifact_type": "code", "paths": ["src/app/signup/page.tsx"] },
+        { "artifact_type": "code", "paths": ["src/app/signup/SignupForm.tsx"] },
+        { "artifact_type": "code", "paths": ["src/app/signup/__tests__/page.test.tsx"] },
+        { "artifact_type": "code", "paths": ["src/app/actions/__tests__/signup.action.test.ts"] }
+      ]
+    },
+    {
+      "name": "qa",
+      "role_type": "verify",
+      "model": "haiku",
+      "effort": "low",
+      "phase_scope": ["review", "integrate"],
+      "owns": ["verification"],
+      "reviews": [
+        {
+          "artifact_type": "code",
+          "criteria": [
+            "pnpm tsc --noEmit green",
+            "pnpm lint green",
+            "pnpm test green",
+            "e2e: signup happy path lands on /dashboard",
+            "e2e: signup email_taken error shown",
+            "no NEXT_REDIRECT crash in production console"
+          ]
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "commands": ["pnpm tsc --noEmit", "pnpm lint", "pnpm test", "pnpm test:e2e"]
+  },
+  "handoff": {
+    "format": "git commits + PR",
+    "required_sections": ["story-id", "files-touched", "verification"]
+  },
+  "coordination": {
+    "parallel_safe": false,
+    "claim_required": true,
+    "single_owner_per_artifact": true
+  }
+}
