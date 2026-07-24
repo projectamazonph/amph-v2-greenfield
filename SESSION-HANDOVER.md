@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-24 (v0.1.0 released — production live, all 12 sprints shipped, Sprint 13 stories ready to plan. `main` @ `da96d64`). Sprint 12 fully closed. Operator-owned items: PayMongo webhook, admin user, launch comms.
+**Updated:** 2026-07-25 (Sprint 13 in progress — simulator rebuilds). `main` @ `9eb5f6b` (PR #179). STORY-067 merged (STR Triage rebuild). STORY-068 PR #180 open (Bid Elevator rebuild). Operator-owned items: PayMongo webhook, admin user, launch comms.
 
 ---
 
@@ -8,10 +8,10 @@
 
 | Metric                   | Value                                                                                                                                                                                                                                                                                                       |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Sprints 1–12 fully shipped. v0.1.0 released. Sprint 13 planned (STORY-061/062/063 written). Production live. Operator items: PayMongo webhook, admin user, launch comms.**                                                                                                                                |
+| Phase                    | **Sprint 13 in progress. STORY-067 merged (PR #179), STORY-068 PR #180 open (Bid Elevator rebuild). Remaining: Campaign Builder (STORY-069) and Listing Audit (STORY-070) simulator rebuilds.**                                                                                                             |
 | Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                                                                               |
 | Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                                                                      |
-| `main` HEAD              | `da96d64` (PR #159 squash): `docs: update CHANGELOG for test sync PR and add Sprint 13`                                                                                                                                                                                                                     |
+| `main` HEAD              | `9eb5f6b` (PR #179 squash): `feat(simulator): STORY-067 STR Triage rebuild — scoring engine integration`                                                                                                                                                                                                    |
 | Production URL           | `https://amph-v2-greenfield.vercel.app` — live, all 4 key routes returning expected status (`/`, `/signup`, `/login` → 200; `/dashboard` → 307 to login when unauthenticated)                                                                                                                               |
 | Vercel project           | `prj_3tEN1Akupoosai3OAGc1t50ru5QG` (`amph-v2-greenfield`), org `team_wIkEXZCToZvRHmrgFFhpsgkV`                                                                                                                                                                                                              |
 | Database                 | **Neon Postgres** (production). `prisma migrate deploy` applied all 12 migrations (added `pricing_tier` + `pricing_tier_early_bird_course_link` last). All four pricing tiers seeded (foundations ₱2,999, mastery ₱5,999 with 7-day early-bird, ultimate ₱9,999 with 3-day early-bird, all-access ₱14,999). |
@@ -24,6 +24,39 @@
 | Release                  | **v0.1.0 tagged and released.**                                                                                                                                                                                                                                                                             |
 
 ---
+
+## What changed this session (2026-07-25, Sprint 13 simulator rebuilds)
+
+### STORY-067: STR Triage rebuild — PR #179 merged
+
+- `StrTriageOutput` now has `ScoreDimensions` (direction, profitability, dataSufficiency, explanation) and per-classification `groundTruth`/`userChoice`/`isCorrect`
+- `StrTriageSimulator.run()` computes dimension scores when `userClassifications` provided
+- `strTriageAttempt()` server action wires full lifecycle: start -> grade (with scoreDimensions) -> compose feedback
+- Legacy `classifyStr()` kept for backward compat
+- 41 STR Triage tests pass; all CI checks green; squash-merged as `9eb5f6b`
+
+### STORY-068: Bid Elevator rebuild — PR #180 open
+
+- `BidElevatorOutput` now has `ScoreDimensions` (bidAccuracy, budgetAdherence, roasHit, explanation)
+- `BidRecommendation` now carries `groundTruth` (suggested bid), `userBid`, `isCorrect`
+- `BidElevatorSimulator.run()` computes dimension scores when `userBidAdjustments` provided
+- `bidElevatorAttempt()` server action wires full lifecycle; legacy `runBidElevator()` kept
+- `BidElevatorResult.tsx` updated to use `groundTruth`
+- `seed-simulator-policies.ts` fixed: bid-elevator policies now use correct dimension names
+- 49 Bid Elevator tests pass (25 simulator + 13 action + 11 page); typecheck 0 errors; lint 0 errors
+- Branch: `feat/STORY-068-bid-elevator-rebuild`; CI running
+
+### Sprint 13 status
+
+| Story     | Title                                 | Status                   |
+| --------- | ------------------------------------- | ------------------------ |
+| STORY-064 | Simulator attempt infrastructure      | merged (main)            |
+| STORY-065 | Scoring engine + dimensional policies | merged (main)            |
+| STORY-066 | Feedback composer + remediation       | merged (main, PR #173)   |
+| STORY-067 | STR Triage rebuild                    | merged (PR #179)         |
+| STORY-068 | Bid Elevator rebuild                  | PR #180 open, CI running |
+| STORY-069 | Campaign Builder rebuild              | pending                  |
+| STORY-070 | Listing Audit rebuild                 | pending                  |
 
 ## What changed this session (2026-07-24, v0.1.0 release)
 
