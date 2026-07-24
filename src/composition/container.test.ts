@@ -59,6 +59,7 @@ import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCert
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
+import { InMemoryScorePolicyRepository } from "@/infra/repositories/InMemoryScorePolicyRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
@@ -143,6 +144,7 @@ import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
 import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
+import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
 import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
@@ -183,6 +185,7 @@ export interface TestContainer extends AppContainer {
   auditLog: InMemoryAuditLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
   simulatorAttemptRepo: InMemorySimulatorAttemptRepository;
+  scorePolicyRepo: InMemoryScorePolicyRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   pricingTierRepo: InMemoryPricingTierRepository;
   sentReminderRepo: InMemorySentReminderRepository;
@@ -234,6 +237,8 @@ export function buildTestContainer(): TestContainer {
   const scenarioRepo = new InMemorySimulatorScenarioRepository();
   // STORY-064: simulator attempt repo
   const simulatorAttemptRepo = new InMemorySimulatorAttemptRepository();
+  // STORY-065: scoring engine
+  const scorePolicyRepo = new InMemoryScorePolicyRepository();
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
   // STORY-011: pricing tier repo
@@ -412,6 +417,7 @@ export function buildTestContainer(): TestContainer {
     recordAuditLog,
     scenarioRepo,
     simulatorAttemptRepo,
+    scorePolicyRepo,
     // STORY-050b: simulator scenario CRUD
     adminListScenarios: new AdminListScenarios({ scenarioRepo }),
     getSimulatorScenario: new GetSimulatorScenario({ scenarioRepo }),
@@ -428,6 +434,10 @@ export function buildTestContainer(): TestContainer {
     }),
     saveSimulatorDecision: new SaveSimulatorDecision({ attemptRepo: simulatorAttemptRepo }),
     submitSimulatorAttempt: new SubmitSimulatorAttempt({ attemptRepo: simulatorAttemptRepo }),
+    gradeSimulatorAttempt: new GradeSimulatorAttempt({
+      attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
+    }),
     // STORY-050c
     liveClassRepo,
     pricingTierRepo,

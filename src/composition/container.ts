@@ -57,6 +57,7 @@ import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
+import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 
@@ -79,6 +80,7 @@ import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertific
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
 import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSimulatorAttemptRepository";
+import { PrismaScorePolicyRepository } from "@/infra/repositories/PrismaScorePolicyRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { prisma } from "@/infra/database/prisma";
@@ -198,6 +200,7 @@ import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
 import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
+import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
 import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
@@ -236,6 +239,8 @@ export interface AppContainer {
   scenarioRepo: ISimulatorScenarioRepository;
   // STORY-064: simulator attempt infrastructure
   simulatorAttemptRepo: ISimulatorAttemptRepository;
+  // STORY-065: scoring engine + dimensional policies
+  scorePolicyRepo: IScorePolicyRepository;
   // STORY-050c: live class admin CRUD
   liveClassRepo: ILiveClassRepository;
   // STORY-011: pricing tier repo
@@ -337,6 +342,8 @@ export interface AppContainer {
   startSimulatorAttempt: StartSimulatorAttempt;
   saveSimulatorDecision: SaveSimulatorDecision;
   submitSimulatorAttempt: SubmitSimulatorAttempt;
+  // STORY-065: scoring engine
+  gradeSimulatorAttempt: GradeSimulatorAttempt;
   // STORY-050c: live class admin CRUD
   adminListLiveClasses: AdminListLiveClasses;
   adminGetLiveClass: AdminGetLiveClass;
@@ -393,6 +400,8 @@ function buildProductionContainer(): AppContainer {
   const simulatorAttemptRepo: ISimulatorAttemptRepository = new PrismaSimulatorAttemptRepository(
     prisma,
   );
+  // STORY-065: scoring engine
+  const scorePolicyRepo: IScorePolicyRepository = new PrismaScorePolicyRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
   // STORY-011: pricing tier repo
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
@@ -604,6 +613,10 @@ function buildProductionContainer(): AppContainer {
     }),
     saveSimulatorDecision: new SaveSimulatorDecision({ attemptRepo: simulatorAttemptRepo }),
     submitSimulatorAttempt: new SubmitSimulatorAttempt({ attemptRepo: simulatorAttemptRepo }),
+    gradeSimulatorAttempt: new GradeSimulatorAttempt({
+      attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
+    }),
     // STORY-011: pricing tier repo
     pricingTierRepo,
     // STORY-048b/c: module + lesson repos (also used by public catalog)

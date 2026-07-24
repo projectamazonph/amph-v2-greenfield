@@ -691,3 +691,22 @@ model SimulatorDecision {
   @@unique([attemptId, revision])
   @@map("simulator_decisions")
 }
+
+
+// ── STORY-065: Scoring Engine ───────────────────────────────────────────
+
+model ScorePolicy {
+  id              String   @id @default(cuid())
+  simulatorId     String
+  difficulty      String
+  mode            String
+  /** JSON: Record<string, { weight: number; passingThreshold: number }> */
+  dimensionConfig Json
+  passingScore    Int      @default(70)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([simulatorId, difficulty, mode])
+  @@index([simulatorId])
+  @@map("score_policies")
+}
