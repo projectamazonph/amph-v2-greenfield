@@ -603,6 +603,7 @@ function buildProductionContainer(): AppContainer {
     recordAuditLog,
     scenarioRepo,
     simulatorAttemptRepo,
+    scorePolicyRepo,
     // STORY-064: simulator attempt lifecycle
     startSimulatorAttempt: new StartSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
