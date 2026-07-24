@@ -1,0 +1,55 @@
+{
+  "project_archetypes": ["software"],
+  "artifacts": [
+    {
+      "id": "signup-action-wrapper",
+      "type": "code",
+      "paths": ["src/app/actions/signup.action.ts"],
+      "owner": "senior-dev",
+      "reviewers": ["architect", "qa"],
+      "depends_on": [],
+      "verification": ["pnpm test src/app/actions/__tests__/signup.action.test.ts"]
+    },
+    {
+      "id": "signup-page",
+      "type": "code",
+      "paths": ["src/app/signup/page.tsx", "src/app/signup/SignupForm.tsx"],
+      "owner": "senior-dev",
+      "reviewers": ["architect", "qa"],
+      "depends_on": ["signup-action-wrapper"],
+      "verification": ["pnpm test src/app/signup/__tests__/page.test.tsx"]
+    },
+    {
+      "id": "signup-action-test",
+      "type": "code",
+      "paths": ["src/app/actions/__tests__/signup.action.test.ts"],
+      "owner": "senior-dev",
+      "reviewers": ["qa"],
+      "depends_on": ["signup-action-wrapper"],
+      "verification": ["pnpm test src/app/actions/__tests__/signup.action.test.ts"]
+    },
+    {
+      "id": "signup-e2e",
+      "type": "test",
+      "paths": ["tests/e2e/signup.spec.ts"],
+      "owner": "qa",
+      "reviewers": [],
+      "depends_on": ["signup-page"],
+      "verification": ["pnpm test:e2e -- signup.spec.ts"]
+    }
+  ],
+  "waves": [
+    {
+      "id": "w1-shape",
+      "mode": "sequential",
+      "artifact_ids": ["signup-action-wrapper", "signup-page", "signup-action-test"],
+      "rationale": "Single-owner refactor of the signup flow; touches both action and page; the test follows the action shape"
+    },
+    {
+      "id": "w2-verify",
+      "mode": "sequential",
+      "artifact_ids": ["signup-e2e"],
+      "rationale": "E2E depends on the refactored action + page being in place"
+    }
+  ]
+}

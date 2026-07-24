@@ -1,11 +1,20 @@
 /**
- * signup.action.test.ts - coverage for the signup action.
+ * signup.action.test.ts — STORY-003 + STORY-046 follow-up.
  *
- * STORY-046 fix: performSignUp does NOT call navigate() / redirect()
- * internally. It returns { kind: "success", email, redirectTo: "/dashboard" }.
- * The page handles client-side navigation via router.push() inside useEffect.
- * This avoids the NEXT_REDIRECT / React 19 useActionState conflict that
- * caused a client-side crash.
+ * Tests the pure `performSignUp` helper extracted from `signUpAndRedirect`.
+ *
+ * The helper takes a container, input, and side-effect functions as
+ * deps, so it can be tested without mocking next/headers or
+ * next/navigation. The thin `signUpAndRedirect` action wrapper that
+ * calls this helper is itself untested in isolation — it's three
+ * lines of glue and would require mocking the whole Next runtime,
+ * which adds little value over testing performSignUp + the SignUp
+ * use case. The wrapper's behavior is covered by the E2E test
+ * (tests/e2e/signup.spec.ts).
+ *
+ * STORY-046 follow-up: `performSignUp` no longer carries a
+ * `redirectTo` field. Navigation is owned by `signUpAndRedirect`,
+ * mirroring `loginAndRedirect` (login.action.ts).
  */
 
 import { describe, it, expect, vi, type Mock } from "vitest";
@@ -166,7 +175,7 @@ describe("performSignUp", () => {
     expect(check).not.toHaveBeenCalled();
   });
 
-  it("creates the user, auto-logs-in, plants cookie, and returns redirectTo on success", async () => {
+  it("creates the user, auto-logs-in, plants cookie, and returns success on the happy path", async () => {
     const container = freshContainer();
     const deps = makeDeps();
     const result = await performSignUp(
@@ -179,11 +188,7 @@ describe("performSignUp", () => {
       },
       deps,
     );
-    expect(result.kind).toBe("success");
-    if (result.kind === "success") {
-      expect(result.email).toBe("new@test.example.com");
-      expect(result.redirectTo).toBe("/dashboard");
-    }
+    expect(result).toMatchObject({ kind: "success", email: "new@test.example.com" });
     const found = await container.userRepo.findByEmail("new@test.example.com");
     expect(found.ok).toBe(true);
     if (found.ok) {
@@ -215,7 +220,12 @@ describe("performSignUp", () => {
     expect(hashSpy).toHaveBeenCalledWith("validPassword123");
   });
 
-  it("gracefully degrades if auto-login fails (signup still returns success without redirectTo)", async () => {
+  it("still returns success (without throwing) if plantCookie fails", async () => {
+    // STORY-046 follow-up: a failed plantCookie is non-fatal — the user
+    // is created, the result is success, and the caller (signUpAndRedirect)
+    // will still redirect to /dashboard. The user lands on /login via
+    // middleware on the next request because the cookie wasn't set.
+    // This matches the login wrapper's "graceful degradation" pattern.
     const container = freshContainer();
     const failingDeps = makeDeps({
       plantCookie: vi.fn(async () => {
@@ -232,11 +242,7 @@ describe("performSignUp", () => {
       },
       failingDeps,
     );
-    expect(result.kind).toBe("success");
-    if (result.kind === "success") {
-      expect(result.email).toBe("degrade@test.example.com");
-      expect(result.redirectTo).toBeUndefined();
-    }
+    expect(result).toMatchObject({ kind: "success", email: "degrade@test.example.com" });
     expect(failingDeps.plantCookie).toHaveBeenCalledTimes(1);
   });
 
