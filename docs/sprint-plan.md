@@ -157,15 +157,17 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 - Smoke tests: `/` → 200, `/signup` → 200, `/login` → 200, `/dashboard` → 307 (redirect)
 - Remaining operator items: PayMongo webhook endpoint, first admin user, custom domain, full signup→checkout smoke test, DB backup/restore drill, security audit, launch comms.
 
-## Sprint 13 — Admin Panel Round 2 (5 pts)
+## Sprint 13 — Simulator Scoring + Admin Round 2 (5 pts)
 
-| ID        | Title                                | Pts | Status     |
-| --------- | ------------------------------------ | --- | ---------- |
-| STORY-061 | Admin audit log viewer + CSV export  | 1   | ⏳ Planned |
-| STORY-062 | Admin refund requests list + process | 1   | ⏳ Planned |
-| STORY-063 | Admin email templates                | 1   | ⏳ Planned |
-| STORY-064 | (to be added)                        | 1   | ⏳ Planned |
-| STORY-065 | (to be added)                        | 1   | ⏳ Planned |
+| ID        | Title                                                 | Pts | Status     |
+| --------- | ----------------------------------------------------- | --- | ---------- |
+| STORY-064 | Simulator attempt infrastructure                      | 1   | ✅ merged  |
+| STORY-065 | Scoring engine + dimensional policies                 | 1   | ✅ merged  |
+| STORY-066 | Feedback composer + remediation recommendations       | 1   | ✅ merged  |
+| STORY-067 | STR Triage rebuild — scoring engine integration       | 1   | ✅ PR #179 |
+| STORY-068 | Bid Elevator rebuild — scoring engine integration     | 1   | ✅ PR #180 |
+| STORY-069 | Campaign Builder rebuild — scoring engine integration | 1   | 🔄 PR #181 |
+| STORY-070 | Listing Audit rebuild — scoring engine integration    | 1   | ⏳ pending |
 
 ---
 
@@ -183,7 +185,7 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | S10       | 5       | Admin (STORY-046, 047, 048a, 048b, 048c, 049, 050a, 050b, 050c, 050d, 050e = 11 × 1pt; STORY-048 split into a/b/c, STORY-050 split into a/b/c/d/e) |
 | S11       | 5       | Observability + tests (5 × 1pt)                                                                                                                    |
 | S12       | 5       | Launch (5 × 1pt)                                                                                                                                   |
-| S13       | 5       | Admin panel round 2 (STORY-061, 062, 063 = 3 × 1pt; add more stories as planned)                                                                   |
+| S13       | 7       | Simulator scoring round 2 (STORY-064..068 = 5 × 1pt done; STORY-069 PR #181; STORY-070 pending)                                                    |
 | **Total** | **60+** |                                                                                                                                                    |
 
 Per-sprint velocity: 5 points. The pack-stories (STORY-040, STORY-050) are honest about the larger scope; if they prove too big, split during planning. STORY-048 and STORY-050 were both split into multiple 1-pt stories to keep each PR within budget.
