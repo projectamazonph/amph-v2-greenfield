@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-24 (Sprint 12 launch in progress — production deployed, pricing tiers seeded, all CI green on `main` @ `9aca555` / `285491e`). Sprints 1–11 fully shipped. STORY-056 (deploy runbook) and STORY-059 (production deploy) effectively executed; STORY-057/058/060 still operator-owned.
+**Updated:** 2026-07-24 (v0.1.0 released — production live, all 12 sprints shipped, Sprint 13 stories ready to plan. `main` @ `022952f`). Sprint 12 fully closed. Operator-owned items: PayMongo webhook, admin user, launch comms.
 
 ---
 
@@ -8,19 +8,56 @@
 
 | Metric                   | Value                                                                                                                                                                                                                                                                                                       |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Sprints 1–11 shipped. Sprint 12 (launch) in progress — production is live, pricing tiers seeded, operator sign-off items remaining (PayMongo webhook, custom domain, admin user, launch comms).**                                                                                                         |
+| Phase                    | **Sprints 1–12 fully shipped. v0.1.0 released. Sprint 13 planned (STORY-061/062/063 written). Production live. Operator items: PayMongo webhook, admin user, launch comms.**                                                                                                                                |
 | Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                                                                               |
 | Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                                                                      |
-| `main` HEAD              | `285491e` (merge commit) / `9aca555` (PR #150 squash): `fix: construct proper PricingTier entity in seed script (use Money.of)`                                                                                                                                                                             |
+| `main` HEAD              | `022952f` (PR #160): `fix(landing): regenerate screenshots in light theme to match app design`                                                                                                                                                                                                              |
 | Production URL           | `https://amph-v2-greenfield.vercel.app` — live, all 4 key routes returning expected status (`/`, `/signup`, `/login` → 200; `/dashboard` → 307 to login when unauthenticated)                                                                                                                               |
 | Vercel project           | `prj_3tEN1Akupoosai3OAGc1t50ru5QG` (`amph-v2-greenfield`), org `team_wIkEXZCToZvRHmrgFFhpsgkV`                                                                                                                                                                                                              |
 | Database                 | **Neon Postgres** (production). `prisma migrate deploy` applied all 12 migrations (added `pricing_tier` + `pricing_tier_early_bird_course_link` last). All four pricing tiers seeded (foundations ₱2,999, mastery ₱5,999 with 7-day early-bird, ultimate ₱9,999 with 3-day early-bird, all-access ₱14,999). |
 | Environment              | `DATABASE_URL`, `SHADOW_DATABASE_URL`, `JWT_SECRET`, `PAYMONGO_SECRET` (live), `PAYMONGO_WEBHOOK_SECRET`, `RESEND_API_KEY`, `SENTRY_DSN`, `NEXT_PUBLIC_APP_URL` pulled from Vercel and mirrored into local `.env` / `.env.local` for script execution                                                       |
-| Unit + integration tests | **2347 passing + 2 skipped, 0 TypeScript errors**                                                                                                                                                                                                                                                           |
+| Unit + integration tests | **2352 passing + 2 skipped, 0 TypeScript errors**                                                                                                                                                                                                                                                           |
 | Architecture compliance  | **419 tests passing, 0 violations**                                                                                                                                                                                                                                                                         |
 | Coverage                 | 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches — all above configured thresholds (80/70/80/80).                                                                                                                                                                                        |
 | E2E                      | 15 passed, 4 intentionally skipped, 0 failed on `chromium-desktop`. a11y.spec.ts soft-passes.                                                                                                                                                                                                               |
-| CI                       | All 6 jobs green on every PR this session (PRs #145–#150).                                                                                                                                                                                                                                                  |
+| CI                       | All 6 jobs green on every PR this session (PRs #145–#159).                                                                                                                                                                                                                                                  |
+| Release                  | **v0.1.0 tagged and released.**                                                                                                                                                                                                                                                                             |
+
+---
+
+## What changed this session (2026-07-24, v0.1.0 release)
+
+### v0.1.0 — first release shipped
+
+**`main` HEAD: `022952f` | PRs merged this session: #156, #157, #158, #159, #160**
+
+- **PR #156** (squash-merged as `513f7a9`): `refactor: rename AMPH Academy to Project Amazon PH Academy in user-facing copy`
+  - Renamed app from "AMPH Academy" to "Project Amazon PH Academy" across all user-facing pages, components, and doc files.
+  - Updated `PRODUCT.md`, `DESIGN.md`, `CHANGELOG.md`, `AGENTS.md` title, and all doc references.
+
+- **PR #157** (merged as `a52ab20`): `feat: add db:seed:admin npm script`
+  - Added `db:seed:admin` npm script for creating the first admin user.
+
+- **PR #158** (squash-merged as `0243b55`): `fix: sync test expectations with rename + simulator count changes`
+  - `Practice.test.tsx`: full rewrite — removed outdated assertions for In development badges, wireframe links, waitlist copy; added tests for 5 tools, Keyword Research New badge, link counts.
+  - `tools/__tests__/page.test.tsx`: added keyword-research to container mock, updated link count from 4 to 6 (4 registry + 2x keyword-research in hardcoded card).
+  - `InMemoryEmailSender.test.ts`: updated expected sender from `AMPH Academy` to `Project Amazon PH Academy`.
+  - 2352 tests passing locally (9 pre-existing Windows-only failures: DATABASE_URL env var not set, prisma CLI bash-style path). All pass in CI.
+
+- **PR #159** (squash-merged as `da96d64`): `docs: update CHANGELOG for test sync PR and add Sprint 13`
+  - Added PR #158 entry to CHANGELOG. Added Sprint 13 section to sprint plan (STORY-061 audit log viewer, STORY-062 refund requests, STORY-063 email templates + placeholders for 064/065).
+
+- **PR #160** (merged as `022952f`): `fix(landing): regenerate screenshots in light theme to match app design`
+
+- **v0.1.0 GitHub release created** — https://github.com/projectamazonph/amph-v2-greenfield/releases/tag/v0.1.0
+
+**Remaining operator items (Sprint 12 closure):**
+
+1. PayMongo webhook endpoint — add `https://amph-v2-greenfield.vercel.app/api/webhooks/paymongo` in PayMongo dashboard
+2. First admin user — `pnpm db:seed:admin`
+3. DB backup/restore drill (STORY-057) — operator-owned
+4. Pre-launch security audit (STORY-058) — operator-owned
+5. Launch comms (STORY-060) — operator-owned
 
 ---
 
