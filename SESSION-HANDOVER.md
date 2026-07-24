@@ -34,7 +34,6 @@
 - **PR #156** (squash-merged as `513f7a9`): `refactor: rename AMPH Academy to Project Amazon PH Academy in user-facing copy`
   - Renamed app from "AMPH Academy" to "Project Amazon PH Academy" across all user-facing pages, components, and doc files.
   - Updated `PRODUCT.md`, `DESIGN.md`, `CHANGELOG.md`, `AGENTS.md` title, and all doc references.
-  - Existing test expectations for "AMPH Academy" (InMemoryEmailSender default sender name) updated to match.
 
 - **PR #157** (merged as `a52ab20`): `feat: add db:seed:admin npm script`
   - Added `db:seed:admin` npm script for creating the first admin user.
@@ -46,12 +45,10 @@
   - 2352 tests passing locally (9 pre-existing Windows-only failures: DATABASE_URL env var not set, prisma CLI bash-style path). All pass in CI.
 
 - **PR #159** (squash-merged as `da96d64`): `docs: update CHANGELOG for test sync PR and add Sprint 13`
+  - Added PR #158 entry to CHANGELOG. Added Sprint 13 section to sprint plan (STORY-061 audit log viewer, STORY-062 refund requests, STORY-063 email templates + placeholders for 064/065).
 
-- **v0.1.0 GitHub release created** — https://github.com/projectamazonph/amph-v2-greenfield/releases/tag/v0.1.0
-
-- **Sprint plan updated**: added Sprint 13 section (STORY-061 audit log viewer, STORY-062 refund requests, STORY-063 email templates + placeholders).
-
-**Remaining operator items (Sprint 12 closure):**
+- **PR #160** (merged as `022952f`): `fix(landing): regenerate screenshots in light theme to match app design`
+  **Remaining operator items (Sprint 12 closure):**
 
 1. PayMongo webhook endpoint — add `https://amph-v2-greenfield.vercel.app/api/webhooks/paymongo` in PayMongo dashboard
 2. First admin user — `pnpm db:seed:admin`
