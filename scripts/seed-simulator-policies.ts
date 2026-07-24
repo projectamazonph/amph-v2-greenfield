@@ -61,17 +61,18 @@ type PolicyDef = {
 
 const POLICIES: PolicyDef[] = [
   // ── Bid Elevator ──────────────────────────────────────────────────────
+  // Dimensions: bidAccuracy (40%), budgetAdherence (30%), roasHit (20%), explanation (10%)
   {
     id: "policy-bid-elevator-beginner-practice",
     simulatorId: "bid-elevator",
     difficulty: "beginner",
     mode: "practice",
     dimensionConfig: {
-      direction: { weight: 0.3, passingThreshold: 70 },
-      magnitude: { weight: 0.3, passingThreshold: 70 },
-      profitability: { weight: 0.4, passingThreshold: 70 },
+      bidAccuracy: { weight: 0.4, passingThreshold: 50 },
+      budgetAdherence: { weight: 0.3, passingThreshold: 50 },
+      roasHit: { weight: 0.2, passingThreshold: 50 },
     },
-    passingScore: 70,
+    passingScore: 50,
   },
   {
     id: "policy-bid-elevator-beginner-credential",
@@ -79,12 +80,12 @@ const POLICIES: PolicyDef[] = [
     difficulty: "beginner",
     mode: "credential",
     dimensionConfig: {
-      direction: { weight: 0.25, passingThreshold: 75 },
-      magnitude: { weight: 0.3, passingThreshold: 75 },
-      profitability: { weight: 0.35, passingThreshold: 75 },
-      explanation: { weight: 0.1, passingThreshold: 70 },
+      bidAccuracy: { weight: 0.4, passingThreshold: 65 },
+      budgetAdherence: { weight: 0.3, passingThreshold: 65 },
+      roasHit: { weight: 0.2, passingThreshold: 65 },
+      explanation: { weight: 0.1, passingThreshold: 60 },
     },
-    passingScore: 75,
+    passingScore: 65,
   },
   {
     id: "policy-bid-elevator-intermediate-practice",
@@ -92,12 +93,11 @@ const POLICIES: PolicyDef[] = [
     difficulty: "intermediate",
     mode: "practice",
     dimensionConfig: {
-      direction: { weight: 0.25, passingThreshold: 72 },
-      magnitude: { weight: 0.3, passingThreshold: 72 },
-      profitability: { weight: 0.35, passingThreshold: 72 },
-      dataSufficiency: { weight: 0.1, passingThreshold: 70 },
+      bidAccuracy: { weight: 0.4, passingThreshold: 65 },
+      budgetAdherence: { weight: 0.3, passingThreshold: 65 },
+      roasHit: { weight: 0.2, passingThreshold: 65 },
     },
-    passingScore: 72,
+    passingScore: 65,
   },
   {
     id: "policy-bid-elevator-advanced-practice",
@@ -105,13 +105,12 @@ const POLICIES: PolicyDef[] = [
     difficulty: "advanced",
     mode: "practice",
     dimensionConfig: {
-      direction: { weight: 0.2, passingThreshold: 75 },
-      magnitude: { weight: 0.25, passingThreshold: 75 },
-      profitability: { weight: 0.35, passingThreshold: 75 },
-      dataSufficiency: { weight: 0.1, passingThreshold: 72 },
+      bidAccuracy: { weight: 0.4, passingThreshold: 80 },
+      budgetAdherence: { weight: 0.3, passingThreshold: 80 },
+      roasHit: { weight: 0.2, passingThreshold: 80 },
       explanation: { weight: 0.1, passingThreshold: 70 },
     },
-    passingScore: 75,
+    passingScore: 80,
   },
 
   // ── STR Triage ───────────────────────────────────────────────────────
