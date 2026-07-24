@@ -2,7 +2,7 @@
 
 ## Goal
 
-Read MDX lesson files from the AMPH curriculum source directory, parse frontmatter, and upsert Module + Lesson rows into the Postgres database. This seeds the public catalog with real curriculum content in a single runnable command.
+Read MDX lesson files from the Project Amazon PH Academy curriculum source directory, parse frontmatter, and upsert Module + Lesson rows into the Postgres database. This seeds the public catalog with real curriculum content in a single runnable command.
 
 ## Scope
 

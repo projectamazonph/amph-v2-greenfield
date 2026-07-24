@@ -4,7 +4,7 @@ Every route referenced across `docs/product-brief.md`, `docs/admin-backend.md` a
 
 ```mermaid
 flowchart TD
-  ROOT(("AMPH"))
+  ROOT(("Project Amazon PH Academy"))
 
   ROOT --> PUB["Public"]
   PUB --> P1["/  landing"]

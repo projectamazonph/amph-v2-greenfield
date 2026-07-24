@@ -1,7 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 /**
- * Practice — 6 contract tests.
- * The version with sourced copy from the Stitch wireframes.
+ * Practice — contract tests for the landing page practice section.
+ *
+ * Tests verify the section lists all 5 simulators, shows the correct
+ * copy, links to each tool page, and contains no banned marketing phrases.
  */
 
 import { describe, it, expect } from "vitest";
@@ -19,33 +21,26 @@ describe("Practice", () => {
     expect(html).toContain("Keyword Research");
   });
 
-  it("honestly labels each tool as 'In development'", () => {
+  it("marks Keyword Research as New", () => {
     const html = renderToString(createElement(Practice));
-    const matches = html.match(/In development/g) ?? [];
-    expect(matches.length).toBeGreaterThanOrEqual(5);
+    expect(html).toContain("Keyword Research");
+    expect(html).toMatch(/<span[^>]*>New<\/span>/);
   });
 
-  it("uses sourced scenario titles from the Stitch spec, not invented copy", () => {
-    // Each of these strings is a verbatim snippet from
-    // docs/ui-specs/STITCH-PROMPTS.md §19-23. If a future change
-    // swaps the scenario for invented copy, the assertion fails.
+  it("links each tool to its page", () => {
     const html = renderToString(createElement(Practice));
-    expect(html).toContain("Reduce ACoS on a high-spend electronics campaign");
-    expect(html).toContain("wireless earbuds");
-    expect(html).toContain("broad match campaign for kitchen products");
-    expect(html).toContain("Bamboo Cutting Board");
+    expect(html).toMatch(/href="\/tools\/bid-elevator"/);
+    expect(html).toMatch(/href="\/tools\/campaign-builder"/);
+    expect(html).toMatch(/href="\/tools\/str-triage"/);
+    expect(html).toMatch(/href="\/tools\/listing-audit"/);
+    expect(html).toMatch(/href="\/tools\/keyword-research"/);
   });
 
-  it("links to the wireframes gallery from each tool row", () => {
+  it("renders 5 simulator cards", () => {
     const html = renderToString(createElement(Practice));
-    const linkMatches = html.match(/See wireframe/g) ?? [];
-    expect(linkMatches.length).toBe(5);
-    expect(html).toMatch(/href="\/docs\/previews\/wireframes.html"/);
-  });
-
-  it("mentions the waitlist in the note below the list", () => {
-    const html = renderToString(createElement(Practice));
-    expect(html.toLowerCase()).toContain("waitlist");
+    // One card li per tool (5 tools defined in TOOLS).
+    const cardMatches = html.match(/<li class="/g) ?? [];
+    expect(cardMatches.length).toBe(5);
   });
 
   it("does not contain any banned marketing phrases", () => {

@@ -39,7 +39,7 @@ describe("InMemoryEmailSender", () => {
   it("uses the default from when not specified", async () => {
     const sender = new InMemoryEmailSender();
     await sender.send(makeMessage());
-    expect(sender.sent[0]!.from).toBe("AMPH Academy <noreply@amph.example.com>");
+    expect(sender.sent[0]!.from).toBe("Project Amazon PH Academy <noreply@amph.example.com>");
   });
 
   it("honors the from override", async () => {
