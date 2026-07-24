@@ -1,45 +1,46 @@
 /**
- * LoginForm — the client component for the /login page.
+ * LoginForm — pure HTML form that POSTs to /api/auth/login.
  *
- * Lives in its own file so the parent page (a server component) can
- * wrap it in <Suspense> (required for any client component that
- * consumes useSearchParams during static prerender).
+ * STORY-066 refactor: the previous implementation used
+ * `useActionState` + `useRouter` to invoke the loginAndRedirect
+ * server action. That combination had a documented Next.js 16
+ * pitfall where `redirect()` throws a NEXT_REDIRECT error that gets
+ * swallowed under React 19 useActionState, producing a 500
+ * "Server Components render" with a hashed digest in production.
  *
- * STORY-006. Migrated from inline React.CSSProperties to AMPH components.
- * User-facing brand name: Project Amazon PH Academy.
+ * This form is now a plain HTML `<form method="POST">` pointing at
+ * the /api/auth/login Route Handler. The browser handles the
+ * 303 redirect natively; error states land back on
+ * /login?error=<kind> where the page renders the alert. No client
+ * state, no useEffect, no useRouter, no useActionState.
+ *
+ * Pure presentational. Renders the same fields as before. Receives
+ * `redirectTo` (from the parent server component's searchParams)
+ * and `errorKind` (also from searchParams) as props.
  */
 
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { loginAndRedirect } from "../actions/login.action";
 import { Button } from "@/components/ui";
 import { Input } from "@/components/ui";
 import styles from "./LoginForm.module.css";
 
-export function LoginForm() {
-  const params = useSearchParams();
-  const redirectTo = params.get("redirect") ?? "/courses";
-  const errorFromQuery = params.get("error");
+const errorMessage: Record<string, string> = {
+  wrong_password: "Incorrect email or password.",
+  user_not_found: "No account with that email.",
+  account_suspended: "This account has been suspended. Contact support.",
+  account_locked: "This account is locked. Reset your password to unlock.",
+  invalid_input: "Please enter your email and password.",
+  rate_limited: "Too many login attempts. Please wait a few minutes and try again.",
+};
 
-  const knownErrors = [
-    "wrong_password",
-    "user_not_found",
-    "account_suspended",
-    "account_locked",
-    "invalid_input",
-    "rate_limited",
-  ];
-
-  const errorMessage: Record<string, string> = {
-    wrong_password: "Incorrect email or password.",
-    user_not_found: "No account with that email.",
-    account_suspended: "This account has been suspended. Contact support.",
-    account_locked: "This account is locked. Reset your password to unlock.",
-    invalid_input: "Please enter your email and password.",
-    rate_limited: "Too many login attempts. Please wait a few minutes and try again.",
-  };
+export function LoginForm({
+  redirectTo,
+  errorKind,
+}: {
+  redirectTo: string;
+  errorKind: string | null;
+}) {
+  const errorText = errorKind ? errorMessage[errorKind] ?? null : null;
 
   return (
     <div className={styles.page}>
@@ -50,13 +51,11 @@ export function LoginForm() {
           <p className={styles.subtitle}>Sign in to continue your training.</p>
         </div>
 
-        {errorFromQuery && (
-          <div className="alert alert-error">
-            {errorMessage[errorFromQuery] ?? "Sign-in failed. Please try again."}
-          </div>
+        {errorText && (
+          <div className="alert alert-error">{errorText}</div>
         )}
 
-        <form action={loginAndRedirect} className={styles.form}>
+        <form method="POST" action="/api/auth/login" className={styles.form}>
           <input type="hidden" name="redirectTo" value={redirectTo} />
 
           <Input

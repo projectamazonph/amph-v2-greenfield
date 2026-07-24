@@ -1,28 +1,25 @@
 /**
- * /signup — STORY-004.
+ * /signup — server component shell.
  *
- * Server component shell. The actual form lives in <SignupForm> (a
- * client component) because it consumes `useSearchParams` to display
- * any `?error=...` query param that the signUpAndRedirect server
- * action appends on failure. Next.js requires a <Suspense> boundary
- * around any client component that calls useSearchParams during
- * static prerender.
+ * STORY-066 refactor: removed the Suspense boundary + useSearchParams
+ * dance. The form is now a plain HTML POST to /api/auth/signup, and
+ * errors come back as ?error=<kind> in the URL. The page just reads
+ * searchParams (server-side) and passes `errorKind` to the form.
  *
- * STORY-046 follow-up: this page no longer needs `useActionState`,
- * `useEffect`, or `useRouter`. The form posts to `signUpAndRedirect`,
- * which calls Next's `redirect()` directly — matching the
- * `loginAndRedirect` pattern in src/app/actions/login.action.ts.
- * This is the only known-working pattern for combining server-action
- * redirects with React 19 in Next.js 16.
+ * No client component, no useEffect, no useRouter, no useActionState.
+ * This is the most stable auth pattern on the web — the boring HTTP
+ * one that has worked for 30 years.
  */
 
-import { Suspense } from "react";
 import { SignupForm } from "./SignupForm";
 
-export default function SignUpPage() {
-  return (
-    <Suspense fallback={null}>
-      <SignupForm />
-    </Suspense>
-  );
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
+  const errorKind = params.error ?? null;
+
+  return <SignupForm errorKind={errorKind} />;
 }
