@@ -9,7 +9,8 @@
 
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { signUpAction, type SignUpState } from "../actions/signup.action";
 import Link from "next/link";
 import { Button } from "@/components/ui";
@@ -19,7 +20,15 @@ import styles from "./signup.module.css";
 const INITIAL_STATE: SignUpState = { kind: "idle" };
 
 export default function SignUpPage() {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(signUpAction, INITIAL_STATE);
+
+  // Handle redirect client-side so useActionState doesn't throw on redirect()
+  useEffect(() => {
+    if (state.kind === "success") {
+      router.push("/dashboard");
+    }
+  }, [state, router]);
 
   return (
     <div className={styles.page}>

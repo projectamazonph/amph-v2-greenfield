@@ -229,9 +229,15 @@ export async function signUpAction(
     });
     return result;
   } catch (err) {
-    // performSignUp doesn't throw (it catches use case + auto-login
-    // errors), but the navigate() call DOES throw on success. That's
-    // the expected Next control-flow — let it bubble.
+    // Next.js redirect() throws a special error to interrupt the response.
+    // useActionState does NOT catch it, so it propagates to React as an
+    // unhandled error and crashes the client. Catch it here and return
+    // a success state — the page uses useEffect to handle the redirect
+    // client-side instead.
+    const redirectObj = err as { digest?: string };
+    if (redirectObj?.digest?.startsWith("NEXT_REDIRECT")) {
+      return { kind: "success", email: input.email };
+    }
     throw err;
   }
 }
