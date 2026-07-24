@@ -58,6 +58,7 @@ import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
+import type { IAttemptFeedbackRepository } from "@/ports/repositories/IAttemptFeedbackRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 
@@ -81,6 +82,7 @@ import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
 import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSimulatorAttemptRepository";
 import { PrismaScorePolicyRepository } from "@/infra/repositories/PrismaScorePolicyRepository";
+import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAttemptFeedbackRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { prisma } from "@/infra/database/prisma";
@@ -201,6 +203,7 @@ import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
 import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
+import { ComposeAttemptFeedback } from "@/usecases/ComposeAttemptFeedback";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
 import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
@@ -241,6 +244,8 @@ export interface AppContainer {
   simulatorAttemptRepo: ISimulatorAttemptRepository;
   // STORY-065: scoring engine + dimensional policies
   scorePolicyRepo: IScorePolicyRepository;
+  // STORY-066: feedback composer + remediation
+  feedbackRepo: IAttemptFeedbackRepository;
   // STORY-050c: live class admin CRUD
   liveClassRepo: ILiveClassRepository;
   // STORY-011: pricing tier repo
@@ -344,6 +349,7 @@ export interface AppContainer {
   submitSimulatorAttempt: SubmitSimulatorAttempt;
   // STORY-065: scoring engine
   gradeSimulatorAttempt: GradeSimulatorAttempt;
+  composeAttemptFeedback: ComposeAttemptFeedback;
   // STORY-050c: live class admin CRUD
   adminListLiveClasses: AdminListLiveClasses;
   adminGetLiveClass: AdminGetLiveClass;
@@ -402,6 +408,8 @@ function buildProductionContainer(): AppContainer {
   );
   // STORY-065: scoring engine
   const scorePolicyRepo: IScorePolicyRepository = new PrismaScorePolicyRepository(prisma);
+  // STORY-066: feedback composer + remediation
+  const feedbackRepo: IAttemptFeedbackRepository = new PrismaAttemptFeedbackRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
   // STORY-011: pricing tier repo
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
@@ -604,6 +612,7 @@ function buildProductionContainer(): AppContainer {
     scenarioRepo,
     simulatorAttemptRepo,
     scorePolicyRepo,
+    feedbackRepo,
     // STORY-064: simulator attempt lifecycle
     startSimulatorAttempt: new StartSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
@@ -617,6 +626,11 @@ function buildProductionContainer(): AppContainer {
     gradeSimulatorAttempt: new GradeSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,
+    }),
+    composeAttemptFeedback: new ComposeAttemptFeedback({
+      attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
+      feedbackRepo,
     }),
     // STORY-011: pricing tier repo
     pricingTierRepo,

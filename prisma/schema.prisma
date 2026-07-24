@@ -710,3 +710,24 @@ model ScorePolicy {
   @@index([simulatorId])
   @@map("score_policies")
 }
+
+// ── STORY-066: Feedback Composer ─────────────────────────────────────────────
+
+model AttemptFeedback {
+  id               String   @id @default(cuid())
+  attemptId        String   @unique
+  userId           String
+  simulatorId      String
+  scenarioId       String
+  difficulty       String
+  mode             String
+  overallScore     Int
+  passed           Boolean
+  overallComment   String
+  remediationLinks Json
+  dimensionFeedback Json
+  completedAt      DateTime @default(now())
+
+  @@index([userId])
+  @@map("attempt_feedbacks")
+}
