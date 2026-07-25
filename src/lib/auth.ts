@@ -51,9 +51,7 @@ const SESSION_COOKIE_PROD = "__Secure-amph_session";
  * and matches the user's mental model.
  */
 function getSessionCookieName(): string {
-  return process.env.NODE_ENV === "production"
-    ? SESSION_COOKIE_PROD
-    : SESSION_COOKIE_DEV;
+  return process.env.NODE_ENV === "production" ? SESSION_COOKIE_PROD : SESSION_COOKIE_DEV;
 }
 
 /** 7 days — matches the Session entity's expected lifetime. */
@@ -117,9 +115,7 @@ export async function getSessionUser(): Promise<User | null> {
 export async function requireAuth(currentPath?: string): Promise<User> {
   const user = await getSessionUser();
   if (!user) {
-    const loginUrl = currentPath
-      ? `/login?redirect=${encodeURIComponent(currentPath)}`
-      : "/login";
+    const loginUrl = currentPath ? `/login?redirect=${encodeURIComponent(currentPath)}` : "/login";
     redirect(loginUrl);
   }
   return user;
@@ -141,8 +137,42 @@ export async function requireAdmin(currentPath?: string): Promise<User> {
 }
 
 /**
+ * The shape we need to set a cookie on. Matches both the response object
+ * returned by `NextResponse.redirect()` (a `NextResponse` whose `.cookies`
+ * is a `ResponseCookies`) and the `cookies()` store from `next/headers`
+ * (a `RequestCookies`). We type it as a structural subset so we can pass
+ * either interchangeably.
+ *
+ * Story 066 follow-up: in Route Handlers that return `NextResponse.redirect()`,
+ * cookies set via the `cookies()` store go to the *implicit* response and
+ * are LOST — the returned NextResponse is a fresh response. Passing the
+ * returned response in here lets us set cookies directly on it.
+ */
+interface CookieTarget {
+  set: (cookie: {
+    name: string;
+    value: string;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: "lax" | "strict" | "none";
+    path?: string;
+    expires?: Date;
+    maxAge?: number;
+  }) => void;
+}
+
+const SESSION_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: COOKIE_MAX_AGE_SECONDS,
+};
+
+/**
  * Set the session cookie. Called by the `SignIn` server action (STORY-006)
- * after a successful password verify.
+ * after a successful password verify, AND by the `/api/auth/login` and
+ * `/api/auth/signup` Route Handlers (STORY-066) on a successful response.
  *
  * The cookie is:
  * - HttpOnly: not readable from JavaScript (XSS protection)
@@ -152,39 +182,54 @@ export async function requireAdmin(currentPath?: string): Promise<User> {
  *
  * `expiresAt` is the JWT's own expiry (typically now + 7 days). The
  * `maxAge` is the cookie's browser-side expiry; both should match.
+ *
+ * If `target` is provided, the cookie is set on it directly. This is the
+ * Route Handler case: a handler creates a `NextResponse.redirect()` and
+ * needs the cookie to travel with that response. If `target` is omitted,
+ * the cookie is set on the request's `cookies()` store (the default for
+ * server actions and pages).
  */
 export async function setAuthCookie(
   token: string,
   expiresAt: Date,
+  target?: CookieTarget,
 ): Promise<void> {
-  (await cookies()).set({
+  const cookie = {
     name: getSessionCookieName(),
     value: token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
+    ...SESSION_COOKIE_OPTIONS,
     expires: expiresAt,
-    maxAge: COOKIE_MAX_AGE_SECONDS,
-  });
+  };
+  if (target) {
+    target.set(cookie);
+    return;
+  }
+  (await cookies()).set(cookie);
 }
 
 /**
  * Clear the session cookie. Called by the `SignOut` server action
- * (STORY-006). Deletes both the dev and prod cookie names so a user
- * who signed in under one environment and is signing out under another
- * doesn't get a stuck cookie.
+ * (STORY-006) and the `/api/auth/logout` Route Handler (STORY-066).
+ *
+ * Deletes both the dev and prod cookie names so a user who signed in
+ * under one environment and is signing out under another doesn't get
+ * a stuck cookie.
+ *
+ * If `target` is provided, the cookies are deleted from it directly
+ * (Route Handler case — see `setAuthCookie` for the rationale).
  */
-export async function clearAuthCookie(): Promise<void> {
-  const jar = await cookies();
+export async function clearAuthCookie(target?: CookieTarget): Promise<void> {
   // Read the current env's cookie name at call time, not module load.
   const currentName = getSessionCookieName();
+  const altName = currentName === SESSION_COOKIE_PROD ? SESSION_COOKIE_DEV : SESSION_COOKIE_PROD;
+
+  if (target) {
+    target.set({ name: currentName, value: "", path: "/" });
+    target.set({ name: altName, value: "", path: "/" });
+    return;
+  }
+  const jar = await cookies();
   jar.delete(currentName);
-  // Also clear the alt name in case the user signed in under a different env
-  const altName =
-    currentName === SESSION_COOKIE_PROD
-      ? SESSION_COOKIE_DEV
-      : SESSION_COOKIE_PROD;
   jar.delete(altName);
 }
 

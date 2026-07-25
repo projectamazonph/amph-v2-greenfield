@@ -42,9 +42,19 @@ export async function POST(request: Request): Promise<Response> {
   );
 
   if (outcome.kind === "success") {
-    // Auto-login succeeded — redirect to dashboard.
-    const url = new URL("/dashboard", request.url);
-    return NextResponse.redirect(url, { status: 303 });
+    // Auto-login succeeded — set the session cookie on the response we
+    // return, then 303 to /dashboard. The previous flow called
+    // setAuthCookie() via cookies() (which writes to the implicit
+    // response) and then returned NextResponse.redirect() — the new
+    // response did not inherit the cookie, so users landed on
+    // /dashboard without a session and got bounced to /login by the
+    // proxy. The fix: plant the cookie on response.cookies here, where
+    // it travels with the 303 back to the browser.
+    const response = NextResponse.redirect(new URL("/dashboard", request.url), {
+      status: 303,
+    });
+    await setAuthCookie(outcome.sessionToken, outcome.expiresAt, response.cookies);
+    return response;
   }
 
   // Map the failure kind to a query-param token. Pages render the

@@ -52,10 +52,17 @@ export async function POST(request: Request): Promise<Response> {
   );
 
   if (outcome.kind === "success") {
-    // Set-Cookie was set by plantCookie (setAuthCookie) on the response
-    // cookies. Send a 303 to the safe redirect target.
-    const url = new URL(outcome.redirectTo, request.url);
-    return NextResponse.redirect(url, { status: 303 });
+    // Plant the session cookie on the response we return, then 303 to
+    // the safe redirect target. The previous flow called setAuthCookie
+    // via cookies() (which writes to the implicit response) and then
+    // returned NextResponse.redirect() — the new response did not
+    // inherit the cookie, so users landed on the redirect target
+    // without a session and got bounced to /login by the proxy.
+    const response = NextResponse.redirect(new URL(outcome.redirectTo, request.url), {
+      status: 303,
+    });
+    await setAuthCookie(outcome.sessionToken, outcome.expiresAt, response.cookies);
+    return response;
   }
 
   // Map the failure kind to a query-param token that the /login page

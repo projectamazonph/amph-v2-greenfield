@@ -47,10 +47,14 @@ export async function POST(request: Request): Promise<Response> {
 
   // 2. Always clear the cookie + redirect. The use case is
   //    idempotent and the cookie clear is the part the user
-  //    actually perceives.
-  await clearAuthCookie();
+  //    actually perceives. We must clear on the response we return,
+  //    not via cookies() — the same bug as login/signup: NextResponse
+  //    doesn't inherit from the implicit cookie store.
+  const response = NextResponse.redirect(new URL("/login", request.url), {
+    status: 303,
+  });
+  await clearAuthCookie(response.cookies);
 
   // 3. Redirect to /login.
-  const url = new URL("/login", request.url);
-  return NextResponse.redirect(url, { status: 303 });
+  return response;
 }
