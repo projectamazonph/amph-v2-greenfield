@@ -49,8 +49,20 @@ const SESSION_COOKIE_PROD = "__Secure-amph_session";
  * tests that set NODE_ENV=production partway through, this was a
  * silent bug. Reading at call time is cheap (one string compare)
  * and matches the user's mental model.
+ *
+ * The `__Secure-` prefix is enforced by browsers: a cookie whose
+ * name starts with `__Secure-` is dropped unless the `Secure` flag
+ * is set. Since HTTPS-only cookies can't be set over HTTP (test
+ * environments), we MUST use the dev name in HTTP contexts even
+ * when NODE_ENV=production. Pass the request protocol's `isHttps`
+ * flag from the route handler; if omitted, fall back to the
+ * env-based default (correct for server actions and pages, where
+ * the request protocol isn't directly available).
  */
-function getSessionCookieName(): string {
+function getSessionCookieName(isHttps?: boolean): string {
+  if (typeof isHttps === "boolean") {
+    return isHttps ? SESSION_COOKIE_PROD : SESSION_COOKIE_DEV;
+  }
   return process.env.NODE_ENV === "production" ? SESSION_COOKIE_PROD : SESSION_COOKIE_DEV;
 }
 
@@ -196,16 +208,28 @@ const SESSION_COOKIE_OPTIONS = {
  * needs the cookie to travel with that response. If `target` is omitted,
  * the cookie is set on the request's `cookies()` store (the default for
  * server actions and pages).
+ *
+ * `secure` and `cookieName` MUST agree. The `__Secure-` prefix is
+ * enforced by browsers — a cookie starting with `__Secure-` is dropped
+ * unless the Secure flag is set. So the cookie name and the Secure flag
+ * are derived together from the same `isHttps` signal. If you only pass
+ * one, the other stays at its NODE_ENV-based default, which is wrong on
+ * HTTP. Always pass both, or neither.
  */
 export async function setAuthCookie(
   token: string,
   expiresAt: Date,
   target?: CookieTarget,
-  options?: { secure?: boolean },
+  options?: { secure?: boolean; isHttps?: boolean },
 ): Promise<void> {
-  const secure = options?.secure ?? SESSION_COOKIE_OPTIONS.secure;
+  // Derive both Secure and the cookie name from a single `isHttps`
+  // signal when available. The two MUST agree (see comment above).
+  const secure =
+    options?.secure ??
+    (typeof options?.isHttps === "boolean" ? options.isHttps : SESSION_COOKIE_OPTIONS.secure);
+  const name = getSessionCookieName(options?.isHttps);
   const cookie = {
-    name: getSessionCookieName(),
+    name,
     value: token,
     httpOnly: SESSION_COOKIE_OPTIONS.httpOnly,
     secure,

@@ -138,11 +138,12 @@ describe("POST /api/auth/signup — happy path", () => {
     expect(setCookie).toContain("stubbed-jwt-token");
   });
 
-  it("does NOT set the Secure flag on the cookie when the request is over HTTP", async () => {
+  it("does NOT set the Secure flag and uses the dev cookie name when the request is over HTTP", async () => {
     // Playwright's `next start` (NODE_ENV=production) runs over HTTP
-    // localhost — if we set Secure=true based on NODE_ENV, the browser
-    // drops the cookie and the user gets bounced back to /login. The
-    // route must decide Secure from the request protocol, not NODE_ENV.
+    // localhost — if we set Secure=true or use the `__Secure-` prefix
+    // based on NODE_ENV, the browser drops the cookie and the user
+    // gets bounced back to /login. The route must decide both from
+    // the request protocol, not NODE_ENV.
     const request = new Request("http://localhost:3000/api/auth/signup", {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -155,14 +156,16 @@ describe("POST /api/auth/signup — happy path", () => {
     });
     const response = await POST(request);
     const setCookie = response.headers.get("set-cookie") ?? "";
-    expect(setCookie).toContain("amph_session=");
+    // Plain dev name (no __Secure- prefix) and no Secure flag.
+    expect(setCookie).toMatch(/(?:^|; )amph_session=/);
+    expect(setCookie.toLowerCase()).not.toMatch(/(?:^|; )__secure-amph_session=/);
     expect(setCookie.toLowerCase()).not.toMatch(/;\s*secure/);
   });
 
-  it("sets the Secure flag on the cookie when the request is over HTTPS", async () => {
+  it("sets the Secure flag and uses the prod cookie name when the request is over HTTPS", async () => {
     // Real production (Vercel) is always HTTPS, and we want the Secure
-    // flag in that case. Make sure we don't accidentally regress and
-    // strip the flag for HTTPS traffic.
+    // flag and the `__Secure-` prefix in that case. Make sure we don't
+    // accidentally regress and strip them for HTTPS traffic.
     const request = new Request("https://example.com/api/auth/signup", {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -175,6 +178,7 @@ describe("POST /api/auth/signup — happy path", () => {
     });
     const response = await POST(request);
     const setCookie = response.headers.get("set-cookie") ?? "";
+    expect(setCookie.toLowerCase()).toMatch(/(?:^|; )__secure-amph_session=/);
     expect(setCookie).toMatch(/;\s*[Ss]ecure/);
   });
 

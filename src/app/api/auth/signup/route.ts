@@ -51,16 +51,17 @@ export async function POST(request: Request): Promise<Response> {
     // proxy. The fix: plant the cookie on response.cookies here, where
     // it travels with the 303 back to the browser.
     //
-    // `secure` is decided by the request protocol, not NODE_ENV:
-    // Playwright's `next start` (NODE_ENV=production) runs over HTTP
-    // localhost, where Secure cookies are silently dropped. Real
-    // production (Vercel) is always HTTPS.
+    // `isHttps` is the single source of truth for both the Secure flag
+    // AND the cookie name. Playwright's `next start` (NODE_ENV=
+    // production) runs over HTTP localhost, where Secure cookies AND
+    // the `__Secure-` prefix are silently dropped. Real production
+    // (Vercel) is always HTTPS so both stay on.
     const isHttps = new URL(request.url).protocol === "https:";
     const response = NextResponse.redirect(new URL("/dashboard", request.url), {
       status: 303,
     });
     await setAuthCookie(outcome.sessionToken, outcome.expiresAt, response.cookies, {
-      secure: isHttps,
+      isHttps,
     });
     return response;
   }
