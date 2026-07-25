@@ -163,6 +163,12 @@ interface CookieTarget {
 
 const SESSION_COOKIE_OPTIONS = {
   httpOnly: true,
+  // Secure flag is decided at call time, not module load. The default
+  // (true in production) is correct for Vercel deployments, but
+  // tests/E2E run `next start` (NODE_ENV=production) over HTTP
+  // localhost — the browser drops Secure cookies on http, so the
+  // session never round-trips. Route Handlers know the actual request
+  // protocol and pass an override.
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax" as const,
   path: "/",
@@ -176,7 +182,9 @@ const SESSION_COOKIE_OPTIONS = {
  *
  * The cookie is:
  * - HttpOnly: not readable from JavaScript (XSS protection)
- * - Secure: in production, only sent over HTTPS
+ * - Secure: only sent over HTTPS, unless overridden via `secure` for
+ *   environments that run over HTTP (e.g. Playwright's `next start`
+ *   against `http://localhost:3000`).
  * - SameSite=Lax: sent on top-level navigations but not cross-site subrequests (CSRF protection)
  * - Path=/: sent to every route
  *
@@ -193,11 +201,17 @@ export async function setAuthCookie(
   token: string,
   expiresAt: Date,
   target?: CookieTarget,
+  options?: { secure?: boolean },
 ): Promise<void> {
+  const secure = options?.secure ?? SESSION_COOKIE_OPTIONS.secure;
   const cookie = {
     name: getSessionCookieName(),
     value: token,
-    ...SESSION_COOKIE_OPTIONS,
+    httpOnly: SESSION_COOKIE_OPTIONS.httpOnly,
+    secure,
+    sameSite: SESSION_COOKIE_OPTIONS.sameSite,
+    path: SESSION_COOKIE_OPTIONS.path,
+    maxAge: SESSION_COOKIE_OPTIONS.maxAge,
     expires: expiresAt,
   };
   if (target) {

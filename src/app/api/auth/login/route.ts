@@ -58,10 +58,18 @@ export async function POST(request: Request): Promise<Response> {
     // returned NextResponse.redirect() — the new response did not
     // inherit the cookie, so users landed on the redirect target
     // without a session and got bounced to /login by the proxy.
+    //
+    // `secure` is decided by the request protocol, not NODE_ENV:
+    // Playwright's `next start` (NODE_ENV=production) runs over HTTP
+    // localhost, where Secure cookies are silently dropped. Real
+    // production (Vercel) is always HTTPS.
+    const isHttps = new URL(request.url).protocol === "https:";
     const response = NextResponse.redirect(new URL(outcome.redirectTo, request.url), {
       status: 303,
     });
-    await setAuthCookie(outcome.sessionToken, outcome.expiresAt, response.cookies);
+    await setAuthCookie(outcome.sessionToken, outcome.expiresAt, response.cookies, {
+      secure: isHttps,
+    });
     return response;
   }
 

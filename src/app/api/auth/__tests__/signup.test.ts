@@ -138,6 +138,46 @@ describe("POST /api/auth/signup — happy path", () => {
     expect(setCookie).toContain("stubbed-jwt-token");
   });
 
+  it("does NOT set the Secure flag on the cookie when the request is over HTTP", async () => {
+    // Playwright's `next start` (NODE_ENV=production) runs over HTTP
+    // localhost — if we set Secure=true based on NODE_ENV, the browser
+    // drops the cookie and the user gets bounced back to /login. The
+    // route must decide Secure from the request protocol, not NODE_ENV.
+    const request = new Request("http://localhost:3000/api/auth/signup", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        email: "u@example.com",
+        password: "Str0ngP@ss123!",
+        firstName: "Test",
+        lastName: "User",
+      }).toString(),
+    });
+    const response = await POST(request);
+    const setCookie = response.headers.get("set-cookie") ?? "";
+    expect(setCookie).toContain("amph_session=");
+    expect(setCookie.toLowerCase()).not.toMatch(/;\s*secure/);
+  });
+
+  it("sets the Secure flag on the cookie when the request is over HTTPS", async () => {
+    // Real production (Vercel) is always HTTPS, and we want the Secure
+    // flag in that case. Make sure we don't accidentally regress and
+    // strip the flag for HTTPS traffic.
+    const request = new Request("https://example.com/api/auth/signup", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        email: "u@example.com",
+        password: "Str0ngP@ss123!",
+        firstName: "Test",
+        lastName: "User",
+      }).toString(),
+    });
+    const response = await POST(request);
+    const setCookie = response.headers.get("set-cookie") ?? "";
+    expect(setCookie).toMatch(/;\s*[Ss]ecure/);
+  });
+
   it("returns 303 to /signup?error=email_taken when email is already registered", async () => {
     // Override the mocked performSignUp for this one test.
     const { performSignUp } = await import("@/app/actions/signup.action");
