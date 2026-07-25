@@ -29,10 +29,24 @@ async function clientIp(): Promise<string | undefined> {
  * `redirectTo` field. The `signUpAndRedirect` server action below
  * owns the navigation, mirroring the `loginAndRedirect` pattern
  * (src/app/actions/login.action.ts).
+ *
+ * Hotfix follow-up: the success variant now carries `sessionToken` and
+ * `expiresAt` so callers (the `/api/auth/signup` route handler in
+ * particular) can set the session cookie directly on the response they
+ * return. `NextResponse.redirect()` does not inherit cookies from the
+ * implicit `cookies()` store, so the previous "call setAuthCookie from
+ * inside performSignUp" flow silently dropped the cookie in route
+ * handlers — leaving users on /dashboard without a session, getting
+ * bounced to /login. Callers now own the cookie-plant side effect.
  */
 export type SignUpResult =
-  | SignUpError
-  | { kind: "success"; email: string }
+  | (SignUpError & { sessionToken?: never; expiresAt?: never })
+  | {
+      kind: "success";
+      email: string;
+      sessionToken: string;
+      expiresAt: Date;
+    }
   | { kind: "invalid_input" }
   | { kind: "rate_limited"; retryAfterSeconds: number }
   | { kind: "unexpected"; message: string };
@@ -96,18 +110,29 @@ export async function performSignUp(
   } catch (err) {
     console.error("[performSignUp] resend verification failed:", err);
   }
+  let sessionToken: string | undefined;
+  let expiresAt: Date | undefined;
   try {
     const loginResult = await container.login.execute({
       email: input.email,
       password: input.password,
     });
     if (loginResult.ok) {
+      sessionToken = loginResult.sessionToken;
+      expiresAt = loginResult.expiresAt;
+      // Still call plantCookie for backwards compatibility with callers
+      // (e.g. the signUpAndRedirect server action wrapper) that wired
+      // their cookie-plant here. Route handlers can ignore the side
+      // effect and use sessionToken/expiresAt from the result instead.
       await deps.plantCookie(loginResult.sessionToken, loginResult.expiresAt);
     }
   } catch (err) {
     console.error("[performSignUp] auto-login failed:", err);
   }
-  return { kind: "success", email: signedUpEmail };
+  if (!sessionToken || !expiresAt) {
+    return { kind: "unexpected", message: "auto-login produced no session" };
+  }
+  return { kind: "success", email: signedUpEmail, sessionToken, expiresAt };
 }
 
 /**

@@ -63,7 +63,17 @@ async function clientIp(): Promise<string | undefined> {
  * just hadn't been migrated.
  */
 export type LoginResult =
-  | { kind: "success"; redirectTo: string; userId: string }
+  | {
+      kind: "success";
+      redirectTo: string;
+      userId: string;
+      // Hotfix follow-up: exposed so the /api/auth/login Route Handler
+      // can plant the session cookie on the response it returns. See
+      // signup.action.ts for the same rationale — NextResponse.redirect()
+      // does not inherit cookies from the implicit `cookies()` store.
+      sessionToken: string;
+      expiresAt: Date;
+    }
   | { kind: "redirect_to_login"; errorKind: string }
   | { kind: "invalid_input" }
   | { kind: "rate_limited"; retryAfterSeconds: number };
@@ -125,7 +135,13 @@ export async function performLogin(
   }
 
   await deps.plantCookie(result.sessionToken, result.expiresAt);
-  return { kind: "success", redirectTo: safeRedirect, userId: result.userId };
+  return {
+    kind: "success",
+    redirectTo: safeRedirect,
+    userId: result.userId,
+    sessionToken: result.sessionToken,
+    expiresAt: result.expiresAt,
+  };
 }
 
 /**

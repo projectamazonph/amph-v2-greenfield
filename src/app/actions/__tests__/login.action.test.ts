@@ -153,11 +153,18 @@ describe("performLogin", () => {
       deps,
     );
 
-    expect(result).toEqual({
+    // Hotfix follow-up: success now also carries sessionToken/expiresAt
+    // (see SignUpResult docstring). toMatchObject so we don't pin the
+    // exact JWT value, which changes per call.
+    expect(result).toMatchObject({
       kind: "success",
       redirectTo: "/admin/users",
       userId: "u-u@test.example.com",
     });
+    if (result.kind === "success") {
+      expect(result.sessionToken).toMatch(/^eyJ/);
+      expect(result.expiresAt).toBeInstanceOf(Date);
+    }
     expect(deps.plantCookie).toHaveBeenCalledTimes(1);
     const plantCall = deps.plantCookie.mock.calls[0];
     expect(plantCall).toBeDefined();
@@ -178,7 +185,7 @@ describe("performLogin", () => {
       },
       deps,
     );
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       kind: "success",
       redirectTo: "/courses",
       userId: "u-u@test.example.com",
@@ -203,7 +210,7 @@ describe("performLogin", () => {
     // //evil.com) means the open-redirect defense is working as
     // intended because the safeRedirect check rejects anything
     // starting with `//`.
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       kind: "success",
       redirectTo: "/courses",
       userId: "u-u@test.example.com",

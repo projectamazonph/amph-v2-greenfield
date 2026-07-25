@@ -49,11 +49,21 @@ const SESSION_COOKIE_PROD = "__Secure-amph_session";
  * tests that set NODE_ENV=production partway through, this was a
  * silent bug. Reading at call time is cheap (one string compare)
  * and matches the user's mental model.
+ *
+ * The `__Secure-` prefix is enforced by browsers: a cookie whose
+ * name starts with `__Secure-` is dropped unless the `Secure` flag
+ * is set. Since HTTPS-only cookies can't be set over HTTP (test
+ * environments), we MUST use the dev name in HTTP contexts even
+ * when NODE_ENV=production. Pass the request protocol's `isHttps`
+ * flag from the route handler; if omitted, fall back to the
+ * env-based default (correct for server actions and pages, where
+ * the request protocol isn't directly available).
  */
-function getSessionCookieName(): string {
-  return process.env.NODE_ENV === "production"
-    ? SESSION_COOKIE_PROD
-    : SESSION_COOKIE_DEV;
+function getSessionCookieName(isHttps?: boolean): string {
+  if (typeof isHttps === "boolean") {
+    return isHttps ? SESSION_COOKIE_PROD : SESSION_COOKIE_DEV;
+  }
+  return process.env.NODE_ENV === "production" ? SESSION_COOKIE_PROD : SESSION_COOKIE_DEV;
 }
 
 /** 7 days — matches the Session entity's expected lifetime. */
@@ -117,9 +127,7 @@ export async function getSessionUser(): Promise<User | null> {
 export async function requireAuth(currentPath?: string): Promise<User> {
   const user = await getSessionUser();
   if (!user) {
-    const loginUrl = currentPath
-      ? `/login?redirect=${encodeURIComponent(currentPath)}`
-      : "/login";
+    const loginUrl = currentPath ? `/login?redirect=${encodeURIComponent(currentPath)}` : "/login";
     redirect(loginUrl);
   }
   return user;
@@ -141,50 +149,125 @@ export async function requireAdmin(currentPath?: string): Promise<User> {
 }
 
 /**
+ * The shape we need to set a cookie on. Matches both the response object
+ * returned by `NextResponse.redirect()` (a `NextResponse` whose `.cookies`
+ * is a `ResponseCookies`) and the `cookies()` store from `next/headers`
+ * (a `RequestCookies`). We type it as a structural subset so we can pass
+ * either interchangeably.
+ *
+ * Story 066 follow-up: in Route Handlers that return `NextResponse.redirect()`,
+ * cookies set via the `cookies()` store go to the *implicit* response and
+ * are LOST — the returned NextResponse is a fresh response. Passing the
+ * returned response in here lets us set cookies directly on it.
+ */
+interface CookieTarget {
+  set: (cookie: {
+    name: string;
+    value: string;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: "lax" | "strict" | "none";
+    path?: string;
+    expires?: Date;
+    maxAge?: number;
+  }) => void;
+}
+
+const SESSION_COOKIE_OPTIONS = {
+  httpOnly: true,
+  // Secure flag is decided at call time, not module load. The default
+  // (true in production) is correct for Vercel deployments, but
+  // tests/E2E run `next start` (NODE_ENV=production) over HTTP
+  // localhost — the browser drops Secure cookies on http, so the
+  // session never round-trips. Route Handlers know the actual request
+  // protocol and pass an override.
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: COOKIE_MAX_AGE_SECONDS,
+};
+
+/**
  * Set the session cookie. Called by the `SignIn` server action (STORY-006)
- * after a successful password verify.
+ * after a successful password verify, AND by the `/api/auth/login` and
+ * `/api/auth/signup` Route Handlers (STORY-066) on a successful response.
  *
  * The cookie is:
  * - HttpOnly: not readable from JavaScript (XSS protection)
- * - Secure: in production, only sent over HTTPS
+ * - Secure: only sent over HTTPS, unless overridden via `secure` for
+ *   environments that run over HTTP (e.g. Playwright's `next start`
+ *   against `http://localhost:3000`).
  * - SameSite=Lax: sent on top-level navigations but not cross-site subrequests (CSRF protection)
  * - Path=/: sent to every route
  *
  * `expiresAt` is the JWT's own expiry (typically now + 7 days). The
  * `maxAge` is the cookie's browser-side expiry; both should match.
+ *
+ * If `target` is provided, the cookie is set on it directly. This is the
+ * Route Handler case: a handler creates a `NextResponse.redirect()` and
+ * needs the cookie to travel with that response. If `target` is omitted,
+ * the cookie is set on the request's `cookies()` store (the default for
+ * server actions and pages).
+ *
+ * `secure` and `cookieName` MUST agree. The `__Secure-` prefix is
+ * enforced by browsers — a cookie starting with `__Secure-` is dropped
+ * unless the Secure flag is set. So the cookie name and the Secure flag
+ * are derived together from the same `isHttps` signal. If you only pass
+ * one, the other stays at its NODE_ENV-based default, which is wrong on
+ * HTTP. Always pass both, or neither.
  */
 export async function setAuthCookie(
   token: string,
   expiresAt: Date,
+  target?: CookieTarget,
+  options?: { secure?: boolean; isHttps?: boolean },
 ): Promise<void> {
-  (await cookies()).set({
-    name: getSessionCookieName(),
+  // Derive both Secure and the cookie name from a single `isHttps`
+  // signal when available. The two MUST agree (see comment above).
+  const secure =
+    options?.secure ??
+    (typeof options?.isHttps === "boolean" ? options.isHttps : SESSION_COOKIE_OPTIONS.secure);
+  const name = getSessionCookieName(options?.isHttps);
+  const cookie = {
+    name,
     value: token,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
+    httpOnly: SESSION_COOKIE_OPTIONS.httpOnly,
+    secure,
+    sameSite: SESSION_COOKIE_OPTIONS.sameSite,
+    path: SESSION_COOKIE_OPTIONS.path,
+    maxAge: SESSION_COOKIE_OPTIONS.maxAge,
     expires: expiresAt,
-    maxAge: COOKIE_MAX_AGE_SECONDS,
-  });
+  };
+  if (target) {
+    target.set(cookie);
+    return;
+  }
+  (await cookies()).set(cookie);
 }
 
 /**
  * Clear the session cookie. Called by the `SignOut` server action
- * (STORY-006). Deletes both the dev and prod cookie names so a user
- * who signed in under one environment and is signing out under another
- * doesn't get a stuck cookie.
+ * (STORY-006) and the `/api/auth/logout` Route Handler (STORY-066).
+ *
+ * Deletes both the dev and prod cookie names so a user who signed in
+ * under one environment and is signing out under another doesn't get
+ * a stuck cookie.
+ *
+ * If `target` is provided, the cookies are deleted from it directly
+ * (Route Handler case — see `setAuthCookie` for the rationale).
  */
-export async function clearAuthCookie(): Promise<void> {
-  const jar = await cookies();
+export async function clearAuthCookie(target?: CookieTarget): Promise<void> {
   // Read the current env's cookie name at call time, not module load.
   const currentName = getSessionCookieName();
+  const altName = currentName === SESSION_COOKIE_PROD ? SESSION_COOKIE_DEV : SESSION_COOKIE_PROD;
+
+  if (target) {
+    target.set({ name: currentName, value: "", path: "/" });
+    target.set({ name: altName, value: "", path: "/" });
+    return;
+  }
+  const jar = await cookies();
   jar.delete(currentName);
-  // Also clear the alt name in case the user signed in under a different env
-  const altName =
-    currentName === SESSION_COOKIE_PROD
-      ? SESSION_COOKIE_DEV
-      : SESSION_COOKIE_PROD;
   jar.delete(altName);
 }
 
