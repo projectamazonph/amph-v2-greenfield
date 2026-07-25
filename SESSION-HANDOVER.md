@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-25 (Sprint 13 in progress — simulator rebuilds). `main` @ `9eb5f6b` (PR #179). STORY-067 merged (STR Triage rebuild). STORY-068 PR #180 open (Bid Elevator rebuild). Operator-owned items: PayMongo webhook, admin user, launch comms.
+**Updated:** 2026-07-25 (Sprint 13 in progress — simulator rebuilds). `main` @ `a0ce6c2` (PR #182 squash: auth cookie fix + Campaign Builder). STORY-067/068/069 merged. STORY-070 next. Operator-owned items: PayMongo webhook, admin user, launch comms.
 
 ---
 
@@ -8,15 +8,15 @@
 
 | Metric                   | Value                                                                                                                                                                                                                                                                                                       |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase                    | **Sprint 13 in progress. STORY-067 merged (PR #179), STORY-068 PR #180 open (Bid Elevator rebuild). Remaining: Campaign Builder (STORY-069) and Listing Audit (STORY-070) simulator rebuilds.**                                                                                                             |
+| Phase                    | **Sprint 13 in progress. STORY-067/068/069 all merged. STORY-070 (Listing Audit rebuild) is next. Auth cookie session hotfix (PR #182) also merged — unblocks all simulator E2E tests.**                                                                                                                    |
 | Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                                                                               |
 | Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                                                                      |
-| `main` HEAD              | `9eb5f6b` (PR #179 squash): `feat(simulator): STORY-067 STR Triage rebuild — scoring engine integration`                                                                                                                                                                                                    |
+| `main` HEAD              | `a0ce6c2` (PR #182 squash): `fix(auth): plant session cookie on the redirect response (STORY-066 follow-up)` — also pulled in STORY-069 Campaign Builder + SESSION-HANDOVER update via squash from a diverged local main                                                                                    |
 | Production URL           | `https://amph-v2-greenfield.vercel.app` — live, all 4 key routes returning expected status (`/`, `/signup`, `/login` → 200; `/dashboard` → 307 to login when unauthenticated)                                                                                                                               |
 | Vercel project           | `prj_3tEN1Akupoosai3OAGc1t50ru5QG` (`amph-v2-greenfield`), org `team_wIkEXZCToZvRHmrgFFhpsgkV`                                                                                                                                                                                                              |
 | Database                 | **Neon Postgres** (production). `prisma migrate deploy` applied all 12 migrations (added `pricing_tier` + `pricing_tier_early_bird_course_link` last). All four pricing tiers seeded (foundations ₱2,999, mastery ₱5,999 with 7-day early-bird, ultimate ₱9,999 with 3-day early-bird, all-access ₱14,999). |
 | Environment              | `DATABASE_URL`, `SHADOW_DATABASE_URL`, `JWT_SECRET`, `PAYMONGO_SECRET` (live), `PAYMONGO_WEBHOOK_SECRET`, `RESEND_API_KEY`, `SENTRY_DSN`, `NEXT_PUBLIC_APP_URL` pulled from Vercel and mirrored into local `.env` / `.env.local` for script execution                                                       |
-| Unit + integration tests | **2352 passing + 2 skipped, 0 TypeScript errors**                                                                                                                                                                                                                                                           |
+| Unit + integration tests | **2827 passing + 2 skipped, 0 TypeScript errors** (2 pre-existing prisma-migration Windows failures unrelated to recent work)                                                                                                                                                                               |
 | Architecture compliance  | **419 tests passing, 0 violations**                                                                                                                                                                                                                                                                         |
 | Coverage                 | 86.3% lines / 87.59% functions / 85.8% statements / 78.12% branches — all above configured thresholds (80/70/80/80).                                                                                                                                                                                        |
 | E2E                      | 15 passed, 4 intentionally skipped, 0 failed on `chromium-desktop`. a11y.spec.ts soft-passes.                                                                                                                                                                                                               |
@@ -35,6 +35,28 @@
 - Legacy `classifyStr()` kept for backward compat
 - 41 STR Triage tests pass; all CI checks green; squash-merged as `9eb5f6b`
 
+### STORY-069: Campaign Builder rebuild — merged (via PR #182 squash)
+
+- `CampaignBuilderOutput` now has `ScoreDimensions` (structureQuality, budgetAllocation, keywordRelevance, explanation)
+- `CampaignBuilderInput` now has `userAdjustedCampaigns` (student's submitted campaign structure for grading)
+- `CampaignBuilderSimulator.run()` computes dimension scores when `userAdjustedCampaigns` provided
+- `campaignBuilderAttempt()` server action wires full lifecycle
+- Legacy `buildCampaign()` kept for backward compat
+- `seed-simulator-policies.ts` fixed: campaign-builder policies now use correct dimension names
+- 37 Campaign Builder tests pass; typecheck 0 errors; lint 0 errors
+- Branch: `feat/STORY-069-campaign-builder-rebuild` (PR #181 opened but closed as redundant — Campaign Builder code was accidentally picked up by PR #182's squash-merge because that branch was based off a local main that already had this commit)
+
+### Hotfix: Auth cookie on redirect (PR #182, merged)
+
+- `/api/auth/{login,signup,logout}` route handlers were calling `setAuthCookie` via `cookies().set()` (which writes to the implicit response) and then returning `NextResponse.redirect()` — a fresh response that did not inherit the cookie. The session cookie was silently dropped.
+- Fix has three pieces:
+  1. `setAuthCookie` / `clearAuthCookie` now accept an optional `CookieTarget` so the cookie can be set on the response we actually return.
+  2. `performSignUp` / `performLogin` now expose `sessionToken` / `expiresAt` in the success result so route handlers can plant the cookie on the redirect response.
+  3. Cookie `Secure` flag AND cookie name (`amph_session` vs `__Secure-amph_session`) are now both derived from the request protocol (`isHttps`), not `NODE_ENV`. The `__Secure-` prefix requires `Secure: true` — browsers drop the cookie otherwise. Playwright's `next start` (NODE_ENV=production) runs over HTTP localhost, so the cookie must be the dev name with no Secure flag. Real production (Vercel) is always HTTPS so both stay on.
+- New route tests in `src/app/api/auth/__tests__/{login,signup}.test.ts` assert `Set-Cookie: amph_session=...` is on the 303 response and that the Secure flag + name follow the request protocol.
+- Typecheck clean, lint clean, 2827 tests pass. The signup E2E that was failing across every PR since #169 now passes.
+- Branch: `fix/auth-cookie-on-redirect`; PR #182 merged as `a0ce6c2`.
+
 ### STORY-068: Bid Elevator rebuild — PR #180 open
 
 - `BidElevatorOutput` now has `ScoreDimensions` (bidAccuracy, budgetAdherence, roasHit, explanation)
@@ -48,15 +70,16 @@
 
 ### Sprint 13 status
 
-| Story     | Title                                 | Status                   |
-| --------- | ------------------------------------- | ------------------------ |
-| STORY-064 | Simulator attempt infrastructure      | merged (main)            |
-| STORY-065 | Scoring engine + dimensional policies | merged (main)            |
-| STORY-066 | Feedback composer + remediation       | merged (main, PR #173)   |
-| STORY-067 | STR Triage rebuild                    | merged (PR #179)         |
-| STORY-068 | Bid Elevator rebuild                  | PR #180 open, CI running |
-| STORY-069 | Campaign Builder rebuild              | pending                  |
-| STORY-070 | Listing Audit rebuild                 | pending                  |
+| Story     | Title                                 | Status                                                                |
+| --------- | ------------------------------------- | --------------------------------------------------------------------- |
+| STORY-064 | Simulator attempt infrastructure      | merged (main)                                                         |
+| STORY-065 | Scoring engine + dimensional policies | merged (main)                                                         |
+| STORY-066 | Feedback composer + remediation       | merged (main, PR #173)                                                |
+| STORY-067 | STR Triage rebuild                    | merged (PR #179)                                                      |
+| STORY-068 | Bid Elevator rebuild                  | merged (PR #180)                                                      |
+| STORY-069 | Campaign Builder rebuild              | merged (PR #181 closed as redundant; code in main via PR #182 squash) |
+| Hotfix    | Auth cookie on redirect               | merged (PR #182)                                                      |
+| STORY-070 | Listing Audit rebuild                 | next                                                                  |
 
 ## What changed this session (2026-07-24, v0.1.0 release)
 
