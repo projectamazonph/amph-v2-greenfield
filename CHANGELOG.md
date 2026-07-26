@@ -4,6 +4,21 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-26: Audit hardening execution (PRs #186–#192)
+
+Follow-up to the docs-only audit verification pass below — executed
+every item on the follow-up list, one PR per item, each verified
+against a real local Postgres 16 and the full test suite before merge.
+
+- **PR #186**: `SignUp.ts` writes a `user.signed_up` audit entry (closes STORY-009's TODO).
+- **PR #187**: persistent `WebhookEvent` log for the PayMongo webhook — every inbound request recorded before processing, outcome updated after, independent of `Order` state.
+- **PR #188**: `PrismaEnrollmentRepository`/`PrismaQuizAttemptRepository` validate persisted status on read instead of an unchecked cast (mirrors `Order`'s existing `PaymentStatus.isValid()` pattern). Did not convert to native Prisma enums — see the PR for why.
+- **PR #190**: `RebuildCourseCurriculum` — all 8 module/lesson mutation use cases now keep `Course.curriculum` in sync with `Module`/`Lesson`, fixing a real bug where an admin-added lesson could show in the catalog and then 404/deny-access when opened.
+- **PR #191**: wrote the 4 missing runbooks (payment incident, webhook replay, DB restore, admin access recovery). Writing the admin one surfaced that session/`lockedUntil` revocation doesn't actually work today, and `pnpm db:seed:admin` points at a script that doesn't exist.
+- **PR #192**: opt-in TOTP 2FA for admin accounts — `TotpService` port, real (`otpauth`) + fake adapters, enroll/confirm/disable use cases, `Login.ts` gains an optional `totpCode`, UI at `/admin/settings` + `/admin/settings/2fa-setup`. Not manually browser-tested — verified via the automated suite and a real-Postgres smoke test only.
+
+Full details in `SESSION-HANDOVER.md` and `docs/audit-2026-07-26-hardening-review.md` (kept current through each merge).
+
 ### 2026-07-26: Audit verification + CLAUDE.md known-gaps correction (docs only)
 
 - A pasted external "audit" (based on README/schema/docs, not the live code) was received as a task. Every claim was checked against the actual source before acting on anything — no application code changed.
