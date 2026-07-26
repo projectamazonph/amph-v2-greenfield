@@ -12,6 +12,23 @@ import { Result } from "@/domain/shared/Result";
 export type EnrollmentStatus = "active" | "cancelled" | "refunded" | "expired";
 export type EnrollmentSource = "direct" | "affiliate" | "simulator_trial";
 
+const ALL_ENROLLMENT_STATUSES: readonly EnrollmentStatus[] = [
+  "active",
+  "cancelled",
+  "refunded",
+  "expired",
+];
+
+/**
+ * Type guard for a value read back from persistence. A repository
+ * adapter should call this before trusting a stored string as an
+ * `EnrollmentStatus` — mirrors `PaymentStatus.isValid()`. A corrupt
+ * or legacy row must not silently hydrate an impossible state.
+ */
+export function isEnrollmentStatus(value: string): value is EnrollmentStatus {
+  return (ALL_ENROLLMENT_STATUSES as readonly string[]).includes(value);
+}
+
 export interface Enrollment {
   readonly id: string;
   readonly userId: string;
@@ -35,9 +52,7 @@ export interface Enrollment {
   markLessonComplete(lessonId: string, courseLessonCount: number): void;
 }
 
-export type CreateEnrollmentError =
-  | { kind: "invalid_user_id" }
-  | { kind: "invalid_course_id" };
+export type CreateEnrollmentError = { kind: "invalid_user_id" } | { kind: "invalid_course_id" };
 
 /**
  * Factory for creating an Enrollment domain object.
@@ -77,9 +92,10 @@ export function createEnrollment(params: {
       }
       // Always update lastLessonId and progressPercent (even on re-visit)
       this.lastLessonId = lessonId;
-      this.progressPercent = courseLessonCount > 0
-        ? Math.min(100, Math.floor((this.completedLessonIds.length / courseLessonCount) * 100))
-        : 0;
+      this.progressPercent =
+        courseLessonCount > 0
+          ? Math.min(100, Math.floor((this.completedLessonIds.length / courseLessonCount) * 100))
+          : 0;
     },
   };
   return Result.ok(enrollment);

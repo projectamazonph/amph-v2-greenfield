@@ -11,6 +11,7 @@ import type {
   QuizAttemptRepositoryError,
 } from "@/ports/repositories/IQuizAttemptRepository";
 import type { QuizAttempt, QuizAttemptAnswer } from "@/domain/entities/QuizAttempt";
+import { isQuizAttemptStatus } from "@/domain/entities/QuizAttempt";
 
 export class PrismaQuizAttemptRepository implements IQuizAttemptRepository {
   constructor(private readonly db: PrismaClient) {}
@@ -97,19 +98,21 @@ export class PrismaQuizAttemptRepository implements IQuizAttemptRepository {
       });
 
       const attempts = await Promise.all(
-        rows.map(async (row: {
-          id: string;
-          userId: string;
-          quizId: string;
-          status: string;
-          score: number | null;
-          passed: boolean | null;
-          startedAt: Date;
-          completedAt: Date | null;
-        }) => {
-          const answers = await this.loadAnswers(row.id);
-          return this.mapRow(row, answers);
-        }),
+        rows.map(
+          async (row: {
+            id: string;
+            userId: string;
+            quizId: string;
+            status: string;
+            score: number | null;
+            passed: boolean | null;
+            startedAt: Date;
+            completedAt: Date | null;
+          }) => {
+            const answers = await this.loadAnswers(row.id);
+            return this.mapRow(row, answers);
+          },
+        ),
       );
 
       return Result.ok(attempts);
@@ -156,11 +159,18 @@ export class PrismaQuizAttemptRepository implements IQuizAttemptRepository {
     },
     answers: QuizAttemptAnswer[],
   ): QuizAttempt {
+    if (!isQuizAttemptStatus(row.status)) {
+      // Caught by the surrounding try/catch in every caller and turned
+      // into a db_error. A corrupt or legacy status value must not
+      // silently hydrate a QuizAttempt that bypasses the entity's
+      // completeQuizAttempt() transition guard.
+      throw new Error(`QuizAttempt ${row.id} has an invalid persisted status: "${row.status}"`);
+    }
     return {
       id: row.id,
       userId: row.userId,
       quizId: row.quizId,
-      status: row.status as QuizAttempt["status"],
+      status: row.status,
       score: row.score,
       passed: row.passed,
       startedAt: row.startedAt,
