@@ -17,6 +17,7 @@ import type { UserRepository, UserError } from "@/ports/repositories/UserReposit
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
+import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 // ── Input / Output types ────────────────────────────────────
 
@@ -35,18 +36,17 @@ export type SignUpError =
   | { kind: "db_error"; message: string };
 
 export type SignUpOutput =
-  | { ok: true; userId: string; email: string }
-  | { ok: false; error: SignUpError };
+  { ok: true; userId: string; email: string } | { ok: false; error: SignUpError };
 
 // ── Password strength ────────────────────────────────────────
 
 /** 0–4 scale. Minimum 3 to pass. */
 function assessPassword(password: string): number {
   let score = 0;
-  if (password.length >= 8)  score++;
+  if (password.length >= 8) score++;
   if (password.length >= 12) score++;
-  if (/[A-Z]/.test(password))  score++;
-  if (/[0-9]/.test(password))  score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
   if (/[^A-Za-z0-9]/.test(password)) score++;
   return Math.min(score, 4);
 }
@@ -59,6 +59,7 @@ export class SignUp {
     private readonly idGen: IdGenerator,
     private readonly clock: Clock,
     private readonly hasher: PasswordHasher,
+    private readonly recordAuditLog: RecordAuditLog,
   ) {}
 
   async execute(input: SignUpInput): Promise<SignUpOutput> {
@@ -113,10 +114,17 @@ export class SignUp {
       };
     }
 
-    // 7. Log audit event (fire-and-forget; does not block the result)
-    this.logAudit("user.signed_up", createResult.value.id, {
-      email: createResult.value.email,
-      timestamp: this.clock.now().toISOString(),
+    // 7. Log audit event — best-effort. RecordAuditLog swallows errors,
+    // so a failed audit write never rolls back the signup.
+    await this.recordAuditLog.execute({
+      actorId: createResult.value.id,
+      action: "user.signed_up",
+      targetType: "user",
+      targetId: createResult.value.id,
+      metadata: {
+        email: createResult.value.email,
+        timestamp: this.clock.now().toISOString(),
+      },
     });
 
     return {
@@ -136,13 +144,5 @@ export class SignUp {
       throw new Error("Password hashing failed — this should not happen in production");
     }
     return result.value;
-  }
-
-  private logAudit(action: string, userId: string | undefined, payload: Record<string, unknown>): void {
-    // TODO (STORY-009): Inject AuditLogRepository and write the audit entry.
-    // Fire-and-forget — audit failures must not roll back the use case.
-    if (process.env.NODE_ENV === "development") {
-      console.debug("[Audit]", action, { userId, ...payload });
-    }
   }
 }

@@ -6,6 +6,7 @@ import { buildContainer } from "@/composition/container";
 import { setAuthCookie } from "@/lib/auth";
 import { SignUp, type SignUpOutput, type SignUpError } from "@/usecases/SignUp";
 import { Login } from "@/usecases/Login";
+import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
@@ -67,6 +68,7 @@ export async function performSignUp(
     login: Login;
     rateLimiter: RateLimiter;
     resendVerification: import("@/usecases/auth/ResendVerification").ResendVerification;
+    recordAuditLog: RecordAuditLog;
   },
   input: SignUpInput,
   deps: {
@@ -97,6 +99,7 @@ export async function performSignUp(
       container.idGen,
       container.clock,
       container.passwordHasher,
+      container.recordAuditLog,
     );
     signUpResult = await useCase.execute(input);
   } catch (err) {
