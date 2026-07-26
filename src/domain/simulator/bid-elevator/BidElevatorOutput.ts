@@ -1,5 +1,5 @@
 /**
- * BidElevatorOutput — output types for the Bid Elevator simulator.
+ * BidElevatorOutput: output types for the Bid Elevator simulator.
  *
  * STORY-068: Bid Elevator Rebuild (Scoring Engine Integration).
  *
@@ -8,10 +8,9 @@
  * scores that feed into GradeSimulatorAttempt.
  *
  * Scoring dimensions:
- *  bidAccuracy      — % of keywords where user's bid is within ±20% of suggested bid
- *  budgetAdherence  — % of simulated spend staying within daily budget (capped at 100)
- *  roasHit          — % of target ROAS achieved (capped at 100)
- *  explanation      — 100 (future: rubric-based on written justification)
+ *  bidAccuracy     : % of keywords where user's bid is within ±20% of suggested bid
+ *  budgetAdherence : % of simulated spend staying within daily budget (capped at 100)
+ *  roasHit         : % of target ROAS achieved (capped at 100)
  */
 
 import type { KeywordBid } from "./BidElevatorInput";
@@ -39,8 +38,7 @@ export interface ScoreDimensions {
   readonly budgetAdherence: number;
   /** % of target ROAS achieved (capped at 100) */
   readonly roasHit: number;
-  /** Placeholder — future rubric-based on written justification */
-  readonly explanation: number;
+  /** Placeholder: future rubric-based on written justification */
 }
 
 export interface BidElevatorOutput {
@@ -51,7 +49,7 @@ export interface BidElevatorOutput {
   /** Estimated ROAS with the selected bids */
   readonly estimatedRoas: number;
   /**
-   * Legacy flat score — preserved for backward compatibility.
+   * Legacy flat score: preserved for backward compatibility.
    * = bidAccuracy when grading (userBidAdjustments provided),
    * = 100 otherwise (no grading, just ground truth).
    */

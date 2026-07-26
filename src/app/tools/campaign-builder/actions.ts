@@ -202,7 +202,6 @@ export async function campaignBuilderAttempt(
         structureQuality: simOutput.scoreDimensions.structureQuality,
         budgetAllocation: simOutput.scoreDimensions.budgetAllocation,
         keywordRelevance: simOutput.scoreDimensions.keywordRelevance,
-        explanation: simOutput.scoreDimensions.explanation,
       },
     });
 

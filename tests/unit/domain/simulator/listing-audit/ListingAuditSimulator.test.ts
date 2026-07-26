@@ -188,9 +188,12 @@ describe("ListingAuditSimulator", () => {
     });
   });
 
-  describe("profitability scoring", () => {
-    it("profitability = 100 when all must-fix findings are marked fix", async () => {
-      // Empty title + no bullets → critical findings on both, both "fix"
+  describe("priorityCoverage scoring", () => {
+    it("priorityCoverage is NOT 100 when everything is marked fix", async () => {
+      // Regression test for STORY-073. This dimension used to be recall
+      // only, so "fix everything" scored a guaranteed 100: you cannot miss
+      // a must-fix if you fix every finding. It now also weighs precision,
+      // so indiscriminate fixing is penalised.
       const input: ListingAuditInput = {
         title: "",
         bullets: [],
@@ -199,14 +202,33 @@ describe("ListingAuditSimulator", () => {
         niche: "shoes",
       };
       const preview = await simulator.run({ ...input, niche: "shoes", title: "x" });
+      const skippable = preview.gradedFindings.filter((f) => f.groundTruth === "skip");
+      expect(skippable.length).toBeGreaterThan(0); // otherwise the test proves nothing
+
       const userFindingActions = Object.fromEntries(
         preview.gradedFindings.map((f) => [f.id, "fix" as const]),
       );
       const result = await simulator.run({ ...input, title: "x", userFindingActions });
-      expect(result.scoreDimensions!.profitability).toBe(100);
+      expect(result.scoreDimensions!.priorityCoverage).toBeLessThan(100);
     });
 
-    it("profitability penalizes skipping a must-fix finding", async () => {
+    it("priorityCoverage = 100 only when the fix set matches ground truth exactly", async () => {
+      const input: ListingAuditInput = {
+        title: "x",
+        bullets: [],
+        description: "",
+        category: "Shoes",
+        niche: "shoes",
+      };
+      const preview = await simulator.run(input);
+      const userFindingActions = Object.fromEntries(
+        preview.gradedFindings.map((f) => [f.id, f.groundTruth]),
+      );
+      const result = await simulator.run({ ...input, userFindingActions });
+      expect(result.scoreDimensions!.priorityCoverage).toBe(100);
+    });
+
+    it("priorityCoverage penalizes skipping a must-fix finding", async () => {
       const input: ListingAuditInput = {
         title: "x",
         bullets: [],
@@ -218,15 +240,15 @@ describe("ListingAuditSimulator", () => {
       const mustFix = preview.gradedFindings.filter((f) => f.groundTruth === "fix");
       expect(mustFix.length).toBeGreaterThan(0);
 
-      // Mark everything "skip" — every must-fix finding is wrongly skipped.
+      // Mark everything "skip" - every must-fix finding is wrongly skipped.
       const userFindingActions = Object.fromEntries(
         preview.gradedFindings.map((f) => [f.id, "skip" as const]),
       );
       const result = await simulator.run({ ...input, userFindingActions });
-      expect(result.scoreDimensions!.profitability).toBe(0);
+      expect(result.scoreDimensions!.priorityCoverage).toBe(0);
     });
 
-    it("profitability = 100 when there are no must-fix findings (neutral)", async () => {
+    it("priorityCoverage = 100 when there are no must-fix findings and none were fixed", async () => {
       const result = await simulator.run({
         title: "",
         bullets: [],
@@ -235,11 +257,11 @@ describe("ListingAuditSimulator", () => {
         niche: "",
         userFindingActions: {},
       });
-      expect(result.scoreDimensions!.profitability).toBe(100);
+      expect(result.scoreDimensions!.priorityCoverage).toBe(100);
     });
   });
 
-  describe("dataSufficiency scoring", () => {
+  describe("reviewCoverage (reported, not graded)", () => {
     const input: ListingAuditInput = {
       title: "x",
       bullets: [],
@@ -248,32 +270,18 @@ describe("ListingAuditSimulator", () => {
       niche: "shoes",
     };
 
-    it("dataSufficiency = 100 when every finding has a userChoice", async () => {
+    it("reviewCoverage = 100 when every finding has a userChoice", async () => {
       const preview = await simulator.run(input);
       const userFindingActions = Object.fromEntries(
         preview.gradedFindings.map((f) => [f.id, f.groundTruth]),
       );
       const result = await simulator.run({ ...input, userFindingActions });
-      expect(result.scoreDimensions!.dataSufficiency).toBe(100);
+      expect(result.scoreDimensions!.reviewCoverage).toBe(100);
     });
 
-    it("dataSufficiency = 0 when no findings are reviewed", async () => {
+    it("reviewCoverage = 0 when no findings are reviewed", async () => {
       const result = await simulator.run({ ...input, userFindingActions: {} });
-      expect(result.scoreDimensions!.dataSufficiency).toBe(0);
-    });
-  });
-
-  describe("explanation score", () => {
-    it("explanation = 0 (no text input)", async () => {
-      const result = await simulator.run({
-        title: "x",
-        bullets: [],
-        description: "",
-        category: "Shoes",
-        niche: "shoes",
-        userFindingActions: {},
-      });
-      expect(result.scoreDimensions!.explanation).toBe(0);
+      expect(result.scoreDimensions!.reviewCoverage).toBe(0);
     });
   });
 
@@ -290,9 +298,8 @@ describe("ListingAuditSimulator", () => {
       expect(result.gradedFindings).toHaveLength(0);
       expect(result.scoreDimensions).toEqual({
         direction: 100,
-        profitability: 100,
-        dataSufficiency: 100,
-        explanation: 0,
+        priorityCoverage: 100,
+        reviewCoverage: 100,
       });
     });
   });

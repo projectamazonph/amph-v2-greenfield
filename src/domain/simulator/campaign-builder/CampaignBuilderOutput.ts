@@ -1,5 +1,5 @@
 /**
- * CampaignBuilderOutput — output types for the Campaign Builder simulator.
+ * CampaignBuilderOutput: output types for the Campaign Builder simulator.
  *
  * STORY-069: Campaign Builder Rebuild (Scoring Engine Integration).
  *
@@ -8,10 +8,9 @@
  * computing per-dimension scores that feed into GradeSimulatorAttempt.
  *
  * Scoring dimensions:
- *  structureQuality   — % match of campaign types and ad group coverage
- *  budgetAllocation   — % of campaigns with budget within 50% of ground truth
- *  keywordRelevance  — % of user keywords containing niche terms
- *  explanation       — 100 (future: rubric-based on written justification)
+ *  structureQuality  : % match of campaign types and ad group coverage
+ *  budgetAllocation  : % of campaigns with budget within 50% of ground truth
+ *  keywordRelevance : % of user keywords containing niche terms
  */
 
 export type MatchType = "exact" | "phrase" | "broad";
@@ -42,8 +41,7 @@ export interface ScoreDimensions {
   readonly budgetAllocation: number;
   /** % of user keywords containing words from the product niche */
   readonly keywordRelevance: number;
-  /** Placeholder — future rubric-based on written justification */
-  readonly explanation: number;
+  /** Placeholder: future rubric-based on written justification */
 }
 
 export interface CampaignBuilderOutput {

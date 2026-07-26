@@ -1,5 +1,5 @@
 /**
- * StrTriageOutput — output types for the STR Triage simulator.
+ * StrTriageOutput: output types for the STR Triage simulator.
  *
  * STORY-067: STR Triage Rebuild (Scoring Engine Integration).
  *
@@ -8,11 +8,16 @@
  * scores that feed into GradeSimulatorAttempt.
  *
  * Scoring dimensions:
- *  direction       — % of keywords correctly classified (user === groundTruth)
- *  profitability  — % of revenue preserved (kept/add keywords that weren't
- *                    pausable vs. total non-pausable revenue)
- *  dataSufficiency — % of rows the user assigned an action to
- *  explanation     — 100 (future: rubric-based on written justification)
+ *  direction     : % of keywords correctly classified (user === groundTruth)
+ *  profitability : % of revenue preserved (kept/add keywords that weren't
+ *                   pausable vs. total non-pausable revenue). Genuinely
+ *                   revenue-based, so unlike Listing Audit's same-named
+ *                   dimension this name is accurate and stays.
+ *  reviewCoverage: % of rows the user assigned an action to (completion,
+ *                   reported but NOT graded; was `dataSufficiency`)
+ *
+ * Sprint 14 removed the hardcoded `explanation: 100`. See
+ * docs/audit-2026-07-26-simulator-accuracy-review.md.
  */
 
 export type TriageAction = "keep" | "pause" | "add_as_exact" | "add_as_phrase";
@@ -39,7 +44,7 @@ export interface StrTriageOutput {
    */
   readonly scoreDimensions: ScoreDimensions | null;
   /**
-   * Legacy flat score — preserved for backward compatibility with existing
+   * Legacy flat score: preserved for backward compatibility with existing
    * callers that don't yet use scoreDimensions.
    * = scoreDimensions?.direction ?? 100 when userClassifications provided,
    * = 100 otherwise (no grading, just ground truth).
@@ -53,8 +58,11 @@ export interface ScoreDimensions {
   readonly direction: number;
   /** % of non-pausable revenue preserved by user's classification choices */
   readonly profitability: number;
-  /** % of rows with a userChoice assigned */
-  readonly dataSufficiency: number;
-  /** Placeholder — future rubric-based scoring */
-  readonly explanation: number;
+  /**
+   * % of rows with a userChoice assigned. Completion, not judgement:
+   * reported for display only. It is NOT graded, and nothing currently
+   * gates submission on it: adding that gate is a UX decision.
+   * Was `dataSufficiency`. STORY-072, STORY-076.
+   */
+  readonly reviewCoverage: number;
 }

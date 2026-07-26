@@ -32,8 +32,8 @@ function makePolicyRepoWithSingleDimension(
     "bid-elevator" | "str-triage" | "campaign-builder" | "listing-audit" = "bid-elevator",
   difficulty: "beginner" | "intermediate" | "advanced" = "beginner",
   mode: "guided" | "practice" | "challenge" | "credential" | "instructor" = "practice",
-  dimensionConfig: Record<string, { weight: number; passingThreshold: number }> = {
-    direction: { weight: 1, passingThreshold: 70 },
+  dimensionConfig: Record<string, { weight: number }> = {
+    direction: { weight: 1 },
   },
   passingScore = 70,
 ) {
@@ -111,9 +111,9 @@ describe("GradeSimulatorAttempt", () => {
       "beginner",
       "practice",
       {
-        bidAccuracy: { weight: 0.4, passingThreshold: 70 },
-        budgetAdherence: { weight: 0.3, passingThreshold: 70 },
-        roasHit: { weight: 0.3, passingThreshold: 70 },
+        bidAccuracy: { weight: 0.4 },
+        budgetAdherence: { weight: 0.3 },
+        roasHit: { weight: 0.3 },
       },
       60,
     );
@@ -136,7 +136,7 @@ describe("GradeSimulatorAttempt", () => {
       "bid-elevator",
       "beginner",
       "practice",
-      { bidAccuracy: { weight: 1, passingThreshold: 70 } },
+      { bidAccuracy: { weight: 1 } },
       70,
     );
     const uc = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo: repo, clock });

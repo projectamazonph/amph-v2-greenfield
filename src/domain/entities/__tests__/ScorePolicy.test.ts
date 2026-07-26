@@ -25,9 +25,9 @@ const BASE_PARAMS: CreateScorePolicyParams = {
   difficulty: "beginner",
   mode: "practice",
   dimensionConfig: {
-    direction: { weight: 0.4, passingThreshold: 50 },
-    profitability: { weight: 0.4, passingThreshold: 50 },
-    dataSufficiency: { weight: 0.2, passingThreshold: 50 },
+    direction: { weight: 0.4 },
+    profitability: { weight: 0.4 },
+    dataSufficiency: { weight: 0.2 },
   },
   passingScore: 60,
 };
@@ -44,9 +44,9 @@ describe("weight sum invariant", () => {
     const params: CreateScorePolicyParams = {
       ...BASE_PARAMS,
       dimensionConfig: {
-        direction: { weight: 0.4, passingThreshold: 50 },
-        profitability: { weight: 0.3, passingThreshold: 50 },
-        dataSufficiency: { weight: 0.2, passingThreshold: 50 }, // 0.4+0.3+0.2 = 0.9 ≠ 1.0
+        direction: { weight: 0.4 },
+        profitability: { weight: 0.3 },
+        dataSufficiency: { weight: 0.2 }, // 0.4+0.3+0.2 = 0.9 ≠ 1.0
       },
     };
     const result = createScorePolicy(params);
@@ -64,9 +64,9 @@ describe("weight sum invariant", () => {
     const params: CreateScorePolicyParams = {
       ...BASE_PARAMS,
       dimensionConfig: {
-        direction: { weight: 0.5, passingThreshold: 50 },
-        profitability: { weight: 0.4, passingThreshold: 50 },
-        dataSufficiency: { weight: 0.2, passingThreshold: 50 }, // 0.5+0.4+0.2 = 1.1
+        direction: { weight: 0.5 },
+        profitability: { weight: 0.4 },
+        dataSufficiency: { weight: 0.2 }, // 0.5+0.4+0.2 = 1.1
       },
     };
     const result = createScorePolicy(params);
@@ -84,9 +84,9 @@ describe("weight sum invariant", () => {
       difficulty: "beginner" as const,
       mode: "practice" as const,
       dimensionConfig: {
-        direction: { weight: 0.4, passingThreshold: 70 },
-        profitability: { weight: 0.4, passingThreshold: 70 },
-        explanation: { weight: 0.1, passingThreshold: 70 }, // 0.9 — bad
+        direction: { weight: 0.4 },
+        profitability: { weight: 0.4 },
+        explanation: { weight: 0.1 }, // 0.9 — bad
       },
       passingScore: 70,
       createdAt: new Date(),
@@ -102,9 +102,9 @@ describe("weight sum invariant", () => {
       difficulty: "beginner" as const,
       mode: "practice" as const,
       dimensionConfig: {
-        direction: { weight: 0.4, passingThreshold: 70 },
-        profitability: { weight: 0.4, passingThreshold: 70 },
-        dataSufficiency: { weight: 0.2, passingThreshold: 70 }, // 1.0
+        direction: { weight: 0.4 },
+        profitability: { weight: 0.4 },
+        dataSufficiency: { weight: 0.2 }, // 1.0
       },
       passingScore: 70,
       createdAt: new Date(),
@@ -177,8 +177,8 @@ describe("unknown dimension names", () => {
     const params: CreateScorePolicyParams = {
       ...BASE_PARAMS,
       dimensionConfig: {
-        direction: { weight: 0.5, passingThreshold: 50 },
-        madeUpDimension: { weight: 0.5, passingThreshold: 50 }, // invalid
+        direction: { weight: 0.5 },
+        madeUpDimension: { weight: 0.5 }, // invalid
       },
     };
     const result = createScorePolicy(params);
@@ -198,8 +198,8 @@ describe("unknown dimension names", () => {
       difficulty: "beginner" as const,
       mode: "practice" as const,
       dimensionConfig: {
-        direction: { weight: 0.5, passingThreshold: 50 },
-        fakeDimension: { weight: 0.5, passingThreshold: 50 },
+        direction: { weight: 0.5 },
+        fakeDimension: { weight: 0.5 },
       },
       passingScore: 60,
       createdAt: new Date(),

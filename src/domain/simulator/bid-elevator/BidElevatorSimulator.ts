@@ -1,5 +1,5 @@
 /**
- * BidElevatorSimulator — the real Bid Elevator PPC simulator.
+ * BidElevatorSimulator: the real Bid Elevator PPC simulator.
  *
  * STORY-068: Bid Elevator Rebuild (Scoring Engine Integration).
  *
@@ -10,10 +10,9 @@
  *  4. Cap suggested bid at 2× current bid to stay conservative.
  *
  * Grading (when userBidAdjustments provided):
- *  bidAccuracy     — % of keywords where |userBid - groundTruth| / groundTruth ≤ 0.20
- *  budgetAdherence — min(100, 100 × budget / userSpend)
- *  roasHit         — min(100, 100 × userRoas / targetRoas)
- *  explanation     — 100 (placeholder)
+ *  bidAccuracy    : % of keywords where |userBid - groundTruth| / groundTruth ≤ 0.20
+ *  budgetAdherence: min(100, 100 × budget / userSpend)
+ *  roasHit        : min(100, 100 × userRoas / targetRoas)
  *
  * Scoring dimensions (when userBidAdjustments provided):
  *  Per-dimension scores are fed to GradeSimulatorAttempt for persistence.
@@ -140,11 +139,7 @@ export class BidElevatorSimulator implements Simulator<BidElevatorInput, BidElev
     // e.g. userRoas = 80% of target → 80; exceeds target → 100
     const roasHit = targetRoas > 0 ? Math.min(100, Math.round((userRoas / targetRoas) * 100)) : 0;
 
-    // explanation: no text input exists in this simulator.
-    // FUTURE (STORY-079): rubric-based scoring once explanation text fields are added.
-    const explanation = 0;
-
-    return { bidAccuracy, budgetAdherence, roasHit, explanation };
+    return { bidAccuracy, budgetAdherence, roasHit };
   }
 
   private emptyResult(): BidElevatorOutput {

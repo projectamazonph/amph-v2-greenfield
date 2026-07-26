@@ -181,10 +181,12 @@ domain layer already declares. None of it needs an Amazon PPC judgement call, an
 all of it is wasted work if done _after_ the subject-matter sprint reshapes the
 dimensions. Full evidence in `docs/audit-2026-07-26-simulator-accuracy-review.md`.
 
-**Honest limit:** this sprint blocks the click-through bypass on beginner and cuts
-blind guessing from ~89% to ~11-19%, but it does **not** close the bypass on
-intermediate/advanced. The residual cause is the binary ground truth itself, which
-is STORY-083. Measured numbers are in the audit doc.
+**Honest limit:** measured against the real simulator, this sprint removes every
+guaranteed free 100 and collapses the pass margin (beginner 90 to 75 against a
+70 threshold), but "fix everything" **still passes at every difficulty**. The
+finding generator emits only 1-4 findings and they skew heavily to `fix`, so
+`direction` alone cannot stop it. Closing the bypass needs STORY-080 (richer
+finding set) and STORY-083 (non-binary ground truth). Numbers in the audit doc.
 
 | ID        | Title                                                                                                                                                     | Pts | Status     |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------- |

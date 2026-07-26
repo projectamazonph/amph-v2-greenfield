@@ -1,5 +1,5 @@
 /**
- * CampaignBuilderSimulator — generates Amazon PPC campaign structures from requirements.
+ * CampaignBuilderSimulator: generates Amazon PPC campaign structures from requirements.
  *
  * STORY-069: Campaign Builder Rebuild (Scoring Engine Integration).
  *
@@ -10,10 +10,9 @@
  * against the ground-truth structure, computing per-dimension scores.
  *
  * Scoring dimensions:
- *  structureQuality  — % of ground-truth campaign types the user covered
- *  budgetAllocation  — % of user campaigns with budget within 50% of ground truth
- *  keywordRelevance  — % of user keywords containing niche words
- *  explanation       — 100 (placeholder)
+ *  structureQuality : % of ground-truth campaign types the user covered
+ *  budgetAllocation : % of user campaigns with budget within 50% of ground truth
+ *  keywordRelevance : % of user keywords containing niche words
  */
 
 import type { Simulator } from "@/ports/simulator/Simulator";
@@ -298,11 +297,7 @@ function computeDimensionScores(
       ? Math.round((relevantKeywords.length / allUserKeywords.length) * 100)
       : 0;
 
-  // explanation: no text input exists in this simulator.
-  // FUTURE (STORY-079): rubric-based scoring once explanation text fields are added.
-  const explanation = 0;
-
-  return { structureQuality, budgetAllocation, keywordRelevance, explanation };
+  return { structureQuality, budgetAllocation, keywordRelevance };
 }
 
 // ── Simulator ───────────────────────────────────────────────────────────

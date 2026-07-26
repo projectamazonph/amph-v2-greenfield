@@ -107,9 +107,8 @@ const SIM_OUTPUT: ListingAuditOutput = {
   ],
   scoreDimensions: {
     direction: 100,
-    profitability: 100,
-    dataSufficiency: 100,
-    explanation: 100,
+    priorityCoverage: 100,
+    reviewCoverage: 100,
   },
 };
 
@@ -132,9 +131,8 @@ function happyContainer() {
       overallScore: 100,
       scoreDimensions: {
         direction: 100,
-        profitability: 100,
-        dataSufficiency: 100,
-        explanation: 100,
+        priorityCoverage: 100,
+        reviewCoverage: 100,
       },
       isPassed: true,
       gradedAt: new Date(),

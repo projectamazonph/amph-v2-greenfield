@@ -41,9 +41,9 @@ const SCORE_POLICY: ScorePolicy = {
   difficulty: "beginner",
   mode: "practice",
   dimensionConfig: {
-    direction: { weight: 0.3, passingThreshold: 70 },
-    magnitude: { weight: 0.3, passingThreshold: 70 },
-    profitability: { weight: 0.4, passingThreshold: 70 },
+    direction: { weight: 0.3 },
+    magnitude: { weight: 0.3 },
+    profitability: { weight: 0.4 },
   },
   passingScore: 70,
   createdAt: new Date(),

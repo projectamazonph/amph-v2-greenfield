@@ -21,8 +21,8 @@ function makePolicy(overrides?: {
     difficulty: overrides?.difficulty ?? "beginner",
     mode: overrides?.mode ?? "practice",
     dimensionConfig: {
-      direction: { weight: 0.5, passingThreshold: 80 },
-      profitability: { weight: 0.5, passingThreshold: 75 },
+      direction: { weight: 0.5 },
+      profitability: { weight: 0.5 },
     },
     passingScore: 70,
   });

@@ -58,7 +58,6 @@ const GRADED_ATTEMPT: SimulatorAttempt = {
     bidAccuracy: 80,
     budgetAdherence: 90,
     roasHit: 100,
-    explanation: 100,
   },
   startedAt: new Date(),
   submittedAt: new Date(),
@@ -94,7 +93,6 @@ const SIM_OUTPUT: BidElevatorOutput = {
     bidAccuracy: 50,
     budgetAdherence: 100,
     roasHit: 100,
-    explanation: 100,
   },
 };
 

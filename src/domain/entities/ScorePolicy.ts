@@ -16,13 +16,26 @@ import { Result } from "@/domain/shared/Result";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
-/** Known grading dimension names. Extend as simulators add new ones. */
+/**
+ * Known grading dimension names. Extend as simulators add new ones.
+ *
+ * Sprint 14 changed this list (see
+ * docs/audit-2026-07-26-simulator-accuracy-review.md):
+ *  - `explanation` removed. Every simulator returned a hardcoded 100 for it
+ *    while policies weighted it 10-25%, so it was pure free marks
+ *    (STORY-071).
+ *  - `dataSufficiency` renamed to `reviewCoverage` and is no longer a
+ *    gradable dimension. It measured completion, not judgement (STORY-072,
+ *    STORY-076).
+ *  - `priorityCoverage` added for Listing Audit, which previously called the
+ *    same thing `profitability` despite modelling no revenue. STR Triage's
+ *    `profitability` IS revenue-based, so it keeps that name (STORY-076).
+ */
 export type GradingDimension =
   | "direction"
   | "magnitude"
-  | "dataSufficiency"
+  | "priorityCoverage"
   | "profitability"
-  | "explanation"
   // Bid Elevator
   | "bidAccuracy"
   | "budgetAdherence"
@@ -35,9 +48,8 @@ export type GradingDimension =
 export const KNOWN_DIMENSIONS: readonly GradingDimension[] = [
   "direction",
   "magnitude",
-  "dataSufficiency",
+  "priorityCoverage",
   "profitability",
-  "explanation",
   // Bid Elevator
   "bidAccuracy",
   "budgetAdherence",
@@ -49,15 +61,32 @@ export const KNOWN_DIMENSIONS: readonly GradingDimension[] = [
 ];
 
 /**
+ * Dimensions a simulator may report for display but which must never be
+ * given weight in a policy. `reviewCoverage` is completion: rewarding it
+ * hands marks to anyone who clicks through every item without thinking.
+ * STORY-072.
+ */
+export const NON_GRADABLE_DIMENSIONS: readonly string[] = ["reviewCoverage", "explanation"];
+
+/**
  * Per-dimension grading configuration.
- * weight:  0.0–1.0; weights across all configured dimensions must sum to 1.0.
- * passingThreshold: raw score (0–100) the student must hit on this dimension
- *                   to earn full credit. Below this, the dimension contributes
- *                   proportionally less (partial credit).
+ *
+ * weight: 0.0-1.0. Weights across all configured dimensions must sum to 1.0.
+ *
+ * This used to carry a `passingThreshold` documented as "the score the
+ * student must hit on this dimension to earn full credit; below this the
+ * dimension contributes proportionally less (partial credit)". No code ever
+ * read it: `getOverallScore()` has always been plain linear weighting, so
+ * the partial-credit behaviour it described did not exist. It was seeded on
+ * every dimension of every policy and silently ignored.
+ *
+ * It is removed rather than implemented. Implementing it now would silently
+ * change every score in the system, which is a pedagogical decision, not a
+ * bug fix. Reintroduce it deliberately if per-dimension gating is wanted.
+ * STORY-075.
  */
 export interface DimensionConfig {
   readonly weight: number;
-  readonly passingThreshold: number;
 }
 
 export interface ScorePolicy {
@@ -76,6 +105,7 @@ export interface ScorePolicy {
 export type ScorePolicyError =
   | { kind: "invalid_weight_sum"; total: number }
   | { kind: "unknown_dimension"; dimension: string }
+  | { kind: "non_gradable_dimension"; dimension: string }
   | { kind: "invalid_config"; reason: string };
 
 // ── Factory ──────────────────────────────────────────────────────────────
@@ -94,6 +124,7 @@ export interface CreateScorePolicyParams {
 /**
  * Create a ScorePolicy. Validates:
  *  - All dimension names are known GradingDimension values
+ *  - No dimension is one of NON_GRADABLE_DIMENSIONS
  *  - Weights sum to 1.0 (±0.001 tolerance)
  *  - passingScore is in 0–100
  */
@@ -102,6 +133,9 @@ export function createScorePolicy(
 ): Result<ScorePolicy, ScorePolicyError> {
   // ── 1. Validate all dimension names ────────────────────────────
   for (const dim of Object.keys(params.dimensionConfig)) {
+    if (NON_GRADABLE_DIMENSIONS.includes(dim)) {
+      return Result.err({ kind: "non_gradable_dimension", dimension: dim });
+    }
     if (!KNOWN_DIMENSIONS.includes(dim as GradingDimension)) {
       return Result.err({ kind: "unknown_dimension", dimension: dim });
     }
@@ -152,7 +186,6 @@ export function getOverallScore(
     const rawScore = scoreDimensions[dimension];
     if (rawScore === undefined) continue;
 
-    // Partial credit: score / 100 * weight * 100
     total += (Math.max(0, Math.min(100, rawScore)) / 100) * config.weight * 100;
   }
 
@@ -171,8 +204,11 @@ export function isPassed(overallScore: number, policy: ScorePolicy): boolean {
  * Useful for validating persisted policies at hydration time.
  */
 export function isValidPolicy(policy: ScorePolicy): boolean {
-  // All dimension names must be known
+  // All dimension names must be known and gradable
   for (const dim of Object.keys(policy.dimensionConfig)) {
+    if (NON_GRADABLE_DIMENSIONS.includes(dim)) {
+      return false;
+    }
     if (!KNOWN_DIMENSIONS.includes(dim as GradingDimension)) {
       return false;
     }

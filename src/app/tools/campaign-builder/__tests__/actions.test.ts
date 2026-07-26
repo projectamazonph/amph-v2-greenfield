@@ -58,7 +58,6 @@ const GRADED_ATTEMPT: SimulatorAttempt = {
     structureQuality: 80,
     budgetAllocation: 90,
     keywordRelevance: 70,
-    explanation: 100,
   },
   startedAt: new Date(),
   submittedAt: new Date(),
@@ -124,7 +123,6 @@ const SIM_OUTPUT: CampaignBuilderOutput = {
     structureQuality: 80,
     budgetAllocation: 90,
     keywordRelevance: 70,
-    explanation: 100,
   },
 };
 
@@ -146,7 +144,6 @@ function happyContainer() {
         structureQuality: 80,
         budgetAllocation: 90,
         keywordRelevance: 70,
-        explanation: 100,
       },
       isPassed: true,
       gradedAt: new Date(),

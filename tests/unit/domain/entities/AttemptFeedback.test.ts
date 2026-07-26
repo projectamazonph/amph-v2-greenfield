@@ -22,9 +22,9 @@ const BASE_SCORE_POLICY: ScorePolicy = {
   difficulty: "beginner",
   mode: "practice",
   dimensionConfig: {
-    direction: { weight: 0.3, passingThreshold: 70 },
-    magnitude: { weight: 0.3, passingThreshold: 70 },
-    profitability: { weight: 0.4, passingThreshold: 70 },
+    direction: { weight: 0.3 },
+    magnitude: { weight: 0.3 },
+    profitability: { weight: 0.4 },
   },
   passingScore: 70,
   createdAt: new Date(),
@@ -243,8 +243,8 @@ describe("AttemptFeedback domain", () => {
         ...BASE_SCORE_POLICY,
         difficulty: "intermediate",
         dimensionConfig: {
-          direction: { weight: 0.5, passingThreshold: 70 },
-          profitability: { weight: 0.5, passingThreshold: 70 },
+          direction: { weight: 0.5 },
+          profitability: { weight: 0.5 },
         },
       };
       const attempt = makeAttempt({
@@ -261,8 +261,8 @@ describe("AttemptFeedback domain", () => {
         ...BASE_SCORE_POLICY,
         difficulty: "advanced",
         dimensionConfig: {
-          direction: { weight: 0.4, passingThreshold: 75 },
-          profitability: { weight: 0.6, passingThreshold: 75 },
+          direction: { weight: 0.4 },
+          profitability: { weight: 0.6 },
         },
         passingScore: 75,
       };
@@ -280,8 +280,8 @@ describe("AttemptFeedback domain", () => {
         ...BASE_SCORE_POLICY,
         mode: "credential",
         dimensionConfig: {
-          direction: { weight: 0.4, passingThreshold: 80 },
-          profitability: { weight: 0.6, passingThreshold: 80 },
+          direction: { weight: 0.4 },
+          profitability: { weight: 0.6 },
         },
         passingScore: 80,
       };
