@@ -70,7 +70,7 @@ reality (it was stale in almost every bullet — see below).
 
 - **Duplicate curriculum representation.** `Course.curriculum` (a `Json`
   field, `{ sections: [{ title, lessons: [...] }] }`) still exists on the
-  `Course` model *alongside* the relational `Module`/`Lesson` models added
+  `Course` model _alongside_ the relational `Module`/`Lesson` models added
   later (`prisma/schema.prisma`, tagged `STORY-048b/048c / P0-2 follow-up`
   in a comment — so this drift was already flagged once before and not
   fully resolved). Nothing enforces the two stay in sync. Worth a follow-up
@@ -104,20 +104,66 @@ the gaps verified above, plus a pointer back to this doc. The "planned admin
 panel" phrasing in the intro paragraph, the ADR range reference, and the
 "Curriculum and content" section were also updated to match current reality.
 
-## Suggested next steps (not done in this pass — documentation only)
+## Follow-up status (updated as each item lands)
 
-1. Resolve the `Course.curriculum` vs `Module`/`Lesson` duplication —
-   decide the source of truth, write the migration.
-2. Wire `AuditLogRepository` into `SignUp.ts` (close out STORY-009).
-3. Convert `Order.status`, `Enrollment.status`, and `QuizAttempt.status` to
-   Prisma enums.
-4. Add a minimal persistent webhook event log (raw payload + signature
-   validity + processed timestamp) for replay/forensics, independent of
-   `Order` state.
-5. Add TOTP-based 2FA for `ADMIN`-role accounts.
-6. Write the missing runbooks in `docs/runbooks/` (payment incident,
-   webhook replay, DB restore, admin access recovery).
+The pass that produced this doc was documentation-only. A second pass
+implemented most of the items below — tracked here so this doc stays the
+single source of truth for "what did the audit actually motivate."
 
-None of these are urgent production blockers on the scale the pasted audit
-implied (the actual P0 — webhook persistence — was already fixed). They're
-ordered here roughly by risk if left alone.
+1. **Done** (PR #190) — `Course.curriculum` vs `Module`/`Lesson`:
+   `Module`/`Lesson` is now the write-source-of-truth; every module/lesson
+   mutation use case rebuilds `curriculum` from them afterward
+   (`RebuildCourseCurriculum`). The read paths (`AuthorizeLessonAccess`,
+   `getLessonData`, `LessonSidebar`, `MarkLessonComplete`) were
+   deliberately left reading `curriculum` unchanged — lower risk than
+   rewiring them to read `Module`/`Lesson` directly.
+2. **Done** (PR #186) — `SignUp.ts` now records a `user.signed_up` audit
+   entry via `RecordAuditLog`, closing STORY-009's TODO.
+3. **Scoped down, not done as originally proposed** (PR #188) — did not
+   convert `Order.status`/`Enrollment.status`/`QuizAttempt.status` to
+   native Prisma enums. Instead added `isEnrollmentStatus()`/
+   `isQuizAttemptStatus()` validation on read (mirroring
+   `PaymentStatus.isValid()`, which `Order` already had), fixing the
+   actual bug (unchecked `as` casts letting a corrupt/legacy status
+   silently hydrate an entity) without a risky `ALTER TYPE` migration.
+   Native enums remain a legitimate follow-up if DB-level `CHECK`
+   enforcement is specifically needed later.
+4. **Done** (PR #187) — `WebhookEvent` Prisma model + `IWebhookEventLog`
+   port/adapters, wired into the PayMongo webhook route. Every inbound
+   request is persisted before any processing, with the outcome recorded
+   afterward.
+5. **Not done.** TOTP-based 2FA for `ADMIN`-role accounts remains open —
+   the largest remaining item, tracked separately (see "Admin TOTP 2FA
+   (opt-in)" in the session's task list / a future PR).
+6. **Done** — `docs/runbooks/paymongo-outage.md`, `webhook-replay.md`,
+   `db-backup-restore.md`, and `admin-access-recovery.md` written (see
+   `docs/runbooks/README.md` for the updated index). The DB restore
+   runbook documents the correct mechanism but has never been drilled.
+
+## Two more gaps found while implementing the runbooks (2026-07-26)
+
+Writing `admin-access-recovery.md` required verifying exactly how session
+revocation works, which surfaced a real gap not in the original audit:
+
+- **Session/account revocation is largely non-functional.**
+  `src/lib/auth.ts`'s `getSessionUserId()`/`getSessionUser()` — the only
+  session-check path, used by every page via `requireAuth`/`requireAdmin`
+  — verifies the JWT's signature and expiry and re-fetches the `User` row,
+  but never queries the `sessions` table and never reads
+  `User.lockedUntil`/`User.failedLoginCount`. Concretely: deleting a
+  `sessions` row does not invalidate an already-issued JWT cookie, and
+  setting `lockedUntil` does not block anything. The only things that
+  actually work today are a role change (checked fresh from the DB on
+  every request — so this _does_ work for revoking admin access
+  specifically) and a full `JWT_SECRET` rotation (works, but logs out
+  every user on the platform). Worth its own hardening story — e.g.
+  checking `sessions` table membership, or a `tokenVersion` claim, on
+  every request.
+- **`pnpm db:seed:admin` is broken.** `package.json` points it at
+  `scripts/seed-admin-user.mjs`, which does not exist — only
+  `gen-secret.js`, `import-amph-content.ts`, `seed-pricing-tiers.ts`, and
+  `seed-simulator-policies.ts` are present in `scripts/`. There is
+  currently no way to create the first admin user other than the direct
+  SQL `UPDATE` documented in `docs/runbooks/admin-access-recovery.md`.
+  Worth either writing the missing script or removing the stale
+  `package.json` entry.
