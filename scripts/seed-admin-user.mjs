@@ -25,6 +25,8 @@ import { parseArgs } from "node:util";
 import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 // argon2 is CJS-only — createRequire matches the interop trick used by
 // src/infra/security/Argon2PasswordHasher.ts, the module this script mirrors.
@@ -100,7 +102,9 @@ async function hashPassword(plain) {
 
 // ── Main ─────────────────────────────────────────────────────────────────
 
-const prisma = new PrismaClient();
+// Prisma 7 requires a driver adapter — mirrors src/infra/database/prisma.ts.
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
 async function main() {
   console.log("\n👤 AMPH Admin User Seed");
