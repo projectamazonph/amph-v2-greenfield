@@ -1,125 +1,232 @@
-/**
- * Pricing — landing page section 4.
- * Three tiers, one-time payment. Mastery is highlighted.
- */
-
+import { COURSES_URL } from "./constants";
+import { CheckIcon } from "./Icons";
+import { Reveal } from "./Reveal";
+import shared from "./shared.module.css";
 import styles from "./Pricing.module.css";
 
 interface Tier {
-  id: string;
+  flag: string;
   name: string;
+  sub: string;
   price: string;
-  priceSuffix: string;
-  blurb: string;
-  features: ReadonlyArray<string>;
-  highlighted: boolean;
+  includes: React.ReactNode[];
   cta: string;
-  ctaHref: string;
+  featured?: boolean;
 }
 
-const TIERS: ReadonlyArray<Tier> = [
+const TIERS: Tier[] = [
   {
-    id: "foundations",
+    flag: "Tier 01",
     name: "PPC Foundations",
-    price: "₱2,999",
-    priceSuffix: "one-time",
-    blurb: "5 core modules. The full Amazon ads workflow, end to end.",
-    features: [
-      "5 modules, ~20 hours of content",
-      "Campaign Builder + Bid Elevator + STR Triage simulators",
+    sub: "5 core modules. The full Amazon ads workflow, end to end.",
+    price: "2,999",
+    includes: [
+      <>
+        <b>5 modules</b> · ~20 hours of content
+      </>,
+      <>
+        <b>Campaign Builder + Bid Elevator + STR Triage</b> simulators
+      </>,
       "Quizzes and badges",
       "Certificate on completion",
       "Community access",
     ],
-    highlighted: false,
     cta: "Start Foundations",
-    ctaHref: "/signup?tier=foundations",
   },
   {
-    id: "mastery",
+    flag: "Tier 02",
     name: "Accelerated Mastery",
-    price: "₱5,999",
-    priceSuffix: "one-time",
-    blurb: "Everything in Foundations + advanced modules + all simulators.",
-    features: [
-      "8 modules, ~40 hours of content",
-      "All 5 simulators (incl. Listing Audit + Keyword Research)",
-      "Scenario packs and downloadable templates",
+    sub: "Everything in Foundations + advanced modules + all simulators.",
+    price: "5,999",
+    includes: [
+      <>
+        <b>8 modules</b> · ~40 hours of content
+      </>,
+      <>
+        <b>All 5 simulators</b> (incl. Listing Audit + Keyword Research)
+      </>,
+      "Scenario packs & downloadable templates",
       "Live class recordings",
-      "Certificate with priority review",
+      <>
+        Certificate with <b>priority review</b>
+      </>,
     ],
-    highlighted: true,
     cta: "Start Mastery",
-    ctaHref: "/signup?tier=mastery",
+    featured: true,
   },
   {
-    id: "ultimate",
+    flag: "Tier 03",
     name: "Ultimate Transformation",
-    price: "₱9,999",
-    priceSuffix: "one-time",
-    blurb: "Everything in Mastery + weekly live classes with Ryan + 1-on-1 review.",
-    features: [
-      "Everything in Mastery",
-      "Weekly live classes with Ryan",
-      "1-on-1 portfolio review (once)",
+    sub: "Everything in Mastery + weekly live classes with Ryan + 1-on-1 review.",
+    price: "9,999",
+    includes: [
+      <>
+        <b>Everything in Mastery</b>
+      </>,
+      <>
+        <b>Weekly live classes</b> with Ryan
+      </>,
+      <>
+        <b>1-on-1 portfolio review</b> (once)
+      </>,
       "Private community channel",
       "Direct line to the team for Q&A",
     ],
-    highlighted: false,
     cta: "Start Ultimate",
-    ctaHref: "/signup?tier=ultimate",
   },
 ];
 
 export function Pricing() {
   return (
-    <section
-      id="pricing"
-      className={styles.section}
-      aria-labelledby="pricing-heading"
-    >
-      <div className={styles.inner}>
-        <h2 id="pricing-heading" className={styles.heading}>
-          Three tiers, one-time payment
-        </h2>
-        <p className={styles.subhead}>
-          Pay once, get the content forever. No subscription, no upsells later.
+    <section className={shared.sec} id="pricing">
+      <div className={shared.wrap}>
+        <div className={shared.secHead}>
+          <div className={shared.stickyCol}>
+            <span className={shared.secNum}>§05 / PRICING</span>
+            <h2 className={shared.secTitle}>Three tiers, one-time payment.</h2>
+          </div>
+          <p className={shared.secLede}>
+            Pay once, get the content forever. <b>No subscription, no upsells later.</b> Prices
+            below are the documented figures from projectamazonph.online, identical on every
+            surface.
+          </p>
+        </div>
+
+        <p className={styles.intro}>
+          The <b>first module is the same in every tier</b>. The difference is how far you go.
         </p>
-        <ul className={styles.grid}>
+
+        <Reveal className={styles.tiers}>
           {TIERS.map((tier) => (
-            <li
-              key={tier.id}
-              className={`${styles.card} ${tier.highlighted ? styles.cardHighlighted : ""}`}
+            <article
+              key={tier.name}
+              className={[styles.card, tier.featured ? styles.featured : ""].join(" ")}
             >
-              {tier.highlighted ? (
+              {tier.featured ? (
                 <span className={styles.ribbon}>Most students pick this</span>
               ) : null}
-              <h3 className={styles.tierName}>{tier.name}</h3>
-              <div className={styles.priceRow}>
-                <span className={styles.price}>{tier.price}</span>
-                <span className={styles.priceSuffix}>{tier.priceSuffix}</span>
+              <span className={styles.flag}>{tier.flag}</span>
+              <h3>{tier.name}</h3>
+              <p className={styles.sub}>{tier.sub}</p>
+              <div className={styles.priceLine}>
+                <span className={styles.tok}>
+                  <span className={styles.cur}>₱</span>
+                  {tier.price}
+                </span>
+                <small>one-time</small>
               </div>
-              <p className={styles.blurb}>{tier.blurb}</p>
-              <ul className={styles.features}>
-                {tier.features.map((f) => (
-                  <li key={f} className={styles.feature}>
-                    <span className={styles.check} aria-hidden="true">+</span>
-                    <span>{f}</span>
+              <p className={styles.payMini}>PayMongo · Card + GCash · receipt emailed</p>
+              <ul className={styles.incl}>
+                {tier.includes.map((item, i) => (
+                  <li key={i}>
+                    <CheckIcon />
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
               <a
-                href={tier.ctaHref}
-                className={`${styles.cta} ${tier.highlighted ? styles.ctaPrimary : styles.ctaSecondary}`}
+                className={[shared.btn, tier.featured ? shared.btnPrimary : shared.btnGhost].join(
+                  " ",
+                )}
+                href={COURSES_URL}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {tier.cta}
+                {tier.cta} <span className={shared.arr}>→</span>
               </a>
-            </li>
+            </article>
           ))}
-        </ul>
-        <p className={styles.note}>
-          Payment via PayMongo. Card and GCash accepted. Receipt emailed.
-        </p>
+        </Reveal>
+
+        <Reveal className={styles.payrail}>
+          <div className={styles.payrailLeft}>
+            <span className={styles.payrailLabel}>Checkout</span>
+            <span className={styles.payChip}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M2 10h20" />
+              </svg>
+              PayMongo
+            </span>
+            <span className={styles.payChip}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M6 15h4" />
+              </svg>
+              Card
+            </span>
+            <span className={styles.payChip}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 2v20M5 7c0 3 3 5 7 5s7-2 7-5M5 17c0-3 3-5 7-5s7 2 7 5" />
+              </svg>
+              GCash
+            </span>
+            <span className={styles.payChip}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 4h16v12H7l-3 3z" />
+              </svg>
+              Receipt emailed
+            </span>
+          </div>
+          <div>
+            <span className={[styles.payChip, styles.guar].join(" ")}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 2 4 5v6c0 5 3.5 8 8 11 4.5-3 8-6 8-11V5z" />
+              </svg>
+              7-day refund if &lt; 25% done
+            </span>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title">
+  <title id="title">Project Amazon PH stacked logo</title>
+  <rect width="640" height="420" fill="#FAFAF7"/>
+  <rect x="56" y="56" width="142" height="142" fill="#FF6B35"/>
+  <path fill="#171717" d="M81 166V89h20l22 35 22-35h20v77h-21v-43l-21 33-21-33v43H81Z"/>
+  <path fill="#FAFAF7" d="m126 86 42 83h-22l-8-18h-25l-8 18H83l42-83h1Zm0 39-5 12h10l-5-12Z"/>
+  <path fill="#171717" d="M56 230h528v2H56z"/>
+  <text x="56" y="302" fill="#171717" font-family="Space Grotesk, Arial, sans-serif" font-size="64" font-weight="700" letter-spacing="-2">PROJECT AMAZON</text>
+  <text x="60" y="350" fill="#737373" font-family="JetBrains Mono, Consolas, monospace" font-size="23" font-weight="500" letter-spacing="5">PHILIPPINES</text>
+</svg>

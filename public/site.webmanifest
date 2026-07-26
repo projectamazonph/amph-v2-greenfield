@@ -1,0 +1,10 @@
+{
+  "name": "Project Amazon PH",
+  "short_name": "Project Amazon PH",
+  "description": "Amazon PPC systems and training for Filipino VAs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF7",
+  "theme_color": "#FF6B35",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

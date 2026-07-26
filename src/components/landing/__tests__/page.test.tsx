@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 /**
  * Landing page — wire-up test.
- * The src/app/page.tsx should render all 8 sections in order.
+ * src/app/page.tsx should render the section headings in order.
  */
 
 import { describe, it, expect } from "vitest";
@@ -10,17 +10,19 @@ import { createElement } from "react";
 import HomePage from "../../../app/page";
 
 describe("Landing page", () => {
-  it("renders all 8 section H1+H2 headings in order", () => {
+  it("renders the section headings in order", () => {
     const html = renderToString(createElement(HomePage));
     const headlines = [
-      "The Amazon ads training built for Filipino VAs", // Hero
-      "What the training gets you", // Numbers
-      "Who this is for", // Audience
-      "just watch lessons", // Practice
-      "Course structure", // Curriculum
-      "Three tiers, one-time payment", // Pricing
-      "Common questions", // FAQ
-      "Pick your tier. Start tonight.", // FinalCTA
+      "Learn PPC by", // Hero
+      "just watch lessons", // Method
+      "Move a bid. Watch the account breathe.", // SimulatorSection
+      "Eight modules, in order. No surprises.", // Curriculum
+      "A paid course. We think it should be.", // WhoFor
+      "Three tiers, one-time payment.", // Pricing
+      "Direct, grounded in real account work.", // Mentor
+      "A certificate that opens doors, not one that sits idle.", // Proof
+      "Plain answers.", // FAQSection
+      "Stop watching.", // DarkCTA
     ];
     let lastIndex = -1;
     for (const headline of headlines) {
@@ -67,10 +69,11 @@ describe("Landing page", () => {
     expect(h1s.length).toBe(1);
   });
 
-  it("does not claim simulators are 'available now' or 'ready to use'", () => {
-    // Tripwire: this would have caught the misleading screenshot
-    // situation. If a future change adds back finished-product claims
-    // about the simulators, this test fails.
+  it("does not claim the in-course simulators are available now or ready to use", () => {
+    // Tripwire: only 4 of 5 simulators exist and the in-course student UI
+    // is still in development (see CLAUDE.md "Known gaps"). The Bid
+    // Elevator widget on this page is an unauthenticated public preview,
+    // not the real scored simulator — copy must stay honest about that.
     const html = renderToString(createElement(HomePage)).toLowerCase();
     expect(html).not.toMatch(/simulators? (are|is) (available|ready|live|finished|complete)/);
     expect(html).not.toContain("try the simulator");

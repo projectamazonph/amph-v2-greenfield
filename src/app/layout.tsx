@@ -14,14 +14,16 @@ const spaceGrotesk = Space_Grotesk({
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "700"],
   variable: "--font-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Project Amazon PH Academy v2",
-  description: "Master Amazon PPC and seller central — built for Filipino VAs.",
+  description: "Master Amazon PPC and seller central, built for Filipino VAs.",
+  manifest: "/site.webmanifest",
+  icons: { icon: "/favicon.svg", apple: "/favicon.svg" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

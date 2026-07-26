@@ -1,0 +1,124 @@
+.sectionTint {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 3.5%, transparent), transparent);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.photoCol {
+  position: relative;
+}
+
+.figure {
+  aspect-ratio: 1 / 1;
+}
+
+.sketch {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-md);
+}
+
+.stamp {
+  position: absolute;
+  left: -12px;
+  bottom: -12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  box-shadow: 3px 3px 0 var(--ink-900);
+  transform: rotate(-3deg);
+}
+
+.quote {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.4rem, 2.8vw, 2.1rem);
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  border-left: 3px solid var(--accent);
+  padding-left: clamp(18px, 2.5vw, 28px);
+  margin-bottom: 24px;
+}
+
+.quote em {
+  font-style: italic;
+}
+
+.tl {
+  color: var(--accent);
+}
+
+.by {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.byText b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--ink-900);
+  letter-spacing: 0;
+}
+
+.byText small {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+
+.points {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+@media (max-width: 520px) {
+  .points {
+    grid-template-columns: 1fr;
+  }
+}
+
+.point {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: var(--surface-1);
+}
+
+.point small {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.point p {
+  font-size: 13.5px;
+  color: var(--ink-700);
+  margin-top: 6px;
+}

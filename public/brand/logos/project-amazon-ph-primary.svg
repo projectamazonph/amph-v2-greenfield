@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 180" role="img" aria-labelledby="title desc">
+  <title id="title">Project Amazon PH</title><desc id="desc">Project Amazon PH primary horizontal logo</desc>
+  <g fill="none" fill-rule="evenodd">
+    <path fill="#FF6B35" d="M0 0h180v180H0z"/>
+    <path fill="#171717" d="M34 137V42h25l28 44 28-44h25v95h-26V84l-27 42L60 84v53H34Z"/>
+    <path fill="#FAFAF7" d="m91 38 52 103h-27l-10-22H75l-10 22H38L90 38h1Zm0 48-7 17h15l-8-17Z"/>
+    <path fill="#171717" d="M218 42h282v12H218z"/>
+    <text x="218" y="94" fill="#171717" font-family="Space Grotesk, Arial, sans-serif" font-size="56" font-weight="700" letter-spacing="-2">PROJECT AMAZON</text>
+    <text x="222" y="137" fill="#737373" font-family="JetBrains Mono, Consolas, monospace" font-size="22" font-weight="500" letter-spacing="4">PHILIPPINES · PPC SYSTEMS</text>
+  </g>
+</svg>
