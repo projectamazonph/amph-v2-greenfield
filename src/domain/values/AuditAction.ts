@@ -38,6 +38,8 @@ export type AuditAction =
   | "user.signed_up"
   | "user.impersonated"
   | "user.stopped_impersonating"
+  | "user.2fa_enabled"
+  | "user.2fa_disabled"
   // Discount code
   | "discount_code.created"
   | "discount_code.updated"
@@ -94,6 +96,8 @@ export const ALL_ACTIONS: AuditAction[] = [
   "user.signed_up",
   "user.impersonated",
   "user.stopped_impersonating",
+  "user.2fa_enabled",
+  "user.2fa_disabled",
   "discount_code.created",
   "discount_code.updated",
   "discount_code.archived",

@@ -172,6 +172,68 @@ describe("performLogin", () => {
     expect(plantCall![1]).toBeInstanceOf(Date);
   });
 
+  // ── 2FA (audit hardening follow-up) ──────────────────────────
+
+  it("returns redirect_to_login with totp_required for a 2FA-enabled account and no code", async () => {
+    const container = freshContainer();
+    await seedUser(container, "admin@test.example.com", "correct-password");
+    await container.userRepo.setTwoFactorSecret("u-admin@test.example.com", "SOMESECRET");
+    await container.userRepo.update("u-admin@test.example.com", { twoFactorEnabled: true });
+
+    const deps = makeDeps();
+    const result = await performLogin(
+      container,
+      { email: "admin@test.example.com", password: "correct-password", redirectTo: "/admin" },
+      deps,
+    );
+
+    expect(result).toEqual({ kind: "redirect_to_login", errorKind: "totp_required" });
+    expect(deps.plantCookie).not.toHaveBeenCalled();
+  });
+
+  it("returns redirect_to_login with invalid_totp_code for a wrong code", async () => {
+    const container = freshContainer();
+    await seedUser(container, "admin@test.example.com", "correct-password");
+    await container.userRepo.setTwoFactorSecret("u-admin@test.example.com", "SOMESECRET");
+    await container.userRepo.update("u-admin@test.example.com", { twoFactorEnabled: true });
+
+    const deps = makeDeps();
+    const result = await performLogin(
+      container,
+      {
+        email: "admin@test.example.com",
+        password: "correct-password",
+        redirectTo: "/admin",
+        totpCode: "000000",
+      },
+      deps,
+    );
+
+    expect(result).toEqual({ kind: "redirect_to_login", errorKind: "invalid_totp_code" });
+  });
+
+  it("succeeds end-to-end when the correct totpCode is passed through", async () => {
+    const container = freshContainer();
+    await seedUser(container, "admin@test.example.com", "correct-password");
+    await container.userRepo.setTwoFactorSecret("u-admin@test.example.com", "SOMESECRET");
+    await container.userRepo.update("u-admin@test.example.com", { twoFactorEnabled: true });
+
+    const deps = makeDeps();
+    const result = await performLogin(
+      container,
+      {
+        email: "admin@test.example.com",
+        password: "correct-password",
+        redirectTo: "/admin",
+        totpCode: "123456", // FakeTotpService's fixed correct code (buildTestContainer wiring)
+      },
+      deps,
+    );
+
+    expect(result).toMatchObject({ kind: "success", redirectTo: "/admin" });
+    expect(deps.plantCookie).toHaveBeenCalledTimes(1);
+  });
+
   it("rejects open redirects and falls back to /courses", async () => {
     const container = freshContainer();
     await seedUser(container, "u@test.example.com", "correct-password");

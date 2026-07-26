@@ -72,12 +72,17 @@ import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
+import { FakeTotpService } from "@/infra/security/FakeTotpService";
+import type { TotpService } from "@/ports/security/TotpService";
 import { InMemoryRateLimiter } from "@/infra/security/InMemoryRateLimiter";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 
 import { SignUp } from "@/usecases/SignUp";
 import { Login } from "@/usecases/Login";
 import { Logout } from "@/usecases/Logout";
+import { EnableTwoFactor } from "@/usecases/EnableTwoFactor";
+import { ConfirmTwoFactor } from "@/usecases/ConfirmTwoFactor";
+import { DisableTwoFactor } from "@/usecases/DisableTwoFactor";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -247,6 +252,10 @@ export function buildTestContainer(): TestContainer {
     process.env.JWT_SECRET ?? "test-secret-must-be-at-least-32-bytes-long-ok",
   );
   const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
+  // FakeTotpService (deterministic fixed code), not the real otpauth
+  // adapter — tests exercising 2FA-gated login need a stable code to
+  // assert against rather than dealing with real time-based codes.
+  const totpService: TotpService = new FakeTotpService();
   // STORY-050a: audit log
   const auditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
@@ -290,8 +299,12 @@ export function buildTestContainer(): TestContainer {
     jwt,
     passwordHasher,
     signUp: new SignUp(userRepo, idGen, clock, passwordHasher, recordAuditLog),
-    login: new Login(userRepo, passwordHasher, sessionRepo, idGen, clock, jwt),
+    login: new Login(userRepo, passwordHasher, sessionRepo, idGen, clock, jwt, totpService),
     logout: new Logout(sessionRepo, jwt),
+    totpService,
+    enableTwoFactor: new EnableTwoFactor({ userRepo, totpService }),
+    confirmTwoFactor: new ConfirmTwoFactor({ userRepo, totpService, recordAuditLog }),
+    disableTwoFactor: new DisableTwoFactor({ userRepo, hasher: passwordHasher, recordAuditLog }),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       orderRepo,

@@ -31,6 +31,8 @@ const errorMessage: Record<string, string> = {
   account_locked: "This account is locked. Reset your password to unlock.",
   invalid_input: "Please enter your email and password.",
   rate_limited: "Too many login attempts. Please wait a few minutes and try again.",
+  totp_required: "Enter the 6-digit code from your authenticator app to continue.",
+  invalid_totp_code: "That code didn't match. Check your authenticator app and try again.",
 };
 
 export function LoginForm({
@@ -41,6 +43,7 @@ export function LoginForm({
   errorKind: string | null;
 }) {
   const errorText = errorKind ? (errorMessage[errorKind] ?? null) : null;
+  const needsTotp = errorKind === "totp_required" || errorKind === "invalid_totp_code";
 
   return (
     <div className={styles.page}>
@@ -73,6 +76,24 @@ export function LoginForm({
             required
             autoComplete="current-password"
             placeholder="••••••••"
+            size="md"
+          />
+
+          {/* Only accounts that went through EnableTwoFactor/ConfirmTwoFactor
+              (opt-in) have twoFactorEnabled=true — this field is silently
+              ignored by Login for every other account, so it's safe to
+              always render rather than needing a two-step form. */}
+          <Input
+            name="totpCode"
+            label="Two-factor code"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            placeholder="123456"
+            hint={
+              needsTotp ? undefined : "Only needed if you've enabled two-factor authentication."
+            }
+            autoFocus={needsTotp}
             size="md"
           />
 

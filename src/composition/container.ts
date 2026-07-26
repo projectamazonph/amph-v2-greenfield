@@ -111,6 +111,8 @@ import { PayMongoAdapter } from "@/infra/payment/PayMongoAdapter";
 
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
+import { OtpauthTotpService } from "@/infra/security/OtpauthTotpService";
+import type { TotpService } from "@/ports/security/TotpService";
 import type { JwtService } from "@/ports/security/JwtService";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 
@@ -123,6 +125,9 @@ import { UpstashRateLimiter } from "@/infra/security/UpstashRateLimiter";
 import { SignUp } from "@/usecases/SignUp";
 import { Login } from "@/usecases/Login";
 import { Logout } from "@/usecases/Logout";
+import { EnableTwoFactor } from "@/usecases/EnableTwoFactor";
+import { ConfirmTwoFactor } from "@/usecases/ConfirmTwoFactor";
+import { DisableTwoFactor } from "@/usecases/DisableTwoFactor";
 import { VerifyEmail } from "@/usecases/auth/VerifyEmail";
 import { ResendVerification } from "@/usecases/auth/ResendVerification";
 import type { EmailVerificationRepository } from "@/ports/repositories/EmailVerificationRepository";
@@ -249,6 +254,7 @@ export interface AppContainer {
   auditLog: IAuditLog;
   webhookEventLog: IWebhookEventLog;
   rebuildCourseCurriculum: RebuildCourseCurriculum;
+  totpService: TotpService;
   scenarioRepo: ISimulatorScenarioRepository;
   // STORY-064: simulator attempt infrastructure
   simulatorAttemptRepo: ISimulatorAttemptRepository;
@@ -282,6 +288,9 @@ export interface AppContainer {
   signUp: SignUp;
   login: Login;
   logout: Logout;
+  enableTwoFactor: EnableTwoFactor;
+  confirmTwoFactor: ConfirmTwoFactor;
+  disableTwoFactor: DisableTwoFactor;
   createPaymentIntent: CreatePaymentIntent;
   checkCourseAccess: CheckCourseAccess;
   // P0-5: per-lesson access decision (single source of truth)
@@ -464,6 +473,7 @@ function buildProductionContainer(): AppContainer {
     process.env.JWT_SECRET ?? "dev-only-secret-please-replace-with-32-bytes-min",
   );
   const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
+  const totpService: TotpService = new OtpauthTotpService();
   const rateLimiter: RateLimiter = new UpstashRateLimiter(
     process.env.UPSTASH_REDIS_REST_URL ?? "",
     process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
@@ -490,8 +500,12 @@ function buildProductionContainer(): AppContainer {
     passwordHasher,
     rateLimiter,
     signUp: new SignUp(userRepo, idGen, clock, passwordHasher, recordAuditLog),
-    login: new Login(userRepo, passwordHasher, sessionRepo, idGen, clock, jwt),
+    login: new Login(userRepo, passwordHasher, sessionRepo, idGen, clock, jwt, totpService),
     logout: new Logout(sessionRepo, jwt),
+    totpService,
+    enableTwoFactor: new EnableTwoFactor({ userRepo, totpService }),
+    confirmTwoFactor: new ConfirmTwoFactor({ userRepo, totpService, recordAuditLog }),
+    disableTwoFactor: new DisableTwoFactor({ userRepo, hasher: passwordHasher, recordAuditLog }),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       orderRepo,

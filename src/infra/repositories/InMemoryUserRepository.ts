@@ -23,6 +23,7 @@ export class InMemoryUserRepository implements UserRepository {
   private users = new Map<string, User>();
   private emailIndex = new Map<string, string>(); // email → id
   private passwordHashes = new Map<string, string>(); // userId → hash
+  private twoFactorSecrets = new Map<string, string>(); // userId → TOTP secret
 
   async findById(id: string): Promise<Result<User, UserError>> {
     const user = this.users.get(id);
@@ -65,6 +66,7 @@ export class InMemoryUserRepository implements UserRepository {
       subscriptionTier: "FREE" as const,
       verificationStatus: "UNVERIFIED" as const,
       enrolledCourseIds: Object.freeze([]),
+      twoFactorEnabled: false,
       createdAt: new Date(),
       totalXp: 0,
       emailVerifiedAt: null,
@@ -90,6 +92,7 @@ export class InMemoryUserRepository implements UserRepository {
       enrolledCourseIds: readonly string[];
       emailVerifiedAt: Date | null;
       passwordHash: string;
+      twoFactorEnabled: boolean;
     }>,
   ): Promise<Result<User, UserError>> {
     const user = this.users.get(id);
@@ -120,6 +123,22 @@ export class InMemoryUserRepository implements UserRepository {
     this.users.clear();
     this.emailIndex.clear();
     this.passwordHashes.clear();
+    this.twoFactorSecrets.clear();
+  }
+
+  async getTwoFactorSecret(id: string): Promise<Result<string | null, UserError>> {
+    if (!this.users.has(id)) return Result.err({ kind: "not_found" });
+    return Result.ok(this.twoFactorSecrets.get(id) ?? null);
+  }
+
+  async setTwoFactorSecret(id: string, secret: string | null): Promise<Result<void, UserError>> {
+    if (!this.users.has(id)) return Result.err({ kind: "not_found" });
+    if (secret === null) {
+      this.twoFactorSecrets.delete(id);
+    } else {
+      this.twoFactorSecrets.set(id, secret);
+    }
+    return Result.ok(undefined);
   }
 
   async updateTotalXp(userId: string, newTotalXp: number): Promise<Result<User, UserError>> {
@@ -131,13 +150,15 @@ export class InMemoryUserRepository implements UserRepository {
   }
 
   /** Pre-load with a set of users (for integration test fixtures). */
-  seed(users: Array<{
-    id: string;
-    email: string;
-    passwordHash: string;
-    firstName: string;
-    lastName: string;
-  }>): void {
+  seed(
+    users: Array<{
+      id: string;
+      email: string;
+      passwordHash: string;
+      firstName: string;
+      lastName: string;
+    }>,
+  ): void {
     users.forEach((u) => {
       this.create(u); // sync in memory
     });

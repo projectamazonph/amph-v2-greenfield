@@ -34,6 +34,7 @@ function makeUser(id: string, role: User["role"] = "STUDENT"): User {
     subscriptionTier: "FREE",
     verificationStatus: "VERIFIED",
     enrolledCourseIds: [],
+    twoFactorEnabled: false,
     createdAt: new Date("2026-01-01T00:00:00Z"),
     totalXp: 0,
     emailVerifiedAt: null,
@@ -96,13 +97,15 @@ function makeJwt(): JwtService & { signCount: () => number } {
   };
 }
 
-function buildDeps(overrides: {
-  userRepo?: InMemoryUserRepository;
-  sessionRepo?: InMemorySessionRepository;
-  jwt?: JwtService;
-  idGen?: IdGenerator;
-  clock?: FixedClock;
-} = {}) {
+function buildDeps(
+  overrides: {
+    userRepo?: InMemoryUserRepository;
+    sessionRepo?: InMemorySessionRepository;
+    jwt?: JwtService;
+    idGen?: IdGenerator;
+    clock?: FixedClock;
+  } = {},
+) {
   return {
     userRepo: overrides.userRepo ?? new InMemoryUserRepository(),
     sessionRepo: overrides.sessionRepo ?? new InMemorySessionRepository(),
@@ -141,6 +144,8 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -173,6 +178,8 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -206,6 +213,8 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -263,8 +272,13 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
-    useCase = new ImpersonateUser({ ...buildDeps({ userRepo: new InMemoryUserRepository() }), userRepo: mockUserRepo });
+    useCase = new ImpersonateUser({
+      ...buildDeps({ userRepo: new InMemoryUserRepository() }),
+      userRepo: mockUserRepo,
+    });
 
     const result = await useCase.execute({
       targetUserId: TARGET_ID,
@@ -327,6 +341,8 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
 
@@ -354,6 +370,8 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
 
@@ -383,14 +401,23 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
     const mockSessionRepo: SessionRepository = {
       findById: async () => ({ ok: false, error: { kind: "not_found" } }),
-      create: async () => ({ ok: false, error: { kind: "db_error", message: "session create failed" } }),
+      create: async () => ({
+        ok: false,
+        error: { kind: "db_error", message: "session create failed" },
+      }),
       deleteById: async () => ({ ok: true, value: undefined }),
       deleteAllForUser: async () => ({ ok: true, value: undefined }),
     };
-    useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo, sessionRepo: mockSessionRepo });
+    useCase = new ImpersonateUser({
+      ...deps,
+      userRepo: mockUserRepo,
+      sessionRepo: mockSessionRepo,
+    });
 
     const result = await useCase.execute({
       targetUserId: TARGET_ID,
@@ -418,6 +445,8 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
     const failingJwt: JwtService = {
       sign: async () => ({ ok: false, error: new Error("sign failed") }),
@@ -455,6 +484,8 @@ describe("ImpersonateUser", () => {
       emailExists: async () => ({ ok: true, value: false }),
       getPasswordHash: async () => ({ ok: true, value: "stub" }),
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
+      getTwoFactorSecret: async () => ({ ok: true, value: null }),
+      setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
     };
     const sessionSpy = vi.spyOn(deps.sessionRepo, "create");
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });

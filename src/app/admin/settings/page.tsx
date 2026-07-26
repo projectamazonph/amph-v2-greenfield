@@ -7,10 +7,35 @@
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
+import { disableTwoFactorAction, enableTwoFactorAction } from "@/app/actions/twoFactor.action";
 import styles from "./page.module.css";
 
-export default async function SettingsPage() {
+const twoFactorErrorMessage: Record<string, string> = {
+  already_enabled: "Two-factor authentication is already enabled.",
+  wrong_password: "Incorrect password — two-factor authentication was not disabled.",
+  user_not_found: "Something went wrong — please try again.",
+  db_error: "Something went wrong — please try again.",
+};
+
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; "2fa"?: string }>;
+}) {
   const session = await requireAdmin();
+  const sp = await searchParams;
+  const twoFactorError = sp.error ? (twoFactorErrorMessage[sp.error] ?? null) : null;
+  const twoFactorNotice =
+    sp["2fa"] === "enabled"
+      ? "Two-factor authentication is now enabled on your account."
+      : sp["2fa"] === "disabled"
+        ? "Two-factor authentication has been disabled."
+        : null;
+
+  async function enable() {
+    "use server";
+    await enableTwoFactorAction();
+  }
 
   // We do not read process.env at runtime to avoid leaking secrets;
   // the placeholder shows *presence* only.
@@ -82,6 +107,55 @@ export default async function SettingsPage() {
           <dt>Role</dt>
           <dd>{session.role}</dd>
         </dl>
+      </Card>
+
+      <Card padding={6} style={{ marginBottom: "1rem" }}>
+        <h2 className={styles.sectionTitle}>Two-factor authentication</h2>
+        <p className={styles.help}>
+          Adds a 6-digit code from an authenticator app to your login, on top of your password.
+          Opt-in — other admin accounts are unaffected until they enable it themselves.
+        </p>
+
+        {twoFactorNotice && <p className={styles.twoFactorNotice}>{twoFactorNotice}</p>}
+        {twoFactorError && <p className={styles.twoFactorError}>{twoFactorError}</p>}
+
+        {session.twoFactorEnabled ? (
+          <>
+            <p className={styles.twoFactorStatus}>
+              <span className={`${styles.statusBadge} ${styles.set}`}>Enabled</span>
+            </p>
+            <form action={disableTwoFactorAction} className={styles.twoFactorForm}>
+              <label className={styles.field}>
+                <span className={styles.label}>Current password</span>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  autoComplete="current-password"
+                  className={styles.input}
+                  placeholder="••••••••"
+                />
+                <span className={styles.hint}>
+                  Confirms it's really you before turning this off.
+                </span>
+              </label>
+              <button type="submit" className={styles.dangerButton}>
+                Disable two-factor authentication
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <p className={styles.twoFactorStatus}>
+              <span className={`${styles.statusBadge} ${styles.unset}`}>Disabled</span>
+            </p>
+            <form action={enable}>
+              <button type="submit" className={styles.submitButton}>
+                Enable two-factor authentication
+              </button>
+            </form>
+          </>
+        )}
       </Card>
 
       <Card padding={6}>

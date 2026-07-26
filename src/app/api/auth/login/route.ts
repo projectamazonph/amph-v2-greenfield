@@ -36,11 +36,12 @@ export async function POST(request: Request): Promise<Response> {
   const email = (form.get("email") as string | null) ?? "";
   const password = (form.get("password") as string | null) ?? "";
   const redirectTo = (form.get("redirectTo") as string | null) ?? "/courses";
+  const totpCode = (form.get("totpCode") as string | null) || undefined;
 
   const container = buildContainer();
   const outcome = await performLogin(
     container,
-    { email, password, redirectTo },
+    { email, password, redirectTo, totpCode },
     {
       plantCookie: setAuthCookie,
       getClientIp: async () => {

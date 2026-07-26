@@ -16,10 +16,18 @@ import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { JwtService } from "@/ports/security/JwtService";
+import type { TotpService } from "@/ports/security/TotpService";
 
 export interface LoginInput {
   email: string;
   password: string;
+  /**
+   * Required only when the account has 2FA enabled. The client
+   * re-submits the same email+password plus this field after the
+   * server responds with `totp_required` — no separate pending-session
+   * token to manage, so there's nothing extra to leak or expire.
+   */
+  totpCode?: string;
 }
 
 export type LoginError =
@@ -28,7 +36,10 @@ export type LoginError =
   | { kind: "account_suspended" }
   | { kind: "account_locked" }
   | { kind: "db_error"; message: string }
-  | { kind: "token_error"; message: string };
+  | { kind: "token_error"; message: string }
+  /** Password was correct; the account has 2FA enabled and no/an empty totpCode was given. */
+  | { kind: "totp_required" }
+  | { kind: "invalid_totp_code" };
 
 export type LoginOutput =
   | { ok: true; sessionToken: string; userId: string; expiresAt: Date }
@@ -44,6 +55,7 @@ export class Login {
     private readonly idGen: IdGenerator,
     private readonly clock: Clock,
     private readonly jwt: JwtService,
+    private readonly totpService: TotpService,
   ) {}
 
   async execute(input: LoginInput): Promise<LoginOutput> {
@@ -76,6 +88,25 @@ export class Login {
     const verifyResult = await this.hasher.verify(input.password, hashResult.value);
     if (Result.isErr(verifyResult) || !verifyResult.value) {
       return { ok: false, error: { kind: "wrong_password" } };
+    }
+
+    // Audit hardening: admin 2FA (opt-in — only accounts that have gone
+    // through EnableTwoFactor/ConfirmTwoFactor have twoFactorEnabled
+    // true, so this is a no-op for every existing account by default).
+    if (user.twoFactorEnabled) {
+      if (!input.totpCode) {
+        return { ok: false, error: { kind: "totp_required" } };
+      }
+      const secretResult = await this.userRepo.getTwoFactorSecret(user.id);
+      if (Result.isErr(secretResult) || !secretResult.value) {
+        // twoFactorEnabled=true with no stored secret should not happen
+        // (ConfirmTwoFactor only sets it after a secret is confirmed) —
+        // fail closed rather than silently skip the check.
+        return { ok: false, error: { kind: "invalid_totp_code" } };
+      }
+      if (!this.totpService.verify(secretResult.value, input.totpCode)) {
+        return { ok: false, error: { kind: "invalid_totp_code" } };
+      }
     }
 
     // Create session record in DB (for admin view / revocation)

@@ -32,7 +32,9 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
-  async findByEmail(email: string): Promise<Result<import("@/domain/entities/User").User, UserError>> {
+  async findByEmail(
+    email: string,
+  ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {
       const row = await this.db.user.findUnique({
         where: { email: email.toLowerCase() },
@@ -65,6 +67,7 @@ export class PrismaUserRepository implements UserRepository {
           subscriptionTier: "FREE",
           simulatorAccess: "NONE",
           enrolledCourseIds: [],
+          twoFactorEnabled: false,
         },
       });
       return Result.ok(this.mapRow(row));
@@ -92,6 +95,7 @@ export class PrismaUserRepository implements UserRepository {
       enrolledCourseIds: string[];
       emailVerifiedAt: Date | null;
       passwordHash: string;
+      twoFactorEnabled: boolean;
     }>,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {
@@ -144,13 +148,49 @@ export class PrismaUserRepository implements UserRepository {
 
   // ── Private helpers ────────────────────────────────────────
 
-  async updateTotalXp(userId: string, newTotalXp: number): Promise<Result<import("@/domain/entities/User").User, UserError>> {
+  async updateTotalXp(
+    userId: string,
+    newTotalXp: number,
+  ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {
       const row = await this.db.user.update({
         where: { id: userId },
         data: { totalXp: newTotalXp },
       });
       return Result.ok(this.mapRow(row));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async getTwoFactorSecret(id: string): Promise<Result<string | null, UserError>> {
+    try {
+      const row = await this.db.user.findUnique({
+        where: { id },
+        select: { twoFactorSecret: true },
+      });
+      if (!row) return Result.err({ kind: "not_found" });
+      return Result.ok(row.twoFactorSecret);
+    } catch (err) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async setTwoFactorSecret(id: string, secret: string | null): Promise<Result<void, UserError>> {
+    try {
+      await this.db.user.update({
+        where: { id },
+        data: { twoFactorSecret: secret },
+      });
+      return Result.ok(undefined);
     } catch (err: unknown) {
       if (
         err &&
@@ -175,6 +215,7 @@ export class PrismaUserRepository implements UserRepository {
     subscriptionTier: "FREE" | "STARTER" | "PRO";
     verificationStatus: "UNVERIFIED" | "VERIFIED" | "SUSPENDED";
     enrolledCourseIds: string[];
+    twoFactorEnabled: boolean;
     createdAt: Date;
     totalXp: number;
     emailVerifiedAt: Date | null;
@@ -188,6 +229,7 @@ export class PrismaUserRepository implements UserRepository {
       subscriptionTier: row.subscriptionTier,
       verificationStatus: row.verificationStatus,
       enrolledCourseIds: Object.freeze([...row.enrolledCourseIds]),
+      twoFactorEnabled: row.twoFactorEnabled,
       createdAt: row.createdAt,
       totalXp: row.totalXp,
       emailVerifiedAt: row.emailVerifiedAt,

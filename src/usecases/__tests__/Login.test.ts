@@ -14,6 +14,8 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { JwtService } from "@/ports/security/JwtService";
 import { FixedClock } from "@/ports/system/Clock";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
+import { FakeTotpService } from "@/infra/security/FakeTotpService";
+import type { TotpService } from "@/ports/security/TotpService";
 
 class StubHasher implements PasswordHasher {
   async hash(password: string) {
@@ -30,6 +32,7 @@ describe("Login", () => {
   let hasher: StubHasher;
   let clock: FixedClock;
   let idGen: InMemoryIdGenerator;
+  let totpService: TotpService;
   let useCase: Login;
 
   beforeEach(async () => {
@@ -38,9 +41,13 @@ describe("Login", () => {
     hasher = new StubHasher();
     clock = new FixedClock(new Date("2026-01-01T00:00:00Z"));
     idGen = new InMemoryIdGenerator();
+    totpService = new FakeTotpService();
     const jwt: JwtService = {
       async sign(payload, expiresIn) {
-        return { ok: true, value: `jwt.${btoa(JSON.stringify({ ...payload, expiresIn }))}.sig` } as const;
+        return {
+          ok: true,
+          value: `jwt.${btoa(JSON.stringify({ ...payload, expiresIn }))}.sig`,
+        } as const;
       },
       async verify(token) {
         if (!token.startsWith("jwt.")) return { ok: false, error: new Error("invalid") } as const;
@@ -51,7 +58,7 @@ describe("Login", () => {
         return { ok: true, value: payload } as const;
       },
     };
-    useCase = new Login(userRepo, hasher, sessionRepo, idGen, clock, jwt);
+    useCase = new Login(userRepo, hasher, sessionRepo, idGen, clock, jwt, totpService);
 
     // Seed a user with a known password
     const storedHash = "stubbed:Str0ngP@ss!";
@@ -110,7 +117,10 @@ describe("Login", () => {
   // ── wrong_password ─────────────────────────────────────────
 
   it("returns wrong_password for incorrect password", async () => {
-    const result = await useCase.execute({ email: "alice@example.com", password: "WrongPassword!" });
+    const result = await useCase.execute({
+      email: "alice@example.com",
+      password: "WrongPassword!",
+    });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toEqual({ kind: "wrong_password" });
@@ -134,6 +144,70 @@ describe("Login", () => {
     expect(sessionRepo.size()).toBe(2);
   });
 
+  // ── 2FA (audit hardening follow-up) ──────────────────────────
+
+  describe("when the account has 2FA enabled", () => {
+    beforeEach(async () => {
+      await userRepo.setTwoFactorSecret("user-1", "SOMESECRET");
+      await userRepo.update("user-1", { twoFactorEnabled: true });
+    });
+
+    it("returns totp_required and creates no session when no code is given", async () => {
+      const result = await useCase.execute({
+        email: "alice@example.com",
+        password: "Str0ngP@ss!",
+      });
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "totp_required" });
+      expect(sessionRepo.size()).toBe(0);
+    });
+
+    it("returns invalid_totp_code and creates no session for a wrong code", async () => {
+      const result = await useCase.execute({
+        email: "alice@example.com",
+        password: "Str0ngP@ss!",
+        totpCode: "000000",
+      });
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "invalid_totp_code" });
+      expect(sessionRepo.size()).toBe(0);
+    });
+
+    it("succeeds and creates a session when the correct code is given", async () => {
+      const result = await useCase.execute({
+        email: "alice@example.com",
+        password: "Str0ngP@ss!",
+        totpCode: "123456", // FakeTotpService's fixed correct code
+      });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.userId).toBe("user-1");
+      expect(sessionRepo.size()).toBe(1);
+    });
+
+    it("checks the password before the TOTP code (wrong password still wins)", async () => {
+      const result = await useCase.execute({
+        email: "alice@example.com",
+        password: "WrongPassword!",
+        totpCode: "123456",
+      });
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "wrong_password" });
+    });
+  });
+
+  it("a totpCode is silently ignored for an account without 2FA enabled", async () => {
+    const result = await useCase.execute({
+      email: "alice@example.com",
+      password: "Str0ngP@ss!",
+      totpCode: "000000", // wrong, but irrelevant — 2FA isn't enabled
+    });
+    expect(result.ok).toBe(true);
+  });
+
   // ── input validation ─────────────────────────────────────
 
   it("returns user_not_found for a malformed email (no @)", async () => {
@@ -151,11 +225,26 @@ describe("Login", () => {
         return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
       }
     })();
-    const failingUseCase = new Login(flakyRepo, hasher, sessionRepo, idGen, clock, {
-      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
-      async verify() { return { ok: true, value: {} } as const; },
+    const failingUseCase = new Login(
+      flakyRepo,
+      hasher,
+      sessionRepo,
+      idGen,
+      clock,
+      {
+        async sign(p) {
+          return { ok: true, value: `t.${p.sub}` } as const;
+        },
+        async verify() {
+          return { ok: true, value: {} } as const;
+        },
+      },
+      totpService,
+    );
+    const result = await failingUseCase.execute({
+      email: "alice@example.com",
+      password: "Str0ngP@ss!",
     });
-    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toEqual({ kind: "db_error", message: "find user failed" });
@@ -167,10 +256,22 @@ describe("Login", () => {
     // Stub the user repo to return a SUSPENDED user. The InMemory repo
     // doesn't let us set verificationStatus via create(), so we wrap it.
     const suspendedRepo = new InMemoryUserRepository();
-    const failingUseCase = new Login(suspendedRepo, hasher, sessionRepo, idGen, clock, {
-      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
-      async verify() { return { ok: true, value: {} } as const; },
-    });
+    const failingUseCase = new Login(
+      suspendedRepo,
+      hasher,
+      sessionRepo,
+      idGen,
+      clock,
+      {
+        async sign(p) {
+          return { ok: true, value: `t.${p.sub}` } as const;
+        },
+        async verify() {
+          return { ok: true, value: {} } as const;
+        },
+      },
+      totpService,
+    );
     // Patch findByEmail to return a suspended user
     (suspendedRepo as { findByEmail: typeof suspendedRepo.findByEmail }).findByEmail =
       (async () => ({
@@ -190,7 +291,10 @@ describe("Login", () => {
         },
       })) as never;
 
-    const result = await failingUseCase.execute({ email: "suspended@example.com", password: "Str0ngP@ss!" });
+    const result = await failingUseCase.execute({
+      email: "suspended@example.com",
+      password: "Str0ngP@ss!",
+    });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toEqual({ kind: "account_suspended" });
@@ -215,11 +319,26 @@ describe("Login", () => {
       firstName: "Alice",
       lastName: "Rodriguez",
     });
-    const failingUseCase = new Login(flakyRepo, hasher, sessionRepo, idGen, clock, {
-      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
-      async verify() { return { ok: true, value: {} } as const; },
+    const failingUseCase = new Login(
+      flakyRepo,
+      hasher,
+      sessionRepo,
+      idGen,
+      clock,
+      {
+        async sign(p) {
+          return { ok: true, value: `t.${p.sub}` } as const;
+        },
+        async verify() {
+          return { ok: true, value: {} } as const;
+        },
+      },
+      totpService,
+    );
+    const result = await failingUseCase.execute({
+      email: "alice@example.com",
+      password: "Str0ngP@ss!",
     });
-    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toEqual({ kind: "wrong_password" });
@@ -229,13 +348,30 @@ describe("Login", () => {
 
   it("returns wrong_password when the hasher verify returns false", async () => {
     const denyHasher = new (class extends StubHasher {
-      override async verify() { return { ok: true, value: false } as const; }
+      override async verify() {
+        return { ok: true, value: false } as const;
+      }
     })();
-    const failingUseCase = new Login(userRepo, denyHasher, sessionRepo, idGen, clock, {
-      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
-      async verify() { return { ok: true, value: {} } as const; },
+    const failingUseCase = new Login(
+      userRepo,
+      denyHasher,
+      sessionRepo,
+      idGen,
+      clock,
+      {
+        async sign(p) {
+          return { ok: true, value: `t.${p.sub}` } as const;
+        },
+        async verify() {
+          return { ok: true, value: {} } as const;
+        },
+      },
+      totpService,
+    );
+    const result = await failingUseCase.execute({
+      email: "alice@example.com",
+      password: "Str0ngP@ss!",
     });
-    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toEqual({ kind: "wrong_password" });
@@ -250,11 +386,26 @@ describe("Login", () => {
         return { ok: false, error: { kind: "db_error", message: "pg down" } } as never;
       }
     })();
-    const failingUseCase = new Login(userRepo, hasher, flakySessionRepo, idGen, clock, {
-      async sign(p) { return { ok: true, value: `t.${p.sub}` } as const; },
-      async verify() { return { ok: true, value: {} } as const; },
+    const failingUseCase = new Login(
+      userRepo,
+      hasher,
+      flakySessionRepo,
+      idGen,
+      clock,
+      {
+        async sign(p) {
+          return { ok: true, value: `t.${p.sub}` } as const;
+        },
+        async verify() {
+          return { ok: true, value: {} } as const;
+        },
+      },
+      totpService,
+    );
+    const result = await failingUseCase.execute({
+      email: "alice@example.com",
+      password: "Str0ngP@ss!",
     });
-    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toEqual({ kind: "db_error", message: "session create failed" });
@@ -263,11 +414,26 @@ describe("Login", () => {
   // ── jwt sign fails ──────────────────────────────────────
 
   it("returns token_error when the jwt sign fails", async () => {
-    const failingUseCase = new Login(userRepo, hasher, sessionRepo, idGen, clock, {
-      async sign() { return { ok: false, error: new Error("HS256 fail") } as const; },
-      async verify() { return { ok: true, value: {} } as const; },
+    const failingUseCase = new Login(
+      userRepo,
+      hasher,
+      sessionRepo,
+      idGen,
+      clock,
+      {
+        async sign() {
+          return { ok: false, error: new Error("HS256 fail") } as const;
+        },
+        async verify() {
+          return { ok: true, value: {} } as const;
+        },
+      },
+      totpService,
+    );
+    const result = await failingUseCase.execute({
+      email: "alice@example.com",
+      password: "Str0ngP@ss!",
     });
-    const result = await failingUseCase.execute({ email: "alice@example.com", password: "Str0ngP@ss!" });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toEqual({ kind: "token_error", message: "jwt sign failed" });
