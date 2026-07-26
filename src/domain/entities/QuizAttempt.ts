@@ -15,11 +15,25 @@ export interface QuizAttemptAnswer {
   readonly selectedOptionId: string;
 }
 
+export type QuizAttemptStatus = "in_progress" | "completed";
+
+const ALL_QUIZ_ATTEMPT_STATUSES: readonly QuizAttemptStatus[] = ["in_progress", "completed"];
+
+/**
+ * Type guard for a value read back from persistence. A repository
+ * adapter should call this before trusting a stored string as a
+ * `QuizAttemptStatus` — mirrors `PaymentStatus.isValid()`. A corrupt
+ * or legacy row must not silently hydrate an impossible state.
+ */
+export function isQuizAttemptStatus(value: string): value is QuizAttemptStatus {
+  return (ALL_QUIZ_ATTEMPT_STATUSES as readonly string[]).includes(value);
+}
+
 export interface QuizAttempt {
   readonly id: string;
   readonly userId: string;
   readonly quizId: string;
-  readonly status: "in_progress" | "completed";
+  readonly status: QuizAttemptStatus;
   readonly answers: readonly QuizAttemptAnswer[];
   readonly score: number | null;
   readonly passed: boolean | null;
@@ -30,9 +44,7 @@ export interface QuizAttempt {
 // ── Error Types ─────────────────────────────────────────────────────────────
 
 export type StartQuizAttemptError =
-  | { kind: "invalid_id" }
-  | { kind: "invalid_user_id" }
-  | { kind: "invalid_quiz_id" };
+  { kind: "invalid_id" } | { kind: "invalid_user_id" } | { kind: "invalid_quiz_id" };
 
 export type AnswerQuestionError =
   | { kind: "attempt_not_in_progress" }
@@ -92,9 +104,7 @@ export function answerQuestion(params: {
   }
 
   // Replace any previous answer for this question
-  const without = params.attempt.answers.filter(
-    (a) => a.questionId !== params.questionId,
-  );
+  const without = params.attempt.answers.filter((a) => a.questionId !== params.questionId);
 
   return Result.ok({
     ...params.attempt,

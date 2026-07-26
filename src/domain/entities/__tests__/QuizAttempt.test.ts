@@ -15,6 +15,7 @@ import {
   completeQuizAttempt,
   attemptAllAnswered,
   attemptAnsweredCount,
+  isQuizAttemptStatus,
 } from "../QuizAttempt";
 import { createQuiz } from "../Quiz";
 import type { Quiz } from "../Quiz";
@@ -418,7 +419,10 @@ describe("completeQuizAttempt", () => {
     const result = completeQuizAttempt({ attempt: a1.value, quiz });
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      const err = result.error as { kind: "not_all_questions_answered"; unanswered: readonly string[] };
+      const err = result.error as {
+        kind: "not_all_questions_answered";
+        unanswered: readonly string[];
+      };
       expect(err.kind).toBe("not_all_questions_answered");
       expect(err.unanswered).toContain("q2");
     }
@@ -497,5 +501,18 @@ describe("attemptAnsweredCount", () => {
     if (!a2.ok) return;
 
     expect(attemptAnsweredCount(a2.value)).toBe(2);
+  });
+});
+
+describe("isQuizAttemptStatus", () => {
+  it("returns true for every valid QuizAttemptStatus", () => {
+    expect(isQuizAttemptStatus("in_progress")).toBe(true);
+    expect(isQuizAttemptStatus("completed")).toBe(true);
+  });
+
+  it("returns false for a corrupt or legacy status string", () => {
+    expect(isQuizAttemptStatus("pending")).toBe(false);
+    expect(isQuizAttemptStatus("")).toBe(false);
+    expect(isQuizAttemptStatus("IN_PROGRESS")).toBe(false);
   });
 });

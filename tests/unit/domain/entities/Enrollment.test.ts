@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { Result } from "@/domain/shared/Result";
 import {
   createEnrollment,
+  isEnrollmentStatus,
   type Enrollment,
   type EnrollmentStatus,
   type EnrollmentSource,
@@ -105,6 +106,21 @@ describe("Enrollment", () => {
       };
       expect(enrollment.status).toBe("active");
       expect(enrollment.progressPercent).toBe(0);
+    });
+  });
+
+  describe("isEnrollmentStatus", () => {
+    it("returns true for every valid EnrollmentStatus", () => {
+      const statuses: EnrollmentStatus[] = ["active", "cancelled", "refunded", "expired"];
+      for (const s of statuses) {
+        expect(isEnrollmentStatus(s)).toBe(true);
+      }
+    });
+
+    it("returns false for a corrupt or legacy status string", () => {
+      expect(isEnrollmentStatus("pending")).toBe(false);
+      expect(isEnrollmentStatus("")).toBe(false);
+      expect(isEnrollmentStatus("ACTIVE")).toBe(false);
     });
   });
 });
