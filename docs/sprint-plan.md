@@ -167,6 +167,63 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-064 | (to be added)                        | 1   | ⏳ Planned |
 | STORY-065 | (to be added)                        | 1   | ⏳ Planned |
 
+## Sprint 14 — Simulator Scoring Integrity (7 pts)
+
+**Goal:** Make the grade mean something before improving what it grades. Today a
+learner can pass every Listing Audit difficulty by clicking "fix" on every
+finding without reading one, four policies cap a flawless learner at 90, and
+`passingThreshold` is seeded config that no code reads.
+
+**Why now:** Every item here is mechanical and provable against invariants the
+domain layer already declares. None of it needs an Amazon PPC judgement call, and
+all of it is wasted work if done _after_ the subject-matter sprint reshapes the
+dimensions. Full evidence in `docs/audit-2026-07-26-simulator-accuracy-review.md`.
+
+**Honest limit:** this sprint blocks the click-through bypass on beginner and cuts
+blind guessing from ~89% to ~11-19%, but it does **not** close the bypass on
+intermediate/advanced. The residual cause is the binary ground truth itself, which
+is STORY-083. Measured numbers are in the audit doc.
+
+| ID        | Title                                                                                                                                                     | Pts | Status     |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------- |
+| STORY-071 | Remove `explanation` from all score policies; rebalance weights to sum 1.0                                                                                | 1   | ⏳ Planned |
+| STORY-072 | Stop grading completion: `reviewCoverage` becomes a submission gate, not a weight                                                                         | 1   | ⏳ Planned |
+| STORY-073 | `priorityCoverage` penalises false positives (recall to F1)                                                                                               | 1   | ⏳ Planned |
+| STORY-074 | Enforce policy validation on the seed + hydration paths (`isValidPolicy`)                                                                                 | 1   | ⏳ Planned |
+| STORY-075 | Resolve dead `passingThreshold`: implement partial credit or remove it                                                                                    | 1   | ⏳ Planned |
+| STORY-076 | Rename `dataSufficiency` → `reviewCoverage` (both sims); Listing Audit's `profitability` → `priorityCoverage` (STR Triage's is correctly named, leave it) | 1   | ⏳ Planned |
+| STORY-077 | Fix the inverted backend search-terms rule in `ListingAuditSimulator`                                                                                     | 1   | ⏳ Planned |
+
+## Sprint 15 — Certification Safety + Subject-Matter Accuracy (7 pts)
+
+**Goal:** Stop simulator scores implying job-readiness they cannot support, then
+replace synthetic ground truth with real Amazon PPC logic.
+
+**Owner note:** STORY-079 through STORY-084 require Ryan's Amazon PPC expertise to
+define correct answers. These are explicitly **not** delegable to an agent. An
+agent inventing plausible-looking ground truth is the exact defect this sprint
+exists to remove.
+
+| ID        | Title                                                                          | Pts | Status     |
+| --------- | ------------------------------------------------------------------------------ | --- | ---------- |
+| STORY-078 | Mark simulator results formative; block from certification/job-readiness       | 1   | ⏳ Planned |
+| STORY-079 | Rewrite Bid Elevator economic model (highest-risk simulator)                   | 1   | ⏳ Planned |
+| STORY-080 | Replace length-based listing scoring with a real rubric                        | 1   | ⏳ Planned |
+| STORY-081 | Versioned keyword scenario datasets; split Listing Audit from Keyword Research | 1   | ⏳ Planned |
+| STORY-082 | Expand STR Triage classifier (thresholds, relevance, match precision)          | 1   | ⏳ Planned |
+| STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ⏳ Planned |
+| STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ⏳ Planned |
+
+## Sprint 16 — Assessment Platform Maturity (5 pts)
+
+| ID        | Title                                             | Pts | Status     |
+| --------- | ------------------------------------------------- | --- | ---------- |
+| STORY-085 | Scenario publishing + versioning                  | 1   | ⏳ Planned |
+| STORY-086 | Instructor calibration + acceptable-answer ranges | 1   | ⏳ Planned |
+| STORY-087 | Explicit business-impact feedback                 | 1   | ⏳ Planned |
+| STORY-088 | Challenge progression                             | 1   | ⏳ Planned |
+| STORY-089 | Connected-account simulator                       | 1   | ⏳ Planned |
+
 ---
 
 | Sprint    | Pts     | Story pattern                                                                                                                                      |
@@ -184,6 +241,9 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | S11       | 5       | Observability + tests (5 × 1pt)                                                                                                                    |
 | S12       | 5       | Launch (5 × 1pt)                                                                                                                                   |
 | S13       | 5       | Admin panel round 2 (STORY-061, 062, 063 = 3 × 1pt; add more stories as planned)                                                                   |
+| S14       | 7       | Simulator scoring integrity (STORY-071–077 = 7 × 1pt; mechanical, no PPC judgement)                                                                |
+| S15       | 7       | Certification safety + subject-matter accuracy (STORY-078–084 = 7 × 1pt; 079–084 need Ryan's PPC expertise)                                        |
+| S16       | 5       | Assessment platform maturity (STORY-085–089 = 5 × 1pt)                                                                                             |
 | **Total** | **60+** |                                                                                                                                                    |
 
 Per-sprint velocity: 5 points. The pack-stories (STORY-040, STORY-050) are honest about the larger scope; if they prove too big, split during planning. STORY-048 and STORY-050 were both split into multiple 1-pt stories to keep each PR within budget.
