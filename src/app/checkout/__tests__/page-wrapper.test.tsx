@@ -6,7 +6,6 @@
  * Suspense is present and the form renders inside it.
  */
 
-/* eslint-disable no-restricted-syntax */
 import { describe, it, expect, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));

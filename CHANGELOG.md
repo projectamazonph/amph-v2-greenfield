@@ -4,6 +4,12 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-26: Production-readiness lint sweep (PR #195)
+
+- Eliminated the last ESLint warning in the codebase: `ImpersonateUser.ts` was logging admin impersonation via `console.log` (flagged by `no-console`) instead of writing a real audit entry. Fixed at the root — it now writes a `user.impersonated` entry via `RecordAuditLog`, the same pattern used by every other sensitive admin action, closing a real "no admin mutation without an audit log" gap rather than just silencing the lint rule.
+- Removed two stale `eslint-disable` comments (`RecordAuditLog.ts`, a checkout test) that were no longer suppressing anything.
+- Full suite verified clean end-to-end: `pnpm tsc --noEmit` (0 errors), `pnpm lint` (0 warnings/errors), `pnpm test` (2966 passed, 2 intentionally skipped), `pnpm build` (clean production build).
+
 ### 2026-07-26: Audit hardening execution (PRs #186–#192)
 
 Follow-up to the docs-only audit verification pass below — executed
