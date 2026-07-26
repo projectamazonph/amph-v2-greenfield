@@ -411,6 +411,7 @@ export function buildTestContainer(): TestContainer {
       jwt,
       clock,
       idGen,
+      recordAuditLog,
     }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),

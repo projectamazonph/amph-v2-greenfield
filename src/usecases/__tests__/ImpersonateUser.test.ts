@@ -8,8 +8,10 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ImpersonateUser } from "@/usecases/ImpersonateUser";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import type { JwtService } from "@/ports/security/JwtService";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
@@ -104,14 +106,23 @@ function buildDeps(
     jwt?: JwtService;
     idGen?: IdGenerator;
     clock?: FixedClock;
+    recordAuditLog?: RecordAuditLog;
   } = {},
 ) {
+  const clock = overrides.clock ?? new FixedClock(new Date("2026-07-19T00:00:00Z"));
   return {
     userRepo: overrides.userRepo ?? new InMemoryUserRepository(),
     sessionRepo: overrides.sessionRepo ?? new InMemorySessionRepository(),
     jwt: overrides.jwt ?? makeJwt(),
     idGen: overrides.idGen ?? makeIdGen(),
-    clock: overrides.clock ?? new FixedClock(new Date("2026-07-19T00:00:00Z")),
+    clock,
+    recordAuditLog:
+      overrides.recordAuditLog ??
+      new RecordAuditLog({
+        auditLog: new InMemoryAuditLog(),
+        idGen: makeIdGen(),
+        clock,
+      }),
   };
 }
 

@@ -33,6 +33,7 @@ import type { JwtService } from "@/ports/security/JwtService";
 import type { Clock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { User } from "@/domain/entities/User";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 const SESSION_TTL = "7d";
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -69,6 +70,7 @@ export interface ImpersonateUserDeps {
   jwt: JwtService;
   clock: Clock;
   idGen: IdGenerator;
+  recordAuditLog: RecordAuditLog;
 }
 
 // ── Use Case ───────────────────────────────────────────────────────────────
@@ -139,13 +141,15 @@ export class ImpersonateUser {
       return Result.err({ kind: "token_error", message: "jwt sign failed" });
     }
 
-    // ── 7. TODO: Audit log (STORY-X) ──────────────────────
-    // AGENTS.md says every admin action logs to AuditLog. There's no
-    // AuditLog port yet (see SignUp.ts TODO). For now, log via the
-    // structured logger pattern.
-    console.log(
-      `[impersonate] admin=${input.adminUserId} target=${targetUser.id} session=${sessionId}`,
-    );
+    // ── 7. Audit log — best-effort. RecordAuditLog swallows its own
+    // errors, so a failed write never blocks the impersonation itself.
+    await this.deps.recordAuditLog.execute({
+      actorId: input.adminUserId,
+      action: "user.impersonated",
+      targetType: "user",
+      targetId: targetUser.id,
+      metadata: { sessionId },
+    });
 
     return Result.ok({
       token: jwtResult.value,

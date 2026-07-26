@@ -40,7 +40,9 @@ export class RecordAuditLog {
   constructor(private readonly deps: RecordAuditLogDeps) {}
 
   /** Exposed for tests only. Do not use in production. */
-  get _auditLog() { return this.deps.auditLog; }
+  get _auditLog() {
+    return this.deps.auditLog;
+  }
 
   async execute(input: RecordAuditLogInput): Promise<RecordAuditLogResult> {
     const id = this.deps.idGen.newId();
@@ -57,17 +59,12 @@ export class RecordAuditLog {
     });
 
     if (!buildResult.ok) {
-      // eslint-disable-next-line no-console
-      console.error(
-        "[RecordAuditLog] invalid input, skipping record:",
-        buildResult.error,
-      );
+      console.error("[RecordAuditLog] invalid input, skipping record:", buildResult.error);
       return { recorded: false };
     }
 
     const recordResult = await this.deps.auditLog.record(buildResult.value);
     if (!recordResult.ok) {
-      // eslint-disable-next-line no-console
       console.error(
         "[RecordAuditLog] failed to persist entry, swallowing error:",
         recordResult.error,
