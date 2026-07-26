@@ -23,6 +23,7 @@ import type { IModuleRepository, ModuleError } from "@/ports/repositories/IModul
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 export interface CreateModuleInput {
   courseId: string;
@@ -39,6 +40,7 @@ export interface CreateModuleDeps {
   idGen: IdGenerator;
   clock: Clock;
   recordAuditLog: RecordAuditLog;
+  rebuildCourseCurriculum: RebuildCourseCurriculum;
 }
 
 export class CreateModule {
@@ -111,6 +113,11 @@ export class CreateModule {
       targetType: "module",
       metadata: { courseId: input.courseId, title: input.title },
     });
+
+    // Keep Course.curriculum in sync — awaited (not fire-and-forget like
+    // the audit log above) so the admin's "module created" response
+    // reflects a curriculum that already includes the new module.
+    await this.deps.rebuildCourseCurriculum.execute(input.courseId);
 
     return Result.ok({ module: persistResult.value });
   }

@@ -8,8 +8,10 @@
 import { Result } from "@/domain/shared/Result";
 import { updateLesson, type Lesson, type UpdateLessonPatch } from "@/domain/entities/Lesson";
 import type { ILessonRepository, LessonError } from "@/ports/repositories/ILessonRepository";
+import type { IModuleRepository } from "@/ports/repositories/IModuleRepository";
 import type { Clock } from "@/ports/system/Clock";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 export interface UpdateLessonInput {
   lessonId: string;
@@ -24,8 +26,10 @@ export type UpdateLessonResult = Result<{ lesson: Lesson }, UpdateLessonError>;
 
 export interface UpdateLessonDeps {
   lessonRepo: ILessonRepository;
+  moduleRepo: IModuleRepository;
   clock: Clock;
   recordAuditLog: RecordAuditLog;
+  rebuildCourseCurriculum: RebuildCourseCurriculum;
 }
 
 export class UpdateLesson {
@@ -90,6 +94,15 @@ export class UpdateLesson {
       // excludes `content`).
       metadata: { patchedFields: Object.keys(input.patch) },
     });
+
+    // title/type/content all feed directly into the curriculum's
+    // corresponding lesson entry — resolve courseId via the module
+    // and rebuild. Best-effort: a lookup failure must not fail the
+    // lesson update itself.
+    const moduleResult = await this.deps.moduleRepo.findById(existing.moduleId);
+    if (moduleResult.ok) {
+      await this.deps.rebuildCourseCurriculum.execute(moduleResult.value.courseId);
+    }
 
     return Result.ok({ lesson: persistResult.value });
   }

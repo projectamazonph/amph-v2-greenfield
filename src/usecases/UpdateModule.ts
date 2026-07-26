@@ -12,6 +12,7 @@ import { updateModule, type Module, type UpdateModulePatch } from "@/domain/enti
 import type { IModuleRepository, ModuleError } from "@/ports/repositories/IModuleRepository";
 import type { Clock } from "@/ports/system/Clock";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 export interface UpdateModuleInput {
   moduleId: string;
@@ -28,6 +29,7 @@ export interface UpdateModuleDeps {
   moduleRepo: IModuleRepository;
   clock: Clock;
   recordAuditLog: RecordAuditLog;
+  rebuildCourseCurriculum: RebuildCourseCurriculum;
 }
 
 export class UpdateModule {
@@ -97,6 +99,9 @@ export class UpdateModule {
       targetType: "module",
       metadata: { patch: input.patch },
     });
+
+    // A title change affects the corresponding curriculum section title.
+    await this.deps.rebuildCourseCurriculum.execute(existing.courseId);
 
     return Result.ok({ module: persistResult.value });
   }

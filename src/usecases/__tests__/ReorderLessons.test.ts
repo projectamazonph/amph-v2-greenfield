@@ -5,10 +5,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { ReorderLessons } from "@/usecases/ReorderLessons";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
+import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createLesson, type Lesson } from "@/domain/entities/Lesson";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 async function seedLesson(
   repo: InMemoryLessonRepository,
@@ -43,8 +46,19 @@ describe("ReorderLessons", () => {
 
   beforeEach(() => {
     lessonRepo = new InMemoryLessonRepository();
+    const moduleRepo = new InMemoryModuleRepository();
     recordAuditLog = makeRecordAuditLog();
-    useCase = new ReorderLessons({ lessonRepo, recordAuditLog });
+    const rebuildCourseCurriculum = new RebuildCourseCurriculum({
+      courseRepo: new InMemoryCourseRepository(),
+      moduleRepo,
+      lessonRepo,
+    });
+    useCase = new ReorderLessons({
+      lessonRepo,
+      moduleRepo,
+      recordAuditLog,
+      rebuildCourseCurriculum,
+    });
   });
 
   it("reorders lessons in the requested order", async () => {

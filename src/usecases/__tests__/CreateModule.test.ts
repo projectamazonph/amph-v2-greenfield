@@ -5,11 +5,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { CreateModule } from "@/usecases/CreateModule";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { Result } from "@/domain/shared/Result";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 function makeIdGen(): IdGenerator {
   let n = 0;
@@ -31,16 +34,23 @@ function makeRecordAuditLog(): RecordAuditLog {
 describe("CreateModule", () => {
   let moduleRepo: InMemoryModuleRepository;
   let recordAuditLog: RecordAuditLog;
+  let rebuildCourseCurriculum: RebuildCourseCurriculum;
   let useCase: CreateModule;
 
   beforeEach(() => {
     moduleRepo = new InMemoryModuleRepository();
     recordAuditLog = makeRecordAuditLog();
+    rebuildCourseCurriculum = new RebuildCourseCurriculum({
+      courseRepo: new InMemoryCourseRepository(),
+      moduleRepo,
+      lessonRepo: new InMemoryLessonRepository(),
+    });
     useCase = new CreateModule({
       moduleRepo,
       idGen: makeIdGen(),
       clock: new FixedClock(new Date("2026-07-19T00:00:00Z")),
       recordAuditLog,
+      rebuildCourseCurriculum,
     });
   });
 
@@ -83,6 +93,7 @@ describe("CreateModule", () => {
       idGen,
       clock: new FixedClock(new Date()),
       recordAuditLog,
+      rebuildCourseCurriculum,
     });
 
     const r = await useCase.execute({ courseId: "course_01", title: "M1", actorId: "admin_1" });
@@ -140,6 +151,7 @@ describe("CreateModule", () => {
       idGen: makeIdGen(),
       clock: new FixedClock(t0),
       recordAuditLog,
+      rebuildCourseCurriculum,
     });
 
     const r = await useCase.execute({ courseId: "course_01", title: "M1", actorId: "admin_1" });

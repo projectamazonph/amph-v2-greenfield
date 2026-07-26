@@ -15,6 +15,7 @@ import {
   courseLessonCount,
   courseTotalDurationMinutes,
   courseIsAvailable,
+  rebuildCurriculumFromModules,
 } from "../Course";
 import type { Curriculum } from "../Course";
 
@@ -25,9 +26,7 @@ const validCurriculum: Curriculum = {
     {
       id: "s1",
       title: "Getting Started",
-      lessons: [
-        { id: "l1", title: "Welcome", type: "TEXT", content: { body: "Hello" } },
-      ],
+      lessons: [{ id: "l1", title: "Welcome", type: "TEXT", content: { body: "Hello" } }],
     },
   ],
 };
@@ -56,7 +55,11 @@ describe("Course entity", () => {
     });
 
     it("normalizes title and tagline (trim)", () => {
-      const result = createCourse({ ...validParams, title: "  PPC Mastery  ", tagline: "  tagline  " });
+      const result = createCourse({
+        ...validParams,
+        title: "  PPC Mastery  ",
+        tagline: "  tagline  ",
+      });
       if (result.ok) {
         expect(result.value.title).toBe("PPC Mastery");
         expect(result.value.tagline).toBe("tagline");
@@ -188,7 +191,11 @@ describe("Course entity", () => {
         ...validParams,
         curriculum: {
           sections: [
-            { id: "s1", title: "Reading", lessons: [{ id: "l1", title: "Ch1", type: "TEXT", content: {} }] },
+            {
+              id: "s1",
+              title: "Reading",
+              lessons: [{ id: "l1", title: "Ch1", type: "TEXT", content: {} }],
+            },
           ],
         },
       });
@@ -210,6 +217,79 @@ describe("Course entity", () => {
     it("returns false for ARCHIVED course", () => {
       const result = createCourse({ ...validParams, status: "ARCHIVED" });
       if (result.ok) expect(courseIsAvailable(result.value)).toBe(false);
+    });
+  });
+
+  describe("rebuildCurriculumFromModules()", () => {
+    it("builds one section per module, in the given module order", () => {
+      const modules = [
+        { id: "m1", title: "Intro" },
+        { id: "m2", title: "Advanced" },
+      ];
+      const lessonsByModuleId = new Map([
+        ["m1", [{ id: "l1", title: "L1", type: "TEXT" as const, content: { body: "hi" } }]],
+        [
+          "m2",
+          [{ id: "l2", title: "L2", type: "VIDEO" as const, content: { durationMinutes: 5 } }],
+        ],
+      ]);
+
+      const curriculum = rebuildCurriculumFromModules(modules, lessonsByModuleId);
+
+      expect(curriculum.sections).toHaveLength(2);
+      expect(curriculum.sections[0]).toEqual({
+        id: "m1",
+        title: "Intro",
+        lessons: [{ id: "l1", title: "L1", type: "TEXT", content: { body: "hi" } }],
+      });
+      expect(curriculum.sections[1]?.id).toBe("m2");
+    });
+
+    it("uses the real Lesson.id — required so completedLessonIds keeps matching after a rebuild", () => {
+      const modules = [{ id: "m1", title: "Intro" }];
+      const lessonsByModuleId = new Map([
+        ["m1", [{ id: "lesson_abc123", title: "L1", type: "TEXT" as const, content: {} }]],
+      ]);
+
+      const curriculum = rebuildCurriculumFromModules(modules, lessonsByModuleId);
+
+      expect(curriculum.sections[0]?.lessons[0]?.id).toBe("lesson_abc123");
+    });
+
+    it("omits a module with zero lessons (in-progress admin edit, not yet a valid section)", () => {
+      const modules = [
+        { id: "m1", title: "Empty module" },
+        { id: "m2", title: "Has a lesson" },
+      ];
+      const lessonsByModuleId = new Map([
+        ["m2", [{ id: "l1", title: "L1", type: "TEXT" as const, content: {} }]],
+      ]);
+
+      const curriculum = rebuildCurriculumFromModules(modules, lessonsByModuleId);
+
+      expect(curriculum.sections).toHaveLength(1);
+      expect(curriculum.sections[0]?.id).toBe("m2");
+    });
+
+    it("returns an empty curriculum for a course with no modules", () => {
+      const curriculum = rebuildCurriculumFromModules([], new Map());
+      expect(curriculum.sections).toEqual([]);
+    });
+
+    it("preserves the caller's module ordering (callers must pass displayOrder-sorted input)", () => {
+      const modules = [
+        { id: "m3", title: "Third" },
+        { id: "m1", title: "First" },
+      ];
+      const lessonsByModuleId = new Map([
+        ["m3", [{ id: "l3", title: "L3", type: "TEXT" as const, content: {} }]],
+        ["m1", [{ id: "l1", title: "L1", type: "TEXT" as const, content: {} }]],
+      ]);
+
+      const curriculum = rebuildCurriculumFromModules(modules, lessonsByModuleId);
+
+      // Function trusts caller-provided order — it does not re-sort.
+      expect(curriculum.sections.map((s) => s.id)).toEqual(["m3", "m1"]);
     });
   });
 });

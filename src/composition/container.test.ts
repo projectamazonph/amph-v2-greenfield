@@ -131,6 +131,7 @@ import { RefundOverride } from "@/usecases/RefundOverride";
 import { ListRefundRequests } from "@/usecases/ListRefundRequests";
 import { AdminProcessRefund } from "@/usecases/AdminProcessRefund";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 import { ListAuditLogs } from "@/usecases/ListAuditLogs";
 import { ExportAuditLogs } from "@/usecases/ExportAuditLogs";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
@@ -192,6 +193,7 @@ export interface TestContainer extends AppContainer {
   accessPolicy: StubAccessPolicy;
   auditLog: InMemoryAuditLog;
   webhookEventLog: InMemoryWebhookEventLog;
+  rebuildCourseCurriculum: RebuildCourseCurriculum;
   scenarioRepo: InMemorySimulatorScenarioRepository;
   simulatorAttemptRepo: InMemorySimulatorAttemptRepository;
   scorePolicyRepo: InMemoryScorePolicyRepository;
@@ -212,6 +214,11 @@ export function buildTestContainer(): TestContainer {
   const courseRepo = new InMemoryCourseRepository();
   const moduleRepo = new InMemoryModuleRepository();
   const lessonRepo = new InMemoryLessonRepository();
+  const rebuildCourseCurriculum = new RebuildCourseCurriculum({
+    courseRepo,
+    moduleRepo,
+    lessonRepo,
+  });
   const orderRepo = new InMemoryOrderRepository();
   const enrollmentRepo = new InMemoryEnrollmentRepository();
   const discountCodeRepo = new InMemoryDiscountCodeRepository();
@@ -401,17 +408,46 @@ export function buildTestContainer(): TestContainer {
     // STORY-048b: admin modules CRUD + reorder
     adminListModules: new AdminListModules({ moduleRepo }),
     adminGetModule: new AdminGetModule({ moduleRepo }),
-    createModule: new CreateModule({ moduleRepo, idGen, clock, recordAuditLog }),
-    updateModule: new UpdateModule({ moduleRepo, clock, recordAuditLog }),
-    deleteModule: new DeleteModule({ moduleRepo, recordAuditLog }),
-    reorderModules: new ReorderModules({ moduleRepo, recordAuditLog }),
+    createModule: new CreateModule({
+      moduleRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+      rebuildCourseCurriculum,
+    }),
+    updateModule: new UpdateModule({ moduleRepo, clock, recordAuditLog, rebuildCourseCurriculum }),
+    deleteModule: new DeleteModule({ moduleRepo, recordAuditLog, rebuildCourseCurriculum }),
+    reorderModules: new ReorderModules({ moduleRepo, recordAuditLog, rebuildCourseCurriculum }),
     // STORY-048c: admin lessons CRUD + reorder
     adminListLessons: new AdminListLessons({ lessonRepo }),
     adminGetLesson: new AdminGetLesson({ lessonRepo }),
-    createLesson: new CreateLesson({ lessonRepo, idGen, clock, recordAuditLog }),
-    updateLesson: new UpdateLesson({ lessonRepo, clock, recordAuditLog }),
-    deleteLesson: new DeleteLesson({ lessonRepo, recordAuditLog }),
-    reorderLessons: new ReorderLessons({ lessonRepo, recordAuditLog }),
+    createLesson: new CreateLesson({
+      lessonRepo,
+      moduleRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+      rebuildCourseCurriculum,
+    }),
+    updateLesson: new UpdateLesson({
+      lessonRepo,
+      moduleRepo,
+      clock,
+      recordAuditLog,
+      rebuildCourseCurriculum,
+    }),
+    deleteLesson: new DeleteLesson({
+      lessonRepo,
+      moduleRepo,
+      recordAuditLog,
+      rebuildCourseCurriculum,
+    }),
+    reorderLessons: new ReorderLessons({
+      lessonRepo,
+      moduleRepo,
+      recordAuditLog,
+      rebuildCourseCurriculum,
+    }),
     // STORY-049: admin payments + refunds + refund override
     adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
@@ -440,6 +476,7 @@ export function buildTestContainer(): TestContainer {
     auditLog,
     recordAuditLog,
     webhookEventLog,
+    rebuildCourseCurriculum,
     listAuditLogs,
     exportAuditLogs,
     scenarioRepo,

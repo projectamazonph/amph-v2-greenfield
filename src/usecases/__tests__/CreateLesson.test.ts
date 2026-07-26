@@ -5,10 +5,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { CreateLesson } from "@/usecases/CreateLesson";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
+import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 function makeIdGen(): IdGenerator {
   let n = 0;
@@ -29,17 +32,27 @@ function makeRecordAuditLog(): RecordAuditLog {
 
 describe("CreateLesson", () => {
   let lessonRepo: InMemoryLessonRepository;
+  let moduleRepo: InMemoryModuleRepository;
   let recordAuditLog: RecordAuditLog;
+  let rebuildCourseCurriculum: RebuildCourseCurriculum;
   let useCase: CreateLesson;
 
   beforeEach(() => {
     lessonRepo = new InMemoryLessonRepository();
+    moduleRepo = new InMemoryModuleRepository();
     recordAuditLog = makeRecordAuditLog();
+    rebuildCourseCurriculum = new RebuildCourseCurriculum({
+      courseRepo: new InMemoryCourseRepository(),
+      moduleRepo,
+      lessonRepo,
+    });
     useCase = new CreateLesson({
       lessonRepo,
+      moduleRepo,
       idGen: makeIdGen(),
       clock: new FixedClock(new Date("2026-07-19T00:00:00Z")),
       recordAuditLog,
+      rebuildCourseCurriculum,
     });
   });
 
@@ -168,9 +181,11 @@ describe("CreateLesson", () => {
     };
     useCase = new CreateLesson({
       lessonRepo,
+      moduleRepo,
       idGen,
       clock: new FixedClock(new Date()),
       recordAuditLog,
+      rebuildCourseCurriculum,
     });
 
     const r = await useCase.execute({
@@ -189,9 +204,11 @@ describe("CreateLesson", () => {
     const t0 = new Date("2026-07-19T12:00:00Z");
     useCase = new CreateLesson({
       lessonRepo,
+      moduleRepo,
       idGen: makeIdGen(),
       clock: new FixedClock(t0),
       recordAuditLog,
+      rebuildCourseCurriculum,
     });
 
     const r = await useCase.execute({

@@ -13,6 +13,7 @@
 import { Result } from "@/domain/shared/Result";
 import type { IModuleRepository, ModuleError } from "@/ports/repositories/IModuleRepository";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 export interface DeleteModuleInput {
   moduleId: string;
@@ -26,12 +27,31 @@ export type DeleteModuleResult = Result<{ deleted: true }, DeleteModuleError>;
 export interface DeleteModuleDeps {
   moduleRepo: IModuleRepository;
   recordAuditLog: RecordAuditLog;
+  rebuildCourseCurriculum: RebuildCourseCurriculum;
 }
 
 export class DeleteModule {
   constructor(private readonly deps: DeleteModuleDeps) {}
 
   async execute(input: DeleteModuleInput): Promise<DeleteModuleResult> {
+    // Fetched before delete — courseId is needed to rebuild the
+    // curriculum afterward, and the row (and its courseId) is gone
+    // once delete() succeeds.
+    const findResult = await this.deps.moduleRepo.findById(input.moduleId);
+    if (!findResult.ok) {
+      const error: DeleteModuleError =
+        findResult.error.kind === "not_found" ? { kind: "module_not_found" } : findResult.error;
+      void this.deps.recordAuditLog.execute({
+        actorId: input.actorId,
+        action: "module.delete_failed",
+        targetId: input.moduleId,
+        targetType: "module",
+        metadata: { error: error.kind },
+      });
+      return Result.err(error);
+    }
+    const courseId = findResult.value.courseId;
+
     const r = await this.deps.moduleRepo.delete(input.moduleId);
     if (!r.ok) {
       const error: DeleteModuleError =
@@ -53,6 +73,8 @@ export class DeleteModule {
       targetType: "module",
       metadata: {},
     });
+
+    await this.deps.rebuildCourseCurriculum.execute(courseId);
 
     return Result.ok({ deleted: true });
   }

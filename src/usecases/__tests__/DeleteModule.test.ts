@@ -5,10 +5,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { DeleteModule } from "@/usecases/DeleteModule";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createModule, type Module } from "@/domain/entities/Module";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 function makeRecordAuditLog(): RecordAuditLog {
   return new RecordAuditLog({
@@ -42,7 +45,12 @@ describe("DeleteModule", () => {
   beforeEach(() => {
     moduleRepo = new InMemoryModuleRepository();
     recordAuditLog = makeRecordAuditLog();
-    useCase = new DeleteModule({ moduleRepo, recordAuditLog });
+    const rebuildCourseCurriculum = new RebuildCourseCurriculum({
+      courseRepo: new InMemoryCourseRepository(),
+      moduleRepo,
+      lessonRepo: new InMemoryLessonRepository(),
+    });
+    useCase = new DeleteModule({ moduleRepo, recordAuditLog, rebuildCourseCurriculum });
   });
 
   it("deletes the module on the happy path", async () => {
@@ -80,6 +88,7 @@ describe("DeleteModule", () => {
   });
 
   it("returns db_error when the repo errors", async () => {
+    await seedModule(moduleRepo);
     moduleRepo.delete = async () => ({
       ok: false,
       error: { kind: "db_error", message: "delete failed" },
