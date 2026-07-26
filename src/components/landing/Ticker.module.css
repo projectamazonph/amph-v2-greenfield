@@ -1,0 +1,75 @@
+.ticker {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+.tickerIn {
+  display: flex;
+  align-items: center;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--surface-0);
+  background: var(--ink-900);
+  padding: 9px 14px;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+
+.ticker:hover .track {
+  animation-play-state: paused;
+}
+
+.set {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.set span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-700);
+  padding: 9px 0;
+}
+
+.set span b {
+  color: var(--ink-900);
+  font-weight: 700;
+}
+
+.set span em {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.set span::after {
+  content: "/";
+  color: var(--border);
+  margin: 0 16px;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}
