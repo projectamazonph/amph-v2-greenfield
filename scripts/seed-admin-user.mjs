@@ -78,19 +78,13 @@ const { values } = parseArgs({
 const email = (values.email ?? process.env.ADMIN_EMAIL ?? "").trim().toLowerCase();
 const firstName = values["first-name"] ?? process.env.ADMIN_FIRST_NAME ?? "Admin";
 const lastName = values["last-name"] ?? process.env.ADMIN_LAST_NAME ?? "User";
-let password = values.password ?? process.env.ADMIN_PASSWORD ?? "";
-let generatedPassword = false;
+const explicitPassword = values.password ?? process.env.ADMIN_PASSWORD ?? "";
 
 if (!email) {
   console.error(
     "Error: an email is required. Pass --email admin@example.com or set ADMIN_EMAIL.",
   );
   process.exit(1);
-}
-
-if (!password) {
-  password = randomBytes(18).toString("base64url");
-  generatedPassword = true;
 }
 
 // ── Hash (must match Argon2PasswordHasher exactly) ──────────────────────────
@@ -114,25 +108,27 @@ async function main() {
   console.log(`  Email: ${email}`);
   console.log("─".repeat(40) + "\n");
 
-  const passwordHash = await hashPassword(password);
   const existing = await prisma.user.findUnique({ where: { email } });
 
   if (existing) {
     const data = { role: "ADMIN" };
     // Only rotate the password if one was explicitly supplied — don't
-    // clobber an existing admin's password on a routine re-run.
-    if (values.password ?? process.env.ADMIN_PASSWORD) {
-      data.password = passwordHash;
+    // clobber an existing admin's password on a routine re-run, and don't
+    // generate one either: a generated password only means something if
+    // it's actually written to the row.
+    if (explicitPassword) {
+      data.password = await hashPassword(explicitPassword);
     }
     await prisma.user.update({ where: { id: existing.id }, data });
     console.log(
       `  [PROMOTE] "${email}" → role ADMIN${data.password ? " (password rotated)" : ""}`,
     );
   } else {
+    const password = explicitPassword || randomBytes(18).toString("base64url");
     await prisma.user.create({
       data: {
         email,
-        password: passwordHash,
+        password: await hashPassword(password),
         firstName,
         lastName,
         role: "ADMIN",
@@ -144,11 +140,10 @@ async function main() {
       },
     });
     console.log(`  [CREATE]  "${email}" → role ADMIN`);
-  }
-
-  if (generatedPassword) {
-    console.log(`\n  Generated password: ${password}`);
-    console.log("  This was printed to your shell history — rotate it after first login.");
+    if (!explicitPassword) {
+      console.log(`\n  Generated password: ${password}`);
+      console.log("  This was printed to your shell history. Rotate it after first login.");
+    }
   }
 
   console.log("\n✅ Done.\n");

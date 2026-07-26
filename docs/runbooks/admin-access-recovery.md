@@ -12,14 +12,15 @@
 
 So "admin access recovery" reduces to: (1) at least one `User` row must have `role = 'ADMIN'` and a usable password, and (2) if an admin account is compromised, the _reliable_ immediate mitigation is a role downgrade (blocks `/admin/*` next request) plus a password rotation (blocks future logins) — not session-table deletion, which does nothing today.
 
-`package.json`'s `db:seed:admin` script now points at a real `scripts/seed-admin-user.mjs` — it creates a `User` row with `role = 'ADMIN'` (or promotes an existing email to `ADMIN`) and hashes the password with the same Argon2id parameters as `Argon2PasswordHasher`:
+`package.json`'s `db:seed:admin` script now points at a real `scripts/seed-admin-user.mjs`. It creates a `User` row with `role = 'ADMIN'` (or promotes an existing email to `ADMIN`) and hashes the password with the same Argon2id parameters as `Argon2PasswordHasher`:
 
 ```bash
-pnpm db:seed:admin --email admin@example.com --password 'Str0ng!Passw0rd' --first-name Admin --last-name User
-# or omit --password to have one generated and printed once
+export ADMIN_PASSWORD='Str0ng!Passw0rd'
+pnpm db:seed:admin --email admin@example.com --first-name Admin --last-name User
+# or omit ADMIN_PASSWORD entirely on a new account to have one generated and printed once
 ```
 
-It's idempotent (upserts by email) and only rotates an existing admin's password if `--password`/`ADMIN_PASSWORD` is explicitly supplied, so re-running it safely is fine. It goes straight to Prisma rather than through `UserRepository.create()`, since that method hardcodes `role: "STUDENT"` (it's the self-signup path). The SQL-based procedure below is still the right tool when you don't have a Node/DB shell handy, or need to promote/downgrade an account rather than create one.
+Prefer `ADMIN_PASSWORD` over the `--password` flag. A CLI argument lingers in shell history and is visible to other processes on the box (`ps`); an exported env var isn't. It's idempotent (upserts by email) and only rotates an existing admin's password if `--password`/`ADMIN_PASSWORD` is explicitly supplied. Omitting it on an existing account leaves the current password untouched rather than generating a value that would never actually be applied. It goes straight to Prisma rather than through `UserRepository.create()`, since that method hardcodes `role: "STUDENT"` (it's the self-signup path). The SQL-based procedure below is still the right tool when you don't have a Node/DB shell handy, or need to promote/downgrade an account rather than create one.
 
 ## Symptoms
 
