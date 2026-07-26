@@ -25,6 +25,41 @@
 
 ---
 
+## What changed this session (2026-07-26, docs-only: audit verification + CLAUDE.md gap correction)
+
+A pasted external "audit" of this repo (based on README/schema/docs only,
+not the actual code) was received as a task on
+`claude/amph-v2-audit-hardening-1xa1vc`. Every claim in it was checked
+against the real source before acting on anything. No application code
+changed this session — documentation only.
+
+- **Its #1 priority claim ("PayMongo webhook uses in-memory repos") is
+  false today** — `src/app/api/webhooks/paymongo/route.ts` already uses
+  `buildContainer()`, has idempotency and signature verification. Several
+  other claims (no admin panel, `courseRepo`/`orderRepo` on in-memory repos,
+  `src/lib/`/`src/components/`/`content/curriculum/` not existing, DB "not
+  provisioned") were also false — most were copied from `CLAUDE.md`'s
+  "Known gaps" section, which had gone stale.
+- **`CLAUDE.md`'s "Known gaps" section was rewritten** to match verified
+  current reality (production adapters, admin panel, migrations, ADR
+  count, curriculum content). See `docs/audit-2026-07-26-hardening-review.md`
+  for the full claim-by-claim breakdown.
+- **A few audit claims turned out to be real** and are worth real
+  follow-up stories: `Course.curriculum` (Json) still coexists with the
+  relational `Module`/`Lesson` models with nothing keeping them in sync;
+  `Order.status`/`Enrollment.status`/`QuizAttempt.status` are plain
+  strings, not enums; there's no persistent webhook event log for
+  replay/forensics; there's no admin 2FA; `docs/runbooks/` is still just a
+  README. None of these are launch blockers — the actual P0 (webhook
+  persistence) was already fixed.
+- **Important correction:** the audit recommended removing
+  `User.subscriptionTier`/`enrolledCourseIds`/`simulatorAccess`/
+  `emailVerificationToken` as "legacy" fields. **Don't.** They're actively
+  load-bearing in `EnrollStudent`, `TierAccessPolicy`, and `ListUsers` —
+  removing them would break access control and signup.
+
+---
+
 ## What changed this session (2026-07-25, Sprint 13 simulator rebuilds)
 
 ### STORY-067: STR Triage rebuild — PR #179 merged
