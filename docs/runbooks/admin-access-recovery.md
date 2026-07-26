@@ -12,7 +12,14 @@
 
 So "admin access recovery" reduces to: (1) at least one `User` row must have `role = 'ADMIN'` and a usable password, and (2) if an admin account is compromised, the _reliable_ immediate mitigation is a role downgrade (blocks `/admin/*` next request) plus a password rotation (blocks future logins) — not session-table deletion, which does nothing today.
 
-**Also broken today:** `package.json`'s `db:seed:admin` script points at `scripts/seed-admin-user.mjs`, which **does not exist** in this repo (checked directly — only `gen-secret.js`, `import-amph-content.ts`, `seed-pricing-tiers.ts`, `seed-simulator-policies.ts` are present). Do not run `pnpm db:seed:admin` expecting it to work — use the SQL-based procedure below instead, and file a story to either write the missing script or remove the stale `package.json` entry.
+`package.json`'s `db:seed:admin` script now points at a real `scripts/seed-admin-user.mjs` — it creates a `User` row with `role = 'ADMIN'` (or promotes an existing email to `ADMIN`) and hashes the password with the same Argon2id parameters as `Argon2PasswordHasher`:
+
+```bash
+pnpm db:seed:admin --email admin@example.com --password 'Str0ng!Passw0rd' --first-name Admin --last-name User
+# or omit --password to have one generated and printed once
+```
+
+It's idempotent (upserts by email) and only rotates an existing admin's password if `--password`/`ADMIN_PASSWORD` is explicitly supplied, so re-running it safely is fine. It goes straight to Prisma rather than through `UserRepository.create()`, since that method hardcodes `role: "STUDENT"` (it's the self-signup path). The SQL-based procedure below is still the right tool when you don't have a Node/DB shell handy, or need to promote/downgrade an account rather than create one.
 
 ## Symptoms
 
