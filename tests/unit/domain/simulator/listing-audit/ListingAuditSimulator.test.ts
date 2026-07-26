@@ -94,4 +94,206 @@ describe("ListingAuditSimulator", () => {
     const findingTypes = new Set(result.audit.findings.map((f) => f.category));
     expect(findingTypes.size).toBeGreaterThan(0);
   });
+
+  it("assigns each finding a stable, unique id", async () => {
+    const input: ListingAuditInput = {
+      title: "Shoes",
+      bullets: [],
+      description: "",
+      category: "Shoes",
+      niche: "running shoes",
+    };
+
+    const result = await simulator.run(input);
+    const ids = result.audit.findings.map((f) => f.id);
+    expect(ids.length).toBeGreaterThan(0);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  // ── STORY-070: grading (userFindingActions provided) ──────────────────
+
+  describe("ground-truth triage (no userFindingActions)", () => {
+    const input: ListingAuditInput = {
+      title: "Shoes",
+      bullets: [],
+      description: "",
+      category: "Shoes",
+      niche: "running shoes",
+    };
+
+    it("returns null scoreDimensions in preview mode", async () => {
+      const result = await simulator.run(input);
+      expect(result.scoreDimensions).toBeNull();
+    });
+
+    it("populates gradedFindings with groundTruth but no userChoice", async () => {
+      const result = await simulator.run(input);
+      expect(result.gradedFindings.length).toBe(result.audit.findings.length);
+      for (const f of result.gradedFindings) {
+        expect(f.userChoice).toBeUndefined();
+        expect(f.isCorrect).toBe(false);
+        expect(["fix", "skip"]).toContain(f.groundTruth);
+      }
+    });
+
+    it("groundTruth is 'skip' for info-severity findings and 'fix' otherwise", async () => {
+      const result = await simulator.run(input);
+      for (const f of result.gradedFindings) {
+        expect(f.groundTruth).toBe(f.severity === "info" ? "skip" : "fix");
+      }
+    });
+  });
+
+  describe("direction scoring (userFindingActions provided)", () => {
+    const input: ListingAuditInput = {
+      title: "Shoes",
+      bullets: [],
+      description: "",
+      category: "Shoes",
+      niche: "running shoes",
+    };
+
+    it("direction = 100 when every finding is triaged correctly", async () => {
+      const preview = await simulator.run(input);
+      const userFindingActions = Object.fromEntries(
+        preview.gradedFindings.map((f) => [f.id, f.groundTruth]),
+      );
+      const result = await simulator.run({ ...input, userFindingActions });
+      expect(result.scoreDimensions).not.toBeNull();
+      expect(result.scoreDimensions!.direction).toBe(100);
+    });
+
+    it("direction = 0 when every finding is triaged incorrectly", async () => {
+      const preview = await simulator.run(input);
+      const userFindingActions: Record<string, "fix" | "skip"> = Object.fromEntries(
+        preview.gradedFindings.map((f): [string, "fix" | "skip"] => [
+          f.id,
+          f.groundTruth === "fix" ? "skip" : "fix",
+        ]),
+      );
+      const result = await simulator.run({ ...input, userFindingActions });
+      expect(result.scoreDimensions!.direction).toBe(0);
+    });
+
+    it("marks isCorrect true only when userChoice matches groundTruth", async () => {
+      const preview = await simulator.run(input);
+      const first = preview.gradedFindings[0]!;
+      const result = await simulator.run({
+        ...input,
+        userFindingActions: { [first.id]: first.groundTruth },
+      });
+      const graded = result.gradedFindings.find((f) => f.id === first.id)!;
+      expect(graded.userChoice).toBe(first.groundTruth);
+      expect(graded.isCorrect).toBe(true);
+    });
+  });
+
+  describe("profitability scoring", () => {
+    it("profitability = 100 when all must-fix findings are marked fix", async () => {
+      // Empty title + no bullets → critical findings on both, both "fix"
+      const input: ListingAuditInput = {
+        title: "",
+        bullets: [],
+        description: "",
+        category: "Shoes",
+        niche: "shoes",
+      };
+      const preview = await simulator.run({ ...input, niche: "shoes", title: "x" });
+      const userFindingActions = Object.fromEntries(
+        preview.gradedFindings.map((f) => [f.id, "fix" as const]),
+      );
+      const result = await simulator.run({ ...input, title: "x", userFindingActions });
+      expect(result.scoreDimensions!.profitability).toBe(100);
+    });
+
+    it("profitability penalizes skipping a must-fix finding", async () => {
+      const input: ListingAuditInput = {
+        title: "x",
+        bullets: [],
+        description: "",
+        category: "Shoes",
+        niche: "shoes",
+      };
+      const preview = await simulator.run(input);
+      const mustFix = preview.gradedFindings.filter((f) => f.groundTruth === "fix");
+      expect(mustFix.length).toBeGreaterThan(0);
+
+      // Mark everything "skip" — every must-fix finding is wrongly skipped.
+      const userFindingActions = Object.fromEntries(
+        preview.gradedFindings.map((f) => [f.id, "skip" as const]),
+      );
+      const result = await simulator.run({ ...input, userFindingActions });
+      expect(result.scoreDimensions!.profitability).toBe(0);
+    });
+
+    it("profitability = 100 when there are no must-fix findings (neutral)", async () => {
+      const result = await simulator.run({
+        title: "",
+        bullets: [],
+        description: "",
+        category: "",
+        niche: "",
+        userFindingActions: {},
+      });
+      expect(result.scoreDimensions!.profitability).toBe(100);
+    });
+  });
+
+  describe("dataSufficiency scoring", () => {
+    const input: ListingAuditInput = {
+      title: "x",
+      bullets: [],
+      description: "",
+      category: "Shoes",
+      niche: "shoes",
+    };
+
+    it("dataSufficiency = 100 when every finding has a userChoice", async () => {
+      const preview = await simulator.run(input);
+      const userFindingActions = Object.fromEntries(
+        preview.gradedFindings.map((f) => [f.id, f.groundTruth]),
+      );
+      const result = await simulator.run({ ...input, userFindingActions });
+      expect(result.scoreDimensions!.dataSufficiency).toBe(100);
+    });
+
+    it("dataSufficiency = 0 when no findings are reviewed", async () => {
+      const result = await simulator.run({ ...input, userFindingActions: {} });
+      expect(result.scoreDimensions!.dataSufficiency).toBe(0);
+    });
+  });
+
+  describe("explanation score", () => {
+    it("explanation = 100 (placeholder)", async () => {
+      const result = await simulator.run({
+        title: "x",
+        bullets: [],
+        description: "",
+        category: "Shoes",
+        niche: "shoes",
+        userFindingActions: {},
+      });
+      expect(result.scoreDimensions!.explanation).toBe(100);
+    });
+  });
+
+  describe("empty listing", () => {
+    it("returns empty gradedFindings and neutral scores when graded", async () => {
+      const result = await simulator.run({
+        title: "",
+        bullets: [],
+        description: "",
+        category: "",
+        niche: "",
+        userFindingActions: {},
+      });
+      expect(result.gradedFindings).toHaveLength(0);
+      expect(result.scoreDimensions).toEqual({
+        direction: 100,
+        profitability: 100,
+        dataSufficiency: 100,
+        explanation: 100,
+      });
+    });
+  });
 });
