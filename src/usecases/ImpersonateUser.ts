@@ -141,7 +141,7 @@ export class ImpersonateUser {
       return Result.err({ kind: "token_error", message: "jwt sign failed" });
     }
 
-    // ── 7. Audit log — best-effort. RecordAuditLog swallows its own
+    // ── 7. Audit log: best-effort. RecordAuditLog swallows its own
     // errors, so a failed write never blocks the impersonation itself.
     await this.deps.recordAuditLog.execute({
       actorId: input.adminUserId,

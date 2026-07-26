@@ -110,17 +110,18 @@ function buildDeps(
   } = {},
 ) {
   const clock = overrides.clock ?? new FixedClock(new Date("2026-07-19T00:00:00Z"));
+  const idGen = overrides.idGen ?? makeIdGen();
   return {
     userRepo: overrides.userRepo ?? new InMemoryUserRepository(),
     sessionRepo: overrides.sessionRepo ?? new InMemorySessionRepository(),
     jwt: overrides.jwt ?? makeJwt(),
-    idGen: overrides.idGen ?? makeIdGen(),
+    idGen,
     clock,
     recordAuditLog:
       overrides.recordAuditLog ??
       new RecordAuditLog({
         auditLog: new InMemoryAuditLog(),
-        idGen: makeIdGen(),
+        idGen,
         clock,
       }),
   };
