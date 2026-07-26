@@ -12,9 +12,11 @@ import {
   type LessonContent,
 } from "@/domain/entities/Lesson";
 import type { ILessonRepository, LessonError } from "@/ports/repositories/ILessonRepository";
+import type { IModuleRepository } from "@/ports/repositories/IModuleRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 export interface CreateLessonInput {
   moduleId: string;
@@ -30,9 +32,11 @@ export type CreateLessonResult = Result<{ lesson: Lesson }, CreateLessonError>;
 
 export interface CreateLessonDeps {
   lessonRepo: ILessonRepository;
+  moduleRepo: IModuleRepository;
   idGen: IdGenerator;
   clock: Clock;
   recordAuditLog: RecordAuditLog;
+  rebuildCourseCurriculum: RebuildCourseCurriculum;
 }
 
 export class CreateLesson {
@@ -106,6 +110,14 @@ export class CreateLesson {
       targetType: "lesson",
       metadata: { moduleId: input.moduleId, title: input.title, type: input.type },
     });
+
+    // Lesson has no courseId of its own — resolve it via the module,
+    // then keep Course.curriculum in sync. Best-effort: a lookup
+    // failure here must not fail the lesson creation itself.
+    const moduleResult = await this.deps.moduleRepo.findById(input.moduleId);
+    if (moduleResult.ok) {
+      await this.deps.rebuildCourseCurriculum.execute(moduleResult.value.courseId);
+    }
 
     return Result.ok({ lesson: persistResult.value });
   }

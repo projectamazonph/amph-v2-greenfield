@@ -54,9 +54,7 @@ export interface Course {
 }
 
 export type CreateCourseError =
-  | { kind: "invalid_slug" }
-  | { kind: "invalid_price" }
-  | { kind: "invalid_curriculum" };
+  { kind: "invalid_slug" } | { kind: "invalid_price" } | { kind: "invalid_curriculum" };
 
 /**
  * Create a Course domain object.
@@ -133,10 +131,7 @@ function isValidCurriculum(c: Curriculum): boolean {
 
 /** Total number of lessons across all sections. */
 export function courseLessonCount(course: Course): number {
-  return course.curriculum.sections.reduce(
-    (total, section) => total + section.lessons.length,
-    0,
-  );
+  return course.curriculum.sections.reduce((total, section) => total + section.lessons.length, 0);
 }
 
 /** Sum of video lesson durations in minutes. Ignores TEXT and QUIZ lessons. */
@@ -151,7 +146,7 @@ export function courseTotalDurationMinutes(course: Course): number {
           lesson.content !== null &&
           "durationMinutes" in lesson.content
         ) {
-          return sectionTotal + ((lesson.content as { durationMinutes: number }).durationMinutes);
+          return sectionTotal + (lesson.content as { durationMinutes: number }).durationMinutes;
         }
         return sectionTotal;
       }, 0)
@@ -162,6 +157,58 @@ export function courseTotalDurationMinutes(course: Course): number {
 /** Is this course available for purchase? */
 export function courseIsAvailable(course: Course): boolean {
   return course.status === "PUBLISHED";
+}
+
+// ── Curriculum rebuild (STORY-048b/c follow-up) ─────────────────────
+
+/**
+ * Rebuild the `curriculum` read-model from the authoritative
+ * `Module`/`Lesson` tables (STORY-048b/c). `Course.curriculum` is a
+ * denormalized Json cache read by lesson viewing, navigation, and
+ * access control (`AuthorizeLessonAccess`, `MarkLessonComplete`,
+ * `getLessonData`); nothing kept it in sync with `Module`/`Lesson`
+ * edits, so a lesson added via the admin editor could show up in the
+ * catalog (which reads `Module`/`Lesson` directly) but 404 or be
+ * access-denied when a student opened it.
+ *
+ * Ordering must match `IModuleRepository.findByCourseId` /
+ * `ILessonRepository.findByModuleId`'s displayOrder-ascending
+ * contract — `AuthorizeLessonAccess`'s preview-window gating indexes
+ * lessons by flattened section order, so a reorder that isn't
+ * reflected here would silently change which lessons are "in
+ * preview."
+ *
+ * A module with zero lessons is omitted (an in-progress admin edit —
+ * a `Section` with no lessons isn't a state any reader expects).
+ */
+export function rebuildCurriculumFromModules(
+  modules: readonly { readonly id: string; readonly title: string }[],
+  lessonsByModuleId: ReadonlyMap<
+    string,
+    readonly {
+      readonly id: string;
+      readonly title: string;
+      readonly type: LessonType;
+      readonly content: unknown;
+    }[]
+  >,
+): Curriculum {
+  const sections: Section[] = [];
+  for (const mod of modules) {
+    const lessons = lessonsByModuleId.get(mod.id) ?? [];
+    if (lessons.length === 0) continue;
+    sections.push({
+      id: mod.id,
+      title: mod.title,
+      lessons: lessons.map((lesson) => ({
+        id: lesson.id,
+        title: lesson.title,
+        type: lesson.type,
+        content: lesson.content,
+      })),
+    });
+  }
+  return { sections };
 }
 
 // ── Update factory ─────────────────────────────────────────────────
@@ -213,9 +260,7 @@ export function updateCourse(
     status: patch.status ?? course.status,
     courseTier: patch.courseTier ?? course.courseTier,
     previewLessonCount:
-      patch.previewLessonCount !== undefined
-        ? patch.previewLessonCount
-        : course.previewLessonCount,
+      patch.previewLessonCount !== undefined ? patch.previewLessonCount : course.previewLessonCount,
     createdAt: course.createdAt,
   };
 

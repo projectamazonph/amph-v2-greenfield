@@ -5,10 +5,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { UpdateLesson } from "@/usecases/UpdateLesson";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
+import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { createLesson, type Lesson } from "@/domain/entities/Lesson";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 async function seedLesson(
   repo: InMemoryLessonRepository,
@@ -38,16 +41,26 @@ function makeRecordAuditLog(): RecordAuditLog {
 
 describe("UpdateLesson", () => {
   let lessonRepo: InMemoryLessonRepository;
+  let moduleRepo: InMemoryModuleRepository;
   let recordAuditLog: RecordAuditLog;
+  let rebuildCourseCurriculum: RebuildCourseCurriculum;
   let useCase: UpdateLesson;
 
   beforeEach(() => {
     lessonRepo = new InMemoryLessonRepository();
+    moduleRepo = new InMemoryModuleRepository();
     recordAuditLog = makeRecordAuditLog();
+    rebuildCourseCurriculum = new RebuildCourseCurriculum({
+      courseRepo: new InMemoryCourseRepository(),
+      moduleRepo,
+      lessonRepo,
+    });
     useCase = new UpdateLesson({
       lessonRepo,
+      moduleRepo,
       clock: new FixedClock(new Date("2026-07-19T12:00:00Z")),
       recordAuditLog,
+      rebuildCourseCurriculum,
     });
   });
 
@@ -131,7 +144,13 @@ describe("UpdateLesson", () => {
 
   it("bumps updatedAt to the injected clock", async () => {
     const t0 = new Date("2026-07-19T12:00:00Z");
-    useCase = new UpdateLesson({ lessonRepo, clock: new FixedClock(t0), recordAuditLog });
+    useCase = new UpdateLesson({
+      lessonRepo,
+      moduleRepo,
+      clock: new FixedClock(t0),
+      recordAuditLog,
+      rebuildCourseCurriculum,
+    });
     await seedLesson(lessonRepo, { updatedAt: new Date("2025-01-01T00:00:00Z") });
 
     const r = await useCase.execute({

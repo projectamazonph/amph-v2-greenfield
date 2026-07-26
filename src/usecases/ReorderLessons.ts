@@ -7,7 +7,9 @@
 import { Result } from "@/domain/shared/Result";
 import type { Lesson } from "@/domain/entities/Lesson";
 import type { ILessonRepository, LessonError } from "@/ports/repositories/ILessonRepository";
+import type { IModuleRepository } from "@/ports/repositories/IModuleRepository";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 export interface ReorderLessonsInput {
   moduleId: string;
@@ -19,7 +21,9 @@ export type ReorderLessonsResult = Result<{ lessons: readonly Lesson[] }, Lesson
 
 export interface ReorderLessonsDeps {
   lessonRepo: ILessonRepository;
+  moduleRepo: IModuleRepository;
   recordAuditLog: RecordAuditLog;
+  rebuildCourseCurriculum: RebuildCourseCurriculum;
 }
 
 export class ReorderLessons {
@@ -45,6 +49,11 @@ export class ReorderLessons {
       targetType: "lesson",
       metadata: { lessonIds: input.lessonIds },
     });
+
+    const moduleResult = await this.deps.moduleRepo.findById(input.moduleId);
+    if (moduleResult.ok) {
+      await this.deps.rebuildCourseCurriculum.execute(moduleResult.value.courseId);
+    }
 
     return Result.ok({ lessons: r.value });
   }

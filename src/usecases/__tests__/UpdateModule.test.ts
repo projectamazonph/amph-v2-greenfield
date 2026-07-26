@@ -5,10 +5,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { UpdateModule } from "@/usecases/UpdateModule";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
+import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { createModule, type Module } from "@/domain/entities/Module";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 function makeRecordAuditLog(): RecordAuditLog {
   return new RecordAuditLog({
@@ -37,15 +40,22 @@ async function seedModule(
 describe("UpdateModule", () => {
   let moduleRepo: InMemoryModuleRepository;
   let recordAuditLog: RecordAuditLog;
+  let rebuildCourseCurriculum: RebuildCourseCurriculum;
   let useCase: UpdateModule;
 
   beforeEach(() => {
     moduleRepo = new InMemoryModuleRepository();
     recordAuditLog = makeRecordAuditLog();
+    rebuildCourseCurriculum = new RebuildCourseCurriculum({
+      courseRepo: new InMemoryCourseRepository(),
+      moduleRepo,
+      lessonRepo: new InMemoryLessonRepository(),
+    });
     useCase = new UpdateModule({
       moduleRepo,
       clock: new FixedClock(new Date("2026-07-19T12:00:00Z")),
       recordAuditLog,
+      rebuildCourseCurriculum,
     });
   });
 
@@ -80,7 +90,7 @@ describe("UpdateModule", () => {
   it("bumps updatedAt to the injected clock", async () => {
     const t0 = new Date("2026-07-19T12:00:00Z");
     const clock = new FixedClock(t0);
-    useCase = new UpdateModule({ moduleRepo, clock, recordAuditLog });
+    useCase = new UpdateModule({ moduleRepo, clock, recordAuditLog, rebuildCourseCurriculum });
     const seeded = await seedModule(moduleRepo, {
       updatedAt: new Date("2025-01-01T00:00:00Z"),
     });

@@ -15,6 +15,7 @@ import { Result } from "@/domain/shared/Result";
 import type { Module } from "@/domain/entities/Module";
 import type { IModuleRepository, ModuleError } from "@/ports/repositories/IModuleRepository";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 export interface ReorderModulesInput {
   courseId: string;
@@ -27,6 +28,7 @@ export type ReorderModulesResult = Result<{ modules: readonly Module[] }, Module
 export interface ReorderModulesDeps {
   moduleRepo: IModuleRepository;
   recordAuditLog: RecordAuditLog;
+  rebuildCourseCurriculum: RebuildCourseCurriculum;
 }
 
 export class ReorderModules {
@@ -52,6 +54,9 @@ export class ReorderModules {
       targetType: "module",
       metadata: { moduleIds: input.moduleIds },
     });
+
+    // Section order in curriculum must match the new module order.
+    await this.deps.rebuildCourseCurriculum.execute(input.courseId);
 
     return Result.ok({ modules: r.value });
   }
