@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-25 (Sprint 13 in progress — simulator rebuilds). `main` @ `a0ce6c2` (PR #182 squash: auth cookie fix + Campaign Builder). STORY-067/068/069 merged. STORY-070 next. Operator-owned items: PayMongo webhook, admin user, launch comms.
+**Updated:** 2026-07-26 (audit hardening series complete — PRs #185–#192). `main` @ `27fdccc`. Docs verified against code, then 6 follow-up hardening PRs merged (SignUp audit log, webhook event log, status-read validation, curriculum/Module-Lesson sync, 4 runbooks, opt-in admin TOTP 2FA). See "What changed this session (2026-07-26, audit hardening execution)" below. Sprint 13 (STORY-070 Listing Audit rebuild) also merged independently — see PR #189. Operator-owned items: PayMongo live webhook secret rotation drill, first real admin user via the runbook's SQL path (`db:seed:admin` script is missing), launch comms.
 
 ---
 
@@ -22,6 +22,59 @@
 | E2E                      | 15 passed, 4 intentionally skipped, 0 failed on `chromium-desktop`. a11y.spec.ts soft-passes.                                                                                                                                                                                                               |
 | CI                       | All 6 jobs green on every PR this session (PRs #145–#159).                                                                                                                                                                                                                                                  |
 | Release                  | **v0.1.0 tagged and released.**                                                                                                                                                                                                                                                                             |
+
+---
+
+## What changed this session (2026-07-26, audit hardening execution — PRs #186–#192)
+
+Follow-up to the docs-only audit verification pass below: executed the
+follow-up list from `docs/audit-2026-07-26-hardening-review.md`, one
+PR per item, each verified against a real local Postgres 16 (migrations
+applied via `prisma migrate deploy`, not `db push`) and the full test
+suite before merge. `main` @ `27fdccc`.
+
+- **PR #186** — `SignUp.ts` now writes a `user.signed_up` audit entry
+  via `RecordAuditLog`, closing the STORY-009 TODO.
+- **PR #187** — persistent `WebhookEvent` log for the PayMongo webhook
+  (`IWebhookEventLog` port + Prisma/InMemory adapters). Every inbound
+  webhook is recorded before processing, with the outcome updated
+  afterward, independent of `Order` state.
+- **PR #188** — `isEnrollmentStatus()`/`isQuizAttemptStatus()` guards
+  added; `PrismaEnrollmentRepository`/`PrismaQuizAttemptRepository` now
+  validate persisted status on read instead of an unchecked `as` cast
+  (mirrors `PaymentStatus.isValid()`, which `Order` already had).
+  Deliberately did **not** convert these columns to native Prisma
+  enums — see the PR description for why.
+- **PR #190** — `RebuildCourseCurriculum` use case; all 8 module/lesson
+  mutation use cases now keep `Course.curriculum` in sync with
+  `Module`/`Lesson` after every write, fixing a real bug where a
+  lesson added via the admin editor could show in the catalog and then
+  404/deny-access when opened.
+- **PR #191** — wrote the 4 missing runbooks (`paymongo-outage.md`,
+  `webhook-replay.md`, `db-backup-restore.md`,
+  `admin-access-recovery.md`). Writing the admin one surfaced two real
+  gaps: session/`lockedUntil` revocation doesn't actually work (only a
+  role change or `JWT_SECRET` rotation does), and `pnpm db:seed:admin`
+  points at a script that doesn't exist.
+- **PR #192** — opt-in TOTP 2FA for admin accounts (`TotpService` port,
+  `OtpauthTotpService`/`FakeTotpService` adapters, `EnableTwoFactor`/
+  `ConfirmTwoFactor`/`DisableTwoFactor` use cases, `Login.ts` gains an
+  optional `totpCode`, UI at `/admin/settings` +
+  `/admin/settings/2fa-setup`). **Not manually browser-tested** — verified
+  via the automated suite + a real-Postgres smoke test only. Recommend a
+  manual click-through before real admins rely on it.
+
+Every PR left `pnpm typecheck && pnpm lint && pnpm test` green (2831 →
+2966 passing across the series, 0 regressions at any step). `CLAUDE.md`
+and `docs/audit-2026-07-26-hardening-review.md` were kept in sync with
+each merge — both should still be accurate as of `27fdccc`.
+
+**Not done / still open:** admin 2FA is opt-in only (nothing enforces
+it); session revocation still doesn't work outside a role change or
+`JWT_SECRET` rotation (flagged as its own follow-up story in the audit
+doc); `db:seed:admin`'s missing script hasn't been fixed, only
+worked around in the runbook; the DB restore runbook has never been
+drilled for real.
 
 ---
 
