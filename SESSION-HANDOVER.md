@@ -1,6 +1,6 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-26 (landing page replaced — PR #194). `main` @ `45e0504`. The public marketing landing page (`src/app/page.tsx`) was rebuilt end-to-end with a new field-manual-styled design; see "What changed this session (2026-07-26, landing page replacement)" below. `main` also picked up PR #195 (production-readiness lint sweep, documented in `CHANGELOG.md`) and #196 (finished the AMPH → Project Amazon PH Academy rename on `/checkout` and PayMongo line items, also in `CHANGELOG.md`) between this and the prior audit-hardening entry below — neither is detailed as its own session-log section here. Before that: audit hardening series complete (PRs #185–#192, SignUp audit log, webhook event log, status-read validation, curriculum/Module-Lesson sync, 4 runbooks, opt-in admin TOTP 2FA). Operator-owned items: PayMongo live webhook secret rotation drill, first real admin user via the runbook's SQL path (`db:seed:admin` script is missing), launch comms.
+**Updated:** 2026-07-26 (landing page replaced, PR #194). `main` @ `45e0504`. The public marketing landing page (`src/app/page.tsx`) was rebuilt end-to-end with a new field-manual-styled design; see "What changed this session (2026-07-26, landing page replacement)" below. `main` also picked up PR #195 (production-readiness lint sweep, documented in `CHANGELOG.md`) and #196 (finished the AMPH → Project Amazon PH Academy rename on `/checkout` and PayMongo line items, also in `CHANGELOG.md`) between this and the prior audit-hardening entry below. Neither is detailed as its own session-log section here. Before that: audit hardening series complete (PRs #185–#192, SignUp audit log, webhook event log, status-read validation, curriculum/Module-Lesson sync, 4 runbooks, opt-in admin TOTP 2FA). Operator-owned items: PayMongo live webhook secret rotation drill, first real admin user via the runbook's SQL path (`db:seed:admin` script is missing), launch comms.
 
 ---
 
@@ -11,8 +11,8 @@
 | Phase                    | **Landing page replaced (PR #194, squash `45e0504`). Sprint 13 (STORY-067/068/069/070) previously merged.**                                                                                                                                                                                                 |
 | Repo                     | `projectamazonph/amph-v2-greenfield` (public)                                                                                                                                                                                                                                                               |
 | Default branch           | `main` (squash-merge only, branches auto-delete on merge; direct push to main blocked)                                                                                                                                                                                                                      |
-| `main` HEAD              | `45e0504` (PR #194 squash): `feat(landing): replace landing page with field-manual-styled redesign` — also picked up PR #195 (lint sweep) and #196 (AMPH rename cleanup) via fast-forward from a slightly-behind local main                                                                                 |
-| Production URL           | **`https://projectamazonph.online`** (custom domain, confirmed live via a user-supplied screenshot this session) — `https://amph-v2-greenfield.vercel.app` is the underlying Vercel project domain, presumed to still resolve to the same deployment but not independently reverified this session          |
+| `main` HEAD              | `45e0504` (PR #194 squash): `feat(landing): replace landing page with field-manual-styled redesign`, also picked up PR #195 (lint sweep) and #196 (AMPH rename cleanup) via fast-forward from a slightly-behind local main                                                                                  |
+| Production URL           | **`https://projectamazonph.online`** (custom domain, confirmed live via a user-supplied screenshot this session). `https://amph-v2-greenfield.vercel.app` is the underlying Vercel project domain, presumed to still resolve to the same deployment but not independently reverified this session           |
 | Vercel project           | `prj_3tEN1Akupoosai3OAGc1t50ru5QG` (`amph-v2-greenfield`), org `team_wIkEXZCToZvRHmrgFFhpsgkV`                                                                                                                                                                                                              |
 | Database                 | **Neon Postgres** (production). `prisma migrate deploy` applied all 12 migrations (added `pricing_tier` + `pricing_tier_early_bird_course_link` last). All four pricing tiers seeded (foundations ₱2,999, mastery ₱5,999 with 7-day early-bird, ultimate ₱9,999 with 3-day early-bird, all-access ₱14,999). |
 | Environment              | `DATABASE_URL`, `SHADOW_DATABASE_URL`, `JWT_SECRET`, `PAYMONGO_SECRET` (live), `PAYMONGO_WEBHOOK_SECRET`, `RESEND_API_KEY`, `SENTRY_DSN`, `NEXT_PUBLIC_APP_URL` pulled from Vercel and mirrored into local `.env` / `.env.local` for script execution                                                       |
@@ -25,7 +25,7 @@
 
 ---
 
-## What changed this session (2026-07-26, landing page replacement — PR #194)
+## What changed this session (2026-07-26, landing page replacement, PR #194)
 
 The user pasted a self-contained HTML/CSS/JS mockup (originally generated via
 a Qwen chat share link) and asked for `src/app/page.tsx` to be replaced with
@@ -42,18 +42,21 @@ hotlinked placeholder images. `main` @ `45e0504`.
   palette. The mockup's colors/fonts already matched this repo's tokens
   almost exactly (`#FF6B35` = `--accent`, Space Grotesk / JetBrains Mono,
   etc.), which made this a clean fit rather than a fork.
-- **Only two client components**: `TopBar` (sticky nav, mobile menu, scroll
-  progress, Manila clock) and `BidElevator` (the interactive preview
-  simulator). Everything else is server-rendered, matching this repo's
-  pre-existing "no client JS for static content" convention on this page.
-  A small reusable `Reveal` client wrapper handles the scroll-fade-in effect
-  without forcing its parent sections to become client components.
+- **Client components kept to a minimum**: `TopBar` (sticky nav, mobile
+  menu, scroll progress, Manila clock) and `BidElevator` (the interactive
+  preview simulator) are the two sections with genuinely interactive
+  behavior. `StatsStrip`'s count-up and the reusable `Reveal` scroll-fade-in
+  wrapper are also `"use client"`, but both are small, self-contained, and
+  used to wrap otherwise-server-rendered markup rather than converting
+  whole sections to client components. Every other section is a plain
+  server component, matching this repo's pre-existing "no client JS for
+  static content" convention on this page.
 - **Bid Elevator preview** (`BidElevator.tsx` + `bidElevator.logic.ts`):
   sliders (budget/bid/target ACoS), a canvas-drawn spend/sales/break-even
   chart, and a search-term harvest table with Auto/Exact/Neg segmented
   controls. The math is pure and unit-tested (`bidElevator.logic.test.ts`,
   12 tests) and deliberately **not** wired to the real, scored
-  `src/domain/simulator/bid-elevator/` simulator — this one is an
+  `src/domain/simulator/bid-elevator/` simulator: this one is an
   unauthenticated public marketing widget on illustrative data, explicitly
   labeled "not a forecast."
 - **Brand kit integration**: `public/brand/logos/*.svg` (primary, mark,
@@ -73,9 +76,9 @@ hotlinked placeholder images. `main` @ `45e0504`.
 - **CodeRabbit review response** (2 rounds): fixed em-dashes across every
   new file (a real, repo-wide `AGENTS.md`/`docs/voice-guide.md` rule that
   should have been caught before the first push, not something CodeRabbit
-  invented); relabeled the "Email me the syllabus" CTA — it reused
+  invented); relabeled the "Email me the syllabus" CTA (it reused
   `COURSES_URL`, duplicating the adjacent primary CTA while promising an
-  email flow that doesn't exist — to "See what's inside", pointed at
+  email flow that doesn't exist) to "See what's inside", pointed at
   `#curriculum`; fixed a real bug (`StatsStrip`'s count-up
   `requestAnimationFrame` wasn't cancelled on unmount); added
   `aria-pressed` to the Bid Elevator's segmented buttons; made the canvas
@@ -95,7 +98,7 @@ hotlinked placeholder images. `main` @ `45e0504`.
   desired design. Two screenshots that looked like real bugs (a duplicated
   "§04 / WHO IT'S FOR" label, an overlapping paragraph in the Method
   section) turned out to be long-screenshot stitching artifacts from
-  capturing the page mid-scroll-animation, not code defects — confirmed by
+  capturing the page mid-scroll-animation, not code defects. Confirmed by
   checking that neither string appears twice in the actual JSX. A third
   screenshot turned out to be `projectamazonph.online` (the **already-live
   production site**, unrelated to the unmerged PR) mistaken for the PR
@@ -111,7 +114,7 @@ hotlinked placeholder images. `main` @ `45e0504`.
   Lighthouse CI, Vercel Preview. Full local suite: 2954+ tests passing.
 
 **Not done / still open:** no story file exists for this
-(`docs/stories/STORY-XXX.md`) — it was a direct user request, not sprint
+(`docs/stories/STORY-XXX.md`); it was a direct user request, not sprint
 backlog work. Production URL note above (`projectamazonph.online` vs. the
 Vercel-default domain) was confirmed via a user screenshot, not
 independently re-verified against Vercel's domain settings this session.
