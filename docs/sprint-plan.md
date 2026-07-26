@@ -184,15 +184,15 @@ blind guessing from ~89% to ~11-19%, but it does **not** close the bypass on
 intermediate/advanced. The residual cause is the binary ground truth itself, which
 is STORY-083. Measured numbers are in the audit doc.
 
-| ID        | Title                                                                             | Pts | Status     |
-| --------- | --------------------------------------------------------------------------------- | --- | ---------- |
-| STORY-071 | Remove `explanation` from all score policies; rebalance weights to sum 1.0        | 1   | ⏳ Planned |
-| STORY-072 | Stop grading completion: `reviewCoverage` becomes a submission gate, not a weight | 1   | ⏳ Planned |
-| STORY-073 | `priorityCoverage` penalises false positives (recall to F1)                       | 1   | ⏳ Planned |
-| STORY-074 | Enforce policy validation on the seed + hydration paths (`isValidPolicy`)         | 1   | ⏳ Planned |
-| STORY-075 | Resolve dead `passingThreshold`: implement partial credit or remove it            | 1   | ⏳ Planned |
-| STORY-076 | Rename `dataSufficiency` → `reviewCoverage`, `profitability` → `priorityCoverage` | 1   | ⏳ Planned |
-| STORY-077 | Fix the inverted backend search-terms rule in `ListingAuditSimulator`             | 1   | ⏳ Planned |
+| ID        | Title                                                                                                                                                     | Pts | Status     |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------- |
+| STORY-071 | Remove `explanation` from all score policies; rebalance weights to sum 1.0                                                                                | 1   | ⏳ Planned |
+| STORY-072 | Stop grading completion: `reviewCoverage` becomes a submission gate, not a weight                                                                         | 1   | ⏳ Planned |
+| STORY-073 | `priorityCoverage` penalises false positives (recall to F1)                                                                                               | 1   | ⏳ Planned |
+| STORY-074 | Enforce policy validation on the seed + hydration paths (`isValidPolicy`)                                                                                 | 1   | ⏳ Planned |
+| STORY-075 | Resolve dead `passingThreshold`: implement partial credit or remove it                                                                                    | 1   | ⏳ Planned |
+| STORY-076 | Rename `dataSufficiency` → `reviewCoverage` (both sims); Listing Audit's `profitability` → `priorityCoverage` (STR Triage's is correctly named, leave it) | 1   | ⏳ Planned |
+| STORY-077 | Fix the inverted backend search-terms rule in `ListingAuditSimulator`                                                                                     | 1   | ⏳ Planned |
 
 ## Sprint 15 — Certification Safety + Subject-Matter Accuracy (7 pts)
 

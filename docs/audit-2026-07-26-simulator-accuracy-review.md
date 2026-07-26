@@ -60,11 +60,40 @@ All three confirmed in `ListingAuditSimulator.ts`:
   `scoreDataSufficiency` (line 201) is
   `findings with a userChoice / total findings`. It measures whether the
   learner clicked, nothing else. Suggested rename: `reviewCoverage`.
-- **`profitability` is not profitability.** `scoreProfitability` (line 186)
-  is severity-weighted coverage of must-fix findings. There is no
-  conversion, revenue, ACOS, PPC-efficiency, compliance-risk, or
-  search-relevance modelling anywhere in it. Suggested rename:
-  `priorityCoverage`.
+- **`profitability` is not profitability, in Listing Audit.**
+  `scoreProfitability` (line 186) is severity-weighted coverage of must-fix
+  findings. There is no conversion, revenue, ACOS, PPC-efficiency,
+  compliance-risk, or search-relevance modelling anywhere in it. Suggested
+  rename: `priorityCoverage`. **This rename must not be applied globally,
+  see the note below.**
+
+### Scope correction: the rename is not uniform across simulators
+
+The external review implied `dataSufficiency` and `profitability` are
+mislabeled wherever they appear. Checking STR Triage, which shares both
+dimension names, shows that is only half true:
+
+| Dimension         | Listing Audit                                  | STR Triage                                                      |
+| ----------------- | ---------------------------------------------- | --------------------------------------------------------------- |
+| `dataSufficiency` | completion (`userChoice` set / total findings) | completion (`reviewed / rows.length`), same mislabel            |
+| `profitability`   | severity-weighted fix coverage, **mislabeled** | `preservedRevenue / nonPausableRevenue`, **legitimately named** |
+
+`StrTriageSimulator.scoreProfitability` (lines 98-132) builds a
+`revenueByKeyword` map, sums `nonPausableRevenue`, and returns the fraction
+of that revenue the learner preserved by not wrongly pausing. That is a
+genuine revenue-impact measure and its name is accurate.
+
+So the rename splits:
+
+- `dataSufficiency` to `reviewCoverage`: **both** simulators, both are
+  completion metrics.
+- `profitability` to `priorityCoverage`: **Listing Audit only**. Renaming
+  STR Triage's would take a correctly-named dimension and mislabel it.
+
+The same asymmetry applies to ungrading completion (STORY-072): STR Triage
+weights its `dataSufficiency` at 0.1 to 0.2, so it has the same free-points
+problem as Listing Audit, just a smaller one.
+
 - **Ground truth is crudely binary.** `groundTruthAction` (line 158) is
   the entire rule:
   ```ts
@@ -252,15 +281,15 @@ Nothing here requires deciding what a correct Amazon answer is. All of it
 is provable against existing invariants or against the measured behaviour
 above.
 
-| ID        | Title                                                                                                                                                           |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| STORY-071 | Remove `explanation` from every active score policy; redistribute weight so all policies sum to 1.0                                                             |
-| STORY-072 | Stop grading completion: `reviewCoverage` becomes a submission gate, not a weighted dimension                                                                   |
-| STORY-073 | Make `priorityCoverage` penalise false positives (recall to F1) so "fix everything" cannot score 100                                                            |
-| STORY-074 | Route policy seeding through `createScorePolicy()`; call `isValidPolicy()` at hydration so an invalid policy can never ship again                               |
-| STORY-075 | Resolve `passingThreshold`: either implement the documented partial-credit behaviour in `getOverallScore()` or delete the field and its seed data               |
-| STORY-076 | Rename `dataSufficiency` to `reviewCoverage` and `profitability` to `priorityCoverage` across simulators, policies, and persisted attempts (migration required) |
-| STORY-077 | Fix the inverted backend search-terms rule in `ListingAuditSimulator`                                                                                           |
+| ID        | Title                                                                                                                                                                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| STORY-071 | Remove `explanation` from every active score policy; redistribute weight so all policies sum to 1.0                                                                                                                                                 |
+| STORY-072 | Stop grading completion: `reviewCoverage` becomes a submission gate, not a weighted dimension                                                                                                                                                       |
+| STORY-073 | Make `priorityCoverage` penalise false positives (recall to F1) so "fix everything" cannot score 100                                                                                                                                                |
+| STORY-074 | Route policy seeding through `createScorePolicy()`; call `isValidPolicy()` at hydration so an invalid policy can never ship again                                                                                                                   |
+| STORY-075 | Resolve `passingThreshold`: either implement the documented partial-credit behaviour in `getOverallScore()` or delete the field and its seed data                                                                                                   |
+| STORY-076 | Rename `dataSufficiency` to `reviewCoverage` (both simulators) and Listing Audit's `profitability` to `priorityCoverage` (**not** STR Triage's, which is correctly named), across simulators, policies, and persisted attempts (migration required) |
+| STORY-077 | Fix the inverted backend search-terms rule in `ListingAuditSimulator`                                                                                                                                                                               |
 
 After Phase 0: a perfect run scores 100, no dimension name claims to
 measure something it does not, no policy can ship with invalid weights, and
