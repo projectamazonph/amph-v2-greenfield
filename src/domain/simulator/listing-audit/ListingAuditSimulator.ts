@@ -2,10 +2,19 @@
  * ListingAuditSimulator — audits Amazon listings and generates keyword research.
  *
  * STORY-040: Listing Audit + Keyword Research simulator.
+ * STORY-070: Listing Audit Rebuild (Scoring Engine Integration).
  *
  * Runs two analyses:
  *  1. Listing audit — scores title/bullets/description, identifies gaps
  *  2. Keyword research — generates a prioritized keyword list from the niche
+ *
+ * When userFindingActions are provided, also grades the student's fix/skip
+ * triage of each finding against ground truth and computes per-dimension
+ * scores:
+ *  direction       — % of findings correctly triaged
+ *  profitability  — % of severity-weighted "must fix" findings preserved
+ *  dataSufficiency — % of findings the student assigned a decision to
+ *  explanation    — 100 (placeholder, future rubric-based)
  */
 
 import type { Simulator } from "@/ports/simulator/Simulator";
@@ -14,13 +23,20 @@ import type {
   ListingAuditOutput,
   ListingAudit,
   AuditFinding,
+  FindingSeverity,
+  FindingAction,
+  GradedFinding,
   KeywordResult,
+  ScoreDimensions,
 } from "./ListingAuditOutput";
 
 // ── Title audit ──────────────────────────────────────────────────────────────
 
-function auditTitle(title: string, niche: string): { score: number; findings: AuditFinding[] } {
-  const findings: AuditFinding[] = [];
+function auditTitle(
+  title: string,
+  niche: string,
+): { score: number; findings: Array<Omit<AuditFinding, "id">> } {
+  const findings: Array<Omit<AuditFinding, "id">> = [];
   const lowerTitle = title.toLowerCase();
   const lowerNiche = niche.toLowerCase();
   const nicheWords = lowerNiche.split(/\s+/);
@@ -70,8 +86,11 @@ function auditTitle(title: string, niche: string): { score: number; findings: Au
 
 // ── Bullet audit ────────────────────────────────────────────────────────────
 
-function auditBullets(bullets: readonly string[]): { score: number; findings: AuditFinding[] } {
-  const findings: AuditFinding[] = [];
+function auditBullets(bullets: readonly string[]): {
+  score: number;
+  findings: Array<Omit<AuditFinding, "id">>;
+} {
+  const findings: Array<Omit<AuditFinding, "id">> = [];
   if (bullets.length === 0) {
     return {
       score: 0,
@@ -130,6 +149,70 @@ function generateKeywords(niche: string): KeywordResult[] {
   }));
 }
 
+// ── Grading ──────────────────────────────────────────────────────────────────
+
+/** Severity weight — proxy for the "cost" of leaving a finding unfixed. */
+const SEVERITY_WEIGHT: Record<FindingSeverity, number> = { critical: 3, warning: 2, info: 1 };
+
+/** A finding must be fixed unless it's merely informational. */
+function groundTruthAction(severity: FindingSeverity): FindingAction {
+  return severity === "info" ? "skip" : "fix";
+}
+
+function buildGradedFindings(
+  findings: readonly AuditFinding[],
+  userFindingActions: Readonly<Record<string, FindingAction>> | undefined,
+): GradedFinding[] {
+  return findings.map((f) => {
+    const groundTruth = groundTruthAction(f.severity);
+    const userChoice = userFindingActions?.[f.id];
+    const isCorrect = userChoice !== undefined && userChoice === groundTruth;
+    return { ...f, groundTruth, userChoice, isCorrect };
+  });
+}
+
+/** Direction score: % of findings where the student's choice matches ground truth. */
+function scoreDirection(gradedFindings: readonly GradedFinding[]): number {
+  if (gradedFindings.length === 0) return 100;
+  const correct = gradedFindings.filter((f) => f.isCorrect).length;
+  return Math.round((correct / gradedFindings.length) * 100);
+}
+
+/**
+ * Profitability score: % of severity-weighted "must fix" findings the
+ * student actually marked fix. Findings that are correctly fine to skip
+ * (ground truth "skip") don't count against this dimension either way.
+ */
+function scoreProfitability(gradedFindings: readonly GradedFinding[]): number {
+  if (gradedFindings.length === 0) return 100;
+
+  const mustFix = gradedFindings.filter((f) => f.groundTruth === "fix");
+  const totalWeight = mustFix.reduce((sum, f) => sum + SEVERITY_WEIGHT[f.severity], 0);
+  if (totalWeight === 0) return 100; // nothing needed fixing — neutral
+
+  const preservedWeight = mustFix
+    .filter((f) => f.userChoice === "fix")
+    .reduce((sum, f) => sum + SEVERITY_WEIGHT[f.severity], 0);
+
+  return Math.round((preservedWeight / totalWeight) * 100);
+}
+
+/** Data sufficiency score: % of findings that have a userChoice assigned. */
+function scoreDataSufficiency(gradedFindings: readonly GradedFinding[]): number {
+  if (gradedFindings.length === 0) return 100;
+  const reviewed = gradedFindings.filter((f) => f.userChoice !== undefined).length;
+  return Math.round((reviewed / gradedFindings.length) * 100);
+}
+
+function computeDimensionScores(gradedFindings: readonly GradedFinding[]): ScoreDimensions {
+  return {
+    direction: scoreDirection(gradedFindings),
+    profitability: scoreProfitability(gradedFindings),
+    dataSufficiency: scoreDataSufficiency(gradedFindings),
+    explanation: 100, // placeholder until rubric-based explanation scoring
+  };
+}
+
 // ── Simulator ────────────────────────────────────────────────────────────────
 
 export class ListingAuditSimulator implements Simulator<ListingAuditInput, ListingAuditOutput> {
@@ -137,7 +220,7 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
   readonly name = "Listing Audit + Keyword Research";
 
   async run(input: ListingAuditInput): Promise<ListingAuditOutput> {
-    const { title, bullets, description, niche } = input;
+    const { title, bullets, description, niche, userFindingActions } = input;
 
     if (!niche && !title) {
       return {
@@ -150,6 +233,8 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
         },
         keywordResearch: { keywords: [], searchVolumeEstimate: 0 },
         score: 0,
+        gradedFindings: [],
+        scoreDimensions: userFindingActions !== undefined ? computeDimensionScores([]) : null,
       };
     }
 
@@ -158,12 +243,12 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
 
     // Description score: proportional to length (100 chars = 50pts, 200+ = 100pts)
     const descriptionScore = Math.min(100, Math.round(description.length / 2));
-    const descriptionFindings =
+    const descriptionFindings: Array<Omit<AuditFinding, "id">> =
       description.length < 100
         ? [
             {
-              category: "description" as const,
-              severity: "warning" as const,
+              category: "description",
+              severity: "warning",
               message: "Description is short.",
               suggestion: "Write at least 200 characters covering features and benefits.",
             },
@@ -172,24 +257,24 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
 
     // Backend keywords: if bullets + title < 500 chars combined, suggest backend
     const totalChars = title.length + bullets.reduce((s, b) => s + b.length, 0);
-    const backendFindings =
+    const backendFindings: Array<Omit<AuditFinding, "id">> =
       totalChars < 500
         ? [
             {
-              category: "backend" as const,
-              severity: "info" as const,
+              category: "backend",
+              severity: "info",
               message: "Not enough room in visible content for all keywords.",
               suggestion: "Add missable keywords to the backend (search terms field).",
             },
           ]
         : [];
 
-    const allFindings = [
+    const allFindings: AuditFinding[] = [
       ...titleFindings,
       ...bulletFindings,
       ...descriptionFindings,
       ...backendFindings,
-    ];
+    ].map((f, i) => ({ ...f, id: `finding-${i}` }));
 
     const overallScore = Math.round((titleScore + bulletScore + descriptionScore) / 3);
 
@@ -204,10 +289,16 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
     const keywords = generateKeywords(niche);
     const searchVolumeEstimate = keywords.reduce((sum, k) => sum + k.searchVolumeEstimate, 0);
 
+    const gradedFindings = buildGradedFindings(allFindings, userFindingActions);
+    const scoreDimensions =
+      userFindingActions !== undefined ? computeDimensionScores(gradedFindings) : null;
+
     return {
       audit,
       keywordResearch: { keywords, searchVolumeEstimate },
       score: overallScore,
+      gradedFindings,
+      scoreDimensions,
     };
   }
 }

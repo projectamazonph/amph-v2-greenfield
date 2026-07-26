@@ -2,16 +2,40 @@
  * ListingAuditOutput — output types for the Listing Audit + Keyword Research simulator.
  *
  * STORY-040: Listing Audit + Keyword Research simulator.
+ * STORY-070: Listing Audit Rebuild (Scoring Engine Integration).
+ *
+ * When userFindingActions are provided, the simulator grades the student's
+ * fix/skip triage of each finding against ground truth and returns
+ * per-dimension scores that feed into GradeSimulatorAttempt.
+ *
+ * Scoring dimensions:
+ *  direction       — % of findings correctly triaged (fix/skip matches ground truth)
+ *  profitability  — % of severity-weighted "must fix" findings actually marked fix
+ *  dataSufficiency — % of findings the student assigned a fix/skip decision to
+ *  explanation     — 100 (future: rubric-based on written justification)
  */
 
 export type AuditCategory = "title" | "bullets" | "description" | "backend";
 export type FindingSeverity = "info" | "warning" | "critical";
 
 export interface AuditFinding {
+  readonly id: string;
   readonly category: AuditCategory;
   readonly severity: FindingSeverity;
   readonly message: string;
   readonly suggestion: string;
+}
+
+/** Student's triage decision for a finding: fix it now, or skip it. */
+export type FindingAction = "fix" | "skip";
+
+export interface GradedFinding extends AuditFinding {
+  /** Ground-truth correct action: "fix" for warning/critical, "skip" for info. */
+  readonly groundTruth: FindingAction;
+  /** Student's submitted action (undefined = not yet reviewed). */
+  readonly userChoice?: FindingAction;
+  /** Whether the student's choice matched ground truth. */
+  readonly isCorrect: boolean;
 }
 
 export interface ListingAudit {
@@ -37,6 +61,29 @@ export interface KeywordResearchResult {
 export interface ListingAuditOutput {
   readonly audit: ListingAudit;
   readonly keywordResearch: KeywordResearchResult;
-  /** Overall score 0–100 */
+  /** Overall listing-quality score 0–100 (title/bullets/description average). */
   readonly score: number;
+  /**
+   * `audit.findings` paired 1:1 with ground-truth triage + the student's
+   * submitted fix/skip decision. Always populated; `userChoice`/`isCorrect`
+   * are only meaningful once `userFindingActions` is submitted.
+   */
+  readonly gradedFindings: readonly GradedFinding[];
+  /**
+   * Per-dimension scores (0–100) when userFindingActions are provided.
+   * Null when no triage decisions are supplied (preview/ground-truth only).
+   */
+  readonly scoreDimensions: ScoreDimensions | null;
+}
+
+/** Dimension scores fed into GradeSimulatorAttempt. */
+export interface ScoreDimensions {
+  /** % of findings correctly triaged (fix/skip matches ground truth) */
+  readonly direction: number;
+  /** % of severity-weighted "must fix" findings the student marked fix */
+  readonly profitability: number;
+  /** % of findings with a userChoice assigned */
+  readonly dataSufficiency: number;
+  /** Placeholder — future rubric-based scoring */
+  readonly explanation: number;
 }
