@@ -1,0 +1,61 @@
+.grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(23, 23, 23, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 23, 23, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  -webkit-mask-image: radial-gradient(120% 90% at 70% 0%, #000 35%, transparent 92%);
+  mask-image: radial-gradient(120% 90% at 70% 0%, #000 35%, transparent 92%);
+}
+
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+.reg {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  color: var(--accent);
+  opacity: 0.16;
+}
+
+.r1 {
+  top: 18%;
+  left: 6%;
+  animation: drift1 26s ease-in-out infinite;
+}
+
+.r2 {
+  top: 62%;
+  right: 7%;
+  animation: drift2 32s ease-in-out infinite;
+}
+
+@keyframes drift1 {
+  50% {
+    transform: translate(14px, -18px) rotate(8deg);
+  }
+}
+
+@keyframes drift2 {
+  50% {
+    transform: translate(-16px, 12px) rotate(-6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .r1,
+  .r2 {
+    animation: none;
+  }
+}

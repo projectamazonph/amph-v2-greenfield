@@ -5,6 +5,11 @@
  * (and the flat "waybill stamp" shadow) far more liberally than the product UI.
  */
 
+.contentLayer {
+  position: relative;
+  z-index: 2;
+}
+
 .wrap {
   max-width: 1240px;
   margin: 0 auto;

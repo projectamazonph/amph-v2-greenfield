@@ -5,6 +5,8 @@
  * the server.
  */
 
+import { PageTexture } from "@/components/landing/PageTexture";
+import shared from "@/components/landing/shared.module.css";
 import { TopBar } from "@/components/landing/TopBar";
 import { Ticker } from "@/components/landing/Ticker";
 import { Hero } from "@/components/landing/Hero";
@@ -23,22 +25,25 @@ import { Footer } from "@/components/landing/Footer";
 export default function HomePage() {
   return (
     <>
-      <TopBar />
-      <Ticker />
-      <main>
-        <Hero />
-        <StatsStrip />
-        <Method />
-        <SimulatorSection />
-        <Curriculum />
-        <WhoFor />
-        <Pricing />
-        <Mentor />
-        <Proof />
-        <FAQSection />
-        <DarkCTA />
-      </main>
-      <Footer />
+      <PageTexture />
+      <div className={shared.contentLayer}>
+        <TopBar />
+        <Ticker />
+        <main>
+          <Hero />
+          <StatsStrip />
+          <Method />
+          <SimulatorSection />
+          <Curriculum />
+          <WhoFor />
+          <Pricing />
+          <Mentor />
+          <Proof />
+          <FAQSection />
+          <DarkCTA />
+        </main>
+        <Footer />
+      </div>
     </>
   );
 }
