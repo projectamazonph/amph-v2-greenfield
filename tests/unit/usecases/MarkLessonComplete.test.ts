@@ -14,12 +14,14 @@ const COURSE_ID = "course_01";
 const LESSON_ID = "les_02";
 const ENROLLMENT_ID = "enroll_01";
 
-function makeEnrollment(overrides: Partial<{
-  status: EnrollmentStatus;
-  completedLessonIds: string[];
-  lastLessonId: string | null;
-  progressPercent: number;
-}> = {}): Enrollment {
+function makeEnrollment(
+  overrides: Partial<{
+    status: EnrollmentStatus;
+    completedLessonIds: string[];
+    lastLessonId: string | null;
+    progressPercent: number;
+  }> = {},
+): Enrollment {
   // Use the real markLessonComplete implementation from the domain entity
   const enrollment: Enrollment = {
     id: ENROLLMENT_ID,
@@ -33,12 +35,17 @@ function makeEnrollment(overrides: Partial<{
     completedLessonIds: [] as string[],
     lastLessonId: null as string | null,
     progressPercent: 0,
-    markLessonComplete: function (this: Enrollment, lessonId: string, courseLessonCount: number): void {
+    markLessonComplete: function (
+      this: Enrollment,
+      lessonId: string,
+      courseLessonCount: number,
+    ): void {
       if (!this.completedLessonIds.includes(lessonId)) {
         this.completedLessonIds.push(lessonId);
-        this.progressPercent = courseLessonCount > 0
-          ? Math.min(100, Math.round((this.completedLessonIds.length / courseLessonCount) * 100))
-          : 0;
+        this.progressPercent =
+          courseLessonCount > 0
+            ? Math.min(100, Math.round((this.completedLessonIds.length / courseLessonCount) * 100))
+            : 0;
       }
       this.lastLessonId = lessonId;
     },
@@ -82,10 +89,10 @@ function makeCourse(lessonIds: string[]): Course {
 const NOW = new Date("2025-07-01T00:00:00Z");
 const mockClock: Clock = { now: vi.fn(() => NOW) };
 const mockIdGen: IdGenerator = {
-    newId: vi.fn(() => "evt_01"),
-    paymentRef: vi.fn(() => "AMPH-abc123"),
-    receiptNumber: vi.fn(() => "RCP-001"),
-  };
+  newId: vi.fn(() => "evt_01"),
+  paymentRef: vi.fn(() => "AMPH-abc123"),
+  receiptNumber: vi.fn(() => "RCP-001"),
+};
 
 function makeEnrollmentRepo(enrollment: Enrollment | null): IEnrollmentRepository {
   return {
@@ -101,9 +108,8 @@ function makeEnrollmentRepo(enrollment: Enrollment | null): IEnrollmentRepositor
 function makeCourseRepo(course: Course | null): CourseRepository {
   return {
     findBySlug: vi.fn(),
-    findById: vi.fn(
-      async (id: string) =>
-        course && id === course.id ? Result.ok(course) : Result.err({ kind: "not_found" }),
+    findById: vi.fn(async (id: string) =>
+      course && id === course.id ? Result.ok(course) : Result.err({ kind: "not_found" }),
     ) as CourseRepository["findById"],
     listAll: vi.fn(),
   } as unknown as CourseRepository;
@@ -119,38 +125,46 @@ function makeProgressEventRepo(): IProgressEventRepository {
 
 function makeUserRepo(): import("@/ports/repositories/UserRepository").UserRepository {
   return {
-    findById: vi.fn(async () => Result.ok({
-      id: USER_ID,
-      email: "student@example.com",
-      firstName: "Test",
-      lastName: "Student",
-      role: "STUDENT" as const,
-      subscriptionTier: "PRO" as const,
-      verificationStatus: "VERIFIED" as const,
-      enrolledCourseIds: [],
-      createdAt: new Date(),
-      totalXp: 0,
-      emailVerifiedAt: null,
-    })),
+    findById: vi.fn(async () =>
+      Result.ok({
+        id: USER_ID,
+        email: "student@example.com",
+        firstName: "Test",
+        lastName: "Student",
+        role: "STUDENT" as const,
+        subscriptionTier: "PRO" as const,
+        verificationStatus: "VERIFIED" as const,
+        enrolledCourseIds: [],
+        twoFactorEnabled: false,
+        createdAt: new Date(),
+        totalXp: 0,
+        emailVerifiedAt: null,
+      }),
+    ),
     findByEmail: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
     emailExists: vi.fn(),
     getPasswordHash: vi.fn(),
     listAll: vi.fn(),
-    updateTotalXp: vi.fn(async (id: string, xp: number) => Result.ok({
-      id: USER_ID,
-      email: "student@example.com",
-      firstName: "Test",
-      lastName: "Student",
-      role: "STUDENT" as const,
-      subscriptionTier: "PRO" as const,
-      verificationStatus: "VERIFIED" as const,
-      enrolledCourseIds: [],
-      createdAt: new Date(),
-      totalXp: xp,
-      emailVerifiedAt: null,
-    })),
+    updateTotalXp: vi.fn(async (id: string, xp: number) =>
+      Result.ok({
+        id: USER_ID,
+        email: "student@example.com",
+        firstName: "Test",
+        lastName: "Student",
+        role: "STUDENT" as const,
+        subscriptionTier: "PRO" as const,
+        verificationStatus: "VERIFIED" as const,
+        enrolledCourseIds: [],
+        twoFactorEnabled: false,
+        createdAt: new Date(),
+        totalXp: xp,
+        emailVerifiedAt: null,
+      }),
+    ),
+    getTwoFactorSecret: vi.fn(),
+    setTwoFactorSecret: vi.fn(),
   };
 }
 
@@ -243,7 +257,11 @@ describe("MarkLessonComplete", () => {
       clock: mockClock,
     });
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, lessonId: "les_01" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: COURSE_ID,
+      lessonId: "les_01",
+    });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -288,7 +306,11 @@ describe("MarkLessonComplete", () => {
       clock: mockClock,
     });
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, lessonId: "les_01" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: COURSE_ID,
+      lessonId: "les_01",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -307,7 +329,11 @@ describe("MarkLessonComplete", () => {
       clock: mockClock,
     });
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, lessonId: "les_01" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: COURSE_ID,
+      lessonId: "les_01",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -326,7 +352,11 @@ describe("MarkLessonComplete", () => {
       clock: mockClock,
     });
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, lessonId: "les_01" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: COURSE_ID,
+      lessonId: "les_01",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -346,7 +376,11 @@ describe("MarkLessonComplete", () => {
       clock: mockClock,
     });
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, lessonId: "nonexistent" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: COURSE_ID,
+      lessonId: "nonexistent",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -366,7 +400,11 @@ describe("MarkLessonComplete", () => {
       clock: mockClock,
     });
 
-    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID, lessonId: "les_02" });
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: COURSE_ID,
+      lessonId: "les_02",
+    });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;

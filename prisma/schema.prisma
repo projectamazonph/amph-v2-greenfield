@@ -75,6 +75,13 @@ model User {
   failedLoginCount    Int        @default(0)
   lockedUntil         DateTime?
 
+  // Two-factor authentication (audit hardening — admin 2FA)
+  // twoFactorSecret is intentionally never exposed on the domain User
+  // entity (same treatment as `password` — accessed only via narrow
+  // UserRepository methods), so it can't ride along on every User read.
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean @default(false)
+
   // Audit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

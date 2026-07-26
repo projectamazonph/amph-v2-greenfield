@@ -20,11 +20,12 @@ export async function POST(request: Request): Promise<Response> {
   const form = await request.formData();
   const email = (form.get("email") as string | null) ?? "";
   const password = (form.get("password") as string | null) ?? "";
+  const totpCode = (form.get("totpCode") as string | null) || undefined;
 
   const container = buildContainer();
   const outcome = await performLogin(
     container,
-    { email, password, redirectTo: "/admin" },
+    { email, password, redirectTo: "/admin", totpCode },
     {
       plantCookie: setAuthCookie,
       getClientIp: async () => {

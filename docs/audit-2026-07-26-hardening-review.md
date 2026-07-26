@@ -132,9 +132,21 @@ single source of truth for "what did the audit actually motivate."
    port/adapters, wired into the PayMongo webhook route. Every inbound
    request is persisted before any processing, with the outcome recorded
    afterward.
-5. **Not done.** TOTP-based 2FA for `ADMIN`-role accounts remains open —
-   the largest remaining item, tracked separately (see "Admin TOTP 2FA
-   (opt-in)" in the session's task list / a future PR).
+5. **Done** — opt-in TOTP 2FA. `User.twoFactorSecret`/`twoFactorEnabled`
+   (secret never exposed on the `User` domain entity, same treatment as
+   the password hash — accessed only via `getTwoFactorSecret`/
+   `setTwoFactorSecret`), a `TotpService` port + `OtpauthTotpService`
+   (real, `otpauth` library) / `FakeTotpService` (deterministic test
+   double) adapters, and three use cases (`EnableTwoFactor` — persists a
+   pending secret; `ConfirmTwoFactor` — verifies a code, only then flips
+   `twoFactorEnabled`; `DisableTwoFactor` — requires the current password,
+   not a TOTP code, so losing the authenticator device doesn't lock
+   someone out of turning 2FA off). `Login.ts` gained an optional
+   `totpCode` field — checked only when `user.twoFactorEnabled` is true,
+   silently ignored otherwise, so every existing account is unaffected
+   until it opts in itself. UI: `/admin/settings` (enable/disable) and
+   `/admin/settings/2fa-setup` (confirm), plus an optional "Two-factor
+   code" field added to both `/login` and `/admin-login`.
 6. **Done** — `docs/runbooks/paymongo-outage.md`, `webhook-replay.md`,
    `db-backup-restore.md`, and `admin-access-recovery.md` written (see
    `docs/runbooks/README.md` for the updated index). The DB restore

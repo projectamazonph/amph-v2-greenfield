@@ -124,6 +124,8 @@ describe("AuthorizeLessonAccess (P0-5: preview-leak fix)", () => {
       getPasswordHash: vi.fn(),
       updateTotalXp: vi.fn(),
       listAll: vi.fn(),
+      getTwoFactorSecret: vi.fn(),
+      setTwoFactorSecret: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),
@@ -240,9 +242,7 @@ describe("AuthorizeLessonAccess (P0-5: preview-leak fix)", () => {
   // ── Admin ─────────────────────────────────────────
 
   it("admin: allows ANY lesson regardless of preview window", async () => {
-    vi.mocked(mockUserRepo.findById).mockResolvedValue(
-      Result.ok(makeUser({ role: "ADMIN" })),
-    );
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser({ role: "ADMIN" })));
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(makeCourse()));
     vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
     const r = await useCase.execute({ userId: "user_01", courseId: "course_01", lessonId: "l5" });

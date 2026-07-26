@@ -27,6 +27,12 @@ export interface User {
   readonly verificationStatus: VerificationStatus;
   /** Course IDs the user has directly enrolled in (paid or granted). */
   readonly enrolledCourseIds: readonly string[];
+  /**
+   * Whether admin TOTP 2FA is active for this account. The secret
+   * itself is never on this entity — same treatment as the password
+   * hash — see UserRepository.getTwoFactorSecret()/setTwoFactorSecret().
+   */
+  readonly twoFactorEnabled: boolean;
   readonly createdAt: Date;
   /** Total XP earned by the user (mutable, updated via XPService). */
   totalXp: number;
@@ -58,6 +64,7 @@ export function createUser(params: {
   subscriptionTier?: SubscriptionTier;
   verificationStatus?: VerificationStatus;
   enrolledCourseIds?: readonly string[];
+  twoFactorEnabled?: boolean;
   createdAt?: Date;
   totalXp?: number;
   emailVerifiedAt?: Date | null;
@@ -69,19 +76,22 @@ export function createUser(params: {
     return Result.err({ kind: "invalid_input", message: "Last name is required." });
   }
 
-  return Result.ok(Object.freeze({
-    id: params.id,
-    email: params.email.toLowerCase().trim(),
-    firstName: params.firstName.trim(),
-    lastName: params.lastName.trim(),
-    role: params.role ?? "STUDENT",
-    subscriptionTier: params.subscriptionTier ?? "FREE",
-    verificationStatus: params.verificationStatus ?? "UNVERIFIED",
-    enrolledCourseIds: Object.freeze([...(params.enrolledCourseIds ?? [])]),
-    createdAt: params.createdAt ?? new Date(),
-    totalXp: params.totalXp ?? 0,
-    emailVerifiedAt: params.emailVerifiedAt ?? null,
-  }));
+  return Result.ok(
+    Object.freeze({
+      id: params.id,
+      email: params.email.toLowerCase().trim(),
+      firstName: params.firstName.trim(),
+      lastName: params.lastName.trim(),
+      role: params.role ?? "STUDENT",
+      subscriptionTier: params.subscriptionTier ?? "FREE",
+      verificationStatus: params.verificationStatus ?? "UNVERIFIED",
+      enrolledCourseIds: Object.freeze([...(params.enrolledCourseIds ?? [])]),
+      twoFactorEnabled: params.twoFactorEnabled ?? false,
+      createdAt: params.createdAt ?? new Date(),
+      totalXp: params.totalXp ?? 0,
+      emailVerifiedAt: params.emailVerifiedAt ?? null,
+    }),
+  );
 }
 
 /** Full name */

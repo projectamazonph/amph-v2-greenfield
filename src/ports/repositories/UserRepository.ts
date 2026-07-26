@@ -11,9 +11,7 @@ import type { User } from "@/domain/entities/User";
 import { Result } from "@/domain/shared/Result";
 
 export type UserError =
-  | { kind: "not_found" }
-  | { kind: "email_taken" }
-  | { kind: "db_error"; message: string };
+  { kind: "not_found" } | { kind: "email_taken" } | { kind: "db_error"; message: string };
 
 export interface UserRepository {
   /**
@@ -72,6 +70,12 @@ export interface UserRepository {
        * ResetPassword use case after a successful token exchange.
        */
       passwordHash: string;
+      /**
+       * Audit hardening: flip once ConfirmTwoFactor validates the
+       * pending secret, or DisableTwoFactor turns it off. Does not
+       * touch the secret itself — use setTwoFactorSecret() for that.
+       */
+      twoFactorEnabled: boolean;
     }>,
   ): Promise<Result<User, UserError>>;
 
@@ -92,4 +96,18 @@ export interface UserRepository {
    * Called by AwardXP use case after persisting an XPEvent.
    */
   updateTotalXp(userId: string, newTotalXp: number): Promise<Result<User, UserError>>;
+
+  /**
+   * Get the stored TOTP secret for a user, or null if 2FA has never
+   * been enrolled / has been disabled. Same narrow-accessor treatment
+   * as getPasswordHash() — never exposed on the User entity itself.
+   */
+  getTwoFactorSecret(userId: string): Promise<Result<string | null, UserError>>;
+
+  /**
+   * Set (or clear, with null) the stored TOTP secret. EnableTwoFactor
+   * sets a pending secret; DisableTwoFactor clears it. Does not touch
+   * twoFactorEnabled — use update() for that.
+   */
+  setTwoFactorSecret(userId: string, secret: string | null): Promise<Result<void, UserError>>;
 }

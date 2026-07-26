@@ -62,6 +62,8 @@ describe("EnrollStudent", () => {
       getPasswordHash: vi.fn(),
       updateTotalXp: vi.fn(),
       listAll: vi.fn(),
+      getTwoFactorSecret: vi.fn(),
+      setTwoFactorSecret: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),

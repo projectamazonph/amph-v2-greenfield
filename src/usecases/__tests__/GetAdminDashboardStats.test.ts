@@ -49,6 +49,7 @@ function makeUser(id: string, role: User["role"] = "STUDENT"): User {
     subscriptionTier: "FREE",
     verificationStatus: "VERIFIED",
     enrolledCourseIds: [],
+    twoFactorEnabled: false,
     createdAt: new Date(),
     totalXp: 0,
     emailVerifiedAt: null,

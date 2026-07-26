@@ -80,7 +80,7 @@ export type LoginResult =
 
 export async function performLogin(
   container: { login: Login; rateLimiter: RateLimiter },
-  input: { email: string; password: string; redirectTo: string },
+  input: { email: string; password: string; redirectTo: string; totpCode?: string },
   deps: {
     plantCookie: (token: string, expiresAt: Date) => Promise<void>;
     getClientIp: () => Promise<string | undefined>;
@@ -128,6 +128,7 @@ export async function performLogin(
   const result = await container.login.execute({
     email: input.email,
     password: input.password,
+    totpCode: input.totpCode,
   });
 
   if (!result.ok) {

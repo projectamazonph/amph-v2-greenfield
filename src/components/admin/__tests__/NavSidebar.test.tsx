@@ -17,6 +17,7 @@ const TEST_USER: User = {
   subscriptionTier: "FREE",
   verificationStatus: "VERIFIED",
   enrolledCourseIds: [],
+  twoFactorEnabled: false,
   createdAt: new Date(),
   totalXp: 0,
   emailVerifiedAt: null,

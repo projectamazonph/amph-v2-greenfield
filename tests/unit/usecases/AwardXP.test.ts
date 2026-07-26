@@ -39,6 +39,7 @@ function makeUser(
     subscriptionTier: "FREE",
     verificationStatus: "VERIFIED",
     enrolledCourseIds: [],
+    twoFactorEnabled: false,
     createdAt: NOW,
     totalXp,
     emailVerifiedAt: null,
@@ -73,6 +74,8 @@ function makeUserRepo(
       ? (((uid: string, xp: number) =>
           user.updateTotalXp(xp)) as unknown as UserRepository["updateTotalXp"])
       : vi.fn(),
+    getTwoFactorSecret: vi.fn(),
+    setTwoFactorSecret: vi.fn(),
   };
 }
 
