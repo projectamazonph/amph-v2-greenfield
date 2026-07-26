@@ -279,7 +279,7 @@ export function buildTestContainer(): TestContainer {
     paymentGateway,
     jwt,
     passwordHasher,
-    signUp: new SignUp(userRepo, idGen, clock, passwordHasher),
+    signUp: new SignUp(userRepo, idGen, clock, passwordHasher, recordAuditLog),
     login: new Login(userRepo, passwordHasher, sessionRepo, idGen, clock, jwt),
     logout: new Logout(sessionRepo, jwt),
     createPaymentIntent: new CreatePaymentIntent({

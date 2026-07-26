@@ -11,24 +11,32 @@ import { FixedClock } from "@/ports/system/Clock";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import { Result as R } from "@/domain/shared/Result";
+import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 
 /** Fast stub hasher for unit tests — no Argon2 overhead. */
 class StubHasher implements PasswordHasher {
-  async hash(password: string) { return R.ok(`stubbed:${password}`); }
-  async verify(password: string, hash: string) { return R.ok(hash === `stubbed:${password}`); }
+  async hash(password: string) {
+    return R.ok(`stubbed:${password}`);
+  }
+  async verify(password: string, hash: string) {
+    return R.ok(hash === `stubbed:${password}`);
+  }
 }
 
 describe("SignUp (class)", () => {
   let userRepo: InMemoryUserRepository;
   let clock: FixedClock;
   let idGen: InMemoryIdGenerator;
+  let recordAuditLog: RecordAuditLog;
   let signUp: SignUp;
 
   beforeEach(() => {
     userRepo = new InMemoryUserRepository();
     clock = new FixedClock(new Date("2026-01-01T00:00:00Z"));
     idGen = new InMemoryIdGenerator();
-    signUp = new SignUp(userRepo, idGen, clock, new StubHasher());
+    recordAuditLog = new RecordAuditLog({ auditLog: new InMemoryAuditLog(), idGen, clock });
+    signUp = new SignUp(userRepo, idGen, clock, new StubHasher(), recordAuditLog);
   });
 
   const validInput = {
@@ -115,6 +123,30 @@ describe("SignUp (class)", () => {
       }
     });
 
+    it("records a user.signed_up audit log entry on success (STORY-009)", async () => {
+      const result = await signUp.execute(validInput);
+      if (!result.ok) throw new Error("signup failed");
+
+      const listResult = await recordAuditLog._auditLog.list({});
+      expect(Result.isOk(listResult)).toBe(true);
+      if (!Result.isOk(listResult)) return;
+
+      const entry = listResult.value.entries.find((e) => e.actorId === result.userId);
+      expect(entry).toBeDefined();
+      expect(entry?.action).toBe("user.signed_up");
+      expect(entry?.targetType).toBe("user");
+      expect(entry?.targetId).toBe(result.userId);
+      expect(entry?.metadata).toMatchObject({ email: "alice@example.com" });
+    });
+
+    it("does not record an audit entry when signup fails validation", async () => {
+      await signUp.execute({ ...validInput, firstName: "" });
+      const listResult = await recordAuditLog._auditLog.list({});
+      expect(Result.isOk(listResult)).toBe(true);
+      if (!Result.isOk(listResult)) return;
+      expect(listResult.value.entries).toHaveLength(0);
+    });
+
     it("stores the hashed password", async () => {
       const result = await signUp.execute(validInput);
       if (!result.ok) throw new Error("signup failed");
@@ -151,7 +183,7 @@ describe("SignUp (class)", () => {
           return R.err({ kind: "db_error", message: "pg down" } as never);
         }
       })();
-      const failingSignUp = new SignUp(flakyRepo, idGen, clock, new StubHasher());
+      const failingSignUp = new SignUp(flakyRepo, idGen, clock, new StubHasher(), recordAuditLog);
       const result = await failingSignUp.execute(validInput);
       expect(result.ok).toBe(false);
       if (result.ok) return;
@@ -170,7 +202,7 @@ describe("SignUp (class)", () => {
           return R.err({ kind: "email_taken" } as never); // but create fails
         }
       })();
-      const racingSignUp = new SignUp(racingRepo, idGen, clock, new StubHasher());
+      const racingSignUp = new SignUp(racingRepo, idGen, clock, new StubHasher(), recordAuditLog);
       const result = await racingSignUp.execute(validInput);
       expect(result.ok).toBe(false);
       if (result.ok) return;
@@ -183,7 +215,7 @@ describe("SignUp (class)", () => {
           return R.err({ kind: "db_error", message: "fk violation" } as never);
         }
       })();
-      const failingSignUp = new SignUp(racingRepo, idGen, clock, new StubHasher());
+      const failingSignUp = new SignUp(racingRepo, idGen, clock, new StubHasher(), recordAuditLog);
       const result = await failingSignUp.execute(validInput);
       expect(result.ok).toBe(false);
       if (result.ok) return;
@@ -199,7 +231,7 @@ describe("SignUp (class)", () => {
           return R.err(new Error("argon2 out of memory") as never);
         }
       })();
-      const failingSignUp = new SignUp(userRepo, idGen, clock, failingHasher);
+      const failingSignUp = new SignUp(userRepo, idGen, clock, failingHasher, recordAuditLog);
       await expect(failingSignUp.execute(validInput)).rejects.toThrow(/Password hashing failed/);
     });
   });
