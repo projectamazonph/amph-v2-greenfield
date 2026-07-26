@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-26: Finish the AMPH → Project Amazon PH Academy rename on customer-facing surfaces
+
+- PR #156 renamed "AMPH Academy" to "Project Amazon PH Academy" in most user-facing copy but missed two spots that still said the bare "AMPH" abbreviation: the logo text on `/checkout` (`CheckoutForm.tsx`, both the empty-state and confirm-purchase views) and the line-item description PayMongo shows the customer during hosted checkout (`PayMongoAdapter.ts`, `createCheckoutSession`). Both now read "Project Amazon PH Academy", matching the convention already used on `/login` and the admin sidebar.
+- Audited every other "AMPH" occurrence in the codebase (cookie names, internal file/class names like `amph-theme.ts`/`IAmphContentReader`, `package.json`'s package name, unused `IdGenerator.paymentRef()`/`receiptNumber()` prefixes, CSS comments) and confirmed none of them are customer-visible — left as-is; renaming them would be pure code churn with no user-facing benefit. The GitHub repo name and the live `amph-v2-greenfield.vercel.app` production URL are also still "AMPH" but touching either has real external consequences (broken links, git remote updates, possible custom-domain purchase) and was intentionally left out of this pass.
+
 ### 2026-07-26: Production-readiness lint sweep (PR #195)
 
 - Eliminated the last ESLint warning in the codebase: `ImpersonateUser.ts` was logging admin impersonation via `console.log` (flagged by `no-console`) instead of writing a real audit entry. Fixed at the root — it now writes a `user.impersonated` entry via `RecordAuditLog`, the same pattern used by every other sensitive admin action, closing a real "no admin mutation without an audit log" gap rather than just silencing the lint rule.

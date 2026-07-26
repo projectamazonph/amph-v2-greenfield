@@ -178,7 +178,7 @@ export default function CheckoutForm() {
       <div style={PAGE_STYLES.page}>
         <div style={PAGE_STYLES.card}>
           <div style={PAGE_STYLES.header}>
-            <div style={PAGE_STYLES.logo}>AMPH</div>
+            <div style={PAGE_STYLES.logo}>Project Amazon PH Academy</div>
             <h1 style={PAGE_STYLES.title}>Checkout</h1>
           </div>
           <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
@@ -197,7 +197,7 @@ export default function CheckoutForm() {
     <div style={PAGE_STYLES.page}>
       <div style={PAGE_STYLES.card}>
         <div style={PAGE_STYLES.header}>
-          <div style={PAGE_STYLES.logo}>AMPH</div>
+          <div style={PAGE_STYLES.logo}>Project Amazon PH Academy</div>
           <h1 style={PAGE_STYLES.title}>Confirm your purchase</h1>
           <p style={PAGE_STYLES.subtitle}>
             You'll be redirected to PayMongo to complete payment. We accept cards, GCash, and
