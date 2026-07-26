@@ -67,6 +67,15 @@ All three confirmed in `ListingAuditSimulator.ts`:
   rename: `priorityCoverage`. **This rename must not be applied globally,
   see the note below.**
 
+- **Ground truth is crudely binary.** `groundTruthAction` (line 158) is
+  the entire rule:
+  ```ts
+  return severity === "info" ? "skip" : "fix";
+  ```
+  Severity is a proxy for correct action, and it does not account for
+  category, marketplace, product strategy, mobile readability, compliance,
+  existing imagery, brand voice, or keyword intent.
+
 ### Scope correction: the rename is not uniform across simulators
 
 The external review implied `dataSufficiency` and `profitability` are
@@ -93,15 +102,6 @@ So the rename splits:
 The same asymmetry applies to ungrading completion (STORY-072): STR Triage
 weights its `dataSufficiency` at 0.1 to 0.2, so it has the same free-points
 problem as Listing Audit, just a smaller one.
-
-- **Ground truth is crudely binary.** `groundTruthAction` (line 158) is
-  the entire rule:
-  ```ts
-  return severity === "info" ? "skip" : "fix";
-  ```
-  Severity is a proxy for correct action, and it does not account for
-  category, marketplace, product strategy, mobile readability, compliance,
-  existing imagery, brand voice, or keyword intent.
 
 ### Keyword research emits generic terms with invented volumes
 
