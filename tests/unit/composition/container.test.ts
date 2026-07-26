@@ -429,14 +429,15 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(typeof c.simulatorRegistry.get).toBe("function");
   });
 
-  simIt("test container has all 4 simulator stubs registered", () => {
+  simIt("test container has all 5 simulator stubs registered", () => {
     const c = buildTestContainer();
     const simulators = c.simulatorRegistry.list();
-    simExpect(simulators).toHaveLength(4);
+    simExpect(simulators).toHaveLength(5);
     simExpect(c.simulatorRegistry.get("bid-elevator")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("str-triage")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("campaign-builder")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("listing-audit")).not.toBeNull();
+    simExpect(c.simulatorRegistry.get("keyword-research")).not.toBeNull();
   });
 
   simIt("bid-elevator simulator is the real BidElevatorSimulator, not a stub", () => {

@@ -1,5 +1,5 @@
 /**
- * buildSimulatorRegistry — creates a SimulatorRegistry with all 4 simulator stubs.
+ * buildSimulatorRegistry — creates a SimulatorRegistry with all 5 simulator stubs.
  *
  * STORY-036: Simulator infrastructure.
  *
@@ -14,6 +14,7 @@ import { BidElevatorSimulator } from "@/domain/simulator/bid-elevator/BidElevato
 import { StrTriageSimulator } from "@/domain/simulator/str-triage/StrTriageSimulator";
 import { CampaignBuilderSimulator } from "@/domain/simulator/campaign-builder/CampaignBuilderSimulator";
 import { ListingAuditSimulator } from "@/domain/simulator/listing-audit/ListingAuditSimulator";
+import { KeywordResearchSimulator } from "@/domain/simulator/keyword-research/KeywordResearchSimulator";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 
 export function buildSimulatorRegistry(): SimulatorRegistry {
@@ -23,6 +24,7 @@ export function buildSimulatorRegistry(): SimulatorRegistry {
   registry.register(new StrTriageSimulator());
   registry.register(new CampaignBuilderSimulator());
   registry.register(new ListingAuditSimulator());
+  registry.register(new KeywordResearchSimulator());
 
   return registry;
 }

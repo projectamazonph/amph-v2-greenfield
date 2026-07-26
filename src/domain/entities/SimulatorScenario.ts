@@ -11,8 +11,9 @@ import { Result } from "@/domain/shared/Result";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
-/** IDs for the four planned simulators. */
-export type SimulatorId = "bid-elevator" | "str-triage" | "campaign-builder" | "listing-audit";
+/** IDs for the five simulators. */
+export type SimulatorId =
+  "bid-elevator" | "str-triage" | "campaign-builder" | "listing-audit" | "keyword-research";
 
 export type SimulatorScenarioError =
   { kind: "invalid_simulator_id" } | { kind: "invalid_difficulty" };
@@ -38,6 +39,7 @@ const VALID_SIMULATOR_IDS: readonly SimulatorId[] = [
   "str-triage",
   "campaign-builder",
   "listing-audit",
+  "keyword-research",
 ];
 
 const VALID_DIFFICULTIES: readonly Difficulty[] = ["beginner", "intermediate", "advanced"];

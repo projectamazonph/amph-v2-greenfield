@@ -152,6 +152,8 @@ const OVERALL_PASS_COMMENT = {
     "Well-structured campaign build. Your keyword and match-type selections show good strategic thinking.",
   "listing-audit":
     "Sharp audit skills. Your identification of listing issues and opportunities is spot-on.",
+  "keyword-research":
+    "Strong keyword research. Your prioritization and negative identification show solid PPC instincts.",
 };
 
 const OVERALL_FAIL_COMMENT = {
@@ -163,6 +165,8 @@ const OVERALL_FAIL_COMMENT = {
     "Review the campaign-building principles and refine your structure. Each revision builds intuition.",
   "listing-audit":
     "Audit skills improve with practice. Review the key listing factors and try again with a sharper eye.",
+  "keyword-research":
+    "Review your keyword prioritization approach. Focus on relevance and volume as key signals for primary keywords.",
 };
 
 const REMEDIATION_LINKS: Record<FeedbackVerdict, readonly string[]> = {
