@@ -4,6 +4,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-26: Audit verification + CLAUDE.md known-gaps correction (docs only)
+
+- A pasted external "audit" (based on README/schema/docs, not the live code) was received as a task. Every claim was checked against the actual source before acting on anything — no application code changed.
+- Its top-priority claim ("PayMongo webhook uses in-memory repos") is false today: `src/app/api/webhooks/paymongo/route.ts` already uses `buildContainer()`, has idempotency and signature verification. Several other claims (no admin panel, `courseRepo`/`orderRepo` on in-memory repos, `src/lib/`/`src/components/`/`content/curriculum/` missing, DB "not provisioned") were also false — most were copied from `CLAUDE.md`'s own "Known gaps" section, which had gone stale.
+- `CLAUDE.md`'s "Known gaps" section rewritten to match verified reality. Full claim-by-claim breakdown in new `docs/audit-2026-07-26-hardening-review.md`.
+- A few audit claims held up and are recorded as real follow-ups: `Course.curriculum` (Json) still coexists with the relational `Module`/`Lesson` models with nothing keeping them in sync; several status fields are plain strings, not enums; there's no persistent webhook event log; there's no admin 2FA; `docs/runbooks/` is still just a README.
+- Important correction flagged: the audit recommended removing `User.subscriptionTier`/`enrolledCourseIds`/`simulatorAccess`/`emailVerificationToken` as "legacy" fields. They are load-bearing (`EnrollStudent`, `TierAccessPolicy`, `ListUsers`) — removing them would break access control and signup.
+
 ### 2026-07-24: Test expectations sync (rename + simulator count)
 
 - **PR #158** (open): `fix: sync test expectations with rename + simulator count changes`
