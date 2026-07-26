@@ -69,7 +69,7 @@
 
 .nav a:hover {
   color: var(--ink-900);
-  background: rgba(255, 107, 53, 0.06);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 
 .nav a:hover::after {

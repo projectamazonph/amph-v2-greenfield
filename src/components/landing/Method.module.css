@@ -30,7 +30,7 @@
 
 .row:hover {
   padding-left: 16px;
-  background: linear-gradient(90deg, rgba(255, 107, 53, 0.05), transparent 60%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 60%);
 }
 
 .row:hover::before {

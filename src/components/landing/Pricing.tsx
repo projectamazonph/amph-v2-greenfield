@@ -1,26 +1,8 @@
+import { COURSES_URL } from "./constants";
+import { CheckIcon } from "./Icons";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Pricing.module.css";
-
-const COURSES_URL = "https://projectamazonph.online";
-
-function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  );
-}
 
 interface Tier {
   flag: string;
@@ -105,13 +87,13 @@ export function Pricing() {
           </div>
           <p className={shared.secLede}>
             Pay once, get the content forever. <b>No subscription, no upsells later.</b> Prices
-            below are the documented figures from projectamazonph.online — identical on every
+            below are the documented figures from projectamazonph.online, identical on every
             surface.
           </p>
         </div>
 
         <p className={styles.intro}>
-          The <b>first module is the same in every tier</b> — the difference is how far you go.
+          The <b>first module is the same in every tier</b>. The difference is how far you go.
         </p>
 
         <Reveal className={styles.tiers}>

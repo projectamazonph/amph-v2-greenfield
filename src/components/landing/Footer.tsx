@@ -1,8 +1,7 @@
+import { COURSES_URL } from "./constants";
 import { Logo } from "./Logo";
 import shared from "./shared.module.css";
 import styles from "./Footer.module.css";
-
-const COURSES_URL = "https://projectamazonph.online";
 
 const ARCHITECTURE = [
   { level: "Master", name: "Project Amazon PH", used: "Social, tools, community, this site" },
@@ -22,7 +21,7 @@ export function Footer() {
           <div className={styles.brand}>
             <Logo />
             <p>
-              Amazon ads training that helps Filipino VAs become specialists clients can see —
+              Amazon ads training that helps Filipino VAs become specialists clients can see:
               competence, not hype. One-time payment, no subscription.
             </p>
           </div>
@@ -48,9 +47,7 @@ export function Footer() {
             <a href={COURSES_URL} target="_blank" rel="noopener noreferrer">
               See the courses
             </a>
-            <a href={COURSES_URL} target="_blank" rel="noopener noreferrer">
-              Email me the syllabus
-            </a>
+            <a href="#curriculum">See what&rsquo;s inside</a>
             <a href="/login">Sign in</a>
             <a href="#top">Back to top</a>
           </div>
@@ -82,7 +79,7 @@ export function Footer() {
             © 2026 Project Amazon PH · ₱2,999 / ₱5,999 / ₱9,999 · one-time via PayMongo ·{" "}
             <b>no subscription</b>
           </span>
-          <span>Alt: Project Amazon PH — Amazon PPC skills and training for Filipino VAs.</span>
+          <span>Alt: Project Amazon PH. Amazon PPC skills and training for Filipino VAs.</span>
         </div>
       </div>
     </footer>

@@ -5,7 +5,7 @@ import styles from "./Mentor.module.css";
 
 /**
  * Stand-in for a photo the brand kit doesn't include yet (BRAND-GUIDE.md
- * explicitly steers away from generic headshot stock imagery anyway) — a
+ * explicitly steers away from generic headshot stock imagery anyway), a
  * rendered "working notebook" sketch: a campaign structure tree, a spend
  * bar chart, and a search-term checklist, in the same ink/orange line
  * language as the rest of the page.
@@ -111,11 +111,7 @@ function NotebookSketch() {
 
 export function Mentor() {
   return (
-    <section
-      className={shared.sec}
-      id="mentor"
-      style={{ background: "linear-gradient(180deg, rgba(255,107,53,0.035), transparent)" }}
-    >
+    <section className={[shared.sec, styles.sectionTint].join(" ")} id="mentor">
       <div className={shared.wrap}>
         <div className={shared.secHead}>
           <div className={shared.stickyCol}>
@@ -124,7 +120,7 @@ export function Mentor() {
           </div>
           <p className={shared.secLede}>
             Ryan Roland Dabao leads the mentorship and the weekly live classes in the Ultimate tier.
-            The voice you get is a working operator&rsquo;s — plain, specific, and honest about what
+            The voice you get is a working operator&rsquo;s: plain, specific, and honest about what
             the data can and can&rsquo;t promise.
           </p>
         </div>
@@ -138,7 +134,7 @@ export function Mentor() {
               <span className={[shared.corner, shared.cornerBr].join(" ")} />
               <NotebookSketch />
               <figcaption className={shared.plateCap}>
-                FIG. 02 — a mentor&rsquo;s working notebook
+                FIG. 02: a mentor&rsquo;s working notebook
               </figcaption>
             </figure>
             <div className={styles.stamp}>Field notes, not slides</div>
@@ -147,7 +143,7 @@ export function Mentor() {
           <div>
             <blockquote className={styles.quote}>
               <span className={styles.tl}>&ldquo;</span>PPC isn&rsquo;t about clicking buttons
-              faster. It&rsquo;s about making fewer, better decisions — and being able to explain
+              faster. It&rsquo;s about making fewer, better decisions, and being able to explain
               them when a client asks <em>why</em>.<span className={styles.tl}>&rdquo;</span>
             </blockquote>
             <div className={styles.by}>
@@ -160,22 +156,20 @@ export function Mentor() {
             <div className={styles.points}>
               <div className={styles.point}>
                 <small>Live classes</small>
-                <p>Ultimate tier — live with Ryan, every week. Real accounts, real calls.</p>
+                <p>Ultimate tier: live with Ryan, every week. Real accounts, real calls.</p>
               </div>
               <div className={styles.point}>
                 <small>1:1 review</small>
-                <p>Ultimate tier — one portfolio review of the decisions you actually made.</p>
+                <p>Ultimate tier: one portfolio review of the decisions you actually made.</p>
               </div>
               <div className={styles.point}>
                 <small>Support</small>
-                <p>
-                  Stuck? Email us — we reply within 1 business day. Ultimate gets a faster line.
-                </p>
+                <p>Stuck? Email us. We reply within 1 business day. Ultimate gets a faster line.</p>
               </div>
               <div className={styles.point}>
                 <small>Certificate</small>
                 <p>
-                  Listed on your profile and recognized in our hiring pipeline — we hire from this
+                  Listed on your profile and recognized in our hiring pipeline. We hire from this
                   audience.
                 </p>
               </div>

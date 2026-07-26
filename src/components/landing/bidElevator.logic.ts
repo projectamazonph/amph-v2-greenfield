@@ -1,6 +1,6 @@
 /**
  * Pure math for the landing page's Bid Elevator preview widget.
- * Illustrative model only — not the real bid-elevator simulator
+ * Illustrative model only, not the real bid-elevator simulator
  * (src/domain/simulator/bid-elevator/), which is scored, port-based, and
  * runs against a signed-in student's account. This one is a public,
  * unauthenticated marketing demo, so it stays self-contained here rather

@@ -1,26 +1,8 @@
+import { COURSES_URL } from "./constants";
+import { CheckIcon } from "./Icons";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./DarkCTA.module.css";
-
-const COURSES_URL = "https://projectamazonph.online";
-
-function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  );
-}
 
 export function DarkCTA() {
   return (
@@ -35,7 +17,7 @@ export function DarkCTA() {
               <em>Start deciding.</em>
             </h2>
             <p className={styles.p}>
-              Pay once, get the content forever. Build Amazon ads skills you can actually show —
+              Pay once, get the content forever. Build Amazon ads skills you can actually show:
               guided modules, five scored simulators, and a certificate recognized in our hiring
               pipeline.
             </p>
@@ -50,11 +32,9 @@ export function DarkCTA() {
               </a>
               <a
                 className={[shared.btn, shared.btnGhost, styles.ghost].join(" ")}
-                href={COURSES_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#curriculum"
               >
-                Email me the syllabus
+                See what&rsquo;s inside
               </a>
             </div>
             <p className={styles.latenight}>

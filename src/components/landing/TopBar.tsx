@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { COURSES_URL } from "./constants";
 import { Logo } from "./Logo";
 import shared from "./shared.module.css";
 import styles from "./TopBar.module.css";
@@ -12,8 +13,6 @@ const NAV_LINKS = [
   { href: "#pricing", label: "Pricing" },
   { href: "#faq", label: "FAQ" },
 ];
-
-const COURSES_URL = "https://projectamazonph.online";
 
 export function TopBar() {
   const [scrolled, setScrolled] = useState(false);

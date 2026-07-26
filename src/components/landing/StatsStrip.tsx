@@ -30,6 +30,7 @@ function CountUp({ to }: { to: number }) {
       setDisplay(Math.round(to).toLocaleString("en-US"));
       return;
     }
+    let raf = 0;
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -42,15 +43,18 @@ function CountUp({ to }: { to: number }) {
             const p = Math.min(1, (ts - start) / duration);
             const eased = 1 - Math.pow(1 - p, 3);
             setDisplay(Math.round(to * eased).toLocaleString("en-US"));
-            if (p < 1) requestAnimationFrame(step);
+            if (p < 1) raf = requestAnimationFrame(step);
           }
-          requestAnimationFrame(step);
+          raf = requestAnimationFrame(step);
         }
       },
       { threshold: 0.4 },
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+    };
   }, [to]);
 
   return <span ref={ref}>{display}</span>;

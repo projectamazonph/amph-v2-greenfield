@@ -1,3 +1,7 @@
+.sectionTint {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 3.5%, transparent), transparent);
+}
+
 .grid {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;

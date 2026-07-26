@@ -9,7 +9,7 @@ interface LogoProps {
 
 /**
  * Square mark + wordmark, per BRAND-GUIDE.md: the mark variant is for
- * "avatar, favicon, app icon, compact navbar" — paired here with live text
+ * "avatar, favicon, app icon, compact navbar", paired here with live text
  * rather than the baked-in wordmark SVG so the tagline can change per spot.
  */
 export function Logo({ size = 34, tagline, className }: LogoProps) {

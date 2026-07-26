@@ -15,7 +15,7 @@ export function Proof() {
           </div>
           <p className={shared.secLede}>
             On completion you get a certificate listed on your profile and{" "}
-            <b>recognized in our hiring pipeline</b> — plus the artefacts below: real, reviewable
+            <b>recognized in our hiring pipeline</b>, plus the artefacts below: real, reviewable
             work a hiring manager or client can open and judge for themselves.
           </p>
         </div>
@@ -46,7 +46,7 @@ export function Proof() {
             <span className={styles.fig}>ARTEFACT 02</span>
             <h3>A triaged search-term report</h3>
             <p>
-              A harvested, pruned term list — exact matches locked, negatives justified, waste
+              A harvested, pruned term list: exact matches locked, negatives justified, waste
               explained line by line.
             </p>
             <div className={styles.mini}>
@@ -72,7 +72,7 @@ export function Proof() {
             <span className={styles.fig}>ARTEFACT 03</span>
             <h3>A bid log with rationale</h3>
             <p>
-              Every bid move you made, the data you saw, and the reason — the paper trail a client
+              Every bid move you made, the data you saw, and the reason: the paper trail a client
               trusts more than a result.
             </p>
             <div className={styles.mini}>
@@ -91,7 +91,7 @@ export function Proof() {
           </article>
 
           <p className={styles.note}>
-            <b>Honesty note —</b> verified student outcomes, when published, come only from the
+            <b>Honesty note:</b> verified student outcomes, when published, come only from the
             approved proof library with consent. We&rsquo;d rather show you the work you&rsquo;ll
             make than invent a result we can&rsquo;t stand behind.
           </p>

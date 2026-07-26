@@ -2,7 +2,7 @@
 
 /**
  * Scroll-triggered fade/slide-up wrapper for the landing page.
- * Wraps already-rendered server-component markup — only the observer
+ * Wraps already-rendered server-component markup. Only the observer
  * lives on the client. Reduced-motion users see full opacity from the
  * shared.module.css media query regardless of JS.
  */

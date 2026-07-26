@@ -10,21 +10,21 @@ interface QA {
 const FAQ: readonly QA[] = [
   {
     q: "Can I pay in installments?",
-    a: "No. One-time only. If ₱2,999 is too much right now, this isn't the right time — we don't want you paying for something you can't finish.",
+    a: "No. One-time only. If ₱2,999 is too much right now, this isn't the right time. We don't want you paying for something you can't finish.",
   },
   {
     q: "Do I get a certificate?",
     a: (
       <>
         Yes, on completion. We list it on your profile, and it&rsquo;s{" "}
-        <span className={styles.tl}>recognized in our hiring pipeline</span> — we hire from this
+        <span className={styles.tl}>recognized in our hiring pipeline</span>. We hire from this
         audience ourselves.
       </>
     ),
   },
   {
     q: "Is there a refund?",
-    a: "Yes — 7 days, no questions asked, if you've done less than 25% of the course. Past 25%, the content has been delivered, so we don't refund.",
+    a: "Yes, 7 days, no questions asked, if you've done less than 25% of the course. Past 25%, the content has been delivered, so we don't refund.",
   },
   {
     q: "Do I need to be in the Philippines to take this?",
@@ -32,7 +32,7 @@ const FAQ: readonly QA[] = [
   },
   {
     q: "What if I get stuck?",
-    a: "Email us — we respond within 1 business day. The Ultimate tier gets a faster channel and weekly live Q&A with Ryan.",
+    a: "Email us. We respond within 1 business day. The Ultimate tier gets a faster channel and weekly live Q&A with Ryan.",
   },
   {
     q: "Do you teach seller-side or agency-side?",

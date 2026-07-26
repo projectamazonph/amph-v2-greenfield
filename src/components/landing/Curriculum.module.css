@@ -44,7 +44,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(255, 107, 53, 0.04);
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
 }
 
 .mod {

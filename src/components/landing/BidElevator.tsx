@@ -18,12 +18,12 @@ import {
 
 const DEFAULTS = { budget: 120, bid: 0.85, targetPct: 30 };
 
-// Canvas 2D can't read CSS custom properties, so these mirror the hex
-// values of --ink-900 / --accent / --ink-500 / --border in globals.css.
-const INK = "#171717";
-const ORANGE = "#FF6B35";
-const MUTED = "#737373";
-const BORDER = "#E5E5E0";
+// Canvas 2D can't read CSS custom properties directly, so these are the
+// fallback values for --ink-900 / --accent / --ink-500 / --border in
+// globals.css; the actual tokens are read at runtime in the resize effect
+// below (same approach as the --font-mono lookup) so a token change there
+// doesn't silently drift from what the canvas draws.
+const FALLBACK_COLORS = { ink: "#171717", orange: "#FF6B35", muted: "#737373", border: "#E5E5E0" };
 
 const STATE_LABEL: Record<TermState, string> = { auto: "Auto", exact: "Exact", neg: "Neg" };
 const STATE_ORDER: readonly TermState[] = ["auto", "exact", "neg"];
@@ -52,6 +52,7 @@ export function BidElevator() {
   const dispBarsRef = useRef<Record<string, { spend: number; sales: number }>>({});
   const sizeRef = useRef({ cw: 0, ch: 0 });
   const monoFontRef = useRef("monospace");
+  const colorsRef = useRef(FALLBACK_COLORS);
 
   const kImpRef = useRef<HTMLDivElement>(null);
   const kClkRef = useRef<HTMLDivElement>(null);
@@ -79,6 +80,7 @@ export function BidElevator() {
     const { cw, ch } = sizeRef.current;
     if (!canvas || !ctx || !cw) return;
     const mono = monoFontRef.current;
+    const { ink, orange, muted, border } = colorsRef.current;
 
     ctx.clearRect(0, 0, cw, ch);
     const view = metrics.view;
@@ -95,9 +97,9 @@ export function BidElevator() {
 
     ctx.font = `9px ${mono}`;
     ctx.textBaseline = "middle";
-    ctx.strokeStyle = BORDER;
+    ctx.strokeStyle = border;
     ctx.lineWidth = 1;
-    ctx.fillStyle = MUTED;
+    ctx.fillStyle = muted;
     const ticks = 4;
     for (let i = 0; i <= ticks; i++) {
       const val = (axisMax * i) / ticks;
@@ -111,15 +113,11 @@ export function BidElevator() {
     }
 
     if (view.length === 0) {
-      ctx.fillStyle = MUTED;
+      ctx.fillStyle = muted;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.font = `11px ${mono}`;
-      ctx.fillText(
-        "All terms negated — set one back to Auto or Exact to model it.",
-        cw / 2,
-        ch / 2,
-      );
+      ctx.fillText("All terms negated. Set one back to Auto or Exact to model it.", cw / 2, ch / 2);
       return;
     }
 
@@ -137,10 +135,10 @@ export function BidElevator() {
       const xS = cx - bw - 2;
       const xA = cx + 2;
       const hS = (db.spend / axisMax) * plotH;
-      ctx.fillStyle = INK;
+      ctx.fillStyle = ink;
       ctx.fillRect(xS, padT + plotH - hS, bw, hS);
       const hA = (db.sales / axisMax) * plotH;
-      ctx.fillStyle = ORANGE;
+      ctx.fillStyle = orange;
       ctx.fillRect(xA, padT + plotH - hA, bw, hA);
 
       const be = v.breakEven;
@@ -148,7 +146,7 @@ export function BidElevator() {
       const hy = y(clamped ? axisMax : be);
       ctx.save();
       ctx.setLineDash([4, 3]);
-      ctx.strokeStyle = ORANGE;
+      ctx.strokeStyle = orange;
       ctx.lineWidth = 1.4;
       ctx.beginPath();
       ctx.moveTo(cx - slot * 0.34, hy);
@@ -156,7 +154,7 @@ export function BidElevator() {
       ctx.stroke();
       ctx.restore();
       if (clamped) {
-        ctx.fillStyle = ORANGE;
+        ctx.fillStyle = orange;
         ctx.font = `9px ${mono}`;
         ctx.textAlign = "center";
         ctx.fillText("▲", cx, hy - 4);
@@ -164,14 +162,14 @@ export function BidElevator() {
 
       ctx.font = `9px ${mono}`;
       ctx.textAlign = "center";
-      ctx.fillStyle = v.acos !== null && v.acos <= tgt ? INK : ORANGE;
+      ctx.fillStyle = v.acos !== null && v.acos <= tgt ? ink : orange;
       ctx.fillText(
         v.acos !== null ? `${v.acos.toFixed(0)}%` : "—",
         cx,
         padT - 2 < 10 ? 10 : padT - 2,
       );
 
-      ctx.fillStyle = MUTED;
+      ctx.fillStyle = muted;
       ctx.font = `8.5px ${mono}`;
       const label = v.term.length > 11 ? `${v.term.slice(0, 10)}…` : v.term;
       ctx.fillText(label, cx, ch - 12);
@@ -213,16 +211,25 @@ export function BidElevator() {
       ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
       sizeRef.current = { cw, ch };
     }
-    const monoVar = getComputedStyle(document.documentElement)
-      .getPropertyValue("--font-mono")
-      .trim();
+    const rootStyle = getComputedStyle(document.documentElement);
+    const monoVar = rootStyle.getPropertyValue("--font-mono").trim();
     if (monoVar) monoFontRef.current = monoVar;
+    const ink = rootStyle.getPropertyValue("--ink-900").trim();
+    const orange = rootStyle.getPropertyValue("--accent").trim();
+    const muted = rootStyle.getPropertyValue("--ink-500").trim();
+    const border = rootStyle.getPropertyValue("--border").trim();
+    colorsRef.current = {
+      ink: ink || FALLBACK_COLORS.ink,
+      orange: orange || FALLBACK_COLORS.orange,
+      muted: muted || FALLBACK_COLORS.muted,
+      border: border || FALLBACK_COLORS.border,
+    };
     resize();
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
 
-  // The interpolation + redraw loop — runs continuously so KPI numbers and
+  // The interpolation + redraw loop runs continuously so KPI numbers and
   // bars ease toward whatever the sliders currently target.
   useEffect(() => {
     let raf = 0;
@@ -411,7 +418,7 @@ export function BidElevator() {
 
           <div className={styles.harvest}>
             <h4>
-              Search-term harvest — <b>promote winners, cut the waste</b>
+              Search-term harvest: <b>promote winners, cut the waste</b>
             </h4>
             <div className={styles.tableWrap}>
               <table className={styles.table}>
@@ -450,6 +457,7 @@ export function BidElevator() {
                                 type="button"
                                 className={state === s ? styles.on : ""}
                                 data-state={s}
+                                aria-pressed={state === s}
                                 onClick={() => setRowState(row.id, s)}
                               >
                                 {STATE_LABEL[s]}

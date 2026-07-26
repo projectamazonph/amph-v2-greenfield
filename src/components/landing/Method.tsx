@@ -15,7 +15,7 @@ const STEPS = [
     n: "02",
     tag: "Decide",
     title: "Make the call in a simulator",
-    body: "Set bids, triage search terms, build a campaign from a brief — on safe, illustrative data. Wrong moves cost nothing here.",
+    body: "Set bids, triage search terms, build a campaign from a brief, all on safe, illustrative data. Wrong moves cost nothing here.",
     outLabel: "You produce",
     out: "A bid log with your reasoning written down",
   },
@@ -31,7 +31,7 @@ const STEPS = [
     n: "04",
     tag: "Repeat",
     title: "Carry the instinct to client work",
-    body: "By the time a real account is on the line, the pattern is muscle memory — not a screenshot you memorised.",
+    body: "By the time a real account is on the line, the pattern is muscle memory, not a screenshot you memorised.",
     outLabel: "You carry",
     out: "A certificate recognized in our hiring pipeline",
   },
@@ -47,7 +47,7 @@ export function Method() {
             <h2 className={shared.secTitle}>You don&rsquo;t just watch lessons.</h2>
           </div>
           <p className={shared.secLede}>
-            Five interactive simulators — the same tools we use on real client accounts. Practice
+            Five interactive simulators: the same tools we use on real client accounts. Practice
             with real data, <b>get scored instantly</b>, then carry the instinct into paid work.
             Here is the loop every module runs.
           </p>

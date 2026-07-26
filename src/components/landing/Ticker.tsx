@@ -26,7 +26,7 @@ function TickerSet() {
 
 /**
  * Illustrative-metrics marquee, purely decorative (aria-hidden). CSS-only
- * animation — no client JS needed to pause on hover.
+ * animation, no client JS needed to pause on hover.
  */
 export function Ticker() {
   return (

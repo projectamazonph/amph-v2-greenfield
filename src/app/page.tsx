@@ -1,5 +1,5 @@
 /**
- * Landing page — server component (per PRODUCT.md, the one documented
+ * Landing page: server component (per PRODUCT.md, the one documented
  * brand-register exception on this site). Only the top bar and the Bid
  * Elevator preview widget need client JS; every other section renders on
  * the server.

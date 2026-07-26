@@ -1,9 +1,8 @@
 import Image from "next/image";
+import { CheckIcon } from "./Icons";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Hero.module.css";
-
-const COURSES_URL = "https://projectamazonph.online";
 
 export function Hero() {
   return (
@@ -19,11 +18,11 @@ export function Hero() {
             <span className={styles.pen}>doing the work.</span>
           </h1>
           <p className={styles.body}>
-            Three tiers, one-time payment — no subscription. Build real campaign decisions across
+            Three tiers, one-time payment, no subscription. Build real campaign decisions across
             eight modules and five scored simulators before a client account is on the line.
           </p>
           <p className={styles.hook}>
-            Built for VAs aiming at <b>₱60k–₱80k / month</b> — not staying at ₱25k.
+            Built for VAs aiming at <b>₱60k–₱80k / month</b>, not staying at ₱25k.
           </p>
           <div className={styles.ctaRow}>
             <a href="#pricing" className={[shared.btn, shared.btnPrimary].join(" ")}>
@@ -34,19 +33,7 @@ export function Hero() {
             </a>
           </div>
           <p className={styles.note}>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
+            <CheckIcon />
             Certificates recognized in our hiring pipeline · agency-side work · PayMongo (Card +
             GCash).
           </p>
@@ -79,7 +66,7 @@ export function Hero() {
               priority
             />
             <figcaption className={shared.plateCap}>
-              FIG. 01 — operator&rsquo;s desk / live campaign view
+              FIG. 01: operator&rsquo;s desk / live campaign view
             </figcaption>
             <div className={styles.stat}>
               <small>Sample ACoS</small>

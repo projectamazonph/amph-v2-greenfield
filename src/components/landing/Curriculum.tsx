@@ -31,8 +31,8 @@ export function Curriculum() {
           </div>
           <p className={shared.secLede}>
             Modules 1–5 are <b>Foundations</b>; 6–8 are <b>Mastery</b>. No jumping around, no hidden
-            &ldquo;advanced&rdquo; paywall mid-course — the tier you pick decides how far you go,
-            not whether you can see the map.
+            &ldquo;advanced&rdquo; paywall mid-course. The tier you pick decides how far you go, not
+            whether you can see the map.
           </p>
         </div>
 

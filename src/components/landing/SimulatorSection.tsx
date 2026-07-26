@@ -47,11 +47,7 @@ const TOOLS: Tool[] = [
 
 export function SimulatorSection() {
   return (
-    <section
-      className={shared.sec}
-      id="simulator"
-      style={{ background: "linear-gradient(180deg, transparent, rgba(255,107,53,0.035))" }}
-    >
+    <section className={[shared.sec, styles.sectionTint].join(" ")} id="simulator">
       <div className={shared.wrap}>
         <div className={shared.secHead}>
           <div className={shared.stickyCol}>
@@ -60,7 +56,7 @@ export function SimulatorSection() {
           </div>
           <p className={shared.secLede}>
             This is a <b>public preview</b> of the Bid Elevator plus a search-term harvest. Drag the
-            budget and bid, then triage the table — promote winners to exact, cut the waste — and
+            budget and bid, then triage the table: promote winners to exact, cut the waste, and
             watch projected ACoS respond. The full scored versions of all five tools ship inside
             every tier.
           </p>
