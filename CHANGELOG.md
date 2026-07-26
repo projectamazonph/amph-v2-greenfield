@@ -4,6 +4,16 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-26: Landing page replaced with a field-manual-styled redesign (PR #194)
+
+- Replaced `src/app/page.tsx` end-to-end: new `TopBar` (sticky nav, mobile menu, scroll progress, Manila clock), `Ticker`, `Hero`, `StatsStrip` (animated count-up), `Method`, `SimulatorSection` with an interactive Bid Elevator preview (canvas chart, budget/bid/target-ACoS sliders, search-term harvest table), `Curriculum`, `WhoFor`, `Pricing`, `Mentor`, `Proof`, `FAQSection`, `DarkCTA`, and `Footer`. All built as Next.js components on the existing `globals.css` design tokens, not a separate palette, exercising the one documented brand-register exception in `PRODUCT.md`.
+- Old landing components (`Hero`, `Numbers`, `Audience`, `Practice`, the old `Curriculum`/`Pricing`/`FAQ`, `FinalCTA`, and their tests) removed entirely, replaced by the new set under `src/components/landing/`.
+- The Bid Elevator preview's math was extracted into a pure, unit-tested module (`bidElevator.logic.ts`, 12 tests). It's illustrative-only and intentionally separate from the real scored `src/domain/simulator/bid-elevator/` simulator (public, unauthenticated marketing widget vs. a signed-in student's graded attempt).
+- Brand kit assets wired in: logo SVGs, hero photography, and a favicon under `public/brand/` and `public/`; `layout.tsx` gained `manifest`/`icons` metadata and a JetBrains Mono 700 weight.
+- CodeRabbit review response: em-dashes removed from all new copy and comments (a real, previously-undocumented-to-us repo-wide rule already in `AGENTS.md`/`docs/voice-guide.md`); the "Email me the syllabus" CTA (which duplicated the primary CTA's destination while promising an email flow that doesn't exist) relabeled to "See what's inside" and repointed at `#curriculum`; a real `requestAnimationFrame` leak in `StatsStrip`'s count-up on unmount fixed; `aria-pressed` added to the Bid Elevator's Auto/Exact/Neg segmented buttons; the canvas now resolves its ink/accent/muted/border colors from the actual CSS custom properties at runtime instead of hardcoded hex (same pattern already used for the mono font); `COURSES_URL` and the check/cross icon SVGs, previously copy-pasted across 5 files, deduplicated into shared `constants.ts`/`Icons.tsx`.
+- After merge, restored two decorative details (the fixed dot-grid/noise background texture, two drifting "register mark" icons) that the first pass had simplified away relative to the reference design, per follow-up user feedback comparing the preview against the original mockup.
+- Squash-merged as `45e0504`. CI green throughout: typecheck, lint, full test suite (2954+ passing), build, E2E, Lighthouse.
+
 ### 2026-07-26: Finish the AMPH → Project Amazon PH Academy rename on customer-facing surfaces
 
 - PR #156 renamed "AMPH Academy" to "Project Amazon PH Academy" in most user-facing copy but missed two spots that still said the bare "AMPH" abbreviation: the logo text on `/checkout` (`CheckoutForm.tsx`, both the empty-state and confirm-purchase views) and the line-item description PayMongo shows the customer during hosted checkout (`PayMongoAdapter.ts`, `createCheckoutSession`). Both now read "Project Amazon PH Academy", matching the convention already used on `/login` and the admin sidebar.
