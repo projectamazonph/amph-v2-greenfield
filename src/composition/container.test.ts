@@ -64,6 +64,7 @@ import { InMemoryAttemptFeedbackRepository } from "@/infra/repositories/InMemory
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { InMemoryWebhookEventLog } from "@/infra/repositories/InMemoryWebhookEventLog";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
 import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHashGenerator";
@@ -190,6 +191,7 @@ export interface TestContainer extends AppContainer {
   mdxRenderer: IMdxContentRenderer;
   accessPolicy: StubAccessPolicy;
   auditLog: InMemoryAuditLog;
+  webhookEventLog: InMemoryWebhookEventLog;
   scenarioRepo: InMemorySimulatorScenarioRepository;
   simulatorAttemptRepo: InMemorySimulatorAttemptRepository;
   scorePolicyRepo: InMemoryScorePolicyRepository;
@@ -241,6 +243,7 @@ export function buildTestContainer(): TestContainer {
   // STORY-050a: audit log
   const auditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  const webhookEventLog = new InMemoryWebhookEventLog();
   // STORY-061: audit log viewer + CSV export
   const listAuditLogs = new ListAuditLogs({ auditLog });
   const exportAuditLogs = new ExportAuditLogs({ auditLog });
@@ -436,6 +439,7 @@ export function buildTestContainer(): TestContainer {
     simulatorRegistry: buildSimulatorRegistry(),
     auditLog,
     recordAuditLog,
+    webhookEventLog,
     listAuditLogs,
     exportAuditLogs,
     scenarioRepo,
