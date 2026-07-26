@@ -73,7 +73,7 @@ export class PayMongoAdapter implements IPaymentGateway {
               success_url: params.successUrl,
               failed_url: params.failedUrl,
               metadata: params.metadata,
-              description: `AMPH — ${params.courseTitle}`,
+              description: `Project Amazon PH Academy: ${params.courseTitle}`,
             },
           },
         }),
@@ -175,9 +175,7 @@ export class PayMongoAdapter implements IPaymentGateway {
 
     // Compute expected HMAC
     const signedPayload = `${timestamp}.${payload}`;
-    const expectedHmac = createHmac("sha256", webhookSecret)
-      .update(signedPayload)
-      .digest("hex");
+    const expectedHmac = createHmac("sha256", webhookSecret).update(signedPayload).digest("hex");
 
     // Constant-time comparison to prevent timing attacks
     if (!timingSafeEqual(Buffer.from(expectedHmac), Buffer.from(receivedHmac))) {
@@ -196,9 +194,7 @@ export class PayMongoAdapter implements IPaymentGateway {
     paymongoPaymentId: string;
     amountMinor: number;
     reason: string;
-  }): Promise<
-    Result<{ refundId: string; processedAt: Date }, PaymentGatewayError>
-  > {
+  }): Promise<Result<{ refundId: string; processedAt: Date }, PaymentGatewayError>> {
     return Result.err({
       kind: "paymongo_error",
       code: "not_implemented",
