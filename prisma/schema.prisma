@@ -403,6 +403,32 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+// ── Audit hardening: webhook event log ───────────────────────
+
+// Persists every inbound webhook payload independent of business-entity
+// state (Order, etc.), so a webhook that fails signature verification,
+// arrives before its order exists, or needs replaying leaves a durable
+// trace. rawPayload is String (not Json) so an unparseable body still
+// persists instead of being rejected by the column type.
+model WebhookEvent {
+  id              String    @id @default(cuid())
+  provider        String    // e.g. "paymongo"
+  eventType       String    // e.g. "checkout_session.completed", "invalid_signature", "invalid_json"
+  providerEventId String?   // e.g. PayMongo checkout session id, when known
+  signatureValid  Boolean
+  rawPayload      String
+
+  processedAt     DateTime?
+  processingError String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([provider, eventType])
+  @@index([providerEventId])
+  @@index([createdAt])
+  @@map("webhook_events")
+}
+
 model EmailLog {
   id        String   @id @default(cuid())
   to        String

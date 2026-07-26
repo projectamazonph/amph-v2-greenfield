@@ -55,6 +55,7 @@ import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepo
 import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
+import type { IWebhookEventLog } from "@/ports/repositories/IWebhookEventLog";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
@@ -79,6 +80,7 @@ import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepositor
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
+import { PrismaWebhookEventLog } from "@/infra/repositories/PrismaWebhookEventLog";
 import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
 import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSimulatorAttemptRepository";
 import { PrismaScorePolicyRepository } from "@/infra/repositories/PrismaScorePolicyRepository";
@@ -244,6 +246,7 @@ export interface AppContainer {
   badgeAwardRepo: IBadgeAwardRepository;
   certificateRepo: ICertificateRepository;
   auditLog: IAuditLog;
+  webhookEventLog: IWebhookEventLog;
   scenarioRepo: ISimulatorScenarioRepository;
   // STORY-064: simulator attempt infrastructure
   simulatorAttemptRepo: ISimulatorAttemptRepository;
@@ -412,6 +415,8 @@ function buildProductionContainer(): AppContainer {
   // STORY-050a: audit log (Postgres-backed in production via PrismaAuditLog)
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  // Audit hardening: persistent webhook event log (Postgres-backed in production)
+  const webhookEventLog: IWebhookEventLog = new PrismaWebhookEventLog(prisma);
   const listAuditLogs = new ListAuditLogs({ auditLog });
   const exportAuditLogs = new ExportAuditLogs({ auditLog });
   const scenarioRepo: ISimulatorScenarioRepository = new PrismaSimulatorScenarioRepository(prisma);
@@ -634,6 +639,7 @@ function buildProductionContainer(): AppContainer {
     recordAuditLog,
     listAuditLogs,
     exportAuditLogs,
+    webhookEventLog,
     scenarioRepo,
     simulatorAttemptRepo,
     scorePolicyRepo,
