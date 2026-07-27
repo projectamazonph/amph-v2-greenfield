@@ -1,53 +1,101 @@
-# Site map, by build status
+# Current site map
 
-Every route referenced across `docs/product-brief.md`, `docs/admin-backend.md` and `docs/sprint-plan.md`, color-coded against what's actually in `src/app` right now.
+**Reviewed:** 2026-07-27  
+**Ground truth:** the App Router files under `src/app/` and the successful `pnpm build` route manifest.
 
-```mermaid
-flowchart TD
-  ROOT(("Project Amazon PH Academy"))
+## Public and account routes
 
-  ROOT --> PUB["Public"]
-  PUB --> P1["/  landing"]
-  PUB --> P2["/pricing"]
-  PUB --> P3["/courses"]
-  PUB --> P4["/courses/[slug]"]
-  PUB --> P5["/signup"]
-  PUB --> P6["/login"]
-  PUB --> P7["/certificates/[hash]"]
+- `/` landing page
+- `/pricing`
+- `/courses`
+- `/courses/[slug]`
+- `/signup`
+- `/login`
+- `/admin-login`
+- `/verify-email`
+- `/verify-email/sent`
+- `/reset-password`
+- `/reset-password/[token]`
+- `/certificates/[hash]`
+- `/certificates/[hash]/pdf`
+- `/checkout`
+- `/checkout/success`
+- `/checkout/failed`
 
-  ROOT --> STU["Student (session required)"]
-  STU --> S1["/dashboard"]
-  STU --> S2["/courses/[slug]/lessons/[id]"]
-  STU --> S3["/courses/[slug]/lessons/[id]/quiz"]
-  STU --> S4["/profile"]
-  STU --> S5["/tools"]
-  S5 --> T1["/tools/bid-elevator"]
-  S5 --> T2["/tools/str-triage"]
-  S5 --> T3["/tools/campaign-builder"]
-  S5 --> T4["/tools/listing-audit"]
+Catalog and pricing pages depend on published course rows and active pricing-tier rows. Empty database state is rendered as an empty-state message, not a build failure.
 
-  ROOT --> ADM["Admin -- Sprint 10, requireAdmin()"]
-  ADM --> A1["/admin"]
-  ADM --> A2["/admin/users/[id]"]
-  ADM --> A3["/admin/courses/[id]"]
-  ADM --> A4["/admin/payments/[id]"]
-  ADM --> A5["/admin/refunds/[id]"]
-  ADM --> A6["/admin/simulators/[sim]"]
-  ADM --> A7["/admin/live-classes"]
-  ADM --> A8["/admin/discount-codes"]
-  ADM --> A9["/admin/badges"]
-  ADM --> A10["/admin/audit-log"]
-  ADM --> A11["/admin/settings"]
+## Student routes
 
-  classDef built stroke:#FF6B35,stroke-width:2.5px,fill:none;
-  classDef ready stroke:#404040,stroke-width:1.5px,fill:none;
-  classDef planned stroke:#D4D4D4,fill:none,stroke-dasharray: 3 3;
+- `/dashboard`
+- `/profile`
+- `/courses/[slug]/lessons/[lessonId]`
+- `/courses/[slug]/lessons/[lessonId]/quiz`
+- `/tools`
+- `/tools/bid-elevator`
+- `/tools/str-triage`
+- `/tools/campaign-builder`
+- `/tools/listing-audit`
+- `/tools/keyword-research`
 
-  class P1,P3,P4,P5,P7,S2 built
-  class P2,P6,S1,S3,S4,S5,T1,T2,T3,T4 ready
-  class ADM,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11 planned
-```
+The four first simulator URLs resolve to registered domain engines. Keyword Research has a page and action surface but currently reuses Listing Audit behavior rather than adding a fifth registry implementation.
 
-- **Built** (`src/app/page.tsx` exists): `/`, `/courses`, `/courses/[slug]`, `/courses/[slug]/lessons/[lessonId]`, `/signup`, `/certificates/[hash]` (+ its `/pdf` route).
-- **Backend-ready, no UI**: the use case exists (`Login`, `ListUserBadges`, the four `Simulator` classes, the quiz-attempt API route) but no page has been written.
-- **Planned**: the entire `/admin/*` tree — no directory, no `requireAdmin()`, nothing started (Sprint 10 in `docs/sprint-plan.md`).
+## Admin routes
+
+All `/admin/*` pages inherit the `requireAdmin()` gate in `src/app/admin/layout.tsx`.
+
+- `/admin`
+- `/admin/users`
+- `/admin/users/[id]`
+- `/admin/courses`
+- `/admin/courses/new`
+- `/admin/courses/[id]`
+- `/admin/courses/[id]/edit`
+- `/admin/courses/[id]/modules/new`
+- `/admin/courses/[id]/modules/[moduleId]`
+- `/admin/courses/[id]/modules/[moduleId]/edit`
+- `/admin/courses/[id]/modules/[moduleId]/lessons/new`
+- `/admin/courses/[id]/modules/[moduleId]/lessons/[lessonId]`
+- `/admin/courses/[id]/modules/[moduleId]/lessons/[lessonId]/edit`
+- `/admin/payments`
+- `/admin/payments/[id]`
+- `/admin/refunds`
+- `/admin/refunds/[orderId]`
+- `/admin/simulators`
+- `/admin/simulators/new`
+- `/admin/simulators/[id]/edit`
+- `/admin/live-classes`
+- `/admin/live-classes/new`
+- `/admin/live-classes/[id]/edit`
+- `/admin/discount-codes`
+- `/admin/discount-codes/new`
+- `/admin/discount-codes/[id]/edit`
+- `/admin/badges`
+- `/admin/badges/new`
+- `/admin/badges/[slug]/edit`
+- `/admin/audit-log`
+- `/admin/settings`
+- `/admin/settings/2fa-setup`
+
+There is no current admin email-template page under `src/app/admin`, despite the entity, repository, and use cases for email templates.
+
+## Route handlers and server endpoints
+
+- `/api/auth/signup`
+- `/api/auth/login`
+- `/api/auth/logout`
+- `/api/auth/admin-login`
+- `/api/health`
+- `/api/cron/live-class-reminders`
+- `/api/quizzes/[quizId]/attempt`
+- `/api/webhooks/paymongo`
+- `/actions/verifyEmail`
+- `/admin/audit-log/export`
+- `/certificates/[hash]/pdf`
+
+The health endpoint is a liveness response and does not query Postgres. The live-class cron requires `CRON_SECRET`; `vercel.json` schedules it daily at `0 8 * * *`.
+
+## Server actions
+
+Mutation and orchestration shims live in `src/app/actions/`. Current action files cover authentication, checkout and enrollment, verification and password reset, certificate revocation, module and lesson CRUD/reordering, course CRUD, discount codes, badges, live classes, simulator scenarios and attempts, refunds, audit-log viewing/export, and two-factor setup.
+
+The complete file inventory is intentionally kept in the source tree. `docs/api-reference.md` records the current groups and the known deviations from the original target design.

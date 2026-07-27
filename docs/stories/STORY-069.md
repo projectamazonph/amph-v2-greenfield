@@ -1,10 +1,14 @@
 # STORY-069: Campaign Builder Rebuild — Scoring Engine Integration
 
+## Status
+
+**Status:** ✅ Implemented in the current source. The Campaign Builder simulator computes score dimensions and `campaignBuilderAttempt()` wires the full attempt lifecycle. Authenticated user attribution remains a follow-up because the action currently uses `userId: "system"`.
+
 ## Context
 
 STORY-039 shipped the original Campaign Builder simulator. It generates a recommended campaign structure (campaigns, ad groups, keywords, match types, bids) from product inputs. It has no concept of user submission, per-dimension scoring, or the attempt lifecycle.
 
-This story rebuilds Campaign Builder to match the pattern used by STR Triage and Bid Elevator: the simulator generates ground truth AND per-dimension scores when user-adjusted campaign structures are supplied. A new `campaignBuilderAttempt()` server action wires it into the full lifecycle.
+This story rebuilds Campaign Builder to match the pattern used by STR Triage and Bid Elevator: the simulator generates ground truth and per-dimension scores when user-adjusted campaign structures are supplied. A new `campaignBuilderAttempt()` server action wires it into the full lifecycle.
 
 ## Design
 

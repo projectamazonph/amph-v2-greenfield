@@ -11,7 +11,8 @@
 - **Story**: STORY-062
 - **Sprint**: 13
 - **Points**: 1
-- **Status:** ⏳ Planned
+- **Status:** ✅ Implemented in the current source (`/admin/refunds`, `/admin/refunds/[orderId]`, list/process actions, and `ListRefundRequests`/`AdminProcessRefund`).
+- **Verified:** `pnpm typecheck`, `pnpm lint`, `pnpm test:arch`, and `pnpm build` pass on 2026-07-27.
 
 ## Goal
 

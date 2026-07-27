@@ -1,6 +1,16 @@
 # SESSION-HANDOVER.md
 
-**Updated:** 2026-07-26 (landing page replaced, PR #194). `main` @ `45e0504`. The public marketing landing page (`src/app/page.tsx`) was rebuilt end-to-end with a new field-manual-styled design; see "What changed this session (2026-07-26, landing page replacement)" below. `main` also picked up PR #195 (production-readiness lint sweep, documented in `CHANGELOG.md`) and #196 (finished the AMPH → Project Amazon PH Academy rename on `/checkout` and PayMongo line items, also in `CHANGELOG.md`) between this and the prior audit-hardening entry below. Neither is detailed as its own session-log section here. Before that: audit hardening series complete (PRs #185–#192, SignUp audit log, webhook event log, status-read validation, curriculum/Module-Lesson sync, 4 runbooks, opt-in admin TOTP 2FA). Operator-owned items: PayMongo live webhook secret rotation drill, first real admin user via the runbook's SQL path (`db:seed:admin` script is missing), launch comms.
+# Current audit addendum (2026-07-27)
+
+The repository was audited at commit `5b8072b` on branch `fix/appurl-helper`. The current source contains 68 App Router page/route files, 34 Prisma models, 20 migrations, the admin route tree, four registered simulator engines, and the four authored operational runbooks. The operator-reported production state below is historical handoff material and was not independently rechecked from this workstation.
+
+Quality checks for this audit: `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm prisma validate`, and `pnpm test:arch` pass. Vitest with `NODE_ENV=test` reports 2,962 passing, 2 skipped, and two Windows-only migration-contract failures caused by POSIX executable paths in the test file. Playwright was not verified because the required browser binaries are not installed.
+
+Current follow-ups are recorded in `docs/audit-2026-07-27-completeness-review.md`. The highest-impact items are authenticated ownership for simulator attempts, Prisma badge mutation methods, Prisma 7 adapter use in `scripts/seed-admin-user.mjs`, session revocation semantics, and first-time impersonation restore. This addendum supersedes older “missing admin panel,” “missing seed script,” “in-memory webhook,” and “no runbooks” statements in the historical sections below.
+
+---
+
+**Updated:** 2026-07-26 (historical handoff entry, landing page replaced, PR #194). `main` @ `45e0504`. The public marketing landing page (`src/app/page.tsx`) was rebuilt end-to-end with a new field-manual-styled design; see "What changed this session (2026-07-26, landing page replacement)" below. `main` also picked up PR #195 (production-readiness lint sweep, documented in `CHANGELOG.md`) and #196 (finished the AMPH → Project Amazon PH Academy rename on `/checkout` and PayMongo line items, also in `CHANGELOG.md`) between this and the prior audit-hardening entry below. Neither is detailed as its own session-log section here. Before that: audit hardening series complete (PRs #185–#192, SignUp audit log, webhook event log, status-read validation, curriculum/Module-Lesson sync, 4 runbooks, opt-in admin TOTP 2FA). Operator-owned items: PayMongo live webhook secret rotation drill, first real admin user via the runbook's SQL path (the `db:seed:admin` script now exists; its Prisma 7 adapter path still needs a smoke test), launch comms.
 
 ---
 

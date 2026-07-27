@@ -4,6 +4,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-27: Completeness audit and documentation synchronization
+
+- Audited the current route tree, composition root, Prisma schema and migrations, server actions, use cases, tests, and operational docs at commit `5b8072b`.
+- Replaced stale feature, API, schema, architecture, route-map, runbook, README, sprint, story, and handover claims with current-source status notes.
+- Recorded real follow-ups: Prisma badge mutation stubs, synthetic simulator ownership, direct Prisma construction in the admin seed script, session revocation and lockout semantics, first-time impersonation restore, the dashboard refund placeholder, and the quiz lesson placeholder.
+- Verification snapshot: typecheck, lint, build, Prisma validation, and architecture tests pass; Vitest has 2,962 passing and two Windows migration-contract path failures; Playwright was not verified because local browser binaries are unavailable.
+- Full evidence: `docs/audit-2026-07-27-completeness-review.md`.
+
 ### 2026-07-26: Landing page replaced with a field-manual-styled redesign (PR #194)
 
 - Replaced `src/app/page.tsx` end-to-end: new `TopBar` (sticky nav, mobile menu, scroll progress, Manila clock), `Ticker`, `Hero`, `StatsStrip` (animated count-up), `Method`, `SimulatorSection` with an interactive Bid Elevator preview (canvas chart, budget/bid/target-ACoS sliders, search-term harvest table), `Curriculum`, `WhoFor`, `Pricing`, `Mentor`, `Proof`, `FAQSection`, `DarkCTA`, and `Footer`. All built as Next.js components on the existing `globals.css` design tokens, not a separate palette, exercising the one documented brand-register exception in `PRODUCT.md`.
@@ -13,6 +21,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 - CodeRabbit review response: em-dashes removed from all new copy and comments (a real, previously-undocumented-to-us repo-wide rule already in `AGENTS.md`/`docs/voice-guide.md`); the "Email me the syllabus" CTA (which duplicated the primary CTA's destination while promising an email flow that doesn't exist) relabeled to "See what's inside" and repointed at `#curriculum`; a real `requestAnimationFrame` leak in `StatsStrip`'s count-up on unmount fixed; `aria-pressed` added to the Bid Elevator's Auto/Exact/Neg segmented buttons; the canvas now resolves its ink/accent/muted/border colors from the actual CSS custom properties at runtime instead of hardcoded hex (same pattern already used for the mono font); `COURSES_URL` and the check/cross icon SVGs, previously copy-pasted across 5 files, deduplicated into shared `constants.ts`/`Icons.tsx`.
 - After merge, restored two decorative details (the fixed dot-grid/noise background texture, two drifting "register mark" icons) that the first pass had simplified away relative to the reference design, per follow-up user feedback comparing the preview against the original mockup.
 - Squash-merged as `45e0504`. CI green throughout: typecheck, lint, full test suite (2954+ passing), build, E2E, Lighthouse.
+
 ### 2026-07-26: Simulator accuracy audit verification (docs only)
 
 - A pasted external review of the simulator subsystem (scoring inflation, dimension naming, Amazon PPC accuracy) was verified claim-by-claim against the source. Unlike the earlier infrastructure audit, **every substantive claim checked out** — hardcoded `explanation: 100` in all four simulators, 10–25% policy weight on that free dimension, `dataSufficiency`/`profitability` measuring completion rather than what they name, binary severity-based ground truth, invented keyword volumes, and an inverted backend search-terms rule.

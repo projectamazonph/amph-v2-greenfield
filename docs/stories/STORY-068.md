@@ -1,12 +1,16 @@
 # STORY-068: Bid Elevator Rebuild — Scoring Engine Integration
 
+## Status
+
+**Status:** ✅ Implemented in the current source. The Bid Elevator simulator computes score dimensions and `bidElevatorAttempt()` wires the full attempt lifecycle. Authenticated user attribution remains a follow-up because the action currently uses `userId: "system"`.
+
 ## Context
 
 STORY-037 shipped the original Bid Elevator simulator. It computes suggested bids and a flat 0-100 score based on ROAS hit. It has no concept of user submission, per-dimension scoring, or the attempt lifecycle (start → grade → feedback).
 
 STORY-065 built the scoring engine: `ScorePolicy`, `GradeSimulatorAttempt`, `ComposeAttemptFeedback`, `AttemptFeedback`. STORY-066 wired feedback composition into the action layer.
 
-This story rebuilds Bid Elevator to match the STR Triage pattern: the simulator's `run()` now computes ground-truth bid recommendations AND per-dimension scores when user-adjusted bids are supplied. A new `bidElevatorAttempt()` server action wires it into the full lifecycle.
+This story rebuilds Bid Elevator to match the STR Triage pattern: the simulator's `run()` now computes ground-truth bid recommendations and per-dimension scores when user-adjusted bids are supplied. A new `bidElevatorAttempt()` server action wires it into the full lifecycle.
 
 ## Design
 
