@@ -98,6 +98,20 @@ export class PrismaCertificateRepository implements ICertificateRepository {
     }
   }
 
+  async listAll(filters?: {
+    status?: "active" | "revoked";
+  }): Promise<Result<readonly Certificate[], CertificateRepositoryError>> {
+    try {
+      const rows: CertificateRow[] = await this.db.certificate.findMany({
+        where: filters?.status ? { status: filters.status } : undefined,
+        orderBy: { issuedAt: "desc" },
+      });
+      return Result.ok(rows.map((r) => this.mapRow(r)));
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   private mapRow(row: CertificateRow): Certificate {
     return {
       id: row.id,

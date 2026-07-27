@@ -89,7 +89,10 @@ function makeCourse(overrides: Partial<Course> = {}): Course {
 // ── Test doubles ───────────────────────────────────────────────────────────
 
 function buildCertRepo(
-  findByHashResult: Result<Certificate | null, { kind: "not_found" } | { kind: "db_error"; message: string }>,
+  findByHashResult: Result<
+    Certificate | null,
+    { kind: "not_found" } | { kind: "db_error"; message: string }
+  >,
 ): ICertificateRepository {
   return {
     create: vi.fn(async () => Result.ok({} as Certificate)),
@@ -97,12 +100,11 @@ function buildCertRepo(
     findByVerificationHash: vi.fn(async () => findByHashResult),
     findByUserId: vi.fn(async () => Result.ok([])),
     update: vi.fn(async (c: Certificate) => Result.ok(c)),
+    listAll: vi.fn(async () => Result.ok([])),
   };
 }
 
-function buildUserRepo(
-  findByIdResult: Result<User, UserError>,
-): UserRepository {
+function buildUserRepo(findByIdResult: Result<User, UserError>): UserRepository {
   return {
     findById: vi.fn(async () => findByIdResult),
     findByEmail: vi.fn(async () => Result.ok({} as User)),
@@ -112,9 +114,7 @@ function buildUserRepo(
   } as any;
 }
 
-function buildCourseRepo(
-  findByIdResult: Result<Course, CourseError>,
-): CourseRepository {
+function buildCourseRepo(findByIdResult: Result<Course, CourseError>): CourseRepository {
   return {
     listPublished: vi.fn(async () => Result.ok([])),
     listAll: vi.fn(async () => Result.ok([])),
@@ -127,22 +127,26 @@ function buildCourseRepo(
   };
 }
 
-function buildUseCase(overrides: {
-  certRepo?: ICertificateRepository;
-  userRepo?: UserRepository;
-  courseRepo?: CourseRepository;
-} = {}): {
+function buildUseCase(
+  overrides: {
+    certRepo?: ICertificateRepository;
+    userRepo?: UserRepository;
+    courseRepo?: CourseRepository;
+  } = {},
+): {
   useCase: VerifyCertificate;
   certRepo: ICertificateRepository;
   userRepo: UserRepository;
   courseRepo: CourseRepository;
 } {
   const cert = makeCertificate();
-  const certRepo =
-    overrides.certRepo ??
-    buildCertRepo(okHashResult<Certificate | null>(cert));
-  const userRepo = overrides.userRepo ?? buildUserRepo(Result.ok(makeUser()) as unknown as Result<User, UserError>);
-  const courseRepo = overrides.courseRepo ?? buildCourseRepo(Result.ok(makeCourse()) as unknown as Result<Course, CourseError>);
+  const certRepo = overrides.certRepo ?? buildCertRepo(okHashResult<Certificate | null>(cert));
+  const userRepo =
+    overrides.userRepo ??
+    buildUserRepo(Result.ok(makeUser()) as unknown as Result<User, UserError>);
+  const courseRepo =
+    overrides.courseRepo ??
+    buildCourseRepo(Result.ok(makeCourse()) as unknown as Result<Course, CourseError>);
 
   return {
     useCase: new VerifyCertificate({ certificateRepo: certRepo, userRepo, courseRepo }),
@@ -152,11 +156,21 @@ function buildUseCase(overrides: {
   };
 }
 
-function okHashResult<T>(value: T): Result<T, { kind: "not_found" } | { kind: "db_error"; message: string }> {
-  return Result.ok(value) as unknown as Result<T, { kind: "not_found" } | { kind: "db_error"; message: string }>;
+function okHashResult<T>(
+  value: T,
+): Result<T, { kind: "not_found" } | { kind: "db_error"; message: string }> {
+  return Result.ok(value) as unknown as Result<
+    T,
+    { kind: "not_found" } | { kind: "db_error"; message: string }
+  >;
 }
-function errHashResult<T>(error: { kind: "not_found" } | { kind: "db_error"; message: string }): Result<T, { kind: "not_found" } | { kind: "db_error"; message: string }> {
-  return Result.err(error) as unknown as Result<T, { kind: "not_found" } | { kind: "db_error"; message: string }>;
+function errHashResult<T>(
+  error: { kind: "not_found" } | { kind: "db_error"; message: string },
+): Result<T, { kind: "not_found" } | { kind: "db_error"; message: string }> {
+  return Result.err(error) as unknown as Result<
+    T,
+    { kind: "not_found" } | { kind: "db_error"; message: string }
+  >;
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────
@@ -240,7 +254,9 @@ describe("VerifyCertificate", () => {
   });
 
   it("returns db_error when the cert repo returns a db_error", async () => {
-    const certRepo = buildCertRepo(errHashResult<Certificate | null>({ kind: "db_error", message: "hash index down" }));
+    const certRepo = buildCertRepo(
+      errHashResult<Certificate | null>({ kind: "db_error", message: "hash index down" }),
+    );
     const { useCase } = buildUseCase({ certRepo });
 
     const result = await useCase.execute({ verificationHash: HASH });
@@ -253,7 +269,9 @@ describe("VerifyCertificate", () => {
   });
 
   it("returns user_not_found when the user does not exist (defensive)", async () => {
-    const userRepo = buildUserRepo(Result.err({ kind: "not_found" }) as unknown as Result<User, UserError>);
+    const userRepo = buildUserRepo(
+      Result.err({ kind: "not_found" }) as unknown as Result<User, UserError>,
+    );
     const { useCase } = buildUseCase({ userRepo });
 
     const result = await useCase.execute({ verificationHash: HASH });
@@ -262,7 +280,12 @@ describe("VerifyCertificate", () => {
   });
 
   it("returns db_error when the user repo returns a db_error", async () => {
-    const userRepo = buildUserRepo(Result.err({ kind: "db_error", message: "user db down" }) as unknown as Result<User, UserError>);
+    const userRepo = buildUserRepo(
+      Result.err({ kind: "db_error", message: "user db down" }) as unknown as Result<
+        User,
+        UserError
+      >,
+    );
     const { useCase } = buildUseCase({ userRepo });
 
     const result = await useCase.execute({ verificationHash: HASH });
@@ -275,7 +298,9 @@ describe("VerifyCertificate", () => {
   });
 
   it("returns course_not_found when the course does not exist (defensive)", async () => {
-    const courseRepo = buildCourseRepo(Result.err({ kind: "not_found" }) as unknown as Result<Course, CourseError>);
+    const courseRepo = buildCourseRepo(
+      Result.err({ kind: "not_found" }) as unknown as Result<Course, CourseError>,
+    );
     const { useCase } = buildUseCase({ courseRepo });
 
     const result = await useCase.execute({ verificationHash: HASH });
@@ -284,7 +309,12 @@ describe("VerifyCertificate", () => {
   });
 
   it("returns db_error when the course repo returns a db_error", async () => {
-    const courseRepo = buildCourseRepo(Result.err({ kind: "db_error", message: "course db down" }) as unknown as Result<Course, CourseError>);
+    const courseRepo = buildCourseRepo(
+      Result.err({ kind: "db_error", message: "course db down" }) as unknown as Result<
+        Course,
+        CourseError
+      >,
+    );
     const { useCase } = buildUseCase({ courseRepo });
 
     const result = await useCase.execute({ verificationHash: HASH });

@@ -20,7 +20,10 @@ export class InMemoryCertificateRepository implements ICertificateRepository {
       (c) => c.userId === cert.userId && c.courseId === cert.courseId,
     );
     if (duplicate) {
-      return Result.err({ kind: "db_error", message: "Certificate already exists for this user/course" });
+      return Result.err({
+        kind: "db_error",
+        message: "Certificate already exists for this user/course",
+      });
     }
     this.certs.set(cert.id, cert);
     return Result.ok(cert);
@@ -52,6 +55,17 @@ export class InMemoryCertificateRepository implements ICertificateRepository {
     }
     this.certs.set(cert.id, cert);
     return Result.ok(cert);
+  }
+
+  async listAll(filters?: {
+    status?: "active" | "revoked";
+  }): Promise<Result<readonly Certificate[], CertificateRepositoryError>> {
+    const all = [...this.certs.values()];
+    const filtered = filters?.status ? all.filter((c) => c.status === filters.status) : all;
+    // Newest first, matching the order used by findByUserId so the
+    // admin list view is consistent.
+    const sorted = filtered.sort((a, b) => b.issuedAt.getTime() - a.issuedAt.getTime());
+    return Result.ok(sorted);
   }
 
   /** Clear all certificates. Call between tests. */
