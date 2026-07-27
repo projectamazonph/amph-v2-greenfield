@@ -1,52 +1,104 @@
-# STORY-091 — Admin Quiz CRUD + Quiz Repository Gap
+# STORY-091 — Quiz admin: list / create / edit / delete + nested question/option editor
 
-**Status:** 🟡 In Progress (US-003 complete; US-004/005/006 pending)
+Status: Done · Sprint: 6/7/9 completeness gap · Depends on: US-003, US-004, US-005
 
-## Coverage in the Sprint-7/9 PRD
+## Summary
 
-This story covers the quiz-admin track in
-`.archon/ralph/sprints-6-7-9-completeness-gaps/prd.md`:
+Closes the "admin can't manage quizzes without SQL" gap by shipping the
+full admin surface for quizzes: a list page, a create page, an edit
+page with a nested question/option editor, and a delete action on the
+edit page (with the has_attempts guard surfaced to the UI).
 
-| US     | Title                                                                   | Status     |
-| ------ | ----------------------------------------------------------------------- | ---------- |
-| US-003 | Quiz repository: add update/delete/findAll + fix order persistence bug  | ✅ Done    |
-| US-004 | Quiz admin use cases + audit actions + container wiring                 | ⏳ Pending |
-| US-005 | Quiz admin server actions                                               | ⏳ Pending |
-| US-006 | Quiz admin pages: list, create, edit with nested question/option editor | ⏳ Pending |
+This story is the admin-facing half of the quiz CRUD trio:
 
-## US-003 — Quiz repository: add update/delete/findAll + fix order persistence bug
+- US-003 (`#219`) — repository: `update` / `delete` / `findAll` + the
+  `order: index` bug fix.
+- US-004 (`#220`) — use cases: `AdminListQuizzes`, `AdminGetQuiz`,
+  `AdminCreateQuiz`, `AdminUpdateQuiz`, `AdminDeleteQuiz` (all with
+  audit-log on every branch).
+- US-005 (`#221`) — server actions: 5 thin pass-throughs with server-side
+  admin gate and per-use-case error mapping.
+- **STORY-091 (US-006, this PR)** — pages: `/admin/quizzes`,
+  `/admin/quizzes/new`, `/admin/quizzes/[quizId]/edit`, plus a client
+  component (`QuizEditor`) for the nested question/option editor.
 
-### Scope
+## Pages shipped
 
-1. **Add three methods to the `IQuizRepository` port**: `findAll()`, `update(quiz)`, `delete(id)`. Add a `not_found` variant to `QuizRepositoryError` (matches the pattern in `ICertificateRepository` and others).
-2. **Implement the three methods in `InMemoryQuizRepository`**: full CRUD with `not_found` semantics on miss.
-3. **Implement the three methods in `PrismaQuizRepository`**: `update` uses `$transaction` to atomic-replace the children; `delete` relies on the Prisma schema's `onDelete: Cascade`; `findAll` mirrors `findByCourseId` without the `where` filter.
-4. **Fix the `order: 0` bug in `PrismaQuizRepository.create`**: questions and options were both hardcoded to `order: 0`, which made the `orderBy: { order: 'asc' }` clauses in `findById`/`findByCourseId` a no-op (every row had the same order). Now they use the array index — `qIndex` for questions, `oIndex` for options.
+| Path                           | Type   | Purpose                                                                                                 |
+| ------------------------------ | ------ | ------------------------------------------------------------------------------------------------------- |
+| `/admin/quizzes`               | server | list every quiz, joined with parent course; "+ Add quiz" CTA                                            |
+| `/admin/quizzes/new`           | server | form to create a quiz, course dropdown, nested question/option editor                                   |
+| `/admin/quizzes/[quizId]/edit` | server | edit title/passing score + re-order/replace questions/options, with delete button in a Danger Zone card |
 
-### Out of scope (deferred to other US)
+All three pages call `requireAdmin()` (the layout also does, but the
+explicit call makes the page-level intent obvious) and render error
+banners keyed by the `Result.error.kind` returned from the server
+action, mapped through a per-page `ERROR_MESSAGES` table to
+human-readable copy.
 
-- `findByCourseId` is untouched. US-003 only adds the missing methods and fixes the order bug.
-- The `order` fix is a behavior change for any caller that depended on the (broken) old behavior. There are no such callers in the repo today — `findById` and `findByCourseId` are the only readers, and both use `orderBy: { order: 'asc' }`, which is the correct behavior once `order` is set.
+## Client components
 
-### Verification
+- `src/components/admin/AdminQuizzesTable.tsx` — Astryx `Table` for the
+  list page, same column-based pattern as `AdminBadgesTable`.
+- `src/components/admin/QuizEditor.tsx` — nested editor: add/remove/
+  reorder questions, add/remove options per question, exactly one
+  correct answer per question (radio-button semantics). Serializes the
+  current state to a hidden `questionsJson` form input on every change
+  so the server action can consume it from a single `FormData`.
 
-- `pnpm tsc --noEmit` clean (no new errors)
-- `pnpm test:arch` 511/511 pass
-- `pnpm lint` clean
-- `pnpm vitest run src/infra/repositories/__tests__/InMemoryQuizRepository.test.ts src/infra/repositories/__tests__/PrismaQuizRepository.test.ts src/domain/entities/__tests__/Quiz.test.ts` — 40/40 pass
-- The new `PrismaQuizRepository` test file (hand-rolled fake PrismaClient) specifically asserts that:
-  - question 0 has `order=0`, question 1 has `order=1` (proves the bug fix)
-  - options within a question have orders `[0, 1]` and `[0, 1, 2]` (proves the bug fix for options)
-  - `findById` round-trips the question/option order
-  - `update` replaces both rows and children in a single transaction
-  - `delete` cascades to questions and options
-  - `update` and `delete` return `not_found` on miss
-  - `create` maps a thrown error to `db_error`
+## Audit log
 
-### Files
+Every `Admin*` use case called by these pages (`#220`) already calls
+`recordAuditLog` on success and on every error branch. The pages
+themselves do NOT need to add audit calls — the use cases own the
+audit contract. Verified via the unit tests in
+`src/usecases/__tests__/Admin{List,Get,Create,Update,Delete}Quiz.test.ts`
+(`assert(...) logs.some((l) => l.action === "quiz.*"))`).
 
-- `src/ports/repositories/IQuizRepository.ts` — port expansion
-- `src/infra/repositories/InMemoryQuizRepository.ts` — adapter impl
-- `src/infra/repositories/PrismaQuizRepository.ts` — adapter impl + order fix
-- `src/infra/repositories/__tests__/InMemoryQuizRepository.test.ts` — new tests
-- `src/infra/repositories/__tests__/PrismaQuizRepository.test.ts` — **new file** (was missing; the Prisma adapter had no unit tests before this)
+## Self-checks
+
+- **No cross-layer imports** in the new files. Pages import from
+  `src/app/actions/*` (page → action → use case → port), client
+  components import only React + `@astryxdesign/core`.
+- **No `actorId` accepted from the client** — all 5 server actions
+  inject `actorId` from the session inside the use case call. Grep
+  the new `*.action.ts` files: `actorId` only appears server-side.
+- **Every error kind handled at every call site** — the 3 page files
+  each have an `ERROR_MESSAGES: Record<string, string>` table that
+  covers every `*Error.kind` their action can return, including the
+  one-of-each validation kind from `CreateQuizError`. No silent
+  fallthrough.
+- **Editor discipline** — `QuizEditor` writes a JSON-serialized snapshot
+  to the hidden `questionsJson` field on every state change so the
+  server action can reconstruct the full quiz structure from a single
+  FormData (no multi-field encoding).
+- **Empty-state copy** — the list page shows "No quizzes yet" instead
+  of a blank table when the repo is empty.
+
+## Tests
+
+US-006 is a UI story, so the meaningful tests are the use-case unit
+tests (already in `src/usecases/__tests__/Admin*Quiz.test.ts`, 27 tests
+total) and the action tests (in `src/app/actions/__tests__/*Quiz*.test.ts`,
+24 tests total). The page components themselves are not unit-tested
+in this PR — they're thin server components and the editor is
+isolated enough to rely on the manual smoke-test path; the existing
+Playwright E2E suite (in US-010) will exercise the full flow.
+
+## Out of scope (handled in later stories)
+
+- US-002 (STORY-090) — student-facing quiz attempt flow + the
+  `submitQuizAttempt` server action + removing the legacy API route.
+  Different code path (LessonContent.tsx → /quiz page) and depends on
+  US-001 not US-005.
+- US-007 / US-008 / US-009 — certificate admin surface, parallel
+  track.
+- US-010 — final integration PR: E2E coverage of /admin/quizzes, the
+  student quiz flow, the certificate admin flow, and the audit-log
+  end-to-end check.
+
+## Refs
+
+- PRD: `.archon/ralph/sprints-6-7-9-completeness-gaps/prd.md` (US-006).
+- Stories: US-003 (#219), US-004 (#220), US-005 (#221).
+- Sibling meta-stories: STORY-090, STORY-092.
