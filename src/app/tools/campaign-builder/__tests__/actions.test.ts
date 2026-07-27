@@ -17,7 +17,12 @@ vi.mock("@/composition/container", () => ({
   getContainer: vi.fn(),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  getSessionUserId: vi.fn(),
+}));
+
 import { getContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { CampaignBuilderOutput } from "@/domain/simulator/campaign-builder/CampaignBuilderOutput";
 import { campaignBuilderAttempt, buildCampaign } from "../actions";
@@ -185,11 +190,26 @@ function setupGetContainer() {
 beforeEach(() => {
   vi.clearAllMocks();
   setupGetContainer();
+  (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue("user_123");
 });
 
 // ── campaignBuilderAttempt tests ───────────────────────────────────────
 
 describe("campaignBuilderAttempt", () => {
+  it("returns unauthorized when user is not authenticated", async () => {
+    (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    const result = await campaignBuilderAttempt({
+      productCategory: "Electronics",
+      productNiche: "wireless earbuds",
+      monthlyBudget: 3000,
+      targetingStrategy: "hybrid",
+      userAdjustedCampaigns: GT_CAMPAIGNS,
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("unauthorized");
+  });
+
   const validInput = {
     productCategory: "Electronics",
     productNiche: "wireless earbuds",

@@ -58,6 +58,7 @@ export type AuditAction =
   | "simulator.created"
   | "simulator.updated"
   | "simulator.archived"
+  | "simulator_attempt.started"
   | "live_class.created"
   | "live_class.updated"
   | "live_class.deleted"
@@ -113,6 +114,7 @@ export const ALL_ACTIONS: AuditAction[] = [
   "simulator.created",
   "simulator.updated",
   "simulator.archived",
+  "simulator_attempt.started",
   "live_class.created",
   "live_class.updated",
   "live_class.deleted",

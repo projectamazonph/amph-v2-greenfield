@@ -18,6 +18,7 @@
 import { z } from "zod";
 import { Result } from "@/domain/shared/Result";
 import { getContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type {
   CampaignBuilderInput,
@@ -66,6 +67,7 @@ export interface CampaignBuilderAttemptResult {
 
 export type CampaignBuilderAttemptResponse =
   | { ok: true; value: CampaignBuilderAttemptResult }
+  | { ok: false; error: { kind: "unauthorized" } }
   | {
       ok: false;
       error: {
@@ -137,9 +139,15 @@ export async function campaignBuilderAttempt(
   const resolvedMode: SimulatorMode = mode ?? "practice";
   const container = getContainer();
 
-  // ── 2. StartSimulatorAttempt ────────────────────────────────────────
+  // ── 2. Authenticate ─────────────────────────────────────────────────
+  const userId = await getSessionUserId();
+  if (!userId) {
+    return { ok: false, error: { kind: "unauthorized" } };
+  }
+
+  // ── 3. StartSimulatorAttempt ────────────────────────────────────────
   const startResult = await container.startSimulatorAttempt.execute({
-    userId: "system", // TODO: get from session (STORY-069 follow-up)
+    userId,
     simulatorId: "campaign-builder",
     scenarioId: scenarioId ?? "campaign-builder-scenario-default",
     mode: resolvedMode,

@@ -17,7 +17,12 @@ vi.mock("@/composition/container", () => ({
   getContainer: vi.fn(),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  getSessionUserId: vi.fn(),
+}));
+
 import { getContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import { bidElevatorAttempt, runBidElevator } from "../actions";
@@ -171,11 +176,26 @@ function setupGetContainer() {
 beforeEach(() => {
   vi.clearAllMocks();
   setupGetContainer();
+  // Authenticated by default for existing tests
+  (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue("user_123");
 });
 
 // ── bidElevatorAttempt tests ───────────────────────────────────────────
 
 describe("bidElevatorAttempt", () => {
+  it("returns unauthorized when user is not authenticated", async () => {
+    // Override the default auth mock to return null
+    (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    const result = await bidElevatorAttempt({
+      keywords: [{ keyword: "running shoes", currentBid: 1.0, currentCpc: 0.8, volume: 1000 }],
+      budget: 50,
+      targetRoas: 3.0,
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("unauthorized");
+  });
+
   const validInput = {
     keywords: [
       { keyword: "running shoes", currentBid: 1.0, currentCpc: 0.8, volume: 1000 },
