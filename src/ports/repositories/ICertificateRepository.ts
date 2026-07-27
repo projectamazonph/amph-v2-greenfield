@@ -7,12 +7,11 @@
  */
 
 import { Result } from "@/domain/shared/Result";
-import type { Certificate } from "@/domain/entities/Certificate";
+import type { Certificate, CertificateStatus } from "@/domain/entities/Certificate";
 
 /** Errors that can arise when reading or writing certificates. */
 export type CertificateRepositoryError =
-  | { kind: "not_found" }
-  | { kind: "db_error"; message: string };
+  { kind: "not_found" } | { kind: "db_error"; message: string };
 
 export interface ICertificateRepository {
   /**
@@ -39,13 +38,23 @@ export interface ICertificateRepository {
   /**
    * Find all certificates for a user, newest first.
    */
-  findByUserId(
-    userId: string,
-  ): Promise<Result<readonly Certificate[], CertificateRepositoryError>>;
+  findByUserId(userId: string): Promise<Result<readonly Certificate[], CertificateRepositoryError>>;
 
   /**
    * Persist changes to an existing certificate.
    * Used by RevokeCertificate (STORY-044).
    */
   update(cert: Certificate): Promise<Result<Certificate, CertificateRepositoryError>>;
+
+  /**
+   * List every certificate in the system, newest first.
+   *
+   * Intended for the admin certificate surface (STORY-092 / US-009).
+   * The student-facing `findByUserId` is preferred for student reads
+   * (cheaper, scoped). The optional `status` filter narrows the
+   * result to active or revoked certificates only.
+   */
+  listAll(filters?: {
+    status?: CertificateStatus;
+  }): Promise<Result<readonly Certificate[], CertificateRepositoryError>>;
 }
