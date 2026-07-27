@@ -1,5 +1,5 @@
-/**
- * StartSimulatorAttempt — begins a new simulator attempt for a student.
+﻿/**
+ * StartSimulatorAttempt ΓÇö begins a new simulator attempt for a student.
  *
  * STORY-064: Simulator Attempt Infrastructure.
  *
@@ -55,7 +55,7 @@ export class StartSimulatorAttempt {
   async execute(input: StartSimulatorAttemptInput): Promise<StartSimulatorAttemptResult> {
     const { attemptRepo, scenarioRepo, idGen, clock, recordAuditLog } = this.deps;
 
-    // ── 1. Scenario must exist ─────────────────────────────────
+    // ΓöÇΓöÇ 1. Scenario must exist ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const scenarioResult = await scenarioRepo.findById(input.scenarioId);
     if (Result.isErr(scenarioResult)) {
       return Result.err({ kind: "scenario_not_found" });
@@ -64,7 +64,7 @@ export class StartSimulatorAttempt {
       return Result.err({ kind: "scenario_not_found" });
     }
 
-    // ── 2. No existing in_progress attempt ─────────────────────
+    // ΓöÇΓöÇ 2. No existing in_progress attempt ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const existingResult = await attemptRepo.findByUserAndScenario(
       input.userId,
       input.simulatorId,
@@ -82,11 +82,11 @@ export class StartSimulatorAttempt {
       return Result.err({ kind: "already_in_progress" });
     }
 
-    // ── 3. Generate attemptId ───────────────────────────────────
+    // ΓöÇΓöÇ 3. Generate attemptId ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const id = idGen.newId();
     const attemptId = `ATT-${id.slice(0, 8).toUpperCase()}`;
 
-    // ── 4. Create attempt ───────────────────────────────────────
+    // ΓöÇΓöÇ 4. Create attempt ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const attemptResult = createSimulatorAttempt({
       id,
       attemptId,
@@ -96,8 +96,9 @@ export class StartSimulatorAttempt {
       scenarioVersion: 1,
       difficulty: scenarioResult.value.difficulty,
       mode: input.mode ?? "practice",
+      startedAt: clock.now(),
     });
-    // createSimulatorAttempt never fails — returns SimulatorAttempt directly
+    // createSimulatorAttempt never fails ΓÇö returns SimulatorAttempt directly
     const attempt = attemptResult;
 
     const createResult = await attemptRepo.create(attempt);
@@ -105,7 +106,7 @@ export class StartSimulatorAttempt {
       return Result.err(createResult.error as unknown as StartSimulatorAttemptError);
     }
 
-    // ── 5. Audit log ────────────────────────────────────────────
+    // ΓöÇΓöÇ 5. Audit log ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     await recordAuditLog.execute({
       actorId: input.userId,
       action: "simulator_attempt.started",

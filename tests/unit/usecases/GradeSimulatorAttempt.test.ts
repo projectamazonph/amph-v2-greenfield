@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GradeSimulatorAttempt use case tests.
  *
  * STORY-065: Scoring Engine + Dimensional Policies.
@@ -96,7 +96,11 @@ describe("GradeSimulatorAttempt", () => {
       Result.ok(gradedAttempt),
     );
 
-    const useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo });
+    const useCase = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo,
+      clock: { now: () => new Date() },
+    });
     const result = await useCase.execute({
       attemptId: "ATT-ABC123",
       scoreDimensions: { direction: 80, magnitude: 60, profitability: 50 },
@@ -114,7 +118,11 @@ describe("GradeSimulatorAttempt", () => {
     const scorePolicyRepo = makeScorePolicyRepo();
     (attemptRepo.findByAttemptId as ReturnType<typeof vi.fn>).mockResolvedValue(Result.ok(null));
 
-    const useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo });
+    const useCase = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo,
+      clock: { now: () => new Date() },
+    });
     const result = await useCase.execute({
       attemptId: "ATT-DNE",
       scoreDimensions: { direction: 80 },
@@ -133,7 +141,11 @@ describe("GradeSimulatorAttempt", () => {
       Result.ok(makeSubmittedAttempt({ status: "in_progress" })),
     );
 
-    const useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo });
+    const useCase = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo,
+      clock: { now: () => new Date() },
+    });
     const result = await useCase.execute({
       attemptId: "ATT-ABC123",
       scoreDimensions: { direction: 80 },
@@ -152,7 +164,11 @@ describe("GradeSimulatorAttempt", () => {
       Result.ok(makeSubmittedAttempt({ status: "graded" })),
     );
 
-    const useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo });
+    const useCase = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo,
+      clock: { now: () => new Date() },
+    });
     const result = await useCase.execute({
       attemptId: "ATT-ABC123",
       scoreDimensions: { direction: 80 },
@@ -174,7 +190,11 @@ describe("GradeSimulatorAttempt", () => {
       Result.ok(null),
     );
 
-    const useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo });
+    const useCase = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo,
+      clock: { now: () => new Date() },
+    });
     const result = await useCase.execute({
       attemptId: "ATT-ABC123",
       scoreDimensions: { direction: 80 },
@@ -196,7 +216,11 @@ describe("GradeSimulatorAttempt", () => {
       Result.ok(makePolicy()),
     );
 
-    const useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo });
+    const useCase = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo,
+      clock: { now: () => new Date() },
+    });
     const result = await useCase.execute({
       attemptId: "ATT-ABC123",
       scoreDimensions: { totallyFake: 50 },
@@ -217,7 +241,11 @@ describe("GradeSimulatorAttempt", () => {
       Result.err({ kind: "db_error", message: "Connection failed" }),
     );
 
-    const useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo });
+    const useCase = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo,
+      clock: { now: () => new Date() },
+    });
     const result = await useCase.execute({
       attemptId: "ATT-ABC123",
       scoreDimensions: { direction: 80 },

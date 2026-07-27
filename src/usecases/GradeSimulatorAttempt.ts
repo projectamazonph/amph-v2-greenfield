@@ -1,5 +1,5 @@
-/**
- * GradeSimulatorAttempt — scores a submitted attempt against its ScorePolicy.
+﻿/**
+ * GradeSimulatorAttempt ΓÇö scores a submitted attempt against its ScorePolicy.
  *
  * STORY-065: Scoring Engine + Dimensional Policies.
  *
@@ -17,13 +17,14 @@ import { getOverallScore, isPassed } from "@/domain/entities/ScorePolicy";
 import type { SimulatorAttempt, SimulatorAttemptError } from "@/domain/entities/SimulatorAttempt";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
+import type { Clock } from "@/ports/system/Clock";
 
-// ── Input / Output ──────────────────────────────────────────────────────
+// ΓöÇΓöÇ Input / Output ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 export interface GradeSimulatorAttemptInput {
   attemptId: string;
   /**
-   * Per-dimension raw scores (0–100). Keys must match the dimension names
+   * Per-dimension raw scores (0ΓÇô100). Keys must match the dimension names
    * defined in the ScorePolicy for this attempt's (simulatorId, difficulty, mode).
    */
   scoreDimensions: Record<string, number>;
@@ -32,6 +33,7 @@ export interface GradeSimulatorAttemptInput {
 export interface GradeSimulatorAttemptDeps {
   attemptRepo: ISimulatorAttemptRepository;
   scorePolicyRepo: IScorePolicyRepository;
+  clock: Clock;
 }
 
 export type GradeSimulatorAttemptError =
@@ -50,7 +52,7 @@ export interface GradeSimulatorAttemptResult {
   readonly gradedAt: Date;
 }
 
-// ── Use Case ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Use Case ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 export class GradeSimulatorAttempt {
   constructor(private readonly deps: GradeSimulatorAttemptDeps) {}
@@ -58,9 +60,9 @@ export class GradeSimulatorAttempt {
   async execute(
     input: GradeSimulatorAttemptInput,
   ): Promise<Result<GradeSimulatorAttemptResult, GradeSimulatorAttemptError>> {
-    const { attemptRepo, scorePolicyRepo } = this.deps;
+    const { attemptRepo, scorePolicyRepo, clock } = this.deps;
 
-    // ── 1. Load attempt ──────────────────────────────────────────
+    // ΓöÇΓöÇ 1. Load attempt ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const attemptResult = await attemptRepo.findByAttemptId(input.attemptId);
     if (Result.isErr(attemptResult)) {
       return Result.err(mapDbError(attemptResult.error));
@@ -71,7 +73,7 @@ export class GradeSimulatorAttempt {
 
     const attempt = attemptResult.value;
 
-    // ── 2. Assert status is submitted ────────────────────────────
+    // ΓöÇΓöÇ 2. Assert status is submitted ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     if (attempt.status === "in_progress") {
       return Result.err({ kind: "attempt_not_submitted" });
     }
@@ -82,7 +84,7 @@ export class GradeSimulatorAttempt {
       return Result.err({ kind: "attempt_not_submitted" });
     }
 
-    // ── 3. Find ScorePolicy ──────────────────────────────────────
+    // ΓöÇΓöÇ 3. Find ScorePolicy ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const policyResult = await scorePolicyRepo.findBySimulatorAndDifficulty(
       attempt.simulatorId,
       attempt.difficulty,
@@ -96,7 +98,7 @@ export class GradeSimulatorAttempt {
       return Result.err({ kind: "policy_not_found" });
     }
 
-    // ── 4. Validate dimension keys ────────────────────────────────
+    // ΓöÇΓöÇ 4. Validate dimension keys ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const unknownKeys = Object.keys(input.scoreDimensions).filter(
       (k) => !(k in policy.dimensionConfig),
     );
@@ -104,15 +106,19 @@ export class GradeSimulatorAttempt {
       return Result.err({ kind: "invalid_dimensions", missing: unknownKeys });
     }
 
-    // ── 5. Compute overall score ──────────────────────────────────
+    // ΓöÇΓöÇ 5. Compute overall score ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const overallScore = getOverallScore(input.scoreDimensions, policy);
     const passed = isPassed(overallScore, policy);
-    const gradedAt = new Date();
+    // Timestamp is the use case's responsibility (not the repo's).
+    // Source: the injected Clock port, so this is deterministic
+    // under test fakes and traceable to the system clock in prod.
+    const gradedAt = clock.now();
 
-    // ── 6. Persist grade ─────────────────────────────────────────
+    // ΓöÇΓöÇ 6. Persist grade ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const updateResult = await attemptRepo.updateStatus(attempt.id, "graded", {
       score: overallScore,
       scoreDimensions: input.scoreDimensions,
+      gradedAt,
     });
 
     if (Result.isErr(updateResult)) {
@@ -134,7 +140,7 @@ export class GradeSimulatorAttempt {
   }
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 function mapDbError(err: SimulatorAttemptError): GradeSimulatorAttemptError {
   if (err.kind === "db_error") {

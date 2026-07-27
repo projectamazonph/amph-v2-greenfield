@@ -1,5 +1,5 @@
-/**
- * StartSimulatorAttempt — opens an in_progress attempt for a student.
+﻿/**
+ * StartSimulatorAttempt ΓÇö opens an in_progress attempt for a student.
  * STORY-064.
  *
  * Convention: hand-wire fakes per file (matches AdminArchiveBadge.test.ts).
@@ -100,6 +100,7 @@ describe("StartSimulatorAttempt", () => {
     expect(r.value.scoreDimensions).toBeNull();
     expect(r.value.decisions).toEqual([]);
     expect(r.value.attemptId).toMatch(/^ATT-[A-Z0-9]{1,8}$/);
+    // Clock is honored: startedAt is the injected FixedClock value, not a fresh Date.now().
     expect(r.value.startedAt).toEqual(new Date("2025-01-01T00:00:00Z"));
     expect(r.value.submittedAt).toBeNull();
     expect(r.value.gradedAt).toBeNull();
@@ -133,6 +134,7 @@ describe("StartSimulatorAttempt", () => {
       simulatorId: "bid-elevator",
       scenarioId: "scn_1",
       seed: "SEED0000",
+      startedAt: new Date("2024-12-31T00:00:00Z"),
     });
     attemptRepo.create(existing);
 

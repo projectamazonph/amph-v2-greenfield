@@ -1,5 +1,5 @@
-/**
- * InMemorySimulatorAttemptRepository — fast, synchronous fake for unit tests.
+﻿/**
+ * InMemorySimulatorAttemptRepository ΓÇö fast, synchronous fake for unit tests.
  *
  * STORY-064: Simulator Attempt Infrastructure.
  *
@@ -34,7 +34,7 @@ export class InMemorySimulatorAttemptRepository implements ISimulatorAttemptRepo
   /** Index: attemptId -> id (human-readable lookup) */
   private attemptIdIndex = new Map<string, string>();
 
-  // ── Test helpers ──────────────────────────────────────────────
+  // ΓöÇΓöÇ Test helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   /** Pre-populate the store. Useful for tests that need existing data. */
   seed(attempts: SimulatorAttempt[]): void {
@@ -50,7 +50,7 @@ export class InMemorySimulatorAttemptRepository implements ISimulatorAttemptRepo
     this.attemptIdIndex.clear();
   }
 
-  // ── Repository methods ────────────────────────────────────────
+  // ΓöÇΓöÇ Repository methods ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   async create(
     attempt: SimulatorAttempt,
@@ -124,7 +124,12 @@ export class InMemorySimulatorAttemptRepository implements ISimulatorAttemptRepo
   async updateStatus(
     id: string,
     status: AttemptStatus,
-    options?: { score?: number; scoreDimensions?: ScoreDimensions },
+    options?: {
+      score?: number;
+      scoreDimensions?: ScoreDimensions;
+      submittedAt?: Date;
+      gradedAt?: Date;
+    },
   ): Promise<Result<SimulatorAttempt, SimulatorAttemptError>> {
     const attempt = this.attempts.get(id);
     if (!attempt) {
@@ -137,12 +142,16 @@ export class InMemorySimulatorAttemptRepository implements ISimulatorAttemptRepo
       return Result.err({ kind: "invalid_status_transition" });
     }
 
-    const now = new Date();
+    // Timestamps are caller-supplied (use case passes clock.now()).
+    // The repo MUST NOT call new Date() ΓÇö that would defeat the Clock port.
     const updatedAttempt: SimulatorAttempt = {
       ...attempt,
       status,
-      submittedAt: status === "submitted" ? now : attempt.submittedAt,
-      gradedAt: status === "graded" ? now : attempt.gradedAt,
+      submittedAt:
+        status === "submitted"
+          ? (options?.submittedAt ?? attempt.submittedAt)
+          : attempt.submittedAt,
+      gradedAt: status === "graded" ? (options?.gradedAt ?? attempt.gradedAt) : attempt.gradedAt,
       score: options?.score ?? attempt.score,
       scoreDimensions: options?.scoreDimensions ?? attempt.scoreDimensions,
     };

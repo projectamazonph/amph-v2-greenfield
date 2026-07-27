@@ -1,4 +1,4 @@
-/**
+﻿/**
  * src/composition/container.test.ts
  *
  * The test container builder. Lives in its own file so that
@@ -27,7 +27,7 @@ import type { CertificateHashGenerator } from "@/ports/security/CertificateHashG
 import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
 // STORY-012: MDX renderer. The test container uses the same
 // NextMdxRenderer as production because the renderer has no IO
-// and is fast in-process — no need for a separate test double.
+// and is fast in-process ΓÇö no need for a separate test double.
 import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
 import { NextMdxRenderer } from "@/infra/rendering/NextMdxRenderer";
 import type { EmailSender } from "@/ports/email/EmailSender";
@@ -244,7 +244,7 @@ export function buildTestContainer(): TestContainer {
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new StaticCertificateRenderer();
   // STORY-012: same NextMdxRenderer as production. No IO, no
-  // stub needed — the test container just hands every test a
+  // stub needed ΓÇö the test container just hands every test a
   // shared, fresh instance with no state leaking between suites.
   const mdxRenderer: IMdxContentRenderer = new NextMdxRenderer();
   const emailSender: EmailSender = new InMemoryEmailSender();
@@ -253,7 +253,7 @@ export function buildTestContainer(): TestContainer {
   );
   const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
   // FakeTotpService (deterministic fixed code), not the real otpauth
-  // adapter — tests exercising 2FA-gated login need a stable code to
+  // adapter ΓÇö tests exercising 2FA-gated login need a stable code to
   // assert against rather than dealing with real time-based codes.
   const totpService: TotpService = new FakeTotpService();
   // STORY-050a: audit log
@@ -278,7 +278,7 @@ export function buildTestContainer(): TestContainer {
 
   // STORY-049 + STORY-062: build RefundOverride once. The
   // `refundOverride` container entry and `adminProcessRefund` share
-  // the same instance — matches the production container's wiring.
+  // the same instance ΓÇö matches the production container's wiring.
   const refundOverride = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
 
   return {
@@ -512,10 +512,14 @@ export function buildTestContainer(): TestContainer {
       recordAuditLog,
     }),
     saveSimulatorDecision: new SaveSimulatorDecision({ attemptRepo: simulatorAttemptRepo }),
-    submitSimulatorAttempt: new SubmitSimulatorAttempt({ attemptRepo: simulatorAttemptRepo }),
+    submitSimulatorAttempt: new SubmitSimulatorAttempt({
+      attemptRepo: simulatorAttemptRepo,
+      clock,
+    }),
     gradeSimulatorAttempt: new GradeSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,
+      clock,
     }),
     composeAttemptFeedback: new ComposeAttemptFeedback({
       attemptRepo: simulatorAttemptRepo,

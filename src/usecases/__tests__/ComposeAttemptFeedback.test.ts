@@ -31,6 +31,7 @@ function makeGradedAttempt(
     difficulty: overrides.difficulty ?? "beginner",
     mode: overrides.mode ?? "practice",
     seed: "SEED0001",
+    startedAt: new Date("2025-02-01T00:00:00Z"),
   });
   return {
     ...base,

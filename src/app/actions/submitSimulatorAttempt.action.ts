@@ -1,5 +1,5 @@
-/**
- * submitSimulatorAttempt — server action.
+﻿/**
+ * submitSimulatorAttempt ΓÇö server action.
  *
  * STORY-064: Simulator Attempt Infrastructure.
  */
@@ -46,6 +46,7 @@ export async function submitSimulatorAttempt(
 
   const uc = new SubmitSimulatorAttempt({
     attemptRepo: container.simulatorAttemptRepo,
+    clock: container.clock,
   });
 
   const result = await uc.execute({

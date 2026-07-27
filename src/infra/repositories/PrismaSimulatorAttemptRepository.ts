@@ -1,5 +1,5 @@
-/**
- * PrismaSimulatorAttemptRepository — production adapter for ISimulatorAttemptRepository.
+﻿/**
+ * PrismaSimulatorAttemptRepository ΓÇö production adapter for ISimulatorAttemptRepository.
  *
  * STORY-064: Simulator Attempt Infrastructure.
  *
@@ -190,7 +190,12 @@ export class PrismaSimulatorAttemptRepository implements ISimulatorAttemptReposi
   async updateStatus(
     id: string,
     status: string,
-    options?: { score?: number; scoreDimensions?: Record<string, unknown> },
+    options?: {
+      score?: number;
+      scoreDimensions?: Record<string, unknown>;
+      submittedAt?: Date;
+      gradedAt?: Date;
+    },
   ): Promise<Result<SimulatorAttempt, SimulatorAttemptError>> {
     try {
       // First check the current status to validate the transition
@@ -211,12 +216,14 @@ export class PrismaSimulatorAttemptRepository implements ISimulatorAttemptReposi
         return Result.err({ kind: "invalid_status_transition" });
       }
 
+      // Timestamps are caller-supplied (use case passes clock.now()).
+      // The repo MUST NOT call new Date() ΓÇö that would defeat the Clock port.
       const row = await this.db.simulatorAttempt.update({
         where: { id },
         data: {
           status,
-          submittedAt: status === "submitted" ? new Date() : undefined,
-          gradedAt: status === "graded" ? new Date() : undefined,
+          submittedAt: status === "submitted" ? options?.submittedAt : undefined,
+          gradedAt: status === "graded" ? options?.gradedAt : undefined,
           score: options?.score,
           scoreDimensions:
             (options?.scoreDimensions as unknown as Prisma.InputJsonValue) ?? undefined,
