@@ -41,5 +41,13 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "docs/ui-specs/refs"]
+  "exclude": [
+    "node_modules",
+    "docs/ui-specs/refs",
+    // Composio WIP — @composio/core not yet installed. Exclude the adapter,
+    // its test, and the action to prevent build errors.
+    "src/infra/integrations/ComposioClientAdapter.ts",
+    "src/infra/integrations/__tests__/ComposioClientAdapter.test.ts",
+    "src/app/actions/composioCreateSession.action.ts",
+  ]
 }
