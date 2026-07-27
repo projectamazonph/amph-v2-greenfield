@@ -66,6 +66,9 @@ src/app/admin/
 │   ├── page.tsx
 │   ├── new/page.tsx
 │   └── [id]/edit/page.tsx
+├── certificates/
+│   ├── page.tsx
+│   └── [id]/page.tsx
 ├── audit-log/
 │   ├── page.tsx
 │   └── export/route.ts             # GET ?query... returns CSV
@@ -298,6 +301,22 @@ Table: slug, title, icon, isActive, awards count, criteria (human-readable summa
 ### Editor
 
 Form: slug, title, description, icon (Phosphor icon name), criteria (JSON, validated against the badge criteria schema), isActive. Audit-logged on save.
+
+## Certificates
+
+Certificate management lives at `/admin/certificates` (STORY-092), driven by the `AdminListCertificates` + `AdminGetCertificate` use cases. The list/detail/revoke flow is intentionally read-mostly — issuance happens automatically via `IssueCertificate` when a course is completed; revocations go through the existing `RevokeCertificate` use case + `revokeCertificateAction`.
+
+### List page (`/admin/certificates`)
+
+Table of every issued certificate: student (name + email + user id), course (title + course id), status (active/revoked badge), issued date, verification hash (truncated to `abcdef12…wxyz` form, with the full hash in the `title` attribute), and a View link to the detail page. Tab nav at the top: All | Active | Revoked, each showing a live count from `AdminListCertificates.execute({ status })`. Empty state shows "No certificates match the current filter."
+
+### Detail page (`/admin/certificates/[id]`)
+
+Server component. Loads the cert via `AdminGetCertificate` (notFound() on `certificate_not_found`). Renders three Card sections: Certificate (id, status, issued at, full verification hash, revoked-at + revoked-reason if revoked), Student (name, email, id), and Course (title, slug, id). For active certs, a fourth Card hosts the Revoke form (required `<textarea name="reason">`) which posts to the existing `revokeCertificateAction`. The form is hidden when the cert is already revoked; the detail view instead shows the recorded revocation timestamp + reason. Success/error feedback via `?revoked=1` and `?error=<kind>` search params, matching the `/admin/refunds/[orderId]` pattern (STORY-062).
+
+### Audit log
+
+Every successful revoke (including the `wasAlreadyRevoked: true` idempotent-replay case) writes a `certificate.revoked` audit entry with metadata `{ reason, courseId, userId, wasAlreadyRevoked }` and the revoking admin's id as `actorId`. Closes the audit-log gap that the original `RevokeCertificate` use case intentionally left to the caller (STORY-044 deferred it).
 
 ## Audit Log
 
