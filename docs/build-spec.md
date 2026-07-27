@@ -76,7 +76,13 @@ src/domain/
 │   ├── StrTriage.ts
 │   ├── CampaignBuilder.ts
 │   ├── ListingAudit.ts
-│   └── KeywordResearch.ts
+│   └── KeywordResearch.ts          # not a separate domain module; thin
+│                                   # server-action alias reusing ListingAudit
+│                                   # (see §Simulators)
+│
+│ NOTE: All four simulators score the `explanation` dimension as 0 because
+│ no student text input exists yet (STORY-079–084, planned Sprint 14–16).
+│ `getOverallScore()` weights sum to 1.0; scores are capped at 100 correctly.
 ├── progress/
 │   ├── ProgressEvent.ts
 │   ├── XPEvent.ts
@@ -210,7 +216,8 @@ src/usecases/
 │   ├── RunStrTriage.ts
 │   ├── RunCampaignBuilder.ts
 │   ├── RunListingAudit.ts
-│   └── RunKeywordResearch.ts
+│   # RunKeywordResearch does not exist; keyword-research calls the
+│   # simulator directly from its server action (no separate use case)
 ├── progress/
 │   ├── MarkLessonComplete.ts
 │   ├── RecordQuizAttempt.ts
@@ -439,8 +446,12 @@ export type Container = {
   streak: StreakService;
 };
 
-export function buildContainer(): Container { /* ... */ }
-export function buildTestContainer(overrides?: Partial<Container>): Container { /* ... */ }
+export function buildContainer(): Container {
+  /* ... */
+}
+export function buildTestContainer(overrides?: Partial<Container>): Container {
+  /* ... */
+}
 ```
 
 ### `requestContainer.ts`
@@ -454,8 +465,7 @@ export const container = {
     if (!c) throw new Error("No container in scope");
     return c;
   },
-  run: <T>(c: Container, fn: () => Promise<T>): Promise<T> =>
-    als.run(c, fn) as Promise<T>,
+  run: <T>(c: Container, fn: () => Promise<T>): Promise<T> => als.run(c, fn) as Promise<T>,
 };
 ```
 
@@ -474,26 +484,31 @@ Use cases and pages get the container via `container.get()`. No globals, no sing
 ## 7. The SOLID Contract
 
 ### Single Responsibility
+
 - One class per file. Always.
 - Repositories own one table each.
 - Use cases orchestrate; they do not implement IO.
 - Adapters translate between outside world and domain.
 
 ### Open/Closed
+
 - New payment gateway = new adapter in `src/infra/<provider>/`. No edits to use cases or the app.
 - New simulator = one new file in `src/domain/simulators/<name>/` + one entry in the registry. No edits to the tools page, access policy, or API.
 - New admin feature = one server action + one page; use cases are unchanged.
 
 ### Liskov Substitution
+
 - Every port has a `Fake*` implementation. The fake and the real must honor the same postconditions.
 - Tests for the use case run against the fake. Integration tests run against the real. The contract is the port.
 
 ### Interface Segregation
+
 - Repositories are split per use case, not one god `PrismaClient`.
 - `EnrollmentRepository` is not `UserRepository`. `CourseRepository` is not `ModuleRepository`.
 - If a use case only needs `findById`, it depends on a port that exposes `findById`, not a port that exposes 20 methods.
 
 ### Dependency Inversion
+
 - `src/domain/`, `src/ports/`, `src/usecases/` never import from `next/*`, `@prisma/*`, `paymongo`, `resend`, `@sentry/*`, `server-only`. ESLint blocks it. ADR-016.
 
 ---
@@ -501,15 +516,18 @@ Use cases and pages get the container via `container.get()`. No globals, no sing
 ## 8. Testing Strategy
 
 ### Unit tests (Vitest, next to source)
+
 - Every domain function: 100% branch coverage. They are pure.
 - Every use case: with `buildTestContainer()`. Cover happy path + every error case + idempotency if applicable.
 - Every adapter: integration test against the real SDK (PayMongo sandbox, Resend test mode). Plus unit test for the in-memory fake to confirm the fake matches the port contract.
 
 ### Integration tests (Vitest, `tests/integration/`)
+
 - Use case flow: `SignUp → VerifyEmail → StartCheckout → HandlePaymentWebhook → EnrollStudent → MarkLessonComplete → IssueCertificate`. Real Postgres in CI, real PayMongo sandbox for the payment step (or `FakePayMongoGateway` if the sandbox is down).
 - Tenant isolation: every server action, every route handler, every Prisma query that touches user-owned data goes through a guard. The test asserts the guard.
 
 ### E2E tests (Playwright, `tests/e2e/`)
+
 - 6 critical journeys at 3 viewports (375×812, 768×1024, 1280×800):
   1. Anonymous → pricing → signup → empty dashboard
   2. Signup → checkout (PayMongo test mode) → enrollment → first lesson
@@ -520,6 +538,7 @@ Use cases and pages get the container via `container.get()`. No globals, no sing
 - axe accessibility checks on every E2E.
 
 ### Coverage gates (CI, fail build)
+
 - `src/domain/`: 100% lines, 100% branches.
 - `src/usecases/`: 90% lines, 85% branches.
 - `src/lib/`: 90% lines, 80% branches.
@@ -565,6 +584,7 @@ If the bug is in a page: the fix is a page change. Page bugs do not ripple.
 12 sprints, 60 stories, 60 points. One point per story. Sprint length: ~1 calendar week.
 
 The cadence is:
+
 1. Pick up the next story from `docs/sprint-plan.md`.
 2. Open the story file. Read acceptance criteria, files touched, code shape, pitfalls, verification, DoD.
 3. Build it. Test it. Commit. PR. Merge.
@@ -577,27 +597,27 @@ Stories are 1 point by design. If a story is bigger than 1 point, split it. If a
 
 ## 12. Conventions Cheat Sheet
 
-| Concern | Convention |
-|---------|-----------|
-| File names (non-component) | `kebab-case.ts` |
-| File names (components) | `PascalCase.tsx` |
-| Class names | `PascalCase` |
-| Function names | `camelCase` |
-| Constants | `UPPER_SNAKE_CASE` for module-level, `camelCase` otherwise |
-| Interface vs type | `interface` for ports and shapes, `type` for unions and aliases |
-| `readonly` | Every domain entity field. Always. |
-| `private constructor` | On every value object. Static factory for construction. |
-| `Result<T, E>` | Every port method's return type. |
-| Errors | Discriminated unions, `{ kind: "..." , ... }`. |
-| Comments | The why, not the what. |
-| Tests | Next to the source. `foo.ts` → `foo.test.ts`. |
-| Commits | Conventional, story ID in parentheses. |
-| Money | `Money` value object, integer minor. |
-| Time | `Clock` port, never `new Date()` in business code. |
-| IDs | `IdGenerator` port, never `crypto.randomUUID()` in business code. |
-| Logging | `Logger` port, never `console.log` in committed code. |
-| Errors | `Result.err` across boundaries. Throw only for invariant violations. |
-| `any` | Banned. `unknown` + narrowing, or a real type. |
-| Emojis in code | Banned. |
-| Em-dashes in copy | Banned. Use periods, commas, parentheses. |
-| AI-slop phrases | Banned. ESLint rule. |
+| Concern                    | Convention                                                           |
+| -------------------------- | -------------------------------------------------------------------- |
+| File names (non-component) | `kebab-case.ts`                                                      |
+| File names (components)    | `PascalCase.tsx`                                                     |
+| Class names                | `PascalCase`                                                         |
+| Function names             | `camelCase`                                                          |
+| Constants                  | `UPPER_SNAKE_CASE` for module-level, `camelCase` otherwise           |
+| Interface vs type          | `interface` for ports and shapes, `type` for unions and aliases      |
+| `readonly`                 | Every domain entity field. Always.                                   |
+| `private constructor`      | On every value object. Static factory for construction.              |
+| `Result<T, E>`             | Every port method's return type.                                     |
+| Errors                     | Discriminated unions, `{ kind: "..." , ... }`.                       |
+| Comments                   | The why, not the what.                                               |
+| Tests                      | Next to the source. `foo.ts` → `foo.test.ts`.                        |
+| Commits                    | Conventional, story ID in parentheses.                               |
+| Money                      | `Money` value object, integer minor.                                 |
+| Time                       | `Clock` port, never `new Date()` in business code.                   |
+| IDs                        | `IdGenerator` port, never `crypto.randomUUID()` in business code.    |
+| Logging                    | `Logger` port, never `console.log` in committed code.                |
+| Errors                     | `Result.err` across boundaries. Throw only for invariant violations. |
+| `any`                      | Banned. `unknown` + narrowing, or a real type.                       |
+| Emojis in code             | Banned.                                                              |
+| Em-dashes in copy          | Banned. Use periods, commas, parentheses.                            |
+| AI-slop phrases            | Banned. ESLint rule.                                                 |

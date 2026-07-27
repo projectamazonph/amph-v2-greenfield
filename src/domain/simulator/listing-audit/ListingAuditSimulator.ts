@@ -209,7 +209,9 @@ function computeDimensionScores(gradedFindings: readonly GradedFinding[]): Score
     direction: scoreDirection(gradedFindings),
     profitability: scoreProfitability(gradedFindings),
     dataSufficiency: scoreDataSufficiency(gradedFindings),
-    explanation: 100, // placeholder until rubric-based explanation scoring
+    // explanation: no text input exists in this simulator.
+    // FUTURE (STORY-079): rubric-based scoring once explanation text fields are added.
+    explanation: 0,
   };
 }
 

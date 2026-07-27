@@ -18,7 +18,19 @@ import { Result } from "@/domain/shared/Result";
 
 /** Known grading dimension names. Extend as simulators add new ones. */
 export type GradingDimension =
-  "direction" | "magnitude" | "dataSufficiency" | "profitability" | "explanation";
+  | "direction"
+  | "magnitude"
+  | "dataSufficiency"
+  | "profitability"
+  | "explanation"
+  // Bid Elevator
+  | "bidAccuracy"
+  | "budgetAdherence"
+  | "roasHit"
+  // Campaign Builder
+  | "structureQuality"
+  | "budgetAllocation"
+  | "keywordRelevance";
 
 export const KNOWN_DIMENSIONS: readonly GradingDimension[] = [
   "direction",
@@ -26,6 +38,14 @@ export const KNOWN_DIMENSIONS: readonly GradingDimension[] = [
   "dataSufficiency",
   "profitability",
   "explanation",
+  // Bid Elevator
+  "bidAccuracy",
+  "budgetAdherence",
+  "roasHit",
+  // Campaign Builder
+  "structureQuality",
+  "budgetAllocation",
+  "keywordRelevance",
 ];
 
 /**

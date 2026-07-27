@@ -1,20 +1,16 @@
 /**
  * POST /api/cron/live-class-reminders — cron entry point.
  *
- * P0-7: called by an external cron (Vercel Cron, GitHub Actions, etc.)
- * every 5 minutes. Returns the count of emails sent.
+ * Called daily at 08:00 UTC via Vercel Cron (see vercel.json).
+ * Returns the count of emails sent.
  *
  * Auth: protected by a shared secret in the `x-cron-secret` header.
  * The cron service must send this header; we compare against
  * process.env.CRON_SECRET (configured in Vercel).
  *
- * Idempotency note:
- *   The use case is NOT idempotent. If the cron runs twice in the
- *   same window, students get duplicate emails. The proper fix is
- *   a SentReminder log table — track as a follow-up.
- *
- *   For now, configure the cron to run at most once per 5 minutes
- *   and accept the small overlap during deploys.
+ * Idempotency:
+ *   PrismaSentReminderRepository prevents duplicate emails for the same
+ *   live-class session on re-runs within the same day.
  */
 
 import type { NextRequest } from "next/server";
@@ -26,10 +22,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // 1. Auth: shared secret in header
   const expected = process.env["CRON_SECRET"];
   if (!expected) {
-    return NextResponse.json(
-      { error: "CRON_SECRET not configured" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "CRON_SECRET not configured" }, { status: 500 });
   }
   const provided = req.headers.get("x-cron-secret");
   if (provided !== expected) {
@@ -47,10 +40,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       classesProcessed: result.value.classesProcessed,
     });
   }
-  return NextResponse.json(
-    { ok: false, error: result.error },
-    { status: 500 },
-  );
+  return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
 }
 
 /**

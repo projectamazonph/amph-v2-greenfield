@@ -51,8 +51,8 @@ export default async function SettingsPage({
       description: "HMAC secret for session cookies",
     },
     {
-      key: "PAYMONGO_SECRET_KEY",
-      present: !!process.env.PAYMONGO_SECRET_KEY,
+      key: "PAYMONGO_SECRET",
+      present: !!process.env.PAYMONGO_SECRET,
       description: "PayMongo API secret",
     },
     {
