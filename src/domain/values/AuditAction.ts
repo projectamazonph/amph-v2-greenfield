@@ -66,7 +66,16 @@ export type AuditAction =
   | "live_class.update_failed"
   | "live_class.delete_failed"
   // Email template
-  | "email_template.updated";
+  | "email_template.updated"
+  // Quiz (STORY-091)
+  | "quiz.created"
+  | "quiz.updated"
+  | "quiz.deleted"
+  | "quiz.create_failed"
+  | "quiz.update_failed"
+  | "quiz.delete_failed"
+  // Certificate (STORY-044 + STORY-092)
+  | "certificate.revoked";
 
 /**
  * STORY-061. All valid AuditAction values as an array.
@@ -123,6 +132,15 @@ export const ALL_ACTIONS: AuditAction[] = [
   "live_class.delete_failed",
   // STORY-063: email template
   "email_template.updated",
+  // STORY-091: quiz admin CRUD
+  "quiz.created",
+  "quiz.updated",
+  "quiz.deleted",
+  "quiz.create_failed",
+  "quiz.update_failed",
+  "quiz.delete_failed",
+  // STORY-044 + STORY-092: certificate revoke
+  "certificate.revoked",
 ];
 
 /**

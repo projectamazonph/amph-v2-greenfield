@@ -11,7 +11,9 @@ import type { QuizAttempt } from "@/domain/entities/QuizAttempt";
 
 // ── Fixture ────────────────────────────────────────────────────────────────
 
-function makeAttempt(overrides: Partial<{ id: string; userId: string; quizId: string }> = {}): QuizAttempt {
+function makeAttempt(
+  overrides: Partial<{ id: string; userId: string; quizId: string }> = {},
+): QuizAttempt {
   const r = startQuizAttempt({
     id: overrides.id ?? "attempt-1",
     userId: overrides.userId ?? "user-1",
@@ -125,6 +127,25 @@ describe("InMemoryQuizAttemptRepository", () => {
       expect(result.ok).toBe(true);
       if (!result.ok) return;
       expect(result.value).toBeNull();
+    });
+  });
+
+  describe("countByQuizId", () => {
+    it("counts only attempts for the given quiz, across users", async () => {
+      await repo.create(makeAttempt({ id: "a-1", userId: "u-1", quizId: "q-1" }));
+      await repo.create(makeAttempt({ id: "a-2", userId: "u-2", quizId: "q-1" }));
+      await repo.create(makeAttempt({ id: "a-3", userId: "u-1", quizId: "q-2" }));
+      const result = await repo.countByQuizId("q-1");
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toBe(2);
+    });
+
+    it("returns 0 when no attempts exist for the quiz", async () => {
+      const result = await repo.countByQuizId("missing-quiz");
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toBe(0);
     });
   });
 

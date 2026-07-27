@@ -138,6 +138,15 @@ export class PrismaQuizAttemptRepository implements IQuizAttemptRepository {
     }
   }
 
+  async countByQuizId(quizId: string): Promise<Result<number, QuizAttemptRepositoryError>> {
+    try {
+      const n = await this.db.quizAttempt.count({ where: { quizId } });
+      return Result.ok(n);
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   private async loadAnswers(attemptId: string): Promise<QuizAttemptAnswer[]> {
     const rows = await this.db.quizAttemptAnswer.findMany({ where: { attemptId } });
     return rows.map((r: { questionId: string; selectedOptionId: string }) => ({

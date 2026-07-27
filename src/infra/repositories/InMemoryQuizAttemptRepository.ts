@@ -4,7 +4,10 @@
  * STORY-031: Quiz + QuizAttempt models + repositories.
  */
 
-import type { IQuizAttemptRepository, QuizAttemptRepositoryError } from "@/ports/repositories/IQuizAttemptRepository";
+import type {
+  IQuizAttemptRepository,
+  QuizAttemptRepositoryError,
+} from "@/ports/repositories/IQuizAttemptRepository";
 import type { QuizAttempt } from "@/domain/entities/QuizAttempt";
 import { Result } from "@/domain/shared/Result";
 
@@ -58,6 +61,11 @@ export class InMemoryQuizAttemptRepository implements IQuizAttemptRepository {
     const results = await this.findByUserAndQuiz(userId, quizId);
     if (!results.ok) return results;
     return Result.ok(results.value?.[0] ?? null);
+  }
+
+  async countByQuizId(quizId: string): Promise<Result<number, QuizAttemptRepositoryError>> {
+    const n = this.attempts.filter((a) => a.quizId === quizId).length;
+    return Result.ok(n);
   }
 
   clear(): void {
