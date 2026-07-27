@@ -109,6 +109,9 @@ import { ResendEmailSender } from "@/infra/email/ResendEmailSender";
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import { PayMongoAdapter } from "@/infra/payment/PayMongoAdapter";
 
+import type { ComposioClient } from "@/ports/integrations/ComposioClient";
+import { ComposioClientAdapter } from "@/infra/integrations/ComposioClientAdapter";
+
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
 import { OtpauthTotpService } from "@/infra/security/OtpauthTotpService";
@@ -280,6 +283,8 @@ export interface AppContainer {
   emailSender: EmailSender;
   jwt: JwtService;
   passwordHasher: PasswordHasher;
+  // STORY-068: Composio integration (admin external-account connections)
+  composioClient: ComposioClient;
 
   // Security
   rateLimiter: RateLimiter;
@@ -467,6 +472,11 @@ function buildProductionContainer(): AppContainer {
   const emailSender: EmailSender = new ResendEmailSender(
     process.env.RESEND_API_KEY ?? "",
     process.env.EMAIL_FROM ?? "Project Amazon PH Academy <noreply@amph.example.com>",
+  );
+
+  // STORY-068: Composio — constructor throws if COMPOSIO_API_KEY is missing.
+  const composioClient: ComposioClient = new ComposioClientAdapter(
+    process.env.COMPOSIO_API_KEY ?? "",
   );
 
   const jwt: JwtService = new JoseJwtService(
@@ -785,6 +795,7 @@ function buildProductionContainer(): AppContainer {
       logger,
       renderer: liveClassReminderRenderer,
     }),
+    composioClient,
   };
 }
 
