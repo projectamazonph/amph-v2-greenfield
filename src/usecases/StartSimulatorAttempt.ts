@@ -96,6 +96,7 @@ export class StartSimulatorAttempt {
       scenarioVersion: 1,
       difficulty: scenarioResult.value.difficulty,
       mode: input.mode ?? "practice",
+      startedAt: clock.now(),
     });
     // createSimulatorAttempt never fails — returns SimulatorAttempt directly
     const attempt = attemptResult;

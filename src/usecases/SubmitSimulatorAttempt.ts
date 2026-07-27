@@ -14,6 +14,7 @@
 import { Result } from "@/domain/shared/Result";
 import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
+import type { Clock } from "@/ports/system/Clock";
 
 export interface SubmitSimulatorAttemptInput {
   attemptId: string;
@@ -22,6 +23,7 @@ export interface SubmitSimulatorAttemptInput {
 
 export interface SubmitSimulatorAttemptDeps {
   attemptRepo: ISimulatorAttemptRepository;
+  clock: Clock;
 }
 
 export type SubmitSimulatorAttemptError =
@@ -42,7 +44,7 @@ export class SubmitSimulatorAttempt {
   async execute(
     input: SubmitSimulatorAttemptInput,
   ): Promise<Result<SubmitSimulatorAttemptResult, SubmitSimulatorAttemptError>> {
-    const { attemptRepo } = this.deps;
+    const { attemptRepo, clock } = this.deps;
 
     // ── 1. Attempt must exist ───────────────────────────────────
     const attemptResult = await attemptRepo.findByAttemptId(input.attemptId);
@@ -74,7 +76,13 @@ export class SubmitSimulatorAttempt {
     }
 
     // ── 3. Transition to submitted ─────────────────────────────
-    const updateResult = await attemptRepo.updateStatus(attempt.id, "submitted");
+    // Timestamp is the use case's responsibility (not the repo's).
+    // Source: the injected Clock port, so this is deterministic
+    // under test fakes and traceable to the system clock in prod.
+    const submittedAt = clock.now();
+    const updateResult = await attemptRepo.updateStatus(attempt.id, "submitted", {
+      submittedAt,
+    });
     return this.mapToSubmitResult(
       updateResult as unknown as Result<SimulatorAttempt, SubmitSimulatorAttemptError>,
     );

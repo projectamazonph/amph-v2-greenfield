@@ -180,6 +180,7 @@ function makeAttempt(overrides: Partial<SimulatorAttemptRow> = {}): SimulatorAtt
     difficulty: "beginner",
     mode: "practice",
     seed: overrides.seed !== undefined ? overrides.seed : "PSEED123",
+    startedAt: new Date("2025-03-01T00:00:00Z"),
   });
   if (overrides.status && overrides.status !== "in_progress") {
     return { ...base, status: overrides.status as SimulatorAttempt["status"] } as SimulatorAttempt;
@@ -295,7 +296,9 @@ describe("PrismaSimulatorAttemptRepository", () => {
       scenarioId: "ps2",
     });
     await repo.create(a1);
-    await repo.updateStatus("patt_p1", "submitted");
+    await repo.updateStatus("patt_p1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
 
     const a2 = makeAttempt({
       id: "patt_p2",
@@ -344,7 +347,9 @@ describe("PrismaSimulatorAttemptRepository", () => {
   it("addDecision returns already_submitted when attempt is submitted", async () => {
     const attempt = makeAttempt({ id: "patt_ds1" });
     await repo.create(attempt);
-    await repo.updateStatus("patt_ds1", "submitted");
+    await repo.updateStatus("patt_ds1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
 
     const decision = makeDecision("patt_ds1", { action: "too_late" });
     const result = await repo.addDecision("patt_ds1", decision);
@@ -356,8 +361,14 @@ describe("PrismaSimulatorAttemptRepository", () => {
   it("addDecision returns already_graded when attempt is graded", async () => {
     const attempt = makeAttempt({ id: "patt_dg1" });
     await repo.create(attempt);
-    await repo.updateStatus("patt_dg1", "submitted");
-    await repo.updateStatus("patt_dg1", "graded", { score: 80, scoreDimensions: {} });
+    await repo.updateStatus("patt_dg1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
+    await repo.updateStatus("patt_dg1", "graded", {
+      score: 80,
+      scoreDimensions: {},
+      gradedAt: new Date("2025-04-01T01:00:00Z"),
+    });
 
     const decision = makeDecision("patt_dg1", { action: "after_graded" });
     const result = await repo.addDecision("patt_dg1", decision);
@@ -372,22 +383,27 @@ describe("PrismaSimulatorAttemptRepository", () => {
     const attempt = makeAttempt({ id: "patt_us1" });
     await repo.create(attempt);
 
-    const result = await repo.updateStatus("patt_us1", "submitted");
+    const result = await repo.updateStatus("patt_us1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     const updated = unwrap(result);
     expect(updated.status).toBe("submitted");
-    expect(updated.submittedAt).not.toBeNull();
+    expect(updated.submittedAt).toEqual(new Date("2025-04-01T00:00:00Z"));
   });
 
   it("updateStatus transitions submitted -> graded with score", async () => {
     const attempt = makeAttempt({ id: "patt_us2" });
     await repo.create(attempt);
-    await repo.updateStatus("patt_us2", "submitted");
+    await repo.updateStatus("patt_us2", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
 
     const result = await repo.updateStatus("patt_us2", "graded", {
       score: 88,
       scoreDimensions: { direction: 90, magnitude: 86 },
+      gradedAt: new Date("2025-04-01T01:00:00Z"),
     });
 
     expect(result.ok).toBe(true);
@@ -396,7 +412,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(graded.status).toBe("graded");
     expect(graded.score).toBe(88);
     expect(graded.scoreDimensions).toEqual({ direction: 90, magnitude: 86 });
-    expect(graded.gradedAt).not.toBeNull();
+    expect(graded.gradedAt).toEqual(new Date("2025-04-01T01:00:00Z"));
   });
 
   it("updateStatus returns not_found when attempt does not exist", async () => {
@@ -409,8 +425,14 @@ describe("PrismaSimulatorAttemptRepository", () => {
   it("updateStatus returns invalid_status_transition for graded->submitted", async () => {
     const attempt = makeAttempt({ id: "patt_inv1" });
     await repo.create(attempt);
-    await repo.updateStatus("patt_inv1", "submitted");
-    await repo.updateStatus("patt_inv1", "graded", { score: 70, scoreDimensions: {} });
+    await repo.updateStatus("patt_inv1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
+    await repo.updateStatus("patt_inv1", "graded", {
+      score: 70,
+      scoreDimensions: {},
+      gradedAt: new Date("2025-04-01T01:00:00Z"),
+    });
 
     const result = await repo.updateStatus("patt_inv1", "submitted");
     expect(result.ok).toBe(false);

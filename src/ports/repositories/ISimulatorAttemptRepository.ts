@@ -61,10 +61,23 @@ export interface ISimulatorAttemptRepository {
   /**
    * Update the status of an attempt, optionally with a score and dimensions.
    * Used for submitAttempt, gradeAttempt transitions.
+   *
+   * `submittedAt` and `gradedAt` are caller-supplied (the use case
+   * passes `clock.now()` from the injected `Clock` port). The repo
+   * MUST NOT call `new Date()` itself: the whole point of the Clock
+   * port is that time is data, not a side effect.
+   *
+   * - `submittedAt` is required when `status === "submitted"`
+   * - `gradedAt` is required when `status === "graded"`
    */
   updateStatus(
     id: string,
     status: AttemptStatus,
-    options?: { score?: number; scoreDimensions?: ScoreDimensions },
+    options?: {
+      score?: number;
+      scoreDimensions?: ScoreDimensions;
+      submittedAt?: Date;
+      gradedAt?: Date;
+    },
   ): Promise<Result<SimulatorAttempt, SimulatorAttemptError>>;
 }

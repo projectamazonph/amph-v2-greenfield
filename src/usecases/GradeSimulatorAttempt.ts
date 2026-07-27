@@ -17,6 +17,7 @@ import { getOverallScore, isPassed } from "@/domain/entities/ScorePolicy";
 import type { SimulatorAttempt, SimulatorAttemptError } from "@/domain/entities/SimulatorAttempt";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
+import type { Clock } from "@/ports/system/Clock";
 
 // ── Input / Output ──────────────────────────────────────────────────────
 
@@ -32,6 +33,7 @@ export interface GradeSimulatorAttemptInput {
 export interface GradeSimulatorAttemptDeps {
   attemptRepo: ISimulatorAttemptRepository;
   scorePolicyRepo: IScorePolicyRepository;
+  clock: Clock;
 }
 
 export type GradeSimulatorAttemptError =
@@ -58,7 +60,7 @@ export class GradeSimulatorAttempt {
   async execute(
     input: GradeSimulatorAttemptInput,
   ): Promise<Result<GradeSimulatorAttemptResult, GradeSimulatorAttemptError>> {
-    const { attemptRepo, scorePolicyRepo } = this.deps;
+    const { attemptRepo, scorePolicyRepo, clock } = this.deps;
 
     // ── 1. Load attempt ──────────────────────────────────────────
     const attemptResult = await attemptRepo.findByAttemptId(input.attemptId);
@@ -107,12 +109,16 @@ export class GradeSimulatorAttempt {
     // ── 5. Compute overall score ──────────────────────────────────
     const overallScore = getOverallScore(input.scoreDimensions, policy);
     const passed = isPassed(overallScore, policy);
-    const gradedAt = new Date();
+    // Timestamp is the use case's responsibility (not the repo's).
+    // Source: the injected Clock port, so this is deterministic
+    // under test fakes and traceable to the system clock in prod.
+    const gradedAt = clock.now();
 
     // ── 6. Persist grade ─────────────────────────────────────────
     const updateResult = await attemptRepo.updateStatus(attempt.id, "graded", {
       score: overallScore,
       scoreDimensions: input.scoreDimensions,
+      gradedAt,
     });
 
     if (Result.isErr(updateResult)) {

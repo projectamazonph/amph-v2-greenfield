@@ -706,10 +706,14 @@ function buildProductionContainer(): AppContainer {
       recordAuditLog,
     }),
     saveSimulatorDecision: new SaveSimulatorDecision({ attemptRepo: simulatorAttemptRepo }),
-    submitSimulatorAttempt: new SubmitSimulatorAttempt({ attemptRepo: simulatorAttemptRepo }),
+    submitSimulatorAttempt: new SubmitSimulatorAttempt({
+      attemptRepo: simulatorAttemptRepo,
+      clock,
+    }),
     gradeSimulatorAttempt: new GradeSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,
+      clock,
     }),
     composeAttemptFeedback: new ComposeAttemptFeedback({
       attemptRepo: simulatorAttemptRepo,
