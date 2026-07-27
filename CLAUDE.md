@@ -40,7 +40,7 @@ As of 2026-07-26 (post audit-hardening pass — see `docs/audit-2026-07-26-harde
 - `docs/build-spec.md` — full engineering build spec: layer by layer, what goes where, ESLint rules, testing strategy. Some of it (the container shape, `requestContainer.ts`) describes the target design rather than the current code — see "Known gaps" above.
 - `docs/decisions.md` — every ADR, with status, context, decision, consequences (ADR-001 through at least ADR-022 as of 2026-07-26 — check the file for the current count; ADRs 013–019 cover the SOLID architecture). `docs/adr/` also holds standalone numbered ADR files (e.g. `0026-lighthouse-ci-disabled.md`) using a different numbering scheme than `docs/decisions.md` — don't assume the two are the same sequence.
 - `docs/api-reference.md` — every port method, every use case input/output/error, every server action, every route handler.
-- `docs/db-schema.md` — every Prisma model, every field, every index (20 models currently in `prisma/schema.prisma`: `User`, `Session`, `Course`, `Enrollment`, `Order`, `PpcCampaign`, `AuditLog`, `EmailLog`, `DiscountCode`, `XPEvent`, `ProgressEvent`, `UserStreak`, `Quiz`, `QuizQuestion`, `QuizOption`, `QuizAttempt`, `QuizAttemptAnswer`, `Badge`, `BadgeAward`, `Certificate`).
+- `docs/db-schema.md` — every Prisma model, every field, every index (34 models currently in `prisma/schema.prisma`, 4 enums; see `prisma/schema.prisma` for the canonical list, e.g. `User`, `Session`, `Course`, `Module`, `Lesson`, `PricingTier`, `Enrollment`, `Order`, `AuditLog`, `EmailLog`, `DiscountCode`, `XPEvent`, `ProgressEvent`, `UserStreak`, `Quiz`, `QuizAttempt`, `Badge`, `BadgeAward`, `Certificate`, `EmailVerification`, `PasswordReset`, `SentReminder`, `SimulatorAttempt`, `SimulatorDecision`, etc.).
 - `docs/security/tenant-isolation.md` — who can read what, per query.
 - `docs/business-layer.md`, `docs/admin-backend.md`, `docs/design-brief.md`, `docs/product-brief.md` — business rules, planned admin panel, visual design system, product framing.
 
@@ -104,7 +104,7 @@ Test files live in two places (both picked up by `vitest.config.ts`): colocated 
 - Do not throw exceptions across layer boundaries. Return `Result.err(...)`. Throw only for programmer errors (invariant violations).
 - Do not mock the real Prisma client in unit tests. Use the `InMemory*Repository` fakes in `src/infra/repositories/` (and `src/infra/payment/`, `src/infra/simulator/`, etc.).
 - Do not add a 6th simulator by editing the tools page or the access policy. Add a domain module + registry entry. OCP.
-- Do not assume a repo wired into `buildProductionContainer()` is Postgres-backed — check; `courseRepo` and `orderRepo` currently are not (see "Known gaps").
+- Do not assume a new repo wired into `buildProductionContainer()` is Postgres-backed — check. Since the P0-2 closeouts (PRs #125–#128, #190), every repo currently in production is Postgres-backed, but a new repo added in a future story may wire an in-memory default before its `Prisma*Repository` lands. Read `src/composition/container.ts` to confirm.
 
 ## Session start checklist
 

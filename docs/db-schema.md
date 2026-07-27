@@ -12,14 +12,16 @@ This document is the source of truth for the Prisma schema. Every model, every f
 
 1. **PostgreSQL-compatible.** Postgres in dev and production. No SQLite-specific features.
 2. **Soft-delete on every mutable table.** `deletedAt DateTime?` filtered by default. Hard delete only via admin action with audit-log entry.
-3. **Audit columns on every mutable table.** `createdById`, `updatedById`, `createdAt`, `updatedAt`. `createdById` is nullable for system-created rows.
+3. **Audit columns on every mutable table** _(aspirational — repo-wide retrofit pending; see note below)_. `createdById`, `updatedById`, `createdAt`, `updatedAt`. `createdById` is nullable for system-created rows.
 4. **Compound indexes on every hot read path.** Specified per model below.
 5. **JSON columns have typed shapes.** Documented in `src/domain/.../*.ts`. Zod-validated on read.
 6. **No `orgId`.** Single-tenant. ADR-015.
-7. **Enums for all state machines.** Never `String` with comment-listing valid values.
+7. **Enums for all state machines** _(aspirational — see note below)_. Never `String` with comment-listing valid values. The four enums today are `Role`, `SubscriptionTier`, `VerificationStatus`, `SimulatorAccess`; lifecycle `status` columns (`Order.status`, `Order.paymongoStatus`, `LiveClass.status`, `EmailLog.status`, `Enrollment.status`, `QuizAttempt.status`, `Certificate.status`) are plain `String` with an inline comment listing the valid values, validated on read via `*Status.isValid()` / `*Status` guard functions.
 8. **CUIDs for primary keys.** Not UUIDs, not auto-increment. Sortable, URL-safe, Prisma-native.
 9. **Money is integer minor units (centavos).** `Int` columns. Never `Float`, never `Decimal`. ADR-018.
 10. **Append-only `ProgressEvent` log.** The source of truth for all learning activity. Denormalized counters are derived.
+
+**Notes on the aspirational items above.** Principles #3 and #7 describe the _target_ convention, not the current state. As of 2026-07-26 (post P0-2 closeouts, PRs #125–#128, #190): only `User` carries `deletedAt`; 33 of 34 models lack `createdById`/`updatedById`; lifecycle `status` columns are plain `String`. Both gaps are deliberate: a repo-wide retrofit touches every model, every domain entity, every port, every admin use case (which currently doesn't thread `actorId` through create/update), and several PRs in the P0-2 series explicitly deferred it rather than single-table their way out of it. Each is its own story; the audit doc at `docs/audit-2026-07-26-simulator-accuracy-review.md` references the pattern, and `SESSION-HANDOVER.md` PRs #125–#128 carry the per-PR rationale.
 
 ---
 
@@ -743,23 +745,23 @@ model Settings {
 
 Hot read paths and their indexes:
 
-| Query | Index |
-|-------|-------|
-| `User.findByEmail` | `User.email` unique |
-| `User.list({ role, deletedAt })` | `User(role, deletedAt)` |
-| `Course.listPublished` | `Course(isPublished, displayOrder)` |
-| `Enrollment.findActive(userId, courseId)` | `Enrollment(userId, status)` |
-| `Enrollment.listByCourse(courseId, status)` | `Enrollment(courseId, status)` |
-| `Checkout.findExpiring(now)` | `Checkout(status, expiresAt)` |
-| `Payment.listByUser(userId, status, since)` | `Payment(userId, status, createdAt)` |
-| `Payment.findByPayMongoId` | `Payment.paymongoPaymentId` unique |
-| `SimulatorScenario.listActive(simulatorId)` | `SimulatorScenario(simulatorId, isActive, displayOrder)` |
-| `ProgressEvent.listByUser(userId, courseId, since)` | `ProgressEvent(userId, courseId, occurredAt)` |
-| `BadgeAward.findByUser(userId)` | `BadgeAward(userId, awardedAt)` |
-| `Certificate.findByHash` | `Certificate.hash` unique |
-| `LiveClass.listUpcoming` | `LiveClass(scheduledAt)` |
-| `AuditLog.listByActor(actorId, since)` | `AuditLog(actorId, occurredAt)` |
-| `AuditLog.listByTarget(targetType, targetId, since)` | `AuditLog(targetType, targetId, occurredAt)` |
+| Query                                                | Index                                                    |
+| ---------------------------------------------------- | -------------------------------------------------------- |
+| `User.findByEmail`                                   | `User.email` unique                                      |
+| `User.list({ role, deletedAt })`                     | `User(role, deletedAt)`                                  |
+| `Course.listPublished`                               | `Course(isPublished, displayOrder)`                      |
+| `Enrollment.findActive(userId, courseId)`            | `Enrollment(userId, status)`                             |
+| `Enrollment.listByCourse(courseId, status)`          | `Enrollment(courseId, status)`                           |
+| `Checkout.findExpiring(now)`                         | `Checkout(status, expiresAt)`                            |
+| `Payment.listByUser(userId, status, since)`          | `Payment(userId, status, createdAt)`                     |
+| `Payment.findByPayMongoId`                           | `Payment.paymongoPaymentId` unique                       |
+| `SimulatorScenario.listActive(simulatorId)`          | `SimulatorScenario(simulatorId, isActive, displayOrder)` |
+| `ProgressEvent.listByUser(userId, courseId, since)`  | `ProgressEvent(userId, courseId, occurredAt)`            |
+| `BadgeAward.findByUser(userId)`                      | `BadgeAward(userId, awardedAt)`                          |
+| `Certificate.findByHash`                             | `Certificate.hash` unique                                |
+| `LiveClass.listUpcoming`                             | `LiveClass(scheduledAt)`                                 |
+| `AuditLog.listByActor(actorId, since)`               | `AuditLog(actorId, occurredAt)`                          |
+| `AuditLog.listByTarget(targetType, targetId, since)` | `AuditLog(targetType, targetId, occurredAt)`             |
 
 ---
 

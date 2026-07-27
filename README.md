@@ -4,7 +4,7 @@
 
 **Stop earning ₱15k/month. Start charging ₱60k–₱80k/month.**
 
-Three courses. One outcome: become the Amazon ads specialist clients retain.
+Three courses plus an all-access pass. One outcome: become the Amazon ads specialist clients retain.
 
 **Live:** [https://amph-v2-greenfield.vercel.app](https://amph-v2-greenfield.vercel.app) (Vercel · Neon Postgres · deployed 2026-07-24)
 
@@ -24,15 +24,16 @@ You learn by doing. Interactive simulators let you practice with real campaign s
 
 ### Structured Courses
 
-Three tiered courses, each building on the last:
+Three tiered courses, each building on the last, plus an all-access pass:
 
-| Course                      | What You Learn                                                                                                | Price  |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------- | ------ |
-| **PPC Foundations**         | Amazon advertising basics, Sponsored Products, campaign structure, keyword research, bid management           | ₱2,999 |
-| **Accelerated Mastery**     | Everything in Foundations + advanced strategies, Sponsored Brands, Sponsored Display, optimization frameworks | ₱5,999 |
-| **Ultimate Transformation** | Everything in both courses + live classes, 1-on-1 support, portfolio-ready projects, job placement guidance   | ₱9,999 |
+| Course                      | What You Learn                                                                                                | Price   | Early-bird (limited window) |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------- | ------- | --------------------------- |
+| **PPC Foundations**         | Amazon advertising basics, Sponsored Products, campaign structure, keyword research, bid management           | ₱2,999  | —                           |
+| **Accelerated Mastery**     | Everything in Foundations + advanced strategies, Sponsored Brands, Sponsored Display, optimization frameworks | ₱5,999  | ₱4,999 for the first 7 days |
+| **Ultimate Transformation** | Everything in both courses + live classes, 1-on-1 support, portfolio-ready projects, job placement guidance   | ₱9,999  | ₱7,999 for the first 3 days |
+| **All-Access Pass**         | Every course, every current and future module, one-time                                                       | ₱14,999 | —                           |
 
-**Early bird deal:** First 30 enrollees pay only ₱499 — full access, not a deposit.
+Early-bird windows are time-limited, per tier, set in the database (`PricingTier.earlyBirdPriceMinor` / `earlyBirdEndsAt`). Once the window closes, the regular price applies.
 
 ![Course Detail](docs/screenshots/course-detail.png)
 
@@ -91,10 +92,9 @@ Generate keyword ideas from a seed term. Get match-type recommendations, estimat
 | Item                    | Price                                       |
 | ----------------------- | ------------------------------------------- |
 | PPC Foundations         | ₱2,999 (one-time)                           |
-| Accelerated Mastery     | ₱5,999 (one-time)                           |
-| Ultimate Transformation | ₱9,999 (one-time)                           |
-| All-access pass         | ₱12,999 (saves vs buying separately)        |
-| Early bird (first 30)   | ₱499 any tier                               |
+| Accelerated Mastery     | ₱5,999 (one-time) · early-bird ₱4,999 (7d)  |
+| Ultimate Transformation | ₱9,999 (one-time) · early-bird ₱7,999 (3d)  |
+| All-access pass         | ₱14,999 (one-time)                          |
 | Refund window           | 7 days, full refund                         |
 | Live classes            | Ultimate tier only, weekly                  |
 | Certificate             | Free on course completion, verified by hash |
@@ -103,17 +103,17 @@ Generate keyword ideas from a seed term. Get match-type recommendations, estimat
 
 ## Status
 
-| Metric        | Value                                                              |
-| ------------- | ------------------------------------------------------------------ |
-| Architecture  | Greenfield, SOLID-layered modular monolith                         |
-| Tech stack    | Next.js 16 App Router + TypeScript strict + Prisma 7 + PostgreSQL  |
-| Payment       | PayMongo (PHP, GCash / Maya / card / bank)                         |
-| Email         | Resend (React Email)                                               |
-| Repo layout   | `src/{domain,ports,usecases,infra,app,components,composition,lib}` |
-| Test stack    | Vitest (unit + integration) + Playwright (e2e)                     |
-| First deploy  | Pending — see `docs/sprint-1/PLAN.md`                              |
-| Documentation | This file + `AGENTS.md` + `CLAUDE.md` + `FEATURES.md` + `docs/`    |
-| Last updated  | 2026-07-24                                                         |
+| Metric        | Value                                                                         |
+| ------------- | ----------------------------------------------------------------------------- |
+| Architecture  | Greenfield, SOLID-layered modular monolith                                    |
+| Tech stack    | Next.js 16 App Router + TypeScript strict + Prisma 7 + PostgreSQL             |
+| Payment       | PayMongo (PHP, GCash / Maya / card / bank)                                    |
+| Email         | Resend (React Email)                                                          |
+| Repo layout   | `src/{domain,ports,usecases,infra,app,components,composition,lib}`            |
+| Test stack    | Vitest (unit + integration) + Playwright (e2e)                                |
+| First deploy  | 2026-07-24 — `https://amph-v2-greenfield.vercel.app` (Vercel · Neon Postgres) |
+| Documentation | This file + `AGENTS.md` + `CLAUDE.md` + `FEATURES.md` + `docs/`               |
+| Last updated  | 2026-07-27                                                                    |
 
 ---
 

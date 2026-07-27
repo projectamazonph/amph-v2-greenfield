@@ -157,15 +157,24 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 - Smoke tests: `/` → 200, `/signup` → 200, `/login` → 200, `/dashboard` → 307 (redirect)
 - Remaining operator items: PayMongo webhook endpoint, first admin user, custom domain, full signup→checkout smoke test, DB backup/restore drill, security audit, launch comms.
 
-## Sprint 13 — Admin Panel Round 2 (5 pts)
+## Sprint 13 — Admin Panel Round 2 + Simulator Rebuilds (10 pts)
 
-| ID        | Title                                | Pts | Status     |
-| --------- | ------------------------------------ | --- | ---------- |
-| STORY-061 | Admin audit log viewer + CSV export  | 1   | ⏳ Planned |
-| STORY-062 | Admin refund requests list + process | 1   | ⏳ Planned |
-| STORY-063 | Admin email templates                | 1   | ⏳ Planned |
-| STORY-064 | (to be added)                        | 1   | ⏳ Planned |
-| STORY-065 | (to be added)                        | 1   | ⏳ Planned |
+| ID        | Title                                                 | Pts | Status                                                                          |
+| --------- | ----------------------------------------------------- | --- | ------------------------------------------------------------------------------- |
+| STORY-061 | Admin audit log viewer + CSV export                   | 1   | ✅ done — PR #165                                                               |
+| STORY-062 | Admin refund requests list + process                  | 1   | ✅ done — PR #174                                                               |
+| STORY-063 | Admin email templates                                 | 1   | ✅ done — PR #174                                                               |
+| STORY-064 | Simulator attempt infrastructure (start/grade/submit) | 1   | ✅ done — PR #166                                                               |
+| STORY-065 | Scoring engine + dimensional policies                 | 1   | ✅ done — see Sprint 13 score policy + simulator scoring engine (paired w/ 064) |
+| STORY-066 | Feedback composer + remediation                       | 1   | ✅ done — PRs #167, #168, #169, #170, #172, #173, #182                          |
+| STORY-067 | STR Triage rebuild                                    | 1   | ✅ done — PR #179                                                               |
+| STORY-068 | Bid Elevator rebuild                                  | 1   | ✅ done — PR #180                                                               |
+| STORY-069 | Campaign Builder rebuild                              | 1   | ✅ done — PR #182 squash (PR #181 closed as redundant)                          |
+| STORY-070 | Listing Audit rebuild                                 | 1   | ✅ done — PR #189                                                               |
+
+**Sprint 13 status: 10/10 stories merged.**
+
+Sprint 13 turned out to be a "fix the simulator grade before improving what it grades" sprint as much as an admin round 2. The audit at `docs/audit-2026-07-26-simulator-accuracy-review.md` (the work that led to Sprints 14–16 below) was commissioned in parallel with the simulator rebuilds and is what made STORY-067–070's scoring-engine integration land against a now-locked scoring model. STORY-065 in particular is paired with STORY-064 — the scoring engine itself ships with the attempt infrastructure, and `scorePolicyRepo` is wired into the production container (PR #172).
 
 ## Sprint 14 — Simulator Scoring Integrity (7 pts)
 
