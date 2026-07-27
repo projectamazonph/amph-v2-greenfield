@@ -219,6 +219,8 @@ export class PrismaUserRepository implements UserRepository {
     createdAt: Date;
     totalXp: number;
     emailVerifiedAt: Date | null;
+    currentSessionVersion: number;
+    lockedUntil: Date | null;
   }) {
     return Object.freeze({
       id: row.id,
@@ -233,6 +235,42 @@ export class PrismaUserRepository implements UserRepository {
       createdAt: row.createdAt,
       totalXp: row.totalXp,
       emailVerifiedAt: row.emailVerifiedAt,
+      currentSessionVersion: row.currentSessionVersion,
+      lockedUntil: row.lockedUntil,
     });
+  }
+
+  async getCurrentSessionVersion(userId: string): Promise<Result<number, UserError>> {
+    try {
+      const row = await this.db.user.findUnique({
+        where: { id: userId },
+        select: { currentSessionVersion: true },
+      });
+      if (!row) return Result.err({ kind: "not_found" });
+      return Result.ok(row.currentSessionVersion);
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async revokeAllSessions(userId: string): Promise<Result<number, UserError>> {
+    try {
+      const row = await this.db.user.update({
+        where: { id: userId },
+        data: { currentSessionVersion: { increment: 1 } },
+        select: { currentSessionVersion: true },
+      });
+      return Result.ok(row.currentSessionVersion);
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
   }
 }
