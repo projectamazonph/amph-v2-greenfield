@@ -11,7 +11,8 @@
 - **Story**: STORY-063
 - **Sprint**: 13
 - **Points**: 1
-- **Status:** ⏳ Planned
+- **Status:** ◐ Backend partial. `EmailTemplate`, its Prisma and in-memory repositories, and the three use cases are present. The documented admin pages, server actions, preview route, and seed script are not present in the current `src/app` and `scripts` trees.
+- **Verified:** backend typecheck and unit coverage pass; the feature is not complete from an admin-user perspective.
 
 ## Goal
 

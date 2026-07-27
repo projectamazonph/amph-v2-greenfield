@@ -1,10 +1,14 @@
 # STORY-065: Scoring Engine + Dimensional Policies
 
+## Status
+
+**Status:** ✅ Implemented in the current source. `ScorePolicy`, `GradeSimulatorAttempt`, Prisma and in-memory score-policy repositories, and the server-action wiring are present. The simulator accuracy limitations and follow-up remediation are recorded in `docs/audit-2026-07-26-simulator-accuracy-review.md`.
+
 ## Context
 
-STORY-064 delivered the attempt infrastructure: SimulatorAttempt entity, ISimulatorAttemptRepository, InMemorySimulatorAttemptRepository, PrismaSimulatorAttemptRepository, StartSimulatorAttempt, SaveSimulatorDecision, and SubmitSimulatorAttempt. The state machine supports in_progress to submitted to graded transitions, but the actual scoring step is not yet implemented.
+STORY-064 delivered the attempt infrastructure: `SimulatorAttempt` entity, `ISimulatorAttemptRepository`, in-memory and Prisma attempt repositories, `StartSimulatorAttempt`, `SaveSimulatorDecision`, and `SubmitSimulatorAttempt`. The state machine supports `in_progress` to `submitted` to `graded` transitions.
 
-STORY-065 fills that gap. It introduces the scoring engine -- a domain service that evaluates a submitted attempt against a per-simulator, per-difficulty, per-mode ScorePolicy, computes per-dimension scores, combines them into an overall score, and persists the result to the attempt.
+STORY-065 fills that gap. It introduces the scoring engine, a domain service that evaluates a submitted attempt against a per-simulator, per-difficulty, per-mode `ScorePolicy`, computes per-dimension scores, combines them into an overall score, and persists the result to the attempt.
 
 This story does NOT implement the per-dimension grading logic inside each simulator. That is future work (STORY-066 covers feedback composition). STORY-065's scope ends at: attempt is submitted -> attempt is graded with a computed overall score and a ScoreDimensions map.
 

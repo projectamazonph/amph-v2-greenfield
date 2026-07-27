@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** 🔨 In progress
+**Status:** ✅ Implemented in the current source. The STR Triage simulator computes score dimensions and the action wires start, grade, and feedback. The action still needs authenticated user attribution (`userId: "system"` is a known follow-up).
 
 ## Context
 

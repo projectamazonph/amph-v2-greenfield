@@ -1,23 +1,35 @@
-# Admin panel wiring — planned (Sprint 10, nothing built)
+# Admin panel wiring
 
-Layout per `docs/admin-backend.md` §"What Lives Where". No `src/app/admin` directory, no `requireAdmin()`, and no `AuditLogRepository`/`SettingsRepository` ports exist yet.
+**Reviewed:** 2026-07-27  
+**Gate:** `src/app/admin/layout.tsx` calls `requireAdmin()` before nested admin pages render.  
+**Composition:** `src/composition/container.ts` wires the admin use cases to production ports.
 
 ```mermaid
 flowchart LR
-  BROWSER["Browser\n/admin/*"] --> LAYOUT["src/app/admin/layout.tsx\nrequireAdmin() gate"]
-  LAYOUT --> ROUTES["~40 routes\nusers · courses · payments · refunds\nsimulators · live-classes\ndiscount-codes · badges · audit-log · settings"]
-  ROUTES --> ADMINUC["Admin* use cases\nAdminIssueRefund, AdminExportAuditLog\nAdminImpersonate, AdminUpdateSettings"]
-  ADMINUC --> AP["IAccessPolicy\nrole check"]
-  ADMINUC --> ALR["AuditLogRepository\nport not created"]
-  ADMINUC --> SR["SettingsRepository\nport not created"]
-  AP --> TAP["TierAccessPolicy\nalready built, reused"]
-  ALR --> PALR["PrismaAuditLogRepository\nnot built -- AuditLog table\nexists in schema, unused"]
-  SR --> PSR["PrismaSettingsRepository\nnot built -- no Settings\nmodel in schema either"]
-
-  classDef built stroke:#FF6B35,stroke-width:2px,fill:none;
-  classDef planned stroke:#D4D4D4,fill:none,stroke-dasharray: 4 3;
-  class TAP built
-  class LAYOUT,ROUTES,ADMINUC,ALR,SR,PALR,PSR planned
+  BROWSER["Admin browser"] --> GATE["/admin/layout.tsx\nrequireAdmin()"]
+  GATE --> ROUTES["Users\nCourses, modules, lessons\nPayments, refunds\nSimulators, live classes\nDiscount codes, badges\nAudit log, settings"]
+  ROUTES --> ACTIONS["Server actions"]
+  ACTIONS --> UC["Admin use cases"]
+  UC --> AUDIT["RecordAuditLog"]
+  UC --> PORTS["Repository and security ports"]
+  PORTS --> PRISMA["Prisma adapters"]
+  PORTS --> GAP["Badge mutation adapter gap"]
 ```
 
-Solid orange = the one piece that already exists and gets reused as-is (**TierAccessPolicy**). Everything dashed is Sprint 10 scope per `docs/sprint-plan.md` — including a **SettingsRepository** port and **Settings** Prisma model that don't exist yet at all.
+## Implemented route groups
+
+| Group          | Routes                                                                      | State                                                                        |
+| -------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Dashboard      | `/admin`                                                                    | Implemented; pending-refund tile currently returns zero                      |
+| Users          | `/admin/users`, `/admin/users/[id]`                                         | Implemented; impersonation restore has a first-use gap                       |
+| Courses        | `/admin/courses` and nested editors                                         | Implemented; module and lesson writes rebuild the course curriculum cache    |
+| Payments       | `/admin/payments`, `/admin/payments/[id]`                                   | Implemented                                                                  |
+| Refunds        | `/admin/refunds`, `/admin/refunds/[orderId]`                                | Implemented                                                                  |
+| Simulators     | `/admin/simulators`, `/admin/simulators/new`, `/admin/simulators/[id]/edit` | Implemented for scenario CRUD                                                |
+| Live classes   | `/admin/live-classes` and create/edit pages                                 | Implemented for admin CRUD and reminder scheduling                           |
+| Discount codes | `/admin/discount-codes` and create/edit pages                               | Implemented                                                                  |
+| Badges         | `/admin/badges` and create/edit pages                                       | List and read paths work; Prisma create/update/archive remain incomplete     |
+| Audit log      | `/admin/audit-log`, `/admin/audit-log/export`                               | Implemented, filter/list/export paths are wired                              |
+| Settings       | `/admin/settings`, `/admin/settings/2fa-setup`                              | TOTP and environment status implemented; general settings remain future work |
+
+Every implemented admin mutation is expected to call `RecordAuditLog`. The current audit report lists the adapter and ownership gaps that still need code work.

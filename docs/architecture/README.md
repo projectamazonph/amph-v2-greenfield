@@ -1,11 +1,11 @@
-# Architecture diagrams
+# Architecture documentation index
 
-Wiring diagrams for Project Amazon PH Academy, drawn against what is actually in the repo — not the aspirational target design in `docs/build-spec.md`. See `CLAUDE.md` §"Known gaps" for the prose version of the same facts.
+These diagrams describe the current repository wiring, not the original greenfield target. The source of truth is `src/composition/container.ts` and the route tree under `src/app/`.
 
-| File                                                     | What it shows                                                                                                                                                                        |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`01-layer-wiring.md`](./01-layer-wiring.md)             | The five-layer dependency graph as wired in `src/composition/container.ts` today, including the two production gaps (in-memory course/order repos, webhook bypassing the container). |
-| [`02-admin-panel-wiring.md`](./02-admin-panel-wiring.md) | The planned Sprint 10 admin panel wiring per `docs/admin-backend.md` — nothing here is built yet.                                                                                    |
-| [`03-site-map.md`](./03-site-map.md)                     | Every route across public/student/admin, color-coded by build status.                                                                                                                |
+| File                                                     | Current subject                                                            |
+| -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`01-layer-wiring.md`](./01-layer-wiring.md)             | Production and test dependency direction, including the known adapter gaps |
+| [`02-admin-panel-wiring.md`](./02-admin-panel-wiring.md) | Implemented admin route and use-case wiring                                |
+| [`03-site-map.md`](./03-site-map.md)                     | Current public, student, API, and admin route inventory                    |
 
-For the corresponding low-fidelity screen wireframes, see [`docs/ui-specs/wireframes/`](../ui-specs/wireframes/README.md).
+Target design material remains in `docs/build-spec.md`. When target design and source differ, record the difference in `docs/audit-2026-07-27-completeness-review.md` rather than treating the target as shipped behavior.

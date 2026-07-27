@@ -11,7 +11,8 @@
 - **Story**: STORY-061
 - **Sprint**: 13
 - **Points**: 1
-- **Status:** ⏳ Planned
+- **Status:** ✅ Implemented in the current source (`/admin/audit-log`, `/admin/audit-log/export`, `ListAuditLogs`, `ExportAuditLogs`, Prisma and in-memory list adapters).
+- **Verified:** `pnpm typecheck`, `pnpm lint`, `pnpm test:arch`, and `pnpm build` pass on 2026-07-27.
 
 ## Goal
 

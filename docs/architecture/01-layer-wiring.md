@@ -1,46 +1,61 @@
-# Layer wiring — current reality
+# Current layer wiring
 
-The five layers as they are actually wired in `src/composition/container.ts` today, including the remaining production gap: `orderRepo` resolves to `InMemoryOrderRepository`, and the PayMongo webhook route never touches the container at all. `courseRepo` was migrated to `PrismaCourseRepository` in PR #89.
+**Reviewed:** 2026-07-27  
+**Source of truth:** `src/composition/container.ts`
+
+The application is a modular monolith. Pages and server actions depend on use cases, use cases depend on ports and domain rules, and production adapters implement the ports. `domain/` remains framework-free. `buildContainer()` creates the production composition, while `container.test.ts` wires deterministic in-memory adapters for tests.
 
 ```mermaid
 flowchart TB
-  subgraph APP["src/app — Next.js App Router"]
-    PAGES["Pages (RSC)\n~48 routes built\n(20 student-facing + 28 admin)"]
-    ACTIONS["Server actions\nsrc/app/actions/*.ts"]
-    WEBHOOK["Route handler\n/api/webhooks/paymongo"]
+  subgraph APP["src/app - Next.js App Router"]
+    PAGES["Public, student, and admin pages"]
+    ACTIONS["Server actions"]
+    ROUTES["Webhook, auth, quiz, health, cron, PDF routes"]
   end
 
-  subgraph COMPOSITION["src/composition/container.ts"]
-    BUILD["buildContainer()\ncached singleton"]
-    SCOPE["runWithContainer / getContainer\nAsyncLocalStorage"]
+  subgraph COMPOSITION["src/composition"]
+    CONTAINER["buildContainer()\nproduction adapters"]
+    SCOPE["runWithContainer() / getContainer()\nrequest scope"]
   end
 
-  subgraph USECASES["src/usecases — 18 classes"]
-    UC["SignUp, Login, EnrollStudent,\nCreatePaymentIntent, IssueCertificate,\nRecordQuizAttempt, AwardBadge ..."]
+  subgraph USECASES["src/usecases"]
+    UC["Auth, catalog, checkout, learning, simulator,\ncertificate, email, and admin use cases"]
   end
 
-  subgraph PORTS["src/ports — interfaces, every method -> Result&lt;T,E&gt;"]
-    PT["repositories/ payment/ email/\naccess/ security/ system/\nrendering/ simulator/"]
+  subgraph PORTS["src/ports"]
+    PORT["Repository, gateway, security, rendering,\naccess, simulator, system, and logging ports"]
   end
 
-  subgraph INFRA["src/infra — adapters"]
-    REAL["Prisma*Repository\nPayMongoAdapter\nResendEmailSender\nReactPdfCertificateRenderer"]
-    FAKE["InMemory* / Stub* / Fake*\ntest fakes -- 2 stuck in prod"]
+  subgraph DOMAIN["src/domain"]
+    RULES["Entities, value objects, Result, services,\nand four registered simulator engines"]
   end
 
-  subgraph DOMAIN["src/domain — pure, zero deps"]
-    DM["entities/ values/ shared/Result\nservices/ simulator/*"]
+  subgraph INFRA["src/infra"]
+    PROD["Prisma repositories, PayMongo, Resend,\nSentry/Pino, PDF, security adapters"]
+    TEST["In-memory, fake, and stub adapters"]
   end
 
-  PAGES --> ACTIONS --> BUILD --> UC
-  UC --> PT --> DM
-  UC --> DM
-  PT -.implemented by.-> REAL --> DM
-  PT -.implemented by.-> FAKE
-  WEBHOOK -. own InMemory* repos, bypasses container .-> FAKE
-
-  classDef gap stroke:#B91C1C,stroke-width:2px,fill:none,stroke-dasharray: 3 3;
-  class WEBHOOK,FAKE gap
+  PAGES --> ACTIONS
+  PAGES --> CONTAINER
+  ROUTES --> CONTAINER
+  ACTIONS --> SCOPE --> UC
+  CONTAINER --> UC
+  UC --> PORT
+  UC --> RULES
+  PORT -. implemented by .-> PROD
+  PORT -. test implementation .-> TEST
+  PROD --> RULES
 ```
 
-Dashed red = the known gap. **orderRepo** still resolves to `InMemoryOrderRepository` inside `buildProductionContainer()` — orders are not yet Postgres-backed in production. `courseRepo` was migrated to `PrismaCourseRepository` in PR #89 (part of the P0-2 in-memory→Prisma sweep; see the `tests/integration/container-uses-prisma-course.test.ts` regression guard). The webhook route re-instantiates its own `InMemory*` repos per request, so it cannot see orders created anywhere else in the app — this remains a follow-up to land `PrismaOrderRepository` + thread the container through the webhook handler.
+## Production adapter status
+
+Most persisted repositories in `buildProductionContainer()` use Prisma adapters, including users, courses, modules, lessons, orders, enrollments, sessions, discount codes, quizzes, attempts, XP, certificates, audit logs, webhook events, simulator scenarios and attempts, score policies, feedback, live classes, pricing tiers, email verification, password reset, and sent reminders.
+
+Known exceptions and follow-ups:
+
+- `PrismaBadgeRepository.create`, `.update`, and `.archive` still throw `Not implemented`; the admin badge mutation path is not production-complete.
+- Graded simulator server actions currently pass `userId: "system"`; they need the authenticated user before attempts can be treated as student-owned records.
+- `GetAdminDashboardStats.pendingRefunds` is a placeholder value of zero.
+- `scripts/seed-admin-user.mjs` constructs Prisma directly instead of using the Prisma 7 driver adapter used by `src/infra/database/prisma.ts`.
+
+The PayMongo webhook uses `buildContainer()`, verifies the signature through `PayMongoAdapter`, persists a `WebhookEvent`, and then processes the order. The historical claim that it creates in-memory repositories per request is no longer true.

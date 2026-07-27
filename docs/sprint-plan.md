@@ -1,12 +1,10 @@
 # Sprint Plan — Project Amazon PH Academy v2
 
-**Date:** 2026-07-17 (greenfield)
-**Owner:** Ryan Roland Dabao
-**Status:** Day 0 — Sprint 1 ready to start
+**Reviewed:** 2026-07-27  
+**Owner:** Ryan Roland Dabao  
+**Status:** Sprints 1–13 implementation is present in the repository. Sprint 12 has operator-owned launch work; Sprints 14–16 are planned simulator remediation. See `docs/audit-2026-07-27-completeness-review.md` for the source audit.
 
-12 sprints, 60 stories, 60 points. One point per story. Sprint length: ~1 calendar week. Solo developer, single Vercel deploy, single Postgres.
-
-The story mix is different from the legacy `amph-v2`: the SOLID architecture adds a foundation sprint (Sprint 1) and re-shapes the early sprints so the SOLID discipline is in place before any business logic lands.
+This plan began as a 12-sprint greenfield plan. The repository has since grown to 16 planned sprints and 89 tracked stories (including the simulator remediation sequence). Historical sprint goals remain below, but a story marked done here must still be checked against its current source and story file.
 
 ---
 
@@ -148,26 +146,30 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-059 | Production deploy (operator executes the runbook)                            | 1   | ✅ done (Vercel auto-deployed `https://amph-v2-greenfield.vercel.app` after PR #150; all 4 routes live) |
 | STORY-060 | Launch communications (Facebook, LinkedIn, Resend broadcast, internal Slack) | 1   | ⏳ operator-owned                                                                                       |
 
-**Sprint 12 in progress: 2/5 stories done (STORY-056, STORY-059). 3/5 operator-owned.**
+**Sprint 12 status:** STORY-056 and STORY-059 are recorded as complete in the historical plan. STORY-057, STORY-058, and STORY-060 remain operator-owned. The repository now contains 20 migrations and a `db:seed:admin` script; the deployment, database contents, webhook registration, and launch communications were not independently verified in the 2026-07-27 repository audit.
 
-**Production status (2026-07-24):**
+**Production reference:** `SESSION-HANDOVER.md` contains the operator-reported deployment notes. Treat them as operational handoff material, not as a substitute for a live smoke test.
 
-- URL: `https://amph-v2-greenfield.vercel.app`
-- Database: Neon Postgres, all 12 migrations applied, 4 pricing tiers seeded
-- Smoke tests: `/` → 200, `/signup` → 200, `/login` → 200, `/dashboard` → 307 (redirect)
-- Remaining operator items: PayMongo webhook endpoint, first admin user, custom domain, full signup→checkout smoke test, DB backup/restore drill, security audit, launch comms.
+## Sprint 13 — Admin panel and assessment infrastructure
 
-## Sprint 13 — Admin Panel Round 2 (5 pts)
+The original Sprint 13 table was written before the work landed. The current repository snapshot is:
 
-| ID        | Title                                | Pts | Status     |
-| --------- | ------------------------------------ | --- | ---------- |
-| STORY-061 | Admin audit log viewer + CSV export  | 1   | ⏳ Planned |
-| STORY-062 | Admin refund requests list + process | 1   | ⏳ Planned |
-| STORY-063 | Admin email templates                | 1   | ⏳ Planned |
-| STORY-064 | (to be added)                        | 1   | ⏳ Planned |
-| STORY-065 | (to be added)                        | 1   | ⏳ Planned |
+| Story     | Current state                                    | Evidence                                                                                                                                                   |
+| --------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| STORY-061 | ✅ Implemented                                   | `/admin/audit-log`, `/admin/audit-log/export`, `ListAuditLogs`, and `ExportAuditLogs` are present.                                                         |
+| STORY-062 | ✅ Implemented                                   | `/admin/refunds`, `/admin/refunds/[orderId]`, list/process actions, and use cases are present.                                                             |
+| STORY-063 | ◐ Backend partial                                | `EmailTemplate` entity, Prisma adapter, repository, and use cases are present; the documented admin email-template pages and actions are not in `src/app`. |
+| STORY-064 | ◐ Implemented in source, story file missing      | Simulator attempt persistence and lifecycle classes are wired, but no `docs/stories/STORY-064.md` is tracked on this branch.                               |
+| STORY-065 | ◐ Implemented in source, story status needs sync | Score policies and grading use cases are wired; the story document still needs a current status note.                                                      |
+| STORY-066 | ✅ Implemented in source                         | Feedback composer and remediation use case are wired and tested.                                                                                           |
+| STORY-067 | ✅ Implemented in source                         | STR Triage graded attempt action and simulator scoring are present.                                                                                        |
+| STORY-068 | ✅ Implemented in source                         | Bid Elevator graded attempt action and simulator scoring are present.                                                                                      |
+| STORY-069 | ✅ Implemented in source                         | Campaign Builder graded attempt action and simulator scoring are present.                                                                                  |
+| STORY-070 | ✅ Implemented in source, story file missing     | Listing Audit graded attempt action and simulator scoring are present, but no `docs/stories/STORY-070.md` is tracked on this branch.                       |
 
-## Sprint 14 — Simulator Scoring Integrity (7 pts)
+The assessment stories remain partial from a product-completeness perspective. The four graded actions currently use `userId: "system"`, and the simulator accuracy audit says scores must not drive certification or hiring decisions.
+
+## Sprint 14 — Simulator scoring integrity (7 pts)
 
 **Goal:** Make the grade mean something before improving what it grades. Today a
 learner can pass every Listing Audit difficulty by clicking "fix" on every

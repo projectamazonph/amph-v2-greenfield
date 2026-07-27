@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-24
 **Owner:** Ryan Dabao
-**Status:** Ready
+**Status:** ✅ Implemented in the current source. `ComposeAttemptFeedback` and `AttemptFeedback` are wired into the graded simulator actions and covered by tests. Simulator score limitations remain documented separately.
 
 ## Context
 
