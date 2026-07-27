@@ -1,5 +1,37 @@
 # SESSION-HANDOVER.md
 
+# Daily log
+
+## 2026-07-27 (session: mvs_9506d1f16ebd47c69db20153aa70acd2)
+
+### Completed
+
+- Fixed simulator test explanation assertions (86/86 green): explanation was 100, needed 0.
+- Fixed TypeScript narrowing errors in ScorePolicy.test.ts, duplicate `id` property in seed-simulator-policies.test.ts.
+- Fixed PayMongo env var mismatch (PAYMONGO_SECRET vs PAYMONGO_SECRET_KEY).
+- Fixed stale cron docs (vercel.json runs daily at 8am UTC, not every 5 min).
+- Updated build-spec.md: KeywordResearch as ListingAudit alias, RunKeywordResearch removed, explanation=0 note.
+- Created Resend webhook route with HMAC-SHA256 verification; added RESEND_WEBHOOK_SECRET to .env.example.
+- Wired `getSessionUserId` into all 4 simulator actions.
+- Created `20260727130000_add_badge_archived` migration and implemented PrismaBadgeRepository.create/update/archive.
+- **#3 Fixed**: seed-admin-user.mjs now uses PrismaPg + pg.Pool (same as src/infra/database/prisma.ts).
+- **#4 Fixed**: session revocation via `currentSessionVersion` counter. JWT embeds sessionVersion at login; getSessionUserId verifies against DB; enforces lockedUntil. Added to UserRepository port, PrismaUserRepository, InMemoryUserRepository. Created `20260728000000_add_session_version` migration. Fixed createUser validation bug (params→direct destructuring).
+- **#5 Fixed**: impersonateUser captures adminSessionToken BEFORE overwriting it.
+- **#6 Fixed**: GetAdminDashboardStats uses orderRepo.countPendingRefunds() instead of hardcoded 0. Wired into port + both implementations + EnrollStudent tests.
+- **#7 Fixed**: Quiz lesson renderer links to /courses/[slug]/lessons/[id]/quiz instead of "coming soon".
+- **#8 Fixed**: Migration contract test uses `node .../prisma/build/index.js` instead of `./node_modules/.bin/prisma` for Windows compatibility. Increased vitest testTimeout to 30s.
+- Fixed all test files: added currentSessionVersion/lockedUntil to User objects, getCurrentSessionVersion/revokeAllSessions mocks, countPendingRefunds mock, quiz placeholder text, auth guard seedUser calls.
+
+### Test results
+- 288 test files, 3056 tests pass, 2 skipped.
+- TypeScript: only 2 pre-existing ComposioClient errors (unrelated).
+- ESLint: clean.
+
+### Pending
+- PR #218 open on branch `test/simulator-use-case-tests` (clock fix + audit completions). Needs CI approval and manual merge (auto-merge not enabled).
+
+---
+
 # Current audit addendum (2026-07-27)
 
 The repository was audited at commit `5b8072b` on branch `fix/appurl-helper`. The current source contains 68 App Router page/route files, 34 Prisma models, 20 migrations, the admin route tree, four registered simulator engines, and the four authored operational runbooks. The operator-reported production state below is historical handoff material and was not independently rechecked from this workstation.
