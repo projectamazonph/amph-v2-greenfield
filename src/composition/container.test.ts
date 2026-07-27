@@ -96,6 +96,9 @@ import { IssueCertificate } from "@/usecases/IssueCertificate";
 import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
 import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 import { RevokeCertificate } from "@/usecases/RevokeCertificate";
+// STORY-092 (US-008): admin certificate list + detail
+import { AdminListCertificates } from "@/usecases/AdminListCertificates";
+import { AdminGetCertificate } from "@/usecases/AdminGetCertificate";
 import { GetAdminDashboardStats } from "@/usecases/GetAdminDashboardStats";
 import { ListCourses } from "@/usecases/ListCourses";
 import { GetCourse } from "@/usecases/GetCourse";
@@ -384,6 +387,17 @@ export function buildTestContainer(): TestContainer {
     revokeCertificate: new RevokeCertificate({
       certificateRepo,
       clock,
+    }),
+    // STORY-092 (US-008): admin certificate list + detail
+    adminListCertificates: new AdminListCertificates({
+      certificateRepo,
+      userRepo,
+      courseRepo,
+    }),
+    adminGetCertificate: new AdminGetCertificate({
+      certificateRepo,
+      userRepo,
+      courseRepo,
     }),
     getAdminDashboardStats: new GetAdminDashboardStats({
       userRepo,

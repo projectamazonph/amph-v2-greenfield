@@ -51,9 +51,9 @@ import type { UserRepository } from "@/ports/repositories/UserRepository";
 
 // ── Helpers ─────────────────────────────────────────────────
 
-type GetCurrentUserFn = (
-  container: { userRepo: UserRepository },
-) => Promise<{ id: string; role: "STUDENT" | "INSTRUCTOR" | "ADMIN" } | null>;
+type GetCurrentUserFn = (container: {
+  userRepo: UserRepository;
+}) => Promise<{ id: string; role: "STUDENT" | "INSTRUCTOR" | "ADMIN" } | null>;
 
 function makeGetCurrentUser(
   returnValue: { id: string; role: "STUDENT" | "INSTRUCTOR" | "ADMIN" } | null,
@@ -88,10 +88,7 @@ async function seedStudent(container: ReturnType<typeof buildTestContainer>, id 
   // The repo's create() default role is STUDENT — no override needed.
 }
 
-async function seedCertificate(
-  container: ReturnType<typeof buildTestContainer>,
-  id = "cert-1",
-) {
+async function seedCertificate(container: ReturnType<typeof buildTestContainer>, id = "cert-1") {
   await container.certificateRepo.create({
     id,
     userId: "u-other",
@@ -281,6 +278,132 @@ describe("performRevokeCertificate", () => {
       }),
     );
     expect(result.ok).toBe(true);
+  });
+});
+
+// ── STORY-092: audit-log gap closure ──────────────────────────────────────
+
+describe("performRevokeCertificate — audit logging (STORY-092)", () => {
+  it("records a certificate.revoked audit entry on a successful first revoke", async () => {
+    const container = buildTestContainer();
+    await seedAdmin(container, "u-admin-1");
+    await seedCertificate(container, "cert-1");
+    const getCurrentUser = makeGetCurrentUser({ id: "u-admin-1", role: "ADMIN" });
+
+    const spy = vi.spyOn(container.recordAuditLog, "execute");
+    const result = await performRevokeCertificate(
+      container,
+      { certificateId: "cert-1", reason: "Refund processed" },
+      getCurrentUser,
+    );
+
+    expect(result.ok).toBe(true);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: "u-admin-1",
+        action: "certificate.revoked",
+        targetType: "certificate",
+        targetId: "cert-1",
+        metadata: expect.objectContaining({
+          reason: "Refund processed",
+          courseId: "course-1",
+          userId: "u-other",
+          wasAlreadyRevoked: false,
+        }),
+      }),
+    );
+  });
+
+  it("records a certificate.revoked audit entry on the wasAlreadyRevoked:true idempotent replay", async () => {
+    const container = buildTestContainer();
+    await seedAdmin(container, "u-admin-1");
+    await seedCertificate(container, "cert-1");
+    const getCurrentUser = makeGetCurrentUser({ id: "u-admin-1", role: "ADMIN" });
+
+    // First revoke: writes to audit log with wasAlreadyRevoked:false
+    await performRevokeCertificate(
+      container,
+      { certificateId: "cert-1", reason: "Refund processed" },
+      getCurrentUser,
+    );
+
+    const spy = vi.spyOn(container.recordAuditLog, "execute");
+    // Second revoke (idempotent): still writes to audit log (wasAlreadyRevoked:true)
+    const result = await performRevokeCertificate(
+      container,
+      { certificateId: "cert-1", reason: "Re-assert" },
+      getCurrentUser,
+    );
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.wasAlreadyRevoked).toBe(true);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: "u-admin-1",
+        action: "certificate.revoked",
+        targetType: "certificate",
+        targetId: "cert-1",
+        metadata: expect.objectContaining({
+          reason: "Re-assert",
+          wasAlreadyRevoked: true,
+        }),
+      }),
+    );
+  });
+
+  it("does NOT record an audit log entry on unauthorized / not_found / invalid_reason paths", async () => {
+    // Test the "all error paths skip the audit log" guarantee.
+    // Each case constructs a fresh container so the spy is isolated.
+    const cases: Array<{
+      label: string;
+      setup: (c: ReturnType<typeof buildTestContainer>) => Promise<void>;
+      getCurrentUser: GetCurrentUserFn;
+      input: { certificateId: string; reason: string };
+    }> = [
+      {
+        label: "unauthorized (no session)",
+        setup: async () => {
+          /* nothing */
+        },
+        getCurrentUser: makeGetCurrentUser(null),
+        input: { certificateId: "cert-1", reason: "x" },
+      },
+      {
+        label: "unauthorized (not admin)",
+        setup: async (c) => {
+          await seedStudent(c, "u-student-1");
+        },
+        getCurrentUser: makeGetCurrentUser({ id: "u-student-1", role: "STUDENT" }),
+        input: { certificateId: "cert-1", reason: "x" },
+      },
+      {
+        label: "invalid_reason (empty)",
+        setup: async (c) => {
+          await seedAdmin(c, "u-admin-1");
+        },
+        getCurrentUser: makeGetCurrentUser({ id: "u-admin-1", role: "ADMIN" }),
+        input: { certificateId: "cert-1", reason: "" },
+      },
+      {
+        label: "certificate_not_found",
+        setup: async (c) => {
+          await seedAdmin(c, "u-admin-1");
+        },
+        getCurrentUser: makeGetCurrentUser({ id: "u-admin-1", role: "ADMIN" }),
+        input: { certificateId: "missing-cert", reason: "x" },
+      },
+    ];
+
+    for (const tc of cases) {
+      const container = buildTestContainer();
+      await tc.setup(container);
+      const spy = vi.spyOn(container.recordAuditLog, "execute");
+      const result = await performRevokeCertificate(container, tc.input, tc.getCurrentUser);
+      expect(result.ok).toBe(false);
+      expect(spy, `audit log should NOT be called for: ${tc.label}`).not.toHaveBeenCalled();
+    }
   });
 });
 
