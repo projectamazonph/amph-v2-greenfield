@@ -1,0 +1,221 @@
+{
+  "project": "amph-v2-greenfield",
+  "branchName": "ralph/sprints-6-7-9-completeness-gaps",
+  "prdFile": "prd.md",
+  "description": "Close three Sprint 6/7/9 completeness gaps: student quiz UI wiring + access control, admin quiz editor, admin certificates page.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Quiz page: enforce AuthorizeLessonAccess",
+      "description": "As a non-enrolled student, I want the quiz page to deny me access past the preview limit so that I cannot bypass course enrollment by guessing a quiz URL.",
+      "acceptanceCriteria": [
+        "src/app/courses/[slug]/lessons/[lessonId]/quiz/page.tsx loads the parent course/lessonId (via quiz.courseId or the existing course-lookup helper) and calls container.authorizeLessonAccess.execute({ userId, courseId, lessonId }) before rendering QuizPlayer, mirroring the exact call shape in src/app/courses/[slug]/lessons/[lessonId]/page.tsx:66-81",
+        "When the decision kind is 'denied', the page renders the existing AccessDeniedPage component instead of QuizPlayer",
+        "When the decision kind is 'allowed' or 'allowed_preview', QuizPlayer renders as before",
+        "Admin users and actively-enrolled users continue to reach the quiz unaffected (no change to AuthorizeLessonAccess itself)",
+        "New/updated test in src/app/courses/[slug]/lessons/[lessonId]/quiz/__tests__/page.test.tsx covers: denied-not-enrolled renders AccessDeniedPage, allowed renders QuizPlayer, allowed_preview renders QuizPlayer",
+        "Type-check passes",
+        "Tests pass"
+      ],
+      "technicalNotes": "Mirror src/app/courses/[slug]/lessons/[lessonId]/page.tsx:66-81 exactly: `const userId = await getSessionUserId(); const authResult = await container.authorizeLessonAccess.execute({ userId: userId ?? \"\", courseId, lessonId }); if (!authResult.ok || authResult.value.kind === \"denied\") return <AccessDeniedPage .../>;`. The current quiz page (src/app/courses/[slug]/lessons/[lessonId]/quiz/page.tsx, 68 lines) only calls getSessionUser() and loads the quiz via container.quizRepo.findById(lessonId) -- courseId is available on the loaded Quiz entity (quiz.courseId) so no extra repo call is needed beyond what already runs. Do not modify AuthorizeLessonAccess (src/usecases/AuthorizeLessonAccess.ts) or its Result/error types. Existing test file: src/app/courses/[slug]/lessons/[lessonId]/quiz/__tests__/page.test.tsx (117 lines) already mocks @/composition/container and next/navigation -- extend those mocks to also stub authorizeLessonAccess.execute.",
+      "dependsOn": [],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Quiz mutation: migrate to server action + wire lesson placeholder",
+      "description": "As an enrolled student, I want to take a quiz directly from the lesson page (not a dead-end placeholder) and have my submission go through a server action so that the flow matches AGENTS.md Rule 4 (server actions for mutations, not API routes).",
+      "acceptanceCriteria": [
+        "New src/app/actions/submitQuizAttempt.action.ts wraps RecordQuizAttempt following the exact shape of src/app/actions/submitSimulatorAttempt.action.ts: auth guard via getSessionUser(), buildContainer(), an AuthorizeLessonAccess check (courseId from the loaded quiz, lessonId = quizId per existing convention), then container.recordQuizAttempt.execute(...), then flatten the Result to a plain response object",
+        "src/components/courses/QuizPlayer.tsx calls submitQuizAttempt(...) via useTransition/startTransition instead of fetch(POST /api/quizzes/[quizId]/attempt)",
+        "src/app/api/quizzes/[quizId]/attempt/route.ts and processQuizAttempt.ts are deleted, along with their dedicated tests, since the mutation now goes through the server action",
+        "src/app/courses/[slug]/lessons/LessonContent.tsx's QuizContent function (currently a static 'Interactive quiz -- coming soon!' placeholder, lines ~126-137) is replaced with a link/button to the sibling quiz route (`${lessonBasePath}/quiz`), using the existing lessonId-as-quizId convention -- no new prop threading needed beyond the lessonId/courseSlug already available in scope",
+        "Unit test for submitQuizAttempt.action.ts covering: unauthenticated -> error, denied access -> error, happy path -> returns attempt/score/passed/xpAwarded, quiz_not_found -> error",
+        "QuizPlayer.tsx tests updated to assert the server action is called instead of fetch",
+        "docs/stories/STORY-090.md written documenting this deliverable end-to-end (US-001 + US-002), matching the STORY-026/STORY-031 template shape (Status, Overview, acceptance criteria, files touched)",
+        "Type-check passes",
+        "Tests pass"
+      ],
+      "technicalNotes": "Pattern file: src/app/actions/submitSimulatorAttempt.action.ts (65 lines, full pattern: auth guard -> own container -> ownership/access check -> instantiate/call use case -> flatten Result into {status,...}|{error:kind}). RecordQuizAttempt signature (src/usecases/RecordQuizAttempt.ts, unchanged): execute({userId, quizId, answers: {questionId, selectedOptionId}[]}) -> Result<{attempt, score, passed, xpAwarded}, RecordQuizAttemptError>. QuizPlayer.tsx is 162 lines, client component, one-question-at-a-time flow -- only the final-submit fetch call needs to change to a server action call (React 19 useTransition + startTransition is already used elsewhere in the codebase for server-action-backed client components; check src/components for an existing example of this pattern before introducing a new one). LessonContent.tsx QuizContent currently only receives {title} -- the lessonId and courseSlug are already in the parent component's scope (see how VideoContent/TextContent receive their props) so pass through what's needed to build the link href (e.g. `/courses/${courseSlug}/lessons/${lessonId}/quiz`). Story doc goes in docs/stories/STORY-090.md -- use STORY-031.md's header/status/acceptance-criteria structure as the template.",
+      "dependsOn": ["US-001"],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Quiz repository: add update/delete/findAll + fix order persistence bug",
+      "description": "As the admin quiz editor (built in later stories), I need IQuizRepository to support update, delete, and findAll so that a full CRUD admin surface is possible, and I need question/option ordering to actually persist.",
+      "acceptanceCriteria": [
+        "src/ports/repositories/IQuizRepository.ts adds: update(quiz: Quiz): Promise<Result<Quiz, QuizRepositoryError>>, delete(id: string): Promise<Result<void, QuizRepositoryError>>, findAll(): Promise<Result<readonly Quiz[], QuizRepositoryError>>",
+        "QuizRepositoryError gains a 'not_found' kind (currently only 'db_error') used by update/delete when the id doesn't exist",
+        "PrismaQuizRepository implements all three new methods; update() replaces child QuizQuestion/QuizOption rows inside a prisma.$transaction (delete-then-recreate, relying on the existing onDelete: Cascade relations) rather than mutating in place",
+        "PrismaQuizRepository.create() and the new update() both persist question/option 'order' as the actual array index instead of the hardcoded 0 (fixes the existing bug at PrismaQuizRepository.ts:32,43)",
+        "delete() returns a 'has_attempts' error kind (added to QuizRepositoryError) and refuses to delete if any QuizAttempt row references the quiz's id (query via a raw findMany on quizAttemptRepo equivalent, or a direct count query in the Prisma adapter -- QuizAttempt.quizId has no FK/cascade declared in prisma/schema.prisma so this must be an explicit application-level guard)",
+        "InMemoryQuizRepository implements the same three methods with equivalent semantics (including the has_attempts guard, taking an optional injected attempt-lookup or checking a shared in-memory store consistent with how InMemoryQuizAttemptRepository is seeded in tests)",
+        "Unit tests for all three new methods on both InMemoryQuizRepository and PrismaQuizRepository (or PrismaQuizRepository's integration test file if one exists) covering happy path, not_found, and has_attempts (for delete)",
+        "port-segregation.test.ts still passes (IQuizRepository goes from 3 to 6 methods, cap is 12)",
+        "Type-check passes",
+        "Tests pass"
+      ],
+      "technicalNotes": "Current port: src/ports/repositories/IQuizRepository.ts (full file, 19 lines) has only create/findById/findByCourseId with QuizRepositoryError = { kind: 'db_error'; message: string }. Precedent for a listAll-style method: src/ports/repositories/OrderRepository.ts:27-32 (listAll(filters?): sorted, sorted createdAt desc -- for quizzes there's no natural filter param needed, so findAll() with no args is fine, or accept an optional courseId filter matching findByCourseId's scope if that reads more consistently). Precedent for hard-delete with an audit trail one layer up: src/usecases/DeleteModule.ts (33-81). Schema: prisma/schema.prisma:533-591 -- Quiz/QuizQuestion/QuizOption have onDelete: Cascade relations; QuizAttempt has no @relation/FK to Quiz at all (bare quizId string), which is why the has_attempts guard must be an explicit query, not something the DB enforces. PrismaQuizRepository.ts:26-46 is the create() method with the order:0 bug at lines 32 and 43 -- fix by using the array index from questions.map((q, qIndex) => ...) and options.map((o, oIndex) => ...).",
+      "dependsOn": [],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Quiz admin use cases + audit actions + container wiring",
+      "description": "As an admin, I need use cases to list, get, create, update, and delete quizzes, each fully audit-logged, so that the admin UI (built in a later story) has something to call.",
+      "acceptanceCriteria": [
+        "New src/usecases/AdminListQuizzes.ts: optional courseId filter, returns Result<{quizzes: readonly Quiz[]}, AdminListQuizzesError>",
+        "New src/usecases/AdminGetQuiz.ts: by id, returns Result<{quiz: Quiz}, AdminGetQuizError> with a not_found kind",
+        "New src/usecases/AdminCreateQuiz.ts: validates via createQuiz(), persists via quizRepo.create(), calls recordAuditLog with action 'quiz.created' on success and 'quiz.create_failed' on every error branch (invalid input and db_error), matching AdminCreateBadge.ts's exact structure",
+        "New src/usecases/AdminUpdateQuiz.ts: loads existing quiz (not_found if missing), reconstructs the full aggregate via createQuiz() with merged fields, persists via quizRepo.update(), audit-logs 'quiz.updated' / 'quiz.update_failed'",
+        "New src/usecases/AdminDeleteQuiz.ts: persists via quizRepo.delete() (surfacing has_attempts from US-003), audit-logs 'quiz.deleted' / 'quiz.delete_failed', matching DeleteModule.ts's hard-delete + audit pattern",
+        "src/domain/values/AuditAction.ts gains quiz.created, quiz.updated, quiz.deleted, quiz.create_failed, quiz.update_failed, quiz.delete_failed in both the type union and the ALL_ACTIONS array",
+        "All 5 use cases wired into src/composition/container.ts (AppContainer interface fields + buildProductionContainer wiring) and src/composition/container.test.ts (TestContainer + buildTestContainer wiring), consuming the existing quizRepo and shared recordAuditLog instance -- same placement/shape as the adminListBadges..adminArchiveBadge block",
+        "Each use case has a colocated __tests__ file (or tests/unit/usecases equivalent) with real, non-todo assertions per use-case-coverage.test.ts's gate, covering: happy path, every declared error kind, and an assertion that recordAuditLog.execute was called with the expected action/targetType/targetId on both success and failure",
+        "Type-check passes",
+        "Tests pass"
+      ],
+      "technicalNotes": "Exact pattern file: src/usecases/AdminCreateBadge.ts (full file, 87 lines) -- options-object deps ({quizRepo, recordAuditLog}), Result<{quiz}, AdminCreateQuizError> with kind union mirroring CreateQuizError (from src/domain/entities/Quiz.ts) plus db_error. RecordAuditLog call shape: await this.deps.recordAuditLog.execute({actorId, action, targetType: 'quiz', targetId: quiz.id, metadata: {...}}) -- see AdminCreateBadge.ts:77-85 for success and 38-72 for the failure branches. AdminUpdateQuiz has no domain updateQuiz() helper to call (confirmed absent from Quiz.ts) -- reconstruct via createQuiz(merged params) same as AdminUpdateBadge.ts:48 does with updateBadge but there's no equivalent pure merge helper for Quiz, so build the merged params object inline in the use case before calling createQuiz(). AdminDeleteQuiz mirrors DeleteModule.ts (33-81) exactly for the audit-on-both-paths shape. Container wiring reference: src/composition/container.ts:544-549 (badge block) and :53,79,152-156,251-252,306-311,421 (import/type/instantiation line numbers for the badge pattern) -- quizRepo is already wired at container.ts:50,76,418,550, so only new use case imports/fields/instantiations are needed, no new repo instantiation.",
+      "dependsOn": ["US-003"],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Quiz admin server actions",
+      "description": "As the admin quiz editor pages (next story), I need server actions for create/update/delete that inject actorId from the session so that no client code can spoof who made a change.",
+      "acceptanceCriteria": [
+        "New src/app/actions/createQuiz.action.ts: requireAdmin() -> buildContainer() -> container.adminCreateQuiz.execute({...input, actorId: session.id}) -> map Result to {ok:true, quizId}|{ok:false, error:string}. Input type has no actorId field.",
+        "New src/app/actions/updateQuiz.action.ts: same shape for update",
+        "New src/app/actions/deleteQuiz.action.ts: same shape for delete, surfacing the has_attempts error kind distinctly so the admin page can show a specific message",
+        "Unit tests for all three actions asserting: requireAdmin() is called, actorId passed to the use case equals the session user's id (never a client-supplied value), and Result.err is mapped to {ok:false, error: <kind>}",
+        "Type-check passes",
+        "Tests pass"
+      ],
+      "technicalNotes": "Exact pattern file: src/app/actions/createBadge.action.ts (full file, 33 lines) -- `const session = await requireAdmin(); const container = buildContainer(); const r = await container.adminCreateBadge.execute({...input, actorId: session.id}); if (!r.ok) return {ok:false, error: r.error.kind}; return {ok:true, badgeSlug: r.value.badge.slug};`. Sibling files updateBadge.action.ts and archiveBadge.action.ts follow the identical shape for update/delete-equivalent operations. Input types for createQuiz/updateQuiz should carry courseId, title, passingScore, and a questions array shape matching CreateQuizParams (id/questionText/options[] with optionText/isCorrect) -- the admin page (US-006) builds this from its nested form state.",
+      "dependsOn": ["US-004"],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Quiz admin pages: list, create, edit with nested question/option editor",
+      "description": "As an admin, I want /admin/quizzes to list all quizzes (filterable by course), and forms to create/edit a quiz including its questions and options, so that I never need direct DB access to manage quiz content.",
+      "acceptanceCriteria": [
+        "src/app/admin/quizzes/page.tsx: requireAdmin() first line, buildContainer(), calls container.adminListQuizzes.execute() (optionally filtered by a ?courseId= search param), renders a client table component with columns: title, course, question count, passing score, and Edit/Delete row actions, plus a '+ Add quiz' link, matching src/app/admin/badges/page.tsx's structure",
+        "src/app/admin/quizzes/new/page.tsx: form with title, passing score, a course dropdown (populated from an existing course-listing use case/repo, validating the selected course exists), and a client-side repeatable question/option editor (add/remove question, add/remove option per question, mark exactly one option correct per question via radio buttons) submitting the whole payload to createQuiz action on submit; validation errors from Result.error.kind rendered as an inline banner, same redirect-with-error-searchparam pattern as /admin/badges/new",
+        "src/app/admin/quizzes/[id]/edit/page.tsx: same nested editor pre-populated from adminGetQuiz, wired to updateQuiz action, plus a delete form/button in a danger-zone section wired to deleteQuiz action; a has_attempts delete error renders a specific 'cannot delete: attempts exist' message rather than a generic error",
+        "notFound() is called when adminGetQuiz returns not_found for an unknown [id]",
+        "docs/stories/STORY-091.md written documenting this deliverable end-to-end (US-003 through US-006), matching the STORY-050b.md template shape (Status, Goal, Acceptance Criteria by layer, Pitfalls, Out of scope)",
+        "docs/admin-backend.md updated: replace the stale 'Quiz editor (JSON, validated against the quiz schema)' note nested under the module editor section with a description of the real /admin/quizzes surface, and add a row to the 'What Lives Where' table",
+        "New UI built with Astryx components per AGENTS.md/CLAUDE.md conventions (Table for the list, no raw <div> layout, tokens not hardcoded values) -- run `pnpm exec astryx build \"admin quiz editor with nested questions and options\"` for a composition kit before writing markup",
+        "E2E test: admin creates a quiz with 2 questions (one correct option each), sees it in the list, edits the title, deletes it",
+        "Type-check passes",
+        "Tests pass",
+        "pnpm build succeeds"
+      ],
+      "technicalNotes": "Pattern files (full content already read): src/app/admin/badges/page.tsx (51 lines, list), src/app/admin/badges/new/page.tsx (169 lines, create form with inline 'use server' handleSubmit delegating to an imported action), src/app/admin/badges/[slug]/edit/page.tsx (213 lines, edit + danger-zone archive -- for quizzes this becomes edit + danger-zone hard-delete). Important architectural note from exploration: the Course/Module/Lesson admin pattern (src/app/admin/courses/[id]/modules/[moduleId]/...) uses a drill-down page-per-level approach for nested children, NOT an inline nested-editor -- this story deliberately departs from that precedent because questions/options are tightly coupled to their quiz (unlike modules/lessons, which are independently orderable/reorderable via dedicated reorder actions) and the task explicitly calls for 'a nested editor for questions and options' in one page. Build the nested editor as client-side React state (array of questions, each with an array of options) submitted as one JSON-shaped payload on final submit -- no per-question/per-option server round-trip needed. Course dropdown: look at how courseId is sourced elsewhere in admin forms (e.g. any existing admin page with a course picker) or use container.courseRepo/adminListCourses if one exists; if no course-listing use case exists for a dropdown, use the simplest existing read path (courseRepo.findAll or equivalent) since this is read-only. docs/admin-backend.md relevant existing section: lines ~160-166 (module editor doc mentioning quiz JSON blob) and ~310-319 ('What Lives Where' table).",
+      "dependsOn": ["US-005"],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Certificate repository: add listAll",
+      "description": "As the admin certificates page (later story), I need ICertificateRepository to support listing all certificates (not just by user) so that an admin list view is possible.",
+      "acceptanceCriteria": [
+        "src/ports/repositories/ICertificateRepository.ts adds listAll(filters?: { status?: CertificateStatus }): Promise<Result<readonly Certificate[], CertificateRepositoryError>>, sorted issuedAt desc",
+        "PrismaCertificateRepository implements listAll with the optional status filter and issuedAt desc ordering",
+        "InMemoryCertificateRepository implements listAll with equivalent semantics",
+        "Unit tests for listAll on InMemoryCertificateRepository (and PrismaCertificateRepository's integration test if one exists) covering: no filter returns all sorted desc, status filter narrows correctly, empty store returns empty array",
+        "port-segregation.test.ts still passes (ICertificateRepository goes from 5 to 6 methods, cap is 12)",
+        "Type-check passes",
+        "Tests pass"
+      ],
+      "technicalNotes": "Exact precedent to mirror: src/ports/repositories/OrderRepository.ts:27-32 -- `listAll(filters?: { status?: PaymentStatus }): Promise<Result<Order[], OrderError>>` with the doc comment pattern ('STORY-XXX: admin list view of all X, sorted by createdAt desc. Optionally filter by status.'). Current port: src/ports/repositories/ICertificateRepository.ts:12-51 (full file) has create/findById/findByVerificationHash/findByUserId/update only. PrismaCertificateRepository.ts:18-113 is the only prod adapter -- add a straightforward findMany with an optional where:{status} and orderBy:{issuedAt:'desc'}.",
+      "dependsOn": [],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Certificate admin use cases + audit-log fix + container wiring",
+      "description": "As an admin, I need use cases to list all certificates (with user/course info) and view one in detail, and I need the existing revoke action to actually leave an audit trail, so that certificate revocation is both usable and accountable.",
+      "acceptanceCriteria": [
+        "New src/usecases/AdminListCertificates.ts: optional status filter, returns Result<{certificates: readonly Certificate[]; users: ReadonlyMap<string,User>; courses: ReadonlyMap<string,Course>}, AdminListCertificatesError>, batch-hydrating users/courses via dedupe-then-loop (mirroring ListRefundRequests.ts:76-88) rather than N+1 lookups per row",
+        "New src/usecases/AdminGetCertificate.ts: by id, returns Result<{certificate: Certificate; user: User; course: Course}, AdminGetCertificateError> with a not_found kind, mirroring AdminGetPayment.ts's single-record join",
+        "src/domain/values/AuditAction.ts gains certificate.revoked in both the type union and ALL_ACTIONS array",
+        "src/app/actions/revokeCertificate.action.ts (existing, 160 lines) gains a recordAuditLog call on the success path (including the wasAlreadyRevoked:true idempotent-replay case) using action 'certificate.revoked', targetType 'certificate', targetId certificateId, metadata: {reason, courseId, userId} -- this closes STORY-044's explicitly deferred audit-log gap. RevokeCertificate.ts itself is NOT modified (audit logging stays the caller's responsibility per its existing design)",
+        "Both new use cases wired into src/composition/container.ts and container.test.ts (AppContainer/TestContainer fields + both builders), consuming the existing certificateRepo, userRepo, courseRepo, and shared recordAuditLog instance",
+        "Colocated tests for both new use cases with real assertions: happy path, not_found, and (for AdminListCertificates) correct Map hydration with duplicate userIds/courseIds collapsed to single lookups",
+        "Test for revokeCertificate.action.ts updated to assert recordAuditLog.execute was called with the expected action/metadata on a successful revoke",
+        "Type-check passes",
+        "Tests pass"
+      ],
+      "technicalNotes": "Hydration pattern: src/usecases/ListRefundRequests.ts:76-88 (Set-dedupe userIds, loop userRepo.findById, build Map<string,User>) -- do the same twice (once for userId, once for courseId) since AdminListCertificates needs both. Single-record join pattern: src/usecases/AdminGetPayment.ts (full file) and src/usecases/VerifyCertificate.ts (126 lines, the existing public-view analog: findByVerificationHash -> userRepo.findById -> courseRepo.findById, mapping missing user/course to defensive not_found-style error kinds since they'd indicate a data-integrity bug). revokeCertificate.action.ts's existing structure (already read in full): performRevokeCertificate(container, input, getCurrentUser) does auth+role check -> reason validation -> container.revokeCertificate.execute({certificateId, reason, revokedBy: sessionUser.id}) -- add the recordAuditLog.execute(...) call right after a successful result, using container.recordAuditLog (already available on AppContainer). RecordAuditLog never returns an error (src/usecases/RecordAuditLog.ts, 78 lines) so no branching needed on its result. Container wiring precedent for the adminListPayments/adminGetPayment pair: container.ts comment blocks at lines ~198-206 and ~352-356 (STORY-049).",
+      "dependsOn": ["US-007"],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Certificate admin pages: list, detail, revoke",
+      "description": "As an admin, I want /admin/certificates to list all issued certificates and let me open one to revoke it with a reason, so that I can handle certificate disputes without SQL access.",
+      "acceptanceCriteria": [
+        "src/app/admin/certificates/page.tsx: requireAdmin() first line, buildContainer(), calls container.adminListCertificates.execute(), renders a table with columns: user (name/email via the hydrated Map), course title, status, issuedAt, and verificationHash truncated (e.g. first 8 + last 4 chars with an ellipsis), each row linking to the detail page. Matches src/app/admin/refunds/page.tsx's structure (dedicated use case + client table component fed serializable rows)",
+        "src/app/admin/certificates/[id]/page.tsx: requireAdmin(), container.adminGetCertificate.execute({id}) (notFound() if not_found), renders certificate detail (full hash, status, issuedAt, revokedAt/revokedReason if revoked) plus user and course info in Card sections",
+        "Detail page has a revoke form (reason textarea, required) wired to the existing revokeCertificateAction (src/app/actions/revokeCertificate.action.ts) via an inline 'use server' handler that redirects back to the detail page with a success or error search-param banner, matching /admin/refunds/[orderId]/page.tsx's handleProcessRefund pattern",
+        "The revoke form is hidden/disabled if the certificate's status is already 'revoked' (no double-revoke UI path, even though the underlying action is idempotent)",
+        "docs/stories/STORY-092.md written documenting this deliverable end-to-end (US-007 through US-009), matching the STORY-041.md template shape (Status, Overview, entity/port/use-case sections already-existing vs new, Design Decisions)",
+        "docs/admin-backend.md 'What Lives Where' table gains a row for /admin/certificates",
+        "New UI built with Astryx components (Table for the list, Card for detail sections, no raw <div> layout, tokens not hardcoded values) -- run `pnpm exec astryx build \"admin certificate list and revoke\"` for a composition kit before writing markup",
+        "E2E test: admin lists certificates, opens one, revokes it with a reason, sees status flip to revoked and the reason displayed",
+        "Type-check passes",
+        "Tests pass",
+        "pnpm build succeeds"
+      ],
+      "technicalNotes": "Pattern files (already read in full): src/app/admin/refunds/page.tsx (194 lines, list: dedicated use-case call + client table + cursor/tab pattern -- certificates need only basic status filter, no pagination cursor needed unless volume warrants it, keep it simple with a single execute() call), src/app/admin/refunds/[orderId]/page.tsx (239 lines, detail: Card sections + inline 'use server' handler wired to a plain <form action={handler}>, e.g. `async function handleRevoke() { \"use server\"; const r = await revokeCertificateAction({certificateId: id, reason}); if (r.ok) redirect(...); redirect(`?error=${r.error.kind}`); }` -- note reason must come from FormData since server actions bound to forms receive FormData, not a closed-over variable, unlike the refund example which has no reason field: use a form action signature `async function handleRevoke(formData: FormData) { \"use server\"; const reason = String(formData.get('reason') ?? ''); ... }`). revokeCertificateAction is already fully built and auth-checked (src/app/actions/revokeCertificate.action.ts, 160 lines) -- call it directly, do not write a new action. Hash truncation: simple string slice, no new utility needed unless one already exists (check src/lib for a truncate/format helper before adding one).",
+      "dependsOn": ["US-008"],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Final integration: full validation, self-check, single PR",
+      "description": "As the team merging this work, I need one PR covering all three deliverables, fully green on CI, with a documented self-check that no architectural rules were violated.",
+      "acceptanceCriteria": [
+        "pnpm tsc --noEmit passes with zero errors across the whole repo",
+        "pnpm lint passes with zero errors (including local/no-ai-slop and the boundary/ISP/dependency-direction architecture tests)",
+        "pnpm test and pnpm test:coverage pass, coverage at or above 80% lines / 70% branches / 80% functions / 80% statements",
+        "pnpm build succeeds",
+        "pnpm test:e2e passes, including the new quiz-access, admin-quiz-CRUD, and admin-certificate-revoke E2E flows added in US-002/US-006/US-009",
+        "Self-check performed and documented in the PR description: grep every new/changed file under src/domain, src/usecases, src/ports for imports of next/@prisma/client/paymongo/resend/server-only -- zero matches",
+        "Self-check: every new *.action.ts file's client-facing input type has no actorId/revokedBy/userId-as-actor field -- actorId/revokedBy is only ever set from requireAdmin()/getSessionUser() session data server-side",
+        "Self-check: every new Admin* use case (AdminCreateQuiz, AdminUpdateQuiz, AdminDeleteQuiz, plus the certificate revoke audit fix) has a recordAuditLog call reachable from every error branch and the success branch -- verified by reading each file, not just grepping for the call once",
+        "Self-check: every new discriminated Result error union (QuizRepositoryError, AdminCreateQuizError, AdminUpdateQuizError, AdminDeleteQuizError, AdminListQuizzesError, AdminGetQuizError, CertificateRepositoryError additions, AdminListCertificatesError, AdminGetCertificateError) is exhaustively handled (switch or if/else covering every kind, or a default that surfaces an explicit 'unknown error' rather than silently ignoring) at every page/action call site",
+        "docs/stories/STORY-090.md, STORY-091.md, STORY-092.md all exist and are committed",
+        "docs/admin-backend.md updated per US-006 and US-009",
+        "One PR opened against main from the ralph/sprints-6-7-9-completeness-gaps branch, body referencing STORY-090, STORY-091, and STORY-092, summarizing all three deliverables and linking the CI run",
+        "Conventional commit messages throughout (feat:, fix:, docs:, test:), one concern per commit"
+      ],
+      "technicalNotes": "This story does not add new product code -- it is the wrap-up gate. Run the full command suite from CLAUDE.md's Commands section in order: pnpm prisma:generate (if the schema changed in US-003/US-007), pnpm tsc --noEmit, pnpm lint, pnpm test, pnpm test:coverage, pnpm test:e2e, pnpm build. For the architecture self-checks, use the existing tests/architecture/*.test.ts suite as a first pass (dependency-direction.test.ts, dependency-inversion.test.ts, domain-purity.test.ts, no-circular-deps.test.ts, port-segregation.test.ts, use-case-coverage.test.ts, entity-coverage.test.ts, single-responsibility.test.ts all already run as part of pnpm test) but note per the exploration that there is NO automated architecture test for 'actorId must come from session, not client' or 'every admin write calls recordAuditLog' -- these two must be verified by manual code reading across every file touched in US-002/US-004/US-005/US-008, since CI will not catch a regression here.",
+      "dependsOn": ["US-002", "US-006", "US-009"],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
