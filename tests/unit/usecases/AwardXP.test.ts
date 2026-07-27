@@ -43,6 +43,8 @@ function makeUser(
     createdAt: NOW,
     totalXp,
     emailVerifiedAt: null,
+    currentSessionVersion: 0,
+    lockedUntil: null,
     ...overrides,
     updateTotalXp: vi.fn(async (xp: number) =>
       Result.ok(makeUser(totalXp + xp, overrides)),
@@ -76,6 +78,8 @@ function makeUserRepo(
       : vi.fn(),
     getTwoFactorSecret: vi.fn(),
     setTwoFactorSecret: vi.fn(),
+    getCurrentSessionVersion: vi.fn(),
+    revokeAllSessions: vi.fn(),
   };
 }
 

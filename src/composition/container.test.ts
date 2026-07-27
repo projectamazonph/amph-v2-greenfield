@@ -23,6 +23,7 @@ import { vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
+import type { ComposioClient } from "@/ports/integrations/ComposioClient";
 import type { CertificateHashGenerator } from "@/ports/security/CertificateHashGenerator";
 import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
 // STORY-012: MDX renderer. The test container uses the same
@@ -70,6 +71,7 @@ import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
 import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHashGenerator";
 import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
+import { InMemoryComposioClient } from "@/infra/integrations/InMemoryComposioClient";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { FakeTotpService } from "@/infra/security/FakeTotpService";
@@ -208,6 +210,7 @@ export interface TestContainer extends AppContainer {
   sentReminderRepo: InMemorySentReminderRepository;
   emailVerificationRepo: InMemoryEmailVerificationRepository;
   passwordResetRepo: InMemoryPasswordResetRepository;
+  composioClient: InMemoryComposioClient;
 }
 
 export function buildTestContainer(): TestContainer {
@@ -280,11 +283,13 @@ export function buildTestContainer(): TestContainer {
   // `refundOverride` container entry and `adminProcessRefund` share
   // the same instance — matches the production container's wiring.
   const refundOverride = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
+  const composioClient: ComposioClient = new InMemoryComposioClient();
 
   return {
     clock,
     idGen,
     emailVerificationRepo,
+    composioClient,
     passwordResetRepo,
     logger,
     rateLimiter,

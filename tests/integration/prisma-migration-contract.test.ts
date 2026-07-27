@@ -44,9 +44,10 @@ async function readDir(p: string): Promise<string[]> {
 async function getSchemaDiff(): Promise<string> {
   // SQL the current schema would produce against an empty DB.
   // Does not require a live Postgres.
+  // Use node + absolute path to the prisma CLI to avoid ./bin/ POSIX shim on Windows.
+  const prismaCli = path.resolve(REPO, "node_modules/prisma/build/index.js");
   return execSync(
-    "./node_modules/.bin/prisma migrate diff " +
-      "--from-empty --to-schema prisma/schema.prisma --script",
+    `node "${prismaCli}" migrate diff --from-empty --to-schema prisma/schema.prisma --script`,
     {
       cwd: REPO,
       env: { ...process.env, DATABASE_URL: "postgresql://x:x@localhost:5432/x" },
@@ -92,7 +93,8 @@ function extractStructuralNames(sql: string): {
     if (m[1]) tables.add(m[1]);
   }
   // CREATE [UNIQUE] INDEX [IF NOT EXISTS] "name"
-  const indexRe = /CREATE\s+(UNIQUE\s+)?INDEX(?:\s+IF\s+NOT\s+EXISTS)?\s+"?([A-Za-z_][A-Za-z0-9_]*)"?/gi;
+  const indexRe =
+    /CREATE\s+(UNIQUE\s+)?INDEX(?:\s+IF\s+NOT\s+EXISTS)?\s+"?([A-Za-z_][A-Za-z0-9_]*)"?/gi;
   for (const m of sql.matchAll(indexRe)) {
     if (m[2]) indexes.add(m[2]);
   }
@@ -112,7 +114,10 @@ function extractStructuralNames(sql: string): {
 describe("P0-3: Prisma migration contract", () => {
   it("prisma/migrations has a migration_lock.toml with provider set", async () => {
     const lockPath = path.join(REPO, "prisma/migrations/migration_lock.toml");
-    const exists = await fs.stat(lockPath).then(() => true).catch(() => false);
+    const exists = await fs
+      .stat(lockPath)
+      .then(() => true)
+      .catch(() => false);
     expect(exists).toBe(true);
     if (!exists) return;
     const content = await fs.readFile(lockPath, "utf8");
@@ -121,27 +126,27 @@ describe("P0-3: Prisma migration contract", () => {
 
   it("prisma/migrations has at least one migration", async () => {
     const entries = await readDir(path.join(REPO, "prisma/migrations"));
-    const migrationDirs = entries.filter(
-      (e) => e !== "migration_lock.toml" && !e.startsWith("."),
-    );
+    const migrationDirs = entries.filter((e) => e !== "migration_lock.toml" && !e.startsWith("."));
     expect(migrationDirs.length).toBeGreaterThanOrEqual(1);
   });
 
   it("each migration has a migration.sql file", async () => {
     const entries = await readDir(path.join(REPO, "prisma/migrations"));
-    const migrationDirs = entries.filter(
-      (e) => e !== "migration_lock.toml" && !e.startsWith("."),
-    );
+    const migrationDirs = entries.filter((e) => e !== "migration_lock.toml" && !e.startsWith("."));
     for (const dir of migrationDirs) {
       const sqlPath = path.join(REPO, "prisma/migrations", dir, "migration.sql");
-      const exists = await fs.stat(sqlPath).then(() => true).catch(() => false);
+      const exists = await fs
+        .stat(sqlPath)
+        .then(() => true)
+        .catch(() => false);
       expect(exists, `Missing migration.sql in ${dir}`).toBe(true);
     }
   });
 
   it("prisma validate succeeds (schema is internally consistent)", () => {
+    const prismaCli = path.resolve(REPO, "node_modules/prisma/build/index.js");
     expect(() => {
-      execSync("./node_modules/.bin/prisma validate", {
+      execSync(`node "${prismaCli}" validate`, {
         cwd: REPO,
         env: { ...process.env, DATABASE_URL: "postgresql://x:x@localhost:5432/x" },
         stdio: "pipe",

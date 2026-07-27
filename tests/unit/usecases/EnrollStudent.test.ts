@@ -100,6 +100,8 @@ describe("EnrollStudent", () => {
       listAll: vi.fn(),
       getTwoFactorSecret: vi.fn(),
       setTwoFactorSecret: vi.fn(),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),
@@ -127,6 +129,7 @@ describe("EnrollStudent", () => {
       listAll: vi.fn(),
       // STORY-062: refund request list
       listRefundRequests: vi.fn(),
+      countPendingRefunds: vi.fn(),
       update: vi.fn(),
       // P0-1 paywall fix
       findPaidForUserAndCourse: vi.fn(),

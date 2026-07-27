@@ -88,17 +88,43 @@ export interface SessionClaims {
 /**
  * Read and verify the session cookie. Returns the user ID if valid,
  * null otherwise. Never throws.
+ *
+ * STORY-051 enforcement:
+ * - JWT signature and expiry are verified by jwt.verify().
+ * - sessionVersion is checked against the DB to detect revoked sessions.
+ * - lockedUntil is checked to enforce account lockouts.
  */
 export async function getSessionUserId(): Promise<string | null> {
   const token = (await cookies()).get(getSessionCookieName())?.value;
   if (!token) return null;
 
-  const { jwt } = buildContainer();
+  const { jwt, userRepo } = buildContainer();
   const result = await jwt.verify(token);
   if (!result.ok) return null;
 
-  const sub = result.value.sub;
-  return typeof sub === "string" && sub.length > 0 ? sub : null;
+  const payload = result.value;
+  const sub = payload.sub;
+  if (typeof sub !== "string" || sub.length === 0) return null;
+
+  // STORY-051: session version check — rejects tokens issued before the
+  // admin last called revokeAllSessions for this user.
+  const embeddedVersion =
+    typeof payload.sessionVersion === "number" ? payload.sessionVersion : undefined;
+  if (embeddedVersion !== undefined) {
+    const versionResult = await userRepo.getCurrentSessionVersion(sub);
+    if (!versionResult.ok) return null; // user deleted or DB error
+    if (versionResult.value !== embeddedVersion) return null; // session was revoked
+  }
+
+  // STORY-051: lockout check — reject tokens for accounts that are locked.
+  const userResult = await userRepo.findById(sub);
+  if (!userResult.ok) return null;
+  const user = userResult.value;
+  if (user.lockedUntil !== null && user.lockedUntil.getTime() > Date.now()) {
+    return null; // account is locked
+  }
+
+  return sub;
 }
 
 /**
@@ -216,6 +242,7 @@ const SESSION_COOKIE_OPTIONS = {
  * one, the other stays at its NODE_ENV-based default, which is wrong on
  * HTTP. Always pass both, or neither.
  */
+export { getSessionCookieName };
 export async function setAuthCookie(
   token: string,
   expiresAt: Date,

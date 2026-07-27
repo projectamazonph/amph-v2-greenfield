@@ -54,6 +54,9 @@ export interface IOrderRepository {
     Result<{ orders: readonly Order[]; nextCursor: string | null; total: number }, OrderError>
   >;
 
+  /** Count orders with refundRequestedAt set but refundProcessedAt still null. */
+  countPendingRefunds(): Promise<Result<number, OrderError>>;
+
   /** Persist changes to an existing order. */
   update(order: Order): Promise<Result<Order, OrderError>>;
 

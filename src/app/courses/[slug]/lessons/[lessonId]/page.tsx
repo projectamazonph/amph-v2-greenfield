@@ -125,7 +125,7 @@ export default async function LessonPage({ params }: PageProps) {
           </div>
 
           {/* Lesson body */}
-          <LessonContent lesson={lesson} />
+          <LessonContent lesson={lesson} lessonId={lessonId} courseSlug={slug} />
 
           {/* Prev / Next navigation */}
           <div className={styles.navFooter}>

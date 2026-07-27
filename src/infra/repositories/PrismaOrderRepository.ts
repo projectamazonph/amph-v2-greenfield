@@ -201,6 +201,20 @@ export class PrismaOrderRepository implements IOrderRepository {
     }
   }
 
+  async countPendingRefunds(): Promise<Result<number, OrderError>> {
+    try {
+      const count = await this.db.order.count({
+        where: {
+          refundRequestedAt: { not: null },
+          refundProcessedAt: null,
+        },
+      });
+      return Result.ok(count);
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async update(order: Order): Promise<Result<Order, OrderError>> {
     try {
       const row = await this.db.order.update({

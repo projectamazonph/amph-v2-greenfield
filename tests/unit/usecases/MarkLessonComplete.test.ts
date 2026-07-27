@@ -139,6 +139,8 @@ function makeUserRepo(): import("@/ports/repositories/UserRepository").UserRepos
         createdAt: new Date(),
         totalXp: 0,
         emailVerifiedAt: null,
+        currentSessionVersion: 0,
+        lockedUntil: null,
       }),
     ),
     findByEmail: vi.fn(),
@@ -161,10 +163,14 @@ function makeUserRepo(): import("@/ports/repositories/UserRepository").UserRepos
         createdAt: new Date(),
         totalXp: xp,
         emailVerifiedAt: null,
+        currentSessionVersion: 0,
+        lockedUntil: null,
       }),
     ),
     getTwoFactorSecret: vi.fn(),
     setTwoFactorSecret: vi.fn(),
+    getCurrentSessionVersion: vi.fn(),
+    revokeAllSessions: vi.fn(),
   };
 }
 

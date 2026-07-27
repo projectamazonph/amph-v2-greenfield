@@ -107,7 +107,7 @@ describe("LessonContent", () => {
     it("renders quiz placeholder", () => {
       const html = renderToString(<LessonContent lesson={QUIZ_LESSON} />);
       expect(html).toContain("Quiz");
-      expect(html).toContain("coming soon");
+      expect(html).toContain("Complete the quiz");
     });
 
     it("shows the quiz title", () => {

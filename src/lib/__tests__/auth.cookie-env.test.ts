@@ -87,12 +87,14 @@ function setNodeEnv(value: string | undefined): void {
 describe("SESSION_COOKIE env flavor (call-time, not module-load-time)", () => {
   it("uses the dev cookie name when NODE_ENV !== production", async () => {
     setNodeEnv("development");
+    await seedUser("u-dev");
     cookieJar.set("amph_session", await signTestToken("u-dev"));
     expect(await getSessionUserId()).toBe("u-dev");
   });
 
   it("uses the prod cookie name when NODE_ENV === production", async () => {
     setNodeEnv("production");
+    await seedUser("u-prod");
     cookieJar.set("__Secure-amph_session", await signTestToken("u-prod"));
     expect(await getSessionUserId()).toBe("u-prod");
   });
@@ -102,6 +104,7 @@ describe("SESSION_COOKIE env flavor (call-time, not module-load-time)", () => {
     // would lock the cookie name on first import. After the fix,
     // the cookie name reflects the CURRENT NODE_ENV.
     setNodeEnv("development");
+    await seedUser("u-dev");
     cookieJar.set("amph_session", await signTestToken("u-dev"));
 
     const resultDev = await getSessionUserId();
@@ -109,6 +112,7 @@ describe("SESSION_COOKIE env flavor (call-time, not module-load-time)", () => {
 
     // Switch to production — the next call should read the prod cookie.
     setNodeEnv("production");
+    await seedUser("u-prod");
     cookieJar.delete("amph_session");
     cookieJar.set("__Secure-amph_session", await signTestToken("u-prod"));
 
@@ -118,6 +122,7 @@ describe("SESSION_COOKIE env flavor (call-time, not module-load-time)", () => {
 
   it("defaults to dev cookie name when NODE_ENV is unset", async () => {
     setNodeEnv(undefined);
+    await seedUser("u-unset");
     cookieJar.set("amph_session", await signTestToken("u-unset"));
     expect(await getSessionUserId()).toBe("u-unset");
   });
@@ -132,9 +137,19 @@ describe("SESSION_COOKIE env flavor (call-time, not module-load-time)", () => {
 
 // ── Helpers ─────────────────────────────────────────────────
 
+async function seedUser(id: string): Promise<void> {
+  await testContainer.userRepo.create({
+    id,
+    email: `${id}@test.example.com`,
+    passwordHash: "placeholder-hash",
+    firstName: "Test",
+    lastName: "User",
+  });
+}
+
 async function signTestToken(userId: string): Promise<string> {
   const sign = await testContainer.jwt.sign(
-    { sub: userId, role: "STUDENT" },
+    { sub: userId, role: "STUDENT", sessionId: "s-1", sessionVersion: 0 },
     "1h",
   );
   if (!sign.ok) throw new Error("sign failed");

@@ -8,13 +8,14 @@
  * Types:
  *  - TEXT: Markdown body via react-markdown + remark-gfm
  *  - VIDEO: YouTube/Vimeo embed or native <video>
- *  - QUIZ: "Coming soon" placeholder
+ *  - QUIZ: "Take quiz" link to the dedicated quiz player page
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Link from "next/link";
 import type { Lesson } from "@/domain/entities/Course";
 import styles from "./LessonContent.module.css";
 
@@ -111,9 +112,7 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
       </div>
       {content.transcript && (
         <details className={styles.transcript}>
-          <summary className={styles.transcriptSummary}>
-            Show transcript
-          </summary>
+          <summary className={styles.transcriptSummary}>Show transcript</summary>
           <div className={styles.transcriptBody}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content.transcript}</ReactMarkdown>
           </div>
@@ -123,20 +122,39 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
   );
 }
 
-function QuizContent({ title }: { title: string }) {
+function QuizContent({
+  title,
+  lessonId,
+  courseSlug,
+}: {
+  title: string;
+  lessonId: string | undefined;
+  courseSlug: string | undefined;
+}) {
   return (
     <div className={styles.quizPlaceholder}>
       <QuizIcon />
       <h3 className={styles.quizTitle}>{title}</h3>
-      <p className={styles.quizText}>Interactive quiz — coming soon!</p>
-      <p className={styles.quizHint}>
-        Complete the quiz to test your understanding of this section.
-      </p>
+      {lessonId && courseSlug ? (
+        <>
+          <p className={styles.quizText}>Test your understanding of this section.</p>
+          <Link
+            href={`/courses/${courseSlug}/lessons/${lessonId}/quiz`}
+            className={styles.quizButton}
+          >
+            Take quiz
+          </Link>
+        </>
+      ) : (
+        <p className={styles.quizHint}>
+          Complete the quiz to test your understanding of this section.
+        </p>
+      )}
     </div>
   );
 }
 
-// ── Icons ────────────────────────────────────────────────────
+// ── Icons ───────────────────────────────────────────────────
 
 function VideoIcon() {
   return (
@@ -184,7 +202,13 @@ function QuizIcon() {
 
 // ── Main component ──────────────────────────────────────────
 
-export function LessonContent({ lesson }: { lesson: Lesson }) {
+interface LessonContentProps {
+  lesson: Lesson;
+  lessonId?: string;
+  courseSlug?: string;
+}
+
+export function LessonContent({ lesson, lessonId, courseSlug }: LessonContentProps) {
   const content = lesson.content as unknown;
 
   if (isTextContent(content)) {
@@ -196,7 +220,7 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
   }
 
   if (isQuizContent(content)) {
-    return <QuizContent title={content.title} />;
+    return <QuizContent title={content.title} lessonId={lessonId} courseSlug={courseSlug} />;
   }
 
   return (

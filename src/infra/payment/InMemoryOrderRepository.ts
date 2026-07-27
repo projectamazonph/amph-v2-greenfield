@@ -106,6 +106,13 @@ export class InMemoryOrderRepository implements IOrderRepository {
     return Result.ok({ orders: page, nextCursor, total });
   }
 
+  async countPendingRefunds(): Promise<Result<number, OrderError>> {
+    const count = Array.from(this.orders.values()).filter(
+      (o) => o.refundRequestedAt !== null && o.refundProcessedAt === null,
+    ).length;
+    return Result.ok(count);
+  }
+
   async update(order: Order): Promise<Result<Order, OrderError>> {
     this.orders.set(order.id, order);
     return Result.ok(order);

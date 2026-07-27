@@ -110,4 +110,18 @@ export interface UserRepository {
    * twoFactorEnabled — use update() for that.
    */
   setTwoFactorSecret(userId: string, secret: string | null): Promise<Result<void, UserError>>;
+
+  /**
+   * STORY-051: session revocation.
+   * Returns the user's current session version (starts at 0).
+   * Used by getSessionUserId to verify the JWT's embedded version.
+   */
+  getCurrentSessionVersion(userId: string): Promise<Result<number, UserError>>;
+
+  /**
+   * STORY-051: revoke all active sessions for a user by incrementing
+   * their session version counter. All existing JWTs for this user become
+   * invalid immediately; the user must re-authenticate.
+   */
+  revokeAllSessions(userId: string): Promise<Result<number, UserError>>;
 }

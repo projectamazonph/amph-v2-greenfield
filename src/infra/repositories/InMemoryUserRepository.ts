@@ -70,6 +70,8 @@ export class InMemoryUserRepository implements UserRepository {
       createdAt: new Date(),
       totalXp: 0,
       emailVerifiedAt: null,
+      currentSessionVersion: 0,
+      lockedUntil: null,
     };
 
     // Use createUser entity (if available) or direct freeze
@@ -181,5 +183,20 @@ export class InMemoryUserRepository implements UserRepository {
   /** Number of users stored. Use in tests. */
   count(): number {
     return this.users.size;
+  }
+
+  async getCurrentSessionVersion(userId: string): Promise<Result<number, UserError>> {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    return Result.ok(user.currentSessionVersion);
+  }
+
+  async revokeAllSessions(userId: string): Promise<Result<number, UserError>> {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    const newVersion = user.currentSessionVersion + 1;
+    const updated = Object.freeze({ ...user, currentSessionVersion: newVersion });
+    this.users.set(userId, updated);
+    return Result.ok(newVersion);
   }
 }

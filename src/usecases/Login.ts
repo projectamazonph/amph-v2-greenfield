@@ -122,9 +122,11 @@ export class Login {
       return { ok: false, error: { kind: "db_error", message: "session create failed" } };
     }
 
-    // Sign JWT — this IS the session token sent to the client
+    // Sign JWT — this IS the session token sent to the client.
+    // sessionVersion is used by getSessionUserId to detect revoked sessions
+    // (admin incremented the user's counter since this token was issued).
     const jwtResult = await this.jwt.sign(
-      { sub: user.id, sessionId, role: user.role },
+      { sub: user.id, sessionId, role: user.role, sessionVersion: user.currentSessionVersion },
       SESSION_TTL,
     );
     if (Result.isErr(jwtResult)) {

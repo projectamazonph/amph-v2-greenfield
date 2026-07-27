@@ -21,6 +21,8 @@ const TEST_USER: User = {
   createdAt: new Date(),
   totalXp: 0,
   emailVerifiedAt: null,
+  currentSessionVersion: 0,
+  lockedUntil: null,
 };
 
 function render(props: { currentPath?: string } = {}) {

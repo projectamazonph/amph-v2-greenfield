@@ -74,6 +74,8 @@ model User {
   passwordChangedAt   DateTime?
   failedLoginCount    Int        @default(0)
   lockedUntil         DateTime?
+  // STORY-051: session revocation counter — incremented on revokeAllSessions
+  currentSessionVersion Int      @default(0)
 
   // Two-factor authentication (audit hardening — admin 2FA)
   // twoFactorSecret is intentionally never exposed on the domain User

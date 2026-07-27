@@ -40,6 +40,8 @@ function makeUser(id: string, role: User["role"] = "STUDENT"): User {
     createdAt: new Date("2026-01-01T00:00:00Z"),
     totalXp: 0,
     emailVerifiedAt: null,
+    currentSessionVersion: 0,
+    lockedUntil: null,
   } as User;
 }
 
@@ -158,6 +160,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -192,6 +196,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -227,6 +233,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -286,6 +294,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     useCase = new ImpersonateUser({
       ...buildDeps({ userRepo: new InMemoryUserRepository() }),
@@ -355,6 +365,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
 
@@ -384,6 +396,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
 
@@ -415,6 +429,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     const mockSessionRepo: SessionRepository = {
       findById: async () => ({ ok: false, error: { kind: "not_found" } }),
@@ -459,6 +475,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     const failingJwt: JwtService = {
       sign: async () => ({ ok: false, error: new Error("sign failed") }),
@@ -498,6 +516,8 @@ describe("ImpersonateUser", () => {
       updateTotalXp: async () => ({ ok: true, value: makeUser("x") }),
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     const sessionSpy = vi.spyOn(deps.sessionRepo, "create");
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });

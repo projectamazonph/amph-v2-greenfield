@@ -22,6 +22,7 @@ function makeOrderRepo(
     listAll: vi.fn(),
     // STORY-062: refund request list
     listRefundRequests: vi.fn(),
+    countPendingRefunds: vi.fn(),
     update: vi.fn(async (order: Order) => Result.ok(order)),
     findPaidForUserAndCourse: vi.fn(async () => Result.ok(null)),
   };

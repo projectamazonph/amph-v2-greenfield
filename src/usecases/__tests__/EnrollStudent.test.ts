@@ -64,6 +64,8 @@ describe("EnrollStudent", () => {
       listAll: vi.fn(),
       getTwoFactorSecret: vi.fn(),
       setTwoFactorSecret: vi.fn(),
+      getCurrentSessionVersion: vi.fn(),
+      revokeAllSessions: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),
@@ -96,6 +98,7 @@ describe("EnrollStudent", () => {
         listRefundRequests: vi.fn(),
         update: vi.fn(),
         findPaidForUserAndCourse: vi.fn(),
+        countPendingRefunds: vi.fn(),
       },
       idGen: { newId: () => `enrol_${++idCounter}` },
     });
