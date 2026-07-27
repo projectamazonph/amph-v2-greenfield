@@ -1,19 +1,24 @@
 /**
- * StrTriageSimulator — categorizes Amazon PPC keyword data into action buckets.
+ * StrTriageSimulator: categorizes Amazon PPC keyword data into action buckets.
  *
  * STORY-067: STR Triage Rebuild (Scoring Engine Integration).
  *
  * Classification rules (checked in priority order):
- *  add_as_exact — ROAS >= targetRoas × 0.8 but spend ratio < 0.3 (low-hanging fruit)
- *  add_as_phrase — ROAS >= targetRoas × 0.7 but < targetRoas, spend ratio >= 0.5 (marginal)
- *  pause        — ROAS < targetRoas AND spend ratio > 0.8 (over-spending bad keywords)
- *  keep         — default: healthy ROAS with reasonable spend
+ *  add_as_exact: ROAS >= targetRoas × 0.8 but spend ratio < 0.3 (low-hanging fruit)
+ *  add_as_phrase: ROAS >= targetRoas × 0.7 but < targetRoas, spend ratio >= 0.5 (marginal)
+ *  pause       : ROAS < targetRoas AND spend ratio > 0.8 (over-spending bad keywords)
+ *  keep        : default: healthy ROAS with reasonable spend
  *
  * When userClassifications are provided, computes per-dimension scores:
- *  direction       — % of keywords correctly classified
- *  profitability  — % of non-pausable revenue preserved
- *  dataSufficiency — % of rows the user assigned an action to
- *  explanation    — 100 (placeholder, future rubric-based)
+ *  direction     : % of keywords correctly classified
+ *  profitability : % of non-pausable revenue preserved (genuinely
+ *                   revenue-based, so this name is accurate and stays)
+ *  reviewCoverage: % of rows the user assigned an action to (completion,
+ *                   NOT graded; was `dataSufficiency`)
+ *
+ * Sprint 14 removed the hardcoded `explanation: 100` that policies weighted
+ * 10%, and stopped grading completion. See
+ * docs/audit-2026-07-26-simulator-accuracy-review.md.
  */
 
 import type { Simulator } from "@/ports/simulator/Simulator";
@@ -72,10 +77,7 @@ export class StrTriageSimulator implements Simulator<StrTriageInput, StrTriageOu
     return {
       direction: this.scoreDirection(classifications),
       profitability: this.scoreProfitability(classifications, rows),
-      dataSufficiency: this.scoreDataSufficiency(classifications, rows),
-      // explanation: no text input exists in this simulator.
-      // FUTURE (STORY-079): rubric-based scoring once explanation text fields are added.
-      explanation: 0,
+      reviewCoverage: this.scoreReviewCoverage(classifications, rows),
     };
   }
 
@@ -117,7 +119,7 @@ export class StrTriageSimulator implements Simulator<StrTriageInput, StrTriageOu
       }
     }
 
-    if (nonPausableRevenue === 0) return 100; // all keywords are pausable — neutral
+    if (nonPausableRevenue === 0) return 100; // all keywords are pausable: neutral
 
     // Find non-pausable revenue that was preserved (not wrongly paused)
     let preservedRevenue = 0;
@@ -135,9 +137,12 @@ export class StrTriageSimulator implements Simulator<StrTriageInput, StrTriageOu
   }
 
   /**
-   * Data sufficiency score: % of rows that have a userChoice assigned.
+   * Review coverage: % of rows that have a userChoice assigned.
+   *
+   * Completion, not judgement, so it is reported but no longer graded.
+   * Was `scoreDataSufficiency`. STORY-072, STORY-076.
    */
-  private scoreDataSufficiency(
+  private scoreReviewCoverage(
     classifications: KeywordClassification[],
     rows: ReadonlyArray<{ keyword: string }>,
   ): number {
@@ -166,7 +171,7 @@ export class StrTriageSimulator implements Simulator<StrTriageInput, StrTriageOu
       return "pause";
     }
 
-    // Keep: default — healthy ROAS or reasonable spend
+    // Keep: default: healthy ROAS or reasonable spend
     return "keep";
   }
 

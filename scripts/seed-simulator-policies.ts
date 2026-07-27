@@ -15,9 +15,9 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { prisma } from "@/infra/database/prisma";
-import { isValidPolicy } from "../src/domain/entities/ScorePolicy";
-import type { SimulatorId } from "../src/domain/entities/SimulatorScenario";
-import type { Difficulty, SimulatorMode } from "../src/domain/entities/SimulatorAttempt";
+import { createScorePolicy, type ScorePolicy } from "@/domain/entities/ScorePolicy";
+import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
+import type { Difficulty, SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 
 // ── .env loader ──────────────────────────────────────────────────────────────
 
@@ -51,239 +51,64 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
-// ── Policy definitions ────────────────────────────────────────────────────
+import { POLICIES } from "./simulator-policies";
 
-type PolicyDef = {
-  id: string;
-  simulatorId: SimulatorId;
-  difficulty: Difficulty;
-  mode: SimulatorMode;
-  dimensionConfig: Record<string, { weight: number; passingThreshold: number }>;
-  passingScore: number;
-};
-
-const POLICIES: PolicyDef[] = [
-  // ── Bid Elevator ──────────────────────────────────────────────────────
-  // Dimensions: bidAccuracy (40%), budgetAdherence (30%), roasHit (20%), explanation (10%)
-  {
-    id: "policy-bid-elevator-beginner-practice",
-    simulatorId: "bid-elevator",
-    difficulty: "beginner",
-    mode: "practice",
-    dimensionConfig: {
-      bidAccuracy: { weight: 0.4, passingThreshold: 50 },
-      budgetAdherence: { weight: 0.3, passingThreshold: 50 },
-      roasHit: { weight: 0.2, passingThreshold: 50 },
-      explanation: { weight: 0.1, passingThreshold: 50 },
-    },
-    passingScore: 50,
-  },
-  {
-    id: "policy-bid-elevator-beginner-credential",
-    simulatorId: "bid-elevator",
-    difficulty: "beginner",
-    mode: "credential",
-    dimensionConfig: {
-      bidAccuracy: { weight: 0.4, passingThreshold: 65 },
-      budgetAdherence: { weight: 0.3, passingThreshold: 65 },
-      roasHit: { weight: 0.2, passingThreshold: 65 },
-      explanation: { weight: 0.1, passingThreshold: 60 },
-    },
-    passingScore: 65,
-  },
-  {
-    id: "policy-bid-elevator-intermediate-practice",
-    simulatorId: "bid-elevator",
-    difficulty: "intermediate",
-    mode: "practice",
-    dimensionConfig: {
-      bidAccuracy: { weight: 0.4, passingThreshold: 65 },
-      budgetAdherence: { weight: 0.3, passingThreshold: 65 },
-      roasHit: { weight: 0.2, passingThreshold: 65 },
-      explanation: { weight: 0.1, passingThreshold: 65 },
-    },
-    passingScore: 65,
-  },
-  {
-    id: "policy-bid-elevator-advanced-practice",
-    simulatorId: "bid-elevator",
-    difficulty: "advanced",
-    mode: "practice",
-    dimensionConfig: {
-      bidAccuracy: { weight: 0.4, passingThreshold: 80 },
-      budgetAdherence: { weight: 0.3, passingThreshold: 80 },
-      roasHit: { weight: 0.2, passingThreshold: 80 },
-      explanation: { weight: 0.1, passingThreshold: 70 },
-    },
-    passingScore: 80,
-  },
-
-  // ── STR Triage ───────────────────────────────────────────────────────
-  {
-    id: "policy-str-triage-beginner-practice",
-    simulatorId: "str-triage",
-    difficulty: "beginner",
-    mode: "practice",
-    dimensionConfig: {
-      direction: { weight: 0.4, passingThreshold: 70 },
-      profitability: { weight: 0.4, passingThreshold: 70 },
-      dataSufficiency: { weight: 0.2, passingThreshold: 70 },
-    },
-    passingScore: 70,
-  },
-  {
-    id: "policy-str-triage-beginner-credential",
-    simulatorId: "str-triage",
-    difficulty: "beginner",
-    mode: "credential",
-    dimensionConfig: {
-      direction: { weight: 0.3, passingThreshold: 75 },
-      profitability: { weight: 0.4, passingThreshold: 75 },
-      dataSufficiency: { weight: 0.2, passingThreshold: 75 },
-      explanation: { weight: 0.1, passingThreshold: 70 },
-    },
-    passingScore: 75,
-  },
-  {
-    id: "policy-str-triage-intermediate-practice",
-    simulatorId: "str-triage",
-    difficulty: "intermediate",
-    mode: "practice",
-    dimensionConfig: {
-      direction: { weight: 0.3, passingThreshold: 72 },
-      profitability: { weight: 0.5, passingThreshold: 72 },
-      dataSufficiency: { weight: 0.1, passingThreshold: 72 },
-      explanation: { weight: 0.1, passingThreshold: 72 },
-    },
-    passingScore: 72,
-  },
-  {
-    id: "policy-str-triage-advanced-practice",
-    simulatorId: "str-triage",
-    difficulty: "advanced",
-    mode: "practice",
-    dimensionConfig: {
-      direction: { weight: 0.3, passingThreshold: 75 },
-      profitability: { weight: 0.5, passingThreshold: 75 },
-      dataSufficiency: { weight: 0.1, passingThreshold: 72 },
-      explanation: { weight: 0.1, passingThreshold: 70 },
-    },
-    passingScore: 75,
-  },
-
-  // ── Campaign Builder ──────────────────────────────────────────────────
-  // Dimensions: structureQuality (40%), budgetAllocation (30%), keywordRelevance (20%), explanation (10%)
-  {
-    id: "policy-campaign-builder-beginner-practice",
-    simulatorId: "campaign-builder",
-    difficulty: "beginner",
-    mode: "practice",
-    dimensionConfig: {
-      structureQuality: { weight: 0.4, passingThreshold: 50 },
-      budgetAllocation: { weight: 0.3, passingThreshold: 50 },
-      keywordRelevance: { weight: 0.2, passingThreshold: 50 },
-      explanation: { weight: 0.1, passingThreshold: 50 },
-    },
-    passingScore: 50,
-  },
-  {
-    id: "policy-campaign-builder-intermediate-practice",
-    simulatorId: "campaign-builder",
-    difficulty: "intermediate",
-    mode: "practice",
-    dimensionConfig: {
-      structureQuality: { weight: 0.4, passingThreshold: 65 },
-      budgetAllocation: { weight: 0.3, passingThreshold: 65 },
-      keywordRelevance: { weight: 0.2, passingThreshold: 65 },
-      explanation: { weight: 0.1, passingThreshold: 65 },
-    },
-    passingScore: 65,
-  },
-  {
-    id: "policy-campaign-builder-advanced-practice",
-    simulatorId: "campaign-builder",
-    difficulty: "advanced",
-    mode: "practice",
-    dimensionConfig: {
-      structureQuality: { weight: 0.4, passingThreshold: 80 },
-      budgetAllocation: { weight: 0.3, passingThreshold: 80 },
-      keywordRelevance: { weight: 0.2, passingThreshold: 80 },
-      explanation: { weight: 0.1, passingThreshold: 70 },
-    },
-    passingScore: 80,
-  },
-
-  // ── Listing Audit ─────────────────────────────────────────────────────
-  {
-    id: "policy-listing-audit-beginner-practice",
-    simulatorId: "listing-audit",
-    difficulty: "beginner",
-    mode: "practice",
-    dimensionConfig: {
-      direction: { weight: 0.4, passingThreshold: 70 },
-      dataSufficiency: { weight: 0.4, passingThreshold: 70 },
-      explanation: { weight: 0.2, passingThreshold: 70 },
-    },
-    passingScore: 70,
-  },
-  {
-    id: "policy-listing-audit-intermediate-practice",
-    simulatorId: "listing-audit",
-    difficulty: "intermediate",
-    mode: "practice",
-    dimensionConfig: {
-      direction: { weight: 0.35, passingThreshold: 72 },
-      dataSufficiency: { weight: 0.35, passingThreshold: 72 },
-      profitability: { weight: 0.15, passingThreshold: 70 },
-      explanation: { weight: 0.15, passingThreshold: 70 },
-    },
-    passingScore: 72,
-  },
-  {
-    id: "policy-listing-audit-advanced-practice",
-    simulatorId: "listing-audit",
-    difficulty: "advanced",
-    mode: "practice",
-    dimensionConfig: {
-      direction: { weight: 0.3, passingThreshold: 75 },
-      dataSufficiency: { weight: 0.25, passingThreshold: 75 },
-      profitability: { weight: 0.2, passingThreshold: 72 },
-      explanation: { weight: 0.25, passingThreshold: 72 },
-    },
-    passingScore: 75,
-  },
-];
+/**
+ * The DB stores `Record<string, { weight }>` to match DimensionConfig. The
+ * table above uses bare numbers because a weight is all a policy carries now
+ * that passingThreshold is gone (STORY-075).
+ */
+function toPersistedConfig(cfg: Record<string, number>): Record<string, { weight: number }> {
+  return Object.fromEntries(Object.entries(cfg).map(([dim, weight]) => [dim, { weight }]));
+}
 
 // ── Main ─────────────────────────────────────────────────────────────────
 
 async function main() {
   console.log(`Seeding ${POLICIES.length} ScorePolicy records...\n`);
 
+  // Validate EVERY policy through the domain factory before writing any of
+  // them. This script used to call prisma.upsert directly, which bypassed
+  // createScorePolicy() entirely: four policies shipped with weights summing
+  // to 0.90 (capping a flawless learner at 90) and seven used dimension names
+  // that were not in KNOWN_DIMENSIONS. Neither was ever caught because the
+  // read path hydrates via hydrateScorePolicy(), which skips validation too.
+  // Validate first, fail loudly, write nothing on error. STORY-074.
+  const validated: ScorePolicy[] = [];
+  const invalid: string[] = [];
+
+  for (const policy of POLICIES) {
+    const result = createScorePolicy({
+      id: policy.id,
+      simulatorId: policy.simulatorId as SimulatorId,
+      difficulty: policy.difficulty as Difficulty,
+      mode: policy.mode as SimulatorMode,
+      dimensionConfig: Object.fromEntries(
+        Object.entries(policy.dimensionConfig).map(([dim, weight]) => [dim, { weight }]),
+      ),
+      passingScore: policy.passingScore,
+    });
+
+    if (!result.ok) {
+      invalid.push(`  ${policy.id}: ${JSON.stringify(result.error)}`);
+    } else {
+      validated.push(result.value);
+    }
+  }
+
+  if (invalid.length > 0) {
+    console.error(`\nRefusing to seed. ${invalid.length} policy/policies are invalid:\n`);
+    console.error(invalid.join("\n"));
+    await prisma.$disconnect();
+    process.exit(1);
+  }
+
+  console.log(`All ${validated.length} policies passed createScorePolicy() validation.\n`);
+
   let created = 0;
   let upserted = 0;
 
   for (const policy of POLICIES) {
-    // Validate weight invariant before touching the database
-    const policyObj = {
-      id: policy.id,
-      simulatorId: policy.simulatorId,
-      difficulty: policy.difficulty,
-      mode: policy.mode,
-      dimensionConfig: policy.dimensionConfig,
-      passingScore: policy.passingScore,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    if (!isValidPolicy(policyObj)) {
-      const weights = Object.values(policy.dimensionConfig)
-        .reduce((s, c) => s + c.weight, 0)
-        .toFixed(2);
-      console.error(
-        `  INVALID    ${policy.simulatorId}/${policy.difficulty}/${policy.mode}: weights sum to ${weights}, must be 1.0`,
-      );
-      continue;
-    }
-
     try {
       const result = await prisma.scorePolicy.upsert({
         where: {
@@ -294,7 +119,7 @@ async function main() {
           },
         },
         update: {
-          dimensionConfig: policy.dimensionConfig,
+          dimensionConfig: toPersistedConfig(policy.dimensionConfig),
           passingScore: policy.passingScore,
         },
         create: {
@@ -302,7 +127,7 @@ async function main() {
           simulatorId: policy.simulatorId,
           difficulty: policy.difficulty,
           mode: policy.mode,
-          dimensionConfig: policy.dimensionConfig,
+          dimensionConfig: toPersistedConfig(policy.dimensionConfig),
           passingScore: policy.passingScore,
         },
       });

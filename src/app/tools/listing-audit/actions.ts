@@ -295,9 +295,8 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
   // If no scoreDimensions (shouldn't happen when userFindingActions provided), compute flat
   const scoreDimensions = simOutput.scoreDimensions ?? {
     direction: simOutput.score,
-    profitability: 100,
-    dataSufficiency: 100,
-    explanation: 100,
+    priorityCoverage: 0,
+    reviewCoverage: 0,
   };
 
   // ── 5. GradeSimulatorAttempt ────────────────────────────────────────
@@ -305,9 +304,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
     attemptId,
     scoreDimensions: {
       direction: scoreDimensions.direction,
-      profitability: scoreDimensions.profitability,
-      dataSufficiency: scoreDimensions.dataSufficiency,
-      explanation: scoreDimensions.explanation,
+      priorityCoverage: scoreDimensions.priorityCoverage,
     },
   });
 

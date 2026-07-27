@@ -173,36 +173,29 @@ describe("StrTriageSimulator", () => {
     });
   });
 
-  describe("dataSufficiency scoring", () => {
-    it("dataSufficiency = 100 when all rows have a userChoice", async () => {
+  describe("reviewCoverage (reported, not graded)", () => {
+    it("reviewCoverage = 100 when all rows have a userChoice", async () => {
       const result = await run([ROW_KEEP, ROW_PAUSE, ROW_ADD_EXACT], {
         "healthy keyword": "keep",
         "bad keyword": "pause",
         "good keyword": "add_as_exact",
       });
-      expect(result.scoreDimensions!.dataSufficiency).toBe(100);
+      expect(result.scoreDimensions!.reviewCoverage).toBe(100);
     });
 
-    it("dataSufficiency = 50 when half the rows are unreviewed", async () => {
+    it("reviewCoverage = 50 when half the rows are unreviewed", async () => {
       const result = await run([ROW_KEEP, ROW_PAUSE, ROW_ADD_EXACT, ROW_ADD_PHRASE], {
         "healthy keyword": "keep",
         "bad keyword": "pause",
         // "good keyword" and "marginal keyword" unreviewed
       });
       // 2/4 reviewed = 50
-      expect(result.scoreDimensions!.dataSufficiency).toBe(50);
+      expect(result.scoreDimensions!.reviewCoverage).toBe(50);
     });
 
-    it("dataSufficiency = 0 when no rows are reviewed", async () => {
+    it("reviewCoverage = 0 when no rows are reviewed", async () => {
       const result = await run([ROW_KEEP, ROW_PAUSE], {});
-      expect(result.scoreDimensions!.dataSufficiency).toBe(0);
-    });
-  });
-
-  describe("explanation score", () => {
-    it("explanation = 0 (no text input)", async () => {
-      const result = await run([ROW_KEEP], { "healthy keyword": "keep" });
-      expect(result.scoreDimensions!.explanation).toBe(0);
+      expect(result.scoreDimensions!.reviewCoverage).toBe(0);
     });
   });
 

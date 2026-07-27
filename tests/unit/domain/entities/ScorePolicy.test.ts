@@ -16,9 +16,9 @@ import {
 } from "@/domain/entities/ScorePolicy";
 
 const validDims = {
-  direction: { weight: 0.4, passingThreshold: 80 },
-  magnitude: { weight: 0.3, passingThreshold: 70 },
-  profitability: { weight: 0.3, passingThreshold: 75 },
+  direction: { weight: 0.4 },
+  magnitude: { weight: 0.3 },
+  profitability: { weight: 0.3 },
 };
 
 const baseParams = {
@@ -56,8 +56,8 @@ describe("ScorePolicy", () => {
 
     it("rejects a policy with weight sum not equal to 1.0", () => {
       const badDims = {
-        direction: { weight: 0.5, passingThreshold: 80 },
-        magnitude: { weight: 0.3, passingThreshold: 70 },
+        direction: { weight: 0.5 },
+        magnitude: { weight: 0.3 },
       };
       const result = createScorePolicy({ ...baseParams, dimensionConfig: badDims });
 
@@ -69,9 +69,9 @@ describe("ScorePolicy", () => {
 
     it("accepts weight sum within ±0.001 tolerance", () => {
       const nearDims = {
-        direction: { weight: 0.333, passingThreshold: 80 },
-        magnitude: { weight: 0.333, passingThreshold: 70 },
-        profitability: { weight: 0.334, passingThreshold: 75 },
+        direction: { weight: 0.333 },
+        magnitude: { weight: 0.333 },
+        profitability: { weight: 0.334 },
       };
       const result = createScorePolicy({ ...baseParams, dimensionConfig: nearDims });
       expect(result.ok).toBe(true);
@@ -79,9 +79,9 @@ describe("ScorePolicy", () => {
 
     it("rejects a policy with an unknown dimension name", () => {
       const badDims = {
-        direction: { weight: 0.4, passingThreshold: 80 },
-        magnitude: { weight: 0.3, passingThreshold: 70 },
-        totallyUnknownDimension: { weight: 0.3, passingThreshold: 75 },
+        direction: { weight: 0.4 },
+        magnitude: { weight: 0.3 },
+        totallyUnknownDimension: { weight: 0.3 },
       };
       const result = createScorePolicy({ ...baseParams, dimensionConfig: badDims });
 
@@ -112,7 +112,7 @@ describe("ScorePolicy", () => {
     });
 
     it("accepts a single-dimension policy with weight 1.0", () => {
-      const singleDim = { direction: { weight: 1.0, passingThreshold: 80 } };
+      const singleDim = { direction: { weight: 1.0 } };
       const result = createScorePolicy({ ...baseParams, dimensionConfig: singleDim });
       expect(result.ok).toBe(true);
     });
@@ -219,7 +219,7 @@ describe("ScorePolicy", () => {
         ...result.value,
         dimensionConfig: {
           ...result.value.dimensionConfig,
-          magnitude: { weight: 0.1, passingThreshold: 70 },
+          magnitude: { weight: 0.1 },
         },
       };
       expect(isValidPolicy(bad)).toBe(false);
@@ -248,7 +248,7 @@ describe("ScorePolicy", () => {
         simulatorId: "str-triage" as const,
         difficulty: "advanced" as const,
         mode: "challenge" as const,
-        dimensionConfig: { direction: { weight: 1.0, passingThreshold: 90 } },
+        dimensionConfig: { direction: { weight: 1.0 } },
         passingScore: 80,
         createdAt: new Date("2026-01-01"),
         updatedAt: new Date("2026-01-02"),

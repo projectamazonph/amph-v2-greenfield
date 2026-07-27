@@ -70,7 +70,7 @@ const GRADED_ATTEMPT: SimulatorAttempt = {
   status: "graded",
   seed: "SEED1234",
   score: 85,
-  scoreDimensions: { direction: 85, profitability: 90, dataSufficiency: 100, explanation: 100 },
+  scoreDimensions: { direction: 85, profitability: 90, reviewCoverage: 100, explanation: 100 },
   startedAt: new Date(),
   submittedAt: new Date(),
   gradedAt: new Date(),
@@ -99,8 +99,7 @@ const SIM_OUTPUT: StrTriageOutput = {
   scoreDimensions: {
     direction: 50,
     profitability: 85,
-    dataSufficiency: 100,
-    explanation: 100,
+    reviewCoverage: 100,
   },
   score: 50,
 };
@@ -122,7 +121,7 @@ function happyContainer() {
     Result.ok({
       attemptId: "ATT-ABC123",
       overallScore: 85,
-      scoreDimensions: { direction: 85, profitability: 90, dataSufficiency: 100, explanation: 100 },
+      scoreDimensions: { direction: 85, profitability: 90, reviewCoverage: 100, explanation: 100 },
       isPassed: true,
       gradedAt: new Date(),
     }),

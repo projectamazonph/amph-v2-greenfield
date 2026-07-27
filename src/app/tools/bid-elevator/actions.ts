@@ -176,7 +176,6 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
           bidAccuracy: simOutput.scoreDimensions.bidAccuracy,
           budgetAdherence: simOutput.scoreDimensions.budgetAdherence,
           roasHit: simOutput.scoreDimensions.roasHit,
-          explanation: simOutput.scoreDimensions.explanation,
         }
       : null;
 

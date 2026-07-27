@@ -307,17 +307,6 @@ describe("dimension scoring (userBidAdjustments provided)", () => {
     const result = await simulator.run(input);
     expect(result.scoreDimensions!.roasHit).toBe(100);
   });
-
-  it("explanation = 0 (no text input)", async () => {
-    const input: BidElevatorInput = {
-      keywords: [{ keyword: "shoes", currentBid: 1.0, currentCpc: 0.8, volume: 1000 }],
-      budget: 50,
-      targetRoas: 3.0,
-      userBidAdjustments: { shoes: 1.0 },
-    };
-    const result = await simulator.run(input);
-    expect(result.scoreDimensions!.explanation).toBe(0);
-  });
 });
 
 // ── Overall score ─────────────────────────────────────────────────────────

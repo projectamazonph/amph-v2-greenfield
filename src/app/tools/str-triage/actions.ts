@@ -241,9 +241,8 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   // If no scoreDimensions (shouldn't happen when userClassifications provided), compute flat
   const scoreDimensions = simOutput.scoreDimensions ?? {
     direction: simOutput.score,
-    profitability: 100,
-    dataSufficiency: 100,
-    explanation: 100,
+    profitability: 0,
+    reviewCoverage: 0,
   };
 
   // ── 6. GradeSimulatorAttempt ────────────────────────────────────────
@@ -252,8 +251,6 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     scoreDimensions: {
       direction: scoreDimensions.direction,
       profitability: scoreDimensions.profitability,
-      dataSufficiency: scoreDimensions.dataSufficiency,
-      explanation: scoreDimensions.explanation,
     },
   });
 

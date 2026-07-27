@@ -224,36 +224,56 @@ into the database and silently ignored.
 
 ## How far the mechanical fixes actually get us
 
-This was measured rather than assumed, because the first draft of this doc
-claimed Phase 0 would stop click-through passing and that claim was wrong.
+Measured twice, because the first two attempts were both too optimistic.
+The first draft asserted Phase 0 would close the bypass. The second modelled
+it against a synthetic six-finding set and claimed beginner would be
+blocked. Running the **real simulator** against the **real post-Sprint-14
+policies** shows neither was right.
 
-Modelling the Phase 0 end state (drop `explanation`, stop grading
-completion, and switch `priorityCoverage` from recall-only to an F1 that
-penalises over-fixing) against the same six-finding set:
+Scoring the actual `ListingAuditSimulator` output for a weak listing
+(`title: "x"`, no bullets, no description, niche "running shoes"):
 
 ```text
-beginner      all-"fix" 67 (needs 70)  BLOCKED       random guess 89.1% -> 11.0%
-intermediate  all-"fix" 74 (needs 72)  still passes  random guess 62.3% -> 18.8%
-advanced      all-"fix" 77 (needs 75)  still passes  random guess 56.5% -> 12.0%
+                 before Sprint 14   after Sprint 14   threshold
+beginner              90                 75              70      still passes
+intermediate          90                 80              72      still passes
+advanced              93                 82              75      still passes
 ```
 
-So the mechanical work is worth doing and is a large improvement: it blocks
-the bypass outright on beginner and cuts blind guessing by roughly a factor
-of five across the board.
+The margin over the pass mark collapses (beginner +20 to +5, advanced +18 to
++7) and every _guaranteed_ free 100 is gone, but **"fix everything" still
+passes at every difficulty.**
 
-**It does not eliminate the bypass on intermediate and advanced.** The
-residual cause is the binary ground truth itself: under
-`severity === "info" ? "skip" : "fix"`, four of six findings genuinely are
-`fix`, so "fix everything" collects 67% on `direction` for free. No amount
-of re-weighting fixes that, because the answer key really does say `fix`
-most of the time. Closing it needs non-binary, category-aware ground truth,
-which is subject-matter work (STORY-083), not mechanical work.
+The reason is structural and only visible against real output. The finding
+generator emits very few findings, and they skew heavily to `fix`:
 
-Phase 0 should therefore be understood as **substantially mitigating** the
-bypass, not closing it. Until STORY-083 lands, Listing Audit results should
-not be treated as evidence of competence, which is what STORY-078 enforces.
+```text
+weak listing    4 findings   3 fix / 1 skip   all-"fix" direction = 75
+decent listing  1 finding    1 fix / 0 skip   all-"fix" direction = 100
+strong listing  1 finding    0 fix / 1 skip   all-"fix" direction = 0
+```
 
----
+With three or four findings, three of which genuinely are `fix`, marking
+everything `fix` earns 75% on `direction` honestly. No re-weighting of
+`direction` can prevent that, because `direction` is the dimension that
+measures judgement and the answer key really does say `fix`. A one-finding
+audit is also not much of an audit, which is its own quality problem.
+
+So Phase 0 should be understood as **removing the guaranteed free marks and
+shrinking the margin, not closing the bypass**:
+
+- `explanation` (guaranteed 100) is gone.
+- `reviewCoverage` (guaranteed 100 for anyone who finishes) is no longer
+  graded.
+- `priorityCoverage` no longer returns a guaranteed 100 for fixing
+  everything (93 instead of 100 on the weak listing, and 0 on the strong
+  one).
+
+Closing it needs two things from Phase 2, not Phase 0: non-binary,
+category-aware ground truth so `fix` is not almost always correct
+(STORY-083), and a finding generator that produces a richer, more balanced
+set (STORY-080). Until both land, STORY-078 is what keeps these results away
+from anything read as a credential.
 
 ## What was _not_ re-verified
 
@@ -293,8 +313,10 @@ above.
 
 After Phase 0: a perfect run scores 100, no dimension name claims to
 measure something it does not, no policy can ship with invalid weights, and
-the click-through bypass is blocked on beginner and heavily suppressed
-elsewhere. It is **not** fully closed, see the measurement section above.
+every guaranteed free 100 is gone. The click-through bypass is **narrowed,
+not closed**: measured against the real simulator it still passes at every
+difficulty, just with a much smaller margin. See the measurement section
+above, and STORY-080 plus STORY-083 for what actually closes it.
 
 ### Phase 1, certification safety (product decision, small code)
 
@@ -342,7 +364,10 @@ grade can currently be obtained without engaging with the content at all.**
 
 The scoring-integrity defects (Phase 0) are worse than the review claimed
 and are also the cheapest to fix, so they should not wait on the
-subject-matter sprint. They do not, on their own, make a Listing Audit
-result trustworthy. That requires STORY-083, and until it lands STORY-078
-should keep those results away from anything a student or employer would
-read as a credential.
+subject-matter sprint. But measuring them against the real simulator rather
+than a model made something clear that neither the review nor the first two
+drafts of this doc got right: **Phase 0 does not make a Listing Audit result
+trustworthy, and does not stop a learner passing by clicking.** It removes
+the free marks and shrinks the margin. Closing the bypass needs STORY-080
+and STORY-083, and until those land STORY-078 should keep these results away
+from anything a student or employer would read as a credential.

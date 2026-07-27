@@ -49,7 +49,7 @@ function seedPolicy(
     difficulty?: "beginner" | "intermediate" | "advanced";
     mode?: "guided" | "practice" | "challenge" | "credential" | "instructor";
     passingScore?: number;
-    dimensionConfig?: Record<string, { weight: number; passingThreshold: number }>;
+    dimensionConfig?: Record<string, { weight: number }>;
   } = {},
 ) {
   const r = createScorePolicy({
@@ -58,7 +58,7 @@ function seedPolicy(
     difficulty: overrides.difficulty ?? "beginner",
     mode: overrides.mode ?? "practice",
     dimensionConfig: overrides.dimensionConfig ?? {
-      direction: { weight: 1, passingThreshold: 70 },
+      direction: { weight: 1 },
     },
     passingScore: overrides.passingScore ?? 70,
     createdAt: new Date("2025-01-01T00:00:00Z"),
@@ -131,9 +131,9 @@ describe("ComposeAttemptFeedback", () => {
     seedPolicy(scorePolicyRepo, {
       simulatorId: "bid-elevator",
       dimensionConfig: {
-        bidAccuracy: { weight: 0.4, passingThreshold: 70 },
-        budgetAdherence: { weight: 0.3, passingThreshold: 70 },
-        roasHit: { weight: 0.3, passingThreshold: 70 },
+        bidAccuracy: { weight: 0.4 },
+        budgetAdherence: { weight: 0.3 },
+        roasHit: { weight: 0.3 },
       },
     });
     attemptRepo.create(
@@ -155,7 +155,7 @@ describe("ComposeAttemptFeedback", () => {
     attemptRepo.create(makeGradedAttempt(80, { direction: 80 }, { simulatorId: "listing-audit" }));
     seedPolicy(scorePolicyRepo, {
       simulatorId: "listing-audit",
-      dimensionConfig: { direction: { weight: 1, passingThreshold: 70 } },
+      dimensionConfig: { direction: { weight: 1 } },
     });
 
     const r = await useCase.execute({ attemptId: "ATT-ABC1234" });

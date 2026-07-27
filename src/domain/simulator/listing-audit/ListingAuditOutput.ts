@@ -1,5 +1,5 @@
 /**
- * ListingAuditOutput — output types for the Listing Audit + Keyword Research simulator.
+ * ListingAuditOutput: output types for the Listing Audit + Keyword Research simulator.
  *
  * STORY-040: Listing Audit + Keyword Research simulator.
  * STORY-070: Listing Audit Rebuild (Scoring Engine Integration).
@@ -9,10 +9,13 @@
  * per-dimension scores that feed into GradeSimulatorAttempt.
  *
  * Scoring dimensions:
- *  direction       — % of findings correctly triaged (fix/skip matches ground truth)
- *  profitability  — % of severity-weighted "must fix" findings actually marked fix
- *  dataSufficiency — % of findings the student assigned a fix/skip decision to
- *  explanation     — 100 (future: rubric-based on written justification)
+ *  direction       : % of findings correctly triaged (fix/skip matches ground truth)
+ *  priorityCoverage: severity-weighted F1 of the student's fix decisions
+ *  reviewCoverage  : % of findings assigned a decision (reported, NOT graded)
+ *
+ * Sprint 14 removed `explanation` (a hardcoded 100 that policies weighted
+ * 10-25%) and stopped grading `reviewCoverage` (completion, not judgement).
+ * See docs/audit-2026-07-26-simulator-accuracy-review.md.
  */
 
 export type AuditCategory = "title" | "bullets" | "description" | "backend";
@@ -80,10 +83,16 @@ export interface ListingAuditOutput {
 export interface ScoreDimensions {
   /** % of findings correctly triaged (fix/skip matches ground truth) */
   readonly direction: number;
-  /** % of severity-weighted "must fix" findings the student marked fix */
-  readonly profitability: number;
-  /** % of findings with a userChoice assigned */
-  readonly dataSufficiency: number;
-  /** Placeholder — future rubric-based scoring */
-  readonly explanation: number;
+  /**
+   * Severity-weighted F1 of the student's `fix` decisions: rewards fixing
+   * what needed fixing AND not fixing what did not. Was `profitability`,
+   * renamed because nothing here models revenue. STORY-073, STORY-076.
+   */
+  readonly priorityCoverage: number;
+  /**
+   * % of findings with a userChoice assigned. Completion, not judgement:
+   * reported for display only. It is NOT a graded
+   * dimension. Was `dataSufficiency`. STORY-072, STORY-076.
+   */
+  readonly reviewCoverage: number;
 }

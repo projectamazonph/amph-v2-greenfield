@@ -42,9 +42,9 @@ function makePolicy(overrides?: Partial<ScorePolicy>): ScorePolicy {
     difficulty: "beginner",
     mode: "practice",
     dimensionConfig: {
-      direction: { weight: 0.4, passingThreshold: 80 },
-      magnitude: { weight: 0.3, passingThreshold: 70 },
-      profitability: { weight: 0.3, passingThreshold: 75 },
+      direction: { weight: 0.4 },
+      magnitude: { weight: 0.3 },
+      profitability: { weight: 0.3 },
     },
     passingScore: 70,
     createdAt: new Date("2026-07-24T00:00:00Z"),

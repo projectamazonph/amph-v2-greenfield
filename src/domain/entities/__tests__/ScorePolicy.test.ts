@@ -17,17 +17,18 @@ import {
 } from "../ScorePolicy";
 import { Result } from "@/domain/shared/Result";
 
-// Use only dimension names that exist in KNOWN_DIMENSIONS:
-// direction | magnitude | dataSufficiency | profitability | explanation
+// Use only dimension names that exist in KNOWN_DIMENSIONS and are gradable.
+// Sprint 14 removed `explanation` and made `reviewCoverage` (formerly
+// `dataSufficiency`) non-gradable, so neither may carry weight here.
 const BASE_PARAMS: CreateScorePolicyParams = {
   id: "test-policy",
   simulatorId: "listing-audit",
   difficulty: "beginner",
   mode: "practice",
   dimensionConfig: {
-    direction: { weight: 0.4, passingThreshold: 50 },
-    profitability: { weight: 0.4, passingThreshold: 50 },
-    dataSufficiency: { weight: 0.2, passingThreshold: 50 },
+    direction: { weight: 0.4 },
+    profitability: { weight: 0.4 },
+    priorityCoverage: { weight: 0.2 },
   },
   passingScore: 60,
 };
@@ -44,9 +45,9 @@ describe("weight sum invariant", () => {
     const params: CreateScorePolicyParams = {
       ...BASE_PARAMS,
       dimensionConfig: {
-        direction: { weight: 0.4, passingThreshold: 50 },
-        profitability: { weight: 0.3, passingThreshold: 50 },
-        dataSufficiency: { weight: 0.2, passingThreshold: 50 }, // 0.4+0.3+0.2 = 0.9 ≠ 1.0
+        direction: { weight: 0.4 },
+        profitability: { weight: 0.3 },
+        priorityCoverage: { weight: 0.2 }, // 0.4+0.3+0.2 = 0.9 ≠ 1.0
       },
     };
     const result = createScorePolicy(params);
@@ -64,9 +65,9 @@ describe("weight sum invariant", () => {
     const params: CreateScorePolicyParams = {
       ...BASE_PARAMS,
       dimensionConfig: {
-        direction: { weight: 0.5, passingThreshold: 50 },
-        profitability: { weight: 0.4, passingThreshold: 50 },
-        dataSufficiency: { weight: 0.2, passingThreshold: 50 }, // 0.5+0.4+0.2 = 1.1
+        direction: { weight: 0.5 },
+        profitability: { weight: 0.4 },
+        priorityCoverage: { weight: 0.2 }, // 0.5+0.4+0.2 = 1.1
       },
     };
     const result = createScorePolicy(params);
@@ -84,9 +85,9 @@ describe("weight sum invariant", () => {
       difficulty: "beginner" as const,
       mode: "practice" as const,
       dimensionConfig: {
-        direction: { weight: 0.4, passingThreshold: 70 },
-        profitability: { weight: 0.4, passingThreshold: 70 },
-        explanation: { weight: 0.1, passingThreshold: 70 }, // 0.9 — bad
+        direction: { weight: 0.4 },
+        profitability: { weight: 0.4 },
+        explanation: { weight: 0.1 }, // 0.9 — bad
       },
       passingScore: 70,
       createdAt: new Date(),
@@ -102,9 +103,9 @@ describe("weight sum invariant", () => {
       difficulty: "beginner" as const,
       mode: "practice" as const,
       dimensionConfig: {
-        direction: { weight: 0.4, passingThreshold: 70 },
-        profitability: { weight: 0.4, passingThreshold: 70 },
-        dataSufficiency: { weight: 0.2, passingThreshold: 70 }, // 1.0
+        direction: { weight: 0.4 },
+        profitability: { weight: 0.4 },
+        priorityCoverage: { weight: 0.2 }, // 1.0
       },
       passingScore: 70,
       createdAt: new Date(),
@@ -122,7 +123,7 @@ describe("getOverallScore", () => {
     expect(policy.ok).toBe(true);
     if (!policy.ok) return;
 
-    const dimensions = { direction: 100, profitability: 100, dataSufficiency: 100 };
+    const dimensions = { direction: 100, profitability: 100, priorityCoverage: 100 };
     const score = getOverallScore(dimensions, policy.value);
     expect(score).toBe(100);
   });
@@ -133,7 +134,7 @@ describe("getOverallScore", () => {
     if (!policy.ok) return;
 
     // All negative — Math.max(0, ...) clamps each to 0, total = 0
-    const dimensions = { direction: -50, profitability: -20, dataSufficiency: -10 };
+    const dimensions = { direction: -50, profitability: -20, priorityCoverage: -10 };
     const score = getOverallScore(dimensions, policy.value);
     expect(score).toBe(0);
   });
@@ -154,7 +155,7 @@ describe("getOverallScore", () => {
     expect(policy.ok).toBe(true);
     if (!policy.ok) return;
 
-    const dimensions = { direction: 100, profitability: 100, dataSufficiency: 100 };
+    const dimensions = { direction: 100, profitability: 100, priorityCoverage: 100 };
     const score = getOverallScore(dimensions, policy.value);
     expect(isPassed(score, policy.value)).toBe(true);
   });
@@ -164,7 +165,7 @@ describe("getOverallScore", () => {
     expect(policy.ok).toBe(true);
     if (!policy.ok) return;
 
-    const dimensions = { direction: 30, profitability: 30, dataSufficiency: 30 };
+    const dimensions = { direction: 30, profitability: 30, priorityCoverage: 30 };
     const score = getOverallScore(dimensions, policy.value);
     expect(isPassed(score, policy.value)).toBe(false);
   });
@@ -177,8 +178,8 @@ describe("unknown dimension names", () => {
     const params: CreateScorePolicyParams = {
       ...BASE_PARAMS,
       dimensionConfig: {
-        direction: { weight: 0.5, passingThreshold: 50 },
-        madeUpDimension: { weight: 0.5, passingThreshold: 50 }, // invalid
+        direction: { weight: 0.5 },
+        madeUpDimension: { weight: 0.5 }, // invalid
       },
     };
     const result = createScorePolicy(params);
@@ -198,8 +199,8 @@ describe("unknown dimension names", () => {
       difficulty: "beginner" as const,
       mode: "practice" as const,
       dimensionConfig: {
-        direction: { weight: 0.5, passingThreshold: 50 },
-        fakeDimension: { weight: 0.5, passingThreshold: 50 },
+        direction: { weight: 0.5 },
+        fakeDimension: { weight: 0.5 },
       },
       passingScore: 60,
       createdAt: new Date(),
