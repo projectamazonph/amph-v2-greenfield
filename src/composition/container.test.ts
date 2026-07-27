@@ -44,6 +44,7 @@ import { InMemoryPasswordResetRepository } from "@/infra/db/inmemory/InMemoryPas
 import { InMemorySentReminderRepository } from "@/infra/db/inmemory/InMemorySentReminderRepository";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
+import { PasswordResetTemplateRenderer } from "@/infra/email/templates/PasswordResetRenderer";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
@@ -239,6 +240,7 @@ export function buildTestContainer(): TestContainer {
   const sentReminderRepo = new InMemorySentReminderRepository();
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
+  const passwordResetEmailRenderer = new PasswordResetTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
@@ -553,6 +555,7 @@ export function buildTestContainer(): TestContainer {
       users: userRepo,
       passwordResets: passwordResetRepo,
       email: emailSender,
+      passwordResetEmailRenderer,
       rateLimiter,
       clock,
       ids: idGen,

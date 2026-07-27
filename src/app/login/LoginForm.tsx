@@ -97,6 +97,12 @@ export function LoginForm({
             size="md"
           />
 
+          <div className={styles.forgotRow}>
+            <Link href="/reset-password" className={styles.forgotLink}>
+              Forgot password?
+            </Link>
+          </div>
+
           <Button type="submit" variant="primary" size="lg" className={styles.submit}>
             Sign in
           </Button>
