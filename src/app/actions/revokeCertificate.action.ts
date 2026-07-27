@@ -2,16 +2,23 @@
  * revokeCertificateAction — admin server action to revoke a certificate.
  *
  * STORY-044: RevokeCertificate on refund + revocation badge.
+ * STORY-092 (US-008): on the success path, also records an audit-log
+ *   entry with action `certificate.revoked` so revocations are
+ *   traceable. Closes the audit-log gap that the use case
+ *   intentionally leaves to the caller.
  *
  * Thin wrapper around RevokeCertificate.execute:
  *  1. Authenticate the caller via getSessionUserId (src/lib/auth.ts)
  *  2. Load the user, verify role === "ADMIN"
- *  3. Delegate to the use case
- *  4. Map use-case errors to action errors
+ *  3. Validate the reason (non-empty after trim)
+ *  4. Delegate to the use case
+ *  5. Map use-case errors to action errors
+ *  6. Record an audit-log entry on success (incl. idempotent replay)
  *
  * Future callers (e.g. an automated refund processor in STORY-049) will
  * NOT go through this action — they'll call the use case directly with
- * `revokedBy: "system"`. This action is the admin contract.
+ * `revokedBy: "system"` AND record their own audit log. This action is
+ * the admin contract.
  *
  * The testable pure logic lives in `performRevokeCertificate` (exported
  * below) which takes the user-lookup as a dependency. The action wrapper
@@ -26,6 +33,7 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { RevokeCertificate } from "@/usecases/RevokeCertificate";
+import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 // ── Public types ───────────────────────────────────────────────────────────
 
@@ -73,11 +81,16 @@ export interface CurrentUserSummary {
  * pass a stub.
  */
 export async function performRevokeCertificate(
-  container: { userRepo: UserRepository; revokeCertificate: RevokeCertificate },
+  container: {
+    userRepo: UserRepository;
+    revokeCertificate: RevokeCertificate;
+    // STORY-092: closure for the audit log call on the success path.
+    // Only `execute()` is needed; the use case's `RecordAuditLog` itself
+    // is `await`ed, so we accept the full type.
+    recordAuditLog: RecordAuditLog;
+  },
   input: RevokeCertificateActionInput,
-  getCurrentUser: (
-    container: { userRepo: UserRepository },
-  ) => Promise<CurrentUserSummary | null>,
+  getCurrentUser: (container: { userRepo: UserRepository }) => Promise<CurrentUserSummary | null>,
 ): Promise<RevokeCertificateActionResult> {
   // 1. Authenticate
   const sessionUser = await getCurrentUser(container);
@@ -124,6 +137,25 @@ export async function performRevokeCertificate(
     }
     return Result.err({ kind: "db_error", message: "Unknown error" });
   }
+
+  // 6. STORY-092 (Architecture Note 6): audit-log every successful
+  //    revocation, including the `wasAlreadyRevoked: true`
+  //    idempotent-replay case — that's still an admin action worth
+  //    a trail entry. RecordAuditLog.execute never throws (it logs
+  //    to console.error on failure and returns { recorded: false }),
+  //    so we don't need to branch on its result here.
+  await container.recordAuditLog.execute({
+    actorId: sessionUser.id,
+    action: "certificate.revoked",
+    targetType: "certificate",
+    targetId: result.value.certificate.id,
+    metadata: {
+      reason: trimmedReason,
+      courseId: result.value.certificate.courseId,
+      userId: result.value.certificate.userId,
+      wasAlreadyRevoked: result.value.wasAlreadyRevoked,
+    },
+  });
 
   return Result.ok({
     certificateId: result.value.certificate.id,
