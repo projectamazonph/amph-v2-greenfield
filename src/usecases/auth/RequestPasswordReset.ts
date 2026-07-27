@@ -24,6 +24,7 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { Result } from "@/domain/shared/Result";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { PasswordResetRepository } from "@/ports/repositories/PasswordResetRepository";
 import type { EmailSender } from "@/ports/email/EmailSender";
@@ -43,8 +44,7 @@ const emailSchema = z.string().email();
 export type RequestPasswordResetInput = { email: string; ip: string };
 export type RequestPasswordResetOutput = { sent: true };
 export type RequestPasswordResetError =
-  | { kind: "rate_limited"; resetAt: Date }
-  | { kind: "validation_failed"; message: string };
+  { kind: "rate_limited"; resetAt: Date } | { kind: "validation_failed"; message: string };
 
 export interface RequestPasswordResetDeps {
   users: UserRepository;
@@ -147,7 +147,6 @@ export class RequestPasswordReset {
   }
 
   private buildResetUrl(rawToken: string): string {
-    const base = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
-    return `${base.replace(/\/$/, "")}/reset-password/${encodeURIComponent(rawToken)}`;
+    return buildAppUrl(`/reset-password/${encodeURIComponent(rawToken)}`);
   }
 }
