@@ -277,12 +277,12 @@ describe("dimension scoring (userAdjustedCampaigns provided)", () => {
     expect(result.scoreDimensions!.keywordRelevance).toBe(0);
   });
 
-  it("explanation = 100 (placeholder)", async () => {
+  it("explanation = 0 (no text input)", async () => {
     const result = await simulator.run({
       ...BASE_INPUT,
       userAdjustedCampaigns: [],
     });
-    expect(result.scoreDimensions!.explanation).toBe(100);
+    expect(result.scoreDimensions!.explanation).toBe(0);
   });
 });
 

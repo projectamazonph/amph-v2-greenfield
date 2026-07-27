@@ -298,8 +298,9 @@ function computeDimensionScores(
       ? Math.round((relevantKeywords.length / allUserKeywords.length) * 100)
       : 0;
 
-  // explanation: placeholder
-  const explanation = 100;
+  // explanation: no text input exists in this simulator.
+  // FUTURE (STORY-079): rubric-based scoring once explanation text fields are added.
+  const explanation = 0;
 
   return { structureQuality, budgetAllocation, keywordRelevance, explanation };
 }

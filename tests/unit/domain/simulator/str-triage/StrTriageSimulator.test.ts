@@ -200,9 +200,9 @@ describe("StrTriageSimulator", () => {
   });
 
   describe("explanation score", () => {
-    it("explanation = 100 (placeholder)", async () => {
+    it("explanation = 0 (no text input)", async () => {
       const result = await run([ROW_KEEP], { "healthy keyword": "keep" });
-      expect(result.scoreDimensions!.explanation).toBe(100);
+      expect(result.scoreDimensions!.explanation).toBe(0);
     });
   });
 

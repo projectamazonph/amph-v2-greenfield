@@ -1,70 +1,25 @@
 /**
- * scripts/seed-simulator-policies.ts
+ * Validates that every policy in scripts/seed-simulator-policies.ts
+ * passes isValidPolicy (weights sum to 1.0, all dimensions are known).
  *
- * Seeds ScorePolicy records for all simulators (bid-elevator, str-triage,
- * campaign-builder, listing-audit) across difficulty/mode combinations.
- * Idempotent: re-running safely upserts existing policies.
- *
- * Usage:
- *   pnpm db:seed:policies
- *
- * Requires DATABASE_URL in .env.local. Run after `pnpm prisma migrate deploy`.
- *
- * STORY-067.
+ * Run:  node_modules\.bin\vitest run tests/unit/scripts/seed-simulator-policies.test.ts
  */
 
-import { existsSync, readFileSync } from "node:fs";
-import { prisma } from "@/infra/database/prisma";
-import { isValidPolicy } from "../src/domain/entities/ScorePolicy";
-import type { SimulatorId } from "../src/domain/entities/SimulatorScenario";
-import type { Difficulty, SimulatorMode } from "../src/domain/entities/SimulatorAttempt";
+import { describe, expect, it } from "vitest";
+import { isValidPolicy } from "@/domain/entities/ScorePolicy";
+import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
+import type { Difficulty, SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 
-// ── .env loader ──────────────────────────────────────────────────────────────
-
-function loadEnvFile(path: string): void {
-  if (!existsSync(path)) return;
-  const text = readFileSync(path, "utf-8");
-  for (const line of text.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const eq = trimmed.indexOf("=");
-    if (eq === -1) continue;
-    const key = trimmed.slice(0, eq).trim();
-    let value = trimmed.slice(eq + 1).trim();
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-    if (process.env[key] === undefined) {
-      process.env[key] = value;
-    }
-  }
-}
-
-loadEnvFile(".env.local");
-loadEnvFile(".env");
-
-if (!process.env.DATABASE_URL) {
-  console.error("Error: DATABASE_URL is not set. Check .env.local or .env.");
-  process.exit(1);
-}
-
-// ── Policy definitions ────────────────────────────────────────────────────
-
-type PolicyDef = {
+// Mirror the exact policy definitions from scripts/seed-simulator-policies.ts
+const POLICIES: {
   id: string;
   simulatorId: SimulatorId;
   difficulty: Difficulty;
   mode: SimulatorMode;
   dimensionConfig: Record<string, { weight: number; passingThreshold: number }>;
   passingScore: number;
-};
-
-const POLICIES: PolicyDef[] = [
-  // ── Bid Elevator ──────────────────────────────────────────────────────
-  // Dimensions: bidAccuracy (40%), budgetAdherence (30%), roasHit (20%), explanation (10%)
+}[] = [
+  // Bid Elevator
   {
     id: "policy-bid-elevator-beginner-practice",
     simulatorId: "bid-elevator",
@@ -118,7 +73,7 @@ const POLICIES: PolicyDef[] = [
     passingScore: 80,
   },
 
-  // ── STR Triage ───────────────────────────────────────────────────────
+  // STR Triage
   {
     id: "policy-str-triage-beginner-practice",
     simulatorId: "str-triage",
@@ -171,8 +126,7 @@ const POLICIES: PolicyDef[] = [
     passingScore: 75,
   },
 
-  // ── Campaign Builder ──────────────────────────────────────────────────
-  // Dimensions: structureQuality (40%), budgetAllocation (30%), keywordRelevance (20%), explanation (10%)
+  // Campaign Builder
   {
     id: "policy-campaign-builder-beginner-practice",
     simulatorId: "campaign-builder",
@@ -213,7 +167,7 @@ const POLICIES: PolicyDef[] = [
     passingScore: 80,
   },
 
-  // ── Listing Audit ─────────────────────────────────────────────────────
+  // Listing Audit
   {
     id: "policy-listing-audit-beginner-practice",
     simulatorId: "listing-audit",
@@ -254,79 +208,25 @@ const POLICIES: PolicyDef[] = [
   },
 ];
 
-// ── Main ─────────────────────────────────────────────────────────────────
+describe("seed-simulator-policies.ts policy definitions", () => {
+  it.each(POLICIES)(
+    "$id: weights must sum to 1.0 and all dimension names must be known",
+    ({ dimensionConfig, ...rest }) => {
+      const policy = {
+        ...rest,
+        dimensionConfig,
+        passingScore: rest.passingScore,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const valid = isValidPolicy(policy);
 
-async function main() {
-  console.log(`Seeding ${POLICIES.length} ScorePolicy records...\n`);
-
-  let created = 0;
-  let upserted = 0;
-
-  for (const policy of POLICIES) {
-    // Validate weight invariant before touching the database
-    const policyObj = {
-      id: policy.id,
-      simulatorId: policy.simulatorId,
-      difficulty: policy.difficulty,
-      mode: policy.mode,
-      dimensionConfig: policy.dimensionConfig,
-      passingScore: policy.passingScore,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    if (!isValidPolicy(policyObj)) {
-      const weights = Object.values(policy.dimensionConfig)
-        .reduce((s, c) => s + c.weight, 0)
+      const weights = Object.values(dimensionConfig)
+        .reduce((sum, c) => sum + c.weight, 0)
         .toFixed(2);
-      console.error(
-        `  INVALID    ${policy.simulatorId}/${policy.difficulty}/${policy.mode}: weights sum to ${weights}, must be 1.0`,
-      );
-      continue;
-    }
+      const dims = Object.keys(dimensionConfig);
 
-    try {
-      const result = await prisma.scorePolicy.upsert({
-        where: {
-          simulatorId_difficulty_mode: {
-            simulatorId: policy.simulatorId,
-            difficulty: policy.difficulty,
-            mode: policy.mode,
-          },
-        },
-        update: {
-          dimensionConfig: policy.dimensionConfig,
-          passingScore: policy.passingScore,
-        },
-        create: {
-          id: policy.id,
-          simulatorId: policy.simulatorId,
-          difficulty: policy.difficulty,
-          mode: policy.mode,
-          dimensionConfig: policy.dimensionConfig,
-          passingScore: policy.passingScore,
-        },
-      });
-
-      const action =
-        result.createdAt.getTime() === result.updatedAt.getTime() ? "created" : "upserted";
-      if (action === "created") created++;
-      else upserted++;
-
-      console.log(
-        `  ${action.padEnd(8)} ${policy.simulatorId}/${policy.difficulty}/${policy.mode}`,
-      );
-    } catch (err) {
-      console.error(`  ERROR   ${policy.simulatorId}/${policy.difficulty}/${policy.mode}:`, err);
-    }
-  }
-
-  console.log(
-    `\nDone: ${created} created, ${upserted} upserted, ${POLICIES.length - created - upserted} failed.`,
+      expect(valid, `weights=${weights} dims=[${dims.join(", ")}]`).toBe(true);
+    },
   );
-  await prisma.$disconnect();
-}
-
-main().catch((err) => {
-  console.error("Seed failed:", err);
-  process.exit(1);
 });

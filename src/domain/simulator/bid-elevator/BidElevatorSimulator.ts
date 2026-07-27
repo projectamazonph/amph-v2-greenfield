@@ -140,8 +140,9 @@ export class BidElevatorSimulator implements Simulator<BidElevatorInput, BidElev
     // e.g. userRoas = 80% of target → 80; exceeds target → 100
     const roasHit = targetRoas > 0 ? Math.min(100, Math.round((userRoas / targetRoas) * 100)) : 0;
 
-    // explanation: placeholder (future rubric-based)
-    const explanation = 100;
+    // explanation: no text input exists in this simulator.
+    // FUTURE (STORY-079): rubric-based scoring once explanation text fields are added.
+    const explanation = 0;
 
     return { bidAccuracy, budgetAdherence, roasHit, explanation };
   }

@@ -73,7 +73,9 @@ export class StrTriageSimulator implements Simulator<StrTriageInput, StrTriageOu
       direction: this.scoreDirection(classifications),
       profitability: this.scoreProfitability(classifications, rows),
       dataSufficiency: this.scoreDataSufficiency(classifications, rows),
-      explanation: 100, // placeholder until rubric-based explanation scoring
+      // explanation: no text input exists in this simulator.
+      // FUTURE (STORY-079): rubric-based scoring once explanation text fields are added.
+      explanation: 0,
     };
   }
 

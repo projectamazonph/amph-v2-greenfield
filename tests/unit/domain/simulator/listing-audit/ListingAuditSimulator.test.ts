@@ -264,7 +264,7 @@ describe("ListingAuditSimulator", () => {
   });
 
   describe("explanation score", () => {
-    it("explanation = 100 (placeholder)", async () => {
+    it("explanation = 0 (no text input)", async () => {
       const result = await simulator.run({
         title: "x",
         bullets: [],
@@ -273,7 +273,7 @@ describe("ListingAuditSimulator", () => {
         niche: "shoes",
         userFindingActions: {},
       });
-      expect(result.scoreDimensions!.explanation).toBe(100);
+      expect(result.scoreDimensions!.explanation).toBe(0);
     });
   });
 
@@ -292,7 +292,7 @@ describe("ListingAuditSimulator", () => {
         direction: 100,
         profitability: 100,
         dataSufficiency: 100,
-        explanation: 100,
+        explanation: 0,
       });
     });
   });
