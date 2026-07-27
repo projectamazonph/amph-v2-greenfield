@@ -24,6 +24,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import { PrismaClient } from "@prisma/client";
 
 // argon2 is CJS-only — createRequire matches the interop trick used by
@@ -98,9 +100,19 @@ async function hashPassword(plain) {
   });
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────
+// ── Prisma client (mirrors src/infra/database/prisma.ts) ──────────────────
 
-const prisma = new PrismaClient();
+function createPrismaClient() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL environment variable is not set");
+  }
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaPg(pool);
+  return new PrismaClient({ adapter });
+}
+
+const prisma = createPrismaClient();
 
 async function main() {
   console.log("\n👤 AMPH Admin User Seed");
