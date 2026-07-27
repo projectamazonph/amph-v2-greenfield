@@ -36,6 +36,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { href: "/admin/simulators", label: "Simulators", icon: "▧" },
   { href: "/admin/badges", label: "Badges", icon: "★" },
   { href: "/admin/quizzes", label: "Quizzes", icon: "?" },
+  { href: "/admin/certificates", label: "Certificates", icon: "▣" },
   { href: "/admin/settings", label: "Settings", icon: "⚙" },
 ] as const;
 
