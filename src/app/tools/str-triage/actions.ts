@@ -15,6 +15,7 @@
 
 import { Result } from "@/domain/shared/Result";
 import { getContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
 import type {
@@ -76,6 +77,7 @@ export interface StrTriageAttemptResult {
 }
 
 export type StrTriageAttemptError =
+  | { ok: false; error: { kind: "unauthorized" } }
   | { ok: false; error: { kind: "validation_error"; message: string } }
   | { ok: false; error: { kind: "attempt_error"; message: string } }
   | { ok: false; error: { kind: "grading_error"; message: string } }
@@ -157,11 +159,17 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   const mode = (validated as StrTriageAttemptInput).mode ?? "practice";
   const container = getContainer();
 
-  // ── 2. StartSimulatorAttempt ────────────────────────────────────────
+  // ── 2. Authenticate ─────────────────────────────────────────────────
+  const userId = await getSessionUserId();
+  if (!userId) {
+    return { ok: false, error: { kind: "unauthorized" } };
+  }
+
+  // ── 3. StartSimulatorAttempt ────────────────────────────────────────
   const scenarioId = "str-triage-scenario-kitchen-products";
 
   const startResult = await container.startSimulatorAttempt.execute({
-    userId: "system", // TODO: get from session (STORY-067 follow-up)
+    userId,
     simulatorId: "str-triage",
     scenarioId,
     mode: mode as SimulatorMode,
@@ -176,7 +184,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
 
   const attemptId = startResult.value.attemptId;
 
-  // ── 3. Save decisions (user classifications as decisions) ──────────
+  // ── 4. Save decisions (user classifications as decisions) ──────────
   // Each user classification is stored as a decision for audit purposes
   for (const [keyword, action] of Object.entries(userActions)) {
     const row = rows.find((r: { keyword: string }) => r.keyword === keyword);
@@ -198,7 +206,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     }
   }
 
-  // ── 4. Run simulator to get dimension scores ─────────────────────────
+  // ── 5. Run simulator to get dimension scores ─────────────────────────
   const sim = container.simulatorRegistry.get("str-triage");
   if (!sim) {
     return {
@@ -238,7 +246,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     explanation: 100,
   };
 
-  // ── 5. GradeSimulatorAttempt ────────────────────────────────────────
+  // ── 6. GradeSimulatorAttempt ────────────────────────────────────────
   const gradeResult = await container.gradeSimulatorAttempt.execute({
     attemptId,
     scoreDimensions: {
@@ -258,7 +266,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
 
   const grade = gradeResult.value;
 
-  // ── 6. ComposeAttemptFeedback ───────────────────────────────────────
+  // ── 7. ComposeAttemptFeedback ───────────────────────────────────────
   const feedbackResult = await container.composeAttemptFeedback.execute({
     attemptId,
   });
@@ -272,10 +280,10 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
 
   const feedback = feedbackResult.value.feedback;
 
-  // ── 7. SubmitSimulatorAttempt ───────────────────────────────────────
+  // ── 8. SubmitSimulatorAttempt ───────────────────────────────────────
   await container.submitSimulatorAttempt.execute({ attemptId });
 
-  // ── 8. Return results ──────────────────────────────────────────────
+  // ── 9. Return results ──────────────────────────────────────────────
   return {
     ok: true,
     value: {

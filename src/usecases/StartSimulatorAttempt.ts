@@ -108,7 +108,7 @@ export class StartSimulatorAttempt {
     // ── 5. Audit log ────────────────────────────────────────────
     await recordAuditLog.execute({
       actorId: input.userId,
-      action: "simulator_attempt_start",
+      action: "simulator_attempt.started",
       targetType: "SimulatorAttempt",
       targetId: attemptId,
       metadata: {

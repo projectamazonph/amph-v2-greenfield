@@ -20,7 +20,12 @@ vi.mock("@/composition/container", () => ({
   buildContainer: vi.fn(),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  getSessionUserId: vi.fn(),
+}));
+
 import { getContainer, buildContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
 import type { ListingAuditOutput } from "@/domain/simulator/listing-audit/ListingAuditOutput";
 import { listingAuditAttempt, auditListing } from "../actions";
 
@@ -175,7 +180,16 @@ describe("listingAuditAttempt", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (getContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
+    (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue("user_123");
     happyContainer();
+  });
+
+  it("returns unauthorized when user is not authenticated", async () => {
+    (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    const result = await listingAuditAttempt(VALID_INPUT);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("unauthorized");
   });
 
   it("returns validation_error when title is missing", async () => {

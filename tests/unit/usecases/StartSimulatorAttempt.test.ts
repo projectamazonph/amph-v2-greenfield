@@ -10,6 +10,7 @@ import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { SimulatorScenario } from "@/domain/entities/SimulatorScenario";
+import type { AuditAction } from "@/domain/values/AuditAction";
 
 function makeScenario(
   overrides: Partial<{
@@ -69,7 +70,7 @@ function makeClock(): { now: () => Date } {
 function makeRecordAuditLog(): {
   execute: (entry: {
     actorId: string;
-    action: string;
+    action: AuditAction;
     targetType: string;
     targetId: string;
     metadata?: Record<string, unknown>;
@@ -88,7 +89,7 @@ describe("StartSimulatorAttempt", () => {
   let recordAuditLog: {
     execute: (entry: {
       actorId: string;
-      action: string;
+      action: AuditAction;
       targetType: string;
       targetId: string;
       metadata?: Record<string, unknown>;
@@ -157,7 +158,7 @@ describe("StartSimulatorAttempt", () => {
     const logEntry = (recordAuditLog.execute as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
     expect(logEntry).toMatchObject({
       actorId: "user_audit",
-      action: "simulator_attempt_start",
+      action: "simulator_attempt.started",
       targetType: "SimulatorAttempt",
     });
   });

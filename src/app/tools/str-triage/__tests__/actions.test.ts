@@ -19,7 +19,12 @@ vi.mock("@/composition/container", () => ({
   getContainer: vi.fn(),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  getSessionUserId: vi.fn(),
+}));
+
 import { getContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { StrTriageOutput } from "@/domain/simulator/str-triage/StrTriageOutput";
 import { strTriageAttempt, classifyStr } from "../actions";
@@ -153,7 +158,20 @@ describe("strTriageAttempt", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (getContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
+    (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue("user_123");
     happyContainer();
+  });
+
+  it("returns unauthorized when user is not authenticated", async () => {
+    (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    const result = await strTriageAttempt({
+      rows: [{ keyword: "wireless earbuds", spend: 10, revenue: 30, orders: 2 }],
+      targetRoas: 3,
+      userActions: { "wireless earbuds": "keep" },
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("unauthorized");
   });
 
   it("returns validation_error when rows is missing", async () => {
@@ -168,7 +186,7 @@ describe("strTriageAttempt", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_error");
-    expect(result.error.message).toContain("non-empty");
+    expect((result.error as { message: string }).message).toContain("non-empty");
   });
 
   it("returns validation_error when targetRoas is not positive", async () => {

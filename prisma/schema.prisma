@@ -598,6 +598,7 @@ model Badge {
   description String
   iconName    String       // Phosphor icon name
   xpReward   Int          @default(0)
+  archived    Boolean      @default(false) // STORY-050e: admin can hide archived badges
   awards     BadgeAward[]
 
   @@map("badges")

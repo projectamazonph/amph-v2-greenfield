@@ -18,6 +18,7 @@
 import { z } from "zod";
 import { Result } from "@/domain/shared/Result";
 import { getContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type { BidElevatorInput } from "@/domain/simulator/bid-elevator/BidElevatorInput";
 import type {
@@ -70,6 +71,7 @@ export interface BidElevatorAttemptResult {
 
 export type BidElevatorAttemptResponse =
   | { ok: true; value: BidElevatorAttemptResult }
+  | { ok: false; error: { kind: "unauthorized" } }
   | {
       ok: false;
       error: {
@@ -115,9 +117,15 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
   const resolvedMode: SimulatorMode = mode ?? "practice";
   const container = getContainer();
 
-  // ── 2. StartSimulatorAttempt ────────────────────────────────────────
+  // ── 2. Authenticate ─────────────────────────────────────────────────
+  const userId = await getSessionUserId();
+  if (!userId) {
+    return { ok: false, error: { kind: "unauthorized" } };
+  }
+
+  // ── 3. StartSimulatorAttempt ────────────────────────────────────────
   const startResult = await container.startSimulatorAttempt.execute({
-    userId: "system", // TODO: get from session (STORY-068 follow-up)
+    userId,
     simulatorId: "bid-elevator",
     scenarioId: scenarioId ?? "bid-elevator-scenario-default",
     mode: resolvedMode,
@@ -132,7 +140,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
 
   const attemptId = startResult.value.attemptId;
 
-  // ── 3. Run simulator ───────────────────────────────────────────────
+  // ── 4. Run simulator ───────────────────────────────────────────────
   const sim = container.simulatorRegistry.get("bid-elevator");
   if (!sim) {
     return {
@@ -161,7 +169,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
     };
   }
 
-  // ── 4. GradeSimulatorAttempt ────────────────────────────────────────
+  // ── 5. GradeSimulatorAttempt ────────────────────────────────────────
   const scoreDimensions =
     simOutput.scoreDimensions !== null
       ? {
@@ -192,7 +200,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
     }
   }
 
-  // ── 5. ComposeAttemptFeedback ───────────────────────────────────────
+  // ── 6. ComposeAttemptFeedback ───────────────────────────────────────
   let feedback: BidElevatorAttemptResult["feedback"] = null;
 
   if (scoreDimensions !== null) {
@@ -216,7 +224,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
     };
   }
 
-  // ── 6. Return results ────────────────────────────────────────────────
+  // ── 7. Return results ────────────────────────────────────────────────
   const isPassed =
     scoreDimensions !== null
       ? (simOutput.scoreDimensions?.bidAccuracy ?? 0) >= 50 // rough pass threshold

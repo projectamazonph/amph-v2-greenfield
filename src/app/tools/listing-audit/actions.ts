@@ -20,6 +20,7 @@
 
 import { Result } from "@/domain/shared/Result";
 import { buildContainer, getContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type { ListingAuditInput } from "@/domain/simulator/listing-audit/ListingAuditInput";
 import type {
@@ -143,6 +144,7 @@ export interface ListingAuditAttemptResult {
 }
 
 export type ListingAuditAttemptError =
+  | { ok: false; error: { kind: "unauthorized" } }
   | { ok: false; error: { kind: "validation_error"; message: string } }
   | { ok: false; error: { kind: "attempt_error"; message: string } }
   | { ok: false; error: { kind: "grading_error"; message: string } }
@@ -218,11 +220,17 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
   const mode = (validated as ListingAuditAttemptInput).mode ?? "practice";
   const container = getContainer();
 
-  // ── 2. StartSimulatorAttempt ────────────────────────────────────────
+  // ── 2. Authenticate ─────────────────────────────────────────────────
+  const userId = await getSessionUserId();
+  if (!userId) {
+    return { ok: false, error: { kind: "unauthorized" } };
+  }
+
+  // ── 3. StartSimulatorAttempt ────────────────────────────────────────
   const scenarioId = "listing-audit-scenario-bamboo-cutting-board";
 
   const startResult = await container.startSimulatorAttempt.execute({
-    userId: "system", // TODO: get from session (STORY-070 follow-up)
+    userId,
     simulatorId: "listing-audit",
     scenarioId,
     mode: mode as SimulatorMode,
