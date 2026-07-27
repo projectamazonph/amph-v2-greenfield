@@ -15,7 +15,10 @@ import { describe, it, expect } from "vitest";
 import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
 import { PrismaQuizAttemptRepository } from "@/infra/repositories/PrismaQuizAttemptRepository";
 import { Result } from "@/domain/shared/Result";
-import type { IQuizAttemptRepository, QuizAttemptRepositoryError } from "@/ports/repositories/IQuizAttemptRepository";
+import type {
+  IQuizAttemptRepository,
+  QuizAttemptRepositoryError,
+} from "@/ports/repositories/IQuizAttemptRepository";
 import type { QuizAttempt } from "@/domain/entities/QuizAttempt";
 
 function makeAttempt(overrides: Partial<QuizAttempt> = {}): QuizAttempt {
@@ -100,8 +103,12 @@ function quizAttemptRepositoryContract(
 
     it("findByUserAndQuiz: returns attempts sorted by recency", async () => {
       const repo = makeRepo();
-      await repo.create(makeAttempt({ id: "qa_1", userId: "u1", quizId: "q1", startedAt: new Date("2025-01-01") }));
-      await repo.create(makeAttempt({ id: "qa_2", userId: "u1", quizId: "q1", startedAt: new Date("2025-02-01") }));
+      await repo.create(
+        makeAttempt({ id: "qa_1", userId: "u1", quizId: "q1", startedAt: new Date("2025-01-01") }),
+      );
+      await repo.create(
+        makeAttempt({ id: "qa_2", userId: "u1", quizId: "q1", startedAt: new Date("2025-02-01") }),
+      );
       const r = await repo.findByUserAndQuiz("u1", "q1");
       expect(r.ok).toBe(true);
       if (!r.ok) return;
@@ -110,8 +117,12 @@ function quizAttemptRepositoryContract(
 
     it("findLatestByUserAndQuiz: returns the most recent attempt", async () => {
       const repo = makeRepo();
-      await repo.create(makeAttempt({ id: "qa_1", userId: "u1", quizId: "q1", startedAt: new Date("2025-01-01") }));
-      await repo.create(makeAttempt({ id: "qa_2", userId: "u1", quizId: "q1", startedAt: new Date("2025-02-01") }));
+      await repo.create(
+        makeAttempt({ id: "qa_1", userId: "u1", quizId: "q1", startedAt: new Date("2025-01-01") }),
+      );
+      await repo.create(
+        makeAttempt({ id: "qa_2", userId: "u1", quizId: "q1", startedAt: new Date("2025-02-01") }),
+      );
       const r = await repo.findLatestByUserAndQuiz("u1", "q1");
       expect(r.ok).toBe(true);
       if (!r.ok) return;
@@ -148,17 +159,31 @@ class PrismaStyleStubRepository implements IQuizAttemptRepository {
     return Result.ok(this.rows.get(id) ?? null);
   }
 
-  async findByUserAndQuiz(userId: string, quizId: string): Promise<Result<readonly QuizAttempt[], QuizAttemptRepositoryError>> {
+  async findByUserAndQuiz(
+    userId: string,
+    quizId: string,
+  ): Promise<Result<readonly QuizAttempt[], QuizAttemptRepositoryError>> {
     const out = Array.from(this.rows.values())
       .filter((a) => a.userId === userId && a.quizId === quizId)
       .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
     return Result.ok(out);
   }
 
-  async findLatestByUserAndQuiz(userId: string, quizId: string): Promise<Result<QuizAttempt | null, QuizAttemptRepositoryError>> {
+  async findLatestByUserAndQuiz(
+    userId: string,
+    quizId: string,
+  ): Promise<Result<QuizAttempt | null, QuizAttemptRepositoryError>> {
     const all = await this.findByUserAndQuiz(userId, quizId);
     if (!all.ok) return all;
     return Result.ok(all.value[0] ?? null);
+  }
+
+  async countByQuizId(quizId: string): Promise<Result<number, QuizAttemptRepositoryError>> {
+    let n = 0;
+    for (const a of this.rows.values()) {
+      if (a.quizId === quizId) n += 1;
+    }
+    return Result.ok(n);
   }
 }
 

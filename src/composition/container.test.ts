@@ -149,6 +149,11 @@ import { AdminGetBadge } from "@/usecases/AdminGetBadge";
 import { AdminCreateBadge } from "@/usecases/AdminCreateBadge";
 import { AdminUpdateBadge } from "@/usecases/AdminUpdateBadge";
 import { AdminArchiveBadge } from "@/usecases/AdminArchiveBadge";
+import { AdminListQuizzes } from "@/usecases/AdminListQuizzes";
+import { AdminGetQuiz } from "@/usecases/AdminGetQuiz";
+import { AdminCreateQuiz } from "@/usecases/AdminCreateQuiz";
+import { AdminUpdateQuiz } from "@/usecases/AdminUpdateQuiz";
+import { AdminDeleteQuiz } from "@/usecases/AdminDeleteQuiz";
 import { AdminListScenarios } from "@/usecases/AdminListScenarios";
 import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
@@ -486,6 +491,12 @@ export function buildTestContainer(): TestContainer {
     adminCreateBadge: new AdminCreateBadge({ badgeRepo, recordAuditLog }),
     adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
     adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
+    // STORY-091: admin quiz CRUD
+    adminListQuizzes: new AdminListQuizzes({ quizRepo, courseRepo }),
+    adminGetQuiz: new AdminGetQuiz({ quizRepo, courseRepo }),
+    adminCreateQuiz: new AdminCreateQuiz({ quizRepo, recordAuditLog }),
+    adminUpdateQuiz: new AdminUpdateQuiz({ quizRepo, recordAuditLog }),
+    adminDeleteQuiz: new AdminDeleteQuiz({ quizRepo, quizAttemptRepo, recordAuditLog }),
     simulatorRegistry: buildSimulatorRegistry(),
     auditLog,
     recordAuditLog,

@@ -10,9 +10,7 @@ import type { Result } from "@/domain/shared/Result";
 import type { QuizAttempt } from "@/domain/entities/QuizAttempt";
 
 export type QuizAttemptRepositoryError =
-  | { kind: "db_error"; message: string }
-  | { kind: "not_found" }
-  | { kind: "already_exists" };
+  { kind: "db_error"; message: string } | { kind: "not_found" } | { kind: "already_exists" };
 
 export interface IQuizAttemptRepository {
   /**
@@ -41,4 +39,11 @@ export interface IQuizAttemptRepository {
     userId: string,
     quizId: string,
   ): Promise<Result<QuizAttempt | null, QuizAttemptRepositoryError>>;
+  /**
+   * Count how many attempts exist for a given quiz. Used by the
+   * admin quiz-delete guard (`AdminDeleteQuiz`) to block deletion
+   * when attempts exist, since `QuizAttempt.quizId` has no FK
+   * relation (STORY-091 Architecture Note 4).
+   */
+  countByQuizId(quizId: string): Promise<Result<number, QuizAttemptRepositoryError>>;
 }

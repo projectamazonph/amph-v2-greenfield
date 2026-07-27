@@ -154,6 +154,11 @@ import { AdminGetBadge } from "@/usecases/AdminGetBadge";
 import { AdminCreateBadge } from "@/usecases/AdminCreateBadge";
 import { AdminUpdateBadge } from "@/usecases/AdminUpdateBadge";
 import { AdminArchiveBadge } from "@/usecases/AdminArchiveBadge";
+import { AdminListQuizzes } from "@/usecases/AdminListQuizzes";
+import { AdminGetQuiz } from "@/usecases/AdminGetQuiz";
+import { AdminCreateQuiz } from "@/usecases/AdminCreateQuiz";
+import { AdminUpdateQuiz } from "@/usecases/AdminUpdateQuiz";
+import { AdminDeleteQuiz } from "@/usecases/AdminDeleteQuiz";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
@@ -309,6 +314,12 @@ export interface AppContainer {
   adminCreateBadge: AdminCreateBadge;
   adminUpdateBadge: AdminUpdateBadge;
   adminArchiveBadge: AdminArchiveBadge;
+  // STORY-091: admin quiz CRUD
+  adminListQuizzes: AdminListQuizzes;
+  adminGetQuiz: AdminGetQuiz;
+  adminCreateQuiz: AdminCreateQuiz;
+  adminUpdateQuiz: AdminUpdateQuiz;
+  adminDeleteQuiz: AdminDeleteQuiz;
   recordQuizAttempt: RecordQuizAttempt;
   awardXp: AwardXP;
   awardBadge: AwardBadge;
@@ -547,6 +558,12 @@ function buildProductionContainer(): AppContainer {
     adminCreateBadge: new AdminCreateBadge({ badgeRepo, recordAuditLog }),
     adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
     adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
+    // STORY-091: admin quiz CRUD
+    adminListQuizzes: new AdminListQuizzes({ quizRepo, courseRepo }),
+    adminGetQuiz: new AdminGetQuiz({ quizRepo, courseRepo }),
+    adminCreateQuiz: new AdminCreateQuiz({ quizRepo, recordAuditLog }),
+    adminUpdateQuiz: new AdminUpdateQuiz({ quizRepo, recordAuditLog }),
+    adminDeleteQuiz: new AdminDeleteQuiz({ quizRepo, quizAttemptRepo, recordAuditLog }),
     quizRepo,
     quizAttemptRepo,
     xpEventRepo,
