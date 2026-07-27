@@ -14,10 +14,10 @@ Every admin route has search, filter, pagination. Every mutation is audited. Eve
 
 ## Roles
 
-| Role | Access |
-|------|--------|
-| `STUDENT` | None on `/admin/*`. All admin routes 302 to `/dashboard`. |
-| `ADMIN` | Read all admin pages. Mutate any non-privileged field. |
+| Role          | Access                                                        |
+| ------------- | ------------------------------------------------------------- |
+| `STUDENT`     | None on `/admin/*`. All admin routes 302 to `/dashboard`.     |
+| `ADMIN`       | Read all admin pages. Mutate any non-privileged field.        |
 | `SUPER_ADMIN` | All ADMIN powers + impersonate + change another admin's role. |
 
 Role is a column on `User`. Stored on the JWT. Re-checked on every admin request (no stale-allow).
@@ -82,18 +82,18 @@ The `/admin` page. Summary tiles + charts.
 
 ### Tiles
 
-| Tile | Source |
-|------|--------|
-| New signups (24h) | `User.count({ createdAt > now - 24h })` |
-| New signups (7d) | `User.count({ createdAt > now - 7d })` |
-| New signups (30d) | `User.count({ createdAt > now - 30d })` |
-| Revenue (24h) | sum `Payment.amountMinor` where `status = COMPLETED` and `paidAt > now - 24h` |
-| Revenue (7d) | same, 7d |
-| Revenue (30d) | same, 30d |
-| Active enrollments | `Enrollment.count({ status = ACTIVE })` |
-| Refund rate (30d) | `Refund.count({ status = COMPLETED, completedAt > now - 30d })` / `Payment.count({ status = COMPLETED, paidAt > now - 30d })` |
-| Simulator attempts (7d) | `SimulatorAttempt.count({ createdAt > now - 7d })` |
-| Open refund requests | `Refund.count({ status = PENDING })` |
+| Tile                    | Source                                                                                                                        |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| New signups (24h)       | `User.count({ createdAt > now - 24h })`                                                                                       |
+| New signups (7d)        | `User.count({ createdAt > now - 7d })`                                                                                        |
+| New signups (30d)       | `User.count({ createdAt > now - 30d })`                                                                                       |
+| Revenue (24h)           | sum `Payment.amountMinor` where `status = COMPLETED` and `paidAt > now - 24h`                                                 |
+| Revenue (7d)            | same, 7d                                                                                                                      |
+| Revenue (30d)           | same, 30d                                                                                                                     |
+| Active enrollments      | `Enrollment.count({ status = ACTIVE })`                                                                                       |
+| Refund rate (30d)       | `Refund.count({ status = COMPLETED, completedAt > now - 30d })` / `Payment.count({ status = COMPLETED, paidAt > now - 30d })` |
+| Simulator attempts (7d) | `SimulatorAttempt.count({ createdAt > now - 7d })`                                                                            |
+| Open refund requests    | `Refund.count({ status = PENDING })`                                                                                          |
 
 ### Charts
 
@@ -108,18 +108,18 @@ The `/admin` page. Summary tiles + charts.
 
 Table columns:
 
-| Column | Sortable | Filterable |
-|--------|----------|-----------|
-| Email | yes | search |
-| Display name | yes | search |
-| Role | yes | select (STUDENT / ADMIN / SUPER_ADMIN) |
-| Created | yes | date range |
-| Last seen | yes | date range |
-| Current tier | yes | select (none / foundations / mastery / ultimate / all-access) |
-| Enrollments | no | range |
-| XP | yes | range |
-| Streak | yes | range |
-| Status | yes | active / deleted |
+| Column       | Sortable | Filterable                                                    |
+| ------------ | -------- | ------------------------------------------------------------- |
+| Email        | yes      | search                                                        |
+| Display name | yes      | search                                                        |
+| Role         | yes      | select (STUDENT / ADMIN / SUPER_ADMIN)                        |
+| Created      | yes      | date range                                                    |
+| Last seen    | yes      | date range                                                    |
+| Current tier | yes      | select (none / foundations / mastery / ultimate / all-access) |
+| Enrollments  | no       | range                                                         |
+| XP           | yes      | range                                                         |
+| Streak       | yes      | range                                                         |
+| Status       | yes      | active / deleted                                              |
 
 Pagination: 50 per page. Search: server-side on email + display name. Filter combos: AND.
 
@@ -128,6 +128,7 @@ Row click → `/admin/users/[id]`.
 ### User detail page (`/admin/users/[id]`)
 
 Sections:
+
 - **Profile** — email, display name, role, created, last seen. Admin actions: change role, send password reset, force re-verify, soft-delete.
 - **Enrollments** — table of all enrollments (active + revoked). Admin action: revoke.
 - **Payments** — table of all payments. Click → payment detail.
@@ -163,8 +164,53 @@ Table: title, slug, tier, price, isPublished, isAllAccess, modules count, enroll
 - Lesson list with drag-to-reorder.
 - Add lesson (modal: slug, title, type, estimatedMinutes, xpReward, mdxPath).
 - Edit lesson (full editor with MDX preview, sourced from `content/curriculum/modules/`).
-- Quiz editor (JSON, validated against the quiz schema).
 - Module-level analytics: completion rate, average time spent.
+
+## Quizzes
+
+Quiz management lives at `/admin/quizzes` (STORY-091), NOT inside the
+module editor. The earlier "JSON blob nested in the module editor"
+design was never built and is superseded by the dedicated surface
+below.
+
+### List page (`/admin/quizzes`)
+
+Table of every quiz across all courses: title (with quiz id), parent
+course (with course id), passing score %, question count, and an
+Edit link to the detail page. The list comes from `AdminListQuizzes`
+which batch-hydrates parent courses via `Map<string, Course>`. Empty
+state shows a "No quizzes yet" message.
+
+### New page (`/admin/quizzes/new`)
+
+Form: quiz id, course dropdown (from `courseRepo.listAll()`), title,
+passing score (0–100), and a nested question/option editor (see
+`QuizEditor` client component). The form posts to `createQuizAction`,
+which calls `AdminCreateQuiz` — the same validation rules as on
+create apply (`createQuiz()` rejects with `invalid_passing_score`,
+`no_questions`, `question_missing_correct_option`, or
+`question_multiple_correct_options`).
+
+### Edit page (`/admin/quizzes/[quizId]/edit`)
+
+Loads the quiz + course via `AdminGetQuiz`. Quiz id and course are
+read-only. Title, passing score, and the question/option tree are
+editable via the same `QuizEditor` used on the new page. Form posts
+to `updateQuizAction`, which calls `AdminUpdateQuiz` (reconstructs
+the full quiz via `createQuiz()`, then a delete-and-recreate of child
+rows in a Prisma transaction per US-003). A Danger Zone card at the
+bottom holds the delete button; the `has_attempts` error from
+`AdminDeleteQuiz` (with `attemptCount`) is surfaced inline so the
+admin can see "this quiz has N attempts; reassign or remove them
+first."
+
+### Nested question/option editor (`QuizEditor`)
+
+Client component. Add/remove/reorder questions (↑↓), add/remove
+options per question (radio-button semantics — exactly one correct
+answer per question). Serializes the current state to a hidden
+`questionsJson` form input on every state change so the server action
+can consume a single `FormData`.
 
 ### Lesson editor
 
@@ -279,43 +325,43 @@ List of email templates. Edit per template: subject, body (JSON, the React Email
 
 Every admin mutation. The use case writes the entry; the adapter persists it. The user detail page reads both "actor" and "target" entries.
 
-| Action | Audit log entry |
-|--------|-----------------|
-| Admin updates user | `action: "user.updated"`, `targetType: "User"`, `targetId: userId`, `metadata: { changes }` |
-| Admin changes role | `action: "user.role_changed"`, `metadata: { from, to }` |
-| Admin issues refund override | `action: "refund.override"`, `targetType: "Payment"`, `targetId: paymentId`, `metadata: { reason, amount }` |
-| Admin marks payment fraud | `action: "payment.flagged"`, `targetType: "Payment"`, `targetId`, `metadata: { reason }` |
-| Admin updates course | `action: "course.updated"`, `targetType: "Course"`, `targetId`, `metadata: { changes }` |
-| Admin creates discount code | `action: "discount_code.created"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { code }` |
-| Admin updates discount code | `action: "discount_code.updated"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { changes }` |
-| Admin creates badge | `action: "badge.created"`, ... |
-| Admin revokes badge | `action: "badge.revoked"`, `targetType: "BadgeAward"`, `targetId`, `metadata: { reason }` |
-| Admin issues certificate | `action: "certificate.issued"`, ... |
-| Admin revokes certificate | `action: "certificate.revoked"`, ... |
-| Admin creates live class | `action: "live_class.created"`, ... |
-| Admin sets recording | `action: "live_class.recording_set"`, ... |
-| Admin marks attendance | `action: "live_class.attendance_marked"`, ... |
-| Admin updates settings | `action: "settings.updated"`, `metadata: { changes }` |
-| Admin updates email template | `action: "email_template.updated"`, ... |
-| Admin impersonates user | `action: "user.impersonated"`, `metadata: { onBehalfOfId, expiresAt }` |
-| Super-admin stops impersonation | `action: "user.impersonation_ended"`, ... |
-| Auth: sign-in success | `action: "auth.signed_in"`, `targetType: "User"`, `targetId: userId`, `metadata: { ip, userAgent }` |
-| Auth: sign-in failure | `action: "auth.signin_failed"`, `metadata: { email, ip, reason }` |
-| Auth: password reset requested | `action: "auth.password_reset_requested"`, ... |
-| Auth: password reset completed | `action: "auth.password_reset_completed"`, ... |
-| Auth: email verified | `action: "auth.email_verified"`, ... |
-| Payment: any state change | `action: "payment.<status>"`, ... |
-| Refund: any state change | `action: "refund.<status>"`, ... |
+| Action                          | Audit log entry                                                                                             |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Admin updates user              | `action: "user.updated"`, `targetType: "User"`, `targetId: userId`, `metadata: { changes }`                 |
+| Admin changes role              | `action: "user.role_changed"`, `metadata: { from, to }`                                                     |
+| Admin issues refund override    | `action: "refund.override"`, `targetType: "Payment"`, `targetId: paymentId`, `metadata: { reason, amount }` |
+| Admin marks payment fraud       | `action: "payment.flagged"`, `targetType: "Payment"`, `targetId`, `metadata: { reason }`                    |
+| Admin updates course            | `action: "course.updated"`, `targetType: "Course"`, `targetId`, `metadata: { changes }`                     |
+| Admin creates discount code     | `action: "discount_code.created"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { code }`           |
+| Admin updates discount code     | `action: "discount_code.updated"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { changes }`        |
+| Admin creates badge             | `action: "badge.created"`, ...                                                                              |
+| Admin revokes badge             | `action: "badge.revoked"`, `targetType: "BadgeAward"`, `targetId`, `metadata: { reason }`                   |
+| Admin issues certificate        | `action: "certificate.issued"`, ...                                                                         |
+| Admin revokes certificate       | `action: "certificate.revoked"`, ...                                                                        |
+| Admin creates live class        | `action: "live_class.created"`, ...                                                                         |
+| Admin sets recording            | `action: "live_class.recording_set"`, ...                                                                   |
+| Admin marks attendance          | `action: "live_class.attendance_marked"`, ...                                                               |
+| Admin updates settings          | `action: "settings.updated"`, `metadata: { changes }`                                                       |
+| Admin updates email template    | `action: "email_template.updated"`, ...                                                                     |
+| Admin impersonates user         | `action: "user.impersonated"`, `metadata: { onBehalfOfId, expiresAt }`                                      |
+| Super-admin stops impersonation | `action: "user.impersonation_ended"`, ...                                                                   |
+| Auth: sign-in success           | `action: "auth.signed_in"`, `targetType: "User"`, `targetId: userId`, `metadata: { ip, userAgent }`         |
+| Auth: sign-in failure           | `action: "auth.signin_failed"`, `metadata: { email, ip, reason }`                                           |
+| Auth: password reset requested  | `action: "auth.password_reset_requested"`, ...                                                              |
+| Auth: password reset completed  | `action: "auth.password_reset_completed"`, ...                                                              |
+| Auth: email verified            | `action: "auth.email_verified"`, ...                                                                        |
+| Payment: any state change       | `action: "payment.<status>"`, ...                                                                           |
+| Refund: any state change        | `action: "refund.<status>"`, ...                                                                            |
 
 ## What Lives Where
 
-| Concern | Domain | Port | Use case | Adapter |
-|---------|--------|------|----------|---------|
-| Role check | `src/domain/users/rules/isAdmin.ts` | `AccessPolicy` | every admin use case | `TierAccessPolicy` |
-| Impersonation logic | `src/domain/users/Impersonation.ts` | — | `AdminImpersonate`, `AdminEndImpersonation` | — |
-| Audit-log write | — | `AuditLogRepository` | every admin use case | `PrismaAuditLogRepository` |
-| CSV export | `src/domain/audit/csv.ts` | — | `AdminExportAuditLog` | — |
-| Settings read/write | `src/domain/settings/` | `SettingsRepository` | `AdminUpdatePricingSettings` | `PrismaSettingsRepository` |
-| Email template storage | `src/domain/email/Template.ts` | `EmailTemplateRepository` (future) | `AdminUpdateEmailTemplate` | (TBD) |
+| Concern                | Domain                              | Port                               | Use case                                    | Adapter                    |
+| ---------------------- | ----------------------------------- | ---------------------------------- | ------------------------------------------- | -------------------------- |
+| Role check             | `src/domain/users/rules/isAdmin.ts` | `AccessPolicy`                     | every admin use case                        | `TierAccessPolicy`         |
+| Impersonation logic    | `src/domain/users/Impersonation.ts` | —                                  | `AdminImpersonate`, `AdminEndImpersonation` | —                          |
+| Audit-log write        | —                                   | `AuditLogRepository`               | every admin use case                        | `PrismaAuditLogRepository` |
+| CSV export             | `src/domain/audit/csv.ts`           | —                                  | `AdminExportAuditLog`                       | —                          |
+| Settings read/write    | `src/domain/settings/`              | `SettingsRepository`               | `AdminUpdatePricingSettings`                | `PrismaSettingsRepository` |
+| Email template storage | `src/domain/email/Template.ts`      | `EmailTemplateRepository` (future) | `AdminUpdateEmailTemplate`                  | (TBD)                      |
 
 The admin panel is the place where the SOLID architecture pays the most: every admin action is a use case that tests with `buildTestContainer()`, no mocking the real Prisma, no mocking the real PayMongo. The cost of adding a new admin section is one server action + one page + one use case + (sometimes) one repository method. No edits to the layout, the auth gate, or the audit log infrastructure.
