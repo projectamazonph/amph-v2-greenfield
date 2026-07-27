@@ -28,6 +28,28 @@ export class InMemoryQuizRepository implements IQuizRepository {
     return Result.ok(filtered);
   }
 
+  async findAll(): Promise<Result<readonly Quiz[], QuizRepositoryError>> {
+    return Result.ok([...this.quizzes].sort((a, b) => a.id.localeCompare(b.id)));
+  }
+
+  async update(quiz: Quiz): Promise<Result<Quiz, QuizRepositoryError>> {
+    const idx = this.quizzes.findIndex((q) => q.id === quiz.id);
+    if (idx === -1) {
+      return Result.err({ kind: "not_found" });
+    }
+    this.quizzes[idx] = Object.freeze({ ...quiz });
+    return Result.ok(quiz);
+  }
+
+  async delete(id: string): Promise<Result<void, QuizRepositoryError>> {
+    const idx = this.quizzes.findIndex((q) => q.id === id);
+    if (idx === -1) {
+      return Result.err({ kind: "not_found" });
+    }
+    this.quizzes.splice(idx, 1);
+    return Result.ok(undefined);
+  }
+
   clear(): void {
     this.quizzes = [];
   }

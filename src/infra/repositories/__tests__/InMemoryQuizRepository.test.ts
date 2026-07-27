@@ -119,4 +119,68 @@ describe("InMemoryQuizRepository", () => {
       expect(result.value?.id).toBe("seeded-quiz");
     });
   });
+
+  // ── RED: findAll ─────────────────────────────────────────────────────────
+
+  describe("findAll", () => {
+    it("returns every quiz across courses", async () => {
+      await repo.create(makeQuiz({ id: "quiz-a", courseId: "course-1" }));
+      await repo.create(makeQuiz({ id: "quiz-b", courseId: "course-2" }));
+      const result = await repo.findAll();
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toHaveLength(2);
+      expect(result.value.map((q) => q.id).sort()).toEqual(["quiz-a", "quiz-b"]);
+    });
+
+    it("returns an empty array when no quizzes exist", async () => {
+      const result = await repo.findAll();
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toEqual([]);
+    });
+  });
+
+  // ── RED: update ──────────────────────────────────────────────────────────
+
+  describe("update", () => {
+    it("replaces the quiz and returns the new shape", async () => {
+      await repo.create(makeQuiz({ id: "quiz-u", title: "Old Title" }));
+      const replacement = makeQuiz({ id: "quiz-u", title: "New Title" });
+      const result = await repo.update(replacement);
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value.title).toBe("New Title");
+      const refetched = await repo.findById("quiz-u");
+      if (!refetched.ok || !refetched.value) throw new Error("expected refetch");
+      expect(refetched.value.title).toBe("New Title");
+    });
+
+    it("returns not_found when the quiz doesn't exist", async () => {
+      const result = await repo.update(makeQuiz({ id: "missing" }));
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.kind).toBe("not_found");
+    });
+  });
+
+  // ── RED: delete ──────────────────────────────────────────────────────────
+
+  describe("delete", () => {
+    it("removes the quiz and returns ok", async () => {
+      await repo.create(makeQuiz({ id: "quiz-d" }));
+      const result = await repo.delete("quiz-d");
+      expect(result.ok).toBe(true);
+      const refetched = await repo.findById("quiz-d");
+      if (!refetched.ok) return;
+      expect(refetched.value).toBeNull();
+    });
+
+    it("returns not_found when the quiz doesn't exist", async () => {
+      const result = await repo.delete("missing");
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.kind).toBe("not_found");
+    });
+  });
 });

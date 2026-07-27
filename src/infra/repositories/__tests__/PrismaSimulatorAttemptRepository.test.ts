@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PrismaSimulatorAttemptRepository adapter tests.
  *
  * STORY-064: Simulator Attempt Infrastructure.
@@ -23,7 +23,7 @@ function unwrap<T>(result: Result<T, SimulatorAttemptError>): T {
   return result.value as T & object;
 }
 
-// ── Hand-rolled fake PrismaClient ───────────────────────────────────────
+// ΓöÇΓöÇ Hand-rolled fake PrismaClient ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 interface SimulatorAttemptRow {
   id: string;
@@ -166,7 +166,7 @@ class FakePrismaClient {
   };
 }
 
-// ── Factory helpers ───────────────────────────────────────────────────────
+// ΓöÇΓöÇ Factory helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 function makeAttempt(overrides: Partial<SimulatorAttemptRow> = {}): SimulatorAttempt {
   const id = overrides.id ?? "patt_01";
@@ -180,6 +180,7 @@ function makeAttempt(overrides: Partial<SimulatorAttemptRow> = {}): SimulatorAtt
     difficulty: "beginner",
     mode: "practice",
     seed: overrides.seed !== undefined ? overrides.seed : "PSEED123",
+    startedAt: new Date("2025-03-01T00:00:00Z"),
   });
   if (overrides.status && overrides.status !== "in_progress") {
     return { ...base, status: overrides.status as SimulatorAttempt["status"] } as SimulatorAttempt;
@@ -202,7 +203,7 @@ function makeDecision(
   return result.value;
 }
 
-// ── Tests ────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Tests ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 describe("PrismaSimulatorAttemptRepository", () => {
   let db: FakePrismaClient;
@@ -213,7 +214,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     repo = new PrismaSimulatorAttemptRepository(db as never);
   });
 
-  // ── create + findById ────────────────────────────────────────
+  // ΓöÇΓöÇ create + findById ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("create persists an attempt and findById round-trips it", async () => {
     const attempt = makeAttempt({ id: "patt_c1", attemptId: "ATT-PC1" });
@@ -237,7 +238,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(result.error.kind).toBe("not_found");
   });
 
-  // ── findByAttemptId ──────────────────────────────────────────
+  // ΓöÇΓöÇ findByAttemptId ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("findByAttemptId locates an attempt by human-readable id", async () => {
     const attempt = makeAttempt({ id: "patt_a1", attemptId: "ATT-PA1B2" });
@@ -256,7 +257,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(result.error.kind).toBe("not_found");
   });
 
-  // ── findByUserAndScenario ────────────────────────────────────
+  // ΓöÇΓöÇ findByUserAndScenario ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("findByUserAndScenario returns matching attempts", async () => {
     const a1 = makeAttempt({
@@ -295,7 +296,9 @@ describe("PrismaSimulatorAttemptRepository", () => {
       scenarioId: "ps2",
     });
     await repo.create(a1);
-    await repo.updateStatus("patt_p1", "submitted");
+    await repo.updateStatus("patt_p1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
 
     const a2 = makeAttempt({
       id: "patt_p2",
@@ -314,7 +317,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(result.value[0]!.id).toBe("patt_p2");
   });
 
-  // ── addDecision ─────────────────────────────────────────────
+  // ΓöÇΓöÇ addDecision ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("addDecision appends a decision to an in_progress attempt", async () => {
     const attempt = makeAttempt({ id: "patt_d1" });
@@ -344,7 +347,9 @@ describe("PrismaSimulatorAttemptRepository", () => {
   it("addDecision returns already_submitted when attempt is submitted", async () => {
     const attempt = makeAttempt({ id: "patt_ds1" });
     await repo.create(attempt);
-    await repo.updateStatus("patt_ds1", "submitted");
+    await repo.updateStatus("patt_ds1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
 
     const decision = makeDecision("patt_ds1", { action: "too_late" });
     const result = await repo.addDecision("patt_ds1", decision);
@@ -356,8 +361,14 @@ describe("PrismaSimulatorAttemptRepository", () => {
   it("addDecision returns already_graded when attempt is graded", async () => {
     const attempt = makeAttempt({ id: "patt_dg1" });
     await repo.create(attempt);
-    await repo.updateStatus("patt_dg1", "submitted");
-    await repo.updateStatus("patt_dg1", "graded", { score: 80, scoreDimensions: {} });
+    await repo.updateStatus("patt_dg1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
+    await repo.updateStatus("patt_dg1", "graded", {
+      score: 80,
+      scoreDimensions: {},
+      gradedAt: new Date("2025-04-01T01:00:00Z"),
+    });
 
     const decision = makeDecision("patt_dg1", { action: "after_graded" });
     const result = await repo.addDecision("patt_dg1", decision);
@@ -366,28 +377,33 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(result.error.kind).toBe("already_graded");
   });
 
-  // ── updateStatus ─────────────────────────────────────────────
+  // ΓöÇΓöÇ updateStatus ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("updateStatus transitions in_progress -> submitted", async () => {
     const attempt = makeAttempt({ id: "patt_us1" });
     await repo.create(attempt);
 
-    const result = await repo.updateStatus("patt_us1", "submitted");
+    const result = await repo.updateStatus("patt_us1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     const updated = unwrap(result);
     expect(updated.status).toBe("submitted");
-    expect(updated.submittedAt).not.toBeNull();
+    expect(updated.submittedAt).toEqual(new Date("2025-04-01T00:00:00Z"));
   });
 
   it("updateStatus transitions submitted -> graded with score", async () => {
     const attempt = makeAttempt({ id: "patt_us2" });
     await repo.create(attempt);
-    await repo.updateStatus("patt_us2", "submitted");
+    await repo.updateStatus("patt_us2", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
 
     const result = await repo.updateStatus("patt_us2", "graded", {
       score: 88,
       scoreDimensions: { direction: 90, magnitude: 86 },
+      gradedAt: new Date("2025-04-01T01:00:00Z"),
     });
 
     expect(result.ok).toBe(true);
@@ -396,7 +412,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(graded.status).toBe("graded");
     expect(graded.score).toBe(88);
     expect(graded.scoreDimensions).toEqual({ direction: 90, magnitude: 86 });
-    expect(graded.gradedAt).not.toBeNull();
+    expect(graded.gradedAt).toEqual(new Date("2025-04-01T01:00:00Z"));
   });
 
   it("updateStatus returns not_found when attempt does not exist", async () => {
@@ -409,8 +425,14 @@ describe("PrismaSimulatorAttemptRepository", () => {
   it("updateStatus returns invalid_status_transition for graded->submitted", async () => {
     const attempt = makeAttempt({ id: "patt_inv1" });
     await repo.create(attempt);
-    await repo.updateStatus("patt_inv1", "submitted");
-    await repo.updateStatus("patt_inv1", "graded", { score: 70, scoreDimensions: {} });
+    await repo.updateStatus("patt_inv1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
+    await repo.updateStatus("patt_inv1", "graded", {
+      score: 70,
+      scoreDimensions: {},
+      gradedAt: new Date("2025-04-01T01:00:00Z"),
+    });
 
     const result = await repo.updateStatus("patt_inv1", "submitted");
     expect(result.ok).toBe(false);
@@ -418,7 +440,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(result.error.kind).toBe("invalid_status_transition");
   });
 
-  // ── Error mapping ────────────────────────────────────────────
+  // ΓöÇΓöÇ Error mapping ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("create returns db_error when Prisma throws", async () => {
     db.failNextCreate = true;
@@ -447,7 +469,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(result.error.kind).toBe("not_found");
   });
 
-  // ── mapRow handles null optionals ───────────────────────────
+  // ΓöÇΓöÇ mapRow handles null optionals ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("mapRow handles null seed and score correctly", async () => {
     const attempt = makeAttempt({ id: "patt_null", seed: null, score: null });
@@ -464,7 +486,7 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(nullAttempt.gradedAt).toBeNull();
   });
 
-  // ── Multiple decisions with revisions ────────────────────────
+  // ΓöÇΓöÇ Multiple decisions with revisions ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("addDecision increments revision for second decision", async () => {
     const attempt = makeAttempt({ id: "patt_multi1" });

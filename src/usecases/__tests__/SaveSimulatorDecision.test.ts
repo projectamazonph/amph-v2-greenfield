@@ -16,12 +16,13 @@ function makeAttempt(status: "in_progress" | "submitted" | "graded" = "in_progre
     simulatorId: "bid-elevator",
     scenarioId: "scn_1",
     seed: "SEED0001",
+    startedAt: new Date("2025-01-15T00:00:00Z"),
   });
   if (status === "in_progress") return attempt;
   if (status === "submitted") {
     // Submit requires at least one decision in the repo to succeed; bypass
     // by manually crafting the state via the in-memory repo transition.
-    const transitioned = submitAttempt(attempt);
+    const transitioned = submitAttempt(attempt, new Date("2025-01-15T12:00:00Z"));
     if (!transitioned.ok) throw new Error("transition failed");
     return transitioned.value;
   }
@@ -110,7 +111,9 @@ describe("SaveSimulatorDecision", () => {
     await useCase.execute({ attemptId: "ATT-ABC1234", decisionData: { bid: 1 } });
 
     // Submit through the repo's transition (bypasses the no-decisions guard)
-    const submitted = await repo.updateStatus("id_1", "submitted");
+    const submitted = await repo.updateStatus("id_1", "submitted", {
+      submittedAt: new Date("2025-01-15T12:00:00Z"),
+    });
     expect(submitted.ok).toBe(true);
 
     const r = await useCase.execute({

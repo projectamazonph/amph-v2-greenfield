@@ -21,6 +21,7 @@ function makeAttempt(status: "submitted" | "in_progress" | "graded" = "submitted
       difficulty: "beginner",
       mode: "practice",
       seed: "SEED0001",
+      startedAt: new Date("2025-02-01T00:00:00Z"),
     }),
     status,
   };
@@ -61,10 +62,8 @@ describe("GradeSimulatorAttempt", () => {
   beforeEach(() => {
     attemptRepo = new InMemorySimulatorAttemptRepository();
     scorePolicyRepo = makePolicyRepoWithSingleDimension();
-    clock = new FixedClock(new Date("2025-02-01T00:00:00Z"));
-    useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo });
-    // Suppress unused warnings — clock isn't injected today but kept for parity.
-    void clock;
+    clock = new FixedClock(new Date("2025-02-01T12:00:00Z"));
+    useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo, clock });
   });
 
   it("grades a passing attempt and persists score + dimensions", async () => {
@@ -80,7 +79,8 @@ describe("GradeSimulatorAttempt", () => {
     expect(r.value.overallScore).toBe(90);
     expect(r.value.isPassed).toBe(true);
     expect(r.value.scoreDimensions).toEqual({ direction: 90 });
-    expect(r.value.gradedAt).toBeInstanceOf(Date);
+    // Clock is honored: gradedAt is the injected FixedClock value, not a fresh Date.now().
+    expect(r.value.gradedAt).toEqual(new Date("2025-02-01T12:00:00Z"));
 
     const persisted = await attemptRepo.findByAttemptId("ATT-ABC1234");
     expect(persisted.ok).toBe(true);
@@ -88,7 +88,7 @@ describe("GradeSimulatorAttempt", () => {
     expect(persisted.value.status).toBe("graded");
     expect(persisted.value.score).toBe(90);
     expect(persisted.value.scoreDimensions).toEqual({ direction: 90 });
-    expect(persisted.value.gradedAt).toBeInstanceOf(Date);
+    expect(persisted.value.gradedAt).toEqual(new Date("2025-02-01T12:00:00Z"));
   });
 
   it("grades a failing attempt below passingScore", async () => {
@@ -117,7 +117,7 @@ describe("GradeSimulatorAttempt", () => {
       },
       60,
     );
-    const uc = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo: repo });
+    const uc = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo: repo, clock });
     attemptRepo.create(makeAttempt("submitted"));
 
     const r = await uc.execute({
@@ -139,7 +139,7 @@ describe("GradeSimulatorAttempt", () => {
       { bidAccuracy: { weight: 1, passingThreshold: 70 } },
       70,
     );
-    const uc = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo: repo });
+    const uc = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo: repo, clock });
     attemptRepo.create(makeAttempt("submitted"));
 
     const r = await uc.execute({
@@ -188,6 +188,7 @@ describe("GradeSimulatorAttempt", () => {
     const uc = new GradeSimulatorAttempt({
       attemptRepo,
       scorePolicyRepo: emptyPolicyRepo,
+      clock,
     });
     attemptRepo.create(makeAttempt("submitted"));
 

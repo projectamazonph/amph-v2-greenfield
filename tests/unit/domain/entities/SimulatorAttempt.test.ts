@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SimulatorAttempt entity tests.
  *
  * STORY-064: Simulator Attempt Infrastructure.
@@ -30,7 +30,7 @@ function unwrapResult<T>(
 }
 
 describe("SimulatorAttempt", () => {
-  // ── createSimulatorAttempt: basic creation ──────────────────
+  // ΓöÇΓöÇ createSimulatorAttempt: basic creation ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("creates with correct fields and status=in_progress", () => {
     const a = createSimulatorAttempt({
@@ -42,6 +42,7 @@ describe("SimulatorAttempt", () => {
       scenarioVersion: 1,
       difficulty: "beginner",
       mode: "practice",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
     expect(a.status).toBe("in_progress");
@@ -72,6 +73,7 @@ describe("SimulatorAttempt", () => {
       scenarioVersion: 1,
       difficulty: "intermediate",
       mode: "challenge",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
     expect(attempt.attemptId).toMatch(/^ATT-/);
@@ -86,12 +88,13 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_03",
       scenarioVersion: 1,
       difficulty: "advanced",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
     expect(attempt.mode).toBe("practice");
   });
 
-  // ── addDecision ─────────────────────────────────────────────
+  // ΓöÇΓöÇ addDecision ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("addDecision appends decision with revision=1 for first decision", () => {
     const attempt = createSimulatorAttempt({
@@ -102,6 +105,7 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_04",
       scenarioVersion: 1,
       difficulty: "beginner",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
     const decision = expectOk(
@@ -128,6 +132,7 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_05",
       scenarioVersion: 1,
       difficulty: "intermediate",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
     const d1 = expectOk(
@@ -163,7 +168,7 @@ describe("SimulatorAttempt", () => {
     expect(r3.decisions[2]!.revision).toBe(3);
   });
 
-  // ── submitAttempt ────────────────────────────────────────────
+  // ΓöÇΓöÇ submitAttempt ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("submitAttempt transitions in_progress to submitted and sets submittedAt", () => {
     const attempt = createSimulatorAttempt({
@@ -174,9 +179,10 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_06",
       scenarioVersion: 1,
       difficulty: "advanced",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
-    const result = submitAttempt(attempt);
+    const result = submitAttempt(attempt, new Date("2026-01-01T01:00:00Z"));
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.status).toBe("submitted");
@@ -193,12 +199,13 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_07",
       scenarioVersion: 1,
       difficulty: "beginner",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
-    const submitted = unwrapResult(submitAttempt(attempt));
+    const submitted = unwrapResult(submitAttempt(attempt, new Date("2026-01-01T01:00:00Z")));
     expect(submitted.status).toBe("submitted");
 
-    const result = submitAttempt(submitted);
+    const result = submitAttempt(submitted, new Date("2026-01-01T01:00:00Z"));
     expect(result.ok).toBe(false);
   });
 
@@ -211,18 +218,24 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_08",
       scenarioVersion: 1,
       difficulty: "intermediate",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
-    const submitted = unwrapResult(submitAttempt(attempt));
-    const graded = gradeAttempt(submitted, 85, { direction: 90, magnitude: 80 });
+    const submitted = unwrapResult(submitAttempt(attempt, new Date("2026-01-01T01:00:00Z")));
+    const graded = gradeAttempt(
+      submitted,
+      85,
+      { direction: 90, magnitude: 80 },
+      new Date("2026-01-01T02:00:00Z"),
+    );
     expect(graded.ok).toBe(true);
     if (!graded.ok) return;
 
-    const result = submitAttempt(graded.value);
+    const result = submitAttempt(graded.value, new Date("2026-01-01T01:00:00Z"));
     expect(result.ok).toBe(false);
   });
 
-  // ── gradeAttempt ─────────────────────────────────────────────
+  // ΓöÇΓöÇ gradeAttempt ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("gradeAttempt transitions submitted to graded with score and dimensions", () => {
     const attempt = createSimulatorAttempt({
@@ -233,14 +246,20 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_09",
       scenarioVersion: 1,
       difficulty: "advanced",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
-    const submitted = unwrapResult(submitAttempt(attempt));
-    const result = gradeAttempt(submitted, 92, {
-      direction: 95,
-      magnitude: 88,
-      profitability: 93,
-    });
+    const submitted = unwrapResult(submitAttempt(attempt, new Date("2026-01-01T01:00:00Z")));
+    const result = gradeAttempt(
+      submitted,
+      92,
+      {
+        direction: 95,
+        magnitude: 88,
+        profitability: 93,
+      },
+      new Date("2026-01-01T02:00:00Z"),
+    );
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -264,9 +283,10 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_10",
       scenarioVersion: 1,
       difficulty: "beginner",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
-    const result = gradeAttempt(attempt, 75, { explanation: 75 });
+    const result = gradeAttempt(attempt, 75, { explanation: 75 }, new Date("2026-01-01T02:00:00Z"));
     expect(result.ok).toBe(false);
   });
 
@@ -279,18 +299,24 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_11",
       scenarioVersion: 1,
       difficulty: "intermediate",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
-    const submitted = unwrapResult(submitAttempt(attempt));
-    const graded = gradeAttempt(submitted, 70, { direction: 70 });
+    const submitted = unwrapResult(submitAttempt(attempt, new Date("2026-01-01T01:00:00Z")));
+    const graded = gradeAttempt(submitted, 70, { direction: 70 }, new Date("2026-01-01T02:00:00Z"));
     expect(graded.ok).toBe(true);
     if (!graded.ok) return;
 
-    const result = gradeAttempt(graded.value, 80, { direction: 80 });
+    const result = gradeAttempt(
+      graded.value,
+      80,
+      { direction: 80 },
+      new Date("2026-01-01T02:00:00Z"),
+    );
     expect(result.ok).toBe(false);
   });
 
-  // ── expireAttempt ─────────────────────────────────────────────
+  // ΓöÇΓöÇ expireAttempt ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("expireAttempt transitions in_progress to expired", () => {
     const attempt = createSimulatorAttempt({
@@ -301,6 +327,7 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_12",
       scenarioVersion: 1,
       difficulty: "beginner",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
     const result = expireAttempt(attempt);
@@ -318,14 +345,15 @@ describe("SimulatorAttempt", () => {
       scenarioId: "scen_13",
       scenarioVersion: 1,
       difficulty: "intermediate",
+      startedAt: new Date("2026-01-01T00:00:00Z"),
     });
 
-    const submitted = unwrapResult(submitAttempt(attempt));
+    const submitted = unwrapResult(submitAttempt(attempt, new Date("2026-01-01T01:00:00Z")));
     const result = expireAttempt(submitted);
     expect(result.ok).toBe(false);
   });
 
-  // ── hydrate ──────────────────────────────────────────────────
+  // ΓöÇΓöÇ hydrate ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("hydrate reconstructs from plain object", () => {
     const plain = {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SubmitSimulatorAttempt use case tests.
  *
  * STORY-064: Simulator Attempt Infrastructure.
@@ -60,7 +60,7 @@ describe("SubmitSimulatorAttempt", () => {
     attemptRepo = makeAttemptRepo();
   });
 
-  // ── Happy path ─────────────────────────────────────────────
+  // ΓöÇΓöÇ Happy path ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("has decisions, in_progress -> transitions to submitted", async () => {
     const attempt = makeAttempt({
@@ -72,7 +72,7 @@ describe("SubmitSimulatorAttempt", () => {
       Result.ok({ ...attempt, status: "submitted" as const, submittedAt: new Date() }),
     );
 
-    const uc = new SubmitSimulatorAttempt({ attemptRepo });
+    const uc = new SubmitSimulatorAttempt({ attemptRepo, clock: { now: () => new Date() } });
 
     const result = await uc.execute({ attemptId: "ATT-001" });
 
@@ -80,10 +80,12 @@ describe("SubmitSimulatorAttempt", () => {
     if (!result.ok) return;
     expect(result.value.status).toBe("submitted");
     expect(result.value.submittedAt).not.toBeNull();
-    expect(attemptRepo.updateStatus).toHaveBeenCalledWith("att_submit", "submitted");
+    expect(attemptRepo.updateStatus).toHaveBeenCalledWith("att_submit", "submitted", {
+      submittedAt: expect.any(Date) as unknown as Date,
+    });
   });
 
-  // ── Idempotency ─────────────────────────────────────────────
+  // ΓöÇΓöÇ Idempotency ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("already_submitted attempt -> returns already_submitted", async () => {
     const attempt = makeAttempt({
@@ -94,7 +96,7 @@ describe("SubmitSimulatorAttempt", () => {
     });
     vi.mocked(attemptRepo.findByAttemptId).mockResolvedValue(Result.ok(attempt));
 
-    const uc = new SubmitSimulatorAttempt({ attemptRepo });
+    const uc = new SubmitSimulatorAttempt({ attemptRepo, clock: { now: () => new Date() } });
 
     // Both calls return already_submitted since the attempt is already submitted
     const r1 = await uc.execute({ attemptId: "ATT-IDEM", idempotencyKey: "idem_abc" });
@@ -102,7 +104,7 @@ describe("SubmitSimulatorAttempt", () => {
     if (r1.ok) return;
     expect(r1.error.kind).toBe("already_submitted");
 
-    // Second call with same key — same result
+    // Second call with same key ΓÇö same result
     const r2 = await uc.execute({ attemptId: "ATT-IDEM", idempotencyKey: "idem_abc" });
     expect(r2.ok).toBe(false);
     if (r2.ok) return;
@@ -111,13 +113,13 @@ describe("SubmitSimulatorAttempt", () => {
     expect(attemptRepo.updateStatus).not.toHaveBeenCalled();
   });
 
-  // ── Error cases ──────────────────────────────────────────────
+  // ΓöÇΓöÇ Error cases ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("no decisions -> returns no_decisions_made", async () => {
     const attempt = makeAttempt({ id: "att_empty", decisions: [] });
     vi.mocked(attemptRepo.findByAttemptId).mockResolvedValue(Result.ok(attempt));
 
-    const uc = new SubmitSimulatorAttempt({ attemptRepo });
+    const uc = new SubmitSimulatorAttempt({ attemptRepo, clock: { now: () => new Date() } });
 
     const result = await uc.execute({ attemptId: "ATT-EMPTY" });
 
@@ -129,7 +131,7 @@ describe("SubmitSimulatorAttempt", () => {
   it("attempt not found -> returns attempt_not_found", async () => {
     vi.mocked(attemptRepo.findByAttemptId).mockResolvedValue(Result.ok(null));
 
-    const uc = new SubmitSimulatorAttempt({ attemptRepo });
+    const uc = new SubmitSimulatorAttempt({ attemptRepo, clock: { now: () => new Date() } });
 
     const result = await uc.execute({ attemptId: "ATT-GHOST" });
 
@@ -146,7 +148,7 @@ describe("SubmitSimulatorAttempt", () => {
     });
     vi.mocked(attemptRepo.findByAttemptId).mockResolvedValue(Result.ok(attempt));
 
-    const uc = new SubmitSimulatorAttempt({ attemptRepo });
+    const uc = new SubmitSimulatorAttempt({ attemptRepo, clock: { now: () => new Date() } });
 
     const result = await uc.execute({ attemptId: "ATT-GRADED" });
 
@@ -162,7 +164,7 @@ describe("SubmitSimulatorAttempt", () => {
     });
     vi.mocked(attemptRepo.findByAttemptId).mockResolvedValue(Result.ok(attempt));
 
-    const uc = new SubmitSimulatorAttempt({ attemptRepo });
+    const uc = new SubmitSimulatorAttempt({ attemptRepo, clock: { now: () => new Date() } });
 
     const result = await uc.execute({ attemptId: "ATT-EXPIRED" });
 
@@ -178,7 +180,7 @@ describe("SubmitSimulatorAttempt", () => {
       Result.err({ kind: "db_error", message: "network error" }),
     );
 
-    const uc = new SubmitSimulatorAttempt({ attemptRepo });
+    const uc = new SubmitSimulatorAttempt({ attemptRepo, clock: { now: () => new Date() } });
 
     const result = await uc.execute({ attemptId: "ATT-DBERR" });
 

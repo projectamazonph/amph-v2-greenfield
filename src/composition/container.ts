@@ -1,4 +1,4 @@
-/**
+﻿/**
  * src/composition/container.ts
  *
  * Composition root for the production container.
@@ -25,7 +25,7 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 
-// ── System ports ───────────────────────────────────────────────
+// ΓöÇΓöÇ System ports ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 import { SystemClock } from "@/ports/system/Clock";
 import type { Clock } from "@/ports/system/Clock";
@@ -33,12 +33,12 @@ import type { Clock } from "@/ports/system/Clock";
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
-// ── Observability ports ────────────────────────────────────────
+// ΓöÇΓöÇ Observability ports ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 import type { Logger } from "@/ports/observability/Logger";
 import { PinoLogger } from "@/infra/observability/PinoLogger";
 
-// ── Repository ports (interfaces) ──────────────────────────────
+// ΓöÇΓöÇ Repository ports (interfaces) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
@@ -63,7 +63,7 @@ import type { IAttemptFeedbackRepository } from "@/ports/repositories/IAttemptFe
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 
-// ── Production adapters (only the prod ones) ──────────────────
+// ΓöÇΓöÇ Production adapters (only the prod ones) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 import { PrismaUserRepository } from "@/infra/repositories/PrismaUserRepository";
 import { PrismaCourseRepository } from "@/infra/repositories/PrismaCourseRepository";
@@ -102,7 +102,7 @@ import { NextMdxRenderer } from "@/infra/rendering/NextMdxRenderer";
 
 import type { EmailSender } from "@/ports/email/EmailSender";
 import { ResendEmailSender } from "@/infra/email/ResendEmailSender";
-// InMemoryEmailSender is NOT imported here — it would pull in
+// InMemoryEmailSender is NOT imported here ΓÇö it would pull in
 // react-dom/server and break `next build`. Test code uses it via
 // ./container.test.ts.
 
@@ -120,7 +120,7 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 import { UpstashRateLimiter } from "@/infra/security/UpstashRateLimiter";
 
-// ── Use cases ───────────────────────────────────────────────
+// ΓöÇΓöÇ Use cases ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 import { SignUp } from "@/usecases/SignUp";
 import { Login } from "@/usecases/Login";
@@ -228,7 +228,7 @@ import type { SentReminderRepository } from "@/ports/repositories/SentReminderRe
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
 
-// ── Container shape ─────────────────────────────────────────
+// ΓöÇΓöÇ Container shape ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 export interface AppContainer {
   // System
@@ -391,7 +391,7 @@ export interface AppContainer {
   sendLiveClassReminders: SendLiveClassReminders;
 }
 
-// ── Production container builder ─────────────────────────────
+// ΓöÇΓöÇ Production container builder ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 function buildProductionContainer(): AppContainer {
   const clock: Clock = new SystemClock();
@@ -481,7 +481,7 @@ function buildProductionContainer(): AppContainer {
 
   // STORY-049 + STORY-062: build RefundOverride once. Both the
   // `refundOverride` container entry and `adminProcessRefund` (which
-  // delegates to it) share the same instance — that keeps a single
+  // delegates to it) share the same instance ΓÇö that keeps a single
   // audit-log context and avoids two RefundOverride objects racing
   // over the same recordAuditLog port.
   const refundOverride = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
@@ -706,10 +706,14 @@ function buildProductionContainer(): AppContainer {
       recordAuditLog,
     }),
     saveSimulatorDecision: new SaveSimulatorDecision({ attemptRepo: simulatorAttemptRepo }),
-    submitSimulatorAttempt: new SubmitSimulatorAttempt({ attemptRepo: simulatorAttemptRepo }),
+    submitSimulatorAttempt: new SubmitSimulatorAttempt({
+      attemptRepo: simulatorAttemptRepo,
+      clock,
+    }),
     gradeSimulatorAttempt: new GradeSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,
+      clock,
     }),
     composeAttemptFeedback: new ComposeAttemptFeedback({
       attemptRepo: simulatorAttemptRepo,
@@ -784,7 +788,7 @@ function buildProductionContainer(): AppContainer {
   };
 }
 
-// ── Request-scoped storage ─────────────────────────────────
+// ΓöÇΓöÇ Request-scoped storage ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 const containerStore = new AsyncLocalStorage<AppContainer>();
 
@@ -805,7 +809,7 @@ export function getContainer(): AppContainer {
   return c;
 }
 
-// ── Cached production singleton ──────────────────────────────
+// ΓöÇΓöÇ Cached production singleton ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 let _productionContainer: AppContainer | null = null;
 
@@ -816,10 +820,10 @@ export function buildContainer(): AppContainer {
   return _productionContainer;
 }
 
-// ── Re-exports for test code ─────────────────────────────────
+// ΓöÇΓöÇ Re-exports for test code ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 //
 // Test code imports `buildTestContainer` (and the TestContainer type)
 // directly from "./container.test" to make the dependency explicit.
-// We intentionally do NOT re-export from here — keeping the test
+// We intentionally do NOT re-export from here ΓÇö keeping the test
 // container in its own file is what keeps the in-memory adapters (and
 // their react-dom/server import) out of the production bundle.

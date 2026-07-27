@@ -1,4 +1,4 @@
-/**
+﻿/**
  * InMemorySimulatorAttemptRepository tests.
  *
  * STORY-064: Simulator Attempt Infrastructure.
@@ -41,6 +41,7 @@ function makeAttempt(
     scenarioVersion: 1,
     difficulty: "beginner",
     mode: "practice",
+    startedAt: new Date("2025-03-01T00:00:00Z"),
   });
   if (overrides.status && overrides.status !== "in_progress") {
     // Allow test to override status (used for seeding submitted/graded attempts)
@@ -71,7 +72,7 @@ describe("InMemorySimulatorAttemptRepository", () => {
     repo = new InMemorySimulatorAttemptRepository();
   });
 
-  // ── create + findById round-trip ─────────────────────────────
+  // ΓöÇΓöÇ create + findById round-trip ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("create -> findById returns it", async () => {
     const attempt = makeAttempt({ id: "att_c1", attemptId: "ATT-C1" });
@@ -95,7 +96,7 @@ describe("InMemorySimulatorAttemptRepository", () => {
     expect(result.value).toBeNull();
   });
 
-  // ── findByAttemptId ─────────────────────────────────────────
+  // ΓöÇΓöÇ findByAttemptId ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("findByAttemptId returns the attempt", async () => {
     const attempt = makeAttempt({ id: "att_a1", attemptId: "ATT-A1B2C3" });
@@ -114,7 +115,7 @@ describe("InMemorySimulatorAttemptRepository", () => {
     expect(result.value).toBeNull();
   });
 
-  // ── findByUserAndScenario ────────────────────────────────────
+  // ΓöÇΓöÇ findByUserAndScenario ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("findByUserAndScenario returns matching attempts", async () => {
     const a1 = makeAttempt({
@@ -157,7 +158,9 @@ describe("InMemorySimulatorAttemptRepository", () => {
     await repo.create(a1);
 
     // Manually set one to submitted
-    await repo.updateStatus("att_p1", "submitted");
+    await repo.updateStatus("att_p1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
 
     const a2 = makeAttempt({
       id: "att_p2",
@@ -184,7 +187,7 @@ describe("InMemorySimulatorAttemptRepository", () => {
     expect(result.value).toEqual([]);
   });
 
-  // ── addDecision ──────────────────────────────────────────────
+  // ΓöÇΓöÇ addDecision ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("addDecision -> decision appears on attempt", async () => {
     const attempt = makeAttempt({ id: "att_d1", attemptId: "ATT-D1" });
@@ -233,27 +236,32 @@ describe("InMemorySimulatorAttemptRepository", () => {
     expect(result.error.kind).toBe("already_graded");
   });
 
-  // ── updateStatus ─────────────────────────────────────────────
+  // ΓöÇΓöÇ updateStatus ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("updateStatus transitions to submitted and sets submittedAt", async () => {
     const attempt = makeAttempt({ id: "att_us1" });
     await repo.create(attempt);
 
-    const result = await repo.updateStatus("att_us1", "submitted");
+    const result = await repo.updateStatus("att_us1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.status).toBe("submitted");
-    expect(result.value.submittedAt).not.toBeNull();
+    expect(result.value.submittedAt).toEqual(new Date("2025-04-01T00:00:00Z"));
   });
 
   it("updateStatus sets score and dimensions on grade", async () => {
     const attempt = makeAttempt({ id: "att_us2" });
     await repo.create(attempt);
-    await repo.updateStatus("att_us2", "submitted");
+    await repo.updateStatus("att_us2", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
 
     const result = await repo.updateStatus("att_us2", "graded", {
       score: 87,
       scoreDimensions: { direction: 90, magnitude: 84 },
+      gradedAt: new Date("2025-04-01T01:00:00Z"),
     });
 
     expect(result.ok).toBe(true);
@@ -261,7 +269,7 @@ describe("InMemorySimulatorAttemptRepository", () => {
     expect(result.value.status).toBe("graded");
     expect(result.value.score).toBe(87);
     expect(result.value.scoreDimensions).toEqual({ direction: 90, magnitude: 84 });
-    expect(result.value.gradedAt).not.toBeNull();
+    expect(result.value.gradedAt).toEqual(new Date("2025-04-01T01:00:00Z"));
   });
 
   it("updateStatus returns not_found for unknown id", async () => {
@@ -274,8 +282,14 @@ describe("InMemorySimulatorAttemptRepository", () => {
   it("updateStatus returns invalid_status_transition for graded->submitted", async () => {
     const attempt = makeAttempt({ id: "att_inv1" });
     await repo.create(attempt);
-    await repo.updateStatus("att_inv1", "submitted");
-    await repo.updateStatus("att_inv1", "graded", { score: 80, scoreDimensions: {} });
+    await repo.updateStatus("att_inv1", "submitted", {
+      submittedAt: new Date("2025-04-01T00:00:00Z"),
+    });
+    await repo.updateStatus("att_inv1", "graded", {
+      score: 80,
+      scoreDimensions: {},
+      gradedAt: new Date("2025-04-01T01:00:00Z"),
+    });
 
     const result = await repo.updateStatus("att_inv1", "submitted");
     expect(result.ok).toBe(false);
@@ -283,7 +297,7 @@ describe("InMemorySimulatorAttemptRepository", () => {
     expect(result.error.kind).toBe("invalid_status_transition");
   });
 
-  // ── seed + clear helpers ─────────────────────────────────────
+  // ΓöÇΓöÇ seed + clear helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("seed() populates the store with pre-existing attempts", async () => {
     const attempt = makeAttempt({ id: "att_seed1" });
@@ -307,13 +321,13 @@ describe("InMemorySimulatorAttemptRepository", () => {
     expect(val).toBeNull();
   });
 
-  // ── Multiple decisions with revisions ─────────────────────────
+  // ΓöÇΓöÇ Multiple decisions with revisions ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("multiple addDecision calls maintain correct revision numbers", async () => {
     const attempt = makeAttempt({ id: "att_multi1", attemptId: "ATT-MULTI1" });
     await repo.create(attempt);
 
-    // Manually set revisions — InMemorySimulatorAttemptRepository.addDecision
+    // Manually set revisions ΓÇö InMemorySimulatorAttemptRepository.addDecision
     // appends the decision as-is without computing revision
     const d1 = makeDecision("att_multi1", { step: 1 }, 1);
     const d2 = makeDecision("att_multi1", { step: 2 }, 2);

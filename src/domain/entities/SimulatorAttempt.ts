@@ -1,5 +1,5 @@
-/**
- * SimulatorAttempt — entity representing a student's attempt at a simulator scenario.
+﻿/**
+ * SimulatorAttempt ΓÇö entity representing a student's attempt at a simulator scenario.
  *
  * STORY-064: Simulator Attempt Infrastructure.
  *
@@ -30,7 +30,7 @@ export type SimulatorAttemptError =
   | { kind: "invalid_status_transition" }
   | { kind: "db_error"; message: string };
 
-// ── Types ────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Types ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 export type AttemptStatus = "in_progress" | "submitted" | "graded" | "expired";
 export type SimulatorMode = "guided" | "practice" | "challenge" | "credential" | "instructor";
@@ -65,7 +65,7 @@ export interface SimulatorAttempt {
   readonly decisions: readonly SimulatorDecision[];
 }
 
-// ── Factory ──────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Factory ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 export interface CreateSimulatorAttemptParams {
   readonly id: string;
@@ -77,11 +77,17 @@ export interface CreateSimulatorAttemptParams {
   readonly difficulty?: Difficulty;
   readonly mode?: SimulatorMode;
   readonly seed?: string | null;
+  /**
+   * Timestamp the attempt is opened. Callers MUST pass `clock.now()`
+   * from the injected Clock port so attempts are deterministic under
+   * test fakes (FixedClock) and traceable to the system clock in prod.
+   */
+  readonly startedAt: Date;
 }
 
 /**
  * Create a new SimulatorAttempt with status=in_progress.
- * This factory never fails — all inputs are validated upstream by the use case.
+ * This factory never fails ΓÇö all inputs are validated upstream by the use case.
  * Generates a seed for deterministic replay (stored now, used later).
  */
 export function createSimulatorAttempt(params: CreateSimulatorAttemptParams): SimulatorAttempt {
@@ -98,7 +104,7 @@ export function createSimulatorAttempt(params: CreateSimulatorAttemptParams): Si
     seed: params.seed !== undefined ? params.seed : generateSeed(),
     score: null,
     scoreDimensions: null,
-    startedAt: new Date(),
+    startedAt: params.startedAt,
     submittedAt: null,
     gradedAt: null,
     decisions: [],
@@ -122,15 +128,22 @@ export function addDecision(
 /**
  * Transition from in_progress to submitted. Returns null if the
  * attempt is not in_progress.
+ *
+ * `submittedAt` MUST come from the caller's injected `Clock` (not
+ * `new Date()`) so this transition is deterministic under test
+ * fakes and traceable to the system clock in prod.
  */
-export function submitAttempt(attempt: SimulatorAttempt): Result<SimulatorAttempt, null> {
+export function submitAttempt(
+  attempt: SimulatorAttempt,
+  submittedAt: Date,
+): Result<SimulatorAttempt, null> {
   if (attempt.status !== "in_progress") {
     return Result.err(null);
   }
   return Result.ok({
     ...attempt,
     status: "submitted",
-    submittedAt: new Date(),
+    submittedAt,
   });
 }
 
@@ -151,11 +164,16 @@ export function expireAttempt(attempt: SimulatorAttempt): Result<SimulatorAttemp
 /**
  * Transition from submitted to graded with score and dimensions.
  * Returns null if the attempt is not in submitted state.
+ *
+ * `gradedAt` MUST come from the caller's injected `Clock` (not
+ * `new Date()`) so this transition is deterministic under test
+ * fakes and traceable to the system clock in prod.
  */
 export function gradeAttempt(
   attempt: SimulatorAttempt,
   score: number,
   scoreDimensions: ScoreDimensions,
+  gradedAt: Date,
 ): Result<SimulatorAttempt, null> {
   if (attempt.status !== "submitted") {
     return Result.err(null);
@@ -165,7 +183,7 @@ export function gradeAttempt(
     status: "graded",
     score,
     scoreDimensions,
-    gradedAt: new Date(),
+    gradedAt,
   });
 }
 
@@ -181,7 +199,7 @@ export function hydrateSimulatorAttempt(
   return { ...plain };
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 function generateSeed(): string {
   // 8-character alphanumeric string for deterministic replay

@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { SubmitSimulatorAttempt } from "../SubmitSimulatorAttempt";
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
 import { createSimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
+import { FixedClock } from "@/ports/system/Clock";
 
 function makeAttempt(overrides: { status?: "in_progress" | "submitted" | "graded" } = {}) {
   const attempt = createSimulatorAttempt({
@@ -15,6 +16,7 @@ function makeAttempt(overrides: { status?: "in_progress" | "submitted" | "graded
     simulatorId: "bid-elevator",
     scenarioId: "scn_1",
     seed: "SEED0001",
+    startedAt: new Date("2025-01-15T00:00:00Z"),
   });
   if (!overrides.status || overrides.status === "in_progress") return attempt;
   return { ...attempt, status: overrides.status };
@@ -22,11 +24,13 @@ function makeAttempt(overrides: { status?: "in_progress" | "submitted" | "graded
 
 describe("SubmitSimulatorAttempt", () => {
   let repo: InMemorySimulatorAttemptRepository;
+  let clock: FixedClock;
   let useCase: SubmitSimulatorAttempt;
 
   beforeEach(() => {
     repo = new InMemorySimulatorAttemptRepository();
-    useCase = new SubmitSimulatorAttempt({ attemptRepo: repo });
+    clock = new FixedClock(new Date("2025-01-15T12:00:00Z"));
+    useCase = new SubmitSimulatorAttempt({ attemptRepo: repo, clock });
   });
 
   it("submits an in_progress attempt with one decision", async () => {

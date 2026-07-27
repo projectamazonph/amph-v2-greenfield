@@ -23,24 +23,31 @@ export class PrismaQuizRepository implements IQuizRepository {
         },
       });
 
-      for (const question of quiz.questions) {
+      // Persist the question/option order as the array index, NOT a
+      // hardcoded 0. The previous implementation stamped every
+      // question and every option with order=0, which made
+      // findById/findByCourseId return the rows in undefined order
+      // (the `orderBy: { order: 'asc' }` in those queries was a
+      // no-op when every row had the same order). This is the
+      // fix for the bug surfaced in the 2026-07-27 grounding.
+      for (const [qIndex, question] of quiz.questions.entries()) {
         const qRow = await this.db.quizQuestion.create({
           data: {
             id: question.id,
             quizId: q.id,
             questionText: question.questionText,
-            order: 0,
+            order: qIndex,
           },
         });
 
-        for (const option of question.options) {
+        for (const [oIndex, option] of question.options.entries()) {
           await this.db.quizOption.create({
             data: {
               id: option.id,
               questionId: qRow.id,
               optionText: option.optionText,
               isCorrect: option.isCorrect,
-              order: 0,
+              order: oIndex,
             },
           });
         }
@@ -86,25 +93,126 @@ export class PrismaQuizRepository implements IQuizRepository {
       });
 
       const result = await Promise.all(
-        quizzes.map(async (quiz: { id: string; courseId: string; title: string; passingScore: number }) => {
-          const questions = await this.db.quizQuestion.findMany({
-            where: { quizId: quiz.id },
-            orderBy: { order: "asc" },
-          });
-          const questionsWithOptions = await Promise.all(
-            questions.map(async (q: { id: string; questionText: string }) => {
-              const options = await this.db.quizOption.findMany({
-                where: { questionId: q.id },
-                orderBy: { order: "asc" },
-              });
-              return { ...q, options };
-            }),
-          );
-          return this.mapQuiz(quiz, questionsWithOptions);
-        }),
+        quizzes.map(
+          async (quiz: { id: string; courseId: string; title: string; passingScore: number }) => {
+            const questions = await this.db.quizQuestion.findMany({
+              where: { quizId: quiz.id },
+              orderBy: { order: "asc" },
+            });
+            const questionsWithOptions = await Promise.all(
+              questions.map(async (q: { id: string; questionText: string }) => {
+                const options = await this.db.quizOption.findMany({
+                  where: { questionId: q.id },
+                  orderBy: { order: "asc" },
+                });
+                return { ...q, options };
+              }),
+            );
+            return this.mapQuiz(quiz, questionsWithOptions);
+          },
+        ),
       );
 
       return Result.ok(result);
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async findAll(): Promise<Result<readonly Quiz[], QuizRepositoryError>> {
+    try {
+      const quizzes = await this.db.quiz.findMany({
+        orderBy: { createdAt: "asc" },
+      });
+      const result = await Promise.all(
+        quizzes.map(
+          async (quiz: { id: string; courseId: string; title: string; passingScore: number }) => {
+            const questions = await this.db.quizQuestion.findMany({
+              where: { quizId: quiz.id },
+              orderBy: { order: "asc" },
+            });
+            const questionsWithOptions = await Promise.all(
+              questions.map(async (q: { id: string; questionText: string }) => {
+                const options = await this.db.quizOption.findMany({
+                  where: { questionId: q.id },
+                  orderBy: { order: "asc" },
+                });
+                return { ...q, options };
+              }),
+            );
+            return this.mapQuiz(quiz, questionsWithOptions);
+          },
+        ),
+      );
+      return Result.ok(result);
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async update(quiz: Quiz): Promise<Result<Quiz, QuizRepositoryError>> {
+    try {
+      // Verify the row exists. We don't rely on the cascade delete's
+      // "row not found" branch because Prisma's P2025 message varies
+      // across versions, and `not_found` is the contract we want.
+      const existing = await this.db.quiz.findUnique({ where: { id: quiz.id } });
+      if (!existing) {
+        return Result.err({ kind: "not_found" });
+      }
+
+      // Atomic replace of the children. The schema cascades
+      // `QuizQuestion` on `Quiz` delete, which in turn cascades
+      // `QuizOption` on `QuizQuestion` delete; deleting the old
+      // questions inside a transaction is enough.
+      await this.db.$transaction([
+        this.db.quizQuestion.deleteMany({ where: { quizId: quiz.id } }),
+        this.db.quiz.update({
+          where: { id: quiz.id },
+          data: {
+            title: quiz.title,
+            passingScore: quiz.passingScore,
+          },
+        }),
+        ...quiz.questions.flatMap((question, qIndex) => [
+          this.db.quizQuestion.create({
+            data: {
+              id: question.id,
+              quizId: quiz.id,
+              questionText: question.questionText,
+              order: qIndex,
+            },
+          }),
+          ...question.options.map((option, oIndex) =>
+            this.db.quizOption.create({
+              data: {
+                id: option.id,
+                questionId: question.id,
+                optionText: option.optionText,
+                isCorrect: option.isCorrect,
+                order: oIndex,
+              },
+            }),
+          ),
+        ]),
+      ]);
+
+      return Result.ok(quiz);
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async delete(id: string): Promise<Result<void, QuizRepositoryError>> {
+    try {
+      const existing = await this.db.quiz.findUnique({ where: { id } });
+      if (!existing) {
+        return Result.err({ kind: "not_found" });
+      }
+      // Children cascade via the Prisma schema (QuizQuestion has
+      // `onDelete: Cascade` on its `quiz` relation; QuizOption has
+      // the same on its `question` relation).
+      await this.db.quiz.delete({ where: { id } });
+      return Result.ok(undefined);
     } catch (err: unknown) {
       return Result.err({ kind: "db_error", message: String(err) });
     }
