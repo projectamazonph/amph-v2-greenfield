@@ -14,14 +14,14 @@ vi.mock("server-only", () => ({}));
 // ── Module mocking ─────────────────────────────────────────────────────
 
 vi.mock("@/composition/container", () => ({
-  getContainer: vi.fn(),
+  buildContainer: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({
   getSessionUserId: vi.fn(),
 }));
 
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
@@ -168,7 +168,7 @@ function happyContainer() {
 }
 
 function setupGetContainer() {
-  (getContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
+  (buildContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
 }
 
 beforeEach(() => {

@@ -21,17 +21,12 @@ import type {
   ComposioSession,
   ComposioSessionOptions,
 } from "@/ports/integrations/ComposioClient";
-
 // @composio/core is mocked in tests via vi.mock(...)
-const { Composio, ComposioError: SdkComposioError } = require("@composio/core") as {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Composio: new (apiKey: string) => any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ComposioError: new (message: string) => any;
-};
+import { Composio, ComposioError as SdkComposioError } from "@composio/core";
 
 export class ComposioClientAdapter implements ComposioClient {
-  private readonly sdk: InstanceType<typeof Composio>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private readonly sdk: any;
 
   constructor(apiKey: string) {
     if (!apiKey || !apiKey.trim()) {
@@ -40,7 +35,7 @@ export class ComposioClientAdapter implements ComposioClient {
           "Add it to .env.local to enable the Composio integration.",
       );
     }
-    this.sdk = new Composio(apiKey);
+    this.sdk = new Composio({ apiKey });
   }
 
   async createSession(
