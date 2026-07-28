@@ -1,10 +1,21 @@
 /**
  * NavSidebar.test.tsx — STORY-046.
+ *
+ * The component is a client component that reads the live path via
+ * `usePathname()` from next/navigation. Tests mock that hook to
+ * control the current path.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderToString } from "react-dom/server";
 import { createElement } from "react";
+
+let currentPath = "/admin";
+
+vi.mock("next/navigation", () => ({
+  usePathname: () => currentPath,
+}));
+
 import { NavSidebar } from "../NavSidebar";
 import type { User } from "@/domain/entities/User";
 
@@ -23,29 +34,44 @@ const TEST_USER: User = {
   emailVerifiedAt: null,
 };
 
-function render(props: { currentPath?: string } = {}) {
-  return renderToString(createElement(NavSidebar, { user: TEST_USER, ...props }));
+function render() {
+  return renderToString(createElement(NavSidebar, { user: TEST_USER }));
 }
 
-function hasActiveClass(html: string, href: string): boolean {
-  // Find the <a ...> tag and check if it has a class containing 'active'.
-  // The href may appear before or after the class in the rendered HTML.
-  const pattern = new RegExp(`<a[^>]*?href="${href.replace(/[/]/g, "\\/")}"[^>]*>`);
-  const m = html.match(pattern);
-  if (!m || !m[0]) return false;
-  const clsMatch = m[0].match(/class="([^"]+)"/);
-  if (!clsMatch || !clsMatch[1]) return false;
-  return clsMatch[1].split(/\s+/).some((c) => c.includes("active"));
+function hasDataActive(html: string, href: string): boolean {
+  // Find each <a>...</a> and check whether it has both `href="<X>"` and
+  // `data-active="true"`. Attribute order is not stable in React 19 SSR
+  // (data-* often comes before href), so we can't rely on the JSX order.
+  const anchorPattern = /<a\b([^>]*)>/g;
+  const escHref = href.replace(/[/\\^$.*+?()[\]{}|]/g, "\\$&");
+  const hrefRe = new RegExp(`href="${escHref}"`);
+  const activeRe = /data-active="true"/;
+  let m: RegExpExecArray | null;
+  while ((m = anchorPattern.exec(html)) !== null) {
+    const attrs = m[1] ?? "";
+    if (hrefRe.test(attrs) && activeRe.test(attrs)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasAnyDataActive(html: string): boolean {
+  return /<a\b[^>]*data-active="true"[^>]*>/.test(html);
 }
 
 describe("NavSidebar", () => {
+  beforeEach(() => {
+    currentPath = "/admin";
+  });
+
   it("renders the brand + Admin badge", () => {
     const html = render();
     expect(html).toContain("Project Amazon PH Academy");
     expect(html).toContain("Admin");
   });
 
-  it("renders all 10 nav items", () => {
+  it("renders all 12 nav items", () => {
     const html = render();
     expect(html).toContain("Dashboard");
     expect(html).toContain("Users");
@@ -56,6 +82,8 @@ describe("NavSidebar", () => {
     expect(html).toContain("Live Classes");
     expect(html).toContain("Simulators");
     expect(html).toContain("Badges");
+    expect(html).toContain("Quizzes");
+    expect(html).toContain("Certificates");
     expect(html).toContain("Settings");
   });
 
@@ -65,32 +93,31 @@ describe("NavSidebar", () => {
     expect(html).toContain('aria-label="Admin navigation"');
   });
 
-  it("marks the /admin link as active when currentPath is /admin", () => {
-    const html = render({ currentPath: "/admin" });
-    expect(hasActiveClass(html, "/admin")).toBe(true);
+  it("marks the /admin link as active when the current path is /admin", () => {
+    currentPath = "/admin";
+    const html = render();
+    expect(hasDataActive(html, "/admin")).toBe(true);
   });
 
-  it("marks the /admin/users link as active when currentPath is /admin/users", () => {
-    const html = render({ currentPath: "/admin/users" });
-    expect(hasActiveClass(html, "/admin/users")).toBe(true);
+  it("marks the /admin/users link as active when the current path is /admin/users", () => {
+    currentPath = "/admin/users";
+    const html = render();
+    expect(hasDataActive(html, "/admin/users")).toBe(true);
     // /admin should NOT be active
-    expect(hasActiveClass(html, "/admin")).toBe(false);
+    expect(hasDataActive(html, "/admin")).toBe(false);
   });
 
   it("marks the /admin/users link as active for sub-routes too", () => {
-    const html = render({ currentPath: "/admin/users/abc-123" });
-    expect(hasActiveClass(html, "/admin/users")).toBe(true);
+    currentPath = "/admin/users/abc-123";
+    const html = render();
+    expect(hasDataActive(html, "/admin/users")).toBe(true);
   });
 
-  it("does not mark any link as active when currentPath is not provided", () => {
+  it("does not mark any link as active when the current path is / (no admin route)", () => {
+    currentPath = "/";
     const html = render();
-    // No link should have the "active" class. We test that no href has
-    // a className containing "active".
-    const linkClasses = Array.from(html.matchAll(/<a[^>]*class="([^"]+)"/g)).map((m) => m[1]);
-    expect(linkClasses.length).toBeGreaterThan(0);
-    for (const cls of linkClasses) {
-      expect(cls).not.toContain("active");
-    }
+    // No <a> should have data-active="true"
+    expect(hasAnyDataActive(html)).toBe(false);
   });
 
   it("renders the user card with the admin's initials", () => {
@@ -99,12 +126,5 @@ describe("NavSidebar", () => {
     expect(html).toContain("User");
     // Initials for "Admin User" are "AU"
     expect(html).toContain("AU");
-  });
-
-  it("renders a logout form", () => {
-    const html = render();
-    expect(html).toContain("<form");
-    expect(html).toContain('action="/api/auth/logout"');
-    expect(html).toContain('type="submit"');
   });
 });

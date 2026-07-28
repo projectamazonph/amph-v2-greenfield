@@ -4,12 +4,14 @@
  * Per design spec §9.1: avatar (first letter of first name), name,
  * role badge, logout button.
  *
- * Server component. Logout is a form action — in the future, when
- * SignOut use case exists, the form will POST to a server action.
- * For now it's a placeholder button (no behavior).
+ * Server component. Logout posts to /api/auth/logout (form action).
+ *
+ * Hallmark: avatar uses a 2-color geometric mark (accent fill + ink
+ * text) for visual identity — no emoji, no avatar URLs to handle.
  */
 
 import type { User } from "@/domain/entities/User";
+import { SignOut } from "@phosphor-icons/react/dist/ssr";
 import styles from "./UserCard.module.css";
 
 export interface UserCardProps {
@@ -33,8 +35,8 @@ export function UserCard({ user }: UserCardProps) {
         <div className={styles.role}>{user.role}</div>
       </div>
       <form action="/api/auth/logout" method="post" className={styles.logoutForm}>
-        <button type="submit" className={styles.logoutButton} aria-label="Log out">
-          ⎋
+        <button type="submit" className={styles.logoutButton} aria-label="Log out" title="Log out">
+          <SignOut size={16} weight="bold" />
         </button>
       </form>
     </div>
