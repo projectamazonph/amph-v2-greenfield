@@ -36,7 +36,7 @@
 
 import { useActionState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   startCheckout,
   CHECKOUT_INITIAL_STATE,
@@ -155,8 +155,18 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
 };
 
 export default function CheckoutForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Normalise legacy ?course= param to the correct ?courseSlug=
+  const legacyCourse = searchParams.get("course");
+  useEffect(() => {
+    if (legacyCourse) {
+      window.location.href = `/checkout?courseSlug=${encodeURIComponent(legacyCourse)}`;
+    }
+  }, [legacyCourse]);
+
+  if (legacyCourse) return null;
+
   const courseSlug = searchParams.get("courseSlug")?.trim() ?? "";
 
   const [state, formAction, isPending] = useActionState<CheckoutActionState, FormData>(
