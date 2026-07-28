@@ -16,14 +16,14 @@ vi.mock("server-only", () => ({}));
 // without needing a real DATABASE_URL.
 
 vi.mock("@/composition/container", () => ({
-  getContainer: vi.fn(),
+  buildContainer: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({
   getSessionUserId: vi.fn(),
 }));
 
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { StrTriageOutput } from "@/domain/simulator/str-triage/StrTriageOutput";
@@ -156,7 +156,7 @@ function happyContainer() {
 describe("strTriageAttempt", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (getContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
+    (buildContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
     (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue("user_123");
     happyContainer();
   });
@@ -304,7 +304,7 @@ describe("strTriageAttempt", () => {
 describe("classifyStr (legacy)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (getContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
+    (buildContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
     happyContainer();
   });
 

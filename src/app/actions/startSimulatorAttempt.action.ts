@@ -9,7 +9,7 @@
 import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 
 export interface StartSimulatorAttemptInput {
@@ -39,7 +39,7 @@ export async function startSimulatorAttempt(
     return { error: "unauthenticated" };
   }
 
-  const container = getContainer();
+  const container = buildContainer();
 
   const uc = new StartSimulatorAttempt({
     attemptRepo: container.simulatorAttemptRepo,
