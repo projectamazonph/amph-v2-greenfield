@@ -49,49 +49,38 @@ Pure business model. The most valuable code in the repo, because it's the only c
 ```
 src/domain/
 ├── shared/
-│   ├── Money.ts
-│   ├── Email.ts
-│   ├── Slug.ts
-│   ├── Tier.ts
-│   └── Result.ts
-├── courses/
-│   ├── Course.ts
-│   ├── Module.ts
-│   ├── Lesson.ts
-│   ├── Progress.ts
-│   └── rules/
-│       ├── canAccessCourse.ts
-│       └── canIssueCertificate.ts
-├── payments/
-│   ├── Payment.ts
-│   ├── Checkout.ts
-│   ├── Refund.ts
-│   ├── WebhookEvent.ts
-│   └── rules/
-│       ├── canRequestRefund.ts
-│       └── isIdempotentReplay.ts
-├── simulators/
-│   ├── Simulator.ts            # the interface
-│   ├── BidElevator.ts
-│   ├── StrTriage.ts
-│   ├── CampaignBuilder.ts
-│   ├── ListingAudit.ts
-│   └── KeywordResearch.ts          # not a separate domain module; thin
-│                                   # server-action alias reusing ListingAudit
-│                                   # (see §Simulators)
-│
-│ NOTE: All four simulators score the `explanation` dimension as 0 because
-│ no student text input exists yet (STORY-079–084, planned Sprint 14–16).
-│ `getOverallScore()` weights sum to 1.0; scores are capped at 100 correctly.
-├── progress/
-│   ├── ProgressEvent.ts
-│   ├── XPEvent.ts
-│   └── rules/
-│       └── computeLevel.ts
-└── users/
-    ├── User.ts
-    └── rules/
-        └── isAdmin.ts
+│   └── Result.ts                  # Result<T, E> sum type
+├── entities/
+│   ├── User.ts, Course.ts, Module.ts, Lesson.ts
+│   ├── Enrollment.ts, Order.ts, Session.ts
+│   ├── Quiz.ts, QuizAttempt.ts
+│   ├── Badge.ts, BadgeAward.ts
+│   ├── Certificate.ts
+│   ├── DiscountCode.ts
+│   ├── ProgressEvent.ts, XPEvent.ts
+│   ├── SimulatorScenario.ts, SimulatorAttempt.ts, SimulatorDecision.ts
+│   ├── ScorePolicy.ts, AttemptFeedback.ts
+│   ├── LiveClass.ts, EmailTemplate.ts
+│   └── AuditLogEntry.ts
+├── values/
+│   ├── Money.ts                  # integer minor units
+│   ├── CourseAccessTier.ts
+│   ├── PaymentStatus.ts
+│   ├── AccessDecision.ts
+│   ├── OrderRefund.ts            # REFUND_WINDOW_DAYS = 30
+│   └── AuditAction.ts
+├── services/
+│   ├── XPService.ts, StreakService.ts, ProgressService.ts
+├── ports/
+│   └── content/
+│       └── IAmphContentReader.ts   # curriculum content reader port
+└── simulator/
+    ├── Simulator.ts              # the interface
+    ├── bid-elevator/             # BidElevatorInput, BidElevatorSimulator, BidElevatorOutput
+    ├── str-triage/               # StrTriageInput, StrTriageSimulator, StrTriageOutput
+    ├── campaign-builder/         # CampaignBuilderInput, CampaignBuilderSimulator, CampaignBuilderOutput
+    └── listing-audit/            # ListingAuditInput, ListingAuditSimulator, ListingAuditOutput
+                                  # KeywordResearch reuses ListingAudit; not a separate module
 ```
 
 ---
@@ -123,42 +112,54 @@ Interfaces. The contract between the use cases and the outside world. Every meth
 ```
 src/ports/
 ├── repositories/
-│   ├── UserRepository.ts
+│   ├── UserRepository.ts, SessionRepository.ts
 │   ├── CourseRepository.ts
-│   ├── ModuleRepository.ts
-│   ├── LessonRepository.ts
-│   ├── EnrollmentRepository.ts
-│   ├── PaymentRepository.ts
-│   ├── RefundRepository.ts
-│   ├── AttemptRepository.ts
-│   ├── ProgressRepository.ts
-│   ├── BadgeRepository.ts
-│   ├── LiveClassRepository.ts
-│   ├── CertificateRepository.ts
-│   ├── AuditLogRepository.ts
-│   └── DiscountCodeRepository.ts
-├── gateways/
-│   ├── PaymentGateway.ts
-│   └── EmailSender.ts
-├── services/
-│   ├── AccessPolicy.ts
-│   ├── PdfRenderer.ts
-│   ├── PricingService.ts
-│   ├── CertificateIssuer.ts
-│   ├── RateLimiter.ts
-│   ├── ContentRenderer.ts
-│   ├── StreakService.ts
-│   ├── XPService.ts
-│   └── ProgressService.ts
+│   ├── IModuleRepository.ts, ILessonRepository.ts
+│   ├── IOrderRepository.ts           # Order only; no separate Payment/Refund repo
+│   ├── IEnrollmentRepository.ts
+│   ├── IDiscountCodeRepository.ts
+│   ├── IQuizRepository.ts, IQuizAttemptRepository.ts
+│   ├── IXPEventRepository.ts, IProgressEventRepository.ts
+│   ├── IBadgeRepository.ts, IBadgeAwardRepository.ts
+│   ├── ICertificateRepository.ts
+│   ├── IAuditLog.ts, IWebhookEventLog.ts
+│   ├── ISimulatorScenarioRepository.ts
+│   ├── ISimulatorAttemptRepository.ts
+│   ├── IScorePolicyRepository.ts, IAttemptFeedbackRepository.ts
+│   ├── ILiveClassRepository.ts
+│   ├── IPricingTierRepository.ts
+│   ├── EmailVerificationRepository.ts
+│   ├── PasswordResetRepository.ts, SentReminderRepository.ts
+│   └── IUserStreakRepository.ts
+├── payment/
+│   └── IPaymentGateway.ts           # PayMongo adapter
+├── email/
+│   ├── EmailSender.ts
+│   ├── EmailVerificationRenderer.ts
+│   └── LiveClassReminderRenderer.ts
+├── access/
+│   └── IAccessPolicy.ts              # TierAccessPolicy implementation
+├── security/
+│   ├── JwtService.ts, PasswordHasher.ts
+│   ├── RateLimiter.ts, TotpService.ts
+│   └── CertificateHashGenerator.ts
+├── rendering/
+│   ├── CertificateRenderer.ts
+│   └── IMdxContentRenderer.ts
 ├── system/
-│   ├── Clock.ts
-│   ├── IdGenerator.ts
-│   ├── Logger.ts
-│   ├── Tracer.ts
-│   └── EventBus.ts
-└── events/
-    └── SimulatorEvent.ts      # event shapes, no impl
+│   ├── Clock.ts, IdGenerator.ts
+│   └── ContentIdGenerator.ts
+├── observability/
+│   └── Logger.ts
+├── simulator/
+│   ├── Simulator.ts                 # the interface
+│   └── SimulatorRegistry.ts
+├── integrations/
+│   └── ComposioClient.ts           # external integrations port
+└── (no events/ — events are in domain/entities/ or use-result-pattern)
 ```
+
+> Note: `PricingService`, `CertificateIssuer`, `ContentRenderer`, `EventBus`, `Tracer`, and `ProgressService` are **not** ports. `PricingService` is `ListPricingTiers` use case. `CertificateIssuer` is `IssueCertificate`. `ContentRenderer` is `IMdxContentRenderer`. `ProgressService` and `StreakService` and `XPService` are domain services. `Tracer` is referenced but not yet a real port/adapter.
 
 ---
 
@@ -191,47 +192,52 @@ Orchestration. One class per use case. Constructor-injected ports. The use case 
 ```
 src/usecases/
 ├── auth/
-│   ├── SignUp.ts
-│   ├── SignIn.ts
-│   ├── SignOut.ts
-│   ├── RequestPasswordReset.ts
-│   ├── ResetPassword.ts
-│   ├── VerifyEmail.ts
-│   └── ResendVerification.ts
-├── checkout/
-│   ├── StartCheckout.ts
-│   └── HandlePaymentWebhook.ts
-├── enroll/
-│   ├── EnrollStudent.ts
-│   └── RevokeEnrollment.ts
-├── refund/
-│   ├── RequestRefund.ts
-│   └── AdminIssueRefund.ts
-├── certificate/
-│   ├── IssueCertificate.ts
-│   ├── VerifyCertificate.ts
-│   └── RevokeCertificate.ts
-├── simulators/
-│   ├── RunBidElevator.ts
-│   ├── RunStrTriage.ts
-│   ├── RunCampaignBuilder.ts
-│   ├── RunListingAudit.ts
-│   # RunKeywordResearch does not exist; keyword-research calls the
-│   # simulator directly from its server action (no separate use case)
-├── progress/
-│   ├── MarkLessonComplete.ts
-│   ├── RecordQuizAttempt.ts
-│   ├── RecordStreakVisit.ts
-│   └── RecordSimulatorAttempt.ts
-├── badges/
-│   ├── AwardBadge.ts
-│   ├── RevokeBadge.ts
-│   └── ListUserBadges.ts
-└── admin/
-    ├── AdminUpdateUser.ts
-    ├── AdminCreateDiscountCode.ts
-    ├── AdminUpdateCourse.ts
-    └── AdminUpdatePricingSettings.ts
+│   ├── SignUp.ts, Login.ts, Logout.ts
+│   ├── VerifyEmail.ts, ResendVerification.ts
+│   ├── RequestPasswordReset.ts, ResetPassword.ts
+│   └── EnableTwoFactor.ts, ConfirmTwoFactor.ts, DisableTwoFactor.ts
+├── CreatePaymentIntent.ts         # checkout: creates PayMongo hosted session
+├── CheckCourseAccess.ts, AuthorizeLessonAccess.ts
+├── EnrollStudent.ts
+├── ApplyDiscountCode.ts
+├── RequestRefund.ts, ProcessRefund.ts, RefundOverride.ts
+├── IssueCertificate.ts, RenderCertificatePdf.ts, VerifyCertificate.ts, RevokeCertificate.ts
+├── RecordQuizAttempt.ts, MarkLessonComplete.ts
+├── AwardXP.ts, AwardBadge.ts, ListUserBadges.ts, RecordStreakVisit.ts
+├── RebuildCourseCurriculum.ts      # keeps Course.curriculum in sync after module/lesson writes
+├── ListCatalogCourses.ts, GetCatalogCourse.ts
+├── ListCourses.ts, GetCourse.ts, ListPricingTiers.ts
+├── CreateCourse.ts, UpdateCourse.ts, ArchiveCourse.ts
+├── CreateModule.ts, UpdateModule.ts, DeleteModule.ts, ReorderModules.ts
+├── CreateLesson.ts, UpdateLesson.ts, DeleteLesson.ts, ReorderLessons.ts
+├── AdminListCourses.ts, AdminGetCourse.ts
+├── AdminListModules.ts, AdminGetModule.ts
+├── AdminListLessons.ts, AdminGetLesson.ts
+├── AdminListPayments.ts, AdminGetPayment.ts
+├── ListRefundRequests.ts, AdminProcessRefund.ts
+├── AdminListDiscountCodes.ts, AdminGetDiscountCode.ts
+├── AdminCreateDiscountCode.ts, AdminUpdateDiscountCode.ts, AdminArchiveDiscountCode.ts
+├── AdminListBadges.ts, AdminGetBadge.ts
+├── AdminCreateBadge.ts, AdminUpdateBadge.ts, AdminArchiveBadge.ts   # create/update/archive stubs
+├── AdminListQuizzes.ts, AdminGetQuiz.ts, AdminCreateQuiz.ts
+├── AdminUpdateQuiz.ts, AdminDeleteQuiz.ts
+├── AdminListCertificates.ts, AdminGetCertificate.ts
+├── AdminListScenarios.ts, GetSimulatorScenario.ts
+├── CreateSimulatorScenario.ts, UpdateSimulatorScenario.ts, ArchiveSimulatorScenario.ts
+├── AdminListLiveClasses.ts, AdminGetLiveClass.ts
+├── CreateLiveClass.ts, UpdateLiveClass.ts, DeleteLiveClass.ts
+├── SendLiveClassReminders.ts
+├── StartSimulatorAttempt.ts, SaveSimulatorDecision.ts, SubmitSimulatorAttempt.ts
+├── GradeSimulatorAttempt.ts, ComposeAttemptFeedback.ts
+├── ListUsers.ts, GetUserDetail.ts, ImpersonateUser.ts
+├── GetAdminDashboardStats.ts
+├── ListAuditLogs.ts, ExportAuditLogs.ts, RecordAuditLog.ts
+├── ListEmailTemplates.ts, GetEmailTemplate.ts, UpdateEmailTemplate.ts
+└── ImportAmphContent.ts           # curriculum import from content/curriculum/
+
+# Simulator use cases are the listed attempt lifecycle above; no per-engine
+# Run<Simulator>.ts files — engines are invoked directly from server actions.
+# KeywordResearch reuses ListingAudit engine; no separate use case.
 ```
 
 ---
@@ -268,52 +274,64 @@ Adapters. The only layer that imports from frameworks and external SDKs. Each ad
 
 ```
 src/infra/
-├── db/
-│   ├── prisma/
-│   │   ├── PrismaUserRepository.ts
-│   │   ├── PrismaCourseRepository.ts
-│   │   ├── PrismaModuleRepository.ts
-│   │   ├── PrismaLessonRepository.ts
-│   │   ├── PrismaEnrollmentRepository.ts
-│   │   ├── PrismaPaymentRepository.ts
-│   │   ├── PrismaRefundRepository.ts
-│   │   ├── PrismaAttemptRepository.ts
-│   │   ├── PrismaProgressRepository.ts
-│   │   ├── PrismaBadgeRepository.ts
-│   │   ├── PrismaLiveClassRepository.ts
-│   │   ├── PrismaCertificateRepository.ts
-│   │   ├── PrismaAuditLogRepository.ts
-│   │   └── PrismaDiscountCodeRepository.ts
-│   └── inmemory/
-│       ├── InMemoryUserRepository.ts
-│       ├── InMemoryCourseRepository.ts
-│       └── ... (one per Prisma*Repository, identical surface)
-├── paymongo/
-│   ├── PayMongoGateway.ts
+├── database/
+│   └── prisma.ts                 # Prisma singleton, Prisma 7 @prisma/adapter-pg
+├── repositories/
+│   ├── PrismaUserRepository.ts, PrismaSessionRepository.ts
+│   ├── PrismaCourseRepository.ts
+│   ├── PrismaModuleRepository.ts, PrismaLessonRepository.ts
+│   ├── PrismaOrderRepository.ts  # Order only; no separate Payment/Refund repo
+│   ├── PrismaEnrollmentRepository.ts
+│   ├── PrismaDiscountCodeRepository.ts
+│   ├── PrismaQuizRepository.ts, PrismaQuizAttemptRepository.ts
+│   ├── PrismaXPEventRepository.ts, PrismaSentReminderRepository.ts
+│   ├── PrismaBadgeRepository.ts  # create/update/archive are stubs
+│   ├── PrismaBadgeAwardRepository.ts
+│   ├── PrismaCertificateRepository.ts
+│   ├── PrismaAuditLog.ts         # AuditLog port impl
+│   ├── PrismaWebhookEventLog.ts  # WebhookEvent log port impl
+│   ├── PrismaSimulatorScenarioRepository.ts
+│   ├── PrismaSimulatorAttemptRepository.ts
+│   ├── PrismaScorePolicyRepository.ts
+│   ├── PrismaAttemptFeedbackRepository.ts
+│   ├── PrismaLiveClassRepository.ts  # under live-class/
+│   ├── PrismaPricingTierRepository.ts
+│   ├── PrismaEmailVerificationRepository.ts
+│   ├── PrismaPasswordResetRepository.ts
+│   └── (InMemory* fakes alongside each repo, in same directory)
+├── payment/
+│   ├── PayMongoAdapter.ts
 │   └── fake/
 │       └── FakePayMongoGateway.ts
 ├── email/
 │   ├── ResendEmailSender.ts
+│   ├── templates/
+│   │   ├── EmailVerificationRenderer.ts
+│   │   └── LiveClassReminderRenderer.ts
 │   └── fake/
-│       └── ConsoleEmailSender.ts
+│       └── InMemoryEmailSender.ts
 ├── pdf/
-│   └── ReactPdfRenderer.ts
-├── ratelimit/
+│   └── ReactPdfCertificateRenderer.ts
+├── access/
+│   └── TierAccessPolicy.ts       # AccessPolicy port impl
+├── security/
+│   ├── Argon2PasswordHasher.ts
+│   ├── JoseJwtService.ts
+│   ├── OtpauthTotpService.ts     # TotpService port impl
 │   ├── UpstashRateLimiter.ts
+│   ├── NodeCertificateHashGenerator.ts
 │   └── fake/
-│       └── InMemoryRateLimiter.ts
-├── content/
-│   └── MDXContentRenderer.ts
-├── observability/
-│   ├── PinoLogger.ts
-│   └── SentryTracer.ts
+│       └── FakeTotpService.ts
 ├── system/
-│   ├── SystemClock.ts
-│   ├── UlidGenerator.ts
-│   └── InMemoryEventBus.ts
-└── pricing/
-    ├── TierPricingService.ts
-    └── EarlyBirdPricingService.ts
+│   ├── SystemClock.ts, UlidGenerator.ts
+│   └── pino/
+│       └── PinoLogger.ts          # Logger port impl
+├── rendering/
+│   └── NextMdxRenderer.ts        # IMdxContentRenderer port impl
+├── simulator/
+│   └── buildSimulatorRegistry.ts # wires 4 engines; no 5th for keyword-research
+└── live-class/
+    └── PrismaLiveClassRepository.ts
 ```
 
 ---
@@ -326,9 +344,9 @@ Next.js App Router. RSC by default. Server actions are 5-line shims. Route handl
 
 - RSC pages. Read from the use case layer. Pass data to dumb components.
 - Server actions. `parse(formData) → call(useCase) → return Result`. Never more than 10 lines.
-- Route handlers for `/api/paymongo/webhook` and `/api/resend/webhook` (and nothing else).
+- Route handlers for `/api/webhooks/paymongo` and `/api/cron/live-class-reminders` (and nothing else).
 - `error.tsx`, `not-found.tsx`, `loading.tsx`, `layout.tsx` per route.
-- Auth middleware (`src/middleware.ts`).
+- `src/proxy.ts` handles security headers, route protection, and JWT verification.
 
 ### What does NOT go here
 
@@ -345,68 +363,68 @@ Next.js App Router. RSC by default. Server actions are 5-line shims. Route handl
 
 ### File shape
 
+The actual route tree does not use route groups. Routes are flat under `src/app/`.
+
 ```
 src/app/
-├── layout.tsx
-├── page.tsx                              # landing
-├── (auth)/
-│   ├── signin/page.tsx
-│   ├── signup/page.tsx
-│   ├── verify-email/page.tsx
-│   ├── reset-password/page.tsx
-│   └── reset-password/[token]/page.tsx
-├── (dashboard)/
-│   ├── layout.tsx                        # auth-gated layout
-│   ├── dashboard/page.tsx
-│   ├── courses/
-│   │   ├── page.tsx                      # catalog
-│   │   └── [courseSlug]/
-│   │       ├── page.tsx                  # course detail
-│   │       ├── certificate/page.tsx
-│   │       └── lessons/
-│   │           └── [lessonSlug]/
-│   │               ├── page.tsx
-│   │               └── quiz/page.tsx
-│   ├── tools/
-│   │   ├── page.tsx                      # simulator index
-│   │   └── [tool]/
-│   │       └── [slug]/page.tsx           # single scenario
-│   ├── certificates/
-│   │   └── [hash]/
-│   │       ├── page.tsx
-│   │       └── pdf/route.ts
-│   ├── payments/page.tsx
-│   ├── payments/[id]/page.tsx
-│   ├── live-classes/page.tsx
-│   └── live-classes/[id]/page.tsx
+├── layout.tsx, global-error.tsx, providers.tsx, WebVitalsReporter.tsx
+├── page.tsx                             # landing page
+├── signup/, login/, admin-login/
+├── reset-password/, reset-password/[token]/
+├── verify-email/, verify-email/sent/
+├── pricing/, courses/, courses/[slug]/
+├── courses/[slug]/lessons/[lessonId]/
+├── courses/[slug]/lessons/[lessonId]/quiz/
+├── dashboard/, profile/
+├── tools/, tools/bid-elevator/, tools/str-triage/
+├── tools/campaign-builder/, tools/listing-audit/, tools/keyword-research/
+├── checkout/, checkout/success/, checkout/failed/
+├── certificates/[hash]/
 ├── admin/
 │   ├── layout.tsx                        # requireAdmin()
-│   ├── page.tsx
-│   ├── users/...
-│   ├── courses/...
-│   ├── payments/...
-│   ├── refunds/...
-│   ├── simulators/...
-│   ├── discount-codes/...
-│   ├── audit-log/...
-│   └── settings/...
+│   ├── page.tsx                          # dashboard
+│   ├── users/, users/[id]/
+│   ├── courses/, courses/new/
+│   │   └── [id]/edit/, modules/new/,
+│   │       modules/[moduleId]/,
+│   │       modules/[moduleId]/edit/,
+│   │       modules/[moduleId]/lessons/new/,
+│   │       modules/[moduleId]/lessons/[lessonId]/,
+│   │       modules/[moduleId]/lessons/[lessonId]/edit/
+│   ├── payments/, payments/[id]/
+│   ├── refunds/, refunds/[orderId]/
+│   ├── simulators/, simulators/new/, simulators/[id]/edit/
+│   ├── live-classes/, live-classes/new/, live-classes/[id]/edit/
+│   ├── discount-codes/, discount-codes/new/, discount-codes/[id]/edit/
+│   ├── badges/, badges/new/, badges/[slug]/edit/
+│   ├── quizzes/, quizzes/new/, quizzes/[quizId]/edit/
+│   ├── certificates/, certificates/[id]/
+│   ├── audit-log/
+│   ├── settings/, settings/2fa-setup/
 ├── api/
-│   ├── paymongo/webhook/route.ts
-│   └── resend/webhook/route.ts
-├── actions/                              # server actions
-│   ├── auth.ts
-│   ├── checkout.ts
-│   ├── enroll.ts
-│   ├── refund.ts
-│   ├── progress.ts
-│   ├── simulator.ts
-│   └── admin.ts
-└── middleware.ts                         # sets up request container
+│   ├── webhooks/paymongo/route.ts
+│   ├── cron/live-class-reminders/route.ts
+│   ├── auth/signup/, login/, logout/, admin-login/
+│   ├── health/route.ts
+│   └── quizzes/[quizId]/attempt/route.ts
+├── actions/                              # server actions (one file per feature)
+│   ├── signup.action.ts, login.action.ts, logout.action.ts
+│   ├── checkout.action.ts, processRefund.action.ts
+│   ├── verifyEmail.action.ts, resendVerification.action.ts
+│   ├── resetPassword.action.ts, requestPasswordReset.action.ts
+│   ├── twoFactorSetup.action.ts, twoFactorVerify.action.ts, twoFactorDisable.action.ts
+│   ├── impersonate.action.ts, stopImpersonating.action.ts
+│   ├── revokeCertificate.action.ts
+│   ├── course.action.ts, module.action.ts, lesson.action.ts
+│   ├── discountCode.action.ts, badge.action.ts, quiz.action.ts
+│   ├── liveClass.action.ts
+│   ├── simulator.actions.ts              # all four tools
+│   ├── refund.action.ts
+│   └── auditLog.action.ts
+└── proxy.ts                             # security headers + route protection + JWT
 ```
 
----
-
-## 6. `src/composition/` — The DI Container
+. `src/composition/` — The DI Container
 
 The only file that knows every concrete type.
 
@@ -573,7 +591,7 @@ If the bug is in a page: the fix is a page change. Page bugs do not ripple.
 3. **Write the use case.** Add a class in `src/usecases/<feature>/`. Constructor-inject the ports. Use `Result<T, E>`. Test with `buildTestContainer()`.
 4. **Implement the adapter (if needed).** In `src/infra/<concern>/`. Wrap the real SDK. Map to and from domain types. Integration test against the real SDK.
 5. **Wire it.** Add to `src/composition/container.ts`. Add to `buildTestContainer()` if relevant.
-6. **Expose it.** Add a server action in `src/app/actions/<feature>.ts` (5 lines: parse, call, return) or a page in `src/app/(dashboard)/<feature>/page.tsx`.
+6. **Expose it.** Add a server action in `src/app/actions/<feature>.action.ts` (parse, call, return) or a page under `src/app/<feature>/`.
 7. **Add a story.** `docs/stories/STORY-XXX.md`. Acceptance criteria, files touched, code shape, pitfalls, verification, DoD.
 8. **Open a PR.** Conventional commit. `pnpm tsc && pnpm lint && pnpm test && pnpm test:coverage` all green. Story ID in the commit message.
 
@@ -581,7 +599,7 @@ If the bug is in a page: the fix is a page change. Page bugs do not ripple.
 
 ## 11. The Sprint Cadence
 
-12 sprints, 60 stories, 60 points. One point per story. Sprint length: ~1 calendar week.
+16 sprints, 89 stories. One point per story. Sprint length: ~1 calendar week. The sprint plan (`docs/sprint-plan.md`) is the authoritative current list.
 
 The cadence is:
 
