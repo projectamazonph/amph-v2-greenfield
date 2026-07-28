@@ -14,7 +14,7 @@
 "use server";
 
 import { Result } from "@/domain/shared/Result";
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
@@ -157,7 +157,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   const targetRoas = (validated as StrTriageAttemptInput).targetRoas;
   const userActions = (validated as StrTriageAttemptInput).userActions;
   const mode = (validated as StrTriageAttemptInput).mode ?? "practice";
-  const container = getContainer();
+  const container = buildContainer();
 
   // ── 2. Authenticate ─────────────────────────────────────────────────
   const userId = await getSessionUserId();
@@ -350,7 +350,7 @@ export async function classifyStr(input: ClassifyStrInput): Promise<ClassifyStrR
     return { ok: false, error: { kind: "invalid_input", message: "targetRoas must be > 0" } };
   }
 
-  const container = getContainer();
+  const container = buildContainer();
   const sim = container.simulatorRegistry.get("str-triage");
   if (!sim) {
     return { ok: false, error: { kind: "engine_error", message: "STR Triage not registered" } };

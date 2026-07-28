@@ -1,4 +1,4 @@
-﻿/**
+/**
  * submitSimulatorAttempt ΓÇö server action.
  *
  * STORY-064: Simulator Attempt Infrastructure.
@@ -7,7 +7,7 @@
 "use server";
 
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 
 export interface SubmitSimulatorAttemptInput {
@@ -34,7 +34,7 @@ export async function submitSimulatorAttempt(
     return { error: "unauthenticated" };
   }
 
-  const container = getContainer();
+  const container = buildContainer();
 
   // Verify ownership
   const attemptResult = await container.simulatorAttemptRepo.findByAttemptId(input.attemptId);

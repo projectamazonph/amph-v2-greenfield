@@ -8,7 +8,7 @@
 
 import { Result } from "@/domain/shared/Result";
 import { ComposeAttemptFeedback } from "@/usecases/ComposeAttemptFeedback";
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 
 export interface ComposeAttemptFeedbackResponse {
   attemptId?: string;
@@ -36,7 +36,7 @@ export async function composeAttemptFeedbackAction(
   _prevState: unknown,
   formData: FormData,
 ): Promise<ComposeAttemptFeedbackResponse> {
-  const container = getContainer();
+  const container = buildContainer();
   const useCase = container.composeAttemptFeedback;
 
   const attemptId = formData.get("attemptId");
