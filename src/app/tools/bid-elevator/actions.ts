@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 import { Result } from "@/domain/shared/Result";
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type { BidElevatorInput } from "@/domain/simulator/bid-elevator/BidElevatorInput";
@@ -115,7 +115,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
 
   const { keywords, budget, targetRoas, scenarioId, mode, userBidAdjustments } = parseResult.data;
   const resolvedMode: SimulatorMode = mode ?? "practice";
-  const container = getContainer();
+  const container = buildContainer();
 
   // ── 2. Authenticate ─────────────────────────────────────────────────
   const userId = await getSessionUserId();
@@ -298,7 +298,7 @@ export async function runBidElevator(input: RunBidElevatorInput): Promise<RunBid
     }
   }
 
-  const container = getContainer();
+  const container = buildContainer();
   const sim = container.simulatorRegistry.get("bid-elevator");
   if (!sim) {
     return {

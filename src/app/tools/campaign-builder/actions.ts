@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 import { Result } from "@/domain/shared/Result";
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type {
@@ -137,7 +137,7 @@ export async function campaignBuilderAttempt(
     userAdjustedCampaigns,
   } = parseResult.data;
   const resolvedMode: SimulatorMode = mode ?? "practice";
-  const container = getContainer();
+  const container = buildContainer();
 
   // ── 2. Authenticate ─────────────────────────────────────────────────
   const userId = await getSessionUserId();
@@ -296,7 +296,7 @@ export async function buildCampaign(input: BuildCampaignInput): Promise<BuildCam
     };
   }
 
-  const container = getContainer();
+  const container = buildContainer();
   const sim = container.simulatorRegistry.get("campaign-builder");
   if (!sim) {
     return {

@@ -8,7 +8,7 @@
 
 import { Result } from "@/domain/shared/Result";
 import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 
 export interface GradeSimulatorAttemptResponse {
   attemptId?: string;
@@ -23,7 +23,7 @@ export async function gradeSimulatorAttemptAction(
   _prevState: unknown,
   formData: FormData,
 ): Promise<GradeSimulatorAttemptResponse> {
-  const container = getContainer();
+  const container = buildContainer();
   const useCase = container.gradeSimulatorAttempt;
 
   const attemptId = formData.get("attemptId");

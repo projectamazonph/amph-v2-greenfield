@@ -7,7 +7,7 @@
 "use server";
 
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
-import { getContainer } from "@/composition/container";
+import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 
 export interface SaveSimulatorDecisionInput {
@@ -34,7 +34,7 @@ export async function saveSimulatorDecision(
     return { error: "unauthenticated" };
   }
 
-  const container = getContainer();
+  const container = buildContainer();
 
   // Verify ownership by looking up the attempt
   const attemptResult = await container.simulatorAttemptRepo.findByAttemptId(input.attemptId);
