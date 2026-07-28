@@ -25,6 +25,8 @@ import { parseArgs } from "node:util";
 import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 
 // argon2 is CJS-only — createRequire matches the interop trick used by
 // src/infra/security/Argon2PasswordHasher.ts, the module this script mirrors.
@@ -100,7 +102,14 @@ async function hashPassword(plain) {
 
 // ── Main ─────────────────────────────────────────────────────────────────
 
-const prisma = new PrismaClient();
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  console.error("\n❌ DATABASE_URL is not set. Add it to .env.local.\n");
+  process.exit(1);
+}
+const pool = new pg.Pool({ connectionString: databaseUrl });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("\n👤 AMPH Admin User Seed");
@@ -154,4 +163,7 @@ main()
     console.error("\n❌ Seed failed:", err);
     process.exitCode = 1;
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+    await pool.end();
+  });

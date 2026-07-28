@@ -1,5 +1,8 @@
 /* NavSidebar.module.css — admin fixed-left sidebar.
-   Per design spec §9.1. */
+   Hallmark · macrostructure: Nav-Sidebar (N3) · tone: utilitarian
+   · per Hallmark: brand wordmark first, then nav, then user card
+   · active state is a full pill (not just a left border) so the
+     current location reads at a glance · Phosphor icons via JSX. */
 
 .sidebar {
   width: 240px;
@@ -14,11 +17,48 @@
 }
 
 .brand {
-  padding: var(--space-6);
+  padding: var(--space-5) var(--space-6);
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.brand:hover {
+  background: var(--surface-2);
+}
+
+/* 2x2 grid of small accent squares — the AMPH geometric mark.
+   Three squares filled in gives a precise, deliberate rhythm;
+   the empty fourth creates negative space. Field-Manual aesthetic. */
+.brandMark {
+  display: grid;
+  grid-template-columns: repeat(2, 6px);
+  grid-template-rows: repeat(2, 6px);
+  gap: 2px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.brandMarkSquare {
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+.brandMarkSquare:nth-child(4) {
+  background: transparent;
+  border: 1px solid var(--accent);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
 }
 
 .brandName {
@@ -27,6 +67,18 @@
   font-size: var(--text-base);
   color: var(--ink-900);
   letter-spacing: -0.01em;
+  line-height: 1.2;
+  /* Brand can wrap on narrow sidebar widths; keep it readable. */
+  word-break: break-word;
+}
+
+.brandSub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-500);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .adminBadge {
@@ -35,27 +87,30 @@
   height: 20px;
   padding: 0 var(--space-2);
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   background: var(--danger-soft);
   color: var(--danger);
   border-radius: var(--radius-sm);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .nav {
   flex: 1;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-4) var(--space-3);
   display: flex;
   flex-direction: column;
   gap: 2px;
   overflow-y: auto;
+  min-height: 0; /* allow inner scroll within flex parent */
 }
 
 .item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   color: var(--ink-700);
   font-size: var(--text-sm);
@@ -64,8 +119,9 @@
   transition:
     background var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out);
-  border-left: 2px solid transparent;
   position: relative;
+  /* keep the row from clipping its icon on small widths */
+  min-width: 0;
 }
 
 .item:hover {
@@ -75,14 +131,18 @@
 
 .item:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 .active {
   background: var(--accent-soft);
   color: var(--accent);
-  border-left-color: var(--accent);
   font-weight: 600;
+}
+
+.active:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .icon {
@@ -91,14 +151,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  line-height: 1;
   flex-shrink: 0;
+  color: currentColor;
 }
 
 .label {
   flex: 1;
   min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .footer {
@@ -124,8 +186,12 @@
     flex-shrink: 0;
     white-space: nowrap;
   }
+  /* On mobile, the active state becomes an underline instead of a
+     pill — pills in a horizontal scrollable row fight the user's
+     swipe gesture. */
   .active {
-    border-left-color: transparent;
-    border-bottom: 2px solid var(--accent);
+    background: transparent;
+    box-shadow: inset 0 -2px 0 0 var(--accent);
+    border-radius: 0;
   }
 }

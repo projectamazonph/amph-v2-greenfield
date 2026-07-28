@@ -1,19 +1,23 @@
 /* Admin layout — fixed-left sidebar + flex content.
-   Per design spec §9.1: 240px sidebar, no overlap, no absolute stacking. */
+   Per design spec §9.1: 240px sidebar, no overlap, no absolute stacking.
+   Hallmark · macrostructure: Sidebar-Layout (N3) · tone: utilitarian
+   · overflow-x: clip on shell so wide children can't push the page
+     horizontally and break the layout. */
 
 .shell {
   display: flex;
   min-height: 100vh;
   background: var(--surface-0);
   font-family: var(--font-body);
+  overflow-x: clip;
 }
 
 .main {
   flex: 1;
   min-width: 0; /* prevent flex item from overflowing */
-  padding: var(--space-8) var(--space-12);
+  padding: var(--space-8) var(--space-8);
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 @media (max-width: 1023px) {
@@ -22,8 +26,9 @@
      bottom-nav is a Sprint 9 carry-over and is out of scope. */
   .shell {
     flex-direction: column;
+    overflow-x: hidden;
   }
   .main {
-    padding: var(--space-6) var(--side-pad);
+    padding: var(--space-6) var(--space-4);
   }
 }

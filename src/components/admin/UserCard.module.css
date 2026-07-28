@@ -54,9 +54,9 @@
 }
 
 .logoutButton {
-  width: 28px;
-  height: 28px;
-  display: flex;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
@@ -64,15 +64,14 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--ink-500);
-  font-size: 14px;
   transition:
     background var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out);
 }
 
 .logoutButton:hover {
-  background: var(--surface-2);
-  color: var(--ink-900);
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .logoutButton:focus-visible {
