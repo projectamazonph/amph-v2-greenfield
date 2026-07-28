@@ -67,6 +67,8 @@ export type RecordQuizAttemptResult = Result<
     score: number | null;
     passed: boolean | null;
     xpAwarded: number;
+    correctCount: number | null;
+    totalQuestions: number | null;
   },
   RecordQuizAttemptError
 >;
@@ -95,10 +97,18 @@ export class RecordQuizAttempt {
 
     for (const answer of input.answers) {
       if (!questionIds.includes(answer.questionId)) {
-        return Result.err({ kind: "invalid_answer", questionId: answer.questionId, reason: "question not found" });
+        return Result.err({
+          kind: "invalid_answer",
+          questionId: answer.questionId,
+          reason: "question not found",
+        });
       }
       if (!optionIds.includes(answer.selectedOptionId)) {
-        return Result.err({ kind: "invalid_answer", questionId: answer.questionId, reason: "option not found" });
+        return Result.err({
+          kind: "invalid_answer",
+          questionId: answer.questionId,
+          reason: "option not found",
+        });
       }
     }
 
@@ -136,7 +146,8 @@ export class RecordQuizAttempt {
       // ── 5a. Complete and score ─────────────────────────────────────
       const completed = completeQuizAttempt({ attempt, quiz });
       if (!completed.ok) return completed;
-      attempt = completed.value;
+      const { attempt: completedAttempt, correctCount, totalQuestions: qCount } = completed.value;
+      attempt = completedAttempt;
       score = attempt.score;
       passed = attempt.passed;
 
@@ -149,9 +160,15 @@ export class RecordQuizAttempt {
           refId: attempt.id,
         });
       }
+
+      const persisted = await quizAttemptRepo.create(attempt);
+      if (!persisted.ok) return persisted;
+      attempt = persisted.value;
+
+      return Result.ok({ attempt, score, passed, xpAwarded, correctCount, totalQuestions: qCount });
     }
 
-    // ── 6. Persist ───────────────────────────────────────────────────────
+    // ── 6. Persist in-progress attempt ─────────────────────────────────
     // P0-6 fix: RecordQuizAttempt ALWAYS creates a fresh attempt
     // (startQuizAttempt generates a new id). It is never an update.
     // The previous code called `update` for completed attempts,
@@ -161,27 +178,32 @@ export class RecordQuizAttempt {
     if (!createResult.ok) return createResult;
     attempt = createResult.value;
 
-    return Result.ok({ attempt, score, passed, xpAwarded });
+    return Result.ok({
+      attempt,
+      score,
+      passed,
+      xpAwarded,
+      correctCount: null,
+      totalQuestions: null,
+    });
   }
 
-  private awardXpFireAndForget(params: {
-    userId: string;
-    amount: number;
-    refId: string;
-  }): void {
+  private awardXpFireAndForget(params: { userId: string; amount: number; refId: string }): void {
     const awardXp = new AwardXP({
       xpEventRepo: this.deps.xpEventRepo,
       userRepo: this.deps.userRepo,
       idGen: this.deps.idGen,
       clock: this.deps.clock,
     });
-    awardXp.execute({
-      userId: params.userId,
-      amount: params.amount,
-      reason: "quiz_passed",
-      refId: params.refId,
-    }).catch((err: unknown) => {
-      console.error("[RecordQuizAttempt] Failed to award quiz XP:", err);
-    });
+    awardXp
+      .execute({
+        userId: params.userId,
+        amount: params.amount,
+        reason: "quiz_passed",
+        refId: params.refId,
+      })
+      .catch((err: unknown) => {
+        console.error("[RecordQuizAttempt] Failed to award quiz XP:", err);
+      });
   }
 }

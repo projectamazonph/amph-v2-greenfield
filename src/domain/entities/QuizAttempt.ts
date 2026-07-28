@@ -56,6 +56,12 @@ export type CompleteQuizAttemptError =
   | { kind: "attempt_not_in_progress" }
   | { kind: "not_all_questions_answered"; unanswered: readonly string[] };
 
+export type CompleteQuizAttemptSuccess = {
+  attempt: QuizAttempt;
+  correctCount: number;
+  totalQuestions: number;
+};
+
 // ── Start Attempt ───────────────────────────────────────────────────────────
 
 export function startQuizAttempt(params: {
@@ -120,7 +126,7 @@ export function answerQuestion(params: {
 export function completeQuizAttempt(params: {
   attempt: QuizAttempt;
   quiz: Quiz;
-}): Result<QuizAttempt, CompleteQuizAttemptError> {
+}): Result<CompleteQuizAttemptSuccess, CompleteQuizAttemptError> {
   if (params.attempt.status === "completed") {
     return Result.err({ kind: "attempt_not_in_progress" });
   }
@@ -148,11 +154,15 @@ export function completeQuizAttempt(params: {
   const passed = score >= params.quiz.passingScore;
 
   return Result.ok({
-    ...params.attempt,
-    status: "completed",
-    score,
-    passed,
-    completedAt: new Date(),
+    attempt: {
+      ...params.attempt,
+      status: "completed",
+      score,
+      passed,
+      completedAt: new Date(),
+    },
+    correctCount,
+    totalQuestions,
   });
 }
 

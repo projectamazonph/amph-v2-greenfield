@@ -120,6 +120,8 @@ describe("processQuizAttempt", () => {
         score: 100,
         passed: true,
         xpAwarded: 20,
+        correctCount: 3,
+        totalQuestions: 3,
       },
     });
   });
@@ -168,6 +170,8 @@ describe("processQuizAttempt", () => {
         score: null,
         passed: null,
         xpAwarded: 0,
+        correctCount: null,
+        totalQuestions: null,
       },
     });
   });
@@ -194,6 +198,8 @@ describe("processQuizAttempt", () => {
     expect(result.value.passed).toBe(false);
     expect(result.value.score).toBe(33); // 1 of 3 correct
     expect(result.value.xpAwarded).toBe(0);
+    expect(result.value.correctCount).toBe(1);
+    expect(result.value.totalQuestions).toBe(3);
   });
 
   // ── quiz not found ────────────────────────────────────────

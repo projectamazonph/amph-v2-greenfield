@@ -62,6 +62,8 @@ export type ProcessQuizAttemptResult =
         score: number | null;
         passed: boolean | null;
         xpAwarded: number;
+        correctCount: number | null;
+        totalQuestions: number | null;
       };
     }
   | { ok: false; status: 400; error: { kind: "validation_error"; message: string } }
@@ -115,7 +117,14 @@ export async function processQuizAttempt(
   return {
     ok: true,
     status: 200,
-    value: result.value,
+    value: {
+      attempt: result.value.attempt,
+      score: result.value.score,
+      passed: result.value.passed,
+      xpAwarded: result.value.xpAwarded,
+      correctCount: result.value.correctCount,
+      totalQuestions: result.value.totalQuestions,
+    },
   };
 }
 
