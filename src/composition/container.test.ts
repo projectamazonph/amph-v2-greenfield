@@ -61,6 +61,8 @@ import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemoryS
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
 import { InMemoryScorePolicyRepository } from "@/infra/repositories/InMemoryScorePolicyRepository";
 import { InMemoryAttemptFeedbackRepository } from "@/infra/repositories/InMemoryAttemptFeedbackRepository";
+// STORY-019: Composio integration fake
+import { InMemoryComposioClient } from "@/infra/integrations/InMemoryComposioClient";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
@@ -211,6 +213,8 @@ export interface TestContainer extends AppContainer {
   simulatorAttemptRepo: InMemorySimulatorAttemptRepository;
   scorePolicyRepo: InMemoryScorePolicyRepository;
   feedbackRepo: InMemoryAttemptFeedbackRepository;
+  // STORY-019: Composio integration fake
+  composioClient: InMemoryComposioClient;
   liveClassRepo: InMemoryLiveClassRepository;
   pricingTierRepo: InMemoryPricingTierRepository;
   sentReminderRepo: InMemorySentReminderRepository;
@@ -279,6 +283,8 @@ export function buildTestContainer(): TestContainer {
   const scorePolicyRepo = new InMemoryScorePolicyRepository();
   // STORY-066: feedback composer
   const feedbackRepo = new InMemoryAttemptFeedbackRepository();
+  // STORY-019: Composio integration fake
+  const composioClient = new InMemoryComposioClient();
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
   // STORY-011: pricing tier repo
@@ -512,6 +518,8 @@ export function buildTestContainer(): TestContainer {
     adminUpdateQuiz: new AdminUpdateQuiz({ quizRepo, recordAuditLog }),
     adminDeleteQuiz: new AdminDeleteQuiz({ quizRepo, quizAttemptRepo, recordAuditLog }),
     simulatorRegistry: buildSimulatorRegistry(),
+    // STORY-019: Composio integration fake
+    composioClient,
     auditLog,
     recordAuditLog,
     webhookEventLog,

@@ -120,6 +120,10 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 import { UpstashRateLimiter } from "@/infra/security/UpstashRateLimiter";
 
+// STORY-019: Composio tool-router integration
+import { ComposioClientAdapter } from "@/infra/integrations/ComposioClientAdapter";
+import type { ComposioClient } from "@/ports/integrations/ComposioClient";
+
 // ΓöÇΓöÇ Use cases ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 import { SignUp } from "@/usecases/SignUp";
@@ -278,6 +282,8 @@ export interface AppContainer {
   moduleRepo: IModuleRepository;
   lessonRepo: ILessonRepository;
   simulatorRegistry: SimulatorRegistry;
+  // STORY-019: Composio tool-router client
+  composioClient: ComposioClient;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -597,6 +603,8 @@ function buildProductionContainer(): AppContainer {
     mdxRenderer,
     emailSender,
     simulatorRegistry: buildSimulatorRegistry(),
+    // STORY-019: Composio tool-router client
+    composioClient: new ComposioClientAdapter(process.env.COMPOSIO_API_KEY ?? ""),
     issueCertificate: new IssueCertificate({
       enrollmentRepo,
       courseRepo,
