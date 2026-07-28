@@ -68,43 +68,51 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 
 ## Sprint 6 — Lesson Delivery + Progress (5 pts)
 
-| ID        | Title                                                                   | Pts |
-| --------- | ----------------------------------------------------------------------- | --- |
-| STORY-026 | Lesson page (RSC, MDX render)                                           | 1   |
-| STORY-027 | `MarkLessonComplete` use case + `ProgressService` + `ProgressEvent` log | 1   |
-| STORY-028 | `XPService` + XP display on dashboard                                   | 1   |
-| STORY-029 | `StreakService` + streak visit recording on dashboard render            | 1   |
-| STORY-030 | Module progress + next-lesson navigation + course completion view       | 1   |
+| ID        | Title                                                                   | Pts | Status         |
+| --------- | ----------------------------------------------------------------------- | --- | -------------- |
+| STORY-026 | Lesson page (RSC, MDX render)                                           | 1   | ✅ done (main) |
+| STORY-027 | `MarkLessonComplete` use case + `ProgressService` + `ProgressEvent` log | 1   | ✅ done (main) |
+| STORY-028 | `XPService` + XP display on dashboard                                   | 1   | ✅ done (main) |
+| STORY-029 | `StreakService` + streak visit recording on dashboard render            | 1   | ✅ done (main) |
+| STORY-030 | Module progress + next-lesson navigation + course completion view       | 1   | ✅ done (main) |
+
+**Sprint 6 closed.**
 
 ## Sprint 7 — Quizzes + Badges (5 pts)
 
-| ID        | Title                                                     | Pts |
-| --------- | --------------------------------------------------------- | --- |
-| STORY-031 | `Quiz` + `QuizAttempt` models + repos + admin quiz editor | 1   |
-| STORY-032 | `RecordQuizAttempt` use case + quiz UI                    | 1   |
-| STORY-033 | `Badge` + `BadgeAward` models + repos + admin badge CRUD  | 1   |
-| STORY-034 | `AwardBadge` use case (criteria-checked)                  | 1   |
-| STORY-035 | Badge display on dashboard + profile                      | 1   |
+| ID        | Title                                                     | Pts | Status         |
+| --------- | --------------------------------------------------------- | --- | -------------- |
+| STORY-031 | `Quiz` + `QuizAttempt` models + repos + admin quiz editor | 1   | ✅ done (main) |
+| STORY-032 | `RecordQuizAttempt` use case + quiz UI                    | 1   | ✅ done (main) |
+| STORY-033 | `Badge` + `BadgeAward` models + repos + admin badge CRUD  | 1   | ✅ done (main) |
+| STORY-034 | `AwardBadge` use case (criteria-checked)                  | 1   | ✅ done (main) |
+| STORY-035 | Badge display on dashboard + profile                      | 1   | ✅ done (main) |
+
+**Sprint 7 closed.**
 
 ## Sprint 8 — Five Simulators (5 pts)
 
-| ID        | Title                                                                                  | Pts |
-| --------- | -------------------------------------------------------------------------------------- | --- |
+| ID        | Title                                                                                  | Pts | Status         |
+| --------- | -------------------------------------------------------------------------------------- | --- | -------------- |
 | STORY-036 | `Simulator<TIn,TOut>` interface + `SimulatorRegistry` port + `SimulatorScenario` model | 1   | ✅ done (main) |
 | STORY-037 | Bid Elevator (domain function + scenario JSON + UI + use case)                         | 1   | ✅ done (main) |
 | STORY-038 | STR Triage                                                                             | 1   | ✅ done (main) |
 | STORY-039 | Campaign Builder                                                                       | 1   | ✅ done (main) |
 | STORY-040 | Listing Audit + Keyword Research (both in one story)                                   | 1   | ✅ done (main) |
 
+**Sprint 8 closed.**
+
 ## Sprint 9 — Certificates + Email Templates (5 pts)
 
-| ID        | Title                                                                                                                      | Pts |
-| --------- | -------------------------------------------------------------------------------------------------------------------------- | --- |
-| STORY-041 | `Certificate` model + repo + `IssueCertificate` use case                                                                   | 1   |
-| STORY-042 | `ReactPdfRenderer` port + adapter + certificate PDF                                                                        | 1   |
-| STORY-043 | `/certificates/[hash]` public view + `/pdf` route                                                                          | 1   |
-| STORY-044 | `RevokeCertificate` on refund + revocation badge                                                                           | 1   |
-| STORY-045 | `EmailSender` port consolidation + React Email templates (receipt, cert, refund, verification, reset, live class reminder) | 1   |
+| ID        | Title                                                                                                                      | Pts | Status         |
+| --------- | -------------------------------------------------------------------------------------------------------------------------- | --- | -------------- |
+| STORY-041 | `Certificate` model + repo + `IssueCertificate` use case                                                                   | 1   | ✅ done (main) |
+| STORY-042 | `ReactPdfRenderer` port + adapter + certificate PDF                                                                        | 1   | ✅ done (main) |
+| STORY-043 | `/certificates/[hash]` public view + `/pdf` route                                                                          | 1   | ✅ done (main) |
+| STORY-044 | `RevokeCertificate` on refund + revocation badge                                                                           | 1   | ✅ done (main) |
+| STORY-045 | `EmailSender` port consolidation + React Email templates (receipt, cert, refund, verification, reset, live class reminder) | 1   | ✅ done (main) |
+
+**Sprint 9 closed.**
 
 ## Sprint 10 — Admin Panel (5 pts)
 
@@ -167,7 +175,7 @@ The original Sprint 13 table was written before the work landed. The current rep
 | STORY-069 | ✅ Implemented in source                         | Campaign Builder graded attempt action and simulator scoring are present.                                                                                  |
 | STORY-070 | ✅ Implemented in source, story file missing     | Listing Audit graded attempt action and simulator scoring are present, but no `docs/stories/STORY-070.md` is tracked on this branch.                       |
 
-The assessment stories remain partial from a product-completeness perspective. The four graded actions currently use `userId: "system"`, and the simulator accuracy audit says scores must not drive certification or hiring decisions.
+**Sprint 13 closed.**
 
 ## Sprint 14 — Simulator scoring integrity (7 pts)
 
@@ -188,15 +196,17 @@ finding generator emits only 1-4 findings and they skew heavily to `fix`, so
 `direction` alone cannot stop it. Closing the bypass needs STORY-080 (richer
 finding set) and STORY-083 (non-binary ground truth). Numbers in the audit doc.
 
-| ID        | Title                                                                                                                                                     | Pts | Status     |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------- |
-| STORY-071 | Remove `explanation` from all score policies; rebalance weights to sum 1.0                                                                                | 1   | ⏳ Planned |
-| STORY-072 | Stop grading completion: `reviewCoverage` becomes a submission gate, not a weight                                                                         | 1   | ⏳ Planned |
-| STORY-073 | `priorityCoverage` penalises false positives (recall to F1)                                                                                               | 1   | ⏳ Planned |
-| STORY-074 | Enforce policy validation on the seed + hydration paths (`isValidPolicy`)                                                                                 | 1   | ⏳ Planned |
-| STORY-075 | Resolve dead `passingThreshold`: implement partial credit or remove it                                                                                    | 1   | ⏳ Planned |
-| STORY-076 | Rename `dataSufficiency` → `reviewCoverage` (both sims); Listing Audit's `profitability` → `priorityCoverage` (STR Triage's is correctly named, leave it) | 1   | ⏳ Planned |
-| STORY-077 | Fix the inverted backend search-terms rule in `ListingAuditSimulator`                                                                                     | 1   | ⏳ Planned |
+| ID        | Title                                                                                                                                                     | Pts | Status            |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ----------------- |
+| STORY-071 | Remove `explanation` from all score policies; rebalance weights to sum 1.0                                                                                | 1   | ✅ done — PR #228 |
+| STORY-072 | Stop grading completion: `reviewCoverage` becomes a submission gate, not a weight                                                                         | 1   | ✅ done — PR #228 |
+| STORY-073 | `priorityCoverage` penalises false positives (recall to F1)                                                                                               | 1   | ✅ done — PR #228 |
+| STORY-074 | Enforce policy validation on the seed + hydration paths (`isValidPolicy`)                                                                                 | 1   | ✅ done — PR #228 |
+| STORY-075 | Resolve dead `passingThreshold`: implement partial credit or remove it                                                                                    | 1   | ✅ done — PR #228 |
+| STORY-076 | Rename `dataSufficiency` → `reviewCoverage` (both sims); Listing Audit's `profitability` → `priorityCoverage` (STR Triage's is correctly named, leave it) | 1   | ✅ done — PR #228 |
+| STORY-077 | Fix the inverted backend search-terms rule in `ListingAuditSimulator`                                                                                     | 1   | ✅ done — PR #228 |
+
+**Sprint 14 closed: 7/7 stories merged (PR #228).**
 
 ## Sprint 15 — Certification Safety + Subject-Matter Accuracy (7 pts)
 
