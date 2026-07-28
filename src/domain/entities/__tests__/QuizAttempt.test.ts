@@ -249,7 +249,7 @@ describe("answerQuestion", () => {
 
     // Attempt is now completed — cannot answer further
     const result = answerQuestion({
-      attempt: completed.value,
+      attempt: completed.value.attempt,
       questionId: "q1",
       selectedOptionId: "o2",
       quizQuestionIds: ids.questionIds,
@@ -291,10 +291,12 @@ describe("completeQuizAttempt", () => {
     const result = completeQuizAttempt({ attempt: a2.value, quiz });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.status).toBe("completed");
-    expect(result.value.score).toBe(100);
-    expect(result.value.passed).toBe(true);
-    expect(result.value.completedAt).not.toBeNull();
+    expect(result.value.attempt.status).toBe("completed");
+    expect(result.value.attempt.score).toBe(100);
+    expect(result.value.attempt.passed).toBe(true);
+    expect(result.value.attempt.completedAt).not.toBeNull();
+    expect(result.value.correctCount).toBe(2);
+    expect(result.value.totalQuestions).toBe(2);
   });
 
   it("calculates score 50% and passed=false when 1 of 2 answers wrong", () => {
@@ -324,8 +326,10 @@ describe("completeQuizAttempt", () => {
     const result = completeQuizAttempt({ attempt: a2.value, quiz });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.score).toBe(50);
-    expect(result.value.passed).toBe(false);
+    expect(result.value.attempt.score).toBe(50);
+    expect(result.value.attempt.passed).toBe(false);
+    expect(result.value.correctCount).toBe(1);
+    expect(result.value.totalQuestions).toBe(2);
   });
 
   it("passes when score equals passingScore (boundary case)", () => {
@@ -363,8 +367,10 @@ describe("completeQuizAttempt", () => {
 
     const result = completeQuizAttempt({ attempt: a1.value, quiz });
     if (!result.ok) return;
-    expect(result.value.score).toBe(100);
-    expect(result.value.passed).toBe(true); // 100 >= 100
+    expect(result.value.attempt.score).toBe(100);
+    expect(result.value.attempt.passed).toBe(true); // 100 >= 100
+    expect(result.value.correctCount).toBe(1);
+    expect(result.value.totalQuestions).toBe(1);
   });
 
   it("fails if attempt is already completed", () => {
@@ -395,7 +401,7 @@ describe("completeQuizAttempt", () => {
     if (!completed.ok) return;
 
     // Try to complete again
-    const result = completeQuizAttempt({ attempt: completed.value, quiz });
+    const result = completeQuizAttempt({ attempt: completed.value.attempt, quiz });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.kind).toBe("attempt_not_in_progress");
   });

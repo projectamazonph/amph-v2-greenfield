@@ -201,6 +201,8 @@ describe("RecordQuizAttempt", () => {
       expect(result.value.passed).toBe(true);
       expect(result.value.score).toBe(100);
       expect(result.value.attempt.status).toBe("completed");
+      expect(result.value.correctCount).toBe(2);
+      expect(result.value.totalQuestions).toBe(2);
     });
 
     it("awards XP fire-and-forget when passed", async () => {
@@ -259,6 +261,8 @@ describe("RecordQuizAttempt", () => {
       expect(result.value.passed).toBe(false);
       expect(result.value.score).toBe(50);
       expect(result.value.attempt.status).toBe("completed");
+      expect(result.value.correctCount).toBe(1);
+      expect(result.value.totalQuestions).toBe(2);
     });
 
     it("awards 0 XP when failed", async () => {
@@ -315,6 +319,8 @@ describe("RecordQuizAttempt", () => {
       expect(result.value.score).toBeNull();
       expect(result.value.passed).toBeNull();
       expect(result.value.xpAwarded).toBe(0);
+      expect(result.value.correctCount).toBeNull();
+      expect(result.value.totalQuestions).toBeNull();
     });
   });
 
