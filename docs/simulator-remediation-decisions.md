@@ -54,6 +54,17 @@ Scenario authoring and simulator grading must not blur what the scenario
 actually reports against what the engine assumes to compute a ground
 truth.
 
+## Every story ships with determinism + shortcut-regression tests
+
+Reinforced across all six per-story decision packs (2026-07-29, second
+pass): every story's test suite must include (a) a deterministic-replay
+test — same scenario + engine version always produces the identical
+output, since these engines now do real arithmetic (elasticities, F1
+scores, response curves) where drift is easy to introduce silently — and
+(b) a shortcut-strategy regression test specific to that simulator's own
+click-through-style bypass (e.g. STORY-083's "mark everything fix_now"
+test), not just a generic passing-score check.
+
 ## Credential-mode gate
 
 None of the rebuilt simulators enter credential mode (results counted
