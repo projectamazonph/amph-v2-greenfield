@@ -7,7 +7,8 @@
  * fresh JWT for the target user; this action:
  *  1. Authenticates the caller via getSessionUserId
  *  2. Reads the caller's CURRENT session cookie (so we can save it as
-     the "admin backup" cookie)
+     the "admin backup" cookie) — this happens before step 4 overwrites
+     it, which is what makes a first impersonation restorable
  *  3. Calls ImpersonateUser.execute
  *  4. Plants the returned token as the session cookie
  *  5. Plants the admin's original token as the amph_admin_session cookie
@@ -27,7 +28,7 @@
 
 import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
-import { getSessionUserId, setAuthCookie } from "@/lib/auth";
+import { getSessionUserId, setAuthCookie, getSessionCookieName } from "@/lib/auth";
 import type { ImpersonateUser } from "@/usecases/ImpersonateUser";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
@@ -65,6 +66,7 @@ export interface CurrentAdminUser {
  *
  * 1. Resolve the current user (must be admin)
  * 2. Read the admin's current session token (so we can back it up)
+ *    — the existing backup wins if one is already present
  * 3. Delegate to ImpersonateUser.execute
  * 4. Plant the new token as the session cookie
  * 5. Plant the admin's original token as the backup cookie
@@ -80,9 +82,7 @@ export async function performImpersonateUser(
     };
   },
   input: ImpersonateUserActionInput,
-  getCurrentAdmin: (
-    container: { userRepo: UserRepository },
-  ) => Promise<CurrentAdminUser | null>,
+  getCurrentAdmin: (container: { userRepo: UserRepository }) => Promise<CurrentAdminUser | null>,
 ): Promise<ImpersonateUserActionResult> {
   // 1. Authenticate
   const admin = await getCurrentAdmin(container);
@@ -90,11 +90,16 @@ export async function performImpersonateUser(
     return Result.err({ kind: "unauthorized" });
   }
 
-  // 2. Read the admin's current session token (so we can back it up)
-  const adminToken = container.cookies.get(getAdminSessionCookieName());
-  // Note: if adminToken is undefined, the admin is impersonating again
-  // (the "real" admin token was already saved on the first impersonation).
-  // For now, we don't support nested impersonation — bail out.
+  // 2. Capture the admin's ORIGINAL session token, BEFORE step 4
+  //    overwrites the session cookie with the target user's token.
+  //
+  //    On a first impersonation there is no backup cookie yet, and the
+  //    session cookie still holds the admin's own token — that's the one
+  //    to back up. If a backup already exists we keep it untouched: the
+  //    session cookie would then hold an impersonated user's token, and
+  //    the admin's real token is the one already saved.
+  const existingBackup = container.cookies.get(getAdminSessionCookieName());
+  const adminToken = existingBackup?.value ?? container.cookies.get(getSessionCookieName())?.value;
 
   // 3. Delegate to the use case
   const result = await container.impersonateUser.execute({
@@ -127,27 +132,22 @@ export async function performImpersonateUser(
   // 4. Plant the new token as the session cookie
   await container.setSessionCookie(result.value.token, result.value.expiresAt);
 
-  // 5. Plant the admin's original token as the backup cookie
-  //    (only if we have one — nested impersonation is not supported)
-  if (adminToken?.value) {
+  // 5. Plant the admin's original token as the backup cookie.
+  //    If there was no token to capture at all (the caller authenticated
+  //    by some other means than the session cookie), we leave the backup
+  //    unset — "Stop impersonating" then falls back to signing the user
+  //    out rather than restoring a session that was never captured.
+  if (adminToken) {
     // The backup cookie has a 24h maxAge — admins shouldn't impersonate
     // for longer than a working day. After 24h, the backup expires and
     // the admin has to sign out + sign in again.
-    container.cookies.set(getAdminSessionCookieName(), adminToken.value, {
+    container.cookies.set(getAdminSessionCookieName(), adminToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: 24 * 60 * 60, // 24h
     });
-  } else {
-    // First-time impersonation: no backup token. The current session
-    // cookie IS the admin's session. We need to read it BEFORE we
-    // overwrote it. For now, we mark the backup as empty and the
-    // "Stop impersonating" action will need to handle that case.
-    // (Out of scope for this story — log a TODO.)
-    // TODO (STORY-X): properly capture the admin's original token on
-    // first impersonation. For now, skip.
   }
 
   return Result.ok({
