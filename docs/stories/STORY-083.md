@@ -114,6 +114,46 @@ it("at least one scenario contains a request-information action", ...)
 
 For a balanced beginner scenario, "fix everything" must score below 70%.
 
+## Decision-pack refinements (implementation-ready, 2026-07-29 second pass)
+
+**Design change from the first decision pass:** ground truth is not a
+single correct action per finding. Each finding's ground-truth rule
+declares a _set_ of allowed actions plus one preferred action, and
+scoring gives partial credit for a defensible-but-not-preferred choice:
+
+```ts
+{
+  ruleId: string;
+  findingId: string;
+  allowedActions: FindingAction[];
+  preferredAction: FindingAction;
+  conditions: /* structured predicates over ListingScenarioContext */;
+  rationale: string;
+  businessImpact: string;
+  severity: "critical" | "warning" | "info";
+  policyVersion: string;
+}
+```
+
+Scoring: full credit for `preferredAction`, partial credit for any other
+member of `allowedActions`, zero credit for anything outside it. Critical
+gates may require a _specific_ escalation or `request_information` path
+rather than accepting any allowed action. This scores judgment about
+consequences and ownership, not a simple severity-to-action lookup.
+
+Required tests (supersedes/extends the six regression tests from the
+first pass):
+
+- Marking every finding `fix_now` scores below the beginner passing
+  threshold.
+- Marking every finding `accept` does not pass.
+- Severity alone cannot derive every preferred action.
+- At least one published scenario contains a valid `accept` action.
+- At least one published scenario contains a valid escalation action.
+- At least one published scenario contains a `request_information`
+  action.
+- A balanced beginner scenario keeps "fix everything" below 70%.
+
 ## Suggested split
 
 - **STORY-083a:** `FindingAction` expansion + `ListingScenarioContext`

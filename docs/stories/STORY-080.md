@@ -120,6 +120,44 @@ Intermediate severity mix: 1-2 critical, 3-5 warning, 3-5 info/optimization,
 deliberate non-issues are load-bearing for STORY-083 — without them,
 "fix everything" stays a viable shortcut.
 
+## Decision-pack refinements (implementation-ready, 2026-07-29 second pass)
+
+Each rule is a stable, identifiable record, not an inline computation:
+
+```ts
+{
+  ruleId: string;
+  dimension: /* one of the 7 dimensions above */ ;
+  result: "pass" | "partial" | "fail";
+  points: 1.0 | 0.5 | 0.0;
+  weight: number;
+  severity: "critical" | "warning" | "info";
+  isCriticalGate: boolean;
+  message: string;
+  suggestion: string;
+  marketplace: string;
+  category: string;
+  policyVersion: string;
+  effectiveDate: string; // ISO date
+}
+```
+
+Every generated finding carries a stable `ruleId` **and** `findingId` —
+required for STORY-083 to reference specific rules in its ground-truth
+mapping, and for regression tests to assert against a fixed identifier
+rather than array position.
+
+Required tests:
+
+- A longer but repetitive title does not outperform a concise, relevant
+  one (proves length alone can't drive score).
+- Category-specific rules activate only for the matching
+  category/marketplace.
+- A critical compliance gate blocks advanced-difficulty passing.
+- Image metadata changes the media dimension score.
+- Published rule packs are immutable by version.
+- Finding counts/severity mix stay within the configured scenario ranges.
+
 ## Suggested split
 
 - **STORY-080a:** Rubric schema + weighted-checklist scoring engine

@@ -120,6 +120,25 @@ Fallback for uncurated niches: a clearly labeled generic sandbox dataset,
 no dynamically generated fake precise volume, credential scoring
 disabled, practice-only classification permitted.
 
+## Decision-pack refinements (implementation-ready, 2026-07-29 second pass)
+
+Registry id for the new simulator, confirmed: `keyword-research`. Listing
+Audit may **reference** a keyword dataset but must not generate keywords
+itself — the current `generateKeywords()` call inside
+`ListingAuditSimulator` moves out entirely, not just its data source.
+
+Required tests:
+
+- The same scenario + dataset version yields identical rows (determinism).
+- Changing dataset version changes only explicitly versioned content.
+- Fallback (uncurated) datasets cannot enter credential mode.
+- `ListingAuditSimulator` no longer calls keyword-template generation at
+  all.
+- Dataset validators reject duplicate `keywordId`s and invalid enum
+  values.
+- Normalization does not merge meaningfully distinct branded and generic
+  terms.
+
 ## Suggested split
 
 - **STORY-081a:** Dataset type + loader + fallback-sandbox behavior

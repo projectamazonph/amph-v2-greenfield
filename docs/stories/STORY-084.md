@@ -149,6 +149,21 @@ type CampaignBuilderScores = {
 };
 ```
 
+## Decision-pack refinements (implementation-ready, 2026-07-29 second pass)
+
+Required tests:
+
+- Auto does not universally require negatives for every manual exact
+  keyword (confirms item 1's "not automatic" rule).
+- `strict_isolation` scenarios penalize missing source negatives;
+  `controlled_overlap` scenarios permit documented duplicates.
+- Branded leakage into generic performance campaigns is penalized.
+- Mixed match types fail `strict` policy but may pass `preferred` policy
+  with a warning (not a hard fail).
+- Budget totals above or below tolerance are penalized proportionally.
+- The house-naming parser rejects malformed segments and invalid enum
+  values, not just well-formed-but-wrong ones.
+
 ## Suggested split
 
 - **STORY-084a:** New 8-dimension scoring schema replacing the current

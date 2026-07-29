@@ -174,6 +174,32 @@ decision, correctly refusing to act on insufficient data. Volume must not
 widen tolerance directly — data confidence does (via
 `minimumClicksForDecision`).
 
+## Decision-pack refinements (implementation-ready, 2026-07-29 second pass)
+
+Acceptance criteria, stated as testable invariants:
+
+- Changing a bid changes projected spend and may change projected ROAS.
+- Two keywords with equal volume but different CVR or AOV receive different
+  maximum sustainable CPC values.
+- No code path sets `estimatedRoas` equal to `targetRoas`.
+- The grader supports full, partial, and incorrect bid outcomes.
+- Published scenarios persist `engineVersion` and `rubricVersion`.
+
+Required tests (beyond per-formula unit tests):
+
+- Higher bids increase competitiveness but do not guarantee higher ROAS.
+- A zero/near-zero bid under-delivers and does not receive perfect budget
+  adherence.
+- A bid above break-even CPC is penalized even within a movement
+  guardrail.
+- Beginner/intermediate/advanced tolerances differ.
+- Insufficient-data scenarios reward hold or `collect_more_data`-style
+  decisions.
+- **Deterministic replay:** the same scenario + engine version produces
+  identical outputs, every time — this is a hard requirement, not just a
+  nice-to-have, since the response curve introduces real arithmetic that
+  must not drift.
+
 ## Suggested split
 
 - **STORY-079a:** New scenario schema + response-curve engine (items 1, 4, 5) — the core economic model.

@@ -136,6 +136,33 @@ confidence: "low" | "medium" | "high";
 A row must not be confidently graded pause/harvest/negate before minimum
 evidence, unless it's unmistakably irrelevant.
 
+## Decision-pack refinements (implementation-ready, 2026-07-29 second pass)
+
+Row-level fields, more specific than the earlier pass — `expectedCvr`,
+`targetCpc`, `averageOrderValue`, `targetAcos`, `breakEvenAcos` belong on
+each `KeywordPerfRow`, not only at scenario level, since the break-even
+and zero-order thresholds are computed per-row:
+
+```
+expectedClicksPerOrder = 1 ÷ expectedCvr
+zeroOrderReviewThreshold = expectedClicksPerOrder × confidenceMultiplier
+zeroOrderSpendThreshold = targetCpc × zeroOrderReviewThreshold
+breakEvenClickThreshold = averageOrderValue × breakEvenAcos ÷ currentCpc
+```
+
+Required tests:
+
+- Low-click, zero-order rows are held for more data
+  (`collect_more_data`), not force-classified.
+- High-click, zero-order, clearly irrelevant rows can receive
+  `negative_exact` or `negative_phrase`.
+- An existing exact target suppresses a duplicate harvest recommendation.
+- A **paused** existing exact target triggers a review recommendation,
+  not silent duplication.
+- Brand aliases normalize safely (case, punctuation, spacing).
+- Conflicting existing negatives surface as explicit errors/warnings, not
+  silently ignored.
+
 ## Suggested split
 
 - **STORY-082a:** Clicks/impressions input fields + new sufficiency
