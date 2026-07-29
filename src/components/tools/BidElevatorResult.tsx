@@ -1,8 +1,10 @@
 /**
  * BidElevatorResult — server component.
  *
- * Renders the simulator's output: a 0-100 score, projected daily
- * spend, projected ROAS, and the per-keyword recommendations.
+ * STORY-079: Bid Elevator economic model rewrite. Renders the
+ * simulator's output: a 0-100 score, projected daily spend, projected
+ * ROAS, and the per-keyword recommendations with their evidence-based
+ * confidence tier.
  */
 
 import styles from "./BidElevatorResult.module.css";
@@ -17,6 +19,17 @@ function scoreColor(score: number): "var(--success)" | "var(--warning)" | "var(-
   if (score >= 80) return "var(--success)";
   if (score >= 50) return "var(--warning)";
   return "var(--danger)";
+}
+
+function confidenceLabel(confidence: "high" | "medium" | "low"): string {
+  switch (confidence) {
+    case "high":
+      return "High confidence";
+    case "medium":
+      return "Medium confidence";
+    case "low":
+      return "Low confidence";
+  }
 }
 
 export function BidElevatorResult({ result, targetRoas }: Props) {
@@ -62,7 +75,7 @@ export function BidElevatorResult({ result, targetRoas }: Props) {
           <thead>
             <tr>
               <th>Keyword</th>
-              <th className={styles.thNum}>Volume</th>
+              <th>Confidence</th>
               <th className={styles.thNum}>Current</th>
               <th className={styles.thNum}>Suggested</th>
               <th className={styles.thNum}>Δ</th>
@@ -72,9 +85,9 @@ export function BidElevatorResult({ result, targetRoas }: Props) {
             {result.bids.map((b) => {
               const delta = b.groundTruth - b.currentBid;
               return (
-                <tr key={b.keyword}>
+                <tr key={b.keywordId}>
                   <td className={styles.tdKw}>{b.keyword}</td>
-                  <td className={styles.tdNum}>{b.volume.toLocaleString()}</td>
+                  <td className={styles.tdKw}>{confidenceLabel(b.confidence)}</td>
                   <td className={styles.tdNum}>₱{b.currentBid.toFixed(2)}</td>
                   <td className={styles.tdNumStrong}>₱{b.groundTruth.toFixed(2)}</td>
                   <td

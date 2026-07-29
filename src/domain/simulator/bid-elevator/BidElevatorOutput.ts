@@ -1,52 +1,62 @@
 /**
  * BidElevatorOutput: output types for the Bid Elevator simulator.
  *
- * STORY-068: Bid Elevator Rebuild (Scoring Engine Integration).
- *
- * When userBidAdjustments are provided, the simulator evaluates each keyword's
- * user-submitted bid against the ground-truth suggested bid and returns per-dimension
- * scores that feed into GradeSimulatorAttempt.
+ * STORY-079: Bid Elevator economic model rewrite.
  *
  * Scoring dimensions:
- *  bidAccuracy     : % of keywords where user's bid is within ±20% of suggested bid
- *  budgetAdherence : % of simulated spend staying within daily budget (capped at 100)
- *  roasHit         : % of target ROAS achieved (capped at 100)
+ *  bidAccuracy     : % of reviewed keywords within the evidence-based
+ *                    tolerance band of the recommended bid
+ *  budgetAdherence : how much the student's bids stayed within the daily
+ *                    budget before pacing had to throttle delivery
+ *  roasHit         : outcome grading — full credit when target ROAS is
+ *                    met and at least 90% of best feasible sales is
+ *                    captured, partial credit for a safe-but-conservative
+ *                    bid, capped when any bid exceeds its economic ceiling
  */
 
-import type { KeywordBid } from "./BidElevatorInput";
+import type { MatchType, KeywordIntent, StrategicRole } from "./BidElevatorInput";
+
+export type BidConfidence = "high" | "medium" | "low";
 
 export interface BidRecommendation {
+  readonly keywordId: string;
   readonly keyword: string;
-  /** Simulator's ground-truth suggested bid */
+  readonly matchType: MatchType;
+  readonly intent: KeywordIntent;
+  readonly strategicRole: StrategicRole;
+  /** The simulator's recommended bid: the best candidate at or below the economic ceiling. */
   readonly groundTruth: number;
-  /** User's current bid from the scenario */
   readonly currentBid: number;
-  /** Estimated CPC for this keyword */
+  readonly benchmarkCpc: number;
+  /** Maximum defensible CPC (baselineCvr × revenuePerOrder × effectiveTargetAcos). */
+  readonly economicCeiling: number;
+  readonly estimatedImpressions: number;
+  readonly estimatedClicks: number;
   readonly estimatedCpc: number;
-  /** Monthly search volume */
-  readonly volume: number;
-  /** User's submitted bid adjustment (undefined = not yet submitted) */
+  readonly estimatedSpend: number;
+  readonly estimatedOrders: number;
+  readonly estimatedSales: number;
+  readonly keywordRoas: number;
+  /** Evidence-based confidence tier used to derive this keyword's tolerance band. */
+  readonly confidence: BidConfidence;
+  /** Student's submitted bid (undefined = not yet reviewed). */
   readonly userBid?: number;
-  /** Whether user's bid is within ±20% of ground truth */
+  /** Whether the student's bid is within the evidence-based tolerance band. */
   readonly isCorrect?: boolean;
 }
 
 export interface ScoreDimensions {
-  /** % of keywords correctly bid (within ±20% of suggested bid) */
   readonly bidAccuracy: number;
-  /** % of simulated spend staying within daily budget (capped at 100) */
   readonly budgetAdherence: number;
-  /** % of target ROAS achieved (capped at 100) */
   readonly roasHit: number;
-  /** Placeholder: future rubric-based on written justification */
 }
 
 export interface BidElevatorOutput {
-  /** Bid recommendations per keyword, ordered by volume descending */
+  /** Bid recommendations per keyword, ordered by available impression volume descending. */
   readonly bids: readonly BidRecommendation[];
-  /** Total estimated daily spend with the selected bids */
+  /** Campaign-level projected daily spend using the recommended bids. */
   readonly estimatedSpend: number;
-  /** Estimated ROAS with the selected bids */
+  /** Campaign-level projected ROAS using the recommended bids. */
   readonly estimatedRoas: number;
   /**
    * Legacy flat score: preserved for backward compatibility.
@@ -55,7 +65,7 @@ export interface BidElevatorOutput {
    */
   readonly score: number;
   /**
-   * Per-dimension scores (0–100) when userBidAdjustments are provided.
+   * Per-dimension scores (0-100) when userBidAdjustments are provided.
    * Null when no user adjustments supplied (preview/ground-truth only).
    */
   readonly scoreDimensions: ScoreDimensions | null;
