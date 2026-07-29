@@ -9,6 +9,8 @@
   /* Default border-radius: --radius-lg for marketing, --radius-md for data.
      Variant=compact uses the smaller radius. */
   border-radius: var(--radius-lg);
+  /* Lifted feel: subtle warm shadow separates cards from --surface-0 */
+  box-shadow: var(--shadow-sm);
   transition:
     border-color var(--duration-fast) var(--ease-out),
     transform var(--duration-base) var(--ease-out),

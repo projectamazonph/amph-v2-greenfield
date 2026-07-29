@@ -25,7 +25,7 @@
   font-family: var(--font-body);
   font-size: 13px;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   min-width: 140px;
@@ -55,7 +55,7 @@
   font-size: 13px;
   font-weight: 500;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   text-decoration: none;
