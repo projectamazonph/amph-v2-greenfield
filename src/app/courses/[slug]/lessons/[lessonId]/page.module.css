@@ -101,6 +101,12 @@
 
 /* Footer */
 
+.completeFooter {
+  margin-top: var(--space-10);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+
 .navFooter {
   margin-top: var(--space-12);
   padding-top: var(--space-6);

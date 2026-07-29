@@ -88,13 +88,14 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const { coursesCreated, modulesUpserted, lessonsUpserted } = result.value;
+  const { coursesCreated, modulesUpserted, lessonsUpserted, curriculaRebuilt } = result.value;
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
 
   console.log("[import] DONE");
   console.log("[import] courses created:", coursesCreated);
   console.log("[import] modules upserted:", modulesUpserted);
   console.log("[import] lessons upserted:", lessonsUpserted);
+  console.log("[import] curricula rebuilt:", curriculaRebuilt.join(", ") || "(none)");
   console.log(`[import] elapsed: ${elapsed}s`);
 
   await prisma.$disconnect();

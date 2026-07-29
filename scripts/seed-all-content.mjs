@@ -109,8 +109,11 @@ const COURSES = [
 const courseIds = {};
 for (const c of COURSES) {
   const id = md5("course", c.slug);
-  courseIds[c.slug] = id;
-  await prisma.course.upsert({
+  // Take the id from the upsert result, not the recomputed hash: the
+  // course may already exist under a different id (created by the admin
+  // panel or an earlier import), in which case `create.id` is ignored and
+  // the hash would point at nothing. Modules below FK onto this value.
+  const saved = await prisma.course.upsert({
     where: { slug: c.slug },
     update: {
       title: c.title,
@@ -141,7 +144,8 @@ for (const c of COURSES) {
       },
     },
   });
-  console.log(`  [course] ${c.slug} → ready (id: ${id.slice(0, 8)}...)`);
+  courseIds[c.slug] = saved.id;
+  console.log(`  [course] ${c.slug} → ready (id: ${saved.id.slice(0, 8)}...)`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -238,6 +242,64 @@ for (const dirName of moduleDirs.sort()) {
 }
 
 console.log(`  Total: ${modulesCreated} modules, ${lessonsCreated} lessons`);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STEP 2b: REBUILD Course.curriculum FROM THE ROWS JUST WRITTEN
+// ═══════════════════════════════════════════════════════════════════════════════
+// Step 1 seeds every course with a stub curriculum so the Course entity's
+// non-empty-curriculum validation passes. The relational Module/Lesson rows
+// above are what the catalog page reads, but the lesson page,
+// AuthorizeLessonAccess and MarkLessonComplete all read the denormalized
+// Course.curriculum JSON. Leaving it at the stub means every lesson link off
+// the catalog 404s. This mirrors the RebuildCourseCurriculum use case that
+// every admin module/lesson mutation already runs.
+console.log("\n[seed] === Step 2b: Rebuild course curricula ===");
+
+for (const courseSlug of Object.keys(courseIds)) {
+  const courseId = courseIds[courseSlug];
+
+  const modules = await prisma.module.findMany({
+    where: { courseId },
+    orderBy: { displayOrder: "asc" },
+  });
+
+  const sections = [];
+  for (const mod of modules) {
+    const lessons = await prisma.lesson.findMany({
+      where: { moduleId: mod.id },
+      orderBy: { displayOrder: "asc" },
+    });
+    // rebuildCurriculumFromModules skips empty modules. Match that.
+    if (lessons.length === 0) continue;
+    sections.push({
+      id: mod.id,
+      title: mod.title,
+      lessons: lessons.map((l) => ({
+        id: l.id,
+        title: l.title,
+        type: l.type,
+        content: l.content,
+      })),
+    });
+  }
+
+  // A course with no lessons yet keeps its stub. Writing an empty
+  // curriculum would fail the Course entity's validation on read.
+  if (sections.length === 0) {
+    console.log(`  [curriculum] ${courseSlug} → no lessons yet, keeping stub`);
+    continue;
+  }
+
+  await prisma.course.update({
+    where: { id: courseId },
+    data: { curriculum: { sections } },
+  });
+
+  const lessonTotal = sections.reduce((n, s) => n + s.lessons.length, 0);
+  console.log(
+    `  [curriculum] ${courseSlug} → ${sections.length} sections, ${lessonTotal} lessons`,
+  );
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // STEP 3: QUIZZES from quiz-questions.json

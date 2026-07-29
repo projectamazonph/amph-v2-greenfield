@@ -13,11 +13,13 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
 import { courseIsAvailable } from "@/domain/entities/Course";
+import type { Course } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
 import { getLessonData } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
-import { LessonSidebar } from "../LessonSidebar";
+import { LessonSidebar, type SidebarSection } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
+import { LessonCompleteButton } from "../LessonCompleteButton";
 import { Button } from "@/components/ui/Button";
 import styles from "./page.module.css";
 
@@ -68,7 +70,15 @@ export default async function LessonPage({ params }: PageProps) {
   // for every user state (anonymous, authed-preview, enrolled,
   // refunded, admin). The page MUST NOT re-implement this logic.
   const userId = await getSessionUserId();
-  const completedLessonIds: string[] = [];
+
+  // Progress comes from the student's enrollment. Anonymous and
+  // preview readers have none, so they see an empty sidebar state and
+  // no complete button — there is nothing to record progress against.
+  const enrollment = userId
+    ? await container.enrollmentRepo.findByUserIdAndCourseId(userId, course.id)
+    : null;
+  const completedLessonIds: readonly string[] = enrollment?.completedLessonIds ?? [];
+  const canTrackProgress = enrollment !== null && enrollment.status === "active";
 
   const authResult = await container.authorizeLessonAccess.execute({
     userId: userId ?? "",
@@ -84,7 +94,9 @@ export default async function LessonPage({ params }: PageProps) {
     <div className={styles.layout}>
       {/* Sidebar navigation */}
       <LessonSidebar
-        course={course}
+        courseTitle={course.title}
+        courseSlug={course.slug}
+        sections={toSidebarSections(course)}
         currentLessonId={lessonId}
         completedLessonIds={completedLessonIds}
       />
@@ -125,7 +137,19 @@ export default async function LessonPage({ params }: PageProps) {
           </div>
 
           {/* Lesson body */}
-          <LessonContent lesson={lesson} />
+          <LessonContent lesson={lesson} courseSlug={slug} lessonId={lessonId} />
+
+          {/* Mark complete — enrolled students only */}
+          {canTrackProgress && (
+            <div className={styles.completeFooter}>
+              <LessonCompleteButton
+                courseId={course.id}
+                courseSlug={slug}
+                lessonId={lessonId}
+                initialCompleted={completedLessonIds.includes(lessonId)}
+              />
+            </div>
+          )}
 
           {/* Prev / Next navigation */}
           <div className={styles.navFooter}>
@@ -139,6 +163,36 @@ export default async function LessonPage({ params }: PageProps) {
       </main>
     </div>
   );
+}
+
+// ── View model ──────────────────────────────────────────────
+
+/**
+ * Flatten the course curriculum into the plain shape LessonSidebar takes.
+ *
+ * The sidebar is a client component, so it cannot receive the `Course`
+ * entity: `Course.price` is a `Money` class instance and React refuses to
+ * serialize a class across the server/client boundary. Doing the lesson
+ * duration lookup here also keeps the `content` blob out of the client
+ * bundle entirely.
+ */
+function toSidebarSections(course: Course): SidebarSection[] {
+  return course.curriculum.sections.map((section) => ({
+    id: section.id,
+    title: section.title,
+    lessons: section.lessons.map((lesson) => ({
+      id: lesson.id,
+      title: lesson.title,
+      type: lesson.type,
+      durationMinutes:
+        lesson.type === "VIDEO" &&
+        typeof lesson.content === "object" &&
+        lesson.content !== null &&
+        "durationMinutes" in lesson.content
+          ? ((lesson.content as { durationMinutes: number }).durationMinutes ?? null)
+          : null,
+    })),
+  }));
 }
 
 // ── Access denied page ──────────────────────────────────────

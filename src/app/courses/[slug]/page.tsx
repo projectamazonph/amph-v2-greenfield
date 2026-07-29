@@ -42,6 +42,12 @@ export default async function CourseDetailPage({ params }: PageProps) {
   if (!result.ok) notFound();
 
   const detail = result.value;
+
+  // Knowledge checks. Quizzes hang off the course, not off a lesson,
+  // so the curriculum accordion above cannot show them. Without this
+  // section the seeded quizzes have no entry point anywhere in the app.
+  const quizzesResult = await container.quizRepo.findByCourseId(detail.courseId);
+  const quizzes = quizzesResult.ok ? quizzesResult.value : [];
   const { totalLessonCount, totalEstimatedMinutes, modules } = detail;
   const hours = Math.floor(totalEstimatedMinutes / 60);
   const minutes = totalEstimatedMinutes % 60;
@@ -129,6 +135,29 @@ export default async function CourseDetailPage({ params }: PageProps) {
           ))}
         </div>
       </div>
+
+      {/* Knowledge checks */}
+      {quizzes.length > 0 && (
+        <div className={styles.quizSection}>
+          <h2 className={styles.curriculumTitle}>Knowledge checks</h2>
+          <ul className={styles.quizList}>
+            {quizzes.map((quiz) => (
+              <li key={quiz.id} className={styles.quizItem}>
+                <Link
+                  href={`/courses/${detail.slug}/quizzes/${quiz.id}`}
+                  className={styles.quizLink}
+                >
+                  {quiz.title}
+                </Link>
+                <span className={styles.quizMeta}>
+                  {quiz.questions.length} question{quiz.questions.length !== 1 ? "s" : ""} · pass ≥{" "}
+                  {quiz.passingScore}%
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </main>
   );
 }

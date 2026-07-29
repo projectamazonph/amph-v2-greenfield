@@ -15,10 +15,7 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
   private enrollments = new Map<string, Enrollment>(); // id → enrollment
   private userCourseIndex = new Map<string, string>(); // `${userId}:${courseId}` → id
 
-  async findByUserIdAndCourseId(
-    userId: string,
-    courseId: string,
-  ): Promise<Enrollment | null> {
+  async findByUserIdAndCourseId(userId: string, courseId: string): Promise<Enrollment | null> {
     const key = `${userId}:${courseId}`;
     const id = this.userCourseIndex.get(key);
     if (!id) return null;
@@ -31,21 +28,13 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
     return Result.ok(e);
   }
 
-  async findByUserId(
-    userId: string,
-  ): Promise<Result<readonly Enrollment[], EnrollmentError>> {
-    const all = Array.from(this.enrollments.values()).filter(
-      (e) => e.userId === userId,
-    );
+  async findByUserId(userId: string): Promise<Result<readonly Enrollment[], EnrollmentError>> {
+    const all = Array.from(this.enrollments.values()).filter((e) => e.userId === userId);
     return Result.ok(all);
   }
 
-  async findByCourseId(
-    courseId: string,
-  ): Promise<Result<readonly Enrollment[], EnrollmentError>> {
-    const all = Array.from(this.enrollments.values()).filter(
-      (e) => e.courseId === courseId,
-    );
+  async findByCourseId(courseId: string): Promise<Result<readonly Enrollment[], EnrollmentError>> {
+    const all = Array.from(this.enrollments.values()).filter((e) => e.courseId === courseId);
     return Result.ok(all);
   }
 
@@ -54,9 +43,16 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
     if (this.userCourseIndex.has(key)) {
       return Result.err({ kind: "already_enrolled" });
     }
-    this.enrollments.set(enrollment.id, Object.freeze({ ...enrollment }));
+    // Store a mutable copy, same as update() below. This used to
+    // Object.freeze() the stored copy, which diverged from both
+    // update() and PrismaEnrollmentRepository: `Enrollment` is a
+    // mutate-then-persist entity (markLessonComplete assigns to
+    // `this`), so a frozen instance threw as soon as a caller read one
+    // back and marked a lesson complete.
+    const stored: Enrollment = { ...enrollment };
+    this.enrollments.set(enrollment.id, stored);
     this.userCourseIndex.set(key, enrollment.id);
-    return Result.ok(enrollment);
+    return Result.ok(stored);
   }
 
   async update(enrollment: Enrollment): Promise<Result<Enrollment, EnrollmentError>> {

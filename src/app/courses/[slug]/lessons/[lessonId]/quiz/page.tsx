@@ -39,10 +39,20 @@ export default async function QuizPage({ params }: Props) {
   const container = buildContainer();
   const quizResult = await container.quizRepo.findById(lessonId);
   if (!Result.isOk(quizResult) || !quizResult.value) {
+    // A Quiz has a courseId, not a lessonId, so this route only resolves
+    // when a lesson id happens to equal a quiz id. Point the student at
+    // the course page, which lists every knowledge check for the course,
+    // instead of dead-ending on "not found".
     return (
       <main className={styles.page}>
+        <nav className={styles.breadcrumb}>
+          <a href={`/courses/${slug}/lessons/${lessonId}`}>← Back to lesson</a>
+        </nav>
         <h1 className={styles.title}>Quiz not found</h1>
-        <p>This lesson does not have a quiz.</p>
+        <p>
+          This lesson does not have its own quiz. The knowledge checks for this course are listed on{" "}
+          <a href={`/courses/${slug}`}>the course page</a>.
+        </p>
       </main>
     );
   }

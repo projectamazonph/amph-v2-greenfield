@@ -49,6 +49,7 @@ import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRep
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
 import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
 import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
+import { InMemoryProgressEventRepository } from "@/infra/repositories/InMemoryProgressEventRepository";
 import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDiscountCodeRepository";
 import { InMemoryQuizRepository } from "@/infra/repositories/InMemoryQuizRepository";
 import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
@@ -87,6 +88,7 @@ import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
+import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
@@ -193,6 +195,7 @@ export interface TestContainer extends AppContainer {
   lessonRepo: InMemoryLessonRepository;
   orderRepo: InMemoryOrderRepository;
   enrollmentRepo: InMemoryEnrollmentRepository;
+  progressEventRepo: InMemoryProgressEventRepository;
   discountCodeRepo: InMemoryDiscountCodeRepository;
   quizRepo: InMemoryQuizRepository;
   quizAttemptRepo: InMemoryQuizAttemptRepository;
@@ -234,6 +237,7 @@ export function buildTestContainer(): TestContainer {
   });
   const orderRepo = new InMemoryOrderRepository();
   const enrollmentRepo = new InMemoryEnrollmentRepository();
+  const progressEventRepo = new InMemoryProgressEventRepository();
   const discountCodeRepo = new InMemoryDiscountCodeRepository();
   const quizRepo = new InMemoryQuizRepository();
   const quizAttemptRepo = new InMemoryQuizAttemptRepository();
@@ -325,6 +329,17 @@ export function buildTestContainer(): TestContainer {
       userRepo,
       courseRepo,
       enrollmentRepo,
+    }),
+    progressEventRepo,
+    // STORY-027: student marks a lesson complete
+    markLessonComplete: new MarkLessonComplete({
+      enrollmentRepo,
+      courseRepo,
+      progressEventRepo,
+      xpEventRepo,
+      userRepo,
+      idGen,
+      clock,
     }),
     enrollStudent: new EnrollStudent({
       userRepo,

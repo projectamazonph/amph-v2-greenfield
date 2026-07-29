@@ -3,19 +3,20 @@
  *
  * Renders the scenario's seed keywords as a table of editable bids.
  * The user tweaks the bid (₱ value) per keyword, then submits. The
- * server action runs the simulator and returns the result; the
- * parent page re-renders with the new result panel.
+ * server action runs the simulator and the result panel renders below
+ * the form, from this component's own state.
  *
  * Default values come from the Stitch spec: a high-spend
- * electronics campaign with 8 keywords. Currency is in USD.
+ * electronics campaign with 8 keywords. Currency is PHP.
  */
 
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./BidElevatorForm.module.css";
 import { runBidElevator, type RunBidElevatorInput } from "@/app/tools/bid-elevator/actions";
+import { BidElevatorResult } from "./BidElevatorResult";
+import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 
 export interface SeedKeyword {
   keyword: string;
@@ -31,11 +32,11 @@ interface Props {
 }
 
 export function BidElevatorForm({ budget, targetRoas, initialKeywords }: Props) {
-  const router = useRouter();
   const [bids, setBids] = useState<Record<string, number>>(() =>
     Object.fromEntries(initialKeywords.map((k) => [k.keyword, k.currentBid])),
   );
   const [pending, startTransition] = useTransition();
+  const [result, setResult] = useState<BidElevatorOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const onChange = (keyword: string, value: number) => {
@@ -54,70 +55,75 @@ export function BidElevatorForm({ budget, targetRoas, initialKeywords }: Props) 
       })),
     };
     startTransition(async () => {
-      const result = await runBidElevator(input);
-      if (!result.ok) {
-        setError(result.error.message);
+      const response = await runBidElevator(input);
+      if (!response.ok) {
+        setError(response.error.message);
+        setResult(null);
         return;
       }
-      // Stash the result in sessionStorage for the page to read
-      // (a clean re-fetch pattern would be a real route param;
-      // this works without adding another route segment).
-      sessionStorage.setItem("bid-elevator:result", JSON.stringify(result.value));
-      router.refresh();
+      // Hold the result here and render it below, the same way the
+      // other four simulator forms do. The previous version stashed it
+      // in browser storage and refreshed the route, but the page is a
+      // server component that never read it back, so submitting the
+      // form appeared to do nothing at all.
+      setResult(response.value);
     });
   };
 
   return (
-    <form className={styles.form} onSubmit={onSubmit}>
-      <div className={styles.metaRow}>
-        <span className={styles.metaItem}>
-          <span className={styles.metaLabel}>Daily budget</span>
-          <span className={styles.metaValue}>₱{budget.toLocaleString()}</span>
-        </span>
-        <span className={styles.metaItem}>
-          <span className={styles.metaLabel}>Target ROAS</span>
-          <span className={styles.metaValue}>{targetRoas.toFixed(1)}×</span>
-        </span>
-      </div>
-      <div className={styles.tableScroll} role="region" aria-label="Bid inputs" tabIndex={0}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Keyword</th>
-              <th className={styles.thNum}>Volume</th>
-              <th className={styles.thNum}>Est. CPC</th>
-              <th className={styles.thNum}>Your bid</th>
-            </tr>
-          </thead>
-          <tbody>
-            {initialKeywords.map((k) => (
-              <tr key={k.keyword}>
-                <td className={styles.tdKw}>{k.keyword}</td>
-                <td className={styles.tdNum}>{k.volume.toLocaleString()}</td>
-                <td className={styles.tdNum}>₱{k.currentCpc.toFixed(2)}</td>
-                <td className={styles.tdNum}>
-                  <span className={styles.inputWrap}>
-                    <span className={styles.inputPrefix}>₱</span>
-                    <input
-                      type="number"
-                      step="0.10"
-                      min="0"
-                      className={styles.input}
-                      value={bids[k.keyword] ?? k.currentBid}
-                      onChange={(e) => onChange(k.keyword, Number(e.target.value))}
-                      aria-label={`Bid for ${k.keyword}`}
-                    />
-                  </span>
-                </td>
+    <>
+      <form className={styles.form} onSubmit={onSubmit}>
+        <div className={styles.metaRow}>
+          <span className={styles.metaItem}>
+            <span className={styles.metaLabel}>Daily budget</span>
+            <span className={styles.metaValue}>₱{budget.toLocaleString()}</span>
+          </span>
+          <span className={styles.metaItem}>
+            <span className={styles.metaLabel}>Target ROAS</span>
+            <span className={styles.metaValue}>{targetRoas.toFixed(1)}×</span>
+          </span>
+        </div>
+        <div className={styles.tableScroll} role="region" aria-label="Bid inputs" tabIndex={0}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Keyword</th>
+                <th className={styles.thNum}>Volume</th>
+                <th className={styles.thNum}>Est. CPC</th>
+                <th className={styles.thNum}>Your bid</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {error ? <p className={styles.error}>{error}</p> : null}
-      <button type="submit" className={styles.submit} disabled={pending}>
-        {pending ? "Running…" : "Run simulation"}
-      </button>
-    </form>
+            </thead>
+            <tbody>
+              {initialKeywords.map((k) => (
+                <tr key={k.keyword}>
+                  <td className={styles.tdKw}>{k.keyword}</td>
+                  <td className={styles.tdNum}>{k.volume.toLocaleString()}</td>
+                  <td className={styles.tdNum}>₱{k.currentCpc.toFixed(2)}</td>
+                  <td className={styles.tdNum}>
+                    <span className={styles.inputWrap}>
+                      <span className={styles.inputPrefix}>₱</span>
+                      <input
+                        type="number"
+                        step="0.10"
+                        min="0"
+                        className={styles.input}
+                        value={bids[k.keyword] ?? k.currentBid}
+                        onChange={(e) => onChange(k.keyword, Number(e.target.value))}
+                        aria-label={`Bid for ${k.keyword}`}
+                      />
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {error ? <p className={styles.error}>{error}</p> : null}
+        <button type="submit" className={styles.submit} disabled={pending}>
+          {pending ? "Running…" : "Run simulation"}
+        </button>
+      </form>
+      {result ? <BidElevatorResult result={result} targetRoas={targetRoas} /> : null}
+    </>
   );
 }

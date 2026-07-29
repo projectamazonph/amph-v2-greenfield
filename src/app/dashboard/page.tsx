@@ -26,9 +26,7 @@ interface CourseWithEnrollment {
   enrollment: Enrollment;
 }
 
-async function loadEnrollmentsWithCourses(
-  userId: string,
-): Promise<CourseWithEnrollment[]> {
+async function loadEnrollmentsWithCourses(userId: string): Promise<CourseWithEnrollment[]> {
   const container = buildContainer();
   const enrollmentsResult = await container.enrollmentRepo.findByUserId(userId);
   if (!enrollmentsResult.ok) {
@@ -80,11 +78,7 @@ export default async function DashboardPage() {
           <h2 className={styles.sectionTitle}>Continue learning</h2>
           <div className={styles.grid}>
             {inProgress.map(({ course, enrollment }) => (
-              <Link
-                key={enrollment.id}
-                href={`/courses/${course.slug}`}
-                className={styles.card}
-              >
+              <Link key={enrollment.id} href={`/courses/${course.slug}`} className={styles.card}>
                 <h3 className={styles.cardTitle}>{course.title}</h3>
                 <p className={styles.cardTagline}>{course.tagline}</p>
                 <div className={styles.progressBar} aria-hidden="true">
@@ -93,9 +87,7 @@ export default async function DashboardPage() {
                     style={{ width: `${enrollment.progressPercent}%` }}
                   />
                 </div>
-                <p className={styles.progressLabel}>
-                  {enrollment.progressPercent}% complete
-                </p>
+                <p className={styles.progressLabel}>{enrollment.progressPercent}% complete</p>
               </Link>
             ))}
           </div>
@@ -124,18 +116,13 @@ export default async function DashboardPage() {
           <ul className={styles.list}>
             {allActive.map(({ course, enrollment }) => (
               <li key={enrollment.id} className={styles.listItem}>
-                <Link
-                  href={`/courses/${course.slug}`}
-                  className={styles.listLink}
-                >
+                <Link href={`/courses/${course.slug}`} className={styles.listLink}>
                   <div className={styles.listMain}>
                     <span className={styles.listTitle}>{course.title}</span>
                     <span className={styles.listTagline}>{course.tagline}</span>
                   </div>
                   <div className={styles.listMeta}>
-                    <span className={styles.listProgress}>
-                      {enrollment.progressPercent}%
-                    </span>
+                    <span className={styles.listProgress}>{enrollment.progressPercent}%</span>
                     {enrollment.progressPercent === 100 && (
                       <span className={styles.completedBadge}>Completed</span>
                     )}
@@ -147,11 +134,16 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      {/* Account link */}
+      {/* Account */}
       <section className={styles.section}>
-        <Link href="/logout" className={styles.mutedLink}>
-          Sign out
-        </Link>
+        {/* /logout is not a route. Logout is POST-only on purpose: a GET
+            logout is a CSRF hole (any third-party <img> would sign the
+            user out). Same form pattern as the admin UserCard. */}
+        <form action="/api/auth/logout" method="post">
+          <button type="submit" className={styles.mutedLink}>
+            Sign out
+          </button>
+        </form>
       </section>
     </main>
   );

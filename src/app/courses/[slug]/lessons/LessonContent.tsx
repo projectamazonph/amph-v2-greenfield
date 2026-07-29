@@ -8,7 +8,7 @@
  * Types:
  *  - TEXT: Markdown body via react-markdown + remark-gfm
  *  - VIDEO: YouTube/Vimeo embed or native <video>
- *  - QUIZ: "Coming soon" placeholder
+ *  - QUIZ: card linking to the quiz player
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
@@ -35,16 +35,52 @@ interface QuizLessonContent {
   title: string;
 }
 
-function isTextContent(c: unknown): c is TextLessonContent {
-  return typeof c === "object" && c !== null && (c as { type?: string }).type === "TEXT";
+/**
+ * Resolve the lesson's kind.
+ *
+ * `Lesson.type` is the authoritative column; the `content` JSON blob is
+ * just the payload and is not required to repeat the discriminator. The
+ * importers write `{ body }` / `{ durationMinutes }` with no `type` key,
+ * so keying only off `content.type` made every seeded lesson fall
+ * through to "Lesson content unavailable" — a reachable page with no
+ * body on it. Prefer the column, fall back to the blob for older rows
+ * that do carry a type.
+ */
+function resolveLessonKind(lesson: Lesson): string | null {
+  if (typeof lesson.type === "string" && lesson.type.length > 0) {
+    return lesson.type;
+  }
+  const c = lesson.content;
+  if (typeof c === "object" && c !== null && typeof (c as { type?: string }).type === "string") {
+    return (c as { type: string }).type;
+  }
+  return null;
 }
 
-function isVideoContent(c: unknown): c is VideoLessonContent {
-  return typeof c === "object" && c !== null && (c as { type?: string }).type === "VIDEO";
+function isRecord(c: unknown): c is Record<string, unknown> {
+  return typeof c === "object" && c !== null;
 }
 
-function isQuizContent(c: unknown): c is QuizLessonContent {
-  return typeof c === "object" && c !== null && (c as { type?: string }).type === "QUIZ";
+function asTextContent(c: unknown): TextLessonContent | null {
+  if (!isRecord(c) || typeof c.body !== "string") return null;
+  return { type: "TEXT", body: c.body };
+}
+
+function asVideoContent(c: unknown): VideoLessonContent | null {
+  if (!isRecord(c)) return null;
+  return {
+    type: "VIDEO",
+    videoUrl: typeof c.videoUrl === "string" ? c.videoUrl : "",
+    durationMinutes: typeof c.durationMinutes === "number" ? c.durationMinutes : 0,
+    ...(typeof c.transcript === "string" ? { transcript: c.transcript } : {}),
+  };
+}
+
+function asQuizContent(c: unknown, fallbackTitle: string): QuizLessonContent {
+  if (isRecord(c) && typeof c.title === "string" && c.title.length > 0) {
+    return { type: "QUIZ", title: c.title };
+  }
+  return { type: "QUIZ", title: fallbackTitle };
 }
 
 function getYouTubeEmbedUrl(url: string): string | null {
@@ -111,9 +147,7 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
       </div>
       {content.transcript && (
         <details className={styles.transcript}>
-          <summary className={styles.transcriptSummary}>
-            Show transcript
-          </summary>
+          <summary className={styles.transcriptSummary}>Show transcript</summary>
           <div className={styles.transcriptBody}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content.transcript}</ReactMarkdown>
           </div>
@@ -123,15 +157,25 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
   );
 }
 
-function QuizContent({ title }: { title: string }) {
+function QuizContent({
+  title,
+  courseSlug,
+  lessonId,
+}: {
+  title: string;
+  courseSlug: string;
+  lessonId: string;
+}) {
   return (
     <div className={styles.quizPlaceholder}>
       <QuizIcon />
       <h3 className={styles.quizTitle}>{title}</h3>
-      <p className={styles.quizText}>Interactive quiz — coming soon!</p>
       <p className={styles.quizHint}>
-        Complete the quiz to test your understanding of this section.
+        Answer the questions to check what you picked up in this section.
       </p>
+      <a className={styles.quizLink} href={`/courses/${courseSlug}/lessons/${lessonId}/quiz`}>
+        Start the quiz
+      </a>
     </div>
   );
 }
@@ -184,19 +228,37 @@ function QuizIcon() {
 
 // ── Main component ──────────────────────────────────────────
 
-export function LessonContent({ lesson }: { lesson: Lesson }) {
+export function LessonContent({
+  lesson,
+  courseSlug,
+  lessonId,
+}: {
+  lesson: Lesson;
+  courseSlug: string;
+  lessonId: string;
+}) {
   const content = lesson.content as unknown;
+  const kind = resolveLessonKind(lesson);
 
-  if (isTextContent(content)) {
-    return <TextContent body={content.body} />;
+  if (kind === "VIDEO") {
+    const video = asVideoContent(content);
+    if (video) return <VideoContent content={video} />;
   }
 
-  if (isVideoContent(content)) {
-    return <VideoContent content={content} />;
+  if (kind === "QUIZ") {
+    return (
+      <QuizContent
+        title={asQuizContent(content, lesson.title).title}
+        courseSlug={courseSlug}
+        lessonId={lessonId}
+      />
+    );
   }
 
-  if (isQuizContent(content)) {
-    return <QuizContent title={content.title} />;
+  // TEXT, and anything else that carries a markdown body.
+  const text = asTextContent(content);
+  if (text) {
+    return <TextContent body={text.body} />;
   }
 
   return (

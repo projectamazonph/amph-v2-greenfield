@@ -53,7 +53,9 @@ const QUIZ_LESSON = makeLesson("QUIZ", {
 describe("LessonContent", () => {
   describe("TEXT lessons", () => {
     it("renders the markdown body content", () => {
-      const html = renderToString(<LessonContent lesson={TEXT_LESSON} />);
+      const html = renderToString(
+        <LessonContent lesson={TEXT_LESSON} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
       expect(html).toContain("Hello");
       expect(html).toContain("bold");
     });
@@ -63,7 +65,9 @@ describe("LessonContent", () => {
         type: "TEXT",
         body: "This is a regular paragraph.",
       });
-      const html = renderToString(<LessonContent lesson={lesson} />);
+      const html = renderToString(
+        <LessonContent lesson={lesson} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
       expect(html).toContain("regular paragraph");
     });
 
@@ -72,47 +76,121 @@ describe("LessonContent", () => {
         type: "TEXT",
         body: "## Section Two\n\n### Subsection",
       });
-      const html = renderToString(<LessonContent lesson={lesson} />);
+      const html = renderToString(
+        <LessonContent lesson={lesson} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
       expect(html).toContain("Section Two");
     });
   });
 
   describe("VIDEO lessons", () => {
     it("renders YouTube iframe with embed URL", () => {
-      const html = renderToString(<LessonContent lesson={VIDEO_LESSON_YOUTUBE} />);
+      const html = renderToString(
+        <LessonContent
+          lesson={VIDEO_LESSON_YOUTUBE}
+          courseSlug="ppc-foundations"
+          lessonId="lesson-1"
+        />,
+      );
       expect(html).toContain("youtube.com/embed");
       expect(html).toContain("dQw4w9WgXcQ");
     });
 
     it("renders Vimeo iframe with embed URL", () => {
-      const html = renderToString(<LessonContent lesson={VIDEO_LESSON_VIMEO} />);
+      const html = renderToString(
+        <LessonContent
+          lesson={VIDEO_LESSON_VIMEO}
+          courseSlug="ppc-foundations"
+          lessonId="lesson-1"
+        />,
+      );
       expect(html).toContain("player.vimeo.com/video");
       expect(html).toContain("123456789");
     });
 
     it("renders native video element for direct MP4 URLs", () => {
-      const html = renderToString(<LessonContent lesson={VIDEO_LESSON_DIRECT} />);
+      const html = renderToString(
+        <LessonContent
+          lesson={VIDEO_LESSON_DIRECT}
+          courseSlug="ppc-foundations"
+          lessonId="lesson-1"
+        />,
+      );
       expect(html).toContain("<video");
       expect(html).toContain("video.mp4");
     });
 
     it("shows duration badge", () => {
-      const html = renderToString(<LessonContent lesson={VIDEO_LESSON_YOUTUBE} />);
+      const html = renderToString(
+        <LessonContent
+          lesson={VIDEO_LESSON_YOUTUBE}
+          courseSlug="ppc-foundations"
+          lessonId="lesson-1"
+        />,
+      );
       // React may render adjacent text nodes as "10<!-- -->m"
       expect(html).toMatch(/10.*m/);
     });
   });
 
   describe("QUIZ lessons", () => {
-    it("renders quiz placeholder", () => {
-      const html = renderToString(<LessonContent lesson={QUIZ_LESSON} />);
+    it("links to the quiz player instead of a placeholder", () => {
+      const html = renderToString(
+        <LessonContent lesson={QUIZ_LESSON} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
       expect(html).toContain("Quiz");
-      expect(html).toContain("coming soon");
+      // Regression: this used to render a dead "coming soon" card even
+      // though QuizPlayer and the attempt API were both already built.
+      expect(html.toLowerCase()).not.toContain("coming soon");
+      expect(html).toContain('href="/courses/ppc-foundations/lessons/lesson-1/quiz"');
     });
 
     it("shows the quiz title", () => {
-      const html = renderToString(<LessonContent lesson={QUIZ_LESSON} />);
+      const html = renderToString(
+        <LessonContent lesson={QUIZ_LESSON} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
       expect(html).toContain("Chapter 1 Quiz");
+    });
+  });
+
+  // Regression: the importers write the content blob WITHOUT repeating the
+  // discriminator (`{ body }` for TEXT, `{ durationMinutes }` for VIDEO) —
+  // `Lesson.type` is the authoritative column. Dispatching only on
+  // `content.type` sent every seeded lesson to the "unavailable" fallback,
+  // so lessons rendered with a title, a sidebar and no body at all. Every
+  // fixture above happens to repeat the type inside content, which is why
+  // this went unnoticed.
+
+  describe("content blobs written by the importers", () => {
+    it("renders a TEXT body when content carries no type discriminator", () => {
+      const lesson = { ...makeLesson("TEXT", { body: "# Seeded heading\n\nSeeded body copy." }) };
+      const html = renderToString(
+        <LessonContent lesson={lesson} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
+      expect(html).toContain("Seeded heading");
+      expect(html).toContain("Seeded body copy");
+      expect(html).not.toContain("unavailable");
+    });
+
+    it("renders a VIDEO lesson when content carries no type discriminator", () => {
+      const lesson = makeLesson("VIDEO", {
+        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        durationMinutes: 12,
+      });
+      const html = renderToString(
+        <LessonContent lesson={lesson} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
+      expect(html).toContain("youtube.com/embed/dQw4w9WgXcQ");
+      expect(html).not.toContain("unavailable");
+    });
+
+    it("falls back to the lesson title for a QUIZ with no title in content", () => {
+      const lesson = { ...makeLesson("QUIZ", {}), title: "Module 1 Knowledge Check" };
+      const html = renderToString(
+        <LessonContent lesson={lesson} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
+      expect(html).toContain("Module 1 Knowledge Check");
+      expect(html).toContain('href="/courses/ppc-foundations/lessons/lesson-1/quiz"');
     });
   });
 
@@ -122,7 +200,9 @@ describe("LessonContent", () => {
         ...TEXT_LESSON,
         content: { type: "PODCAST", data: "some data" }, // unknown content type
       };
-      const html = renderToString(<LessonContent lesson={unknownLesson} />);
+      const html = renderToString(
+        <LessonContent lesson={unknownLesson} courseSlug="ppc-foundations" lessonId="lesson-1" />,
+      );
       expect(html).toContain("unavailable");
     });
   });

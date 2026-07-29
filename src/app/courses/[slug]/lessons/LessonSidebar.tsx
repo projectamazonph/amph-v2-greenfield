@@ -10,37 +10,82 @@
  * Sections are collapsible (current lesson's section is open by default).
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
+ *
+ * Takes a plain view model, NOT the `Course` entity. `Course.price` is a
+ * `Money` class instance, and React cannot serialize a class across the
+ * server/client boundary, so passing the entity in threw
+ * "Only plain objects ... can be passed to Client Components" and 500'd
+ * every lesson page a reader could actually open. Keep this shape plain.
  */
 
-import type { Course } from "@/domain/entities/Course";
+import { useState } from "react";
 import styles from "./LessonSidebar.module.css";
 
+export interface SidebarLesson {
+  id: string;
+  title: string;
+  type: string;
+  /** Minutes, for VIDEO lessons. Null for everything else. */
+  durationMinutes: number | null;
+}
+
+export interface SidebarSection {
+  id: string;
+  title: string;
+  lessons: readonly SidebarLesson[];
+}
+
 interface LessonSidebarProps {
-  course: Course;
+  courseTitle: string;
+  courseSlug: string;
+  sections: readonly SidebarSection[];
   currentLessonId: string;
   completedLessonIds: readonly string[];
 }
 
-export function LessonSidebar({ course, currentLessonId, completedLessonIds }: LessonSidebarProps) {
-  const currentSectionIndex = course.curriculum.sections.findIndex((section) =>
+export function LessonSidebar({
+  courseTitle,
+  courseSlug,
+  sections,
+  currentLessonId,
+  completedLessonIds,
+}: LessonSidebarProps) {
+  const currentSectionIndex = sections.findIndex((section) =>
     section.lessons.some((l) => l.id === currentLessonId),
   );
+  const totalLessons = sections.reduce((total, section) => total + section.lessons.length, 0);
+
+  // The section headers were rendered as buttons with aria-expanded but
+  // `isOpen` was a const, so clicking did nothing and the ARIA state was
+  // a lie. Track the open set for real, seeded with the current section.
+  const [openSectionIndexes, setOpenSectionIndexes] = useState<ReadonlySet<number>>(
+    () => new Set(currentSectionIndex === -1 ? [] : [currentSectionIndex]),
+  );
+
+  const toggleSection = (index: number) => {
+    setOpenSectionIndexes((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
 
   return (
     <aside className={styles.sidebar}>
       {/* Course title header */}
       <div className={styles.header}>
-        <h2 className={styles.headerTitle}>{course.title}</h2>
-        <p className={styles.headerSubtitle}>
-          {courseLessonCount(course)} lessons
-        </p>
+        <h2 className={styles.headerTitle}>{courseTitle}</h2>
+        <p className={styles.headerSubtitle}>{totalLessons} lessons</p>
       </div>
 
       {/* Sections */}
       <nav className={styles.nav}>
-        {course.curriculum.sections.map((section, si) => {
-          const isCurrentSection = si === currentSectionIndex;
-          const isOpen = isCurrentSection;
+        {sections.map((section, si) => {
+          const isOpen = openSectionIndexes.has(si);
           const completedCount = section.lessons.filter((l) =>
             completedLessonIds.includes(l.id),
           ).length;
@@ -51,6 +96,7 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
               <button
                 className={styles.sectionHeader}
                 aria-expanded={isOpen}
+                onClick={() => toggleSection(si)}
                 type="button"
               >
                 <ChevronIcon expanded={isOpen} />
@@ -69,13 +115,7 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
                     const isCurrent = lesson.id === currentLessonId;
                     const isCompleted = completedLessonIds.includes(lesson.id);
                     const isVideo = lesson.type === "VIDEO";
-                    const duration =
-                      isVideo &&
-                      typeof lesson.content === "object" &&
-                      lesson.content !== null &&
-                      "durationMinutes" in lesson.content
-                        ? (lesson.content as { durationMinutes: number }).durationMinutes
-                        : null;
+                    const duration = lesson.durationMinutes;
 
                     const linkClass = [
                       styles.lessonLink,
@@ -84,14 +124,11 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
 
                     return (
                       <li key={lesson.id}>
-                        <a href={`/courses/${course.slug}/lessons/${lesson.id}`} className={linkClass}>
-                          {isCompleted ? (
-                            <CheckIcon />
-                          ) : isVideo ? (
-                            <VideoIcon />
-                          ) : (
-                            <TextIcon />
-                          )}
+                        <a
+                          href={`/courses/${courseSlug}/lessons/${lesson.id}`}
+                          className={linkClass}
+                        >
+                          {isCompleted ? <CheckIcon /> : isVideo ? <VideoIcon /> : <TextIcon />}
 
                           <span className={styles.lessonTitle}>{lesson.title}</span>
 
@@ -112,13 +149,6 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
   );
 }
 
-function courseLessonCount(course: Course): number {
-  return course.curriculum.sections.reduce(
-    (total, section) => total + section.lessons.length,
-    0,
-  );
-}
-
 // ── Icons ───────────────────────────────────────────────────
 
 function ChevronIcon({ expanded }: { expanded: boolean }) {
@@ -130,12 +160,7 @@ function ChevronIcon({ expanded }: { expanded: boolean }) {
       stroke="currentColor"
       aria-hidden="true"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M9 5l7 7-7 7"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
     </svg>
   );
 }
@@ -149,12 +174,7 @@ function CheckIcon() {
       stroke="currentColor"
       aria-hidden="true"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2.5}
-        d="M5 13l4 4L19 7"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
     </svg>
   );
 }

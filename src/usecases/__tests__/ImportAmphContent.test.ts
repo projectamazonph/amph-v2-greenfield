@@ -149,6 +149,113 @@ describe("ImportAmphContent", () => {
     expect(result.value.lessonsUpserted).toBe(3);
   });
 
+  // ── Curriculum rebuild ───────────────────────────────────────────────
+  //
+  // The import creates each course with a stub curriculum so the Course
+  // entity's non-empty validation passes, then writes the real content as
+  // Module/Lesson rows. Every student-facing lesson read (the lesson page,
+  // AuthorizeLessonAccess, MarkLessonComplete) goes through the
+  // denormalized Course.curriculum JSON, so if the stub survives the
+  // import, every imported lesson 404s.
+
+  it("rebuilds Course.curriculum from the imported modules and lessons", async () => {
+    contentReader.setFiles([
+      {
+        courseSlug: "ppc-foundations",
+        files: [
+          makeMdxFile("0-onboarding", {
+            title: "Welcome",
+            slug: "0.1-welcome",
+            moduleNumber: 0,
+            lessonNumber: 1,
+            type: "reading",
+            estimatedMinutes: 8,
+            xpReward: 50,
+          }),
+          makeMdxFile("0-onboarding", {
+            title: "How This Works",
+            slug: "0.2-how-this-works",
+            moduleNumber: 0,
+            lessonNumber: 2,
+            type: "reading",
+            estimatedMinutes: 6,
+            xpReward: 50,
+          }),
+        ],
+      },
+    ]);
+
+    const result = await useCase.execute();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.curriculaRebuilt).toContain("ppc-foundations");
+
+    const course = await courseRepo.findBySlug("ppc-foundations");
+    expect(course.ok && !!course.value).toBe(true);
+    if (!course.ok || !course.value) return;
+
+    const { sections } = course.value.curriculum;
+    expect(sections).toHaveLength(1);
+    expect(sections[0]!.title).toBe("Onboarding");
+    expect(sections[0]!.lessons.map((l) => l.title)).toEqual(["Welcome", "How This Works"]);
+
+    // No stub survives the import.
+    const allLessonIds = sections.flatMap((s) => s.lessons.map((l) => l.id));
+    expect(allLessonIds).not.toContain("stub-lesson");
+  });
+
+  it("puts every imported lesson id into Course.curriculum so lesson pages resolve", async () => {
+    contentReader.setFiles([
+      {
+        courseSlug: "ppc-foundations",
+        files: [
+          makeMdxFile("0-onboarding", {
+            title: "Welcome",
+            slug: "0.1-welcome",
+            moduleNumber: 0,
+            lessonNumber: 1,
+            type: "reading",
+            estimatedMinutes: 8,
+            xpReward: 50,
+          }),
+          makeMdxFile("1-foundations", {
+            title: "Read PPC Data",
+            slug: "1.1-read-ppc-data",
+            moduleNumber: 1,
+            lessonNumber: 1,
+            type: "reading",
+            estimatedMinutes: 15,
+            xpReward: 75,
+          }),
+        ],
+      },
+    ]);
+
+    await useCase.execute();
+
+    const course = await courseRepo.findBySlug("ppc-foundations");
+    if (!course.ok || !course.value) throw new Error("course missing");
+
+    const modules = await moduleRepo.findByCourseId(course.value.id);
+    expect(modules.ok).toBe(true);
+    if (!modules.ok) return;
+    expect(modules.value.length).toBe(2);
+
+    const curriculumLessonIds = new Set(
+      course.value.curriculum.sections.flatMap((s) => s.lessons.map((l) => l.id)),
+    );
+
+    for (const mod of modules.value) {
+      const lessons = await lessonRepo.findByModuleId(mod.id);
+      expect(lessons.ok).toBe(true);
+      if (!lessons.ok) return;
+      expect(lessons.value.length).toBeGreaterThan(0);
+      for (const lesson of lessons.value) {
+        expect(curriculumLessonIds.has(lesson.id)).toBe(true);
+      }
+    }
+  });
+
   it("creates the two target courses with the correct slugs and titles", async () => {
     contentReader.setFiles([
       {

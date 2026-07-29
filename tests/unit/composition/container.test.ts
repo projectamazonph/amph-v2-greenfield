@@ -471,3 +471,151 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(la!.simulatorId).toBe("listing-audit");
   });
 });
+
+// ── markLessonComplete wiring ─────────────────────────────────────────
+//
+// STORY-027 shipped the MarkLessonComplete use case, but it was never
+// added to the container and had no server action or UI. Enrollment
+// progress therefore stayed at 0% forever, which also meant no lesson
+// XP and no certificate eligibility. These tests exercise the wired
+// path end to end through the test container.
+
+describe("container — markLessonComplete wiring", () => {
+  function seedCourseAndEnrollment(c: ReturnType<typeof buildTestContainer>) {
+    const courseResult = createCourse({
+      id: "course-1",
+      slug: "ppc-foundations",
+      title: "PPC Foundations",
+      tagline: "Start here",
+      description: "The basics of Amazon PPC.",
+      priceMinor: 0,
+      status: "PUBLISHED",
+      curriculum: {
+        sections: [
+          {
+            id: "mod-1",
+            title: "Onboarding",
+            lessons: [
+              { id: "lesson-1", title: "Welcome", type: "TEXT", content: { body: "" } },
+              { id: "lesson-2", title: "How This Works", type: "TEXT", content: { body: "" } },
+            ],
+          },
+        ],
+      },
+    });
+    if (!courseResult.ok) throw new Error("course seed failed");
+    c.courseRepo.seed([courseResult.value]);
+
+    const enrollmentResult = createEnrollment({
+      id: "enrollment-1",
+      userId: "user-1",
+      courseId: "course-1",
+    });
+    if (!enrollmentResult.ok) throw new Error("enrollment seed failed");
+    return { course: courseResult.value, enrollment: enrollmentResult.value };
+  }
+
+  it("test container exposes markLessonComplete and progressEventRepo", () => {
+    const c = buildTestContainer();
+    expect(c.markLessonComplete).toBeDefined();
+    expect(typeof c.markLessonComplete.execute).toBe("function");
+    expect(c.progressEventRepo).toBeDefined();
+  });
+
+  it("end-to-end: completing a lesson moves progress and logs an event", async () => {
+    const c = buildTestContainer();
+    const { enrollment } = seedCourseAndEnrollment(c);
+    await c.enrollmentRepo.create(enrollment);
+
+    const result = await c.markLessonComplete.execute({
+      userId: "user-1",
+      courseId: "course-1",
+      lessonId: "lesson-1",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // One of two lessons done.
+    expect(result.value.progressPercent).toBe(50);
+    expect(result.value.enrollment.completedLessonIds).toContain("lesson-1");
+
+    const events = await c.progressEventRepo.findByUserId("user-1");
+    expect(events.ok).toBe(true);
+    if (!events.ok) return;
+    expect(events.value.some((e) => e.type === "lesson_completed")).toBe(true);
+  });
+
+  it("end-to-end: completing every lesson reaches 100%", async () => {
+    const c = buildTestContainer();
+    const { enrollment } = seedCourseAndEnrollment(c);
+    await c.enrollmentRepo.create(enrollment);
+
+    await c.markLessonComplete.execute({
+      userId: "user-1",
+      courseId: "course-1",
+      lessonId: "lesson-1",
+    });
+    const result = await c.markLessonComplete.execute({
+      userId: "user-1",
+      courseId: "course-1",
+      lessonId: "lesson-2",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.progressPercent).toBe(100);
+  });
+
+  it("is idempotent: marking the same lesson twice does not double-count", async () => {
+    const c = buildTestContainer();
+    const { enrollment } = seedCourseAndEnrollment(c);
+    await c.enrollmentRepo.create(enrollment);
+
+    await c.markLessonComplete.execute({
+      userId: "user-1",
+      courseId: "course-1",
+      lessonId: "lesson-1",
+    });
+    const result = await c.markLessonComplete.execute({
+      userId: "user-1",
+      courseId: "course-1",
+      lessonId: "lesson-1",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.progressPercent).toBe(50);
+    expect(result.value.enrollment.completedLessonIds).toEqual(["lesson-1"]);
+  });
+
+  it("rejects a lesson that is not in the course curriculum", async () => {
+    const c = buildTestContainer();
+    const { enrollment } = seedCourseAndEnrollment(c);
+    await c.enrollmentRepo.create(enrollment);
+
+    const result = await c.markLessonComplete.execute({
+      userId: "user-1",
+      courseId: "course-1",
+      lessonId: "not-a-lesson",
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("lesson_not_in_course");
+  });
+
+  it("rejects a user with no enrollment", async () => {
+    const c = buildTestContainer();
+    seedCourseAndEnrollment(c);
+
+    const result = await c.markLessonComplete.execute({
+      userId: "stranger",
+      courseId: "course-1",
+      lessonId: "lesson-1",
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("enrollment_not_found");
+  });
+});

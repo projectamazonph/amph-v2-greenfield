@@ -72,6 +72,8 @@ import { PrismaLessonRepository } from "@/infra/repositories/PrismaLessonReposit
 import { PrismaOrderRepository } from "@/infra/repositories/PrismaOrderRepository";
 import { PrismaSessionRepository } from "@/infra/repositories/PrismaSessionRepository";
 import { PrismaEnrollmentRepository } from "@/infra/repositories/PrismaEnrollmentRepository";
+import { PrismaProgressEventRepository } from "@/infra/repositories/PrismaProgressEventRepository";
+import type { IProgressEventRepository } from "@/ports/repositories/IProgressEventRepository";
 import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscountCodeRepository";
 import { PrismaQuizRepository } from "@/infra/repositories/PrismaQuizRepository";
 import { PrismaQuizAttemptRepository } from "@/infra/repositories/PrismaQuizAttemptRepository";
@@ -143,6 +145,7 @@ import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
+import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
 import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
@@ -252,6 +255,7 @@ export interface AppContainer {
   courseRepo: CourseRepository;
   orderRepo: IOrderRepository;
   enrollmentRepo: IEnrollmentRepository;
+  progressEventRepo: IProgressEventRepository;
   discountCodeRepo: IDiscountCodeRepository;
   quizRepo: IQuizRepository;
   quizAttemptRepo: IQuizAttemptRepository;
@@ -303,6 +307,8 @@ export interface AppContainer {
   checkCourseAccess: CheckCourseAccess;
   // P0-5: per-lesson access decision (single source of truth)
   authorizeLessonAccess: AuthorizeLessonAccess;
+  // STORY-027: student marks a lesson complete (progress, XP, certificates)
+  markLessonComplete: MarkLessonComplete;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
   // STORY-050d: admin discount code CRUD
@@ -431,6 +437,7 @@ function buildProductionContainer(): AppContainer {
   const orderRepo: IOrderRepository = new PrismaOrderRepository(prisma);
 
   const enrollmentRepo: IEnrollmentRepository = new PrismaEnrollmentRepository(prisma);
+  const progressEventRepo: IProgressEventRepository = new PrismaProgressEventRepository(prisma);
   const discountCodeRepo: IDiscountCodeRepository = new PrismaDiscountCodeRepository(prisma);
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
   const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
@@ -535,6 +542,17 @@ function buildProductionContainer(): AppContainer {
       userRepo,
       courseRepo,
       enrollmentRepo,
+    }),
+    progressEventRepo,
+    // STORY-027: student marks a lesson complete
+    markLessonComplete: new MarkLessonComplete({
+      enrollmentRepo,
+      courseRepo,
+      progressEventRepo,
+      xpEventRepo,
+      userRepo,
+      idGen,
+      clock,
     }),
     enrollStudent: new EnrollStudent({
       userRepo,

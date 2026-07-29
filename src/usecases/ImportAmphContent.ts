@@ -28,6 +28,7 @@ import { createLesson, updateLesson } from "@/domain/entities/Lesson";
 import type { ILessonRepository, LessonError } from "@/ports/repositories/ILessonRepository";
 import type { CourseRepository, CourseError } from "@/ports/repositories/CourseRepository";
 import { createCourse } from "@/domain/entities/Course";
+import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 
 // ── Result types ───────────────────────────────────────────────────────────────
 
@@ -35,6 +36,8 @@ export interface ImportAmphContentResult {
   readonly coursesCreated: number;
   readonly modulesUpserted: number;
   readonly lessonsUpserted: number;
+  /** Course slugs whose `Course.curriculum` was rebuilt from the imported rows. */
+  readonly curriculaRebuilt: readonly string[];
 }
 
 export type ImportAmphContentError =
@@ -94,6 +97,22 @@ export interface ImportAmphContentOptions {
 export class ImportAmphContent {
   constructor(private readonly options: ImportAmphContentOptions) {}
 
+  /**
+   * Built from the same three repos this use case already holds, in the
+   * same style as `MarkLessonComplete` building its own `AwardXP`. The
+   * import writes Module/Lesson rows, but every student-facing read of a
+   * lesson (the lesson page, `AuthorizeLessonAccess`, `MarkLessonComplete`)
+   * goes through the denormalized `Course.curriculum` JSON. Leaving that at
+   * the stub written in step 2 makes every imported lesson 404.
+   */
+  private get rebuildCourseCurriculum(): RebuildCourseCurriculum {
+    return new RebuildCourseCurriculum({
+      courseRepo: this.options.courseRepo,
+      moduleRepo: this.options.moduleRepo,
+      lessonRepo: this.options.lessonRepo,
+    });
+  }
+
   async execute(): Promise<Result<ImportAmphContentResult, ImportAmphContentError>> {
     const { idGen } = this.options;
 
@@ -107,6 +126,8 @@ export class ImportAmphContent {
     let coursesCreated = 0;
     let modulesUpserted = 0;
     let lessonsUpserted = 0;
+    /** slug → id, for the curriculum rebuild in step 4. */
+    const importedCourseIds = new Map<string, string>();
 
     // Step 2: ensure the two target courses exist
     for (const targetSlug of ["ppc-foundations", "accelerated-mastery"]) {
@@ -234,9 +255,20 @@ export class ImportAmphContent {
           lessonsUpserted++;
         }
       }
+
+      importedCourseIds.set(group.courseSlug, course.id);
     }
 
-    return Result.ok({ coursesCreated, modulesUpserted, lessonsUpserted });
+    // Step 4: rebuild `Course.curriculum` from the rows just written.
+    // Without this the course keeps the stub curriculum from step 2 and
+    // every lesson link off the catalog page resolves to a 404.
+    const curriculaRebuilt: string[] = [];
+    for (const [slug, courseId] of importedCourseIds) {
+      const { rebuilt } = await this.rebuildCourseCurriculum.execute(courseId);
+      if (rebuilt) curriculaRebuilt.push(slug);
+    }
+
+    return Result.ok({ coursesCreated, modulesUpserted, lessonsUpserted, curriculaRebuilt });
   }
 
   private async upsertModule(params: {
