@@ -85,7 +85,7 @@ const COURSES = [
     title: "PPC Foundations",
     tagline: "You can support a safe Sponsored Products launch and explain the numbers behind it.",
     description: "Build a listing-readiness checklist, a profitability and max-CPC worksheet, a keyword map, and a campaign-build rationale.",
-    priceMinor: 499900,
+    priceMinor: 299900,
     tier: "foundations",
   },
   {
@@ -93,7 +93,7 @@ const COURSES = [
     title: "Accelerated Mastery",
     tagline: "You can run a structured weekly optimization cycle and report the outcome.",
     description: "Build a search-term action log, a bid-change plan, a budget decision log, and a one-page client report.",
-    priceMinor: 999900,
+    priceMinor: 599900,
     tier: "accelerated",
   },
   {
@@ -101,7 +101,7 @@ const COURSES = [
     title: "Ultimate Transformation",
     tagline: "You can present a small account plan and operate like a dependable junior PPC specialist.",
     description: "Build a reviewed portfolio, a recorded walkthrough, and an interview-ready story.",
-    priceMinor: 1499900,
+    priceMinor: 999900,
     tier: "ultimate",
   },
 ];
@@ -428,7 +428,7 @@ const TIERS = [
   {
     slug: "foundations",
     name: "PPC Foundations",
-    priceMinor: 499900,
+    priceMinor: 299900,
     currency: "PHP",
     status: "ACTIVE",
     displayOrder: 1,
@@ -436,7 +436,7 @@ const TIERS = [
   {
     slug: "accelerated",
     name: "Accelerated Mastery",
-    priceMinor: 999900,
+    priceMinor: 599900,
     currency: "PHP",
     status: "ACTIVE",
     displayOrder: 2,
@@ -444,7 +444,7 @@ const TIERS = [
   {
     slug: "ultimate",
     name: "Ultimate Transformation",
-    priceMinor: 1499900,
+    priceMinor: 999900,
     currency: "PHP",
     status: "ACTIVE",
     displayOrder: 3,
