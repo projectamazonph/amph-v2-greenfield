@@ -83,11 +83,12 @@
   color: inherit;
   transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   min-width: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 .card:hover {
   border-color: var(--ink-300);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .cardTitle {

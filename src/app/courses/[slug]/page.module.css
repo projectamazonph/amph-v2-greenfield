@@ -177,6 +177,7 @@
   border: 1px solid var(--border);
   background: var(--surface-1);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .sectionSummary {

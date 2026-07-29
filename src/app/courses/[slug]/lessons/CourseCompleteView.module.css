@@ -16,14 +16,14 @@
 .trophyWrapper {
   margin-bottom: var(--space-6);
   border-radius: var(--radius-full);
-  background: #fef3c7;
+  background: var(--warning-soft);
   padding: var(--space-6);
 }
 
 .trophyIcon {
   width: 64px;
   height: 64px;
-  color: #eab308;
+  color: var(--warning);
 }
 
 .heading {

@@ -32,7 +32,7 @@
   padding: 2px 8px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   align-self: flex-start;
 }
 
