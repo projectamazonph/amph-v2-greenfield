@@ -1,16 +1,19 @@
 /**
  * bid-elevator/actions.ts — server actions for the Bid Elevator simulator.
  *
- * STORY-068: Bid Elevator Rebuild (Scoring Engine Integration).
+ * STORY-079: Bid Elevator economic model rewrite.
  *
  * `bidElevatorAttempt()` follows the full attempt lifecycle:
  *   1. StartSimulatorAttempt — creates the attempt record
  *   2. BidElevatorSimulator.run() — computes dimension scores from user bid adjustments
  *   3. GradeSimulatorAttempt — persists the grade with score dimensions
  *   4. ComposeAttemptFeedback — generates actionable student feedback
+ * It requires an authenticated session.
  *
- * Legacy `runBidElevator()` is kept for backward compatibility. It calls the
- * simulator directly with no user adjustments, so scoreDimensions is always null.
+ * `runBidElevator()` is the legacy, unauthenticated, preview-only entry
+ * point the public practice page still uses: it calls the simulator
+ * directly with no user adjustments, so scoreDimensions is always null.
+ * Kept ungated so the practice tool stays reachable without a login.
  */
 
 "use server";
@@ -20,7 +23,10 @@ import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
-import type { BidElevatorInput } from "@/domain/simulator/bid-elevator/BidElevatorInput";
+import type {
+  BidElevatorInput,
+  BidElevatorKeywordScenario,
+} from "@/domain/simulator/bid-elevator/BidElevatorInput";
 import type {
   BidElevatorOutput,
   BidRecommendation,
@@ -28,25 +34,58 @@ import type {
 } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
 
-// ── Input types ─────────────────────────────────────────────────────────
+// ── Zod schema (shared) ────────────────────────────────────────────────
+
+const keywordScenarioSchema = z.object({
+  keywordId: z.string().min(1),
+  keyword: z.string().min(1),
+  matchType: z.enum(["exact", "phrase", "broad"]),
+  intent: z.enum(["branded", "generic", "competitor", "category"]),
+  strategicRole: z.enum(["defense", "research", "performance"]),
+  currentBid: z.number().nonnegative(),
+  baselineBid: z.number().nonnegative(),
+  baselineCtrPct: z.number().nonnegative(),
+  baselineCvrPct: z.number().nonnegative(),
+  revenuePerOrder: z.number().positive().optional(),
+  benchmarkCpc: z.number().nonnegative(),
+  availableImpressionsPerDay: z.number().nonnegative(),
+  maxImpressionSharePct: z.number().min(0).max(100),
+  bidElasticity: z.number().positive(),
+  evidenceClicks: z.number().nonnegative(),
+  evidenceOrders: z.number().nonnegative(),
+  evidenceWindowDays: z.number().nonnegative(),
+});
+
+const scenarioSchema = z.object({
+  currencyCode: z.string().min(1),
+  dailyBudget: z.number().positive(),
+  simulationDays: z.number().positive(),
+  targetRoas: z.number().positive(),
+  breakEvenAcosPct: z.number().positive(),
+  defaultRevenuePerOrder: z.number().positive(),
+  minimumBidIncrement: z.number().positive(),
+  maxBidChangePct: z.number().positive().optional(),
+  keywords: z.array(keywordScenarioSchema).min(1),
+});
+
+// ── bidElevatorAttempt: full graded lifecycle (authenticated) ─────────
 
 export interface BidElevatorAttemptInput {
-  readonly keywords: ReadonlyArray<{
-    readonly keyword: string;
-    readonly currentBid: number;
-    readonly currentCpc: number;
-    readonly volume: number;
-  }>;
-  readonly budget: number;
+  readonly currencyCode: string;
+  readonly dailyBudget: number;
+  readonly simulationDays: number;
   readonly targetRoas: number;
+  readonly breakEvenAcosPct: number;
+  readonly defaultRevenuePerOrder: number;
+  readonly minimumBidIncrement: number;
+  readonly maxBidChangePct?: number;
+  readonly keywords: readonly BidElevatorKeywordScenario[];
   readonly scenarioId?: string;
   /** Defaults to "practice" */
   readonly mode?: SimulatorMode;
-  /** User-submitted bid adjustments (keyword → bid amount) */
+  /** Student-submitted bid adjustments, keyed by keywordId */
   readonly userBidAdjustments?: Readonly<Record<string, number>>;
 }
-
-// ── Response types ─────────────────────────────────────────────────────
 
 export interface BidElevatorAttemptResult {
   readonly attemptId: string;
@@ -80,25 +119,11 @@ export type BidElevatorAttemptResponse =
       };
     };
 
-// ── Zod schema ─────────────────────────────────────────────────────────
-
-const keywordSchema = z.object({
-  keyword: z.string().min(1),
-  currentBid: z.number().nonnegative(),
-  currentCpc: z.number().nonnegative(),
-  volume: z.number().nonnegative(),
-});
-
-const bidElevatorAttemptSchema = z.object({
-  keywords: z.array(keywordSchema).min(1),
-  budget: z.number().positive(),
-  targetRoas: z.number().positive(),
+const bidElevatorAttemptSchema = scenarioSchema.extend({
   scenarioId: z.string().optional(),
   mode: z.enum(["guided", "practice", "challenge", "credential", "instructor"]).optional(),
   userBidAdjustments: z.record(z.string(), z.number().nonnegative()).optional(),
 });
-
-// ── bidElevatorAttempt ─────────────────────────────────────────────────
 
 export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAttemptResponse> {
   // ── 1. Validate ────────────────────────────────────────────────────
@@ -113,7 +138,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
     };
   }
 
-  const { keywords, budget, targetRoas, scenarioId, mode, userBidAdjustments } = parseResult.data;
+  const { scenarioId, mode, userBidAdjustments, ...scenario } = parseResult.data;
   const resolvedMode: SimulatorMode = mode ?? "practice";
   const container = buildContainer();
 
@@ -150,9 +175,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
   }
 
   const domainInput: BidElevatorInput = {
-    keywords,
-    budget,
-    targetRoas,
+    ...scenario,
     ...(userBidAdjustments !== undefined ? { userBidAdjustments } : {}),
   };
 
@@ -244,60 +267,49 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
   };
 }
 
-// ── Legacy: runBidElevator ──────────────────────────────────────────────
+// ── runBidElevator: legacy, unauthenticated, preview-only ──────────────
 
-export type RunBidElevatorInput = {
-  keywords: ReadonlyArray<{
-    keyword: string;
-    currentBid: number;
-    currentCpc: number;
-    volume: number;
-  }>;
-  budget: number;
-  targetRoas: number;
-};
+export interface RunBidElevatorInput {
+  readonly currencyCode: string;
+  readonly dailyBudget: number;
+  readonly simulationDays: number;
+  readonly targetRoas: number;
+  readonly breakEvenAcosPct: number;
+  readonly defaultRevenuePerOrder: number;
+  readonly minimumBidIncrement: number;
+  readonly maxBidChangePct?: number;
+  readonly keywords: readonly BidElevatorKeywordScenario[];
+  /** Student-submitted bid adjustments, keyed by keywordId */
+  readonly userBidAdjustments?: Readonly<Record<string, number>>;
+}
 
 export type RunBidElevatorResult =
   | { ok: true; value: BidElevatorOutput }
   | { ok: false; error: { kind: "invalid_input" | "engine_error"; message: string } };
 
+const runBidElevatorSchema = scenarioSchema.extend({
+  userBidAdjustments: z.record(z.string(), z.number().nonnegative()).optional(),
+});
+
 /**
- * Legacy server action — kept for backward compatibility.
- * Calls the simulator directly with no user adjustments, so scoreDimensions
- * is always null and score is computed from the ROAS formula (existing behavior).
+ * Legacy server action — kept for backward compatibility and to keep the
+ * public practice page unauthenticated. Calls the simulator directly; when
+ * userBidAdjustments is provided it returns graded scoreDimensions, but no
+ * attempt record is created (no persistence, no feedback).
  */
-export async function runBidElevator(input: RunBidElevatorInput): Promise<RunBidElevatorResult> {
-  if (
-    !input ||
-    !Array.isArray(input.keywords) ||
-    input.keywords.length === 0 ||
-    typeof input.budget !== "number" ||
-    input.budget <= 0 ||
-    typeof input.targetRoas !== "number" ||
-    input.targetRoas <= 0
-  ) {
+export async function runBidElevator(input: unknown): Promise<RunBidElevatorResult> {
+  const parseResult = runBidElevatorSchema.safeParse(input);
+  if (!parseResult.success) {
     return {
       ok: false,
-      error: { kind: "invalid_input", message: "Need ≥1 keyword, budget > 0, target ROAS > 0" },
+      error: {
+        kind: "invalid_input",
+        message: parseResult.error.issues.map((i) => i.message).join("; "),
+      },
     };
   }
-  for (const k of input.keywords) {
-    if (
-      typeof k.keyword !== "string" ||
-      typeof k.currentBid !== "number" ||
-      k.currentBid < 0 ||
-      typeof k.currentCpc !== "number" ||
-      k.currentCpc < 0 ||
-      typeof k.volume !== "number" ||
-      k.volume < 0
-    ) {
-      return {
-        ok: false,
-        error: { kind: "invalid_input", message: `Bad keyword: ${JSON.stringify(k)}` },
-      };
-    }
-  }
 
+  const { userBidAdjustments, ...scenario } = parseResult.data;
   const container = buildContainer();
   const sim = container.simulatorRegistry.get("bid-elevator");
   if (!sim) {
@@ -308,10 +320,10 @@ export async function runBidElevator(input: RunBidElevatorInput): Promise<RunBid
   }
 
   const domainInput: BidElevatorInput = {
-    keywords: input.keywords as readonly KeywordBid[],
-    budget: input.budget,
-    targetRoas: input.targetRoas,
+    ...scenario,
+    ...(userBidAdjustments !== undefined ? { userBidAdjustments } : {}),
   };
+
   try {
     const output = (await sim.run(domainInput)) as BidElevatorOutput;
     return { ok: true, value: output };
@@ -325,6 +337,3 @@ export async function runBidElevator(input: RunBidElevatorInput): Promise<RunBid
     };
   }
 }
-
-// re-export for consumers
-type KeywordBid = import("@/domain/simulator/bid-elevator/BidElevatorInput").KeywordBid;

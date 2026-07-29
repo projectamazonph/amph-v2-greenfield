@@ -1,10 +1,11 @@
 /**
  * bid-elevator actions — server action contract tests.
  *
- * STORY-068: Bid Elevator Rebuild (Scoring Engine Integration).
+ * STORY-079: Bid Elevator economic model rewrite.
  *
- * Tests both the new bidElevatorAttempt() lifecycle function and the
- * legacy runBidElevator() backward-compatibility wrapper.
+ * Tests both the bidElevatorAttempt() lifecycle function (authenticated,
+ * full grading) and the runBidElevator() legacy wrapper (unauthenticated,
+ * used by the public practice page).
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -25,6 +26,7 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
+import type { BidElevatorKeywordScenario } from "@/domain/simulator/bid-elevator/BidElevatorInput";
 import { bidElevatorAttempt, runBidElevator } from "../actions";
 
 const mockContainer = {
@@ -42,48 +44,60 @@ const fakeSimulator = {
 
 // ── Fixtures ──────────────────────────────────────────────────────────
 
-const GRADED_ATTEMPT: SimulatorAttempt = {
-  id: "sys-attempt-1",
-  attemptId: "ATT-BID001",
-  userId: "system",
-  simulatorId: "bid-elevator",
-  scenarioId: "bid-elevator-scenario-default",
-  scenarioVersion: 1,
-  difficulty: "beginner",
-  mode: "practice",
-  status: "graded",
-  seed: "SEED9999",
-  score: 80,
-  scoreDimensions: {
-    bidAccuracy: 80,
-    budgetAdherence: 90,
-    roasHit: 100,
-  },
-  startedAt: new Date(),
-  submittedAt: new Date(),
-  gradedAt: new Date(),
-  decisions: [],
+function keyword(overrides: Partial<BidElevatorKeywordScenario> = {}): BidElevatorKeywordScenario {
+  return {
+    keywordId: "kw1",
+    keyword: "running shoes",
+    matchType: "exact",
+    intent: "generic",
+    strategicRole: "performance",
+    currentBid: 1.0,
+    baselineBid: 1.0,
+    baselineCtrPct: 2,
+    baselineCvrPct: 10,
+    benchmarkCpc: 0.8,
+    availableImpressionsPerDay: 1000,
+    maxImpressionSharePct: 40,
+    bidElasticity: 1.5,
+    evidenceClicks: 40,
+    evidenceOrders: 5,
+    evidenceWindowDays: 30,
+    ...overrides,
+  };
+}
+
+const SCENARIO_BASE = {
+  currencyCode: "USD",
+  dailyBudget: 50,
+  simulationDays: 1,
+  targetRoas: 3.0,
+  breakEvenAcosPct: 45,
+  defaultRevenuePerOrder: 30,
+  minimumBidIncrement: 0.05,
 };
 
 const SIM_OUTPUT: BidElevatorOutput = {
   bids: [
     {
+      keywordId: "kw1",
       keyword: "running shoes",
+      matchType: "exact",
+      intent: "generic",
+      strategicRole: "performance",
       groundTruth: 1.2,
       currentBid: 1.0,
+      benchmarkCpc: 0.8,
+      economicCeiling: 1.5,
+      estimatedImpressions: 500,
+      estimatedClicks: 10,
       estimatedCpc: 0.8,
-      volume: 1000,
+      estimatedSpend: 8,
+      estimatedOrders: 1,
+      estimatedSales: 30,
+      keywordRoas: 3.75,
+      confidence: "high",
       userBid: 1.2,
       isCorrect: true,
-    },
-    {
-      keyword: "jogging shoes",
-      groundTruth: 0.9,
-      currentBid: 0.8,
-      estimatedCpc: 0.6,
-      volume: 500,
-      userBid: 2.5,
-      isCorrect: false,
     },
   ],
   estimatedSpend: 25,
@@ -110,7 +124,7 @@ function happyContainer() {
     Result.ok({
       attemptId: "ATT-BID001",
       overallScore: 80,
-      scoreDimensions: { bidAccuracy: 80, budgetAdherence: 90, roasHit: 100, explanation: 100 },
+      scoreDimensions: { bidAccuracy: 50, budgetAdherence: 100, roasHit: 100 },
       isPassed: true,
       gradedAt: new Date(),
     }),
@@ -124,7 +138,7 @@ function happyContainer() {
         scenarioId: "bid-elevator-scenario-default",
         difficulty: "beginner",
         mode: "practice",
-        overallScore: 80,
+        overallScore: 50,
         passed: true,
         overallComment: "Solid bid management.",
         remediationLinks: ["/courses/ppc-101"],
@@ -134,36 +148,12 @@ function happyContainer() {
     }),
   );
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
-  // Dynamic mock: return scoreDimensions only when userBidAdjustments is provided
-  // Returns values matching SIM_OUTPUT fixture when user adjustments are present
   fakeSimulator.run.mockImplementation(
-    async (input: {
-      keywords: readonly { keyword: string; currentBid: number }[];
-      userBidAdjustments?: Record<string, number>;
-    }) => {
-      const hasUserBids = input.userBidAdjustments !== undefined;
-      const bids = input.keywords.map((k) => {
-        const gt = 1.2; // matches SIM_OUTPUT groundTruth
-        const ub = hasUserBids ? input.userBidAdjustments![k.keyword] : undefined;
-        return {
-          keyword: k.keyword,
-          groundTruth: gt,
-          currentBid: k.currentBid,
-          estimatedCpc: 0.8,
-          volume: 1000,
-          ...(ub !== undefined ? { userBid: ub, isCorrect: ub === gt } : {}),
-        };
-      });
-      return {
-        bids,
-        estimatedSpend: 20,
-        estimatedRoas: 3.0,
-        score: hasUserBids ? 50 : 100, // matches SIM_OUTPUT.score
-        scoreDimensions: hasUserBids
-          ? { bidAccuracy: 50, budgetAdherence: 100, roasHit: 100, explanation: 100 }
-          : null,
-      };
-    },
+    async (input: { userBidAdjustments?: Record<string, number> }) => ({
+      ...SIM_OUTPUT,
+      scoreDimensions: input.userBidAdjustments !== undefined ? SIM_OUTPUT.scoreDimensions : null,
+      score: input.userBidAdjustments !== undefined ? 50 : 100,
+    }),
   );
 }
 
@@ -174,7 +164,6 @@ function setupGetContainer() {
 beforeEach(() => {
   vi.clearAllMocks();
   setupGetContainer();
-  // Authenticated by default for existing tests
   (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue("user_123");
 });
 
@@ -182,47 +171,38 @@ beforeEach(() => {
 
 describe("bidElevatorAttempt", () => {
   it("returns unauthorized when user is not authenticated", async () => {
-    // Override the default auth mock to return null
     (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
-    const result = await bidElevatorAttempt({
-      keywords: [{ keyword: "running shoes", currentBid: 1.0, currentCpc: 0.8, volume: 1000 }],
-      budget: 50,
-      targetRoas: 3.0,
-    });
+    const result = await bidElevatorAttempt({ ...SCENARIO_BASE, keywords: [keyword()] });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("unauthorized");
   });
 
   const validInput = {
-    keywords: [
-      { keyword: "running shoes", currentBid: 1.0, currentCpc: 0.8, volume: 1000 },
-      { keyword: "jogging shoes", currentBid: 0.8, currentCpc: 0.6, volume: 500 },
-    ],
-    budget: 50,
-    targetRoas: 3.0,
-    userBidAdjustments: { "running shoes": 1.2, "jogging shoes": 2.5 },
+    ...SCENARIO_BASE,
+    keywords: [keyword(), keyword({ keywordId: "kw2", keyword: "jogging shoes" })],
+    userBidAdjustments: { kw1: 1.2, kw2: 2.5 },
   };
 
   it("returns validation_error when keywords is missing", async () => {
-    const result = await bidElevatorAttempt({ budget: 50, targetRoas: 3.0 });
+    const result = await bidElevatorAttempt({ ...SCENARIO_BASE });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_error");
   });
 
   it("returns validation_error when keywords array is empty", async () => {
-    const result = await bidElevatorAttempt({ keywords: [], budget: 50, targetRoas: 3.0 });
+    const result = await bidElevatorAttempt({ ...SCENARIO_BASE, keywords: [] });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_error");
   });
 
-  it("returns validation_error when budget is not positive", async () => {
+  it("returns validation_error when dailyBudget is not positive", async () => {
     const result = await bidElevatorAttempt({
-      keywords: validInput.keywords,
-      budget: 0,
-      targetRoas: 3.0,
+      ...SCENARIO_BASE,
+      dailyBudget: 0,
+      keywords: [keyword()],
     });
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -231,9 +211,9 @@ describe("bidElevatorAttempt", () => {
 
   it("returns validation_error when targetRoas is not positive", async () => {
     const result = await bidElevatorAttempt({
-      keywords: validInput.keywords,
-      budget: 50,
+      ...SCENARIO_BASE,
       targetRoas: -1,
+      keywords: [keyword()],
     });
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -246,17 +226,14 @@ describe("bidElevatorAttempt", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
-    // startSimulatorAttempt called
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
       expect.objectContaining({ simulatorId: "bid-elevator", mode: "practice" }),
     );
 
-    // simulator run called
     expect(fakeSimulator.run).toHaveBeenCalledWith(
-      expect.objectContaining({ keywords: validInput.keywords, budget: 50, targetRoas: 3.0 }),
+      expect.objectContaining({ keywords: validInput.keywords, dailyBudget: 50, targetRoas: 3.0 }),
     );
 
-    // gradeSimulatorAttempt called
     expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalledWith(
       expect.objectContaining({
         attemptId: "ATT-BID001",
@@ -264,12 +241,10 @@ describe("bidElevatorAttempt", () => {
       }),
     );
 
-    // composeAttemptFeedback called
     expect(mockContainer.composeAttemptFeedback.execute).toHaveBeenCalledWith({
       attemptId: "ATT-BID001",
     });
 
-    // response shape
     expect(result.value.attemptId).toBe("ATT-BID001");
     expect(result.value.overallScore).toBe(50);
     expect(result.value.scoreDimensions).not.toBeNull();
@@ -316,7 +291,7 @@ describe("bidElevatorAttempt", () => {
     const result = await bidElevatorAttempt(validInput);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.bids).toHaveLength(2);
+    expect(result.value.bids).toHaveLength(1);
     expect(result.value.bids[0]!.keyword).toBe("running shoes");
     expect(result.value.bids[0]!.groundTruth).toBe(1.2);
     expect(result.value.bids[0]!.userBid).toBe(1.2);
@@ -325,12 +300,7 @@ describe("bidElevatorAttempt", () => {
 
   it("preview mode (no userBidAdjustments) skips grading and feedback", async () => {
     happyContainer();
-    const previewInput = {
-      keywords: validInput.keywords,
-      budget: 50,
-      targetRoas: 3.0,
-      // no userBidAdjustments
-    };
+    const previewInput = { ...SCENARIO_BASE, keywords: [keyword()] };
     const result = await bidElevatorAttempt(previewInput);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -344,11 +314,7 @@ describe("bidElevatorAttempt", () => {
 
   it("uses provided scenarioId and mode in startSimulatorAttempt", async () => {
     happyContainer();
-    await bidElevatorAttempt({
-      ...validInput,
-      scenarioId: "my-scenario",
-      mode: "challenge",
-    });
+    await bidElevatorAttempt({ ...validInput, scenarioId: "my-scenario", mode: "challenge" });
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
       expect.objectContaining({ scenarioId: "my-scenario", mode: "challenge" }),
     );
@@ -363,27 +329,24 @@ describe("bidElevatorAttempt", () => {
   });
 });
 
-// ── runBidElevator (legacy) tests ─────────────────────────────────────
+// ── runBidElevator (legacy, unauthenticated) ────────────────────────────
 
-describe("runBidElevator (legacy)", () => {
+describe("runBidElevator", () => {
   const VALID_KEYWORDS = [
-    { keyword: "earbuds", currentBid: 1.0, currentCpc: 0.5, volume: 1000 },
-    { keyword: "headphones", currentBid: 1.5, currentCpc: 0.8, volume: 800 },
+    keyword({ keywordId: "earbuds", keyword: "earbuds" }),
+    keyword({ keywordId: "headphones", keyword: "headphones" }),
   ];
 
   beforeEach(() => {
     vi.clearAllMocks();
     setupGetContainer();
     mockContainer.simulatorRegistry.get.mockReturnValue(fakeSimulator);
-    // Return bids matching all input keywords
     fakeSimulator.run.mockImplementation(
-      async (input: { keywords: readonly { keyword: string }[] }) => ({
+      async (input: { keywords: readonly { keywordId: string; keyword: string }[] }) => ({
         bids: input.keywords.map((k) => ({
+          ...SIM_OUTPUT.bids[0]!,
+          keywordId: k.keywordId,
           keyword: k.keyword,
-          groundTruth: 1.0,
-          currentBid: 1.0,
-          estimatedCpc: 0.5,
-          volume: 1000,
         })),
         estimatedSpend: 20,
         estimatedRoas: 3.0,
@@ -393,29 +356,43 @@ describe("runBidElevator (legacy)", () => {
     );
   });
 
+  it("does not require authentication", async () => {
+    (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: VALID_KEYWORDS });
+    expect(result.ok).toBe(true);
+  });
+
   it("returns invalid_input when keywords is empty", async () => {
-    const result = await runBidElevator({ keywords: [], budget: 100, targetRoas: 4 });
+    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: [] });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("invalid_input");
   });
 
-  it("returns invalid_input when budget is 0", async () => {
-    const result = await runBidElevator({ keywords: VALID_KEYWORDS, budget: 0, targetRoas: 4 });
+  it("returns invalid_input when dailyBudget is 0", async () => {
+    const result = await runBidElevator({
+      ...SCENARIO_BASE,
+      dailyBudget: 0,
+      keywords: VALID_KEYWORDS,
+    });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("invalid_input");
   });
 
   it("returns invalid_input when targetRoas is not positive", async () => {
-    const result = await runBidElevator({ keywords: VALID_KEYWORDS, budget: 100, targetRoas: 0 });
+    const result = await runBidElevator({
+      ...SCENARIO_BASE,
+      targetRoas: 0,
+      keywords: VALID_KEYWORDS,
+    });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("invalid_input");
   });
 
   it("returns a score in 0-100 for valid input", async () => {
-    const result = await runBidElevator({ keywords: VALID_KEYWORDS, budget: 100, targetRoas: 4 });
+    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: VALID_KEYWORDS });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.score).toBeGreaterThanOrEqual(0);
@@ -423,15 +400,15 @@ describe("runBidElevator (legacy)", () => {
   });
 
   it("returns per-keyword bids matching input keywords", async () => {
-    const result = await runBidElevator({ keywords: VALID_KEYWORDS, budget: 100, targetRoas: 4 });
+    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: VALID_KEYWORDS });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     const keywords = result.value.bids.map((b) => b.keyword).sort();
     expect(keywords).toEqual(["earbuds", "headphones"]);
   });
 
-  it("scoreDimensions is null in legacy mode (preview only)", async () => {
-    const result = await runBidElevator({ keywords: VALID_KEYWORDS, budget: 100, targetRoas: 4 });
+  it("scoreDimensions is null without userBidAdjustments (preview only)", async () => {
+    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: VALID_KEYWORDS });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.scoreDimensions).toBeNull();

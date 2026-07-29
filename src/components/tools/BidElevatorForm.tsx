@@ -1,13 +1,14 @@
 /**
  * BidElevatorForm — client component.
  *
- * Renders the scenario's seed keywords as a table of editable bids.
- * The user tweaks the bid (₱ value) per keyword, then submits. The
- * server action runs the simulator and returns the result; the
- * parent page re-renders with the new result panel.
+ * STORY-079: Bid Elevator economic model rewrite. Renders the scenario's
+ * authored keywords as a table of editable bids. The user tweaks the bid
+ * per keyword, then submits; the server action runs the simulator and
+ * returns the result, which the parent page re-renders.
  *
- * Default values come from the Stitch spec: a high-spend
- * electronics campaign with 8 keywords. Currency is in USD.
+ * Per the STORY-079 scoping decision the tool is scenario-only: keyword
+ * economics (CTR, CVR, benchmark CPC, etc.) are authored server-side, not
+ * typed in by the student — only the bid is editable.
  */
 
 "use client";
@@ -17,41 +18,28 @@ import { useRouter } from "next/navigation";
 import styles from "./BidElevatorForm.module.css";
 import { runBidElevator, type RunBidElevatorInput } from "@/app/tools/bid-elevator/actions";
 
-export interface SeedKeyword {
-  keyword: string;
-  currentBid: number;
-  currentCpc: number;
-  volume: number;
-}
-
 interface Props {
-  budget: number;
-  targetRoas: number;
-  initialKeywords: ReadonlyArray<SeedKeyword>;
+  scenario: Omit<RunBidElevatorInput, "userBidAdjustments">;
 }
 
-export function BidElevatorForm({ budget, targetRoas, initialKeywords }: Props) {
+export function BidElevatorForm({ scenario }: Props) {
   const router = useRouter();
   const [bids, setBids] = useState<Record<string, number>>(() =>
-    Object.fromEntries(initialKeywords.map((k) => [k.keyword, k.currentBid])),
+    Object.fromEntries(scenario.keywords.map((k) => [k.keywordId, k.currentBid])),
   );
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const onChange = (keyword: string, value: number) => {
-    setBids((prev) => ({ ...prev, [keyword]: value }));
+  const onChange = (keywordId: string, value: number) => {
+    setBids((prev) => ({ ...prev, [keywordId]: value }));
   };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     const input: RunBidElevatorInput = {
-      budget,
-      targetRoas,
-      keywords: initialKeywords.map((k) => ({
-        ...k,
-        currentBid: bids[k.keyword] ?? k.currentBid,
-      })),
+      ...scenario,
+      userBidAdjustments: bids,
     };
     startTransition(async () => {
       const result = await runBidElevator(input);
@@ -72,11 +60,11 @@ export function BidElevatorForm({ budget, targetRoas, initialKeywords }: Props) 
       <div className={styles.metaRow}>
         <span className={styles.metaItem}>
           <span className={styles.metaLabel}>Daily budget</span>
-          <span className={styles.metaValue}>₱{budget.toLocaleString()}</span>
+          <span className={styles.metaValue}>₱{scenario.dailyBudget.toLocaleString()}</span>
         </span>
         <span className={styles.metaItem}>
           <span className={styles.metaLabel}>Target ROAS</span>
-          <span className={styles.metaValue}>{targetRoas.toFixed(1)}×</span>
+          <span className={styles.metaValue}>{scenario.targetRoas.toFixed(1)}×</span>
         </span>
       </div>
       <div className={styles.tableScroll} role="region" aria-label="Bid inputs" tabIndex={0}>
@@ -84,17 +72,17 @@ export function BidElevatorForm({ budget, targetRoas, initialKeywords }: Props) 
           <thead>
             <tr>
               <th>Keyword</th>
-              <th className={styles.thNum}>Volume</th>
-              <th className={styles.thNum}>Est. CPC</th>
+              <th className={styles.thNum}>Impr/day</th>
+              <th className={styles.thNum}>Benchmark CPC</th>
               <th className={styles.thNum}>Your bid</th>
             </tr>
           </thead>
           <tbody>
-            {initialKeywords.map((k) => (
-              <tr key={k.keyword}>
+            {scenario.keywords.map((k) => (
+              <tr key={k.keywordId}>
                 <td className={styles.tdKw}>{k.keyword}</td>
-                <td className={styles.tdNum}>{k.volume.toLocaleString()}</td>
-                <td className={styles.tdNum}>₱{k.currentCpc.toFixed(2)}</td>
+                <td className={styles.tdNum}>{k.availableImpressionsPerDay.toLocaleString()}</td>
+                <td className={styles.tdNum}>₱{k.benchmarkCpc.toFixed(2)}</td>
                 <td className={styles.tdNum}>
                   <span className={styles.inputWrap}>
                     <span className={styles.inputPrefix}>₱</span>
@@ -103,8 +91,8 @@ export function BidElevatorForm({ budget, targetRoas, initialKeywords }: Props) 
                       step="0.10"
                       min="0"
                       className={styles.input}
-                      value={bids[k.keyword] ?? k.currentBid}
-                      onChange={(e) => onChange(k.keyword, Number(e.target.value))}
+                      value={bids[k.keywordId] ?? k.currentBid}
+                      onChange={(e) => onChange(k.keywordId, Number(e.target.value))}
                       aria-label={`Bid for ${k.keyword}`}
                     />
                   </span>
