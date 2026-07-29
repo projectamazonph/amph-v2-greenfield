@@ -123,6 +123,23 @@
   display: none;
 }
 
+.loginLink {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 8px 11px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: color 200ms ease, background 200ms ease;
+}
+
+.loginLink:hover {
+  color: var(--accent-hover);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
 .burger {
   display: none;
   margin-left: auto;

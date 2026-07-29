@@ -20,6 +20,8 @@ export function TopBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [clock, setClock] = useState("--:--");
 
+  const loginLink = { href: "/login", label: "Log in" };
+
   useEffect(() => {
     function onScroll() {
       const y = window.scrollY;
@@ -70,6 +72,13 @@ export function TopBar() {
                 {link.label}
               </a>
             ))}
+            <a
+              href={loginLink.href}
+              className={styles.loginLink}
+              onClick={() => setMenuOpen(false)}
+            >
+              {loginLink.label}
+            </a>
             <a
               className={[shared.btn, shared.btnPrimary, styles.navCtaMobile].join(" ")}
               href={COURSES_URL}
