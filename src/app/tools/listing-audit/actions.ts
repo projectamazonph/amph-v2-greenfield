@@ -1,7 +1,9 @@
 /**
- * Listing Audit + Keyword Research — server actions.
+ * Listing Audit — server actions.
  *
  * STORY-070: Listing Audit Rebuild (Scoring Engine Integration).
+ * STORY-081 split Keyword Research into its own simulator/registry entry
+ * (src/app/tools/keyword-research/) -- it no longer shares this file.
  *
  * Adds `listingAuditAttempt()`, which follows the full attempt lifecycle
  * established by STORY-067/068/069 (STR Triage, Bid Elevator, Campaign
@@ -12,8 +14,7 @@
  *   3. GradeSimulatorAttempt — persists the grade with score dimensions
  *   4. ComposeAttemptFeedback — generates actionable student feedback
  *
- * `auditListing()` is kept as the legacy preview-only wrapper (mirrors
- * `classifyStr()`).
+ * `auditListing()` is kept as the legacy preview-only wrapper.
  */
 
 "use server";

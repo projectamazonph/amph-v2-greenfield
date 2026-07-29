@@ -2,38 +2,52 @@
  * StrTriageOutput: output types for the STR Triage simulator.
  *
  * STORY-067: STR Triage Rebuild (Scoring Engine Integration).
+ * STORY-082: Expand STR Triage classifier. TriageAction grows from 4 to 7
+ * values -- INSUFFICIENT_DATA is a real fifth (well, seventh) action:
+ * restraint is a valid decision when the evidence thresholds aren't met.
+ * See docs/stories/STORY-082.md.
  *
- * When userClassifications are provided, the simulator evaluates each
- * keyword classification against ground truth and returns per-dimension
- * scores that feed into GradeSimulatorAttempt.
- *
- * Scoring dimensions:
- *  direction     : % of keywords correctly classified (user === groundTruth)
- *  profitability : % of revenue preserved (kept/add keywords that weren't
- *                   pausable vs. total non-pausable revenue). Genuinely
- *                   revenue-based, so unlike Listing Audit's same-named
- *                   dimension this name is accurate and stays.
+ * Scoring dimensions (formulas unchanged by STORY-082, only which ground
+ * truths count as "removal" grows to match the wider action set):
+ *  direction     : % of terms correctly classified (user === groundTruth)
+ *  profitability : % of revenue preserved on terms whose ground truth was
+ *                  NOT a removal action (pause/negative_exact/
+ *                  negative_phrase). Genuinely revenue-based.
  *  reviewCoverage: % of rows the user assigned an action to (completion,
- *                   reported but NOT graded; was `dataSufficiency`)
- *
- * Sprint 14 removed the hardcoded `explanation: 100`. See
- * docs/audit-2026-07-26-simulator-accuracy-review.md.
+ *                   reported but NOT graded)
  */
 
-export type TriageAction = "keep" | "pause" | "add_as_exact" | "add_as_phrase";
+import type { BrandClass } from "./StrTriageInput";
+
+export type TriageAction =
+  | "harvest_exact"
+  | "harvest_phrase"
+  | "negative_exact"
+  | "negative_phrase"
+  | "keep"
+  | "pause"
+  | "insufficient_data";
 
 export interface KeywordClassification {
-  readonly keyword: string;
+  readonly searchTerm: string;
   /** Ground-truth correct action (simulator's classification) */
   readonly groundTruth: TriageAction;
   /** User's submitted action (undefined = not yet submitted) */
   readonly userChoice?: TriageAction;
-  /** ROAS for this keyword */
-  readonly roas: number;
-  /** Total spend for this keyword */
-  readonly spend: number;
-  /** Whether the user's choice matched ground truth */
+  /** Whether the user's choice matched ground truth. */
   readonly isCorrect: boolean;
+  /** ROAS for this search term (sales / spend). */
+  readonly roas: number;
+  readonly spend: number;
+  readonly brandClass: BrandClass;
+  /** Why the ground truth is what it is -- shown to the student as feedback. */
+  readonly reasoning: string;
+  /**
+   * Set when there's a branded/non-branded lane issue independent of the
+   * core action (e.g. a profitable own-brand term sitting in Research
+   * instead of Defense). Null when there's no routing concern.
+   */
+  readonly routingNote: string | null;
 }
 
 export interface StrTriageOutput {
@@ -54,15 +68,13 @@ export interface StrTriageOutput {
 
 /** Dimension scores fed into GradeSimulatorAttempt. */
 export interface ScoreDimensions {
-  /** % of keywords correctly classified (direction) */
+  /** % of terms correctly classified (direction) */
   readonly direction: number;
-  /** % of non-pausable revenue preserved by user's classification choices */
+  /** % of non-removal-ground-truth revenue preserved by user's classification choices */
   readonly profitability: number;
   /**
    * % of rows with a userChoice assigned. Completion, not judgement:
-   * reported for display only. It is NOT graded, and nothing currently
-   * gates submission on it: adding that gate is a UX decision.
-   * Was `dataSufficiency`. STORY-072, STORY-076.
+   * reported for display only. It is NOT a graded dimension.
    */
   readonly reviewCoverage: number;
 }

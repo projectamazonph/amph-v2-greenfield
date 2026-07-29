@@ -1,218 +1,321 @@
-/**
- * StrTriageSimulator unit tests.
- *
- * STORY-067: STR Triage Rebuild (Scoring Engine Integration).
- */
-
 import { describe, it, expect } from "vitest";
 import { StrTriageSimulator } from "@/domain/simulator/str-triage/StrTriageSimulator";
-import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
+import type {
+  StrTriageInput,
+  SearchTermRow,
+  ExistingTarget,
+} from "@/domain/simulator/str-triage/StrTriageInput";
 
-// ── Test fixtures ───────────────────────────────────────────────────────
-
-function makeRow(
-  keyword: string,
-  spend: number,
-  revenue: number,
-): { keyword: string; spend: number; revenue: number; orders: number } {
-  return { keyword, spend, revenue, orders: Math.floor(revenue / 50) };
+function baseInput(
+  rows: readonly SearchTermRow[],
+  overrides: Partial<StrTriageInput> = {},
+): StrTriageInput {
+  return {
+    rows,
+    averageOrderValue: 30,
+    expectedCtrPct: 4, // -> minImpressionsForCtrEvaluation = 250 (floor engaged)
+    expectedCvrPct: 5, // -> zeroOrderClickThreshold = 32
+    brandTargetRoas: 5, // -> targetCpa = 6
+    genericTargetRoas: 3, // -> targetCpa = 10
+    competitorTargetRoas: 4, // -> targetCpa = 7.5
+    confidenceLevel: 0.8,
+    minElapsedDays: 7,
+    minOrdersForWinner: 2,
+    brandLexicon: ["acme"],
+    competitorBrandLexicon: ["rivalco"],
+    existingTargets: [],
+    sourceCampaignRole: "research",
+    ...overrides,
+  };
 }
 
-const TARGET_ROAS = 3.0;
-
-// Row where ROAS = 9.0 (3× target), spend ratio = 0.08 → add_as_exact
-const ROW_ADD_EXACT = makeRow("good keyword", 2, 18); // roas=9, spend_ratio=0.08
-// Row where ROAS = 2.5 (0.83× target), spend ratio = 0.6 → add_as_phrase
-const ROW_ADD_PHRASE = makeRow("marginal keyword", 15, 37.5); // roas=2.5, spend_ratio=0.6
-// Row where ROAS = 1.0 (< target), spend ratio = 1.2 → pause
-const ROW_PAUSE = makeRow("bad keyword", 30, 30); // roas=1.0, spend_ratio=1.2
-// Row where ROAS = 4.0 (> target), spend ratio = 0.4 → keep
-const ROW_KEEP = makeRow("healthy keyword", 10, 40); // roas=4, spend_ratio=0.4
-
-function run(
-  rows: ReturnType<typeof makeRow>[],
-  userClassifications?: Record<string, "keep" | "pause" | "add_as_exact" | "add_as_phrase">,
-): ReturnType<StrTriageSimulator["run"]> {
-  const sim = new StrTriageSimulator();
-  return sim.run({ rows, targetRoas: TARGET_ROAS, userClassifications });
+function row(searchTerm: string, overrides: Partial<SearchTermRow> = {}): SearchTermRow {
+  return {
+    searchTerm,
+    impressions: 1000,
+    clicks: 50,
+    spend: 20,
+    orders: 0,
+    sales: 0,
+    elapsedDays: 14,
+    sourceCampaignId: "camp-research-1",
+    sourceAdGroupId: "ag-1",
+    sourceTarget: searchTerm,
+    sourceMatchType: "broad",
+    ...overrides,
+  };
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────
 
 describe("StrTriageSimulator", () => {
-  describe("ground truth classification (no userClassifications)", () => {
-    it("returns add_as_exact for high-ROAS low-spend keywords", async () => {
-      const result = await run([ROW_ADD_EXACT]);
-      expect(result.classifications[0]!.groundTruth).toBe("add_as_exact");
-      expect(result.scoreDimensions).toBeNull();
-      expect(result.score).toBe(100);
-    });
+  const sim = new StrTriageSimulator();
 
-    it("returns add_as_phrase for marginal-ROAS high-spend keywords", async () => {
-      const result = await run([ROW_ADD_PHRASE]);
-      expect(result.classifications[0]!.groundTruth).toBe("add_as_phrase");
-    });
-
-    it("returns pause for low-ROAS over-budget keywords", async () => {
-      const result = await run([ROW_PAUSE]);
-      expect(result.classifications[0]!.groundTruth).toBe("pause");
-    });
-
-    it("returns keep for healthy-ROAS reasonable-spend keywords", async () => {
-      const result = await run([ROW_KEEP]);
-      expect(result.classifications[0]!.groundTruth).toBe("keep");
-    });
-
-    it("returns empty result for empty rows", async () => {
-      const result = await run([]);
-      expect(result.classifications).toHaveLength(0);
-      expect(result.scoreDimensions).toBeNull();
-      expect(result.score).toBe(100);
-    });
-
-    it("computes correct ROAS values", async () => {
-      const result = await run([ROW_ADD_EXACT, ROW_PAUSE, ROW_KEEP]);
-      expect(result.classifications[0]!.roas).toBeCloseTo(9.0);
-      expect(result.classifications[1]!.roas).toBeCloseTo(1.0);
-      expect(result.classifications[2]!.roas).toBeCloseTo(4.0);
-    });
+  it("has the expected identity", () => {
+    expect(sim.simulatorId).toBe("str-triage");
+    expect(sim.name).toBe("STR Triage");
   });
 
-  describe("direction scoring (userClassifications provided)", () => {
-    it("direction = 100 when all classifications are correct", async () => {
-      const result = await run([ROW_ADD_EXACT, ROW_KEEP, ROW_PAUSE], {
-        "good keyword": "add_as_exact",
-        "healthy keyword": "keep",
-        "bad keyword": "pause",
-      });
-      expect(result.scoreDimensions).not.toBeNull();
-      expect(result.scoreDimensions!.direction).toBe(100);
-    });
-
-    it("direction = 0 when all classifications are wrong", async () => {
-      const result = await run([ROW_ADD_EXACT, ROW_KEEP, ROW_PAUSE], {
-        "good keyword": "pause",
-        "healthy keyword": "pause",
-        "bad keyword": "add_as_exact",
-      });
-      expect(result.scoreDimensions!.direction).toBe(0);
-    });
-
-    it("direction = 50 when half of classifications are correct", async () => {
-      const result = await run([ROW_ADD_EXACT, ROW_KEEP, ROW_PAUSE, ROW_ADD_PHRASE], {
-        "good keyword": "add_as_exact",
-        "healthy keyword": "pause",
-        "bad keyword": "pause",
-        "marginal keyword": "add_as_phrase",
-      });
-      // 3/4 correct = 75 (add_exact✓, keep✗, pause✓, add_phrase✓)
-      expect(result.scoreDimensions!.direction).toBe(75);
-    });
-
-    it("isCorrect is false when userChoice is undefined", async () => {
-      const result = await run([ROW_KEEP], {});
-      expect(result.classifications[0]!.isCorrect).toBe(false);
-    });
-
-    it("score equals direction score when grading", async () => {
-      const result = await run([ROW_KEEP, ROW_PAUSE], {
-        "healthy keyword": "keep",
-        "bad keyword": "pause",
-      });
-      expect(result.score).toBe(100);
-      expect(result.scoreDimensions!.direction).toBe(100);
-    });
-
-    it("score = 100 when no userClassifications (preview mode)", async () => {
-      const result = await run([ROW_KEEP, ROW_PAUSE]);
-      expect(result.score).toBe(100);
-      expect(result.scoreDimensions).toBeNull();
-    });
+  it("returns an empty result for zero rows", async () => {
+    const output = await sim.run(baseInput([]));
+    expect(output).toEqual({ classifications: [], scoreDimensions: null, score: 100 });
   });
 
-  describe("profitability scoring", () => {
-    it("profitability = 100 when all non-pausable revenue is preserved", async () => {
-      // add_exact and keep keywords are non-pausable — all preserved
-      const result = await run([ROW_ADD_EXACT, ROW_KEEP], {
-        "good keyword": "add_as_exact",
-        "healthy keyword": "keep",
-      });
-      expect(result.scoreDimensions!.profitability).toBe(100);
-    });
-
-    it("profitability penalizes pausing a non-pausable keyword", async () => {
-      // Non-pausable revenue = ROW_ADD_EXACT.revenue(18) + ROW_KEEP.revenue(40) = 58
-      // Pausing ROW_ADD_EXACT loses 18 revenue → preserved = 40
-      // score = 40/58 * 100 ≈ 69
-      const result = await run([ROW_ADD_EXACT, ROW_KEEP], {
-        "good keyword": "pause",
-        "healthy keyword": "keep",
-      });
-      const expected = Math.round((40 / 58) * 100);
-      expect(result.scoreDimensions!.profitability).toBe(expected);
-    });
-
-    it("profitability = 100 when all keywords are pausable (neutral)", async () => {
-      // Rows where ground truth is "pause"
-      const row1 = makeRow("keyword1", 50, 20); // roas=0.4, spend_ratio=2 → pause
-      const row2 = makeRow("keyword2", 40, 10); // roas=0.25, spend_ratio=1.6 → pause
-      const result = await run(
-        [row1, row2],
-        { keyword1: "pause", keyword2: "keep" }, // user chose differently
+  describe("insufficient_data", () => {
+    it("gates on elapsed days regardless of everything else", async () => {
+      const output = await sim.run(
+        baseInput([row("kitchen knife set", { orders: 5, sales: 500, elapsedDays: 3 })]),
       );
-      // All revenue is pausable, so it's neutral
-      expect(result.scoreDimensions!.profitability).toBe(100);
+      expect(output.classifications[0]!.groundTruth).toBe("insufficient_data");
     });
 
-    it("pausing a pausable keyword is neutral (correct action for pause)", async () => {
-      const row1 = makeRow("keyword1", 50, 20); // pause
-      const row2 = makeRow("keyword2", 5, 20); // add_as_exact
-      const result = await run([row1, row2], { keyword1: "pause", keyword2: "add_as_exact" });
-      // Non-pausable revenue = 20, all preserved → 100
-      expect(result.scoreDimensions!.profitability).toBe(100);
-    });
-  });
-
-  describe("reviewCoverage (reported, not graded)", () => {
-    it("reviewCoverage = 100 when all rows have a userChoice", async () => {
-      const result = await run([ROW_KEEP, ROW_PAUSE, ROW_ADD_EXACT], {
-        "healthy keyword": "keep",
-        "bad keyword": "pause",
-        "good keyword": "add_as_exact",
-      });
-      expect(result.scoreDimensions!.reviewCoverage).toBe(100);
+    it("flags too few orders as insufficient rather than guessing", async () => {
+      const output = await sim.run(
+        baseInput([row("kitchen knife set", { orders: 1, sales: 40, spend: 20 })]),
+      );
+      expect(output.classifications[0]!.groundTruth).toBe("insufficient_data");
     });
 
-    it("reviewCoverage = 50 when half the rows are unreviewed", async () => {
-      const result = await run([ROW_KEEP, ROW_PAUSE, ROW_ADD_EXACT, ROW_ADD_PHRASE], {
-        "healthy keyword": "keep",
-        "bad keyword": "pause",
-        // "good keyword" and "marginal keyword" unreviewed
-      });
-      // 2/4 reviewed = 50
-      expect(result.scoreDimensions!.reviewCoverage).toBe(50);
+    it("flags zero-order spend below targetCpa as insufficient", async () => {
+      const output = await sim.run(
+        baseInput([row("random accessory", { spend: 5, clicks: 40, impressions: 300 })]),
+      );
+      expect(output.classifications[0]!.groundTruth).toBe("insufficient_data");
     });
 
-    it("reviewCoverage = 0 when no rows are reviewed", async () => {
-      const result = await run([ROW_KEEP, ROW_PAUSE], {});
-      expect(result.scoreDimensions!.reviewCoverage).toBe(0);
+    it("flags zero-order clicks below the statistical threshold as insufficient", async () => {
+      const output = await sim.run(
+        baseInput([row("random accessory", { spend: 15, clicks: 20, impressions: 300 })]),
+      );
+      expect(output.classifications[0]!.groundTruth).toBe("insufficient_data");
+    });
+
+    it("flags zero-order impressions below the CTR-evaluation floor as insufficient", async () => {
+      const output = await sim.run(
+        baseInput([row("random accessory", { spend: 15, clicks: 40, impressions: 100 })]),
+      );
+      expect(output.classifications[0]!.groundTruth).toBe("insufficient_data");
     });
   });
 
-  describe("groundTruth and userChoice in output", () => {
-    it("groundTruth is always set regardless of userChoice", async () => {
-      const result = await run([ROW_KEEP], { "healthy keyword": "pause" });
-      expect(result.classifications[0]!.groundTruth).toBe("keep");
+  describe("winner path", () => {
+    it("harvests a fresh winner to exact with no existing target", async () => {
+      const output = await sim.run(
+        baseInput([row("kitchen knife set", { orders: 3, sales: 120, spend: 20 })]),
+      );
+      const c = output.classifications[0]!;
+      expect(c.groundTruth).toBe("harvest_exact");
+      expect(c.roas).toBe(6);
     });
 
-    it("userChoice is undefined when not provided", async () => {
-      const result = await run([ROW_KEEP]);
-      expect(result.classifications[0]!.userChoice).toBeUndefined();
+    it("keeps (doesn't duplicate) a winner already Exact somewhere", async () => {
+      const existingTargets: ExistingTarget[] = [
+        {
+          text: "kitchen knife set",
+          normalizedText: "kitchen knife set",
+          matchType: "exact",
+          campaignId: "camp-perf-1",
+          adGroupId: "ag-9",
+          campaignRole: "performance",
+          state: "enabled",
+        },
+      ];
+      const output = await sim.run(
+        baseInput([row("kitchen knife set", { orders: 3, sales: 120, spend: 20 })], {
+          existingTargets,
+        }),
+      );
+      expect(output.classifications[0]!.groundTruth).toBe("keep");
     });
 
-    it("userChoice is set when provided", async () => {
-      const result = await run([ROW_KEEP], { "healthy keyword": "keep" });
-      expect(result.classifications[0]!.userChoice).toBe("keep");
+    it("still harvests to exact when the winner only exists as broad/phrase", async () => {
+      const existingTargets: ExistingTarget[] = [
+        {
+          text: "kitchen knife set",
+          normalizedText: "kitchen knife set",
+          matchType: "phrase",
+          campaignId: "camp-research-1",
+          adGroupId: "ag-1",
+          campaignRole: "research",
+          state: "enabled",
+        },
+      ];
+      const output = await sim.run(
+        baseInput([row("kitchen knife set", { orders: 3, sales: 120, spend: 20 })], {
+          existingTargets,
+        }),
+      );
+      const c = output.classifications[0]!;
+      expect(c.groundTruth).toBe("harvest_exact");
+      expect(c.reasoning).toContain("isolated control");
+    });
+
+    it("routes a profitable own-brand winner to Defense instead of harvesting in place", async () => {
+      const output = await sim.run(
+        baseInput([row("acme knife set", { orders: 3, sales: 120, spend: 20 })]),
+      );
+      const c = output.classifications[0]!;
+      expect(c.brandClass).toBe("ownBrand");
+      expect(c.groundTruth).toBe("harvest_exact");
+      expect(c.routingNote).toContain("Defense");
+    });
+
+    it("does not add a routing note when the own-brand winner is already in Defense", async () => {
+      const output = await sim.run(
+        baseInput([row("acme knife set", { orders: 3, sales: 120, spend: 20 })], {
+          sourceCampaignRole: "defense",
+        }),
+      );
+      expect(output.classifications[0]!.routingNote).toBeNull();
+    });
+
+    it("pauses a term with enough order evidence but ROAS below target", async () => {
+      const output = await sim.run(
+        baseInput([row("kitchen knife set", { orders: 2, sales: 40, spend: 20 })]),
+      );
+      // roas = 2, generic target = 3 -> below target, but orders(2) >= minOrdersForWinner(2)
+      expect(output.classifications[0]!.groundTruth).toBe("pause");
+    });
+
+    it("requires >= 3 orders for a competitor term even when minOrdersForWinner is lower", async () => {
+      const notEnough = await sim.run(
+        baseInput([row("rivalco knife set", { orders: 2, sales: 100, spend: 20 })]),
+      );
+      expect(notEnough.classifications[0]!.groundTruth).toBe("insufficient_data");
+
+      const enough = await sim.run(
+        baseInput([row("rivalco knife set", { orders: 3, sales: 150, spend: 20 })]),
+      );
+      expect(enough.classifications[0]!.groundTruth).toBe("harvest_exact");
+    });
+  });
+
+  describe("zero-order loser: negative precision", () => {
+    it("defaults a single generic confident loser to negative_exact", async () => {
+      const output = await sim.run(
+        baseInput([row("random accessory", { spend: 15, clicks: 40, impressions: 300 })]),
+      );
+      const c = output.classifications[0]!;
+      expect(c.groundTruth).toBe("negative_exact");
+      expect(c.reasoning).toContain("target CPA");
+    });
+
+    it("uses negative_phrase for a competitor term to isolate every variation", async () => {
+      const output = await sim.run(
+        baseInput([row("rivalco gadget", { spend: 15, clicks: 40, impressions: 300 })]),
+      );
+      const c = output.classifications[0]!;
+      expect(c.brandClass).toBe("competitorBrand");
+      expect(c.groundTruth).toBe("negative_phrase");
+    });
+
+    it("uses negative_phrase for a scenario-authored incompatible attribute", async () => {
+      const output = await sim.run(
+        baseInput([row("extra small widget", { spend: 15, clicks: 40, impressions: 300 })], {
+          incompatibleAttributeLexicon: ["extra small"],
+        }),
+      );
+      expect(output.classifications[0]!.groundTruth).toBe("negative_phrase");
+    });
+
+    it("escalates to negative_phrase when >= 3 distinct generic terms share a proven theme", async () => {
+      const rows = [
+        row("pink phone case", { spend: 15, clicks: 40, impressions: 300 }),
+        row("pink laptop sleeve", { spend: 15, clicks: 40, impressions: 300 }),
+        row("pink water bottle", { spend: 15, clicks: 40, impressions: 300 }),
+        row("unrelated accessory", { spend: 15, clicks: 40, impressions: 300 }),
+      ];
+      const output = await sim.run(baseInput(rows));
+
+      const pinkResults = output.classifications.filter((c) => c.searchTerm.startsWith("pink"));
+      expect(pinkResults).toHaveLength(3);
+      for (const c of pinkResults) {
+        expect(c.groundTruth).toBe("negative_phrase");
+        expect(c.reasoning).toContain("pink");
+      }
+
+      const unrelated = output.classifications.find((c) => c.searchTerm === "unrelated accessory")!;
+      expect(unrelated.groundTruth).toBe("negative_exact");
+    });
+
+    it("does not escalate when only 2 distinct terms share a theme", async () => {
+      const rows = [
+        row("teal phone case", { spend: 15, clicks: 40, impressions: 300 }),
+        row("teal laptop sleeve", { spend: 15, clicks: 40, impressions: 300 }),
+      ];
+      const output = await sim.run(baseInput(rows));
+      for (const c of output.classifications) {
+        expect(c.groundTruth).toBe("negative_exact");
+      }
+    });
+  });
+
+  describe("wrong-lane routing", () => {
+    it("flags a non-branded term found in a Defense campaign", async () => {
+      const output = await sim.run(
+        baseInput([row("random accessory", { spend: 15, clicks: 40, impressions: 300 })], {
+          sourceCampaignRole: "defense",
+        }),
+      );
+      expect(output.classifications[0]!.routingNote).toContain("Defense");
+    });
+  });
+
+  describe("brand detection", () => {
+    it("matches on whole words only (no substring false positives)", async () => {
+      const output = await sim.run(
+        baseInput([row("acetone cleaner spray", { spend: 15, clicks: 40, impressions: 300 })], {
+          brandLexicon: ["ace"],
+        }),
+      );
+      expect(output.classifications[0]!.brandClass).toBe("generic");
+    });
+  });
+
+  describe("grading", () => {
+    it("computes direction/profitability/reviewCoverage from a worked example", async () => {
+      const rows = [
+        row("winner term", { orders: 3, sales: 120, spend: 20 }),
+        row("loser term", { spend: 15, clicks: 40, impressions: 300 }),
+      ];
+      const output = await sim.run(
+        baseInput(rows, {
+          userClassifications: { "winner term": "harvest_exact", "loser term": "keep" },
+        }),
+      );
+
+      expect(output.scoreDimensions).toEqual({
+        direction: 50,
+        profitability: 100,
+        reviewCoverage: 100,
+      });
+    });
+
+    it("penalizes profitability for wrongly removing a non-removal-ground-truth term", async () => {
+      const rows = [row("winner term", { orders: 3, sales: 100, spend: 20 })];
+      const output = await sim.run(
+        baseInput(rows, { userClassifications: { "winner term": "pause" } }),
+      );
+      expect(output.scoreDimensions?.profitability).toBe(0);
+    });
+
+    it("is deterministic: identical input produces identical output", async () => {
+      const rows = [
+        row("winner term", { orders: 3, sales: 120, spend: 20 }),
+        row("loser term", { spend: 15, clicks: 40, impressions: 300 }),
+        row("pink phone case", { spend: 15, clicks: 40, impressions: 300 }),
+        row("pink laptop sleeve", { spend: 15, clicks: 40, impressions: 300 }),
+        row("pink water bottle", { spend: 15, clicks: 40, impressions: 300 }),
+      ];
+      const input = baseInput(rows, {
+        userClassifications: {
+          "winner term": "harvest_exact",
+          "loser term": "negative_exact",
+          "pink phone case": "negative_phrase",
+        },
+      });
+
+      const first = await sim.run(input);
+      const second = await sim.run(input);
+      expect(second).toEqual(first);
     });
   });
 });

@@ -2,9 +2,7 @@
 /**
  * /tools/str-triage — page contract tests.
  *
- * Server component. Renders the seeded scenario, 20 search terms,
- * target ROAS, and a form with action selectors. Calls the
- * simulator via the action layer (covered separately).
+ * STORY-082: scenario schema expanded; rewritten to match.
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -15,19 +13,16 @@ vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     simulatorRegistry: {
       get: (id: string) =>
-        id === "str-triage"
-          ? { simulatorId: id, name: "STR Triage", run: async () => null }
-          : null,
+        id === "str-triage" ? { simulatorId: id, name: "STR Triage", run: async () => null } : null,
     },
   }),
 }));
 
 import { renderToString } from "react-dom/server";
-import { createElement } from "react";
 import StrTriagePage from "../page";
 
 describe("/tools/str-triage", () => {
-  it("renders the scenario title from the Stitch spec", async () => {
+  it("renders the scenario title", async () => {
     const html = renderToString(await StrTriagePage());
     expect(html).toContain("Clean up a broad match campaign for kitchen products");
   });
@@ -37,18 +32,18 @@ describe("/tools/str-triage", () => {
     expect(html).toContain("Sponsored Products campaign");
   });
 
-  it("renders all 20 seeded search terms", async () => {
+  it("renders seeded search terms", async () => {
     const html = renderToString(await StrTriagePage());
     expect(html).toContain("stainless steel knife set");
-    expect(html).toContain("knife set");
-    expect(html).toContain("kitchen utensil set");
+    expect(html).toContain("homechef knife set");
+    expect(html).toContain("left handed knife set");
   });
 
-  it("shows the target ROAS and search term count", async () => {
+  it("shows the generic target ROAS and search term count", async () => {
     const html = renderToString(await StrTriagePage());
     expect(html).toContain("Target ROAS");
-    expect(html).toMatch(/3\.33/);
-    expect(html).toMatch(/20/); // count of search terms
+    expect(html).toMatch(/3\.00/);
+    expect(html).toMatch(/14/); // count of search terms
   });
 
   it("links back to the tools index", async () => {
