@@ -5,7 +5,7 @@
 - **Story**: STORY-093
 - **Sprint**: ad hoc
 - **Points**: 1
-  **Status:** In progress
+  **Status:** Done
 
 ## Bug
 
@@ -137,10 +137,10 @@ return {
 
 ## Acceptance Criteria
 
-- [ ] `completeQuizAttempt` returns `correctCount` and `totalQuestions`
-- [ ] `RecordQuizAttempt` result includes `correctCount` and `totalQuestions`
-- [ ] API response includes `correctCount` and `totalQuestions`
-- [ ] `QuizPlayer` result screen shows "X of Y correct" with real numbers
-- [ ] All three test suites updated and passing
-- [ ] `pnpm typecheck && pnpm lint && pnpm test` green
+- [x] `completeQuizAttempt` returns `correctCount` and `totalQuestions`
+- [x] `RecordQuizAttempt` result includes `correctCount` and `totalQuestions`
+- [x] API response includes `correctCount` and `totalQuestions`
+- [x] `QuizPlayer` result screen shows "X of Y correct" with real numbers
+- [x] All three test suites updated and passing
+- [x] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR opened against `main`

@@ -4,7 +4,7 @@
 **Points:** 1
 **Epic:** Catalog
 **Owner:** Ryan
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -194,8 +194,8 @@ docs/
       `buildProductionContainer()` and `buildTestContainer()`.
 - [x] `docs/sprint-3/PLAN.md` exists.
 - [x] `pnpm typecheck && pnpm lint && pnpm test && pnpm test:arch &&
-    pnpm build` all green.
+pnpm build` all green.
 - [x] Conventional commit: `feat(catalog): STORY-011 PricingTier model +
-    repo`.
+repo`.
 - [x] PR opened against `main`. CI green. Squash merge.
 - [x] `SESSION-HANDOVER.md` updated.
