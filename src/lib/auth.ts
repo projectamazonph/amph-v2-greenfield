@@ -59,7 +59,7 @@ const SESSION_COOKIE_PROD = "__Secure-amph_session";
  * env-based default (correct for server actions and pages, where
  * the request protocol isn't directly available).
  */
-function getSessionCookieName(isHttps?: boolean): string {
+export function getSessionCookieName(isHttps?: boolean): string {
   if (typeof isHttps === "boolean") {
     return isHttps ? SESSION_COOKIE_PROD : SESSION_COOKIE_DEV;
   }

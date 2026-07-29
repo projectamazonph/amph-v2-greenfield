@@ -10,10 +10,10 @@
  *  3. Delete the backup cookie
  *  4. Return success
  *
- * If there's no backup cookie (first-time impersonation didn't capture
- * one — see TODO in impersonateUser.action.ts), we fall back to
- * `clearAuthCookie()` so the user is at least signed out instead of
- * stuck impersonating.
+ * If there's no backup cookie (the impersonation predates the fix that
+ * captures the admin's token on the FIRST impersonation, or the admin
+ * had no session cookie to capture), we fall back to `clearAuthCookie()`
+ * so the user is at least signed out instead of stuck impersonating.
  *
  * Testable pure logic: `performStopImpersonating` (below). Action
  * wrapper: thin shell.
@@ -25,8 +25,7 @@ import { Result } from "@/domain/shared/Result";
 import { setAuthCookie, clearAuthCookie } from "@/lib/auth";
 
 export type StopImpersonatingActionError =
-  | { kind: "no_admin_session" }
-  | { kind: "db_error"; message: string };
+  { kind: "no_admin_session" } | { kind: "db_error"; message: string };
 
 export type StopImpersonatingActionResult = Result<
   { restored: boolean },
