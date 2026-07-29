@@ -13,7 +13,10 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { ListingAuditSimulator } from "@/domain/simulator/listing-audit/ListingAuditSimulator";
+import {
+  ListingAuditSimulator,
+  DIMENSION_WEIGHTS,
+} from "@/domain/simulator/listing-audit/ListingAuditSimulator";
 import type {
   ListingAuditInput,
   ListingImage,
@@ -68,17 +71,9 @@ describe("rubric scoring", () => {
   });
 
   it("dimension weights sum to 100%", () => {
-    // Re-derive from the same weights the simulator uses, so this test
+    // Asserts against the simulator's actual exported constant, so this
     // fails loudly if a dimension is added/removed without updating the total.
-    const weights = {
-      compliance: 0.25,
-      relevance: 0.2,
-      accuracy: 0.15,
-      conversion: 0.15,
-      mobile: 0.1,
-      imagery: 0.15,
-    };
-    const total = Object.values(weights).reduce((s, w) => s + w, 0);
+    const total = Object.values(DIMENSION_WEIGHTS).reduce((s, w) => s + w, 0);
     expect(total).toBeCloseTo(1.0, 5);
   });
 
@@ -134,6 +129,25 @@ describe("rubric scoring", () => {
 // ── Category variants ────────────────────────────────────────────────────
 
 describe("category variants", () => {
+  it("does not false-positive on an innocuous word that merely contains a claim term", async () => {
+    // "manicures" contains "cures", and a Grocery/general_home listing
+    // mentioning "dog treats" is not a medical claim -- neither should
+    // trigger the compliance gates.
+    const result = await simulator.run(
+      greatListing({
+        category: "Grocery",
+        bullets: [
+          ...greatListing().bullets,
+          "Comes with a coupon for manicures and healthy dog treats",
+        ],
+      }),
+    );
+    expect(result.audit.findings.some((f) => f.ruleId === "prohibited_medical_claims")).toBe(false);
+    expect(result.audit.findings.some((f) => f.ruleId === "category_prohibited_claims")).toBe(
+      false,
+    );
+  });
+
   it("flags a beauty-restricted claim only for the beauty category", async () => {
     const claimText = "This serum eliminates wrinkles permanently.";
     const beautyResult = await simulator.run(
@@ -225,6 +239,29 @@ describe("finding generation", () => {
     const ids = result.audit.findings.map((f) => f.id);
     expect(new Set(ids).size).toBe(ids.length);
     expect(result.audit.findings.every((f) => f.ruleId.length > 0)).toBe(true);
+    expect(result.audit.findings.every((f) => f.id === `finding-${f.ruleId}`)).toBe(true);
+  });
+
+  it("a finding keeps the same id even when an earlier rule's outcome changes", async () => {
+    // Regression test: ids used to be positional over the filtered
+    // warning/fail list, so fixing an earlier finding (here, the title)
+    // shifted every later finding's id. Two runs, same set of remaining
+    // problems (bad description, no images), different title.
+    const withBadTitle = await simulator.run(
+      greatListing({ title: "x", description: "", images: [] }),
+    );
+    const withGoodTitle = await simulator.run(
+      greatListing({ title: "Bamboo Cutting Board for Kitchen Prep", description: "", images: [] }),
+    );
+    const descriptionFindingBad = withBadTitle.audit.findings.find(
+      (f) => f.ruleId === "description_length_gate",
+    );
+    const descriptionFindingGood = withGoodTitle.audit.findings.find(
+      (f) => f.ruleId === "description_length_gate",
+    );
+    expect(descriptionFindingBad).toBeDefined();
+    expect(descriptionFindingGood).toBeDefined();
+    expect(descriptionFindingGood!.id).toBe(descriptionFindingBad!.id);
   });
 
   it("produces findings across more than one dimension for a mediocre listing", async () => {

@@ -21,6 +21,10 @@ export type RuleOutcome = "pass" | "warning" | "fail" | "notApplicable";
 
 export type FindingSeverity = "info" | "warning" | "critical";
 
+/** The five launch category variants (docs/stories/STORY-080.md). */
+export type CategoryVariant =
+  "general_home" | "beauty" | "food_supplements" | "electronics" | "apparel";
+
 export interface AuditFinding {
   readonly id: string;
   readonly ruleId: string;
@@ -30,8 +34,9 @@ export interface AuditFinding {
   readonly isCriticalGate: boolean;
   readonly message: string;
   readonly suggestion: string;
-  /** Normalized category-variant id this finding's rule was evaluated under (e.g. "beauty"). */
-  readonly category: string;
+  /** Normalized category-variant id this finding's rule was evaluated under. */
+  readonly category: CategoryVariant;
+  /** Marketplace code, e.g. "US" -- the only marketplace with a verified title policy today. */
   readonly marketplace: string;
   readonly policyVersion: string;
   readonly effectiveDate: string;

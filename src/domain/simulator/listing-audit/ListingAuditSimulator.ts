@@ -32,11 +32,10 @@ import type {
   ScoreDimensions,
   RuleDimension,
   RuleOutcome,
+  CategoryVariant,
 } from "./ListingAuditOutput";
 
 // ── Category variants ──────────────────────────────────────────────────────
-
-type CategoryVariant = "general_home" | "beauty" | "food_supplements" | "electronics" | "apparel";
 
 interface CategoryVariantConfig {
   readonly id: CategoryVariant;
@@ -63,7 +62,15 @@ const CATEGORY_VARIANTS: Record<CategoryVariant, CategoryVariantConfig> = {
   food_supplements: {
     id: "food_supplements",
     label: "Food and Supplements",
-    prohibitedClaimTerms: ["cures", "treats", "diagnoses", "prevents disease"],
+    // Multi-word phrases, not bare "treats"/"cures" -- those single words
+    // are genuinely ambiguous ("treats" as in snacks vs. a medical claim)
+    // and would false-positive on innocuous copy even with word-boundary matching.
+    prohibitedClaimTerms: [
+      "cures disease",
+      "treats illness",
+      "diagnoses conditions",
+      "prevents disease",
+    ],
     requiredAttributeTerms: ["serving size", "ingredients"],
   },
   electronics: {
@@ -143,8 +150,13 @@ function combinedText(ctx: RuleContext): string {
   return `${ctx.lowerTitle} ${ctx.lowerBullets.join(" ")} ${ctx.lowerDescription}`;
 }
 
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Word-boundary match so "cures" does not fire on "manicures" or "treats" on "dog treats". */
 function containsAny(text: string, terms: readonly string[]): boolean {
-  return terms.some((t) => text.includes(t.toLowerCase()));
+  return terms.some((t) => new RegExp(`\\b${escapeRegExp(t.toLowerCase())}\\b`).test(text));
 }
 
 const MEDICAL_CLAIM_TERMS = ["cures", "treats disease", "heals", "diagnose", "prevents illness"];
@@ -396,7 +408,7 @@ const RULES: readonly RuleDefinition[] = [
           outcome: "fail",
           severity: "warning",
           message: "Description is empty.",
-          suggestion: "Write at least 100 characters covering features and benefits.",
+          suggestion: "Write at least 200 characters covering features and benefits.",
         };
       }
       if (ctx.description.length < 100) {
@@ -490,7 +502,10 @@ const RULES: readonly RuleDefinition[] = [
   {
     ruleId: "main_image_present",
     dimension: "imagery",
-    isCriticalGate: false,
+    // No main image at all is strictly worse than a wrong-background main
+    // image (main_image_white_background, below), which already gates --
+    // so this must gate at least as hard.
+    isCriticalGate: true,
     evaluate: (ctx) => {
       if (!ctx.images.some((img) => img.role === "main")) {
         return {
@@ -591,7 +606,7 @@ const RULES: readonly RuleDefinition[] = [
   },
 ];
 
-const DIMENSION_WEIGHTS: Record<RuleDimension, number> = {
+export const DIMENSION_WEIGHTS: Record<RuleDimension, number> = {
   compliance: 0.25,
   relevance: 0.2,
   accuracy: 0.15,
@@ -714,7 +729,14 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
 
   async run(input: ListingAuditInput): Promise<ListingAuditOutput> {
     const { title, bullets, description, niche, userFindingActions } = input;
-    const marketplace = input.marketplace ?? TITLE_POLICY.marketplace;
+    // Only the US policy is verified today (see TITLE_POLICY above), so an
+    // unsupported marketplace must not be stamped onto findings that were
+    // actually graded against US thresholds.
+    const requestedMarketplace = input.marketplace ?? TITLE_POLICY.marketplace;
+    const marketplace =
+      requestedMarketplace === TITLE_POLICY.marketplace
+        ? requestedMarketplace
+        : TITLE_POLICY.marketplace;
     const images = input.images ?? [];
     const hasVideo = input.hasVideo ?? false;
     const hasAPlus = input.hasAPlus ?? false;
@@ -754,8 +776,10 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
 
     const allFindings: AuditFinding[] = evaluations
       .filter(({ result }) => result.outcome === "warning" || result.outcome === "fail")
-      .map(({ rule, result }, i) => ({
-        id: `finding-${i}`,
+      .map(({ rule, result }) => ({
+        // ruleId-derived, not positional, so the same finding keeps the
+        // same id across runs even if an earlier rule's outcome changes.
+        id: `finding-${rule.ruleId}`,
         ruleId: rule.ruleId,
         dimension: rule.dimension,
         severity: result.severity,
