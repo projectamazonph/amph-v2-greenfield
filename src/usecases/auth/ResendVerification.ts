@@ -25,10 +25,9 @@
 
 import { createHash } from "node:crypto";
 import { Result } from "@/domain/shared/Result";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
-import type {
-  EmailVerificationRepository,
-} from "@/ports/repositories/EmailVerificationRepository";
+import type { EmailVerificationRepository } from "@/ports/repositories/EmailVerificationRepository";
 import type { Clock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
@@ -87,9 +86,7 @@ export class ResendVerification {
       windowSeconds: RESEND_WINDOW_SECONDS,
     });
     if (rl.ok && !rl.value.allowed) {
-      const retryAfter = new Date(
-        this.deps.clock.now().getTime() + rl.value.resetSeconds * 1000,
-      );
+      const retryAfter = new Date(this.deps.clock.now().getTime() + rl.value.resetSeconds * 1000);
       this.deps.logger.info("resend_verification.rate_limited", {
         userId: user.id,
         retryAfter: retryAfter.toISOString(),
@@ -141,10 +138,6 @@ export class ResendVerification {
   /** Build the verification URL. Kept here so the use case owns the
    * link shape; the page is a thin handler. */
   private buildVerifyUrl(rawToken: string): string {
-    const base =
-      process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
-    return `${base.replace(/\/$/, "")}/verify-email?token=${encodeURIComponent(
-      rawToken,
-    )}`;
+    return buildAppUrl(`/verify-email?token=${encodeURIComponent(rawToken)}`);
   }
 }
