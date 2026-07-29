@@ -66,7 +66,7 @@ export default async function SettingsPage({
     <div>
       <TopBar title="Settings" subtitle="System configuration and operational status" />
 
-      <Card padding={6} style={{ marginBottom: "1rem" }}>
+      <Card padding={6} className={styles.cardGap}>
         <h2 className={styles.sectionTitle}>Environment</h2>
         <p className={styles.help}>
           The current values of required environment variables. Values are never displayed.
@@ -97,7 +97,7 @@ export default async function SettingsPage({
         </table>
       </Card>
 
-      <Card padding={6} style={{ marginBottom: "1rem" }}>
+      <Card padding={6} className={styles.cardGap}>
         <h2 className={styles.sectionTitle}>Actor</h2>
         <dl className={styles.dl}>
           <dt>Signed-in admin</dt>
@@ -109,7 +109,7 @@ export default async function SettingsPage({
         </dl>
       </Card>
 
-      <Card padding={6} style={{ marginBottom: "1rem" }}>
+      <Card padding={6} className={styles.cardGap}>
         <h2 className={styles.sectionTitle}>Two-factor authentication</h2>
         <p className={styles.help}>
           Adds a 6-digit code from an authenticator app to your login, on top of your password.

@@ -1,5 +1,13 @@
 /* STORY-050e — admin settings — Field Manual tokens */
 
+.cardGap {
+  margin-bottom: var(--space-4);
+}
+
+.cardGap:last-child {
+  margin-bottom: 0;
+}
+
 .sectionTitle {
   font-family: var(--font-display);
   font-size: var(--text-base);

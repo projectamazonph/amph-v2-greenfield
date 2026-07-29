@@ -13,7 +13,7 @@
 }
 
 .addButton:hover {
-  background: var(--accent-dark, var(--accent));
+  background: var(--accent-hover);
 }
 
 .filters {
@@ -32,7 +32,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-1);
-  color: var(--text);
+  color: var(--ink-900);
 }
 
 .searchInput:focus {
@@ -47,7 +47,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-1);
-  color: var(--text);
+  color: var(--ink-900);
   min-width: 140px;
 }
 
@@ -63,6 +63,10 @@
   cursor: pointer;
 }
 
+.filterButton:hover {
+  background: var(--accent-hover);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -76,7 +80,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-muted);
+  color: var(--ink-500);
   border-bottom: 1px solid var(--border);
 }
 
@@ -89,12 +93,12 @@
 .td:nth-child(4),
 .td:nth-child(5) {
   font-family: var(--font-mono);
-  color: var(--text-muted);
+  color: var(--ink-500);
   text-align: right;
 }
 
 .courseLink {
-  color: var(--text);
+  color: var(--ink-900);
   text-decoration: none;
   font-weight: 500;
 }
@@ -106,7 +110,7 @@
 .slug {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--ink-500);
   background: var(--surface-2);
   padding: 2px 6px;
   border-radius: 3px;
@@ -115,7 +119,7 @@
 .emptyState {
   padding: var(--space-8);
   text-align: center;
-  color: var(--text-muted);
+  color: var(--ink-500);
   font-size: 14px;
 }
 
@@ -143,12 +147,12 @@
 }
 
 .pageLinkDisabled {
-  color: var(--text-muted);
+  color: var(--ink-500);
   opacity: 0.5;
 }
 
 .pageInfo {
-  color: var(--text-muted);
+  color: var(--ink-500);
   font-family: var(--font-mono);
   font-size: 13px;
 }

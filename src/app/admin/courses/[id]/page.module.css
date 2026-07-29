@@ -3,7 +3,7 @@
 .backLink {
   display: inline-block;
   margin-bottom: var(--space-4);
-  color: var(--text-muted);
+  color: var(--ink-500);
   text-decoration: none;
   font-size: 13px;
 }
@@ -31,7 +31,7 @@
   font-size: 13px;
   font-weight: 500;
   background: var(--surface-1);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   text-decoration: none;
@@ -76,7 +76,7 @@
 .sectionTitle {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--ink-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 var(--space-4) 0;
@@ -90,7 +90,7 @@
 }
 
 .details dt {
-  color: var(--text-muted);
+  color: var(--ink-500);
   font-weight: 500;
   text-transform: uppercase;
   font-size: 11px;
@@ -98,7 +98,7 @@
 }
 
 .details dd {
-  color: var(--text);
+  color: var(--ink-900);
   margin: 0;
 }
 
@@ -107,7 +107,7 @@
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--ink-500);
   font-style: italic;
 }
 
@@ -117,12 +117,12 @@
   background: var(--surface-2);
   border-radius: var(--radius-sm);
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--ink-500);
   line-height: 1.5;
 }
 
 .placeholder strong {
-  color: var(--text);
+  color: var(--ink-900);
 }
 
 .error {
@@ -157,7 +157,7 @@
 }
 
 .addButton:hover {
-  background: var(--accent-strong);
+  background: var(--accent-hover);
 }
 
 .moduleList {
@@ -185,7 +185,7 @@
 .moduleOrder {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--ink-500);
   min-width: 24px;
   text-align: right;
 }
@@ -194,7 +194,7 @@
   flex: 1;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--ink-900);
   text-decoration: none;
 }
 
@@ -213,7 +213,7 @@
   font-family: var(--font-mono);
   font-size: 12px;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -233,7 +233,7 @@
   padding: var(--space-1) var(--space-3);
   font-size: 12px;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   text-decoration: none;

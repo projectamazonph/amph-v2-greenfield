@@ -12,14 +12,14 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--ink-500);
   text-decoration: none;
   border-bottom: 2px solid transparent;
   transition: color 120ms ease, border-color 120ms ease;
 }
 
 .tab:hover {
-  color: var(--text);
+  color: var(--ink-900);
 }
 
 .tabActive {

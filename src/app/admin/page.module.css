@@ -32,10 +32,13 @@
   border-left: 3px solid var(--accent);
   border-radius: var(--radius-md);
   min-width: 0; /* honor minmax(0, 1fr) at the cell level */
+  /* Lifted tile: subtle shadow + border = elevated panel */
+  box-shadow: var(--shadow-sm);
   transition:
     background var(--duration-fast) var(--ease-out),
     border-left-color var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .tile::before {
@@ -58,8 +61,9 @@
 
 .tile:hover {
   background: var(--accent-soft);
-  border-left-color: var(--accent-hover, var(--accent));
+  border-left-color: var(--accent-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .tile:hover::before {

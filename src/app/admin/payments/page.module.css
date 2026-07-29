@@ -13,7 +13,7 @@
   gap: var(--space-1);
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--ink-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -24,7 +24,7 @@
   font-family: var(--font-body);
   font-size: 13px;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   min-width: 240px;
@@ -45,7 +45,7 @@
 }
 
 .applyButton:hover {
-  background: var(--accent-strong);
+  background: var(--accent-hover);
 }
 
 .clearButton {
@@ -54,7 +54,7 @@
   font-size: 13px;
   font-weight: 500;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   text-decoration: none;
@@ -81,7 +81,7 @@
 .table th {
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--ink-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   background: var(--surface-1);
@@ -101,7 +101,7 @@
 }
 
 .muted {
-  color: var(--text-muted);
+  color: var(--ink-500);
   font-style: italic;
 }
 
@@ -114,7 +114,7 @@
   padding: var(--space-1) var(--space-3);
   font-size: 12px;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   text-decoration: none;

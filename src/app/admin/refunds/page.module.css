@@ -12,14 +12,14 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--ink-500);
   text-decoration: none;
   border-bottom: 2px solid transparent;
   transition: color 120ms ease, border-color 120ms ease;
 }
 
 .tab:hover {
-  color: var(--text);
+  color: var(--ink-900);
 }
 
 .tabActive {
@@ -41,7 +41,7 @@
   gap: var(--space-1);
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--ink-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -51,7 +51,7 @@
   font-family: var(--font-body);
   font-size: 13px;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   min-width: 280px;
@@ -78,7 +78,7 @@
 }
 
 .applyButton:hover {
-  background: var(--accent-strong);
+  background: var(--accent-hover);
 }
 
 .clearButton {
@@ -87,7 +87,7 @@
   font-size: 13px;
   font-weight: 500;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--ink-900);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   text-decoration: none;
@@ -110,7 +110,7 @@
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--border);
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--ink-500);
 }
 
 .paginationInfo {
@@ -129,8 +129,8 @@
 }
 
 .nextButton:hover {
-  background: var(--accent-strong);
-  border-color: var(--accent-strong);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .nextButtonDisabled {

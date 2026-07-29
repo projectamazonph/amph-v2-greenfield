@@ -106,6 +106,6 @@
 }
 
 .FIXED {
-  background-color: #f3e8ff;
-  color: #7c3aed;
+  background-color: var(--accent-soft);
+  color: var(--accent);
 }
