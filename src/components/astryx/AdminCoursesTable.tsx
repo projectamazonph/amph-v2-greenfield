@@ -103,7 +103,7 @@ const COLUMNS: TableColumn<CourseRow>[] = [
     width: { type: "pixel", value: 100 },
     renderCell: (row) => (
       <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
-        {formatPhp(row.priceMinor)}
+        {formatPhp(row.priceMinor / 100)}
       </span>
     ),
   },

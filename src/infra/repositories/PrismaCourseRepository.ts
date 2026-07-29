@@ -26,11 +26,9 @@
 
 import { PrismaClient, Prisma } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
-import type {
-  CourseRepository,
-  CourseError,
-} from "@/ports/repositories/CourseRepository";
+import type { CourseRepository, CourseError } from "@/ports/repositories/CourseRepository";
 import type { Course, Curriculum, LessonType } from "@/domain/entities/Course";
+import { Money } from "@/domain/values/Money";
 
 interface PrismaCourseRow {
   id: string;
@@ -108,7 +106,12 @@ export class PrismaCourseRepository implements CourseRepository {
       return Result.ok(this.mapRow(row as PrismaCourseRow));
     } catch (err) {
       // Prisma unique-constraint violation on slug.
-      if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2002") {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2002"
+      ) {
         return Result.err({ kind: "slug_taken" });
       }
       return Result.err({ kind: "db_error", message: String(err) });
@@ -154,11 +157,19 @@ export class PrismaCourseRepository implements CourseRepository {
       }
       const row = await this.db.course.update({
         where: { id },
-        data: { displayOrder: -Math.abs((existing as PrismaCourseRow).displayOrder || 1) - 1, isPublished: false },
+        data: {
+          displayOrder: -Math.abs((existing as PrismaCourseRow).displayOrder || 1) - 1,
+          isPublished: false,
+        },
       });
       return Result.ok(this.mapRow(row as PrismaCourseRow));
     } catch (err) {
-      if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2025") {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
         return Result.err({ kind: "not_found" });
       }
       return Result.err({ kind: "db_error", message: String(err) });
@@ -211,10 +222,7 @@ export class PrismaCourseRepository implements CourseRepository {
       title: row.title,
       tagline: row.tagline,
       description: row.description,
-      price: {
-        minor: row.priceMinor,
-        currency: row.currency as "PHP",
-      } as Course["price"],
+      price: Money.of(row.priceMinor, (row.currency as "PHP") ?? "PHP"),
       curriculum: this.parseCurriculum(row.curriculum),
       coverImage: row.coverImage,
       isFeatured: row.isFeatured,
@@ -265,7 +273,14 @@ export class PrismaCourseRepository implements CourseRepository {
         if (t !== "VIDEO" && t !== "TEXT" && t !== "QUIZ") {
           return [];
         }
-        return [{ id: lesson.id, title: lesson.title, type: t as LessonType, content: lesson.content ?? {} }];
+        return [
+          {
+            id: lesson.id,
+            title: lesson.title,
+            type: t as LessonType,
+            content: lesson.content ?? {},
+          },
+        ];
       });
       return [{ id: section.id, title: section.title, lessons }];
     });
