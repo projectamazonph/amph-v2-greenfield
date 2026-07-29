@@ -3,7 +3,7 @@
  * /courses/[slug]/lessons/[lessonId]/quiz — page contract tests.
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
@@ -18,15 +18,23 @@ const mockUser = {
   email: "ry@example.com",
   firstName: "Ryan",
   lastName: "Dabao",
-  role: "student" as const,
+  role: "STUDENT" as const,
   subscriptionTier: "mastery" as const,
   totalXp: 100,
   createdAt: new Date(),
 };
 
+const mockGetSessionUser = vi.fn();
 vi.mock("@/lib/auth", () => ({
-  getSessionUser: vi.fn(async () => mockUser),
+  getSessionUser: () => mockGetSessionUser(),
 }));
+
+const mockCourse = {
+  id: "course-1",
+  slug: "foundations",
+  title: "PPC Foundations",
+  status: "PUBLISHED",
+};
 
 const mockQuiz = {
   id: "quiz-1",
@@ -55,15 +63,22 @@ const mockQuiz = {
   ],
 };
 
+const mockFindEnrollment = vi.fn();
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     quizRepo: {
       findById: vi.fn(async (id: string) =>
-        id === "quiz-1"
-          ? { ok: true, value: mockQuiz }
-          : { ok: true, value: null },
+        id === "quiz-1" ? { ok: true, value: mockQuiz } : { ok: true, value: null },
       ),
     },
+    courseRepo: {
+      findBySlug: vi.fn(async (slug: string) =>
+        slug === "foundations"
+          ? { ok: true, value: mockCourse }
+          : { ok: false, error: { kind: "not_found" } },
+      ),
+    },
+    enrollmentRepo: { findByUserIdAndCourseId: mockFindEnrollment },
   }),
 }));
 
@@ -72,6 +87,11 @@ import { createElement } from "react";
 import QuizPage from "../page";
 
 describe("/courses/[slug]/lessons/[lessonId]/quiz", () => {
+  beforeEach(() => {
+    mockGetSessionUser.mockResolvedValue(mockUser);
+    mockFindEnrollment.mockResolvedValue({ id: "e-1", status: "active" });
+  });
+
   it("renders the quiz title and first question", async () => {
     const html = renderToString(
       await QuizPage({ params: Promise.resolve({ slug: "foundations", lessonId: "quiz-1" }) }),
@@ -104,6 +124,32 @@ describe("/courses/[slug]/lessons/[lessonId]/quiz", () => {
       await QuizPage({ params: Promise.resolve({ slug: "foundations", lessonId: "no-such" }) }),
     );
     expect(html).toContain("Quiz not found");
+  });
+
+  it("asks unenrolled students to enroll rather than serving the quiz", async () => {
+    mockFindEnrollment.mockResolvedValue(null);
+    const html = renderToString(
+      await QuizPage({ params: Promise.resolve({ slug: "foundations", lessonId: "quiz-1" }) }),
+    );
+    expect(html).toContain("Enroll to take this quiz");
+    expect(html).not.toContain("Advertising Cost of Sales");
+  });
+
+  it("lets an admin through without an enrollment", async () => {
+    mockGetSessionUser.mockResolvedValue({ ...mockUser, role: "ADMIN" as const });
+    mockFindEnrollment.mockResolvedValue(null);
+    const html = renderToString(
+      await QuizPage({ params: Promise.resolve({ slug: "foundations", lessonId: "quiz-1" }) }),
+    );
+    expect(html).toContain("Module 1 Knowledge Check");
+  });
+
+  it("refuses a quiz that belongs to another course", async () => {
+    const html = renderToString(
+      await QuizPage({ params: Promise.resolve({ slug: "no-such", lessonId: "quiz-1" }) }),
+    );
+    expect(html).toContain("Quiz not found");
+    expect(html).not.toContain("Advertising Cost of Sales");
   });
 
   it("does not contain banned marketing phrases", async () => {

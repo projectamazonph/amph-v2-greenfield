@@ -144,7 +144,6 @@ export default async function LessonPage({ params }: PageProps) {
             <div className={styles.completeFooter}>
               <LessonCompleteButton
                 courseId={course.id}
-                courseSlug={slug}
                 lessonId={lessonId}
                 initialCompleted={completedLessonIds.includes(lessonId)}
               />

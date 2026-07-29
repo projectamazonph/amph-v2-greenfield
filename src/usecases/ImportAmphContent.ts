@@ -263,9 +263,30 @@ export class ImportAmphContent {
     // Without this the course keeps the stub curriculum from step 2 and
     // every lesson link off the catalog page resolves to a 404.
     const curriculaRebuilt: string[] = [];
+    const curriculaFailed: string[] = [];
     for (const [slug, courseId] of importedCourseIds) {
       const { rebuilt } = await this.rebuildCourseCurriculum.execute(courseId);
-      if (rebuilt) curriculaRebuilt.push(slug);
+      if (rebuilt) {
+        curriculaRebuilt.push(slug);
+      } else {
+        curriculaFailed.push(slug);
+      }
+    }
+
+    // RebuildCourseCurriculum never returns an error, by design: an admin
+    // editing one lesson must not have that edit rolled back because the
+    // read model could not be refreshed. For the importer the rebuild IS
+    // the deliverable, so a silent `{ rebuilt: false }` here would exit 0
+    // while leaving that course's lessons 404ing off the catalog, which is
+    // the exact failure this use case exists to prevent. Fail loud instead.
+    if (curriculaFailed.length > 0) {
+      return Result.err({
+        kind: "db_error",
+        message:
+          `Modules and lessons were written, but Course.curriculum could not be rebuilt for: ` +
+          `${curriculaFailed.join(", ")}. Those courses will 404 on their lesson pages until ` +
+          `the import is re-run successfully.`,
+      });
     }
 
     return Result.ok({ coursesCreated, modulesUpserted, lessonsUpserted, curriculaRebuilt });

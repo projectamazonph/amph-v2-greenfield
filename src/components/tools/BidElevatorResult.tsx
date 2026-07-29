@@ -1,5 +1,5 @@
 /**
- * BidElevatorResult — presentational, rendered by BidElevatorForm.
+ * BidElevatorResult: presentational, rendered by BidElevatorForm.
  *
  * Renders the simulator's output: a 0-100 score, projected daily
  * spend, projected ROAS, and the per-keyword recommendations.

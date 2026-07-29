@@ -1,5 +1,5 @@
 /**
- * markLessonComplete action — STORY-027.
+ * markLessonComplete action (STORY-027).
  *
  * The MarkLessonComplete use case shipped with STORY-027 but had no
  * caller: it was absent from the container, had no server action and no
@@ -24,9 +24,11 @@ vi.mock("next/cache", () => ({
 }));
 
 const mockMarkLessonComplete = vi.fn();
+const mockCourseFindById = vi.fn();
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     markLessonComplete: { execute: mockMarkLessonComplete },
+    courseRepo: { findById: mockCourseFindById },
   }),
 }));
 
@@ -34,7 +36,6 @@ import { markLessonComplete } from "../markLessonComplete.action";
 
 const INPUT = {
   courseId: "course-1",
-  courseSlug: "ppc-foundations",
   lessonId: "lesson-2",
 };
 
@@ -54,6 +55,10 @@ describe("markLessonComplete action", () => {
     vi.clearAllMocks();
     mockGetSessionUserId.mockResolvedValue("user-1");
     mockMarkLessonComplete.mockResolvedValue(okResult(50, ["lesson-1", "lesson-2"]));
+    mockCourseFindById.mockResolvedValue({
+      ok: true,
+      value: { id: "course-1", slug: "ppc-foundations" },
+    });
   });
 
   it("refuses when there is no session", async () => {
@@ -104,6 +109,34 @@ describe("markLessonComplete action", () => {
     expect(paths).toContain("/courses/ppc-foundations/lessons/lesson-2");
     expect(paths).toContain("/courses/ppc-foundations");
     expect(paths).toContain("/dashboard");
+  });
+
+  // The action takes no slug from the caller. A client-supplied slug that
+  // did not match courseId would invalidate an unrelated course page and
+  // leave the pages the student is looking at stale, so the canonical slug
+  // is read back from the course instead.
+  it("derives the course slug from the course, not from the caller", async () => {
+    mockCourseFindById.mockResolvedValue({
+      ok: true,
+      value: { id: "course-1", slug: "canonical-slug" },
+    });
+
+    await markLessonComplete(INPUT);
+
+    expect(mockCourseFindById).toHaveBeenCalledWith("course-1");
+    const paths = mockRevalidatePath.mock.calls.map(([p]) => p);
+    expect(paths).toContain("/courses/canonical-slug/lessons/lesson-2");
+    expect(paths).toContain("/courses/canonical-slug");
+  });
+
+  it("still revalidates the dashboard when the course lookup fails", async () => {
+    mockCourseFindById.mockResolvedValue({ ok: false, error: { kind: "not_found" } });
+
+    const result = await markLessonComplete(INPUT);
+
+    expect(result.ok).toBe(true);
+    const paths = mockRevalidatePath.mock.calls.map(([p]) => p);
+    expect(paths).toEqual(["/dashboard"]);
   });
 
   it("surfaces use-case errors without revalidating", async () => {

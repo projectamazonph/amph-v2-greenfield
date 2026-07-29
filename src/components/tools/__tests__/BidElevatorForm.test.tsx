@@ -1,5 +1,5 @@
 /**
- * BidElevatorForm — result-panel wiring.
+ * BidElevatorForm: result-panel wiring.
  *
  * Regression: the form used to stash the simulator output in
  * sessionStorage and call router.refresh(). The Bid Elevator page is a

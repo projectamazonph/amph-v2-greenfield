@@ -204,6 +204,46 @@ describe("ImportAmphContent", () => {
     expect(allLessonIds).not.toContain("stub-lesson");
   });
 
+  it("fails loud when a curriculum rebuild does not land", async () => {
+    contentReader.setFiles([
+      {
+        courseSlug: "ppc-foundations",
+        files: [
+          makeMdxFile("0-onboarding", {
+            title: "Welcome",
+            slug: "0.1-welcome",
+            moduleNumber: 0,
+            lessonNumber: 1,
+            type: "reading",
+            estimatedMinutes: 8,
+            xpReward: 50,
+          }),
+        ],
+      },
+    ]);
+
+    // RebuildCourseCurriculum swallows its own errors by design (an admin
+    // lesson edit must not roll back because the read model failed to
+    // refresh). For the importer the rebuild IS the deliverable, so a
+    // silent failure would exit 0 while leaving those lessons 404ing.
+    const realUpdate = courseRepo.update.bind(courseRepo);
+    let updateCalls = 0;
+    courseRepo.update = async (course) => {
+      updateCalls++;
+      // Let the step-2 create through, fail the curriculum rebuild.
+      return updateCalls > 0
+        ? Result.err({ kind: "db_error", message: "simulated write failure" })
+        : realUpdate(course);
+    };
+
+    const result = await useCase.execute();
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("db_error");
+    expect(result.error.message).toContain("ppc-foundations");
+  });
+
   it("puts every imported lesson id into Course.curriculum so lesson pages resolve", async () => {
     contentReader.setFiles([
       {

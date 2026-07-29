@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * LessonCompleteButton — marks the current lesson complete.
+ * LessonCompleteButton: marks the current lesson complete.
  *
  * STORY-027. The MarkLessonComplete use case had no caller until this
  * component; enrollment progress, lesson XP and certificate eligibility
@@ -14,12 +14,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Check } from "@phosphor-icons/react/dist/ssr";
 import { markLessonComplete } from "@/app/actions/markLessonComplete.action";
 import styles from "./LessonCompleteButton.module.css";
 
 interface Props {
   courseId: string;
-  courseSlug: string;
   lessonId: string;
   /** Server-rendered starting state, from the student's enrollment. */
   initialCompleted: boolean;
@@ -33,7 +33,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   lesson_not_in_course: "We could not match this lesson to the course. Refresh and try again.",
 };
 
-export function LessonCompleteButton({ courseId, courseSlug, lessonId, initialCompleted }: Props) {
+export function LessonCompleteButton({ courseId, lessonId, initialCompleted }: Props) {
   const router = useRouter();
   const [completed, setCompleted] = useState(initialCompleted);
   const [progressPercent, setProgressPercent] = useState<number | null>(null);
@@ -43,7 +43,7 @@ export function LessonCompleteButton({ courseId, courseSlug, lessonId, initialCo
   const onClick = () => {
     setError(null);
     startTransition(async () => {
-      const result = await markLessonComplete({ courseId, courseSlug, lessonId });
+      const result = await markLessonComplete({ courseId, lessonId });
       if (!result.ok) {
         setError(ERROR_MESSAGES[result.error.kind] ?? "Could not save your progress.");
         return;
@@ -59,7 +59,7 @@ export function LessonCompleteButton({ courseId, courseSlug, lessonId, initialCo
     return (
       <div className={styles.doneRow}>
         <p className={styles.done}>
-          <CheckIcon />
+          <Check className={styles.checkIcon} weight="light" aria-hidden="true" />
           <span>Lesson complete</span>
         </p>
         {progressPercent !== null && (
@@ -84,19 +84,5 @@ export function LessonCompleteButton({ courseId, courseSlug, lessonId, initialCo
         </p>
       )}
     </div>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      className={styles.checkIcon}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-    </svg>
   );
 }

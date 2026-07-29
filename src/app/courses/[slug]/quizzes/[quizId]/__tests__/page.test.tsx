@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 /**
- * /courses/[slug]/quizzes/[quizId] — page contract tests.
+ * /courses/[slug]/quizzes/[quizId]: page contract tests.
  *
  * A Quiz carries a courseId, never a lessonId, so the pre-existing
  * /courses/[slug]/lessons/[lessonId]/quiz route could only resolve a

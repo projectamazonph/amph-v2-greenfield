@@ -1,11 +1,11 @@
 /**
- * /courses/[slug]/quizzes/[quizId] — student-facing quiz player.
+ * /courses/[slug]/quizzes/[quizId]: student-facing quiz player.
  *
  * A Quiz belongs to a Course (`Quiz.courseId`); it has no lesson or
  * module foreign key. The pre-existing
  * /courses/[slug]/lessons/[lessonId]/quiz route looked a quiz up by
  * lesson id, so it only ever resolved if a lesson id happened to equal
- * a quiz id — which no seeded content does. This route keys on the id
+ * a quiz id, which no seeded content does. This route keys on the id
  * the data model actually has, so the seeded knowledge checks are
  * reachable.
  *
