@@ -2,224 +2,185 @@
 
 ## Status
 
-**Decided.** Ryan's decisions recorded below (2026-07-29). See
-`docs/simulator-remediation-decisions.md` for cross-cutting rules
-(versioning, no magic constants, credential-mode gate) that apply here too.
+**Final — ready for implementation.** This is Ryan's third and
+authoritative decision pass (2026-07-29), delivered as explicit product
+rules and acceptance criteria. It **supersedes** the two earlier passes
+(merged in PRs #241/#242) wherever they conflict — notably the
+elasticity model and the tolerance basis both changed. The earlier
+passes remain in git history for context; this document is the one to
+implement against.
 
-**Scope note:** this decision set is much larger than the original
-1-point estimate — it adds a full auction-response-curve model with
-elasticities, a bidding-strategy/placement-adjustment system, and a
-graduated tolerance-and-partial-credit grading scheme. Recommend splitting
-before implementation; see "Suggested split" below.
+See `docs/simulator-remediation-decisions.md` for cross-cutting rules
+(versioning, no unversioned constants, credential-mode gate) that still
+apply.
+
+**Scope note:** still substantially larger than the original 1-point
+estimate. See "Suggested split" below.
 
 ## Current mechanism (verbatim, `BidElevatorSimulator.ts`)
 
 ```ts
 const CTR = 0.02; // 2% CTR estimate, hardcoded for every keyword
-
-const volumeShare = keyword.volume / totalVolume;
-const allocatedBudget = budget * volumeShare;
-const estimatedClicks = keyword.volume * CTR;
-const suggestedBid = estimatedClicks > 0 ? allocatedBudget / estimatedClicks : 0;
+const suggestedBid = allocatedBudget / estimatedClicks; // volume-share allocation
 groundTruthBids.set(keyword, Math.min(suggestedBid, keyword.currentBid * 2));
+// estimatedRoas = targetRoas by construction — never actually computed
 ```
 
-`estimatedRoas` is not derived from the bids at all — it's set to
-`targetRoas` by construction (`BidElevatorSimulator.ts:80`).
+## Decisions (final)
 
-## Decisions
+### CTR and forecasting
 
-### 1. Replace fixed 2% CTR
+Replace the fixed 2% CTR with a scenario-authored `baselineCtrPct` per
+keyword. Match type, intent, category, and relevance may supply
+**authoring-time fallback defaults** when a scenario is generated, but
+they must never secretly determine ground truth at runtime — the
+authored value is the sole reproducible source of truth.
 
-Scenario-authored baseline performance, not a match-type-only formula.
-Match type is a small modifier on top of authored values, not the source
-of truth:
-
-```ts
-matchTypeModifier = { exact: 1.05, phrase: 1.0, broad: 0.92 };
-```
-
-New required scenario fields: `baselineCtr`, `baselineCvr`,
-`baselineImpressions`, `baselineBid`. These modifiers are simulator
-assumptions, not universal Amazon facts, and must be versioned.
-
-### 2. Max-bid formula
-
-Target-ACoS-driven, not volume-share-driven:
+Budget allocation uses **projected eligible traffic**, not raw
+search-volume share:
 
 ```
-Max sustainable CPC = averageOrderValue × expectedCvr × targetAcos
+bidRatio      = chosenBid / benchmarkCpc
+impressionShare =
+  maxImpressionSharePct × bidRatio^bidElasticity / (1 + bidRatio^bidElasticity)
+estimatedCpc  = min(chosenBid, benchmarkCpc × (0.75 + 0.25 × min(bidRatio, 1.5)))
+impressions   = availableImpressionsPerDay × simulationDays × impressionShare
+clicks        = impressions × baselineCtr
+spend         = clicks × estimatedCpc
+orders        = clicks × baselineCvr
+sales         = orders × revenuePerOrder
 ```
 
-(equivalently `× expectedCvr ÷ targetRoas`, since `targetAcos = 1 /
-targetRoas`). Worked example: AOV $29.99, CVR 12%, target ACoS 30% →
-max CPC = $1.08.
-
-Required new scenario fields: `averageOrderValue`, `targetAcos`,
-`breakEvenAcos`, `baselineCvr`, `currentCpc`, `currentBid`, `clicks`,
-`orders`, `spend`, `sales`. `breakEvenAcos` specifically enables feedback
-that distinguishes "above target but still profitable" from "above
-break-even, losing margin" from "below target, room to scale."
-
-### 3. Remove the universal 2× bid cap
-
-Replace with scenario-configured guardrails:
-
-```ts
-maxIncreasePct: number;   // e.g. 0.20
-maxDecreasePct: number;   // e.g. 0.30
-absoluteMaxBid?: number;
-absoluteMinBid?: number;
-```
-
-Suggested defaults by situation (insufficient data → 0/±5%; stable
-profitable → +10-20%; growth objective → +20-30%; moderately inefficient
-→ -10-20%; materially above break-even → -20-40%; clearly irrelevant →
-pause/major cut). Also model Amazon's dynamic bidding adjustments
-separately from the entered base bid:
-
-```ts
-biddingStrategy: "fixed" | "down_only" | "up_and_down";
-topOfSearchAdjustmentPct: number; // up to 100% per Amazon's dynamic bidding
-restOfSearchAdjustmentPct: number; // up to 50%
-productPageAdjustmentPct: number;
-```
-
-### 4. Estimated ROAS must respond to bids
-
-Deterministic response curve, no randomness in v1:
+If total projected spend exceeds the budget, scale projected traffic:
 
 ```
-bid → competitiveness → impressions → clicks → spend → orders → sales → ROAS
+budgetScale = availableBudget / unconstrainedSpend
 ```
 
-```ts
-competitiveness = clamp(userBid / baselineBid, 0, maxCompetitiveness);
-impressionMultiplier = Math.pow(competitiveness, impressionElasticity);
-estimatedImpressions = baselineImpressions * impressionMultiplier;
-estimatedCtr = baselineCtr * relevanceModifier * placementModifier;
-estimatedClicks = estimatedImpressions * estimatedCtr;
-estimatedCpc = Math.min(userBid, baselineCpc * Math.pow(competitiveness, cpcElasticity));
-estimatedSpend = estimatedClicks * estimatedCpc;
-estimatedCvr = baselineCvr * conversionModifier;
-estimatedOrders = estimatedClicks * estimatedCvr;
-estimatedSales = estimatedOrders * averageOrderValue;
-estimatedRoas = estimatedSales / estimatedSpend;
+This models campaign pacing rather than pretending budget is manually
+assigned per keyword.
+
+### Maximum bid: the economic CPC ceiling
+
+```
+targetAcos        = 1 / targetRoas
+effectiveTargetAcos = min(targetAcos, breakEvenAcosPct)
+maxEconomicCpc    = baselineCvr × revenuePerOrder × effectiveTargetAcos
 ```
 
-Behavior invariant to test: raising bids should generally raise
-competitiveness, impressions, and CPC, and may raise sales, but must
-never _guarantee_ more orders.
+Worked example: CVR 12%, revenue/order $30, target ROAS 4 (→ target ACoS
+25%) → max CPC = 0.12 × 30 × 0.25 = **$0.90**.
 
-### 5. Full scenario schema
+This is the maximum _defensible_ CPC, not automatically the single
+perfect bid — the recommended bid is the best candidate below that
+ceiling that maximizes projected sales/contribution while holding the
+target ROAS. If placement adjustments are added later:
+`maxBaseBid = maxEconomicCpc / (1 + maximumPlacementAdjustment)` — do not
+model placement multipliers until the simulator actually exposes them.
 
-```ts
-type BidKeywordScenario = {
-  keywordId: string;
-  keyword: string;
-  matchType: "exact" | "phrase" | "broad";
-  intent: "branded" | "generic" | "competitor" | "category";
-  strategicRole: "defense" | "research" | "performance";
-  currentBid: number;
-  baselineBid: number;
-  currentCpc: number;
-  baselineImpressions: number;
-  baselineCtr: number;
-  baselineCvr: number;
-  clicks: number;
-  orders: number;
-  spend: number;
-  sales: number;
-  averageOrderValue: number;
-  targetAcos: number;
-  breakEvenAcos: number;
-  impressionElasticity: number;
-  cpcElasticity: number;
-  relevanceModifier: number;
-  conversionModifier: number;
-  maxIncreasePct: number;
-  maxDecreasePct: number;
-  absoluteMinBid?: number;
-  absoluteMaxBid?: number;
-  minimumClicksForDecision: number;
-  minimumOrdersForScaling: number;
-  biddingStrategy: "fixed" | "down_only" | "up_and_down";
-  placementAdjustmentPct?: number;
-};
+### Remove the 2× cap entirely
 
-// Scenario-level:
-currency: "USD" | "GBP" | "EUR" | "CAD";
-evaluationDays: number;
-campaignDailyBudget: number;
-objective: "profitability" | "growth" | "ranking" | "defense";
+Not a valid economic rule: a bad current bid of $5.00 shouldn't authorize
+$10.00, and a conservative current bid of $0.10 shouldn't block a
+justified move to $0.50. Replace with three separate, distinct concepts:
+
+- **Economic ceiling** — from CVR, order value, target ROAS, break-even
+  ACoS (above).
+- **Market ceiling** — informed by the keyword's `benchmarkCpc`.
+- **Per-optimization change guardrail** — an optional 10-20% operational
+  adjustment limit, which may vary by data confidence but must never
+  _redefine_ the correct destination bid.
+
+### Estimated ROAS must respond to the bids
+
+```
+keywordRoas  = estimatedSales / estimatedSpend
+campaignRoas = sum(estimatedSales) / sum(estimatedSpend)
 ```
 
-### 6. Bid-accuracy tolerance
+Must respond to the selected bids through estimated CPC, impression
+share, clicks, spend, and sales. Must never echo `targetRoas`.
 
-Not a flat ±20%. Combine absolute + percentage tolerance, scaled by
-difficulty, plus partial credit:
+### Required fields
 
-```ts
-tolerance = Math.max(absoluteTolerance, groundTruthBid * percentageTolerance);
+**Scenario-level:**
+
+| Field                    | Unit                                 |
+| ------------------------ | ------------------------------------ |
+| `currencyCode`           | ISO currency code                    |
+| `dailyBudget`            | currency/day                         |
+| `simulationDays`         | days                                 |
+| `targetRoas`             | ratio, e.g. 4.0                      |
+| `breakEvenAcosPct`       | percent of sales                     |
+| `defaultRevenuePerOrder` | currency/order                       |
+| `minimumBidIncrement`    | currency/click                       |
+| `maxBidChangePct`        | percent/optimization round, optional |
+
+**Per keyword:**
+
+| Field                        | Unit                              |
+| ---------------------------- | --------------------------------- |
+| `baselineCtrPct`             | percent                           |
+| `baselineCvrPct`             | percent                           |
+| `revenuePerOrder`            | currency/order, optional override |
+| `benchmarkCpc`               | currency/click                    |
+| `availableImpressionsPerDay` | impressions/day                   |
+| `maxImpressionSharePct`      | percent                           |
+| `bidElasticity`              | unitless                          |
+| `evidenceClicks`             | clicks                            |
+| `evidenceOrders`             | orders                            |
+| `evidenceWindowDays`         | days                              |
+
+### Bid tolerance: evidence-based, not difficulty-based
+
+```
+allowedDelta = max(5 × minimumBidIncrement, recommendedBid × confidenceTolerance)
 ```
 
-| Difficulty   | Percentage | Absolute floor |
-| ------------ | ---------- | -------------- |
-| Beginner     | ±20%       | $0.10          |
-| Intermediate | ±12%       | $0.07          |
-| Advanced     | ±8%        | $0.05          |
+| Confidence         | Basis                    | Tolerance |
+| ------------------ | ------------------------ | --------- |
+| High               | ≥30 clicks and ≥3 orders | ±10%      |
+| Medium             | ≥15 clicks or ≥2 orders  | ±15%      |
+| Low / modeled-only | below both               | ±20%      |
 
-Partial credit for: correct direction but outside range, correct hold
-decision, correctly refusing to act on insufficient data. Volume must not
-widen tolerance directly — data confidence does (via
-`minimumClicksForDecision`).
+Search volume affects _opportunity_, not statistical confidence — it
+must not widen tolerance on its own.
 
-## Decision-pack refinements (implementation-ready, 2026-07-29 second pass)
+### Grading the outcome
 
-Acceptance criteria, stated as testable invariants:
-
-- Changing a bid changes projected spend and may change projected ROAS.
-- Two keywords with equal volume but different CVR or AOV receive different
-  maximum sustainable CPC values.
-- No code path sets `estimatedRoas` equal to `targetRoas`.
-- The grader supports full, partial, and incorrect bid outcomes.
-- Published scenarios persist `engineVersion` and `rubricVersion`.
-
-Required tests (beyond per-formula unit tests):
-
-- Higher bids increase competitiveness but do not guarantee higher ROAS.
-- A zero/near-zero bid under-delivers and does not receive perfect budget
-  adherence.
-- A bid above break-even CPC is penalized even within a movement
-  guardrail.
-- Beginner/intermediate/advanced tolerances differ.
-- Insufficient-data scenarios reward hold or `collect_more_data`-style
-  decisions.
-- **Deterministic replay:** the same scenario + engine version produces
-  identical outputs, every time — this is a hard requirement, not just a
-  nice-to-have, since the response curve introduces real arithmetic that
-  must not drift.
+- Full credit when projected ROAS meets target **and** the bid captures
+  at least 90% of the best feasible projected sales.
+- Partial credit for an economically safe but overly conservative bid.
+- Score is capped when the bid exceeds the economic ceiling.
 
 ## Suggested split
 
-- **STORY-079a:** New scenario schema + response-curve engine (items 1, 4, 5) — the core economic model.
-- **STORY-079b:** Guardrails + bidding-strategy adjustments (item 3).
-- **STORY-079c:** Max-bid formula + break-even feedback (item 2).
-- **STORY-079d:** Graduated tolerance + partial credit (item 6).
+- **STORY-079a:** Scenario schema + the projected-traffic forecasting
+  engine (CTR/impression-share/CPC/budget-pacing formulas).
+- **STORY-079b:** Max-bid ceiling (economic + market) + guardrail
+  separation.
+- **STORY-079c:** Evidence-based tolerance + outcome grading (full/
+  partial/capped credit).
 
 ## Acceptance criteria
 
-- [ ] Split confirmed (or explicitly kept as one story) before work starts
-- [ ] `BidElevatorInput`/`KeywordBid`/scenario JSON carry every new field
-      listed in the schema above
-- [ ] Ground-truth max-bid formula matches the worked example above
-      exactly
-- [ ] `estimatedRoas` responds to bid changes per the response-curve model
-- [ ] Guardrails replace the flat 2× cap
-- [ ] Tolerance + partial credit implemented per the table above
-- [ ] Domain tests cover the response curve, the max-bid formula, and each
-      tolerance band, with full branch coverage
-- [ ] Every new constant is scenario/policy-sourced, versioned, and
-      documented (per `docs/simulator-remediation-decisions.md`)
+- [ ] `BidElevatorInput`/`KeywordBid`/scenario JSON carry every field in
+      the schema above
+- [ ] Ground-truth forecasting matches the formulas above exactly,
+      verified against the worked $0.90 example
+- [ ] Budget pacing (`budgetScale`) implemented — projected traffic scales
+      down when unconstrained spend exceeds the daily budget
+- [ ] The 2× cap is gone; economic ceiling, market ceiling, and the
+      optional change guardrail are three separate, testable concepts
+- [ ] `estimatedRoas`/`keywordRoas`/`campaignRoas` respond to bid changes;
+      no code path echoes `targetRoas`
+- [ ] Tolerance is evidence-based (`evidenceClicks`/`evidenceOrders`), not
+      keyed to difficulty or volume
+- [ ] Grading supports full/partial/capped credit per the rules above
+- [ ] Deterministic-replay test: same scenario + engine version → identical
+      output
+- [ ] Domain tests cover each formula, each confidence tier, and the
+      grading rule with full branch coverage
+- [ ] Every constant is scenario/policy-sourced, versioned, documented
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR against `main`, CI green, squash merge

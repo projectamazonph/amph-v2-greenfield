@@ -2,192 +2,152 @@
 
 ## Status
 
-**Decided.** Ryan's decisions recorded below (2026-07-29). See
-`docs/simulator-remediation-decisions.md` for cross-cutting rules.
-
-**Scope note:** negative architecture, a house naming convention, and
-budget reconciliation are each separately testable systems. Recommend
-splitting; see "Suggested split" below.
+**Final — ready for implementation.** Ryan's third and authoritative
+decision pass (2026-07-29). **Supersedes** the two earlier passes (PRs
+#241/#242) — the budget-reconciliation tolerance (flat ±2%, not a
+difficulty-tiered table), the dimension weights, and several field names
+changed.
 
 ## Current mechanism (verbatim, `CampaignBuilderSimulator.ts`)
 
-```ts
-// structureQuality: % of {SP Manual, SP Auto, SB} campaign types covered
-// budgetAllocation: % of campaigns with budget within 50% of ground truth
-// keywordRelevance: % of keywords containing a word from the niche string
-```
+Only checks campaign-type coverage, budget within ±50% per type, and
+niche-word substring match in keywords. No negatives, duplication check,
+branded isolation, match-type-mixing check, or budget reconciliation.
 
-No negatives concept, no duplication check, no branded distinction, no
-match-type-mixing check beyond the ground truth's own template, no
-budget-reconciliation check against `monthlyBudget`.
+## Decisions (final)
 
-## Decisions
-
-### 1. Negative-keyword architecture
+### Negative-keyword structure
 
 ```ts
 negativeKeywords: Array<{
-  term: string;
-  matchType: "negative_exact" | "negative_phrase";
-  level: "campaign" | "ad_group";
+  text: string;
+  matchType: "negativeExact" | "negativePhrase";
+  level: "campaign" | "adGroup";
+  reason: string;
 }>;
 ```
 
-Research campaigns (broad/phrase/auto discovery) may have harvested exact
-terms added as negative-exact to source campaigns when routing isolation
-is wanted; phrase negatives reserved for clearly irrelevant concepts.
-Performance-exact campaigns are **not** automatically negated against
-every other campaign in every scenario — only when the scenario's
-routing policy calls for strict isolation:
+Expected routing: Auto and Broad Research campaigns receive
+negative-exact entries for keywords moved into Phrase, Exact, or
+SKAG/Performance structures. Phrase Research campaigns receive
+negative-exact entries for keywords moved into Exact or SKAG/Performance.
+Non-branded campaigns receive brand negatives so branded traffic stays in
+Defense. Generic campaigns may receive competitor-brand negatives when a
+separate competitor campaign exists. Negative-phrase is reserved for
+proven-irrelevant themes or explicit routing rules.
+
+### Duplicate targeting
+
+Same normalized keyword + match type is an **error** only when **all**
+of these match: advertised ASIN/ASIN-set, campaign role, brand lane,
+targeting objective. Exact/Phrase/Broad versions of the same keyword are
+**not automatically duplicates**, provided the negative-routing structure
+prevents uncontrolled overlap. Allowed when: different ASINs are
+intentionally advertised; the campaigns have an explicit testing or
+placement-isolation purpose; the scenario contains a documented
+duplication justification. For a single-ASIN beginner scenario, duplicate
+keyword+match-type targets should be graded wrong.
+
+### Branded treatment
 
 ```ts
-routingPolicy: "strict_isolation" | "controlled_overlap" | "discovery_first";
+brandName: string;
+brandAliases: string[];
+brandMisspellings: string[];
+brandProductNames: string[];
+competitorBrands: string[];
 ```
 
-Non-branded campaigns negate owned-brand terms when the strategy requires
-branded isolation; branded traffic stays in defense campaigns.
+Normalized **token and phrase** matching, not substring matching. Rules:
+own-brand terms belong only in Defense. Generic Research/Performance
+campaigns exclude own-brand traffic. Competitor terms belong in a
+separate competitor strategy where one exists. A combined query
+containing the brand _and_ a generic product term is still branded.
 
-### 2. Target duplication is not always wrong
+### Match-type structure
 
-Amazon itself notes using multiple match types for the same keyword
-doesn't inherently mean self-competition, and the highest eligible bid
-may be used when multiple match types qualify. Treat as an error only
-when: same normalized keyword + same match type appears in two campaigns
-with the same role, for the same ASIN, with no intentional routing rule,
-with conflicting bids/negatives, or in a structure that makes reporting
-ownership unclear. Allow when: separate ASINs, separate marketplaces,
-one campaign is branded-defense vs. another with a documented separate
-role, an explicit controlled test/migration permits it, or different
-match types are intentional.
+"One match type per ad group" is the house rule and is graded explicitly
+— a training-architecture rule, not an Amazon platform limitation.
+Multiple relevant keywords with the same match type may share an ad
+group. Broad/Phrase/Exact must not be mixed within one ad group. Keyword
+targeting, product targeting, and Auto targeting must not be mixed. SKAG
+is a deliberate special structure, not the default for every keyword.
 
-```ts
-allowDuplicateTargeting: boolean;
-allowedDuplicateReasons: string[];
-```
-
-### 3. Branded determination (shared taxonomy with STORY-082)
-
-```ts
-brandTerms: string[];
-ownedBrandAliases: string[];
-competitorBrandTerms: string[];
-```
-
-Branded campaigns require: `strategy: "defense"`, owned-brand terms only,
-separate budget, no generic/competitor terms unless explicitly allowed,
-appropriate negative isolation per the scenario's `routingPolicy`.
-
-### 4. Match-type separation
-
-AMPH default for manually targeted keyword ad groups: one campaign
-strategy + one target family + one match type per ad group. Not a
-universal Amazon platform requirement — grade explicitly per scenario:
-
-```ts
-matchTypeIsolationPolicy: "strict" | "preferred" | "not_required";
-```
-
-Strict for performance/research manual campaigns at beginner/intermediate;
-not applicable to Auto or product-targeting ad groups. The grader
-inspects the user's actual submitted keywords/match types, not campaign
-names.
-
-### 5. Naming convention
-
-Replace the current `"{SP|SB} | {MatchType} | {niche} | ₱{budget}/d"` with
-the house convention:
+### Naming convention
 
 ```
 Brand | ASIN | Channel | Strategy | Target Type | Match | Label
 ```
 
-e.g. `CasaNook | B0ABC123 | SP | Research | Keyword | Broad | Core`. Rules:
-ASIN after brand, no marketplace code, "Defense" for branded defense,
-"Research" (not "gen"), branded terms only in branded campaigns, no DSP
-field, machine-parseable separators, consistent canonical enum values.
-Versioned:
+e.g. `Acme | B0ABC123 | SP | Research | Keyword | Broad | Core`. Rules:
+"Defense" for branded campaigns; "Research," not "gen"; branded terms
+stay out of Performance; no marketplace codes or budgets in the name;
+**Down Only bidding by default** unless the scenario explicitly teaches
+another bidding strategy.
+
+### Budget reconciliation
 
 ```ts
-namingConventionVersion: string;
+monthlyBudget: number;
+planningPeriodDays: number;
+accountDailyBudgetCap: number; // scenario-specific, never a hardcoded universal
 ```
 
-### 6. Budget reconciliation
-
 ```
-Total submitted daily budget = sum(campaign.dailyBudget)
-Expected daily budget = statedMonthlyBudget ÷ planningDays   // planningDays: 30 | 31
+plannedSpend = sum(campaign.dailyBudget) × planningPeriodDays
 ```
 
-| Difficulty   | Tolerance |
-| ------------ | --------- |
-| Beginner     | ±10%      |
-| Intermediate | ±5%       |
-| Advanced     | ±2%       |
+Require planned spend within **±2%** of the stated monthly budget — the
+explicit `planningPeriodDays` field prevents 30-day-vs-30.4-day
+ambiguity. Campaign-role allocation uses scenario-defined acceptable
+ranges, normally within **±10 percentage points** of the target
+allocation (the current ±50% tolerance is too loose to teach anything).
 
-Also grade: no negative budget, no zero-budget active campaign, no
-unexplained unallocated amount, no implausible per-campaign share,
-objective-aligned allocation, portfolio/account daily cap respected. A
-learner may explicitly mark a reserve rather than allocate every dollar:
+### Scoring
 
-```ts
-unallocatedReserve: number;
-reserveReason?: string;
-```
+| Dimension                             | Weight |
+| ------------------------------------- | ------ |
+| Keyword relevance and intent coverage | 20%    |
+| Campaign/ad-group structure           | 20%    |
+| Negative routing and harvesting       | 20%    |
+| Budget reconciliation and allocation  | 15%    |
+| Branded isolation                     | 10%    |
+| Duplicate/cannibalization control     | 10%    |
+| Naming compliance                     | 5%     |
 
-### Full dimension set
-
-```ts
-type CampaignBuilderScores = {
-  strategicCoverage: number; // 20%
-  campaignIsolation: number; // 15%
-  budgetReconciliation: number; // 15%
-  budgetStrategy: number; // 10%
-  negativeArchitecture: number; // 15%
-  targetingRelevance: number; // 10%
-  namingCompliance: number; // 10%
-  maintainability: number; // 5%
-};
-```
-
-## Decision-pack refinements (implementation-ready, 2026-07-29 second pass)
-
-Required tests:
-
-- Auto does not universally require negatives for every manual exact
-  keyword (confirms item 1's "not automatic" rule).
-- `strict_isolation` scenarios penalize missing source negatives;
-  `controlled_overlap` scenarios permit documented duplicates.
-- Branded leakage into generic performance campaigns is penalized.
-- Mixed match types fail `strict` policy but may pass `preferred` policy
-  with a warning (not a hard fail).
-- Budget totals above or below tolerance are penalized proportionally.
-- The house-naming parser rejects malformed segments and invalid enum
-  values, not just well-formed-but-wrong ones.
+Naming matters but never rescues a strategically broken campaign plan —
+a well-named dumpster fire is still a dumpster fire.
 
 ## Suggested split
 
-- **STORY-084a:** New 8-dimension scoring schema replacing the current
-  3-dimension `ScoreDimensions` (the dimension table above).
-- **STORY-084b:** Negative architecture + `routingPolicy` +
-  duplication rules (items 1, 2).
+- **STORY-084a:** New 7-dimension scoring schema replacing the current
+  3-dimension `ScoreDimensions`.
+- **STORY-084b:** Negative architecture + routing rules + duplication
+  detection.
 - **STORY-084c:** Branded taxonomy + match-type-isolation grading
-  (items 3, 4) — coordinate with STORY-082's shared brand taxonomy so
-  the two aren't defined twice.
-- **STORY-084d:** Naming convention + budget reconciliation (items 5, 6).
+  (coordinate with STORY-082's shared brand-detection approach so the two
+  aren't defined twice).
+- **STORY-084d:** Naming convention + budget reconciliation (flat ±2%
+  total, ±10pp per-role allocation).
 
 ## Acceptance criteria
 
-- [ ] Split confirmed (or explicitly kept as one story) before work starts
 - [ ] `CampaignStructure`/`AdGroup` extended with `negativeKeywords`
-- [ ] `routingPolicy`, `matchTypeIsolationPolicy`, `allowDuplicateTargeting`
-      implemented and graded per the rules above
-- [ ] Brand taxonomy shared with STORY-082, not redefined separately
-- [ ] Naming grades against the house convention, not the old template
-- [ ] Budget reconciliation implemented with per-difficulty tolerance,
-      reserve handling included
-- [ ] `CampaignBuilderScores` is the new 8-dimension shape;
+- [ ] Duplicate-targeting detection implemented per the 4-factor rule
+      (ASIN, role, brand lane, objective) — not a blanket "same
+      keyword+match-type is always wrong"
+- [ ] Branded taxonomy implemented with normalized token/phrase matching
+- [ ] Match-type-isolation grading inspects the user's actual submission,
+      not campaign names
+- [ ] Naming graded against the house convention (`Brand | ASIN | Channel
+    | Strategy | Target Type | Match | Label`)
+- [ ] Budget reconciliation: flat ±2% total, ±10pp per-role allocation,
+      reserve/cap handling scenario-specific
+- [ ] `CampaignBuilderScores` is the new 7-dimension shape;
       `seed-simulator-policies.ts` weights updated to match
-- [ ] Domain tests cover each new check against Ryan-supplied example
-      submissions (a correct one and at least one flawed one per rule)
+- [ ] Deterministic-replay test: same scenario + engine version → identical
+      output
+- [ ] Domain tests cover each check against Ryan-supplied example
+      submissions (correct + at least one flawed per rule)
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR against `main`, CI green, squash merge
