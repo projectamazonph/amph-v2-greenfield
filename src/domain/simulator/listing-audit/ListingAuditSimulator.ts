@@ -3,33 +3,24 @@
  *
  * STORY-040: Listing Audit + Keyword Research simulator.
  * STORY-070: Listing Audit Rebuild (Scoring Engine Integration).
+ * STORY-080: Listing Audit rubric rewrite. Replaces character-count
+ * title/bullet/description scoring with a rule engine across six
+ * weighted dimensions (compliance, relevance, accuracy, conversion,
+ * mobile, imagery). See docs/stories/STORY-080.md for the full decision
+ * record. The category-specific claim lists and required-attribute
+ * lists below are starter heuristics pending a PPC subject-matter
+ * review -- they are deliberately simple, versioned, and overridable,
+ * not asserted as exhaustive Amazon policy.
  *
- * Runs two analyses:
- *  1. Listing audit: scores title/bullets/description, identifies gaps
- *  2. Keyword research: generates a prioritized keyword list from the niche
- *
- * When userFindingActions are provided, also grades the student's fix/skip
- * triage of each finding against ground truth and computes per-dimension
- * scores:
- *  direction       : % of findings correctly triaged
- *  priorityCoverage: severity-weighted F1 of the student's fix decisions
- *  reviewCoverage  : % of findings assigned a decision (NOT graded, see below)
- *
- * Two dimensions were removed in Sprint 14 rather than renamed:
- *  - `explanation` was a hardcoded 100 that policies weighted 10-25%, so it
- *    was pure free marks. Gone until real rubric scoring exists (STORY-071).
- *  - `reviewCoverage` (formerly `dataSufficiency`) is completion, not
- *    judgement. It is still reported for display, but nothing gates submission on it,
- *    but it is no longer a graded dimension (STORY-072).
- *
- * `priorityCoverage` (formerly `profitability`) was renamed because it never
- * measured profitability: there is no revenue or ACOS model behind it. Note
- * STR Triage's `profitability` IS revenue-based and keeps its name.
- * See docs/audit-2026-07-26-simulator-accuracy-review.md.
+ * This story does NOT change the ground-truth fix/skip grading
+ * (groundTruthAction, direction, priorityCoverage, reviewCoverage) --
+ * that binary model, and its replacement with a contextual, non-binary
+ * action set, is STORY-083's job. Only the finding generator and the
+ * listing score change here.
  */
 
 import type { Simulator } from "@/ports/simulator/Simulator";
-import type { ListingAuditInput } from "./ListingAuditInput";
+import type { ListingAuditInput, ListingImage } from "./ListingAuditInput";
 import type {
   ListingAuditOutput,
   ListingAudit,
@@ -39,114 +30,592 @@ import type {
   GradedFinding,
   KeywordResult,
   ScoreDimensions,
+  RuleDimension,
+  RuleOutcome,
 } from "./ListingAuditOutput";
 
-/**
- * Combined title + bullet length at which the visible copy is considered
- * close to its limits, so overflow keywords belong in the backend
- * search-terms field instead.
- *
- * Amazon allows roughly 200 characters of title and 5 bullets of about 500
- * characters each, so the visible fields hold on the order of 2,700
- * characters. 1,800 is the point where most of that budget is spent.
- *
- * This is a placeholder heuristic, not a sourced rule. STORY-080 replaces
- * length-based listing scoring with a real rubric.
- */
-const VISIBLE_COPY_NEARLY_FULL_CHARS = 1800;
+// ── Category variants ──────────────────────────────────────────────────────
 
-// ── Title audit ──────────────────────────────────────────────────────────────
+type CategoryVariant = "general_home" | "beauty" | "food_supplements" | "electronics" | "apparel";
 
-function auditTitle(
-  title: string,
-  niche: string,
-): { score: number; findings: Array<Omit<AuditFinding, "id">> } {
-  const findings: Array<Omit<AuditFinding, "id">> = [];
-  const lowerTitle = title.toLowerCase();
-  const lowerNiche = niche.toLowerCase();
-  const nicheWords = lowerNiche.split(/\s+/);
-
-  // Score: 1pt per 10 chars, +10 if niche is referenced, +10 per niche word found
-  let score = Math.min(100, Math.round(title.length / 3));
-
-  if (title.length < 50) {
-    findings.push({
-      category: "title",
-      severity: "warning",
-      message: "Title is shorter than recommended (50–200 characters).",
-      suggestion: "Expand the title with key features, material, and target audience.",
-    });
-    score = Math.max(0, score - 20);
-  }
-
-  // Check niche coverage
-  const nicheCovered = nicheWords.every((w) => lowerTitle.includes(w));
-  if (!nicheCovered) {
-    const missing = nicheWords.filter((w) => !lowerTitle.includes(w));
-    findings.push({
-      category: "title",
-      severity: "info",
-      message: `Niche keyword "${missing[0]}" not found in title.`,
-      suggestion: `Add "${missing[0]}" to the title.`,
-    });
-    score = Math.max(0, score - 10);
-  }
-
-  if (title.length === 0) {
-    return {
-      score: 0,
-      findings: [
-        {
-          category: "title",
-          severity: "critical",
-          message: "Title is empty.",
-          suggestion: "Write a descriptive title including the product name and key features.",
-        },
-      ],
-    };
-  }
-
-  return { score: Math.min(100, score), findings };
+interface CategoryVariantConfig {
+  readonly id: CategoryVariant;
+  readonly label: string;
+  /** Claim phrases prohibited in this category beyond the universal medical-claim list. */
+  readonly prohibitedClaimTerms: readonly string[];
+  /** Content that should appear somewhere in bullets/description for this category. */
+  readonly requiredAttributeTerms: readonly string[];
 }
 
-// ── Bullet audit ────────────────────────────────────────────────────────────
+const CATEGORY_VARIANTS: Record<CategoryVariant, CategoryVariantConfig> = {
+  general_home: {
+    id: "general_home",
+    label: "General Hardlines & Home",
+    prohibitedClaimTerms: [],
+    requiredAttributeTerms: ["material", "dimensions"],
+  },
+  beauty: {
+    id: "beauty",
+    label: "Beauty and Personal Care",
+    prohibitedClaimTerms: ["eliminates wrinkles", "erases wrinkles", "permanent results"],
+    requiredAttributeTerms: ["skin type", "how to use"],
+  },
+  food_supplements: {
+    id: "food_supplements",
+    label: "Food and Supplements",
+    prohibitedClaimTerms: ["cures", "treats", "diagnoses", "prevents disease"],
+    requiredAttributeTerms: ["serving size", "ingredients"],
+  },
+  electronics: {
+    id: "electronics",
+    label: "Electronics",
+    prohibitedClaimTerms: [],
+    requiredAttributeTerms: ["compatible", "requires"],
+  },
+  apparel: {
+    id: "apparel",
+    label: "Apparel",
+    prohibitedClaimTerms: [],
+    requiredAttributeTerms: ["size", "material"],
+  },
+};
 
-function auditBullets(bullets: readonly string[]): {
-  score: number;
-  findings: Array<Omit<AuditFinding, "id">>;
-} {
-  const findings: Array<Omit<AuditFinding, "id">> = [];
-  if (bullets.length === 0) {
-    return {
-      score: 0,
-      findings: [
-        {
-          category: "bullets",
+function normalizeCategoryVariant(category: string): CategoryVariant {
+  const lower = category.toLowerCase();
+  if (/beauty|cosmetic|skincare|makeup|personal care/.test(lower)) return "beauty";
+  if (/food|supplement|vitamin|nutrition|grocery/.test(lower)) return "food_supplements";
+  if (/electronic|gadget|device|charger|cable|earbud|headphone/.test(lower)) return "electronics";
+  if (/apparel|clothing|shoe|shirt|dress|jacket|jean/.test(lower)) return "apparel";
+  return "general_home";
+}
+
+// ── Title policy (versioned) ────────────────────────────────────────────────
+
+/**
+ * 75-character title limit for most non-media categories, effective
+ * 2026-07-27, verified against public Amazon Seller Central sources
+ * (see docs/simulator-remediation-decisions.md). Same limit applied
+ * across all five category variants today -- the config shape supports
+ * per-category overrides once a category-specific limit is verified.
+ */
+const TITLE_POLICY = {
+  marketplace: "US",
+  policyVersion: "amazon-2026-07-27",
+  effectiveDate: "2026-07-27",
+  titleMaxChars: 75,
+} as const;
+
+// ── Rule engine ──────────────────────────────────────────────────────────
+
+interface RuleContext {
+  readonly title: string;
+  readonly lowerTitle: string;
+  readonly bullets: readonly string[];
+  readonly lowerBullets: readonly string[];
+  readonly description: string;
+  readonly lowerDescription: string;
+  readonly niche: string;
+  readonly nicheWords: readonly string[];
+  readonly categoryVariant: CategoryVariantConfig;
+  readonly marketplace: string;
+  readonly images: readonly ListingImage[];
+  readonly hasVideo: boolean;
+  readonly hasAPlus: boolean;
+}
+
+interface RuleEvalResult {
+  readonly outcome: RuleOutcome;
+  readonly severity: FindingSeverity;
+  readonly message: string;
+  readonly suggestion: string;
+}
+
+interface RuleDefinition {
+  readonly ruleId: string;
+  readonly dimension: RuleDimension;
+  readonly isCriticalGate: boolean;
+  readonly evaluate: (ctx: RuleContext) => RuleEvalResult;
+}
+
+const PASS: Omit<RuleEvalResult, "outcome"> = { severity: "info", message: "", suggestion: "" };
+
+function combinedText(ctx: RuleContext): string {
+  return `${ctx.lowerTitle} ${ctx.lowerBullets.join(" ")} ${ctx.lowerDescription}`;
+}
+
+function containsAny(text: string, terms: readonly string[]): boolean {
+  return terms.some((t) => text.includes(t.toLowerCase()));
+}
+
+const MEDICAL_CLAIM_TERMS = ["cures", "treats disease", "heals", "diagnose", "prevents illness"];
+const SUPERLATIVE_TERMS = ["best seller", "#1 rated", "guaranteed", "100% satisfaction guarantee"];
+const BENEFIT_PHRASES = ["so you can", "perfect for", "ideal for", "designed to", "helps you"];
+const DIFFERENTIATOR_TERMS = ["unlike", "compared to", "stands out", "unique", "premium quality"];
+
+const RULES: readonly RuleDefinition[] = [
+  // ── Compliance (25%) ──────────────────────────────────────────────
+  {
+    ruleId: "title_length_limit",
+    dimension: "compliance",
+    isCriticalGate: true,
+    evaluate: (ctx) => {
+      if (ctx.title.length > TITLE_POLICY.titleMaxChars) {
+        return {
+          outcome: "fail",
+          severity: "critical",
+          message: `Title is ${ctx.title.length} characters, over the ${TITLE_POLICY.titleMaxChars}-character marketplace limit.`,
+          suggestion: `Shorten the title to ${TITLE_POLICY.titleMaxChars} characters or fewer; move overflow detail to Item Highlights.`,
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "prohibited_medical_claims",
+    dimension: "compliance",
+    isCriticalGate: true,
+    evaluate: (ctx) => {
+      if (containsAny(combinedText(ctx), MEDICAL_CLAIM_TERMS)) {
+        return {
+          outcome: "fail",
+          severity: "critical",
+          message: "Listing content includes an unsubstantiated medical claim.",
+          suggestion:
+            "Remove disease-treatment/cure language; use compliant structure/function wording instead.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "prohibited_superlative_claims",
+    dimension: "compliance",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (containsAny(combinedText(ctx), SUPERLATIVE_TERMS)) {
+        return {
+          outcome: "warning",
+          severity: "warning",
+          message: "Listing content includes an unverifiable superlative claim.",
+          suggestion:
+            'Remove or qualify claims like "best seller" or "guaranteed" that Amazon may flag.',
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "all_caps_abuse",
+    dimension: "compliance",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      const capsWords = ctx.title
+        .split(/\s+/)
+        .filter((w) => w.length >= 3 && w === w.toUpperCase() && /[A-Z]/.test(w));
+      if (capsWords.length >= 2) {
+        return {
+          outcome: "warning",
+          severity: "warning",
+          message: "Title has multiple all-caps words.",
+          suggestion:
+            "Use standard capitalization; reserve caps for acronyms and brand names only.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "category_prohibited_claims",
+    dimension: "compliance",
+    isCriticalGate: true,
+    evaluate: (ctx) => {
+      if (ctx.categoryVariant.prohibitedClaimTerms.length === 0) {
+        return { outcome: "notApplicable", ...PASS };
+      }
+      if (containsAny(combinedText(ctx), ctx.categoryVariant.prohibitedClaimTerms)) {
+        return {
+          outcome: "fail",
+          severity: "critical",
+          message: `Listing content includes a claim restricted for ${ctx.categoryVariant.label}.`,
+          suggestion:
+            "Remove the restricted claim or replace it with compliant, qualified language.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+
+  // ── Relevance (20%) ────────────────────────────────────────────────
+  {
+    ruleId: "niche_in_title",
+    dimension: "relevance",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (ctx.nicheWords.length === 0) return { outcome: "notApplicable", ...PASS };
+      const missing = ctx.nicheWords.filter((w) => !ctx.lowerTitle.includes(w));
+      if (missing.length === ctx.nicheWords.length) {
+        return {
+          outcome: "fail",
+          severity: "warning",
+          message: "None of the niche's core keywords appear in the title.",
+          suggestion: `Add the core niche terms to the title: ${ctx.nicheWords.join(", ")}.`,
+        };
+      }
+      if (missing.length > 0) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: `Niche keyword${missing.length > 1 ? "s" : ""} "${missing.join(", ")}" not found in title.`,
+          suggestion: `Add "${missing[0]}" to the title.`,
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "niche_in_bullets_or_description",
+    dimension: "relevance",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (ctx.nicheWords.length === 0) return { outcome: "notApplicable", ...PASS };
+      const supportingText = `${ctx.lowerBullets.join(" ")} ${ctx.lowerDescription}`;
+      const covered = ctx.nicheWords.some((w) => supportingText.includes(w));
+      if (!covered) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: "Bullets and description don't reinforce the niche keywords from the title.",
+          suggestion: "Work at least one niche term naturally into a bullet or the description.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "keyword_stuffing",
+    dimension: "relevance",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (!ctx.niche) return { outcome: "notApplicable", ...PASS };
+      const text = combinedText(ctx);
+      const nicheLower = ctx.niche.toLowerCase();
+      const occurrences = nicheLower.length > 0 ? text.split(nicheLower).length - 1 : 0;
+      if (occurrences >= 4) {
+        return {
+          outcome: "warning",
+          severity: "warning",
+          message: `The niche phrase "${ctx.niche}" is repeated ${occurrences} times -- reads as keyword stuffing.`,
+          suggestion: "Use synonyms and natural variation instead of repeating the exact phrase.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "backend_keyword_room",
+    dimension: "relevance",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      const totalChars = ctx.title.length + ctx.bullets.reduce((s, b) => s + b.length, 0);
+      if (totalChars >= 1800) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: "Visible content is close to its limits, so extra keywords will not fit.",
+          suggestion: "Move remaining keywords to the backend search-terms field.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+
+  // ── Accuracy (15%) ─────────────────────────────────────────────────
+  {
+    ruleId: "bullet_count_sufficient",
+    dimension: "accuracy",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (ctx.bullets.length === 0) {
+        return {
+          outcome: "fail",
           severity: "critical",
           message: "No bullet points found.",
-          suggestion: "Add at least 3–5 keyword-rich bullet points.",
-        },
-      ],
-    };
+          suggestion: "Add at least 3-5 keyword-rich bullet points.",
+        };
+      }
+      if (ctx.bullets.length < 3) {
+        return {
+          outcome: "warning",
+          severity: "warning",
+          message: `Only ${ctx.bullets.length} bullet(s) found: add more for full coverage.`,
+          suggestion: "Aim for 5 bullet points (Amazon limit).",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "category_required_attributes",
+    dimension: "accuracy",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      const required = ctx.categoryVariant.requiredAttributeTerms;
+      if (required.length === 0) return { outcome: "notApplicable", ...PASS };
+      const supportingText = `${ctx.lowerBullets.join(" ")} ${ctx.lowerDescription}`;
+      const foundCount = required.filter((term) =>
+        supportingText.includes(term.toLowerCase()),
+      ).length;
+      if (foundCount === 0) {
+        return {
+          outcome: "fail",
+          severity: "warning",
+          message: `Listing is missing ${ctx.categoryVariant.label}-specific attribute information (${required.join(", ")}).`,
+          suggestion: `Cover ${required.join(" or ")} in a bullet or the description.`,
+        };
+      }
+      if (foundCount < required.length) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: `Listing covers some but not all expected ${ctx.categoryVariant.label} attributes.`,
+          suggestion: `Also cover: ${required.filter((t) => !supportingText.includes(t.toLowerCase())).join(", ")}.`,
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+
+  // ── Conversion (15%) ───────────────────────────────────────────────
+  {
+    ruleId: "description_length_gate",
+    dimension: "conversion",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (ctx.description.length === 0) {
+        return {
+          outcome: "fail",
+          severity: "warning",
+          message: "Description is empty.",
+          suggestion: "Write at least 100 characters covering features and benefits.",
+        };
+      }
+      if (ctx.description.length < 100) {
+        return {
+          outcome: "warning",
+          severity: "warning",
+          message: "Description is short.",
+          suggestion: "Expand to at least 200 characters covering features and benefits.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "benefit_language_present",
+    dimension: "conversion",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (!containsAny(`${ctx.lowerBullets.join(" ")} ${ctx.lowerDescription}`, BENEFIT_PHRASES)) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message:
+            "Bullets and description read as feature lists without connecting to a customer benefit.",
+          suggestion:
+            'Frame at least one bullet as a benefit, e.g. "...so you can..." or "perfect for...".',
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "differentiation_signal",
+    dimension: "conversion",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (
+        !containsAny(`${ctx.lowerBullets.join(" ")} ${ctx.lowerDescription}`, DIFFERENTIATOR_TERMS)
+      ) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: "Listing doesn't signal what makes this product different from competitors.",
+          suggestion:
+            'Add a differentiator, e.g. "unlike standard X, this..." or "premium quality".',
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+
+  // ── Mobile (10%) ───────────────────────────────────────────────────
+  {
+    ruleId: "title_front_loaded",
+    dimension: "mobile",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (ctx.nicheWords.length === 0) return { outcome: "notApplicable", ...PASS };
+      const visiblePrefix = ctx.lowerTitle.slice(0, 40);
+      if (!ctx.nicheWords.some((w) => visiblePrefix.includes(w))) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message:
+            "The product's core identity isn't clear within the first 40 characters of the title.",
+          suggestion: "Front-load the title with the product type and key niche term.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "bullet_length_scannable",
+    dimension: "mobile",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (ctx.bullets.length === 0) return { outcome: "notApplicable", ...PASS };
+      if (ctx.bullets.some((b) => b.length > 200)) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: "At least one bullet is long enough to wall-of-text on mobile.",
+          suggestion: "Keep bullets under ~200 characters so they scan well on mobile.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+
+  // ── Imagery (15%) ──────────────────────────────────────────────────
+  {
+    ruleId: "main_image_present",
+    dimension: "imagery",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (!ctx.images.some((img) => img.role === "main")) {
+        return {
+          outcome: "fail",
+          severity: "critical",
+          message: "No main product image.",
+          suggestion: "Add a main image showing the product against a plain white background.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "main_image_white_background",
+    dimension: "imagery",
+    // A real, hard Amazon requirement (not just a quality nice-to-have) --
+    // violating it risks listing suppression, so it gates like a
+    // compliance failure even though it's weighted under "imagery".
+    isCriticalGate: true,
+    evaluate: (ctx) => {
+      const main = ctx.images.find((img) => img.role === "main");
+      if (!main) return { outcome: "notApplicable", ...PASS };
+      if (!main.whiteBackground) {
+        return {
+          outcome: "fail",
+          severity: "critical",
+          message: "Main image does not use a plain white background.",
+          suggestion: "Amazon requires the main image to be on a pure white background.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "lifestyle_image_present",
+    dimension: "imagery",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (!ctx.images.some((img) => img.role === "lifestyle")) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: "No lifestyle image showing the product in use.",
+          suggestion: "Add a lifestyle image to help buyers picture the product in context.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "image_count_sufficient",
+    dimension: "imagery",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (ctx.images.length < 5) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: `Only ${ctx.images.length} image(s) -- Amazon listings convert best with 5+.`,
+          suggestion: "Add more images: additional angles, scale, and use-case shots.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "infographic_or_dimensions_present",
+    dimension: "imagery",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (!ctx.images.some((img) => img.role === "infographic" || img.role === "dimensions")) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: "No infographic or dimensions image.",
+          suggestion:
+            "Add an infographic or dimensions image to communicate scale and key facts at a glance.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+  {
+    ruleId: "supporting_media_present",
+    dimension: "imagery",
+    isCriticalGate: false,
+    evaluate: (ctx) => {
+      if (!ctx.hasVideo && !ctx.hasAPlus) {
+        return {
+          outcome: "warning",
+          severity: "info",
+          message: "No video or A+ Content.",
+          suggestion: "Add a product video or A+ Content to support the listing with richer media.",
+        };
+      }
+      return { outcome: "pass", ...PASS };
+    },
+  },
+];
+
+const DIMENSION_WEIGHTS: Record<RuleDimension, number> = {
+  compliance: 0.25,
+  relevance: 0.2,
+  accuracy: 0.15,
+  conversion: 0.15,
+  mobile: 0.1,
+  imagery: 0.15,
+};
+
+const CRITICAL_GATE_CAP = 59;
+
+function outcomePoints(outcome: RuleOutcome): number {
+  switch (outcome) {
+    case "pass":
+      return 1;
+    case "warning":
+      return 0.5;
+    case "fail":
+      return 0;
+    case "notApplicable":
+      return 0; // excluded from denominator, so never actually averaged in
   }
-
-  const totalChars = bullets.reduce((sum, b) => sum + b.length, 0);
-  let score = Math.min(100, Math.round(totalChars / 5));
-
-  if (bullets.length < 5) {
-    findings.push({
-      category: "bullets",
-      severity: "warning",
-      message: `Only ${bullets.length} bullet(s) found: add more for full coverage.`,
-      suggestion: "Aim for 5 bullet points (Amazon limit).",
-    });
-    score = Math.max(0, score - 15);
-  }
-
-  return { score, findings };
 }
 
-// ── Keyword research ─────────────────────────────────────────────────────────
+// ── Keyword research (unchanged -- STORY-081's concern) ────────────────────
 
 function generateKeywords(niche: string): KeywordResult[] {
   const lower = niche.toLowerCase();
@@ -174,12 +643,10 @@ function generateKeywords(niche: string): KeywordResult[] {
   }));
 }
 
-// ── Grading ──────────────────────────────────────────────────────────────────
+// ── Grading (unchanged -- STORY-083 replaces this) ──────────────────────────
 
-/** Severity weight: proxy for the "cost" of leaving a finding unfixed. */
 const SEVERITY_WEIGHT: Record<FindingSeverity, number> = { critical: 3, warning: 2, info: 1 };
 
-/** A finding must be fixed unless it's merely informational. */
 function groundTruthAction(severity: FindingSeverity): FindingAction {
   return severity === "info" ? "skip" : "fix";
 }
@@ -196,24 +663,12 @@ function buildGradedFindings(
   });
 }
 
-/** Direction score: % of findings where the student's choice matches ground truth. */
 function scoreDirection(gradedFindings: readonly GradedFinding[]): number {
   if (gradedFindings.length === 0) return 100;
   const correct = gradedFindings.filter((f) => f.isCorrect).length;
   return Math.round((correct / gradedFindings.length) * 100);
 }
 
-/**
- * Priority coverage: how well the student's `fix` decisions line up with the
- * findings that actually needed fixing, in severity-weighted terms.
- *
- * This used to be recall only ("of the must-fix findings, how many did you
- * fix?"), which meant marking every single finding `fix` scored a guaranteed
- * 100 by construction: you cannot miss a must-fix if you fix everything. It
- * now also accounts for precision ("of the findings you fixed, how many
- * needed it?") and combines the two as an F1, so indiscriminate fixing is
- * penalised. STORY-073.
- */
 function scorePriorityCoverage(gradedFindings: readonly GradedFinding[]): number {
   if (gradedFindings.length === 0) return 100;
 
@@ -228,7 +683,6 @@ function scorePriorityCoverage(gradedFindings: readonly GradedFinding[]): number
   const userFixedWeight = weightOf(userFixed);
   const hitWeight = weightOf(correctlyFixed);
 
-  // Nothing needed fixing. Fixing nothing is perfect; fixing anything is not.
   if (mustFixWeight === 0) return userFixedWeight === 0 ? 100 : 0;
 
   const recall = hitWeight / mustFixWeight;
@@ -238,14 +692,6 @@ function scorePriorityCoverage(gradedFindings: readonly GradedFinding[]): number
   return Math.round(((2 * recall * precision) / (recall + precision)) * 100);
 }
 
-/**
- * Review coverage: % of findings the student assigned a decision to.
- *
- * This is a completion metric, not a measure of judgement, so it is NOT a
- * graded dimension. It is returned for display and for use as a submission
- * gate. Grading it handed out free marks to anyone who clicked through every
- * finding. STORY-072.
- */
 function scoreReviewCoverage(gradedFindings: readonly GradedFinding[]): number {
   if (gradedFindings.length === 0) return 100;
   const reviewed = gradedFindings.filter((f) => f.userChoice !== undefined).length;
@@ -268,16 +714,17 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
 
   async run(input: ListingAuditInput): Promise<ListingAuditOutput> {
     const { title, bullets, description, niche, userFindingActions } = input;
+    const marketplace = input.marketplace ?? TITLE_POLICY.marketplace;
+    const images = input.images ?? [];
+    const hasVideo = input.hasVideo ?? false;
+    const hasAPlus = input.hasAPlus ?? false;
 
     if (!niche && !title) {
+      const emptyDimensionScores = Object.fromEntries(
+        (Object.keys(DIMENSION_WEIGHTS) as RuleDimension[]).map((d) => [d, 0]),
+      ) as Record<RuleDimension, number>;
       return {
-        audit: {
-          titleScore: 0,
-          bulletScore: 0,
-          descriptionScore: 0,
-          overallScore: 0,
-          findings: [],
-        },
+        audit: { dimensionScores: emptyDimensionScores, overallScore: 0, findings: [] },
         keywordResearch: { keywords: [], searchVolumeEstimate: 0 },
         score: 0,
         gradedFindings: [],
@@ -285,57 +732,71 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
       };
     }
 
-    const { score: titleScore, findings: titleFindings } = auditTitle(title, niche);
-    const { score: bulletScore, findings: bulletFindings } = auditBullets(bullets);
-
-    // Description score: proportional to length (100 chars = 50pts, 200+ = 100pts)
-    const descriptionScore = Math.min(100, Math.round(description.length / 2));
-    const descriptionFindings: Array<Omit<AuditFinding, "id">> =
-      description.length < 100
-        ? [
-            {
-              category: "description",
-              severity: "warning",
-              message: "Description is short.",
-              suggestion: "Write at least 200 characters covering features and benefits.",
-            },
-          ]
-        : [];
-
-    // Backend keywords. The condition used to be inverted: it fired when the
-    // visible copy was SHORT and then told the seller there was no room left.
-    // Short copy means there is room remaining; it is copy that has used up
-    // the visible fields that forces overflow keywords into the backend
-    // search-terms field. STORY-077.
-    const totalChars = title.length + bullets.reduce((s, b) => s + b.length, 0);
-    const backendFindings: Array<Omit<AuditFinding, "id">> =
-      totalChars >= VISIBLE_COPY_NEARLY_FULL_CHARS
-        ? [
-            {
-              category: "backend",
-              severity: "info",
-              message: "Visible content is close to its limits, so extra keywords will not fit.",
-              suggestion: "Move the remaining keywords to the backend (search terms field).",
-            },
-          ]
-        : [];
-
-    const allFindings: AuditFinding[] = [
-      ...titleFindings,
-      ...bulletFindings,
-      ...descriptionFindings,
-      ...backendFindings,
-    ].map((f, i) => ({ ...f, id: `finding-${i}` }));
-
-    const overallScore = Math.round((titleScore + bulletScore + descriptionScore) / 3);
-
-    const audit: ListingAudit = {
-      titleScore,
-      bulletScore,
-      descriptionScore,
-      overallScore,
-      findings: allFindings,
+    const categoryVariant = CATEGORY_VARIANTS[normalizeCategoryVariant(input.category)];
+    const ctx: RuleContext = {
+      title,
+      lowerTitle: title.toLowerCase(),
+      bullets,
+      lowerBullets: bullets.map((b) => b.toLowerCase()),
+      description,
+      lowerDescription: description.toLowerCase(),
+      niche,
+      nicheWords: niche.toLowerCase().split(/\s+/).filter(Boolean),
+      categoryVariant,
+      marketplace,
+      images,
+      hasVideo,
+      hasAPlus,
     };
+
+    // ── Evaluate every rule ─────────────────────────────────────────────
+    const evaluations = RULES.map((rule) => ({ rule, result: rule.evaluate(ctx) }));
+
+    const allFindings: AuditFinding[] = evaluations
+      .filter(({ result }) => result.outcome === "warning" || result.outcome === "fail")
+      .map(({ rule, result }, i) => ({
+        id: `finding-${i}`,
+        ruleId: rule.ruleId,
+        dimension: rule.dimension,
+        severity: result.severity,
+        isCriticalGate: rule.isCriticalGate,
+        message: result.message,
+        suggestion: result.suggestion,
+        category: categoryVariant.id,
+        marketplace,
+        policyVersion: TITLE_POLICY.policyVersion,
+        effectiveDate: TITLE_POLICY.effectiveDate,
+      }));
+
+    // ── Dimension scores ─────────────────────────────────────────────────
+    const dimensionScores = Object.fromEntries(
+      (Object.keys(DIMENSION_WEIGHTS) as RuleDimension[]).map((dim) => {
+        const applicable = evaluations.filter(
+          ({ rule, result }) => rule.dimension === dim && result.outcome !== "notApplicable",
+        );
+        if (applicable.length === 0) return [dim, 100];
+        const points = applicable.reduce(
+          (sum, { result }) => sum + outcomePoints(result.outcome),
+          0,
+        );
+        return [dim, Math.round((points / applicable.length) * 100)];
+      }),
+    ) as Record<RuleDimension, number>;
+
+    const weightedScore = (Object.keys(DIMENSION_WEIGHTS) as RuleDimension[]).reduce(
+      (sum, dim) => sum + dimensionScores[dim] * DIMENSION_WEIGHTS[dim],
+      0,
+    );
+
+    const anyCriticalGateFailed = evaluations.some(
+      ({ rule, result }) => rule.isCriticalGate && result.outcome === "fail",
+    );
+
+    const overallScore = anyCriticalGateFailed
+      ? Math.min(Math.round(weightedScore), CRITICAL_GATE_CAP)
+      : Math.round(weightedScore);
+
+    const audit: ListingAudit = { dimensionScores, overallScore, findings: allFindings };
 
     const keywords = generateKeywords(niche);
     const searchVolumeEstimate = keywords.reduce((sum, k) => sum + k.searchVolumeEstimate, 0);

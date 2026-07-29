@@ -3,30 +3,38 @@
  *
  * STORY-040: Listing Audit + Keyword Research simulator.
  * STORY-070: Listing Audit Rebuild (Scoring Engine Integration).
+ * STORY-080: Listing Audit rubric rewrite. Replaces the character-count
+ * title/bullet/description scores with a weighted-categorical rubric
+ * across six dimensions. See docs/stories/STORY-080.md.
  *
- * When userFindingActions are provided, the simulator grades the student's
- * fix/skip triage of each finding against ground truth and returns
- * per-dimension scores that feed into GradeSimulatorAttempt.
- *
- * Scoring dimensions:
- *  direction       : % of findings correctly triaged (fix/skip matches ground truth)
- *  priorityCoverage: severity-weighted F1 of the student's fix decisions
- *  reviewCoverage  : % of findings assigned a decision (reported, NOT graded)
- *
- * Sprint 14 removed `explanation` (a hardcoded 100 that policies weighted
- * 10-25%) and stopped grading `reviewCoverage` (completion, not judgement).
- * See docs/audit-2026-07-26-simulator-accuracy-review.md.
+ * The fix/skip ground-truth grading (groundTruthAction, direction,
+ * priorityCoverage, reviewCoverage) is unchanged here -- STORY-083 owns
+ * replacing that with a contextual, non-binary action model. This story
+ * only replaces how findings are generated and how the listing is scored.
  */
 
-export type AuditCategory = "title" | "bullets" | "description" | "backend";
+export type RuleDimension =
+  "compliance" | "relevance" | "accuracy" | "conversion" | "mobile" | "imagery";
+
+/** A rule's evaluated outcome for one listing. notApplicable rules don't count toward their dimension's score. */
+export type RuleOutcome = "pass" | "warning" | "fail" | "notApplicable";
+
 export type FindingSeverity = "info" | "warning" | "critical";
 
 export interface AuditFinding {
   readonly id: string;
-  readonly category: AuditCategory;
+  readonly ruleId: string;
+  readonly dimension: RuleDimension;
   readonly severity: FindingSeverity;
+  /** If true and this rule's outcome is "fail", the overall score is capped regardless of the weighted total. */
+  readonly isCriticalGate: boolean;
   readonly message: string;
   readonly suggestion: string;
+  /** Normalized category-variant id this finding's rule was evaluated under (e.g. "beauty"). */
+  readonly category: string;
+  readonly marketplace: string;
+  readonly policyVersion: string;
+  readonly effectiveDate: string;
 }
 
 /** Student's triage decision for a finding: fix it now, or skip it. */
@@ -42,10 +50,10 @@ export interface GradedFinding extends AuditFinding {
 }
 
 export interface ListingAudit {
-  readonly titleScore: number; // 0–100
-  readonly bulletScore: number; // 0–100
-  readonly descriptionScore: number; // 0–100
-  readonly overallScore: number; // 0–100
+  /** 0-100 score per dimension, weighted-categorical (see docs/stories/STORY-080.md). */
+  readonly dimensionScores: Record<RuleDimension, number>;
+  /** Weighted sum of dimensionScores, capped if a critical-gate rule failed. */
+  readonly overallScore: number;
   readonly findings: readonly AuditFinding[];
 }
 
@@ -64,7 +72,7 @@ export interface KeywordResearchResult {
 export interface ListingAuditOutput {
   readonly audit: ListingAudit;
   readonly keywordResearch: KeywordResearchResult;
-  /** Overall listing-quality score 0–100 (title/bullets/description average). */
+  /** Overall listing-quality score 0-100, mirrors audit.overallScore. */
   readonly score: number;
   /**
    * `audit.findings` paired 1:1 with ground-truth triage + the student's
@@ -73,13 +81,13 @@ export interface ListingAuditOutput {
    */
   readonly gradedFindings: readonly GradedFinding[];
   /**
-   * Per-dimension scores (0–100) when userFindingActions are provided.
+   * Per-dimension scores (0-100) when userFindingActions are provided.
    * Null when no triage decisions are supplied (preview/ground-truth only).
    */
   readonly scoreDimensions: ScoreDimensions | null;
 }
 
-/** Dimension scores fed into GradeSimulatorAttempt. */
+/** Dimension scores fed into GradeSimulatorAttempt. Unchanged by STORY-080. */
 export interface ScoreDimensions {
   /** % of findings correctly triaged (fix/skip matches ground truth) */
   readonly direction: number;
