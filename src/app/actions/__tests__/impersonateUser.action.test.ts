@@ -1,5 +1,5 @@
 /**
- * impersonateUser.action.test.ts — covers `performImpersonateUser`, the
+ * impersonateUser.action.test.ts covers `performImpersonateUser`, the
  * pure half of the impersonate server action.
  *
  * The behaviour under test is the cookie choreography, which is where
@@ -15,7 +15,8 @@
  *  - a pre-existing backup cookie wins over the current session cookie
  *  - no token to capture at all → no backup cookie is written
  *  - the target user's token is planted as the session cookie
- *  - use-case errors map onto the action's error union
+ *  - use-case errors map onto the action's error union, including the
+ *    two that carry a message (db_error, token_error)
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -220,6 +221,26 @@ describe("performImpersonateUser", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.kind).toBe(actionKind);
     // A failed impersonation must not touch either cookie.
+    expect(cookies.sets).toHaveLength(0);
+  });
+
+  it("maps a use-case token_error, preserving its message", async () => {
+    const cookies = makeCookieJar({ [SESSION_COOKIE]: "admin-token" });
+    const execute = vi.fn(async () =>
+      Result.err({ kind: "token_error", message: "jwt sign failed" }),
+    ) as unknown as ImpersonateUser["execute"];
+    const { container } = makeContainer({ cookies, execute });
+
+    const result = await performImpersonateUser(
+      container,
+      { targetUserId: "user_target" },
+      getCurrentAdmin(ADMIN),
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toEqual({ kind: "token_error", message: "jwt sign failed" });
+    }
     expect(cookies.sets).toHaveLength(0);
   });
 

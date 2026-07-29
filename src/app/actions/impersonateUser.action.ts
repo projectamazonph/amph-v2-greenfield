@@ -7,8 +7,8 @@
  * fresh JWT for the target user; this action:
  *  1. Authenticates the caller via getSessionUserId
  *  2. Reads the caller's CURRENT session cookie (so we can save it as
-     the "admin backup" cookie) — this happens before step 4 overwrites
-     it, which is what makes a first impersonation restorable
+     the "admin backup" cookie). This happens before step 4 overwrites
+     it, which is what makes a first impersonation restorable.
  *  3. Calls ImpersonateUser.execute
  *  4. Plants the returned token as the session cookie
  *  5. Plants the admin's original token as the amph_admin_session cookie
@@ -65,8 +65,8 @@ export interface CurrentAdminUser {
  * Pure helper. Testable without Next runtime.
  *
  * 1. Resolve the current user (must be admin)
- * 2. Read the admin's current session token (so we can back it up)
- *    — the existing backup wins if one is already present
+ * 2. Read the admin's current session token (so we can back it up).
+ *    The existing backup wins if one is already present.
  * 3. Delegate to ImpersonateUser.execute
  * 4. Plant the new token as the session cookie
  * 5. Plant the admin's original token as the backup cookie
@@ -94,8 +94,8 @@ export async function performImpersonateUser(
   //    overwrites the session cookie with the target user's token.
   //
   //    On a first impersonation there is no backup cookie yet, and the
-  //    session cookie still holds the admin's own token — that's the one
-  //    to back up. If a backup already exists we keep it untouched: the
+  //    session cookie still holds the admin's own token, which is the
+  //    one to back up. If a backup already exists we keep it untouched: the
   //    session cookie would then hold an impersonated user's token, and
   //    the admin's real token is the one already saved.
   const existingBackup = container.cookies.get(getAdminSessionCookieName());
@@ -135,7 +135,7 @@ export async function performImpersonateUser(
   // 5. Plant the admin's original token as the backup cookie.
   //    If there was no token to capture at all (the caller authenticated
   //    by some other means than the session cookie), we leave the backup
-  //    unset — "Stop impersonating" then falls back to signing the user
+  //    unset. "Stop impersonating" then falls back to signing the user
   //    out rather than restoring a session that was never captured.
   if (adminToken) {
     // The backup cookie has a 24h maxAge — admins shouldn't impersonate

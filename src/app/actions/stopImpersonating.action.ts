@@ -10,9 +10,9 @@
  *  3. Delete the backup cookie
  *  4. Return success
  *
- * If there's no backup cookie — the impersonation predates the fix that
+ * If there's no backup cookie (the impersonation predates the fix that
  * captures the admin's token on the FIRST impersonation, or the admin
- * had no session cookie to capture — we fall back to `clearAuthCookie()`
+ * had no session cookie to capture), we fall back to `clearAuthCookie()`
  * so the user is at least signed out instead of stuck impersonating.
  *
  * Testable pure logic: `performStopImpersonating` (below). Action
