@@ -2,109 +2,160 @@
 
 ## Status
 
-**Blocked — needs Ryan's PPC/listing-optimization input.** Per
-`docs/sprint-plan.md` Sprint 15 and
-`docs/audit-2026-07-26-simulator-accuracy-review.md` Phase 2. This is also
-the story that supplies half of what's needed to close the Listing Audit
-click-through bypass (the other half is STORY-083's ground-truth rule) —
-a richer, more varied finding set is what stops "mark everything fix"
-from being cheaply correct.
+**Decided.** Ryan's decisions recorded below (2026-07-29). See
+`docs/simulator-remediation-decisions.md` for cross-cutting rules. This
+story is coupled with STORY-083 (see that doc) — build the new rubric and
+richer finding generator here, and the non-binary ground truth on top of
+it there, in the sequence given at the bottom of this doc.
+
+**Scope note:** category rule packs, imagery metadata, and a 12-18-finding
+generator are each substantial on their own. Recommend splitting; see
+"Suggested split" below.
 
 ## Current mechanism (verbatim, `ListingAuditSimulator.ts`)
 
 ```ts
-// Title: 1pt per 3 chars, capped at 100, minus 20 if <50 chars, minus 10 if a niche word is missing
-let score = Math.min(100, Math.round(title.length / 3));
-
-// Bullets: 1pt per 5 chars of combined bullet text, minus 15 if fewer than 5 bullets
-let score = Math.min(100, Math.round(totalChars / 5));
-
-// Description: 1pt per 2 chars, capped at 100
+let score = Math.min(100, Math.round(title.length / 3)); // title
+let score = Math.min(100, Math.round(totalChars / 5)); // bullets
 const descriptionScore = Math.min(100, Math.round(description.length / 2));
 ```
 
-Every score is a function of character count, plus one niche-keyword
-substring check on the title. There is no relevance, search-intent, Amazon
-policy/TOS compliance, mobile-readability, or imagery modeling anywhere —
-imagery in particular cannot be modeled today because `ListingAuditInput`
-has no image field at all.
+Pure character-count formulas, one niche-substring check, and a
+generator that tops out at ~4 findings.
 
-The finding generator (same file) currently produces at most 4 findings
-per listing (title, bullets, description, backend — one each, gated by
-simple thresholds), which is part of why "fix everything" is cheap: there
-just isn't much to get wrong. See the audit doc's "Undocumented finding 1"
-section for the measured pass-rates this produces.
+## Decisions
 
-## Open questions for Ryan
+### 1. Real audit dimensions and weights
 
-1. **What are the real audit dimensions?** Candidates pulled from common
-   Amazon listing-optimization practice, for you to confirm/replace/reject
-   — not to be taken as the answer:
-   - Search-intent / keyword relevance and placement (front-loaded vs
-     buried)
-   - Compliance red flags (prohibited claims, competitor/ASIN mentions,
-     subjective superlatives Amazon flags, ALL-CAPS abuse, restricted
-     category language)
-   - Mobile readability (title truncation point on mobile search results,
-     bullet line-length)
-   - Category-specific rules (e.g. supplement compliance claims vs.
-     apparel sizing/fit content)
-     **Answer:**
+| Dimension                            | Weight |
+| ------------------------------------ | ------ |
+| Product and query relevance          | 20%    |
+| Customer clarity and comprehension   | 15%    |
+| Benefit and differentiation coverage | 15%    |
+| Search-term coverage                 | 15%    |
+| Compliance and claims risk           | 15%    |
+| Mobile and scan readability          | 10%    |
+| Conversion-supporting media          | 10%    |
 
-2. **Does length still matter at all, and if so how?** Amazon does have
-   real limits (title ~200 chars, 5 bullets). Should length be a pass/fail
-   gate near those real limits rather than a linear score driver?
-   **Answer:**
+Confirmed: relevance/intent, compliance red flags, mobile readability,
+category-specific rules, keyword coverage. Added: differentiation,
+conversion clarity, media support (limited initial scope, see item 4).
+This is an **AMPH instructional rubric**, not an official Amazon
+listing-quality score — do not present it as one.
 
-3. **Should the rubric vary by `category`/`niche`** (both already inputs)?
-   If so, what's the smallest set of category-specific rule variants worth
-   building first?
-   **Answer:**
+### 2. Length is a gate, not the score driver
 
-4. **Imagery is explicitly out of scope today** — `ListingAuditInput` has
-   no image data. Do you want this story to add an imagery checklist input
-   (e.g. image count, whether a lifestyle/infographic image is present) as
-   new fields, or defer imagery entirely to a later story?
-   **Answer:**
+```ts
+{ rule: "title_length", result: "pass" | "warning" | "fail", points: 0 | 0.5 | 1 }
+```
 
-5. **What shape do you want the rubric in?** A weighted checklist of
-   binary pass/fail rules (easier to make deterministic and testable), or
-   continuous per-rule scores? Either is buildable; pick one so the finding
-   generator and the scoring function agree on it.
-   **Answer:**
+Length only matters where it affects compliance, truncation, clarity,
+missing information, or repetition — not as a linear score driver.
 
-6. **How many findings should a realistic listing produce?** The current
-   generator tops out at ~4. What's a realistic count and severity mix
-   (e.g. 8-15 findings, weighted toward warning/info) for a mediocre
-   listing, so the bypass STORY-083 needs to close actually has enough
-   surface area?
-   **Answer:**
+**Verified:** Amazon's title limit drops to 75 characters (most non-media
+categories) effective 2026-07-27, with a new 125-character Item Highlights
+field (confirmed via public sources, see
+`docs/simulator-remediation-decisions.md`). Title rules must be versioned
+by marketplace and effective date:
 
-## What ships once answered (mechanical, agent-doable)
+```ts
+policyVersion: string;
+marketplace: string;
+category: string;
+effectiveDate: string;
+titleMaxChars: number;
+```
 
-Once the rubric shape and rule set are specified, implementation is
-ordinary domain work: replace `auditTitle`/`auditBullets`/description
-scoring with functions that implement the specified checks, extend
-`AuditCategory` and the finding generator to emit the richer, more varied
-set from Q6, and (if Q4 says yes) extend `ListingAuditInput` with imagery
-fields. Tests assert each rule against listings Ryan characterizes as
-good/mediocre/bad — not against invented pass thresholds.
+### 3. Category-specific variants
 
-## Non-goals
+Launch with three curated category packs (of an eventual eight-category
+target list): **Home & Kitchen**, **Beauty and Personal Care**, **Health
+and Household**. Each pack covers required-attribute emphasis, claim
+sensitivity, size/compatibility/material info, variation handling, safety
+statements, prohibited language, title policy, and image expectations.
 
-- Full NLP-based semantic relevance scoring. Rule-based checks are the
-  target unless Ryan asks for something more sophisticated.
-- Live Amazon API integration for actual search-rank verification.
+### 4. Imagery: structured metadata only, no computer vision
 
-## Acceptance criteria (contingent on answers above)
+```ts
+images: Array<{
+  type:
+    | "main"
+    | "lifestyle"
+    | "infographic"
+    | "dimensions"
+    | "comparison"
+    | "instructional"
+    | "packaging";
+  present: boolean;
+  hasReadableText?: boolean;
+  supportsPrimaryBenefit?: boolean;
+}>;
+videoPresent: boolean;
+aPlusPresent: boolean;
+```
 
-- [ ] Q1–Q6 answered by Ryan (no TBDs remain)
-- [ ] Title/bullet/description scoring replaced by the specified rubric,
-      not character-count proxies
-- [ ] Finding generator produces the richer, more varied set from Q6
-- [ ] Imagery handled per Q4 (either new input fields + checks, or
-      explicitly deferred with a follow-up story filed)
+Explicitly deferred: pixel analysis, OCR, background detection, any
+computer vision.
+
+### 5. Weighted checklist, three states, with hard gates
+
+```ts
+"pass" | "partial" | "fail"; // 1.0 / 0.5 / 0.0
+isCriticalGate: true; // a listing cannot pass advanced with a missed critical-gate rule, regardless of total score
+```
+
+Chosen over continuous per-rule scoring: easier to author, test, explain,
+and calibrate.
+
+### 6. Findings per listing
+
+| Difficulty   | Findings |
+| ------------ | -------- |
+| Beginner     | 6-8      |
+| Intermediate | 9-12     |
+| Advanced     | 12-18    |
+
+Intermediate severity mix: 1-2 critical, 3-5 warning, 3-5 info/optimization,
+**1-2 deliberate non-issues** the student should leave alone. The
+deliberate non-issues are load-bearing for STORY-083 — without them,
+"fix everything" stays a viable shortcut.
+
+## Suggested split
+
+- **STORY-080a:** Rubric schema + weighted-checklist scoring engine
+  (items 1, 2, 5).
+- **STORY-080b:** Richer finding generator, 6-18 findings with deliberate
+  non-issues (item 6).
+- **STORY-080c:** Category packs — Home & Kitchen, Beauty, Health &
+  Household (item 3).
+- **STORY-080d:** Imagery metadata fields + scoring (item 4).
+
+## Sequencing with STORY-083
+
+1. New rubric schema (this story).
+2. Richer finding generation (this story).
+3. Contextual ground-truth actions (STORY-083).
+4. Graded student decisions (STORY-083).
+5. Regression tests (STORY-083).
+
+Do not build STORY-083's ground truth against the old character-count
+findings — it would bake weak ground truth into the new action system.
+
+## Acceptance criteria
+
+- [ ] Split confirmed (or explicitly kept as one story) before work starts
+- [ ] Title/bullet/description scoring replaced by the weighted-checklist
+      rubric above, not character-count proxies
+- [ ] Title-length gate versioned by marketplace/effective date, matches
+      the verified 75-character policy
+- [ ] Three category packs implemented (Home & Kitchen, Beauty, Health &
+      Household)
+- [ ] Imagery fields added per item 4, scored, not analyzed
+- [ ] Finding generator produces 6-18 findings per the severity mix table,
+      including deliberate non-issues
+- [ ] Critical-gate rules block advanced-difficulty passing regardless of
+      total score
 - [ ] Domain tests cover each rubric rule against Ryan-characterized
-      example listings
+      example listings (good/mediocre/bad)
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR against `main`, CI green, squash merge

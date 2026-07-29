@@ -2,9 +2,12 @@
 
 ## Status
 
-**Blocked — needs Ryan's keyword-research input (or a sourcing decision).**
-Per `docs/sprint-plan.md` Sprint 15 and
-`docs/audit-2026-07-26-simulator-accuracy-review.md` Phase 2.
+**Decided.** Ryan's decisions recorded below (2026-07-29). See
+`docs/simulator-remediation-decisions.md` for cross-cutting rules.
+
+**Scope note:** curating 10 real datasets across 5 categories plus
+splitting out a new registry entry is content-authoring work as much as
+engineering work. Recommend splitting; see "Suggested split" below.
 
 ## Current mechanism (verbatim, `ListingAuditSimulator.ts:generateKeywords`)
 
@@ -12,82 +15,133 @@ Per `docs/sprint-plan.md` Sprint 15 and
 const templates: Array<[string, number, KeywordResult["competition"]]> = [
   [`${lower}`, 5000, "high"],
   [`${lower} buy online`, 2000, "medium"],
-  [`best ${lower}`, 3000, "high"],
-  [`${words[0]} ${words[words.length - 1]} reviews`, 1000, "low"],
-  [`${lower} cheap`, 1500, "medium"],
-  [`${lower} for ${words[0]}`, 800, "low"],
-  [`wholesale ${lower}`, 300, "low"],
-  [`${lower} near me`, 2000, "medium"],
-  // ...
+  // ... hardcoded string templates + hardcoded volume/competition constants
 ];
 ```
 
-Every keyword is a string template applied to whatever `niche` the learner
-typed, and every volume/competition figure is a literal constant, identical
-in shape for every niche. `${lower} near me` is local-search intent that
-doesn't transfer to Amazon retail search — the audit doc flags this
-specifically. `Campaign Builder`'s `generateKeywords` (a separate, smaller
-template list) has the same structural problem, though it's not explicitly
-in this story's title.
+Identical shape for every niche; includes `near me` (local-search intent
+that doesn't transfer to Amazon retail).
 
-## Open questions for Ryan
+## Decisions
 
-1. **Where should real keyword data come from?** Options: (a) you export
-   real keyword-research data (e.g. from a tool you use) that gets curated
-   into per-niche datasets, (b) synthetic-but-realistic distributions you
-   specify per category (e.g. "a mid-competition consumer-goods niche looks
-   like: 1 head term at 3000-8000/mo, 3-5 mid-tail at 500-2000, 5+ long-tail
-   under 300"), (c) something else.
-   **Answer:**
+### 1. Hybrid data source
 
-2. **What's the dataset shape?** A `KeywordScenarioDataset` keyed by
-   niche/category (similar in spirit to how `SimulatorScenario` JSON already
-   works for other simulators) with `(keyword, volume, competition)`
-   tuples authored per scenario? Or keyed more broadly by category so many
-   niches within a category share a distribution shape?
-   **Answer:**
+Primary: curated, anonymized exports from real research workflows
+(competitor-export-style, seed-export-style, search-term reports,
+brand-analytics-style query data). Do not reproduce proprietary column
+names or imply synthetic data came directly from Amazon unless it did.
 
-3. **Should Keyword Research become a genuinely separate concern from
-   Listing Audit**, per the story title — its own registry entry / scenario
-   file, still reachable from the same page alias — or is decoupling the
-   _data_ (own dataset, still one simulator) sufficient?
-   **Answer:**
+Secondary: synthetic-but-realistic datasets authored from category
+distributions, explicitly labeled:
 
-4. **Versioning:** do you want dataset versions tied to scenario versions so
-   a learner's historical attempt stays reproducible against the dataset
-   that graded it, matching any existing scenario-versioning convention in
-   the repo? Or is versioning out of scope for this pass?
-   **Answer:**
+```ts
+dataOrigin: "curated_anonymized" | "synthetic_calibrated";
+```
 
-5. **How many niches/categories need a curated dataset for launch** — is
-   this a handful of the most common course niches, or does every niche a
-   learner might type need coverage (with a fallback distribution for
-   anything uncurated)?
-   **Answer:**
+Never present hardcoded search volume as real live Amazon volume.
 
-## What ships once answered (mechanical, agent-doable)
+### 2. Dataset shape
 
-Once the sourcing decision and dataset shape are fixed, this is
-infrastructure work: define the dataset type, a repository/loader for it
-(JSON file per niche/category, or a table, depending on Q2), replace
-`generateKeywords()`'s template array with a dataset lookup plus a documented
-fallback for uncurated niches, and apply the same replacement to Campaign
-Builder's keyword generator if Ryan confirms it's in scope. Tests assert the
-loader returns exactly what's in a given dataset fixture — no invented
-numbers.
+Keyed by `category + niche + marketplace + version`
+(e.g. `home-kitchen/drawer-organizers/US/v1.0.0`):
 
-## Non-goals
+```ts
+type KeywordDataset = {
+  id: string;
+  version: string;
+  category: string;
+  niche: string;
+  marketplace: string;
+  currency: string;
+  dataOrigin: "curated_anonymized" | "synthetic_calibrated";
+  generatedAt?: string;
+  product: {
+    brand: string;
+    title: string;
+    asin?: string;
+    attributes: string[];
+    useCases: string[];
+    audiences: string[];
+  };
+  keywords: Array<{
+    keywordId: string;
+    term: string;
+    searchVolumeBand: "very_low" | "low" | "medium" | "high" | "very_high";
+    searchVolumeEstimate?: number;
+    relevance: "core" | "high" | "medium" | "low" | "irrelevant";
+    intent:
+      "generic" | "branded" | "competitor" | "feature" | "use_case" | "audience" | "complementary";
+    competitionBand: "low" | "medium" | "high";
+    suggestedMatchTypes: Array<"exact" | "phrase" | "broad">;
+    launchPriority: "exclude" | "research" | "secondary" | "primary";
+    expectedNegative?: "exact" | "phrase" | null;
+    notes?: string;
+  }>;
+};
+```
 
-- Live integration with an external keyword-research API. This story is
-  about replacing invented constants with curated-but-static data, not
-  building a live data pipeline (that would be a separate, larger story).
+Volume bands for beginner exercises; precise estimates exposed only at
+advanced difficulty.
 
-## Acceptance criteria (contingent on answers above)
+### 3. Keyword Research becomes a separate registry entry
 
-- [ ] Q1–Q5 answered by Ryan (no TBDs remain)
-- [ ] Keyword dataset type + loader implemented per the agreed shape
+Yes — new `keyword-research` registry entry. Listing Audit consumes/
+references keyword datasets but does not generate them. Listing Audit
+owns evaluating content and identifying gaps; Keyword Research Lab owns
+cleaning terms, classifying relevance/intent, grouping, assigning match
+types, selecting negatives, prioritizing, and producing launch clusters.
+
+### 4. Dataset versions tie to scenario versions (required)
+
+```ts
+scenarioVersion: "1.2.0";
+keywordDatasetId: "kw-home-drawer-us";
+keywordDatasetVersion: "1.1.0";
+rubricVersion: "2.0.0";
+```
+
+Attempts persist all of these — see
+`docs/simulator-remediation-decisions.md`. Otherwise a dataset update
+silently changes the expected answer for old attempts.
+
+### 5. Launch coverage
+
+5 categories × 2 niches = 10 curated datasets:
+
+| Category          | Niches                                   |
+| ----------------- | ---------------------------------------- |
+| Home & Kitchen    | Drawer organizer, insulated water bottle |
+| Beauty            | Vitamin C serum, hair mask               |
+| Pet Supplies      | Dog grooming brush, cat water fountain   |
+| Sports & Outdoors | Resistance bands, yoga mat               |
+| Electronics       | USB-C hub, wireless earbuds case         |
+
+Fallback for uncurated niches: a clearly labeled generic sandbox dataset,
+no dynamically generated fake precise volume, credential scoring
+disabled, practice-only classification permitted.
+
+## Suggested split
+
+- **STORY-081a:** Dataset type + loader + fallback-sandbox behavior
+  (items 2, 5's fallback rule).
+- **STORY-081b:** Curate and author the 10 launch datasets (item 5's
+  coverage list) — content work, may not need Ryan's direct authoring
+  time if a template + review process is set up first.
+- **STORY-081c:** Split Keyword Research into its own registry entry
+  (item 3).
+- **STORY-081d:** Version-tie datasets to scenarios/attempts (item 4).
+
+## Acceptance criteria
+
+- [ ] Split confirmed (or explicitly kept as one story) before work starts
+- [ ] `KeywordDataset` type + loader implemented per the schema above
 - [ ] `near me` and other non-transferable local-intent templates removed
-- [ ] Fallback behavior for uncurated niches is explicit and tested, not
-      silent
+- [ ] 10 curated datasets authored across the 5 launch categories
+- [ ] Fallback sandbox dataset behavior implemented and tested (labeled,
+      not credential-scored)
+- [ ] Keyword Research is a separate registry entry, still reachable from
+      the existing page alias
+- [ ] Attempts persist `keywordDatasetId`/`keywordDatasetVersion` alongside
+      `scenarioVersion`/`rubricVersion`
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR against `main`, CI green, squash merge

@@ -2,13 +2,15 @@
 
 ## Status
 
-**Blocked — needs Ryan's PPC/listing input.** Per `docs/sprint-plan.md`
-Sprint 15 and `docs/audit-2026-07-26-simulator-accuracy-review.md`
-Phase 2. **This is the story that actually closes the click-through
-bypass** — Phase 0 (Sprint 14) only shrank the margin; measured against
-the real simulator, "mark everything fix" still passes at every difficulty
-today (beginner 75 vs. a 70 threshold, advanced 82 vs. 75 — see the audit
-doc's "How far the mechanical fixes actually get us" section).
+**Decided.** Ryan's decisions recorded below (2026-07-29). See
+`docs/simulator-remediation-decisions.md` for cross-cutting rules. **This
+is the story that actually closes the click-through bypass** — build it
+on top of STORY-080's new rubric/findings, in the sequence given there,
+not on the old character-count findings.
+
+**Scope note:** a 7-action ground-truth system with context-dependent
+rules and 6 new regression tests is more than one story. Recommend
+splitting; see "Suggested split" below.
 
 ## Current mechanism (verbatim, `ListingAuditSimulator.ts:groundTruthAction`)
 
@@ -18,81 +20,121 @@ function groundTruthAction(severity: FindingSeverity): FindingAction {
 }
 ```
 
-This is the entire ground-truth rule. It is a pure function of severity —
-category, marketplace, product strategy, existing performance, and
-compliance risk play no part. Since the finding generator (STORY-080's
-concern) currently skews heavily toward `warning`/`critical` findings that
-this rule always calls `fix`, marking every finding `fix` is very close to
-always correct: the audit doc's real-simulator measurement shows a 4-finding
-weak listing scoring `direction = 75` (3 of 4 findings really are `fix`)
-just by always answering `fix`.
+Pure function of severity. Measured against the real simulator (post
+Sprint 14), "mark everything fix" still passes at every difficulty
+(beginner 75 vs. 70 threshold, advanced 82 vs. 75).
 
-## Why STORY-080 alone can't close this
+## Decisions
 
-A richer, more balanced finding set (STORY-080) helps, but as long as the
-ground-truth _rule_ is "warning/critical ⇒ always fix," a learner who
-learns that one fact can still guess correctly on most findings without
-reading them. Closing the bypass needs the rule itself to depend on more
-than severity, so severity stops being a reliable proxy for the answer.
+### 1. Concrete cases where severity does not determine the correct action
 
-## Open questions for Ryan
+- **Title lacks a secondary keyword (warning) → correctly skip** when the
+  keyword is covered naturally in bullets/Item Highlights, adding it would
+  hurt readability, and the title already meets policy + primary intent.
+- **Only 4 bullets (warning) → correctly skip** when they fully cover the
+  decision-driving info, a 5th would be repetitive, and category rules
+  don't require 5.
+- **No comparison image (warning) → correctly skip** when there's no
+  meaningful comparison set or other images already communicate value.
+- **Short description (warning) → correctly skip** when A+ Content covers
+  it, the product is simple, or the description already answers the
+  essential purchase questions.
+- **Potential medical claim (critical) → `escalate_compliance`**, not a
+  direct edit — needs legal/compliance review.
+- **Main image may violate category policy (critical) →
+  `escalate_creative`** if the student doesn't control creative assets.
+- **Uncertain product compatibility (critical) → `request_information`**
+  — inventing compatibility data would be worse than leaving it.
+- **Brand name mismatch (critical) → `escalate_catalog`**, not a copy
+  edit — needs catalog authority or brand-registry intervention.
 
-1. **Are there real cases where a `warning`/`critical`-severity finding is
-   correctly `skip`?** E.g. a stylistic suggestion that's genuinely
-   optional in some categories/marketplaces even though it's flagged at
-   `warning` severity. Give concrete examples per category
-   (title/bullets/description/backend).
-   **Answer:**
+### 2. Expand beyond fix/skip
 
-2. **Should ground truth stay binary (fix/skip), or do you want more
-   actions** — e.g. "defer" (fix later, not urgent), "escalate" (needs
-   legal/compliance review), "context-dependent" (correct action varies by
-   strategy)? If more actions, define them.
-   **Answer:**
+```ts
+type FindingAction =
+  | "fix_now"
+  | "defer"
+  | "accept"
+  | "request_information"
+  | "escalate_compliance"
+  | "escalate_catalog"
+  | "escalate_creative";
+```
 
-3. **What additional signals should ground truth depend on**, beyond
-   severity and category? Candidates: marketplace (US vs. other), product
-   compliance category (regulated vs. not), current conversion
-   performance, existing image count, seller's stated strategy for this
-   listing (e.g. "budget/value" vs. "premium"). Which of these does
-   `ListingAuditInput` need to gain as new fields, and what's the rule for
-   each?
-   **Answer:**
+`skip` is dropped because it conflates "the finding is wrong," "valid but
+low priority," "another team owns it," and "needs more information" —
+four different situations that need different feedback.
 
-4. **Do you want this coupled with STORY-080's finding-generator richness
-   in one story, or delivered separately?** The audit doc treats them as a
-   pair (richer findings + non-binary ground truth) but they're separately
-   stoppable if you'd rather review them one at a time.
-   **Answer:**
+### 3. Additional ground-truth signals
 
-5. **What does "done" look like, measurably?** E.g.: "mark everything fix"
-   should score below the beginner passing threshold (70) against a
-   representative scenario set. Do you want that as a literal regression
-   test (a fixed scenario + a fixed all-fix strategy asserted to fail), so
-   this bypass can't silently regress again?
-   **Answer:**
+```ts
+type ListingScenarioContext = {
+  marketplace: string;
+  category: string;
+  policyVersion: string;
+  strategy: "launch" | "conversion_recovery" | "ranking" | "defense" | "maintenance";
+  currentConversionRate?: number;
+  categoryBenchmarkCvr?: number;
+  currentSessions?: number;
+  currentSales?: number;
+  imageCount: number;
+  imageTypes: string[];
+  videoPresent: boolean;
+  aPlusPresent: boolean;
+  sellerHasEditAuthority: boolean;
+  creativeAssetsAvailable: boolean;
+  complianceReviewRequired: boolean;
+  missingProductData: string[];
+};
+```
 
-## What ships once answered (mechanical, agent-doable)
+Example rules: compliance-risk finding + `complianceReviewRequired` →
+`escalate_compliance`. Missing compatibility + `missingProductData`
+includes compatibility → `request_information`. Weak imagery +
+`creativeAssetsAvailable` → `fix_now`; weak imagery + no assets available
+→ `escalate_creative`. Minor secondary-keyword gap + above-benchmark
+conversion + `maintenance` strategy → `accept` or `defer`.
 
-Once the rule and any new input fields are specified, implementation is
-ordinary domain work: extend `ListingAuditInput` with whatever new fields
-Q3 requires, replace `groundTruthAction()`'s severity-only branch with the
-specified rule (and extend `FindingAction` if Q2 adds actions), and add the
-regression test from Q5 alongside the existing scoring tests.
+### 4. Coupled with STORY-080
 
-## Non-goals
+Deliver together, in this order: rubric schema → richer finding
+generation (STORY-080) → contextual ground-truth actions → graded student
+decisions (this story) → regression tests.
 
-- Machine-learned or externally-sourced ground truth. This story is about
-  encoding Ryan's explicit rules, not training a model.
+### 5. Mandatory regression tests
 
-## Acceptance criteria (contingent on answers above)
+```ts
+it("marking every finding fix_now does not pass beginner mode", ...)
+it("marking every finding accept does not pass", ...)
+it("severity alone cannot determine every ground-truth action", ...)
+it("at least one scenario contains a valid accept action", ...)
+it("at least one scenario contains a valid escalation action", ...)
+it("at least one scenario contains a request-information action", ...)
+```
 
-- [ ] Q1–Q5 answered by Ryan (no TBDs remain)
-- [ ] `groundTruthAction()` depends on more than severity alone, matching
-      Ryan's specified rule
-- [ ] Any new required input fields added to `ListingAuditInput`
-- [ ] Regression test asserts "mark everything fix" scores below the
-      beginner passing threshold on a representative scenario
-- [ ] Domain tests cover each new ground-truth branch
+For a balanced beginner scenario, "fix everything" must score below 70%.
+
+## Suggested split
+
+- **STORY-083a:** `FindingAction` expansion + `ListingScenarioContext`
+  schema (items 2, 3).
+- **STORY-083b:** Context-dependent ground-truth rule implementation,
+  encoding the concrete cases from item 1.
+- **STORY-083c:** The 6 mandatory regression tests (item 5) — small, but
+  keep as its own PR so it's reviewable as the literal proof the bypass
+  is closed.
+
+## Acceptance criteria
+
+- [ ] Split confirmed (or explicitly kept as one story) before work starts
+- [ ] Built on top of STORY-080's rubric/findings, not the old
+      character-count findings
+- [ ] `FindingAction` expanded to the 7-action set; `skip` removed
+- [ ] `ListingScenarioContext` implemented with all fields above
+- [ ] `groundTruthAction()` depends on severity + category + context, not
+      severity alone
+- [ ] All 6 regression tests from item 5 pass, including "fix everything
+      scores below 70% on beginner"
+- [ ] Domain tests cover each of the 8 concrete cases from item 1
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR against `main`, CI green, squash merge

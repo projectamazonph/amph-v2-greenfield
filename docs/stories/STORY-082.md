@@ -2,92 +2,162 @@
 
 ## Status
 
-**Blocked — needs Ryan's PPC search-term-triage input.** Per
-`docs/sprint-plan.md` Sprint 15 and
-`docs/audit-2026-07-26-simulator-accuracy-review.md` Phase 2.
+**Decided.** Ryan's decisions recorded below (2026-07-29). See
+`docs/simulator-remediation-decisions.md` for cross-cutting rules.
+
+**Scope note:** existing-target detection, negative-type distinction, and
+branded routing are each meaningfully separate rule systems. Recommend
+splitting; see "Suggested split" below.
 
 ## Current mechanism (verbatim, `StrTriageSimulator.ts:classify`)
 
 ```ts
-const avgSpendPerKeyword = 25; // assumed budget per keyword for classification
+const avgSpendPerKeyword = 25; // hardcoded, unrelated to actual campaign
 const spendRatio = row.spend / avgSpendPerKeyword;
-
 if (roas >= targetRoas * 0.8 && spendRatio < 0.3) return "add_as_exact";
 if (roas >= targetRoas * 0.7 && roas < targetRoas && spendRatio >= 0.5) return "add_as_phrase";
 if (roas < targetRoas && spendRatio > 0.8) return "pause";
-return "keep"; // default
+return "keep";
 ```
 
-`KeywordPerfRow` (the input shape) only carries `spend`, `revenue`, and
-`orders` — no clicks, no impressions. The classifier's only signals are
-spend, revenue-derived ROAS, and a hardcoded `$25`/keyword spend assumption
-that has no relationship to the actual campaign's budget or spend
-distribution.
+`KeywordPerfRow` has only `spend`, `revenue`, `orders` — no clicks, no
+impressions.
 
-## Open questions for Ryan
+## Decisions
 
-1. **What should `avgSpendPerKeyword = 25` be replaced with?** Options:
-   (a) spend ratio relative to total campaign/account spend, (b) a target
-   CPC × expected-clicks baseline, (c) something else entirely. What's the
-   real basis you use for "has this term spent enough to judge it"?
-   **Answer:**
+### 1. Replace the $25 constant with economic decision thresholds
 
-2. **Does the real decision need clicks and impressions?** `KeywordPerfRow`
-   has neither today. If click-through rate or statistical significance
-   (minimum click/impression count before acting) matters to your real
-   triage process, what thresholds, and should these become new required
-   input fields?
-   **Answer:**
+Not campaign-spend share alone. Break-even click threshold:
 
-3. **"Existing target detection"** — does this mean checking whether a
-   search term already exists as a keyword target elsewhere in the
-   account? If so, what does "existing" as input data look like (a list of
-   current keyword targets per scenario), and how should it change the
-   recommended action (e.g. suppress "add_as_exact" if already targeted,
-   recommend negative instead)?
-   **Answer:**
+```
+Break-even click threshold = averageOrderValue × breakEvenAcos ÷ currentCpc
+```
 
-4. **Negative-match precision** — should the classifier distinguish
-   negative-exact from negative-phrase, and on what basis (spend with zero
-   orders, volume, overlap with a targeted term)?
-   **Answer:**
+Zero-order review threshold, from expected clicks per order:
 
-5. **Branded vs. non-branded routing** — what determines "branded" for a
-   search term (a brand-term list you supply per scenario, or a pattern
-   match against the product/brand name)? Should branded terms get
-   different thresholds or a different action set entirely?
-   **Answer:**
+```
+Expected clicks per order = 1 ÷ expectedCvr
+Zero-order review threshold = expectedClicksPerOrder × confidenceMultiplier
+```
 
-6. **Data-delay awareness** — Amazon attribution has a reporting lag. Do
-   you want a minimum order count, spend threshold, or elapsed-days
-   assumption before a pause/add decision is "statistically confident,"
-   and what happens below that threshold (a fifth "insufficient data"
-   action, or a hold on grading that row)?
-   **Answer:**
+Worked example: CVR 10% → 10 clicks/order; multiplier 1.5 → review
+threshold 15 clicks. Secondary check, spend-based:
+`Zero-order spend threshold = targetCpc × zeroOrderClickThreshold`.
 
-## What ships once answered (mechanical, agent-doable)
+### 2. Add clicks and impressions
 
-Once the real basis for each threshold and any new required input fields
-are specified, this is ordinary domain work: extend `KeywordPerfRow`/
-`StrTriageInput` with whatever new fields Q2/Q3/Q5 require, replace
-`classify()`'s branching with the specified rules, extend `TriageAction` if
-a new action (negative-exact/phrase, insufficient-data) is added, and write
-tests against Ryan-supplied worked examples per rule.
+```ts
+impressions: number;
+clicks: number;
+spend: number;
+orders: number;
+sales: number;
+unitsOrdered?: number;
+evaluationDays: number;
+// derived: ctr, cpc, cvr, acos, roas
+```
 
-## Non-goals
+Default sufficiency thresholds (training defaults, not universal Amazon
+rules — versioned per `docs/simulator-remediation-decisions.md`):
 
-- Full attribution-model rebuild (multi-touch attribution, view-through
-  conversions). This story extends the classification rules, not Amazon's
-  underlying reporting model.
+```ts
+minimumClicksForNegativeDecision: 12;
+minimumClicksForHarvestDecision: 8;
+minimumOrdersForHarvest: 2;
+minimumOrdersForBidIncrease: 3;
+minimumEvaluationDays: 7;
+```
 
-## Acceptance criteria (contingent on answers above)
+### 3. Existing-target detection
 
-- [ ] Q1–Q6 answered by Ryan (no TBDs remain)
-- [ ] `avgSpendPerKeyword` hardcoded constant removed and replaced per Q1
-- [ ] Any new required input fields (clicks, impressions, existing targets,
-      brand-term list) added to `StrTriageInput`/`KeywordPerfRow`
-- [ ] `classify()` rules match Ryan's stated thresholds, verified against
-      worked numeric examples he supplies
-- [ ] Domain tests cover each new branch with full coverage
+```ts
+existingTargets: Array<{
+  normalizedTerm: string;
+  matchType: "exact" | "phrase" | "broad";
+  campaignId: string;
+  adGroupId: string;
+  campaignRole: "defense" | "research" | "performance";
+  state: "enabled" | "paused";
+}>;
+existingNegatives: Array<{
+  normalizedTerm: string;
+  negativeMatchType: "negative_exact" | "negative_phrase";
+  campaignId?: string;
+  adGroupId?: string;
+}>;
+```
+
+Rules: qualified term not in exact → harvest exact. Already in intended
+exact destination → don't duplicate. Present in wrong campaign role →
+recommend routing correction. Already negative → flag conflict. Existing
+exact paused → recommend review, not automatic duplication.
+
+### 4. Distinguish negative-exact from negative-phrase
+
+Negative-exact: the specific term is poor, but close variations may still
+be useful, term is ambiguous, or evidence is limited to that exact query.
+Negative-phrase: a whole phrase/concept is categorically irrelevant,
+every containing variation is undesirable, wrong product
+type/material/audience/size/use-case, or compliance/brand policy requires
+exclusion.
+
+### 5. Branded determination
+
+```ts
+brandTerms: string[];
+ownedBrandAliases: string[];
+competitorBrandTerms: string[];
+// normalize: lowercase, strip punctuation, collapse spaces, match aliases/token boundaries
+brandClass: "owned_brand" | "competitor_brand" | "generic" | "ambiguous";
+```
+
+Owned brand → route to defense campaigns, defense-appropriate
+profitability thresholds, never harvest into generic performance
+campaigns. Competitor brand → route to competitor-targeting campaigns,
+stricter relevance/profitability thresholds, never treated as generic
+discovery.
+
+### 6. Add a fifth action: `collect_more_data`
+
+```ts
+type TriageAction =
+  | "harvest_exact" | "harvest_phrase"
+  | "negative_exact" | "negative_phrase"
+  | "reduce_source_bid" | "increase_bid"
+  | "keep" | "pause_target"
+  | "collect_more_data"
+  | "escalate_listing" | "escalate_profitability";
+
+primaryAction: TriageAction;
+secondaryActions: TriageAction[];
+confidence: "low" | "medium" | "high";
+```
+
+A row must not be confidently graded pause/harvest/negate before minimum
+evidence, unless it's unmistakably irrelevant.
+
+## Suggested split
+
+- **STORY-082a:** Clicks/impressions input fields + new sufficiency
+  thresholds + `collect_more_data` action (items 2, 6).
+- **STORY-082b:** Economic thresholds replacing the $25 constant (item 1).
+- **STORY-082c:** Existing-target/negative-conflict detection (item 3).
+- **STORY-082d:** Negative-type distinction + branded routing
+  (items 4, 5).
+
+## Acceptance criteria
+
+- [ ] Split confirmed (or explicitly kept as one story) before work starts
+- [ ] `avgSpendPerKeyword` constant removed, replaced by the break-even /
+      zero-order threshold formulas above
+- [ ] `StrTriageInput`/`KeywordPerfRow` extended with clicks, impressions,
+      existing targets, existing negatives, brand-term lists
+- [ ] `TriageAction` extended with `collect_more_data` and the confidence/
+      secondary-actions shape
+- [ ] Negative-exact vs. negative-phrase distinguished per the stated
+      rules
+- [ ] Branded routing implemented (owned vs. competitor vs. generic vs.
+      ambiguous)
+- [ ] Domain tests cover each new rule against worked numeric examples
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR against `main`, CI green, squash merge

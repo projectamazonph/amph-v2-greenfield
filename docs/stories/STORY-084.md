@@ -2,93 +2,177 @@
 
 ## Status
 
-**Blocked — needs Ryan's PPC campaign-structure input.** Per
-`docs/sprint-plan.md` Sprint 15 and
-`docs/audit-2026-07-26-simulator-accuracy-review.md` Phase 2.
+**Decided.** Ryan's decisions recorded below (2026-07-29). See
+`docs/simulator-remediation-decisions.md` for cross-cutting rules.
+
+**Scope note:** negative architecture, a house naming convention, and
+budget reconciliation are each separately testable systems. Recommend
+splitting; see "Suggested split" below.
 
 ## Current mechanism (verbatim, `CampaignBuilderSimulator.ts`)
 
 ```ts
-// structureQuality: % of {SP Manual, SP Auto, SB} campaign types the user covered
-// budgetAllocation: % of user campaigns whose budget is within 50% of ground truth
-// keywordRelevance: % of user keywords containing a word from the niche string
+// structureQuality: % of {SP Manual, SP Auto, SB} campaign types covered
+// budgetAllocation: % of campaigns with budget within 50% of ground truth
+// keywordRelevance: % of keywords containing a word from the niche string
 ```
 
-`CampaignStructure`/`AdGroup` (the data the user submits and is graded on)
-has no concept of negative keywords at all. There is no check for the same
-keyword+match-type appearing in more than one ad group or campaign
-(duplication/cannibalization), no branded-vs-non-branded distinction, no
-explicit match-type-mixing check within an ad group, no naming-convention
-grading beyond whatever the ground-truth generator's own template produces,
-and no check that the user's campaign budgets reconcile to the stated
-`monthlyBudget`.
+No negatives concept, no duplication check, no branded distinction, no
+match-type-mixing check beyond the ground truth's own template, no
+budget-reconciliation check against `monthlyBudget`.
 
-## Open questions for Ryan
+## Decisions
 
-1. **Negative-keyword architecture** — what negatives do you expect
-   structurally? E.g., should the SP Auto campaign carry the SP Manual
-   campaign's exact-match keywords as negatives, to prevent the two from
-   competing for the same search? Does `CampaignStructure`/`AdGroup` need a
-   new `negativeKeywords` field to grade this?
-   **Answer:**
+### 1. Negative-keyword architecture
 
-2. **Target duplication** — is the same keyword+match-type appearing in
-   more than one ad group/campaign always wrong, or situationally fine
-   (e.g. exact-match in Manual + broad-match in Auto is expected, but exact
-   in two different Manual ad groups is not)? Give the specific rule.
-   **Answer:**
+```ts
+negativeKeywords: Array<{
+  term: string;
+  matchType: "negative_exact" | "negative_phrase";
+  level: "campaign" | "ad_group";
+}>;
+```
 
-3. **Branded isolation** — what determines "branded" here (a brand-name
-   list per scenario, similar to STR Triage's Q5 in STORY-082)? Should
-   branded campaigns get separate budget or scoring treatment, and if so
-   what?
-   **Answer:**
+Research campaigns (broad/phrase/auto discovery) may have harvested exact
+terms added as negative-exact to source campaigns when routing isolation
+is wanted; phrase negatives reserved for clearly irrelevant concepts.
+Performance-exact campaigns are **not** automatically negated against
+every other campaign in every scenario — only when the scenario's
+routing policy calls for strict isolation:
 
-4. **Match-type separation** — is "one match type per ad group" the rule?
-   Is that already implicit in the ground-truth generator's own structure
-   (it currently splits Exact/Phrase into separate ad groups), or does
-   grading need to explicitly check the _user's_ submission for mixed
-   match types within one ad group?
-   **Answer:**
+```ts
+routingPolicy: "strict_isolation" | "controlled_overlap" | "discovery_first";
+```
 
-5. **Naming compliance** — the ground truth currently names campaigns
-   `"{SP|SB} | {MatchType} | {niche} | ₱{budget}/d"`. Is that the
-   convention to grade the user's naming against, or do you use a
-   different house convention that should replace it (and be graded
-   instead)?
-   **Answer:**
+Non-branded campaigns negate owned-brand terms when the strategy requires
+branded isolation; branded traffic stays in defense campaigns.
 
-6. **Budget reconciliation** — should scoring check that the user's total
-   campaign budgets sum close to the stated `monthlyBudget` (currently
-   unchecked entirely)? What tolerance?
-   **Answer:**
+### 2. Target duplication is not always wrong
 
-## What ships once answered (mechanical, agent-doable)
+Amazon itself notes using multiple match types for the same keyword
+doesn't inherently mean self-competition, and the highest eligible bid
+may be used when multiple match types qualify. Treat as an error only
+when: same normalized keyword + same match type appears in two campaigns
+with the same role, for the same ASIN, with no intentional routing rule,
+with conflicting bids/negatives, or in a structure that makes reporting
+ownership unclear. Allow when: separate ASINs, separate marketplaces,
+one campaign is branded-defense vs. another with a documented separate
+role, an explicit controlled test/migration permits it, or different
+match types are intentional.
 
-Once the structural rules are specified, this is ordinary domain work:
-extend `CampaignStructure`/`AdGroup` with a `negativeKeywords` field if Q1
-requires it, add duplication/branded/match-type/naming/budget-reconciliation
-checks as new dimensions or refinements of the existing three, and update
-`scripts/seed-simulator-policies.ts` weights to include them. Tests assert
-each new check against Ryan-supplied example submissions (a correct
-structure and at least one flawed one per rule).
+```ts
+allowDuplicateTargeting: boolean;
+allowedDuplicateReasons: string[];
+```
 
-## Non-goals
+### 3. Branded determination (shared taxonomy with STORY-082)
 
-- Multi-marketplace campaign structuring (this simulator is scoped to a
-  single marketplace's structure per the existing input shape).
+```ts
+brandTerms: string[];
+ownedBrandAliases: string[];
+competitorBrandTerms: string[];
+```
 
-## Acceptance criteria (contingent on answers above)
+Branded campaigns require: `strategy: "defense"`, owned-brand terms only,
+separate budget, no generic/competitor terms unless explicitly allowed,
+appropriate negative isolation per the scenario's `routingPolicy`.
 
-- [ ] Q1–Q6 answered by Ryan (no TBDs remain)
-- [ ] `CampaignStructure`/`AdGroup` extended with `negativeKeywords` if Q1
-      requires it
-- [ ] New dimension(s) or refinements for duplication, branded isolation,
-      match-type separation, naming compliance, and budget reconciliation
-      implemented per Ryan's rules
-- [ ] `seed-simulator-policies.ts` updated with new/adjusted dimension
-      weights
+### 4. Match-type separation
+
+AMPH default for manually targeted keyword ad groups: one campaign
+strategy + one target family + one match type per ad group. Not a
+universal Amazon platform requirement — grade explicitly per scenario:
+
+```ts
+matchTypeIsolationPolicy: "strict" | "preferred" | "not_required";
+```
+
+Strict for performance/research manual campaigns at beginner/intermediate;
+not applicable to Auto or product-targeting ad groups. The grader
+inspects the user's actual submitted keywords/match types, not campaign
+names.
+
+### 5. Naming convention
+
+Replace the current `"{SP|SB} | {MatchType} | {niche} | ₱{budget}/d"` with
+the house convention:
+
+```
+Brand | ASIN | Channel | Strategy | Target Type | Match | Label
+```
+
+e.g. `CasaNook | B0ABC123 | SP | Research | Keyword | Broad | Core`. Rules:
+ASIN after brand, no marketplace code, "Defense" for branded defense,
+"Research" (not "gen"), branded terms only in branded campaigns, no DSP
+field, machine-parseable separators, consistent canonical enum values.
+Versioned:
+
+```ts
+namingConventionVersion: string;
+```
+
+### 6. Budget reconciliation
+
+```
+Total submitted daily budget = sum(campaign.dailyBudget)
+Expected daily budget = statedMonthlyBudget ÷ planningDays   // planningDays: 30 | 31
+```
+
+| Difficulty   | Tolerance |
+| ------------ | --------- |
+| Beginner     | ±10%      |
+| Intermediate | ±5%       |
+| Advanced     | ±2%       |
+
+Also grade: no negative budget, no zero-budget active campaign, no
+unexplained unallocated amount, no implausible per-campaign share,
+objective-aligned allocation, portfolio/account daily cap respected. A
+learner may explicitly mark a reserve rather than allocate every dollar:
+
+```ts
+unallocatedReserve: number;
+reserveReason?: string;
+```
+
+### Full dimension set
+
+```ts
+type CampaignBuilderScores = {
+  strategicCoverage: number; // 20%
+  campaignIsolation: number; // 15%
+  budgetReconciliation: number; // 15%
+  budgetStrategy: number; // 10%
+  negativeArchitecture: number; // 15%
+  targetingRelevance: number; // 10%
+  namingCompliance: number; // 10%
+  maintainability: number; // 5%
+};
+```
+
+## Suggested split
+
+- **STORY-084a:** New 8-dimension scoring schema replacing the current
+  3-dimension `ScoreDimensions` (the dimension table above).
+- **STORY-084b:** Negative architecture + `routingPolicy` +
+  duplication rules (items 1, 2).
+- **STORY-084c:** Branded taxonomy + match-type-isolation grading
+  (items 3, 4) — coordinate with STORY-082's shared brand taxonomy so
+  the two aren't defined twice.
+- **STORY-084d:** Naming convention + budget reconciliation (items 5, 6).
+
+## Acceptance criteria
+
+- [ ] Split confirmed (or explicitly kept as one story) before work starts
+- [ ] `CampaignStructure`/`AdGroup` extended with `negativeKeywords`
+- [ ] `routingPolicy`, `matchTypeIsolationPolicy`, `allowDuplicateTargeting`
+      implemented and graded per the rules above
+- [ ] Brand taxonomy shared with STORY-082, not redefined separately
+- [ ] Naming grades against the house convention, not the old template
+- [ ] Budget reconciliation implemented with per-difficulty tolerance,
+      reserve handling included
+- [ ] `CampaignBuilderScores` is the new 8-dimension shape;
+      `seed-simulator-policies.ts` weights updated to match
 - [ ] Domain tests cover each new check against Ryan-supplied example
-      submissions
+      submissions (a correct one and at least one flawed one per rule)
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR against `main`, CI green, squash merge

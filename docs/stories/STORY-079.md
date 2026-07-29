@@ -2,11 +2,15 @@
 
 ## Status
 
-**Blocked — needs Ryan's PPC input.** Per `docs/sprint-plan.md` Sprint 15 and
-`docs/audit-2026-07-26-simulator-accuracy-review.md` Phase 2, this story
-requires real Amazon PPC bidding expertise. An agent must not invent the
-ground-truth formula. This document scopes the current defect precisely and
-lists the specific decisions needed before any code changes.
+**Decided.** Ryan's decisions recorded below (2026-07-29). See
+`docs/simulator-remediation-decisions.md` for cross-cutting rules
+(versioning, no magic constants, credential-mode gate) that apply here too.
+
+**Scope note:** this decision set is much larger than the original
+1-point estimate — it adds a full auction-response-curve model with
+elasticities, a bidding-strategy/placement-adjustment system, and a
+graduated tolerance-and-partial-credit grading scheme. Recommend splitting
+before implementation; see "Suggested split" below.
 
 ## Current mechanism (verbatim, `BidElevatorSimulator.ts`)
 
@@ -17,99 +21,179 @@ const volumeShare = keyword.volume / totalVolume;
 const allocatedBudget = budget * volumeShare;
 const estimatedClicks = keyword.volume * CTR;
 const suggestedBid = estimatedClicks > 0 ? allocatedBudget / estimatedClicks : 0;
-// Cap at 2× current bid to stay conservative
 groundTruthBids.set(keyword, Math.min(suggestedBid, keyword.currentBid * 2));
 ```
 
-`estimatedRoas` in the output is **not derived from the bids at all** —
-`BidElevatorSimulator.ts:80` sets `estimatedRoas = targetRoas` by construction,
-so the "ground truth ROAS" is tautological: whatever target the scenario
-states, the ground truth claims to hit it exactly, regardless of the actual
-bid math above it.
+`estimatedRoas` is not derived from the bids at all — it's set to
+`targetRoas` by construction (`BidElevatorSimulator.ts:80`).
 
-Grading tolerance: `isBidAccurate()` accepts any user bid within ±20% of
-ground truth, flat, for every keyword regardless of volume or bid size.
+## Decisions
 
-## Why this is wrong
+### 1. Replace fixed 2% CTR
 
-- CTR is not a function of anything in the input (match type, keyword
-  intent, historical performance). Every keyword in every scenario gets
-  the identical 2%.
-- Budget is allocated purely by volume share, with no conversion rate,
-  revenue-per-conversion, or margin anywhere in the model. Two keywords
-  with identical volume get identical suggested bids even if one converts
-  at 10× the rate of the other.
-- The "cap at 2× current bid" rule has no stated rationale in code or
-  docs — it may be an arbitrary safety valve, not a PPC principle.
-- `estimatedRoas` doesn't move when bids change, so the simulator cannot
-  actually demonstrate the ROAS tradeoff it claims to teach.
+Scenario-authored baseline performance, not a match-type-only formula.
+Match type is a small modifier on top of authored values, not the source
+of truth:
 
-## Open questions for Ryan
+```ts
+matchTypeModifier = { exact: 1.05, phrase: 1.0, broad: 0.92 };
+```
 
-Answer inline; a placeholder ("TBD") blocks the corresponding acceptance
-criterion.
+New required scenario fields: `baselineCtr`, `baselineCvr`,
+`baselineImpressions`, `baselineBid`. These modifiers are simulator
+assumptions, not universal Amazon facts, and must be versioned.
 
-1. **What should replace the fixed 2% CTR?** Options: (a) a per-keyword CTR
-   field added to `KeywordBid` and authored per scenario, (b) a formula
-   derived from match type / keyword intent, (c) something else.
-   **Answer:**
+### 2. Max-bid formula
 
-2. **What is the actual max-bid formula you use?** E.g. something in the
-   family of `maxBid = (conversionRate × revenuePerConversion) / targetRoas`,
-   or your own variant. What inputs does it need that
-   `BidElevatorInput`/`KeywordBid` don't currently have (conversion rate,
-   average order value, current ACOS, break-even ACOS)?
-   **Answer:**
+Target-ACoS-driven, not volume-share-driven:
 
-3. **Is "cap at 2× current bid" a real rule of thumb, or should it be
-   removed / replaced?** If kept, does the multiplier vary by anything
-   (match type, days of data, current spend)?
-   **Answer:**
+```
+Max sustainable CPC = averageOrderValue × expectedCvr × targetAcos
+```
 
-4. **What should `estimatedRoas` actually be a function of?** It needs to
-   move when the ground-truth bids (or the user's bids) change, not echo
-   `targetRoas` unconditionally.
-   **Answer:**
+(equivalently `× expectedCvr ÷ targetRoas`, since `targetAcos = 1 /
+targetRoas`). Worked example: AOV $29.99, CVR 12%, target ACoS 30% →
+max CPC = $1.08.
 
-5. **What new business-context fields does the scenario need to capture**
-   to make the above possible (conversion rate, AOV, current ACOS,
-   break-even ACOS, match type, current bid rank/position)? List the exact
-   fields and units.
-   **Answer:**
+Required new scenario fields: `averageOrderValue`, `targetAcos`,
+`breakEvenAcos`, `baselineCvr`, `currentCpc`, `currentBid`, `clicks`,
+`orders`, `spend`, `sales`. `breakEvenAcos` specifically enables feedback
+that distinguishes "above target but still profitable" from "above
+break-even, losing margin" from "below target, room to scale."
 
-6. **Is the ±20% bid-accuracy tolerance right?** Flat for every keyword, or
-   should it scale with bid magnitude or keyword volume (e.g. tighter
-   tolerance on high-volume keywords where the cost of being wrong is
-   larger)?
-   **Answer:**
+### 3. Remove the universal 2× bid cap
 
-## What ships once answered (mechanical, agent-doable)
+Replace with scenario-configured guardrails:
 
-Once the formula and required input fields are specified, the code change
-itself is ordinary domain-logic work: extend `BidElevatorInput`/`KeywordBid`
-with the new fields, replace the ground-truth bid computation and the
-`estimatedRoas` derivation with the specified formula, update
-`isBidAccurate()`'s tolerance if changed, update the scenario JSON and seed
-data to carry the new fields, and write unit tests asserting the new formula
-against hand-computed examples Ryan supplies (a worked example per answer
-above is the acceptance test, not an invented one).
+```ts
+maxIncreasePct: number;   // e.g. 0.20
+maxDecreasePct: number;   // e.g. 0.30
+absoluteMaxBid?: number;
+absoluteMinBid?: number;
+```
 
-## Non-goals
+Suggested defaults by situation (insufficient data → 0/±5%; stable
+profitable → +10-20%; growth objective → +20-30%; moderately inefficient
+→ -10-20%; materially above break-even → -20-40%; clearly irrelevant →
+pause/major cut). Also model Amazon's dynamic bidding adjustments
+separately from the entered base bid:
 
-- Not in scope: dayparting, placement bidding (top-of-search vs
-  product-page), or portfolio-level budget optimization. Keep the story to
-  the per-keyword bid model unless Ryan asks to expand it.
+```ts
+biddingStrategy: "fixed" | "down_only" | "up_and_down";
+topOfSearchAdjustmentPct: number; // up to 100% per Amazon's dynamic bidding
+restOfSearchAdjustmentPct: number; // up to 50%
+productPageAdjustmentPct: number;
+```
 
-## Acceptance criteria (contingent on answers above)
+### 4. Estimated ROAS must respond to bids
 
-- [ ] Q1–Q6 answered by Ryan (no TBDs remain)
-- [ ] `BidElevatorInput`/`KeywordBid`/scenario JSON updated with whatever new
-      fields the formula needs
-- [ ] Ground-truth bid computation matches Ryan's stated formula, verified
-      against at least one worked numeric example he supplies
-- [ ] `estimatedRoas` is derived from the actual bids, not echoed from
-      `targetRoas`
-- [ ] Bid-accuracy tolerance matches Ryan's answer to Q6
-- [ ] Domain tests cover the new formula with full branch coverage
+Deterministic response curve, no randomness in v1:
+
+```
+bid → competitiveness → impressions → clicks → spend → orders → sales → ROAS
+```
+
+```ts
+competitiveness = clamp(userBid / baselineBid, 0, maxCompetitiveness);
+impressionMultiplier = Math.pow(competitiveness, impressionElasticity);
+estimatedImpressions = baselineImpressions * impressionMultiplier;
+estimatedCtr = baselineCtr * relevanceModifier * placementModifier;
+estimatedClicks = estimatedImpressions * estimatedCtr;
+estimatedCpc = Math.min(userBid, baselineCpc * Math.pow(competitiveness, cpcElasticity));
+estimatedSpend = estimatedClicks * estimatedCpc;
+estimatedCvr = baselineCvr * conversionModifier;
+estimatedOrders = estimatedClicks * estimatedCvr;
+estimatedSales = estimatedOrders * averageOrderValue;
+estimatedRoas = estimatedSales / estimatedSpend;
+```
+
+Behavior invariant to test: raising bids should generally raise
+competitiveness, impressions, and CPC, and may raise sales, but must
+never _guarantee_ more orders.
+
+### 5. Full scenario schema
+
+```ts
+type BidKeywordScenario = {
+  keywordId: string;
+  keyword: string;
+  matchType: "exact" | "phrase" | "broad";
+  intent: "branded" | "generic" | "competitor" | "category";
+  strategicRole: "defense" | "research" | "performance";
+  currentBid: number;
+  baselineBid: number;
+  currentCpc: number;
+  baselineImpressions: number;
+  baselineCtr: number;
+  baselineCvr: number;
+  clicks: number;
+  orders: number;
+  spend: number;
+  sales: number;
+  averageOrderValue: number;
+  targetAcos: number;
+  breakEvenAcos: number;
+  impressionElasticity: number;
+  cpcElasticity: number;
+  relevanceModifier: number;
+  conversionModifier: number;
+  maxIncreasePct: number;
+  maxDecreasePct: number;
+  absoluteMinBid?: number;
+  absoluteMaxBid?: number;
+  minimumClicksForDecision: number;
+  minimumOrdersForScaling: number;
+  biddingStrategy: "fixed" | "down_only" | "up_and_down";
+  placementAdjustmentPct?: number;
+};
+
+// Scenario-level:
+currency: "USD" | "GBP" | "EUR" | "CAD";
+evaluationDays: number;
+campaignDailyBudget: number;
+objective: "profitability" | "growth" | "ranking" | "defense";
+```
+
+### 6. Bid-accuracy tolerance
+
+Not a flat ±20%. Combine absolute + percentage tolerance, scaled by
+difficulty, plus partial credit:
+
+```ts
+tolerance = Math.max(absoluteTolerance, groundTruthBid * percentageTolerance);
+```
+
+| Difficulty   | Percentage | Absolute floor |
+| ------------ | ---------- | -------------- |
+| Beginner     | ±20%       | $0.10          |
+| Intermediate | ±12%       | $0.07          |
+| Advanced     | ±8%        | $0.05          |
+
+Partial credit for: correct direction but outside range, correct hold
+decision, correctly refusing to act on insufficient data. Volume must not
+widen tolerance directly — data confidence does (via
+`minimumClicksForDecision`).
+
+## Suggested split
+
+- **STORY-079a:** New scenario schema + response-curve engine (items 1, 4, 5) — the core economic model.
+- **STORY-079b:** Guardrails + bidding-strategy adjustments (item 3).
+- **STORY-079c:** Max-bid formula + break-even feedback (item 2).
+- **STORY-079d:** Graduated tolerance + partial credit (item 6).
+
+## Acceptance criteria
+
+- [ ] Split confirmed (or explicitly kept as one story) before work starts
+- [ ] `BidElevatorInput`/`KeywordBid`/scenario JSON carry every new field
+      listed in the schema above
+- [ ] Ground-truth max-bid formula matches the worked example above
+      exactly
+- [ ] `estimatedRoas` responds to bid changes per the response-curve model
+- [ ] Guardrails replace the flat 2× cap
+- [ ] Tolerance + partial credit implemented per the table above
+- [ ] Domain tests cover the response curve, the max-bid formula, and each
+      tolerance band, with full branch coverage
+- [ ] Every new constant is scenario/policy-sourced, versioned, and
+      documented (per `docs/simulator-remediation-decisions.md`)
 - [ ] `pnpm typecheck && pnpm lint && pnpm test` green
 - [ ] PR against `main`, CI green, squash merge
