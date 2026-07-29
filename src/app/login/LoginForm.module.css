@@ -63,6 +63,23 @@
   margin-top: var(--space-1);
 }
 
+.forgotRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: calc(-1 * var(--space-1));
+}
+
+.forgotLink {
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
+}
+
 .altPrompt {
   text-align: center;
   font-size: 14px;

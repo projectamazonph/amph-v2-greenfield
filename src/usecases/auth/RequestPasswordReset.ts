@@ -27,6 +27,7 @@ import { Result } from "@/domain/shared/Result";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { PasswordResetRepository } from "@/ports/repositories/PasswordResetRepository";
 import type { EmailSender } from "@/ports/email/EmailSender";
+import type { PasswordResetRenderer } from "@/ports/email/PasswordResetRenderer";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 import type { Clock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
@@ -43,13 +44,13 @@ const emailSchema = z.string().email();
 export type RequestPasswordResetInput = { email: string; ip: string };
 export type RequestPasswordResetOutput = { sent: true };
 export type RequestPasswordResetError =
-  | { kind: "rate_limited"; resetAt: Date }
-  | { kind: "validation_failed"; message: string };
+  { kind: "rate_limited"; resetAt: Date } | { kind: "validation_failed"; message: string };
 
 export interface RequestPasswordResetDeps {
   users: UserRepository;
   passwordResets: PasswordResetRepository;
   email: EmailSender;
+  passwordResetEmailRenderer: PasswordResetRenderer;
   rateLimiter: RateLimiter;
   clock: Clock;
   ids: IdGenerator;
@@ -137,10 +138,12 @@ export class RequestPasswordReset {
     await this.deps.email.send({
       to: user.email,
       subject: "Reset your Project Amazon PH Academy password",
-      react: null, // template wiring is a follow-up; the email body
-      // still goes out (the EmailSender adapter will handle a null
-      // react with a fallback plain-text body for now)
-    } as unknown as Parameters<EmailSender["send"]>[0]);
+      react: this.deps.passwordResetEmailRenderer.render({
+        firstName: user.firstName,
+        resetUrl,
+        expiresInMinutes: TOKEN_TTL_HOURS * 60,
+      }),
+    });
 
     this.deps.logger.info("request_password_reset.success", { userId: user.id });
     return Result.ok({ sent: true });
