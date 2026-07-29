@@ -152,6 +152,8 @@ const OVERALL_PASS_COMMENT = {
     "Well-structured campaign build. Your keyword and match-type selections show good strategic thinking.",
   "listing-audit":
     "Sharp audit skills. Your identification of listing issues and opportunities is spot-on.",
+  "keyword-research":
+    "Strong keyword instincts. Your intent classifications and negative-keyword calls show a good read on the niche.",
 };
 
 const OVERALL_FAIL_COMMENT = {
@@ -163,6 +165,8 @@ const OVERALL_FAIL_COMMENT = {
     "Review the campaign-building principles and refine your structure. Each revision builds intuition.",
   "listing-audit":
     "Audit skills improve with practice. Review the key listing factors and try again with a sharper eye.",
+  "keyword-research":
+    "Keyword judgment improves with practice. Review the intent taxonomy and look again at which terms don't fit the niche.",
 };
 
 const REMEDIATION_LINKS: Record<FeedbackVerdict, readonly string[]> = {

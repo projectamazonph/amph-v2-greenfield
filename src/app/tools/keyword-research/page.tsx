@@ -1,11 +1,9 @@
 /**
  * /tools/keyword-research — student-facing simulator page.
  *
- * Scenario from docs/ui-specs/STITCH-PROMPTS.md §23:
- * "Keyword research for the bamboo cutting board niche.
- *  25 seed terms, expand, categorize, ship to a campaign."
- *
- * Reuses the ListingAuditSimulator's keyword generation.
+ * STORY-081: Keyword Research is its own registered simulator (see
+ * src/domain/simulator/keyword-research/), no longer a page reusing
+ * ListingAuditSimulator's hardcoded keyword generator.
  */
 
 import { buildContainer } from "@/composition/container";
@@ -17,15 +15,15 @@ export const dynamic = "force-dynamic";
 const SCENARIO = {
   title: "Keyword research for bamboo cutting board niche",
   brief:
-    "Enter a product niche and generate a prioritized keyword list. Filter by priority, check search volume, and export to a campaign brief.",
-  seedNiche: "bamboo cutting board",
+    "Enter a product niche to generate its keyword set, classify each keyword's search intent, flag negatives, and submit for grading against the dataset's own labels.",
+  seedNiche: "bamboo-cutting-board",
 };
 
 export default async function KeywordResearchPage() {
   const container = buildContainer();
-  const sim = container.simulatorRegistry.get("listing-audit");
+  const sim = container.simulatorRegistry.get("keyword-research");
   if (!sim) {
-    throw new Error("Listing Audit simulator not registered");
+    throw new Error("Keyword Research simulator not registered");
   }
 
   return (

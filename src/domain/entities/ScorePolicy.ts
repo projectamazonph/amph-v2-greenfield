@@ -43,7 +43,10 @@ export type GradingDimension =
   // Campaign Builder
   | "structureQuality"
   | "budgetAllocation"
-  | "keywordRelevance";
+  | "keywordRelevance"
+  // Keyword Research
+  | "intentAccuracy"
+  | "negativeIdentification";
 
 export const KNOWN_DIMENSIONS: readonly GradingDimension[] = [
   "direction",
@@ -58,6 +61,9 @@ export const KNOWN_DIMENSIONS: readonly GradingDimension[] = [
   "structureQuality",
   "budgetAllocation",
   "keywordRelevance",
+  // Keyword Research
+  "intentAccuracy",
+  "negativeIdentification",
 ];
 
 /**

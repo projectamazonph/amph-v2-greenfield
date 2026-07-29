@@ -1,63 +1,352 @@
 /**
- * Keyword Research — server action.
+ * Keyword Research — server actions.
  *
- * Reuses the ListingAuditSimulator's keyword generation logic.
- * The student enters a niche, and we generate a prioritized keyword
- * list they can filter and export.
+ * STORY-081: Keyword Research is now its own registry entry with its own
+ * workflow, scoring, and state — no longer a page-level alias that reused
+ * ListingAuditSimulator's hardcoded keyword-template generator.
+ *
+ * `previewKeywordResearch()` resolves the niche's KeywordDataset (curated
+ * starter niche, or a deterministic synthetic fallback for any other
+ * niche — see StaticKeywordDatasetRepository) and returns the keyword rows
+ * with their market metrics but WITHOUT the ground-truth intent/negative
+ * labels: those are what the student is being asked to judge.
+ *
+ * `keywordResearchAttempt()` follows the full attempt lifecycle established
+ * by STORY-067/068/069/080 (STR Triage, Bid Elevator, Campaign Builder,
+ * Listing Audit):
+ *   1. StartSimulatorAttempt — creates the attempt record
+ *   2. saveSimulatorDecision — persists keywordDatasetId/Version + the
+ *      student's raw classifications (SimulatorAttempt has no dedicated
+ *      dataset-version field, so this is where that provenance lives)
+ *   3. KeywordResearchSimulator.run() — grades classifications against the
+ *      dataset's own labels
+ *   4. GradeSimulatorAttempt — persists the grade with score dimensions
+ *   5. ComposeAttemptFeedback — generates actionable student feedback
+ *   6. SubmitSimulatorAttempt
  */
 
 "use server";
 
-import { buildContainer } from "@/composition/container";
-import type { ListingAuditInput } from "@/domain/simulator/listing-audit/ListingAuditInput";
-import type { ListingAuditOutput } from "@/domain/simulator/listing-audit/ListingAuditOutput";
+import { z } from "zod";
+import { Result } from "@/domain/shared/Result";
+import { buildContainer, getContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
+import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
+import type { KeywordIntent } from "@/domain/entities/KeywordDataset";
+import type {
+  KeywordResearchInput,
+  KeywordUserClassification,
+} from "@/domain/simulator/keyword-research/KeywordResearchInput";
+import type { KeywordResearchOutput } from "@/domain/simulator/keyword-research/KeywordResearchOutput";
+import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
 
-export type KeywordResearchInput = {
-  niche: string;
-};
+const DEFAULT_SCENARIO_ID = "keyword-research-scenario-default";
 
-export type KeywordResearchResult =
-  | { ok: true; value: ListingAuditOutput["keywordResearch"] }
+const KEYWORD_INTENTS: readonly KeywordIntent[] = [
+  "core",
+  "feature",
+  "problem",
+  "useCase",
+  "competitor",
+  "ownBrand",
+  "irrelevant",
+];
+
+// ── previewKeywordResearch ───────────────────────────────────────────────
+
+export interface KeywordPreviewRow {
+  readonly term: string;
+  readonly normalizedTerm: string;
+  readonly monthlySearchVolume: number;
+  readonly competitionIndex: number;
+  readonly suggestedBidLow: number;
+  readonly suggestedBidMedian: number;
+  readonly suggestedBidHigh: number;
+  readonly relevanceScore: number;
+  readonly seasonalityIndex: number;
+}
+
+export interface KeywordPreview {
+  readonly datasetId: string;
+  readonly datasetVersion: string;
+  readonly sourceType: "curated_export" | "synthetic_calibrated";
+  readonly categoryId: string;
+  readonly nicheId: string;
+  readonly keywords: readonly KeywordPreviewRow[];
+}
+
+export type PreviewKeywordResearchInput = { niche: string };
+
+export type PreviewKeywordResearchResult =
+  | { ok: true; value: KeywordPreview }
   | { ok: false; error: { kind: "invalid_input" | "engine_error"; message: string } };
 
-export async function runKeywordResearch(
-  input: KeywordResearchInput,
-): Promise<KeywordResearchResult> {
+export async function previewKeywordResearch(
+  input: PreviewKeywordResearchInput,
+): Promise<PreviewKeywordResearchResult> {
   if (!input || typeof input.niche !== "string" || input.niche.trim().length === 0) {
-    return {
-      ok: false,
-      error: { kind: "invalid_input", message: "Niche is required." },
-    };
+    return { ok: false, error: { kind: "invalid_input", message: "Niche is required." } };
   }
 
   const container = buildContainer();
-  const sim = container.simulatorRegistry.get("listing-audit");
-  if (!sim) {
+  const datasetResult = await container.keywordDatasetRepo.findByNiche(input.niche.trim());
+  if (Result.isErr(datasetResult)) {
     return {
       ok: false,
-      error: { kind: "engine_error", message: "Listing Audit simulator not registered" },
+      error: {
+        kind: "invalid_input",
+        message: "Could not resolve a keyword dataset for that niche.",
+      },
     };
   }
 
-  // Run with empty listing — the simulator will skip audit and only emit keywords
-  const domainInput: ListingAuditInput = {
-    title: "",
-    bullets: [],
-    description: "",
-    category: "General",
-    niche: input.niche.trim(),
-  };
+  const sim = container.simulatorRegistry.get("keyword-research");
+  if (!sim) {
+    return {
+      ok: false,
+      error: { kind: "engine_error", message: "Keyword Research simulator not registered" },
+    };
+  }
 
+  const domainInput: KeywordResearchInput = { dataset: datasetResult.value };
   try {
-    const output = (await sim.run(domainInput)) as ListingAuditOutput;
-    return { ok: true, value: output.keywordResearch };
+    const output = (await sim.run(domainInput)) as KeywordResearchOutput;
+    return {
+      ok: true,
+      value: {
+        datasetId: output.datasetId,
+        datasetVersion: output.datasetVersion,
+        sourceType: output.sourceType,
+        categoryId: output.categoryId,
+        nicheId: output.nicheId,
+        keywords: output.keywords.map((k) => ({
+          term: k.term,
+          normalizedTerm: k.normalizedTerm,
+          monthlySearchVolume: k.monthlySearchVolume,
+          competitionIndex: k.competitionIndex,
+          suggestedBidLow: k.suggestedBidLow,
+          suggestedBidMedian: k.suggestedBidMedian,
+          suggestedBidHigh: k.suggestedBidHigh,
+          relevanceScore: k.relevanceScore,
+          seasonalityIndex: k.seasonalityIndex,
+        })),
+      },
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      error: { kind: "engine_error", message: err instanceof Error ? err.message : String(err) },
+    };
+  }
+}
+
+// ── keywordResearchAttempt() — full grading lifecycle ───────────────────
+
+const classificationSchema = z.object({
+  intent: z.enum(KEYWORD_INTENTS as [KeywordIntent, ...KeywordIntent[]]),
+  isNegative: z.boolean(),
+});
+
+const keywordResearchAttemptSchema = z.object({
+  niche: z.string().min(1),
+  classifications: z.record(z.string(), classificationSchema),
+  mode: z.enum(["guided", "practice", "challenge", "credential", "instructor"]).optional(),
+});
+
+export interface KeywordResearchAttemptResult {
+  readonly attemptId: string;
+  readonly overallScore: number;
+  readonly scoreDimensions: Record<string, number>;
+  readonly isPassed: boolean;
+  readonly keywords: KeywordResearchOutput["keywords"];
+  readonly feedback: {
+    readonly passed: boolean;
+    readonly overallScore: number;
+    readonly overallComment: string;
+    readonly remediationLinks: readonly string[];
+    readonly dimensionFeedback: readonly {
+      readonly dimension: string;
+      readonly verdict: FeedbackVerdict;
+      readonly comment: string;
+    }[];
+  };
+}
+
+export type KeywordResearchAttemptResponse =
+  | { ok: true; value: KeywordResearchAttemptResult }
+  | { ok: false; error: { kind: "unauthorized" } }
+  | {
+      ok: false;
+      error: {
+        kind:
+          | "validation_error"
+          | "credential_requires_curated_dataset"
+          | "attempt_error"
+          | "grading_error"
+          | "feedback_error";
+        message: string;
+      };
+    };
+
+export async function keywordResearchAttempt(
+  input: unknown,
+): Promise<KeywordResearchAttemptResponse> {
+  // ── 1. Validate ────────────────────────────────────────────────────
+  const parseResult = keywordResearchAttemptSchema.safeParse(input);
+  if (!parseResult.success) {
+    return {
+      ok: false,
+      error: {
+        kind: "validation_error",
+        message: parseResult.error.issues.map((i) => i.message).join("; "),
+      },
+    };
+  }
+
+  const { niche, classifications, mode } = parseResult.data;
+  const resolvedMode: SimulatorMode = mode ?? "practice";
+  const container = getContainer();
+
+  // ── 2. Authenticate ─────────────────────────────────────────────────
+  const userId = await getSessionUserId();
+  if (!userId) {
+    return { ok: false, error: { kind: "unauthorized" } };
+  }
+
+  // ── 3. Resolve dataset ──────────────────────────────────────────────
+  const datasetResult = await container.keywordDatasetRepo.findByNiche(niche);
+  if (Result.isErr(datasetResult)) {
+    return {
+      ok: false,
+      error: {
+        kind: "validation_error",
+        message: "Could not resolve a keyword dataset for that niche.",
+      },
+    };
+  }
+  const dataset = datasetResult.value;
+
+  // Formal assessments/leaderboard scores use curated datasets only
+  // (docs/stories/STORY-081.md). None of today's starter datasets are
+  // curated_export yet -- that gate is real even though it currently
+  // rejects every credential-mode attempt.
+  if (resolvedMode === "credential" && dataset.sourceType !== "curated_export") {
+    return {
+      ok: false,
+      error: {
+        kind: "credential_requires_curated_dataset",
+        message:
+          "This niche's keyword dataset is synthetic (practice-mode only) and cannot be used for a credential attempt.",
+      },
+    };
+  }
+
+  // ── 4. StartSimulatorAttempt ────────────────────────────────────────
+  const startResult = await container.startSimulatorAttempt.execute({
+    userId,
+    simulatorId: "keyword-research",
+    scenarioId: DEFAULT_SCENARIO_ID,
+    mode: resolvedMode,
+  });
+
+  if (Result.isErr(startResult)) {
+    return { ok: false, error: { kind: "attempt_error", message: startResult.error.kind } };
+  }
+
+  const attemptId = startResult.value.attemptId;
+
+  // ── 5. Save decision (dataset provenance + raw classifications) ─────
+  const decisionResult = await container.saveSimulatorDecision.execute({
+    attemptId,
+    decisionData: {
+      type: "keyword-research-classification",
+      keywordDatasetId: dataset.datasetId,
+      keywordDatasetVersion: dataset.version,
+      classifications,
+    },
+  });
+  if (Result.isErr(decisionResult)) {
+    console.warn(
+      `Failed to save keyword-research decision for attempt "${attemptId}":`,
+      decisionResult.error,
+    );
+  }
+
+  // ── 6. Run simulator ────────────────────────────────────────────────
+  const sim = container.simulatorRegistry.get("keyword-research");
+  if (!sim) {
+    return {
+      ok: false,
+      error: { kind: "attempt_error", message: "keyword-research simulator not registered" },
+    };
+  }
+
+  const userClassifications: Record<string, KeywordUserClassification> = classifications;
+  const domainInput: KeywordResearchInput = { dataset, userClassifications };
+
+  let simOutput: KeywordResearchOutput;
+  try {
+    simOutput = (await sim.run(domainInput)) as KeywordResearchOutput;
   } catch (err) {
     return {
       ok: false,
       error: {
-        kind: "engine_error",
-        message: err instanceof Error ? err.message : String(err),
+        kind: "grading_error",
+        message: err instanceof Error ? err.message : "Simulator failed",
       },
     };
   }
+
+  const scoreDimensions = simOutput.scoreDimensions ?? {
+    intentAccuracy: 0,
+    negativeIdentification: 0,
+  };
+
+  // ── 7. GradeSimulatorAttempt ────────────────────────────────────────
+  const gradeResult = await container.gradeSimulatorAttempt.execute({
+    attemptId,
+    scoreDimensions: {
+      intentAccuracy: scoreDimensions.intentAccuracy,
+      negativeIdentification: scoreDimensions.negativeIdentification,
+    },
+  });
+
+  if (Result.isErr(gradeResult)) {
+    return { ok: false, error: { kind: "grading_error", message: gradeResult.error.kind } };
+  }
+
+  const grade = gradeResult.value;
+
+  // ── 8. ComposeAttemptFeedback ───────────────────────────────────────
+  const feedbackResult = await container.composeAttemptFeedback.execute({ attemptId });
+  if (Result.isErr(feedbackResult)) {
+    return { ok: false, error: { kind: "feedback_error", message: feedbackResult.error.kind } };
+  }
+  const feedback = feedbackResult.value.feedback;
+
+  // ── 9. SubmitSimulatorAttempt ───────────────────────────────────────
+  await container.submitSimulatorAttempt.execute({ attemptId });
+
+  // ── 10. Return results ──────────────────────────────────────────────
+  return {
+    ok: true,
+    value: {
+      attemptId,
+      overallScore: grade.overallScore,
+      scoreDimensions: grade.scoreDimensions,
+      isPassed: grade.isPassed,
+      keywords: simOutput.keywords,
+      feedback: {
+        passed: feedback.passed,
+        overallScore: feedback.overallScore,
+        overallComment: feedback.overallComment,
+        remediationLinks: feedback.remediationLinks,
+        dimensionFeedback: feedback.dimensionFeedback.map((d) => ({
+          dimension: d.dimension,
+          verdict: d.verdict,
+          comment: d.comment,
+        })),
+      },
+    },
+  };
 }
