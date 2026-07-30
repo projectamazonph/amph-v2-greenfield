@@ -136,7 +136,7 @@ export class RequestPasswordReset {
 
     // 7. Send the email.
     const resetUrl = this.buildResetUrl(rawToken);
-    await this.deps.email.send({
+    const sendResult = await this.deps.email.send({
       to: user.email,
       subject: "Reset your Project Amazon PH Academy password",
       react: this.deps.passwordResetEmailRenderer.render({
@@ -145,6 +145,12 @@ export class RequestPasswordReset {
         expiresInMinutes: TOKEN_TTL_HOURS * 60,
       }),
     });
+    if (!sendResult.ok) {
+      this.deps.logger.warn("request_password_reset.email_send_failed", {
+        userId: user.id,
+        error: sendResult.error,
+      });
+    }
 
     this.deps.logger.info("request_password_reset.success", { userId: user.id });
     return Result.ok({ sent: true });

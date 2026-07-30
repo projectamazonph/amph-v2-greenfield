@@ -25,25 +25,26 @@
 import { createHash } from "node:crypto";
 import { Result } from "@/domain/shared/Result";
 import type { User } from "@/domain/entities/User";
-import type {
-  EmailVerificationRepository,
-} from "@/ports/repositories/EmailVerificationRepository";
+import type { EmailVerificationRepository } from "@/ports/repositories/EmailVerificationRepository";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { Clock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
+import type { EmailSender } from "@/ports/email/EmailSender";
+import type { WelcomeRenderer } from "@/ports/email/WelcomeRenderer";
 
 export type VerifyEmailInput = { token: string };
 export type VerifyEmailOutput = { user: User };
 export type VerifyEmailError =
-  | { kind: "invalid_token" }
-  | { kind: "token_expired" }
-  | { kind: "token_already_used" };
+  { kind: "invalid_token" } | { kind: "token_expired" } | { kind: "token_already_used" };
 
 export interface VerifyEmailDeps {
   emailVerifications: EmailVerificationRepository;
   users: UserRepository;
   clock: Clock;
   logger: Logger;
+  emailSender: EmailSender;
+  welcomeEmailRenderer: WelcomeRenderer;
 }
 
 function sha256(input: string): string {
@@ -53,14 +54,10 @@ function sha256(input: string): string {
 export class VerifyEmail {
   constructor(private readonly deps: VerifyEmailDeps) {}
 
-  async execute(
-    input: VerifyEmailInput,
-  ): Promise<Result<VerifyEmailOutput, VerifyEmailError>> {
+  async execute(input: VerifyEmailInput): Promise<Result<VerifyEmailOutput, VerifyEmailError>> {
     const tokenHash = sha256(input.token);
 
-    const recordResult = await this.deps.emailVerifications.findByTokenHash(
-      tokenHash,
-    );
+    const recordResult = await this.deps.emailVerifications.findByTokenHash(tokenHash);
     if (!recordResult.ok) {
       // repository returns not_found or db_error; both surface as
       // invalid_token to the user (don't leak DB state via error codes).
@@ -113,6 +110,23 @@ export class VerifyEmail {
     this.deps.logger.info("verify_email.success", {
       userId: record.userId,
     });
+
+    // Welcome email (best-effort — never blocks verification itself).
+    const sendResult = await this.deps.emailSender.send({
+      to: userResult.value.email,
+      subject: `Welcome to Project Amazon PH Academy, ${userResult.value.firstName}!`,
+      react: this.deps.welcomeEmailRenderer.render({
+        firstName: userResult.value.firstName,
+        dashboardUrl: buildAppUrl("/dashboard"),
+      }),
+    });
+    if (!sendResult.ok) {
+      this.deps.logger.warn("verify_email.welcome_email_send_failed", {
+        userId: record.userId,
+        error: sendResult.error,
+      });
+    }
+
     return Result.ok({ user: userResult.value });
   }
 }

@@ -19,6 +19,11 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { FixedClock } from "@/ports/system/Clock";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
+import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
+import { TestLogger } from "@/infra/observability/TestLogger";
 
 describe("AdminProcessRefund", () => {
   let orderRepo: InMemoryOrderRepository;
@@ -37,7 +42,16 @@ describe("AdminProcessRefund", () => {
       idGen: new InMemoryIdGenerator(),
       clock: new FixedClock(new Date()),
     });
-    refundOverride = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
+    refundOverride = new RefundOverride({
+      orderRepo,
+      paymentGateway,
+      recordAuditLog,
+      courseRepo: new InMemoryCourseRepository(),
+      userRepo: new InMemoryUserRepository(),
+      emailSender: new InMemoryEmailSender(),
+      refundEmailRenderer: new RefundTemplateRenderer(),
+      logger: new TestLogger(),
+    });
     useCase = new AdminProcessRefund({ orderRepo, refundOverride });
 
     // Track RefundOverride calls

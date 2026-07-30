@@ -115,7 +115,7 @@ export class ResendVerification {
 
     // Send the email. Build the verification URL using the raw token.
     const verifyUrl = this.buildVerifyUrl(rawToken);
-    await this.deps.emailSender.send({
+    const sendResult = await this.deps.emailSender.send({
       to: user.email,
       subject: "Verify your Project Amazon PH Academy email",
       react: this.deps.verificationEmailRenderer.render({
@@ -124,6 +124,12 @@ export class ResendVerification {
         expiresInHours: TOKEN_TTL_HOURS,
       }),
     });
+    if (!sendResult.ok) {
+      this.deps.logger.warn("resend_verification.email_send_failed", {
+        userId: user.id,
+        error: sendResult.error,
+      });
+    }
 
     this.deps.logger.info("resend_verification.success", {
       userId: user.id,

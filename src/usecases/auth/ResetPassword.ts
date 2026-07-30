@@ -19,6 +19,7 @@ import type { PasswordResetRepository } from "@/ports/repositories/PasswordReset
 import type { Clock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
+import type { PasswordChangedRenderer } from "@/ports/email/PasswordChangedRenderer";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 
@@ -41,6 +42,7 @@ export interface ResetPasswordDeps {
   clock: Clock;
   logger: Logger;
   email: EmailSender;
+  passwordChangedEmailRenderer: PasswordChangedRenderer;
   hasher: PasswordHasher;
 }
 
@@ -115,13 +117,23 @@ export class ResetPassword {
     // Revoke all existing sessions.
     await this.deps.sessions.deleteAllForUser(record.userId);
 
-    // Send confirmation email.
+    // Send confirmation email (best-effort — never blocks the reset itself).
     const user = updateResult.value;
-    await this.deps.email.send({
+    const changedAt = this.deps.clock.now();
+    const sendResult = await this.deps.email.send({
       to: user.email,
       subject: "Your Project Amazon PH Academy password was changed",
-      react: null,
-    } as unknown as Parameters<EmailSender["send"]>[0]);
+      react: this.deps.passwordChangedEmailRenderer.render({
+        firstName: user.firstName,
+        changedAt,
+      }),
+    });
+    if (!sendResult.ok) {
+      this.deps.logger.warn("reset_password.email_send_failed", {
+        userId: record.userId,
+        error: sendResult.error,
+      });
+    }
 
     this.deps.logger.info("reset_password.success", { userId: record.userId });
     return Result.ok({ userId: record.userId });

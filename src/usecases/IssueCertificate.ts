@@ -21,8 +21,10 @@
 import { Result } from "@/domain/shared/Result";
 import type { Certificate } from "@/domain/entities/Certificate";
 import { createCertificate } from "@/domain/entities/Certificate";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type {
   ICertificateRepository,
   CertificateRepositoryError,
@@ -30,6 +32,9 @@ import type {
 import type { CertificateHashGenerator } from "@/ports/security/CertificateHashGenerator";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
+import type { EmailSender } from "@/ports/email/EmailSender";
+import type { CertificateEmailRenderer } from "@/ports/email/CertificateEmailRenderer";
+import type { Logger } from "@/ports/observability/Logger";
 
 // ── Input / Output types ───────────────────────────────────────────────────
 
@@ -60,6 +65,10 @@ export interface IssueCertificateDeps {
   hashGen: CertificateHashGenerator;
   idGen: IdGenerator;
   clock: Clock;
+  userRepo: UserRepository;
+  emailSender: EmailSender;
+  certificateEmailRenderer: CertificateEmailRenderer;
+  logger: Logger;
 }
 
 // ── Use Case ───────────────────────────────────────────────────────────────
@@ -76,6 +85,7 @@ export class IssueCertificate {
       }
       return Result.err({ kind: "db_error", message: "Failed to fetch course" });
     }
+    const course = courseResult.value;
 
     // ── 2. Enrollment must exist ───────────────────────────────
     const enrollment = await this.deps.enrollmentRepo.findByUserIdAndCourseId(
@@ -104,9 +114,7 @@ export class IssueCertificate {
     if (!existingResult.ok) {
       return this.mapRepoError(existingResult.error, "Failed to check existing certificates");
     }
-    const existing = existingResult.value.find(
-      (c) => c.courseId === input.courseId,
-    );
+    const existing = existingResult.value.find((c) => c.courseId === input.courseId);
     if (existing) {
       return Result.err({ kind: "already_issued", existingCertificateId: existing.id });
     }
@@ -114,7 +122,12 @@ export class IssueCertificate {
     // ── 6. Build the certificate ──────────────────────────────
     const id = this.deps.idGen.newId();
     const issuedAt = this.deps.clock.now();
-    const verificationHash = this.deps.hashGen.hash({ id, userId: input.userId, courseId: input.courseId, issuedAt });
+    const verificationHash = this.deps.hashGen.hash({
+      id,
+      userId: input.userId,
+      courseId: input.courseId,
+      issuedAt,
+    });
 
     const certResult = createCertificate({
       id,
@@ -139,7 +152,45 @@ export class IssueCertificate {
       return this.mapRepoError(persistResult.error, "Failed to persist certificate");
     }
 
+    // ── 8. Send the certificate-issued email (best-effort) ────
+    await this.sendCertificateEmail(input.userId, course.title, persistResult.value);
+
     return Result.ok({ certificate: persistResult.value, isReissue: false });
+  }
+
+  private async sendCertificateEmail(
+    userId: string,
+    courseTitle: string,
+    certificate: Certificate,
+  ): Promise<void> {
+    const userResult = await this.deps.userRepo.findById(userId);
+    if (!userResult.ok) {
+      this.deps.logger.warn("issue_certificate.email_skipped_user_lookup_failed", {
+        userId,
+        certificateId: certificate.id,
+      });
+      return;
+    }
+    const user = userResult.value;
+    const verifyUrl = buildAppUrl(`/certificates/${certificate.verificationHash}`);
+
+    const sendResult = await this.deps.emailSender.send({
+      to: user.email,
+      subject: `Certificate earned — ${courseTitle}`,
+      react: this.deps.certificateEmailRenderer.render({
+        firstName: user.firstName,
+        courseTitle,
+        verificationHash: certificate.verificationHash,
+        verifyUrl,
+      }),
+    });
+    if (!sendResult.ok) {
+      this.deps.logger.warn("issue_certificate.email_send_failed", {
+        userId,
+        certificateId: certificate.id,
+        error: sendResult.error,
+      });
+    }
   }
 
   private mapRepoError(

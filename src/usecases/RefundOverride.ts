@@ -22,13 +22,19 @@ import type { Order } from "@/domain/entities/Order";
 import type { IOrderRepository, OrderError } from "@/ports/repositories/OrderRepository";
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { sendRefundEmail } from "@/usecases/ProcessRefund";
+import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { UserRepository } from "@/ports/repositories/UserRepository";
+import type { EmailSender } from "@/ports/email/EmailSender";
+import type { RefundRenderer } from "@/ports/email/RefundRenderer";
+import type { Logger } from "@/ports/observability/Logger";
 
 export interface RefundOverrideInput {
   orderId: string;
-  actorId: string;         // admin user id from the session
+  actorId: string; // admin user id from the session
   amountMinor: number;
-  reason: string;           // user-facing reason (the same field ProcessRefund uses)
-  overrideReason: string;   // internal reason (required, stored for audit)
+  reason: string; // user-facing reason (the same field ProcessRefund uses)
+  overrideReason: string; // internal reason (required, stored for audit)
 }
 
 export type RefundOverrideError =
@@ -42,15 +48,17 @@ export type RefundOverrideError =
   | { kind: "no_paymongo_payment_id" }
   | OrderError;
 
-export type RefundOverrideResult = Result<
-  { order: Order; refundId: string },
-  RefundOverrideError
->;
+export type RefundOverrideResult = Result<{ order: Order; refundId: string }, RefundOverrideError>;
 
 export interface RefundOverrideDeps {
   orderRepo: IOrderRepository;
   paymentGateway: IPaymentGateway;
   recordAuditLog: RecordAuditLog;
+  courseRepo: CourseRepository;
+  userRepo: UserRepository;
+  emailSender: EmailSender;
+  refundEmailRenderer: RefundRenderer;
+  logger: Logger;
 }
 
 export class RefundOverride {
@@ -119,6 +127,10 @@ export class RefundOverride {
         reason: input.reason,
       },
     });
+
+    // Refund-processed email (best-effort) — shares the send logic with
+    // ProcessRefund so both refund paths notify the student the same way.
+    await sendRefundEmail(this.deps, persistResult.value, input.reason);
 
     return Result.ok({
       order: persistResult.value,

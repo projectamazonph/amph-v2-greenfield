@@ -23,6 +23,8 @@ import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserReposit
 import { InMemoryEmailVerificationRepository } from "@/infra/db/inmemory/InMemoryEmailVerificationRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
+import type { EmailSender } from "@/ports/email/EmailSender";
+import type { WelcomeRenderer } from "@/ports/email/WelcomeRenderer";
 
 class SilentLogger implements Logger {
   debug() {}
@@ -31,6 +33,22 @@ class SilentLogger implements Logger {
   error() {}
   child() {
     return this;
+  }
+}
+
+class StubEmailSender implements EmailSender {
+  public sent: Array<{ to: string; subject: string }> = [];
+  async send(args: Parameters<EmailSender["send"]>[0]) {
+    this.sent.push({ to: args.to, subject: args.subject });
+    return Result.ok({ messageId: "msg-1" } as never);
+  }
+}
+
+class StubWelcomeRenderer implements WelcomeRenderer {
+  public calls: Array<{ firstName: string; dashboardUrl: string }> = [];
+  render(args: { firstName: string; dashboardUrl: string }) {
+    this.calls.push(args);
+    return { __stub_welcome_email__: args } as unknown as React.ReactElement;
   }
 }
 
@@ -44,6 +62,8 @@ describe("VerifyEmail", () => {
   let emailVerifications: InMemoryEmailVerificationRepository;
   let clock: FixedClock;
   let logger: Logger;
+  let emailSender: StubEmailSender;
+  let welcomeEmailRenderer: StubWelcomeRenderer;
   let useCase: VerifyEmail;
 
   // Anchor time for the test suite. T0 = Jan 1 2026 00:00:00 UTC.
@@ -54,11 +74,15 @@ describe("VerifyEmail", () => {
     emailVerifications = new InMemoryEmailVerificationRepository();
     clock = new FixedClock(T0);
     logger = new SilentLogger();
+    emailSender = new StubEmailSender();
+    welcomeEmailRenderer = new StubWelcomeRenderer();
     useCase = new VerifyEmail({
       emailVerifications,
       users,
       clock,
       logger,
+      emailSender,
+      welcomeEmailRenderer,
     });
 
     // Seed a user
@@ -87,6 +111,12 @@ describe("VerifyEmail", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.user.id).toBe("user-1");
+
+    // Welcome email fires once verification succeeds.
+    expect(emailSender.sent).toHaveLength(1);
+    expect(emailSender.sent[0]?.to).toBe("alice@example.com");
+    expect(welcomeEmailRenderer.calls).toHaveLength(1);
+    expect(welcomeEmailRenderer.calls[0]?.firstName).toBe("Alice");
   });
 
   it("marks the token as used so it can't be replayed", async () => {
@@ -180,6 +210,8 @@ describe("VerifyEmail", () => {
       users,
       clock,
       logger,
+      emailSender,
+      welcomeEmailRenderer,
     });
     const result = await useCaseWithSpy.execute({ token });
 
@@ -214,6 +246,8 @@ describe("VerifyEmail", () => {
       users,
       clock,
       logger,
+      emailSender,
+      welcomeEmailRenderer,
     });
     const result = await useCaseWithSpy.execute({ token });
     expect(result.ok).toBe(false);
@@ -238,6 +272,8 @@ describe("VerifyEmail", () => {
       users: flakyUsers,
       clock,
       logger,
+      emailSender,
+      welcomeEmailRenderer,
     });
     const result = await useCaseWithFlaky.execute({ token });
     expect(result.ok).toBe(false);

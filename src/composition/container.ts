@@ -105,6 +105,7 @@ import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer"
 import { NextMdxRenderer } from "@/infra/rendering/NextMdxRenderer";
 
 import type { EmailSender } from "@/ports/email/EmailSender";
+import type { ReceiptRenderer } from "@/ports/email/ReceiptRenderer";
 import { ResendEmailSender } from "@/infra/email/ResendEmailSender";
 // InMemoryEmailSender is NOT imported here ΓÇö it would pull in
 // react-dom/server and break `next build`. Test code uses it via
@@ -141,6 +142,11 @@ import { PrismaSentReminderRepository } from "@/infra/repositories/PrismaSentRem
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
 import { PasswordResetTemplateRenderer } from "@/infra/email/templates/PasswordResetRenderer";
+import { WelcomeTemplateRenderer } from "@/infra/email/templates/WelcomeRenderer";
+import { PasswordChangedTemplateRenderer } from "@/infra/email/templates/PasswordChangedRenderer";
+import { CertificateEmailTemplateRenderer } from "@/infra/email/templates/CertificateEmailRenderer";
+import { ReceiptTemplateRenderer } from "@/infra/email/templates/ReceiptRenderer";
+import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
 import { ResetPassword } from "@/usecases/auth/ResetPassword";
 import type { PasswordResetRepository } from "@/ports/repositories/PasswordResetRepository";
@@ -293,6 +299,10 @@ export interface AppContainer {
   // STORY-012: MDX content renderer (port-adapter: NextMdxRenderer)
   mdxRenderer: IMdxContentRenderer;
   emailSender: EmailSender;
+  // Exposed so the PayMongo webhook route can send a receipt email
+  // directly (that route reaches into container fields for all its
+  // data access rather than going through a single use case).
+  receiptEmailRenderer: ReceiptRenderer;
   jwt: JwtService;
   passwordHasher: PasswordHasher;
 
@@ -454,6 +464,11 @@ function buildProductionContainer(): AppContainer {
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
   const passwordResetEmailRenderer = new PasswordResetTemplateRenderer();
+  const welcomeEmailRenderer = new WelcomeTemplateRenderer();
+  const passwordChangedEmailRenderer = new PasswordChangedTemplateRenderer();
+  const certificateEmailRenderer = new CertificateEmailTemplateRenderer();
+  const receiptEmailRenderer = new ReceiptTemplateRenderer();
+  const refundEmailRenderer = new RefundTemplateRenderer();
   // STORY-050a: audit log (Postgres-backed in production via PrismaAuditLog)
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
@@ -493,7 +508,7 @@ function buildProductionContainer(): AppContainer {
 
   const emailSender: EmailSender = new ResendEmailSender(
     process.env.RESEND_API_KEY ?? "",
-    process.env.EMAIL_FROM ?? "Project Amazon PH Academy <noreply@amph.example.com>",
+    process.env.EMAIL_FROM ?? "Project Amazon PH Academy <noreply@projectamazonph.online>",
   );
 
   const jwt: JwtService = new JoseJwtService(
@@ -511,7 +526,16 @@ function buildProductionContainer(): AppContainer {
   // delegates to it) share the same instance ΓÇö that keeps a single
   // audit-log context and avoids two RefundOverride objects racing
   // over the same recordAuditLog port.
-  const refundOverride = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
+  const refundOverride = new RefundOverride({
+    orderRepo,
+    paymentGateway,
+    recordAuditLog,
+    courseRepo,
+    userRepo,
+    emailSender,
+    refundEmailRenderer,
+    logger,
+  });
 
   return {
     clock,
@@ -606,6 +630,7 @@ function buildProductionContainer(): AppContainer {
     certificateRenderer,
     mdxRenderer,
     emailSender,
+    receiptEmailRenderer,
     simulatorRegistry: buildSimulatorRegistry(),
     issueCertificate: new IssueCertificate({
       enrollmentRepo,
@@ -614,6 +639,10 @@ function buildProductionContainer(): AppContainer {
       hashGen: certificateHashGen,
       idGen,
       clock,
+      userRepo,
+      emailSender,
+      certificateEmailRenderer,
+      logger,
     }),
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
@@ -726,7 +755,16 @@ function buildProductionContainer(): AppContainer {
     // STORY-049: admin payments + refunds + refund override
     adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
-    processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
+    processRefund: new ProcessRefund({
+      orderRepo,
+      paymentGateway,
+      clock,
+      courseRepo,
+      userRepo,
+      emailSender,
+      refundEmailRenderer,
+      logger,
+    }),
     refundOverride,
     // STORY-062: admin refund request list + process
     listRefundRequests: new ListRefundRequests({ orderRepo, userRepo }),
@@ -790,6 +828,8 @@ function buildProductionContainer(): AppContainer {
       users: userRepo,
       clock,
       logger,
+      emailSender,
+      welcomeEmailRenderer,
     }),
     resendVerification: new ResendVerification({
       users: userRepo,
@@ -819,6 +859,7 @@ function buildProductionContainer(): AppContainer {
       clock,
       logger,
       email: emailSender,
+      passwordChangedEmailRenderer,
       hasher: passwordHasher,
     }),
     // P0-7: live class reminders

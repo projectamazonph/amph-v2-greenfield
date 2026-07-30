@@ -17,6 +17,11 @@ import type { Order } from "@/domain/entities/Order";
 import type { IOrderRepository, OrderError } from "@/ports/repositories/OrderRepository";
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import type { Clock } from "@/ports/system/Clock";
+import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { UserRepository } from "@/ports/repositories/UserRepository";
+import type { EmailSender } from "@/ports/email/EmailSender";
+import type { RefundRenderer } from "@/ports/email/RefundRenderer";
+import type { Logger } from "@/ports/observability/Logger";
 
 export interface ProcessRefundInput {
   orderId: string;
@@ -35,15 +40,17 @@ export type ProcessRefundError =
   | { kind: "invalid_amount" }
   | OrderError;
 
-export type ProcessRefundResult = Result<
-  { order: Order; refundId: string },
-  ProcessRefundError
->;
+export type ProcessRefundResult = Result<{ order: Order; refundId: string }, ProcessRefundError>;
 
 export interface ProcessRefundDeps {
   orderRepo: IOrderRepository;
   paymentGateway: IPaymentGateway;
   clock: Clock;
+  courseRepo: CourseRepository;
+  userRepo: UserRepository;
+  emailSender: EmailSender;
+  refundEmailRenderer: RefundRenderer;
+  logger: Logger;
 }
 
 export class ProcessRefund {
@@ -100,9 +107,62 @@ export class ProcessRefund {
       return Result.err(persistResult.error);
     }
 
+    // ── 5. Send the refund-processed email (best-effort) ───
+    await sendRefundEmail(this.deps, persistResult.value, input.reason);
+
     return Result.ok({
       order: persistResult.value,
       refundId: refundResult.value.refundId,
+    });
+  }
+}
+
+/**
+ * Shared by ProcessRefund and RefundOverride — both mark an order
+ * refunded via the same paymentGateway.refund() + order.markRefunded()
+ * shape, so the confirmation email fires the same way from either path.
+ */
+export async function sendRefundEmail(
+  deps: {
+    userRepo: UserRepository;
+    courseRepo: CourseRepository;
+    emailSender: EmailSender;
+    refundEmailRenderer: RefundRenderer;
+    logger: Logger;
+  },
+  order: Order,
+  reason: string,
+): Promise<void> {
+  const [userResult, courseResult] = await Promise.all([
+    deps.userRepo.findById(order.userId),
+    deps.courseRepo.findById(order.courseId),
+  ]);
+  if (!userResult.ok || !courseResult.ok) {
+    deps.logger.warn("refund.email_skipped_lookup_failed", {
+      orderId: order.id,
+      userFound: userResult.ok,
+      courseFound: courseResult.ok,
+    });
+    return;
+  }
+
+  const sendResult = await deps.emailSender.send({
+    to: userResult.value.email,
+    subject: `Refund processed for ${order.id}`,
+    react: deps.refundEmailRenderer.render({
+      firstName: userResult.value.firstName,
+      orderNumber: order.id,
+      courseTitle: courseResult.value.title,
+      amountMinor: order.refundAmountMinor ?? order.totalMinor,
+      currency: order.currency,
+      refundedAt: order.refundProcessedAt ?? new Date(),
+      reason,
+    }),
+  });
+  if (!sendResult.ok) {
+    deps.logger.warn("refund.email_send_failed", {
+      orderId: order.id,
+      error: sendResult.error,
     });
   }
 }
