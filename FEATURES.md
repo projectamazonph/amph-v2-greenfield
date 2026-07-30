@@ -54,15 +54,15 @@ Pricing tier rows and course rows are separate records. The repository contains 
 
 ### Practice tools
 
-| URL                       | Status               | Notes                                                                                             |
-| ------------------------- | -------------------- | ------------------------------------------------------------------------------------------------- |
-| `/tools/bid-elevator`     | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`. |
-| `/tools/str-triage`       | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`. |
-| `/tools/campaign-builder` | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`. |
-| `/tools/listing-audit`    | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`. |
-| `/tools/keyword-research` | Partial              | UI route exists and reuses Listing Audit behavior; it is not a fifth registry implementation.     |
+| URL                       | Status               | Notes                                                                                                                                                                                                                                                             |
+| ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/tools/bid-elevator`     | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`.                                                                                                                                                                 |
+| `/tools/str-triage`       | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`.                                                                                                                                                                 |
+| `/tools/campaign-builder` | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`.                                                                                                                                                                 |
+| `/tools/listing-audit`    | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`.                                                                                                                                                                 |
+| `/tools/keyword-research` | Implemented, partial | Registered simulator (STORY-081) with its own versioned `KeywordDataset` and graded lifecycle; only 4 of 12 launch niches are curated so far, and every dataset is `synthetic_calibrated` (no curated-export data yet, so credential-mode attempts are rejected). |
 
-The four registered simulators share the attempt, scoring, and feedback infrastructure. Their scores are formative only. The simulator accuracy audit documents free dimensions, policy gaps, and a Listing Audit click-through strategy; scores must not be used as certification, hiring, or job-readiness evidence yet.
+The five registered simulators share the attempt, scoring, and feedback infrastructure. Their scores are formative only. The simulator accuracy audit documents free dimensions, policy gaps, and a Listing Audit click-through strategy; scores must not be used as certification, hiring, or job-readiness evidence yet.
 
 ### Learning progress and credentials
 

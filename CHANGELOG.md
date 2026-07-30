@@ -4,6 +4,13 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-30: Sprint 15 — STORY-081 (Keyword Research) and STORY-082 (STR Triage)
+
+- **STORY-081** (PR #246, `2046fed`): Keyword Research promoted from a page-level alias over Listing Audit to its own registered simulator (`src/domain/simulator/keyword-research/`), backed by a versioned `KeywordDataset` entity and `StaticKeywordDatasetRepository` (4 of 12 launch niches, all `synthetic_calibrated`). Grades `intentAccuracy` and `negativeIdentification` (F1) against the dataset's own labels. Credential-mode attempts are rejected until real curated data lands. Fixed in review: a lifecycle-ordering bug that called `GradeSimulatorAttempt` before `SubmitSimulatorAttempt` (would fail every real grading attempt with `attempt_not_submitted`; the same bug still exists in the other three simulators' actions, flagged as out-of-scope follow-up), and a scoring-integrity bug where an unclassified, negative-flagged keyword defaulted to intent `"core"` instead of staying ungraded.
+- **STORY-082** (PR #247, `2edb67a`): STR Triage classifier rewritten from a 4-field row and a hardcoded `avgSpendPerKeyword` constant to the full search-term-report schema, statistical zero-order thresholds, existing-target detection, per-brand-class target ROAS, and a real `insufficient_data` action (7 actions total). The practice page now runs the full graded lifecycle instead of a preview-only path.
+- Sprint 15 is now 4/7 done (STORY-079–082); STORY-078, 083, 084 remain planned.
+- Documentation synchronized: `CLAUDE.md`, `docs/sprint-plan.md`, `docs/stories/STORY-079..082.md`, `README.md`, `FEATURES.md`, `docs/db-schema.md`, `docs/architecture/01-layer-wiring.md`, `docs/architecture/03-site-map.md`.
+
 ### 2026-07-27: Completeness audit and documentation synchronization
 
 - Audited the current route tree, composition root, Prisma schema and migrations, server actions, use cases, tests, and operational docs at commit `5b8072b`.

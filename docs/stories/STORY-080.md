@@ -2,14 +2,15 @@
 
 ## Status
 
-**Final — ready for implementation.** Ryan's third and authoritative
+**✅ Done — merged in PR #245.** Ryan's third and authoritative
 decision pass (2026-07-29). **Supersedes** the two earlier passes (PRs
 #241/#242) — the dimension set, category list, imagery schema, scoring
 states, and finding volumes all changed from the prior passes. This
-document is the one to implement against.
+document is the one that was implemented against.
 
-Coupled with STORY-083 — build the rubric and richer finding generator
-here, ground truth there, in the sequence at the bottom of this doc.
+Coupled with STORY-083 (still planned) — this story built the rubric
+and richer finding generator; STORY-083 still owes the non-binary
+ground truth, in the sequence at the bottom of this doc.
 
 **Scope note:** still substantially larger than the original estimate.
 See "Suggested split" below.

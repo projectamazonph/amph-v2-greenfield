@@ -76,7 +76,7 @@ The current schema uses `Order` for checkout and payment state. It does not cont
 
 ### Simulators and assessment
 
-`SimulatorScenario`, `SimulatorAttempt`, `SimulatorDecision`, `ScorePolicy`, and `AttemptFeedback` support the four registered simulators. Keyword Research is a page-level reuse of Listing Audit and has no separate simulator model or registry entry.
+`SimulatorScenario`, `SimulatorAttempt`, `SimulatorDecision`, `ScorePolicy`, and `AttemptFeedback` support the five registered simulators, including Keyword Research (STORY-081). Keyword Research's `KeywordDataset` is a plain in-code repository (`StaticKeywordDatasetRepository`), not a Prisma model — there is no DB table or admin CRUD for keyword datasets yet.
 
 The simulator scoring configuration has known integrity and subject-matter limitations. Do not use attempt scores for certification or hiring decisions; see `docs/audit-2026-07-26-simulator-accuracy-review.md`.
 

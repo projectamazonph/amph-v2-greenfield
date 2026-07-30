@@ -2,15 +2,19 @@
 
 ## Status
 
-**Final — ready for implementation.** Ryan's third and authoritative
+**✅ Done — merged in PR #246.** Ryan's third and authoritative
 decision pass (2026-07-29). **Supersedes** the two earlier passes (PRs
 #241/#242) — the dataset schema, intent taxonomy, and launch coverage
 target all changed (12 niches × ~150-250 keywords each, not 10 × unlisted
 count).
 
-**Scope note:** curating 12 niches at 150-250 labeled keywords each
-(1,800-3,000 total labeled rows) is a large content-authoring effort on
-top of the engineering work. See "Suggested split" below.
+**Scope note:** the engineering half (domain simulator, repository,
+registry, app layer) is done. Only 4 of the 12 launch niches are
+curated so far (~18 keywords each, not 150-250), and every dataset is
+`synthetic_calibrated` rather than a real seller export — the remaining
+content-authoring work is tracked as follow-up (STORY-081b/c), not
+silently deferred. See "Suggested split" below for the original scope
+breakdown.
 
 ## Current mechanism (verbatim, `ListingAuditSimulator.ts:generateKeywords`)
 

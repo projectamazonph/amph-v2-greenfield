@@ -3,8 +3,8 @@
  *
  * STORY-036: Simulator infrastructure.
  *
- * All four simulator stubs are pre-registered at startup.
- * Real implementations replace the stubs in future stories (STORY-037+).
+ * All five simulators (bid-elevator, campaign-builder, listing-audit,
+ * str-triage, keyword-research) are registered at startup.
  */
 
 import type { Simulator } from "./Simulator";

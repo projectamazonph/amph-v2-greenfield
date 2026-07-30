@@ -2,11 +2,16 @@
 
 ## Status
 
-**Final — ready for implementation.** Ryan's third and authoritative
+**✅ Done — merged in PR #247.** Ryan's third and authoritative
 decision pass (2026-07-29). **Supersedes** the two earlier passes (PRs
 #241/#242) — the zero-order statistical formula, the fifth action's name
 (`INSUFFICIENT_DATA`, not `collect_more_data`), and several field names
 changed.
+
+**Known gap carried forward:** ground truth never produces `harvest_phrase`
+(winners are always harvested to Exact) — the action stays in the
+taxonomy but no rule currently emits it. Flagged in the PR rather than
+inventing an unspecified rule.
 
 **Scope note:** still multiple separately testable rule systems. See
 "Suggested split" below.
