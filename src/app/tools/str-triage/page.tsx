@@ -1,46 +1,242 @@
 /**
  * /tools/str-triage — student-facing simulator page.
  *
- * Loads a hardcoded scenario from the Stitch spec
- * (docs/ui-specs/STITCH-PROMPTS.md §21, "Clean up a broad match
- * campaign for kitchen products"), renders the 20 search terms
- * with a per-row action selector, and grades the user's
- * classification when they submit.
+ * STORY-082: Expand STR Triage classifier. Scenario now carries the full
+ * search-term-report schema plus the economics needed for
+ * targetCpa/zero-order thresholds, existing-target detection, and
+ * per-brand-class target ROAS. See docs/stories/STORY-082.md.
  */
 
 import { buildContainer } from "@/composition/container";
-import { StrTriageForm, type StrSeedRow } from "@/components/tools/StrTriageForm";
+import { StrTriageForm } from "@/components/tools/StrTriageForm";
+import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
-const SCENARIO = {
+type StrScenario = Omit<StrTriageInput, "userClassifications">;
+
+const SCENARIO: { title: string; brief: string } & StrScenario = {
   title: "Clean up a broad match campaign for kitchen products",
   brief:
-    "Your Sponsored Products campaign is getting irrelevant clicks. Triage 20 search terms — keep the winners, pause the losers, negate the junk.",
-  targetRoas: 3.33, // 30% ACoS
+    "Your Sponsored Products campaign is getting broad-match spillover. Triage each search term: harvest the winners, pause or negate the losers, and flag what still needs more time.",
+  averageOrderValue: 30,
+  expectedCtrPct: 4,
+  expectedCvrPct: 5,
+  brandTargetRoas: 5,
+  genericTargetRoas: 3,
+  competitorTargetRoas: 4,
+  confidenceLevel: 0.8,
+  minElapsedDays: 7,
+  minOrdersForWinner: 2,
+  brandLexicon: ["homechef"],
+  competitorBrandLexicon: ["cutco"],
+  incompatibleAttributeLexicon: ["left handed"],
+  sourceCampaignRole: "research",
+  existingTargets: [
+    {
+      text: "stainless steel knife set",
+      normalizedText: "stainless steel knife set",
+      matchType: "exact",
+      campaignId: "camp-performance-kitchen-1",
+      adGroupId: "ag-performance-1",
+      campaignRole: "performance",
+      state: "enabled",
+    },
+    {
+      text: "kitchen knife",
+      normalizedText: "kitchen knife",
+      matchType: "broad",
+      campaignId: "camp-research-kitchen-1",
+      adGroupId: "ag-broad-kitchen",
+      campaignRole: "research",
+      state: "enabled",
+    },
+  ],
   rows: [
-    { keyword: "stainless steel knife set", spend: 120, revenue: 480, orders: 8 },
-    { keyword: "knife set", spend: 95, revenue: 285, orders: 5 },
-    { keyword: "kitchen knife", spend: 80, revenue: 240, orders: 4 },
-    { keyword: "knife block", spend: 60, revenue: 0, orders: 0 },
-    { keyword: "steak knives", spend: 55, revenue: 165, orders: 3 },
-    { keyword: "knife sharpener", spend: 40, revenue: 0, orders: 0 },
-    { keyword: "wooden cutting board", spend: 35, revenue: 105, orders: 2 },
-    { keyword: "cheap knives", spend: 30, revenue: 0, orders: 0 },
-    { keyword: "kitchen scissors", spend: 28, revenue: 84, orders: 2 },
-    { keyword: "knife holder", spend: 25, revenue: 0, orders: 0 },
-    { keyword: "cutting board", spend: 22, revenue: 88, orders: 2 },
-    { keyword: "kitchen knife set", spend: 22, revenue: 88, orders: 2 },
-    { keyword: "pocket knife", spend: 20, revenue: 0, orders: 0 },
-    { keyword: "kitchen shears", spend: 18, revenue: 36, orders: 1 },
-    { keyword: "knife magnet", spend: 15, revenue: 0, orders: 0 },
-    { keyword: "santoku knife", spend: 14, revenue: 56, orders: 1 },
-    { keyword: "knife set with block", spend: 12, revenue: 60, orders: 1 },
-    { keyword: "knife case", spend: 10, revenue: 0, orders: 0 },
-    { keyword: "kitchen utensil set", spend: 8, revenue: 32, orders: 1 },
-    { keyword: "knife holder magnetic", spend: 6, revenue: 0, orders: 0 },
-  ] as const satisfies ReadonlyArray<StrSeedRow>,
+    {
+      searchTerm: "stainless steel knife set",
+      impressions: 6000,
+      clicks: 300,
+      spend: 120,
+      orders: 8,
+      sales: 480,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "kitchen knife",
+      impressions: 5000,
+      clicks: 250,
+      spend: 95,
+      orders: 5,
+      sales: 285,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "cutting board oil",
+      impressions: 900,
+      clicks: 45,
+      spend: 60,
+      orders: 0,
+      sales: 0,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "cheap knives",
+      impressions: 900,
+      clicks: 45,
+      spend: 30,
+      orders: 0,
+      sales: 0,
+      elapsedDays: 3,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "wooden cutting board",
+      impressions: 1200,
+      clicks: 60,
+      spend: 30,
+      orders: 2,
+      sales: 90,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "homechef knife set",
+      impressions: 1200,
+      clicks: 60,
+      spend: 30,
+      orders: 3,
+      sales: 150,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "cutco knife sharpener",
+      impressions: 1000,
+      clicks: 50,
+      spend: 20,
+      orders: 2,
+      sales: 80,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "cutco replacement blade",
+      impressions: 1000,
+      clicks: 50,
+      spend: 25,
+      orders: 3,
+      sales: 150,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "kitchen shears",
+      impressions: 900,
+      clicks: 45,
+      spend: 20,
+      orders: 2,
+      sales: 40,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "plastic spoon rest",
+      impressions: 900,
+      clicks: 45,
+      spend: 20,
+      orders: 0,
+      sales: 0,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "plastic ladle holder",
+      impressions: 900,
+      clicks: 45,
+      spend: 20,
+      orders: 0,
+      sales: 0,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "plastic trivet mat",
+      impressions: 900,
+      clicks: 45,
+      spend: 20,
+      orders: 0,
+      sales: 0,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "utensil drying rack",
+      impressions: 900,
+      clicks: 45,
+      spend: 20,
+      orders: 0,
+      sales: 0,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+    {
+      searchTerm: "left handed knife set",
+      impressions: 900,
+      clicks: 45,
+      spend: 20,
+      orders: 0,
+      sales: 0,
+      elapsedDays: 14,
+      sourceCampaignId: "camp-research-kitchen-1",
+      sourceAdGroupId: "ag-broad-kitchen",
+      sourceTarget: "kitchen knives",
+      sourceMatchType: "broad",
+    },
+  ],
 };
 
 export default async function StrTriagePage() {
@@ -49,6 +245,8 @@ export default async function StrTriagePage() {
   if (!sim) {
     throw new Error("STR Triage simulator not registered");
   }
+
+  const { title, brief, ...scenario } = SCENARIO;
 
   return (
     <main className={styles.page}>
@@ -59,22 +257,17 @@ export default async function StrTriagePage() {
       </nav>
       <header className={styles.header}>
         <span className={styles.eyebrow}>Simulator</span>
-        <h1 className={styles.title}>{SCENARIO.title}</h1>
-        <p className={styles.brief}>{SCENARIO.brief}</p>
+        <h1 className={styles.title}>{title}</h1>
+        <p className={styles.brief}>{brief}</p>
         <p className={styles.meta}>
-          <span className={styles.metaLabel}>Target ROAS</span>
-          <span className={styles.metaValue}>
-            {SCENARIO.targetRoas.toFixed(2)}×
-          </span>
+          <span className={styles.metaLabel}>Target ROAS (generic)</span>
+          <span className={styles.metaValue}>{scenario.genericTargetRoas.toFixed(2)}×</span>
           <span className={styles.metaDivider}>·</span>
           <span className={styles.metaLabel}>Search terms</span>
-          <span className={styles.metaValue}>{SCENARIO.rows.length}</span>
+          <span className={styles.metaValue}>{scenario.rows.length}</span>
         </p>
       </header>
-      <StrTriageForm
-        targetRoas={SCENARIO.targetRoas}
-        initialRows={SCENARIO.rows}
-      />
+      <StrTriageForm scenario={scenario} />
     </main>
   );
 }

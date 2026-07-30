@@ -2,161 +2,157 @@
  * str-triage/actions.ts — server actions for the STR Triage simulator.
  *
  * STORY-067: STR Triage Rebuild (Scoring Engine Integration).
+ * STORY-082: Expand STR Triage classifier. `strTriageAttempt()` now
+ * carries the full search-term-report schema (impressions/clicks/
+ * elapsedDays/source campaign+ad-group+target+match-type), the scenario's
+ * economics (per-brand-class target ROAS, confidence level, evidence
+ * minimums, lexicons, existing targets), and the 7-value TriageAction
+ * taxonomy. The old 4-field KeywordPerfRow / classifyStr() legacy path is
+ * removed rather than kept alongside: nothing in this app depended on the
+ * old narrow shape once the domain schema changed underneath it.
  *
- * Replaces the old `classifyStr()` function with `strTriageAttempt()`,
- * which follows the full attempt lifecycle:
+ * Lifecycle:
  *   1. StartSimulatorAttempt — creates the attempt record
- *   2. StrTriageSimulator.run() — computes dimension scores from user classifications
- *   3. GradeSimulatorAttempt — persists the grade with score dimensions
- *   4. ComposeAttemptFeedback — generates actionable student feedback
+ *   2. saveSimulatorDecision — one decision per user classification (audit trail)
+ *   3. StrTriageSimulator.run() — computes ground truth + dimension scores
+ *   4. GradeSimulatorAttempt — persists the grade with score dimensions
+ *   5. ComposeAttemptFeedback — generates actionable student feedback
+ *   6. SubmitSimulatorAttempt
  */
 
 "use server";
 
+import { z } from "zod";
 import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
-import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
+import type {
+  StrTriageInput,
+  SearchTermRow,
+  ExistingTarget,
+  MatchType,
+  CampaignRole,
+  TargetState,
+} from "@/domain/simulator/str-triage/StrTriageInput";
 import type {
   StrTriageOutput,
   TriageAction,
   KeywordClassification,
 } from "@/domain/simulator/str-triage/StrTriageOutput";
+import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
 
-// ── Input types ─────────────────────────────────────────────────────────
+const DEFAULT_SCENARIO_ID = "str-triage-scenario-kitchen-products";
 
-export interface StrTriageAttemptInput {
-  readonly rows: ReadonlyArray<{
-    readonly keyword: string;
-    readonly spend: number;
-    readonly revenue: number;
-    readonly orders: number;
-  }>;
-  readonly targetRoas: number;
-  /**
-   * User's per-keyword classifications. Keys are keyword strings, values are
-   * the user's chosen TriageAction.
-   */
-  readonly userActions: Readonly<Record<string, TriageAction>>;
-  readonly difficulty?: string;
-  readonly mode?: string;
-}
+const TRIAGE_ACTIONS: readonly TriageAction[] = [
+  "harvest_exact",
+  "harvest_phrase",
+  "negative_exact",
+  "negative_phrase",
+  "keep",
+  "pause",
+  "insufficient_data",
+];
+const MATCH_TYPES: readonly MatchType[] = ["exact", "phrase", "broad"];
+const CAMPAIGN_ROLES: readonly CampaignRole[] = ["research", "performance", "defense"];
+const TARGET_STATES: readonly TargetState[] = ["enabled", "paused", "archived"];
 
-// ── Output types ────────────────────────────────────────────────────────
+// ── Zod schema ─────────────────────────────────────────────────────────
+
+const searchTermRowSchema = z.object({
+  searchTerm: z.string().min(1),
+  impressions: z.number().nonnegative(),
+  clicks: z.number().nonnegative(),
+  spend: z.number().nonnegative(),
+  orders: z.number().nonnegative(),
+  sales: z.number().nonnegative(),
+  elapsedDays: z.number().nonnegative(),
+  sourceCampaignId: z.string().min(1),
+  sourceAdGroupId: z.string().min(1),
+  sourceTarget: z.string().min(1),
+  sourceMatchType: z.enum(MATCH_TYPES as [MatchType, ...MatchType[]]),
+});
+
+const existingTargetSchema = z.object({
+  text: z.string().min(1),
+  normalizedText: z.string().min(1),
+  matchType: z.enum(MATCH_TYPES as [MatchType, ...MatchType[]]),
+  campaignId: z.string().min(1),
+  adGroupId: z.string().min(1),
+  campaignRole: z.enum(CAMPAIGN_ROLES as [CampaignRole, ...CampaignRole[]]),
+  state: z.enum(TARGET_STATES as [TargetState, ...TargetState[]]),
+});
+
+const strTriageAttemptSchema = z.object({
+  rows: z.array(searchTermRowSchema).min(1),
+  averageOrderValue: z.number().positive(),
+  expectedCtrPct: z.number().positive(),
+  expectedCvrPct: z.number().positive(),
+  brandTargetRoas: z.number().positive(),
+  genericTargetRoas: z.number().positive(),
+  competitorTargetRoas: z.number().positive(),
+  confidenceLevel: z.number().min(0).max(1),
+  minElapsedDays: z.number().nonnegative(),
+  minOrdersForWinner: z.number().nonnegative(),
+  brandLexicon: z.array(z.string()),
+  competitorBrandLexicon: z.array(z.string()),
+  incompatibleAttributeLexicon: z.array(z.string()).optional(),
+  existingTargets: z.array(existingTargetSchema),
+  sourceCampaignRole: z.enum(CAMPAIGN_ROLES as [CampaignRole, ...CampaignRole[]]),
+  userActions: z.record(z.string(), z.enum(TRIAGE_ACTIONS as [TriageAction, ...TriageAction[]])),
+  scenarioId: z.string().optional(),
+  mode: z.enum(["guided", "practice", "challenge", "credential", "instructor"]).optional(),
+});
+
+// ── Response types ─────────────────────────────────────────────────────
 
 export interface StrTriageAttemptResult {
-  readonly ok: true;
-  readonly value: {
-    readonly attemptId: string;
+  readonly attemptId: string;
+  readonly overallScore: number;
+  readonly scoreDimensions: Record<string, number>;
+  readonly isPassed: boolean;
+  readonly classifications: readonly KeywordClassification[];
+  readonly feedback: {
+    readonly passed: boolean;
     readonly overallScore: number;
-    readonly scoreDimensions: Record<string, number>;
-    readonly isPassed: boolean;
-    readonly classifications: ReadonlyArray<{
-      readonly keyword: string;
-      readonly groundTruth: TriageAction;
-      readonly userChoice: TriageAction;
-      readonly isCorrect: boolean;
-      readonly roas: number;
-      readonly spend: number;
-    }>;
-    readonly feedback: {
-      readonly passed: boolean;
-      readonly overallScore: number;
-      readonly overallComment: string;
-      readonly remediationLinks: readonly string[];
-      readonly dimensionFeedback: ReadonlyArray<{
-        readonly dimension: string;
-        readonly verdict: string;
-        readonly score: number;
-        readonly comment: string;
-        readonly recommendation: string;
-      }>;
-    };
+    readonly overallComment: string;
+    readonly remediationLinks: readonly string[];
+    readonly dimensionFeedback: readonly {
+      readonly dimension: string;
+      readonly verdict: FeedbackVerdict;
+      readonly comment: string;
+    }[];
   };
 }
 
-export type StrTriageAttemptError =
+export type StrTriageAttemptResponse =
+  | { ok: true; value: StrTriageAttemptResult }
   | { ok: false; error: { kind: "unauthorized" } }
-  | { ok: false; error: { kind: "validation_error"; message: string } }
-  | { ok: false; error: { kind: "attempt_error"; message: string } }
-  | { ok: false; error: { kind: "grading_error"; message: string } }
-  | { ok: false; error: { kind: "feedback_error"; message: string } };
-
-export type StrTriageAttemptResponse = StrTriageAttemptResult | StrTriageAttemptError;
-
-// ── Validation ─────────────────────────────────────────────────────────
-
-const VALID_ACTIONS: readonly TriageAction[] = ["keep", "pause", "add_as_exact", "add_as_phrase"];
-
-function validateInput(
-  input: unknown,
-): StrTriageAttemptInput | { kind: "validation_error"; message: string } {
-  if (!input || typeof input !== "object") {
-    return { kind: "validation_error", message: "Input must be an object" };
-  }
-  const obj = input as Record<string, unknown>;
-
-  if (!Array.isArray(obj.rows) || obj.rows.length === 0) {
-    return { kind: "validation_error", message: "rows must be a non-empty array" };
-  }
-  for (const r of obj.rows) {
-    if (!r || typeof r !== "object") {
-      return { kind: "validation_error", message: "Each row must be an object" };
-    }
-    const row = r as Record<string, unknown>;
-    if (typeof row.keyword !== "string" || !row.keyword) {
-      return { kind: "validation_error", message: "Each row must have a string keyword" };
-    }
-    if (typeof row.spend !== "number" || row.spend < 0) {
-      return { kind: "validation_error", message: "Each row must have a non-negative spend" };
-    }
-    if (typeof row.revenue !== "number" || row.revenue < 0) {
-      return { kind: "validation_error", message: "Each row must have a non-negative revenue" };
-    }
-  }
-
-  if (typeof obj.targetRoas !== "number" || obj.targetRoas <= 0) {
-    return { kind: "validation_error", message: "targetRoas must be a positive number" };
-  }
-
-  if (!obj.userActions || typeof obj.userActions !== "object") {
-    return { kind: "validation_error", message: "userActions must be an object" };
-  }
-  const userActions = obj.userActions as Record<string, unknown>;
-  for (const [keyword, action] of Object.entries(userActions)) {
-    if (!VALID_ACTIONS.includes(action as TriageAction)) {
-      return {
-        kind: "validation_error",
-        message: `Invalid action "${String(action)}" for keyword "${keyword}". Valid actions: ${VALID_ACTIONS.join(", ")}`,
+  | {
+      ok: false;
+      error: {
+        kind: "validation_error" | "attempt_error" | "grading_error" | "feedback_error";
+        message: string;
       };
-    }
-  }
-
-  return {
-    rows: obj.rows as StrTriageAttemptInput["rows"],
-    targetRoas: obj.targetRoas as number,
-    userActions: userActions as StrTriageAttemptInput["userActions"],
-  };
-}
+    };
 
 // ── Action ─────────────────────────────────────────────────────────────
 
-/**
- * Run the full STR Triage attempt lifecycle:
- * start → grade → compose feedback → return results.
- */
 export async function strTriageAttempt(input: unknown): Promise<StrTriageAttemptResponse> {
   // ── 1. Validate ────────────────────────────────────────────────────
-  const validated = validateInput(input);
-  if ("kind" in validated && validated.kind === "validation_error") {
-    return { ok: false, error: { kind: "validation_error", message: validated.message } };
+  const parseResult = strTriageAttemptSchema.safeParse(input);
+  if (!parseResult.success) {
+    return {
+      ok: false,
+      error: {
+        kind: "validation_error",
+        message: parseResult.error.issues.map((i) => i.message).join("; "),
+      },
+    };
   }
 
-  const rows = (validated as StrTriageAttemptInput).rows;
-  const targetRoas = (validated as StrTriageAttemptInput).targetRoas;
-  const userActions = (validated as StrTriageAttemptInput).userActions;
-  const mode = (validated as StrTriageAttemptInput).mode ?? "practice";
+  const { rows, userActions, scenarioId, mode, ...scenarioConfig } = parseResult.data;
+  const resolvedMode: SimulatorMode = mode ?? "practice";
   const container = buildContainer();
 
   // ── 2. Authenticate ─────────────────────────────────────────────────
@@ -166,47 +162,42 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   }
 
   // ── 3. StartSimulatorAttempt ────────────────────────────────────────
-  const scenarioId = "str-triage-scenario-kitchen-products";
-
   const startResult = await container.startSimulatorAttempt.execute({
     userId,
     simulatorId: "str-triage",
-    scenarioId,
-    mode: mode as SimulatorMode,
+    scenarioId: scenarioId ?? DEFAULT_SCENARIO_ID,
+    mode: resolvedMode,
   });
 
   if (Result.isErr(startResult)) {
-    return {
-      ok: false,
-      error: { kind: "attempt_error", message: startResult.error.kind },
-    };
+    return { ok: false, error: { kind: "attempt_error", message: startResult.error.kind } };
   }
 
   const attemptId = startResult.value.attemptId;
 
   // ── 4. Save decisions (user classifications as decisions) ──────────
-  // Each user classification is stored as a decision for audit purposes
-  for (const [keyword, action] of Object.entries(userActions)) {
-    const row = rows.find((r: { keyword: string }) => r.keyword === keyword);
+  for (const [searchTerm, action] of Object.entries(userActions)) {
+    const row = rows.find((r) => r.searchTerm === searchTerm);
     if (!row) continue;
 
     const decisionResult = await container.saveSimulatorDecision.execute({
       attemptId,
       decisionData: {
         type: "str-triage-classification",
-        keyword,
+        searchTerm,
         action,
-        rowData: { spend: row.spend, revenue: row.revenue, orders: row.orders },
+        rowData: { spend: row.spend, sales: row.sales, orders: row.orders, clicks: row.clicks },
       },
     });
-
-    // Non-fatal: continue even if decision save fails
     if (Result.isErr(decisionResult)) {
-      console.warn(`Failed to save decision for keyword "${keyword}":`, decisionResult.error);
+      console.warn(
+        `Failed to save decision for search term "${searchTerm}":`,
+        decisionResult.error,
+      );
     }
   }
 
-  // ── 5. Run simulator to get dimension scores ─────────────────────────
+  // ── 5. Run simulator ────────────────────────────────────────────────
   const sim = container.simulatorRegistry.get("str-triage");
   if (!sim) {
     return {
@@ -215,19 +206,16 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     };
   }
 
+  const domainInput: StrTriageInput = {
+    rows: rows as readonly SearchTermRow[],
+    ...scenarioConfig,
+    existingTargets: scenarioConfig.existingTargets as readonly ExistingTarget[],
+    userClassifications: userActions,
+  };
+
   let simOutput: StrTriageOutput;
   try {
-    const simInput: StrTriageInput = {
-      rows: rows.map((r: { keyword: string; spend: number; revenue: number; orders: number }) => ({
-        keyword: r.keyword,
-        spend: r.spend,
-        revenue: r.revenue,
-        orders: r.orders,
-      })),
-      targetRoas,
-      userClassifications: { ...userActions },
-    };
-    simOutput = (await sim.run(simInput)) as StrTriageOutput;
+    simOutput = (await sim.run(domainInput)) as StrTriageOutput;
   } catch (err) {
     return {
       ok: false,
@@ -238,7 +226,6 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     };
   }
 
-  // If no scoreDimensions (shouldn't happen when userClassifications provided), compute flat
   const scoreDimensions = simOutput.scoreDimensions ?? {
     direction: simOutput.score,
     profitability: 0,
@@ -255,26 +242,16 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   });
 
   if (Result.isErr(gradeResult)) {
-    return {
-      ok: false,
-      error: { kind: "grading_error", message: gradeResult.error.kind },
-    };
+    return { ok: false, error: { kind: "grading_error", message: gradeResult.error.kind } };
   }
 
   const grade = gradeResult.value;
 
   // ── 7. ComposeAttemptFeedback ───────────────────────────────────────
-  const feedbackResult = await container.composeAttemptFeedback.execute({
-    attemptId,
-  });
-
+  const feedbackResult = await container.composeAttemptFeedback.execute({ attemptId });
   if (Result.isErr(feedbackResult)) {
-    return {
-      ok: false,
-      error: { kind: "feedback_error", message: feedbackResult.error.kind },
-    };
+    return { ok: false, error: { kind: "feedback_error", message: feedbackResult.error.kind } };
   }
-
   const feedback = feedbackResult.value.feedback;
 
   // ── 8. SubmitSimulatorAttempt ───────────────────────────────────────
@@ -288,14 +265,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
       overallScore: grade.overallScore,
       scoreDimensions: grade.scoreDimensions,
       isPassed: grade.isPassed,
-      classifications: simOutput.classifications.map((c: KeywordClassification) => ({
-        keyword: c.keyword,
-        groundTruth: c.groundTruth,
-        userChoice: c.userChoice ?? userActions[c.keyword]!,
-        isCorrect: c.isCorrect,
-        roas: c.roas,
-        spend: c.spend,
-      })),
+      classifications: simOutput.classifications,
       feedback: {
         passed: feedback.passed,
         overallScore: feedback.overallScore,
@@ -304,78 +274,9 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
         dimensionFeedback: feedback.dimensionFeedback.map((d) => ({
           dimension: d.dimension,
           verdict: d.verdict,
-          score: d.score,
           comment: d.comment,
-          recommendation: d.recommendation,
         })),
       },
     },
   };
-}
-
-// ── Legacy re-export (for backward compatibility during migration) ────────
-
-export type ClassifyStrRow = {
-  keyword: string;
-  spend: number;
-  revenue: number;
-  orders: number;
-  action: TriageAction;
-};
-
-export type ClassifyStrInput = {
-  rows: ReadonlyArray<ClassifyStrRow>;
-  targetRoas: number;
-};
-
-export type ClassifyStrResult =
-  | {
-      ok: true;
-      value: StrTriageOutput;
-    }
-  | {
-      ok: false;
-      error: { kind: "invalid_input" | "engine_error"; message: string };
-    };
-
-/**
- * @deprecated Use `strTriageAttempt()` instead. This is kept for backward
- * compatibility during the migration period.
- */
-export async function classifyStr(input: ClassifyStrInput): Promise<ClassifyStrResult> {
-  if (!input || !Array.isArray(input.rows) || input.rows.length === 0) {
-    return { ok: false, error: { kind: "invalid_input", message: "Need ≥1 row" } };
-  }
-  if (typeof input.targetRoas !== "number" || input.targetRoas <= 0) {
-    return { ok: false, error: { kind: "invalid_input", message: "targetRoas must be > 0" } };
-  }
-
-  const container = buildContainer();
-  const sim = container.simulatorRegistry.get("str-triage");
-  if (!sim) {
-    return { ok: false, error: { kind: "engine_error", message: "STR Triage not registered" } };
-  }
-
-  try {
-    const domainInput: StrTriageInput = {
-      rows: input.rows.map((r) => ({
-        keyword: r.keyword,
-        spend: r.spend,
-        revenue: r.revenue,
-        orders: r.orders,
-      })),
-      targetRoas: input.targetRoas,
-      userClassifications: Object.fromEntries(input.rows.map((r) => [r.keyword, r.action])),
-    };
-    const output = (await sim.run(domainInput)) as StrTriageOutput;
-    return { ok: true, value: output };
-  } catch (err) {
-    return {
-      ok: false,
-      error: {
-        kind: "engine_error",
-        message: err instanceof Error ? err.message : String(err),
-      },
-    };
-  }
 }

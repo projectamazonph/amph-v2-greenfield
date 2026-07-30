@@ -1,19 +1,14 @@
 /**
  * str-triage actions — server action contract tests.
  *
- * STORY-067: STR Triage Rebuild (Scoring Engine Integration).
- *
- * Tests both the new strTriageAttempt() lifecycle function and the
- * legacy classifyStr() backward-compatibility wrapper.
+ * STORY-082: Expand STR Triage classifier. Rewritten for the new
+ * SearchTermRow schema, 7-value TriageAction taxonomy, and the removal of
+ * the legacy classifyStr() path.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Result } from "@/domain/shared/Result";
 vi.mock("server-only", () => ({}));
-
-// ── Module mocking ─────────────────────────────────────────────────────
-// We mock the composition container so we can inject fake dependencies
-// without needing a real DATABASE_URL.
 
 vi.mock("@/composition/container", () => ({
   buildContainer: vi.fn(),
@@ -25,29 +20,16 @@ vi.mock("@/lib/auth", () => ({
 
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
-import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { StrTriageOutput } from "@/domain/simulator/str-triage/StrTriageOutput";
-import { strTriageAttempt, classifyStr } from "../actions";
+import { strTriageAttempt } from "../actions";
 
 const mockContainer = {
-  startSimulatorAttempt: {
-    execute: vi.fn(),
-  },
-  saveSimulatorDecision: {
-    execute: vi.fn(),
-  },
-  gradeSimulatorAttempt: {
-    execute: vi.fn(),
-  },
-  composeAttemptFeedback: {
-    execute: vi.fn(),
-  },
-  submitSimulatorAttempt: {
-    execute: vi.fn(),
-  },
-  simulatorRegistry: {
-    get: vi.fn(),
-  },
+  startSimulatorAttempt: { execute: vi.fn() },
+  saveSimulatorDecision: { execute: vi.fn() },
+  gradeSimulatorAttempt: { execute: vi.fn() },
+  composeAttemptFeedback: { execute: vi.fn() },
+  submitSimulatorAttempt: { execute: vi.fn() },
+  simulatorRegistry: { get: vi.fn() },
 };
 
 const fakeSimulator = {
@@ -56,86 +38,80 @@ const fakeSimulator = {
   run: vi.fn(),
 };
 
-// ── Fixtures ────────────────────────────────────────────────────────────
+const VALID_ROW = {
+  searchTerm: "stainless steel knife set",
+  impressions: 6000,
+  clicks: 300,
+  spend: 120,
+  orders: 8,
+  sales: 480,
+  elapsedDays: 14,
+  sourceCampaignId: "camp-research-1",
+  sourceAdGroupId: "ag-1",
+  sourceTarget: "kitchen knives",
+  sourceMatchType: "broad" as const,
+};
 
-const GRADED_ATTEMPT: SimulatorAttempt = {
-  id: "sys-attempt-1",
-  attemptId: "ATT-ABC123",
-  userId: "system",
-  simulatorId: "str-triage",
-  scenarioId: "str-triage-scenario-kitchen-products",
-  scenarioVersion: 1,
-  difficulty: "beginner",
-  mode: "practice",
-  status: "graded",
-  seed: "SEED1234",
-  score: 85,
-  scoreDimensions: { direction: 85, profitability: 90, reviewCoverage: 100, explanation: 100 },
-  startedAt: new Date(),
-  submittedAt: new Date(),
-  gradedAt: new Date(),
-  decisions: [],
+const VALID_INPUT = {
+  rows: [VALID_ROW],
+  averageOrderValue: 30,
+  expectedCtrPct: 4,
+  expectedCvrPct: 5,
+  brandTargetRoas: 5,
+  genericTargetRoas: 3,
+  competitorTargetRoas: 4,
+  confidenceLevel: 0.8,
+  minElapsedDays: 7,
+  minOrdersForWinner: 2,
+  brandLexicon: ["homechef"],
+  competitorBrandLexicon: ["cutco"],
+  existingTargets: [],
+  sourceCampaignRole: "research" as const,
+  userActions: { "stainless steel knife set": "harvest_exact" as const },
 };
 
 const SIM_OUTPUT: StrTriageOutput = {
   classifications: [
     {
-      keyword: "stainless steel knife set",
-      groundTruth: "keep",
-      userChoice: "keep",
+      searchTerm: "stainless steel knife set",
+      groundTruth: "harvest_exact",
+      userChoice: "harvest_exact",
+      isCorrect: true,
       roas: 4.0,
       spend: 120,
-      isCorrect: true,
-    },
-    {
-      keyword: "knife set",
-      groundTruth: "pause",
-      userChoice: "keep",
-      roas: 3.0,
-      spend: 95,
-      isCorrect: false,
+      brandClass: "generic",
+      reasoning: "Winning term with no existing exact target.",
+      routingNote: null,
     },
   ],
-  scoreDimensions: {
-    direction: 50,
-    profitability: 85,
-    reviewCoverage: 100,
-  },
-  score: 50,
+  scoreDimensions: { direction: 100, profitability: 100, reviewCoverage: 100 },
+  score: 100,
 };
 
 function happyContainer() {
-  const c = mockContainer as typeof mockContainer & {
-    startSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
-    saveSimulatorDecision: { execute: ReturnType<typeof vi.fn> };
-    gradeSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
-    composeAttemptFeedback: { execute: ReturnType<typeof vi.fn> };
-    submitSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
-    simulatorRegistry: { get: ReturnType<typeof vi.fn> };
-  };
-  c.startSimulatorAttempt.execute.mockResolvedValue(
-    Result.ok({ attemptId: "ATT-ABC123", startedAt: new Date() }),
+  mockContainer.startSimulatorAttempt.execute.mockResolvedValue(
+    Result.ok({ attemptId: "ATT-STR1234", startedAt: new Date() }),
   );
-  c.saveSimulatorDecision.execute.mockResolvedValue(Result.ok({}));
-  c.gradeSimulatorAttempt.execute.mockResolvedValue(
+  mockContainer.saveSimulatorDecision.execute.mockResolvedValue(Result.ok({}));
+  mockContainer.gradeSimulatorAttempt.execute.mockResolvedValue(
     Result.ok({
-      attemptId: "ATT-ABC123",
-      overallScore: 85,
-      scoreDimensions: { direction: 85, profitability: 90, reviewCoverage: 100, explanation: 100 },
+      attemptId: "ATT-STR1234",
+      overallScore: 100,
+      scoreDimensions: { direction: 100, profitability: 100 },
       isPassed: true,
       gradedAt: new Date(),
     }),
   );
-  c.composeAttemptFeedback.execute.mockResolvedValue(
+  mockContainer.composeAttemptFeedback.execute.mockResolvedValue(
     Result.ok({
       feedback: {
-        attemptId: "ATT-ABC123",
+        attemptId: "ATT-STR1234",
         userId: "system",
         simulatorId: "str-triage",
         scenarioId: "str-triage-scenario-kitchen-products",
         difficulty: "beginner",
         mode: "practice",
-        overallScore: 85,
+        overallScore: 100,
         passed: true,
         overallComment: "Excellent prioritization.",
         remediationLinks: ["/courses", "/dashboard"],
@@ -144,14 +120,12 @@ function happyContainer() {
       },
     }),
   );
-  c.submitSimulatorAttempt.execute.mockResolvedValue(
+  mockContainer.submitSimulatorAttempt.execute.mockResolvedValue(
     Result.ok({ status: "submitted", submittedAt: new Date() }),
   );
-  c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
-  (fakeSimulator.run as ReturnType<typeof vi.fn>).mockResolvedValue(SIM_OUTPUT);
+  mockContainer.simulatorRegistry.get.mockReturnValue(fakeSimulator);
+  fakeSimulator.run.mockResolvedValue(SIM_OUTPUT);
 }
-
-// ── strTriageAttempt tests ─────────────────────────────────────────────
 
 describe("strTriageAttempt", () => {
   beforeEach(() => {
@@ -163,47 +137,43 @@ describe("strTriageAttempt", () => {
 
   it("returns unauthorized when user is not authenticated", async () => {
     (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
-    const result = await strTriageAttempt({
-      rows: [{ keyword: "wireless earbuds", spend: 10, revenue: 30, orders: 2 }],
-      targetRoas: 3,
-      userActions: { "wireless earbuds": "keep" },
-    });
+    const result = await strTriageAttempt(VALID_INPUT);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("unauthorized");
   });
 
-  it("returns validation_error when rows is missing", async () => {
-    const result = await strTriageAttempt({ targetRoas: 3, userActions: {} });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
   it("returns validation_error when rows is empty", async () => {
-    const result = await strTriageAttempt({ rows: [], targetRoas: 3, userActions: {} });
+    const result = await strTriageAttempt({ ...VALID_INPUT, rows: [] });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_error");
-    expect((result.error as { message: string }).message).toContain("non-empty");
   });
 
-  it("returns validation_error when targetRoas is not positive", async () => {
+  it("returns validation_error when a row is missing required fields", async () => {
     const result = await strTriageAttempt({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1 }],
-      targetRoas: 0,
-      userActions: {},
+      ...VALID_INPUT,
+      rows: [{ searchTerm: "incomplete" }],
     });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_error");
   });
 
-  it("returns validation_error for unknown action", async () => {
+  it("returns validation_error for an unknown triage action", async () => {
     const result = await strTriageAttempt({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1 }],
-      targetRoas: 3,
-      userActions: { a: "shrug" as never },
+      ...VALID_INPUT,
+      userActions: { "stainless steel knife set": "shrug" },
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("validation_error");
+  });
+
+  it("returns validation_error for a malformed existing target", async () => {
+    const result = await strTriageAttempt({
+      ...VALID_INPUT,
+      existingTargets: [{ text: "x" }],
     });
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -211,128 +181,72 @@ describe("strTriageAttempt", () => {
   });
 
   it("happy path: starts attempt, grades, composes feedback, returns result", async () => {
-    const result = await strTriageAttempt({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1 }],
-      targetRoas: 3,
-      userActions: { a: "keep" },
-    });
+    const result = await strTriageAttempt(VALID_INPUT);
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
-    expect(result.value.attemptId).toBe("ATT-ABC123");
-    expect(result.value.overallScore).toBe(85);
+    expect(result.value.attemptId).toBe("ATT-STR1234");
+    expect(result.value.overallScore).toBe(100);
     expect(result.value.isPassed).toBe(true);
-    expect(result.value.feedback.passed).toBe(true);
     expect(result.value.feedback.overallComment).toBe("Excellent prioritization.");
+    expect(result.value.classifications).toHaveLength(1);
+    expect(result.value.classifications[0]!.searchTerm).toBe("stainless steel knife set");
 
-    expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalled();
-    expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalled();
+    expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
+      expect.objectContaining({ simulatorId: "str-triage", mode: "practice" }),
+    );
+    expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalledWith({
+      attemptId: "ATT-STR1234",
+      scoreDimensions: { direction: 100, profitability: 100 },
+    });
     expect(mockContainer.composeAttemptFeedback.execute).toHaveBeenCalledWith({
-      attemptId: "ATT-ABC123",
+      attemptId: "ATT-STR1234",
     });
     expect(mockContainer.submitSimulatorAttempt.execute).toHaveBeenCalled();
   });
 
-  it("returns attempt_error when startSimulatorAttempt fails", async () => {
-    (mockContainer.startSimulatorAttempt.execute as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      Result.err({ kind: "attempt_not_found" }),
+  it("passes the full scenario config through to the simulator", async () => {
+    await strTriageAttempt(VALID_INPUT);
+    expect(fakeSimulator.run).toHaveBeenCalledWith(
+      expect.objectContaining({
+        averageOrderValue: 30,
+        brandTargetRoas: 5,
+        genericTargetRoas: 3,
+        competitorTargetRoas: 4,
+        sourceCampaignRole: "research",
+        userClassifications: VALID_INPUT.userActions,
+      }),
     );
+  });
 
-    const result = await strTriageAttempt({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1 }],
-      targetRoas: 3,
-      userActions: { a: "keep" },
-    });
-
+  it("returns attempt_error when startSimulatorAttempt fails", async () => {
+    mockContainer.startSimulatorAttempt.execute.mockResolvedValueOnce(
+      Result.err({ kind: "scenario_not_found" }),
+    );
+    const result = await strTriageAttempt(VALID_INPUT);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("attempt_error");
   });
 
   it("returns grading_error when gradeSimulatorAttempt fails", async () => {
-    (mockContainer.gradeSimulatorAttempt.execute as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+    mockContainer.gradeSimulatorAttempt.execute.mockResolvedValueOnce(
       Result.err({ kind: "policy_not_found" }),
     );
-
-    const result = await strTriageAttempt({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1 }],
-      targetRoas: 3,
-      userActions: { a: "keep" },
-    });
-
+    const result = await strTriageAttempt(VALID_INPUT);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("grading_error");
   });
 
   it("returns feedback_error when composeAttemptFeedback fails", async () => {
-    (
-      mockContainer.composeAttemptFeedback.execute as ReturnType<typeof vi.fn>
-    ).mockResolvedValueOnce(Result.err({ kind: "attempt_not_found" }));
-
-    const result = await strTriageAttempt({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1 }],
-      targetRoas: 3,
-      userActions: { a: "keep" },
-    });
-
+    mockContainer.composeAttemptFeedback.execute.mockResolvedValueOnce(
+      Result.err({ kind: "attempt_not_found" }),
+    );
+    const result = await strTriageAttempt(VALID_INPUT);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("feedback_error");
-  });
-
-  it("includes per-classification results in the response", async () => {
-    const result = await strTriageAttempt({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1 }],
-      targetRoas: 3,
-      userActions: { a: "keep" },
-    });
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-
-    expect(result.value.classifications).toHaveLength(2);
-    expect(result.value.classifications[0]!.keyword).toBe("stainless steel knife set");
-    expect(result.value.classifications[0]!.groundTruth).toBe("keep");
-    expect(result.value.classifications[0]!.isCorrect).toBe(true);
-  });
-});
-
-// ── classifyStr legacy tests ──────────────────────────────────────────
-
-describe("classifyStr (legacy)", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    (buildContainer as ReturnType<typeof vi.fn>).mockReturnValue(mockContainer);
-    happyContainer();
-  });
-
-  it("returns invalid_input when rows is empty", async () => {
-    const result = await classifyStr({ rows: [], targetRoas: 3 });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns invalid_input when targetRoas is 0", async () => {
-    const result = await classifyStr({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1, action: "keep" }],
-      targetRoas: 0,
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns a 0-100 score for valid input", async () => {
-    const result = await classifyStr({
-      rows: [{ keyword: "a", spend: 1, revenue: 3, orders: 1, action: "keep" }],
-      targetRoas: 3,
-    });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.score).toBeGreaterThanOrEqual(0);
-    expect(result.value.score).toBeLessThanOrEqual(100);
   });
 });

@@ -113,3 +113,13 @@
   font-size: var(--text-lg);
   font-weight: 600;
 }
+
+.resultBadge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.resultBadge[data-correct="true"] { color: var(--success); }
+.resultBadge[data-correct="false"] { color: var(--danger); }
