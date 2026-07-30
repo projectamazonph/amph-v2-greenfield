@@ -150,4 +150,38 @@ export const POLICIES: PolicyDef[] = [
     dimensionConfig: { direction: 0.6, priorityCoverage: 0.4 },
     passingScore: 75,
   },
+
+  // ── Keyword Research ──────────────────────────────────────────────────
+  // STORY-081. Even 50/50 split between intentAccuracy and
+  // negativeIdentification is a placeholder, not a domain-expert-reviewed
+  // weighting -- Ryan's decision pass specifies the two dimensions and
+  // their formulas but not their relative weight. Revisit once there is
+  // real subject-matter input on which skill matters more. No
+  // credential-mode policy yet: credential-mode attempts are rejected
+  // against non-curated datasets (see keyword-research actions), and none
+  // of today's starter datasets are curated_export.
+  {
+    id: "policy-keyword-research-beginner-practice",
+    simulatorId: "keyword-research",
+    difficulty: "beginner",
+    mode: "practice",
+    dimensionConfig: { intentAccuracy: 0.5, negativeIdentification: 0.5 },
+    passingScore: 70,
+  },
+  {
+    id: "policy-keyword-research-intermediate-practice",
+    simulatorId: "keyword-research",
+    difficulty: "intermediate",
+    mode: "practice",
+    dimensionConfig: { intentAccuracy: 0.5, negativeIdentification: 0.5 },
+    passingScore: 75,
+  },
+  {
+    id: "policy-keyword-research-advanced-practice",
+    simulatorId: "keyword-research",
+    difficulty: "advanced",
+    mode: "practice",
+    dimensionConfig: { intentAccuracy: 0.5, negativeIdentification: 0.5 },
+    passingScore: 80,
+  },
 ];

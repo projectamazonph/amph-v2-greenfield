@@ -64,6 +64,7 @@ import { InMemoryScorePolicyRepository } from "@/infra/repositories/InMemoryScor
 import { InMemoryAttemptFeedbackRepository } from "@/infra/repositories/InMemoryAttemptFeedbackRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
+import { StaticKeywordDatasetRepository } from "@/infra/repositories/StaticKeywordDatasetRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { InMemoryWebhookEventLog } from "@/infra/repositories/InMemoryWebhookEventLog";
 import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
@@ -214,6 +215,7 @@ export interface TestContainer extends AppContainer {
   feedbackRepo: InMemoryAttemptFeedbackRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   pricingTierRepo: InMemoryPricingTierRepository;
+  keywordDatasetRepo: StaticKeywordDatasetRepository;
   sentReminderRepo: InMemorySentReminderRepository;
   emailVerificationRepo: InMemoryEmailVerificationRepository;
   passwordResetRepo: InMemoryPasswordResetRepository;
@@ -285,6 +287,8 @@ export function buildTestContainer(): TestContainer {
   const liveClassRepo = new InMemoryLiveClassRepository();
   // STORY-011: pricing tier repo
   const pricingTierRepo = new InMemoryPricingTierRepository();
+  // STORY-081: same in-code repository as production -- no DB table yet.
+  const keywordDatasetRepo = new StaticKeywordDatasetRepository();
 
   // STORY-049 + STORY-062: build RefundOverride once. The
   // `refundOverride` container entry and `adminProcessRefund` share
@@ -556,6 +560,7 @@ export function buildTestContainer(): TestContainer {
     // STORY-050c
     liveClassRepo,
     pricingTierRepo,
+    keywordDatasetRepo,
     sentReminderRepo,
     adminListLiveClasses: new AdminListLiveClasses({ liveClassRepo }),
     adminGetLiveClass: new AdminGetLiveClass({ liveClassRepo }),

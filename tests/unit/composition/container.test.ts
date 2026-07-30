@@ -429,14 +429,15 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(typeof c.simulatorRegistry.get).toBe("function");
   });
 
-  simIt("test container has all 4 simulator stubs registered", () => {
+  simIt("test container has all 5 simulators registered", () => {
     const c = buildTestContainer();
     const simulators = c.simulatorRegistry.list();
-    simExpect(simulators).toHaveLength(4);
+    simExpect(simulators).toHaveLength(5);
     simExpect(c.simulatorRegistry.get("bid-elevator")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("str-triage")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("campaign-builder")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("listing-audit")).not.toBeNull();
+    simExpect(c.simulatorRegistry.get("keyword-research")).not.toBeNull();
   });
 
   simIt("bid-elevator simulator is the real BidElevatorSimulator, not a stub", () => {
@@ -469,5 +470,19 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(la).not.toBeNull();
     simExpect(la!.name).toBe("Listing Audit + Keyword Research");
     simExpect(la!.simulatorId).toBe("listing-audit");
+  });
+
+  simIt("keyword-research simulator is the real KeywordResearchSimulator, not a stub", () => {
+    const c = buildTestContainer();
+    const kr = c.simulatorRegistry.get("keyword-research");
+    simExpect(kr).not.toBeNull();
+    simExpect(kr!.name).toBe("Keyword Research");
+    simExpect(kr!.simulatorId).toBe("keyword-research");
+  });
+
+  simIt("test container exposes keywordDatasetRepo", () => {
+    const c = buildTestContainer();
+    simExpect(c.keywordDatasetRepo).toBeDefined();
+    simExpect(typeof c.keywordDatasetRepo.findByNiche).toBe("function");
   });
 });

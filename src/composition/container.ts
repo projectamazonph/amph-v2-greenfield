@@ -62,6 +62,7 @@ import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRe
 import type { IAttemptFeedbackRepository } from "@/ports/repositories/IAttemptFeedbackRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
+import type { KeywordDatasetRepository } from "@/ports/repositories/KeywordDatasetRepository";
 
 // ΓöÇΓöÇ Production adapters (only the prod ones) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
@@ -89,6 +90,9 @@ import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRep
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
+// STORY-081: no DB table/admin CRUD for keyword datasets yet -- this
+// in-code repository backs both the prod and test containers today.
+import { StaticKeywordDatasetRepository } from "@/infra/repositories/StaticKeywordDatasetRepository";
 
 import type { CertificateHashGenerator } from "@/ports/security/CertificateHashGenerator";
 import { NodeCertificateHashGenerator } from "@/infra/security/NodeCertificateHashGenerator";
@@ -279,6 +283,8 @@ export interface AppContainer {
   moduleRepo: IModuleRepository;
   lessonRepo: ILessonRepository;
   simulatorRegistry: SimulatorRegistry;
+  // STORY-081: keyword dataset lookup for the Keyword Research simulator
+  keywordDatasetRepo: KeywordDatasetRepository;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -467,6 +473,8 @@ function buildProductionContainer(): AppContainer {
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
   // STORY-011: pricing tier repo
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
+  // STORY-081: no DB table yet -- see StaticKeywordDatasetRepository's docblock
+  const keywordDatasetRepo: KeywordDatasetRepository = new StaticKeywordDatasetRepository();
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -761,6 +769,8 @@ function buildProductionContainer(): AppContainer {
     // STORY-048b/c: module + lesson repos (also used by public catalog)
     moduleRepo,
     lessonRepo,
+    // STORY-081: keyword dataset lookup for the Keyword Research simulator
+    keywordDatasetRepo,
     // STORY-050b: simulator scenario CRUD
     adminListScenarios: new AdminListScenarios({ scenarioRepo }),
     getSimulatorScenario: new GetSimulatorScenario({ scenarioRepo }),

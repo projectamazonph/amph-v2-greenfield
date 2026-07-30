@@ -1,8 +1,11 @@
 /**
  * KeywordResearchForm — client component.
  *
- * Takes a niche as input, runs keyword research, and displays
- * a filterable/sortable keyword table with priority badges.
+ * STORY-081: Keyword Research is now its own simulator with its own
+ * workflow: generate a niche's keyword rows (market metrics only, no
+ * ground-truth labels), classify each keyword's search intent and flag
+ * which ones should become negative keywords, then submit for grading
+ * against the dataset's own labels.
  */
 
 "use client";
@@ -10,45 +13,102 @@
 import { useState, useTransition } from "react";
 import styles from "./KeywordResearchForm.module.css";
 import {
-  runKeywordResearch,
-  type KeywordResearchResult,
+  previewKeywordResearch,
+  keywordResearchAttempt,
+  type KeywordPreview,
+  type KeywordResearchAttemptResult,
 } from "@/app/tools/keyword-research/actions";
-import type { KeywordResult } from "@/domain/simulator/listing-audit/ListingAuditOutput";
+import type { KeywordIntent } from "@/domain/entities/KeywordDataset";
 
 interface Props {
   initialNiche: string;
 }
 
-type PriorityFilter = "all" | KeywordResult["priority"];
+interface Classification {
+  /** Undefined until the student explicitly picks one -- never defaulted. */
+  intent?: KeywordIntent;
+  isNegative: boolean;
+}
+
+const INTENT_OPTIONS: readonly { value: KeywordIntent; label: string }[] = [
+  { value: "core", label: "Core" },
+  { value: "feature", label: "Feature" },
+  { value: "problem", label: "Problem" },
+  { value: "useCase", label: "Use case" },
+  { value: "competitor", label: "Competitor" },
+  { value: "ownBrand", label: "Own brand" },
+  { value: "irrelevant", label: "Irrelevant" },
+];
 
 export function KeywordResearchForm({ initialNiche }: Props) {
   const [niche, setNiche] = useState(initialNiche);
-  const [filter, setFilter] = useState<PriorityFilter>("all");
   const [pending, startTransition] = useTransition();
-  const [result, setResult] = useState<KeywordResearchResult | null>(null);
+  const [preview, setPreview] = useState<KeywordPreview | null>(null);
+  const [classifications, setClassifications] = useState<Record<string, Classification>>({});
+  const [attempt, setAttempt] = useState<KeywordResearchAttemptResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onGenerate = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setAttempt(null);
     startTransition(async () => {
-      const r = await runKeywordResearch({ niche });
+      const r = await previewKeywordResearch({ niche });
       if (r.ok) {
-        setResult(r);
+        setPreview(r.value);
+        setClassifications({});
       } else {
+        setPreview(null);
         setError(r.error.message);
       }
     });
   };
 
-  const keywords = result?.ok ? result.value.keywords : [];
-  const filtered = filter === "all" ? keywords : keywords.filter((k) => k.priority === filter);
+  const setClassification = (normalizedTerm: string, patch: Partial<Classification>) => {
+    setClassifications((prev) => ({
+      ...prev,
+      [normalizedTerm]: {
+        intent: prev[normalizedTerm]?.intent,
+        isNegative: prev[normalizedTerm]?.isNegative ?? false,
+        ...patch,
+      },
+    }));
+  };
 
-  const totalVolume = keywords.reduce((s, k) => s + k.searchVolumeEstimate, 0);
+  const onSubmitForGrading = () => {
+    if (!preview) return;
+    setError(null);
+    // Every row must have an explicit intent before this fires (the submit
+    // button stays disabled until classifiedCount === keywords.length), but
+    // narrow here too so a partially-classified row can never be silently
+    // graded with an intent the student didn't choose.
+    const fullyClassified: Record<string, { intent: KeywordIntent; isNegative: boolean }> = {};
+    for (const [normalizedTerm, c] of Object.entries(classifications)) {
+      if (c.intent !== undefined) {
+        fullyClassified[normalizedTerm] = { intent: c.intent, isNegative: c.isNegative };
+      }
+    }
+    startTransition(async () => {
+      const r = await keywordResearchAttempt({
+        niche,
+        classifications: fullyClassified,
+        mode: "practice",
+      });
+      if (r.ok) {
+        setAttempt(r.value);
+      } else {
+        setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+      }
+    });
+  };
+
+  const classifiedCount = preview
+    ? preview.keywords.filter((k) => classifications[k.normalizedTerm]?.intent !== undefined).length
+    : 0;
 
   return (
     <div className={styles.wrapper}>
-      <form className={styles.form} onSubmit={onSubmit}>
+      <form className={styles.form} onSubmit={onGenerate}>
         <div className={styles.inputRow}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="kr-niche">
@@ -64,50 +124,39 @@ export function KeywordResearchForm({ initialNiche }: Props) {
             />
           </div>
           <button type="submit" className={styles.submit} disabled={pending}>
-            {pending ? "Researching…" : "Generate keywords"}
+            {pending ? "Loading…" : "Generate keywords"}
           </button>
         </div>
         {error ? <p className={styles.error}>{error}</p> : null}
       </form>
 
-      {result?.ok ? (
+      {preview && !attempt ? (
         <div className={styles.results}>
           <div className={styles.summary}>
             <span className={styles.summaryItem}>
               <span className={styles.summaryLabel}>Keywords</span>
-              <span className={styles.summaryValue}>{keywords.length}</span>
+              <span className={styles.summaryValue}>{preview.keywords.length}</span>
             </span>
             <span className={styles.summaryDivider}>·</span>
             <span className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Est. volume</span>
-              <span className={styles.summaryValue}>{totalVolume.toLocaleString()}/mo</span>
-            </span>
-            <span className={styles.summaryDivider}>·</span>
-            <span className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>High priority</span>
+              <span className={styles.summaryLabel}>Classified</span>
               <span className={styles.summaryValue}>
-                {keywords.filter((k) => k.priority === "high").length}
+                {classifiedCount}/{preview.keywords.length}
               </span>
             </span>
-          </div>
-
-          <div className={styles.filters}>
-            {(["all", "high", "medium", "low"] as PriorityFilter[]).map((f) => (
-              <button
-                key={f}
-                className={`${styles.filterBtn} ${filter === f ? styles.filterBtnActive : ""}`}
-                onClick={() => setFilter(f)}
-                type="button"
-              >
-                {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
+            <span className={styles.summaryDivider}>·</span>
+            <span className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Dataset</span>
+              <span className={styles.summaryValue}>
+                {preview.sourceType === "curated_export" ? "Curated" : "Synthetic (practice)"}
+              </span>
+            </span>
           </div>
 
           <div
             className={styles.tableScroll}
             role="region"
-            aria-label="Keyword results"
+            aria-label="Keyword classification"
             tabIndex={0}
           >
             <table className={styles.table}>
@@ -116,22 +165,109 @@ export function KeywordResearchForm({ initialNiche }: Props) {
                   <th>Keyword</th>
                   <th className={styles.thNum}>Volume/mo</th>
                   <th className={styles.thNum}>Competition</th>
-                  <th>Priority</th>
+                  <th className={styles.thNum}>Median bid</th>
+                  <th>Intent</th>
+                  <th>Negative</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((k) => (
-                  <tr key={k.keyword}>
-                    <td className={styles.tdKw}>{k.keyword}</td>
-                    <td className={styles.tdNum}>{k.searchVolumeEstimate.toLocaleString()}</td>
-                    <td className={styles.tdNum}>
-                      <span className={styles.competition} data-comp={k.competition}>
-                        {k.competition}
-                      </span>
-                    </td>
+                {preview.keywords.map((k) => {
+                  const c = classifications[k.normalizedTerm];
+                  return (
+                    <tr key={k.normalizedTerm}>
+                      <td className={styles.tdKw}>{k.term}</td>
+                      <td className={styles.tdNum}>{k.monthlySearchVolume.toLocaleString()}</td>
+                      <td className={styles.tdNum}>{Math.round(k.competitionIndex * 100)}%</td>
+                      <td className={styles.tdNum}>${k.suggestedBidMedian.toFixed(2)}</td>
+                      <td>
+                        <select
+                          className={styles.select}
+                          value={c?.intent ?? ""}
+                          onChange={(e) =>
+                            setClassification(k.normalizedTerm, {
+                              intent: e.target.value as KeywordIntent,
+                            })
+                          }
+                        >
+                          <option value="" disabled>
+                            Choose…
+                          </option>
+                          {INTENT_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={c?.isNegative ?? false}
+                          onChange={(e) =>
+                            setClassification(k.normalizedTerm, { isNegative: e.target.checked })
+                          }
+                          aria-label={`Flag "${k.term}" as negative`}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <button
+            type="button"
+            className={styles.submit}
+            disabled={pending || classifiedCount < preview.keywords.length}
+            onClick={onSubmitForGrading}
+          >
+            {pending ? "Grading…" : "Submit for grading"}
+          </button>
+        </div>
+      ) : null}
+
+      {attempt ? (
+        <div className={styles.results}>
+          <div className={styles.summary}>
+            <span className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Score</span>
+              <span className={styles.summaryValue}>{attempt.overallScore}</span>
+            </span>
+            <span className={styles.summaryDivider}>·</span>
+            <span className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Result</span>
+              <span className={styles.summaryValue}>{attempt.isPassed ? "Passed" : "Not yet"}</span>
+            </span>
+          </div>
+          <p>{attempt.feedback.overallComment}</p>
+          <div
+            className={styles.tableScroll}
+            role="region"
+            aria-label="Keyword grading results"
+            tabIndex={0}
+          >
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Keyword</th>
+                  <th>Your intent</th>
+                  <th>Correct intent</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attempt.keywords.map((k) => (
+                  <tr key={k.normalizedTerm}>
+                    <td className={styles.tdKw}>{k.term}</td>
+                    <td>{k.userIntent ?? "—"}</td>
+                    <td>{k.groundTruthIntent}</td>
                     <td>
-                      <span className={styles.priority} data-priority={k.priority}>
-                        {k.priority}
+                      <span
+                        className={styles.resultBadge}
+                        data-correct={k.isIntentCorrect ? "true" : "false"}
+                      >
+                        {k.isIntentCorrect ? "Correct" : "Incorrect"}
                       </span>
                     </td>
                   </tr>

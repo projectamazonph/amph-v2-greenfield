@@ -14,6 +14,7 @@ import { BidElevatorSimulator } from "@/domain/simulator/bid-elevator/BidElevato
 import { StrTriageSimulator } from "@/domain/simulator/str-triage/StrTriageSimulator";
 import { CampaignBuilderSimulator } from "@/domain/simulator/campaign-builder/CampaignBuilderSimulator";
 import { ListingAuditSimulator } from "@/domain/simulator/listing-audit/ListingAuditSimulator";
+import { KeywordResearchSimulator } from "@/domain/simulator/keyword-research/KeywordResearchSimulator";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 
 export function buildSimulatorRegistry(): SimulatorRegistry {
@@ -23,6 +24,9 @@ export function buildSimulatorRegistry(): SimulatorRegistry {
   registry.register(new StrTriageSimulator());
   registry.register(new CampaignBuilderSimulator());
   registry.register(new ListingAuditSimulator());
+  // STORY-081: Keyword Research is its own registry entry, no longer a
+  // page-level alias reusing ListingAuditSimulator's keyword generator.
+  registry.register(new KeywordResearchSimulator());
 
   return registry;
 }
