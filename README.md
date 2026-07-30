@@ -13,7 +13,7 @@ Three courses, practical tools, and a Field Manual interface. The repository con
 - Authentication, email verification, password reset, and optional admin TOTP.
 - Course catalog, MDX curriculum import, lessons, quizzes, XP, streaks, badges, and certificates.
 - PayMongo checkout, webhook processing, enrollment, discount codes, and refund workflows.
-- Four registered simulator implementations plus a Keyword Research UI alias.
+- Five registered simulator implementations, including Keyword Research as its own versioned-dataset engine.
 - Admin users, courses, modules, lessons, payments, refunds, scenarios, live classes, badges, audit logs, and settings routes.
 - PostgreSQL through Prisma 7, Resend email, Sentry configuration, Pino logging, Upstash rate limiting, and Vercel cron wiring.
 
@@ -37,7 +37,7 @@ Tool routes:
 - `/tools/str-triage`
 - `/tools/campaign-builder`
 - `/tools/listing-audit`
-- `/tools/keyword-research` (currently reuses Listing Audit behavior)
+- `/tools/keyword-research` (own registered simulator, STORY-081)
 
 ![Bid Elevator](public/screenshots/bid-elevator.png)
 ![Campaign Builder](public/screenshots/campaign-builder.png)

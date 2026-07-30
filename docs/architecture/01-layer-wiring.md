@@ -27,7 +27,7 @@ flowchart TB
   end
 
   subgraph DOMAIN["src/domain"]
-    RULES["Entities, value objects, Result, services,\nand four registered simulator engines"]
+    RULES["Entities, value objects, Result, services,\nand five registered simulator engines"]
   end
 
   subgraph INFRA["src/infra"]

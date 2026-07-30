@@ -1,5 +1,61 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-07-30)
+
+`main` @ `2edb67a`. Two Sprint 15 stories merged this session, both squash
+merges with CI green (typecheck/lint/test/build, Vercel deploy, CodeRabbit
+review) and no unresolved review threads at merge time:
+
+- **PR #246 — STORY-081** (`2046fed`): Keyword Research is now its own
+  registered simulator (`src/domain/simulator/keyword-research/`) driven by
+  a versioned `KeywordDataset`, not a page-level alias over Listing Audit.
+  `StaticKeywordDatasetRepository` ships 4 of the story's 12 launch niches
+  (all `synthetic_calibrated`, not curated-export), so credential-mode
+  attempts are rejected until real seller-export data lands (STORY-081b).
+  During review, a pre-existing lifecycle-ordering defect was found and
+  fixed: the action called `GradeSimulatorAttempt` before
+  `SubmitSimulatorAttempt`, which would make every real (non-mocked)
+  grading attempt fail with `attempt_not_submitted` — `SubmitSimulatorAttempt`
+  is the only use case that transitions `in_progress → submitted`, and
+  `GradeSimulatorAttempt` requires `submitted`. **The same ordering bug
+  still exists in the other three simulators' `actions.ts` files
+  (bid-elevator, str-triage, listing-audit) on `main` as of this entry** —
+  flagged, not fixed, out of scope for PR #246. A real scoring-integrity bug
+  in `KeywordResearchForm` was also fixed: an unchecked negative-keyword
+  checkbox silently defaulted the keyword's intent to `"core"` even though
+  the student never chose one; intent is now `undefined` until explicitly
+  picked, and ungraded/partial rows can't reach the grading call.
+- **PR #247 — STORY-082** (`2edb67a`): STR Triage's classifier expanded from
+  a 4-field row and a hardcoded `avgSpendPerKeyword = 25` to the full
+  search-term-report schema, statistical zero-order thresholds, existing-target
+  detection, per-brand-class target ROAS, and a real `insufficient_data`
+  action (7 actions total, up from 4). The practice page now goes through
+  the full start → save-decision → run → submit → grade → feedback lifecycle
+  (it previously only called a preview-only path and never graded). Known
+  gap carried into the story doc: ground truth never produces
+  `harvest_phrase` — no rule currently emits it.
+
+Both branches needed a merge from `origin/main` before merging (PR #246's
+branch was cut before STORY-080 finished merging, a sequencing slip from
+earlier in the session) — resolved as clean auto-merges, not real conflicts.
+
+**Sprint 15 is now 4/7 done** (STORY-079 PR #244, STORY-080 PR #245,
+STORY-081 PR #246, STORY-082 PR #247). STORY-078 (formative-only labeling),
+STORY-083 (non-binary Listing Audit ground truth — closes the click-through
+bypass), and STORY-084 (Campaign Builder strategic scoring) remain planned;
+083/084 need Ryan's Amazon PPC expertise, not an agent's guess.
+
+Documentation updated to match: `CLAUDE.md` (five registered simulators, not
+four-plus-alias; "Known gaps" simulator-scores bullet corrected — it was
+still describing the pre-Sprint-14 hardcoded-`explanation` state even
+though Sprint 14 landed before this session), `docs/sprint-plan.md`,
+`docs/stories/STORY-079..082.md` status headers, `README.md`, `FEATURES.md`,
+`docs/db-schema.md`, `docs/architecture/01-layer-wiring.md`,
+`docs/architecture/03-site-map.md`, and the stale doc-comment in
+`src/ports/simulator/SimulatorRegistry.ts`.
+
+---
+
 # Current audit addendum (2026-07-27)
 
 The repository was audited at commit `5b8072b` on branch `fix/appurl-helper`. The current source contains 68 App Router page/route files, 34 Prisma models, 20 migrations, the admin route tree, four registered simulator engines, and the four authored operational runbooks. The operator-reported production state below is historical handoff material and was not independently rechecked from this workstation.

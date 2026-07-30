@@ -37,7 +37,7 @@ Catalog and pricing pages depend on published course rows and active pricing-tie
 - `/tools/listing-audit`
 - `/tools/keyword-research`
 
-The four first simulator URLs resolve to registered domain engines. Keyword Research has a page and action surface but currently reuses Listing Audit behavior rather than adding a fifth registry implementation.
+All five simulator URLs resolve to registered domain engines, including Keyword Research (STORY-081), which now has its own domain simulator and versioned `KeywordDataset` repository rather than reusing Listing Audit.
 
 ## Admin routes
 

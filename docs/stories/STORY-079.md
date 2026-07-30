@@ -2,13 +2,13 @@
 
 ## Status
 
-**Final — ready for implementation.** This is Ryan's third and
+**✅ Done — merged in PR #244.** This is Ryan's third and
 authoritative decision pass (2026-07-29), delivered as explicit product
 rules and acceptance criteria. It **supersedes** the two earlier passes
 (merged in PRs #241/#242) wherever they conflict — notably the
 elasticity model and the tolerance basis both changed. The earlier
-passes remain in git history for context; this document is the one to
-implement against.
+passes remain in git history for context; this document is the one that
+was implemented against.
 
 See `docs/simulator-remediation-decisions.md` for cross-cutting rules
 (versioning, no unversioned constants, credential-mode gate) that still
