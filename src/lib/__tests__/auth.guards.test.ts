@@ -50,9 +50,17 @@ const mockGet = vi.fn((name: string) => {
   const value = cookieJar.get(name);
   return value ? { value } : undefined;
 });
-const mockSet = vi.fn((opts: { name: string; value: string; expires?: Date; maxAge?: number; [k: string]: unknown }) => {
-  cookieJar.set(opts.name, opts.value);
-});
+const mockSet = vi.fn(
+  (opts: {
+    name: string;
+    value: string;
+    expires?: Date;
+    maxAge?: number;
+    [k: string]: unknown;
+  }) => {
+    cookieJar.set(opts.name, opts.value);
+  },
+);
 const mockDelete = vi.fn((name: string) => {
   cookieJar.delete(name);
 });
@@ -86,11 +94,13 @@ const SESSION_COOKIE = "amph_session";
 
 // ── Setup helpers ───────────────────────────────────────────
 
-async function seedUser(opts: {
-  id?: string;
-  role?: "STUDENT" | "INSTRUCTOR" | "ADMIN";
-  email?: string;
-} = {}) {
+async function seedUser(
+  opts: {
+    id?: string;
+    role?: "STUDENT" | "INSTRUCTOR" | "ADMIN";
+    email?: string;
+  } = {},
+) {
   const id = opts.id ?? "u-1";
   await testContainer.userRepo.create({
     id,
@@ -116,13 +126,24 @@ async function seedUser(opts: {
   return id;
 }
 
-async function seedSessionCookie(userId: string, role: "STUDENT" | "ADMIN" = "STUDENT", sessionId = "s-1") {
-  const sign = await testContainer.jwt.sign(
-    { sub: userId, role, sessionId },
-    "1h",
-  );
+async function seedSessionCookie(
+  userId: string,
+  role: "STUDENT" | "ADMIN" = "STUDENT",
+  sessionId = "s-1",
+) {
+  const sign = await testContainer.jwt.sign({ sub: userId, role, sessionId }, "1h");
   if (!sign.ok) throw new Error("sign failed");
   cookieJar.set(SESSION_COOKIE, sign.value);
+
+  // Create a matching session record so that the server-side
+  // session-revocation check in getSessionUserId() passes.
+  await testContainer.sessionRepo.create({
+    id: sessionId,
+    userId,
+    tokenHash: "test-hash",
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
+
   return sign.value;
 }
 

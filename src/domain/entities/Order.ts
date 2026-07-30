@@ -6,10 +6,20 @@
  *                 → FAILED
  *                 → EXPIRED
  *   PAID  → REFUNDED          (admin-initiated)
+ *
+ * Transition methods return `Result<void, OrderTransitionError>` instead of
+ * throwing, so callers can handle invalid-state errors without try/catch.
  */
 
+import { Result } from "@/domain/shared/Result";
 import { PaymentStatus as _PaymentStatusValues } from "@/domain/values/PaymentStatus";
 import type { PaymentStatus } from "@/domain/values/PaymentStatus";
+
+/** Error returned by Order transition methods on invalid state changes. */
+export type OrderTransitionError = {
+  kind: "invalid_transition";
+  message: string;
+};
 
 export interface OrderCreateParams {
   readonly id: string;
@@ -107,79 +117,89 @@ export class Order {
    * Transition to PENDING: PayMongo checkout session has been created.
    * Only valid from DRAFT.
    */
-  markPending(paymongoPaymentId: string, checkoutUrl: string): void {
+  markPending(paymongoPaymentId: string, checkoutUrl: string): Result<void, OrderTransitionError> {
     if (this.status !== "DRAFT") {
-      throw new Error(
-        `Cannot mark pending: order is ${this.status}. Can only transition from DRAFT.`,
-      );
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot mark pending: order is ${this.status}. Can only transition from DRAFT.`,
+      });
     }
     this.paymongoPaymentId = paymongoPaymentId;
     this.paymongoCheckoutUrl = checkoutUrl;
     this.status = "PENDING";
     this.updatedAt = new Date();
+    return Result.ok(undefined);
   }
 
   /**
    * Transition to PAID: PayMongo has confirmed the payment.
    * Only valid from PENDING.
    */
-  markPaid(paidAt = new Date()): void {
+  markPaid(paidAt = new Date()): Result<void, OrderTransitionError> {
     if (this.status !== "PENDING") {
-      throw new Error(
-        `Cannot mark paid: order is ${this.status}. Can only transition from PENDING.`,
-      );
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot mark paid: order is ${this.status}. Can only transition from PENDING.`,
+      });
     }
     this.status = "PAID";
     this.paymongoStatus = "paid";
     this.paymongoPaidAt = paidAt;
     this.updatedAt = new Date();
+    return Result.ok(undefined);
   }
 
   /**
    * Transition to FAILED: payment attempt failed.
    * Only valid from PENDING.
    */
-  markFailed(): void {
+  markFailed(): Result<void, OrderTransitionError> {
     if (this.status !== "PENDING") {
-      throw new Error(
-        `Cannot mark failed: order is ${this.status}. Can only transition from PENDING.`,
-      );
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot mark failed: order is ${this.status}. Can only transition from PENDING.`,
+      });
     }
     this.status = "FAILED";
     this.paymongoStatus = "failed";
     this.updatedAt = new Date();
+    return Result.ok(undefined);
   }
 
   /**
    * Transition to EXPIRED: checkout session timed out.
    * Only valid from PENDING.
    */
-  markExpired(): void {
+  markExpired(): Result<void, OrderTransitionError> {
     if (this.status !== "PENDING") {
-      throw new Error(
-        `Cannot mark expired: order is ${this.status}. Can only transition from PENDING.`,
-      );
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot mark expired: order is ${this.status}. Can only transition from PENDING.`,
+      });
     }
     this.status = "EXPIRED";
     this.paymongoStatus = "expired";
     this.updatedAt = new Date();
+    return Result.ok(undefined);
   }
 
   /**
    * Transition to REFUNDED: full refund issued.
    * Only valid from PAID.
    */
-  markRefunded(reason: string, amountMinor: number): void {
+  markRefunded(reason: string, amountMinor: number): Result<void, OrderTransitionError> {
     if (this.status !== "PAID") {
-      throw new Error(
-        `Cannot mark refunded: order is ${this.status}. Can only transition from PAID.`,
-      );
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot mark refunded: order is ${this.status}. Can only transition from PAID.`,
+      });
     }
     this.status = "REFUNDED";
     this.refundReason = reason;
     this.refundProcessedAt = new Date();
     this.refundAmountMinor = amountMinor;
     this.updatedAt = new Date();
+    return Result.ok(undefined);
   }
 
   // ── Guards ────────────────────────────────────────────────

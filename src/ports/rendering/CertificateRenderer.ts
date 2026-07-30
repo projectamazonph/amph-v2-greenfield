@@ -39,9 +39,14 @@ export interface CertificateRenderer {
    * raw PDF bytes. The caller streams the buffer to the response
    * (Next.js route handler) or attaches it to an email.
    *
-   * Throwing is acceptable for the renderer (PDF library errors are
-   * not domain errors); the use case wraps and converts to a
-   * Result<{ buffer, hash }, render_error>.
+   * **Throw contract:** On any failure (PDF library error, missing
+   * font, invalid input data, etc.) the implementation MUST throw an
+   * `Error` whose `message` describes the failure and whose `cause`
+   * wraps the original error. Callers MUST treat this as a "never
+   * resolves with a buffer" path — use a try/catch or Result wrapper.
+   *
+   * The use case layer converts throws to
+   * `Result<{ buffer, hash }, render_error>`.
    */
-  render(input: CertificateRenderInput): Promise<Buffer>;
+  render(input: CertificateRenderInput): Promise<Buffer> | never;
 }

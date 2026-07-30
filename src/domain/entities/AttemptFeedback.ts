@@ -11,10 +11,9 @@
  * by verdict and dimension.
  */
 
-import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
+import type { Difficulty, SimulatorId } from "@/domain/entities/SimulatorScenario";
 import type {
   AttemptStatus,
-  Difficulty,
   SimulatorAttempt,
   SimulatorMode,
   ScoreDimensions,

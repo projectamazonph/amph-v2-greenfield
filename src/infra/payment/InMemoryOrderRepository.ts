@@ -152,11 +152,13 @@ export class InMemoryOrderRepository implements IOrderRepository {
       totalMinor: total,
       currency: "PHP",
     });
-    order.markPending(
+    const rPending = order.markPending(
       params.paymongoPaymentId ?? "cs_paid",
       "https://checkout.paymongo.com/cs_paid",
     );
-    order.markPaid();
+    if (!rPending.ok) throw new Error(`markPending failed: ${JSON.stringify(rPending.error)}`);
+    const rPaid = order.markPaid();
+    if (!rPaid.ok) throw new Error(`markPaid failed: ${JSON.stringify(rPaid.error)}`);
     this.orders.set(order.id, order);
   }
 
@@ -178,7 +180,8 @@ export class InMemoryOrderRepository implements IOrderRepository {
       totalMinor: params.totalMinor ?? 299900,
       currency: "PHP",
     });
-    order.markPending(params.paymongoPaymentId, params.paymongoCheckoutUrl);
+    const r = order.markPending(params.paymongoPaymentId, params.paymongoCheckoutUrl);
+    if (!r.ok) throw new Error(`markPending failed: ${JSON.stringify(r.error)}`);
     this.orders.set(order.id, order);
   }
 
@@ -198,8 +201,10 @@ export class InMemoryOrderRepository implements IOrderRepository {
       totalMinor: params.totalMinor ?? 299900,
       currency: "PHP",
     });
-    order.markPending("cs_failed", "https://checkout.paymongo.com/cs_failed");
-    order.markFailed();
+    const rPending = order.markPending("cs_failed", "https://checkout.paymongo.com/cs_failed");
+    if (!rPending.ok) throw new Error(`markPending failed: ${JSON.stringify(rPending.error)}`);
+    const rFailed = order.markFailed();
+    if (!rFailed.ok) throw new Error(`markFailed failed: ${JSON.stringify(rFailed.error)}`);
     this.orders.set(order.id, order);
   }
 
@@ -219,8 +224,10 @@ export class InMemoryOrderRepository implements IOrderRepository {
       totalMinor: params.totalMinor ?? 299900,
       currency: "PHP",
     });
-    order.markPending("cs_expired", "https://checkout.paymongo.com/cs_expired");
-    order.markExpired();
+    const rPending = order.markPending("cs_expired", "https://checkout.paymongo.com/cs_expired");
+    if (!rPending.ok) throw new Error(`markPending failed: ${JSON.stringify(rPending.error)}`);
+    const rExpired = order.markExpired();
+    if (!rExpired.ok) throw new Error(`markExpired failed: ${JSON.stringify(rExpired.error)}`);
     this.orders.set(order.id, order);
   }
 }

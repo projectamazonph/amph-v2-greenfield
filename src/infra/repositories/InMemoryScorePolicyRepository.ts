@@ -4,9 +4,9 @@
  * STORY-065: Scoring Engine + Dimensional Policies.
  */
 
-import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
+import type { SimulatorId, Difficulty } from "@/domain/entities/SimulatorScenario";
 import type { ScorePolicy } from "@/domain/entities/ScorePolicy";
-import type { Difficulty, SimulatorMode } from "@/domain/entities/SimulatorAttempt";
+import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type { SimulatorAttemptError } from "@/domain/entities/SimulatorAttempt";
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
 import { Result } from "@/domain/shared/Result";

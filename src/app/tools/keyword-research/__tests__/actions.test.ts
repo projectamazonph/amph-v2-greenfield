@@ -145,7 +145,7 @@ function happyContainer() {
     Result.ok({
       feedback: {
         attemptId: "ATT-KW12345",
-        userId: "system",
+        userId: "user_123",
         simulatorId: "keyword-research",
         scenarioId: "keyword-research-scenario-default",
         difficulty: "beginner",

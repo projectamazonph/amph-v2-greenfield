@@ -19,10 +19,18 @@ import { CertificateDocument } from "@/infra/pdf/CertificateDocument";
 
 export class ReactPdfCertificateRenderer implements CertificateRenderer {
   async render(input: CertificateRenderInput): Promise<Buffer> {
-    // Cast: createElement returns ReactElement<{ input }, ...> but the
-    // @react-pdf/renderer DocumentProps type is stricter. The runtime
-    // is happy — CertificateDocument is a valid document component.
-    const element = createElement(CertificateDocument, { input });
-    return renderToBuffer(element as Parameters<typeof renderToBuffer>[0]);
+    try {
+      // Cast: createElement returns ReactElement<{ input }, ...> but the
+      // @react-pdf/renderer DocumentProps type is stricter. The runtime
+      // is happy — CertificateDocument is a valid document component.
+      const element = createElement(CertificateDocument, { input });
+      return await renderToBuffer(element as Parameters<typeof renderToBuffer>[0]);
+    } catch (err: unknown) {
+      console.error("[ReactPdfCertificateRenderer] Failed to render certificate PDF:", err);
+      throw new Error(
+        `Certificate PDF rendering failed: ${err instanceof Error ? err.message : String(err)}`,
+        { cause: err },
+      );
+    }
   }
 }

@@ -91,7 +91,6 @@ describe("RefundOverride", () => {
       ok: true;
       value: {
         paymongoPaidAt: Date | null;
-        markPaid: (d: Date) => void;
         paymongoStatus: string | null;
         status: string;
       };

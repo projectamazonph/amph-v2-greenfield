@@ -45,19 +45,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const container = buildContainer();
 
   // ── 2. Verify webhook signature ─────────────────────────────
-  let signatureValid = true;
-  try {
-    // The paymentGateway's verifyWebhookSignature lives on the
-    // PayMongoAdapter concrete class (it's a PayMongo-specific
-    // method, not a port). We cast to access it. The container
-    // is the single source of truth for the gateway instance.
-    const gateway = container.paymentGateway as unknown as {
-      verifyWebhookSignature(body: string, signature: string): void;
-    };
-    gateway.verifyWebhookSignature(rawBody, signature);
-  } catch {
-    signatureValid = false;
-  }
+  // The paymentGateway's verifyWebhookSignature lives on the
+  // PayMongoAdapter concrete class (it's a PayMongo-specific
+  // method, not a port). We cast to access it. The container
+  // is the single source of truth for the gateway instance.
+  const gateway = container.paymentGateway as unknown as {
+    verifyWebhookSignature(body: string, signature: string): Result<boolean, { kind: string }>;
+  };
+  const sigResult = gateway.verifyWebhookSignature(rawBody, signature);
+  const signatureValid = Result.isOk(sigResult);
 
   // ── 3. Persist the raw event before any further processing ──
   // Best-effort peek at the event type/id for the log entry only —
@@ -129,16 +125,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   // ── 7. Mark order as paid (via the container's orderRepo) ──
-  try {
-    order.markPaid();
-    await container.orderRepo.update(order);
-  } catch (err) {
-    console.error(`[webhook] Failed to mark order ${order.id} as paid:`, err);
+  const paidResult = order.markPaid();
+  if (!paidResult.ok) {
+    console.error(`[webhook] Failed to mark order ${order.id} as paid:`, paidResult.error);
     return finish(
       NextResponse.json({ error: "Failed to update order" }, { status: 500 }),
-      `failed_to_update_order: ${String(err)}`,
+      `failed_to_update_order: ${JSON.stringify(paidResult.error)}`,
     );
   }
+  await container.orderRepo.update(order);
 
   // ── 8. Auto-enroll the student (via the container's use case) ─
   let enrollError: string | undefined;

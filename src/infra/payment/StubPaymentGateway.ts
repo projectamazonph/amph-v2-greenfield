@@ -39,13 +39,18 @@ export class StubPaymentGateway implements IPaymentGateway {
   ): Promise<Result<CheckoutSession, PaymentGatewayError>> {
     const session = this._checkoutSessions.get(sessionId);
     if (!session) {
-      return Result.err({ kind: "paymongo_error", code: "not_found", message: `Session ${sessionId} not found` });
+      return Result.err({
+        kind: "paymongo_error",
+        code: "not_found",
+        message: `Session ${sessionId} not found`,
+      });
     }
     return Result.ok(session);
   }
 
-  verifyWebhookSignature(_payload: string, _signature: string): void {
+  verifyWebhookSignature(_payload: string, _signature: string): Result<boolean, { kind: string }> {
     // Stub always passes — override in specific tests to test rejection
+    return Result.ok(true);
   }
 
   // ── STORY-049: refund support ─────────────────────────────────
@@ -66,9 +71,7 @@ export class StubPaymentGateway implements IPaymentGateway {
     paymongoPaymentId: string;
     amountMinor: number;
     reason: string;
-  }): Promise<
-    Result<{ refundId: string; processedAt: Date }, PaymentGatewayError>
-  > {
+  }): Promise<Result<{ refundId: string; processedAt: Date }, PaymentGatewayError>> {
     this.refundCalls.push({ ...params });
 
     if (this.refundShouldFail) {

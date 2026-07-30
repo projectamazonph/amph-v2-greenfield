@@ -208,7 +208,7 @@ export class PrismaPricingTierRepository implements IPricingTierRepository {
       id: row.id,
       slug: row.slug,
       name: row.name,
-      price: Money.of(row.priceMinor, row.currency as "PHP" | "USD"),
+      price: Result.unwrap(Money.of(row.priceMinor, row.currency as "PHP" | "USD")),
       status: row.status as PricingTierStatus,
       displayOrder: row.displayOrder,
       earlyBirdPriceMinor: row.earlyBirdPriceMinor ?? undefined,

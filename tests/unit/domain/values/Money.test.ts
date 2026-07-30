@@ -1,18 +1,30 @@
 import { describe, it, expect } from "vitest";
 import { Money } from "@/domain/values/Money";
+import { Result } from "@/domain/shared/Result";
 
 describe("Money", () => {
   describe("construction", () => {
     it("Money.of takes integer minor units", () => {
-      const m = Money.of(299900, "PHP");
-      expect(m.toMinor()).toBe(299900);
-      expect(m.currency).toBe("PHP");
+      const r = Money.of(299900, "PHP");
+      expect(r.ok).toBe(true);
+      if (r.ok) {
+        expect(r.value.toMinor()).toBe(299900);
+        expect(r.value.currency).toBe("PHP");
+      }
     });
 
     it("Money.of rejects non-integer minor units (NO FLOATING POINT)", () => {
-      expect(() => Money.of(2999.99, "PHP")).toThrow(/integer/);
-      expect(() => Money.of(NaN, "PHP")).toThrow(/integer/);
-      expect(() => Money.of(Infinity, "PHP")).toThrow(/integer/);
+      const r1 = Money.of(2999.99, "PHP");
+      expect(r1.ok).toBe(false);
+      if (!r1.ok) expect(r1.error.kind).toBe("non_integer_minor");
+
+      const r2 = Money.of(NaN, "PHP");
+      expect(r2.ok).toBe(false);
+      if (!r2.ok) expect(r2.error.kind).toBe("non_integer_minor");
+
+      const r3 = Money.of(Infinity, "PHP");
+      expect(r3.ok).toBe(false);
+      if (!r3.ok) expect(r3.error.kind).toBe("non_integer_minor");
     });
 
     it("Money.php converts pesos to centavos", () => {
@@ -50,7 +62,7 @@ describe("Money", () => {
 
     it("add/subtract require same currency", () => {
       const php = Money.php(100);
-      const usd = Money.of(10000, "USD");
+      const usd = Result.unwrap(Money.of(10000, "USD"));
       expect(() => php.add(usd)).toThrow(/PHP.*USD/);
       expect(() => php.subtract(usd)).toThrow(/PHP.*USD/);
     });
@@ -79,7 +91,7 @@ describe("Money", () => {
     it("equals", () => {
       expect(Money.php(100).equals(Money.php(100))).toBe(true);
       expect(Money.php(100).equals(Money.php(101))).toBe(false);
-      expect(Money.php(100).equals(Money.of(10000, "USD"))).toBe(false);
+      expect(Money.php(100).equals(Result.unwrap(Money.of(10000, "USD")))).toBe(false);
     });
 
     it("gt / gte / lt / lte", () => {
@@ -112,7 +124,7 @@ describe("Money", () => {
     });
 
     it("format() outputs USD format when currency is USD", () => {
-      const m = Money.of(50000, "USD");
+      const m = Result.unwrap(Money.of(50000, "USD"));
       const formatted = m.format("en-US");
       expect(formatted).toBe("$500.00");
     });

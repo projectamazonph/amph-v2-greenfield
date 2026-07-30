@@ -86,8 +86,8 @@ function makePaidOrder(id: string, userId: string, courseId: string, totalMinor:
     totalMinor,
     currency: "PHP",
   });
-  order.markPending(`pay_${id}`, "https://example.com/checkout");
-  order.markPaid();
+  expect(order.markPending(`pay_${id}`, "https://example.com/checkout").ok).toBe(true);
+  expect(order.markPaid().ok).toBe(true);
   return order;
 }
 

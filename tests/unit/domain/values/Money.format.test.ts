@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Money } from "@/domain/values/Money";
+import { Result } from "@/domain/shared/Result";
 
 /**
  * Format helpers — pure formatters with no side effects.
@@ -11,7 +12,7 @@ describe("Money.format()", () => {
   });
 
   it("formats USD dollars with 2 decimal places", () => {
-    expect(Money.of(5000, "USD").format("en-US")).toBe("$50.00");
+    expect(Result.unwrap(Money.of(5000, "USD")).format("en-US")).toBe("$50.00");
   });
 
   it("formats large amounts with thousand separators", () => {
@@ -27,7 +28,7 @@ describe("Money edge cases", () => {
   });
 
   it("handles very small amounts (1 centavo)", () => {
-    const m = Money.of(1, "PHP");
+    const m = Result.unwrap(Money.of(1, "PHP"));
     expect(m.format()).toMatch(/0\.01/);
   });
 });

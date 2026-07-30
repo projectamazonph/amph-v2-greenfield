@@ -17,8 +17,8 @@ import {
   isValidPolicy,
   NON_GRADABLE_DIMENSIONS,
 } from "@/domain/entities/ScorePolicy";
-import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
-import type { Difficulty, SimulatorMode } from "@/domain/entities/SimulatorAttempt";
+import type { Difficulty, SimulatorId } from "@/domain/entities/SimulatorScenario";
+import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 
 describe("seed-simulator-policies.ts policy definitions", () => {
   it("seeds a non-empty policy set", () => {

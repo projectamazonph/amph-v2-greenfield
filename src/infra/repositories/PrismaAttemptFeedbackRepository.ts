@@ -15,8 +15,8 @@ import type {
 } from "@/ports/repositories/IAttemptFeedbackRepository";
 import { Result } from "@/domain/shared/Result";
 import { hydrateAttemptFeedback } from "@/domain/entities/AttemptFeedback";
-import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
-import type { Difficulty, SimulatorMode } from "@/domain/entities/SimulatorAttempt";
+import type { SimulatorId, Difficulty } from "@/domain/entities/SimulatorScenario";
+import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 
 function toDomain(raw: {
   id: string;

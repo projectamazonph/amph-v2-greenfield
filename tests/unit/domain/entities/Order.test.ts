@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Order, OrderCreateParams, OrderHydrateParams } from "@/domain/entities/Order";
+import type { OrderTransitionError } from "@/domain/entities/Order";
 
 describe("Order — creation", () => {
   function makeParams(overrides: Partial<OrderCreateParams> = {}): OrderCreateParams {
@@ -62,26 +63,34 @@ describe("Order — payment state transitions", () => {
   describe("markPending()", () => {
     it("transitions DRAFT → PENDING", () => {
       const order = makeDraft();
-      order.markPending("cs_test_abc123", "https://checkout.paymongo.com/cs_abc123");
+      const result = order.markPending("cs_test_abc123", "https://checkout.paymongo.com/cs_abc123");
+      expect(result.ok).toBe(true);
       expect(order.status).toBe("PENDING");
     });
 
     it("sets paymongoPaymentId", () => {
       const order = makeDraft();
-      order.markPending("cs_test_abc123", "https://checkout.paymongo.com/cs_abc123");
+      const result = order.markPending("cs_test_abc123", "https://checkout.paymongo.com/cs_abc123");
+      expect(result.ok).toBe(true);
       expect(order.paymongoPaymentId).toBe("cs_test_abc123");
     });
 
     it("sets paymongoCheckoutUrl", () => {
       const order = makeDraft();
-      order.markPending("cs_test_abc123", "https://checkout.paymongo.com/cs_abc123");
+      const result = order.markPending("cs_test_abc123", "https://checkout.paymongo.com/cs_abc123");
+      expect(result.ok).toBe(true);
       expect(order.paymongoCheckoutUrl).toBe("https://checkout.paymongo.com/cs_abc123");
     });
 
-    it("throws if not DRAFT", () => {
+    it("returns error if not DRAFT", () => {
       const order = makeDraft();
       order.markPending("cs_1", "https://example.com");
-      expect(() => order.markPending("cs_2", "https://example.com")).toThrow(/PENDING/);
+      const result = order.markPending("cs_2", "https://example.com");
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe("invalid_transition");
+        expect(result.error.message).toMatch(/PENDING/);
+      }
     });
   });
 
@@ -89,14 +98,16 @@ describe("Order — payment state transitions", () => {
     it("transitions PENDING → PAID", () => {
       const order = makeDraft();
       order.markPending("cs_test", "https://example.com");
-      order.markPaid();
+      const result = order.markPaid();
+      expect(result.ok).toBe(true);
       expect(order.status).toBe("PAID");
     });
 
     it("sets paymongoStatus to paid", () => {
       const order = makeDraft();
       order.markPending("cs_test", "https://example.com");
-      order.markPaid();
+      const result = order.markPaid();
+      expect(result.ok).toBe(true);
       expect(order.paymongoStatus).toBe("paid");
     });
 
@@ -104,20 +115,31 @@ describe("Order — payment state transitions", () => {
       const order = makeDraft();
       order.markPending("cs_test", "https://example.com");
       const paidAt = new Date("2026-07-01T12:00:00Z");
-      order.markPaid(paidAt);
+      const result = order.markPaid(paidAt);
+      expect(result.ok).toBe(true);
       expect(order.paymongoPaidAt).toEqual(paidAt);
     });
 
-    it("throws if not PENDING", () => {
+    it("returns error if not PENDING", () => {
       const order = makeDraft();
-      expect(() => order.markPaid()).toThrow(/PENDING/);
+      const result = order.markPaid();
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe("invalid_transition");
+        expect(result.error.message).toMatch(/DRAFT/);
+      }
     });
 
-    it("throws if already PAID", () => {
+    it("returns error if already PAID", () => {
       const order = makeDraft();
       order.markPending("cs_test", "https://example.com");
       order.markPaid();
-      expect(() => order.markPaid()).toThrow(/PAID/);
+      const result = order.markPaid();
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe("invalid_transition");
+        expect(result.error.message).toMatch(/PAID/);
+      }
     });
   });
 
@@ -125,13 +147,19 @@ describe("Order — payment state transitions", () => {
     it("transitions PENDING → FAILED", () => {
       const order = makeDraft();
       order.markPending("cs_test", "https://example.com");
-      order.markFailed();
+      const result = order.markFailed();
+      expect(result.ok).toBe(true);
       expect(order.status).toBe("FAILED");
     });
 
-    it("throws if not PENDING", () => {
+    it("returns error if not PENDING", () => {
       const order = makeDraft();
-      expect(() => order.markFailed()).toThrow(/PENDING/);
+      const result = order.markFailed();
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe("invalid_transition");
+        expect(result.error.message).toMatch(/DRAFT/);
+      }
     });
   });
 
@@ -139,13 +167,19 @@ describe("Order — payment state transitions", () => {
     it("transitions PENDING → EXPIRED", () => {
       const order = makeDraft();
       order.markPending("cs_test", "https://example.com");
-      order.markExpired();
+      const result = order.markExpired();
+      expect(result.ok).toBe(true);
       expect(order.status).toBe("EXPIRED");
     });
 
-    it("throws if not PENDING", () => {
+    it("returns error if not PENDING", () => {
       const order = makeDraft();
-      expect(() => order.markExpired()).toThrow(/PENDING/);
+      const result = order.markExpired();
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe("invalid_transition");
+        expect(result.error.message).toMatch(/DRAFT/);
+      }
     });
   });
 });
@@ -161,14 +195,16 @@ describe("Order — guards", () => {
       totalMinor: 299900,
       currency: "PHP",
     });
-    order.markPending("cs_test", "https://example.com");
+    const r = order.markPending("cs_test", "https://example.com");
+    expect(r.ok).toBe(true);
     return order;
   }
 
   describe("isPaid()", () => {
     it("true when PAID", () => {
       const order = makePending();
-      order.markPaid();
+      const r = order.markPaid();
+      expect(r.ok).toBe(true);
       expect(order.isPaid()).toBe(true);
     });
 
@@ -178,7 +214,8 @@ describe("Order — guards", () => {
 
     it("false when FAILED", () => {
       const order = makePending();
-      order.markFailed();
+      const r = order.markFailed();
+      expect(r.ok).toBe(true);
       expect(order.isPaid()).toBe(false);
     });
   });
@@ -204,13 +241,15 @@ describe("Order — guards", () => {
 
     it("PAID cannot transition to PAID", () => {
       const order = makePending();
-      order.markPaid();
+      const r = order.markPaid();
+      expect(r.ok).toBe(true);
       expect(order.canTransitionTo("PAID")).toBe(false);
     });
 
     it("PAID can transition to REFUNDED (full refund)", () => {
       const order = makePending();
-      order.markPaid();
+      const r = order.markPaid();
+      expect(r.ok).toBe(true);
       expect(order.canTransitionTo("REFUNDED")).toBe(true);
     });
   });

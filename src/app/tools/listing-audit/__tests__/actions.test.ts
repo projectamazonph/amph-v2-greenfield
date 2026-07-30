@@ -171,7 +171,7 @@ function happyContainer() {
     Result.ok({
       feedback: {
         attemptId: "ATT-XYZ789",
-        userId: "system",
+        userId: "user_123",
         simulatorId: "listing-audit",
         scenarioId: "listing-audit-scenario-bamboo-cutting-board",
         difficulty: "beginner",

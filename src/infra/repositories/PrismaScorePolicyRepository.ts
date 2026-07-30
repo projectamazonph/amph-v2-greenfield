@@ -5,9 +5,9 @@
  */
 
 import { PrismaClient, type Prisma } from "@prisma/client";
-import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
+import type { SimulatorId, Difficulty } from "@/domain/entities/SimulatorScenario";
 import type { ScorePolicy, DimensionConfig } from "@/domain/entities/ScorePolicy";
-import type { Difficulty, SimulatorMode } from "@/domain/entities/SimulatorAttempt";
+import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type { SimulatorAttemptError } from "@/domain/entities/SimulatorAttempt";
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
 import { Result } from "@/domain/shared/Result";

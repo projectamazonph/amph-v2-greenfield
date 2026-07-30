@@ -9,7 +9,8 @@
  */
 
 import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";
-import { join, extname } from "node:path";
+import { join, extname, resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import { Result } from "@/domain/shared/Result";
 import type {
@@ -193,11 +194,15 @@ export class NodeContentReader implements IAmphContentReader {
 
 /**
  * Resolves the content root directory.
- * Uses CONTENT_ROOT env var if set; otherwise falls back to the
- * default path on the developer's machine.
+ * Uses CONTENT_ROOT env var if set; otherwise computes the path
+ * relative to the project root (three levels up from this file's
+ * directory, which lives at src/infra/content/).
  */
 function resolveContentRoot(): string {
   if (process.env.CONTENT_ROOT) return process.env.CONTENT_ROOT;
-  // Default on the AMPH developer machine
-  return "D:\\Web Project\\amph-v2\\content\\curriculum\\modules";
+
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  // This file is at <project-root>/src/infra/content/, so go up 3 levels
+  const projectRoot = resolve(__dirname, "..", "..", "..");
+  return join(projectRoot, "content", "curriculum", "modules");
 }

@@ -29,8 +29,8 @@ export interface IPaymentGateway {
   createCheckoutSession(params: {
     courseId: string;
     courseTitle: string;
-    amountMinor: number;   // integer minor units (centavos)
-    currency: string;      // "PHP"
+    amountMinor: number; // integer minor units (centavos)
+    currency: string; // "PHP"
     successUrl: string;
     failedUrl: string;
     metadata: Record<string, string>; // { orderId, userId, courseId }
@@ -43,11 +43,11 @@ export interface IPaymentGateway {
 
   /**
    * Verify a webhook signature from PayMongo.
-   * Throws Error if the signature is invalid or tampered.
+   * Returns Result.ok(true) if valid, Result.err({ kind }) otherwise.
    * @param payload  Raw request body as string
    * @param signature  Value of the PayMongo-Signature header
    */
-  verifyWebhookSignature(payload: string, signature: string): void;
+  verifyWebhookSignature(payload: string, signature: string): Result<boolean, { kind: string }>;
 
   /**
    * STORY-049: Issue a refund for a paid PayMongo payment.
@@ -64,10 +64,5 @@ export interface IPaymentGateway {
     paymongoPaymentId: string;
     amountMinor: number;
     reason: string;
-  }): Promise<
-    Result<
-      { refundId: string; processedAt: Date },
-      PaymentGatewayError
-    >
-  >;
+  }): Promise<Result<{ refundId: string; processedAt: Date }, PaymentGatewayError>>;
 }

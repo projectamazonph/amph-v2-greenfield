@@ -88,17 +88,32 @@ export interface SessionClaims {
 /**
  * Read and verify the session cookie. Returns the user ID if valid,
  * null otherwise. Never throws.
+ *
+ * SECURITY: After the JWT crypto check succeeds, we verify the session
+ * record still exists in the database. This ensures that server-side
+ * session revocation (logout, admin lockout, "logout everywhere") takes
+ * effect immediately instead of waiting for the JWT to expire.
  */
 export async function getSessionUserId(): Promise<string | null> {
   const token = (await cookies()).get(getSessionCookieName())?.value;
   if (!token) return null;
 
-  const { jwt } = buildContainer();
+  const { jwt, sessionRepo } = buildContainer();
   const result = await jwt.verify(token);
   if (!result.ok) return null;
 
   const sub = result.value.sub;
-  return typeof sub === "string" && sub.length > 0 ? sub : null;
+  if (typeof sub !== "string" || sub.length === 0) return null;
+
+  // If the JWT carries a sessionId, verify it still exists server-side.
+  // If the session was deleted (logout, admin revocation), reject the token.
+  const sessionId = result.value.sessionId;
+  if (typeof sessionId === "string" && sessionId.length > 0) {
+    const sessionResult = await sessionRepo.findById(sessionId);
+    if (!sessionResult.ok) return null;
+  }
+
+  return sub;
 }
 
 /**

@@ -15,7 +15,7 @@
  * instance with the decision appended.
  */
 
-import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
+import type { Difficulty, SimulatorId } from "@/domain/entities/SimulatorScenario";
 import type { SimulatorDecision } from "@/domain/entities/SimulatorDecision";
 import { Result } from "@/domain/shared/Result";
 
@@ -34,7 +34,6 @@ export type SimulatorAttemptError =
 
 export type AttemptStatus = "in_progress" | "submitted" | "graded" | "expired";
 export type SimulatorMode = "guided" | "practice" | "challenge" | "credential" | "instructor";
-export type Difficulty = "beginner" | "intermediate" | "advanced";
 
 export interface ScoreDimensions {
   direction?: number;
