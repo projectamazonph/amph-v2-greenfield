@@ -50,6 +50,7 @@ const ALL_ACTIONS: AuditAction[] = [
   "refund.overridden",
   "user.impersonated",
   "user.stopped_impersonating",
+  "user.subscription_granted",
   "discount_code.created",
   "discount_code.updated",
   "discount_code.archived",

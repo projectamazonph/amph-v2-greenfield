@@ -14,6 +14,7 @@
  * SOLID: thin page. All business logic is in `ListUsers` (the use case).
  */
 
+import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
@@ -89,7 +90,15 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <TopBar title="Users" subtitle={`${totalCount} total`} />
+      <TopBar
+        title="Users"
+        subtitle={`${totalCount} total`}
+        actions={
+          <Link href="/admin/users/new" className={styles.addButton}>
+            + Add student
+          </Link>
+        }
+      />
 
       {/* Filter form — GET submission updates URL params; server re-renders */}
       <form className={styles.filters} method="get">

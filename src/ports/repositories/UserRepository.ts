@@ -7,7 +7,7 @@
  * ADR-014: Every port method returns Result<T, E>. No exceptions across boundaries.
  */
 
-import type { User } from "@/domain/entities/User";
+import type { User, SubscriptionTier } from "@/domain/entities/User";
 import { Result } from "@/domain/shared/Result";
 
 export type UserError =
@@ -76,6 +76,13 @@ export interface UserRepository {
        * touch the secret itself — use setTwoFactorSecret() for that.
        */
       twoFactorEnabled: boolean;
+      /**
+       * Set by AdminGrantSubscription — an admin manually granting a
+       * student STARTER/PRO access outside the checkout flow (e.g.
+       * paid by bank transfer). Also usable to correct a mistaken grant
+       * back to FREE.
+       */
+      subscriptionTier: SubscriptionTier;
     }>,
   ): Promise<Result<User, UserError>>;
 
