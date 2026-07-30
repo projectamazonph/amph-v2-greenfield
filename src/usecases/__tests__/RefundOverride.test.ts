@@ -9,18 +9,42 @@ import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { SystemClock } from "@/ports/system/Clock";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
+import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
+import { TestLogger } from "@/infra/observability/TestLogger";
 
 describe("RefundOverride", () => {
   let orderRepo: InMemoryOrderRepository;
   let paymentGateway: StubPaymentGateway;
+  let courseRepo: InMemoryCourseRepository;
+  let userRepo: InMemoryUserRepository;
+  let emailSender: InMemoryEmailSender;
   let useCase: RefundOverride;
 
   beforeEach(() => {
     orderRepo = new InMemoryOrderRepository();
     paymentGateway = new StubPaymentGateway();
+    courseRepo = new InMemoryCourseRepository();
+    userRepo = new InMemoryUserRepository();
+    emailSender = new InMemoryEmailSender();
     const auditLog = new InMemoryAuditLog();
-    const recordAuditLog = new RecordAuditLog({ auditLog, idGen: { newId: () => `ale_${Date.now()}`, paymentRef: () => "x", receiptNumber: () => "x" }, clock: new SystemClock() });
-    useCase = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
+    const recordAuditLog = new RecordAuditLog({
+      auditLog,
+      idGen: { newId: () => `ale_${Date.now()}`, paymentRef: () => "x", receiptNumber: () => "x" },
+      clock: new SystemClock(),
+    });
+    useCase = new RefundOverride({
+      orderRepo,
+      paymentGateway,
+      recordAuditLog,
+      courseRepo,
+      userRepo,
+      emailSender,
+      refundEmailRenderer: new RefundTemplateRenderer(),
+      logger: new TestLogger(),
+    });
     // Ensure clock exists (used by ProcessRefund, not RefundOverride — for type compat only)
     void new SystemClock();
   });
@@ -63,7 +87,15 @@ describe("RefundOverride", () => {
     });
 
     // Force a stale paidAt
-    const order = (await orderRepo.findById("o1")) as { ok: true; value: { paymongoPaidAt: Date | null; markPaid: (d: Date) => void; paymongoStatus: string | null; status: string } };
+    const order = (await orderRepo.findById("o1")) as {
+      ok: true;
+      value: {
+        paymongoPaidAt: Date | null;
+        markPaid: (d: Date) => void;
+        paymongoStatus: string | null;
+        status: string;
+      };
+    };
     if (order.ok) {
       order.value.paymongoPaidAt = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000);
     }
@@ -232,5 +264,53 @@ describe("RefundOverride", () => {
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("refund_failed");
+  });
+
+  it("sends the refund-processed email when the user and course are found", async () => {
+    await orderRepo.seedPaidOrder({
+      id: "o1",
+      userId: "u1",
+      courseId: "c1",
+      totalMinor: 1000,
+      paymongoPaymentId: "cs_paid_1",
+    });
+    await userRepo.create({
+      id: "u1",
+      email: "student@example.com",
+      passwordHash: "hash",
+      firstName: "Ana",
+      lastName: "Reyes",
+    });
+    courseRepo.seed([
+      {
+        id: "c1",
+        slug: "test-course",
+        title: "PPC Foundations",
+        tagline: "",
+        description: "",
+        price: { minor: 1000, currency: "PHP" },
+        curriculum: { sections: [] },
+        coverImage: null,
+        isFeatured: false,
+        displayOrder: 0,
+        status: "PUBLISHED",
+        courseTier: "STARTER",
+        previewLessonCount: 0,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        moduleIds: [],
+      } as never,
+    ]);
+
+    const r = await useCase.execute({
+      orderId: "o1",
+      actorId: "admin_1",
+      amountMinor: 1000,
+      reason: "Goodwill",
+      overrideReason: "Customer escalated; support approved",
+    });
+
+    expect(r.ok).toBe(true);
+    expect(emailSender.sent).toHaveLength(1);
+    expect(emailSender.sent[0]?.to).toBe("student@example.com");
   });
 });

@@ -21,6 +21,7 @@ import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionR
 import { FixedClock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
+import type { PasswordChangedRenderer } from "@/ports/email/PasswordChangedRenderer";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { Clock } from "@/ports/system/Clock";
 
@@ -35,10 +36,18 @@ class SilentLogger implements Logger {
 }
 
 class StubEmailSender implements EmailSender {
-  public sent: Array<{ to: string; subject: string }> = [];
+  public sent: Array<{ to: string; subject: string; react: unknown }> = [];
   async send(args: Parameters<EmailSender["send"]>[0]) {
-    this.sent.push({ to: args.to, subject: args.subject });
+    this.sent.push({ to: args.to, subject: args.subject, react: args.react });
     return Result.ok({ messageId: "msg-1" } as never);
+  }
+}
+
+class StubPasswordChangedRenderer implements PasswordChangedRenderer {
+  public calls: Array<{ firstName: string; changedAt: Date }> = [];
+  render(args: { firstName: string; changedAt: Date }) {
+    this.calls.push(args);
+    return { __stub_password_changed_email__: args } as unknown as React.ReactElement;
   }
 }
 
@@ -59,6 +68,7 @@ describe("ResetPassword", () => {
   let users: InMemoryUserRepository;
   let passwordResets: InMemoryPasswordResetRepository;
   let emailSender: StubEmailSender;
+  let passwordChangedEmailRenderer: StubPasswordChangedRenderer;
   let hasher: StubPasswordHasher;
   let useCase: ResetPassword;
 
@@ -69,6 +79,7 @@ describe("ResetPassword", () => {
     users = new InMemoryUserRepository();
     passwordResets = new InMemoryPasswordResetRepository();
     emailSender = new StubEmailSender();
+    passwordChangedEmailRenderer = new StubPasswordChangedRenderer();
     hasher = new StubPasswordHasher();
     useCase = new ResetPassword({
       users,
@@ -77,6 +88,7 @@ describe("ResetPassword", () => {
       clock,
       logger: new SilentLogger(),
       email: emailSender,
+      passwordChangedEmailRenderer,
       hasher,
     });
   });
@@ -119,6 +131,14 @@ describe("ResetPassword", () => {
     const find = await passwordResets.findByTokenHash(sha256(rawToken));
     expect(find.ok).toBe(true);
     if (find.ok) expect(find.value.usedAt).not.toBeNull();
+
+    // Confirmation email was sent with real content (not the old `react:
+    // null` placeholder).
+    expect(emailSender.sent).toHaveLength(1);
+    expect(emailSender.sent[0]?.to).toBe("alice@example.com");
+    expect(emailSender.sent[0]?.react).not.toBeNull();
+    expect(passwordChangedEmailRenderer.calls).toHaveLength(1);
+    expect(passwordChangedEmailRenderer.calls[0]?.firstName).toBe("Alice");
   });
 
   it("returns invalid_token for an unknown token", async () => {
@@ -201,6 +221,7 @@ describe("ResetPassword", () => {
       clock,
       logger: new SilentLogger(),
       email: emailSender,
+      passwordChangedEmailRenderer,
       hasher: failingHasher,
     });
     const result = await failingUseCase.execute({
@@ -229,6 +250,7 @@ describe("ResetPassword", () => {
       clock,
       logger: new SilentLogger(),
       email: emailSender,
+      passwordChangedEmailRenderer,
       hasher,
     });
     const result = await failingUseCase.execute({

@@ -83,7 +83,7 @@ export function EmailLayout({
   preview,
   eyebrow,
   children,
-  homeUrl = "https://amph.example.com",
+  homeUrl = "https://projectamazonph.online",
 }: EmailLayoutProps) {
   return (
     <Html>

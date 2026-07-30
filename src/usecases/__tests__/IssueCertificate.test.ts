@@ -24,6 +24,10 @@ import { IssueCertificate } from "@/usecases/IssueCertificate";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
+import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
+import { CertificateEmailTemplateRenderer } from "@/infra/email/templates/CertificateEmailRenderer";
+import { TestLogger } from "@/infra/observability/TestLogger";
 import { FixedClock } from "@/ports/system/Clock";
 import type { Course } from "@/domain/entities/Course";
 import type { Enrollment } from "@/domain/entities/Enrollment";
@@ -95,18 +99,31 @@ function deterministicHash(input: {
 }
 
 /** Hash generator that produces a malformed (non-64-hex) hash. */
-function malformedHash(_input: { id: string; userId: string; courseId: string; issuedAt: Date }): string {
+function malformedHash(_input: {
+  id: string;
+  userId: string;
+  courseId: string;
+  issuedAt: Date;
+}): string {
   return "not-a-real-hash";
 }
 
-function buildDeps(overrides: {
-  hashGen?: { hash: (input: { id: string; userId: string; courseId: string; issuedAt: Date }) => string };
-  idGen?: { newId: () => string; paymentRef: () => string; receiptNumber: () => string };
-  clock?: FixedClock;
-} = {}) {
+function buildDeps(
+  overrides: {
+    hashGen?: {
+      hash: (input: { id: string; userId: string; courseId: string; issuedAt: Date }) => string;
+    };
+    idGen?: { newId: () => string; paymentRef: () => string; receiptNumber: () => string };
+    clock?: FixedClock;
+  } = {},
+) {
   const courseRepo = new InMemoryCourseRepository();
   const enrollmentRepo = new InMemoryEnrollmentRepository();
   const certificateRepo = new InMemoryCertificateRepository();
+  const userRepo = new InMemoryUserRepository();
+  const emailSender = new InMemoryEmailSender();
+  const certificateEmailRenderer = new CertificateEmailTemplateRenderer();
+  const logger = new TestLogger();
 
   const defaultIdGen = {
     newId: () => "cert_test_01",
@@ -118,6 +135,8 @@ function buildDeps(overrides: {
     courseRepo,
     enrollmentRepo,
     certificateRepo,
+    userRepo,
+    emailSender,
     useCase: new IssueCertificate({
       courseRepo,
       enrollmentRepo,
@@ -125,6 +144,10 @@ function buildDeps(overrides: {
       hashGen: overrides.hashGen ?? { hash: deterministicHash },
       idGen: overrides.idGen ?? defaultIdGen,
       clock: overrides.clock ?? new FixedClock(new Date("2026-07-19T00:00:00Z")),
+      userRepo,
+      emailSender,
+      certificateEmailRenderer,
+      logger,
     }),
   };
 }
@@ -182,9 +205,7 @@ describe("IssueCertificate", () => {
   it("returns enrollment_not_active when the enrollment is cancelled", async () => {
     const { useCase, courseRepo, enrollmentRepo } = buildDeps();
     courseRepo.seed([makeCourse()]);
-    await enrollmentRepo.create(
-      makeEnrollment({ status: "cancelled", progressPercent: 100 }),
-    );
+    await enrollmentRepo.create(makeEnrollment({ status: "cancelled", progressPercent: 100 }));
 
     const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
 
@@ -198,9 +219,7 @@ describe("IssueCertificate", () => {
   it("returns enrollment_not_active when the enrollment is refunded", async () => {
     const { useCase, courseRepo, enrollmentRepo } = buildDeps();
     courseRepo.seed([makeCourse()]);
-    await enrollmentRepo.create(
-      makeEnrollment({ status: "refunded", progressPercent: 100 }),
-    );
+    await enrollmentRepo.create(makeEnrollment({ status: "refunded", progressPercent: 100 }));
 
     const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
 
@@ -342,7 +361,11 @@ describe("IssueCertificate", () => {
     const issuedAt = new Date("2026-07-19T00:00:00Z");
     const { useCase, courseRepo, enrollmentRepo, certificateRepo } = buildDeps({
       clock: new FixedClock(issuedAt),
-      idGen: { newId: () => "cert_new_01", paymentRef: () => "AMPH-x", receiptNumber: () => "AMPH-2026-x" },
+      idGen: {
+        newId: () => "cert_new_01",
+        paymentRef: () => "AMPH-x",
+        receiptNumber: () => "AMPH-2026-x",
+      },
     });
     courseRepo.seed([makeCourse()]);
     await enrollmentRepo.create(makeEnrollment({ progressPercent: 100 }));
@@ -399,7 +422,11 @@ describe("IssueCertificate", () => {
   it("uses the injected id generator for the cert id", async () => {
     let n = 0;
     const { useCase, courseRepo, enrollmentRepo } = buildDeps({
-      idGen: { newId: () => `cert_seq_${++n}`, paymentRef: () => "AMPH-x", receiptNumber: () => "AMPH-2026-x" },
+      idGen: {
+        newId: () => `cert_seq_${++n}`,
+        paymentRef: () => "AMPH-x",
+        receiptNumber: () => "AMPH-2026-x",
+      },
     });
     courseRepo.seed([makeCourse()]);
     await enrollmentRepo.create(makeEnrollment({ progressPercent: 100 }));
@@ -464,5 +491,40 @@ describe("IssueCertificate", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.kind).toBe("course_not_found");
     expect(spy).not.toHaveBeenCalled();
+  });
+
+  // ── 12. certificate-issued email ────────────────────────
+
+  it("sends the certificate-issued email to the enrolled user on success", async () => {
+    const { useCase, courseRepo, enrollmentRepo, userRepo, emailSender } = buildDeps();
+    courseRepo.seed([makeCourse({ title: "PPC Foundations" })]);
+    await enrollmentRepo.create(makeEnrollment({ progressPercent: 100 }));
+    await userRepo.create({
+      id: USER_ID,
+      email: "student@example.com",
+      passwordHash: "hash",
+      firstName: "Ana",
+      lastName: "Reyes",
+    });
+
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+
+    expect(result.ok).toBe(true);
+    expect(emailSender.sent).toHaveLength(1);
+    expect(emailSender.sent[0]?.to).toBe("student@example.com");
+    expect(emailSender.sent[0]?.subject).toContain("PPC Foundations");
+  });
+
+  it("does not fail the use case when the user lookup fails for the email step", async () => {
+    // No user seeded — the email step should log and skip, not blow up
+    // the certificate issuance that already succeeded.
+    const { useCase, courseRepo, enrollmentRepo, emailSender } = buildDeps();
+    courseRepo.seed([makeCourse()]);
+    await enrollmentRepo.create(makeEnrollment({ progressPercent: 100 }));
+
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+
+    expect(result.ok).toBe(true);
+    expect(emailSender.sent).toHaveLength(0);
   });
 });

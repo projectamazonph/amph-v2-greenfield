@@ -45,6 +45,12 @@ import { InMemorySentReminderRepository } from "@/infra/db/inmemory/InMemorySent
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
 import { PasswordResetTemplateRenderer } from "@/infra/email/templates/PasswordResetRenderer";
+import { WelcomeTemplateRenderer } from "@/infra/email/templates/WelcomeRenderer";
+import { PasswordChangedTemplateRenderer } from "@/infra/email/templates/PasswordChangedRenderer";
+import { CertificateEmailTemplateRenderer } from "@/infra/email/templates/CertificateEmailRenderer";
+import type { ReceiptRenderer } from "@/ports/email/ReceiptRenderer";
+import { ReceiptTemplateRenderer } from "@/infra/email/templates/ReceiptRenderer";
+import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
@@ -219,6 +225,7 @@ export interface TestContainer extends AppContainer {
   sentReminderRepo: InMemorySentReminderRepository;
   emailVerificationRepo: InMemoryEmailVerificationRepository;
   passwordResetRepo: InMemoryPasswordResetRepository;
+  receiptEmailRenderer: ReceiptRenderer;
 }
 
 export function buildTestContainer(): TestContainer {
@@ -251,6 +258,11 @@ export function buildTestContainer(): TestContainer {
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
   const passwordResetEmailRenderer = new PasswordResetTemplateRenderer();
+  const welcomeEmailRenderer = new WelcomeTemplateRenderer();
+  const passwordChangedEmailRenderer = new PasswordChangedTemplateRenderer();
+  const certificateEmailRenderer = new CertificateEmailTemplateRenderer();
+  const receiptEmailRenderer = new ReceiptTemplateRenderer();
+  const refundEmailRenderer = new RefundTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
@@ -293,7 +305,16 @@ export function buildTestContainer(): TestContainer {
   // STORY-049 + STORY-062: build RefundOverride once. The
   // `refundOverride` container entry and `adminProcessRefund` share
   // the same instance ΓÇö matches the production container's wiring.
-  const refundOverride = new RefundOverride({ orderRepo, paymentGateway, recordAuditLog });
+  const refundOverride = new RefundOverride({
+    orderRepo,
+    paymentGateway,
+    recordAuditLog,
+    courseRepo,
+    userRepo,
+    emailSender,
+    refundEmailRenderer,
+    logger,
+  });
 
   return {
     clock,
@@ -354,6 +375,7 @@ export function buildTestContainer(): TestContainer {
     certificateRenderer,
     mdxRenderer,
     emailSender,
+    receiptEmailRenderer,
     accessPolicy,
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,
@@ -378,6 +400,10 @@ export function buildTestContainer(): TestContainer {
       hashGen: certificateHashGen,
       idGen,
       clock,
+      userRepo,
+      emailSender,
+      certificateEmailRenderer,
+      logger,
     }),
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
@@ -490,7 +516,16 @@ export function buildTestContainer(): TestContainer {
     // STORY-049: admin payments + refunds + refund override
     adminListPayments: new AdminListPayments({ orderRepo, userRepo }),
     adminGetPayment: new AdminGetPayment({ orderRepo, userRepo, courseRepo }),
-    processRefund: new ProcessRefund({ orderRepo, paymentGateway, clock }),
+    processRefund: new ProcessRefund({
+      orderRepo,
+      paymentGateway,
+      clock,
+      courseRepo,
+      userRepo,
+      emailSender,
+      refundEmailRenderer,
+      logger,
+    }),
     refundOverride,
     // STORY-062: admin refund request list + process
     listRefundRequests: new ListRefundRequests({ orderRepo, userRepo }),
@@ -573,6 +608,8 @@ export function buildTestContainer(): TestContainer {
       users: userRepo,
       clock,
       logger,
+      emailSender,
+      welcomeEmailRenderer,
     }),
     resendVerification: new ResendVerification({
       users: userRepo,
@@ -602,6 +639,7 @@ export function buildTestContainer(): TestContainer {
       clock,
       logger,
       email: emailSender,
+      passwordChangedEmailRenderer,
       hasher: passwordHasher,
     }),
     // P0-7: live class reminders

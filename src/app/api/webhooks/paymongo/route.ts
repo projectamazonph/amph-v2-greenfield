@@ -31,6 +31,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildContainer } from "@/composition/container";
 import { Result } from "@/domain/shared/Result";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
 
 const PROVIDER = "paymongo";
 
@@ -153,6 +154,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       console.warn(`[webhook] Enrollment failed for order ${order.id}:`, enrollResult.error);
       // Non-fatal — order is already marked paid. Enrollment can be retried.
       enrollError = `enrollment_failed: ${JSON.stringify(enrollResult.error)}`;
+    } else {
+      // ── 9. Send the payment receipt (best-effort) ────────────
+      await sendReceiptEmail(container, order);
     }
   } catch (err) {
     console.error(`[webhook] Enrollment error for order ${order.id}:`, err);
@@ -160,4 +164,51 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   return finish(NextResponse.json({ received: true }), enrollError);
+}
+
+/**
+ * Best-effort receipt email after a successful payment + enrollment.
+ * Never throws — a failure here must not affect the webhook's 200
+ * response or the order/enrollment state that already succeeded.
+ */
+async function sendReceiptEmail(
+  container: ReturnType<typeof buildContainer>,
+  order: {
+    id: string;
+    userId: string;
+    courseId: string;
+    totalMinor: number;
+    currency: string;
+    paymongoPaidAt: Date | null;
+  },
+): Promise<void> {
+  try {
+    const [userResult, courseResult] = await Promise.all([
+      container.userRepo.findById(order.userId),
+      container.courseRepo.findById(order.courseId),
+    ]);
+    if (!userResult.ok || !courseResult.ok) {
+      console.warn(`[webhook] Receipt email skipped for order ${order.id}: lookup failed`);
+      return;
+    }
+
+    const sendResult = await container.emailSender.send({
+      to: userResult.value.email,
+      subject: `Receipt for ${order.id} — ${courseResult.value.title}`,
+      react: container.receiptEmailRenderer.render({
+        firstName: userResult.value.firstName,
+        orderNumber: order.id,
+        courseTitle: courseResult.value.title,
+        amountMinor: order.totalMinor,
+        currency: order.currency,
+        paidAt: order.paymongoPaidAt ?? new Date(),
+        receiptUrl: buildAppUrl("/dashboard"),
+      }),
+    });
+    if (!sendResult.ok) {
+      console.warn(`[webhook] Receipt email send failed for order ${order.id}:`, sendResult.error);
+    }
+  } catch (err) {
+    console.error(`[webhook] Receipt email error for order ${order.id}:`, err);
+  }
 }
