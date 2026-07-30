@@ -45,6 +45,17 @@ Tool routes:
 ![Listing Audit](public/screenshots/listing-audit.png)
 ![Keyword Research](public/screenshots/keyword-research.png)
 
+## 📚 Curriculum Syllabus
+
+For a comprehensive overview of all courses, modules, and lessons taught by the platform, see **[CURRICULUM-SYLLABUS.md](CURRICULUM-SYLLABUS.md)**.
+
+**Quick Overview:**
+- **Total Duration:** ~45 hours of structured learning
+- **Total XP:** ~2,700 points across 31 lessons
+- **Two Main Courses:** PPC Foundations (Modules 0-4) and Accelerated Mastery (Modules 5-8)
+- **Five Simulation Tools:** Bid Elevator, STR Triage, Campaign Builder, Listing Audit, Keyword Research
+- **Assessment:** Module quizzes with 70% pass threshold + practical simulations
+
 ## Current repository status
 
 | Metric                            | Verified state                                           |
