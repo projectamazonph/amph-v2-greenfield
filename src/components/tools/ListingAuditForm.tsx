@@ -10,10 +10,7 @@
 
 import { useState, useTransition } from "react";
 import styles from "./ListingAuditForm.module.css";
-import {
-  auditListing,
-  type AuditListingResult,
-} from "@/app/tools/listing-audit/actions";
+import { auditListing, type AuditListingResult } from "@/app/tools/listing-audit/actions";
 
 interface Props {
   initialTitle: string;
@@ -63,7 +60,9 @@ export function ListingAuditForm({
   return (
     <form className={styles.form} onSubmit={onSubmit}>
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="la-title">Title</label>
+        <label className={styles.label} htmlFor="la-title">
+          Title
+        </label>
         <input
           id="la-title"
           className={styles.input}
@@ -88,7 +87,9 @@ export function ListingAuditForm({
         </div>
       </div>
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="la-description">Description</label>
+        <label className={styles.label} htmlFor="la-description">
+          Description
+        </label>
         <textarea
           id="la-description"
           className={styles.textarea}
@@ -125,13 +126,10 @@ export function ListingAuditForm({
           <ul className={styles.findingsList}>
             {result.value.audit.findings.map((f, i) => (
               <li key={i} className={styles.finding}>
-                <span
-                  className={styles.findingSev}
-                  data-sev={f.severity}
-                >
+                <span className={styles.findingSev} data-sev={f.severity}>
                   {f.severity}
                 </span>
-                <span className={styles.findingCategory}>{f.category}</span>
+                <span className={styles.findingCategory}>{f.dimension}</span>
                 <span className={styles.findingMessage}>{f.message}</span>
               </li>
             ))}

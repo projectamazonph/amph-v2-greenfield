@@ -140,6 +140,7 @@ import { PrismaPasswordResetRepository } from "@/infra/repositories/PrismaPasswo
 import { PrismaSentReminderRepository } from "@/infra/repositories/PrismaSentReminderRepository";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
+import { PasswordResetTemplateRenderer } from "@/infra/email/templates/PasswordResetRenderer";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
 import { ResetPassword } from "@/usecases/auth/ResetPassword";
 import type { PasswordResetRepository } from "@/ports/repositories/PasswordResetRepository";
@@ -452,6 +453,7 @@ function buildProductionContainer(): AppContainer {
   const sentReminderRepo: SentReminderRepository = new PrismaSentReminderRepository(prisma);
   const verificationEmailRenderer = new EmailVerificationTemplateRenderer();
   const liveClassReminderRenderer = new LiveClassReminderTemplateRenderer();
+  const passwordResetEmailRenderer = new PasswordResetTemplateRenderer();
   // STORY-050a: audit log (Postgres-backed in production via PrismaAuditLog)
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
@@ -804,6 +806,7 @@ function buildProductionContainer(): AppContainer {
       users: userRepo,
       passwordResets: passwordResetRepo,
       email: emailSender,
+      passwordResetEmailRenderer,
       rateLimiter,
       clock,
       ids: idGen,
