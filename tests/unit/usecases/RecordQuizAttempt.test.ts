@@ -40,6 +40,7 @@ function makeQuiz() {
       {
         id: "q1",
         questionText: "What does PPC stand for?",
+        explanation: "PPC = Pay Per Click, what you pay each time someone clicks your ad.",
         options: [
           { id: "o1", optionText: "Pay Per Click", isCorrect: true },
           { id: "o2", optionText: "Post Paid Credit", isCorrect: false },
@@ -205,6 +206,39 @@ describe("RecordQuizAttempt", () => {
       expect(result.value.totalQuestions).toBe(2);
     });
 
+    it("returns a per-question review with the learner's pick, the correct pick, and the explanation", async () => {
+      const quiz = makeQuiz();
+      quizRepo.seed(quiz);
+
+      const useCase = buildUseCase({
+        quizRepo,
+        quizAttemptRepo,
+        xpEventRepo,
+        userRepo,
+        idGen,
+        clock,
+      });
+
+      const result = await useCase.execute({
+        userId: USER_ID,
+        quizId: QUIZ_ID,
+        answers: [
+          { questionId: "q1", selectedOptionId: "o1" },
+          { questionId: "q2", selectedOptionId: "o3" },
+        ],
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value.review).toHaveLength(2);
+      const q1Review = result.value.review?.find((r) => r.questionId === "q1");
+      expect(q1Review).toMatchObject({
+        selectedOptionId: "o1",
+        correctOptionId: "o1",
+        explanation: "PPC = Pay Per Click, what you pay each time someone clicks your ad.",
+      });
+    });
+
     it("awards XP fire-and-forget when passed", async () => {
       const quiz = makeQuiz();
       quizRepo.seed(quiz);
@@ -321,6 +355,7 @@ describe("RecordQuizAttempt", () => {
       expect(result.value.xpAwarded).toBe(0);
       expect(result.value.correctCount).toBeNull();
       expect(result.value.totalQuestions).toBeNull();
+      expect(result.value.review).toBeNull();
     });
   });
 

@@ -18,6 +18,8 @@ export interface QuizQuestion {
   readonly id: string;
   readonly questionText: string;
   readonly options: readonly QuizOption[];
+  /** Shown to the learner after they submit an attempt, win or lose. Empty string if none was authored. */
+  readonly explanation: string;
 }
 
 export interface Quiz {
@@ -45,6 +47,8 @@ export type CreateQuizQuestionParams = {
   id: string;
   questionText: string;
   options: { id: string; optionText: string; isCorrect: boolean }[];
+  /** Optional — defaults to "" so existing callers that don't set it keep working. */
+  explanation?: string;
 };
 
 export type CreateQuizParams = {
@@ -85,6 +89,7 @@ export function createQuiz(params: CreateQuizParams): Result<Quiz, CreateQuizErr
       id: q.id,
       questionText: q.questionText,
       options: q.options.map((o) => ({ ...o })),
+      explanation: q.explanation ?? "",
     })),
   });
 }
@@ -109,4 +114,9 @@ export function quizCorrectAnswers(quiz: Quiz): Map<string, string> {
     if (correct) map.set(q.id, correct.id);
   }
   return map;
+}
+
+export function quizQuestionExplanation(quiz: Quiz, questionId: string): string {
+  const question = quiz.questions.find((q) => q.id === questionId);
+  return question ? question.explanation : "";
 }

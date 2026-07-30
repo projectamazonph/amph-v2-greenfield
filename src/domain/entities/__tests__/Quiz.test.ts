@@ -14,6 +14,7 @@ import {
   quizQuestionCount,
   quizCorrectOptionId,
   quizCorrectAnswers,
+  quizQuestionExplanation,
 } from "../Quiz";
 import type { CreateQuizParams } from "../Quiz";
 
@@ -201,5 +202,51 @@ describe("quizCorrectAnswers", () => {
     expect(map.get("q1")).toBe("o1");
     expect(map.get("q2")).toBe("o3");
     expect(map.size).toBe(2);
+  });
+});
+
+describe("explanation", () => {
+  it("defaults to an empty string when not provided", () => {
+    const result = createQuiz(validQuiz);
+    if (!result.ok) return;
+    expect(result.value.questions[0]!.explanation).toBe("");
+  });
+
+  it("is carried through when provided", () => {
+    const result = createQuiz({
+      ...validQuiz,
+      questions: [
+        {
+          ...validQuiz.questions[0]!,
+          explanation: "PPC = Pay Per Click, what you pay each time someone clicks your ad.",
+        },
+        validQuiz.questions[1]!,
+      ],
+    });
+    if (!result.ok) return;
+    expect(result.value.questions[0]!.explanation).toBe(
+      "PPC = Pay Per Click, what you pay each time someone clicks your ad.",
+    );
+    expect(result.value.questions[1]!.explanation).toBe("");
+  });
+});
+
+describe("quizQuestionExplanation", () => {
+  it("returns the explanation for a question", () => {
+    const result = createQuiz({
+      ...validQuiz,
+      questions: [
+        { ...validQuiz.questions[0]!, explanation: "Pay Per Click." },
+        validQuiz.questions[1]!,
+      ],
+    });
+    if (!result.ok) return;
+    expect(quizQuestionExplanation(result.value, "q1")).toBe("Pay Per Click.");
+  });
+
+  it("returns an empty string for a non-existent question", () => {
+    const result = createQuiz(validQuiz);
+    if (!result.ok) return;
+    expect(quizQuestionExplanation(result.value, "nonexistent")).toBe("");
   });
 });

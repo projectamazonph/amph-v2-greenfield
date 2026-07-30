@@ -28,6 +28,13 @@ interface Props {
   questions: ReadonlyArray<Question>;
 }
 
+interface ReviewItem {
+  questionId: string;
+  selectedOptionId: string;
+  correctOptionId: string;
+  explanation: string;
+}
+
 interface SubmitResult {
   ok: boolean;
   score?: number;
@@ -35,6 +42,7 @@ interface SubmitResult {
   correctCount?: number;
   totalQuestions?: number;
   xpAwarded?: number;
+  review?: ReviewItem[] | null;
   error?: string;
 }
 
@@ -86,27 +94,60 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
 
   if (submitted && result?.ok) {
     const passed = result.passed ?? false;
+    const questionById = new Map(questions.map((q) => [q.id, q]));
     return (
-      <div className={styles.resultPanel}>
-        <h2 className={styles.resultTitle}>{passed ? "You passed" : "You did not pass"}</h2>
-        <div
-          className={styles.resultScore}
-          style={{
-            color: passed ? "var(--success)" : "var(--danger)",
-          }}
-        >
-          {result.score ?? 0}%
+      <>
+        <div className={styles.resultPanel}>
+          <h2 className={styles.resultTitle}>{passed ? "You passed" : "You did not pass"}</h2>
+          <div
+            className={styles.resultScore}
+            style={{
+              color: passed ? "var(--success)" : "var(--danger)",
+            }}
+          >
+            {result.score ?? 0}%
+          </div>
+          <p className={styles.resultDetail}>
+            {result.correctCount} of {result.totalQuestions} correct. Passing score: {passingScore}
+            %.
+          </p>
+          {passed && result.xpAwarded ? (
+            <p className={styles.xpLine}>+{result.xpAwarded} XP awarded</p>
+          ) : null}
+          <a href="/dashboard" className={styles.backLink}>
+            Back to dashboard
+          </a>
         </div>
-        <p className={styles.resultDetail}>
-          {result.correctCount} of {result.totalQuestions} correct. Passing score: {passingScore}%.
-        </p>
-        {passed && result.xpAwarded ? (
-          <p className={styles.xpLine}>+{result.xpAwarded} XP awarded</p>
+        {result.review && result.review.length > 0 ? (
+          <div className={styles.review}>
+            <h3 className={styles.reviewHeading}>Answer review</h3>
+            {result.review.map((item) => {
+              const question = questionById.get(item.questionId);
+              if (!question) return null;
+              const isCorrect = item.selectedOptionId === item.correctOptionId;
+              const optionById = new Map(question.options.map((o) => [o.id, o]));
+              const selectedText = optionById.get(item.selectedOptionId)?.optionText ?? "";
+              const correctText = optionById.get(item.correctOptionId)?.optionText ?? "";
+              return (
+                <div key={item.questionId} className={styles.reviewItem} data-correct={isCorrect}>
+                  <p className={styles.reviewQuestion}>{question.questionText}</p>
+                  <p className={styles.reviewAnswer}>
+                    Your answer: <strong>{selectedText}</strong>
+                  </p>
+                  {!isCorrect ? (
+                    <p className={styles.reviewAnswer}>
+                      Correct answer: <strong>{correctText}</strong>
+                    </p>
+                  ) : null}
+                  {item.explanation ? (
+                    <p className={styles.reviewExplanation}>{item.explanation}</p>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
         ) : null}
-        <a href="/dashboard" className={styles.backLink}>
-          Back to dashboard
-        </a>
-      </div>
+      </>
     );
   }
 

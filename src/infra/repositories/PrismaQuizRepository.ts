@@ -36,6 +36,7 @@ export class PrismaQuizRepository implements IQuizRepository {
             id: question.id,
             quizId: q.id,
             questionText: question.questionText,
+            explanation: question.explanation,
             order: qIndex,
           },
         });
@@ -70,7 +71,7 @@ export class PrismaQuizRepository implements IQuizRepository {
       });
 
       const questionsWithOptions = await Promise.all(
-        questions.map(async (q: { id: string; questionText: string }) => {
+        questions.map(async (q: { id: string; questionText: string; explanation: string }) => {
           const options = await this.db.quizOption.findMany({
             where: { questionId: q.id },
             orderBy: { order: "asc" },
@@ -100,13 +101,15 @@ export class PrismaQuizRepository implements IQuizRepository {
               orderBy: { order: "asc" },
             });
             const questionsWithOptions = await Promise.all(
-              questions.map(async (q: { id: string; questionText: string }) => {
-                const options = await this.db.quizOption.findMany({
-                  where: { questionId: q.id },
-                  orderBy: { order: "asc" },
-                });
-                return { ...q, options };
-              }),
+              questions.map(
+                async (q: { id: string; questionText: string; explanation: string }) => {
+                  const options = await this.db.quizOption.findMany({
+                    where: { questionId: q.id },
+                    orderBy: { order: "asc" },
+                  });
+                  return { ...q, options };
+                },
+              ),
             );
             return this.mapQuiz(quiz, questionsWithOptions);
           },
@@ -132,13 +135,15 @@ export class PrismaQuizRepository implements IQuizRepository {
               orderBy: { order: "asc" },
             });
             const questionsWithOptions = await Promise.all(
-              questions.map(async (q: { id: string; questionText: string }) => {
-                const options = await this.db.quizOption.findMany({
-                  where: { questionId: q.id },
-                  orderBy: { order: "asc" },
-                });
-                return { ...q, options };
-              }),
+              questions.map(
+                async (q: { id: string; questionText: string; explanation: string }) => {
+                  const options = await this.db.quizOption.findMany({
+                    where: { questionId: q.id },
+                    orderBy: { order: "asc" },
+                  });
+                  return { ...q, options };
+                },
+              ),
             );
             return this.mapQuiz(quiz, questionsWithOptions);
           },
@@ -179,6 +184,7 @@ export class PrismaQuizRepository implements IQuizRepository {
               id: question.id,
               quizId: quiz.id,
               questionText: question.questionText,
+              explanation: question.explanation,
               order: qIndex,
             },
           }),
@@ -223,6 +229,7 @@ export class PrismaQuizRepository implements IQuizRepository {
     questions: {
       id: string;
       questionText: string;
+      explanation: string;
       options: { id: string; optionText: string; isCorrect: boolean }[];
     }[],
   ): Quiz {
@@ -234,6 +241,7 @@ export class PrismaQuizRepository implements IQuizRepository {
       questions: questions.map((q) => ({
         id: q.id,
         questionText: q.questionText,
+        explanation: q.explanation,
         options: q.options.map((o) => ({
           id: o.id,
           optionText: o.optionText,

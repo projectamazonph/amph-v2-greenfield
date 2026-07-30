@@ -46,6 +46,7 @@ function makeQuiz() {
       {
         id: "q3",
         questionText: "Pick a true statement",
+        explanation: "CPC is what you pay per click, not per conversion.",
         options: [
           { id: "o5", optionText: "CPC = cost per click", isCorrect: true },
           { id: "o6", optionText: "CPC = cost per conversion", isCorrect: false },
@@ -124,6 +125,48 @@ describe("processQuizAttempt", () => {
         totalQuestions: 3,
       },
     });
+  });
+
+  it("returns a per-question review on a completed attempt", async () => {
+    deps.quizRepo.seed(makeQuiz());
+
+    const result = await processQuizAttempt(deps, {
+      quizId: QUIZ_ID,
+      userId: USER_ID,
+      body: {
+        answers: [
+          { questionId: "q1", selectedOptionId: "o1" },
+          { questionId: "q2", selectedOptionId: "o4" }, // wrong
+          { questionId: "q3", selectedOptionId: "o5" },
+        ],
+      },
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.review).toHaveLength(3);
+    const q3Review = result.value.review?.find((r) => r.questionId === "q3");
+    expect(q3Review).toMatchObject({
+      selectedOptionId: "o5",
+      correctOptionId: "o5",
+      explanation: "CPC is what you pay per click, not per conversion.",
+    });
+  });
+
+  it("returns review=null for an in-progress attempt", async () => {
+    deps.quizRepo.seed(makeQuiz());
+
+    const result = await processQuizAttempt(deps, {
+      quizId: QUIZ_ID,
+      userId: USER_ID,
+      body: {
+        answers: [{ questionId: "q1", selectedOptionId: "o1" }],
+      },
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.review).toBeNull();
   });
 
   it("persists the attempt as completed on a passing attempt", async () => {

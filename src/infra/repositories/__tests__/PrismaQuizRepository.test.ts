@@ -31,6 +31,7 @@ interface QuizQuestionRow {
   id: string;
   quizId: string;
   questionText: string;
+  explanation: string;
   order: number;
 }
 
@@ -118,7 +119,13 @@ class FakePrismaClient {
 
   quizQuestion = {
     create: async (args: {
-      data: { id: string; quizId: string; questionText: string; order: number };
+      data: {
+        id: string;
+        quizId: string;
+        questionText: string;
+        explanation: string;
+        order: number;
+      };
     }) => {
       this.ensureUnique(this.questions, args.data.id, "quizQuestion");
       const row: QuizQuestionRow = args.data;
@@ -185,6 +192,7 @@ function makeQuiz(
       id: string;
       questionText: string;
       options: { id: string; optionText: string; isCorrect: boolean }[];
+      explanation?: string;
     }>;
   } = {},
 ): Quiz {
@@ -270,6 +278,38 @@ describe("PrismaQuizRepository", () => {
       expect(result.value.questions.map((q) => q.id)).toEqual(["q1", "q2"]);
       expect(result.value.questions[0]!.options.map((o) => o.id)).toEqual(["o1", "o2"]);
       expect(result.value.questions[1]!.options.map((o) => o.id)).toEqual(["o3", "o4", "o5"]);
+    });
+  });
+
+  describe("explanation round-trip", () => {
+    it("persists and hydrates each question's explanation", async () => {
+      await repo.create(
+        makeQuiz({
+          questions: [
+            {
+              id: "q1",
+              questionText: "What?",
+              explanation: "Because A is correct.",
+              options: [
+                { id: "o1", optionText: "A", isCorrect: true },
+                { id: "o2", optionText: "B", isCorrect: false },
+              ],
+            },
+          ],
+        }),
+      );
+      const result = await repo.findById("quiz-1");
+      expect(result.ok).toBe(true);
+      if (!result.ok || !result.value) return;
+      expect(result.value.questions[0]!.explanation).toBe("Because A is correct.");
+    });
+
+    it("defaults to an empty string when no explanation was given", async () => {
+      await repo.create(makeQuiz());
+      const result = await repo.findById("quiz-1");
+      expect(result.ok).toBe(true);
+      if (!result.ok || !result.value) return;
+      expect(result.value.questions[0]!.explanation).toBe("");
     });
   });
 
