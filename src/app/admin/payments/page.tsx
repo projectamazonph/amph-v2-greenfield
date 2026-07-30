@@ -101,6 +101,8 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
         </Link>
       </form>
 
+      <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>All</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Paid</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Pending</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Failed</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Refunded</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Export CSV</button></div>
+
       {/* Table — client component handles renderCell (function props) */}
       <Card padding={6}>
         <AdminPaymentsTable payments={rows} filters={{ status, email }} />

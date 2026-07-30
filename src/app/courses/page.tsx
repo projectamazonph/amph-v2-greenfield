@@ -15,6 +15,7 @@ import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
 import type { CatalogCourse } from "@/usecases/ListCatalogCourses";
 import styles from "./page.module.css";
+import { StudentShell } from "@/components/student/StudentShell";
 
 export const metadata: Metadata = {
   title: "Courses — Project Amazon PH Academy",
@@ -27,15 +28,18 @@ export default async function CoursesPage() {
 
   if (!result.ok) {
     return (
-      <main className={styles.errorPage}>
-        <p className={styles.errorText}>Unable to load courses. Please try again later.</p>
-      </main>
+      <StudentShell>
+        <main className={styles.errorPage}>
+          <p className={styles.errorText}>Unable to load courses. Please try again later.</p>
+        </main>
+      </StudentShell>
     );
   }
 
   const courses = result.value.courses;
 
   return (
+    <StudentShell>
     <main className={styles.page}>
       {/* Hero */}
       <section className={styles.hero}>
@@ -47,23 +51,19 @@ export default async function CoursesPage() {
 
       {/* Grid */}
       <section className={styles.gridSection}>
-        {courses.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p className={styles.emptyText}>Courses coming soon.</p>
-          </div>
-        ) : (
-          <div className={styles.grid}>
-            {courses.map((catalogCourse: CatalogCourse) => (
-              <CourseCard key={catalogCourse.course.id} catalogCourse={catalogCourse} />
-            ))}
-          </div>
-        )}
+        <div className={styles.grid}>
+          {courses.map((catalogCourse: CatalogCourse, index: number) => (
+            <CourseCard key={catalogCourse.course.id} catalogCourse={catalogCourse} isFeatured={index === 0} />
+          ))}
+        </div>
+        {courses.length === 0 && (<div style={{ textAlign: 'center', padding: 'var(--space-10)', color: 'var(--ink-500)' }}><p>No courses available yet. Check back soon.</p></div>)}
       </section>
     </main>
+    </StudentShell>
   );
 }
 
-function CourseCard({ catalogCourse }: { catalogCourse: CatalogCourse }) {
+function CourseCard({ catalogCourse, isFeatured = false }: { catalogCourse: CatalogCourse; isFeatured?: boolean }) {
   const { course, lessonCount, estimatedMinutes } = catalogCourse;
   const hours = Math.floor(estimatedMinutes / 60);
   const minutes = estimatedMinutes % 60;
@@ -81,6 +81,9 @@ function CourseCard({ catalogCourse }: { catalogCourse: CatalogCourse }) {
       )}
 
       <div className={styles.cardBody}>
+        {isFeatured && (
+          <span style={{ display: 'inline-block', fontSize: '10px', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '2px 6px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: '4px', marginBottom: 'var(--space-2)' }}>Featured</span>
+        )}
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>{course.title}</h2>
           <span className={styles.cardPrice}>{priceDisplay}</span>

@@ -187,3 +187,12 @@
   font-size: var(--text-xs);
   color: var(--ink-500);
 }
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+}
+@media (max-width: 639px) { .grid { grid-template-columns: 1fr; gap: var(--space-4); } }

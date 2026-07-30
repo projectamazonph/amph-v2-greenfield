@@ -10,6 +10,8 @@ import Link from "next/link";
 import { ResetRequestForm } from "@/components/auth/ResetRequestForm";
 import styles from "./page.module.css";
 
+export const metadata = { title: 'Reset Password — AMPH Academy' };
+
 export const dynamic = "force-dynamic";
 
 export default function ResetRequestPage() {

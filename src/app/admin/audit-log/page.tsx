@@ -153,7 +153,12 @@ export default async function AdminAuditLogPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <TopBar title="Audit Log" subtitle={`${result.value.total.toLocaleString()} total entries`} />
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+        <div style={{ flex: 1 }}>
+          <TopBar title="Audit Log" subtitle={`${result.value.total.toLocaleString()} total entries`} />
+        </div>
+        <button className="btn btn-ghost" style={{ fontSize: 'var(--text-sm)' }}>Download CSV</button>
+      </div>
 
       <form method="get" className={styles.filters}>
         <div className={styles.filterRow}>

@@ -7,8 +7,10 @@
  * per-brand-class target ROAS. See docs/stories/STORY-082.md.
  */
 
+import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { StrTriageForm } from "@/components/tools/StrTriageForm";
+import { StudentShell } from "@/components/student/StudentShell";
 import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
 import styles from "./page.module.css";
 
@@ -249,25 +251,27 @@ export default async function StrTriagePage() {
   const { title, brief, ...scenario } = SCENARIO;
 
   return (
-    <main className={styles.page}>
-      <nav className={styles.breadcrumb}>
-        <a href="/tools">← Tools</a>
-        <span aria-hidden="true"> / </span>
-        <span>Search Term Triage</span>
-      </nav>
-      <header className={styles.header}>
-        <span className={styles.eyebrow}>Simulator</span>
-        <h1 className={styles.title}>{title}</h1>
-        <p className={styles.brief}>{brief}</p>
-        <p className={styles.meta}>
-          <span className={styles.metaLabel}>Target ROAS (generic)</span>
-          <span className={styles.metaValue}>{scenario.genericTargetRoas.toFixed(2)}×</span>
-          <span className={styles.metaDivider}>·</span>
-          <span className={styles.metaLabel}>Search terms</span>
-          <span className={styles.metaValue}>{scenario.rows.length}</span>
-        </p>
-      </header>
-      <StrTriageForm scenario={scenario} />
-    </main>
+    <StudentShell>
+      <main className={styles.page}>
+        <nav className={styles.breadcrumb}>
+          <Link href="/tools">← Tools</Link>
+          <span aria-hidden="true"> / </span>
+          <span>Search Term Triage</span>
+        </nav>
+        <header className={styles.header}>
+          <span className={styles.eyebrow}>Simulator</span>
+          <h1 className={styles.title}>{title}</h1>
+          <p className={styles.brief}>{brief}</p>
+          <p className={styles.meta}>
+            <span className={styles.metaLabel}>Target ROAS (generic)</span>
+            <span className={styles.metaValue}>{scenario.genericTargetRoas.toFixed(2)}×</span>
+            <span className={styles.metaDivider}>·</span>
+            <span className={styles.metaLabel}>Search terms</span>
+            <span className={styles.metaValue}>{scenario.rows.length}</span>
+          </p>
+        </header>
+        <StrTriageForm scenario={scenario} />
+      </main>
+    </StudentShell>
   );
 }

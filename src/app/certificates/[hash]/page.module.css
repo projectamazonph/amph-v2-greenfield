@@ -70,9 +70,14 @@
 .certCard {
   background: var(--surface-1);
   border-radius: var(--radius-md);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   border: 4px solid var(--info);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.certCard:hover {
+  box-shadow: var(--shadow-1);
+  transform: translateY(-1px);
 }
 
 .certCardRevoked {

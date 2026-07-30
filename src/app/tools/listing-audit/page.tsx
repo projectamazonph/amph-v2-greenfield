@@ -5,8 +5,10 @@
  * Bamboo Cutting Board listing audit + keyword research.
  */
 
+import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { ListingAuditForm } from "@/components/tools/ListingAuditForm";
+import { StudentShell } from '@/components/student/StudentShell';
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -34,9 +36,10 @@ export default async function ListingAuditPage() {
   }
 
   return (
+    <StudentShell>
     <main className={styles.page}>
       <nav className={styles.breadcrumb}>
-        <a href="/tools">← Tools</a>
+        <Link href="/tools">← Tools</Link>
         <span aria-hidden="true"> / </span>
         <span>Listing Audit</span>
       </nav>
@@ -53,5 +56,6 @@ export default async function ListingAuditPage() {
         niche={SCENARIO.niche}
       />
     </main>
+    </StudentShell>
   );
 }

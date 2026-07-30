@@ -78,3 +78,5 @@
 }
 
 .metaDivider { color: var(--ink-300); margin: 0 var(--space-2); }
+
+@media (max-width: 767px) { .layout { flex-direction: column; } }

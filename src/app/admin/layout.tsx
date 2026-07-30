@@ -16,6 +16,8 @@
 import type { ReactNode } from "react";
 import { requireAdmin } from "@/lib/auth";
 import { NavSidebar } from "@/components/admin/NavSidebar";
+import { MobileNavToggle } from "@/components/ui/MobileNavToggle";
+import { CommandPalette } from "@/components/ui/CommandPalette";
 import styles from "./layout.module.css";
 
 export default async function AdminLayout({
@@ -30,8 +32,28 @@ export default async function AdminLayout({
 
   return (
     <div className={styles.shell}>
+      <MobileNavToggle sidebarId="admin-sidebar" />
       <NavSidebar user={user} />
       <main className={styles.main}>{children}</main>
+      <CommandPalette
+        items={[
+          { href: "/admin", label: "Dashboard", section: "Overview" },
+          { href: "/admin/courses", label: "Courses", section: "Content" },
+          { href: "/admin/content", label: "Content", section: "Content" },
+          { href: "/admin/simulators", label: "Simulators", section: "Content" },
+          { href: "/admin/quizzes", label: "Quizzes", section: "Content" },
+          { href: "/admin/badges", label: "Badges", section: "Content" },
+          { href: "/admin/users", label: "Users", section: "Operations" },
+          { href: "/admin/payments", label: "Payments", section: "Operations" },
+          { href: "/admin/refunds", label: "Refunds", section: "Operations" },
+          { href: "/admin/live-classes", label: "Live Classes", section: "Operations" },
+          { href: "/admin/certificates", label: "Certificates", section: "Operations" },
+          { href: "/admin/settings", label: "Settings", section: "System" },
+          { href: "/admin/audit-log", label: "Audit Log", section: "System" },
+          { href: "/admin/users/new", label: "Create User", section: "Quick Actions" },
+          { href: "/admin/courses/new", label: "Create Course", section: "Quick Actions" },
+        ]}
+      />
     </div>
   );
 }

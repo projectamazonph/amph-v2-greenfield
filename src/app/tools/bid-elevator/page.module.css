@@ -65,3 +65,7 @@
   margin: 0;
   text-align: center;
 }
+
+@media (max-width: 767px) {
+  .layout { flex-direction: column; }
+}
