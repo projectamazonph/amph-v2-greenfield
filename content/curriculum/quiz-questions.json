@@ -332,6 +332,83 @@
       ]
     },
     {
+      "moduleNumber": 5,
+      "title": "Portfolio Strategy Knowledge Check",
+      "description": "Test your understanding of campaign portfolios, budget pacing, and seasonal strategy — the account-level skills for managing scale.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "At what rough campaign count does this module recommend switching from managing campaigns individually to grouping them into portfolios?",
+          "optionA": "2-3 campaigns",
+          "optionB": "Around 10 or more campaigns",
+          "optionC": "Only after 100+ campaigns",
+          "optionD": "Never — always manage each campaign individually",
+          "correctAnswer": "B",
+          "explanation": "Once an account has roughly 10 or more campaigns, group them into portfolios for shared budgeting and reporting. Below that, managing campaigns one by one is still practical."
+        },
+        {
+          "order": 2,
+          "question": "Using the 60/20/10/10 rule on a ₱100,000/month budget, how much goes to the New Launches portfolio?",
+          "optionA": "₱60,000",
+          "optionB": "₱10,000",
+          "optionC": "₱20,000",
+          "optionD": "₱100,000",
+          "correctAnswer": "C",
+          "explanation": "New Launches gets 20% of the budget under the 60/20/10/10 rule: 20% of ₱100,000 is ₱20,000. Core Products gets 60%, Brand Defense and Seasonal each get 10%."
+        },
+        {
+          "order": 3,
+          "question": "Do negative keywords automatically apply across every campaign inside a portfolio?",
+          "optionA": "Yes, portfolios maintain one shared negative list for every campaign inside them",
+          "optionB": "No — negative keywords and bid adjustments are campaign-level controls, so each campaign needs its own",
+          "optionC": "Only for Sponsored Brands campaigns",
+          "optionD": "Only if a shared-negatives setting is turned on for the portfolio",
+          "correctAnswer": "B",
+          "explanation": "Portfolios group campaigns for shared budgeting and reporting, but they don't carry a shared negative-keyword list. Each campaign inside a portfolio still needs its own negatives entered or copied over."
+        },
+        {
+          "order": 4,
+          "question": "What's a good pacing target for the percentage of a daily budget spent by end of day?",
+          "optionA": "40-50%",
+          "optionB": "60-70%",
+          "optionC": "80-90%",
+          "optionD": "Exactly 100% by noon",
+          "correctAnswer": "C",
+          "explanation": "A good pacing target is 80 to 90% of the daily budget spent by end of day. Hitting 100% by midday is a signal the budget is too low for demand, not a target to aim for."
+        },
+        {
+          "order": 5,
+          "question": "Over how long a period is your Amazon daily budget actually averaged, and what can happen on a single high-traffic day?",
+          "optionA": "Averaged over a single day; spend can never exceed 100% of the daily budget",
+          "optionB": "Averaged over the calendar month; a single day can over-deliver by up to 25% or up to 100%, depending on the account's setting",
+          "optionC": "Averaged over a calendar year with no daily limit at all",
+          "optionD": "Averaged over the campaign's total lifetime, with a fixed spend per day",
+          "correctAnswer": "B",
+          "explanation": "Amazon's daily budget is an average across the calendar month, not a hard per-day cap. A single day can legitimately show 125% or 200% of the daily budget depending on which over-delivery setting (25% or 100%) is active on the account."
+        },
+        {
+          "order": 6,
+          "question": "During a Q4 peak, a campaign's ACoS rises from 25% to 40%, but profit after ad spend increases by ₱25,000. What's the correct read?",
+          "optionA": "The campaign is failing because ACoS went up",
+          "optionB": "Rising ACoS during a peak event can be acceptable if profit after ad spend still increases because sales volume grew enough to offset the lower efficiency",
+          "optionC": "ACoS and profit after ad spend always move in the same direction",
+          "optionD": "Profit after ad spend and ACoS measure the same thing",
+          "correctAnswer": "B",
+          "explanation": "Judge a seasonal campaign by whether profit after ad spend is going up, not by whether ACoS is going up. A higher ACoS during a peak event is expected and can still mean more money for the client if sales volume grows enough."
+        },
+        {
+          "order": 7,
+          "question": "When should Q4 holiday-season preparation start, according to this module?",
+          "optionA": "October 1st, right when the season begins",
+          "optionB": "August, roughly two months before the October start of the peak",
+          "optionC": "The week of Black Friday",
+          "optionD": "Only after Q3 sales numbers come in",
+          "correctAnswer": "B",
+          "explanation": "Start Q4 preparation in August: research seasonal keywords, launch discovery campaigns, and test seasonal ad copy well before the October-December peak, not once it has already started."
+        }
+      ]
+    },
+    {
       "moduleNumber": 6,
       "title": "Bidding Lab Knowledge Check",
       "description": "Verify your understanding of bid strategies, placement adjustments, and how to optimize bids for profitability.",
@@ -452,6 +529,93 @@
           "optionD": "It replaces the need for bid strategy adjustments",
           "correctAnswer": "B",
           "explanation": "Regular search term analysis is the single highest-ROI activity in PPC management. It lets you cut waste (irrelevant terms draining budget) and capture opportunity (converting terms you should bid on explicitly). This is the core loop: discover → triage → optimize → repeat."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 8,
+      "title": "Competitive Intelligence Knowledge Check",
+      "description": "Test your understanding of Brand Analytics, Share of Voice, and competitor benchmarking — turning competitive data into specific campaign actions.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "What do you need, beyond Brand Registry enrollment, to access Amazon Brand Analytics (ABA)?",
+          "optionA": "Nothing else — Brand Registry enrollment alone unlocks ABA",
+          "optionB": "An active Professional selling account and Brand Representative access assigned for that brand",
+          "optionC": "A minimum of ₱500,000/month in ad spend",
+          "optionD": "Enrollment in Amazon DSP",
+          "correctAnswer": "B",
+          "explanation": "Brand Registry enrollment alone isn't enough to see ABA. The account also needs an active Professional selling account and Brand Representative access assigned for that brand."
+        },
+        {
+          "order": 2,
+          "question": "Amazon discontinued the standalone Item Comparison / Alternate Purchase Behavior report in 2022. How do you find competitor ASINs to target now?",
+          "optionA": "It's impossible without third-party tools",
+          "optionB": "Use the top-clicked ASINs shown in the Top Search Terms report, plus Market Basket Analysis",
+          "optionC": "Amazon emails a list of competitor ASINs automatically",
+          "optionD": "Competitor ASINs can only be found through Sponsored Display",
+          "correctAnswer": "B",
+          "explanation": "Competitor ASIN discovery now comes from Top Search Terms' top-clicked products, Market Basket Analysis, and your own search-based research, not a dedicated comparison report."
+        },
+        {
+          "order": 3,
+          "question": "Your demographics report shows mostly high-income buyers. Does that alone justify raising your ACoS ceiling for that segment?",
+          "optionA": "Yes, high income always means a higher acceptable ACoS",
+          "optionB": "No — demographics are a targeting hypothesis; the ACoS ceiling should still come from margin and this segment's measured performance",
+          "optionC": "Yes, but only for luxury products",
+          "optionD": "No, demographics reports are unreliable and should be ignored entirely",
+          "correctAnswer": "B",
+          "explanation": "Demographics data is a targeting hypothesis, not proof of conversion or profitability. Set your ACoS ceiling from margin and this segment's actual measured performance, not income alone."
+        },
+        {
+          "order": 4,
+          "question": "Amazon doesn't give you total category impression data directly. What should you do to estimate Share of Voice (SOV)?",
+          "optionA": "Wait for Amazon to publish an official SOV report",
+          "optionB": "Build an estimate using Brand Analytics, campaign reports, or a bid-ceiling test",
+          "optionC": "Assume your SOV is always 50%",
+          "optionD": "SOV can't be estimated without third-party software",
+          "correctAnswer": "B",
+          "explanation": "Treat SOV as an estimate you build, not a report you pull. Brand Analytics' Top Search Terms, your own campaign reports, or a small bid-ceiling test are the three ways to approximate it."
+        },
+        {
+          "order": 5,
+          "question": "Your SOV for a keyword is 40%. What's the right strategic move?",
+          "optionA": "Keep raising bids to grow impression share further",
+          "optionB": "Shift budget toward ROAS and new segments, since you're already in the Dominant tier",
+          "optionC": "Pause the keyword since SOV is too high",
+          "optionD": "SOV over 35% means you should lower your price instead",
+          "correctAnswer": "B",
+          "explanation": "Above 35% SOV you're Dominant. The right posture is maximizing ROAS and shifting budget to new segments, not continuing to chase more impression share you've already won."
+        },
+        {
+          "order": 6,
+          "question": "Your SOV on a keyword drops 12% in one week. How fast should you investigate?",
+          "optionA": "Wait for the monthly review",
+          "optionB": "Immediately — a 10%+ weekly drop is a signal to investigate right away",
+          "optionC": "Only if it keeps dropping for three consecutive months",
+          "optionD": "SOV drops don't need investigation, only rises do",
+          "correctAnswer": "B",
+          "explanation": "A 10%+ SOV drop in a week is an alert, not something to file for the monthly review. Investigate immediately — it could be a budget issue or a new competitor entering the market."
+        },
+        {
+          "order": 7,
+          "question": "In the gap analysis matrix, competitors average 2.5 on a dimension and you average 1.0. What does this indicate?",
+          "optionA": "An opportunity to double down",
+          "optionB": "A vulnerability to shore up",
+          "optionC": "A contested dimension needing a closer look",
+          "optionD": "Data that should be ignored",
+          "correctAnswer": "B",
+          "explanation": "Vulnerability = competitors' average at or above 2 AND your average at or below 1.5. Competitors at 2.5 and you at 1.0 clears that rule, flagging a gap to shore up before scaling anything else."
+        },
+        {
+          "order": 8,
+          "question": "Where does \"new product launches\" fit on the gap analysis matrix's Strong/Medium/Weak/Not-using scale?",
+          "optionA": "It's always scored Strong for whoever launches fastest",
+          "optionB": "It doesn't fit the scale — it's tracked as a separate qualitative note instead",
+          "optionC": "It's scored the same way as brand term defense",
+          "optionD": "New product launches are excluded from competitive analysis entirely",
+          "correctAnswer": "B",
+          "explanation": "Speed to market is a different thing from execution quality — a competitor can launch fast and badly, or slowly and well. Track it as a qualitative note rather than forcing it into the four-point score."
         }
       ]
     }
