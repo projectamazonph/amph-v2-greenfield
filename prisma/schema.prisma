@@ -546,6 +546,7 @@ model QuizQuestion {
   quizId       String
   quiz         Quiz        @relation(fields: [quizId], references: [id], onDelete: Cascade)
   questionText String
+  explanation  String       @default("")
   options      QuizOption[]
   order        Int          @default(0)
 

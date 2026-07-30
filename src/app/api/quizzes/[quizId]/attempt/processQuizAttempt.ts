@@ -18,6 +18,7 @@ import { z } from "zod";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import type { RecordQuizAttemptError } from "@/usecases/RecordQuizAttempt";
 import type { QuizAttempt } from "@/domain/entities/QuizAttempt";
+import type { QuizAttemptReviewItem } from "@/domain/entities/QuizAttemptReview";
 import type { IQuizRepository } from "@/ports/repositories/IQuizRepository";
 import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRepository";
 import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
@@ -64,6 +65,7 @@ export type ProcessQuizAttemptResult =
         xpAwarded: number;
         correctCount: number | null;
         totalQuestions: number | null;
+        review: readonly QuizAttemptReviewItem[] | null;
       };
     }
   | { ok: false; status: 400; error: { kind: "validation_error"; message: string } }
@@ -124,6 +126,7 @@ export async function processQuizAttempt(
       xpAwarded: result.value.xpAwarded,
       correctCount: result.value.correctCount,
       totalQuestions: result.value.totalQuestions,
+      review: result.value.review,
     },
   };
 }

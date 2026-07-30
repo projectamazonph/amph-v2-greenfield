@@ -15,6 +15,8 @@
 import { Result } from "@/domain/shared/Result";
 import { quizQuestionCount } from "@/domain/entities/Quiz";
 import type { Quiz } from "@/domain/entities/Quiz";
+import type { QuizAttemptReviewItem } from "@/domain/entities/QuizAttemptReview";
+import { buildQuizAttemptReview } from "@/domain/entities/QuizAttemptReview";
 import {
   startQuizAttempt,
   answerQuestion,
@@ -69,6 +71,8 @@ export type RecordQuizAttemptResult = Result<
     xpAwarded: number;
     correctCount: number | null;
     totalQuestions: number | null;
+    /** Per-question learner pick, correct pick, and explanation. Null until the attempt completes. */
+    review: readonly QuizAttemptReviewItem[] | null;
   },
   RecordQuizAttemptError
 >;
@@ -165,7 +169,17 @@ export class RecordQuizAttempt {
       if (!persisted.ok) return persisted;
       attempt = persisted.value;
 
-      return Result.ok({ attempt, score, passed, xpAwarded, correctCount, totalQuestions: qCount });
+      const review = buildQuizAttemptReview(quiz, attempt.answers);
+
+      return Result.ok({
+        attempt,
+        score,
+        passed,
+        xpAwarded,
+        correctCount,
+        totalQuestions: qCount,
+        review,
+      });
     }
 
     // ── 6. Persist in-progress attempt ─────────────────────────────────
@@ -185,6 +199,7 @@ export class RecordQuizAttempt {
       xpAwarded,
       correctCount: null,
       totalQuestions: null,
+      review: null,
     });
   }
 

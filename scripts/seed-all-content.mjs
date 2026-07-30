@@ -299,6 +299,7 @@ if (!existsSync(quizPath)) {
           id: questionId,
           quizId,
           questionText: q.question,
+          explanation: q.explanation ?? "",
           order: q.order,
         },
       });
