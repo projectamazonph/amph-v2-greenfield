@@ -162,6 +162,15 @@ const moduleDirs = readdirSync(CONTENT_ROOT).filter((d) => {
 let modulesCreated = 0;
 let lessonsCreated = 0;
 
+// Accumulates each course's real curriculum (Sections + embedded Lessons) as
+// we walk the MDX files, so it can be written to Course.curriculum after this
+// loop. This is the JSON the student-facing lesson page and the
+// AuthorizeLessonAccess use case actually read — the Module/Lesson tables
+// populated below are a separate, admin-facing read model (STORY-048) and are
+// not consulted by that flow. Without this, Course.curriculum stays the
+// placeholder stub set in Step 1 and every lesson link 404s.
+const curriculumSectionsByCourse = { "ppc-foundations": [], "accelerated-mastery": [] };
+
 for (const dirName of moduleDirs.sort()) {
   const dirPath = join(CONTENT_ROOT, dirName);
   const mdxFiles = readdirSync(dirPath)
@@ -198,6 +207,7 @@ for (const dirName of moduleDirs.sort()) {
   modulesCreated++;
 
   // Process lessons
+  const curriculumLessons = [];
   for (const fileName of mdxFiles) {
     const filePath = join(dirPath, fileName);
     const raw = readFileSync(filePath, "utf-8");
@@ -230,7 +240,25 @@ for (const dirName of moduleDirs.sort()) {
       },
     });
     lessonsCreated++;
+
+    // Same id/title/type as the Lesson row above, so links generated from
+    // either read model resolve to the same lesson. `content.type` is
+    // embedded redundantly because LessonContent.tsx (the student-facing
+    // renderer) discriminates on it — see LessonContent.test.tsx and
+    // getLessonData.test.ts fixtures for the expected shape.
+    curriculumLessons.push({
+      id: lessonId,
+      title: fm.title,
+      type: lessonType,
+      content: { type: lessonType, ...content },
+    });
   }
+
+  curriculumSectionsByCourse[courseSlug].push({
+    id: moduleId,
+    title: moduleTitle,
+    lessons: curriculumLessons,
+  });
 
   console.log(
     `  [module] ${dirName} → ${moduleTitle} (${mdxFiles.length} lessons, course: ${courseSlug})`,
@@ -238,6 +266,19 @@ for (const dirName of moduleDirs.sort()) {
 }
 
 console.log(`  Total: ${modulesCreated} modules, ${lessonsCreated} lessons`);
+
+// Write the accumulated curriculum to each course, replacing the Step-1 stub.
+for (const [courseSlug, sections] of Object.entries(curriculumSectionsByCourse)) {
+  if (sections.length === 0) continue;
+  await prisma.course.update({
+    where: { id: courseIds[courseSlug] },
+    data: { curriculum: { sections } },
+  });
+  const lessonCount = sections.reduce((n, s) => n + s.lessons.length, 0);
+  console.log(
+    `  [curriculum] ${courseSlug} → ${sections.length} sections, ${lessonCount} lessons`,
+  );
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // STEP 3: QUIZZES from quiz-questions.json

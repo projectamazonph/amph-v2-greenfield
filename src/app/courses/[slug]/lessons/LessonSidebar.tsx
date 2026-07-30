@@ -15,8 +15,15 @@
 import type { Course } from "@/domain/entities/Course";
 import styles from "./LessonSidebar.module.css";
 
+// Only the plain-data subset of Course this component needs. Course.price is
+// a Money class instance, and passing the full Course (server-fetched) into
+// this "use client" component would fail Next's RSC serialization boundary
+// ("Only plain objects... can be passed to Client Components"). Pick<> keeps
+// this in sync with Course's field types without re-declaring them.
+type LessonSidebarCourse = Pick<Course, "slug" | "title" | "curriculum">;
+
 interface LessonSidebarProps {
-  course: Course;
+  course: LessonSidebarCourse;
   currentLessonId: string;
   completedLessonIds: readonly string[];
 }
@@ -31,9 +38,7 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
       {/* Course title header */}
       <div className={styles.header}>
         <h2 className={styles.headerTitle}>{course.title}</h2>
-        <p className={styles.headerSubtitle}>
-          {courseLessonCount(course)} lessons
-        </p>
+        <p className={styles.headerSubtitle}>{courseLessonCount(course)} lessons</p>
       </div>
 
       {/* Sections */}
@@ -48,11 +53,7 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
           return (
             <div key={section.id} className={styles.section}>
               {/* Section header */}
-              <button
-                className={styles.sectionHeader}
-                aria-expanded={isOpen}
-                type="button"
-              >
+              <button className={styles.sectionHeader} aria-expanded={isOpen} type="button">
                 <ChevronIcon expanded={isOpen} />
                 <span className={styles.sectionTitle}>
                   {si + 1}. {section.title}
@@ -84,14 +85,11 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
 
                     return (
                       <li key={lesson.id}>
-                        <a href={`/courses/${course.slug}/lessons/${lesson.id}`} className={linkClass}>
-                          {isCompleted ? (
-                            <CheckIcon />
-                          ) : isVideo ? (
-                            <VideoIcon />
-                          ) : (
-                            <TextIcon />
-                          )}
+                        <a
+                          href={`/courses/${course.slug}/lessons/${lesson.id}`}
+                          className={linkClass}
+                        >
+                          {isCompleted ? <CheckIcon /> : isVideo ? <VideoIcon /> : <TextIcon />}
 
                           <span className={styles.lessonTitle}>{lesson.title}</span>
 
@@ -112,11 +110,8 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
   );
 }
 
-function courseLessonCount(course: Course): number {
-  return course.curriculum.sections.reduce(
-    (total, section) => total + section.lessons.length,
-    0,
-  );
+function courseLessonCount(course: LessonSidebarCourse): number {
+  return course.curriculum.sections.reduce((total, section) => total + section.lessons.length, 0);
 }
 
 // ── Icons ───────────────────────────────────────────────────
@@ -130,12 +125,7 @@ function ChevronIcon({ expanded }: { expanded: boolean }) {
       stroke="currentColor"
       aria-hidden="true"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M9 5l7 7-7 7"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
     </svg>
   );
 }
@@ -149,12 +139,7 @@ function CheckIcon() {
       stroke="currentColor"
       aria-hidden="true"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2.5}
-        d="M5 13l4 4L19 7"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
     </svg>
   );
 }
