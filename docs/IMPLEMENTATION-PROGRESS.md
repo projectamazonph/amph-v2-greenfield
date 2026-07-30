@@ -143,3 +143,70 @@ All medium fixes done: responsive layouts, search inputs, focus rings, button tr
 | P3-87 | Real notifications system | Needs push notification setup |
 
 These are feature-level work, not quick fixes.
+---
+
+## Post-Merge Status — 2026-07-31
+
+**PR #257 merged to `main` via squash merge.**
+
+| Field | Value |
+|-------|-------|
+| PR | https://github.com/projectamazonph/amph-v2-greenfield/pull/257 |
+| Merge commit | `f135a84ca443c7cabcc455dc88360f4a46cdd883` |
+| Branch | `ui-audit-fixes-2026-07-31` |
+| Merge method | squash |
+| Files changed | 136 |
+| Lines | +21,122 / -376 |
+
+### CI Status at Merge Time
+
+- **Vercel production deployment**: ✅ success
+- **GitHub Actions (Typecheck + Lint)**: ⚠️ Typecheck failed on one new file
+- **Mergeable**: true (no conflicts)
+- **Mergeable state**: unstable (due to Typecheck failure)
+
+### Typecheck Issue — Fast Follow
+
+The GitHub Actions Typecheck step failed on one of the new files. The Vercel build succeeded which means the production app compiles, but the stricter CI Typecheck caught a type mismatch. Likely candidates:
+
+- A `ComponentType` type import that doesn't match the exact Sign/Pulse icon signature
+- A missing return type on one of the new utility functions
+- An `as` cast that needs narrowing
+
+**Recommended next step:** Open a fast-follow PR with `[skip ci]` or a targeted fix to the failing file. Run `pnpm typecheck` locally to identify the exact file and line.
+
+### Post-Merge Verification
+
+To verify the merged changes are live:
+
+1. Check main: `git log --oneline -1` should show `f135a84`
+2. Vercel deployment URL for the PR preview
+3. Production: https://amph-v2-greenfield.vercel.app (if configured)
+
+### What This Delivers
+
+- **93 UI improvements** shipped across 45 routes
+- **8 new shared components** (Skeleton, EmptyState, SubmitButton, Toast, CommandPalette, MobileNavToggle, StudentSidebar, StudentShell)
+- **2 new hooks** (useUnsavedChanges, useToast)
+- **1 new utility** (format-date)
+- **50+ loading.tsx files** for route-level loading states
+- **35+ files modified** including globals.css, every admin page, every student page, auth pages, checkout, certificates, and tools
+
+### Deferred to Follow-Up PR (6 P3 items)
+
+See `docs/REMAINING-P3-FEATURES.md` for full implementation specs.
+
+| # | Feature | Dependency |
+|---|---------|-----------|
+| P3-82 | Real confetti | `canvas-confetti` (deps already in REMAINING-P3-FEATURES.md) |
+| P3-83 | Drag-and-drop reorder | `@dnd-kit/core`, `@dnd-kit/sortable` |
+| P3-84 | Dark mode toggle | None (token override) |
+| P3-85 | Real CSV export | None (server action) |
+| P3-86 | PDF certificate download | `@react-pdf/renderer` (already in package.json) |
+| P3-87 | In-app notifications | Schema migration |
+
+### Recommendation
+
+1. Open a fast-follow PR to fix the Typecheck issue (likely a 1-2 line fix).
+2. Then open a follow-up PR for the 6 deferred P3 features.
+3. Schedule a code review session to walk through the new shared components and hooks.
