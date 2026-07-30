@@ -194,6 +194,7 @@ import { ListPricingTiers } from "@/usecases/ListPricingTiers";
 import { ListUsers } from "@/usecases/ListUsers";
 import { GetUserDetail } from "@/usecases/GetUserDetail";
 import { ImpersonateUser } from "@/usecases/ImpersonateUser";
+import { AdminGrantSubscription } from "@/usecases/AdminGrantSubscription";
 // STORY-048a: admin courses CRUD
 import { AdminListCourses } from "@/usecases/AdminListCourses";
 import { AdminGetCourse } from "@/usecases/AdminGetCourse";
@@ -363,6 +364,7 @@ export interface AppContainer {
   listUsers: ListUsers;
   getUserDetail: GetUserDetail;
   impersonateUser: ImpersonateUser;
+  adminGrantSubscription: AdminGrantSubscription;
   // STORY-048a: admin courses CRUD
   adminListCourses: AdminListCourses;
   adminGetCourse: AdminGetCourse;
@@ -520,6 +522,20 @@ function buildProductionContainer(): AppContainer {
     process.env.UPSTASH_REDIS_REST_URL ?? "",
     process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
   );
+
+  // STORY-008: password reset. Hoisted (not built inline in the returned
+  // object below) so adminGrantSubscription can reuse this same instance
+  // to send new accounts a "set your password" email.
+  const requestPasswordReset = new RequestPasswordReset({
+    users: userRepo,
+    passwordResets: passwordResetRepo,
+    email: emailSender,
+    passwordResetEmailRenderer,
+    rateLimiter,
+    clock,
+    ids: idGen,
+    logger,
+  });
 
   // STORY-049 + STORY-062: build RefundOverride once. Both the
   // `refundOverride` container entry and `adminProcessRefund` (which
@@ -703,6 +719,14 @@ function buildProductionContainer(): AppContainer {
       idGen,
       recordAuditLog,
     }),
+    adminGrantSubscription: new AdminGrantSubscription({
+      userRepo,
+      idGen,
+      passwordHasher,
+      recordAuditLog,
+      requestPasswordReset,
+      logger,
+    }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
     adminGetCourse: new AdminGetCourse({ courseRepo }),
@@ -841,17 +865,8 @@ function buildProductionContainer(): AppContainer {
       rateLimiter,
       idGen,
     }),
-    // STORY-008: password reset
-    requestPasswordReset: new RequestPasswordReset({
-      users: userRepo,
-      passwordResets: passwordResetRepo,
-      email: emailSender,
-      passwordResetEmailRenderer,
-      rateLimiter,
-      clock,
-      ids: idGen,
-      logger,
-    }),
+    // STORY-008: password reset (hoisted above, also reused by adminGrantSubscription)
+    requestPasswordReset,
     resetPassword: new ResetPassword({
       users: userRepo,
       passwordResets: passwordResetRepo,

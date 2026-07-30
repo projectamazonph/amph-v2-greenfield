@@ -8,7 +8,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import type { UserRepository, UserError } from "@/ports/repositories/UserRepository";
-import type { Role } from "@/domain/entities/User";
+import type { Role, SubscriptionTier } from "@/domain/entities/User";
 
 export class PrismaUserRepository implements UserRepository {
   constructor(private readonly db: PrismaClient) {}
@@ -96,6 +96,7 @@ export class PrismaUserRepository implements UserRepository {
       emailVerifiedAt: Date | null;
       passwordHash: string;
       twoFactorEnabled: boolean;
+      subscriptionTier: SubscriptionTier;
     }>,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {

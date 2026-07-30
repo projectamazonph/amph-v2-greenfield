@@ -118,6 +118,7 @@ import { ListPricingTiers } from "@/usecases/ListPricingTiers";
 import { ListUsers } from "@/usecases/ListUsers";
 import { GetUserDetail } from "@/usecases/GetUserDetail";
 import { ImpersonateUser } from "@/usecases/ImpersonateUser";
+import { AdminGrantSubscription } from "@/usecases/AdminGrantSubscription";
 // STORY-048a: admin courses CRUD
 import { AdminListCourses } from "@/usecases/AdminListCourses";
 import { AdminGetCourse } from "@/usecases/AdminGetCourse";
@@ -302,6 +303,20 @@ export function buildTestContainer(): TestContainer {
   // STORY-081: same in-code repository as production -- no DB table yet.
   const keywordDatasetRepo = new StaticKeywordDatasetRepository();
 
+  // STORY-008: password reset. Hoisted (not built inline in the returned
+  // object below) so adminGrantSubscription can reuse this same instance,
+  // matching the production container's wiring.
+  const requestPasswordReset = new RequestPasswordReset({
+    users: userRepo,
+    passwordResets: passwordResetRepo,
+    email: emailSender,
+    passwordResetEmailRenderer,
+    rateLimiter,
+    clock,
+    ids: idGen,
+    logger,
+  });
+
   // STORY-049 + STORY-062: build RefundOverride once. The
   // `refundOverride` container entry and `adminProcessRefund` share
   // the same instance ΓÇö matches the production container's wiring.
@@ -464,6 +479,14 @@ export function buildTestContainer(): TestContainer {
       idGen,
       recordAuditLog,
     }),
+    adminGrantSubscription: new AdminGrantSubscription({
+      userRepo,
+      idGen,
+      passwordHasher,
+      recordAuditLog,
+      requestPasswordReset,
+      logger,
+    }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
     adminGetCourse: new AdminGetCourse({ courseRepo }),
@@ -621,17 +644,8 @@ export function buildTestContainer(): TestContainer {
       rateLimiter,
       idGen,
     }),
-    // STORY-008: password reset
-    requestPasswordReset: new RequestPasswordReset({
-      users: userRepo,
-      passwordResets: passwordResetRepo,
-      email: emailSender,
-      passwordResetEmailRenderer,
-      rateLimiter,
-      clock,
-      ids: idGen,
-      logger,
-    }),
+    // STORY-008: password reset (hoisted above, also reused by adminGrantSubscription)
+    requestPasswordReset,
     resetPassword: new ResetPassword({
       users: userRepo,
       passwordResets: passwordResetRepo,

@@ -11,6 +11,13 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 - Sprint 15 is now 4/7 done (STORY-079–082); STORY-078, 083, 084 remain planned.
 - Documentation synchronized: `CLAUDE.md`, `docs/sprint-plan.md`, `docs/stories/STORY-079..082.md`, `README.md`, `FEATURES.md`, `docs/db-schema.md`, `docs/architecture/01-layer-wiring.md`, `docs/architecture/03-site-map.md`.
 
+### 2026-07-30: Admin manual subscription-tier grant (bypass checkout)
+
+- New `AdminGrantSubscription` use case + `/admin/users/new` admin form: an admin can grant a student STARTER/PRO access directly, for students who paid outside the platform (bank transfer, GCash sent directly, cash) rather than through PayMongo checkout. Creates a placeholder account if the student doesn't have one yet and reuses `RequestPasswordReset` to email a "set your password" link (no bespoke claim-token system added).
+- Optionally records how the student paid (method, amount, free-text reference) as `AuditLog` metadata under a new `user.subscription_granted` action, for bookkeeping. No `Order` row is created, since `Order` is scoped to a single course purchase and this grant is tier-wide.
+- `UserRepository.update()` gained a `subscriptionTier` patch field; both the Prisma and in-memory adapters already handled it generically via object spread, so no adapter logic changed, only the port/type declarations.
+- Verification: full unit suite (2,732 tests) green, all 13 architecture-compliance suites (TDD coverage + SOLID layering rules) green, `pnpm typecheck` clean, `pnpm lint` clean repo-wide, `pnpm build` succeeds.
+
 ### 2026-07-27: Completeness audit and documentation synchronization
 
 - Audited the current route tree, composition root, Prisma schema and migrations, server actions, use cases, tests, and operational docs at commit `5b8072b`.
