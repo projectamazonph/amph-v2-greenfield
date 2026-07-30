@@ -35,7 +35,7 @@ async function processWebhookEvent(
   }
 
   // Mark order paid
-  order.markPaid();
+  const _markPaidR = order.markPaid(); /* ignore in test */
   await deps.orderRepo.update(order);
 
   return { ok: true };
@@ -56,12 +56,14 @@ describe("processWebhookEvent", () => {
     paymentGateway = new StubPaymentGateway();
   });
 
-  function seedPendingOrder(overrides: {
-    id?: string;
-    userId?: string;
-    courseId?: string;
-    paymongoPaymentId?: string;
-  } = {}) {
+  function seedPendingOrder(
+    overrides: {
+      id?: string;
+      userId?: string;
+      courseId?: string;
+      paymongoPaymentId?: string;
+    } = {},
+  ) {
     const order = Order.create({
       id: overrides.id ?? "order_01",
       userId: overrides.userId ?? "user_01",
@@ -71,10 +73,10 @@ describe("processWebhookEvent", () => {
       totalMinor: 299900,
       currency: "PHP",
     });
-    order.markPending(
+    const _markPendingR = order.markPending(
       overrides.paymongoPaymentId ?? "cs_abc",
       "https://checkout.paymongo.com/cs_abc",
-    );
+    ); /* ignore in test */
     orderRepo.orders.set(order.id, order);
   }
 
@@ -193,7 +195,7 @@ describe("StubPaymentGateway.verifyWebhookSignature", () => {
   // PayMongoAdapter's own unit tests with the real HMAC implementation.
   it("always passes (stub behavior — real verification tested in PayMongoAdapter tests)", () => {
     const adapter = new StubPaymentGateway();
-    expect(() => adapter.verifyWebhookSignature("{}", "")).not.toThrow();
-    expect(() => adapter.verifyWebhookSignature("{}", "t=123,v1=abc")).not.toThrow();
+    expect(Result.isOk(adapter.verifyWebhookSignature("{}", ""))).toBe(true);
+    expect(Result.isOk(adapter.verifyWebhookSignature("{}", "t=123,v1=abc"))).toBe(true);
   });
 });

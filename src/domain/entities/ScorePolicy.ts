@@ -11,7 +11,8 @@
  */
 
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
-import type { Difficulty, SimulatorMode } from "@/domain/entities/SimulatorAttempt";
+import type { Difficulty } from "@/domain/entities/SimulatorScenario";
+import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import { Result } from "@/domain/shared/Result";
 
 // ── Types ────────────────────────────────────────────────────────────────

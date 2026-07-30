@@ -22,6 +22,7 @@ import { parseArgs } from "node:util";
 import { prisma } from "@/infra/database/prisma";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { Money } from "@/domain/values/Money";
+import { Result } from "@/domain/shared/Result";
 
 // ── .env loader ──────────────────────────────────────────────────────────────
 
@@ -130,7 +131,7 @@ async function upsertTier(def: TierDef): Promise<void> {
     const updated = {
       ...existing.value,
       name: def.name,
-      price: Money.of(def.priceMinor, "PHP"),
+      price: Result.unwrap(Money.of(def.priceMinor, "PHP")),
       earlyBirdPriceMinor: def.earlyBirdPriceMinor,
       earlyBirdEndsAt: def.earlyBirdEndsAt ? new Date(def.earlyBirdEndsAt) : undefined,
     };
@@ -146,7 +147,7 @@ async function upsertTier(def: TierDef): Promise<void> {
       id: def.id,
       slug: def.slug,
       name: def.name,
-      price: Money.of(def.priceMinor, "PHP"),
+      price: Result.unwrap(Money.of(def.priceMinor, "PHP")),
       status: "ACTIVE" as const,
       displayOrder: def.displayOrder,
       earlyBirdPriceMinor: def.earlyBirdPriceMinor,

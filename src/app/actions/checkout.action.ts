@@ -104,5 +104,7 @@ function mapPaymentError(err: CreatePaymentIntentError): CheckoutActionState {
       return { kind: "already_enrolled" };
     case "payment_error":
       return { kind: "payment_error", message: err.message };
+    default:
+      return { kind: "payment_error", message: "An unexpected error occurred" };
   }
 }

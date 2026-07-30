@@ -20,7 +20,7 @@
  * - activeEnrollments: count of all enrollments (via per-user findByUserId)
  * - totalRevenuePhp: sum of paid order amounts in PHP (centavos / 100)
  * - certificatesIssued: count of non-revoked certificates
- * - pendingRefunds: 0 (RefundRequestRepository not yet implemented; future story)
+ * - pendingRefunds: count of orders with a pending refund request
  *
  * Performance: this is a small-N implementation. It iterates all users
  * to compute per-user aggregates. For an admin app with < 100k records
@@ -50,17 +50,17 @@ export type GetAdminDashboardStatsError = {
 };
 
 export class GetAdminDashboardStats {
-  constructor(private readonly deps: {
-    userRepo: UserRepository;
-    courseRepo: CourseRepository;
-    orderRepo: OrderRepository;
-    enrollmentRepo: IEnrollmentRepository;
-    certificateRepo: ICertificateRepository;
-  }) {}
+  constructor(
+    private readonly deps: {
+      userRepo: UserRepository;
+      courseRepo: CourseRepository;
+      orderRepo: OrderRepository;
+      enrollmentRepo: IEnrollmentRepository;
+      certificateRepo: ICertificateRepository;
+    },
+  ) {}
 
-  async execute(): Promise<
-    Result<AdminDashboardStats, GetAdminDashboardStatsError>
-  > {
+  async execute(): Promise<Result<AdminDashboardStats, GetAdminDashboardStatsError>> {
     // ── totalStudents ────────────────────────────────────────────
     // SCALE: replace with userRepo.count({ role: 'STUDENT' })
     const usersResult = await this.deps.userRepo.listAll();
@@ -70,9 +70,7 @@ export class GetAdminDashboardStats {
         message: `userRepo.listAll failed: ${usersResult.error.kind}`,
       });
     }
-    const totalStudents = usersResult.value.filter(
-      (u) => u.role === "STUDENT",
-    ).length;
+    const totalStudents = usersResult.value.filter((u) => u.role === "STUDENT").length;
     const allUsers = usersResult.value;
 
     // ── totalCourses ─────────────────────────────────────────────
@@ -118,13 +116,20 @@ export class GetAdminDashboardStats {
       }
     }
 
+    // ── pendingRefunds ─────────────────────────────────────────────
+    const pendingRefundsResult = await this.deps.orderRepo.listRefundRequests({
+      status: "pending",
+      limit: 1_000_000,
+    });
+    const pendingRefunds = pendingRefundsResult.ok ? pendingRefundsResult.value.orders.length : 0;
+
     return Result.ok({
       totalStudents,
       totalCourses,
       activeEnrollments,
       totalRevenuePhp,
       certificatesIssued,
-      pendingRefunds: 0, // RefundRequestRepository not yet implemented
+      pendingRefunds,
     });
   }
 }

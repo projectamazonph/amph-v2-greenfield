@@ -12,9 +12,9 @@
 import { Result } from "@/domain/shared/Result";
 import { Money } from "@/domain/values/Money";
 import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
+import type { LessonType } from "@/domain/entities/Lesson";
 
 export type CourseStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
-export type LessonType = "VIDEO" | "TEXT" | "QUIZ";
 
 export interface Lesson {
   readonly id: string;
@@ -97,13 +97,18 @@ export function createCourse(params: {
     return Result.err({ kind: "invalid_curriculum" });
   }
 
+  const priceResult = Money.of(params.priceMinor, (params.currency as "PHP") ?? "PHP");
+  if (!priceResult.ok) {
+    return Result.err({ kind: "invalid_price" });
+  }
+
   return Result.ok({
     id: params.id,
     slug: params.slug,
     title: params.title.trim(),
     tagline: params.tagline.trim(),
     description: params.description.trim(),
-    price: Money.of(params.priceMinor, (params.currency as "PHP") ?? "PHP"),
+    price: priceResult.value,
     curriculum: params.curriculum,
     coverImage: params.coverImage ?? null,
     isFeatured: params.isFeatured ?? false,

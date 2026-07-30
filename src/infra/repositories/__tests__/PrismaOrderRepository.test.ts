@@ -173,14 +173,16 @@ describe("PrismaOrderRepository", () => {
     const order = makeDraftOrder();
     await repo.create(order);
 
-    order.markPending("cs_test_abc", "https://checkout.paymongo.com/cs_test_abc");
+    expect(order.markPending("cs_test_abc", "https://checkout.paymongo.com/cs_test_abc").ok).toBe(
+      true,
+    );
     const pendingUpdate = await repo.update(order);
     expect(pendingUpdate.ok).toBe(true);
     if (!pendingUpdate.ok) return;
     expect(pendingUpdate.value.status).toBe("PENDING");
     expect(pendingUpdate.value.paymongoPaymentId).toBe("cs_test_abc");
 
-    order.markPaid(new Date("2026-07-01T00:00:00Z"));
+    expect(order.markPaid(new Date("2026-07-01T00:00:00Z")).ok).toBe(true);
     const paidUpdate = await repo.update(order);
     expect(paidUpdate.ok).toBe(true);
     if (!paidUpdate.ok) return;
@@ -206,7 +208,9 @@ describe("PrismaOrderRepository", () => {
   it("findByPaymongoPaymentId locates a PENDING order by its checkout session id", async () => {
     const order = makeDraftOrder();
     await repo.create(order);
-    order.markPending("cs_lookup_me", "https://checkout.paymongo.com/cs_lookup_me");
+    expect(order.markPending("cs_lookup_me", "https://checkout.paymongo.com/cs_lookup_me").ok).toBe(
+      true,
+    );
     await repo.update(order);
 
     const found = await repo.findByPaymongoPaymentId("cs_lookup_me");
@@ -252,9 +256,9 @@ describe("PrismaOrderRepository", () => {
   it("listAll filters by status", async () => {
     const paid = makeDraftOrder({ id: "paid-1" });
     await repo.create(paid);
-    paid.markPending("cs_1", "https://x");
+    expect(paid.markPending("cs_1", "https://x").ok).toBe(true);
     await repo.update(paid);
-    paid.markPaid();
+    expect(paid.markPaid().ok).toBe(true);
     await repo.update(paid);
 
     const draft = makeDraftOrder({ id: "draft-1" });
@@ -271,9 +275,9 @@ describe("PrismaOrderRepository", () => {
   it("findPaidForUserAndCourse returns the PAID order for that user + course", async () => {
     const order = makeDraftOrder({ id: "paid-order", userId: "user_x", courseId: "course_x" });
     await repo.create(order);
-    order.markPending("cs_1", "https://x");
+    expect(order.markPending("cs_1", "https://x").ok).toBe(true);
     await repo.update(order);
-    order.markPaid();
+    expect(order.markPaid().ok).toBe(true);
     await repo.update(order);
 
     const result = await repo.findPaidForUserAndCourse("user_x", "course_x");

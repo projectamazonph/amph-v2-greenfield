@@ -106,7 +106,7 @@ function happyContainer() {
     Result.ok({
       feedback: {
         attemptId: "ATT-STR1234",
-        userId: "system",
+        userId: "user_123",
         simulatorId: "str-triage",
         scenarioId: "str-triage-scenario-kitchen-products",
         difficulty: "beginner",

@@ -25,6 +25,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { enrollStudent, type EnrollStudentActionResult } from "@/app/actions/enroll";
 import { Money } from "@/domain/values/Money";
+import { Result } from "@/domain/shared/Result";
 import { Button } from "@/components/ui/Button";
 import styles from "./EnrollButton.module.css";
 
@@ -94,7 +95,7 @@ export function EnrollButton({
     return (
       <Link href={`/checkout?courseSlug=${courseSlug}`} className={styles.fullWidth}>
         <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
-          Buy now — {Money.of(priceMinor, "PHP").format()}
+          Buy now — {Result.unwrap(Money.of(priceMinor, "PHP")).format()}
         </Button>
       </Link>
     );

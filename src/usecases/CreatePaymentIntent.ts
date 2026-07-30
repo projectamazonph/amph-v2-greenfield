@@ -30,7 +30,8 @@ export type CreatePaymentIntentError =
   | { kind: "course_not_found" }
   | { kind: "course_not_published" }
   | { kind: "already_enrolled" }
-  | { kind: "payment_error"; message: string };
+  | { kind: "payment_error"; message: string }
+  | { kind: "invalid_transition"; message: string };
 
 export type CreatePaymentIntentOutput =
   | { ok: true; checkoutUrl: string; orderId: string }
@@ -64,9 +65,7 @@ export class CreatePaymentIntent {
     // ── 3. Fail fast: user must not already have a PAID order ─
     const existingOrders = await orderRepo.findByUserId(input.userId);
     if (Result.isOk(existingOrders)) {
-      const alreadyPaid = existingOrders.value.some(
-        (o) => o.courseId === course.id && o.isPaid(),
-      );
+      const alreadyPaid = existingOrders.value.some((o) => o.courseId === course.id && o.isPaid());
       if (alreadyPaid) {
         return { ok: false, error: { kind: "already_enrolled" } };
       }
@@ -78,7 +77,11 @@ export class CreatePaymentIntent {
         (o) => o.courseId === course.id && o.status === "PENDING" && o.paymongoCheckoutUrl !== null,
       );
       if (pendingOrder && pendingOrder.paymongoCheckoutUrl) {
-        return { ok: true, checkoutUrl: pendingOrder.paymongoCheckoutUrl, orderId: pendingOrder.id };
+        return {
+          ok: true,
+          checkoutUrl: pendingOrder.paymongoCheckoutUrl,
+          orderId: pendingOrder.id,
+        };
       }
     }
 
@@ -106,7 +109,7 @@ export class CreatePaymentIntent {
       amountMinor: course.price.minor,
       currency: course.price.currency,
       successUrl: `${baseUrl}/checkout/success?orderId=${order.id}`,
-      failedUrl:  `${baseUrl}/checkout/failed?orderId=${order.id}`,
+      failedUrl: `${baseUrl}/checkout/failed?orderId=${order.id}`,
       metadata: {
         orderId: order.id,
         userId: input.userId,
@@ -125,7 +128,12 @@ export class CreatePaymentIntent {
     }
 
     // ── 7. Transition Order to PENDING ────────────────────────
-    order.markPending(checkoutResult.value.id, checkoutResult.value.url);
+    const markResult = order.markPending(checkoutResult.value.id, checkoutResult.value.url);
+    if (!markResult.ok)
+      return {
+        ok: false,
+        error: { kind: "invalid_transition", message: markResult.error.message },
+      };
     await orderRepo.update(order);
 
     return { ok: true, checkoutUrl: checkoutResult.value.url, orderId: order.id };

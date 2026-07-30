@@ -28,7 +28,11 @@ function seedPendingOrder(paymongoPaymentId: string) {
     totalMinor: 299900,
     currency: "PHP",
   });
-  order.markPending(paymongoPaymentId, `https://checkout.paymongo.com/${paymongoPaymentId}`);
+  const r = order.markPending(
+    paymongoPaymentId,
+    `https://checkout.paymongo.com/${paymongoPaymentId}`,
+  );
+  expect(r.ok).toBe(true);
   orderRepo.orders.set(order.id, order);
 }
 
@@ -36,7 +40,8 @@ vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     paymentGateway: {
       verifyWebhookSignature: (_body: string, _sig: string) => {
-        if (signatureShouldFail) throw new Error("bad signature");
+        if (signatureShouldFail) return Result.err({ kind: "signature_mismatch" });
+        return Result.ok(true);
       },
     },
     orderRepo,
@@ -121,7 +126,7 @@ describe("POST /api/webhooks/paymongo — persistence", () => {
   it("persists a record with no processingError for idempotent replays (already-paid order)", async () => {
     seedPendingOrder("cs_paid");
     const order = orderRepo.orders.get("order_01");
-    order?.markPaid();
+    expect(order?.markPaid().ok).toBe(true);
 
     const res = await POST(
       makeRequest('{"type":"checkout_session.completed","data":{"id":"cs_paid"}}') as never,

@@ -117,12 +117,17 @@ export function createPricingTier(params: {
     return Result.err({ kind: "invalid_price" });
   }
 
+  const priceResult = Money.of(params.priceMinor, params.currency ?? "PHP");
+  if (!priceResult.ok) {
+    return Result.err({ kind: "invalid_price" });
+  }
+
   const now = params.updatedAt ?? params.createdAt ?? new Date();
   return Result.ok({
     id: params.id,
     slug: params.slug,
     name: trimmedName,
-    price: Money.of(params.priceMinor, params.currency ?? "PHP"),
+    price: priceResult.value,
     status: params.status ?? "DRAFT",
     displayOrder: params.displayOrder ?? 0,
     earlyBirdPriceMinor: params.earlyBirdPriceMinor,
@@ -163,7 +168,8 @@ export function effectivePrice(tier: PricingTier, now: Date = new Date()): Money
     tier.earlyBirdPriceMinor !== undefined &&
     tier.earlyBirdEndsAt > now
   ) {
-    return Money.of(tier.earlyBirdPriceMinor, tier.price.currency);
+    // earlyBirdPriceMinor is validated as integer at tier creation time.
+    return Result.unwrap(Money.of(tier.earlyBirdPriceMinor, tier.price.currency));
   }
   return tier.price;
 }

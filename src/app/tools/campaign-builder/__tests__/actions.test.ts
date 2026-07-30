@@ -45,7 +45,7 @@ const fakeSimulator = {
 const GRADED_ATTEMPT: SimulatorAttempt = {
   id: "sys-attempt-1",
   attemptId: "ATT-CB001",
-  userId: "system",
+  userId: "user_123",
   simulatorId: "campaign-builder",
   scenarioId: "campaign-builder-scenario-default",
   scenarioVersion: 1,
@@ -153,7 +153,7 @@ function happyContainer() {
     Result.ok({
       feedback: {
         attemptId: "ATT-CB001",
-        userId: "system",
+        userId: "user_123",
         simulatorId: "campaign-builder",
         scenarioId: "campaign-builder-scenario-default",
         difficulty: "beginner",

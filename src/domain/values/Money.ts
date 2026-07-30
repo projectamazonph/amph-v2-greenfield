@@ -13,8 +13,13 @@
  * ```
  */
 
+import { Result } from "@/domain/shared/Result";
+
 /** Supported currencies. ADR-008: PHP only in v2. */
 export type Currency = "PHP" | "USD";
+
+/** Error returned by `Money.of` when the minor-unit amount is not an integer. */
+export type MoneyError = { kind: "non_integer_minor" };
 
 export class Money {
   /** Integer minor units (centavos / cents). Never a float. */
@@ -32,15 +37,21 @@ export class Money {
    * Construct from integer minor units.
    * @param minor  Integer — e.g. 299900 for ₱2,999.00
    * @param currency  The currency
-   * @throws {Error} if minor is not an integer
+   * @returns `Result.ok(Money)` on success, `Result.err` if minor is not an integer
    */
-  static of(minor: number, currency: Currency): Money {
+  static of(minor: number, currency: Currency): Result<Money, MoneyError> {
     if (!Number.isInteger(minor)) {
-      throw new Error(
-        `Money.of requires an integer minor amount. Got ${minor}. ` +
-        "Use Money.php(pesos) for float-to-centavos conversion.",
-      );
+      return Result.err({ kind: "non_integer_minor" });
     }
+    return Result.ok(new Money(minor, currency));
+  }
+
+  /**
+   * Internal factory — bypasses integer validation.
+   * Used by methods where the caller already guarantees an integer value
+   * (e.g. after `Math.round`, or from validated domain data).
+   */
+  private static _create(minor: number, currency: Currency): Money {
     return new Money(minor, currency);
   }
 
@@ -49,34 +60,34 @@ export class Money {
    * @param pesos  Float or integer — e.g. 29.99 → ₱29.99
    */
   static php(pesos: number): Money {
-    return Money.of(Math.round(pesos * 100), "PHP");
+    return Money._create(Math.round(pesos * 100), "PHP");
   }
 
   /** Zero money. Valid (free tier, zero-price course). */
   static zero(currency: Currency): Money {
-    return Money.of(0, currency);
+    return Money._create(0, currency);
   }
 
   // ── Arithmetic ────────────────────────────────────────────
 
   add(other: Money): Money {
     this._assertSameCurrency(other);
-    return Money.of(this.minor + other.minor, this.currency);
+    return Money._create(this.minor + other.minor, this.currency);
   }
 
   subtract(other: Money): Money {
     this._assertSameCurrency(other);
-    return Money.of(this.minor - other.minor, this.currency);
+    return Money._create(this.minor - other.minor, this.currency);
   }
 
   /** Multiply by a scalar (e.g. 0.5 for 50% discount). */
   multiply(factor: number): Money {
-    return Money.of(Math.round(this.minor * factor), this.currency);
+    return Money._create(Math.round(this.minor * factor), this.currency);
   }
 
   /** Percentage of this amount (e.g. `money.percent(15)` for a 15% fee). */
   percent(pct: number): Money {
-    return Money.of(Math.round(this.minor * (pct / 100)), this.currency);
+    return Money._create(Math.round(this.minor * (pct / 100)), this.currency);
   }
 
   /** Is this amount greater than zero? */
@@ -150,7 +161,7 @@ export class Money {
     if (this.currency !== other.currency) {
       throw new Error(
         `Currency mismatch: cannot operate on ${this.currency} and ${other.currency}. ` +
-        "All money in the same operation must use the same currency.",
+          "All money in the same operation must use the same currency.",
       );
     }
   }

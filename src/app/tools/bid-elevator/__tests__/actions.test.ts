@@ -133,7 +133,7 @@ function happyContainer() {
     Result.ok({
       feedback: {
         attemptId: "ATT-BID001",
-        userId: "system",
+        userId: "user_123",
         simulatorId: "bid-elevator",
         scenarioId: "bid-elevator-scenario-default",
         difficulty: "beginner",

@@ -91,7 +91,7 @@ The admin route tree is implemented and gated by `requireAdmin()`:
 - `/admin/audit-log` and CSV export
 - `/admin/settings` and TOTP setup
 
-Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog` for the implemented mutation paths. The Prisma badge adapter still throws for create, update, and archive, so those three admin badge mutations are not production-complete. The dashboard's pending-refund statistic is currently a hardcoded zero.
+Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog` for the implemented mutation paths. The Prisma badge adapter now implements create, update, and archive with slug-uniqueness and not-found error handling, so admin badge CRUD is production-complete. The dashboard's pending-refund statistic is currently a hardcoded zero.
 
 ### Email, observability, and scheduled work
 
@@ -99,7 +99,7 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 - Pino structured logging, action tracing, Sentry client/server/edge configuration, and Web Vitals reporting are present.
 - `/api/cron/live-class-reminders` is protected by `CRON_SECRET` and uses `SentReminder` persistence for idempotency.
 - `vercel.json` schedules the reminder endpoint once daily at `0 8 * * *`.
-- `/api/health` is a lightweight liveness response. It does not query the database.
+- `/api/health` is a readiness probe that runs `SELECT 1` against Postgres via a lightweight Prisma client and returns 503 if the database is unreachable.
 
 ## Partial or not shipped
 
@@ -110,7 +110,7 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 | Live-class experience        | Partial       | Admin live-class CRUD and reminder email exist; RSVP, capacity, attendance, recordings, and student-facing class pages are not represented by a complete route/model surface. |
 | Editable email templates     | Partial       | Entity, port, adapter, and use cases exist; the documented admin email-template pages and actions are not present in `src/app`.                                               |
 | Simulator ownership          | Partial       | Replace `userId: "system"` with the authenticated user in all four graded actions and add ownership tests.                                                                    |
-| Badge administration         | Partial       | Implement Prisma create, update, and archive before treating the admin badge editor as shipped.                                                                               |
+| Badge administration         | Implemented   | Prisma create, update, and archive are wired; admin badge CRUD is shipped with slug-uniqueness and error handling.                                                            |
 | Session revocation           | Partial       | Add session membership or token-version checks and enforce account lockout behavior.                                                                                          |
 | Impersonation restore        | Partial       | Capture the original admin token on the first impersonation; the current fallback signs out.                                                                                  |
 | Admin refund metric          | Partial       | Replace `pendingRefunds: 0` with a repository query or label the value unavailable.                                                                                           |

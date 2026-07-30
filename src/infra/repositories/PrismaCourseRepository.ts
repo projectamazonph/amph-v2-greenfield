@@ -27,7 +27,8 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import type { CourseRepository, CourseError } from "@/ports/repositories/CourseRepository";
-import type { Course, Curriculum, LessonType } from "@/domain/entities/Course";
+import type { Course, Curriculum } from "@/domain/entities/Course";
+import type { LessonType } from "@/domain/entities/Lesson";
 import { Money } from "@/domain/values/Money";
 
 interface PrismaCourseRow {
@@ -222,7 +223,7 @@ export class PrismaCourseRepository implements CourseRepository {
       title: row.title,
       tagline: row.tagline,
       description: row.description,
-      price: Money.of(row.priceMinor, (row.currency as "PHP") ?? "PHP"),
+      price: Result.unwrap(Money.of(row.priceMinor, (row.currency as "PHP") ?? "PHP")),
       curriculum: this.parseCurriculum(row.curriculum),
       coverImage: row.coverImage,
       isFeatured: row.isFeatured,

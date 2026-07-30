@@ -147,10 +147,10 @@ export class PayMongoAdapter implements IPaymentGateway {
    * The signature is computed as:
    *   HMAC-SHA256(webhook_secret, "timestamp.payload")
    */
-  verifyWebhookSignature(payload: string, signature: string): void {
+  verifyWebhookSignature(payload: string, signature: string): Result<boolean, { kind: string }> {
     const webhookSecret = this._webhookSecret ?? process.env.PAYMONGO_WEBHOOK_SECRET;
     if (!webhookSecret) {
-      throw new Error("PAYMONGO_WEBHOOK_SECRET environment variable is not set");
+      return Result.err({ kind: "webhook_secret_missing" });
     }
 
     // Parse the signature header
@@ -164,13 +164,13 @@ export class PayMongoAdapter implements IPaymentGateway {
     const receivedHmac = parts["v1"] as string | undefined;
 
     if (!timestamp || !receivedHmac) {
-      throw new Error("Invalid PayMongo signature format");
+      return Result.err({ kind: "invalid_signature_format" });
     }
 
     // Reject stale webhooks (> 5 minutes old)
     const ageSeconds = Math.floor(Date.now() / 1000) - parseInt(timestamp, 10);
     if (ageSeconds > 300) {
-      throw new Error(`Webhook timestamp too old: ${ageSeconds}s`);
+      return Result.err({ kind: "stale_webhook" });
     }
 
     // Compute expected HMAC
@@ -179,8 +179,10 @@ export class PayMongoAdapter implements IPaymentGateway {
 
     // Constant-time comparison to prevent timing attacks
     if (!timingSafeEqual(Buffer.from(expectedHmac), Buffer.from(receivedHmac))) {
-      throw new Error("Webhook signature mismatch — possible tampering");
+      return Result.err({ kind: "signature_mismatch" });
     }
+
+    return Result.ok(true);
   }
 
   /**

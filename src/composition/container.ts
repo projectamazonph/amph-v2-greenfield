@@ -914,9 +914,27 @@ export function getContainer(): AppContainer {
 
 // ΓöÇΓöÇ Cached production singleton ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
+// ── Startup env-var validation ──────────────────────────────────────────────
+
+function validateRequiredEnvVars(): void {
+  if (!process.env.PAYMONGO_SECRET) {
+    throw new Error("Missing required environment variable: PAYMONGO_SECRET");
+  }
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("Missing required environment variable: RESEND_API_KEY");
+  }
+  if (!process.env.JWT_SECRET) {
+    throw new Error("Missing required environment variable: JWT_SECRET");
+  }
+  if (!process.env.DATABASE_URL) {
+    throw new Error("Missing required environment variable: DATABASE_URL");
+  }
+}
+
 let _productionContainer: AppContainer | null = null;
 
 export function buildContainer(): AppContainer {
+  validateRequiredEnvVars();
   if (!_productionContainer) {
     _productionContainer = buildProductionContainer();
   }

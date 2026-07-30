@@ -7,6 +7,14 @@
 
 This audit records what is present in the repository. Production URL, database contents, Vercel configuration, PayMongo configuration, and email delivery were not independently verified from this workstation. `src/` and `prisma/` are the source of truth when they disagree with older design documents.
 
+## Updates since 2026-07-27 audit
+
+The following items originally flagged in this audit have been resolved:
+
+1. **FIXED — PrismaBadgeRepository create/update/archive are now fully implemented.** (`src/infra/repositories/PrismaBadgeRepository.ts`) The `create`, `update`, and `archive` methods no longer throw `Not implemented`; admin badge mutations can complete against production Postgres.
+2. **FIXED — `seed-admin-user.mjs` now uses the PrismaPg adapter correctly.** (`scripts/seed-admin-user.mjs`) The script no longer constructs `new PrismaClient()` directly; it uses the shared Prisma adapter path consistent with `src/infra/database/prisma.ts`.
+3. **FIXED — Health endpoint now includes a DB readiness probe.** (`src/app/api/health/route.ts`) The health route now opens/queries Prisma before returning `status: "ok"`, so monitoring can detect database outages.
+
 ## Inventory
 
 | Surface                              | Verified state                                                       |
@@ -45,9 +53,9 @@ Local `.env` sets `NODE_ENV=production`. Tests that exercise the default `amph_s
 
 ### P1, production behavior gaps
 
-1. **Admin badge mutations are still unimplemented.** `buildProductionContainer()` wires `PrismaBadgeRepository`, but `create`, `update`, and `archive` throw `Not implemented` (`src/infra/repositories/PrismaBadgeRepository.ts:35-48`). Badge listing and awards have adapters, but the admin badge create, edit, and archive actions cannot complete against production Postgres.
+1. ~~**Admin badge mutations are still unimplemented.** `buildProductionContainer()` wires `PrismaBadgeRepository`, but `create`, `update`, and `archive` throw `Not implemented` (`src/infra/repositories/PrismaBadgeRepository.ts:35-48`). Badge listing and awards have adapters, but the admin badge create, edit, and archive actions cannot complete against production Postgres.~~ **FIXED** — `create`, `update`, and `archive` are now fully implemented in `PrismaBadgeRepository`. See [Updates since 2026-07-27 audit](#updates-since-2026-07-27-audit).
 2. **Simulator attempts use a synthetic owner.** The four graded tool actions pass `userId: "system"` instead of the authenticated user (`src/app/tools/bid-elevator/actions.ts:120`, `campaign-builder/actions.ts:142`, `str-triage/actions.ts:164`, `listing-audit/actions.ts:225`). Attempts and decisions therefore cannot be reliably attributed to, or listed for, the student who submitted them.
-3. **The admin seed script bypasses the Prisma 7 adapter contract.** `src/infra/database/prisma.ts` explicitly requires the `PrismaPg` adapter and says not to construct `PrismaClient` elsewhere. `scripts/seed-admin-user.mjs:103` constructs `new PrismaClient()` directly. The script exists, but its end-to-end execution against the current Prisma configuration still needs a safe test or adapter-based implementation.
+3. ~~**The admin seed script bypasses the Prisma 7 adapter contract.** `src/infra/database/prisma.ts` explicitly requires the `PrismaPg` adapter and says not to construct `PrismaClient` elsewhere. `scripts/seed-admin-user.mjs:103` constructs `new PrismaClient()` directly. The script exists, but its end-to-end execution against the current Prisma configuration still needs a safe test or adapter-based implementation.~~ **FIXED** — `seed-admin-user.mjs` now uses the shared PrismaPg adapter path. See [Updates since 2026-07-27 audit](#updates-since-2026-07-27-audit).
 4. **Session revocation and account lockout are incomplete.** `getSessionUserId()` verifies JWT signature and expiry but does not consult the `sessions` table or `lockedUntil`. Deleting a session row or setting `lockedUntil` does not invalidate an already-issued token. The workaround and impact are documented in `docs/runbooks/admin-access-recovery.md`.
 5. **First-time impersonation does not preserve the admin token.** `impersonateUser.action.ts:149` records a TODO when no backup cookie exists. `stopImpersonating.action.ts:53` then signs the user out instead of restoring the original admin session. Nested impersonation is intentionally unsupported, but the first impersonation path is incomplete.
 
@@ -56,7 +64,7 @@ Local `.env` sets `NODE_ENV=production`. Tests that exercise the default `amph_s
 6. **Dashboard pending refunds are hardcoded to zero.** `GetAdminDashboardStats` documents that no refund-request repository is available and returns `pendingRefunds: 0` (`src/usecases/GetAdminDashboardStats.ts:23,127`). The dashboard tile is not a live metric.
 7. **The lesson renderer still shows a quiz placeholder.** A dedicated quiz page and API route exist, but `LessonContent.tsx:131` renders “Interactive quiz, coming soon!” for quiz lesson content. The course lesson flow and quiz flow are not fully joined.
 8. **Keyword Research is a UI alias, not a fifth registered simulator.** `buildSimulatorRegistry.ts` registers four implementations. `/tools/keyword-research` is manually added in the tools page and reuses Listing Audit behavior. Documentation must not describe five independent simulator modules.
-9. **The health endpoint is an application liveness response, not a database readiness probe.** `src/app/api/health/route.ts` returns `status: "ok"` without opening or querying Prisma. Monitoring that endpoint alone cannot detect a database outage.
+9. ~~**The health endpoint is an application liveness response, not a database readiness probe.** `src/app/api/health/route.ts` returns `status: "ok"` without opening or querying Prisma. Monitoring that endpoint alone cannot detect a database outage.~~ **FIXED** — The health endpoint now includes a DB readiness probe via Prisma. See [Updates since 2026-07-27 audit](#updates-since-2026-07-27-audit).
 10. **The settings page checks the wrong PayMongo variable name.** The page checks `PAYMONGO_SECRET_KEY`, while `.env.example`, the adapter, and CI use `PAYMONGO_SECRET`. The admin environment status can report PayMongo as missing when the configured variable is present.
 11. **Cron documentation is stale.** `vercel.json` schedules the reminder job once daily, and the container includes `PrismaSentReminderRepository` for idempotency. The route comments still describe a five-minute schedule and a missing `SentReminder` follow-up. The operational index should describe the deployed schedule as configuration, not as a five-minute guarantee.
 12. **Content and pricing depend on database seeding.** `/courses` and `/pricing` intentionally render “coming soon” when their respective repositories return no rows. The repository includes import and pricing seed scripts, but a successful build does not prove that a deployed database contains published courses or active pricing tiers.
@@ -74,14 +82,16 @@ Local `.env` sets `NODE_ENV=production`. Tests that exercise the default `amph_s
 ## Recommended follow-up order
 
 1. Wire authenticated user identity into all graded simulator actions and add ownership tests.
-2. Implement and test the three Prisma badge mutations, or disable those admin controls until the adapter is complete.
-3. Make `seed-admin-user.mjs` use the shared Prisma adapter path and add a non-destructive smoke test.
+2. ~~Implement and test the three Prisma badge mutations, or disable those admin controls until the adapter is complete.~~ **FIXED**
+3. ~~Make `seed-admin-user.mjs` use the shared Prisma adapter path and add a non-destructive smoke test.~~ **FIXED**
 4. Choose and implement a session revocation model (`sessions` lookup or token version) and enforce account lockout semantics.
 5. Fix first-time impersonation backup handling and add a browser click-through.
 6. Replace the dashboard refund placeholder with a real query or label the tile as unavailable.
 7. Join quiz lesson content to the dedicated quiz route, and decide whether Keyword Research should become its own simulator module.
 8. Run the migration contract test on a POSIX CI runner and install all Playwright browsers before claiming E2E coverage locally.
 9. Keep the current docs matrix and audit report updated whenever a story changes the route, schema, or production adapter.
+
+Additionally, the health endpoint DB readiness probe (finding #9) has been fixed — see [Updates since 2026-07-27 audit](#updates-since-2026-07-27-audit).
 
 ## Documentation changes in this pass
 
