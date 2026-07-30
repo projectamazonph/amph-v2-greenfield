@@ -33,7 +33,7 @@ interface SubmitResult {
   score?: number;
   passed?: boolean;
   correctCount?: number;
-  totalCount?: number;
+  totalQuestions?: number;
   xpAwarded?: number;
   error?: string;
 }
@@ -98,7 +98,7 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
           {result.score ?? 0}%
         </div>
         <p className={styles.resultDetail}>
-          {result.correctCount} of {result.totalCount} correct. Passing score: {passingScore}%.
+          {result.correctCount} of {result.totalQuestions} correct. Passing score: {passingScore}%.
         </p>
         {passed && result.xpAwarded ? (
           <p className={styles.xpLine}>+{result.xpAwarded} XP awarded</p>

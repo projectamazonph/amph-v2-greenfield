@@ -27,6 +27,7 @@ import { InMemoryPasswordResetRepository } from "@/infra/db/inmemory/InMemoryPas
 import { FixedClock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
+import type { PasswordResetRenderer } from "@/ports/email/PasswordResetRenderer";
 import type { RateLimiter, RateLimitResult } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
@@ -62,6 +63,15 @@ class StubEmailSender implements EmailSender {
   }
 }
 
+class StubPasswordResetRenderer implements PasswordResetRenderer {
+  public calls: Array<{ firstName: string; resetUrl: string; expiresInMinutes: number }> = [];
+  render(args: { firstName: string; resetUrl: string; expiresInMinutes: number }) {
+    this.calls.push(args);
+    // Return a stable object the stub can identify in assertions.
+    return { __stub_reset_email__: args } as unknown as React.ReactElement;
+  }
+}
+
 class StubRateLimiter implements RateLimiter {
   public calls: Array<{ key: string; limit: number; windowSeconds: number }> = [];
   // By default, allow everything. Tests override per-key.
@@ -71,7 +81,11 @@ class StubRateLimiter implements RateLimiter {
     this.blocks.add(key);
   }
 
-  async check(args: { key: string; limit: number; windowSeconds: number }): Promise<Result<RateLimitResult, never>> {
+  async check(args: {
+    key: string;
+    limit: number;
+    windowSeconds: number;
+  }): Promise<Result<RateLimitResult, never>> {
     this.calls.push(args);
     if (this.blocks.has(args.key)) {
       return Result.ok({ allowed: false, remaining: 0, resetSeconds: args.windowSeconds });
@@ -84,6 +98,7 @@ describe("RequestPasswordReset", () => {
   let users: InMemoryUserRepository;
   let passwordResets: InMemoryPasswordResetRepository;
   let emailSender: StubEmailSender;
+  let passwordResetRenderer: StubPasswordResetRenderer;
   let rateLimiter: StubRateLimiter;
   let idGen: FixedIdGenerator;
   let useCase: RequestPasswordReset;
@@ -95,12 +110,14 @@ describe("RequestPasswordReset", () => {
     users = new InMemoryUserRepository();
     passwordResets = new InMemoryPasswordResetRepository();
     emailSender = new StubEmailSender();
+    passwordResetRenderer = new StubPasswordResetRenderer();
     rateLimiter = new StubRateLimiter();
     idGen = new FixedIdGenerator();
     useCase = new RequestPasswordReset({
       users,
       passwordResets,
       email: emailSender,
+      passwordResetEmailRenderer: passwordResetRenderer,
       rateLimiter,
       clock,
       ids: idGen,
@@ -131,6 +148,17 @@ describe("RequestPasswordReset", () => {
     expect(result.value.sent).toBe(true);
     expect(emailSender.sent).toHaveLength(1);
     expect(emailSender.sent[0]!.to).toBe("alice@example.com");
+    // The email body must be the rendered template, NOT null —
+    // if the renderer is forgotten the user gets a blank email
+    // (the original bug this fix is closing).
+    expect(emailSender.sent[0]!.subject).toBe("Reset your Project Amazon PH Academy password");
+    expect(emailSender.sent[0]!.react).not.toBeNull();
+    // The renderer must be invoked with the user's first name and a
+    // /reset-password/<token> URL.
+    expect(passwordResetRenderer.calls).toHaveLength(1);
+    expect(passwordResetRenderer.calls[0]!.firstName).toBe("Alice");
+    expect(passwordResetRenderer.calls[0]!.resetUrl).toMatch(/^https?:\/\/[^/]+\/reset-password\//);
+    expect(passwordResetRenderer.calls[0]!.expiresInMinutes).toBe(60);
   });
 
   it("returns sent: true for a non-existent email (no token, no email)", async () => {
@@ -195,6 +223,7 @@ describe("RequestPasswordReset", () => {
       users,
       passwordResets: flakyRepo,
       email: emailSender,
+      passwordResetEmailRenderer: passwordResetRenderer,
       rateLimiter,
       clock,
       ids: idGen,
