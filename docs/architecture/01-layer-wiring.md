@@ -56,6 +56,6 @@ Known exceptions and follow-ups:
 - `PrismaBadgeRepository.create`, `.update`, and `.archive` still throw `Not implemented`; the admin badge mutation path is not production-complete.
 - Graded simulator server actions currently pass `userId: "system"`; they need the authenticated user before attempts can be treated as student-owned records.
 - `GetAdminDashboardStats.pendingRefunds` is a placeholder value of zero.
-- `scripts/seed-admin-user.mjs` constructs Prisma directly instead of using the Prisma 7 driver adapter used by `src/infra/database/prisma.ts`.
+- `scripts/seed-admin-user.mjs` now correctly uses the PrismaPg driver adapter consistent with `src/infra/database/prisma.ts`.
 
 The PayMongo webhook uses `buildContainer()`, verifies the signature through `PayMongoAdapter`, persists a `WebhookEvent`, and then processes the order. The historical claim that it creates in-memory repositories per request is no longer true.
