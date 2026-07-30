@@ -37,7 +37,7 @@ Tool routes:
 - `/tools/str-triage`
 - `/tools/campaign-builder`
 - `/tools/listing-audit`
-- `/tools/keyword-research` (currently reuses Listing Audit behavior)
+- `/tools/keyword-research` (own registered simulator, STORY-081)
 
 ![Bid Elevator](public/screenshots/bid-elevator.png)
 ![Campaign Builder](public/screenshots/campaign-builder.png)

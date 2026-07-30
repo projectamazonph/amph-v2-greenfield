@@ -218,17 +218,17 @@ define correct answers. These are explicitly **not** delegable to an agent. An
 agent inventing plausible-looking ground truth is the exact defect this sprint
 exists to remove.
 
-| ID        | Title                                                                          | Pts | Status            |
-| --------- | ------------------------------------------------------------------------------ | --- | ----------------- |
-| STORY-078 | Mark simulator results formative; block from certification/job-readiness       | 1   | ⏳ Planned        |
-| STORY-079 | Rewrite Bid Elevator economic model (highest-risk simulator)                   | 1   | ✅ done — PR #244 |
-| STORY-080 | Replace length-based listing scoring with a real rubric                        | 1   | ✅ done — PR #245 |
-| STORY-081 | Versioned keyword scenario datasets; split Listing Audit from Keyword Research | 1   | ✅ done — PR #246 |
-| STORY-082 | Expand STR Triage classifier (thresholds, relevance, match precision)          | 1   | ✅ done — PR #247 |
-| STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ⏳ Planned        |
-| STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ⏳ Planned        |
+| ID        | Title                                                                          | Pts | Status                                                                   |
+| --------- | ------------------------------------------------------------------------------ | --- | ------------------------------------------------------------------------ |
+| STORY-078 | Mark simulator results formative; block from certification/job-readiness       | 1   | ⏳ Planned                                                               |
+| STORY-079 | Rewrite Bid Elevator economic model (highest-risk simulator)                   | 1   | ✅ done — PR #244                                                        |
+| STORY-080 | Replace length-based listing scoring with a real rubric                        | 1   | ◐ merged, PR #245 (difficulty-scaled finding volume not yet implemented) |
+| STORY-081 | Versioned keyword scenario datasets; split Listing Audit from Keyword Research | 1   | ✅ done — PR #246                                                        |
+| STORY-082 | Expand STR Triage classifier (thresholds, relevance, match precision)          | 1   | ✅ done — PR #247                                                        |
+| STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ⏳ Planned                                                               |
+| STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ⏳ Planned                                                               |
 
-**Sprint 15 status:** 4/7 stories merged (STORY-079–082). STORY-078 (formative-only labeling), STORY-083, and STORY-084 remain planned.
+**Sprint 15 status:** 4/7 stories merged (STORY-079–082), though STORY-080 has one open acceptance criterion (see its story doc). STORY-078 (formative-only labeling), STORY-083, and STORY-084 remain planned.
 
 ## Sprint 16 — Assessment Platform Maturity (5 pts)
 
