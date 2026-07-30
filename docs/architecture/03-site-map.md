@@ -92,7 +92,7 @@ There is no current admin email-template page under `src/app/admin`, despite the
 - `/admin/audit-log/export`
 - `/certificates/[hash]/pdf`
 
-The health endpoint is a liveness response and does not query Postgres. The live-class cron requires `CRON_SECRET`; `vercel.json` schedules it daily at `0 8 * * *`.
+The health endpoint runs `courseRepo.listAll()` as a DB readiness probe to verify Postgres connectivity. The live-class cron requires `CRON_SECRET`; `vercel.json` schedules it daily at `0 8 * * *`.
 
 ## Server actions
 

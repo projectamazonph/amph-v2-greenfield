@@ -17,17 +17,17 @@ container-composition-root, no hand-rolled JWTs, etc.). A follow-up
 session on the same day (2026-07-19) landed three more PRs that closed
 Tier C and corrected Tier D.
 
-| PR | What | Tests | Tier |
-|---|---|---|---|
-| **#62** | Strict TDD + SOLID for SignIn/SignOut | +39 | Tier 1 (SOLID/TDD) |
-| **#63** | ESLint `no-tailwind-classes` rule | +25 | Tier 1 (rule) |
-| **#64** | Migrate 11 files to design system | +3 | Tier 1 follow-up (migration) |
-| **#65** | Tier 1 SOLID + TDD violations (hand-rolled JWT, env-flavor) | +23 | Tier 1 (audit) |
-| **#66** | Tier A production bugs + lazy-init Resend | +15 | **Tier A (production-impacting)** |
-| **#68** | Tier B coverage for `IssueCertificate` | +17 | Tier B (TDD gaps) |
-| **#69** | Tier B coverage for `RevokeCertificate` | +21 | Tier B (TDD gaps) |
-| **#70** | Tier C cleanup: typed Prisma rows, dropped unused eslint-disable, middleware → proxy | +0 (no test changes) | Tier C (SOLID hygiene) |
-| **#71** | This doc — correct Tier D misread | +0 | Docs |
+| PR      | What                                                                                 | Tests                | Tier                              |
+| ------- | ------------------------------------------------------------------------------------ | -------------------- | --------------------------------- |
+| **#62** | Strict TDD + SOLID for SignIn/SignOut                                                | +39                  | Tier 1 (SOLID/TDD)                |
+| **#63** | ESLint `no-tailwind-classes` rule                                                    | +25                  | Tier 1 (rule)                     |
+| **#64** | Migrate 11 files to design system                                                    | +3                   | Tier 1 follow-up (migration)      |
+| **#65** | Tier 1 SOLID + TDD violations (hand-rolled JWT, env-flavor)                          | +23                  | Tier 1 (audit)                    |
+| **#66** | Tier A production bugs + lazy-init Resend                                            | +15                  | **Tier A (production-impacting)** |
+| **#68** | Tier B coverage for `IssueCertificate`                                               | +17                  | Tier B (TDD gaps)                 |
+| **#69** | Tier B coverage for `RevokeCertificate`                                              | +21                  | Tier B (TDD gaps)                 |
+| **#70** | Tier C cleanup: typed Prisma rows, dropped unused eslint-disable, middleware → proxy | +0 (no test changes) | Tier C (SOLID hygiene)            |
+| **#71** | This doc — correct Tier D misread                                                    | +0                   | Docs                              |
 
 **Net tests added across both sessions:** +143 (837 → 970)
 **Net production bugs fixed (original session):** 4 (all the same root cause: `new InMemory*()` in production)
@@ -261,22 +261,22 @@ If any step fails, the branch is not ready to push.
 
 ## Test Counters (At Session End)
 
-| Metric | Count |
-|---|---|
-| Test files | 100 |
-| Tests | 932 |
-| tsc errors | 0 |
-| ESLint new violations (this session) | 0 |
-| Build status | ✅ succeeds WITHOUT dummy env vars |
+| Metric                               | Count                              |
+| ------------------------------------ | ---------------------------------- |
+| Test files                           | 100                                |
+| Tests                                | 932                                |
+| tsc errors                           | 0                                  |
+| ESLint new violations (this session) | 0                                  |
+| Build status                         | ✅ succeeds WITHOUT dummy env vars |
 
 ### Updated 2026-07-19 (post-audit follow-up)
 
-| Metric | Count | Change |
-|---|---|---|
-| Test files | 102 | +2 (PR #68, #69) |
-| Tests | 970 | +38 (PR #68 +17, PR #69 +21) |
-| tsc errors | 0 | unchanged |
-| New ESLint violations | 0 | unchanged |
+| Metric                | Count | Change                       |
+| --------------------- | ----- | ---------------------------- |
+| Test files            | 102   | +2 (PR #68, #69)             |
+| Tests                 | 970   | +38 (PR #68 +17, PR #69 +21) |
+| tsc errors            | 0     | unchanged                    |
+| New ESLint violations | 0     | unchanged                    |
 
 Tier C is fully closed (PR #70). Tier D removed as a misread. Tier B
 partially closed: 2 of 12 use cases now have tests (`IssueCertificate`,
@@ -294,24 +294,24 @@ are addressed"** — Tier B is the remaining open item.
 
 ### Tier B: TDD coverage gaps (PARTIALLY closed)
 
-| # | What | Effort | Status |
-|---|---|---|---|
-| 1 | 12 use cases with no tests | Large. Each needs ~10-15 tests. | **2 of 12 done as of PR #70** (`IssueCertificate` in PR #68, `RevokeCertificate` in PR #69). 10 remaining: `ApplyDiscountCode`, `AwardBadge`, `AwardXP`, `CheckCourseAccess`, `CreatePaymentIntent`, `ListUserBadges`, `RecordQuizAttempt`, `RenderCertificatePdf`, `RequestRefund`, `VerifyCertificate`. Note: `MarkLessonComplete` and `RecordStreakVisit` were misclassified under Tier D — they're pending stories, not dead code. Recommend doing as stories are touched (each story's TDD cycle covers its own use case), not as a separate bulk effort. |
-| 2 | 10 `InMemory*` repository adapters with no tests (out of 13 total): `InMemoryBadgeAwardRepository`, `InMemoryBadgeRepository`, `InMemoryCertificateRepository`, `InMemoryCourseRepository`, `InMemoryDiscountCodeRepository`, `InMemoryEnrollmentRepository`, `InMemoryProgressEventRepository` (dead chain), `InMemoryUserRepository`, `InMemoryUserStreakRepository` (dead chain), `InMemoryXPEventRepository` | Same as above. | **Not started.** `InMemoryProgressEventRepository` and `InMemoryUserStreakRepository` are part of the dead-chain from the misread Tier D and will be covered when their parent stories (STORY-025, STORY-027) land. Defer the rest to story-by-story TDD cycle. |
+| #   | What                                                                                                                                                                                                                                                                                                                                                                                                             | Effort                          | Status                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 12 use cases with no tests                                                                                                                                                                                                                                                                                                                                                                                       | Large. Each needs ~10-15 tests. | **2 of 12 done as of PR #70** (`IssueCertificate` in PR #68, `RevokeCertificate` in PR #69). 10 remaining: `ApplyDiscountCode`, `AwardBadge`, `AwardXP`, `CheckCourseAccess`, `CreatePaymentIntent`, `ListUserBadges`, `RecordQuizAttempt`, `RenderCertificatePdf`, `RequestRefund`, `VerifyCertificate`. Note: `MarkLessonComplete` and `RecordStreakVisit` have been deleted as dead code (removed in the Tier D cleanup). |
+| 2   | 10 `InMemory*` repository adapters with no tests (out of 13 total): `InMemoryBadgeAwardRepository`, `InMemoryBadgeRepository`, `InMemoryCertificateRepository`, `InMemoryCourseRepository`, `InMemoryDiscountCodeRepository`, `InMemoryEnrollmentRepository`, `InMemoryProgressEventRepository` (dead chain), `InMemoryUserRepository`, `InMemoryUserStreakRepository` (dead chain), `InMemoryXPEventRepository` | Same as above.                  | **Not started.** `InMemoryProgressEventRepository` and `InMemoryUserStreakRepository` are part of the dead-chain from the misread Tier D and will be covered when their parent stories (STORY-025, STORY-027) land. Defer the rest to story-by-story TDD cycle.                                                                                                                                                              |
 
 ### Tier C: SOLID hygiene (CLOSED in PR #70)
 
-| # | What | Status |
-|---|---|---|
-| 3 | 4 `any` casts in `PrismaBadge*Repository.ts` (2 each) | **Done.** Replaced with `Prisma.XGetPayload<{}>`. The test-file `as any` in `GetAdminDashboardStats.test.ts` was intentionally left as is — it's the established pattern for accessing private internals of in-memory test repos. |
-| 4 | 3 unused `eslint-disable` directives in `src/app/certificates/[hash]/pdf/route.ts` | **Done.** The `no-console` rule is configured at warn level with `allow: ["warn", "error", "debug"]`, so the `eslint-disable` was stale from before the rule config. |
-| 5 | Middleware → Proxy migration (Next 16 deprecation warning) | **Done.** Renamed `src/middleware.ts` → `src/proxy.ts`, function `middleware` → `proxy`, updated comment references. |
+| #   | What                                                                               | Status                                                                                                                                                                                                                            |
+| --- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3   | 4 `any` casts in `PrismaBadge*Repository.ts` (2 each)                              | **Done.** Replaced with `Prisma.XGetPayload<{}>`. The test-file `as any` in `GetAdminDashboardStats.test.ts` was intentionally left as is — it's the established pattern for accessing private internals of in-memory test repos. |
+| 4   | 3 unused `eslint-disable` directives in `src/app/certificates/[hash]/pdf/route.ts` | **Done.** The `no-console` rule is configured at warn level with `allow: ["warn", "error", "debug"]`, so the `eslint-disable` was stale from before the rule config.                                                              |
+| 5   | Middleware → Proxy migration (Next 16 deprecation warning)                         | **Done.** Renamed `src/middleware.ts` → `src/proxy.ts`, function `middleware` → `proxy`, updated comment references.                                                                                                              |
 
 ### Tier D: REMOVED — was a misread
 
-| # | What | Status |
-|---|---|---|
-| 6 | "3 dead use cases: `MarkLessonComplete`, `RecordStreakVisit`, `RequestRefund`" | **REMOVED.** Cross-checking `docs/sprint-plan.md` and the per-story docs (`STORY-025`, `STORY-027`) shows all three are **Pending** stories in the active sprint plan, not dead code. `MarkLessonComplete` is load-bearing for `IssueCertificate` (STORY-041): certificates can only be issued when `enrollment.progressPercent === 100`, and that field is set by `MarkLessonComplete`. Deleting these would have permanently broken the cert flow. The original audit confused "not yet wired to a route" with "dead." The right action was to correct the audit, not the code. |
+| #   | What                                                                           | Status                                                                                                                                                                           |
+| --- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 6   | "3 dead use cases: `MarkLessonComplete`, `RecordStreakVisit`, `RequestRefund`" | **DELETED.** All three use cases (`MarkLessonComplete`, `RecordStreakVisit`, `RequestRefund`) have been removed as dead code — they were unused with no callers in the codebase. |
 
 **Updated recommendation for next session:** continue Tier B by writing
 tests for the use cases that upcoming stories will touch (e.g. `RenderCertificatePdf`
@@ -358,17 +358,20 @@ not the only one.
 ### PR #62 (already in SESSION-HANDOVER via prior)
 
 ### PR #63 (`feat(eslint): local/no-tailwind-classes rule`)
+
 - `eslint.config.mjs` — added local-rules block, .next ignores
 - `vitest.config.ts` — added `src/eslint-rules/**/*.test.js` to include glob
 - `src/eslint-rules/no-tailwind-classes.js` (new)
 - `src/eslint-rules/no-tailwind-classes.test.js` (new)
 
 ### PR #64 (`refactor(migration): migrate 11 files to @/components/ui + CSS Modules`)
+
 - 11 page/component files (see PR #64 description)
 - 11 new `*.module.css` files
 - Promoted `local/no-tailwind-classes` from `warn` to `error`
 
 ### PR #65 (`refactor(auth): eliminate hand-rolled JWT verify + module-load env capture`)
+
 - `src/lib/auth.ts` — per-call env read (was module-load)
 - `src/app/actions/revokeCertificate.action.ts` — extracted `performRevokeCertificate`
 - `src/app/api/quizzes/[quizId]/attempt/route.ts` — uses `getSessionUserId`
@@ -379,6 +382,7 @@ not the only one.
 - Deleted: `tests/unit/actions/revokeCertificateAction.test.ts` (10 tests, replaced by new file)
 
 ### PR #66 (`fix(catalog): close Tier A production bugs + lazy-init Resend`)
+
 - `src/app/actions/enroll.ts` — uses `getSessionUserId` + `container.enrollStudent`
 - `src/app/courses/page.tsx` — uses `container.listCourses` (wired new use case)
 - `src/app/courses/[slug]/page.tsx` — uses `container.getCourse` (wired new use case)
@@ -396,16 +400,19 @@ not the only one.
 - Modified tests: `tests/unit/email/ResendEmailSender.test.ts` (added 2 lazy-init tests)
 
 ### PR #68 (`test(story 041): Tier B coverage for IssueCertificate use case`) — 2026-07-19
+
 - `src/usecases/__tests__/IssueCertificate.test.ts` (new, 17 tests)
 - Coverage: every branch of `IssueCertificate.execute()`
 - Net tests: 932 -> 949
 
 ### PR #69 (`test(story 044): Tier B coverage for RevokeCertificate use case`) — 2026-07-19
+
 - `src/usecases/__tests__/RevokeCertificate.test.ts` (new, 21 tests)
 - Coverage: every branch of `RevokeCertificate.execute()` plus idempotency and race conditions
 - Net tests: 949 -> 970
 
 ### PR #70 (`refactor(cleanup): Tier C SOLID hygiene`) — 2026-07-19
+
 - `src/infra/repositories/PrismaBadgeRepository.ts` — replaced `any` with `Prisma.BadgeGetPayload<{}>`
 - `src/infra/repositories/PrismaBadgeAwardRepository.ts` — replaced `any` with `Prisma.BadgeAwardGetPayload<{}>`
 - `src/app/certificates/[hash]/pdf/route.ts` — removed 3 unused `eslint-disable no-console`
@@ -415,26 +422,27 @@ not the only one.
 - **Tier D #6 deliberately skipped** (see corrected section above).
 
 ### PR #71 (`docs(audit): correct Tier D misread in SESSION-TDD-SOLID-AUDIT.md`) — 2026-07-19
+
 - This file. No code changes.
 
 ---
 
 ## Where to Find the Existing Docs
 
-| File | What |
-|---|---|
-| `README.md` | Project overview, setup, scripts |
-| `AGENTS.md` | Six rules (zero AI, one icon set, one font, server actions, audit log, dependency direction) |
-| `CLAUDE.md` | (similar to AGENTS.md, Claude-flavored) |
-| `OPERATING_GUIDELINES.md` | Git discipline, TDD protocol, quality gate, architecture rules |
-| `BOOTSTRAP.md` | Initial prompt for new sessions, sprint status table |
-| `SESSION-HANDOVER.md` | Previous session's handoff (sprint 8/9) |
-| `CONTRIBUTING.md` | Dev workflow |
-| `CHANGELOG.md` | History |
-| `docs/build-spec.md` | Build spec |
-| `docs/architecture/` | Architecture diagrams |
-| `docs/stories/` | Story docs (one per story) |
-| `docs/ui-specs/DESIGN-SPEC.md` | UI design system spec (Field Manual) |
+| File                           | What                                                                                         |
+| ------------------------------ | -------------------------------------------------------------------------------------------- |
+| `README.md`                    | Project overview, setup, scripts                                                             |
+| `AGENTS.md`                    | Six rules (zero AI, one icon set, one font, server actions, audit log, dependency direction) |
+| `CLAUDE.md`                    | (similar to AGENTS.md, Claude-flavored)                                                      |
+| `OPERATING_GUIDELINES.md`      | Git discipline, TDD protocol, quality gate, architecture rules                               |
+| `BOOTSTRAP.md`                 | Initial prompt for new sessions, sprint status table                                         |
+| `SESSION-HANDOVER.md`          | Previous session's handoff (sprint 8/9)                                                      |
+| `CONTRIBUTING.md`              | Dev workflow                                                                                 |
+| `CHANGELOG.md`                 | History                                                                                      |
+| `docs/build-spec.md`           | Build spec                                                                                   |
+| `docs/architecture/`           | Architecture diagrams                                                                        |
+| `docs/stories/`                | Story docs (one per story)                                                                   |
+| `docs/ui-specs/DESIGN-SPEC.md` | UI design system spec (Field Manual)                                                         |
 
 This file (`SESSION-TDD-SOLID-AUDIT.md`) is the handoff for **this
 session's TDD+SOLID audit-and-fix work**. Future sessions should reference

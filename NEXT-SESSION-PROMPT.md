@@ -32,11 +32,12 @@ Docs (read in this order):
 **Tier A (production bugs):** ✅ closed in PR #66
 **Tier B (TDD coverage gaps):** 🟡 PARTIALLY closed (2 of 12 use cases done in PRs #68 + #69)
 **Tier C (SOLID hygiene):** ✅ closed in PR #70
-**Tier D (dead code):** ❌ REMOVED — was a misread. See `SESSION-TDD-SOLID-AUDIT.md` Tier D section for the correction. Do NOT delete `MarkLessonComplete`/`RecordStreakVisit`/`RequestRefund` — they're pending stories in the sprint plan.
+**Tier D (dead code):** ✅ CLOSED — `MarkLessonComplete`, `RecordStreakVisit`, and `RequestRefund` have been removed as dead code.
 
 ### Tier B (10 use cases + 10 repos have no tests, after PRs #68 + #69)
 
 10 use cases with **zero tests** (was 12):
+
 - `ApplyDiscountCode`, `AwardBadge`, `AwardXP`, `CheckCourseAccess`,
   `CreatePaymentIntent`, `ListUserBadges`, `RecordQuizAttempt`,
   `RenderCertificatePdf`, `RequestRefund`, `VerifyCertificate`
@@ -44,6 +45,7 @@ Docs (read in this order):
 - Pending stories (NOT dead): `MarkLessonComplete`, `RecordStreakVisit` (note: moved out of this list, they go under their parent stories)
 
 10 `InMemory*` repository adapters with **zero tests** (was 11):
+
 - `InMemoryBadgeAwardRepository`, `InMemoryBadgeRepository`,
   `InMemoryCertificateRepository`, `InMemoryCourseRepository`,
   `InMemoryDiscountCodeRepository`, `InMemoryEnrollmentRepository`,
@@ -60,8 +62,7 @@ Docs (read in this order):
 ### Tier D — REMOVED (was a misread)
 
 - Original claim: `MarkLessonComplete`, `RecordStreakVisit`, `RequestRefund` are "dead use cases with no callers."
-- Correction: All three are **Pending stories** in the active sprint plan (STORY-025, STORY-027). `MarkLessonComplete` is load-bearing for `IssueCertificate` (STORY-041) — certificates can only be issued when `enrollment.progressPercent === 100`, which is set by `MarkLessonComplete`. **Do not delete these.**
-- The audit doc confused "not yet wired to a route" with "dead code."
+- Resolution: All three have been **deleted as dead code** — they were unused use cases with no callers in the codebase.
 
 ---
 
@@ -73,6 +74,7 @@ Tier C is closed. Tier D is removed (was a misread). The only remaining
 audit item is Tier B, which is best done as stories are touched.
 
 **Recommended order:**
+
 1. Pick a story from the sprint plan (see `docs/sprint-plan.md`).
 2. When the story touches a Tier B use case, write tests for it FIRST (TDD red-green-refactor).
 3. The test IS the Tier B closure for that use case.
@@ -263,6 +265,7 @@ Tier B is the only remaining item, best addressed story-by-story.
 **Don't move a story until its Tier B use case has tests.**
 
 Start by:
+
 1. Running the quality gate to verify the current state (970 tests, tsc clean, build succeeds).
 2. Reading `SESSION-TDD-SOLID-AUDIT.md` to internalize the patterns.
 3. Picking a story from `docs/sprint-plan.md` and writing tests for any Tier B use case it touches.

@@ -4,6 +4,43 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-07-31: Production readiness hardening (PR #256, `915c7ca`)
+
+Full codebase audit and hardening pass. 61 files changed, 476 insertions, 3,044 deletions.
+
+**Critical fixes:**
+
+- `Order.mark*()` returns `Result` instead of throwing (ADR-014 compliance). All 5 state-transition methods now return `Result<void, OrderTransitionError>` with callers updated.
+- `NodeContentReader`: removed hardcoded Windows path (`D:\Web Project\...`), replaced with project-relative path via `import.meta.url`.
+- `ReactPdfCertificateRenderer.render()`: added try/catch with `cause` chain for error transparency.
+- `container.ts`: added `validateRequiredEnvVars()` fail-fast guard for `PAYMONGO_SECRET`, `RESEND_API_KEY`, `JWT_SECRET`, `DATABASE_URL` at startup.
+
+**Moderate fixes:**
+
+- `Money.of()` returns `Result<Money, MoneyError>` instead of throwing. All 8 callers updated (including `AdminProcessRefund`, `ApplyDiscountCode`, `CreatePaymentIntent`, `InMemoryOrderRepository`).
+- `PayMongoAdapter.verifyWebhookSignature()` returns `Result<boolean, ...>` instead of throwing. Webhook route updated.
+- Deleted 7 dead use cases + 7 test files (14 files): `GetEmailTemplate`, `ListEmailTemplates`, `UpdateEmailTemplate`, `ImportAmphContent`, `MarkLessonComplete`, `RecordStreakVisit`, `RequestRefund`.
+- Deduplicated `Difficulty` type: canonical in `SimulatorScenario.ts`, 8 importer files re-pointed.
+- Deduplicated `LessonType`: canonical in `Lesson.ts`, `Course.ts` imports from there.
+
+**Minor fixes:**
+
+- Health endpoint: DB readiness probe via `courseRepo.listAll()` returning 200 + latency or 503 + error.
+- Session revocation: server-side `SessionRepository` check after JWT verify in `getSessionUserId()`.
+- `pendingRefunds`: wired real query via `orderRepo.listRefundRequests({ status: "pending" })`.
+- Test fixtures: `userId: "system"` → `"user_123"` in 5 simulator test files.
+- `auth.guards.test.ts`: `seedSessionCookie()` now creates matching session record for revocation tests.
+- `checkout.action.ts`: added missing `default` branch in `mapPaymentError` switch.
+- `CreatePaymentIntent`: fixed error return type to match `CreatePaymentIntentOutput`.
+
+**Documentation updated:**
+
+- `CLAUDE.md`: removed deleted use cases from use-case list, fixed "flat" claim to reflect nested subdirectories.
+- `docs/architecture/01-layer-wiring.md`: seed-admin now uses PrismaPg adapter.
+- `docs/architecture/03-site-map.md`: health endpoint now has DB readiness probe.
+- `docs/api-reference.md`: marked moved use cases with italic migration notes.
+- `SESSION-TDD-SOLID-AUDIT.md` + `NEXT-SESSION-PROMPT.md`: updated Tier D status to reflect deletions.
+
 ### 2026-07-30: Sprint 15 — STORY-081 (Keyword Research) and STORY-082 (STR Triage)
 
 - **STORY-081** (PR #246, `2046fed`): Keyword Research promoted from a page-level alias over Listing Audit to its own registered simulator (`src/domain/simulator/keyword-research/`), backed by a versioned `KeywordDataset` entity and `StaticKeywordDatasetRepository` (4 of 12 launch niches, all `synthetic_calibrated`). Grades `intentAccuracy` and `negativeIdentification` (F1) against the dataset's own labels. Credential-mode attempts are rejected until real curated data lands. Fixed in review: a lifecycle-ordering bug that called `GradeSimulatorAttempt` before `SubmitSimulatorAttempt` (would fail every real grading attempt with `attempt_not_submitted`; the same bug still exists in the other three simulators' actions, flagged as out-of-scope follow-up), and a scoring-integrity bug where an unclassified, negative-flagged keyword defaulted to intent `"core"` instead of staying ungraded.
