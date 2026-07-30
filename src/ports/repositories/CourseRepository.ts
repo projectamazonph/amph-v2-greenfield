@@ -19,7 +19,28 @@ export interface CourseRepository {
   /** All courses regardless of status (admin only — STORY-036). */
   listAll(): Promise<Result<readonly Course[], CourseError>>;
 
+  /**
+   * Find a course by its unique ID.
+   *
+   * @param id - Course UUID
+   * @returns The course, or `not_found` if no course exists with this ID
+   *
+   * Errors: `not_found` — no course with this ID exists.
+   * Idempotent: Yes — reading does not mutate state.
+   * Postconditions: Returns the course in any status (DRAFT, PUBLISHED, ARCHIVED).
+   */
   findById(id: string): Promise<Result<Course, CourseError>>;
+
+  /**
+   * Find a course by its URL slug.
+   *
+   * @param slug - URL-safe slug (e.g. "ppc-foundations")
+   * @returns The course, or `not_found` if no course exists with this slug
+   *
+   * Errors: `not_found` — no course with this slug exists.
+   * Idempotent: Yes — reading does not mutate state.
+   * Postconditions: Returns the course in any status (DRAFT, PUBLISHED, ARCHIVED).
+   */
   findBySlug(slug: string): Promise<Result<Course, CourseError>>;
 
   // ── STORY-048a: Admin courses CRUD ──────────────────────

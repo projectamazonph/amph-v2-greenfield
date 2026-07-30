@@ -30,11 +30,49 @@ export interface IQuizAttemptRepository {
    * contract is now explicit: `update` is NOT an upsert.
    */
   update(attempt: QuizAttempt): Promise<Result<QuizAttempt, QuizAttemptRepositoryError>>;
+
+  /**
+   * Find a quiz attempt by its unique ID.
+   *
+   * @param id - Attempt UUID
+   * @returns The attempt, or null if no attempt exists with this ID
+   *
+   * Errors: `db_error` — database failure.
+   * Idempotent: Yes — reading does not mutate state.
+   * Postconditions: Returns the attempt in its current state (may be in_progress or graded).
+   */
   findById(id: string): Promise<Result<QuizAttempt | null, QuizAttemptRepositoryError>>;
+
+  /**
+   * Find all attempts by a specific user for a specific quiz.
+   * Used to display attempt history and enforce attempt limits.
+   *
+   * @param userId - User UUID
+   * @param quizId - Quiz UUID
+   * @returns Array of attempts, ordered by creation time (newest first)
+   *
+   * Errors: `db_error` — database failure.
+   * Idempotent: Yes — reading does not mutate state.
+   * Postconditions: Returns empty array if no attempts exist for this user+quiz.
+   */
   findByUserAndQuiz(
     userId: string,
     quizId: string,
   ): Promise<Result<readonly QuizAttempt[], QuizAttemptRepositoryError>>;
+
+  /**
+   * Find the most recent attempt by a specific user for a specific quiz.
+   * Used to check if the user has an in-progress attempt or to display
+   * the latest score.
+   *
+   * @param userId - User UUID
+   * @param quizId - Quiz UUID
+   * @returns The most recent attempt, or null if no attempts exist
+   *
+   * Errors: `db_error` — database failure.
+   * Idempotent: Yes — reading does not mutate state.
+   * Postconditions: Returns the attempt with the latest `createdAt` timestamp.
+   */
   findLatestByUserAndQuiz(
     userId: string,
     quizId: string,
