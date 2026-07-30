@@ -1,0 +1,17 @@
+{
+  "name": "amph-v2-greenfield",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "corepack enable || true",
+  "forwardPorts": [
+    3000,
+    5555,
+    5432
+  ],
+  "remoteUser": "node",
+  "containerUser": "node",
+  "updateRemoteUserUID": true
+}
