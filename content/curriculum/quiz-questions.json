@@ -106,7 +106,7 @@
           "optionC": "They measure the same thing — TACoS is just the newer name",
           "optionD": "TACoS measures click cost while ACoS measures revenue",
           "correctAnswer": "A",
-          "explanation": "TACoS = Ad Spend / Total Revenue (organic + ads), while ACoS = Ad Spend / Ad Revenue only. TACoS gives you a holistic view of how ads impact your total business, not just the direct ad-attributed revenue."
+          "explanation": "TACoS = Ad Spend / Total Revenue (organic + ads), while ACoS = Ad Spend / Ad Revenue only. TACoS shows how ads impact your whole business, not just the direct ad-attributed revenue."
         },
         {
           "order": 5,
@@ -147,6 +147,46 @@
           "optionD": "CTR only affects ad placement, not CPC",
           "correctAnswer": "B",
           "explanation": "Amazon's algorithm uses CTR as a quality signal. Higher CTR indicates relevance, which can lead to better placements at lower costs, creating a virtuous cycle of better performance."
+        },
+        {
+          "order": 9,
+          "question": "A campaign has a strong 3.2% CTR but only a 1.5% CVR, and ACoS is well above margin. What's the most defensible first action?",
+          "optionA": "Lower the bid immediately to cut spend",
+          "optionB": "Pull the search-term report to confirm relevance, then inspect the listing",
+          "optionC": "Pause the keyword since it clearly isn't working",
+          "optionD": "Raise the bid to get more data faster",
+          "correctAnswer": "B",
+          "explanation": "High CTR with low CVR usually points to a listing problem once you've confirmed the traffic is relevant, not a targeting or bid problem. Cutting the bid or pausing the keyword first risks losing traffic that would convert if the listing were fixed."
+        },
+        {
+          "order": 10,
+          "question": "A campaign launched 8 days ago is running a 65% ACoS on a product with a 35% margin. What's the most useful next question?",
+          "optionA": "Is this campaign a failure that should be paused?",
+          "optionB": "Is ACoS trending down week over week as the campaign gathers data?",
+          "optionC": "Should the bid be doubled to win more auctions faster?",
+          "optionD": "Is 65% ACoS acceptable forever since it's a new product?",
+          "correctAnswer": "B",
+          "explanation": "New campaigns often run high ACoS while they build search-term data and reviews. The useful question isn't whether today's number is high, it's whether the trend is moving toward break-even. Judge launch campaigns on trajectory, not one day's number."
+        },
+        {
+          "order": 11,
+          "question": "TACoS has risen from 15% to 22% over the past month while ACoS stayed flat. What should you check before telling the client organic sales are falling?",
+          "optionA": "Nothing — a rising TACoS always means organic sales are falling",
+          "optionB": "The actual ad-sales and organic-sales split behind the total",
+          "optionC": "Whether the client's return policy changed",
+          "optionD": "The campaign's placement adjustments only",
+          "correctAnswer": "B",
+          "explanation": "A rising TACoS with flat ACoS can come from falling organic sales, but also from total sales staying flat while ad spend grows, or a seasonal dip. Pull the ad-sales and organic-sales split before naming a cause."
+        },
+        {
+          "order": 12,
+          "question": "Amazon's suggested bid range for a keyword is $0.90 to $1.30. Your calculated maximum CPC for the target ACoS is $0.60. What should you do?",
+          "optionA": "Bid within Amazon's suggested range since Amazon knows the auction best",
+          "optionB": "Treat the suggested range as a signal to compare against your maximum, and bid at or below what your numbers support",
+          "optionC": "Split the difference between the suggested range and your maximum",
+          "optionD": "Ignore your maximum CPC calculation since Amazon's suggestion is more current",
+          "correctAnswer": "B",
+          "explanation": "Amazon's suggested bid reflects what tends to win the auction, not what your margin can afford. When the suggested range sits above your maximum CPC, hold your bid near your own ceiling and investigate targeting or listing fixes instead of chasing the suggestion."
         }
       ]
     },
@@ -204,6 +244,36 @@
           "optionD": "Broad match keywords stop working after enough data accumulates",
           "correctAnswer": "A",
           "explanation": "Once an exact-match keyword has a real conversion track record, it's the most predictable place to invest further budget. Broad and phrase remain useful for discovering new terms, not for scaling proven ones."
+        },
+        {
+          "order": 6,
+          "question": "An ad group has \"cutting board for meat,\" \"cutting board gift set,\" and \"large cutting board.\" What's the problem with this grouping?",
+          "optionA": "There's no problem — they're all cutting board keywords",
+          "optionB": "The keywords reflect three different shopper intents (use case, gift buying, size), so one bid and one negative list won't fit all three well",
+          "optionC": "The group has too few keywords to be useful",
+          "optionD": "Match types are mixed, which is the only real grouping error",
+          "correctAnswer": "B",
+          "explanation": "A good ad group shares one obvious shopper intent so a single bid and negative list make sense for everything in it. A gift buyer, a use-case buyer, and a size-driven buyer are different shoppers behind the same product, and grouping them together blurs the bid and reporting clarity theming is supposed to give you."
+        },
+        {
+          "order": 7,
+          "question": "Why run broad, phrase, and exact match versions of the same keyword in separate campaigns instead of the same ad group?",
+          "optionA": "Amazon technically forbids mixing match types in one ad group",
+          "optionB": "It gives independent budget and bid control per match type and avoids the same keyword competing against itself across match types",
+          "optionC": "Separate campaigns are required before Brand Registry approval",
+          "optionD": "It has no real effect — it's mainly a cosmetic organization choice",
+          "correctAnswer": "B",
+          "explanation": "Mixing match types in one ad group causes cannibalization: the same keyword in broad and exact can compete against itself in the auction. Separate campaigns by match type give you independent budgets and bids, and a clean read on which match type is actually performing."
+        },
+        {
+          "order": 8,
+          "question": "You've pulled 300 candidate keywords. Which two filtering criteria should you apply first, before scoring by volume or competition?",
+          "optionA": "Volume and competition",
+          "optionB": "Relevance and purchase intent",
+          "optionC": "Alphabetical order and keyword length",
+          "optionD": "Price and category",
+          "correctAnswer": "B",
+          "explanation": "Relevance and intent are the first cut: remove anything outside your product category and anything reflecting research intent (\"how to,\" \"vs,\" \"review\") before you spend time scoring what survives for volume and competition. Filtering by volume too early wastes scoring effort on keywords that should never have made the list."
         }
       ]
     },
@@ -261,6 +331,36 @@
           "optionD": "It removes Amazon's referral fees",
           "correctAnswer": "B",
           "explanation": "Brand Registry unlocks A+ Content and Sponsored Brands campaigns, both commonly linked to better conversion and reach. It's not a ranking guarantee, not required for basic Sponsored Products, and has nothing to do with referral fees."
+        },
+        {
+          "order": 6,
+          "question": "A listing's main image is 800px on a white background. What's the concrete problem?",
+          "optionA": "Nothing — white background is all that matters",
+          "optionB": "It's below the roughly 1000px minimum needed to enable Amazon's zoom feature",
+          "optionC": "Amazon will suspend the listing immediately",
+          "optionD": "The image needs a colored background instead",
+          "correctAnswer": "B",
+          "explanation": "Main images need to be at least around 1000px to enable Amazon's zoom feature, which listings commonly rely on to help shoppers examine the product before buying. White background is necessary but not sufficient on its own."
+        },
+        {
+          "order": 7,
+          "question": "A bullet point reads \"350ml capacity.\" What's missing to make it a PPC-aware bullet?",
+          "optionA": "Nothing — specs are exactly what shoppers want to see",
+          "optionB": "The benefit and proof that turn the spec into a reason to buy",
+          "optionC": "A keyword-stuffed rewrite of the same spec",
+          "optionD": "An exclamation point for emphasis",
+          "correctAnswer": "B",
+          "explanation": "A bare feature like \"350ml capacity\" tells a shopper what the product is, not why it matters to them. The feature-to-benefit-to-proof structure turns a spec into a reason to click and buy."
+        },
+        {
+          "order": 8,
+          "question": "Why should a title stay concise and natural instead of stuffing in every possible keyword?",
+          "optionA": "Amazon enforces category-specific title-length limits, and a truncated or rejected title is worse than a clean, shorter one",
+          "optionB": "Longer titles always rank higher regardless of length limits",
+          "optionC": "Keyword stuffing has no downside as long as every word is relevant",
+          "optionD": "Amazon rewards keyword density with a lower CPC",
+          "correctAnswer": "A",
+          "explanation": "Amazon enforces hard title-length limits that vary by category and change over time. A title that gets truncated on mobile or rejected outright is a worse outcome than a shorter, natural title with the primary keyword near the front."
         }
       ]
     },
@@ -328,6 +428,113 @@
           "optionD": "Running auto campaigns alongside manual campaigns",
           "correctAnswer": "A",
           "explanation": "Under-budgeting causes campaigns to stop running before the day ends. Amazon shoppers are active 24/7, and you may miss peak converting hours. Monitor spend patterns and set budgets that allow full-day coverage for proven campaigns."
+        },
+        {
+          "order": 7,
+          "question": "Your exact-match campaign already targets \"garlic press\" at a $1.10 bid with a proven 18% CVR. Your broad-match campaign for the same product is also picking up clicks on the same search term at a $0.35 bid. What fixes this?",
+          "optionA": "Raise the exact-match bid even higher to compensate",
+          "optionB": "Add \"garlic press\" as a negative exact keyword inside the broad-match campaign",
+          "optionC": "Delete the broad-match campaign entirely",
+          "optionD": "Lower the broad campaign's daily budget to zero",
+          "correctAnswer": "B",
+          "explanation": "Broad match naturally also matches the exact search it's meant to discover around, so both of your own campaigns end up eligible for the same search. Adding the term as a negative exact in the broad campaign stops it from competing with the exact campaign that already owns that keyword, freeing the broad campaign's budget for genuinely new terms."
+        },
+        {
+          "order": 8,
+          "question": "In the Campaign Builder tool's scoring, which criterion carries the most weight, and why?",
+          "optionA": "Keyword selection, because relevance matters more than anything else",
+          "optionB": "Campaign structure, because a well-organized campaign with decent keywords outperforms a chaotic campaign with great keywords",
+          "optionC": "Negative keywords, because wasted spend is the single biggest risk",
+          "optionD": "Budget allocation, because the campaign with the most money always wins",
+          "correctAnswer": "B",
+          "explanation": "Campaign structure carries the most weight (30%) because it's the foundation everything else depends on. Good keywords and reasonable bids can't do their job inside a structure that mixes proven and unproven terms in the same budget and ad group."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 5,
+      "title": "Portfolio Strategy Knowledge Check",
+      "description": "Test your understanding of campaign portfolios, budget pacing, and seasonal strategy.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "At roughly what campaign count does it make sense to move from managing campaigns individually to grouping them into portfolios?",
+          "optionA": "2-3 campaigns",
+          "optionB": "10 or more campaigns",
+          "optionC": "100 or more campaigns",
+          "optionD": "Never — always manage every campaign individually",
+          "correctAnswer": "B",
+          "explanation": "Below roughly 10 campaigns, managing each one individually is still practical. Past that point, shared budgeting and consolidated reporting through portfolios save real time."
+        },
+        {
+          "order": 2,
+          "question": "A portfolio has a ₱60,000 monthly budget. Campaigns inside it have spent ₱57,000 combined with a few days left in the month. What happens once the portfolio's ₱60,000 is fully spent?",
+          "optionA": "Only the highest-spending campaign inside the portfolio pauses",
+          "optionB": "Every campaign inside the portfolio stops serving for the rest of the period, regardless of each one's own remaining budget",
+          "optionC": "The portfolio automatically raises its own budget to keep campaigns running",
+          "optionD": "Nothing — portfolio budgets are informational only and don't cap spend",
+          "correctAnswer": "B",
+          "explanation": "A portfolio budget is a spend cap for the whole group over the period. Once it's exhausted, every campaign inside stops serving, even one that still had room left on its own individual budget."
+        },
+        {
+          "order": 3,
+          "question": "Do negative keywords and bid adjustments apply across every campaign in a portfolio automatically?",
+          "optionA": "Yes — portfolios manage negatives and bids for every campaign inside them",
+          "optionB": "No — negatives and bid adjustments are campaign-level controls, so each campaign in a portfolio still needs its own",
+          "optionC": "Only bids are shared across the portfolio, not negatives",
+          "optionD": "Only negatives are shared across the portfolio, not bids",
+          "correctAnswer": "B",
+          "explanation": "Portfolios group campaigns for shared budgeting and reporting only. Negative keywords and bid adjustments stay campaign-level, so a new campaign added to a portfolio still needs its own negative list built or copied over."
+        },
+        {
+          "order": 4,
+          "question": "A campaign with a ₱1,500 daily budget has spent 80% of it by 11AM, three days running. What does this pattern indicate, and what's the fix?",
+          "optionA": "Normal pacing — no action needed",
+          "optionB": "Budget is too low for demand; raise the daily budget",
+          "optionC": "Budget is too high for demand; lower it",
+          "optionD": "The campaign should be paused immediately",
+          "correctAnswer": "B",
+          "explanation": "A good pacing target is 80-90% of the daily budget spent by end of day. Hitting 80% by 11AM repeatedly means the campaign is burning through budget in a few hours and going dark for the rest of the day — a sign to raise the budget, not a curiosity to ignore."
+        },
+        {
+          "order": 5,
+          "question": "Over what period is Amazon's stated daily budget actually averaged, and what does that mean for a single day's spend?",
+          "optionA": "Averaged over the calendar month; a single day can legitimately spend above the daily budget, up to an account-set over-delivery cap",
+          "optionB": "Averaged over a single week only",
+          "optionC": "It's a hard per-day cap that can never be exceeded",
+          "optionD": "Averaged over the product's entire lifetime on Amazon",
+          "correctAnswer": "A",
+          "explanation": "The daily budget is averaged over the calendar month, and Amazon allows a single high-traffic day to spend above that average, capped at either 25% or 100% over depending on the account's setting, as long as the month's total doesn't exceed daily budget times days in the month."
+        },
+        {
+          "order": 6,
+          "question": "ACoS rises from 20% to 32% during a seasonal push while margin stays flat and ad spend grows substantially. What should decide whether this is actually a problem?",
+          "optionA": "ACoS alone — any increase is a red flag that should be reversed",
+          "optionB": "Whether profit after ad spend (sales times margin, minus ad spend) still increases despite the higher ACoS",
+          "optionC": "Whether the client feels nervous about the number",
+          "optionD": "The absolute peso size of the ad spend increase, regardless of sales",
+          "correctAnswer": "B",
+          "explanation": "A higher ACoS during a seasonal push is expected and can still mean more money for the client, as long as the sales-volume increase outpaces the efficiency drop. Profit after ad spend is the number that actually answers whether the trade-off is worth it, not ACoS on its own."
+        },
+        {
+          "order": 7,
+          "question": "Per this module's seasonal calendar, when should Q4 (Christmas) PPC preparation start?",
+          "optionA": "October 1, when Q4 officially begins",
+          "optionB": "August, roughly two months ahead of the peak spending window",
+          "optionC": "The day after Black Friday",
+          "optionD": "Whenever the client happens to remember to ask",
+          "correctAnswer": "B",
+          "explanation": "Christmas prep starts in August: researching seasonal keywords, launching discovery campaigns, and testing seasonal messaging well before the November-December peak window."
+        },
+        {
+          "order": 8,
+          "question": "A seasonal profit-after-ad-spend calculation assumes margin stays flat between a normal month and a promotional month. What should you check before trusting that calculation?",
+          "optionA": "Nothing — margin never changes seasonally",
+          "optionB": "Whether the seller is running discounts or lower prices during the promotional push, which would lower the actual margin used in the calculation",
+          "optionC": "Whether the client has approved the calculation in writing",
+          "optionD": "Whether ACoS stays below 50% throughout the season",
+          "correctAnswer": "B",
+          "explanation": "Sellers often discount or run promotions during peak season, which lowers the actual margin. A profit-after-ad-spend projection built on a flat margin assumption needs to be redone with the real promotional margin, not treated as guaranteed."
         }
       ]
     },
@@ -381,10 +588,30 @@
           "question": "Your keyword has a CPC of $2.50, CVR of 8%, and your product price is $30 with 30% profit margin. What is your approximate ACoS?",
           "optionA": "8.3%",
           "optionB": "62.5%",
-          "optionC": "1042%",
+          "optionC": "104.2%",
           "optionD": "42.7%",
-          "correctAnswer": "B",
+          "correctAnswer": "C",
           "explanation": "Cost per order = CPC / CVR = $2.50 / 0.08 = $31.25. ACoS = Ad Spend / Ad Revenue = $31.25 / $30 = 104.2%. Since this exceeds 100%, you're paying more per order than the product price — this keyword is extremely unprofitable."
+        },
+        {
+          "order": 6,
+          "question": "A $1.00 base bid uses Dynamic Up and Down at its maximum +100% increase, stacked with a +900% top-of-search placement adjustment. What's the maximum possible effective bid at top of search?",
+          "optionA": "$1.00, since placement adjustments replace the dynamic increase rather than stacking with it",
+          "optionB": "$10.00, from the placement adjustment alone",
+          "optionC": "$20.00, since the two multipliers stack: $1.00 × 2.0 × 10.0",
+          "optionD": "$2.00, from the dynamic increase alone",
+          "correctAnswer": "C",
+          "explanation": "Dynamic bid adjustments and placement adjustments stack multiplicatively, not additively. At their combined maximum, a $1.00 base bid can become $1.00 × 2.0 (dynamic) × 10.0 (placement) = $20.00, a 20x multiplier that catches advertisers who only account for one of the two."
+        },
+        {
+          "order": 7,
+          "question": "A keyword's market CPC range sits entirely above your calculated max CPC for the target ACoS. What are your real options?",
+          "optionA": "Bid above your max CPC anyway, since high competition means the keyword must be worth it",
+          "optionB": "Accept a higher ACoS, improve CVR through listing work, or walk away from the keyword",
+          "optionC": "Always walk away — there's never a reason to bid above your calculated max CPC",
+          "optionD": "Switch to Dynamic Up and Down, which removes the ceiling entirely",
+          "correctAnswer": "B",
+          "explanation": "Good bidding is as much about walking away as picking a number. When the market won't let you win profitably at your target ACoS, the real choices are accepting a higher ACoS (sometimes defensible, like during a launch), improving conversion rate so the same CPC supports a lower ACoS, or not bidding on that keyword at all — not bidding blind above your ceiling."
         }
       ]
     },
@@ -452,6 +679,73 @@
           "optionD": "It replaces the need for bid strategy adjustments",
           "correctAnswer": "B",
           "explanation": "Regular search term analysis is the single highest-ROI activity in PPC management. It lets you cut waste (irrelevant terms draining budget) and capture opportunity (converting terms you should bid on explicitly). This is the core loop: discover → triage → optimize → repeat."
+        },
+        {
+          "order": 7,
+          "question": "A search term has 3 clicks and 1 order, a 33% CVR. Why shouldn't you treat this as proof the term is a strong converter?",
+          "optionA": "3 clicks is too small a sample to trust; the true conversion rate could be very different once more data comes in",
+          "optionB": "33% CVR is mathematically impossible, so the data must be wrong",
+          "optionC": "You should always wait exactly 100 clicks before taking any action on any term",
+          "optionD": "Low click counts always mean the term is irrelevant",
+          "correctAnswer": "A",
+          "explanation": "A handful of clicks can produce an eye-catching CVR by pure chance. Confidence grows with volume: below 30 clicks your CVR estimate carries a wide margin of error, and it's much tighter above 100 clicks. A 33% CVR on 3 clicks is one lucky order, not a proven pattern yet."
+        },
+        {
+          "order": 8,
+          "question": "You rank #2 organically for a keyword your Sponsored Products ad also targets. A shopper who would have found you organically clicks the paid ad instead. What category does this fall into, and what should you check?",
+          "optionA": "Winner — any click that converts should be harvested and bid up further",
+          "optionB": "Cannibalizer — check whether the ad click is incremental or just paying for traffic you'd have gotten for free",
+          "optionC": "Irrelevant — negative the term immediately",
+          "optionD": "Surprise — investigate it as a new keyword opportunity",
+          "correctAnswer": "B",
+          "explanation": "This is the Cannibalizer category: you may be paying for a click you'd have earned organically anyway. The judgment call is whether the ad is bringing in incremental shoppers (good) or just displacing free organic clicks (wasted spend) — worth reducing bids on if you rank highly, and worth keeping if your organic position is weak."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 8,
+      "title": "Competitive Intelligence Knowledge Check",
+      "description": "Test your understanding of Brand Analytics, share of voice, and competitor benchmarking.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "What does Amazon Brand Analytics' Search Frequency Rank actually tell you about a search term?",
+          "optionA": "The exact number of monthly searches for that term",
+          "optionB": "A relative ranking against every other search term in the period — rank 1 is the most-searched, but the gap between ranks isn't a fixed size",
+          "optionC": "How many advertisers are currently bidding on that term",
+          "optionD": "The term's average CPC across the category",
+          "correctAnswer": "B",
+          "explanation": "Search Frequency Rank is relative, not absolute. Rank 1 is the single most-searched term in the period, and higher numbers mean less popular, but Amazon doesn't disclose actual search counts, and the gap between rank 5 and 6 isn't the same size as between rank 100 and 101."
+        },
+        {
+          "order": 2,
+          "question": "Per this lesson, what does a seller need beyond Brand Registry enrollment to actually access Amazon Brand Analytics?",
+          "optionA": "Nothing more — Brand Registry enrollment alone is sufficient",
+          "optionB": "An active Professional selling account and Brand Representative access assigned for the enrolled brand",
+          "optionC": "At least $10,000 in monthly ad spend",
+          "optionD": "A minimum of 100 product reviews",
+          "correctAnswer": "B",
+          "explanation": "Brand Registry enrollment alone isn't enough to see Brand Analytics. The account also needs an active Professional selling account and Brand Representative access assigned for that brand — confirm both before promising a client this data."
+        },
+        {
+          "order": 3,
+          "question": "Share of voice measures which of the following?",
+          "optionA": "How much a brand spends on advertising in total dollars",
+          "optionB": "A brand's visibility relative to competitors for a given keyword or category, not an absolute spend figure",
+          "optionC": "The number of five-star reviews a product has",
+          "optionD": "How many Sponsored Brands campaigns an account is running",
+          "correctAnswer": "B",
+          "explanation": "Share of voice is a relative visibility measure — how often a brand shows up for a keyword or category compared to competitors — not a dollar figure or a review count."
+        },
+        {
+          "order": 4,
+          "question": "A gap analysis dimension shows competitors averaging 2.5 (Strong/Medium) and you averaging 1.0 (Weak). Using the matrix's scoring rule (Opportunity = competitors' average at or below 1.5 and yours at or above 2; Vulnerability = competitors' average at or above 2 and yours at or below 1.5), what does this dimension represent?",
+          "optionA": "Opportunity — double down since you're clearly ahead of competitors here",
+          "optionB": "Vulnerability — competitors are strong here and you're weak, so this needs shoring up",
+          "optionC": "Neither — this dimension needs no action",
+          "optionD": "Not enough information — the four-point scale doesn't apply to this dimension",
+          "correctAnswer": "B",
+          "explanation": "This clears the vulnerability rule exactly: competitors' average (2.5) is at or above 2, and your average (1.0) is at or below 1.5. That combination means competitors are winning where you're weak — a gap to shore up, not one to leave for later."
         }
       ]
     }
