@@ -84,7 +84,7 @@ export default async function LessonPage({ params }: PageProps) {
     <div className={styles.layout}>
       {/* Sidebar navigation */}
       <LessonSidebar
-        course={course}
+        course={{ slug: course.slug, title: course.title, curriculum: course.curriculum }}
         currentLessonId={lessonId}
         completedLessonIds={completedLessonIds}
       />
