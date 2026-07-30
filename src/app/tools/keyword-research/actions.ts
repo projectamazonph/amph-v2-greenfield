@@ -273,10 +273,10 @@ export async function keywordResearchAttempt(
     },
   });
   if (Result.isErr(decisionResult)) {
-    console.warn(
-      `Failed to save keyword-research decision for attempt "${attemptId}":`,
-      decisionResult.error,
-    );
+    container.logger.warn("Failed to save keyword-research decision", {
+      attemptId,
+      error: decisionResult.error,
+    });
   }
 
   // ── 6. Run simulator ────────────────────────────────────────────────

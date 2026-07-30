@@ -113,6 +113,7 @@ const mockContainer = {
   gradeSimulatorAttempt: { execute: vi.fn() },
   composeAttemptFeedback: { execute: vi.fn() },
   submitSimulatorAttempt: { execute: vi.fn() },
+  logger: { warn: vi.fn() },
 };
 
 const fakeSimulator = {
@@ -308,6 +309,21 @@ describe("keywordResearchAttempt", () => {
     if (result.ok) return;
     expect(result.error.kind).toBe("attempt_error");
     expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
+  });
+
+  it("logs (not console.warn) and continues when saveSimulatorDecision fails", async () => {
+    mockContainer.saveSimulatorDecision.execute.mockResolvedValueOnce(
+      Result.err({ kind: "attempt_not_in_progress" }),
+    );
+    const result = await keywordResearchAttempt({
+      niche: "bamboo-cutting-board",
+      classifications: VALID_CLASSIFICATIONS,
+    });
+    expect(result.ok).toBe(true);
+    expect(mockContainer.logger.warn).toHaveBeenCalledWith(
+      "Failed to save keyword-research decision",
+      expect.objectContaining({ attemptId: "ATT-KW12345" }),
+    );
   });
 
   it("returns attempt_error when startSimulatorAttempt fails", async () => {
