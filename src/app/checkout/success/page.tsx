@@ -18,72 +18,8 @@
  */
 
 import Link from "next/link";
-
-const STYLES: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "24px 16px",
-    background: "var(--surface-0)",
-  },
-  card: {
-    width: "100%",
-    maxWidth: 480,
-    background: "white",
-    border: "1px solid var(--border)",
-    borderRadius: 8,
-    padding: "clamp(24px, 8vw, 40px) clamp(20px, 8vw, 40px) 32px",
-    display: "flex",
-    flexDirection: "column",
-    gap: 24,
-    textAlign: "center",
-    overflowWrap: "anywhere",
-  },
-  logo: {
-    fontFamily: "var(--font-mono)",
-    fontSize: 11,
-    fontWeight: 700,
-    letterSpacing: "0.12em",
-    color: "var(--accent)",
-    textTransform: "uppercase",
-  },
-  checkmark: {
-    width: 64,
-    height: 64,
-    margin: "0 auto",
-    color: "var(--success)",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 700,
-    color: "var(--ink-900)",
-    lineHeight: 1.2,
-    letterSpacing: "-0.02em",
-  },
-  body: {
-    fontSize: 15,
-    color: "var(--ink-500)",
-    lineHeight: 1.6,
-  },
-  cta: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-  },
-  link: {
-    color: "var(--accent)",
-    textDecoration: "none",
-    fontWeight: 600,
-  },
-  orderId: {
-    fontFamily: "var(--font-mono)",
-    fontSize: 11,
-    color: "var(--ink-500)",
-    wordBreak: "break-all",
-  },
-};
+import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
+import styles from "../checkout-status.module.css";
 
 export default function CheckoutSuccessPage({
   searchParams,
@@ -92,24 +28,16 @@ export default function CheckoutSuccessPage({
 }) {
   const orderId = searchParams.orderId?.trim() ?? "";
   return (
-    <div style={STYLES.page}>
-      <div style={STYLES.card}>
-        <div style={STYLES.logo}>Project Amazon PH Academy</div>
-        <svg
-          style={STYLES.checkmark}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-        <h1 style={STYLES.title}>Payment received</h1>
-        <p style={STYLES.body}>
+    <div className={styles.page}>
+      <div className={styles.card}>
+        <div className={styles.logo}>Project Amazon PH Academy</div>
+        <CheckCircle className={styles.checkmark} weight="duotone" aria-hidden="true" />
+        <h1 className={styles.title}>Payment received</h1>
+        <p className={styles.body}>
           Thanks for your purchase. We're confirming your enrollment — it usually takes a few
           seconds. Head to your dashboard to start learning.
         </p>
-        <div style={STYLES.cta}>
+        <div className={styles.cta}>
           <Link
             href="/dashboard"
             className="btn btn-primary"
@@ -117,11 +45,11 @@ export default function CheckoutSuccessPage({
           >
             Go to dashboard
           </Link>
-          <Link href="/courses" style={STYLES.link}>
+          <Link href="/courses" className={styles.link}>
             Back to catalog
           </Link>
         </div>
-        {orderId && <p style={STYLES.orderId}>Order reference: {orderId}</p>}
+        {orderId && <p className={styles.orderId}>Order reference: {orderId}</p>}
       </div>
     </div>
   );

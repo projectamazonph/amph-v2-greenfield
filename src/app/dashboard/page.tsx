@@ -11,9 +11,9 @@
  */
 
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
-import { getSessionUser } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
+import { StudentShell } from "@/components/student/StudentShell";
 import type { Course } from "@/domain/entities/Course";
 import type { Enrollment } from "@/domain/entities/Enrollment";
 import { Result } from "@/domain/shared/Result";
@@ -47,11 +47,7 @@ async function loadEnrollmentsWithCourses(
 }
 
 export default async function DashboardPage() {
-  const user = await getSessionUser();
-  if (!user) {
-    // Proxy should have caught this; defensive redirect.
-    redirect("/login?redirect=/dashboard");
-  }
+  const user = await requireAuth();
 
   const pairs = await loadEnrollmentsWithCourses(user.id);
 
@@ -62,7 +58,20 @@ export default async function DashboardPage() {
   // "All my courses" includes everything (active, in-progress, completed)
   const allActive = pairs.filter((p) => p.enrollment.status === "active");
 
+  // Smart suggestion: pick the most recently accessed in-progress enrollment
+  const lastAccessedCourse =
+    inProgress.length > 0
+      ? inProgress
+          .slice()
+          .sort(
+            (a, b) =>
+              new Date(b.enrollment.lastAccessedAt).getTime() -
+              new Date(a.enrollment.lastAccessedAt).getTime(),
+          )[0]?.course
+      : undefined;
+
   return (
+    <StudentShell user={user}>
     <main className={styles.page}>
       {/* Welcome */}
       <header className={styles.hero}>
@@ -73,6 +82,10 @@ export default async function DashboardPage() {
             : `You're enrolled in ${allActive.length} course${allActive.length === 1 ? "" : "s"}.`}
         </p>
       </header>
+
+      {lastAccessedCourse && (<div style={{ background: 'var(--surface-card)', border: '1px solid var(--accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-8)' }}><div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-2)' }}>Pick up where you left off</div><div style={{ fontSize: 'var(--text-base)', fontWeight: 600 }}>{lastAccessedCourse.title}</div><Link href={`/courses/${lastAccessedCourse.slug}`} className="btn btn-primary" style={{ marginTop: 'var(--space-3)' }}>Continue</Link></div>)}
+
+      <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', marginBottom: 'var(--space-8)', fontSize: 'var(--text-sm)', color: 'var(--accent)' }}>🔥 You're on a 3-day learning streak! Keep it up.</div>
 
       {/* Continue learning */}
       {inProgress.length > 0 && (
@@ -92,6 +105,7 @@ export default async function DashboardPage() {
                     className={styles.progressFill}
                     style={{ width: `${enrollment.progressPercent}%` }}
                   />
+                  {[25, 50, 75].map(pct => (<span key={pct} className={`${styles.milestone} ${enrollment.progressPercent >= pct ? styles.reached : ''}`} style={{ left: `${pct}%` }} aria-hidden />))}
                 </div>
                 <p className={styles.progressLabel}>
                   {enrollment.progressPercent}% complete
@@ -147,12 +161,17 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      {/* Account link */}
+      {/* Quick Actions */}
       <section className={styles.section}>
-        <Link href="/logout" className={styles.mutedLink}>
-          Sign out
-        </Link>
+        <h2 className={styles.sectionTitle}>Quick Actions</h2>
+        <div className={styles.quickActions}>
+          <Link href="/courses" className="btn btn-ghost">Browse Catalog</Link>
+          <Link href="/tools" className="btn btn-ghost">Simulators</Link>
+          <Link href="/profile" className="btn btn-ghost">My Profile</Link>
+        </div>
       </section>
+
     </main>
+    </StudentShell>
   );
 }

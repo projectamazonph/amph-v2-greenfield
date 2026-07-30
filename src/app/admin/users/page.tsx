@@ -90,6 +90,12 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
   return (
     <div>
+      <nav style={{ marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--ink-500)' }}>
+        <Link href="/admin" style={{ color: 'var(--ink-500)', textDecoration: 'none' }}>Admin</Link>
+        <span style={{ margin: '0 var(--space-2)' }}>/</span>
+        <span>Users</span>
+      </nav>
+
       <TopBar
         title="Users"
         subtitle={`${totalCount} total`}
@@ -126,6 +132,10 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
         </button>
       </form>
 
+      <div style={{ marginBottom: 'var(--space-4)' }}><input type="text" placeholder="Search by name or email..." className={styles.filterInput || ''} style={{ padding: 'var(--space-2) var(--space-3)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)', width: '100%', maxWidth: 320 }} /></div>
+
+      <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>All</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Student</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Admin</button></div>
+
       {/* Table — client component handles renderCell (function props) */}
       <Card padding={6}>
         <AdminUsersTable
@@ -136,6 +146,15 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
           filters={{ search, role, tier }}
         />
       </Card>
+
+      {users.length === 0 && (
+        <div style={{ textAlign: 'center', padding: 'var(--space-10)', color: 'var(--ink-500)' }}>
+          <p>No users found.</p>
+          <Link href="/admin/users/new" className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>
+            + Create User
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

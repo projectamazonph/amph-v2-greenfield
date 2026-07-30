@@ -12,6 +12,7 @@
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
+import { StudentShell } from '@/components/student/StudentShell';
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -65,6 +66,24 @@ export default async function CertificatePage({ params }: PageProps) {
   const truncatedHash = `${certificate.verificationHash.slice(0, 8)}…${certificate.verificationHash.slice(-8)}`;
 
   return (
+    <StudentShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'EducationalOccupationalCredential',
+            name: `Certificate: ${course.title}`,
+            description: `Certificate of completion for ${course.title} issued by AMPH Academy`,
+            issuedBy: {
+              '@type': 'Organization',
+              name: 'AMPH Academy',
+            },
+            datePublished: certificate.issuedAt?.toISOString?.() || new Date().toISOString(),
+            credentialCategory: 'certificate',
+          }),
+        }}
+      />
     <main className={styles.page}>
       <div className={styles.container}>
         {/* Status badge */}
@@ -178,6 +197,7 @@ export default async function CertificatePage({ params }: PageProps) {
               Browse Courses
             </Button>
           </Link>
+          <button onClick={() => window.print()} className="btn btn-ghost" style={{ marginTop: 'var(--space-4)' }}>Download Certificate</button>
         </div>
 
         {/* Verification footer */}
@@ -188,5 +208,6 @@ export default async function CertificatePage({ params }: PageProps) {
         </p>
       </div>
     </main>
+    </StudentShell>
   );
 }

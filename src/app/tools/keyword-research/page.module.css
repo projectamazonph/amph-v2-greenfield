@@ -49,3 +49,5 @@
   max-width: 72ch;
   margin: 0;
 }
+
+@media (max-width: 767px) { .layout { flex-direction: column; } }

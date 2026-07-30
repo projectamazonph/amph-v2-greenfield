@@ -74,9 +74,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/users" className={styles.backLink}>
-        ← Back to users
-      </Link>
+      <Link href="/admin/users" style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-500)', textDecoration: 'none', marginBottom: 'var(--space-4)', display: 'inline-block' }}>← Back to Users</Link>
 
       <TopBar
         title={fullName}

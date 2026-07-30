@@ -91,3 +91,13 @@
   color: var(--accent);
   font-weight: 500;
 }
+
+.errorMessage {
+  font-size: var(--text-sm);
+  color: var(--danger);
+  padding: var(--space-3) var(--space-4);
+  background: #FFF5F5;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+}

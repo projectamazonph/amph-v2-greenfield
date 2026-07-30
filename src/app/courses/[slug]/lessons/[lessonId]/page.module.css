@@ -165,4 +165,12 @@
   .content {
     padding: var(--space-6) var(--space-4);
   }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: 40vh;
+    overflow-y: auto;
+  }
 }

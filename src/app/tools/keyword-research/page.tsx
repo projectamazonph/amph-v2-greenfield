@@ -6,7 +6,9 @@
  * ListingAuditSimulator's hardcoded keyword generator.
  */
 
+import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { StudentShell } from "@/components/student/StudentShell";
 import { KeywordResearchForm } from "@/components/tools/KeywordResearchForm";
 import styles from "./page.module.css";
 
@@ -27,9 +29,10 @@ export default async function KeywordResearchPage() {
   }
 
   return (
+    <StudentShell>
     <main className={styles.page}>
       <nav className={styles.breadcrumb}>
-        <a href="/tools">← Tools</a>
+        <Link href="/tools">← Tools</Link>
         <span aria-hidden="true"> / </span>
         <span>Keyword Research</span>
       </nav>
@@ -40,5 +43,6 @@ export default async function KeywordResearchPage() {
       </header>
       <KeywordResearchForm initialNiche={SCENARIO.seedNiche} />
     </main>
+    </StudentShell>
   );
 }

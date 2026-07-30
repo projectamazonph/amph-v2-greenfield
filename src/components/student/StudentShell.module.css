@@ -1,0 +1,28 @@
+/* StudentShell.module.css — fixed-left sidebar + flex content.
+   Mirrors admin layout.module.css for consistency.
+   Per design spec §9.1: 240px sidebar, no overlap, no absolute stacking.
+   Hallmark · macrostructure: Sidebar-Layout (N3) · tone: utilitarian
+   · overflow-x: clip on shell so wide children can't push the page
+     horizontally and break the layout. */
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--surface-0);
+  font-family: var(--font-body);
+  overflow-x: clip;
+}
+
+.main {
+  flex: 1;
+  min-width: 0; /* prevent flex item from overflowing */
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@media (max-width: 1023px) {
+  .shell {
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+}

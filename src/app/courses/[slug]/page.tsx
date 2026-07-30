@@ -11,6 +11,7 @@
  */
 
 import Link from "next/link";
+import { StudentShell } from "@/components/student/StudentShell";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
@@ -49,7 +50,9 @@ export default async function CourseDetailPage({ params }: PageProps) {
     detail.priceMinor === 0 ? "FREE" : `₱${(detail.priceMinor / 100).toFixed(2)}`;
 
   return (
+    <StudentShell>
     <main className={styles.page}>
+      <Link href={`/checkout?courseSlug=${detail.slug}`} className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Enroll Now</Link>
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerInner}>
@@ -77,6 +80,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <span className={styles.metaItem}>
                   <BookIcon /> {totalLessonCount} lesson{totalLessonCount !== 1 ? "s" : ""}
                 </span>
+                <span className={styles.metaDivider}>·</span><span className={styles.metaItem}>≈ {Math.ceil(course.curriculum.sections.flatMap(s => s.lessons).length * 0.5)} hours</span>
                 {totalEstimatedMinutes > 0 && (
                   <span className={styles.metaItem}>
                     <ClockIcon /> {hours > 0 ? `${hours}h ` : ""}
@@ -91,6 +95,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 courseSlug={detail.slug}
                 priceMinor={detail.priceMinor}
               />
+              <button className="btn btn-ghost" style={{ marginLeft: 'var(--space-2)' }}>Share</button>
             </div>
           </div>
         </div>
@@ -130,6 +135,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
         </div>
       </div>
     </main>
+    </StudentShell>
   );
 }
 

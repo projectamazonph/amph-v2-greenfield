@@ -284,10 +284,7 @@ video {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background var(--transition),
-    transform 80ms ease,
-    box-shadow var(--transition);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
   border: none;
   outline: none;
 }
@@ -360,4 +357,90 @@ video {
   flex: 1;
   height: 1px;
   background: var(--border);
+}
+
+
+/* ── Table row hover — global for all admin/data tables ──── */
+
+.table tbody tr,
+table tbody tr {
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.table tbody tr:hover,
+table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+/* Card hover lift */
+.astryx-card,
+[class*="card"] {
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+.astryx-card:hover,
+[class*="card"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Consistent focus ring for form inputs */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+/* Consistent display font for page titles */
+h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Zebra striping for admin tables */
+.table tbody tr:nth-child(even),
+table tbody tr:nth-child(even) {
+  background: var(--surface-1);
+}
+
+/* Monospace utility for numeric data */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Skip-to-content link for accessibility */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.skip-link:focus {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  width: auto;
+  height: auto;
+  z-index: 9999;
+  background: var(--accent);
+  color: var(--surface-0);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* Consistent spacing override */
+.astryx-card {
+  padding: var(--space-5) !important;
+}
+
+/* Consistent border-radius override */
+.astryx-card {
+  border-radius: var(--radius-md) !important;
 }

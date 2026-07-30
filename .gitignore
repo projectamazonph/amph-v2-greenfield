@@ -67,3 +67,4 @@ skills-lock.json
 .agents/
 .claude/
 agent/
+node_modules/

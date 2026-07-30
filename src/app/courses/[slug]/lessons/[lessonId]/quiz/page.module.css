@@ -22,3 +22,9 @@
   margin: 0 0 var(--space-3);
   letter-spacing: -0.01em;
 }
+
+@media (max-width: 767px) {
+  .quizContainer {
+    padding: var(--space-4);
+  }
+}

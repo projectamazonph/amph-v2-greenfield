@@ -1,19 +1,17 @@
 "use client";
 
 /**
- * NavSidebar — admin navigation sidebar.
+ * NavSidebar — admin navigation sidebar with section grouping.
  *
  * Per design spec §9.1: 240px fixed-left, brand + nav items + user card
- * at the bottom. Active state uses a full-pill accent background
- * (not just a left border) for clearer at-a-glance scanning.
+ * at the bottom. Items are grouped into logical sections (Overview,
+ * Content, Operations, System) with monospace labels for quick scanning.
+ *
+ * Active state uses a full-pill accent background for clearer at-a-glance
+ * scanning.
  *
  * Client component so the active state stays in sync with the current
  * path during client-side navigation (Next.js App Router default).
- *
- * SOLID: this is a pure presentational component. It receives the
- * current user (already loaded by the layout) and reads the current
- * path via `usePathname()`. It doesn't know anything about auth
- * (lib/auth), container (composition), or domain.
  */
 
 import Link from "next/link";
@@ -37,32 +35,59 @@ import { UserCard } from "./UserCard";
 import styles from "./NavSidebar.module.css";
 import type { ComponentType, SVGProps } from "react";
 
+type IconComponent = ComponentType<
+  SVGProps<SVGSVGElement> & {
+    weight?: "thin" | "light" | "regular" | "bold" | "fill" | "duotone";
+    size?: number | string;
+  }
+>;
+
 export interface NavItem {
   href: string;
   label: string;
-  // Phosphor icon component. Picked at module load so we don't pay a
-  // per-render import cost.
-  icon: ComponentType<
-    SVGProps<SVGSVGElement> & {
-      weight?: "thin" | "light" | "regular" | "bold" | "fill" | "duotone";
-      size?: number | string;
-    }
-  >;
+  icon: IconComponent;
+  /** Optional badge count rendered as a small pill at the right of the item. */
+  badge?: number;
 }
 
-const NAV_ITEMS: readonly NavItem[] = [
-  { href: "/admin", label: "Dashboard", icon: SquaresFour },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/courses", label: "Courses", icon: BookOpen },
-  { href: "/admin/content", label: "Content", icon: Files },
-  { href: "/admin/payments", label: "Payments", icon: CurrencyDollar },
-  { href: "/admin/refunds", label: "Refunds", icon: ArrowsCounterClockwise },
-  { href: "/admin/live-classes", label: "Live Classes", icon: CalendarDots },
-  { href: "/admin/simulators", label: "Simulators", icon: GameController },
-  { href: "/admin/badges", label: "Badges", icon: Star },
-  { href: "/admin/quizzes", label: "Quizzes", icon: Question },
-  { href: "/admin/certificates", label: "Certificates", icon: Certificate },
-  { href: "/admin/settings", label: "Settings", icon: Gear },
+interface NavSection {
+  label: string;
+  items: readonly NavItem[];
+}
+
+const NAV_SECTIONS: readonly NavSection[] = [
+  {
+    label: "Overview",
+    items: [
+      { href: "/admin", label: "Dashboard", icon: SquaresFour },
+    ],
+  },
+  {
+    label: "Content",
+    items: [
+      { href: "/admin/courses", label: "Courses", icon: BookOpen },
+      { href: "/admin/content", label: "Content", icon: Files },
+      { href: "/admin/simulators", label: "Simulators", icon: GameController },
+      { href: "/admin/quizzes", label: "Quizzes", icon: Question },
+      { href: "/admin/badges", label: "Badges", icon: Star },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { href: "/admin/users", label: "Users", icon: Users },
+      { href: "/admin/payments", label: "Payments", icon: CurrencyDollar },
+      { href: "/admin/refunds", label: "Refunds", icon: ArrowsCounterClockwise, badge: 3 },
+      { href: "/admin/live-classes", label: "Live Classes", icon: CalendarDots },
+      { href: "/admin/certificates", label: "Certificates", icon: Certificate },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { href: "/admin/settings", label: "Settings", icon: Gear },
+    ],
+  },
 ] as const;
 
 export interface NavSidebarProps {
@@ -70,13 +95,10 @@ export interface NavSidebarProps {
 }
 
 export function NavSidebar({ user }: NavSidebarProps) {
-  // Reads the live path so client navigation updates the active item
-  // without a full page reload. Falls back to "/" if the path is null
-  // (e.g. during the first render on the server).
   const pathname = usePathname() ?? "/";
 
   return (
-    <aside className={styles.sidebar} aria-label="Admin navigation">
+    <aside id="admin-sidebar" className={styles.sidebar} aria-label="Admin navigation">
       <Link href="/admin" className={styles.brand}>
         <span className={styles.brandMark} aria-hidden>
           <span className={styles.brandMarkSquare} />
@@ -91,26 +113,48 @@ export function NavSidebar({ user }: NavSidebarProps) {
       </Link>
 
       <nav className={styles.nav}>
-        {NAV_ITEMS.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/admin" && pathname.startsWith(item.href + "/"));
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              data-active={isActive}
-              className={[styles.item, isActive ? styles.active : ""].filter(Boolean).join(" ")}
-              aria-current={isActive ? "page" : undefined}
-            >
-              <span className={styles.icon} aria-hidden>
-                <Icon size={18} weight={isActive ? "fill" : "regular"} />
-              </span>
-              <span className={styles.label}>{item.label}</span>
-            </Link>
-          );
-        })}
+        {NAV_SECTIONS.map((section) => (
+          <div key={section.label} className={styles.section}>
+            <div className={styles.sectionLabel}>{section.label}</div>
+            {section.items.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/admin" && pathname.startsWith(item.href + "/"));
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  data-active={isActive}
+                  className={[styles.item, isActive ? styles.active : ""]
+                    .filter(Boolean)
+                    .join(" ")}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <span className={styles.icon} aria-hidden>
+                    <Icon size={18} weight={isActive ? "fill" : "regular"} />
+                  </span>
+                  <span className={styles.label}>{item.label}</span>
+                  {item.badge ? (
+                    <span
+                      style={{
+                        marginLeft: "auto",
+                        fontSize: "10px",
+                        fontFamily: "var(--font-mono)",
+                        background: "var(--accent)",
+                        color: "var(--accent-ink)",
+                        padding: "1px 6px",
+                        borderRadius: "10px",
+                      }}
+                    >
+                      {item.badge}
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       <div className={styles.footer}>

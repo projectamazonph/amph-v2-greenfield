@@ -115,11 +115,12 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
         }
         actions={
           <div className={styles.actions}>
+            <Link href={`/courses/${course.slug}`} className="btn btn-ghost" target="_blank">View as Student</Link>
             <Link href={`/admin/courses/${course.id}/edit`} className={styles.editButton}>
               Edit
             </Link>
             {course.status !== "ARCHIVED" && (
-              <form action={handleArchive}>
+              <form action={handleArchive} onClick={(e) => { if (!window.confirm('Are you sure? This cannot be undone.')) { e.preventDefault(); } }}>
                 <button type="submit" className={styles.archiveButton}>
                   Archive
                 </button>
@@ -236,7 +237,7 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
                         >
                           Edit
                         </Link>
-                        <form action={handleDeleteModule.bind(null, m.id)}>
+                        <form action={handleDeleteModule.bind(null, m.id)} onClick={(e) => { if (!window.confirm('Are you sure? This cannot be undone.')) { e.preventDefault(); } }}>
                           <button
                             type="submit"
                             className={styles.deleteButton}

@@ -6,8 +6,10 @@
  * Form takes 4 inputs: product, niche, monthly budget, targeting.
  */
 
+import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { CampaignBuilderForm } from "@/components/tools/CampaignBuilderForm";
+import { StudentShell } from "@/components/student/StudentShell";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -29,22 +31,24 @@ export default async function CampaignBuilderPage() {
   }
 
   return (
-    <main className={styles.page}>
-      <nav className={styles.breadcrumb}>
-        <a href="/tools">← Tools</a>
-        <span aria-hidden="true"> / </span>
-        <span>Campaign Builder</span>
-      </nav>
-      <header className={styles.header}>
-        <span className={styles.eyebrow}>Simulator</span>
-        <h1 className={styles.title}>{SCENARIO.title}</h1>
-        <p className={styles.brief}>{SCENARIO.brief}</p>
-      </header>
-      <CampaignBuilderForm
-        productCategory={SCENARIO.productCategory}
-        productNiche={SCENARIO.productNiche}
-        monthlyBudget={SCENARIO.monthlyBudget}
-      />
-    </main>
+    <StudentShell>
+      <main className={styles.page}>
+        <nav className={styles.breadcrumb}>
+          <Link href="/tools">← Tools</Link>
+          <span aria-hidden="true"> / </span>
+          <span>Campaign Builder</span>
+        </nav>
+        <header className={styles.header}>
+          <span className={styles.eyebrow}>Simulator</span>
+          <h1 className={styles.title}>{SCENARIO.title}</h1>
+          <p className={styles.brief}>{SCENARIO.brief}</p>
+        </header>
+        <CampaignBuilderForm
+          productCategory={SCENARIO.productCategory}
+          productNiche={SCENARIO.productNiche}
+          monthlyBudget={SCENARIO.monthlyBudget}
+        />
+      </main>
+    </StudentShell>
   );
 }

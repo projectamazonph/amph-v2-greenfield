@@ -101,9 +101,27 @@
   padding: var(--space-4) var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-4);
   overflow-y: auto;
   min-height: 0; /* allow inner scroll within flex parent */
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sectionLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-500);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--space-1) var(--space-3);
+  margin-bottom: var(--space-1);
+  border-bottom: 1px solid var(--border);
 }
 
 .item {
@@ -171,27 +189,22 @@
 
 @media (max-width: 1023px) {
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: static;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    width: 280px;
+    min-height: 100vh;
+  }
+  .sidebar[data-open="true"] {
+    transform: translateX(0);
   }
   .nav {
-    flex-direction: row;
-    overflow-x: auto;
-    padding: var(--space-2);
-  }
-  .item {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-  /* On mobile, the active state becomes an underline instead of a
-     pill — pills in a horizontal scrollable row fight the user's
-     swipe gesture. */
-  .active {
-    background: transparent;
-    box-shadow: inset 0 -2px 0 0 var(--accent);
-    border-radius: 0;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }

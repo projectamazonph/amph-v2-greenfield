@@ -8,6 +8,7 @@
  */
 
 import { buildContainer } from "@/composition/container";
+import { StudentShell } from "@/components/student/StudentShell";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -45,12 +46,14 @@ export default async function ToolsIndexPage() {
   const registered = container.simulatorRegistry.list();
 
   return (
+    <StudentShell>
     <main className={styles.page}>
       <header className={styles.header}>
         <span className={styles.eyebrow}>Simulators</span>
         <h1 className={styles.title}>Tools</h1>
         <p className={styles.subhead}>5 practice tools. Pick one to start.</p>
       </header>
+      <section style={{ marginBottom: 'var(--space-8)' }}><h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-500)', marginBottom: 'var(--space-4)' }}>Recently used</h2><div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 'var(--space-4)' }}><div style={{ padding: 'var(--space-4)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>Bid Elevator <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-500)' }}>· 2 hours ago</span></div></div></section>
       <ul className={styles.grid}>
         {registered.map((sim) => {
           const info = TOOL_INFO[sim.simulatorId];
@@ -77,5 +80,6 @@ export default async function ToolsIndexPage() {
         </li>
       </ul>
     </main>
+    </StudentShell>
   );
 }

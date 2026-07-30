@@ -1,0 +1,34 @@
+/* MobileNavToggle.module.css — hamburger button visible on mobile only. */
+
+.toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--ink-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  position: fixed;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 1001;
+}
+
+.toggle:hover {
+  background: var(--surface-2);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1023px) {
+  .toggle {
+    display: flex;
+  }
+}
