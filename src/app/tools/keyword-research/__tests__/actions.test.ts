@@ -285,6 +285,31 @@ describe("keywordResearchAttempt", () => {
     });
   });
 
+  it("submits before grading (GradeSimulatorAttempt requires 'submitted' status)", async () => {
+    await keywordResearchAttempt({
+      niche: "bamboo-cutting-board",
+      classifications: VALID_CLASSIFICATIONS,
+    });
+
+    expect(mockContainer.submitSimulatorAttempt.execute.mock.invocationCallOrder[0]).toBeLessThan(
+      mockContainer.gradeSimulatorAttempt.execute.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it("returns attempt_error when submitSimulatorAttempt fails", async () => {
+    mockContainer.submitSimulatorAttempt.execute.mockResolvedValueOnce(
+      Result.err({ kind: "already_submitted" }),
+    );
+    const result = await keywordResearchAttempt({
+      niche: "bamboo-cutting-board",
+      classifications: VALID_CLASSIFICATIONS,
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
+    expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
+  });
+
   it("returns attempt_error when startSimulatorAttempt fails", async () => {
     mockContainer.startSimulatorAttempt.execute.mockResolvedValueOnce(
       Result.err({ kind: "scenario_not_found" }),

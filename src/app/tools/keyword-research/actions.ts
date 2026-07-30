@@ -20,9 +20,16 @@
  *      dataset-version field, so this is where that provenance lives)
  *   3. KeywordResearchSimulator.run() — grades classifications against the
  *      dataset's own labels
- *   4. GradeSimulatorAttempt — persists the grade with score dimensions
- *   5. ComposeAttemptFeedback — generates actionable student feedback
- *   6. SubmitSimulatorAttempt
+ *   4. SubmitSimulatorAttempt — transitions in_progress -> submitted
+ *   5. GradeSimulatorAttempt — requires "submitted" status; persists the
+ *      grade with score dimensions (submitted -> graded)
+ *   6. ComposeAttemptFeedback — requires "graded" status
+ *
+ * Submit must run before grade, and grade before feedback: each use case
+ * enforces its own required prior status (GradeSimulatorAttempt rejects
+ * anything but "submitted"; ComposeAttemptFeedback requires "graded").
+ * SaveSimulatorDecision is the only thing that runs while still
+ * "in_progress".
  */
 
 "use server";
@@ -143,7 +150,7 @@ export async function previewKeywordResearch(
 // ── keywordResearchAttempt() — full grading lifecycle ───────────────────
 
 const classificationSchema = z.object({
-  intent: z.enum(KEYWORD_INTENTS as [KeywordIntent, ...KeywordIntent[]]),
+  intent: z.enum(KEYWORD_INTENTS),
   isNegative: z.boolean(),
 });
 
@@ -302,7 +309,16 @@ export async function keywordResearchAttempt(
     negativeIdentification: 0,
   };
 
-  // ── 7. GradeSimulatorAttempt ────────────────────────────────────────
+  // ── 7. SubmitSimulatorAttempt ─────────────────────────────────────────
+  // Must happen before grading: GradeSimulatorAttempt requires "submitted"
+  // status, and SubmitSimulatorAttempt is the only thing that transitions
+  // the attempt out of "in_progress".
+  const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
+  if (Result.isErr(submitResult)) {
+    return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
+  }
+
+  // ── 8. GradeSimulatorAttempt ────────────────────────────────────────
   const gradeResult = await container.gradeSimulatorAttempt.execute({
     attemptId,
     scoreDimensions: {
@@ -317,15 +333,12 @@ export async function keywordResearchAttempt(
 
   const grade = gradeResult.value;
 
-  // ── 8. ComposeAttemptFeedback ───────────────────────────────────────
+  // ── 9. ComposeAttemptFeedback ───────────────────────────────────────
   const feedbackResult = await container.composeAttemptFeedback.execute({ attemptId });
   if (Result.isErr(feedbackResult)) {
     return { ok: false, error: { kind: "feedback_error", message: feedbackResult.error.kind } };
   }
   const feedback = feedbackResult.value.feedback;
-
-  // ── 9. SubmitSimulatorAttempt ───────────────────────────────────────
-  await container.submitSimulatorAttempt.execute({ attemptId });
 
   // ── 10. Return results ──────────────────────────────────────────────
   return {

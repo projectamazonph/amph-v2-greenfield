@@ -25,7 +25,8 @@ interface Props {
 }
 
 interface Classification {
-  intent: KeywordIntent;
+  /** Undefined until the student explicitly picks one -- never defaulted. */
+  intent?: KeywordIntent;
   isNegative: boolean;
 }
 
@@ -67,7 +68,7 @@ export function KeywordResearchForm({ initialNiche }: Props) {
     setClassifications((prev) => ({
       ...prev,
       [normalizedTerm]: {
-        intent: prev[normalizedTerm]?.intent ?? "core",
+        intent: prev[normalizedTerm]?.intent,
         isNegative: prev[normalizedTerm]?.isNegative ?? false,
         ...patch,
       },
@@ -77,8 +78,22 @@ export function KeywordResearchForm({ initialNiche }: Props) {
   const onSubmitForGrading = () => {
     if (!preview) return;
     setError(null);
+    // Every row must have an explicit intent before this fires (the submit
+    // button stays disabled until classifiedCount === keywords.length), but
+    // narrow here too so a partially-classified row can never be silently
+    // graded with an intent the student didn't choose.
+    const fullyClassified: Record<string, { intent: KeywordIntent; isNegative: boolean }> = {};
+    for (const [normalizedTerm, c] of Object.entries(classifications)) {
+      if (c.intent !== undefined) {
+        fullyClassified[normalizedTerm] = { intent: c.intent, isNegative: c.isNegative };
+      }
+    }
     startTransition(async () => {
-      const r = await keywordResearchAttempt({ niche, classifications, mode: "practice" });
+      const r = await keywordResearchAttempt({
+        niche,
+        classifications: fullyClassified,
+        mode: "practice",
+      });
       if (r.ok) {
         setAttempt(r.value);
       } else {
@@ -88,7 +103,7 @@ export function KeywordResearchForm({ initialNiche }: Props) {
   };
 
   const classifiedCount = preview
-    ? preview.keywords.filter((k) => classifications[k.normalizedTerm] !== undefined).length
+    ? preview.keywords.filter((k) => classifications[k.normalizedTerm]?.intent !== undefined).length
     : 0;
 
   return (
