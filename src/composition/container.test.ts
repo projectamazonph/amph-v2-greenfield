@@ -304,8 +304,8 @@ export function buildTestContainer(): TestContainer {
   const keywordDatasetRepo = new StaticKeywordDatasetRepository();
 
   // STORY-008: password reset. Hoisted (not built inline in the returned
-  // object below) so adminGrantSubscription can reuse this same instance —
-  // matches the production container's wiring.
+  // object below) so adminGrantSubscription can reuse this same instance,
+  // matching the production container's wiring.
   const requestPasswordReset = new RequestPasswordReset({
     users: userRepo,
     passwordResets: passwordResetRepo,
@@ -485,6 +485,7 @@ export function buildTestContainer(): TestContainer {
       passwordHasher,
       recordAuditLog,
       requestPasswordReset,
+      logger,
     }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
@@ -643,7 +644,7 @@ export function buildTestContainer(): TestContainer {
       rateLimiter,
       idGen,
     }),
-    // STORY-008: password reset (hoisted above — also reused by adminGrantSubscription)
+    // STORY-008: password reset (hoisted above, also reused by adminGrantSubscription)
     requestPasswordReset,
     resetPassword: new ResetPassword({
       users: userRepo,

@@ -7,8 +7,9 @@
  *  - existing user: tier updated, no account created, no claim email
  *  - payment metadata recorded in the audit log when provided
  *  - validation: invalid email, missing first/last name for new accounts
- *  - db_error propagation from hash / create / update
+ *  - db_error propagation from findByEmail / hash / create / update
  *  - the email_taken race between findByEmail and create
+ *  - a rate-limited claim email is logged, not silently dropped
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -16,6 +17,7 @@ import { Result } from "@/domain/shared/Result";
 import type { User } from "@/domain/entities/User";
 import type { UserError } from "@/ports/repositories/UserRepository";
 import type { PasswordHasher, HashError } from "@/ports/security/PasswordHasher";
+import { Money } from "@/domain/values/Money";
 import { AdminGrantSubscription } from "../AdminGrantSubscription";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
@@ -58,23 +60,10 @@ class UpdateFailsRepo extends InMemoryUserRepository {
   }
 }
 
-function buildRequestPasswordReset(deps: {
-  users: InMemoryUserRepository;
-  passwordResets: InMemoryPasswordResetRepository;
-  email: InMemoryEmailSender;
-  clock: FixedClock;
-  idGen: InMemoryIdGenerator;
-}) {
-  return new RequestPasswordReset({
-    users: deps.users,
-    passwordResets: deps.passwordResets,
-    email: deps.email,
-    passwordResetEmailRenderer: new PasswordResetTemplateRenderer(),
-    rateLimiter: new InMemoryRateLimiter(),
-    clock: deps.clock,
-    ids: deps.idGen,
-    logger: new TestLogger(),
-  });
+class FindByEmailFailsRepo extends InMemoryUserRepository {
+  async findByEmail(): Promise<Result<User, UserError>> {
+    return Result.err({ kind: "db_error", message: "lookup failed" });
+  }
 }
 
 describe("AdminGrantSubscription", () => {
@@ -85,6 +74,8 @@ describe("AdminGrantSubscription", () => {
   let idGen: InMemoryIdGenerator;
   let clock: FixedClock;
   let hasher: StubHasher;
+  let logger: TestLogger;
+  let rateLimiter: InMemoryRateLimiter;
 
   beforeEach(() => {
     users = new InMemoryUserRepository();
@@ -94,16 +85,21 @@ describe("AdminGrantSubscription", () => {
     idGen = new InMemoryIdGenerator();
     clock = new FixedClock(new Date("2026-01-01T00:00:00Z"));
     hasher = new StubHasher();
+    logger = new TestLogger();
+    rateLimiter = new InMemoryRateLimiter();
   });
 
   function build(userRepo: InMemoryUserRepository = users) {
     const recordAuditLog = new RecordAuditLog({ auditLog: audit, idGen, clock });
-    const requestPasswordReset = buildRequestPasswordReset({
+    const requestPasswordReset = new RequestPasswordReset({
       users: userRepo,
       passwordResets,
       email,
+      passwordResetEmailRenderer: new PasswordResetTemplateRenderer(),
+      rateLimiter,
       clock,
-      idGen,
+      ids: idGen,
+      logger: new TestLogger(),
     });
     return new AdminGrantSubscription({
       userRepo,
@@ -111,6 +107,7 @@ describe("AdminGrantSubscription", () => {
       passwordHasher: hasher,
       recordAuditLog,
       requestPasswordReset,
+      logger,
     });
   }
 
@@ -199,7 +196,7 @@ describe("AdminGrantSubscription", () => {
       lastName: "Reyes",
       subscriptionTier: "STARTER",
       actorId: "admin-1",
-      payment: { method: "GCash", amountMinor: 299900, reference: "ref-123" },
+      payment: { method: "GCash", amount: Money.php(2999), reference: "ref-123" },
     });
 
     expect(r.ok).toBe(true);
@@ -273,6 +270,18 @@ describe("AdminGrantSubscription", () => {
     if (!r.ok) expect(r.error.kind).toBe("db_error");
   });
 
+  it("propagates a db_error when the initial email lookup fails, without misreporting it as a name-validation error", async () => {
+    const repo = new FindByEmailFailsRepo();
+    const useCase = build(repo);
+    const r = await useCase.execute({
+      email: "lookupfail@student.com",
+      subscriptionTier: "PRO",
+      actorId: "admin-1",
+    });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.error).toEqual({ kind: "db_error", message: "lookup failed" });
+  });
+
   it("propagates a db_error when user creation fails", async () => {
     const repo = new CreateFailsRepo();
     const useCase = build(repo);
@@ -321,5 +330,36 @@ describe("AdminGrantSubscription", () => {
       expect(r.error.kind).toBe("db_error");
       expect(r.error).toMatchObject({ message: "email_taken but lookup failed" });
     }
+  });
+
+  it("logs a warning instead of silently dropping a rate-limited claim email", async () => {
+    const useCase = build();
+    // Exhaust the shared IP rate-limit bucket (20/hour) RequestPasswordReset
+    // enforces for the fixed "admin-grant" key every grant shares.
+    for (let i = 0; i < 20; i++) {
+      await useCase.execute({
+        email: `bulk-${i}@student.com`,
+        firstName: "A",
+        lastName: "B",
+        subscriptionTier: "STARTER",
+        actorId: "admin-1",
+      });
+    }
+    email.clear();
+
+    const r = await useCase.execute({
+      email: "rate-limited@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "STARTER",
+      actorId: "admin-1",
+    });
+
+    expect(r.ok).toBe(true);
+    expect(email.sent).toHaveLength(0);
+    const warning = logger.entries.find(
+      (e) => e.level === "warn" && e.message === "admin_grant_subscription.claim_email_failed",
+    );
+    expect(warning).toBeDefined();
   });
 });

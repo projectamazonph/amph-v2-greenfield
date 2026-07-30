@@ -1,8 +1,8 @@
 /**
- * /admin/users/new — admin grant-subscription form.
+ * /admin/users/new: admin grant-subscription form.
  *
  * Grants a student a subscription tier (FREE/STARTER/PRO) outside the
- * checkout flow — for students who paid outside the platform (bank
+ * checkout flow, for students who paid outside the platform (bank
  * transfer, GCash sent directly, cash). Creates the student's account
  * if they don't have one yet and emails them a "set your password"
  * link. Optionally records how they paid for bookkeeping.
@@ -15,6 +15,7 @@ import { adminGrantSubscriptionAction } from "@/app/actions/adminGrantSubscripti
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
+import { Money } from "@/domain/values/Money";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -24,7 +25,8 @@ interface PageProps {
 const ERROR_MESSAGES: Record<string, string> = {
   invalid_email: "Enter a valid email address.",
   invalid_name:
-    "This student doesn't have an account yet — first and last name are required to create one.",
+    "This student doesn't have an account yet. First and last name are required to create one.",
+  invalid_payment_amount: "Enter a valid amount paid, greater than zero.",
   db_error: "Something went wrong saving this. Try again.",
 };
 
@@ -42,7 +44,7 @@ export default async function NewUserPage({ searchParams }: PageProps) {
 
       <TopBar
         title="Add student"
-        subtitle="Grant a subscription tier without going through checkout — for students who paid outside the platform."
+        subtitle="Grant a subscription tier without going through checkout, for students who paid outside the platform."
       />
 
       {errorMsg && (
@@ -100,7 +102,7 @@ export default async function NewUserPage({ searchParams }: PageProps) {
               <label className={styles.field}>
                 <span className={styles.label}>Payment method</span>
                 <select name="paymentMethod" defaultValue="" className={styles.select}>
-                  <option value="">— None (comp / free grant) —</option>
+                  <option value="">(None, comp / free grant)</option>
                   <option value="GCash">GCash</option>
                   <option value="Maya">Maya</option>
                   <option value="Bank transfer">Bank transfer</option>
@@ -160,14 +162,19 @@ async function handleSubmit(formData: FormData) {
   const paymentAmountRaw = String(formData.get("paymentAmount") ?? "").trim();
   const paymentReference = String(formData.get("paymentReference") ?? "").trim();
 
-  const payment =
-    paymentMethod && paymentAmountRaw
-      ? {
-          method: paymentMethod,
-          amountMinor: Math.round(parseFloat(paymentAmountRaw) * 100),
-          reference: paymentReference || undefined,
-        }
-      : undefined;
+  let payment: { method: string; amount: Money; reference?: string } | undefined;
+  if (paymentMethod && paymentAmountRaw) {
+    const pesos = parseFloat(paymentAmountRaw);
+    if (!Number.isFinite(pesos) || pesos <= 0) {
+      redirect("/admin/users/new?error=invalid_payment_amount");
+      return;
+    }
+    payment = {
+      method: paymentMethod,
+      amount: Money.php(pesos),
+      reference: paymentReference || undefined,
+    };
+  }
 
   const r = await adminGrantSubscriptionAction({
     email,

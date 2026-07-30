@@ -725,6 +725,7 @@ function buildProductionContainer(): AppContainer {
       passwordHasher,
       recordAuditLog,
       requestPasswordReset,
+      logger,
     }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
@@ -864,7 +865,7 @@ function buildProductionContainer(): AppContainer {
       rateLimiter,
       idGen,
     }),
-    // STORY-008: password reset (hoisted above — also reused by adminGrantSubscription)
+    // STORY-008: password reset (hoisted above, also reused by adminGrantSubscription)
     requestPasswordReset,
     resetPassword: new ResetPassword({
       users: userRepo,

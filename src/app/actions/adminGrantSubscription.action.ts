@@ -1,5 +1,5 @@
 /**
- * adminGrantSubscription.action.ts — server action.
+ * adminGrantSubscription.action.ts, a server action.
  *
  * Admin grants a student a subscription tier outside checkout (paid
  * outside the platform). Injects actorId from the admin session.
@@ -7,6 +7,7 @@
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import type { SubscriptionTier } from "@/domain/entities/User";
+import type { Money } from "@/domain/values/Money";
 
 export type AdminGrantSubscriptionPageInput = {
   email: string;
@@ -15,7 +16,7 @@ export type AdminGrantSubscriptionPageInput = {
   subscriptionTier: SubscriptionTier;
   payment?: {
     method: string;
-    amountMinor: number;
+    amount: Money;
     reference?: string;
   };
 };
