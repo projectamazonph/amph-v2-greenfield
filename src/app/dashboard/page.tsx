@@ -26,9 +26,7 @@ interface CourseWithEnrollment {
   enrollment: Enrollment;
 }
 
-async function loadEnrollmentsWithCourses(
-  userId: string,
-): Promise<CourseWithEnrollment[]> {
+async function loadEnrollmentsWithCourses(userId: string): Promise<CourseWithEnrollment[]> {
   const container = buildContainer();
   const enrollmentsResult = await container.enrollmentRepo.findByUserId(userId);
   if (!enrollmentsResult.ok) {
@@ -58,120 +56,168 @@ export default async function DashboardPage() {
   // "All my courses" includes everything (active, in-progress, completed)
   const allActive = pairs.filter((p) => p.enrollment.status === "active");
 
-  // Smart suggestion: pick the most recently accessed in-progress enrollment
+  // Smart suggestion: pick the most recently enrolled in-progress enrollment.
+  // (No `lastAccessedAt` field exists on Enrollment — sort by `createdAt` as
+  // the closest proxy: newest enrollment ≈ most recent activity.)
   const lastAccessedCourse =
     inProgress.length > 0
       ? inProgress
           .slice()
           .sort(
             (a, b) =>
-              new Date(b.enrollment.lastAccessedAt).getTime() -
-              new Date(a.enrollment.lastAccessedAt).getTime(),
+              new Date(b.enrollment.createdAt).getTime() -
+              new Date(a.enrollment.createdAt).getTime(),
           )[0]?.course
       : undefined;
 
   return (
     <StudentShell user={user}>
-    <main className={styles.page}>
-      {/* Welcome */}
-      <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>Welcome back, {user.firstName}.</h1>
-        <p className={styles.heroSubtitle}>
-          {allActive.length === 0
-            ? "You haven't started any courses yet."
-            : `You're enrolled in ${allActive.length} course${allActive.length === 1 ? "" : "s"}.`}
-        </p>
-      </header>
+      <main className={styles.page}>
+        {/* Welcome */}
+        <header className={styles.hero}>
+          <h1 className={styles.heroTitle}>Welcome back, {user.firstName}.</h1>
+          <p className={styles.heroSubtitle}>
+            {allActive.length === 0
+              ? "You haven't started any courses yet."
+              : `You're enrolled in ${allActive.length} course${allActive.length === 1 ? "" : "s"}.`}
+          </p>
+        </header>
 
-      {lastAccessedCourse && (<div style={{ background: 'var(--surface-card)', border: '1px solid var(--accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-8)' }}><div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-2)' }}>Pick up where you left off</div><div style={{ fontSize: 'var(--text-base)', fontWeight: 600 }}>{lastAccessedCourse.title}</div><Link href={`/courses/${lastAccessedCourse.slug}`} className="btn btn-primary" style={{ marginTop: 'var(--space-3)' }}>Continue</Link></div>)}
-
-      <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', marginBottom: 'var(--space-8)', fontSize: 'var(--text-sm)', color: 'var(--accent)' }}>🔥 You're on a 3-day learning streak! Keep it up.</div>
-
-      {/* Continue learning */}
-      {inProgress.length > 0 && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Continue learning</h2>
-          <div className={styles.grid}>
-            {inProgress.map(({ course, enrollment }) => (
-              <Link
-                key={enrollment.id}
-                href={`/courses/${course.slug}`}
-                className={styles.card}
-              >
-                <h3 className={styles.cardTitle}>{course.title}</h3>
-                <p className={styles.cardTagline}>{course.tagline}</p>
-                <div className={styles.progressBar} aria-hidden="true">
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: `${enrollment.progressPercent}%` }}
-                  />
-                  {[25, 50, 75].map(pct => (<span key={pct} className={`${styles.milestone} ${enrollment.progressPercent >= pct ? styles.reached : ''}`} style={{ left: `${pct}%` }} aria-hidden />))}
-                </div>
-                <p className={styles.progressLabel}>
-                  {enrollment.progressPercent}% complete
-                </p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* My courses */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>My courses</h2>
-          <Link href="/courses" className={styles.browseLink}>
-            Browse the catalog →
-          </Link>
-        </div>
-
-        {allActive.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p className={styles.emptyText}>
-              You don't have any courses yet. Browse the catalog to get started.
-            </p>
-            <Link href="/courses" className={styles.browseButton}>
-              Browse courses
+        {lastAccessedCourse && (
+          <div
+            style={{
+              background: "var(--surface-card)",
+              border: "1px solid var(--accent)",
+              borderRadius: "var(--radius-md)",
+              padding: "var(--space-5)",
+              marginBottom: "var(--space-8)",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "10px",
+                color: "var(--accent)",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                marginBottom: "var(--space-2)",
+              }}
+            >
+              Pick up where you left off
+            </div>
+            <div style={{ fontSize: "var(--text-base)", fontWeight: 600 }}>
+              {lastAccessedCourse.title}
+            </div>
+            <Link
+              href={`/courses/${lastAccessedCourse.slug}`}
+              className="btn btn-primary"
+              style={{ marginTop: "var(--space-3)" }}
+            >
+              Continue
             </Link>
           </div>
-        ) : (
-          <ul className={styles.list}>
-            {allActive.map(({ course, enrollment }) => (
-              <li key={enrollment.id} className={styles.listItem}>
-                <Link
-                  href={`/courses/${course.slug}`}
-                  className={styles.listLink}
-                >
-                  <div className={styles.listMain}>
-                    <span className={styles.listTitle}>{course.title}</span>
-                    <span className={styles.listTagline}>{course.tagline}</span>
-                  </div>
-                  <div className={styles.listMeta}>
-                    <span className={styles.listProgress}>
-                      {enrollment.progressPercent}%
-                    </span>
-                    {enrollment.progressPercent === 100 && (
-                      <span className={styles.completedBadge}>Completed</span>
-                    )}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
         )}
-      </section>
 
-      {/* Quick Actions */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Quick Actions</h2>
-        <div className={styles.quickActions}>
-          <Link href="/courses" className="btn btn-ghost">Browse Catalog</Link>
-          <Link href="/tools" className="btn btn-ghost">Simulators</Link>
-          <Link href="/profile" className="btn btn-ghost">My Profile</Link>
+        <div
+          style={{
+            background: "var(--accent-soft)",
+            border: "1px solid var(--accent)",
+            borderRadius: "var(--radius-md)",
+            padding: "var(--space-4)",
+            marginBottom: "var(--space-8)",
+            fontSize: "var(--text-sm)",
+            color: "var(--accent)",
+          }}
+        >
+          🔥 You're on a 3-day learning streak! Keep it up.
         </div>
-      </section>
 
-    </main>
+        {/* Continue learning */}
+        {inProgress.length > 0 && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Continue learning</h2>
+            <div className={styles.grid}>
+              {inProgress.map(({ course, enrollment }) => (
+                <Link key={enrollment.id} href={`/courses/${course.slug}`} className={styles.card}>
+                  <h3 className={styles.cardTitle}>{course.title}</h3>
+                  <p className={styles.cardTagline}>{course.tagline}</p>
+                  <div className={styles.progressBar} aria-hidden="true">
+                    <div
+                      className={styles.progressFill}
+                      style={{ width: `${enrollment.progressPercent}%` }}
+                    />
+                    {[25, 50, 75].map((pct) => (
+                      <span
+                        key={pct}
+                        className={`${styles.milestone} ${enrollment.progressPercent >= pct ? styles.reached : ""}`}
+                        style={{ left: `${pct}%` }}
+                        aria-hidden
+                      />
+                    ))}
+                  </div>
+                  <p className={styles.progressLabel}>{enrollment.progressPercent}% complete</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* My courses */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>My courses</h2>
+            <Link href="/courses" className={styles.browseLink}>
+              Browse the catalog →
+            </Link>
+          </div>
+
+          {allActive.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p className={styles.emptyText}>
+                You don't have any courses yet. Browse the catalog to get started.
+              </p>
+              <Link href="/courses" className={styles.browseButton}>
+                Browse courses
+              </Link>
+            </div>
+          ) : (
+            <ul className={styles.list}>
+              {allActive.map(({ course, enrollment }) => (
+                <li key={enrollment.id} className={styles.listItem}>
+                  <Link href={`/courses/${course.slug}`} className={styles.listLink}>
+                    <div className={styles.listMain}>
+                      <span className={styles.listTitle}>{course.title}</span>
+                      <span className={styles.listTagline}>{course.tagline}</span>
+                    </div>
+                    <div className={styles.listMeta}>
+                      <span className={styles.listProgress}>{enrollment.progressPercent}%</span>
+                      {enrollment.progressPercent === 100 && (
+                        <span className={styles.completedBadge}>Completed</span>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* Quick Actions */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Quick Actions</h2>
+          <div className={styles.quickActions}>
+            <Link href="/courses" className="btn btn-ghost">
+              Browse Catalog
+            </Link>
+            <Link href="/tools" className="btn btn-ghost">
+              Simulators
+            </Link>
+            <Link href="/profile" className="btn btn-ghost">
+              My Profile
+            </Link>
+          </div>
+        </section>
+      </main>
     </StudentShell>
   );
 }

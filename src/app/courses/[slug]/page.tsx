@@ -94,8 +94,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                   </span>
                   <span className={styles.metaDivider}>·</span>
                   <span className={styles.metaItem}>
-                    ≈ {Math.ceil(course.curriculum.sections.flatMap((s) => s.lessons).length * 0.5)}{" "}
-                    hours
+                    ≈ {Math.ceil(modules.flatMap((m) => m.lessons).length * 0.5)} hours
                   </span>
                   {totalEstimatedMinutes > 0 && (
                     <span className={styles.metaItem}>

@@ -141,7 +141,13 @@ export default async function LessonPage({ params }: PageProps) {
             </ol>
           </nav>
 
-          <Link href={`/courses/${slug}`} className="btn btn-ghost" style={{ fontSize: 'var(--text-sm)', marginTop: 'var(--space-2)' }}>← Back to Course</Link>
+          <Link
+            href={`/courses/${slug}`}
+            className="btn btn-ghost"
+            style={{ fontSize: "var(--text-sm)", marginTop: "var(--space-2)" }}
+          >
+            ← Back to Course
+          </Link>
 
           {/* Lesson header */}
           <div className={styles.lessonHeader}>
@@ -153,10 +159,16 @@ export default async function LessonPage({ params }: PageProps) {
           <LessonContent lesson={lesson} />
 
           {/* Mark as Complete */}
-          <form action="/api/lessons/complete" method="post" style={{ marginTop: 'var(--space-4)' }}>
+          <form
+            action="/api/lessons/complete"
+            method="post"
+            style={{ marginTop: "var(--space-4)" }}
+          >
             <input type="hidden" name="lessonId" value={lessonId} />
             <input type="hidden" name="courseId" value={course.id} />
-            <Button variant="primary" size="md" type="submit">Mark as Complete</Button>
+            <Button variant="primary" size="md" type="submit">
+              Mark as Complete
+            </Button>
           </form>
 
           {/* Prev / Next navigation */}
@@ -172,12 +184,6 @@ export default async function LessonPage({ params }: PageProps) {
     </div>
   );
 }
-
-useEffect(() => {
-  if (justCompleted) {
-    // trigger confetti or fade animation here
-  }
-}, [justCompleted]);
 
 // ── Access denied page ──────────────────────────────────────
 
