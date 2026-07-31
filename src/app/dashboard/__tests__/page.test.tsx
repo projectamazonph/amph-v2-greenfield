@@ -19,6 +19,15 @@ const mockGetSessionUser = vi.fn();
 vi.mock("@/lib/auth", () => ({
   getSessionUser: () => mockGetSessionUser(),
   getSessionUserId: () => mockGetSessionUser().then((u: unknown) => (u as { id: string } | null)?.id ?? null),
+  // requireAuth must be async to match the real API.
+  // When getSessionUser() returns null, requireAuth throws NEXT_REDIRECT.
+  // When getSessionUser() returns a user, requireAuth returns that user.
+  requireAuth: async () => {
+    const user = await mockGetSessionUser();
+    if (!user) throw Object.assign(new Error("NEXT_REDIRECT"), { digest: "NEXT_REDIRECT" });
+    return user;
+  },
+  getSessionCookieName: () => "session_token",
 }));
 
 // Mock the container so we can stub the enrollment + course queries.
@@ -136,16 +145,12 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     expect(mockCourseFindById).toHaveBeenCalledWith("course_02");
   });
 
-  it("redirects to /login when the session user is null (defensive)", async () => {
+  it("does not crash when the session user is null (defensive)", async () => {
+    // /proxy.ts handles redirects for unauthenticated requests at the edge.
+    // The page itself should still throw NEXT_REDIRECT (from requireAuth)
+    // rather than rendering with a null user.
     mockGetSessionUser.mockResolvedValue(null);
-    try {
-      await DashboardPage();
-    } catch (err) {
-      // The redirect is implemented as a thrown NEXT_REDIRECT.
-      // The mock's redirect() throws a tagged error.
-      expect((err as Error).message).toContain("NEXT_REDIRECT");
-    }
-    expect(mockRedirect).toHaveBeenCalledWith("/login?redirect=/dashboard");
+    await expect(DashboardPage()).rejects.toThrow(/NEXT_REDIRECT/);
   });
 
   it("returns an empty list when enrollmentRepo returns an error", async () => {
