@@ -8,12 +8,10 @@
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
-"use client";
-
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { useEffect, useState } from "react";
+
 import { buildContainer } from "@/composition/container";
 import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
@@ -50,17 +48,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function LessonPage({ params }: PageProps) {
   // NOTE: This page is now a Client Component so we can hook in the
-  // 'Lesson complete' confetti trigger. As a side-effect, `generateMetadata`
-  // above stops running (it requires a Server Component). If SEO metadata
-  // is needed for this route, move it onto a sibling server component
-  // (e.g. a `layout.tsx` or a server `<head>` wrapper) — see the project
-  // migration notes. For now the route still renders correctly.
-
-  // Hooks (useState / useEffect) MUST be called before any `await` so
-  // React's rules-of-hooks stay satisfied for both server- and client-
-  // side execution paths.
-  const [justCompleted] = useState(false);
-
   const { slug, lessonId } = await params;
   const container = buildContainer();
 
