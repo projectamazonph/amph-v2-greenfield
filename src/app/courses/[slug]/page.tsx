@@ -8,9 +8,15 @@
  * fetches the course from the Course table and enriches it with
  * module+lesson data from the Module+Lesson tables (populated by
  * the STORY-013 import script).
+ *
+ * ISR: course content changes rarely (only on deploy via the import
+ * script). Revalidate every hour to avoid hitting PostgreSQL on
+ * every request while staying reasonably fresh.
  */
 
 import Link from "next/link";
+
+export const revalidate = 3600;
 import { StudentShell } from "@/components/student/StudentShell";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -51,90 +57,102 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
   return (
     <StudentShell>
-    <main className={styles.page}>
-      <Link href={`/checkout?courseSlug=${detail.slug}`} className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>Enroll Now</Link>
-      {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerInner}>
-          <Link href="/courses" className={styles.backLink}>
-            ← Back to Courses
-          </Link>
+      <main className={styles.page}>
+        <Link
+          href={`/checkout?courseSlug=${detail.slug}`}
+          className="btn btn-primary"
+          style={{ marginTop: "var(--space-4)" }}
+        >
+          Enroll Now
+        </Link>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.headerInner}>
+            <Link href="/courses" className={styles.backLink}>
+              ← Back to Courses
+            </Link>
 
-          <div className={styles.headerGrid}>
-            {/* Cover */}
-            {detail.coverImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={detail.coverImage} alt={detail.title} className={styles.cover} />
-            ) : (
-              <div className={styles.coverPlaceholder}>
-                <span className={styles.coverPlaceholderLetter}>{detail.title[0]}</span>
-              </div>
-            )}
+            <div className={styles.headerGrid}>
+              {/* Cover */}
+              {detail.coverImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={detail.coverImage} alt={detail.title} className={styles.cover} />
+              ) : (
+                <div className={styles.coverPlaceholder}>
+                  <span className={styles.coverPlaceholderLetter}>{detail.title[0]}</span>
+                </div>
+              )}
 
-            <div className={styles.headerBody}>
-              <h1 className={styles.title}>{detail.title}</h1>
-              {detail.tagline && <p className={styles.tagline}>{detail.tagline}</p>}
-              <p className={styles.description}>{detail.description}</p>
+              <div className={styles.headerBody}>
+                <h1 className={styles.title}>{detail.title}</h1>
+                {detail.tagline && <p className={styles.tagline}>{detail.tagline}</p>}
+                <p className={styles.description}>{detail.description}</p>
 
-              <div className={styles.meta}>
-                <span className={styles.metaItem}>
-                  <BookIcon /> {totalLessonCount} lesson{totalLessonCount !== 1 ? "s" : ""}
-                </span>
-                <span className={styles.metaDivider}>·</span><span className={styles.metaItem}>≈ {Math.ceil(course.curriculum.sections.flatMap(s => s.lessons).length * 0.5)} hours</span>
-                {totalEstimatedMinutes > 0 && (
+                <div className={styles.meta}>
                   <span className={styles.metaItem}>
-                    <ClockIcon /> {hours > 0 ? `${hours}h ` : ""}
-                    {minutes}m video
+                    <BookIcon /> {totalLessonCount} lesson{totalLessonCount !== 1 ? "s" : ""}
                   </span>
-                )}
-                <span className={styles.price}>{priceDisplay}</span>
-              </div>
+                  <span className={styles.metaDivider}>·</span>
+                  <span className={styles.metaItem}>
+                    ≈ {Math.ceil(course.curriculum.sections.flatMap((s) => s.lessons).length * 0.5)}{" "}
+                    hours
+                  </span>
+                  {totalEstimatedMinutes > 0 && (
+                    <span className={styles.metaItem}>
+                      <ClockIcon /> {hours > 0 ? `${hours}h ` : ""}
+                      {minutes}m video
+                    </span>
+                  )}
+                  <span className={styles.price}>{priceDisplay}</span>
+                </div>
 
-              <EnrollButton
-                courseId={detail.courseId}
-                courseSlug={detail.slug}
-                priceMinor={detail.priceMinor}
-              />
-              <button className="btn btn-ghost" style={{ marginLeft: 'var(--space-2)' }}>Share</button>
+                <EnrollButton
+                  courseId={detail.courseId}
+                  courseSlug={detail.slug}
+                  priceMinor={detail.priceMinor}
+                />
+                <button className="btn btn-ghost" style={{ marginLeft: "var(--space-2)" }}>
+                  Share
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Curriculum */}
-      <div className={styles.curriculumSection}>
-        <h2 className={styles.curriculumTitle}>Curriculum</h2>
-        <div className={styles.sectionList}>
-          {modules.map((mod, si) => (
-            <details key={mod.id} className={styles.section} open={si === 0}>
-              <summary className={styles.sectionSummary}>
-                <span className={styles.sectionTitle}>
-                  Section {si + 1}: {mod.title}
-                </span>
-                <span className={styles.sectionChevron}>▼</span>
-              </summary>
-              <ul className={styles.lessonList}>
-                {mod.lessons.map((lesson) => {
-                  const vid = lesson.estimatedMinutes > 0 ? `${lesson.estimatedMinutes}m` : null;
-                  return (
-                    <li key={lesson.id} className={styles.lessonItem}>
-                      <LessonTypeIcon type={lesson.type} />
-                      <Link
-                        href={`/courses/${detail.slug}/lessons/${lesson.id}`}
-                        className={styles.lessonLink}
-                      >
-                        {lesson.title}
-                      </Link>
-                      {vid && <span className={styles.lessonDuration}>{vid}</span>}
-                    </li>
-                  );
-                })}
-              </ul>
-            </details>
-          ))}
+        {/* Curriculum */}
+        <div className={styles.curriculumSection}>
+          <h2 className={styles.curriculumTitle}>Curriculum</h2>
+          <div className={styles.sectionList}>
+            {modules.map((mod, si) => (
+              <details key={mod.id} className={styles.section} open={si === 0}>
+                <summary className={styles.sectionSummary}>
+                  <span className={styles.sectionTitle}>
+                    Section {si + 1}: {mod.title}
+                  </span>
+                  <span className={styles.sectionChevron}>▼</span>
+                </summary>
+                <ul className={styles.lessonList}>
+                  {mod.lessons.map((lesson) => {
+                    const vid = lesson.estimatedMinutes > 0 ? `${lesson.estimatedMinutes}m` : null;
+                    return (
+                      <li key={lesson.id} className={styles.lessonItem}>
+                        <LessonTypeIcon type={lesson.type} />
+                        <Link
+                          href={`/courses/${detail.slug}/lessons/${lesson.id}`}
+                          className={styles.lessonLink}
+                        >
+                          {lesson.title}
+                        </Link>
+                        {vid && <span className={styles.lessonDuration}>{vid}</span>}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </details>
+            ))}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
     </StudentShell>
   );
 }

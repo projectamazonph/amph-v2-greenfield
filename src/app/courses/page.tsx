@@ -8,10 +8,16 @@
  * ListCatalogCourses use case, which fetches courses from the
  * Course table and enriches them with module metadata from the
  * Module+Lesson tables (populated by the STORY-013 import script).
+ *
+ * ISR: course catalog data changes rarely (only on deploy via the
+ * import script). Revalidate every hour to avoid hitting PostgreSQL
+ * on every request while staying reasonably fresh.
  */
 
 import Link from "next/link";
 import type { Metadata } from "next";
+
+export const revalidate = 3600;
 import { buildContainer } from "@/composition/container";
 import type { CatalogCourse } from "@/usecases/ListCatalogCourses";
 import styles from "./page.module.css";
@@ -40,30 +46,46 @@ export default async function CoursesPage() {
 
   return (
     <StudentShell>
-    <main className={styles.page}>
-      {/* Hero */}
-      <section className={styles.hero}>
-        <h1 className={styles.heroTitle}>Course Catalog</h1>
-        <p className={styles.heroSubtitle}>
-          Expert-led Amazon FBA training, taught in Filipino. Learn at your own pace.
-        </p>
-      </section>
+      <main className={styles.page}>
+        {/* Hero */}
+        <section className={styles.hero}>
+          <h1 className={styles.heroTitle}>Course Catalog</h1>
+          <p className={styles.heroSubtitle}>
+            Expert-led Amazon FBA training, taught in Filipino. Learn at your own pace.
+          </p>
+        </section>
 
-      {/* Grid */}
-      <section className={styles.gridSection}>
-        <div className={styles.grid}>
-          {courses.map((catalogCourse: CatalogCourse, index: number) => (
-            <CourseCard key={catalogCourse.course.id} catalogCourse={catalogCourse} isFeatured={index === 0} />
-          ))}
-        </div>
-        {courses.length === 0 && (<div style={{ textAlign: 'center', padding: 'var(--space-10)', color: 'var(--ink-500)' }}><p>No courses available yet. Check back soon.</p></div>)}
-      </section>
-    </main>
+        {/* Grid */}
+        <section className={styles.gridSection}>
+          <div className={styles.grid}>
+            {courses.map((catalogCourse: CatalogCourse, index: number) => (
+              <CourseCard
+                key={catalogCourse.course.id}
+                catalogCourse={catalogCourse}
+                isFeatured={index === 0}
+              />
+            ))}
+          </div>
+          {courses.length === 0 && (
+            <div
+              style={{ textAlign: "center", padding: "var(--space-10)", color: "var(--ink-500)" }}
+            >
+              <p>No courses available yet. Check back soon.</p>
+            </div>
+          )}
+        </section>
+      </main>
     </StudentShell>
   );
 }
 
-function CourseCard({ catalogCourse, isFeatured = false }: { catalogCourse: CatalogCourse; isFeatured?: boolean }) {
+function CourseCard({
+  catalogCourse,
+  isFeatured = false,
+}: {
+  catalogCourse: CatalogCourse;
+  isFeatured?: boolean;
+}) {
   const { course, lessonCount, estimatedMinutes } = catalogCourse;
   const hours = Math.floor(estimatedMinutes / 60);
   const minutes = estimatedMinutes % 60;
@@ -82,7 +104,22 @@ function CourseCard({ catalogCourse, isFeatured = false }: { catalogCourse: Cata
 
       <div className={styles.cardBody}>
         {isFeatured && (
-          <span style={{ display: 'inline-block', fontSize: '10px', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '2px 6px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: '4px', marginBottom: 'var(--space-2)' }}>Featured</span>
+          <span
+            style={{
+              display: "inline-block",
+              fontSize: "10px",
+              fontFamily: "var(--font-mono)",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              padding: "2px 6px",
+              background: "var(--accent-soft)",
+              color: "var(--accent)",
+              borderRadius: "4px",
+              marginBottom: "var(--space-2)",
+            }}
+          >
+            Featured
+          </span>
         )}
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>{course.title}</h2>
