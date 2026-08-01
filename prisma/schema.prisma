@@ -96,6 +96,7 @@ model User {
   certificates Certificate[]
   emailVerifications EmailVerification[]
   passwordResets PasswordReset[]
+  liveClassRegistrations LiveClassRegistration[]
 
   @@index([email])
   @@index([paymongoCustomerId])
