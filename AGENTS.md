@@ -191,6 +191,120 @@ When something breaks:
 6. **Expose it.** Add a server action in `src/app/actions/<feature>.ts` (5 lines: parse, call, return) or a page in `src/app/(dashboard)/...`.
 7. **Add a story.** `docs/stories/STORY-XXX.md`. Acceptance criteria. Definition of Done.
 
+## Guardrails for AI Agents
+
+This section is derived from real audit findings. Each rule below is a defect that shipped or almost shipped.
+
+### Pre-flight checklist (run before opening a PR)
+
+1. **Verify the gap exists.** Grep the source for the alleged missing piece. Many "planned" features are already implemented — don't re-build what's there.
+2. **Read the story file.** If `docs/stories/STORY-XXX.md` already exists, read its `## Status` block. Trust it unless the source contradicts it.
+3. **Check `docs/STUDENT-FEATURE-GAP-ANALYSIS.md`.** It is the live audit of student-facing gaps. If your work is in there as "fixed", update the doc in the same PR.
+4. **Find the canonical owner of the file path.** Use `git log --follow <file>` to see who last touched it and the PR that introduced the current pattern. Match that style.
+5. **Check the corresponding port.** If you add a method to a repository, confirm the port in `src/ports/` declares it, the `Fake*` adapter in `src/infra/<concern>/fake/` implements it, and `buildTestContainer()` wires the real adapter.
+
+### Hard Rules for Adding or Editing Code
+
+#### Routes and server actions
+
+- Every new student-facing route lives under `src/app/<feature>/page.tsx`. Use the App Router conventions already present (`loading.tsx`, `error.tsx`, `__tests__/`).
+- Every new mutation lives as a server action in `src/app/actions/<feature>.action.ts`, not as an API route. The only API routes are webhooks and third-party callbacks (Rule 4).
+- Server actions must call a use case, not implement business logic. The action is a 5-line shim: parse, call, return.
+- New student-facing pages must register with the loading-skeleton coverage target (64/64). Add `loading.tsx` to every new page directory.
+
+#### Database changes
+
+- Every mutable Prisma model needs `deletedAt`, `createdById`, `updatedById`. No exceptions.
+- Never edit an existing migration. Append a new one under `prisma/migrations/<timestamp>_<description>/migration.sql`.
+- Never call `new PrismaClient()` outside `src/infra/database/prisma.ts`. Use `buildContainer()`.
+- Money is never `number`. Use `Money.of(amount, "PHP")` in domain code.
+
+#### Auth and sessions
+
+- New auth code must use `getSessionUserId()` from `src/lib/auth.ts`, not a hand-rolled cookie parse.
+- Session-touching use cases must validate against the `sessions` table, not just the JWT signature. JWT-only auth is a P1 audit finding.
+- Any new impersonation path must capture the admin's original token and replant it on restore. Don't sign the admin out.
+
+#### Audit logging
+
+- Every admin mutation goes through `RecordAuditLog`. Add the call inside the use case, not in the action.
+- New audit actions extend the `AuditAction` enum at `src/domain/values/AuditAction.ts`. Don't use string literals.
+
+#### Simulator rules (these have shipped several P1s)
+
+- Every graded action passes the real `userId` from `getSessionUserId()`. Never hardcode `"system"` or any literal.
+- Adding a simulator requires a new entry in `buildSimulatorRegistry.ts`, not a new branch in `src/app/tools/`.
+- Simulator scores are formative. Never label them "certified" or "hiring ready" in copy.
+
+#### Admin pages
+
+- Every `/admin/*` route is gated by `requireAdmin()`.
+- Every list page has search, filter, and pagination.
+- Every mutation is audited (see above).
+- New admin forms use the AMPH `@/components/ui` primitives — never raw HTML inputs.
+
+#### Student-facing copy
+
+- Voice: direct, plain-spoken, Filipino VA audience. No AI-slop phrases.
+- No em-dashes in copy or commit messages.
+- Forms have real labels, not just placeholders.
+- Money displays in PHP (`₱`). Never `$`. Never `USD`.
+
+### Things to Never Do (extended list)
+
+- Don't add a use case without an `Fake*` adapter wired into `buildTestContainer()`. Tests will silently use the real adapter.
+- Don't add a port method without updating its JSDoc postconditions. Future agents will misuse the contract.
+- Don't ship a new page with `loading.tsx` missing. Hardcode a skeleton import — `import { Skeleton } from "@/components/ui/Skeleton"`.
+- Don't bypass the AuditLog on a "one-off" admin action. There are no one-offs.
+- Don't add `pnpm install` packages without updating `package.json` and `pnpm-lock.yaml`. PR will fail CI.
+- Don't write `// @ts-expect-error` to make a build pass. Fix the type or ask.
+- Don't duplicate content from `docs/stories/STORY-XXX.md` into the PR description. Link to the file.
+- Don't open a PR with uncommitted changes in the working tree.
+- Don't rebase by force-pushing `main`. PRs merge via squash.
+- Don't put emoji in code, commits, or PR descriptions.
+- Don't ship a `feat:` commit that includes a `refactor:` of unrelated files.
+- Don't add a 6th simulator by editing `src/app/tools/page.tsx`. Add a domain module + registry entry (this is already in `## Don't Do`; restated here).
+- Don't write story docs that mark work as "Planned" when the source already ships it. Run a grep first.
+
+### Story doc maintenance
+
+Every time you change a student-facing feature, in the same PR update:
+
+1. The corresponding `docs/stories/STORY-XXX.md` `## Status` block.
+2. `FEATURES.md` status column for the affected feature.
+3. `CHANGELOG.md` with a one-line entry.
+4. `docs/STUDENT-FEATURE-GAP-ANALYSIS.md` if the change closes a verified gap.
+
+### Audit verification pattern
+
+For "is this already built?" questions, prefer this pattern over guessing:
+
+```bash
+# Does the route exist?
+ls src/app/<feature>
+
+# Is it wired in the container?
+grep -rn '<Feature>Repository' src/composition/
+
+# Does the use case exist?
+ls src/usecases/<Feature>*.ts
+
+# Is there a test?
+ls src/usecases/__tests__/<Feature>*.test.ts
+```
+
+If all four pass, the feature ships. If 1-3 pass, build the missing pieces. If 0 pass, start from the recipe in "Adding a New Feature".
+
+### When you're not sure
+
+1. Run `grep -r '<keyword>' src/` for the implementation status.
+2. Read the story doc if one exists.
+3. Read `docs/STUDENT-FEATURE-GAP-ANALYSIS.md`.
+4. Read `docs/audit-2026-07-27-completeness-review.md`.
+5. Read `docs/sprint-plan.md`.
+6. Read `docs/decisions.md` (ADRs).
+7. If still uncertain, **do not invent**. Mark the PR draft and ask.
+
 ## Memoria Protocol
 
 This repo uses Memoria for cross-agent context. Tag memories with:
