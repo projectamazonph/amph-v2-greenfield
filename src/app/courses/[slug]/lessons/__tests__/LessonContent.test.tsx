@@ -55,7 +55,7 @@ describe("LessonContent (render)", () => {
       content: {
         durationMinutes: 12,
         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      },
+      } as unknown as Lesson["content"],
     });
     const html = renderToString(
       <LessonContent lesson={lesson} courseSlug={courseSlug} />,

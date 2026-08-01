@@ -17,6 +17,7 @@ import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
 import { getLessonData } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
+import type { Lesson } from "@/domain/entities/Lesson";
 import { LessonSidebar } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
 import { Button } from "@/components/ui/Button";
@@ -143,7 +144,7 @@ export default async function LessonPage({ params }: PageProps) {
           </div>
 
           {/* Lesson body */}
-          <LessonContent lesson={lesson} courseSlug={slug} />
+          <LessonContent lesson={lesson as Lesson} courseSlug={slug} />
 
           {/* Mark as Complete */}
           <form

@@ -225,6 +225,7 @@ export interface TestContainer extends AppContainer {
   scorePolicyRepo: InMemoryScorePolicyRepository;
   feedbackRepo: InMemoryAttemptFeedbackRepository;
   liveClassRepo: InMemoryLiveClassRepository;
+  liveClassRegistrationRepo: InMemoryLiveClassRegistrationRepository;
   pricingTierRepo: InMemoryPricingTierRepository;
   keywordDatasetRepo: StaticKeywordDatasetRepository;
   sentReminderRepo: InMemorySentReminderRepository;
@@ -302,6 +303,7 @@ export function buildTestContainer(): TestContainer {
   const feedbackRepo = new InMemoryAttemptFeedbackRepository();
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
+  const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
   // STORY-011: pricing tier repo
   const pricingTierRepo = new InMemoryPricingTierRepository();
   // STORY-081: same in-code repository as production -- no DB table yet.
@@ -621,6 +623,7 @@ export function buildTestContainer(): TestContainer {
     }),
     // STORY-050c
     liveClassRepo,
+    liveClassRegistrationRepo,
     pricingTierRepo,
     keywordDatasetRepo,
     sentReminderRepo,
