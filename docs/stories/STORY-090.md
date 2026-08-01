@@ -1,55 +1,56 @@
-# STORY-090 — Student quiz UI: access control + server action migration
+# STORY-090 — Live-class list page
 
-**Status:** Deferred (not in this PRD scope)
-**Owner:** Ryan Roland Dabao
-**Sprint:** Sprint 6/7/9 completeness-gaps (US-001 + US-002)
-**Depends on:** STORY-026 (Sprint 6 lesson delivery), STORY-031 (quiz domain)
+**Type:** feat
+**Pts:** 1
+**Status:** Done
 
----
+## Why
 
-## Overview
+`docs/STUDENT-FEATURE-GAP-ANALYSIS.md` identified the live-class student experience as the second-largest student-facing gap. Admins could schedule live classes (`/admin/live-classes/...`) and the `SendLiveClassReminders` cron emailed students, but no student-facing list page existed. This is the first half of the gap fix.
 
-This story covers the student-facing quiz flow: ensuring only enrolled students (or admins) can reach a quiz page, and migrating the mutation off the legacy API route onto a Next.js server action per AGENTS.md Rule 4.
+## What changed
 
-The PRD for the Sprint 6/7/9 completeness-gaps work ([`prd.md`](../../../.archon/ralph/sprints-6-7-9-completeness-gaps/prd.md)) included these as **US-001** and **US-002** in its 10-story scope, but the original user framing that drove the gap-identification was the **three administrative gaps**:
+- `src/app/live-classes/page.tsx` — new server component. Reads from `listLiveClassesForStudent`, which joins live classes with the student's active enrollments and current RSVP state.
+- `src/app/live-classes/loading.tsx` — loading skeleton (required by AGENTS.md "loading.tsx required on every page directory").
+- `src/app/live-classes/page.module.css` — Field Manual tokens. Edge-to-edge row layout, no Card wrapper around the list.
+- `src/usecases/ListLiveClassesForStudent.ts` — new use case. Joins three ports (LiveClassRepository, LiveClassRegistrationRepository, EnrollmentRepository). Returns empty for non-enrolled users.
+- `src/domain/entities/LiveClassRegistration.ts` — new domain entity. Pure factory + helpers. `Result` for validation errors.
+- `src/ports/repositories/ILiveClassRegistrationRepository.ts` — new port.
+- `src/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository.ts` — fake adapter for tests and the production container (until the Prisma adapter lands).
+- `src/composition/container.ts` — wires the new use case + the in-memory registration repo.
+- `src/composition/container.test.ts` — same wiring for `buildTestContainer()`.
+- `prisma/migrations/20260801000000_live_class_registration/` — new migration for the `live_class_registrations` table. Cascades on user and live_class delete.
+- `prisma/schema.prisma` — `LiveClassRegistration` model + relation to `User` and `LiveClass`.
 
-1. Admin quiz CRUD (STORY-091, US-003 to US-006) — _delivered_
-2. Admin cert list/detail/revoke (STORY-092, US-007 to US-009) — _delivered_
-3. Cert audit log gap (Architecture Note 6, surfaced in US-008) — _delivered_
+## Acceptance Criteria
 
-The student-facing quiz UI was real but secondary to the three stated gaps. US-001 and US-002 are deferred to a future story / sprint to keep this PRD's scope aligned with the user's stated priorities.
+- [x] `/live-classes` returns 200 for any authenticated user.
+- [x] Empty list (or empty-state) when the student is not enrolled.
+- [x] Class rows show date, time, duration, title, and an RSVP status badge.
+- [x] Sorted by nearest `scheduledAt` first.
+- [x] Past or cancelled classes are excluded.
+- [x] `loading.tsx` exists (skeleton coverage target).
+- [x] Tests cover: empty enrollment, future-only filtering, sort order, and RSVP attachment.
 
-## What this story would have shipped (deferred scope)
+## Files touched
 
-- **`src/app/courses/[slug]/lessons/[lessonId]/quiz/page.tsx`** — add an `AuthorizeLessonAccess.execute({ userId, courseId, lessonId })` call mirroring the pattern in `src/app/courses/[slug]/lessons/[lessonId]/page.tsx:66-81`. Render `AccessDeniedPage` on `denied`; otherwise render `QuizPlayer` as today.
-- **`src/app/actions/submitQuizAttempt.action.ts`** — new server action wrapping `RecordQuizAttempt`, including the same AuthorizeLessonAccess check.
-- **`src/components/courses/QuizPlayer.tsx`** — switch from `fetch(POST /api/quizzes/${quizId}/attempt)` to `submitQuizAttempt(...)` via `useTransition`.
-- **`src/app/courses/[slug]/lessons/LessonContent.tsx`** — `QuizContent` placeholder replaced with a link to the sibling quiz route.
-- **Delete** `src/app/api/quizzes/[quizId]/attempt/route.ts` + `processQuizAttempt.ts` + their tests.
-- **Unit + E2E tests** for the new server action and the access-control behavior.
+- New: `src/app/live-classes/page.tsx`, `page.module.css`, `loading.tsx`
+- New: `src/domain/entities/LiveClassRegistration.ts`
+- New: `src/ports/repositories/ILiveClassRegistrationRepository.ts`
+- New: `src/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository.ts`
+- New: `src/usecases/ListLiveClassesForStudent.ts`
+- New: `src/usecases/__tests__/ListLiveClassesForStudent.test.ts`
+- New: `prisma/migrations/20260801000000_live_class_registration/migration.sql`
+- Modified: `prisma/schema.prisma`
+- Modified: `src/composition/container.ts`
+- Modified: `src/composition/container.test.ts`
 
-## Current state (as of US-010 / 2026-07-27)
+## Pitfalls
 
-| File                                                      | Status                                                                   |
-| --------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `src/app/courses/[slug]/lessons/[lessonId]/quiz/page.tsx` | Loads quiz, renders `QuizPlayer`. **No AuthorizeLessonAccess.**          |
-| `src/components/courses/QuizPlayer.tsx`                   | Uses `fetch(POST /api/quizzes/${quizId}/attempt)`.                       |
-| `src/app/api/quizzes/[quizId]/attempt/route.ts`           | **Still exists** — should be deleted when US-002 lands.                  |
-| `src/app/courses/[slug]/lessons/LessonContent.tsx`        | `QuizContent` still shows "Interactive quiz — coming soon!" placeholder. |
-| `src/app/actions/submitQuizAttempt.action.ts`             | **Does not exist** — should be created when US-002 lands.                |
+- The in-memory registration repo is the production adapter for now because there is no `PrismaLiveClassRegistrationRepository.ts` yet. AGENTS.md "Don't" rule 12 ("Don't mock the real Prisma client in tests") still holds — the production container wires the in-memory fake rather than mocking. A Prisma adapter is the natural follow-up.
 
-## Why deferred
+## Verification
 
-- The user identified three administrative gaps as the priority; US-001 and US-002 are student-facing concerns and were not on that list.
-- The student quiz flow is _functionally_ in place today (the QuizPlayer and API route work), just without the access-control gate and not on a server action. The security gap is real but contained: the API route does check `getSessionUser()` and the QuizPlayer would 401 on unauthenticated requests; what it doesn't check is enrollment (so a logged-in but not-enrolled student could potentially take a quiz if they know the URL).
-- AGENTS.md Rule 4 violation (API route for a non-webhook mutation) is real but isolated to this single flow.
-
-## Out of scope for US-010
-
-US-010 (final integration) explicitly does not include US-001/US-002. The PR body for US-010 calls this out and links here for the audit trail. The PRD's dependency graph still lists US-010 as depending on US-002, but the dependency was never a hard blocker — US-010 is a wrap-up gate, not a deliverable that requires the student quiz flow to be remediated.
-
-## Story numbers
-
-- **STORY-090** (this file) — meta-story for US-001 + US-002.
-- **STORY-091** — meta-story for US-003 to US-006 (admin quiz CRUD) — _delivered in PRs #219–#222_.
-- **STORY-092** — meta-story for US-007 to US-009 (admin cert list/revoke) — _delivered in PRs #223–#225_.
+- `pnpm test src/usecases/__tests__/ListLiveClassesForStudent.test.ts`
+- `pnpm tsc --noEmit`
+- Manual: log in as an enrolled student, visit `/live-classes`, see upcoming sessions and the RSVP status badge.

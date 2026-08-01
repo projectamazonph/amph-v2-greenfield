@@ -261,21 +261,38 @@ model LiveClass {
   id       String @id @default(cuid())
   courseId String
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
   title           String
   scheduledAt     DateTime
   durationMinutes Int
   instructorId    String
   meetingUrl      String
   status          String   @default("scheduled") // scheduled | cancelled | completed
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  registrations LiveClassRegistration[]
   @@index([courseId])
   @@index([status])
   @@index([scheduledAt])
   @@map("live_classes")
+}
+
+model LiveClassRegistration {
+  id           String   @id @default(cuid())
+  userId       String
+  liveClassId  String
+  liveClass    LiveClass @relation(fields: [liveClassId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       String   @default("registered") // registered | cancelled | attended | no_show
+  registeredAt DateTime @default(now())
+  cancelledAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, liveClassId])
+  @@index([userId])
+  @@index([liveClassId])
+  @@index([status])
+  @@map("live_class_registrations")
 }
 
 model Enrollment {

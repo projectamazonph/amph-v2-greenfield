@@ -61,6 +61,7 @@ import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulato
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
 import type { IAttemptFeedbackRepository } from "@/ports/repositories/IAttemptFeedbackRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
+import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiveClassRegistrationRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 import type { KeywordDatasetRepository } from "@/ports/repositories/KeywordDatasetRepository";
 
@@ -87,6 +88,7 @@ import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSim
 import { PrismaScorePolicyRepository } from "@/infra/repositories/PrismaScorePolicyRepository";
 import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAttemptFeedbackRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
+import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
@@ -243,6 +245,9 @@ import { CreateLiveClass } from "@/usecases/CreateLiveClass";
 import { UpdateLiveClass } from "@/usecases/UpdateLiveClass";
 import { DeleteLiveClass } from "@/usecases/DeleteLiveClass";
 import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
+import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent";
+import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
+import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
 import type { SentReminderRepository } from "@/ports/repositories/SentReminderRepository";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
@@ -284,6 +289,8 @@ export interface AppContainer {
   feedbackRepo: IAttemptFeedbackRepository;
   // STORY-050c: live class admin CRUD
   liveClassRepo: ILiveClassRepository;
+  // STORY-091: live class RSVP for students
+  liveClassRegistrationRepo: ILiveClassRegistrationRepository;
   // STORY-011: pricing tier repo
   pricingTierRepo: IPricingTierRepository;
   // STORY-048b/c: module + lesson repos (also used by public catalog)
@@ -425,6 +432,10 @@ export interface AppContainer {
   resetPassword: ResetPassword;
   // P0-7: live class reminders (cron entry point)
   sendLiveClassReminders: SendLiveClassReminders;
+  // STORY-090/091: student RSVP flow
+  listLiveClassesForStudent: ListLiveClassesForStudent;
+  rsvpLiveClass: RsvpLiveClass;
+  cancelLiveClassRsvp: CancelLiveClassRsvp;
 }
 
 // ΓöÇΓöÇ Production container builder ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -488,6 +499,10 @@ function buildProductionContainer(): AppContainer {
   // STORY-066: feedback composer + remediation
   const feedbackRepo: IAttemptFeedbackRepository = new PrismaAttemptFeedbackRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
+  // STORY-091: in-memory fallback until Prisma adapter lands — collection
+  // lives across hot reload (test_container wires the same instance).
+  const liveClassRegistrationRepo: ILiveClassRegistrationRepository =
+    new InMemoryLiveClassRegistrationRepository();
   // STORY-011: pricing tier repo
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
   // STORY-081: no DB table yet -- see StaticKeywordDatasetRepository's docblock
@@ -887,6 +902,22 @@ function buildProductionContainer(): AppContainer {
       clock,
       logger,
       renderer: liveClassReminderRenderer,
+    }),
+    // STORY-090/091: live class student flow
+    listLiveClassesForStudent: new ListLiveClassesForStudent({
+      liveClassRepo,
+      liveClassRegistrationRepo,
+      enrollmentRepo,
+    }),
+    rsvpLiveClass: new RsvpLiveClass({
+      liveClassRepo,
+      liveClassRegistrationRepo,
+      ids: idGen,
+      clock,
+    }),
+    cancelLiveClassRsvp: new CancelLiveClassRsvp({
+      liveClassRegistrationRepo,
+      clock,
     }),
   };
 }

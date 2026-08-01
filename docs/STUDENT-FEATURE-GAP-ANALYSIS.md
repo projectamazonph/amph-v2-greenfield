@@ -28,7 +28,7 @@ This is the verified version. Each gap has been checked against the source. Alre
    - STORY-085 through STORY-089 (Sprint 16, never written)
 2. **Code gaps**
    - ~~Lesson-to-quiz transition still placeholder (`LessonContent.tsx:131`)~~ **CLOSED in STORY-094**
-   - Live-class student page does not exist
+   - ~~Live-class student page does not exist~~ **CLOSED in STORY-090 + STORY-091** — `/live-classes` list + `/live-classes/[id]` detail with RSVP
    - Admin email-template editor page does not exist
    - Student 2FA opt-in page does not exist
    - Account deletion / data export does not exist
