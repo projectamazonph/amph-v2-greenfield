@@ -106,9 +106,8 @@ export class RsvpLiveClass {
     }
 
     // 3. Create a new registration row.
-    const idResult = this.deps.ids.generate();
     const regInput = {
-      id: idResult.value,
+      id: this.deps.ids.newId(),
       userId: input.userId,
       liveClassId: input.liveClassId,
     };
