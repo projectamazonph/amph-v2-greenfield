@@ -2,6 +2,8 @@
 
 All notable changes to Project Amazon PH Academy v2 are documented here.
 ## [Unreleased]
+### 2026-08-01: Live-class student experience (STORY-090, STORY-091)
+Closes the second-largest entry in `docs/STUDENT-FEATURE-GAP-ANALYSIS.md`. Adds `/live-classes` (list) and `/live-classes/[id]` (detail + RSVP) for enrolled students. New `LiveClassRegistration` domain entity, `ILiveClassRegistrationRepository` port, in-memory adapter (`live_class_registrations` table migration), and three use cases (`ListLiveClassesForStudent`, `RsvpLiveClass`, `CancelLiveClassRsvp`). Server actions validate the session via `getSessionUserId()` and revalidate the affected routes. RSVP is idempotent; cancelled RSVPs can be re-registered.
 ### 2026-08-01: Lesson-to-quiz transition wiring (STORY-094)
 QUIZ lessons in the curriculum previously rendered an "Interactive quiz, coming soon!" placeholder. The `LessonContent` component now matches the domain `Lesson` entity and renders a real quiz card with the question count, a preview of the first two prompts, and a "Start Quiz" link to `/courses/[slug]/lessons/[lessonId]/quiz`. Removes a documented audit gap and restores a path the seeded content was already pointing at.
 ### 2026-07-31: Production readiness hardening (PR #256, `915c7ca`)

@@ -186,6 +186,10 @@ import { ResendVerification } from "@/usecases/auth/ResendVerification";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
 import { ResetPassword } from "@/usecases/auth/ResetPassword";
 import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
+import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent";
+import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
+import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
+import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
 
 import type { AppContainer } from "./container";
 
@@ -666,6 +670,22 @@ export function buildTestContainer(): TestContainer {
       clock,
       logger,
       renderer: liveClassReminderRenderer,
+    }),
+    // STORY-090/091: student RSVP
+    listLiveClassesForStudent: new ListLiveClassesForStudent({
+      liveClassRepo,
+      liveClassRegistrationRepo: new InMemoryLiveClassRegistrationRepository(),
+      enrollmentRepo,
+    }),
+    rsvpLiveClass: new RsvpLiveClass({
+      liveClassRepo,
+      liveClassRegistrationRepo: new InMemoryLiveClassRegistrationRepository(),
+      ids: idGen,
+      clock,
+    }),
+    cancelLiveClassRsvp: new CancelLiveClassRsvp({
+      liveClassRegistrationRepo: new InMemoryLiveClassRegistrationRepository(),
+      clock,
     }),
   };
 }
