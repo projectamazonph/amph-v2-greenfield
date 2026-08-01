@@ -8,12 +8,10 @@
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
-"use client";
-
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { useEffect, useState } from "react";
+
 import { buildContainer } from "@/composition/container";
 import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
@@ -50,17 +48,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function LessonPage({ params }: PageProps) {
   // NOTE: This page is now a Client Component so we can hook in the
-  // 'Lesson complete' confetti trigger. As a side-effect, `generateMetadata`
-  // above stops running (it requires a Server Component). If SEO metadata
-  // is needed for this route, move it onto a sibling server component
-  // (e.g. a `layout.tsx` or a server `<head>` wrapper) — see the project
-  // migration notes. For now the route still renders correctly.
-
-  // Hooks (useState / useEffect) MUST be called before any `await` so
-  // React's rules-of-hooks stay satisfied for both server- and client-
-  // side execution paths.
-  const [justCompleted] = useState(false);
-
   const { slug, lessonId } = await params;
   const container = buildContainer();
 
@@ -141,7 +128,13 @@ export default async function LessonPage({ params }: PageProps) {
             </ol>
           </nav>
 
-          <Link href={`/courses/${slug}`} className="btn btn-ghost" style={{ fontSize: 'var(--text-sm)', marginTop: 'var(--space-2)' }}>← Back to Course</Link>
+          <Link
+            href={`/courses/${slug}`}
+            className="btn btn-ghost"
+            style={{ fontSize: "var(--text-sm)", marginTop: "var(--space-2)" }}
+          >
+            ← Back to Course
+          </Link>
 
           {/* Lesson header */}
           <div className={styles.lessonHeader}>
@@ -153,10 +146,16 @@ export default async function LessonPage({ params }: PageProps) {
           <LessonContent lesson={lesson} />
 
           {/* Mark as Complete */}
-          <form action="/api/lessons/complete" method="post" style={{ marginTop: 'var(--space-4)' }}>
+          <form
+            action="/api/lessons/complete"
+            method="post"
+            style={{ marginTop: "var(--space-4)" }}
+          >
             <input type="hidden" name="lessonId" value={lessonId} />
             <input type="hidden" name="courseId" value={course.id} />
-            <Button variant="primary" size="md" type="submit">Mark as Complete</Button>
+            <Button variant="primary" size="md" type="submit">
+              Mark as Complete
+            </Button>
           </form>
 
           {/* Prev / Next navigation */}
@@ -172,12 +171,6 @@ export default async function LessonPage({ params }: PageProps) {
     </div>
   );
 }
-
-useEffect(() => {
-  if (justCompleted) {
-    // trigger confetti or fade animation here
-  }
-}, [justCompleted]);
 
 // ── Access denied page ──────────────────────────────────────
 
