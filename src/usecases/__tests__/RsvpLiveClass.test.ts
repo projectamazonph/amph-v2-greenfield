@@ -11,7 +11,7 @@ import { createLiveClass } from "@/domain/entities/LiveClass";
 import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
-import { InMemoryLiveClassRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRepository";
+import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";

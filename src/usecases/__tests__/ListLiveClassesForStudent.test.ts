@@ -5,9 +5,10 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { createLiveClass } from "@/domain/entities/LiveClass";
+import { createLiveClass, type LiveClass } from "@/domain/entities/LiveClass";
 import { createLiveClassRegistration } from "@/domain/entities/LiveClassRegistration";
 import type { Enrollment } from "@/domain/entities/Enrollment";
+import { createEnrollment } from "@/domain/entities/Enrollment";
 import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent";
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
@@ -53,11 +54,49 @@ function makeEnrollments(items: Enrollment[]) {
       const filtered = items.filter((e) => e.userId === userId);
       return Result.ok(filtered);
     },
+    async findByUserIdAndCourseId(userId: string, courseId: string) {
+      const found = items.find((e) => e.userId === userId && e.courseId === courseId);
+      return found ?? null;
+    },
+    async findByCourseId(courseId: string) {
+      const filtered = items.filter((e) => e.courseId === courseId);
+      return Result.ok(filtered);
+    },
+    async findById(id: string) {
+      const found = items.find((e) => e.id === id);
+      if (!found) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.ok(found);
+    },
+    async create(enrollment: Enrollment) {
+      items.push(enrollment);
+      return Result.ok(enrollment);
+    },
+    async update(enrollment: Enrollment) {
+      const idx = items.findIndex((e) => e.id === enrollment.id);
+      if (idx === -1) {
+        return Result.err({ kind: "not_found" });
+      }
+      items[idx] = enrollment;
+      return Result.ok(enrollment);
+    },
   };
   return repo;
 }
 
 const now = new Date("2026-08-01T00:00:00Z");
+
+function makeEnrollment(opts: { id: string; userId: string; courseId: string }): Enrollment {
+  const r = createEnrollment({
+    id: opts.id,
+    userId: opts.userId,
+    courseId: opts.courseId,
+    createdAt: now,
+  });
+  if (!r.ok) throw new Error("seed enrollment");
+  return r.value;
+}
 
 describe("ListLiveClassesForStudent", () => {
   it("returns no classes when the student is not enrolled anywhere", async () => {
@@ -79,33 +118,38 @@ describe("ListLiveClassesForStudent", () => {
   });
 
   it("returns only future classes for enrolled courses", async () => {
+    // `createLiveClass` rejects past-dated classes at the factory, so the
+    // past entry is hand-constructed to exercise the use case's
+    // `scheduledAt > now` filter without the factory blocking it. The
+    // future date uses a far-out horizon so the test stays valid
+    // regardless of when CI runs it.
+    const past = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 1 week ago
+    const future = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 2 weeks out
+    const pastClass: LiveClass = {
+      id: "lc-2",
+      courseId: "c-1",
+      title: "Past class",
+      scheduledAt: past,
+      durationMinutes: 60,
+      instructorId: "u-1",
+      meetingUrl: "https://zoom.example/lc-2",
+      status: "scheduled",
+      createdAt: past,
+      updatedAt: past,
+    };
     const liveClassRepo = makeLiveClassRepo([
       makeClass({
         id: "lc-1",
         courseId: "c-1",
-        scheduledAt: new Date("2026-08-15T10:00:00Z"),
+        scheduledAt: future,
       }),
-      makeClass({
-        id: "lc-2",
-        courseId: "c-1",
-        scheduledAt: new Date("2026-07-15T10:00:00Z"),
-      }),
+      pastClass,
     ]);
     const useCase = new ListLiveClassesForStudent({
       liveClassRepo,
       liveClassRegistrationRepo: makeRegistrationRepo(),
       enrollmentRepo: makeEnrollments([
-        {
-          id: "e-1",
-          userId: "u-2",
-          courseId: "c-1",
-          status: "active",
-          source: "direct",
-          completedLessonIds: [],
-          progressPercent: 0,
-          createdAt: now,
-          updatedAt: now,
-        },
+        makeEnrollment({ id: "e-1", userId: "u-2", courseId: "c-1" }),
       ]),
     });
     const r = await useCase.execute({ userId: "u-2" });
@@ -138,17 +182,7 @@ describe("ListLiveClassesForStudent", () => {
       liveClassRepo,
       liveClassRegistrationRepo: makeRegistrationRepo(),
       enrollmentRepo: makeEnrollments([
-        {
-          id: "e-1",
-          userId: "u-2",
-          courseId: "c-1",
-          status: "active",
-          source: "direct",
-          completedLessonIds: [],
-          progressPercent: 0,
-          createdAt: now,
-          updatedAt: now,
-        },
+        makeEnrollment({ id: "e-1", userId: "u-2", courseId: "c-1" }),
       ]),
     });
     const r = await useCase.execute({ userId: "u-2" });
@@ -187,17 +221,7 @@ describe("ListLiveClassesForStudent", () => {
       liveClassRepo,
       liveClassRegistrationRepo,
       enrollmentRepo: makeEnrollments([
-        {
-          id: "e-1",
-          userId: "u-2",
-          courseId: "c-1",
-          status: "active",
-          source: "direct",
-          completedLessonIds: [],
-          progressPercent: 0,
-          createdAt: now,
-          updatedAt: now,
-        },
+        makeEnrollment({ id: "e-1", userId: "u-2", courseId: "c-1" }),
       ]),
     });
     const r = await useCase.execute({ userId: "u-2" });
