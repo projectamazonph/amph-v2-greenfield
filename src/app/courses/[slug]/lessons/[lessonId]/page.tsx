@@ -143,7 +143,7 @@ export default async function LessonPage({ params }: PageProps) {
           </div>
 
           {/* Lesson body */}
-          <LessonContent lesson={lesson} />
+          <LessonContent lesson={lesson} courseSlug={slug} />
 
           {/* Mark as Complete */}
           <form

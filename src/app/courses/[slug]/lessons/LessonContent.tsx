@@ -4,26 +4,34 @@
  * LessonContent — renders the body of a lesson by type.
  *
  * STORY-026: Lesson page (RSC + MDX render).
+ * STORY-094: Wire QUIZ lessons to the dedicated quiz route.
  *
  * Types:
- *  - TEXT: Markdown body via react-markdown + remark-gfm
+ *  - TEXT:  Markdown body via react-markdown + remark-gfm
  *  - VIDEO: YouTube/Vimeo embed or native <video>
- *  - QUIZ: "Coming soon" placeholder
+ *  - QUIZ:  Question preview + Start Quiz CTA → /courses/[slug]/lessons/[lessonId]/quiz
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { Lesson } from "@/domain/entities/Course";
+import type {
+  Lesson,
+  LessonContent as DomainLessonContent,
+  QuizQuestion,
+  VideoContent,
+  TextContent,
+} from "@/domain/entities/Lesson";
 import styles from "./LessonContent.module.css";
 
-interface TextLessonContent {
+interface TextLessonContent extends TextContent {
   type: "TEXT";
   body: string;
 }
 
-interface VideoLessonContent {
+interface VideoLessonContent extends VideoContent {
   type: "VIDEO";
   videoUrl: string;
   durationMinutes: number;
@@ -32,19 +40,28 @@ interface VideoLessonContent {
 
 interface QuizLessonContent {
   type: "QUIZ";
-  title: string;
+  questions: readonly QuizQuestion[];
+  quizHref: string;
 }
 
-function isTextContent(c: unknown): c is TextLessonContent {
-  return typeof c === "object" && c !== null && (c as { type?: string }).type === "TEXT";
+type LessonContentForRender =
+  | TextLessonContent
+  | VideoLessonContent
+  | QuizLessonContent;
+
+function isTextContent(c: DomainLessonContent): c is TextContent {
+  return "body" in c && typeof (c as TextContent).body === "string";
 }
 
-function isVideoContent(c: unknown): c is VideoLessonContent {
-  return typeof c === "object" && c !== null && (c as { type?: string }).type === "VIDEO";
+function isVideoContent(c: DomainLessonContent): c is VideoContent {
+  return (
+    "durationMinutes" in c &&
+    typeof (c as VideoContent).durationMinutes === "number"
+  );
 }
 
-function isQuizContent(c: unknown): c is QuizLessonContent {
-  return typeof c === "object" && c !== null && (c as { type?: string }).type === "QUIZ";
+function isQuizContent(c: DomainLessonContent): c is { questions: readonly QuizQuestion[] } {
+  return "questions" in c && Array.isArray((c as { questions?: unknown }).questions);
 }
 
 function getYouTubeEmbedUrl(url: string): string | null {
@@ -123,15 +140,63 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
   );
 }
 
-function QuizContent({ title }: { title: string }) {
+function QuizContent({ lessonId, content, quizHref }: QuizLessonContent) {
+  const questionCount = content.questions.length;
+  const firstQuestion = content.questions[0];
+
   return (
-    <div className={styles.quizPlaceholder}>
+    <div className={styles.quizCard}>
       <QuizIcon />
-      <h3 className={styles.quizTitle}>{title}</h3>
-      <p className={styles.quizText}>Interactive quiz — coming soon!</p>
-      <p className={styles.quizHint}>
-        Complete the quiz to test your understanding of this section.
-      </p>
+      <div className={styles.quizIntro}>
+        <h3 className={styles.quizTitle}>Knowledge check</h3>
+        <p className={styles.quizSubtitle}>
+          {questionCount === 1
+            ? "1 question in this lesson"
+            : `${questionCount} questions in this lesson`}
+        </p>
+      </div>
+
+      <div className={styles.quizMeta}>
+        <span className={styles.quizMetaItem}>
+          <QuizCountIcon />
+          {questionCount} {questionCount === 1 ? "question" : "questions"}
+        </span>
+      </div>
+
+      {firstQuestion && (
+        <ol className={styles.quizQuestionsList} aria-label="Question preview">
+          {content.questions.slice(0, 2).map((q, i) => (
+            <li key={q.id} className={styles.quizQuestionItem}>
+              <span className={styles.quizQuestionNumber} aria-hidden="true">
+                {i + 1}
+              </span>
+              <div className={styles.quizQuestionPrompt}>
+                {q.prompt}
+              </div>
+            </li>
+          ))}
+          {content.questions.length > 2 && (
+            <li className={styles.quizQuestionItem}>
+              <span className={styles.quizQuestionNumber} aria-hidden="true">
+                …
+              </span>
+              <div className={styles.quizQuestionPrompt}>
+                {content.questions.length - 2} more{" "}
+                {content.questions.length - 2 === 1 ? "question" : "questions"}
+              </div>
+            </li>
+          )}
+        </ol>
+      )}
+
+      <Link
+        href={quizHref}
+        className="btn btn-primary"
+        data-testid="start-quiz-link"
+        style={{ marginTop: "var(--space-4)" }}
+      >
+        Start Quiz →
+      </Link>
     </div>
   );
 }
@@ -182,26 +247,79 @@ function QuizIcon() {
   );
 }
 
+function QuizCountIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3v.5"
+      />
+    </svg>
+  );
+}
+
 // ── Main component ──────────────────────────────────────────
 
-export function LessonContent({ lesson }: { lesson: Lesson }) {
-  const content = lesson.content as unknown;
+export interface LessonContentProps {
+  lesson: Lesson;
+  courseSlug: string;
+}
 
-  if (isTextContent(content)) {
-    return <TextContent body={content.body} />;
+export function LessonContent({ lesson, courseSlug }: LessonContentProps) {
+  const quizHref = `/courses/${courseSlug}/lessons/${lesson.id}/quiz`;
+  const rawContent = lesson.content as unknown;
+
+  // Build the typed render-shape from the actual domain content.
+  let renderable: LessonContentForRender;
+  if (isQuizContent(rawContent as DomainLessonContent) && lesson.type === "QUIZ") {
+    const quizContent = rawContent as { questions: readonly QuizQuestion[] };
+    renderable = {
+      type: "QUIZ",
+      questions: quizContent.questions,
+      quizHref,
+    };
+  } else if (
+    isVideoContent(rawContent as DomainLessonContent) &&
+    lesson.type === "VIDEO"
+  ) {
+    const vc = rawContent as VideoContent & { videoUrl?: string };
+    renderable = {
+      type: "VIDEO",
+      videoUrl: (vc as { videoUrl?: string }).videoUrl ?? "",
+      durationMinutes: vc.durationMinutes,
+      transcript: (vc as { transcript?: string }).transcript,
+    };
+  } else if (
+    isTextContent(rawContent as DomainLessonContent) &&
+    lesson.type === "TEXT"
+  ) {
+    const tc = rawContent as TextContent;
+    renderable = { type: "TEXT", body: tc.body };
+  } else {
+    return (
+      <div className={styles.unavailable}>
+        <p>Lesson content unavailable.</p>
+      </div>
+    );
   }
 
-  if (isVideoContent(content)) {
-    return <VideoContent content={content} />;
+  if (renderable.type === "TEXT") {
+    return <TextContent body={renderable.body} />;
   }
 
-  if (isQuizContent(content)) {
-    return <QuizContent title={content.title} />;
+  if (renderable.type === "VIDEO") {
+    return <VideoContent content={renderable} />;
   }
 
-  return (
-    <div className={styles.unavailable}>
-      <p>Lesson content unavailable.</p>
-    </div>
-  );
+  // renderable.type === "QUIZ"
+  return <QuizContent lessonId={lesson.id} content={renderable} quizHref={renderable.quizHref} />;
 }

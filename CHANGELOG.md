@@ -1,9 +1,9 @@
 # Changelog
 
 All notable changes to Project Amazon PH Academy v2 are documented here.
-
 ## [Unreleased]
-
+### 2026-08-01: Lesson-to-quiz transition wiring (STORY-094)
+QUIZ lessons in the curriculum previously rendered an "Interactive quiz, coming soon!" placeholder. The `LessonContent` component now matches the domain `Lesson` entity and renders a real quiz card with the question count, a preview of the first two prompts, and a "Start Quiz" link to `/courses/[slug]/lessons/[lessonId]/quiz`. Removes a documented audit gap and restores a path the seeded content was already pointing at.
 ### 2026-07-31: Production readiness hardening (PR #256, `915c7ca`)
 
 Full codebase audit and hardening pass. 61 files changed, 476 insertions, 3,044 deletions.
