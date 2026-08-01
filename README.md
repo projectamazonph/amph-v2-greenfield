@@ -6,7 +6,7 @@ Three courses, practical tools, and a Field Manual interface. The repository con
 
 **Deployment note:** `SESSION-HANDOVER.md` records the latest operator-reported deployment state. This workstation audit did not independently verify the production URL, database contents, PayMongo webhook registration, or email delivery.
 
-![Landing Page](public/screenshots/landing.png)
+![Landing Page](public/screenshots/landing-placeholder.svg)
 
 ## What is included
 
