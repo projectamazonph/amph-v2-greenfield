@@ -27,7 +27,7 @@ This is the verified version. Each gap has been checked against the source. Alre
    - STORY-064, STORY-070 (Sprint 13 simulator infrastructure)
    - STORY-085 through STORY-089 (Sprint 16, never written)
 2. **Code gaps**
-   - Lesson-to-quiz transition still placeholder (`LessonContent.tsx:131`)
+   - ~~Lesson-to-quiz transition still placeholder (`LessonContent.tsx:131`)~~ **CLOSED in STORY-094**
    - Live-class student page does not exist
    - Admin email-template editor page does not exist
    - Student 2FA opt-in page does not exist
