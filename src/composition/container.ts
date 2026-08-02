@@ -855,6 +855,7 @@ function buildProductionContainer(): AppContainer {
     updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
     // STORY-050c
+    liveClassRegistrationRepo,
     liveClassRepo,
     adminListLiveClasses: new AdminListLiveClasses({ liveClassRepo }),
     adminGetLiveClass: new AdminGetLiveClass({ liveClassRepo }),

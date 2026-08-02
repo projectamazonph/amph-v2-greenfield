@@ -40,7 +40,14 @@ describe("/tools/listing-audit — domain layer", () => {
   it("registry returns null for unknown IDs", async () => {
     const { buildContainer } = await import("@/composition/container");
     const container = buildContainer();
-    expect(container.simulatorRegistry.get("listing-audit")).toBeNull();
+    // The mock's `get` only resolves "listing-audit"; every other ID falls
+    // through to null. Cast away the SimulatorId literal-type check so
+    // we can probe the unknown-ID branch without TS narrowing.
+    expect(
+      container.simulatorRegistry.get(
+        "definitely-not-registered" as unknown as Parameters<typeof container.simulatorRegistry.get>[0],
+      ),
+    ).toBeNull();
   });
 
   it("simulator has required fields (simulatorId, name, run)", async () => {

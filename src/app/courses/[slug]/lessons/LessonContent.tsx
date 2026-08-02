@@ -140,7 +140,13 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
   );
 }
 
-function QuizContent({ lessonId, content, quizHref }: QuizLessonContent) {
+function QuizContent({
+  content,
+  quizHref,
+}: {
+  content: QuizLessonContent;
+  quizHref: string;
+}) {
   const questionCount = content.questions.length;
   const firstQuestion = content.questions[0];
 
@@ -165,7 +171,7 @@ function QuizContent({ lessonId, content, quizHref }: QuizLessonContent) {
 
       {firstQuestion && (
         <ol className={styles.quizQuestionsList} aria-label="Question preview">
-          {content.questions.slice(0, 2).map((q, i) => (
+          {content.questions.slice(0, 2).map((q: QuizQuestion, i: number) => (
             <li key={q.id} className={styles.quizQuestionItem}>
               <span className={styles.quizQuestionNumber} aria-hidden="true">
                 {i + 1}
@@ -321,5 +327,5 @@ export function LessonContent({ lesson, courseSlug }: LessonContentProps) {
   }
 
   // renderable.type === "QUIZ"
-  return <QuizContent lessonId={lesson.id} content={renderable} quizHref={renderable.quizHref} />;
+  return <QuizContent content={renderable} quizHref={renderable.quizHref} />;
 }

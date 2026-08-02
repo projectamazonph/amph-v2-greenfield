@@ -270,6 +270,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: build
+    # /api/health is now a static liveness probe (no DB call), so the
+    # Lighthouse job doesn't need the Postgres service to be up —
+    # the marketing/catalog/pricing/login pages it scores don't touch
+    # the DB at render time either.
     env:
       DATABASE_URL: postgresql://test:test@localhost:5432/amph_test
       JWT_SECRET: test-secret-at-least-32-bytes-long-please

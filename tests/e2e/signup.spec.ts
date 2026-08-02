@@ -28,7 +28,11 @@ test.describe("Sign Up", () => {
   });
 
   test("page loads with correct title and heading", async ({ page }) => {
-    await expect(page).toHaveTitle(/Amazon PH Academy/i);
+    // The page sets `<title>Sign Up — AMPH Academy</title>`. Earlier
+    // versions of this test expected `/Amazon PH Academy/i`, which
+    // doesn't match the actual brand string. Use `/AMPH Academy/i` so
+    // the assertion exercises the brand prefix on every page.
+    await expect(page).toHaveTitle(/AMPH Academy/i);
     await expect(page.getByRole("heading", { name: /create your account/i })).toBeVisible();
   });
 

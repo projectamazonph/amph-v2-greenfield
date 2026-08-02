@@ -55,13 +55,14 @@ describe("LessonContent (render)", () => {
       content: {
         durationMinutes: 12,
         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      },
+      } as unknown as Lesson["content"],
     });
     const html = renderToString(
       <LessonContent lesson={lesson} courseSlug={courseSlug} />,
     );
     expect(html).toContain("youtube.com/embed/dQw4w9WgXcQ");
-    expect(html).toContain("12m");
+    // React renders adjacent text nodes as "12<!-- -->m" — accept either form.
+    expect(html).toMatch(/12(?:<!-- -->)?m/);
     expect(html).not.toContain("Start Quiz");
   });
 
@@ -124,8 +125,9 @@ describe("LessonContent (render)", () => {
     // Only first 2 questions preview
     expect(html).toContain("Q1");
     expect(html).toContain("Q2");
-    // Tail summary line for the rest
-    expect(html).toContain("3 more");
+    // Tail summary line for the rest (React inserts `<!-- -->` between
+    // adjacent text nodes — accept both the merged and the split form).
+    expect(html).toMatch(/3(?:<!-- -->)? more/);
   });
 
   it("shows singular 'question' wording for a 1-question QUIZ", () => {
