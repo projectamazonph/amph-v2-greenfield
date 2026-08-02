@@ -4,6 +4,32 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-02: Fix chromium-mobile/chromium-tablet E2E timeout (playwright.config.ts)
+
+Root-caused the mobile/tablet E2E signup timeout that PR #272 flagged as
+pre-existing on `main`. `chromium-mobile` and `chromium-tablet` project
+names were a lie: `devices["iPhone 13"]` and `devices["iPad (gen 7)"]`
+both set `defaultBrowserType: "webkit"`, and nothing in the project `use`
+blocks overrode it, so both projects silently launched WebKit, not
+Chromium, on every run (confirmed by reproducing locally, clicking the
+signup submit button under WebKit never triggered navigation at all,
+the page stayed on `/signup` until the 15s assertion timeout). Only
+`chromium-desktop` (via `devices["Desktop Chrome"]`, which correctly
+sets `defaultBrowserType: "chromium"`) was ever actually testing
+Chromium.
+
+Fix: explicitly set `browserName: "chromium"` on both projects (it
+takes precedence over the inherited `defaultBrowserType`), so they test
+what their names claim, Chromium at a mobile/tablet viewport and touch
+profile, not real WebKit/Safari behavior, which was never the intent
+(nothing else in the repo, CI config, docs, other test files, suggests
+Safari/WebKit compatibility was ever an explicit target).
+
+Verified locally: full `pnpm exec playwright test` (all 3 projects).
+45 passed, 12 skipped, 0 failed, including every test in
+`signup.spec.ts` and `critical-journeys.spec.ts` on `chromium-mobile`
+and `chromium-tablet` that was failing/flaking on `main`.
+
 ### 2026-08-02: Production-readiness fix session (STORY-049.5, STORY-078, STORY-097, STORY-095, STORY-096)
 
 Follow-up to a thorough production-readiness review. Fixes three verified bugs and builds four previously-missing student/admin features.
