@@ -53,6 +53,7 @@ import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository
 import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
 import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
+import type { IProgressEventRepository } from "@/ports/repositories/IProgressEventRepository";
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 import type { IWebhookEventLog } from "@/ports/repositories/IWebhookEventLog";
@@ -64,6 +65,7 @@ import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassReposi
 import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiveClassRegistrationRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 import type { KeywordDatasetRepository } from "@/ports/repositories/KeywordDatasetRepository";
+import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 
 // ΓöÇΓöÇ Production adapters (only the prod ones) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
@@ -81,6 +83,7 @@ import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepos
 import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
+import { PrismaProgressEventRepository } from "@/infra/repositories/PrismaProgressEventRepository";
 import { PrismaAuditLog } from "@/infra/repositories/PrismaAuditLog";
 import { PrismaWebhookEventLog } from "@/infra/repositories/PrismaWebhookEventLog";
 import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
@@ -90,6 +93,7 @@ import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAtte
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
+import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 // STORY-081: no DB table/admin CRUD for keyword datasets yet -- this
@@ -167,6 +171,11 @@ import { AdminGetBadge } from "@/usecases/AdminGetBadge";
 import { AdminCreateBadge } from "@/usecases/AdminCreateBadge";
 import { AdminUpdateBadge } from "@/usecases/AdminUpdateBadge";
 import { AdminArchiveBadge } from "@/usecases/AdminArchiveBadge";
+import { ListEmailTemplates } from "@/usecases/ListEmailTemplates";
+import { GetEmailTemplate } from "@/usecases/GetEmailTemplate";
+import { UpdateEmailTemplate } from "@/usecases/UpdateEmailTemplate";
+import { DeleteUserAccount } from "@/usecases/DeleteUserAccount";
+import { ExportUserData } from "@/usecases/ExportUserData";
 import { AdminListQuizzes } from "@/usecases/AdminListQuizzes";
 import { AdminGetQuiz } from "@/usecases/AdminGetQuiz";
 import { AdminCreateQuiz } from "@/usecases/AdminCreateQuiz";
@@ -276,6 +285,7 @@ export interface AppContainer {
   badgeRepo: IBadgeRepository;
   badgeAwardRepo: IBadgeAwardRepository;
   certificateRepo: ICertificateRepository;
+  progressEventRepo: IProgressEventRepository;
   auditLog: IAuditLog;
   webhookEventLog: IWebhookEventLog;
   rebuildCourseCurriculum: RebuildCourseCurriculum;
@@ -299,6 +309,14 @@ export interface AppContainer {
   simulatorRegistry: SimulatorRegistry;
   // STORY-081: keyword dataset lookup for the Keyword Research simulator
   keywordDatasetRepo: KeywordDatasetRepository;
+  // STORY-095: admin email template editor
+  emailTemplateRepo: IEmailTemplateRepository;
+  listEmailTemplates: ListEmailTemplates;
+  getEmailTemplate: GetEmailTemplate;
+  updateEmailTemplate: UpdateEmailTemplate;
+  // STORY-096: account deletion + data export
+  deleteUserAccount: DeleteUserAccount;
+  exportUserData: ExportUserData;
 
   // External services
   paymentGateway: IPaymentGateway;
@@ -468,6 +486,8 @@ function buildProductionContainer(): AppContainer {
   const badgeRepo: IBadgeRepository = new PrismaBadgeRepository(prisma);
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
+  // STORY-096: was never wired into either container before this fix.
+  const progressEventRepo: IProgressEventRepository = new PrismaProgressEventRepository(prisma);
   const sessionRepo: SessionRepository = new PrismaSessionRepository(prisma);
   const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(
     prisma,
@@ -507,6 +527,8 @@ function buildProductionContainer(): AppContainer {
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
   // STORY-081: no DB table yet -- see StaticKeywordDatasetRepository's docblock
   const keywordDatasetRepo: KeywordDatasetRepository = new StaticKeywordDatasetRepository();
+  // STORY-095: admin email template editor
+  const emailTemplateRepo: IEmailTemplateRepository = new PrismaEmailTemplateRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -629,6 +651,31 @@ function buildProductionContainer(): AppContainer {
     adminCreateBadge: new AdminCreateBadge({ badgeRepo, recordAuditLog }),
     adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
     adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
+    emailTemplateRepo,
+    listEmailTemplates: new ListEmailTemplates({ emailTemplateRepo }),
+    getEmailTemplate: new GetEmailTemplate({ emailTemplateRepo }),
+    updateEmailTemplate: new UpdateEmailTemplate({
+      emailTemplateRepo,
+      recordAuditLog,
+      idGen,
+      clock,
+    }),
+    deleteUserAccount: new DeleteUserAccount({
+      userRepo,
+      hasher: passwordHasher,
+      sessionRepo,
+      recordAuditLog,
+    }),
+    exportUserData: new ExportUserData({
+      userRepo,
+      orderRepo,
+      enrollmentRepo,
+      certificateRepo,
+      badgeAwardRepo,
+      xpEventRepo,
+      progressEventRepo,
+      clock,
+    }),
     // STORY-091: admin quiz CRUD
     adminListQuizzes: new AdminListQuizzes({ quizRepo, courseRepo }),
     adminGetQuiz: new AdminGetQuiz({ quizRepo, courseRepo }),
@@ -657,6 +704,7 @@ function buildProductionContainer(): AppContainer {
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
     certificateRepo,
+    progressEventRepo,
     certificateHashGen,
     certificateRenderer,
     mdxRenderer,

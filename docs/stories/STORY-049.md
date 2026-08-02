@@ -11,7 +11,7 @@
 - **Story**: STORY-049
 - **Sprint**: 10 — Admin panel
 - **Points**: 1
-**Status:** ✅ Done (PR #049, commit `4235d5d` — `feat(admin): STORY-049 admin payments + refunds + refund override`)
+  **Status:** ✅ Done (PR #049, commit `4235d5d` — `feat(admin): STORY-049 admin payments + refunds + refund override`)
 
 ## Goal
 
@@ -168,6 +168,7 @@ pnpm build
 ```
 
 Manual smoke:
+
 - Sign in as admin
 - Visit `/admin/payments` — see all orders (or empty)
 - Click an order — see detail
@@ -178,7 +179,7 @@ Manual smoke:
 
 ## Out of scope (separate stories)
 
-- **STORY-049.5** — PayMongo Refunds API real adapter
+- ~~**STORY-049.5** — PayMongo Refunds API real adapter~~ **Done, 2026-08-02.** `PayMongoAdapter.refund()` calls the real PayMongo Refunds API (`POST /v1/refunds`), mapping the domain's free-text `reason` to PayMongo's `notes` field with the fixed enum reason `"others"` (PayMongo's `reason` field only accepts `duplicate`/`fraudulent`/`requested_by_customer`/`others`, and there's no structured taxonomy on the admin-facing input to map more precisely). A `"pending"` refund status is treated as success (PayMongo settles asynchronously); only `"failed"` is an error.
 - **STORY-049.6** — Partial refunds (multiple refunds per order) — not supported in this story, only full refund
 - **STORY-049.7** — Refund webhook handler (PayMongo sends a `refund.succeeded` event)
 - **STORY-049.8** — Refund email notification to the student

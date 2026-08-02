@@ -16,6 +16,16 @@
  * - Pool error handler prevents unhandled errors from crashing the process.
  * - Graceful shutdown drains the pool on SIGTERM (serverless cold starts,
  *   Docker stop, etc.) so in-flight queries can finish cleanly.
+ *
+ * Lazy construction (production-readiness audit): `prisma` is a Proxy
+ * that only calls createPrismaClient() on first property access, not on
+ * import. `next build`'s page-data collection step imports every route
+ * module (including this one, transitively) to inspect its exports;
+ * eager construction here used to throw "DATABASE_URL environment
+ * variable is not set" during build in any environment where the var
+ * isn't present at build time, even though no request was ever served.
+ * Runtime behavior is unchanged: the first real `prisma.<model>.*` call
+ * still constructs and caches exactly one client, same as before.
  */
 
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -71,8 +81,22 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+function getPrismaClient(): PrismaClient {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+  const client = createPrismaClient();
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = client;
+  }
+  return client;
 }
+
+let _instance: PrismaClient | undefined;
+
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    _instance ??= getPrismaClient();
+    // Receiver defaults to _instance itself (not the proxy) so any
+    // getter on the real client runs with the correct `this`.
+    return Reflect.get(_instance, prop, _instance);
+  },
+});

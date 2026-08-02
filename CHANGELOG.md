@@ -1,11 +1,37 @@
 # Changelog
 
 All notable changes to Project Amazon PH Academy v2 are documented here.
+
 ## [Unreleased]
+
+### 2026-08-02: Production-readiness fix session (STORY-049.5, STORY-078, STORY-097, STORY-095, STORY-096)
+
+Follow-up to a thorough production-readiness review. Fixes three verified bugs and builds four previously-missing student/admin features.
+
+**Fixes:**
+
+- `PayMongoAdapter.refund()` now calls the real PayMongo Refunds API (`POST /v1/refunds`) instead of returning `not_implemented` (STORY-049.5). `ProcessRefund`/`RefundOverride` can now actually issue refunds against production PayMongo.
+- `src/infra/database/prisma.ts`: the Prisma client is now a lazily-initialized `Proxy` instead of being constructed eagerly at module import time. Fixes a real bug where `next build` (and any CI/preview build) crashed with "DATABASE_URL environment variable is not set" during page-data collection, even without serving a request.
+- Added a `Content-Security-Policy` header to `src/proxy.ts` (pragmatic first pass: `script-src`/`style-src` still allow `'unsafe-inline'`, no nonce plumbing yet).
+- `src/infra/payment/PayMongoAdapter.test.ts` was silently never executed by `pnpm test`/CI — it lived outside `vitest.config.ts`'s `include` glob (`__tests__/`/`tests/` only). Moved to `src/infra/payment/__tests__/PayMongoAdapter.test.ts` and extended with refund coverage.
+
+**New features:**
+
+- **STORY-078** — shared `FormativeScoreNotice` component now renders on all 5 simulators' result views ("Practice score only. Not a certification, job-readiness signal, or hiring credential."), pinned by a regression test.
+- **STORY-097** — student 2FA opt-in at `/profile/security` + `/profile/security/2fa-setup`, reusing the same role-agnostic `EnableTwoFactor`/`ConfirmTwoFactor`/`DisableTwoFactor` use cases the admin flow already used.
+- **STORY-095** — admin email-template editor at `/admin/email-templates` (list) and `/admin/email-templates/[type]/edit` (upsert-by-type form). New `ListEmailTemplates`/`GetEmailTemplate`/`UpdateEmailTemplate` use cases (re-creating what PR #256 deleted as dead code on 2026-07-31, this time with container wiring and pages). Known limitation stated on the page itself: not yet wired into the actual send path.
+- **STORY-096** — account deletion + data export at `/profile/data`. New `UserRepository.anonymizeAndDelete()` port method; new `DeleteUserAccount` (password-confirmed) and `ExportUserData` use cases. Financial/academic records (orders, enrollments, certificates) are deliberately not deleted, only disassociated from reusable PII. `IProgressEventRepository`/`PrismaProgressEventRepository` (previously unwired dead code) got wired into both containers as a side effect.
+
+Verification: `pnpm typecheck && pnpm lint && pnpm test` all green (3335 passed, 2 skipped, 0 failed) and `pnpm build` succeeds with zero environment variables set. (First `pnpm build` attempt after STORY-096 caught a real bug: `exportUserData.action.ts` was missing `"use server"`, so the client component `ExportDataButton.tsx` calling it directly dragged `buildContainer()`'s server-only dependency graph — Prisma, `pg`, `NextMdxRenderer` — into the client bundle and failed with "the chunking context does not support external modules (request: node:module)". Fixed by adding the directive; rebuilt clean.)
+
 ### 2026-08-01: Live-class student experience (STORY-090, STORY-091)
+
 Closes the second-largest entry in `docs/STUDENT-FEATURE-GAP-ANALYSIS.md`. Adds `/live-classes` (list) and `/live-classes/[id]` (detail + RSVP) for enrolled students. New `LiveClassRegistration` domain entity, `ILiveClassRegistrationRepository` port, in-memory adapter (`live_class_registrations` table migration), and three use cases (`ListLiveClassesForStudent`, `RsvpLiveClass`, `CancelLiveClassRsvp`). Server actions validate the session via `getSessionUserId()` and revalidate the affected routes. RSVP is idempotent; cancelled RSVPs can be re-registered.
+
 ### 2026-08-01: Lesson-to-quiz transition wiring (STORY-094)
+
 QUIZ lessons in the curriculum previously rendered an "Interactive quiz, coming soon!" placeholder. The `LessonContent` component now matches the domain `Lesson` entity and renders a real quiz card with the question count, a preview of the first two prompts, and a "Start Quiz" link to `/courses/[slug]/lessons/[lessonId]/quiz`. Removes a documented audit gap and restores a path the seeded content was already pointing at.
+
 ### 2026-07-31: Production readiness hardening (PR #256, `915c7ca`)
 
 Full codebase audit and hardening pass. 61 files changed, 476 insertions, 3,044 deletions.

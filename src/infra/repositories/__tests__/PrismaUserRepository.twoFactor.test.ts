@@ -18,12 +18,17 @@ interface UserRow {
   email: string;
   firstName: string;
   lastName: string;
+  phone?: string | null;
+  avatarUrl?: string | null;
+  bio?: string | null;
+  password?: string;
   role: "STUDENT" | "INSTRUCTOR" | "ADMIN";
   subscriptionTier: "FREE" | "STARTER" | "PRO";
   verificationStatus: "UNVERIFIED" | "VERIFIED" | "SUSPENDED";
   enrolledCourseIds: string[];
   twoFactorEnabled: boolean;
   twoFactorSecret: string | null;
+  deletedAt?: Date | null;
   createdAt: Date;
   totalXp: number;
   emailVerifiedAt: Date | null;
@@ -72,6 +77,14 @@ class FakePrismaClient {
       if (!row) {
         const err = new Error("record not found");
         (err as unknown as { code: string }).code = "P2025";
+        throw err;
+      }
+      if (
+        typeof args.data.email === "string" &&
+        this.rows.some((r) => r.id !== args.where.id && r.email === args.data.email)
+      ) {
+        const err = new Error("Unique constraint failed on the fields: (`email`)");
+        (err as unknown as { code: string }).code = "P2002";
         throw err;
       }
       Object.assign(row, args.data);
@@ -143,5 +156,68 @@ describe("PrismaUserRepository — 2FA", () => {
     if (!result.ok) return;
     expect(result.value.twoFactorEnabled).toBe(true);
     expect(result.value).not.toHaveProperty("twoFactorSecret");
+  });
+
+  describe("anonymizeAndDelete", () => {
+    it("scrubs PII, clears the password and 2FA secret, and stamps deletedAt", async () => {
+      db.rows.push(
+        makeRow({
+          email: "student@example.com",
+          firstName: "Jane",
+          lastName: "Doe",
+          phone: "+639171234567",
+          avatarUrl: "https://example.com/avatar.png",
+          bio: "hi",
+          password: "$argon2id$realHash",
+          twoFactorEnabled: true,
+          twoFactorSecret: "SOMESECRET",
+        }),
+      );
+
+      const result = await repo.anonymizeAndDelete(
+        "u1",
+        "deleted-u1@deleted.projectamazonph.invalid",
+      );
+      expect(result.ok).toBe(true);
+
+      const row = db.rows[0];
+      expect(row?.email).toBe("deleted-u1@deleted.projectamazonph.invalid");
+      expect(row?.firstName).toBe("Deleted");
+      expect(row?.lastName).toBe("User");
+      expect(row?.phone).toBeNull();
+      expect(row?.avatarUrl).toBeNull();
+      expect(row?.bio).toBeNull();
+      expect(row?.password).toBe("");
+      expect(row?.twoFactorSecret).toBeNull();
+      expect(row?.twoFactorEnabled).toBe(false);
+      expect(row?.deletedAt).toBeInstanceOf(Date);
+    });
+
+    it("lowercases the anonymized email", async () => {
+      db.rows.push(makeRow());
+      await repo.anonymizeAndDelete("u1", "Deleted-U1@Deleted.Invalid");
+      expect(db.rows[0]?.email).toBe("deleted-u1@deleted.invalid");
+    });
+
+    it("returns not_found for a nonexistent user", async () => {
+      const result = await repo.anonymizeAndDelete("nobody", "deleted-nobody@deleted.invalid");
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.kind).toBe("not_found");
+    });
+
+    it("returns email_taken on a unique-constraint collision instead of a generic db_error", async () => {
+      db.rows.push(makeRow({ id: "u1", email: "student@example.com" }));
+      db.rows.push(makeRow({ id: "u2", email: "already-here@deleted.invalid" }));
+
+      const result = await repo.anonymizeAndDelete("u1", "already-here@deleted.invalid");
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.kind).toBe("email_taken");
+
+      // u1's row is untouched on failure.
+      const u1 = db.rows.find((r) => r.id === "u1");
+      expect(u1?.email).toBe("student@example.com");
+    });
   });
 });

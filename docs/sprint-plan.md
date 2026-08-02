@@ -220,7 +220,7 @@ exists to remove.
 
 | ID        | Title                                                                          | Pts | Status                                                                   |
 | --------- | ------------------------------------------------------------------------------ | --- | ------------------------------------------------------------------------ |
-| STORY-078 | Mark simulator results formative; block from certification/job-readiness       | 1   | ⏳ Planned                                                               |
+| STORY-078 | Mark simulator results formative; block from certification/job-readiness       | 1   | ✅ done — shared `FormativeScoreNotice` on all 5 simulator result views  |
 | STORY-079 | Rewrite Bid Elevator economic model (highest-risk simulator)                   | 1   | ✅ done — PR #244                                                        |
 | STORY-080 | Replace length-based listing scoring with a real rubric                        | 1   | ◐ merged, PR #245 (difficulty-scaled finding volume not yet implemented) |
 | STORY-081 | Versioned keyword scenario datasets; split Listing Audit from Keyword Research | 1   | ✅ done — PR #246                                                        |
@@ -228,7 +228,7 @@ exists to remove.
 | STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ⏳ Planned                                                               |
 | STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ⏳ Planned                                                               |
 
-**Sprint 15 status:** 4/7 stories merged (STORY-079–082), though STORY-080 has one open acceptance criterion (see its story doc). STORY-078 (formative-only labeling), STORY-083, and STORY-084 remain planned.
+**Sprint 15 status:** 5/7 stories done (STORY-078–082); STORY-080 has one open acceptance criterion (see its story doc). STORY-083 and STORY-084 remain planned — both need Ryan's Amazon PPC expertise, not delegable to an agent.
 
 ## Sprint 16 — Assessment Platform Maturity (5 pts)
 
@@ -239,6 +239,21 @@ exists to remove.
 | STORY-087 | Explicit business-impact feedback                 | 1   | ⏳ Planned |
 | STORY-088 | Challenge progression                             | 1   | ⏳ Planned |
 | STORY-089 | Connected-account simulator                       | 1   | ⏳ Planned |
+
+## Student-facing gap closure (2026-08-01/02, see docs/STUDENT-FEATURE-GAP-ANALYSIS.md)
+
+Not an original numbered sprint — stories recommended by the 2026-08-01 student-feature
+gap audit, closed across two sessions.
+
+| ID        | Title                                  | Pts | Status                                                                                        |
+| --------- | -------------------------------------- | --- | --------------------------------------------------------------------------------------------- |
+| STORY-090 | Live-class list page (`/live-classes`) | 1   | ✅ done — PR #268                                                                             |
+| STORY-091 | Live-class detail + RSVP               | 1   | ✅ done — PR #268                                                                             |
+| STORY-097 | Student 2FA at `/profile/security`     | 1   | ✅ done — 2026-08-02, reuses the admin flow's role-agnostic use cases                         |
+| STORY-094 | Lesson-to-quiz transition wiring       | 1   | ✅ done — PR #267                                                                             |
+| STORY-095 | Admin email-template editor page       | 1   | ◐ done — 2026-08-02, but not yet wired into the actual send path (see CLAUDE.md "Known gaps") |
+| STORY-096 | Account deletion + data export         | 1   | ◐ done — 2026-08-02, export omits quiz/simulator attempt history (see CLAUDE.md "Known gaps") |
+| STORY-092 | Live-class recording + post-class XP   | 1   | ⏳ Planned                                                                                    |
 
 ---
 
@@ -258,7 +273,7 @@ exists to remove.
 | S12       | 5       | Launch (5 × 1pt)                                                                                                                                   |
 | S13       | 5       | Admin panel round 2 (STORY-061, 062, 063 = 3 × 1pt; add more stories as planned)                                                                   |
 | S14       | 7       | Simulator scoring integrity (STORY-071–077 = 7 × 1pt; mechanical, no PPC judgement)                                                                |
-| S15       | 7       | Certification safety + subject-matter accuracy (STORY-078–084 = 7 × 1pt; 079–084 need Ryan's PPC expertise)                                        |
+| S15       | 7       | Certification safety + subject-matter accuracy (STORY-078–084 = 7 × 1pt; 079–084 need Ryan's PPC expertise; 078 done 2026-08-02)                   |
 | S16       | 5       | Assessment platform maturity (STORY-085–089 = 5 × 1pt)                                                                                             |
 | **Total** | **60+** |                                                                                                                                                    |
 

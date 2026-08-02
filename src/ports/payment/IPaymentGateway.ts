@@ -50,11 +50,12 @@ export interface IPaymentGateway {
   verifyWebhookSignature(payload: string, signature: string): Result<boolean, { kind: string }>;
 
   /**
-   * STORY-049: Issue a refund for a paid PayMongo payment.
+   * STORY-049 / STORY-049.5: Issue a refund for a paid PayMongo payment.
    *
-   * The prod adapter (PayMongoAdapter) is currently a stub that throws
-   * "not yet wired" — the real PayMongo Refunds API is a follow-up
-   * (STORY-049.5). The StubPaymentGateway implements this for tests.
+   * The prod adapter (PayMongoAdapter) calls the real PayMongo Refunds
+   * API. A "pending" refund status (PayMongo settles asynchronously) is
+   * treated as Result.ok; only "failed" is an error. StubPaymentGateway
+   * implements this for tests.
    *
    * @param params.paymongoPaymentId  The PayMongo payment ID (not the order ID)
    * @param params.amountMinor        Amount to refund, in minor units (centavos)

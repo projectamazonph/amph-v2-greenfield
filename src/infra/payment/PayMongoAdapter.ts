@@ -31,6 +31,19 @@ type PayMongoApiResponse = {
   errors?: Array<{ code: string; detail: string }>;
 };
 
+type PayMongoRefundAttributes = {
+  status: string; // "pending" | "succeeded" | "failed"
+  created_at: number;
+};
+
+type PayMongoRefundResponse = {
+  data: {
+    id: string;
+    attributes: PayMongoRefundAttributes;
+  };
+  errors?: Array<{ code: string; detail: string }>;
+};
+
 export class PayMongoAdapter implements IPaymentGateway {
   private readonly baseUrl = PAYMONGO_BASE;
   private readonly headers: HeadersInit;
@@ -186,22 +199,71 @@ export class PayMongoAdapter implements IPaymentGateway {
   }
 
   /**
-   * STORY-049: Issue a refund via PayMongo.
+   * STORY-049.5: Issue a refund via the PayMongo Refunds API.
+   * https://developers.paymongo.com/reference/create-a-refund
    *
-   * STUB: throws "not yet wired". The real PayMongo Refunds API
-   * integration is STORY-049.5. The prod container falls back to
-   * throwing on refund until that lands.
+   * PayMongo's `reason` field is a fixed enum (duplicate | fraudulent |
+   * requested_by_customer | others), not free text. Our domain callers
+   * (ProcessRefund, RefundOverride) pass an admin-authored free-text
+   * reason, so it's sent as `notes` and the enum is pinned to "others"
+   * rather than guessing a more specific category from the text.
+   *
+   * A "pending" refund status is treated as success: PayMongo accepted
+   * the refund request and will settle it asynchronously. The caller
+   * (ProcessRefund/RefundOverride) marks the order REFUNDED on any
+   * Result.ok, matching how createCheckoutSession's "created but not yet
+   * paid" state is already handled elsewhere in this adapter.
    */
-  async refund(_params: {
+  async refund(params: {
     paymongoPaymentId: string;
     amountMinor: number;
     reason: string;
   }): Promise<Result<{ refundId: string; processedAt: Date }, PaymentGatewayError>> {
-    return Result.err({
-      kind: "paymongo_error",
-      code: "not_implemented",
-      message:
-        "PayMongo refunds are not wired yet. See STORY-049.5. The use case must be tested against the stub gateway.",
-    });
+    try {
+      const res = await fetch(`${this.baseUrl}/refunds`, {
+        method: "POST",
+        headers: this.headers,
+        body: JSON.stringify({
+          data: {
+            attributes: {
+              amount: params.amountMinor,
+              payment_id: params.paymongoPaymentId,
+              reason: "others",
+              notes: params.reason,
+            },
+          },
+        }),
+      });
+
+      const json = (await res.json()) as PayMongoRefundResponse;
+
+      if (!res.ok) {
+        const err = json.errors?.[0];
+        return Result.err({
+          kind: "paymongo_error",
+          code: String(err?.code ?? "unknown"),
+          message: err?.detail ?? `PayMongo API error (HTTP ${res.status})`,
+        } satisfies PaymentGatewayError);
+      }
+
+      const attrs = json.data.attributes;
+      if (attrs.status === "failed") {
+        return Result.err({
+          kind: "paymongo_error",
+          code: "refund_failed",
+          message: `PayMongo refund ${json.data.id} was rejected (status: failed).`,
+        } satisfies PaymentGatewayError);
+      }
+
+      return Result.ok({
+        refundId: json.data.id,
+        processedAt: new Date(attrs.created_at * 1000),
+      });
+    } catch (err) {
+      return Result.err({
+        kind: "network_error",
+        message: err instanceof Error ? err.message : String(err),
+      } satisfies PaymentGatewayError);
+    }
   }
 }

@@ -40,6 +40,8 @@ export type AuditAction =
   | "user.stopped_impersonating"
   | "user.2fa_enabled"
   | "user.2fa_disabled"
+  | "user.account_deleted"
+  | "user.data_exported"
   // Admin manual subscription-tier grant (bypasses checkout)
   | "user.subscription_granted"
   // Discount code
@@ -110,6 +112,8 @@ export const ALL_ACTIONS: AuditAction[] = [
   "user.stopped_impersonating",
   "user.2fa_enabled",
   "user.2fa_disabled",
+  "user.account_deleted",
+  "user.data_exported",
   "user.subscription_granted",
   "discount_code.created",
   "discount_code.updated",

@@ -12,6 +12,7 @@
 
 import { useState, useTransition } from "react";
 import styles from "./KeywordResearchForm.module.css";
+import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import {
   previewKeywordResearch,
   keywordResearchAttempt,
@@ -240,6 +241,7 @@ export function KeywordResearchForm({ initialNiche }: Props) {
               <span className={styles.summaryValue}>{attempt.isPassed ? "Passed" : "Not yet"}</span>
             </span>
           </div>
+          <FormativeScoreNotice />
           <p>{attempt.feedback.overallComment}</p>
           <div
             className={styles.tableScroll}

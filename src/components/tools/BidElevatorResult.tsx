@@ -9,6 +9,7 @@
 
 import styles from "./BidElevatorResult.module.css";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
+import { FormativeScoreNotice } from "./FormativeScoreNotice";
 
 interface Props {
   result: BidElevatorOutput;
@@ -44,6 +45,7 @@ export function BidElevatorResult({ result, targetRoas }: Props) {
           <span className={styles.scoreSuffix}>/100</span>
         </div>
       </header>
+      <FormativeScoreNotice />
       <div className={styles.metaRow}>
         <div className={styles.metaItem}>
           <span className={styles.metaLabel}>Projected daily spend</span>

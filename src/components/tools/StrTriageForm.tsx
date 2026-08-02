@@ -12,6 +12,7 @@
 import { useState, useTransition } from "react";
 import styles from "./StrTriageForm.module.css";
 import { strTriageAttempt, type StrTriageAttemptResult } from "@/app/tools/str-triage/actions";
+import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
 import type { TriageAction } from "@/domain/simulator/str-triage/StrTriageOutput";
 
@@ -145,6 +146,7 @@ export function StrTriageForm({ scenario }: Props) {
           </div>
         ) : null}
       </div>
+      {result ? <FormativeScoreNotice /> : null}
     </form>
   );
 }

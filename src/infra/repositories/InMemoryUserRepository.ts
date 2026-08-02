@@ -119,6 +119,34 @@ export class InMemoryUserRepository implements UserRepository {
     return Result.ok(hash);
   }
 
+  async anonymizeAndDelete(id: string, anonymizedEmail: string): Promise<Result<void, UserError>> {
+    const user = this.users.get(id);
+    if (!user) return Result.err({ kind: "not_found" });
+
+    const normalizedEmail = anonymizedEmail.toLowerCase();
+    const existingOwnerId = this.emailIndex.get(normalizedEmail);
+    if (existingOwnerId && existingOwnerId !== id) {
+      // Mirrors PrismaUserRepository's P2002 handling: the real DB has a
+      // unique constraint on email, so a collision must be surfaced, not
+      // silently overwritten.
+      return Result.err({ kind: "email_taken" });
+    }
+
+    this.emailIndex.delete(user.email);
+    const updated = Object.freeze({
+      ...user,
+      email: normalizedEmail,
+      firstName: "Deleted",
+      lastName: "User",
+      twoFactorEnabled: false,
+    });
+    this.users.set(id, updated);
+    this.emailIndex.set(normalizedEmail, id);
+    this.passwordHashes.set(id, "");
+    this.twoFactorSecrets.delete(id);
+    return Result.ok(undefined);
+  }
+
   /** Remove all users. Call between tests. */
   clear(): void {
     this.users.clear();

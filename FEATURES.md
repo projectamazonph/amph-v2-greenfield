@@ -1,8 +1,8 @@
 # Feature inventory
 
-**Last reviewed:** 2026-07-27  
+**Last reviewed:** 2026-08-02  
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
-**Related audit:** `docs/audit-2026-07-27-completeness-review.md`
+**Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
 This file is a status inventory, not a list of promises. A route can be implemented while still requiring database seed data or an operator configuration step.
 
@@ -27,7 +27,7 @@ Status labels:
 | Admin two-factor authentication | Opt-in TOTP setup under `/admin/settings` and `/admin/settings/2fa-setup`                         |
 | Rate limiting                   | Upstash adapter with in-memory test implementation; signup, login, and checkout actions are wired |
 
-The current session guard validates the JWT and reloads the user. It does not consult the `sessions` table or `lockedUntil`; see the audit and `docs/runbooks/admin-access-recovery.md` before relying on session deletion as revocation.
+The session guard validates the JWT, then (fixed 2026-07-31) checks the `sessions` table server-side when the token carries a `sessionId` — a deleted session is rejected even if the JWT itself hasn't expired. `lockedUntil` still has no enforcement path; see `docs/runbooks/admin-access-recovery.md`.
 
 ### Courses and curriculum
 
@@ -38,7 +38,7 @@ The current session guard validates the JWT and reloads the user. It does not co
 - `scripts/import-amph-content.ts` imports the MDX curriculum under `content/curriculum/` into module and lesson rows.
 - Admin course, module, and lesson CRUD is available under `/admin/courses`.
 
-The public catalog and pricing pages deliberately render an empty-state message when no published course or active pricing rows have been seeded. The lesson renderer still displays a placeholder for quiz content in some lesson paths, so the lesson-to-quiz transition is not completely unified.
+The public catalog and pricing pages deliberately render an empty-state message when no published course or active pricing rows have been seeded. `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01) — the placeholder is gone.
 
 ### Pricing, checkout, and refunds
 
@@ -48,7 +48,7 @@ The public catalog and pricing pages deliberately render an empty-state message 
 - `/api/webhooks/paymongo` records webhook events and processes payment state through the production container.
 - `PrismaOrderRepository`, `PrismaEnrollmentRepository`, and `PrismaAuditLog` persist the primary payment, access, and audit paths.
 - Discount-code create, update, archive, list, and apply flows are available through the admin pages and checkout action.
-- Student refund requests and admin refund processing are available under `/admin/refunds`.
+- Student refund requests and admin refund processing are available under `/admin/refunds`, backed by the real PayMongo Refunds API as of 2026-08-02 (previously a stub that always errored).
 
 Pricing tier rows and course rows are separate records. The repository contains seed scripts, but this audit did not verify the contents of a deployed database or a full live PayMongo transaction.
 
@@ -56,10 +56,10 @@ Pricing tier rows and course rows are separate records. The repository contains 
 
 | URL                       | Status               | Notes                                                                                                                                                                                                                                                             |
 | ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/tools/bid-elevator`     | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`.                                                                                                                                                                 |
-| `/tools/str-triage`       | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`.                                                                                                                                                                 |
-| `/tools/campaign-builder` | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`.                                                                                                                                                                 |
-| `/tools/listing-audit`    | Implemented, partial | Registered simulator and graded attempt action exist; action currently records owner as `system`.                                                                                                                                                                 |
+| `/tools/bid-elevator`     | Implemented          | Registered simulator and graded attempt action exist; the score is formative-labeled (STORY-078) and owned by the authenticated user.                                                                                                                             |
+| `/tools/str-triage`       | Implemented          | Registered simulator and graded attempt action exist; the score is formative-labeled (STORY-078) and owned by the authenticated user.                                                                                                                             |
+| `/tools/campaign-builder` | Implemented          | Registered simulator and graded attempt action exist; the score is formative-labeled (STORY-078) and owned by the authenticated user.                                                                                                                             |
+| `/tools/listing-audit`    | Implemented          | Registered simulator and graded attempt action exist; the score is formative-labeled (STORY-078) and owned by the authenticated user.                                                                                                                             |
 | `/tools/keyword-research` | Implemented, partial | Registered simulator (STORY-081) with its own versioned `KeywordDataset` and graded lifecycle; only 4 of 12 launch niches are curated so far, and every dataset is `synthetic_calibrated` (no curated-export data yet, so credential-mode attempts are rejected). |
 
 The five registered simulators share the attempt, scoring, and feedback infrastructure. Their scores are formative only. The simulator accuracy audit documents free dimensions, policy gaps, and a Listing Audit click-through strategy; scores must not be used as certification, hiring, or job-readiness evidence yet.
@@ -91,7 +91,7 @@ The admin route tree is implemented and gated by `requireAdmin()`:
 - `/admin/audit-log` and CSV export
 - `/admin/settings` and TOTP setup
 
-Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog` for the implemented mutation paths. The Prisma badge adapter now implements create, update, and archive with slug-uniqueness and not-found error handling, so admin badge CRUD is production-complete. The dashboard's pending-refund statistic is currently a hardcoded zero.
+Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog` for the implemented mutation paths. The Prisma badge adapter now implements create, update, and archive with slug-uniqueness and not-found error handling, so admin badge CRUD is production-complete. The dashboard's pending-refund statistic queries `orderRepo.listRefundRequests()` (fixed 2026-07-31; no longer a hardcoded zero). `/admin/email-templates` (STORY-095, 2026-08-02) lists and edits all 7 known template types.
 
 ### Email, observability, and scheduled work
 
@@ -103,20 +103,21 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 
 ## Partial or not shipped
 
-| Area                         | Current state | Evidence or next step                                                                                                                                                         |
-| ---------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Student account settings     | Partial       | Profile display exists; password, notification, data-export, and account-deletion product flows described in older docs are not all present as routes or actions.             |
-| All-access entitlement rules | Partial       | Pricing-tier and early-bird models exist; verify checkout and enrollment semantics before describing all-access as a complete product path.                                   |
-| Live-class experience        | Partial       | Admin live-class CRUD and reminder email exist; RSVP, capacity, attendance, recordings, and student-facing class pages are not represented by a complete route/model surface. |
-| Editable email templates     | Partial       | Entity, port, adapter, and use cases exist; the documented admin email-template pages and actions are not present in `src/app`.                                               |
-| Simulator ownership          | Partial       | Replace `userId: "system"` with the authenticated user in all four graded actions and add ownership tests.                                                                    |
-| Badge administration         | Implemented   | Prisma create, update, and archive are wired; admin badge CRUD is shipped with slug-uniqueness and error handling.                                                            |
-| Session revocation           | Partial       | Add session membership or token-version checks and enforce account lockout behavior.                                                                                          |
-| Impersonation restore        | Partial       | Capture the original admin token on the first impersonation; the current fallback signs out.                                                                                  |
-| Admin refund metric          | Partial       | Replace `pendingRefunds: 0` with a repository query or label the value unavailable.                                                                                           |
-| Quiz lesson transition       | Partial       | Link quiz lesson content to the dedicated quiz page instead of rendering the placeholder.                                                                                     |
-| Admin settings               | Partial       | TOTP is implemented; general site settings and maintenance controls remain “Coming soon”.                                                                                     |
-| Admin seed smoke test        | Partial       | `scripts/seed-admin-user.mjs` exists, but it constructs Prisma directly instead of using the Prisma 7 driver adapter.                                                         |
+| Area                         | Current state        | Evidence or next step                                                                                                                                                                                                                                 |
+| ---------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Student account settings     | Implemented, partial | Profile display, password change, 2FA (`/profile/security`, 2026-08-02), and data export + account deletion (`/profile/data`, 2026-08-02) all exist. Notification preferences are still checkbox placeholders on `/profile` with no backing use case. |
+| All-access entitlement rules | Partial              | Pricing-tier and early-bird models exist; verify checkout and enrollment semantics before describing all-access as a complete product path.                                                                                                           |
+| Live-class experience        | Implemented, partial | Admin CRUD, reminder email, and student-facing `/live-classes` list + `/live-classes/[id]` RSVP (STORY-090/091) exist. Capacity limits, attendance tracking, and recordings are not represented by a complete route/model surface.                    |
+| Editable email templates     | Implemented, partial | `/admin/email-templates` (list) and `/admin/email-templates/[type]/edit` exist (STORY-095, 2026-08-02), backed by real use cases. Not yet wired into the actual send path — editing a template here does not change what Resend sends yet.            |
+| Simulator ownership          | Implemented          | All 5 graded actions pass the authenticated `userId` from `getSessionUserId()`, not `"system"` (fixed 2026-07-31).                                                                                                                                    |
+| Badge administration         | Implemented          | Prisma create, update, and archive are wired; admin badge CRUD is shipped with slug-uniqueness and error handling.                                                                                                                                    |
+| Session revocation           | Implemented          | `getSessionUserId()` checks `SessionRepository` server-side after JWT verification when a `sessionId` is present in the token (fixed 2026-07-31). Account lockout (`lockedUntil`) still has no enforcement path.                                      |
+| Impersonation restore        | Implemented          | `impersonateUser.action.ts` captures the admin's original session token and `stopImpersonating.action.ts` replants it on restore (fixed 2026-07-31).                                                                                                  |
+| Admin refund metric          | Implemented          | `GetAdminDashboardStats.pendingRefunds` queries `orderRepo.listRefundRequests()` (fixed 2026-07-31).                                                                                                                                                  |
+| Quiz lesson transition       | Implemented          | `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01).                                                                                                                                                           |
+| PayMongo refunds             | Implemented          | `PayMongoAdapter.refund()` calls the real PayMongo Refunds API (fixed 2026-08-02, STORY-049.5); `ProcessRefund`/`RefundOverride` work against production PayMongo.                                                                                    |
+| Admin settings               | Partial              | TOTP is implemented; general site settings and maintenance controls remain “Coming soon”.                                                                                                                                                             |
+| Admin seed smoke test        | Implemented          | `scripts/seed-admin-user.mjs` uses the shared PrismaPg adapter path (fixed prior to 2026-07-27).                                                                                                                                                      |
 
 ## Deliberately out of scope
 

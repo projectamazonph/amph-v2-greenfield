@@ -23,10 +23,7 @@ import { describe, it, expect } from "vitest";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
-const PROXY_PATH = path.resolve(
-  process.cwd(),
-  "src/proxy.ts",
-);
+const PROXY_PATH = path.resolve(process.cwd(), "src/proxy.ts");
 
 describe("proxy (src/proxy.ts)", () => {
   it("does NOT redirect / to /signup", async () => {
@@ -55,6 +52,21 @@ describe("proxy (src/proxy.ts)", () => {
     expect(source).toMatch(/X-Content-Type-Options/);
     expect(source).toMatch(/Referrer-Policy/);
     expect(source).toMatch(/Permissions-Policy/);
+  });
+
+  it("attaches a Content-Security-Policy with frame-ancestors and default-src locked down", async () => {
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).toMatch(/Content-Security-Policy/);
+    expect(source).toMatch(/default-src 'self'/);
+    expect(source).toMatch(/frame-ancestors 'none'/);
+    expect(source).toMatch(/object-src 'none'/);
+  });
+
+  it("allows https: image sources (Course.coverImage is an arbitrary admin-entered URL)", async () => {
+    // PR #272 review fix: img-src 'self' data: blob: alone blocked
+    // external course cover images and broke /courses and /courses/[slug].
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).toMatch(/img-src[^"]*https:/);
   });
 
   it("has a comment explaining why / is not redirected", async () => {

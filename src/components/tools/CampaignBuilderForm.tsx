@@ -12,6 +12,7 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import styles from "./CampaignBuilderForm.module.css";
 import { buildCampaign, type BuildCampaignResult } from "@/app/tools/campaign-builder/actions";
+import { FormativeScoreNotice } from "./FormativeScoreNotice";
 
 interface Props {
   productCategory: string;
@@ -137,6 +138,7 @@ export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudg
           </div>
         ) : null}
       </div>
+      {result && result.ok ? <FormativeScoreNotice /> : null}
     </form>
   );
 }

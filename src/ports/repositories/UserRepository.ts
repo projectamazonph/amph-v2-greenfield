@@ -117,4 +117,22 @@ export interface UserRepository {
    * twoFactorEnabled — use update() for that.
    */
   setTwoFactorSecret(userId: string, secret: string | null): Promise<Result<void, UserError>>;
+
+  /**
+   * STORY-096: irreversibly scrub a user's PII and stamp deletedAt.
+   * Overwrites email, firstName, lastName, phone, avatarUrl, bio, and
+   * the password hash with anonymized placeholders; clears the TOTP
+   * secret and disables 2FA. Does NOT touch or cascade-delete Order,
+   * Enrollment, Certificate, or other financial/audit records — those
+   * keep referencing this userId so tax and audit trails survive
+   * account deletion, per docs/business-layer.md's receipt retention
+   * rule. Callers are responsible for also revoking sessions
+   * (SessionRepository.deleteAllForUser) — this method only touches
+   * the User row itself.
+   *
+   * @param anonymizedEmail  Caller-supplied replacement email (must be
+   *   unique — the use case derives it from the user's id so the
+   *   original email becomes available for a fresh signup).
+   */
+  anonymizeAndDelete(userId: string, anonymizedEmail: string): Promise<Result<void, UserError>>;
 }
