@@ -28,6 +28,7 @@ import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 export interface CreateModuleInput {
   courseId: string;
   title: string;
+  coverImage?: string | null;
   actorId: string;
 }
 
@@ -79,6 +80,7 @@ export class CreateModule {
       courseId: input.courseId,
       title: input.title,
       displayOrder: nextOrder,
+      coverImage: input.coverImage,
       createdAt: now,
       updatedAt: now,
     });

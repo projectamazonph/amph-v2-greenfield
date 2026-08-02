@@ -22,12 +22,12 @@ export interface Module {
   readonly courseId: string;
   readonly title: string;
   readonly displayOrder: number;
+  readonly coverImage: string | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
 
-export type ModuleError =
-  | { kind: "invalid_input"; message: string };
+export type ModuleError = { kind: "invalid_input"; message: string };
 
 // ── Factory ────────────────────────────────────────────────────────────
 
@@ -36,13 +36,12 @@ export interface CreateModuleParams {
   courseId: string;
   title: string;
   displayOrder: number;
+  coverImage?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export function createModule(
-  params: CreateModuleParams,
-): Result<Module, ModuleError> {
+export function createModule(params: CreateModuleParams): Result<Module, ModuleError> {
   if (!params.id.trim()) {
     return Result.err({ kind: "invalid_input", message: "Module id is required" });
   }
@@ -64,6 +63,7 @@ export function createModule(
     courseId: params.courseId.trim(),
     title: params.title.trim(),
     displayOrder: params.displayOrder,
+    coverImage: params.coverImage ?? null,
     createdAt: params.createdAt ?? now,
     updatedAt: params.updatedAt ?? now,
   });
@@ -74,6 +74,7 @@ export function createModule(
 export interface UpdateModulePatch {
   title?: string;
   displayOrder?: number;
+  coverImage?: string | null;
 }
 
 export function updateModule(
@@ -85,6 +86,7 @@ export function updateModule(
     courseId: module.courseId,
     title: patch.title ?? module.title,
     displayOrder: patch.displayOrder ?? module.displayOrder,
+    coverImage: patch.coverImage !== undefined ? patch.coverImage : module.coverImage,
     createdAt: module.createdAt,
     updatedAt: new Date(),
   });

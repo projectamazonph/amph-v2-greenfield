@@ -51,6 +51,7 @@ export interface CatalogModule {
   readonly id: string;
   readonly title: string;
   readonly displayOrder: number;
+  readonly coverImage: string | null;
   readonly lessons: readonly CatalogLesson[];
 }
 
@@ -162,6 +163,7 @@ export class GetCatalogCourse {
         id: mod.id,
         title: mod.title,
         displayOrder: mod.displayOrder,
+        coverImage: mod.coverImage,
         lessons: catalogLessons,
       });
     }

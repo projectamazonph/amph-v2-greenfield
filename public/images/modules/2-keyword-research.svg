@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Keyword Research module icon</title>
+  <desc id="desc">A magnifying glass, representing keyword research.</desc>
+  <circle cx="48" cy="48" r="48" fill="#FFE5D9"/>
+  <circle cx="48" cy="48" r="47" fill="none" stroke="#FF6B35" stroke-opacity="0.18" stroke-width="2"/>
+  <circle cx="42" cy="42" r="14" fill="none" stroke="#FF6B35" stroke-width="5"/>
+  <line x1="52" y1="52" x2="66" y2="66" stroke="#FF6B35" stroke-width="5" stroke-linecap="round"/>
+</svg>

@@ -24,6 +24,7 @@ interface ModuleRow {
   courseId: string;
   title: string;
   displayOrder: number;
+  coverImage: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -67,6 +68,7 @@ export class PrismaModuleRepository implements IModuleRepository {
           courseId: module.courseId,
           title: module.title,
           displayOrder: module.displayOrder,
+          coverImage: module.coverImage,
         },
       });
       return Result.ok(this.mapRow(row));
@@ -82,6 +84,7 @@ export class PrismaModuleRepository implements IModuleRepository {
         data: {
           title: module.title,
           displayOrder: module.displayOrder,
+          coverImage: module.coverImage,
         },
       });
       return Result.ok(this.mapRow(row));
@@ -155,6 +158,7 @@ export class PrismaModuleRepository implements IModuleRepository {
       courseId: row.courseId,
       title: row.title,
       displayOrder: row.displayOrder,
+      coverImage: row.coverImage,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     });

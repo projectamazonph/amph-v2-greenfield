@@ -125,8 +125,16 @@ export default async function CourseDetailPage({ params }: PageProps) {
             {modules.map((mod, si) => (
               <details key={mod.id} className={styles.section} open={si === 0}>
                 <summary className={styles.sectionSummary}>
-                  <span className={styles.sectionTitle}>
-                    Section {si + 1}: {mod.title}
+                  <span className={styles.sectionTitleGroup}>
+                    {mod.coverImage ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={mod.coverImage} alt="" className={styles.sectionIcon} />
+                    ) : (
+                      <span className={styles.sectionIconPlaceholder} aria-hidden="true" />
+                    )}
+                    <span className={styles.sectionTitle}>
+                      Section {si + 1}: {mod.title}
+                    </span>
                   </span>
                   <span className={styles.sectionChevron}>▼</span>
                 </summary>

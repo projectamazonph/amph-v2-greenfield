@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Onboarding module icon</title>
+  <desc id="desc">A compass, representing getting oriented on the platform.</desc>
+  <circle cx="48" cy="48" r="48" fill="#FFE5D9"/>
+  <circle cx="48" cy="48" r="47" fill="none" stroke="#FF6B35" stroke-opacity="0.18" stroke-width="2"/>
+  <circle cx="48" cy="48" r="21" fill="none" stroke="#FF6B35" stroke-width="4"/>
+  <path d="M48 29 L55 48 L48 67 L41 48 Z" fill="none" stroke="#FF6B35" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="48" cy="48" r="3" fill="#FF6B35"/>
+</svg>

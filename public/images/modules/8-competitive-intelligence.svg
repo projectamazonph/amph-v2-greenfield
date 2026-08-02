@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Competitive Intelligence module icon</title>
+  <desc id="desc">A radar sweep with a detected blip, representing watching competitor activity.</desc>
+  <circle cx="48" cy="48" r="48" fill="#FFE5D9"/>
+  <circle cx="48" cy="48" r="47" fill="none" stroke="#FF6B35" stroke-opacity="0.18" stroke-width="2"/>
+  <circle cx="48" cy="48" r="22" fill="none" stroke="#FF6B35" stroke-opacity="0.5" stroke-width="2" stroke-dasharray="2 6"/>
+  <circle cx="48" cy="48" r="13" fill="none" stroke="#FF6B35" stroke-opacity="0.5" stroke-width="2" stroke-dasharray="2 6"/>
+  <line x1="48" y1="48" x2="65" y2="31" stroke="#FF6B35" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="48" cy="48" r="3" fill="#FF6B35"/>
+  <circle cx="61" cy="35" r="3.5" fill="#FF6B35"/>
+</svg>

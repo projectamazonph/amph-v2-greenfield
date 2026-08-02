@@ -201,6 +201,30 @@
   background: var(--surface-0);
 }
 
+.sectionTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.sectionIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  display: block;
+  object-fit: cover;
+}
+
+.sectionIconPlaceholder {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: var(--accent-soft);
+}
+
 .sectionTitle {
   font-weight: 500;
   color: var(--ink-900);

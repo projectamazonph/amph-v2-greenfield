@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Bidding Lab module icon</title>
+  <desc id="desc">A price tag with an upward chevron, representing bid changes.</desc>
+  <circle cx="48" cy="48" r="48" fill="#FFE5D9"/>
+  <circle cx="48" cy="48" r="47" fill="none" stroke="#FF6B35" stroke-opacity="0.18" stroke-width="2"/>
+  <path d="M25 33 L49 33 L64 48 L45 67 L25 51 Z" fill="none" stroke="#FF6B35" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="34" cy="41" r="3" fill="#FF6B35"/>
+  <circle cx="66" cy="66" r="11" fill="#FF6B35"/>
+  <path d="M61 69 L66 62 L71 69" fill="none" stroke="#FFE5D9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

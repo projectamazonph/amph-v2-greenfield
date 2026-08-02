@@ -74,6 +74,7 @@ function makeModule(overrides: Partial<Module> = {}): Module {
     courseId: overrides.courseId ?? "course_1",
     title: overrides.title ?? "Module One",
     displayOrder: overrides.displayOrder ?? 1,
+    coverImage: overrides.coverImage ?? null,
     createdAt: overrides.createdAt ?? new Date(),
     updatedAt: overrides.updatedAt ?? new Date(),
   };

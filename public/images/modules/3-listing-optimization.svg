@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Listing Optimization module icon</title>
+  <desc id="desc">A document with a checkmark badge, representing an optimized, validated listing.</desc>
+  <circle cx="48" cy="48" r="48" fill="#FFE5D9"/>
+  <circle cx="48" cy="48" r="47" fill="none" stroke="#FF6B35" stroke-opacity="0.18" stroke-width="2"/>
+  <rect x="28" y="22" width="36" height="48" rx="4" fill="none" stroke="#FF6B35" stroke-width="4"/>
+  <line x1="35" y1="34" x2="57" y2="34" stroke="#FF6B35" stroke-opacity="0.6" stroke-width="3" stroke-linecap="round"/>
+  <line x1="35" y1="43" x2="57" y2="43" stroke="#FF6B35" stroke-opacity="0.6" stroke-width="3" stroke-linecap="round"/>
+  <line x1="35" y1="52" x2="49" y2="52" stroke="#FF6B35" stroke-opacity="0.6" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="63" cy="63" r="11" fill="#FF6B35"/>
+  <path d="M58 63 L62 67 L69 58" fill="none" stroke="#FFE5D9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

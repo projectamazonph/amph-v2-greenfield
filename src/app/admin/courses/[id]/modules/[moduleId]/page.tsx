@@ -119,6 +119,16 @@ export default async function ModuleDetailPage({ params }: PageProps) {
             <dd>{mod.title}</dd>
             <dt>Display order</dt>
             <dd className={styles.mono}>{mod.displayOrder}</dd>
+            <dt>Cover image</dt>
+            <dd>
+              {mod.coverImage ? (
+                <a href={mod.coverImage} target="_blank" rel="noopener noreferrer">
+                  {mod.coverImage}
+                </a>
+              ) : (
+                "—"
+              )}
+            </dd>
             <dt>Created</dt>
             <dd className={styles.mono}>{created}</dd>
             <dt>Updated</dt>

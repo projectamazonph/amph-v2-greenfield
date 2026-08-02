@@ -37,9 +37,10 @@ export default async function EditModulePage({ params }: PageProps) {
     if (!title) {
       redirect(`/admin/courses/${courseId}/modules/${moduleId}/edit?error=missing_title`);
     }
+    const coverImage = String(formData.get("coverImage") ?? "").trim() || null;
     const r = await updateModuleAction({
       moduleId,
-      patch: { title },
+      patch: { title, coverImage },
     });
     if (r.ok) {
       redirect(`/admin/courses/${courseId}/modules/${moduleId}`);
@@ -73,6 +74,17 @@ export default async function EditModulePage({ params }: PageProps) {
               autoFocus
               defaultValue={moduleEntity.title}
               className={styles.input}
+            />
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.label}>Cover image URL</span>
+            <input
+              name="coverImage"
+              type="url"
+              defaultValue={moduleEntity.coverImage ?? ""}
+              className={styles.input}
+              placeholder="https://..."
             />
           </label>
 

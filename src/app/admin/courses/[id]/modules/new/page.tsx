@@ -34,7 +34,8 @@ export default async function NewModulePage({ params }: PageProps) {
     if (!title) {
       redirect(`/admin/courses/${courseId}/modules/new?error=missing_title`);
     }
-    const r = await createModuleAction({ courseId, title });
+    const coverImage = String(formData.get("coverImage") ?? "").trim() || null;
+    const r = await createModuleAction({ courseId, title, coverImage });
     if (r.ok) {
       redirect(`/admin/courses/${courseId}`);
     }
@@ -65,6 +66,16 @@ export default async function NewModulePage({ params }: PageProps) {
               autoFocus
               className={styles.input}
               placeholder="e.g. Introduction to the platform"
+            />
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.label}>Cover image URL</span>
+            <input
+              name="coverImage"
+              type="url"
+              className={styles.input}
+              placeholder="https://..."
             />
           </label>
 

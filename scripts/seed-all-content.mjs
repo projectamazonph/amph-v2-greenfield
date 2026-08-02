@@ -197,16 +197,19 @@ for (const dirName of moduleDirs.sort()) {
   const moduleId = md5("module", courseSlug, String(moduleNumber));
   const moduleTitle = deriveTitle(dirName);
   const courseId = courseIds[courseSlug];
+  // dirName (e.g. "1-foundations") matches the icon filename 1:1.
+  const moduleCoverImage = `/images/modules/${dirName}.svg`;
 
   // Upsert module
   await prisma.module.upsert({
     where: { id: moduleId },
-    update: { title: moduleTitle, displayOrder: moduleNumber + 1 },
+    update: { title: moduleTitle, displayOrder: moduleNumber + 1, coverImage: moduleCoverImage },
     create: {
       id: moduleId,
       courseId,
       title: moduleTitle,
       displayOrder: moduleNumber + 1,
+      coverImage: moduleCoverImage,
     },
   });
   modulesCreated++;
