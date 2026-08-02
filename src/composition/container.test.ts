@@ -36,6 +36,7 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 
 import { FixedClock } from "@/ports/system/Clock";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
+import { StubDatabaseHealthCheck } from "@/infra/system/StubDatabaseHealthCheck";
 import { TestLogger } from "@/infra/observability/TestLogger";
 
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
@@ -206,6 +207,7 @@ import type { AppContainer } from "./container";
 export interface TestContainer extends AppContainer {
   logger: TestLogger;
   rateLimiter: InMemoryRateLimiter;
+  databaseHealthCheck: StubDatabaseHealthCheck;
   userRepo: InMemoryUserRepository;
   sessionRepo: InMemorySessionRepository;
   courseRepo: InMemoryCourseRepository;
@@ -246,6 +248,7 @@ export interface TestContainer extends AppContainer {
 export function buildTestContainer(): TestContainer {
   const clock = new FixedClock(new Date());
   const idGen = new InMemoryIdGenerator();
+  const databaseHealthCheck = new StubDatabaseHealthCheck();
   const logger = new TestLogger();
   const rateLimiter = new InMemoryRateLimiter();
   const userRepo = new InMemoryUserRepository();
@@ -351,6 +354,7 @@ export function buildTestContainer(): TestContainer {
   return {
     clock,
     idGen,
+    databaseHealthCheck,
     emailVerificationRepo,
     passwordResetRepo,
     logger,
