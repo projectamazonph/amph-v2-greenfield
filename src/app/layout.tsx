@@ -20,10 +20,19 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Project Amazon PH Academy v2",
+  title: "Project Amazon PH Academy",
   description: "Master Amazon PPC and seller central, built for Filipino VAs.",
   manifest: "/site.webmanifest",
   icons: { icon: "/favicon.svg", apple: "/favicon.svg" },
+  openGraph: {
+    title: "Project Amazon PH Academy",
+    description: "Master Amazon PPC and seller central, built for Filipino VAs.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Project Amazon PH Academy",
+    description: "Master Amazon PPC and seller central, built for Filipino VAs.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
