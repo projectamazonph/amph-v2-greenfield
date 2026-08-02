@@ -2,11 +2,15 @@ import { describe, it, expect } from "vitest";
 import { createLiveClass, updateLiveClass, isValidLiveClassStatus } from "../LiveClass";
 
 describe("LiveClass entity", () => {
+  // Use a far-future date so the test stays valid regardless of when
+  // CI runs it. `createLiveClass` rejects any date that is now-or-in-the
+  // past; the original `2026-08-01T10:00:00Z` was valid at the time the
+  // test was authored but is no longer.
   const baseInput = {
     id: "lc_1",
     courseId: "course_1",
     title: "Advanced PPC Strategies",
-    scheduledAt: new Date("2026-08-01T10:00:00Z"),
+    scheduledAt: new Date("2099-08-01T10:00:00Z"),
     durationMinutes: 60,
     instructorId: "user_instructor_1",
     meetingUrl: "https://zoom.us/j/123456",
@@ -22,7 +26,7 @@ describe("LiveClass entity", () => {
       expect(lc.id).toBe("lc_1");
       expect(lc.courseId).toBe("course_1");
       expect(lc.title).toBe("Advanced PPC Strategies");
-      expect(lc.scheduledAt).toEqual(new Date("2026-08-01T10:00:00Z"));
+      expect(lc.scheduledAt).toEqual(new Date("2099-08-01T10:00:00Z"));
       expect(lc.durationMinutes).toBe(60);
       expect(lc.instructorId).toBe("user_instructor_1");
       expect(lc.meetingUrl).toBe("https://zoom.us/j/123456");
