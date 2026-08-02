@@ -544,7 +544,7 @@ function buildProductionContainer(): AppContainer {
   );
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-  const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo);
+  const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo, enrollmentRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();
   // STORY-012: bounded LRU cache (default 500 entries). Each entry

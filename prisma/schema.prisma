@@ -65,6 +65,10 @@ model User {
 
   // AMPH course access
   simulatorAccess SimulatorAccess @default(NONE)
+  // Deprecated (Proposal 8): denormalized copy of Enrollment rows,
+  // no longer read or written by application code — Enrollment is
+  // the sole source of truth for course access. Column kept for now
+  // (multi-step removal); do not add new reads/writes.
   enrolledCourseIds String[]      @default([])
 
   // XP (experience points)

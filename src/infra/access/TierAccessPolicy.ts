@@ -15,11 +15,19 @@ import type { AccessDecision } from "@/domain/values/AccessDecision";
 import { subscriptionMeetsCourseTier } from "@/domain/values/CourseAccessTier";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 
 export class TierAccessPolicy implements IAccessPolicy {
   constructor(
     private readonly userRepo: UserRepository,
     private readonly courseRepo: CourseRepository,
+    // Proposal 8: the Enrollment table is the source of truth for "is
+    // this user enrolled in this course" — User.enrolledCourseIds was
+    // a denormalized copy that could silently drift from it (e.g. if
+    // the User.update() write in EnrollStudent failed after the
+    // Enrollment row was already committed). Access control now reads
+    // Enrollment directly instead of the copy.
+    private readonly enrollmentRepo: IEnrollmentRepository,
   ) {}
 
   async canAccess(userId: string, courseId: string): Promise<AccessDecision> {
@@ -43,7 +51,8 @@ export class TierAccessPolicy implements IAccessPolicy {
     const course = courseResult.value;
 
     // Rule 1: enrolled → always full access
-    if (user.enrolledCourseIds.includes(courseId)) {
+    const enrollment = await this.enrollmentRepo.findByUserIdAndCourseId(userId, courseId);
+    if (enrollment !== null) {
       return { kind: "allowed" };
     }
 

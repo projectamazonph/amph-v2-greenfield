@@ -245,23 +245,6 @@ describe("EnrollStudent", () => {
     expect(result.error.kind).toBe("course_not_published");
   });
 
-  it("returns already_enrolled when user already enrolled (via enrolledCourseIds)", async () => {
-    vi.mocked(mockUserRepo.findById).mockResolvedValue(
-      Result.ok(makeUser({ enrolledCourseIds: [COURSE_ID] })),
-    );
-    vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(makeCourse()));
-
-    const result = await useCase.execute({
-      userId: USER_ID,
-      courseId: COURSE_ID,
-      entitlement: "admin_grant",
-    });
-
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("already_enrolled");
-  });
-
   it("returns already_enrolled when enrollment record exists in DB", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(makeCourse()));
