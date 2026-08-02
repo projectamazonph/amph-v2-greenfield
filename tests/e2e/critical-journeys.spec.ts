@@ -37,10 +37,15 @@ test.describe("Critical journeys", () => {
     // The catalog page shows "Course Catalog" as the h1.
     await expect(page.getByRole("heading", { name: /course catalog/i })).toBeVisible();
 
-    const firstCourse = page.getByRole("link").first();
+    // Scope the link search to the catalog grid (skip the public-shell
+    // header's "Sign in" / "Sign up" / "Brand" links, which are the
+    // first 2-3 links in document order and would cause the test to
+    // navigate to /login or /signup instead of a course detail page).
+    const catalogGrid = page.locator("main");
+    const firstCourse = catalogGrid.getByRole("link").first();
     if (await firstCourse.isVisible().catch(() => false)) {
       await firstCourse.click();
-      await expect(page).toHaveURL(/courses\//, { timeout: 10_000 });
+      await expect(page).toHaveURL(/\/courses\/[^/]+$/, { timeout: 10_000 });
     }
   });
 

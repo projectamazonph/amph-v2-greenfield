@@ -81,14 +81,17 @@ test.describe("Sign Up", () => {
     await page.getByRole("button", { name: /create account/i }).click();
 
     // First signup succeeds: the route handler sets the session cookie
-    // and 303-redirects to /dashboard. Wait for both the URL change
-    // AND the network to settle so the next `page.goto` doesn't race
-    // a still-in-flight response. (The previous version triggered
-    // "Navigation to /signup is interrupted by another navigation to
-    // /login" on mobile/tablet viewports because the implicit form
-    // POST → 303 → /dashboard chain wasn't fully drained.)
+    // and 303-redirects to /dashboard. Wait for the URL change AND
+    // for the dashboard page to finish loading so the next `page.goto`
+    // doesn't race a still-in-flight response.
+    //
+    // Note: `networkidle` is unreliable here — the Next.js dev server
+    // keeps a persistent WebSocket open (HMR + RSC pings) so
+    // "networkidle" never fires within the 30s test budget. Use
+    // `domcontentloaded` on the dashboard page (which is what the
+    // browser actually transitions on after the 303 → /dashboard).
     await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Second signup with same email: sign out first so the first
     // session's cookie doesn't persist between signups (the /api/auth
