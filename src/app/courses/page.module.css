@@ -110,7 +110,8 @@
 .cardImage {
   width: 100%;
   height: 176px;
-  object-fit: cover;
+  object-fit: contain;
+  background: var(--surface-3);
   display: block;
 }
 
