@@ -80,15 +80,24 @@ test.describe("Sign Up", () => {
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
-    // First signup succeeds: the action auto-logs the user in and
-    // navigates to /dashboard. We assert the URL change, not an
-    // in-page success alert — the success alert is never rendered
-    // because the action throws NEXT_REDIRECT before useActionState
-    // ever observes the success state.
+    // First signup succeeds: the route handler sets the session cookie
+    // and 303-redirects to /dashboard. Wait for both the URL change
+    // AND the network to settle so the next `page.goto` doesn't race
+    // a still-in-flight response. (The previous version triggered
+    // "Navigation to /signup is interrupted by another navigation to
+    // /login" on mobile/tablet viewports because the implicit form
+    // POST → 303 → /dashboard chain wasn't fully drained.)
     await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
+    await page.waitForLoadState("networkidle");
 
-    // Second signup with same email shows email_taken
+    // Second signup with same email: sign out first so the first
+    // session's cookie doesn't persist between signups (the /api/auth
+    // /signup route would otherwise succeed for the same logged-in
+    // email and never trigger the email_taken error path). Then
+    // navigate fresh, fill the form, submit, and assert the alert.
+    await page.context().clearCookies();
     await page.goto(`${BASE}/signup`);
+    await expect(page).toHaveURL(/\/signup$/);
     await page.getByLabel(/first name/i).fill("Alice");
     await page.getByLabel(/last name/i).fill("Rodriguez");
     await page.getByLabel(/email address/i).fill(email);

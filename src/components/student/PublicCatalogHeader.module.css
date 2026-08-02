@@ -1,0 +1,120 @@
+/* PublicCatalogHeader.module.css — slim top bar shown on
+   requireAuth={false} student pages (course catalog, course detail).
+   Mirrors the visual identity of StudentSidebar.brand but rendered as
+   a horizontal header so anonymous visitors get a marketing-friendly
+   nav instead of the authenticated sidebar. */
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface-1, #ffffff);
+  border-bottom: 1px solid var(--ink-100, #e7e2da);
+  font-family: var(--font-body);
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4, 16px) var(--space-6, 24px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4, 16px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  color: var(--ink-900, #1a1a1a);
+  text-decoration: none;
+}
+
+.brandMark {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 8px);
+  grid-template-rows: repeat(2, 8px);
+  gap: 2px;
+}
+
+.brandMarkSquare {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: var(--accent, #ff6b1a);
+  border-radius: 1px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brandName {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.brandSub {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-500, #6b6b6b);
+  margin-top: 2px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+
+.signIn {
+  padding: var(--space-2, 8px) var(--space-4, 16px);
+  border-radius: 6px;
+  color: var(--ink-900, #1a1a1a);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  border: 1px solid var(--ink-200, #d6d1c8);
+  background: transparent;
+  transition: background-color 120ms ease;
+}
+
+.signIn:hover {
+  background: var(--surface-2, #f5f3ee);
+}
+
+.signUp {
+  padding: var(--space-2, 8px) var(--space-4, 16px);
+  border-radius: 6px;
+  color: #ffffff;
+  background: var(--accent, #ff6b1a);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid var(--accent, #ff6b1a);
+  transition: filter 120ms ease;
+}
+
+.signUp:hover {
+  filter: brightness(1.05);
+}
+
+@media (max-width: 480px) {
+  .inner {
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+  }
+  .brandSub {
+    display: none;
+  }
+  .signIn,
+  .signUp {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
