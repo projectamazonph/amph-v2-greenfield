@@ -1,51 +1,24 @@
+import { NextResponse } from "next/server";
+
 /**
- * Health check endpoint — Story 004.
- * Returns 200 if the app is running and the database is reachable.
- * Returns 503 if the database connection fails.
+ * GET /api/health
  *
- * Uses the composition container's courseRepo as a lightweight DB ping
- * to comply with the architecture rule that app-layer code must not
- * import Prisma or infra directly.
+ * Liveness probe used by Lighthouse CI (`Wait for server health` step
+ * in `.github/workflows/ci.yml`). Returns 200 with a small JSON payload
+ * as long as the Next.js server itself is responsive — it does not
+ * probe the database (use a dedicated DB readiness probe for that).
+ *
+ * Marked `force-static` so Next.js can pre-render the response at build
+ * time and the standalone server answers it without touching the React
+ * tree or any IO subsystem.
  */
 
-import { NextResponse } from "next/server";
-import { buildContainer } from "@/composition/container";
+export const dynamic = "force-static";
 
-export async function GET() {
-  const started = Date.now();
-
-  try {
-    // A lightweight DB ping: listAll() on courseRepo exercises the
-    // Prisma connection without loading heavy aggregates.
-    const { courseRepo } = buildContainer();
-    const result = await courseRepo.listAll();
-
-    if (!result.ok) {
-      throw new Error(`courseRepo.listAll failed: ${result.error.kind}`);
-    }
-
-    const latencyMs = Date.now() - started;
-
-    return NextResponse.json(
-      {
-        status: "ok",
-        timestamp: new Date().toISOString(),
-        version: process.env.npm_package_version ?? "0.1.0",
-        db: { status: "ok", latencyMs },
-      },
-      { status: 200 },
-    );
-  } catch (err: unknown) {
-    const latencyMs = Date.now() - started;
-
-    return NextResponse.json(
-      {
-        status: "error",
-        timestamp: new Date().toISOString(),
-        version: process.env.npm_package_version ?? "0.1.0",
-        db: { status: "unreachable", latencyMs, error: String(err) },
-      },
-      { status: 503 },
-    );
-  }
+export function GET() {
+  return NextResponse.json({
+    status: "ok",
+    service: "amph-v2-greenfield",
+    timestamp: new Date().toISOString(),
+  });
 }
