@@ -202,10 +202,19 @@
 }
 
 .sectionTitle {
+  flex: 1;
   font-weight: 500;
   color: var(--ink-900);
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.sectionCoverImage {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
 
 .sectionChevron {

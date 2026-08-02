@@ -23,6 +23,7 @@ import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
 import type { CatalogCourseDetail } from "@/usecases/GetCatalogCourse";
 import { EnrollButton } from "./EnrollButton";
+import { MODULE_COVER_IMAGES } from "@/lib/moduleCoverImages";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -122,33 +123,41 @@ export default async function CourseDetailPage({ params }: PageProps) {
         <div className={styles.curriculumSection}>
           <h2 className={styles.curriculumTitle}>Curriculum</h2>
           <div className={styles.sectionList}>
-            {modules.map((mod, si) => (
-              <details key={mod.id} className={styles.section} open={si === 0}>
-                <summary className={styles.sectionSummary}>
-                  <span className={styles.sectionTitle}>
-                    Section {si + 1}: {mod.title}
-                  </span>
-                  <span className={styles.sectionChevron}>▼</span>
-                </summary>
-                <ul className={styles.lessonList}>
-                  {mod.lessons.map((lesson) => {
-                    const vid = lesson.estimatedMinutes > 0 ? `${lesson.estimatedMinutes}m` : null;
-                    return (
-                      <li key={lesson.id} className={styles.lessonItem}>
-                        <LessonTypeIcon type={lesson.type} />
-                        <Link
-                          href={`/courses/${detail.slug}/lessons/${lesson.id}`}
-                          className={styles.lessonLink}
-                        >
-                          {lesson.title}
-                        </Link>
-                        {vid && <span className={styles.lessonDuration}>{vid}</span>}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </details>
-            ))}
+            {modules.map((mod, si) => {
+              const coverImage = MODULE_COVER_IMAGES[mod.title];
+              return (
+                <details key={mod.id} className={styles.section} open={si === 0}>
+                  <summary className={styles.sectionSummary}>
+                    {coverImage && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={coverImage} alt="" className={styles.sectionCoverImage} />
+                    )}
+                    <span className={styles.sectionTitle}>
+                      Section {si + 1}: {mod.title}
+                    </span>
+                    <span className={styles.sectionChevron}>▼</span>
+                  </summary>
+                  <ul className={styles.lessonList}>
+                    {mod.lessons.map((lesson) => {
+                      const vid =
+                        lesson.estimatedMinutes > 0 ? `${lesson.estimatedMinutes}m` : null;
+                      return (
+                        <li key={lesson.id} className={styles.lessonItem}>
+                          <LessonTypeIcon type={lesson.type} />
+                          <Link
+                            href={`/courses/${detail.slug}/lessons/${lesson.id}`}
+                            className={styles.lessonLink}
+                          >
+                            {lesson.title}
+                          </Link>
+                          {vid && <span className={styles.lessonDuration}>{vid}</span>}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </details>
+              );
+            })}
           </div>
         </div>
       </main>
