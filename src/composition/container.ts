@@ -91,7 +91,7 @@ import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSim
 import { PrismaScorePolicyRepository } from "@/infra/repositories/PrismaScorePolicyRepository";
 import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAttemptFeedbackRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
-import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
+import { PrismaLiveClassRegistrationRepository } from "@/infra/repositories/PrismaLiveClassRegistrationRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { prisma } from "@/infra/database/prisma";
@@ -519,10 +519,12 @@ function buildProductionContainer(): AppContainer {
   // STORY-066: feedback composer + remediation
   const feedbackRepo: IAttemptFeedbackRepository = new PrismaAttemptFeedbackRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
-  // STORY-091: in-memory fallback until Prisma adapter lands — collection
-  // lives across hot reload (test_container wires the same instance).
+  // Proposal 3: Postgres-backed — RSVPs used to live only in-memory
+  // (InMemoryLiveClassRegistrationRepository), so every cold start or
+  // redeploy silently dropped them. buildTestContainer() in
+  // container.test.ts still uses the in-memory fake.
   const liveClassRegistrationRepo: ILiveClassRegistrationRepository =
-    new InMemoryLiveClassRegistrationRepository();
+    new PrismaLiveClassRegistrationRepository(prisma);
   // STORY-011: pricing tier repo
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
   // STORY-081: no DB table yet -- see StaticKeywordDatasetRepository's docblock
