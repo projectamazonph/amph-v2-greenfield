@@ -16,7 +16,7 @@ export function Logo({ size = 34, tagline, className }: LogoProps) {
   return (
     <span className={[shared.logo, className].filter(Boolean).join(" ")}>
       <Image
-        src="/brand/logos/project-amazon-ph-mark.svg"
+        src="/brand/logos/project-amazon-ph-mark.png"
         alt=""
         width={size}
         height={size}

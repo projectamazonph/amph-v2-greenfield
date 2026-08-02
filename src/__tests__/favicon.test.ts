@@ -12,9 +12,11 @@
  * pins the file's existence so the favicon can't silently
  * disappear in a future refactor.
  *
- * We also pin `app/icon.svg` (Next.js 16 generates `<link
- * rel="icon" href="/icon">` from it) so the SVG variant
- * doesn't regress either.
+ * We also pin the PNG icons referenced explicitly by
+ * `metadata.icons` in `src/app/layout.tsx` (favicon-32,
+ * icon-512, apple-touch-icon) so those can't silently disappear
+ * either — there is no `src/app/icon.*` file convention in use
+ * since the brand mark logo is a raster asset.
  */
 
 import { describe, it, expect } from "vitest";
@@ -22,7 +24,11 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
 const FAVICON = path.resolve(process.cwd(), "src/app/favicon.ico");
-const ICON_SVG = path.resolve(process.cwd(), "src/app/icon.svg");
+const PUBLIC_ICONS = [
+  "public/favicon-32.png",
+  "public/icon-512.png",
+  "public/apple-touch-icon.png",
+].map((p) => path.resolve(process.cwd(), p));
 
 describe("favicon metadata", () => {
   it("has a favicon.ico at src/app/favicon.ico", async () => {
@@ -31,8 +37,8 @@ describe("favicon metadata", () => {
     expect(stat.size).toBeGreaterThan(0);
   });
 
-  it("has an icon.svg at src/app/icon.svg (Next 16 metadata convention)", async () => {
-    const stat = await fs.stat(ICON_SVG);
+  it.each(PUBLIC_ICONS)("has a referenced icon at %s", async (iconPath) => {
+    const stat = await fs.stat(iconPath);
     expect(stat.isFile()).toBe(true);
     expect(stat.size).toBeGreaterThan(0);
   });
