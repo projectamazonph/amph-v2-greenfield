@@ -13,7 +13,7 @@
  * to [data-open="true"] on mobile breakpoints.
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { List, X } from "@phosphor-icons/react/dist/ssr";
 import styles from "./MobileNavToggle.module.css";
@@ -26,6 +26,7 @@ export interface MobileNavToggleProps {
 export function MobileNavToggle({ sidebarId }: MobileNavToggleProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const isFirstRender = useRef(true);
 
   const close = useCallback(() => {
     const sidebar = document.getElementById(sidebarId);
@@ -37,7 +38,13 @@ export function MobileNavToggle({ sidebarId }: MobileNavToggleProps) {
   // Close the drawer and unlock body scroll on route change. Necessary
   // both for persistent-layout sidebars (admin) whose instance survives
   // navigation, and as a safety net for per-page sidebars (student).
+  // Skip the initial mount: nothing is open yet, and closing there would
+  // race a drawer the user opens before this effect's first run flushes.
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     close();
   }, [pathname, close]);
 
