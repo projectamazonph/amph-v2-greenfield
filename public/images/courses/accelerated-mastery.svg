@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 550" role="img" aria-labelledby="title desc">
+  <title id="title">Accelerated Mastery</title>
+  <desc id="desc">Field-manual style cover plate for the Accelerated Mastery course: a tachometer dial with a cycle-repeat arrow.</desc>
+  <defs>
+    <pattern id="grid-2" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#FAFAF7" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="550" fill="#1A1A1A"/>
+  <rect width="1200" height="550" fill="url(#grid-2)"/>
+
+  <!-- ghost tier numeral, bleeding off the right edge -->
+  <text x="1180" y="430" text-anchor="end" font-family="Space Grotesk, system-ui, sans-serif" font-size="440" font-weight="700" fill="#FAFAF7" fill-opacity="0.07">02</text>
+
+  <!-- top label -->
+  <text x="90" y="86" font-family="JetBrains Mono, ui-monospace, monospace" font-size="20" letter-spacing="4" fill="#FAFAF7" fill-opacity="0.55">PROJECT AMAZON PH ACADEMY</text>
+
+  <!-- icon: gauge dial with needle + weekly cycle arrow -->
+  <g transform="translate(600,290)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- dial face -->
+    <circle cx="0" cy="0" r="150" fill="none" stroke="#FAFAF7" stroke-opacity="0.35" stroke-width="3" stroke-dasharray="2 10"/>
+
+    <!-- major ticks around the top arc -->
+    <line x1="0" y1="-150" x2="0" y2="-130" stroke="#FAFAF7" stroke-opacity="0.6" stroke-width="4"/>
+    <line x1="-106" y1="-106" x2="-92" y2="-92" stroke="#FAFAF7" stroke-opacity="0.6" stroke-width="4"/>
+    <line x1="106" y1="-106" x2="92" y2="-92" stroke="#FAFAF7" stroke-opacity="0.6" stroke-width="4"/>
+    <line x1="-150" y1="0" x2="-130" y2="0" stroke="#FAFAF7" stroke-opacity="0.6" stroke-width="4"/>
+    <line x1="150" y1="0" x2="130" y2="0" stroke="#FAFAF7" stroke-opacity="0.6" stroke-width="4"/>
+
+    <!-- needle pointing up and to the right: accelerating -->
+    <line x1="0" y1="0" x2="88" y2="-96" stroke="#FF6B35" stroke-width="7"/>
+    <circle cx="0" cy="0" r="14" fill="#FF6B35"/>
+
+    <!-- weekly cycle-repeat arrow beneath the dial -->
+    <path d="M-58 176a58 58 0 1 1 116 0" fill="none" stroke="#FAFAF7" stroke-width="4"/>
+    <path d="M-58 176l-18-8 4 20z" fill="#FAFAF7"/>
+  </g>
+
+  <!-- bottom accent rule + labels -->
+  <line x1="90" y1="470" x2="1110" y2="470" stroke="#FF6B35" stroke-width="4"/>
+  <text x="90" y="510" font-family="JetBrains Mono, ui-monospace, monospace" font-size="24" letter-spacing="3" fill="#FAFAF7" fill-opacity="0.85">TIER 02</text>
+  <text x="1110" y="512" text-anchor="end" font-family="Space Grotesk, system-ui, sans-serif" font-size="28" font-weight="600" fill="#FAFAF7">ACCELERATED</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 550" role="img" aria-labelledby="title desc">
+  <title id="title">Ultimate Transformation</title>
+  <desc id="desc">Field-manual style cover plate for the Ultimate Transformation course: a certification seal with a checkmark and ribbon.</desc>
+  <defs>
+    <pattern id="grid-3" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#FAFAF7" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="550" fill="#1A1A1A"/>
+  <rect width="1200" height="550" fill="url(#grid-3)"/>
+
+  <!-- ghost tier numeral, bleeding off the right edge -->
+  <text x="1180" y="430" text-anchor="end" font-family="Space Grotesk, system-ui, sans-serif" font-size="440" font-weight="700" fill="#FAFAF7" fill-opacity="0.07">03</text>
+
+  <!-- top label -->
+  <text x="90" y="86" font-family="JetBrains Mono, ui-monospace, monospace" font-size="20" letter-spacing="4" fill="#FAFAF7" fill-opacity="0.55">PROJECT AMAZON PH ACADEMY</text>
+
+  <!-- icon: certification seal + ribbon -->
+  <g transform="translate(600,270)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- ribbon tails -->
+    <path d="M-46 96 L-70 200 L-30 176 Z" fill="none" stroke="#FF6B35" stroke-width="5"/>
+    <path d="M46 96 L70 200 L30 176 Z" fill="none" stroke="#FF6B35" stroke-width="5"/>
+
+    <!-- seal rings -->
+    <circle cx="0" cy="0" r="118" fill="#1A1A1A" stroke="#FF6B35" stroke-width="6"/>
+    <circle cx="0" cy="0" r="92" fill="none" stroke="#FAFAF7" stroke-opacity="0.4" stroke-width="2" stroke-dasharray="3 9"/>
+
+    <!-- checkmark -->
+    <path d="M-46 4 L-14 40 L52 -36" fill="none" stroke="#FAFAF7" stroke-width="10"/>
+  </g>
+
+  <!-- bottom accent rule + labels -->
+  <line x1="90" y1="470" x2="1110" y2="470" stroke="#FF6B35" stroke-width="4"/>
+  <text x="90" y="510" font-family="JetBrains Mono, ui-monospace, monospace" font-size="24" letter-spacing="3" fill="#FAFAF7" fill-opacity="0.85">TIER 03</text>
+  <text x="1110" y="512" text-anchor="end" font-family="Space Grotesk, system-ui, sans-serif" font-size="28" font-weight="600" fill="#FAFAF7">TRANSFORMATION</text>
+</svg>
