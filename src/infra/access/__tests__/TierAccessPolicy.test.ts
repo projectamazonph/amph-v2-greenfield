@@ -299,4 +299,18 @@ describe("TierAccessPolicy", () => {
       requiredTier: "STARTER",
     });
   });
+
+  // ── transient repo failure (Copilot review finding) ──────
+
+  it("DENIED_NOT_AUTHENTICATED (fails closed) when the enrollment lookup throws", async () => {
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
+    vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(makeCourse()));
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockRejectedValue(
+      new Error("connection reset"),
+    );
+
+    const result = await policy.canAccess(USER_ID, COURSE_ID);
+
+    expect(result).toEqual({ kind: "denied_not_authenticated" });
+  });
 });

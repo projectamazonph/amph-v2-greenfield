@@ -103,11 +103,13 @@ export class Login {
     }
     const verifyResult = await this.hasher.verify(input.password, hashResult.value);
     if (Result.isErr(verifyResult) || !verifyResult.value) {
-      const lockUntil = new Date(this.clock.now().getTime() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
+      const now = this.clock.now();
+      const lockUntil = new Date(now.getTime() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
       const attemptResult = await this.userRepo.recordLoginAttempt(user.id, {
         kind: "failure",
         maxAttempts: MAX_FAILED_ATTEMPTS,
         lockUntil,
+        now,
       });
       if (Result.isOk(attemptResult) && attemptResult.value.lockedUntil) {
         return { ok: false, error: { kind: "account_locked" } };

@@ -183,7 +183,8 @@ export class InMemoryUserRepository implements UserRepository {
 
   async recordLoginAttempt(
     userId: string,
-    outcome: { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date },
+    outcome:
+      { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date; now: Date },
   ): Promise<Result<{ lockedUntil: Date | null }, UserError>> {
     const user = this.users.get(userId);
     if (!user) return Result.err({ kind: "not_found" });
@@ -194,10 +195,16 @@ export class InMemoryUserRepository implements UserRepository {
       return Result.ok({ lockedUntil: null });
     }
 
-    const nextCount = (this.failedLoginCounts.get(userId) ?? 0) + 1;
+    // If a previous lockout has already expired, the streak restarts
+    // at 1 instead of incrementing — otherwise the first wrong
+    // password after the window passes would find the counter still
+    // sitting at maxAttempts and re-lock immediately.
+    const currentLockedUntil = user.lockedUntil ?? null;
+    const priorLockExpired = currentLockedUntil !== null && currentLockedUntil <= outcome.now;
+    const nextCount = priorLockExpired ? 1 : (this.failedLoginCounts.get(userId) ?? 0) + 1;
     this.failedLoginCounts.set(userId, nextCount);
     const lockedUntil = nextCount >= outcome.maxAttempts ? outcome.lockUntil : null;
-    if (lockedUntil) {
+    if (lockedUntil || priorLockExpired) {
       this.users.set(userId, Object.freeze({ ...user, lockedUntil }));
     }
     return Result.ok({ lockedUntil });

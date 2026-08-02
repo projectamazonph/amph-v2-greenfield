@@ -143,7 +143,12 @@ export interface UserRepository {
    *   active lockout (called by Login after a correct password).
    * - `{ kind: "failure" }` atomically increments the failed-attempt
    *   streak and, once it reaches `maxAttempts`, locks the account
-   *   until `lockUntil` (called by Login after a wrong password).
+   *   until `lockUntil` (called by Login after a wrong password). If a
+   *   *previous* lockout has already expired as of `now`, the streak
+   *   restarts at 1 instead of incrementing — otherwise the first
+   *   wrong password after the lockout window passes would find the
+   *   counter still sitting at `maxAttempts` and re-lock immediately,
+   *   breaking the "N *consecutive* failures" contract.
    *
    * A single method (rather than separate get/increment/reset/lock
    * methods) keeps this port under the ISP method-count threshold
@@ -157,6 +162,7 @@ export interface UserRepository {
    */
   recordLoginAttempt(
     userId: string,
-    outcome: { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date },
+    outcome:
+      { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date; now: Date },
   ): Promise<Result<{ lockedUntil: Date | null }, UserError>>;
 }

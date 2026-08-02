@@ -118,6 +118,7 @@ describe("PrismaUserRepository — recordLoginAttempt", () => {
         kind: "failure",
         maxAttempts: 5,
         lockUntil: new Date("2026-08-02T12:15:00Z"),
+        now: new Date("2026-08-02T12:00:00Z"),
       });
       expect(result.ok).toBe(true);
       if (!result.ok) return;
@@ -133,6 +134,7 @@ describe("PrismaUserRepository — recordLoginAttempt", () => {
         kind: "failure",
         maxAttempts: 5,
         lockUntil,
+        now: new Date("2026-08-02T12:00:00Z"),
       });
       expect(result.ok).toBe(true);
       if (!result.ok) return;
@@ -146,10 +148,46 @@ describe("PrismaUserRepository — recordLoginAttempt", () => {
         kind: "failure",
         maxAttempts: 5,
         lockUntil: new Date("2026-08-02T12:15:00Z"),
+        now: new Date("2026-08-02T12:00:00Z"),
       });
       expect(result.ok).toBe(false);
       if (result.ok) return;
       expect(result.error.kind).toBe("not_found");
+    });
+
+    it("restarts the streak at 1 (does not immediately re-lock) once a prior lockout has expired", async () => {
+      // Copilot review finding: the account was locked (count=5) with a
+      // lockout that expired at 12:15; this attempt happens at 12:20,
+      // after expiry. Without the fix, incrementing straight to 6 would
+      // re-lock on the very first attempt after the window passed.
+      db.rows.push(makeRow({ failedLoginCount: 5, lockedUntil: new Date("2026-08-02T12:15:00Z") }));
+      const result = await repo.recordLoginAttempt("u1", {
+        kind: "failure",
+        maxAttempts: 5,
+        lockUntil: new Date("2026-08-02T12:35:00Z"),
+        now: new Date("2026-08-02T12:20:00Z"),
+      });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toEqual({ lockedUntil: null });
+      expect(db.rows[0]?.failedLoginCount).toBe(1);
+      expect(db.rows[0]?.lockedUntil).toBeNull();
+    });
+
+    it("still increments normally when the prior lockout has not yet expired", async () => {
+      // Belt-and-suspenders: Login's own pre-check already blocks entry
+      // while locked, but recordLoginAttempt should not silently reset
+      // the streak just because lockedUntil is set — only once it's past.
+      db.rows.push(makeRow({ failedLoginCount: 5, lockedUntil: new Date("2026-08-02T12:15:00Z") }));
+      const result = await repo.recordLoginAttempt("u1", {
+        kind: "failure",
+        maxAttempts: 5,
+        lockUntil: new Date("2026-08-02T12:20:00Z"),
+        now: new Date("2026-08-02T12:10:00Z"), // before the 12:15 expiry
+      });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(db.rows[0]?.failedLoginCount).toBe(6);
     });
   });
 });

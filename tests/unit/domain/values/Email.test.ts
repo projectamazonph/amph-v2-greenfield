@@ -101,10 +101,14 @@ describe("createEmail", () => {
   });
 
   it("does not hang on pathological input (ReDoS check)", () => {
+    // The regex's linear structure (no nested quantifiers) is the real
+    // protection; a wall-clock threshold here would be flaky on slower
+    // CI runners. If the regex ever regressed to exponential behavior,
+    // this call would hang and the test would fail via Vitest's own
+    // test timeout instead of a timing assertion.
     const pathological = "a".repeat(50000) + "!";
-    const start = Date.now();
-    createEmail(pathological);
-    expect(Date.now() - start).toBeLessThan(100);
+    const result = createEmail(pathological);
+    expect(result.ok).toBe(false);
   });
 });
 

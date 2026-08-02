@@ -25,7 +25,9 @@ export type EmailError =
 
 // Deliberately simple and linear-time (no nested quantifiers) to avoid
 // ReDoS. Not a full RFC 5322 grammar — practical subset: one "@", no
-// whitespace, a dot-separated domain with a TLD of at least 2 letters.
+// whitespace, a dot-separated domain with at least 2 non-whitespace/
+// non-"@" characters after the last dot (deliberately not restricted
+// to letters — accepts numeric or punycode-style TLDs too).
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const MAX_TOTAL_LENGTH = 254; // RFC 5321 §4.5.3.1.3

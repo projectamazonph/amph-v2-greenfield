@@ -74,7 +74,11 @@ export async function proxy(request: NextRequest) {
   // isn't part of the CSP spec (only 'unsafe-inline' or
   // 'unsafe-hashes' cover it) — hardening that would mean migrating
   // every inline style to CSS Modules first, out of scope here.
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  // btoa(), not Buffer.from(...).toString("base64") — this file runs on
+  // Next.js's Edge Runtime by default (no `export const runtime =
+  // "nodejs"`), and btoa is the Web-standard API guaranteed there,
+  // vs. relying on Buffer's Edge Runtime polyfill.
+  const nonce = btoa(crypto.randomUUID());
   const cspHeaderValue = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}'`,

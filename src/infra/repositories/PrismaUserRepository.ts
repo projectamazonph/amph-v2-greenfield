@@ -244,7 +244,8 @@ export class PrismaUserRepository implements UserRepository {
 
   async recordLoginAttempt(
     id: string,
-    outcome: { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date },
+    outcome:
+      { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date; now: Date },
   ): Promise<Result<{ lockedUntil: Date | null }, UserError>> {
     try {
       if (outcome.kind === "success") {
@@ -255,9 +256,22 @@ export class PrismaUserRepository implements UserRepository {
         return Result.ok({ lockedUntil: null });
       }
 
+      // If a previous lockout has already expired, the streak restarts
+      // at 1 instead of incrementing — otherwise the first wrong
+      // password after the window passes would find the counter still
+      // sitting at maxAttempts and re-lock immediately.
+      const existing = await this.db.user.findUnique({
+        where: { id },
+        select: { lockedUntil: true },
+      });
+      if (!existing) return Result.err({ kind: "not_found" });
+      const priorLockExpired = existing.lockedUntil !== null && existing.lockedUntil <= outcome.now;
+
       const row = await this.db.user.update({
         where: { id },
-        data: { failedLoginCount: { increment: 1 } },
+        data: priorLockExpired
+          ? { failedLoginCount: 1, lockedUntil: null }
+          : { failedLoginCount: { increment: 1 } },
         select: { failedLoginCount: true },
       });
       if (row.failedLoginCount < outcome.maxAttempts) {

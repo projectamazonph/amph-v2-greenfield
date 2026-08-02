@@ -465,6 +465,24 @@ describe("Login", () => {
       expect(result.ok).toBe(true);
     });
 
+    it("does not immediately re-lock on the first wrong password after the lockout window passes", async () => {
+      // Copilot review finding: without resetting the streak on expiry,
+      // the counter is still at 5 when the window passes, so a single
+      // additional wrong password (→ 6) would re-lock instantly,
+      // breaking the "5 *consecutive* failures" contract.
+      for (let i = 0; i < 5; i++) {
+        await useCase.execute({ email: "alice@example.com", password: "WrongPassword!" });
+      }
+      clock.advance(16 * 60 * 1000); // past the 15-minute lockout window
+      const result = await useCase.execute({
+        email: "alice@example.com",
+        password: "WrongPassword!",
+      });
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "wrong_password" });
+    });
+
     it("resets the failed-login streak on a successful login", async () => {
       await useCase.execute({ email: "alice@example.com", password: "WrongPassword!" });
       await useCase.execute({ email: "alice@example.com", password: "WrongPassword!" });
