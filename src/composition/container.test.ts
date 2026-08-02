@@ -62,7 +62,9 @@ import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuiz
 import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
 import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepository";
 import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
+import { InMemoryProgressEventRepository } from "@/infra/repositories/InMemoryProgressEventRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
@@ -161,6 +163,11 @@ import { AdminGetBadge } from "@/usecases/AdminGetBadge";
 import { AdminCreateBadge } from "@/usecases/AdminCreateBadge";
 import { AdminUpdateBadge } from "@/usecases/AdminUpdateBadge";
 import { AdminArchiveBadge } from "@/usecases/AdminArchiveBadge";
+import { ListEmailTemplates } from "@/usecases/ListEmailTemplates";
+import { GetEmailTemplate } from "@/usecases/GetEmailTemplate";
+import { UpdateEmailTemplate } from "@/usecases/UpdateEmailTemplate";
+import { DeleteUserAccount } from "@/usecases/DeleteUserAccount";
+import { ExportUserData } from "@/usecases/ExportUserData";
 import { AdminListQuizzes } from "@/usecases/AdminListQuizzes";
 import { AdminGetQuiz } from "@/usecases/AdminGetQuiz";
 import { AdminCreateQuiz } from "@/usecases/AdminCreateQuiz";
@@ -212,7 +219,9 @@ export interface TestContainer extends AppContainer {
   xpEventRepo: InMemoryXPEventRepository;
   badgeRepo: InMemoryBadgeRepository;
   badgeAwardRepo: InMemoryBadgeAwardRepository;
+  emailTemplateRepo: InMemoryEmailTemplateRepository;
   certificateRepo: InMemoryCertificateRepository;
+  progressEventRepo: InMemoryProgressEventRepository;
   certificateRenderer: StaticCertificateRenderer;
   // STORY-012: tests share NextMdxRenderer with production.
   mdxRenderer: IMdxContentRenderer;
@@ -256,7 +265,9 @@ export function buildTestContainer(): TestContainer {
   const xpEventRepo = new InMemoryXPEventRepository();
   const badgeRepo = new InMemoryBadgeRepository();
   const badgeAwardRepo = new InMemoryBadgeAwardRepository();
+  const emailTemplateRepo = new InMemoryEmailTemplateRepository();
   const certificateRepo = new InMemoryCertificateRepository();
+  const progressEventRepo = new InMemoryProgressEventRepository();
   const sessionRepo = new InMemorySessionRepository();
   const emailVerificationRepo = new InMemoryEmailVerificationRepository();
   const passwordResetRepo = new InMemoryPasswordResetRepository();
@@ -392,6 +403,7 @@ export function buildTestContainer(): TestContainer {
     badgeRepo,
     badgeAwardRepo,
     certificateRepo,
+    progressEventRepo,
     certificateHashGen,
     certificateRenderer,
     mdxRenderer,
@@ -575,6 +587,31 @@ export function buildTestContainer(): TestContainer {
     adminCreateBadge: new AdminCreateBadge({ badgeRepo, recordAuditLog }),
     adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
     adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
+    emailTemplateRepo,
+    listEmailTemplates: new ListEmailTemplates({ emailTemplateRepo }),
+    getEmailTemplate: new GetEmailTemplate({ emailTemplateRepo }),
+    updateEmailTemplate: new UpdateEmailTemplate({
+      emailTemplateRepo,
+      recordAuditLog,
+      idGen,
+      clock,
+    }),
+    deleteUserAccount: new DeleteUserAccount({
+      userRepo,
+      hasher: passwordHasher,
+      sessionRepo,
+      recordAuditLog,
+    }),
+    exportUserData: new ExportUserData({
+      userRepo,
+      orderRepo,
+      enrollmentRepo,
+      certificateRepo,
+      badgeAwardRepo,
+      xpEventRepo,
+      progressEventRepo,
+      clock,
+    }),
     // STORY-091: admin quiz CRUD
     adminListQuizzes: new AdminListQuizzes({ quizRepo, courseRepo }),
     adminGetQuiz: new AdminGetQuiz({ quizRepo, courseRepo }),

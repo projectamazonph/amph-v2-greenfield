@@ -119,6 +119,26 @@ export class InMemoryUserRepository implements UserRepository {
     return Result.ok(hash);
   }
 
+  async anonymizeAndDelete(id: string, anonymizedEmail: string): Promise<Result<void, UserError>> {
+    const user = this.users.get(id);
+    if (!user) return Result.err({ kind: "not_found" });
+
+    this.emailIndex.delete(user.email);
+    const normalizedEmail = anonymizedEmail.toLowerCase();
+    const updated = Object.freeze({
+      ...user,
+      email: normalizedEmail,
+      firstName: "Deleted",
+      lastName: "User",
+      twoFactorEnabled: false,
+    });
+    this.users.set(id, updated);
+    this.emailIndex.set(normalizedEmail, id);
+    this.passwordHashes.set(id, "");
+    this.twoFactorSecrets.delete(id);
+    return Result.ok(undefined);
+  }
+
   /** Remove all users. Call between tests. */
   clear(): void {
     this.users.clear();

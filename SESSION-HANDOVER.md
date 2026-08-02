@@ -1,5 +1,110 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-02, production-readiness fix session)
+
+A prior turn in this session ran a thorough production-readiness review (typecheck, lint,
+full test suite, and a real `pnpm build` with and without env vars — the repo hadn't had
+`pnpm install` run yet this session, so this was the first real verification against a
+clean checkout in a while). Findings, then this session fixed the real bugs and built the
+features that didn't need Ryan's product/PPC judgment, on branch
+`claude/production-readiness-review-k19ffm`.
+
+**Note on scope drift vs. `SESSION-HANDOVER.md`'s prior entries:** this file's most recent
+entry before this one was dated 2026-07-30, but `git log` showed the actual branch history
+continued through 2026-08-02 (PRs #248–271) without corresponding handover entries —
+Sprint 15 STORY-079–082 docs sync, dependency bumps, PR #256's "production readiness"
+pass (which itself fixed several things this review's first pass initially thought were
+still open — userId "system", pendingRefunds, session revocation, impersonation restore,
+health DB probe — all already fixed by 2026-07-31, re-verified against source before
+acting), the UI audit (PR #257), hardening (PR #260), and the student-feature-gap audit
+(PRs #265/266, closing STORY-090/091/094). None of that is re-litigated here; it was
+verified against source, not assumed from stale docs.
+
+## What this session found (verified against source, not assumed)
+
+- `pnpm typecheck`, `pnpm lint`, `pnpm test` (3268 passed/2 skipped before this session's
+  changes), `pnpm test:arch` (546/546), and `pnpm build` all genuinely pass on a fresh
+  `pnpm install`.
+- **Real bug:** `pnpm build` crashes with "DATABASE_URL environment variable is not set"
+  when no env vars are present, because `src/infra/database/prisma.ts` constructed the
+  Prisma client eagerly at module import time and Next's page-data-collection step imports
+  every route transitively. Reproduced, fixed (lazy `Proxy`), re-verified the build passes
+  with zero env vars.
+- **Real gap:** `PayMongoAdapter.refund()` was still `Result.err({ code: "not_implemented" })`
+  — STORY-049.5 was flagged as a real follow-up in STORY-049's own doc and never picked up.
+  Fixed: calls the real PayMongo Refunds API now.
+- **Real gap:** `src/infra/payment/PayMongoAdapter.test.ts` (checkout + webhook-signature
+  coverage) sat outside `vitest.config.ts`'s `include` glob and was silently never executed
+  by `pnpm test` or CI. Moved into `src/infra/payment/__tests__/`.
+- **Real, but lower-severity:** no CSP header, admin 2FA opt-in but not enforced, simulator
+  scores lacked an explicit formative-only UI disclaimer (AGENTS.md's own guardrail says
+  this should exist), and three student-facing routes from the 2026-08-01 gap analysis were
+  still unbuilt (student 2FA, admin email-template editor, account deletion/export).
+
+## What this session built
+
+See `CHANGELOG.md`'s 2026-08-02 entry and `docs/stories/STORY-{049,078,095,096,097}.md`
+for the full detail. Summary:
+
+1. **STORY-049.5** — real PayMongo Refunds API integration.
+2. **Prisma lazy-init fix** — `next build` no longer needs `DATABASE_URL` at build time.
+3. **CSP header** — pragmatic first pass (`'unsafe-inline'` still allowed, no nonce
+   plumbing yet — a real hardening follow-up, not done here).
+4. **STORY-095** — admin email-template editor (`/admin/email-templates`). Caveat stated on
+   the page: not yet wired into the actual send path.
+5. **STORY-097** — student 2FA (`/profile/security`), renumbered from the gap-analysis
+   doc's suggested STORY-093 because that number was already in use for an unrelated,
+   already-shipped quiz UI fix (checked `docs/stories/` before writing, per AGENTS.md's own
+   audit-verification pattern — good thing, since three of the five gap-analysis-recommended
+   numbers, STORY-090/091/094, turned out to already exist correctly but STORY-092/093 did
+   not mean what the gap analysis assumed).
+6. **STORY-096** — account deletion + data export (`/profile/data`). Caveat stated on the
+   page: export omits quiz/simulator attempt history (those repos only support
+   per-quiz/per-scenario lookups, not a full per-user history).
+7. **STORY-078** — shared `FormativeScoreNotice` component on all 5 simulator result views.
+
+Docs updated in the same session: `CLAUDE.md` (Known gaps addendum + the `container.test.ts`
+doc-drift correction — it's not actually a Vitest spec despite the name, and
+`buildTestContainer()` is NOT in `container.ts` as the doc used to claim), `docs/sprint-plan.md`,
+`docs/STUDENT-FEATURE-GAP-ANALYSIS.md`, `FEATURES.md` (several rows were stale — simulator
+ownership, session revocation, impersonation restore, refund metric, quiz transition were
+already fixed in a prior session but the doc still said "Partial"), `CHANGELOG.md`, and new
+story docs for STORY-078/095/096/097 (STORY-049's doc already existed; updated its
+"Out of scope" note instead).
+
+## Explicitly not attempted this session, and why
+
+- **STORY-083/084** (Listing Audit non-binary ground truth, Campaign Builder strategic
+  scoring) — need Ryan's Amazon PPC expertise per the sprint plan's own owner note. An
+  agent inventing plausible-looking ground truth is exactly the defect Sprint 15 exists to
+  remove.
+- **DB backup/restore drill** — needs a real, live Neon project; destructive-adjacent;
+  operator-owned per `docs/runbooks/db-backup-restore.md`.
+- **External uptime monitoring** — needs a third-party account/credentials.
+- **Admin 2FA enforcement** (vs. opt-in) — a security/UX policy decision with real lockout
+  risk for a solo-admin project. Flagged in CLAUDE.md, not decided unilaterally.
+- **Wiring the email-template repo into the actual Resend send path** (STORY-095.5) —
+  would touch 7 revenue-critical, already-tested email renderers (receipts, verification)
+  in the same session as three other features; too much blast radius for the value versus
+  shipping the CRUD tool now and wiring it as a focused follow-up.
+- **Full quiz/simulator attempt export** — would need new port methods + two adapters;
+  the existing `findByUserAndQuiz`/`findByUserAndScenario` methods don't support "every
+  attempt by this user."
+- **`liveClassRegistrationRepo` still `InMemoryLiveClassRegistrationRepository` in
+  production** (RSVPs lost on cold start/redeploy) — noticed in passing, out of scope,
+  flagged in CLAUDE.md.
+
+## Verification
+
+`pnpm typecheck && pnpm lint && pnpm test` all green (3335 passed, 2 skipped, 0 failed,
+up from 3268/2/0 at session start) and `pnpm build` succeeds with zero environment
+variables set (previously crashed). Full details of each fix/feature are in the
+corresponding story doc; this entry intentionally doesn't duplicate them (per AGENTS.md's
+"Don't duplicate content from docs/stories/STORY-XXX.md into the PR description" rule,
+applied here to the handover log too).
+
+---
+
 # Session update (2026-07-30)
 
 `main` @ `2edb67a`. Two Sprint 15 stories merged this session, both squash

@@ -11,6 +11,7 @@
 import { useState, useTransition } from "react";
 import styles from "./ListingAuditForm.module.css";
 import { auditListing, type AuditListingResult } from "@/app/tools/listing-audit/actions";
+import { FormativeScoreNotice } from "./FormativeScoreNotice";
 
 interface Props {
   initialTitle: string;
@@ -120,6 +121,7 @@ export function ListingAuditForm({
           </div>
         ) : null}
       </div>
+      {result && result.ok ? <FormativeScoreNotice /> : null}
       {result && result.ok ? (
         <div className={styles.findings}>
           <h3 className={styles.findingsTitle}>Findings</h3>

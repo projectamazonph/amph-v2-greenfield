@@ -14,6 +14,13 @@ The following items originally flagged in this audit have been resolved:
 1. **FIXED — PrismaBadgeRepository create/update/archive are now fully implemented.** (`src/infra/repositories/PrismaBadgeRepository.ts`) The `create`, `update`, and `archive` methods no longer throw `Not implemented`; admin badge mutations can complete against production Postgres.
 2. **FIXED — `seed-admin-user.mjs` now uses the PrismaPg adapter correctly.** (`scripts/seed-admin-user.mjs`) The script no longer constructs `new PrismaClient()` directly; it uses the shared Prisma adapter path consistent with `src/infra/database/prisma.ts`.
 3. **FIXED — Health endpoint now includes a DB readiness probe.** (`src/app/api/health/route.ts`) The health route now opens/queries Prisma before returning `status: "ok"`, so monitoring can detect database outages.
+4. **FIXED (2026-07-31, prior session) — Simulator attempts use the authenticated user.** All 5 graded actions now call `getSessionUserId()` instead of hardcoding `"system"`.
+5. **FIXED (2026-07-31, prior session) — Dashboard pending refunds is a live query.** `GetAdminDashboardStats.pendingRefunds` calls `orderRepo.listRefundRequests()`.
+6. **FIXED (2026-07-31, prior session) — Session revocation and impersonation restore.** `getSessionUserId()` checks `SessionRepository` server-side; `impersonateUser.action.ts` captures and replants the admin's original token.
+7. **FIXED (2026-08-01, prior session) — Quiz lesson placeholder closed.** `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094).
+8. **FIXED (2026-08-02, production-readiness fix session) — PayMongo refunds are real.** `PayMongoAdapter.refund()` calls the real Refunds API instead of `not_implemented` (STORY-049.5, this audit's own item 2 in "Recommended follow-up order" below).
+9. **FIXED (2026-08-02) — `next build` no longer requires `DATABASE_URL` at build time.** The Prisma client construction was eager at module load; it's now a lazy `Proxy`. This audit's own `pnpm build` "Pass" result (below) only held because this workstation happened to have `DATABASE_URL` set — a genuinely clean environment would have failed.
+10. **PARTIALLY ADDRESSED (2026-08-02) — Admin email-template editor, quiz owner attribution notwithstanding, real gaps closed: student 2FA, account deletion/export, and simulator formative-only labeling all shipped** (STORY-095/096/097/078, none of which this audit originally flagged as they postdate it) — see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum and `docs/STUDENT-FEATURE-GAP-ANALYSIS.md` for current status and stated caveats.
 
 ## Inventory
 
@@ -81,13 +88,13 @@ Local `.env` sets `NODE_ENV=production`. Tests that exercise the default `amph_s
 
 ## Recommended follow-up order
 
-1. Wire authenticated user identity into all graded simulator actions and add ownership tests.
+1. ~~Wire authenticated user identity into all graded simulator actions and add ownership tests.~~ **FIXED** (2026-07-31)
 2. ~~Implement and test the three Prisma badge mutations, or disable those admin controls until the adapter is complete.~~ **FIXED**
 3. ~~Make `seed-admin-user.mjs` use the shared Prisma adapter path and add a non-destructive smoke test.~~ **FIXED**
-4. Choose and implement a session revocation model (`sessions` lookup or token version) and enforce account lockout semantics.
-5. Fix first-time impersonation backup handling and add a browser click-through.
-6. Replace the dashboard refund placeholder with a real query or label the tile as unavailable.
-7. Join quiz lesson content to the dedicated quiz route, and decide whether Keyword Research should become its own simulator module.
+4. ~~Choose and implement a session revocation model (`sessions` lookup or token version) and enforce account lockout semantics.~~ **PARTIALLY FIXED** (2026-07-31): server-side `sessions` lookup after JWT verify is in. `lockedUntil` enforcement is still not wired.
+5. ~~Fix first-time impersonation backup handling and add a browser click-through.~~ **FIXED** (2026-07-31) for the backup handling; a browser click-through was not separately verified.
+6. ~~Replace the dashboard refund placeholder with a real query or label the tile as unavailable.~~ **FIXED** (2026-07-31)
+7. ~~Join quiz lesson content to the dedicated quiz route~~ **FIXED** (STORY-094, 2026-08-01). Keyword Research becoming its own simulator module: also done (STORY-081, prior to this audit's writing — see `CLAUDE.md`).
 8. Run the migration contract test on a POSIX CI runner and install all Playwright browsers before claiming E2E coverage locally.
 9. Keep the current docs matrix and audit report updated whenever a story changes the route, schema, or production adapter.
 

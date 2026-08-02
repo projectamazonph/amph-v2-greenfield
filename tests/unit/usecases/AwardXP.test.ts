@@ -76,6 +76,7 @@ function makeUserRepo(
       : vi.fn(),
     getTwoFactorSecret: vi.fn(),
     setTwoFactorSecret: vi.fn(),
+    anonymizeAndDelete: vi.fn(),
   };
 }
 

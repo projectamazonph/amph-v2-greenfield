@@ -29,6 +29,7 @@ import {
   Question,
   Certificate,
   Gear,
+  Envelope,
 } from "@phosphor-icons/react/dist/ssr";
 import type { User } from "@/domain/entities/User";
 import { UserCard } from "./UserCard";
@@ -58,9 +59,7 @@ interface NavSection {
 const NAV_SECTIONS: readonly NavSection[] = [
   {
     label: "Overview",
-    items: [
-      { href: "/admin", label: "Dashboard", icon: SquaresFour },
-    ],
+    items: [{ href: "/admin", label: "Dashboard", icon: SquaresFour }],
   },
   {
     label: "Content",
@@ -70,6 +69,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/admin/simulators", label: "Simulators", icon: GameController },
       { href: "/admin/quizzes", label: "Quizzes", icon: Question },
       { href: "/admin/badges", label: "Badges", icon: Star },
+      { href: "/admin/email-templates", label: "Email templates", icon: Envelope },
     ],
   },
   {
@@ -84,9 +84,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
   },
   {
     label: "System",
-    items: [
-      { href: "/admin/settings", label: "Settings", icon: Gear },
-    ],
+    items: [{ href: "/admin/settings", label: "Settings", icon: Gear }],
   },
 ] as const;
 
@@ -126,9 +124,7 @@ export function NavSidebar({ user }: NavSidebarProps) {
                   key={item.href}
                   href={item.href}
                   data-active={isActive}
-                  className={[styles.item, isActive ? styles.active : ""]
-                    .filter(Boolean)
-                    .join(" ")}
+                  className={[styles.item, isActive ? styles.active : ""].filter(Boolean).join(" ")}
                   aria-current={isActive ? "page" : undefined}
                 >
                   <span className={styles.icon} aria-hidden>

@@ -52,6 +52,30 @@ export async function proxy(request: NextRequest) {
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  // Pragmatic first CSP (production-readiness audit): 'unsafe-inline' on
+  // script-src/style-src is needed because this app has no nonce plumbing
+  // through Next's RSC payload and CSS-module inline styles yet. A
+  // nonce-based CSP that drops 'unsafe-inline' is a real hardening
+  // follow-up, not implemented here. connect-src allows PayMongo (API
+  // calls from checkout) and Sentry's ingest endpoints; checkout itself
+  // is a top-level redirect (window.location.href), never an iframe, so
+  // no frame-src allowance is needed for it.
+  res.headers.set(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob:",
+      "font-src 'self' data:",
+      "connect-src 'self' https://api.paymongo.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "object-src 'none'",
+      "upgrade-insecure-requests",
+    ].join("; "),
+  );
 
   // ── Route protection ─────────────────────────────────────
   const isProtected = isProtectedPath(pathname) && !isAdminLoginPath(pathname);

@@ -1,0 +1,91 @@
+/* STORY-095 — email template list — Field Manual tokens */
+
+.empty {
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  text-align: center;
+  padding: var(--space-8) 0;
+  margin: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th {
+  text-align: left;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--ink-500);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.name {
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.subject {
+  color: var(--ink-500);
+  max-width: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date {
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.actions {
+  text-align: right;
+}
+
+.editLink {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.editLink:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.customized {
+  background-color: var(--success-soft);
+  color: var(--success);
+}
+
+.default {
+  background-color: var(--surface-2);
+  color: var(--ink-500);
+}

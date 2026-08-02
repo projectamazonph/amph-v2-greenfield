@@ -147,6 +147,37 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  async anonymizeAndDelete(id: string, anonymizedEmail: string): Promise<Result<void, UserError>> {
+    try {
+      await this.db.user.update({
+        where: { id },
+        data: {
+          email: anonymizedEmail.toLowerCase(),
+          firstName: "Deleted",
+          lastName: "User",
+          phone: null,
+          avatarUrl: null,
+          bio: null,
+          password: "",
+          twoFactorSecret: null,
+          twoFactorEnabled: false,
+          deletedAt: new Date(),
+        },
+      });
+      return Result.ok(undefined);
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   // ── Private helpers ────────────────────────────────────────
 
   async updateTotalXp(

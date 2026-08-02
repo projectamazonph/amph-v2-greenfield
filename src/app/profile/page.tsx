@@ -37,7 +37,9 @@ export default async function ProfilePage() {
     <StudentShell user={user}>
       <main className={styles.page}>
         <header className={styles.header}>
-          <h1 className={styles.title}>{user.firstName} {user.lastName}</h1>
+          <h1 className={styles.title}>
+            {user.firstName} {user.lastName}
+          </h1>
           <p className={styles.email}>{user.email}</p>
         </header>
         <div className={styles.grid}>
@@ -47,11 +49,7 @@ export default async function ProfilePage() {
               <Field label="Role" value={user.role} />
               <Field label="Subscription" value={user.subscriptionTier} />
               <Field label="Total XP" value={String(user.totalXp)} mono />
-              <Field
-                label="Member since"
-                value={user.createdAt.toISOString().slice(0, 10)}
-                mono
-              />
+              <Field label="Member since" value={user.createdAt.toISOString().slice(0, 10)} mono />
             </dl>
           </section>
           <section className={styles.section}>
@@ -72,8 +70,38 @@ export default async function ProfilePage() {
             )}
           </section>
         </div>
-        <div style={{ marginTop: 'var(--space-8)' }}><Link href="/reset-password" className="btn btn-ghost">Change Password</Link></div>
-        <section style={{ marginTop: 'var(--space-8)' }}><h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, marginBottom: 'var(--space-4)' }}>Notifications</h2><label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><input type="checkbox" defaultChecked /> Email me when new courses are released</label><br /><label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}><input type="checkbox" defaultChecked /> Remind me to continue my course</label></section>
+        <div style={{ marginTop: "var(--space-8)", display: "flex", gap: "var(--space-3)" }}>
+          <Link href="/reset-password" className="btn btn-ghost">
+            Change Password
+          </Link>
+          <Link href="/profile/security" className="btn btn-ghost">
+            Security (2FA)
+          </Link>
+          <Link href="/profile/data" className="btn btn-ghost">
+            Your data
+          </Link>
+        </div>
+        <section style={{ marginTop: "var(--space-8)" }}>
+          <h2
+            style={{ fontSize: "var(--text-lg)", fontWeight: 600, marginBottom: "var(--space-4)" }}
+          >
+            Notifications
+          </h2>
+          <label style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <input type="checkbox" defaultChecked /> Email me when new courses are released
+          </label>
+          <br />
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-2)",
+              marginTop: "var(--space-2)",
+            }}
+          >
+            <input type="checkbox" defaultChecked /> Remind me to continue my course
+          </label>
+        </section>
       </main>
     </StudentShell>
   );
