@@ -20,8 +20,9 @@
  *  3. **P0-1: paywall check** — if course is paid, require order or admin_grant
  *  4. Check no Enrollment record exists (DB uniqueness, also serves as
  *     the "already enrolled" check)
- *  5. Create Enrollment record
- *  6. Return the Enrollment
+ *  5. Build the Enrollment record
+ *  6. Persist it
+ *  7. Return the Enrollment
  *
  * Fail Fast: returns typed errors early before touching persistence.
  *
@@ -154,7 +155,7 @@ export class EnrollStudent {
       return Result.err({ kind: "user_not_found" }); // closest error
     }
 
-    // ── 6. Return enrollment ─────────────────────────────────
+    // ── 7. Return enrollment ─────────────────────────────────
     return Result.ok(enrollment);
   }
 }
