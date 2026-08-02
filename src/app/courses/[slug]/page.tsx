@@ -56,7 +56,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
     detail.priceMinor === 0 ? "FREE" : `₱${(detail.priceMinor / 100).toFixed(2)}`;
 
   return (
-    <StudentShell>
+    <StudentShell requireAuth={false}>
       <main className={styles.page}>
         <Link
           href={`/checkout?courseSlug=${detail.slug}`}

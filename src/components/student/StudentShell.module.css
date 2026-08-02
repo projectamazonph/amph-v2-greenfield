@@ -26,3 +26,23 @@
     overflow-x: hidden;
   }
 }
+
+/* Public-shell layout (requireAuth={false}).
+   A single-column flow with a sticky top header and the main content
+   directly under it. No sidebar, no command palette, no mobile
+   nav-toggle. This is the layout used by anonymous visitors on the
+   course catalog + course detail pages. */
+
+.publicShell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface-0);
+  font-family: var(--font-body);
+}
+
+.publicMain {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+}

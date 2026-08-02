@@ -34,8 +34,8 @@ export default async function CoursesPage() {
 
   if (!result.ok) {
     return (
-      <StudentShell>
-        <main className={styles.errorPage}>
+      <StudentShell requireAuth={false}>
+      <main className={styles.errorPage}>
           <p className={styles.errorText}>Unable to load courses. Please try again later.</p>
         </main>
       </StudentShell>
@@ -45,7 +45,7 @@ export default async function CoursesPage() {
   const courses = result.value.courses;
 
   return (
-    <StudentShell>
+    <StudentShell requireAuth={false}>
       <main className={styles.page}>
         {/* Hero */}
         <section className={styles.hero}>
