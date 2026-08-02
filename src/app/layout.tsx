@@ -23,7 +23,13 @@ export const metadata: Metadata = {
   title: "Project Amazon PH Academy",
   description: "Master Amazon PPC and seller central, built for Filipino VAs.",
   manifest: "/site.webmanifest",
-  icons: { icon: "/favicon.svg", apple: "/favicon.svg" },
+  icons: {
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "Project Amazon PH Academy",
     description: "Master Amazon PPC and seller central, built for Filipino VAs.",
