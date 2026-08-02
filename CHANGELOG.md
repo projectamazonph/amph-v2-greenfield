@@ -4,6 +4,69 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-02: Consolidated engineering review — 8 of 10 proposals implemented
+
+Implements Proposals 1-8 and 10 from a consolidated code review + engineering
+proposal document. Proposal 9 (DailySnapshot table) was skipped after
+discovering `PpcCampaign`/`dailySnapshots` is fully dead schema (zero
+references anywhere in `src/`) — building a repository/use case for it would
+have been unused infrastructure.
+
+**Security:**
+
+- **Proposal 1** — `Login` now enforces the previously-unused
+  `failedLoginCount`/`lockedUntil` columns: 5 consecutive wrong passwords
+  locks the account for 15 minutes. New `UserRepository.recordLoginAttempt()`
+  (a single consolidated method, to stay under the ISP method-count
+  architecture test's threshold) and `User.lockedUntil` on the domain entity.
+- **Proposal 2** — Replaced CSP `script-src 'unsafe-inline'` with a
+  per-request nonce (`src/proxy.ts`). Deliberately does **not** add
+  `'strict-dynamic'` — verified via a real Chromium run that it breaks
+  Turbopack's route-loading (`loading.tsx`) chunks, a known open
+  Next.js/Turbopack ecosystem issue. `style-src` still allows
+  `'unsafe-inline'` (inline `style={{...}}` attributes throughout the app).
+- **Proposal 4** — New `src/domain/values/Email.ts` (`createEmail`/
+  `isValidEmail`) replacing weak `email.includes("@")` checks in
+  `SignUp`/`Login` with a shared, ReDoS-safe RFC 5321-informed validator.
+
+**Durability:**
+
+- **Proposal 3** — `PrismaLiveClassRegistrationRepository` replaces
+  `InMemoryLiveClassRegistrationRepository` in production — RSVPs no longer
+  lost on cold start/redeploy.
+- **Proposal 5** — New `GET /api/health/ready` readiness probe (checks DB via
+  a new `DatabaseHealthCheck` port) alongside the existing static `/api/health`
+  liveness check.
+- **Proposal 10** — `SignUp.hashPassword()` returns `Result` instead of
+  throwing on a hasher failure (new `hash_error` `SignUpError` variant).
+
+**Quality / tech debt:**
+
+- **Proposal 7** — 7 composite indexes added (`orders`, `quiz_attempts`,
+  `progress_events`, `audit_logs`), each matched to a real query in the
+  corresponding repository and confirmed via `EXPLAIN`. `CREATE/DROP INDEX
+CONCURRENTLY`, following the existing migration convention.
+- **Proposal 8** — Fixed a real dual-source-of-truth bug: `TierAccessPolicy`
+  (production access control) read the denormalized `User.enrolledCourseIds`
+  copy instead of the authoritative `Enrollment` table, so a failed
+  `User.update()` write after enrollment could silently leave a paying user
+  without access. `TierAccessPolicy` now queries `Enrollment` directly;
+  `EnrollStudent` no longer writes the denormalized copy. The field is marked
+  `@deprecated` but not dropped yet (multi-step removal).
+- **Proposal 6** — Implemented 3 of 4 previously-`test.skip()`'d critical
+  E2E journeys (admin login + discount code, admin login + create course,
+  public certificate verification), with new `seedAdminUser`/`seedCertificate`
+  E2E helpers. Running these against a real browser caught **two real
+  production bugs**, both fixed: (1) `/admin/courses/[id]` crashed for every
+  visitor — a Server Component passed `onClick` directly to `<form>`
+  elements, invalid in Next.js; extracted into a `ConfirmSubmitButton`
+  Client Component. (2) `/certificates/[hash]` — documented as "no auth
+  required" — actually required login (`StudentShell`'s `requireAuth` default
+  was never overridden) and had the same `onClick`-on-Server-Component crash
+  on its print button (`PrintButton` Client Component). Also fixed a
+  test-isolation race (parallel E2E workers deleting each other's seeded
+  sessions mid-test) with `test.describe.configure({ mode: "serial" })`.
+
 ### 2026-08-02: Fix chromium-mobile/chromium-tablet E2E timeout (playwright.config.ts)
 
 Root-caused the mobile/tablet E2E signup timeout that PR #272 flagged as
