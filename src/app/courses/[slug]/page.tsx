@@ -26,6 +26,7 @@ import { ShareCourseButton } from "@/components/courses/ShareCourseButton";
 import { getSessionUser } from "@/lib/auth";
 import { CourseCover } from "@/components/student/CourseCover";
 import { Money } from "@/domain/values/Money";
+import { MODULE_COVER_IMAGES } from "@/lib/moduleCoverImages";
 import { ArrowLeft, Book, Clock, Play, Article, CheckSquare } from "@phosphor-icons/react/dist/ssr";
 import styles from "./page.module.css";
 
@@ -208,42 +209,50 @@ export default async function CourseDetailPage({ params }: PageProps) {
         <div className={styles.curriculumSection}>
           <h2 className={styles.curriculumTitle}>Curriculum</h2>
           <div className={styles.sectionList}>
-            {modules.map((mod, si) => (
-              <details key={mod.id} className={styles.section} open={si === 0}>
-                <summary className={styles.sectionSummary}>
-                  <span className={styles.sectionTitle}>
-                    Section {si + 1}: {mod.title}
-                  </span>
-                  <span className={styles.sectionChevron}>▼</span>
-                </summary>
-                <ul className={styles.lessonList}>
-                  {mod.lessons.map((lesson) => {
-                    const vid = lesson.estimatedMinutes > 0 ? `${lesson.estimatedMinutes}m` : null;
-                    const isCompleted = completedLessonIds.includes(lesson.id);
-                    return (
-                      <li key={lesson.id} className={styles.lessonItem}>
-                        <LessonTypeIcon type={lesson.type} />
-                        <Link
-                          href={`/courses/${detail.slug}/lessons/${lesson.id}`}
-                          className={styles.lessonLink}
-                        >
-                          {lesson.title}
-                        </Link>
-                        {vid && <span className={styles.lessonDuration}>{vid}</span>}
-                        {accessMode !== "purchase" && (
-                          <span
-                            className={styles.lessonStatus}
-                            data-complete={isCompleted}
+            {modules.map((mod, si) => {
+              const coverImage = MODULE_COVER_IMAGES[mod.title];
+
+              return (
+                <details key={mod.id} className={styles.section} open={si === 0}>
+                  <summary className={styles.sectionSummary}>
+                    {coverImage && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={coverImage} alt="" className={styles.sectionCoverImage} />
+                    )}
+                    <span className={styles.sectionTitle}>
+                      Section {si + 1}: {mod.title}
+                    </span>
+                    <span className={styles.sectionChevron}>▼</span>
+                  </summary>
+                  <ul className={styles.lessonList}>
+                    {mod.lessons.map((lesson) => {
+                      const vid = lesson.estimatedMinutes > 0 ? `${lesson.estimatedMinutes}m` : null;
+                      const isCompleted = completedLessonIds.includes(lesson.id);
+                      return (
+                        <li key={lesson.id} className={styles.lessonItem}>
+                          <LessonTypeIcon type={lesson.type} />
+                          <Link
+                            href={`/courses/${detail.slug}/lessons/${lesson.id}`}
+                            className={styles.lessonLink}
                           >
-                            {isCompleted ? "Complete" : "Not started"}
-                          </span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </details>
-            ))}
+                            {lesson.title}
+                          </Link>
+                          {vid && <span className={styles.lessonDuration}>{vid}</span>}
+                          {accessMode !== "purchase" && (
+                            <span
+                              className={styles.lessonStatus}
+                              data-complete={isCompleted}
+                            >
+                              {isCompleted ? "Complete" : "Not started"}
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </details>
+              );
+            })}
           </div>
 
           {quizzes.length > 0 ? (
