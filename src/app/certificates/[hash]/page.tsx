@@ -7,7 +7,9 @@
  * the data — the cert still exists as a record, the revocation is
  * metadata).
  *
- * SSR only. No client components needed.
+ * Mostly SSR — the one interactive bit (the "Download Certificate"
+ * print button) is a small Client Component (PrintButton), since a
+ * Server Component can't attach a DOM onClick handler directly.
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
@@ -19,6 +21,7 @@ import { headers } from "next/headers";
 import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
 import { Button } from "@/components/ui/Button";
+import { PrintButton } from "@/components/ui/PrintButton";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -70,7 +73,7 @@ export default async function CertificatePage({ params }: PageProps) {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
-    <StudentShell>
+    <StudentShell requireAuth={false}>
       <script
         type="application/ld+json"
         nonce={nonce}
@@ -202,13 +205,9 @@ export default async function CertificatePage({ params }: PageProps) {
                 Browse Courses
               </Button>
             </Link>
-            <button
-              onClick={() => window.print()}
-              className="btn btn-ghost"
-              style={{ marginTop: "var(--space-4)" }}
-            >
+            <PrintButton className="btn btn-ghost" style={{ marginTop: "var(--space-4)" }}>
               Download Certificate
-            </button>
+            </PrintButton>
           </div>
 
           {/* Verification footer */}
