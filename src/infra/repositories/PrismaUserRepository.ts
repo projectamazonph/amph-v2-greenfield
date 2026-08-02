@@ -242,6 +242,45 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  async recordLoginAttempt(
+    id: string,
+    outcome: { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date },
+  ): Promise<Result<{ lockedUntil: Date | null }, UserError>> {
+    try {
+      if (outcome.kind === "success") {
+        await this.db.user.update({
+          where: { id },
+          data: { failedLoginCount: 0, lockedUntil: null },
+        });
+        return Result.ok({ lockedUntil: null });
+      }
+
+      const row = await this.db.user.update({
+        where: { id },
+        data: { failedLoginCount: { increment: 1 } },
+        select: { failedLoginCount: true },
+      });
+      if (row.failedLoginCount < outcome.maxAttempts) {
+        return Result.ok({ lockedUntil: null });
+      }
+      await this.db.user.update({
+        where: { id },
+        data: { lockedUntil: outcome.lockUntil },
+      });
+      return Result.ok({ lockedUntil: outcome.lockUntil });
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   // ── Private helpers ────────────────────────────────────────
 
   private mapRow(row: {
@@ -257,6 +296,7 @@ export class PrismaUserRepository implements UserRepository {
     createdAt: Date;
     totalXp: number;
     emailVerifiedAt: Date | null;
+    lockedUntil?: Date | null;
   }) {
     return Object.freeze({
       id: row.id,
@@ -271,6 +311,7 @@ export class PrismaUserRepository implements UserRepository {
       createdAt: row.createdAt,
       totalXp: row.totalXp,
       emailVerifiedAt: row.emailVerifiedAt,
+      lockedUntil: row.lockedUntil ?? null,
     });
   }
 }

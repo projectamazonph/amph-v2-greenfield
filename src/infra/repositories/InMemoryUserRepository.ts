@@ -24,6 +24,7 @@ export class InMemoryUserRepository implements UserRepository {
   private emailIndex = new Map<string, string>(); // email → id
   private passwordHashes = new Map<string, string>(); // userId → hash
   private twoFactorSecrets = new Map<string, string>(); // userId → TOTP secret
+  private failedLoginCounts = new Map<string, number>(); // userId → count
 
   async findById(id: string): Promise<Result<User, UserError>> {
     const user = this.users.get(id);
@@ -70,6 +71,7 @@ export class InMemoryUserRepository implements UserRepository {
       createdAt: new Date(),
       totalXp: 0,
       emailVerifiedAt: null,
+      lockedUntil: null,
     };
 
     // Use createUser entity (if available) or direct freeze
@@ -153,6 +155,7 @@ export class InMemoryUserRepository implements UserRepository {
     this.emailIndex.clear();
     this.passwordHashes.clear();
     this.twoFactorSecrets.clear();
+    this.failedLoginCounts.clear();
   }
 
   async getTwoFactorSecret(id: string): Promise<Result<string | null, UserError>> {
@@ -176,6 +179,28 @@ export class InMemoryUserRepository implements UserRepository {
     const updated = { ...user, totalXp: newTotalXp };
     this.users.set(userId, updated);
     return Result.ok(updated);
+  }
+
+  async recordLoginAttempt(
+    userId: string,
+    outcome: { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date },
+  ): Promise<Result<{ lockedUntil: Date | null }, UserError>> {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+
+    if (outcome.kind === "success") {
+      this.failedLoginCounts.delete(userId);
+      this.users.set(userId, Object.freeze({ ...user, lockedUntil: null }));
+      return Result.ok({ lockedUntil: null });
+    }
+
+    const nextCount = (this.failedLoginCounts.get(userId) ?? 0) + 1;
+    this.failedLoginCounts.set(userId, nextCount);
+    const lockedUntil = nextCount >= outcome.maxAttempts ? outcome.lockUntil : null;
+    if (lockedUntil) {
+      this.users.set(userId, Object.freeze({ ...user, lockedUntil }));
+    }
+    return Result.ok({ lockedUntil });
   }
 
   /** Pre-load with a set of users (for integration test fixtures). */

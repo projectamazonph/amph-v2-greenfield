@@ -10,6 +10,7 @@
  */
 
 import { Result } from "@/domain/shared/Result";
+import { isValidEmail } from "@/domain/values/Email";
 import type { UserRepository, UserError } from "@/ports/repositories/UserRepository";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
@@ -47,6 +48,11 @@ export type LoginOutput =
 
 const SESSION_TTL = "7d"; // jose duration string
 
+/** Consecutive wrong-password attempts allowed before the account locks. */
+const MAX_FAILED_ATTEMPTS = 5;
+/** How long an account stays locked after crossing MAX_FAILED_ATTEMPTS. */
+const LOCKOUT_DURATION_MINUTES = 15;
+
 export class Login {
   constructor(
     private readonly userRepo: UserRepository,
@@ -59,8 +65,10 @@ export class Login {
   ) {}
 
   async execute(input: LoginInput): Promise<LoginOutput> {
-    // Fail Fast: email format
-    if (!input.email.includes("@")) {
+    // Fail Fast: email format. Same error kind as "not found" — an
+    // invalid format can never match a stored account, and returning
+    // a distinct error here would leak formation-oracle info for free.
+    if (!isValidEmail(input.email)) {
       return { ok: false, error: { kind: "user_not_found" } };
     }
 
@@ -80,6 +88,14 @@ export class Login {
       return { ok: false, error: { kind: "account_suspended" } };
     }
 
+    // Account lockout: reject before touching the password hash at all
+    // once a prior failure streak has locked the account. lockedUntil
+    // comes straight off the user record findByEmail already fetched —
+    // no extra repo round-trip needed.
+    if (user.lockedUntil && user.lockedUntil.getTime() > this.clock.now().getTime()) {
+      return { ok: false, error: { kind: "account_locked" } };
+    }
+
     // Verify password
     const hashResult = await this.userRepo.getPasswordHash(user.id);
     if (Result.isErr(hashResult)) {
@@ -87,8 +103,20 @@ export class Login {
     }
     const verifyResult = await this.hasher.verify(input.password, hashResult.value);
     if (Result.isErr(verifyResult) || !verifyResult.value) {
+      const lockUntil = new Date(this.clock.now().getTime() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
+      const attemptResult = await this.userRepo.recordLoginAttempt(user.id, {
+        kind: "failure",
+        maxAttempts: MAX_FAILED_ATTEMPTS,
+        lockUntil,
+      });
+      if (Result.isOk(attemptResult) && attemptResult.value.lockedUntil) {
+        return { ok: false, error: { kind: "account_locked" } };
+      }
       return { ok: false, error: { kind: "wrong_password" } };
     }
+
+    // Correct password — clear any failure streak.
+    await this.userRepo.recordLoginAttempt(user.id, { kind: "success" });
 
     // Audit hardening: admin 2FA (opt-in — only accounts that have gone
     // through EnableTwoFactor/ConfirmTwoFactor have twoFactorEnabled

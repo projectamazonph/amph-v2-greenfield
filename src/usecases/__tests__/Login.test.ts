@@ -411,6 +411,83 @@ describe("Login", () => {
     expect(result.error).toEqual({ kind: "db_error", message: "session create failed" });
   });
 
+  // ── account lockout (Proposal 1) ────────────────────────
+
+  describe("account lockout", () => {
+    it("keeps returning wrong_password below the lockout threshold", async () => {
+      for (let i = 0; i < 4; i++) {
+        const result = await useCase.execute({
+          email: "alice@example.com",
+          password: "WrongPassword!",
+        });
+        expect(result.ok).toBe(false);
+        if (result.ok) return;
+        expect(result.error).toEqual({ kind: "wrong_password" });
+      }
+    });
+
+    it("locks the account after 5 consecutive wrong-password attempts", async () => {
+      let last;
+      for (let i = 0; i < 5; i++) {
+        last = await useCase.execute({
+          email: "alice@example.com",
+          password: "WrongPassword!",
+        });
+      }
+      expect(last?.ok).toBe(false);
+      if (!last || last.ok) return;
+      expect(last.error).toEqual({ kind: "account_locked" });
+    });
+
+    it("rejects the correct password once the account is locked", async () => {
+      for (let i = 0; i < 5; i++) {
+        await useCase.execute({ email: "alice@example.com", password: "WrongPassword!" });
+      }
+      const result = await useCase.execute({
+        email: "alice@example.com",
+        password: "Str0ngP@ss!",
+      });
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "account_locked" });
+      expect(sessionRepo.size()).toBe(0);
+    });
+
+    it("allows login again once the lockout window has passed", async () => {
+      for (let i = 0; i < 5; i++) {
+        await useCase.execute({ email: "alice@example.com", password: "WrongPassword!" });
+      }
+      clock.advance(16 * 60 * 1000); // past the 15-minute lockout window
+      const result = await useCase.execute({
+        email: "alice@example.com",
+        password: "Str0ngP@ss!",
+      });
+      expect(result.ok).toBe(true);
+    });
+
+    it("resets the failed-login streak on a successful login", async () => {
+      await useCase.execute({ email: "alice@example.com", password: "WrongPassword!" });
+      await useCase.execute({ email: "alice@example.com", password: "WrongPassword!" });
+      const success = await useCase.execute({
+        email: "alice@example.com",
+        password: "Str0ngP@ss!",
+      });
+      expect(success.ok).toBe(true);
+
+      // Streak should have reset — 4 more wrong attempts should not lock yet.
+      let last;
+      for (let i = 0; i < 4; i++) {
+        last = await useCase.execute({
+          email: "alice@example.com",
+          password: "WrongPassword!",
+        });
+      }
+      expect(last?.ok).toBe(false);
+      if (!last || last.ok) return;
+      expect(last.error).toEqual({ kind: "wrong_password" });
+    });
+  });
+
   // ── jwt sign fails ──────────────────────────────────────
 
   it("returns token_error when the jwt sign fails", async () => {
