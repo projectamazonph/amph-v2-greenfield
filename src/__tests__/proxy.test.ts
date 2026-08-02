@@ -62,6 +62,13 @@ describe("proxy (src/proxy.ts)", () => {
     expect(source).toMatch(/object-src 'none'/);
   });
 
+  it("allows https: image sources (Course.coverImage is an arbitrary admin-entered URL)", async () => {
+    // PR #272 review fix: img-src 'self' data: blob: alone blocked
+    // external course cover images and broke /courses and /courses/[slug].
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).toMatch(/img-src[^"]*https:/);
+  });
+
   it("has a comment explaining why / is not redirected", async () => {
     // The fix isn't enough on its own — without a comment explaining
     // WHY the redirect was removed, the next refactor is likely to

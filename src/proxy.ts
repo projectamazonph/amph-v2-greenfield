@@ -66,7 +66,10 @@ export async function proxy(request: NextRequest) {
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob:",
+      // https: (not scoped to a single host) because Course.coverImage is a
+      // free-text admin-entered URL, not restricted to one CDN — see
+      // src/app/courses/page.tsx and src/app/courses/[slug]/page.tsx.
+      "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
       "connect-src 'self' https://api.paymongo.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
       "frame-ancestors 'none'",

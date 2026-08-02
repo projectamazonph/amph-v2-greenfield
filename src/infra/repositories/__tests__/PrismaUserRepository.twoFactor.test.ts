@@ -79,6 +79,14 @@ class FakePrismaClient {
         (err as unknown as { code: string }).code = "P2025";
         throw err;
       }
+      if (
+        typeof args.data.email === "string" &&
+        this.rows.some((r) => r.id !== args.where.id && r.email === args.data.email)
+      ) {
+        const err = new Error("Unique constraint failed on the fields: (`email`)");
+        (err as unknown as { code: string }).code = "P2002";
+        throw err;
+      }
       Object.assign(row, args.data);
       return row;
     },
@@ -196,6 +204,20 @@ describe("PrismaUserRepository — 2FA", () => {
       expect(result.ok).toBe(false);
       if (result.ok) return;
       expect(result.error.kind).toBe("not_found");
+    });
+
+    it("returns email_taken on a unique-constraint collision instead of a generic db_error", async () => {
+      db.rows.push(makeRow({ id: "u1", email: "student@example.com" }));
+      db.rows.push(makeRow({ id: "u2", email: "already-here@deleted.invalid" }));
+
+      const result = await repo.anonymizeAndDelete("u1", "already-here@deleted.invalid");
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.kind).toBe("email_taken");
+
+      // u1's row is untouched on failure.
+      const u1 = db.rows.find((r) => r.id === "u1");
+      expect(u1?.email).toBe("student@example.com");
     });
   });
 });

@@ -123,8 +123,16 @@ export class InMemoryUserRepository implements UserRepository {
     const user = this.users.get(id);
     if (!user) return Result.err({ kind: "not_found" });
 
-    this.emailIndex.delete(user.email);
     const normalizedEmail = anonymizedEmail.toLowerCase();
+    const existingOwnerId = this.emailIndex.get(normalizedEmail);
+    if (existingOwnerId && existingOwnerId !== id) {
+      // Mirrors PrismaUserRepository's P2002 handling: the real DB has a
+      // unique constraint on email, so a collision must be surfaced, not
+      // silently overwritten.
+      return Result.err({ kind: "email_taken" });
+    }
+
+    this.emailIndex.delete(user.email);
     const updated = Object.freeze({
       ...user,
       email: normalizedEmail,

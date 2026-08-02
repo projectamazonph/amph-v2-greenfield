@@ -166,13 +166,19 @@ export class PrismaUserRepository implements UserRepository {
       });
       return Result.ok(undefined);
     } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === "object" &&
-        "code" in err &&
-        (err as { code: string }).code === "P2025"
-      ) {
-        return Result.err({ kind: "not_found" });
+      if (err && typeof err === "object" && "code" in err) {
+        const code = (err as { code: string }).code;
+        if (code === "P2025") {
+          return Result.err({ kind: "not_found" });
+        }
+        // P2002 = unique constraint violation. The anonymized email is
+        // deterministic per userId, so a collision here would mean the
+        // same account was already anonymized (idempotency edge case) or
+        // an extremely unlikely hash collision — surface it rather than
+        // silently overwriting another row.
+        if (code === "P2002") {
+          return Result.err({ kind: "email_taken" });
+        }
       }
       return Result.err({ kind: "db_error", message: String(err) });
     }
