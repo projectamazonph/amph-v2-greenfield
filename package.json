@@ -29,6 +29,7 @@
     "db:seed:admin": "node scripts/seed-admin-user.mjs",
     "db:seed:tiers": "tsx scripts/seed-pricing-tiers.ts",
     "db:seed:policies": "tsx scripts/seed-simulator-policies.ts",
+    "db:seed:scenarios": "tsx scripts/seed-simulator-scenarios.ts",
     "db:seed:resources": "tsx scripts/seed-resources.ts",
     "format": "prettier --write .",
     "prepare": "husky",

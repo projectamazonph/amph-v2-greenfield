@@ -4,6 +4,22 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-03: Add embedded Amazon Ad Console page
+
+New `/tools/ad-console` page embeds the external campaign-management
+console (`amazon-ad-console.vercel.app`) in an iframe, with a guide
+section on signing in, using it alongside the practice simulators, and
+a warning that — unlike the 5 formative simulators — this is a live
+tool connected to a real Amazon Ads account, so changes are real and
+generally not reversible.
+
+Added a card on the `/tools` index and a command-palette entry.
+`src/proxy.ts` had no `frame-src` CSP directive at all (it fell back
+to `default-src 'self'`, which would have silently blocked the
+iframe) — added `frame-src https://amazon-ad-console.vercel.app`.
+Includes an "Open in new tab" fallback in case the target site's own
+headers refuse to be framed.
+
 ### 2026-08-02: Fix chromium-mobile/chromium-tablet E2E timeout (playwright.config.ts)
 
 Root-caused the mobile/tablet E2E signup timeout that PR #272 flagged as

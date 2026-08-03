@@ -59,7 +59,12 @@ export async function proxy(request: NextRequest) {
   // follow-up, not implemented here. connect-src allows PayMongo (API
   // calls from checkout) and Sentry's ingest endpoints; checkout itself
   // is a top-level redirect (window.location.href), never an iframe, so
-  // no frame-src allowance is needed for it.
+  // no frame-src allowance is needed for it. frame-src allows the
+  // embedded Amazon Ad Console (src/app/tools/ad-console/page.tsx) plus
+  // the YouTube/Vimeo lesson-video embeds (LessonContent.tsx) — there
+  // was no frame-src directive at all before, so it fell back to
+  // default-src 'self' and silently blocked every iframe on the site,
+  // lesson videos included.
   res.headers.set(
     "Content-Security-Policy",
     [
@@ -72,6 +77,7 @@ export async function proxy(request: NextRequest) {
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
       "connect-src 'self' https://api.paymongo.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+      "frame-src 'self' https://amazon-ad-console.vercel.app https://www.youtube.com https://player.vimeo.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

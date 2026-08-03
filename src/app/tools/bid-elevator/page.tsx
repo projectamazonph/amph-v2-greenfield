@@ -12,16 +12,15 @@
  * type in keyword economics themselves (those fields can't be filled in
  * meaningfully by a free-typing user under the new model).
  *
- * The result is stored in sessionStorage by the client form and
- * re-read here on re-render. (A cleaner pattern is a real route
- * segment; sessionStorage keeps this file to one route.)
+ * The result renders inline inside BidElevatorForm (client state) once
+ * the student clicks "Run simulation" — no route change needed.
  */
 
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { BidElevatorForm } from "@/components/tools/BidElevatorForm";
 import type { BidElevatorKeywordScenario } from "@/domain/simulator/bid-elevator/BidElevatorInput";
-import { StudentShell } from '@/components/student/StudentShell';
+import { StudentShell } from "@/components/student/StudentShell";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -201,8 +200,16 @@ export default async function BidElevatorPage() {
           <Link href="/tools">← Tools</Link>
           <span aria-hidden="true"> / </span>
           <span>Bid Elevator</span>
-          <Link href="/tools/bid-elevator" className="btn btn-ghost" style={{ marginLeft: 'var(--space-3)' }}>Reset</Link>
-          <button className="btn btn-ghost" style={{ marginLeft: 'var(--space-3)' }}>Save scenario</button>
+          <Link
+            href="/tools/bid-elevator"
+            className="btn btn-ghost"
+            style={{ marginLeft: "var(--space-3)" }}
+          >
+            Reset
+          </Link>
+          <button className="btn btn-ghost" style={{ marginLeft: "var(--space-3)" }}>
+            Save scenario
+          </button>
         </nav>
         <header className={styles.header}>
           <span className={styles.eyebrow}>Simulator</span>
@@ -210,9 +217,6 @@ export default async function BidElevatorPage() {
           <p className={styles.brief}>{SCENARIO.brief}</p>
         </header>
         <BidElevatorForm scenario={SCENARIO} />
-        <p className={styles.note}>
-          Adjust the bids and run the simulation. The result appears below.
-        </p>
       </main>
     </StudentShell>
   );
