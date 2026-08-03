@@ -1,10 +1,8 @@
 /**
  * /tools — student-facing tools index.
  *
- * Lists the 5 simulators with their names, descriptions, and a
- * link to open each one. The 4 registered simulators come from the
- * registry; keyword-research is added manually (it reuses the
- * listing-audit simulator).
+ * Lists the 5 registered simulators (from the registry) with their
+ * names, descriptions, and a link to open each one.
  */
 
 import { buildContainer } from "@/composition/container";
@@ -47,39 +45,28 @@ export default async function ToolsIndexPage() {
 
   return (
     <StudentShell>
-    <main className={styles.page}>
-      <header className={styles.header}>
-        <span className={styles.eyebrow}>Simulators</span>
-        <h1 className={styles.title}>Tools</h1>
-        <p className={styles.subhead}>5 practice tools. Pick one to start.</p>
-      </header>
-      <section style={{ marginBottom: 'var(--space-8)' }}><h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-500)', marginBottom: 'var(--space-4)' }}>Recently used</h2><div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 'var(--space-4)' }}><div style={{ padding: 'var(--space-4)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>Bid Elevator <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-500)' }}>· 2 hours ago</span></div></div></section>
-      <ul className={styles.grid}>
-        {registered.map((sim) => {
-          const info = TOOL_INFO[sim.simulatorId];
-          if (!info) return null;
-          return (
-            <li key={sim.simulatorId} className={styles.card}>
-              <h2 className={styles.cardName}>{info.name}</h2>
-              <p className={styles.cardBlurb}>{info.blurb}</p>
-              <a href={info.href} className={styles.cardLink}>
-                Open tool →
-              </a>
-            </li>
-          );
-        })}
-        {/* Keyword Research reuses the listing-audit simulator */}
-        <li key="keyword-research" className={styles.card}>
-          <h2 className={styles.cardName}>Keyword Research</h2>
-          <p className={styles.cardBlurb}>
-            Enter a niche, get a prioritized keyword list. Filter by volume and export.
-          </p>
-          <a href="/tools/keyword-research" className={styles.cardLink}>
-            Open tool →
-          </a>
-        </li>
-      </ul>
-    </main>
+      <main className={styles.page}>
+        <header className={styles.header}>
+          <span className={styles.eyebrow}>Simulators</span>
+          <h1 className={styles.title}>Tools</h1>
+          <p className={styles.subhead}>5 practice tools. Pick one to start.</p>
+        </header>
+        <ul className={styles.grid}>
+          {registered.map((sim) => {
+            const info = TOOL_INFO[sim.simulatorId];
+            if (!info) return null;
+            return (
+              <li key={sim.simulatorId} className={styles.card}>
+                <h2 className={styles.cardName}>{info.name}</h2>
+                <p className={styles.cardBlurb}>{info.blurb}</p>
+                <a href={info.href} className={styles.cardLink}>
+                  Open tool →
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </main>
     </StudentShell>
   );
 }
