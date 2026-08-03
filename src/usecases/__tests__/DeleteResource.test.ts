@@ -52,7 +52,7 @@ describe("DeleteResource", () => {
     expect(auditLog.getAll().some((e) => e.action === "resource.deleted")).toBe(true);
   });
 
-  it("fails when repository lookup errors", async () => {
+  it("succeeds as a no-op when the resource id does not exist", async () => {
     const r = await useCase.execute({ id: "does_not_exist", actorId: "admin_1" });
     // findById on a missing id returns { ok: true, value: null } in the
     // in-memory repo, which the use case treats as already-unpublished
