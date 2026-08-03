@@ -4,28 +4,28 @@
 
 Follow-up to the download center sessions below (STORY-098/098.5,
 merged as PR #286). Ask: enhance the content library itself with more
-materials — no specific topics requested, judgment call on what fills
-gaps, spread across all 5 categories, "a large batch (15-20+)."
+materials (no specific topics requested, judgment call on what fills
+gaps, spread across all 5 categories, "a large batch (15-20+)").
 
 **16 new resources added (STORY-099), library now 26 total:**
 3 guides (PDF, PREVIEW), 3 templates (XLSX, STARTER), 4 automation
 tools with live formulas (XLSX, STARTER), 3 cheat sheets (PDF,
 PREVIEW), 3 handouts (2 PDF + 1 DOCX, PREVIEW). Full list and content
-summary in `docs/stories/STORY-099.md`. Zero code changes — the
+summary in `docs/stories/STORY-099.md`. Zero code changes: the
 `Resource` domain model, ports, use cases, admin CRUD, and student page
 already handle any number of resources; this is `scripts/seed-resources.ts`
 data plus the files themselves.
 
 **Formula verification, 4 automation tools:** same LibreOffice
 headless-recalculation limitation as STORY-098 (still can't get it
-working in this sandbox — confirmed again via the same failure mode).
+working in this sandbox, confirmed again via the same failure mode).
 Verified each tool's formula logic by reimplementing it in Python
 against the exact sample rows shipped in the workbook and confirming
 the expected status/recommendation bucket for every row. Details and
 per-tool sample-row breakdown in `docs/stories/STORY-099.md`.
 
 Branch reused from `origin/main` after PR #286 merged (per the
-branch-reuse rule — a merged PR's branch is restarted from main, not
+branch-reuse rule: a merged PR's branch is restarted from main, not
 stacked on): `claude/download-center-guides-templates-d9sei0`.
 
 # Session update (2026-08-03, download center file upload + pre-installed content)

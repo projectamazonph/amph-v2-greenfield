@@ -4,7 +4,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
-### 2026-08-03: Download center — content library expansion (STORY-099)
+### 2026-08-03: Download center: content library expansion (STORY-099)
 
 16 new resources added to the download center, bringing the library
 from 10 to 26: 3 guides (Sponsored Brands setup, Sponsored Display
@@ -15,7 +15,7 @@ modifier calculator, keyword bid calculator, budget pacing &
 dayparting analyzer, campaign health scorecard), 3 cheat sheets
 (acronyms/glossary, SP vs SB vs SD comparison, negative keyword match
 types), and 3 handouts (VA weekly task checklist, PPC troubleshooting,
-client communication etiquette). No code changes — the download center
+client communication etiquette). No code changes: the download center
 already supports any number of resources; this is pure content plus
 26 total `ResourceDef` entries in `scripts/seed-resources.ts`.
 

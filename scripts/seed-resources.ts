@@ -281,7 +281,7 @@ const RESOURCES: ResourceDef[] = [
     id: "res_cheatsheet_acronyms_glossary",
     title: "Amazon PPC Acronyms & Glossary Cheat Sheet",
     description:
-      "The terms you'll hit in your first month, in one place — metrics, ad formats, structure, and catalog vocabulary.",
+      "The terms you'll hit in your first month, in one place: metrics, ad formats, structure, and catalog vocabulary.",
     category: "cheat_sheet",
     fileType: "pdf",
     fileUrl: "/downloads/cheat-sheets/amazon-ppc-acronyms-glossary-cheat-sheet.pdf",

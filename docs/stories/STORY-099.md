@@ -11,7 +11,7 @@
 
 STORY-098/098.5 shipped the download center feature end-to-end with 10
 pre-installed resources (2 per category). The feature itself needed no
-further code — `Resource`, its ports/adapters, admin CRUD, and the
+further code: `Resource`, its ports/adapters, admin CRUD, and the
 student page already handle any number of resources in any of the 5
 categories and 3 access tiers. What was missing was more content. This
 story adds 16 more real, downloadable resources, bringing the library
@@ -34,32 +34,32 @@ total):
 
 **Templates (3, XLSX, STARTER tier):**
 
-- Negative Keyword Master List Template — a running log (keyword/ASIN,
+- Negative Keyword Master List Template: a running log (keyword/ASIN,
   match type, level, applied-to, reason, date) with dropdown data
   validation for match type and level.
-- New Client Onboarding Checklist Template — a 5-phase checklist
+- New Client Onboarding Checklist Template: a 5-phase checklist
   (access, audit, goals, campaign cleanup, first report) with a Status
   dropdown and conditional formatting.
-- Budget Pacing Tracker Template — a daily budget-vs-actual log with
+- Budget Pacing Tracker Template: a daily budget-vs-actual log with
   running month totals and average daily spend (`SUM`/`AVERAGEIF`
-  formulas), intentionally simpler than the automation tool below —
-  this one is for the daily manual log, not hour-level analysis.
+  formulas), intentionally simpler than the automation tool below (this
+  one is for the daily manual log, not hour-level analysis).
 
 **Automation tools (4, XLSX with live formulas, STARTER tier):**
 
-- Placement Bid Modifier Calculator — recommends a bid modifier per
+- Placement Bid Modifier Calculator: recommends a bid modifier per
   placement (Top of Search / Product Pages / Rest of Search) from
   target ACOS, flagging placements without enough orders as
   "Insufficient data."
-- Keyword Bid Calculator — suggests a starting max CPC for new/low-data
-  keywords from target ACOS × estimated CVR × average order value ×
-  a safety margin, and buckets current bids as Lower bid / OK / Room
-  to raise.
-- Budget Pacing & Dayparting Analyzer — two sheets: daily pacing
+- Keyword Bid Calculator: suggests a starting max CPC for new/low-data
+  keywords from target ACOS, estimated CVR, average order value, and a
+  safety margin, and buckets current bids as Lower bid / OK / Room to
+  raise.
+- Budget Pacing & Dayparting Analyzer: two sheets, daily pacing
   (expected spend vs. actual, flagging over/under-pacing) and hourly
   dayparting (flags hours with poor ACOS or zero orders as dayparting
   candidates).
-- Campaign Health Scorecard — a weighted 0-100 score per campaign (50%
+- Campaign Health Scorecard: a weighted 0-100 score per campaign (50%
   ACOS-vs-target, 25% CTR-vs-target, 25% CVR-vs-target), bucketed into
   Healthy / Watch / At risk, with an "Insufficient data" floor for
   campaigns below a minimum order count.
@@ -74,38 +74,41 @@ total):
 
 - VA Weekly Task Checklist (PDF)
 - Troubleshooting Common PPC Issues (PDF)
-- Client Communication Etiquette (DOCX) — pairs with the existing
-  Client Communication — Email Templates handout from STORY-098; that
+- Client Communication Etiquette (DOCX), pairs with the existing
+  Client Communication: Email Templates handout from STORY-098; that
   one is ready-to-send email copy, this one is the tone/process
   guidance behind it.
 
 No changes to `src/domain/`, `src/ports/`, `src/usecases/`,
-`src/infra/`, or `src/app/` — this story is pure content plus the
+`src/infra/`, or `src/app/`: this story is pure content plus the
 `scripts/seed-resources.ts` data it's seeded from.
 
 ## Formula verification caveat
 
 Same limitation as STORY-098: this sandbox cannot get LibreOffice's
 headless recalculation working (confirmed via `strace` in the prior
-session — an environment limitation, not a defect in the generated
+session, an environment limitation, not a defect in the generated
 files). All four automation tools' formula _logic_ was independently
 verified by reimplementing each formula in plain Python against the
 exact sample rows shipped in the workbook, and confirming the bucket
 (status/recommendation/action) each row lands in matches what a human
 reviewing the same numbers would expect:
 
-- **Placement Bid Modifier Calculator** — 8 sample placement rows:
+- **Placement Bid Modifier Calculator:** 8 sample placement rows.
   3 "Insufficient data" (orders below the minimum), 5 numeric
   modifiers ranging from +0% to +150%.
-- **Keyword Bid Calculator** — 7 sample keyword rows: 3 "Lower bid,"
+- **Keyword Bid Calculator:** 7 sample keyword rows: 3 "Lower bid,"
   2 "Room to raise," 2 "OK" (current bid re-tuned during authoring to
   get a realistic spread instead of one status dominating the demo).
-- **Budget Pacing & Dayparting Analyzer** — 4 sample campaigns:
-  2 Overpacing, 1 Underpacing, 1 On pace; 8 sample hours: 6 Keep on,
-  1 Consider dayparting off, 1 No orders.
-- **Campaign Health Scorecard** — 5 sample campaigns: 3 Healthy,
-  1 Watch, 1 At risk (one campaign deliberately below the minimum-order
-  floor to exercise "Insufficient data").
+- **Budget Pacing & Dayparting Analyzer:** 4 sample campaigns
+  (2 Overpacing, 1 Underpacing, 1 On pace) and 8 sample hours (6 Keep
+  on, 1 Consider dayparting off, 1 No orders).
+- **Campaign Health Scorecard:** 5 sample campaigns: 3 Healthy,
+  1 Watch, 1 At risk. None of the 5 shipped rows falls below the
+  minimum-order floor (unlike the Placement Bid Modifier Calculator's
+  sample, which does); the "Insufficient data" branch itself is a
+  single deterministic threshold check (`orders < minimum`), verified
+  directly rather than via a sample row.
 
 All workbooks open and recalculate normally in real Excel/Google
 Sheets; they don't ship with LibreOffice-cached values baked in.
