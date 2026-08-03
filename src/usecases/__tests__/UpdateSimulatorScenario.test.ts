@@ -24,9 +24,15 @@ function makeRecordAuditLog(): RecordAuditLog {
   });
 }
 
-function makeScenario(overrides: Partial<{
-  id: string; simulatorId: string; name: string; difficulty: string; estimatedMinutes: number;
-}> = {}) {
+function makeScenario(
+  overrides: Partial<{
+    id: string;
+    simulatorId: string;
+    name: string;
+    difficulty: string;
+    estimatedMinutes: number;
+  }> = {},
+) {
   const r = createSimulatorScenario({
     id: "s1",
     simulatorId: "bid-elevator" as const,
@@ -42,7 +48,10 @@ function makeScenario(overrides: Partial<{
   return r.value;
 }
 
-function makeInput(id: string, overrides: Partial<Parameters<typeof UpdateSimulatorScenario.prototype.execute>[0]> = {}) {
+function makeInput(
+  id: string,
+  overrides: Partial<Parameters<typeof UpdateSimulatorScenario.prototype.execute>[0]> = {},
+) {
   return {
     id,
     simulatorId: "bid-elevator" as const,
@@ -76,6 +85,20 @@ describe("UpdateSimulatorScenario", () => {
     if (!r.ok) return;
     expect(r.value.scenario.name).toBe("Updated");
     expect(r.value.scenario.difficulty).toBe("intermediate");
+  });
+
+  it("bumps version past whatever is currently persisted, not back to 1 (STORY-085)", async () => {
+    repo.seed(makeScenario({ id: "s1" })); // version 1
+
+    const first = await useCase.execute(makeInput("s1"));
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    expect(first.value.scenario.version).toBe(2);
+
+    const second = await useCase.execute(makeInput("s1", { name: "Updated again" }));
+    expect(second.ok).toBe(true);
+    if (!second.ok) return;
+    expect(second.value.scenario.version).toBe(3);
   });
 
   it("returns scenario_not_found when the scenario doesn't exist", async () => {

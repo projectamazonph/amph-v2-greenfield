@@ -19,6 +19,7 @@ interface ScenarioRow {
   outputSchema: unknown;
   difficulty: string;
   estimatedMinutes: number;
+  version: number;
   archivedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -98,6 +99,7 @@ function makeScenario(overrides: Partial<SimulatorScenario> = {}): SimulatorScen
     outputSchema: overrides.outputSchema ?? { type: "object" },
     difficulty: overrides.difficulty ?? "intermediate",
     estimatedMinutes: overrides.estimatedMinutes ?? 15,
+    version: overrides.version ?? 1,
   };
 }
 
@@ -192,6 +194,20 @@ describe("PrismaSimulatorScenarioRepository", () => {
     expect(result.error.kind).toBe("not_found");
   });
 
+  it("version round-trips through create and update (STORY-085)", async () => {
+    const created = await repo.create(makeScenario({ id: "sc_1", version: 1 }));
+    expect(created.ok).toBe(true);
+    if (created.ok) expect(created.value.version).toBe(1);
+
+    const updated = await repo.update(makeScenario({ id: "sc_1", version: 2 }));
+    expect(updated.ok).toBe(true);
+    if (updated.ok) expect(updated.value.version).toBe(2);
+
+    const found = await repo.findById("sc_1");
+    expect(found.ok).toBe(true);
+    if (found.ok) expect(found.value?.version).toBe(2);
+  });
+
   // ── archive ────────────────────────────────────────────────
 
   it("archive hides the scenario from listAll and findById", async () => {
@@ -223,6 +239,7 @@ describe("PrismaSimulatorScenarioRepository", () => {
       outputSchema: {},
       difficulty: "beginner",
       estimatedMinutes: 10,
+      version: 1,
       archivedAt: null,
       createdAt: new Date(1),
       updatedAt: new Date(1),
@@ -244,6 +261,7 @@ describe("PrismaSimulatorScenarioRepository", () => {
       outputSchema: {},
       difficulty: "impossible",
       estimatedMinutes: 10,
+      version: 1,
       archivedAt: null,
       createdAt: new Date(1),
       updatedAt: new Date(1),

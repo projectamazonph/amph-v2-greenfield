@@ -36,6 +36,7 @@ interface SimulatorScenarioRow {
   outputSchema: Prisma.JsonValue;
   difficulty: string;
   estimatedMinutes: number;
+  version: number;
 }
 
 export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepository {
@@ -81,6 +82,7 @@ export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepo
           outputSchema: scenario.outputSchema as Prisma.InputJsonValue,
           difficulty: scenario.difficulty,
           estimatedMinutes: scenario.estimatedMinutes,
+          version: scenario.version,
         },
       });
       return Result.ok(this.mapRow(row));
@@ -103,6 +105,7 @@ export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepo
           outputSchema: scenario.outputSchema as Prisma.InputJsonValue,
           difficulty: scenario.difficulty,
           estimatedMinutes: scenario.estimatedMinutes,
+          version: scenario.version,
         },
       });
       return Result.ok(this.mapRow(row));
@@ -149,6 +152,7 @@ export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepo
       outputSchema: row.outputSchema as Record<string, unknown>,
       difficulty: row.difficulty,
       estimatedMinutes: row.estimatedMinutes,
+      version: row.version,
     });
     if (!result.ok) {
       // Caught by the surrounding try/catch in every caller and turned

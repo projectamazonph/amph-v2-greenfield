@@ -18,6 +18,7 @@ function makeScenario(
     simulatorId: string;
     name: string;
     difficulty: string;
+    version: number;
   }> = {},
 ): SimulatorScenario {
   return {
@@ -29,6 +30,7 @@ function makeScenario(
     outputSchema: {},
     difficulty: (overrides.difficulty ?? "beginner") as SimulatorScenario["difficulty"],
     estimatedMinutes: 10,
+    version: overrides.version ?? 1,
   };
 }
 
@@ -134,6 +136,30 @@ describe("StartSimulatorAttempt", () => {
     expect(attempt.status).toBe("in_progress");
     expect(attempt.attemptId).toMatch(/^ATT-/);
     expect(attempt.seed).not.toBeNull();
+  });
+
+  it("records the scenario's real version, not a hardcoded literal (STORY-085)", async () => {
+    const scenario = makeScenario({ id: "scen_edited", version: 3 });
+    vi.mocked(scenarioRepo.findById).mockResolvedValue(Result.ok(scenario));
+    vi.mocked(attemptRepo.findByUserAndScenario).mockResolvedValue(Result.ok([]));
+
+    const uc = new StartSimulatorAttempt({
+      attemptRepo,
+      scenarioRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    });
+
+    const result = await uc.execute({
+      userId: "user_01",
+      simulatorId: "bid-elevator",
+      scenarioId: "scen_edited",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.scenarioVersion).toBe(3);
   });
 
   it("logs to audit log on success", async () => {

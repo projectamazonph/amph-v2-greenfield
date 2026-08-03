@@ -46,6 +46,25 @@ describe("SimulatorScenario", () => {
     expect(scenario.name).toBe("Bid Elevator — ROAS Target 3x");
     expect(scenario.difficulty).toBe("intermediate");
     expect(scenario.estimatedMinutes).toBe(15);
+    expect(scenario.version).toBe(1);
+  });
+
+  it("accepts an explicit version (STORY-085, used by UpdateSimulatorScenario)", () => {
+    const result = createSimulatorScenario({
+      id: "scenario_04",
+      simulatorId: "bid-elevator",
+      name: "Test",
+      description: "Test",
+      inputSchema: {},
+      outputSchema: {},
+      difficulty: "beginner",
+      estimatedMinutes: 5,
+      version: 4,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.version).toBe(4);
   });
 
   it("returns invalid_simulator_id for an unknown simulatorId", () => {

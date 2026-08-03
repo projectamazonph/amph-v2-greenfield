@@ -93,7 +93,9 @@ export class StartSimulatorAttempt {
       userId: input.userId,
       simulatorId: input.simulatorId,
       scenarioId: input.scenarioId,
-      scenarioVersion: 1,
+      // STORY-085: the scenario's real version, not a hardcoded literal —
+      // pins which content the student saw at start time.
+      scenarioVersion: scenarioResult.value.version,
       difficulty: scenarioResult.value.difficulty,
       mode: input.mode ?? "practice",
       startedAt: clock.now(),

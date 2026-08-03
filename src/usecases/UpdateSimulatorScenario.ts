@@ -5,7 +5,10 @@
  *
  * Flow:
  *  1. Find the existing scenario
- *  2. Validate the updated fields via the entity factory
+ *  2. Validate the updated fields via the entity factory, bumping
+ *     `version` past whatever is currently persisted (STORY-085) — every
+ *     edit is a new version, so a `SimulatorAttempt.scenarioVersion`
+ *     pinned at start-time reflects real content the student saw.
  *  3. Persist via scenarioRepo.update
  *  4. Record audit log (best-effort)
  *  5. Return the updated scenario
@@ -52,15 +55,16 @@ export interface UpdateSimulatorScenarioDeps {
 export class UpdateSimulatorScenario {
   constructor(private readonly deps: UpdateSimulatorScenarioDeps) {}
 
-  async execute(
-    input: UpdateSimulatorScenarioInput,
-  ): Promise<UpdateSimulatorScenarioResult> {
+  async execute(input: UpdateSimulatorScenarioInput): Promise<UpdateSimulatorScenarioResult> {
     // ── 1. Find existing ──────────────────────────────────
     const findResult = await this.deps.scenarioRepo.findById(input.id);
     if (!findResult.ok) {
       return Result.err({
         kind: "db_error",
-        message: findResult.error.kind === "db_error" ? findResult.error.message : "Failed to fetch scenario",
+        message:
+          findResult.error.kind === "db_error"
+            ? findResult.error.message
+            : "Failed to fetch scenario",
       });
     }
     if (findResult.value === null) {
@@ -77,6 +81,7 @@ export class UpdateSimulatorScenario {
       outputSchema: input.outputSchema,
       difficulty: input.difficulty,
       estimatedMinutes: input.estimatedMinutes,
+      version: findResult.value.version + 1,
     });
     if (!buildResult.ok) {
       if (buildResult.error.kind === "invalid_simulator_id") {
@@ -91,7 +96,10 @@ export class UpdateSimulatorScenario {
     if (!persistResult.ok) {
       return Result.err({
         kind: "db_error",
-        message: persistResult.error.kind === "db_error" ? persistResult.error.message : "Failed to update scenario",
+        message:
+          persistResult.error.kind === "db_error"
+            ? persistResult.error.message
+            : "Failed to update scenario",
       });
     }
 

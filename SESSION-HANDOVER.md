@@ -1,5 +1,40 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-03, STORY-085 scenario versioning)
+
+Follow-up to PR #275 (consolidated engineering review, merged as commit
+`2b66d69`). Picked up Sprint 16 (assessment platform maturity) — chose
+STORY-085 over STORY-086–089 because it was the only one of the five that
+didn't require either Ryan's PPC/instructor judgment (086) or a large,
+multi-day buildout (089's connected-account simulator); see the research
+summary in this session's transcript for why.
+
+**What shipped:** `SimulatorScenario` gained a real `version: number` field
+(`src/domain/entities/SimulatorScenario.ts`); `UpdateSimulatorScenario` now
+bumps it past whatever's currently persisted on every edit instead of it
+staying implicit; `StartSimulatorAttempt` now records the scenario's real
+version on `SimulatorAttempt.scenarioVersion` instead of the hardcoded
+literal `1` it shipped with since STORY-064 — that column existed but
+carried zero signal until this. Migration
+`20260803210000_simulator_scenario_version` adds the column
+(`ADD COLUMN ... DEFAULT 1`, no `CONCURRENTLY` needed — not an index).
+
+**Scope note (important — read before assuming STORY-085 is fully closed):**
+this is the versioning half only, not the full "publishing" workflow the
+backlog title implies. No draft/published lifecycle, no historical-content
+snapshot/retrieval by version. Full rationale and a documented follow-up
+(STORY-085b) in `docs/stories/STORY-085.md`'s "Scope note" section.
+
+**Not verified against a live Postgres**: no reachable `DATABASE_URL` or
+Docker daemon in this session's sandbox. The migration is a single
+low-risk `ADD COLUMN ... DEFAULT 1` statement; verify against a real DB at
+deploy time.
+
+Verification: `pnpm typecheck`, `pnpm lint`, `pnpm test` (3528 passed / 2
+skipped, up from 3524/2) all green. Branch restarted from `origin/main`
+per the merged-branch-reuse rule (`claude/amazon-ph-academy-proposals-tjp3qb`,
+since PR #275 on that branch name had already merged).
+
 # Session update (2026-08-03, download center content library expansion)
 
 Follow-up to the download center sessions below (STORY-098/098.5,

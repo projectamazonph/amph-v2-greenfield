@@ -248,6 +248,11 @@ model SimulatorScenario {
   difficulty       String // beginner | intermediate | advanced
   estimatedMinutes Int
 
+  // STORY-085: real versioning. Bumped by UpdateSimulatorScenario on every
+  // edit; SimulatorAttempt.scenarioVersion pins the version a student saw
+  // at start time instead of the previous hardcoded literal 1.
+  version Int @default(1)
+
   // Soft-delete. Null = active. Matches the discount_codes.archivedAt
   // convention (P0-2 follow-up).
   archivedAt DateTime?
