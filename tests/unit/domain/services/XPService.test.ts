@@ -14,6 +14,12 @@ describe("XPService", () => {
     });
   });
 
+  describe("LIVE_CLASS_ATTENDED_XP", () => {
+    it("awards 15 XP for watching a live class or its recording", () => {
+      expect(XPService.LIVE_CLASS_ATTENDED_XP).toBe(15);
+    });
+  });
+
   describe("xpTierLabel", () => {
     it("returns Newcomer for 0–99 XP", () => {
       expect(XPService.xpTierLabel(0)).toBe("Newcomer");
@@ -52,6 +58,8 @@ describe("XPService", () => {
       expect(XPService.isXpReason("course_completed")).toBe(true);
       expect(XPService.isXpReason("quiz_passed")).toBe(true);
       expect(XPService.isXpReason("streak_bonus")).toBe(true);
+      expect(XPService.isXpReason("badge_awarded")).toBe(true);
+      expect(XPService.isXpReason("live_class_attended")).toBe(true);
     });
 
     it("returns false for invalid reasons", () => {

@@ -98,6 +98,7 @@ function makeLiveClass(overrides: Partial<LiveClass> = {}): LiveClass {
     instructorId: overrides.instructorId ?? "instructor_1",
     meetingUrl: overrides.meetingUrl ?? "https://meet.example.com/abc",
     status: overrides.status ?? "scheduled",
+    recordingUrl: overrides.recordingUrl ?? null,
     createdAt: overrides.createdAt ?? new Date(),
     updatedAt: overrides.updatedAt ?? new Date(),
   };

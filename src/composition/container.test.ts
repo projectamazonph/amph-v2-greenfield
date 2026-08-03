@@ -196,6 +196,7 @@ import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
 import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent";
 import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
+import { MarkLiveClassRecordingWatched } from "@/usecases/MarkLiveClassRecordingWatched";
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
 import { InMemoryResourceRepository } from "@/infra/repositories/InMemoryResourceRepository";
 import { CreateResource } from "@/usecases/CreateResource";
@@ -728,20 +729,33 @@ export function buildTestContainer(): TestContainer {
       logger,
       renderer: liveClassReminderRenderer,
     }),
-    // STORY-090/091: student RSVP
+    // STORY-090/091: student RSVP. Wired to the same `liveClassRegistrationRepo`
+    // instance exposed on the container (previously each of these three
+    // constructed its own fresh InMemoryLiveClassRegistrationRepository, so an
+    // RSVP made through one use case was invisible to the others and to
+    // `container.liveClassRegistrationRepo` directly — a real fragmentation
+    // bug found while wiring STORY-100's markLiveClassRecordingWatched, which
+    // needs to see RSVPs created by rsvpLiveClass in the same test run).
     listLiveClassesForStudent: new ListLiveClassesForStudent({
       liveClassRepo,
-      liveClassRegistrationRepo: new InMemoryLiveClassRegistrationRepository(),
+      liveClassRegistrationRepo,
       enrollmentRepo,
     }),
     rsvpLiveClass: new RsvpLiveClass({
       liveClassRepo,
-      liveClassRegistrationRepo: new InMemoryLiveClassRegistrationRepository(),
+      liveClassRegistrationRepo,
       ids: idGen,
       clock,
     }),
     cancelLiveClassRsvp: new CancelLiveClassRsvp({
-      liveClassRegistrationRepo: new InMemoryLiveClassRegistrationRepository(),
+      liveClassRegistrationRepo,
+      clock,
+    }),
+    // STORY-100: live-class recording + post-class XP
+    markLiveClassRecordingWatched: new MarkLiveClassRecordingWatched({
+      liveClassRepo,
+      liveClassRegistrationRepo,
+      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
       clock,
     }),
     // STORY-098: download center resources

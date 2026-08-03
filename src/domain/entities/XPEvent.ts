@@ -22,7 +22,8 @@ export type XPReason =
   | "course_completed"
   | "quiz_passed"
   | "streak_bonus"
-  | "badge_awarded";
+  | "badge_awarded"
+  | "live_class_attended";
 
 export const VALID_XP_REASONS: readonly string[] = [
   "lesson_completed",
@@ -30,6 +31,7 @@ export const VALID_XP_REASONS: readonly string[] = [
   "quiz_passed",
   "streak_bonus",
   "badge_awarded",
+  "live_class_attended",
 ] as const;
 
 export type XPEventError =

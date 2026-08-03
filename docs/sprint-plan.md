@@ -245,15 +245,15 @@ exists to remove.
 Not an original numbered sprint — stories recommended by the 2026-08-01 student-feature
 gap audit, closed across two sessions.
 
-| ID        | Title                                  | Pts | Status                                                                                        |
-| --------- | -------------------------------------- | --- | --------------------------------------------------------------------------------------------- |
-| STORY-090 | Live-class list page (`/live-classes`) | 1   | ✅ done — PR #268                                                                             |
-| STORY-091 | Live-class detail + RSVP               | 1   | ✅ done — PR #268                                                                             |
-| STORY-097 | Student 2FA at `/profile/security`     | 1   | ✅ done — 2026-08-02, reuses the admin flow's role-agnostic use cases                         |
-| STORY-094 | Lesson-to-quiz transition wiring       | 1   | ✅ done — PR #267                                                                             |
-| STORY-095 | Admin email-template editor page       | 1   | ◐ done — 2026-08-02, but not yet wired into the actual send path (see CLAUDE.md "Known gaps") |
-| STORY-096 | Account deletion + data export         | 1   | ◐ done — 2026-08-02, export omits quiz/simulator attempt history (see CLAUDE.md "Known gaps") |
-| STORY-092 | Live-class recording + post-class XP   | 1   | ⏳ Planned                                                                                    |
+| ID        | Title                                  | Pts | Status                                                                                                                                                       |
+| --------- | -------------------------------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| STORY-090 | Live-class list page (`/live-classes`) | 1   | ✅ done — PR #268                                                                                                                                            |
+| STORY-091 | Live-class detail + RSVP               | 1   | ✅ done — PR #268                                                                                                                                            |
+| STORY-097 | Student 2FA at `/profile/security`     | 1   | ✅ done — 2026-08-02, reuses the admin flow's role-agnostic use cases                                                                                        |
+| STORY-094 | Lesson-to-quiz transition wiring       | 1   | ✅ done — PR #267                                                                                                                                            |
+| STORY-095 | Admin email-template editor page       | 1   | ◐ done — 2026-08-02, but not yet wired into the actual send path (see CLAUDE.md "Known gaps")                                                                |
+| STORY-096 | Account deletion + data export         | 1   | ◐ done — 2026-08-02, export omits quiz/simulator attempt history (see CLAUDE.md "Known gaps")                                                                |
+| STORY-100 | Live-class recording + post-class XP   | 1   | ✅ done — 2026-08-03, see `docs/stories/STORY-100.md` (renumbered from STORY-092, which was already in use for a shipped, unrelated certificate-admin story) |
 
 ---
 

@@ -3,6 +3,7 @@ import {
   createLiveClassRegistration,
   cancelRegistration,
   rsvpAgain,
+  markRecordingWatched,
   isValidRegistrationStatus,
 } from "../LiveClassRegistration";
 
@@ -48,9 +49,9 @@ describe("LiveClassRegistration entity", () => {
     });
 
     it("fails when id is empty or whitespace", () => {
-      expect(
-        createLiveClassRegistration({ id: "", userId: "u-1", liveClassId: "lc-1" }).ok,
-      ).toBe(false);
+      expect(createLiveClassRegistration({ id: "", userId: "u-1", liveClassId: "lc-1" }).ok).toBe(
+        false,
+      );
       expect(
         createLiveClassRegistration({ id: "   ", userId: "u-1", liveClassId: "lc-1" }).ok,
       ).toBe(false);
@@ -140,10 +141,7 @@ describe("LiveClassRegistration entity", () => {
       });
       expect(r.ok).toBe(true);
       if (!r.ok) return;
-      const cancelled = cancelRegistration(
-        r.value,
-        new Date("2026-08-10T10:00:00Z"),
-      );
+      const cancelled = cancelRegistration(r.value, new Date("2026-08-10T10:00:00Z"));
       const now = new Date("2026-08-15T10:00:00Z");
       const reRsvpd = rsvpAgain(cancelled, now);
       expect(reRsvpd.status).toBe("registered");
@@ -171,13 +169,47 @@ describe("LiveClassRegistration entity", () => {
     });
   });
 
+  describe("markRecordingWatched", () => {
+    it("flips status to 'attended' and stamps watchedRecordingAt + updatedAt", () => {
+      const r = createLiveClassRegistration({
+        id: "r-1",
+        userId: "u-1",
+        liveClassId: "lc-1",
+      });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      const now = new Date("2026-08-15T10:00:00Z");
+      const watched = markRecordingWatched(r.value, now);
+      expect(watched.status).toBe("attended");
+      expect(watched.watchedRecordingAt).toEqual(now);
+      expect(watched.updatedAt).toEqual(now);
+      // Identity fields are preserved
+      expect(watched.id).toBe(r.value.id);
+      expect(watched.userId).toBe(r.value.userId);
+      expect(watched.liveClassId).toBe(r.value.liveClassId);
+    });
+
+    it("keeps the original watchedRecordingAt if called again (idempotent timestamp)", () => {
+      const r = createLiveClassRegistration({
+        id: "r-1",
+        userId: "u-1",
+        liveClassId: "lc-1",
+      });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      const first = new Date("2026-08-10T10:00:00Z");
+      const watched = markRecordingWatched(r.value, first);
+      const second = new Date("2026-08-20T10:00:00Z");
+      const rewatched = markRecordingWatched(watched, second);
+      expect(rewatched.watchedRecordingAt).toEqual(first);
+      expect(rewatched.updatedAt).toEqual(second);
+    });
+  });
+
   describe("isValidRegistrationStatus()", () => {
-    it.each(["registered", "cancelled", "attended", "no_show"])(
-      "returns true for %s",
-      (status) => {
-        expect(isValidRegistrationStatus(status)).toBe(true);
-      },
-    );
+    it.each(["registered", "cancelled", "attended", "no_show"])("returns true for %s", (status) => {
+      expect(isValidRegistrationStatus(status)).toBe(true);
+    });
 
     it("returns false for an unknown status string", () => {
       expect(isValidRegistrationStatus("REJECTED")).toBe(false);

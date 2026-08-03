@@ -31,6 +31,7 @@ interface LiveClassRow {
   instructorId: string;
   meetingUrl: string;
   status: string;
+  recordingUrl: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -76,6 +77,7 @@ export class PrismaLiveClassRepository implements ILiveClassRepository {
           instructorId: liveClass.instructorId,
           meetingUrl: liveClass.meetingUrl,
           status: liveClass.status,
+          recordingUrl: liveClass.recordingUrl,
         },
       });
       return Result.ok(undefined);
@@ -95,6 +97,7 @@ export class PrismaLiveClassRepository implements ILiveClassRepository {
           instructorId: liveClass.instructorId,
           meetingUrl: liveClass.meetingUrl,
           status: liveClass.status,
+          recordingUrl: liveClass.recordingUrl,
         },
       });
       return Result.ok(undefined);
@@ -147,6 +150,7 @@ export class PrismaLiveClassRepository implements ILiveClassRepository {
       instructorId: row.instructorId,
       meetingUrl: row.meetingUrl,
       status: row.status,
+      recordingUrl: row.recordingUrl,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

@@ -93,7 +93,7 @@ import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSim
 import { PrismaScorePolicyRepository } from "@/infra/repositories/PrismaScorePolicyRepository";
 import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAttemptFeedbackRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
-import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
+import { PrismaLiveClassRegistrationRepository } from "@/infra/repositories/PrismaLiveClassRegistrationRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { PrismaResourceRepository } from "@/infra/repositories/PrismaResourceRepository";
@@ -262,6 +262,7 @@ import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
 import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent";
 import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
+import { MarkLiveClassRecordingWatched } from "@/usecases/MarkLiveClassRecordingWatched";
 import { CreateResource } from "@/usecases/CreateResource";
 import { UpdateResource } from "@/usecases/UpdateResource";
 import { DeleteResource } from "@/usecases/DeleteResource";
@@ -473,6 +474,8 @@ export interface AppContainer {
   listLiveClassesForStudent: ListLiveClassesForStudent;
   rsvpLiveClass: RsvpLiveClass;
   cancelLiveClassRsvp: CancelLiveClassRsvp;
+  // STORY-100: live-class recording + post-class XP
+  markLiveClassRecordingWatched: MarkLiveClassRecordingWatched;
   // STORY-098: download center resources
   createResource: CreateResource;
   updateResource: UpdateResource;
@@ -549,10 +552,8 @@ function buildProductionContainer(): AppContainer {
   // STORY-066: feedback composer + remediation
   const feedbackRepo: IAttemptFeedbackRepository = new PrismaAttemptFeedbackRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
-  // STORY-091: in-memory fallback until Prisma adapter lands — collection
-  // lives across hot reload (test_container wires the same instance).
   const liveClassRegistrationRepo: ILiveClassRegistrationRepository =
-    new InMemoryLiveClassRegistrationRepository();
+    new PrismaLiveClassRegistrationRepository(prisma);
   // STORY-098: download center resources
   const resourceRepo: IResourceRepository = new PrismaResourceRepository(prisma);
   // STORY-098.5: Vercel Blob when a store is provisioned (BLOB_READ_WRITE_TOKEN set),
@@ -1004,6 +1005,12 @@ function buildProductionContainer(): AppContainer {
     }),
     cancelLiveClassRsvp: new CancelLiveClassRsvp({
       liveClassRegistrationRepo,
+      clock,
+    }),
+    markLiveClassRecordingWatched: new MarkLiveClassRecordingWatched({
+      liveClassRepo,
+      liveClassRegistrationRepo,
+      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
       clock,
     }),
     // STORY-098: download center resources

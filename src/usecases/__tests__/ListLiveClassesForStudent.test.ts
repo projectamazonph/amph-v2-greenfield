@@ -17,11 +17,7 @@ import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepo
 import type { LiveClassRegistration } from "@/domain/entities/LiveClassRegistration";
 import { Result } from "@/domain/shared/Result";
 
-function makeClass(opts: {
-  id: string;
-  courseId: string;
-  scheduledAt: Date;
-}) {
+function makeClass(opts: { id: string; courseId: string; scheduledAt: Date }) {
   const result = createLiveClass({
     id: opts.id,
     courseId: opts.courseId,
@@ -134,6 +130,7 @@ describe("ListLiveClassesForStudent", () => {
       instructorId: "u-1",
       meetingUrl: "https://zoom.example/lc-2",
       status: "scheduled",
+      recordingUrl: null,
       createdAt: past,
       updatedAt: past,
     };

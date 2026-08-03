@@ -18,6 +18,9 @@ export class XPService {
   /** XP awarded when a quiz is passed */
   static readonly QUIZ_PASSED_XP = 20;
 
+  /** XP awarded when a student watches a live class (live or its recording) */
+  static readonly LIVE_CLASS_ATTENDED_XP = 15;
+
   /** XP thresholds for each tier */
   private static readonly TIER_THRESHOLDS: readonly [number, string][] = [
     [0, "Newcomer"],
@@ -58,7 +61,8 @@ export class XPService {
       reason === "course_completed" ||
       reason === "quiz_passed" ||
       reason === "streak_bonus" ||
-      reason === "badge_awarded"
+      reason === "badge_awarded" ||
+      reason === "live_class_attended"
     );
   }
 }

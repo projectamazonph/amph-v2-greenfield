@@ -12,6 +12,7 @@ import { Card } from "@astryxdesign/core";
 import { updateLiveClassAction } from "@/app/actions/updateLiveClass.action";
 import { deleteLiveClassAction } from "@/app/actions/deleteLiveClass.action";
 import type { LiveClassStatus } from "@/domain/entities/LiveClass";
+import { XPService } from "@/domain/services/XPService";
 import styles from "../../new/page.module.css";
 
 const STATUSES: LiveClassStatus[] = ["scheduled", "cancelled", "completed"];
@@ -40,6 +41,7 @@ export default async function EditLiveClassPage({ params, searchParams }: PagePr
         invalid_scheduled_at: "Scheduled date must be in the future.",
         invalid_duration: "Duration must be at least 1 minute.",
         invalid_meeting_url: "Please enter a valid URL.",
+        invalid_recording_url: "Please enter a valid recording URL.",
         not_found: "Live class not found.",
       }[sp.error]
     : null;
@@ -160,6 +162,22 @@ export default async function EditLiveClassPage({ params, searchParams }: PagePr
             </select>
           </label>
 
+          <label className={styles.field}>
+            <span className={styles.label}>Recording URL</span>
+            <input
+              type="url"
+              name="recordingUrl"
+              maxLength={300}
+              defaultValue={lc.recordingUrl ?? ""}
+              className={styles.input}
+            />
+            <span className={styles.hint}>
+              Paste the recording link once the class has happened. Leave blank to clear. Students
+              who RSVPd can mark it watched for {XPService.LIVE_CLASS_ATTENDED_XP} XP once status is
+              &quot;completed&quot;.
+            </span>
+          </label>
+
           <div className={styles.actions}>
             <Link href="/admin/live-classes" className={styles.cancelButton}>
               Cancel
@@ -217,6 +235,7 @@ function handleUpdate(id: string) {
     const durationMinutes = parseInt(String(formData.get("durationMinutes") ?? "60"), 10);
     const meetingUrl = String(formData.get("meetingUrl") ?? "").trim();
     const status = String(formData.get("status") ?? "").trim() as LiveClassStatus;
+    const recordingUrl = String(formData.get("recordingUrl") ?? "").trim();
 
     const scheduledAt = new Date(scheduledAtStr);
     if (isNaN(scheduledAt.getTime())) {
@@ -225,7 +244,7 @@ function handleUpdate(id: string) {
 
     const r = await updateLiveClassAction({
       id,
-      patch: { title, scheduledAt, durationMinutes, meetingUrl, status },
+      patch: { title, scheduledAt, durationMinutes, meetingUrl, status, recordingUrl },
     });
 
     if (!r.ok) {

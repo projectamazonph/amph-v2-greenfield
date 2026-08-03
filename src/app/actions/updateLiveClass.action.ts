@@ -20,13 +20,12 @@ export type UpdateLiveClassError =
   | { kind: "invalid_duration" }
   | { kind: "invalid_meeting_url" }
   | { kind: "invalid_status" }
+  | { kind: "invalid_recording_url" }
   | { kind: "db_error"; message: string };
 
 export async function updateLiveClassAction(
   input: UpdateLiveClassPageInput,
-): Promise<
-  { ok: true; liveClassId: string } | { ok: false; error: UpdateLiveClassError }
-> {
+): Promise<{ ok: true; liveClassId: string } | { ok: false; error: UpdateLiveClassError }> {
   const session = await requireAdmin();
   const container = buildContainer();
 

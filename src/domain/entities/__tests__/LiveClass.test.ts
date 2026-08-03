@@ -31,6 +31,7 @@ describe("LiveClass entity", () => {
       expect(lc.instructorId).toBe("user_instructor_1");
       expect(lc.meetingUrl).toBe("https://zoom.us/j/123456");
       expect(lc.status).toBe("scheduled");
+      expect(lc.recordingUrl).toBeNull();
       expect(lc.createdAt).toBeInstanceOf(Date);
       expect(lc.updatedAt).toBeInstanceOf(Date);
     });
@@ -138,6 +139,62 @@ describe("LiveClass entity", () => {
       expect(updated.ok).toBe(false);
       if (updated.ok) return;
       expect(updated.error.kind).toBe("invalid_title");
+    });
+
+    it("sets recordingUrl when a valid URL is patched in", () => {
+      const r = createLiveClass(baseInput);
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+
+      const updated = updateLiveClass(r.value, {
+        recordingUrl: "https://vimeo.com/12345",
+      });
+      expect(updated.ok).toBe(true);
+      if (!updated.ok) return;
+      expect(updated.value.recordingUrl).toBe("https://vimeo.com/12345");
+    });
+
+    it("clears recordingUrl when patched with an empty string", () => {
+      const r = createLiveClass(baseInput);
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      const withRecording = updateLiveClass(r.value, {
+        recordingUrl: "https://vimeo.com/12345",
+      });
+      expect(withRecording.ok).toBe(true);
+      if (!withRecording.ok) return;
+
+      const cleared = updateLiveClass(withRecording.value, { recordingUrl: "" });
+      expect(cleared.ok).toBe(true);
+      if (!cleared.ok) return;
+      expect(cleared.value.recordingUrl).toBeNull();
+    });
+
+    it("leaves recordingUrl unchanged when omitted from the patch", () => {
+      const r = createLiveClass(baseInput);
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      const withRecording = updateLiveClass(r.value, {
+        recordingUrl: "https://vimeo.com/12345",
+      });
+      expect(withRecording.ok).toBe(true);
+      if (!withRecording.ok) return;
+
+      const updated = updateLiveClass(withRecording.value, { title: "Retitled" });
+      expect(updated.ok).toBe(true);
+      if (!updated.ok) return;
+      expect(updated.value.recordingUrl).toBe("https://vimeo.com/12345");
+    });
+
+    it("fails when recordingUrl is not a valid URL", () => {
+      const r = createLiveClass(baseInput);
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+
+      const updated = updateLiveClass(r.value, { recordingUrl: "not-a-url" });
+      expect(updated.ok).toBe(false);
+      if (updated.ok) return;
+      expect(updated.error.kind).toBe("invalid_recording_url");
     });
   });
 

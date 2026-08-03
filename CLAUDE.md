@@ -20,6 +20,8 @@ Read `AGENTS.md` first — it's the terse rules file this document expands on. `
 
 ## Known gaps (don't assume otherwise)
 
+**Addendum, 2026-08-03 (STORY-100, live-class recording + XP):** `liveClassRegistrationRepo` is **no longer** `InMemoryLiveClassRegistrationRepository` in production — `buildProductionContainer()` now wires the real `PrismaLiveClassRegistrationRepository` (`src/infra/repositories/PrismaLiveClassRegistrationRepository.ts`), closing the gap the 2026-08-02 addendum below flags as "not touched, out of scope." RSVPs (and the new watched-recording XP-award guard) now survive cold start/redeploy. `LiveClass` also gained a `recordingUrl` field and `LiveClassRegistration` a `watchedRecordingAt` field (migration `20260803020000_live_class_recording`); see `docs/stories/STORY-100.md` for the full slice. Also fixed in passing: `buildTestContainer()` was wiring three separate fresh `InMemoryLiveClassRegistrationRepository()` instances for `listLiveClassesForStudent`/`rsvpLiveClass`/`cancelLiveClassRsvp` instead of sharing the one exposed on the test container — an RSVP made through one wasn't visible to the others in a test. All four (including the new `markLiveClassRecordingWatched`) now share one instance.
+
 **Addendum, 2026-08-02 (production-readiness fix session):** the following were verified as real gaps against the source that day and fixed in the same session — re-verify against source before trusting anything older that contradicts these:
 
 - **STORY-049.5 (PayMongo real refunds) is done.** `PayMongoAdapter.refund()` calls the real PayMongo Refunds API (`POST /v1/refunds`) instead of returning `not_implemented`. `ProcessRefund`/`RefundOverride` now actually work against production PayMongo, not just the in-memory stub.
