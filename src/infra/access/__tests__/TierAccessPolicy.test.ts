@@ -2,8 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { TierAccessPolicy } from "@/infra/access/TierAccessPolicy";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { User } from "@/domain/entities/User";
 import type { Course } from "@/domain/entities/Course";
+import type { Enrollment } from "@/domain/entities/Enrollment";
 import { Result } from "@/domain/shared/Result";
 
 // ── Test fixtures ───────────────────────────────────────────
@@ -43,9 +45,28 @@ function makeCourse(overrides: Partial<Course> = {}): Course {
   } as Course;
 }
 
+function makeEnrollment(overrides: Partial<Enrollment> = {}): Enrollment {
+  return {
+    id: "enrollment_01",
+    userId: "user_01",
+    courseId: "course_01",
+    status: "active",
+    source: "direct",
+    couponCode: null,
+    couponDiscount: null,
+    createdAt: new Date(),
+    completedLessonIds: [],
+    lastLessonId: null,
+    progressPercent: 0,
+    markLessonComplete: () => {},
+    ...overrides,
+  } as Enrollment;
+}
+
 describe("TierAccessPolicy", () => {
   let mockUserRepo: UserRepository;
   let mockCourseRepo: CourseRepository;
+  let mockEnrollmentRepo: IEnrollmentRepository;
   let policy: TierAccessPolicy;
 
   const USER_ID = "user_01";
@@ -64,6 +85,7 @@ describe("TierAccessPolicy", () => {
       getTwoFactorSecret: vi.fn(),
       setTwoFactorSecret: vi.fn(),
       anonymizeAndDelete: vi.fn(),
+      recordLoginAttempt: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),
@@ -75,7 +97,19 @@ describe("TierAccessPolicy", () => {
       update: vi.fn(),
       archive: vi.fn(),
     };
-    policy = new TierAccessPolicy(mockUserRepo, mockCourseRepo);
+    // Proposal 8: TierAccessPolicy now reads Enrollment directly
+    // instead of the (removed) User.enrolledCourseIds denormalization.
+    // Default to "not enrolled"; individual tests override with
+    // mockResolvedValue(makeEnrollment()) where enrollment is expected.
+    mockEnrollmentRepo = {
+      findByUserIdAndCourseId: vi.fn().mockResolvedValue(null),
+      findByUserId: vi.fn(),
+      findByCourseId: vi.fn(),
+      findById: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+    };
+    policy = new TierAccessPolicy(mockUserRepo, mockCourseRepo, mockEnrollmentRepo);
   });
 
   // ── anonymous / user not found ───────────────────────────
@@ -132,11 +166,12 @@ describe("TierAccessPolicy", () => {
 
   it("ALLOWED when user is enrolled regardless of subscription tier", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(
-      Result.ok(makeUser({ enrolledCourseIds: [COURSE_ID], subscriptionTier: "FREE" })),
+      Result.ok(makeUser({ subscriptionTier: "FREE" })),
     );
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(
       Result.ok(makeCourse({ courseTier: "PRO" })),
     );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(makeEnrollment());
 
     const result = await policy.canAccess(USER_ID, COURSE_ID);
 
@@ -186,7 +221,7 @@ describe("TierAccessPolicy", () => {
 
   it("DENIED_TIER when STARTER user accesses PRO course (not enrolled)", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(
-      Result.ok(makeUser({ subscriptionTier: "STARTER", enrolledCourseIds: [] })),
+      Result.ok(makeUser({ subscriptionTier: "STARTER" })),
     );
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(
       Result.ok(makeCourse({ courseTier: "PRO" })),
@@ -203,11 +238,12 @@ describe("TierAccessPolicy", () => {
 
   it("ALLOWED when STARTER user accesses PRO course (enrolled)", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(
-      Result.ok(makeUser({ subscriptionTier: "STARTER", enrolledCourseIds: [COURSE_ID] })),
+      Result.ok(makeUser({ subscriptionTier: "STARTER" })),
     );
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(
       Result.ok(makeCourse({ courseTier: "PRO" })),
     );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(makeEnrollment());
 
     const result = await policy.canAccess(USER_ID, COURSE_ID);
 
@@ -249,7 +285,7 @@ describe("TierAccessPolicy", () => {
 
   it("DENIED_TIER when FREE user accesses STARTER course", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(
-      Result.ok(makeUser({ subscriptionTier: "FREE", enrolledCourseIds: [] })),
+      Result.ok(makeUser({ subscriptionTier: "FREE" })),
     );
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(
       Result.ok(makeCourse({ courseTier: "STARTER" })),
@@ -262,5 +298,19 @@ describe("TierAccessPolicy", () => {
       userTier: "FREE",
       requiredTier: "STARTER",
     });
+  });
+
+  // ── transient repo failure (Copilot review finding) ──────
+
+  it("DENIED_NOT_AUTHENTICATED (fails closed) when the enrollment lookup throws", async () => {
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
+    vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(makeCourse()));
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockRejectedValue(
+      new Error("connection reset"),
+    );
+
+    const result = await policy.canAccess(USER_ID, COURSE_ID);
+
+    expect(result).toEqual({ kind: "denied_not_authenticated" });
   });
 });

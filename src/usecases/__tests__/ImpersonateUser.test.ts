@@ -159,6 +159,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -194,6 +195,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -230,6 +232,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -290,6 +293,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({
       ...buildDeps({ userRepo: new InMemoryUserRepository() }),
@@ -360,6 +364,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
 
@@ -390,6 +395,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
 
@@ -422,6 +428,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     const mockSessionRepo: SessionRepository = {
       findById: async () => ({ ok: false, error: { kind: "not_found" } }),
@@ -467,6 +474,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     const failingJwt: JwtService = {
       sign: async () => ({ ok: false, error: new Error("sign failed") }),
@@ -507,6 +515,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     const sessionSpy = vi.spyOn(deps.sessionRepo, "create");
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });

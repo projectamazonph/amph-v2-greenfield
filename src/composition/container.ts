@@ -33,6 +33,9 @@ import type { Clock } from "@/ports/system/Clock";
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
+import { PrismaDatabaseHealthCheck } from "@/infra/system/PrismaDatabaseHealthCheck";
+import type { DatabaseHealthCheck } from "@/ports/system/DatabaseHealthCheck";
+
 // ΓöÇΓöÇ Observability ports ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 import type { Logger } from "@/ports/observability/Logger";
@@ -93,7 +96,7 @@ import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSim
 import { PrismaScorePolicyRepository } from "@/infra/repositories/PrismaScorePolicyRepository";
 import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAttemptFeedbackRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
-import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
+import { PrismaLiveClassRegistrationRepository } from "@/infra/repositories/PrismaLiveClassRegistrationRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { PrismaResourceRepository } from "@/infra/repositories/PrismaResourceRepository";
@@ -283,6 +286,8 @@ export interface AppContainer {
   // System
   clock: Clock;
   idGen: IdGenerator;
+  /** Proposal 5: DB connectivity check backing /api/health/ready. */
+  databaseHealthCheck: DatabaseHealthCheck;
 
   // Observability
   logger: Logger;
@@ -492,6 +497,7 @@ function buildProductionContainer(): AppContainer {
   const clock: Clock = new SystemClock();
   const idGen: IdGenerator = new UlidGenerator();
   const logger: Logger = new PinoLogger(process.env.LOG_LEVEL);
+  const databaseHealthCheck: DatabaseHealthCheck = new PrismaDatabaseHealthCheck(prisma);
 
   const userRepo: UserRepository = new PrismaUserRepository(prisma);
   // P0-2: course data now persists to PostgreSQL. The catalog
@@ -549,10 +555,12 @@ function buildProductionContainer(): AppContainer {
   // STORY-066: feedback composer + remediation
   const feedbackRepo: IAttemptFeedbackRepository = new PrismaAttemptFeedbackRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
-  // STORY-091: in-memory fallback until Prisma adapter lands — collection
-  // lives across hot reload (test_container wires the same instance).
+  // Proposal 3: Postgres-backed — RSVPs used to live only in-memory
+  // (InMemoryLiveClassRegistrationRepository), so every cold start or
+  // redeploy silently dropped them. buildTestContainer() in
+  // container.test.ts still uses the in-memory fake.
   const liveClassRegistrationRepo: ILiveClassRegistrationRepository =
-    new InMemoryLiveClassRegistrationRepository();
+    new PrismaLiveClassRegistrationRepository(prisma);
   // STORY-098: download center resources
   const resourceRepo: IResourceRepository = new PrismaResourceRepository(prisma);
   // STORY-098.5: Vercel Blob when a store is provisioned (BLOB_READ_WRITE_TOKEN set),
@@ -574,7 +582,7 @@ function buildProductionContainer(): AppContainer {
   );
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-  const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo);
+  const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo, enrollmentRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();
   // STORY-012: bounded LRU cache (default 500 entries). Each entry
@@ -631,6 +639,7 @@ function buildProductionContainer(): AppContainer {
   return {
     clock,
     idGen,
+    databaseHealthCheck,
     logger,
     userRepo,
     sessionRepo,

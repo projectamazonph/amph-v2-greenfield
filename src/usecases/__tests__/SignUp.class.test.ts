@@ -123,6 +123,51 @@ describe("SignUp (class)", () => {
       }
     });
 
+    // ── Proposal 4: strengthened email validation ──────────
+
+    it("normalizes email casing and trims whitespace on success", async () => {
+      const result = await signUp.execute({ ...validInput, email: "  Alice@Example.COM  " });
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.email).toBe("alice@example.com");
+    });
+
+    it("rejects an empty/whitespace-only email", async () => {
+      const result = await signUp.execute({ ...validInput, email: "   " });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.kind).toBe("invalid_email");
+    });
+
+    it("rejects an email containing a space", async () => {
+      const result = await signUp.execute({ ...validInput, email: "alice smith@example.com" });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.kind).toBe("invalid_email");
+    });
+
+    it("rejects an email with a 1-character TLD", async () => {
+      const result = await signUp.execute({ ...validInput, email: "alice@example.c" });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.kind).toBe("invalid_email");
+    });
+
+    it("rejects an email over 254 characters total", async () => {
+      const longDomain = "b".repeat(190) + ".com";
+      const result = await signUp.execute({
+        ...validInput,
+        email: `${"a".repeat(64)}@${longDomain}`,
+      });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.kind).toBe("invalid_email");
+    });
+
+    it("rejects an email with a local part over 64 characters", async () => {
+      const result = await signUp.execute({
+        ...validInput,
+        email: `${"a".repeat(65)}@example.com`,
+      });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.kind).toBe("invalid_email");
+    });
+
     it("records a user.signed_up audit log entry on success (STORY-009)", async () => {
       const result = await signUp.execute(validInput);
       if (!result.ok) throw new Error("signup failed");
@@ -222,17 +267,31 @@ describe("SignUp (class)", () => {
       expect(result.error).toEqual({ kind: "db_error", message: "create user failed" });
     });
 
-    it("throws when the hasher returns an error (defensive branch — should not happen in prod)", async () => {
-      // The use case has a private hashPassword that throws if
-      // the hasher returns Result.err. We use a failing hasher to
-      // hit that defensive branch.
+    // ── Proposal 10: hashPassword() returns Result instead of throwing ──
+
+    it("returns hash_error instead of throwing when the hasher fails", async () => {
       const failingHasher = new (class extends StubHasher {
         override async hash() {
           return R.err(new Error("argon2 out of memory") as never);
         }
       })();
       const failingSignUp = new SignUp(userRepo, idGen, clock, failingHasher, recordAuditLog);
-      await expect(failingSignUp.execute(validInput)).rejects.toThrow(/Password hashing failed/);
+      const result = await failingSignUp.execute(validInput);
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toEqual({ kind: "hash_error", message: "Password hashing failed" });
+    });
+
+    it("creates no user when the hasher fails", async () => {
+      const failingHasher = new (class extends StubHasher {
+        override async hash() {
+          return R.err(new Error("argon2 out of memory") as never);
+        }
+      })();
+      const failingSignUp = new SignUp(userRepo, idGen, clock, failingHasher, recordAuditLog);
+      await failingSignUp.execute(validInput);
+      const existsResult = await userRepo.emailExists(validInput.email);
+      expect(existsResult.ok && existsResult.value).toBe(false);
     });
   });
 });

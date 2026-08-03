@@ -65,6 +65,10 @@ model User {
 
   // AMPH course access
   simulatorAccess SimulatorAccess @default(NONE)
+  // Deprecated (Proposal 8): denormalized copy of Enrollment rows,
+  // no longer read or written by application code — Enrollment is
+  // the sole source of truth for course access. Column kept for now
+  // (multi-step removal); do not add new reads/writes.
   enrolledCourseIds String[]      @default([])
 
   // XP (experience points)
@@ -371,6 +375,17 @@ model Order {
   @@index([courseId])
   @@index([paymongoPaymentId])
   @@index([status])
+  // Proposal 7: composite indexes for real query patterns —
+  // PrismaOrderRepository.listAll({status}) filters by status and
+  // sorts by createdAt desc; listRefundRequests() always filters
+  // refundRequestedAt IS NOT NULL and sorts by [refundRequestedAt
+  // desc, id desc]; findPaidForUserAndCourse() filters all three
+  // columns together. The single-column indexes above can't satisfy
+  // the filter+sort or multi-column-equality parts of these queries
+  // without an extra sort/heap-filter step.
+  @@index([status, createdAt])
+  @@index([refundRequestedAt, id])
+  @@index([userId, courseId, status])
   @@map("orders")
 }
 
@@ -425,6 +440,11 @@ model AuditLog {
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+  // Proposal 7: PrismaAuditLog.list() paginates with a keyset cursor
+  // that compares (createdAt, id) together and sorts by
+  // [createdAt desc, id desc] — a single-column createdAt index can't
+  // fully satisfy either the tie-break comparison or the sort.
+  @@index([createdAt, id])
   @@map("audit_logs")
 }
 
@@ -528,6 +548,10 @@ model ProgressEvent {
   @@index([userId])
   @@index([courseId])
   @@index([createdAt])
+  // Proposal 7: PrismaProgressEventRepository.findByUserId/findByCourseId
+  // each filter on one column and sort by createdAt desc.
+  @@index([userId, createdAt])
+  @@index([courseId, createdAt])
   @@map("progress_events")
 }
 
@@ -593,7 +617,11 @@ model QuizAttempt {
   completedAt DateTime?
   answers     QuizAttemptAnswer[]
 
-  @@index([userId, quizId])
+  // Proposal 7: widened from [userId, quizId] — findByUserAndQuiz() and
+  // findLatestByUserAndQuiz() both filter on {userId, quizId} and sort
+  // by startedAt desc; the 2-column index couldn't satisfy the sort
+  // without an extra step.
+  @@index([userId, quizId, startedAt])
   @@index([quizId])
   @@map("quiz_attempts")
 }

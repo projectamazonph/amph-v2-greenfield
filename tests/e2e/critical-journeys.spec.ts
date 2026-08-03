@@ -6,15 +6,31 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { clearE2EUsers } from "./helpers/seed";
+import { clearE2EUsers, clearE2ESeedData, seedAdminUser, seedCertificate } from "./helpers/seed";
 
 const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 const DATABASE_URL = process.env.DATABASE_URL ?? "";
 
 test.describe("Critical journeys", () => {
+  // Serial, not parallel: clearE2EUsers()/clearE2ESeedData() delete
+  // every "@example.com"/"e2e-"-tagged row, and journeys 3/4/6 depend
+  // on a logged-in session surviving across several page loads. Under
+  // Playwright's default fullyParallel scheduling, one test's
+  // afterEach cleanup can delete another still-running test's seeded
+  // user (cascade-deleting its Session row) mid-journey, silently
+  // invalidating its session and bouncing it to /login — reproduced
+  // locally, both within this file and across files sharing the same
+  // "@example.com" convention (e.g. signup.spec.ts). playwright.config.ts
+  // already sets `workers: 1` in CI, which serializes the *whole*
+  // suite and avoids this there; this `serial` mode is belt-and-
+  // suspenders so `pnpm test:e2e` is equally deterministic locally
+  // (where workers default to multiple).
+  test.describe.configure({ mode: "serial" });
+
   test.afterEach(async () => {
     if (DATABASE_URL) {
       await clearE2EUsers(DATABASE_URL);
+      await clearE2ESeedData(DATABASE_URL);
     }
   });
 
@@ -50,20 +66,77 @@ test.describe("Critical journeys", () => {
   });
 
   test("journey 3: admin login and create discount code", async ({ page }) => {
-    // This journey assumes an admin user exists in the seed data.
-    // For a greenfield test environment without seeded admins, skip.
-    test.skip();
+    test.skip(!DATABASE_URL, "requires DATABASE_URL to seed an admin user");
+    const admin = await seedAdminUser(DATABASE_URL);
+    test.skip(!admin, "admin seeding failed — see console warnings");
+    if (!admin) return;
+
+    await page.goto(`${BASE}/admin-login`);
+    await page.getByLabel(/admin email/i).fill(admin.email);
+    await page.getByLabel(/^password$/i).fill(admin.password);
+    await page.getByRole("button", { name: /sign in/i }).click();
+    await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
+
+    await page.goto(`${BASE}/admin/discount-codes/new`);
+    const code = `E2E${Date.now()}`;
+    await page.getByPlaceholder(/e\.g\. save20/i).fill(code);
+    await page.getByRole("button", { name: /create discount code/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/discount-codes$/, { timeout: 15_000 });
+    await expect(page.getByText(code)).toBeVisible();
   });
 
   test("journey 4: admin login and create course", async ({ page }) => {
-    test.skip();
+    test.skip(!DATABASE_URL, "requires DATABASE_URL to seed an admin user");
+    const admin = await seedAdminUser(DATABASE_URL);
+    test.skip(!admin, "admin seeding failed — see console warnings");
+    if (!admin) return;
+
+    await page.goto(`${BASE}/admin-login`);
+    await page.getByLabel(/admin email/i).fill(admin.email);
+    await page.getByLabel(/^password$/i).fill(admin.password);
+    await page.getByRole("button", { name: /sign in/i }).click();
+    await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
+
+    await page.goto(`${BASE}/admin/courses/new`);
+    const suffix = Date.now();
+    await page.locator('input[name="id"]').fill(`e2e-journey4-${suffix}`);
+    await page.locator('input[name="slug"]').fill(`e2e-journey4-${suffix}`);
+    await page.locator('input[name="title"]').fill(`E2E Journey 4 Course ${suffix}`);
+    await page.getByRole("button", { name: /create course/i }).click();
+
+    // createCourseAction redirects to /admin/courses/{id} on success.
+    await expect(page).toHaveURL(new RegExp(`/admin/courses/e2e-journey4-${suffix}$`), {
+      timeout: 15_000,
+    });
+    await expect(page.getByText(`E2E Journey 4 Course ${suffix}`)).toBeVisible();
   });
 
   test("journey 5: admin issues certificate for completed enrollment", async ({ page }) => {
+    // No manual "issue certificate" admin UI exists — certificates are
+    // issued programmatically by IssueCertificate when a course is
+    // completed (src/usecases/IssueCertificate.ts), not driven through
+    // a form. Covering that path end-to-end would mean scripting a
+    // full course completion (enroll, finish every lesson/quiz) purely
+    // to reach a UI-less trigger, which is better covered by
+    // IssueCertificate's own unit/integration tests. Journey 6 below
+    // covers the actual UI surface (public verification page) using a
+    // directly-seeded certificate instead.
     test.skip();
   });
 
   test("journey 6: public verifies certificate by hash", async ({ page }) => {
-    test.skip();
+    test.skip(!DATABASE_URL, "requires DATABASE_URL to seed a certificate");
+    const cert = await seedCertificate(DATABASE_URL);
+    test.skip(!cert, "certificate seeding failed — see console warnings");
+    if (!cert) return;
+
+    await page.goto(`${BASE}/certificates/${cert.verificationHash}`);
+    // Scope to <main> — the fullName/courseTitle also appear in the
+    // page <title>, which getByText() would otherwise also match.
+    const main = page.locator("main");
+    await expect(page.getByText(/verified certificate/i)).toBeVisible();
+    await expect(main.getByText(cert.fullName)).toBeVisible();
+    await expect(main.getByText(cert.courseTitle)).toBeVisible();
   });
 });

@@ -15,6 +15,7 @@
  */
 
 import Link from "next/link";
+import { headers } from "next/headers";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,10 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
   // Token path — auto-submit a form so we go through the action.
   // The action handles the actual VerifyEmail.execute() call.
   if (token) {
+    // Proposal 2: script-src no longer allows 'unsafe-inline' — this
+    // inline bootstrap script needs the per-request nonce the proxy
+    // set on the `x-nonce` request header.
+    const nonce = (await headers()).get("x-nonce") ?? undefined;
     return (
       <main className={styles.page}>
         <h1 className={styles.title}>Verifying your email…</h1>
@@ -81,6 +86,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
           </noscript>
         </form>
         <script
+          nonce={nonce}
           // The form auto-submits on load. The action redirects
           // to /dashboard on success or /verify-email?error=... on
           // failure.
@@ -97,9 +103,8 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
     <main className={styles.page}>
       <h1 className={styles.title}>Check your email</h1>
       <p className={styles.body}>
-        We sent a verification email when you signed up. Click the link
-        in that email to verify your address. If you don't see it, check
-        your spam folder or request a new one.
+        We sent a verification email when you signed up. Click the link in that email to verify your
+        address. If you don't see it, check your spam folder or request a new one.
       </p>
       <Link href="/verify-email/sent" className={styles.cta}>
         Resend verification email

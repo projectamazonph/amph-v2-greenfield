@@ -135,4 +135,34 @@ export interface UserRepository {
    *   original email becomes available for a fresh signup).
    */
   anonymizeAndDelete(userId: string, anonymizedEmail: string): Promise<Result<void, UserError>>;
+
+  /**
+   * Proposal 1 (account lockout): record the outcome of a login attempt.
+   *
+   * - `{ kind: "success" }` clears the failed-attempt streak and any
+   *   active lockout (called by Login after a correct password).
+   * - `{ kind: "failure" }` atomically increments the failed-attempt
+   *   streak and, once it reaches `maxAttempts`, locks the account
+   *   until `lockUntil` (called by Login after a wrong password). If a
+   *   *previous* lockout has already expired as of `now`, the streak
+   *   restarts at 1 instead of incrementing — otherwise the first
+   *   wrong password after the lockout window passes would find the
+   *   counter still sitting at `maxAttempts` and re-lock immediately,
+   *   breaking the "N *consecutive* failures" contract.
+   *
+   * A single method (rather than separate get/increment/reset/lock
+   * methods) keeps this port under the ISP method-count threshold
+   * enforced by tests/architecture/port-segregation.test.ts — the
+   * increment-then-maybe-lock comparison is trivial enough to live in
+   * the adapter, while the actual policy (5 attempts / 15 minutes)
+   * stays in the Login use case. Returns the resulting `lockedUntil` so
+   * the caller can tell whether *this* attempt just tripped the lock.
+   * The pre-attempt lockout check reads `User.lockedUntil` directly off
+   * the entity already returned by findByEmail — no separate read here.
+   */
+  recordLoginAttempt(
+    userId: string,
+    outcome:
+      { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date; now: Date },
+  ): Promise<Result<{ lockedUntil: Date | null }, UserError>>;
 }
