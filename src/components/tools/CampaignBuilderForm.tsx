@@ -88,7 +88,7 @@ export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudg
             <input
               id="cb-budget"
               type="number"
-              min="1"
+              min="100"
               step="100"
               className={styles.inputNum}
               value={budget}
@@ -139,6 +139,40 @@ export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudg
         ) : null}
       </div>
       {result && result.ok ? <FormativeScoreNotice /> : null}
+      {result && result.ok ? (
+        <div className={styles.campaigns}>
+          <h3 className={styles.campaignsTitle}>Campaign structure</h3>
+          {result.value.campaigns.map((campaign) => (
+            <div key={campaign.name} className={styles.campaign}>
+              <div className={styles.campaignHeader}>
+                <span className={styles.campaignName}>{campaign.name}</span>
+                <span className={styles.campaignMeta}>
+                  {campaign.type} · ₱{campaign.dailyBudget.toFixed(2)}/day
+                </span>
+              </div>
+              {campaign.adGroups.map((adGroup) => (
+                <div key={adGroup.name} className={styles.adGroup}>
+                  <div className={styles.adGroupHeader}>
+                    <span className={styles.adGroupName}>{adGroup.name}</span>
+                    <span className={styles.adGroupMeta}>
+                      Suggested bid ₱{adGroup.suggestedBid.toFixed(2)}
+                    </span>
+                  </div>
+                  <ul className={styles.keywordList}>
+                    {adGroup.keywords.map((kw) => (
+                      <li key={`${kw.keyword}-${kw.matchType}`} className={styles.keyword}>
+                        <span className={styles.keywordText}>{kw.keyword}</span>
+                        <span className={styles.keywordMatchType}>{kw.matchType}</span>
+                        <span className={styles.keywordBid}>₱{kw.suggestedBid.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : null}
     </form>
   );
 }
