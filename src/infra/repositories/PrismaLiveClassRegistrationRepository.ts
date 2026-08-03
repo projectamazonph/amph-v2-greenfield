@@ -1,9 +1,18 @@
 /**
- * PrismaLiveClassRegistrationRepository — production adapter for
+ * PrismaLiveClassRegistrationRepository, production adapter for
  * ILiveClassRegistrationRepository.
  *
- * Proposal 3: replaces InMemoryLiveClassRegistrationRepository in
- * production, which lost every RSVP on cold start / redeploy. Mirrors
+ * STORY-100: buildProductionContainer() was still wiring
+ * InMemoryLiveClassRegistrationRepository — every RSVP (and, as of
+ * STORY-100, every "watched the recording" XP-award guard) vanished on
+ * cold start / redeploy. The `live_class_registrations` table already
+ * existed (migration 20260801000000_live_class_registration); no adapter
+ * had ever been written to read/write it.
+ *
+ * Merge note: `main` independently fixed the same gap in the same window
+ * (PR #275, "Proposal 3") with a functionally-identical adapter. This
+ * version wins the merge because STORY-100 also needs `watchedRecordingAt`
+ * mapped, which main's version didn't have. Mirrors
  * PrismaEnrollmentRepository's mapping/error-handling conventions
  * (P2002 → already_registered, P2025 → not_found, invalid persisted
  * status throws — caught here and turned into a db_error).
@@ -15,8 +24,20 @@ import type {
   ILiveClassRegistrationRepository,
   LiveClassRegistrationRepositoryError,
 } from "@/ports/repositories/ILiveClassRegistrationRepository";
-import type { LiveClassRegistration } from "@/domain/entities/LiveClassRegistration";
 import { isValidRegistrationStatus } from "@/domain/entities/LiveClassRegistration";
+import type { LiveClassRegistration } from "@/domain/entities/LiveClassRegistration";
+
+interface LiveClassRegistrationRow {
+  id: string;
+  userId: string;
+  liveClassId: string;
+  status: string;
+  registeredAt: Date;
+  cancelledAt: Date | null;
+  watchedRecordingAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export class PrismaLiveClassRegistrationRepository implements ILiveClassRegistrationRepository {
   constructor(private readonly db: PrismaClient) {}
@@ -56,8 +77,7 @@ export class PrismaLiveClassRegistrationRepository implements ILiveClassRegistra
       const row = await this.db.liveClassRegistration.findUnique({
         where: { userId_liveClassId: { userId, liveClassId } },
       });
-      if (!row) return Result.ok(null);
-      return Result.ok(this.mapRow(row));
+      return Result.ok(row ? this.mapRow(row) : null);
     } catch (err: unknown) {
       return Result.err({ kind: "db_error", message: String(err) });
     }
@@ -75,6 +95,7 @@ export class PrismaLiveClassRegistrationRepository implements ILiveClassRegistra
           status: registration.status,
           registeredAt: registration.registeredAt,
           cancelledAt: registration.cancelledAt,
+          watchedRecordingAt: registration.watchedRecordingAt,
         },
       });
       return Result.ok(undefined);
@@ -104,7 +125,9 @@ export class PrismaLiveClassRegistrationRepository implements ILiveClassRegistra
         },
         data: {
           status: registration.status,
+          registeredAt: registration.registeredAt,
           cancelledAt: registration.cancelledAt,
+          watchedRecordingAt: registration.watchedRecordingAt,
         },
       });
       return Result.ok(undefined);
@@ -121,17 +144,11 @@ export class PrismaLiveClassRegistrationRepository implements ILiveClassRegistra
     }
   }
 
-  private mapRow(row: {
-    id: string;
-    userId: string;
-    liveClassId: string;
-    status: string;
-    registeredAt: Date;
-    cancelledAt: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }): LiveClassRegistration {
+  private mapRow(row: LiveClassRegistrationRow): LiveClassRegistration {
     if (!isValidRegistrationStatus(row.status)) {
+      // Caught by the surrounding try/catch in every caller and turned
+      // into a db_error. A corrupt or legacy status value must not
+      // silently hydrate an invalid LiveClassRegistration.
       throw new Error(
         `LiveClassRegistration ${row.id} has an invalid persisted status: "${row.status}"`,
       );
@@ -143,6 +160,7 @@ export class PrismaLiveClassRegistrationRepository implements ILiveClassRegistra
       status: row.status,
       registeredAt: row.registeredAt,
       cancelledAt: row.cancelledAt,
+      watchedRecordingAt: row.watchedRecordingAt,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

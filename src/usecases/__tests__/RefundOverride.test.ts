@@ -13,6 +13,7 @@ import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRep
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import { TestLogger } from "@/infra/observability/TestLogger";
 
 describe("RefundOverride", () => {
@@ -44,6 +45,7 @@ describe("RefundOverride", () => {
       emailSender,
       refundEmailRenderer: new RefundTemplateRenderer(),
       logger: new TestLogger(),
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
     // Ensure clock exists (used by ProcessRefund, not RefundOverride — for type compat only)
     void new SystemClock();

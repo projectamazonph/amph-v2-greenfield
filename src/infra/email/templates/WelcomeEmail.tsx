@@ -7,24 +7,31 @@
 
 import { Button, Heading, Text } from "@react-email/components";
 import { EmailLayout } from "./EmailLayout";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
-export interface WelcomeEmailProps {
+export interface WelcomeEmailProps extends EmailTemplateOverride {
   firstName: string;
   dashboardUrl: string;
 }
 
-export function WelcomeEmail({ firstName, dashboardUrl }: WelcomeEmailProps) {
+export function WelcomeEmail({
+  firstName,
+  dashboardUrl,
+  headlineOverride,
+  introBodyOverride,
+  ctaLabelOverride,
+}: WelcomeEmailProps) {
   return (
     <EmailLayout
       preview={`Welcome, ${firstName} — your account is ready`}
       eyebrow="Account verified"
     >
       <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
-        Welcome, {firstName}!
+        {headlineOverride ?? `Welcome, ${firstName}!`}
       </Heading>
       <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
-        Your email is verified and your account is ready. Head to your dashboard to start your first
-        course, track your XP, and unlock the practice simulators.
+        {introBodyOverride ??
+          "Your email is verified and your account is ready. Head to your dashboard to start your first course, track your XP, and unlock the practice simulators."}
       </Text>
 
       <Button
@@ -40,7 +47,7 @@ export function WelcomeEmail({ firstName, dashboardUrl }: WelcomeEmailProps) {
           display: "inline-block",
         }}
       >
-        Go to your dashboard
+        {ctaLabelOverride ?? "Go to your dashboard"}
       </Button>
     </EmailLayout>
   );

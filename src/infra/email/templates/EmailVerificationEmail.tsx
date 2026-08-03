@@ -6,8 +6,9 @@
 
 import { Button, Heading, Text } from "@react-email/components";
 import { EmailLayout } from "./EmailLayout";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
-export interface EmailVerificationEmailProps {
+export interface EmailVerificationEmailProps extends EmailTemplateOverride {
   firstName: string;
   verificationUrl: string;
   expiresInHours: number;
@@ -17,6 +18,9 @@ export function EmailVerificationEmail({
   firstName,
   verificationUrl,
   expiresInHours,
+  headlineOverride,
+  introBodyOverride,
+  ctaLabelOverride,
 }: EmailVerificationEmailProps) {
   return (
     <EmailLayout
@@ -24,11 +28,11 @@ export function EmailVerificationEmail({
       eyebrow="Welcome to Project Amazon PH Academy"
     >
       <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
-        Welcome, {firstName}!
+        {headlineOverride ?? `Welcome, ${firstName}!`}
       </Heading>
       <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
-        Thanks for signing up for Project Amazon PH Academy. To get started, please verify your
-        email address by clicking the button below.
+        {introBodyOverride ??
+          "Thanks for signing up for Project Amazon PH Academy. To get started, please verify your email address by clicking the button below."}
       </Text>
 
       <Button
@@ -44,7 +48,7 @@ export function EmailVerificationEmail({
           display: "inline-block",
         }}
       >
-        Verify Email Address
+        {ctaLabelOverride ?? "Verify Email Address"}
       </Button>
 
       <Text style={{ margin: "24px 0 8px 0", color: "#737373", fontSize: "13px" }}>

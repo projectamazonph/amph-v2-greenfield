@@ -39,10 +39,12 @@ import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrol
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import { createLiveClass } from "@/domain/entities/LiveClass";
+import { createEmailTemplate } from "@/domain/entities/EmailTemplate";
 import { createEnrollment } from "@/domain/entities/Enrollment";
 import { createUser } from "@/domain/entities/User";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import { LiveClassReminderTemplateRenderer } from "@/infra/email/templates/LiveClassReminderRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import { InMemorySentReminderRepository } from "@/infra/db/inmemory/InMemorySentReminderRepository";
 import type { Logger } from "@/ports/observability/Logger";
 
@@ -70,6 +72,7 @@ describe("SendLiveClassReminders", () => {
   let userRepo: InMemoryUserRepository;
   let emailSender: StubEmailSender;
   let sentReminderRepo: InMemorySentReminderRepository;
+  let emailTemplateRepo: InMemoryEmailTemplateRepository;
   let useCase: SendLiveClassReminders;
   const renderer = new LiveClassReminderTemplateRenderer();
 
@@ -81,6 +84,7 @@ describe("SendLiveClassReminders", () => {
     userRepo = new InMemoryUserRepository();
     emailSender = new StubEmailSender();
     sentReminderRepo = new InMemorySentReminderRepository();
+    emailTemplateRepo = new InMemoryEmailTemplateRepository();
     useCase = new SendLiveClassReminders({
       liveClassRepo,
       enrollmentRepo,
@@ -90,6 +94,7 @@ describe("SendLiveClassReminders", () => {
       clock: new FixedClock(NOW),
       logger: new SilentLogger(),
       renderer,
+      emailTemplateRepo,
     });
   });
 
@@ -315,6 +320,43 @@ describe("SendLiveClassReminders", () => {
     expect(html).toContain("30 minutes");
   });
 
+  it("uses the admin-customized subject/headline/introBody/ctaLabel for every recipient when a 'live_class_reminder' template exists (STORY-095.5)", async () => {
+    const templateResult = createEmailTemplate({
+      id: "tpl-lcr",
+      type: "live_class_reminder",
+      subject: "Custom reminder subject",
+      headline: "Custom reminder headline",
+      introBody: "Custom reminder intro.",
+      ctaLabel: "Custom Join",
+      updatedById: "admin-1",
+    });
+    if (!templateResult.ok) throw new Error("seed");
+    emailTemplateRepo.seed(templateResult.value);
+
+    const cls = await seedClass({
+      id: "class-1",
+      courseId: "course-1",
+      title: "PPC Mastery",
+      minutesFromNow: 30,
+    });
+    await seedUser({ id: "u-1", firstName: "Alice", email: "a@e.com" });
+    await seedUser({ id: "u-2", firstName: "Bob", email: "b@e.com" });
+    await seedEnrollment({ userId: "u-1", courseId: cls.courseId });
+    await seedEnrollment({ userId: "u-2", courseId: cls.courseId });
+
+    await useCase.execute();
+
+    expect(emailSender.sent).toHaveLength(2);
+    for (const sent of emailSender.sent) {
+      expect(sent.subject).toBe("Custom reminder subject");
+      const { renderToStaticMarkup } = await import("react-dom/server");
+      const html = renderToStaticMarkup(sent.react as React.ReactElement);
+      expect(html).toContain("Custom reminder headline");
+      expect(html).toContain("Custom reminder intro.");
+      expect(html).toContain("Custom Join");
+    }
+  });
+
   // ── idempotency (P0-7 follow-up) ───────────────────────────────────
 
   it("skips a (class, student) pair that was already reminded", async () => {
@@ -386,6 +428,7 @@ describe("SendLiveClassReminders", () => {
       clock: new FixedClock(NOW),
       logger: new SilentLogger(),
       renderer,
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
 
     const result = await useCase.execute();

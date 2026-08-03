@@ -10,8 +10,9 @@
 
 import { Button, Heading, Section, Text } from "@react-email/components";
 import { EmailLayout } from "./EmailLayout";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
-export interface CertificateEmailProps {
+export interface CertificateEmailProps extends EmailTemplateOverride {
   firstName: string;
   courseTitle: string;
   verificationHash: string;
@@ -23,6 +24,9 @@ export function CertificateEmail({
   courseTitle,
   verificationHash,
   verifyUrl,
+  headlineOverride,
+  introBodyOverride,
+  ctaLabelOverride,
 }: CertificateEmailProps) {
   return (
     <EmailLayout
@@ -30,11 +34,15 @@ export function CertificateEmail({
       eyebrow="Course completed"
     >
       <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
-        Congratulations, {firstName}!
+        {headlineOverride ?? `Congratulations, ${firstName}!`}
       </Heading>
       <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
-        You completed <strong>{courseTitle}</strong>. Your certificate of completion is
-        attached to this email as a PDF.
+        {introBodyOverride ?? (
+          <>
+            You completed <strong>{courseTitle}</strong>. Your certificate of completion is attached
+            to this email as a PDF.
+          </>
+        )}
       </Text>
 
       <Section
@@ -46,7 +54,15 @@ export function CertificateEmail({
           textAlign: "center",
         }}
       >
-        <Text style={{ margin: "0 0 8px 0", fontSize: "12px", color: "#737373", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+        <Text
+          style={{
+            margin: "0 0 8px 0",
+            fontSize: "12px",
+            color: "#737373",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+          }}
+        >
           Verification hash
         </Text>
         <Text
@@ -75,12 +91,12 @@ export function CertificateEmail({
           display: "inline-block",
         }}
       >
-        View Public Certificate
+        {ctaLabelOverride ?? "View Public Certificate"}
       </Button>
 
       <Text style={{ margin: "24px 0 0 0", color: "#737373", fontSize: "13px" }}>
-        Share your public certificate link with employers, on LinkedIn, or wherever you
-        want to showcase your accomplishment. Anyone with the link can verify it.
+        Share your public certificate link with employers, on LinkedIn, or wherever you want to
+        showcase your accomplishment. Anyone with the link can verify it.
       </Text>
     </EmailLayout>
   );

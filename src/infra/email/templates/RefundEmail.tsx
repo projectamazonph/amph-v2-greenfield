@@ -6,8 +6,18 @@
 
 import { Heading, Section, Text } from "@react-email/components";
 import { EmailLayout } from "./EmailLayout";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
-export interface RefundEmailProps {
+/**
+ * STORY-095.5 note: this email has no CTA button, so
+ * `EmailTemplateOverride.ctaLabelOverride` — accepted here for interface
+ * consistency with the other admin-editable templates — has nothing to
+ * apply to. `EmailTemplate.ctaLabel` is still required at the domain
+ * level for a "refund" row (the entity validates all four fields for
+ * every type uniformly); admins can fill it in but it won't render
+ * anywhere. Pre-existing model/renderer mismatch, not introduced here.
+ */
+export interface RefundEmailProps extends EmailTemplateOverride {
   firstName: string;
   orderNumber: string;
   courseTitle: string;
@@ -30,18 +40,17 @@ export function RefundEmail({
   currency,
   refundedAt,
   reason,
+  headlineOverride,
+  introBodyOverride,
 }: RefundEmailProps) {
   return (
-    <EmailLayout
-      preview={`Refund processed for ${orderNumber}`}
-      eyebrow="Refund issued"
-    >
+    <EmailLayout preview={`Refund processed for ${orderNumber}`} eyebrow="Refund issued">
       <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
-        Your refund has been processed, {firstName}
+        {headlineOverride ?? `Your refund has been processed, ${firstName}`}
       </Heading>
       <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
-        We've issued a refund to your original payment method. Funds typically appear in
-        your account within 5–10 business days, depending on your bank.
+        {introBodyOverride ??
+          "We've issued a refund to your original payment method. Funds typically appear in your account within 5–10 business days, depending on your bank."}
       </Text>
 
       <Section
@@ -52,42 +61,73 @@ export function RefundEmail({
           margin: "0 0 24px 0",
         }}
       >
-        <Text style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#737373", textTransform: "uppercase" }}>
+        <Text
+          style={{
+            margin: "0 0 4px 0",
+            fontSize: "12px",
+            color: "#737373",
+            textTransform: "uppercase",
+          }}
+        >
           Order
         </Text>
         <Text style={{ margin: "0 0 12px 0", fontSize: "16px", fontWeight: 600, color: "#1a365d" }}>
           {orderNumber}
         </Text>
-        <Text style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#737373", textTransform: "uppercase" }}>
+        <Text
+          style={{
+            margin: "0 0 4px 0",
+            fontSize: "12px",
+            color: "#737373",
+            textTransform: "uppercase",
+          }}
+        >
           Course
         </Text>
         <Text style={{ margin: "0 0 12px 0", fontSize: "16px", fontWeight: 600, color: "#171717" }}>
           {courseTitle}
         </Text>
-        <Text style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#737373", textTransform: "uppercase" }}>
+        <Text
+          style={{
+            margin: "0 0 4px 0",
+            fontSize: "12px",
+            color: "#737373",
+            textTransform: "uppercase",
+          }}
+        >
           Refund amount
         </Text>
         <Text style={{ margin: "0 0 12px 0", fontSize: "20px", fontWeight: 700, color: "#DC2626" }}>
           {formatMoney(amountMinor, currency)}
         </Text>
-        <Text style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#737373", textTransform: "uppercase" }}>
+        <Text
+          style={{
+            margin: "0 0 4px 0",
+            fontSize: "12px",
+            color: "#737373",
+            textTransform: "uppercase",
+          }}
+        >
           Refund reason
         </Text>
-        <Text style={{ margin: "0 0 12px 0", fontSize: "14px", color: "#171717" }}>
-          {reason}
-        </Text>
+        <Text style={{ margin: "0 0 12px 0", fontSize: "14px", color: "#171717" }}>{reason}</Text>
         <Text style={{ margin: 0, fontSize: "12px", color: "#737373" }}>
-          Refunded on {refundedAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+          Refunded on{" "}
+          {refundedAt.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
         </Text>
       </Section>
 
       <Text style={{ margin: "0 0 8px 0", color: "#404040" }}>
-        Your access to the course has been removed. If you change your mind, you can
-        re-purchase anytime.
+        Your access to the course has been removed. If you change your mind, you can re-purchase
+        anytime.
       </Text>
       <Text style={{ margin: 0, color: "#737373", fontSize: "13px" }}>
-        If you don't see the refund in your account within 10 business days, reply to
-        this email and we'll investigate.
+        If you don't see the refund in your account within 10 business days, reply to this email and
+        we'll investigate.
       </Text>
     </EmailLayout>
   );

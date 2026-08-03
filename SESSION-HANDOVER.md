@@ -1,5 +1,57 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-03, live-class recording/XP + email-template wiring)
+
+Follow-up work picked from the "anything left to do here" gap review at the top of this
+session: two of the smaller, self-contained items flagged in `CLAUDE.md`'s "Known gaps"
+and `docs/sprint-plan.md`, done back-to-back on `claude/remaining-tasks-qfuq0b`.
+
+**STORY-100 — live-class recording + post-class XP** (commit `de9d212`). Renumbered from
+the sprint-plan's "STORY-092" slot, which collided with an already-shipped, unrelated
+story of that ID (`docs/stories/STORY-092.md` is "Certificate admin list, detail, and
+revoke" — different feature entirely). `LiveClass` gained `recordingUrl`;
+`LiveClassRegistration` gained `watchedRecordingAt` plus a real writer of the
+previously-declared-but-dead `"attended"` status. New `MarkLiveClassRecordingWatched` use
+case awards `XPService.LIVE_CLASS_ATTENDED_XP` (15) once per (user, class), idempotently.
+Admin edit form gained a Recording URL field; the student detail page gained a "Watch
+recording" / "Mark as watched" control. **Real production gap closed as a prerequisite:**
+`buildProductionContainer()` was still wiring `InMemoryLiveClassRegistrationRepository` —
+every RSVP vanished on cold start/redeploy. Built `PrismaLiveClassRegistrationRepository`
+and swapped it in. Also fixed a related test-only bug: `buildTestContainer()` was giving
+three live-class use cases three separate fresh in-memory registration repos instead of
+sharing one, so an RSVP made through one was invisible to the others in a test. Full detail
+in `docs/stories/STORY-100.md`.
+
+**STORY-095.5 — wire admin email templates into the Resend send path** (commit `a7eb951`).
+STORY-095's own doc flagged this as the real follow-up: editing a template at
+`/admin/email-templates` had zero effect on what Resend actually sent, since the 7
+`*Email.tsx` renderers never consulted `IEmailTemplateRepository`. All 7
+(`email_verification`, `password_reset`, `welcome`, `receipt`, `refund`, `certificate`,
+`live_class_reminder`) now accept `headlineOverride`/`introBodyOverride`/`ctaLabelOverride`
+via a shared `EmailTemplateOverride` port type, and every triggering call site
+(`ResendVerification`, `VerifyEmail`, `RequestPasswordReset`, `IssueCertificate`,
+`SendLiveClassReminders`, the shared `sendRefundEmail()` in `ProcessRefund.ts`, and the
+PayMongo webhook's `sendReceiptEmail()`) fetches the template and falls back to the
+original hardcoded copy when uncustomized — confirmed by the full pre-existing test suite
+passing unchanged. **Two real limitations, not bugs, both documented on the admin edit page
+itself:** `EmailTemplate` has no `{{placeholder}}` syntax, so a customized field loses any
+per-recipient interpolation (e.g. firstName) the default had; and `RefundEmail` has no CTA
+button at all, so its `ctaLabel` is accepted for interface consistency but never renders —
+a pre-existing model/renderer mismatch, not introduced or fixed here. Full detail in
+`docs/stories/STORY-095.5.md`.
+
+Verification for both: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test` (3503 passed / 2
+skipped, up from 3464/2 baseline at session start), `pnpm test:arch` (615/615), and
+`pnpm build` all green after each commit. `CLAUDE.md`, `docs/sprint-plan.md`, and
+`docs/stories/STORY-095.md` updated to match.
+
+**Not attempted this session:** everything else on the gap-review list — STORY-083/084,
+Sprint 16 (STORY-085–089), admin 2FA enforcement, and the operator-owned items (DB restore
+drill, uptime monitoring, launch comms). Re-derive the full list from `CLAUDE.md`'s "Known
+gaps" and `docs/sprint-plan.md` if picking this up later.
+
+---
+
 # Session update (2026-08-03, download center content library expansion)
 
 Follow-up to the download center sessions below (STORY-098/098.5,

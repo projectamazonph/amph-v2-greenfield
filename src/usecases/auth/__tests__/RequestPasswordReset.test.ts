@@ -28,6 +28,7 @@ import { FixedClock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { PasswordResetRenderer } from "@/ports/email/PasswordResetRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import type { RateLimiter, RateLimitResult } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
@@ -122,6 +123,7 @@ describe("RequestPasswordReset", () => {
       clock,
       ids: idGen,
       logger: new SilentLogger(),
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
   });
 
@@ -228,6 +230,7 @@ describe("RequestPasswordReset", () => {
       clock,
       ids: idGen,
       logger: new SilentLogger(),
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
     await seedUser();
     const result = await failingUseCase.execute({

@@ -6,15 +6,18 @@
  */
 
 import type { ReactElement } from "react";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface RefundRenderer {
-  render(args: {
-    firstName: string;
-    orderNumber: string;
-    courseTitle: string;
-    amountMinor: number;
-    currency: string;
-    refundedAt: Date;
-    reason: string;
-  }): ReactElement;
+  render(
+    args: {
+      firstName: string;
+      orderNumber: string;
+      courseTitle: string;
+      amountMinor: number;
+      currency: string;
+      refundedAt: Date;
+      reason: string;
+    } & EmailTemplateOverride,
+  ): ReactElement;
 }

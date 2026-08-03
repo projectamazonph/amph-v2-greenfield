@@ -22,6 +22,7 @@ import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { RefundRenderer } from "@/ports/email/RefundRenderer";
 import type { Logger } from "@/ports/observability/Logger";
+import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 
 export interface ProcessRefundInput {
   orderId: string;
@@ -51,6 +52,7 @@ export interface ProcessRefundDeps {
   emailSender: EmailSender;
   refundEmailRenderer: RefundRenderer;
   logger: Logger;
+  emailTemplateRepo: IEmailTemplateRepository;
 }
 
 export class ProcessRefund {
@@ -129,6 +131,7 @@ export async function sendRefundEmail(
     emailSender: EmailSender;
     refundEmailRenderer: RefundRenderer;
     logger: Logger;
+    emailTemplateRepo: IEmailTemplateRepository;
   },
   order: Order,
   reason: string,
@@ -146,9 +149,11 @@ export async function sendRefundEmail(
     return;
   }
 
+  const templateResult = await deps.emailTemplateRepo.findByType("refund");
+  const template = templateResult.ok ? templateResult.value : null;
   const sendResult = await deps.emailSender.send({
     to: userResult.value.email,
-    subject: `Refund processed for ${order.id}`,
+    subject: template?.subject ?? `Refund processed for ${order.id}`,
     react: deps.refundEmailRenderer.render({
       firstName: userResult.value.firstName,
       orderNumber: order.id,
@@ -157,6 +162,8 @@ export async function sendRefundEmail(
       currency: order.currency,
       refundedAt: order.refundProcessedAt ?? new Date(),
       reason,
+      headlineOverride: template?.headline,
+      introBodyOverride: template?.introBody,
     }),
   });
   if (!sendResult.ok) {

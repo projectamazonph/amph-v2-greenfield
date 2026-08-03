@@ -265,6 +265,7 @@ import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
 import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent";
 import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
+import { MarkLiveClassRecordingWatched } from "@/usecases/MarkLiveClassRecordingWatched";
 import { CreateResource } from "@/usecases/CreateResource";
 import { UpdateResource } from "@/usecases/UpdateResource";
 import { DeleteResource } from "@/usecases/DeleteResource";
@@ -478,6 +479,8 @@ export interface AppContainer {
   listLiveClassesForStudent: ListLiveClassesForStudent;
   rsvpLiveClass: RsvpLiveClass;
   cancelLiveClassRsvp: CancelLiveClassRsvp;
+  // STORY-100: live-class recording + post-class XP
+  markLiveClassRecordingWatched: MarkLiveClassRecordingWatched;
   // STORY-098: download center resources
   createResource: CreateResource;
   updateResource: UpdateResource;
@@ -555,10 +558,11 @@ function buildProductionContainer(): AppContainer {
   // STORY-066: feedback composer + remediation
   const feedbackRepo: IAttemptFeedbackRepository = new PrismaAttemptFeedbackRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
-  // Proposal 3: Postgres-backed — RSVPs used to live only in-memory
+  // Postgres-backed — RSVPs used to live only in-memory
   // (InMemoryLiveClassRegistrationRepository), so every cold start or
-  // redeploy silently dropped them. buildTestContainer() in
-  // container.test.ts still uses the in-memory fake.
+  // redeploy silently dropped them. Fixed independently on both `main`
+  // (PR #275, "Proposal 3") and this branch (STORY-100); this branch's
+  // adapter wins the merge since it also maps `watchedRecordingAt`.
   const liveClassRegistrationRepo: ILiveClassRegistrationRepository =
     new PrismaLiveClassRegistrationRepository(prisma);
   // STORY-098: download center resources
@@ -618,6 +622,7 @@ function buildProductionContainer(): AppContainer {
     clock,
     ids: idGen,
     logger,
+    emailTemplateRepo,
   });
 
   // STORY-049 + STORY-062: build RefundOverride once. Both the
@@ -634,6 +639,7 @@ function buildProductionContainer(): AppContainer {
     emailSender,
     refundEmailRenderer,
     logger,
+    emailTemplateRepo,
   });
 
   return {
@@ -769,6 +775,7 @@ function buildProductionContainer(): AppContainer {
       emailSender,
       certificateEmailRenderer,
       logger,
+      emailTemplateRepo,
     }),
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
@@ -898,6 +905,7 @@ function buildProductionContainer(): AppContainer {
       emailSender,
       refundEmailRenderer,
       logger,
+      emailTemplateRepo,
     }),
     refundOverride,
     // STORY-062: admin refund request list + process
@@ -965,6 +973,7 @@ function buildProductionContainer(): AppContainer {
       logger,
       emailSender,
       welcomeEmailRenderer,
+      emailTemplateRepo,
     }),
     resendVerification: new ResendVerification({
       users: userRepo,
@@ -975,6 +984,7 @@ function buildProductionContainer(): AppContainer {
       verificationEmailRenderer,
       rateLimiter,
       idGen,
+      emailTemplateRepo,
     }),
     // STORY-008: password reset (hoisted above, also reused by adminGrantSubscription)
     requestPasswordReset,
@@ -998,6 +1008,7 @@ function buildProductionContainer(): AppContainer {
       clock,
       logger,
       renderer: liveClassReminderRenderer,
+      emailTemplateRepo,
     }),
     // STORY-090/091: live class student flow
     listLiveClassesForStudent: new ListLiveClassesForStudent({
@@ -1013,6 +1024,12 @@ function buildProductionContainer(): AppContainer {
     }),
     cancelLiveClassRsvp: new CancelLiveClassRsvp({
       liveClassRegistrationRepo,
+      clock,
+    }),
+    markLiveClassRecordingWatched: new MarkLiveClassRecordingWatched({
+      liveClassRepo,
+      liveClassRegistrationRepo,
+      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
       clock,
     }),
     // STORY-098: download center resources

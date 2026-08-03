@@ -17,7 +17,9 @@ import { Badge } from "@astryxdesign/core";
 import { Card } from "@astryxdesign/core";
 import { StudentShell } from "@/components/student/StudentShell";
 import { LiveClassRsvpButton } from "@/components/student/LiveClassRsvpButton";
+import { LiveClassRecordingButton } from "@/components/student/LiveClassRecordingButton";
 import { Button } from "@/components/ui/Button";
+import { XPService } from "@/domain/services/XPService";
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
@@ -29,9 +31,7 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const container = buildContainer();
   const r = await container.liveClassRepo.findById(id);
@@ -59,9 +59,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
   // ── Enrollment check (for the RSVP gate) ────────────────────
   const enrollments = await container.enrollmentRepo.findByUserId(user.id);
   const isEnrolled = enrollments.ok
-    ? enrollments.value.some(
-        (e) => e.courseId === liveClass.courseId && e.status === "active",
-      )
+    ? enrollments.value.some((e) => e.courseId === liveClass.courseId && e.status === "active")
     : false;
 
   // ── Current RSVP for the user ────────────────────────────────
@@ -71,6 +69,9 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
   );
   const rsvp = rsvpResult.ok ? rsvpResult.value : null;
   const isRegistered = rsvp?.status === "registered";
+  const hasRsvpd = rsvp !== null && rsvp.status !== "cancelled";
+  const hasWatchedRecording =
+    rsvp?.watchedRecordingAt !== null && rsvp?.watchedRecordingAt !== undefined;
 
   const isCancelled = liveClass.status === "cancelled";
   const isCompleted = liveClass.status === "completed";
@@ -93,9 +94,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
             ) : (
               <Badge variant="success" label="Scheduled" />
             )}
-            {isRegistered && (
-              <Badge variant="success" label="You are RSVPd" />
-            )}
+            {isRegistered && <Badge variant="success" label="You are RSVPd" />}
           </div>
           <h1 className={styles.title}>{liveClass.title}</h1>
         </header>
@@ -114,9 +113,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
           </div>
           <div className={styles.metaRow}>
             <dt className={styles.metaLabel}>Duration</dt>
-            <dd className={styles.metaValue}>
-              {liveClass.durationMinutes} minutes
-            </dd>
+            <dd className={styles.metaValue}>{liveClass.durationMinutes} minutes</dd>
           </div>
         </dl>
 
@@ -125,27 +122,34 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
             <p className={styles.noticeText}>
               You must be enrolled in the course to RSVP for this live class.
             </p>
-            <Link
-              href={`/courses`}
-              className={styles.noticeLink}
-            >
+            <Link href={`/courses`} className={styles.noticeLink}>
               <Button variant="secondary" size="md">
                 Browse courses
               </Button>
             </Link>
           </div>
         ) : isCancelled ? (
-          <p className={styles.noticeText}>
-            This class was cancelled. RSVP is not available.
-          </p>
+          <p className={styles.noticeText}>This class was cancelled. RSVP is not available.</p>
         ) : isCompleted ? (
-          <p className={styles.noticeText}>This class has ended.</p>
+          liveClass.recordingUrl && hasRsvpd ? (
+            <LiveClassRecordingButton
+              liveClassId={liveClass.id}
+              recordingUrl={liveClass.recordingUrl}
+              alreadyWatched={hasWatchedRecording}
+              xpAmount={XPService.LIVE_CLASS_ATTENDED_XP}
+            />
+          ) : liveClass.recordingUrl ? (
+            <p className={styles.noticeText}>
+              This class has ended. You must have RSVPd to watch the recording.
+            </p>
+          ) : (
+            <p className={styles.noticeText}>
+              This class has ended. The recording has not been posted yet.
+            </p>
+          )
         ) : (
           <div className={styles.actions}>
-            <LiveClassRsvpButton
-              liveClassId={liveClass.id}
-              isRegistered={isRegistered}
-            />
+            <LiveClassRsvpButton liveClassId={liveClass.id} isRegistered={isRegistered} />
             {isRegistered && (
               <a
                 href={liveClass.meetingUrl}

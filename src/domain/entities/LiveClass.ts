@@ -30,6 +30,8 @@ export interface LiveClass {
   readonly instructorId: string;
   readonly meetingUrl: string;
   readonly status: LiveClassStatus;
+  /** Set once the class has happened and a recording is posted. Null until then. */
+  readonly recordingUrl: string | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -51,7 +53,10 @@ export interface CreateLiveClassInput {
 
 export type UpdateLiveClassPatch = Partial<
   Pick<LiveClass, "title" | "scheduledAt" | "durationMinutes" | "meetingUrl" | "status">
->;
+> & {
+  /** Pass a URL to set/replace, an empty string to clear, or omit to leave unchanged. */
+  recordingUrl?: string | null;
+};
 
 // ---------------------------------------------------------------------------
 // Error types
@@ -63,7 +68,8 @@ export type LiveClassError =
   | { kind: "invalid_scheduled_at" }
   | { kind: "invalid_duration" }
   | { kind: "invalid_meeting_url" }
-  | { kind: "invalid_status" };
+  | { kind: "invalid_status" }
+  | { kind: "invalid_recording_url" };
 
 // ---------------------------------------------------------------------------
 // Factory
@@ -105,6 +111,7 @@ export function createLiveClass(input: CreateLiveClassInput): Result<LiveClass, 
       instructorId: input.instructorId.trim(),
       meetingUrl: input.meetingUrl.trim(),
       status: input.status,
+      recordingUrl: null,
       createdAt: now,
       updatedAt: now,
     }),
@@ -140,6 +147,18 @@ export function updateLiveClass(
     errors.push({ kind: "invalid_status" });
   }
 
+  let recordingUrl = original.recordingUrl;
+  if (patch.recordingUrl !== undefined) {
+    const trimmed = patch.recordingUrl?.trim() ?? "";
+    if (!trimmed) {
+      recordingUrl = null;
+    } else if (!isValidUrl(trimmed)) {
+      errors.push({ kind: "invalid_recording_url" });
+    } else {
+      recordingUrl = trimmed;
+    }
+  }
+
   if (errors.length > 0) return { ok: false, error: errors[0]! };
 
   return {
@@ -151,6 +170,7 @@ export function updateLiveClass(
       durationMinutes,
       meetingUrl,
       status,
+      recordingUrl,
       updatedAt: new Date(),
     }),
   };

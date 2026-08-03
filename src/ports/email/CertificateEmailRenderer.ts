@@ -8,12 +8,15 @@
  */
 
 import type { ReactElement } from "react";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface CertificateEmailRenderer {
-  render(args: {
-    firstName: string;
-    courseTitle: string;
-    verificationHash: string;
-    verifyUrl: string;
-  }): ReactElement;
+  render(
+    args: {
+      firstName: string;
+      courseTitle: string;
+      verificationHash: string;
+      verifyUrl: string;
+    } & EmailTemplateOverride,
+  ): ReactElement;
 }

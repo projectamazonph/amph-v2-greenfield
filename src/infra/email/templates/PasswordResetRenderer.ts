@@ -11,6 +11,7 @@
 
 import type { ReactElement } from "react";
 import type { PasswordResetRenderer as IPasswordResetRenderer } from "@/ports/email/PasswordResetRenderer";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 import { PasswordResetEmail } from "./PasswordResetEmail";
 
 // Re-export under the port name so consumers that already have a
@@ -19,7 +20,9 @@ import { PasswordResetEmail } from "./PasswordResetEmail";
 export type { PasswordResetRenderer as IPasswordResetRenderer } from "@/ports/email/PasswordResetRenderer";
 
 export class PasswordResetTemplateRenderer implements IPasswordResetRenderer {
-  render(args: { firstName: string; resetUrl: string; expiresInMinutes: number }): ReactElement {
+  render(
+    args: { firstName: string; resetUrl: string; expiresInMinutes: number } & EmailTemplateOverride,
+  ): ReactElement {
     return PasswordResetEmail(args);
   }
 }

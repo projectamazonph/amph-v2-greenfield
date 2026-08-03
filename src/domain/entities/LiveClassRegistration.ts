@@ -8,11 +8,7 @@ import { Result } from "@/domain/shared/Result";
  * Immutable — updates produce new instances via the helpers below.
  */
 
-export type RegistrationStatus =
-  | "registered"
-  | "cancelled"
-  | "attended"
-  | "no_show";
+export type RegistrationStatus = "registered" | "cancelled" | "attended" | "no_show";
 
 const ALL_STATUSES: readonly RegistrationStatus[] = [
   "registered",
@@ -21,9 +17,7 @@ const ALL_STATUSES: readonly RegistrationStatus[] = [
   "no_show",
 ];
 
-export function isValidRegistrationStatus(
-  s: string,
-): s is RegistrationStatus {
+export function isValidRegistrationStatus(s: string): s is RegistrationStatus {
   return (ALL_STATUSES as readonly string[]).includes(s);
 }
 
@@ -34,6 +28,8 @@ export interface LiveClassRegistration {
   readonly status: RegistrationStatus;
   readonly registeredAt: Date;
   readonly cancelledAt: Date | null;
+  /** Set the first time the student marks the posted recording as watched. STORY-100. */
+  readonly watchedRecordingAt: Date | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -45,9 +41,7 @@ export interface CreateLiveClassRegistrationInput {
 }
 
 export type LiveClassRegistrationError =
-  | { kind: "invalid_id" }
-  | { kind: "invalid_user_id" }
-  | { kind: "invalid_live_class_id" };
+  { kind: "invalid_id" } | { kind: "invalid_user_id" } | { kind: "invalid_live_class_id" };
 
 export function createLiveClassRegistration(
   input: CreateLiveClassRegistrationInput,
@@ -69,6 +63,7 @@ export function createLiveClassRegistration(
     status: "registered",
     registeredAt: now,
     cancelledAt: null,
+    watchedRecordingAt: null,
     createdAt: now,
     updatedAt: now,
   });
@@ -94,6 +89,25 @@ export function rsvpAgain(
     ...reg,
     status: "registered",
     cancelledAt: null,
+    updatedAt: now,
+  };
+}
+
+/**
+ * Marks a registration as having watched the class recording. Also
+ * transitions status to "attended" (previously a declared-but-unused
+ * enum value — this is the first real writer of it). Idempotent at the
+ * use-case level: callers should check `watchedRecordingAt` first so a
+ * repeat call doesn't re-award XP.
+ */
+export function markRecordingWatched(
+  reg: LiveClassRegistration,
+  now: Date = new Date(),
+): LiveClassRegistration {
+  return {
+    ...reg,
+    status: "attended",
+    watchedRecordingAt: reg.watchedRecordingAt ?? now,
     updatedAt: now,
   };
 }

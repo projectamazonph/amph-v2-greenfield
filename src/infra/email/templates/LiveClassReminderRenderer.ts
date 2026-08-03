@@ -8,18 +8,19 @@
 
 import type { ReactElement } from "react";
 import type { LiveClassReminderRenderer } from "@/ports/email/LiveClassReminderRenderer";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 import { LiveClassReminderEmail } from "./LiveClassReminderEmail";
 
-export class LiveClassReminderTemplateRenderer
-  implements LiveClassReminderRenderer
-{
-  render(args: {
-    firstName: string;
-    classTitle: string;
-    startsAt: Date;
-    joinUrl: string;
-    minutesUntilStart: number;
-  }): ReactElement {
+export class LiveClassReminderTemplateRenderer implements LiveClassReminderRenderer {
+  render(
+    args: {
+      firstName: string;
+      classTitle: string;
+      startsAt: Date;
+      joinUrl: string;
+      minutesUntilStart: number;
+    } & EmailTemplateOverride,
+  ): ReactElement {
     return LiveClassReminderEmail(args);
   }
 }

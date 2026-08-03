@@ -28,6 +28,7 @@ import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { RefundRenderer } from "@/ports/email/RefundRenderer";
 import type { Logger } from "@/ports/observability/Logger";
+import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 
 export interface RefundOverrideInput {
   orderId: string;
@@ -59,6 +60,7 @@ export interface RefundOverrideDeps {
   emailSender: EmailSender;
   refundEmailRenderer: RefundRenderer;
   logger: Logger;
+  emailTemplateRepo: IEmailTemplateRepository;
 }
 
 export class RefundOverride {

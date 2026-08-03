@@ -36,18 +36,22 @@ time with actual container wiring and pages, closing the loop.
 - Nav link added to `NavSidebar.tsx` under "Content".
 - Tests: `src/usecases/__tests__/{ListEmailTemplates,GetEmailTemplate,UpdateEmailTemplate}.test.ts`.
 
-## Known limitation — stated on the page itself
+## Known limitation — CLOSED by STORY-095.5
 
-**The actual email-sending renderers (`src/infra/email/templates/*.tsx`) do not read from
-this repository.** Editing a template through this admin page does not change what Resend
-actually sends to students — the renderers still use their own hardcoded copy. Wiring the
-7 renderers (and the subject-line call sites, which live outside the renderer components)
-to consult `IEmailTemplateRepository` with a fallback to current hardcoded defaults is a
-real follow-up (call it STORY-095.5), deliberately not attempted in this story: the
-renderers cover revenue-critical transactional email (receipts, verification codes) with
-existing test coverage pinning exact copy, and touching all 7 in the same session as three
-other features was judged too much blast radius for the value. The edit page's own copy
-tells the admin this explicitly rather than silently shipping a no-op editor.
+**Superseded, 2026-08-03.** The limitation described below (editing a template here had no
+effect on what Resend sends) is fixed — see `docs/stories/STORY-095.5.md`. Left verbatim
+for the historical record of why it wasn't done in this story originally:
+
+> The actual email-sending renderers (`src/infra/email/templates/*.tsx`) do not read from
+> this repository. Editing a template through this admin page does not change what Resend
+> actually sends to students — the renderers still use their own hardcoded copy. Wiring the
+> 7 renderers (and the subject-line call sites, which live outside the renderer components)
+> to consult `IEmailTemplateRepository` with a fallback to current hardcoded defaults is a
+> real follow-up (call it STORY-095.5), deliberately not attempted in this story: the
+> renderers cover revenue-critical transactional email (receipts, verification codes) with
+> existing test coverage pinning exact copy, and touching all 7 in the same session as three
+> other features was judged too much blast radius for the value. The edit page's own copy
+> tells the admin this explicitly rather than silently shipping a no-op editor.
 
 ## Verification
 

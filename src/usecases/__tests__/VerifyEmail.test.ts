@@ -25,6 +25,7 @@ import { FixedClock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { WelcomeRenderer } from "@/ports/email/WelcomeRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 
 class SilentLogger implements Logger {
   debug() {}
@@ -83,6 +84,7 @@ describe("VerifyEmail", () => {
       logger,
       emailSender,
       welcomeEmailRenderer,
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
 
     // Seed a user
@@ -212,6 +214,7 @@ describe("VerifyEmail", () => {
       logger,
       emailSender,
       welcomeEmailRenderer,
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
     const result = await useCaseWithSpy.execute({ token });
 
@@ -248,6 +251,7 @@ describe("VerifyEmail", () => {
       logger,
       emailSender,
       welcomeEmailRenderer,
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
     const result = await useCaseWithSpy.execute({ token });
     expect(result.ok).toBe(false);
@@ -274,6 +278,7 @@ describe("VerifyEmail", () => {
       logger,
       emailSender,
       welcomeEmailRenderer,
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
     const result = await useCaseWithFlaky.execute({ token });
     expect(result.ok).toBe(false);
