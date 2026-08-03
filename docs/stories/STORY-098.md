@@ -26,11 +26,13 @@ center" page, plus an admin CRUD panel to publish them.
   `subscriptionMeetsCourseTier`). `createResource`/`updateResource`
   factories, full branch-coverage tests in
   `src/domain/entities/__tests__/Resource.test.ts`.
-- **No file-storage/blob layer exists in this codebase.** A `Resource`
-  row is metadata plus an externally-hosted `fileUrl` (a Google
-  Drive/Sheets share link, or any public asset URL) — not the file
-  bytes themselves. Building real upload/blob storage was explicitly
-  out of scope for this pass; see "Known limitations" below.
+- A `Resource` row is metadata plus a `fileUrl` — not the file bytes
+  themselves. At the time this story shipped there was no file-upload
+  layer, so `fileUrl` could only be a root-relative `/downloads/...`
+  static asset or an admin-pasted external link. **STORY-098.5 (same
+  day) added real upload/file-management** — see that story doc; this
+  one's "Known limitations" below is left as originally written for
+  the historical record, but the first bullet is superseded.
 - `src/ports/repositories/IResourceRepository.ts` +
   `InMemoryResourceRepository` (`src/infra/repositories/`) +
   `PrismaResourceRepository`. New `resources` table, migration
@@ -63,20 +65,47 @@ center" page, plus an admin CRUD panel to publish them.
 
 ## Known limitations
 
-- **No file upload / blob storage.** Every resource's actual file
-  lives outside this app (Google Drive/Sheets or similar); the admin
-  panel only stores a link. If a hosted upload flow is wanted later
-  (e.g. `@vercel/blob`), that's a real follow-up — deliberately not
-  built here to avoid taking on a new storage dependency in the same
-  pass as the CRUD/access-gating plumbing.
+- **No file upload / blob storage.** ~~Every resource's actual file
+  lives outside this app~~ — closed by STORY-098.5 the same day. Left
+  here verbatim for the historical record of what this story alone
+  shipped; do not treat it as still true.
 - Access gating is subscription-tier only, same as course access — it
   does not consider per-course enrollment. A `PRO`-tier resource is
   visible to any `PRO` subscriber regardless of which course(s) they
   are enrolled in, matching how `CourseAccessTier` already works for
   courses.
-- "Delete" is really "unpublish" (`isPublished = false`); there is no
-  hard delete, matching `DeleteLiveClass`'s existing soft-delete
-  contract.
+- "Delete" is really "unpublish" (`isPublished = false`), matching
+  `DeleteLiveClass`'s existing soft-delete contract. STORY-098.5 added
+  a separate hard-delete (`PurgeResource`) for the rare
+  genuinely-wrong-upload case; it's not the same button.
+
+## Pre-installed resources (2026-08-03, same session)
+
+Ten real files were authored and checked into `public/downloads/` (two
+per category): two PDF guides, three XLSX templates (client report,
+weekly monitoring, listing audit checklist), one XLSX automation tool
+(the STR Winner/Bleeder Scanner — real formulas, not a mockup: flags
+WINNER/BLEEDER/WATCH per row against adjustable ACOS/spend/click
+thresholds on a Settings tab), two PDF cheat sheets, and one PDF + one
+DOCX handout. `scripts/seed-resources.ts` (`pnpm db:seed:resources`,
+`--dry-run` supported) upserts all ten as published `Resource` rows by
+a fixed id, same idempotent-upsert pattern as
+`scripts/seed-pricing-tiers.ts`. Not run automatically — an operator
+runs it post-deploy, same convention as the other `db:seed:*` scripts.
+
+**Formula verification caveat:** this session's sandbox could not get
+LibreOffice's headless recalculation working (confirmed via `strace` —
+even a trivial one-cell `.xlsx` and a plain `.txt` file both failed to
+load in `--convert-to` mode, and macro-based recalculation hung
+indefinitely; this is an environment limitation, not a defect in the
+generated files). The STR Scanner's formula _logic_ was independently
+verified by reimplementing it in Python against the same 18 sample
+rows and confirming an identical Winner/Bleeder/Watch classification
+(9/4/5) — see the session's tool transcript. All workbooks open and
+calculate normally in real Excel/Google Sheets (both recalculate
+formula-only cells automatically on open); they just don't ship with
+LibreOffice-cached values baked in the way the `xlsx` skill's normal
+workflow produces.
 
 ## Verification
 

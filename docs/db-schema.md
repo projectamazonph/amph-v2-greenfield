@@ -85,9 +85,9 @@ The simulator scoring configuration has known integrity and subject-matter limit
 
 `AuditLog` and `WebhookEvent` provide durable audit and webhook records. `SentReminder` prevents duplicate live-class reminder sends. `EmailTemplate` has repository and use-case support, but no current admin page under `src/app/admin`.
 
-### Download center (STORY-098)
+### Download center (STORY-098 / STORY-098.5)
 
-`Resource` (the download-center catalog: guides, templates, automation tools, handouts, cheat sheets) stores metadata plus an externally-hosted `fileUrl` — there is no file-upload/blob-storage layer in this codebase, so the row never owns the actual file bytes. `category`, `fileType`, and `accessTier` are string columns validated on read (same pattern as `LiveClass.status`), not native Prisma enums. Admin CRUD lives at `/admin/resources`; the student-facing list is `/resources`.
+`Resource` (the download-center catalog: guides, templates, automation tools, handouts, cheat sheets) stores metadata plus a `fileUrl` — either a root-relative `/downloads/...` or `/uploads/...` path (a pre-installed static asset, or a file uploaded via `LocalFileStorage`), or an absolute URL (an admin-pasted external link, or a Vercel Blob URL). `fileKey` is non-null only when `IFileStorage` owns the file (an admin upload) — it's null for static assets and external links, since there's nothing in blob storage to clean up for either of those. `category`, `fileType`, and `accessTier` are string columns validated on read (same pattern as `LiveClass.status`), not native Prisma enums. Admin CRUD lives at `/admin/resources`; the student-facing list is `/resources`.
 
 ## Migration inventory
 

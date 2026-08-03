@@ -67,6 +67,7 @@ import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRe
 import type { KeywordDatasetRepository } from "@/ports/repositories/KeywordDatasetRepository";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 import type { IResourceRepository } from "@/ports/repositories/IResourceRepository";
+import type { IFileStorage } from "@/ports/storage/IFileStorage";
 
 // ΓöÇΓöÇ Production adapters (only the prod ones) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
@@ -96,6 +97,8 @@ import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/in
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { PrismaResourceRepository } from "@/infra/repositories/PrismaResourceRepository";
+import { VercelBlobFileStorage } from "@/infra/storage/VercelBlobFileStorage";
+import { LocalFileStorage } from "@/infra/storage/LocalFileStorage";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 // STORY-081: no DB table/admin CRUD for keyword datasets yet -- this
@@ -266,6 +269,9 @@ import { AdminListResources } from "@/usecases/AdminListResources";
 import { AdminGetResource } from "@/usecases/AdminGetResource";
 import { ListAvailableResources } from "@/usecases/ListAvailableResources";
 import { RecordResourceDownload } from "@/usecases/RecordResourceDownload";
+import { UploadFile } from "@/usecases/UploadFile";
+import { DeleteFile } from "@/usecases/DeleteFile";
+import { PurgeResource } from "@/usecases/PurgeResource";
 import type { SentReminderRepository } from "@/ports/repositories/SentReminderRepository";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
@@ -312,6 +318,8 @@ export interface AppContainer {
   liveClassRegistrationRepo: ILiveClassRegistrationRepository;
   // STORY-098: download center resources
   resourceRepo: IResourceRepository;
+  // STORY-098.5: download center file upload/management
+  fileStorage: IFileStorage;
   // STORY-011: pricing tier repo
   pricingTierRepo: IPricingTierRepository;
   // STORY-048b/c: module + lesson repos (also used by public catalog)
@@ -473,6 +481,9 @@ export interface AppContainer {
   adminGetResource: AdminGetResource;
   listAvailableResources: ListAvailableResources;
   recordResourceDownload: RecordResourceDownload;
+  purgeResource: PurgeResource;
+  uploadFile: UploadFile;
+  deleteFile: DeleteFile;
 }
 
 // ΓöÇΓöÇ Production container builder ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -544,6 +555,12 @@ function buildProductionContainer(): AppContainer {
     new InMemoryLiveClassRegistrationRepository();
   // STORY-098: download center resources
   const resourceRepo: IResourceRepository = new PrismaResourceRepository(prisma);
+  // STORY-098.5: Vercel Blob when a store is provisioned (BLOB_READ_WRITE_TOKEN set),
+  // otherwise LocalFileStorage — viable for local dev, NOT for production on Vercel's
+  // read-only serverless filesystem. See LocalFileStorage's docblock.
+  const fileStorage: IFileStorage = process.env.BLOB_READ_WRITE_TOKEN
+    ? new VercelBlobFileStorage(process.env.BLOB_READ_WRITE_TOKEN)
+    : new LocalFileStorage();
   // STORY-011: pricing tier repo
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
   // STORY-081: no DB table yet -- see StaticKeywordDatasetRepository's docblock
@@ -991,13 +1008,18 @@ function buildProductionContainer(): AppContainer {
     }),
     // STORY-098: download center resources
     resourceRepo,
+    fileStorage,
     createResource: new CreateResource({ resourceRepo, recordAuditLog }),
-    updateResource: new UpdateResource({ resourceRepo, recordAuditLog }),
+    updateResource: new UpdateResource({ resourceRepo, fileStorage, recordAuditLog }),
     deleteResource: new DeleteResource({ resourceRepo, recordAuditLog }),
     adminListResources: new AdminListResources({ resourceRepo }),
     adminGetResource: new AdminGetResource({ resourceRepo }),
     listAvailableResources: new ListAvailableResources({ resourceRepo }),
     recordResourceDownload: new RecordResourceDownload({ resourceRepo, recordAuditLog }),
+    // STORY-098.5: download center file upload/management
+    purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog }),
+    uploadFile: new UploadFile({ fileStorage }),
+    deleteFile: new DeleteFile({ fileStorage }),
   };
 }
 

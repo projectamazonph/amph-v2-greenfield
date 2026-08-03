@@ -1,10 +1,11 @@
 /**
  * PrismaResourceRepository, production adapter for IResourceRepository.
  *
- * STORY-098. "Deleting" a resource is a soft transition to
- * isPublished=false, matching InMemoryResourceRepository's contract;
- * there is no hard delete. Migration 20260803000000_resource adds
- * the table.
+ * STORY-098. `delete()` is a soft transition to isPublished=false,
+ * matching InMemoryResourceRepository's contract. `hardDelete()`
+ * (STORY-098.5) actually removes the row — used by `PurgeResource`
+ * when an admin-uploaded file needs to be fully removed, storage and
+ * all. Migration 20260803000000_resource adds the table.
  */
 
 import { PrismaClient } from "@prisma/client";
@@ -27,6 +28,7 @@ interface ResourceRow {
   category: string;
   fileType: string;
   fileUrl: string;
+  fileKey: string | null;
   accessTier: string;
   isPublished: boolean;
   downloadCount: number;
@@ -77,6 +79,7 @@ export class PrismaResourceRepository implements IResourceRepository {
           category: resource.category,
           fileType: resource.fileType,
           fileUrl: resource.fileUrl,
+          fileKey: resource.fileKey,
           accessTier: resource.accessTier,
           isPublished: resource.isPublished,
           downloadCount: resource.downloadCount,
@@ -98,6 +101,7 @@ export class PrismaResourceRepository implements IResourceRepository {
           category: resource.category,
           fileType: resource.fileType,
           fileUrl: resource.fileUrl,
+          fileKey: resource.fileKey,
           accessTier: resource.accessTier,
           isPublished: resource.isPublished,
         },
@@ -115,6 +119,16 @@ export class PrismaResourceRepository implements IResourceRepository {
         where: { id },
         data: { isPublished: false },
       });
+      return Result.ok(undefined);
+    } catch (err: unknown) {
+      if (isNotFoundError(err)) return Result.err({ kind: "not_found" });
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async hardDelete(id: string): Promise<Result<void, ResourceRepositoryError>> {
+    try {
+      await this.db.resource.delete({ where: { id } });
       return Result.ok(undefined);
     } catch (err: unknown) {
       if (isNotFoundError(err)) return Result.err({ kind: "not_found" });
@@ -154,6 +168,7 @@ export class PrismaResourceRepository implements IResourceRepository {
       category: row.category,
       fileType: row.fileType,
       fileUrl: row.fileUrl,
+      fileKey: row.fileKey,
       accessTier: row.accessTier,
       isPublished: row.isPublished,
       downloadCount: row.downloadCount,

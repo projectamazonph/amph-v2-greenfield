@@ -109,17 +109,25 @@ export default async function NewResourcePage({ searchParams }: PageProps) {
           </label>
 
           <label className={styles.field}>
-            <span className={styles.label}>File URL *</span>
+            <span className={styles.label}>Upload a file</span>
+            <input type="file" name="file" className={styles.input} />
+            <span className={styles.hint}>
+              Uploads the file directly. If you upload one, it's used instead of the link below.
+            </span>
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.label}>...or paste an external link</span>
             <input
               type="url"
               name="fileUrl"
-              required
               maxLength={500}
               className={styles.input}
               placeholder="https://docs.google.com/spreadsheets/d/.../copy"
             />
             <span className={styles.hint}>
-              An externally-hosted link (Google Drive/Sheets share link, or a public asset URL).
+              A Google Drive/Sheets share link, or any public URL. Required only if you didn't
+              upload a file above.
             </span>
           </label>
 
@@ -160,8 +168,10 @@ async function handleSubmit(formData: FormData) {
   const fileType = String(formData.get("fileType") ?? "") as ResourceFileType;
   const fileUrl = String(formData.get("fileUrl") ?? "").trim();
   const accessTier = String(formData.get("accessTier") ?? "") as CourseAccessTier;
+  const fileEntry = formData.get("file");
+  const file = fileEntry instanceof File && fileEntry.size > 0 ? fileEntry : null;
 
-  if (!title || !description || !category || !fileType || !fileUrl || !accessTier) {
+  if (!title || !description || !category || !fileType || !accessTier || (!fileUrl && !file)) {
     redirect("/admin/resources/new?error=missing");
   }
 
@@ -171,6 +181,7 @@ async function handleSubmit(formData: FormData) {
     category,
     fileType,
     fileUrl,
+    file,
     accessTier,
   });
 

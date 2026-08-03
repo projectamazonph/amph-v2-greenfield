@@ -11,6 +11,7 @@ import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
 import { updateResourceAction } from "@/app/actions/updateResource.action";
 import { deleteResourceAction } from "@/app/actions/deleteResource.action";
+import { purgeResourceAction } from "@/app/actions/purgeResource.action";
 import type { ResourceCategory, ResourceFileType } from "@/domain/entities/Resource";
 import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
 import styles from "../../new/page.module.css";
@@ -139,7 +140,17 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
           </label>
 
           <label className={styles.field}>
-            <span className={styles.label}>File URL *</span>
+            <span className={styles.label}>Replace file</span>
+            <input type="file" name="file" className={styles.input} />
+            <span className={styles.hint}>
+              {resource.fileKey
+                ? "This resource's current file was uploaded directly. Uploading a new one replaces it and deletes the old copy from storage."
+                : "This resource currently points at the external link below. Uploading a file here switches it to a hosted, admin-managed copy."}
+            </span>
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.label}>...or file URL *</span>
             <input
               type="url"
               name="fileUrl"
@@ -148,6 +159,10 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
               defaultValue={resource.fileUrl}
               className={styles.input}
             />
+            <span className={styles.hint}>
+              Ignored if you upload a replacement file above. Otherwise this is used as-is — editing
+              it directly re-points an external link without re-uploading anything.
+            </span>
           </label>
 
           <label className={styles.field}>
@@ -225,6 +240,37 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
             Unpublish resource
           </button>
         </form>
+
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--ink-500)",
+            margin: "1.5rem 0 1rem 0",
+            paddingTop: "1rem",
+            borderTop: "1px solid var(--border)",
+          }}
+        >
+          Permanently deleting removes this resource entirely
+          {resource.fileKey ? " and deletes its uploaded file from storage" : ""}. This cannot be
+          undone — use it only for a genuinely wrong upload, not routine cleanup.
+        </p>
+        <form action={handlePurge(id)}>
+          <button
+            type="submit"
+            style={{
+              padding: "0.5rem 1rem",
+              backgroundColor: "transparent",
+              color: "var(--danger)",
+              border: "1px solid var(--danger)",
+              borderRadius: "0.375rem",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Permanently delete
+          </button>
+        </form>
       </Card>
     </div>
   );
@@ -241,10 +287,13 @@ function handleUpdate(id: string) {
     const fileUrl = String(formData.get("fileUrl") ?? "").trim();
     const accessTier = String(formData.get("accessTier") ?? "") as CourseAccessTier;
     const isPublished = String(formData.get("isPublished") ?? "true") === "true";
+    const fileEntry = formData.get("file");
+    const file = fileEntry instanceof File && fileEntry.size > 0 ? fileEntry : null;
 
     const r = await updateResourceAction({
       id,
       patch: { title, description, category, fileType, fileUrl, accessTier, isPublished },
+      file,
     });
 
     if (!r.ok) {
@@ -260,6 +309,18 @@ function handleDelete(id: string) {
   return async function () {
     "use server";
     const r = await deleteResourceAction({ id });
+    if (!r.ok) {
+      redirect(`/admin/resources/${id}/edit?error=${r.error.kind}`);
+      return;
+    }
+    redirect("/admin/resources");
+  };
+}
+
+function handlePurge(id: string) {
+  return async function () {
+    "use server";
+    const r = await purgeResourceAction({ id });
     if (!r.ok) {
       redirect(`/admin/resources/${id}/edit?error=${r.error.kind}`);
       return;

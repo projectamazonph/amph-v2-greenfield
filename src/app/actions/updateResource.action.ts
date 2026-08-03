@@ -1,15 +1,21 @@
 /**
  * updateResource.action.ts — server action.
  *
- * STORY-098. Injects actorId from session.
+ * STORY-098. Injects actorId from session. STORY-098.5: accepts an
+ * optional `file` to replace the resource's current file — when
+ * present, it's uploaded and the patch's fileUrl/fileKey are set from
+ * the upload result before the resource is updated. Cleanup of the
+ * previously-uploaded file (if any) happens inside `UpdateResource`.
  */
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import type { UpdateResourcePatch } from "@/domain/entities/Resource";
+import { uploadResourceFile } from "@/app/actions/resourceFileUpload.helper";
 
 export interface UpdateResourcePageInput {
   id: string;
   patch: UpdateResourcePatch;
+  file?: File | null;
 }
 
 export type UpdateResourceError =
@@ -28,9 +34,19 @@ export async function updateResourceAction(
   const session = await requireAdmin();
   const container = buildContainer();
 
+  let patch = input.patch;
+
+  if (input.file && input.file.size > 0) {
+    const uploadResult = await uploadResourceFile(container, input.id, input.file);
+    if (!uploadResult.ok) {
+      return { ok: false, error: uploadResult.error };
+    }
+    patch = { ...patch, fileUrl: uploadResult.fileUrl, fileKey: uploadResult.fileKey };
+  }
+
   const result = await container.updateResource.execute({
     id: input.id,
-    patch: input.patch,
+    patch,
     actorId: session.id,
   });
 

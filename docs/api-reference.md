@@ -95,20 +95,20 @@ There is no `src/app/admin/settings/email-templates` page in the current tree. E
 
 ### Route handlers
 
-| Method and path                            | Purpose                                                                                    |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `POST /api/auth/signup`                    | Signup and redirect response with session cookie                                           |
-| `POST /api/auth/login`                     | Login and redirect response with session cookie                                            |
-| `POST /api/auth/admin-login`               | Login with an admin-role check                                                             |
-| `POST /api/auth/logout`                    | Clear the session cookie                                                                   |
-| `GET /api/health`                          | Liveness response and version; no database probe                                           |
-| `GET, POST /api/cron/live-class-reminders` | Cron health check and protected reminder execution                                         |
-| `POST /api/quizzes/[quizId]/attempt`       | Quiz attempt submission                                                                    |
-| `GET /api/resources/[id]/download`         | Re-checks access, records the download, 302-redirects to the resource's external `fileUrl` |
-| `POST /api/webhooks/paymongo`              | Signature-verified PayMongo webhook processing                                             |
-| `POST /actions/verifyEmail`                | Email verification action route                                                            |
-| `GET /admin/audit-log/export`              | CSV audit-log export                                                                       |
-| `GET /certificates/[hash]/pdf`             | Certificate PDF response                                                                   |
+| Method and path                            | Purpose                                                                                                                                |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /api/auth/signup`                    | Signup and redirect response with session cookie                                                                                       |
+| `POST /api/auth/login`                     | Login and redirect response with session cookie                                                                                        |
+| `POST /api/auth/admin-login`               | Login with an admin-role check                                                                                                         |
+| `POST /api/auth/logout`                    | Clear the session cookie                                                                                                               |
+| `GET /api/health`                          | Liveness response and version; no database probe                                                                                       |
+| `GET, POST /api/cron/live-class-reminders` | Cron health check and protected reminder execution                                                                                     |
+| `POST /api/quizzes/[quizId]/attempt`       | Quiz attempt submission                                                                                                                |
+| `GET /api/resources/[id]/download`         | Re-checks access, records the download, 302-redirects to the resource's `fileUrl` (relative paths resolved against the request origin) |
+| `POST /api/webhooks/paymongo`              | Signature-verified PayMongo webhook processing                                                                                         |
+| `POST /actions/verifyEmail`                | Email verification action route                                                                                                        |
+| `GET /admin/audit-log/export`              | CSV audit-log export                                                                                                                   |
+| `GET /certificates/[hash]/pdf`             | Certificate PDF response                                                                                                               |
 
 There is no public REST API version. Mutations use server actions except for webhooks, third-party callbacks, health, cron, quiz submission, and PDF or CSV responses.
 
@@ -142,7 +142,7 @@ Each action should parse untrusted input, obtain the request container, call a u
 | Admin operations            | `ListUsers`, `GetUserDetail`, `ImpersonateUser`, `GetAdminDashboardStats`, payment and refund admin classes, audit-log classes, live-class classes, discount-code classes, badge classes                                                                                             |
 | Email and reminders         | `SendLiveClassReminders` _(moved to `email/`: `ListEmailTemplates`, `GetEmailTemplate`, `UpdateEmailTemplate`)_                                                                                                                                                                      |
 | Two-factor authentication   | `EnableTwoFactor`, `ConfirmTwoFactor`, `DisableTwoFactor`                                                                                                                                                                                                                            |
-| Download center (STORY-098) | `CreateResource`, `UpdateResource`, `DeleteResource`, `AdminListResources`, `AdminGetResource`, `ListAvailableResources`, `RecordResourceDownload`                                                                                                                                   |
+| Download center (STORY-098) | `CreateResource`, `UpdateResource`, `DeleteResource`, `AdminListResources`, `AdminGetResource`, `ListAvailableResources`, `RecordResourceDownload`, `PurgeResource`, `UploadFile`, `DeleteFile` (STORY-098.5)                                                                        |
 
 ## Ports and adapters
 
@@ -152,6 +152,7 @@ Each action should parse untrusted input, obtain the request container, call a u
 
 ### Service and gateway ports
 
+- `IFileStorage` (STORY-098.5) — generic upload/delete; production adapter is `VercelBlobFileStorage`, dev fallback is `LocalFileStorage` (does not persist in production)
 - `IPaymentGateway`
 - `EmailSender`, `EmailVerificationRenderer`, `LiveClassReminderRenderer`
 - `IAccessPolicy`

@@ -8,9 +8,20 @@ import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
  * automation tool (e.g. a Google Sheet that scans an STR report and
  * flags winners/bleeders), client reporting template, monitoring
  * sheet, audit template, student handout, cheat sheet, or quick
- * guide. There is no file-upload/blob-storage layer in this codebase
- * yet, so `fileUrl` points at an externally-hosted file (Google
- * Drive/Sheets, or a public asset URL) rather than owning the bytes.
+ * guide.
+ *
+ * `fileUrl` is either:
+ *  - a root-relative path (`/downloads/...`) into `public/` for the
+ *    pre-installed resources shipped with the app, or
+ *  - an absolute http(s) URL — either an admin-pasted external link
+ *    (Google Drive/Sheets) or a URL returned by `IFileStorage` (STORY-098.5)
+ *    for an admin-uploaded file.
+ *
+ * `fileKey` (STORY-098.5) is non-null only when the file was uploaded
+ * through `IFileStorage`: it's the storage key needed to delete or
+ * replace that file later. It's null for pre-installed static assets
+ * and for admin-pasted external links — in both cases we don't own
+ * the file and have nothing to delete on our end.
  *
  * Gated the same way courses are: `accessTier` reuses
  * `CourseAccessTier` (PREVIEW/STARTER/PRO) and is checked against the
@@ -66,6 +77,8 @@ export interface Resource {
   readonly category: ResourceCategory;
   readonly fileType: ResourceFileType;
   readonly fileUrl: string;
+  /** Storage key for admin-uploaded files (STORY-098.5); null for static assets and external links. */
+  readonly fileKey: string | null;
   readonly accessTier: CourseAccessTier;
   readonly isPublished: boolean;
   readonly downloadCount: number;
@@ -84,13 +97,22 @@ export interface CreateResourceInput {
   category: ResourceCategory;
   fileType: ResourceFileType;
   fileUrl: string;
+  /** Storage key if this file was uploaded via IFileStorage. Omit/null for static assets and external links. */
+  fileKey?: string | null;
   accessTier: CourseAccessTier;
 }
 
 export type UpdateResourcePatch = Partial<
   Pick<
     Resource,
-    "title" | "description" | "category" | "fileType" | "fileUrl" | "accessTier" | "isPublished"
+    | "title"
+    | "description"
+    | "category"
+    | "fileType"
+    | "fileUrl"
+    | "fileKey"
+    | "accessTier"
+    | "isPublished"
   >
 >;
 
@@ -148,6 +170,7 @@ export function createResource(input: CreateResourceInput): Result<Resource, Res
       category: input.category,
       fileType: input.fileType,
       fileUrl: input.fileUrl.trim(),
+      fileKey: input.fileKey?.trim() || null,
       accessTier: input.accessTier,
       isPublished: true,
       downloadCount: 0,
@@ -179,6 +202,8 @@ export function updateResource(
   const fileUrl = patch.fileUrl !== undefined ? patch.fileUrl.trim() : original.fileUrl;
   if (!isValidUrl(fileUrl)) errors.push({ kind: "invalid_file_url" });
 
+  const fileKey = patch.fileKey !== undefined ? patch.fileKey : original.fileKey;
+
   const accessTier = patch.accessTier !== undefined ? patch.accessTier : original.accessTier;
   if (!isValidResourceAccessTier(accessTier)) errors.push({ kind: "invalid_access_tier" });
 
@@ -195,6 +220,7 @@ export function updateResource(
       category,
       fileType,
       fileUrl,
+      fileKey,
       accessTier,
       isPublished,
       updatedAt: new Date(),
@@ -206,7 +232,15 @@ export function updateResource(
 // Helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Accepts either a root-relative path into `public/` (`/downloads/...`,
+ * for pre-installed static assets) or an absolute http(s) URL (an
+ * external link, or a storage URL from `IFileStorage`). Rejects
+ * protocol-relative (`//host/...`) and anything else that isn't
+ * unambiguously same-origin or a real http(s) URL.
+ */
 function isValidUrl(s: string): boolean {
+  if (s.startsWith("/") && !s.startsWith("//")) return true;
   try {
     const u = new URL(s);
     return u.protocol === "http:" || u.protocol === "https:";

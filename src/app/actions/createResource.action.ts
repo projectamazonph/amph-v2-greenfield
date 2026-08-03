@@ -1,13 +1,22 @@
 /**
  * createResource.action.ts — server action.
  *
- * STORY-098. Injects actorId from session.
+ * STORY-098. Injects actorId from session. STORY-098.5: accepts an
+ * optional uploaded `file` alongside (or instead of) a pasted
+ * `fileUrl` — when both are present, the upload wins.
  */
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import type { CreateResourceInput_ } from "@/usecases/CreateResource";
+import { uploadResourceFile } from "@/app/actions/resourceFileUpload.helper";
 
-export type CreateResourcePageInput = Omit<CreateResourceInput_, "id" | "actorId">;
+export type CreateResourcePageInput = Omit<
+  CreateResourceInput_,
+  "id" | "actorId" | "fileUrl" | "fileKey"
+> & {
+  fileUrl?: string;
+  file?: File | null;
+};
 
 export type CreateResourceError =
   | { kind: "invalid_id" }
@@ -26,8 +35,31 @@ export async function createResourceAction(
   const container = buildContainer();
 
   const id = container.idGen.newId();
+
+  let fileUrl = input.fileUrl?.trim() ?? "";
+  let fileKey: string | null = null;
+
+  if (input.file && input.file.size > 0) {
+    const uploadResult = await uploadResourceFile(container, id, input.file);
+    if (!uploadResult.ok) {
+      return { ok: false, error: uploadResult.error };
+    }
+    fileUrl = uploadResult.fileUrl;
+    fileKey = uploadResult.fileKey;
+  }
+
+  if (!fileUrl) {
+    return { ok: false, error: { kind: "invalid_file_url" } };
+  }
+
   const result = await container.createResource.execute({
-    ...input,
+    title: input.title,
+    description: input.description,
+    category: input.category,
+    fileType: input.fileType,
+    accessTier: input.accessTier,
+    fileUrl,
+    fileKey,
     id,
     actorId: session.id,
   });

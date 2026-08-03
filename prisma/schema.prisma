@@ -809,6 +809,7 @@ model Resource {
   category      String   // guide | template | automation_tool | cheat_sheet | handout
   fileType      String   // pdf | xlsx | gsheet | docx | zip | link
   fileUrl       String
+  fileKey       String? // storage key if uploaded via IFileStorage (STORY-098.5); null for static assets/external links
   accessTier    String   @default("PREVIEW") // STARTER | PRO | PREVIEW
   isPublished   Boolean  @default(true)
   downloadCount Int      @default(0)

@@ -27,6 +27,9 @@ export interface IResourceRepository {
   /** Soft-delete (unpublish) a resource. */
   delete(id: string): Promise<Result<void, ResourceRepositoryError>>;
 
+  /** Permanently remove the row. Used by PurgeResource; does not touch storage. */
+  hardDelete(id: string): Promise<Result<void, ResourceRepositoryError>>;
+
   /** Atomically bump the download counter by 1. */
   incrementDownloadCount(id: string): Promise<Result<void, ResourceRepositoryError>>;
 }

@@ -57,6 +57,14 @@ export class InMemoryResourceRepository implements IResourceRepository {
     return { ok: true, value: undefined };
   }
 
+  async hardDelete(id: string): Promise<Result<void, ResourceRepositoryError>> {
+    if (!this._resources.has(id)) {
+      return { ok: false, error: { kind: "not_found" } };
+    }
+    this._resources.delete(id);
+    return { ok: true, value: undefined };
+  }
+
   async incrementDownloadCount(id: string): Promise<Result<void, ResourceRepositoryError>> {
     const resource = this._resources.get(id);
     if (!resource) {

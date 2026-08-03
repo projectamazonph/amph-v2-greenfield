@@ -1,5 +1,49 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-03, download center file upload + pre-installed content)
+
+Same-day follow-up to the download center session below (STORY-098.5).
+Two asks: (1) actually author the guides/templates/automation-tool/
+cheat-sheet/handout files the original request named, and ship them as
+pre-installed download-center entries; (2) add real file upload and
+file-management (replace, permanently delete) for whatever admins add
+later, since STORY-098 only supported pasting an external link.
+
+**Pre-installed content (10 files, `public/downloads/`):** 2 PDF
+guides, 3 XLSX templates, 1 XLSX automation tool (the STR
+Winner/Bleeder Scanner — real formulas, not a mockup), 2 PDF cheat
+sheets, 1 PDF + 1 DOCX handout. `pnpm db:seed:resources` (`--dry-run`
+supported) upserts them as published `Resource` rows by a fixed id.
+**Formula-verification caveat:** this session's sandbox could not get
+LibreOffice headless recalculation working at all (confirmed via
+`strace` — even a trivial file failed to load; an environment issue,
+not a file defect). Verified the STR Scanner's formula logic instead
+by reimplementing it in Python against the same sample data and
+confirming identical output. Full detail in `docs/stories/STORY-098.md`'s
+"Pre-installed resources" section.
+
+**File upload + management:** new `IFileStorage` port
+(`src/ports/storage/`) with `InMemoryFileStorage`/`LocalFileStorage`/
+`VercelBlobFileStorage` adapters (new `@vercel/blob` dependency);
+`buildContainer()` picks Vercel Blob when `BLOB_READ_WRITE_TOKEN` is
+set, else falls back to `LocalFileStorage` (dev-only — does NOT
+persist in production on Vercel's read-only serverless filesystem,
+documented in the adapter's own docblock and in `.env.example`).
+`Resource` gained `fileKey` (non-null only for uploaded files) and
+`fileUrl` validation now also accepts root-relative paths. New
+`UploadFile`/`DeleteFile`/`PurgeResource` use cases; `UpdateResource`
+cleans up a replaced file's old blob. Admin forms
+(`/admin/resources/new`, `/admin/resources/[id]/edit`) gained a file
+input alongside the URL field, and the edit page gained a
+"Permanently delete" danger-zone action distinct from "Unpublish".
+Full detail in `docs/stories/STORY-098.5.md`.
+
+Verification: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test` (3464
+passed / 2 skipped, up from 3425/2), `pnpm test:arch` (610/610), and
+`pnpm build` all green. Smoke-tested with `pnpm dev`: pre-installed
+static assets serve with correct `Content-Type` headers; all resource
+routes behave the same as the STORY-098 baseline.
+
 # Session update (2026-08-03, download center)
 
 Built STORY-098: the download center (`/resources` student-facing, `/admin/resources`

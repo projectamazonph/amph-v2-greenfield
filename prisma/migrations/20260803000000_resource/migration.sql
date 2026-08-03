@@ -2,9 +2,15 @@
 -- client reporting templates, monitoring sheets, audit templates,
 -- student handouts, cheat sheets, quick guides).
 --
--- No file-storage/blob layer exists in this codebase yet, so a
--- Resource row is metadata + an externally-hosted fileUrl (Google
--- Drive/Sheets or a public asset URL), not the file bytes themselves.
+-- A Resource row is metadata + a fileUrl, not the file bytes
+-- themselves. fileUrl is either a root-relative /downloads/... path
+-- (pre-installed static assets shipped in public/), an external link
+-- an admin pasted (Google Drive/Sheets), or a storage URL returned by
+-- IFileStorage for an admin-uploaded file (STORY-098.5). fileKey is
+-- non-null only in that last case — it's the storage key needed to
+-- delete/replace the file later; this migration adds it up front
+-- (not as a separate migration) since the table has not shipped to
+-- any deployed environment yet.
 
 CREATE TABLE "resources" (
     "id" TEXT NOT NULL,
@@ -13,6 +19,7 @@ CREATE TABLE "resources" (
     "category" TEXT NOT NULL,
     "fileType" TEXT NOT NULL,
     "fileUrl" TEXT NOT NULL,
+    "fileKey" TEXT,
     "accessTier" TEXT NOT NULL DEFAULT 'PREVIEW',
     "isPublished" BOOLEAN NOT NULL DEFAULT true,
     "downloadCount" INTEGER NOT NULL DEFAULT 0,

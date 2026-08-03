@@ -33,8 +33,41 @@ describe("Resource entity", () => {
       expect(res.accessTier).toBe("STARTER");
       expect(res.isPublished).toBe(true);
       expect(res.downloadCount).toBe(0);
+      expect(res.fileKey).toBeNull();
       expect(res.createdAt).toBeInstanceOf(Date);
       expect(res.updatedAt).toBeInstanceOf(Date);
+    });
+
+    it("accepts a root-relative fileUrl into public/ (pre-installed static assets)", () => {
+      const r = createResource({ ...baseInput, fileUrl: "/downloads/guides/quick-start.pdf" });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.fileUrl).toBe("/downloads/guides/quick-start.pdf");
+    });
+
+    it("rejects a protocol-relative fileUrl", () => {
+      const r = createResource({ ...baseInput, fileUrl: "//evil.example.com/file.pdf" });
+      expect(r.ok).toBe(false);
+      if (r.ok) return;
+      expect(r.error.kind).toBe("invalid_file_url");
+    });
+
+    it("stores fileKey when the file was uploaded via IFileStorage", () => {
+      const r = createResource({
+        ...baseInput,
+        fileUrl: "https://storage.example.com/resources/abc123.xlsx",
+        fileKey: "resources/abc123.xlsx",
+      });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.fileKey).toBe("resources/abc123.xlsx");
+    });
+
+    it("defaults fileKey to null when omitted or blank", () => {
+      const r1 = createResource(baseInput);
+      expect(r1.ok && r1.value.fileKey).toBeNull();
+      const r2 = createResource({ ...baseInput, fileKey: "   " });
+      expect(r2.ok && r2.value.fileKey).toBeNull();
     });
 
     it("trims whitespace on title, description, fileUrl", () => {
@@ -163,8 +196,34 @@ describe("Resource entity", () => {
       expect(r.value.category).toBe(resource.category);
       expect(r.value.fileType).toBe(resource.fileType);
       expect(r.value.fileUrl).toBe(resource.fileUrl);
+      expect(r.value.fileKey).toBe(resource.fileKey);
       expect(r.value.accessTier).toBe(resource.accessTier);
       expect(r.value.isPublished).toBe(resource.isPublished);
+    });
+
+    it("updates fileKey when replacing an uploaded file", () => {
+      const r = updateResource(resource, {
+        fileUrl: "https://storage.example.com/resources/new.xlsx",
+        fileKey: "resources/new.xlsx",
+      });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.fileKey).toBe("resources/new.xlsx");
+    });
+
+    it("clears fileKey when explicitly patched to null (switching to an external link)", () => {
+      const withKey = updateResource(resource, {
+        fileUrl: "https://storage.example.com/resources/new.xlsx",
+        fileKey: "resources/new.xlsx",
+      });
+      if (!withKey.ok) throw new Error("fixture setup failed");
+      const r = updateResource(withKey.value, {
+        fileUrl: "https://drive.google.com/file/d/xyz",
+        fileKey: null,
+      });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.fileKey).toBeNull();
     });
 
     it("fails when patched title is blank", () => {

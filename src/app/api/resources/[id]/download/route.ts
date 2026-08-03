@@ -1,23 +1,27 @@
 /**
  * GET /api/resources/[id]/download — download-center download link.
  *
- * STORY-098. There's no file-storage layer in this codebase, so a
- * resource's actual bytes live at an externally-hosted `fileUrl`.
- * This route is the choke point between "student clicks Download" and
- * that external URL: it re-checks (server-side, not just in the UI)
- * that the resource is published and the signed-in student's
- * subscription tier actually meets the resource's access tier, then
- * records the download (audit log + counter) before redirecting.
+ * STORY-098. A resource's actual bytes live either at a root-relative
+ * `/downloads/...` or `/uploads/...` path (pre-installed static
+ * assets, or a file uploaded via `LocalFileStorage`) or an absolute
+ * URL (an admin-pasted external link, or a Vercel Blob URL). This
+ * route is the choke point between "student clicks Download" and
+ * that URL: it re-checks (server-side, not just in the UI) that the
+ * resource is published and the signed-in student's subscription
+ * tier actually meets the resource's access tier, then records the
+ * download (audit log + counter) before redirecting.
  *
  * Thin by design — all the logic lives in RecordResourceDownload so
- * it's unit-testable without HTTP.
+ * it's unit-testable without HTTP. The only HTTP-specific piece is
+ * resolving a relative fileUrl to an absolute one, since
+ * `NextResponse.redirect` requires an absolute URL.
  */
 import { NextResponse } from "next/server";
 import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 
 export async function GET(
-  _req: Request,
+  req: Request,
   context: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
   const { id } = await context.params;
@@ -44,5 +48,6 @@ export async function GET(
     return NextResponse.json({ error: result.error }, { status });
   }
 
-  return NextResponse.redirect(result.value.fileUrl);
+  const absoluteUrl = new URL(result.value.fileUrl, req.url).toString();
+  return NextResponse.redirect(absoluteUrl);
 }

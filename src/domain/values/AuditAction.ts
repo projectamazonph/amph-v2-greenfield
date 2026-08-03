@@ -87,7 +87,9 @@ export type AuditAction =
   | "resource.create_failed"
   | "resource.update_failed"
   | "resource.delete_failed"
-  | "resource.downloaded";
+  | "resource.downloaded"
+  | "resource.purged"
+  | "resource.purge_failed";
 
 /**
  * STORY-061. All valid AuditAction values as an array.
@@ -164,6 +166,8 @@ export const ALL_ACTIONS: AuditAction[] = [
   "resource.update_failed",
   "resource.delete_failed",
   "resource.downloaded",
+  "resource.purged",
+  "resource.purge_failed",
 ];
 
 /**

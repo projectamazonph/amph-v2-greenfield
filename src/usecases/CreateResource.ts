@@ -41,6 +41,7 @@ export class CreateResource {
       category: input.category,
       fileType: input.fileType,
       fileUrl: input.fileUrl,
+      fileKey: input.fileKey,
       accessTier: input.accessTier,
     });
 
