@@ -11,14 +11,18 @@
  * removed rather than kept alongside: nothing in this app depended on the
  * old narrow shape once the domain schema changed underneath it.
  *
- * Lifecycle:
+ * Lifecycle (mirrors keyword-research/actions.ts's ordering):
  *   1. StartSimulatorAttempt — creates the attempt record
  *   2. saveSimulatorDecision — one decision per user classification (audit trail)
- *   3. SubmitSimulatorAttempt — transitions in_progress -> submitted
+ *   3. StrTriageSimulator.run() — computes ground truth + dimension scores.
+ *      Runs before submission so a registry-lookup failure or a sim.run()
+ *      throw returns early without ever marking the attempt "submitted"
+ *      (an attempt stuck submitted-but-ungraded would be unrecoverable
+ *      orphaned state).
+ *   4. SubmitSimulatorAttempt — transitions in_progress -> submitted
  *      (must run before grading: GradeSimulatorAttempt requires status
  *      "submitted", and submission itself requires at least one decision
- *      to already be saved)
- *   4. StrTriageSimulator.run() — computes ground truth + dimension scores
+ *      to already be saved, which step 2 did)
  *   5. GradeSimulatorAttempt — persists the grade with score dimensions
  *   6. ComposeAttemptFeedback — generates actionable student feedback
  */
@@ -200,16 +204,11 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     }
   }
 
-  // ── 5. SubmitSimulatorAttempt ─────────────────────────────────────────
-  // GradeSimulatorAttempt requires status="submitted"; must run before
-  // grading, not after (it also requires at least one decision saved,
-  // which step 4 above already did).
-  const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
-  if (Result.isErr(submitResult)) {
-    return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
-  }
-
-  // ── 6. Run simulator ────────────────────────────────────────────────
+  // ── 5. Run simulator ────────────────────────────────────────────────
+  // Runs before SubmitSimulatorAttempt so a registry-lookup failure or a
+  // sim.run() throw returns early without ever marking the attempt
+  // "submitted" — an attempt stuck submitted-but-ungraded is orphaned
+  // state with no way to grade or retry it under this scenario.
   const sim = container.simulatorRegistry.get("str-triage");
   if (!sim) {
     return {
@@ -243,6 +242,15 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     profitability: 0,
     reviewCoverage: 0,
   };
+
+  // ── 6. SubmitSimulatorAttempt ─────────────────────────────────────────
+  // GradeSimulatorAttempt requires status="submitted"; must run before
+  // grading, not before the simulator (it also requires at least one
+  // decision saved, which step 4 above already did).
+  const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
+  if (Result.isErr(submitResult)) {
+    return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
+  }
 
   // ── 7. GradeSimulatorAttempt ────────────────────────────────────────
   const gradeResult = await container.gradeSimulatorAttempt.execute({

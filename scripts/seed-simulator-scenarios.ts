@@ -147,6 +147,7 @@ async function main() {
 
   let created = 0;
   let upserted = 0;
+  let failed = 0;
 
   for (const scenario of validated) {
     try {
@@ -180,13 +181,16 @@ async function main() {
       console.log(`  ${action.padEnd(8)} ${scenario.simulatorId}/${scenario.id}`);
     } catch (err) {
       console.error(`  ERROR   ${scenario.simulatorId}/${scenario.id}:`, err);
+      failed++;
     }
   }
 
-  console.log(
-    `\nDone: ${created} created, ${upserted} upserted, ${validated.length - created - upserted} failed.`,
-  );
+  console.log(`\nDone: ${created} created, ${upserted} upserted, ${failed} failed.`);
   await prisma.$disconnect();
+  // A partial failure here must not look like success to a setup chain or
+  // CI job — that's exactly how the scenario_not_found bug this script
+  // fixes would go unnoticed and recur.
+  if (failed > 0) process.exit(1);
 }
 
 main().catch((err) => {
