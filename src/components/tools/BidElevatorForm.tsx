@@ -3,8 +3,8 @@
  *
  * STORY-079: Bid Elevator economic model rewrite. Renders the scenario's
  * authored keywords as a table of editable bids. The user tweaks the bid
- * per keyword, then submits; the server action runs the simulator and
- * returns the result, which the parent page re-renders.
+ * per keyword, then submits; the server action runs the simulator and the
+ * result renders inline via BidElevatorResult.
  *
  * Per the STORY-079 scoping decision the tool is scenario-only: keyword
  * economics (CTR, CVR, benchmark CPC, etc.) are authored server-side, not
@@ -14,21 +14,22 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./BidElevatorForm.module.css";
 import { runBidElevator, type RunBidElevatorInput } from "@/app/tools/bid-elevator/actions";
+import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
+import { BidElevatorResult } from "./BidElevatorResult";
 
 interface Props {
   scenario: Omit<RunBidElevatorInput, "userBidAdjustments">;
 }
 
 export function BidElevatorForm({ scenario }: Props) {
-  const router = useRouter();
   const [bids, setBids] = useState<Record<string, number>>(() =>
     Object.fromEntries(scenario.keywords.map((k) => [k.keywordId, k.currentBid])),
   );
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [simResult, setSimResult] = useState<BidElevatorOutput | null>(null);
 
   const onChange = (keywordId: string, value: number) => {
     setBids((prev) => ({ ...prev, [keywordId]: value }));
@@ -42,16 +43,12 @@ export function BidElevatorForm({ scenario }: Props) {
       userBidAdjustments: bids,
     };
     startTransition(async () => {
-      const result = await runBidElevator(input);
-      if (!result.ok) {
-        setError(result.error.message);
+      const response = await runBidElevator(input);
+      if (!response.ok) {
+        setError(response.error.message);
         return;
       }
-      // Stash the result in sessionStorage for the page to read
-      // (a clean re-fetch pattern would be a real route param;
-      // this works without adding another route segment).
-      sessionStorage.setItem("bid-elevator:result", JSON.stringify(result.value));
-      router.refresh();
+      setSimResult(response.value);
     });
   };
 
@@ -106,6 +103,7 @@ export function BidElevatorForm({ scenario }: Props) {
       <button type="submit" className={styles.submit} disabled={pending}>
         {pending ? "Running…" : "Run simulation"}
       </button>
+      {simResult ? <BidElevatorResult result={simResult} targetRoas={scenario.targetRoas} /> : null}
     </form>
   );
 }

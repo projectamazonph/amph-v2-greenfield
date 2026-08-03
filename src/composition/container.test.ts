@@ -198,6 +198,18 @@ import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent"
 import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
+import { InMemoryResourceRepository } from "@/infra/repositories/InMemoryResourceRepository";
+import { CreateResource } from "@/usecases/CreateResource";
+import { UpdateResource } from "@/usecases/UpdateResource";
+import { DeleteResource } from "@/usecases/DeleteResource";
+import { AdminListResources } from "@/usecases/AdminListResources";
+import { AdminGetResource } from "@/usecases/AdminGetResource";
+import { ListAvailableResources } from "@/usecases/ListAvailableResources";
+import { RecordResourceDownload } from "@/usecases/RecordResourceDownload";
+import { InMemoryFileStorage } from "@/infra/storage/InMemoryFileStorage";
+import { UploadFile } from "@/usecases/UploadFile";
+import { DeleteFile } from "@/usecases/DeleteFile";
+import { PurgeResource } from "@/usecases/PurgeResource";
 
 import type { AppContainer } from "./container";
 
@@ -237,6 +249,8 @@ export interface TestContainer extends AppContainer {
   feedbackRepo: InMemoryAttemptFeedbackRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   liveClassRegistrationRepo: InMemoryLiveClassRegistrationRepository;
+  resourceRepo: InMemoryResourceRepository;
+  fileStorage: InMemoryFileStorage;
   pricingTierRepo: InMemoryPricingTierRepository;
   keywordDatasetRepo: StaticKeywordDatasetRepository;
   sentReminderRepo: InMemorySentReminderRepository;
@@ -318,6 +332,9 @@ export function buildTestContainer(): TestContainer {
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
   const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
+  // STORY-098: download center resources
+  const resourceRepo = new InMemoryResourceRepository();
+  const fileStorage = new InMemoryFileStorage();
   // STORY-011: pricing tier repo
   const pricingTierRepo = new InMemoryPricingTierRepository();
   // STORY-081: same in-code repository as production -- no DB table yet.
@@ -731,5 +748,19 @@ export function buildTestContainer(): TestContainer {
       liveClassRegistrationRepo: new InMemoryLiveClassRegistrationRepository(),
       clock,
     }),
+    // STORY-098: download center resources
+    resourceRepo,
+    fileStorage,
+    createResource: new CreateResource({ resourceRepo, recordAuditLog }),
+    updateResource: new UpdateResource({ resourceRepo, fileStorage, recordAuditLog }),
+    deleteResource: new DeleteResource({ resourceRepo, recordAuditLog }),
+    adminListResources: new AdminListResources({ resourceRepo }),
+    adminGetResource: new AdminGetResource({ resourceRepo }),
+    listAvailableResources: new ListAvailableResources({ resourceRepo }),
+    recordResourceDownload: new RecordResourceDownload({ resourceRepo, recordAuditLog }),
+    // STORY-098.5: download center file upload/management
+    purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog }),
+    uploadFile: new UploadFile({ fileStorage }),
+    deleteFile: new DeleteFile({ fileStorage }),
   };
 }

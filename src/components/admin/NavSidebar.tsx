@@ -30,6 +30,7 @@ import {
   Certificate,
   Gear,
   Envelope,
+  DownloadSimple,
 } from "@phosphor-icons/react/dist/ssr";
 import type { User } from "@/domain/entities/User";
 import { UserCard } from "./UserCard";
@@ -70,6 +71,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/admin/quizzes", label: "Quizzes", icon: Question },
       { href: "/admin/badges", label: "Badges", icon: Star },
       { href: "/admin/email-templates", label: "Email templates", icon: Envelope },
+      { href: "/admin/resources", label: "Download center", icon: DownloadSimple },
     ],
   },
   {

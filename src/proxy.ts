@@ -89,6 +89,12 @@ export async function proxy(request: NextRequest) {
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     "connect-src 'self' https://api.paymongo.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+    // There was no frame-src directive at all before, so it fell back to
+    // default-src 'self' and silently blocked every iframe on the site —
+    // the embedded Amazon Ad Console (src/app/tools/ad-console/page.tsx)
+    // and the YouTube/Vimeo lesson-video embeds (LessonContent.tsx)
+    // included.
+    "frame-src 'self' https://amazon-ad-console.vercel.app https://www.youtube.com https://player.vimeo.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

@@ -21,6 +21,7 @@ import {
   Certificate,
   UserCircle,
   SignOut,
+  DownloadSimple,
 } from "@phosphor-icons/react/dist/ssr";
 import styles from "./StudentSidebar.module.css";
 import type { ComponentType, SVGProps } from "react";
@@ -40,6 +41,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: SquaresFour },
   { href: "/courses", label: "My Courses", icon: BookOpen },
   { href: "/tools", label: "Simulators", icon: GameController },
+  { href: "/resources", label: "Download center", icon: DownloadSimple },
   { href: "/certificates", label: "Certificates", icon: Certificate },
   { href: "/profile", label: "Profile", icon: UserCircle },
 ] as const;
@@ -53,10 +55,7 @@ export interface StudentSidebarProps {
 }
 
 function initials(firstName: string, lastName?: string | null): string {
-  return (
-    firstName.charAt(0).toUpperCase() +
-    (lastName?.charAt(0).toUpperCase() ?? "")
-  );
+  return firstName.charAt(0).toUpperCase() + (lastName?.charAt(0).toUpperCase() ?? "");
 }
 
 export function StudentSidebar({ user }: StudentSidebarProps) {
@@ -89,9 +88,7 @@ export function StudentSidebar({ user }: StudentSidebarProps) {
               key={item.href}
               href={item.href}
               data-active={isActive}
-              className={[styles.item, isActive ? styles.active : ""]
-                .filter(Boolean)
-                .join(" ")}
+              className={[styles.item, isActive ? styles.active : ""].filter(Boolean).join(" ")}
               aria-current={isActive ? "page" : undefined}
             >
               <span className={styles.icon} aria-hidden>

@@ -4,6 +4,67 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-03: Download center: content library expansion (STORY-099)
+
+16 new resources added to the download center, bringing the library
+from 10 to 26: 3 guides (Sponsored Brands setup, Sponsored Display
+setup, campaign structure & match type strategy), 3 templates
+(negative keyword master list, new client onboarding checklist, budget
+pacing tracker), 4 automation tools with live formulas (placement bid
+modifier calculator, keyword bid calculator, budget pacing &
+dayparting analyzer, campaign health scorecard), 3 cheat sheets
+(acronyms/glossary, SP vs SB vs SD comparison, negative keyword match
+types), and 3 handouts (VA weekly task checklist, PPC troubleshooting,
+client communication etiquette). No code changes: the download center
+already supports any number of resources; this is pure content plus
+26 total `ResourceDef` entries in `scripts/seed-resources.ts`.
+
+See `docs/stories/STORY-099.md` for the full list, formula-verification
+notes for the 4 automation tools, and the LibreOffice caveat (carried
+over from STORY-098).
+
+### 2026-08-03: Download center — pre-installed resources + file upload (STORY-098, STORY-098.5)
+
+New `/resources` download center (student-facing) and `/admin/resources`
+(admin CRUD): guides, templates, automation tools, cheat sheets, and
+student handouts, gated by `CourseAccessTier` the same way courses are.
+`GET /api/resources/[id]/download` is the real access-enforcement and
+download-tracking endpoint, not just the UI's lock icon.
+
+Shipped with 10 real pre-installed files in `public/downloads/`
+(`pnpm db:seed:resources` to load them): 2 PDF guides, 3 Excel
+templates, 1 Excel automation tool (an STR report scanner that flags
+Winner/Bleeder/Watch search terms via live formulas against adjustable
+thresholds), 2 PDF cheat sheets, and a PDF + a DOCX handout.
+
+Admins can also upload files directly instead of only pasting an
+external link, via a new `IFileStorage` port (`VercelBlobFileStorage`
+in production when `BLOB_READ_WRITE_TOKEN` is set, `LocalFileStorage`
+as a dev-only fallback — it does not persist on Vercel's serverless
+filesystem). Replacing an uploaded file cleans up the old one; a
+separate "Permanently delete" action removes a resource and its file
+entirely, distinct from the existing unpublish action.
+
+See `docs/stories/STORY-098.md` and `docs/stories/STORY-098.5.md`.
+
+### 2026-08-03: Add embedded Amazon Ad Console page
+
+New `/tools/ad-console` page embeds the external campaign-management
+console (`amazon-ad-console.vercel.app`) in an iframe, with a guide
+section on signing in, using it alongside the practice simulators, and
+a warning that — unlike the 5 formative simulators — this is a live
+tool connected to a real Amazon Ads account, so changes are real and
+generally not reversible.
+
+Added a card on the `/tools` index and a command-palette entry.
+`src/proxy.ts` had no `frame-src` CSP directive at all (it fell back
+to `default-src 'self'`, which would have silently blocked the
+iframe) — added `frame-src https://amazon-ad-console.vercel.app`
+(folded into the nonce-based CSP array added by the 2026-08-02
+consolidated engineering review, below, since both touch the same
+header). Includes an "Open in new tab" fallback in case the target
+site's own headers refuse to be framed.
+
 ### 2026-08-02: Consolidated engineering review — 8 of 10 proposals implemented
 
 Implements Proposals 1-8 and 10 from a consolidated code review + engineering
