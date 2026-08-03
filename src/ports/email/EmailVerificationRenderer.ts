@@ -15,14 +15,17 @@
  */
 
 import type { ReactElement } from "react";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface EmailVerificationRenderer {
   /**
    * Build the React element for the verification email.
    */
-  render(args: {
-    firstName: string;
-    verificationUrl: string;
-    expiresInHours: number;
-  }): ReactElement;
+  render(
+    args: {
+      firstName: string;
+      verificationUrl: string;
+      expiresInHours: number;
+    } & EmailTemplateOverride,
+  ): ReactElement;
 }

@@ -32,6 +32,8 @@ import { FixedClock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
+import { createEmailTemplate } from "@/domain/entities/EmailTemplate";
 import type { RateLimiter, RateLimitResult } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
@@ -108,7 +110,10 @@ describe("ResendVerification", () => {
     idGen = new FixedIdGenerator("raw-token-fixed-for-tests");
   });
 
-  function makeUseCase(rateLimiter: RateLimiter) {
+  function makeUseCase(
+    rateLimiter: RateLimiter,
+    emailTemplateRepo: InMemoryEmailTemplateRepository = new InMemoryEmailTemplateRepository(),
+  ) {
     return new ResendVerification({
       users,
       emailVerifications,
@@ -118,6 +123,7 @@ describe("ResendVerification", () => {
       verificationEmailRenderer: new EmailVerificationTemplateRenderer(),
       rateLimiter,
       idGen,
+      emailTemplateRepo,
     });
   }
 
@@ -171,6 +177,38 @@ describe("ResendVerification", () => {
     // A token record was persisted (hashed)
     expect(rateLimiter.calls).toHaveLength(1);
     expect(rateLimiter.calls[0]!.key).toBe("user-1");
+  });
+
+  it("uses the admin-customized subject/headline/introBody/ctaLabel when a template exists (STORY-095.5)", async () => {
+    await seedUnverifiedUser();
+    const emailTemplateRepo = new InMemoryEmailTemplateRepository();
+    const templateResult = createEmailTemplate({
+      id: "tpl-1",
+      type: "email_verification",
+      subject: "Custom subject line",
+      headline: "Custom headline",
+      introBody: "Custom intro body copy.",
+      ctaLabel: "Custom CTA",
+      updatedById: "admin-1",
+    });
+    if (!templateResult.ok) throw new Error("seed");
+    emailTemplateRepo.seed(templateResult.value);
+
+    const useCase = makeUseCase(new StubRateLimiter(true), emailTemplateRepo);
+    const result = await useCase.execute({ userId: "user-1" });
+
+    expect(result.ok).toBe(true);
+    expect(emailSender.sent).toHaveLength(1);
+    expect(emailSender.sent[0]!.subject).toBe("Custom subject line");
+
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const html = renderToStaticMarkup(emailSender.sent[0]!.react as React.ReactElement);
+    expect(html).toContain("Custom headline");
+    expect(html).toContain("Custom intro body copy.");
+    expect(html).toContain("Custom CTA");
+    // Overridden copy replaces the hardcoded default entirely (no
+    // {{placeholder}} interpolation support on EmailTemplate).
+    expect(html).not.toContain("Welcome, Alice!");
   });
 
   // ── error paths ─────────────────────────────────────────────
@@ -238,6 +276,7 @@ describe("ResendVerification", () => {
       verificationEmailRenderer: new EmailVerificationTemplateRenderer(),
       rateLimiter,
       idGen,
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
 
     const result = await useCase.execute({ userId: "user-1" });

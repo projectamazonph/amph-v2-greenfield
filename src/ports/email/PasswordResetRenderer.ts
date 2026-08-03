@@ -14,10 +14,13 @@
  */
 
 import type { ReactElement } from "react";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface PasswordResetRenderer {
   /**
    * Build the React element for the password-reset email.
    */
-  render(args: { firstName: string; resetUrl: string; expiresInMinutes: number }): ReactElement;
+  render(
+    args: { firstName: string; resetUrl: string; expiresInMinutes: number } & EmailTemplateOverride,
+  ): ReactElement;
 }

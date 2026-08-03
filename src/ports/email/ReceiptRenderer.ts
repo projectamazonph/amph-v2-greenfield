@@ -6,15 +6,18 @@
  */
 
 import type { ReactElement } from "react";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface ReceiptRenderer {
-  render(args: {
-    firstName: string;
-    orderNumber: string;
-    courseTitle: string;
-    amountMinor: number;
-    currency: string;
-    paidAt: Date;
-    receiptUrl: string;
-  }): ReactElement;
+  render(
+    args: {
+      firstName: string;
+      orderNumber: string;
+      courseTitle: string;
+      amountMinor: number;
+      currency: string;
+      paidAt: Date;
+      receiptUrl: string;
+    } & EmailTemplateOverride,
+  ): ReactElement;
 }

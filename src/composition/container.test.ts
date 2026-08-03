@@ -350,6 +350,7 @@ export function buildTestContainer(): TestContainer {
     clock,
     ids: idGen,
     logger,
+    emailTemplateRepo,
   });
 
   // STORY-049 + STORY-062: build RefundOverride once. The
@@ -364,6 +365,7 @@ export function buildTestContainer(): TestContainer {
     emailSender,
     refundEmailRenderer,
     logger,
+    emailTemplateRepo,
   });
 
   return {
@@ -455,6 +457,7 @@ export function buildTestContainer(): TestContainer {
       emailSender,
       certificateEmailRenderer,
       logger,
+      emailTemplateRepo,
     }),
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
@@ -584,6 +587,7 @@ export function buildTestContainer(): TestContainer {
       emailSender,
       refundEmailRenderer,
       logger,
+      emailTemplateRepo,
     }),
     refundOverride,
     // STORY-062: admin refund request list + process
@@ -695,6 +699,7 @@ export function buildTestContainer(): TestContainer {
       logger,
       emailSender,
       welcomeEmailRenderer,
+      emailTemplateRepo,
     }),
     resendVerification: new ResendVerification({
       users: userRepo,
@@ -705,6 +710,7 @@ export function buildTestContainer(): TestContainer {
       verificationEmailRenderer,
       rateLimiter,
       idGen,
+      emailTemplateRepo,
     }),
     // STORY-008: password reset (hoisted above, also reused by adminGrantSubscription)
     requestPasswordReset,
@@ -728,6 +734,7 @@ export function buildTestContainer(): TestContainer {
       clock,
       logger,
       renderer: liveClassReminderRenderer,
+      emailTemplateRepo,
     }),
     // STORY-090/091: student RSVP. Wired to the same `liveClassRegistrationRepo`
     // instance exposed on the container (previously each of these three

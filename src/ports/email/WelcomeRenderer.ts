@@ -7,7 +7,8 @@
  */
 
 import type { ReactElement } from "react";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface WelcomeRenderer {
-  render(args: { firstName: string; dashboardUrl: string }): ReactElement;
+  render(args: { firstName: string; dashboardUrl: string } & EmailTemplateOverride): ReactElement;
 }

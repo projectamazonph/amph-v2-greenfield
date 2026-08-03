@@ -611,6 +611,7 @@ function buildProductionContainer(): AppContainer {
     clock,
     ids: idGen,
     logger,
+    emailTemplateRepo,
   });
 
   // STORY-049 + STORY-062: build RefundOverride once. Both the
@@ -627,6 +628,7 @@ function buildProductionContainer(): AppContainer {
     emailSender,
     refundEmailRenderer,
     logger,
+    emailTemplateRepo,
   });
 
   return {
@@ -761,6 +763,7 @@ function buildProductionContainer(): AppContainer {
       emailSender,
       certificateEmailRenderer,
       logger,
+      emailTemplateRepo,
     }),
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
@@ -890,6 +893,7 @@ function buildProductionContainer(): AppContainer {
       emailSender,
       refundEmailRenderer,
       logger,
+      emailTemplateRepo,
     }),
     refundOverride,
     // STORY-062: admin refund request list + process
@@ -957,6 +961,7 @@ function buildProductionContainer(): AppContainer {
       logger,
       emailSender,
       welcomeEmailRenderer,
+      emailTemplateRepo,
     }),
     resendVerification: new ResendVerification({
       users: userRepo,
@@ -967,6 +972,7 @@ function buildProductionContainer(): AppContainer {
       verificationEmailRenderer,
       rateLimiter,
       idGen,
+      emailTemplateRepo,
     }),
     // STORY-008: password reset (hoisted above, also reused by adminGrantSubscription)
     requestPasswordReset,
@@ -990,6 +996,7 @@ function buildProductionContainer(): AppContainer {
       clock,
       logger,
       renderer: liveClassReminderRenderer,
+      emailTemplateRepo,
     }),
     // STORY-090/091: live class student flow
     listLiveClassesForStudent: new ListLiveClassesForStudent({

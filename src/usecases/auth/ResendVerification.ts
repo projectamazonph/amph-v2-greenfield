@@ -34,6 +34,7 @@ import type { EmailSender } from "@/ports/email/EmailSender";
 import type { EmailVerificationRenderer } from "@/ports/email/EmailVerificationRenderer";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
+import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 
 export type ResendVerificationInput = { userId: string };
 export type ResendVerificationOutput = { sent: true; retryAfter: Date };
@@ -51,6 +52,7 @@ export interface ResendVerificationDeps {
   verificationEmailRenderer: EmailVerificationRenderer;
   rateLimiter: RateLimiter;
   idGen: IdGenerator;
+  emailTemplateRepo: IEmailTemplateRepository;
 }
 
 const RESEND_WINDOW_SECONDS = 60;
@@ -115,13 +117,18 @@ export class ResendVerification {
 
     // Send the email. Build the verification URL using the raw token.
     const verifyUrl = this.buildVerifyUrl(rawToken);
+    const templateResult = await this.deps.emailTemplateRepo.findByType("email_verification");
+    const template = templateResult.ok ? templateResult.value : null;
     const sendResult = await this.deps.emailSender.send({
       to: user.email,
-      subject: "Verify your Project Amazon PH Academy email",
+      subject: template?.subject ?? "Verify your Project Amazon PH Academy email",
       react: this.deps.verificationEmailRenderer.render({
         firstName: user.firstName,
         verificationUrl: verifyUrl,
         expiresInHours: TOKEN_TTL_HOURS,
+        headlineOverride: template?.headline,
+        introBodyOverride: template?.introBody,
+        ctaLabelOverride: template?.ctaLabel,
       }),
     });
     if (!sendResult.ok) {

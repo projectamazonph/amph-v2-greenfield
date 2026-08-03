@@ -6,8 +6,9 @@
 
 import { Button, Heading, Section, Text } from "@react-email/components";
 import { EmailLayout } from "./EmailLayout";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
-export interface ReceiptEmailProps {
+export interface ReceiptEmailProps extends EmailTemplateOverride {
   firstName: string;
   orderNumber: string;
   courseTitle: string;
@@ -30,6 +31,9 @@ export function ReceiptEmail({
   currency,
   paidAt,
   receiptUrl,
+  headlineOverride,
+  introBodyOverride,
+  ctaLabelOverride,
 }: ReceiptEmailProps) {
   return (
     <EmailLayout
@@ -37,10 +41,11 @@ export function ReceiptEmail({
       eyebrow="Payment confirmed"
     >
       <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
-        Thanks for your purchase, {firstName}!
+        {headlineOverride ?? `Thanks for your purchase, ${firstName}!`}
       </Heading>
       <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
-        Your payment was successful. You now have full access to the course below.
+        {introBodyOverride ??
+          "Your payment was successful. You now have full access to the course below."}
       </Text>
 
       <Section
@@ -51,26 +56,48 @@ export function ReceiptEmail({
           margin: "0 0 24px 0",
         }}
       >
-        <Text style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#737373", textTransform: "uppercase" }}>
+        <Text
+          style={{
+            margin: "0 0 4px 0",
+            fontSize: "12px",
+            color: "#737373",
+            textTransform: "uppercase",
+          }}
+        >
           Order
         </Text>
         <Text style={{ margin: "0 0 12px 0", fontSize: "16px", fontWeight: 600, color: "#1a365d" }}>
           {orderNumber}
         </Text>
-        <Text style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#737373", textTransform: "uppercase" }}>
+        <Text
+          style={{
+            margin: "0 0 4px 0",
+            fontSize: "12px",
+            color: "#737373",
+            textTransform: "uppercase",
+          }}
+        >
           Course
         </Text>
         <Text style={{ margin: "0 0 12px 0", fontSize: "16px", fontWeight: 600, color: "#171717" }}>
           {courseTitle}
         </Text>
-        <Text style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#737373", textTransform: "uppercase" }}>
+        <Text
+          style={{
+            margin: "0 0 4px 0",
+            fontSize: "12px",
+            color: "#737373",
+            textTransform: "uppercase",
+          }}
+        >
           Amount paid
         </Text>
         <Text style={{ margin: "0 0 12px 0", fontSize: "20px", fontWeight: 700, color: "#0E7C3A" }}>
           {formatMoney(amountMinor, currency)}
         </Text>
         <Text style={{ margin: 0, fontSize: "12px", color: "#737373" }}>
-          Paid on {paidAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+          Paid on{" "}
+          {paidAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
         </Text>
       </Section>
 
@@ -87,11 +114,11 @@ export function ReceiptEmail({
           display: "inline-block",
         }}
       >
-        View Receipt
+        {ctaLabelOverride ?? "View Receipt"}
       </Button>
       <Text style={{ margin: "24px 0 0 0", color: "#737373", fontSize: "13px" }}>
-        Keep this email for your records. If you have any questions, reply to this email
-        and our support team will help.
+        Keep this email for your records. If you have any questions, reply to this email and our
+        support team will help.
       </Text>
     </EmailLayout>
   );

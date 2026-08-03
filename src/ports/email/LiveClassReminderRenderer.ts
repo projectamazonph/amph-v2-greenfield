@@ -10,13 +10,16 @@
  */
 
 import type { ReactElement } from "react";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface LiveClassReminderRenderer {
-  render(args: {
-    firstName: string;
-    classTitle: string;
-    startsAt: Date;
-    joinUrl: string;
-    minutesUntilStart: number;
-  }): ReactElement;
+  render(
+    args: {
+      firstName: string;
+      classTitle: string;
+      startsAt: Date;
+      joinUrl: string;
+      minutesUntilStart: number;
+    } & EmailTemplateOverride,
+  ): ReactElement;
 }

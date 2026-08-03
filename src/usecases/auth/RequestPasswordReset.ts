@@ -33,6 +33,7 @@ import type { RateLimiter } from "@/ports/security/RateLimiter";
 import type { Clock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Logger } from "@/ports/observability/Logger";
+import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 
 const EMAIL_LIMIT = 5;
 const EMAIL_WINDOW_SECONDS = 3600;
@@ -56,6 +57,7 @@ export interface RequestPasswordResetDeps {
   clock: Clock;
   ids: IdGenerator;
   logger: Logger;
+  emailTemplateRepo: IEmailTemplateRepository;
 }
 
 function sha256(input: string): string {
@@ -136,13 +138,18 @@ export class RequestPasswordReset {
 
     // 7. Send the email.
     const resetUrl = this.buildResetUrl(rawToken);
+    const templateResult = await this.deps.emailTemplateRepo.findByType("password_reset");
+    const template = templateResult.ok ? templateResult.value : null;
     const sendResult = await this.deps.email.send({
       to: user.email,
-      subject: "Reset your Project Amazon PH Academy password",
+      subject: template?.subject ?? "Reset your Project Amazon PH Academy password",
       react: this.deps.passwordResetEmailRenderer.render({
         firstName: user.firstName,
         resetUrl,
         expiresInMinutes: TOKEN_TTL_HOURS * 60,
+        headlineOverride: template?.headline,
+        introBodyOverride: template?.introBody,
+        ctaLabelOverride: template?.ctaLabel,
       }),
     });
     if (!sendResult.ok) {

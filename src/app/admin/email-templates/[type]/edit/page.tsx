@@ -65,10 +65,13 @@ export default async function EditEmailTemplatePage({ params, searchParams }: Pa
 
       <Card padding={6} style={{ marginBottom: "1rem" }}>
         <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--ink-500)" }}>
-          This content is stored and versioned, but is not yet wired into the live email-sending
-          pipeline: the actual emails Resend sends still use their built-in copy. Saving here
-          records the admin-authored content for review; see STORY-095.5 to connect it to the send
-          path.
+          Saving here replaces the corresponding email&apos;s live copy the next time it sends
+          (STORY-095.5). There is no {"{{"}placeholder{"}}"} support — whatever you write here
+          replaces the default text verbatim, so a per-recipient detail baked into the default (like
+          the student&apos;s first name in a headline) is lost once you customize that field.
+          {type === "refund"
+            ? " The refund email has no call-to-action button, so Cta label has no effect here."
+            : null}
         </p>
       </Card>
 

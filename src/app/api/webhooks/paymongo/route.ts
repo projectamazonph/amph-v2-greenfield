@@ -187,9 +187,11 @@ async function sendReceiptEmail(
       return;
     }
 
+    const templateResult = await container.emailTemplateRepo.findByType("receipt");
+    const template = templateResult.ok ? templateResult.value : null;
     const sendResult = await container.emailSender.send({
       to: userResult.value.email,
-      subject: `Receipt for ${order.id} — ${courseResult.value.title}`,
+      subject: template?.subject ?? `Receipt for ${order.id} — ${courseResult.value.title}`,
       react: container.receiptEmailRenderer.render({
         firstName: userResult.value.firstName,
         orderNumber: order.id,
@@ -198,6 +200,9 @@ async function sendReceiptEmail(
         currency: order.currency,
         paidAt: order.paymongoPaidAt ?? new Date(),
         receiptUrl: buildAppUrl("/dashboard"),
+        headlineOverride: template?.headline,
+        introBodyOverride: template?.introBody,
+        ctaLabelOverride: template?.ctaLabel,
       }),
     });
     if (!sendResult.ok) {

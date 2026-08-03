@@ -23,6 +23,7 @@ import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRep
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import { TestLogger } from "@/infra/observability/TestLogger";
 
 describe("AdminProcessRefund", () => {
@@ -51,6 +52,7 @@ describe("AdminProcessRefund", () => {
       emailSender: new InMemoryEmailSender(),
       refundEmailRenderer: new RefundTemplateRenderer(),
       logger: new TestLogger(),
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
     useCase = new AdminProcessRefund({ orderRepo, refundOverride });
 

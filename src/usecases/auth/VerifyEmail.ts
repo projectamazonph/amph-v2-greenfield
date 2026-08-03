@@ -32,6 +32,7 @@ import type { Logger } from "@/ports/observability/Logger";
 import { buildAppUrl } from "@/domain/shared/AppUrl";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { WelcomeRenderer } from "@/ports/email/WelcomeRenderer";
+import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 
 export type VerifyEmailInput = { token: string };
 export type VerifyEmailOutput = { user: User };
@@ -45,6 +46,7 @@ export interface VerifyEmailDeps {
   logger: Logger;
   emailSender: EmailSender;
   welcomeEmailRenderer: WelcomeRenderer;
+  emailTemplateRepo: IEmailTemplateRepository;
 }
 
 function sha256(input: string): string {
@@ -112,12 +114,18 @@ export class VerifyEmail {
     });
 
     // Welcome email (best-effort — never blocks verification itself).
+    const templateResult = await this.deps.emailTemplateRepo.findByType("welcome");
+    const template = templateResult.ok ? templateResult.value : null;
     const sendResult = await this.deps.emailSender.send({
       to: userResult.value.email,
-      subject: `Welcome to Project Amazon PH Academy, ${userResult.value.firstName}!`,
+      subject:
+        template?.subject ?? `Welcome to Project Amazon PH Academy, ${userResult.value.firstName}!`,
       react: this.deps.welcomeEmailRenderer.render({
         firstName: userResult.value.firstName,
         dashboardUrl: buildAppUrl("/dashboard"),
+        headlineOverride: template?.headline,
+        introBodyOverride: template?.introBody,
+        ctaLabelOverride: template?.ctaLabel,
       }),
     });
     if (!sendResult.ok) {

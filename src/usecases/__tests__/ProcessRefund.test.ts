@@ -10,6 +10,8 @@ import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRep
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
+import { createEmailTemplate } from "@/domain/entities/EmailTemplate";
 import { TestLogger } from "@/infra/observability/TestLogger";
 import { FixedClock, SystemClock } from "@/ports/system/Clock";
 
@@ -19,6 +21,7 @@ describe("ProcessRefund", () => {
   let courseRepo: InMemoryCourseRepository;
   let userRepo: InMemoryUserRepository;
   let emailSender: InMemoryEmailSender;
+  let emailTemplateRepo: InMemoryEmailTemplateRepository;
   let useCase: ProcessRefund;
 
   beforeEach(() => {
@@ -27,6 +30,7 @@ describe("ProcessRefund", () => {
     courseRepo = new InMemoryCourseRepository();
     userRepo = new InMemoryUserRepository();
     emailSender = new InMemoryEmailSender();
+    emailTemplateRepo = new InMemoryEmailTemplateRepository();
     // Use SystemClock so the seed's `new Date()` (which sets paymongoPaidAt)
     // matches the clock's "now". The window test overrides to a future date.
     useCase = new ProcessRefund({
@@ -38,6 +42,7 @@ describe("ProcessRefund", () => {
       emailSender,
       refundEmailRenderer: new RefundTemplateRenderer(),
       logger: new TestLogger(),
+      emailTemplateRepo,
     });
   });
 
@@ -172,6 +177,7 @@ describe("ProcessRefund", () => {
       emailSender,
       refundEmailRenderer: new RefundTemplateRenderer(),
       logger: new TestLogger(),
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
 
     const r = await useCase.execute({
@@ -288,6 +294,70 @@ describe("ProcessRefund", () => {
     expect(emailSender.sent).toHaveLength(1);
     expect(emailSender.sent[0]?.to).toBe("student@example.com");
     expect(emailSender.sent[0]?.subject).toContain("o1");
+  });
+
+  it("uses the admin-customized subject/headline/introBody when a 'refund' template exists; ctaLabel has no effect (no button on this email) (STORY-095.5)", async () => {
+    const templateResult = createEmailTemplate({
+      id: "tpl-refund",
+      type: "refund",
+      subject: "Custom refund subject",
+      headline: "Custom refund headline",
+      introBody: "Custom refund intro.",
+      ctaLabel: "Unused CTA",
+      updatedById: "admin-1",
+    });
+    if (!templateResult.ok) throw new Error("seed");
+    emailTemplateRepo.seed(templateResult.value);
+
+    await orderRepo.seedPaidOrder({
+      id: "o1",
+      userId: "u1",
+      courseId: "c1",
+      totalMinor: 1000,
+      paymongoPaymentId: "cs_paid_1",
+    });
+    await userRepo.create({
+      id: "u1",
+      email: "student@example.com",
+      passwordHash: "hash",
+      firstName: "Ana",
+      lastName: "Reyes",
+    });
+    courseRepo.seed([
+      {
+        id: "c1",
+        slug: "test-course",
+        title: "PPC Foundations",
+        tagline: "",
+        description: "",
+        price: { minor: 1000, currency: "PHP" },
+        curriculum: { sections: [] },
+        coverImage: null,
+        isFeatured: false,
+        displayOrder: 0,
+        status: "PUBLISHED",
+        courseTier: "STARTER",
+        previewLessonCount: 0,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        moduleIds: [],
+      } as never,
+    ]);
+
+    const r = await useCase.execute({
+      orderId: "o1",
+      amountMinor: 1000,
+      reason: "Customer requested",
+    });
+
+    expect(r.ok).toBe(true);
+    expect(emailSender.sent).toHaveLength(1);
+    expect(emailSender.sent[0]?.subject).toBe("Custom refund subject");
+    const html = emailSender.sent[0]!.html;
+    expect(html).toContain("Custom refund headline");
+    expect(html).toContain("Custom refund intro.");
+    // RefundEmail has no CTA button — the override is accepted for
+    // interface consistency but has nothing to render.
+    expect(html).not.toContain("Unused CTA");
   });
 
   it("does not fail the refund when the user/course lookup fails for the email step", async () => {

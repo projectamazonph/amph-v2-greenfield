@@ -29,6 +29,7 @@ import { InMemoryRateLimiter } from "@/infra/security/InMemoryRateLimiter";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { TestLogger } from "@/infra/observability/TestLogger";
 import { PasswordResetTemplateRenderer } from "@/infra/email/templates/PasswordResetRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import { FixedClock } from "@/ports/system/Clock";
 
 class StubHasher implements PasswordHasher {
@@ -100,6 +101,7 @@ describe("AdminGrantSubscription", () => {
       clock,
       ids: idGen,
       logger: new TestLogger(),
+      emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
     return new AdminGrantSubscription({
       userRepo,

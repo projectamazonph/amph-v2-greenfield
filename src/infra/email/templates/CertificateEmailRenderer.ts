@@ -9,15 +9,18 @@
 
 import type { ReactElement } from "react";
 import type { CertificateEmailRenderer as ICertificateEmailRenderer } from "@/ports/email/CertificateEmailRenderer";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 import { CertificateEmail } from "./CertificateEmail";
 
 export class CertificateEmailTemplateRenderer implements ICertificateEmailRenderer {
-  render(args: {
-    firstName: string;
-    courseTitle: string;
-    verificationHash: string;
-    verifyUrl: string;
-  }): ReactElement {
+  render(
+    args: {
+      firstName: string;
+      courseTitle: string;
+      verificationHash: string;
+      verifyUrl: string;
+    } & EmailTemplateOverride,
+  ): ReactElement {
     return CertificateEmail(args);
   }
 }

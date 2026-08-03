@@ -27,6 +27,8 @@ import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCert
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { CertificateEmailTemplateRenderer } from "@/infra/email/templates/CertificateEmailRenderer";
+import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
+import { createEmailTemplate } from "@/domain/entities/EmailTemplate";
 import { TestLogger } from "@/infra/observability/TestLogger";
 import { FixedClock } from "@/ports/system/Clock";
 import type { Course } from "@/domain/entities/Course";
@@ -115,6 +117,7 @@ function buildDeps(
     };
     idGen?: { newId: () => string; paymentRef: () => string; receiptNumber: () => string };
     clock?: FixedClock;
+    emailTemplateRepo?: InMemoryEmailTemplateRepository;
   } = {},
 ) {
   const courseRepo = new InMemoryCourseRepository();
@@ -148,6 +151,7 @@ function buildDeps(
       emailSender,
       certificateEmailRenderer,
       logger,
+      emailTemplateRepo: overrides.emailTemplateRepo ?? new InMemoryEmailTemplateRepository(),
     }),
   };
 }
@@ -526,5 +530,43 @@ describe("IssueCertificate", () => {
 
     expect(result.ok).toBe(true);
     expect(emailSender.sent).toHaveLength(0);
+  });
+
+  it("uses the admin-customized subject/headline/introBody/ctaLabel when a 'certificate' template exists (STORY-095.5)", async () => {
+    const emailTemplateRepo = new InMemoryEmailTemplateRepository();
+    const templateResult = createEmailTemplate({
+      id: "tpl-cert",
+      type: "certificate",
+      subject: "Custom certificate subject",
+      headline: "Custom certificate headline",
+      introBody: "Custom certificate intro.",
+      ctaLabel: "Custom View Cert",
+      updatedById: "admin-1",
+    });
+    if (!templateResult.ok) throw new Error("seed");
+    emailTemplateRepo.seed(templateResult.value);
+
+    const { useCase, courseRepo, enrollmentRepo, userRepo, emailSender } = buildDeps({
+      emailTemplateRepo,
+    });
+    courseRepo.seed([makeCourse({ title: "PPC Foundations" })]);
+    await enrollmentRepo.create(makeEnrollment({ progressPercent: 100 }));
+    await userRepo.create({
+      id: USER_ID,
+      email: "student@example.com",
+      passwordHash: "hash",
+      firstName: "Ana",
+      lastName: "Reyes",
+    });
+
+    const result = await useCase.execute({ userId: USER_ID, courseId: COURSE_ID });
+
+    expect(result.ok).toBe(true);
+    expect(emailSender.sent).toHaveLength(1);
+    expect(emailSender.sent[0]?.subject).toBe("Custom certificate subject");
+    const html = emailSender.sent[0]!.html;
+    expect(html).toContain("Custom certificate headline");
+    expect(html).toContain("Custom certificate intro.");
+    expect(html).toContain("Custom View Cert");
   });
 });

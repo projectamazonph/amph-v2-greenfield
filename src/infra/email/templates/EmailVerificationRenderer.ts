@@ -10,16 +10,17 @@
 
 import type { ReactElement } from "react";
 import type { EmailVerificationRenderer } from "@/ports/email/EmailVerificationRenderer";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 import { EmailVerificationEmail } from "./EmailVerificationEmail";
 
-export class EmailVerificationTemplateRenderer
-  implements EmailVerificationRenderer
-{
-  render(args: {
-    firstName: string;
-    verificationUrl: string;
-    expiresInHours: number;
-  }): ReactElement {
+export class EmailVerificationTemplateRenderer implements EmailVerificationRenderer {
+  render(
+    args: {
+      firstName: string;
+      verificationUrl: string;
+      expiresInHours: number;
+    } & EmailTemplateOverride,
+  ): ReactElement {
     return EmailVerificationEmail(args);
   }
 }

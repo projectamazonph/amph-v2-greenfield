@@ -9,18 +9,21 @@
 
 import type { ReactElement } from "react";
 import type { RefundRenderer as IRefundRenderer } from "@/ports/email/RefundRenderer";
+import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 import { RefundEmail } from "./RefundEmail";
 
 export class RefundTemplateRenderer implements IRefundRenderer {
-  render(args: {
-    firstName: string;
-    orderNumber: string;
-    courseTitle: string;
-    amountMinor: number;
-    currency: string;
-    refundedAt: Date;
-    reason: string;
-  }): ReactElement {
+  render(
+    args: {
+      firstName: string;
+      orderNumber: string;
+      courseTitle: string;
+      amountMinor: number;
+      currency: string;
+      refundedAt: Date;
+      reason: string;
+    } & EmailTemplateOverride,
+  ): ReactElement {
     return RefundEmail(args);
   }
 }

@@ -41,6 +41,7 @@ import type { EmailSender } from "@/ports/email/EmailSender";
 import type { LiveClassReminderRenderer } from "@/ports/email/LiveClassReminderRenderer";
 import type { Clock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
+import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 
 const DEFAULT_WINDOW_MINUTES = 60;
 
@@ -67,6 +68,7 @@ export interface SendLiveClassRemindersDeps {
   clock: Clock;
   logger: Logger;
   renderer: LiveClassReminderRenderer;
+  emailTemplateRepo: IEmailTemplateRepository;
 }
 
 export class SendLiveClassReminders {
@@ -99,6 +101,12 @@ export class SendLiveClassReminders {
     let emailsSent = 0;
     let classesProcessed = 0;
 
+    let template = null;
+    if (upcoming.length > 0) {
+      const templateResult = await this.deps.emailTemplateRepo.findByType("live_class_reminder");
+      template = templateResult.ok ? templateResult.value : null;
+    }
+
     for (const cls of upcoming) {
       // 3. Find the enrolled students for this course
       const enrollmentsResult = await this.deps.enrollmentRepo.findByCourseId(cls.courseId);
@@ -118,9 +126,7 @@ export class SendLiveClassReminders {
       }
 
       classesProcessed += 1;
-      const minutesUntilStart = Math.round(
-        (cls.scheduledAt.getTime() - now.getTime()) / 60_000,
-      );
+      const minutesUntilStart = Math.round((cls.scheduledAt.getTime() - now.getTime()) / 60_000);
 
       for (const studentId of studentIds) {
         // 4. Idempotency: skip if we already sent a reminder for this
@@ -151,11 +157,15 @@ export class SendLiveClassReminders {
           startsAt: cls.scheduledAt,
           joinUrl: cls.meetingUrl,
           minutesUntilStart,
+          headlineOverride: template?.headline,
+          introBodyOverride: template?.introBody,
+          ctaLabelOverride: template?.ctaLabel,
         });
 
         const sendResult = await this.deps.email.send({
           to: user.email,
-          subject: `Reminder: ${cls.title} starts in ${minutesUntilStart} minutes`,
+          subject:
+            template?.subject ?? `Reminder: ${cls.title} starts in ${minutesUntilStart} minutes`,
           react,
         });
         if (sendResult.ok) {
