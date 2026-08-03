@@ -40,7 +40,7 @@ export class PurgeResource {
   async execute(input: PurgeResourceInput): Promise<PurgeResourceResult> {
     const findResult = await this.deps.resourceRepo.findById(input.id);
     if (!findResult.ok) {
-      void this.deps.recordAuditLog.execute({
+      await this.deps.recordAuditLog.execute({
         actorId: input.actorId,
         action: "resource.purge_failed",
         targetId: input.id,
@@ -50,7 +50,7 @@ export class PurgeResource {
       return findResult;
     }
     if (findResult.value === null) {
-      void this.deps.recordAuditLog.execute({
+      await this.deps.recordAuditLog.execute({
         actorId: input.actorId,
         action: "resource.purge_failed",
         targetId: input.id,
@@ -64,7 +64,7 @@ export class PurgeResource {
 
     const deleteResult = await this.deps.resourceRepo.hardDelete(input.id);
     if (!deleteResult.ok) {
-      void this.deps.recordAuditLog.execute({
+      await this.deps.recordAuditLog.execute({
         actorId: input.actorId,
         action: "resource.purge_failed",
         targetId: input.id,

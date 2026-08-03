@@ -13,7 +13,15 @@ export type ResourceFileUploadError =
 
 /** Storage key: resources/<resourceId>/<sanitized original filename>. */
 function buildResourceFileKey(resourceId: string, originalName: string): string {
-  const sanitized = originalName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-120);
+  let sanitized = originalName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-120);
+  // The regex above already strips every "/" and "\", so a path-traversal
+  // sequence like "../../etc/passwd" can't survive as multiple segments —
+  // but a bare "." or ".." is still a single valid (if useless) path
+  // segment. Reject those specifically rather than relying on the fixed
+  // "resources/<id>/" prefix alone to contain them.
+  if (sanitized === "." || sanitized === "..") {
+    sanitized = "upload";
+  }
   return `resources/${resourceId}/${sanitized}`;
 }
 

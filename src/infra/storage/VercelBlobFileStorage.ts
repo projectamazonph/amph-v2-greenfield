@@ -31,6 +31,10 @@ export class VercelBlobFileStorage implements IFileStorage {
         contentType: input.contentType,
         token: this.token,
         addRandomSuffix: false,
+        // put() rejects an existing pathname by default; a resource replacing
+        // its uploaded file re-uses the same sanitized-filename key, so this
+        // must be an overwrite, not a first-time create.
+        allowOverwrite: true,
       });
       return { ok: true, value: { url: blob.url, key: input.key } };
     } catch (err: unknown) {

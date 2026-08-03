@@ -47,7 +47,22 @@ export default async function ResourcesPage() {
     subscriptionTier: user.subscriptionTier,
   });
 
-  const items = result.ok ? result.value : [];
+  if (!result.ok) {
+    return (
+      <StudentShell user={user}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Download center</h1>
+        </div>
+        <Card padding={6}>
+          <p className={styles.empty}>
+            Something went wrong loading the download center. Please try again.
+          </p>
+        </Card>
+      </StudentShell>
+    );
+  }
+
+  const items = result.value;
 
   const byCategory = new Map<ResourceCategory, ResourceWithAccess[]>();
   for (const item of items) {

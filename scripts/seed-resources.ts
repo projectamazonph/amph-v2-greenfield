@@ -176,12 +176,12 @@ const RESOURCES: ResourceDef[] = [
 
 // ── Upsert logic ─────────────────────────────────────────────────────────────
 
-async function upsertResource(def: ResourceDef, repo: PrismaResourceRepository): Promise<void> {
+async function upsertResource(def: ResourceDef, repo: PrismaResourceRepository): Promise<boolean> {
   const existing = await repo.findById(def.id);
 
   if (!existing.ok) {
     console.error(`  [ERROR] Failed to look up "${def.id}":`, existing.error);
-    return;
+    return false;
   }
 
   if (existing.value !== null) {
@@ -197,36 +197,38 @@ async function upsertResource(def: ResourceDef, repo: PrismaResourceRepository):
     });
     if (!updated.ok) {
       console.error(`  [ERROR] Failed to build update for "${def.id}":`, updated.error);
-      return;
+      return false;
     }
     const result = await repo.update(updated.value);
     if (!result.ok) {
       console.error(`  [ERROR] Failed to update "${def.id}":`, result.error);
-      return;
+      return false;
     }
     console.log(`  [UPDATE] "${def.id}" → ${def.title}`);
-  } else {
-    const created = createResource({
-      id: def.id,
-      title: def.title,
-      description: def.description,
-      category: def.category,
-      fileType: def.fileType,
-      fileUrl: def.fileUrl,
-      fileKey: null,
-      accessTier: def.accessTier,
-    });
-    if (!created.ok) {
-      console.error(`  [ERROR] Failed to build "${def.id}":`, created.error);
-      return;
-    }
-    const result = await repo.create(created.value);
-    if (!result.ok) {
-      console.error(`  [ERROR] Failed to create "${def.id}":`, result.error);
-      return;
-    }
-    console.log(`  [CREATE] "${def.id}" → ${def.title}`);
+    return true;
   }
+
+  const created = createResource({
+    id: def.id,
+    title: def.title,
+    description: def.description,
+    category: def.category,
+    fileType: def.fileType,
+    fileUrl: def.fileUrl,
+    fileKey: null,
+    accessTier: def.accessTier,
+  });
+  if (!created.ok) {
+    console.error(`  [ERROR] Failed to build "${def.id}":`, created.error);
+    return false;
+  }
+  const result = await repo.create(created.value);
+  if (!result.ok) {
+    console.error(`  [ERROR] Failed to create "${def.id}":`, result.error);
+    return false;
+  }
+  console.log(`  [CREATE] "${def.id}" → ${def.title}`);
+  return true;
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -241,7 +243,7 @@ async function main() {
 
   const dryRun = values["dry-run"] === true;
 
-  console.log("\n📁 AMPH Download Center Resource Seed");
+  console.log("\nAMPH Download Center Resource Seed");
   console.log("─".repeat(40));
   console.log(`  Mode: ${dryRun ? "DRY RUN (no writes)" : "LIVE"}`);
   console.log(`  Resources: ${RESOURCES.length}`);
@@ -251,21 +253,26 @@ async function main() {
     for (const def of RESOURCES) {
       console.log(`  [DRY]   "${def.id}" (${def.category}/${def.accessTier}) → ${def.title}`);
     }
-    console.log("\n✅ Dry run complete.\n");
+    console.log("\n[OK] Dry run complete.\n");
     return;
   }
 
   const repo = new PrismaResourceRepository(prisma);
+  let failures = 0;
   for (const def of RESOURCES) {
-    await upsertResource(def, repo);
+    if (!(await upsertResource(def, repo))) failures += 1;
   }
 
-  console.log("\n✅ Done. Download center resources are ready.\n");
+  if (failures > 0) {
+    throw new Error(`${failures} of ${RESOURCES.length} resources failed to seed.`);
+  }
+
+  console.log("\n[OK] Done. Download center resources are ready.\n");
 }
 
 main()
   .catch((err) => {
-    console.error("\n❌ Seed failed:", err);
-    process.exit(1);
+    console.error("\n[FAIL] Seed failed:", err);
+    process.exitCode = 1;
   })
   .finally(() => prisma.$disconnect());

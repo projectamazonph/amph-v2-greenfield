@@ -42,6 +42,12 @@ export async function updateResourceAction(
       return { ok: false, error: uploadResult.error };
     }
     patch = { ...patch, fileUrl: uploadResult.fileUrl, fileKey: uploadResult.fileKey };
+  } else if (patch.fileUrl !== undefined) {
+    // A plain URL edit without a new upload switches this resource to an
+    // external link (or a different static asset) we don't own — clear
+    // fileKey so UpdateResource's cleanup deletes the now-orphaned upload
+    // and future edits don't treat this resource as still owning it.
+    patch = { ...patch, fileKey: null };
   }
 
   const result = await container.updateResource.execute({

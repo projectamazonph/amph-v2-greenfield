@@ -2,11 +2,11 @@
  * `RecordResourceDownload` — authorize + record a download-center
  * download.
  *
- * STORY-098. There's no file-storage layer in this codebase, so the
- * actual bytes live at an external `fileUrl` (Google Drive/Sheets or
- * a public asset URL). This use case is what stands between "student
- * clicks Download" and that external URL: it re-checks the resource
- * is published and the viewer's subscription tier actually meets the
+ * STORY-098 / STORY-098.5. `fileUrl` may be a static asset, an
+ * admin-pasted external link, or an `IFileStorage` upload URL — this
+ * use case doesn't care which. It's what stands between "student
+ * clicks Download" and that URL: it re-checks the resource is
+ * published and the viewer's subscription tier actually meets the
  * resource's `accessTier` (a student can't bypass the lock by hitting
  * the download route directly), then increments the download counter
  * and writes an audit entry before handing back the URL to redirect
@@ -66,7 +66,7 @@ export class RecordResourceDownload {
     const incrementResult = await this.deps.resourceRepo.incrementDownloadCount(resource.id);
     if (!incrementResult.ok) return incrementResult;
 
-    void this.deps.recordAuditLog.execute({
+    await this.deps.recordAuditLog.execute({
       actorId: input.userId,
       action: "resource.downloaded",
       targetId: resource.id,

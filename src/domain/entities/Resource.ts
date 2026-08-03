@@ -202,7 +202,7 @@ export function updateResource(
   const fileUrl = patch.fileUrl !== undefined ? patch.fileUrl.trim() : original.fileUrl;
   if (!isValidUrl(fileUrl)) errors.push({ kind: "invalid_file_url" });
 
-  const fileKey = patch.fileKey !== undefined ? patch.fileKey : original.fileKey;
+  const fileKey = patch.fileKey !== undefined ? patch.fileKey?.trim() || null : original.fileKey;
 
   const accessTier = patch.accessTier !== undefined ? patch.accessTier : original.accessTier;
   if (!isValidResourceAccessTier(accessTier)) errors.push({ kind: "invalid_access_tier" });
@@ -236,11 +236,13 @@ export function updateResource(
  * Accepts either a root-relative path into `public/` (`/downloads/...`,
  * for pre-installed static assets) or an absolute http(s) URL (an
  * external link, or a storage URL from `IFileStorage`). Rejects
- * protocol-relative (`//host/...`) and anything else that isn't
- * unambiguously same-origin or a real http(s) URL.
+ * protocol-relative (`//host/...`) and backslash-prefixed
+ * (`/\host/...`) paths — some browsers normalize `/\` to `//` and
+ * navigate off-origin, so a single leading slash followed by a second
+ * slash or backslash is not a safe same-origin path.
  */
 function isValidUrl(s: string): boolean {
-  if (s.startsWith("/") && !s.startsWith("//")) return true;
+  if (s.startsWith("/") && !/^\/[/\\]/.test(s)) return true;
   try {
     const u = new URL(s);
     return u.protocol === "http:" || u.protocol === "https:";

@@ -52,6 +52,13 @@ describe("Resource entity", () => {
       expect(r.error.kind).toBe("invalid_file_url");
     });
 
+    it("rejects a backslash-prefixed fileUrl (browsers normalize /\\ to //)", () => {
+      const r = createResource({ ...baseInput, fileUrl: "/\\evil.example.com/file.pdf" });
+      expect(r.ok).toBe(false);
+      if (r.ok) return;
+      expect(r.error.kind).toBe("invalid_file_url");
+    });
+
     it("stores fileKey when the file was uploaded via IFileStorage", () => {
       const r = createResource({
         ...baseInput,
@@ -220,6 +227,16 @@ describe("Resource entity", () => {
       const r = updateResource(withKey.value, {
         fileUrl: "https://drive.google.com/file/d/xyz",
         fileKey: null,
+      });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.fileKey).toBeNull();
+    });
+
+    it("normalizes a whitespace-only patched fileKey to null", () => {
+      const r = updateResource(resource, {
+        fileUrl: "https://drive.google.com/file/d/xyz",
+        fileKey: "   ",
       });
       expect(r.ok).toBe(true);
       if (!r.ok) return;
