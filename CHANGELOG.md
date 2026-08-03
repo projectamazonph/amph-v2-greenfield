@@ -4,6 +4,30 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-03: Download center — pre-installed resources + file upload (STORY-098, STORY-098.5)
+
+New `/resources` download center (student-facing) and `/admin/resources`
+(admin CRUD): guides, templates, automation tools, cheat sheets, and
+student handouts, gated by `CourseAccessTier` the same way courses are.
+`GET /api/resources/[id]/download` is the real access-enforcement and
+download-tracking endpoint, not just the UI's lock icon.
+
+Shipped with 10 real pre-installed files in `public/downloads/`
+(`pnpm db:seed:resources` to load them): 2 PDF guides, 3 Excel
+templates, 1 Excel automation tool (an STR report scanner that flags
+Winner/Bleeder/Watch search terms via live formulas against adjustable
+thresholds), 2 PDF cheat sheets, and a PDF + a DOCX handout.
+
+Admins can also upload files directly instead of only pasting an
+external link, via a new `IFileStorage` port (`VercelBlobFileStorage`
+in production when `BLOB_READ_WRITE_TOKEN` is set, `LocalFileStorage`
+as a dev-only fallback — it does not persist on Vercel's serverless
+filesystem). Replacing an uploaded file cleans up the old one; a
+separate "Permanently delete" action removes a resource and its file
+entirely, distinct from the existing unpublish action.
+
+See `docs/stories/STORY-098.md` and `docs/stories/STORY-098.5.md`.
+
 ### 2026-08-03: Add embedded Amazon Ad Console page
 
 New `/tools/ad-console` page embeds the external campaign-management
