@@ -85,12 +85,20 @@ export default async function AdConsolePage() {
         </div>
 
         <div className={styles.frameWrap}>
+          {/*
+            Scripts/forms/same-origin (scoped to the console's own origin,
+            not ours) so the SPA and its login flow work; popups so an
+            Amazon OAuth-style sign-in can open in a new window; top
+            navigation only on user activation so the console can't
+            silently redirect the whole tab out from under the student.
+          */}
           <iframe
             className={styles.frame}
             src={AD_CONSOLE_URL}
             title="Amazon Ad Console"
             allow="clipboard-write"
             referrerPolicy="no-referrer"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
           />
         </div>
       </main>
