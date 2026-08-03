@@ -25,7 +25,16 @@ export interface User {
   readonly role: Role;
   readonly subscriptionTier: SubscriptionTier;
   readonly verificationStatus: VerificationStatus;
-  /** Course IDs the user has directly enrolled in (paid or granted). */
+  /**
+   * @deprecated Proposal 8: this denormalized copy is no longer
+   * written or read by application code — the `Enrollment` table
+   * (`IEnrollmentRepository`) is the sole source of truth for course
+   * access. Kept on the entity/schema for now (multi-step removal:
+   * stop reading/writing first, drop the column in a later pass) so
+   * this isn't a breaking schema change on its own. Do not add new
+   * reads or writes of this field — use `IEnrollmentRepository`
+   * instead.
+   */
   readonly enrolledCourseIds: readonly string[];
   /**
    * Whether admin TOTP 2FA is active for this account. The secret
@@ -44,6 +53,14 @@ export interface User {
    * derived from it.
    */
   readonly emailVerifiedAt: Date | null;
+  /**
+   * Proposal 1 (account lockout): set once a consecutive-failed-login
+   * streak crosses the threshold; cleared on the next successful
+   * login. Optional so existing call sites that build a `User` literal
+   * directly (mocks, fixtures) don't need updating — absence means
+   * "not locked", same as `null`. See UserRepository.recordLoginAttempt().
+   */
+  readonly lockedUntil?: Date | null;
 }
 
 export interface CreateUserParams {
@@ -68,6 +85,7 @@ export function createUser(params: {
   createdAt?: Date;
   totalXp?: number;
   emailVerifiedAt?: Date | null;
+  lockedUntil?: Date | null;
 }): Result<User, { kind: "invalid_input"; message: string }> {
   if (!params.firstName.trim()) {
     return Result.err({ kind: "invalid_input", message: "First name is required." });
@@ -90,6 +108,7 @@ export function createUser(params: {
       createdAt: params.createdAt ?? new Date(),
       totalXp: params.totalXp ?? 0,
       emailVerifiedAt: params.emailVerifiedAt ?? null,
+      lockedUntil: params.lockedUntil ?? null,
     }),
   );
 }

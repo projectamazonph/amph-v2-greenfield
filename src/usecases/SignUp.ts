@@ -13,6 +13,7 @@
  */
 
 import { Result } from "@/domain/shared/Result";
+import { createEmail } from "@/domain/values/Email";
 import type { UserRepository, UserError } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
@@ -33,7 +34,8 @@ export type SignUpError =
   | { kind: "weak_password"; score: number }
   | { kind: "invalid_name"; field: "firstName" | "lastName" }
   | { kind: "invalid_email" }
-  | { kind: "db_error"; message: string };
+  | { kind: "db_error"; message: string }
+  | { kind: "hash_error"; message: string };
 
 export type SignUpOutput =
   { ok: true; userId: string; email: string } | { ok: false; error: SignUpError };
@@ -72,9 +74,11 @@ export class SignUp {
     }
 
     // 2. Validate email format
-    if (!this.isValidEmail(input.email)) {
+    const emailResult = createEmail(input.email);
+    if (Result.isErr(emailResult)) {
       return { ok: false, error: { kind: "invalid_email" } };
     }
+    const email = emailResult.value;
 
     // 3. Validate password strength
     const score = assessPassword(input.password);
@@ -83,7 +87,7 @@ export class SignUp {
     }
 
     // 4. Check email uniqueness
-    const emailExists = await this.userRepo.emailExists(input.email);
+    const emailExists = await this.userRepo.emailExists(email);
     if (Result.isErr(emailExists)) {
       return { ok: false, error: { kind: "db_error", message: "email check failed" } };
     }
@@ -92,13 +96,17 @@ export class SignUp {
     }
 
     // 5. Hash password (delegated to infra — this interface will be added in STORY-011)
-    const passwordHash = await this.hashPassword(input.password);
+    const hashResult = await this.hashPassword(input.password);
+    if (Result.isErr(hashResult)) {
+      return { ok: false, error: hashResult.error };
+    }
+    const passwordHash = hashResult.value;
 
     // 6. Persist user
     const id = this.idGen.newId();
     const createResult = await this.userRepo.create({
       id,
-      email: input.email,
+      email,
       passwordHash,
       firstName: input.firstName,
       lastName: input.lastName,
@@ -134,15 +142,13 @@ export class SignUp {
     };
   }
 
-  private isValidEmail(email: string): boolean {
-    return email.includes("@") && email.includes(".") && email.length <= 254;
-  }
-
-  private async hashPassword(password: string): Promise<string> {
+  private async hashPassword(
+    password: string,
+  ): Promise<Result<string, { kind: "hash_error"; message: string }>> {
     const result = await this.hasher.hash(password);
     if (Result.isErr(result)) {
-      throw new Error("Password hashing failed — this should not happen in production");
+      return Result.err({ kind: "hash_error", message: "Password hashing failed" });
     }
-    return result.value;
+    return Result.ok(result.value);
   }
 }

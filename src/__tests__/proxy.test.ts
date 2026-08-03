@@ -69,6 +69,37 @@ describe("proxy (src/proxy.ts)", () => {
     expect(source).toMatch(/img-src[^"]*https:/);
   });
 
+  it("uses a per-request nonce on script-src instead of 'unsafe-inline' (Proposal 2)", async () => {
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).toMatch(/script-src 'self' 'nonce-\$\{nonce\}'/);
+    expect(source).not.toMatch(/script-src 'self' 'unsafe-inline'/);
+  });
+
+  it("does NOT use 'strict-dynamic' on script-src (breaks Turbopack route-loading chunks — see comment)", async () => {
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    // Check the actual CSP directive line, not the explanatory comment
+    // above it (which deliberately mentions "strict-dynamic" by name).
+    const scriptSrcLine = source.match(/`script-src[^`]*`/)?.[0];
+    expect(scriptSrcLine).toBeDefined();
+    expect(scriptSrcLine).not.toMatch(/strict-dynamic/);
+  });
+
+  it("threads the nonce to Server Components via an x-nonce request header (Proposal 2)", async () => {
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).toMatch(/requestHeaders\.set\("x-nonce", nonce\)/);
+  });
+
+  it("sets the CSP (with nonce) on the request headers too, not just the response, so Next's own inline scripts pick it up (Proposal 2)", async () => {
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).toMatch(/requestHeaders\.set\("Content-Security-Policy", cspHeaderValue\)/);
+    expect(source).toMatch(/NextResponse\.next\(\{ request: \{ headers: requestHeaders \} \}\)/);
+  });
+
+  it("still allows 'unsafe-inline' on style-src (React inline style attributes, not attempted this pass)", async () => {
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).toMatch(/style-src 'self' 'unsafe-inline'/);
+  });
+
   it("has a comment explaining why / is not redirected", async () => {
     // The fix isn't enough on its own — without a comment explaining
     // WHY the redirect was removed, the next refactor is likely to

@@ -242,6 +242,59 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  async recordLoginAttempt(
+    id: string,
+    outcome:
+      { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date; now: Date },
+  ): Promise<Result<{ lockedUntil: Date | null }, UserError>> {
+    try {
+      if (outcome.kind === "success") {
+        await this.db.user.update({
+          where: { id },
+          data: { failedLoginCount: 0, lockedUntil: null },
+        });
+        return Result.ok({ lockedUntil: null });
+      }
+
+      // If a previous lockout has already expired, the streak restarts
+      // at 1 instead of incrementing — otherwise the first wrong
+      // password after the window passes would find the counter still
+      // sitting at maxAttempts and re-lock immediately.
+      const existing = await this.db.user.findUnique({
+        where: { id },
+        select: { lockedUntil: true },
+      });
+      if (!existing) return Result.err({ kind: "not_found" });
+      const priorLockExpired = existing.lockedUntil !== null && existing.lockedUntil <= outcome.now;
+
+      const row = await this.db.user.update({
+        where: { id },
+        data: priorLockExpired
+          ? { failedLoginCount: 1, lockedUntil: null }
+          : { failedLoginCount: { increment: 1 } },
+        select: { failedLoginCount: true },
+      });
+      if (row.failedLoginCount < outcome.maxAttempts) {
+        return Result.ok({ lockedUntil: null });
+      }
+      await this.db.user.update({
+        where: { id },
+        data: { lockedUntil: outcome.lockUntil },
+      });
+      return Result.ok({ lockedUntil: outcome.lockUntil });
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   // ── Private helpers ────────────────────────────────────────
 
   private mapRow(row: {
@@ -257,6 +310,7 @@ export class PrismaUserRepository implements UserRepository {
     createdAt: Date;
     totalXp: number;
     emailVerifiedAt: Date | null;
+    lockedUntil?: Date | null;
   }) {
     return Object.freeze({
       id: row.id,
@@ -271,6 +325,7 @@ export class PrismaUserRepository implements UserRepository {
       createdAt: row.createdAt,
       totalXp: row.totalXp,
       emailVerifiedAt: row.emailVerifiedAt,
+      lockedUntil: row.lockedUntil ?? null,
     });
   }
 }

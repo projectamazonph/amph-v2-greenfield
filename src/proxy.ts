@@ -46,45 +46,73 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Security headers ──────────────────────────────────────
-  const res = NextResponse.next();
+  // Proposal 2: nonce-based CSP. A fresh nonce per request replaces
+  // 'unsafe-inline' on script-src. The nonce is threaded to Server
+  // Components as the `x-nonce` request header, read via `headers()`
+  // wherever an inline `<script>` needs `nonce={nonce}` (see
+  // verify-email/page.tsx and certificates/[hash]/page.tsx); Next.js
+  // itself auto-applies the same nonce to its own framework-injected
+  // inline scripts, but only if the CSP header containing that nonce
+  // is present on the *request* headers, not just the response —
+  // hence setting it on `requestHeaders` below before constructing
+  // the response.
+  //
+  // Deliberately NOT adding 'strict-dynamic': verified via a real
+  // Chromium run (Playwright) against `next dev` that 'strict-dynamic'
+  // revokes the 'self' source for every script, including Next's own
+  // same-origin `/_next/static/chunks/*` route-loading (loading.tsx)
+  // scripts — Turbopack doesn't consistently propagate nonce trust to
+  // those dynamically-inserted chunks (a known, still-open pain point
+  // across the Next.js/Turbopack ecosystem, not fixable from
+  // application code alone), so 'strict-dynamic' broke route loading
+  // states across the app. Plain 'self' + nonce avoids that: same-
+  // origin chunks stay trusted via 'self' (no strict-dynamic to
+  // revoke it), and the two inline scripts we control use the nonce.
+  //
+  // style-src keeps 'unsafe-inline': this app renders plenty of React
+  // inline `style={{...}}` attributes, and a `style` attribute nonce
+  // isn't part of the CSP spec (only 'unsafe-inline' or
+  // 'unsafe-hashes' cover it) — hardening that would mean migrating
+  // every inline style to CSS Modules first, out of scope here.
+  // btoa(), not Buffer.from(...).toString("base64") — this file runs on
+  // Next.js's Edge Runtime by default (no `export const runtime =
+  // "nodejs"`), and btoa is the Web-standard API guaranteed there,
+  // vs. relying on Buffer's Edge Runtime polyfill.
+  const nonce = btoa(crypto.randomUUID());
+  const cspHeaderValue = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    "style-src 'self' 'unsafe-inline'",
+    // https: (not scoped to a single host) because Course.coverImage is a
+    // free-text admin-entered URL, not restricted to one CDN — see
+    // src/app/courses/page.tsx and src/app/courses/[slug]/page.tsx.
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://api.paymongo.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+    // There was no frame-src directive at all before, so it fell back to
+    // default-src 'self' and silently blocked every iframe on the site —
+    // the embedded Amazon Ad Console (src/app/tools/ad-console/page.tsx)
+    // and the YouTube/Vimeo lesson-video embeds (LessonContent.tsx)
+    // included.
+    "frame-src 'self' https://amazon-ad-console.vercel.app https://www.youtube.com https://player.vimeo.com",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", cspHeaderValue);
+
+  const res = NextResponse.next({ request: { headers: requestHeaders } });
 
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  // Pragmatic first CSP (production-readiness audit): 'unsafe-inline' on
-  // script-src/style-src is needed because this app has no nonce plumbing
-  // through Next's RSC payload and CSS-module inline styles yet. A
-  // nonce-based CSP that drops 'unsafe-inline' is a real hardening
-  // follow-up, not implemented here. connect-src allows PayMongo (API
-  // calls from checkout) and Sentry's ingest endpoints; checkout itself
-  // is a top-level redirect (window.location.href), never an iframe, so
-  // no frame-src allowance is needed for it. frame-src allows the
-  // embedded Amazon Ad Console (src/app/tools/ad-console/page.tsx) plus
-  // the YouTube/Vimeo lesson-video embeds (LessonContent.tsx) — there
-  // was no frame-src directive at all before, so it fell back to
-  // default-src 'self' and silently blocked every iframe on the site,
-  // lesson videos included.
-  res.headers.set(
-    "Content-Security-Policy",
-    [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
-      "style-src 'self' 'unsafe-inline'",
-      // https: (not scoped to a single host) because Course.coverImage is a
-      // free-text admin-entered URL, not restricted to one CDN — see
-      // src/app/courses/page.tsx and src/app/courses/[slug]/page.tsx.
-      "img-src 'self' data: blob: https:",
-      "font-src 'self' data:",
-      "connect-src 'self' https://api.paymongo.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
-      "frame-src 'self' https://amazon-ad-console.vercel.app https://www.youtube.com https://player.vimeo.com",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "object-src 'none'",
-      "upgrade-insecure-requests",
-    ].join("; "),
-  );
+  res.headers.set("Content-Security-Policy", cspHeaderValue);
 
   // ── Route protection ─────────────────────────────────────
   const isProtected = isProtectedPath(pathname) && !isAdminLoginPath(pathname);

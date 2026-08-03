@@ -4,6 +4,12 @@
  * Uses a hand-rolled in-memory PrismaClient fake so the test stays fast
  * and DB-free, following the pattern established by
  * PrismaLiveClassRepository.test.ts.
+ *
+ * Merge note: `main` independently added a test file of the same name
+ * for the same adapter (PR #275, "Proposal 3"). This version wins the
+ * merge — it additionally covers `watchedRecordingAt` (required by
+ * STORY-100) and exercises every db_error branch via fault-injection
+ * flags on the fake, which main's variant didn't have.
  */
 
 import { describe, it, expect, beforeEach } from "vitest";

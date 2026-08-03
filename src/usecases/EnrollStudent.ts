@@ -16,15 +16,23 @@
  *
  * Steps:
  *  1. Validate user exists
- *  2. Check user is not already enrolled (pre-check on User.enrolledCourseIds)
- *  3. Validate course exists and is PUBLISHED
- *  4. **P0-1: paywall check** — if course is paid, require order or admin_grant
- *  5. Check no Enrollment record exists (DB uniqueness)
- *  6. Create Enrollment record
- *  7. Append courseId to User.enrolledCourseIds
- *  8. Return the Enrollment
+ *  2. Validate course exists and is PUBLISHED
+ *  3. **P0-1: paywall check** — if course is paid, require order or admin_grant
+ *  4. Check no Enrollment record exists (DB uniqueness, also serves as
+ *     the "already enrolled" check)
+ *  5. Build the Enrollment record
+ *  6. Persist it
+ *  7. Return the Enrollment
  *
  * Fail Fast: returns typed errors early before touching persistence.
+ *
+ * Proposal 8: this used to also append courseId to
+ * User.enrolledCourseIds as a denormalized copy, which
+ * TierAccessPolicy read directly for access checks. That created a
+ * dual-source-of-truth risk — if the User.update() write failed after
+ * the Enrollment row was already committed, the user would have a
+ * real Enrollment but no access, silently. Enrollment is now the only
+ * source of truth; TierAccessPolicy queries it directly.
  */
 
 import { Result } from "@/domain/shared/Result";
@@ -55,10 +63,7 @@ export type EnrollStudentError =
   | { kind: "already_enrolled" }
   | { kind: "paid_no_entitlement" };
 
-export type EnrollStudentResult = Result<
-  Enrollment,
-  EnrollStudentError
->;
+export type EnrollStudentResult = Result<Enrollment, EnrollStudentError>;
 
 /** Minimal ID generator interface — EnrollStudent only needs newId(). */
 export type IdGen = { newId(): string };
@@ -82,12 +87,6 @@ export class EnrollStudent {
     const userResult = await userRepo.findById(input.userId);
     if (Result.isErr(userResult)) {
       return Result.err({ kind: "user_not_found" });
-    }
-    const user = userResult.value;
-
-    // ── Pre-check: already enrolled via User.enrolledCourseIds ─
-    if (user.enrolledCourseIds.includes(input.courseId)) {
-      return Result.err({ kind: "already_enrolled" });
     }
 
     // ── 2. Course must exist and be PUBLISHED ───────────────
@@ -126,10 +125,7 @@ export class EnrollStudent {
     // Free courses: any entitlement is allowed.
 
     // ── 4. DB-level uniqueness check ─────────────────────────
-    const existing = await enrollmentRepo.findByUserIdAndCourseId(
-      input.userId,
-      input.courseId,
-    );
+    const existing = await enrollmentRepo.findByUserIdAndCourseId(input.userId, input.courseId);
     if (existing !== null) {
       return Result.err({ kind: "already_enrolled" });
     }
@@ -159,16 +155,7 @@ export class EnrollStudent {
       return Result.err({ kind: "user_not_found" }); // closest error
     }
 
-    // ── 7. Update User.enrolledCourseIds ────────────────────
-    const updatedUserResult = await userRepo.update(input.userId, {
-      enrolledCourseIds: [...user.enrolledCourseIds, input.courseId],
-    });
-    if (Result.isErr(updatedUserResult)) {
-      // Non-fatal: enrollment is persisted; access policy will still grant access
-      // Log here in production. For now, continue.
-    }
-
-    // ── 8. Return enrollment ─────────────────────────────────
+    // ── 7. Return enrollment ─────────────────────────────────
     return Result.ok(enrollment);
   }
 }

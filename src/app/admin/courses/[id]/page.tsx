@@ -13,6 +13,7 @@ import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
 import { formatPhp } from "@/app/admin/_lib/formatPhp";
@@ -115,15 +116,20 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
         }
         actions={
           <div className={styles.actions}>
-            <Link href={`/courses/${course.slug}`} className="btn btn-ghost" target="_blank">View as Student</Link>
+            <Link href={`/courses/${course.slug}`} className="btn btn-ghost" target="_blank">
+              View as Student
+            </Link>
             <Link href={`/admin/courses/${course.id}/edit`} className={styles.editButton}>
               Edit
             </Link>
             {course.status !== "ARCHIVED" && (
-              <form action={handleArchive} onClick={(e) => { if (!window.confirm('Are you sure? This cannot be undone.')) { e.preventDefault(); } }}>
-                <button type="submit" className={styles.archiveButton}>
+              <form action={handleArchive}>
+                <ConfirmSubmitButton
+                  confirmMessage="Are you sure? This cannot be undone."
+                  className={styles.archiveButton}
+                >
                   Archive
-                </button>
+                </ConfirmSubmitButton>
               </form>
             )}
           </div>
@@ -237,14 +243,14 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
                         >
                           Edit
                         </Link>
-                        <form action={handleDeleteModule.bind(null, m.id)} onClick={(e) => { if (!window.confirm('Are you sure? This cannot be undone.')) { e.preventDefault(); } }}>
-                          <button
-                            type="submit"
+                        <form action={handleDeleteModule.bind(null, m.id)}>
+                          <ConfirmSubmitButton
+                            confirmMessage="Are you sure? This cannot be undone."
                             className={styles.deleteButton}
                             aria-label={`Delete ${m.title}`}
                           >
                             Delete
-                          </button>
+                          </ConfirmSubmitButton>
                         </form>
                       </div>
                     </div>

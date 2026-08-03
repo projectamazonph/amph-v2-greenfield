@@ -15,11 +15,19 @@ import type { AccessDecision } from "@/domain/values/AccessDecision";
 import { subscriptionMeetsCourseTier } from "@/domain/values/CourseAccessTier";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 
 export class TierAccessPolicy implements IAccessPolicy {
   constructor(
     private readonly userRepo: UserRepository,
     private readonly courseRepo: CourseRepository,
+    // Proposal 8: the Enrollment table is the source of truth for "is
+    // this user enrolled in this course" — User.enrolledCourseIds was
+    // a denormalized copy that could silently drift from it (e.g. if
+    // the User.update() write in EnrollStudent failed after the
+    // Enrollment row was already committed). Access control now reads
+    // Enrollment directly instead of the copy.
+    private readonly enrollmentRepo: IEnrollmentRepository,
   ) {}
 
   async canAccess(userId: string, courseId: string): Promise<AccessDecision> {
@@ -43,7 +51,21 @@ export class TierAccessPolicy implements IAccessPolicy {
     const course = courseResult.value;
 
     // Rule 1: enrolled → always full access
-    if (user.enrolledCourseIds.includes(courseId)) {
+    //
+    // IEnrollmentRepository.findByUserIdAndCourseId() has no Result
+    // error channel, and PrismaEnrollmentRepository's underlying
+    // findUnique() call isn't itself wrapped in a try/catch (only its
+    // row-mapping step is) — so a transient DB error here would throw
+    // uncaught into this access check. Fail closed the same way the
+    // user/course lookups above already do, rather than letting a
+    // transient DB error surface as an unhandled 500.
+    let enrollment: Awaited<ReturnType<typeof this.enrollmentRepo.findByUserIdAndCourseId>>;
+    try {
+      enrollment = await this.enrollmentRepo.findByUserIdAndCourseId(userId, courseId);
+    } catch {
+      return { kind: "denied_not_authenticated" };
+    }
+    if (enrollment !== null) {
       return { kind: "allowed" };
     }
 

@@ -8,6 +8,14 @@
  * cold start / redeploy. The `live_class_registrations` table already
  * existed (migration 20260801000000_live_class_registration); no adapter
  * had ever been written to read/write it.
+ *
+ * Merge note: `main` independently fixed the same gap in the same window
+ * (PR #275, "Proposal 3") with a functionally-identical adapter. This
+ * version wins the merge because STORY-100 also needs `watchedRecordingAt`
+ * mapped, which main's version didn't have. Mirrors
+ * PrismaEnrollmentRepository's mapping/error-handling conventions
+ * (P2002 → already_registered, P2025 → not_found, invalid persisted
+ * status throws — caught here and turned into a db_error).
  */
 
 import { PrismaClient } from "@prisma/client";

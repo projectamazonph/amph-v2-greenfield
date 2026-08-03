@@ -23,6 +23,7 @@ const errorMessage: Record<string, string> = {
   invalid_name: "Please enter your first and last name.",
   invalid_email: "Please enter a valid email address.",
   db_error: "Could not create your account right now. Please try again.",
+  hash_error: "Could not create your account right now. Please try again.",
   unexpected: "Something went wrong. Please try again.",
   rate_limited: "Too many attempts. Please wait a few minutes before trying again.",
 };
@@ -34,7 +35,19 @@ export function SignupForm({ errorKind }: { errorKind: string | null }) {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent)', textTransform: 'uppercase', textAlign: 'center' }}>Project Amazon PH Academy</div>
+          <div
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              color: "var(--accent)",
+              textTransform: "uppercase",
+              textAlign: "center",
+            }}
+          >
+            Project Amazon PH Academy
+          </div>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.subtitle}>
             Master Amazon PPC and Seller Central - built for Filipino VAs.
