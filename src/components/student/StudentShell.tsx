@@ -123,6 +123,7 @@ const COMMAND_PALETTE_ITEMS = [
   { href: "/tools/listing-audit", label: "Listing Audit", section: "Tools" },
   { href: "/tools/str-triage", label: "STR Triage", section: "Tools" },
   { href: "/tools/ad-console", label: "Amazon Ad Console", section: "Tools" },
+  { href: "/resources", label: "Download center" },
   { href: "/profile", label: "Profile" },
   { href: "/courses", label: "Browse Catalog", section: "Quick Actions" },
 ] as const;

@@ -17,7 +17,7 @@ The old version of this document described an aspirational schema with universal
 
 ## Actual model inventory
 
-`prisma/schema.prisma` currently defines 34 models:
+`prisma/schema.prisma` currently defines 35 models (the count below predates STORY-098's `Resource` addition and other 2026-08-02 session changes; re-count from the schema before trusting either number):
 
 1. `User`
 2. `Session`
@@ -53,6 +53,7 @@ The old version of this document described an aspirational schema with universal
 32. `ScorePolicy`
 33. `EmailTemplate`
 34. `AttemptFeedback`
+35. `Resource`
 
 The schema defines four enums: `Role`, `SubscriptionTier`, `VerificationStatus`, and `SimulatorAccess`.
 
@@ -83,6 +84,10 @@ The simulator scoring configuration has known integrity and subject-matter limit
 ### Operations
 
 `AuditLog` and `WebhookEvent` provide durable audit and webhook records. `SentReminder` prevents duplicate live-class reminder sends. `EmailTemplate` has repository and use-case support, but no current admin page under `src/app/admin`.
+
+### Download center (STORY-098 / STORY-098.5)
+
+`Resource` (the download-center catalog: guides, templates, automation tools, handouts, cheat sheets) stores metadata plus a `fileUrl` — either a root-relative `/downloads/...` or `/uploads/...` path (a pre-installed static asset, or a file uploaded via `LocalFileStorage`), or an absolute URL (an admin-pasted external link, or a Vercel Blob URL). `fileKey` is non-null only when `IFileStorage` owns the file (an admin upload) — it's null for static assets and external links, since there's nothing in blob storage to clean up for either of those. `category`, `fileType`, and `accessTier` are string columns validated on read (same pattern as `LiveClass.status`), not native Prisma enums. Admin CRUD lives at `/admin/resources`; the student-facing list is `/resources`.
 
 ## Migration inventory
 

@@ -1,5 +1,84 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-03, download center file upload + pre-installed content)
+
+Same-day follow-up to the download center session below (STORY-098.5).
+Two asks: (1) actually author the guides/templates/automation-tool/
+cheat-sheet/handout files the original request named, and ship them as
+pre-installed download-center entries; (2) add real file upload and
+file-management (replace, permanently delete) for whatever admins add
+later, since STORY-098 only supported pasting an external link.
+
+**Pre-installed content (10 files, `public/downloads/`):** 2 PDF
+guides, 3 XLSX templates, 1 XLSX automation tool (the STR
+Winner/Bleeder Scanner — real formulas, not a mockup), 2 PDF cheat
+sheets, 1 PDF + 1 DOCX handout. `pnpm db:seed:resources` (`--dry-run`
+supported) upserts them as published `Resource` rows by a fixed id.
+**Formula-verification caveat:** this session's sandbox could not get
+LibreOffice headless recalculation working at all (confirmed via
+`strace` — even a trivial file failed to load; an environment issue,
+not a file defect). Verified the STR Scanner's formula logic instead
+by reimplementing it in Python against the same sample data and
+confirming identical output. Full detail in `docs/stories/STORY-098.md`'s
+"Pre-installed resources" section.
+
+**File upload + management:** new `IFileStorage` port
+(`src/ports/storage/`) with `InMemoryFileStorage`/`LocalFileStorage`/
+`VercelBlobFileStorage` adapters (new `@vercel/blob` dependency);
+`buildContainer()` picks Vercel Blob when `BLOB_READ_WRITE_TOKEN` is
+set, else falls back to `LocalFileStorage` (dev-only — does NOT
+persist in production on Vercel's read-only serverless filesystem,
+documented in the adapter's own docblock and in `.env.example`).
+`Resource` gained `fileKey` (non-null only for uploaded files) and
+`fileUrl` validation now also accepts root-relative paths. New
+`UploadFile`/`DeleteFile`/`PurgeResource` use cases; `UpdateResource`
+cleans up a replaced file's old blob. Admin forms
+(`/admin/resources/new`, `/admin/resources/[id]/edit`) gained a file
+input alongside the URL field, and the edit page gained a
+"Permanently delete" danger-zone action distinct from "Unpublish".
+Full detail in `docs/stories/STORY-098.5.md`.
+
+Verification: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test` (3464
+passed / 2 skipped, up from 3425/2), `pnpm test:arch` (610/610), and
+`pnpm build` all green. Smoke-tested with `pnpm dev`: pre-installed
+static assets serve with correct `Content-Type` headers; all resource
+routes behave the same as the STORY-098 baseline.
+
+# Session update (2026-08-03, download center)
+
+Built STORY-098: the download center (`/resources` student-facing, `/admin/resources`
+admin CRUD) requested directly — guides, templates, automation tools (e.g. an STR
+report scanner sheet that flags winners/bleeders), client reporting templates,
+monitoring sheets, audit templates, student handouts, cheat sheets, and quick guides.
+Branch `claude/download-center-guides-templates-d9sei0`.
+
+Full five-layer slice: `Resource` domain entity (`src/domain/entities/Resource.ts`,
+category/fileType/accessTier, full branch-coverage tests), `IResourceRepository` port
+
+- `InMemoryResourceRepository`/`PrismaResourceRepository` adapters, new `resources`
+  table (migration `20260803000000_resource`), seven use cases (`CreateResource`,
+  `UpdateResource`, `DeleteResource`, `AdminListResources`, `AdminGetResource`,
+  `ListAvailableResources`, `RecordResourceDownload`) wired into both
+  `buildProductionContainer()` and `buildTestContainer()`, admin pages under
+  `/admin/resources`, the student `/resources` page, and `GET
+/api/resources/[id]/download` as the actual access-enforcement + download-tracking
+  endpoint. New `resource.*` `AuditAction` values. Nav entries added to both
+  `NavSidebar.tsx` and `StudentSidebar.tsx`/command palette.
+
+**Important known limitation, stated on the story doc and the admin form itself:**
+there is no file-upload/blob-storage layer in this codebase. A `Resource` row is
+metadata plus an externally-hosted `fileUrl` (a Google Drive/Sheets share link or any
+public asset URL) — admins paste a link, they don't upload a file. Access gating reuses
+`CourseAccessTier`/`subscriptionMeetsCourseTier`, the same hierarchy courses already
+use (PRO ≥ STARTER ≥ PREVIEW); it is not scoped per-course-enrollment.
+
+Verification: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test` (3425 passed / 2 skipped,
+up from 3335/2 baseline), `pnpm test:arch` (597/597), and `pnpm build` all green.
+Smoke-tested with `pnpm dev`: `/resources` and `/admin/resources` redirect
+unauthenticated visitors the same way sibling pages (`/tools`, `/admin/live-classes`)
+do, and the download route returns 401 JSON when signed out. See
+`docs/stories/STORY-098.md` for full detail.
+
 # Session update (2026-08-02, production-readiness fix session)
 
 A prior turn in this session ran a thorough production-readiness review (typecheck, lint,

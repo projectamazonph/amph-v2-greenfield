@@ -79,7 +79,17 @@ export type AuditAction =
   | "quiz.update_failed"
   | "quiz.delete_failed"
   // Certificate (STORY-044 + STORY-092)
-  | "certificate.revoked";
+  | "certificate.revoked"
+  // Resource / download center (STORY-098)
+  | "resource.created"
+  | "resource.updated"
+  | "resource.deleted"
+  | "resource.create_failed"
+  | "resource.update_failed"
+  | "resource.delete_failed"
+  | "resource.downloaded"
+  | "resource.purged"
+  | "resource.purge_failed";
 
 /**
  * STORY-061. All valid AuditAction values as an array.
@@ -148,6 +158,16 @@ export const ALL_ACTIONS: AuditAction[] = [
   "quiz.delete_failed",
   // STORY-044 + STORY-092: certificate revoke
   "certificate.revoked",
+  // STORY-098: download center resources
+  "resource.created",
+  "resource.updated",
+  "resource.deleted",
+  "resource.create_failed",
+  "resource.update_failed",
+  "resource.delete_failed",
+  "resource.downloaded",
+  "resource.purged",
+  "resource.purge_failed",
 ];
 
 /**

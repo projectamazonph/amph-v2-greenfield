@@ -30,6 +30,7 @@
     "db:seed:tiers": "tsx scripts/seed-pricing-tiers.ts",
     "db:seed:policies": "tsx scripts/seed-simulator-policies.ts",
     "db:seed:scenarios": "tsx scripts/seed-simulator-scenarios.ts",
+    "db:seed:resources": "tsx scripts/seed-resources.ts",
     "format": "prettier --write .",
     "prepare": "husky",
     "postinstall": "prisma generate"
@@ -48,6 +49,7 @@
     "@swc/helpers": "0.5.23",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
+    "@vercel/blob": "^2.6.1",
     "clsx": "^2.1.1",
     "gray-matter": "^4.0.3",
     "jose": "^6.2.3",
