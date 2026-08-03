@@ -1,11 +1,10 @@
 /**
  * /tools — student-facing tools index.
  *
- * Lists the 5 practice simulators plus the embedded Amazon Ad Console,
- * with names, descriptions, and a link to open each one. The 4
- * registered simulators come from the registry; keyword-research and
- * ad-console are added manually (keyword-research reuses the
- * listing-audit simulator; ad-console isn't a simulator at all).
+ * Lists the 5 registered simulators (from the registry) plus the
+ * embedded Amazon Ad Console, with names, descriptions, and a link
+ * to open each one. ad-console is added manually — it isn't a
+ * simulator, so it has no registry entry.
  */
 
 import { buildContainer } from "@/composition/container";
@@ -70,16 +69,6 @@ export default async function ToolsIndexPage() {
               </li>
             );
           })}
-          {/* Keyword Research reuses the listing-audit simulator */}
-          <li key="keyword-research" className={styles.card}>
-            <h2 className={styles.cardName}>Keyword Research</h2>
-            <p className={styles.cardBlurb}>
-              Enter a niche, get a prioritized keyword list. Filter by volume and export.
-            </p>
-            <a href="/tools/keyword-research" className={styles.cardLink}>
-              Open tool →
-            </a>
-          </li>
           {/* Amazon Ad Console — embedded external tool, not a registered simulator */}
           <li key="ad-console" className={styles.card}>
             <h2 className={styles.cardName}>Amazon Ad Console</h2>
