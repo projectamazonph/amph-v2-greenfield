@@ -41,6 +41,7 @@ export default async function NewResourcePage({ searchParams }: PageProps) {
         invalid_file_url: "Please enter a valid http(s) URL.",
         invalid_access_tier: "Please choose an access tier.",
         missing: "Please fill in every required field.",
+        db_error: "Something went wrong saving this resource. Please try again.",
       }[sp.error]
     : null;
 

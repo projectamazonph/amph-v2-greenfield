@@ -77,6 +77,12 @@ describe("PurgeResource", () => {
     expect(r.error.kind).toBe("not_found");
   });
 
+  it("records a purge_failed audit entry for a missing resource", async () => {
+    await useCase.execute({ id: "does_not_exist", actorId: "admin_1" });
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    expect(auditLog.getAll().some((e) => e.action === "resource.purge_failed")).toBe(true);
+  });
+
   it("records an audit log entry on success", async () => {
     const seed = createResource({
       id: "res_3",

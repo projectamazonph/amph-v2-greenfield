@@ -50,6 +50,13 @@ export class PurgeResource {
       return findResult;
     }
     if (findResult.value === null) {
+      void this.deps.recordAuditLog.execute({
+        actorId: input.actorId,
+        action: "resource.purge_failed",
+        targetId: input.id,
+        targetType: "resource",
+        metadata: { error: "not_found" },
+      });
       return { ok: false, error: { kind: "not_found" } };
     }
 

@@ -179,7 +179,12 @@ const RESOURCES: ResourceDef[] = [
 async function upsertResource(def: ResourceDef, repo: PrismaResourceRepository): Promise<void> {
   const existing = await repo.findById(def.id);
 
-  if (existing.ok && existing.value !== null) {
+  if (!existing.ok) {
+    console.error(`  [ERROR] Failed to look up "${def.id}":`, existing.error);
+    return;
+  }
+
+  if (existing.value !== null) {
     const updated = updateResource(existing.value, {
       title: def.title,
       description: def.description,

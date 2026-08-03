@@ -54,6 +54,7 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
         invalid_file_url: "Please enter a valid http(s) URL.",
         invalid_access_tier: "Please choose an access tier.",
         not_found: "Resource not found.",
+        db_error: "Something went wrong. Please try again.",
       }[sp.error]
     : null;
 
