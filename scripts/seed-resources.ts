@@ -1,9 +1,11 @@
 /**
  * scripts/seed-resources.ts
  *
- * Seeds the 10 pre-installed download-center resources (STORY-098):
- * two guides, three templates, one automation tool, two cheat sheets,
- * and two handouts. Idempotent: re-running upserts by a fixed id
+ * Seeds the pre-installed download-center resources: the original 10
+ * from STORY-098 (two guides, three templates, one automation tool,
+ * two cheat sheets, two handouts), plus 16 more from STORY-099 (three
+ * guides, three templates, four automation tools, three cheat sheets,
+ * three handouts). Idempotent: re-running upserts by a fixed id
  * instead of creating duplicates.
  *
  * These are static assets checked into `public/downloads/` — their
@@ -170,6 +172,169 @@ const RESOURCES: ResourceDef[] = [
     category: "handout",
     fileType: "docx",
     fileUrl: "/downloads/handouts/client-communication-email-templates.docx",
+    accessTier: "PREVIEW",
+  },
+
+  // ── STORY-099: library expansion (16 new resources) ───────────────────────
+
+  {
+    id: "res_guide_sponsored_brands_setup",
+    title: "Sponsored Brands Setup Guide",
+    description:
+      "Ad formats, eligibility, step-by-step setup, and the mistakes that quietly waste Sponsored Brands budget.",
+    category: "guide",
+    fileType: "pdf",
+    fileUrl: "/downloads/guides/sponsored-brands-setup-guide.pdf",
+    accessTier: "PREVIEW",
+  },
+  {
+    id: "res_guide_sponsored_display_setup",
+    title: "Sponsored Display Setup Guide",
+    description:
+      "Targeting types, setup steps, and how to judge Sponsored Display performance without holding it to Sponsored Products' bar.",
+    category: "guide",
+    fileType: "pdf",
+    fileUrl: "/downloads/guides/sponsored-display-setup-guide.pdf",
+    accessTier: "PREVIEW",
+  },
+  {
+    id: "res_guide_campaign_structure",
+    title: "Campaign Structure & Match Type Strategy Guide",
+    description:
+      "The Auto → Broad → Phrase → Exact structure, and the weekly harvest loop that makes it worth building.",
+    category: "guide",
+    fileType: "pdf",
+    fileUrl: "/downloads/guides/campaign-structure-match-type-strategy-guide.pdf",
+    accessTier: "PREVIEW",
+  },
+  {
+    id: "res_template_negative_keyword_list",
+    title: "Negative Keyword Master List Template",
+    description:
+      "One central log of every negative keyword you've added across campaigns, with match type, level, and reason, so you never re-discover the same bleeder twice.",
+    category: "template",
+    fileType: "xlsx",
+    fileUrl: "/downloads/templates/negative-keyword-master-list-template.xlsx",
+    accessTier: "STARTER",
+  },
+  {
+    id: "res_template_client_onboarding",
+    title: "New Client Onboarding Checklist Template",
+    description:
+      "A five-phase checklist (access, audit, goals, campaign cleanup, first report) for taking over a new Amazon Ads account.",
+    category: "template",
+    fileType: "xlsx",
+    fileUrl: "/downloads/templates/new-client-onboarding-checklist-template.xlsx",
+    accessTier: "STARTER",
+  },
+  {
+    id: "res_template_budget_pacing_tracker",
+    title: "Budget Pacing Tracker Template",
+    description:
+      "A daily log of planned budget vs. actual spend per campaign, with running month totals and average daily spend.",
+    category: "template",
+    fileType: "xlsx",
+    fileUrl: "/downloads/templates/budget-pacing-tracker-template.xlsx",
+    accessTier: "STARTER",
+  },
+  {
+    id: "res_automation_placement_bid_calculator",
+    title: "Placement Bid Modifier Calculator",
+    description:
+      "Paste in Placement report data and it recommends a bid modifier per placement against your target ACOS, flagging rows without enough orders to trust.",
+    category: "automation_tool",
+    fileType: "xlsx",
+    fileUrl: "/downloads/automation-tools/placement-bid-modifier-calculator.xlsx",
+    accessTier: "STARTER",
+  },
+  {
+    id: "res_automation_keyword_bid_calculator",
+    title: "Keyword Bid Calculator",
+    description:
+      "Suggests a starting max CPC for new or low-data keywords from target ACOS, estimated conversion rate, and average order value.",
+    category: "automation_tool",
+    fileType: "xlsx",
+    fileUrl: "/downloads/automation-tools/keyword-bid-calculator.xlsx",
+    accessTier: "STARTER",
+  },
+  {
+    id: "res_automation_budget_pacing_dayparting",
+    title: "Budget Pacing & Dayparting Analyzer",
+    description:
+      "Flags campaigns overpacing or underpacing their daily budget, and hour-of-day spend that's a candidate for dayparting off.",
+    category: "automation_tool",
+    fileType: "xlsx",
+    fileUrl: "/downloads/automation-tools/budget-pacing-dayparting-analyzer.xlsx",
+    accessTier: "STARTER",
+  },
+  {
+    id: "res_automation_campaign_health_scorecard",
+    title: "Campaign Health Scorecard",
+    description:
+      "Scores every campaign 0-100 from ACOS, CTR, and CVR against your targets, and buckets each as Healthy, Watch, or At risk for fast portfolio triage.",
+    category: "automation_tool",
+    fileType: "xlsx",
+    fileUrl: "/downloads/automation-tools/campaign-health-scorecard.xlsx",
+    accessTier: "STARTER",
+  },
+  {
+    id: "res_cheatsheet_acronyms_glossary",
+    title: "Amazon PPC Acronyms & Glossary Cheat Sheet",
+    description:
+      "The terms you'll hit in your first month, in one place — metrics, ad formats, structure, and catalog vocabulary.",
+    category: "cheat_sheet",
+    fileType: "pdf",
+    fileUrl: "/downloads/cheat-sheets/amazon-ppc-acronyms-glossary-cheat-sheet.pdf",
+    accessTier: "PREVIEW",
+  },
+  {
+    id: "res_cheatsheet_sp_sb_sd_comparison",
+    title: "SP vs SB vs SD Comparison Cheat Sheet",
+    description:
+      "Sponsored Products, Sponsored Brands, and Sponsored Display side by side, and when each one earns its place in the budget.",
+    category: "cheat_sheet",
+    fileType: "pdf",
+    fileUrl: "/downloads/cheat-sheets/sp-sb-sd-comparison-cheat-sheet.pdf",
+    accessTier: "PREVIEW",
+  },
+  {
+    id: "res_cheatsheet_negative_match_type",
+    title: "Negative Keyword Match Type Cheat Sheet",
+    description:
+      "Exact vs. Phrase vs. Product negatives, and the one mistake (applying at the wrong level) that quietly undoes them all.",
+    category: "cheat_sheet",
+    fileType: "pdf",
+    fileUrl: "/downloads/cheat-sheets/negative-keyword-match-type-cheat-sheet.pdf",
+    accessTier: "PREVIEW",
+  },
+  {
+    id: "res_handout_va_weekly_checklist",
+    title: "VA Weekly Task Checklist",
+    description:
+      "The recurring weekly and monthly tasks that keep an Amazon Ads account healthy between full audits.",
+    category: "handout",
+    fileType: "pdf",
+    fileUrl: "/downloads/handouts/va-weekly-task-checklist-handout.pdf",
+    accessTier: "PREVIEW",
+  },
+  {
+    id: "res_handout_troubleshooting_ppc",
+    title: "Troubleshooting Common PPC Issues",
+    description:
+      "A first-pass diagnosis table for the symptoms you'll see most often (ACOS spikes, dead impressions, missing orders) and the order to check things in.",
+    category: "handout",
+    fileType: "pdf",
+    fileUrl: "/downloads/handouts/troubleshooting-common-ppc-issues-handout.pdf",
+    accessTier: "PREVIEW",
+  },
+  {
+    id: "res_handout_client_etiquette",
+    title: "Client Communication Etiquette",
+    description:
+      "Response-time expectations, tone guidelines, and how to deliver bad news and escalate decisions without eroding client trust.",
+    category: "handout",
+    fileType: "docx",
+    fileUrl: "/downloads/handouts/client-communication-etiquette-handout.docx",
     accessTier: "PREVIEW",
   },
 ];
