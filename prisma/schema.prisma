@@ -799,3 +799,24 @@ model AttemptFeedback {
   @@index([userId])
   @@map("attempt_feedbacks")
 }
+
+// ── STORY-098: Download Center ───────────────────────────────────────────────
+
+model Resource {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  category      String   // guide | template | automation_tool | cheat_sheet | handout
+  fileType      String   // pdf | xlsx | gsheet | docx | zip | link
+  fileUrl       String
+  accessTier    String   @default("PREVIEW") // STARTER | PRO | PREVIEW
+  isPublished   Boolean  @default(true)
+  downloadCount Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([isPublished])
+  @@index([accessTier])
+  @@map("resources")
+}

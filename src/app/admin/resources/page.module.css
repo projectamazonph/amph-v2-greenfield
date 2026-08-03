@@ -1,0 +1,17 @@
+/* STORY-098 — Field Manual tokens (mirrors admin/live-classes) */
+
+.addButton {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.addButton:hover {
+  background-color: var(--accent-hover);
+}

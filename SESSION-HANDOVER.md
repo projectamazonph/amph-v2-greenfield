@@ -1,5 +1,40 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-03, download center)
+
+Built STORY-098: the download center (`/resources` student-facing, `/admin/resources`
+admin CRUD) requested directly — guides, templates, automation tools (e.g. an STR
+report scanner sheet that flags winners/bleeders), client reporting templates,
+monitoring sheets, audit templates, student handouts, cheat sheets, and quick guides.
+Branch `claude/download-center-guides-templates-d9sei0`.
+
+Full five-layer slice: `Resource` domain entity (`src/domain/entities/Resource.ts`,
+category/fileType/accessTier, full branch-coverage tests), `IResourceRepository` port
+
+- `InMemoryResourceRepository`/`PrismaResourceRepository` adapters, new `resources`
+  table (migration `20260803000000_resource`), seven use cases (`CreateResource`,
+  `UpdateResource`, `DeleteResource`, `AdminListResources`, `AdminGetResource`,
+  `ListAvailableResources`, `RecordResourceDownload`) wired into both
+  `buildProductionContainer()` and `buildTestContainer()`, admin pages under
+  `/admin/resources`, the student `/resources` page, and `GET
+/api/resources/[id]/download` as the actual access-enforcement + download-tracking
+  endpoint. New `resource.*` `AuditAction` values. Nav entries added to both
+  `NavSidebar.tsx` and `StudentSidebar.tsx`/command palette.
+
+**Important known limitation, stated on the story doc and the admin form itself:**
+there is no file-upload/blob-storage layer in this codebase. A `Resource` row is
+metadata plus an externally-hosted `fileUrl` (a Google Drive/Sheets share link or any
+public asset URL) — admins paste a link, they don't upload a file. Access gating reuses
+`CourseAccessTier`/`subscriptionMeetsCourseTier`, the same hierarchy courses already
+use (PRO ≥ STARTER ≥ PREVIEW); it is not scoped per-course-enrollment.
+
+Verification: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test` (3425 passed / 2 skipped,
+up from 3335/2 baseline), `pnpm test:arch` (597/597), and `pnpm build` all green.
+Smoke-tested with `pnpm dev`: `/resources` and `/admin/resources` redirect
+unauthenticated visitors the same way sibling pages (`/tools`, `/admin/live-classes`)
+do, and the download route returns 401 JSON when signed out. See
+`docs/stories/STORY-098.md` for full detail.
+
 # Session update (2026-08-02, production-readiness fix session)
 
 A prior turn in this session ran a thorough production-readiness review (typecheck, lint,

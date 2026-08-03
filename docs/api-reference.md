@@ -68,6 +68,7 @@ The ESLint boundary tests enforce the direction. `src/composition/container.ts` 
 - `/tools/campaign-builder`
 - `/tools/listing-audit`
 - `/tools/keyword-research`
+- `/resources` — download center (STORY-098): guides, templates, automation tools, handouts, cheat sheets, grouped by category and gated by `CourseAccessTier`
 
 ### Admin pages
 
@@ -84,6 +85,7 @@ All pages under `/admin` inherit `requireAdmin()` from `src/app/admin/layout.tsx
 - `/admin/refunds`, `/admin/refunds/[orderId]`
 - `/admin/simulators`, `/admin/simulators/new`, `/admin/simulators/[id]/edit`
 - `/admin/live-classes`, `/admin/live-classes/new`, `/admin/live-classes/[id]/edit`
+- `/admin/resources`, `/admin/resources/new`, `/admin/resources/[id]/edit` — download-center CRUD (STORY-098)
 - `/admin/discount-codes`, `/new`, `/[id]/edit`
 - `/admin/badges`, `/new`, `/[slug]/edit`
 - `/admin/audit-log`
@@ -93,19 +95,20 @@ There is no `src/app/admin/settings/email-templates` page in the current tree. E
 
 ### Route handlers
 
-| Method and path                            | Purpose                                            |
-| ------------------------------------------ | -------------------------------------------------- |
-| `POST /api/auth/signup`                    | Signup and redirect response with session cookie   |
-| `POST /api/auth/login`                     | Login and redirect response with session cookie    |
-| `POST /api/auth/admin-login`               | Login with an admin-role check                     |
-| `POST /api/auth/logout`                    | Clear the session cookie                           |
-| `GET /api/health`                          | Liveness response and version; no database probe   |
-| `GET, POST /api/cron/live-class-reminders` | Cron health check and protected reminder execution |
-| `POST /api/quizzes/[quizId]/attempt`       | Quiz attempt submission                            |
-| `POST /api/webhooks/paymongo`              | Signature-verified PayMongo webhook processing     |
-| `POST /actions/verifyEmail`                | Email verification action route                    |
-| `GET /admin/audit-log/export`              | CSV audit-log export                               |
-| `GET /certificates/[hash]/pdf`             | Certificate PDF response                           |
+| Method and path                            | Purpose                                                                                    |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `POST /api/auth/signup`                    | Signup and redirect response with session cookie                                           |
+| `POST /api/auth/login`                     | Login and redirect response with session cookie                                            |
+| `POST /api/auth/admin-login`               | Login with an admin-role check                                                             |
+| `POST /api/auth/logout`                    | Clear the session cookie                                                                   |
+| `GET /api/health`                          | Liveness response and version; no database probe                                           |
+| `GET, POST /api/cron/live-class-reminders` | Cron health check and protected reminder execution                                         |
+| `POST /api/quizzes/[quizId]/attempt`       | Quiz attempt submission                                                                    |
+| `GET /api/resources/[id]/download`         | Re-checks access, records the download, 302-redirects to the resource's external `fileUrl` |
+| `POST /api/webhooks/paymongo`              | Signature-verified PayMongo webhook processing                                             |
+| `POST /actions/verifyEmail`                | Email verification action route                                                            |
+| `GET /admin/audit-log/export`              | CSV audit-log export                                                                       |
+| `GET /certificates/[hash]/pdf`             | Certificate PDF response                                                                   |
 
 There is no public REST API version. Mutations use server actions except for webhooks, third-party callbacks, health, cron, quiz submission, and PDF or CSV responses.
 
@@ -117,7 +120,7 @@ Files under `src/app/actions/` currently cover:
 - Checkout and access: checkout, enrollment, course access.
 - Curriculum administration: course, module, lesson create/update/delete/reorder/archive actions.
 - Payment operations: refund request, refund processing, certificate revocation.
-- Admin resources: users and impersonation, discount codes, badges, simulator scenarios, live classes.
+- Admin resources: users and impersonation, discount codes, badges, simulator scenarios, live classes, download-center resources.
 - Simulator lifecycle: start attempt, save decision, submit, grade, compose feedback, and four tool-specific wrappers.
 - Audit and operations: list/export audit logs, live-class reminder invocation.
 
@@ -127,24 +130,25 @@ Each action should parse untrusted input, obtain the request container, call a u
 
 `src/usecases/` contains flat application classes plus `src/usecases/auth/` for the password and email token flows.
 
-| Group                     | Representative classes                                                                                                                                                                                                                                                               |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Authentication            | `SignUp`, `Login`, `Logout`, `VerifyEmail`, `ResendVerification`, `RequestPasswordReset`, `ResetPassword`                                                                                                                                                                            |
-| Checkout and access       | `CreatePaymentIntent`, `ApplyDiscountCode`, `EnrollStudent`, `CheckCourseAccess`, `AuthorizeLessonAccess`, `ProcessRefund` _(moved to `refund/`: `RequestRefund`)_                                                                                                                   |
-| Curriculum                | `ListCatalogCourses`, `GetCatalogCourse`, `ListCourses`, `GetCourse`, `CreateCourse`, `UpdateCourse`, `ArchiveCourse`, `CreateModule`, `UpdateModule`, `DeleteModule`, `ReorderModules`, `CreateLesson`, `UpdateLesson`, `DeleteLesson`, `ReorderLessons`, `RebuildCourseCurriculum` |
-| Learning                  | `RecordQuizAttempt`, `AwardXP`, `AwardBadge`, `ListUserBadges` _(moved to `progress/`: `RecordStreakVisit`, `MarkLessonComplete`)_                                                                                                                                                   |
-| Certificates              | `IssueCertificate`, `RenderCertificatePdf`, `VerifyCertificate`, `RevokeCertificate`                                                                                                                                                                                                 |
-| Simulator infrastructure  | `StartSimulatorAttempt`, `SaveSimulatorDecision`, `SubmitSimulatorAttempt`, `GradeSimulatorAttempt`, `ComposeAttemptFeedback`                                                                                                                                                        |
-| Simulator administration  | `AdminListScenarios`, `GetSimulatorScenario`, `CreateSimulatorScenario`, `UpdateSimulatorScenario`, `ArchiveSimulatorScenario`                                                                                                                                                       |
-| Admin operations          | `ListUsers`, `GetUserDetail`, `ImpersonateUser`, `GetAdminDashboardStats`, payment and refund admin classes, audit-log classes, live-class classes, discount-code classes, badge classes                                                                                             |
-| Email and reminders       | `SendLiveClassReminders` _(moved to `email/`: `ListEmailTemplates`, `GetEmailTemplate`, `UpdateEmailTemplate`)_                                                                                                                                                                      |
-| Two-factor authentication | `EnableTwoFactor`, `ConfirmTwoFactor`, `DisableTwoFactor`                                                                                                                                                                                                                            |
+| Group                       | Representative classes                                                                                                                                                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Authentication              | `SignUp`, `Login`, `Logout`, `VerifyEmail`, `ResendVerification`, `RequestPasswordReset`, `ResetPassword`                                                                                                                                                                            |
+| Checkout and access         | `CreatePaymentIntent`, `ApplyDiscountCode`, `EnrollStudent`, `CheckCourseAccess`, `AuthorizeLessonAccess`, `ProcessRefund` _(moved to `refund/`: `RequestRefund`)_                                                                                                                   |
+| Curriculum                  | `ListCatalogCourses`, `GetCatalogCourse`, `ListCourses`, `GetCourse`, `CreateCourse`, `UpdateCourse`, `ArchiveCourse`, `CreateModule`, `UpdateModule`, `DeleteModule`, `ReorderModules`, `CreateLesson`, `UpdateLesson`, `DeleteLesson`, `ReorderLessons`, `RebuildCourseCurriculum` |
+| Learning                    | `RecordQuizAttempt`, `AwardXP`, `AwardBadge`, `ListUserBadges` _(moved to `progress/`: `RecordStreakVisit`, `MarkLessonComplete`)_                                                                                                                                                   |
+| Certificates                | `IssueCertificate`, `RenderCertificatePdf`, `VerifyCertificate`, `RevokeCertificate`                                                                                                                                                                                                 |
+| Simulator infrastructure    | `StartSimulatorAttempt`, `SaveSimulatorDecision`, `SubmitSimulatorAttempt`, `GradeSimulatorAttempt`, `ComposeAttemptFeedback`                                                                                                                                                        |
+| Simulator administration    | `AdminListScenarios`, `GetSimulatorScenario`, `CreateSimulatorScenario`, `UpdateSimulatorScenario`, `ArchiveSimulatorScenario`                                                                                                                                                       |
+| Admin operations            | `ListUsers`, `GetUserDetail`, `ImpersonateUser`, `GetAdminDashboardStats`, payment and refund admin classes, audit-log classes, live-class classes, discount-code classes, badge classes                                                                                             |
+| Email and reminders         | `SendLiveClassReminders` _(moved to `email/`: `ListEmailTemplates`, `GetEmailTemplate`, `UpdateEmailTemplate`)_                                                                                                                                                                      |
+| Two-factor authentication   | `EnableTwoFactor`, `ConfirmTwoFactor`, `DisableTwoFactor`                                                                                                                                                                                                                            |
+| Download center (STORY-098) | `CreateResource`, `UpdateResource`, `DeleteResource`, `AdminListResources`, `AdminGetResource`, `ListAvailableResources`, `RecordResourceDownload`                                                                                                                                   |
 
 ## Ports and adapters
 
 ### Repository ports
 
-`src/ports/repositories/` contains ports for users, sessions, courses, modules, lessons, orders, enrollments, discount codes, quizzes and attempts, XP and progress, badges and awards, certificates, audit logs, webhook events, simulator scenarios and attempts, score policies, feedback, live classes, pricing tiers, email verification, password reset, sent reminders, user streaks, and email templates.
+`src/ports/repositories/` contains ports for users, sessions, courses, modules, lessons, orders, enrollments, discount codes, quizzes and attempts, XP and progress, badges and awards, certificates, audit logs, webhook events, simulator scenarios and attempts, score policies, feedback, live classes, pricing tiers, email verification, password reset, sent reminders, user streaks, email templates, and download-center resources (`IResourceRepository`, STORY-098).
 
 ### Service and gateway ports
 

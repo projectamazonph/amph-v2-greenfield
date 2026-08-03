@@ -66,6 +66,7 @@ import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiv
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 import type { KeywordDatasetRepository } from "@/ports/repositories/KeywordDatasetRepository";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
+import type { IResourceRepository } from "@/ports/repositories/IResourceRepository";
 
 // ΓöÇΓöÇ Production adapters (only the prod ones) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
@@ -94,6 +95,7 @@ import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRep
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
+import { PrismaResourceRepository } from "@/infra/repositories/PrismaResourceRepository";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
 // STORY-081: no DB table/admin CRUD for keyword datasets yet -- this
@@ -257,6 +259,13 @@ import { SendLiveClassReminders } from "@/usecases/SendLiveClassReminders";
 import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent";
 import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
+import { CreateResource } from "@/usecases/CreateResource";
+import { UpdateResource } from "@/usecases/UpdateResource";
+import { DeleteResource } from "@/usecases/DeleteResource";
+import { AdminListResources } from "@/usecases/AdminListResources";
+import { AdminGetResource } from "@/usecases/AdminGetResource";
+import { ListAvailableResources } from "@/usecases/ListAvailableResources";
+import { RecordResourceDownload } from "@/usecases/RecordResourceDownload";
 import type { SentReminderRepository } from "@/ports/repositories/SentReminderRepository";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
@@ -301,6 +310,8 @@ export interface AppContainer {
   liveClassRepo: ILiveClassRepository;
   // STORY-091: live class RSVP for students
   liveClassRegistrationRepo: ILiveClassRegistrationRepository;
+  // STORY-098: download center resources
+  resourceRepo: IResourceRepository;
   // STORY-011: pricing tier repo
   pricingTierRepo: IPricingTierRepository;
   // STORY-048b/c: module + lesson repos (also used by public catalog)
@@ -454,6 +465,14 @@ export interface AppContainer {
   listLiveClassesForStudent: ListLiveClassesForStudent;
   rsvpLiveClass: RsvpLiveClass;
   cancelLiveClassRsvp: CancelLiveClassRsvp;
+  // STORY-098: download center resources
+  createResource: CreateResource;
+  updateResource: UpdateResource;
+  deleteResource: DeleteResource;
+  adminListResources: AdminListResources;
+  adminGetResource: AdminGetResource;
+  listAvailableResources: ListAvailableResources;
+  recordResourceDownload: RecordResourceDownload;
 }
 
 // ΓöÇΓöÇ Production container builder ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -523,6 +542,8 @@ function buildProductionContainer(): AppContainer {
   // lives across hot reload (test_container wires the same instance).
   const liveClassRegistrationRepo: ILiveClassRegistrationRepository =
     new InMemoryLiveClassRegistrationRepository();
+  // STORY-098: download center resources
+  const resourceRepo: IResourceRepository = new PrismaResourceRepository(prisma);
   // STORY-011: pricing tier repo
   const pricingTierRepo: IPricingTierRepository = new PrismaPricingTierRepository(prisma);
   // STORY-081: no DB table yet -- see StaticKeywordDatasetRepository's docblock
@@ -968,6 +989,15 @@ function buildProductionContainer(): AppContainer {
       liveClassRegistrationRepo,
       clock,
     }),
+    // STORY-098: download center resources
+    resourceRepo,
+    createResource: new CreateResource({ resourceRepo, recordAuditLog }),
+    updateResource: new UpdateResource({ resourceRepo, recordAuditLog }),
+    deleteResource: new DeleteResource({ resourceRepo, recordAuditLog }),
+    adminListResources: new AdminListResources({ resourceRepo }),
+    adminGetResource: new AdminGetResource({ resourceRepo }),
+    listAvailableResources: new ListAvailableResources({ resourceRepo }),
+    recordResourceDownload: new RecordResourceDownload({ resourceRepo, recordAuditLog }),
   };
 }
 
