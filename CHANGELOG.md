@@ -4,6 +4,23 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-03: Live-class recording + post-class XP; email templates wired into the send path (STORY-100, STORY-095.5)
+
+Two follow-ups picked from a repo-wide gap review:
+
+- **STORY-100 (live-class recording + XP):** admins can attach a recording URL to a
+  completed live class; students who RSVPd can mark it watched for 15 XP, once,
+  idempotently. Also closed a real production gap this surfaced: `buildProductionContainer()`
+  was still wiring an in-memory RSVP repository, so registrations vanished on every cold
+  start/redeploy. Built `PrismaLiveClassRegistrationRepository` and swapped it in.
+- **STORY-095.5 (email templates wired into Resend):** the `/admin/email-templates` editor
+  built earlier had no effect on what Resend actually sent. All 7 admin-editable templates
+  (verification, password reset, welcome, receipt, refund, certificate, live-class reminder)
+  now pull admin-customized subject/headline/intro/CTA copy at send time, falling back to
+  the original hardcoded copy when nothing's customized.
+
+See `docs/stories/STORY-100.md` and `docs/stories/STORY-095.5.md` for full detail.
+
 ### 2026-08-03: Download center: content library expansion (STORY-099)
 
 16 new resources added to the download center, bringing the library
