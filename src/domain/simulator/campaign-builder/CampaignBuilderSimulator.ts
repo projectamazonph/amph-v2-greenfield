@@ -2,17 +2,18 @@
  * CampaignBuilderSimulator: generates Amazon PPC campaign structures from requirements.
  *
  * STORY-069: Campaign Builder Rebuild (Scoring Engine Integration).
+ * STORY-084: Campaign Builder strategic scoring (Stage 1 of 2 -- see
+ * docs/stories/STORY-084.md). Adds negative-keyword routing and duplicate-
+ * target detection as real, graded dimensions. `structureQuality` and
+ * `budgetAllocation` keep their pre-STORY-084 formulas in this stage;
+ * `brandedIsolation`/`namingCompliance` are 100-stubs. Stage 2 rewrites all
+ * four to their final STORY-084 behavior.
  *
  * Given product category, budget, and targeting strategy, produces a recommended
  * campaign structure: campaigns, ad groups, keywords, match types, and starting bids.
  *
  * When userAdjustedCampaigns are provided, grades the student's self-built structure
  * against the ground-truth structure, computing per-dimension scores.
- *
- * Scoring dimensions:
- *  structureQuality : % of ground-truth campaign types the user covered
- *  budgetAllocation : % of user campaigns with budget within 50% of ground truth
- *  keywordRelevance : % of user keywords containing niche words
  */
 
 import type { Simulator } from "@/ports/simulator/Simulator";
@@ -23,6 +24,7 @@ import type {
   AdGroup,
   KeywordSuggestion,
   MatchType,
+  NegativeKeyword,
   ScoreDimensions,
 } from "./CampaignBuilderOutput";
 
@@ -110,8 +112,41 @@ function buildCampaign(
   type: CampaignStructure["type"],
   dailyBudget: number,
   adGroups: AdGroup[],
+  negativeKeywords: readonly NegativeKeyword[] = [],
 ): CampaignStructure {
-  return { name, type, dailyBudget, adGroups };
+  return { name, type, dailyBudget, adGroups, negativeKeywords };
+}
+
+// ── Ground truth negative-keyword routing (STORY-084) ───────────────────────
+//
+// Two concrete, structurally-derivable routing rules from Ryan's broader
+// decision table (docs/stories/STORY-084.md), plus brand protection:
+//  1. Auto -> Manual: SP Auto gets a negative-exact entry for every Core
+//     (Exact) keyword, so Auto doesn't compete with Manual's proven winners.
+//  2. Phrase -> Exact isolation: Manual's Discovery (Phrase) ad group gets a
+//     negative-exact entry for every Core (Exact) keyword, so the same term
+//     doesn't run both match types within one campaign.
+//  3. Brand protection: every non-Brand campaign gets `brandName` as a
+//     negative-exact entry, when provided -- keeps branded search out of
+//     non-brand traffic. The SB (Brand) campaign is the designated
+//     "Defense" role and never gets this negative (branded traffic belongs
+//     there).
+
+function negativeFromKeyword(
+  kw: KeywordSuggestion,
+  level: NegativeKeyword["level"],
+  reason: string,
+): NegativeKeyword {
+  return { text: kw.keyword, matchType: "negativeExact", level, reason };
+}
+
+function brandProtectionNegative(brandName: string): NegativeKeyword {
+  return {
+    text: brandName,
+    matchType: "negativeExact",
+    level: "campaign",
+    reason: "Keep branded search traffic in the Brand/Defense campaign, not here.",
+  };
 }
 
 // ── Ground truth generator ────────────────────────────────────────────────
@@ -120,22 +155,38 @@ function generateGroundTruth(
   monthlyBudget: number,
   targetingStrategy: CampaignBuilderInput["targetingStrategy"],
   productNiche: string,
+  brandName: string | undefined,
 ): { campaigns: CampaignStructure[]; gtBudgets: GroundTruthBudget } {
   const dailyBudget = Math.round((monthlyBudget / 30) * 100) / 100;
   const keywords = generateKeywords(productNiche);
   const gtBudgets = groundTruthBudgets(dailyBudget);
   const campaigns: CampaignStructure[] = [];
 
+  const hasManual = targetingStrategy === "manual" || targetingStrategy === "hybrid";
+  const coreKeywords = keywords.slice(0, 3);
+  const discoveryKeywords = keywords.slice(3);
+  const brandNegatives = brandName ? [brandProtectionNegative(brandName)] : [];
+
   // SP Manual
-  if (targetingStrategy === "manual" || targetingStrategy === "hybrid") {
+  if (hasManual) {
     campaigns.push(
       buildCampaign(
         campaignName("SP", "Manual", productNiche, gtBudgets.spManual),
         "sponsored-products",
         gtBudgets.spManual,
         [
-          buildAdGroup(adGroupName("Exact", productNiche, "Core"), keywords.slice(0, 3)),
-          buildAdGroup(adGroupName("Phrase", productNiche, "Discovery"), keywords.slice(3)),
+          buildAdGroup(adGroupName("Exact", productNiche, "Core"), coreKeywords),
+          buildAdGroup(adGroupName("Phrase", productNiche, "Discovery"), discoveryKeywords),
+        ],
+        [
+          ...coreKeywords.map((k) =>
+            negativeFromKeyword(
+              k,
+              "adGroup",
+              "Isolate Discovery (Phrase) from Core (Exact) -- the same keyword shouldn't run both match types in this campaign.",
+            ),
+          ),
+          ...brandNegatives,
         ],
       ),
     );
@@ -148,10 +199,23 @@ function generateGroundTruth(
       "sponsored-products",
       gtBudgets.spAuto,
       [buildAdGroup(adGroupName("Auto", productNiche, "Catch-all"), [])],
+      [
+        ...(hasManual
+          ? coreKeywords.map((k) =>
+              negativeFromKeyword(
+                k,
+                "campaign",
+                "Auto shouldn't compete with Manual's proven exact-match winners.",
+              ),
+            )
+          : []),
+        ...brandNegatives,
+      ],
     ),
   );
 
-  // Sponsored Brands (budget threshold)
+  // Sponsored Brands (budget threshold) -- the designated Brand/Defense
+  // campaign; branded traffic belongs here, so no brand-protection negative.
   if (monthlyBudget >= 500) {
     campaigns.push(
       buildCampaign(
@@ -236,6 +300,88 @@ function keywordMatchesNiche(keyword: string, nicheWords: string[]): boolean {
   return nicheWords.some((w) => kwLower.includes(w));
 }
 
+function normalizeText(text: string): string {
+  return text.trim().toLowerCase();
+}
+
+/** Same role-matching convention `computeDimensionScores` already uses for budget matching. */
+function roleOf(campaign: CampaignStructure): "manual" | "auto" | "sb" | null {
+  if (campaign.name.includes("Manual")) return "manual";
+  if (campaign.name.includes("Auto")) return "auto";
+  if (campaign.name.includes("SB")) return "sb";
+  return null;
+}
+
+/**
+ * F1 of the user's submitted negative keywords against the flattened
+ * expected-negative set, matched by (role, normalized text, matchType) so a
+ * negative submitted on the right campaign role counts even if the user
+ * named their campaign differently from the ground truth.
+ */
+function computeNegativeRouting(
+  userCampaigns: readonly CampaignStructure[],
+  gtCampaigns: readonly CampaignStructure[],
+): number {
+  const expected = new Set<string>();
+  for (const gtCamp of gtCampaigns) {
+    const role = roleOf(gtCamp);
+    if (!role) continue;
+    for (const neg of gtCamp.negativeKeywords ?? []) {
+      expected.add(`${role}::${normalizeText(neg.text)}::${neg.matchType}`);
+    }
+  }
+
+  const submitted = new Set<string>();
+  for (const userCamp of userCampaigns) {
+    const role = roleOf(userCamp);
+    if (!role) continue;
+    for (const neg of userCamp.negativeKeywords ?? []) {
+      submitted.add(`${role}::${normalizeText(neg.text)}::${neg.matchType}`);
+    }
+  }
+
+  if (expected.size === 0) {
+    // No negatives expected (e.g. no brandName, auto-only targeting) --
+    // the correct outcome is submitting none.
+    return submitted.size === 0 ? 100 : 0;
+  }
+
+  const hits = [...expected].filter((e) => submitted.has(e)).length;
+  const recall = hits / expected.size;
+  const precision = submitted.size === 0 ? 0 : hits / submitted.size;
+  if (recall + precision === 0) return 0;
+  return Math.round(((2 * recall * precision) / (recall + precision)) * 100);
+}
+
+/**
+ * Duplicate-target detection (STORY-084). The story's 4-factor rule (ASIN +
+ * campaign role + brand lane + targeting objective) collapses to this one
+ * check in our single-ASIN, single-scenario model, where the other 3
+ * factors are always held constant: the same normalized keyword text +
+ * matchType appearing in more than one ad group across the user's own
+ * campaigns is a duplicate target.
+ */
+function computeDuplicateControl(userCampaigns: readonly CampaignStructure[]): number {
+  const occurrences = new Map<string, number>();
+  let total = 0;
+  for (const c of userCampaigns) {
+    for (const ag of c.adGroups) {
+      for (const kw of ag.keywords) {
+        total++;
+        const key = `${normalizeText(kw.keyword)}::${kw.matchType}`;
+        occurrences.set(key, (occurrences.get(key) ?? 0) + 1);
+      }
+    }
+  }
+  if (total === 0) return 100;
+
+  let duplicateCount = 0;
+  for (const count of occurrences.values()) {
+    if (count > 1) duplicateCount += count - 1;
+  }
+  return Math.max(0, 100 - Math.round((duplicateCount / total) * 100));
+}
+
 // ── Dimension scoring ─────────────────────────────────────────────────────
 
 function computeDimensionScores(
@@ -297,7 +443,25 @@ function computeDimensionScores(
       ? Math.round((relevantKeywords.length / allUserKeywords.length) * 100)
       : 0;
 
-  return { structureQuality, budgetAllocation, keywordRelevance };
+  // STORY-084, real in Stage 1:
+  const negativeRouting = computeNegativeRouting(userCampaigns, gtCampaigns);
+  const duplicateControl = computeDuplicateControl(userCampaigns);
+
+  // STORY-084, Stage 2 stubs -- brandedIsolation and namingCompliance get
+  // their real implementations once brand taxonomy / ASIN context is wired
+  // through computeDimensionScores in Stage 2.
+  const brandedIsolation = 100;
+  const namingCompliance = 100;
+
+  return {
+    keywordRelevance,
+    structureQuality,
+    negativeRouting,
+    budgetAllocation,
+    brandedIsolation,
+    duplicateControl,
+    namingCompliance,
+  };
 }
 
 // ── Simulator ───────────────────────────────────────────────────────────
@@ -320,6 +484,7 @@ export class CampaignBuilderSimulator implements Simulator<
       monthlyBudget,
       targetingStrategy,
       productNiche,
+      input.brandName,
     );
 
     // Legacy structural completeness score

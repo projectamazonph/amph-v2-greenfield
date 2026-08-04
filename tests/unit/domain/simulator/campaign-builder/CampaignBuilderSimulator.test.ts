@@ -278,6 +278,245 @@ describe("dimension scoring (userAdjustedCampaigns provided)", () => {
   });
 });
 
+// ── STORY-084 Stage 1: negativeRouting ──────────────────────────────────────
+// Agent-constructed synthetic examples (not Ryan-reviewed), per the user's
+// explicit choice for this story's test data.
+
+describe("negativeRouting scoring (STORY-084)", () => {
+  it("negativeRouting = 100 when the user submits exactly the expected negative set", async () => {
+    const preview = await simulator.run(BASE_INPUT);
+    const userAdjustedCampaigns = preview.campaigns.map((c) => ({
+      name: c.name,
+      type: c.type,
+      dailyBudget: c.dailyBudget,
+      adGroups: c.adGroups,
+      negativeKeywords: c.negativeKeywords,
+    }));
+    const result = await simulator.run({ ...BASE_INPUT, userAdjustedCampaigns });
+    expect(result.scoreDimensions!.negativeRouting).toBe(100);
+  });
+
+  it("negativeRouting = 100 when no negatives are expected (auto-only, no brandName) and none are submitted", async () => {
+    const input: CampaignBuilderInput = { ...BASE_INPUT, targetingStrategy: "auto" };
+    const result = await simulator.run({
+      ...input,
+      userAdjustedCampaigns: [
+        {
+          name: "SP | Auto | wireless earbuds | ₱25/d",
+          type: "sponsored-products",
+          dailyBudget: 25,
+          adGroups: [],
+          negativeKeywords: [],
+        },
+      ],
+    });
+    expect(result.scoreDimensions!.negativeRouting).toBe(100);
+  });
+
+  it("negativeRouting = 0 when the user submits no negatives but some are expected", async () => {
+    const result = await simulator.run({
+      ...BASE_INPUT,
+      userAdjustedCampaigns: [
+        {
+          name: "SP | Manual | wireless earbuds | ₱60/d",
+          type: "sponsored-products",
+          dailyBudget: 60,
+          adGroups: [],
+          negativeKeywords: [],
+        },
+        {
+          name: "SP | Auto | wireless earbuds | ₱25/d",
+          type: "sponsored-products",
+          dailyBudget: 25,
+          adGroups: [],
+          negativeKeywords: [],
+        },
+        {
+          name: "SB | Brand | wireless earbuds | ₱15/d",
+          type: "sponsored-brands",
+          dailyBudget: 15,
+          adGroups: [],
+          negativeKeywords: [],
+        },
+      ],
+    });
+    expect(result.scoreDimensions!.negativeRouting).toBe(0);
+  });
+
+  it("negativeRouting scores strictly between 0 and 100 for partially-correct routing", async () => {
+    const preview = await simulator.run(BASE_INPUT);
+    const manualGT = preview.campaigns.find((c) => c.name.includes("Manual"))!;
+    const result = await simulator.run({
+      ...BASE_INPUT,
+      userAdjustedCampaigns: [
+        {
+          name: manualGT.name,
+          type: manualGT.type,
+          dailyBudget: manualGT.dailyBudget,
+          adGroups: manualGT.adGroups,
+          negativeKeywords: manualGT.negativeKeywords,
+        },
+        {
+          name: "SP | Auto | wireless earbuds | ₱25/d",
+          type: "sponsored-products",
+          dailyBudget: 25,
+          adGroups: [],
+          negativeKeywords: [],
+        },
+        {
+          name: "SB | Brand | wireless earbuds | ₱15/d",
+          type: "sponsored-brands",
+          dailyBudget: 15,
+          adGroups: [],
+          negativeKeywords: [],
+        },
+      ],
+    });
+    expect(result.scoreDimensions!.negativeRouting).toBeGreaterThan(0);
+    expect(result.scoreDimensions!.negativeRouting).toBeLessThan(100);
+  });
+
+  it("negativeRouting punishes an irrelevant negative on the wrong campaign (precision)", async () => {
+    const preview = await simulator.run(BASE_INPUT);
+    const allCorrect = preview.campaigns.map((c) => ({
+      name: c.name,
+      type: c.type,
+      dailyBudget: c.dailyBudget,
+      adGroups: c.adGroups,
+      negativeKeywords: c.negativeKeywords,
+    }));
+    const withExtra = allCorrect.map((c) =>
+      c.name.includes("SB")
+        ? {
+            ...c,
+            negativeKeywords: [
+              ...(c.negativeKeywords ?? []),
+              {
+                text: "totally unrelated term",
+                matchType: "negativeExact" as const,
+                level: "campaign" as const,
+                reason: "irrelevant",
+              },
+            ],
+          }
+        : c,
+    );
+    const clean = await simulator.run({ ...BASE_INPUT, userAdjustedCampaigns: allCorrect });
+    const dirty = await simulator.run({ ...BASE_INPUT, userAdjustedCampaigns: withExtra });
+    expect(dirty.scoreDimensions!.negativeRouting).toBeLessThan(
+      clean.scoreDimensions!.negativeRouting!,
+    );
+  });
+});
+
+// ── STORY-084 Stage 1: duplicateControl ─────────────────────────────────────
+
+describe("duplicateControl scoring (STORY-084)", () => {
+  it("duplicateControl = 100 when there are no duplicate keyword+matchType targets", async () => {
+    const result = await simulator.run({
+      ...BASE_INPUT,
+      userAdjustedCampaigns: [
+        {
+          name: "SP | Manual | wireless earbuds | ₱60/d",
+          type: "sponsored-products",
+          dailyBudget: 60,
+          adGroups: [
+            {
+              name: "Core",
+              suggestedBid: 0.4,
+              keywords: [{ keyword: "wireless earbuds", matchType: "exact", suggestedBid: 0.4 }],
+            },
+          ],
+          negativeKeywords: [],
+        },
+      ],
+    });
+    expect(result.scoreDimensions!.duplicateControl).toBe(100);
+  });
+
+  it("duplicateControl = 100 when the same text appears with different match types (not a duplicate)", async () => {
+    const result = await simulator.run({
+      ...BASE_INPUT,
+      userAdjustedCampaigns: [
+        {
+          name: "SP | Manual | wireless earbuds | ₱60/d",
+          type: "sponsored-products",
+          dailyBudget: 60,
+          adGroups: [
+            {
+              name: "Core",
+              suggestedBid: 0.4,
+              keywords: [
+                { keyword: "wireless earbuds", matchType: "exact", suggestedBid: 0.4 },
+                { keyword: "wireless earbuds", matchType: "phrase", suggestedBid: 0.32 },
+              ],
+            },
+          ],
+          negativeKeywords: [],
+        },
+      ],
+    });
+    expect(result.scoreDimensions!.duplicateControl).toBe(100);
+  });
+
+  it("duplicateControl drops when the same keyword+matchType is targeted in two ad groups", async () => {
+    const result = await simulator.run({
+      ...BASE_INPUT,
+      userAdjustedCampaigns: [
+        {
+          name: "SP | Manual | wireless earbuds | ₱60/d",
+          type: "sponsored-products",
+          dailyBudget: 60,
+          adGroups: [
+            {
+              name: "Core",
+              suggestedBid: 0.4,
+              keywords: [{ keyword: "wireless earbuds", matchType: "exact", suggestedBid: 0.4 }],
+            },
+            {
+              name: "Discovery",
+              suggestedBid: 0.4,
+              keywords: [{ keyword: "wireless earbuds", matchType: "exact", suggestedBid: 0.4 }],
+            },
+          ],
+          negativeKeywords: [],
+        },
+      ],
+    });
+    expect(result.scoreDimensions!.duplicateControl).toBeLessThan(100);
+  });
+
+  it("duplicateControl treats case/whitespace variants of the same keyword as duplicates", async () => {
+    const result = await simulator.run({
+      ...BASE_INPUT,
+      userAdjustedCampaigns: [
+        {
+          name: "SP | Manual | wireless earbuds | ₱60/d",
+          type: "sponsored-products",
+          dailyBudget: 60,
+          adGroups: [
+            {
+              name: "Core",
+              suggestedBid: 0.4,
+              keywords: [
+                { keyword: "Wireless Earbuds", matchType: "exact", suggestedBid: 0.4 },
+                { keyword: " wireless earbuds ", matchType: "exact", suggestedBid: 0.4 },
+              ],
+            },
+          ],
+          negativeKeywords: [],
+        },
+      ],
+    });
+    expect(result.scoreDimensions!.duplicateControl).toBeLessThan(100);
+  });
+
+  it("duplicateControl = 100 when there are no keywords at all", async () => {
+    const result = await simulator.run({ ...BASE_INPUT, userAdjustedCampaigns: [] });
+    expect(result.scoreDimensions!.duplicateControl).toBe(100);
+  });
+});
+
 // ── Overall score ────────────────────────────────────────────────────────
 
 describe("overall score", () => {
