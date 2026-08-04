@@ -108,6 +108,37 @@ describe("MarkLiveClassRecordingWatched", () => {
     expect(mockAwardXp.execute).not.toHaveBeenCalled();
   });
 
+  it("is race-safe — two concurrent calls award XP exactly once", async () => {
+    // Regression for a real bug found in review: the old implementation
+    // read watchedRecordingAt, checked it in-process, then wrote
+    // unconditionally — two calls in flight before either write landed
+    // could both pass the check and both award XP.
+    // `markRecordingWatched()` on the repo is now the atomic guard, and
+    // this drives two `execute()` calls concurrently (not sequentially)
+    // against the *same* repo instance to exercise it.
+    const liveClassRepo = makeRepo();
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
+    const seed = createLiveClassRegistration({ id: "r-1", userId: "u-2", liveClassId: "lc-1" });
+    if (!seed.ok) throw new Error("seed");
+    await liveClassRegistrationRepo.create(seed.value);
+
+    const useCase = new MarkLiveClassRecordingWatched({
+      liveClassRepo,
+      liveClassRegistrationRepo,
+      awardXp: mockAwardXp,
+      clock: new FixedClock(new Date("2026-08-03T00:00:00Z")),
+    });
+
+    const [r1, r2] = await Promise.all([
+      useCase.execute({ userId: "u-2", liveClassId: "lc-1" }),
+      useCase.execute({ userId: "u-2", liveClassId: "lc-1" }),
+    ]);
+
+    expect(r1.ok).toBe(true);
+    expect(r2.ok).toBe(true);
+    expect(mockAwardXp.execute).toHaveBeenCalledTimes(1);
+  });
+
   it("returns not_found when the live class does not exist", async () => {
     const liveClassRepo = new InMemoryLiveClassRepository();
     const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();

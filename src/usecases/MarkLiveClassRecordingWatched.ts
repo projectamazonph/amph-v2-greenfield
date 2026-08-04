@@ -11,6 +11,17 @@
  *  3. Caller must have an RSVP row for this class → not_registered
  *  4. Idempotent: if already watched, returns the existing registration
  *     without re-awarding XP.
+ *
+ * Race safety: the "already watched?" guard used to be a plain read
+ * (`findByUserAndClass`) followed by an unconditional `update()` — two
+ * concurrent calls could both read `watchedRecordingAt === null` before
+ * either write landed, and both would award XP (a real bug found in
+ * review). `liveClassRegistrationRepo.markRecordingWatched()` is a
+ * conditional, atomic write (`UPDATE ... WHERE watched_recording_at IS
+ * NULL`); only the caller whose write actually flips the row gets `true`
+ * back and is allowed to award XP. Everyone else — including the fast
+ * in-process check below, which stays only as a read-avoidance
+ * optimization for the common already-watched case — is a no-op.
  */
 
 import { Result } from "@/domain/shared/Result";
@@ -71,16 +82,39 @@ export class MarkLiveClassRecordingWatched {
     }
 
     if (registration.watchedRecordingAt) {
-      // Already watched — idempotent no-op, no duplicate XP.
+      // Already watched — idempotent no-op, no duplicate XP. Read-avoidance
+      // fast path only; the atomic call below is the real guard.
       return Result.ok(registration);
     }
 
     const now = this.deps.clock.now();
-    const updated = markRecordingWatched(registration, now);
-    const persistResult = await this.deps.liveClassRegistrationRepo.update(updated);
-    if (!persistResult.ok) {
+    const markResult = await this.deps.liveClassRegistrationRepo.markRecordingWatched(
+      input.userId,
+      input.liveClassId,
+      now,
+    );
+    if (!markResult.ok) {
+      if (markResult.error.kind === "not_found") {
+        return Result.err({ kind: "not_registered" });
+      }
       return Result.err({ kind: "db_error", message: "update failed" });
     }
+
+    if (!markResult.value) {
+      // Someone else won the race between our read above and this write —
+      // it's already watched. Re-fetch for the accurate persisted state
+      // rather than fabricating one; no XP award, same as the fast path.
+      const refetch = await this.deps.liveClassRegistrationRepo.findByUserAndClass(
+        input.userId,
+        input.liveClassId,
+      );
+      if (!refetch.ok || !refetch.value) {
+        return Result.err({ kind: "db_error", message: "registration lookup failed" });
+      }
+      return Result.ok(refetch.value);
+    }
+
+    const updated = markRecordingWatched(registration, now);
 
     this.deps.awardXp
       .execute({

@@ -1,8 +1,10 @@
 "use client";
 
 /**
- * LiveClassRecordingButton — student-facing "watch recording" control on
- * the live-class detail page. Opens the recording, then marks it watched
+ * LiveClassRecordingButton — student-facing "watch recording" controls on
+ * the live-class detail page. Two separate controls, not one combined
+ * action: a link that opens the recording in a new tab, and a distinct
+ * "Mark as watched" button the student clicks afterward to record it
  * (awarding XP once) via a server action.
  *
  * STORY-100.
@@ -11,6 +13,7 @@
 import { useState, useTransition } from "react";
 import { markLiveClassRecordingWatchedAction } from "@/app/actions/markLiveClassRecordingWatched.action";
 import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 
 export interface LiveClassRecordingButtonProps {
   liveClassId: string;
@@ -39,10 +42,20 @@ export function LiveClassRecordingButton({
 
   return (
     <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
-      <a href={recordingUrl} target="_blank" rel="noopener noreferrer">
-        <Button variant="primary" size="md">
-          Watch recording
-        </Button>
+      {/*
+        A native <button> (what Button always renders) can't legally nest
+        inside an <a> — invalid interactive-in-interactive HTML, broken
+        tab order and screen-reader announcement. Style the anchor
+        directly with Button's own CSS module classes instead of nesting
+        a Button component inside it.
+      */}
+      <a
+        href={recordingUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.md].join(" ")}
+      >
+        Watch recording
       </a>
       {watched ? (
         <span data-testid="live-class-recording-watched" style={{ color: "var(--ink-500)" }}>
