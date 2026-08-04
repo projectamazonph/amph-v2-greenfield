@@ -179,6 +179,9 @@ import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
 import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
 import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
+import { PublishSimulatorScenario } from "@/usecases/PublishSimulatorScenario";
+import { CreateScenarioVersionDraft } from "@/usecases/CreateScenarioVersionDraft";
+import { ListScenarioVersions } from "@/usecases/ListScenarioVersions";
 import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
@@ -661,6 +664,15 @@ export function buildTestContainer(): TestContainer {
     createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    // STORY-085: scenario publishing + versioning
+    publishSimulatorScenario: new PublishSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    createScenarioVersionDraft: new CreateScenarioVersionDraft({
+      scenarioRepo,
+      recordAuditLog,
+      idGen,
+      clock,
+    }),
+    listScenarioVersions: new ListScenarioVersions({ scenarioRepo }),
     // STORY-064: simulator attempt lifecycle
     startSimulatorAttempt: new StartSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,

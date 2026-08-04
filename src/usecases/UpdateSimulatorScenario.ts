@@ -5,10 +5,13 @@
  *
  * Flow:
  *  1. Find the existing scenario
- *  2. Validate the updated fields via the entity factory
- *  3. Persist via scenarioRepo.update
- *  4. Record audit log (best-effort)
- *  5. Return the updated scenario
+ *  2. Reject unless it's a draft (STORY-085: published/archived rows are
+ *     immutable historical records — changes go through
+ *     CreateScenarioVersionDraft instead)
+ *  3. Validate the updated fields via the entity factory
+ *  4. Persist via scenarioRepo.update
+ *  5. Record audit log (best-effort)
+ *  6. Return the updated scenario
  */
 
 import { Result } from "@/domain/shared/Result";
@@ -35,6 +38,7 @@ export interface UpdateSimulatorScenarioInput {
 
 export type UpdateSimulatorScenarioError =
   | { kind: "scenario_not_found" }
+  | { kind: "not_editable" }
   | { kind: "invalid_simulator_id" }
   | { kind: "invalid_difficulty" }
   | { kind: "db_error"; message: string };
@@ -52,19 +56,23 @@ export interface UpdateSimulatorScenarioDeps {
 export class UpdateSimulatorScenario {
   constructor(private readonly deps: UpdateSimulatorScenarioDeps) {}
 
-  async execute(
-    input: UpdateSimulatorScenarioInput,
-  ): Promise<UpdateSimulatorScenarioResult> {
+  async execute(input: UpdateSimulatorScenarioInput): Promise<UpdateSimulatorScenarioResult> {
     // ── 1. Find existing ──────────────────────────────────
     const findResult = await this.deps.scenarioRepo.findById(input.id);
     if (!findResult.ok) {
       return Result.err({
         kind: "db_error",
-        message: findResult.error.kind === "db_error" ? findResult.error.message : "Failed to fetch scenario",
+        message:
+          findResult.error.kind === "db_error"
+            ? findResult.error.message
+            : "Failed to fetch scenario",
       });
     }
     if (findResult.value === null) {
       return Result.err({ kind: "scenario_not_found" });
+    }
+    if (findResult.value.status !== "draft") {
+      return Result.err({ kind: "not_editable" });
     }
 
     // ── 2. Validate via entity factory ───────────────────
@@ -91,7 +99,10 @@ export class UpdateSimulatorScenario {
     if (!persistResult.ok) {
       return Result.err({
         kind: "db_error",
-        message: persistResult.error.kind === "db_error" ? persistResult.error.message : "Failed to update scenario",
+        message:
+          persistResult.error.kind === "db_error"
+            ? persistResult.error.message
+            : "Failed to update scenario",
       });
     }
 

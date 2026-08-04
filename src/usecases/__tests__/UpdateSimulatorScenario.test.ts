@@ -24,9 +24,15 @@ function makeRecordAuditLog(): RecordAuditLog {
   });
 }
 
-function makeScenario(overrides: Partial<{
-  id: string; simulatorId: string; name: string; difficulty: string; estimatedMinutes: number;
-}> = {}) {
+function makeScenario(
+  overrides: Partial<{
+    id: string;
+    simulatorId: string;
+    name: string;
+    difficulty: string;
+    estimatedMinutes: number;
+  }> = {},
+) {
   const r = createSimulatorScenario({
     id: "s1",
     simulatorId: "bid-elevator" as const,
@@ -42,7 +48,10 @@ function makeScenario(overrides: Partial<{
   return r.value;
 }
 
-function makeInput(id: string, overrides: Partial<Parameters<typeof UpdateSimulatorScenario.prototype.execute>[0]> = {}) {
+function makeInput(
+  id: string,
+  overrides: Partial<Parameters<typeof UpdateSimulatorScenario.prototype.execute>[0]> = {},
+) {
   return {
     id,
     simulatorId: "bid-elevator" as const,
@@ -99,6 +108,16 @@ describe("UpdateSimulatorScenario", () => {
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("invalid_difficulty");
+  });
+
+  it("returns not_editable when the scenario is not a draft", async () => {
+    const scenario = makeScenario({ id: "s1" });
+    repo.seed({ ...scenario, status: "published" });
+
+    const r = await useCase.execute(makeInput("s1"));
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error.kind).toBe("not_editable");
   });
 
   it("records an audit log entry on success", async () => {
