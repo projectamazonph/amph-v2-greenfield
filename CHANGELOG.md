@@ -4,6 +4,29 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-04: Scenario publishing + versioning — full rewire (STORY-085)
+
+`SimulatorScenario` rows used to be pure metadata: every practice page hardcoded its actual
+content in a `SCENARIO` const, decoupled from the DB row, with no draft/published lifecycle.
+This story built the real thing:
+
+- Draft → published → archived lifecycle with version history for `SimulatorScenario`,
+  admin UI to create drafts, publish them, and browse version history.
+- All 5 practice pages (bid-elevator, str-triage, campaign-builder, listing-audit,
+  keyword-research) now read their content from the currently published scenario
+  server-side, so publishing a new version through the admin UI actually takes effect.
+- Closed a real trust gap in bid-elevator, str-triage, and listing-audit: their server
+  actions used to accept scenario economics/category/niche back from the client on submit;
+  a forged payload could directly control the grade. Now resolved server-side.
+- campaign-builder and bid-elevator's practice pages were switched from a legacy
+  preview-only action (never persisted an attempt) to their existing but previously-unwired
+  graded lifecycle — both simulators now create a real, persisted `SimulatorAttempt` for the
+  first time.
+
+Known limitation: neither campaign-builder nor listing-audit has a UI for the free-form
+submission their richest grading path expects — building that editor is a separate feature.
+See `docs/stories/STORY-085.md` for the full 6-stage breakdown.
+
 ### 2026-08-03: Live-class recording + post-class XP; email templates wired into the send path (STORY-100, STORY-095.5)
 
 Two follow-ups picked from a repo-wide gap review:

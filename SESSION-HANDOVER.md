@@ -1,5 +1,55 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-04, STORY-085 scenario publishing + versioning — full rewire)
+
+Picked up Sprint 16's STORY-085 after the 2026-08-03 session's follow-ups merged. Sized as
+1pt/title-only in `docs/sprint-plan.md`, but research found `SimulatorScenario` rows were
+pure metadata — every practice page hardcoded its real content in a `SCENARIO` const,
+decoupled from the DB. User was asked twice via `AskUserQuestion` how far to scope this and
+both times chose the largest option: a real draft/published/archived lifecycle with version
+history, backfilled content, and all 5 practice pages/actions rewired to read that content
+server-side.
+
+Delivered across 6 checkpointed stages, one commit each, full `tsc/lint/test/test:arch/build`
+sweep after every commit:
+
+1. **Domain + ports + migration** — `SimulatorScenario` gains `scenarioKey`/`version`/`status`,
+   `publishScenario()`/`createDraftFromScenario()`/`archiveScenario()`, 3 new repo methods
+   (`findPublished`/`listVersions`/`publish`), migration `20260804000000_simulator_scenario_publishing`.
+2. **Use cases + container wiring** — `PublishSimulatorScenario`, `CreateScenarioVersionDraft`,
+   `ListScenarioVersions`; `UpdateSimulatorScenario` now rejects edits on non-draft rows;
+   `StartSimulatorAttempt` stamps the real scenario version instead of a hardcoded `1`.
+3. **Admin UI** — fixed a pre-existing gap where 4 files' `SIMULATOR_IDS` omitted
+   `"keyword-research"`; scenario list groups by family; new `/admin/simulators/[id]/versions`
+   version-history page; edit page branches read-only vs editable on status.
+4. **Seed script + content backfill** — `scripts/seed-simulator-scenarios.ts` now carries real
+   `inputSchema` content per simulator, losslessly migrated from each page's hardcoded const.
+5. **Per-simulator rewire, easiest→hardest** — listing-audit → str-triage → keyword-research →
+   campaign-builder → bid-elevator. All 5 pages now fetch the published scenario server-side.
+   Closed a real trust gap in 3 simulators (server actions used to trust client-echoed
+   scenario data). campaign-builder and bid-elevator switched from a legacy preview-only
+   action to their existing but previously-unwired graded lifecycle — both now persist a real
+   `SimulatorAttempt` for the first time. `buildCampaign()`/`runBidElevator()` deleted.
+6. **Docs** — `docs/stories/STORY-085.md` (full detail + known limitations),
+   `docs/sprint-plan.md`, `CLAUDE.md` known-gaps addendum, `CHANGELOG.md`, this file.
+
+**Known limitations, not fixed (out of scope, documented):** neither campaign-builder nor
+listing-audit has a UI for the free-form submission their richest grading path expects
+(`userAdjustedCampaigns` / `userFindingActions`) — building either editor is a separate
+feature. No Postgres partial-unique-index for "one published version per scenarioKey"
+(enforced at the transaction layer instead, a deliberate choice for this solo-admin app).
+STORY-083/084 (rubric/ground-truth authoring) still need Ryan's PPC judgment, untouched.
+
+**Not manually browser-tested:** no live Postgres or browser was available in this session's
+remote execution environment. All verification was `pnpm tsc --noEmit && pnpm lint && pnpm
+test && pnpm test:arch && pnpm build`, green after every one of the 8 commits on this
+branch. A real click-through of the admin publish/draft flow and each rewired practice page
+is recommended before the next production deploy.
+
+See `docs/stories/STORY-085.md` for full detail.
+
+---
+
 # Session update (2026-08-03, live-class recording/XP + email-template wiring)
 
 Follow-up work picked from the "anything left to do here" gap review at the top of this
