@@ -55,7 +55,7 @@ export function StrTriageForm({ scenario }: Props) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const r = await strTriageAttempt({ ...scenario, userActions: actions, mode: "practice" });
+      const r = await strTriageAttempt({ userActions: actions, mode: "practice" });
       if (r.ok) {
         setResult(r.value);
       } else {
