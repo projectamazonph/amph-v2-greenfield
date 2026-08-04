@@ -47,7 +47,7 @@ export function SimulatorModeToggle({ mode, onChange, unlocked, disabled = false
         title={unlocked ? undefined : "Pass this simulator in Practice mode to unlock Challenge"}
         onClick={() => onChange("challenge")}
       >
-        Challenge {unlocked ? null : <span className={styles.lock}>🔒</span>}
+        Challenge {unlocked ? null : <span className={styles.lock}>(locked)</span>}
       </button>
       {mode === "challenge" ? (
         <span className={styles.hint}>Challenge mode: passing awards a one-time bonus XP.</span>

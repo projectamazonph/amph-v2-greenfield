@@ -85,12 +85,14 @@ export interface Resource {
   readonly createdAt: Date;
   readonly updatedAt: Date;
   /**
-   * Soft-delete marker, added in review alongside createdById/updatedById.
-   * `isPublished: false` remains the flag `listPublished()` filters on
-   * (unpublish-and-keep-visible-to-admins is a distinct, older concept
-   * from this); `deletedAt` is the more precise "actually deleted"
-   * signal `delete()` now also sets. Null for every row untouched by a
-   * delete.
+   * Soft-delete marker column, added in review alongside createdById/
+   * updatedById. Deliberately NOT wired into `delete()` or `hardDelete()`
+   * (see `PrismaResourceRepository`'s docblock for why) — `delete()`
+   * still only flips `isPublished: false`, the flag `listPublished()`
+   * filters on, and no code path currently sets `deletedAt`. It stays
+   * null in practice today; the column exists for schema completeness
+   * and as a hook for a future genuine soft-delete concept, not a live
+   * signal to read yet.
    */
   readonly deletedAt: Date | null;
   /** Actor id of whoever created this row. Bare string, no FK relation —

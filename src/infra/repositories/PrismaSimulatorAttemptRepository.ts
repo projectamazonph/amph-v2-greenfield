@@ -10,7 +10,11 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import { hydrateSimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
-import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
+import type {
+  SimulatorAttempt,
+  SimulatorMode,
+  AttemptStatus,
+} from "@/domain/entities/SimulatorAttempt";
 import type { SimulatorDecision } from "@/domain/entities/SimulatorDecision";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
 import type {
@@ -143,7 +147,7 @@ export class PrismaSimulatorAttemptRepository implements ISimulatorAttemptReposi
   async findByUserAndSimulator(
     userId: string,
     simulatorId: SimulatorId,
-    options?: { mode?: string; status?: string },
+    options?: { mode?: SimulatorMode; status?: AttemptStatus },
   ): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>> {
     try {
       const where: Record<string, unknown> = { userId, simulatorId };
