@@ -159,12 +159,46 @@
 .scoreWarning { color: var(--warning); }
 .scoreDanger { color: var(--danger); }
 
-.campaigns {
+.hint {
+  background: var(--surface-2);
+  border-radius: 6px;
+  padding: var(--space-4);
+}
+
+.hintTitle {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-700);
+  margin: 0 0 var(--space-2);
+}
+
+.hintList {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.builder {
   border-top: 1px solid var(--border);
   padding-top: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+.builderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
 }
 
 .campaignsTitle {
@@ -177,6 +211,12 @@
   margin: 0;
 }
 
+.empty {
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  margin: 0;
+}
+
 .campaign {
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -186,25 +226,11 @@
   gap: var(--space-3);
 }
 
-.campaignHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
+.campaignFieldsRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
   gap: var(--space-2);
-}
-
-.campaignName {
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--ink-900);
-}
-
-.campaignMeta {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--ink-500);
+  align-items: center;
 }
 
 .adGroup {
@@ -216,45 +242,54 @@
   gap: var(--space-2);
 }
 
-.adGroupHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
+.adGroupFieldsRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
   gap: var(--space-2);
-}
-
-.adGroupName {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink-900);
-}
-
-.adGroupMeta {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--ink-500);
+  align-items: center;
 }
 
 .keywordList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.keyword {
+.keywordRow {
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: var(--space-3);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  padding: var(--space-1) 0;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: var(--space-2);
+  align-items: center;
 }
 
-.keywordText { color: var(--ink-900); }
-.keywordMatchType { color: var(--ink-500); text-transform: uppercase; }
-.keywordBid { color: var(--ink-700); font-weight: 600; }
+.select {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  height: 40px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-1);
+  cursor: pointer;
+  width: 100%;
+}
+
+.select:focus {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.select:disabled, .input:disabled, .inputNum:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 639px) {
+  .campaignFieldsRow, .adGroupFieldsRow, .keywordRow {
+    grid-template-columns: 1fr;
+  }
+}
