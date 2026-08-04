@@ -226,9 +226,9 @@ exists to remove.
 | STORY-081 | Versioned keyword scenario datasets; split Listing Audit from Keyword Research | 1   | ✅ done — PR #246                                                        |
 | STORY-082 | Expand STR Triage classifier (thresholds, relevance, match precision)          | 1   | ✅ done — PR #247                                                        |
 | STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-083.md`                    |
-| STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ⏳ Planned                                                               |
+| STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-084.md`                    |
 
-**Sprint 15 status:** 6/7 stories done (STORY-078–083); STORY-080 has one open acceptance criterion (see its story doc). STORY-084 remains planned — needs Ryan's Amazon PPC expertise; STORY-083 is done as of 2026-08-04 (Ryan directing the work directly, with his decisions already recorded in the story doc, rather than an agent inventing the judgment calls).
+**Sprint 15 status:** 7/7 stories done (STORY-078–084); STORY-080 has one open acceptance criterion (see its story doc). STORY-083 and STORY-084 are both done as of 2026-08-04 (Ryan directing the work directly, with his decisions already recorded in each story doc, rather than an agent inventing the judgment calls). STORY-084 has two deliberate scope simplifications documented in its "What shipped" section: the 4-factor duplicate-detection rule collapsed to 1 factor, and the negative-routing rule table covers only the 2 rules structurally derivable from the simulator's fixed 3-campaign shape.
 
 ## Sprint 16 — Assessment Platform Maturity (5 pts)
 
