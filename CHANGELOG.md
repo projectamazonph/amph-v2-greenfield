@@ -4,6 +4,64 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-04: Review-comment fixes across PRs #285/#286/#288
+
+XP double-award race, unbounded uploads, fail-open storage, and two admin
+conventions the resources feature was missing — all found by review comments
+on already-merged PRs.
+
+- **Live-class recording XP race (real bug)** — `MarkLiveClassRecordingWatched`
+  read-checked-then-wrote `watchedRecordingAt` non-atomically; two concurrent
+  calls could both pass the check and both award XP.
+  `ILiveClassRegistrationRepository.markRecordingWatched()` makes the flip
+  atomic (`UPDATE ... WHERE watched_recording_at IS NULL`); only the caller
+  whose write actually lands awards XP. New concurrency regression test.
+- **Resources durability** — `UpdateResource`/`PurgeResource`'s storage-delete
+  and audit-log writes are now `await`ed instead of fire-and-forget, closing a
+  window where a frozen serverless execution context could silently drop them
+  after the response was already sent.
+- **Resources upload validation** — size (25 MB) and MIME-type allowlist
+  checks added before buffering an uploaded file into memory.
+- **Storage fails closed in production** — `buildContainer()` now throws if
+  `BLOB_READ_WRITE_TOKEN` is unset in production, instead of silently falling
+  back to `LocalFileStorage` (which doesn't persist on Vercel's serverless
+  filesystem).
+- **Resources admin conventions** — `/admin/resources` gained search/filter/
+  pagination (every other admin list page already had it); `Resource` gained
+  `createdById`/`updatedById` actor-audit fields (new migration).
+- Two smaller fixes: an invalid `<button>` nested inside an `<a>` in
+  `LiveClassRecordingButton.tsx`, and a stale "Simulators" nav label left over
+  from the Amazon Ad Console page's rename to "Tools".
+- **Deliberately not done**: rebuilding the resources admin forms with AMPH
+  `@/components/ui` primitives — no admin form in the codebase uses them, so
+  doing it only for resources would make resources the inconsistent one.
+
+### 2026-08-04: Non-binary Listing Audit ground truth + Campaign Builder strategic scoring (STORY-083, STORY-084)
+
+Both stories were previously flagged as needing Ryan's Amazon PPC expertise,
+not delegable to an agent — implemented directly under Ryan's in-session
+direction, with his decisions already recorded in each story doc.
+
+- **STORY-083** — Listing Audit's binary fix/skip verdict becomes a 4-value
+  `FindingAction` (`fixNow | defer | skip | escalate`), resolved per finding
+  by a new category-, compliance-evidence-, and rule-id-aware
+  `resolveExpectedAction()` layer sitting on top of the existing STORY-080
+  finding generator (left untouched). Closes the click-through-every-finding
+  bypass the audit report flagged.
+- **STORY-084** — Campaign Builder's 3-dimension scoring expands to 7
+  (adds negative-keyword routing, branded isolation, duplicate control,
+  naming compliance; rewrites budget allocation from a flat ±50% tolerance to
+  a ±2% total-spend gate + ±10pp per-role check). Two scope simplifications,
+  documented in `docs/stories/STORY-084.md`: the story's 4-factor duplicate
+  rule collapses to 1 factor (the other 3 are always constant in this
+  single-ASIN scenario model), and only 2 of the broader negative-routing
+  table's rules are structurally derivable from the simulator's fixed
+  3-campaign shape.
+- Test data for both: agent-constructed synthetic submissions, documented as
+  such (not Ryan-reviewed), per Ryan's own choice.
+
+See `docs/stories/STORY-083.md` and `docs/stories/STORY-084.md`.
+
 ### 2026-08-04: Build the missing listing-audit and campaign-builder UIs; fix a real grading bug
 
 Follow-up to STORY-085 (below): built the two UI gaps it left open, and fixed a
