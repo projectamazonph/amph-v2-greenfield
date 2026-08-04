@@ -1,5 +1,75 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-04, STORY-083/084 + review-comment fixes — PR #289 merged)
+
+Continuation of the same day's STORY-085 session (below). Ryan redirected the work to
+STORY-083 and STORY-084 directly ("Lets work on 83 and 84") — both previously flagged in
+`docs/sprint-plan.md` as needing his Amazon PPC expertise, not delegable to an agent.
+Implementing them under his explicit in-session direction, with his decisions already
+recorded in each story doc, is a different thing from an agent inventing the judgment calls
+that note warns against.
+
+**STORY-083 — non-binary, category-aware Listing Audit ground truth** (commits `1b00181`
+code, `78c03fc` docs). Binary fix/skip verdict becomes a 4-value `FindingAction` (`fixNow |
+defer | skip | escalate`), resolved per finding by a new `resolveExpectedAction()` layer
+(category/compliance-evidence/rule-id-aware) sitting on top of the existing STORY-080 finding
+generator, left untouched. Closes the "click fix on every finding" bypass the 2026-07-26
+simulator-accuracy audit flagged. See `docs/stories/STORY-083.md`'s "What shipped" section.
+
+**STORY-084 — Campaign Builder strategic scoring** (commits `ceac62d` stage 1, `e65972f`
+stage 2, `df7201f` docs). 3-dimension scoring expands to 7 (adds negative-keyword routing,
+branded isolation, duplicate control, naming compliance; rewrites budget allocation from a
+flat ±50% tolerance to a ±2% total-spend gate + ±10pp per-role check). Two deliberate scope
+simplifications, documented in `docs/stories/STORY-084.md`: the story's 4-factor duplicate
+rule collapses to 1 factor (the other 3 are always constant in this single-ASIN scenario
+model), and only 2 of the broader negative-routing rule table's rules are structurally
+derivable from the simulator's fixed 3-campaign shape. Test data for both stories: agent-
+constructed synthetic submissions, documented as such, per Ryan's own choice (not
+Ryan-reviewed examples, which the acceptance criteria originally called for).
+
+**Review-comment fix pass** (commits `95aa315`, `2581089`, `af44f34`, `4998255`, plus two
+follow-up fixes after PR review: `353a6bf`, `6b9752e`). Ryan asked for a review of comments
+left on the last 10 PRs, then to fix them — scoped via `AskUserQuestion` to all 4 categories
+found. Deep research corrected two of my own initial findings before any code was touched:
+PR #285 was already mostly self-fixed by its own merge, and "rebuild the resources admin
+forms with AMPH primitives" isn't fixing a violated convention (no admin form in the codebase
+uses those primitives) — skipped, documented why, same reasoning CodeRabbit itself accepted
+and withdrew on in PR #284 for CSS tokens.
+
+- **XP double-award race (real bug, PR #288)** — `MarkLiveClassRecordingWatched` read-checked-
+  then-wrote non-atomically; `ILiveClassRegistrationRepository.markRecordingWatched()` makes
+  the flip atomic. New concurrency regression test.
+- **Resources durability (PR #286)** — `UpdateResource`/`PurgeResource`'s storage-delete and
+  audit-log writes are now `await`ed instead of fire-and-forget.
+- **Upload validation (PR #286)** — size (25 MB) + MIME allowlist checks before buffering.
+- **Storage fails closed in production (PR #286)** — `buildContainer()` throws if
+  `BLOB_READ_WRITE_TOKEN` is unset in production instead of silently degrading to
+  `LocalFileStorage`.
+- **Resources admin conventions (PR #286)** — search/filter/pagination on `/admin/resources`;
+  `Resource` gained `createdById`/`updatedById` actor-audit fields (migration
+  `20260804010000_resource_audit_fields`). `deletedAt` was added to the schema but
+  deliberately left unwired into `delete()`/reads — see `PrismaResourceRepository`'s docblock
+  for why (wiring it the obvious way would have broken the admin unpublish/republish flow).
+- Two smaller fixes: invalid `<button>` nested in `<a>` in `LiveClassRecordingButton.tsx`;
+  stale "Simulators" nav label after the Ad Console page's rename to "Tools" (PR #285).
+
+**PR #289 opened, watched to green, merged** (squash commit `ff86065`). Real snag worth
+flagging for future sessions: the new BLOB_READ_WRITE_TOKEN fail-closed check (above) broke
+E2E CI — `pnpm start` (`next start`) always runs in production mode regardless of shell
+`NODE_ENV`, and CI's env block didn't have this new var the way it already has dummy values
+for every other required secret. Fixed by adding a dummy `BLOB_READ_WRITE_TOKEN` to the e2e
+and lighthouse jobs' env blocks in `.github/workflows/ci.yml` (commit `6b9752e`). Separately,
+paused before merging to ask Ryan to confirm the **real** Vercel project actually has this
+token configured — a CI/PR-preview build succeeding says nothing about that, since
+`buildContainer()` isn't called at build time, and if it were missing in real production the
+blast radius would be the whole site 500ing, not just resource uploads silently degrading
+(the original, narrower bug this fix closes). Ryan confirmed before the merge went through.
+
+See `docs/stories/STORY-083.md`, `docs/stories/STORY-084.md`, and this file's own commit
+history for full detail. No further follow-up items open from this session.
+
+---
+
 # Session update (2026-08-04, STORY-085 scenario publishing + versioning — full rewire)
 
 Picked up Sprint 16's STORY-085 after the 2026-08-03 session's follow-ups merged. Sized as
