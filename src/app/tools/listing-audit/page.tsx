@@ -1,32 +1,20 @@
 /**
  * /tools/listing-audit — student-facing simulator page.
  *
- * Scenario from docs/ui-specs/STITCH-PROMPTS.md §22, §23:
- * Bamboo Cutting Board listing audit + keyword research.
+ * STORY-085: content is no longer a hardcoded SCENARIO const — it's read
+ * server-side from the currently published listing-audit SimulatorScenario,
+ * so publishing a new version through the admin UI actually changes what
+ * students see.
  */
 
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { ListingAuditForm } from "@/components/tools/ListingAuditForm";
-import { StudentShell } from '@/components/student/StudentShell';
+import { StudentShell } from "@/components/student/StudentShell";
+import { listingAuditScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
-
-const SCENARIO = {
-  title: "Bamboo Cutting Board — Premium Kitchen Essential",
-  brief:
-    "Audit this listing and revise the fields you think have problems. Get a score and a keyword research list.",
-  category: "Kitchen",
-  niche: "bamboo cutting board",
-  bullets: [
-    "100% organic bamboo, sustainable and food-safe",
-    "Knife-friendly surface that won't dull your blades",
-    "Easy to clean — hand wash with soap and water",
-  ],
-  description:
-    "High-quality bamboo cutting board for home cooks and professional chefs. Durable, knife-friendly, and naturally beautiful.",
-};
 
 export default async function ListingAuditPage() {
   const container = buildContainer();
@@ -35,27 +23,32 @@ export default async function ListingAuditPage() {
     throw new Error("Listing Audit simulator not registered");
   }
 
+  const scenarioResult = await container.scenarioRepo.findPublished("listing-audit");
+  if (!scenarioResult.ok || !scenarioResult.value) {
+    throw new Error("No published listing-audit scenario found");
+  }
+  const scenario = scenarioResult.value;
+  const content = listingAuditScenarioContentSchema.parse(scenario.inputSchema);
+
   return (
     <StudentShell>
-    <main className={styles.page}>
-      <nav className={styles.breadcrumb}>
-        <Link href="/tools">← Tools</Link>
-        <span aria-hidden="true"> / </span>
-        <span>Listing Audit</span>
-      </nav>
-      <header className={styles.header}>
-        <span className={styles.eyebrow}>Simulator</span>
-        <h1 className={styles.title}>{SCENARIO.title}</h1>
-        <p className={styles.brief}>{SCENARIO.brief}</p>
-      </header>
-      <ListingAuditForm
-        initialTitle={SCENARIO.title}
-        initialBullets={SCENARIO.bullets}
-        initialDescription={SCENARIO.description}
-        category={SCENARIO.category}
-        niche={SCENARIO.niche}
-      />
-    </main>
+      <main className={styles.page}>
+        <nav className={styles.breadcrumb}>
+          <Link href="/tools">← Tools</Link>
+          <span aria-hidden="true"> / </span>
+          <span>Listing Audit</span>
+        </nav>
+        <header className={styles.header}>
+          <span className={styles.eyebrow}>Simulator</span>
+          <h1 className={styles.title}>{scenario.name}</h1>
+          <p className={styles.brief}>{scenario.description}</p>
+        </header>
+        <ListingAuditForm
+          initialTitle={scenario.name}
+          initialBullets={content.bullets}
+          initialDescription={content.description}
+        />
+      </main>
     </StudentShell>
   );
 }

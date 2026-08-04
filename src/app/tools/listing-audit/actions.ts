@@ -15,27 +15,54 @@
  *   4. ComposeAttemptFeedback — generates actionable student feedback
  *
  * `auditListing()` is kept as the legacy preview-only wrapper.
+ *
+ * STORY-085: `category`/`niche`/`images`/`hasVideo`/`hasAPlus`/`marketplace`
+ * are no longer accepted from the client — a malicious caller could
+ * otherwise forge a friendlier category to game which rubric variant
+ * applies. Both functions now resolve the *currently published*
+ * listing-audit scenario server-side and use its content for those
+ * fields; only `title`/`bullets`/`description` (the student's actual
+ * submission) are trusted from the client. This also means publishing a
+ * new scenario version through the admin UI (see PublishSimulatorScenario)
+ * takes effect immediately, instead of both functions being pinned to a
+ * hardcoded scenario id that versioning could never change.
  */
 
 "use server";
 
+import { z } from "zod";
 import { Result } from "@/domain/shared/Result";
 import { buildContainer, getContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
+import type { AppContainer } from "@/composition/container";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
-import type { ListingAuditInput } from "@/domain/simulator/listing-audit/ListingAuditInput";
+import type {
+  ListingAuditInput,
+  ListingImage,
+} from "@/domain/simulator/listing-audit/ListingAuditInput";
 import type {
   ListingAuditOutput,
   FindingAction,
   GradedFinding,
 } from "@/domain/simulator/listing-audit/ListingAuditOutput";
+import { listingAuditScenarioContentSchema } from "./scenarioContent";
+
+async function resolvePublishedScenario(container: AppContainer) {
+  const result = await container.scenarioRepo.findPublished("listing-audit");
+  if (!result.ok || !result.value) {
+    return null;
+  }
+  const parsed = listingAuditScenarioContentSchema.safeParse(result.value.inputSchema);
+  if (!parsed.success) {
+    return null;
+  }
+  return { scenarioId: result.value.id, content: parsed.data };
+}
 
 export type AuditListingInput = {
   title: string;
   bullets: ReadonlyArray<string>;
   description: string;
-  category: string;
-  niche: string;
 };
 
 export type AuditListingResult =
@@ -49,17 +76,13 @@ export async function auditListing(input: AuditListingInput): Promise<AuditListi
     input.title.length === 0 ||
     !Array.isArray(input.bullets) ||
     input.bullets.some((b) => typeof b !== "string") ||
-    typeof input.description !== "string" ||
-    typeof input.category !== "string" ||
-    input.category.length === 0 ||
-    typeof input.niche !== "string" ||
-    input.niche.length === 0
+    typeof input.description !== "string"
   ) {
     return {
       ok: false,
       error: {
         kind: "invalid_input",
-        message: "Need title, ≥0 bullets, description, category, niche",
+        message: "Need title, ≥0 bullets, description",
       },
     };
   }
@@ -73,12 +96,24 @@ export async function auditListing(input: AuditListingInput): Promise<AuditListi
     };
   }
 
+  const scenario = await resolvePublishedScenario(container);
+  if (!scenario) {
+    return {
+      ok: false,
+      error: { kind: "engine_error", message: "No published listing-audit scenario found" },
+    };
+  }
+
   const domainInput: ListingAuditInput = {
     title: input.title,
     bullets: input.bullets,
     description: input.description,
-    category: input.category,
-    niche: input.niche,
+    category: scenario.content.category,
+    niche: scenario.content.niche,
+    marketplace: scenario.content.marketplace,
+    images: scenario.content.images as unknown as readonly ListingImage[],
+    hasVideo: scenario.content.hasVideo,
+    hasAPlus: scenario.content.hasAPlus,
   };
   try {
     const output = (await sim.run(domainInput)) as ListingAuditOutput;
@@ -100,8 +135,6 @@ export interface ListingAuditAttemptInput {
   readonly title: string;
   readonly bullets: ReadonlyArray<string>;
   readonly description: string;
-  readonly category: string;
-  readonly niche: string;
   /**
    * Student's per-finding fix/skip decisions. Keys are finding ids from a
    * prior preview call's `gradedFindings`.
@@ -157,51 +190,17 @@ export type ListingAuditAttemptResponse = ListingAuditAttemptResult | ListingAud
 
 const VALID_FINDING_ACTIONS: readonly FindingAction[] = ["fix", "skip"];
 
-function validateAttemptInput(
-  input: unknown,
-): ListingAuditAttemptInput | { kind: "validation_error"; message: string } {
-  if (!input || typeof input !== "object") {
-    return { kind: "validation_error", message: "Input must be an object" };
-  }
-  const obj = input as Record<string, unknown>;
-
-  if (typeof obj.title !== "string" || obj.title.length === 0) {
-    return { kind: "validation_error", message: "title must be a non-empty string" };
-  }
-  if (!Array.isArray(obj.bullets) || obj.bullets.some((b) => typeof b !== "string")) {
-    return { kind: "validation_error", message: "bullets must be an array of strings" };
-  }
-  if (typeof obj.description !== "string") {
-    return { kind: "validation_error", message: "description must be a string" };
-  }
-  if (typeof obj.category !== "string" || obj.category.length === 0) {
-    return { kind: "validation_error", message: "category must be a non-empty string" };
-  }
-  if (typeof obj.niche !== "string" || obj.niche.length === 0) {
-    return { kind: "validation_error", message: "niche must be a non-empty string" };
-  }
-  if (!obj.userFindingActions || typeof obj.userFindingActions !== "object") {
-    return { kind: "validation_error", message: "userFindingActions must be an object" };
-  }
-  const userFindingActions = obj.userFindingActions as Record<string, unknown>;
-  for (const [findingId, action] of Object.entries(userFindingActions)) {
-    if (!VALID_FINDING_ACTIONS.includes(action as FindingAction)) {
-      return {
-        kind: "validation_error",
-        message: `Invalid action "${String(action)}" for finding "${findingId}". Valid actions: ${VALID_FINDING_ACTIONS.join(", ")}`,
-      };
-    }
-  }
-
-  return {
-    title: obj.title,
-    bullets: obj.bullets as ReadonlyArray<string>,
-    description: obj.description,
-    category: obj.category,
-    niche: obj.niche,
-    userFindingActions: userFindingActions as Record<string, FindingAction>,
-  };
-}
+const listingAuditAttemptSchema = z.object({
+  title: z.string().min(1),
+  bullets: z.array(z.string()),
+  description: z.string(),
+  userFindingActions: z.record(
+    z.string(),
+    z.enum(VALID_FINDING_ACTIONS as [FindingAction, ...FindingAction[]]),
+  ),
+  difficulty: z.string().optional(),
+  mode: z.string().optional(),
+});
 
 // ── Action ─────────────────────────────────────────────────────────────
 
@@ -211,14 +210,19 @@ function validateAttemptInput(
  */
 export async function listingAuditAttempt(input: unknown): Promise<ListingAuditAttemptResponse> {
   // ── 1. Validate ────────────────────────────────────────────────────
-  const validated = validateAttemptInput(input);
-  if ("kind" in validated && validated.kind === "validation_error") {
-    return { ok: false, error: { kind: "validation_error", message: validated.message } };
+  const parseResult = listingAuditAttemptSchema.safeParse(input);
+  if (!parseResult.success) {
+    return {
+      ok: false,
+      error: {
+        kind: "validation_error",
+        message: parseResult.error.issues.map((i) => i.message).join("; "),
+      },
+    };
   }
 
-  const { title, bullets, description, category, niche, userFindingActions } =
-    validated as ListingAuditAttemptInput;
-  const mode = (validated as ListingAuditAttemptInput).mode ?? "practice";
+  const { title, bullets, description, userFindingActions, mode } = parseResult.data;
+  const resolvedMode = mode ?? "practice";
   const container = getContainer();
 
   // ── 2. Authenticate ─────────────────────────────────────────────────
@@ -227,14 +231,21 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
     return { ok: false, error: { kind: "unauthorized" } };
   }
 
-  // ── 3. StartSimulatorAttempt ────────────────────────────────────────
-  const scenarioId = "listing-audit-scenario-bamboo-cutting-board";
+  // ── 3. Resolve the published scenario server-side ───────────────────
+  const scenario = await resolvePublishedScenario(container);
+  if (!scenario) {
+    return {
+      ok: false,
+      error: { kind: "attempt_error", message: "No published listing-audit scenario found" },
+    };
+  }
 
+  // ── 4. StartSimulatorAttempt ────────────────────────────────────────
   const startResult = await container.startSimulatorAttempt.execute({
     userId,
     simulatorId: "listing-audit",
-    scenarioId,
-    mode: mode as SimulatorMode,
+    scenarioId: scenario.scenarioId,
+    mode: resolvedMode as SimulatorMode,
   });
 
   if (Result.isErr(startResult)) {
@@ -246,7 +257,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
 
   const attemptId = startResult.value.attemptId;
 
-  // ── 3. Save decisions (user fix/skip triage as decisions) ──────────
+  // ── 5. Save decisions (user fix/skip triage as decisions) ──────────
   for (const [findingId, action] of Object.entries(userFindingActions)) {
     const decisionResult = await container.saveSimulatorDecision.execute({
       attemptId,
@@ -263,7 +274,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
     }
   }
 
-  // ── 4. Run simulator to get dimension scores ─────────────────────────
+  // ── 6. Run simulator to get dimension scores ─────────────────────────
   const sim = container.simulatorRegistry.get("listing-audit");
   if (!sim) {
     return {
@@ -278,8 +289,12 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
       title,
       bullets,
       description,
-      category,
-      niche,
+      category: scenario.content.category,
+      niche: scenario.content.niche,
+      marketplace: scenario.content.marketplace,
+      images: scenario.content.images as unknown as readonly ListingImage[],
+      hasVideo: scenario.content.hasVideo,
+      hasAPlus: scenario.content.hasAPlus,
       userFindingActions: { ...userFindingActions },
     };
     simOutput = (await sim.run(simInput)) as ListingAuditOutput;
@@ -300,7 +315,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
     reviewCoverage: 0,
   };
 
-  // ── 5. GradeSimulatorAttempt ────────────────────────────────────────
+  // ── 7. GradeSimulatorAttempt ────────────────────────────────────────
   const gradeResult = await container.gradeSimulatorAttempt.execute({
     attemptId,
     scoreDimensions: {
@@ -318,7 +333,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
 
   const grade = gradeResult.value;
 
-  // ── 6. ComposeAttemptFeedback ───────────────────────────────────────
+  // ── 8. ComposeAttemptFeedback ───────────────────────────────────────
   const feedbackResult = await container.composeAttemptFeedback.execute({
     attemptId,
   });
@@ -332,10 +347,10 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
 
   const feedback = feedbackResult.value.feedback;
 
-  // ── 7. SubmitSimulatorAttempt ───────────────────────────────────────
+  // ── 9. SubmitSimulatorAttempt ───────────────────────────────────────
   await container.submitSimulatorAttempt.execute({ attemptId });
 
-  // ── 8. Return results ──────────────────────────────────────────────
+  // ── 10. Return results ──────────────────────────────────────────────
   return {
     ok: true,
     value: {

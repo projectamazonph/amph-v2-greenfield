@@ -48,6 +48,34 @@ const mockContainer = {
   simulatorRegistry: {
     get: vi.fn(),
   },
+  scenarioRepo: {
+    findPublished: vi.fn(),
+  },
+};
+
+const PUBLISHED_SCENARIO = {
+  id: "listing-audit-scenario-bamboo-cutting-board",
+  scenarioKey: "listing-audit-scenario-bamboo-cutting-board",
+  version: 1,
+  status: "published" as const,
+  simulatorId: "listing-audit" as const,
+  name: "Bamboo Cutting Board — Premium Kitchen Essential",
+  description: "Audit and revise a bamboo cutting board listing.",
+  inputSchema: {
+    category: "Kitchen",
+    niche: "bamboo cutting board",
+    bullets: [],
+    description: "",
+    images: [],
+    hasVideo: false,
+    hasAPlus: false,
+    marketplace: "US",
+  },
+  outputSchema: {},
+  difficulty: "beginner" as const,
+  estimatedMinutes: 10,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const fakeSimulator = {
@@ -190,14 +218,13 @@ function happyContainer() {
   );
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
   (fakeSimulator.run as ReturnType<typeof vi.fn>).mockResolvedValue(SIM_OUTPUT);
+  c.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
 }
 
 const VALID_INPUT = {
   title: "Bamboo Cutting Board",
   bullets: ["100% organic bamboo"],
   description: "High-quality bamboo cutting board.",
-  category: "Kitchen",
-  niche: "bamboo cutting board",
   userFindingActions: { "finding-0": "fix", "finding-1": "skip" },
 };
 
@@ -233,11 +260,14 @@ describe("listingAuditAttempt", () => {
     expect(result.error.kind).toBe("validation_error");
   });
 
-  it("returns validation_error when niche is empty", async () => {
-    const result = await listingAuditAttempt({ ...VALID_INPUT, niche: "" });
+  it("returns attempt_error when no published scenario exists", async () => {
+    (mockContainer.scenarioRepo.findPublished as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      Result.ok(null),
+    );
+    const result = await listingAuditAttempt(VALID_INPUT);
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
+    expect(result.error.kind).toBe("attempt_error");
   });
 
   it("returns validation_error for an unknown finding action", async () => {
@@ -333,8 +363,6 @@ describe("auditListing (legacy)", () => {
       title: "",
       bullets: [],
       description: "",
-      category: "Kitchen",
-      niche: "bamboo",
     });
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -346,12 +374,24 @@ describe("auditListing (legacy)", () => {
       title: "Bamboo Cutting Board",
       bullets: ["100% organic bamboo"],
       description: "High-quality bamboo cutting board.",
-      category: "Kitchen",
-      niche: "bamboo cutting board",
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.score).toBeGreaterThanOrEqual(0);
     expect(result.value.score).toBeLessThanOrEqual(100);
+  });
+
+  it("returns engine_error when no published scenario exists", async () => {
+    (mockContainer.scenarioRepo.findPublished as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      Result.ok(null),
+    );
+    const result = await auditListing({
+      title: "Bamboo Cutting Board",
+      bullets: ["100% organic bamboo"],
+      description: "High-quality bamboo cutting board.",
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("engine_error");
   });
 });

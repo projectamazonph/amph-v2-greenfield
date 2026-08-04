@@ -17,17 +17,9 @@ interface Props {
   initialTitle: string;
   initialBullets: ReadonlyArray<string>;
   initialDescription: string;
-  category: string;
-  niche: string;
 }
 
-export function ListingAuditForm({
-  initialTitle,
-  initialBullets,
-  initialDescription,
-  category,
-  niche,
-}: Props) {
+export function ListingAuditForm({ initialTitle, initialBullets, initialDescription }: Props) {
   const [title, setTitle] = useState(initialTitle);
   const [bullets, setBullets] = useState<string[]>([...initialBullets]);
   const [description, setDescription] = useState(initialDescription);
@@ -47,8 +39,6 @@ export function ListingAuditForm({
         title,
         bullets: bullets.filter((b) => b.length > 0),
         description,
-        category,
-        niche,
       });
       if (r.ok) {
         setResult(r);
