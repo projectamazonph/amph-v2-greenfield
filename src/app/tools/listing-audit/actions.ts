@@ -9,10 +9,15 @@
  * established by STORY-067/068/069 (STR Triage, Bid Elevator, Campaign
  * Builder):
  *   1. StartSimulatorAttempt — creates the attempt record
- *   2. ListingAuditSimulator.run() — computes dimension scores from the
+ *   2. saveSimulatorDecision — one decision per finding triage (audit trail)
+ *   3. ListingAuditSimulator.run() — computes dimension scores from the
  *      student's fix/skip triage of each finding
- *   3. GradeSimulatorAttempt — persists the grade with score dimensions
- *   4. ComposeAttemptFeedback — generates actionable student feedback
+ *   4. SubmitSimulatorAttempt — transitions in_progress -> submitted
+ *      (must run before grading: GradeSimulatorAttempt requires status
+ *      "submitted", and submission itself requires at least one decision
+ *      to already be saved, which step 2 did)
+ *   5. GradeSimulatorAttempt — persists the grade with score dimensions
+ *   6. ComposeAttemptFeedback — generates actionable student feedback
  *
  * `auditListing()` is kept as the legacy preview-only wrapper.
  *
@@ -26,6 +31,14 @@
  * new scenario version through the admin UI (see PublishSimulatorScenario)
  * takes effect immediately, instead of both functions being pinned to a
  * hardcoded scenario id that versioning could never change.
+ *
+ * Also fixed in the same pass: `listingAuditAttempt()` used to call
+ * SubmitSimulatorAttempt *after* GradeSimulatorAttempt instead of before —
+ * a real, pre-existing bug (predates STORY-085) that made every graded
+ * call fail in production, since GradeSimulatorAttempt rejects anything
+ * that isn't already "submitted". Unit tests never caught it because they
+ * mock gradeSimulatorAttempt.execute() directly rather than exercising the
+ * real use case's status check.
  */
 
 "use server";
@@ -315,7 +328,16 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
     reviewCoverage: 0,
   };
 
-  // ── 7. GradeSimulatorAttempt ────────────────────────────────────────
+  // ── 7. SubmitSimulatorAttempt ─────────────────────────────────────────
+  // GradeSimulatorAttempt requires status="submitted"; must run before
+  // grading, not after (it also requires at least one decision saved,
+  // which step 5 above already did).
+  const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
+  if (Result.isErr(submitResult)) {
+    return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
+  }
+
+  // ── 8. GradeSimulatorAttempt ────────────────────────────────────────
   const gradeResult = await container.gradeSimulatorAttempt.execute({
     attemptId,
     scoreDimensions: {
@@ -333,7 +355,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
 
   const grade = gradeResult.value;
 
-  // ── 8. ComposeAttemptFeedback ───────────────────────────────────────
+  // ── 9. ComposeAttemptFeedback ───────────────────────────────────────
   const feedbackResult = await container.composeAttemptFeedback.execute({
     attemptId,
   });
@@ -346,9 +368,6 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
   }
 
   const feedback = feedbackResult.value.feedback;
-
-  // ── 9. SubmitSimulatorAttempt ───────────────────────────────────────
-  await container.submitSimulatorAttempt.execute({ attemptId });
 
   // ── 10. Return results ──────────────────────────────────────────────
   return {

@@ -300,6 +300,29 @@ describe("listingAuditAttempt", () => {
     expect(mockContainer.submitSimulatorAttempt.execute).toHaveBeenCalled();
   });
 
+  it("submits before grading (GradeSimulatorAttempt requires 'submitted' status)", async () => {
+    await listingAuditAttempt(VALID_INPUT);
+
+    expect(
+      (mockContainer.submitSimulatorAttempt.execute as ReturnType<typeof vi.fn>).mock
+        .invocationCallOrder[0],
+    ).toBeLessThan(
+      (mockContainer.gradeSimulatorAttempt.execute as ReturnType<typeof vi.fn>).mock
+        .invocationCallOrder[0]!,
+    );
+  });
+
+  it("returns attempt_error when submitSimulatorAttempt fails", async () => {
+    (
+      mockContainer.submitSimulatorAttempt.execute as ReturnType<typeof vi.fn>
+    ).mockResolvedValueOnce(Result.err({ kind: "no_decisions_made" }));
+    const result = await listingAuditAttempt(VALID_INPUT);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
+    expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
+  });
+
   it("returns attempt_error when startSimulatorAttempt fails", async () => {
     (mockContainer.startSimulatorAttempt.execute as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
       Result.err({ kind: "attempt_not_found" }),

@@ -6,9 +6,23 @@
  * `bidElevatorAttempt()` follows the full attempt lifecycle:
  *   1. StartSimulatorAttempt — creates the attempt record
  *   2. BidElevatorSimulator.run() — computes dimension scores from user bid adjustments
- *   3. GradeSimulatorAttempt — persists the grade with score dimensions
- *   4. ComposeAttemptFeedback — generates actionable student feedback
+ *   3. saveSimulatorDecision — records the bid adjustments (audit trail;
+ *      also satisfies SubmitSimulatorAttempt's "at least one decision" rule)
+ *   4. SubmitSimulatorAttempt — transitions in_progress -> submitted
+ *      (must run before grading: GradeSimulatorAttempt requires status
+ *      "submitted")
+ *   5. GradeSimulatorAttempt — persists the grade with score dimensions
+ *   6. ComposeAttemptFeedback — generates actionable student feedback
  * It requires an authenticated session.
+ *
+ * Fixed in the STORY-085 pass: grading used to be attempted with no prior
+ * saveSimulatorDecision/SubmitSimulatorAttempt call at all — a real,
+ * pre-existing bug (predates STORY-085) that made every graded call fail
+ * in production, since GradeSimulatorAttempt rejects anything that isn't
+ * already "submitted", and SubmitSimulatorAttempt itself rejects an
+ * attempt with zero saved decisions. Unit tests never caught it because
+ * they mock gradeSimulatorAttempt.execute() directly rather than
+ * exercising the real use cases' status checks.
  *
  * STORY-085: the legacy `runBidElevator()` wrapper is removed — it was the
  * only thing BidElevatorForm actually called, so bid-elevator never
@@ -178,6 +192,22 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
       : null;
 
   if (scoreDimensions !== null) {
+    // Save a decision (audit trail; also satisfies SubmitSimulatorAttempt's
+    // "at least one decision" precondition), then submit before grading —
+    // GradeSimulatorAttempt requires status="submitted".
+    await container.saveSimulatorDecision.execute({
+      attemptId,
+      decisionData: { type: "bid-elevator-bid-adjustments", bids: userBidAdjustments },
+    });
+
+    const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
+    if (Result.isErr(submitResult)) {
+      return {
+        ok: false,
+        error: { kind: "attempt_error", message: submitResult.error.kind },
+      };
+    }
+
     const gradeResult = await container.gradeSimulatorAttempt.execute({
       attemptId,
       scoreDimensions,

@@ -30,6 +30,8 @@ import { campaignBuilderAttempt } from "../actions";
 
 const mockContainer = {
   startSimulatorAttempt: { execute: vi.fn() },
+  saveSimulatorDecision: { execute: vi.fn() },
+  submitSimulatorAttempt: { execute: vi.fn() },
   gradeSimulatorAttempt: { execute: vi.fn() },
   composeAttemptFeedback: { execute: vi.fn() },
   simulatorRegistry: { get: vi.fn() },
@@ -118,12 +120,18 @@ const GT_CAMPAIGNS: CampaignStructure[] = [
 function happyContainer() {
   const c = mockContainer as typeof mockContainer & {
     startSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
+    saveSimulatorDecision: { execute: ReturnType<typeof vi.fn> };
+    submitSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
     gradeSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
     composeAttemptFeedback: { execute: ReturnType<typeof vi.fn> };
     simulatorRegistry: { get: ReturnType<typeof vi.fn> };
   };
   c.startSimulatorAttempt.execute.mockResolvedValue(
     Result.ok({ attemptId: "ATT-CB001", startedAt: new Date() }),
+  );
+  c.saveSimulatorDecision.execute.mockResolvedValue(Result.ok(undefined));
+  c.submitSimulatorAttempt.execute.mockResolvedValue(
+    Result.ok({ status: "submitted", submittedAt: new Date() }),
   );
   c.gradeSimulatorAttempt.execute.mockResolvedValue(
     Result.ok({
@@ -271,6 +279,30 @@ describe("campaignBuilderAttempt", () => {
     expect(result.error.kind).toBe("grading_error");
   });
 
+  it("saves a decision and submits before grading (GradeSimulatorAttempt requires 'submitted' status)", async () => {
+    happyContainer();
+    await campaignBuilderAttempt(validInput);
+
+    expect(mockContainer.saveSimulatorDecision.execute).toHaveBeenCalledWith(
+      expect.objectContaining({ attemptId: "ATT-CB001" }),
+    );
+    expect(mockContainer.submitSimulatorAttempt.execute.mock.invocationCallOrder[0]).toBeLessThan(
+      mockContainer.gradeSimulatorAttempt.execute.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it("returns attempt_error when submitSimulatorAttempt fails", async () => {
+    happyContainer();
+    mockContainer.submitSimulatorAttempt.execute.mockResolvedValue(
+      Result.err({ kind: "no_decisions_made" }),
+    );
+    const result = await campaignBuilderAttempt(validInput);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
+    expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
+  });
+
   it("preview mode (no userAdjustedCampaigns) skips grading and feedback, but still persists an attempt", async () => {
     happyContainer();
     const previewInput = { targetingStrategy: "hybrid" as const };
@@ -279,6 +311,8 @@ describe("campaignBuilderAttempt", () => {
     if (!result.ok) return;
 
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalled();
+    expect(mockContainer.saveSimulatorDecision.execute).not.toHaveBeenCalled();
+    expect(mockContainer.submitSimulatorAttempt.execute).not.toHaveBeenCalled();
     expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
     expect(mockContainer.composeAttemptFeedback.execute).not.toHaveBeenCalled();
     expect(result.value.scoreDimensions).toBeNull();

@@ -6,8 +6,14 @@
  * `campaignBuilderAttempt()` follows the full attempt lifecycle:
  *   1. StartSimulatorAttempt — creates the attempt record
  *   2. CampaignBuilderSimulator.run() — computes dimension scores from user-adjusted campaigns
- *   3. GradeSimulatorAttempt — persists the grade with score dimensions
- *   4. ComposeAttemptFeedback — generates actionable student feedback
+ *   3. saveSimulatorDecision — records the submitted campaign structure
+ *      (audit trail; also satisfies SubmitSimulatorAttempt's "at least
+ *      one decision" rule)
+ *   4. SubmitSimulatorAttempt — transitions in_progress -> submitted
+ *      (must run before grading: GradeSimulatorAttempt requires status
+ *      "submitted")
+ *   5. GradeSimulatorAttempt — persists the grade with score dimensions
+ *   6. ComposeAttemptFeedback — generates actionable student feedback
  *
  * STORY-085: the legacy `buildCampaign()` wrapper is removed — it never
  * persisted a SimulatorAttempt at all, so every campaign-builder "run" was
@@ -20,15 +26,18 @@
  * from the client would let a forged budget/niche pick an easier scoring
  * target. Both are now resolved server-side from the currently published
  * campaign-builder SimulatorScenario. Only `targetingStrategy` (the
- * student's real choice) and, once a manual campaign editor exists,
- * `userAdjustedCampaigns` remain client input.
+ * student's real choice) and `userAdjustedCampaigns` (the student's
+ * self-built campaign structure, now collected by CampaignBuilderForm's
+ * manual editor) remain client input.
  *
- * No manual campaign-structure editor exists in the UI yet (a
- * `userAdjustedCampaigns` submission form is a real, separate feature —
- * out of scope for this story), so `campaignBuilderAttempt()` is called
- * without it: scoreDimensions/feedback stay null (same as before), but
- * unlike the removed `buildCampaign()`, a real SimulatorAttempt is now
- * persisted every time a student runs this simulator.
+ * Also fixed in the same pass: grading used to be attempted with no prior
+ * saveSimulatorDecision/SubmitSimulatorAttempt call at all — a real,
+ * pre-existing bug (predates STORY-085) that made every graded call fail
+ * in production, since GradeSimulatorAttempt rejects anything that isn't
+ * already "submitted", and SubmitSimulatorAttempt itself rejects an
+ * attempt with zero saved decisions. Unit tests never caught it because
+ * they mock gradeSimulatorAttempt.execute() directly rather than
+ * exercising the real use cases' status checks.
  */
 
 "use server";
@@ -205,6 +214,22 @@ export async function campaignBuilderAttempt(
   let feedback: CampaignBuilderAttemptResult["feedback"] = null;
 
   if (simOutput.scoreDimensions !== null) {
+    // Save a decision (audit trail; also satisfies SubmitSimulatorAttempt's
+    // "at least one decision" precondition), then submit before grading —
+    // GradeSimulatorAttempt requires status="submitted".
+    await container.saveSimulatorDecision.execute({
+      attemptId,
+      decisionData: { type: "campaign-builder-structure", campaigns: userAdjustedCampaigns },
+    });
+
+    const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
+    if (Result.isErr(submitResult)) {
+      return {
+        ok: false,
+        error: { kind: "attempt_error", message: submitResult.error.kind },
+      };
+    }
+
     const gradeResult = await container.gradeSimulatorAttempt.execute({
       attemptId,
       scoreDimensions: {
