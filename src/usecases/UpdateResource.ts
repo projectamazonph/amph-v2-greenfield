@@ -7,6 +7,15 @@
  * storage after the DB update succeeds. Best-effort — a failed
  * cleanup leaves an orphaned blob, which is a cost problem, not a
  * correctness one, so it must not fail the update itself.
+ *
+ * Both the storage delete and every audit-log write are `await`ed, not
+ * fire-and-forget. The DB mutation has already committed by that point,
+ * so a failure here still can't turn the whole use case into an error —
+ * but on a serverless/edge runtime, a `void`-called async write can be
+ * silently dropped if the execution context freezes right after the
+ * response is sent, before the write actually lands. Awaiting closes
+ * that window; failures are logged so cleanup gaps are visible instead
+ * of invisible.
  */
 import { Result } from "@/domain/shared/Result";
 import {
@@ -47,7 +56,7 @@ export class UpdateResource {
       return findResult as unknown as UpdateResourceResult;
     }
     if (findResult.value === null) {
-      void this.deps.recordAuditLog.execute({
+      await this.deps.recordAuditLog.execute({
         actorId: input.actorId,
         action: "resource.update_failed",
         targetId: input.id,
@@ -59,7 +68,7 @@ export class UpdateResource {
 
     const updateResult = updateResource(findResult.value, input.patch);
     if (!updateResult.ok) {
-      void this.deps.recordAuditLog.execute({
+      await this.deps.recordAuditLog.execute({
         actorId: input.actorId,
         action: "resource.update_failed",
         targetId: input.id,
@@ -71,7 +80,7 @@ export class UpdateResource {
 
     const persistResult = await this.deps.resourceRepo.update(updateResult.value);
     if (!persistResult.ok) {
-      void this.deps.recordAuditLog.execute({
+      await this.deps.recordAuditLog.execute({
         actorId: input.actorId,
         action: "resource.update_failed",
         targetId: input.id,
@@ -86,7 +95,7 @@ export class UpdateResource {
       return persistResult as unknown as UpdateResourceResult;
     }
 
-    void this.deps.recordAuditLog.execute({
+    await this.deps.recordAuditLog.execute({
       actorId: input.actorId,
       action: "resource.updated",
       targetId: input.id,
@@ -97,7 +106,13 @@ export class UpdateResource {
     const oldFileKey = findResult.value.fileKey;
     const newFileKey = updateResult.value.fileKey;
     if (oldFileKey && oldFileKey !== newFileKey) {
-      void this.deps.fileStorage.delete(oldFileKey);
+      const deleteResult = await this.deps.fileStorage.delete(oldFileKey);
+      if (!deleteResult.ok) {
+        console.error(
+          `[UpdateResource] Failed to delete orphaned file "${oldFileKey}":`,
+          deleteResult.error,
+        );
+      }
     }
 
     return { ok: true, value: { resourceId: input.id } };

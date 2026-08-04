@@ -26,6 +26,8 @@ export type CreateResourceError =
   | { kind: "invalid_file_type" }
   | { kind: "invalid_file_url" }
   | { kind: "invalid_access_tier" }
+  | { kind: "file_too_large" }
+  | { kind: "unsupported_file_type" }
   | { kind: "db_error"; message: string };
 
 export async function createResourceAction(

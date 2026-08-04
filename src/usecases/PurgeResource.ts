@@ -12,6 +12,15 @@
  * File cleanup happens after the row is gone and is best-effort: a
  * failed blob delete leaves an orphan, which doesn't need to block
  * the purge succeeding.
+ *
+ * The file delete and every audit-log write are `await`ed, not
+ * fire-and-forget — a `void`-called async write can be silently dropped
+ * if a serverless/edge execution context freezes right after the
+ * response is sent, before the write lands. Awaiting doesn't change the
+ * best-effort *contract* (a storage-cleanup failure still doesn't fail
+ * the purge, since the row is already gone), it just makes sure the
+ * attempt actually completes and any failure gets logged instead of
+ * disappearing.
  */
 import type { Result } from "@/domain/shared/Result";
 import type {
@@ -75,10 +84,16 @@ export class PurgeResource {
     }
 
     if (fileKey) {
-      void this.deps.fileStorage.delete(fileKey);
+      const deleteResult = await this.deps.fileStorage.delete(fileKey);
+      if (!deleteResult.ok) {
+        console.error(
+          `[PurgeResource] Failed to delete purged file "${fileKey}":`,
+          deleteResult.error,
+        );
+      }
     }
 
-    void this.deps.recordAuditLog.execute({
+    await this.deps.recordAuditLog.execute({
       actorId: input.actorId,
       action: "resource.purged",
       targetId: input.id,

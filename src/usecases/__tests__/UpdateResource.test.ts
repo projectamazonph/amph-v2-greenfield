@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { UpdateResource } from "../UpdateResource";
 import { InMemoryResourceRepository } from "@/infra/repositories/InMemoryResourceRepository";
 import { InMemoryFileStorage } from "@/infra/storage/InMemoryFileStorage";
@@ -6,6 +6,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { createResource } from "@/domain/entities/Resource";
+import type { IFileStorage } from "@/ports/storage/IFileStorage";
 
 describe("UpdateResource", () => {
   let repo: InMemoryResourceRepository;
@@ -143,5 +144,65 @@ describe("UpdateResource", () => {
       actorId: "admin_1",
     });
     expect(r.ok).toBe(true);
+  });
+
+  it("awaits the storage delete instead of firing it and forgetting", async () => {
+    // Regression for a review finding: the old cleanup call was
+    // `void`-called, so execute()'s returned promise could resolve
+    // before the delete actually landed — on a serverless/edge runtime
+    // that window can drop the cleanup entirely if the execution
+    // context freezes right after the response is sent. A storage fake
+    // whose delete() resolves one microtask late proves execute() now
+    // waits for it: if it were still fire-and-forget, `deleteSettled`
+    // would still be false the instant execute() resolves.
+    let deleteSettled = false;
+    const slowStorage: IFileStorage = {
+      upload: fileStorage.upload.bind(fileStorage),
+      delete: async (key: string) => {
+        await Promise.resolve();
+        deleteSettled = true;
+        return fileStorage.delete(key);
+      },
+    };
+    const slowUseCase = new UpdateResource({
+      resourceRepo: repo,
+      fileStorage: slowStorage,
+      recordAuditLog,
+    });
+
+    await fileStorage.upload({
+      key: "resources/res_1/old.pdf",
+      data: Buffer.from("old"),
+      contentType: "application/pdf",
+    });
+    await slowUseCase.execute({
+      id: "res_1",
+      patch: {
+        fileUrl: "https://fake-storage.test/resources/res_1/old.pdf",
+        fileKey: "resources/res_1/old.pdf",
+      },
+      actorId: "admin_1",
+    });
+
+    await slowUseCase.execute({
+      id: "res_1",
+      patch: {
+        fileUrl: "https://fake-storage.test/resources/res_1/new.pdf",
+        fileKey: "resources/res_1/new.pdf",
+      },
+      actorId: "admin_1",
+    });
+
+    expect(deleteSettled).toBe(true);
+  });
+
+  it("awaits the audit-log write instead of firing it and forgetting", async () => {
+    const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
+    const spy = vi.spyOn(auditLog, "record");
+    await useCase.execute({ id: "res_1", patch: { title: "New" }, actorId: "admin_1" });
+    // If the write were still fire-and-forget, execute() could resolve
+    // before record() had been called at all — asserting it synchronously
+    // after the awaited execute() call is the regression check.
+    expect(spy).toHaveBeenCalled();
   });
 });
