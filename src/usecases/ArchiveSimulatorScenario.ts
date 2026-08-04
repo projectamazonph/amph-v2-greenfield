@@ -22,8 +22,7 @@ export interface ArchiveSimulatorScenarioInput {
   actorId: string;
 }
 
-export type ArchiveSimulatorScenarioError =
-  | { kind: "db_error"; message: string };
+export type ArchiveSimulatorScenarioError = { kind: "db_error"; message: string };
 
 export type ArchiveSimulatorScenarioResult = Result<
   { wasAlreadyArchived: boolean },
@@ -38,9 +37,7 @@ export interface ArchiveSimulatorScenarioDeps {
 export class ArchiveSimulatorScenario {
   constructor(private readonly deps: ArchiveSimulatorScenarioDeps) {}
 
-  async execute(
-    input: ArchiveSimulatorScenarioInput,
-  ): Promise<ArchiveSimulatorScenarioResult> {
+  async execute(input: ArchiveSimulatorScenarioInput): Promise<ArchiveSimulatorScenarioResult> {
     // Check if already archived (idempotent)
     const findResult = await this.deps.scenarioRepo.findById(input.id);
     if (!findResult.ok) {
@@ -50,14 +47,20 @@ export class ArchiveSimulatorScenario {
           : "Failed to fetch scenario";
       return Result.err({ kind: "db_error", message: msg ?? "Unknown error" });
     }
-    const wasAlreadyArchived = findResult.value === null;
+    // STORY-085: findById no longer filters out archived rows (it resolves
+    // any status), so "already archived" is now read off the row's status
+    // rather than inferred from a null result.
+    const wasAlreadyArchived = findResult.value === null || findResult.value.status === "archived";
 
     if (!wasAlreadyArchived) {
       const archiveResult = await this.deps.scenarioRepo.archive(input.id);
       if (!archiveResult.ok) {
         return Result.err({
           kind: "db_error",
-          message: archiveResult.error.kind === "db_error" ? archiveResult.error.message : "Failed to archive scenario",
+          message:
+            archiveResult.error.kind === "db_error"
+              ? archiveResult.error.message
+              : "Failed to archive scenario",
         });
       }
     }

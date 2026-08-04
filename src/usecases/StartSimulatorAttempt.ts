@@ -93,7 +93,7 @@ export class StartSimulatorAttempt {
       userId: input.userId,
       simulatorId: input.simulatorId,
       scenarioId: input.scenarioId,
-      scenarioVersion: 1,
+      scenarioVersion: scenarioResult.value.version,
       difficulty: scenarioResult.value.difficulty,
       mode: input.mode ?? "practice",
       startedAt: clock.now(),

@@ -18,10 +18,15 @@ function makeScenario(
     simulatorId: string;
     name: string;
     difficulty: string;
+    version: number;
   }> = {},
 ): SimulatorScenario {
+  const id = overrides.id ?? "scen_01";
   return {
-    id: overrides.id ?? "scen_01",
+    id,
+    scenarioKey: id,
+    version: overrides.version ?? 1,
+    status: "published",
     simulatorId: (overrides.simulatorId ?? "bid-elevator") as SimulatorScenario["simulatorId"],
     name: overrides.name ?? "Test Scenario",
     description: "A test scenario",
@@ -29,6 +34,8 @@ function makeScenario(
     outputSchema: {},
     difficulty: (overrides.difficulty ?? "beginner") as SimulatorScenario["difficulty"],
     estimatedMinutes: 10,
+    createdAt: new Date("2026-01-01T00:00:00Z"),
+    updatedAt: new Date("2026-01-01T00:00:00Z"),
   };
 }
 
@@ -47,6 +54,9 @@ function makeScenarioRepo(): ISimulatorScenarioRepository {
   return {
     listAll: vi.fn().mockResolvedValue(Result.ok([])),
     findById: vi.fn(),
+    findPublished: vi.fn().mockResolvedValue(Result.ok(null)),
+    listVersions: vi.fn().mockResolvedValue(Result.ok([])),
+    publish: vi.fn().mockResolvedValue(Result.ok(makeScenario())),
     create: vi.fn().mockResolvedValue(Result.ok(makeScenario())),
     update: vi.fn().mockResolvedValue(Result.ok(makeScenario())),
     archive: vi.fn().mockResolvedValue(Result.ok(undefined)),
@@ -134,6 +144,29 @@ describe("StartSimulatorAttempt", () => {
     expect(attempt.status).toBe("in_progress");
     expect(attempt.attemptId).toMatch(/^ATT-/);
     expect(attempt.seed).not.toBeNull();
+  });
+
+  it("stamps the attempt's scenarioVersion from the scenario's actual version", async () => {
+    const scenario = makeScenario({ id: "scen_v3", version: 3 });
+    vi.mocked(scenarioRepo.findById).mockResolvedValue(Result.ok(scenario));
+
+    const uc = new StartSimulatorAttempt({
+      attemptRepo,
+      scenarioRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    });
+
+    const result = await uc.execute({
+      userId: "user_v3",
+      simulatorId: "bid-elevator",
+      scenarioId: "scen_v3",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.scenarioVersion).toBe(3);
   });
 
   it("logs to audit log on success", async () => {

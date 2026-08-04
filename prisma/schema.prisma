@@ -238,7 +238,7 @@ model Lesson {
 
 model SimulatorScenario {
   id          String @id @default(cuid())
-  simulatorId String // bid-elevator | str-triage | campaign-builder | listing-audit
+  simulatorId String // bid-elevator | str-triage | campaign-builder | listing-audit | keyword-research
   name        String
   description String
 
@@ -248,8 +248,19 @@ model SimulatorScenario {
   difficulty       String // beginner | intermediate | advanced
   estimatedMinutes Int
 
-  // Soft-delete. Null = active. Matches the discount_codes.archivedAt
-  // convention (P0-2 follow-up).
+  // STORY-085: publishing + versioning. scenarioKey groups every version of
+  // "the same" scenario; status is the lifecycle signal the app reasons
+  // about (draft | published | archived). At most one row per scenarioKey
+  // should be "published" at a time — enforced in the use-case layer via
+  // PrismaSimulatorScenarioRepository.publish()'s transaction, not a DB
+  // constraint (solo-admin, low-traffic app; not worth the added rigor).
+  scenarioKey String
+  version     Int    @default(1)
+  status      String @default("published") // draft | published | archived
+
+  // Soft-delete marker, kept for the existing index/audit trail. `status`
+  // is the primary lifecycle signal now; this is set alongside status
+  // transitioning to "archived" but not read on its own.
   archivedAt DateTime?
 
   createdAt DateTime @default(now())
@@ -257,6 +268,8 @@ model SimulatorScenario {
 
   @@index([simulatorId])
   @@index([archivedAt])
+  @@index([scenarioKey])
+  @@index([status])
   @@map("simulator_scenarios")
 }
 
