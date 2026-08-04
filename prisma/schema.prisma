@@ -42,42 +42,42 @@ enum SimulatorAccess {
 // ── Models ─────────────────────────────────────────────────
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String  @id @default(cuid())
+  email     String  @unique
   password  String
   firstName String
   lastName  String
   phone     String?
-  role      Role     @default(STUDENT)
+  role      Role    @default(STUDENT)
   avatarUrl String?
   bio       String?
 
   // Email verification
-  emailVerificationToken String?  @unique
+  emailVerificationToken String?            @unique
   emailVerifiedAt        DateTime?
   verificationStatus     VerificationStatus @default(UNVERIFIED)
 
   // Subscription
-  subscriptionTier SubscriptionTier @default(FREE)
-  subscriptionEndsAt          DateTime?
-  paymongoCustomerId           String?   @unique
+  subscriptionTier             SubscriptionTier @default(FREE)
+  subscriptionEndsAt           DateTime?
+  paymongoCustomerId           String?          @unique
   paymongoDefaultPaymentMethod String?
 
   // AMPH course access
-  simulatorAccess SimulatorAccess @default(NONE)
+  simulatorAccess   SimulatorAccess @default(NONE)
   // Deprecated (Proposal 8): denormalized copy of Enrollment rows,
   // no longer read or written by application code — Enrollment is
   // the sole source of truth for course access. Column kept for now
   // (multi-step removal); do not add new reads/writes.
-  enrolledCourseIds String[]      @default([])
+  enrolledCourseIds String[]        @default([])
 
   // XP (experience points)
-  totalXp     Int @default(0)
+  totalXp Int @default(0)
 
   // Security
-  passwordChangedAt   DateTime?
-  failedLoginCount    Int        @default(0)
-  lockedUntil         DateTime?
+  passwordChangedAt DateTime?
+  failedLoginCount  Int       @default(0)
+  lockedUntil       DateTime?
 
   // Two-factor authentication (audit hardening — admin 2FA)
   // twoFactorSecret is intentionally never exposed on the domain User
@@ -87,19 +87,19 @@ model User {
   twoFactorEnabled Boolean @default(false)
 
   // Audit
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   // Relations
-  sessions     Session[]
-  enrollments  Enrollment[]
-  orders       Order[]
-  auditLogs    AuditLog[]
-  ppcCampaigns PpcCampaign[]
-  certificates Certificate[]
-  emailVerifications EmailVerification[]
-  passwordResets PasswordReset[]
+  sessions               Session[]
+  enrollments            Enrollment[]
+  orders                 Order[]
+  auditLogs              AuditLog[]
+  ppcCampaigns           PpcCampaign[]
+  certificates           Certificate[]
+  emailVerifications     EmailVerification[]
+  passwordResets         PasswordReset[]
   liveClassRegistrations LiveClassRegistration[]
 
   @@index([email])
@@ -108,17 +108,17 @@ model User {
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  tokenHash  String   @unique
-  userAgent  String?
-  ipAddress  String?
-  expiresAt  DateTime
+  tokenHash String   @unique
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
 
   // Rotation
-  rotatedFrom String?  @unique
+  rotatedFrom String? @unique
 
   createdAt DateTime @default(now())
 
@@ -128,27 +128,27 @@ model Session {
 }
 
 model Course {
-  id          String   @id @default(cuid())
-  slug        String   @unique
+  id          String @id @default(cuid())
+  slug        String @unique
   title       String
   tagline     String
   description String
 
   // Pricing
-  priceMinor      Int
-  currency        String  @default("PHP")
-  pricingTierId   String?
-  pricingTier     PricingTier? @relation(fields: [pricingTierId], references: [id])
+  priceMinor    Int
+  currency      String       @default("PHP")
+  pricingTierId String?
+  pricingTier   PricingTier? @relation(fields: [pricingTierId], references: [id])
 
   // Content
-  curriculum  Json     // { sections: [{ title, lessons: [{ title, type, content }] }] }
+  curriculum   Json // { sections: [{ title, lessons: [{ title, type, content }] }] }
   coverImage   String?
   previewVideo String?
 
   // Meta
-  isPublished    Boolean @default(false)
-  isFeatured     Boolean @default(false)
-  displayOrder   Int     @default(0)
+  isPublished  Boolean @default(false)
+  isFeatured   Boolean @default(false)
+  displayOrder Int     @default(0)
 
   // PayMongo
   paymongoPriceId String?
@@ -158,8 +158,8 @@ model Course {
   updatedAt DateTime @updatedAt
 
   // Relations
-  enrollments Enrollment[]
-  orders      Order[]
+  enrollments  Enrollment[]
+  orders       Order[]
   certificates Certificate[]
   liveClasses  LiveClass[]
   modules      Module[]
@@ -170,18 +170,18 @@ model Course {
 // ── STORY-011: Pricing Tiers ─────────────────────────────
 
 model PricingTier {
-  id          String  @id @default(cuid())
-  slug        String  @unique // "foundations", "mastery", "ultimate", "all-access"
-  name        String
-  priceMinor  Int
-  currency    String  @default("PHP")
+  id         String @id @default(cuid())
+  slug       String @unique // "foundations", "mastery", "ultimate", "all-access"
+  name       String
+  priceMinor Int
+  currency   String @default("PHP")
 
   // Lifecycle: DRAFT (admin only) -> ACTIVE (visible on /pricing) -> ARCHIVED.
   // Follows the Course.status / LiveClass.status convention, not the
   // DiscountCode.archivedAt / SimulatorScenario.archivedAt convention.
-  status        String  @default("DRAFT") // DRAFT | ACTIVE | ARCHIVED
+  status String @default("DRAFT") // DRAFT | ACTIVE | ARCHIVED
 
-  displayOrder  Int     @default(0)
+  displayOrder Int @default(0)
 
   // Early-bird pricing: time-windowed discount shown on /pricing.
   // STORY-015.
@@ -276,19 +276,20 @@ model SimulatorScenario {
 // ── STORY-050c: Live classes ────────────────────────────
 
 model LiveClass {
-  id       String @id @default(cuid())
-  courseId String
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id              String                  @id @default(cuid())
+  courseId        String
+  course          Course                  @relation(fields: [courseId], references: [id], onDelete: Cascade)
   title           String
   scheduledAt     DateTime
   durationMinutes Int
   instructorId    String
   meetingUrl      String
-  status          String   @default("scheduled") // scheduled | cancelled | completed
+  status          String                  @default("scheduled") // scheduled | cancelled | completed
   recordingUrl    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  registrations LiveClassRegistration[]
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  registrations   LiveClassRegistration[]
+
   @@index([courseId])
   @@index([status])
   @@index([scheduledAt])
@@ -296,17 +297,17 @@ model LiveClass {
 }
 
 model LiveClassRegistration {
-  id           String   @id @default(cuid())
-  userId       String
-  liveClassId  String
-  liveClass    LiveClass @relation(fields: [liveClassId], references: [id], onDelete: Cascade)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status       String   @default("registered") // registered | cancelled | attended | no_show
-  registeredAt DateTime @default(now())
-  cancelledAt  DateTime?
+  id                 String    @id @default(cuid())
+  userId             String
+  liveClassId        String
+  liveClass          LiveClass @relation(fields: [liveClassId], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status             String    @default("registered") // registered | cancelled | attended | no_show
+  registeredAt       DateTime  @default(now())
+  cancelledAt        DateTime?
   watchedRecordingAt DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   @@unique([userId, liveClassId])
   @@index([userId])
@@ -316,27 +317,27 @@ model LiveClassRegistration {
 }
 
 model Enrollment {
-  id         String   @id @default(cuid())
-  userId     String
-  courseId   String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  userId   String
+  courseId String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  status     String   @default("active")  // active | cancelled | refunded | expired
-  source     String   @default("direct")  // direct | affiliate | simulator_trial
+  status String @default("active") // active | cancelled | refunded | expired
+  source String @default("direct") // direct | affiliate | simulator_trial
 
   // Progress
   completedLessonIds String[] @default([])
   lastLessonId       String?
-  progressPercent     Int      @default(0)
+  progressPercent    Int      @default(0)
 
   // Coupon
-  couponCode   String?
+  couponCode     String?
   couponDiscount Int?
 
   // Audit
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, courseId])
   @@index([userId])
@@ -345,28 +346,28 @@ model Enrollment {
 }
 
 model Order {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id])
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
 
   // Domain state machine: DRAFT | PENDING | PAID | FAILED | EXPIRED | REFUNDED
-  status    String   @default("DRAFT")
+  status String @default("DRAFT")
 
   // Money (always minor units)
-  subtotalMinor     Int
-  discountMinor     Int     @default(0)
-  platformFeeMinor  Int     @default(0)
-  totalMinor        Int
-  currency          String  @default("PHP")
+  subtotalMinor    Int
+  discountMinor    Int    @default(0)
+  platformFeeMinor Int    @default(0)
+  totalMinor       Int
+  currency         String @default("PHP")
 
   // PayMongo
-  paymongoPaymentId  String?  @unique
+  paymongoPaymentId   String?   @unique
   paymongoCheckoutUrl String?
-  paymongoStatus     String?  // pending | paid | failed | expired | refunded | partially_refunded
-  paymongoPaidAt     DateTime?
+  paymongoStatus      String? // pending | paid | failed | expired | refunded | partially_refunded
+  paymongoPaidAt      DateTime?
 
   // Manual override (e.g. affiliate free enrollment)
   manuallySetBy     String?
@@ -374,10 +375,10 @@ model Order {
   manuallySetAt     DateTime?
 
   // Refund
-  refundReason       String?
-  refundRequestedAt  DateTime?
-  refundProcessedAt  DateTime?
-  refundAmountMinor  Int?
+  refundReason      String?
+  refundRequestedAt DateTime?
+  refundProcessedAt DateTime?
+  refundAmountMinor Int?
 
   // Receipt
   receiptNumber String? @unique
@@ -405,25 +406,25 @@ model Order {
 }
 
 model PpcCampaign {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  name      String
+  name        String
   budgetMinor Int
-  currency  String   @default("PHP")
+  currency    String @default("PHP")
 
   // Simulation state
-  dailySpendMinor  Int      @default(0)
-  impressions      Int      @default(0)
-  clicks           Int      @default(0)
-  conversions      Int      @default(0)
-  avgCpcMinor      Int      @default(0)
+  dailySpendMinor Int @default(0)
+  impressions     Int @default(0)
+  clicks          Int @default(0)
+  conversions     Int @default(0)
+  avgCpcMinor     Int @default(0)
 
   // Daily snapshot roll-up
   dailySnapshots Json @default("[]")
 
-  status    String   @default("active")  // active | paused | exhausted | ended
+  status String @default("active") // active | paused | exhausted | ended
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -433,24 +434,24 @@ model PpcCampaign {
 }
 
 model AuditLog {
-  id         String   @id @default(cuid())
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  id     String  @id @default(cuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   // Actor tracking
-  actorType  String   @default("user")  // user | system | admin
-  actorId    String?
-  ipAddress  String?
+  actorType String  @default("user") // user | system | admin
+  actorId   String?
+  ipAddress String?
 
   // What happened
-  action     String   // e.g. "order.created", "user.login_failed"
-  resource   String   // e.g. "order", "user"
+  action     String // e.g. "order.created", "user.login_failed"
+  resource   String // e.g. "order", "user"
   resourceId String?
 
   // Details
-  payload    Json     @default("{}")
+  payload Json @default("{}")
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId])
   @@index([action])
@@ -471,17 +472,17 @@ model AuditLog {
 // trace. rawPayload is String (not Json) so an unparseable body still
 // persists instead of being rejected by the column type.
 model WebhookEvent {
-  id              String    @id @default(cuid())
-  provider        String    // e.g. "paymongo"
-  eventType       String    // e.g. "checkout_session.completed", "invalid_signature", "invalid_json"
-  providerEventId String?   // e.g. PayMongo checkout session id, when known
+  id              String  @id @default(cuid())
+  provider        String // e.g. "paymongo"
+  eventType       String // e.g. "checkout_session.completed", "invalid_signature", "invalid_json"
+  providerEventId String? // e.g. PayMongo checkout session id, when known
   signatureValid  Boolean
   rawPayload      String
 
   processedAt     DateTime?
   processingError String?
 
-  createdAt       DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   @@index([provider, eventType])
   @@index([providerEventId])
@@ -490,19 +491,19 @@ model WebhookEvent {
 }
 
 model EmailLog {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   to        String
   from      String
   subject   String
   template  String
-  status    String   @default("queued")  // queued | sent | bounced | complained
-  messageId String?  @unique
+  status    String  @default("queued") // queued | sent | bounced | complained
+  messageId String? @unique
 
   // Resend API
-  resendId  String?  @unique
+  resendId String? @unique
 
   // Audit
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   sentAt    DateTime?
 
   @@index([to])
@@ -513,21 +514,21 @@ model EmailLog {
 // ── STORY-024: Discount Codes ────────────────────────────────
 
 model DiscountCode {
-  id         String   @id @default(cuid())
-  code       String   @unique  // uppercase, e.g. "SAVE20"
-  type       String   // PERCENTAGE | FIXED
-  value      Int      // percentage (1-100) or minor units (e.g. 10000 = PHP 100.00)
-  maxUses    Int?     // null = unlimited
-  usedCount  Int      @default(0)
+  id         String    @id @default(cuid())
+  code       String    @unique // uppercase, e.g. "SAVE20"
+  type       String // PERCENTAGE | FIXED
+  value      Int // percentage (1-100) or minor units (e.g. 10000 = PHP 100.00)
+  maxUses    Int? // null = unlimited
+  usedCount  Int       @default(0)
   validFrom  DateTime?
   validUntil DateTime?
-  courseIds  String[] @default([])  // empty = all courses; non-empty = applies only to these
+  courseIds  String[]  @default([]) // empty = all courses; non-empty = applies only to these
 
   // STORY-050d: soft-delete. Null = active. Archived codes are hidden from
   // listAll()/findById() but still findByCode()-able (matches InMemoryDiscountCodeRepository).
   archivedAt DateTime?
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([archivedAt])
   @@map("discount_codes")
@@ -536,11 +537,11 @@ model DiscountCode {
 // ── STORY-028: XP Events ────────────────────────────────
 
 model XPEvent {
-  id        String   @id @default(cuid())
-  userId    String
-  amount    Int
-  reason    String   // lesson_completed | course_completed | quiz_passed | streak_bonus
-  refId     String?  // lessonId, courseId, quizAttemptId, etc.
+  id     String  @id @default(cuid())
+  userId String
+  amount Int
+  reason String // lesson_completed | course_completed | quiz_passed | streak_bonus
+  refId  String? // lessonId, courseId, quizAttemptId, etc.
 
   createdAt DateTime @default(now())
 
@@ -551,12 +552,12 @@ model XPEvent {
 // ── STORY-027: Progress Events ────────────────────────────────
 
 model ProgressEvent {
-  id        String   @id @default(cuid())
-  userId    String
-  courseId  String
-  lessonId  String?
-  type      String   // lesson_completed | course_started | course_completed
-  metadata  Json     @default("{}")
+  id       String  @id @default(cuid())
+  userId   String
+  courseId String
+  lessonId String?
+  type     String // lesson_completed | course_started | course_completed
+  metadata Json    @default("{}")
 
   createdAt DateTime @default(now())
 
@@ -575,12 +576,12 @@ model ProgressEvent {
 model UserStreak {
   id            String   @id @default(cuid())
   userId        String   @unique
-  currentStreak Int     @default(1)
-  longestStreak Int     @default(1)
+  currentStreak Int      @default(1)
+  longestStreak Int      @default(1)
   lastVisitDate DateTime @default(now())
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("user_streaks")
 }
@@ -601,7 +602,7 @@ model Quiz {
 model QuizQuestion {
   id           String       @id @default(cuid())
   quizId       String
-  quiz         Quiz        @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz         Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   questionText String
   explanation  String       @default("")
   options      QuizOption[]
@@ -611,24 +612,24 @@ model QuizQuestion {
 }
 
 model QuizOption {
-  id         String        @id @default(cuid())
+  id         String       @id @default(cuid())
   questionId String
   question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
   optionText String
-  isCorrect  Boolean       @default(false)
-  order      Int           @default(0)
+  isCorrect  Boolean      @default(false)
+  order      Int          @default(0)
 
   @@map("quiz_options")
 }
 
 model QuizAttempt {
-  id          String                @id @default(cuid())
+  id          String              @id @default(cuid())
   userId      String
   quizId      String
-  status      String                @default("in_progress")
+  status      String              @default("in_progress")
   score       Int?
   passed      Boolean?
-  startedAt   DateTime              @default(now())
+  startedAt   DateTime            @default(now())
   completedAt DateTime?
   answers     QuizAttemptAnswer[]
 
@@ -658,10 +659,10 @@ model Badge {
   slug        String       @id // e.g. "first-quiz-pass"
   name        String
   description String
-  iconName    String       // Phosphor icon name
-  xpReward   Int          @default(0)
+  iconName    String // Phosphor icon name
+  xpReward    Int          @default(0)
   archived    Boolean      @default(false) // STORY-050e: admin can hide archived badges
-  awards     BadgeAward[]
+  awards      BadgeAward[]
 
   @@map("badges")
 }
@@ -681,14 +682,14 @@ model BadgeAward {
 // ── Certificates ───────────────────────────────────────────────────────────
 
 model Certificate {
-  id               String   @id // ULID
+  id               String    @id // ULID
   userId           String
   courseId         String
-  verificationHash String   @unique
-  issuedAt         DateTime @default(now())
+  verificationHash String    @unique
+  issuedAt         DateTime  @default(now())
   revokedAt        DateTime?
   revokedReason    String?
-  status           String   @default("active") // active | revoked
+  status           String    @default("active") // active | revoked
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -702,12 +703,12 @@ model Certificate {
 // ── Email verification (STORY-007) ─────────────────────────────────────────
 
 model EmailVerification {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -719,12 +720,12 @@ model EmailVerification {
 // ── Password reset (STORY-008) ───────────────────────────────────
 
 model PasswordReset {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -735,10 +736,10 @@ model PasswordReset {
 // ── Live class reminder log (P0-7 follow-up) ───────────────────────
 
 model SentReminder {
-  id           String   @id @default(cuid())
-  liveClassId  String
-  userId       String
-  sentAt       DateTime @default(now())
+  id          String   @id @default(cuid())
+  liveClassId String
+  userId      String
+  sentAt      DateTime @default(now())
 
   // Unique on the (liveClassId, userId) pair so the database itself
   // enforces "you can't send the same reminder twice". The use case
@@ -752,22 +753,22 @@ model SentReminder {
 // ── STORY-064: Simulator Attempts ─────────────────────────────────
 
 model SimulatorAttempt {
-  id               String   @id
-  attemptId        String   @unique // human-readable, e.g. "ATT-A1B2C3"
-  userId           String
-  simulatorId       String
-  scenarioId       String
-  scenarioVersion  Int      @default(1)
-  difficulty       String   // beginner | intermediate | advanced
-  mode             String   @default("practice")
-  status           String   @default("in_progress") // in_progress | submitted | graded | expired
-  seed             String?
-  score            Int?
-  scoreDimensions  Json?
-  startedAt        DateTime @default(now())
-  submittedAt      DateTime?
-  gradedAt         DateTime?
-  decisions        SimulatorDecision[]
+  id              String              @id
+  attemptId       String              @unique // human-readable, e.g. "ATT-A1B2C3"
+  userId          String
+  simulatorId     String
+  scenarioId      String
+  scenarioVersion Int                 @default(1)
+  difficulty      String // beginner | intermediate | advanced
+  mode            String              @default("practice")
+  status          String              @default("in_progress") // in_progress | submitted | graded | expired
+  seed            String?
+  score           Int?
+  scoreDimensions Json?
+  startedAt       DateTime            @default(now())
+  submittedAt     DateTime?
+  gradedAt        DateTime?
+  decisions       SimulatorDecision[]
 
   @@index([userId])
   @@index([simulatorId])
@@ -777,17 +778,16 @@ model SimulatorAttempt {
 }
 
 model SimulatorDecision {
-  id           String   @id
+  id           String           @id
   attemptId    String
   attempt      SimulatorAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  revision     Int      @default(1)
+  revision     Int              @default(1)
   decisionData Json
-  submittedAt  DateTime @default(now())
+  submittedAt  DateTime         @default(now())
 
   @@unique([attemptId, revision])
   @@map("simulator_decisions")
 }
-
 
 // ── STORY-065: Scoring Engine ───────────────────────────────────────────
 
@@ -796,7 +796,9 @@ model ScorePolicy {
   simulatorId     String
   difficulty      String
   mode            String
-  /** JSON: Record<string, { weight: number; passingThreshold: number }> */
+  /**
+   * JSON: Record<string, { weight: number; passingThreshold: number }>
+   */
   dimensionConfig Json
   passingScore    Int      @default(70)
   createdAt       DateTime @default(now())
@@ -810,13 +812,13 @@ model ScorePolicy {
 // ── STORY-063: Email Templates ──────────────────────────────────────────────
 
 model EmailTemplate {
-  id         String   @id @default(cuid())
-  type       String   @unique  // EmailTemplateType discriminator (one row per type)
-  subject    String
-  headline   String
-  introBody  String
-  ctaLabel   String
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(cuid())
+  type        String   @unique // EmailTemplateType discriminator (one row per type)
+  subject     String
+  headline    String
+  introBody   String
+  ctaLabel    String
+  updatedAt   DateTime @updatedAt
   updatedById String
 
   @@map("email_templates")
@@ -825,19 +827,19 @@ model EmailTemplate {
 // ── STORY-066: Feedback Composer ─────────────────────────────────────────────
 
 model AttemptFeedback {
-  id               String   @id @default(cuid())
-  attemptId        String   @unique
-  userId           String
-  simulatorId      String
-  scenarioId       String
-  difficulty       String
-  mode             String
-  overallScore     Int
-  passed           Boolean
-  overallComment   String
-  remediationLinks Json
+  id                String   @id @default(cuid())
+  attemptId         String   @unique
+  userId            String
+  simulatorId       String
+  scenarioId        String
+  difficulty        String
+  mode              String
+  overallScore      Int
+  passed            Boolean
+  overallComment    String
+  remediationLinks  Json
   dimensionFeedback Json
-  completedAt      DateTime @default(now())
+  completedAt       DateTime @default(now())
 
   @@index([userId])
   @@map("attempt_feedbacks")
@@ -846,18 +848,26 @@ model AttemptFeedback {
 // ── STORY-098: Download Center ───────────────────────────────────────────────
 
 model Resource {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   title         String
   description   String
-  category      String   // guide | template | automation_tool | cheat_sheet | handout
-  fileType      String   // pdf | xlsx | gsheet | docx | zip | link
+  category      String // guide | template | automation_tool | cheat_sheet | handout
+  fileType      String // pdf | xlsx | gsheet | docx | zip | link
   fileUrl       String
   fileKey       String? // storage key if uploaded via IFileStorage (STORY-098.5); null for static assets/external links
-  accessTier    String   @default("PREVIEW") // STARTER | PRO | PREVIEW
-  isPublished   Boolean  @default(true)
-  downloadCount Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  accessTier    String    @default("PREVIEW") // STARTER | PRO | PREVIEW
+  isPublished   Boolean   @default(true)
+  downloadCount Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  // Audit fields added in review. Bare String actor ids, no @relation —
+  // same treatment as EmailTemplate.updatedById, the only existing
+  // precedent in this schema for a "who did this" column; there's no
+  // FK-relation precedent to follow instead. Nullable since rows
+  // created before this migration have neither.
+  deletedAt     DateTime?
+  createdById   String?
+  updatedById   String?
 
   @@index([category])
   @@index([isPublished])

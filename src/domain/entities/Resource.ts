@@ -84,6 +84,21 @@ export interface Resource {
   readonly downloadCount: number;
   readonly createdAt: Date;
   readonly updatedAt: Date;
+  /**
+   * Soft-delete marker, added in review alongside createdById/updatedById.
+   * `isPublished: false` remains the flag `listPublished()` filters on
+   * (unpublish-and-keep-visible-to-admins is a distinct, older concept
+   * from this); `deletedAt` is the more precise "actually deleted"
+   * signal `delete()` now also sets. Null for every row untouched by a
+   * delete.
+   */
+  readonly deletedAt: Date | null;
+  /** Actor id of whoever created this row. Bare string, no FK relation —
+   * matches EmailTemplate.updatedById, the only existing precedent in
+   * this schema. Null for rows created before this field existed. */
+  readonly createdById: string | null;
+  /** Actor id of whoever last updated this row. Null until the first edit. */
+  readonly updatedById: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -100,6 +115,8 @@ export interface CreateResourceInput {
   /** Storage key if this file was uploaded via IFileStorage. Omit/null for static assets and external links. */
   fileKey?: string | null;
   accessTier: CourseAccessTier;
+  /** Actor id of the admin creating this resource. Omit/null when unknown. */
+  createdById?: string | null;
 }
 
 export type UpdateResourcePatch = Partial<
@@ -176,6 +193,9 @@ export function createResource(input: CreateResourceInput): Result<Resource, Res
       downloadCount: 0,
       createdAt: now,
       updatedAt: now,
+      deletedAt: null,
+      createdById: input.createdById?.trim() || null,
+      updatedById: null,
     }),
   };
 }
@@ -183,6 +203,7 @@ export function createResource(input: CreateResourceInput): Result<Resource, Res
 export function updateResource(
   original: Resource,
   patch: UpdateResourcePatch,
+  updatedById?: string | null,
 ): Result<Resource, ResourceError> {
   const errors: ResourceError[] = [];
 
@@ -224,6 +245,7 @@ export function updateResource(
       accessTier,
       isPublished,
       updatedAt: new Date(),
+      updatedById: updatedById?.trim() || original.updatedById,
     }),
   };
 }

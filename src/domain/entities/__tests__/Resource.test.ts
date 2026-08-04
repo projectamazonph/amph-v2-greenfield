@@ -36,6 +36,17 @@ describe("Resource entity", () => {
       expect(res.fileKey).toBeNull();
       expect(res.createdAt).toBeInstanceOf(Date);
       expect(res.updatedAt).toBeInstanceOf(Date);
+      expect(res.deletedAt).toBeNull();
+      expect(res.createdById).toBeNull();
+      expect(res.updatedById).toBeNull();
+    });
+
+    it("records createdById when provided", () => {
+      const r = createResource({ ...baseInput, createdById: "admin_1" });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.createdById).toBe("admin_1");
+      expect(r.value.updatedById).toBeNull();
     });
 
     it("accepts a root-relative fileUrl into public/ (pre-installed static assets)", () => {
@@ -192,6 +203,22 @@ describe("Resource entity", () => {
       expect(r.ok).toBe(true);
       if (!r.ok) return;
       expect(r.value.isPublished).toBe(false);
+    });
+
+    it("records updatedById when provided", () => {
+      const r = updateResource(resource, { title: "New Title" }, "admin_2");
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.updatedById).toBe("admin_2");
+    });
+
+    it("leaves updatedById unchanged when not provided", () => {
+      const withActor = updateResource(resource, {}, "admin_2");
+      if (!withActor.ok) throw new Error("fixture setup failed");
+      const r = updateResource(withActor.value, { title: "Another Title" });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.updatedById).toBe("admin_2");
     });
 
     it("leaves fields untouched when patch omits them", () => {

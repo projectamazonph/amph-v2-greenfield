@@ -49,6 +49,12 @@ describe("CreateResource", () => {
     expect(found.ok && found.value?.title).toBe("STR Winner/Bleeder Scanner");
   });
 
+  it("records the creating admin as createdById", async () => {
+    await useCase.execute(makeInput({ id: "res_created_by", actorId: "admin_7" }));
+    const found = await repo.findById("res_created_by");
+    expect(found.ok && found.value?.createdById).toBe("admin_7");
+  });
+
   it("fails validation when title is empty", async () => {
     const r = await useCase.execute(makeInput({ title: "   " }));
     expect(r.ok).toBe(false);

@@ -6,6 +6,20 @@
  * (STORY-098.5) actually removes the row — used by `PurgeResource`
  * when an admin-uploaded file needs to be fully removed, storage and
  * all. Migration 20260803000000_resource adds the table.
+ *
+ * `deletedAt`/`createdById`/`updatedById` added in review (schema
+ * completeness — a mutable model with soft/hard delete but no actor
+ * trail). `createdById`/`updatedById` are real and wired through
+ * create()/update(). `deletedAt` is deliberately left unset by both
+ * delete() and hardDelete(), and reads do not filter on it: `delete()`
+ * already has a working, admin-reversible signal (`isPublished: false`
+ * — the edit page's "Published" toggle round-trips through it, and
+ * `findById`/the edit page must keep finding an unpublished resource),
+ * and `hardDelete()` leaves no row to mark. Wiring `deletedAt` into
+ * either would either duplicate `isPublished` with a second flag
+ * nothing reads, or — if reads filtered on it — break the unpublish/
+ * republish flow outright (confirmed against `DeleteResource.test.ts`,
+ * which re-`findById`s after `delete()` and expects to find the row).
  */
 
 import { PrismaClient } from "@prisma/client";
@@ -34,6 +48,9 @@ interface ResourceRow {
   downloadCount: number;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
+  createdById: string | null;
+  updatedById: string | null;
 }
 
 export class PrismaResourceRepository implements IResourceRepository {
@@ -83,6 +100,7 @@ export class PrismaResourceRepository implements IResourceRepository {
           accessTier: resource.accessTier,
           isPublished: resource.isPublished,
           downloadCount: resource.downloadCount,
+          createdById: resource.createdById,
         },
       });
       return Result.ok(undefined);
@@ -104,6 +122,7 @@ export class PrismaResourceRepository implements IResourceRepository {
           fileKey: resource.fileKey,
           accessTier: resource.accessTier,
           isPublished: resource.isPublished,
+          updatedById: resource.updatedById,
         },
       });
       return Result.ok(undefined);
@@ -174,6 +193,9 @@ export class PrismaResourceRepository implements IResourceRepository {
       downloadCount: row.downloadCount,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
+      deletedAt: row.deletedAt,
+      createdById: row.createdById,
+      updatedById: row.updatedById,
     };
   }
 }

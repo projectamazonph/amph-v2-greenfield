@@ -66,7 +66,7 @@ export class UpdateResource {
       return { ok: false, error: { kind: "not_found" } };
     }
 
-    const updateResult = updateResource(findResult.value, input.patch);
+    const updateResult = updateResource(findResult.value, input.patch, input.actorId);
     if (!updateResult.ok) {
       await this.deps.recordAuditLog.execute({
         actorId: input.actorId,

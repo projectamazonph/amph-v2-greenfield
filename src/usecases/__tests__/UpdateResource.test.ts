@@ -88,6 +88,12 @@ describe("UpdateResource", () => {
     expect(auditLog.getAll().some((e) => e.action === "resource.updated")).toBe(true);
   });
 
+  it("records the editing admin as updatedById", async () => {
+    await useCase.execute({ id: "res_1", patch: { title: "New" }, actorId: "admin_9" });
+    const found = await repo.findById("res_1");
+    expect(found.ok && found.value?.updatedById).toBe("admin_9");
+  });
+
   it("deletes the old uploaded file from storage when the file is replaced", async () => {
     await fileStorage.upload({
       key: "resources/res_1/old.pdf",
