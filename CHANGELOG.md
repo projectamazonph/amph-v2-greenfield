@@ -4,6 +4,28 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-04: Build the missing listing-audit and campaign-builder UIs; fix a real grading bug
+
+Follow-up to STORY-085 (below): built the two UI gaps it left open, and fixed a
+pre-existing production bug discovered while building them.
+
+- **listing-audit** — `ListingAuditForm` now has a real edit → triage (fix/skip per
+  finding) → grade flow, calling `listingAuditAttempt()` instead of stopping at the
+  preview-only `auditListing()`.
+- **campaign-builder** — `CampaignBuilderForm` now has a real nested editor: add/remove
+  campaigns, ad groups, and keywords, submitted as `userAdjustedCampaigns` so grading
+  produces real `scoreDimensions`/feedback instead of always `null`.
+- **Bug fix, unrelated to STORY-085's own changes** (present since STORY-067/069/070):
+  `GradeSimulatorAttempt` requires an attempt already `"submitted"`, and
+  `SubmitSimulatorAttempt` requires at least one saved decision. bid-elevator and
+  campaign-builder never called either before grading; listing-audit called submit
+  _after_ grading instead of before. Every graded call to these three actions was
+  silently failing in production — invisible to unit tests since they mock the grading
+  call directly. Fixed in all three, with regression tests asserting submit-before-grade
+  ordering.
+
+See `docs/stories/STORY-085.md`'s "Post-merge follow-up" section for full detail.
+
 ### 2026-08-04: Scenario publishing + versioning — full rewire (STORY-085)
 
 `SimulatorScenario` rows used to be pure metadata: every practice page hardcoded its actual

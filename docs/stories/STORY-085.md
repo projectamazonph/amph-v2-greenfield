@@ -117,16 +117,36 @@ client-echoed payload, closing a real trust gap — done in ascending risk order
    `runBidElevator()` and its tests removed. `BidElevatorResult` (the shared result view) was
    unchanged — its props already matched what `bidElevatorAttempt()`'s response maps onto.
 
+## Post-merge follow-up: the two UI gaps below were closed the same week
+
+The original version of this section flagged two known gaps as deliberately out of scope:
+a manual campaign-structure editor for campaign-builder, and a fix/skip review UI for
+listing-audit. Both were built in a follow-up session (2026-08-04, same branch):
+
+- **listing-audit**: `ListingAuditForm` now has a real edit → triage → grade flow. The
+  student edits the listing and runs a preview (`auditListing()`), triages each finding as
+  fix/skip (mirroring the real Amazon workflow), then submits for grading — which now calls
+  `listingAuditAttempt()` (previously unreachable from the UI) instead of stopping at the
+  preview.
+- **campaign-builder**: `CampaignBuilderForm` now has a real nested editor — add/remove
+  campaigns (name/type/budget), each with ad groups (name/bid), each with keywords
+  (text/match-type/bid) — submitted as `userAdjustedCampaigns` in a single
+  `campaignBuilderAttempt()` call, so `scoreDimensions`/`feedback` are now real instead of
+  always `null`.
+
+**A real, pre-existing production bug was found and fixed in the same pass, unrelated to
+STORY-085 itself** (present since STORY-067/069/070, well before this story): `GradeSimulatorAttempt`
+requires an attempt already in `"submitted"` status, and `SubmitSimulatorAttempt` itself
+requires at least one saved decision. bid-elevator and campaign-builder never called
+`saveSimulatorDecision` or `submitSimulatorAttempt` at all before grading; listing-audit
+called `submitSimulatorAttempt` _after_ grading instead of before. Every graded call to
+these three actions was silently failing in production — invisible to unit tests because
+they mock `gradeSimulatorAttempt.execute()` directly rather than exercising the real use
+case's status checks. All three now save a decision and submit before grading, with new
+regression tests asserting the call order.
+
 ## Known limitations (discovered during implementation, deliberately not expanded into)
 
-- **No manual campaign-structure or fix/skip editor exists in the UI.** `campaignBuilderAttempt()`
-  accepts an optional `userAdjustedCampaigns` (a self-built campaign structure to grade) and
-  `listingAuditAttempt()` requires `userFindingActions` (per-finding fix/skip decisions) —
-  both existed in code before this story, but no UI collects either. campaign-builder now
-  persists an attempt without them (`scoreDimensions`/`feedback` stay `null`, same degraded
-  behavior the legacy path always had). listing-audit's UI still calls the preview-only
-  `auditListing()`, not `listingAuditAttempt()`, for the same reason — building either editor
-  is a real, separate feature addition, not a rewire, and was out of scope for this story.
 - **No Postgres partial-unique-index enforces "at most one published version per
   scenarioKey."** Enforced at the transaction layer (`PrismaSimulatorScenarioRepository.publish()`)
   instead — a deliberate choice for this solo-admin, low-traffic app, not an oversight.
