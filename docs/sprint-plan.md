@@ -225,10 +225,10 @@ exists to remove.
 | STORY-080 | Replace length-based listing scoring with a real rubric                        | 1   | ◐ merged, PR #245 (difficulty-scaled finding volume not yet implemented) |
 | STORY-081 | Versioned keyword scenario datasets; split Listing Audit from Keyword Research | 1   | ✅ done — PR #246                                                        |
 | STORY-082 | Expand STR Triage classifier (thresholds, relevance, match precision)          | 1   | ✅ done — PR #247                                                        |
-| STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ⏳ Planned                                                               |
+| STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-083.md`                    |
 | STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ⏳ Planned                                                               |
 
-**Sprint 15 status:** 5/7 stories done (STORY-078–082); STORY-080 has one open acceptance criterion (see its story doc). STORY-083 and STORY-084 remain planned — both need Ryan's Amazon PPC expertise, not delegable to an agent.
+**Sprint 15 status:** 6/7 stories done (STORY-078–083); STORY-080 has one open acceptance criterion (see its story doc). STORY-084 remains planned — needs Ryan's Amazon PPC expertise; STORY-083 is done as of 2026-08-04 (Ryan directing the work directly, with his decisions already recorded in the story doc, rather than an agent inventing the judgment calls).
 
 ## Sprint 16 — Assessment Platform Maturity (5 pts)
 
