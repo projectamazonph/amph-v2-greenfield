@@ -5,12 +5,14 @@
  *  1. "editing" — pre-fills a listing (title, bullets, description) and
  *     lets the student revise it. "Run audit" calls auditListing() (a
  *     preview: findings against the current content, no persisted attempt).
- *  2. "reviewing" — the student triages each finding as fix/skip, mirroring
- *     Amazon's real workflow of deciding what to act on. "Submit for
- *     grading" calls listingAuditAttempt() with those decisions, which
- *     persists a real graded SimulatorAttempt.
- *  3. "graded" — shows the score, ground-truth correctness per finding,
- *     and formative feedback.
+ *  2. "reviewing" — the student triages each finding as fix now / defer /
+ *     skip / escalate (STORY-083), mirroring a real reviewer's workflow of
+ *     deciding what to act on, what to schedule, what's a non-issue, and
+ *     what needs a second opinion. "Submit for grading" calls
+ *     listingAuditAttempt() with those decisions, which persists a real
+ *     graded SimulatorAttempt.
+ *  3. "graded" — shows the score, the resolved expected action + rationale
+ *     per finding, and formative feedback.
  *
  * "Start over" returns to stage 1 without losing the edited content, in
  * case the student wants to revise the listing based on what the findings
@@ -44,8 +46,10 @@ interface Props {
 type Stage = "editing" | "reviewing" | "graded";
 
 const FINDING_ACTIONS: ReadonlyArray<{ value: FindingAction; label: string }> = [
+  { value: "fixNow", label: "Fix now" },
+  { value: "defer", label: "Defer" },
   { value: "skip", label: "Skip" },
-  { value: "fix", label: "Fix" },
+  { value: "escalate", label: "Escalate" },
 ];
 
 export function ListingAuditForm({
@@ -236,7 +240,9 @@ export function ListingAuditForm({
       ) : null}
       {stage !== "editing" ? (
         <div className={styles.findings}>
-          <h3 className={styles.findingsTitle}>Findings — triage each one as fix or skip</h3>
+          <h3 className={styles.findingsTitle}>
+            Findings — triage each one as fix now, defer, skip, or escalate
+          </h3>
           <ul className={styles.findingsList}>
             {findings.map((f) => {
               const graded = gradedFindingsById?.get(f.id);
@@ -251,8 +257,9 @@ export function ListingAuditForm({
                     <span
                       className={styles.resultBadge}
                       data-correct={graded.isCorrect ? "true" : "false"}
+                      title={graded.rationale}
                     >
-                      {graded.isCorrect ? "✓ correct" : `✗ was ${graded.groundTruth}`}
+                      {graded.isCorrect ? "✓ correct" : `✗ expected ${graded.expectedAction}`}
                     </span>
                   ) : (
                     <select

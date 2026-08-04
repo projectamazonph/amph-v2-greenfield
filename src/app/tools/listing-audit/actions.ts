@@ -42,6 +42,13 @@
  *
  * STORY-088: a passing Challenge-mode attempt awards a one-time
  * `XPService.SIMULATOR_CHALLENGE_PASSED_XP` bonus.
+ *
+ * STORY-083: `FindingAction` expands from a binary fix/skip set to
+ * `fixNow`/`defer`/`skip`/`escalate`, and ground truth is resolved per
+ * finding (context-dependent), not from severity alone. The scenario's
+ * `structuredAttributes`/`primaryCustomerIntent`/`primaryKeywords`/
+ * `complianceEvidence` are resolved server-side alongside the rest of the
+ * scenario content, same trust boundary as `category`/`niche`/etc.
  */
 
 "use server";
@@ -132,6 +139,10 @@ export async function auditListing(input: AuditListingInput): Promise<AuditListi
     images: scenario.content.images as unknown as readonly ListingImage[],
     hasVideo: scenario.content.hasVideo,
     hasAPlus: scenario.content.hasAPlus,
+    structuredAttributes: scenario.content.structuredAttributes,
+    primaryCustomerIntent: scenario.content.primaryCustomerIntent,
+    primaryKeywords: scenario.content.primaryKeywords,
+    complianceEvidence: scenario.content.complianceEvidence,
   };
   try {
     const output = (await sim.run(domainInput)) as ListingAuditOutput;
@@ -175,7 +186,9 @@ export interface ListingAuditAttemptResult {
       readonly severity: string;
       readonly message: string;
       readonly suggestion: string;
-      readonly groundTruth: FindingAction;
+      readonly expectedAction: FindingAction;
+      readonly acceptedActions: readonly FindingAction[];
+      readonly rationale: string;
       readonly userChoice: FindingAction | undefined;
       readonly isCorrect: boolean;
     }>;
@@ -207,7 +220,7 @@ export type ListingAuditAttemptResponse = ListingAuditAttemptResult | ListingAud
 
 // ── Validation ─────────────────────────────────────────────────────────
 
-const VALID_FINDING_ACTIONS: readonly FindingAction[] = ["fix", "skip"];
+const VALID_FINDING_ACTIONS: readonly FindingAction[] = ["fixNow", "defer", "skip", "escalate"];
 
 const listingAuditAttemptSchema = z.object({
   title: z.string().min(1),
@@ -314,6 +327,10 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
       images: scenario.content.images as unknown as readonly ListingImage[],
       hasVideo: scenario.content.hasVideo,
       hasAPlus: scenario.content.hasAPlus,
+      structuredAttributes: scenario.content.structuredAttributes,
+      primaryCustomerIntent: scenario.content.primaryCustomerIntent,
+      primaryKeywords: scenario.content.primaryKeywords,
+      complianceEvidence: scenario.content.complianceEvidence,
       userFindingActions: { ...userFindingActions },
     };
     simOutput = (await sim.run(simInput)) as ListingAuditOutput;
@@ -410,7 +427,9 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
         severity: f.severity,
         message: f.message,
         suggestion: f.suggestion,
-        groundTruth: f.groundTruth,
+        expectedAction: f.expectedAction,
+        acceptedActions: f.acceptedActions,
+        rationale: f.rationale,
         userChoice: f.userChoice ?? userFindingActions[f.id],
         isCorrect: f.isCorrect,
       })),

@@ -18,6 +18,11 @@ export const listingAuditScenarioContentSchema = z.object({
   hasVideo: z.boolean().default(false),
   hasAPlus: z.boolean().default(false),
   marketplace: z.string().default("US"),
+  // ── STORY-083: ground-truth resolver context ─────────────────────────
+  structuredAttributes: z.record(z.string(), z.string()).default({}),
+  primaryCustomerIntent: z.string().default(""),
+  primaryKeywords: z.array(z.string()).default([]),
+  complianceEvidence: z.record(z.string(), z.string()).default({}),
 });
 
 export type ListingAuditScenarioContent = z.infer<typeof listingAuditScenarioContentSchema>;

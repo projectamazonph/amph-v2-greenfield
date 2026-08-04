@@ -150,8 +150,12 @@ const SIM_OUTPUT: ListingAuditOutput = {
       marketplace: "US",
       policyVersion: "amazon-2026-07-27",
       effectiveDate: "2026-07-27",
-      groundTruth: "fix",
-      userChoice: "fix",
+      expectedAction: "fixNow",
+      acceptedActions: ["fixNow", "defer"],
+      rationale:
+        "A meaningful listing-quality issue; act on it now or schedule it -- don't ignore it.",
+      evidenceRefs: [],
+      userChoice: "fixNow",
       isCorrect: true,
     },
     {
@@ -166,7 +170,11 @@ const SIM_OUTPUT: ListingAuditOutput = {
       marketplace: "US",
       policyVersion: "amazon-2026-07-27",
       effectiveDate: "2026-07-27",
-      groundTruth: "skip",
+      expectedAction: "skip",
+      acceptedActions: ["skip", "defer"],
+      rationale:
+        "Low-impact finding with no compliance risk; skipping or scheduling it later is reasonable.",
+      evidenceRefs: [],
       userChoice: "skip",
       isCorrect: true,
     },
@@ -238,7 +246,7 @@ const VALID_INPUT = {
   title: "Bamboo Cutting Board",
   bullets: ["100% organic bamboo"],
   description: "High-quality bamboo cutting board.",
-  userFindingActions: { "finding-0": "fix", "finding-1": "skip" },
+  userFindingActions: { "finding-0": "fixNow", "finding-1": "skip" },
 };
 
 // ── listingAuditAttempt tests ────────────────────────────────────────────
@@ -380,7 +388,7 @@ describe("listingAuditAttempt", () => {
 
     expect(result.value.gradedFindings).toHaveLength(2);
     expect(result.value.gradedFindings[0]!.id).toBe("finding-0");
-    expect(result.value.gradedFindings[0]!.groundTruth).toBe("fix");
+    expect(result.value.gradedFindings[0]!.expectedAction).toBe("fixNow");
     expect(result.value.gradedFindings[0]!.isCorrect).toBe(true);
   });
 

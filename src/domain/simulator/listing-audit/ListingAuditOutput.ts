@@ -7,10 +7,14 @@
  * title/bullet/description scores with a weighted-categorical rubric
  * across six dimensions. See docs/stories/STORY-080.md.
  *
- * The fix/skip ground-truth grading (groundTruthAction, direction,
- * priorityCoverage, reviewCoverage) is unchanged here -- STORY-083 owns
- * replacing that with a contextual, non-binary action model. This story
- * only replaces how findings are generated and how the listing is scored.
+ * STORY-083: replaces the binary fix/skip ground truth (a pure function of
+ * severity -- "mark everything fix" passed at every difficulty) with a
+ * 4-action, context-dependent model. `FindingAction` gains `defer` and
+ * `escalate`; `GradedFinding` carries `expectedAction`/`acceptedActions`/
+ * `rationale`/`evidenceRefs` instead of a bare `groundTruth`. The finding
+ * generator (RULES, `evaluate()`) is untouched -- STORY-083 only replaces
+ * how a finding's expected action is resolved, in
+ * `ListingAuditSimulator.ts`'s `resolveExpectedAction()`.
  */
 
 export type RuleDimension =
@@ -42,16 +46,70 @@ export interface AuditFinding {
   readonly effectiveDate: string;
 }
 
-/** Student's triage decision for a finding: fix it now, or skip it. */
-export type FindingAction = "fix" | "skip";
+/**
+ * Student's triage decision for a finding. STORY-083 expands this from a
+ * binary fix/skip set to four actions, matching how a real PPC/listing
+ * reviewer actually triages an audit:
+ *  - fixNow:   act on this immediately, no ambiguity
+ *  - defer:    a real improvement, but not urgent -- schedule it, don't skip it
+ *  - skip:     a genuine non-issue in this context (false positive, covered
+ *              elsewhere, or not applicable) -- not the same as "ignore it"
+ *  - escalate: compliance risk is plausible but not disproven by available
+ *              evidence -- flag for human review rather than guessing
+ */
+export type FindingAction = "fixNow" | "defer" | "skip" | "escalate";
 
 export interface GradedFinding extends AuditFinding {
-  /** Ground-truth correct action: "fix" for warning/critical, "skip" for info. */
-  readonly groundTruth: FindingAction;
+  /**
+   * The single best action for this finding given its context --
+   * resolved by `resolveExpectedAction()`, not by severity alone.
+   */
+  readonly expectedAction: FindingAction;
+  /**
+   * Every action that counts as correct for this finding. Usually just
+   * `[expectedAction]`, but a finding can have more than one legitimate
+   * response (e.g. both `skip` and `defer` are defensible for a low-impact,
+   * context-disproven warning).
+   */
+  readonly acceptedActions: readonly FindingAction[];
+  /** Why this action (or set of actions) is correct -- shown to the student. */
+  readonly rationale: string;
+  /** `ListingScenarioContext` field paths that justified the resolution, e.g. `["structuredAttributes.dimensions"]`. */
+  readonly evidenceRefs: readonly string[];
   /** Student's submitted action (undefined = not yet reviewed). */
   readonly userChoice?: FindingAction;
-  /** Whether the student's choice matched ground truth. */
+  /** Whether the student's choice is in `acceptedActions`. */
   readonly isCorrect: boolean;
+}
+
+/**
+ * Additional per-listing context STORY-083's ground-truth resolver needs to
+ * tell a genuine issue from a context-disproven false positive. All fields
+ * beyond the ones ListingAuditInput already carried (marketplace, images,
+ * hasAPlus) are new; all are optional with defaults so existing callers
+ * that only audit title/bullets/description keep working, matching
+ * STORY-080's precedent for `images`/`hasVideo`/`hasAPlus`.
+ */
+export interface ListingScenarioContext {
+  readonly marketplace: string;
+  readonly categoryId: string;
+  readonly productType: string;
+  /** e.g. `{ material: "bamboo", dimensions: "18 x 12 x 1 in" }` -- disproves missing-attribute findings. */
+  readonly structuredAttributes: Readonly<Record<string, string>>;
+  readonly variationTheme: string;
+  /** What the shopper is actually trying to accomplish -- used to judge whether front-loaded/synonym coverage is sufficient. */
+  readonly primaryCustomerIntent: string;
+  readonly primaryKeywords: readonly string[];
+  readonly listingStrategy: string;
+  readonly currentPerformance: Readonly<Record<string, unknown>>;
+  /**
+   * Evidence that disproves or confirms a compliance-adjacent finding, e.g.
+   * `{ "prohibited_superlative_claims": "BPA-free is a material fact, not a promotional claim" }`.
+   * Keyed by ruleId. Presence of a key means the finding has documented
+   * evidence; absence means the resolver has nothing to go on and must not
+   * silently assume innocence.
+   */
+  readonly complianceEvidence: Readonly<Record<string, string>>;
 }
 
 export interface ListingAudit {

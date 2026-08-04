@@ -494,6 +494,10 @@ const SCENARIOS: ReadonlyArray<{
     // `images`/`hasVideo`/`hasAPlus`/`marketplace` were implicit defaults on the
     // page before — made explicit here. `name` above doubles as the initial
     // listing title (the page's SCENARIO.title served both roles already).
+    // STORY-083: structuredAttributes/primaryCustomerIntent/primaryKeywords/
+    // complianceEvidence are new ground-truth resolver context — reasonable,
+    // documented scenario content, not requiring Ryan's per-scenario
+    // authoring (only the engine *rules* needed his judgment).
     inputSchema: {
       category: "Kitchen",
       niche: "bamboo cutting board",
@@ -508,6 +512,13 @@ const SCENARIOS: ReadonlyArray<{
       hasVideo: false,
       hasAPlus: false,
       marketplace: "US",
+      structuredAttributes: {
+        material: "100% organic bamboo",
+        dimensions: "18 x 12 x 1 in",
+      },
+      primaryCustomerIntent: "home cooks looking for a durable, sustainable kitchen cutting board",
+      primaryKeywords: ["bamboo cutting board", "kitchen cutting board"],
+      complianceEvidence: {},
     },
   },
   {
