@@ -28,6 +28,7 @@ function makeAttempt(
     simulatorId: string;
     scenarioId: string;
     status: string;
+    mode: string;
     decisions: readonly SimulatorDecision[];
   }> = {},
 ): SimulatorAttempt {
@@ -40,7 +41,7 @@ function makeAttempt(
     scenarioId: overrides.scenarioId ?? "scen_01",
     scenarioVersion: 1,
     difficulty: "beginner",
-    mode: "practice",
+    mode: (overrides.mode ?? "practice") as SimulatorAttempt["mode"],
     startedAt: new Date("2025-03-01T00:00:00Z"),
   });
   if (overrides.status && overrides.status !== "in_progress") {
@@ -182,6 +183,77 @@ describe("InMemorySimulatorAttemptRepository", () => {
 
   it("findByUserAndScenario returns empty array when no matches", async () => {
     const result = await repo.findByUserAndScenario("nobody", "bid-elevator", "ghost_scenario");
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value).toEqual([]);
+  });
+
+  it("findByUserAndSimulator returns attempts across scenario versions", async () => {
+    const a1 = makeAttempt({
+      id: "att_sim1",
+      userId: "dana",
+      simulatorId: "bid-elevator",
+      scenarioId: "s_v1",
+    });
+    const a2 = makeAttempt({
+      id: "att_sim2",
+      userId: "dana",
+      simulatorId: "bid-elevator",
+      scenarioId: "s_v2",
+    });
+    const a3 = makeAttempt({
+      id: "att_sim3",
+      userId: "erin",
+      simulatorId: "bid-elevator",
+      scenarioId: "s_v1",
+    });
+    await repo.create(a1);
+    await repo.create(a2);
+    await repo.create(a3);
+
+    const result = await repo.findByUserAndSimulator("dana", "bid-elevator");
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.map((a) => a.id).sort()).toEqual(["att_sim1", "att_sim2"]);
+  });
+
+  it("findByUserAndSimulator filters by mode and status", async () => {
+    const practiceGraded = makeAttempt({
+      id: "att_mode1",
+      userId: "frank",
+      simulatorId: "str-triage",
+      mode: "practice",
+      status: "graded",
+    });
+    const challengeGraded = makeAttempt({
+      id: "att_mode2",
+      userId: "frank",
+      simulatorId: "str-triage",
+      mode: "challenge",
+      status: "graded",
+    });
+    const practiceInProgress = makeAttempt({
+      id: "att_mode3",
+      userId: "frank",
+      simulatorId: "str-triage",
+      mode: "practice",
+      status: "in_progress",
+    });
+    await repo.create(practiceGraded);
+    await repo.create(challengeGraded);
+    await repo.create(practiceInProgress);
+
+    const result = await repo.findByUserAndSimulator("frank", "str-triage", {
+      mode: "practice",
+      status: "graded",
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.map((a) => a.id)).toEqual(["att_mode1"]);
+  });
+
+  it("findByUserAndSimulator returns empty array when no matches", async () => {
+    const result = await repo.findByUserAndSimulator("nobody", "bid-elevator");
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value).toEqual([]);

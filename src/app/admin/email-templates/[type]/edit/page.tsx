@@ -66,11 +66,11 @@ export default async function EditEmailTemplatePage({ params, searchParams }: Pa
       <Card padding={6} style={{ marginBottom: "1rem" }}>
         <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--ink-500)" }}>
           Saving here replaces the corresponding email&apos;s live copy the next time it sends
-          (STORY-095.5). There is no {"{{"}placeholder{"}}"} support — whatever you write here
-          replaces the default text verbatim, so a per-recipient detail baked into the default (like
-          the student&apos;s first name in a headline) is lost once you customize that field.
+          (STORY-095.5). There is no {"{{"}placeholder{"}}"} support, so whatever you write here
+          replaces the default text verbatim, and a per-recipient detail baked into the default
+          (like the student&apos;s first name in a headline) is lost once you customize that field.
           {type === "refund"
-            ? " The refund email has no call-to-action button, so Cta label has no effect here."
+            ? " The refund email has no call-to-action button, so CTA label has no effect here."
             : null}
         </p>
       </Card>

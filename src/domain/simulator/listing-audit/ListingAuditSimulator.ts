@@ -12,15 +12,14 @@
  * review -- they are deliberately simple, versioned, and overridable,
  * not asserted as exhaustive Amazon policy.
  *
- * This story does NOT change the ground-truth fix/skip grading
- * (groundTruthAction, direction, priorityCoverage, reviewCoverage) --
- * that binary model, and its replacement with a contextual, non-binary
- * action set, is STORY-083's job. Only the finding generator and the
- * listing score change here.
+ * STORY-080 does NOT change the ground-truth fix/skip grading -- that
+ * binary model, and its replacement with a contextual, non-binary action
+ * set, is STORY-083's job (see the "Ground truth resolution" section
+ * below). Only the finding generator and the listing score changed here.
  */
 
 import type { Simulator } from "@/ports/simulator/Simulator";
-import type { ListingAuditInput, ListingImage } from "./ListingAuditInput";
+import type { ListingAuditInput, ListingImage, ImageRole } from "./ListingAuditInput";
 import type {
   ListingAuditOutput,
   ListingAudit,
@@ -114,7 +113,7 @@ const TITLE_POLICY = {
 
 // ── Rule engine ──────────────────────────────────────────────────────────
 
-interface RuleContext {
+export interface RuleContext {
   readonly title: string;
   readonly lowerTitle: string;
   readonly bullets: readonly string[];
@@ -128,6 +127,11 @@ interface RuleContext {
   readonly images: readonly ListingImage[];
   readonly hasVideo: boolean;
   readonly hasAPlus: boolean;
+  // ── STORY-083: ground-truth resolver context ─────────────────────────
+  readonly structuredAttributes: Readonly<Record<string, string>>;
+  readonly primaryCustomerIntent: string;
+  readonly primaryKeywords: readonly string[];
+  readonly complianceEvidence: Readonly<Record<string, string>>;
 }
 
 interface RuleEvalResult {
@@ -658,23 +662,234 @@ function generateKeywords(niche: string): KeywordResult[] {
   }));
 }
 
-// ── Grading (unchanged -- STORY-083 replaces this) ──────────────────────────
+// ── Ground truth resolution (STORY-083) ──────────────────────────────────
+//
+// Replaces the binary `severity === "info" ? "skip" : "fix"` ground truth,
+// which meant "mark everything fix" passed at every difficulty. Each
+// finding's expected action is resolved from its ruleId + the listing's
+// ListingScenarioContext, not from severity alone -- severity only backs
+// the *default* resolution for rules with no documented context override.
+//
+// Design boundary: STORY-080's finding generator (RULES, evaluate()) is
+// untouched. This section only decides what a student *should have done*
+// about a finding that's already been generated.
+
+export interface ExpectedActionResult {
+  readonly expectedAction: FindingAction;
+  readonly acceptedActions: readonly FindingAction[];
+  readonly rationale: string;
+  readonly evidenceRefs: readonly string[];
+}
 
 const SEVERITY_WEIGHT: Record<FindingSeverity, number> = { critical: 3, warning: 2, info: 1 };
 
-function groundTruthAction(severity: FindingSeverity): FindingAction {
-  return severity === "info" ? "skip" : "fix";
+/**
+ * Rules whose failure risks real Amazon compliance/suppression action --
+ * the only rules where `escalate` (vs. an outright `skip`) is ever the
+ * correct call for documented-but-unresolved evidence. Not the same set as
+ * `isCriticalGate` on RuleDefinition: some critical-severity findings
+ * (e.g. `bullet_count_sufficient` at zero bullets) are objectively
+ * true/false with no compliance ambiguity possible, so they don't need
+ * the escalate nuance -- they stay in the plain severity-based default.
+ */
+const CRITICAL_GATE_RULE_IDS: ReadonlySet<string> = new Set([
+  "title_length_limit",
+  "prohibited_medical_claims",
+  "category_prohibited_claims",
+  "main_image_present",
+  "main_image_white_background",
+]);
+
+/**
+ * Severity-informed fallback for any rule without a specific override
+ * below. Severity describes potential impact, not the correct action, but
+ * absent more specific context it's the only signal available.
+ */
+function defaultResolution(finding: AuditFinding): ExpectedActionResult {
+  if (finding.severity === "info") {
+    return {
+      expectedAction: "skip",
+      acceptedActions: ["skip", "defer"],
+      rationale:
+        "Low-impact finding with no compliance risk; skipping or scheduling it later is reasonable.",
+      evidenceRefs: [],
+    };
+  }
+  if (finding.severity === "warning") {
+    return {
+      expectedAction: "fixNow",
+      acceptedActions: ["fixNow", "defer"],
+      rationale:
+        "A meaningful listing-quality issue; act on it now or schedule it -- don't ignore it.",
+      evidenceRefs: [],
+    };
+  }
+  return {
+    expectedAction: "fixNow",
+    acceptedActions: ["fixNow"],
+    rationale: "Critical issue with no documented context to disprove it; must be fixed.",
+    evidenceRefs: [],
+  };
+}
+
+/**
+ * The five real-compliance-risk rules: never skippable outright. Documented
+ * `complianceEvidence` for the ruleId either disproves the finding (value
+ * prefixed "disproven:" -> skip) or merely documents genuine ambiguity
+ * (any other value -> escalate, per the story decision "if compliance is
+ * uncertain rather than disproven, the correct action is escalate, not
+ * skip"). No evidence at all -> the violation is real; must fix now.
+ */
+function resolveCriticalGate(finding: AuditFinding, ctx: RuleContext): ExpectedActionResult | null {
+  if (!CRITICAL_GATE_RULE_IDS.has(finding.ruleId)) return null;
+
+  const evidence = ctx.complianceEvidence[finding.ruleId];
+  if (evidence === undefined) {
+    return {
+      expectedAction: "fixNow",
+      acceptedActions: ["fixNow"],
+      rationale:
+        "Critical compliance or suppression risk with no documented evidence to the contrary -- must be fixed.",
+      evidenceRefs: [],
+    };
+  }
+  if (evidence.toLowerCase().startsWith("disproven:")) {
+    return {
+      expectedAction: "skip",
+      acceptedActions: ["skip"],
+      rationale: `Documented evidence disproves this as a false positive: ${evidence}`,
+      evidenceRefs: [`complianceEvidence.${finding.ruleId}`],
+    };
+  }
+  return {
+    expectedAction: "escalate",
+    acceptedActions: ["escalate"],
+    rationale: `Compliance risk is plausible but not disproven -- flag for human review: ${evidence}`,
+    evidenceRefs: [`complianceEvidence.${finding.ruleId}`],
+  };
+}
+
+/**
+ * Rule-specific overrides encoding the six documented skip cases
+ * (docs/stories/STORY-083.md). Each checks the context that would actually
+ * disprove the finding for that rule; returns null (fall through to the
+ * severity default) when the context doesn't support a skip.
+ */
+const OVERRIDE_RESOLVERS: Readonly<
+  Record<string, (finding: AuditFinding, ctx: RuleContext) => ExpectedActionResult | null>
+> = {
+  // Skip case: an exact niche keyword is absent from the title, but
+  // another primary keyword (this scenario's stand-in for "a clear
+  // synonym") already covers the customer's intent there.
+  niche_in_title: (_finding, ctx) => {
+    const titleHasAnyPrimaryKeyword = ctx.primaryKeywords.some((k) =>
+      ctx.lowerTitle.includes(k.toLowerCase()),
+    );
+    if (!titleHasAnyPrimaryKeyword || ctx.primaryCustomerIntent.length === 0) return null;
+    return {
+      expectedAction: "skip",
+      acceptedActions: ["skip", "defer"],
+      rationale:
+        "A primary keyword already covers the customer's intent in the title; adding the exact missing term would risk keyword stuffing.",
+      evidenceRefs: ["primaryKeywords", "primaryCustomerIntent"],
+    };
+  },
+  // Skip case: "BPA-free" (or similar) incorrectly flagged as a
+  // promotional superlative -- it's a material fact, not marketing copy.
+  prohibited_superlative_claims: (finding, ctx) => {
+    const evidence = ctx.complianceEvidence[finding.ruleId];
+    if (evidence === undefined) return null;
+    return {
+      expectedAction: "skip",
+      acceptedActions: ["skip"],
+      rationale: `Documented compliance evidence disproves this finding: ${evidence}`,
+      evidenceRefs: [`complianceEvidence.${finding.ruleId}`],
+    };
+  },
+  // Skip case: title is long, but the first-screen (~40 char) portion
+  // already identifies the product per the documented customer intent.
+  title_front_loaded: (_finding, ctx) => {
+    const visiblePrefix = ctx.lowerTitle.slice(0, 40);
+    const intentWords = ctx.primaryCustomerIntent.toLowerCase().split(/\s+/).filter(Boolean);
+    const prefixCoversIntent = intentWords.some((w) => visiblePrefix.includes(w));
+    if (!prefixCoversIntent) return null;
+    return {
+      expectedAction: "skip",
+      acceptedActions: ["skip", "defer"],
+      rationale:
+        "The first 40 characters already identify the product per the documented customer intent.",
+      evidenceRefs: ["primaryCustomerIntent"],
+    };
+  },
+  // Skip case (apparel/electronics): a required attribute isn't in the
+  // visible copy, but structured listing data (size chart, compatibility
+  // table) already covers it in full.
+  category_required_attributes: (_finding, ctx) => {
+    const required = ctx.categoryVariant.requiredAttributeTerms;
+    if (required.length === 0 || Object.keys(ctx.structuredAttributes).length === 0) return null;
+    const coveredByStructuredData = required.every((term) =>
+      Object.keys(ctx.structuredAttributes).some((k) =>
+        k.toLowerCase().includes(term.toLowerCase()),
+      ),
+    );
+    if (!coveredByStructuredData) return null;
+    return {
+      expectedAction: "skip",
+      acceptedActions: ["skip", "defer"],
+      rationale:
+        "Structured listing data (e.g. a size chart or compatibility table) already covers the required attributes outside the visible copy.",
+      evidenceRefs: ["structuredAttributes"],
+    };
+  },
+  // Skip case: six images instead of seven, but every image role this
+  // category actually needs is already present -- the raw count doesn't
+  // indicate a real gap.
+  image_count_sufficient: (_finding, ctx) => {
+    const requiredRoles: readonly ImageRole[] = ["main", "lifestyle", "infographic"];
+    const presentRoles = new Set(ctx.images.map((img) => img.role));
+    const allRequiredRolesPresent = requiredRoles.every((r) => presentRoles.has(r));
+    if (!allRequiredRolesPresent) return null;
+    return {
+      expectedAction: "skip",
+      acceptedActions: ["skip", "defer"],
+      rationale:
+        "Every image role this category needs is already present; the raw image count doesn't indicate a real gap.",
+      evidenceRefs: ["images"],
+    };
+  },
+};
+
+export function resolveExpectedAction(
+  finding: AuditFinding,
+  ctx: RuleContext,
+): ExpectedActionResult {
+  const criticalGateResult = resolveCriticalGate(finding, ctx);
+  if (criticalGateResult) return criticalGateResult;
+
+  const override = OVERRIDE_RESOLVERS[finding.ruleId]?.(finding, ctx);
+  if (override) return override;
+
+  return defaultResolution(finding);
 }
 
 function buildGradedFindings(
   findings: readonly AuditFinding[],
   userFindingActions: Readonly<Record<string, FindingAction>> | undefined,
+  ctx: RuleContext,
 ): GradedFinding[] {
   return findings.map((f) => {
-    const groundTruth = groundTruthAction(f.severity);
+    const resolution = resolveExpectedAction(f, ctx);
     const userChoice = userFindingActions?.[f.id];
-    const isCorrect = userChoice !== undefined && userChoice === groundTruth;
-    return { ...f, groundTruth, userChoice, isCorrect };
+    const isCorrect = userChoice !== undefined && resolution.acceptedActions.includes(userChoice);
+    return {
+      ...f,
+      expectedAction: resolution.expectedAction,
+      acceptedActions: resolution.acceptedActions,
+      rationale: resolution.rationale,
+      evidenceRefs: resolution.evidenceRefs,
+      userChoice,
+      isCorrect,
+    };
   });
 }
 
@@ -684,24 +899,30 @@ function scoreDirection(gradedFindings: readonly GradedFinding[]): number {
   return Math.round((correct / gradedFindings.length) * 100);
 }
 
+/**
+ * Severity-weighted F1 of the student's `fixNow` decisions -- generalized
+ * from STORY-080's "fix" to "fixNow" (the only action that means "act on
+ * this immediately"). Rewards correctly identifying what's actually urgent
+ * AND not over-flagging things that aren't.
+ */
 function scorePriorityCoverage(gradedFindings: readonly GradedFinding[]): number {
   if (gradedFindings.length === 0) return 100;
 
   const weightOf = (fs: readonly GradedFinding[]) =>
     fs.reduce((sum, f) => sum + SEVERITY_WEIGHT[f.severity], 0);
 
-  const mustFix = gradedFindings.filter((f) => f.groundTruth === "fix");
-  const userFixed = gradedFindings.filter((f) => f.userChoice === "fix");
-  const correctlyFixed = mustFix.filter((f) => f.userChoice === "fix");
+  const mustFixNow = gradedFindings.filter((f) => f.expectedAction === "fixNow");
+  const userFixedNow = gradedFindings.filter((f) => f.userChoice === "fixNow");
+  const correctlyFixedNow = mustFixNow.filter((f) => f.userChoice === "fixNow");
 
-  const mustFixWeight = weightOf(mustFix);
-  const userFixedWeight = weightOf(userFixed);
-  const hitWeight = weightOf(correctlyFixed);
+  const mustFixNowWeight = weightOf(mustFixNow);
+  const userFixedNowWeight = weightOf(userFixedNow);
+  const hitWeight = weightOf(correctlyFixedNow);
 
-  if (mustFixWeight === 0) return userFixedWeight === 0 ? 100 : 0;
+  if (mustFixNowWeight === 0) return userFixedNowWeight === 0 ? 100 : 0;
 
-  const recall = hitWeight / mustFixWeight;
-  const precision = userFixedWeight === 0 ? 0 : hitWeight / userFixedWeight;
+  const recall = hitWeight / mustFixNowWeight;
+  const precision = userFixedNowWeight === 0 ? 0 : hitWeight / userFixedNowWeight;
   if (recall + precision === 0) return 0;
 
   return Math.round(((2 * recall * precision) / (recall + precision)) * 100);
@@ -740,6 +961,10 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
     const images = input.images ?? [];
     const hasVideo = input.hasVideo ?? false;
     const hasAPlus = input.hasAPlus ?? false;
+    const structuredAttributes = input.structuredAttributes ?? {};
+    const primaryCustomerIntent = input.primaryCustomerIntent ?? "";
+    const primaryKeywords = input.primaryKeywords ?? [];
+    const complianceEvidence = input.complianceEvidence ?? {};
 
     if (!niche && !title) {
       const emptyDimensionScores = Object.fromEntries(
@@ -769,6 +994,10 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
       images,
       hasVideo,
       hasAPlus,
+      structuredAttributes,
+      primaryCustomerIntent,
+      primaryKeywords,
+      complianceEvidence,
     };
 
     // ── Evaluate every rule ─────────────────────────────────────────────
@@ -825,7 +1054,7 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
     const keywords = generateKeywords(niche);
     const searchVolumeEstimate = keywords.reduce((sum, k) => sum + k.searchVolumeEstimate, 0);
 
-    const gradedFindings = buildGradedFindings(allFindings, userFindingActions);
+    const gradedFindings = buildGradedFindings(allFindings, userFindingActions, ctx);
     const scoreDimensions =
       userFindingActions !== undefined ? computeDimensionScores(gradedFindings) : null;
 

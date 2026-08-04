@@ -108,7 +108,13 @@ class FakePrismaClient {
     },
 
     findMany: async (args: {
-      where?: { userId?: string; simulatorId?: string; scenarioId?: string; status?: string };
+      where?: {
+        userId?: string;
+        simulatorId?: string;
+        scenarioId?: string;
+        status?: string;
+        mode?: string;
+      };
     }) => {
       if (this.failNextFind) {
         this.failNextFind = false;
@@ -121,6 +127,7 @@ class FakePrismaClient {
       if (args.where?.scenarioId)
         rows = rows.filter((r) => r.scenarioId === args.where!.scenarioId);
       if (args.where?.status) rows = rows.filter((r) => r.status === args.where!.status);
+      if (args.where?.mode) rows = rows.filter((r) => r.mode === args.where!.mode);
       return rows.map((r) => ({
         ...r,
         decisions: this.decisionRows.filter((d) => d.attemptId === r.id),
@@ -178,7 +185,7 @@ function makeAttempt(overrides: Partial<SimulatorAttemptRow> = {}): SimulatorAtt
     scenarioId: overrides.scenarioId ?? "pscen_01",
     scenarioVersion: 1,
     difficulty: "beginner",
-    mode: "practice",
+    mode: (overrides.mode ?? "practice") as SimulatorAttempt["mode"],
     seed: overrides.seed !== undefined ? overrides.seed : "PSEED123",
     startedAt: new Date("2025-03-01T00:00:00Z"),
   });
@@ -317,7 +324,65 @@ describe("PrismaSimulatorAttemptRepository", () => {
     expect(result.value[0]!.id).toBe("patt_p2");
   });
 
-  // ΓöÇΓöÇ addDecision ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  // ── findByUserAndSimulator ────────────────────────────────────────────
+
+  it("findByUserAndSimulator returns attempts across scenario versions", async () => {
+    const a1 = makeAttempt({
+      id: "patt_sim1",
+      userId: "sam",
+      simulatorId: "bid-elevator",
+      scenarioId: "ps_v1",
+    });
+    const a2 = makeAttempt({
+      id: "patt_sim2",
+      userId: "sam",
+      simulatorId: "bid-elevator",
+      scenarioId: "ps_v2",
+    });
+    const a3 = makeAttempt({
+      id: "patt_sim3",
+      userId: "tina",
+      simulatorId: "bid-elevator",
+      scenarioId: "ps_v1",
+    });
+    await repo.create(a1);
+    await repo.create(a2);
+    await repo.create(a3);
+
+    const result = await repo.findByUserAndSimulator("sam", "bid-elevator");
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.map((a) => a.id).sort()).toEqual(["patt_sim1", "patt_sim2"]);
+  });
+
+  it("findByUserAndSimulator filters by mode and status", async () => {
+    const practiceGraded = makeAttempt({
+      id: "patt_mode1",
+      userId: "uma",
+      simulatorId: "str-triage",
+      mode: "practice",
+      status: "graded",
+    });
+    const challengeGraded = makeAttempt({
+      id: "patt_mode2",
+      userId: "uma",
+      simulatorId: "str-triage",
+      mode: "challenge",
+      status: "graded",
+    });
+    await repo.create(practiceGraded);
+    await repo.create(challengeGraded);
+
+    const result = await repo.findByUserAndSimulator("uma", "str-triage", {
+      mode: "practice",
+      status: "graded",
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.map((a) => a.id)).toEqual(["patt_mode1"]);
+  });
+
+  // ── addDecision ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
   it("addDecision appends a decision to an in_progress attempt", async () => {
     const attempt = makeAttempt({ id: "patt_d1" });

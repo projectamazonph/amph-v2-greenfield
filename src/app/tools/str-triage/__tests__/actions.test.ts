@@ -4,6 +4,11 @@
  * STORY-082: Expand STR Triage classifier. Rewritten for the new
  * SearchTermRow schema, 7-value TriageAction taxonomy, and the removal of
  * the legacy classifyStr() path.
+ *
+ * STORY-085: strTriageAttempt() no longer accepts scenario economics from
+ * the client — it resolves the currently published str-triage scenario
+ * server-side via scenarioRepo.findPublished(). Tests mock that lookup
+ * instead of passing scenario fields in the input.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -30,6 +35,10 @@ const mockContainer = {
   composeAttemptFeedback: { execute: vi.fn() },
   submitSimulatorAttempt: { execute: vi.fn() },
   simulatorRegistry: { get: vi.fn() },
+  scenarioRepo: { findPublished: vi.fn() },
+  simulatorAttemptRepo: { findByUserAndSimulator: vi.fn() },
+  scorePolicyRepo: { findBySimulatorAndDifficulty: vi.fn() },
+  awardXp: { execute: vi.fn() },
 };
 
 const fakeSimulator = {
@@ -52,7 +61,7 @@ const VALID_ROW = {
   sourceMatchType: "broad" as const,
 };
 
-const VALID_INPUT = {
+const SCENARIO_CONTENT = {
   rows: [VALID_ROW],
   averageOrderValue: 30,
   expectedCtrPct: 4,
@@ -67,7 +76,27 @@ const VALID_INPUT = {
   competitorBrandLexicon: ["cutco"],
   existingTargets: [],
   sourceCampaignRole: "research" as const,
+};
+
+const PUBLISHED_SCENARIO = {
+  id: "str-triage-scenario-kitchen-products",
+  scenarioKey: "str-triage-scenario-kitchen-products",
+  version: 1,
+  status: "published" as const,
+  simulatorId: "str-triage" as const,
+  name: "Clean up a broad match campaign for kitchen products",
+  description: "Triage 14 search terms from a broad-match kitchen products campaign.",
+  inputSchema: SCENARIO_CONTENT,
+  outputSchema: {},
+  difficulty: "intermediate" as const,
+  estimatedMinutes: 15,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const VALID_INPUT = {
   userActions: { "stainless steel knife set": "harvest_exact" as const },
+  mode: "practice" as const,
 };
 
 const SIM_OUTPUT: StrTriageOutput = {
@@ -125,6 +154,11 @@ function happyContainer() {
   );
   mockContainer.simulatorRegistry.get.mockReturnValue(fakeSimulator);
   fakeSimulator.run.mockResolvedValue(SIM_OUTPUT);
+  mockContainer.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
+  mockContainer.simulatorAttemptRepo.findByUserAndSimulator.mockResolvedValue(Result.ok([]));
+  mockContainer.awardXp.execute.mockResolvedValue(
+    Result.ok({ xpEvent: { id: "xpe_1" }, totalXp: 100 }),
+  );
 }
 
 describe("strTriageAttempt", () => {
@@ -143,26 +177,8 @@ describe("strTriageAttempt", () => {
     expect(result.error.kind).toBe("unauthorized");
   });
 
-  it("returns validation_error when rows is empty", async () => {
-    const result = await strTriageAttempt({ ...VALID_INPUT, rows: [] });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
-  it("returns validation_error when a row is missing required fields", async () => {
-    const result = await strTriageAttempt({
-      ...VALID_INPUT,
-      rows: [{ searchTerm: "incomplete" }],
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
   it("returns validation_error for an unknown triage action", async () => {
     const result = await strTriageAttempt({
-      ...VALID_INPUT,
       userActions: { "stainless steel knife set": "shrug" },
     });
     expect(result.ok).toBe(false);
@@ -170,14 +186,22 @@ describe("strTriageAttempt", () => {
     expect(result.error.kind).toBe("validation_error");
   });
 
-  it("returns validation_error for a malformed existing target", async () => {
-    const result = await strTriageAttempt({
-      ...VALID_INPUT,
-      existingTargets: [{ text: "x" }],
-    });
+  it("returns attempt_error when no published scenario exists", async () => {
+    mockContainer.scenarioRepo.findPublished.mockResolvedValueOnce(Result.ok(null));
+    const result = await strTriageAttempt(VALID_INPUT);
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
+    expect(result.error.kind).toBe("attempt_error");
+  });
+
+  it("returns attempt_error when the published scenario's content is malformed", async () => {
+    mockContainer.scenarioRepo.findPublished.mockResolvedValueOnce(
+      Result.ok({ ...PUBLISHED_SCENARIO, inputSchema: { rows: [] } }),
+    );
+    const result = await strTriageAttempt(VALID_INPUT);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
   });
 
   it("happy path: starts attempt, grades, composes feedback, returns result", async () => {
@@ -194,7 +218,11 @@ describe("strTriageAttempt", () => {
     expect(result.value.classifications[0]!.searchTerm).toBe("stainless steel knife set");
 
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
-      expect.objectContaining({ simulatorId: "str-triage", mode: "practice" }),
+      expect.objectContaining({
+        simulatorId: "str-triage",
+        mode: "practice",
+        scenarioId: "str-triage-scenario-kitchen-products",
+      }),
     );
     expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalledWith({
       attemptId: "ATT-STR1234",
@@ -206,7 +234,7 @@ describe("strTriageAttempt", () => {
     expect(mockContainer.submitSimulatorAttempt.execute).toHaveBeenCalled();
   });
 
-  it("passes the full scenario config through to the simulator", async () => {
+  it("passes the server-resolved scenario config through to the simulator, not client input", async () => {
     await strTriageAttempt(VALID_INPUT);
     expect(fakeSimulator.run).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -248,5 +276,28 @@ describe("strTriageAttempt", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("feedback_error");
+  });
+
+  it("awards Challenge-mode XP on a passing challenge attempt", async () => {
+    const result = await strTriageAttempt({ ...VALID_INPUT, mode: "challenge" });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).toHaveBeenCalledWith({
+      userId: "user_123",
+      amount: 25,
+      reason: "simulator_challenge_passed",
+      refId: "ATT-STR1234",
+    });
+    expect(result.value.xpAwarded).toBe(25);
+  });
+
+  it("does not award XP for a passing practice-mode attempt", async () => {
+    const result = await strTriageAttempt(VALID_INPUT);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).not.toHaveBeenCalled();
+    expect(result.value.xpAwarded).toBeNull();
   });
 });

@@ -154,6 +154,13 @@ jobs:
       RESEND_API_KEY: re_test_dummy
       SENTRY_DSN: ""
       EMAIL_VERIFICATION_SECRET: test-verification-secret
+      # Dummy value so validateRequiredEnvVars()'s production fail-closed
+      # check (added in review, closes a real silent-fallback-to-
+      # LocalFileStorage gap) doesn't throw here. `pnpm build && pnpm start`
+      # runs in production mode (next start always does, regardless of the
+      # shell env), but this is CI, not a real deploy — same treatment as
+      # every other secret above.
+      BLOB_READ_WRITE_TOKEN: vercel_blob_rw_test_dummy
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -281,7 +288,12 @@ jobs:
       PAYMONGO_WEBHOOK_SECRET: whsec_test_dummy
       RESEND_API_KEY: re_test_dummy
       NEXT_PUBLIC_APP_URL: http://localhost:3000
-      PORT: '3000'
+      PORT: "3000"
+      # Same dummy-value treatment as the e2e job above — this standalone
+      # server also runs in production mode, so validateRequiredEnvVars()'s
+      # fail-closed check needs something here even though the pages this
+      # job scores don't touch the DB/container at render time today.
+      BLOB_READ_WRITE_TOKEN: vercel_blob_rw_test_dummy
     steps:
       - uses: actions/checkout@v4
 

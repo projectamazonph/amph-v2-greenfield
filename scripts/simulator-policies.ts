@@ -98,12 +98,23 @@ export const POLICIES: PolicyDef[] = [
   },
 
   // ── Campaign Builder ──────────────────────────────────────────────────
+  // STORY-084: 7-dimension weight table, Ryan's 2026-07-29 decision pass
+  // (docs/stories/STORY-084.md). Same weights across difficulties, only
+  // passingScore differs -- matches the pre-STORY-084 convention.
   {
     id: "policy-campaign-builder-beginner-practice",
     simulatorId: "campaign-builder",
     difficulty: "beginner",
     mode: "practice",
-    dimensionConfig: { structureQuality: 0.45, budgetAllocation: 0.33, keywordRelevance: 0.22 },
+    dimensionConfig: {
+      keywordRelevance: 0.2,
+      structureQuality: 0.2,
+      negativeRouting: 0.2,
+      budgetAllocation: 0.15,
+      brandedIsolation: 0.1,
+      duplicateControl: 0.1,
+      namingCompliance: 0.05,
+    },
     passingScore: 50,
   },
   {
@@ -111,7 +122,15 @@ export const POLICIES: PolicyDef[] = [
     simulatorId: "campaign-builder",
     difficulty: "intermediate",
     mode: "practice",
-    dimensionConfig: { structureQuality: 0.45, budgetAllocation: 0.33, keywordRelevance: 0.22 },
+    dimensionConfig: {
+      keywordRelevance: 0.2,
+      structureQuality: 0.2,
+      negativeRouting: 0.2,
+      budgetAllocation: 0.15,
+      brandedIsolation: 0.1,
+      duplicateControl: 0.1,
+      namingCompliance: 0.05,
+    },
     passingScore: 65,
   },
   {
@@ -119,7 +138,15 @@ export const POLICIES: PolicyDef[] = [
     simulatorId: "campaign-builder",
     difficulty: "advanced",
     mode: "practice",
-    dimensionConfig: { structureQuality: 0.45, budgetAllocation: 0.33, keywordRelevance: 0.22 },
+    dimensionConfig: {
+      keywordRelevance: 0.2,
+      structureQuality: 0.2,
+      negativeRouting: 0.2,
+      budgetAllocation: 0.15,
+      brandedIsolation: 0.1,
+      duplicateControl: 0.1,
+      namingCompliance: 0.05,
+    },
     passingScore: 80,
   },
 

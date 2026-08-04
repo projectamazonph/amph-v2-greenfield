@@ -12,6 +12,7 @@ import type {
   SimulatorAttempt,
   AttemptStatus,
   ScoreDimensions,
+  SimulatorMode,
 } from "@/domain/entities/SimulatorAttempt";
 import type { SimulatorDecision } from "@/domain/entities/SimulatorDecision";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
@@ -91,6 +92,21 @@ export class InMemorySimulatorAttemptRepository implements ISimulatorAttemptRepo
         a.simulatorId === simulatorId &&
         a.scenarioId === scenarioId &&
         (options?.onlyInProgress ? a.status === "in_progress" : true),
+    );
+    return Result.ok(matches);
+  }
+
+  async findByUserAndSimulator(
+    userId: string,
+    simulatorId: SimulatorId,
+    options?: { mode?: SimulatorMode; status?: AttemptStatus },
+  ): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>> {
+    const matches = Array.from(this.attempts.values()).filter(
+      (a) =>
+        a.userId === userId &&
+        a.simulatorId === simulatorId &&
+        (options?.mode ? a.mode === options.mode : true) &&
+        (options?.status ? a.status === options.status : true),
     );
     return Result.ok(matches);
   }

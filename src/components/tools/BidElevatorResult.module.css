@@ -112,3 +112,10 @@
 .tdNumStrong { text-align: right; font-family: var(--font-mono); color: var(--ink-900); font-weight: 600; }
 
 .table tr:last-child td { border-bottom: 0; }
+
+.xpBanner {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--success);
+}

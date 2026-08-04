@@ -10,7 +10,11 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import { hydrateSimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
-import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
+import type {
+  SimulatorAttempt,
+  SimulatorMode,
+  AttemptStatus,
+} from "@/domain/entities/SimulatorAttempt";
 import type { SimulatorDecision } from "@/domain/entities/SimulatorDecision";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
 import type {
@@ -123,6 +127,35 @@ export class PrismaSimulatorAttemptRepository implements ISimulatorAttemptReposi
       const where: Record<string, unknown> = { userId, simulatorId, scenarioId };
       if (options?.onlyInProgress) {
         where.status = "in_progress";
+      }
+      const rows = await this.db.simulatorAttempt.findMany({
+        where,
+        include: { decisions: { orderBy: { revision: "asc" } } },
+        orderBy: { startedAt: "desc" },
+      });
+      return Result.ok(
+        rows
+          .map((r) => this.mapRow(r as unknown as PrismaAttemptRow))
+          .filter((r) => r.ok)
+          .map((r) => r.value),
+      );
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async findByUserAndSimulator(
+    userId: string,
+    simulatorId: SimulatorId,
+    options?: { mode?: SimulatorMode; status?: AttemptStatus },
+  ): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>> {
+    try {
+      const where: Record<string, unknown> = { userId, simulatorId };
+      if (options?.mode) {
+        where.mode = options.mode;
+      }
+      if (options?.status) {
+        where.status = options.status;
       }
       const rows = await this.db.simulatorAttempt.findMany({
         where,

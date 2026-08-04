@@ -38,6 +38,7 @@ function makeAttemptRepo(): ISimulatorAttemptRepository {
     findById: vi.fn(),
     findByAttemptId: vi.fn(),
     findByUserAndScenario: vi.fn(),
+    findByUserAndSimulator: vi.fn(),
     addDecision: vi.fn().mockResolvedValue(Result.ok(undefined)),
     updateStatus: vi.fn(),
   };

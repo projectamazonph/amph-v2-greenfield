@@ -116,7 +116,7 @@ export async function StudentShell({
 const COMMAND_PALETTE_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/courses", label: "My Courses" },
-  { href: "/tools", label: "Simulators" },
+  { href: "/tools", label: "Tools" },
   { href: "/tools/bid-elevator", label: "Bid Elevator", section: "Tools" },
   { href: "/tools/campaign-builder", label: "Campaign Builder", section: "Tools" },
   { href: "/tools/keyword-research", label: "Keyword Research", section: "Tools" },

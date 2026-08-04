@@ -9,18 +9,22 @@
  *  3. Imagery scoring
  *  4. Finding generation (volume, stability, determinism)
  *  5. Keyword research (unchanged, STORY-081's concern)
- *  6. Ground-truth fix/skip grading (unchanged, STORY-083's concern)
+ *  6. Ground-truth triage (STORY-083): 4-action, context-dependent
+ *     resolution replacing the old severity-only fix/skip model.
  */
 
 import { describe, it, expect } from "vitest";
 import {
   ListingAuditSimulator,
   DIMENSION_WEIGHTS,
+  resolveExpectedAction,
 } from "@/domain/simulator/listing-audit/ListingAuditSimulator";
+import type { RuleContext } from "@/domain/simulator/listing-audit/ListingAuditSimulator";
 import type {
   ListingAuditInput,
   ListingImage,
 } from "@/domain/simulator/listing-audit/ListingAuditInput";
+import type { AuditFinding } from "@/domain/simulator/listing-audit/ListingAuditOutput";
 
 const simulator = new ListingAuditSimulator();
 
@@ -346,85 +350,80 @@ describe("keyword research", () => {
   });
 });
 
-// ── Ground-truth fix/skip grading (unchanged -- STORY-083's concern) ────────
+// ── Ground-truth triage (STORY-083) ─────────────────────────────────────────
+//
+// `input` below has no structuredAttributes/primaryKeywords/complianceEvidence
+// and uses greatListing()'s default 5-image set, so none of the six
+// context-dependent skip-case overrides trigger for it -- every finding
+// falls through to the severity-informed default resolution. That's a
+// deliberate, useful baseline: it isolates "does the default behave
+// correctly" from "do the context overrides behave correctly" (tested
+// separately below). It produces a mix of info/warning/non-gate-critical
+// findings (verified by the "spans more than one action type" test).
+
+const gtInput = greatListing({ title: "x", bullets: [], description: "" });
 
 describe("ground-truth triage (no userFindingActions)", () => {
-  const input = greatListing({ title: "x", bullets: [], description: "" });
-
   it("returns null scoreDimensions in preview mode", async () => {
-    const result = await simulator.run(input);
+    const result = await simulator.run(gtInput);
     expect(result.scoreDimensions).toBeNull();
   });
 
-  it("populates gradedFindings with groundTruth but no userChoice", async () => {
-    const result = await simulator.run(input);
+  it("populates gradedFindings with a resolved expectedAction but no userChoice", async () => {
+    const result = await simulator.run(gtInput);
     expect(result.gradedFindings.length).toBe(result.audit.findings.length);
     for (const f of result.gradedFindings) {
       expect(f.userChoice).toBeUndefined();
       expect(f.isCorrect).toBe(false);
-      expect(["fix", "skip"]).toContain(f.groundTruth);
+      expect(["fixNow", "defer", "skip", "escalate"]).toContain(f.expectedAction);
+      expect(f.acceptedActions).toContain(f.expectedAction);
+      expect(f.rationale.length).toBeGreaterThan(0);
     }
   });
 
-  it("groundTruth is 'skip' for info-severity findings and 'fix' otherwise", async () => {
-    const result = await simulator.run(input);
+  it("default resolution (no override context) is skip for info, fixNow for warning/critical", async () => {
+    const result = await simulator.run(gtInput);
     for (const f of result.gradedFindings) {
-      expect(f.groundTruth).toBe(f.severity === "info" ? "skip" : "fix");
+      expect(f.expectedAction).toBe(f.severity === "info" ? "skip" : "fixNow");
     }
   });
 });
 
 describe("direction scoring (userFindingActions provided)", () => {
-  const input = greatListing({ title: "x", bullets: [], description: "" });
-
   it("direction = 100 when every finding is triaged correctly", async () => {
-    const preview = await simulator.run(input);
+    const preview = await simulator.run(gtInput);
     const userFindingActions = Object.fromEntries(
-      preview.gradedFindings.map((f) => [f.id, f.groundTruth]),
+      preview.gradedFindings.map((f) => [f.id, f.expectedAction]),
     );
-    const result = await simulator.run({ ...input, userFindingActions });
+    const result = await simulator.run({ ...gtInput, userFindingActions });
     expect(result.scoreDimensions).not.toBeNull();
     expect(result.scoreDimensions!.direction).toBe(100);
   });
 
-  it("direction = 0 when every finding is triaged incorrectly", async () => {
-    const preview = await simulator.run(input);
-    const userFindingActions: Record<string, "fix" | "skip"> = Object.fromEntries(
-      preview.gradedFindings.map((f): [string, "fix" | "skip"] => [
+  it("direction = 0 when every finding is triaged with a non-accepted action", async () => {
+    const preview = await simulator.run(gtInput);
+    const userFindingActions: Record<string, "fixNow" | "skip"> = Object.fromEntries(
+      preview.gradedFindings.map((f): [string, "fixNow" | "skip"] => [
         f.id,
-        f.groundTruth === "fix" ? "skip" : "fix",
+        f.expectedAction === "fixNow" ? "skip" : "fixNow",
       ]),
     );
-    const result = await simulator.run({ ...input, userFindingActions });
+    const result = await simulator.run({ ...gtInput, userFindingActions });
     expect(result.scoreDimensions!.direction).toBe(0);
   });
 });
 
 describe("priorityCoverage scoring", () => {
-  it("priorityCoverage is NOT 100 when everything is marked fix", async () => {
-    const input = greatListing({ title: "x", bullets: [], description: "" });
-    const preview = await simulator.run(input);
-    const skippable = preview.gradedFindings.filter((f) => f.groundTruth === "skip");
-    expect(skippable.length).toBeGreaterThan(0);
-
+  it("priorityCoverage = 100 only when the fixNow set matches ground truth exactly", async () => {
+    const preview = await simulator.run(gtInput);
     const userFindingActions = Object.fromEntries(
-      preview.gradedFindings.map((f) => [f.id, "fix" as const]),
+      preview.gradedFindings.map((f) => [f.id, f.expectedAction]),
     );
-    const result = await simulator.run({ ...input, userFindingActions });
-    expect(result.scoreDimensions!.priorityCoverage).toBeLessThan(100);
-  });
-
-  it("priorityCoverage = 100 only when the fix set matches ground truth exactly", async () => {
-    const input = greatListing({ title: "x", bullets: [], description: "" });
-    const preview = await simulator.run(input);
-    const userFindingActions = Object.fromEntries(
-      preview.gradedFindings.map((f) => [f.id, f.groundTruth]),
-    );
-    const result = await simulator.run({ ...input, userFindingActions });
+    const result = await simulator.run({ ...gtInput, userFindingActions });
     expect(result.scoreDimensions!.priorityCoverage).toBe(100);
   });
 
-  it("priorityCoverage = 100 when there are no must-fix findings and none were fixed", async () => {
+  it("priorityCoverage = 100 when there are no must-fix-now findings and none were fixed", async () => {
     const result = await simulator.run({
       title: "",
       bullets: [],
@@ -438,19 +437,17 @@ describe("priorityCoverage scoring", () => {
 });
 
 describe("reviewCoverage (reported, not graded)", () => {
-  const input = greatListing({ title: "x", bullets: [], description: "" });
-
   it("reviewCoverage = 100 when every finding has a userChoice", async () => {
-    const preview = await simulator.run(input);
+    const preview = await simulator.run(gtInput);
     const userFindingActions = Object.fromEntries(
-      preview.gradedFindings.map((f) => [f.id, f.groundTruth]),
+      preview.gradedFindings.map((f) => [f.id, f.expectedAction]),
     );
-    const result = await simulator.run({ ...input, userFindingActions });
+    const result = await simulator.run({ ...gtInput, userFindingActions });
     expect(result.scoreDimensions!.reviewCoverage).toBe(100);
   });
 
   it("reviewCoverage = 0 when no findings are reviewed", async () => {
-    const result = await simulator.run({ ...input, userFindingActions: {} });
+    const result = await simulator.run({ ...gtInput, userFindingActions: {} });
     expect(result.scoreDimensions!.reviewCoverage).toBe(0);
   });
 });
@@ -471,5 +468,274 @@ describe("empty listing", () => {
       priorityCoverage: 100,
       reviewCoverage: 100,
     });
+  });
+});
+
+// ── STORY-083 mandatory regression tests ────────────────────────────────────
+// docs/stories/STORY-083.md's five required regressions, proving the
+// "mark everything the same action" bypass this story exists to close is
+// actually closed.
+
+describe("STORY-083 mandatory regressions", () => {
+  it("marking every finding fixNow scores below the beginner passing threshold", async () => {
+    const preview = await simulator.run(gtInput);
+    const userFindingActions = Object.fromEntries(
+      preview.gradedFindings.map((f) => [f.id, "fixNow" as const]),
+    );
+    const result = await simulator.run({ ...gtInput, userFindingActions });
+    // Beginner listing-audit policy passes at direction >= 70
+    // (scripts/simulator-policies.ts); blanket fixNow must fail it.
+    expect(result.scoreDimensions!.direction).toBeLessThan(70);
+  });
+
+  it("marking every finding skip also fails", async () => {
+    const preview = await simulator.run(gtInput);
+    const userFindingActions = Object.fromEntries(
+      preview.gradedFindings.map((f) => [f.id, "skip" as const]),
+    );
+    const result = await simulator.run({ ...gtInput, userFindingActions });
+    expect(result.scoreDimensions!.direction).toBeLessThan(70);
+    expect(result.scoreDimensions!.priorityCoverage).toBeLessThan(70);
+  });
+
+  it("skipping a required critical fix hurts priorityCoverage even when everything else is correct", async () => {
+    const input = greatListing({ title: "A".repeat(80) + " bamboo cutting board" });
+    const preview = await simulator.run(input);
+    const criticalFinding = preview.gradedFindings.find((f) => f.ruleId === "title_length_limit");
+    expect(criticalFinding).toBeDefined();
+    expect(criticalFinding!.expectedAction).toBe("fixNow");
+    expect(criticalFinding!.acceptedActions).not.toContain("skip");
+
+    const userFindingActions = Object.fromEntries(
+      preview.gradedFindings.map((f) => [
+        f.id,
+        f.id === criticalFinding!.id ? ("skip" as const) : f.expectedAction,
+      ]),
+    );
+    const result = await simulator.run({ ...input, userFindingActions });
+    expect(result.scoreDimensions!.priorityCoverage).toBeLessThan(100);
+    expect(result.scoreDimensions!.direction).toBeLessThan(100);
+  });
+
+  it("this scenario's findings span more than one valid expectedAction", async () => {
+    const result = await simulator.run(gtInput);
+    const actionTypes = new Set(result.gradedFindings.map((f) => f.expectedAction));
+    expect(actionTypes.size).toBeGreaterThan(1);
+  });
+
+  it("severity changes alone do not silently rewrite the resolved action", () => {
+    // Same ruleId, same context, different severity -- resolution must be
+    // identical because it's the override on niche_in_title's context (a
+    // primary keyword covers the title), not the finding's severity, that
+    // decides this. Proves the resolver isn't secretly still
+    // `severity === "info" ? "skip" : "fix"`.
+    const ctx: RuleContext = {
+      title: "Reliable Widget For Home Use",
+      lowerTitle: "reliable widget for home use",
+      bullets: [],
+      lowerBullets: [],
+      description: "",
+      lowerDescription: "",
+      niche: "widget",
+      nicheWords: ["widget"],
+      categoryVariant: {
+        id: "general_home",
+        label: "General Hardlines & Home",
+        prohibitedClaimTerms: [],
+        requiredAttributeTerms: [],
+      },
+      marketplace: "US",
+      images: [],
+      hasVideo: false,
+      hasAPlus: false,
+      structuredAttributes: {},
+      primaryCustomerIntent: "shoppers looking for a reliable widget",
+      primaryKeywords: ["reliable widget"],
+      complianceEvidence: {},
+    };
+    const makeFinding = (severity: AuditFinding["severity"]): AuditFinding => ({
+      id: `f-${severity}`,
+      ruleId: "niche_in_title",
+      dimension: "relevance",
+      severity,
+      isCriticalGate: false,
+      message: "Niche keyword not found in title.",
+      suggestion: "Add the niche term to the title.",
+      category: "general_home",
+      marketplace: "US",
+      policyVersion: "test-policy",
+      effectiveDate: "2026-01-01",
+    });
+
+    const warningResult = resolveExpectedAction(makeFinding("warning"), ctx);
+    const infoResult = resolveExpectedAction(makeFinding("info"), ctx);
+    const criticalResult = resolveExpectedAction(makeFinding("critical"), ctx);
+
+    expect(warningResult.expectedAction).toBe("skip");
+    expect(infoResult.expectedAction).toBe("skip");
+    expect(criticalResult.expectedAction).toBe("skip");
+  });
+});
+
+// ── STORY-083 concrete skip cases ────────────────────────────────────────────
+// docs/stories/STORY-083.md's six documented skip cases, each verified
+// end-to-end through simulator.run() so the wiring from ListingAuditInput's
+// context fields through to the resolved expectedAction is proven, not
+// just the resolver function in isolation.
+
+describe("STORY-083 concrete skip cases", () => {
+  it("relevance: a primary keyword synonym in the title disproves a missing-niche-word finding", async () => {
+    const result = await simulator.run(
+      greatListing({
+        title: "Eco Kitchen Prep Surface for Everyday Cooking",
+        niche: "bamboo cutting board",
+        primaryKeywords: ["eco kitchen prep"],
+        primaryCustomerIntent: "shoppers looking for an eco-friendly kitchen prep surface",
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "niche_in_title");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("skip");
+  });
+
+  it("compliance: documented evidence disproves a superlative-claim false positive", async () => {
+    const result = await simulator.run(
+      greatListing({
+        bullets: [...greatListing().bullets, "Backed by our 100% satisfaction guarantee program"],
+        complianceEvidence: {
+          prohibited_superlative_claims:
+            "This is our registered guarantee program name, not an unverifiable claim.",
+        },
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "prohibited_superlative_claims");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("skip");
+  });
+
+  it("mobile: the first-screen title portion identifies the product per documented customer intent", async () => {
+    const result = await simulator.run(
+      greatListing({
+        title: "Eco-Friendly Sustainable Kitchen Prep Surface Made From Bamboo",
+        primaryCustomerIntent: "eco-friendly sustainable kitchen prep surface",
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "title_front_loaded");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("skip");
+  });
+
+  it("apparel: structured data (size chart) covers a required attribute missing from visible copy", async () => {
+    const result = await simulator.run(
+      greatListing({
+        category: "Apparel",
+        bullets: ["Comfortable everyday wear", "Great for any occasion"],
+        description: "A great addition to your wardrobe that looks good every time you wear it.",
+        structuredAttributes: {
+          sizeChart: "S/M/L/XL available, see size guide",
+          materialComposition: "100% cotton",
+        },
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "category_required_attributes");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("skip");
+  });
+
+  it("electronics: structured data (compatibility table) covers a required attribute missing from visible copy", async () => {
+    const result = await simulator.run(
+      greatListing({
+        category: "Electronics",
+        bullets: ["Sleek design", "Long-lasting battery"],
+        description: "A great addition to your desk setup.",
+        structuredAttributes: {
+          compatibleDevices: "Works with iPhone 12+, USB-C required",
+          requiresPower: "Requires 5V/2A power adapter",
+        },
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "category_required_attributes");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("skip");
+  });
+
+  it("imagery: fewer than 5 images is not a real gap when every required role is already present", async () => {
+    const result = await simulator.run(
+      greatListing({
+        images: [
+          {
+            slot: 1,
+            role: "main",
+            whiteBackground: true,
+            hasTextOverlay: false,
+            productFillPct: 85,
+          },
+          {
+            slot: 2,
+            role: "lifestyle",
+            whiteBackground: false,
+            hasTextOverlay: false,
+            productFillPct: 60,
+          },
+          {
+            slot: 3,
+            role: "infographic",
+            whiteBackground: false,
+            hasTextOverlay: true,
+            productFillPct: 40,
+          },
+        ],
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "image_count_sufficient");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("skip");
+  });
+});
+
+// ── STORY-083 critical-gate escalate exception ───────────────────────────────
+
+describe("STORY-083 critical-gate escalate exception", () => {
+  it("a critical finding with no documented evidence must be fixed now, never skipped", async () => {
+    const result = await simulator.run(
+      greatListing({
+        bullets: [...greatListing().bullets, "This natural finish cures in 48 hours"],
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "prohibited_medical_claims");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("fixNow");
+    expect(finding!.acceptedActions).toEqual(["fixNow"]);
+  });
+
+  it("disproven evidence on a critical-gate finding resolves to skip", async () => {
+    const result = await simulator.run(
+      greatListing({
+        bullets: [...greatListing().bullets, "This natural finish cures in 48 hours"],
+        complianceEvidence: {
+          prohibited_medical_claims:
+            "disproven: 'cures' describes the wood-finish curing process, not a medical claim.",
+        },
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "prohibited_medical_claims");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("skip");
+  });
+
+  it("ambiguous (not disproven) evidence on a critical-gate finding resolves to escalate, never skip", async () => {
+    const result = await simulator.run(
+      greatListing({
+        bullets: [...greatListing().bullets, "This natural finish cures in 48 hours"],
+        complianceEvidence: {
+          prohibited_medical_claims:
+            "Legal is reviewing whether 'cures' in this context could be read as a health claim.",
+        },
+      }),
+    );
+    const finding = result.gradedFindings.find((f) => f.ruleId === "prohibited_medical_claims");
+    expect(finding).toBeDefined();
+    expect(finding!.expectedAction).toBe("escalate");
+    expect(finding!.acceptedActions).not.toContain("skip");
   });
 });

@@ -13,6 +13,8 @@
 import { useState, useTransition } from "react";
 import styles from "./KeywordResearchForm.module.css";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
+import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 import {
   previewKeywordResearch,
   keywordResearchAttempt,
@@ -23,6 +25,7 @@ import type { KeywordIntent } from "@/domain/entities/KeywordDataset";
 
 interface Props {
   initialNiche: string;
+  challengeUnlocked: boolean;
 }
 
 interface Classification {
@@ -41,8 +44,9 @@ const INTENT_OPTIONS: readonly { value: KeywordIntent; label: string }[] = [
   { value: "irrelevant", label: "Irrelevant" },
 ];
 
-export function KeywordResearchForm({ initialNiche }: Props) {
+export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) {
   const [niche, setNiche] = useState(initialNiche);
+  const [mode, setMode] = useState<PracticeOrChallengeMode>("practice");
   const [pending, startTransition] = useTransition();
   const [preview, setPreview] = useState<KeywordPreview | null>(null);
   const [classifications, setClassifications] = useState<Record<string, Classification>>({});
@@ -93,7 +97,7 @@ export function KeywordResearchForm({ initialNiche }: Props) {
       const r = await keywordResearchAttempt({
         niche,
         classifications: fullyClassified,
-        mode: "practice",
+        mode,
       });
       if (r.ok) {
         setAttempt(r.value);
@@ -109,6 +113,12 @@ export function KeywordResearchForm({ initialNiche }: Props) {
 
   return (
     <div className={styles.wrapper}>
+      <SimulatorModeToggle
+        mode={mode}
+        onChange={setMode}
+        unlocked={challengeUnlocked}
+        disabled={attempt !== null}
+      />
       <form className={styles.form} onSubmit={onGenerate}>
         <div className={styles.inputRow}>
           <div className={styles.field}>
@@ -242,6 +252,11 @@ export function KeywordResearchForm({ initialNiche }: Props) {
             </span>
           </div>
           <FormativeScoreNotice />
+          {attempt.xpAwarded ? (
+            <p className={styles.xpBanner}>
+              +{attempt.xpAwarded} XP earned for passing in Challenge mode.
+            </p>
+          ) : null}
           <p>{attempt.feedback.overallComment}</p>
           <div
             className={styles.tableScroll}

@@ -31,6 +31,9 @@ import { Result } from "@/domain/shared/Result";
  *  - `priorityCoverage` added for Listing Audit, which previously called the
  *    same thing `profitability` despite modelling no revenue. STR Triage's
  *    `profitability` IS revenue-based, so it keeps that name (STORY-076).
+ *  - `negativeRouting`/`brandedIsolation`/`duplicateControl`/
+ *    `namingCompliance` added for Campaign Builder's 7-dimension rewrite
+ *    (STORY-084) -- see docs/stories/STORY-084.md.
  */
 export type GradingDimension =
   | "direction"
@@ -45,6 +48,10 @@ export type GradingDimension =
   | "structureQuality"
   | "budgetAllocation"
   | "keywordRelevance"
+  | "negativeRouting"
+  | "brandedIsolation"
+  | "duplicateControl"
+  | "namingCompliance"
   // Keyword Research
   | "intentAccuracy"
   | "negativeIdentification";
@@ -62,6 +69,10 @@ export const KNOWN_DIMENSIONS: readonly GradingDimension[] = [
   "structureQuality",
   "budgetAllocation",
   "keywordRelevance",
+  "negativeRouting",
+  "brandedIsolation",
+  "duplicateControl",
+  "namingCompliance",
   // Keyword Research
   "intentAccuracy",
   "negativeIdentification",

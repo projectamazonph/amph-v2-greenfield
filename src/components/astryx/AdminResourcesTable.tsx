@@ -2,14 +2,20 @@
  * AdminResourcesTable — Astryx Table for /admin/resources.
  *
  * "use client" only because Table's renderCell prop is a function.
- * No pagination — the download-center catalog is small enough to
- * show all at once.
+ * All data fetching and filter routing stay server-side in the parent
+ * page. Pagination added in review, mirroring AdminUsersTable.
  */
 
 "use client";
 
 import Link from "next/link";
-import { Table, type TableColumn, Badge } from "@astryxdesign/core";
+import {
+  Table,
+  type TableColumn,
+  type TablePlugin,
+  useTablePagination,
+  Badge,
+} from "@astryxdesign/core";
 import type { ResourceCategory, ResourceFileType } from "@/domain/entities/Resource";
 import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
 
@@ -25,6 +31,14 @@ export interface ResourceRow extends Record<string, unknown> {
 
 interface AdminResourcesTableProps {
   resources: ResourceRow[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  filters: {
+    search?: string;
+    category?: ResourceCategory;
+    tier?: CourseAccessTier;
+  };
 }
 
 const CATEGORY_LABELS: Record<ResourceCategory, string> = {
@@ -46,6 +60,15 @@ function accessTierBadgeVariant(tier: CourseAccessTier) {
     default:
       return "neutral" as const;
   }
+}
+
+function buildPageHref(targetPage: number, filters: AdminResourcesTableProps["filters"]) {
+  const url = new URL("http://x/admin/resources");
+  if (filters.search) url.searchParams.set("search", filters.search);
+  if (filters.category) url.searchParams.set("category", filters.category);
+  if (filters.tier) url.searchParams.set("tier", filters.tier);
+  url.searchParams.set("page", String(targetPage));
+  return url.pathname + url.search;
 }
 
 // ── Column definitions ─────────────────────────────────────────────────────────
@@ -118,7 +141,27 @@ const COLUMNS: TableColumn<ResourceRow>[] = [
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function AdminResourcesTable({ resources }: AdminResourcesTableProps) {
+export function AdminResourcesTable({
+  resources,
+  totalCount,
+  page,
+  pageSize,
+  filters,
+}: AdminResourcesTableProps) {
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
+  const paginationPlugin = useTablePagination({
+    page,
+    onPageChange: () => {
+      /* navigation handled by <Link> elements below */
+    },
+    totalItems: totalCount,
+    pageSize,
+    variant: "pages",
+    position: "below",
+    align: "center",
+  }) as unknown as TablePlugin<ResourceRow>;
+
   return (
     <>
       <Table
@@ -128,6 +171,7 @@ export function AdminResourcesTable({ resources }: AdminResourcesTableProps) {
         density="compact"
         dividers="rows"
         hasHover
+        plugins={{ pagination: paginationPlugin }}
       />
       {resources.length === 0 && (
         <p
@@ -138,8 +182,54 @@ export function AdminResourcesTable({ resources }: AdminResourcesTableProps) {
             fontSize: "var(--font-size-sm)",
           }}
         >
-          No resources yet.
+          No resources found.
         </p>
+      )}
+
+      {totalPages > 1 && (
+        <nav
+          aria-label="Pagination"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "var(--spacing-6)",
+            marginTop: "var(--spacing-6)",
+            fontSize: "var(--font-size-sm)",
+            color: "var(--ink-700)",
+          }}
+        >
+          <Link
+            href={buildPageHref(Math.max(1, page - 1), filters)}
+            style={{
+              color: page > 1 ? "var(--accent)" : "var(--ink-300)",
+              textDecoration: "none",
+              fontWeight: 500,
+              cursor: page > 1 ? "pointer" : "default",
+            }}
+          >
+            ← Prev
+          </Link>
+          <span
+            style={{
+              fontFamily: "var(--font-family-code)",
+              fontSize: 13,
+            }}
+          >
+            Page {page} of {totalPages}
+          </span>
+          <Link
+            href={buildPageHref(Math.min(totalPages, page + 1), filters)}
+            style={{
+              color: page < totalPages ? "var(--accent)" : "var(--ink-300)",
+              textDecoration: "none",
+              fontWeight: 500,
+              cursor: page < totalPages ? "pointer" : "default",
+            }}
+          >
+            Next →
+          </Link>
+        </nav>
       )}
     </>
   );

@@ -11,6 +11,18 @@
  * removed rather than kept alongside: nothing in this app depended on the
  * old narrow shape once the domain schema changed underneath it.
  *
+ * STORY-085: the scenario's rows/economics/lexicons/existingTargets are no
+ * longer accepted from the client — the client used to echo the entire
+ * scenario object back on submit, so a forged economics payload could game
+ * the grade. `strTriageAttempt()` now resolves the *currently published*
+ * str-triage scenario server-side and uses its content; only
+ * `userActions` (the student's classifications) and `mode` are trusted
+ * from the client. This also means publishing a new scenario version
+ * through the admin UI takes effect immediately.
+ *
+ * STORY-088: a passing Challenge-mode attempt awards a one-time
+ * `XPService.SIMULATOR_CHALLENGE_PASSED_XP` bonus.
+ *
  * Lifecycle (mirrors keyword-research/actions.ts's ordering):
  *   1. StartSimulatorAttempt — creates the attempt record
  *   2. saveSimulatorDecision — one decision per user classification (audit trail)
@@ -33,14 +45,12 @@ import { z } from "zod";
 import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
+import type { AppContainer } from "@/composition/container";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type {
   StrTriageInput,
   SearchTermRow,
   ExistingTarget,
-  MatchType,
-  CampaignRole,
-  TargetState,
 } from "@/domain/simulator/str-triage/StrTriageInput";
 import type {
   StrTriageOutput,
@@ -48,8 +58,9 @@ import type {
   KeywordClassification,
 } from "@/domain/simulator/str-triage/StrTriageOutput";
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
-
-const DEFAULT_SCENARIO_ID = "str-triage-scenario-kitchen-products";
+import { XPService } from "@/domain/services/XPService";
+import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
+import { strTriageScenarioContentSchema } from "./scenarioContent";
 
 const TRIAGE_ACTIONS: readonly TriageAction[] = [
   "harvest_exact",
@@ -60,54 +71,23 @@ const TRIAGE_ACTIONS: readonly TriageAction[] = [
   "pause",
   "insufficient_data",
 ];
-const MATCH_TYPES: readonly MatchType[] = ["exact", "phrase", "broad"];
-const CAMPAIGN_ROLES: readonly CampaignRole[] = ["research", "performance", "defense"];
-const TARGET_STATES: readonly TargetState[] = ["enabled", "paused", "archived"];
+
+async function resolvePublishedScenario(container: AppContainer) {
+  const result = await container.scenarioRepo.findPublished("str-triage");
+  if (!result.ok || !result.value) {
+    return null;
+  }
+  const parsed = strTriageScenarioContentSchema.safeParse(result.value.inputSchema);
+  if (!parsed.success) {
+    return null;
+  }
+  return { scenarioId: result.value.id, content: parsed.data };
+}
 
 // ── Zod schema ─────────────────────────────────────────────────────────
 
-const searchTermRowSchema = z.object({
-  searchTerm: z.string().min(1),
-  impressions: z.number().nonnegative(),
-  clicks: z.number().nonnegative(),
-  spend: z.number().nonnegative(),
-  orders: z.number().nonnegative(),
-  sales: z.number().nonnegative(),
-  elapsedDays: z.number().nonnegative(),
-  sourceCampaignId: z.string().min(1),
-  sourceAdGroupId: z.string().min(1),
-  sourceTarget: z.string().min(1),
-  sourceMatchType: z.enum(MATCH_TYPES as [MatchType, ...MatchType[]]),
-});
-
-const existingTargetSchema = z.object({
-  text: z.string().min(1),
-  normalizedText: z.string().min(1),
-  matchType: z.enum(MATCH_TYPES as [MatchType, ...MatchType[]]),
-  campaignId: z.string().min(1),
-  adGroupId: z.string().min(1),
-  campaignRole: z.enum(CAMPAIGN_ROLES as [CampaignRole, ...CampaignRole[]]),
-  state: z.enum(TARGET_STATES as [TargetState, ...TargetState[]]),
-});
-
 const strTriageAttemptSchema = z.object({
-  rows: z.array(searchTermRowSchema).min(1),
-  averageOrderValue: z.number().positive(),
-  expectedCtrPct: z.number().positive(),
-  expectedCvrPct: z.number().positive(),
-  brandTargetRoas: z.number().positive(),
-  genericTargetRoas: z.number().positive(),
-  competitorTargetRoas: z.number().positive(),
-  confidenceLevel: z.number().min(0).max(1),
-  minElapsedDays: z.number().nonnegative(),
-  minOrdersForWinner: z.number().nonnegative(),
-  brandLexicon: z.array(z.string()),
-  competitorBrandLexicon: z.array(z.string()),
-  incompatibleAttributeLexicon: z.array(z.string()).optional(),
-  existingTargets: z.array(existingTargetSchema),
-  sourceCampaignRole: z.enum(CAMPAIGN_ROLES as [CampaignRole, ...CampaignRole[]]),
   userActions: z.record(z.string(), z.enum(TRIAGE_ACTIONS as [TriageAction, ...TriageAction[]])),
-  scenarioId: z.string().optional(),
   mode: z.enum(["guided", "practice", "challenge", "credential", "instructor"]).optional(),
 });
 
@@ -119,6 +99,7 @@ export interface StrTriageAttemptResult {
   readonly scoreDimensions: Record<string, number>;
   readonly isPassed: boolean;
   readonly classifications: readonly KeywordClassification[];
+  readonly xpAwarded: number | null;
   readonly feedback: {
     readonly passed: boolean;
     readonly overallScore: number;
@@ -158,7 +139,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     };
   }
 
-  const { rows, userActions, scenarioId, mode, ...scenarioConfig } = parseResult.data;
+  const { userActions, mode } = parseResult.data;
   const resolvedMode: SimulatorMode = mode ?? "practice";
   const container = buildContainer();
 
@@ -168,11 +149,20 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     return { ok: false, error: { kind: "unauthorized" } };
   }
 
-  // ── 3. StartSimulatorAttempt ────────────────────────────────────────
+  // ── 3. Resolve the published scenario server-side ───────────────────
+  const scenario = await resolvePublishedScenario(container);
+  if (!scenario) {
+    return {
+      ok: false,
+      error: { kind: "attempt_error", message: "No published str-triage scenario found" },
+    };
+  }
+
+  // ── 4. StartSimulatorAttempt ────────────────────────────────────────
   const startResult = await container.startSimulatorAttempt.execute({
     userId,
     simulatorId: "str-triage",
-    scenarioId: scenarioId ?? DEFAULT_SCENARIO_ID,
+    scenarioId: scenario.scenarioId,
     mode: resolvedMode,
   });
 
@@ -182,9 +172,9 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
 
   const attemptId = startResult.value.attemptId;
 
-  // ── 4. Save decisions (user classifications as decisions) ──────────
+  // ── 5. Save decisions (user classifications as decisions) ──────────
   for (const [searchTerm, action] of Object.entries(userActions)) {
-    const row = rows.find((r) => r.searchTerm === searchTerm);
+    const row = scenario.content.rows.find((r) => r.searchTerm === searchTerm);
     if (!row) continue;
 
     const decisionResult = await container.saveSimulatorDecision.execute({
@@ -204,7 +194,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     }
   }
 
-  // ── 5. Run simulator ────────────────────────────────────────────────
+  // ── 6. Run simulator ────────────────────────────────────────────────
   // Runs before SubmitSimulatorAttempt so a registry-lookup failure or a
   // sim.run() throw returns early without ever marking the attempt
   // "submitted" — an attempt stuck submitted-but-ungraded is orphaned
@@ -218,9 +208,21 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   }
 
   const domainInput: StrTriageInput = {
-    rows: rows as readonly SearchTermRow[],
-    ...scenarioConfig,
-    existingTargets: scenarioConfig.existingTargets as readonly ExistingTarget[],
+    rows: scenario.content.rows as readonly SearchTermRow[],
+    averageOrderValue: scenario.content.averageOrderValue,
+    expectedCtrPct: scenario.content.expectedCtrPct,
+    expectedCvrPct: scenario.content.expectedCvrPct,
+    brandTargetRoas: scenario.content.brandTargetRoas,
+    genericTargetRoas: scenario.content.genericTargetRoas,
+    competitorTargetRoas: scenario.content.competitorTargetRoas,
+    confidenceLevel: scenario.content.confidenceLevel,
+    minElapsedDays: scenario.content.minElapsedDays,
+    minOrdersForWinner: scenario.content.minOrdersForWinner,
+    brandLexicon: scenario.content.brandLexicon,
+    competitorBrandLexicon: scenario.content.competitorBrandLexicon,
+    incompatibleAttributeLexicon: scenario.content.incompatibleAttributeLexicon,
+    existingTargets: scenario.content.existingTargets as readonly ExistingTarget[],
+    sourceCampaignRole: scenario.content.sourceCampaignRole,
     userClassifications: userActions,
   };
 
@@ -243,7 +245,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     reviewCoverage: 0,
   };
 
-  // ── 6. SubmitSimulatorAttempt ─────────────────────────────────────────
+  // ── 7. SubmitSimulatorAttempt ─────────────────────────────────────────
   // GradeSimulatorAttempt requires status="submitted"; must run before
   // grading, not before the simulator (it also requires at least one
   // decision saved, which step 4 above already did).
@@ -252,7 +254,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
     return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
   }
 
-  // ── 7. GradeSimulatorAttempt ────────────────────────────────────────
+  // ── 8. GradeSimulatorAttempt ────────────────────────────────────────
   const gradeResult = await container.gradeSimulatorAttempt.execute({
     attemptId,
     scoreDimensions: {
@@ -267,14 +269,35 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
 
   const grade = gradeResult.value;
 
-  // ── 8. ComposeAttemptFeedback ───────────────────────────────────────
+  // ── 9. ComposeAttemptFeedback ───────────────────────────────────────
   const feedbackResult = await container.composeAttemptFeedback.execute({ attemptId });
   if (Result.isErr(feedbackResult)) {
     return { ok: false, error: { kind: "feedback_error", message: feedbackResult.error.kind } };
   }
   const feedback = feedbackResult.value.feedback;
 
-  // ── 9. Return results ──────────────────────────────────────────────
+  // ── 10. Award Challenge-mode XP (once per simulator, first pass only) ─
+  let xpAwarded: number | null = null;
+  if (resolvedMode === "challenge" && feedback.passed) {
+    const alreadyEarnedResult = await hasEverPassedSimulatorInMode(
+      { attemptRepo: container.simulatorAttemptRepo, scorePolicyRepo: container.scorePolicyRepo },
+      { userId, simulatorId: "str-triage", mode: "challenge", excludeAttemptId: attemptId },
+    );
+    const alreadyEarned = Result.isOk(alreadyEarnedResult) && alreadyEarnedResult.value;
+    if (!alreadyEarned) {
+      const xpResult = await container.awardXp.execute({
+        userId,
+        amount: XPService.SIMULATOR_CHALLENGE_PASSED_XP,
+        reason: "simulator_challenge_passed",
+        refId: attemptId,
+      });
+      if (Result.isOk(xpResult)) {
+        xpAwarded = XPService.SIMULATOR_CHALLENGE_PASSED_XP;
+      }
+    }
+  }
+
+  // ── 11. Return results ──────────────────────────────────────────────
   return {
     ok: true,
     value: {
@@ -283,6 +306,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
       scoreDimensions: grade.scoreDimensions,
       isPassed: grade.isPassed,
       classifications: simOutput.classifications,
+      xpAwarded,
       feedback: {
         passed: feedback.passed,
         overallScore: feedback.overallScore,

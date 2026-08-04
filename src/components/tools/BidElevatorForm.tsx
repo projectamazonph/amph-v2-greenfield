@@ -9,27 +9,39 @@
  * Per the STORY-079 scoping decision the tool is scenario-only: keyword
  * economics (CTR, CVR, benchmark CPC, etc.) are authored server-side, not
  * typed in by the student — only the bid is editable.
+ *
+ * STORY-085: submits to bidElevatorAttempt() (the graded, persisted-attempt
+ * lifecycle) instead of the legacy runBidElevator(), which never created a
+ * SimulatorAttempt record. Only the student's bid adjustments are sent —
+ * the scenario's economics are resolved server-side from the currently
+ * published scenario, not echoed back from this component's props.
  */
 
 "use client";
 
 import { useState, useTransition } from "react";
 import styles from "./BidElevatorForm.module.css";
-import { runBidElevator, type RunBidElevatorInput } from "@/app/tools/bid-elevator/actions";
+import { bidElevatorAttempt } from "@/app/tools/bid-elevator/actions";
+import type { BidElevatorScenarioContent } from "@/app/tools/bid-elevator/scenarioContent";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import { BidElevatorResult } from "./BidElevatorResult";
+import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 
 interface Props {
-  scenario: Omit<RunBidElevatorInput, "userBidAdjustments">;
+  scenario: BidElevatorScenarioContent;
+  challengeUnlocked: boolean;
 }
 
-export function BidElevatorForm({ scenario }: Props) {
+export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
   const [bids, setBids] = useState<Record<string, number>>(() =>
     Object.fromEntries(scenario.keywords.map((k) => [k.keywordId, k.currentBid])),
   );
+  const [mode, setMode] = useState<PracticeOrChallengeMode>("practice");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [simResult, setSimResult] = useState<BidElevatorOutput | null>(null);
+  const [xpAwarded, setXpAwarded] = useState<number | null>(null);
 
   const onChange = (keywordId: string, value: number) => {
     setBids((prev) => ({ ...prev, [keywordId]: value }));
@@ -38,22 +50,28 @@ export function BidElevatorForm({ scenario }: Props) {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    const input: RunBidElevatorInput = {
-      ...scenario,
-      userBidAdjustments: bids,
-    };
     startTransition(async () => {
-      const response = await runBidElevator(input);
+      const response = await bidElevatorAttempt({ userBidAdjustments: bids, mode });
       if (!response.ok) {
-        setError(response.error.message);
+        setError(
+          "message" in response.error ? response.error.message : "Could not run this simulation.",
+        );
         return;
       }
-      setSimResult(response.value);
+      setSimResult({
+        score: response.value.overallScore,
+        scoreDimensions: response.value.scoreDimensions,
+        bids: response.value.bids,
+        estimatedSpend: response.value.estimatedSpend,
+        estimatedRoas: response.value.estimatedRoas,
+      });
+      setXpAwarded(response.value.xpAwarded ?? null);
     });
   };
 
   return (
     <form className={styles.form} onSubmit={onSubmit}>
+      <SimulatorModeToggle mode={mode} onChange={setMode} unlocked={challengeUnlocked} />
       <div className={styles.metaRow}>
         <span className={styles.metaItem}>
           <span className={styles.metaLabel}>Daily budget</span>
@@ -103,7 +121,13 @@ export function BidElevatorForm({ scenario }: Props) {
       <button type="submit" className={styles.submit} disabled={pending}>
         {pending ? "Running…" : "Run simulation"}
       </button>
-      {simResult ? <BidElevatorResult result={simResult} targetRoas={scenario.targetRoas} /> : null}
+      {simResult ? (
+        <BidElevatorResult
+          result={simResult}
+          targetRoas={scenario.targetRoas}
+          xpAwarded={xpAwarded}
+        />
+      ) : null}
     </form>
   );
 }

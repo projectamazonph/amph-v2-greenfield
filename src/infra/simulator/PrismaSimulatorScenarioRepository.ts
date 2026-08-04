@@ -7,20 +7,30 @@
  * scenario vanished on cold start / redeploy. Migration
  * 20260722030000_simulator_scenario adds the table.
  *
- * "Archiving" a scenario is a soft-delete via the nullable archivedAt
- * column, matching InMemorySimulatorScenarioRepository's existing
- * contract; there is no hard delete.
+ * STORY-085: publishing + versioning. `status` (draft|published|archived)
+ * is now the primary lifecycle signal; `archivedAt` is kept (and still
+ * written alongside a transition to "archived") for its existing index,
+ * but not read back onto the domain entity. `publish()` is the one
+ * operation where correctness genuinely depends on atomicity: it archives
+ * any existing published sibling (same scenarioKey) and publishes the
+ * target inside a single `$transaction`, mirroring
+ * PrismaModuleRepository's existing `$transaction` usage style.
  *
  * mapRow() reuses createSimulatorScenario() (the domain factory) to
  * validate a persisted row instead of duplicating its
- * simulatorId/difficulty checks: a corrupt or legacy row throws, which
+ * simulatorId/difficulty checks, then overrides the factory's
+ * new-entity defaults (scenarioKey/version/status/timestamps) with the
+ * row's actual persisted values: a corrupt or legacy row throws, which
  * every caller's try/catch turns into db_error.
  */
 
 import { PrismaClient, Prisma } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
-import { createSimulatorScenario } from "@/domain/entities/SimulatorScenario";
-import type { SimulatorScenario } from "@/domain/entities/SimulatorScenario";
+import {
+  createSimulatorScenario,
+  isValidScenarioStatus,
+} from "@/domain/entities/SimulatorScenario";
+import type { SimulatorScenario, SimulatorId } from "@/domain/entities/SimulatorScenario";
 import type {
   ISimulatorScenarioRepository,
   SimulatorScenarioError,
@@ -29,6 +39,9 @@ import type {
 
 interface SimulatorScenarioRow {
   id: string;
+  scenarioKey: string;
+  version: number;
+  status: string;
   simulatorId: string;
   name: string;
   description: string;
@@ -36,6 +49,8 @@ interface SimulatorScenarioRow {
   outputSchema: Prisma.JsonValue;
   difficulty: string;
   estimatedMinutes: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepository {
@@ -47,7 +62,7 @@ export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepo
     try {
       const rows = await this.db.simulatorScenario.findMany({
         where: {
-          archivedAt: null,
+          status: { not: "archived" },
           ...(filter?.simulatorId ? { simulatorId: filter.simulatorId } : {}),
         },
       });
@@ -60,9 +75,76 @@ export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepo
   async findById(id: string): Promise<Result<SimulatorScenario | null, SimulatorScenarioError>> {
     try {
       const row = await this.db.simulatorScenario.findUnique({ where: { id } });
-      if (!row || row.archivedAt !== null) return Result.ok(null);
-      return Result.ok(this.mapRow(row));
+      return Result.ok(row ? this.mapRow(row) : null);
     } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async findPublished(
+    simulatorId: SimulatorId,
+  ): Promise<Result<SimulatorScenario | null, SimulatorScenarioError>> {
+    try {
+      const row = await this.db.simulatorScenario.findFirst({
+        where: { simulatorId, status: "published" },
+      });
+      return Result.ok(row ? this.mapRow(row) : null);
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async listVersions(
+    scenarioKey: string,
+  ): Promise<Result<SimulatorScenario[], SimulatorScenarioError>> {
+    try {
+      const rows = await this.db.simulatorScenario.findMany({
+        where: { scenarioKey },
+        orderBy: { version: "desc" },
+      });
+      return Result.ok(rows.map((r) => this.mapRow(r)));
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async publish(id: string): Promise<Result<SimulatorScenario, SimulatorScenarioError>> {
+    try {
+      const target = await this.db.simulatorScenario.findUnique({ where: { id } });
+      if (!target) {
+        return Result.err({ kind: "not_found" });
+      }
+      const sibling = await this.db.simulatorScenario.findFirst({
+        where: { scenarioKey: target.scenarioKey, status: "published", id: { not: id } },
+      });
+
+      const now = new Date();
+      await this.db.$transaction([
+        ...(sibling
+          ? [
+              this.db.simulatorScenario.update({
+                where: { id: sibling.id },
+                data: { status: "archived", archivedAt: now },
+              }),
+            ]
+          : []),
+        this.db.simulatorScenario.update({
+          where: { id },
+          data: { status: "published" },
+        }),
+      ]);
+
+      const updated = await this.db.simulatorScenario.findUniqueOrThrow({ where: { id } });
+      return Result.ok(this.mapRow(updated));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
       return Result.err({ kind: "db_error", message: String(err) });
     }
   }
@@ -74,6 +156,9 @@ export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepo
       const row = await this.db.simulatorScenario.create({
         data: {
           id: scenario.id,
+          scenarioKey: scenario.scenarioKey,
+          version: scenario.version,
+          status: scenario.status,
           simulatorId: scenario.simulatorId,
           name: scenario.name,
           description: scenario.description,
@@ -123,7 +208,7 @@ export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepo
     try {
       await this.db.simulatorScenario.update({
         where: { id },
-        data: { archivedAt: new Date() },
+        data: { status: "archived", archivedAt: new Date() },
       });
       return Result.ok(undefined);
     } catch (err: unknown) {
@@ -158,6 +243,18 @@ export class PrismaSimulatorScenarioRepository implements ISimulatorScenarioRepo
         `SimulatorScenario ${row.id} failed validation on read: ${result.error.kind}`,
       );
     }
-    return result.value;
+    if (!isValidScenarioStatus(row.status)) {
+      throw new Error(
+        `SimulatorScenario ${row.id} has an invalid persisted status: "${row.status}"`,
+      );
+    }
+    return {
+      ...result.value,
+      scenarioKey: row.scenarioKey,
+      version: row.version,
+      status: row.status,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    };
   }
 }

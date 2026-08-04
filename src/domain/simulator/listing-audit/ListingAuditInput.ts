@@ -7,6 +7,10 @@
  * and marketplace so the new rubric can score them. Both are optional
  * with sensible defaults (no images, US marketplace) so existing callers
  * that only audit title/bullets/description keep working unchanged.
+ * STORY-083: adds the remaining `ListingScenarioContext` fields (see
+ * ListingAuditOutput.ts) the ground-truth resolver needs to tell a real
+ * issue from a context-disproven false positive. Same "optional, defaults
+ * to empty" treatment as STORY-080's fields.
  */
 
 import type { FindingAction } from "./ListingAuditOutput";
@@ -41,4 +45,21 @@ export interface ListingAuditInput {
    * When absent, returns ground truth only (preview mode).
    */
   readonly userFindingActions?: Readonly<Record<string, FindingAction>>;
+
+  // ── STORY-083: ground-truth resolver context, all optional/defaulted ────
+  /** Defaults to `category` normalized -- pass explicitly once category ids diverge from the free-text `category` field. */
+  readonly categoryId?: string;
+  readonly productType?: string;
+  /** Defaults to {}. e.g. `{ material: "bamboo", dimensions: "18 x 12 x 1 in" }`. */
+  readonly structuredAttributes?: Readonly<Record<string, string>>;
+  readonly variationTheme?: string;
+  /** Defaults to "". What the shopper is trying to accomplish. */
+  readonly primaryCustomerIntent?: string;
+  /** Defaults to []. */
+  readonly primaryKeywords?: readonly string[];
+  readonly listingStrategy?: string;
+  /** Defaults to {}. */
+  readonly currentPerformance?: Readonly<Record<string, unknown>>;
+  /** Defaults to {}. Keyed by ruleId -- see ListingScenarioContext.complianceEvidence. */
+  readonly complianceEvidence?: Readonly<Record<string, string>>;
 }

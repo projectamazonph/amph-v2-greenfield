@@ -41,6 +41,9 @@ export default async function NewResourcePage({ searchParams }: PageProps) {
         invalid_file_url: "Please enter a valid http(s) URL.",
         invalid_access_tier: "Please choose an access tier.",
         missing: "Please fill in every required field.",
+        file_too_large: "That file is too large. Please upload something under 25 MB.",
+        unsupported_file_type:
+          "That file type isn't supported. Please upload a PDF, spreadsheet, document, presentation, zip, or image.",
         db_error: "Something went wrong saving this resource. Please try again.",
       }[sp.error]
     : null;

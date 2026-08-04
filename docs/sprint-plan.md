@@ -162,18 +162,18 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 
 The original Sprint 13 table was written before the work landed. The current repository snapshot is:
 
-| Story     | Current state                                    | Evidence                                                                                                                                                   |
-| --------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| STORY-061 | ✅ Implemented                                   | `/admin/audit-log`, `/admin/audit-log/export`, `ListAuditLogs`, and `ExportAuditLogs` are present.                                                         |
-| STORY-062 | ✅ Implemented                                   | `/admin/refunds`, `/admin/refunds/[orderId]`, list/process actions, and use cases are present.                                                             |
-| STORY-063 | ◐ Backend partial                                | `EmailTemplate` entity, Prisma adapter, repository, and use cases are present; the documented admin email-template pages and actions are not in `src/app`. |
-| STORY-064 | ◐ Implemented in source, story file missing      | Simulator attempt persistence and lifecycle classes are wired, but no `docs/stories/STORY-064.md` is tracked on this branch.                               |
-| STORY-065 | ◐ Implemented in source, story status needs sync | Score policies and grading use cases are wired; the story document still needs a current status note.                                                      |
-| STORY-066 | ✅ Implemented in source                         | Feedback composer and remediation use case are wired and tested.                                                                                           |
-| STORY-067 | ✅ Implemented in source                         | STR Triage graded attempt action and simulator scoring are present.                                                                                        |
-| STORY-068 | ✅ Implemented in source                         | Bid Elevator graded attempt action and simulator scoring are present.                                                                                      |
-| STORY-069 | ✅ Implemented in source                         | Campaign Builder graded attempt action and simulator scoring are present.                                                                                  |
-| STORY-070 | ✅ Implemented in source, story file missing     | Listing Audit graded attempt action and simulator scoring are present, but no `docs/stories/STORY-070.md` is tracked on this branch.                       |
+| Story     | Current state                                    | Evidence                                                                                                                                                                                                                                     |
+| --------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| STORY-061 | ✅ Implemented                                   | `/admin/audit-log`, `/admin/audit-log/export`, `ListAuditLogs`, and `ExportAuditLogs` are present.                                                                                                                                           |
+| STORY-062 | ✅ Implemented                                   | `/admin/refunds`, `/admin/refunds/[orderId]`, list/process actions, and use cases are present.                                                                                                                                               |
+| STORY-063 | ✅ Implemented (closed by STORY-095/095.5)       | `EmailTemplate` entity, Prisma adapter, repository, and use cases are present; `/admin/email-templates` (+ `[type]/edit`) pages and actions now exist in `src/app` and are wired into the actual Resend send path (STORY-095.5, 2026-08-03). |
+| STORY-064 | ◐ Implemented in source, story file missing      | Simulator attempt persistence and lifecycle classes are wired, but no `docs/stories/STORY-064.md` is tracked on this branch.                                                                                                                 |
+| STORY-065 | ◐ Implemented in source, story status needs sync | Score policies and grading use cases are wired; the story document still needs a current status note.                                                                                                                                        |
+| STORY-066 | ✅ Implemented in source                         | Feedback composer and remediation use case are wired and tested.                                                                                                                                                                             |
+| STORY-067 | ✅ Implemented in source                         | STR Triage graded attempt action and simulator scoring are present.                                                                                                                                                                          |
+| STORY-068 | ✅ Implemented in source                         | Bid Elevator graded attempt action and simulator scoring are present.                                                                                                                                                                        |
+| STORY-069 | ✅ Implemented in source                         | Campaign Builder graded attempt action and simulator scoring are present.                                                                                                                                                                    |
+| STORY-070 | ✅ Implemented in source, story file missing     | Listing Audit graded attempt action and simulator scoring are present, but no `docs/stories/STORY-070.md` is tracked on this branch.                                                                                                         |
 
 **Sprint 13 closed.**
 
@@ -225,20 +225,20 @@ exists to remove.
 | STORY-080 | Replace length-based listing scoring with a real rubric                        | 1   | ◐ merged, PR #245 (difficulty-scaled finding volume not yet implemented) |
 | STORY-081 | Versioned keyword scenario datasets; split Listing Audit from Keyword Research | 1   | ✅ done — PR #246                                                        |
 | STORY-082 | Expand STR Triage classifier (thresholds, relevance, match precision)          | 1   | ✅ done — PR #247                                                        |
-| STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ⏳ Planned                                                               |
-| STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ⏳ Planned                                                               |
+| STORY-083 | Non-binary, category-aware Listing Audit ground truth (closes the bypass)      | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-083.md`                    |
+| STORY-084 | Campaign Builder strategic scoring (negatives, isolation, reconciliation)      | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-084.md`                    |
 
-**Sprint 15 status:** 5/7 stories done (STORY-078–082); STORY-080 has one open acceptance criterion (see its story doc). STORY-083 and STORY-084 remain planned — both need Ryan's Amazon PPC expertise, not delegable to an agent.
+**Sprint 15 status:** 7/7 stories done (STORY-078–084); STORY-080 has one open acceptance criterion (see its story doc). STORY-083 and STORY-084 are both done as of 2026-08-04 (Ryan directing the work directly, with his decisions already recorded in each story doc, rather than an agent inventing the judgment calls). STORY-084 has two deliberate scope simplifications documented in its "What shipped" section: the 4-factor duplicate-detection rule collapsed to 1 factor, and the negative-routing rule table covers only the 2 rules structurally derivable from the simulator's fixed 3-campaign shape.
 
 ## Sprint 16 — Assessment Platform Maturity (5 pts)
 
-| ID        | Title                                             | Pts | Status     |
-| --------- | ------------------------------------------------- | --- | ---------- |
-| STORY-085 | Scenario publishing + versioning                  | 1   | ⏳ Planned |
-| STORY-086 | Instructor calibration + acceptable-answer ranges | 1   | ⏳ Planned |
-| STORY-087 | Explicit business-impact feedback                 | 1   | ⏳ Planned |
-| STORY-088 | Challenge progression                             | 1   | ⏳ Planned |
-| STORY-089 | Connected-account simulator                       | 1   | ⏳ Planned |
+| ID        | Title                                             | Pts | Status                                                                                          |
+| --------- | ------------------------------------------------- | --- | ----------------------------------------------------------------------------------------------- |
+| STORY-085 | Scenario publishing + versioning                  | 1   | ✅ done — 2026-08-04, full-scope rewire (much bigger than 1pt), see `docs/stories/STORY-085.md` |
+| STORY-086 | Instructor calibration + acceptable-answer ranges | 1   | ⏳ Planned                                                                                      |
+| STORY-087 | Explicit business-impact feedback                 | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-087.md`                                           |
+| STORY-088 | Challenge progression                             | 1   | ✅ done — 2026-08-04, minimal scope, see `docs/stories/STORY-088.md`                            |
+| STORY-089 | Connected-account simulator                       | 1   | ⏳ Planned                                                                                      |
 
 ## Student-facing gap closure (2026-08-01/02, see docs/STUDENT-FEATURE-GAP-ANALYSIS.md)
 

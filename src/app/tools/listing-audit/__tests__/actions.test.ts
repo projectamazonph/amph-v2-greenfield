@@ -48,6 +48,43 @@ const mockContainer = {
   simulatorRegistry: {
     get: vi.fn(),
   },
+  scenarioRepo: {
+    findPublished: vi.fn(),
+  },
+  simulatorAttemptRepo: {
+    findByUserAndSimulator: vi.fn(),
+  },
+  scorePolicyRepo: {
+    findBySimulatorAndDifficulty: vi.fn(),
+  },
+  awardXp: {
+    execute: vi.fn(),
+  },
+};
+
+const PUBLISHED_SCENARIO = {
+  id: "listing-audit-scenario-bamboo-cutting-board",
+  scenarioKey: "listing-audit-scenario-bamboo-cutting-board",
+  version: 1,
+  status: "published" as const,
+  simulatorId: "listing-audit" as const,
+  name: "Bamboo Cutting Board — Premium Kitchen Essential",
+  description: "Audit and revise a bamboo cutting board listing.",
+  inputSchema: {
+    category: "Kitchen",
+    niche: "bamboo cutting board",
+    bullets: [],
+    description: "",
+    images: [],
+    hasVideo: false,
+    hasAPlus: false,
+    marketplace: "US",
+  },
+  outputSchema: {},
+  difficulty: "beginner" as const,
+  estimatedMinutes: 10,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const fakeSimulator = {
@@ -113,8 +150,12 @@ const SIM_OUTPUT: ListingAuditOutput = {
       marketplace: "US",
       policyVersion: "amazon-2026-07-27",
       effectiveDate: "2026-07-27",
-      groundTruth: "fix",
-      userChoice: "fix",
+      expectedAction: "fixNow",
+      acceptedActions: ["fixNow", "defer"],
+      rationale:
+        "A meaningful listing-quality issue; act on it now or schedule it -- don't ignore it.",
+      evidenceRefs: [],
+      userChoice: "fixNow",
       isCorrect: true,
     },
     {
@@ -129,7 +170,11 @@ const SIM_OUTPUT: ListingAuditOutput = {
       marketplace: "US",
       policyVersion: "amazon-2026-07-27",
       effectiveDate: "2026-07-27",
-      groundTruth: "skip",
+      expectedAction: "skip",
+      acceptedActions: ["skip", "defer"],
+      rationale:
+        "Low-impact finding with no compliance risk; skipping or scheduling it later is reasonable.",
+      evidenceRefs: [],
       userChoice: "skip",
       isCorrect: true,
     },
@@ -190,15 +235,18 @@ function happyContainer() {
   );
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
   (fakeSimulator.run as ReturnType<typeof vi.fn>).mockResolvedValue(SIM_OUTPUT);
+  c.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
+  mockContainer.simulatorAttemptRepo.findByUserAndSimulator.mockResolvedValue(Result.ok([]));
+  mockContainer.awardXp.execute.mockResolvedValue(
+    Result.ok({ xpEvent: { id: "xpe_1" }, totalXp: 100 }),
+  );
 }
 
 const VALID_INPUT = {
   title: "Bamboo Cutting Board",
   bullets: ["100% organic bamboo"],
   description: "High-quality bamboo cutting board.",
-  category: "Kitchen",
-  niche: "bamboo cutting board",
-  userFindingActions: { "finding-0": "fix", "finding-1": "skip" },
+  userFindingActions: { "finding-0": "fixNow", "finding-1": "skip" },
 };
 
 // ── listingAuditAttempt tests ────────────────────────────────────────────
@@ -233,11 +281,14 @@ describe("listingAuditAttempt", () => {
     expect(result.error.kind).toBe("validation_error");
   });
 
-  it("returns validation_error when niche is empty", async () => {
-    const result = await listingAuditAttempt({ ...VALID_INPUT, niche: "" });
+  it("returns attempt_error when no published scenario exists", async () => {
+    (mockContainer.scenarioRepo.findPublished as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      Result.ok(null),
+    );
+    const result = await listingAuditAttempt(VALID_INPUT);
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
+    expect(result.error.kind).toBe("attempt_error");
   });
 
   it("returns validation_error for an unknown finding action", async () => {
@@ -268,6 +319,29 @@ describe("listingAuditAttempt", () => {
       attemptId: "ATT-XYZ789",
     });
     expect(mockContainer.submitSimulatorAttempt.execute).toHaveBeenCalled();
+  });
+
+  it("submits before grading (GradeSimulatorAttempt requires 'submitted' status)", async () => {
+    await listingAuditAttempt(VALID_INPUT);
+
+    expect(
+      (mockContainer.submitSimulatorAttempt.execute as ReturnType<typeof vi.fn>).mock
+        .invocationCallOrder[0],
+    ).toBeLessThan(
+      (mockContainer.gradeSimulatorAttempt.execute as ReturnType<typeof vi.fn>).mock
+        .invocationCallOrder[0]!,
+    );
+  });
+
+  it("returns attempt_error when submitSimulatorAttempt fails", async () => {
+    (
+      mockContainer.submitSimulatorAttempt.execute as ReturnType<typeof vi.fn>
+    ).mockResolvedValueOnce(Result.err({ kind: "no_decisions_made" }));
+    const result = await listingAuditAttempt(VALID_INPUT);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
+    expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
   });
 
   it("returns attempt_error when startSimulatorAttempt fails", async () => {
@@ -314,8 +388,31 @@ describe("listingAuditAttempt", () => {
 
     expect(result.value.gradedFindings).toHaveLength(2);
     expect(result.value.gradedFindings[0]!.id).toBe("finding-0");
-    expect(result.value.gradedFindings[0]!.groundTruth).toBe("fix");
+    expect(result.value.gradedFindings[0]!.expectedAction).toBe("fixNow");
     expect(result.value.gradedFindings[0]!.isCorrect).toBe(true);
+  });
+
+  it("awards Challenge-mode XP on a passing challenge attempt", async () => {
+    const result = await listingAuditAttempt({ ...VALID_INPUT, mode: "challenge" });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).toHaveBeenCalledWith({
+      userId: "user_123",
+      amount: 25,
+      reason: "simulator_challenge_passed",
+      refId: "ATT-XYZ789",
+    });
+    expect(result.value.xpAwarded).toBe(25);
+  });
+
+  it("does not award XP for a passing practice-mode attempt", async () => {
+    const result = await listingAuditAttempt(VALID_INPUT);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).not.toHaveBeenCalled();
+    expect(result.value.xpAwarded).toBeNull();
   });
 });
 
@@ -333,8 +430,6 @@ describe("auditListing (legacy)", () => {
       title: "",
       bullets: [],
       description: "",
-      category: "Kitchen",
-      niche: "bamboo",
     });
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -346,12 +441,24 @@ describe("auditListing (legacy)", () => {
       title: "Bamboo Cutting Board",
       bullets: ["100% organic bamboo"],
       description: "High-quality bamboo cutting board.",
-      category: "Kitchen",
-      niche: "bamboo cutting board",
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.score).toBeGreaterThanOrEqual(0);
     expect(result.value.score).toBeLessThanOrEqual(100);
+  });
+
+  it("returns engine_error when no published scenario exists", async () => {
+    (mockContainer.scenarioRepo.findPublished as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      Result.ok(null),
+    );
+    const result = await auditListing({
+      title: "Bamboo Cutting Board",
+      bullets: ["100% organic bamboo"],
+      description: "High-quality bamboo cutting board.",
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("engine_error");
   });
 });

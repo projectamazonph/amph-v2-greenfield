@@ -8,11 +8,14 @@
 
 import Link from "next/link";
 import { Table, type TableColumn, Badge } from "@astryxdesign/core";
-import type { Difficulty, SimulatorId } from "@/domain/entities/SimulatorScenario";
+import type { Difficulty, ScenarioStatus, SimulatorId } from "@/domain/entities/SimulatorScenario";
 
 // Must satisfy Table's `T extends Record<string, unknown>` constraint.
 export interface ScenarioRow extends Record<string, unknown> {
   id: string;
+  scenarioKey: string;
+  version: number;
+  status: ScenarioStatus;
   simulatorId: SimulatorId;
   name: string;
   difficulty: Difficulty;
@@ -29,6 +32,7 @@ const SIMULATOR_IDS: SimulatorId[] = [
   "str-triage",
   "campaign-builder",
   "listing-audit",
+  "keyword-research",
 ];
 
 function difficultyVariant(d: Difficulty) {
@@ -38,6 +42,19 @@ function difficultyVariant(d: Difficulty) {
     case "intermediate":
       return "warning" as const;
     case "advanced":
+      return "error" as const;
+    default:
+      return "neutral" as const;
+  }
+}
+
+function statusVariant(s: ScenarioStatus) {
+  switch (s) {
+    case "published":
+      return "success" as const;
+    case "draft":
+      return "neutral" as const;
+    case "archived":
       return "error" as const;
     default:
       return "neutral" as const;
@@ -97,22 +114,54 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
     ),
   },
   {
+    key: "status",
+    header: "Status",
+    width: { type: "pixel", value: 130 },
+    renderCell: (row) => (
+      <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <Badge variant={statusVariant(row.status)} label={row.status} />
+        <span
+          style={{
+            fontFamily: "var(--font-family-code)",
+            fontSize: 11,
+            color: "var(--ink-500)",
+          }}
+        >
+          v{row.version}
+        </span>
+      </span>
+    ),
+  },
+  {
     key: "actions",
     header: "",
-    width: { type: "pixel", value: 60 },
+    width: { type: "pixel", value: 120 },
     align: "end",
     renderCell: (row) => (
-      <Link
-        href={`/admin/simulators/${row.id}/edit`}
-        style={{
-          color: "var(--accent)",
-          textDecoration: "none",
-          fontWeight: 500,
-          fontSize: "var(--font-size-sm)",
-        }}
-      >
-        Edit
-      </Link>
+      <span style={{ display: "flex", gap: "var(--spacing-3)" }}>
+        <Link
+          href={`/admin/simulators/${row.id}/versions`}
+          style={{
+            color: "var(--ink-700)",
+            textDecoration: "none",
+            fontWeight: 500,
+            fontSize: "var(--font-size-sm)",
+          }}
+        >
+          Versions
+        </Link>
+        <Link
+          href={`/admin/simulators/${row.id}/edit`}
+          style={{
+            color: "var(--accent)",
+            textDecoration: "none",
+            fontWeight: 500,
+            fontSize: "var(--font-size-sm)",
+          }}
+        >
+          Edit
+        </Link>
+      </span>
     ),
   },
 ];

@@ -144,6 +144,39 @@ export class PrismaLiveClassRegistrationRepository implements ILiveClassRegistra
     }
   }
 
+  async markRecordingWatched(
+    userId: string,
+    liveClassId: string,
+    watchedAt: Date,
+  ): Promise<Result<boolean, LiveClassRegistrationRepositoryError>> {
+    try {
+      // updateMany + a `watchedRecordingAt: null` guard in the WHERE clause
+      // makes this atomic at the DB level: Prisma's singular `update()`
+      // can't express a conditional predicate beyond the unique key and
+      // throws P2025 only when the row is missing entirely, not when a
+      // condition fails — it can't report "0 rows matched because someone
+      // else already set this." `updateMany`'s `count` gives us that.
+      const result = await this.db.liveClassRegistration.updateMany({
+        where: { userId, liveClassId, watchedRecordingAt: null },
+        data: { watchedRecordingAt: watchedAt, status: "attended" },
+      });
+      if (result.count > 0) {
+        return Result.ok(true);
+      }
+      // Either already watched, or the registration doesn't exist at all —
+      // disambiguate so callers can still return not_found correctly.
+      const existing = await this.db.liveClassRegistration.findUnique({
+        where: { userId_liveClassId: { userId, liveClassId } },
+      });
+      if (!existing) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.ok(false);
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   private mapRow(row: LiveClassRegistrationRow): LiveClassRegistration {
     if (!isValidRegistrationStatus(row.status)) {
       // Caught by the surrounding try/catch in every caller and turned

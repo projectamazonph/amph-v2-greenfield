@@ -20,6 +20,7 @@ const SIMULATOR_IDS: SimulatorId[] = [
   "str-triage",
   "campaign-builder",
   "listing-audit",
+  "keyword-research",
 ];
 
 const DIFFICULTIES: Difficulty[] = ["beginner", "intermediate", "advanced"];
@@ -46,7 +47,10 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
         ← Back to scenarios
       </Link>
 
-      <TopBar title="Add scenario" subtitle="Create a new simulator scenario" />
+      <TopBar
+        title="Add scenario"
+        subtitle="Creates a new draft scenario family — publish it from the version history view to make it live"
+      />
 
       {errorMsg && (
         <Card padding={6}>

@@ -6,6 +6,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { createResource } from "@/domain/entities/Resource";
+import type { IFileStorage } from "@/ports/storage/IFileStorage";
 
 describe("PurgeResource", () => {
   let repo: InMemoryResourceRepository;
@@ -99,5 +100,48 @@ describe("PurgeResource", () => {
     await useCase.execute({ id: "res_3", actorId: "admin_1" });
     const auditLog = recordAuditLog._auditLog as InMemoryAuditLog;
     expect(auditLog.getAll().some((e) => e.action === "resource.purged")).toBe(true);
+  });
+
+  it("awaits the storage delete instead of firing it and forgetting", async () => {
+    // Regression for a review finding: the file delete used to be
+    // `void`-called, so execute() could resolve before it actually
+    // landed. A storage fake whose delete() resolves one microtask late
+    // proves it's awaited now: if it were still fire-and-forget,
+    // `deleteSettled` would still be false the instant execute() resolves.
+    let deleteSettled = false;
+    const slowStorage: IFileStorage = {
+      upload: fileStorage.upload.bind(fileStorage),
+      delete: async (key: string) => {
+        await Promise.resolve();
+        deleteSettled = true;
+        return fileStorage.delete(key);
+      },
+    };
+    const slowUseCase = new PurgeResource({
+      resourceRepo: repo,
+      fileStorage: slowStorage,
+      recordAuditLog,
+    });
+
+    await fileStorage.upload({
+      key: "resources/res_4/handout.pdf",
+      data: Buffer.from("x"),
+      contentType: "application/pdf",
+    });
+    const seed = createResource({
+      id: "res_4",
+      title: "Title",
+      description: "Description",
+      category: "handout",
+      fileType: "pdf",
+      fileUrl: "https://fake-storage.test/resources/res_4/handout.pdf",
+      fileKey: "resources/res_4/handout.pdf",
+      accessTier: "PREVIEW",
+    });
+    if (!seed.ok) throw new Error("seed failed");
+    repo.seed(seed.value);
+
+    await slowUseCase.execute({ id: "res_4", actorId: "admin_1" });
+    expect(deleteSettled).toBe(true);
   });
 });

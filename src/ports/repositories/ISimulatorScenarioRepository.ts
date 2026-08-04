@@ -28,12 +28,38 @@ export interface ISimulatorScenarioRepository {
    * List all scenarios, optionally filtered by simulatorId.
    * Returns an empty array (not an error) when no matches.
    */
-  listAll(filter?: ListScenariosFilter): Promise<Result<SimulatorScenario[], SimulatorScenarioError>>;
+  listAll(
+    filter?: ListScenariosFilter,
+  ): Promise<Result<SimulatorScenario[], SimulatorScenarioError>>;
 
   /**
-   * Find a scenario by its id. Returns null (not an error) if not found.
+   * Find a scenario by its id, regardless of status (draft/published/
+   * archived). Returns null (not an error) if not found. Unlike listAll,
+   * this does not filter archived rows — an admin navigating to a
+   * specific version by id (via version history) should always resolve it.
    */
   findById(id: string): Promise<Result<SimulatorScenario | null, SimulatorScenarioError>>;
+
+  /**
+   * Find the currently published scenario for a simulator. Returns null
+   * (not an error) if none is published yet. STORY-085.
+   */
+  findPublished(
+    simulatorId: SimulatorId,
+  ): Promise<Result<SimulatorScenario | null, SimulatorScenarioError>>;
+
+  /**
+   * List every version (draft/published/archived) sharing a scenarioKey,
+   * newest first. STORY-085.
+   */
+  listVersions(scenarioKey: string): Promise<Result<SimulatorScenario[], SimulatorScenarioError>>;
+
+  /**
+   * Publish a draft scenario: atomically archives any currently-published
+   * scenario sharing the same scenarioKey, then marks this one published.
+   * Returns not_found if the scenario doesn't exist. STORY-085.
+   */
+  publish(id: string): Promise<Result<SimulatorScenario, SimulatorScenarioError>>;
 
   /**
    * Persist a new scenario. The entity factory (createSimulatorScenario)

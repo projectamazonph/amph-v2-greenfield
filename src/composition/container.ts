@@ -251,11 +251,15 @@ import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
 import { UpdateSimulatorScenario } from "@/usecases/UpdateSimulatorScenario";
 import { ArchiveSimulatorScenario } from "@/usecases/ArchiveSimulatorScenario";
+import { PublishSimulatorScenario } from "@/usecases/PublishSimulatorScenario";
+import { CreateScenarioVersionDraft } from "@/usecases/CreateScenarioVersionDraft";
+import { ListScenarioVersions } from "@/usecases/ListScenarioVersions";
 import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
 import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
 import { ComposeAttemptFeedback } from "@/usecases/ComposeAttemptFeedback";
+import { CheckChallengeModeUnlocked } from "@/usecases/CheckChallengeModeUnlocked";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
 import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
@@ -454,6 +458,9 @@ export interface AppContainer {
   createSimulatorScenario: CreateSimulatorScenario;
   updateSimulatorScenario: UpdateSimulatorScenario;
   archiveSimulatorScenario: ArchiveSimulatorScenario;
+  publishSimulatorScenario: PublishSimulatorScenario;
+  createScenarioVersionDraft: CreateScenarioVersionDraft;
+  listScenarioVersions: ListScenarioVersions;
   // STORY-064: simulator attempt lifecycle
   startSimulatorAttempt: StartSimulatorAttempt;
   saveSimulatorDecision: SaveSimulatorDecision;
@@ -461,6 +468,8 @@ export interface AppContainer {
   // STORY-065: scoring engine
   gradeSimulatorAttempt: GradeSimulatorAttempt;
   composeAttemptFeedback: ComposeAttemptFeedback;
+  // STORY-088: challenge mode unlock
+  checkChallengeModeUnlocked: CheckChallengeModeUnlocked;
   // STORY-050c: live class admin CRUD
   adminListLiveClasses: AdminListLiveClasses;
   adminGetLiveClass: AdminGetLiveClass;
@@ -944,6 +953,10 @@ function buildProductionContainer(): AppContainer {
       scorePolicyRepo,
       feedbackRepo,
     }),
+    checkChallengeModeUnlocked: new CheckChallengeModeUnlocked({
+      attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
+    }),
     // STORY-011: pricing tier repo
     pricingTierRepo,
     // STORY-048b/c: module + lesson repos (also used by public catalog)
@@ -957,6 +970,15 @@ function buildProductionContainer(): AppContainer {
     createSimulatorScenario: new CreateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     updateSimulatorScenario: new UpdateSimulatorScenario({ scenarioRepo, recordAuditLog }),
     archiveSimulatorScenario: new ArchiveSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    // STORY-085: scenario publishing + versioning
+    publishSimulatorScenario: new PublishSimulatorScenario({ scenarioRepo, recordAuditLog }),
+    createScenarioVersionDraft: new CreateScenarioVersionDraft({
+      scenarioRepo,
+      recordAuditLog,
+      idGen,
+      clock,
+    }),
+    listScenarioVersions: new ListScenarioVersions({ scenarioRepo }),
     // STORY-050c
     liveClassRegistrationRepo,
     liveClassRepo,
@@ -1074,7 +1096,10 @@ export function getContainer(): AppContainer {
 
 // ── Startup env-var validation ──────────────────────────────────────────────
 
-function validateRequiredEnvVars(): void {
+// Exported for direct unit testing — buildContainer() itself constructs a
+// real production container (Prisma, PayMongo, etc.) on success, too heavy
+// to exercise just to test this validation.
+export function validateRequiredEnvVars(): void {
   if (!process.env.PAYMONGO_SECRET) {
     throw new Error("Missing required environment variable: PAYMONGO_SECRET");
   }
@@ -1086,6 +1111,19 @@ function validateRequiredEnvVars(): void {
   }
   if (!process.env.DATABASE_URL) {
     throw new Error("Missing required environment variable: DATABASE_URL");
+  }
+  // STORY-098.5 review finding: without BLOB_READ_WRITE_TOKEN, the resource
+  // file-storage wiring below silently falls back to LocalFileStorage,
+  // which writes to Vercel's ephemeral/read-only serverless filesystem —
+  // uploads "succeed" and then disappear on the next cold start/redeploy.
+  // Gated to production only so local dev and tests keep working without
+  // a blob store provisioned.
+  if (process.env.NODE_ENV === "production" && !process.env.BLOB_READ_WRITE_TOKEN) {
+    throw new Error(
+      "Missing required environment variable: BLOB_READ_WRITE_TOKEN (required in production — " +
+        "without it, resource file storage silently falls back to LocalFileStorage, which does " +
+        "not persist on Vercel's serverless filesystem)",
+    );
   }
 }
 

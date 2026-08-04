@@ -54,6 +54,9 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
         invalid_file_url: "Please enter a valid http(s) URL.",
         invalid_access_tier: "Please choose an access tier.",
         not_found: "Resource not found.",
+        file_too_large: "That file is too large. Please upload something under 25 MB.",
+        unsupported_file_type:
+          "That file type isn't supported. Please upload a PDF, spreadsheet, document, presentation, zip, or image.",
         db_error: "Something went wrong. Please try again.",
       }[sp.error]
     : null;

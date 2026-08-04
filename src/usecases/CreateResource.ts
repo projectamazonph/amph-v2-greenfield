@@ -43,6 +43,7 @@ export class CreateResource {
       fileUrl: input.fileUrl,
       fileKey: input.fileKey,
       accessTier: input.accessTier,
+      createdById: input.actorId,
     });
 
     if (!resourceResult.ok) {

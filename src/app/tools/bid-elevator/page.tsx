@@ -1,7 +1,7 @@
 /**
  * /tools/bid-elevator — student-facing simulator page.
  *
- * STORY-079: Bid Elevator economic model rewrite. The scenario is now
+ * STORY-079: Bid Elevator economic model rewrite. The scenario is
  * authored with per-keyword economics (baseline CTR/CVR, benchmark CPC,
  * available impression volume, bid elasticity, evidence counts) rather
  * than a bare keyword/volume/CPC row, so ground truth is reproducible
@@ -12,185 +12,48 @@
  * type in keyword economics themselves (those fields can't be filled in
  * meaningfully by a free-typing user under the new model).
  *
+ * STORY-085: content is read server-side from the currently published
+ * bid-elevator SimulatorScenario instead of a hardcoded page const, so
+ * publishing a new version through the admin UI actually changes what
+ * students see and get graded against.
+ *
  * The result renders inline inside BidElevatorForm (client state) once
  * the student clicks "Run simulation" — no route change needed.
  */
 
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
+import { Result } from "@/domain/shared/Result";
 import { BidElevatorForm } from "@/components/tools/BidElevatorForm";
-import type { BidElevatorKeywordScenario } from "@/domain/simulator/bid-elevator/BidElevatorInput";
 import { StudentShell } from "@/components/student/StudentShell";
+import { bidElevatorScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
-const SCENARIO = {
-  title: "Reduce ACoS on a high-spend electronics campaign",
-  brief:
-    "Your wireless earbuds campaign is spending ₱800/day but ACoS is 45%. Target ACoS is 25%. Adjust bids to bring spend in line.",
-  currencyCode: "USD",
-  dailyBudget: 1000,
-  simulationDays: 1,
-  targetRoas: 4.0, // implied from 25% ACoS -> 4x ROAS
-  breakEvenAcosPct: 45,
-  defaultRevenuePerOrder: 35,
-  minimumBidIncrement: 0.05,
-  keywords: [
-    {
-      keywordId: "wireless-earbuds",
-      keyword: "wireless earbuds",
-      matchType: "exact",
-      intent: "generic",
-      strategicRole: "performance",
-      currentBid: 25,
-      baselineBid: 25,
-      baselineCtrPct: 2.6,
-      baselineCvrPct: 11,
-      benchmarkCpc: 0.85,
-      availableImpressionsPerDay: 415,
-      maxImpressionSharePct: 40,
-      bidElasticity: 1.5,
-      evidenceClicks: 62,
-      evidenceOrders: 7,
-      evidenceWindowDays: 30,
-    },
-    {
-      keywordId: "bluetooth-earbuds",
-      keyword: "bluetooth earbuds",
-      matchType: "exact",
-      intent: "generic",
-      strategicRole: "performance",
-      currentBid: 30,
-      baselineBid: 30,
-      baselineCtrPct: 2.2,
-      baselineCvrPct: 9,
-      benchmarkCpc: 1.1,
-      availableImpressionsPerDay: 273,
-      maxImpressionSharePct: 38,
-      bidElasticity: 1.4,
-      evidenceClicks: 48,
-      evidenceOrders: 4,
-      evidenceWindowDays: 30,
-    },
-    {
-      keywordId: "wireless-headphones",
-      keyword: "wireless headphones",
-      matchType: "broad",
-      intent: "category",
-      strategicRole: "research",
-      currentBid: 15,
-      baselineBid: 15,
-      baselineCtrPct: 1.6,
-      baselineCvrPct: 6,
-      benchmarkCpc: 0.6,
-      availableImpressionsPerDay: 737,
-      maxImpressionSharePct: 30,
-      bidElasticity: 1.2,
-      evidenceClicks: 35,
-      evidenceOrders: 2,
-      evidenceWindowDays: 30,
-    },
-    {
-      keywordId: "earbuds-for-iphone",
-      keyword: "earbuds for iphone",
-      matchType: "phrase",
-      intent: "category",
-      strategicRole: "research",
-      currentBid: 20,
-      baselineBid: 20,
-      baselineCtrPct: 2.4,
-      baselineCvrPct: 10,
-      benchmarkCpc: 0.75,
-      availableImpressionsPerDay: 187,
-      maxImpressionSharePct: 40,
-      bidElasticity: 1.6,
-      evidenceClicks: 33,
-      evidenceOrders: 4,
-      evidenceWindowDays: 30,
-    },
-    {
-      keywordId: "cheap-earbuds",
-      keyword: "cheap earbuds",
-      matchType: "broad",
-      intent: "category",
-      strategicRole: "research",
-      currentBid: 18,
-      baselineBid: 18,
-      baselineCtrPct: 1.8,
-      baselineCvrPct: 5,
-      benchmarkCpc: 0.5,
-      availableImpressionsPerDay: 510,
-      maxImpressionSharePct: 32,
-      bidElasticity: 1.1,
-      evidenceClicks: 41,
-      evidenceOrders: 2,
-      evidenceWindowDays: 30,
-    },
-    {
-      keywordId: "running-earbuds",
-      keyword: "running earbuds",
-      matchType: "phrase",
-      intent: "category",
-      strategicRole: "research",
-      currentBid: 22,
-      baselineBid: 22,
-      baselineCtrPct: 2.9,
-      baselineCvrPct: 12,
-      benchmarkCpc: 0.95,
-      availableImpressionsPerDay: 137,
-      maxImpressionSharePct: 42,
-      bidElasticity: 1.7,
-      evidenceClicks: 29,
-      evidenceOrders: 3,
-      evidenceWindowDays: 30,
-    },
-    {
-      keywordId: "noise-cancelling-earbuds",
-      keyword: "noise cancelling earbuds",
-      matchType: "exact",
-      intent: "generic",
-      strategicRole: "performance",
-      currentBid: 28,
-      baselineBid: 28,
-      baselineCtrPct: 2.7,
-      baselineCvrPct: 13,
-      benchmarkCpc: 1.2,
-      availableImpressionsPerDay: 227,
-      maxImpressionSharePct: 40,
-      bidElasticity: 1.5,
-      evidenceClicks: 55,
-      evidenceOrders: 8,
-      evidenceWindowDays: 30,
-    },
-    {
-      keywordId: "earbuds-with-mic",
-      keyword: "earbuds with mic",
-      matchType: "phrase",
-      intent: "category",
-      strategicRole: "research",
-      currentBid: 16,
-      baselineBid: 16,
-      baselineCtrPct: 2.0,
-      baselineCvrPct: 8,
-      benchmarkCpc: 0.65,
-      availableImpressionsPerDay: 313,
-      maxImpressionSharePct: 35,
-      bidElasticity: 1.3,
-      evidenceClicks: 26,
-      evidenceOrders: 2,
-      evidenceWindowDays: 30,
-    },
-  ] as const satisfies ReadonlyArray<BidElevatorKeywordScenario>,
-};
-
 export default async function BidElevatorPage() {
-  // Make sure the simulator is actually registered in this container
-  // (smoke test for the DI wiring; would catch a missing import).
   const container = buildContainer();
   const sim = container.simulatorRegistry.get("bid-elevator");
   if (!sim) {
     throw new Error("Bid Elevator simulator not registered");
+  }
+
+  const scenarioResult = await container.scenarioRepo.findPublished("bid-elevator");
+  if (!scenarioResult.ok || !scenarioResult.value) {
+    throw new Error("No published bid-elevator scenario found");
+  }
+  const scenario = scenarioResult.value;
+  const content = bidElevatorScenarioContentSchema.parse(scenario.inputSchema);
+
+  const userId = await getSessionUserId();
+  let challengeUnlocked = false;
+  if (userId) {
+    const unlockedResult = await container.checkChallengeModeUnlocked.execute({
+      userId,
+      simulatorId: "bid-elevator",
+    });
+    challengeUnlocked = Result.isOk(unlockedResult) ? unlockedResult.value.unlocked : false;
   }
 
   return (
@@ -213,10 +76,10 @@ export default async function BidElevatorPage() {
         </nav>
         <header className={styles.header}>
           <span className={styles.eyebrow}>Simulator</span>
-          <h1 className={styles.title}>{SCENARIO.title}</h1>
-          <p className={styles.brief}>{SCENARIO.brief}</p>
+          <h1 className={styles.title}>{scenario.name}</h1>
+          <p className={styles.brief}>{scenario.description}</p>
         </header>
-        <BidElevatorForm scenario={SCENARIO} />
+        <BidElevatorForm scenario={content} challengeUnlocked={challengeUnlocked} />
       </main>
     </StudentShell>
   );

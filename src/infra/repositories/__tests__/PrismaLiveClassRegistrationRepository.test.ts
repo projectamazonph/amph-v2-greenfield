@@ -33,6 +33,7 @@ class FakePrismaClient {
   failNextCreate = false;
   failNextFind = false;
   failNextUpdate = false;
+  failNextUpdateMany = false;
 
   liveClassRegistration = {
     create: async (args: { data: Omit<RegistrationRow, "createdAt" | "updatedAt"> }) => {
@@ -100,6 +101,24 @@ class FakePrismaClient {
       }
       Object.assign(row, args.data, { updatedAt: new Date() });
       return row;
+    },
+    updateMany: async (args: {
+      where: { userId: string; liveClassId: string; watchedRecordingAt: null };
+      data: Partial<RegistrationRow>;
+    }) => {
+      if (this.failNextUpdateMany) {
+        this.failNextUpdateMany = false;
+        throw new Error("forced updateMany error");
+      }
+      const { userId, liveClassId } = args.where;
+      const matches = this.rows.filter(
+        (r) =>
+          r.userId === userId && r.liveClassId === liveClassId && r.watchedRecordingAt === null,
+      );
+      for (const row of matches) {
+        Object.assign(row, args.data, { updatedAt: new Date() });
+      }
+      return { count: matches.length };
     },
   };
 }
@@ -245,5 +264,50 @@ describe("PrismaLiveClassRegistrationRepository", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("db_error");
+  });
+
+  describe("markRecordingWatched", () => {
+    it("flips an unwatched registration and returns true", async () => {
+      await repo.create(makeRegistration());
+      const watchedAt = new Date("2026-08-03T00:00:00Z");
+      const result = await repo.markRecordingWatched("user_1", "lc_1", watchedAt);
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toBe(true);
+
+      const found = await repo.findByUserAndClass("user_1", "lc_1");
+      expect(found.ok).toBe(true);
+      if (!found.ok) return;
+      expect(found.value?.status).toBe("attended");
+      expect(found.value?.watchedRecordingAt).toEqual(watchedAt);
+    });
+
+    it("returns false (no-op) when already watched — the race guard", async () => {
+      await repo.create(makeRegistration({ watchedRecordingAt: new Date("2026-08-01T00:00:00Z") }));
+      const result = await repo.markRecordingWatched(
+        "user_1",
+        "lc_1",
+        new Date("2026-08-03T00:00:00Z"),
+      );
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.value).toBe(false);
+    });
+
+    it("returns not_found when the registration does not exist", async () => {
+      const result = await repo.markRecordingWatched("ghost", "lc_1", new Date());
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.kind).toBe("not_found");
+    });
+
+    it("returns db_error when Prisma throws", async () => {
+      await repo.create(makeRegistration());
+      db.failNextUpdateMany = true;
+      const result = await repo.markRecordingWatched("user_1", "lc_1", new Date());
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error.kind).toBe("db_error");
+    });
   });
 });

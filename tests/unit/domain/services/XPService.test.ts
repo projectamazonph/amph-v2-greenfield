@@ -20,6 +20,12 @@ describe("XPService", () => {
     });
   });
 
+  describe("SIMULATOR_CHALLENGE_PASSED_XP", () => {
+    it("awards 25 XP for passing a simulator in Challenge mode", () => {
+      expect(XPService.SIMULATOR_CHALLENGE_PASSED_XP).toBe(25);
+    });
+  });
+
   describe("xpTierLabel", () => {
     it("returns Newcomer for 0–99 XP", () => {
       expect(XPService.xpTierLabel(0)).toBe("Newcomer");
@@ -60,6 +66,7 @@ describe("XPService", () => {
       expect(XPService.isXpReason("streak_bonus")).toBe(true);
       expect(XPService.isXpReason("badge_awarded")).toBe(true);
       expect(XPService.isXpReason("live_class_attended")).toBe(true);
+      expect(XPService.isXpReason("simulator_challenge_passed")).toBe(true);
     });
 
     it("returns false for invalid reasons", () => {

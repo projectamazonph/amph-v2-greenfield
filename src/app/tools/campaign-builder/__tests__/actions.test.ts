@@ -3,8 +3,11 @@
  *
  * STORY-069: Campaign Builder Rebuild (Scoring Engine Integration).
  *
- * Tests both the new campaignBuilderAttempt() lifecycle function and the
- * legacy buildCampaign() backward-compatibility wrapper.
+ * STORY-085: campaignBuilderAttempt() no longer accepts
+ * productCategory/productNiche/monthlyBudget from the client — it
+ * resolves the currently published campaign-builder scenario server-side
+ * via scenarioRepo.findPublished(). The legacy buildCampaign() wrapper
+ * (which never persisted a SimulatorAttempt) is removed.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -23,15 +26,19 @@ vi.mock("@/lib/auth", () => ({
 
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
-import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
-import type { CampaignBuilderOutput } from "@/domain/simulator/campaign-builder/CampaignBuilderOutput";
-import { campaignBuilderAttempt, buildCampaign } from "../actions";
+import { campaignBuilderAttempt } from "../actions";
 
 const mockContainer = {
   startSimulatorAttempt: { execute: vi.fn() },
+  saveSimulatorDecision: { execute: vi.fn() },
+  submitSimulatorAttempt: { execute: vi.fn() },
   gradeSimulatorAttempt: { execute: vi.fn() },
   composeAttemptFeedback: { execute: vi.fn() },
   simulatorRegistry: { get: vi.fn() },
+  scenarioRepo: { findPublished: vi.fn() },
+  simulatorAttemptRepo: { findByUserAndSimulator: vi.fn() },
+  scorePolicyRepo: { findBySimulatorAndDifficulty: vi.fn() },
+  awardXp: { execute: vi.fn() },
 };
 
 const fakeSimulator = {
@@ -42,27 +49,24 @@ const fakeSimulator = {
 
 // ── Fixtures ──────────────────────────────────────────────────────────
 
-const GRADED_ATTEMPT: SimulatorAttempt = {
-  id: "sys-attempt-1",
-  attemptId: "ATT-CB001",
-  userId: "user_123",
-  simulatorId: "campaign-builder",
-  scenarioId: "campaign-builder-scenario-default",
-  scenarioVersion: 1,
-  difficulty: "beginner",
-  mode: "practice",
-  status: "graded",
-  seed: "SEED8888",
-  score: 80,
-  scoreDimensions: {
-    structureQuality: 80,
-    budgetAllocation: 90,
-    keywordRelevance: 70,
+const PUBLISHED_SCENARIO = {
+  id: "campaign-builder-scenario-default",
+  scenarioKey: "campaign-builder-scenario-default",
+  version: 1,
+  status: "published" as const,
+  simulatorId: "campaign-builder" as const,
+  name: "Launch a Sponsored Products campaign for wireless earbuds",
+  description: "Build a complete SP campaign with manual targeting and a ₱500/day budget.",
+  inputSchema: {
+    productCategory: "Electronics",
+    productNiche: "wireless earbuds",
+    monthlyBudget: 15000,
   },
-  startedAt: new Date(),
-  submittedAt: new Date(),
-  gradedAt: new Date(),
-  decisions: [],
+  outputSchema: {},
+  difficulty: "beginner" as const,
+  estimatedMinutes: 15,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const GT_CAMPAIGNS: CampaignStructure[] = [
@@ -116,19 +120,11 @@ const GT_CAMPAIGNS: CampaignStructure[] = [
   },
 ];
 
-const SIM_OUTPUT: CampaignBuilderOutput = {
-  campaigns: GT_CAMPAIGNS,
-  score: 80,
-  scoreDimensions: {
-    structureQuality: 80,
-    budgetAllocation: 90,
-    keywordRelevance: 70,
-  },
-};
-
 function happyContainer() {
   const c = mockContainer as typeof mockContainer & {
     startSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
+    saveSimulatorDecision: { execute: ReturnType<typeof vi.fn> };
+    submitSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
     gradeSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
     composeAttemptFeedback: { execute: ReturnType<typeof vi.fn> };
     simulatorRegistry: { get: ReturnType<typeof vi.fn> };
@@ -136,14 +132,22 @@ function happyContainer() {
   c.startSimulatorAttempt.execute.mockResolvedValue(
     Result.ok({ attemptId: "ATT-CB001", startedAt: new Date() }),
   );
+  c.saveSimulatorDecision.execute.mockResolvedValue(Result.ok(undefined));
+  c.submitSimulatorAttempt.execute.mockResolvedValue(
+    Result.ok({ status: "submitted", submittedAt: new Date() }),
+  );
   c.gradeSimulatorAttempt.execute.mockResolvedValue(
     Result.ok({
       attemptId: "ATT-CB001",
       overallScore: 80,
       scoreDimensions: {
-        structureQuality: 80,
-        budgetAllocation: 90,
         keywordRelevance: 70,
+        structureQuality: 80,
+        negativeRouting: 75,
+        budgetAllocation: 90,
+        brandedIsolation: 100,
+        duplicateControl: 100,
+        namingCompliance: 60,
       },
       isPassed: true,
       gradedAt: new Date(),
@@ -168,13 +172,26 @@ function happyContainer() {
     }),
   );
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
+  mockContainer.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
+  mockContainer.simulatorAttemptRepo.findByUserAndSimulator.mockResolvedValue(Result.ok([]));
+  mockContainer.awardXp.execute.mockResolvedValue(
+    Result.ok({ xpEvent: { id: "xpe_1" }, totalXp: 100 }),
+  );
   fakeSimulator.run.mockImplementation(
     async (input: { userAdjustedCampaigns?: CampaignStructure[] }) => ({
       campaigns: GT_CAMPAIGNS,
       score: input.userAdjustedCampaigns !== undefined ? 80 : 90,
       scoreDimensions:
         input.userAdjustedCampaigns !== undefined
-          ? { structureQuality: 80, budgetAllocation: 90, keywordRelevance: 70, explanation: 100 }
+          ? {
+              keywordRelevance: 70,
+              structureQuality: 80,
+              negativeRouting: 75,
+              budgetAllocation: 90,
+              brandedIsolation: 100,
+              duplicateControl: 100,
+              namingCompliance: 60,
+            }
           : null,
     }),
   );
@@ -196,9 +213,6 @@ describe("campaignBuilderAttempt", () => {
   it("returns unauthorized when user is not authenticated", async () => {
     (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
     const result = await campaignBuilderAttempt({
-      productCategory: "Electronics",
-      productNiche: "wireless earbuds",
-      monthlyBudget: 3000,
       targetingStrategy: "hybrid",
       userAdjustedCampaigns: GT_CAMPAIGNS,
     });
@@ -208,46 +222,26 @@ describe("campaignBuilderAttempt", () => {
   });
 
   const validInput = {
-    productCategory: "Electronics",
-    productNiche: "wireless earbuds",
-    monthlyBudget: 3000,
     targetingStrategy: "hybrid" as const,
     userAdjustedCampaigns: GT_CAMPAIGNS,
   };
 
-  it("returns validation_error when productCategory is missing", async () => {
-    const result = await campaignBuilderAttempt({
-      productNiche: "earbuds",
-      monthlyBudget: 1000,
-      targetingStrategy: "auto",
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
-  it("returns validation_error when monthlyBudget is not positive", async () => {
-    const result = await campaignBuilderAttempt({
-      productCategory: "Electronics",
-      productNiche: "earbuds",
-      monthlyBudget: 0,
-      targetingStrategy: "auto",
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
   it("returns validation_error when targetingStrategy is invalid", async () => {
     const result = await campaignBuilderAttempt({
-      productCategory: "Electronics",
-      productNiche: "earbuds",
-      monthlyBudget: 1000,
       targetingStrategy: "invalid" as TargetingStrategy,
     });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_error");
+  });
+
+  it("returns attempt_error when no published scenario exists", async () => {
+    happyContainer();
+    mockContainer.scenarioRepo.findPublished.mockResolvedValueOnce(Result.ok(null));
+    const result = await campaignBuilderAttempt(validInput);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
   });
 
   it("happy path: starts attempt, grades, composes feedback, returns result", async () => {
@@ -257,10 +251,33 @@ describe("campaignBuilderAttempt", () => {
     if (!result.ok) return;
 
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
-      expect.objectContaining({ simulatorId: "campaign-builder", mode: "practice" }),
+      expect.objectContaining({
+        simulatorId: "campaign-builder",
+        mode: "practice",
+        scenarioId: "campaign-builder-scenario-default",
+      }),
     );
-    expect(fakeSimulator.run).toHaveBeenCalled();
-    expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalled();
+    expect(fakeSimulator.run).toHaveBeenCalledWith(
+      expect.objectContaining({
+        productCategory: "Electronics",
+        productNiche: "wireless earbuds",
+        monthlyBudget: 15000,
+      }),
+    );
+    // STORY-084: all 7 dimensions must reach GradeSimulatorAttempt, not
+    // just the pre-STORY-084 structureQuality/budgetAllocation/keywordRelevance.
+    expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalledWith({
+      attemptId: "ATT-CB001",
+      scoreDimensions: {
+        keywordRelevance: 70,
+        structureQuality: 80,
+        negativeRouting: 75,
+        budgetAllocation: 90,
+        brandedIsolation: 100,
+        duplicateControl: 100,
+        namingCompliance: 60,
+      },
+    });
     expect(mockContainer.composeAttemptFeedback.execute).toHaveBeenCalledWith({
       attemptId: "ATT-CB001",
     });
@@ -294,18 +311,40 @@ describe("campaignBuilderAttempt", () => {
     expect(result.error.kind).toBe("grading_error");
   });
 
-  it("preview mode (no userAdjustedCampaigns) skips grading and feedback", async () => {
+  it("saves a decision and submits before grading (GradeSimulatorAttempt requires 'submitted' status)", async () => {
     happyContainer();
-    const previewInput = {
-      productCategory: "Electronics",
-      productNiche: "wireless earbuds",
-      monthlyBudget: 3000,
-      targetingStrategy: "hybrid" as const,
-    };
+    await campaignBuilderAttempt(validInput);
+
+    expect(mockContainer.saveSimulatorDecision.execute).toHaveBeenCalledWith(
+      expect.objectContaining({ attemptId: "ATT-CB001" }),
+    );
+    expect(mockContainer.submitSimulatorAttempt.execute.mock.invocationCallOrder[0]).toBeLessThan(
+      mockContainer.gradeSimulatorAttempt.execute.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it("returns attempt_error when submitSimulatorAttempt fails", async () => {
+    happyContainer();
+    mockContainer.submitSimulatorAttempt.execute.mockResolvedValue(
+      Result.err({ kind: "no_decisions_made" }),
+    );
+    const result = await campaignBuilderAttempt(validInput);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
+    expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
+  });
+
+  it("preview mode (no userAdjustedCampaigns) skips grading and feedback, but still persists an attempt", async () => {
+    happyContainer();
+    const previewInput = { targetingStrategy: "hybrid" as const };
     const result = await campaignBuilderAttempt(previewInput);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalled();
+    expect(mockContainer.saveSimulatorDecision.execute).not.toHaveBeenCalled();
+    expect(mockContainer.submitSimulatorAttempt.execute).not.toHaveBeenCalled();
     expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
     expect(mockContainer.composeAttemptFeedback.execute).not.toHaveBeenCalled();
     expect(result.value.scoreDimensions).toBeNull();
@@ -320,69 +359,30 @@ describe("campaignBuilderAttempt", () => {
     if (!result.ok) return;
     expect(result.value.campaigns).toHaveLength(3);
   });
-});
 
-// ── buildCampaign (legacy) tests ──────────────────────────────────────
-
-describe("buildCampaign (legacy)", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    setupGetContainer();
-    mockContainer.simulatorRegistry.get.mockReturnValue(fakeSimulator);
-    fakeSimulator.run.mockResolvedValue({
-      campaigns: GT_CAMPAIGNS,
-      score: 90,
-      scoreDimensions: null,
-    });
-  });
-
-  it("returns invalid_input when productCategory is empty", async () => {
-    const result = await buildCampaign({
-      productCategory: "",
-      productNiche: "earbuds",
-      monthlyBudget: 1000,
-      targetingStrategy: "auto",
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns invalid_input when monthlyBudget is 0", async () => {
-    const result = await buildCampaign({
-      productCategory: "Electronics",
-      productNiche: "earbuds",
-      monthlyBudget: 0,
-      targetingStrategy: "auto",
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns invalid_input when targetingStrategy is invalid", async () => {
-    const result = await buildCampaign({
-      productCategory: "Electronics",
-      productNiche: "earbuds",
-      monthlyBudget: 1000,
-      targetingStrategy: "invalid" as TargetingStrategy,
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns campaigns for valid input", async () => {
-    const result = await buildCampaign({
-      productCategory: "Electronics",
-      productNiche: "wireless earbuds",
-      monthlyBudget: 3000,
-      targetingStrategy: "hybrid",
-    });
+  it("awards Challenge-mode XP on a passing challenge attempt", async () => {
+    happyContainer();
+    const result = await campaignBuilderAttempt({ ...validInput, mode: "challenge" });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.campaigns).toHaveLength(3);
-    expect(result.value.scoreDimensions).toBeNull();
+
+    expect(mockContainer.awardXp.execute).toHaveBeenCalledWith({
+      userId: "user_123",
+      amount: 25,
+      reason: "simulator_challenge_passed",
+      refId: "ATT-CB001",
+    });
+    expect(result.value.xpAwarded).toBe(25);
+  });
+
+  it("does not award XP for a passing practice-mode attempt", async () => {
+    happyContainer();
+    const result = await campaignBuilderAttempt(validInput);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).not.toHaveBeenCalled();
+    expect(result.value.xpAwarded).toBeNull();
   });
 });
 
