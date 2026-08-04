@@ -475,12 +475,24 @@ const SCENARIOS: ReadonlyArray<{
     difficulty: "beginner",
     estimatedMinutes: 15,
     // Losslessly migrated from src/app/tools/campaign-builder/page.tsx's SCENARIO const.
-    // This is genuinely all that exists — ground truth is procedurally generated
-    // from hardcoded engine constants (STORY-084 is the real ground-truth story).
+    // Ground truth is still procedurally generated from hardcoded engine
+    // constants; STORY-084 added the brand-taxonomy/ASIN/budget-
+    // reconciliation fields below so the 4 new grading dimensions have
+    // scenario context (agent-authored scenario content, not requiring
+    // Ryan's per-scenario authoring — same reasoning as STORY-083's seed
+    // update).
     inputSchema: {
       productCategory: "Electronics",
       productNiche: "wireless earbuds",
       monthlyBudget: 15000,
+      brandName: "Sonora",
+      brandAliases: ["Sonora Audio"],
+      brandMisspellings: ["Sonara", "Sonorra"],
+      brandProductNames: ["Sonora Pulse", "Sonora Pulse Pro"],
+      competitorBrands: ["Beats", "Bose", "Sony"],
+      asin: "B0EXAMPLE1",
+      planningPeriodDays: 30,
+      accountDailyBudgetCap: 1000,
     },
   },
   {

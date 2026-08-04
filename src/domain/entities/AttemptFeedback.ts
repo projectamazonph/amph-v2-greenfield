@@ -137,17 +137,6 @@ const DIMENSION_COMMENTS: Record<string, Record<FeedbackVerdict, DimensionCopyFn
     poor: (s) =>
       `${s}% structural coverage is thin for this budget and niche. A structure this incomplete would leave real discovery and defense gaps from day one.`,
   },
-  // campaign-builder: % of campaigns with budget within 50% of ground-truth allocation
-  budgetAllocation: {
-    excellent: (s) =>
-      `Your budget split across campaigns (${s}%) matches how a launch this size should actually allocate spend.`,
-    good: (s) =>
-      `${s}% of your campaigns are reasonably funded. One or two are probably over- or under-funded relative to what that campaign type needs to do its job.`,
-    fair: (s) =>
-      `${s}% allocation accuracy — real misallocation here, likely starving a campaign that needs volume to learn, or overfunding one that doesn't.`,
-    poor: (s) =>
-      `${s}% — the budget split is off enough that some campaigns would never get the spend to exit learning phase, while others burn budget with nothing left to optimize.`,
-  },
   // campaign-builder: % of user keywords containing words from the product niche
   keywordRelevance: {
     excellent: (s) =>
@@ -158,6 +147,61 @@ const DIMENSION_COMMENTS: Record<string, Record<FeedbackVerdict, DimensionCopyFn
       `${s}% relevance means real budget risk — enough off-niche keywords here that spend would leak to searches that don't convert.`,
     poor: (s) =>
       `${s}% relevance is a real problem — this keyword set would spend meaningfully against traffic that has nothing to do with the product.`,
+  },
+  // campaign-builder: F1 of submitted negatives against the expected routing set (STORY-084)
+  negativeRouting: {
+    excellent: (s) =>
+      `${s}% of your negative-keyword routing matches how this structure actually needs to be protected — Auto isn't cannibalizing Manual's winners, and match types aren't competing against themselves.`,
+    good: (s) =>
+      `${s}% routing accuracy. A negative or two is missing — likely Auto quietly bidding against a keyword Manual already owns, which is wasted spend hiding in plain sight.`,
+    fair: (s) =>
+      `${s}% routing accuracy means real internal cannibalization — campaigns are bidding against each other for the same searches instead of each doing its own job.`,
+    poor: (s) =>
+      `${s}% — with almost no negative routing in place, this structure would bid against itself constantly, inflating CPCs on your own best keywords.`,
+  },
+  // campaign-builder: budget reconciliation (STORY-084)
+  budgetAllocation: {
+    excellent: (s) =>
+      `Your budget reconciles cleanly (${s}%) — the total matches what was actually approved, and each campaign role is funded close to how a launch this size should allocate spend.`,
+    good: (s) =>
+      `${s}% budget accuracy. Either the total is slightly off from what was approved, or one campaign role is funded meaningfully more or less than its job calls for.`,
+    fair: (s) =>
+      `${s}% accuracy is a real reconciliation problem — this is the kind of budget gap that shows up in a monthly spend report and needs explaining.`,
+    poor: (s) =>
+      `${s}% — the budget here doesn't reconcile against what was approved, and the per-role split would leave some campaigns starved while others overspend with nothing left to optimize.`,
+  },
+  // campaign-builder: % of keywords correctly kept out of/confined to branded traffic (STORY-084)
+  brandedIsolation: {
+    excellent: (s) =>
+      `${s}% branded-traffic isolation — your own brand terms stay in Defense, and nothing here is quietly bidding on a competitor's name.`,
+    good: (s) =>
+      `${s}% isolation. A branded or competitor term has leaked into the wrong campaign, which either wastes spend on traffic you already own or opens a fight you didn't mean to start.`,
+    fair: (s) =>
+      `${s}% isolation is a real problem — branded search traffic is landing outside Defense, or competitor terms are running without the containment they need.`,
+    poor: (s) =>
+      `${s}% — branded and competitor traffic isn't isolated at all here, which in a real account means spend leaking into searches this structure was never meant to touch.`,
+  },
+  // campaign-builder: % of keyword targets that aren't duplicated across ad groups (STORY-084)
+  duplicateControl: {
+    excellent: (s) =>
+      `${s}% duplicate-free — no keyword is quietly competing against itself across two ad groups, so every dollar of bid pressure goes to one clear target.`,
+    good: (s) =>
+      `${s}% duplicate control. A keyword or two is targeted in more than one ad group, which means you're bidding against yourself for that search instead of Amazon's other advertisers.`,
+    fair: (s) =>
+      `${s}% duplicate control means real self-cannibalization — multiple ad groups are competing for the same auction, driving your own CPC up for no reason.`,
+    poor: (s) =>
+      `${s}% — with this much duplication, a meaningful share of your budget would go toward outbidding your own ad groups instead of winning new customers.`,
+  },
+  // campaign-builder: % of campaigns matching the house naming convention (STORY-084)
+  namingCompliance: {
+    excellent: (s) =>
+      `${s}% naming compliance — every campaign follows the house convention, so anyone on the team can tell what it does and how it's funded just from the name.`,
+    good: (s) =>
+      `${s}% compliance. Most names follow the convention; the rest would slow down anyone auditing this account later.`,
+    fair: (s) =>
+      `${s}% compliance is a real gap — enough campaigns are off-convention that a teammate skimming the account couldn't reliably tell strategy from label.`,
+    poor: (s) =>
+      `${s}% — naming here wouldn't hold up in a real account. A well-named campaign structure that's strategically broken is still broken, but a broken naming convention is its own maintenance cost.`,
   },
   // keyword-research: correctly classifying keyword intent
   intentAccuracy: {
@@ -257,16 +301,6 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     poor: () =>
       "Study a complete reference structure (manual, auto, and brand campaigns) before building your own from scratch.",
   },
-  budgetAllocation: {
-    excellent: () =>
-      "Try a scenario with a smaller total budget to test your allocation judgment under real constraints.",
-    good: () =>
-      "Check each campaign's share of the total budget against what that campaign type typically needs to perform.",
-    fair: () =>
-      "Before setting daily budgets, decide what role each campaign plays (discovery, performance, defense) — funding should follow role.",
-    poor: () =>
-      "Review typical SP-manual/SP-auto/SB budget splits for a launch this size before assigning budgets.",
-  },
   keywordRelevance: {
     excellent: () =>
       "Try a niche with more ambiguous terminology to sharpen your relevance judgment.",
@@ -276,6 +310,56 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
       "Re-read the product niche description and cut any keyword that doesn't clearly relate to it.",
     poor: () =>
       "Build your keyword list starting from the niche's own words, then expand outward — not the reverse.",
+  },
+  negativeRouting: {
+    excellent: () =>
+      "Try a scenario with more campaign roles to test your negative-keyword routing across a larger structure.",
+    good: () =>
+      "For every keyword you place in a more specific ad group or campaign, add the matching negative to the broader one it would otherwise still show for.",
+    fair: () =>
+      "Before submitting, walk each campaign in order (Auto, then Manual's ad groups) and negative out anything the next, more specific level already owns.",
+    poor: () =>
+      "Study which campaigns should protect which others (Auto vs. Manual, Phrase vs. Exact) before adding a single negative keyword.",
+  },
+  budgetAllocation: {
+    excellent: () =>
+      "Try a scenario with a tighter account-level budget cap to test your reconciliation discipline under a real ceiling.",
+    good: () =>
+      "Add up your daily budgets, multiply by the planning period, and check the total against the approved monthly figure before submitting.",
+    fair: () =>
+      "Work out each campaign role's target share of the total budget (discovery, performance, defense) before assigning daily budgets.",
+    poor: () =>
+      "Practice the reconciliation math on paper: sum of daily budgets × planning period should land within a couple percent of the approved monthly figure.",
+  },
+  brandedIsolation: {
+    excellent: () =>
+      "Try a scenario with a longer competitor-brand list to sharpen your isolation judgment.",
+    good: () =>
+      "Before finalizing keywords, check each one against the brand's own names, aliases, and misspellings — and keep those confined to Defense.",
+    fair: () =>
+      "Review which campaign is your Defense (Brand) campaign before assigning any keyword that includes the brand name.",
+    poor: () =>
+      "Build the brand-taxonomy list first (brand name, aliases, misspellings, competitor names) and check every keyword against it before adding any.",
+  },
+  duplicateControl: {
+    excellent: () =>
+      "Try a scenario with more ad groups to test your duplicate-detection discipline at scale.",
+    good: () =>
+      "Before submitting, scan for the same keyword text appearing in more than one ad group with the same match type.",
+    fair: () =>
+      "Keep a running list of every keyword+match-type pair as you build ad groups, and check new entries against it before adding them.",
+    poor: () =>
+      "Build one ad group completely before starting the next, checking each new keyword against everything already placed.",
+  },
+  namingCompliance: {
+    excellent: () =>
+      "Try a scenario with more campaigns to test whether you can keep the naming convention consistent at scale.",
+    good: () =>
+      "Double-check each campaign name against the convention (Brand | ASIN | Channel | Strategy | Target Type | Match | Label) before submitting.",
+    fair: () =>
+      "Write out the naming convention's 7 segments before naming your first campaign, then fill each one in deliberately.",
+    poor: () =>
+      "Copy the naming convention template exactly for your first campaign, then adapt it for the rest rather than writing names from scratch.",
   },
   intentAccuracy: {
     excellent: () =>

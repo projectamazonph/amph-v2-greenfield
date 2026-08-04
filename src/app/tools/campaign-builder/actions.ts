@@ -45,6 +45,15 @@
  * ComposeAttemptFeedback — fixed to use `feedback.passed`, the
  * authoritative source. This also means Challenge-mode attempts that pass
  * now award a one-time `XPService.SIMULATOR_CHALLENGE_PASSED_XP` bonus.
+ *
+ * STORY-084: scoring expands to 7 dimensions (see
+ * docs/stories/STORY-084.md) — all 7 are now passed into
+ * GradeSimulatorAttempt, not just structureQuality/budgetAllocation/
+ * keywordRelevance. The scenario's brand-taxonomy/ASIN/budget-
+ * reconciliation fields are resolved server-side alongside the rest of
+ * the scenario content, same trust boundary as productCategory/
+ * productNiche/monthlyBudget. `userAdjustedCampaigns` may now include
+ * `negativeKeywords` per campaign.
  */
 
 "use server";
@@ -114,11 +123,19 @@ const adGroupSchema = z.object({
   suggestedBid: z.number().nonnegative(),
 });
 
+const negativeKeywordSchema = z.object({
+  text: z.string().min(1),
+  matchType: z.enum(["negativeExact", "negativePhrase"]),
+  level: z.enum(["campaign", "adGroup"]),
+  reason: z.string(),
+});
+
 const campaignStructureSchema = z.object({
   name: z.string().min(1),
   type: campaignTypeSchema,
   dailyBudget: z.number().nonnegative(),
   adGroups: z.array(adGroupSchema),
+  negativeKeywords: z.array(negativeKeywordSchema).optional(),
 });
 
 const campaignBuilderAttemptSchema = z.object({
@@ -171,7 +188,19 @@ export async function campaignBuilderAttempt(
       error: { kind: "attempt_error", message: "Published scenario content is malformed" },
     };
   }
-  const { productCategory, productNiche, monthlyBudget } = parsedContent.data;
+  const {
+    productCategory,
+    productNiche,
+    monthlyBudget,
+    brandName,
+    brandAliases,
+    brandMisspellings,
+    brandProductNames,
+    competitorBrands,
+    asin,
+    planningPeriodDays,
+    accountDailyBudgetCap,
+  } = parsedContent.data;
 
   // ── 4. StartSimulatorAttempt ────────────────────────────────────────
   const startResult = await container.startSimulatorAttempt.execute({
@@ -204,6 +233,14 @@ export async function campaignBuilderAttempt(
     productNiche,
     monthlyBudget,
     targetingStrategy,
+    brandName,
+    brandAliases,
+    brandMisspellings,
+    brandProductNames,
+    competitorBrands,
+    asin,
+    planningPeriodDays,
+    accountDailyBudgetCap,
     ...(userAdjustedCampaigns !== undefined ? { userAdjustedCampaigns } : {}),
   };
 
@@ -243,9 +280,13 @@ export async function campaignBuilderAttempt(
     const gradeResult = await container.gradeSimulatorAttempt.execute({
       attemptId,
       scoreDimensions: {
-        structureQuality: simOutput.scoreDimensions.structureQuality,
-        budgetAllocation: simOutput.scoreDimensions.budgetAllocation,
         keywordRelevance: simOutput.scoreDimensions.keywordRelevance,
+        structureQuality: simOutput.scoreDimensions.structureQuality,
+        negativeRouting: simOutput.scoreDimensions.negativeRouting,
+        budgetAllocation: simOutput.scoreDimensions.budgetAllocation,
+        brandedIsolation: simOutput.scoreDimensions.brandedIsolation,
+        duplicateControl: simOutput.scoreDimensions.duplicateControl,
+        namingCompliance: simOutput.scoreDimensions.namingCompliance,
       },
     });
 

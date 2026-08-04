@@ -2,12 +2,13 @@
  * CampaignBuilderSimulator: generates Amazon PPC campaign structures from requirements.
  *
  * STORY-069: Campaign Builder Rebuild (Scoring Engine Integration).
- * STORY-084: Campaign Builder strategic scoring (Stage 1 of 2 -- see
- * docs/stories/STORY-084.md). Adds negative-keyword routing and duplicate-
- * target detection as real, graded dimensions. `structureQuality` and
- * `budgetAllocation` keep their pre-STORY-084 formulas in this stage;
- * `brandedIsolation`/`namingCompliance` are 100-stubs. Stage 2 rewrites all
- * four to their final STORY-084 behavior.
+ * STORY-084: Campaign Builder strategic scoring -- see
+ * docs/stories/STORY-084.md for the full decision record. Expands the
+ * 3-dimension scoring engine (structural completeness, +-50% budget
+ * tolerance, niche substring match) to 7 dimensions: negative-keyword
+ * routing, duplicate-target detection, branded-traffic isolation, naming-
+ * convention compliance, ad-group match-type purity, and tightened budget
+ * reconciliation (+-2% total, +-10pp per-role).
  *
  * Given product category, budget, and targeting strategy, produces a recommended
  * campaign structure: campaigns, ad groups, keywords, match types, and starting bids.
@@ -269,29 +270,6 @@ function extractGTStructure(gtCampaigns: CampaignStructure[]): GTStructure {
 
 // ── Scoring helpers ───────────────────────────────────────────────────────
 
-/** Returns the ground-truth budget for a campaign type, or null if not applicable. */
-function getGTBudget(
-  gtBudgets: GroundTruthBudget,
-  campaignType: CampaignStructure["type"],
-  matchType: string,
-): number | null {
-  if (campaignType === "sponsored-products") {
-    if (matchType.includes("Manual")) return gtBudgets.spManual;
-    return gtBudgets.spAuto;
-  }
-  if (campaignType === "sponsored-brands") return gtBudgets.sb;
-  return null;
-}
-
-/**
- * Check if user's budget for a campaign is within 50% of the ground truth.
- */
-function isBudgetAcceptable(userBudget: number, gtBudget: number): boolean {
-  if (gtBudget === 0) return true;
-  const ratio = userBudget / gtBudget;
-  return ratio >= 0.5 && ratio <= 2.0;
-}
-
 /**
  * Check if a keyword contains at least one word from the niche.
  */
@@ -382,51 +360,198 @@ function computeDuplicateControl(userCampaigns: readonly CampaignStructure[]): n
   return Math.max(0, 100 - Math.round((duplicateCount / total) * 100));
 }
 
+/**
+ * "One match type per ad group" house rule (STORY-084) -- a training-
+ * architecture rule, not an Amazon platform limitation. An ad group with
+ * no keywords has nothing to violate and isn't counted.
+ */
+function computeMatchTypePurity(userCampaigns: readonly CampaignStructure[]): number {
+  let checkedAdGroups = 0;
+  let pureAdGroups = 0;
+  for (const c of userCampaigns) {
+    for (const ag of c.adGroups) {
+      if (ag.keywords.length === 0) continue;
+      checkedAdGroups++;
+      const matchTypes = new Set(ag.keywords.map((k) => k.matchType));
+      if (matchTypes.size === 1) pureAdGroups++;
+    }
+  }
+  if (checkedAdGroups === 0) return 100;
+  return Math.round((pureAdGroups / checkedAdGroups) * 100);
+}
+
+/**
+ * Budget reconciliation (STORY-084): plannedSpend = sum(dailyBudget) x
+ * planningPeriodDays must land within +-2% of monthlyBudget, and must not
+ * exceed accountDailyBudgetCap. A hard gate (0 or 100), matching "require
+ * planned spend within +-2%" rather than a graduated tolerance.
+ */
+function computeBudgetReconciliation(
+  userCampaigns: readonly CampaignStructure[],
+  monthlyBudget: number,
+  planningPeriodDays: number,
+  accountDailyBudgetCap: number,
+): number {
+  const totalDailyBudget = userCampaigns.reduce((sum, c) => sum + c.dailyBudget, 0);
+  if (totalDailyBudget > accountDailyBudgetCap) return 0;
+
+  const plannedSpend = totalDailyBudget * planningPeriodDays;
+  if (monthlyBudget === 0) return plannedSpend === 0 ? 100 : 0;
+
+  const deviation = Math.abs(plannedSpend - monthlyBudget) / monthlyBudget;
+  return deviation <= 0.02 ? 100 : 0;
+}
+
+/**
+ * Per-role budget allocation (STORY-084): each GT role's (Manual/Auto/SB)
+ * share of the user's total daily budget must land within +-10 percentage
+ * points of that role's target share (the existing 60/25/15 split from
+ * `groundTruthBudgets()`). Checked against every role present in the
+ * ground truth, not just roles the user happened to submit -- an omitted
+ * role scores 0% share, which naturally fails tolerance rather than being
+ * silently skipped.
+ */
+function computePerRoleAllocation(
+  userCampaigns: readonly CampaignStructure[],
+  gtCampaigns: readonly CampaignStructure[],
+): number {
+  const gtRoles = new Set(
+    gtCampaigns.map((c) => roleOf(c)).filter((r): r is "manual" | "auto" | "sb" => r !== null),
+  );
+  if (gtRoles.size === 0) return 100;
+
+  const roleTargetShare: Record<"manual" | "auto" | "sb", number> = {
+    manual: 0.6,
+    auto: 0.25,
+    sb: 0.15,
+  };
+  const totalUserDaily = userCampaigns.reduce((sum, c) => sum + c.dailyBudget, 0);
+
+  let withinTolerance = 0;
+  for (const role of gtRoles) {
+    const roleDaily = userCampaigns
+      .filter((c) => roleOf(c) === role)
+      .reduce((sum, c) => sum + c.dailyBudget, 0);
+    const roleShare = totalUserDaily === 0 ? 0 : roleDaily / totalUserDaily;
+    if (Math.abs(roleShare - roleTargetShare[role]) <= 0.1) withinTolerance++;
+  }
+  return Math.round((withinTolerance / gtRoles.size) * 100);
+}
+
+/** Word-boundary match, same approach as listing-audit's containsAny. */
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function containsBrandTerm(text: string, terms: readonly string[]): boolean {
+  const lower = text.toLowerCase();
+  return terms.some((t) => {
+    const term = t.trim().toLowerCase();
+    if (term.length === 0) return false;
+    return new RegExp(`\\b${escapeRegExp(term)}\\b`).test(lower);
+  });
+}
+
+/**
+ * Branded-traffic isolation (STORY-084): own-brand terms belong only in
+ * the Brand/Defense (SB) campaign; competitor terms belong in a dedicated
+ * competitor campaign, which this ground-truth structure never generates,
+ * so any competitor-brand keyword anywhere is a violation. Returns 100
+ * when no brand taxonomy is configured for this scenario -- nothing to
+ * isolate.
+ */
+function computeBrandedIsolation(
+  userCampaigns: readonly CampaignStructure[],
+  input: CampaignBuilderInput,
+): number {
+  const brandTerms = [
+    ...(input.brandName ? [input.brandName] : []),
+    ...(input.brandAliases ?? []),
+    ...(input.brandMisspellings ?? []),
+    ...(input.brandProductNames ?? []),
+  ];
+  const competitorTerms = input.competitorBrands ?? [];
+  if (brandTerms.length === 0 && competitorTerms.length === 0) return 100;
+
+  let totalKeywords = 0;
+  let violations = 0;
+  for (const c of userCampaigns) {
+    const isBrandCampaign = c.name.includes("SB") || c.name.includes("Brand");
+    for (const ag of c.adGroups) {
+      for (const kw of ag.keywords) {
+        totalKeywords++;
+        if (containsBrandTerm(kw.keyword, competitorTerms)) {
+          violations++;
+          continue;
+        }
+        if (containsBrandTerm(kw.keyword, brandTerms) && !isBrandCampaign) {
+          violations++;
+        }
+      }
+    }
+  }
+  if (totalKeywords === 0) return 100;
+  return Math.max(0, 100 - Math.round((violations / totalKeywords) * 100));
+}
+
+/**
+ * House naming convention (STORY-084): `Brand | ASIN | Channel | Strategy
+ * | Target Type | Match | Label` -- exactly 7 pipe-delimited segments, no
+ * currency symbols in the name, and the Strategy segment isn't literally
+ * "gen" (Ryan's decision: "Research," not "gen").
+ */
+function isNamingCompliant(campaign: CampaignStructure): boolean {
+  const segments = campaign.name.split("|").map((s) => s.trim());
+  if (segments.length !== 7 || segments.some((s) => s.length === 0)) return false;
+  if (/[₱$]/.test(campaign.name)) return false;
+  const strategySegment = segments[3] ?? "";
+  if (/\bgen\b/i.test(strategySegment)) return false;
+  return true;
+}
+
+function computeNamingCompliance(userCampaigns: readonly CampaignStructure[]): number {
+  if (userCampaigns.length === 0) return 0;
+  const compliant = userCampaigns.filter(isNamingCompliant).length;
+  return Math.round((compliant / userCampaigns.length) * 100);
+}
+
 // ── Dimension scoring ─────────────────────────────────────────────────────
 
 function computeDimensionScores(
   userCampaigns: readonly CampaignStructure[],
   gtCampaigns: CampaignStructure[],
   gtBudgets: GroundTruthBudget,
-  productNiche: string,
+  input: CampaignBuilderInput,
 ): ScoreDimensions {
+  const { productNiche, monthlyBudget } = input;
+  const planningPeriodDays = input.planningPeriodDays ?? 30;
+  const accountDailyBudgetCap = input.accountDailyBudgetCap ?? Infinity;
   const gt = extractGTStructure(gtCampaigns);
   const nicheWords = productNiche.toLowerCase().split(/\s+/);
 
-  // structureQuality: % of expected campaign types covered
+  // structureQuality: % of expected campaign types covered, averaged with
+  // ad-group match-type purity (STORY-084's "one match type per ad group").
   const expectedTypes = (gt.hasSpManual ? 1 : 0) + (gt.hasSpAuto ? 1 : 0) + (gt.hasSb ? 1 : 0);
   const coveredTypes =
     (gt.hasSpManual && userCampaigns.some((c) => c.name.includes("Manual")) ? 1 : 0) +
     (gt.hasSpAuto && userCampaigns.some((c) => c.name.includes("Auto")) ? 1 : 0) +
     (gt.hasSb && userCampaigns.some((c) => c.name.includes("SB")) ? 1 : 0);
-  const structureQuality = expectedTypes > 0 ? Math.round((coveredTypes / expectedTypes) * 100) : 0;
+  const campaignTypeCoverage =
+    expectedTypes > 0 ? Math.round((coveredTypes / expectedTypes) * 100) : 0;
+  const matchTypePurity = computeMatchTypePurity(userCampaigns);
+  const structureQuality = Math.round((campaignTypeCoverage + matchTypePurity) / 2);
 
-  // budgetAllocation: % of user's campaigns with budget within 50% of ground truth
-  let budgetOkCount = 0;
-  let totalGtCampaigns = 0;
-  for (const gtCamp of gtCampaigns) {
-    const matchType = gtCamp.name.includes("Manual")
-      ? "Manual"
-      : gtCamp.name.includes("Auto")
-        ? "Auto"
-        : "Brand";
-    const gtBudget = getGTBudget(gtBudgets, gtCamp.type, matchType);
-    if (gtBudget === null) continue;
-    totalGtCampaigns++;
-
-    // Find user's campaign of the same type closest to the GT budget
-    const userMatch = userCampaigns.find((c) => {
-      if (c.type !== gtCamp.type) return false;
-      if (gtCamp.name.includes("Manual") && !c.name.includes("Manual")) return false;
-      if (gtCamp.name.includes("Auto") && !c.name.includes("Auto")) return false;
-      return true;
-    });
-    if (userMatch && isBudgetAcceptable(userMatch.dailyBudget, gtBudget)) {
-      budgetOkCount++;
-    }
-  }
-  const budgetAllocation =
-    totalGtCampaigns > 0 ? Math.round((budgetOkCount / totalGtCampaigns) * 100) : 0;
+  // budgetAllocation (STORY-084 rewrite): 40% total reconciliation (+-2%,
+  // hard gate) + 60% per-role allocation accuracy (+-10pp), replacing the
+  // old +-50%-per-campaign tolerance.
+  const totalReconciliation = computeBudgetReconciliation(
+    userCampaigns,
+    monthlyBudget,
+    planningPeriodDays,
+    accountDailyBudgetCap,
+  );
+  const perRoleAllocation = computePerRoleAllocation(userCampaigns, gtCampaigns);
+  const budgetAllocation = Math.round(0.4 * totalReconciliation + 0.6 * perRoleAllocation);
 
   // keywordRelevance: % of user keywords that contain niche words
   const allUserKeywords: string[] = [];
@@ -443,15 +568,10 @@ function computeDimensionScores(
       ? Math.round((relevantKeywords.length / allUserKeywords.length) * 100)
       : 0;
 
-  // STORY-084, real in Stage 1:
   const negativeRouting = computeNegativeRouting(userCampaigns, gtCampaigns);
   const duplicateControl = computeDuplicateControl(userCampaigns);
-
-  // STORY-084, Stage 2 stubs -- brandedIsolation and namingCompliance get
-  // their real implementations once brand taxonomy / ASIN context is wired
-  // through computeDimensionScores in Stage 2.
-  const brandedIsolation = 100;
-  const namingCompliance = 100;
+  const brandedIsolation = computeBrandedIsolation(userCampaigns, input);
+  const namingCompliance = computeNamingCompliance(userCampaigns);
 
   return {
     keywordRelevance,
@@ -504,7 +624,7 @@ export class CampaignBuilderSimulator implements Simulator<
         userAdjustedCampaigns,
         gtCampaigns,
         gtBudgets,
-        productNiche,
+        input,
       );
       score = scoreDimensions.structureQuality; // primary dimension
     }

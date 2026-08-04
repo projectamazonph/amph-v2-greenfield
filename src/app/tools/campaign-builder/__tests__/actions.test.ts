@@ -141,9 +141,13 @@ function happyContainer() {
       attemptId: "ATT-CB001",
       overallScore: 80,
       scoreDimensions: {
-        structureQuality: 80,
-        budgetAllocation: 90,
         keywordRelevance: 70,
+        structureQuality: 80,
+        negativeRouting: 75,
+        budgetAllocation: 90,
+        brandedIsolation: 100,
+        duplicateControl: 100,
+        namingCompliance: 60,
       },
       isPassed: true,
       gradedAt: new Date(),
@@ -179,7 +183,15 @@ function happyContainer() {
       score: input.userAdjustedCampaigns !== undefined ? 80 : 90,
       scoreDimensions:
         input.userAdjustedCampaigns !== undefined
-          ? { structureQuality: 80, budgetAllocation: 90, keywordRelevance: 70, explanation: 100 }
+          ? {
+              keywordRelevance: 70,
+              structureQuality: 80,
+              negativeRouting: 75,
+              budgetAllocation: 90,
+              brandedIsolation: 100,
+              duplicateControl: 100,
+              namingCompliance: 60,
+            }
           : null,
     }),
   );
@@ -252,7 +264,20 @@ describe("campaignBuilderAttempt", () => {
         monthlyBudget: 15000,
       }),
     );
-    expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalled();
+    // STORY-084: all 7 dimensions must reach GradeSimulatorAttempt, not
+    // just the pre-STORY-084 structureQuality/budgetAllocation/keywordRelevance.
+    expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalledWith({
+      attemptId: "ATT-CB001",
+      scoreDimensions: {
+        keywordRelevance: 70,
+        structureQuality: 80,
+        negativeRouting: 75,
+        budgetAllocation: 90,
+        brandedIsolation: 100,
+        duplicateControl: 100,
+        namingCompliance: 60,
+      },
+    });
     expect(mockContainer.composeAttemptFeedback.execute).toHaveBeenCalledWith({
       attemptId: "ATT-CB001",
     });

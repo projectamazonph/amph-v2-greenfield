@@ -41,6 +41,8 @@ interface Props {
 type Targeting = "auto" | "manual" | "hybrid";
 type MatchType = "exact" | "phrase" | "broad";
 type CampaignType = "sponsored-products" | "sponsored-brands" | "sponsored-display";
+type NegativeMatchType = "negativeExact" | "negativePhrase";
+type NegativeLevel = "campaign" | "adGroup";
 
 interface EditableKeyword {
   readonly id: string;
@@ -56,12 +58,21 @@ interface EditableAdGroup {
   keywords: EditableKeyword[];
 }
 
+interface EditableNegativeKeyword {
+  readonly id: string;
+  text: string;
+  matchType: NegativeMatchType;
+  level: NegativeLevel;
+  reason: string;
+}
+
 interface EditableCampaign {
   readonly id: string;
   name: string;
   type: CampaignType;
   dailyBudget: number;
   adGroups: EditableAdGroup[];
+  negativeKeywords: EditableNegativeKeyword[];
 }
 
 const TARGETING: ReadonlyArray<{ value: Targeting; label: string; blurb: string }> = [
@@ -85,7 +96,14 @@ function newLocalId(): string {
 }
 
 function emptyCampaign(): EditableCampaign {
-  return { id: newLocalId(), name: "", type: "sponsored-products", dailyBudget: 0, adGroups: [] };
+  return {
+    id: newLocalId(),
+    name: "",
+    type: "sponsored-products",
+    dailyBudget: 0,
+    adGroups: [],
+    negativeKeywords: [],
+  };
 }
 
 function emptyAdGroup(): EditableAdGroup {
@@ -94,6 +112,10 @@ function emptyAdGroup(): EditableAdGroup {
 
 function emptyKeyword(): EditableKeyword {
   return { id: newLocalId(), keyword: "", matchType: "exact", suggestedBid: 0 };
+}
+
+function emptyNegativeKeyword(): EditableNegativeKeyword {
+  return { id: newLocalId(), text: "", matchType: "negativeExact", level: "campaign", reason: "" };
 }
 
 export function CampaignBuilderForm({
@@ -178,6 +200,32 @@ export function CampaignBuilderForm({
       ),
     );
 
+  const addNegative = (ci: number) =>
+    setCampaigns((prev) =>
+      prev.map((c, i) =>
+        i === ci ? { ...c, negativeKeywords: [...c.negativeKeywords, emptyNegativeKeyword()] } : c,
+      ),
+    );
+  const removeNegative = (ci: number, ni: number) =>
+    setCampaigns((prev) =>
+      prev.map((c, i) =>
+        i === ci ? { ...c, negativeKeywords: c.negativeKeywords.filter((_, n) => n !== ni) } : c,
+      ),
+    );
+  const updateNegative = (ci: number, ni: number, patch: Partial<EditableNegativeKeyword>) =>
+    setCampaigns((prev) =>
+      prev.map((c, i) =>
+        i === ci
+          ? {
+              ...c,
+              negativeKeywords: c.negativeKeywords.map((neg, n) =>
+                n === ni ? { ...neg, ...patch } : neg,
+              ),
+            }
+          : c,
+      ),
+    );
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -206,6 +254,14 @@ export function CampaignBuilderForm({
             suggestedBid: kw.suggestedBid,
           })),
       })),
+      negativeKeywords: c.negativeKeywords
+        .filter((neg) => neg.text.trim().length > 0)
+        .map((neg) => ({
+          text: neg.text.trim(),
+          matchType: neg.matchType,
+          level: neg.level,
+          reason: neg.reason.trim(),
+        })),
     }));
 
     startTransition(async () => {
@@ -284,13 +340,28 @@ export function CampaignBuilderForm({
         <p className={styles.hintTitle}>How this is scored</p>
         <ul className={styles.hintList}>
           <li>
-            Structure quality — cover the campaign types a real launch for this niche would use (a
-            manual campaign for known keywords, an auto campaign to discover new ones, and a brand
-            campaign if budget allows).
+            Structure quality — cover the campaign types a real launch would use, and keep one match
+            type per ad group (don&apos;t mix exact/phrase/broad together).
           </li>
           <li>
-            Budget allocation — each campaign&apos;s daily budget should be a reasonable share of
-            the total.
+            Negative routing — protect your own campaigns from each other: negative your proven
+            exact-match winners out of Auto, and out of your Phrase ad group.
+          </li>
+          <li>
+            Budget allocation — the total planned spend should reconcile with the monthly budget,
+            and each campaign role should get a reasonable share of it.
+          </li>
+          <li>
+            Branded isolation — keep your own brand name (and misspellings) only in the Brand
+            campaign; never bid on a competitor&apos;s name outside a dedicated strategy.
+          </li>
+          <li>
+            Duplicate control — don&apos;t target the same keyword + match type in more than one ad
+            group.
+          </li>
+          <li>
+            Naming compliance — follow the house convention: Brand | ASIN | Channel | Strategy |
+            Target Type | Match | Label.
           </li>
           <li>
             Keyword relevance — every keyword should actually relate to the product niche above.
@@ -461,6 +532,69 @@ export function CampaignBuilderForm({
                 + Add ad group
               </Button>
             ) : null}
+
+            <div className={styles.negatives}>
+              <p className={styles.negativesTitle}>Negative keywords</p>
+              <ul className={styles.negativesList}>
+                {campaign.negativeKeywords.map((neg, ni) => (
+                  <li key={neg.id} className={styles.negativeRow}>
+                    <input
+                      className={styles.input}
+                      placeholder="Negative keyword text"
+                      value={neg.text}
+                      onChange={(e) => updateNegative(ci, ni, { text: e.target.value })}
+                      disabled={graded}
+                    />
+                    <select
+                      className={styles.select}
+                      value={neg.matchType}
+                      onChange={(e) =>
+                        updateNegative(ci, ni, {
+                          matchType: e.target.value as NegativeMatchType,
+                        })
+                      }
+                      disabled={graded}
+                    >
+                      <option value="negativeExact">negative exact</option>
+                      <option value="negativePhrase">negative phrase</option>
+                    </select>
+                    <select
+                      className={styles.select}
+                      value={neg.level}
+                      onChange={(e) =>
+                        updateNegative(ci, ni, { level: e.target.value as NegativeLevel })
+                      }
+                      disabled={graded}
+                    >
+                      <option value="campaign">campaign-level</option>
+                      <option value="adGroup">ad-group-level</option>
+                    </select>
+                    <input
+                      className={styles.input}
+                      placeholder="Reason (why this negative?)"
+                      value={neg.reason}
+                      onChange={(e) => updateNegative(ci, ni, { reason: e.target.value })}
+                      disabled={graded}
+                    />
+                    {!graded ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeNegative(ci, ni)}
+                      >
+                        Remove
+                      </Button>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+              {!graded ? (
+                <Button type="button" variant="ghost" size="sm" onClick={() => addNegative(ci)}>
+                  + Add negative keyword
+                </Button>
+              ) : null}
+            </div>
           </div>
         ))}
       </div>

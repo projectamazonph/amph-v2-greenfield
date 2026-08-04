@@ -231,6 +231,10 @@ describe("AttemptFeedback domain", () => {
       "structureQuality", // campaign-builder
       "budgetAllocation", // campaign-builder
       "keywordRelevance", // campaign-builder
+      "negativeRouting", // campaign-builder (STORY-084)
+      "brandedIsolation", // campaign-builder (STORY-084)
+      "duplicateControl", // campaign-builder (STORY-084)
+      "namingCompliance", // campaign-builder (STORY-084)
       "intentAccuracy", // keyword-research
       "negativeIdentification", // keyword-research
       "direction", // str-triage, listing-audit
