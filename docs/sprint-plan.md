@@ -237,7 +237,7 @@ exists to remove.
 | STORY-085 | Scenario publishing + versioning                  | 1   | ✅ done — 2026-08-04, full-scope rewire (much bigger than 1pt), see `docs/stories/STORY-085.md` |
 | STORY-086 | Instructor calibration + acceptable-answer ranges | 1   | ⏳ Planned                                                                                      |
 | STORY-087 | Explicit business-impact feedback                 | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-087.md`                                           |
-| STORY-088 | Challenge progression                             | 1   | ⏳ Planned                                                                                      |
+| STORY-088 | Challenge progression                             | 1   | ✅ done — 2026-08-04, minimal scope, see `docs/stories/STORY-088.md`                            |
 | STORY-089 | Connected-account simulator                       | 1   | ⏳ Planned                                                                                      |
 
 ## Student-facing gap closure (2026-08-01/02, see docs/STUDENT-FEATURE-GAP-ANALYSIS.md)
