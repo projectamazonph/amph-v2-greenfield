@@ -9,18 +9,25 @@
  * Per the STORY-079 scoping decision the tool is scenario-only: keyword
  * economics (CTR, CVR, benchmark CPC, etc.) are authored server-side, not
  * typed in by the student — only the bid is editable.
+ *
+ * STORY-085: submits to bidElevatorAttempt() (the graded, persisted-attempt
+ * lifecycle) instead of the legacy runBidElevator(), which never created a
+ * SimulatorAttempt record. Only the student's bid adjustments are sent —
+ * the scenario's economics are resolved server-side from the currently
+ * published scenario, not echoed back from this component's props.
  */
 
 "use client";
 
 import { useState, useTransition } from "react";
 import styles from "./BidElevatorForm.module.css";
-import { runBidElevator, type RunBidElevatorInput } from "@/app/tools/bid-elevator/actions";
+import { bidElevatorAttempt } from "@/app/tools/bid-elevator/actions";
+import type { BidElevatorScenarioContent } from "@/app/tools/bid-elevator/scenarioContent";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import { BidElevatorResult } from "./BidElevatorResult";
 
 interface Props {
-  scenario: Omit<RunBidElevatorInput, "userBidAdjustments">;
+  scenario: BidElevatorScenarioContent;
 }
 
 export function BidElevatorForm({ scenario }: Props) {
@@ -38,17 +45,21 @@ export function BidElevatorForm({ scenario }: Props) {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    const input: RunBidElevatorInput = {
-      ...scenario,
-      userBidAdjustments: bids,
-    };
     startTransition(async () => {
-      const response = await runBidElevator(input);
+      const response = await bidElevatorAttempt({ userBidAdjustments: bids, mode: "practice" });
       if (!response.ok) {
-        setError(response.error.message);
+        setError(
+          "message" in response.error ? response.error.message : "Could not run this simulation.",
+        );
         return;
       }
-      setSimResult(response.value);
+      setSimResult({
+        score: response.value.overallScore,
+        scoreDimensions: response.value.scoreDimensions,
+        bids: response.value.bids,
+        estimatedSpend: response.value.estimatedSpend,
+        estimatedRoas: response.value.estimatedRoas,
+      });
     });
   };
 

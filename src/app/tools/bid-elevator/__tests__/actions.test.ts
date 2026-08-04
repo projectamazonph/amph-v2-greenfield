@@ -3,9 +3,11 @@
  *
  * STORY-079: Bid Elevator economic model rewrite.
  *
- * Tests both the bidElevatorAttempt() lifecycle function (authenticated,
- * full grading) and the runBidElevator() legacy wrapper (unauthenticated,
- * used by the public practice page).
+ * STORY-085: bidElevatorAttempt() no longer accepts scenario economics
+ * from the client — it resolves the currently published bid-elevator
+ * scenario server-side via scenarioRepo.findPublished(). The legacy
+ * runBidElevator() wrapper (which never persisted a SimulatorAttempt) is
+ * removed.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -24,16 +26,16 @@ vi.mock("@/lib/auth", () => ({
 
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
-import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import type { BidElevatorKeywordScenario } from "@/domain/simulator/bid-elevator/BidElevatorInput";
-import { bidElevatorAttempt, runBidElevator } from "../actions";
+import { bidElevatorAttempt } from "../actions";
 
 const mockContainer = {
   startSimulatorAttempt: { execute: vi.fn() },
   gradeSimulatorAttempt: { execute: vi.fn() },
   composeAttemptFeedback: { execute: vi.fn() },
   simulatorRegistry: { get: vi.fn() },
+  scenarioRepo: { findPublished: vi.fn() },
 };
 
 const fakeSimulator = {
@@ -74,6 +76,25 @@ const SCENARIO_BASE = {
   breakEvenAcosPct: 45,
   defaultRevenuePerOrder: 30,
   minimumBidIncrement: 0.05,
+};
+
+const PUBLISHED_SCENARIO = {
+  id: "bid-elevator-scenario-default",
+  scenarioKey: "bid-elevator-scenario-default",
+  version: 1,
+  status: "published" as const,
+  simulatorId: "bid-elevator" as const,
+  name: "Reduce ACoS on a high-spend electronics campaign",
+  description: "Wireless earbuds campaign spending ₱800/day at 45% ACoS; target is 25%.",
+  inputSchema: {
+    ...SCENARIO_BASE,
+    keywords: [keyword(), keyword({ keywordId: "kw2", keyword: "jogging shoes" })],
+  },
+  outputSchema: {},
+  difficulty: "intermediate" as const,
+  estimatedMinutes: 10,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const SIM_OUTPUT: BidElevatorOutput = {
@@ -148,6 +169,7 @@ function happyContainer() {
     }),
   );
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
+  mockContainer.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
   fakeSimulator.run.mockImplementation(
     async (input: { userBidAdjustments?: Record<string, number> }) => ({
       ...SIM_OUTPUT,
@@ -172,52 +194,30 @@ beforeEach(() => {
 describe("bidElevatorAttempt", () => {
   it("returns unauthorized when user is not authenticated", async () => {
     (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
-    const result = await bidElevatorAttempt({ ...SCENARIO_BASE, keywords: [keyword()] });
+    const result = await bidElevatorAttempt({ userBidAdjustments: { kw1: 1.2 } });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("unauthorized");
   });
 
   const validInput = {
-    ...SCENARIO_BASE,
-    keywords: [keyword(), keyword({ keywordId: "kw2", keyword: "jogging shoes" })],
     userBidAdjustments: { kw1: 1.2, kw2: 2.5 },
   };
 
-  it("returns validation_error when keywords is missing", async () => {
-    const result = await bidElevatorAttempt({ ...SCENARIO_BASE });
+  it("returns validation_error for a malformed userBidAdjustments entry", async () => {
+    const result = await bidElevatorAttempt({ userBidAdjustments: { kw1: -1 } });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_error");
   });
 
-  it("returns validation_error when keywords array is empty", async () => {
-    const result = await bidElevatorAttempt({ ...SCENARIO_BASE, keywords: [] });
+  it("returns attempt_error when no published scenario exists", async () => {
+    happyContainer();
+    mockContainer.scenarioRepo.findPublished.mockResolvedValueOnce(Result.ok(null));
+    const result = await bidElevatorAttempt(validInput);
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
-  it("returns validation_error when dailyBudget is not positive", async () => {
-    const result = await bidElevatorAttempt({
-      ...SCENARIO_BASE,
-      dailyBudget: 0,
-      keywords: [keyword()],
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
-  it("returns validation_error when targetRoas is not positive", async () => {
-    const result = await bidElevatorAttempt({
-      ...SCENARIO_BASE,
-      targetRoas: -1,
-      keywords: [keyword()],
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
+    expect(result.error.kind).toBe("attempt_error");
   });
 
   it("happy path: starts attempt, grades, composes feedback, returns result", async () => {
@@ -227,11 +227,15 @@ describe("bidElevatorAttempt", () => {
     if (!result.ok) return;
 
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
-      expect.objectContaining({ simulatorId: "bid-elevator", mode: "practice" }),
+      expect.objectContaining({
+        simulatorId: "bid-elevator",
+        mode: "practice",
+        scenarioId: "bid-elevator-scenario-default",
+      }),
     );
 
     expect(fakeSimulator.run).toHaveBeenCalledWith(
-      expect.objectContaining({ keywords: validInput.keywords, dailyBudget: 50, targetRoas: 3.0 }),
+      expect.objectContaining({ dailyBudget: 50, targetRoas: 3.0 }),
     );
 
     expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalledWith(
@@ -300,8 +304,7 @@ describe("bidElevatorAttempt", () => {
 
   it("preview mode (no userBidAdjustments) skips grading and feedback", async () => {
     happyContainer();
-    const previewInput = { ...SCENARIO_BASE, keywords: [keyword()] };
-    const result = await bidElevatorAttempt(previewInput);
+    const result = await bidElevatorAttempt({});
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
@@ -312,11 +315,14 @@ describe("bidElevatorAttempt", () => {
     expect(result.value.isPassed).toBe(false);
   });
 
-  it("uses provided scenarioId and mode in startSimulatorAttempt", async () => {
+  it("uses the published scenario's id in startSimulatorAttempt, not client input", async () => {
     happyContainer();
-    await bidElevatorAttempt({ ...validInput, scenarioId: "my-scenario", mode: "challenge" });
+    await bidElevatorAttempt({ ...validInput, mode: "challenge" });
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
-      expect.objectContaining({ scenarioId: "my-scenario", mode: "challenge" }),
+      expect.objectContaining({
+        scenarioId: "bid-elevator-scenario-default",
+        mode: "challenge",
+      }),
     );
   });
 
@@ -326,91 +332,5 @@ describe("bidElevatorAttempt", () => {
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
       expect.objectContaining({ mode: "practice" }),
     );
-  });
-});
-
-// ── runBidElevator (legacy, unauthenticated) ────────────────────────────
-
-describe("runBidElevator", () => {
-  const VALID_KEYWORDS = [
-    keyword({ keywordId: "earbuds", keyword: "earbuds" }),
-    keyword({ keywordId: "headphones", keyword: "headphones" }),
-  ];
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    setupGetContainer();
-    mockContainer.simulatorRegistry.get.mockReturnValue(fakeSimulator);
-    fakeSimulator.run.mockImplementation(
-      async (input: { keywords: readonly { keywordId: string; keyword: string }[] }) => ({
-        bids: input.keywords.map((k) => ({
-          ...SIM_OUTPUT.bids[0]!,
-          keywordId: k.keywordId,
-          keyword: k.keyword,
-        })),
-        estimatedSpend: 20,
-        estimatedRoas: 3.0,
-        score: 100,
-        scoreDimensions: null,
-      }),
-    );
-  });
-
-  it("does not require authentication", async () => {
-    (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
-    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: VALID_KEYWORDS });
-    expect(result.ok).toBe(true);
-  });
-
-  it("returns invalid_input when keywords is empty", async () => {
-    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: [] });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns invalid_input when dailyBudget is 0", async () => {
-    const result = await runBidElevator({
-      ...SCENARIO_BASE,
-      dailyBudget: 0,
-      keywords: VALID_KEYWORDS,
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns invalid_input when targetRoas is not positive", async () => {
-    const result = await runBidElevator({
-      ...SCENARIO_BASE,
-      targetRoas: 0,
-      keywords: VALID_KEYWORDS,
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns a score in 0-100 for valid input", async () => {
-    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: VALID_KEYWORDS });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.score).toBeGreaterThanOrEqual(0);
-    expect(result.value.score).toBeLessThanOrEqual(100);
-  });
-
-  it("returns per-keyword bids matching input keywords", async () => {
-    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: VALID_KEYWORDS });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    const keywords = result.value.bids.map((b) => b.keyword).sort();
-    expect(keywords).toEqual(["earbuds", "headphones"]);
-  });
-
-  it("scoreDimensions is null without userBidAdjustments (preview only)", async () => {
-    const result = await runBidElevator({ ...SCENARIO_BASE, keywords: VALID_KEYWORDS });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.scoreDimensions).toBeNull();
   });
 });
