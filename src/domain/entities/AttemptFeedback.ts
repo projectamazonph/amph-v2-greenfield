@@ -74,71 +74,258 @@ function getVerdict(score: number): FeedbackVerdict {
 }
 
 // ── Comment + recommendation templates ─────────────────────────────────
+//
+// STORY-087: keyed to each simulator's *current* ScoreDimensions field
+// names (bid-elevator: bidAccuracy/budgetAdherence/roasHit; str-triage:
+// direction/profitability; listing-audit: direction/priorityCoverage;
+// campaign-builder: structureQuality/budgetAllocation/keywordRelevance;
+// keyword-research: intentAccuracy/negativeIdentification) — the previous
+// table was keyed to dimension names (direction as a bid-elevator concept,
+// magnitude, dataSufficiency, explanation) that were renamed or removed by
+// STORY-071/072/076, so every real dimension except `profitability` fell
+// through to the generic "Score of X on Y" fallback below. Each entry is a
+// function of the actual score so the copy states the real percentage and
+// what it means in concrete terms, not just an abstract verdict label.
+// `reviewCoverage` (str-triage, listing-audit) is a non-gradable submission
+// gate (STORY-072) and never reaches GradeSimulatorAttempt, so it has no
+// entry here — it can't appear in a graded attempt's scoreDimensions.
 
-const DIMENSION_COMMENTS: Record<string, Record<FeedbackVerdict, string>> = {
+type DimensionCopyFn = (score: number) => string;
+
+const DIMENSION_COMMENTS: Record<string, Record<FeedbackVerdict, DimensionCopyFn>> = {
+  // bid-elevator: % of bids within the evidence-supported tolerance band
+  bidAccuracy: {
+    excellent: (s) =>
+      `${s}% of your bids landed in the range the data actually supported — no keywords left underfunded, none pushed past what the evidence justified.`,
+    good: (s) =>
+      `${s}% of your bids were well-calibrated. The rest were probably bid on gut feel rather than the CTR/CVR evidence for that keyword — worth a second look before running this at scale.`,
+    fair: (s) =>
+      `${s}% of your bids matched what the data supported. Close to half your keywords were mispriced, which in a real account means budget drifting toward the wrong terms.`,
+    poor: (s) =>
+      `Only ${s}% of your bids matched the evidence. At this error rate, a real campaign would be losing money on overpriced clicks while starving the keywords that actually convert.`,
+  },
+  // bid-elevator: how much budget was used efficiently before pacing throttled
+  budgetAdherence: {
+    excellent: (s) =>
+      `Your bids kept spend on pace all day (${s}%) — no early budget exhaustion, no wasted headroom sitting unspent.`,
+    good: (s) =>
+      `${s}% budget adherence. You're close, but a few bids are probably running hot enough to throttle the campaign before the day ends, or low enough to leave spend on the table.`,
+    fair: (s) =>
+      `${s}% adherence means the daily budget likely ran out early (from overbidding) or under-delivered (from underbidding) — either way, real ad spend not doing its job for part of the day.`,
+    poor: (s) =>
+      `${s}% adherence is a real budget-management problem — this bid set would blow through the daily cap hours early, or barely spend it at all.`,
+  },
+  // bid-elevator: hit target ROAS while capturing available sales, without bidding past the profitable ceiling
+  roasHit: {
+    excellent: () =>
+      `You hit the target ROAS while capturing the sales that were actually available — the profitable outcome, not just a passing score.`,
+    good: (s) =>
+      `Close to target ROAS (${s}%). You're leaving some profitable sales on the table, or shaving margin thinner than the target allows.`,
+    fair: (s) =>
+      `${s}% of the profitable outcome achieved. This bid set would land meaningfully under target ROAS — the kind of gap a client would ask about.`,
+    poor: (s) =>
+      `${s}% — this bid set either chases sales past the point where they're profitable, or leaves so much volume uncaptured that ROAS never gets close to target.`,
+  },
+  // campaign-builder: % match of campaign types + ad group coverage vs. ground truth
+  structureQuality: {
+    excellent: (s) =>
+      `Your campaign structure covers the launch types this niche and budget actually call for (${s}%).`,
+    good: (s) =>
+      `${s}% structural coverage. You're missing a campaign type a real launch plan for this niche would include — usually the gap between "runs" and "performs."`,
+    fair: (s) =>
+      `${s}% coverage means real gaps in the structure — likely missing the auto-discovery layer, the brand-defense layer, or both.`,
+    poor: (s) =>
+      `${s}% structural coverage is thin for this budget and niche. A structure this incomplete would leave real discovery and defense gaps from day one.`,
+  },
+  // campaign-builder: % of campaigns with budget within 50% of ground-truth allocation
+  budgetAllocation: {
+    excellent: (s) =>
+      `Your budget split across campaigns (${s}%) matches how a launch this size should actually allocate spend.`,
+    good: (s) =>
+      `${s}% of your campaigns are reasonably funded. One or two are probably over- or under-funded relative to what that campaign type needs to do its job.`,
+    fair: (s) =>
+      `${s}% allocation accuracy — real misallocation here, likely starving a campaign that needs volume to learn, or overfunding one that doesn't.`,
+    poor: (s) =>
+      `${s}% — the budget split is off enough that some campaigns would never get the spend to exit learning phase, while others burn budget with nothing left to optimize.`,
+  },
+  // campaign-builder: % of user keywords containing words from the product niche
+  keywordRelevance: {
+    excellent: (s) =>
+      `${s}% of your keywords are clearly on-niche — minimal risk of spend leaking to irrelevant search traffic.`,
+    good: (s) =>
+      `${s}% relevance. A handful of keywords look like they'd pull in traffic outside what this product actually serves.`,
+    fair: (s) =>
+      `${s}% relevance means real budget risk — enough off-niche keywords here that spend would leak to searches that don't convert.`,
+    poor: (s) =>
+      `${s}% relevance is a real problem — this keyword set would spend meaningfully against traffic that has nothing to do with the product.`,
+  },
+  // keyword-research: correctly classifying keyword intent
+  intentAccuracy: {
+    excellent: (s) =>
+      `${s}% correct intent calls — the foundation this niche's targeting strategy would actually be built on.`,
+    good: (s) =>
+      `${s}% accuracy. A few keywords are probably filed under the wrong intent bucket, which would nudge match-type and campaign-role decisions downstream.`,
+    fair: (s) =>
+      `${s}% correct is a real gap — misclassified intent here would send keywords into the wrong campaign role (defense vs. discovery vs. performance).`,
+    poor: (s) =>
+      `${s}% correct intent classification would misroute a meaningful share of this keyword list before any campaign is even built.`,
+  },
+  // keyword-research: flagging keywords that should be excluded
+  negativeIdentification: {
+    excellent: (s) =>
+      `You correctly flagged ${s}% of the keywords that don't belong in this campaign — that's spend that never gets wasted.`,
+    good: (s) =>
+      `${s}% of true negatives caught. The ones you missed would slip into a campaign and quietly draw clicks that were never going to convert.`,
+    fair: (s) =>
+      `${s}% catch rate on negatives — real spend leakage here, keywords that should've been excluded but weren't.`,
+    poor: (s) =>
+      `${s}% — most of the keywords that needed to be flagged as negative got through, which in a live campaign means ongoing wasted spend until someone catches it manually.`,
+  },
+  // str-triage: % terms correctly classified; listing-audit: % findings correctly triaged fix/skip
   direction: {
-    excellent: "Outstanding. You correctly identified the optimal bid direction and timing.",
-    good: "Solid direction. Your strategy was mostly aligned with the campaign objective.",
-    fair: "Your bid direction was partially correct. Review the campaign goal and align your bid adjustments accordingly.",
-    poor: "The bid direction needs significant work. Revisit the fundamentals of PPC bid strategy and how direction maps to campaign goals.",
+    excellent: (s) =>
+      `${s}% correct calls — the kind of consistency that compounds into real account performance over time.`,
+    good: (s) =>
+      `${s}% correct. The misses here are the quiet kind: a decision left standing that should have changed, or vice versa.`,
+    fair: (s) =>
+      `${s}% correct is a real gap — in a live account, this error rate means decisions a manager would have to catch and reverse later.`,
+    poor: (s) =>
+      `${s}% correct is below what a coin flip would get on a well-structured decision set — worth rebuilding the fundamentals before this runs on a real account.`,
   },
-  magnitude: {
-    excellent: "Excellent bid magnitude. Your adjustments were precisely calibrated to the data.",
-    good: "Good magnitude decisions. Your bids were reasonable given the performance data.",
-    fair: "Your bid magnitudes were somewhat off. Consider whether you are responding appropriately to ACOS and CTR signals.",
-    poor: "Bid magnitudes need significant adjustment. Review how bid changes propagate through the campaign structure.",
-  },
-  dataSufficiency: {
-    excellent: "You used all relevant data points and drew sound conclusions.",
-    good: "You considered the key data adequately before making your decision.",
-    fair: "Review more data before deciding. Certain metrics were overlooked.",
-    poor: "More analysis is needed. Ensure you are looking at the full picture before adjusting bids.",
-  },
+  // str-triage: % of non-removal-ground-truth revenue preserved by classification choices
   profitability: {
-    excellent: "Excellent profitability analysis. Your decisions optimized for the right metric.",
-    good: "Good profitability judgment. Your approach balanced revenue and cost appropriately.",
-    fair: "Your profitability assessment was incomplete. Double-check your ACOS and margin calculations.",
-    poor: "Profitability considerations were missing or incorrect. Review how to evaluate PPC profitability.",
+    excellent: (s) =>
+      `Your classification choices preserved ${s}% of the revenue that should have stayed in the campaign — no winning terms wrongly cut.`,
+    good: (s) =>
+      `${s}% of revenue preserved. Somewhere in here a term that was actually earning its keep probably got paused or negated.`,
+    fair: (s) =>
+      `${s}% revenue preservation means real sales left on the table — terms that were working got treated like losers.`,
+    poor: (s) =>
+      `${s}% — this decision set would cut a meaningful share of revenue-generating terms, the opposite of what triage is supposed to protect.`,
   },
-  explanation: {
-    excellent: "Clear, data-backed reasoning that demonstrates strong analytical thinking.",
-    good: "Adequate explanation showing sound understanding of the decision rationale.",
-    fair: "The reasoning needs more structure. Walk through your data, your interpretation, and your conclusion.",
-    poor: "An explanation is required. Always document why you made each decision.",
+  // listing-audit: severity-weighted F1 of the student's fix decisions
+  priorityCoverage: {
+    excellent: (s) =>
+      `You fixed what actually mattered (${s}%) without wasting effort on issues that weren't worth touching.`,
+    good: (s) =>
+      `${s}%. You caught most of the priority issues, but probably spent some effort on low-severity findings while a higher-priority one went untouched.`,
+    fair: (s) =>
+      `${s}% priority coverage — the fix effort here isn't matched to what actually moves the listing's performance.`,
+    poor: (s) =>
+      `${s}% — this triage would spend fix effort on the wrong findings, leaving the issues that actually hurt conversion and compliance unaddressed.`,
   },
 };
 
-const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, string>> = {
+const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, DimensionCopyFn>> = {
+  bidAccuracy: {
+    excellent: () =>
+      "Try a scenario with tighter evidence windows to test your calibration under more uncertainty.",
+    good: () =>
+      "Before bidding, check each keyword's evidence count — low-evidence terms deserve more caution.",
+    fair: () =>
+      "Compare your bid to the benchmark CPC and the keyword's CTR/CVR before adjusting — don't bid on intuition alone.",
+    poor: () =>
+      "Start smaller: bid one keyword at a time and check it against the evidence before moving to the next.",
+  },
+  budgetAdherence: {
+    excellent: () =>
+      "Move to a scenario with a tighter daily budget to test your pacing discipline.",
+    good: () =>
+      "Add up your projected spend across all keywords before submitting — check it against the daily cap.",
+    fair: () =>
+      "Calculate estimated daily spend per keyword (bid × available impressions × CTR) and total it before submitting.",
+    poor: () =>
+      "Practice budget math on paper first: bid × impressions × CTR, summed across every keyword, must fit the daily cap.",
+  },
+  roasHit: {
+    excellent: () =>
+      "Try a scenario with a higher target ROAS to test your bidding discipline under a tighter margin.",
+    good: () =>
+      "Check each bid against its economic ceiling — the highest bid that stays profitable — before finalizing.",
+    fair: () =>
+      "Recalculate your target ROAS from the scenario's break-even ACoS before adjusting any bids.",
+    poor: () =>
+      "Review how target ROAS, break-even ACoS, and bid ceiling relate before attempting another scenario.",
+  },
+  structureQuality: {
+    excellent: () =>
+      "Try a lower-budget scenario to see which campaign types get cut first when budget is tight.",
+    good: () =>
+      "Review what a manual, auto, and (budget permitting) brand campaign each contribute before finalizing your structure.",
+    fair: () =>
+      "List the campaign types a real launch for this niche and budget would need before you start adding campaigns.",
+    poor: () =>
+      "Study a complete reference structure (manual, auto, and brand campaigns) before building your own from scratch.",
+  },
+  budgetAllocation: {
+    excellent: () =>
+      "Try a scenario with a smaller total budget to test your allocation judgment under real constraints.",
+    good: () =>
+      "Check each campaign's share of the total budget against what that campaign type typically needs to perform.",
+    fair: () =>
+      "Before setting daily budgets, decide what role each campaign plays (discovery, performance, defense) — funding should follow role.",
+    poor: () =>
+      "Review typical SP-manual/SP-auto/SB budget splits for a launch this size before assigning budgets.",
+  },
+  keywordRelevance: {
+    excellent: () =>
+      "Try a niche with more ambiguous terminology to sharpen your relevance judgment.",
+    good: () =>
+      "Before adding a keyword, check it actually contains a word describing the product niche, not just a related category.",
+    fair: () =>
+      "Re-read the product niche description and cut any keyword that doesn't clearly relate to it.",
+    poor: () =>
+      "Build your keyword list starting from the niche's own words, then expand outward — not the reverse.",
+  },
+  intentAccuracy: {
+    excellent: () =>
+      "Try a niche with more competitor and cross-category terms to sharpen your intent judgment.",
+    good: () =>
+      "For each uncertain keyword, ask what the searcher is actually trying to do before assigning an intent.",
+    fair: () =>
+      "Review the intent taxonomy (core, feature, problem, useCase, competitor, ownBrand, irrelevant) before classifying the next batch.",
+    poor: () =>
+      'Start by sorting keywords into just "about this product" vs. "not about this product," then refine into the full taxonomy.',
+  },
+  negativeIdentification: {
+    excellent: () =>
+      "Try a niche with more overlapping-but-irrelevant terms to sharpen your negative-keyword instincts.",
+    good: () =>
+      "Before marking a keyword as relevant, ask whether it could also describe a completely different product.",
+    fair: () =>
+      "Build a checklist of what makes a keyword irrelevant for this niche, and run every keyword against it.",
+    poor: () =>
+      "Focus specifically on negatives next attempt — go through the list looking only for terms that don't belong.",
+  },
   direction: {
-    excellent: "Try a more complex scenario to push your strategic thinking further.",
-    good: "Practice identifying signals earlier to improve your directional decision speed.",
-    fair: "Review the campaign objective summary and map each bid change back to the goal.",
-    poor: "Start with the Bid Elevator beginner scenarios to build directional intuition.",
-  },
-  magnitude: {
-    excellent: "Move to challenge mode to test your calibration under tighter constraints.",
-    good: "Practice with tighter budgets to sharpen your magnitude judgment.",
-    fair: "Track your bid changes and their outcomes to build magnitude intuition.",
-    poor: "Practice with smaller adjustments first. Aim for 10-20% changes before scaling up.",
-  },
-  dataSufficiency: {
-    excellent: "Explore the campaign with additional data filters to find edge-case patterns.",
-    good: "Try scenarios with noisier data to strengthen your signal-to-noise judgment.",
-    fair: "Create a pre-flight checklist: ACOS, CTR, CPC, impressions, spend — review all five.",
-    poor: "Always check at least ACOS, CTR, and impressions before making a bid decision.",
+    excellent: () =>
+      "Try a scenario with more ambiguous or borderline cases to keep sharpening your judgment.",
+    good: () =>
+      "For each borderline case, write down the specific evidence that tipped your decision before committing to it.",
+    fair: () =>
+      "Slow down on cases you're unsure about — check the underlying numbers again before deciding.",
+    poor: () =>
+      "Start with the most clear-cut cases first to rebuild the fundamentals before tackling the ambiguous ones.",
   },
   profitability: {
-    excellent: "Test scenarios with negative margin products to push your profitability analysis.",
-    good: "Try products at different margin tiers to calibrate your profitability thresholds.",
-    fair: "Calculate target ACOS from your product margin before each scenario.",
-    poor: "Review the relationship between ACOS, product margin, and average order value.",
+    excellent: () =>
+      "Try a scenario with tighter target ROAS thresholds to test your judgment under less margin for error.",
+    good: () =>
+      "Double-check the ROAS on any term you're about to pause or negate — a losing-looking term can still be a real winner.",
+    fair: () =>
+      "Before removing a term, confirm it's actually underperforming target ROAS, not just spending the most.",
+    poor: () =>
+      "Review which terms are actually earning their keep (ROAS vs. target) before making any removal decisions.",
   },
-  explanation: {
-    excellent:
-      "Practice explaining your reasoning to someone unfamiliar with PPC to sharpen clarity.",
-    good: "Work on being more concise while covering all key data points.",
-    fair: "Structure your explanations as: Data Observed -> Interpretation -> Decision.",
-    poor: "For each bid decision, write down what you saw, what you concluded, and what you did.",
+  priorityCoverage: {
+    excellent: () =>
+      "Try a scenario with more findings to keep testing your prioritization under a larger workload.",
+    good: () =>
+      "Before fixing a low-severity finding, check whether a higher-severity one still needs attention.",
+    fair: () =>
+      "Sort findings by severity first, then work top-down — fix effort should follow impact, not order of discovery.",
+    poor: () =>
+      "Focus on critical and warning-severity findings first next attempt; info-severity findings can usually wait.",
   },
 };
 
@@ -201,16 +388,16 @@ export function composeAttemptFeedback(params: ComposeAttemptFeedbackParams): At
     if (rawScore === undefined) continue;
     const verdict = getVerdict(rawScore);
 
-    const comments = DIMENSION_COMMENTS[dimension];
-    const recommendations = DIMENSION_RECOMMENDATIONS[dimension];
+    const comment = DIMENSION_COMMENTS[dimension]?.[verdict];
+    const recommendation = DIMENSION_RECOMMENDATIONS[dimension]?.[verdict];
 
     dimensionFeedback.push({
       dimension,
       verdict,
       score: rawScore,
-      comment: comments?.[verdict] ?? `Score of ${rawScore} on ${dimension}.`,
+      comment: comment?.(rawScore) ?? `Score of ${rawScore} on ${dimension}.`,
       recommendation:
-        recommendations?.[verdict] ??
+        recommendation?.(rawScore) ??
         `Review your approach to ${dimension} and practice with simpler scenarios.`,
     });
   }

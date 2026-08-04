@@ -216,6 +216,47 @@ describe("AttemptFeedback domain", () => {
       }
     });
 
+    // STORY-087: pins real, per-simulator business-impact copy for every
+    // dimension name each simulator's ScoreDimensions type actually
+    // produces today. Regression guard against the bug this story fixed:
+    // the template table used to be keyed to dimension names (magnitude,
+    // dataSufficiency, explanation, a bid-elevator-flavored "direction")
+    // that STORY-071/072/076 renamed or removed, so every real dimension
+    // except str-triage's `profitability` silently fell through to the
+    // generic "Score of X on Y" fallback.
+    const REAL_DIMENSION_NAMES = [
+      "bidAccuracy", // bid-elevator
+      "budgetAdherence", // bid-elevator
+      "roasHit", // bid-elevator
+      "structureQuality", // campaign-builder
+      "budgetAllocation", // campaign-builder
+      "keywordRelevance", // campaign-builder
+      "intentAccuracy", // keyword-research
+      "negativeIdentification", // keyword-research
+      "direction", // str-triage, listing-audit
+      "profitability", // str-triage
+      "priorityCoverage", // listing-audit
+    ];
+
+    it.each(REAL_DIMENSION_NAMES)(
+      "has real business-impact copy for '%s', not the generic fallback",
+      (dimension) => {
+        const attempt = makeAttempt({
+          score: 65,
+          scoreDimensions: { [dimension]: 65 },
+        });
+        const result = composeAttemptFeedback({ attempt, policy: BASE_SCORE_POLICY });
+
+        const feedback = result.dimensionFeedback.find((d) => d.dimension === dimension);
+        expect(feedback).toBeDefined();
+        expect(feedback!.comment).not.toBe(`Score of 65 on ${dimension}.`);
+        expect(feedback!.comment).toContain("65");
+        expect(feedback!.recommendation).not.toBe(
+          `Review your approach to ${dimension} and practice with simpler scenarios.`,
+        );
+      },
+    );
+
     it("missing dimensions are omitted from dimensionFeedback", () => {
       const attempt = makeAttempt({
         score: 80,
