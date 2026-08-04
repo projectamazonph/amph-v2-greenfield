@@ -113,7 +113,24 @@ const mockContainer = {
   gradeSimulatorAttempt: { execute: vi.fn() },
   composeAttemptFeedback: { execute: vi.fn() },
   submitSimulatorAttempt: { execute: vi.fn() },
+  scenarioRepo: { findPublished: vi.fn() },
   logger: { warn: vi.fn() },
+};
+
+const PUBLISHED_SCENARIO = {
+  id: "keyword-research-scenario-default",
+  scenarioKey: "keyword-research-scenario-default",
+  version: 1,
+  status: "published" as const,
+  simulatorId: "keyword-research" as const,
+  name: "Keyword research for bamboo cutting board niche",
+  description: "Classify intent and flag negatives across 18 keywords in the niche.",
+  inputSchema: { defaultNicheId: "bamboo-cutting-board" },
+  outputSchema: {},
+  difficulty: "beginner" as const,
+  estimatedMinutes: 10,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const fakeSimulator = {
@@ -162,6 +179,7 @@ function happyContainer() {
   mockContainer.submitSimulatorAttempt.execute.mockResolvedValue(
     Result.ok({ status: "submitted", submittedAt: new Date() }),
   );
+  mockContainer.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
 }
 
 describe("previewKeywordResearch", () => {
@@ -252,6 +270,17 @@ describe("keywordResearchAttempt", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("credential_requires_curated_dataset");
+  });
+
+  it("returns attempt_error when no published scenario exists", async () => {
+    mockContainer.scenarioRepo.findPublished.mockResolvedValueOnce(Result.ok(null));
+    const result = await keywordResearchAttempt({
+      niche: "bamboo-cutting-board",
+      classifications: VALID_CLASSIFICATIONS,
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
   });
 
   it("happy path: runs the full lifecycle and returns the grade", async () => {

@@ -30,6 +30,15 @@
  * anything but "submitted"; ComposeAttemptFeedback requires "graded").
  * SaveSimulatorDecision is the only thing that runs while still
  * "in_progress".
+ *
+ * STORY-085: `keywordResearchAttempt()` resolves the scenarioId from the
+ * currently published keyword-research SimulatorScenario server-side
+ * instead of a hardcoded constant, so publishing a new version takes
+ * effect. `niche` itself stays client-supplied — that's an intentional
+ * design decision, not a trust gap: the student can research any niche,
+ * and KeywordDataset content (STORY-081) is resolved fresh server-side
+ * via keywordDatasetRepo.findByNiche() regardless of what niche is asked
+ * for, so there's nothing to forge.
  */
 
 "use server";
@@ -46,8 +55,6 @@ import type {
 } from "@/domain/simulator/keyword-research/KeywordResearchInput";
 import type { KeywordResearchOutput } from "@/domain/simulator/keyword-research/KeywordResearchOutput";
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
-
-const DEFAULT_SCENARIO_ID = "keyword-research-scenario-default";
 
 const KEYWORD_INTENTS: readonly KeywordIntent[] = [
   "core",
@@ -248,11 +255,21 @@ export async function keywordResearchAttempt(
     };
   }
 
-  // ── 4. StartSimulatorAttempt ────────────────────────────────────────
+  // ── 4. Resolve the published scenario (id only — content is the
+  //      dataset resolved above, not this scenario's inputSchema) ───────
+  const scenarioResult = await container.scenarioRepo.findPublished("keyword-research");
+  if (!scenarioResult.ok || !scenarioResult.value) {
+    return {
+      ok: false,
+      error: { kind: "attempt_error", message: "No published keyword-research scenario found" },
+    };
+  }
+
+  // ── 5. StartSimulatorAttempt ────────────────────────────────────────
   const startResult = await container.startSimulatorAttempt.execute({
     userId,
     simulatorId: "keyword-research",
-    scenarioId: DEFAULT_SCENARIO_ID,
+    scenarioId: scenarioResult.value.id,
     mode: resolvedMode,
   });
 
@@ -262,7 +279,7 @@ export async function keywordResearchAttempt(
 
   const attemptId = startResult.value.attemptId;
 
-  // ── 5. Save decision (dataset provenance + raw classifications) ─────
+  // ── 6. Save decision (dataset provenance + raw classifications) ─────
   const decisionResult = await container.saveSimulatorDecision.execute({
     attemptId,
     decisionData: {
@@ -279,7 +296,7 @@ export async function keywordResearchAttempt(
     });
   }
 
-  // ── 6. Run simulator ────────────────────────────────────────────────
+  // ── 7. Run simulator ────────────────────────────────────────────────
   const sim = container.simulatorRegistry.get("keyword-research");
   if (!sim) {
     return {
@@ -309,7 +326,7 @@ export async function keywordResearchAttempt(
     negativeIdentification: 0,
   };
 
-  // ── 7. SubmitSimulatorAttempt ─────────────────────────────────────────
+  // ── 8. SubmitSimulatorAttempt ─────────────────────────────────────────
   // Must happen before grading: GradeSimulatorAttempt requires "submitted"
   // status, and SubmitSimulatorAttempt is the only thing that transitions
   // the attempt out of "in_progress".
@@ -318,7 +335,7 @@ export async function keywordResearchAttempt(
     return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
   }
 
-  // ── 8. GradeSimulatorAttempt ────────────────────────────────────────
+  // ── 9. GradeSimulatorAttempt ────────────────────────────────────────
   const gradeResult = await container.gradeSimulatorAttempt.execute({
     attemptId,
     scoreDimensions: {
@@ -333,14 +350,14 @@ export async function keywordResearchAttempt(
 
   const grade = gradeResult.value;
 
-  // ── 9. ComposeAttemptFeedback ───────────────────────────────────────
+  // ── 10. ComposeAttemptFeedback ───────────────────────────────────────
   const feedbackResult = await container.composeAttemptFeedback.execute({ attemptId });
   if (Result.isErr(feedbackResult)) {
     return { ok: false, error: { kind: "feedback_error", message: feedbackResult.error.kind } };
   }
   const feedback = feedbackResult.value.feedback;
 
-  // ── 10. Return results ──────────────────────────────────────────────
+  // ── 11. Return results ──────────────────────────────────────────────
   return {
     ok: true,
     value: {
