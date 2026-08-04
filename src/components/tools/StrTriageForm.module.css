@@ -78,6 +78,13 @@
   margin: 0;
 }
 
+.xpBanner {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--success);
+  margin: 0;
+}
+
 .footer {
   display: flex;
   justify-content: space-between;

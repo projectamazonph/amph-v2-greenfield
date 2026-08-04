@@ -21,6 +21,9 @@ export class XPService {
   /** XP awarded when a student watches a live class (live or its recording) */
   static readonly LIVE_CLASS_ATTENDED_XP = 15;
 
+  /** Bonus XP awarded the first time a student passes a simulator in Challenge mode */
+  static readonly SIMULATOR_CHALLENGE_PASSED_XP = 25;
+
   /** XP thresholds for each tier */
   private static readonly TIER_THRESHOLDS: readonly [number, string][] = [
     [0, "Newcomer"],
@@ -62,7 +65,8 @@ export class XPService {
       reason === "quiz_passed" ||
       reason === "streak_bonus" ||
       reason === "badge_awarded" ||
-      reason === "live_class_attended"
+      reason === "live_class_attended" ||
+      reason === "simulator_challenge_passed"
     );
   }
 }

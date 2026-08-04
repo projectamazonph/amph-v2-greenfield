@@ -13,6 +13,8 @@ import { useState, useTransition } from "react";
 import styles from "./StrTriageForm.module.css";
 import { strTriageAttempt, type StrTriageAttemptResult } from "@/app/tools/str-triage/actions";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
+import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
 import type { TriageAction } from "@/domain/simulator/str-triage/StrTriageOutput";
 
@@ -20,6 +22,7 @@ type StrScenario = Omit<StrTriageInput, "userClassifications">;
 
 interface Props {
   scenario: StrScenario;
+  challengeUnlocked: boolean;
 }
 
 const ACTIONS: ReadonlyArray<{ value: TriageAction; label: string }> = [
@@ -39,10 +42,11 @@ function actionColor(a: TriageAction): string {
   return "var(--danger)"; // negative_exact / negative_phrase
 }
 
-export function StrTriageForm({ scenario }: Props) {
+export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
   const [actions, setActions] = useState<Record<string, TriageAction>>(() =>
     Object.fromEntries(scenario.rows.map((r) => [r.searchTerm, "keep" as TriageAction])),
   );
+  const [mode, setMode] = useState<PracticeOrChallengeMode>("practice");
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<StrTriageAttemptResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +59,7 @@ export function StrTriageForm({ scenario }: Props) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const r = await strTriageAttempt({ userActions: actions, mode: "practice" });
+      const r = await strTriageAttempt({ userActions: actions, mode });
       if (r.ok) {
         setResult(r.value);
       } else {
@@ -66,6 +70,12 @@ export function StrTriageForm({ scenario }: Props) {
 
   return (
     <form className={styles.form} onSubmit={onSubmit}>
+      <SimulatorModeToggle
+        mode={mode}
+        onChange={setMode}
+        unlocked={challengeUnlocked}
+        disabled={result !== null}
+      />
       <div
         className={styles.tableScroll}
         role="region"
@@ -147,6 +157,11 @@ export function StrTriageForm({ scenario }: Props) {
         ) : null}
       </div>
       {result ? <FormativeScoreNotice /> : null}
+      {result?.xpAwarded ? (
+        <p className={styles.xpBanner}>
+          +{result.xpAwarded} XP earned for passing in Challenge mode.
+        </p>
+      ) : null}
     </form>
   );
 }

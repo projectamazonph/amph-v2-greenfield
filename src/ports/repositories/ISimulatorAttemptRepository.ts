@@ -12,6 +12,7 @@ import type {
   AttemptStatus,
   ScoreDimensions,
   SimulatorAttemptError,
+  SimulatorMode,
 } from "@/domain/entities/SimulatorAttempt";
 import type { SimulatorDecision } from "@/domain/entities/SimulatorDecision";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
@@ -47,6 +48,19 @@ export interface ISimulatorAttemptRepository {
     simulatorId: SimulatorId,
     scenarioId: string,
     options?: { onlyInProgress?: boolean },
+  ): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>>;
+
+  /**
+   * List attempts for a user + simulator, across all scenarios/versions.
+   * Used by STORY-088's Challenge-mode unlock check ("has this user ever
+   * passed this simulator in Practice mode"), which must not be scoped to
+   * a single scenario version since publishing a new version shouldn't
+   * reset a student's earned eligibility.
+   */
+  findByUserAndSimulator(
+    userId: string,
+    simulatorId: SimulatorId,
+    options?: { mode?: SimulatorMode; status?: AttemptStatus },
   ): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>>;
 
   /**

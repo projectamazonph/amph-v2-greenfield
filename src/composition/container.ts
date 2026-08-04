@@ -259,6 +259,7 @@ import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
 import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
 import { ComposeAttemptFeedback } from "@/usecases/ComposeAttemptFeedback";
+import { CheckChallengeModeUnlocked } from "@/usecases/CheckChallengeModeUnlocked";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
 import { AdminGetLiveClass } from "@/usecases/AdminGetLiveClass";
 import { CreateLiveClass } from "@/usecases/CreateLiveClass";
@@ -467,6 +468,8 @@ export interface AppContainer {
   // STORY-065: scoring engine
   gradeSimulatorAttempt: GradeSimulatorAttempt;
   composeAttemptFeedback: ComposeAttemptFeedback;
+  // STORY-088: challenge mode unlock
+  checkChallengeModeUnlocked: CheckChallengeModeUnlocked;
   // STORY-050c: live class admin CRUD
   adminListLiveClasses: AdminListLiveClasses;
   adminGetLiveClass: AdminGetLiveClass;
@@ -949,6 +952,10 @@ function buildProductionContainer(): AppContainer {
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,
       feedbackRepo,
+    }),
+    checkChallengeModeUnlocked: new CheckChallengeModeUnlocked({
+      attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
     }),
     // STORY-011: pricing tier repo
     pricingTierRepo,

@@ -9,6 +9,8 @@
 
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
+import { Result } from "@/domain/shared/Result";
 import { CampaignBuilderForm } from "@/components/tools/CampaignBuilderForm";
 import { StudentShell } from "@/components/student/StudentShell";
 import { campaignBuilderScenarioContentSchema } from "./scenarioContent";
@@ -30,6 +32,16 @@ export default async function CampaignBuilderPage() {
   const scenario = scenarioResult.value;
   const content = campaignBuilderScenarioContentSchema.parse(scenario.inputSchema);
 
+  const userId = await getSessionUserId();
+  let challengeUnlocked = false;
+  if (userId) {
+    const unlockedResult = await container.checkChallengeModeUnlocked.execute({
+      userId,
+      simulatorId: "campaign-builder",
+    });
+    challengeUnlocked = Result.isOk(unlockedResult) ? unlockedResult.value.unlocked : false;
+  }
+
   return (
     <StudentShell>
       <main className={styles.page}>
@@ -47,6 +59,7 @@ export default async function CampaignBuilderPage() {
           productCategory={content.productCategory}
           productNiche={content.productNiche}
           monthlyBudget={content.monthlyBudget}
+          challengeUnlocked={challengeUnlocked}
         />
       </main>
     </StudentShell>

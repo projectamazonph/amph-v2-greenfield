@@ -39,6 +39,9 @@
  * that isn't already "submitted". Unit tests never caught it because they
  * mock gradeSimulatorAttempt.execute() directly rather than exercising the
  * real use case's status check.
+ *
+ * STORY-088: a passing Challenge-mode attempt awards a one-time
+ * `XPService.SIMULATOR_CHALLENGE_PASSED_XP` bonus.
  */
 
 "use server";
@@ -58,6 +61,8 @@ import type {
   FindingAction,
   GradedFinding,
 } from "@/domain/simulator/listing-audit/ListingAuditOutput";
+import { XPService } from "@/domain/services/XPService";
+import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
 import { listingAuditScenarioContentSchema } from "./scenarioContent";
 
 async function resolvePublishedScenario(container: AppContainer) {
@@ -174,6 +179,7 @@ export interface ListingAuditAttemptResult {
       readonly userChoice: FindingAction | undefined;
       readonly isCorrect: boolean;
     }>;
+    readonly xpAwarded: number | null;
     readonly feedback: {
       readonly passed: boolean;
       readonly overallScore: number;
@@ -369,7 +375,28 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
 
   const feedback = feedbackResult.value.feedback;
 
-  // ── 10. Return results ──────────────────────────────────────────────
+  // ── 10. Award Challenge-mode XP (once per simulator, first pass only) ─
+  let xpAwarded: number | null = null;
+  if (resolvedMode === "challenge" && feedback.passed) {
+    const alreadyEarnedResult = await hasEverPassedSimulatorInMode(
+      { attemptRepo: container.simulatorAttemptRepo, scorePolicyRepo: container.scorePolicyRepo },
+      { userId, simulatorId: "listing-audit", mode: "challenge", excludeAttemptId: attemptId },
+    );
+    const alreadyEarned = Result.isOk(alreadyEarnedResult) && alreadyEarnedResult.value;
+    if (!alreadyEarned) {
+      const xpResult = await container.awardXp.execute({
+        userId,
+        amount: XPService.SIMULATOR_CHALLENGE_PASSED_XP,
+        reason: "simulator_challenge_passed",
+        refId: attemptId,
+      });
+      if (Result.isOk(xpResult)) {
+        xpAwarded = XPService.SIMULATOR_CHALLENGE_PASSED_XP;
+      }
+    }
+  }
+
+  // ── 11. Return results ──────────────────────────────────────────────
   return {
     ok: true,
     value: {
@@ -387,6 +414,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
         userChoice: f.userChoice ?? userFindingActions[f.id],
         isCorrect: f.isCorrect,
       })),
+      xpAwarded,
       feedback: {
         passed: feedback.passed,
         overallScore: feedback.overallScore,

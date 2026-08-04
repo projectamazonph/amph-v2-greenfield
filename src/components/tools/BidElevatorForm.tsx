@@ -25,18 +25,23 @@ import { bidElevatorAttempt } from "@/app/tools/bid-elevator/actions";
 import type { BidElevatorScenarioContent } from "@/app/tools/bid-elevator/scenarioContent";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import { BidElevatorResult } from "./BidElevatorResult";
+import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 
 interface Props {
   scenario: BidElevatorScenarioContent;
+  challengeUnlocked: boolean;
 }
 
-export function BidElevatorForm({ scenario }: Props) {
+export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
   const [bids, setBids] = useState<Record<string, number>>(() =>
     Object.fromEntries(scenario.keywords.map((k) => [k.keywordId, k.currentBid])),
   );
+  const [mode, setMode] = useState<PracticeOrChallengeMode>("practice");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [simResult, setSimResult] = useState<BidElevatorOutput | null>(null);
+  const [xpAwarded, setXpAwarded] = useState<number | null>(null);
 
   const onChange = (keywordId: string, value: number) => {
     setBids((prev) => ({ ...prev, [keywordId]: value }));
@@ -46,7 +51,7 @@ export function BidElevatorForm({ scenario }: Props) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const response = await bidElevatorAttempt({ userBidAdjustments: bids, mode: "practice" });
+      const response = await bidElevatorAttempt({ userBidAdjustments: bids, mode });
       if (!response.ok) {
         setError(
           "message" in response.error ? response.error.message : "Could not run this simulation.",
@@ -60,11 +65,13 @@ export function BidElevatorForm({ scenario }: Props) {
         estimatedSpend: response.value.estimatedSpend,
         estimatedRoas: response.value.estimatedRoas,
       });
+      setXpAwarded(response.value.xpAwarded ?? null);
     });
   };
 
   return (
     <form className={styles.form} onSubmit={onSubmit}>
+      <SimulatorModeToggle mode={mode} onChange={setMode} unlocked={challengeUnlocked} />
       <div className={styles.metaRow}>
         <span className={styles.metaItem}>
           <span className={styles.metaLabel}>Daily budget</span>
@@ -114,7 +121,13 @@ export function BidElevatorForm({ scenario }: Props) {
       <button type="submit" className={styles.submit} disabled={pending}>
         {pending ? "Running…" : "Run simulation"}
       </button>
-      {simResult ? <BidElevatorResult result={simResult} targetRoas={scenario.targetRoas} /> : null}
+      {simResult ? (
+        <BidElevatorResult
+          result={simResult}
+          targetRoas={scenario.targetRoas}
+          xpAwarded={xpAwarded}
+        />
+      ) : null}
     </form>
   );
 }

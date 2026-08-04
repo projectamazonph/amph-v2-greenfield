@@ -31,11 +31,14 @@ import type {
   FindingAction,
 } from "@/domain/simulator/listing-audit/ListingAuditOutput";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
+import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 
 interface Props {
   initialTitle: string;
   initialBullets: ReadonlyArray<string>;
   initialDescription: string;
+  challengeUnlocked: boolean;
 }
 
 type Stage = "editing" | "reviewing" | "graded";
@@ -45,10 +48,16 @@ const FINDING_ACTIONS: ReadonlyArray<{ value: FindingAction; label: string }> = 
   { value: "fix", label: "Fix" },
 ];
 
-export function ListingAuditForm({ initialTitle, initialBullets, initialDescription }: Props) {
+export function ListingAuditForm({
+  initialTitle,
+  initialBullets,
+  initialDescription,
+  challengeUnlocked,
+}: Props) {
   const [title, setTitle] = useState(initialTitle);
   const [bullets, setBullets] = useState<string[]>([...initialBullets]);
   const [description, setDescription] = useState(initialDescription);
+  const [mode, setMode] = useState<PracticeOrChallengeMode>("practice");
   const [stage, setStage] = useState<Stage>("editing");
   const [findings, setFindings] = useState<readonly AuditFinding[]>([]);
   const [findingActions, setFindingActions] = useState<Record<string, FindingAction>>({});
@@ -93,6 +102,7 @@ export function ListingAuditForm({ initialTitle, initialBullets, initialDescript
         bullets: bullets.filter((b) => b.length > 0),
         description,
         userFindingActions: findingActions,
+        mode,
       });
       if (!r.ok) {
         setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
@@ -119,6 +129,12 @@ export function ListingAuditForm({ initialTitle, initialBullets, initialDescript
 
   return (
     <form className={styles.form} onSubmit={isEditing ? onRunAudit : (e) => e.preventDefault()}>
+      <SimulatorModeToggle
+        mode={mode}
+        onChange={setMode}
+        unlocked={challengeUnlocked}
+        disabled={stage === "graded"}
+      />
       <div className={styles.field}>
         <label className={styles.label} htmlFor="la-title">
           Title
@@ -208,6 +224,11 @@ export function ListingAuditForm({ initialTitle, initialBullets, initialDescript
         ) : null}
       </div>
       {gradeResult && gradeResult.ok ? <FormativeScoreNotice /> : null}
+      {gradeResult && gradeResult.ok && gradeResult.value.xpAwarded ? (
+        <p className={styles.xpBanner}>
+          +{gradeResult.value.xpAwarded} XP earned for passing in Challenge mode.
+        </p>
+      ) : null}
       {gradeResult && gradeResult.ok ? (
         <p className={styles.error} style={{ color: "var(--ink-700)" }}>
           {gradeResult.value.feedback.overallComment}

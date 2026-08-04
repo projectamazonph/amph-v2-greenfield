@@ -38,6 +38,9 @@ const mockContainer = {
   composeAttemptFeedback: { execute: vi.fn() },
   simulatorRegistry: { get: vi.fn() },
   scenarioRepo: { findPublished: vi.fn() },
+  simulatorAttemptRepo: { findByUserAndSimulator: vi.fn() },
+  scorePolicyRepo: { findBySimulatorAndDifficulty: vi.fn() },
+  awardXp: { execute: vi.fn() },
 };
 
 const fakeSimulator = {
@@ -178,6 +181,10 @@ function happyContainer() {
   );
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
   mockContainer.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
+  mockContainer.simulatorAttemptRepo.findByUserAndSimulator.mockResolvedValue(Result.ok([]));
+  mockContainer.awardXp.execute.mockResolvedValue(
+    Result.ok({ xpEvent: { id: "xpe_1" }, totalXp: 100 }),
+  );
   fakeSimulator.run.mockImplementation(
     async (input: { userBidAdjustments?: Record<string, number> }) => ({
       ...SIM_OUTPUT,
@@ -366,5 +373,63 @@ describe("bidElevatorAttempt", () => {
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
       expect.objectContaining({ mode: "practice" }),
     );
+  });
+
+  it("awards Challenge-mode XP on a passing challenge attempt", async () => {
+    happyContainer();
+    const result = await bidElevatorAttempt({ ...validInput, mode: "challenge" });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).toHaveBeenCalledWith({
+      userId: "user_123",
+      amount: 25,
+      reason: "simulator_challenge_passed",
+      refId: "ATT-BID001",
+    });
+    expect(result.value.xpAwarded).toBe(25);
+  });
+
+  it("does not award XP for a passing practice-mode attempt", async () => {
+    happyContainer();
+    const result = await bidElevatorAttempt(validInput);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).not.toHaveBeenCalled();
+    expect(result.value.xpAwarded).toBeNull();
+  });
+
+  it("does not award XP again if the student already passed Challenge mode before", async () => {
+    happyContainer();
+    mockContainer.simulatorAttemptRepo.findByUserAndSimulator.mockResolvedValue(
+      Result.ok([
+        {
+          id: "ATT-EARLIER",
+          score: 90,
+          difficulty: "intermediate",
+          scoreDimensions: {},
+        },
+      ]),
+    );
+    mockContainer.scorePolicyRepo.findBySimulatorAndDifficulty.mockResolvedValue(
+      Result.ok({
+        id: "policy_1",
+        simulatorId: "bid-elevator",
+        difficulty: "intermediate",
+        mode: "challenge",
+        dimensionConfig: { bidAccuracy: { weight: 1 } },
+        passingScore: 70,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    );
+
+    const result = await bidElevatorAttempt({ ...validInput, mode: "challenge" });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).not.toHaveBeenCalled();
+    expect(result.value.xpAwarded).toBeNull();
   });
 });

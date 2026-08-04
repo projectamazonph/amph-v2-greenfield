@@ -51,6 +51,15 @@ const mockContainer = {
   scenarioRepo: {
     findPublished: vi.fn(),
   },
+  simulatorAttemptRepo: {
+    findByUserAndSimulator: vi.fn(),
+  },
+  scorePolicyRepo: {
+    findBySimulatorAndDifficulty: vi.fn(),
+  },
+  awardXp: {
+    execute: vi.fn(),
+  },
 };
 
 const PUBLISHED_SCENARIO = {
@@ -219,6 +228,10 @@ function happyContainer() {
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
   (fakeSimulator.run as ReturnType<typeof vi.fn>).mockResolvedValue(SIM_OUTPUT);
   c.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
+  mockContainer.simulatorAttemptRepo.findByUserAndSimulator.mockResolvedValue(Result.ok([]));
+  mockContainer.awardXp.execute.mockResolvedValue(
+    Result.ok({ xpEvent: { id: "xpe_1" }, totalXp: 100 }),
+  );
 }
 
 const VALID_INPUT = {
@@ -369,6 +382,29 @@ describe("listingAuditAttempt", () => {
     expect(result.value.gradedFindings[0]!.id).toBe("finding-0");
     expect(result.value.gradedFindings[0]!.groundTruth).toBe("fix");
     expect(result.value.gradedFindings[0]!.isCorrect).toBe(true);
+  });
+
+  it("awards Challenge-mode XP on a passing challenge attempt", async () => {
+    const result = await listingAuditAttempt({ ...VALID_INPUT, mode: "challenge" });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).toHaveBeenCalledWith({
+      userId: "user_123",
+      amount: 25,
+      reason: "simulator_challenge_passed",
+      refId: "ATT-XYZ789",
+    });
+    expect(result.value.xpAwarded).toBe(25);
+  });
+
+  it("does not award XP for a passing practice-mode attempt", async () => {
+    const result = await listingAuditAttempt(VALID_INPUT);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).not.toHaveBeenCalled();
+    expect(result.value.xpAwarded).toBeNull();
   });
 });
 

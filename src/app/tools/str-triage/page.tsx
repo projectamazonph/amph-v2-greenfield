@@ -14,6 +14,8 @@
 
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
+import { Result } from "@/domain/shared/Result";
 import { StrTriageForm } from "@/components/tools/StrTriageForm";
 import { StudentShell } from "@/components/student/StudentShell";
 import { strTriageScenarioContentSchema } from "./scenarioContent";
@@ -35,6 +37,16 @@ export default async function StrTriagePage() {
   const scenario = scenarioResult.value;
   const content = strTriageScenarioContentSchema.parse(scenario.inputSchema);
 
+  const userId = await getSessionUserId();
+  let challengeUnlocked = false;
+  if (userId) {
+    const unlockedResult = await container.checkChallengeModeUnlocked.execute({
+      userId,
+      simulatorId: "str-triage",
+    });
+    challengeUnlocked = Result.isOk(unlockedResult) ? unlockedResult.value.unlocked : false;
+  }
+
   return (
     <StudentShell>
       <main className={styles.page}>
@@ -55,7 +67,7 @@ export default async function StrTriagePage() {
             <span className={styles.metaValue}>{content.rows.length}</span>
           </p>
         </header>
-        <StrTriageForm scenario={content} />
+        <StrTriageForm scenario={content} challengeUnlocked={challengeUnlocked} />
       </main>
     </StudentShell>
   );

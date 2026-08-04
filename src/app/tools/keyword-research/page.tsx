@@ -14,6 +14,8 @@
 
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
+import { Result } from "@/domain/shared/Result";
 import { StudentShell } from "@/components/student/StudentShell";
 import { KeywordResearchForm } from "@/components/tools/KeywordResearchForm";
 import { keywordResearchScenarioContentSchema } from "./scenarioContent";
@@ -35,6 +37,16 @@ export default async function KeywordResearchPage() {
   const scenario = scenarioResult.value;
   const content = keywordResearchScenarioContentSchema.parse(scenario.inputSchema);
 
+  const userId = await getSessionUserId();
+  let challengeUnlocked = false;
+  if (userId) {
+    const unlockedResult = await container.checkChallengeModeUnlocked.execute({
+      userId,
+      simulatorId: "keyword-research",
+    });
+    challengeUnlocked = Result.isOk(unlockedResult) ? unlockedResult.value.unlocked : false;
+  }
+
   return (
     <StudentShell>
       <main className={styles.page}>
@@ -48,7 +60,10 @@ export default async function KeywordResearchPage() {
           <h1 className={styles.title}>{scenario.name}</h1>
           <p className={styles.brief}>{scenario.description}</p>
         </header>
-        <KeywordResearchForm initialNiche={content.defaultNicheId} />
+        <KeywordResearchForm
+          initialNiche={content.defaultNicheId}
+          challengeUnlocked={challengeUnlocked}
+        />
       </main>
     </StudentShell>
   );

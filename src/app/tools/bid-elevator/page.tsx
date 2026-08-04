@@ -23,6 +23,8 @@
 
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
+import { Result } from "@/domain/shared/Result";
 import { BidElevatorForm } from "@/components/tools/BidElevatorForm";
 import { StudentShell } from "@/components/student/StudentShell";
 import { bidElevatorScenarioContentSchema } from "./scenarioContent";
@@ -43,6 +45,16 @@ export default async function BidElevatorPage() {
   }
   const scenario = scenarioResult.value;
   const content = bidElevatorScenarioContentSchema.parse(scenario.inputSchema);
+
+  const userId = await getSessionUserId();
+  let challengeUnlocked = false;
+  if (userId) {
+    const unlockedResult = await container.checkChallengeModeUnlocked.execute({
+      userId,
+      simulatorId: "bid-elevator",
+    });
+    challengeUnlocked = Result.isOk(unlockedResult) ? unlockedResult.value.unlocked : false;
+  }
 
   return (
     <StudentShell>
@@ -67,7 +79,7 @@ export default async function BidElevatorPage() {
           <h1 className={styles.title}>{scenario.name}</h1>
           <p className={styles.brief}>{scenario.description}</p>
         </header>
-        <BidElevatorForm scenario={content} />
+        <BidElevatorForm scenario={content} challengeUnlocked={challengeUnlocked} />
       </main>
     </StudentShell>
   );

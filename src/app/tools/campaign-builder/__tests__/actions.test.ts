@@ -36,6 +36,9 @@ const mockContainer = {
   composeAttemptFeedback: { execute: vi.fn() },
   simulatorRegistry: { get: vi.fn() },
   scenarioRepo: { findPublished: vi.fn() },
+  simulatorAttemptRepo: { findByUserAndSimulator: vi.fn() },
+  scorePolicyRepo: { findBySimulatorAndDifficulty: vi.fn() },
+  awardXp: { execute: vi.fn() },
 };
 
 const fakeSimulator = {
@@ -166,6 +169,10 @@ function happyContainer() {
   );
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
   mockContainer.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
+  mockContainer.simulatorAttemptRepo.findByUserAndSimulator.mockResolvedValue(Result.ok([]));
+  mockContainer.awardXp.execute.mockResolvedValue(
+    Result.ok({ xpEvent: { id: "xpe_1" }, totalXp: 100 }),
+  );
   fakeSimulator.run.mockImplementation(
     async (input: { userAdjustedCampaigns?: CampaignStructure[] }) => ({
       campaigns: GT_CAMPAIGNS,
@@ -326,6 +333,31 @@ describe("campaignBuilderAttempt", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.campaigns).toHaveLength(3);
+  });
+
+  it("awards Challenge-mode XP on a passing challenge attempt", async () => {
+    happyContainer();
+    const result = await campaignBuilderAttempt({ ...validInput, mode: "challenge" });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).toHaveBeenCalledWith({
+      userId: "user_123",
+      amount: 25,
+      reason: "simulator_challenge_passed",
+      refId: "ATT-CB001",
+    });
+    expect(result.value.xpAwarded).toBe(25);
+  });
+
+  it("does not award XP for a passing practice-mode attempt", async () => {
+    happyContainer();
+    const result = await campaignBuilderAttempt(validInput);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(mockContainer.awardXp.execute).not.toHaveBeenCalled();
+    expect(result.value.xpAwarded).toBeNull();
   });
 });
 

@@ -35,6 +35,13 @@
  * bid-elevator scenario server-side and uses its content; only
  * `userBidAdjustments` (the student's bids) and `mode` are trusted from
  * the client.
+ *
+ * STORY-088: the returned `isPassed` used to be a rough, disconnected
+ * heuristic (`bidAccuracy >= 50`) instead of the actual ScorePolicy
+ * pass/fail already computed by GradeSimulatorAttempt and re-derived by
+ * ComposeAttemptFeedback — fixed to use `feedback.passed`, the
+ * authoritative source. This also means Challenge-mode attempts that pass
+ * now award a one-time `XPService.SIMULATOR_CHALLENGE_PASSED_XP` bonus.
  */
 
 "use server";
@@ -52,6 +59,8 @@ import type {
   ScoreDimensions,
 } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
+import { XPService } from "@/domain/services/XPService";
+import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
 import { bidElevatorScenarioContentSchema } from "./scenarioContent";
 
 async function resolvePublishedScenario(container: AppContainer) {
@@ -76,6 +85,7 @@ export interface BidElevatorAttemptResult {
   readonly bids: readonly BidRecommendation[];
   readonly estimatedSpend: number;
   readonly estimatedRoas: number;
+  readonly xpAwarded: number | null;
   readonly feedback: {
     readonly passed: boolean;
     readonly overallScore: number;
@@ -251,22 +261,39 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
     };
   }
 
-  // ── 8. Return results ────────────────────────────────────────────────
-  const isPassed =
-    scoreDimensions !== null
-      ? (simOutput.scoreDimensions?.bidAccuracy ?? 0) >= 50 // rough pass threshold
-      : false;
+  // ── 8. Award Challenge-mode XP (once per simulator, first pass only) ──
+  let xpAwarded: number | null = null;
+  if (resolvedMode === "challenge" && feedback?.passed) {
+    const alreadyEarnedResult = await hasEverPassedSimulatorInMode(
+      { attemptRepo: container.simulatorAttemptRepo, scorePolicyRepo: container.scorePolicyRepo },
+      { userId, simulatorId: "bid-elevator", mode: "challenge", excludeAttemptId: attemptId },
+    );
+    const alreadyEarned = Result.isOk(alreadyEarnedResult) && alreadyEarnedResult.value;
+    if (!alreadyEarned) {
+      const xpResult = await container.awardXp.execute({
+        userId,
+        amount: XPService.SIMULATOR_CHALLENGE_PASSED_XP,
+        reason: "simulator_challenge_passed",
+        refId: attemptId,
+      });
+      if (Result.isOk(xpResult)) {
+        xpAwarded = XPService.SIMULATOR_CHALLENGE_PASSED_XP;
+      }
+    }
+  }
 
+  // ── 9. Return results ────────────────────────────────────────────────
   return {
     ok: true,
     value: {
       attemptId,
       overallScore: simOutput.score,
       scoreDimensions: simOutput.scoreDimensions,
-      isPassed,
+      isPassed: feedback?.passed ?? false,
       bids: simOutput.bids,
       estimatedSpend: simOutput.estimatedSpend,
       estimatedRoas: simOutput.estimatedRoas,
+      xpAwarded,
       feedback,
     },
   };

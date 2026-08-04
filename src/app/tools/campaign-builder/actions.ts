@@ -38,6 +38,13 @@
  * attempt with zero saved decisions. Unit tests never caught it because
  * they mock gradeSimulatorAttempt.execute() directly rather than
  * exercising the real use cases' status checks.
+ *
+ * STORY-088: the returned `isPassed` used to be a rough, disconnected
+ * heuristic (`structureQuality >= 50`) instead of the actual ScorePolicy
+ * pass/fail already computed by GradeSimulatorAttempt and re-derived by
+ * ComposeAttemptFeedback — fixed to use `feedback.passed`, the
+ * authoritative source. This also means Challenge-mode attempts that pass
+ * now award a one-time `XPService.SIMULATOR_CHALLENGE_PASSED_XP` bonus.
  */
 
 "use server";
@@ -53,6 +60,8 @@ import type {
   CampaignStructure,
   ScoreDimensions,
 } from "@/domain/simulator/campaign-builder/CampaignBuilderOutput";
+import { XPService } from "@/domain/services/XPService";
+import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
 import { campaignBuilderScenarioContentSchema } from "./scenarioContent";
 
 // ── Input types ─────────────────────────────────────────────────────────
@@ -63,6 +72,7 @@ export interface CampaignBuilderAttemptResult {
   readonly scoreDimensions: ScoreDimensions | null;
   readonly isPassed: boolean;
   readonly campaigns: readonly CampaignStructure[];
+  readonly xpAwarded: number | null;
   readonly feedback: {
     readonly passed: boolean;
     readonly overallScore: number;
@@ -273,18 +283,37 @@ export async function campaignBuilderAttempt(
     };
   }
 
-  // ── 8. Return results ────────────────────────────────────────────────
+  // ── 8. Award Challenge-mode XP (once per simulator, first pass only) ──
+  let xpAwarded: number | null = null;
+  if (resolvedMode === "challenge" && feedback?.passed) {
+    const alreadyEarnedResult = await hasEverPassedSimulatorInMode(
+      { attemptRepo: container.simulatorAttemptRepo, scorePolicyRepo: container.scorePolicyRepo },
+      { userId, simulatorId: "campaign-builder", mode: "challenge", excludeAttemptId: attemptId },
+    );
+    const alreadyEarned = Result.isOk(alreadyEarnedResult) && alreadyEarnedResult.value;
+    if (!alreadyEarned) {
+      const xpResult = await container.awardXp.execute({
+        userId,
+        amount: XPService.SIMULATOR_CHALLENGE_PASSED_XP,
+        reason: "simulator_challenge_passed",
+        refId: attemptId,
+      });
+      if (Result.isOk(xpResult)) {
+        xpAwarded = XPService.SIMULATOR_CHALLENGE_PASSED_XP;
+      }
+    }
+  }
+
+  // ── 9. Return results ────────────────────────────────────────────────
   return {
     ok: true,
     value: {
       attemptId,
       overallScore: simOutput.score,
       scoreDimensions: simOutput.scoreDimensions,
-      isPassed:
-        simOutput.scoreDimensions !== null
-          ? (simOutput.scoreDimensions.structureQuality ?? 0) >= 50
-          : false,
+      isPassed: feedback?.passed ?? false,
       campaigns: simOutput.campaigns,
+      xpAwarded,
       feedback,
     },
   };

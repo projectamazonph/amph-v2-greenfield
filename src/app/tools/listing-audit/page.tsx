@@ -9,6 +9,8 @@
 
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { getSessionUserId } from "@/lib/auth";
+import { Result } from "@/domain/shared/Result";
 import { ListingAuditForm } from "@/components/tools/ListingAuditForm";
 import { StudentShell } from "@/components/student/StudentShell";
 import { listingAuditScenarioContentSchema } from "./scenarioContent";
@@ -30,6 +32,16 @@ export default async function ListingAuditPage() {
   const scenario = scenarioResult.value;
   const content = listingAuditScenarioContentSchema.parse(scenario.inputSchema);
 
+  const userId = await getSessionUserId();
+  let challengeUnlocked = false;
+  if (userId) {
+    const unlockedResult = await container.checkChallengeModeUnlocked.execute({
+      userId,
+      simulatorId: "listing-audit",
+    });
+    challengeUnlocked = Result.isOk(unlockedResult) ? unlockedResult.value.unlocked : false;
+  }
+
   return (
     <StudentShell>
       <main className={styles.page}>
@@ -47,6 +59,7 @@ export default async function ListingAuditPage() {
           initialTitle={scenario.name}
           initialBullets={content.bullets}
           initialDescription={content.description}
+          challengeUnlocked={challengeUnlocked}
         />
       </main>
     </StudentShell>

@@ -28,11 +28,14 @@ import {
   type CampaignBuilderAttemptResponse,
 } from "@/app/tools/campaign-builder/actions";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
+import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 
 interface Props {
   productCategory: string;
   productNiche: string;
   monthlyBudget: number;
+  challengeUnlocked: boolean;
 }
 
 type Targeting = "auto" | "manual" | "hybrid";
@@ -93,8 +96,14 @@ function emptyKeyword(): EditableKeyword {
   return { id: newLocalId(), keyword: "", matchType: "exact", suggestedBid: 0 };
 }
 
-export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudget }: Props) {
+export function CampaignBuilderForm({
+  productCategory,
+  productNiche,
+  monthlyBudget,
+  challengeUnlocked,
+}: Props) {
   const [targeting, setTargeting] = useState<Targeting>("manual");
+  const [mode, setMode] = useState<PracticeOrChallengeMode>("practice");
   const [campaigns, setCampaigns] = useState<EditableCampaign[]>([]);
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<CampaignBuilderAttemptResponse | null>(null);
@@ -202,6 +211,7 @@ export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudg
     startTransition(async () => {
       const r = await campaignBuilderAttempt({
         targetingStrategy: targeting,
+        mode,
         userAdjustedCampaigns,
       });
       if (r.ok) {
@@ -217,6 +227,12 @@ export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudg
 
   return (
     <form className={styles.form} onSubmit={onSubmit}>
+      <SimulatorModeToggle
+        mode={mode}
+        onChange={setMode}
+        unlocked={challengeUnlocked}
+        disabled={graded}
+      />
       <div className={styles.fieldsRow}>
         <Field
           label="Product category"
@@ -469,6 +485,11 @@ export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudg
         ) : null}
       </div>
       {gradedValue ? <FormativeScoreNotice /> : null}
+      {gradedValue && gradedValue.xpAwarded ? (
+        <p className={styles.xpBanner}>
+          +{gradedValue.xpAwarded} XP earned for passing in Challenge mode.
+        </p>
+      ) : null}
       {gradedValue && gradedValue.feedback ? (
         <p className={styles.error} style={{ color: "var(--ink-700)" }}>
           {gradedValue.feedback.overallComment}

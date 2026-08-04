@@ -20,6 +20,9 @@
  * from the client. This also means publishing a new scenario version
  * through the admin UI takes effect immediately.
  *
+ * STORY-088: a passing Challenge-mode attempt awards a one-time
+ * `XPService.SIMULATOR_CHALLENGE_PASSED_XP` bonus.
+ *
  * Lifecycle (mirrors keyword-research/actions.ts's ordering):
  *   1. StartSimulatorAttempt — creates the attempt record
  *   2. saveSimulatorDecision — one decision per user classification (audit trail)
@@ -55,6 +58,8 @@ import type {
   KeywordClassification,
 } from "@/domain/simulator/str-triage/StrTriageOutput";
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
+import { XPService } from "@/domain/services/XPService";
+import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
 import { strTriageScenarioContentSchema } from "./scenarioContent";
 
 const TRIAGE_ACTIONS: readonly TriageAction[] = [
@@ -94,6 +99,7 @@ export interface StrTriageAttemptResult {
   readonly scoreDimensions: Record<string, number>;
   readonly isPassed: boolean;
   readonly classifications: readonly KeywordClassification[];
+  readonly xpAwarded: number | null;
   readonly feedback: {
     readonly passed: boolean;
     readonly overallScore: number;
@@ -270,7 +276,28 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   }
   const feedback = feedbackResult.value.feedback;
 
-  // ── 10. Return results ──────────────────────────────────────────────
+  // ── 10. Award Challenge-mode XP (once per simulator, first pass only) ─
+  let xpAwarded: number | null = null;
+  if (resolvedMode === "challenge" && feedback.passed) {
+    const alreadyEarnedResult = await hasEverPassedSimulatorInMode(
+      { attemptRepo: container.simulatorAttemptRepo, scorePolicyRepo: container.scorePolicyRepo },
+      { userId, simulatorId: "str-triage", mode: "challenge", excludeAttemptId: attemptId },
+    );
+    const alreadyEarned = Result.isOk(alreadyEarnedResult) && alreadyEarnedResult.value;
+    if (!alreadyEarned) {
+      const xpResult = await container.awardXp.execute({
+        userId,
+        amount: XPService.SIMULATOR_CHALLENGE_PASSED_XP,
+        reason: "simulator_challenge_passed",
+        refId: attemptId,
+      });
+      if (Result.isOk(xpResult)) {
+        xpAwarded = XPService.SIMULATOR_CHALLENGE_PASSED_XP;
+      }
+    }
+  }
+
+  // ── 11. Return results ──────────────────────────────────────────────
   return {
     ok: true,
     value: {
@@ -279,6 +306,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
       scoreDimensions: grade.scoreDimensions,
       isPassed: grade.isPassed,
       classifications: simOutput.classifications,
+      xpAwarded,
       feedback: {
         passed: feedback.passed,
         overallScore: feedback.overallScore,

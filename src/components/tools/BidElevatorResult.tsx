@@ -14,6 +14,7 @@ import { FormativeScoreNotice } from "./FormativeScoreNotice";
 interface Props {
   result: BidElevatorOutput;
   targetRoas: number;
+  xpAwarded?: number | null;
 }
 
 function scoreColor(score: number): "var(--success)" | "var(--warning)" | "var(--danger)" {
@@ -33,7 +34,7 @@ function confidenceLabel(confidence: "high" | "medium" | "low"): string {
   }
 }
 
-export function BidElevatorResult({ result, targetRoas }: Props) {
+export function BidElevatorResult({ result, targetRoas, xpAwarded }: Props) {
   return (
     <section className={styles.panel} aria-labelledby="bid-result-heading">
       <header className={styles.header}>
@@ -46,6 +47,9 @@ export function BidElevatorResult({ result, targetRoas }: Props) {
         </div>
       </header>
       <FormativeScoreNotice />
+      {xpAwarded ? (
+        <p className={styles.xpBanner}>+{xpAwarded} XP earned for passing in Challenge mode.</p>
+      ) : null}
       <div className={styles.metaRow}>
         <div className={styles.metaItem}>
           <span className={styles.metaLabel}>Projected daily spend</span>

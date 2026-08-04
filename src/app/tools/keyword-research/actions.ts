@@ -39,6 +39,9 @@
  * and KeywordDataset content (STORY-081) is resolved fresh server-side
  * via keywordDatasetRepo.findByNiche() regardless of what niche is asked
  * for, so there's nothing to forge.
+ *
+ * STORY-088: a passing Challenge-mode attempt awards a one-time
+ * `XPService.SIMULATOR_CHALLENGE_PASSED_XP` bonus.
  */
 
 "use server";
@@ -55,6 +58,8 @@ import type {
 } from "@/domain/simulator/keyword-research/KeywordResearchInput";
 import type { KeywordResearchOutput } from "@/domain/simulator/keyword-research/KeywordResearchOutput";
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
+import { XPService } from "@/domain/services/XPService";
+import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
 
 const KEYWORD_INTENTS: readonly KeywordIntent[] = [
   "core",
@@ -173,6 +178,7 @@ export interface KeywordResearchAttemptResult {
   readonly scoreDimensions: Record<string, number>;
   readonly isPassed: boolean;
   readonly keywords: KeywordResearchOutput["keywords"];
+  readonly xpAwarded: number | null;
   readonly feedback: {
     readonly passed: boolean;
     readonly overallScore: number;
@@ -357,7 +363,28 @@ export async function keywordResearchAttempt(
   }
   const feedback = feedbackResult.value.feedback;
 
-  // ── 11. Return results ──────────────────────────────────────────────
+  // ── 11. Award Challenge-mode XP (once per simulator, first pass only) ─
+  let xpAwarded: number | null = null;
+  if (resolvedMode === "challenge" && feedback.passed) {
+    const alreadyEarnedResult = await hasEverPassedSimulatorInMode(
+      { attemptRepo: container.simulatorAttemptRepo, scorePolicyRepo: container.scorePolicyRepo },
+      { userId, simulatorId: "keyword-research", mode: "challenge", excludeAttemptId: attemptId },
+    );
+    const alreadyEarned = Result.isOk(alreadyEarnedResult) && alreadyEarnedResult.value;
+    if (!alreadyEarned) {
+      const xpResult = await container.awardXp.execute({
+        userId,
+        amount: XPService.SIMULATOR_CHALLENGE_PASSED_XP,
+        reason: "simulator_challenge_passed",
+        refId: attemptId,
+      });
+      if (Result.isOk(xpResult)) {
+        xpAwarded = XPService.SIMULATOR_CHALLENGE_PASSED_XP;
+      }
+    }
+  }
+
+  // ── 12. Return results ──────────────────────────────────────────────
   return {
     ok: true,
     value: {
@@ -366,6 +393,7 @@ export async function keywordResearchAttempt(
       scoreDimensions: grade.scoreDimensions,
       isPassed: grade.isPassed,
       keywords: simOutput.keywords,
+      xpAwarded,
       feedback: {
         passed: feedback.passed,
         overallScore: feedback.overallScore,
