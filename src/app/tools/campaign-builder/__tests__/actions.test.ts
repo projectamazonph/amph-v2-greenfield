@@ -3,8 +3,11 @@
  *
  * STORY-069: Campaign Builder Rebuild (Scoring Engine Integration).
  *
- * Tests both the new campaignBuilderAttempt() lifecycle function and the
- * legacy buildCampaign() backward-compatibility wrapper.
+ * STORY-085: campaignBuilderAttempt() no longer accepts
+ * productCategory/productNiche/monthlyBudget from the client — it
+ * resolves the currently published campaign-builder scenario server-side
+ * via scenarioRepo.findPublished(). The legacy buildCampaign() wrapper
+ * (which never persisted a SimulatorAttempt) is removed.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -23,15 +26,14 @@ vi.mock("@/lib/auth", () => ({
 
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
-import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
-import type { CampaignBuilderOutput } from "@/domain/simulator/campaign-builder/CampaignBuilderOutput";
-import { campaignBuilderAttempt, buildCampaign } from "../actions";
+import { campaignBuilderAttempt } from "../actions";
 
 const mockContainer = {
   startSimulatorAttempt: { execute: vi.fn() },
   gradeSimulatorAttempt: { execute: vi.fn() },
   composeAttemptFeedback: { execute: vi.fn() },
   simulatorRegistry: { get: vi.fn() },
+  scenarioRepo: { findPublished: vi.fn() },
 };
 
 const fakeSimulator = {
@@ -42,27 +44,24 @@ const fakeSimulator = {
 
 // ── Fixtures ──────────────────────────────────────────────────────────
 
-const GRADED_ATTEMPT: SimulatorAttempt = {
-  id: "sys-attempt-1",
-  attemptId: "ATT-CB001",
-  userId: "user_123",
-  simulatorId: "campaign-builder",
-  scenarioId: "campaign-builder-scenario-default",
-  scenarioVersion: 1,
-  difficulty: "beginner",
-  mode: "practice",
-  status: "graded",
-  seed: "SEED8888",
-  score: 80,
-  scoreDimensions: {
-    structureQuality: 80,
-    budgetAllocation: 90,
-    keywordRelevance: 70,
+const PUBLISHED_SCENARIO = {
+  id: "campaign-builder-scenario-default",
+  scenarioKey: "campaign-builder-scenario-default",
+  version: 1,
+  status: "published" as const,
+  simulatorId: "campaign-builder" as const,
+  name: "Launch a Sponsored Products campaign for wireless earbuds",
+  description: "Build a complete SP campaign with manual targeting and a ₱500/day budget.",
+  inputSchema: {
+    productCategory: "Electronics",
+    productNiche: "wireless earbuds",
+    monthlyBudget: 15000,
   },
-  startedAt: new Date(),
-  submittedAt: new Date(),
-  gradedAt: new Date(),
-  decisions: [],
+  outputSchema: {},
+  difficulty: "beginner" as const,
+  estimatedMinutes: 15,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const GT_CAMPAIGNS: CampaignStructure[] = [
@@ -116,16 +115,6 @@ const GT_CAMPAIGNS: CampaignStructure[] = [
   },
 ];
 
-const SIM_OUTPUT: CampaignBuilderOutput = {
-  campaigns: GT_CAMPAIGNS,
-  score: 80,
-  scoreDimensions: {
-    structureQuality: 80,
-    budgetAllocation: 90,
-    keywordRelevance: 70,
-  },
-};
-
 function happyContainer() {
   const c = mockContainer as typeof mockContainer & {
     startSimulatorAttempt: { execute: ReturnType<typeof vi.fn> };
@@ -168,6 +157,7 @@ function happyContainer() {
     }),
   );
   c.simulatorRegistry.get.mockReturnValue(fakeSimulator);
+  mockContainer.scenarioRepo.findPublished.mockResolvedValue(Result.ok(PUBLISHED_SCENARIO));
   fakeSimulator.run.mockImplementation(
     async (input: { userAdjustedCampaigns?: CampaignStructure[] }) => ({
       campaigns: GT_CAMPAIGNS,
@@ -196,9 +186,6 @@ describe("campaignBuilderAttempt", () => {
   it("returns unauthorized when user is not authenticated", async () => {
     (getSessionUserId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
     const result = await campaignBuilderAttempt({
-      productCategory: "Electronics",
-      productNiche: "wireless earbuds",
-      monthlyBudget: 3000,
       targetingStrategy: "hybrid",
       userAdjustedCampaigns: GT_CAMPAIGNS,
     });
@@ -208,46 +195,26 @@ describe("campaignBuilderAttempt", () => {
   });
 
   const validInput = {
-    productCategory: "Electronics",
-    productNiche: "wireless earbuds",
-    monthlyBudget: 3000,
     targetingStrategy: "hybrid" as const,
     userAdjustedCampaigns: GT_CAMPAIGNS,
   };
 
-  it("returns validation_error when productCategory is missing", async () => {
-    const result = await campaignBuilderAttempt({
-      productNiche: "earbuds",
-      monthlyBudget: 1000,
-      targetingStrategy: "auto",
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
-  it("returns validation_error when monthlyBudget is not positive", async () => {
-    const result = await campaignBuilderAttempt({
-      productCategory: "Electronics",
-      productNiche: "earbuds",
-      monthlyBudget: 0,
-      targetingStrategy: "auto",
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("validation_error");
-  });
-
   it("returns validation_error when targetingStrategy is invalid", async () => {
     const result = await campaignBuilderAttempt({
-      productCategory: "Electronics",
-      productNiche: "earbuds",
-      monthlyBudget: 1000,
       targetingStrategy: "invalid" as TargetingStrategy,
     });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("validation_error");
+  });
+
+  it("returns attempt_error when no published scenario exists", async () => {
+    happyContainer();
+    mockContainer.scenarioRepo.findPublished.mockResolvedValueOnce(Result.ok(null));
+    const result = await campaignBuilderAttempt(validInput);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("attempt_error");
   });
 
   it("happy path: starts attempt, grades, composes feedback, returns result", async () => {
@@ -257,9 +224,19 @@ describe("campaignBuilderAttempt", () => {
     if (!result.ok) return;
 
     expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalledWith(
-      expect.objectContaining({ simulatorId: "campaign-builder", mode: "practice" }),
+      expect.objectContaining({
+        simulatorId: "campaign-builder",
+        mode: "practice",
+        scenarioId: "campaign-builder-scenario-default",
+      }),
     );
-    expect(fakeSimulator.run).toHaveBeenCalled();
+    expect(fakeSimulator.run).toHaveBeenCalledWith(
+      expect.objectContaining({
+        productCategory: "Electronics",
+        productNiche: "wireless earbuds",
+        monthlyBudget: 15000,
+      }),
+    );
     expect(mockContainer.gradeSimulatorAttempt.execute).toHaveBeenCalled();
     expect(mockContainer.composeAttemptFeedback.execute).toHaveBeenCalledWith({
       attemptId: "ATT-CB001",
@@ -294,18 +271,14 @@ describe("campaignBuilderAttempt", () => {
     expect(result.error.kind).toBe("grading_error");
   });
 
-  it("preview mode (no userAdjustedCampaigns) skips grading and feedback", async () => {
+  it("preview mode (no userAdjustedCampaigns) skips grading and feedback, but still persists an attempt", async () => {
     happyContainer();
-    const previewInput = {
-      productCategory: "Electronics",
-      productNiche: "wireless earbuds",
-      monthlyBudget: 3000,
-      targetingStrategy: "hybrid" as const,
-    };
+    const previewInput = { targetingStrategy: "hybrid" as const };
     const result = await campaignBuilderAttempt(previewInput);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
+    expect(mockContainer.startSimulatorAttempt.execute).toHaveBeenCalled();
     expect(mockContainer.gradeSimulatorAttempt.execute).not.toHaveBeenCalled();
     expect(mockContainer.composeAttemptFeedback.execute).not.toHaveBeenCalled();
     expect(result.value.scoreDimensions).toBeNull();
@@ -319,70 +292,6 @@ describe("campaignBuilderAttempt", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.campaigns).toHaveLength(3);
-  });
-});
-
-// ── buildCampaign (legacy) tests ──────────────────────────────────────
-
-describe("buildCampaign (legacy)", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    setupGetContainer();
-    mockContainer.simulatorRegistry.get.mockReturnValue(fakeSimulator);
-    fakeSimulator.run.mockResolvedValue({
-      campaigns: GT_CAMPAIGNS,
-      score: 90,
-      scoreDimensions: null,
-    });
-  });
-
-  it("returns invalid_input when productCategory is empty", async () => {
-    const result = await buildCampaign({
-      productCategory: "",
-      productNiche: "earbuds",
-      monthlyBudget: 1000,
-      targetingStrategy: "auto",
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns invalid_input when monthlyBudget is 0", async () => {
-    const result = await buildCampaign({
-      productCategory: "Electronics",
-      productNiche: "earbuds",
-      monthlyBudget: 0,
-      targetingStrategy: "auto",
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns invalid_input when targetingStrategy is invalid", async () => {
-    const result = await buildCampaign({
-      productCategory: "Electronics",
-      productNiche: "earbuds",
-      monthlyBudget: 1000,
-      targetingStrategy: "invalid" as TargetingStrategy,
-    });
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error.kind).toBe("invalid_input");
-  });
-
-  it("returns campaigns for valid input", async () => {
-    const result = await buildCampaign({
-      productCategory: "Electronics",
-      productNiche: "wireless earbuds",
-      monthlyBudget: 3000,
-      targetingStrategy: "hybrid",
-    });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.campaigns).toHaveLength(3);
-    expect(result.value.scoreDimensions).toBeNull();
   });
 });
 

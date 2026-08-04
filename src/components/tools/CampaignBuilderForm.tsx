@@ -1,9 +1,11 @@
 /**
  * CampaignBuilderForm — client component.
  *
- * 4-input form: product category, niche, monthly budget, targeting
- * strategy. Submits to the buildCampaign action and renders the
- * resulting campaign structure.
+ * Product category/niche/budget come from the scenario (server-resolved,
+ * not student-editable — see STORY-085) and are shown read-only; the
+ * student's real input is the targeting strategy. Submits to
+ * campaignBuilderAttempt() (the graded, persisted-attempt lifecycle) and
+ * renders the resulting campaign structure.
  */
 
 "use client";
@@ -11,7 +13,10 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import styles from "./CampaignBuilderForm.module.css";
-import { buildCampaign, type BuildCampaignResult } from "@/app/tools/campaign-builder/actions";
+import {
+  campaignBuilderAttempt,
+  type CampaignBuilderAttemptResponse,
+} from "@/app/tools/campaign-builder/actions";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 
 interface Props {
@@ -29,28 +34,20 @@ const TARGETING: ReadonlyArray<{ value: Targeting; label: string; blurb: string 
 ];
 
 export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudget }: Props) {
-  const [category, setCategory] = useState(productCategory);
-  const [niche, setNiche] = useState(productNiche);
-  const [budget, setBudget] = useState(monthlyBudget);
   const [targeting, setTargeting] = useState<Targeting>("manual");
   const [pending, startTransition] = useTransition();
-  const [result, setResult] = useState<BuildCampaignResult | null>(null);
+  const [result, setResult] = useState<CampaignBuilderAttemptResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const r = await buildCampaign({
-        productCategory: category,
-        productNiche: niche,
-        monthlyBudget: budget,
-        targetingStrategy: targeting,
-      });
+      const r = await campaignBuilderAttempt({ targetingStrategy: targeting });
       if (r.ok) {
         setResult(r);
       } else {
-        setError(r.error.message);
+        setError("message" in r.error ? r.error.message : "Could not build this campaign.");
       }
     });
   };
@@ -63,37 +60,19 @@ export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudg
           id="cb-category"
           help="High-level taxonomy (Electronics, Home, etc.)"
         >
-          <input
-            id="cb-category"
-            className={styles.input}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
+          <span className={styles.input}>{productCategory}</span>
         </Field>
         <Field
           label="Product niche"
           id="cb-niche"
           help="Specific audience (wireless earbuds, yoga mats)"
         >
-          <input
-            id="cb-niche"
-            className={styles.input}
-            value={niche}
-            onChange={(e) => setNiche(e.target.value)}
-          />
+          <span className={styles.input}>{productNiche}</span>
         </Field>
         <Field label="Monthly budget" id="cb-budget" help="₱ value, total">
           <span className={styles.inputWrap}>
             <span className={styles.prefix}>₱</span>
-            <input
-              id="cb-budget"
-              type="number"
-              min="100"
-              step="100"
-              className={styles.inputNum}
-              value={budget}
-              onChange={(e) => setBudget(Number(e.target.value))}
-            />
+            <span className={styles.inputNum}>{monthlyBudget}</span>
           </span>
         </Field>
       </div>
@@ -127,14 +106,14 @@ export function CampaignBuilderForm({ productCategory, productNiche, monthlyBudg
         {result && result.ok ? (
           <div
             className={`${styles.score} ${
-              result.value.score >= 80
+              result.value.overallScore >= 80
                 ? styles.scoreSuccess
-                : result.value.score >= 50
+                : result.value.overallScore >= 50
                   ? styles.scoreWarning
                   : styles.scoreDanger
             }`}
           >
-            Score: {result.value.score}%
+            Score: {result.value.overallScore}%
           </div>
         ) : null}
       </div>

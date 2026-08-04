@@ -9,8 +9,26 @@
  *   3. GradeSimulatorAttempt — persists the grade with score dimensions
  *   4. ComposeAttemptFeedback — generates actionable student feedback
  *
- * Legacy `buildCampaign()` is kept for backward compatibility. It calls the
- * simulator directly with no user adjustments, so scoreDimensions is always null.
+ * STORY-085: the legacy `buildCampaign()` wrapper is removed — it never
+ * persisted a SimulatorAttempt at all, so every campaign-builder "run" was
+ * silently unattemptable/unattempted. CampaignBuilderForm now calls
+ * `campaignBuilderAttempt()` directly, giving campaign-builder its first
+ * real persisted-attempt path. `productCategory`/`productNiche`/
+ * `monthlyBudget` are no longer accepted from the client — they're the
+ * scenario's actual content (per SCENARIO in the old page.tsx, that's
+ * genuinely all a campaign-builder scenario carries), so trusting them
+ * from the client would let a forged budget/niche pick an easier scoring
+ * target. Both are now resolved server-side from the currently published
+ * campaign-builder SimulatorScenario. Only `targetingStrategy` (the
+ * student's real choice) and, once a manual campaign editor exists,
+ * `userAdjustedCampaigns` remain client input.
+ *
+ * No manual campaign-structure editor exists in the UI yet (a
+ * `userAdjustedCampaigns` submission form is a real, separate feature —
+ * out of scope for this story), so `campaignBuilderAttempt()` is called
+ * without it: scoreDimensions/feedback stay null (same as before), but
+ * unlike the removed `buildCampaign()`, a real SimulatorAttempt is now
+ * persisted every time a student runs this simulator.
  */
 
 "use server";
@@ -20,31 +38,15 @@ import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
-import type {
-  CampaignBuilderInput,
-  TargetingStrategy,
-} from "@/domain/simulator/campaign-builder/CampaignBuilderInput";
+import type { CampaignBuilderInput } from "@/domain/simulator/campaign-builder/CampaignBuilderInput";
 import type {
   CampaignBuilderOutput,
   CampaignStructure,
   ScoreDimensions,
 } from "@/domain/simulator/campaign-builder/CampaignBuilderOutput";
+import { campaignBuilderScenarioContentSchema } from "./scenarioContent";
 
 // ── Input types ─────────────────────────────────────────────────────────
-
-export interface CampaignBuilderAttemptInput {
-  readonly productCategory: string;
-  readonly productNiche: string;
-  readonly monthlyBudget: number;
-  readonly targetingStrategy: TargetingStrategy;
-  readonly scenarioId?: string;
-  /** Defaults to "practice" */
-  readonly mode?: SimulatorMode;
-  /** Student's self-built campaign structure (submitted for grading) */
-  readonly userAdjustedCampaigns?: ReadonlyArray<CampaignStructure>;
-}
-
-// ── Response types ─────────────────────────────────────────────────────
 
 export interface CampaignBuilderAttemptResult {
   readonly attemptId: string;
@@ -101,11 +103,7 @@ const campaignStructureSchema = z.object({
 });
 
 const campaignBuilderAttemptSchema = z.object({
-  productCategory: z.string().min(1),
-  productNiche: z.string().min(1),
-  monthlyBudget: z.number().positive(),
   targetingStrategy: z.enum(["auto", "manual", "hybrid"]),
-  scenarioId: z.string().optional(),
   mode: z.enum(["guided", "practice", "challenge", "credential", "instructor"]).optional(),
   userAdjustedCampaigns: z.array(campaignStructureSchema).optional(),
 });
@@ -127,15 +125,7 @@ export async function campaignBuilderAttempt(
     };
   }
 
-  const {
-    productCategory,
-    productNiche,
-    monthlyBudget,
-    targetingStrategy,
-    scenarioId,
-    mode,
-    userAdjustedCampaigns,
-  } = parseResult.data;
+  const { targetingStrategy, mode, userAdjustedCampaigns } = parseResult.data;
   const resolvedMode: SimulatorMode = mode ?? "practice";
   const container = buildContainer();
 
@@ -145,11 +135,30 @@ export async function campaignBuilderAttempt(
     return { ok: false, error: { kind: "unauthorized" } };
   }
 
-  // ── 3. StartSimulatorAttempt ────────────────────────────────────────
+  // ── 3. Resolve the published scenario server-side ───────────────────
+  const scenarioResult = await container.scenarioRepo.findPublished("campaign-builder");
+  if (!scenarioResult.ok || !scenarioResult.value) {
+    return {
+      ok: false,
+      error: { kind: "attempt_error", message: "No published campaign-builder scenario found" },
+    };
+  }
+  const parsedContent = campaignBuilderScenarioContentSchema.safeParse(
+    scenarioResult.value.inputSchema,
+  );
+  if (!parsedContent.success) {
+    return {
+      ok: false,
+      error: { kind: "attempt_error", message: "Published scenario content is malformed" },
+    };
+  }
+  const { productCategory, productNiche, monthlyBudget } = parsedContent.data;
+
+  // ── 4. StartSimulatorAttempt ────────────────────────────────────────
   const startResult = await container.startSimulatorAttempt.execute({
     userId,
     simulatorId: "campaign-builder",
-    scenarioId: scenarioId ?? "campaign-builder-scenario-default",
+    scenarioId: scenarioResult.value.id,
     mode: resolvedMode,
   });
 
@@ -162,7 +171,7 @@ export async function campaignBuilderAttempt(
 
   const attemptId = startResult.value.attemptId;
 
-  // ── 3. Run simulator ───────────────────────────────────────────────
+  // ── 5. Run simulator ───────────────────────────────────────────────
   const sim = container.simulatorRegistry.get("campaign-builder");
   if (!sim) {
     return {
@@ -192,7 +201,7 @@ export async function campaignBuilderAttempt(
     };
   }
 
-  // ── 4. GradeSimulatorAttempt ────────────────────────────────────────
+  // ── 6. GradeSimulatorAttempt ────────────────────────────────────────
   let feedback: CampaignBuilderAttemptResult["feedback"] = null;
 
   if (simOutput.scoreDimensions !== null) {
@@ -218,7 +227,7 @@ export async function campaignBuilderAttempt(
       };
     }
 
-    // ── 5. ComposeAttemptFeedback ───────────────────────────────────
+    // ── 7. ComposeAttemptFeedback ───────────────────────────────────
     const feedbackResult = await container.composeAttemptFeedback.execute({ attemptId });
     if (Result.isErr(feedbackResult)) {
       return {
@@ -239,7 +248,7 @@ export async function campaignBuilderAttempt(
     };
   }
 
-  // ── 6. Return results ────────────────────────────────────────────────
+  // ── 8. Return results ────────────────────────────────────────────────
   return {
     ok: true,
     value: {
@@ -254,73 +263,4 @@ export async function campaignBuilderAttempt(
       feedback,
     },
   };
-}
-
-// ── Legacy: buildCampaign ────────────────────────────────────────────────
-
-export type BuildCampaignInput = {
-  productCategory: string;
-  productNiche: string;
-  monthlyBudget: number;
-  targetingStrategy: TargetingStrategy;
-};
-
-export type BuildCampaignResult =
-  | { ok: true; value: CampaignBuilderOutput }
-  | { ok: false; error: { kind: "invalid_input" | "engine_error"; message: string } };
-
-const VALID_STRATEGIES: ReadonlyArray<TargetingStrategy> = ["auto", "manual", "hybrid"];
-
-/**
- * Legacy server action — kept for backward compatibility.
- * Calls the simulator directly with no user adjustments, so scoreDimensions
- * is always null (preview/exploration mode).
- */
-export async function buildCampaign(input: BuildCampaignInput): Promise<BuildCampaignResult> {
-  if (
-    !input ||
-    typeof input.productCategory !== "string" ||
-    input.productCategory.length === 0 ||
-    typeof input.productNiche !== "string" ||
-    input.productNiche.length === 0 ||
-    typeof input.monthlyBudget !== "number" ||
-    input.monthlyBudget <= 0 ||
-    !VALID_STRATEGIES.includes(input.targetingStrategy)
-  ) {
-    return {
-      ok: false,
-      error: {
-        kind: "invalid_input",
-        message: "Need product category, niche, budget > 0, and a valid targeting strategy",
-      },
-    };
-  }
-
-  const container = buildContainer();
-  const sim = container.simulatorRegistry.get("campaign-builder");
-  if (!sim) {
-    return {
-      ok: false,
-      error: { kind: "engine_error", message: "Campaign Builder simulator not registered" },
-    };
-  }
-
-  const domainInput: CampaignBuilderInput = {
-    productCategory: input.productCategory,
-    productNiche: input.productNiche,
-    monthlyBudget: input.monthlyBudget,
-    targetingStrategy: input.targetingStrategy,
-  };
-  try {
-    const output = (await sim.run(domainInput)) as CampaignBuilderOutput;
-    return { ok: true, value: output };
-  } catch (err) {
-    return {
-      ok: false,
-      error: {
-        kind: "engine_error",
-        message: err instanceof Error ? err.message : String(err),
-      },
-    };
-  }
 }
