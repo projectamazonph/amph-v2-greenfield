@@ -89,18 +89,24 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <p className={styles.description}>{detail.description}</p>
 
                 <div className={styles.meta}>
-                  <span className={styles.metaItem}>
-                    <BookIcon /> {totalLessonCount} lesson{totalLessonCount !== 1 ? "s" : ""}
-                  </span>
-                  <span className={styles.metaDivider}>·</span>
-                  <span className={styles.metaItem}>
-                    ≈ {Math.ceil(modules.flatMap((m) => m.lessons).length * 0.5)} hours
-                  </span>
-                  {totalEstimatedMinutes > 0 && (
-                    <span className={styles.metaItem}>
-                      <ClockIcon /> {hours > 0 ? `${hours}h ` : ""}
-                      {minutes}m video
-                    </span>
+                  {totalLessonCount > 0 ? (
+                    <>
+                      <span className={styles.metaItem}>
+                        <BookIcon /> {totalLessonCount} lesson{totalLessonCount !== 1 ? "s" : ""}
+                      </span>
+                      <span className={styles.metaDivider}>·</span>
+                      <span className={styles.metaItem}>
+                        ≈ {Math.ceil(modules.flatMap((m) => m.lessons).length * 0.5)} hours
+                      </span>
+                      {totalEstimatedMinutes > 0 && (
+                        <span className={styles.metaItem}>
+                          <ClockIcon /> {hours > 0 ? `${hours}h ` : ""}
+                          {minutes}m video
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className={styles.metaItem}>Live cohort + 1:1 review</span>
                   )}
                   <span className={styles.price}>{priceDisplay}</span>
                 </div>

@@ -158,7 +158,7 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
   return (
     <div className={styles.player}>
       <header className={styles.header}>
-        <span className={styles.kicker}>Knowledge check</span>
+        <span className={styles.kicker}>Quick check</span>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.progressRow}>
           <span className={styles.progress}>

@@ -4,6 +4,25 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-05: Course detail zero-meta + voice fixes (STORY-102)
+
+Three follow-up fixes from the 2026-08-05 audit pass on the live
+deployment, after STORY-101 shipped:
+
+- **Course detail `0 lessons · ≈ 0 hours` on Ultimate.** Same class
+  of bug as STORY-101, but on `/courses/[slug]`. The detail page
+  header meta now branches on `totalLessonCount > 0` and shows
+  `Live cohort + 1:1 review` for live tiers; the `≈ X hours` and
+  `Xh Ym video` lines are hidden for the same reason. Visiting
+  `/courses/ultimate-transformation` no longer shows a misleading
+  `0 lessons · ≈ 0 hours` next to the Buy button.
+- **`Knowledge check` → `Quick check` (LessonContent).** The QUIZ
+  lesson card title used "Knowledge check", an AI-slop tell per
+  the voice guide. Replaced with `Quick check` — direct, describes
+  the action.
+- **`Knowledge check` → `Quick check` (QuizPlayer).** Same fix in
+  the standalone quiz player kicker.
+
 ### 2026-08-05: /courses catalog launch-bug fixes (STORY-101)
 
 Two student-facing bugs found by a production smoke test on
