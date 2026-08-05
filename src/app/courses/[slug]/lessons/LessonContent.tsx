@@ -44,20 +44,14 @@ interface QuizLessonContent {
   quizHref: string;
 }
 
-type LessonContentForRender =
-  | TextLessonContent
-  | VideoLessonContent
-  | QuizLessonContent;
+type LessonContentForRender = TextLessonContent | VideoLessonContent | QuizLessonContent;
 
 function isTextContent(c: DomainLessonContent): c is TextContent {
   return "body" in c && typeof (c as TextContent).body === "string";
 }
 
 function isVideoContent(c: DomainLessonContent): c is VideoContent {
-  return (
-    "durationMinutes" in c &&
-    typeof (c as VideoContent).durationMinutes === "number"
-  );
+  return "durationMinutes" in c && typeof (c as VideoContent).durationMinutes === "number";
 }
 
 function isQuizContent(c: DomainLessonContent): c is { questions: readonly QuizQuestion[] } {
@@ -128,9 +122,7 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
       </div>
       {content.transcript && (
         <details className={styles.transcript}>
-          <summary className={styles.transcriptSummary}>
-            Show transcript
-          </summary>
+          <summary className={styles.transcriptSummary}>Show transcript</summary>
           <div className={styles.transcriptBody}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content.transcript}</ReactMarkdown>
           </div>
@@ -140,13 +132,7 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
   );
 }
 
-function QuizContent({
-  content,
-  quizHref,
-}: {
-  content: QuizLessonContent;
-  quizHref: string;
-}) {
+function QuizContent({ content, quizHref }: { content: QuizLessonContent; quizHref: string }) {
   const questionCount = content.questions.length;
   const firstQuestion = content.questions[0];
 
@@ -154,7 +140,7 @@ function QuizContent({
     <div className={styles.quizCard}>
       <QuizIcon />
       <div className={styles.quizIntro}>
-        <h3 className={styles.quizTitle}>Knowledge check</h3>
+        <h3 className={styles.quizTitle}>Quick check</h3>
         <p className={styles.quizSubtitle}>
           {questionCount === 1
             ? "1 question in this lesson"
@@ -176,9 +162,7 @@ function QuizContent({
               <span className={styles.quizQuestionNumber} aria-hidden="true">
                 {i + 1}
               </span>
-              <div className={styles.quizQuestionPrompt}>
-                {q.prompt}
-              </div>
+              <div className={styles.quizQuestionPrompt}>{q.prompt}</div>
             </li>
           ))}
           {content.questions.length > 2 && (
@@ -293,10 +277,7 @@ export function LessonContent({ lesson, courseSlug }: LessonContentProps) {
       questions: quizContent.questions,
       quizHref,
     };
-  } else if (
-    isVideoContent(rawContent as DomainLessonContent) &&
-    lesson.type === "VIDEO"
-  ) {
+  } else if (isVideoContent(rawContent as DomainLessonContent) && lesson.type === "VIDEO") {
     const vc = rawContent as VideoContent & { videoUrl?: string };
     renderable = {
       type: "VIDEO",
@@ -304,10 +285,7 @@ export function LessonContent({ lesson, courseSlug }: LessonContentProps) {
       durationMinutes: vc.durationMinutes,
       transcript: (vc as { transcript?: string }).transcript,
     };
-  } else if (
-    isTextContent(rawContent as DomainLessonContent) &&
-    lesson.type === "TEXT"
-  ) {
+  } else if (isTextContent(rawContent as DomainLessonContent) && lesson.type === "TEXT") {
     const tc = rawContent as TextContent;
     renderable = { type: "TEXT", body: tc.body };
   } else {

@@ -40,9 +40,7 @@ describe("LessonContent (render)", () => {
       type: "TEXT",
       content: { body: "# Heading\n\nBody text" },
     });
-    const html = renderToString(
-      <LessonContent lesson={lesson} courseSlug={courseSlug} />,
-    );
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
     expect(html).toContain("Heading");
     expect(html).toContain("Body text");
     // No quiz placeholder text should appear for a TEXT lesson.
@@ -57,9 +55,7 @@ describe("LessonContent (render)", () => {
         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       } as unknown as Lesson["content"],
     });
-    const html = renderToString(
-      <LessonContent lesson={lesson} courseSlug={courseSlug} />,
-    );
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
     expect(html).toContain("youtube.com/embed/dQw4w9WgXcQ");
     // React renders adjacent text nodes as "12<!-- -->m" — accept either form.
     expect(html).toMatch(/12(?:<!-- -->)?m/);
@@ -71,9 +67,7 @@ describe("LessonContent (render)", () => {
       type: "TEXT",
       content: { unexpectedShape: true } as unknown as Lesson["content"],
     });
-    const html = renderToString(
-      <LessonContent lesson={lesson} courseSlug={courseSlug} />,
-    );
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
     expect(html).toContain("Lesson content unavailable.");
   });
 
@@ -94,15 +88,11 @@ describe("LessonContent (render)", () => {
         ],
       },
     });
-    const html = renderToString(
-      <LessonContent lesson={lesson} courseSlug={courseSlug} />,
-    );
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
 
     // CTA exists with the right link
     expect(html).toContain("Start Quiz");
-    expect(html).toContain(
-      `/courses/${courseSlug}/lessons/quiz-lesson/quiz`,
-    );
+    expect(html).toContain(`/courses/${courseSlug}/lessons/quiz-lesson/quiz`);
   });
 
   it("shows QUIZ question count in plural form for multiple questions", () => {
@@ -118,9 +108,7 @@ describe("LessonContent (render)", () => {
         ],
       },
     });
-    const html = renderToString(
-      <LessonContent lesson={lesson} courseSlug={courseSlug} />,
-    );
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
     expect(html).toContain("5 questions in this lesson");
     // Only first 2 questions preview
     expect(html).toContain("Q1");
@@ -144,9 +132,7 @@ describe("LessonContent (render)", () => {
         ],
       },
     });
-    const html = renderToString(
-      <LessonContent lesson={lesson} courseSlug={courseSlug} />,
-    );
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
     expect(html).toContain("1 question in this lesson");
     expect(html).not.toContain("1 questions");
   });
@@ -155,16 +141,28 @@ describe("LessonContent (render)", () => {
     const lesson = makeLesson({
       type: "QUIZ",
       content: {
-        questions: [
-          { id: "q1", prompt: "Q", options: ["a", "b"], correctOptionIndex: 0 },
-        ],
+        questions: [{ id: "q1", prompt: "Q", options: ["a", "b"], correctOptionIndex: 0 }],
       },
     });
-    const html = renderToString(
-      <LessonContent lesson={lesson} courseSlug={courseSlug} />,
-    );
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
     // Story-094 acceptance: the "coming soon" placeholder is gone.
     expect(html).not.toContain("coming soon");
     expect(html).not.toContain("Interactive quiz");
+  });
+
+  it("uses direct voice for the quiz card title (no 'Knowledge check' slop)", () => {
+    // The voice guide (§marketing-ese / sentence-level) bans the
+    // "knowledge check" framing — it's a tell of AI-generated copy.
+    // The card title should describe the action instead.
+    const lesson = makeLesson({
+      type: "QUIZ",
+      content: {
+        questions: [{ id: "q1", prompt: "Q", options: ["a", "b"], correctOptionIndex: 0 }],
+      },
+    });
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
+    expect(html).not.toContain("Knowledge check");
+    expect(html).not.toContain("knowledge check");
+    expect(html).toContain("Quick check");
   });
 });

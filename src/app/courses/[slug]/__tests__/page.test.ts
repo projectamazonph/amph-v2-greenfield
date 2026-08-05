@@ -48,3 +48,42 @@ describe("/courses/[slug] page — SOLID regression guard", () => {
     // (the regression guard on line 31 catches that).
   });
 });
+
+describe("/courses/[slug] page — header meta for live-cohort tiers", () => {
+  // The Ultimate Transformation tier is live-cohort only (no on-demand
+  // lessons in the DB). The detail-page meta line must not render a
+  // bare "0 lessons · ≈ 0 hours" — show the tier-appropriate label
+  // instead, matching the /courses catalog card fix (STORY-101).
+  it("branches on totalLessonCount > 0 in the meta block", async () => {
+    const pagePath = path.resolve(process.cwd(), "src/app/courses/[slug]/page.tsx");
+    const source = await fs.readFile(pagePath, "utf8");
+    expect(source).toMatch(/totalLessonCount\s*>\s*0/);
+  });
+
+  it("DOES show 'Live cohort' label when totalLessonCount is 0", async () => {
+    const pagePath = path.resolve(process.cwd(), "src/app/courses/[slug]/page.tsx");
+    const source = await fs.readFile(pagePath, "utf8");
+    expect(source).toMatch(/Live cohort/);
+  });
+
+  it("DOES NOT render the ≈ hours line inside the zero-lesson branch", async () => {
+    // The hours line is gated on totalLessonCount > 0, so the
+    // "≈ ... hours" computation only runs for tiers that have lessons.
+    const pagePath = path.resolve(process.cwd(), "src/app/courses/[slug]/page.tsx");
+    const source = await fs.readFile(pagePath, "utf8");
+    // Find the meta block (between the two relevant { markers)
+    const metaStart = source.indexOf("<div className={styles.meta}>");
+    const metaEnd = source.indexOf("</div>", metaStart);
+    expect(metaStart).toBeGreaterThan(-1);
+    expect(metaEnd).toBeGreaterThan(metaStart);
+    const meta = source.slice(metaStart, metaEnd);
+    // Find the else branch (the zero-lesson branch)
+    const elseStart = meta.indexOf(": (");
+    const elseEnd = meta.lastIndexOf(")}");
+    expect(elseStart).toBeGreaterThan(-1);
+    expect(elseEnd).toBeGreaterThan(elseStart);
+    const elseBlock = meta.slice(elseStart, elseEnd);
+    expect(elseBlock).not.toMatch(/Math\.ceil/);
+    expect(elseBlock).not.toMatch(/hours/);
+  });
+});
