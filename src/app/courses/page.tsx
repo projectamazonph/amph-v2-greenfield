@@ -25,7 +25,8 @@ import { StudentShell } from "@/components/student/StudentShell";
 
 export const metadata: Metadata = {
   title: "Courses — Project Amazon PH Academy",
-  description: "Expert-led Amazon FBA courses taught in Filipino.",
+  description:
+    "Expert-led Amazon PPC training for Filipino VAs. Agency-side ads work, taught in Filipino.",
 };
 
 export default async function CoursesPage() {
@@ -35,7 +36,7 @@ export default async function CoursesPage() {
   if (!result.ok) {
     return (
       <StudentShell requireAuth={false}>
-      <main className={styles.errorPage}>
+        <main className={styles.errorPage}>
           <p className={styles.errorText}>Unable to load courses. Please try again later.</p>
         </main>
       </StudentShell>
@@ -51,7 +52,8 @@ export default async function CoursesPage() {
         <section className={styles.hero}>
           <h1 className={styles.heroTitle}>Course Catalog</h1>
           <p className={styles.heroSubtitle}>
-            Expert-led Amazon FBA training, taught in Filipino. Learn at your own pace.
+            Expert-led Amazon PPC training for Filipino VAs. Agency-side work, taught in Filipino.
+            Learn at your own pace.
           </p>
         </section>
 
@@ -129,14 +131,20 @@ function CourseCard({
         {course.tagline && <p className={styles.cardTagline}>{course.tagline}</p>}
 
         <div className={styles.cardMeta}>
-          <span>
-            {lessonCount} lesson{lessonCount !== 1 ? "s" : ""}
-          </span>
-          {estimatedMinutes > 0 && (
-            <span>
-              {hours > 0 ? `${hours}h ` : ""}
-              {minutes}m video
-            </span>
+          {lessonCount > 0 ? (
+            <>
+              <span>
+                {lessonCount} lesson{lessonCount !== 1 ? "s" : ""}
+              </span>
+              {estimatedMinutes > 0 && (
+                <span>
+                  {hours > 0 ? `${hours}h ` : ""}
+                  {minutes}m video
+                </span>
+              )}
+            </>
+          ) : (
+            <span>Live cohort + 1:1 review</span>
           )}
         </div>
       </div>

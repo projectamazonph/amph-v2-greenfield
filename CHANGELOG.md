@@ -4,6 +4,22 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-05: /courses catalog launch-bug fixes (STORY-101)
+
+Two student-facing bugs found by a production smoke test on
+`https://projectamazonph.vercel.app`:
+
+- **`0 lessons` on Ultimate card.** The catalog card meta rendered a bare
+  "0 lessons" for the `Ultimate Transformation` tier. The tier is a
+  live-cohort offering (no on-demand lessons in the DB) so the count is
+  correct, but the visible "0 lessons" reads as broken. The card now
+  shows `Live cohort + 1:1 review` for tiers with zero on-demand lessons.
+- **"Amazon FBA training" copy.** The `/courses` metadata description and
+  hero subtitle called the offering "Expert-led Amazon FBA training."
+  The landing FAQ is explicit: we teach agency-side PPC for VAs, not
+  Amazon FBA selling. Both strings re-aligned to "Amazon PPC training
+  for Filipino VAs. Agency-side work, taught in Filipino."
+
 ### 2026-08-04: Review-comment fixes across PRs #285/#286/#288
 
 XP double-award race, unbounded uploads, fail-open storage, and two admin
