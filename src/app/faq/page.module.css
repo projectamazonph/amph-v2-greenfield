@@ -94,7 +94,9 @@
 }
 
 .itemBody {
-  padding-left: calc(1.5rem + var(--space-4));
+  /* Lines answer text up under the question, past the number + gap
+     (--space-10 is exactly the width that combination occupied). */
+  padding-left: var(--space-10);
 }
 
 .paragraph {
