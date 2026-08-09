@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./FAQSection.module.css";
@@ -71,6 +72,11 @@ export function FAQSection() {
             </details>
           ))}
         </Reveal>
+
+        <p className={styles.moreLink}>
+          Want the longer, harder answers, including what I still haven&rsquo;t fixed?{" "}
+          <Link href="/faq">Read the full FAQ</Link>
+        </p>
       </div>
     </section>
   );

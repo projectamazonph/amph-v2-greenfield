@@ -84,3 +84,16 @@
   font-size: 15px;
   max-width: 64ch;
 }
+
+.moreLink {
+  margin: 24px 4px 0;
+  font-size: 14px;
+  color: var(--ink-500);
+}
+
+.moreLink a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

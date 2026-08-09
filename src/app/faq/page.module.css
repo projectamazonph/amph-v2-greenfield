@@ -1,0 +1,202 @@
+/**
+ * /faq — long-form FAQ styles.
+ * Design tokens only, no hardcoded colors. Mirrors the hero pattern
+ * from /courses/page.module.css and the numbered-item rhythm of
+ * FAQSection.module.css, at article length instead of accordion length.
+ */
+
+.page {
+  min-height: 100vh;
+  background: var(--surface-0);
+  font-family: var(--font-body);
+}
+
+/* Hero */
+
+.hero {
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-16) var(--space-6) var(--space-12);
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-3);
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-4) 0;
+  letter-spacing: -0.01em;
+  line-height: var(--leading-tight);
+  max-width: 46ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-wrap: balance;
+}
+
+.heroSubtitle {
+  font-size: var(--text-lg);
+  color: var(--ink-700);
+  max-width: 60ch;
+  margin: 0 auto;
+  line-height: var(--leading-normal);
+}
+
+/* Q&A list */
+
+.list {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.item {
+  scroll-margin-top: var(--space-8);
+}
+
+.itemHead {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-4);
+  align-items: baseline;
+  margin-bottom: var(--space-4);
+}
+
+.itemNumber {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.itemQuestion {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--ink-900);
+  margin: 0;
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+.itemBody {
+  padding-left: calc(1.5rem + var(--space-4));
+}
+
+.paragraph {
+  font-size: var(--text-base);
+  color: var(--ink-700);
+  line-height: var(--leading-normal);
+  max-width: 66ch;
+  margin: 0 0 var(--space-4);
+}
+
+.paragraph:last-of-type {
+  margin-bottom: 0;
+}
+
+.status {
+  margin-top: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.statusLine {
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  line-height: var(--leading-snug);
+  margin: 0;
+  max-width: 62ch;
+}
+
+.statusLabel {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--ink-900);
+}
+
+.statusLabelOpen {
+  color: var(--accent);
+}
+
+/* Closing position */
+
+.position {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-6) var(--space-20);
+  border-top: 1px solid var(--border);
+}
+
+.positionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--ink-900);
+  margin: var(--space-8) 0 var(--space-4);
+}
+
+.positionActions {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.positionLink {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--space-5);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+
+.positionLinkGhost {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--space-5);
+  background: transparent;
+  color: var(--ink-900);
+  border: 1px solid var(--border-strong);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+
+@media (max-width: 560px) {
+  .itemHead {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .itemBody {
+    padding-left: 0;
+  }
+}
