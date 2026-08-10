@@ -21,6 +21,7 @@ import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { Course } from "@/domain/entities/Course";
+import { subscriptionMeetsCourseTier } from "@/domain/values/CourseAccessTier";
 
 export type AuthorizeLessonAccessInput = {
   /** Empty string = anonymous. */
@@ -35,9 +36,7 @@ export type AuthorizeLessonAccessDecision =
   | { readonly kind: "denied"; readonly reason: "preview_limit" | "not_enrolled" };
 
 export type AuthorizeLessonAccessError =
-  | { kind: "course_not_found" }
-  | { kind: "lesson_not_found" }
-  | { kind: "user_not_found" };
+  { kind: "course_not_found" } | { kind: "lesson_not_found" } | { kind: "user_not_found" };
 
 export type AuthorizeLessonAccessResult = Result<
   AuthorizeLessonAccessDecision,
@@ -95,6 +94,13 @@ export class AuthorizeLessonAccess {
       input.courseId,
     );
     if (enrollment !== null && enrollment.status === "active") {
+      return Result.ok({ kind: "allowed" });
+    }
+
+    if (
+      course.courseTier !== "PREVIEW" &&
+      subscriptionMeetsCourseTier(user.subscriptionTier, course.courseTier)
+    ) {
       return Result.ok({ kind: "allowed" });
     }
 

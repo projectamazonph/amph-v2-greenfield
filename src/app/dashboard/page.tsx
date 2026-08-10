@@ -16,7 +16,6 @@ import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
 import type { Course } from "@/domain/entities/Course";
 import type { Enrollment } from "@/domain/entities/Enrollment";
-import { Result } from "@/domain/shared/Result";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -30,18 +29,18 @@ async function loadEnrollmentsWithCourses(userId: string): Promise<CourseWithEnr
   const container = buildContainer();
   const enrollmentsResult = await container.enrollmentRepo.findByUserId(userId);
   if (!enrollmentsResult.ok) {
-    return [];
+    throw new Error("Failed to load enrollments");
   }
   const enrollments = enrollmentsResult.value;
-
-  const pairs: CourseWithEnrollment[] = [];
-  for (const enrollment of enrollments) {
-    const courseResult = await container.courseRepo.findById(enrollment.courseId);
-    if (Result.isOk(courseResult)) {
-      pairs.push({ course: courseResult.value, enrollment });
-    }
-  }
-  return pairs;
+  return Promise.all(
+    enrollments.map(async (enrollment): Promise<CourseWithEnrollment> => {
+      const courseResult = await container.courseRepo.findById(enrollment.courseId);
+      if (!courseResult.ok) {
+        throw new Error("Failed to load an enrolled course");
+      }
+      return { course: courseResult.value, enrollment };
+    }),
+  );
 }
 
 export default async function DashboardPage() {
@@ -117,20 +116,6 @@ export default async function DashboardPage() {
             </Link>
           </div>
         )}
-
-        <div
-          style={{
-            background: "var(--accent-soft)",
-            border: "1px solid var(--accent)",
-            borderRadius: "var(--radius-md)",
-            padding: "var(--space-4)",
-            marginBottom: "var(--space-8)",
-            fontSize: "var(--text-sm)",
-            color: "var(--accent)",
-          }}
-        >
-          🔥 You're on a 3-day learning streak! Keep it up.
-        </div>
 
         {/* Continue learning */}
         {inProgress.length > 0 && (

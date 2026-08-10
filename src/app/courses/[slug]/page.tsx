@@ -23,6 +23,8 @@ import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
 import type { CatalogCourseDetail } from "@/usecases/GetCatalogCourse";
 import { EnrollButton } from "./EnrollButton";
+import { ShareCourseButton } from "@/components/courses/ShareCourseButton";
+import { getSessionUser } from "@/lib/auth";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -49,6 +51,35 @@ export default async function CourseDetailPage({ params }: PageProps) {
   if (!result.ok) notFound();
 
   const detail = result.value;
+  const [user, quizzesResult] = await Promise.all([
+    getSessionUser(),
+    container.quizRepo.findByCourseId(detail.courseId),
+  ]);
+  if (!quizzesResult.ok) {
+    throw new Error("Failed to load course quizzes");
+  }
+  const quizzes = quizzesResult.value;
+  const firstLessonId = detail.modules.flatMap((module) => module.lessons)[0]?.id ?? null;
+  let accessMode: "purchase" | "subscription" | "enrolled" | "admin" = "purchase";
+  if (user) {
+    const enrollment = await container.enrollmentRepo.findByUserIdAndCourseId(
+      user.id,
+      detail.courseId,
+    );
+    if (enrollment?.status === "active") {
+      accessMode = "enrolled";
+    } else if (user.role === "ADMIN") {
+      accessMode = "admin";
+    } else {
+      const accessResult = await container.checkCourseAccess.execute({
+        userId: user.id,
+        courseId: detail.courseId,
+      });
+      if (accessResult.ok && accessResult.value.kind === "allowed") {
+        accessMode = "subscription";
+      }
+    }
+  }
   const { totalLessonCount, totalEstimatedMinutes, modules } = detail;
   const hours = Math.floor(totalEstimatedMinutes / 60);
   const minutes = totalEstimatedMinutes % 60;
@@ -56,15 +87,8 @@ export default async function CourseDetailPage({ params }: PageProps) {
     detail.priceMinor === 0 ? "FREE" : `₱${(detail.priceMinor / 100).toFixed(2)}`;
 
   return (
-    <StudentShell requireAuth={false}>
+    <StudentShell requireAuth={false} user={user}>
       <main className={styles.page}>
-        <Link
-          href={`/checkout?courseSlug=${detail.slug}`}
-          className="btn btn-primary"
-          style={{ marginTop: "var(--space-4)" }}
-        >
-          Enroll Now
-        </Link>
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerInner}>
@@ -115,10 +139,10 @@ export default async function CourseDetailPage({ params }: PageProps) {
                   courseId={detail.courseId}
                   courseSlug={detail.slug}
                   priceMinor={detail.priceMinor}
+                  accessMode={accessMode}
+                  firstLessonId={firstLessonId}
                 />
-                <button className="btn btn-ghost" style={{ marginLeft: "var(--space-2)" }}>
-                  Share
-                </button>
+                <ShareCourseButton title={detail.title} />
               </div>
             </div>
           </div>
@@ -156,6 +180,34 @@ export default async function CourseDetailPage({ params }: PageProps) {
               </details>
             ))}
           </div>
+
+          {quizzes.length > 0 ? (
+            <section className={styles.quizSection} aria-labelledby="course-quizzes-title">
+              <h2 id="course-quizzes-title" className={styles.curriculumTitle}>
+                Knowledge checks
+              </h2>
+              <ul className={styles.quizList}>
+                {quizzes.map((quiz) => (
+                  <li key={quiz.id} className={styles.quizItem}>
+                    <div>
+                      <h3 className={styles.quizTitle}>{quiz.title}</h3>
+                      <p className={styles.quizMeta}>
+                        {quiz.questions.length} question{quiz.questions.length === 1 ? "" : "s"}
+                        {" · "}
+                        Pass at {quiz.passingScore}%
+                      </p>
+                    </div>
+                    <Link
+                      href={`/courses/${detail.slug}/quizzes/${quiz.id}`}
+                      className="btn btn-secondary"
+                    >
+                      Take quiz
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
         </div>
       </main>
     </StudentShell>

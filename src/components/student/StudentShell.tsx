@@ -89,12 +89,14 @@ export async function StudentShell({
   // Public shell: no sidebar, no CommandPalette (sidebar-anchored),
   // no MobileNavToggle. Renders the PublicCatalogHeader (which is the
   // simple Brand + Sign in + Sign up + Browse Catalog strip) and a
-  // clean <main>.
+  // clean content wrapper. Each route owns its single <main> landmark.
   if (!user) {
     return (
       <div className={styles.publicShell}>
         <PublicCatalogHeader />
-        <main className={styles.publicMain}>{children}</main>
+        <div className={styles.publicMain} data-navigation-content>
+          {children}
+        </div>
       </div>
     );
   }
@@ -104,7 +106,9 @@ export async function StudentShell({
     <div className={styles.shell}>
       <MobileNavToggle sidebarId="student-sidebar" />
       <StudentSidebar user={user} />
-      <main className={styles.main}>{children}</main>
+      <div className={styles.main} data-navigation-content>
+        {children}
+      </div>
       <CommandPalette items={COMMAND_PALETTE_ITEMS} />
     </div>
   );

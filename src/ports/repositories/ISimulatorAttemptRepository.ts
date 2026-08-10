@@ -63,6 +63,9 @@ export interface ISimulatorAttemptRepository {
     options?: { mode?: SimulatorMode; status?: AttemptStatus },
   ): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>>;
 
+  /** Complete simulator-attempt history for a user, newest first. */
+  findByUserId(userId: string): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>>;
+
   /**
    * Append a decision to an existing attempt.
    * Returns an error if the attempt is not in_progress.

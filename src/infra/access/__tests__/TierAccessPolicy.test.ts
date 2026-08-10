@@ -178,6 +178,39 @@ describe("TierAccessPolicy", () => {
     expect(result).toEqual({ kind: "allowed" });
   });
 
+  it("does not treat a refunded enrollment as active access", async () => {
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(
+      Result.ok(makeUser({ subscriptionTier: "FREE" })),
+    );
+    vi.mocked(mockCourseRepo.findById).mockResolvedValue(
+      Result.ok(makeCourse({ courseTier: "PRO" })),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(
+      makeEnrollment({ status: "refunded" }),
+    );
+
+    const result = await policy.canAccess(USER_ID, COURSE_ID);
+
+    expect(result).toEqual({
+      kind: "denied_tier",
+      userTier: "FREE",
+      requiredTier: "PRO",
+    });
+  });
+
+  it("allows administrators to inspect published courses", async () => {
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(
+      Result.ok(makeUser({ role: "ADMIN", subscriptionTier: "FREE" })),
+    );
+    vi.mocked(mockCourseRepo.findById).mockResolvedValue(
+      Result.ok(makeCourse({ courseTier: "PRO" })),
+    );
+
+    const result = await policy.canAccess(USER_ID, COURSE_ID);
+
+    expect(result).toEqual({ kind: "allowed" });
+  });
+
   // ── tier access ───────────────────────────────────────────
 
   it("ALLOWED when PRO user accesses PRO course", async () => {

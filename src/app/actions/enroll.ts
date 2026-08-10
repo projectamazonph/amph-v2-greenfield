@@ -24,18 +24,20 @@ import type { EnrollStudentResult } from "@/usecases/EnrollStudent";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
+import { subscriptionMeetsCourseTier } from "@/domain/values/CourseAccessTier";
 
-export type EnrollStudentActionResult = EnrollStudentResult | {
-  ok: false;
-  error: { kind: "unauthorized" };
-} | {
-  ok: false;
-  error: { kind: "paid_checkout_required" };
-};
+export type EnrollStudentActionResult =
+  | EnrollStudentResult
+  | {
+      ok: false;
+      error: { kind: "unauthorized" };
+    }
+  | {
+      ok: false;
+      error: { kind: "paid_checkout_required" };
+    };
 
-export async function enrollStudent(
-  courseId: string,
-): Promise<EnrollStudentActionResult> {
+export async function enrollStudent(courseId: string): Promise<EnrollStudentActionResult> {
   // 1. Authenticate via the sanctioned session helper.
   const userId = await getSessionUserId();
   if (!userId) {
@@ -51,9 +53,24 @@ export async function enrollStudent(
   }
   const course = courseResult.value;
 
-  // 3. P0-1: refuse manual enroll for paid courses. Paid enrollments
-  //    go through the checkout flow (PayMongo webhook → entitlement: "order").
+  // 3. A matching subscription grants access but still needs an
+  //    Enrollment row to store course progress.
   if (course.price.minor > 0) {
+    const userResult = await container.userRepo.findById(userId);
+    if (
+      Result.isOk(userResult) &&
+      subscriptionMeetsCourseTier(userResult.value.subscriptionTier, course.courseTier)
+    ) {
+      const result = await container.enrollStudent.execute({
+        userId,
+        courseId,
+        entitlement: "subscription",
+        source: "subscription",
+      });
+      return Result.isOk(result)
+        ? { ok: true, value: result.value }
+        : { ok: false, error: result.error };
+    }
     return { ok: false, error: { kind: "paid_checkout_required" } };
   }
 

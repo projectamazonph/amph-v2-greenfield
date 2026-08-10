@@ -95,9 +95,11 @@ import { EnableTwoFactor } from "@/usecases/EnableTwoFactor";
 import { ConfirmTwoFactor } from "@/usecases/ConfirmTwoFactor";
 import { DisableTwoFactor } from "@/usecases/DisableTwoFactor";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
+import { GetCheckoutSummary } from "@/usecases/GetCheckoutSummary";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
+import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
@@ -152,6 +154,7 @@ import { RefundOverride } from "@/usecases/RefundOverride";
 // STORY-062: refund request list + process
 import { ListRefundRequests } from "@/usecases/ListRefundRequests";
 import { AdminProcessRefund } from "@/usecases/AdminProcessRefund";
+import { RequestRefund } from "@/usecases/RequestRefund";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 import { ListAuditLogs } from "@/usecases/ListAuditLogs";
@@ -404,16 +407,25 @@ export function buildTestContainer(): TestContainer {
     disableTwoFactor: new DisableTwoFactor({ userRepo, hasher: passwordHasher, recordAuditLog }),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
+      pricingTierRepo,
       orderRepo,
       paymentGateway,
       baseUrl: "https://test.amph.example.com",
     }),
+    getCheckoutSummary: new GetCheckoutSummary({ courseRepo, pricingTierRepo }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
     // P0-5: per-lesson access decision
     authorizeLessonAccess: new AuthorizeLessonAccess({
       userRepo,
       courseRepo,
       enrollmentRepo,
+    }),
+    markLessonComplete: new MarkLessonComplete({
+      enrollmentRepo,
+      courseRepo,
+      progressEventRepo,
+      idGen,
+      clock,
     }),
     enrollStudent: new EnrollStudent({
       userRepo,
@@ -447,6 +459,7 @@ export function buildTestContainer(): TestContainer {
       userRepo,
       idGen,
       clock,
+      accessPolicy,
     }),
     awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
     awardBadge: new AwardBadge({
@@ -612,6 +625,7 @@ export function buildTestContainer(): TestContainer {
     // STORY-062: admin refund request list + process
     listRefundRequests: new ListRefundRequests({ orderRepo, userRepo }),
     adminProcessRefund: new AdminProcessRefund({ orderRepo, refundOverride }),
+    requestRefund: new RequestRefund({ orderRepo, enrollmentRepo, clock }),
     // STORY-050d: admin discount code CRUD
     adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
     adminGetDiscountCode: new AdminGetDiscountCode({ discountCodeRepo }),
@@ -651,6 +665,8 @@ export function buildTestContainer(): TestContainer {
       badgeAwardRepo,
       xpEventRepo,
       progressEventRepo,
+      quizAttemptRepo,
+      simulatorAttemptRepo,
       clock,
     }),
     // STORY-091: admin quiz CRUD
@@ -688,6 +704,7 @@ export function buildTestContainer(): TestContainer {
     // STORY-064: simulator attempt lifecycle
     startSimulatorAttempt: new StartSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -783,6 +800,7 @@ export function buildTestContainer(): TestContainer {
     rsvpLiveClass: new RsvpLiveClass({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo,
       ids: idGen,
       clock,
     }),
@@ -794,6 +812,7 @@ export function buildTestContainer(): TestContainer {
     markLiveClassRecordingWatched: new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo,
       awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
       clock,
     }),

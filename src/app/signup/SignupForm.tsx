@@ -28,7 +28,13 @@ const errorMessage: Record<string, string> = {
   rate_limited: "Too many attempts. Please wait a few minutes before trying again.",
 };
 
-export function SignupForm({ errorKind }: { errorKind: string | null }) {
+export function SignupForm({
+  errorKind,
+  tierSlug,
+}: {
+  errorKind: string | null;
+  tierSlug: string | null;
+}) {
   const errorText = errorKind ? (errorMessage[errorKind] ?? null) : null;
 
   return (
@@ -71,6 +77,7 @@ export function SignupForm({ errorKind }: { errorKind: string | null }) {
         )}
 
         <form method="POST" action="/api/auth/signup" className={styles.form}>
+          {tierSlug ? <input type="hidden" name="tier" value={tierSlug} /> : null}
           <div className={styles.row}>
             <Input
               name="firstName"
@@ -115,13 +122,20 @@ export function SignupForm({ errorKind }: { errorKind: string | null }) {
           </div>
 
           <Button type="submit" variant="primary" size="lg" style={{ width: "100%" }}>
-            Create account
+            {tierSlug ? "Create account and continue" : "Create account"}
           </Button>
         </form>
 
         <p className={styles.footer}>
           Already have an account?{" "}
-          <Link href="/login" className={styles.link}>
+          <Link
+            href={
+              tierSlug
+                ? `/login?redirect=${encodeURIComponent(`/checkout?pricingTier=${tierSlug}`)}`
+                : "/login"
+            }
+            className={styles.link}
+          >
             Sign in
           </Link>
         </p>

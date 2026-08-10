@@ -42,16 +42,18 @@ import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { IOrderRepository } from "@/ports/repositories/OrderRepository";
 import type { Enrollment } from "@/domain/entities/Enrollment";
+import type { EnrollmentSource } from "@/domain/entities/Enrollment";
+import { subscriptionMeetsCourseTier } from "@/domain/values/CourseAccessTier";
 
 /** P0-1: how did the caller earn the right to enroll? */
-export type EntitlementSource = "free" | "order" | "admin_grant";
+export type EntitlementSource = "free" | "order" | "admin_grant" | "subscription";
 
 export interface EnrollStudentInput {
   userId: string;
   courseId: string;
   /** P0-1: required. Caller must declare how this enrollment is entitled. */
   entitlement: EntitlementSource;
-  source?: "direct" | "affiliate" | "simulator_trial";
+  source?: EnrollmentSource;
   couponCode?: string | null;
   couponDiscount?: number | null;
 }
@@ -88,6 +90,7 @@ export class EnrollStudent {
     if (Result.isErr(userResult)) {
       return Result.err({ kind: "user_not_found" });
     }
+    const user = userResult.value;
 
     // ── 2. Course must exist and be PUBLISHED ───────────────
     const courseResult = await courseRepo.findById(input.courseId);
@@ -106,6 +109,10 @@ export class EnrollStudent {
     if (!isFree) {
       if (input.entitlement === "admin_grant") {
         // Trusted path: server-side admin action. No order check.
+      } else if (input.entitlement === "subscription") {
+        if (!subscriptionMeetsCourseTier(user.subscriptionTier, course.courseTier)) {
+          return Result.err({ kind: "paid_no_entitlement" });
+        }
       } else if (input.entitlement === "order") {
         const paidOrderResult = await orderRepo.findPaidForUserAndCourse(
           input.userId,

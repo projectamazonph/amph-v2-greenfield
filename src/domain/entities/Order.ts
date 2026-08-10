@@ -202,6 +202,21 @@ export class Order {
     return Result.ok(undefined);
   }
 
+  /** Record a student's refund request without changing payment status. */
+  requestRefund(reason: string, requestedAt: Date): Result<void, OrderTransitionError> {
+    if (this.status !== "PAID") {
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot request refund: order is ${this.status}.`,
+      });
+    }
+    if (this.refundRequestedAt !== null) return Result.ok(undefined);
+    this.refundReason = reason.trim();
+    this.refundRequestedAt = requestedAt;
+    this.updatedAt = requestedAt;
+    return Result.ok(undefined);
+  }
+
   // ── Guards ────────────────────────────────────────────────
 
   isPaid(): boolean {

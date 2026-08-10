@@ -33,9 +33,11 @@ export function RouteError({ error, reset }: RouteErrorProps) {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <p className={styles.emoji}>⚠️</p>
+        <p className={styles.emoji} aria-hidden="true">
+          !
+        </p>
         <h2 className={styles.title}>Something went wrong</h2>
-        <p className={styles.message}>{error.message || "An unexpected error occurred."}</p>
+        <p className={styles.message}>We could not load this page. Please try again.</p>
         {error.digest && <p className={styles.digest}>Error ID: {error.digest}</p>}
         <button type="button" className={styles.retry} onClick={reset}>
           Try again

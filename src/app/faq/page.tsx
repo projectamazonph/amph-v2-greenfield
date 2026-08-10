@@ -27,10 +27,7 @@ export const metadata: Metadata = {
 export default function FaqPage() {
   return (
     <StudentShell requireAuth={false}>
-      {/* StudentShell already renders the page's <main> landmark; a nested
-          one is invalid HTML and breaks landmark navigation for screen
-          readers, so this is a plain wrapper, not a second <main>. */}
-      <div className={styles.page}>
+      <main className={styles.page}>
         <section className={styles.hero}>
           <span className={styles.eyebrow}>Before you pay</span>
           <h1 className={styles.heroTitle}>
@@ -102,7 +99,7 @@ export default function FaqPage() {
             </Link>
           </div>
         </section>
-      </div>
+      </main>
     </StudentShell>
   );
 }

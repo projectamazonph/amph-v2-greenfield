@@ -43,6 +43,7 @@ export async function startSimulatorAttempt(
 
   const uc = new StartSimulatorAttempt({
     attemptRepo: container.simulatorAttemptRepo,
+    scorePolicyRepo: container.scorePolicyRepo,
     scenarioRepo: container.scenarioRepo,
     idGen: container.idGen,
     clock: container.clock,

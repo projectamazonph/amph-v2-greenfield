@@ -16,6 +16,7 @@ import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserReposit
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { FixedClock } from "@/ports/system/Clock";
 import { createQuiz } from "@/domain/entities/Quiz";
+import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 
 const USER_ID = "user-1";
 const QUIZ_ID = "quiz-1";
@@ -65,6 +66,7 @@ interface Deps {
   userRepo: InMemoryUserRepository;
   idGen: InMemoryIdGenerator;
   clock: FixedClock;
+  accessPolicy: IAccessPolicy;
 }
 
 function buildDeps(): Deps {
@@ -85,6 +87,7 @@ function buildDeps(): Deps {
     userRepo,
     idGen: new InMemoryIdGenerator(),
     clock: new FixedClock(new Date("2026-01-01T00:00:00Z")),
+    accessPolicy: { canAccess: vi.fn(async () => ({ kind: "allowed" as const })) },
   };
 }
 

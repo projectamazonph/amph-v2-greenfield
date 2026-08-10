@@ -11,17 +11,20 @@
  * one that has worked for 30 years.
  */
 
-export const metadata = { title: 'Sign Up — AMPH Academy' };
+export const metadata = { title: "Sign Up — AMPH Academy" };
 
 import { SignupForm } from "./SignupForm";
 
 export default async function SignUpPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; tier?: string }>;
 }) {
   const params = await searchParams;
   const errorKind = params.error ?? null;
+  const tierSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(params.tier ?? "")
+    ? (params.tier ?? null)
+    : null;
 
-  return <SignupForm errorKind={errorKind} />;
+  return <SignupForm errorKind={errorKind} tierSlug={tierSlug} />;
 }

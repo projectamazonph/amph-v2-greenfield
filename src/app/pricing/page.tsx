@@ -35,9 +35,10 @@ export default async function PricingPage() {
 
   const result = await useCase.execute();
 
-  // If DB is unavailable, render a graceful fallback (no crash).
-  // This keeps the page SSR-safe even before migrations are applied.
-  const tiers = result.ok ? result.value.tiers : [];
+  if (!result.ok) {
+    throw new Error("Failed to load pricing offers");
+  }
+  const tiers = result.value.tiers;
 
   return (
     <main className={styles.page}>
@@ -91,12 +92,18 @@ export default async function PricingPage() {
                 </p>
               )}
 
-              <a
-                href={`/signup?tier=${tier.slug}`}
-                className={`${styles.cta} ${tier.slug === "mastery" ? styles.ctaPrimary : styles.ctaSecondary}`}
-              >
-                Enroll in {tier.name}
-              </a>
+              {tier.courseSlug ? (
+                <a
+                  href={`/signup?tier=${tier.slug}`}
+                  className={`${styles.cta} ${tier.slug === "mastery" ? styles.ctaPrimary : styles.ctaSecondary}`}
+                >
+                  Enroll in {tier.name}
+                </a>
+              ) : (
+                <span className={`${styles.cta} ${styles.ctaSecondary}`} aria-disabled="true">
+                  Not currently available
+                </span>
+              )}
             </li>
           ))}
         </ul>

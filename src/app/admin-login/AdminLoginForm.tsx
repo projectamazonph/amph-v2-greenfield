@@ -11,8 +11,7 @@ import { Input } from "@/components/ui";
 import styles from "./AdminLoginForm.module.css";
 
 const errorMessage: Record<string, string> = {
-  wrong_password: "Incorrect email or password.",
-  user_not_found: "No account with that email.",
+  invalid_credentials: "Incorrect email or password.",
   account_suspended: "This account has been suspended.",
   account_locked: "This account is locked. Reset your password to unlock.",
   invalid_input: "Please enter your email and password.",

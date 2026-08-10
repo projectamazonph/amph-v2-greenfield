@@ -58,7 +58,6 @@ import { Result } from "@/domain/shared/Result";
 import { buildContainer, getContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { AppContainer } from "@/composition/container";
-import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type {
   ListingAuditInput,
   ListingImage,
@@ -231,7 +230,7 @@ const listingAuditAttemptSchema = z.object({
     z.enum(VALID_FINDING_ACTIONS as [FindingAction, ...FindingAction[]]),
   ),
   difficulty: z.string().optional(),
-  mode: z.string().optional(),
+  mode: z.enum(["guided", "practice", "challenge", "credential", "instructor"]).optional(),
 });
 
 // ── Action ─────────────────────────────────────────────────────────────
@@ -277,7 +276,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
     userId,
     simulatorId: "listing-audit",
     scenarioId: scenario.scenarioId,
-    mode: resolvedMode as SimulatorMode,
+    mode: resolvedMode,
   });
 
   if (Result.isErr(startResult)) {

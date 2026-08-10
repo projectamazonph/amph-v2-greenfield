@@ -10,7 +10,7 @@
 import { Result } from "@/domain/shared/Result";
 
 export type EnrollmentStatus = "active" | "cancelled" | "refunded" | "expired";
-export type EnrollmentSource = "direct" | "affiliate" | "simulator_trial";
+export type EnrollmentSource = "direct" | "affiliate" | "simulator_trial" | "subscription";
 
 const ALL_ENROLLMENT_STATUSES: readonly EnrollmentStatus[] = [
   "active",

@@ -45,6 +45,9 @@ export interface IPricingTierRepository {
    */
   findBySlug(slug: string): Promise<Result<PricingTier | null, PricingTierRepositoryError>>;
 
+  /** Published course linked to this tier, or null for non-course offers. */
+  findLinkedCourseSlug(tierId: string): Promise<Result<string | null, PricingTierRepositoryError>>;
+
   /**
    * Persist a new tier. Enforces slug uniqueness across all tiers
    * (including archived). Returns `slug_taken` on conflict.

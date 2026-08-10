@@ -58,6 +58,7 @@ describe("container — recordQuizAttempt wiring", () => {
     });
     if (!quizResult.ok) throw new Error("seed failed");
     c.quizRepo.seed(quizResult.value);
+    c.accessPolicy.stubDecision = { kind: "allowed" };
 
     const result = await c.recordQuizAttempt.execute({
       userId: "user-1",

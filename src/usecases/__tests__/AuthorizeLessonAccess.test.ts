@@ -201,6 +201,24 @@ describe("AuthorizeLessonAccess (P0-5: preview-leak fix)", () => {
     expect(r.value.kind).toBe("denied");
   });
 
+  it("subscription tier: allows a PRO student to open a PRO lesson without a course purchase", async () => {
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(
+      Result.ok(makeUser({ subscriptionTier: "PRO" })),
+    );
+    vi.mocked(mockCourseRepo.findById).mockResolvedValue(
+      Result.ok(makeCourse({ courseTier: "PRO" })),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
+
+    const r = await useCase.execute({
+      userId: "user_01",
+      courseId: "course_01",
+      lessonId: "l5",
+    });
+
+    expect(r).toEqual(Result.ok({ kind: "allowed" }));
+  });
+
   // ── Enrolled ───────────────────────────────────────
 
   it("enrolled (active Enrollment): allows ANY lesson", async () => {

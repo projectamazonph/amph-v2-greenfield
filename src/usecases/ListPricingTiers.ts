@@ -46,6 +46,7 @@ export interface PublicPricingTier {
   readonly displayOrder: number;
   readonly isEarlyBird: boolean;
   readonly earlyBirdMinutesRemaining: number;
+  readonly courseSlug: string | null;
 }
 
 export type ListPricingTiersError = { kind: "db_error"; message: string };
@@ -73,7 +74,16 @@ export class ListPricingTiers {
     const now = new Date();
     const publicTiers: PublicPricingTier[] = [];
 
-    for (const tier of result.value) {
+    const linkResults = await Promise.all(
+      result.value.map((tier) => this._repo.findLinkedCourseSlug(tier.id)),
+    );
+
+    for (let index = 0; index < result.value.length; index++) {
+      const tier = result.value[index]!;
+      const linkResult = linkResults[index]!;
+      if (!linkResult.ok) {
+        return Result.err({ kind: "db_error", message: tierErrorMsg(linkResult.error) });
+      }
       const isEarlyBird = earlyBirdIsActive(tier, now);
       const displayPrice = effectivePrice(tier, now);
 
@@ -88,6 +98,7 @@ export class ListPricingTiers {
         displayOrder: tier.displayOrder,
         isEarlyBird,
         earlyBirdMinutesRemaining: isEarlyBird ? earlyBirdMinutesRemaining(tier, now) : 0,
+        courseSlug: linkResult.value,
       });
     }
 

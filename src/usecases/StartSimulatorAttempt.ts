@@ -18,6 +18,8 @@ import type { SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
+import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
+import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
 
 export interface StartSimulatorAttemptInput {
   userId: string;
@@ -28,6 +30,7 @@ export interface StartSimulatorAttemptInput {
 
 export interface StartSimulatorAttemptDeps {
   attemptRepo: ISimulatorAttemptRepository;
+  scorePolicyRepo: IScorePolicyRepository;
   scenarioRepo: ISimulatorScenarioRepository;
   idGen: { newId(): string };
   clock: { now(): Date };
@@ -45,6 +48,8 @@ export interface StartSimulatorAttemptDeps {
 export type StartSimulatorAttemptError =
   | { kind: "scenario_not_found" }
   | { kind: "already_in_progress" }
+  | { kind: "challenge_locked" }
+  | { kind: "mode_not_allowed" }
   | { kind: "db_error"; message: string };
 
 export type StartSimulatorAttemptResult = Result<SimulatorAttempt, StartSimulatorAttemptError>;
@@ -53,7 +58,29 @@ export class StartSimulatorAttempt {
   constructor(private readonly deps: StartSimulatorAttemptDeps) {}
 
   async execute(input: StartSimulatorAttemptInput): Promise<StartSimulatorAttemptResult> {
-    const { attemptRepo, scenarioRepo, idGen, clock, recordAuditLog } = this.deps;
+    const { attemptRepo, scorePolicyRepo, scenarioRepo, idGen, clock, recordAuditLog } = this.deps;
+    const mode = input.mode ?? "practice";
+
+    if (
+      !(["guided", "practice", "challenge", "credential", "instructor"] as const).includes(
+        mode as never,
+      )
+    ) {
+      return Result.err({ kind: "mode_not_allowed" });
+    }
+
+    if (mode === "challenge") {
+      const unlocked = await hasEverPassedSimulatorInMode(
+        { attemptRepo, scorePolicyRepo },
+        { userId: input.userId, simulatorId: input.simulatorId, mode: "practice" },
+      );
+      if (!unlocked.ok) {
+        return Result.err(unlocked.error);
+      }
+      if (!unlocked.value) {
+        return Result.err({ kind: "challenge_locked" });
+      }
+    }
 
     // ΓöÇΓöÇ 1. Scenario must exist ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     const scenarioResult = await scenarioRepo.findById(input.scenarioId);
@@ -61,6 +88,9 @@ export class StartSimulatorAttempt {
       return Result.err({ kind: "scenario_not_found" });
     }
     if (scenarioResult.value === null) {
+      return Result.err({ kind: "scenario_not_found" });
+    }
+    if (scenarioResult.value.simulatorId !== input.simulatorId) {
       return Result.err({ kind: "scenario_not_found" });
     }
 
@@ -95,7 +125,7 @@ export class StartSimulatorAttempt {
       scenarioId: input.scenarioId,
       scenarioVersion: scenarioResult.value.version,
       difficulty: scenarioResult.value.difficulty,
-      mode: input.mode ?? "practice",
+      mode,
       startedAt: clock.now(),
     });
     // createSimulatorAttempt never fails ΓÇö returns SimulatorAttempt directly

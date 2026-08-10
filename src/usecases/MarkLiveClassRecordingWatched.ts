@@ -32,11 +32,13 @@ import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiv
 import type { Clock } from "@/ports/system/Clock";
 import { AwardXP } from "@/usecases/AwardXP";
 import { XPService } from "@/domain/services/XPService";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 
 export type MarkLiveClassRecordingWatchedError =
   | { kind: "not_found" }
   | { kind: "recording_not_available" }
   | { kind: "not_registered" }
+  | { kind: "course_access_required" }
   | { kind: "db_error"; message: string };
 
 export interface MarkLiveClassRecordingWatchedInput {
@@ -47,6 +49,7 @@ export interface MarkLiveClassRecordingWatchedInput {
 export interface MarkLiveClassRecordingWatchedDeps {
   liveClassRepo: ILiveClassRepository;
   liveClassRegistrationRepo: ILiveClassRegistrationRepository;
+  enrollmentRepo: IEnrollmentRepository;
   awardXp: AwardXP;
   clock: Clock;
 }
@@ -67,6 +70,14 @@ export class MarkLiveClassRecordingWatched {
     }
     if (liveClass.status !== "completed" || !liveClass.recordingUrl) {
       return Result.err({ kind: "recording_not_available" });
+    }
+
+    const enrollment = await this.deps.enrollmentRepo.findByUserIdAndCourseId(
+      input.userId,
+      liveClass.courseId,
+    );
+    if (!enrollment || enrollment.status !== "active") {
+      return Result.err({ kind: "course_access_required" });
     }
 
     const regResult = await this.deps.liveClassRegistrationRepo.findByUserAndClass(

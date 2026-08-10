@@ -14,6 +14,11 @@ import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/in
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { FixedClock } from "@/ports/system/Clock";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
+
+const activeEnrollmentRepo = {
+  findByUserIdAndCourseId: async () => ({ status: "active" }),
+} as unknown as IEnrollmentRepository;
 
 function makeCompletedClassWithRecording(): ReturnType<typeof createLiveClass> {
   const future = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -68,6 +73,7 @@ describe("MarkLiveClassRecordingWatched", () => {
     const useCase = new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date("2026-08-03T00:00:00Z")),
     });
@@ -96,6 +102,7 @@ describe("MarkLiveClassRecordingWatched", () => {
     const useCase = new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date("2026-08-03T00:00:00Z")),
     });
@@ -125,6 +132,7 @@ describe("MarkLiveClassRecordingWatched", () => {
     const useCase = new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date("2026-08-03T00:00:00Z")),
     });
@@ -145,6 +153,7 @@ describe("MarkLiveClassRecordingWatched", () => {
     const useCase = new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
     });
@@ -176,6 +185,7 @@ describe("MarkLiveClassRecordingWatched", () => {
     const useCase = new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
     });
@@ -210,6 +220,7 @@ describe("MarkLiveClassRecordingWatched", () => {
     const useCase = new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
     });
@@ -224,6 +235,7 @@ describe("MarkLiveClassRecordingWatched", () => {
     const useCase = new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
     });
@@ -247,11 +259,35 @@ describe("MarkLiveClassRecordingWatched", () => {
     const useCase = new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
     });
     const r = await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error.kind).toBe("not_registered");
+  });
+
+  it("rejects a recording watch when active course access has ended", async () => {
+    const liveClassRepo = makeRepo();
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
+    const seed = createLiveClassRegistration({ id: "r-1", userId: "u-2", liveClassId: "lc-1" });
+    if (!seed.ok) throw new Error("seed");
+    await liveClassRegistrationRepo.create(seed.value);
+    const useCase = new MarkLiveClassRecordingWatched({
+      liveClassRepo,
+      liveClassRegistrationRepo,
+      enrollmentRepo: {
+        ...activeEnrollmentRepo,
+        findByUserIdAndCourseId: async () => null,
+      },
+      awardXp: mockAwardXp,
+      clock: new FixedClock(new Date()),
+    });
+
+    const result = await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });
+
+    expect(result).toEqual({ ok: false, error: { kind: "course_access_required" } });
+    expect(mockAwardXp.execute).not.toHaveBeenCalled();
   });
 });

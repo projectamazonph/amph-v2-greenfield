@@ -169,6 +169,12 @@ class PrismaStyleStubRepository implements IQuizAttemptRepository {
     return Result.ok(out);
   }
 
+  async findByUserId(
+    userId: string,
+  ): Promise<Result<readonly QuizAttempt[], QuizAttemptRepositoryError>> {
+    return Result.ok(Array.from(this.rows.values()).filter((attempt) => attempt.userId === userId));
+  }
+
   async findLatestByUserAndQuiz(
     userId: string,
     quizId: string,

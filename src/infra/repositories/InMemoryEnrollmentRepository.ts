@@ -43,7 +43,10 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
     if (this.userCourseIndex.has(key)) {
       return Result.err({ kind: "already_enrolled" });
     }
-    this.enrollments.set(enrollment.id, Object.freeze({ ...enrollment }));
+    this.enrollments.set(enrollment.id, {
+      ...enrollment,
+      completedLessonIds: [...enrollment.completedLessonIds],
+    });
     this.userCourseIndex.set(key, enrollment.id);
     return Result.ok(enrollment);
   }

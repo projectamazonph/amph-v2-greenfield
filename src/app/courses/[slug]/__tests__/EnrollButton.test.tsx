@@ -84,4 +84,36 @@ describe("EnrollButton (render)", () => {
     // similar. We don't assert the exact hash, just the structure.
     expect(html).toMatch(/class="[^"]*_btn_[a-zA-Z0-9_]+/);
   });
+
+  it("offers to start a paid course already covered by the student's subscription", () => {
+    const html = renderToString(
+      createElement(EnrollButton, {
+        courseId: "c-4",
+        courseSlug: "pro-course",
+        priceMinor: 199900,
+        accessMode: "subscription",
+        firstLessonId: "lesson-1",
+      }),
+    );
+
+    expect(html).toContain("Start course");
+    expect(html).toMatch(/<form/);
+    expect(html).not.toContain("Buy now");
+  });
+
+  it("takes an enrolled student straight to the first lesson", () => {
+    const html = renderToString(
+      createElement(EnrollButton, {
+        courseId: "c-5",
+        courseSlug: "active-course",
+        priceMinor: 199900,
+        accessMode: "enrolled",
+        firstLessonId: "lesson-1",
+      }),
+    );
+
+    expect(html).toContain("Continue learning");
+    expect(html).toMatch(/href="\/courses\/active-course\/lessons\/lesson-1"/);
+    expect(html).not.toContain("Buy now");
+  });
 });

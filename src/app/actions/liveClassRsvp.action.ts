@@ -16,11 +16,18 @@ import { buildContainer } from "@/composition/container";
 
 export type RsvpResult =
   | { ok: true }
-  | { ok: false; error: "unauthenticated" | "already_registered" | "class_not_found" | "class_unavailable" | "db_error" };
+  | {
+      ok: false;
+      error:
+        | "unauthenticated"
+        | "already_registered"
+        | "class_not_found"
+        | "class_unavailable"
+        | "course_access_required"
+        | "db_error";
+    };
 
-export async function rsvpLiveClassAction(
-  liveClassId: string,
-): Promise<RsvpResult> {
+export async function rsvpLiveClassAction(liveClassId: string): Promise<RsvpResult> {
   const userId = await getSessionUserId();
   if (!userId) {
     return { ok: false, error: "unauthenticated" };
@@ -42,19 +49,18 @@ export async function rsvpLiveClassAction(
       ? { ok: false, error: "class_not_found" }
       : e.kind === "class_cancelled_or_completed"
         ? { ok: false, error: "class_unavailable" }
-        : e.kind === "already_registered"
-          ? { ok: false, error: "already_registered" }
-          : { ok: false, error: "db_error" };
+        : e.kind === "course_access_required"
+          ? { ok: false, error: "course_access_required" }
+          : e.kind === "already_registered"
+            ? { ok: false, error: "already_registered" }
+            : { ok: false, error: "db_error" };
   return mapped;
 }
 
 export type CancelRsvpResult =
-  | { ok: true }
-  | { ok: false; error: "unauthenticated" | "not_registered" | "db_error" };
+  { ok: true } | { ok: false; error: "unauthenticated" | "not_registered" | "db_error" };
 
-export async function cancelLiveClassRsvpAction(
-  liveClassId: string,
-): Promise<CancelRsvpResult> {
+export async function cancelLiveClassRsvpAction(liveClassId: string): Promise<CancelRsvpResult> {
   const userId = await getSessionUserId();
   if (!userId) {
     return { ok: false, error: "unauthenticated" };

@@ -30,12 +30,16 @@ export function LiveClassRecordingButton({
 }: LiveClassRecordingButtonProps) {
   const [isPending, startTransition] = useTransition();
   const [watched, setWatched] = useState(alreadyWatched);
+  const [error, setError] = useState<string | null>(null);
 
   function handleMarkWatched() {
     startTransition(async () => {
+      setError(null);
       const result = await markLiveClassRecordingWatchedAction(liveClassId);
       if (result.ok) {
         setWatched(true);
+      } else {
+        setError(recordingErrorMessage(result.error));
       }
     });
   }
@@ -73,6 +77,23 @@ export function LiveClassRecordingButton({
           {isPending ? "Saving..." : `Mark as watched (+${xpAmount} XP)`}
         </Button>
       )}
+      {error ? <p role="alert">{error}</p> : null}
     </div>
   );
+}
+
+function recordingErrorMessage(error: string): string {
+  switch (error) {
+    case "unauthenticated":
+      return "Your session expired. Sign in again to continue.";
+    case "course_access_required":
+      return "Active enrollment in this course is required.";
+    case "recording_not_available":
+    case "class_not_found":
+      return "This recording is no longer available.";
+    case "not_registered":
+      return "An active RSVP is required before marking this recording watched.";
+    default:
+      return "We could not save your progress. Please try again.";
+  }
 }

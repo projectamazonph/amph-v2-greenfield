@@ -20,6 +20,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://amazonph.vercel.app"),
   title: "Project Amazon PH Academy",
   description: "Master Amazon PPC and seller central, built for Filipino VAs.",
   manifest: "/site.webmanifest",

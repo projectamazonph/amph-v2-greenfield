@@ -132,7 +132,11 @@ export async function performLogin(
   });
 
   if (!result.ok) {
-    return { kind: "redirect_to_login", errorKind: result.error.kind };
+    const errorKind =
+      result.error.kind === "user_not_found" || result.error.kind === "wrong_password"
+        ? "invalid_credentials"
+        : result.error.kind;
+    return { kind: "redirect_to_login", errorKind };
   }
 
   await deps.plantCookie(result.sessionToken, result.expiresAt);

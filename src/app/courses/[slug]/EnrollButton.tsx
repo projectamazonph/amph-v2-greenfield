@@ -35,6 +35,8 @@ export function EnrollButton({
   courseId,
   courseSlug,
   priceMinor,
+  accessMode = "purchase",
+  firstLessonId,
 }: {
   /** The course's UUID — used for free-course enroll action. */
   courseId: string;
@@ -42,6 +44,8 @@ export function EnrollButton({
   courseSlug: string;
   /** Effective price in minor PHP units from the PricingTier. */
   priceMinor: number;
+  accessMode?: "purchase" | "subscription" | "enrolled" | "admin";
+  firstLessonId?: string | null;
 }) {
   const [state, formAction, isPending] = useActionState<EnrollState, FormData>(
     async (_prevState: EnrollState) => {
@@ -52,6 +56,16 @@ export function EnrollButton({
 
   // isFree is PRESENTATION-ONLY. The server does its own check.
   const isFree = priceMinor === 0;
+
+  if ((accessMode === "enrolled" || accessMode === "admin") && firstLessonId) {
+    return (
+      <Link href={`/courses/${courseSlug}/lessons/${firstLessonId}`} className={styles.fullWidth}>
+        <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
+          Continue learning
+        </Button>
+      </Link>
+    );
+  }
 
   if (state && state.ok) {
     return (
@@ -90,8 +104,7 @@ export function EnrollButton({
     return <p className={styles.error}>Unable to enroll. Please try again.</p>;
   }
 
-  // Paid courses: redirect to checkout.
-  if (!isFree) {
+  if (!isFree && accessMode !== "subscription") {
     return (
       <Link href={`/checkout?courseSlug=${courseSlug}`} className={styles.fullWidth}>
         <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
@@ -101,7 +114,8 @@ export function EnrollButton({
     );
   }
 
-  // Free courses: enroll via the server action.
+  const label = accessMode === "subscription" ? "Start course" : "Enroll for Free";
+
   return (
     <form action={formAction}>
       <Button
@@ -111,7 +125,7 @@ export function EnrollButton({
         className={styles.fullWidth}
         disabled={isPending}
       >
-        {isPending ? "Enrolling..." : "Enroll for Free"}
+        {isPending ? "Enrolling..." : label}
       </Button>
     </form>
   );

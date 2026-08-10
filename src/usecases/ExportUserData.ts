@@ -32,6 +32,14 @@ import type {
   ProgressEventError,
 } from "@/ports/repositories/IProgressEventRepository";
 import type { Clock } from "@/ports/system/Clock";
+import type {
+  IQuizAttemptRepository,
+  QuizAttemptRepositoryError,
+} from "@/ports/repositories/IQuizAttemptRepository";
+import type {
+  ISimulatorAttemptRepository,
+  SimulatorAttemptError,
+} from "@/ports/repositories/ISimulatorAttemptRepository";
 
 export interface ExportUserDataInput {
   userId: string;
@@ -45,7 +53,15 @@ export type ExportUserDataError =
   | CertificateRepositoryError
   | BadgeAwardError
   | XPEventError
-  | ProgressEventError;
+  | ProgressEventError
+  | QuizAttemptRepositoryError
+  | SimulatorAttemptError;
+
+type JsonPrimitive = string | number | boolean | null;
+type JsonValue = JsonPrimitive | JsonObject | readonly JsonValue[];
+interface JsonObject {
+  readonly [key: string]: JsonValue;
+}
 
 export interface UserDataExport {
   exportedAt: string;
@@ -59,12 +75,14 @@ export interface UserDataExport {
     totalXp: number;
     createdAt: string;
   };
-  orders: readonly unknown[];
-  enrollments: readonly unknown[];
-  certificates: readonly unknown[];
-  badgeAwards: readonly unknown[];
-  xpEvents: readonly unknown[];
-  progressEvents: readonly unknown[];
+  orders: readonly JsonObject[];
+  enrollments: readonly JsonObject[];
+  certificates: readonly JsonObject[];
+  badgeAwards: readonly JsonObject[];
+  xpEvents: readonly JsonObject[];
+  progressEvents: readonly JsonObject[];
+  quizAttempts: readonly JsonObject[];
+  simulatorAttempts: readonly JsonObject[];
   notes: readonly string[];
 }
 
@@ -78,6 +96,8 @@ export interface ExportUserDataDeps {
   badgeAwardRepo: IBadgeAwardRepository;
   xpEventRepo: IXPEventRepository;
   progressEventRepo: IProgressEventRepository;
+  quizAttemptRepo: IQuizAttemptRepository;
+  simulatorAttemptRepo: ISimulatorAttemptRepository;
   clock: Clock;
 }
 
@@ -93,15 +113,25 @@ export class ExportUserData {
     }
     const user = userResult.value;
 
-    const [orders, enrollments, certificates, badgeAwards, xpEvents, progressEvents] =
-      await Promise.all([
-        this.deps.orderRepo.findByUserId(input.userId),
-        this.deps.enrollmentRepo.findByUserId(input.userId),
-        this.deps.certificateRepo.findByUserId(input.userId),
-        this.deps.badgeAwardRepo.findByUserId(input.userId),
-        this.deps.xpEventRepo.findByUserId(input.userId),
-        this.deps.progressEventRepo.findByUserId(input.userId),
-      ]);
+    const [
+      orders,
+      enrollments,
+      certificates,
+      badgeAwards,
+      xpEvents,
+      progressEvents,
+      quizAttempts,
+      simulatorAttempts,
+    ] = await Promise.all([
+      this.deps.orderRepo.findByUserId(input.userId),
+      this.deps.enrollmentRepo.findByUserId(input.userId),
+      this.deps.certificateRepo.findByUserId(input.userId),
+      this.deps.badgeAwardRepo.findByUserId(input.userId),
+      this.deps.xpEventRepo.findByUserId(input.userId),
+      this.deps.progressEventRepo.findByUserId(input.userId),
+      this.deps.quizAttemptRepo.findByUserId(input.userId),
+      this.deps.simulatorAttemptRepo.findByUserId(input.userId),
+    ]);
 
     if (!orders.ok) return Result.err(orders.error);
     if (!enrollments.ok) return Result.err(enrollments.error);
@@ -109,6 +139,8 @@ export class ExportUserData {
     if (!badgeAwards.ok) return Result.err(badgeAwards.error);
     if (!xpEvents.ok) return Result.err(xpEvents.error);
     if (!progressEvents.ok) return Result.err(progressEvents.error);
+    if (!quizAttempts.ok) return Result.err(quizAttempts.error);
+    if (!simulatorAttempts.ok) return Result.err(simulatorAttempts.error);
 
     return Result.ok({
       exportedAt: this.deps.clock.now().toISOString(),
@@ -122,17 +154,19 @@ export class ExportUserData {
         totalXp: user.totalXp,
         createdAt: user.createdAt.toISOString(),
       },
-      orders: orders.value,
-      enrollments: enrollments.value,
-      certificates: certificates.value,
-      badgeAwards: badgeAwards.value,
-      xpEvents: xpEvents.value,
-      progressEvents: progressEvents.value,
-      notes: [
-        "Quiz attempts and simulator attempts are not included in this export yet " +
-          "(the underlying repositories only support per-quiz/per-scenario lookups, " +
-          "not a full history by user).",
-      ],
+      orders: toJsonRecords(orders.value),
+      enrollments: toJsonRecords(enrollments.value),
+      certificates: toJsonRecords(certificates.value),
+      badgeAwards: toJsonRecords(badgeAwards.value),
+      xpEvents: toJsonRecords(xpEvents.value),
+      progressEvents: toJsonRecords(progressEvents.value),
+      quizAttempts: toJsonRecords(quizAttempts.value),
+      simulatorAttempts: toJsonRecords(simulatorAttempts.value),
+      notes: [],
     });
   }
+}
+
+function toJsonRecords(values: readonly unknown[]): readonly JsonObject[] {
+  return JSON.parse(JSON.stringify(values)) as JsonObject[];
 }

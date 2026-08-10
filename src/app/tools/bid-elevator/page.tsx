@@ -70,9 +70,6 @@ export default async function BidElevatorPage() {
           >
             Reset
           </Link>
-          <button className="btn btn-ghost" style={{ marginLeft: "var(--space-3)" }}>
-            Save scenario
-          </button>
         </nav>
         <header className={styles.header}>
           <span className={styles.eyebrow}>Simulator</span>

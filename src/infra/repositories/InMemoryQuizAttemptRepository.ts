@@ -54,6 +54,16 @@ export class InMemoryQuizAttemptRepository implements IQuizAttemptRepository {
     return Result.ok(filtered);
   }
 
+  async findByUserId(
+    userId: string,
+  ): Promise<Result<readonly QuizAttempt[], QuizAttemptRepositoryError>> {
+    return Result.ok(
+      this.attempts
+        .filter((attempt) => attempt.userId === userId)
+        .sort((left, right) => right.startedAt.getTime() - left.startedAt.getTime()),
+    );
+  }
+
   async findLatestByUserAndQuiz(
     userId: string,
     quizId: string,

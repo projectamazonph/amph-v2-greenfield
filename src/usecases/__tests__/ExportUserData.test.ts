@@ -8,6 +8,8 @@ import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadge
 import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
 import { InMemoryProgressEventRepository } from "@/infra/repositories/InMemoryProgressEventRepository";
 import { FixedClock } from "@/ports/system/Clock";
+import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
+import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
 
 function buildUseCase(overrides: { userRepo?: InMemoryUserRepository } = {}) {
   return new ExportUserData({
@@ -18,6 +20,8 @@ function buildUseCase(overrides: { userRepo?: InMemoryUserRepository } = {}) {
     badgeAwardRepo: new InMemoryBadgeAwardRepository(),
     xpEventRepo: new InMemoryXPEventRepository(),
     progressEventRepo: new InMemoryProgressEventRepository(),
+    quizAttemptRepo: new InMemoryQuizAttemptRepository(),
+    simulatorAttemptRepo: new InMemorySimulatorAttemptRepository(),
     clock: new FixedClock(new Date("2026-01-01T00:00:00Z")),
   });
 }
@@ -57,7 +61,10 @@ describe("ExportUserData", () => {
     expect(r.value.badgeAwards).toEqual([]);
     expect(r.value.xpEvents).toEqual([]);
     expect(r.value.progressEvents).toEqual([]);
+    expect(r.value.quizAttempts).toEqual([]);
+    expect(r.value.simulatorAttempts).toEqual([]);
     expect(r.value.exportedAt).toBe("2026-01-01T00:00:00.000Z");
-    expect(r.value.notes.length).toBeGreaterThan(0);
+    expect(r.value.notes).toEqual([]);
+    expect(JSON.parse(JSON.stringify(r.value))).toEqual(r.value);
   });
 });

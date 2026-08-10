@@ -60,6 +60,9 @@ export interface IQuizAttemptRepository {
     quizId: string,
   ): Promise<Result<readonly QuizAttempt[], QuizAttemptRepositoryError>>;
 
+  /** Complete quiz-attempt history for a user, newest first. */
+  findByUserId(userId: string): Promise<Result<readonly QuizAttempt[], QuizAttemptRepositoryError>>;
+
   /**
    * Find the most recent attempt by a specific user for a specific quiz.
    * Used to check if the user has an in-progress attempt or to display

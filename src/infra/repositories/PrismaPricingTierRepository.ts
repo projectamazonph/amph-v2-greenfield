@@ -99,6 +99,21 @@ export class PrismaPricingTierRepository implements IPricingTierRepository {
     }
   }
 
+  async findLinkedCourseSlug(
+    tierId: string,
+  ): Promise<Result<string | null, PricingTierRepositoryError>> {
+    try {
+      const course = await this.db.course.findFirst({
+        where: { pricingTierId: tierId, isPublished: true, displayOrder: { gte: 0 } },
+        orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+        select: { slug: true },
+      });
+      return Result.ok(course?.slug ?? null);
+    } catch (err) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async create(tier: PricingTier): Promise<Result<PricingTier, PricingTierRepositoryError>> {
     try {
       const row = await this.db.pricingTier.create({

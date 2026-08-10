@@ -173,6 +173,25 @@ export class PrismaSimulatorAttemptRepository implements ISimulatorAttemptReposi
     }
   }
 
+  async findByUserId(userId: string): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>> {
+    try {
+      const rows = await this.db.simulatorAttempt.findMany({
+        where: { userId },
+        include: { decisions: { orderBy: { revision: "asc" } } },
+        orderBy: { startedAt: "desc" },
+      });
+      const attempts: SimulatorAttempt[] = [];
+      for (const row of rows) {
+        const mapped = this.mapRow(row as unknown as PrismaAttemptRow);
+        if (!mapped.ok) return mapped;
+        attempts.push(mapped.value);
+      }
+      return Result.ok(attempts);
+    } catch (err) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async addDecision(
     attemptId: string,
     decision: SimulatorDecision,
