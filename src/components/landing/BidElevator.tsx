@@ -417,9 +417,9 @@ export function BidElevator() {
           </div>
 
           <div className={styles.harvest}>
-            <h4>
+            <h3>
               Search-term harvest: <b>promote winners, cut the waste</b>
-            </h4>
+            </h3>
             <div className={styles.tableWrap}>
               <table className={styles.table}>
                 <thead>

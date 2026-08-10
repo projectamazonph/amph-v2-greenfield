@@ -18,7 +18,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 - Added route error boundaries, mobile navigation focus management, exception
   recovery for student actions, and the configured production app URL for payment
   redirects and metadata.
-- Verified 3,789 passing tests, 82.17% statement coverage, 83.21% line coverage,
+- Repaired public contrast, heading order, landmarks, link naming, responsive
+  image sizing, and the pricing outage state. Axe and Lighthouse now fail CI on
+  accessibility regressions instead of logging or swallowing them.
+- Verified 3,795 passing tests, 82.17% statement coverage, 83.21% line coverage,
   clean TypeScript and ESLint checks, and a successful Next.js production build.
   Local Playwright launch remains unavailable because this workspace cannot
   download the required Chromium binary.

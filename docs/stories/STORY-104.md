@@ -48,7 +48,7 @@ account export.
 
 ## Verification
 
-- 3,789 tests passed and 2 were intentionally skipped.
+- 3,795 tests passed and 2 were intentionally skipped.
 - Coverage is 82.17% statements and 83.21% lines.
 - Next.js production build completed all 94 routes.
 - Local browser execution is blocked by the unavailable Chromium binary. The

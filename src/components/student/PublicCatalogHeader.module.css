@@ -92,7 +92,7 @@
 .signUp {
   padding: var(--space-2, 8px) var(--space-4, 16px);
   border-radius: 6px;
-  color: #ffffff;
+  color: var(--accent-ink, #1a1a2e);
   background: var(--accent, #ff6b1a);
   text-decoration: none;
   font-weight: 600;

@@ -80,7 +80,7 @@
 }
 
 .hook b {
-  color: var(--accent-hover);
+  color: var(--accent-text);
 }
 
 .ctaRow {

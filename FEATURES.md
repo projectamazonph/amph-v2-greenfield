@@ -137,7 +137,7 @@ On 2026-08-10:
 - TypeScript: pass.
 - ESLint: pass.
 - Next.js production build: pass, 94 application routes compiled.
-- Full Vitest run without file parallelism: 3,789 passing, 2 skipped.
+- Full Vitest run without file parallelism: 3,795 passing, 2 skipped.
 - Coverage: 82.17% statements, 76.69% branches, 82.83% functions, 83.21% lines.
 - Prisma schema and migration contract tests: pass as part of the full suite.
 - Playwright E2E: blocked locally because the required Chromium binary is not installed and the restricted workspace network returns an empty archive for the standard download.

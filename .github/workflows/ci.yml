@@ -354,16 +354,11 @@ jobs:
         # best-practices as warnings (so a new PR doesn't fail the
         # build on the first performance blip).
         #
-        # The wrapper `|| true` is a soft-pass: the assertion
-        # results still surface in the GitHub Actions summary, so
-        # a regression is visible even when the job stays green.
-        # Tighten to a hard-fail (drop `|| true`) once we have a
-        # stable baseline that meets all four thresholds
-        # consistently.
+        # Accessibility and SEO are hard release gates. Performance
+        # and best-practices remain warnings while their baselines settle.
         run: |
           npx --yes @lhci/cli@0.14.x autorun \
-            --config=./.lighthouserc.json \
-            || true
+            --config=./.lighthouserc.json
       - name: Stop server
         if: always()
         run: pkill -f "server.js" || true

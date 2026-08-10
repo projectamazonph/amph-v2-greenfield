@@ -49,7 +49,7 @@
 
 .mod {
   font-family: var(--font-mono);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
   font-size: 12px;
   white-space: nowrap;
@@ -107,7 +107,7 @@
 }
 
 .note b {
-  color: var(--accent-hover);
+  color: var(--accent-text);
 }
 
 @media (max-width: 760px) {

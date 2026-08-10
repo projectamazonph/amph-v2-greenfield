@@ -35,10 +35,10 @@ export default async function PricingPage() {
 
   const result = await useCase.execute();
 
-  if (!result.ok) {
-    throw new Error("Failed to load pricing offers");
-  }
-  const tiers = result.value.tiers;
+  const loadError = result.ok
+    ? null
+    : "Pricing is temporarily unavailable. Please try again in a few minutes.";
+  const tiers = result.ok ? result.value.tiers : [];
 
   return (
     <main className={styles.page}>
@@ -50,7 +50,11 @@ export default async function PricingPage() {
         </p>
       </header>
 
-      {tiers.length === 0 ? (
+      {loadError ? (
+        <p className={styles.error} role="alert">
+          {loadError}
+        </p>
+      ) : tiers.length === 0 ? (
         <p className={styles.note}>Pricing tiers coming soon.</p>
       ) : (
         <ul className={styles.grid}>

@@ -33,9 +33,11 @@ export function Ticker() {
     <div className={styles.ticker} aria-hidden="true">
       <div className={styles.tickerIn}>
         <span className={styles.tag}>Sample metrics</span>
-        <div className={styles.track}>
-          <TickerSet />
-          <TickerSet />
+        <div className={styles.viewport}>
+          <div className={styles.track}>
+            <TickerSet />
+            <TickerSet />
+          </div>
         </div>
       </div>
     </div>

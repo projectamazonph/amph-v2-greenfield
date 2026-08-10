@@ -33,7 +33,7 @@
   margin-top: 14px;
 }
 
-.col h5 {
+.col h2 {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.18em;
@@ -121,6 +121,6 @@
 }
 
 .bottom b {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }

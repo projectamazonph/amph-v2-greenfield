@@ -35,7 +35,7 @@
 }
 
 .affix {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.62em;
   font-weight: 700;
 }
