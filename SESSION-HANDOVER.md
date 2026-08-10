@@ -11,7 +11,7 @@ workflow on `/admin/users/[id]`.
 New `AdminSetEnrollmentStatus` behavior grants, revokes, and restores access
 without deleting progress, blocks refunded restoration, and records audited
 actor/target/status metadata. Existing subscription changes now distinguish a
-new grant from a change and record the previous tier. The Vercel build command
+new grant from a change and record the previous tier. The production Vercel build command
 runs `prisma migrate deploy` before `next build`, closing the deployed
 `resources` table gap shown in production.
 

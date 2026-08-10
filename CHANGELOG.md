@@ -14,7 +14,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 - Replaced fake dashboard trends, dead buttons, duplicate filters, and the
   content placeholder with real audit activity, refund status, and content
   counts.
-- Added a Vercel build migration step so deployed databases receive pending
+- Added a production-only Vercel build migration step so deployed databases receive pending
   additive Prisma migrations before the new application build goes live.
 - Added an authenticated Playwright journey for tier changes and enrollment
   grant, revoke, and restore on desktop, tablet, and mobile projects.

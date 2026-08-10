@@ -27,8 +27,8 @@ course access, revoke it without losing progress, and restore it later.
 - Replace fake dashboard trends and dead controls with real audit activity,
   pending refund counts, and working links.
 - Replace the content placeholder with real course, module, and lesson counts.
-- Run `prisma migrate deploy` in the Vercel build so additive migrations such
-  as the download-center `resources` table reach the deployed database.
+- Run `prisma migrate deploy` in production Vercel builds so additive migrations
+  such as the download-center `resources` table reach the deployed database.
 
 ## Acceptance checks
 
