@@ -13,7 +13,9 @@ without deleting progress, blocks refunded restoration, and records audited
 actor/target/status metadata. Existing subscription changes now distinguish a
 new grant from a change and record the previous tier. The production Vercel build command
 runs `prisma migrate deploy` before `next build`, closing the deployed
-`resources` table gap shown in production.
+`resources` table gap shown in production. The command clears
+`SHADOW_DATABASE_URL` for `migrate deploy` because Vercel currently defines it
+as the main Neon URL; deploy migrations do not require a shadow database.
 
 Verification before publication: typecheck and lint clean; architecture suite
 641 tests pass; full suite 3,732 tests pass with 2 existing skips; coverage is
