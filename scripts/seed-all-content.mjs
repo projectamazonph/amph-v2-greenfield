@@ -87,6 +87,7 @@ const COURSES = [
     description: "Build a listing-readiness checklist, a profitability and max-CPC worksheet, a keyword map, and a campaign-build rationale.",
     priceMinor: 299900,
     tier: "foundations",
+    coverImage: "/images/courses/course-ppc-foundations.png",
   },
   {
     slug: "accelerated-mastery",
@@ -95,6 +96,7 @@ const COURSES = [
     description: "Build a search-term action log, a bid-change plan, a budget decision log, and a one-page client report.",
     priceMinor: 599900,
     tier: "accelerated",
+    coverImage: "/images/courses/course-accelerated-mastery.png",
   },
   {
     slug: "ultimate-transformation",
@@ -118,6 +120,7 @@ for (const c of COURSES) {
       description: c.description,
       priceMinor: c.priceMinor,
       currency: "PHP",
+      coverImage: c.coverImage ?? null,
     },
     create: {
       id,
@@ -127,6 +130,7 @@ for (const c of COURSES) {
       description: c.description,
       priceMinor: c.priceMinor,
       currency: "PHP",
+      coverImage: c.coverImage ?? null,
       isPublished: true,
       isFeatured: c.slug === "ppc-foundations",
       displayOrder: COURSES.indexOf(c) + 1,
