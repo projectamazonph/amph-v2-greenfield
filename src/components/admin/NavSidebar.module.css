@@ -207,4 +207,10 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
+  /* 44px minimum tap target per DESIGN.md — desktop density (the base
+     .item rule above) stays untouched, this only applies in the drawer. */
+  .item {
+    min-height: 44px;
+    padding: var(--space-3) var(--space-3);
+  }
 }

@@ -12,6 +12,15 @@
   animation: fadeIn 0.15s ease-out;
 }
 
+@media (max-width: 640px) {
+  .overlay {
+    /* .palette is width:100% inside this box — side padding here gives
+       it natural margins instead of touching both screen edges. */
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

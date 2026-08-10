@@ -30,5 +30,9 @@
 @media (max-width: 1023px) {
   .toggle {
     display: flex;
+    /* 44x44 minimum tap target per DESIGN.md — the base rule's 40x40
+       is fine on desktop where this button is display:none anyway. */
+    width: 44px;
+    height: 44px;
   }
 }
