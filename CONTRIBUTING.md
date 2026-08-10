@@ -13,6 +13,7 @@ is future-you, future-co-admins, and the AI agents that work in this repo.
    add a port — never disable the rule.
 3. **One concern per commit.** Conventional commits. Reference the story ID
    in parentheses. Example: `feat(auth): SignIn use case (STORY-006)`.
+   Use `feat/*` for feature branches and `fix/*` for bugfix branches.
 4. **Tests are not optional.** A use case without a `buildTestContainer()`
    test is not done. A domain function without 100% branch coverage is not
    done.
