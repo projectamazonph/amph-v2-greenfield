@@ -168,7 +168,12 @@ describe("AdminGrantSubscription", () => {
     if (stored.ok) expect(stored.value.subscriptionTier).toBe("STARTER");
 
     expect(email.sent).toHaveLength(0);
-    expect(audit.getAll()[0]!.metadata).toMatchObject({ isNewUser: false });
+    expect(audit.getAll()[0]).toMatchObject({ action: "user.subscription_changed" });
+    expect(audit.getAll()[0]!.metadata).toMatchObject({
+      isNewUser: false,
+      previousTier: "FREE",
+      subscriptionTier: "STARTER",
+    });
   });
 
   it("allows correcting a mistaken grant back to FREE", async () => {

@@ -32,7 +32,8 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
   await requireAdmin();
 
   const container = buildContainer();
-  const status = (params.status || undefined) as PaymentStatus | undefined;
+  const selectedStatus = STATUSES.find((entry) => entry.value === params.status)?.value;
+  const status = selectedStatus || undefined;
   const email = params.email || undefined;
 
   const result = await container.adminListPayments.execute({
@@ -100,8 +101,6 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
           Clear
         </Link>
       </form>
-
-      <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>All</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Paid</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Pending</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Failed</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Refunded</button><button className="btn btn-ghost" style={{ fontSize: 'var(--text-xs)' }}>Export CSV</button></div>
 
       {/* Table — client component handles renderCell (function props) */}
       <Card padding={6}>

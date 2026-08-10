@@ -125,6 +125,8 @@ export const amphTheme = defineTheme({
     // AMPH surfaces — warm off-white, not cool gray
     "--color-background-body": amphPalette.surfacePaper,
     "--color-background-surface": amphPalette.surfaceCard,
+    "--color-background-card": amphPalette.surfaceCard,
+    "--color-background-popover": amphPalette.surfaceCard,
     "--color-background-muted": amphPalette.surfaceSubtle,
 
     // AMPH ink ramp

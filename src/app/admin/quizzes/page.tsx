@@ -19,8 +19,18 @@ export default async function QuizzesPage() {
 
   const container = buildContainer();
   const r = await container.adminListQuizzes.execute({});
-  const quizzes = r.ok ? r.value.quizzes : [];
-  const courses = r.ok ? r.value.courses : new Map();
+  if (!r.ok) {
+    return (
+      <div>
+        <TopBar title="Quizzes" subtitle="Manage quiz content for each course" />
+        <Card padding={6}>
+          <p className={styles.error}>Quizzes could not be loaded. Try again.</p>
+        </Card>
+      </div>
+    );
+  }
+  const quizzes = r.value.quizzes;
+  const courses = r.value.courses;
 
   // Map domain Quiz[] → QuizRow[] (plain serializable for client component)
   const rows: QuizRow[] = quizzes.map((q) => ({
@@ -46,9 +56,12 @@ export default async function QuizzesPage() {
 
       <Card padding={6}>
         {rows.length === 0 ? (
-          <p style={{ color: "var(--ink-500)", margin: 0 }}>
-            No quizzes yet. Click <strong>+ Add quiz</strong> to create one.
-          </p>
+          <div className={styles.emptyState}>
+            <p>No quizzes have been created yet.</p>
+            <Link href="/admin/quizzes/new" className={styles.emptyAction}>
+              Create the first quiz
+            </Link>
+          </div>
         ) : (
           <AdminQuizzesTable quizzes={rows} />
         )}

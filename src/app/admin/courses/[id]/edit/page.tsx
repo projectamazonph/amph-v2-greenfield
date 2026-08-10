@@ -3,8 +3,8 @@
  *
  * STORY-048a. Server component (server-action driven).
  *
- * Pre-populated with the current course values. Modules / Lessons
- * editing is a placeholder (STORY-048b/c).
+ * Pre-populated with the current course values. Curriculum management
+ * remains on the course detail page so course metadata saves stay focused.
  */
 
 import Link from "next/link";
@@ -168,13 +168,13 @@ export default async function EditCoursePage({ params }: PageProps) {
         </Card>
 
         <Card padding={6}>
-          <h2 className={styles.sectionTitle}>Modules & lessons (placeholder)</h2>
+          <h2 className={styles.sectionTitle}>Modules and lessons</h2>
           <p className={styles.placeholder}>
-            The curriculum editor lands in <strong>STORY-048b</strong> (modules) and{" "}
-            <strong>STORY-048c</strong> (lessons + MDX). The course currently has{" "}
-            {course.curriculum.sections.length} section(s) and{" "}
-            {course.curriculum.sections.reduce((n, s) => n + s.lessons.length, 0)} lesson(s).
+            Add, edit, reorder, or remove modules and lessons from the course management page.
           </p>
+          <Link href={`/admin/courses/${id}`} className={styles.manageButton}>
+            Manage curriculum
+          </Link>
         </Card>
 
         <Card padding={6}>

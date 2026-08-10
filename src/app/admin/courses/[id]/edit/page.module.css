@@ -107,6 +107,25 @@
   color: var(--ink-900);
 }
 
+.manageButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-4);
+  min-height: 2.75rem;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--ink-900);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.manageButton:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .actions {
   display: flex;
   gap: var(--space-3);

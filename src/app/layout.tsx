@@ -43,7 +43,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      data-theme="light"
+      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+    >
       <body>
         {/* STORY-047: shown when an admin is impersonating another user.
             Server component, reads the amph_admin_session cookie, returns

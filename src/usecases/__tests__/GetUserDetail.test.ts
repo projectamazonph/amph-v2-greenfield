@@ -35,7 +35,10 @@ function makeUser(overrides: Partial<User> = {}): User {
   } as User;
 }
 
-async function seedUser(repo: InMemoryUserRepository, overrides: Partial<User> = {}): Promise<User> {
+async function seedUser(
+  repo: InMemoryUserRepository,
+  overrides: Partial<User> = {},
+): Promise<User> {
   const u = makeUser(overrides);
   await repo.create({
     id: u.id,
@@ -77,6 +80,12 @@ describe("GetUserDetail", () => {
     expect(result.value.user.id).toBe(USER_ID);
     expect(result.value.user.email).toBe("alice@example.com");
     expect(result.value.enrollmentCount).toBe(3);
+    expect(result.value.enrollments).toHaveLength(3);
+    expect(result.value.enrollments.map((enrollment) => enrollment.courseId)).toEqual([
+      "course_0",
+      "course_1",
+      "course_2",
+    ]);
   });
 
   it("returns enrollmentCount=0 when the user has no enrollments", async () => {
@@ -90,6 +99,7 @@ describe("GetUserDetail", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.enrollmentCount).toBe(0);
+    expect(result.value.enrollments).toEqual([]);
   });
 
   it("returns user_not_found when the user does not exist", async () => {

@@ -11,7 +11,7 @@ import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
 import { AdminAuditLogTable, type AuditLogRow } from "@/components/astryx/AdminAuditLogTable";
-import type { AuditAction } from "@/domain/values/AuditAction";
+import { ALL_ACTIONS, isAuditAction } from "@/domain/values/AuditAction";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -26,54 +26,6 @@ interface PageProps {
   }>;
 }
 
-const ALL_ACTIONS: AuditAction[] = [
-  "course.created",
-  "course.updated",
-  "course.archived",
-  "module.created",
-  "module.updated",
-  "module.deleted",
-  "module.reordered",
-  "module.create_failed",
-  "module.update_failed",
-  "module.delete_failed",
-  "module.reorder_failed",
-  "lesson.created",
-  "lesson.updated",
-  "lesson.deleted",
-  "lesson.reordered",
-  "lesson.create_failed",
-  "lesson.update_failed",
-  "lesson.delete_failed",
-  "lesson.reorder_failed",
-  "refund.processed",
-  "refund.overridden",
-  "user.impersonated",
-  "user.stopped_impersonating",
-  "user.subscription_granted",
-  "discount_code.created",
-  "discount_code.updated",
-  "discount_code.archived",
-  "discount_code.create_failed",
-  "discount_code.update_failed",
-  "discount_code.archive_failed",
-  "badge.created",
-  "badge.updated",
-  "badge.archived",
-  "badge.create_failed",
-  "badge.update_failed",
-  "badge.archive_failed",
-  "simulator.created",
-  "simulator.updated",
-  "simulator.archived",
-  "live_class.created",
-  "live_class.updated",
-  "live_class.deleted",
-  "live_class.create_failed",
-  "live_class.update_failed",
-  "live_class.delete_failed",
-];
-
 const TARGET_TYPES = [
   "course",
   "module",
@@ -84,6 +36,11 @@ const TARGET_TYPES = [
   "simulator",
   "live_class",
   "user",
+  "enrollment",
+  "quiz",
+  "certificate",
+  "resource",
+  "email_template",
 ];
 
 export default async function AdminAuditLogPage({ searchParams }: PageProps) {
@@ -94,7 +51,7 @@ export default async function AdminAuditLogPage({ searchParams }: PageProps) {
 
   const filters = {
     actorId: params.actorId || undefined,
-    action: (params.action || undefined) as AuditAction | undefined,
+    action: params.action && isAuditAction(params.action) ? params.action : undefined,
     targetType: params.targetType || undefined,
     targetId: params.targetId || undefined,
     from: params.from ? new Date(params.from) : undefined,
@@ -153,12 +110,7 @@ export default async function AdminAuditLogPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
-        <div style={{ flex: 1 }}>
-          <TopBar title="Audit Log" subtitle={`${result.value.total.toLocaleString()} total entries`} />
-        </div>
-        <button className="btn btn-ghost" style={{ fontSize: 'var(--text-sm)' }}>Download CSV</button>
-      </div>
+      <TopBar title="Audit Log" subtitle={`${result.value.total.toLocaleString()} total entries`} />
 
       <form method="get" className={styles.filters}>
         <div className={styles.filterRow}>

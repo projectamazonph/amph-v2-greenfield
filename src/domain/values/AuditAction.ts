@@ -44,6 +44,11 @@ export type AuditAction =
   | "user.data_exported"
   // Admin manual subscription-tier grant (bypasses checkout)
   | "user.subscription_granted"
+  | "user.subscription_changed"
+  // Enrollment access
+  | "enrollment.granted"
+  | "enrollment.revoked"
+  | "enrollment.restored"
   // Discount code
   | "discount_code.created"
   | "discount_code.updated"
@@ -127,6 +132,10 @@ export const ALL_ACTIONS: AuditAction[] = [
   "user.account_deleted",
   "user.data_exported",
   "user.subscription_granted",
+  "user.subscription_changed",
+  "enrollment.granted",
+  "enrollment.revoked",
+  "enrollment.restored",
   "discount_code.created",
   "discount_code.updated",
   "discount_code.archived",

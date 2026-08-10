@@ -76,8 +76,7 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
         <TopBar title="Download center" subtitle="Guides, templates, and other downloadables" />
         <Card padding={6}>
           <p className={styles.error}>
-            Failed to load resources:{" "}
-            {result.error.kind === "db_error" ? result.error.message : result.error.kind}
+            Resources could not be loaded. The database may still be updating; try again shortly.
           </p>
         </Card>
       </div>

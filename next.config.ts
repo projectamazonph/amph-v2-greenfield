@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   // STORY-0026 follow-up: build a self-contained production artifact
   // so the lighthouse job (and any other consumer) can start the
   // server without the broken pnpm-store symlinks in .next/.
-  output: 'standalone',
+  output: "standalone",
   // The generated Prisma client (query compiler WASM + generated JS)
   // lives in node_modules/.prisma/client, a dot-prefixed directory that
   // @prisma/client requires via a computed path rather than a literal
@@ -25,4 +25,7 @@ export default withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG ?? "amph",
   project: process.env.SENTRY_PROJECT ?? "amph-v2",
   silent: !process.env.SENTRY_AUTH_TOKEN,
+  // Keep builds deterministic in restricted CI environments. Runtime error
+  // reporting and authenticated source-map uploads are unaffected.
+  telemetry: false,
 });

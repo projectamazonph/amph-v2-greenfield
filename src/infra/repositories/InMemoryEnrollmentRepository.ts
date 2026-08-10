@@ -15,10 +15,7 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
   private enrollments = new Map<string, Enrollment>(); // id → enrollment
   private userCourseIndex = new Map<string, string>(); // `${userId}:${courseId}` → id
 
-  async findByUserIdAndCourseId(
-    userId: string,
-    courseId: string,
-  ): Promise<Enrollment | null> {
+  async findByUserIdAndCourseId(userId: string, courseId: string): Promise<Enrollment | null> {
     const key = `${userId}:${courseId}`;
     const id = this.userCourseIndex.get(key);
     if (!id) return null;
@@ -31,21 +28,13 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
     return Result.ok(e);
   }
 
-  async findByUserId(
-    userId: string,
-  ): Promise<Result<readonly Enrollment[], EnrollmentError>> {
-    const all = Array.from(this.enrollments.values()).filter(
-      (e) => e.userId === userId,
-    );
+  async findByUserId(userId: string): Promise<Result<readonly Enrollment[], EnrollmentError>> {
+    const all = Array.from(this.enrollments.values()).filter((e) => e.userId === userId);
     return Result.ok(all);
   }
 
-  async findByCourseId(
-    courseId: string,
-  ): Promise<Result<readonly Enrollment[], EnrollmentError>> {
-    const all = Array.from(this.enrollments.values()).filter(
-      (e) => e.courseId === courseId,
-    );
+  async findByCourseId(courseId: string): Promise<Result<readonly Enrollment[], EnrollmentError>> {
+    const all = Array.from(this.enrollments.values()).filter((e) => e.courseId === courseId);
     return Result.ok(all);
   }
 
@@ -64,7 +53,10 @@ export class InMemoryEnrollmentRepository implements IEnrollmentRepository {
       return Result.err({ kind: "not_found" });
     }
     // Store as mutable copy so callers can mutate progress fields
-    const updated: Enrollment = { ...enrollment };
+    const updated: Enrollment = {
+      ...enrollment,
+      completedLessonIds: [...enrollment.completedLessonIds],
+    };
     this.enrollments.set(enrollment.id, updated);
     return Result.ok(updated);
   }

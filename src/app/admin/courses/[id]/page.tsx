@@ -3,9 +3,8 @@
  *
  * STORY-048a + STORY-048b. Server component.
  *
- * Shows the course's fields + an Archive button + a live modules
- * section (added in 048b). Lessons section is still a placeholder
- * (STORY-048c).
+ * Shows the course fields, publishing controls, and the live module
+ * and lesson management entry points.
  */
 
 import Link from "next/link";
@@ -186,8 +185,8 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
             <dd className={styles.mono}>{courseTotalDurationMinutes(course)} min</dd>
           </dl>
           <p className={styles.placeholder}>
-            The legacy <code>Course.curriculum</code> JSON blob is still shown for backward compat.
-            The <strong>Modules</strong> section below is the new admin surface (STORY-048b).
+            These totals come from the original curriculum record. Use the modules below to manage
+            the current course structure and lesson content.
           </p>
         </Card>
 

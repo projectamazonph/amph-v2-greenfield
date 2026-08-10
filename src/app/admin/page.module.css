@@ -138,6 +138,48 @@
   border-left: 1px solid var(--border);
 }
 
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activityItem {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-500);
+}
+
+.activityItem:last-child {
+  border-bottom: 0;
+}
+.activityItem svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.activityItem div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.activityItem strong {
+  color: var(--ink-900);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.activityItem span {
+  color: var(--ink-500);
+  font: var(--text-xs)/1.4 var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
 .cardHeader {
   margin-bottom: var(--space-4);
 }

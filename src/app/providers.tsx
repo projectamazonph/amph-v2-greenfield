@@ -26,7 +26,7 @@ export interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <Theme theme={amphTheme}>
+    <Theme theme={amphTheme} mode="light">
       <LinkProvider component={Link}>{children}</LinkProvider>
     </Theme>
   );

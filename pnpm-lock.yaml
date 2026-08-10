@@ -120,6 +120,9 @@ importers:
       '@eslint/eslintrc':
         specifier: '3'
         version: 3.3.6
+      '@next/eslint-plugin-next':
+        specifier: 16.2.10
+        version: 16.2.10
       '@playwright/test':
         specifier: ^1.62.0
         version: 1.62.0

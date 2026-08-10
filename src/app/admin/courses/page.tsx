@@ -127,8 +127,6 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
           filters={{ search, status }}
         />
       </Card>
-
-      <Link href="/admin/courses/new" style={{ position: 'fixed', bottom: 'var(--space-6)', right: 'var(--space-6)', width: 56, height: 56, borderRadius: '50%', background: 'var(--accent)', color: 'var(--accent-ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>+</Link>
     </div>
   );
 }

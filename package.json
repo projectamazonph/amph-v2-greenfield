@@ -75,6 +75,7 @@
     "@cobusgreyling/loop-cost": "^1.2.0",
     "@cobusgreyling/loop-sync": "^1.0.0",
     "@eslint/eslintrc": "3",
+    "@next/eslint-plugin-next": "16.2.10",
     "@playwright/test": "^1.62.0",
     "@types/node": "^26.1.2",
     "@types/pg": "^8.11.0",

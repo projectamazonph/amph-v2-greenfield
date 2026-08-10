@@ -48,3 +48,29 @@
   gap: var(--space-3);
   flex-shrink: 0;
 }
+
+@media (max-width: 640px) {
+  .header {
+    padding: 0 0 var(--space-5);
+    margin-bottom: var(--space-5);
+  }
+  .row {
+    gap: var(--space-4);
+  }
+  .title {
+    font-size: var(--text-2xl);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+  .subtitle {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+  }
+  .actions {
+    width: 100%;
+  }
+  .actions > * {
+    flex: 1;
+    text-align: center;
+  }
+}

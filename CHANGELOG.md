@@ -4,6 +4,21 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-10: Admin access management and responsive recovery (STORY-103)
+
+- Added audited subscription-tier changes and course enrollment grant, revoke,
+  and restore controls to each admin user detail page.
+- Fixed the Astryx light/dark token mismatch that rendered dark cards with dark
+  text on phones, plus mobile header, drawer, grid, form, card, and table
+  overflow across the admin console.
+- Replaced fake dashboard trends, dead buttons, duplicate filters, and the
+  content placeholder with real audit activity, refund status, and content
+  counts.
+- Added a production-only Vercel build migration step so deployed databases receive pending
+  additive Prisma migrations before the new application build goes live.
+- Added an authenticated Playwright journey for tier changes and enrollment
+  grant, revoke, and restore on desktop, tablet, and mobile projects.
+
 ### 2026-08-09: Long-form skeptical-buyer FAQ page (`/faq`)
 
 Direct request, not sprint backlog work (same pattern as the 2026-07-26
