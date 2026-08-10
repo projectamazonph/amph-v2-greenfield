@@ -4,6 +4,32 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-09: Long-form skeptical-buyer FAQ page (`/faq`)
+
+Direct request, not sprint backlog work (same pattern as the 2026-07-26
+landing page replacement: no `docs/stories/STORY-XXX.md` for this one).
+
+- **New `/faq` page.** Ryan's 10-question skeptical-buyer FAQ, first
+  person, structured around naming what still isn't finished, not just
+  what works. Content lives in `src/app/faq/faqContent.ts` as data,
+  separate from `src/app/faq/page.tsx`'s layout.
+- **Two "what I need to fix" claims corrected before publishing.** The
+  simulator-realism and score/certificate questions described gaps
+  that Sprint 14/15 already closed (formative-only labeling, non-binary
+  Listing Audit ground truth, Campaign Builder's 7-dimension scoring,
+  anti-gaming calibration). Two more got a "what I've fixed" line added
+  from verifiable shipped work (the download center + embedded Ad
+  Console, and the homepage's live Bid Elevator preview). The other six
+  questions are unchanged from what Ryan supplied — no evidence those
+  gaps are closed.
+- **Linked from the landing page's short FAQ accordion**
+  (`src/components/landing/FAQSection.tsx`), which keeps its own
+  six-answer quick-reference content unchanged.
+- Regression test (`src/app/faq/__tests__/faq-page.test.ts`) locks in
+  the structure: exactly 10 items, no em dashes, no
+  `docs/voice-guide.md` banned phrases, and the scoring answer can't
+  drift into job-guarantee language.
+
 ### 2026-08-05: Course detail zero-meta + voice fixes (STORY-102)
 
 Three follow-up fixes from the 2026-08-05 audit pass on the live
