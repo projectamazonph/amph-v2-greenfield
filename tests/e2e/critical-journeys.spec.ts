@@ -6,7 +6,13 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { clearE2EUsers, clearE2ESeedData, seedAdminUser, seedCertificate } from "./helpers/seed";
+import {
+  clearE2EUsers,
+  clearE2ESeedData,
+  seedAdminAccessScenario,
+  seedAdminUser,
+  seedCertificate,
+} from "./helpers/seed";
 
 const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 const DATABASE_URL = process.env.DATABASE_URL ?? "";
@@ -112,17 +118,57 @@ test.describe("Critical journeys", () => {
     await expect(page.getByText(`E2E Journey 4 Course ${suffix}`)).toBeVisible();
   });
 
-  test("journey 5: admin issues certificate for completed enrollment", async ({ page }) => {
-    // No manual "issue certificate" admin UI exists — certificates are
-    // issued programmatically by IssueCertificate when a course is
-    // completed (src/usecases/IssueCertificate.ts), not driven through
-    // a form. Covering that path end-to-end would mean scripting a
-    // full course completion (enroll, finish every lesson/quiz) purely
-    // to reach a UI-less trigger, which is better covered by
-    // IssueCertificate's own unit/integration tests. Journey 6 below
-    // covers the actual UI surface (public verification page) using a
-    // directly-seeded certificate instead.
-    test.skip();
+  test("journey 5: admin changes a tier and manages course enrollment", async ({ page }) => {
+    test.skip(!DATABASE_URL, "requires DATABASE_URL to seed admin access data");
+    const [admin, scenario] = await Promise.all([
+      seedAdminUser(DATABASE_URL),
+      seedAdminAccessScenario(DATABASE_URL),
+    ]);
+    test.skip(!admin || !scenario, "admin access seeding failed; see console warnings");
+    if (!admin || !scenario) return;
+
+    await page.goto(`${BASE}/admin-login`);
+    await page.getByLabel(/admin email/i).fill(admin.email);
+    await page.getByLabel(/^password$/i).fill(admin.password);
+    await page.getByRole("button", { name: /sign in/i }).click();
+    await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
+
+    const adminPages = [
+      ["/admin/content", "Content"],
+      ["/admin/quizzes", "Quizzes"],
+      ["/admin/simulators", "Simulator scenarios"],
+      ["/admin/resources", "Download center"],
+      ["/admin/users", "Users"],
+    ] as const;
+    for (const [path, heading] of adminPages) {
+      await page.goto(`${BASE}${path}`);
+      await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+        .toBe(true);
+    }
+
+    await page.goto(`${BASE}/admin/users/${scenario.studentId}`);
+    await expect(page.getByRole("heading", { name: scenario.studentName })).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+      .toBe(true);
+
+    await page.getByLabel(/^tier$/i).selectOption("PRO");
+    await page.getByRole("button", { name: /save tier/i }).click();
+    await expect(page.getByRole("status")).toContainText("Subscription tier updated");
+
+    const courseRow = page.getByText(scenario.courseTitle).locator("..").locator("..");
+    await courseRow.getByRole("button", { name: /^enroll$/i }).click();
+    await expect(page.getByRole("status")).toContainText("Course access");
+    await expect(courseRow.getByText("Active", { exact: true })).toBeVisible();
+
+    page.once("dialog", (dialog) => dialog.accept());
+    await courseRow.getByRole("button", { name: /^revoke$/i }).click();
+    await expect(page.getByRole("status")).toContainText("Course access revoked");
+
+    await courseRow.getByRole("button", { name: /^restore$/i }).click();
+    await expect(page.getByRole("status")).toContainText("Course access restored");
   });
 
   test("journey 6: public verifies certificate by hash", async ({ page }) => {

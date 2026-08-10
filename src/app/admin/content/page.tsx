@@ -1,97 +1,101 @@
-/**
- * /admin/content — Content management hub.
- *
- * STORY-046. Server component.
- *
- * Story 019 (composio) and Sprint 14 (curriculum content) are the
- * real content surfaces; this page is a placeholder hub that:
- *  - Documents where content actually lives in the app
- *  - Surfaces the "Import amph content" admin action once Sprint 11
- *    ships the admin-gated form for it
- *  - Shows existing content counts read from the repo so the page
- *    is useful even today
- *
- * Sprint 11+ will replace this with a full CMS.
- */
-
 import Link from "next/link";
+import { BookOpen, DownloadSimple, GameController, Question } from "@phosphor-icons/react/dist/ssr";
+import { Card } from "@astryxdesign/core";
 import { requireAdmin } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
-import { Card } from "@astryxdesign/core";
 import styles from "./page.module.css";
 
 const numberFormat = new Intl.NumberFormat("en-US");
 
 export default async function AdminContentPage() {
-  const user = await requireAdmin();
-  const container = buildContainer();
-
-  // Best-effort course count. If the DB or repo isn't reachable the
-  // page still renders with zero — the hub is informational.
-  const coursesResult = await container.courseRepo.listAll();
-  const courseCount = coursesResult.ok ? coursesResult.value.length : 0;
+  await requireAdmin();
+  const result = await buildContainer().getAdminContentStats.execute();
 
   return (
     <div>
-      <TopBar title="Content" subtitle="Curriculum modules, lessons, and MDX posts" />
+      <TopBar title="Content" subtitle="Manage the complete learning catalog from one workspace" />
 
-      <section className={styles.statGrid} aria-label="Content counts">
-        <div className={styles.countCard}>
-          <div className={styles.countLabel}>Courses</div>
-          <div className={styles.countValue}>{numberFormat.format(courseCount)}</div>
-          <Link href="/admin/courses" className={styles.countLink}>
-            Manage →
-          </Link>
-        </div>
-        <div className={styles.countCard}>
-          <div className={styles.countLabel}>Modules</div>
-          <div className={styles.countValue}>—</div>
-          <span className={styles.countHint}>counted per course</span>
-        </div>
-        <div className={styles.countCard}>
-          <div className={styles.countLabel}>Lessons</div>
-          <div className={styles.countValue}>—</div>
-          <span className={styles.countHint}>counted per module</span>
-        </div>
+      {!result.ok ? (
+        <Card padding={6} className={styles.cardGap}>
+          <p className={styles.error}>Content counts could not be loaded: {result.error.message}</p>
+        </Card>
+      ) : (
+        <section className={styles.statGrid} aria-label="Content counts">
+          <CountCard label="Courses" value={result.value.courseCount} />
+          <CountCard label="Modules" value={result.value.moduleCount} />
+          <CountCard label="Lessons" value={result.value.lessonCount} />
+        </section>
+      )}
+
+      <section className={styles.actionGrid} aria-label="Content management areas">
+        <ContentLink
+          href="/admin/courses"
+          icon={<BookOpen size={24} weight="duotone" />}
+          title="Courses and lessons"
+          description="Create courses, organize modules, edit lessons, and control publishing."
+        />
+        <ContentLink
+          href="/admin/quizzes"
+          icon={<Question size={24} weight="duotone" />}
+          title="Quizzes"
+          description="Build assessments, answer options, explanations, and passing scores."
+        />
+        <ContentLink
+          href="/admin/simulators"
+          icon={<GameController size={24} weight="duotone" />}
+          title="Simulator scenarios"
+          description="Draft, publish, version, and archive simulator practice scenarios."
+        />
+        <ContentLink
+          href="/admin/resources"
+          icon={<DownloadSimple size={24} weight="duotone" />}
+          title="Download center"
+          description="Upload and manage guides, templates, handouts, and access tiers."
+        />
       </section>
 
-      <Card padding={6} className={styles.importCard}>
-        <h2 className={styles.sectionTitle}>Import AMPH content</h2>
+      <Card padding={6}>
+        <h2 className={styles.sectionTitle}>How curriculum content is stored</h2>
         <p className={styles.help}>
-          Bulk-import the curriculum from <code>content/curriculum/</code> (MDX + JSON). The CLI is{" "}
-          <code>pnpm import:content</code>. The web-based importer UI lands in Sprint 11+; until
-          then, run the script from a machine with write access to the DB.
-        </p>
-      </Card>
-
-      <Card padding={6} className={styles.comingCard}>
-        <h2 className={styles.sectionTitle}>What lives here</h2>
-        <ul className={styles.list}>
-          <li>
-            <strong>Course catalog</strong> — managed under{" "}
-            <Link href="/admin/courses">Courses</Link>. Each course owns modules and lessons.
-          </li>
-          <li>
-            <strong>Lesson body</strong> — stored as MDX in{" "}
-            <code>content/curriculum/modules/&lt;slug&gt;/</code>. The Next.js MDX renderer (
-            <code>NextMdxRenderer</code>) reads from the filesystem at request time.
-          </li>
-          <li>
-            <strong>Quizzes</strong> — managed under <Link href="/admin/quizzes">Quizzes</Link>.
-            Questions and options live in the <code>quizzes</code>, <code>quiz_questions</code>, and{" "}
-            <code>quiz_options</code> tables.
-          </li>
-          <li>
-            <strong>Simulator scenarios</strong> — managed under{" "}
-            <Link href="/admin/simulators">Simulators</Link>.
-          </li>
-        </ul>
-        <p className={styles.footerNote}>
-          {user.firstName}, this page is intentionally a hub for now — the full CMS UI ships in
-          Sprint 11+.
+          Course structure is managed in the database through the course editor. Lesson bodies can
+          reference MDX under <code>content/curriculum/</code>, while quizzes and simulator
+          scenarios use their dedicated editors above.
         </p>
       </Card>
     </div>
+  );
+}
+
+function CountCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className={styles.countCard}>
+      <div className={styles.countLabel}>{label}</div>
+      <div className={styles.countValue}>{numberFormat.format(value)}</div>
+    </div>
+  );
+}
+
+function ContentLink({
+  href,
+  icon,
+  title,
+  description,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Link href={href} className={styles.actionCard}>
+      <span className={styles.actionIcon} aria-hidden>
+        {icon}
+      </span>
+      <span className={styles.actionText}>
+        <strong>{title}</strong>
+        <small>{description}</small>
+      </span>
+    </Link>
   );
 }

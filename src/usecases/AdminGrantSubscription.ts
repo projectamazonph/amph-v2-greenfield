@@ -88,10 +88,12 @@ export class AdminGrantSubscription {
 
     let userId: string;
     let isNewUser: boolean;
+    let previousTier: SubscriptionTier | null;
 
     if (existingResult.ok) {
       userId = existingResult.value.id;
       isNewUser = false;
+      previousTier = existingResult.value.subscriptionTier;
     } else if (existingResult.error.kind === "db_error") {
       return Result.err({ kind: "db_error", message: existingResult.error.message });
     } else {
@@ -124,6 +126,7 @@ export class AdminGrantSubscription {
       if (createResult.ok) {
         userId = createResult.value.id;
         isNewUser = true;
+        previousTier = null;
       } else if (createResult.error.kind === "email_taken") {
         // Race: another request created this user between findByEmail and
         // create() above. Treat it like the "existing user" path.
@@ -133,6 +136,7 @@ export class AdminGrantSubscription {
         }
         userId = raceResult.value.id;
         isNewUser = false;
+        previousTier = raceResult.value.subscriptionTier;
       } else {
         const message =
           createResult.error.kind === "db_error"
@@ -155,11 +159,12 @@ export class AdminGrantSubscription {
 
     await this.deps.recordAuditLog.execute({
       actorId: input.actorId,
-      action: "user.subscription_granted",
+      action: isNewUser ? "user.subscription_granted" : "user.subscription_changed",
       targetType: "user",
       targetId: userId,
       metadata: {
         subscriptionTier: input.subscriptionTier,
+        previousTier,
         isNewUser,
         ...(input.payment
           ? {

@@ -1,10 +1,10 @@
 /**
  * /admin/settings — admin system settings view.
  *
- * STORY-050e. Read-only dashboard for runtime config + operational
- * status. Future story (Sprint 11+) will add write actions.
+ * Runtime configuration, operational links, and admin 2FA controls.
  */
 import { requireAdmin } from "@/lib/auth";
+import Link from "next/link";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
 import { disableTwoFactorAction, enableTwoFactorAction } from "@/app/actions/twoFactor.action";
@@ -159,13 +159,15 @@ export default async function SettingsPage({
       </Card>
 
       <Card padding={6}>
-        <h2 className={styles.sectionTitle}>Coming soon</h2>
-        <ul className={styles.list}>
-          <li>Edit site name + tagline (Sprint 11+)</li>
-          <li>Configure default XP multipliers (Sprint 11+)</li>
-          <li>Toggle maintenance mode (Sprint 11+)</li>
-          <li>Custom certificate template (Sprint 11+)</li>
-        </ul>
+        <h2 className={styles.sectionTitle}>Operations</h2>
+        <p className={styles.help}>
+          Review security-sensitive changes and verify content services.
+        </p>
+        <div className={styles.operationLinks}>
+          <Link href="/admin/audit-log">Open audit log</Link>
+          <Link href="/admin/resources">Manage download center</Link>
+          <Link href="/admin/email-templates">Manage email templates</Link>
+        </div>
       </Card>
     </div>
   );

@@ -1,5 +1,27 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-10, STORY-103)
+
+Ryan requested a complete admin usability and student-access recovery after a
+mobile production review. The implementation is on
+`feat/admin-backend-completion`. It fixes the Astryx system-mode mismatch,
+responsive admin shell and table overflow, and the missing tier/enrollment
+workflow on `/admin/users/[id]`.
+
+New `AdminSetEnrollmentStatus` behavior grants, revokes, and restores access
+without deleting progress, blocks refunded restoration, and records audited
+actor/target/status metadata. Existing subscription changes now distinguish a
+new grant from a change and record the previous tier. The Vercel build command
+runs `prisma migrate deploy` before `next build`, closing the deployed
+`resources` table gap shown in production.
+
+Verification before publication: typecheck and lint clean; architecture suite
+641 tests pass; full suite 3,732 tests pass with 2 existing skips; coverage is
+82.74% statements and 77.17% branches. The authenticated Playwright journey now
+covers tier update plus enroll, revoke, and restore across all configured
+desktop, tablet, and mobile projects. The production build completes all 52
+pages. PR checks still need to be recorded below when the branch is published.
+
 # Session update (2026-08-04, STORY-083/084 + review-comment fixes, PR #289 merged)
 
 Continuation of the same day's STORY-085 session (below). Ryan redirected the work to

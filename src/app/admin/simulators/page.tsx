@@ -56,7 +56,17 @@ export default async function AdminSimulatorsPage({ searchParams }: PageProps) {
   }
 
   const result = await container.adminListScenarios.execute(filter);
-  const scenarios = result.ok ? pickRepresentative(result.value.scenarios) : [];
+  if (!result.ok) {
+    return (
+      <div>
+        <TopBar title="Simulator scenarios" subtitle="Manage simulator practice content" />
+        <Card padding={6}>
+          <p className={styles.error}>Simulator scenarios could not be loaded. Try again.</p>
+        </Card>
+      </div>
+    );
+  }
+  const scenarios = pickRepresentative(result.value.scenarios);
 
   // Map domain SimulatorScenario[] → ScenarioRow[]
   const rows: ScenarioRow[] = scenarios.map((s) => ({

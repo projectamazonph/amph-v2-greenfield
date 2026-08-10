@@ -100,3 +100,12 @@ export function createEnrollment(params: {
   };
   return Result.ok(enrollment);
 }
+
+/** Preserve learning progress while changing the access state. */
+export function withEnrollmentStatus(enrollment: Enrollment, status: EnrollmentStatus): Enrollment {
+  return {
+    ...enrollment,
+    status,
+    completedLessonIds: [...enrollment.completedLessonIds],
+  };
+}

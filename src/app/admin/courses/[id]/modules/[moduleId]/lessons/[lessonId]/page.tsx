@@ -139,8 +139,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
         </dl>
 
         <p className={styles.placeholder}>
-          The full content JSON is shown on the edit page. The MDX/text editor for TEXT lessons
-          lands in <strong>STORY-048c.5</strong>.
+          Use Edit to update the lesson title, type, and validated content payload.
         </p>
       </Card>
     </div>

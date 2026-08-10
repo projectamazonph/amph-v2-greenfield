@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm prisma:deploy && pnpm build",
   "crons": [
     {
       "path": "/api/cron/live-class-reminders",

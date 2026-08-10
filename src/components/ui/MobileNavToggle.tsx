@@ -71,15 +71,25 @@ export function MobileNavToggle({ sidebarId }: MobileNavToggleProps) {
   }, [open, sidebarId]);
 
   return (
-    <button
-      type="button"
-      className={styles.toggle}
-      onClick={toggle}
-      aria-expanded={open}
-      aria-controls={sidebarId}
-      aria-label={open ? "Close navigation" : "Open navigation"}
-    >
-      {open ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
-    </button>
+    <>
+      <button
+        type="button"
+        className={styles.toggle}
+        onClick={toggle}
+        aria-expanded={open}
+        aria-controls={sidebarId}
+        aria-label={open ? "Close navigation" : "Open navigation"}
+      >
+        {open ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
+      </button>
+      {open ? (
+        <button
+          type="button"
+          className={styles.backdrop}
+          onClick={close}
+          aria-label="Close navigation"
+        />
+      ) : null}
+    </>
   );
 }

@@ -20,11 +20,7 @@ import { MobileNavToggle } from "@/components/ui/MobileNavToggle";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import styles from "./layout.module.css";
 
-export default async function AdminLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
   // Auth gate. This redirects to /login or /dashboard?error=forbidden
   // if the user isn't an admin. The redirect throws — execution does
   // not continue past this line in the unauthorized case.
@@ -43,6 +39,8 @@ export default async function AdminLayout({
           { href: "/admin/simulators", label: "Simulators", section: "Content" },
           { href: "/admin/quizzes", label: "Quizzes", section: "Content" },
           { href: "/admin/badges", label: "Badges", section: "Content" },
+          { href: "/admin/email-templates", label: "Email templates", section: "Content" },
+          { href: "/admin/resources", label: "Download center", section: "Content" },
           { href: "/admin/users", label: "Users", section: "Operations" },
           { href: "/admin/payments", label: "Payments", section: "Operations" },
           { href: "/admin/refunds", label: "Refunds", section: "Operations" },

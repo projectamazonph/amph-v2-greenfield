@@ -15,9 +15,10 @@
  */
 
 import { Result } from "@/domain/shared/Result";
-import type { UserRepository, UserError } from "@/ports/repositories/UserRepository";
-import type { IEnrollmentRepository, EnrollmentError } from "@/ports/repositories/IEnrollmentRepository";
+import type { UserRepository } from "@/ports/repositories/UserRepository";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { User } from "@/domain/entities/User";
+import type { Enrollment } from "@/domain/entities/Enrollment";
 
 // ── Input / Output types ───────────────────────────────────────────────────
 
@@ -25,12 +26,10 @@ export interface GetUserDetailInput {
   userId: string;
 }
 
-export type GetUserDetailError =
-  | { kind: "user_not_found" }
-  | { kind: "db_error"; message: string };
+export type GetUserDetailError = { kind: "user_not_found" } | { kind: "db_error"; message: string };
 
 export type GetUserDetailResult = Result<
-  { user: User; enrollmentCount: number },
+  { user: User; enrollments: readonly Enrollment[]; enrollmentCount: number },
   GetUserDetailError
 >;
 
@@ -70,9 +69,10 @@ export class GetUserDetail {
           : "Failed to count enrollments";
       return Result.err({ kind: "db_error", message: msg });
     }
-    const enrollmentCount = enrollmentsResult.value.length;
+    const enrollments = enrollmentsResult.value;
+    const enrollmentCount = enrollments.length;
 
     // ── 3. Return ─────────────────────────────────────────
-    return Result.ok({ user, enrollmentCount });
+    return Result.ok({ user, enrollments, enrollmentCount });
   }
 }

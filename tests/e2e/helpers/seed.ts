@@ -141,6 +141,58 @@ export async function seedAdminUser(
   }
 }
 
+/** Seed the student and published course used by the admin access journey. */
+export async function seedAdminAccessScenario(
+  databaseUrl: string,
+): Promise<{ studentId: string; studentName: string; courseTitle: string } | null> {
+  const conn = await connectForSeed(databaseUrl, "seedAdminAccessScenario");
+  if (!conn) return null;
+  try {
+    const suffix = Date.now();
+    const student = await conn.prisma.user.create({
+      data: {
+        id: `e2e-access-student-${suffix}`,
+        email: `e2e-access-student-${suffix}@example.com`,
+        password: "unused-in-this-journey",
+        firstName: "Ana",
+        lastName: `Santos${suffix}`,
+        verificationStatus: "VERIFIED",
+      },
+    });
+    const course = await conn.prisma.course.create({
+      data: {
+        id: `e2e-access-course-${suffix}`,
+        slug: `e2e-access-course-${suffix}`,
+        title: `E2E Access Course ${suffix}`,
+        tagline: "Seeded for admin access management",
+        description: "Seeded for admin access management.",
+        priceMinor: 299900,
+        curriculum: {
+          sections: [
+            {
+              id: "module-1",
+              title: "Module 1",
+              lessons: [{ id: "lesson-1", title: "Lesson 1", type: "TEXT", content: "" }],
+            },
+          ],
+        },
+        isPublished: true,
+      },
+    });
+    return {
+      studentId: student.id,
+      studentName: `${student.firstName} ${student.lastName}`,
+      courseTitle: course.title,
+    };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("[seedAdminAccessScenario] failed (non-fatal):", err);
+    return null;
+  } finally {
+    await disconnect(conn);
+  }
+}
+
 /**
  * Seed a user + a PUBLISHED course + an issued Certificate for that
  * (user, course) pair, directly via Prisma — certificates are issued

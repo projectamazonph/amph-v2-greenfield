@@ -236,6 +236,9 @@ describe("GetAdminDashboardStats", () => {
     await deps.enrollmentRepo.create(makeEnrollment("e1", "u1", "c1"));
     await deps.enrollmentRepo.create(makeEnrollment("e2", "u1", "c2"));
     await deps.enrollmentRepo.create(makeEnrollment("e3", "u2", "c1"));
+    const cancelled = makeEnrollment("e4", "u2", "c2");
+    await deps.enrollmentRepo.create(cancelled);
+    await deps.enrollmentRepo.update({ ...cancelled, status: "cancelled" });
 
     const uc = new GetAdminDashboardStats(deps);
     const result = await uc.execute();

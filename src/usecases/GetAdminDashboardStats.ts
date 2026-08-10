@@ -89,7 +89,8 @@ export class GetAdminDashboardStats {
     let activeEnrollments = 0;
     for (const user of allUsers) {
       const r = await this.deps.enrollmentRepo.findByUserId(user.id);
-      if (r.ok) activeEnrollments += r.value.length;
+      if (r.ok)
+        activeEnrollments += r.value.filter((enrollment) => enrollment.status === "active").length;
     }
 
     // ── totalRevenuePhp ──────────────────────────────────────────

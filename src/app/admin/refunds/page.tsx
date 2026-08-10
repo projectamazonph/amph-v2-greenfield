@@ -128,8 +128,6 @@ export default async function AdminRefundsPage({ searchParams }: PageProps) {
         subtitle={`${total.toLocaleString()} ${status} request${total === 1 ? "" : "s"}`}
       />
 
-      <div style={{ marginBottom: 'var(--space-4)' }}><button className="btn btn-ghost" style={{ fontSize: 'var(--text-sm)' }}>Bulk approve</button></div>
-
       <nav className={styles.tabs} aria-label="Refund status">
         <Link
           href={`/admin/refunds${buildFilterParams(filterParams, { status: "pending", cursor: "" })}`}

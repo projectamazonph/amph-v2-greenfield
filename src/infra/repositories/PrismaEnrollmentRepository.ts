@@ -140,6 +140,7 @@ export class PrismaEnrollmentRepository implements IEnrollmentRepository {
       const row = await this.db.enrollment.update({
         where: { id: enrollment.id },
         data: {
+          status: enrollment.status,
           completedLessonIds: enrollment.completedLessonIds,
           lastLessonId: enrollment.lastLessonId,
           progressPercent: enrollment.progressPercent,

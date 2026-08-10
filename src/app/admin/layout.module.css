@@ -20,6 +20,11 @@
   overflow-x: clip;
 }
 
+.main :global(.astryx-card) {
+  max-width: 100%;
+  min-width: 0;
+}
+
 @media (max-width: 1023px) {
   /* Below the desktop breakpoint, the sidebar collapses to a topbar.
      For now, just stack the layout vertically. The full mobile
@@ -29,6 +34,14 @@
     overflow-x: hidden;
   }
   .main {
-    padding: var(--space-6) var(--space-4);
+    padding: 72px var(--space-4) var(--space-8);
+    overflow-x: hidden;
+  }
+  .main :global(.astryx-card) {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+  .main :global(.astryx-table) {
+    min-width: 680px;
   }
 }

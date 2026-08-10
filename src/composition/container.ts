@@ -214,6 +214,8 @@ import { ListUsers } from "@/usecases/ListUsers";
 import { GetUserDetail } from "@/usecases/GetUserDetail";
 import { ImpersonateUser } from "@/usecases/ImpersonateUser";
 import { AdminGrantSubscription } from "@/usecases/AdminGrantSubscription";
+import { AdminSetEnrollmentStatus } from "@/usecases/AdminSetEnrollmentStatus";
+import { GetAdminContentStats } from "@/usecases/GetAdminContentStats";
 // STORY-048a: admin courses CRUD
 import { AdminListCourses } from "@/usecases/AdminListCourses";
 import { AdminGetCourse } from "@/usecases/AdminGetCourse";
@@ -419,6 +421,8 @@ export interface AppContainer {
   getUserDetail: GetUserDetail;
   impersonateUser: ImpersonateUser;
   adminGrantSubscription: AdminGrantSubscription;
+  adminSetEnrollmentStatus: AdminSetEnrollmentStatus;
+  getAdminContentStats: GetAdminContentStats;
   // STORY-048a: admin courses CRUD
   adminListCourses: AdminListCourses;
   adminGetCourse: AdminGetCourse;
@@ -853,6 +857,15 @@ function buildProductionContainer(): AppContainer {
       requestPasswordReset,
       logger,
     }),
+    adminSetEnrollmentStatus: new AdminSetEnrollmentStatus({
+      userRepo,
+      courseRepo,
+      enrollmentRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    getAdminContentStats: new GetAdminContentStats({ courseRepo, moduleRepo, lessonRepo }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
     adminGetCourse: new AdminGetCourse({ courseRepo }),
