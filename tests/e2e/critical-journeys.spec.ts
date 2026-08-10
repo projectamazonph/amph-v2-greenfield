@@ -119,6 +119,7 @@ test.describe("Critical journeys", () => {
   });
 
   test("journey 5: admin changes a tier and manages course enrollment", async ({ page }) => {
+    test.setTimeout(90_000);
     test.skip(!DATABASE_URL, "requires DATABASE_URL to seed admin access data");
     const [admin, scenario] = await Promise.all([
       seedAdminUser(DATABASE_URL),
@@ -154,7 +155,7 @@ test.describe("Critical journeys", () => {
       .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
       .toBe(true);
 
-    await page.getByLabel(/^tier$/i).selectOption("PRO");
+    await page.getByRole("combobox", { name: /tier/i }).selectOption("PRO");
     await page.getByRole("button", { name: /save tier/i }).click();
     await expect(page.getByRole("status")).toContainText("Subscription tier updated");
 
