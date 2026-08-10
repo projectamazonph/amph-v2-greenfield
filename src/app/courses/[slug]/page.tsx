@@ -100,7 +100,15 @@ export default async function CourseDetailPage({ params }: PageProps) {
               {/* Cover */}
               {detail.coverImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={detail.coverImage} alt={detail.title} className={styles.cover} />
+                <img
+                  src={detail.coverImage}
+                  alt={detail.title}
+                  width={576}
+                  height={384}
+                  fetchPriority="high"
+                  decoding="async"
+                  className={styles.cover}
+                />
               ) : (
                 <div className={styles.coverPlaceholder}>
                   <span className={styles.coverPlaceholderLetter}>{detail.title[0]}</span>

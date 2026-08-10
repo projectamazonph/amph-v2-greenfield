@@ -115,19 +115,22 @@ export function MobileNavToggle({ sidebarId }: MobileNavToggleProps) {
   }, [open, sidebarId, close]);
 
   const toggle = useCallback(() => {
+    if (open) {
+      close();
+      return;
+    }
+
     const sidebar = document.getElementById(sidebarId);
     if (!sidebar) return;
-    const next = !open;
-    setOpen(next);
-    sidebar.dataset.open = String(next);
-    document.body.style.overflow = next ? "hidden" : "";
+    setOpen(true);
+    sidebar.dataset.open = "true";
+    document.body.style.overflow = "hidden";
     const content = document.querySelector<HTMLElement>("[data-navigation-content]");
     if (content) {
-      content.inert = next;
-      if (next) content.setAttribute("aria-hidden", "true");
-      else content.removeAttribute("aria-hidden");
+      content.inert = true;
+      content.setAttribute("aria-hidden", "true");
     }
-  }, [open, sidebarId]);
+  }, [open, sidebarId, close]);
 
   return (
     <>

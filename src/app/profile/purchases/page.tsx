@@ -64,6 +64,9 @@ export default async function PurchasesPage({ searchParams }: Props) {
           <div className={styles.grid}>
             {orders.map((order, index) => {
               const courseResult = courseResults[index];
+              if (!courseResult?.ok && courseResult?.error.kind === "db_error") {
+                throw new Error("Failed to load purchase course");
+              }
               const courseTitle = courseResult?.ok ? courseResult.value.title : "Course purchase";
               const enrollment = enrollments[index];
               const withinWindow = Boolean(

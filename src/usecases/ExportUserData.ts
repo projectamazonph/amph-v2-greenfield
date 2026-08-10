@@ -3,12 +3,9 @@
  *
  * Gathers everything the app knows about one user into a single plain
  * object the action layer serializes to JSON for download. Limited to
- * repositories that already expose a findByUserId-style query;
- * QuizAttempt and SimulatorAttempt only support per-quiz/per-scenario
- * lookups today (no "all attempts by this user" method), so those two
- * categories are intentionally left out rather than adding new port
- * surface just for this export. `notes` on the result says so
- * explicitly instead of silently omitting them.
+ * repositories that expose a findByUserId-style query, including quiz
+ * and simulator attempts. The returned object is normalized to plain
+ * JSON data before it crosses the Server Action boundary.
  */
 import { Result } from "@/domain/shared/Result";
 import type { UserRepository, UserError } from "@/ports/repositories/UserRepository";

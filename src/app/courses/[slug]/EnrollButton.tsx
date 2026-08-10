@@ -27,6 +27,7 @@ import { enrollStudent, type EnrollStudentActionResult } from "@/app/actions/enr
 import { Money } from "@/domain/values/Money";
 import { Result } from "@/domain/shared/Result";
 import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 import styles from "./EnrollButton.module.css";
 
 type EnrollState = EnrollStudentActionResult | null;
@@ -59,10 +60,13 @@ export function EnrollButton({
 
   if ((accessMode === "enrolled" || accessMode === "admin") && firstLessonId) {
     return (
-      <Link href={`/courses/${courseSlug}/lessons/${firstLessonId}`} className={styles.fullWidth}>
-        <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
-          Continue learning
-        </Button>
+      <Link
+        href={`/courses/${courseSlug}/lessons/${firstLessonId}`}
+        className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg, styles.fullWidth].join(
+          " ",
+        )}
+      >
+        Continue learning
       </Link>
     );
   }
@@ -94,10 +98,16 @@ export function EnrollButton({
     }
     if ("kind" in err && err.kind === "paid_checkout_required") {
       return (
-        <Link href={`/checkout?courseSlug=${courseSlug}`} className={styles.fullWidth}>
-          <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
-            Continue to checkout
-          </Button>
+        <Link
+          href={`/checkout?courseSlug=${courseSlug}`}
+          className={[
+            buttonStyles.btn,
+            buttonStyles.primary,
+            buttonStyles.lg,
+            styles.fullWidth,
+          ].join(" ")}
+        >
+          Continue to checkout
         </Link>
       );
     }
@@ -106,10 +116,13 @@ export function EnrollButton({
 
   if (!isFree && accessMode !== "subscription") {
     return (
-      <Link href={`/checkout?courseSlug=${courseSlug}`} className={styles.fullWidth}>
-        <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
-          Buy now — {Result.unwrap(Money.of(priceMinor, "PHP")).format()}
-        </Button>
+      <Link
+        href={`/checkout?courseSlug=${courseSlug}`}
+        className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg, styles.fullWidth].join(
+          " ",
+        )}
+      >
+        Buy now — {Result.unwrap(Money.of(priceMinor, "PHP")).format()}
       </Link>
     );
   }

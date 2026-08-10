@@ -29,6 +29,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 import { SystemClock } from "@/ports/system/Clock";
 import type { Clock } from "@/ports/system/Clock";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
 
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
@@ -605,7 +606,7 @@ function buildProductionContainer(): AppContainer {
     process.env.PAYMONGO_WEBHOOK_SECRET,
   );
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = buildAppUrl("").replace(/\/$/, "");
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo, enrollmentRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();

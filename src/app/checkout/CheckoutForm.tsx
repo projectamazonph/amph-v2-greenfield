@@ -188,7 +188,7 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
             <div style={PAGE_STYLES.logo}>Project Amazon PH Academy</div>
             <h1 style={PAGE_STYLES.title}>Checkout</h1>
           </div>
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             {checkoutLoadErrorMessage(loadError)} Pick a course from the{" "}
             <Link href="/courses" style={PAGE_STYLES.link}>
               catalog
@@ -222,7 +222,7 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
 
         {/* Error alerts */}
         {state.kind === "unauthorized" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             Please{" "}
             <Link
               href={`/login?redirect=${encodeURIComponent(returnPath)}`}
@@ -234,22 +234,22 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
           </div>
         )}
         {state.kind === "course_not_found" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             That course was not found. It may have been removed.
           </div>
         )}
         {state.kind === "course_not_published" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             This course is not available for purchase right now.
           </div>
         )}
         {(state.kind === "pricing_tier_not_found" || state.kind === "pricing_tier_unavailable") && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             This pricing offer is no longer available. Choose a current offer from the pricing page.
           </div>
         )}
         {state.kind === "already_enrolled" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertInfo }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertInfo }} role="status">
             You're already enrolled in this course. Head to your{" "}
             <Link href="/dashboard" style={PAGE_STYLES.link}>
               dashboard
@@ -258,13 +258,13 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
           </div>
         )}
         {state.kind === "payment_error" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             Could not start checkout: {state.message}. Please try again, or contact support if the
             problem persists.
           </div>
         )}
         {state.kind === "rate_limited" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             Too many checkout attempts. Please wait a few minutes before trying again.
           </div>
         )}

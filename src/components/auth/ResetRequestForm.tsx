@@ -42,7 +42,11 @@ export function ResetRequestForm() {
         className={styles.input}
         autoComplete="email"
       />
-      {state.message ? <p className={styles.error}>{state.message}</p> : null}
+      {state.message ? (
+        <p className={styles.error} role="alert">
+          {state.message}
+        </p>
+      ) : null}
       <button type="submit" className={styles.submit} disabled={pending}>
         {pending ? "Sending…" : "Send reset link"}
       </button>

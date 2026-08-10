@@ -3,6 +3,7 @@ import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { WebVitalsReporter } from "./WebVitalsReporter";
 import { Providers } from "./providers";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -20,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://amazonph.vercel.app"),
+  metadataBase: new URL(buildAppUrl("/")),
   title: "Project Amazon PH Academy",
   description: "Master Amazon PPC and seller central, built for Filipino VAs.",
   manifest: "/site.webmanifest",

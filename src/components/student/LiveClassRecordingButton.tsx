@@ -35,11 +35,15 @@ export function LiveClassRecordingButton({
   function handleMarkWatched() {
     startTransition(async () => {
       setError(null);
-      const result = await markLiveClassRecordingWatchedAction(liveClassId);
-      if (result.ok) {
-        setWatched(true);
-      } else {
-        setError(recordingErrorMessage(result.error));
+      try {
+        const result = await markLiveClassRecordingWatchedAction(liveClassId);
+        if (result.ok) {
+          setWatched(true);
+        } else {
+          setError(recordingErrorMessage(result.error));
+        }
+      } catch {
+        setError("We could not save your progress. Please try again.");
       }
     });
   }

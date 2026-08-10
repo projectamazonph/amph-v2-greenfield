@@ -265,15 +265,19 @@ export function CampaignBuilderForm({
     }));
 
     startTransition(async () => {
-      const r = await campaignBuilderAttempt({
-        targetingStrategy: targeting,
-        mode,
-        userAdjustedCampaigns,
-      });
-      if (r.ok) {
-        setResult(r);
-      } else {
-        setError("message" in r.error ? r.error.message : "Could not grade this campaign.");
+      try {
+        const r = await campaignBuilderAttempt({
+          targetingStrategy: targeting,
+          mode,
+          userAdjustedCampaigns,
+        });
+        if (r.ok) {
+          setResult(r);
+        } else {
+          setError("message" in r.error ? r.error.message : "Could not grade this campaign.");
+        }
+      } catch {
+        setError("Could not grade this campaign. Please try again.");
       }
     });
   };
@@ -599,7 +603,11 @@ export function CampaignBuilderForm({
         ))}
       </div>
 
-      {error ? <p className={styles.error}>{error}</p> : null}
+      {error ? (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      ) : null}
       <div className={styles.footer}>
         <Button type="submit" variant="primary" disabled={pending || graded}>
           {pending ? "Grading…" : graded ? "Graded" : "Submit for grading"}

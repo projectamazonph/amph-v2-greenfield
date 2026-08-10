@@ -4,6 +4,25 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-10: Student journey reliability repair (STORY-104)
+
+- Completed lesson progress, canonical quiz submission, subscription entitlement,
+  simulator challenge gating, and live-class enrollment enforcement.
+- Linked pricing tiers to checkout offers, preserved tier selection through signup,
+  and made checkout totals use authoritative early-bird pricing.
+- Added student purchase history, policy-enforced refund requests, certificate lists,
+  and complete profile, payment, progress, quiz, and simulator data export.
+- Replaced account-enumerating login messages, silent data failures, nested
+  interactive controls, invalid landmarks, dead controls, and hard-coded progress
+  claims with truthful and accessible states.
+- Added route error boundaries, mobile navigation focus management, exception
+  recovery for student actions, and the configured production app URL for payment
+  redirects and metadata.
+- Verified 3,789 passing tests, 82.17% statement coverage, 83.21% line coverage,
+  clean TypeScript and ESLint checks, and a successful Next.js production build.
+  Local Playwright launch remains unavailable because this workspace cannot
+  download the required Chromium binary.
+
 ### 2026-08-10: Admin access management and responsive recovery (STORY-103)
 
 - Added audited subscription-tier changes and course enrollment grant, revoke,

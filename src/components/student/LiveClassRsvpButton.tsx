@@ -26,16 +26,24 @@ export function LiveClassRsvpButton({ liveClassId, isRegistered }: LiveClassRsvp
   function handleRsvp() {
     startTransition(async () => {
       setError(null);
-      const result = await rsvpLiveClassAction(liveClassId);
-      if (!result.ok) setError(rsvpErrorMessage(result.error));
+      try {
+        const result = await rsvpLiveClassAction(liveClassId);
+        if (!result.ok) setError(rsvpErrorMessage(result.error));
+      } catch {
+        setError("We could not update your RSVP. Please try again.");
+      }
     });
   }
 
   function handleCancel() {
     startTransition(async () => {
       setError(null);
-      const result = await cancelLiveClassRsvpAction(liveClassId);
-      if (!result.ok) setError(rsvpErrorMessage(result.error));
+      try {
+        const result = await cancelLiveClassRsvpAction(liveClassId);
+        if (!result.ok) setError(rsvpErrorMessage(result.error));
+      } catch {
+        setError("We could not update your RSVP. Please try again.");
+      }
     });
   }
 

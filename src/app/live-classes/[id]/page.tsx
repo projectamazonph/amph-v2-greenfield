@@ -18,7 +18,7 @@ import { Card } from "@astryxdesign/core";
 import { StudentShell } from "@/components/student/StudentShell";
 import { LiveClassRsvpButton } from "@/components/student/LiveClassRsvpButton";
 import { LiveClassRecordingButton } from "@/components/student/LiveClassRecordingButton";
-import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 import { XPService } from "@/domain/services/XPService";
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
@@ -51,23 +51,32 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
 
   // ── Class metadata ───────────────────────────────────────────
   const classResult = await container.liveClassRepo.findById(id);
-  if (!classResult.ok || !classResult.value) {
+  if (!classResult.ok) {
+    throw new Error("Failed to load live class");
+  }
+  if (!classResult.value) {
     notFound();
   }
   const liveClass = classResult.value;
 
   // ── Enrollment check (for the RSVP gate) ────────────────────
   const enrollments = await container.enrollmentRepo.findByUserId(user.id);
-  const isEnrolled = enrollments.ok
-    ? enrollments.value.some((e) => e.courseId === liveClass.courseId && e.status === "active")
-    : false;
+  if (!enrollments.ok) {
+    throw new Error("Failed to verify live class enrollment");
+  }
+  const isEnrolled = enrollments.value.some(
+    (enrollment) => enrollment.courseId === liveClass.courseId && enrollment.status === "active",
+  );
 
   // ── Current RSVP for the user ────────────────────────────────
   const rsvpResult = await container.liveClassRegistrationRepo.findByUserAndClass(
     user.id,
     liveClass.id,
   );
-  const rsvp = rsvpResult.ok ? rsvpResult.value : null;
+  if (!rsvpResult.ok) {
+    throw new Error("Failed to load live class registration");
+  }
+  const rsvp = rsvpResult.value;
   const isRegistered = rsvp?.status === "registered";
   const hasRsvpd = rsvp !== null && rsvp.status !== "cancelled";
   const hasWatchedRecording =
@@ -123,10 +132,16 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
               <p className={styles.noticeText}>
                 You must be enrolled in the course to RSVP for this live class.
               </p>
-              <Link href={`/courses`} className={styles.noticeLink}>
-                <Button variant="secondary" size="md">
-                  Browse courses
-                </Button>
+              <Link
+                href="/courses"
+                className={[
+                  buttonStyles.btn,
+                  buttonStyles.secondary,
+                  buttonStyles.md,
+                  styles.noticeLink,
+                ].join(" ")}
+              >
+                Browse courses
               </Link>
             </div>
           ) : isCancelled ? (
@@ -156,11 +171,14 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
                   href={liveClass.meetingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={styles.meetingLink}
+                  className={[
+                    buttonStyles.btn,
+                    buttonStyles.ghost,
+                    buttonStyles.md,
+                    styles.meetingLink,
+                  ].join(" ")}
                 >
-                  <Button variant="ghost" size="md">
-                    Open meeting link
-                  </Button>
+                  Open meeting link
                 </a>
               )}
             </div>

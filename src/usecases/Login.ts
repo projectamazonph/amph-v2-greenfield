@@ -53,6 +53,12 @@ const MAX_FAILED_ATTEMPTS = 5;
 /** How long an account stays locked after crossing MAX_FAILED_ATTEMPTS. */
 const LOCKOUT_DURATION_MINUTES = 15;
 
+// A real Argon2id hash keeps an unknown-email attempt on the same expensive
+// password-verification path as a known account. The plaintext used to create
+// this hash is intentionally irrelevant; it is never accepted as a credential.
+const DUMMY_PASSWORD_HASH =
+  "$argon2id$v=19$m=65536,p=1,t=3$STcR08u7CZ5U+v0lxmXgmg$Zp4wYtM0je0+JOPv92eEasy0pdZOXT/+3lm1PDqxs74";
+
 export class Login {
   constructor(
     private readonly userRepo: UserRepository,
@@ -76,6 +82,7 @@ export class Login {
     const userResult = await this.userRepo.findByEmail(input.email);
     if (Result.isErr(userResult)) {
       if (userResult.error.kind === "not_found" || userResult.error.kind === "email_taken") {
+        await this.hasher.verify(input.password, DUMMY_PASSWORD_HASH);
         return { ok: false, error: { kind: "user_not_found" } };
       }
       return { ok: false, error: { kind: "db_error", message: "find user failed" } };

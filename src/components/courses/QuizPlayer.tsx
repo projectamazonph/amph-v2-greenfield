@@ -82,8 +82,11 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
           } else {
             setResult({ ok: false, error: quizErrorMessage(response.error) });
           }
-        } catch (e) {
-          setResult({ ok: false, error: e instanceof Error ? e.message : String(e) });
+        } catch {
+          setResult({
+            ok: false,
+            error: "We could not submit your quiz. Please try again.",
+          });
         }
       });
     }
@@ -183,7 +186,11 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
           })}
         </div>
       </div>
-      {result && !result.ok ? <p className={styles.error}>{result.error}</p> : null}
+      {result && !result.ok ? (
+        <p className={styles.error} role="alert">
+          {result.error}
+        </p>
+      ) : null}
       <div className={styles.footer}>
         <button
           type="button"

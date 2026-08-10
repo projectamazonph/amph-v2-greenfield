@@ -7,7 +7,7 @@
  */
 
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
@@ -79,10 +79,13 @@ export default async function LiveClassesPage() {
                   )}
                 </div>
                 <div className={styles.cellAction}>
-                  <Link href={`/live-classes/${liveClass.id}`}>
-                    <Button variant="secondary" size="md">
-                      View
-                    </Button>
+                  <Link
+                    href={`/live-classes/${liveClass.id}`}
+                    className={[buttonStyles.btn, buttonStyles.secondary, buttonStyles.md].join(
+                      " ",
+                    )}
+                  >
+                    View
                   </Link>
                 </div>
               </li>

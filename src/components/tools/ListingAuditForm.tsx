@@ -81,39 +81,47 @@ export function ListingAuditForm({
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const r = await auditListing({
-        title,
-        bullets: bullets.filter((b) => b.length > 0),
-        description,
-      });
-      if (!r.ok) {
-        setError(r.error.message);
-        return;
+      try {
+        const r = await auditListing({
+          title,
+          bullets: bullets.filter((b) => b.length > 0),
+          description,
+        });
+        if (!r.ok) {
+          setError(r.error.message);
+          return;
+        }
+        setFindings(r.value.audit.findings);
+        setFindingActions(
+          Object.fromEntries(r.value.audit.findings.map((f) => [f.id, "skip" as FindingAction])),
+        );
+        setStage("reviewing");
+      } catch {
+        setError("Could not run the listing audit. Please try again.");
       }
-      setFindings(r.value.audit.findings);
-      setFindingActions(
-        Object.fromEntries(r.value.audit.findings.map((f) => [f.id, "skip" as FindingAction])),
-      );
-      setStage("reviewing");
     });
   };
 
   const onSubmitForGrading = () => {
     setError(null);
     startTransition(async () => {
-      const r = await listingAuditAttempt({
-        title,
-        bullets: bullets.filter((b) => b.length > 0),
-        description,
-        userFindingActions: findingActions,
-        mode,
-      });
-      if (!r.ok) {
-        setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
-        return;
+      try {
+        const r = await listingAuditAttempt({
+          title,
+          bullets: bullets.filter((b) => b.length > 0),
+          description,
+          userFindingActions: findingActions,
+          mode,
+        });
+        if (!r.ok) {
+          setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+          return;
+        }
+        setGradeResult(r);
+        setStage("graded");
+      } catch {
+        setError("Could not grade this attempt. Please try again.");
       }
-      setGradeResult(r);
-      setStage("graded");
     });
   };
 
@@ -182,7 +190,11 @@ export function ListingAuditForm({
           disabled={!isEditing}
         />
       </div>
-      {error ? <p className={styles.error}>{error}</p> : null}
+      {error ? (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      ) : null}
       <div className={styles.footer}>
         {isEditing ? (
           <button type="submit" className={styles.submit} disabled={pending}>

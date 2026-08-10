@@ -61,7 +61,7 @@ export function SignupForm({
         </div>
 
         {errorText && (
-          <div className="alert alert-error">
+          <div className="alert alert-error" role="alert">
             {errorKind === "email_taken" ? (
               <>
                 That email is already registered. Try{" "}

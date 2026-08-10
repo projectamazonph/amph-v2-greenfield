@@ -51,21 +51,25 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const response = await bidElevatorAttempt({ userBidAdjustments: bids, mode });
-      if (!response.ok) {
-        setError(
-          "message" in response.error ? response.error.message : "Could not run this simulation.",
-        );
-        return;
+      try {
+        const response = await bidElevatorAttempt({ userBidAdjustments: bids, mode });
+        if (!response.ok) {
+          setError(
+            "message" in response.error ? response.error.message : "Could not run this simulation.",
+          );
+          return;
+        }
+        setSimResult({
+          score: response.value.overallScore,
+          scoreDimensions: response.value.scoreDimensions,
+          bids: response.value.bids,
+          estimatedSpend: response.value.estimatedSpend,
+          estimatedRoas: response.value.estimatedRoas,
+        });
+        setXpAwarded(response.value.xpAwarded ?? null);
+      } catch {
+        setError("Could not run this simulation. Please try again.");
       }
-      setSimResult({
-        score: response.value.overallScore,
-        scoreDimensions: response.value.scoreDimensions,
-        bids: response.value.bids,
-        estimatedSpend: response.value.estimatedSpend,
-        estimatedRoas: response.value.estimatedRoas,
-      });
-      setXpAwarded(response.value.xpAwarded ?? null);
     });
   };
 
@@ -117,7 +121,11 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           </tbody>
         </table>
       </div>
-      {error ? <p className={styles.error}>{error}</p> : null}
+      {error ? (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      ) : null}
       <button type="submit" className={styles.submit} disabled={pending}>
         {pending ? "Running…" : "Run simulation"}
       </button>

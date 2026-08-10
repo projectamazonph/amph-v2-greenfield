@@ -40,7 +40,13 @@ export default async function StudentTwoFactorSetupPage({
 
   const container = buildContainer();
   const secretResult = await container.userRepo.getTwoFactorSecret(session.id);
-  const secret = secretResult.ok ? secretResult.value : null;
+  if (!secretResult.ok) {
+    if (secretResult.error.kind === "not_found") {
+      redirect("/profile/security");
+    }
+    throw new Error("Failed to load two-factor setup");
+  }
+  const secret = secretResult.value;
 
   if (!secret) {
     redirect("/profile/security");
@@ -70,7 +76,11 @@ export default async function StudentTwoFactorSetupPage({
         </h1>
         <p className={styles.help}>Scan the code, then confirm with a 6-digit code to finish.</p>
 
-        {errorText && <p className={styles.error}>{errorText}</p>}
+        {errorText && (
+          <p className={styles.error} role="alert">
+            {errorText}
+          </p>
+        )}
 
         <Card padding={6} style={{ marginBottom: "1rem" }}>
           <h2 className={styles.sectionTitle}>1. Add this account to your authenticator app</h2>

@@ -21,6 +21,7 @@ import type { Lesson } from "@/domain/entities/Lesson";
 import { LessonSidebar } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
 import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.action";
 import styles from "./page.module.css";
 
@@ -200,7 +201,7 @@ function AccessDeniedPage({
   courseTitle: string;
 }) {
   return (
-    <div className={styles.accessDeniedPage}>
+    <main className={styles.accessDeniedPage}>
       <div className={styles.accessDeniedCard}>
         <LockIcon />
         <h1 className={styles.accessDeniedTitle}>Enroll to Access This Lesson</h1>
@@ -208,13 +209,14 @@ function AccessDeniedPage({
           This lesson is part of <strong>{courseTitle}</strong>. Enroll to unlock all lessons and
           materials.
         </p>
-        <Link href={`/courses/${courseSlug}`}>
-          <Button variant="primary" size="md">
-            View Course & Enroll
-          </Button>
+        <Link
+          href={`/courses/${courseSlug}`}
+          className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.md].join(" ")}
+        >
+          View Course & Enroll
         </Link>
       </div>
-    </div>
+    </main>
   );
 }
 

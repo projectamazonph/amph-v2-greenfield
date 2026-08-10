@@ -17,22 +17,28 @@ export function ExportDataButton({ className }: { className?: string }) {
 
   async function handleClick() {
     setStatus("loading");
-    const result = await exportUserDataAction();
-    if (!result.ok) {
-      setStatus("error");
-      return;
-    }
+    try {
+      const result = await exportUserDataAction();
+      if (!result.ok) {
+        setStatus("error");
+        return;
+      }
 
-    const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `amph-my-data-${result.data.profile.id}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    setStatus("idle");
+      const blob = new Blob([JSON.stringify(result.data, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `amph-my-data-${result.data.profile.id}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setStatus("idle");
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (
@@ -47,6 +53,7 @@ export function ExportDataButton({ className }: { className?: string }) {
       </button>
       {status === "error" && (
         <p
+          role="alert"
           style={{
             color: "var(--danger)",
             fontSize: "var(--text-sm)",

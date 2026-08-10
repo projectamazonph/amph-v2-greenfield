@@ -9,7 +9,7 @@
  */
 
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 import styles from "./not-found.module.css";
 
 export default function CertificateNotFound() {
@@ -34,19 +34,21 @@ export default function CertificateNotFound() {
         </div>
         <h1 className={styles.title}>Certificate Not Found</h1>
         <p className={styles.subtitle}>
-          The verification link is invalid, malformed, or the certificate
-          has been removed. Double-check the URL or contact the issuer.
+          The verification link is invalid, malformed, or the certificate has been removed.
+          Double-check the URL or contact the issuer.
         </p>
         <div className={styles.actions}>
-          <Link href="/courses">
-            <Button variant="primary" size="lg">
-              Browse Courses
-            </Button>
+          <Link
+            href="/courses"
+            className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg].join(" ")}
+          >
+            Browse Courses
           </Link>
-          <Link href="/">
-            <Button variant="secondary" size="lg">
-              Go Home
-            </Button>
+          <Link
+            href="/"
+            className={[buttonStyles.btn, buttonStyles.secondary, buttonStyles.lg].join(" ")}
+          >
+            Go Home
           </Link>
         </div>
       </div>

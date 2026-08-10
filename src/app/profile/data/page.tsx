@@ -60,7 +60,11 @@ export default async function ProfileDataPage({ searchParams }: PageProps) {
             undone.
           </p>
 
-          {errorText && <p className={styles.twoFactorError}>{errorText}</p>}
+          {errorText && (
+            <p className={styles.twoFactorError} role="alert">
+              {errorText}
+            </p>
+          )}
 
           <form action={deleteAccountAction} className={styles.twoFactorForm}>
             <label className={styles.field}>

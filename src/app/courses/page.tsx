@@ -97,7 +97,15 @@ function CourseCard({
     <Link href={`/courses/${course.slug}`} className={styles.card}>
       {course.coverImage ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={course.coverImage} alt={course.title} className={styles.cardImage} />
+        <img
+          src={course.coverImage}
+          alt={course.title}
+          width={640}
+          height={352}
+          loading="lazy"
+          decoding="async"
+          className={styles.cardImage}
+        />
       ) : (
         <div className={styles.cardImagePlaceholder}>
           <span className={styles.cardImagePlaceholderLetter}>{course.title[0]}</span>
