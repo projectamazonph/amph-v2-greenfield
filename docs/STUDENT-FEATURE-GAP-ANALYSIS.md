@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-10
+**Last verified:** 2026-08-11
 
 **Repository:** `amph-v2-greenfield`
 
@@ -26,19 +26,19 @@ verification, not missing product code.
 | Purchases and refunds | `/profile/purchases` shows orders and refund state. Refund requests enforce ownership, paid status, the policy window, completion threshold, and idempotence.                                     | Refund use-case and action tests                 |
 | Certificates          | `/certificates` lists the student's credentials. Public verification and PDF routes remain available.                                                                                             | Certificate route and repository tests           |
 | Account data          | `/profile/data` exports profile, subscriptions, orders, enrollments, progress, quiz attempts, simulator attempts, badges, certificates, sessions, and audit data.                                 | Export use-case and page tests                   |
-| Navigation and errors | Student routes use one main landmark, accessible mobile drawer behavior, visible pending and error states, and no nested interactive controls.                                                    | Static regression scans, ESLint, and route tests |
+| Navigation and errors | Student routes use one main landmark, accessible mobile drawer behavior, headed error states, busy loading landmarks, announced mutation outcomes, and no nested interactive controls.            | Static regression scans, ESLint, and route tests |
 
 ## Verification snapshot
 
 - TypeScript: pass.
 - ESLint: pass.
-- Full Vitest suite: 3,795 passing and 2 intentionally skipped.
-- Coverage: 82.17% statements, 76.69% branches, 82.83% functions, and 83.21%
-  lines.
+- Full Vitest suite: 3,804 passing and 2 intentionally skipped.
+- Architecture suite: 665 passing, including design-token and loading-state
+  contracts.
 - Next.js production build: pass with 94 application routes.
 - Prisma schema and migration contracts: pass in the full test suite.
-- Local Playwright browser launch: blocked because Chromium is unavailable and
-  the restricted workspace network returns an empty browser archive.
+- Local Playwright server launch: blocked by the workspace network-interface
+  restriction. GitHub CI is the browser authority for this repair.
 
 ## Release verification still required
 

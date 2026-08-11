@@ -48,9 +48,11 @@ account export.
 
 ## Verification
 
-- 3,795 tests passed and 2 were intentionally skipped.
-- Coverage is 82.17% statements and 83.21% lines.
+- 3,804 tests passed and 2 were intentionally skipped.
+- All 665 architecture checks passed, including design-token, loading-state,
+  landmark, heading, and client-feedback contracts.
 - Next.js production build completed all 94 routes.
-- Local browser execution is blocked by the unavailable Chromium binary. The
-  preview deployment must complete the desktop and mobile browser gate before
-  merge.
+- TypeScript and ESLint completed without errors.
+- Local browser execution is blocked by the workspace network-interface
+  restriction. The GitHub desktop, tablet, and mobile browser gates must pass
+  before merge.

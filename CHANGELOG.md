@@ -21,10 +21,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 - Repaired public contrast, heading order, landmarks, link naming, responsive
   image sizing, and the pricing outage state. Axe and Lighthouse now fail CI on
   accessibility regressions instead of logging or swallowing them.
-- Verified 3,795 passing tests, 82.17% statement coverage, 83.21% line coverage,
-  clean TypeScript and ESLint checks, and a successful Next.js production build.
-  Local Playwright launch remains unavailable because this workspace cannot
-  download the required Chromium binary.
+- Removed undefined CSS and inline-style tokens, enforced accessible accent text,
+  restored headed route errors, and announced student mutation outcomes.
+- Added busy main landmarks to every non-admin loading state and route-level
+  loading UI for FAQ, resources, and Ad Console, backed by architecture guards.
+- Verified 3,804 passing tests and 2 intentional skips, 665 passing architecture
+  checks, clean TypeScript and ESLint checks, and a successful Next.js production
+  build. Local Playwright remains blocked by the workspace network-interface
+  restriction, so GitHub CI remains the browser authority.
 
 ### 2026-08-10: Admin access management and responsive recovery (STORY-103)
 
