@@ -47,4 +47,10 @@ describe("public accessibility release gates", () => {
     expect(login).toContain("<main className={styles.page}>");
     expect(signup).toContain("<main className={styles.page}>");
   });
+
+  it("keeps the course catalog error state headed", async () => {
+    const courses = await source("src/app/courses/page.tsx");
+
+    expect(courses).toContain("<h1 className={styles.errorTitle}>Courses unavailable</h1>");
+  });
 });

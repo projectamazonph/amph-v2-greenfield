@@ -37,6 +37,7 @@ export default async function CoursesPage() {
     return (
       <StudentShell requireAuth={false}>
         <main className={styles.errorPage}>
+          <h1 className={styles.errorTitle}>Courses unavailable</h1>
           <p className={styles.errorText}>Unable to load courses. Please try again later.</p>
         </main>
       </StudentShell>
