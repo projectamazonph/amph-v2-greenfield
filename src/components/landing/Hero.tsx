@@ -51,7 +51,7 @@ export function Hero() {
           </div>
         </Reveal>
 
-        <Reveal className={styles.right} delayMs={120}>
+        <Reveal className={styles.right}>
           <figure className={[shared.plate, styles.figure].join(" ")}>
             <span className={[shared.corner, shared.cornerTl].join(" ")} />
             <span className={[shared.corner, shared.cornerTr].join(" ")} />

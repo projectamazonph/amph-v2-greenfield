@@ -116,6 +116,10 @@
   background: var(--accent-soft);
 }
 
+.toolLive .toolDesc {
+  color: var(--ink-700);
+}
+
 .toolLive .status {
   background: var(--accent);
   color: var(--accent-ink);
