@@ -43,12 +43,18 @@ function isLightStudentSurface(file: string): boolean {
 describe("design token contract", () => {
   it("only references declared or runtime-provided CSS custom properties", () => {
     const sources = cssSources();
+    const references = [
+      ...sources,
+      ...tsxFiles(SRC)
+        .filter(isLightStudentSurface)
+        .map((file) => ({ file, css: readFileSync(file, "utf8") })),
+    ];
     const declared = new Set(
       sources.flatMap(({ css }) =>
         Array.from(css.matchAll(/(^|[;{]\s*)(--[\w-]+)\s*:/gm), (match) => match[2]!),
       ),
     );
-    const violations = sources.flatMap(({ file, css }) =>
+    const violations = references.flatMap(({ file, css }) =>
       Array.from(css.matchAll(/var\(\s*(--[\w-]+)/g), (match) => match[1]!)
         .filter((token) => !declared.has(token) && !RUNTIME_TOKENS.has(token))
         .map((token) => `${relative(process.cwd(), file)}: ${token}`),

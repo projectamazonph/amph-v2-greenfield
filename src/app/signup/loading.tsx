@@ -1,9 +1,26 @@
-import { SkeletonForm } from '@/components/ui/Skeleton';
+import { SkeletonForm } from "@/components/ui/Skeleton";
 
 export default function SignupLoading() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: 'var(--space-6)' }}>
-      <div style={{ width: '100%', maxWidth: 400, border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-8)', background: 'var(--surface-card)' }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        padding: "var(--space-6)",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 400,
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          padding: "var(--space-8)",
+          background: "var(--surface-1)",
+        }}
+      >
         <SkeletonForm fields={4} />
       </div>
     </div>

@@ -18,7 +18,7 @@ export default function VerifyEmailSentLoading() {
           border: "1px solid var(--border)",
           borderRadius: "var(--radius-lg)",
           padding: "var(--space-8)",
-          background: "var(--surface-card)",
+          background: "var(--surface-1)",
           textAlign: "center",
         }}
       >

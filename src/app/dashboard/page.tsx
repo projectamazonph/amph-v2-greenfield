@@ -85,7 +85,7 @@ export default async function DashboardPage() {
         {lastAccessedCourse && (
           <div
             style={{
-              background: "var(--surface-card)",
+              background: "var(--surface-1)",
               border: "1px solid var(--accent)",
               borderRadius: "var(--radius-md)",
               padding: "var(--space-5)",
