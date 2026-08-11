@@ -1,19 +1,19 @@
 import { readFile, readdir } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
 async function source(path: string): Promise<string> {
   return readFile(new URL(`../../${path}`, import.meta.url), "utf8");
 }
 
-async function loadingFiles(directory: string): Promise<string[]> {
+async function routeFiles(directory: string, filename: string): Promise<string[]> {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = await Promise.all(
     entries.map((entry) => {
       const path = join(directory, entry.name);
       return entry.isDirectory()
-        ? loadingFiles(path)
-        : Promise.resolve(path.endsWith("loading.tsx") ? [path] : []);
+        ? routeFiles(path, filename)
+        : Promise.resolve(entry.name === filename ? [path] : []);
     }),
   );
   return files.flat();
@@ -70,7 +70,7 @@ describe("public accessibility release gates", () => {
 
   it("exposes non-admin loading states as busy main landmarks", async () => {
     const app = join(process.cwd(), "src", "app");
-    const files = (await loadingFiles(app)).filter(
+    const files = (await routeFiles(app, "loading.tsx")).filter(
       (file) => !relative(app, file).startsWith("admin/"),
     );
     const violations = await Promise.all(
@@ -83,6 +83,22 @@ describe("public accessibility release gates", () => {
     );
 
     expect(violations.filter(Boolean)).toEqual([]);
+  });
+
+  it("provides a loading state for every non-admin page", async () => {
+    const app = join(process.cwd(), "src", "app");
+    const pages = (await routeFiles(app, "page.tsx")).filter(
+      (file) => !relative(app, file).startsWith("admin/"),
+    );
+    const loadingDirectories = new Set(
+      (await routeFiles(app, "loading.tsx")).map((file) => dirname(file)),
+    );
+    const missing = pages
+      .map((file) => dirname(file))
+      .filter((directory) => !loadingDirectories.has(directory))
+      .map((directory) => relative(process.cwd(), directory));
+
+    expect(missing).toEqual([]);
   });
 
   it("announces client-side student mutation outcomes", async () => {
