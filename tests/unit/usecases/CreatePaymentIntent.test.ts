@@ -6,6 +6,8 @@ import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { createCourse } from "@/domain/entities/Course";
 import { Result } from "@/domain/shared/Result";
 import type { Course } from "@/domain/entities/Course";
+import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
+import { createPricingTier } from "@/domain/entities/PricingTier";
 
 function makeCourse(overrides: Partial<Parameters<typeof createCourse>[0]> = {}): Course {
   const r = createCourse({
@@ -17,10 +19,15 @@ function makeCourse(overrides: Partial<Parameters<typeof createCourse>[0]> = {})
     priceMinor: 299900,
     currency: "PHP",
     curriculum: {
-      sections: [{
-        id: "s1", title: "Intro",
-        lessons: [{ id: "l1", title: "Welcome", type: "VIDEO" as const, content: { durationMinutes: 5 } }],
-      }],
+      sections: [
+        {
+          id: "s1",
+          title: "Intro",
+          lessons: [
+            { id: "l1", title: "Welcome", type: "VIDEO" as const, content: { durationMinutes: 5 } },
+          ],
+        },
+      ],
     },
     status: "PUBLISHED",
     displayOrder: 0,
@@ -35,6 +42,7 @@ describe("CreatePaymentIntent", () => {
   let courseRepo: InMemoryCourseRepository;
   let orderRepo: InMemoryOrderRepository;
   let paymentGateway: StubPaymentGateway;
+  let pricingTierRepo: InMemoryPricingTierRepository;
   let useCase: CreatePaymentIntent;
 
   const BASE_URL = "https://amph.example.com";
@@ -45,12 +53,37 @@ describe("CreatePaymentIntent", () => {
     courseRepo = new InMemoryCourseRepository();
     orderRepo = new InMemoryOrderRepository();
     paymentGateway = new StubPaymentGateway();
+    pricingTierRepo = new InMemoryPricingTierRepository();
     useCase = new CreatePaymentIntent({
       courseRepo,
+      pricingTierRepo,
       orderRepo,
       paymentGateway,
       baseUrl: BASE_URL,
     });
+  });
+
+  it("charges the active tier's effective price for its linked course", async () => {
+    courseRepo.seed([makeCourse({ id: "course_01", slug: COURSE_SLUG, priceMinor: 599900 })]);
+    const tier = createPricingTier({
+      id: "tier-mastery",
+      slug: "mastery",
+      name: "Accelerated Mastery",
+      priceMinor: 599900,
+      earlyBirdPriceMinor: 499900,
+      earlyBirdEndsAt: new Date(Date.now() + 60_000),
+      status: "ACTIVE",
+    });
+    if (!tier.ok) throw new Error("tier seed failed");
+    pricingTierRepo.seed(tier.value);
+    pricingTierRepo.seedCourseLink(tier.value.id, COURSE_SLUG);
+
+    const result = await useCase.execute({ userId: USER_ID, pricingTierSlug: "mastery" });
+
+    expect(result.ok).toBe(true);
+    expect(orderRepo.getAll()[0]?.totalMinor).toBe(499900);
+    expect(paymentGateway.calls[0]?.params.amountMinor).toBe(499900);
+    expect(paymentGateway.calls[0]?.params.metadata.pricingTierSlug).toBe("mastery");
   });
 
   // ── happy path ─────────────────────────────────────────────
@@ -188,7 +221,11 @@ describe("CreatePaymentIntent", () => {
     courseRepo.seed([course]);
 
     paymentGateway.shouldFail = true;
-    paymentGateway.failureReason = { kind: "paymongo_error", code: "server_error", message: "PayMongo is down" };
+    paymentGateway.failureReason = {
+      kind: "paymongo_error",
+      code: "server_error",
+      message: "PayMongo is down",
+    };
 
     const result = await useCase.execute({ userId: USER_ID, courseSlug: COURSE_SLUG });
 

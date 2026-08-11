@@ -11,8 +11,7 @@
  */
 
 import { buildContainer } from "@/composition/container";
-import { getSessionUser } from "@/lib/auth";
-import { Result } from "@/domain/shared/Result";
+import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
 import Link from "next/link";
 import styles from "./page.module.css";
@@ -20,18 +19,14 @@ import styles from "./page.module.css";
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-  const user = await getSessionUser();
-  if (!user) {
-    return (
-      <main className={styles.page}>
-        <p>Sign in to view your profile.</p>
-      </main>
-    );
-  }
+  const user = await requireAuth();
 
   const container = buildContainer();
   const badgesResult = await container.listUserBadges.execute({ userId: user.id });
-  const badges = Result.isOk(badgesResult) ? badgesResult.value.badges : [];
+  if (!badgesResult.ok) {
+    throw new Error("Failed to load profile badges");
+  }
+  const badges = badgesResult.value.badges;
 
   return (
     <StudentShell user={user}>
@@ -80,28 +75,10 @@ export default async function ProfilePage() {
           <Link href="/profile/data" className="btn btn-ghost">
             Your data
           </Link>
+          <Link href="/profile/purchases" className="btn btn-ghost">
+            Purchases and refunds
+          </Link>
         </div>
-        <section style={{ marginTop: "var(--space-8)" }}>
-          <h2
-            style={{ fontSize: "var(--text-lg)", fontWeight: 600, marginBottom: "var(--space-4)" }}
-          >
-            Notifications
-          </h2>
-          <label style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
-            <input type="checkbox" defaultChecked /> Email me when new courses are released
-          </label>
-          <br />
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "var(--space-2)",
-              marginTop: "var(--space-2)",
-            }}
-          >
-            <input type="checkbox" defaultChecked /> Remind me to continue my course
-          </label>
-        </section>
       </main>
     </StudentShell>
   );

@@ -8,8 +8,8 @@
   height: 40px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--surface-card);
-  color: var(--ink-primary);
+  background: var(--surface-1);
+  color: var(--ink-900);
   cursor: pointer;
   transition: background 0.15s ease;
   position: fixed;

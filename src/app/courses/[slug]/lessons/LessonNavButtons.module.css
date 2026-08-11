@@ -35,7 +35,7 @@
 
 .nextButton {
   background: var(--accent);
-  color: var(--surface-1);
+  color: var(--accent-ink);
   font-weight: 500;
   margin-left: auto;
   border: 1px solid var(--accent);

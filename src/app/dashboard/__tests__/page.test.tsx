@@ -18,7 +18,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockGetSessionUser = vi.fn();
 vi.mock("@/lib/auth", () => ({
   getSessionUser: () => mockGetSessionUser(),
-  getSessionUserId: () => mockGetSessionUser().then((u: unknown) => (u as { id: string } | null)?.id ?? null),
+  getSessionUserId: () =>
+    mockGetSessionUser().then((u: unknown) => (u as { id: string } | null)?.id ?? null),
   // requireAuth must be async to match the real API.
   // When getSessionUser() returns null, requireAuth throws NEXT_REDIRECT.
   // When getSessionUser() returns a user, requireAuth returns that user.
@@ -132,7 +133,10 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
 
   it("looks up the course for each enrollment", async () => {
     mockGetSessionUser.mockResolvedValue(makeUser());
-    mockEnrollments.mockResolvedValue({ ok: true, value: [makeEnrollment(), makeEnrollment({ id: "enr_2", courseId: "course_02" })] });
+    mockEnrollments.mockResolvedValue({
+      ok: true,
+      value: [makeEnrollment(), makeEnrollment({ id: "enr_2", courseId: "course_02" })],
+    });
     mockCourseFindById.mockResolvedValue({ ok: true, value: makeCourse() });
 
     try {
@@ -153,16 +157,12 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     await expect(DashboardPage()).rejects.toThrow(/NEXT_REDIRECT/);
   });
 
-  it("returns an empty list when enrollmentRepo returns an error", async () => {
+  it("surfaces enrollment loading errors to the route boundary", async () => {
     mockGetSessionUser.mockResolvedValue(makeUser());
     mockEnrollments.mockResolvedValue({ ok: false, error: { kind: "db_error", message: "down" } });
     mockCourseFindById.mockResolvedValue({ ok: true, value: makeCourse() });
 
-    try {
-      await DashboardPage();
-    } catch {
-      // ignore
-    }
+    await expect(DashboardPage()).rejects.toThrow("Failed to load enrollments");
 
     // The page should not have called courseRepo since enrollments failed
     expect(mockCourseFindById).not.toHaveBeenCalled();

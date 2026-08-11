@@ -4,6 +4,32 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-10: Student journey reliability repair (STORY-104)
+
+- Completed lesson progress, canonical quiz submission, subscription entitlement,
+  simulator challenge gating, and live-class enrollment enforcement.
+- Linked pricing tiers to checkout offers, preserved tier selection through signup,
+  and made checkout totals use authoritative early-bird pricing.
+- Added student purchase history, policy-enforced refund requests, certificate lists,
+  and complete profile, payment, progress, quiz, and simulator data export.
+- Replaced account-enumerating login messages, silent data failures, nested
+  interactive controls, invalid landmarks, dead controls, and hard-coded progress
+  claims with truthful and accessible states.
+- Added route error boundaries, mobile navigation focus management, exception
+  recovery for student actions, and the configured production app URL for payment
+  redirects and metadata.
+- Repaired public contrast, heading order, landmarks, link naming, responsive
+  image sizing, and the pricing outage state. Axe and Lighthouse now fail CI on
+  accessibility regressions instead of logging or swallowing them.
+- Removed undefined CSS and inline-style tokens, enforced accessible accent text,
+  restored headed route errors, and announced student mutation outcomes.
+- Added busy main landmarks to every non-admin loading state and route-level
+  loading UI for FAQ, resources, and Ad Console, backed by architecture guards.
+- Verified 3,804 passing tests and 2 intentional skips, 665 passing architecture
+  checks, clean TypeScript and ESLint checks, and a successful Next.js production
+  build. Local Playwright remains blocked by the workspace network-interface
+  restriction, so GitHub CI remains the browser authority.
+
 ### 2026-08-10: Admin access management and responsive recovery (STORY-103)
 
 - Added audited subscription-tier changes and course enrollment grant, revoke,

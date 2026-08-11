@@ -18,10 +18,13 @@ import { FakeTotpService } from "@/infra/security/FakeTotpService";
 import type { TotpService } from "@/ports/security/TotpService";
 
 class StubHasher implements PasswordHasher {
+  verifyCalls = 0;
+
   async hash(password: string) {
     return { ok: true, value: `stubbed:${password}` } as const;
   }
   async verify(password: string, hash: string) {
+    this.verifyCalls += 1;
     return { ok: true, value: hash === `stubbed:${password}` } as const;
   }
 }
@@ -107,6 +110,12 @@ describe("Login", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toEqual({ kind: "user_not_found" });
+  });
+
+  it("performs password verification for an unknown email to reduce timing disclosure", async () => {
+    await useCase.execute({ email: "nobody@example.com", password: "password" });
+
+    expect(hasher.verifyCalls).toBe(1);
   });
 
   it("email comparison is case-insensitive", async () => {

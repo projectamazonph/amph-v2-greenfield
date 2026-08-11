@@ -3,7 +3,7 @@
 }
 
 .tl {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -92,7 +92,7 @@
 }
 
 .moreLink a {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;

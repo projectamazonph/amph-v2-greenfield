@@ -35,6 +35,8 @@ export type CheckoutActionState =
   | { kind: "invalid_input"; message: string }
   | { kind: "course_not_found" }
   | { kind: "course_not_published" }
+  | { kind: "pricing_tier_not_found" }
+  | { kind: "pricing_tier_unavailable" }
   | { kind: "already_enrolled" }
   | { kind: "payment_error"; message: string }
   | { kind: "rate_limited"; retryAfterSeconds: number }
@@ -54,7 +56,13 @@ export async function startCheckout(
   formData: FormData,
 ): Promise<CheckoutActionState> {
   const slug = String(formData.get("courseSlug") ?? "").trim();
-  if (!slug) {
+  const pricingTierSlug = String(formData.get("pricingTierSlug") ?? "").trim();
+  const validSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+  if (
+    (!slug && !pricingTierSlug) ||
+    (slug && !validSlug.test(slug)) ||
+    (pricingTierSlug && !validSlug.test(pricingTierSlug))
+  ) {
     return { kind: "invalid_input", message: "Missing course" };
   }
 
@@ -80,7 +88,7 @@ export async function startCheckout(
   }
   const result = await container.createPaymentIntent.execute({
     userId,
-    courseSlug: slug,
+    ...(pricingTierSlug ? { pricingTierSlug } : { courseSlug: slug }),
   });
 
   if (result.ok) {
@@ -100,6 +108,10 @@ function mapPaymentError(err: CreatePaymentIntentError): CheckoutActionState {
       return { kind: "course_not_found" };
     case "course_not_published":
       return { kind: "course_not_published" };
+    case "pricing_tier_not_found":
+      return { kind: "pricing_tier_not_found" };
+    case "pricing_tier_unavailable":
+      return { kind: "pricing_tier_unavailable" };
     case "already_enrolled":
       return { kind: "already_enrolled" };
     case "payment_error":

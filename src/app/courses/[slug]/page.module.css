@@ -85,7 +85,7 @@
 .coverPlaceholderLetter {
   color: var(--surface-1);
   font-family: var(--font-display);
-  font-size: var(--text-5xl);
+  font-size: var(--text-4xl);
   font-weight: 700;
   opacity: 0.3;
 }
@@ -108,7 +108,7 @@
 
 .tagline {
   font-size: var(--text-lg);
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0 0 var(--space-3) 0;
   line-height: var(--leading-snug);
   overflow-wrap: anywhere;
@@ -118,7 +118,7 @@
   font-size: var(--text-base);
   color: var(--ink-700);
   margin: 0 0 var(--space-6) 0;
-  line-height: var(--leading-relaxed);
+  line-height: var(--leading-loose);
   overflow-wrap: anywhere;
 }
 
@@ -243,7 +243,7 @@
 .lessonIcon {
   width: 16px;
   height: 16px;
-  color: var(--accent);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -271,6 +271,43 @@
   flex-shrink: 0;
 }
 
+.quizSection {
+  margin-top: var(--space-10);
+}
+
+.quizList {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quizItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  box-shadow: var(--shadow-sm);
+}
+
+.quizTitle {
+  margin: 0 0 var(--space-1);
+  color: var(--ink-900);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+}
+
+.quizMeta {
+  margin: 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+}
+
 /* Mobile */
 
 @media (max-width: 767px) {
@@ -281,5 +318,10 @@
   .courseMeta {
     flex-direction: column;
     gap: var(--space-2);
+  }
+
+  .quizItem {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

@@ -25,6 +25,7 @@ import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
+import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 
 // ── Request schema ──────────────────────────────────────────────
 
@@ -50,6 +51,7 @@ export interface ProcessQuizAttemptDeps {
   userRepo: UserRepository;
   idGen: IdGenerator;
   clock: Clock;
+  accessPolicy: IAccessPolicy;
 }
 
 // ── Result type ─────────────────────────────────────────────────
@@ -75,6 +77,7 @@ export type ProcessQuizAttemptResult =
       error: { kind: "invalid_answer"; questionId: string; reason: string };
     }
   | { ok: false; status: 401; error: { kind: "unauthorized" } }
+  | { ok: false; status: 403; error: { kind: "access_denied" } }
   | { ok: false; status: 404; error: { kind: "quiz_not_found" } }
   | { ok: false; status: 500; error: { kind: "internal_error"; message: string } };
 
@@ -147,6 +150,8 @@ function mapUseCaseError(error: RecordQuizAttemptError): ProcessQuizAttemptResul
           reason: error.reason,
         },
       };
+    case "access_denied":
+      return { ok: false, status: 403, error: { kind: "access_denied" } };
     // StartQuizAttemptError, AnswerQuestionError, CompleteQuizAttemptError,
     // QuizAttemptRepositoryError — these are internal state errors that
     // shouldn't happen if the use case ran with valid input. Treat as 500.

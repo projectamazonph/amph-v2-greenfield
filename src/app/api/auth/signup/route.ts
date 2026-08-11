@@ -26,6 +26,8 @@ export async function POST(request: Request): Promise<Response> {
   const password = (form.get("password") as string | null) ?? "";
   const firstName = (form.get("firstName") as string | null) ?? "";
   const lastName = (form.get("lastName") as string | null) ?? "";
+  const rawTier = (form.get("tier") as string | null) ?? "";
+  const tier = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(rawTier) ? rawTier : null;
 
   const container = buildContainer();
   const outcome = await performSignUp(
@@ -57,7 +59,8 @@ export async function POST(request: Request): Promise<Response> {
     // the `__Secure-` prefix are silently dropped. Real production
     // (Vercel) is always HTTPS so both stay on.
     const isHttps = new URL(request.url).protocol === "https:";
-    const response = NextResponse.redirect(new URL("/dashboard", request.url), {
+    const destination = tier ? `/checkout?pricingTier=${encodeURIComponent(tier)}` : "/dashboard";
+    const response = NextResponse.redirect(new URL(destination, request.url), {
       status: 303,
     });
     await setAuthCookie(outcome.sessionToken, outcome.expiresAt, response.cookies, {
@@ -70,6 +73,9 @@ export async function POST(request: Request): Promise<Response> {
   // user-facing copy, so the route never echoes the server message.
   const errorCode = outcome.kind;
 
-  const url = new URL(`/signup?error=${errorCode}`, request.url);
+  const retryPath = tier
+    ? `/signup?error=${errorCode}&tier=${encodeURIComponent(tier)}`
+    : `/signup?error=${errorCode}`;
+  const url = new URL(retryPath, request.url);
   return NextResponse.redirect(url, { status: 303 });
 }

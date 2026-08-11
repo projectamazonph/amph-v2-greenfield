@@ -62,8 +62,16 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
             Opt-in. Your account works the same either way until you turn this on.
           </p>
 
-          {twoFactorNotice && <p className={styles.twoFactorNotice}>{twoFactorNotice}</p>}
-          {twoFactorError && <p className={styles.twoFactorError}>{twoFactorError}</p>}
+          {twoFactorNotice && (
+            <p className={styles.twoFactorNotice} role="status">
+              {twoFactorNotice}
+            </p>
+          )}
+          {twoFactorError && (
+            <p className={styles.twoFactorError} role="alert">
+              {twoFactorError}
+            </p>
+          )}
 
           {session.twoFactorEnabled ? (
             <>

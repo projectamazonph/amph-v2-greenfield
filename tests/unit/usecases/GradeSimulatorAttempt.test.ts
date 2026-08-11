@@ -60,6 +60,7 @@ function makeAttemptRepo(): ISimulatorAttemptRepository {
     findByAttemptId: vi.fn(),
     findByUserAndScenario: vi.fn(),
     findByUserAndSimulator: vi.fn(),
+    findByUserId: vi.fn(),
     addDecision: vi.fn(),
     updateStatus: vi.fn(),
   };

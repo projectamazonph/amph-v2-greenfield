@@ -26,7 +26,7 @@
 }
 
 .barTitle i {
-  color: var(--accent);
+  color: var(--accent-text);
   font-style: normal;
 }
 
@@ -216,7 +216,7 @@
 }
 
 .kpi.acos .kpiValue {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .kpi.acos.ok .kpiValue {
@@ -231,7 +231,7 @@
 }
 
 .kpi.acos .kpiVs b {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .kpi.acos.ok .kpiVs b {
@@ -286,7 +286,7 @@
   display: block;
 }
 
-.harvest h4 {
+.harvest h3 {
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.14em;
@@ -295,8 +295,8 @@
   margin-bottom: 10px;
 }
 
-.harvest h4 b {
-  color: var(--accent);
+.harvest h3 b {
+  color: var(--accent-text);
 }
 
 .tableWrap {
@@ -357,7 +357,7 @@
 }
 
 .acosCell.bad {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .acosCell.good {

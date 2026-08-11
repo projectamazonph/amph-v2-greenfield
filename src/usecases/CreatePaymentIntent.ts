@@ -20,15 +20,20 @@ import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IOrderRepository } from "@/ports/repositories/OrderRepository";
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import { Order } from "@/domain/entities/Order";
+import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
+import { resolveCheckoutOffer } from "@/usecases/GetCheckoutSummary";
 
 export interface CreatePaymentIntentInput {
   userId: string;
-  courseSlug: string;
+  courseSlug?: string;
+  pricingTierSlug?: string;
 }
 
 export type CreatePaymentIntentError =
   | { kind: "course_not_found" }
   | { kind: "course_not_published" }
+  | { kind: "pricing_tier_not_found" }
+  | { kind: "pricing_tier_unavailable" }
   | { kind: "already_enrolled" }
   | { kind: "payment_error"; message: string }
   | { kind: "invalid_transition"; message: string };
@@ -39,6 +44,7 @@ export type CreatePaymentIntentOutput =
 
 export interface CreatePaymentIntentDeps {
   courseRepo: CourseRepository;
+  pricingTierRepo: IPricingTierRepository;
   orderRepo: IOrderRepository;
   paymentGateway: IPaymentGateway;
   baseUrl: string;
@@ -48,19 +54,13 @@ export class CreatePaymentIntent {
   constructor(private readonly deps: CreatePaymentIntentDeps) {}
 
   async execute(input: CreatePaymentIntentInput): Promise<CreatePaymentIntentOutput> {
-    const { courseRepo, orderRepo, paymentGateway, baseUrl } = this.deps;
-
-    // ── 1. Fail fast: course must exist ──────────────────────
-    const courseResult = await courseRepo.findBySlug(input.courseSlug);
-    if (Result.isErr(courseResult)) {
-      return { ok: false, error: { kind: "course_not_found" } };
-    }
-    const course = courseResult.value;
-
-    // ── 2. Fail fast: course must be published ────────────────
-    if (course.status !== "PUBLISHED") {
-      return { ok: false, error: { kind: "course_not_published" } };
-    }
+    const { courseRepo, pricingTierRepo, orderRepo, paymentGateway, baseUrl } = this.deps;
+    const offerResult = await resolveCheckoutOffer(
+      { courseRepo, pricingTierRepo },
+      { courseSlug: input.courseSlug, pricingTierSlug: input.pricingTierSlug },
+    );
+    if (!offerResult.ok) return { ok: false, error: offerResult.error };
+    const { course, price } = offerResult.value;
 
     // ── 3. Fail fast: user must not already have a PAID order ─
     const existingOrders = await orderRepo.findByUserId(input.userId);
@@ -74,7 +74,11 @@ export class CreatePaymentIntent {
     // ── 4. Reuse existing pending checkout if one exists ─────
     if (Result.isOk(existingOrders)) {
       const pendingOrder = existingOrders.value.find(
-        (o) => o.courseId === course.id && o.status === "PENDING" && o.paymongoCheckoutUrl !== null,
+        (o) =>
+          o.courseId === course.id &&
+          o.status === "PENDING" &&
+          o.totalMinor === price.minor &&
+          o.paymongoCheckoutUrl !== null,
       );
       if (pendingOrder && pendingOrder.paymongoCheckoutUrl) {
         return {
@@ -91,10 +95,10 @@ export class CreatePaymentIntent {
       id: orderId,
       userId: input.userId,
       courseId: course.id,
-      subtotalMinor: course.price.minor,
+      subtotalMinor: price.minor,
       discountMinor: 0,
-      totalMinor: course.price.minor,
-      currency: course.price.currency,
+      totalMinor: price.minor,
+      currency: price.currency,
     });
 
     const createResult = await orderRepo.create(order);
@@ -106,14 +110,15 @@ export class CreatePaymentIntent {
     const checkoutResult = await paymentGateway.createCheckoutSession({
       courseId: course.id,
       courseTitle: course.title,
-      amountMinor: course.price.minor,
-      currency: course.price.currency,
+      amountMinor: price.minor,
+      currency: price.currency,
       successUrl: `${baseUrl}/checkout/success?orderId=${order.id}`,
       failedUrl: `${baseUrl}/checkout/failed?orderId=${order.id}`,
       metadata: {
         orderId: order.id,
         userId: input.userId,
         courseId: course.id,
+        ...(input.pricingTierSlug ? { pricingTierSlug: input.pricingTierSlug } : {}),
       },
     });
 

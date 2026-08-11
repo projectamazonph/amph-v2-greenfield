@@ -59,11 +59,15 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const r = await strTriageAttempt({ userActions: actions, mode });
-      if (r.ok) {
-        setResult(r.value);
-      } else {
-        setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+      try {
+        const r = await strTriageAttempt({ userActions: actions, mode });
+        if (r.ok) {
+          setResult(r.value);
+        } else {
+          setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+        }
+      } catch {
+        setError("Could not grade this attempt. Please try again.");
       }
     });
   };
@@ -135,7 +139,11 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
           </tbody>
         </table>
       </div>
-      {error ? <p className={styles.error}>{error}</p> : null}
+      {error ? (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      ) : null}
       <div className={styles.footer}>
         <button type="submit" className={styles.submit} disabled={pending || result !== null}>
           {pending ? "Grading…" : result ? "Graded" : "Grade my triage"}

@@ -112,9 +112,7 @@ function VideoContent({ content }: { content: VideoLessonContent }) {
           />
         </div>
       ) : (
-        <video className={styles.video} controls src={content.videoUrl} preload="metadata">
-          <track kind="captions" />
-        </video>
+        <video className={styles.video} controls src={content.videoUrl} preload="metadata" />
       )}
       <div className={styles.videoMeta}>
         <VideoIcon />

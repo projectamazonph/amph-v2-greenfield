@@ -121,6 +121,23 @@ export class PrismaQuizAttemptRepository implements IQuizAttemptRepository {
     }
   }
 
+  async findByUserId(
+    userId: string,
+  ): Promise<Result<readonly QuizAttempt[], QuizAttemptRepositoryError>> {
+    try {
+      const rows = await this.db.quizAttempt.findMany({
+        where: { userId },
+        orderBy: { startedAt: "desc" },
+      });
+      const attempts = await Promise.all(
+        rows.map(async (row) => this.mapRow(row, await this.loadAnswers(row.id))),
+      );
+      return Result.ok(attempts);
+    } catch (err) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async findLatestByUserAndQuiz(
     userId: string,
     quizId: string,

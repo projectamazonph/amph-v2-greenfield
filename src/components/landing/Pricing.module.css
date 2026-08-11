@@ -12,7 +12,7 @@
 }
 
 .intro b {
-  color: var(--accent-hover);
+  color: var(--accent-text);
 }
 
 .tiers {
@@ -89,7 +89,7 @@
   font-size: 9.5px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 
@@ -128,7 +128,7 @@
 }
 
 .cur {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.62em;
   vertical-align: 0.18em;
   margin-right: 1px;
@@ -144,6 +144,11 @@
 
 .featured .priceLine small {
   color: #9a9a9a;
+}
+
+.featured .flag,
+.featured .cur {
+  color: var(--accent);
 }
 
 .payMini {
@@ -181,8 +186,12 @@
 
 .incl li svg {
   flex-shrink: 0;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-top: 2px;
+}
+
+.featured .incl li svg {
+  color: var(--accent);
 }
 
 .incl li b {
@@ -240,7 +249,9 @@
   align-items: center;
   gap: 7px;
   background: var(--surface-0);
-  transition: border-color 200ms ease, transform 200ms ease;
+  transition:
+    border-color 200ms ease,
+    transform 200ms ease;
 }
 
 .payChip:hover {
@@ -249,11 +260,11 @@
 }
 
 .payChip svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .guar {
   border-color: var(--accent-soft);
   background: var(--accent-soft);
-  color: var(--accent-hover);
+  color: var(--accent-text);
 }

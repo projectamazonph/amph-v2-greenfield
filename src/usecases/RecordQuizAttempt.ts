@@ -37,6 +37,7 @@ import type {
   CompleteQuizAttemptError,
 } from "@/domain/entities/QuizAttempt";
 import type { QuizAttemptRepositoryError } from "@/ports/repositories/IQuizAttemptRepository";
+import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
 
 // ── Input / Output types ───────────────────────────────────────────────────
 
@@ -53,10 +54,12 @@ export type RecordQuizAttemptDeps = {
   userRepo: UserRepository;
   idGen: IdGenerator;
   clock: Clock;
+  accessPolicy: IAccessPolicy;
 };
 
 export type RecordQuizAttemptError =
   | { kind: "quiz_not_found" }
+  | { kind: "access_denied" }
   | { kind: "invalid_answer"; questionId: string; reason: string }
   | StartQuizAttemptError
   | AnswerQuestionError
@@ -93,6 +96,11 @@ export class RecordQuizAttempt {
     const quiz = quizResult.value;
     if (!quiz) {
       return Result.err({ kind: "quiz_not_found" });
+    }
+
+    const access = await this.deps.accessPolicy.canAccess(input.userId, quiz.courseId);
+    if (access.kind !== "allowed") {
+      return Result.err({ kind: "access_denied" });
     }
 
     // ── 2. Validate all answers ─────────────────────────────────────────

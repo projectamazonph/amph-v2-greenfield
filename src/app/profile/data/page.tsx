@@ -44,7 +44,7 @@ export default async function ProfileDataPage({ searchParams }: PageProps) {
           <h2 className={styles.sectionTitle}>Download my data</h2>
           <p className={styles.help}>
             Get a JSON file with your profile, orders, enrollments, certificates, badges, XP events,
-            and progress events. Quiz and simulator attempt history is not included yet.
+            progress events, quiz attempts, and simulator attempts.
           </p>
           <ExportDataButton className={styles.submitButton} />
         </Card>
@@ -60,7 +60,11 @@ export default async function ProfileDataPage({ searchParams }: PageProps) {
             undone.
           </p>
 
-          {errorText && <p className={styles.twoFactorError}>{errorText}</p>}
+          {errorText && (
+            <p className={styles.twoFactorError} role="alert">
+              {errorText}
+            </p>
+          )}
 
           <form action={deleteAccountAction} className={styles.twoFactorForm}>
             <label className={styles.field}>

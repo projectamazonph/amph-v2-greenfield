@@ -24,10 +24,8 @@ export function ResetConfirmForm({ token }: Props) {
 
   if (state.kind === "success") {
     return (
-      <div className={styles.success}>
-        <p className={styles.successText}>
-          Your password was changed. Sign in with the new one.
-        </p>
+      <div className={styles.success} role="status">
+        <p className={styles.successText}>Your password was changed. Sign in with the new one.</p>
         <Link href="/login" className={styles.cta}>
           Sign in
         </Link>
@@ -50,7 +48,11 @@ export function ResetConfirmForm({ token }: Props) {
         autoComplete="new-password"
         minLength={8}
       />
-      {state.message ? <p className={styles.error}>{state.message}</p> : null}
+      {state.message ? (
+        <p className={styles.error} role="alert">
+          {state.message}
+        </p>
+      ) : null}
       <button type="submit" className={styles.submit} disabled={pending}>
         {pending ? "Saving…" : "Set new password"}
       </button>

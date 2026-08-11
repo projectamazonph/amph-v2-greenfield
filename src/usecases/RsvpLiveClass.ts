@@ -8,6 +8,7 @@ import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassReposi
 import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiveClassRegistrationRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 
 /**
  * `RsvpLiveClass` — STORY-091.
@@ -21,6 +22,7 @@ import type { Clock } from "@/ports/system/Clock";
 export type RsvpLiveClassError =
   | { kind: "not_found"; liveClassId: string }
   | { kind: "class_cancelled_or_completed"; status: LiveClassStatus }
+  | { kind: "course_access_required" }
   | { kind: "already_registered" }
   | { kind: "db_error"; message: string };
 
@@ -32,6 +34,7 @@ export interface RsvpLiveClassInput {
 export interface RsvpLiveClassDeps {
   liveClassRepo: ILiveClassRepository;
   liveClassRegistrationRepo: ILiveClassRegistrationRepository;
+  enrollmentRepo: IEnrollmentRepository;
   ids: IdGenerator;
   clock: Clock;
 }
@@ -43,9 +46,7 @@ export class RsvpLiveClass {
     input: RsvpLiveClassInput,
   ): Promise<Result<LiveClassRegistration, RsvpLiveClassError>> {
     // 1. Validate class exists and is RSVP-able.
-    const classResult = await this.deps.liveClassRepo.findById(
-      input.liveClassId,
-    );
+    const classResult = await this.deps.liveClassRepo.findById(input.liveClassId);
     if (!classResult.ok) {
       return Result.err({
         kind: "db_error",
@@ -66,12 +67,19 @@ export class RsvpLiveClass {
       });
     }
 
+    const enrollment = await this.deps.enrollmentRepo.findByUserIdAndCourseId(
+      input.userId,
+      liveClass.courseId,
+    );
+    if (!enrollment || enrollment.status !== "active") {
+      return Result.err({ kind: "course_access_required" });
+    }
+
     // 2. Existing RSVP?
-    const existingResult =
-      await this.deps.liveClassRegistrationRepo.findByUserAndClass(
-        input.userId,
-        input.liveClassId,
-      );
+    const existingResult = await this.deps.liveClassRegistrationRepo.findByUserAndClass(
+      input.userId,
+      input.liveClassId,
+    );
     if (!existingResult.ok) {
       return Result.err({
         kind: "db_error",
@@ -93,9 +101,7 @@ export class RsvpLiveClass {
         registeredAt: existing.registeredAt ?? now,
         updatedAt: now,
       };
-      const upd = await this.deps.liveClassRegistrationRepo.update(
-        reRegistered,
-      );
+      const upd = await this.deps.liveClassRegistrationRepo.update(reRegistered);
       if (!upd.ok) {
         return Result.err({
           kind: "db_error",
@@ -121,9 +127,7 @@ export class RsvpLiveClass {
       createdAt: now,
       updatedAt: now,
     };
-    const createResult = await this.deps.liveClassRegistrationRepo.create(
-      registration,
-    );
+    const createResult = await this.deps.liveClassRegistrationRepo.create(registration);
     if (!createResult.ok) {
       if (createResult.error.kind === "already_registered") {
         return Result.err({ kind: "already_registered" });

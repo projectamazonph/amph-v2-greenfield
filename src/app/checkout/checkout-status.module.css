@@ -13,7 +13,7 @@
 .card {
   width: 100%;
   max-width: 480px;
-  background: var(--surface-card);
+  background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: clamp(var(--space-6), 8vw, var(--space-10)) clamp(var(--space-5), 8vw, var(--space-10)) var(--space-8);
@@ -29,7 +29,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--accent);
+  color: var(--accent-text);
   text-transform: uppercase;
 }
 
@@ -64,7 +64,7 @@
 }
 
 .link {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
   font-weight: 600;
   font-size: var(--text-sm);

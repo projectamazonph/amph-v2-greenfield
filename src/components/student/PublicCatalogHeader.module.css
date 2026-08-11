@@ -9,7 +9,7 @@
   top: 0;
   z-index: 10;
   background: var(--surface-1, #ffffff);
-  border-bottom: 1px solid var(--ink-100, #e7e2da);
+  border-bottom: 1px solid var(--border);
   font-family: var(--font-body);
 }
 
@@ -80,7 +80,7 @@
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
-  border: 1px solid var(--ink-200, #d6d1c8);
+  border: 1px solid var(--border);
   background: transparent;
   transition: background-color 120ms ease;
 }
@@ -92,7 +92,7 @@
 .signUp {
   padding: var(--space-2, 8px) var(--space-4, 16px);
   border-radius: 6px;
-  color: #ffffff;
+  color: var(--accent-ink, #1a1a2e);
   background: var(--accent, #ff6b1a);
   text-decoration: none;
   font-weight: 600;

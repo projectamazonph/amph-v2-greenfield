@@ -36,13 +36,12 @@
 
 import { useActionState, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import {
   startCheckout,
   CHECKOUT_INITIAL_STATE,
   type CheckoutActionState,
 } from "@/app/actions/checkout.action";
-import { Money } from "@/domain/values/Money";
+import type { CheckoutSummary } from "@/usecases/GetCheckoutSummary";
 
 const PAGE_STYLES: Record<string, React.CSSProperties> = {
   page: {
@@ -74,7 +73,7 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
     fontSize: 11,
     fontWeight: 700,
     letterSpacing: "0.12em",
-    color: "var(--accent)",
+    color: "var(--accent-text)",
     textTransform: "uppercase",
   },
   title: {
@@ -148,27 +147,25 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
     color: "var(--ink-500)",
   },
   link: {
-    color: "var(--accent)",
+    color: "var(--accent-text)",
     textDecoration: "none",
     fontWeight: 600,
   },
 };
 
-export default function CheckoutForm() {
-  const searchParams = useSearchParams();
+interface CheckoutFormProps {
+  offer: { courseSlug: string } | { pricingTierSlug: string } | null;
+  summary: CheckoutSummary | null;
+  loadError:
+    | "missing_offer"
+    | "course_not_found"
+    | "course_not_published"
+    | "pricing_tier_not_found"
+    | "pricing_tier_unavailable"
+    | null;
+}
 
-  // Normalise legacy ?course= param to the correct ?courseSlug=
-  const legacyCourse = searchParams.get("course");
-  useEffect(() => {
-    if (legacyCourse) {
-      window.location.href = `/checkout?courseSlug=${encodeURIComponent(legacyCourse)}`;
-    }
-  }, [legacyCourse]);
-
-  if (legacyCourse) return null;
-
-  const courseSlug = searchParams.get("courseSlug")?.trim() ?? "";
-
+export default function CheckoutForm({ offer, summary, loadError }: CheckoutFormProps) {
   const [state, formAction, isPending] = useActionState<CheckoutActionState, FormData>(
     startCheckout,
     CHECKOUT_INITIAL_STATE,
@@ -183,7 +180,7 @@ export default function CheckoutForm() {
     }
   }, [state]);
 
-  if (!courseSlug) {
+  if (!offer || !summary) {
     return (
       <div style={PAGE_STYLES.page}>
         <div style={PAGE_STYLES.card}>
@@ -191,8 +188,8 @@ export default function CheckoutForm() {
             <div style={PAGE_STYLES.logo}>Project Amazon PH Academy</div>
             <h1 style={PAGE_STYLES.title}>Checkout</h1>
           </div>
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
-            Missing course. Pick a course from the{" "}
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
+            {checkoutLoadErrorMessage(loadError)} Pick a course from the{" "}
             <Link href="/courses" style={PAGE_STYLES.link}>
               catalog
             </Link>{" "}
@@ -202,6 +199,14 @@ export default function CheckoutForm() {
       </div>
     );
   }
+
+  const returnPath = summary.pricingTierSlug
+    ? `/checkout?pricingTier=${summary.pricingTierSlug}`
+    : `/checkout?courseSlug=${summary.courseSlug}`;
+  const formattedTotal = new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: summary.currency,
+  }).format(summary.amountMinor / 100);
 
   return (
     <div style={PAGE_STYLES.page}>
@@ -217,10 +222,10 @@ export default function CheckoutForm() {
 
         {/* Error alerts */}
         {state.kind === "unauthorized" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             Please{" "}
             <Link
-              href={`/login?next=${encodeURIComponent(`/checkout?courseSlug=${courseSlug}`)}`}
+              href={`/login?redirect=${encodeURIComponent(returnPath)}`}
               style={PAGE_STYLES.link}
             >
               sign in
@@ -229,17 +234,22 @@ export default function CheckoutForm() {
           </div>
         )}
         {state.kind === "course_not_found" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             That course was not found. It may have been removed.
           </div>
         )}
         {state.kind === "course_not_published" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             This course is not available for purchase right now.
           </div>
         )}
+        {(state.kind === "pricing_tier_not_found" || state.kind === "pricing_tier_unavailable") && (
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
+            This pricing offer is no longer available. Choose a current offer from the pricing page.
+          </div>
+        )}
         {state.kind === "already_enrolled" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertInfo }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertInfo }} role="status">
             You're already enrolled in this course. Head to your{" "}
             <Link href="/dashboard" style={PAGE_STYLES.link}>
               dashboard
@@ -248,13 +258,13 @@ export default function CheckoutForm() {
           </div>
         )}
         {state.kind === "payment_error" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             Could not start checkout: {state.message}. Please try again, or contact support if the
             problem persists.
           </div>
         )}
         {state.kind === "rate_limited" && (
-          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }}>
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
             Too many checkout attempts. Please wait a few minutes before trying again.
           </div>
         )}
@@ -273,26 +283,29 @@ export default function CheckoutForm() {
                 textAlign: "right",
               }}
             >
-              {courseSlug}
+              {summary.courseTitle}
             </span>
           </div>
           <div style={PAGE_STYLES.summaryRow}>
             <span>Subtotal</span>
-            <span style={{ color: "var(--ink-500)" }}>See PayMongo</span>
+            <span style={{ color: "var(--ink-500)" }}>{formattedTotal}</span>
           </div>
           <div style={PAGE_STYLES.summaryTotal}>
             <span>Total</span>
-            <span>Final price on PayMongo</span>
+            <span>{formattedTotal}</span>
           </div>
         </div>
 
         <p style={PAGE_STYLES.hint}>
-          The exact price (including any active discount codes) is shown on the PayMongo checkout
-          page. We never store your card details.
+          This is the amount sent to PayMongo. We never store your card details.
         </p>
 
         <form action={formAction} style={PAGE_STYLES.form}>
-          <input type="hidden" name="courseSlug" value={courseSlug} />
+          {"pricingTierSlug" in offer ? (
+            <input type="hidden" name="pricingTierSlug" value={offer.pricingTierSlug} />
+          ) : (
+            <input type="hidden" name="courseSlug" value={offer.courseSlug} />
+          )}
           <button
             type="submit"
             className="btn btn-primary"
@@ -318,7 +331,16 @@ export default function CheckoutForm() {
   );
 }
 
-// Money is imported to ensure the build picks up the value-object
-// barrel. The actual amount is computed on the PayMongo side because
-// discount codes may be applied at checkout.
-void Money;
+function checkoutLoadErrorMessage(error: CheckoutFormProps["loadError"]): string {
+  switch (error) {
+    case "course_not_found":
+      return "That course could not be found.";
+    case "course_not_published":
+      return "That course is not available for purchase.";
+    case "pricing_tier_not_found":
+    case "pricing_tier_unavailable":
+      return "That pricing offer is no longer available.";
+    default:
+      return "No checkout offer was selected.";
+  }
+}

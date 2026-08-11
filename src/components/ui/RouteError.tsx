@@ -23,24 +23,32 @@ import styles from "./RouteError.module.css";
 interface RouteErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
+  /** Set when a parent layout already renders the page's main landmark. */
+  withinMain?: boolean;
 }
 
-export function RouteError({ error, reset }: RouteErrorProps) {
+export function RouteError({ error, reset, withinMain = false }: RouteErrorProps) {
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
 
-  return (
-    <div className={styles.wrapper}>
-      <div className={styles.card}>
-        <p className={styles.emoji}>⚠️</p>
-        <h2 className={styles.title}>Something went wrong</h2>
-        <p className={styles.message}>{error.message || "An unexpected error occurred."}</p>
-        {error.digest && <p className={styles.digest}>Error ID: {error.digest}</p>}
-        <button type="button" className={styles.retry} onClick={reset}>
-          Try again
-        </button>
-      </div>
+  const content = (
+    <div className={styles.card}>
+      <p className={styles.emoji} aria-hidden="true">
+        !
+      </p>
+      <h1 className={styles.title}>Something went wrong</h1>
+      <p className={styles.message}>We could not load this page. Please try again.</p>
+      {error.digest && <p className={styles.digest}>Error ID: {error.digest}</p>}
+      <button type="button" className={styles.retry} onClick={reset}>
+        Try again
+      </button>
     </div>
   );
+
+  if (withinMain) {
+    return <div className={styles.wrapper}>{content}</div>;
+  }
+
+  return <main className={styles.wrapper}>{content}</main>;
 }

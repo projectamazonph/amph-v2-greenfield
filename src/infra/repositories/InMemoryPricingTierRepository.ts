@@ -20,6 +20,7 @@ import { Result } from "@/domain/shared/Result";
 export class InMemoryPricingTierRepository implements IPricingTierRepository {
   private tiers = new Map<string, PricingTier>(); // id -> tier
   private archived = new Set<string>(); // archived tier ids
+  private courseLinks = new Map<string, string>(); // tier id -> published course slug
 
   async listAll(): Promise<Result<readonly PricingTier[], PricingTierRepositoryError>> {
     try {
@@ -67,6 +68,12 @@ export class InMemoryPricingTierRepository implements IPricingTierRepository {
     } catch (err) {
       return Result.err({ kind: "db_error", message: String(err) });
     }
+  }
+
+  async findLinkedCourseSlug(
+    tierId: string,
+  ): Promise<Result<string | null, PricingTierRepositoryError>> {
+    return Result.ok(this.courseLinks.get(tierId) ?? null);
   }
 
   async create(tier: PricingTier): Promise<Result<PricingTier, PricingTierRepositoryError>> {
@@ -126,6 +133,7 @@ export class InMemoryPricingTierRepository implements IPricingTierRepository {
   clear(): void {
     this.tiers.clear();
     this.archived.clear();
+    this.courseLinks.clear();
   }
 
   /** Pre-seed a tier (test-only helper). */
@@ -138,5 +146,10 @@ export class InMemoryPricingTierRepository implements IPricingTierRepository {
   /** Pre-seed several tiers. */
   seedMany(tiers: readonly PricingTier[]): void {
     for (const tier of tiers) this.seed(tier);
+  }
+
+  /** Link a tier to its purchasable course (test/dev helper). */
+  seedCourseLink(tierId: string, courseSlug: string): void {
+    this.courseLinks.set(tierId, courseSlug);
   }
 }

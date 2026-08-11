@@ -27,7 +27,7 @@ export function Footer() {
           </div>
 
           <div className={styles.col}>
-            <h5>Course</h5>
+            <h2>Course</h2>
             <a href="#method">The method</a>
             <a href="#simulator">Simulators</a>
             <a href="#curriculum">Curriculum</a>
@@ -35,7 +35,7 @@ export function Footer() {
           </div>
 
           <div className={styles.col}>
-            <h5>Project</h5>
+            <h2>Project</h2>
             <a href="#whofor">Who it&rsquo;s for</a>
             <a href="#mentor">Mentor</a>
             <a href="#proof">What you can show</a>
@@ -43,7 +43,7 @@ export function Footer() {
           </div>
 
           <div className={styles.col}>
-            <h5>Enrol</h5>
+            <h2>Enrol</h2>
             <a href={COURSES_URL} target="_blank" rel="noopener noreferrer">
               See the courses
             </a>

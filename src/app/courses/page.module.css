@@ -13,12 +13,24 @@
   min-height: 100vh;
   background: var(--surface-0);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--side-pad);
+  text-align: center;
+}
+
+.errorTitle {
+  color: var(--ink-900);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  margin: 0;
 }
 
 .errorText {
-  color: var(--ink-500);
+  color: var(--ink-700);
   font-size: var(--text-base);
   margin: 0;
 }
@@ -157,13 +169,13 @@
 }
 
 .card:hover .cardTitle {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .cardPrice {
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
   white-space: nowrap;
   flex-shrink: 0;
 }

@@ -5,7 +5,7 @@
  */
 
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 import styles from "./not-found.module.css";
 
 export default function CourseNotFound() {
@@ -13,13 +13,12 @@ export default function CourseNotFound() {
     <main className={styles.page}>
       <div className={styles.center}>
         <h1 className={styles.title}>Course Not Found</h1>
-        <p className={styles.subtitle}>
-          This course doesn&apos;t exist or has been removed.
-        </p>
-        <Link href="/courses">
-          <Button variant="primary" size="lg">
-            Browse All Courses
-          </Button>
+        <p className={styles.subtitle}>This course doesn&apos;t exist or has been removed.</p>
+        <Link
+          href="/courses"
+          className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg].join(" ")}
+        >
+          Browse All Courses
         </Link>
       </div>
     </main>

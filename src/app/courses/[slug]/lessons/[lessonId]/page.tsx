@@ -21,10 +21,13 @@ import type { Lesson } from "@/domain/entities/Lesson";
 import { LessonSidebar } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
 import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
+import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.action";
 import styles from "./page.module.css";
 
 interface PageProps {
   params: Promise<{ slug: string; lessonId: string }>;
+  searchParams: Promise<{ completed?: string; completeError?: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -47,9 +50,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function LessonPage({ params }: PageProps) {
-  // NOTE: This page is now a Client Component so we can hook in the
+export default async function LessonPage({ params, searchParams }: PageProps) {
   const { slug, lessonId } = await params;
+  const completionStatus = await searchParams;
   const container = buildContainer();
 
   // ── Fetch course ────────────────────────────────────────
@@ -74,10 +77,12 @@ export default async function LessonPage({ params }: PageProps) {
 
   // Load completed lessons from the enrollment (if enrolled).
   let completedLessonIds: string[] = [];
+  let hasActiveEnrollment = false;
   if (userId) {
     const enrollment = await container.enrollmentRepo.findByUserIdAndCourseId(userId, course.id);
     if (enrollment) {
       completedLessonIds = enrollment.completedLessonIds;
+      hasActiveEnrollment = enrollment.status === "active";
     }
   }
 
@@ -90,6 +95,13 @@ export default async function LessonPage({ params }: PageProps) {
   if (!authResult.ok || (authResult.ok && authResult.value.kind === "denied")) {
     return <AccessDeniedPage courseSlug={slug} courseTitle={course.title} />;
   }
+
+  const isCompleted = completedLessonIds.includes(lessonId);
+  const completeLesson = markLessonCompleteAction.bind(null, {
+    courseId: course.id,
+    courseSlug: slug,
+    lessonId,
+  });
 
   return (
     <div className={styles.layout}>
@@ -146,18 +158,24 @@ export default async function LessonPage({ params }: PageProps) {
           {/* Lesson body */}
           <LessonContent lesson={lesson as Lesson} courseSlug={slug} />
 
-          {/* Mark as Complete */}
-          <form
-            action="/api/lessons/complete"
-            method="post"
-            style={{ marginTop: "var(--space-4)" }}
-          >
-            <input type="hidden" name="lessonId" value={lessonId} />
-            <input type="hidden" name="courseId" value={course.id} />
-            <Button variant="primary" size="md" type="submit">
-              Mark as Complete
-            </Button>
-          </form>
+          {completionStatus.completed === "1" ? (
+            <p className="alert-success" role="status">
+              Lesson complete. Your course progress is updated.
+            </p>
+          ) : null}
+          {completionStatus.completeError ? (
+            <p className="alert-error" role="alert">
+              We could not update your progress. Refresh the page and try again.
+            </p>
+          ) : null}
+
+          {hasActiveEnrollment ? (
+            <form action={completeLesson} className={styles.completionForm}>
+              <Button variant={isCompleted ? "secondary" : "primary"} size="md" type="submit">
+                {isCompleted ? "Completed" : "Mark as Complete"}
+              </Button>
+            </form>
+          ) : null}
 
           {/* Prev / Next navigation */}
           <div className={styles.navFooter}>
@@ -183,7 +201,7 @@ function AccessDeniedPage({
   courseTitle: string;
 }) {
   return (
-    <div className={styles.accessDeniedPage}>
+    <main className={styles.accessDeniedPage}>
       <div className={styles.accessDeniedCard}>
         <LockIcon />
         <h1 className={styles.accessDeniedTitle}>Enroll to Access This Lesson</h1>
@@ -191,13 +209,14 @@ function AccessDeniedPage({
           This lesson is part of <strong>{courseTitle}</strong>. Enroll to unlock all lessons and
           materials.
         </p>
-        <Link href={`/courses/${courseSlug}`}>
-          <Button variant="primary" size="md">
-            View Course & Enroll
-          </Button>
+        <Link
+          href={`/courses/${courseSlug}`}
+          className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.md].join(" ")}
+        >
+          View Course & Enroll
         </Link>
       </div>
-    </div>
+    </main>
   );
 }
 

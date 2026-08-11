@@ -102,7 +102,7 @@ describe("performLogin", () => {
     expect(result).toEqual({ kind: "invalid_input" });
   });
 
-  it("returns redirect_to_login with user_not_found when user does not exist", async () => {
+  it("returns a generic credential error when user does not exist", async () => {
     const container = freshContainer();
     const deps = makeDeps();
     const result = await performLogin(
@@ -116,11 +116,11 @@ describe("performLogin", () => {
     );
     expect(result).toEqual({
       kind: "redirect_to_login",
-      errorKind: "user_not_found",
+      errorKind: "invalid_credentials",
     });
   });
 
-  it("returns redirect_to_login with wrong_password when password is wrong", async () => {
+  it("returns the same generic credential error when password is wrong", async () => {
     const container = freshContainer();
     await seedUser(container, "u@test.example.com", "correct-password");
     const deps = makeDeps();
@@ -135,7 +135,7 @@ describe("performLogin", () => {
     );
     expect(result).toEqual({
       kind: "redirect_to_login",
-      errorKind: "wrong_password",
+      errorKind: "invalid_credentials",
     });
   });
 
@@ -294,7 +294,7 @@ describe("performLogin", () => {
       deps,
     );
 
-    expect(result).toEqual({ kind: "redirect_to_login", errorKind: "user_not_found" });
+    expect(result).toEqual({ kind: "redirect_to_login", errorKind: "invalid_credentials" });
     expect(check).toHaveBeenNthCalledWith(1, {
       key: "login:email:student@example.com",
       limit: 5,
@@ -322,7 +322,7 @@ describe("performLogin", () => {
       deps,
     );
 
-    expect(result).toEqual({ kind: "redirect_to_login", errorKind: "user_not_found" });
+    expect(result).toEqual({ kind: "redirect_to_login", errorKind: "invalid_credentials" });
     expect(check).toHaveBeenCalledTimes(1);
     expect(check).toHaveBeenCalledWith({
       key: "login:email:no-ip@example.com",

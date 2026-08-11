@@ -16,13 +16,14 @@ import Link from "next/link";
 import { XCircle } from "@phosphor-icons/react/dist/ssr";
 import styles from "../checkout-status.module.css";
 
-export default function CheckoutFailedPage({
+export default async function CheckoutFailedPage({
   searchParams,
 }: {
-  searchParams: { orderId?: string; courseSlug?: string };
+  searchParams: Promise<{ orderId?: string; courseSlug?: string }>;
 }) {
-  const orderId = searchParams.orderId?.trim() ?? "";
-  const courseSlug = searchParams.courseSlug?.trim() ?? "";
+  const params = await searchParams;
+  const orderId = params.orderId?.trim() ?? "";
+  const courseSlug = params.courseSlug?.trim() ?? "";
   // If we know the slug, deep-link back to /checkout for retry.
   const retryHref = courseSlug
     ? `/checkout?courseSlug=${encodeURIComponent(courseSlug)}`
@@ -31,7 +32,12 @@ export default function CheckoutFailedPage({
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>Project Amazon PH Academy</div>
-        <XCircle className={styles.checkmark} weight="duotone" style={{ color: "var(--danger)" }} aria-hidden="true" />
+        <XCircle
+          className={styles.checkmark}
+          weight="duotone"
+          style={{ color: "var(--danger)" }}
+          aria-hidden="true"
+        />
         <h1 className={styles.title}>Payment not completed</h1>
         <p className={styles.body}>
           Your payment was cancelled or didn't go through. You haven't been charged. Try again

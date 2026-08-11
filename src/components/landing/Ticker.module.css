@@ -19,6 +19,14 @@
   padding: 9px 14px;
   flex-shrink: 0;
   font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+
+.viewport {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .track {
@@ -51,7 +59,7 @@
 }
 
 .set span em {
-  color: var(--accent);
+  color: var(--accent-text);
   font-style: normal;
   font-weight: 700;
 }

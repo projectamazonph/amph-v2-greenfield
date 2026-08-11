@@ -13,6 +13,8 @@ import { createSimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import type { AuditAction } from "@/domain/values/AuditAction";
+import { InMemoryScorePolicyRepository } from "@/infra/repositories/InMemoryScorePolicyRepository";
+import { createScorePolicy } from "@/domain/entities/ScorePolicy";
 
 function makeScenarioRepo() {
   const repo = new InMemorySimulatorScenarioRepository();
@@ -65,6 +67,7 @@ describe("StartSimulatorAttempt", () => {
   let audit: InMemoryAuditLog;
   let idGen: ReturnType<typeof makeIdGen>;
   let clock: FixedClock;
+  let scorePolicyRepo: InMemoryScorePolicyRepository;
   let useCase: StartSimulatorAttempt;
 
   beforeEach(() => {
@@ -73,8 +76,10 @@ describe("StartSimulatorAttempt", () => {
     audit = new InMemoryAuditLog();
     idGen = makeIdGen();
     clock = new FixedClock(new Date("2025-01-01T00:00:00Z"));
+    scorePolicyRepo = new InMemoryScorePolicyRepository();
     useCase = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -110,6 +115,7 @@ describe("StartSimulatorAttempt", () => {
     const emptyScenarioRepo = new InMemorySimulatorScenarioRepository();
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo: emptyScenarioRepo,
       idGen,
       clock,
@@ -148,16 +154,61 @@ describe("StartSimulatorAttempt", () => {
     expect(r.error.kind).toBe("already_in_progress");
   });
 
-  it("respects a custom mode override", async () => {
+  it("respects a guided mode override", async () => {
+    const r = await useCase.execute({
+      userId: "u_1",
+      simulatorId: "bid-elevator",
+      scenarioId: "scn_1",
+      mode: "guided",
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.mode).toBe("guided");
+  });
+
+  it("rejects challenge mode until the student passes practice", async () => {
     const r = await useCase.execute({
       userId: "u_1",
       simulatorId: "bid-elevator",
       scenarioId: "scn_1",
       mode: "challenge",
     });
+
+    expect(r).toEqual({ ok: false, error: { kind: "challenge_locked" } });
+  });
+
+  it("allows challenge mode after the student passes practice", async () => {
+    const policy = createScorePolicy({
+      id: "policy-1",
+      simulatorId: "bid-elevator",
+      difficulty: "beginner",
+      mode: "practice",
+      dimensionConfig: { direction: { weight: 1 } },
+      passingScore: 70,
+    });
+    if (!policy.ok) throw new Error("policy seed failed");
+    await scorePolicyRepo.create(policy.value);
+    const practiceAttempt = createSimulatorAttempt({
+      id: "practice-pass",
+      attemptId: "ATT-PRACTICE",
+      userId: "u_1",
+      simulatorId: "bid-elevator",
+      scenarioId: "older-scenario",
+      difficulty: "beginner",
+      mode: "practice",
+      startedAt: new Date("2024-12-31T00:00:00Z"),
+    });
+    attemptRepo.seed([{ ...practiceAttempt, status: "graded", score: 85 }]);
+
+    const r = await useCase.execute({
+      userId: "u_1",
+      simulatorId: "bid-elevator",
+      scenarioId: "scn_1",
+      mode: "challenge",
+    });
+
     expect(r.ok).toBe(true);
-    if (!r.ok) return;
-    expect(r.value.mode).toBe("challenge");
+    if (r.ok) expect(r.value.mode).toBe("challenge");
   });
 
   it("writes a simulator_attempt_start audit entry", async () => {
@@ -176,6 +227,7 @@ describe("StartSimulatorAttempt", () => {
     const emptyScenarioRepo = new InMemorySimulatorScenarioRepository();
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo: emptyScenarioRepo,
       idGen,
       clock,

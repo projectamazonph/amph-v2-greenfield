@@ -11,6 +11,7 @@ import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulato
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { SimulatorScenario } from "@/domain/entities/SimulatorScenario";
 import type { AuditAction } from "@/domain/values/AuditAction";
+import { InMemoryScorePolicyRepository } from "@/infra/repositories/InMemoryScorePolicyRepository";
 
 function makeScenario(
   overrides: Partial<{
@@ -46,6 +47,7 @@ function makeAttemptRepo(): ISimulatorAttemptRepository {
     findByAttemptId: vi.fn().mockResolvedValue(Result.ok(null)),
     findByUserAndScenario: vi.fn().mockResolvedValue(Result.ok([])),
     findByUserAndSimulator: vi.fn().mockResolvedValue(Result.ok([])),
+    findByUserId: vi.fn().mockResolvedValue(Result.ok([])),
     addDecision: vi.fn().mockResolvedValue(Result.ok(undefined)),
     updateStatus: vi.fn().mockResolvedValue(Result.ok({} as never)),
   };
@@ -95,6 +97,7 @@ function makeRecordAuditLog(): {
 describe("StartSimulatorAttempt", () => {
   let attemptRepo: ISimulatorAttemptRepository;
   let scenarioRepo: ISimulatorScenarioRepository;
+  let scorePolicyRepo: InMemoryScorePolicyRepository;
   let idGen: { newId: () => string };
   let clock: { now: () => Date };
   let recordAuditLog: {
@@ -110,6 +113,7 @@ describe("StartSimulatorAttempt", () => {
   beforeEach(() => {
     attemptRepo = makeAttemptRepo();
     scenarioRepo = makeScenarioRepo();
+    scorePolicyRepo = new InMemoryScorePolicyRepository();
     idGen = makeIdGen();
     clock = makeClock();
     recordAuditLog = makeRecordAuditLog();
@@ -124,6 +128,7 @@ describe("StartSimulatorAttempt", () => {
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -153,6 +158,7 @@ describe("StartSimulatorAttempt", () => {
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -171,11 +177,12 @@ describe("StartSimulatorAttempt", () => {
   });
 
   it("logs to audit log on success", async () => {
-    const scenario = makeScenario({ id: "scen_audit" });
+    const scenario = makeScenario({ id: "scen_audit", simulatorId: "str-triage" });
     vi.mocked(scenarioRepo.findById).mockResolvedValue(Result.ok(scenario));
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -204,6 +211,7 @@ describe("StartSimulatorAttempt", () => {
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -249,6 +257,7 @@ describe("StartSimulatorAttempt", () => {
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -267,11 +276,12 @@ describe("StartSimulatorAttempt", () => {
   });
 
   it("generates attemptId with ATT- prefix", async () => {
-    const scenario = makeScenario({ id: "scen_attid" });
+    const scenario = makeScenario({ id: "scen_attid", simulatorId: "campaign-builder" });
     vi.mocked(scenarioRepo.findById).mockResolvedValue(Result.ok(scenario));
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -290,11 +300,12 @@ describe("StartSimulatorAttempt", () => {
   });
 
   it("defaults mode to practice", async () => {
-    const scenario = makeScenario({ id: "scen_mode" });
+    const scenario = makeScenario({ id: "scen_mode", simulatorId: "listing-audit" });
     vi.mocked(scenarioRepo.findById).mockResolvedValue(Result.ok(scenario));
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -312,12 +323,13 @@ describe("StartSimulatorAttempt", () => {
     expect(result.value.mode).toBe("practice");
   });
 
-  it("respects explicit mode parameter", async () => {
-    const scenario = makeScenario({ id: "scen_explicit_mode" });
+  it("respects an explicit guided mode parameter", async () => {
+    const scenario = makeScenario({ id: "scen_explicit_mode", simulatorId: "str-triage" });
     vi.mocked(scenarioRepo.findById).mockResolvedValue(Result.ok(scenario));
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -328,12 +340,12 @@ describe("StartSimulatorAttempt", () => {
       userId: "user_explicit",
       simulatorId: "str-triage",
       scenarioId: "scen_explicit_mode",
-      mode: "challenge",
+      mode: "guided",
     });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.mode).toBe("challenge");
+    expect(result.value.mode).toBe("guided");
   });
 
   it("returns db_error when repo create fails", async () => {
@@ -345,6 +357,7 @@ describe("StartSimulatorAttempt", () => {
 
     const uc = new StartSimulatorAttempt({
       attemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,

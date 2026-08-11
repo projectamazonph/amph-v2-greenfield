@@ -27,6 +27,7 @@ import { enrollStudent, type EnrollStudentActionResult } from "@/app/actions/enr
 import { Money } from "@/domain/values/Money";
 import { Result } from "@/domain/shared/Result";
 import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 import styles from "./EnrollButton.module.css";
 
 type EnrollState = EnrollStudentActionResult | null;
@@ -35,6 +36,8 @@ export function EnrollButton({
   courseId,
   courseSlug,
   priceMinor,
+  accessMode = "purchase",
+  firstLessonId,
 }: {
   /** The course's UUID — used for free-course enroll action. */
   courseId: string;
@@ -42,6 +45,8 @@ export function EnrollButton({
   courseSlug: string;
   /** Effective price in minor PHP units from the PricingTier. */
   priceMinor: number;
+  accessMode?: "purchase" | "subscription" | "enrolled" | "admin";
+  firstLessonId?: string | null;
 }) {
   const [state, formAction, isPending] = useActionState<EnrollState, FormData>(
     async (_prevState: EnrollState) => {
@@ -53,9 +58,22 @@ export function EnrollButton({
   // isFree is PRESENTATION-ONLY. The server does its own check.
   const isFree = priceMinor === 0;
 
+  if ((accessMode === "enrolled" || accessMode === "admin") && firstLessonId) {
+    return (
+      <Link
+        href={`/courses/${courseSlug}/lessons/${firstLessonId}`}
+        className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg, styles.fullWidth].join(
+          " ",
+        )}
+      >
+        Continue learning
+      </Link>
+    );
+  }
+
   if (state && state.ok) {
     return (
-      <div className={styles.success}>
+      <div className={styles.success} role="status">
         <svg
           className={styles.successIcon}
           viewBox="0 0 24 24"
@@ -73,35 +91,56 @@ export function EnrollButton({
   if (state && !state.ok) {
     const err = state.error;
     if ("kind" in err && err.kind === "course_not_published") {
-      return <p className={styles.notAvailable}>This course is not available.</p>;
+      return (
+        <p className={styles.notAvailable} role="alert">
+          This course is not available.
+        </p>
+      );
     }
     if ("kind" in err && err.kind === "unauthorized") {
-      return <p className={styles.error}>Please sign in to enroll.</p>;
+      return (
+        <p className={styles.error} role="alert">
+          Please sign in to enroll.
+        </p>
+      );
     }
     if ("kind" in err && err.kind === "paid_checkout_required") {
       return (
-        <Link href={`/checkout?courseSlug=${courseSlug}`} className={styles.fullWidth}>
-          <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
-            Continue to checkout
-          </Button>
+        <Link
+          href={`/checkout?courseSlug=${courseSlug}`}
+          className={[
+            buttonStyles.btn,
+            buttonStyles.primary,
+            buttonStyles.lg,
+            styles.fullWidth,
+          ].join(" ")}
+        >
+          Continue to checkout
         </Link>
       );
     }
-    return <p className={styles.error}>Unable to enroll. Please try again.</p>;
+    return (
+      <p className={styles.error} role="alert">
+        Unable to enroll. Please try again.
+      </p>
+    );
   }
 
-  // Paid courses: redirect to checkout.
-  if (!isFree) {
+  if (!isFree && accessMode !== "subscription") {
     return (
-      <Link href={`/checkout?courseSlug=${courseSlug}`} className={styles.fullWidth}>
-        <Button type="button" variant="primary" size="lg" className={styles.fullWidth}>
-          Buy now — {Result.unwrap(Money.of(priceMinor, "PHP")).format()}
-        </Button>
+      <Link
+        href={`/checkout?courseSlug=${courseSlug}`}
+        className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg, styles.fullWidth].join(
+          " ",
+        )}
+      >
+        Buy now — {Result.unwrap(Money.of(priceMinor, "PHP")).format()}
       </Link>
     );
   }
 
-  // Free courses: enroll via the server action.
+  const label = accessMode === "subscription" ? "Start course" : "Enroll for Free";
+
   return (
     <form action={formAction}>
       <Button
@@ -111,7 +150,7 @@ export function EnrollButton({
         className={styles.fullWidth}
         disabled={isPending}
       >
-        {isPending ? "Enrolling..." : "Enroll for Free"}
+        {isPending ? "Enrolling..." : label}
       </Button>
     </form>
   );

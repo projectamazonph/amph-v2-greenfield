@@ -37,6 +37,7 @@ export default async function CoursesPage() {
     return (
       <StudentShell requireAuth={false}>
         <main className={styles.errorPage}>
+          <h1 className={styles.errorTitle}>Courses unavailable</h1>
           <p className={styles.errorText}>Unable to load courses. Please try again later.</p>
         </main>
       </StudentShell>
@@ -97,7 +98,15 @@ function CourseCard({
     <Link href={`/courses/${course.slug}`} className={styles.card}>
       {course.coverImage ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={course.coverImage} alt={course.title} className={styles.cardImage} />
+        <img
+          src={course.coverImage}
+          alt={course.title}
+          width={640}
+          height={352}
+          loading="lazy"
+          decoding="async"
+          className={styles.cardImage}
+        />
       ) : (
         <div className={styles.cardImagePlaceholder}>
           <span className={styles.cardImagePlaceholderLetter}>{course.title[0]}</span>
@@ -115,7 +124,7 @@ function CourseCard({
               letterSpacing: "0.05em",
               padding: "2px 6px",
               background: "var(--accent-soft)",
-              color: "var(--accent)",
+              color: "var(--accent-text)",
               borderRadius: "4px",
               marginBottom: "var(--space-2)",
             }}

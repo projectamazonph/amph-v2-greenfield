@@ -25,8 +25,7 @@ import { Input } from "@/components/ui";
 import styles from "./LoginForm.module.css";
 
 const errorMessage: Record<string, string> = {
-  wrong_password: "Incorrect email or password.",
-  user_not_found: "No account with that email.",
+  invalid_credentials: "Incorrect email or password.",
   account_suspended: "This account has been suspended. Contact support.",
   account_locked: "This account is locked. Reset your password to unlock.",
   invalid_input: "Please enter your email and password.",
@@ -46,15 +45,19 @@ export function LoginForm({
   const needsTotp = errorKind === "totp_required" || errorKind === "invalid_totp_code";
 
   return (
-    <div className={styles.page}>
+    <main className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent)', textTransform: 'uppercase', textAlign: 'center' }}>Project Amazon PH Academy</div>
+          <div className={styles.logo}>Project Amazon PH Academy</div>
           <h1 className={styles.title}>Welcome back</h1>
           <p className={styles.subtitle}>Sign in to continue your training.</p>
         </div>
 
-        {errorText && <div className="alert alert-error">{errorText}</div>}
+        {errorText && (
+          <div className="alert alert-error" role="alert">
+            {errorText}
+          </div>
+        )}
 
         <form method="POST" action="/api/auth/login" className={styles.form}>
           <input type="hidden" name="redirectTo" value={redirectTo} />
@@ -115,6 +118,6 @@ export function LoginForm({
           </Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }

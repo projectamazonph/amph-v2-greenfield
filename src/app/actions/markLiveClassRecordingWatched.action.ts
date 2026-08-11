@@ -20,6 +20,7 @@ export type MarkLiveClassRecordingWatchedResult =
         | "class_not_found"
         | "recording_not_available"
         | "not_registered"
+        | "course_access_required"
         | "db_error";
     };
 
@@ -46,8 +47,10 @@ export async function markLiveClassRecordingWatchedAction(
       ? { ok: false, error: "class_not_found" }
       : e.kind === "recording_not_available"
         ? { ok: false, error: "recording_not_available" }
-        : e.kind === "not_registered"
-          ? { ok: false, error: "not_registered" }
-          : { ok: false, error: "db_error" };
+        : e.kind === "course_access_required"
+          ? { ok: false, error: "course_access_required" }
+          : e.kind === "not_registered"
+            ? { ok: false, error: "not_registered" }
+            : { ok: false, error: "db_error" };
   return mapped;
 }

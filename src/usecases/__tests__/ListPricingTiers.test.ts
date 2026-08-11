@@ -48,6 +48,24 @@ function makeTier(
 // ── Tests ───────────────────────────────────────────────────────────────────
 
 describe("ListPricingTiers", () => {
+  it("includes the published course linked to a tier", async () => {
+    const repo = new InMemoryPricingTierRepository();
+    const tier = createPricingTier({
+      id: "tier-foundations",
+      slug: "foundations",
+      name: "PPC Foundations",
+      priceMinor: 299900,
+      status: "ACTIVE",
+    });
+    if (!tier.ok) throw new Error("seed failed");
+    repo.seed(tier.value);
+    repo.seedCourseLink("tier-foundations", "ppc-foundations");
+
+    const result = await new ListPricingTiers({ pricingTierRepo: repo }).execute();
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.tiers[0]?.courseSlug).toBe("ppc-foundations");
+  });
   let repo: InMemoryPricingTierRepository;
   let useCase: ListPricingTiers;
 
@@ -197,6 +215,8 @@ describe("ListPricingTiers", () => {
       listActive: async () => Result.err({ kind: "db_error", message: "Connection refused" }),
       findById: async () => Result.err({ kind: "db_error", message: "Connection refused" }),
       findBySlug: async () => Result.err({ kind: "db_error", message: "Connection refused" }),
+      findLinkedCourseSlug: async () =>
+        Result.err({ kind: "db_error", message: "Connection refused" }),
       create: async () => Result.err({ kind: "db_error", message: "Connection refused" }),
       update: async () => Result.err({ kind: "db_error", message: "Connection refused" }),
       archive: async () => Result.err({ kind: "db_error", message: "Connection refused" }),

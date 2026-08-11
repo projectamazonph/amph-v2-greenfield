@@ -83,6 +83,10 @@ function makeEnrollments(items: Enrollment[]) {
 
 const now = new Date("2026-08-01T00:00:00Z");
 
+function daysFromNow(days: number): Date {
+  return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+}
+
 function makeEnrollment(opts: { id: string; userId: string; courseId: string }): Enrollment {
   const r = createEnrollment({
     id: opts.id,
@@ -100,7 +104,7 @@ describe("ListLiveClassesForStudent", () => {
       makeClass({
         id: "lc-1",
         courseId: "c-1",
-        scheduledAt: new Date("2026-08-15T10:00:00Z"),
+        scheduledAt: daysFromNow(14),
       }),
     ]);
     const useCase = new ListLiveClassesForStudent({
@@ -162,17 +166,17 @@ describe("ListLiveClassesForStudent", () => {
       makeClass({
         id: "lc-1",
         courseId: "c-1",
-        scheduledAt: new Date("2026-08-20T10:00:00Z"),
+        scheduledAt: daysFromNow(30),
       }),
       makeClass({
         id: "lc-2",
         courseId: "c-1",
-        scheduledAt: new Date("2026-08-10T10:00:00Z"),
+        scheduledAt: daysFromNow(10),
       }),
       makeClass({
         id: "lc-3",
         courseId: "c-1",
-        scheduledAt: new Date("2026-08-15T10:00:00Z"),
+        scheduledAt: daysFromNow(20),
       }),
     ]);
     const useCase = new ListLiveClassesForStudent({
@@ -195,7 +199,7 @@ describe("ListLiveClassesForStudent", () => {
       makeClass({
         id: "lc-1",
         courseId: "c-1",
-        scheduledAt: new Date("2026-08-15T10:00:00Z"),
+        scheduledAt: daysFromNow(14),
       }),
     ]);
     const liveClassRegistrationRepo = makeRegistrationRepo();

@@ -180,6 +180,49 @@ describe("EnrollStudent", () => {
     expect(result.value.source).toBe("affiliate");
   });
 
+  it("creates a progress enrollment when the subscription satisfies the course tier", async () => {
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(
+      Result.ok(makeUser({ subscriptionTier: "PRO" })),
+    );
+    vi.mocked(mockCourseRepo.findById).mockResolvedValue(
+      Result.ok(makeCourse({ courseTier: "PRO" })),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
+    vi.mocked(mockEnrollmentRepo.create).mockImplementation(async (enrollment) =>
+      Result.ok(enrollment),
+    );
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: COURSE_ID,
+      entitlement: "subscription",
+      source: "subscription",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.source).toBe("subscription");
+  });
+
+  it("rejects subscription enrollment when the tier is too low", async () => {
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(
+      Result.ok(makeUser({ subscriptionTier: "STARTER" })),
+    );
+    vi.mocked(mockCourseRepo.findById).mockResolvedValue(
+      Result.ok(makeCourse({ courseTier: "PRO" })),
+    );
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: COURSE_ID,
+      entitlement: "subscription",
+      source: "subscription",
+    });
+
+    expect(result).toEqual(Result.err({ kind: "paid_no_entitlement" }));
+    expect(mockEnrollmentRepo.create).not.toHaveBeenCalled();
+  });
+
   // ── error cases ──────────────────────────────────────────
 
   it("returns user_not_found when user does not exist", async () => {

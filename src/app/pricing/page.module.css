@@ -18,7 +18,7 @@
   font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: 0.08em;
-  color: var(--ink-500);
+  color: var(--ink-700);
   text-transform: uppercase;
   padding: 2px 8px;
   background: var(--surface-2);
@@ -54,7 +54,11 @@
   padding: 0;
 }
 
-@media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
 
 .card {
   background: var(--surface-1);
@@ -78,7 +82,7 @@
   top: -12px;
   right: var(--space-4);
   background: var(--accent);
-  color: var(--ink-inverse);
+  color: var(--accent-ink);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: 600;
@@ -96,7 +100,7 @@
   text-transform: uppercase;
   padding: 2px 8px;
   background: color-mix(in srgb, var(--accent) 15%, transparent);
-  color: var(--accent);
+  color: var(--accent-text);
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   border-radius: 3px;
   width: fit-content;
@@ -139,7 +143,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-lg);
   font-weight: 400;
-  color: var(--ink-400);
+  color: var(--ink-500);
   text-decoration: line-through;
   line-height: 1;
 }
@@ -176,7 +180,7 @@
 }
 
 .plus {
-  color: var(--accent);
+  color: var(--accent-text);
   font-family: var(--font-mono);
   font-weight: 600;
   flex-shrink: 0;
@@ -198,11 +202,14 @@
 
 .ctaPrimary {
   background: var(--accent);
-  color: var(--ink-inverse);
+  color: var(--accent-ink);
   border: 1px solid var(--accent);
 }
 
-.ctaPrimary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.ctaPrimary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
 
 .ctaSecondary {
   background: var(--surface-1);
@@ -210,7 +217,9 @@
   border: 1px solid var(--border-strong);
 }
 
-.ctaSecondary:hover { background: var(--surface-2); }
+.ctaSecondary:hover {
+  background: var(--surface-2);
+}
 
 .note {
   font-size: var(--text-sm);
@@ -220,4 +229,15 @@
   max-width: 60ch;
   margin-left: auto;
   margin-right: auto;
+}
+
+.error {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-5);
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-md);
+  text-align: center;
 }

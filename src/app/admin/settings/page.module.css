@@ -228,5 +228,5 @@
 
 .dangerButton:hover {
   background-color: var(--danger);
-  color: var(--danger-ink, white);
+  color: var(--ink-inverse);
 }

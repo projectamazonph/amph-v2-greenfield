@@ -76,7 +76,7 @@
 }
 
 .certCard:hover {
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
@@ -96,7 +96,7 @@
 
 @media (min-width: 640px) {
   .certBody {
-    padding: var(--space-14);
+    padding: calc(var(--space-12) + var(--space-2));
   }
 }
 

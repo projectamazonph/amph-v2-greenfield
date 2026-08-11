@@ -27,13 +27,27 @@ export function MobileNavToggle({ sidebarId }: MobileNavToggleProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const isFirstRender = useRef(true);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
-  const close = useCallback(() => {
-    const sidebar = document.getElementById(sidebarId);
-    if (sidebar) sidebar.dataset.open = "false";
-    document.body.style.overflow = "";
-    setOpen(false);
-  }, [sidebarId]);
+  const close = useCallback(
+    (restoreFocus = true) => {
+      const sidebar = document.getElementById(sidebarId);
+      if (sidebar) {
+        sidebar.dataset.open = "false";
+        sidebar.removeAttribute("role");
+        sidebar.removeAttribute("aria-modal");
+      }
+      const content = document.querySelector<HTMLElement>("[data-navigation-content]");
+      if (content) {
+        content.inert = false;
+        content.removeAttribute("aria-hidden");
+      }
+      document.body.style.overflow = "";
+      setOpen(false);
+      if (restoreFocus) toggleRef.current?.focus();
+    },
+    [sidebarId],
+  );
 
   // Close the drawer and unlock body scroll on route change. Necessary
   // both for persistent-layout sidebars (admin) whose instance survives
@@ -45,7 +59,7 @@ export function MobileNavToggle({ sidebarId }: MobileNavToggleProps) {
       isFirstRender.current = false;
       return;
     }
-    close();
+    close(false);
   }, [pathname, close]);
 
   // Student pages mount a fresh MobileNavToggle per page rather than
@@ -57,23 +71,72 @@ export function MobileNavToggle({ sidebarId }: MobileNavToggleProps) {
   useEffect(() => {
     return () => {
       document.body.style.overflow = "";
+      const content = document.querySelector<HTMLElement>("[data-navigation-content]");
+      if (content) {
+        content.inert = false;
+        content.removeAttribute("aria-hidden");
+      }
     };
   }, []);
 
-  const toggle = useCallback(() => {
+  useEffect(() => {
+    if (!open) return;
     const sidebar = document.getElementById(sidebarId);
     if (!sidebar) return;
-    const next = !open;
-    setOpen(next);
-    sidebar.dataset.open = String(next);
-    // Prevent body scroll when sidebar is open
-    document.body.style.overflow = next ? "hidden" : "";
-  }, [open, sidebarId]);
+
+    sidebar.setAttribute("role", "dialog");
+    sidebar.setAttribute("aria-modal", "true");
+    const focusable = Array.from(
+      sidebar.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+    focusable[0]?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== "Tab" || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open, sidebarId, close]);
+
+  const toggle = useCallback(() => {
+    if (open) {
+      close();
+      return;
+    }
+
+    const sidebar = document.getElementById(sidebarId);
+    if (!sidebar) return;
+    setOpen(true);
+    sidebar.dataset.open = "true";
+    document.body.style.overflow = "hidden";
+    const content = document.querySelector<HTMLElement>("[data-navigation-content]");
+    if (content) {
+      content.inert = true;
+      content.setAttribute("aria-hidden", "true");
+    }
+  }, [open, sidebarId, close]);
 
   return (
     <>
       <button
         type="button"
+        ref={toggleRef}
         className={styles.toggle}
         onClick={toggle}
         aria-expanded={open}
@@ -86,7 +149,7 @@ export function MobileNavToggle({ sidebarId }: MobileNavToggleProps) {
         <button
           type="button"
           className={styles.backdrop}
-          onClick={close}
+          onClick={() => close()}
           aria-label="Close navigation"
         />
       ) : null}

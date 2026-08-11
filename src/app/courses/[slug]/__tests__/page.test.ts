@@ -87,3 +87,13 @@ describe("/courses/[slug] page — header meta for live-cohort tiers", () => {
     expect(elseBlock).not.toMatch(/hours/);
   });
 });
+
+describe("/courses/[slug] page — course quizzes", () => {
+  it("loads course quizzes and links each one to the student player", async () => {
+    const pagePath = path.resolve(process.cwd(), "src/app/courses/[slug]/page.tsx");
+    const source = await fs.readFile(pagePath, "utf8");
+
+    expect(source).toMatch(/quizRepo\.findByCourseId/);
+    expect(source).toMatch(/\/quizzes\/\$\{quiz\.id\}/);
+  });
+});

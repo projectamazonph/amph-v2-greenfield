@@ -4,12 +4,13 @@
  * Walks through the quiz questions one at a time. Picks an
  * option, clicks Submit, then advances. On the last question,
  * POST to /api/quizzes/[quizId]/attempt with all the answers
- * and shows the score + pass/fail.
+ * through the authenticated Server Action and shows the score + pass/fail.
  */
 
 "use client";
 
 import { useState, useTransition } from "react";
+import { submitQuizAttemptAction } from "@/app/actions/submitQuizAttempt.action";
 import styles from "./QuizPlayer.module.css";
 
 interface Option {
@@ -37,12 +38,12 @@ interface ReviewItem {
 
 interface SubmitResult {
   ok: boolean;
-  score?: number;
-  passed?: boolean;
-  correctCount?: number;
-  totalQuestions?: number;
-  xpAwarded?: number;
-  review?: ReviewItem[] | null;
+  score?: number | null;
+  passed?: boolean | null;
+  correctCount?: number | null;
+  totalQuestions?: number | null;
+  xpAwarded?: number | null;
+  review?: readonly ReviewItem[] | null;
   error?: string;
 }
 
@@ -68,25 +69,24 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
       // Submit
       startTransition(async () => {
         try {
-          const res = await fetch(`/api/quizzes/${quizId}/attempt`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              answers: questions.map((q) => ({
-                questionId: q.id,
-                selectedOptionId: answers[q.id],
-              })),
-            }),
+          const response = await submitQuizAttemptAction({
+            quizId,
+            answers: questions.map((question) => ({
+              questionId: question.id,
+              selectedOptionId: answers[question.id] ?? "",
+            })),
           });
-          const body = (await res.json()) as SubmitResult;
-          if (res.ok) {
-            setResult({ ...body, ok: true });
+          if (response.ok) {
+            setResult(response);
             setSubmitted(true);
           } else {
-            setResult({ ok: false, error: body.error ?? "Submission failed" });
+            setResult({ ok: false, error: quizErrorMessage(response.error) });
           }
-        } catch (e) {
-          setResult({ ok: false, error: e instanceof Error ? e.message : String(e) });
+        } catch {
+          setResult({
+            ok: false,
+            error: "We could not submit your quiz. Please try again.",
+          });
         }
       });
     }
@@ -186,7 +186,11 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
           })}
         </div>
       </div>
-      {result && !result.ok ? <p className={styles.error}>{result.error}</p> : null}
+      {result && !result.ok ? (
+        <p className={styles.error} role="alert">
+          {result.error}
+        </p>
+      ) : null}
       <div className={styles.footer}>
         <button
           type="button"
@@ -199,4 +203,20 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
       </div>
     </div>
   );
+}
+
+function quizErrorMessage(error: string): string {
+  switch (error) {
+    case "not_authenticated":
+      return "Your session expired. Sign in again before submitting.";
+    case "access_denied":
+      return "Course access is required to submit this quiz.";
+    case "quiz_not_found":
+      return "This quiz is no longer available.";
+    case "invalid_submission":
+    case "invalid_answer":
+      return "One or more answers are invalid. Reload the page and try again.";
+    default:
+      return "We could not submit your quiz. Please try again.";
+  }
 }

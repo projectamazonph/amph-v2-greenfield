@@ -1,5 +1,9 @@
 .sectionTint {
-  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 3.5%, transparent));
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--accent) 3.5%, transparent)
+  );
 }
 
 .roster {
@@ -32,7 +36,7 @@
   font-family: var(--font-mono);
   font-size: 9.5px;
   letter-spacing: 0.06em;
-  color: var(--ink-500);
+  color: var(--ink-700);
 }
 
 .tools {
@@ -110,6 +114,10 @@
 .toolLive {
   border-color: var(--accent-soft);
   background: var(--accent-soft);
+}
+
+.toolLive .toolDesc {
+  color: var(--ink-700);
 }
 
 .toolLive .status {

@@ -19,6 +19,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { ListPricingTiers } from "@/usecases/ListPricingTiers";
 import { createPricingTier } from "@/domain/entities/PricingTier";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 
 // ── Test data ───────────────────────────────────────────────────────────────
 
@@ -126,5 +128,16 @@ describe("/pricing — ListPricingTiers integration", () => {
     const masteryTier = result.value.tiers.find((t) => t.slug === "mastery");
     expect(masteryTier).toBeDefined();
     expect(masteryTier!.slug).toBe("mastery");
+  });
+});
+
+describe("/pricing page outage behavior", () => {
+  it("renders a visible error state without throwing a Server Component error", async () => {
+    const pagePath = path.resolve(process.cwd(), "src/app/pricing/page.tsx");
+    const pageSource = await fs.readFile(pagePath, "utf8");
+
+    expect(pageSource).not.toContain('throw new Error("Failed to load pricing offers")');
+    expect(pageSource).toContain('role="alert"');
+    expect(pageSource).toContain("Pricing is temporarily unavailable");
   });
 });

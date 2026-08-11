@@ -26,42 +26,52 @@ vi.mock("@/app/actions/checkout.action", () => ({
   CHECKOUT_INITIAL_STATE: { kind: "idle" as const },
 }));
 
-// Stub next/navigation hooks used by the client page.
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
-  useSearchParams: () => new URLSearchParams("courseSlug=ppc-101"),
-  usePathname: () => "/checkout",
-}));
-
 import { renderToString } from "react-dom/server";
 import { createElement } from "react";
 import CheckoutForm from "../CheckoutForm";
 
+function renderForm() {
+  return renderToString(
+    createElement(CheckoutForm, {
+      offer: { courseSlug: "ppc-101" },
+      summary: {
+        courseSlug: "ppc-101",
+        courseTitle: "PPC 101",
+        offerName: "PPC 101",
+        amountMinor: 299900,
+        currency: "PHP",
+        pricingTierSlug: null,
+      },
+      loadError: null,
+    }),
+  );
+}
+
 describe("/checkout", () => {
   it("renders the title and the Pay-with-PayMongo button", () => {
-    const html = renderToString(createElement(CheckoutForm));
+    const html = renderForm();
     expect(html).toMatch(/confirm your purchase/i);
     expect(html).toMatch(/pay with paymongo/i);
   });
 
   it("renders a hidden courseSlug field with the slug from the query", () => {
-    const html = renderToString(createElement(CheckoutForm));
+    const html = renderForm();
     expect(html).toMatch(/<input[^>]+name="courseSlug"[^>]+value="ppc-101"/);
   });
 
   it("renders a form wired to the server action", () => {
-    const html = renderToString(createElement(CheckoutForm));
+    const html = renderForm();
     expect(html).toMatch(/<form/);
     expect(html).toMatch(/<button[^>]*type="submit"/);
   });
 
   it("links back to /courses for recovery", () => {
-    const html = renderToString(createElement(CheckoutForm));
+    const html = renderForm();
     expect(html).toMatch(/href="\/courses"/);
   });
 
   it("does not contain banned marketing phrases", () => {
-    const html = renderToString(createElement(CheckoutForm));
+    const html = renderForm();
     const lower = html.toLowerCase();
     expect(lower).not.toContain("delve");
     expect(lower).not.toContain("leverage");
@@ -72,7 +82,7 @@ describe("/checkout", () => {
   });
 
   it("uses the design system button class, not inline Tailwind utilities", () => {
-    const html = renderToString(createElement(CheckoutForm));
+    const html = renderForm();
     // The CTA goes through the .btn / .btn-primary class. It must
     // not include any Tailwind utility class names.
     expect(html).not.toMatch(/class="[^"]*\bbg-\w+/);

@@ -64,10 +64,12 @@ vi.mock("@/usecases/EnrollStudent", () => ({
 // use its enrollStudent field. We assert the wiring.
 const mockEnrollStudentInstance = { execute: mockEnrollStudentExecute };
 const mockCourseRepoFindById = vi.fn();
+const mockUserRepoFindById = vi.fn();
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     enrollStudent: mockEnrollStudentInstance,
     courseRepo: { findById: mockCourseRepoFindById },
+    userRepo: { findById: mockUserRepoFindById },
   }),
 }));
 
@@ -77,10 +79,19 @@ beforeEach(() => {
   mockGetSessionUserId.mockClear();
   mockEnrollStudentExecute.mockClear();
   mockCourseRepoFindById.mockReset();
+  mockUserRepoFindById.mockReset();
   // Default: a free course, so the action proceeds to call EnrollStudent
   mockCourseRepoFindById.mockResolvedValue({
     ok: true,
-    value: { id: "course-1", price: { minor: 0, currency: "PHP" } },
+    value: {
+      id: "course-1",
+      courseTier: "STARTER",
+      price: { minor: 0, currency: "PHP" },
+    },
+  });
+  mockUserRepoFindById.mockResolvedValue({
+    ok: true,
+    value: { id: "u-from-session", subscriptionTier: "FREE" },
   });
 });
 
@@ -161,15 +172,40 @@ describe("enrollStudent action", () => {
     );
   });
 
+  it("creates an enrollment for a paid course covered by the student's subscription", async () => {
+    mockCourseRepoFindById.mockResolvedValueOnce({
+      ok: true,
+      value: {
+        id: "course-1",
+        courseTier: "PRO",
+        price: { minor: 100000, currency: "PHP" },
+      },
+    });
+    mockUserRepoFindById.mockResolvedValueOnce({
+      ok: true,
+      value: { id: "u-from-session", subscriptionTier: "PRO" },
+    });
+    mockEnrollStudentExecute.mockResolvedValueOnce({
+      ok: true,
+      value: { id: "enrol-1", userId: "u-from-session", courseId: "course-1" },
+    });
+
+    await enrollStudent("course-1");
+
+    expect(mockEnrollStudentExecute).toHaveBeenCalledWith({
+      userId: "u-from-session",
+      courseId: "course-1",
+      entitlement: "subscription",
+      source: "subscription",
+    });
+  });
+
   it("does NOT instantiate InMemory* repositories directly (SOLID regression guard)", async () => {
     // Static-analysis check: the action's source must not contain
     // direct instantiations of InMemory* adapters. If a future
     // refactor reverts to the hand-rolled pattern, this test
     // will fail before the test-suite even runs.
-    const actionPath = path.resolve(
-      process.cwd(),
-      "src/app/actions/enroll.ts",
-    );
+    const actionPath = path.resolve(process.cwd(), "src/app/actions/enroll.ts");
     const source = await fs.readFile(actionPath, "utf8");
     // No `new InMemory` calls (anywhere in the file)
     expect(source).not.toMatch(/new\s+InMemory/);

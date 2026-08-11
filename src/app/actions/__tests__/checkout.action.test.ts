@@ -136,6 +136,26 @@ describe("startCheckout (server action)", () => {
     });
   });
 
+  it("starts checkout from a selected pricing tier", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    mockCreatePaymentIntent.mockResolvedValueOnce({
+      ok: true,
+      checkoutUrl: "https://paymongo.com/cs_tier",
+      orderId: "ord-tier",
+    });
+
+    const result = await startCheckout(
+      { kind: "idle" },
+      makeFormData({ pricingTierSlug: "mastery" }),
+    );
+
+    expect(result.kind).toBe("redirect");
+    expect(mockCreatePaymentIntent).toHaveBeenCalledWith({
+      userId: "user-1",
+      pricingTierSlug: "mastery",
+    });
+  });
+
   it("maps course_not_found to a course_not_found state", async () => {
     mockGetSessionUserId.mockResolvedValueOnce("user-1");
     mockCreatePaymentIntent.mockResolvedValueOnce({

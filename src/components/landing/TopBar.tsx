@@ -58,7 +58,7 @@ export function TopBar() {
       <div className={styles.progress} style={{ width: `${progress}%` }} aria-hidden="true" />
       <header className={[styles.topbar, scrolled ? styles.scrolled : ""].join(" ")}>
         <div className={[shared.wrap, styles.topbarIn].join(" ")}>
-          <a href="#top" className={styles.brand} aria-label="Project Amazon PH home">
+          <a href="#top" className={styles.brand}>
             <Logo tagline="Amazon ads · practice-first" />
           </a>
 

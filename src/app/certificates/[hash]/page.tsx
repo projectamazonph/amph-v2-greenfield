@@ -20,7 +20,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
-import { Button } from "@/components/ui/Button";
+import buttonStyles from "@/components/ui/Button.module.css";
 import { PrintButton } from "@/components/ui/PrintButton";
 import styles from "./page.module.css";
 
@@ -180,30 +180,32 @@ export default async function CertificatePage({ params }: PageProps) {
           {/* Actions */}
           <div className={styles.actions}>
             {!isRevoked ? (
-              <Link href={`/certificates/${certificate.verificationHash}/pdf`}>
-                <Button variant="primary" size="lg">
-                  <svg
-                    className={styles.actionIcon}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                  Download PDF
-                </Button>
+              <Link
+                href={`/certificates/${certificate.verificationHash}/pdf`}
+                className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg].join(" ")}
+              >
+                <svg
+                  className={styles.actionIcon}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Download PDF
               </Link>
             ) : null}
-            <Link href="/courses">
-              <Button variant="secondary" size="lg">
-                Browse Courses
-              </Button>
+            <Link
+              href="/courses"
+              className={[buttonStyles.btn, buttonStyles.secondary, buttonStyles.lg].join(" ")}
+            >
+              Browse Courses
             </Link>
             <PrintButton className="btn btn-ghost" style={{ marginTop: "var(--space-4)" }}>
               Download Certificate

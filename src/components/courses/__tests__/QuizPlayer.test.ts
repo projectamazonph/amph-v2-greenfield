@@ -32,4 +32,12 @@ describe("QuizPlayer — voice regression guard", () => {
     const source = await fs.readFile(componentPath, "utf8");
     expect(source).toMatch(/Quick check/);
   });
+
+  it("does not render raw thrown errors to the student", async () => {
+    const componentPath = path.resolve(process.cwd(), "src/components/courses/QuizPlayer.tsx");
+    const source = await fs.readFile(componentPath, "utf8");
+    expect(source).not.toMatch(/e instanceof Error/);
+    expect(source).not.toMatch(/String\(e\)/);
+    expect(source).toContain("We could not submit your quiz. Please try again.");
+  });
 });

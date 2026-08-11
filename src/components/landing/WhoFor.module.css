@@ -58,7 +58,7 @@
 
 .yes .icon {
   background: var(--accent-soft);
-  color: var(--accent-hover);
+  color: var(--accent-text);
 }
 
 .no .icon {
@@ -99,7 +99,7 @@
 }
 
 .yes li svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .no li svg {

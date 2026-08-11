@@ -29,6 +29,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 import { SystemClock } from "@/ports/system/Clock";
 import type { Clock } from "@/ports/system/Clock";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
 
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
@@ -165,9 +166,11 @@ import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
 import { ResetPassword } from "@/usecases/auth/ResetPassword";
 import type { PasswordResetRepository } from "@/ports/repositories/PasswordResetRepository";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
+import { GetCheckoutSummary } from "@/usecases/GetCheckoutSummary";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
+import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
 import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
@@ -244,6 +247,7 @@ import { RefundOverride } from "@/usecases/RefundOverride";
 // STORY-062: refund request list + process
 import { ListRefundRequests } from "@/usecases/ListRefundRequests";
 import { AdminProcessRefund } from "@/usecases/AdminProcessRefund";
+import { RequestRefund } from "@/usecases/RequestRefund";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 import { ListAuditLogs } from "@/usecases/ListAuditLogs";
@@ -365,6 +369,7 @@ export interface AppContainer {
 
   // Security
   rateLimiter: RateLimiter;
+  accessPolicy: IAccessPolicy;
 
   // Use cases
   signUp: SignUp;
@@ -374,9 +379,11 @@ export interface AppContainer {
   confirmTwoFactor: ConfirmTwoFactor;
   disableTwoFactor: DisableTwoFactor;
   createPaymentIntent: CreatePaymentIntent;
+  getCheckoutSummary: GetCheckoutSummary;
   checkCourseAccess: CheckCourseAccess;
   // P0-5: per-lesson access decision (single source of truth)
   authorizeLessonAccess: AuthorizeLessonAccess;
+  markLessonComplete: MarkLessonComplete;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
   // STORY-050d: admin discount code CRUD
@@ -451,6 +458,7 @@ export interface AppContainer {
   // STORY-062: admin refund request list + process
   listRefundRequests: ListRefundRequests;
   adminProcessRefund: AdminProcessRefund;
+  requestRefund: RequestRefund;
   // STORY-050a: audit log
   recordAuditLog: RecordAuditLog;
   // STORY-061: audit log viewer + CSV export
@@ -598,7 +606,7 @@ function buildProductionContainer(): AppContainer {
     process.env.PAYMONGO_WEBHOOK_SECRET,
   );
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = buildAppUrl("").replace(/\/$/, "");
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo, enrollmentRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();
@@ -669,6 +677,7 @@ function buildProductionContainer(): AppContainer {
     jwt,
     passwordHasher,
     rateLimiter,
+    accessPolicy,
     signUp: new SignUp(userRepo, idGen, clock, passwordHasher, recordAuditLog),
     login: new Login(userRepo, passwordHasher, sessionRepo, idGen, clock, jwt, totpService),
     logout: new Logout(sessionRepo, jwt),
@@ -678,16 +687,25 @@ function buildProductionContainer(): AppContainer {
     disableTwoFactor: new DisableTwoFactor({ userRepo, hasher: passwordHasher, recordAuditLog }),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
+      pricingTierRepo,
       orderRepo,
       paymentGateway,
       baseUrl,
     }),
+    getCheckoutSummary: new GetCheckoutSummary({ courseRepo, pricingTierRepo }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
     // P0-5: per-lesson access decision
     authorizeLessonAccess: new AuthorizeLessonAccess({
       userRepo,
       courseRepo,
       enrollmentRepo,
+    }),
+    markLessonComplete: new MarkLessonComplete({
+      enrollmentRepo,
+      courseRepo,
+      progressEventRepo,
+      idGen,
+      clock,
     }),
     enrollStudent: new EnrollStudent({
       userRepo,
@@ -740,6 +758,8 @@ function buildProductionContainer(): AppContainer {
       badgeAwardRepo,
       xpEventRepo,
       progressEventRepo,
+      quizAttemptRepo,
+      simulatorAttemptRepo,
       clock,
     }),
     // STORY-091: admin quiz CRUD
@@ -760,6 +780,7 @@ function buildProductionContainer(): AppContainer {
       userRepo,
       idGen,
       clock,
+      accessPolicy,
     }),
     awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
     awardBadge: new AwardBadge({
@@ -933,6 +954,7 @@ function buildProductionContainer(): AppContainer {
     // STORY-062: admin refund request list + process
     listRefundRequests: new ListRefundRequests({ orderRepo, userRepo }),
     adminProcessRefund: new AdminProcessRefund({ orderRepo, refundOverride }),
+    requestRefund: new RequestRefund({ orderRepo, enrollmentRepo, clock }),
     auditLog,
     recordAuditLog,
     listAuditLogs,
@@ -946,6 +968,7 @@ function buildProductionContainer(): AppContainer {
     // STORY-064: simulator attempt lifecycle
     startSimulatorAttempt: new StartSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
+      scorePolicyRepo,
       scenarioRepo,
       idGen,
       clock,
@@ -1054,6 +1077,7 @@ function buildProductionContainer(): AppContainer {
     rsvpLiveClass: new RsvpLiveClass({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo,
       ids: idGen,
       clock,
     }),
@@ -1064,6 +1088,7 @@ function buildProductionContainer(): AppContainer {
     markLiveClassRecordingWatched: new MarkLiveClassRecordingWatched({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo,
       awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
       clock,
     }),

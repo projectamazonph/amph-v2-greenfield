@@ -22,7 +22,7 @@
 .option[data-active="true"] {
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--surface-1);
+  color: var(--accent-ink);
 }
 
 .option:disabled {

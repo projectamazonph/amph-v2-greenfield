@@ -15,6 +15,11 @@ import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClas
 import { FixedClock } from "@/ports/system/Clock";
 import { UlidGenerator } from "@/infra/system/UlidGenerator";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
+
+const activeEnrollmentRepo = {
+  findByUserIdAndCourseId: async () => ({ status: "active" }),
+} as unknown as IEnrollmentRepository;
 
 function makeClass(opts: { status?: "scheduled" | "cancelled" | "completed" } = {}) {
   const future = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -43,11 +48,11 @@ function makeRepo(classes: ReturnType<typeof makeClass>[] = []): ILiveClassRepos
 describe("RsvpLiveClass", () => {
   it("creates a registration when the class exists and is scheduled", async () => {
     const liveClassRepo = makeRepo([makeClass()]);
-    const liveClassRegistrationRepo =
-      new InMemoryLiveClassRegistrationRepository();
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
     const useCase = new RsvpLiveClass({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       ids: new UlidGenerator(),
       clock: new FixedClock(new Date("2026-08-01T00:00:00Z")),
     });
@@ -66,11 +71,11 @@ describe("RsvpLiveClass", () => {
 
   it("rejects when the live class does not exist", async () => {
     const liveClassRepo = makeRepo([]);
-    const liveClassRegistrationRepo =
-      new InMemoryLiveClassRegistrationRepository();
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
     const useCase = new RsvpLiveClass({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       ids: new UlidGenerator(),
       clock: new FixedClock(new Date()),
     });
@@ -83,14 +88,12 @@ describe("RsvpLiveClass", () => {
   });
 
   it("rejects when the class is cancelled", async () => {
-    const liveClassRepo = makeRepo([
-      makeClass({ status: "cancelled" }),
-    ]);
-    const liveClassRegistrationRepo =
-      new InMemoryLiveClassRegistrationRepository();
+    const liveClassRepo = makeRepo([makeClass({ status: "cancelled" })]);
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
     const useCase = new RsvpLiveClass({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       ids: new UlidGenerator(),
       clock: new FixedClock(new Date()),
     });
@@ -104,8 +107,7 @@ describe("RsvpLiveClass", () => {
 
   it("is idempotent when the user is already registered", async () => {
     const liveClassRepo = makeRepo([makeClass()]);
-    const liveClassRegistrationRepo =
-      new InMemoryLiveClassRegistrationRepository();
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
     const existing = createLiveClassRegistration({
       id: "r-1",
       userId: "u-2",
@@ -124,6 +126,7 @@ describe("RsvpLiveClass", () => {
     const useCase = new RsvpLiveClass({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       ids: new UlidGenerator(),
       clock: new FixedClock(new Date("2026-08-01T00:00:00Z")),
     });
@@ -137,8 +140,7 @@ describe("RsvpLiveClass", () => {
 
   it("re-registers a cancelled RSVP", async () => {
     const liveClassRepo = makeRepo([makeClass()]);
-    const liveClassRegistrationRepo =
-      new InMemoryLiveClassRegistrationRepository();
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
     const existing = createLiveClassRegistration({
       id: "r-1",
       userId: "u-2",
@@ -158,6 +160,7 @@ describe("RsvpLiveClass", () => {
     const useCase = new RsvpLiveClass({
       liveClassRepo,
       liveClassRegistrationRepo,
+      enrollmentRepo: activeEnrollmentRepo,
       ids: new UlidGenerator(),
       clock: new FixedClock(new Date("2026-08-02T00:00:00Z")),
     });
@@ -171,12 +174,28 @@ describe("RsvpLiveClass", () => {
       expect(r.value.cancelledAt).toBeNull();
     }
   });
+
+  it("rejects a student who is not actively enrolled in the class course", async () => {
+    const useCase = new RsvpLiveClass({
+      liveClassRepo: makeRepo([makeClass()]),
+      liveClassRegistrationRepo: new InMemoryLiveClassRegistrationRepository(),
+      enrollmentRepo: {
+        ...activeEnrollmentRepo,
+        findByUserIdAndCourseId: async () => null,
+      },
+      ids: new UlidGenerator(),
+      clock: new FixedClock(new Date()),
+    });
+
+    const result = await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });
+
+    expect(result).toEqual({ ok: false, error: { kind: "course_access_required" } });
+  });
 });
 
 describe("CancelLiveClassRsvp", () => {
   it("cancels an existing registration", async () => {
-    const liveClassRegistrationRepo =
-      new InMemoryLiveClassRegistrationRepository();
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
     const existing = createLiveClassRegistration({
       id: "r-1",
       userId: "u-2",
@@ -203,9 +222,7 @@ describe("CancelLiveClassRsvp", () => {
     expect(r.ok).toBe(true);
     if (r.ok) {
       expect(r.value.status).toBe("cancelled");
-      expect(r.value.cancelledAt?.toISOString()).toBe(
-        "2026-08-02T00:00:00.000Z",
-      );
+      expect(r.value.cancelledAt?.toISOString()).toBe("2026-08-02T00:00:00.000Z");
     }
   });
 
@@ -223,8 +240,7 @@ describe("CancelLiveClassRsvp", () => {
   });
 
   it("is idempotent — cancelling an already-cancelled RSVP is a no-op", async () => {
-    const liveClassRegistrationRepo =
-      new InMemoryLiveClassRegistrationRepository();
+    const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
     const existing = createLiveClassRegistration({
       id: "r-1",
       userId: "u-2",
@@ -252,9 +268,7 @@ describe("CancelLiveClassRsvp", () => {
     expect(r.ok).toBe(true);
     if (r.ok) {
       expect(r.value.status).toBe("cancelled");
-      expect(r.value.cancelledAt?.toISOString()).toBe(
-        "2026-08-01T00:00:00.000Z",
-      );
+      expect(r.value.cancelledAt?.toISOString()).toBe("2026-08-01T00:00:00.000Z");
     }
   });
 });

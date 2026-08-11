@@ -111,6 +111,14 @@ export class InMemorySimulatorAttemptRepository implements ISimulatorAttemptRepo
     return Result.ok(matches);
   }
 
+  async findByUserId(userId: string): Promise<Result<SimulatorAttempt[], SimulatorAttemptError>> {
+    return Result.ok(
+      Array.from(this.attempts.values())
+        .filter((attempt) => attempt.userId === userId)
+        .sort((left, right) => right.startedAt.getTime() - left.startedAt.getTime()),
+    );
+  }
+
   async addDecision(
     attemptId: string,
     decision: SimulatorDecision,

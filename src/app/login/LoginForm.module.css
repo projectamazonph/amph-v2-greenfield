@@ -32,9 +32,11 @@
 .logo {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 20px;
-  letter-spacing: 0.04em;
-  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--accent-text);
+  text-transform: uppercase;
+  text-align: center;
 }
 
 .title {
@@ -71,7 +73,7 @@
 
 .forgotLink {
   font-size: 13px;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
   font-weight: 500;
 }
@@ -88,7 +90,7 @@
 }
 
 .altLink {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 500;
 }
 
@@ -96,7 +98,7 @@
   font-size: var(--text-sm);
   color: var(--danger);
   padding: var(--space-3) var(--space-4);
-  background: #FFF5F5;
+  background: #fff5f5;
   border: 1px solid var(--danger);
   border-radius: var(--radius-sm);
   margin-bottom: var(--space-4);

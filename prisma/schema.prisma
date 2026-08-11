@@ -324,7 +324,7 @@ model Enrollment {
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   status String @default("active") // active | cancelled | refunded | expired
-  source String @default("direct") // direct | affiliate | simulator_trial
+  source String @default("direct") // direct | affiliate | simulator_trial | subscription
 
   // Progress
   completedLessonIds String[] @default([])

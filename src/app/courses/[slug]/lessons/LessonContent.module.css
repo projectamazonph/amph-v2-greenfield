@@ -8,7 +8,7 @@
   color: var(--ink-900);
   font-family: var(--font-body);
   font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
+  line-height: var(--leading-loose);
 }
 
 .prose p {
@@ -32,7 +32,7 @@
 .prose h4 { font-size: var(--text-lg); }
 
 .prose a {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -52,7 +52,7 @@
 
 .prose pre {
   background: var(--surface-3);
-  color: var(--ink-inverse);
+  color: var(--accent-ink);
   padding: var(--space-4);
   border-radius: var(--radius-sm);
   overflow-x: auto;
@@ -166,7 +166,7 @@
 .transcriptBody {
   margin-top: var(--space-2);
   font-size: var(--text-sm);
-  line-height: var(--leading-relaxed);
+  line-height: var(--leading-loose);
 }
 
 /* Quiz card */
@@ -194,7 +194,7 @@
 .iconLarge {
   width: 48px;
   height: 48px;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .quizTitle {
@@ -255,7 +255,7 @@
   height: 28px;
   border-radius: var(--radius-full);
   background: var(--accent);
-  color: var(--ink-inverse);
+  color: var(--accent-ink);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: 600;

@@ -2,7 +2,8 @@ import { SkeletonBlock } from "@/components/ui/Skeleton";
 
 export default function VerifyEmailSentLoading() {
   return (
-    <div
+    <main
+      aria-busy="true"
       style={{
         display: "flex",
         justifyContent: "center",
@@ -18,7 +19,7 @@ export default function VerifyEmailSentLoading() {
           border: "1px solid var(--border)",
           borderRadius: "var(--radius-lg)",
           padding: "var(--space-8)",
-          background: "var(--surface-card)",
+          background: "var(--surface-1)",
           textAlign: "center",
         }}
       >
@@ -33,6 +34,6 @@ export default function VerifyEmailSentLoading() {
           <SkeletonBlock width="85%" height="0.875rem" variant="text" />
         </div>
       </div>
-    </div>
+    </main>
   );
 }

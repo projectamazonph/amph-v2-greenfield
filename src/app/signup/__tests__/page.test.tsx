@@ -21,12 +21,12 @@ import { describe, expect, it, vi } from "vitest";
 
 // Spy on the form so we can assert on the props the page passes
 // (which is the page's only job: turn the URL into props).
-const signupFormSpy = vi.fn((_props: { errorKind: string | null }) =>
+const signupFormSpy = vi.fn((_props: { errorKind: string | null; tierSlug: string | null }) =>
   createElement("div", null, createElement("h1", null, "Create your account")),
 );
 
 vi.mock("../SignupForm", () => ({
-  SignupForm: (props: { errorKind: string | null }) => {
+  SignupForm: (props: { errorKind: string | null; tierSlug: string | null }) => {
     signupFormSpy(props);
     return createElement("div", null, createElement("h1", null, "Create your account"));
   },
@@ -69,5 +69,11 @@ describe("/signup", () => {
     await renderPage();
 
     expect(signupFormSpy).toHaveBeenCalledWith(expect.objectContaining({ errorKind: null }));
+  });
+
+  it("preserves the selected pricing tier through signup", async () => {
+    await renderPage({ tier: "mastery" });
+
+    expect(signupFormSpy).toHaveBeenCalledWith(expect.objectContaining({ tierSlug: "mastery" }));
   });
 });

@@ -14,19 +14,42 @@ vi.mock("../CheckoutForm", () => ({
   default: () => null,
 }));
 
+vi.mock("@/composition/container", () => ({
+  buildContainer: () => ({
+    getCheckoutSummary: {
+      execute: vi.fn(async () => ({
+        ok: true,
+        value: {
+          courseSlug: "ppc-101",
+          courseTitle: "PPC 101",
+          offerName: "PPC 101",
+          amountMinor: 299900,
+          currency: "PHP",
+          pricingTierSlug: null,
+        },
+      })),
+    },
+  }),
+}));
+
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn(),
+}));
+
 import { renderToString } from "react-dom/server";
-import { createElement } from "react";
 import CheckoutPage from "../page";
 
 describe("/checkout (page wrapper)", () => {
-  it("renders without throwing and includes a Suspense boundary", () => {
+  it("resolves the checkout summary on the server", async () => {
     // If the page weren't wrapped in Suspense, the build would
     // fail with "useSearchParams() should be wrapped in a
     // suspense boundary". The render itself won't fail (the
     // mocked CheckoutForm returns null) but we assert the page
     // exports a default function.
     expect(typeof CheckoutPage).toBe("function");
-    const html = renderToString(createElement(CheckoutPage));
+    const html = renderToString(
+      await CheckoutPage({ searchParams: Promise.resolve({ courseSlug: "ppc-101" }) }),
+    );
     // The mocked CheckoutForm returns null, so the html is empty
     // — but the render must succeed.
     expect(html).toBeDefined();

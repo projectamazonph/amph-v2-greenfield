@@ -51,7 +51,7 @@ export function Hero() {
           </div>
         </Reveal>
 
-        <Reveal className={styles.right} delayMs={120}>
+        <Reveal className={styles.right}>
           <figure className={[shared.plate, styles.figure].join(" ")}>
             <span className={[shared.corner, shared.cornerTl].join(" ")} />
             <span className={[shared.corner, shared.cornerTr].join(" ")} />
@@ -62,6 +62,7 @@ export function Hero() {
               alt="Top-down view of an operator's desk: a laptop showing a campaign dashboard beside notebooks and a pencil."
               width={1672}
               height={941}
+              sizes="(max-width: 900px) calc(100vw - 36px), 46vw"
               className={[shared.plateImg, styles.img].join(" ")}
               priority
             />

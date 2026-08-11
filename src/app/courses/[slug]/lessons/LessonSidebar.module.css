@@ -110,7 +110,7 @@
 }
 
 .lessonLinkCurrent {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 500;
   background: var(--accent-soft);
 }
@@ -150,7 +150,7 @@
 }
 
 .iconAccent {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .iconMuted {

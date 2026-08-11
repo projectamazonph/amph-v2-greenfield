@@ -50,14 +50,16 @@ export default async function ResourcesPage() {
   if (!result.ok) {
     return (
       <StudentShell user={user}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Download center</h1>
-        </div>
-        <Card padding={6}>
-          <p className={styles.empty}>
-            Something went wrong loading the download center. Please try again.
-          </p>
-        </Card>
+        <main>
+          <div className={styles.header}>
+            <h1 className={styles.title}>Download center</h1>
+          </div>
+          <Card padding={6}>
+            <p className={styles.empty} role="alert">
+              Something went wrong loading the download center. Please try again.
+            </p>
+          </Card>
+        </main>
       </StudentShell>
     );
   }
@@ -73,52 +75,58 @@ export default async function ResourcesPage() {
 
   return (
     <StudentShell user={user}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Download center</h1>
-        <p className={styles.subtitle}>
-          Guides, templates, automation tools, and handouts you can use on the job.
-        </p>
-      </div>
+      <main>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Download center</h1>
+          <p className={styles.subtitle}>
+            Guides, templates, automation tools, and handouts you can use on the job.
+          </p>
+        </div>
 
-      {items.length === 0 ? (
-        <Card padding={6}>
-          <p className={styles.empty}>No resources are published yet. Check back soon.</p>
-        </Card>
-      ) : (
-        CATEGORY_ORDER.filter((category) => byCategory.has(category)).map((category) => (
-          <section key={category} className={styles.section} aria-label={CATEGORY_LABELS[category]}>
-            <h2 className={styles.sectionTitle}>{CATEGORY_LABELS[category]}</h2>
-            <ul className={styles.list}>
-              {byCategory.get(category)!.map(({ resource, locked }) => (
-                <li key={resource.id} className={styles.row}>
-                  <div className={styles.cellBody}>
-                    <h3 className={styles.resourceTitle}>{resource.title}</h3>
-                    <p className={styles.resourceDescription}>{resource.description}</p>
-                  </div>
-                  <div className={styles.cellMeta}>
-                    <span className={styles.fileType}>{resource.fileType}</span>
-                    {locked && <Badge variant="neutral" label={`${resource.accessTier} only`} />}
-                  </div>
-                  <div className={styles.cellAction}>
-                    {locked ? (
-                      <Link href="/pricing" className={styles.upgradeLink}>
-                        Upgrade to unlock
-                      </Link>
-                    ) : (
-                      <a
-                        href={`/api/resources/${resource.id}/download`}
-                        className={styles.downloadLink}
-                      >
-                        Download
-                      </a>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      )}
+        {items.length === 0 ? (
+          <Card padding={6}>
+            <p className={styles.empty}>No resources are published yet. Check back soon.</p>
+          </Card>
+        ) : (
+          CATEGORY_ORDER.filter((category) => byCategory.has(category)).map((category) => (
+            <section
+              key={category}
+              className={styles.section}
+              aria-label={CATEGORY_LABELS[category]}
+            >
+              <h2 className={styles.sectionTitle}>{CATEGORY_LABELS[category]}</h2>
+              <ul className={styles.list}>
+                {byCategory.get(category)!.map(({ resource, locked }) => (
+                  <li key={resource.id} className={styles.row}>
+                    <div className={styles.cellBody}>
+                      <h3 className={styles.resourceTitle}>{resource.title}</h3>
+                      <p className={styles.resourceDescription}>{resource.description}</p>
+                    </div>
+                    <div className={styles.cellMeta}>
+                      <span className={styles.fileType}>{resource.fileType}</span>
+                      {locked && <Badge variant="neutral" label={`${resource.accessTier} only`} />}
+                    </div>
+                    <div className={styles.cellAction}>
+                      {locked ? (
+                        <Link href="/pricing" className={styles.upgradeLink}>
+                          Upgrade to unlock
+                        </Link>
+                      ) : (
+                        <a
+                          href={`/api/resources/${resource.id}/download`}
+                          className={styles.downloadLink}
+                        >
+                          Download
+                        </a>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        )}
+      </main>
     </StudentShell>
   );
 }

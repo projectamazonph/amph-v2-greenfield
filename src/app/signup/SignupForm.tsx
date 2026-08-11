@@ -28,26 +28,20 @@ const errorMessage: Record<string, string> = {
   rate_limited: "Too many attempts. Please wait a few minutes before trying again.",
 };
 
-export function SignupForm({ errorKind }: { errorKind: string | null }) {
+export function SignupForm({
+  errorKind,
+  tierSlug,
+}: {
+  errorKind: string | null;
+  tierSlug: string | null;
+}) {
   const errorText = errorKind ? (errorMessage[errorKind] ?? null) : null;
 
   return (
-    <div className={styles.page}>
+    <main className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.12em",
-              color: "var(--accent)",
-              textTransform: "uppercase",
-              textAlign: "center",
-            }}
-          >
-            Project Amazon PH Academy
-          </div>
+          <div className={styles.logo}>Project Amazon PH Academy</div>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.subtitle}>
             Master Amazon PPC and Seller Central - built for Filipino VAs.
@@ -55,7 +49,7 @@ export function SignupForm({ errorKind }: { errorKind: string | null }) {
         </div>
 
         {errorText && (
-          <div className="alert alert-error">
+          <div className="alert alert-error" role="alert">
             {errorKind === "email_taken" ? (
               <>
                 That email is already registered. Try{" "}
@@ -71,6 +65,7 @@ export function SignupForm({ errorKind }: { errorKind: string | null }) {
         )}
 
         <form method="POST" action="/api/auth/signup" className={styles.form}>
+          {tierSlug ? <input type="hidden" name="tier" value={tierSlug} /> : null}
           <div className={styles.row}>
             <Input
               name="firstName"
@@ -115,17 +110,24 @@ export function SignupForm({ errorKind }: { errorKind: string | null }) {
           </div>
 
           <Button type="submit" variant="primary" size="lg" style={{ width: "100%" }}>
-            Create account
+            {tierSlug ? "Create account and continue" : "Create account"}
           </Button>
         </form>
 
         <p className={styles.footer}>
           Already have an account?{" "}
-          <Link href="/login" className={styles.link}>
+          <Link
+            href={
+              tierSlug
+                ? `/login?redirect=${encodeURIComponent(`/checkout?pricingTier=${tierSlug}`)}`
+                : "/login"
+            }
+            className={styles.link}
+          >
             Sign in
           </Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }

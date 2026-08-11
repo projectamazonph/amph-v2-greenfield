@@ -21,12 +21,13 @@ import Link from "next/link";
 import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 import styles from "../checkout-status.module.css";
 
-export default function CheckoutSuccessPage({
+export default async function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: { orderId?: string };
+  searchParams: Promise<{ orderId?: string }>;
 }) {
-  const orderId = searchParams.orderId?.trim() ?? "";
+  const params = await searchParams;
+  const orderId = params.orderId?.trim() ?? "";
   return (
     <div className={styles.page}>
       <div className={styles.card}>

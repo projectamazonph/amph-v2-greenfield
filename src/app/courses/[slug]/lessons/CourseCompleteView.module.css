@@ -51,7 +51,7 @@
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-full);
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   font-size: var(--text-lg);
   margin-bottom: var(--space-8);
@@ -70,7 +70,7 @@
   padding: var(--space-3) var(--space-8);
   border-radius: var(--radius-sm);
   background: var(--accent);
-  color: var(--surface-1);
+  color: var(--accent-ink);
   font-weight: 600;
   text-decoration: none;
   font-size: var(--text-base);

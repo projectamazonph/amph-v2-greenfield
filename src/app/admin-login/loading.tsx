@@ -2,7 +2,8 @@ import { SkeletonForm } from "@/components/ui/Skeleton";
 
 export default function AdminLoginLoading() {
   return (
-    <div
+    <main
+      aria-busy="true"
       style={{
         display: "flex",
         justifyContent: "center",
@@ -18,11 +19,11 @@ export default function AdminLoginLoading() {
           border: "1px solid var(--border)",
           borderRadius: "var(--radius-lg)",
           padding: "var(--space-8)",
-          background: "var(--surface-card)",
+          background: "var(--surface-1)",
         }}
       >
         <SkeletonForm fields={2} />
       </div>
-    </div>
+    </main>
   );
 }

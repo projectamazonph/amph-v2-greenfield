@@ -1,105 +1,54 @@
-# Student-Facing Feature Gap Analysis — Verified
+# Student-facing feature audit
 
-**Date:** 2026-08-01 (audit pass)
-**Repo:** `amph-v2-greenfield`
-**Current main:** `810b82b`
+**Last verified:** 2026-08-11
 
-This is the verified version. Each gap has been checked against the source. Already-shipped items are removed from the queue. New ones are added only when a follow-up audit confirms them.
+**Repository:** `amph-v2-greenfield`
 
----
+**Implementation story:** `docs/stories/STORY-104.md`
 
-## Audit Results: 6 of 9 gaps are already fixed in source
+This report replaces the 2026-08-01 gap queue. The previous open student
+journey gaps were checked against the current routes, server actions, use cases,
+repositories, schema, and tests. STORY-104 closes the application-level gaps
+listed below. Environment-specific payment and browser checks remain release
+verification, not missing product code.
 
-### ✅ FIXED (no action needed)
+## Verified student journeys
 
-| Original gap                              | Verified at                                                                                                                                                                                                                                                    |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Simulator grading owns `userId: "system"` | All 5 simulator actions (`bid-elevator/actions.ts:146`, `campaign-builder/actions.ts:143`, `str-triage/actions.ts:159`, `listing-audit/actions.ts:225`, `keyword-research/actions.ts:218`) call `getSessionUserId()` and pass the real user id to the attempt. |
-| Settings page checks wrong env var        | `src/app/admin/settings/page.tsx:54` reads `PAYMONGO_SECRET` correctly.                                                                                                                                                                                        |
-| Dashboard `pendingRefunds` hardcoded to 0 | `src/usecases/GetAdminDashboardStats.ts:120` now calls `orderRepo.listRefundRequests()` and counts real rows.                                                                                                                                                  |
-| Session revocation incomplete             | `src/lib/auth.ts:103-110` verifies `sessionRepo.findById(sessionId)` after JWT validation. Server-side revocation is enforced.                                                                                                                                 |
-| Impersonation restore signs out admin     | `src/app/actions/impersonateUser.action.ts:102,141` captures and replants the admin's original token.                                                                                                                                                          |
-| Live-class student experience missing     | Confirmed: there is no `src/app/live-classes/` directory; only `src/app/admin/live-classes/` exists. (this one is **still missing**, see below.)                                                                                                               |
+| Journey               | Current behavior                                                                                                                                                                                  | Verification                                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Authentication        | Signup preserves the selected tier. Login uses generic public credential errors, enforces lockout, and validates server-side sessions. Password reset and opt-in 2FA have visible failure states. | Auth use-case, action, and route tests           |
+| Course access         | Active enrollment, eligible subscription, or admin access grants the course. Public catalog and detail pages fail visibly when data cannot load.                                                  | Entitlement and course route tests               |
+| Lesson progress       | A student can complete an entitled lesson once. Repeated submissions are idempotent and course progress is recalculated.                                                                          | `CompleteLesson` and action tests                |
+| Quizzes               | Lesson links use `/courses/[slug]/quizzes/[quizId]`. The legacy URL redirects. Page load and submission both enforce course access.                                                               | Quiz route, action, and attempt tests            |
+| Simulators            | All attempts use the authenticated student, validate the registered scenario, and enforce challenge prerequisites on the server.                                                                  | Simulator action and challenge-access tests      |
+| Checkout              | Pricing tiers resolve their linked course server-side. Direct and tier checkout use one authoritative effective price, including early-bird pricing.                                              | Checkout action and pricing tests                |
+| Live classes          | List, detail, RSVP, cancellation, recording access, watched state, and XP are implemented. Student mutations require active course enrollment.                                                    | Live-class route and action tests                |
+| Purchases and refunds | `/profile/purchases` shows orders and refund state. Refund requests enforce ownership, paid status, the policy window, completion threshold, and idempotence.                                     | Refund use-case and action tests                 |
+| Certificates          | `/certificates` lists the student's credentials. Public verification and PDF routes remain available.                                                                                             | Certificate route and repository tests           |
+| Account data          | `/profile/data` exports profile, subscriptions, orders, enrollments, progress, quiz attempts, simulator attempts, badges, certificates, sessions, and audit data.                                 | Export use-case and page tests                   |
+| Navigation and errors | Student routes use one main landmark, accessible mobile drawer behavior, headed error states, busy loading landmarks, announced mutation outcomes, and no nested interactive controls.            | Static regression scans, ESLint, and route tests |
 
-### ❌ Still Open
+## Verification snapshot
 
-1. **Story-doc files missing**
-   - STORY-064, STORY-070 (Sprint 13 simulator infrastructure)
-   - STORY-085 through STORY-089 (Sprint 16, never written)
-2. **Code gaps**
-   - ~~Lesson-to-quiz transition still placeholder (`LessonContent.tsx:131`)~~ **CLOSED in STORY-094**
-   - ~~Live-class student page does not exist~~ **CLOSED in STORY-090 + STORY-091** — `/live-classes` list + `/live-classes/[id]` detail with RSVP
-   - ~~Admin email-template editor page does not exist~~ **CLOSED 2026-08-02 (STORY-095)** — `/admin/email-templates` + edit page. Caveat: not yet wired into the actual send path, see CLAUDE.md "Known gaps."
-   - ~~Student 2FA opt-in page does not exist~~ **CLOSED 2026-08-02 (STORY-097)** — `/profile/security` + `/profile/security/2fa-setup`.
-   - ~~Account deletion / data export does not exist~~ **CLOSED 2026-08-02 (STORY-096)** — `/profile/data`. Caveat: export omits quiz/simulator attempt history, see CLAUDE.md "Known gaps."
-3. **Doc drift**
-   - FEATURES.md overstates implementation status
-   - README still says "first deploy pending"
-   - Story file `## Status` blocks lag source
+- TypeScript: pass.
+- ESLint: pass.
+- Full Vitest suite: 3,804 passing and 2 intentionally skipped.
+- Architecture suite: 665 passing, including design-token and loading-state
+  contracts.
+- Next.js production build: pass with 94 application routes.
+- Prisma schema and migration contracts: pass in the full test suite.
+- Local Playwright server launch: blocked by the workspace network-interface
+  restriction. GitHub CI is the browser authority for this repair.
 
----
+## Release verification still required
 
-## Verified Queued Work (ordered by student impact)
+1. Let the GitHub and Vercel checks finish on the pull request.
+2. Exercise the deployed preview at mobile and desktop widths.
+3. Confirm a sandbox PayMongo checkout and webhook using deployment-managed
+   credentials.
+4. Confirm representative seeded subscriptions, enrollments, quizzes, live
+   classes, refunds, and certificates in the target database.
 
-### Tier 1: Visible to every student on day one
-
-| #   | Item                                    | File                                      | Effort  | Status                          |
-| --- | --------------------------------------- | ----------------------------------------- | ------- | ------------------------------- |
-| 1   | Wire lesson-to-quiz transition          | `LessonContent.tsx` (line 131)            | 1 PR    | ✅ done (STORY-094)             |
-| 2   | Build `/live-classes` student list page | new route                                 | 1 story | ✅ done (STORY-090)             |
-| 3   | Build `/live-classes/[id]` + RSVP       | new route + `LiveClassRegistration` model | 1 story | ✅ done (STORY-091)             |
-| 4   | Student 2FA at `/profile/security`      | new route + 1 use case                    | 1 story | ✅ done (STORY-097, 2026-08-02) |
-
-### Tier 2: Admin completeness
-
-| #   | Item                                                             | Effort  | Status                                                                 |
-| --- | ---------------------------------------------------------------- | ------- | ---------------------------------------------------------------------- |
-| 5   | `/admin/email-templates` page (entity + use cases already exist) | 1 story | ✅ done (STORY-095, 2026-08-02) — not yet wired into the send path     |
-| 6   | All-access tier integration test (semantics not verified)        | 1 story | ⏳ still open                                                          |
-| 7   | Account deletion + data export (`/profile/data`)                 | 1 story | ✅ done (STORY-096, 2026-08-02) — export omits quiz/simulator attempts |
-
-### Tier 3: Doc + test hygiene
-
-| #   | Item                                                                                     | Effort |
-| --- | ---------------------------------------------------------------------------------------- | ------ |
-| 8   | Bring every STORY-XXX.md `## Status` block in line with source                           | 1 PR   |
-| 9   | Regenerate README, FEATURES.md, `docs/api-reference.md`, `docs/db-schema.md` from source | 1 PR   |
-| 10  | E2E coverage for the 6 critical journeys                                                 | 1 PR   |
-
----
-
-## Recommended Story Doc Adds
-
-```
-STORY-090  Live-class list page (`/live-classes`)
-STORY-091  Live-class detail + RSVP (`/live-classes/[id]`)
-STORY-092  Live-class recording + post-class XP
-STORY-097  Student 2FA at `/profile/security`
-STORY-094  Lesson-to-quiz transition wiring
-STORY-095  Admin email-template editor page
-STORY-096  Account deletion + data export
-STORY-064  (backfill) Simulator attempt infrastructure
-STORY-070  (backfill) Listing Audit graded attempt action
-```
-
----
-
-## Out of scope
-
-- Multi-tenant organizations
-- Subscription billing (one-time via PayMongo only)
-- Native mobile
-- AI features (zero AI by ADR-003)
-- Automated job-readiness decisions (per Sprint 15 STORY-078 — planned)
-
----
-
-## Status update flow
-
-When any of these are completed:
-
-1. Update the affected `## Status` block in the story doc
-2. Update `FEATURES.md` status column for the feature
-3. Update `CHANGELOG.md`
-4. Mark closed in the next sprint closeout
-5. Re-run this audit if the change introduces a new student-facing route
+These checks validate a particular deployment and its data. Failures found in
+that gate must be fixed before merge; they are not silently treated as future
+feature work.

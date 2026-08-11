@@ -58,13 +58,18 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
     setError(null);
     setAttempt(null);
     startTransition(async () => {
-      const r = await previewKeywordResearch({ niche });
-      if (r.ok) {
-        setPreview(r.value);
-        setClassifications({});
-      } else {
+      try {
+        const r = await previewKeywordResearch({ niche });
+        if (r.ok) {
+          setPreview(r.value);
+          setClassifications({});
+        } else {
+          setPreview(null);
+          setError(r.error.message);
+        }
+      } catch {
         setPreview(null);
-        setError(r.error.message);
+        setError("Could not generate keywords. Please try again.");
       }
     });
   };
@@ -94,15 +99,19 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
       }
     }
     startTransition(async () => {
-      const r = await keywordResearchAttempt({
-        niche,
-        classifications: fullyClassified,
-        mode,
-      });
-      if (r.ok) {
-        setAttempt(r.value);
-      } else {
-        setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+      try {
+        const r = await keywordResearchAttempt({
+          niche,
+          classifications: fullyClassified,
+          mode,
+        });
+        if (r.ok) {
+          setAttempt(r.value);
+        } else {
+          setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+        }
+      } catch {
+        setError("Could not grade this attempt. Please try again.");
       }
     });
   };
@@ -138,7 +147,11 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
             {pending ? "Loading…" : "Generate keywords"}
           </button>
         </div>
-        {error ? <p className={styles.error}>{error}</p> : null}
+        {error ? (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        ) : null}
       </form>
 
       {preview && !attempt ? (

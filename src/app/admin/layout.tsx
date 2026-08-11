@@ -30,7 +30,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     <div className={styles.shell}>
       <MobileNavToggle sidebarId="admin-sidebar" />
       <NavSidebar user={user} />
-      <main className={styles.main}>{children}</main>
+      <main className={styles.main} data-navigation-content>
+        {children}
+      </main>
       <CommandPalette
         items={[
           { href: "/admin", label: "Dashboard", section: "Overview" },

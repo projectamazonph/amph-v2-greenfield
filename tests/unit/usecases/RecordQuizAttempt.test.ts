@@ -24,6 +24,7 @@ import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
+import type { AccessDecision } from "@/domain/values/AccessDecision";
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -60,15 +61,21 @@ function makeQuiz() {
   return r.value;
 }
 
-function buildUseCase(deps: {
-  quizRepo: IQuizRepository;
-  quizAttemptRepo: IQuizAttemptRepository;
-  xpEventRepo: IXPEventRepository;
-  userRepo: UserRepository;
-  idGen: IdGenerator;
-  clock: Clock;
-}) {
-  return new RecordQuizAttempt(deps);
+function buildUseCase(
+  deps: {
+    quizRepo: IQuizRepository;
+    quizAttemptRepo: IQuizAttemptRepository;
+    xpEventRepo: IXPEventRepository;
+    userRepo: UserRepository;
+    idGen: IdGenerator;
+    clock: Clock;
+  },
+  accessDecision: AccessDecision = { kind: "allowed" },
+) {
+  return new RecordQuizAttempt({
+    ...deps,
+    accessPolicy: { canAccess: vi.fn(async () => accessDecision) },
+  });
 }
 
 // ── RED: RecordQuizAttempt ────────────────────────────────────────────────
@@ -111,6 +118,26 @@ describe("RecordQuizAttempt", () => {
       if (!result.ok) {
         expect(result.error.kind).toBe("quiz_not_found");
       }
+    });
+  });
+
+  describe("course access", () => {
+    it("rejects an authenticated student without course entitlement", async () => {
+      quizRepo.seed(makeQuiz());
+      const useCase = buildUseCase(
+        { quizRepo, quizAttemptRepo, xpEventRepo, userRepo, idGen, clock },
+        { kind: "denied_tier", userTier: "FREE", requiredTier: "STARTER" },
+      );
+
+      const result = await useCase.execute({
+        userId: USER_ID,
+        quizId: QUIZ_ID,
+        answers: [{ questionId: "q1", selectedOptionId: "o1" }],
+      });
+
+      expect(result).toEqual(Result.err({ kind: "access_denied" }));
+      const attempts = await quizAttemptRepo.findByUserAndQuiz(USER_ID, QUIZ_ID);
+      expect(attempts.ok && attempts.value).toEqual([]);
     });
   });
 

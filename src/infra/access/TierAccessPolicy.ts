@@ -50,6 +50,10 @@ export class TierAccessPolicy implements IAccessPolicy {
     }
     const course = courseResult.value;
 
+    if (user.role === "ADMIN") {
+      return { kind: "allowed" };
+    }
+
     // Rule 1: enrolled → always full access
     //
     // IEnrollmentRepository.findByUserIdAndCourseId() has no Result
@@ -65,7 +69,7 @@ export class TierAccessPolicy implements IAccessPolicy {
     } catch {
       return { kind: "denied_not_authenticated" };
     }
-    if (enrollment !== null) {
+    if (enrollment?.status === "active") {
       return { kind: "allowed" };
     }
 
