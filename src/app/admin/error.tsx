@@ -9,5 +9,5 @@ export default function AdminError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  return <RouteError error={error} reset={reset} />;
+  return <RouteError error={error} reset={reset} withinMain />;
 }
