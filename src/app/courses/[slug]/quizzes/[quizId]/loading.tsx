@@ -2,7 +2,7 @@ import { SkeletonBlock, SkeletonText } from "@/components/ui/Skeleton";
 
 export default function QuizLoading() {
   return (
-    <div style={{ padding: "var(--space-10) var(--side-pad)", maxWidth: 720 }}>
+    <main aria-busy="true" style={{ padding: "var(--space-10) var(--side-pad)", maxWidth: 720 }}>
       <SkeletonBlock width="200px" height="2rem" variant="text" />
       <div style={{ marginTop: "var(--space-6)" }}>
         <SkeletonText lines={4} />
@@ -22,6 +22,6 @@ export default function QuizLoading() {
           </div>
         ))}
       </div>
-    </div>
+    </main>
   );
 }

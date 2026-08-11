@@ -2,7 +2,8 @@ import { SkeletonForm } from "@/components/ui/Skeleton";
 
 export default function ResetPasswordLoading() {
   return (
-    <div
+    <main
+      aria-busy="true"
       style={{
         display: "flex",
         justifyContent: "center",
@@ -23,6 +24,6 @@ export default function ResetPasswordLoading() {
       >
         <SkeletonForm fields={2} />
       </div>
-    </div>
+    </main>
   );
 }

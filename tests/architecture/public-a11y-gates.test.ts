@@ -1,8 +1,22 @@
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
+import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
 async function source(path: string): Promise<string> {
   return readFile(new URL(`../../${path}`, import.meta.url), "utf8");
+}
+
+async function loadingFiles(directory: string): Promise<string[]> {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = await Promise.all(
+    entries.map((entry) => {
+      const path = join(directory, entry.name);
+      return entry.isDirectory()
+        ? loadingFiles(path)
+        : Promise.resolve(path.endsWith("loading.tsx") ? [path] : []);
+    }),
+  );
+  return files.flat();
 }
 
 describe("public accessibility release gates", () => {
@@ -52,5 +66,22 @@ describe("public accessibility release gates", () => {
     const courses = await source("src/app/courses/page.tsx");
 
     expect(courses).toContain("<h1 className={styles.errorTitle}>Courses unavailable</h1>");
+  });
+
+  it("exposes non-admin loading states as busy main landmarks", async () => {
+    const app = join(process.cwd(), "src", "app");
+    const files = (await loadingFiles(app)).filter(
+      (file) => !relative(app, file).startsWith("admin/"),
+    );
+    const violations = await Promise.all(
+      files.map(async (file) => {
+        const body = await readFile(file, "utf8");
+        return body.includes("<main") && body.includes('aria-busy="true"')
+          ? null
+          : relative(process.cwd(), file);
+      }),
+    );
+
+    expect(violations.filter(Boolean)).toEqual([]);
   });
 });
