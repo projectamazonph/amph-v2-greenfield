@@ -123,7 +123,7 @@ function CourseCard({
               letterSpacing: "0.05em",
               padding: "2px 6px",
               background: "var(--accent-soft)",
-              color: "var(--accent)",
+              color: "var(--accent-text)",
               borderRadius: "4px",
               marginBottom: "var(--space-2)",
             }}

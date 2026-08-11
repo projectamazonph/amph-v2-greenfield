@@ -73,7 +73,7 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
     fontSize: 11,
     fontWeight: 700,
     letterSpacing: "0.12em",
-    color: "var(--accent)",
+    color: "var(--accent-text)",
     textTransform: "uppercase",
   },
   title: {
@@ -147,7 +147,7 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
     color: "var(--ink-500)",
   },
   link: {
-    color: "var(--accent)",
+    color: "var(--accent-text)",
     textDecoration: "none",
     fontWeight: 600,
   },

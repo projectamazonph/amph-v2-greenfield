@@ -38,7 +38,7 @@
   font-weight: 700;
   font-size: 18px;
   letter-spacing: 0.04em;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .logoIcon {
@@ -88,7 +88,7 @@
 
 .forgotLink {
   font-size: 13px;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
   font-weight: 500;
 }
@@ -109,6 +109,6 @@
 }
 
 .backHref:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
 }

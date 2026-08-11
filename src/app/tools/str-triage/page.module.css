@@ -13,7 +13,7 @@
   color: var(--ink-500);
 }
 
-.breadcrumb a { color: var(--accent); text-decoration: none; }
+.breadcrumb a { color: var(--accent-text); text-decoration: none; }
 .breadcrumb a:hover { text-decoration: underline; }
 
 .header {

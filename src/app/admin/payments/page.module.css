@@ -36,7 +36,7 @@
   font-size: 13px;
   font-weight: 500;
   background: var(--accent);
-  color: var(--surface-0);
+  color: var(--accent-ink);
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
   cursor: pointer;

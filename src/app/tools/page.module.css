@@ -82,7 +82,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: 500;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
   align-self: flex-start;
 }

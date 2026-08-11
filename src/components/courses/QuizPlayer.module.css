@@ -130,7 +130,7 @@
   height: 44px;
   padding: 0 var(--space-5);
   background: var(--accent);
-  color: var(--ink-inverse);
+  color: var(--accent-ink);
   border: 1px solid var(--accent);
   border-radius: 6px;
   font-family: var(--font-body);
@@ -183,7 +183,7 @@
 .xpLine {
   font-family: var(--font-mono);
   font-size: var(--text-base);
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0;
   font-weight: 600;
 }
@@ -192,7 +192,7 @@
   margin-top: var(--space-4);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
 }
 

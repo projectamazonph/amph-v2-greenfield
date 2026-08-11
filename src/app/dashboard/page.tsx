@@ -96,7 +96,7 @@ export default async function DashboardPage() {
               style={{
                 fontFamily: "var(--font-mono)",
                 fontSize: "10px",
-                color: "var(--accent)",
+                color: "var(--accent-text)",
                 textTransform: "uppercase",
                 letterSpacing: "0.05em",
                 marginBottom: "var(--space-2)",

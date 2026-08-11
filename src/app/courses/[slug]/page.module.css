@@ -108,7 +108,7 @@
 
 .tagline {
   font-size: var(--text-lg);
-  color: var(--accent);
+  color: var(--accent-text);
   margin: 0 0 var(--space-3) 0;
   line-height: var(--leading-snug);
   overflow-wrap: anywhere;
@@ -243,7 +243,7 @@
 .lessonIcon {
   width: 16px;
   height: 16px;
-  color: var(--accent);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 

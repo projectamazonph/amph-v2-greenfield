@@ -157,13 +157,13 @@
 }
 
 .card:hover .cardTitle {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .cardPrice {
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
   white-space: nowrap;
   flex-shrink: 0;
 }

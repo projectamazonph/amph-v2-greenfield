@@ -436,7 +436,7 @@ table tbody tr:nth-child(even) {
   height: auto;
   z-index: 9999;
   background: var(--accent);
-  color: var(--surface-0);
+  color: var(--accent-ink);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
   font-size: var(--text-sm);
