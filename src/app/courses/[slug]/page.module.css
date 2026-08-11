@@ -85,7 +85,7 @@
 .coverPlaceholderLetter {
   color: var(--surface-1);
   font-family: var(--font-display);
-  font-size: var(--text-5xl);
+  font-size: var(--text-4xl);
   font-weight: 700;
   opacity: 0.3;
 }
@@ -118,7 +118,7 @@
   font-size: var(--text-base);
   color: var(--ink-700);
   margin: 0 0 var(--space-6) 0;
-  line-height: var(--leading-relaxed);
+  line-height: var(--leading-loose);
   overflow-wrap: anywhere;
 }
 

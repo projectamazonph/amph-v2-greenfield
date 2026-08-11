@@ -8,7 +8,7 @@
   color: var(--ink-900);
   font-family: var(--font-body);
   font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
+  line-height: var(--leading-loose);
 }
 
 .prose p {
@@ -166,7 +166,7 @@
 .transcriptBody {
   margin-top: var(--space-2);
   font-size: var(--text-sm);
-  line-height: var(--leading-relaxed);
+  line-height: var(--leading-loose);
 }
 
 /* Quiz card */

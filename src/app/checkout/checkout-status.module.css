@@ -13,7 +13,7 @@
 .card {
   width: 100%;
   max-width: 480px;
-  background: var(--surface-card);
+  background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: clamp(var(--space-6), 8vw, var(--space-10)) clamp(var(--space-5), 8vw, var(--space-10)) var(--space-8);
