@@ -186,8 +186,12 @@
 
 .incl li svg {
   flex-shrink: 0;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-top: 2px;
+}
+
+.featured .incl li svg {
+  color: var(--accent);
 }
 
 .incl li b {
@@ -256,7 +260,7 @@
 }
 
 .payChip svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .guar {

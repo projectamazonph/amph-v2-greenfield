@@ -77,7 +77,7 @@
 .tierPill.mastery {
   border-color: var(--accent-soft);
   background: var(--accent-soft);
-  color: var(--accent-hover);
+  color: var(--accent-text);
 }
 
 .hours {
@@ -95,7 +95,7 @@
 }
 
 .table tfoot b {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .note {

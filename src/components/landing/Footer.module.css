@@ -54,7 +54,7 @@
 }
 
 .col a:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   padding-left: 5px;
 }
 

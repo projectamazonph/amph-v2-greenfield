@@ -67,7 +67,7 @@
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.04em;
-  color: var(--ink-500);
+  color: var(--ink-700);
   border-left: 3px solid var(--accent);
   padding: 10px 14px;
   background: var(--accent-soft);

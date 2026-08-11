@@ -104,7 +104,7 @@
 
 .note svg {
   flex-shrink: 0;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-top: 2px;
 }
 
