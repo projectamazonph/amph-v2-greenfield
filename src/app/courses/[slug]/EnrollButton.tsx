@@ -73,7 +73,7 @@ export function EnrollButton({
 
   if (state && state.ok) {
     return (
-      <div className={styles.success}>
+      <div className={styles.success} role="status">
         <svg
           className={styles.successIcon}
           viewBox="0 0 24 24"
@@ -91,10 +91,18 @@ export function EnrollButton({
   if (state && !state.ok) {
     const err = state.error;
     if ("kind" in err && err.kind === "course_not_published") {
-      return <p className={styles.notAvailable}>This course is not available.</p>;
+      return (
+        <p className={styles.notAvailable} role="alert">
+          This course is not available.
+        </p>
+      );
     }
     if ("kind" in err && err.kind === "unauthorized") {
-      return <p className={styles.error}>Please sign in to enroll.</p>;
+      return (
+        <p className={styles.error} role="alert">
+          Please sign in to enroll.
+        </p>
+      );
     }
     if ("kind" in err && err.kind === "paid_checkout_required") {
       return (
@@ -111,7 +119,11 @@ export function EnrollButton({
         </Link>
       );
     }
-    return <p className={styles.error}>Unable to enroll. Please try again.</p>;
+    return (
+      <p className={styles.error} role="alert">
+        Unable to enroll. Please try again.
+      </p>
+    );
   }
 
   if (!isFree && accessMode !== "subscription") {

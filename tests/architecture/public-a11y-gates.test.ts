@@ -84,4 +84,15 @@ describe("public accessibility release gates", () => {
 
     expect(violations.filter(Boolean)).toEqual([]);
   });
+
+  it("announces client-side student mutation outcomes", async () => {
+    const enrollment = await source("src/app/courses/[slug]/EnrollButton.tsx");
+    const recording = await source("src/components/student/LiveClassRecordingButton.tsx");
+    const reset = await source("src/components/auth/ResetConfirmForm.tsx");
+
+    expect(enrollment).toContain('className={styles.success} role="status"');
+    expect(enrollment.match(/role="alert"/g)).toHaveLength(3);
+    expect(recording).toContain('role="status"');
+    expect(reset).toContain('className={styles.success} role="status"');
+  });
 });

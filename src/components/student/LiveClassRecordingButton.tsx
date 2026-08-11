@@ -66,7 +66,11 @@ export function LiveClassRecordingButton({
         Watch recording
       </a>
       {watched ? (
-        <span data-testid="live-class-recording-watched" style={{ color: "var(--ink-500)" }}>
+        <span
+          data-testid="live-class-recording-watched"
+          role="status"
+          style={{ color: "var(--ink-500)" }}
+        >
           ✓ Marked as watched
         </span>
       ) : (

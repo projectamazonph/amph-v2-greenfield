@@ -24,7 +24,7 @@ export function ResetConfirmForm({ token }: Props) {
 
   if (state.kind === "success") {
     return (
-      <div className={styles.success}>
+      <div className={styles.success} role="status">
         <p className={styles.successText}>Your password was changed. Sign in with the new one.</p>
         <Link href="/login" className={styles.cta}>
           Sign in
