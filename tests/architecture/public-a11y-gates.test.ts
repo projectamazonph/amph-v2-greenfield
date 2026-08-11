@@ -24,6 +24,8 @@ describe("public accessibility release gates", () => {
     const spec = await source("tests/e2e/a11y.spec.ts");
 
     expect(spec).toContain('"/pricing"');
+    expect(spec).toContain("page.locator('main[aria-busy=\"true\"]')");
+    expect(spec).toContain('page.locator("main")).toHaveCount(1)');
     expect(spec).toContain("expect(accessibilityScanResults.violations).toEqual([])");
     expect(spec).not.toContain("toBeLessThan(100)");
   });
@@ -46,11 +48,14 @@ describe("public accessibility release gates", () => {
     expect(topBar).not.toContain('aria-label="Project Amazon PH home"');
   });
 
-  it("declares a light-surface accent and responsive hero image sizes", async () => {
+  it("declares surface-appropriate accents and responsive hero image sizes", async () => {
     const globals = await source("src/app/globals.css");
+    const curriculum = await source("src/components/landing/Curriculum.module.css");
     const hero = await source("src/components/landing/Hero.tsx");
 
     expect(globals).toContain("--accent-text:");
+    expect(globals).toContain("--accent-inverse:");
+    expect(curriculum).toMatch(/\.table tfoot b\s*{\s*color: var\(--accent-inverse\);\s*}/);
     expect(hero).toContain("sizes=");
   });
 

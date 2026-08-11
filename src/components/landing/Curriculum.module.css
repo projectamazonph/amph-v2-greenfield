@@ -95,7 +95,7 @@
 }
 
 .table tfoot b {
-  color: var(--accent-text);
+  color: var(--accent-inverse);
 }
 
 .note {

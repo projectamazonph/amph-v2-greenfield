@@ -36,6 +36,7 @@
   --accent: #ff6b35;
   --accent-hover: #e55a2b;
   --accent-text: #a63c18; /* 6.4:1 on white; use for accent-colored text on light surfaces */
+  --accent-inverse: #ff9a75; /* 8.7:1 on --ink-900; use on inverse surfaces */
   --accent-soft: #ffe5d9;
   --accent-ink: #1a1a2e; /* 6.0:1 contrast on --accent; use as primary button text */
 
@@ -142,6 +143,7 @@
   --ink-500: #a3a3a3;
   --border: #404040;
   --accent-text: #ff9a75;
+  --accent-inverse: #a63c18;
   --accent-ink: #fafaf7;
 }
 

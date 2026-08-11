@@ -16,6 +16,8 @@ test.describe("Accessibility", () => {
     test(`axe check on ${path}`, async ({ page }) => {
       const response = await page.goto(`${BASE}${path}`);
       expect(response?.ok()).toBe(true);
+      await expect(page.locator('main[aria-busy="true"]')).toHaveCount(0);
+      await expect(page.locator("main")).toHaveCount(1);
       await expect(page.locator("main")).toBeVisible();
       await expect(page.locator("h1")).toBeVisible();
       const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
