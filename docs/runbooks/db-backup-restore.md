@@ -2,9 +2,9 @@
 
 **Severity:** P0
 **Owner:** Operator (Neon project owner) + on-call engineer
-**Last reviewed:** 2026-07-26
+**Last reviewed:** 2026-08-12
 
-**This runbook has not been drilled end-to-end.** `docs/sprint-plan.md` (STORY-057) flags this explicitly: "Neon has automatic backups, drill not yet run." Everything below is the correct mechanism per Neon's platform (point-in-time recovery via branching — there is no separate `pg_dump`-based backup job in this repo; grep found none), but treat the exact retention window and step-by-step timing as unverified until someone actually runs this against a non-production Neon project.
+**This runbook has not been drilled end-to-end.** Confirm the current Neon retention and point-in-time restore controls in the Neon console before acting. The repository has no separate `pg_dump` backup job. Use `/api/health/ready`, not the static `/api/health` liveness route, to verify database readiness after recovery.
 
 ## Symptoms
 

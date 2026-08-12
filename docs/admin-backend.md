@@ -3,7 +3,7 @@
 **Status:** Approved
 **Owner:** Ryan Roland Dabao
 **Date:** 2026-07-17 (greenfield)
-**Last updated:** 2026-07-28 (doc audit — layout tree corrections, Order model, stale paths)
+**Last updated:** 2026-08-12 against `ee1737a`
 
 ---
 
@@ -13,13 +13,15 @@ The admin panel is what lets Ryan (and any future co-admins) operate the platfor
 
 Every admin route has search, filter, pagination. Every mutation is audited. Every action runs through a use case — no direct Prisma from page files. ADR-013, ISP, DIP.
 
+Manual paid-tier grants also create eligible published-course enrollments. They are idempotent, create no Order row, and send a password-reset link for a new account. Admin login sets its cookie on the redirect response before navigating to `/admin`.
+
 ## Roles
 
-| Role          | Access                                                        |
-| ------------- | ------------------------------------------------------------- |
-| `STUDENT`     | None on `/admin/*`. All admin routes 302 to `/dashboard`.     |
-| `ADMIN`       | Read all admin pages. Mutate any non-privileged field.        |
-| `SUPER_ADMIN` | All ADMIN powers + impersonate + change another admin's role. |
+| Role         | Access                                                              |
+| ------------ | ------------------------------------------------------------------- |
+| `STUDENT`    | No `/admin/*` access                                                |
+| `INSTRUCTOR` | No `/admin/*` access under the current `requireAdmin()` gate        |
+| `ADMIN`      | Admin pages and audited mutations; cannot impersonate another admin |
 
 Role is a column on `User`. Stored on the JWT. Re-checked on every admin request (no stale-allow).
 
@@ -113,7 +115,7 @@ The `/admin` page. Summary tiles + charts.
 | Simulator attempts (7d) | `SimulatorAttempt.count({ createdAt > now - 7d })`                                                                       |
 | Open refund requests    | `Order.count({ status = REFUND_REQUESTED })` (tracked in `pendingRefunds` in `GetAdminDashboardStats`)                   |
 
-> **Note:** `GetAdminDashboardStats.pendingRefunds` is currently hardcoded to zero pending review. See the 2026-07-27 audit report for details.
+`GetAdminDashboardStats.pendingRefunds` reads `orderRepo.listRefundRequests()`.
 
 ### Charts
 
@@ -362,13 +364,13 @@ Every admin mutation. The use case writes the entry; the adapter persists it. Th
 
 ## What Lives Where
 
-| Concern                | Domain                                 | Port                                | Use case                                    | Adapter                       |
-| ---------------------- | -------------------------------------- | ----------------------------------- | ------------------------------------------- | ----------------------------- |
-| Role check             | `src/domain/entities/User.ts`          | `IAccessPolicy`                     | every admin use case                        | `TierAccessPolicy`            |
-| Impersonation logic    | `src/domain/entities/User.ts`          | -                                   | `AdminImpersonate`, `AdminEndImpersonation` | -                             |
-| Audit-log write        | -                                      | `IAuditLog`                         | every admin use case                        | `PrismaAuditLog`              |
-| CSV export             | `src/domain/shared/`                   | -                                   | `AdminExportAuditLog`                       | -                             |
-| Settings read/write    | `src/domain/values/`                   | `IPricingTierRepository`            | `AdminUpdateSettings`                       | `PrismaPricingTierRepository` |
-| Email template storage | `src/domain/entities/EmailTemplate.ts` | `IEmailTemplateRepository` (future) | `AdminUpdateEmailTemplate`                  | (not yet wired)               |
+| Concern                | Domain                                 | Port                       | Use case                                    | Adapter                         |
+| ---------------------- | -------------------------------------- | -------------------------- | ------------------------------------------- | ------------------------------- |
+| Role check             | `src/domain/entities/User.ts`          | `IAccessPolicy`            | every admin use case                        | `TierAccessPolicy`              |
+| Impersonation logic    | `src/domain/entities/User.ts`          | -                          | `AdminImpersonate`, `AdminEndImpersonation` | -                               |
+| Audit-log write        | -                                      | `IAuditLog`                | every admin use case                        | `PrismaAuditLog`                |
+| CSV export             | `src/domain/shared/`                   | -                          | `AdminExportAuditLog`                       | -                               |
+| Settings read/write    | `src/domain/values/`                   | `IPricingTierRepository`   | `AdminUpdateSettings`                       | `PrismaPricingTierRepository`   |
+| Email template storage | `src/domain/entities/EmailTemplate.ts` | `IEmailTemplateRepository` | `UpdateEmailTemplate`                       | `PrismaEmailTemplateRepository` |
 
 The admin panel is the place where the SOLID architecture pays the most: every admin action is a use case that tests with `buildTestContainer()`, no mocking the real Prisma, no mocking the real PayMongo. The cost of adding a new admin section is one server action + one page + one use case + (sometimes) one repository method. No edits to the layout, the auth gate, or the audit log infrastructure.

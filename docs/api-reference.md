@@ -1,6 +1,6 @@
 # API and runtime inventory
 
-**Reviewed:** 2026-07-27  
+**Reviewed:** 2026-08-12 against `ee1737a`
 **Application:** Project Amazon PH Academy v2  
 **Source of truth:** `src/app/`, `src/app/actions/`, `src/usecases/`, `src/ports/`, `src/composition/container.ts`, and `prisma/schema.prisma`.
 
@@ -163,7 +163,7 @@ Each action should parse untrusted input, obtain the request container, call a u
 
 The production container uses Prisma, PayMongo, Resend, Argon2, jose, otpauth, Upstash, React PDF, and Next MDX adapters. The test container uses in-memory or fake implementations.
 
-Known adapter gaps are tracked in `docs/audit-2026-07-27-completeness-review.md`. In particular, Prisma badge mutation methods are stubs, and the admin seed script does not use the shared Prisma 7 adapter.
+Prisma badge mutations, the shared Prisma 7 admin seed path, live-class registration persistence, and authenticated simulator ownership are implemented. Dated audit files retain the earlier findings for history.
 
 ## Authentication behavior
 
@@ -174,7 +174,7 @@ Known adapter gaps are tracked in `docs/audit-2026-07-27-completeness-review.md`
 - `requireAuth()` redirects unauthenticated requests to `/login`.
 - `requireAdmin()` redirects non-admin users to `/dashboard?error=forbidden`.
 
-Current limitation: request guards do not consult the `sessions` table or `lockedUntil`, so session deletion and account lockout do not revoke an already-issued JWT. Role changes are re-read from Postgres and do take effect on the next guarded request.
+Request guards consult the `sessions` table when the JWT carries a `sessionId`, so deleting that session revokes access. Login enforces `lockedUntil`. Role changes are re-read from Postgres and take effect on the next guarded request.
 
 ## Payment and webhook behavior
 

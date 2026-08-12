@@ -3,7 +3,7 @@
 **Status:** Approved
 **Owner:** Ryan Roland Dabao
 **Date:** 2026-07-17 (greenfield)
-**Last updated:** 2026-07-28 (doc audit — Payment/Receipt/Refund -> Order model, refund window, receipt status)
+**Last updated:** 2026-08-12 against `ee1737a`
 
 ---
 
@@ -14,6 +14,8 @@ The business layer is what turns Project Amazon PH Academy from "free course sit
 **Note on entities:** There is no separate `Payment` or `Refund` table. The `Order` entity (`src/domain/entities/Order.ts`) is the single source of truth for all payment-related state. `Order.status` tracks the payment lifecycle (pending/completed/failed/expired/refunded), and `Order.paymongoStatus` mirrors PayMongo's raw status. Receipt PDF generation and Vercel Blob upload are not yet implemented (Sprint 13 placeholder). The `BusinessProfile` table for BIR compliance is also not yet implemented.
 
 This spec assumes PayMongo as the payment provider, behind the `IPaymentGateway` port. PayMongo is the right choice because:
+
+An admin manual tier grant is an access-recovery path, not a payment. It creates eligible published-course enrollments for STARTER or PRO, is idempotent, and does not create an Order. A webhook can store PAID before enrollment fails; an already-paid replay returns early, so confirmed-paid partial states are repaired with this audited grant flow.
 
 - Native Philippine peso (PHP) support, no currency conversion fees
 - Supports GCash, Maya, GrabPay, bank transfer (InstaPay/PESONet), and credit/debit card
@@ -90,20 +92,14 @@ Each state is a column on `Order.status` and `Enrollment.status`. Discriminated 
 
 ## Refund Flow
 
-### Within Window (default 30 days)
+### Student request window (7 days)
 
 ```
-1. User clicks "Request refund" on /order/[orderId]
-2. POST /api/refunds (or refundAction server action)
-3. RequestRefund use case:
+1. User opens `/profile/purchases` and submits the refund server action.
+2. RequestRefund use case:
    a. Loads order (IOrderRepository)
-   b. Checks window: now - order.createdAt <= 30 days (REFUND_WINDOW_DAYS from OrderRefund value object)
-   c. Calls PaymentGateway.refund(order)
-   d. In a single DB transaction:
-      - Update Order.status = "refunded"
-      - Update Enrollment.revoked = true, revokedAt, revokedReason
-      - Send refund email (EmailSender)
-   e. Returns Result.ok
+   b. Checks ownership, paid status, a 7-day window from `paymongoPaidAt`, and less than 25% course completion.
+   c. Stores the refund request for admin processing.
 ```
 
 ### Outside Window (Admin Override)
@@ -113,9 +109,10 @@ Each state is a column on `Order.status` and `Enrollment.status`. Discriminated 
 2. Clicks "Issue refund (override)"
 3. Enters reason (20+ chars, validated)
 4. ProcessRefund use case:
-   a. Same as above, but no window check
-   b. AuditLog entry: actor=adminId, target=orderId, event="refund.override", metadata={reason}
-   c. Email includes "Issued by support" line
+   a. Calls the real PayMongo Refunds API through `IPaymentGateway`.
+   b. Updates the Order and revokes course access.
+   c. Records the audited actor, target, and reason.
+   d. Sends the configured refund email.
 ```
 
 ## Receipts

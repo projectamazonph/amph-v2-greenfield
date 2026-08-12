@@ -1,7 +1,8 @@
 # Disaster Recovery Runbook
 
-**Last updated:** 2026-07-31  
-**Stack:** Next.js 16 (Vercel) · PostgreSQL (Supabase/Neon) · PayMongo · Resend · Upstash Redis · Sentry
+**Last updated:** 2026-08-12
+**Stack:** Next.js 16 (Vercel), PostgreSQL (Neon), PayMongo, Resend, Upstash Redis, Sentry
+**Production:** <https://projectamazonph.vercel.app>
 
 ---
 

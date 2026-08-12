@@ -2,15 +2,15 @@
 
 **Severity:** P1 (P0 if it's the only admin account and payments/refunds are blocked)
 **Owner:** Operator
-**Last reviewed:** 2026-07-26
+**Last reviewed:** 2026-08-12
 
 **Known gaps this runbook depends on** (verified directly against the code, not assumed):
 
 - There IS a dedicated admin login route: `/admin-login` (form) → `POST /api/auth/admin-login`, which additionally checks `role === "ADMIN"` before redirecting to `/admin` (redirects to `/admin-login?error=not_admin` otherwise). The regular `/login` route works too — `requireAdmin()` (`src/lib/auth.ts:143-149`) checks `user.role === "ADMIN"` on whichever session is active regardless of which route created it, so an admin isn't required to use `/admin-login` specifically. _(Corrected 2026-07-26 — an earlier version of this runbook claimed no admin-specific route existed; verify routes directly under `src/app/` rather than trusting a doc's claim about "no X route.")_
 - Admin TOTP 2FA now exists (opt-in, `/admin/settings` → "Enable two-factor authentication") — see `docs/audit-2026-07-26-hardening-review.md`. An admin with 2FA enabled must also supply their code (both `/login` and `/admin-login` accept an optional `totpCode` field) — `Login.ts` returns `totp_required` if it's missing and the account has 2FA on. This doesn't change the account-lockout/recovery steps below (2FA is a login-time check, not a session-revocation mechanism), but if `user_not_found`/`wrong_password` isn't the symptom, check the account's `twoFactorEnabled` flag before assuming something else is wrong.
-- **Session/account revocation is weaker than it looks.** `src/lib/auth.ts`'s `getSessionUserId()`/`getSessionUser()` — the only session-check path, used by every page via `requireAuth`/`requireAdmin` — verifies the JWT's signature and expiry and re-fetches the `User` row, but **never queries the `sessions` table at all**. The `sessions` table is written by `Login.ts` (create) and `Logout.ts` (delete-on-logout) but nothing reads it back to gate access. Deleting a `sessions` row does **not** invalidate an already-issued JWT cookie — the cookie stays valid until its own expiry (7 days) or a `JWT_SECRET` rotation, regardless of what's in the table. Likewise, `User.lockedUntil` and `User.failedLoginCount` exist on the schema but are not read anywhere in `Login.ts` or `src/lib/auth.ts` — setting `lockedUntil` does not currently block anything. **What does work immediately**: `requireAdmin()` re-checks `user.role` freshly from the DB on every page load (not from a cached JWT claim), so demoting `role` away from `'ADMIN'` takes effect on the compromised account's very next request.
+- Session/account revocation is enforced for current login tokens. `getSessionUserId()` checks the session repository when a JWT contains `sessionId`, login enforces `lockedUntil`, and `requireAdmin()` re-reads the user's role. Delete the user's sessions, set an appropriate lock, rotate the password, and demote the role when compromise is suspected.
 
-So "admin access recovery" reduces to: (1) at least one `User` row must have `role = 'ADMIN'` and a usable password, and (2) if an admin account is compromised, the _reliable_ immediate mitigation is a role downgrade (blocks `/admin/*` next request) plus a password rotation (blocks future logins) — not session-table deletion, which does nothing today.
+Admin access recovery requires at least one usable `ADMIN` account. For a compromised account, combine session deletion, lockout or password rotation, and role demotion as appropriate.
 
 `package.json`'s `db:seed:admin` script now points at a real `scripts/seed-admin-user.mjs`. It creates a `User` row with `role = 'ADMIN'` (or promotes an existing email to `ADMIN`) and hashes the password with the same Argon2id parameters as `Argon2PasswordHasher`:
 
@@ -87,26 +87,26 @@ Then:
 UPDATE users SET password = '<hash from above>' WHERE email = 'admin@example.com';
 ```
 
-Have the admin log in immediately and change the password via their account settings — this temporary password was visible in your shell history/terminal. (`"failedLoginCount"`/`"lockedUntil"` are safe to leave alone here — see the note above, nothing currently reads them.)
+Have the admin log in immediately and change the password via account settings. Clear a stale lock only after confirming ownership because login enforces `lockedUntil`.
 
 ### Compromised admin account — lock it down
 
-Do these in order — step 1 is the one that actually takes effect immediately; don't stop there.
+Do these in order:
 
 1. **Downgrade the role first — this is the fast, reliable stop.** `requireAdmin()` re-fetches the user from the DB on every page load, so this blocks `/admin/*` on the account's very next request, even with its existing session cookie still "valid":
    ```sql
    UPDATE users SET role = 'STUDENT' WHERE id = '<user id>';
    ```
-   Pick whatever non-admin role fits; `STUDENT` is the safe default. Do **not** rely on `DELETE FROM sessions WHERE "userId" = ...` or setting `"lockedUntil"` for this — verified directly against `src/lib/auth.ts`: neither is checked on the request path today, so neither actually revokes an active JWT. (Deleting the session rows is still fine to do for hygiene/cleanliness, just don't treat it as the fix.)
-2. Rotate the password using the hash procedure above — this stops the compromised credentials from being used to log back in (as any role) once the current JWT eventually expires (7 days) or if the account is later re-promoted.
-3. If you believe the JWT signing key itself (not just this one account) may be exposed, rotate `JWT_SECRET` in Vercel env vars — this is the only thing that invalidates an already-issued JWT before it naturally expires, but it logs out **every** user on the platform, not just the compromised account. Reserve this for a confirmed key-level compromise, not a single-account incident — role downgrade (step 1) is the targeted response for that.
-4. Review the audit log (Diagnosis step 2) for every action taken while compromised, and manually assess/reverse anything damaging (e.g. a bogus refund, an altered discount code) — there is no automated rollback for admin actions.
-5. **File a follow-up**: the app has no working per-session/per-account revocation mechanism short of a role change or a platform-wide secret rotation. That's a real gap worth its own hardening story (e.g. checking `sessions` table membership — or a `tokenVersion`/`sessionVersion` claim — on every request), independent of the admin-2FA gap already tracked in `docs/audit-2026-07-26-hardening-review.md`.
+   Pick the correct non-admin role; `STUDENT` is the safest default.
+2. Delete the user's session rows. JWTs issued by the current login flow carry `sessionId`, and request guards reject a missing session.
+3. Set `lockedUntil` when a temporary account lock is needed, then rotate the password.
+4. If the JWT signing key itself may be exposed, rotate `JWT_SECRET` in Vercel. This logs out every user and is reserved for a confirmed key compromise.
+5. Review the audit log (Diagnosis step 2) for every action taken while compromised, and manually assess or reverse anything damaging. There is no automated rollback for admin actions.
 
 ## Resolution
 
 - Confirm the intended admin(s) — and only them — have `role = 'ADMIN'` and a working password.
-- If this incident involved a compromise, decide whether the JWT-signing-key-level rotation (step 3 above) is warranted, given it affects every user, not just the compromised account.
+- If this incident involved a compromise, decide whether the JWT-signing-key-level rotation (step 4 above) is warranted, given it affects every user, not just the compromised account.
 
 ## Verification
 

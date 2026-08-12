@@ -1,6 +1,6 @@
 # Current site map
 
-**Reviewed:** 2026-07-27  
+**Reviewed:** 2026-08-12 against `ee1737a`
 **Ground truth:** the App Router files under `src/app/` and the successful `pnpm build` route manifest.
 
 ## Public and account routes

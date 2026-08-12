@@ -1,5 +1,26 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-12, student repair follow-ups merged)
+
+The production baseline is `main` at `ee1737a`. The canonical deployment is
+`https://projectamazonph.vercel.app`; `https://amph-v2-greenfield.vercel.app`
+is retired and must not be used for new links.
+
+PR #305 (`9096cf4`) repaired the complete student journey and accessibility
+states. PR #306 (`9d80c77`) fixed manually granted student access by creating
+eligible published-course enrollments. PR #307 (`88d83d9`) plants the session
+cookie on the admin-login redirect response. PR #308 (`ee1737a`) normalizes
+forgot-password and transactional links to the canonical production origin.
+
+The complete gate passed: 3,816 Vitest tests with 2 skipped, 665 architecture
+checks, TypeScript, ESLint, the production build, Playwright, and Lighthouse.
+
+Manual grants are idempotent and do not create an Order row. STARTER grants
+published STARTER and PREVIEW courses, PRO grants all eligible published
+courses, and FREE creates no enrollment. If a PayMongo webhook stores PAID
+before enrollment fails, replay exits early for the paid order; confirm payment
+and repair access with the audited admin tier-grant flow.
+
 # Session update (2026-08-10, STORY-103)
 
 Ryan requested a complete admin usability and student-access recovery after a

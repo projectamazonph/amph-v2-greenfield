@@ -4,6 +4,22 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-12: Student repair follow-ups and current verification
+
+- Merged PR #305 (`9096cf4`), the full student-facing journey, route-state,
+  navigation, export, and accessibility repair.
+- Merged PR #306 (`9d80c77`). Audited manual STARTER and PRO tier grants now
+  create the eligible published-course enrollments needed by the dashboard and
+  lesson access checks. The operation is idempotent and does not create an order.
+- Merged PR #307 (`88d83d9`). Admin login now plants the session cookie on the
+  redirect response before navigating to `/admin`.
+- Merged PR #308 (`ee1737a`). Password-reset and transactional links normalize
+  the retired deployment origin to `https://projectamazonph.vercel.app` while
+  preserving local and custom configured origins.
+- Verified 3,816 Vitest tests passed with 2 skipped, 665 architecture checks
+  passed, and TypeScript, ESLint, the production build, Playwright, and
+  Lighthouse passed.
+
 ### 2026-08-10: Student journey reliability repair (STORY-104)
 
 - Completed lesson progress, canonical quiz submission, subscription entitlement,

@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-11
+**Last verified:** 2026-08-12 against `ee1737a`
 
 **Repository:** `amph-v2-greenfield`
 
@@ -11,6 +11,12 @@ journey gaps were checked against the current routes, server actions, use cases,
 repositories, schema, and tests. STORY-104 closes the application-level gaps
 listed below. Environment-specific payment and browser checks remain release
 verification, not missing product code.
+
+PR #305 merged the repair at `9096cf4`. PR #306 then repaired manually granted
+student access by creating eligible published-course enrollments. PR #307 fixed
+the admin-login redirect cookie, and PR #308 fixed forgot-password links. The
+post-merge gate passed 3,816 Vitest tests with 2 skipped, 665 architecture
+checks, TypeScript, ESLint, production build, Playwright, and Lighthouse.
 
 ## Verified student journeys
 

@@ -1,6 +1,6 @@
 # Production runbooks
 
-**Reviewed:** 2026-07-27  
+**Reviewed:** 2026-08-12
 **Source of truth:** files present under `docs/runbooks/`.
 
 A row is marked **authored** only when the corresponding file exists. The remaining procedures are planned topics, not runnable instructions.
@@ -9,10 +9,10 @@ A row is marked **authored** only when the corresponding file exists. The remain
 
 | File                       | Status                           | Use when                                                          |
 | -------------------------- | -------------------------------- | ----------------------------------------------------------------- |
-| `paymongo-outage.md`       | Authored 2026-07-26              | PayMongo is degraded or a paid order did not produce access       |
-| `webhook-replay.md`        | Authored 2026-07-26              | A PayMongo event needs inspection or replay                       |
-| `db-backup-restore.md`     | Authored 2026-07-26, not drilled | A Neon database restore is required                               |
-| `admin-access-recovery.md` | Authored 2026-07-26              | No usable admin account exists or an admin account is compromised |
+| `paymongo-outage.md`       | Reviewed 2026-08-12              | PayMongo is degraded or a paid order did not produce access       |
+| `webhook-replay.md`        | Reviewed 2026-08-12              | A PayMongo event needs inspection or replay                       |
+| `db-backup-restore.md`     | Reviewed 2026-08-12, not drilled | A Neon database restore is required                               |
+| `admin-access-recovery.md` | Reviewed 2026-08-12              | No usable admin account exists or an admin account is compromised |
 
 The database restore procedure has not been exercised against a real backup. Treat its timing and operator commands as unverified until a staging drill is completed.
 
@@ -40,7 +40,7 @@ Do not link a planned topic as an executable procedure. Add the file, test it in
 - The live-class reminder route requires `CRON_SECRET` and is scheduled in `vercel.json` at `0 8 * * *` (daily).
 - `SentReminder` persistence makes reminder sends idempotent.
 - `/api/health` is a liveness response and does not query Postgres.
-- Session-table deletion and `lockedUntil` do not currently revoke an already-issued JWT. See `admin-access-recovery.md`.
+- Session-table deletion revokes JWT-backed sessions that carry a `sessionId`; login enforces `lockedUntil`. See `admin-access-recovery.md`.
 - The admin seed command is `pnpm db:seed:admin`; its Prisma 7 adapter compatibility is a tracked follow-up in the completeness audit.
 
 ## Runbook template

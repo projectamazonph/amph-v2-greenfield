@@ -2,7 +2,11 @@
 
 **Severity:** P0
 **Owner:** On-call engineer (escalate to operator for PayMongo support contact)
-**Last reviewed:** 2026-07-26
+**Last reviewed:** 2026-08-12
+
+**Canonical production origin:** `https://projectamazonph.vercel.app`
+
+The webhook can persist `Order.status = PAID` before `EnrollStudent` fails. A replay then exits early because the order is already paid. For that confirmed-paid partial state, verify the PayMongo payment and use the audited admin tier-grant flow to create the missing eligible enrollments. Do not invent a second order.
 
 ## Symptoms
 

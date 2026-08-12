@@ -1,6 +1,6 @@
 # Current database schema inventory
 
-**Reviewed:** 2026-07-27  
+**Reviewed:** 2026-08-12 against `ee1737a`
 **Source of truth:** `prisma/schema.prisma` and the SQL files under `prisma/migrations/`.  
 **Validation:** `pnpm prisma validate` passes.
 
@@ -17,7 +17,7 @@ The old version of this document described an aspirational schema with universal
 
 ## Actual model inventory
 
-`prisma/schema.prisma` currently defines 35 models (the count below predates STORY-098's `Resource` addition and other 2026-08-02 session changes; re-count from the schema before trusting either number):
+`prisma/schema.prisma` currently defines 36 models and 4 enums:
 
 1. `User`
 2. `Session`
@@ -27,33 +27,34 @@ The old version of this document described an aspirational schema with universal
 6. `Lesson`
 7. `SimulatorScenario`
 8. `LiveClass`
-9. `Enrollment`
-10. `Order`
-11. `PpcCampaign`
-12. `AuditLog`
-13. `WebhookEvent`
-14. `EmailLog`
-15. `DiscountCode`
-16. `XPEvent`
-17. `ProgressEvent`
-18. `UserStreak`
-19. `Quiz`
-20. `QuizQuestion`
-21. `QuizOption`
-22. `QuizAttempt`
-23. `QuizAttemptAnswer`
-24. `Badge`
-25. `BadgeAward`
-26. `Certificate`
-27. `EmailVerification`
-28. `PasswordReset`
-29. `SentReminder`
-30. `SimulatorAttempt`
-31. `SimulatorDecision`
-32. `ScorePolicy`
-33. `EmailTemplate`
-34. `AttemptFeedback`
-35. `Resource`
+9. `LiveClassRegistration`
+10. `Enrollment`
+11. `Order`
+12. `PpcCampaign`
+13. `AuditLog`
+14. `WebhookEvent`
+15. `EmailLog`
+16. `DiscountCode`
+17. `XPEvent`
+18. `ProgressEvent`
+19. `UserStreak`
+20. `Quiz`
+21. `QuizQuestion`
+22. `QuizOption`
+23. `QuizAttempt`
+24. `QuizAttemptAnswer`
+25. `Badge`
+26. `BadgeAward`
+27. `Certificate`
+28. `EmailVerification`
+29. `PasswordReset`
+30. `SentReminder`
+31. `SimulatorAttempt`
+32. `SimulatorDecision`
+33. `ScorePolicy`
+34. `EmailTemplate`
+35. `AttemptFeedback`
+36. `Resource`
 
 The schema defines four enums: `Role`, `SubscriptionTier`, `VerificationStatus`, and `SimulatorAccess`.
 
@@ -61,7 +62,7 @@ The schema defines four enums: `Role`, `SubscriptionTier`, `VerificationStatus`,
 
 ### Identity and access
 
-`User` stores first and last name, password hash, role, verification state, subscription fields, legacy course-access fields, XP, failed-login counters, lockout timestamp, and optional TOTP state. `Session` stores token hashes and expiry, but the current request guard does not consult it when validating a JWT.
+`User` stores first and last name, password hash, role, verification state, subscription fields, legacy course-access fields, XP, failed-login counters, lockout timestamp, and optional TOTP state. `Session` stores token hashes and expiry; current JWTs carry a `sessionId` that request guards verify against this table.
 
 ### Courses and curriculum
 
@@ -83,7 +84,7 @@ The simulator scoring configuration has known integrity and subject-matter limit
 
 ### Operations
 
-`AuditLog` and `WebhookEvent` provide durable audit and webhook records. `SentReminder` prevents duplicate live-class reminder sends. `EmailTemplate` has repository and use-case support, but no current admin page under `src/app/admin`.
+`AuditLog` and `WebhookEvent` provide durable audit and webhook records. `SentReminder` prevents duplicate live-class reminder sends. `EmailTemplate` has repository, use-case, admin editor, and Resend send-path support.
 
 ### Download center (STORY-098 / STORY-098.5)
 
@@ -91,7 +92,7 @@ The simulator scoring configuration has known integrity and subject-matter limit
 
 ## Migration inventory
 
-There are 20 committed migration directories plus `migration_lock.toml`. Migration names include the baseline, email verification, password reset, reminder idempotency, order status, discount-code archive state, live classes, simulator scenarios, modules and lessons, pricing tiers, attempt feedback, score policies, simulator attempts and decisions, email templates, webhook events, two-factor authentication, and related indexes.
+There are 35 committed migration directories plus `migration_lock.toml`. Migration names include the baseline, identity, curriculum, pricing, payment, assessment, live-class, resource, and index changes.
 
 Use these commands when changing the schema:
 
@@ -113,7 +114,7 @@ The following rules appeared in the original target document but are not impleme
 - `createdById` and `updatedById` are not present on every mutable table.
 - Every state machine is not a native Prisma enum.
 - A separate Settings model does not exist.
-- Live-class RSVP, recording, and capacity tables do not exist as a complete student-facing feature.
-- Data-export and account-deletion tables or workflows are not present.
+- Live-class RSVP and recording state are implemented through `LiveClassRegistration`; capacity limits are not modeled.
+- Account export and anonymizing deletion are implemented as use cases over the existing user-owned tables.
 
 Treat these as design work or follow-up requirements, not as current database guarantees.

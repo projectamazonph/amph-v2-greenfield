@@ -1,5 +1,7 @@
 # ADR-0026: Disable Lighthouse CI; Diagnose Next.js 16 Artifact Transport (and Re-enable via `output: 'standalone'`)
 
+**Current note (2026-08-12):** Lighthouse CI is enabled and passed the PR #305 gate. The canonical deployment is <https://projectamazonph.vercel.app>. Older deployment URLs below are retained as historical context.
+
 **Status:** Accepted (workaround) — 2026-07-20
 **Status:** Updated (fix landed) — 2026-07-20
 **Status:** Tightened (multi-URL, thresholded) — 2026-07-21
@@ -10,14 +12,16 @@
 **Fix (PR #116):** added `output: 'standalone'` to `next.config.ts`, switched the build artifact to `.next/standalone`, and re-enabled the lighthouse job. Verified the standalone server boots cleanly with `node .next/standalone/server.js` and responds 200 on `/api/health`.
 
 **Tightening (PR #123):** the original job scored only the root URL with `|| true` (soft-pass at the wrapper level). The job's 404 result was silently masked by the soft-pass — so a real bug landed unnoticed: the `proxy.ts` placeholder from the greenfield bootstrap was redirecting `/` to `/signup`, making the marketing landing page (PR #110) unreachable. Tightening forced that bug into the open. The fix:
-  - New `.lighthouserc.json` with 4 canonical URLs (`/`, `/courses`, `/pricing`, `/login`), real assertion thresholds (a11y + SEO hard-error, perf + best-practices warning), and median aggregation.
-  - `src/proxy.ts`: removed the `/` → `/signup` redirect; the landing page is now reachable for unauthenticated visitors.
-  - Tripwire tests in `src/__tests__/proxy.test.ts` and `src/__tests__/lighthouserc.test.ts` so the change sticks.
+
+- New `.lighthouserc.json` with 4 canonical URLs (`/`, `/courses`, `/pricing`, `/login`), real assertion thresholds (a11y + SEO hard-error, perf + best-practices warning), and median aggregation.
+- `src/proxy.ts`: removed the `/` → `/signup` redirect; the landing page is now reachable for unauthenticated visitors.
+- Tripwire tests in `src/__tests__/proxy.test.ts` and `src/__tests__/lighthouserc.test.ts` so the change sticks.
 
 **Bundling fix (PR #124):** the first PR-#123 run surfaced a deeper bug: 14 of 14 Lighthouse runs scored 0 on `errors-in-console` because every CSS chunk, font, and favicon was 404ing. The standalone `server.js` reads static files from `.next/standalone/.next/static/` and `.next/standalone/public/` — not from the project root. The CI workflow was uploading `.next/standalone`, `.next/static`, and `public/` as separate paths and relying on relative resolution that doesn't actually work. Fix:
-  - Added a `Copy static assets into standalone bundle` step to the build job: `cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public`.
-  - Reduced the upload path to `.next/standalone` (the bundle is now self-contained).
-  - Added `src/__tests__/ci-workflow.test.ts` with 6 tripwire tests that pin the contract (the copy steps must run, the upload path must be just `.next/standalone`, the server must boot from `.next/standalone/server.js`, the lhci command must read the config file).
+
+- Added a `Copy static assets into standalone bundle` step to the build job: `cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public`.
+- Reduced the upload path to `.next/standalone` (the bundle is now self-contained).
+- Added `src/__tests__/ci-workflow.test.ts` with 6 tripwire tests that pin the contract (the copy steps must run, the upload path must be just `.next/standalone`, the server must boot from `.next/standalone/server.js`, the lhci command must read the config file).
 
 The wrapper still has `|| true` (a soft-pass at the shell level) so a regression on a new URL doesn't block the build on the first run; the assertion results still surface in the GitHub Actions summary. Tighten to a hard-fail (drop `|| true`) once the baseline is stable.
 
@@ -53,15 +57,18 @@ This is the standard Next.js production deployment pattern and is what Vercel it
 ## Consequences
 
 **Positive:**
+
 - PR #101 (E2E fix) can merge cleanly. The handoff is unblocked.
 - We stop thrashing on the bundler artifact issue. Eight failed fix attempts (commits 9dac705, 1e67282, 1164f6b, 78c694d, fe54fd3, 10abec4, 56825d7, ae5c467) didn't make progress.
 - The Vercel deployment (https://amph-v2-greenfield.vercel.app) is unaffected — Vercel handles its own bundling for its runtime, separate from our CI artifact flow.
 
 **Negative:**
+
 - We lose automated Lighthouse checks on every PR until the standalone fix lands. Performance regressions and accessibility issues won't be caught at PR time.
 - A real performance regression would only be caught by manual Lighthouse runs against the Vercel deployment.
 
 **Mitigation:**
+
 - The deployed app is on a public URL (https://amph-v2-greenfield.vercel.app) so anyone can run Lighthouse against it manually in devtools.
 - The architecture tests + unit/integration tests still catch the SOLID compliance regressions.
 - The follow-up is small (a few hours of work) and tracked in the handoff.
@@ -81,7 +88,7 @@ This is the standard Next.js production deployment pattern and is what Vercel it
 ```ts
 // next.config.ts
 const nextConfig: NextConfig = {
-  output: 'standalone',  // <-- add this
+  output: "standalone", // <-- add this
   // ...existing config
 };
 ```
