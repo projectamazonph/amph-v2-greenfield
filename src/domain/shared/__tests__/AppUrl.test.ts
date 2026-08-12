@@ -24,10 +24,10 @@ afterEach(() => {
 });
 
 describe("buildAppUrl", () => {
-  it("returns an absolute https URL when the env var has no scheme (the bug)", () => {
+  it("replaces the retired Vercel hostname with the live Academy hostname", () => {
     process.env["NEXT_PUBLIC_APP_URL"] = "amph-v2-greenfield.vercel.app";
     const url = buildAppUrl("/reset-password/abc");
-    expect(url).toBe("https://amph-v2-greenfield.vercel.app/reset-password/abc");
+    expect(url).toBe("https://projectamazonph.vercel.app/reset-password/abc");
   });
 
   it("defaults to http://localhost:3000 when the env var is unset", () => {
@@ -47,10 +47,10 @@ describe("buildAppUrl", () => {
     expect(url).toBe("http://127.0.0.1:3000/verify-email?token=xyz");
   });
 
-  it("preserves an explicit https:// scheme", () => {
+  it("replaces the retired hostname when it includes an https scheme", () => {
     process.env["NEXT_PUBLIC_APP_URL"] = "https://amph-v2-greenfield.vercel.app";
     const url = buildAppUrl("/reset-password/abc");
-    expect(url).toBe("https://amph-v2-greenfield.vercel.app/reset-password/abc");
+    expect(url).toBe("https://projectamazonph.vercel.app/reset-password/abc");
   });
 
   it("preserves an explicit http:// scheme", () => {

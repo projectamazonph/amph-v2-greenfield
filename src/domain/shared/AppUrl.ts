@@ -8,7 +8,7 @@
  *   - Used by auth use cases that need to construct absolute links
  *     to put in outbound emails.
  *
- * Hardening (fixes the "Forgot password" broken-link bug):
+ * Hardening:
  *   If `NEXT_PUBLIC_APP_URL` is set without a scheme (e.g.
  *   `amph-v2-greenfield.vercel.app`), browsers read the resulting
  *   `amph-v2-greenfield.vercel.app/reset-password/...` as a relative
@@ -16,9 +16,13 @@
  *   scheme is present, and `http://` only when the host is explicitly
  *   `localhost` / `127.0.0.1` (so dev still works without a scheme).
  *
- *   See: PR #211, which shipped the email-body fix; this closes the
- *   related env-var gap.
+ *   The original Vercel hostname was retired after the production app
+ *   moved to `projectamazonph.vercel.app`. Normalize that stale value so
+ *   transactional emails cannot send users to DEPLOYMENT_NOT_FOUND.
  */
+const RETIRED_PRODUCTION_ORIGIN = "https://amph-v2-greenfield.vercel.app";
+const LIVE_PRODUCTION_ORIGIN = "https://projectamazonph.vercel.app";
+
 export function buildAppUrl(path: string): string {
   const raw = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
   const hasProtocol = /^https?:\/\//i.test(raw);
@@ -28,6 +32,8 @@ export function buildAppUrl(path: string): string {
       ? `http://${raw}`
       : `https://${raw}`;
   const base = withProtocol.replace(/\/+$/, "");
+  const canonicalBase =
+    base.toLowerCase() === RETIRED_PRODUCTION_ORIGIN ? LIVE_PRODUCTION_ORIGIN : base;
   const suffix = path.startsWith("/") ? path : `/${path}`;
-  return `${base}${suffix}`;
+  return `${canonicalBase}${suffix}`;
 }
