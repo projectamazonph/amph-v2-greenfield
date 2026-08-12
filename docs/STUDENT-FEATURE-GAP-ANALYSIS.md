@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-12 against `ee1737a`
+**Last verified:** 2026-08-13 against the student-event coverage branch
 
 **Repository:** `amph-v2-greenfield`
 
@@ -38,7 +38,9 @@ checks, TypeScript, ESLint, production build, Playwright, and Lighthouse.
 
 - TypeScript: pass.
 - ESLint: pass.
-- Full Vitest suite: 3,816 passing and 2 intentionally skipped.
+- Full Vitest suite: 3,848 passing and 2 intentionally skipped.
+- Student event boundary coverage is documented in
+  `docs/STUDENT-EVENT-COVERAGE.md`.
 - Architecture suite: 665 passing, including design-token and loading-state
   contracts.
 - Next.js production build: pass with 94 application routes.
