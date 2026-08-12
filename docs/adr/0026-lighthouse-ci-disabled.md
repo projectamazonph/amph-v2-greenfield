@@ -2,11 +2,10 @@
 
 **Current note (2026-08-12):** Lighthouse CI is enabled and passed the PR #305 gate. The canonical deployment is <https://projectamazonph.vercel.app>. Older deployment URLs below are retained as historical context.
 
-**Status:** Accepted (workaround) — 2026-07-20
-**Status:** Updated (fix landed) — 2026-07-20
-**Status:** Tightened (multi-URL, thresholded) — 2026-07-21
+**Status:** Superseded by the re-enabled, thresholded Lighthouse CI configuration
+**Historical status:** Disabled as a workaround on 2026-07-20, then re-enabled and tightened on 2026-07-21
 **Context:** Lighthouse CI job was failing in the GitHub Actions runner.
-**Decision:** Disable the Lighthouse CI job and document the root cause. Fix properly in a follow-up using Next.js's `output: 'standalone'` configuration.
+**Historical decision:** Disable Lighthouse CI temporarily and document the root cause. The active decision is the later fix: use Next.js `output: 'standalone'`, package static assets into that bundle, and run thresholded Lighthouse checks.
 **Supersedes:** None
 **Superseded by:** None
 **Fix (PR #116):** added `output: 'standalone'` to `next.config.ts`, switched the build artifact to `.next/standalone`, and re-enabled the lighthouse job. Verified the standalone server boots cleanly with `node .next/standalone/server.js` and responds 200 on `/api/health`.

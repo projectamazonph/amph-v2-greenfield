@@ -154,7 +154,7 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 | STORY-059 | Production deploy (operator executes the runbook)                            | 1   | ✅ done; canonical production is `https://projectamazonph.vercel.app`                           |
 | STORY-060 | Launch communications (Facebook, LinkedIn, Resend broadcast, internal Slack) | 1   | ⏳ operator-owned                                                                               |
 
-**Sprint 12 status:** STORY-056 and STORY-059 are recorded as complete in the historical plan. STORY-057, STORY-058, and STORY-060 remain operator-owned. The repository now contains 20 migrations and a `db:seed:admin` script; the deployment, database contents, webhook registration, and launch communications were not independently verified in the 2026-07-27 repository audit.
+**Sprint 12 status:** STORY-056 and STORY-059 are recorded as complete in the historical plan. STORY-057, STORY-058, and STORY-060 remain operator-owned. The repository now contains 35 migrations and a `db:seed:admin` script. The canonical deployment is `https://projectamazonph.vercel.app`; database contents, webhook registration, and launch communications remain operator checks.
 
 **Production reference:** `SESSION-HANDOVER.md` contains the operator-reported deployment notes. Treat them as operational handoff material, not as a substitute for a live smoke test.
 

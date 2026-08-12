@@ -41,7 +41,7 @@
 
 ## Verification
 
-- `GET /api/health` returns healthy against the restored/promoted database.
+- `GET /api/health/ready` returns healthy against the restored or promoted database.
 - Smoke test the golden path: `/`, `/login`, a course page, `/dashboard` for a known test account.
 - Spot-check the specific records that motivated the restore.
 - Confirm `webhook_events` and `orders` around the restore boundary look consistent — a restore can leave an order `PENDING` if its `PAID` transition happened after the restore point; reconcile those against PayMongo's dashboard using the same procedure as `docs/runbooks/paymongo-outage.md`.

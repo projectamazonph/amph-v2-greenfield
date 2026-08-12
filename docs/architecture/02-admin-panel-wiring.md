@@ -28,6 +28,7 @@ flowchart LR
 | Live classes   | `/admin/live-classes` and create/edit pages                                 | Implemented for admin CRUD and reminder scheduling                                                |
 | Discount codes | `/admin/discount-codes` and create/edit pages                               | Implemented                                                                                       |
 | Badges         | `/admin/badges` and create/edit pages                                       | Prisma list, create, update, and archive are implemented                                          |
+| Resources      | `/admin/resources`, `/admin/resources/new`, `/admin/resources/[id]/edit`    | Download-center CRUD and file upload are implemented                                              |
 | Audit log      | `/admin/audit-log`, `/admin/audit-log/export`                               | Implemented, filter/list/export paths are wired                                                   |
 | Settings       | `/admin/settings`, `/admin/settings/2fa-setup`                              | TOTP and environment status implemented; general settings remain future work                      |
 

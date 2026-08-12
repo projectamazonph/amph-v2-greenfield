@@ -91,7 +91,7 @@ All pages under `/admin` inherit `requireAdmin()` from `src/app/admin/layout.tsx
 - `/admin/audit-log`
 - `/admin/settings`, `/admin/settings/2fa-setup`
 
-There is no `src/app/admin/settings/email-templates` page in the current tree. Email-template entity and use-case code is backend-only until a UI story is implemented.
+Email-template UI routes are `/admin/email-templates` and `/admin/email-templates/[type]/edit`. They are linked from the admin navigation and save through `UpdateEmailTemplate`.
 
 ### Route handlers
 

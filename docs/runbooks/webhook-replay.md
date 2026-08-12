@@ -6,7 +6,7 @@
 
 **Canonical production origin:** `https://projectamazonph.vercel.app`
 
-Replay does not repair every partial state. If the original delivery persisted the order as PAID and enrollment then failed, the handler returns early on replay. Confirm the payment and repair access through the audited admin tier-grant flow.
+Replay does not repair every partial state. If the original delivery persisted the order as PAID and enrollment then failed, the handler returns early on replay. Confirm the payment and use the audited admin tier-grant flow, which creates the eligible published-course Enrollment rows rather than only updating `subscriptionTier`.
 
 ## Symptoms
 

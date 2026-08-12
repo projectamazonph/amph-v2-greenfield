@@ -94,7 +94,7 @@ Each state is a column on `Order.status` and `Enrollment.status`. Discriminated 
 
 ### Student request window (7 days)
 
-```
+```text
 1. User opens `/profile/purchases` and submits the refund server action.
 2. RequestRefund use case:
    a. Loads order (IOrderRepository)
@@ -104,11 +104,11 @@ Each state is a column on `Order.status` and `Enrollment.status`. Discriminated 
 
 ### Outside Window (Admin Override)
 
-```
+```text
 1. Admin opens /admin/refunds/[orderId]
 2. Clicks "Issue refund (override)"
 3. Enters reason (20+ chars, validated)
-4. ProcessRefund use case:
+4. RefundOverride use case:
    a. Calls the real PayMongo Refunds API through `IPaymentGateway`.
    b. Updates the Order and revokes course access.
    c. Records the audited actor, target, and reason.
@@ -141,21 +141,21 @@ export interface IAccessPolicy {
 }
 ```
 
-| Resource                | Foundations   | Mastery       | Ultimate      | Admin                                  |
-| ----------------------- | ------------- | ------------- | ------------- | -------------------------------------- |
-| Foundations course      | yes           | yes           | yes           | yes                                    |
-| Mastery course          | no            | yes           | yes           | yes                                    |
-| Ultimate course         | no            | no            | yes           | yes                                    |
-| All-access pass holders | yes           | yes           | yes           | yes                                    |
-| Campaign Builder        | yes           | yes           | yes           | yes                                    |
-| Bid Elevator            | yes           | yes           | yes           | yes                                    |
-| STR Triage              | yes           | yes           | yes           | yes                                    |
-| Listing Audit           | no            | yes           | yes           | yes                                    |
-| Keyword Research        | no            | yes           | yes           | yes                                    |
-| Live classes (RSVP)     | no            | no            | yes           | yes                                    |
-| Recordings archive      | no            | no            | yes           | yes                                    |
-| Certificate download    | on completion | on completion | on completion | n/a                                    |
-| `/admin/*`              | no            | no            | no            | yes (super_admin only for impersonate) |
+| Resource                | Foundations   | Mastery       | Ultimate      | Admin                                      |
+| ----------------------- | ------------- | ------------- | ------------- | ------------------------------------------ |
+| Foundations course      | yes           | yes           | yes           | yes                                        |
+| Mastery course          | no            | yes           | yes           | yes                                        |
+| Ultimate course         | no            | no            | yes           | yes                                        |
+| All-access pass holders | yes           | yes           | yes           | yes                                        |
+| Campaign Builder        | yes           | yes           | yes           | yes                                        |
+| Bid Elevator            | yes           | yes           | yes           | yes                                        |
+| STR Triage              | yes           | yes           | yes           | yes                                        |
+| Listing Audit           | no            | yes           | yes           | yes                                        |
+| Keyword Research        | no            | yes           | yes           | yes                                        |
+| Live classes (RSVP)     | no            | no            | yes           | yes                                        |
+| Recordings archive      | no            | no            | yes           | yes                                        |
+| Certificate download    | on completion | on completion | on completion | n/a                                        |
+| `/admin/*`              | no            | no            | no            | yes; ADMIN can impersonate non-admin users |
 
 The `IAccessPolicy` implementation is a single class that reads from the registry and the user's enrollments. It is the only place these rules are encoded. UI and server actions both ask it, so the rule lives in one place. ISP, DIP.
 

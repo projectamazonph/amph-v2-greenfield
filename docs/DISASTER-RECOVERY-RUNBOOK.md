@@ -20,10 +20,10 @@
 
 ### Current State
 
-- **No automated backup scripts in the repo.** Backups are managed at the database provider level.
-- **Action required:** Verify which provider hosts production and confirm backup settings.
+- **Production provider:** Neon. Backups and point-in-time recovery are managed in the Neon project.
+- **No automated backup scripts in the repo.** Confirm the production branch's current retention before an incident.
 
-### Supabase
+### Historical Supabase notes
 
 - **Daily backups:** Automatic on Pro plan (7-day retention).
 - **Point-in-time recovery (PITR):** Available on Pro+ plan.
@@ -39,7 +39,7 @@
   pg_dump "$DATABASE_URL" > backup_$(date +%Y%m%d_%H%M%S).sql
   ```
 
-### Restore Procedure (Either Provider)
+### Restore procedure (Neon)
 
 ```bash
 # 1. Set the target database URL
@@ -55,7 +55,7 @@ pnpm import:content
 pnpm db:seed:tiers
 
 # 5. Verify health check
-curl -f https://your-domain.com/api/health
+curl -f https://projectamazonph.vercel.app/api/health/ready
 ```
 
 ---

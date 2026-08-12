@@ -38,13 +38,12 @@ checks, TypeScript, ESLint, production build, Playwright, and Lighthouse.
 
 - TypeScript: pass.
 - ESLint: pass.
-- Full Vitest suite: 3,804 passing and 2 intentionally skipped.
+- Full Vitest suite: 3,816 passing and 2 intentionally skipped.
 - Architecture suite: 665 passing, including design-token and loading-state
   contracts.
 - Next.js production build: pass with 94 application routes.
 - Prisma schema and migration contracts: pass in the full test suite.
-- Local Playwright server launch: blocked by the workspace network-interface
-  restriction. GitHub CI is the browser authority for this repair.
+- Playwright and Lighthouse: passed in GitHub CI.
 
 ## Release verification still required
 

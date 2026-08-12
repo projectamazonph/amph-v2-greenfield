@@ -35,7 +35,7 @@ src/app/admin/
 │   ├── page.tsx                      # list + search + filter
 │   └── [id]/
 │       ├── page.tsx                  # user detail
-│       └── impersonate.action.ts     # super-admin only (server action)
+│       └── impersonate.action.ts     # admin can impersonate non-admin users
 ├── courses/
 │   ├── page.tsx
 │   ├── new/page.tsx                  # create course
@@ -134,7 +134,7 @@ Table columns:
 | ------------ | -------- | ------------------------------------------------------------- |
 | Email        | yes      | search                                                        |
 | Display name | yes      | search                                                        |
-| Role         | yes      | select (STUDENT / ADMIN / SUPER_ADMIN)                        |
+| Role         | yes      | select (STUDENT / INSTRUCTOR / ADMIN)                         |
 | Created      | yes      | date range                                                    |
 | Last seen    | yes      | date range                                                    |
 | Current tier | yes      | select (none / foundations / mastery / ultimate / all-access) |
@@ -163,9 +163,9 @@ Sections:
 - **Audit log (as actor)** — all audit-log entries where this user was the actor.
 - **Audit log (as target)** — all entries where this user was the target.
 
-### Impersonate (super-admin only)
+### Impersonate
 
-`/admin/users/[id]/impersonate` is a server action (`impersonate.action.ts`). Sets a short-lived (1 hour) "impersonation" JWT with `impersonatorId` claim. The original admin's role is preserved; the impersonator's actions are logged with both `actorId` and `onBehalfOfId`. Stop-impersonating is one click in a persistent banner.
+An ADMIN can impersonate a STUDENT or INSTRUCTOR, but not another ADMIN. The action preserves the original admin session in a separate secure cookie, logs the impersonation, and plants the target user's session. Stopping impersonation restores the original admin session from that cookie.
 
 ## Courses
 
@@ -330,37 +330,37 @@ Form: refundWindowDays, earlyBirdLimit, earlyBirdPriceMinor, featureFlags (JSON 
 
 Admin TOTP enrollment flow. Admins can opt in to 2FA via an authenticator app. There is no enforcement that all admins must use 2FA — it is currently opt-in only.
 
-> **Note:** Email template management at `/admin/settings/email-templates` is planned (STORY-063). The page does not yet exist.
+Email templates are managed at `/admin/email-templates` and `/admin/email-templates/[type]/edit`. Saves use `UpdateEmailTemplate` and affect all seven Resend send paths.
 
 ## Audit Log: What Gets Logged
 
 Every admin mutation. The use case writes the entry; the adapter persists it. The user detail page reads both "actor" and "target" entries.
 
-| Action                          | Audit log entry                                                                                         |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Admin updates user              | `action: "user.updated"`, `targetType: "User"`, `targetId: userId`, `metadata: { changes }`             |
-| Admin changes role              | `action: "user.role_changed"`, `metadata: { from, to }`                                                 |
-| Admin issues refund override    | `action: "refund.override"`, `targetType: "Order"`, `targetId: orderId`, `metadata: { reason, amount }` |
-| Admin marks order fraud         | `action: "order.flagged"`, `targetType: "Order"`, `targetId`, `metadata: { reason }`                    |
-| Admin updates course            | `action: "course.updated"`, `targetType: "Course"`, `targetId`, `metadata: { changes }`                 |
-| Admin creates discount code     | `action: "discount_code.created"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { code }`       |
-| Admin updates discount code     | `action: "discount_code.updated"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { changes }`    |
-| Admin creates badge             | `action: "badge.created"`, ...                                                                          |
-| Admin revokes badge             | `action: "badge.revoked"`, `targetType: "BadgeAward"`, `targetId`, `metadata: { reason }`               |
-| Admin issues certificate        | `action: "certificate.issued"`, ...                                                                     |
-| Admin revokes certificate       | `action: "certificate.revoked"`, ...                                                                    |
-| Admin creates live class        | `action: "live_class.created"`, ...                                                                     |
-| Admin sets recording            | `action: "live_class.recording_set"`, ...                                                               |
-| Admin marks attendance          | `action: "live_class.attendance_marked"`, ...                                                           |
-| Admin updates settings          | `action: "settings.updated"`, `metadata: { changes }`                                                   |
-| Admin impersonates user         | `action: "user.impersonated"`, `metadata: { onBehalfOfId, expiresAt }`                                  |
-| Super-admin stops impersonation | `action: "user.impersonation_ended"`, ...                                                               |
-| Auth: sign-in success           | `action: "auth.signed_in"`, `targetType: "User"`, `targetId: userId`, `metadata: { ip, userAgent }`     |
-| Auth: sign-in failure           | `action: "auth.signin_failed"`, `metadata: { email, ip, reason }`                                       |
-| Auth: password reset requested  | `action: "auth.password_reset_requested"`, ...                                                          |
-| Auth: password reset completed  | `action: "auth.password_reset_completed"`, ...                                                          |
-| Auth: email verified            | `action: "auth.email_verified"`, ...                                                                    |
-| Order: any state change         | `action: "order.<status>"`, ...                                                                         |
+| Action                         | Audit log entry                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Admin updates user             | `action: "user.updated"`, `targetType: "User"`, `targetId: userId`, `metadata: { changes }`             |
+| Admin changes role             | `action: "user.role_changed"`, `metadata: { from, to }`                                                 |
+| Admin issues refund override   | `action: "refund.override"`, `targetType: "Order"`, `targetId: orderId`, `metadata: { reason, amount }` |
+| Admin marks order fraud        | `action: "order.flagged"`, `targetType: "Order"`, `targetId`, `metadata: { reason }`                    |
+| Admin updates course           | `action: "course.updated"`, `targetType: "Course"`, `targetId`, `metadata: { changes }`                 |
+| Admin creates discount code    | `action: "discount_code.created"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { code }`       |
+| Admin updates discount code    | `action: "discount_code.updated"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { changes }`    |
+| Admin creates badge            | `action: "badge.created"`, ...                                                                          |
+| Admin revokes badge            | `action: "badge.revoked"`, `targetType: "BadgeAward"`, `targetId`, `metadata: { reason }`               |
+| Admin issues certificate       | `action: "certificate.issued"`, ...                                                                     |
+| Admin revokes certificate      | `action: "certificate.revoked"`, ...                                                                    |
+| Admin creates live class       | `action: "live_class.created"`, ...                                                                     |
+| Admin sets recording           | `action: "live_class.recording_set"`, ...                                                               |
+| Admin marks attendance         | `action: "live_class.attendance_marked"`, ...                                                           |
+| Admin updates settings         | `action: "settings.updated"`, `metadata: { changes }`                                                   |
+| Admin impersonates user        | `action: "user.impersonated"`, `metadata: { onBehalfOfId, expiresAt }`                                  |
+| Admin stops impersonation      | `action: "user.impersonation_ended"`, ...                                                               |
+| Auth: sign-in success          | `action: "auth.signed_in"`, `targetType: "User"`, `targetId: userId`, `metadata: { ip, userAgent }`     |
+| Auth: sign-in failure          | `action: "auth.signin_failed"`, `metadata: { email, ip, reason }`                                       |
+| Auth: password reset requested | `action: "auth.password_reset_requested"`, ...                                                          |
+| Auth: password reset completed | `action: "auth.password_reset_completed"`, ...                                                          |
+| Auth: email verified           | `action: "auth.email_verified"`, ...                                                                    |
+| Order: any state change        | `action: "order.<status>"`, ...                                                                         |
 
 ## What Lives Where
 

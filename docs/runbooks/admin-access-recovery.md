@@ -116,4 +116,4 @@ Do these in order:
 
 ## Postmortem
 
-Required if this was a compromise (not required for a routine "forgot password" recovery). Cover: how the account was compromised, what actions were taken while compromised (from the audit log), and whether admin 2FA (currently absent — see `docs/audit-2026-07-26-hardening-review.md`'s follow-up list) would have prevented it.
+Required if this was a compromise, but not for a routine forgot-password recovery. Cover how the account was compromised, what actions were taken while compromised, whether the admin had opt-in TOTP enabled, and whether mandatory 2FA policy would have reduced the risk.

@@ -76,7 +76,7 @@ All `/admin/*` pages inherit the `requireAdmin()` gate in `src/app/admin/layout.
 - `/admin/settings`
 - `/admin/settings/2fa-setup`
 
-There is no current admin email-template page under `src/app/admin`, despite the entity, repository, and use cases for email templates.
+Email-template management is available at `/admin/email-templates` and `/admin/email-templates/[type]/edit`, linked from the admin navigation and saved through the update action.
 
 ## Route handlers and server endpoints
 
@@ -85,6 +85,7 @@ There is no current admin email-template page under `src/app/admin`, despite the
 - `/api/auth/logout`
 - `/api/auth/admin-login`
 - `/api/health`
+- `/api/health/ready`
 - `/api/cron/live-class-reminders`
 - `/api/quizzes/[quizId]/attempt`
 - `/api/webhooks/paymongo`
@@ -92,7 +93,7 @@ There is no current admin email-template page under `src/app/admin`, despite the
 - `/admin/audit-log/export`
 - `/certificates/[hash]/pdf`
 
-The health endpoint runs `courseRepo.listAll()` as a DB readiness probe to verify Postgres connectivity. The live-class cron requires `CRON_SECRET`; `vercel.json` schedules it daily at `0 8 * * *`.
+`/api/health` is a static liveness response. `/api/health/ready` probes Postgres through the database health-check port. The live-class cron requires `CRON_SECRET`; `vercel.json` schedules it daily at `0 8 * * *`.
 
 ## Server actions
 
