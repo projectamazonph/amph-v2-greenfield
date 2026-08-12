@@ -129,8 +129,8 @@ describe("admin server-action wrappers", () => {
       title: "Guide",
       description: "A guide",
       category: "guide",
-      fileType: "PDF",
-      accessTier: "FREE",
+      fileType: "pdf",
+      accessTier: "PREVIEW",
     });
     expect(result).toEqual({ ok: false, error: { kind: "invalid_file_url" } });
     expect(mocks.execute).not.toHaveBeenCalled();
