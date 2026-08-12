@@ -4,6 +4,16 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-13: Admin event boundary coverage
+
+- Added direct boundary tests for admin course, module, lesson, simulator,
+  subscription, discount, badge, live-class, resource, audit-log, refund, and
+  email-template actions.
+- Added event contracts for stop-impersonation recovery, confirmation submit,
+  and the impersonation banner.
+- Added `docs/ADMIN-EVENT-COVERAGE.md` plus an inventory test that keeps every
+  tracked admin action represented by a boundary test.
+
 ### 2026-08-13: Student event boundary coverage
 
 - Added direct tests for remaining student auth, account, live-class, simulator,
