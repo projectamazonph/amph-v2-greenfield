@@ -21,9 +21,7 @@ export interface PasswordResetRecord {
   readonly createdAt: Date;
 }
 
-export type PasswordResetError =
-  | { kind: "not_found" }
-  | { kind: "db_error"; message: string };
+export type PasswordResetError = { kind: "not_found" } | { kind: "db_error"; message: string };
 
 export interface PasswordResetRepository {
   /**
@@ -38,21 +36,18 @@ export interface PasswordResetRepository {
   /**
    * Look up a reset record by its (hashed) token.
    */
-  findByTokenHash(
-    tokenHash: string,
-  ): Promise<Result<PasswordResetRecord, PasswordResetError>>;
+  findByTokenHash(tokenHash: string): Promise<Result<PasswordResetRecord, PasswordResetError>>;
 
   /**
-   * Mark a token as used. Idempotent (filter on usedAt IS NULL).
+   * Atomically claim a token. `marked` is false when another request
+   * already consumed the token.
    */
-  markUsed(id: string): Promise<Result<void, PasswordResetError>>;
+  markUsed(id: string): Promise<Result<{ marked: boolean }, PasswordResetError>>;
 
   /**
    * Mark all of a user's existing tokens as used. Called when
    * a new reset is requested so only the latest token works.
    * Returns the number of rows affected.
    */
-  invalidateAllForUser(
-    userId: string,
-  ): Promise<Result<{ count: number }, PasswordResetError>>;
+  invalidateAllForUser(userId: string): Promise<Result<{ count: number }, PasswordResetError>>;
 }

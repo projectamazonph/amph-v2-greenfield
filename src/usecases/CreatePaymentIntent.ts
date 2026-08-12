@@ -139,7 +139,13 @@ export class CreatePaymentIntent {
         ok: false,
         error: { kind: "invalid_transition", message: markResult.error.message },
       };
-    await orderRepo.update(order);
+    const updateResult = await orderRepo.update(order);
+    if (Result.isErr(updateResult)) {
+      return {
+        ok: false,
+        error: { kind: "payment_error", message: "Could not save order" },
+      };
+    }
 
     return { ok: true, checkoutUrl: checkoutResult.value.url, orderId: order.id };
   }

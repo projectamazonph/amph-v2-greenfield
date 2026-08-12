@@ -7,8 +7,8 @@
 "use server";
 
 import { Result } from "@/domain/shared/Result";
-import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
 import { buildContainer } from "@/composition/container";
+import { getSessionUser } from "@/lib/auth";
 
 export interface GradeSimulatorAttemptResponse {
   attemptId?: string;
@@ -23,9 +23,6 @@ export async function gradeSimulatorAttemptAction(
   _prevState: unknown,
   formData: FormData,
 ): Promise<GradeSimulatorAttemptResponse> {
-  const container = buildContainer();
-  const useCase = container.gradeSimulatorAttempt;
-
   const attemptId = formData.get("attemptId");
   const scoreDimensionsRaw = formData.get("scoreDimensions");
 
@@ -36,6 +33,16 @@ export async function gradeSimulatorAttemptAction(
     return { error: "validation_error: scoreDimensions is required" };
   }
 
+  const user = await getSessionUser();
+  if (!user) return { error: "unauthenticated" };
+
+  const container = buildContainer();
+  const attemptResult = await container.simulatorAttemptRepo.findByAttemptId(attemptId);
+  if (!attemptResult.ok) return { error: "internal_error" };
+  if (attemptResult.value !== null && attemptResult.value.userId !== user.id) {
+    return { error: "forbidden" };
+  }
+
   let scoreDimensions: Record<string, number>;
   try {
     scoreDimensions = JSON.parse(scoreDimensionsRaw) as Record<string, number>;
@@ -43,7 +50,7 @@ export async function gradeSimulatorAttemptAction(
     return { error: "validation_error: scoreDimensions must be valid JSON" };
   }
 
-  const result = await useCase.execute({ attemptId, scoreDimensions });
+  const result = await container.gradeSimulatorAttempt.execute({ attemptId, scoreDimensions });
 
   if (Result.isErr(result)) {
     const err = result.error as { kind: string };

@@ -14,9 +14,7 @@ import { Result } from "@/domain/shared/Result";
 let _seq = 0;
 const nextId = (): string => `password-reset-${++_seq}-${Date.now().toString(36)}`;
 
-export class InMemoryPasswordResetRepository
-  implements PasswordResetRepository
-{
+export class InMemoryPasswordResetRepository implements PasswordResetRepository {
   private records = new Map<string, PasswordResetRecord>();
   private byHash = new Map<string, string>();
 
@@ -53,15 +51,16 @@ export class InMemoryPasswordResetRepository
     return Result.ok(record);
   }
 
-  async markUsed(id: string): Promise<Result<void, PasswordResetError>> {
+  async markUsed(id: string): Promise<Result<{ marked: boolean }, PasswordResetError>> {
     const record = this.records.get(id);
     if (!record) {
       return Result.err({ kind: "not_found" });
     }
     if (record.usedAt === null) {
       this.records.set(id, { ...record, usedAt: new Date() });
+      return Result.ok({ marked: true });
     }
-    return Result.ok(undefined);
+    return Result.ok({ marked: false });
   }
 
   async invalidateAllForUser(

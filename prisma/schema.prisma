@@ -146,9 +146,11 @@ model Course {
   previewVideo String?
 
   // Meta
-  isPublished  Boolean @default(false)
-  isFeatured   Boolean @default(false)
-  displayOrder Int     @default(0)
+  isPublished        Boolean @default(false)
+  isFeatured         Boolean @default(false)
+  displayOrder       Int     @default(0)
+  courseTier         String  @default("STARTER")
+  previewLessonCount Int     @default(1)
 
   // PayMongo
   paymongoPriceId String?

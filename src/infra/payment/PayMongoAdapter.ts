@@ -181,8 +181,15 @@ export class PayMongoAdapter implements IPaymentGateway {
     }
 
     // Reject stale webhooks (> 5 minutes old)
-    const ageSeconds = Math.floor(Date.now() / 1000) - parseInt(timestamp, 10);
-    if (ageSeconds > 300) {
+    if (!/^\d+$/.test(timestamp)) {
+      return Result.err({ kind: "invalid_signature_format" });
+    }
+    const timestampSeconds = Number(timestamp);
+    if (!Number.isSafeInteger(timestampSeconds)) {
+      return Result.err({ kind: "invalid_signature_format" });
+    }
+    const ageSeconds = Math.floor(Date.now() / 1000) - timestampSeconds;
+    if (Math.abs(ageSeconds) > 300) {
       return Result.err({ kind: "stale_webhook" });
     }
 
@@ -191,7 +198,12 @@ export class PayMongoAdapter implements IPaymentGateway {
     const expectedHmac = createHmac("sha256", webhookSecret).update(signedPayload).digest("hex");
 
     // Constant-time comparison to prevent timing attacks
-    if (!timingSafeEqual(Buffer.from(expectedHmac), Buffer.from(receivedHmac))) {
+    const expectedBuffer = Buffer.from(expectedHmac);
+    const receivedBuffer = Buffer.from(receivedHmac);
+    if (
+      expectedBuffer.length !== receivedBuffer.length ||
+      !timingSafeEqual(expectedBuffer, receivedBuffer)
+    ) {
       return Result.err({ kind: "signature_mismatch" });
     }
 

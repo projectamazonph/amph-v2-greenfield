@@ -6,6 +6,8 @@
  */
 
 import type { Course, Lesson } from "@/domain/entities/Course";
+import type { Lesson as PersistedLesson, LessonType } from "@/domain/entities/Lesson";
+import type { CatalogCourseDetail } from "@/usecases/GetCatalogCourse";
 
 export interface LessonData {
   /** The lesson being viewed. */
@@ -20,6 +22,29 @@ export interface LessonData {
   sectionIndex: number;
   /** 0-based index of the lesson within its section. */
   lessonIndex: number;
+}
+
+/** Build lesson navigation from the authoritative Module/Lesson catalog read model. */
+export function withCatalogCurriculum(
+  course: Course,
+  detail: CatalogCourseDetail,
+  selectedLesson: PersistedLesson,
+): Course {
+  return {
+    ...course,
+    curriculum: {
+      sections: detail.modules.map((module) => ({
+        id: module.id,
+        title: module.title,
+        lessons: module.lessons.map((lesson) => ({
+          id: lesson.id,
+          title: lesson.title,
+          type: lesson.type as LessonType,
+          content: lesson.id === selectedLesson.id ? selectedLesson.content : {},
+        })),
+      })),
+    },
+  };
 }
 
 /**

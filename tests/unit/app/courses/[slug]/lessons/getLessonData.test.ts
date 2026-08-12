@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
 import type { Course } from "@/domain/entities/Course";
-import { getLessonData, nextIncompleteLesson } from "@/app/courses/[slug]/lessons/getLessonData";
+import type { Lesson } from "@/domain/entities/Lesson";
+import type { CatalogCourseDetail } from "@/usecases/GetCatalogCourse";
+import {
+  getLessonData,
+  nextIncompleteLesson,
+  withCatalogCurriculum,
+} from "@/app/courses/[slug]/lessons/getLessonData";
 
 /**
  * Tests for the getLessonData helper.
@@ -23,16 +29,36 @@ function makeCourse(lessonIds: string[]): Course {
           id: "section_01",
           title: "Section 1",
           lessons: [
-            { id: lessonIds[0], title: "Lesson 1-1", type: "TEXT", content: { type: "TEXT", body: "" } },
-            { id: lessonIds[1], title: "Lesson 1-2", type: "TEXT", content: { type: "TEXT", body: "" } },
+            {
+              id: lessonIds[0],
+              title: "Lesson 1-1",
+              type: "TEXT",
+              content: { type: "TEXT", body: "" },
+            },
+            {
+              id: lessonIds[1],
+              title: "Lesson 1-2",
+              type: "TEXT",
+              content: { type: "TEXT", body: "" },
+            },
           ],
         },
         {
           id: "section_02",
           title: "Section 2",
           lessons: [
-            { id: lessonIds[2], title: "Lesson 2-1", type: "TEXT", content: { type: "TEXT", body: "" } },
-            { id: lessonIds[3], title: "Lesson 2-2", type: "TEXT", content: { type: "TEXT", body: "" } },
+            {
+              id: lessonIds[2],
+              title: "Lesson 2-1",
+              type: "TEXT",
+              content: { type: "TEXT", body: "" },
+            },
+            {
+              id: lessonIds[3],
+              title: "Lesson 2-2",
+              type: "TEXT",
+              content: { type: "TEXT", body: "" },
+            },
           ],
         },
       ],
@@ -104,6 +130,64 @@ describe("getLessonData", () => {
     const course = makeCourse(["les_01", "les_02", "les_03", "les_04"]);
     expect(getLessonData(course, "les_01")!.lessonIndex).toBe(0);
     expect(getLessonData(course, "les_02")!.lessonIndex).toBe(1);
+  });
+});
+
+describe("withCatalogCurriculum", () => {
+  it("uses catalog rows for navigation and selected persisted content", () => {
+    const course = makeCourse(["legacy-1", "legacy-2", "legacy-3", "legacy-4"]);
+    const detail = {
+      courseId: course.id,
+      slug: course.slug,
+      title: course.title,
+      tagline: course.tagline,
+      description: course.description,
+      priceMinor: course.price.minor,
+      currency: "PHP",
+      coverImage: null,
+      status: "PUBLISHED",
+      totalLessonCount: 2,
+      totalEstimatedMinutes: 0,
+      modules: [
+        {
+          id: "module-1",
+          title: "Current module",
+          displayOrder: 1,
+          lessons: [
+            {
+              id: "lesson-current",
+              title: "Current lesson",
+              type: "TEXT",
+              estimatedMinutes: 0,
+              displayOrder: 1,
+            },
+            {
+              id: "lesson-next",
+              title: "Next lesson",
+              type: "VIDEO",
+              estimatedMinutes: 5,
+              displayOrder: 2,
+            },
+          ],
+        },
+      ],
+    } satisfies CatalogCourseDetail;
+    const selectedLesson = {
+      id: "lesson-current",
+      moduleId: "module-1",
+      title: "Current lesson",
+      type: "TEXT",
+      content: { body: "persisted" },
+      displayOrder: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Lesson;
+    const result = withCatalogCurriculum(course, detail, selectedLesson);
+    expect(result.curriculum.sections[0]?.lessons.map((lesson) => lesson.id)).toEqual([
+      "lesson-current",
+      "lesson-next",
+    ]);
+    expect(result.curriculum.sections[0]?.lessons[0]?.content).toEqual({ body: "persisted" });
   });
 });
 

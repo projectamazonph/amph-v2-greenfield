@@ -25,15 +25,27 @@
  */
 
 import { NextResponse } from "next/server";
-import { clearAuthCookie } from "@/lib/auth";
+import { clearAuthCookie, getSessionCookieName } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
 
 export function extractSessionToken(request: Request): string {
   const cookieHeader = request.headers.get("cookie") ?? "";
-  // The session cookie name is the standard Next.js cookie name set
-  // by setAuthCookie() in src/lib/auth.ts.
-  const match = cookieHeader.match(/(?:^|;\s*)amph_session=([^;]+)/);
-  return match && match[1] ? decodeURIComponent(match[1]) : "";
+  const currentName = getSessionCookieName();
+  const alternateName = currentName === "amph_session" ? "__Secure-amph_session" : "amph_session";
+  const values = new Map(
+    cookieHeader.split(";").flatMap((part) => {
+      const separator = part.indexOf("=");
+      if (separator < 0) return [];
+      return [[part.slice(0, separator).trim(), part.slice(separator + 1)]] as const;
+    }),
+  );
+  const rawToken = values.get(currentName) ?? values.get(alternateName);
+  if (!rawToken) return "";
+  try {
+    return decodeURIComponent(rawToken);
+  } catch {
+    return rawToken;
+  }
 }
 
 export async function POST(request: Request): Promise<Response> {
