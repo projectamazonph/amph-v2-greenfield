@@ -1,50 +1,45 @@
-# Loop State — AMPH v2
+# Current project state
 
-**Project:** Amazon PH Academy v2
-**Last updated:** 2026-07-23
-**Last loop run:** 2026-07-23
+**Project:** Project Amazon PH Academy v2
+**Reviewed:** 2026-08-12
+**Main:** `ee1737a`
 
-## Sprint Focus (current)
+## Production
 
-Shipping the core AMPH v2 features to production:
+- Canonical URL: <https://projectamazonph.vercel.app>
+- Retired URL: `https://amph-v2-greenfield.vercel.app`
+- Framework: Next.js 16, React 19, strict TypeScript, Prisma 7, PostgreSQL
+- Database inventory: 36 models, 4 enums, 35 append-only migrations
 
-1. Course + Enrollment + Payment flows (PayMongo)
-2. Five PPC simulators wiring
-3. Gamification (XP, badges, certificates)
-4. Production deploy on Vercel
+## Latest merged repairs
 
-## High Priority (loop is acting or waiting on human)
+| PR   | Commit    | Result                                                                                                                |
+| ---- | --------- | --------------------------------------------------------------------------------------------------------------------- |
+| #305 | `9096cf4` | Repaired the student journey, route states, navigation, data export, and accessibility coverage                       |
+| #306 | `9d80c77` | Manual paid-tier grants now create the eligible published-course enrollments students need to see courses and lessons |
+| #307 | `88d83d9` | Admin login plants the session cookie on the redirect response                                                        |
+| #308 | `ee1737a` | Password-reset emails normalize the retired deployment origin to the canonical production URL                         |
 
-_(empty)_
+Manual grants are idempotent. STARTER grants published STARTER and PREVIEW courses; PRO grants all eligible published courses; FREE creates no enrollment. A new manually granted account receives a password-reset link. The grant does not create an Order row.
 
-## Watch List
+## Verified gate
 
-| Item             | Status      | Notes                                                               |
-| ---------------- | ----------- | ------------------------------------------------------------------- |
-| DB provisioning  | pending     | Postgres not yet provisioned per SESSION-HANDOVER.md                |
-| Prisma wiring    | partial     | courseRepo + orderRepo still InMemory in production container       |
-| PayMongo webhook | broken      | Webhook handler uses InMemory repos per-request — needs real wiring |
-| Admin panel      | not started | No `src/app/admin` yet                                              |
-| harness-foundry  | planned     | L2+ milestone — version loop as composable runtime                  |
+- Vitest: 3,816 passed, 2 skipped
+- Architecture: 665 passed
+- TypeScript: passed
+- ESLint: passed
+- Production build: passed
+- Playwright: passed
+- Lighthouse: passed
 
-## Recent Noise (ignored this run)
+## Remaining known limitations
 
-- Loop-sync structural mismatch between STATE.md and LOOP.md — expected, different doc types
+- Simulator scores are formative, not certification or hiring evidence.
+- Email-template overrides do not interpolate placeholders. `RefundEmail.ctaLabel` has no rendered button.
+- Admin 2FA is opt-in.
+- Live backup/restore, payment-webhook rotation, and external uptime checks require operator execution.
+- A PayMongo event can be stored as PAID before enrollment fails. Because replay exits early for an already-paid order, use the audited admin tier-grant flow to repair a confirmed-paid partial state.
 
-## Loop Run Log
+## Next action
 
-| Date       | Level | Score   | Findings                                                    | Actions Taken           |
-| ---------- | ----- | ------- | ----------------------------------------------------------- | ----------------------- |
-| 2026-07-23 | L1    | 100/100 | 3 watch items flagged (DB, Prisma wiring, PayMongo webhook) | First run — report only |
-
-## Token Budget (this week)
-
-| Day      | Spend | Cap  | Notes           |
-| -------- | ----- | ---- | --------------- |
-| Mon 7/20 | —     | 300k |                 |
-| Tue 7/21 | —     | 300k |                 |
-| Wed 7/22 | —     | 300k |                 |
-| Thu 7/23 | ~5k   | 300k | First audit run |
-| Fri 7/24 | —     | 300k |                 |
-| Sat 7/25 | —     | 300k |                 |
-| Sun 7/26 | —     | 300k |                 |
+Operate from the canonical production URL, keep runbooks current after operator drills, and verify the relevant quality gates before every merge.

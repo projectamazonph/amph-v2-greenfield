@@ -3,7 +3,7 @@
 **Status:** Approved
 **Owner:** Ryan Roland Dabao
 **Date:** 2026-07-17 (greenfield)
-**Last updated:** 2026-07-28 (doc audit — layout tree corrections, Order model, stale paths)
+**Last updated:** 2026-08-12 against `ee1737a`
 
 ---
 
@@ -13,13 +13,15 @@ The admin panel is what lets Ryan (and any future co-admins) operate the platfor
 
 Every admin route has search, filter, pagination. Every mutation is audited. Every action runs through a use case — no direct Prisma from page files. ADR-013, ISP, DIP.
 
+Manual paid-tier grants also create eligible published-course enrollments. They are idempotent, create no Order row, and send a password-reset link for a new account. Admin login sets its cookie on the redirect response before navigating to `/admin`.
+
 ## Roles
 
-| Role          | Access                                                        |
-| ------------- | ------------------------------------------------------------- |
-| `STUDENT`     | None on `/admin/*`. All admin routes 302 to `/dashboard`.     |
-| `ADMIN`       | Read all admin pages. Mutate any non-privileged field.        |
-| `SUPER_ADMIN` | All ADMIN powers + impersonate + change another admin's role. |
+| Role         | Access                                                              |
+| ------------ | ------------------------------------------------------------------- |
+| `STUDENT`    | No `/admin/*` access                                                |
+| `INSTRUCTOR` | No `/admin/*` access under the current `requireAdmin()` gate        |
+| `ADMIN`      | Admin pages and audited mutations; cannot impersonate another admin |
 
 Role is a column on `User`. Stored on the JWT. Re-checked on every admin request (no stale-allow).
 
@@ -33,7 +35,7 @@ src/app/admin/
 │   ├── page.tsx                      # list + search + filter
 │   └── [id]/
 │       ├── page.tsx                  # user detail
-│       └── impersonate.action.ts     # super-admin only (server action)
+│       └── impersonate.action.ts     # admin can impersonate non-admin users
 ├── courses/
 │   ├── page.tsx
 │   ├── new/page.tsx                  # create course
@@ -113,7 +115,7 @@ The `/admin` page. Summary tiles + charts.
 | Simulator attempts (7d) | `SimulatorAttempt.count({ createdAt > now - 7d })`                                                                       |
 | Open refund requests    | `Order.count({ status = REFUND_REQUESTED })` (tracked in `pendingRefunds` in `GetAdminDashboardStats`)                   |
 
-> **Note:** `GetAdminDashboardStats.pendingRefunds` is currently hardcoded to zero pending review. See the 2026-07-27 audit report for details.
+`GetAdminDashboardStats.pendingRefunds` reads `orderRepo.listRefundRequests()`.
 
 ### Charts
 
@@ -132,7 +134,7 @@ Table columns:
 | ------------ | -------- | ------------------------------------------------------------- |
 | Email        | yes      | search                                                        |
 | Display name | yes      | search                                                        |
-| Role         | yes      | select (STUDENT / ADMIN / SUPER_ADMIN)                        |
+| Role         | yes      | select (STUDENT / INSTRUCTOR / ADMIN)                         |
 | Created      | yes      | date range                                                    |
 | Last seen    | yes      | date range                                                    |
 | Current tier | yes      | select (none / foundations / mastery / ultimate / all-access) |
@@ -161,9 +163,9 @@ Sections:
 - **Audit log (as actor)** — all audit-log entries where this user was the actor.
 - **Audit log (as target)** — all entries where this user was the target.
 
-### Impersonate (super-admin only)
+### Impersonate
 
-`/admin/users/[id]/impersonate` is a server action (`impersonate.action.ts`). Sets a short-lived (1 hour) "impersonation" JWT with `impersonatorId` claim. The original admin's role is preserved; the impersonator's actions are logged with both `actorId` and `onBehalfOfId`. Stop-impersonating is one click in a persistent banner.
+An ADMIN can impersonate a STUDENT or INSTRUCTOR, but not another ADMIN. The action preserves the original admin session in a separate secure cookie, logs the impersonation, and plants the target user's session. Stopping impersonation restores the original admin session from that cookie.
 
 ## Courses
 
@@ -328,47 +330,47 @@ Form: refundWindowDays, earlyBirdLimit, earlyBirdPriceMinor, featureFlags (JSON 
 
 Admin TOTP enrollment flow. Admins can opt in to 2FA via an authenticator app. There is no enforcement that all admins must use 2FA — it is currently opt-in only.
 
-> **Note:** Email template management at `/admin/settings/email-templates` is planned (STORY-063). The page does not yet exist.
+Email templates are managed at `/admin/email-templates` and `/admin/email-templates/[type]/edit`. Saves use `UpdateEmailTemplate` and affect all seven Resend send paths.
 
 ## Audit Log: What Gets Logged
 
 Every admin mutation. The use case writes the entry; the adapter persists it. The user detail page reads both "actor" and "target" entries.
 
-| Action                          | Audit log entry                                                                                         |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Admin updates user              | `action: "user.updated"`, `targetType: "User"`, `targetId: userId`, `metadata: { changes }`             |
-| Admin changes role              | `action: "user.role_changed"`, `metadata: { from, to }`                                                 |
-| Admin issues refund override    | `action: "refund.override"`, `targetType: "Order"`, `targetId: orderId`, `metadata: { reason, amount }` |
-| Admin marks order fraud         | `action: "order.flagged"`, `targetType: "Order"`, `targetId`, `metadata: { reason }`                    |
-| Admin updates course            | `action: "course.updated"`, `targetType: "Course"`, `targetId`, `metadata: { changes }`                 |
-| Admin creates discount code     | `action: "discount_code.created"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { code }`       |
-| Admin updates discount code     | `action: "discount_code.updated"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { changes }`    |
-| Admin creates badge             | `action: "badge.created"`, ...                                                                          |
-| Admin revokes badge             | `action: "badge.revoked"`, `targetType: "BadgeAward"`, `targetId`, `metadata: { reason }`               |
-| Admin issues certificate        | `action: "certificate.issued"`, ...                                                                     |
-| Admin revokes certificate       | `action: "certificate.revoked"`, ...                                                                    |
-| Admin creates live class        | `action: "live_class.created"`, ...                                                                     |
-| Admin sets recording            | `action: "live_class.recording_set"`, ...                                                               |
-| Admin marks attendance          | `action: "live_class.attendance_marked"`, ...                                                           |
-| Admin updates settings          | `action: "settings.updated"`, `metadata: { changes }`                                                   |
-| Admin impersonates user         | `action: "user.impersonated"`, `metadata: { onBehalfOfId, expiresAt }`                                  |
-| Super-admin stops impersonation | `action: "user.impersonation_ended"`, ...                                                               |
-| Auth: sign-in success           | `action: "auth.signed_in"`, `targetType: "User"`, `targetId: userId`, `metadata: { ip, userAgent }`     |
-| Auth: sign-in failure           | `action: "auth.signin_failed"`, `metadata: { email, ip, reason }`                                       |
-| Auth: password reset requested  | `action: "auth.password_reset_requested"`, ...                                                          |
-| Auth: password reset completed  | `action: "auth.password_reset_completed"`, ...                                                          |
-| Auth: email verified            | `action: "auth.email_verified"`, ...                                                                    |
-| Order: any state change         | `action: "order.<status>"`, ...                                                                         |
+| Action                         | Audit log entry                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Admin updates user             | `action: "user.updated"`, `targetType: "User"`, `targetId: userId`, `metadata: { changes }`             |
+| Admin changes role             | `action: "user.role_changed"`, `metadata: { from, to }`                                                 |
+| Admin issues refund override   | `action: "refund.override"`, `targetType: "Order"`, `targetId: orderId`, `metadata: { reason, amount }` |
+| Admin marks order fraud        | `action: "order.flagged"`, `targetType: "Order"`, `targetId`, `metadata: { reason }`                    |
+| Admin updates course           | `action: "course.updated"`, `targetType: "Course"`, `targetId`, `metadata: { changes }`                 |
+| Admin creates discount code    | `action: "discount_code.created"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { code }`       |
+| Admin updates discount code    | `action: "discount_code.updated"`, `targetType: "DiscountCode"`, `targetId`, `metadata: { changes }`    |
+| Admin creates badge            | `action: "badge.created"`, ...                                                                          |
+| Admin revokes badge            | `action: "badge.revoked"`, `targetType: "BadgeAward"`, `targetId`, `metadata: { reason }`               |
+| Admin issues certificate       | `action: "certificate.issued"`, ...                                                                     |
+| Admin revokes certificate      | `action: "certificate.revoked"`, ...                                                                    |
+| Admin creates live class       | `action: "live_class.created"`, ...                                                                     |
+| Admin sets recording           | `action: "live_class.recording_set"`, ...                                                               |
+| Admin marks attendance         | `action: "live_class.attendance_marked"`, ...                                                           |
+| Admin updates settings         | `action: "settings.updated"`, `metadata: { changes }`                                                   |
+| Admin impersonates user        | `action: "user.impersonated"`, `metadata: { onBehalfOfId, expiresAt }`                                  |
+| Admin stops impersonation      | `action: "user.impersonation_ended"`, ...                                                               |
+| Auth: sign-in success          | `action: "auth.signed_in"`, `targetType: "User"`, `targetId: userId`, `metadata: { ip, userAgent }`     |
+| Auth: sign-in failure          | `action: "auth.signin_failed"`, `metadata: { email, ip, reason }`                                       |
+| Auth: password reset requested | `action: "auth.password_reset_requested"`, ...                                                          |
+| Auth: password reset completed | `action: "auth.password_reset_completed"`, ...                                                          |
+| Auth: email verified           | `action: "auth.email_verified"`, ...                                                                    |
+| Order: any state change        | `action: "order.<status>"`, ...                                                                         |
 
 ## What Lives Where
 
-| Concern                | Domain                                 | Port                                | Use case                                    | Adapter                       |
-| ---------------------- | -------------------------------------- | ----------------------------------- | ------------------------------------------- | ----------------------------- |
-| Role check             | `src/domain/entities/User.ts`          | `IAccessPolicy`                     | every admin use case                        | `TierAccessPolicy`            |
-| Impersonation logic    | `src/domain/entities/User.ts`          | -                                   | `AdminImpersonate`, `AdminEndImpersonation` | -                             |
-| Audit-log write        | -                                      | `IAuditLog`                         | every admin use case                        | `PrismaAuditLog`              |
-| CSV export             | `src/domain/shared/`                   | -                                   | `AdminExportAuditLog`                       | -                             |
-| Settings read/write    | `src/domain/values/`                   | `IPricingTierRepository`            | `AdminUpdateSettings`                       | `PrismaPricingTierRepository` |
-| Email template storage | `src/domain/entities/EmailTemplate.ts` | `IEmailTemplateRepository` (future) | `AdminUpdateEmailTemplate`                  | (not yet wired)               |
+| Concern                | Domain                                 | Port                       | Use case                                    | Adapter                         |
+| ---------------------- | -------------------------------------- | -------------------------- | ------------------------------------------- | ------------------------------- |
+| Role check             | `src/domain/entities/User.ts`          | `IAccessPolicy`            | every admin use case                        | `TierAccessPolicy`              |
+| Impersonation logic    | `src/domain/entities/User.ts`          | -                          | `AdminImpersonate`, `AdminEndImpersonation` | -                               |
+| Audit-log write        | -                                      | `IAuditLog`                | every admin use case                        | `PrismaAuditLog`                |
+| CSV export             | `src/domain/shared/`                   | -                          | `AdminExportAuditLog`                       | -                               |
+| Settings read/write    | `src/domain/values/`                   | `IPricingTierRepository`   | `AdminUpdateSettings`                       | `PrismaPricingTierRepository`   |
+| Email template storage | `src/domain/entities/EmailTemplate.ts` | `IEmailTemplateRepository` | `UpdateEmailTemplate`                       | `PrismaEmailTemplateRepository` |
 
 The admin panel is the place where the SOLID architecture pays the most: every admin action is a use case that tests with `buildTestContainer()`, no mocking the real Prisma, no mocking the real PayMongo. The cost of adding a new admin section is one server action + one page + one use case + (sometimes) one repository method. No edits to the layout, the auth gate, or the audit log infrastructure.

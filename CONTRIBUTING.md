@@ -1,5 +1,7 @@
 # Contributing
 
+**Reviewed:** 2026-08-12. Start with `docs/README.md` and `STATE.md`; historical audit files are not the current backlog.
+
 This is a single-developer, docs-first project. The audience for contributions
 is future-you, future-co-admins, and the AI agents that work in this repo.
 

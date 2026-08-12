@@ -1,6 +1,6 @@
 # Current layer wiring
 
-**Reviewed:** 2026-07-27  
+**Reviewed:** 2026-08-12 against `ee1737a`
 **Source of truth:** `src/composition/container.ts`
 
 The application is a modular monolith. Pages and server actions depend on use cases, use cases depend on ports and domain rules, and production adapters implement the ports. `domain/` remains framework-free. `buildContainer()` creates the production composition, while `container.test.ts` wires deterministic in-memory adapters for tests.
@@ -51,11 +51,12 @@ flowchart TB
 
 Most persisted repositories in `buildProductionContainer()` use Prisma adapters, including users, courses, modules, lessons, orders, enrollments, sessions, discount codes, quizzes, attempts, XP, certificates, audit logs, webhook events, simulator scenarios and attempts, score policies, feedback, live classes, pricing tiers, email verification, password reset, and sent reminders.
 
-Known exceptions and follow-ups:
+Current notes:
 
-- `PrismaBadgeRepository.create`, `.update`, and `.archive` still throw `Not implemented`; the admin badge mutation path is not production-complete.
-- Graded simulator server actions currently pass `userId: "system"`; they need the authenticated user before attempts can be treated as student-owned records.
-- `GetAdminDashboardStats.pendingRefunds` is a placeholder value of zero.
-- `scripts/seed-admin-user.mjs` now correctly uses the PrismaPg driver adapter consistent with `src/infra/database/prisma.ts`.
+- Badge mutations use the Prisma adapter.
+- Graded simulator actions use the authenticated user ID.
+- Dashboard pending refunds come from `orderRepo.listRefundRequests()`.
+- `scripts/seed-admin-user.mjs` uses the PrismaPg driver adapter.
+- Live-class registrations and watched-recording state use the Prisma adapter in production.
 
 The PayMongo webhook uses `buildContainer()`, verifies the signature through `PayMongoAdapter`, persists a `WebhookEvent`, and then processes the order. The historical claim that it creates in-memory repositories per request is no longer true.

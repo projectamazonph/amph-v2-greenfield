@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+**Current addendum, 2026-08-12:** `main` is reviewed at `ee1737a`. PR #305 repaired the student journey and accessibility states. PR #306 fixed manually granted students by creating eligible published-course enrollments instead of changing only `subscriptionTier`. PR #307 fixed the admin-login redirect cookie. PR #308 fixed forgot-password links by normalizing the retired deployment origin to `https://projectamazonph.vercel.app`. The verified gate is 3,816 Vitest passed, 2 skipped; 665 architecture checks; TypeScript, ESLint, production build, Playwright, and Lighthouse passed. Read `docs/README.md` and `STATE.md` before relying on older addenda below.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## What this is

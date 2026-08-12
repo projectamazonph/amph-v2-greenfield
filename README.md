@@ -4,7 +4,7 @@ Amazon PPC training for Filipino virtual assistants.
 
 Three courses, practical tools, and a Field Manual interface. The repository contains the Next.js application, Prisma schema and migrations, curriculum importer, payment integration, admin panel, and automated tests.
 
-**Deployment note:** `SESSION-HANDOVER.md` records the latest operator-reported deployment state. Production URL, database contents, PayMongo webhook registration, and email delivery are operator-owned and were not independently re-verified in this documentation pass.
+**Production:** <https://projectamazonph.vercel.app>. The retired `amph-v2-greenfield.vercel.app` origin must not be used for new links. Deployment configuration, database contents, payment webhooks, and live email delivery remain operator-owned checks.
 
 ![Landing Page](public/screenshots/landing-placeholder.svg)
 
@@ -57,6 +57,7 @@ Every simulator reads its practice content from a `SimulatorScenario` row that i
 For a comprehensive overview of all courses, modules, and lessons taught by the platform, see **[CURRICULUM-SYLLABUS.md](CURRICULUM-SYLLABUS.md)**.
 
 **Quick Overview:**
+
 - **Total Duration:** ~45 hours of structured learning
 - **Total XP:** ~2,700 points across 31 lessons
 - **Two Main Courses:** PPC Foundations (Modules 0-4) and Accelerated Mastery (Modules 5-8)
@@ -65,22 +66,23 @@ For a comprehensive overview of all courses, modules, and lessons taught by the 
 
 ## Current repository status
 
-| Metric                            | Verified state                                                                                |
-| --------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Architecture                      | SOLID-layered modular monolith with a composition root                                        |
-| Framework                         | Next.js 16 App Router, TypeScript strict                                                      |
-| Database                          | PostgreSQL through Prisma 7, 36 models and 35 migrations                                      |
-| Payments                          | PayMongo adapter (checkout + real Refunds API) and `/api/webhooks/paymongo` route              |
-| Email                             | Resend adapter with React Email templates, wired to admin-editable overrides                  |
-| Admin                             | `/admin/*` route tree gated by `requireAdmin()`, 12 sub-areas including resources              |
-| Simulators                        | 5 registered engines with versioned/published scenarios and formative-only scoring            |
+| Metric                            | Verified state                                                                                                        |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Architecture                      | SOLID-layered modular monolith with a composition root                                                                |
+| Framework                         | Next.js 16 App Router, TypeScript strict                                                                              |
+| Database                          | PostgreSQL through Prisma 7, 36 models and 35 migrations                                                              |
+| Payments                          | PayMongo adapter (checkout + real Refunds API) and `/api/webhooks/paymongo` route                                     |
+| Email                             | Resend adapter with React Email templates, wired to admin-editable overrides                                          |
+| Admin                             | `/admin/*` route tree gated by `requireAdmin()`, 12 sub-areas including resources                                     |
+| Simulators                        | 5 registered engines with versioned/published scenarios and formative-only scoring                                    |
 | Tests                             | Vitest unit and integration tests, Playwright E2E suite, a dedicated architecture-compliance suite (`pnpm test:arch`) |
-| Latest repository commit reviewed | `ff86065` on 2026-08-04 (Sprint 16 + STORY-083/084 + review-comment fixes)                     |
-| Documentation review              | `CLAUDE.md` "Known gaps" (dated, kept current), `docs/sprint-plan.md`, `SESSION-HANDOVER.md`   |
+| Latest repository commit reviewed | `ee1737a` on 2026-08-12 (PRs #305-#308)                                                                               |
+| Verification                      | 3,816 Vitest passed, 2 skipped; 665 architecture checks; TypeScript, ESLint, build, Playwright, and Lighthouse passed |
+| Documentation review              | 2026-08-12. Start with `docs/README.md`, then `STATE.md` and `SESSION-HANDOVER.md`                                    |
 
-Sprints 1–13 (foundation through admin panel round 2) are fully implemented. Sprint 14 (simulator scoring integrity, STORY-071–077) is complete. Sprint 15 (certification safety + subject-matter accuracy, STORY-078–084) is complete — Listing Audit's non-binary ground truth and Campaign Builder's strategic scoring, both requiring the product owner's own Amazon PPC judgment, shipped 2026-08-04. Sprint 16 (assessment platform maturity) is 3 of 5 stories done (STORY-085, 087, 088); STORY-086 (instructor calibration) and STORY-089 (connected-account simulator) remain planned with no story doc yet. See "Planned work" below for the full breakdown.
+Sprints 1-15 are complete. Sprint 16 has STORY-085, STORY-087, and STORY-088 complete; STORY-086 and STORY-089 remain planned. The student journey repair is merged through PR #305, and the follow-up fixes for manual enrollment, admin login redirects, and password-reset links are merged through PRs #306-#308.
 
-Historically, `pnpm typecheck`, `pnpm lint`, `pnpm build`, and `pnpm test:arch` have passed cleanly at every session's checkpoint per `SESSION-HANDOVER.md`; the full Vitest suite was last reported at roughly 3,500 passing / 2 skipped (2026-08-03) and has grown with each story since. This pass did not re-run the suite (no database configured in this session) — re-verify with the commands below before relying on an exact count.
+The 2026-08-12 documentation gate ran against `ee1737a`: 3,816 Vitest tests passed, 2 skipped; all 665 architecture checks passed; TypeScript, ESLint, the production build, Playwright, and Lighthouse passed.
 
 ## Planned work and known gaps
 
@@ -95,9 +97,8 @@ Not exhaustive — `CLAUDE.md`'s "Known gaps" section is the dated, actively-mai
 
 - **Keyword Research** dataset covers 4 of the story's 12 launch niches, and every dataset is `synthetic_calibrated` — credential-mode attempts are rejected pending real seller-export data (STORY-081b, unplanned).
 - **Listing Audit's difficulty-scaled finding-volume** acceptance criterion (STORY-080) is not implemented.
-- **Account data export** (`/profile/data`) omits quiz and simulator attempt history — the repositories only support per-quiz/per-scenario lookups, not "every attempt by this user."
 - **Email template placeholders**: an admin-customized email field replaces the default copy verbatim; there is no `{{firstName}}`-style interpolation. `RefundEmail`'s `ctaLabel` field has no corresponding UI to render it.
-- **Admin two-factor authentication** is opt-in only — nothing enforces it, and account lockout (`lockedUntil`) has no enforcement path either.
+- **Admin two-factor authentication** is opt-in. Login lockout and session-row revocation are enforced, but 2FA enrollment is not mandatory.
 - **Local file storage** (`LocalFileStorage`, used when `BLOB_READ_WRITE_TOKEN` is unset) does not persist on Vercel's read-only serverless filesystem; production fails closed instead of silently falling back to it.
 
 **Operator-owned, not delegable to an agent:**
@@ -107,23 +108,24 @@ Not exhaustive — `CLAUDE.md`'s "Known gaps" section is the dated, actively-mai
 - Launch communications.
 - PayMongo live webhook secret rotation drills.
 
-**Documentation drift to watch for:** `FEATURES.md` was last reviewed 2026-08-02 and predates Sprint 16, the download center, and the embedded Ad Console page — cross-check it against `CLAUDE.md`'s dated addenda and `docs/sprint-plan.md` before trusting a status claim there in isolation. `CHANGELOG.md`'s "Unreleased" section does not yet have entries for STORY-087/088 even though `docs/sprint-plan.md` and their own story docs mark them done 2026-08-04 — worth a follow-up changelog entry.
+Historical audits and session entries are retained as records. For current status, use `docs/README.md`, `STATE.md`, `FEATURES.md`, and the newest `SESSION-HANDOVER.md` entry.
 
 ## Read this repo in this order
 
 1. [`AGENTS.md`](AGENTS.md), repository rules.
-2. [`CLAUDE.md`](CLAUDE.md), coding-agent guidance and the actively-maintained, dated "Known gaps" section — read this before trusting any older doc's completeness claims.
-3. [`FEATURES.md`](FEATURES.md), feature status matrix (stale as of 2026-08-02; cross-check against `CLAUDE.md`).
-4. [`docs/sprint-plan.md`](docs/sprint-plan.md), delivery plan, sprint-by-sprint story status through Sprint 16.
-5. [`docs/audit-2026-07-27-completeness-review.md`](docs/audit-2026-07-27-completeness-review.md), the last full completeness audit (historical baseline, superseded in places by `CLAUDE.md`).
-6. [`docs/product-brief.md`](docs/product-brief.md), product framing.
-7. [`docs/decisions.md`](docs/decisions.md), accepted architectural decisions.
-8. [`docs/build-spec.md`](docs/build-spec.md), target engineering rules.
-9. [`docs/business-layer.md`](docs/business-layer.md), payment and refund rules.
-10. [`docs/db-schema.md`](docs/db-schema.md), current schema inventory and divergences.
-11. [`docs/api-reference.md`](docs/api-reference.md), current route, action, and use-case inventory.
-12. [`SESSION-HANDOVER.md`](SESSION-HANDOVER.md), session-by-session history and operator handoff, most recent entry first.
-13. [`CHANGELOG.md`](CHANGELOG.md), dated, one-entry-per-change log of shipped work.
+2. [`docs/README.md`](docs/README.md), documentation map and current-versus-historical rules.
+3. [`STATE.md`](STATE.md), current production and repository state.
+4. [`CLAUDE.md`](CLAUDE.md), coding-agent guidance and dated addenda.
+5. [`FEATURES.md`](FEATURES.md), current feature status matrix.
+6. [`docs/sprint-plan.md`](docs/sprint-plan.md), delivery plan and story status.
+7. [`docs/product-brief.md`](docs/product-brief.md), product framing.
+8. [`docs/decisions.md`](docs/decisions.md), accepted architectural decisions.
+9. [`docs/build-spec.md`](docs/build-spec.md), engineering rules.
+10. [`docs/business-layer.md`](docs/business-layer.md), payment and refund rules.
+11. [`docs/db-schema.md`](docs/db-schema.md), schema inventory.
+12. [`docs/api-reference.md`](docs/api-reference.md), route, action, and use-case inventory.
+13. [`SESSION-HANDOVER.md`](SESSION-HANDOVER.md), newest operational handoff first.
+14. [`CHANGELOG.md`](CHANGELOG.md), shipped-change history.
 
 ## Commands
 

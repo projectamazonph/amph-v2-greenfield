@@ -1,8 +1,8 @@
 # Sprint Plan — Project Amazon PH Academy v2
 
-**Reviewed:** 2026-07-27  
+**Reviewed:** 2026-08-12 against `ee1737a`
 **Owner:** Ryan Roland Dabao  
-**Status:** Sprints 1–13 implementation is present in the repository. Sprint 12 has operator-owned launch work; Sprints 14–16 are planned simulator remediation. See `docs/audit-2026-07-27-completeness-review.md` for the source audit.
+**Status:** Sprints 1-15 are complete. Sprint 16 has STORY-085, STORY-087, and STORY-088 complete; STORY-086 and STORY-089 remain planned. Student repair STORY-104 is merged in PR #305 with follow-ups #306-#308. Operator-owned launch and recovery drills remain.
 
 This plan began as a 12-sprint greenfield plan. The repository has since grown to 16 planned sprints and 89 tracked stories (including the simulator remediation sequence). Historical sprint goals remain below, but a story marked done here must still be checked against its current source and story file.
 
@@ -146,15 +146,15 @@ See `docs/sprint-1/PLAN.md` for the detailed plan.
 
 ## Sprint 12 — Launch (5 pts)
 
-| ID        | Title                                                                        | Pts | Status                                                                                                  |
-| --------- | ---------------------------------------------------------------------------- | --- | ------------------------------------------------------------------------------------------------------- |
-| STORY-056 | Production deploy runbook + smoke script + env-var checklist                 | 1   | ✅ done (env vars synced, smoke script in `SESSION-HANDOVER.md`, runbook lived through PR #150)         |
-| STORY-057 | DB backup + restore drill + cron                                             | 1   | ⏳ operator-owned (Neon has automatic backups, drill not yet run)                                       |
-| STORY-058 | Pre-launch security audit (npm audit, gitleaks, headers, isolation)          | 1   | ⏳ operator-owned                                                                                       |
-| STORY-059 | Production deploy (operator executes the runbook)                            | 1   | ✅ done (Vercel auto-deployed `https://amph-v2-greenfield.vercel.app` after PR #150; all 4 routes live) |
-| STORY-060 | Launch communications (Facebook, LinkedIn, Resend broadcast, internal Slack) | 1   | ⏳ operator-owned                                                                                       |
+| ID        | Title                                                                        | Pts | Status                                                                                          |
+| --------- | ---------------------------------------------------------------------------- | --- | ----------------------------------------------------------------------------------------------- |
+| STORY-056 | Production deploy runbook + smoke script + env-var checklist                 | 1   | ✅ done (env vars synced, smoke script in `SESSION-HANDOVER.md`, runbook lived through PR #150) |
+| STORY-057 | DB backup + restore drill + cron                                             | 1   | ⏳ operator-owned (Neon has automatic backups, drill not yet run)                               |
+| STORY-058 | Pre-launch security audit (npm audit, gitleaks, headers, isolation)          | 1   | ⏳ operator-owned                                                                               |
+| STORY-059 | Production deploy (operator executes the runbook)                            | 1   | ✅ done; canonical production is `https://projectamazonph.vercel.app`                           |
+| STORY-060 | Launch communications (Facebook, LinkedIn, Resend broadcast, internal Slack) | 1   | ⏳ operator-owned                                                                               |
 
-**Sprint 12 status:** STORY-056 and STORY-059 are recorded as complete in the historical plan. STORY-057, STORY-058, and STORY-060 remain operator-owned. The repository now contains 20 migrations and a `db:seed:admin` script; the deployment, database contents, webhook registration, and launch communications were not independently verified in the 2026-07-27 repository audit.
+**Sprint 12 status:** STORY-056 and STORY-059 are recorded as complete in the historical plan. STORY-057, STORY-058, and STORY-060 remain operator-owned. The repository now contains 35 migrations and a `db:seed:admin` script. The canonical deployment is `https://projectamazonph.vercel.app`; database contents, webhook registration, and launch communications remain operator checks.
 
 **Production reference:** `SESSION-HANDOVER.md` contains the operator-reported deployment notes. Treat them as operational handoff material, not as a substitute for a live smoke test.
 
@@ -253,7 +253,7 @@ gap audit, closed across two sessions.
 | STORY-094   | Lesson-to-quiz transition wiring           | 1   | ✅ done — PR #267                                                                                                                                            |
 | STORY-095   | Admin email-template editor page           | 1   | ✅ done — 2026-08-02; wired into the send path by STORY-095.5, 2026-08-03                                                                                    |
 | STORY-095.5 | Wire email templates into Resend send path | 1   | ✅ done — 2026-08-03, see `docs/stories/STORY-095.5.md`                                                                                                      |
-| STORY-096   | Account deletion + data export             | 1   | ◐ done — 2026-08-02, export omits quiz/simulator attempt history (see CLAUDE.md "Known gaps")                                                                |
+| STORY-096   | Account deletion + data export             | 1   | ✅ done; PR #305 added quiz and simulator attempt history                                                                                                    |
 | STORY-100   | Live-class recording + post-class XP       | 1   | ✅ done — 2026-08-03, see `docs/stories/STORY-100.md` (renumbered from STORY-092, which was already in use for a shipped, unrelated certificate-admin story) |
 
 ---

@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-10
+**Last reviewed:** 2026-08-12 against `ee1737a`
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
@@ -29,6 +29,8 @@ Status labels:
 
 The session guard validates the JWT, then checks the `sessions` table server-side when the token carries a `sessionId`. A deleted session is rejected even if the JWT itself has not expired. Login enforces `lockedUntil` and public responses no longer distinguish an unknown email from a wrong password.
 
+Password-reset and transactional links use the configured application origin. The exact retired origin `amph-v2-greenfield.vercel.app`, with or without a scheme, is normalized to `https://projectamazonph.vercel.app`; custom and local origins remain unchanged. Admin login plants the session cookie on its redirect response before navigating to `/admin`.
+
 ### Courses and curriculum
 
 - `/courses` lists published catalog rows from Postgres.
@@ -51,6 +53,8 @@ The public catalog and pricing pages deliberately render an empty-state message 
 - Student purchase history and refund requests are available at `/profile/purchases`. The request policy enforces order ownership, paid status, a seven-day window, and less than 25% completion. Admin processing remains under `/admin/refunds` and uses the real PayMongo Refunds API.
 
 Pricing tier rows link to course rows through `PricingTierCourse`. Signup preserves the selected tier, checkout resolves the linked course server-side, and both the displayed and charged totals use the same effective early-bird price. A deployed database and live PayMongo transaction still require environment-specific verification.
+
+An audited manual tier grant also creates the course enrollments required by the dashboard and lesson access checks. STARTER grants published STARTER and PREVIEW courses, PRO grants all eligible published courses, and FREE creates no new enrollment. The operation is idempotent and does not create an Order row.
 
 ### Practice tools
 
@@ -100,25 +104,25 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 - Pino structured logging, action tracing, Sentry client/server/edge configuration, and Web Vitals reporting are present.
 - `/api/cron/live-class-reminders` is protected by `CRON_SECRET` and uses `SentReminder` persistence for idempotency.
 - `vercel.json` schedules the reminder endpoint once daily at `0 8 * * *`.
-- `/api/health` is a readiness probe that runs `SELECT 1` against Postgres via a lightweight Prisma client and returns 503 if the database is unreachable.
+- `/api/health` is a static liveness check. `/api/health/ready` runs `SELECT 1` through the database health-check port and returns 503 when Postgres is unreachable.
 
 ## Partial or not shipped
 
-| Area                         | Current state        | Evidence or next step                                                                                                                                                                                                                      |
-| ---------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Student account settings     | Implemented          | Profile display, password change, 2FA, complete JSON data export, account deletion, purchases, refunds, and certificates exist. Unpersisted notification checkboxes were removed instead of presenting fake settings.                      |
-| All-access entitlement rules | Implemented          | Active enrollment, admin access, and eligible subscription tiers grant course access. Tier checkout resolves the linked course and effective price server-side. Live production payment verification remains operational work.             |
-| Live-class experience        | Implemented          | Student list, detail, enrollment-gated RSVP, cancellation, recording access, idempotent watched state, and XP award are implemented. Capacity limits are not part of the current model.                                                    |
-| Editable email templates     | Implemented, partial | `/admin/email-templates` (list) and `/admin/email-templates/[type]/edit` exist (STORY-095, 2026-08-02), backed by real use cases. Not yet wired into the actual send path — editing a template here does not change what Resend sends yet. |
-| Simulator ownership          | Implemented          | All 5 graded actions pass the authenticated `userId` from `getSessionUserId()`, not `"system"` (fixed 2026-07-31).                                                                                                                         |
-| Badge administration         | Implemented          | Prisma create, update, and archive are wired; admin badge CRUD is shipped with slug-uniqueness and error handling.                                                                                                                         |
-| Session revocation           | Implemented          | `getSessionUserId()` checks `SessionRepository` server-side after JWT verification when a `sessionId` is present. Login also enforces `lockedUntil`.                                                                                       |
-| Impersonation restore        | Implemented          | `impersonateUser.action.ts` captures the admin's original session token and `stopImpersonating.action.ts` replants it on restore (fixed 2026-07-31).                                                                                       |
-| Admin refund metric          | Implemented          | `GetAdminDashboardStats.pendingRefunds` queries `orderRepo.listRefundRequests()` (fixed 2026-07-31).                                                                                                                                       |
-| Quiz lesson transition       | Implemented          | `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01).                                                                                                                                                |
-| PayMongo refunds             | Implemented          | `PayMongoAdapter.refund()` calls the real PayMongo Refunds API (fixed 2026-08-02, STORY-049.5); `ProcessRefund`/`RefundOverride` work against production PayMongo.                                                                         |
-| Admin settings               | Partial              | TOTP is implemented; general site settings and maintenance controls remain “Coming soon”.                                                                                                                                                  |
-| Admin seed smoke test        | Implemented          | `scripts/seed-admin-user.mjs` uses the shared PrismaPg adapter path (fixed prior to 2026-07-27).                                                                                                                                           |
+| Area                         | Current state        | Evidence or next step                                                                                                                                                                                                             |
+| ---------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Student account settings     | Implemented          | Profile display, password change, 2FA, complete JSON data export, account deletion, purchases, refunds, and certificates exist. Unpersisted notification checkboxes were removed instead of presenting fake settings.             |
+| All-access entitlement rules | Implemented          | Active enrollment, admin access, and eligible subscription tiers grant course access. Tier checkout resolves the linked course and effective price server-side. Live production payment verification remains operational work.    |
+| Live-class experience        | Implemented          | Student list, detail, enrollment-gated RSVP, cancellation, recording access, idempotent watched state, and XP award are implemented. Capacity limits are not part of the current model.                                           |
+| Editable email templates     | Implemented, partial | `/admin/email-templates` and its edit route are wired into all seven Resend send paths. Overrides replace default copy verbatim; placeholder interpolation is not implemented, and `RefundEmail.ctaLabel` has no rendered button. |
+| Simulator ownership          | Implemented          | All 5 graded actions pass the authenticated `userId` from `getSessionUserId()`, not `"system"` (fixed 2026-07-31).                                                                                                                |
+| Badge administration         | Implemented          | Prisma create, update, and archive are wired; admin badge CRUD is shipped with slug-uniqueness and error handling.                                                                                                                |
+| Session revocation           | Implemented          | `getSessionUserId()` checks `SessionRepository` server-side after JWT verification when a `sessionId` is present. Login also enforces `lockedUntil`.                                                                              |
+| Impersonation restore        | Implemented          | `impersonateUser.action.ts` captures the admin's original session token and `stopImpersonating.action.ts` replants it on restore (fixed 2026-07-31).                                                                              |
+| Admin refund metric          | Implemented          | `GetAdminDashboardStats.pendingRefunds` queries `orderRepo.listRefundRequests()` (fixed 2026-07-31).                                                                                                                              |
+| Quiz lesson transition       | Implemented          | `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01).                                                                                                                                       |
+| PayMongo refunds             | Implemented          | `PayMongoAdapter.refund()` calls the real PayMongo Refunds API (fixed 2026-08-02, STORY-049.5); `ProcessRefund`/`RefundOverride` work against production PayMongo.                                                                |
+| Admin settings               | Partial              | TOTP is implemented; general site settings and maintenance controls remain “Coming soon”.                                                                                                                                         |
+| Admin seed smoke test        | Implemented          | `scripts/seed-admin-user.mjs` uses the shared PrismaPg adapter path (fixed prior to 2026-07-27).                                                                                                                                  |
 
 ## Deliberately out of scope
 
@@ -132,12 +136,13 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 
 ## Verification snapshot
 
-On 2026-08-10:
+On 2026-08-12:
 
 - TypeScript: pass.
 - ESLint: pass.
-- Next.js production build: pass, 94 application routes compiled.
-- Full Vitest run without file parallelism: 3,795 passing, 2 skipped.
-- Coverage: 82.17% statements, 76.69% branches, 82.83% functions, 83.21% lines.
+- Next.js production build: pass.
+- Full Vitest run: 3,816 passing, 2 skipped.
+- Architecture suite: 665 passing.
 - Prisma schema and migration contract tests: pass as part of the full suite.
-- Playwright E2E: blocked locally because the required Chromium binary is not installed and the restricted workspace network returns an empty archive for the standard download.
+- Playwright E2E: pass.
+- Lighthouse: pass.

@@ -2,7 +2,11 @@
 
 **Severity:** P1
 **Owner:** On-call engineer
-**Last reviewed:** 2026-07-26
+**Last reviewed:** 2026-08-12
+
+**Canonical production origin:** `https://projectamazonph.vercel.app`
+
+Replay does not repair every partial state. If the original delivery persisted the order as PAID and enrollment then failed, the handler returns early on replay. Confirm the payment and use the audited admin tier-grant flow, which creates the eligible published-course Enrollment rows rather than only updating `subscriptionTier`.
 
 ## Symptoms
 
@@ -59,7 +63,7 @@ This means a stored `rawPayload` cannot be replayed with its **original** signat
    ```
 3. POST it to the live endpoint immediately (the signature is only valid for 5 minutes from the timestamp generated above):
    ```bash
-   curl -i -X POST https://amph-v2-greenfield.vercel.app/api/webhooks/paymongo \
+   curl -i -X POST https://projectamazonph.vercel.app/api/webhooks/paymongo \
      -H "paymongo-signature: <output from step 2>" \
      -H "Content-Type: application/json" \
      --data-binary @payload.json

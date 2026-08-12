@@ -1,4 +1,6 @@
-# Loop Configuration — AMPH v2 Daily Triage
+# Loop Configuration - AMPH v2 Daily Triage
+
+**Reviewed:** 2026-08-12
 
 ## Active Loops
 
@@ -8,13 +10,12 @@
 
 ## Project Context
 
-AMPH v2 is a Next.js 16 modular monolith (Amazon PPC training platform). Five-layer SOLID architecture. Production not yet deployed. Primary concerns right now:
+AMPH v2 is a deployed Next.js 16 modular monolith with a five-layer SOLID architecture. Production is `https://projectamazonph.vercel.app`. Current concerns are:
 
-- Complete core course/enrollment/payment flows
-- Get to production deploy
-- Five interactive PPC simulators
-- Gamification (XP, badges, certificates)
-- Admin panel (future)
+- Preserve the repaired student course, lesson, checkout, and password-reset journeys
+- Monitor production payment, email, database, and Blob integrations
+- Keep simulator scores formative
+- Complete operator-owned restore and webhook drills
 
 ## Human Gates
 
