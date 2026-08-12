@@ -7,8 +7,8 @@
 "use server";
 
 import { Result } from "@/domain/shared/Result";
-import { ComposeAttemptFeedback } from "@/usecases/ComposeAttemptFeedback";
 import { buildContainer } from "@/composition/container";
+import { getSessionUser } from "@/lib/auth";
 
 export interface ComposeAttemptFeedbackResponse {
   attemptId?: string;
@@ -36,16 +36,23 @@ export async function composeAttemptFeedbackAction(
   _prevState: unknown,
   formData: FormData,
 ): Promise<ComposeAttemptFeedbackResponse> {
-  const container = buildContainer();
-  const useCase = container.composeAttemptFeedback;
-
   const attemptId = formData.get("attemptId");
 
   if (typeof attemptId !== "string" || !attemptId.trim()) {
     return { error: "validation_error: attemptId is required" };
   }
 
-  const result = await useCase.execute({ attemptId });
+  const user = await getSessionUser();
+  if (!user) return { error: "unauthenticated" };
+
+  const container = buildContainer();
+  const attemptResult = await container.simulatorAttemptRepo.findByAttemptId(attemptId);
+  if (!attemptResult.ok) return { error: "internal_error" };
+  if (attemptResult.value !== null && attemptResult.value.userId !== user.id) {
+    return { error: "forbidden" };
+  }
+
+  const result = await container.composeAttemptFeedback.execute({ attemptId });
 
   if (Result.isErr(result)) {
     const err = result.error as { kind: string };

@@ -29,6 +29,7 @@ import { Result } from "@/domain/shared/Result";
 import type { CourseRepository, CourseError } from "@/ports/repositories/CourseRepository";
 import type { Course, Curriculum } from "@/domain/entities/Course";
 import type { LessonType } from "@/domain/entities/Lesson";
+import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
 import { Money } from "@/domain/values/Money";
 
 interface PrismaCourseRow {
@@ -44,6 +45,8 @@ interface PrismaCourseRow {
   isPublished: boolean;
   isFeatured: boolean;
   displayOrder: number;
+  courseTier: string;
+  previewLessonCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -192,6 +195,8 @@ export class PrismaCourseRepository implements CourseRepository {
     isPublished: boolean;
     isFeatured: boolean;
     displayOrder: number;
+    courseTier: string;
+    previewLessonCount: number;
   } {
     return {
       id: course.id,
@@ -205,6 +210,8 @@ export class PrismaCourseRepository implements CourseRepository {
       coverImage: course.coverImage,
       isPublished: course.status === "PUBLISHED",
       isFeatured: course.isFeatured,
+      courseTier: course.courseTier,
+      previewLessonCount: course.previewLessonCount,
       // Encode ARCHIVED as negative displayOrder; the in-memory repo
       // uses the same convention (ARCHIVED is status=ARCHIVED; we
       // map it to displayOrder < 0 for DB persistence since the
@@ -229,11 +236,8 @@ export class PrismaCourseRepository implements CourseRepository {
       isFeatured: row.isFeatured,
       displayOrder: Math.abs(row.displayOrder),
       status: this.mapStatus(row),
-      // The Prisma schema doesn't yet have courseTier / previewLessonCount.
-      // The audit's P1-7 calls out adding these; for now we hardcode
-      // the preview tier so the page doesn't break.
-      courseTier: "STARTER" as Course["courseTier"],
-      previewLessonCount: 1,
+      courseTier: row.courseTier as CourseAccessTier,
+      previewLessonCount: row.previewLessonCount,
       createdAt: row.createdAt,
     };
   }

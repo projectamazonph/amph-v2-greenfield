@@ -100,19 +100,23 @@ export class ResetPassword {
       });
     }
 
-    // Persist the new password hash.
+    // Claim the token before changing the password. A concurrent reset
+    // request must fail here, before it can overwrite the password again.
+    const marked = await this.deps.passwordResets.markUsed(record.id);
+    if (!marked.ok) {
+      return Result.err({ kind: "db_error", message: "Failed to consume password reset token" });
+    }
+    if (!marked.value.marked) {
+      return Result.err({ kind: "token_already_used" });
+    }
+
+    // Persist the new password hash after the token claim succeeds.
     const updateResult = await this.deps.users.update(record.userId, {
       passwordHash: hashResult.value,
     });
     if (!updateResult.ok) {
-      return Result.err({
-        kind: "db_error",
-        message: "Failed to update user password",
-      });
+      return Result.err({ kind: "db_error", message: "Failed to update user password" });
     }
-
-    // Mark the token used.
-    await this.deps.passwordResets.markUsed(record.id);
 
     // Revoke all existing sessions.
     await this.deps.sessions.deleteAllForUser(record.userId);

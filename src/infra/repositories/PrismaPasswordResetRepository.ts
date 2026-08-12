@@ -57,13 +57,13 @@ export class PrismaPasswordResetRepository implements PasswordResetRepository {
     }
   }
 
-  async markUsed(id: string): Promise<Result<void, PasswordResetError>> {
+  async markUsed(id: string): Promise<Result<{ marked: boolean }, PasswordResetError>> {
     try {
-      await this.db.passwordReset.updateMany({
+      const result = await this.db.passwordReset.updateMany({
         where: { id, usedAt: null },
         data: { usedAt: new Date() },
       });
-      return Result.ok(undefined);
+      return Result.ok({ marked: result.count === 1 });
     } catch (err: unknown) {
       return Result.err({
         kind: "db_error",

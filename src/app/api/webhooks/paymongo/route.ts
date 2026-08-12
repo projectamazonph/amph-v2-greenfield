@@ -133,7 +133,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       `failed_to_update_order: ${JSON.stringify(paidResult.error)}`,
     );
   }
-  await container.orderRepo.update(order);
+  const orderUpdateResult = await container.orderRepo.update(order);
+  if (Result.isErr(orderUpdateResult)) {
+    console.error(`[webhook] Failed to persist paid order ${order.id}:`, orderUpdateResult.error);
+    return finish(
+      NextResponse.json({ error: "Failed to update order" }, { status: 500 }),
+      `failed_to_persist_paid_order: ${JSON.stringify(orderUpdateResult.error)}`,
+    );
+  }
 
   // ── 8. Auto-enroll the student (via the container's use case) ─
   let enrollError: string | undefined;

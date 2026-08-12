@@ -15,7 +15,7 @@ import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
 import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
-import { getLessonData } from "../getLessonData";
+import { getLessonData, withCatalogCurriculum } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
 import type { Lesson } from "@/domain/entities/Lesson";
 import { LessonSidebar } from "../LessonSidebar";
@@ -33,20 +33,22 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug, lessonId } = await params;
   const container = buildContainer();
-  const course = await container.courseRepo.findBySlug(slug);
+  const catalog = await container.getCatalogCourse.execute(slug);
 
-  if (!course.ok || !courseIsAvailable(course.value)) {
+  if (!catalog.ok) {
     return { title: "Course Not Found — Project Amazon PH Academy" };
   }
 
-  const lessonData = getLessonData(course.value, lessonId);
-  if (!lessonData) {
+  const lessonLocation = catalog.value.modules
+    .flatMap((module) => module.lessons.map((lesson) => ({ module, lesson })))
+    .find(({ lesson }) => lesson.id === lessonId);
+  if (!lessonLocation) {
     return { title: "Lesson Not Found — Project Amazon PH Academy" };
   }
 
   return {
-    title: `${lessonData.lesson.title} — ${course.value.title} | Project Amazon PH Academy`,
-    description: `${lessonData.sectionTitle}: ${lessonData.lesson.title}`,
+    title: `${lessonLocation.lesson.title} — ${catalog.value.title} | Project Amazon PH Academy`,
+    description: `${lessonLocation.module.title}: ${lessonLocation.lesson.title}`,
   };
 }
 
@@ -55,12 +57,32 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
   const completionStatus = await searchParams;
   const container = buildContainer();
 
-  // ── Fetch course ────────────────────────────────────────
+  // ── Fetch course and authoritative catalog read model ───
   const courseResult = await container.courseRepo.findBySlug(slug);
-  if (!courseResult.ok || !courseIsAvailable(courseResult.value)) {
+  const catalogResult = await container.getCatalogCourse.execute(slug);
+  if (
+    !courseResult.ok ||
+    !courseIsAvailable(courseResult.value) ||
+    !catalogResult.ok ||
+    catalogResult.value.courseId !== courseResult.value.id
+  ) {
     notFound();
   }
-  const course = courseResult.value;
+
+  const catalog = catalogResult.value;
+  const lessonLocation = catalog.modules
+    .flatMap((module) => module.lessons.map((lesson) => ({ module, lesson })))
+    .find(({ lesson }) => lesson.id === lessonId);
+  if (!lessonLocation) notFound();
+
+  const selectedLessonResult = await container.lessonRepo.findById(lessonId);
+  if (
+    !selectedLessonResult.ok ||
+    selectedLessonResult.value.moduleId !== lessonLocation.module.id
+  ) {
+    notFound();
+  }
+  const course = withCatalogCurriculum(courseResult.value, catalog, selectedLessonResult.value);
 
   // ── Find lesson ─────────────────────────────────────────
   const lessonData = getLessonData(course, lessonId);

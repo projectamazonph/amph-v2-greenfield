@@ -29,6 +29,7 @@ vi.mock("server-only", () => ({}));
 // Mock the auth helpers so we don't need a real Next runtime.
 vi.mock("@/lib/auth", () => ({
   clearAuthCookie: vi.fn(async () => undefined),
+  getSessionCookieName: vi.fn(() => "amph_session"),
 }));
 
 // Mock the container so we don't need to wire up the full prod container.
@@ -89,6 +90,13 @@ describe("extractSessionToken", () => {
       }),
     } as Request);
     expect(token).toBe("first");
+  });
+
+  it("extracts the secure cookie used in production HTTPS", () => {
+    const token = extractSessionToken({
+      headers: new Headers({ cookie: "__Secure-amph_session=secure-token" }),
+    } as Request);
+    expect(token).toBe("secure-token");
   });
 });
 
