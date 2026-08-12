@@ -365,6 +365,17 @@ export function buildTestContainer(): TestContainer {
     emailTemplateRepo,
   });
 
+  // Hoisted so adminGrantSubscription can reuse the same EnrollStudent
+  // instance for its auto-enrollment step. Mirrors the production
+  // container's wiring.
+  const enrollStudent = new EnrollStudent({
+    userRepo,
+    courseRepo,
+    enrollmentRepo,
+    orderRepo,
+    idGen,
+  });
+
   // STORY-049 + STORY-062: build RefundOverride once. The
   // `refundOverride` container entry and `adminProcessRefund` share
   // the same instance ΓÇö matches the production container's wiring.
@@ -427,13 +438,7 @@ export function buildTestContainer(): TestContainer {
       idGen,
       clock,
     }),
-    enrollStudent: new EnrollStudent({
-      userRepo,
-      courseRepo,
-      enrollmentRepo,
-      orderRepo,
-      idGen,
-    }),
+    enrollStudent,
     discountCodeRepo,
     applyDiscountCode: new ApplyDiscountCode({
       discountCodeRepo,
@@ -543,10 +548,12 @@ export function buildTestContainer(): TestContainer {
     }),
     adminGrantSubscription: new AdminGrantSubscription({
       userRepo,
+      courseRepo,
       idGen,
       passwordHasher,
       recordAuditLog,
       requestPasswordReset,
+      enrollStudent,
       logger,
     }),
     adminSetEnrollmentStatus: new AdminSetEnrollmentStatus({

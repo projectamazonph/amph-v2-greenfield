@@ -10,18 +10,28 @@
  *  - db_error propagation from findByEmail / hash / create / update
  *  - the email_taken race between findByEmail and create
  *  - a rate-limited claim email is logged, not silently dropped
+ *  - auto-enrollment: STARTER grants enroll in STARTER + PREVIEW courses,
+ *    PRO grants enroll in everything, FREE is a no-op, and re-grants
+ *    are idempotent (already_enrolled counts as success)
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { Result } from "@/domain/shared/Result";
 import type { User } from "@/domain/entities/User";
+import type { Course } from "@/domain/entities/Course";
+import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
 import type { UserError } from "@/ports/repositories/UserRepository";
 import type { PasswordHasher, HashError } from "@/ports/security/PasswordHasher";
 import { Money } from "@/domain/values/Money";
+import { createCourse } from "@/domain/entities/Course";
 import { AdminGrantSubscription } from "../AdminGrantSubscription";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
+import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
+import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
+import { InMemoryOrderRepository } from "@/infra/payment/InMemoryOrderRepository";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { InMemoryPasswordResetRepository } from "@/infra/db/inmemory/InMemoryPasswordResetRepository";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
@@ -67,8 +77,45 @@ class FindByEmailFailsRepo extends InMemoryUserRepository {
   }
 }
 
+// ── Test data factories ──────────────────────────────────────────────────────
+
+function makeCourse(overrides: {
+  id?: string;
+  slug?: string;
+  courseTier?: CourseAccessTier;
+  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  priceMinor?: number;
+} = {}): Course {
+  const result = createCourse({
+    id: overrides.id ?? "course-id",
+    slug: overrides.slug ?? "course-slug",
+    title: "Test Course",
+    tagline: "",
+    description: "",
+    priceMinor: overrides.priceMinor ?? 0,
+    curriculum: {
+      sections: [
+        {
+          id: "seed-section-1",
+          title: "Intro",
+          lessons: [
+            { id: "seed-lesson-1", title: "Welcome", type: "TEXT", content: { body: "Hi" } },
+          ],
+        },
+      ],
+    },
+    courseTier: overrides.courseTier ?? "STARTER",
+    status: overrides.status ?? "PUBLISHED",
+  });
+  if (!result.ok) throw new Error(`Test setup: createCourse failed: ${result.error.kind}`);
+  return result.value;
+}
+
 describe("AdminGrantSubscription", () => {
   let users: InMemoryUserRepository;
+  let courseRepo: InMemoryCourseRepository;
+  let enrollmentRepo: InMemoryEnrollmentRepository;
+  let orderRepo: InMemoryOrderRepository;
   let audit: InMemoryAuditLog;
   let email: InMemoryEmailSender;
   let passwordResets: InMemoryPasswordResetRepository;
@@ -80,6 +127,9 @@ describe("AdminGrantSubscription", () => {
 
   beforeEach(() => {
     users = new InMemoryUserRepository();
+    courseRepo = new InMemoryCourseRepository();
+    enrollmentRepo = new InMemoryEnrollmentRepository();
+    orderRepo = new InMemoryOrderRepository();
     audit = new InMemoryAuditLog();
     email = new InMemoryEmailSender();
     passwordResets = new InMemoryPasswordResetRepository();
@@ -103,12 +153,21 @@ describe("AdminGrantSubscription", () => {
       logger: new TestLogger(),
       emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
+    const enrollStudent = new EnrollStudent({
+      userRepo,
+      courseRepo,
+      enrollmentRepo,
+      orderRepo,
+      idGen,
+    });
     return new AdminGrantSubscription({
       userRepo,
+      courseRepo,
       idGen,
       passwordHasher: hasher,
       recordAuditLog,
       requestPasswordReset,
+      enrollStudent,
       logger,
     });
   }
@@ -368,5 +427,266 @@ describe("AdminGrantSubscription", () => {
       (e) => e.level === "warn" && e.message === "admin_grant_subscription.claim_email_failed",
     );
     expect(warning).toBeDefined();
+  });
+
+  // ── Auto-enrollment: tier-based access grant creates Enrollment rows ──
+
+  it("auto-enrolls a STARTER-grant student in every published STARTER and PREVIEW course", async () => {
+    courseRepo.seed([
+      makeCourse({ id: "c-starter", slug: "starter", courseTier: "STARTER" }),
+      makeCourse({ id: "c-preview", slug: "preview", courseTier: "PREVIEW" }),
+      makeCourse({ id: "c-pro-only", slug: "pro-only", courseTier: "PRO" }),
+      makeCourse({ id: "c-draft", slug: "draft", courseTier: "STARTER", status: "DRAFT" }),
+    ]);
+
+    const useCase = build();
+    const r = await useCase.execute({
+      email: "fresh@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "STARTER",
+      actorId: "admin-1",
+    });
+    expect(r.ok).toBe(true);
+
+    const enrollmentsResult = await enrollmentRepo.findByUserId(r.ok ? r.value.userId : "x");
+    expect(enrollmentsResult.ok).toBe(true);
+    if (!enrollmentsResult.ok) return;
+    const courseIds = enrollmentsResult.value.map((e) => e.courseId).sort();
+    expect(courseIds).toEqual(["c-preview", "c-starter"]);
+
+    const entry = audit.getAll()[0]!;
+    expect(entry.metadata).toMatchObject({
+      subscriptionTier: "STARTER",
+      enrolledCourseIds: expect.arrayContaining(["c-preview", "c-starter"]),
+    });
+  });
+
+  it("auto-enrolls a PRO-grant student in every published course regardless of tier", async () => {
+    courseRepo.seed([
+      makeCourse({ id: "c-starter", slug: "starter", courseTier: "STARTER" }),
+      makeCourse({ id: "c-pro", slug: "pro", courseTier: "PRO" }),
+      makeCourse({ id: "c-preview", slug: "preview", courseTier: "PREVIEW" }),
+      makeCourse({ id: "c-draft", slug: "draft", courseTier: "STARTER", status: "DRAFT" }),
+    ]);
+
+    const useCase = build();
+    const r = await useCase.execute({
+      email: "vip@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "PRO",
+      actorId: "admin-1",
+    });
+    expect(r.ok).toBe(true);
+
+    const enrollmentsResult = await enrollmentRepo.findByUserId(r.ok ? r.value.userId : "x");
+    expect(enrollmentsResult.ok).toBe(true);
+    if (!enrollmentsResult.ok) return;
+    const courseIds = enrollmentsResult.value.map((e) => e.courseId).sort();
+    expect(courseIds).toEqual(["c-preview", "c-pro", "c-starter"]);
+  });
+
+  it("does not auto-enroll on a FREE grant (revocation only)", async () => {
+    courseRepo.seed([
+      makeCourse({ id: "c-starter", slug: "starter", courseTier: "STARTER" }),
+      makeCourse({ id: "c-preview", slug: "preview", courseTier: "PREVIEW" }),
+    ]);
+
+    const useCase = build();
+    const r = await useCase.execute({
+      email: "revoke@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "FREE",
+      actorId: "admin-1",
+    });
+    expect(r.ok).toBe(true);
+
+    const enrollmentsResult = await enrollmentRepo.findByUserId(r.ok ? r.value.userId : "x");
+    expect(enrollmentsResult.ok).toBe(true);
+    if (!enrollmentsResult.ok) return;
+    expect(enrollmentsResult.value).toHaveLength(0);
+
+    const entry = audit.getAll()[0]!;
+    expect(entry.metadata).toMatchObject({
+      subscriptionTier: "FREE",
+      enrolledCourseIds: [],
+    });
+  });
+
+  it("auto-enrolls into paid courses too (admin_grant entitlement bypasses paywall)", async () => {
+    // priceMinor > 0 = paid course. EnrollStudent's P0-1 paywall check
+    // would refuse `entitlement: "free"` here; the grant path uses
+    // `entitlement: "admin_grant"`, which is trusted.
+    courseRepo.seed([
+      makeCourse({ id: "c-paid-starter", slug: "paid-starter", courseTier: "STARTER", priceMinor: 299900 }),
+    ]);
+
+    const useCase = build();
+    const r = await useCase.execute({
+      email: "paid-grant@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "STARTER",
+      actorId: "admin-1",
+    });
+    expect(r.ok).toBe(true);
+
+    const enrollmentsResult = await enrollmentRepo.findByUserId(r.ok ? r.value.userId : "x");
+    expect(enrollmentsResult.ok).toBe(true);
+    if (!enrollmentsResult.ok) return;
+    expect(enrollmentsResult.value.map((e) => e.courseId)).toEqual(["c-paid-starter"]);
+  });
+
+  it("is idempotent — re-granting the same tier does not fail and counts already-enrolled courses", async () => {
+    courseRepo.seed([
+      makeCourse({ id: "c-starter", slug: "starter", courseTier: "STARTER" }),
+      makeCourse({ id: "c-preview", slug: "preview", courseTier: "PREVIEW" }),
+    ]);
+
+    const useCase = build();
+    const first = await useCase.execute({
+      email: "repeat@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "PRO",
+      actorId: "admin-1",
+    });
+    expect(first.ok).toBe(true);
+
+    const second = await useCase.execute({
+      email: "repeat@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "PRO",
+      actorId: "admin-1",
+    });
+    expect(second.ok).toBe(true);
+
+    // Still exactly one enrollment row per course, not two.
+    const enrollmentsResult = await enrollmentRepo.findByUserId(first.ok ? first.value.userId : "x");
+    expect(enrollmentsResult.ok).toBe(true);
+    if (!enrollmentsResult.ok) return;
+    expect(enrollmentsResult.value).toHaveLength(2);
+
+    // Both grant audits list the full set of eligible courses.
+    const entries = audit.getAll();
+    expect(entries).toHaveLength(2);
+    expect(entries[0]!.metadata).toMatchObject({
+      enrolledCourseIds: expect.arrayContaining(["c-preview", "c-starter"]),
+    });
+    expect(entries[1]!.metadata).toMatchObject({
+      enrolledCourseIds: expect.arrayContaining(["c-preview", "c-starter"]),
+    });
+  });
+
+  it("downgrades keep existing enrollments and add no new ones", async () => {
+    // First grant PRO to a student who already has a paid enrollment in
+    // a PRO course (e.g. they bought it individually before the grant).
+    courseRepo.seed([
+      makeCourse({ id: "c-pro", slug: "pro", courseTier: "PRO", priceMinor: 499900 }),
+    ]);
+    const useCase = build();
+    const proGrant = await useCase.execute({
+      email: "downgrade@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "PRO",
+      actorId: "admin-1",
+    });
+    expect(proGrant.ok).toBe(true);
+
+    // Now downgrade to FREE. The PRO enrollment must stay (they paid
+    // for it individually) and no new enrollments should appear.
+    const freeGrant = await useCase.execute({
+      email: "downgrade@student.com",
+      subscriptionTier: "FREE",
+      actorId: "admin-1",
+    });
+    expect(freeGrant.ok).toBe(true);
+
+    const enrollmentsResult = await enrollmentRepo.findByUserId(
+      proGrant.ok ? proGrant.value.userId : "x",
+    );
+    expect(enrollmentsResult.ok).toBe(true);
+    if (!enrollmentsResult.ok) return;
+    expect(enrollmentsResult.value.map((e) => e.courseId)).toEqual(["c-pro"]);
+
+    const downgradeEntry = audit.getAll()[1]!;
+    expect(downgradeEntry.metadata).toMatchObject({
+      subscriptionTier: "FREE",
+      enrolledCourseIds: [],
+    });
+  });
+
+  it("does not fail the grant if a single course fails to enroll (logged + continued)", async () => {
+    courseRepo.seed([
+      makeCourse({ id: "c-ok", slug: "ok", courseTier: "STARTER" }),
+      makeCourse({ id: "c-bad", slug: "bad", courseTier: "STARTER" }),
+    ]);
+
+    // Make the enrollment repo fail only for the second course.
+    const realCreate = enrollmentRepo.create.bind(enrollmentRepo);
+    let calls = 0;
+    enrollmentRepo.create = async (enrollment) => {
+      calls++;
+      if (enrollment.courseId === "c-bad") {
+        return Result.err({ kind: "db_error", message: "transient failure" });
+      }
+      return realCreate(enrollment);
+    };
+
+    const useCase = build();
+    const r = await useCase.execute({
+      email: "partial@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "STARTER",
+      actorId: "admin-1",
+    });
+    expect(r.ok).toBe(true);
+
+    // The good course is enrolled; the bad one is logged.
+    const enrollmentsResult = await enrollmentRepo.findByUserId(r.ok ? r.value.userId : "x");
+    expect(enrollmentsResult.ok).toBe(true);
+    if (!enrollmentsResult.ok) return;
+    expect(enrollmentsResult.value.map((e) => e.courseId)).toEqual(["c-ok"]);
+
+    const warn = logger.entries.find(
+      (e) => e.level === "warn" && e.message === "admin_grant_subscription.auto_enroll_failed",
+    );
+    expect(warn).toBeDefined();
+
+    // Audit still records the courses that ended up enrolled.
+    const entry = audit.getAll()[0]!;
+    expect(entry.metadata).toMatchObject({ enrolledCourseIds: ["c-ok"] });
+    expect(calls).toBe(2);
+  });
+
+  it("logs a warning and proceeds when the course listing itself fails", async () => {
+    const realList = courseRepo.listPublished.bind(courseRepo);
+    courseRepo.listPublished = async () =>
+      Result.err({ kind: "db_error", message: "catalog down" });
+
+    const useCase = build();
+    const r = await useCase.execute({
+      email: "listfail@student.com",
+      firstName: "A",
+      lastName: "B",
+      subscriptionTier: "STARTER",
+      actorId: "admin-1",
+    });
+    expect(r.ok).toBe(true);
+
+    const warn = logger.entries.find(
+      (e) => e.level === "warn" && e.message === "admin_grant_subscription.course_list_failed",
+    );
+    expect(warn).toBeDefined();
+
+    const entry = audit.getAll()[0]!;
+    expect(entry.metadata).toMatchObject({ enrolledCourseIds: [] });
+
+    courseRepo.listPublished = realList;
   });
 });

@@ -14,16 +14,37 @@
  * enter). Reuses RequestPasswordReset to mint a "set your password"
  * email, exactly like the public forgot-password flow, so the
  * account isn't left unreachable.
+ *
+ * After the tier is set, the use case auto-enrolls the student in
+ * every published course their new tier unlocks (STARTER grants
+ * unlock STARTER + PREVIEW courses, PRO grants unlock everything).
+ * Without this step the student's dashboard "My courses" section is
+ * empty (it reads from the Enrollment table, not the user's tier
+ * field), even though TierAccessPolicy would let them in by URL.
+ * TierAccessPolicy still does the access check on lesson views; this
+ * step just makes the dashboard, progress tracking, and "continue
+ * learning" surfaces work for the granted tier.
+ *
+ * The auto-enroll step is idempotent (re-granting the same tier
+ * returns "already_enrolled" for each course, which we treat as
+ * success) and best-effort for non-conflict errors — if one course
+ * fails to enroll for an unexpected reason, the grant itself still
+ * stands and the failure is logged. A downgrade to FREE skips
+ * auto-enrollment entirely (revocation, not new access; existing
+ * enrollments are left intact).
  */
 
 import { Result } from "@/domain/shared/Result";
 import type { Money } from "@/domain/values/Money";
+import { subscriptionMeetsCourseTier } from "@/domain/values/CourseAccessTier";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
+import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Logger } from "@/ports/observability/Logger";
 import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import type { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
+import type { EnrollStudent } from "@/usecases/EnrollStudent";
 import type { SubscriptionTier } from "@/domain/entities/User";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,11 +88,14 @@ export type AdminGrantSubscriptionResult = Result<
 
 export interface AdminGrantSubscriptionDeps {
   userRepo: UserRepository;
+  courseRepo: CourseRepository;
   idGen: IdGenerator;
   passwordHasher: PasswordHasher;
   recordAuditLog: RecordAuditLog;
   /** Reused (not duplicated) to send new accounts a "set your password" email. */
   requestPasswordReset: RequestPasswordReset;
+  /** Reused to auto-enroll the student in every course the granted tier unlocks. */
+  enrollStudent: EnrollStudent;
   logger: Logger;
 }
 
@@ -157,6 +181,14 @@ export class AdminGrantSubscription {
       return Result.err({ kind: "db_error", message });
     }
 
+    // Auto-enroll the student in every published course the granted tier
+    // unlocks. Skipped for FREE because that's a revocation, not new
+    // access. `already_enrolled` is the expected outcome on re-grant and
+    // on courses the student already bought individually — counted as
+    // success. Other errors are logged but don't fail the grant: the
+    // tier is already set and audited below.
+    const enrolledCourseIds = await this.autoEnrollAtTier(userId, input.subscriptionTier);
+
     await this.deps.recordAuditLog.execute({
       actorId: input.actorId,
       action: isNewUser ? "user.subscription_granted" : "user.subscription_changed",
@@ -166,6 +198,7 @@ export class AdminGrantSubscription {
         subscriptionTier: input.subscriptionTier,
         previousTier,
         isNewUser,
+        enrolledCourseIds,
         ...(input.payment
           ? {
               paymentMethod: input.payment.method,
@@ -194,5 +227,58 @@ export class AdminGrantSubscription {
     }
 
     return Result.ok({ userId, isNewUser, subscriptionTier: input.subscriptionTier });
+  }
+
+  /**
+   * Enroll the user in every published course the granted tier unlocks.
+   * Returns the list of course IDs that ended up with a fresh enrollment
+   * OR an "already_enrolled" result (so the audit metadata reflects the
+   * full set of courses the grant covers, not just the new ones).
+   *
+   * FREE grants are a no-op — downgrading shouldn't create new rows.
+   * Individual enroll errors are logged at warn and swallowed: the
+   * grant itself has already succeeded, and a flaky course shouldn't
+   * undo the subscription for the rest of the catalog.
+   */
+  private async autoEnrollAtTier(
+    userId: string,
+    tier: SubscriptionTier,
+  ): Promise<readonly string[]> {
+    if (tier === "FREE") return [];
+
+    const coursesResult = await this.deps.courseRepo.listPublished();
+    if (!coursesResult.ok) {
+      this.deps.logger.warn("admin_grant_subscription.course_list_failed", {
+        userId,
+        error: coursesResult.error,
+      });
+      return [];
+    }
+
+    const eligible = coursesResult.value.filter((c) =>
+      subscriptionMeetsCourseTier(tier, c.courseTier),
+    );
+
+    const enrolled: string[] = [];
+    for (const course of eligible) {
+      const result = await this.deps.enrollStudent.execute({
+        userId,
+        courseId: course.id,
+        entitlement: "admin_grant",
+      });
+
+      if (result.ok || result.error.kind === "already_enrolled") {
+        enrolled.push(course.id);
+        continue;
+      }
+
+      this.deps.logger.warn("admin_grant_subscription.auto_enroll_failed", {
+        userId,
+        courseId: course.id,
+        courseSlug: course.slug,
+        error: result.error,
+      });
+    }
+    return enrolled;
   }
 }

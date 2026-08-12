@@ -159,9 +159,12 @@ test.describe("Critical journeys", () => {
     await page.getByRole("button", { name: /save tier/i }).click();
     await expect(page.getByRole("status")).toContainText("Subscription tier updated");
 
+    // Granting a PRO tier auto-enrolls the student in every published
+    // course their tier unlocks (STORY-105 follow-up to the admin-grant
+    // paywall fix). The course is "Active" immediately — no manual
+    // enroll click. The revoke/restore round-trip below still exercises
+    // the per-course admin actions.
     const courseRow = page.getByText(scenario.courseTitle).locator("..").locator("..");
-    await courseRow.getByRole("button", { name: /^enroll$/i }).click();
-    await expect(page.getByRole("status")).toContainText("Course access");
     await expect(courseRow.getByText("Active", { exact: true })).toBeVisible();
 
     page.once("dialog", (dialog) => dialog.accept());
