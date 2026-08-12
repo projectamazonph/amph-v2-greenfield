@@ -646,6 +646,16 @@ function buildProductionContainer(): AppContainer {
     emailTemplateRepo,
   });
 
+  // Hoisted so adminGrantSubscription can reuse the same EnrollStudent
+  // instance for its auto-enrollment step (see use-case comment).
+  const enrollStudent = new EnrollStudent({
+    userRepo,
+    courseRepo,
+    enrollmentRepo,
+    orderRepo,
+    idGen,
+  });
+
   // STORY-049 + STORY-062: build RefundOverride once. Both the
   // `refundOverride` container entry and `adminProcessRefund` (which
   // delegates to it) share the same instance ΓÇö that keeps a single
@@ -707,13 +717,7 @@ function buildProductionContainer(): AppContainer {
       idGen,
       clock,
     }),
-    enrollStudent: new EnrollStudent({
-      userRepo,
-      courseRepo,
-      enrollmentRepo,
-      orderRepo,
-      idGen,
-    }),
+    enrollStudent,
     discountCodeRepo,
     applyDiscountCode: new ApplyDiscountCode({
       discountCodeRepo,
@@ -872,10 +876,12 @@ function buildProductionContainer(): AppContainer {
     }),
     adminGrantSubscription: new AdminGrantSubscription({
       userRepo,
+      courseRepo,
       idGen,
       passwordHasher,
       recordAuditLog,
       requestPasswordReset,
+      enrollStudent,
       logger,
     }),
     adminSetEnrollmentStatus: new AdminSetEnrollmentStatus({
