@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-13 against the student-event coverage branch
+**Last reviewed:** 2026-08-13 against the admin-event coverage branch
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
@@ -44,6 +44,11 @@ The public catalog and pricing pages deliberately render an empty-state message 
 
 Student-facing actions, routes, and event controls have direct boundary tests.
 See `docs/STUDENT-EVENT-COVERAGE.md` for the inventory and future test contract.
+
+Admin mutations and event controls have direct boundary contracts covering actor
+injection, authorization, input normalization, success mapping, and failure
+mapping. See `docs/ADMIN-EVENT-COVERAGE.md` and the inventory test under
+`src/app/actions/__tests__` before adding new admin actions.
 
 ### Pricing, checkout, and refunds
 
@@ -144,7 +149,9 @@ On 2026-08-13:
 - TypeScript: pass.
 - ESLint: pass.
 - Next.js production build: pass.
-- Full Vitest run: 3,848 passing, 2 skipped.
+- Full Vitest run: 3,869 passing, 2 skipped.
+- Coverage run: 80.21% statements, 74.17% branches, 81.46% functions, and
+  81.56% lines.
 - Architecture suite: 665 passing.
 - Prisma schema and migration contract tests: pass as part of the full suite.
 - Playwright E2E: pass.
