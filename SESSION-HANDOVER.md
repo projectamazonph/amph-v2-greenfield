@@ -1,5 +1,80 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-12, forgot-password fix + STORY-104 doc sync)
+
+Picked up under a standing `/goal` directive ("fixed platform, ready for
+student intake"). Two parts, both on `claude/fixed-platform-student-intake-pgwm8i`.
+
+**Part 1 — doc-hygiene gap found and closed.** `docs/stories/STORY-104.md`
+("Student journey reliability repair", 13 pts) had shipped as three merged
+PRs — **#305** `fix(student): repair end-to-end learning flows` (a large
+sweep: persisted lesson/quiz progress, server-side access/scenario/prerequisite
+enforcement, live-class enrollment gating, tier-vs-direct checkout price
+parity, purchase/certificate history + fuller data export, and an
+accessibility pass — landmarks, loading states, nested-interactive-element
+and account-enumeration fixes), **#306** `fix(admin): auto-enroll student in
+courses at granted tier` (a real bug: `AdminGrantSubscription` set the tier
+but never created `Enrollment` rows, so the student dashboard stayed empty
+after an admin grant), and **#307** `fix(admin): plant session cookie on
+admin-login redirect response` (a real production-breaking bug: admins could
+not log in at all, because `/api/auth/admin-login` returned a fresh redirect
+response that never carried the session cookie — the same class of bug
+already fixed on `/login`/`/signup` in PR #182, missed here when the route
+was added in PR #174) — but this file never got a session-log entry for it,
+and the story doc's own header still said "In review". Both corrected: the
+story doc now points at the three merge commits, and this entry closes the
+gap. Re-verified fresh (not just trusted the stale docs): `pnpm typecheck`,
+`pnpm lint`, `pnpm test` (**3,816** passed / 2 skipped, up from the story
+doc's reported 3,804), `pnpm test:arch` (665/665), `pnpm build` (96 routes)
+all green on a clean `pnpm install`.
+
+**Part 2 — real bug found and fixed: forgot-password sent no email.** Ryan
+reported "forgot password not working, no email arrives" mid-session.
+`Vercel__get_runtime_errors` on the production project showed the actual
+cause: two hits the same day on `/reset-password` for `Error: A "use server"
+file can only export async functions, found object`. Root cause:
+`src/app/actions/authPasswordReset.action.ts` is a `"use server"` file that
+exported a plain object (`initialRequestResetState`, re-exported from a
+`const INITIAL`) — Next.js's server-actions compiler only allows async
+function exports from a `"use server"` file, and `ResetRequestForm.tsx`
+imported that object directly. The violation broke the page at request time,
+so `requestPasswordResetAction` never actually ran and no reset email was
+ever sent — this is invisible to `pnpm build`/CI because the check fires at
+RSC/server-action module instantiation on a real request, not at build time.
+Fixed by moving the initial-state constant into the client component instead
+of exporting it from the action file (mirroring how `ResetConfirmForm.tsx`
+already did this correctly).
+
+**Swept for the same pattern and found one more, fixed proactively:**
+`src/app/actions/checkout.action.ts` exported the identical
+`CHECKOUT_INITIAL_STATE` object, imported by `CheckoutForm.tsx` on the actual
+payment path. No production error had fired for `/checkout` yet, but it's
+the same violation on the revenue-critical route, so fixed the same way
+before it did. Grepped every other `"use server"` file in `src/app/`
+(`export -nE '^export '` across all of them) — every other export is either
+an async function or a type/interface (erased at compile time, not subject
+to the runtime check), so no further instances exist.
+
+Commit `9b314f3`: `fix(auth): repair forgot-password flow broken by "use
+server" export violation`. Verified again after the fix: typecheck/lint
+clean, `pnpm test` 3,815 passed / 2 skipped (one fewer than the sweep above
+because a test asserting the now-removed `CHECKOUT_INITIAL_STATE` export was
+removed, not a regression — the assertion moved to what the component
+actually renders), `test:arch` 665/665, `build` 96 routes, all green.
+
+**Not attempted this session, and why (all operator-owned, no credentials
+available here):** PayMongo live/sandbox webhook registration and a real
+checkout smoke test, a DB backup/restore drill, pre-launch security audit
+execution, launch communications, external uptime monitoring, creating the
+first real production admin user, and the admin-2FA _enforcement_ policy
+decision (opt-in TOTP already exists; nothing requires it yet — a real
+lockout-risk call for a solo-admin project). Sprint 16's STORY-086
+(instructor calibration) and STORY-089 (connected-account simulator) are
+still `⏳ Planned` and are not launch blockers — simulator-maturity work, not
+part of "fixed platform, ready for student intake."
+
+---
+
 # Session update (2026-08-10, STORY-103)
 
 Ryan requested a complete admin usability and student-access recovery after a

@@ -8,7 +8,11 @@
 
 **Owner:** Ryan
 
-**Status:** In review
+**Status:** Done — merged to `main` via PR #305 (`9096cf4`), PR #306
+(`9d80c77`), PR #307 (`88d83d9`). CI green on all three; this doc's own
+"Status: In review" header had gone stale relative to the merge — see
+`SESSION-HANDOVER.md`'s 2026-08-12 entry, which also closes the gap where
+this story was never logged there despite being merged.
 
 ## Goal
 
