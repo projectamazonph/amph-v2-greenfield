@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-12 against `ee1737a`
+**Last reviewed:** 2026-08-13 against the student-event coverage branch
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
@@ -41,6 +41,9 @@ Password-reset and transactional links use the configured application origin. Th
 - Admin course, module, and lesson CRUD is available under `/admin/courses`.
 
 The public catalog and pricing pages deliberately render an empty-state message when no published course or active pricing rows have been seeded. `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01) — the placeholder is gone.
+
+Student-facing actions, routes, and event controls have direct boundary tests.
+See `docs/STUDENT-EVENT-COVERAGE.md` for the inventory and future test contract.
 
 ### Pricing, checkout, and refunds
 
@@ -136,12 +139,12 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 
 ## Verification snapshot
 
-On 2026-08-12:
+On 2026-08-13:
 
 - TypeScript: pass.
 - ESLint: pass.
 - Next.js production build: pass.
-- Full Vitest run: 3,816 passing, 2 skipped.
+- Full Vitest run: 3,848 passing, 2 skipped.
 - Architecture suite: 665 passing.
 - Prisma schema and migration contract tests: pass as part of the full suite.
 - Playwright E2E: pass.

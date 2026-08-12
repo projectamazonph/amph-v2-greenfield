@@ -4,6 +4,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-13: Student event boundary coverage
+
+- Added direct tests for remaining student auth, account, live-class, simulator,
+  download, certificate, verification, and form event boundaries.
+- Added `docs/STUDENT-EVENT-COVERAGE.md` as the ongoing coverage contract.
+- Verified 3,848 Vitest tests passed with 2 skipped and 665 architecture checks
+  passed.
+
 ### 2026-08-12: Student repair follow-ups and current verification
 
 - Merged PR #305 (`9096cf4`), the full student-facing journey, route-state,

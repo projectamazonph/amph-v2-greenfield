@@ -53,7 +53,9 @@ redirect cookie), and PR #308 (password-reset URL normalization). Current gate:
 3,816 Vitest passed, 2 skipped; 665 architecture checks; TypeScript, ESLint,
 production build, Playwright, and Lighthouse passed.
 
-- The PR #305 gate passed 3,804 tests with 2 skipped. The current post-follow-up gate passes 3,816 tests with 2 skipped.
+- The PR #305 gate passed 3,804 tests with 2 skipped. The current post-follow-up
+  gate passes 3,848 tests with 2 skipped. Student event boundary coverage is
+  documented in `docs/STUDENT-EVENT-COVERAGE.md`.
 - All 665 architecture checks passed, including design-token, loading-state,
   landmark, heading, and client-feedback contracts.
 - Next.js production build completed all 94 routes.
