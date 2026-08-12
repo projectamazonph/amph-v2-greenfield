@@ -47,7 +47,7 @@ function makeFormData(values: Record<string, string>): FormData {
   return fd;
 }
 
-import { startCheckout, CHECKOUT_INITIAL_STATE } from "../checkout.action";
+import { startCheckout } from "../checkout.action";
 
 describe("startCheckout (server action)", () => {
   beforeEach(() => {
@@ -58,10 +58,6 @@ describe("startCheckout (server action)", () => {
       ok: true,
       value: { allowed: true, remaining: 99, resetSeconds: 60 },
     });
-  });
-
-  it("exports an initial state of kind: idle", () => {
-    expect(CHECKOUT_INITIAL_STATE).toEqual({ kind: "idle" });
   });
 
   it("returns invalid_input when courseSlug is empty", async () => {

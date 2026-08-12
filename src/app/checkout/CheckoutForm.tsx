@@ -36,12 +36,14 @@
 
 import { useActionState, useEffect } from "react";
 import Link from "next/link";
-import {
-  startCheckout,
-  CHECKOUT_INITIAL_STATE,
-  type CheckoutActionState,
-} from "@/app/actions/checkout.action";
+import { startCheckout, type CheckoutActionState } from "@/app/actions/checkout.action";
 import type { CheckoutSummary } from "@/usecases/GetCheckoutSummary";
+
+// Kept out of the "use server" action file: a file with "use server" at
+// the top can only export async functions, not plain values — importing
+// this object from there breaks the page at runtime (Next.js error "A
+// 'use server' file can only export async functions, found object").
+const CHECKOUT_INITIAL_STATE: CheckoutActionState = { kind: "idle" };
 
 const PAGE_STYLES: Record<string, React.CSSProperties> = {
   page: {

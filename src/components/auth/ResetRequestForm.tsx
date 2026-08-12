@@ -11,15 +11,18 @@
 import { useActionState } from "react";
 import {
   requestPasswordResetAction,
-  initialRequestResetState,
+  type RequestResetState,
 } from "@/app/actions/authPasswordReset.action";
 import styles from "./ResetRequestForm.module.css";
 
+// Kept out of the "use server" action file: a file with "use server" at
+// the top can only export async functions, not plain values — importing
+// this object from there breaks the page at runtime (Next.js error "A
+// 'use server' file can only export async functions, found object").
+const INITIAL_STATE: RequestResetState = { kind: "idle" };
+
 export function ResetRequestForm() {
-  const [state, formAction, pending] = useActionState(
-    requestPasswordResetAction,
-    initialRequestResetState,
-  );
+  const [state, formAction, pending] = useActionState(requestPasswordResetAction, INITIAL_STATE);
 
   if (state.kind === "sent") {
     return (

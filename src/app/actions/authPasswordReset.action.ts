@@ -24,8 +24,6 @@ export type RequestResetState = {
   retryAfterSeconds?: number;
 };
 
-const INITIAL: RequestResetState = { kind: "idle" };
-
 export async function requestPasswordResetAction(
   _prev: RequestResetState,
   formData: FormData,
@@ -36,9 +34,7 @@ export async function requestPasswordResetAction(
   // Pull the IP for the rate-limit key.
   const hdrs = await headers();
   const ip =
-    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    hdrs.get("x-real-ip") ??
-    "0.0.0.0";
+    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "0.0.0.0";
 
   const container = buildContainer();
   const result = await container.requestPasswordReset.execute({ email, ip });
@@ -49,15 +45,11 @@ export async function requestPasswordResetAction(
     return {
       kind: "rate_limited",
       message: "Too many requests. Try again later.",
-      retryAfterSeconds: Math.ceil(
-        (result.error.resetAt.getTime() - Date.now()) / 1000,
-      ),
+      retryAfterSeconds: Math.ceil((result.error.resetAt.getTime() - Date.now()) / 1000),
     };
   }
   return { kind: "validation_failed", message: "Email format is invalid" };
 }
-
-export { INITIAL as initialRequestResetState };
 
 // ── ResetPassword action ───────────────────────────────────────
 

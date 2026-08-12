@@ -23,7 +23,6 @@ vi.mock("server-only", () => ({}));
 // in the action test.
 vi.mock("@/app/actions/checkout.action", () => ({
   startCheckout: vi.fn(async () => ({ kind: "idle" as const })),
-  CHECKOUT_INITIAL_STATE: { kind: "idle" as const },
 }));
 
 import { renderToString } from "react-dom/server";

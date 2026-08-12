@@ -44,9 +44,6 @@ export type CheckoutActionState =
 
 const CHECKOUT_RATE_LIMIT = { limit: 10, windowSeconds: 3600 }; // 10 per hour
 
-const INITIAL: CheckoutActionState = { kind: "idle" };
-export const CHECKOUT_INITIAL_STATE = INITIAL;
-
 /**
  * Main entrypoint. Receives FormData from the /checkout form.
  * Validates input, calls CreatePaymentIntent, returns the result.
