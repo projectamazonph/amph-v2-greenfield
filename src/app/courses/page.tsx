@@ -22,6 +22,7 @@ import { buildContainer } from "@/composition/container";
 import type { CatalogCourse } from "@/usecases/ListCatalogCourses";
 import styles from "./page.module.css";
 import { StudentShell } from "@/components/student/StudentShell";
+import { CourseCover } from "@/components/student/CourseCover";
 
 export const metadata: Metadata = {
   title: "Courses — Project Amazon PH Academy",
@@ -96,22 +97,14 @@ function CourseCard({
 
   return (
     <Link href={`/courses/${course.slug}`} className={styles.card}>
-      {course.coverImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={course.coverImage}
-          alt={course.title}
-          width={640}
-          height={352}
-          loading="lazy"
-          decoding="async"
-          className={styles.cardImage}
-        />
-      ) : (
-        <div className={styles.cardImagePlaceholder}>
-          <span className={styles.cardImagePlaceholderLetter}>{course.title[0]}</span>
-        </div>
-      )}
+      <CourseCover
+        title={course.title}
+        slug={course.slug}
+        coverImage={course.coverImage}
+        width={640}
+        height={352}
+        className={styles.cardImage}
+      />
 
       <div className={styles.cardBody}>
         {isFeatured && (

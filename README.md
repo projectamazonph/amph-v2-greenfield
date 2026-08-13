@@ -6,7 +6,7 @@ Three courses, practical tools, and a Field Manual interface. The repository con
 
 **Production:** <https://projectamazonph.vercel.app>. The retired `amph-v2-greenfield.vercel.app` origin must not be used for new links. Deployment configuration, database contents, payment webhooks, and live email delivery remain operator-owned checks.
 
-![Landing Page](public/screenshots/landing-placeholder.svg)
+![Landing Page](public/landing/academy-hero.png)
 
 ## What is included
 

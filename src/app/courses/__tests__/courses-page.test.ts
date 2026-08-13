@@ -81,3 +81,12 @@ describe("/courses page — catalog card meta line", () => {
     expect(source).toMatch(/Live cohort/);
   });
 });
+
+describe("/courses page — cover artwork", () => {
+  it("uses the shared course-cover fallback instead of a letter placeholder", async () => {
+    const pagePath = path.resolve(process.cwd(), "src/app/courses/page.tsx");
+    const source = await fs.readFile(pagePath, "utf8");
+    expect(source).toMatch(/CourseCover/);
+    expect(source).not.toMatch(/cardImagePlaceholderLetter/);
+  });
+});

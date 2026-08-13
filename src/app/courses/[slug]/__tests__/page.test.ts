@@ -88,6 +88,15 @@ describe("/courses/[slug] page — header meta for live-cohort tiers", () => {
   });
 });
 
+describe("/courses/[slug] page — cover artwork", () => {
+  it("uses the shared course-cover fallback instead of a letter placeholder", async () => {
+    const pagePath = path.resolve(process.cwd(), "src/app/courses/[slug]/page.tsx");
+    const source = await fs.readFile(pagePath, "utf8");
+    expect(source).toMatch(/CourseCover/);
+    expect(source).not.toMatch(/coverPlaceholderLetter/);
+  });
+});
+
 describe("/courses/[slug] page — course quizzes", () => {
   it("loads course quizzes and links each one to the student player", async () => {
     const pagePath = path.resolve(process.cwd(), "src/app/courses/[slug]/page.tsx");
