@@ -13,8 +13,8 @@ export interface CourseCoverProps {
   slug: string;
   coverImage: string | null;
   className?: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   loading?: "eager" | "lazy";
   fetchPriority?: "high" | "low" | "auto";
 }
@@ -29,8 +29,8 @@ export function CourseCover({
   slug,
   coverImage,
   className,
-  width,
-  height,
+  width = 640,
+  height = 352,
   loading = "lazy",
   fetchPriority,
 }: CourseCoverProps) {

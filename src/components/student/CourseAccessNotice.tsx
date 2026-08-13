@@ -75,7 +75,7 @@ function getNoticeCopy({
   signedIn,
   userTier,
   requiredTier,
-}: CourseAccessNoticeProps): { title: string; body: string } {
+}: Omit<CourseAccessNoticeProps, "courseSlug">): { title: string; body: string } {
   if (reason === "verification_unavailable") {
     return {
       title: "We couldn't verify your course access",
