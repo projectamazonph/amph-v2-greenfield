@@ -25,6 +25,7 @@ import type { CatalogCourseDetail } from "@/usecases/GetCatalogCourse";
 import { EnrollButton } from "./EnrollButton";
 import { ShareCourseButton } from "@/components/courses/ShareCourseButton";
 import { getSessionUser } from "@/lib/auth";
+import { CourseCover } from "@/components/student/CourseCover";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -98,22 +99,15 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
             <div className={styles.headerGrid}>
               {/* Cover */}
-              {detail.coverImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={detail.coverImage}
-                  alt={detail.title}
-                  width={576}
-                  height={384}
-                  fetchPriority="high"
-                  decoding="async"
-                  className={styles.cover}
-                />
-              ) : (
-                <div className={styles.coverPlaceholder}>
-                  <span className={styles.coverPlaceholderLetter}>{detail.title[0]}</span>
-                </div>
-              )}
+              <CourseCover
+                title={detail.title}
+                slug={detail.slug}
+                coverImage={detail.coverImage}
+                width={576}
+                height={384}
+                fetchPriority="high"
+                className={styles.cover}
+              />
 
               <div className={styles.headerBody}>
                 <h1 className={styles.title}>{detail.title}</h1>

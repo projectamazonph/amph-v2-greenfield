@@ -23,6 +23,18 @@ describe("P0-5: lesson page uses AuthorizeLessonAccess", () => {
     expect(source).toMatch(/container\.authorizeLessonAccess\.execute/);
   });
 
+  it("uses a reason-specific student access notice instead of a generic lock screen", async () => {
+    const p = path.resolve(
+      process.cwd(),
+      "src/app/courses/[slug]/lessons/[lessonId]/page.tsx",
+    );
+    const source = await fs.readFile(p, "utf8");
+    expect(source).toMatch(/CourseAccessNotice/);
+    expect(source).toMatch(/verification_unavailable/);
+    expect(source).toMatch(/preview_limit/);
+    expect(source).not.toMatch(/Enroll to Access This Lesson/);
+  });
+
   it("the lesson page no longer calls container.checkCourseAccess (the old broken path)", async () => {
     const p = path.resolve(
       process.cwd(),

@@ -25,7 +25,12 @@ interface Props {
 
 export function SimulatorModeToggle({ mode, onChange, unlocked, disabled = false }: Props) {
   return (
-    <div className={styles.toggle} role="radiogroup" aria-label="Simulator mode">
+    <div
+      className={styles.toggle}
+      role="radiogroup"
+      aria-label="Simulator mode"
+      aria-describedby={unlocked ? undefined : "simulator-challenge-lock-hint"}
+    >
       <button
         type="button"
         role="radio"
@@ -44,11 +49,16 @@ export function SimulatorModeToggle({ mode, onChange, unlocked, disabled = false
         className={styles.option}
         data-active={mode === "challenge"}
         disabled={disabled || !unlocked}
-        title={unlocked ? undefined : "Pass this simulator in Practice mode to unlock Challenge"}
+        title={unlocked ? undefined : "Pass this simulator in Practice mode once to unlock it"}
         onClick={() => onChange("challenge")}
       >
         Challenge {unlocked ? null : <span className={styles.lock}>(locked)</span>}
       </button>
+      {!unlocked ? (
+        <span id="simulator-challenge-lock-hint" className={styles.lockHint} role="status">
+          Challenge mode is locked. Pass this simulator in Practice mode once to unlock it.
+        </span>
+      ) : null}
       {mode === "challenge" ? (
         <span className={styles.hint}>Challenge mode: passing awards a one-time bonus XP.</span>
       ) : null}

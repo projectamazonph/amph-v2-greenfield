@@ -35,6 +35,7 @@ import type {
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import { SimulatorModeToggle } from "./SimulatorModeToggle";
 import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
 interface Props {
   initialTitle: string;
@@ -97,7 +98,7 @@ export function ListingAuditForm({
         );
         setStage("reviewing");
       } catch {
-        setError("Could not run the listing audit. Please try again.");
+        setError(studentErrorCopy.simulatorRun);
       }
     });
   };
@@ -114,13 +115,13 @@ export function ListingAuditForm({
           mode,
         });
         if (!r.ok) {
-          setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+          setError("message" in r.error ? r.error.message : studentErrorCopy.simulatorGrade);
           return;
         }
         setGradeResult(r);
         setStage("graded");
       } catch {
-        setError("Could not grade this attempt. Please try again.");
+        setError(studentErrorCopy.simulatorGrade);
       }
     });
   };

@@ -13,7 +13,12 @@ import type { AccessDecision } from "@/domain/values/AccessDecision";
 
 export type CheckCourseAccessResult = Result<
   AccessDecision,
-  { kind: "access_denied"; tier: string | undefined }
+  {
+    kind: "access_denied";
+    reason: "tier" | "not_enrolled" | "not_authenticated";
+    tier: string | undefined;
+    requiredTier: string | undefined;
+  }
 >;
 
 export interface CheckCourseAccessParams {
@@ -31,9 +36,20 @@ export class CheckCourseAccess {
       return Result.ok(decision);
     }
 
+    if (decision.kind === "denied_tier") {
+      return Result.err({
+        kind: "access_denied",
+        reason: "tier",
+        tier: decision.userTier,
+        requiredTier: decision.requiredTier,
+      });
+    }
+
     return Result.err({
       kind: "access_denied",
-      tier: decision.kind === "denied_tier" ? decision.userTier : undefined,
+      reason: decision.kind === "denied_not_enrolled" ? "not_enrolled" : "not_authenticated",
+      tier: undefined,
+      requiredTier: undefined,
     });
   }
 }

@@ -18,8 +18,10 @@ import styles from "../../admin/settings/page.module.css";
 const twoFactorErrorMessage: Record<string, string> = {
   already_enabled: "Two-factor authentication is already enabled.",
   wrong_password: "Incorrect password. Two-factor authentication was not disabled.",
-  user_not_found: "Something went wrong. Please try again.",
-  db_error: "Something went wrong. Please try again.",
+  user_not_found:
+    "We could not find your account. Your 2FA settings are unchanged. Sign in again and try once more.",
+  db_error:
+    "We could not update your security settings. Your 2FA state is unchanged. Try again in a moment.",
 };
 
 interface PageProps {

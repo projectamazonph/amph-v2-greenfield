@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { QuizPlayer } from "@/components/courses/QuizPlayer";
+import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
 import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 import styles from "../../lessons/[lessonId]/quiz/page.module.css";
@@ -42,13 +43,36 @@ export default async function QuizPage({ params }: Props) {
     userId: user.id,
     courseId: courseResult.value.courseId,
   });
-  if (!accessResult.ok || accessResult.value.kind !== "allowed") {
+  if (!accessResult.ok) {
+    const reason = accessResult.error.reason;
     return (
-      <main className={styles.page}>
-        <h1 className={styles.title}>Course access required</h1>
-        <p>Enroll in this course or choose an eligible plan before taking its quizzes.</p>
-        <Link href={`/courses/${slug}`}>View course access options</Link>
-      </main>
+      <CourseAccessNotice
+        courseSlug={slug}
+        courseTitle={courseResult.value.title}
+        feature="quiz"
+        reason={
+          reason === "tier"
+            ? "plan_required"
+            : reason === "not_enrolled"
+              ? "enrollment_required"
+              : "verification_unavailable"
+        }
+        signedIn
+        userTier={accessResult.error.tier}
+        requiredTier={accessResult.error.requiredTier}
+      />
+    );
+  }
+
+  if (accessResult.value.kind !== "allowed") {
+    return (
+      <CourseAccessNotice
+        courseSlug={slug}
+        courseTitle={courseResult.value.title}
+        feature="quiz"
+        reason="preview_limit"
+        signedIn
+      />
     );
   }
 

@@ -27,6 +27,7 @@ import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidEleva
 import { BidElevatorResult } from "./BidElevatorResult";
 import { SimulatorModeToggle } from "./SimulatorModeToggle";
 import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
 interface Props {
   scenario: BidElevatorScenarioContent;
@@ -55,7 +56,7 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
         const response = await bidElevatorAttempt({ userBidAdjustments: bids, mode });
         if (!response.ok) {
           setError(
-            "message" in response.error ? response.error.message : "Could not run this simulation.",
+            "message" in response.error ? response.error.message : studentErrorCopy.simulatorRun,
           );
           return;
         }
@@ -68,7 +69,7 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
         });
         setXpAwarded(response.value.xpAwarded ?? null);
       } catch {
-        setError("Could not run this simulation. Please try again.");
+        setError(studentErrorCopy.simulatorRun);
       }
     });
   };

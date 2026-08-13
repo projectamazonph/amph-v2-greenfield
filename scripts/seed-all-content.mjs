@@ -84,25 +84,32 @@ const COURSES = [
     slug: "ppc-foundations",
     title: "PPC Foundations",
     tagline: "You can support a safe Sponsored Products launch and explain the numbers behind it.",
-    description: "Build a listing-readiness checklist, a profitability and max-CPC worksheet, a keyword map, and a campaign-build rationale.",
+    description:
+      "Build a listing-readiness checklist, a profitability and max-CPC worksheet, a keyword map, and a campaign-build rationale.",
     priceMinor: 299900,
     tier: "foundations",
+    coverImage: "/courses/ppc-foundations.png",
   },
   {
     slug: "accelerated-mastery",
     title: "Accelerated Mastery",
     tagline: "You can run a structured weekly optimization cycle and report the outcome.",
-    description: "Build a search-term action log, a bid-change plan, a budget decision log, and a one-page client report.",
+    description:
+      "Build a search-term action log, a bid-change plan, a budget decision log, and a one-page client report.",
     priceMinor: 599900,
     tier: "accelerated",
+    coverImage: "/courses/accelerated-mastery.png",
   },
   {
     slug: "ultimate-transformation",
     title: "Ultimate Transformation",
-    tagline: "You can present a small account plan and operate like a dependable junior PPC specialist.",
-    description: "Build a reviewed portfolio, a recorded walkthrough, and an interview-ready story.",
+    tagline:
+      "You can present a small account plan and operate like a dependable junior PPC specialist.",
+    description:
+      "Build a reviewed portfolio, a recorded walkthrough, and an interview-ready story.",
     priceMinor: 999900,
     tier: "ultimate",
+    coverImage: "/courses/ultimate-transformation.png",
   },
 ];
 
@@ -118,6 +125,7 @@ for (const c of COURSES) {
       description: c.description,
       priceMinor: c.priceMinor,
       currency: "PHP",
+      coverImage: c.coverImage,
     },
     create: {
       id,
@@ -127,6 +135,7 @@ for (const c of COURSES) {
       description: c.description,
       priceMinor: c.priceMinor,
       currency: "PHP",
+      coverImage: c.coverImage,
       isPublished: true,
       isFeatured: c.slug === "ppc-foundations",
       displayOrder: COURSES.indexOf(c) + 1,
@@ -135,7 +144,9 @@ for (const c of COURSES) {
           {
             id: "stub-section",
             title: "Curriculum",
-            lessons: [{ id: "stub-lesson", title: "See modules", type: "TEXT", content: { body: "" } }],
+            lessons: [
+              { id: "stub-lesson", title: "See modules", type: "TEXT", content: { body: "" } },
+            ],
           },
         ],
       },
@@ -275,9 +286,7 @@ for (const [courseSlug, sections] of Object.entries(curriculumSectionsByCourse))
     data: { curriculum: { sections } },
   });
   const lessonCount = sections.reduce((n, s) => n + s.lessons.length, 0);
-  console.log(
-    `  [curriculum] ${courseSlug} → ${sections.length} sections, ${lessonCount} lessons`,
-  );
+  console.log(`  [curriculum] ${courseSlug} → ${sections.length} sections, ${lessonCount} lessons`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -455,7 +464,12 @@ const BADGES = [
 for (const b of BADGES) {
   await prisma.badge.upsert({
     where: { slug: b.slug },
-    update: { name: b.name, description: b.description, iconName: b.iconName, xpReward: b.xpReward },
+    update: {
+      name: b.name,
+      description: b.description,
+      iconName: b.iconName,
+      xpReward: b.xpReward,
+    },
     create: b,
   });
   console.log(`  [badge] ${b.slug} → ${b.name}`);

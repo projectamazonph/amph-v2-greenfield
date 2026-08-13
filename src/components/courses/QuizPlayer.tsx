@@ -11,6 +11,7 @@
 
 import { useState, useTransition } from "react";
 import { submitQuizAttemptAction } from "@/app/actions/submitQuizAttempt.action";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 import styles from "./QuizPlayer.module.css";
 
 interface Option {
@@ -85,7 +86,7 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
         } catch {
           setResult({
             ok: false,
-            error: "We could not submit your quiz. Please try again.",
+            error: studentErrorCopy.quizSubmit,
           });
         }
       });
@@ -217,6 +218,6 @@ function quizErrorMessage(error: string): string {
     case "invalid_answer":
       return "One or more answers are invalid. Reload the page and try again.";
     default:
-      return "We could not submit your quiz. Please try again.";
+      return studentErrorCopy.quizSubmit;
   }
 }

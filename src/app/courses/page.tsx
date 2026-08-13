@@ -22,6 +22,7 @@ import { buildContainer } from "@/composition/container";
 import type { CatalogCourse } from "@/usecases/ListCatalogCourses";
 import styles from "./page.module.css";
 import { StudentShell } from "@/components/student/StudentShell";
+import { CourseCover } from "@/components/student/CourseCover";
 
 export const metadata: Metadata = {
   title: "Courses — Project Amazon PH Academy",
@@ -38,7 +39,10 @@ export default async function CoursesPage() {
       <StudentShell requireAuth={false}>
         <main className={styles.errorPage}>
           <h1 className={styles.errorTitle}>Courses unavailable</h1>
-          <p className={styles.errorText}>Unable to load courses. Please try again later.</p>
+          <p className={styles.errorText}>
+            We couldn&apos;t load the course catalog right now. Your account is unchanged. Refresh
+            to try again.
+          </p>
         </main>
       </StudentShell>
     );
@@ -73,7 +77,9 @@ export default async function CoursesPage() {
             <div
               style={{ textAlign: "center", padding: "var(--space-10)", color: "var(--ink-500)" }}
             >
-              <p>No courses available yet. Check back soon.</p>
+              <p>
+                No published courses are available yet. Check back after the next content release.
+              </p>
             </div>
           )}
         </section>
@@ -96,22 +102,14 @@ function CourseCard({
 
   return (
     <Link href={`/courses/${course.slug}`} className={styles.card}>
-      {course.coverImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={course.coverImage}
-          alt={course.title}
-          width={640}
-          height={352}
-          loading="lazy"
-          decoding="async"
-          className={styles.cardImage}
-        />
-      ) : (
-        <div className={styles.cardImagePlaceholder}>
-          <span className={styles.cardImagePlaceholderLetter}>{course.title[0]}</span>
-        </div>
-      )}
+      <CourseCover
+        title={course.title}
+        slug={course.slug}
+        coverImage={course.coverImage}
+        width={640}
+        height={352}
+        className={styles.cardImage}
+      />
 
       <div className={styles.cardBody}>
         {isFeatured && (

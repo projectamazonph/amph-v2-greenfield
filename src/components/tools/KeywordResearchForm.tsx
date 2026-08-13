@@ -22,6 +22,7 @@ import {
   type KeywordResearchAttemptResult,
 } from "@/app/tools/keyword-research/actions";
 import type { KeywordIntent } from "@/domain/entities/KeywordDataset";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
 interface Props {
   initialNiche: string;
@@ -69,7 +70,7 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
         }
       } catch {
         setPreview(null);
-        setError("Could not generate keywords. Please try again.");
+        setError("Keyword data could not be generated. Check your connection and try again.");
       }
     });
   };
@@ -108,10 +109,10 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
         if (r.ok) {
           setAttempt(r.value);
         } else {
-          setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+          setError("message" in r.error ? r.error.message : studentErrorCopy.simulatorGrade);
         }
       } catch {
-        setError("Could not grade this attempt. Please try again.");
+        setError(studentErrorCopy.simulatorGrade);
       }
     });
   };

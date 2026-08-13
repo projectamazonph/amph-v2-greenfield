@@ -37,7 +37,7 @@ export default async function PricingPage() {
 
   const loadError = result.ok
     ? null
-    : "Pricing is temporarily unavailable. Please try again in a few minutes.";
+    : "We couldn't load pricing right now. Course access is unchanged. Refresh in a moment and try again.";
   const tiers = result.ok ? result.value.tiers : [];
 
   return (
@@ -55,7 +55,7 @@ export default async function PricingPage() {
           {loadError}
         </p>
       ) : tiers.length === 0 ? (
-        <p className={styles.note}>Pricing tiers coming soon.</p>
+        <p className={styles.note}>No active pricing plans are published yet. Check back soon.</p>
       ) : (
         <ul className={styles.grid}>
           {tiers.map((tier) => (

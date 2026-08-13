@@ -13,6 +13,7 @@
 import { useState, useTransition } from "react";
 import { cancelLiveClassRsvpAction, rsvpLiveClassAction } from "@/app/actions/liveClassRsvp.action";
 import { Button } from "@/components/ui/Button";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
 export interface LiveClassRsvpButtonProps {
   liveClassId: string;
@@ -30,7 +31,7 @@ export function LiveClassRsvpButton({ liveClassId, isRegistered }: LiveClassRsvp
         const result = await rsvpLiveClassAction(liveClassId);
         if (!result.ok) setError(rsvpErrorMessage(result.error));
       } catch {
-        setError("We could not update your RSVP. Please try again.");
+        setError(studentErrorCopy.rsvp);
       }
     });
   }
@@ -42,7 +43,7 @@ export function LiveClassRsvpButton({ liveClassId, isRegistered }: LiveClassRsvp
         const result = await cancelLiveClassRsvpAction(liveClassId);
         if (!result.ok) setError(rsvpErrorMessage(result.error));
       } catch {
-        setError("We could not update your RSVP. Please try again.");
+        setError(studentErrorCopy.rsvp);
       }
     });
   }
@@ -94,6 +95,6 @@ function rsvpErrorMessage(error: string): string {
     case "not_registered":
       return "No active RSVP was found.";
     default:
-      return "We could not update your RSVP. Please try again.";
+      return studentErrorCopy.rsvp;
   }
 }
