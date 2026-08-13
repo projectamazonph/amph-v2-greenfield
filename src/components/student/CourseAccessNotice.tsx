@@ -84,8 +84,8 @@ function getNoticeCopy({
   }
 
   if (reason === "plan_required") {
-    const currentPlan = userTier ?? "current";
-    const requiredPlan = requiredTier ?? "eligible plan";
+    const currentPlan = formatTierLabel(userTier) ?? "current";
+    const requiredPlan = formatTierLabel(requiredTier) ?? "an eligible plan";
     return {
       title: `This ${feature} is not included in your current plan`,
       body: `Your ${currentPlan} plan does not include ${requiredPlan} access for ${courseTitle}. Choose an eligible plan to continue.`,
@@ -117,4 +117,9 @@ function getNoticeCopy({
     title: "This lesson is in the full course",
     body: `You can preview the first lessons in ${courseTitle}. Sign in or enroll to keep learning past the preview.`,
   };
+}
+
+function formatTierLabel(tier: string | undefined): string | undefined {
+  if (!tier) return undefined;
+  return tier.charAt(0) + tier.slice(1).toLowerCase();
 }
