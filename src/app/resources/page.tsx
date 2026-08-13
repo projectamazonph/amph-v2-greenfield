@@ -56,7 +56,8 @@ export default async function ResourcesPage() {
           </div>
           <Card padding={6}>
             <p className={styles.empty} role="alert">
-              Something went wrong loading the download center. Please try again.
+              We couldn&apos;t load your download center right now. Your access and files are
+              unchanged. Refresh to try again.
             </p>
           </Card>
         </main>

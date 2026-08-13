@@ -14,6 +14,7 @@ import { useState, useTransition } from "react";
 import { markLiveClassRecordingWatchedAction } from "@/app/actions/markLiveClassRecordingWatched.action";
 import { Button } from "@/components/ui/Button";
 import buttonStyles from "@/components/ui/Button.module.css";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
 export interface LiveClassRecordingButtonProps {
   liveClassId: string;
@@ -43,7 +44,7 @@ export function LiveClassRecordingButton({
           setError(recordingErrorMessage(result.error));
         }
       } catch {
-        setError("We could not save your progress. Please try again.");
+        setError(studentErrorCopy.recording);
       }
     });
   }
@@ -102,6 +103,6 @@ function recordingErrorMessage(error: string): string {
     case "not_registered":
       return "An active RSVP is required before marking this recording watched.";
     default:
-      return "We could not save your progress. Please try again.";
+      return studentErrorCopy.recording;
   }
 }

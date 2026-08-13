@@ -11,6 +11,7 @@
 
 import { useState } from "react";
 import { exportUserDataAction } from "@/app/actions/exportUserData.action";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
 export function ExportDataButton({ className }: { className?: string }) {
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
@@ -60,7 +61,7 @@ export function ExportDataButton({ className }: { className?: string }) {
             marginTop: "var(--space-2)",
           }}
         >
-          Something went wrong. Please try again.
+          {studentErrorCopy.exportData}
         </p>
       )}
     </div>

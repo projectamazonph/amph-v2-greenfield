@@ -17,6 +17,7 @@ import { SimulatorModeToggle } from "./SimulatorModeToggle";
 import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
 import type { TriageAction } from "@/domain/simulator/str-triage/StrTriageOutput";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
 type StrScenario = Omit<StrTriageInput, "userClassifications">;
 
@@ -64,10 +65,10 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
         if (r.ok) {
           setResult(r.value);
         } else {
-          setError("message" in r.error ? r.error.message : "Could not grade this attempt.");
+          setError("message" in r.error ? r.error.message : studentErrorCopy.simulatorGrade);
         }
       } catch {
-        setError("Could not grade this attempt. Please try again.");
+        setError(studentErrorCopy.simulatorGrade);
       }
     });
   };

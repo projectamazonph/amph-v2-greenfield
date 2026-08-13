@@ -38,6 +38,6 @@ describe("QuizPlayer — voice regression guard", () => {
     const source = await fs.readFile(componentPath, "utf8");
     expect(source).not.toMatch(/e instanceof Error/);
     expect(source).not.toMatch(/String\(e\)/);
-    expect(source).toContain("We could not submit your quiz. Please try again.");
+    expect(source).toContain("studentErrorCopy.quizSubmit");
   });
 });

@@ -138,6 +138,6 @@ describe("/pricing page outage behavior", () => {
 
     expect(pageSource).not.toContain('throw new Error("Failed to load pricing offers")');
     expect(pageSource).toContain('role="alert"');
-    expect(pageSource).toContain("Pricing is temporarily unavailable");
+    expect(pageSource).toContain("Course access is unchanged");
   });
 });

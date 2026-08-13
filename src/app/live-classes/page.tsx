@@ -35,7 +35,8 @@ export default async function LiveClassesPage() {
         {!result.ok ? (
           <Card padding={6}>
             <p className={styles.empty} role="alert">
-              Live classes could not be loaded. Please try again.
+              We couldn&apos;t load live classes right now. Your enrollment and RSVP status are
+              unchanged. Refresh to try again.
             </p>
           </Card>
         ) : result.value.length === 0 ? (

@@ -28,6 +28,7 @@ import { Money } from "@/domain/values/Money";
 import { Result } from "@/domain/shared/Result";
 import { Button } from "@/components/ui/Button";
 import buttonStyles from "@/components/ui/Button.module.css";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 import styles from "./EnrollButton.module.css";
 
 type EnrollState = EnrollStudentActionResult | null;
@@ -121,7 +122,7 @@ export function EnrollButton({
     }
     return (
       <p className={styles.error} role="alert">
-        Unable to enroll. Please try again.
+        {studentErrorCopy.enrollment}
       </p>
     );
   }

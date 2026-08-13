@@ -39,7 +39,10 @@ export default async function CoursesPage() {
       <StudentShell requireAuth={false}>
         <main className={styles.errorPage}>
           <h1 className={styles.errorTitle}>Courses unavailable</h1>
-          <p className={styles.errorText}>Unable to load courses. Please try again later.</p>
+          <p className={styles.errorText}>
+            We couldn&apos;t load the course catalog right now. Your account is unchanged. Refresh to
+            try again.
+          </p>
         </main>
       </StudentShell>
     );
@@ -74,7 +77,7 @@ export default async function CoursesPage() {
             <div
               style={{ textAlign: "center", padding: "var(--space-10)", color: "var(--ink-500)" }}
             >
-              <p>No courses available yet. Check back soon.</p>
+              <p>No published courses are available yet. Check back after the next content release.</p>
             </div>
           )}
         </section>

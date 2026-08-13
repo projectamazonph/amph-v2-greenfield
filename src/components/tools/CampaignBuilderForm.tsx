@@ -30,6 +30,7 @@ import {
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import { SimulatorModeToggle } from "./SimulatorModeToggle";
 import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
+import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
 interface Props {
   productCategory: string;
@@ -274,10 +275,10 @@ export function CampaignBuilderForm({
         if (r.ok) {
           setResult(r);
         } else {
-          setError("message" in r.error ? r.error.message : "Could not grade this campaign.");
+          setError("message" in r.error ? r.error.message : studentErrorCopy.simulatorGrade);
         }
       } catch {
-        setError("Could not grade this campaign. Please try again.");
+        setError(studentErrorCopy.simulatorGrade);
       }
     });
   };
