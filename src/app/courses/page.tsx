@@ -40,8 +40,8 @@ export default async function CoursesPage() {
         <main className={styles.errorPage}>
           <h1 className={styles.errorTitle}>Courses unavailable</h1>
           <p className={styles.errorText}>
-            We couldn&apos;t load the course catalog right now. Your account is unchanged. Refresh to
-            try again.
+            We couldn&apos;t load the course catalog right now. Your account is unchanged. Refresh
+            to try again.
           </p>
         </main>
       </StudentShell>
@@ -77,7 +77,9 @@ export default async function CoursesPage() {
             <div
               style={{ textAlign: "center", padding: "var(--space-10)", color: "var(--ink-500)" }}
             >
-              <p>No published courses are available yet. Check back after the next content release.</p>
+              <p>
+                No published courses are available yet. Check back after the next content release.
+              </p>
             </div>
           )}
         </section>

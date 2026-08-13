@@ -47,8 +47,7 @@ export class CheckCourseAccess {
 
     return Result.err({
       kind: "access_denied",
-      reason:
-        decision.kind === "denied_not_enrolled" ? "not_enrolled" : "not_authenticated",
+      reason: decision.kind === "denied_not_enrolled" ? "not_enrolled" : "not_authenticated",
       tier: undefined,
       requiredTier: undefined,
     });

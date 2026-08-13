@@ -21,7 +21,8 @@ import styles from "../../../admin/settings/2fa-setup/page.module.css";
 const errorMessage: Record<string, string> = {
   invalid_code: "That code didn't match. Check your authenticator app and try again.",
   no_pending_secret: "No pending setup found. Start over below.",
-  user_not_found: "We could not find your account. Your 2FA setup is unchanged. Sign in again and start over.",
+  user_not_found:
+    "We could not find your account. Your 2FA setup is unchanged. Sign in again and start over.",
   db_error: "We could not save your 2FA setup. Your account is unchanged. Try again in a moment.",
 };
 

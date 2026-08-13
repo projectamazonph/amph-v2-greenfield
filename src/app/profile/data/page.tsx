@@ -14,8 +14,10 @@ import styles from "../../admin/settings/page.module.css";
 
 const errorMessage: Record<string, string> = {
   wrong_password: "Incorrect password. Your account was not deleted.",
-  user_not_found: "We could not find your account. No account changes were made. Sign in again and retry.",
-  db_error: "We could not update your account data. No account changes were made. Try again in a moment.",
+  user_not_found:
+    "We could not find your account. No account changes were made. Sign in again and retry.",
+  db_error:
+    "We could not update your account data. No account changes were made. Try again in a moment.",
 };
 
 interface PageProps {

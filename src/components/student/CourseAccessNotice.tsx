@@ -4,10 +4,7 @@ import styles from "./CourseAccessNotice.module.css";
 
 export type CourseAccessNoticeFeature = "lesson" | "quiz";
 export type CourseAccessNoticeReason =
-  | "preview_limit"
-  | "plan_required"
-  | "enrollment_required"
-  | "verification_unavailable";
+  "preview_limit" | "plan_required" | "enrollment_required" | "verification_unavailable";
 
 export interface CourseAccessNoticeProps {
   courseSlug: string;
