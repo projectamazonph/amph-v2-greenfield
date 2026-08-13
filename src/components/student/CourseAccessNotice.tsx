@@ -3,7 +3,11 @@ import { LockKey, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import styles from "./CourseAccessNotice.module.css";
 
 export type CourseAccessNoticeFeature = "lesson" | "quiz";
-export type CourseAccessNoticeReason = "preview_limit" | "verification_unavailable";
+export type CourseAccessNoticeReason =
+  | "preview_limit"
+  | "plan_required"
+  | "enrollment_required"
+  | "verification_unavailable";
 
 export interface CourseAccessNoticeProps {
   courseSlug: string;
@@ -11,6 +15,8 @@ export interface CourseAccessNoticeProps {
   feature: CourseAccessNoticeFeature;
   reason: CourseAccessNoticeReason;
   signedIn: boolean;
+  userTier?: string;
+  requiredTier?: string;
 }
 
 export function CourseAccessNotice({
@@ -19,9 +25,18 @@ export function CourseAccessNotice({
   feature,
   reason,
   signedIn,
+  userTier,
+  requiredTier,
 }: CourseAccessNoticeProps) {
   const courseHref = `/courses/${courseSlug}`;
-  const copy = getNoticeCopy({ courseTitle, feature, reason, signedIn });
+  const copy = getNoticeCopy({
+    courseTitle,
+    feature,
+    reason,
+    signedIn,
+    userTier,
+    requiredTier,
+  });
 
   return (
     <main className={styles.page} aria-labelledby="course-access-title">
@@ -58,11 +73,29 @@ function getNoticeCopy({
   feature,
   reason,
   signedIn,
+  userTier,
+  requiredTier,
 }: CourseAccessNoticeProps): { title: string; body: string } {
   if (reason === "verification_unavailable") {
     return {
       title: "We couldn't verify your course access",
       body: "Your course content is safe. Refresh the page or return to the course and try again. If it still does not work, sign out and back in.",
+    };
+  }
+
+  if (reason === "plan_required") {
+    const currentPlan = userTier ?? "current";
+    const requiredPlan = requiredTier ?? "eligible plan";
+    return {
+      title: `This ${feature} is not included in your current plan`,
+      body: `Your ${currentPlan} plan does not include ${requiredPlan} access for ${courseTitle}. Choose an eligible plan to continue.`,
+    };
+  }
+
+  if (reason === "enrollment_required") {
+    return {
+      title: `Enroll in ${courseTitle} to continue`,
+      body: `Your account can see this ${feature}, but it needs an active enrollment before you can use it. Open the course page to enroll or review your access.`,
     };
   }
 

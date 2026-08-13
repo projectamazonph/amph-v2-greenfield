@@ -107,7 +107,31 @@ describe("/courses/[slug]/quizzes/[quizId]", () => {
       }),
     );
 
-    expect(html).toContain("Course access required");
+    expect(html).toContain("This quiz opens with full course access");
+    expect(html).toContain("take quizzes and save your score");
+    expect(html).not.toContain("Advertising Cost of Sales");
+  });
+
+  it("explains when the student's plan is below the course tier", async () => {
+    mocks.checkCourseAccessExecute.mockResolvedValue({
+      ok: false,
+      error: {
+        kind: "access_denied",
+        reason: "tier",
+        tier: "STARTER",
+        requiredTier: "ULTIMATE",
+      },
+    });
+
+    const html = renderToString(
+      await QuizPage({
+        params: Promise.resolve({ slug: "foundations", quizId: "quiz-1" }),
+      }),
+    );
+
+    expect(html).toContain("This quiz is not included in your current plan");
+    expect(html).toContain("STARTER plan");
+    expect(html).toContain("ULTIMATE access");
     expect(html).not.toContain("Advertising Cost of Sales");
   });
 

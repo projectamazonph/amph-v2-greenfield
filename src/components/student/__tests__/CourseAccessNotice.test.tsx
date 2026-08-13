@@ -51,6 +51,24 @@ describe("CourseAccessNotice", () => {
     expect(html).toContain("take quizzes and save your score");
   });
 
+  it("explains when a student's current plan does not include a quiz", () => {
+    const html = renderToString(
+      <CourseAccessNotice
+        courseSlug="ppc-foundations"
+        courseTitle="PPC Foundations"
+        feature="quiz"
+        reason="plan_required"
+        signedIn
+        userTier="STARTER"
+        requiredTier="ULTIMATE"
+      />,
+    );
+
+    expect(html).toContain("This quiz is not included in your current plan");
+    expect(html).toContain("STARTER plan");
+    expect(html).toContain("ULTIMATE access");
+  });
+
   it("explains a temporary access-check failure without exposing internals", () => {
     const html = renderToString(
       <CourseAccessNotice
