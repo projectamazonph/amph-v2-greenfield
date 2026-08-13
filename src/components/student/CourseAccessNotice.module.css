@@ -45,7 +45,7 @@
 .body {
   max-width: 31rem;
   margin: var(--space-4) auto 0;
-  color: var(--ink-600);
+  color: var(--ink-500);
   line-height: 1.65;
 }
 
@@ -54,7 +54,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-3);
-  margin-top: var(--space-7);
+  margin-top: var(--space-6);
 }
 
 .actions a {

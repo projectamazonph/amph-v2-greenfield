@@ -130,8 +130,8 @@ describe("/courses/[slug]/quizzes/[quizId]", () => {
     );
 
     expect(html).toContain("This quiz is not included in your current plan");
-    expect(html).toContain("STARTER plan");
-    expect(html).toContain("ULTIMATE access");
+    expect(html).toContain("Starter plan");
+    expect(html).toContain("Ultimate access");
     expect(html).not.toContain("Advertising Cost of Sales");
   });
 

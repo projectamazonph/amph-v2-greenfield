@@ -43,5 +43,5 @@
 .lockHint {
   flex-basis: 100%;
   font-size: var(--text-xs);
-  color: var(--ink-600);
+  color: var(--ink-500);
 }
