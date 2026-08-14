@@ -8,6 +8,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import {
   Table,
   type TableColumn,
@@ -109,7 +110,7 @@ const COLUMNS: TableColumn<UserRow>[] = [
             color: "var(--ink-900)",
             fontSize: 11,
             fontWeight: 600,
-            fontFamily: "var(--font-family-code)",
+            fontFamily: "var(--font-mono)",
             flexShrink: 0,
           }}
         >
@@ -216,11 +217,11 @@ export function AdminUsersTable({
               cursor: page > 1 ? "pointer" : "default",
             }}
           >
-            ← Prev
+            <ArrowLeft size={16} aria-hidden />{" "}Prev
           </Link>
           <span
             style={{
-              fontFamily: "var(--font-family-code)",
+              fontFamily: "var(--font-mono)",
               fontSize: 13,
             }}
           >
@@ -235,7 +236,7 @@ export function AdminUsersTable({
               cursor: page < totalPages ? "pointer" : "default",
             }}
           >
-            Next →
+            Next{" "}<ArrowRight size={16} aria-hidden />
           </Link>
         </nav>
       )}

@@ -42,7 +42,7 @@ const COLUMNS: TableColumn<DiscountCodeRow>[] = [
     header: "Code",
     width: { type: "proportional", value: 1 },
     renderCell: (row) => (
-      <code style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.code}</code>
+      <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.code}</code>
     ),
   },
   {
@@ -56,7 +56,7 @@ const COLUMNS: TableColumn<DiscountCodeRow>[] = [
     header: "Value",
     width: { type: "pixel", value: 90 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
         {formatValue(row.type, row.value)}
       </span>
     ),
@@ -66,7 +66,7 @@ const COLUMNS: TableColumn<DiscountCodeRow>[] = [
     header: "Uses",
     width: { type: "pixel", value: 90 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
         {row.maxUses !== null ? `${row.usedCount} / ${row.maxUses}` : `${row.usedCount} / ∞`}
       </span>
     ),
