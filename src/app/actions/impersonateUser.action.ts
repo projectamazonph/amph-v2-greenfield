@@ -28,7 +28,13 @@
 
 import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
-import { getSessionUserId, setAuthCookie, getSessionCookieName, getAdminSessionCookieName } from "@/lib/auth";
+import {
+  getSessionUserId,
+  setAuthCookie,
+  setAdminSessionCookie,
+  getSessionCookieName,
+  getAdminSessionCookieName,
+} from "@/lib/auth";
 import type { ImpersonateUser } from "@/usecases/ImpersonateUser";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
@@ -76,10 +82,23 @@ export async function performImpersonateUser(
     userRepo: UserRepository;
     impersonateUser: ImpersonateUser;
     setSessionCookie: typeof setAuthCookie;
+    setAdminSessionCookie: typeof setAdminSessionCookie;
     cookies: {
       get: (name: string) => { value: string } | undefined;
-      set: (name: string, value: string, opts: Record<string, unknown>) => void;
+      set: (
+        cookie: {
+          name: string;
+          value: string;
+          httpOnly?: boolean;
+          secure?: boolean;
+          sameSite?: "lax" | "strict" | "none";
+          path?: string;
+          expires?: Date;
+          maxAge?: number;
+        },
+      ) => void;
     };
+    isHttps?: boolean;
   },
   input: ImpersonateUserActionInput,
   getCurrentAdmin: (container: { userRepo: UserRepository }) => Promise<CurrentAdminUser | null>,
@@ -98,6 +117,8 @@ export async function performImpersonateUser(
   //    one to back up. If a backup already exists we keep it untouched: the
   //    session cookie would then hold an impersonated user's token, and
   //    the admin's real token is the one already saved.
+  //    We also need to read the backup cookie under its PROTOCOL-AWARE
+  //    name (dev or `__Secure-`), so we pass `isHttps` through.
   const existingBackup = container.cookies.get(getAdminSessionCookieName());
   const adminToken = existingBackup?.value ?? container.cookies.get(getSessionCookieName())?.value;
 
@@ -133,21 +154,34 @@ export async function performImpersonateUser(
   await container.setSessionCookie(result.value.token, result.value.expiresAt);
 
   // 5. Plant the admin's original token as the backup cookie.
-  //    If there was no token to capture at all (the caller authenticated
-  //    by some other means than the session cookie), we leave the backup
-  //    unset. "Stop impersonating" then falls back to signing the user
-  //    out rather than restoring a session that was never captured.
+  //    `setAdminSessionCookie` derives the cookie name and the Secure
+  //    flag from the same `isHttps` signal (S3 fix). If there was no
+  //    token to capture at all (the caller authenticated by some other
+  //    means than the session cookie), we leave the backup unset.
+  //    "Stop impersonating" then falls back to signing the user out
+  //    rather than restoring a session that was never captured.
   if (adminToken) {
-    // The backup cookie has a 24h maxAge — admins shouldn't impersonate
-    // for longer than a working day. After 24h, the backup expires and
-    // the admin has to sign out + sign in again.
-    container.cookies.set(getAdminSessionCookieName(), adminToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 24 * 60 * 60, // 24h
-    });
+    await container.setAdminSessionCookie(
+      adminToken,
+      // Pass the cookie jar as the target so the helper writes
+      // directly to it (instead of falling back to the implicit
+      // `cookies()` store, which is unavailable in tests).
+      {
+        set: (cookie) => {
+          container.cookies.set(cookie as unknown as {
+            name: string;
+            value: string;
+            httpOnly?: boolean;
+            secure?: boolean;
+            sameSite?: "lax" | "strict" | "none";
+            path?: string;
+            expires?: Date;
+            maxAge?: number;
+          });
+        },
+      },
+      { isHttps: container.isHttps },
+    );
   }
 
   return Result.ok({
@@ -156,16 +190,28 @@ export async function performImpersonateUser(
   });
 }
 
-// ── Cookie name ───────────────────────────────────────────────────────────
+// ── Action wrapper (thin shell) ──────────────────────────────────────────
 
 /**
- * Name of the cookie that holds the admin's ORIGINAL session token
- * during impersonation. Different from the regular session cookie
- * (amph_session / __Secure-amph_session) so the impersonation
- * machinery can detect "we're impersonating" by the presence of this
- * cookie.
+ * Detect whether the inbound request was HTTPS. Server actions in
+ * Next.js don't expose `request`, so we read the standard proxy header
+ * (`x-forwarded-proto`, set by Vercel at the edge) and fall back to the
+ * `x-forwarded-ssl` / direct `https` on origin Node. In dev on
+ * `localhost` no header is set → returns false → cookies land with
+ * dev names and `Secure=false` (correct).
  */
-// ── Action wrapper (thin shell) ──────────────────────────────────────────
+async function detectRequestIsHttps(): Promise<boolean> {
+  const { headers } = await import("next/headers");
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? h.get("x-forwarded-ssl");
+  if (proto && proto.toLowerCase().startsWith("https")) return true;
+  const host = h.get("host") ?? "";
+  // Vercel preview URLs / direct origin deployments sometimes set host
+  // without the forwarded-proto header — assume HTTPS for hosts under
+  // *.vercel.app and *.vercel.com.
+  if (/\.vercel\.app$/.test(host) || /\.vercel\.com$/.test(host)) return true;
+  return false;
+}
 
 /**
  * Default getCurrentAdmin: reads the session, loads the user, and
@@ -187,23 +233,41 @@ export async function impersonateUserAction(
 ): Promise<ImpersonateUserActionResult> {
   const { cookies } = await import("next/headers");
   const cookieJar = await cookies();
+  const isHttps = await detectRequestIsHttps();
   const container = {
     ...buildContainer(),
     setSessionCookie: setAuthCookie,
+    // S3 fix: route the helper through so the cookie name + Secure
+    // flag come from a single signal (the request protocol).
+    // The helper itself accepts `target`/cookie jar, but we let it
+    // use the default cookie store here — the current request's
+    // `cookies()` jar is what server actions naturally write to.
+    setAdminSessionCookie: ((token: string) =>
+      setAdminSessionCookie(token, undefined, { isHttps })) as typeof setAdminSessionCookie,
+    isHttps,
     cookies: {
       get: (name: string) => {
         const c = cookieJar.get(name);
         return c ? { value: c.value } : undefined;
       },
-      set: (name: string, value: string, opts: Record<string, unknown>) => {
+      set: (cookie: {
+        name: string;
+        value: string;
+        httpOnly?: boolean;
+        secure?: boolean;
+        sameSite?: "lax" | "strict" | "none";
+        path?: string;
+        expires?: Date;
+        maxAge?: number;
+      }) => {
         cookieJar.set({
-          name,
-          value,
-          httpOnly: opts.httpOnly as boolean | undefined,
-          secure: opts.secure as boolean | undefined,
-          sameSite: opts.sameSite as "lax" | "strict" | "none" | undefined,
-          path: opts.path as string | undefined,
-          maxAge: opts.maxAge as number | undefined,
+          name: cookie.name,
+          value: cookie.value,
+          httpOnly: cookie.httpOnly,
+          secure: cookie.secure,
+          sameSite: cookie.sameSite,
+          path: cookie.path,
+          maxAge: cookie.maxAge,
         });
       },
     },

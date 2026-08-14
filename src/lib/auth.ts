@@ -218,6 +218,68 @@ const SESSION_COOKIE_OPTIONS = {
   maxAge: COOKIE_MAX_AGE_SECONDS,
 };
 
+const ADMIN_SESSION_COOKIE_OPTIONS = {
+  httpOnly: true,
+  // Mirrors SESSION_COOKIE_OPTIONS.secure at module load — the real
+  // value is recomputed per call from the request's protocol so the
+  // Secure flag and the `__Secure-` cookie name stay in lock-step.
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  // 24h working window (mirrored from
+  // impersonateUser.action.ts which uses 24 * 60 * 60).
+  maxAge: 24 * 60 * 60,
+};
+
+/**
+ * Set the admin session cookie (the impersonation backup that holds
+ * the admin's ORIGINAL session token during an impersonation).
+ *
+ * Called by `impersonateUserAction` when an admin starts impersonating.
+ * Symmetric with `setAuthCookie` (the user session cookie). Same rule:
+ * the cookie name and the `Secure` flag are derived from a single
+ * `isHttps` signal — there is intentionally NO `secure` override,
+ * because allowing one would let the cookie name and the Secure flag
+ * drift back into the S3 bug this helper exists to prevent.
+ *
+ * `target` is the cookie store to write to. Default: the implicit
+ * `cookies()` store from `next/headers`. Server actions/pages use the
+ * default; tests inject a stub.
+ *
+ * Returns the cookie name that was set, so the caller can refer to the
+ * same name from a follow-up `cookies.set` (e.g. impersonate writes the
+ * backup here AND may need to read it again later in the same handler).
+ */
+export async function setAdminSessionCookie(
+  token: string,
+  target?: CookieTarget,
+  options?: { isHttps?: boolean },
+): Promise<string> {
+  // Single source of truth for the Secure flag and the cookie name.
+  // Both follow `isHttps`, which the caller should derive from the
+  // request protocol — not from NODE_ENV (an admin running
+  // `next start` on localhost hits the NODE_ENV=production branch
+  // over plain HTTP, where a `__Secure-` cookie is silently dropped).
+  const isHttps = options?.isHttps ?? ADMIN_SESSION_COOKIE_OPTIONS.secure;
+  const secure = isHttps;
+  const name = getAdminSessionCookieName(isHttps);
+  const cookie = {
+    name,
+    value: token,
+    httpOnly: ADMIN_SESSION_COOKIE_OPTIONS.httpOnly,
+    secure,
+    sameSite: ADMIN_SESSION_COOKIE_OPTIONS.sameSite,
+    path: ADMIN_SESSION_COOKIE_OPTIONS.path,
+    maxAge: ADMIN_SESSION_COOKIE_OPTIONS.maxAge,
+  };
+  if (target) {
+    target.set(cookie);
+  } else {
+    (await cookies()).set(cookie);
+  }
+  return name;
+}
+
 /**
  * Set the session cookie. Called by the `SignIn` server action (STORY-006)
  * after a successful password verify, AND by the `/api/auth/login` and
