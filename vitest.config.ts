@@ -53,6 +53,11 @@ export default defineConfig({
         // rules via static analysis, not runtime assertions. They
         // should never count toward coverage thresholds.
         "tests/architecture/**",
+        // E2E helpers — these talk directly to the test database via
+        // Prisma and are only exercised by Playwright runs, not by
+        // Vitest. Including them in coverage pulls the global rate
+        // down on branches that don't apply to unit-test execution.
+        "tests/e2e/**",
       ],
     },
   },
