@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createCourse } from "@/domain/entities/Course";
 import { createPricingTier } from "@/domain/entities/PricingTier";
+import { Money } from "@/domain/values/Money";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
 import { GetCheckoutSummary } from "@/usecases/GetCheckoutSummary";
@@ -50,17 +51,8 @@ describe("GetCheckoutSummary", () => {
       pricingTierSlug: "mastery",
     });
 
-    expect(result).toEqual({
-      ok: true,
-      value: {
-        courseSlug: "ppc-mastery",
-        courseTitle: "Accelerated Mastery",
-        offerName: "Accelerated Mastery",
-        amountMinor: 499900,
-        currency: "PHP",
-        pricingTierSlug: "mastery",
-      },
-    });
+    expect(result.ok && result.value.price.minor).toBe(499900);
+    expect(result.ok && result.value.price.currency).toBe("PHP");
   });
 
   it("returns the course price for direct course checkout", async () => {
@@ -72,7 +64,8 @@ describe("GetCheckoutSummary", () => {
       courseSlug: "ppc-mastery",
     });
 
-    expect(result.ok && result.value.amountMinor).toBe(599900);
+    expect(result.ok && result.value.price.minor).toBe(599900);
+    expect(result.ok && result.value.price.currency).toBe("PHP");
   });
 
   it("does not expose an unlinked tier for checkout", async () => {

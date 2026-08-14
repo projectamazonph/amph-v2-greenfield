@@ -24,8 +24,14 @@ export default async function NewCoursePage() {
   async function handleSubmit(formData: FormData) {
     "use server";
     await requireAdmin();
+    const rawId = String(formData.get("id") ?? "").trim();
+    // S10 fix: auto-generate a ULID if the admin leaves the ID field blank.
+    const courseId = rawId || (() => {
+      const container = buildContainer();
+      return container.idGen.newId();
+    })();
     const input: CreateCoursePageInput = {
-      id: String(formData.get("id") ?? "").trim(),
+      id: courseId,
       slug: String(formData.get("slug") ?? "").trim(),
       title: String(formData.get("title") ?? "").trim(),
       tagline: String(formData.get("tagline") ?? "").trim(),

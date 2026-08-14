@@ -168,7 +168,7 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
       {result ? <FormativeScoreNotice /> : null}
       {result?.xpAwarded ? (
         <p className={styles.xpBanner}>
-          +{result.xpAwarded} XP earned for passing in Challenge mode.
+          +{result.xpAwarded} XP earned for passing in Challenge Mode.
         </p>
       ) : null}
     </form>

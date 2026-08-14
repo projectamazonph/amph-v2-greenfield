@@ -90,7 +90,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
     ? "FREE"
     : priceMoney.ok
       ? priceMoney.value.format("en-PH")
-      : `₱${(detail.priceMinor / 100).toFixed(2)}`;
+      : (() => { throw new Error("priceMinor must be an integer minor-unit amount"); })();
 
   return (
     <StudentShell requireAuth={false} user={user}>

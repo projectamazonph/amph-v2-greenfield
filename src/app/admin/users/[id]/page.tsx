@@ -103,9 +103,11 @@ export default async function AdminUserDetailPage({ params, searchParams }: Page
     redirect(`/admin/users/${id}?notice=tier-updated`);
   }
 
-  async function setEnrollment(courseId: string, formData: FormData) {
+  async function setEnrollment(formData: FormData) {
     "use server";
+    const courseId = String(formData.get("courseId") ?? "");
     const status = String(formData.get("status") ?? "");
+    if (!courseId) redirect(`/admin/users/${id}?error=missing_course_id`);
     if (!isManagedEnrollmentStatus(status)) {
       redirect(`/admin/users/${id}?error=invalid_status`);
     }
@@ -248,7 +250,8 @@ export default async function AdminUserDetailPage({ params, searchParams }: Page
                       <span>{status ? statusLabel(status) : "Not enrolled"}</span>
                     </div>
                     {status === "active" ? (
-                      <form action={setEnrollment.bind(null, course.id)}>
+                      <form action={setEnrollment}>
+                        <input type="hidden" name="courseId" value={course.id} />
                         <input type="hidden" name="status" value="cancelled" />
                         <ConfirmSubmitButton
                           className={styles.dangerButton}
@@ -260,7 +263,8 @@ export default async function AdminUserDetailPage({ params, searchParams }: Page
                     ) : status === "refunded" ? (
                       <span className={styles.lockedLabel}>Refunded</span>
                     ) : (
-                      <form action={setEnrollment.bind(null, course.id)}>
+                      <form action={setEnrollment}>
+                        <input type="hidden" name="courseId" value={course.id} />
                         <input type="hidden" name="status" value="active" />
                         <SubmitButton className={styles.primaryButton}>
                           {canRestore ? "Restore" : "Enroll"}

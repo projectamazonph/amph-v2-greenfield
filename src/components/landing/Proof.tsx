@@ -1,3 +1,4 @@
+import React from "react";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Proof.module.css";
@@ -29,15 +30,22 @@ export function Proof() {
               the fix written next to each.
             </p>
             <div className={styles.mini}>
-              <svg viewBox="0 0 200 54" preserveAspectRatio="none" fill="none" aria-hidden="true">
-                <line x1="0" y1="44" x2="200" y2="44" stroke="#E5E5E0" />
-                <rect x="8" y="20" width="14" height="24" fill="#171717" />
-                <rect x="34" y="10" width="14" height="34" fill="#FF6B35" />
-                <rect x="60" y="28" width="14" height="16" fill="#171717" />
-                <rect x="86" y="6" width="14" height="38" fill="#FF6B35" />
-                <rect x="112" y="32" width="14" height="12" fill="#737373" />
-                <rect x="138" y="16" width="14" height="28" fill="#171717" />
-                <rect x="164" y="24" width="14" height="20" fill="#FF6B35" />
+              {/* S7 fix: use CSS custom properties instead of raw hex for design token alignment */}
+              <svg viewBox="0 0 200 54" preserveAspectRatio="none" fill="none" aria-hidden="true"
+                style={{
+                  "--bar-light": "var(--border)",
+                  "--bar-dark": "var(--ink-900)",
+                  "--bar-accent": "var(--accent)",
+                  "--bar-mid": "var(--ink-500)",
+                } as React.CSSProperties}>
+                <line x1="0" y1="44" x2="200" y2="44" stroke="var(--bar-light)" />
+                <rect x="8" y="20" width="14" height="24" fill="var(--bar-dark)" />
+                <rect x="34" y="10" width="14" height="34" fill="var(--bar-accent)" />
+                <rect x="60" y="28" width="14" height="16" fill="var(--bar-dark)" />
+                <rect x="86" y="6" width="14" height="38" fill="var(--bar-accent)" />
+                <rect x="112" y="32" width="14" height="12" fill="var(--bar-mid)" />
+                <rect x="138" y="16" width="14" height="28" fill="var(--bar-dark)" />
+                <rect x="164" y="24" width="14" height="20" fill="var(--bar-accent)" />
               </svg>
             </div>
           </article>
@@ -56,14 +64,19 @@ export function Proof() {
                 fill="none"
                 strokeWidth="2"
                 aria-hidden="true"
+                style={{
+                  "--bar-light": "var(--border)",
+                  "--bar-accent": "var(--accent)",
+                  "--bar-mid": "var(--ink-500)",
+                } as React.CSSProperties}
               >
-                <line x1="6" y1="12" x2="150" y2="12" stroke="#E5E5E0" />
-                <line x1="6" y1="24" x2="120" y2="24" stroke="#E5E5E0" />
-                <line x1="6" y1="36" x2="170" y2="36" stroke="#E5E5E0" />
-                <line x1="6" y1="48" x2="96" y2="48" stroke="#E5E5E0" />
-                <path d="M176 10 l4 4 l8 -8" stroke="#FF6B35" />
-                <path d="M176 34 l4 4 l8 -8" stroke="#FF6B35" />
-                <path d="M150 22 l8 8 M158 22 l-8 8" stroke="#737373" />
+                <line x1="6" y1="12" x2="150" y2="12" stroke="var(--bar-light)" />
+                <line x1="6" y1="24" x2="120" y2="24" stroke="var(--bar-light)" />
+                <line x1="6" y1="36" x2="170" y2="36" stroke="var(--bar-light)" />
+                <line x1="6" y1="48" x2="96" y2="48" stroke="var(--bar-light)" />
+                <path d="M176 10 l4 4 l8 -8" stroke="var(--bar-accent)" />
+                <path d="M176 34 l4 4 l8 -8" stroke="var(--bar-accent)" />
+                <path d="M150 22 l8 8 M158 22 l-8 8" stroke="var(--bar-mid)" />
               </svg>
             </div>
           </article>
@@ -76,16 +89,21 @@ export function Proof() {
               trusts more than a result.
             </p>
             <div className={styles.mini}>
-              <svg viewBox="0 0 200 54" preserveAspectRatio="none" fill="none" aria-hidden="true">
+              <svg viewBox="0 0 200 54" preserveAspectRatio="none" fill="none" aria-hidden="true"
+                style={{
+                  "--bar-light": "var(--border)",
+                  "--bar-dark": "var(--ink-900)",
+                  "--bar-accent": "var(--accent)",
+                } as React.CSSProperties}>
                 <polyline
                   points="6,40 40,30 74,34 108,18 142,22 176,8"
-                  stroke="#FF6B35"
+                  stroke="var(--bar-accent)"
                   strokeWidth="2"
                   fill="none"
                 />
-                <circle cx="108" cy="18" r="3" fill="#171717" />
-                <circle cx="176" cy="8" r="3" fill="#171717" />
-                <line x1="6" y1="48" x2="194" y2="48" stroke="#E5E5E0" />
+                <circle cx="108" cy="18" r="3" fill="var(--bar-dark)" />
+                <circle cx="176" cy="8" r="3" fill="var(--bar-dark)" />
+                <line x1="6" y1="48" x2="194" y2="48" stroke="var(--bar-light)" />
               </svg>
             </div>
           </article>

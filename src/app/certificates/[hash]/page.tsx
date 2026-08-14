@@ -119,7 +119,7 @@ export default async function CertificatePage({ params }: PageProps) {
             <div className={styles.certBody}>
               <p className={styles.certOrg}>PROJECT AMAZON PH ACADEMY</p>
               <h1 className={styles.certTitle}>Certificate of Completion</h1>
-              <p className={styles.certSubtitle}>— awarded for excellence —</p>
+              <p className={styles.certSubtitle}>Awarded for excellence</p>
 
               <p className={styles.certLabel}>This is to certify that</p>
               <p className={styles.certName}>{fullName}</p>

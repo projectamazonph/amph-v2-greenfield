@@ -42,7 +42,6 @@ import {
   type CheckoutActionState,
 } from "@/app/actions/checkout.action";
 import type { CheckoutSummary } from "@/usecases/GetCheckoutSummary";
-import { Money } from "@/domain/values/Money";
 import { Button } from "@/components/ui/Button";
 
 const PAGE_STYLES: Record<string, React.CSSProperties> = {
@@ -126,7 +125,7 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
   alertError: {
     background: "var(--danger-soft)",
     color: "var(--danger)",
-    borderColor: "#FECACA",
+    borderColor: "var(--color-error)",
   },
   alertInfo: {
     background: "var(--accent-soft)",
@@ -210,10 +209,7 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
   const returnPath = summary.pricingTierSlug
     ? `/checkout?pricingTier=${summary.pricingTierSlug}`
     : `/checkout?courseSlug=${summary.courseSlug}`;
-  const summaryMoney = Money.of(summary.amountMinor, summary.currency as "PHP");
-  const formattedTotal = summaryMoney.ok
-    ? summaryMoney.value.format("en-PH")
-    : new Intl.NumberFormat("en-PH", { style: "currency", currency: summary.currency }).format(summary.amountMinor / 100);
+  const formattedTotal = summary.price.format("en-PH");
 
   return (
     <div style={PAGE_STYLES.page}>
@@ -319,7 +315,6 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
             type="submit"
             onMouseDown={() => setOptimisticDisabled(true)}
             disabled={optimisticDisabled || isPending || state.kind === "redirect"}
-            style={{ width: "100%" }}
           >
             {isPending
               ? "Preparing checkout…"
