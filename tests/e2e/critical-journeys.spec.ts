@@ -157,7 +157,16 @@ test.describe("Critical journeys", () => {
 
     await page.getByRole("combobox", { name: /tier/i }).selectOption("PRO");
     await page.getByRole("button", { name: /save tier/i }).click();
-    await expect(page.getByRole("status")).toContainText("Subscription tier updated");
+    // The page renders the success notice as a <p role="status">. Scope to
+    // <p> specifically: Astryx Button components (used by every Dialog
+    // close button, including the ConfirmSubmitButton's "Confirm action"
+    // header) ship a VisuallyHidden <span role="status" aria-live="polite">
+    // live region for loading announcements, which is always mounted. A
+    // bare getByRole("status") collides with that hidden span under
+    // Playwright's strict mode and the assertion trips before the
+    // redirect completes.
+    const notice = page.locator('main p[role="status"]');
+    await expect(notice).toContainText("Subscription tier updated");
 
     // Granting a PRO tier auto-enrolls the student in every published
     // course their tier unlocks (STORY-105 follow-up to the admin-grant
@@ -169,10 +178,10 @@ test.describe("Critical journeys", () => {
 
     page.once("dialog", (dialog) => dialog.accept());
     await courseRow.getByRole("button", { name: /^revoke$/i }).click();
-    await expect(page.getByRole("status")).toContainText("Course access revoked");
+    await expect(notice).toContainText("Course access revoked");
 
     await courseRow.getByRole("button", { name: /^restore$/i }).click();
-    await expect(page.getByRole("status")).toContainText("Course access restored");
+    await expect(notice).toContainText("Course access restored");
   });
 
   test("journey 6: public verifies certificate by hash", async ({ page }) => {
