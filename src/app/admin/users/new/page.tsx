@@ -14,7 +14,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { adminGrantSubscriptionAction } from "@/app/actions/adminGrantSubscription.action";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { Money } from "@/domain/values/Money";
 import styles from "./page.module.css";
@@ -39,12 +39,10 @@ export default async function NewUserPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/users" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden />{" "}Back to users
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title="Add student"
+        backHref="/admin/users"
+        backLabel="Back to users"
         subtitle="Grant a subscription tier without going through checkout, for students who paid outside the platform."
       />
 

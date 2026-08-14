@@ -179,7 +179,11 @@ export function AdminUsersTable({
   }) as unknown as TablePlugin<UserRow>;
 
   return (
-    <>
+    // L11 fix: <figcaption> provides WCAG 1.3.1 accessible name for the table.
+    // Visually hidden (sr-only) so it doesn't disrupt the layout. The scope="col"
+    // on header cells is set by the TableColumn definition (Astryx Table handles this).
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">User accounts</figcaption>
       <Table
         data={users}
         columns={COLUMNS}
@@ -235,6 +239,6 @@ export function AdminUsersTable({
           </Link>
         </nav>
       )}
-    </>
+    </figure>
   );
 }

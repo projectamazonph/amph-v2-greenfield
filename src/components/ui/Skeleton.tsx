@@ -10,7 +10,7 @@
  *   <SkeletonCard />
  */
 
-import styles from './Skeleton.module.css';
+import styles from "./Skeleton.module.css";
 
 /* ------------------------------------------------------------------ */
 /*  Block — single animated rectangle                                  */
@@ -20,24 +20,24 @@ export interface SkeletonBlockProps {
   width?: string;
   height?: string;
   borderRadius?: string;
-  variant?: 'text' | 'rect' | 'circle';
+  variant?: "text" | "rect" | "circle";
   className?: string;
 }
 
 export function SkeletonBlock({
-  width = '100%',
-  height = '1rem',
+  width = "100%",
+  height = "1rem",
   borderRadius,
-  variant = 'rect',
+  variant = "rect",
   className,
 }: SkeletonBlockProps) {
   const br =
     borderRadius ??
-    (variant === 'circle' ? '50%' : variant === 'text' ? 'var(--radius-sm)' : 'var(--radius-md)');
+    (variant === "circle" ? "50%" : variant === "text" ? "var(--radius-sm)" : "var(--radius-md)");
 
   return (
     <div
-      className={`${styles.pulse} ${className ?? ''}`}
+      className={`${styles.pulse} ${className ?? ""}`}
       style={{ width, height, borderRadius: br }}
       aria-hidden="true"
     />
@@ -54,7 +54,7 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
       {Array.from({ length: lines }).map((_, i) => (
         <SkeletonBlock
           key={i}
-          width={i === lines - 1 ? '60%' : '100%'}
+          width={i === lines - 1 ? "60%" : "100%"}
           height="0.875rem"
           variant="text"
           className={styles.textLine}
@@ -72,12 +72,7 @@ export function SkeletonRow({ columns = 4 }: { columns?: number }) {
   return (
     <div className={styles.row}>
       {Array.from({ length: columns }).map((_, i) => (
-        <SkeletonBlock
-          key={i}
-          width={i === 0 ? '40%' : '20%'}
-          height="0.75rem"
-          variant="text"
-        />
+        <SkeletonBlock key={i} width={i === 0 ? "40%" : "20%"} height="0.75rem" variant="text" />
       ))}
     </div>
   );
@@ -87,20 +82,14 @@ export function SkeletonRow({ columns = 4 }: { columns?: number }) {
 /*  Card — a rectangular card skeleton with optional header lines      */
 /* ------------------------------------------------------------------ */
 
-export function SkeletonCard({
-  lines = 2,
-  className,
-}: {
-  lines?: number;
-  className?: string;
-}) {
+export function SkeletonCard({ lines = 2, className }: { lines?: number; className?: string }) {
   return (
-    <div className={`${styles.card} ${className ?? ''}`}>
+    <div className={`${styles.card} ${className ?? ""}`}>
       <SkeletonBlock width="60%" height="1rem" variant="text" />
       {Array.from({ length: lines }).map((_, i) => (
         <SkeletonBlock
           key={i}
-          width={i === lines - 1 ? '40%' : '100%'}
+          width={i === lines - 1 ? "40%" : "100%"}
           height="0.75rem"
           variant="text"
           className={styles.textLine}
@@ -114,23 +103,15 @@ export function SkeletonCard({
 /*  Table — a full table skeleton with header + rows                   */
 /* ------------------------------------------------------------------ */
 
-export function SkeletonTable({
-  columns = 4,
-  rows = 5,
-}: {
-  columns?: number;
-  rows?: number;
-}) {
+export function SkeletonTable({ columns = 4, rows = 5 }: { columns?: number; rows?: number }) {
+  // L10 fix: the region wrapper signals to assistive tech that content
+  // is loading. The inner skeleton blocks use aria-hidden so they don't
+  // create noise; the region announces the busy state instead.
   return (
-    <div className={styles.table}>
+    <div className={styles.table} aria-busy="true" aria-live="polite" role="status">
       <div className={styles.tableHeader}>
         {Array.from({ length: columns }).map((_, i) => (
-          <SkeletonBlock
-            key={i}
-            width="20%"
-            height="0.625rem"
-            variant="text"
-          />
+          <SkeletonBlock key={i} width="20%" height="0.625rem" variant="text" />
         ))}
       </div>
       {Array.from({ length: rows }).map((_, i) => (
@@ -146,7 +127,7 @@ export function SkeletonTable({
 
 export function SkeletonStatTile({ className }: { className?: string }) {
   return (
-    <div className={`${styles.statTile} ${className ?? ''}`}>
+    <div className={`${styles.statTile} ${className ?? ""}`}>
       <SkeletonBlock width="3rem" height="2rem" variant="rect" />
       <SkeletonBlock width="60%" height="0.75rem" variant="text" className={styles.textLine} />
     </div>
@@ -159,7 +140,7 @@ export function SkeletonStatTile({ className }: { className?: string }) {
 
 export function SkeletonForm({ fields = 4 }: { fields?: number }) {
   return (
-    <div className={styles.form}>
+    <div className={styles.form} aria-busy="true" aria-live="polite" role="status">
       {Array.from({ length: fields }).map((_, i) => (
         <div key={i} className={styles.formField}>
           <SkeletonBlock width="25%" height="0.75rem" variant="text" />

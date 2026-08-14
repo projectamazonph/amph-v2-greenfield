@@ -4,7 +4,7 @@
 **Points:** 3
 **Epic:** Payments
 **Dependencies:** STORY-008 (Course entity), STORY-016-017 (Enrollment), STORY-013 (JWT auth)
-**Status:** ✅ Done (PR #122, commit TBD — `feat(story-021): /checkout page closes the student-facing flow`; `CreatePaymentIntent` use case, `PayMongoAdapter`, and webhook handler all already landed; this PR adds the missing `/checkout` page (with `/checkout/success` and `/checkout/failed` return pages) and the `startCheckout` server action that bridges the EnrollButton to the PayMongo-hosted checkout.)
+**Status:** ✅ Done (PR #122, commit TBD — `feat(story-021): /checkout page closes the student-facing flow`; `CreatePaymentIntent` use case, `PayMongoAdapter`, and webhook handler all already landed; this PR adds the missing `/checkout` page (with `/checkout/success` and `/checkout/failed` return pages) and the `startCheckout` server action that bridges the EnrollButton to the PayMongo-hosted checkout.) **Follow-up 2026-08-14 (H6, H7):** `CheckoutSummary` now carries `price: Money` instead of `amountMinor: number + currency: string`, centralizing PHP formatting in the `Money` value object. `CheckoutForm.tsx` uses `summary.price.format("en-PH")`. Course detail page uses the same `Money.format()` path. Touched: `src/usecases/GetCheckoutSummary.ts`, `src/app/checkout/CheckoutForm.tsx`, `src/app/courses/[slug]/page.tsx`, `src/usecases/__tests__/GetCheckoutSummary.test.ts`, `src/app/checkout/__tests__/page.test.tsx`.
 
 ---
 
@@ -24,16 +24,22 @@ Every payment state is one of:
 // src/domain/values/PaymentStatus.ts
 
 export type PaymentStatus =
-  | "PENDING"    // Order created, waiting for payment
-  | "PAID"       // Payment confirmed by PayMongo webhook
-  | "FAILED"     // Payment attempt failed
-  | "EXPIRED"    // Checkout session timed out (PayMongo: 24h)
-  | "REFUNDED";  // Admin or PayMongo-initiated refund
+  | "PENDING" // Order created, waiting for payment
+  | "PAID" // Payment confirmed by PayMongo webhook
+  | "FAILED" // Payment attempt failed
+  | "EXPIRED" // Checkout session timed out (PayMongo: 24h)
+  | "REFUNDED"; // Admin or PayMongo-initiated refund
 
 export const PaymentStatus = {
-  isPaid(s: PaymentStatus)      { return s === "PAID"; },
-  isFinal(s: PaymentStatus)    { return s === "PAID" || s === "REFUNDED"; },
-  isActive(s: PaymentStatus)   { return s === "PENDING"; },
+  isPaid(s: PaymentStatus) {
+    return s === "PAID";
+  },
+  isFinal(s: PaymentStatus) {
+    return s === "PAID" || s === "REFUNDED";
+  },
+  isActive(s: PaymentStatus) {
+    return s === "PENDING";
+  },
 } as const;
 ```
 
@@ -53,7 +59,7 @@ export class Order {
     public readonly discountMinor: number,
     public readonly totalMinor: number,
     public readonly currency: string,
-    public status: PaymentStatus,           // ← domain field
+    public status: PaymentStatus, // ← domain field
     public paymongoPaymentId: string | null,
     public paymongoCheckoutUrl: string | null,
     public readonly createdAt: Date,
@@ -63,7 +69,8 @@ export class Order {
   // ── State transitions ─────────────────────────────────────
 
   markPending(paymongoPaymentId: string, checkoutUrl: string): void {
-    if (this.status !== "PENDING") throw new Error(`Cannot mark pending: current status is ${this.status}`);
+    if (this.status !== "PENDING")
+      throw new Error(`Cannot mark pending: current status is ${this.status}`);
     this.paymongoPaymentId = paymongoPaymentId;
     this.paymongoCheckoutUrl = checkoutUrl;
     this.status = "PENDING";
@@ -71,19 +78,22 @@ export class Order {
   }
 
   markPaid(paidAt = new Date()): void {
-    if (this.status !== "PENDING") throw new Error(`Cannot mark paid: current status is ${this.status}`);
+    if (this.status !== "PENDING")
+      throw new Error(`Cannot mark paid: current status is ${this.status}`);
     this.status = "PAID";
     this.updatedAt = paidAt;
   }
 
   markFailed(): void {
-    if (this.status !== "PENDING") throw new Error(`Cannot mark failed: current status is ${this.status}`);
+    if (this.status !== "PENDING")
+      throw new Error(`Cannot mark failed: current status is ${this.status}`);
     this.status = "FAILED";
     this.updatedAt = new Date();
   }
 
   markExpired(): void {
-    if (this.status !== "PENDING") throw new Error(`Cannot mark expired: current status is ${this.status}`);
+    if (this.status !== "PENDING")
+      throw new Error(`Cannot mark expired: current status is ${this.status}`);
     this.status = "EXPIRED";
     this.updatedAt = new Date();
   }
@@ -94,7 +104,9 @@ export class Order {
     return this.status === "PENDING" && next === "PAID";
   }
 
-  isPaid(): boolean { return PaymentStatus.isPaid(this.status); }
+  isPaid(): boolean {
+    return PaymentStatus.isPaid(this.status);
+  }
 }
 ```
 
@@ -110,10 +122,10 @@ export class Order {
 import type { Result } from "@/domain/shared/Result";
 
 export interface CheckoutSession {
-  id: string;          // PayMongo Checkout Session ID (starts with "cs_")
-  url: string;         // The hosted checkout URL
+  id: string; // PayMongo Checkout Session ID (starts with "cs_")
+  url: string; // The hosted checkout URL
   createdAt: Date;
-  expiresAt: Date;     // Usually now + 24h
+  expiresAt: Date; // Usually now + 24h
 }
 
 export type PaymentGatewayError =
@@ -129,11 +141,11 @@ export interface IPaymentGateway {
   createCheckoutSession(params: {
     courseId: string;
     courseTitle: string;
-    amountMinor: number;   // integer minor units (centavos)
-    currency: string;      // "PHP"
+    amountMinor: number; // integer minor units (centavos)
+    currency: string; // "PHP"
     successUrl: string;
     failedUrl: string;
-    metadata: Record<string, string>;  // { orderId, userId, courseId }
+    metadata: Record<string, string>; // { orderId, userId, courseId }
   }): Promise<Result<CheckoutSession, PaymentGatewayError>>;
 
   /**
@@ -158,9 +170,7 @@ import type { Result } from "@/domain/shared/Result";
 import type { Order } from "@/domain/entities/Order";
 
 export type OrderError =
-  | { kind: "not_found" }
-  | { kind: "already_enrolled" }
-  | { kind: "db_error"; message: string };
+  { kind: "not_found" } | { kind: "already_enrolled" } | { kind: "db_error"; message: string };
 
 export interface IOrderRepository {
   create(order: Order): Promise<Result<Order, OrderError>>;
@@ -307,11 +317,13 @@ export class PayMongoAdapter implements IPaymentGateway {
         body: JSON.stringify({
           data: {
             attributes: {
-              line_items: [{
-                name: params.courseTitle,
-                quantity: 1,
-                price: params.amountMinor,
-              }],
+              line_items: [
+                {
+                  name: params.courseTitle,
+                  quantity: 1,
+                  price: params.amountMinor,
+                },
+              ],
               payment_method_types: ["card", "gcash", "grab_pay"],
               success_url: params.successUrl,
               failed_url: params.failedUrl,
@@ -321,7 +333,7 @@ export class PayMongoAdapter implements IPaymentGateway {
         }),
       });
 
-      const json = await res.json() as PaymongoApiResponse;
+      const json = (await res.json()) as PaymongoApiResponse;
 
       if (!res.ok) {
         const err = json.errors?.[0];
@@ -344,18 +356,29 @@ export class PayMongoAdapter implements IPaymentGateway {
     }
   }
 
-  async getCheckoutSession(sessionId: string): Promise<Result<CheckoutSession, PaymentGatewayError>> {
+  async getCheckoutSession(
+    sessionId: string,
+  ): Promise<Result<CheckoutSession, PaymentGatewayError>> {
     try {
       const res = await fetch(`${this.baseUrl}/checkout_sessions/${sessionId}`, {
         headers: this.headers,
       });
-      const json = await res.json() as PaymongoApiResponse;
+      const json = (await res.json()) as PaymongoApiResponse;
       if (!res.ok) {
         const err = json.errors?.[0];
-        return Result.err({ kind: "paymongo_error", code: String(err?.code ?? ""), message: err?.detail ?? "" });
+        return Result.err({
+          kind: "paymongo_error",
+          code: String(err?.code ?? ""),
+          message: err?.detail ?? "",
+        });
       }
       const attrs = json.data.attributes;
-      return Result.ok({ id: json.data.id, url: attrs.checkout_url, createdAt: new Date(attrs.created_at * 1000), expiresAt: new Date(attrs.expires_at * 1000) });
+      return Result.ok({
+        id: json.data.id,
+        url: attrs.checkout_url,
+        createdAt: new Date(attrs.created_at * 1000),
+        expiresAt: new Date(attrs.expires_at * 1000),
+      });
     } catch (e) {
       return Result.err({ kind: "network_error", message: String(e) });
     }
@@ -364,10 +387,10 @@ export class PayMongoAdapter implements IPaymentGateway {
   verifyWebhookSignature(payload: string, signature: string): void {
     // PayMongo uses HMAC-SHA256.
     // Signature header format: "t=timestamp,v1=hmac"
-    const parts = Object.fromEntries(signature.split(",").map(p => p.split("=")));
+    const parts = Object.fromEntries(signature.split(",").map((p) => p.split("=")));
     const timestamp = parts["t"];
-    const expected  = parts["v1"];
-    const computed  = crypto
+    const expected = parts["v1"];
+    const computed = crypto
       .createHmac("sha256", process.env.PAYMONGO_WEBHOOK_SECRET!)
       .update(`${timestamp}.${payload}`)
       .digest("hex");
@@ -447,27 +470,57 @@ export async function POST(req: NextRequest) {
 // src/usecases/__tests__/CreatePaymentIntent.test.ts
 
 describe("CreatePaymentIntent", () => {
-  it("happy path: creates order and returns checkout URL", async () => { /* ... */ });
-  it("course not found: returns error", async () => { /* ... */ });
-  it("course not published: returns error", async () => { /* ... */ });
-  it("already enrolled: returns error", async () => { /* ... */ });
-  it("PayMongo failure: returns payment_error", async () => { /* ... */ });
-  it("order already has pending payment: reuses existing checkout URL", async () => { /* ... */ });
+  it("happy path: creates order and returns checkout URL", async () => {
+    /* ... */
+  });
+  it("course not found: returns error", async () => {
+    /* ... */
+  });
+  it("course not published: returns error", async () => {
+    /* ... */
+  });
+  it("already enrolled: returns error", async () => {
+    /* ... */
+  });
+  it("PayMongo failure: returns payment_error", async () => {
+    /* ... */
+  });
+  it("order already has pending payment: reuses existing checkout URL", async () => {
+    /* ... */
+  });
 });
 
 describe("Order payment state transitions", () => {
-  it("newly created order is PENDING", () => { /* ... */ });
-  it("markPending sets fields and status", () => { /* ... */ });
-  it("markPaid transitions PENDING → PAID", () => { /* ... */ });
-  it("markPaid throws if not PENDING", () => { /* ... */ });
-  it("markFailed transitions PENDING → FAILED", () => { /* ... */ });
-  it("markExpired transitions PENDING → EXPIRED", () => { /* ... */ });
+  it("newly created order is PENDING", () => {
+    /* ... */
+  });
+  it("markPending sets fields and status", () => {
+    /* ... */
+  });
+  it("markPaid transitions PENDING → PAID", () => {
+    /* ... */
+  });
+  it("markPaid throws if not PENDING", () => {
+    /* ... */
+  });
+  it("markFailed transitions PENDING → FAILED", () => {
+    /* ... */
+  });
+  it("markExpired transitions PENDING → EXPIRED", () => {
+    /* ... */
+  });
 });
 
 describe("PayMongoAdapter", () => {
-  it("createCheckoutSession calls PayMongo API with correct params", async () => { /* ... */ });
-  it("returns error on network failure", async () => { /* ... */ });
-  it("verifyWebhookSignature throws on invalid signature", () => { /* ... */ });
+  it("createCheckoutSession calls PayMongo API with correct params", async () => {
+    /* ... */
+  });
+  it("returns error on network failure", async () => {
+    /* ... */
+  });
+  it("verifyWebhookSignature throws on invalid signature", () => {
+    /* ... */
+  });
 });
 ```
 
@@ -477,10 +530,18 @@ describe("PayMongoAdapter", () => {
 // src/app/api/webhooks/paymongo/__tests__/route.test.ts
 
 describe("POST /api/webhooks/paymongo", () => {
-  it("returns 401 for invalid signature", async () => { /* ... */ });
-  it("marks order paid and enrolls user on checkout_session.completed", async () => { /* ... */ });
-  it("ignores unrelated event types", async () => { /* ... */ });
-  it("returns 404 if order not found", async () => { /* ... */ });
+  it("returns 401 for invalid signature", async () => {
+    /* ... */
+  });
+  it("marks order paid and enrolls user on checkout_session.completed", async () => {
+    /* ... */
+  });
+  it("ignores unrelated event types", async () => {
+    /* ... */
+  });
+  it("returns 404 if order not found", async () => {
+    /* ... */
+  });
 });
 ```
 
@@ -488,27 +549,27 @@ describe("POST /api/webhooks/paymongo", () => {
 
 ## Files to create
 
-| File | Action |
-|------|--------|
-| `src/domain/values/PaymentStatus.ts` | Create |
-| `src/domain/entities/Order.ts` | Create |
-| `src/ports/payment/IPaymentGateway.ts` | Create |
-| `src/ports/repositories/OrderRepository.ts` | Create |
-| `src/usecases/CreatePaymentIntent.ts` | Create |
-| `src/usecases/__tests__/CreatePaymentIntent.test.ts` | Create |
-| `src/infra/payment/PayMongoAdapter.ts` | Create |
-| `src/infra/payment/InMemoryPaymentGateway.ts` | Create (test double) |
-| `src/infra/repositories/InMemoryOrderRepository.ts` | Create (test double) |
-| `src/app/api/webhooks/paymongo/route.ts` | Create |
-| `src/app/api/webhooks/paymongo/__tests__/route.test.ts` | Create |
-| `src/composition/container.ts` | Modify — wire PayMongoAdapter |
-| `tests/unit/domain/entities/Order.test.ts` | Create |
-| `tests/unit/domain/values/PaymentStatus.test.ts` | Create |
+| File                                                    | Action                        |
+| ------------------------------------------------------- | ----------------------------- |
+| `src/domain/values/PaymentStatus.ts`                    | Create                        |
+| `src/domain/entities/Order.ts`                          | Create                        |
+| `src/ports/payment/IPaymentGateway.ts`                  | Create                        |
+| `src/ports/repositories/OrderRepository.ts`             | Create                        |
+| `src/usecases/CreatePaymentIntent.ts`                   | Create                        |
+| `src/usecases/__tests__/CreatePaymentIntent.test.ts`    | Create                        |
+| `src/infra/payment/PayMongoAdapter.ts`                  | Create                        |
+| `src/infra/payment/InMemoryPaymentGateway.ts`           | Create (test double)          |
+| `src/infra/repositories/InMemoryOrderRepository.ts`     | Create (test double)          |
+| `src/app/api/webhooks/paymongo/route.ts`                | Create                        |
+| `src/app/api/webhooks/paymongo/__tests__/route.test.ts` | Create                        |
+| `src/composition/container.ts`                          | Modify — wire PayMongoAdapter |
+| `tests/unit/domain/entities/Order.test.ts`              | Create                        |
+| `tests/unit/domain/values/PaymentStatus.test.ts`        | Create                        |
 
 ## Files to modify
 
-| File | Action |
-|------|--------|
+| File                           | Action                                                        |
+| ------------------------------ | ------------------------------------------------------------- |
 | `src/composition/container.ts` | Add `orderRepo`, `paymentGateway`, wire `CreatePaymentIntent` |
 
 ---
@@ -533,6 +594,7 @@ Webhook secret: whsec_...
 ```
 
 Set in `.env.test`:
+
 ```
 PAYMONGO_SECRET=sk_test_dummy
 PAYMONGO_WEBHOOK_SECRET=whsec_test_dummy

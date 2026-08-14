@@ -5,7 +5,7 @@
 - **Story**: STORY-027
 - **Sprint**: 6 — Lesson Delivery + Progress
 - **Points**: 1
-**Status:** ✅ Done (PR #27, commit `5a7a9e2` — `feat(story-027): MarkLessonComplete use case + ProgressEvent log`)
+  **Status:** ✅ Done (PR #27, commit `5a7a9e2` — `feat(story-027): MarkLessonComplete use case + ProgressEvent log`) **Follow-up 2026-08-14 (M8):** `admin/users/[id]/page.tsx` eliminated the per-render `setEnrollment.bind(null, course.id)` pattern by passing `courseId` as a hidden form field instead. The single `setEnrollment` action reads `courseId` from `formData`. Prevents unnecessary React reconciler churn when rendering 100+ enrollment rows. Touched: `src/app/admin/users/[id]/page.tsx`.
 
 ## Overview
 
@@ -30,6 +30,7 @@ markLessonComplete(lessonId: string, courseLessonCount: number): void;
 ```
 
 `markLessonComplete`:
+
 - Appends `lessonId` to `completedLessonIds` (if not already present — idempotent)
 - Sets `lastLessonId = lessonId`
 - Sets `progressPercent = Math.round((completedLessonIds.length / courseLessonCount) * 100)`
@@ -45,7 +46,7 @@ export interface ProgressEvent {
   readonly courseId: string;
   readonly lessonId: string | null;
   readonly type: ProgressEventType;
-  readonly metadata: Record<string, unknown>;  // e.g. { progressPercent: 50 }
+  readonly metadata: Record<string, unknown>; // e.g. { progressPercent: 50 }
   readonly createdAt: Date;
 }
 ```
@@ -83,14 +84,18 @@ type MarkLessonCompleteError =
   | { kind: "lesson_not_in_course" }
   | { kind: "enrollment_not_active" };
 
-type MarkLessonCompleteResult = Result<{
-  enrollment: Enrollment;
-  progressEvent: ProgressEvent;
-  progressPercent: number;
-}, MarkLessonCompleteError>;
+type MarkLessonCompleteResult = Result<
+  {
+    enrollment: Enrollment;
+    progressEvent: ProgressEvent;
+    progressPercent: number;
+  },
+  MarkLessonCompleteError
+>;
 ```
 
 Rules:
+
 1. Enrollment must exist for user + course → `enrollment_not_found`
 2. Enrollment must be `active` → `enrollment_not_active`
 3. Course must exist → `course_not_found`
@@ -114,10 +119,7 @@ function computeProgressPercent(
 /**
  * Is the course fully completed?
  */
-function isCourseCompleted(
-  completedLessonIds: readonly string[],
-  totalLessons: number,
-): boolean;
+function isCourseCompleted(completedLessonIds: readonly string[], totalLessons: number): boolean;
 
 /**
  * Log a course_completed ProgressEvent when all lessons are done.

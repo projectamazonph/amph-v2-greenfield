@@ -76,11 +76,13 @@ export default async function SettingsPage({
           The current values of required environment variables. Values are never displayed.
         </p>
         <table className={styles.table}>
+          {/* L11 fix: <caption> provides WCAG 1.3.1 accessible name for the table. */}
+          <caption className="sr-only">Environment variable configuration status</caption>
           <thead>
             <tr>
-              <th>Variable</th>
-              <th>Status</th>
-              <th>Description</th>
+              <th scope="col">Variable</th>
+              <th scope="col">Status</th>
+              <th scope="col">Description</th>
             </tr>
           </thead>
           <tbody>
@@ -122,7 +124,7 @@ export default async function SettingsPage({
 
         {twoFactorNotice && <p className={styles.twoFactorNotice}>{twoFactorNotice}</p>}
         {enableError && <p className={styles.twoFactorError}>{enableError}</p>}
-        
+
         {session.twoFactorEnabled ? (
           <>
             <p className={styles.twoFactorStatus}>

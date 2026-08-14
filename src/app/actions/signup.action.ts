@@ -179,10 +179,12 @@ export async function signUpAndRedirect(formData: FormData): Promise<void> {
     redirect("/dashboard");
   }
   if (outcome.kind === "verification_required") {
-    // Signup succeeded; the user must click the verification link before
-    // they can sign in. /verify-email/sent already exists (STORY-007)
-    // and renders the "Check your email" message.
-    redirect(`/verify-email/sent?status=sent&email=${encodeURIComponent(outcome.email)}`);
+    // S18 fix: do not carry the email in the URL query string. It
+    // lands in browser history and analytics, and the /verify-email/sent
+    // page does not need the email in the URL to display the right
+    // message (the session cookie is set during auto-login, so the page
+    // can look up the user from the session).
+    redirect("/verify-email/sent?status=sent");
   }
   // All failure paths land back on /signup with an `?error=...` query
   // param that SignupForm reads via useSearchParams to render an alert.

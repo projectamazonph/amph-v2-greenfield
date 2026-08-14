@@ -162,7 +162,9 @@ export function AdminPaymentsTable({ payments, filters, pagination }: AdminPayme
   }) as unknown as TablePlugin<PaymentRow>;
 
   return (
-    <>
+    // L11 fix: <figcaption> provides WCAG 1.3.1 accessible name for the table.
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Payment orders</figcaption>
       <Table
         data={payments}
         columns={COLUMNS}
@@ -185,6 +187,6 @@ export function AdminPaymentsTable({ payments, filters, pagination }: AdminPayme
           No orders match the current filters.
         </p>
       )}
-    </>
+    </figure>
   );
 }

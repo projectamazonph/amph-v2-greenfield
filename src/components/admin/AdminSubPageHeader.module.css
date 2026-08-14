@@ -1,0 +1,14 @@
+/* AdminSubPageHeader.module.css — L5 fix */
+
+.backLink {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--ink-500);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.backLink:hover {
+  color: var(--accent);
+}

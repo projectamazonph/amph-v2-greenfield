@@ -5,12 +5,11 @@
  * page resolves its scenarioKey and lists every version sharing it.
  */
 
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card, Badge } from "@astryxdesign/core";
 import { publishSimulatorScenarioAction } from "@/app/actions/publishSimulatorScenario.action";
 import { createScenarioVersionDraftAction } from "@/app/actions/createScenarioVersionDraft.action";
@@ -60,11 +59,12 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
 
   return (
     <div>
-      <Link href="/admin/simulators" className={formStyles.backLink}>
-        <ArrowLeft size={16} aria-hidden />{" "}Back to scenarios
-      </Link>
-
-      <TopBar title={`Version history: ${name}`} subtitle={`${simulatorId} · ${scenarioKey}`} />
+      <AdminSubPageHeader
+        title={`Version history: ${name}`}
+        backHref="/admin/simulators"
+        backLabel="Back to scenarios"
+        subtitle={`${simulatorId} · ${scenarioKey}`}
+      />
 
       {errorMsg && (
         <Card padding={6}>
@@ -86,9 +86,7 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-3)" }}>
-                <span
-                  style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600 }}
-                >
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600 }}>
                   v{v.version}
                 </span>
                 <Badge variant={statusVariant(v.status)} label={v.status} />

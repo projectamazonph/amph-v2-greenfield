@@ -103,15 +103,15 @@ export default async function DashboardPage() {
                 marginBottom: "var(--space-2)",
               }}
             >
-              Your courses
+              {/* M7 fix: label honestly reflects what this card shows — the
+                 most recently enrolled in-progress course. 'Your courses' was
+                 misleading because this card is only one course, not all courses. */}
+              Continue where you enrolled
             </div>
             <div style={{ fontSize: "var(--text-base)", fontWeight: 600 }}>
               {lastAccessedCourse.title}
             </div>
-            <Link
-              href={`/courses/${lastAccessedCourse.slug}`}
-              className={styles.continueBtn}
-            >
+            <Link href={`/courses/${lastAccessedCourse.slug}`} className={styles.continueBtn}>
               Continue
             </Link>
           </div>
@@ -152,7 +152,7 @@ export default async function DashboardPage() {
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>My courses</h2>
             <Link href="/courses" className={styles.browseLink}>
-              Browse the catalog{" "}<ArrowRight size={16} aria-hidden />
+              Browse the catalog <ArrowRight size={16} aria-hidden />
             </Link>
           </div>
 

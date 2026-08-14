@@ -142,7 +142,9 @@ const COLUMNS: TableColumn<RefundRequestRow>[] = [
 
 export function AdminRefundsTable({ rows }: AdminRefundsTableProps) {
   return (
-    <>
+    // L11 fix: <figcaption> provides WCAG 1.3.1 accessible name for the table.
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Refund requests</figcaption>
       <Table data={rows} columns={COLUMNS} idKey="id" density="compact" dividers="rows" hasHover />
 
       {rows.length === 0 && (
@@ -157,6 +159,6 @@ export function AdminRefundsTable({ rows }: AdminRefundsTableProps) {
           No refund requests match the current filters.
         </p>
       )}
-    </>
+    </figure>
   );
 }

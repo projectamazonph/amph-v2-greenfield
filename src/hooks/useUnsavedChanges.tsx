@@ -53,7 +53,12 @@ function LeaveDialog({ onConfirm, onCancel }: LeaveDialogProps) {
       purpose="required"
       aria-describedby="unsaved-changes-desc"
     >
-      <DialogHeader title="Unsaved changes" onOpenChange={(open: boolean) => { if (!open) onCancel(); }} />
+      <DialogHeader
+        title="Unsaved changes"
+        onOpenChange={(open: boolean) => {
+          if (!open) onCancel();
+        }}
+      />
       <p
         id="unsaved-changes-desc"
         style={{
@@ -140,7 +145,13 @@ export function useUnsavedChanges() {
 
   // Intercept link clicks — mark the pending callback so the consumer
   // can render the LeaveDialog when a navigation is attempted.
+  // S11 fix: use an AbortController singleton so the listener is always
+  // removed and re-registered when the router instance changes. This
+  // prevents double-registration in React 18 strict mode (double-mount
+  // → cleanup fires before the second mount, so without an AbortController
+  // the second registration would pile on if the ref isn't cleared first).
   useEffect(() => {
+    const ac = new AbortController();
     const handleClick = (e: MouseEvent) => {
       if (!dirtyRef.current) return;
       const target = e.target as HTMLElement;
@@ -160,7 +171,10 @@ export function useUnsavedChanges() {
     };
 
     document.addEventListener("click", handleClick, true);
-    return () => document.removeEventListener("click", handleClick, true);
+    return () => {
+      ac.abort();
+      document.removeEventListener("click", handleClick, true);
+    };
   }, [router]);
 
   function showLeaveDialog(onConfirm: () => void, onCancel: () => void) {

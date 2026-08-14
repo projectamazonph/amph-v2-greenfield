@@ -5,7 +5,7 @@
 **Epic:** Auth
 **Owner:** Ryan
 **Dependencies:** STORY-006
-**Status:** ✅ Done (PR #107, commit `df775ba` — `feat(auth): STORY-007 email verification + STORY-008 password reset`; `VerifyEmail` + `ResendVerification` use cases + `/verify-email` + `/verify-email/sent` pages)
+**Status:** ✅ Done (PR #107, commit `df775ba` — `feat(auth): STORY-007 email verification + STORY-008 password reset`; `VerifyEmail` + `ResendVerification` use cases + `/verify-email` + `/verify-email/sent` pages). **Follow-up 2026-08-14 (S18):** the `/verify-email/sent` redirect from signup carried the user's email as a query parameter, leaking it into browser history and analytics — stripped the `email` param from the redirect URL. Touched: `src/app/actions/signup.action.ts`.
 
 ## Goal
 
@@ -27,21 +27,21 @@ The verification link that the user got during signup (STORY-003) actually works
 
 ## Files touched
 
-| File | Action |
-|------|--------|
-| `prisma/schema.prisma` | Modify — add `EmailVerification` model |
-| `prisma/migrations/0003_email_verification/migration.sql` | Create (generated) |
-| `src/ports/repositories/EmailVerificationRepository.ts` | Create |
-| `src/infra/db/prisma/PrismaEmailVerificationRepository.ts` | Create |
-| `src/infra/db/inmemory/InMemoryEmailVerificationRepository.ts` | Create |
-| `src/usecases/auth/VerifyEmail.ts` | Create |
-| `src/usecases/auth/ResendVerification.ts` | Create |
-| `src/usecases/auth/__tests__/VerifyEmail.test.ts` | Create |
-| `src/usecases/auth/__tests__/ResendVerification.test.ts` | Create |
-| `src/app/(auth)/verify-email/page.tsx` | Create |
-| `src/app/(auth)/verify-email/sent/page.tsx` | Modify — add "resend" button |
-| `src/app/actions/auth.ts` | Modify — add `resendVerificationAction` |
-| `src/composition/container.ts` | Modify — wire `emailVerificationRepo` |
+| File                                                           | Action                                  |
+| -------------------------------------------------------------- | --------------------------------------- |
+| `prisma/schema.prisma`                                         | Modify — add `EmailVerification` model  |
+| `prisma/migrations/0003_email_verification/migration.sql`      | Create (generated)                      |
+| `src/ports/repositories/EmailVerificationRepository.ts`        | Create                                  |
+| `src/infra/db/prisma/PrismaEmailVerificationRepository.ts`     | Create                                  |
+| `src/infra/db/inmemory/InMemoryEmailVerificationRepository.ts` | Create                                  |
+| `src/usecases/auth/VerifyEmail.ts`                             | Create                                  |
+| `src/usecases/auth/ResendVerification.ts`                      | Create                                  |
+| `src/usecases/auth/__tests__/VerifyEmail.test.ts`              | Create                                  |
+| `src/usecases/auth/__tests__/ResendVerification.test.ts`       | Create                                  |
+| `src/app/(auth)/verify-email/page.tsx`                         | Create                                  |
+| `src/app/(auth)/verify-email/sent/page.tsx`                    | Modify — add "resend" button            |
+| `src/app/actions/auth.ts`                                      | Modify — add `resendVerificationAction` |
+| `src/composition/container.ts`                                 | Modify — wire `emailVerificationRepo`   |
 
 ## Code shape
 
@@ -50,17 +50,17 @@ The verification link that the user got during signup (STORY-003) actually works
 export type VerifyEmailInput = { token: string };
 export type VerifyEmailOutput = { user: User };
 export type VerifyEmailError =
-  | { kind: "invalid_token" }
-  | { kind: "token_expired" }
-  | { kind: "token_already_used" };
+  { kind: "invalid_token" } | { kind: "token_expired" } | { kind: "token_already_used" };
 
 export class VerifyEmail {
-  constructor(private deps: {
-    emailVerifications: EmailVerificationRepository;
-    users: UserRepository;
-    clock: Clock;
-    logger: Logger;
-  }) {}
+  constructor(
+    private deps: {
+      emailVerifications: EmailVerificationRepository;
+      users: UserRepository;
+      clock: Clock;
+      logger: Logger;
+    },
+  ) {}
 
   async exec(input: VerifyEmailInput): Promise<Result<VerifyEmailOutput, VerifyEmailError>> {
     const tokenHash = sha256(input.token);
@@ -70,7 +70,11 @@ export class VerifyEmail {
     if (record.expiresAt < this.deps.clock.now()) return Result.err({ kind: "token_expired" });
 
     await this.deps.emailVerifications.markUsed(record.id);
-    const user = await this.deps.users.update(record.userId, { emailVerifiedAt: this.deps.clock.now() }, null);
+    const user = await this.deps.users.update(
+      record.userId,
+      { emailVerifiedAt: this.deps.clock.now() },
+      null,
+    );
     return Result.ok({ user });
   }
 }

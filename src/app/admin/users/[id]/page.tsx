@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import Link from "next/link";
 import { Badge, Card } from "@astryxdesign/core";
+import { TopBar } from "@/components/admin/TopBar";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { impersonateUserAction } from "@/app/actions/impersonateUser.action";
@@ -124,13 +124,10 @@ export default async function AdminUserDetailPage({ params, searchParams }: Page
 
   return (
     <div>
-      <Link href="/admin/users" className={styles.backLink}>
-        <ArrowLeft size={16} weight="bold" aria-hidden />
-        Back to users
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={fullName}
+        backHref="/admin/users"
+        backLabel="Back to users"
         subtitle={
           <span className={styles.badges}>
             <Badge
