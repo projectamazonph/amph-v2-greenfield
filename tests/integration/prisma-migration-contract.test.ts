@@ -31,11 +31,24 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
 const REPO = path.resolve(process.cwd());
+
+// Invoke the prisma CLI directly through Node so we never spawn a
+// .cmd/.bat shim (which Node refuses on Windows without `shell: true`,
+// and `shell: true` trips on paths that contain spaces). The CLI's
+// real entry point is prisma/build/index.js, registered as `main`
+// and `bin.prisma` in node_modules/prisma/package.json.
+const PRISMA_ENTRY = path.join(REPO, "node_modules", "prisma", "build", "index.js");
+const runPrisma = (args: string[]): string =>
+  execFileSync(process.execPath, [PRISMA_ENTRY, ...args], {
+    cwd: REPO,
+    env: { ...process.env, DATABASE_URL: "postgresql://x:x@localhost:5432/x" },
+    encoding: "utf8",
+  }).toString();
 
 async function readDir(p: string): Promise<string[]> {
   return fs.readdir(p);
@@ -44,17 +57,14 @@ async function readDir(p: string): Promise<string[]> {
 async function getSchemaDiff(): Promise<string> {
   // SQL the current schema would produce against an empty DB.
   // Does not require a live Postgres.
-  // Cross-platform: pass an explicit shell executable so Windows
-  // resolves `prisma.CMD` and POSIX finds `prisma` on PATH.
-  return execSync(
-    "prisma migrate diff " + "--from-empty --to-schema prisma/schema.prisma --script",
-    {
-      cwd: REPO,
-      env: { ...process.env, DATABASE_URL: "postgresql://x:x@localhost:5432/x" },
-      encoding: "utf8",
-      shell: process.platform === "win32" ? "cmd.exe" : "/bin/sh",
-    },
-  );
+  return runPrisma([
+    "migrate",
+    "diff",
+    "--from-empty",
+    "--to-schema",
+    "prisma/schema.prisma",
+    "--script",
+  ]);
 }
 
 async function getMigrationsSql(): Promise<string> {
@@ -144,26 +154,21 @@ describe("P0-3: Prisma migration contract", () => {
     }
   });
 
-  it("prisma validate succeeds (schema is internally consistent)", // 30s timeout: the prisma CLI cold-starts a Node process, which
+  // 30s timeout: the prisma CLI cold-starts a Node process, which
   // easily exceeds vitest's 5s default on Windows.
-  () => {
+  it("prisma validate succeeds (schema is internally consistent)", () => {
     expect(() => {
-      // Cross-platform: Windows ships `prisma.CMD` next to `prisma`,
-      // and execSync without `shell: <name>` won't resolve the
-      // latter. Pass an explicit shell executable so both POSIX
-      // and Windows work.
-      execSync("prisma validate", {
-        cwd: REPO,
-        env: { ...process.env, DATABASE_URL: "postgresql://x:x@localhost:5432/x" },
-        stdio: "pipe",
-        shell: process.platform === "win32" ? "cmd.exe" : "/bin/sh",
-      });
+      // Cross-platform: invoke the prisma CLI through Node directly
+      // (prisma/build/index.js). Bypasses the .cmd/.bat spawn
+      // restriction on Windows and avoids any shell quoting for
+      // paths that contain spaces.
+      runPrisma(["validate"]);
     }).not.toThrow();
   }, 30_000);
 
-  it("migrations cover every table in the current schema (P0-3 fresh-DB bootstrap)", // 30s timeout: the prisma CLI cold-starts a Node process, which
+  // 30s timeout: the prisma CLI cold-starts a Node process, which
   // easily exceeds vitest's 5s default on Windows.
-  async () => {
+  it("migrations cover every table in the current schema (P0-3 fresh-DB bootstrap)", async () => {
     const schemaDiff = await getSchemaDiff();
     const migrationsSql = await getMigrationsSql();
 
