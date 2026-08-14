@@ -5,7 +5,7 @@
 **Epic:** Test infrastructure
 **Owner:** Ryan
 **Dependencies:** STORY-004
-**Status:** ✅ Done (shipped in initial greenfield bootstrap; Playwright signup happy-path test lives at `tests/e2e/signup.spec.ts`)
+**Status:** ✅ Done (shipped in initial greenfield bootstrap; Playwright signup happy-path test lives at `tests/e2e/signup.spec.ts`). **Follow-up 2026-08-14:** canonical signup error returned `kind: "unexpected"` when the auto-login could not mint a session (UNVERIFIED user) — fixed at the action boundary by adding `kind: "verification_required"` to `SignUpResult` and routing `signUpAndRedirect` to `/verify-email/sent?status=sent&email=...` for that variant. Resolves the documented smoketest failure in `scripts/.smoketest-report.md`. Touched: `src/app/actions/signup.action.ts`, `src/app/actions/__tests__/signup.action.test.ts` (added `verification_required` case).
 
 ## Goal
 
@@ -22,12 +22,12 @@ Playwright test that signs up, asserts the redirect, asserts the User row exists
 
 ## Files touched
 
-| File | Action |
-|------|--------|
-| `tests/e2e/auth/signup.spec.ts` | Create |
-| `tests/e2e/helpers/db.ts` | Create |
-| `playwright.config.ts` | Modify — `webServer`, `testDir`, projects for the 3 viewports |
-| `.github/workflows/ci.yml` | Modify — add `pnpm test:e2e` step |
+| File                            | Action                                                        |
+| ------------------------------- | ------------------------------------------------------------- |
+| `tests/e2e/auth/signup.spec.ts` | Create                                                        |
+| `tests/e2e/helpers/db.ts`       | Create                                                        |
+| `playwright.config.ts`          | Modify — `webServer`, `testDir`, projects for the 3 viewports |
+| `.github/workflows/ci.yml`      | Modify — add `pnpm test:e2e` step                             |
 
 ## Code shape
 
@@ -123,6 +123,7 @@ DATABASE_URL=postgresql://test:test@localhost:5432/amph_test pnpm test:e2e
 ```
 
 Local:
+
 ```bash
 # Terminal 1: pnpm dev
 # Terminal 2: pnpm test:e2e
