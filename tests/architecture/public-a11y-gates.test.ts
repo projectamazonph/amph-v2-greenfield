@@ -1,6 +1,12 @@
 import { readFile, readdir } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
+
+/**
+ * Normalize a relative path to POSIX separators so the admin/ prefix
+ * check works on Windows where path.relative emits backslashes.
+ */
+const isAdminPath = (rel: string): boolean => rel.split(sep).join("/").startsWith("admin/");
 
 async function source(path: string): Promise<string> {
   return readFile(new URL(`../../${path}`, import.meta.url), "utf8");
@@ -76,7 +82,7 @@ describe("public accessibility release gates", () => {
   it("exposes non-admin loading states as busy main landmarks", async () => {
     const app = join(process.cwd(), "src", "app");
     const files = (await routeFiles(app, "loading.tsx")).filter(
-      (file) => !relative(app, file).startsWith("admin/"),
+      (file) => !isAdminPath(relative(app, file)),
     );
     const violations = await Promise.all(
       files.map(async (file) => {
@@ -93,7 +99,7 @@ describe("public accessibility release gates", () => {
   it("provides a loading state for every non-admin page", async () => {
     const app = join(process.cwd(), "src", "app");
     const pages = (await routeFiles(app, "page.tsx")).filter(
-      (file) => !relative(app, file).startsWith("admin/"),
+      (file) => !isAdminPath(relative(app, file)),
     );
     const loadingDirectories = new Set(
       (await routeFiles(app, "loading.tsx")).map((file) => dirname(file)),
