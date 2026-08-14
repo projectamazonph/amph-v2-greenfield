@@ -20,6 +20,7 @@ import type { Metadata } from "next";
 export const revalidate = 3600;
 import { buildContainer } from "@/composition/container";
 import type { CatalogCourse } from "@/usecases/ListCatalogCourses";
+import { getSessionUser } from "@/lib/auth";
 import styles from "./page.module.css";
 import { StudentShell } from "@/components/student/StudentShell";
 import { CourseCover } from "@/components/student/CourseCover";
@@ -32,15 +33,18 @@ export const metadata: Metadata = {
 
 export default async function CoursesPage() {
   const container = buildContainer();
-  const result = await container.listCatalogCourses.execute();
+  const [catalogResult, user] = await Promise.all([
+    container.listCatalogCourses.execute(),
+    getSessionUser(),
+  ]);
 
-  if (!result.ok) {
+  if (!catalogResult.ok) {
     return (
       <StudentShell requireAuth={false}>
         <main className={styles.errorPage}>
           <h1 className={styles.errorTitle}>Courses unavailable</h1>
           <p className={styles.errorText}>
-            We couldn&apos;t load the course catalog right now. Your account is unchanged. Refresh
+            We could not load the course catalog right now. Your account is unchanged. Refresh
             to try again.
           </p>
         </main>
@@ -48,7 +52,18 @@ export default async function CoursesPage() {
     );
   }
 
-  const courses = result.value.courses;
+  const courses = catalogResult.value.courses;
+
+  // M11 fix: build enrollment map for signed-in users
+  const enrolledCourseIds = new Set<string>();
+  if (user) {
+    const enrollmentsResult = await container.enrollmentRepo.findByUserId(user.id);
+    if (enrollmentsResult.ok) {
+      for (const e of enrollmentsResult.value) {
+        if (e.status === "active") enrolledCourseIds.add(e.courseId);
+      }
+    }
+  }
 
   return (
     <StudentShell requireAuth={false}>
@@ -70,6 +85,7 @@ export default async function CoursesPage() {
                 key={catalogCourse.course.id}
                 catalogCourse={catalogCourse}
                 isFeatured={index === 0}
+                isEnrolled={enrolledCourseIds.has(catalogCourse.course.id)}
               />
             ))}
           </div>
@@ -91,9 +107,11 @@ export default async function CoursesPage() {
 function CourseCard({
   catalogCourse,
   isFeatured = false,
+  isEnrolled = false,
 }: {
   catalogCourse: CatalogCourse;
   isFeatured?: boolean;
+  isEnrolled?: boolean;
 }) {
   const { course, lessonCount, estimatedMinutes } = catalogCourse;
   const hours = Math.floor(estimatedMinutes / 60);
@@ -134,6 +152,25 @@ function CourseCard({
           <h2 className={styles.cardTitle}>{course.title}</h2>
           <span className={styles.cardPrice}>{priceDisplay}</span>
         </div>
+
+        {isEnrolled && (
+          <span
+            style={{
+              display: "inline-block",
+              fontSize: "10px",
+              fontFamily: "var(--font-mono)",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              padding: "2px 6px",
+              background: "var(--success-soft)",
+              color: "var(--success-text)",
+              borderRadius: "4px",
+              marginBottom: "var(--space-2)",
+            }}
+          >
+            Enrolled
+          </span>
+        )}
 
         {course.tagline && <p className={styles.cardTagline}>{course.tagline}</p>}
 

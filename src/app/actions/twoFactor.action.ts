@@ -88,3 +88,28 @@ export async function disableTwoFactorAction(formData: FormData): Promise<void> 
   }
   redirect("/admin/settings?2fa=disabled");
 }
+
+/**
+ * Form-safe variant of disableTwoFactorAction.
+ * Returns a typed result instead of calling redirect(), so it can be used
+ * with useActionState for inline error display (M5 fix).
+ */
+export type DisableTwoFactorFormResult =
+  | { kind: "success" }
+  | { kind: "error"; error: string };
+
+export async function disableTwoFactorForFormAction(
+  _prevState: unknown,
+  formData: FormData,
+): Promise<DisableTwoFactorFormResult> {
+  const userId = await getSessionUserId();
+  if (!userId) return { kind: "error", error: "not_authenticated" };
+
+  const password = (formData.get("password") as string | null) ?? "";
+  const container = buildContainer();
+  const result = await performDisableTwoFactor(container, userId, password);
+  if (!result.ok) {
+    return { kind: "error", error: result.error.kind };
+  }
+  return { kind: "success" };
+}

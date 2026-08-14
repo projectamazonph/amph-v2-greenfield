@@ -25,7 +25,7 @@ import type {
   TextContent,
 } from "@/domain/entities/Lesson";
 import styles from "./LessonContent.module.css";
-import { Play, CheckSquare } from "@phosphor-icons/react/dist/ssr";
+import { Play, CheckSquare, ChatCircleText } from "@phosphor-icons/react/dist/ssr";
 
 interface TextLessonContent extends TextContent {
   type: "TEXT";
@@ -212,21 +212,12 @@ function QuizIcon() {
 
 function QuizCountIcon() {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3v.5"
-      />
-    </svg>
+    <ChatCircleText
+      size={16}
+      weight="regular"
+      className={styles.iconSmall}
+      aria-hidden
+    />
   );
 }
 

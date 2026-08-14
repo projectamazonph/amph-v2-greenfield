@@ -7,14 +7,15 @@ import { requireAdmin } from "@/lib/auth";
 import Link from "next/link";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
-import { disableTwoFactorAction, enableTwoFactorAction } from "@/app/actions/twoFactor.action";
+import { enableTwoFactorAction } from "@/app/actions/twoFactor.action";
+import { DisableTwoFactorForm } from "./DisableTwoFactorForm";
 import styles from "./page.module.css";
 
 const twoFactorErrorMessage: Record<string, string> = {
   already_enabled: "Two-factor authentication is already enabled.",
-  wrong_password: "Incorrect password — two-factor authentication was not disabled.",
-  user_not_found: "Something went wrong — please try again.",
-  db_error: "Something went wrong — please try again.",
+  wrong_password: "Incorrect password. Two-factor authentication was not disabled.",
+  user_not_found: "Something went wrong. Please try again.",
+  db_error: "Something went wrong. Please try again.",
 };
 
 export default async function SettingsPage({
@@ -24,13 +25,16 @@ export default async function SettingsPage({
 }) {
   const session = await requireAdmin();
   const sp = await searchParams;
-  const twoFactorError = sp.error ? (twoFactorErrorMessage[sp.error] ?? null) : null;
   const twoFactorNotice =
     sp["2fa"] === "enabled"
       ? "Two-factor authentication is now enabled on your account."
       : sp["2fa"] === "disabled"
         ? "Two-factor authentication has been disabled."
         : null;
+  // M5 fix: disableTwoFactorError from ?error= is now handled inline by
+  // DisableTwoFactorForm via useActionState — no query-string error needed.
+  // The enable action still uses ?error= redirect; surface it here.
+  const enableError = sp.error ? (twoFactorErrorMessage[sp.error] ?? null) : null;
 
   async function enable() {
     "use server";
@@ -117,32 +121,14 @@ export default async function SettingsPage({
         </p>
 
         {twoFactorNotice && <p className={styles.twoFactorNotice}>{twoFactorNotice}</p>}
-        {twoFactorError && <p className={styles.twoFactorError}>{twoFactorError}</p>}
-
+        {enableError && <p className={styles.twoFactorError}>{enableError}</p>}
+        
         {session.twoFactorEnabled ? (
           <>
             <p className={styles.twoFactorStatus}>
               <span className={`${styles.statusBadge} ${styles.set}`}>Enabled</span>
             </p>
-            <form action={disableTwoFactorAction} className={styles.twoFactorForm}>
-              <label className={styles.field}>
-                <span className={styles.label}>Current password</span>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  autoComplete="current-password"
-                  className={styles.input}
-                  placeholder="••••••••"
-                />
-                <span className={styles.hint}>
-                  Confirms it's really you before turning this off.
-                </span>
-              </label>
-              <button type="submit" className={styles.dangerButton}>
-                Disable two-factor authentication
-              </button>
-            </form>
+            <DisableTwoFactorForm />
           </>
         ) : (
           <>
