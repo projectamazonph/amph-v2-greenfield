@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 export default function FaqPage() {
   return (
     <StudentShell requireAuth={false}>
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <section className={styles.hero}>
           <span className={styles.eyebrow}>Before you pay</span>
           <h1 className={styles.heroTitle}>
