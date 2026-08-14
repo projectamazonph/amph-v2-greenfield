@@ -47,20 +47,18 @@ export default async function CoursesPage() {
     if (!catalogResult.ok) {
       console.warn("[courses] catalog load failed", catalogResult.error);
     } else {
-      console.warn(
-        `[courses] catalog loaded: ${catalogResult.value.courses.length} course(s)`,
-      );
+      console.warn(`[courses] catalog loaded: ${catalogResult.value.courses.length} course(s)`);
     }
   }
 
   if (!catalogResult.ok) {
     return (
       <StudentShell requireAuth={false}>
-        <main className={styles.errorPage}>
+        <main id="main-content" tabIndex={-1} className={styles.errorPage}>
           <h1 className={styles.errorTitle}>Courses unavailable</h1>
           <p className={styles.errorText}>
-            We could not load the course catalog right now. Your account is unchanged. Refresh
-            to try again.
+            We could not load the course catalog right now. Your account is unchanged. Refresh to
+            try again.
           </p>
         </main>
       </StudentShell>
@@ -82,7 +80,7 @@ export default async function CoursesPage() {
 
   return (
     <StudentShell requireAuth={false}>
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         {/* Hero */}
         <section className={styles.hero}>
           <h1 className={styles.heroTitle}>Course Catalog</h1>
