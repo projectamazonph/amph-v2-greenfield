@@ -50,6 +50,15 @@ export type SignUpResult =
     }
   | { kind: "invalid_input" }
   | { kind: "rate_limited"; retryAfterSeconds: number }
+  /**
+   * Signup succeeded and the verification email was queued, but the
+   * post-signup auto-login did not produce a session. New accounts sit in
+   * `UNVERIFIED`, so the Login use case cannot mint a session until the
+   * user clicks the link in the email. Returning a typed member — instead
+   * of `unexpected` — keeps the documented happy path off the
+   * `/signup?error=unexpected` branch in `scripts/.smoketest-report.md`.
+   */
+  | { kind: "verification_required"; email: string }
   | { kind: "unexpected"; message: string };
 
 export interface SignUpInput {
@@ -133,7 +142,13 @@ export async function performSignUp(
     console.error("[performSignUp] auto-login failed:", err);
   }
   if (!sessionToken || !expiresAt) {
-    return { kind: "unexpected", message: "auto-login produced no session" };
+    // Signup succeeded (the user row exists), but the auto-login did not
+    // produce a session. New accounts are UNVERIFIED — the Login use case
+    // rejects them until email verification completes, so this is the
+    // expected state. Surface it as a typed `verification_required`
+    // member instead of `unexpected` so /signup?error=unexpected stays
+    // reserved for true programmer-error paths.
+    return { kind: "verification_required", email: signedUpEmail };
   }
   return { kind: "success", email: signedUpEmail, sessionToken, expiresAt };
 }
@@ -162,6 +177,12 @@ export async function signUpAndRedirect(formData: FormData): Promise<void> {
 
   if (outcome.kind === "success") {
     redirect("/dashboard");
+  }
+  if (outcome.kind === "verification_required") {
+    // Signup succeeded; the user must click the verification link before
+    // they can sign in. /verify-email/sent already exists (STORY-007)
+    // and renders the "Check your email" message.
+    redirect(`/verify-email/sent?status=sent&email=${encodeURIComponent(outcome.email)}`);
   }
   // All failure paths land back on /signup with an `?error=...` query
   // param that SignupForm reads via useSearchParams to render an alert.

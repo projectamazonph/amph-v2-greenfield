@@ -202,6 +202,38 @@ describe("performSignUp", () => {
     expect(plantCall![1]).toBeInstanceOf(Date);
   });
 
+  it("returns verification_required when signup succeeds but auto-login cannot mint a session", async () => {
+    // Mirrors the documented smoketest path in scripts/.smoketest-report.md:
+    // new accounts sit in UNVERIFIED so the Login use case refuses to mint a
+    // session until email verification completes. The action must surface this
+    // as a typed member instead of `kind: "unexpected"` so the wrapper
+    // can redirect to /verify-email/sent.
+    const container = freshContainer();
+    const loginSpy = vi.spyOn(container.login, "execute").mockResolvedValue({
+      ok: false,
+      error: { kind: "user_not_found" },
+    });
+    const deps = makeDeps();
+    const result = await performSignUp(
+      container,
+      {
+        email: "verify-me@test.example.com",
+        password: "validPassword123",
+        firstName: "Verify",
+        lastName: "Me",
+      },
+      deps,
+    );
+    expect(result).toMatchObject({
+      kind: "verification_required",
+      email: "verify-me@test.example.com",
+    });
+    expect(loginSpy).toHaveBeenCalledTimes(1);
+    expect(deps.plantCookie).not.toHaveBeenCalled();
+    const found = await container.userRepo.findByEmail("verify-me@test.example.com");
+    expect(found.ok).toBe(true);
+  });
+
   it("uses container.passwordHasher (no inline Argon2PasswordHasher instantiation)", async () => {
     const container = freshContainer();
     const deps = makeDeps();
