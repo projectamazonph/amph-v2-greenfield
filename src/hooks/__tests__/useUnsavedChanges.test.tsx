@@ -21,9 +21,7 @@ const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></
   pretendToBeVisual: true,
   runScripts: "dangerously",
 });
-// @ts-expect-error — jsdom's Window satisfies the globalThis.document we need
 globalThis.document = dom.window.document;
-// @ts-expect-error — jsdom's Window satisfies the globalThis.window we need
 globalThis.window = dom.window as unknown as Window & typeof globalThis;
 globalThis.history = dom.window.history;
 
