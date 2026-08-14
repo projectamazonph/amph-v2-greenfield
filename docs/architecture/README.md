@@ -1,6 +1,6 @@
 # Architecture documentation index
 
-**Reviewed:** 2026-08-12 against `ee1737a`
+**Reviewed:** 2026-08-14 against `6c61fc3`
 
 These diagrams describe the current repository wiring, not the original greenfield target. The source of truth is `src/composition/container.ts` and the route tree under `src/app/`.
 

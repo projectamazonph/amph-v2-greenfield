@@ -1,6 +1,6 @@
 # Current layer wiring
 
-**Reviewed:** 2026-08-12 against `ee1737a`
+**Reviewed:** 2026-08-14 against `6c61fc3`
 **Source of truth:** `src/composition/container.ts`
 
 The application is a modular monolith. Pages and server actions depend on use cases, use cases depend on ports and domain rules, and production adapters implement the ports. `domain/` remains framework-free. `buildContainer()` creates the production composition, while `container.test.ts` wires deterministic in-memory adapters for tests.
