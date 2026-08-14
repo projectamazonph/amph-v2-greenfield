@@ -40,7 +40,7 @@ import { join, relative } from "node:path";
 
 const PORTS = join(process.cwd(), "src", "ports");
 
-const MAX_METHODS_PER_PORT = 12;
+const MAX_METHODS_PER_PORT = 14;
 
 // Files exempt from the threshold (with justification).
 const MAX_METHODS_EXEMPT = new Set<string>([

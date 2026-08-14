@@ -49,8 +49,23 @@ export interface IOrderRepository {
    * STORY-049: admin list view of all orders, sorted by createdAt desc.
    * Optionally filter by status. The user-email search happens in the
    * use case layer (it joins against userRepo), not here.
+   *
+   * For large tables (thousands of orders), prefer `listPaginated` instead.
    */
   listAll(filters?: { status?: PaymentStatus }): Promise<Result<Order[], OrderError>>;
+
+  /**
+   * STORY-049 follow-up (C3 fix): paginated admin list of all orders.
+   * Offset pagination — `page` is 1-based. Server-side cap of `pageSize`
+   * prevents runaway queries even if a malicious caller requests pageSize=9999.
+   */
+  listPaginated(filters: {
+    status?: PaymentStatus;
+    page?: number;
+    pageSize?: number;
+  }): Promise<
+    Result<{ orders: readonly Order[]; total: number; page: number; pageSize: number }, OrderError>
+  >;
 
   /**
    * STORY-062: admin list view of refund requests.

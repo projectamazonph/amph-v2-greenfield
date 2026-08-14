@@ -41,8 +41,7 @@ export default async function CheckoutSuccessPage({
         <div className={styles.cta}>
           <Link
             href="/dashboard"
-            className="btn btn-primary"
-            style={{ display: "inline-block", padding: "12px 24px" }}
+            className={styles.btnPrimary}
           >
             Go to dashboard
           </Link>

@@ -5,6 +5,7 @@
  * POSTs to /api/auth/admin-login which handles the ADMIN role check.
  */
 
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { Button } from "@/components/ui";
 import { Input } from "@/components/ui";
@@ -91,7 +92,7 @@ export function AdminLoginForm({ errorKind }: { errorKind: string | null }) {
 
         <p className={styles.backLink}>
           <Link href="/login" className={styles.backHref}>
-            ← Back to student login
+            <ArrowLeft size={16} aria-hidden />{" "}Back to student login
           </Link>
         </p>
       </div>

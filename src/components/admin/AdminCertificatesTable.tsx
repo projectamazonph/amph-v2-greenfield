@@ -111,7 +111,7 @@ const COLUMNS: TableColumn<CertificateRow>[] = [
     renderCell: (row) => (
       <Link
         href={`/admin/certificates/${row.id}`}
-        style={{ color: "var(--brand)", textDecoration: "none", fontWeight: 500, fontSize: 13 }}
+        style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500, fontSize: 13 }}
       >
         View
       </Link>

@@ -198,7 +198,7 @@ async function sendReceiptEmail(
     const template = templateResult.ok ? templateResult.value : null;
     const sendResult = await container.emailSender.send({
       to: userResult.value.email,
-      subject: template?.subject ?? `Receipt for ${order.id} — ${courseResult.value.title}`,
+      subject: template?.subject ?? `Receipt for ${order.id}: ${courseResult.value.title}`,
       react: container.receiptEmailRenderer.render({
         firstName: userResult.value.firstName,
         orderNumber: order.id,

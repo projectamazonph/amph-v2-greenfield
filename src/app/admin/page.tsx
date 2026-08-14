@@ -86,10 +86,10 @@ export default async function AdminDashboardPage() {
       </section>
 
       <div className={styles.quickActions}>
-        <Link href="/admin/courses/new" className="btn btn-ghost">
+        <Link href="/admin/courses/new" className={styles.actionBtn}>
           + Create Course
         </Link>
-        <Link href="/admin/users/new" className="btn btn-ghost">
+        <Link href="/admin/users/new" className={styles.actionBtn}>
           + Add User
         </Link>
       </div>
@@ -124,7 +124,7 @@ export default async function AdminDashboardPage() {
               title="No admin activity yet"
               body="Audited admin actions will appear here after the first change."
               action={
-                <Link href="/admin/audit-log" className="btn btn-ghost">
+                <Link href="/admin/audit-log" className={styles.actionBtn}>
                   Open audit log
                 </Link>
               }
@@ -149,7 +149,7 @@ export default async function AdminDashboardPage() {
                 : "There are no pending refund requests."
             }
             action={
-              <Link href="/admin/refunds" className="btn btn-ghost">
+              <Link href="/admin/refunds" className={styles.actionBtn}>
                 Review refunds
               </Link>
             }

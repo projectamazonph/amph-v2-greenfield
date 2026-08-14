@@ -20,6 +20,7 @@ import { LiveClassRsvpButton } from "@/components/student/LiveClassRsvpButton";
 import { LiveClassRecordingButton } from "@/components/student/LiveClassRecordingButton";
 import buttonStyles from "@/components/ui/Button.module.css";
 import { XPService } from "@/domain/services/XPService";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
@@ -90,7 +91,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
       <main>
         <div className={styles.breadcrumb}>
           <Link href="/live-classes" className={styles.breadcrumbLink}>
-            ← All live classes
+            <ArrowLeft size={16} aria-hidden />{" "}All live classes
           </Link>
         </div>
 

@@ -4,27 +4,16 @@
  * STORY-049. Server component. Status filter + email search.
  */
 
-import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
-import type { PaymentStatus } from "@/domain/values/PaymentStatus";
+import { PaymentFilters, STATUSES } from "./PaymentFilters";
 import { AdminPaymentsTable, type PaymentRow } from "@/components/astryx/AdminPaymentsTable";
 import styles from "./page.module.css";
 
-const STATUSES: { value: PaymentStatus | ""; label: string }[] = [
-  { value: "", label: "All" },
-  { value: "DRAFT", label: "Draft" },
-  { value: "PENDING", label: "Pending" },
-  { value: "PAID", label: "Paid" },
-  { value: "FAILED", label: "Failed" },
-  { value: "EXPIRED", label: "Expired" },
-  { value: "REFUNDED", label: "Refunded" },
-];
-
 interface PageProps {
-  searchParams: Promise<{ status?: string; email?: string }>;
+  searchParams: Promise<{ status?: string; email?: string; page?: string }>;
 }
 
 export default async function AdminPaymentsPage({ searchParams }: PageProps) {
@@ -35,10 +24,13 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
   const selectedStatus = STATUSES.find((entry) => entry.value === params.status)?.value;
   const status = selectedStatus || undefined;
   const email = params.email || undefined;
+  const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
 
   const result = await container.adminListPayments.execute({
     status,
     userEmailSearch: email,
+    page,
+    pageSize: 25,
   });
 
   if (!result.ok) {
@@ -52,7 +44,7 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
     );
   }
 
-  const { orders, users } = result.value;
+  const { orders, users, total, page: currentPage, pageSize } = result.value;
 
   // Map domain Order[] → PaymentRow[] (plain serializable data for client component)
   const rows: PaymentRow[] = orders.map((o) => ({
@@ -69,42 +61,18 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
     <div>
       <TopBar
         title="Payments"
-        subtitle={`${orders.length} order${orders.length === 1 ? "" : "s"}`}
+        subtitle={`${total} order${total === 1 ? "" : "s"}`}
       />
 
-      {/* Filter form — GET submission updates URL params */}
-      <form method="get" className={styles.filters}>
-        <label>
-          <span>Status</span>
-          <select name="status" defaultValue={params.status ?? ""} className={styles.select}>
-            {STATUSES.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          <span>User email</span>
-          <input
-            type="search"
-            name="email"
-            placeholder="e.g. alice@example.com"
-            defaultValue={params.email ?? ""}
-            className={styles.input}
-          />
-        </label>
-        <button type="submit" className={styles.applyButton}>
-          Apply
-        </button>
-        <Link href="/admin/payments" className={styles.clearButton}>
-          Clear
-        </Link>
-      </form>
+      <PaymentFilters defaultStatus={params.status ?? ""} defaultEmail={params.email ?? ""} />
 
       {/* Table — client component handles renderCell (function props) */}
       <Card padding={6}>
-        <AdminPaymentsTable payments={rows} filters={{ status, email }} />
+        <AdminPaymentsTable
+          payments={rows}
+          filters={{ status, email }}
+          pagination={{ total, page: currentPage, pageSize }}
+        />
       </Card>
     </div>
   );

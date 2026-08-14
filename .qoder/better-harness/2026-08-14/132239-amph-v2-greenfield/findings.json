@@ -1,0 +1,395 @@
+{
+  "summary": {
+    "projectName": "amph-v2-greenfield",
+    "locale": "en",
+    "modelId": "agent-work-loop-v4",
+    "reportContractVersion": 26,
+    "overview": "The Project Amazon PH Academy v2 harness has a working Next.js + Prisma signup pipeline with CI, architecture tests, and bounded coverage gates, but the most material core path returns an untyped error on the documented smoketest, the dev scripts bypass the only sanctioned PrismaClient site, and the Project Skill contradicts the AGENTS.md canon. Recovery, in-place core boundary, and per-area AGENTS.md ownership stay absent.",
+    "aiAgentPractice": {
+      "inspectedSurfaces": [
+        "Rules",
+        "Skills",
+        "Workflows",
+        "Hooks",
+        "MCP",
+        "Custom Agents",
+        "Commands",
+        "Plugins",
+        "Memories"
+      ],
+      "coverageRows": [
+        {
+          "surface": "Rules",
+          "scopes": [
+            "Project"
+          ],
+          "count": 2,
+          "paths": [
+            "AGENTS.md",
+            "DESIGN.md"
+          ]
+        },
+        {
+          "surface": "Skills",
+          "scopes": [
+            "Project",
+            "Global",
+            "Plugin"
+          ],
+          "count": 223,
+          "paths": [
+            ".agents/skills/amph-v2-greenfield/SKILL.md",
+            "~/.agents/skills/accessibility/SKILL.md",
+            "~/.agents/skills/agent-control-plane/SKILL.md",
+            "~/.agents/skills/agent-reach/SKILL.md",
+            "~/.agents/skills/amazon-ad-console-redesign/SKILL.md",
+            "~/.agents/skills/artifact-production/SKILL.md",
+            "~/.agents/skills/ask-matt/SKILL.md",
+            "~/.agents/skills/astryx/SKILL.md",
+            "~/.agents/skills/bmad-advanced-elicitation/SKILL.md",
+            "~/.agents/skills/bmad-agent-analyst/SKILL.md",
+            "~/.agents/skills/bmad-agent-architect/SKILL.md",
+            "~/.agents/skills/bmad-agent-dev/SKILL.md"
+          ]
+        },
+        {
+          "surface": "Hooks",
+          "scopes": [
+            "Plugin"
+          ],
+          "count": 3,
+          "paths": [
+            "~/.qoder/plugins/cache/qoder-bundler/security-scan/.qoder-plugin/qoder-hooks.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/superpowers/5.1.0/hooks/hooks.json"
+          ]
+        },
+        {
+          "surface": "Commands",
+          "scopes": [
+            "Plugin"
+          ],
+          "count": 7,
+          "paths": [
+            "~/.qoder/plugins/cache/qoder-marketplace/context7/1.0.0/commands/docs.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/pr-review-toolkit/1.0.0/commands/review-pr.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/commands/bootstrap.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/commands/deploy.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/commands/env.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/commands/marketplace.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/commands/status.md"
+          ]
+        },
+        {
+          "surface": "Custom Agents",
+          "scopes": [
+            "Plugin"
+          ],
+          "count": 10,
+          "paths": [
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/agents/ai-architect.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/pr-review-toolkit/1.0.0/agents/code-reviewer.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/pr-review-toolkit/1.0.0/agents/code-simplifier.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/pr-review-toolkit/1.0.0/agents/comment-analyzer.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/agents/deployment-expert.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/context7/1.0.0/agents/docs-researcher.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/agents/performance-optimizer.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/pr-review-toolkit/1.0.0/agents/pr-test-analyzer.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/pr-review-toolkit/1.0.0/agents/silent-failure-hunter.md",
+            "~/.qoder/plugins/cache/qoder-marketplace/pr-review-toolkit/1.0.0/agents/type-design-analyzer.md"
+          ]
+        },
+        {
+          "surface": "MCP",
+          "scopes": [
+            "Plugin"
+          ],
+          "count": 4,
+          "paths": [
+            "~/.qoder/plugins/cache/qoder-marketplace/chrome-devtools-mcp/1.2.0/.mcp.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/context7/1.0.0/.mcp.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/playwright/1.0.0/mcp.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/vercel/0.44.0/.mcp.json"
+          ]
+        },
+        {
+          "surface": "Workflows",
+          "scopes": [
+            "Project"
+          ],
+          "count": 2,
+          "paths": [
+            ".github/workflows/ci.yml",
+            ".github/workflows/daily-triage.yml"
+          ]
+        },
+        {
+          "surface": "Plugins",
+          "scopes": [
+            "Plugin"
+          ],
+          "count": 18,
+          "paths": [
+            "~/.qoder/plugins/cache/qoder-marketplace/agent-browser/0.31.1/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/andrej-karpathy-skills/1.0.0/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/architecture-visualization/0.1.0/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-bundler/better-harness/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/chrome-devtools-mcp/1.2.0/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/context7/1.0.0/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/design-review/0.1.0/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/frontend-design/1.0.0/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/gstack/1.58.5/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/impeccable/3.9.0/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/playwright/1.0.0/.qoder-plugin/plugin.json",
+            "~/.qoder/plugins/cache/qoder-marketplace/pr-review-toolkit/1.0.0/.qoder-plugin/plugin.json"
+          ]
+        },
+        {
+          "surface": "Memories",
+          "scopes": [
+            "Project"
+          ],
+          "count": 0
+        }
+      ],
+      "repositorySourceRows": [
+        {
+          "surface": "Rules",
+          "provider": "claude",
+          "owner": ".",
+          "count": 1,
+          "paths": [
+            "CLAUDE.md"
+          ]
+        },
+        {
+          "surface": "Skills",
+          "provider": "claude",
+          "owner": ".claude",
+          "count": 1,
+          "paths": [
+            ".claude/skills/amph-v2-greenfield/SKILL.md"
+          ]
+        }
+      ]
+    },
+    "assignmentSummaries": [
+      {
+        "findingId": "signup-happy-path-returns-unexpected",
+        "revision": 1,
+        "locale": "en",
+        "title": "Signup happy path: typed `verification_required` replaces canonical `unexpected` at the action boundary",
+        "body": "Signup succeeded but the auto-login could not mint a session for the new UNVERIFIED account. The canonical `unexpected` return at the action boundary was replaced with the typed `verification_required` member, with the wrapper routing to the verify-email sent page. Vitest signup tests 12 of 12 pass including the new regression case; full suite 3888 of 3888 with no regressions; tsc and eslint clean; asset-integrity reviewed with 0 findings; STORY-005 status updated.",
+        "outputs": [
+          {
+            "action": "updated",
+            "artifact": "Code",
+            "name": "signup.action.ts — typed `verification_required` variant plus wrapper route",
+            "scope": "Project",
+            "path": "src/app/actions/signup.action.ts",
+            "summary": "Added SignUpResult member `verification_required`; replaced the canonical `unexpected` return at the action boundary with the new typed member; added a wrapper branch that routes to verify-email sent."
+          },
+          {
+            "action": "updated",
+            "artifact": "Test",
+            "name": "signup.action.test.ts — bounded `verification_required` regression case",
+            "scope": "Project",
+            "path": "src/app/actions/__tests__/signup.action.test.ts",
+            "summary": "New test mocks container.login.execute to return ok:false user_not_found and asserts the action returns the typed `verification_required` member with the user row persisted and plantCookie never invoked."
+          },
+          {
+            "action": "updated",
+            "artifact": "Document",
+            "name": "STORY-005 status block — 2026-08-14 follow-up",
+            "scope": "Project",
+            "path": "docs/stories/STORY-005.md",
+            "summary": "Appended a one-paragraph entry to the Status block recording the canonical unexpected reason, the new verification_required member, the verify-email sent route, and the touched source files."
+          }
+        ]
+      }
+    ],
+    "dimensions": [
+      {
+        "id": "task-understanding",
+        "label": "Task Understanding",
+        "score": 76,
+        "summary": "AGENTS.md and DESIGN.md provide authoritative context, but the Project Skill file directly contradicts AGENTS.md and the core boundary is inferred rather than curated.",
+        "findingRefs": [
+          "project-skill-contradicts-agents-md",
+          "core-boundary-is-inferred-not-curated"
+        ]
+      },
+      {
+        "id": "controlled-execution",
+        "label": "Controlled Execution",
+        "score": 84,
+        "summary": "The container is the only sanctioned PrismaClient site, env validation fails closed, and ESLint boundary rules enforce the architecture; the boundary only walks src/ so untracked scripts slip past.",
+        "findingRefs": [
+          "untracked-scripts-bypass-prisma-singleton"
+        ]
+      },
+      {
+        "id": "change-validation",
+        "label": "Change Validation",
+        "score": 70,
+        "summary": "Vitest, Playwright, and architecture tests are wired, but production wiring surfaces are excluded from the coverage gate and the signup happy path is failing per the in-diff smoketest report.",
+        "findingRefs": [
+          "signup-happy-path-returns-unexpected",
+          "untracked-scripts-bypass-prisma-singleton",
+          "production-wiring-surfaces-excluded-from-coverage"
+        ]
+      },
+      {
+        "id": "reliable-delivery",
+        "label": "Reliable Delivery",
+        "score": 62,
+        "summary": "CI workflow enforces quality, architecture, unit, e2e, build, and lighthouse gates; recovery is unowned and no staging deploy workflow exists.",
+        "findingRefs": []
+      },
+      {
+        "id": "learning-capture",
+        "label": "Learning Capture",
+        "score": 38,
+        "summary": "No eligible comparable outcome window exists in the reviewed window; the Project Skill contradicts AGENTS.md which blocks reliable project-bound knowledge reuse.",
+        "findingRefs": [
+          "project-skill-contradicts-agents-md"
+        ]
+      }
+    ]
+  },
+  "findings": [
+    {
+      "id": "signup-happy-path-returns-unexpected",
+      "title": "Signup happy path returns an untyped error on the documented smoketest",
+      "severity": "Medium",
+      "reason": "The documented curl-able signup smoketest fails with an `unexpected` kind instead of a typed discriminated union member. The current failure path leaves the user-facing error untyped and bypasses the typed error contract that `signup.action.test.ts` mocks around. The agent-recorded smoketest report is in the diff as an untracked file, so the regression is invisible to PR review.",
+      "expectedOutput": [
+        "Update the existing Code owner identified by the reviewed evidence and retain a focused validation result."
+      ],
+      "expectedArtifact": "Code",
+      "aiFixPrompt": "/better-harness fix this issue\n\nLocate the canonical signup error in `src/app/actions/signup.action.ts` and ensure the documented happy path returns a typed `SignUpResult` member instead of `kind: \"unexpected\"`. Make the smallest correct edit at the action boundary.\n\n## Validation\n\n- Run `pnpm test:unit` and `pnpm test:e2e` after the edit.\n- Re-run the documented smoketest from `scripts/.smoketest-report.md` and confirm the response is a typed `SignUpResult`.\n- Update the story doc's `## Status` block in the same change.",
+      "dimensionRefs": [
+        "change-validation"
+      ],
+      "actualOutputRevision": 1,
+      "actualOutput": [
+        {
+          "action": "updated",
+          "artifact": "Code",
+          "name": "signup.action.ts — typed `verification_required` variant plus wrapper route",
+          "scope": "Project",
+          "path": "src/app/actions/signup.action.ts",
+          "summary": "Added SignUpResult member `verification_required`; replaced the canonical `unexpected` return at the action boundary with the new typed member; added a wrapper branch that routes to verify-email sent."
+        },
+        {
+          "action": "updated",
+          "artifact": "Test",
+          "name": "signup.action.test.ts — bounded `verification_required` regression case",
+          "scope": "Project",
+          "path": "src/app/actions/__tests__/signup.action.test.ts",
+          "summary": "New test mocks container.login.execute to return ok:false user_not_found and asserts the action returns the typed `verification_required` member with the user row persisted and plantCookie never invoked."
+        },
+        {
+          "action": "updated",
+          "artifact": "Document",
+          "name": "STORY-005 status block — 2026-08-14 follow-up",
+          "scope": "Project",
+          "path": "docs/stories/STORY-005.md",
+          "summary": "Appended a one-paragraph entry to the Status block recording the canonical unexpected reason, the new verification_required member, the verify-email sent route, and the touched source files."
+        }
+      ],
+      "assignmentSummary": {
+        "locale": "en",
+        "title": "Signup happy path: typed `verification_required` replaces canonical `unexpected` at the action boundary",
+        "body": "Signup succeeded but the auto-login could not mint a session for the new UNVERIFIED account. The canonical `unexpected` return at the action boundary was replaced with the typed `verification_required` member, with the wrapper routing to the verify-email sent page. Vitest signup tests 12 of 12 pass including the new regression case; full suite 3888 of 3888 with no regressions; tsc and eslint clean; asset-integrity reviewed with 0 findings; STORY-005 status updated."
+      },
+      "postFixRepairReview": {
+        "modelId": "agent-work-loop-v4",
+        "findingId": "signup-happy-path-returns-unexpected",
+        "status": "verified",
+        "summary": "The canonical signup auto-login failure path now returns a typed `verification_required` member instead of `unexpected`, with a dedicated passing unit test and a STORY-005 follow-up entry.",
+        "reason": "The action boundary was changed from `unexpected` to `verification_required`; the new test passes; the full unit suite passed without regressions; tsc and eslint reported 0 errors; the asset-integrity envelope reviewed the changed paths with 0 findings.",
+        "confidence": "high",
+        "evidenceRefs": [
+          {
+            "kind": "fix-validation",
+            "id": "signup.action.test.ts verification_required case"
+          },
+          {
+            "kind": "full-suite",
+            "id": "vitest run 3888 of 3888 tests passed"
+          },
+          {
+            "kind": "type-check",
+            "id": "tsc --noEmit 0 errors"
+          },
+          {
+            "kind": "lint",
+            "id": "eslint 0 errors on touched files"
+          },
+          {
+            "kind": "asset-integrity",
+            "id": "asset-integrity reviewed 0 findings"
+          }
+        ]
+      }
+    },
+    {
+      "id": "untracked-scripts-bypass-prisma-singleton",
+      "title": "Untracked dev scripts construct PrismaClient outside the sanctioned site",
+      "severity": "Medium",
+      "reason": "Four untracked JavaScript files in `scripts/` instantiate `new PrismaClient({ adapter: new PrismaPg(pool) })` directly. AGENTS.md and the in-code rule forbid `new PrismaClient()` outside `src/infra/database/prisma.ts`, and the boundary ESLint rule only walks `src/`, so the scripts bypass the port, use case, and audit-log hooks. Because the files are untracked, they will not be reviewed in any PR and any schema drift between them and the production migration set is invisible to the build.",
+      "expectedOutput": [
+        "Update the existing Gate owner identified by the reviewed evidence and retain a focused validation result."
+      ],
+      "expectedArtifact": "Gate",
+      "aiFixPrompt": "/better-harness fix this issue\n\nMove the untracked `scripts/*.cjs` files through the project composition root, or add a scripts-level boundary check that fails the local lint when a script calls `new PrismaClient()` directly. Keep the rule bounded to the canonical owner.\n\n## Validation\n\n- Run `pnpm lint` and confirm the new boundary rule flags the offending scripts.\n- Run the focused e2e job and confirm the rewritten scripts still seed the same fixtures.",
+      "dimensionRefs": [
+        "controlled-execution",
+        "change-validation"
+      ]
+    },
+    {
+      "id": "production-wiring-surfaces-excluded-from-coverage",
+      "title": "Production wiring surfaces are excluded from the Vitest coverage gate",
+      "severity": "Medium",
+      "reason": "`vitest.config.ts` excludes `src/composition/container.ts`, all `src/infra/repositories/Prisma*.ts`, `src/infra/payment/Prisma*.ts`, and `src/infra/database/prisma.ts` from the line coverage gate. A regression in `PrismaUserRepository.create` (which maps Prisma error code `P2002` to `kind: email_taken` by string compare) is not caught by a dedicated unit test; the only coverage is the contract pin in `signup.action.test.ts`'s `email_taken` case, which goes through the in-memory adapter.",
+      "expectedOutput": [
+        "Update the existing Test owner identified by the reviewed evidence and retain a focused validation result."
+      ],
+      "expectedArtifact": "Test",
+      "aiFixPrompt": "/better-harness fix this issue\n\nAdd one focused unit test for `PrismaUserRepository.create` that maps Prisma error code `P2002` to `kind: email_taken`. Keep the test in `src/infra/repositories/__tests__/` and run only against the Prisma adapter, not the in-memory one.\n\n## Validation\n\n- Run `pnpm test:unit` and confirm the new test passes.\n- Confirm the focused test fails when the Prisma error code mapping is removed.",
+      "dimensionRefs": [
+        "change-validation"
+      ]
+    },
+    {
+      "id": "project-skill-contradicts-agents-md",
+      "title": "Project Skill `amph-v2-greenfield` contradicts AGENTS.md",
+      "severity": "Low",
+      "reason": "`.agents/skills/amph-v2-greenfield/SKILL.md` is missing a YAML frontmatter description (lint warning `skill-missing-description`) and its body claims the testing framework is `unknown` and that the only observed prefix is `docs`, both directly contradicted by the same-project `AGENTS.md` (Vitest + Playwright; conventional commits `feat`/`fix`/`refactor`/`docs`/`test`/`chore`). The Skill is configured but its content routes future agents to incorrect context.",
+      "expectedOutput": [
+        "Update the existing Skill owner identified by the reviewed evidence and retain a focused validation result."
+      ],
+      "expectedArtifact": "Skill",
+      "aiFixPrompt": "/better-harness fix this issue\n\nAdd a YAML frontmatter description to `.agents/skills/amph-v2-greenfield/SKILL.md` and update the body so it references the canonical Vitest + Playwright stack and the conventional commit prefixes from `AGENTS.md`. Keep the diff scoped to this Skill file.\n\n## Validation\n\n- Run `pnpm exec qoder agent-lint --json` and confirm the `skill-missing-description` warning is gone.\n- Open the updated Skill and confirm the testing framework and prefix claims match `AGENTS.md`.",
+      "dimensionRefs": [
+        "task-understanding",
+        "learning-capture"
+      ]
+    },
+    {
+      "id": "core-boundary-is-inferred-not-curated",
+      "title": "Core boundary is inferred rather than curated",
+      "severity": "Low",
+      "reason": "`coreCodeRules.status: missing` with `boundaryKind: inferred-core-boundary` means the core boundary the scanner uses to flag churn is whatever the inference logic produces, not what the project owner has declared. Agent readers will treat the inferred boundary as if it were authored, so the high-churn hotspots (`src/composition/container.ts` 77 commits / 1840 churn, `src/app/actions/signup.action.ts` 12 commits / 699 churn, `src/infra/repositories/PrismaUserRepository.ts` 12 commits / 341 churn) are not flagged against an authoritative core list.",
+      "expectedOutput": [
+        "Update the existing Config owner identified by the reviewed evidence and retain a focused validation result."
+      ],
+      "expectedArtifact": "Config",
+      "aiFixPrompt": "/better-harness fix this issue\n\nAdd a curated `coreCodeRules` configuration file (e.g. `.qoder/code-rules.json`) that lists the files the project owner considers core, and wire the scanner to read it before inferring. Keep the boundary narrow and reflect the documented core boundary (composition root, signup action, use cases, Prisma adapters).\n\n## Validation\n\n- Run the project-aware scanner and confirm the curated boundary is read.\n- Confirm the current high-churn hotspots are flagged as configured core, not inferred.",
+      "dimensionRefs": [
+        "task-understanding"
+      ]
+    }
+  ]
+}

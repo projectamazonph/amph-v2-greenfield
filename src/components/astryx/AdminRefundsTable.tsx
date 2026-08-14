@@ -50,7 +50,7 @@ const COLUMNS: TableColumn<RefundRequestRow>[] = [
     renderCell: (row) => {
       const d = new Date(row.refundRequestedAt);
       return (
-        <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
           {d.toLocaleDateString("en-US", { dateStyle: "medium" })}
         </span>
       );
@@ -61,7 +61,7 @@ const COLUMNS: TableColumn<RefundRequestRow>[] = [
     header: "Student",
     width: { type: "proportional", value: 2 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.userEmail}</span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.userEmail}</span>
     ),
   },
   {
@@ -69,7 +69,7 @@ const COLUMNS: TableColumn<RefundRequestRow>[] = [
     header: "Course",
     width: { type: "proportional", value: 1 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.courseId}</span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.courseId}</span>
     ),
   },
   {
@@ -77,7 +77,7 @@ const COLUMNS: TableColumn<RefundRequestRow>[] = [
     header: "Amount",
     width: { type: "pixel", value: 110 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
         {formatPhp(row.totalMinor / 100)}
       </span>
     ),

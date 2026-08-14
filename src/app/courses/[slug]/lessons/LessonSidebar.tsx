@@ -13,6 +13,7 @@
  */
 
 import type { Course } from "@/domain/entities/Course";
+import { CaretRight, CaretDown, CheckCircle, Play } from "@phosphor-icons/react/dist/ssr";
 import styles from "./LessonSidebar.module.css";
 
 // Only the plain-data subset of Course this component needs. Course.price is
@@ -114,52 +115,37 @@ function courseLessonCount(course: LessonSidebarCourse): number {
   return course.curriculum.sections.reduce((total, section) => total + section.lessons.length, 0);
 }
 
-// ── Icons ───────────────────────────────────────────────────
-
 function ChevronIcon({ expanded }: { expanded: boolean }) {
+  const Icon = expanded ? CaretDown : CaretRight;
   return (
-    <svg
+    <Icon
+      size={12}
+      weight="bold"
       className={`${styles.iconTiny} ${expanded ? styles.iconRotated : ""}`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function CheckIcon() {
   return (
-    <svg
+    <CheckCircle
+      size={14}
+      weight="fill"
       className={`${styles.iconSmall} ${styles.iconSuccess}`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function VideoIcon() {
   return (
-    <svg
+    <Play
+      size={14}
+      weight="fill"
       className={`${styles.iconSmall} ${styles.iconAccent}`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-      />
-    </svg>
+      aria-hidden
+    />
   );
 }
 

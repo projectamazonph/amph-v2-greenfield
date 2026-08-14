@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import styles from "./ShareCourseButton.module.css";
 
 export function ShareCourseButton({ title }: { title: string }) {
   const [status, setStatus] = useState<string | null>(null);
@@ -26,8 +27,7 @@ export function ShareCourseButton({ title }: { title: string }) {
     <>
       <button
         type="button"
-        className="btn btn-ghost"
-        style={{ marginLeft: "var(--space-2)" }}
+        className={styles.shareBtn}
         onClick={share}
       >
         Share

@@ -50,12 +50,12 @@ export function CourseAccessNotice({
           {!signedIn && reason !== "verification_unavailable" ? (
             <Link
               href={`/login?redirect=${encodeURIComponent(courseHref)}`}
-              className="btn btn-primary"
+              className={styles.primary}
             >
               Sign in
             </Link>
           ) : null}
-          <Link href={courseHref} className="btn btn-secondary">
+          <Link href={courseHref} className={styles.secondary}>
             {reason === "verification_unavailable" ? "Return to course" : "View course options"}
             <ArrowRight size={16} weight="bold" aria-hidden="true" />
           </Link>

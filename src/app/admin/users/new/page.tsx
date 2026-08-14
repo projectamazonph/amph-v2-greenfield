@@ -9,6 +9,7 @@
  *
  * Server component, mirrors /admin/badges/new.
  */
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { adminGrantSubscriptionAction } from "@/app/actions/adminGrantSubscription.action";
@@ -39,7 +40,7 @@ export default async function NewUserPage({ searchParams }: PageProps) {
   return (
     <div>
       <Link href="/admin/users" className={styles.backLink}>
-        ← Back to users
+        <ArrowLeft size={16} aria-hidden />{" "}Back to users
       </Link>
 
       <TopBar
@@ -152,6 +153,8 @@ export default async function NewUserPage({ searchParams }: PageProps) {
 
 async function handleSubmit(formData: FormData) {
   "use server";
+
+  await requireAdmin();
 
   const email = String(formData.get("email") ?? "").trim();
   const firstName = String(formData.get("firstName") ?? "").trim();

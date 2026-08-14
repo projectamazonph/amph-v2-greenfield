@@ -34,7 +34,7 @@
 
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   startCheckout,
@@ -42,6 +42,8 @@ import {
   type CheckoutActionState,
 } from "@/app/actions/checkout.action";
 import type { CheckoutSummary } from "@/usecases/GetCheckoutSummary";
+import { Money } from "@/domain/values/Money";
+import { Button } from "@/components/ui/Button";
 
 const PAGE_STYLES: Record<string, React.CSSProperties> = {
   page: {
@@ -170,6 +172,11 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
     startCheckout,
     CHECKOUT_INITIAL_STATE,
   );
+  const [optimisticDisabled, setOptimisticDisabled] = useState(false);
+
+  // Immediately disable the button on mousedown so a fast double-click cannot
+  // fire two form submissions before the action round-trip completes.
+  // The onMouseDown fires synchronously before the form submit event.
 
   // When the action returns a redirect, navigate to PayMongo.
   useEffect(() => {
@@ -203,10 +210,10 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
   const returnPath = summary.pricingTierSlug
     ? `/checkout?pricingTier=${summary.pricingTierSlug}`
     : `/checkout?courseSlug=${summary.courseSlug}`;
-  const formattedTotal = new Intl.NumberFormat("en-PH", {
-    style: "currency",
-    currency: summary.currency,
-  }).format(summary.amountMinor / 100);
+  const summaryMoney = Money.of(summary.amountMinor, summary.currency as "PHP");
+  const formattedTotal = summaryMoney.ok
+    ? summaryMoney.value.format("en-PH")
+    : new Intl.NumberFormat("en-PH", { style: "currency", currency: summary.currency }).format(summary.amountMinor / 100);
 
   return (
     <div style={PAGE_STYLES.page}>
@@ -306,18 +313,20 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
           ) : (
             <input type="hidden" name="courseSlug" value={offer.courseSlug} />
           )}
-          <button
+          <Button
+            variant="primary"
+            size="lg"
             type="submit"
-            className="btn btn-primary"
-            disabled={isPending || state.kind === "redirect"}
-            style={{ width: "100%", marginTop: 8 }}
+            onMouseDown={() => setOptimisticDisabled(true)}
+            disabled={optimisticDisabled || isPending || state.kind === "redirect"}
+            style={{ width: "100%" }}
           >
             {isPending
               ? "Preparing checkout…"
               : state.kind === "redirect"
                 ? "Redirecting to PayMongo…"
                 : "Pay with PayMongo"}
-          </button>
+          </Button>
         </form>
 
         <p style={PAGE_STYLES.footer}>

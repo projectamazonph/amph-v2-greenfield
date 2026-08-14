@@ -66,16 +66,16 @@ export default async function ProfilePage() {
           </section>
         </div>
         <div style={{ marginTop: "var(--space-8)", display: "flex", gap: "var(--space-3)" }}>
-          <Link href="/reset-password" className="btn btn-ghost">
+          <Link href="/reset-password" className={styles.btnGhost}>
             Change Password
           </Link>
-          <Link href="/profile/security" className="btn btn-ghost">
+          <Link href="/profile/security" className={styles.btnGhost}>
             Security (2FA)
           </Link>
-          <Link href="/profile/data" className="btn btn-ghost">
+          <Link href="/profile/data" className={styles.btnGhost}>
             Your data
           </Link>
-          <Link href="/profile/purchases" className="btn btn-ghost">
+          <Link href="/profile/purchases" className={styles.btnGhost}>
             Purchases and refunds
           </Link>
         </div>

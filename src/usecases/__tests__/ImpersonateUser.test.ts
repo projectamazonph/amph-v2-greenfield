@@ -159,6 +159,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
@@ -195,6 +196,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
@@ -232,6 +234,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
@@ -293,6 +296,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({
@@ -364,6 +368,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
@@ -395,6 +400,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
@@ -428,6 +434,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     const mockSessionRepo: SessionRepository = {
@@ -474,6 +481,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     const failingJwt: JwtService = {
@@ -515,6 +523,7 @@ describe("ImpersonateUser", () => {
       getTwoFactorSecret: async () => ({ ok: true, value: null }),
       setTwoFactorSecret: async () => ({ ok: true, value: undefined }),
       anonymizeAndDelete: async () => ({ ok: true, value: undefined }),
+      findByIds: async () => ({ ok: true, value: [] }),
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
     };
     const sessionSpy = vi.spyOn(deps.sessionRepo, "create");

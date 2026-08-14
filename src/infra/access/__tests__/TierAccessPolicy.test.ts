@@ -85,6 +85,7 @@ describe("TierAccessPolicy", () => {
       getTwoFactorSecret: vi.fn(),
       setTwoFactorSecret: vi.fn(),
       anonymizeAndDelete: vi.fn(),
+      findByIds: vi.fn(),
       recordLoginAttempt: vi.fn(),
     };
     mockCourseRepo = {

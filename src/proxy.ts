@@ -139,10 +139,10 @@ export async function proxy(request: NextRequest) {
       return new NextResponse("Internal server error", { status: 500 });
     }
 
-    const jwt = buildContainer().jwt;
-    const result = await jwt.verify(sessionToken);
+    const { jwt, sessionRepo } = buildContainer();
+    const jwtResult = await jwt.verify(sessionToken);
 
-    if (!result.ok) {
+    if (!jwtResult.ok) {
       // Token invalid or expired — clear cookie + redirect
       const loginPath = pathname.startsWith("/admin") ? "/admin-login" : "/login";
       const loginUrl = new URL(loginPath, request.url);
@@ -152,10 +152,27 @@ export async function proxy(request: NextRequest) {
       return redirectRes;
     }
 
+    // If the JWT carries a sessionId, verify the session row still exists.
+    // This ensures revoked sessions (logout, admin lockout, fraud kill) are
+    // rejected immediately — not just when the JWT expires.
+    const sessionId = jwtResult.value.sessionId;
+    if (typeof sessionId === "string" && sessionId.length > 0) {
+      const sessionResult = await sessionRepo.findById(sessionId);
+      if (!sessionResult.ok) {
+        // Session revoked — clear cookie + redirect
+        const loginPath = pathname.startsWith("/admin") ? "/admin-login" : "/login";
+        const loginUrl = new URL(loginPath, request.url);
+        const redirectRes = NextResponse.redirect(loginUrl);
+        redirectRes.cookies.delete("amph_session");
+        redirectRes.cookies.delete("__Secure-amph_session");
+        return redirectRes;
+      }
+    }
+
     // Attach user context to request headers for downstream use
-    res.headers.set("x-amph-user-id", String(result.value.sub));
-    res.headers.set("x-amph-session-id", String(result.value.sessionId));
-    res.headers.set("x-amph-role", String(result.value.role ?? "STUDENT"));
+    res.headers.set("x-amph-user-id", String(jwtResult.value.sub));
+    res.headers.set("x-amph-session-id", String(sessionId ?? ""));
+    res.headers.set("x-amph-role", String(jwtResult.value.role ?? "STUDENT"));
   }
 
   // No root redirect: `/` is the public marketing landing page

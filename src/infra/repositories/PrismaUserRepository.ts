@@ -23,6 +23,19 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  async findByIds(ids: readonly string[]): Promise<Result<readonly import("@/domain/entities/User").User[], UserError>> {
+    const deduped = [...new Set(ids)];
+    if (deduped.length === 0) return Result.ok([]);
+    try {
+      const rows = await this.db.user.findMany({
+        where: { id: { in: deduped } },
+      });
+      return Result.ok(rows.map((r) => this.mapRow(r)));
+    } catch (err) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async listAll(): Promise<Result<readonly import("@/domain/entities/User").User[], UserError>> {
     try {
       const rows = await this.db.user.findMany({ orderBy: { createdAt: "desc" } });

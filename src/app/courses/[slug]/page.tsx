@@ -16,7 +16,6 @@
 
 import Link from "next/link";
 
-export const revalidate = 3600;
 import { StudentShell } from "@/components/student/StudentShell";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -26,6 +25,8 @@ import { EnrollButton } from "./EnrollButton";
 import { ShareCourseButton } from "@/components/courses/ShareCourseButton";
 import { getSessionUser } from "@/lib/auth";
 import { CourseCover } from "@/components/student/CourseCover";
+import { Money } from "@/domain/values/Money";
+import { ArrowLeft, Book, Clock, Play, Article, CheckSquare } from "@phosphor-icons/react/dist/ssr";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -84,17 +85,22 @@ export default async function CourseDetailPage({ params }: PageProps) {
   const { totalLessonCount, totalEstimatedMinutes, modules } = detail;
   const hours = Math.floor(totalEstimatedMinutes / 60);
   const minutes = totalEstimatedMinutes % 60;
-  const priceDisplay =
-    detail.priceMinor === 0 ? "FREE" : `₱${(detail.priceMinor / 100).toFixed(2)}`;
+  const priceMoney = Money.of(detail.priceMinor, "PHP");
+  const priceDisplay = detail.priceMinor === 0
+    ? "FREE"
+    : priceMoney.ok
+      ? priceMoney.value.format("en-PH")
+      : `₱${(detail.priceMinor / 100).toFixed(2)}`;
 
   return (
     <StudentShell requireAuth={false} user={user}>
-      <main className={styles.page}>
+      <main id="main-content" className={styles.page}>
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerInner}>
             <Link href="/courses" className={styles.backLink}>
-              ← Back to Courses
+              <ArrowLeft size={16} weight="regular" />
+              Back to Courses
             </Link>
 
             <div className={styles.headerGrid}>
@@ -118,15 +124,14 @@ export default async function CourseDetailPage({ params }: PageProps) {
                   {totalLessonCount > 0 ? (
                     <>
                       <span className={styles.metaItem}>
-                        <BookIcon /> {totalLessonCount} lesson{totalLessonCount !== 1 ? "s" : ""}
+                        <Book size={16} weight="regular" className={styles.metaIcon} aria-hidden />
+                        {totalLessonCount} lesson{totalLessonCount !== 1 ? "s" : ""}
                       </span>
                       <span className={styles.metaDivider}>·</span>
-                      <span className={styles.metaItem}>
-                        ≈ {Math.ceil(modules.flatMap((m) => m.lessons).length * 0.5)} hours
-                      </span>
                       {totalEstimatedMinutes > 0 && (
                         <span className={styles.metaItem}>
-                          <ClockIcon /> {hours > 0 ? `${hours}h ` : ""}
+                          <Clock size={16} weight="regular" className={styles.metaIcon} aria-hidden />
+                          {hours > 0 ? `${hours}h ` : ""}
                           {minutes}m video
                         </span>
                       )}
@@ -201,7 +206,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                     </div>
                     <Link
                       href={`/courses/${detail.slug}/quizzes/${quiz.id}`}
-                      className="btn btn-secondary"
+                      className={styles.quizCta}
                     >
                       Take quiz
                     </Link>
@@ -216,90 +221,13 @@ export default async function CourseDetailPage({ params }: PageProps) {
   );
 }
 
-function BookIcon() {
-  return (
-    <svg
-      className={styles.metaIcon}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-      />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg
-      className={styles.metaIcon}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-      />
-    </svg>
-  );
-}
 
 function LessonTypeIcon({ type }: { type: string }) {
-  const commonProps = {
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    "aria-hidden": "true",
-    className: styles.lessonIcon,
-  } as const;
   if (type === "VIDEO") {
-    return (
-      <svg {...commonProps}>
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    );
+    return <Play size={16} weight="fill" className={styles.lessonIcon} aria-hidden />;
   }
   if (type === "QUIZ") {
-    return (
-      <svg {...commonProps}>
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-        />
-      </svg>
-    );
+    return <CheckSquare size={16} weight="fill" className={styles.lessonIcon} aria-hidden />;
   }
-  return (
-    <svg {...commonProps}>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-      />
-    </svg>
-  );
+  return <Article size={16} weight="fill" className={styles.lessonIcon} aria-hidden />;
 }

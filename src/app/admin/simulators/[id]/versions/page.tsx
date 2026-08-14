@@ -5,6 +5,7 @@
  * page resolves its scenarioKey and lists every version sharing it.
  */
 
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
@@ -60,7 +61,7 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
   return (
     <div>
       <Link href="/admin/simulators" className={formStyles.backLink}>
-        ← Back to scenarios
+        <ArrowLeft size={16} aria-hidden />{" "}Back to scenarios
       </Link>
 
       <TopBar title={`Version history: ${name}`} subtitle={`${simulatorId} · ${scenarioKey}`} />
@@ -86,14 +87,14 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
             >
               <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-3)" }}>
                 <span
-                  style={{ fontFamily: "var(--font-family-code)", fontSize: 13, fontWeight: 600 }}
+                  style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600 }}
                 >
                   v{v.version}
                 </span>
                 <Badge variant={statusVariant(v.status)} label={v.status} />
                 <code
                   style={{
-                    fontFamily: "var(--font-family-code)",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 12,
                     color: "var(--ink-500)",
                   }}

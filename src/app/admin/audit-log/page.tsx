@@ -73,19 +73,15 @@ export default async function AdminAuditLogPage({ searchParams }: PageProps) {
     );
   }
 
-  // Batch-fetch actor emails for all distinct actorIds in this page
-  const actorIds = [...new Set(result.value.entries.map((e) => e.actorId))];
+  // Batch-fetch actor emails for all distinct actorIds in this page (H3 fix: single query, not N)
+  const actorIds = [...new Set(result.value.entries.map((e) => e.actorId))].filter(Boolean) as string[];
+  const actorResult = actorIds.length > 0 ? await container.userRepo.findByIds(actorIds) : { ok: true as const, value: [] as const };
   const actorEmails = new Map<string, string>();
-  await Promise.all(
-    actorIds.map(async (id) => {
-      if (id) {
-        const userResult = await container.userRepo.findById(id);
-        if (userResult.ok) {
-          actorEmails.set(id, userResult.value.email);
-        }
-      }
-    }),
-  );
+  if (actorResult.ok) {
+    for (const user of actorResult.value) {
+      actorEmails.set(user.id, user.email);
+    }
+  }
 
   const rows: AuditLogRow[] = result.value.entries.map((e) => ({
     id: e.id,

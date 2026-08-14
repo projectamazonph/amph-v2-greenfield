@@ -69,7 +69,7 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
     header: "ID",
     width: { type: "proportional", value: 1 },
     renderCell: (row) => (
-      <code style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.id}</code>
+      <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.id}</code>
     ),
   },
   {
@@ -79,7 +79,7 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
     renderCell: (row) => (
       <span
         style={{
-          fontFamily: "var(--font-family-code)",
+          fontFamily: "var(--font-mono)",
           fontSize: 12,
           background: "var(--surface-2)",
           padding: "2px 6px",
@@ -108,7 +108,7 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
     header: "Est. (min)",
     width: { type: "pixel", value: 90 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
         {row.estimatedMinutes}
       </span>
     ),
@@ -122,7 +122,7 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
         <Badge variant={statusVariant(row.status)} label={row.status} />
         <span
           style={{
-            fontFamily: "var(--font-family-code)",
+            fontFamily: "var(--font-mono)",
             fontSize: 11,
             color: "var(--ink-500)",
           }}
@@ -196,7 +196,7 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
             padding: "4px 10px",
             borderRadius: "var(--radius-full)",
             fontSize: "var(--font-size-sm)",
-            fontFamily: "var(--font-family-code)",
+            fontFamily: "var(--font-mono)",
             textDecoration: "none",
             background: !currentSimulatorId ? "var(--accent)" : "var(--surface-2)",
             color: !currentSimulatorId ? "var(--accent-ink)" : "var(--ink-900)",
@@ -214,7 +214,7 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
               padding: "4px 10px",
               borderRadius: "var(--radius-full)",
               fontSize: "var(--font-size-sm)",
-              fontFamily: "var(--font-family-code)",
+              fontFamily: "var(--font-mono)",
               textDecoration: "none",
               background: currentSimulatorId === id ? "var(--accent)" : "var(--surface-2)",
               color: currentSimulatorId === id ? "var(--accent-ink)" : "var(--ink-900)",

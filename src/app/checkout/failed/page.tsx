@@ -46,8 +46,7 @@ export default async function CheckoutFailedPage({
         <div className={styles.cta}>
           <Link
             href={retryHref}
-            className="btn btn-primary"
-            style={{ display: "inline-block", padding: "12px 24px" }}
+            className={styles.btnPrimary}
           >
             Try again
           </Link>

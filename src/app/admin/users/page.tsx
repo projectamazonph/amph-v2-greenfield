@@ -156,8 +156,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
           <p>No users found.</p>
           <Link
             href="/admin/users/new"
-            className="btn btn-primary"
-            style={{ marginTop: "var(--space-4)" }}
+            className={styles.addButton}
           >
             + Create User
           </Link>

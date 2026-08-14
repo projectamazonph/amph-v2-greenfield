@@ -5,16 +5,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   cookies: vi.fn(),
   getSessionUser: vi.fn(),
+  getAdminSessionCookieName: vi.fn(() => "amph_admin_session"),
 }));
 
 vi.mock("next/headers", () => ({ cookies: mocks.cookies }));
-vi.mock("@/lib/auth", () => ({ getSessionUser: mocks.getSessionUser, setAuthCookie: vi.fn(), clearAuthCookie: vi.fn() }));
+vi.mock("@/lib/auth", () => ({
+  getSessionUser: mocks.getSessionUser,
+  setAuthCookie: vi.fn(),
+  clearAuthCookie: vi.fn(),
+  getAdminSessionCookieName: mocks.getAdminSessionCookieName,
+}));
 
 import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
 import { ImpersonationBanner } from "../ImpersonationBanner";
 
 describe("admin event controls", () => {
-  it("renders a submit control for server-action forms", () => {
+  it("renders a submit control for server-action forms with an accessible Dialog", () => {
     const markup = renderToString(
       <ConfirmSubmitButton confirmMessage="Archive this course?" className="danger">
         Archive
@@ -24,8 +30,11 @@ describe("admin event controls", () => {
     expect(markup).toContain("Archive");
 
     const source = readFileSync(new URL("../ConfirmSubmitButton.tsx", import.meta.url), "utf8");
-    expect(source).toContain("window.confirm(confirmMessage)");
-    expect(source).toContain("e.preventDefault()");
+    // Uses Astryx Dialog component (not native window.confirm)
+    expect(source).toContain("from \"@astryxdesign/core/Dialog\"");
+    expect(source).toContain('purpose="required"');
+    // Uses programmatic form submission after confirmation
+    expect(source).toContain("requestSubmit");
   });
 
   describe("ImpersonationBanner", () => {

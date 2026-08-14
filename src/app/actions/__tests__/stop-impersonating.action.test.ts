@@ -3,11 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   setAuthCookie: vi.fn(),
   clearAuthCookie: vi.fn(),
+  getAdminSessionCookieName: vi.fn(() => "amph_admin_session"),
 }));
 
 vi.mock("@/lib/auth", () => ({
   setAuthCookie: mocks.setAuthCookie,
   clearAuthCookie: mocks.clearAuthCookie,
+  getAdminSessionCookieName: mocks.getAdminSessionCookieName,
 }));
 
 import { performStopImpersonating } from "../stopImpersonating.action";

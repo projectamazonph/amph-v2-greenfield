@@ -66,6 +66,32 @@
   text-align: center;
 }
 
+/* Reset button */
+.resetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  color: var(--ink-700);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  margin-left: var(--space-3);
+  transition: background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+.resetBtn:hover {
+  background: var(--surface-0);
+  border-color: var(--ink-300);
+}
+
 @media (max-width: 767px) {
   .layout { flex-direction: column; }
 }

@@ -49,13 +49,16 @@ export default async function EmailTemplatesPage() {
           <p className={styles.empty}>No email template types found.</p>
         ) : (
           <table className={styles.table}>
+            <caption className={styles.caption}>
+              Email templates — edit subject, headline, intro, and CTA text for transactional emails
+            </caption>
             <thead>
               <tr>
-                <th>Type</th>
-                <th>Subject</th>
-                <th>Status</th>
-                <th>Last updated</th>
-                <th className={styles.actions}>Actions</th>
+                <th scope="col">Type</th>
+                <th scope="col">Subject</th>
+                <th scope="col">Status</th>
+                <th scope="col">Last updated</th>
+                <th scope="col" className={styles.actions}>Actions</th>
               </tr>
             </thead>
             <tbody>

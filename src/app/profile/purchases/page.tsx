@@ -116,7 +116,7 @@ export default async function PurchasesPage({ searchParams }: Props) {
                         required
                         rows={4}
                       />
-                      <button type="submit" className="btn btn-secondary">
+                      <button type="submit" className={styles.btnSecondary}>
                         Request refund
                       </button>
                     </form>

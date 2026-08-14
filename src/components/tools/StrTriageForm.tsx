@@ -161,7 +161,7 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
                     : "var(--danger)",
             }}
           >
-            Score: {result.overallScore}% — {result.feedback.overallComment}
+            Score: {result.overallScore}%: {result.feedback.overallComment}
           </div>
         ) : null}
       </div>

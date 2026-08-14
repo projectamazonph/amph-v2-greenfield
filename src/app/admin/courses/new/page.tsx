@@ -7,6 +7,7 @@
  * provides module and lesson management.
  */
 
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
@@ -22,6 +23,7 @@ export default async function NewCoursePage() {
 
   async function handleSubmit(formData: FormData) {
     "use server";
+    await requireAdmin();
     const input: CreateCoursePageInput = {
       id: String(formData.get("id") ?? "").trim(),
       slug: String(formData.get("slug") ?? "").trim(),
@@ -52,7 +54,7 @@ export default async function NewCoursePage() {
   return (
     <div>
       <Link href="/admin/courses" className={styles.backLink}>
-        ← Back to courses
+        <ArrowLeft size={16} aria-hidden />{" "}Back to courses
       </Link>
 
       <TopBar title="Add course" subtitle="Create a new course (DRAFT by default)" />
