@@ -5,6 +5,7 @@
  * action that calls createQuizAction.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -55,7 +56,7 @@ export default async function NewQuizPage({ searchParams }: PageProps) {
   return (
     <div>
       <Link href="/admin/quizzes" className={styles.backLink}>
-        ← Back to quizzes
+        <ArrowLeft size={16} aria-hidden /> Back to quizzes
       </Link>
 
       <TopBar title="Add quiz" subtitle="Create a new quiz for a course" />

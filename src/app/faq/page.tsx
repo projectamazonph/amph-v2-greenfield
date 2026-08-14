@@ -19,7 +19,7 @@ import { FAQ_ITEMS } from "./faqContent";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "FAQ — Project Amazon PH Academy",
+  title: "FAQ | Project Amazon PH Academy",
   description:
     "Ten honest questions to ask before you pay for Project Amazon PH Academy, answered plainly, including what still isn't finished.",
 };

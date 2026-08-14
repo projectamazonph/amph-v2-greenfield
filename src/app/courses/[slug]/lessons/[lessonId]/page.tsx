@@ -36,18 +36,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const catalog = await container.getCatalogCourse.execute(slug);
 
   if (!catalog.ok) {
-    return { title: "Course Not Found — Project Amazon PH Academy" };
+    return { title: "Course Not Found | Project Amazon PH Academy" };
   }
 
   const lessonLocation = catalog.value.modules
     .flatMap((module) => module.lessons.map((lesson) => ({ module, lesson })))
     .find(({ lesson }) => lesson.id === lessonId);
   if (!lessonLocation) {
-    return { title: "Lesson Not Found — Project Amazon PH Academy" };
+    return { title: "Lesson Not Found | Project Amazon PH Academy" };
   }
 
   return {
-    title: `${lessonLocation.lesson.title} — ${catalog.value.title} | Project Amazon PH Academy`,
+    title: `${lessonLocation.lesson.title} | ${catalog.value.title} | Project Amazon PH Academy`,
     description: `${lessonLocation.module.title}: ${lessonLocation.lesson.title}`,
   };
 }

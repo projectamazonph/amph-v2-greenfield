@@ -4,6 +4,7 @@
  * STORY-050e. Server component.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -53,7 +54,7 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
   return (
     <div>
       <Link href="/admin/badges" className={styles.backLink}>
-        ← Back to badges
+        <ArrowLeft size={16} aria-hidden /> Back to badges
       </Link>
 
       <TopBar title={`Edit: ${b.name}`} subtitle={b.slug} />

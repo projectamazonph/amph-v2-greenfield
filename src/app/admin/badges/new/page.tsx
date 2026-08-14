@@ -4,6 +4,7 @@
  * STORY-050e. Server component.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { createBadgeAction } from "@/app/actions/createBadge.action";
 import { requireAdmin } from "@/lib/auth";
@@ -47,7 +48,7 @@ export default async function NewBadgePage({ searchParams }: PageProps) {
   return (
     <div>
       <Link href="/admin/badges" className={styles.backLink}>
-        ← Back to badges
+        <ArrowLeft size={16} aria-hidden /> Back to badges
       </Link>
 
       <TopBar title="Add badge" subtitle="Create a new badge template" />
@@ -64,7 +65,7 @@ export default async function NewBadgePage({ searchParams }: PageProps) {
             <span className={styles.label}>Slug *</span>
             <select name="slug" required defaultValue="" className={styles.input}>
               <option value="" disabled>
-                — Select a slug —
+                Select a slug
               </option>
               {VALID_SLUGS.map((s) => (
                 <option key={s.slug} value={s.slug}>

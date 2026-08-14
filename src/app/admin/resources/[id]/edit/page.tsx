@@ -4,6 +4,7 @@
  * STORY-098. Server component.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -64,7 +65,7 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
   return (
     <div>
       <Link href="/admin/resources" className={styles.backLink}>
-        ← Back to download center
+        <ArrowLeft size={16} aria-hidden /> Back to download center
       </Link>
 
       <TopBar title={`Edit: ${resource.title}`} subtitle={resource.id} />
@@ -164,7 +165,7 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
               className={styles.input}
             />
             <span className={styles.hint}>
-              Ignored if you upload a replacement file above. Otherwise this is used as-is — editing
+              Ignored if you upload a replacement file above. Otherwise this is used as-is. Editing
               it directly re-points an external link without re-uploading anything.
             </span>
           </label>
@@ -193,8 +194,8 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
               defaultValue={resource.isPublished ? "true" : "false"}
               className={styles.select}
             >
-              <option value="true">Published — visible in the download center</option>
-              <option value="false">Unpublished — hidden from students</option>
+              <option value="true">Published (visible in the download center)</option>
+              <option value="false">Unpublished (hidden from students)</option>
             </select>
           </label>
 
@@ -256,7 +257,7 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
         >
           Permanently deleting removes this resource entirely
           {resource.fileKey ? " and deletes its uploaded file from storage" : ""}. This cannot be
-          undone — use it only for a genuinely wrong upload, not routine cleanup.
+          undone. Use it only for a genuinely wrong upload, not routine cleanup.
         </p>
         <form action={handlePurge(id)}>
           <button

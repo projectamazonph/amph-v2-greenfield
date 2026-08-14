@@ -16,6 +16,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { StudentShell } from "@/components/student/StudentShell";
 import styles from "./page.module.css";
 
@@ -28,7 +29,9 @@ export default async function AdConsolePage() {
     <StudentShell>
       <main className={styles.page}>
         <nav className={styles.breadcrumb}>
-          <Link href="/tools">← Tools</Link>
+          <Link href="/tools">
+            <ArrowLeft size={16} aria-hidden /> Tools
+          </Link>
           <span aria-hidden="true"> / </span>
           <span>Amazon Ad Console</span>
         </nav>
@@ -37,7 +40,7 @@ export default async function AdConsolePage() {
           <span className={styles.eyebrow}>External tool · Live account</span>
           <h1 className={styles.title}>Amazon Ad Console</h1>
           <p className={styles.brief}>
-            A real campaign-management dashboard for your own Amazon Advertising account — not a
+            A real campaign-management dashboard for your own Amazon Advertising account, not a
             practice simulator. Sign in with your Amazon Ads credentials inside the frame below to
             view and manage real Sponsored Products campaigns, bids, and keywords.
           </p>
@@ -50,7 +53,7 @@ export default async function AdConsolePage() {
           <ol className={styles.guideList}>
             <li>
               Sign in inside the console below with your own Amazon Advertising account. AMPH does
-              not see or store your Amazon login or ad account data — the console runs in an
+              not see or store your Amazon login or ad account data. The console runs in an
               isolated frame, separate from this site.
             </li>
             <li>
@@ -59,17 +62,17 @@ export default async function AdConsolePage() {
             </li>
             <li>
               Practice a change in the Bid Elevator or Campaign Builder simulator first if
-              you&apos;re unsure — then apply the same logic here once you&apos;re confident.
+              you&apos;re unsure, then apply the same logic here once you&apos;re confident.
             </li>
             <li>
               This is a production tool. Bid, budget, and keyword changes you make here affect real
-              ad spend immediately and generally can&apos;t be undone — there&apos;s no reset button
+              ad spend immediately and generally can&apos;t be undone. There&apos;s no reset button
               like the simulators have.
             </li>
           </ol>
           <p className={styles.guideNote}>
             If the console below appears blank or refuses to load, open it directly in a new tab
-            instead — some external tools block being embedded inside another site&apos;s page.
+            instead. Some external tools block being embedded inside another site&apos;s page.
           </p>
         </section>
 
@@ -80,7 +83,8 @@ export default async function AdConsolePage() {
             rel="noopener noreferrer"
             className={styles.openLink}
           >
-            Open in new tab ↗
+            <ArrowUpRight size={16} weight="bold" aria-hidden="true" />
+            Open in new tab
           </a>
         </div>
 

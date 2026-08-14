@@ -6,6 +6,7 @@
  * repository contract).
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -58,7 +59,7 @@ export default async function EditEmailTemplatePage({ params, searchParams }: Pa
   return (
     <div>
       <Link href="/admin/email-templates" className={styles.backLink}>
-        ← Back to email templates
+        <ArrowLeft size={16} aria-hidden /> Back to email templates
       </Link>
 
       <TopBar title={`Edit: ${TEMPLATE_LABELS[type]}`} subtitle={type} />

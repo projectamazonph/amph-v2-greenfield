@@ -26,7 +26,7 @@ import { StudentShell } from "@/components/student/StudentShell";
 import { CourseCover } from "@/components/student/CourseCover";
 
 export const metadata: Metadata = {
-  title: "Courses — Project Amazon PH Academy",
+  title: "Courses | Project Amazon PH Academy",
   description:
     "Expert-led Amazon PPC training for Filipino VAs. Agency-side ads work, taught in Filipino.",
 };
@@ -37,6 +37,21 @@ export default async function CoursesPage() {
     container.listCatalogCourses.execute(),
     getSessionUser(),
   ]);
+
+  // Operational signal: log the catalog load outcome so a SRE can
+  // tell from server logs whether the empty-state was caused by
+  // "no rows" vs "DB error". Never exposed to students — the page
+  // below always uses the safe, generic copy. console.warn is the
+  // only console method that ESLint's `no-console` rule allows.
+  if (process.env.NODE_ENV !== "test") {
+    if (!catalogResult.ok) {
+      console.warn("[courses] catalog load failed", catalogResult.error);
+    } else {
+      console.warn(
+        `[courses] catalog loaded: ${catalogResult.value.courses.length} course(s)`,
+      );
+    }
+  }
 
   if (!catalogResult.ok) {
     return (

@@ -10,6 +10,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -79,7 +80,7 @@ export default async function EditScenarioPage({ params, searchParams }: PagePro
   return (
     <div>
       <Link href="/admin/simulators" className={formStyles.backLink}>
-        ← Back to scenarios
+        <ArrowLeft size={16} aria-hidden /> Back to scenarios
       </Link>
 
       <TopBar
@@ -113,7 +114,7 @@ export default async function EditScenarioPage({ params, searchParams }: PagePro
             <dt style={{ color: "var(--ink-500)", fontSize: "0.875rem" }}>Name</dt>
             <dd style={{ margin: 0, fontSize: "0.875rem" }}>{scenario.name}</dd>
             <dt style={{ color: "var(--ink-500)", fontSize: "0.875rem" }}>Description</dt>
-            <dd style={{ margin: 0, fontSize: "0.875rem" }}>{scenario.description || "—"}</dd>
+            <dd style={{ margin: 0, fontSize: "0.875rem" }}>{scenario.description || "(none)"}</dd>
             <dt style={{ color: "var(--ink-500)", fontSize: "0.875rem" }}>Difficulty</dt>
             <dd style={{ margin: 0, fontSize: "0.875rem" }}>{scenario.difficulty}</dd>
             <dt style={{ color: "var(--ink-500)", fontSize: "0.875rem" }}>Estimated time</dt>

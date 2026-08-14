@@ -6,6 +6,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -80,7 +81,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
   return (
     <div>
       <Link href="/admin/payments" className={styles.backLink}>
-        ← Back to payments
+        <ArrowLeft size={16} aria-hidden /> Back to payments
       </Link>
 
       <TopBar
@@ -216,9 +217,9 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
           <h2 className={styles.sectionTitle}>PayMongo</h2>
           <dl className={styles.details}>
             <dt>Payment ID</dt>
-            <dd className={styles.mono}>{order.paymongoPaymentId ?? "—"}</dd>
+            <dd className={styles.mono}>{order.paymongoPaymentId ?? "(none)"}</dd>
             <dt>Status</dt>
-            <dd className={styles.mono}>{order.paymongoStatus ?? "—"}</dd>
+            <dd className={styles.mono}>{order.paymongoStatus ?? "(none)"}</dd>
             <dt>Checkout URL</dt>
             <dd>
               {order.paymongoCheckoutUrl ? (
@@ -226,7 +227,7 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
                   {order.paymongoCheckoutUrl}
                 </a>
               ) : (
-                "—"
+                "(none)"
               )}
             </dd>
           </dl>

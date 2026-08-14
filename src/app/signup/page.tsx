@@ -11,7 +11,7 @@
  * one that has worked for 30 years.
  */
 
-export const metadata = { title: "Sign Up — AMPH Academy" };
+export const metadata = { title: "Sign Up | AMPH Academy" };
 
 import { SignupForm } from "./SignupForm";
 

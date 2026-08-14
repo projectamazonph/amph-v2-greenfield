@@ -4,6 +4,7 @@
  * STORY-050d. Server component.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { createDiscountCodeAction } from "@/app/actions/createDiscountCode.action";
 import { requireAdmin } from "@/lib/auth";
@@ -32,7 +33,7 @@ export default async function NewDiscountCodePage({ searchParams }: PageProps) {
   return (
     <div>
       <Link href="/admin/discount-codes" className={styles.backLink}>
-        ← Back to discount codes
+        <ArrowLeft size={16} aria-hidden /> Back to discount codes
       </Link>
 
       <TopBar title="Add discount code" subtitle="Create a new promotional discount code" />

@@ -8,6 +8,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -82,7 +83,7 @@ export default async function ModuleDetailPage({ params }: PageProps) {
   return (
     <div>
       <Link href={`/admin/courses/${courseId}`} className={styles.backLink}>
-        ← Back to course
+        <ArrowLeft size={16} aria-hidden /> Back to course
       </Link>
 
       <TopBar

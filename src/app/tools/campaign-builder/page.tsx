@@ -8,6 +8,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
@@ -46,7 +47,9 @@ export default async function CampaignBuilderPage() {
     <StudentShell>
       <main className={styles.page}>
         <nav className={styles.breadcrumb}>
-          <Link href="/tools">← Tools</Link>
+          <Link href="/tools">
+            <ArrowLeft size={16} aria-hidden /> Tools
+          </Link>
           <span aria-hidden="true"> / </span>
           <span>Campaign Builder</span>
         </nav>
