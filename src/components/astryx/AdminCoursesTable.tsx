@@ -6,6 +6,7 @@
 
 "use client";
 
+import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import {
   Table,
@@ -88,7 +89,7 @@ const COLUMNS: TableColumn<CourseRow>[] = [
     header: "Slug",
     width: { type: "proportional", value: 1 },
     renderCell: (row) => (
-      <code style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.slug}</code>
+      <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.slug}</code>
     ),
   },
   {
@@ -102,7 +103,7 @@ const COLUMNS: TableColumn<CourseRow>[] = [
     header: "Price",
     width: { type: "pixel", value: 100 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
         {formatPhp(row.priceMinor / 100)}
       </span>
     ),
@@ -196,9 +197,9 @@ export function AdminCoursesTable({
               cursor: page > 1 ? "pointer" : "default",
             }}
           >
-            ← Prev
+            <ArrowLeft size={16} aria-hidden />{" "}Prev
           </Link>
-          <span style={{ fontFamily: "var(--font-family-code)", fontSize: 13 }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>
             Page {page} of {totalPages}
           </span>
           <Link
@@ -210,7 +211,7 @@ export function AdminCoursesTable({
               cursor: page < totalPages ? "pointer" : "default",
             }}
           >
-            Next →
+            Next{" "}<ArrowRight size={16} aria-hidden />
           </Link>
         </nav>
       )}

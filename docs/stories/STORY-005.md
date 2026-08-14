@@ -5,7 +5,7 @@
 **Epic:** Test infrastructure
 **Owner:** Ryan
 **Dependencies:** STORY-004
-**Status:** ✅ Done (shipped in initial greenfield bootstrap; Playwright signup happy-path test lives at `tests/e2e/signup.spec.ts`). **Follow-up 2026-08-14:** canonical signup error returned `kind: "unexpected"` when the auto-login could not mint a session (UNVERIFIED user) — fixed at the action boundary by adding `kind: "verification_required"` to `SignUpResult` and routing `signUpAndRedirect` to `/verify-email/sent?status=sent&email=...` for that variant. Resolves the documented smoketest failure in `scripts/.smoketest-report.md`. Touched: `src/app/actions/signup.action.ts`, `src/app/actions/__tests__/signup.action.test.ts` (added `verification_required` case).
+**Status:** ✅ Done (shipped in initial greenfield bootstrap; Playwright signup happy-path test lives at `tests/e2e/signup.spec.ts`). **Follow-up 2026-08-14:** canonical signup error returned `kind: "unexpected"` when the auto-login could not mint a session (UNVERIFIED user) — fixed at the action boundary by adding `kind: "verification_required"` to `SignUpResult` and routing `signUpAndRedirect` to `/verify-email/sent?status=sent` for that variant. Resolves the documented smoketest failure in `scripts/.smoketest-report.md`. Touched: `src/app/actions/signup.action.ts`, `src/app/actions/__tests__/signup.action.test.ts` (added `verification_required` case). **Second follow-up 2026-08-14 (S18):** the `/verify-email/sent` redirect carried the user's email as a query parameter, leaking it into browser history and analytics — stripped the `email` param from the redirect URL.
 
 ## Goal
 

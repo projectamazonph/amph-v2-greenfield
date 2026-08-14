@@ -9,6 +9,7 @@
  * invalidate whatever the user already scanned.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
@@ -63,7 +64,7 @@ export default async function StudentTwoFactorSetupPage({
     <StudentShell user={session}>
       <main style={{ padding: "var(--space-8) var(--side-pad)", maxWidth: 640 }}>
         <Link href="/profile/security" className={styles.backLink}>
-          ← Back to security
+          <ArrowLeft size={16} aria-hidden /> Back to security
         </Link>
 
         <h1

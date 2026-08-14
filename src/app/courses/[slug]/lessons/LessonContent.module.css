@@ -287,3 +287,30 @@
   text-align: center;
   color: var(--ink-500);
 }
+
+/* Quiz CTA button */
+
+.quizCta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+  margin-top: var(--space-4);
+}
+
+.quizCta:hover {
+  background: color-mix(in srgb, var(--accent) 90%, var(--ink-900));
+  box-shadow: none;
+}

@@ -21,6 +21,15 @@ export interface UserRepository {
   findById(id: string): Promise<Result<User, UserError>>;
 
   /**
+   * Batch-find users by a list of IDs. Deduplicates internally.
+   * Returns an empty list for an empty input array.
+   *
+   * Used by the audit-log page to batch-fetch actor emails in one
+   * query instead of N individual findById calls (H3 fix).
+   */
+  findByIds(ids: readonly string[]): Promise<Result<readonly User[], UserError>>;
+
+  /**
    * List all users. Used by admin pages (e.g., the admin users list,
    * the admin dashboard's "total students" stat). For a small admin
    * app this is fine; at scale, add a paginated list() method.

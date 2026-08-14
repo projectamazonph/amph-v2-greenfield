@@ -96,9 +96,9 @@ describe("AdminListPayments", () => {
   });
 
   it("returns db_error when the repo errors", async () => {
-    orderRepo.listAll = async () => ({
+    orderRepo.listPaginated = async () => ({
       ok: false,
-      error: { kind: "db_error", message: "list failed" },
+      error: { kind: "db_error", message: "paginated list failed" },
     });
 
     const r = await useCase.execute({});

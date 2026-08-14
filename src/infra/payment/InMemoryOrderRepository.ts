@@ -41,6 +41,29 @@ export class InMemoryOrderRepository implements IOrderRepository {
     return Result.ok(orders);
   }
 
+  async listPaginated(filters: {
+    status?: PaymentStatus;
+    page?: number;
+    pageSize?: number;
+  }): Promise<
+    Result<{ orders: readonly Order[]; total: number; page: number; pageSize: number }, OrderError>
+  > {
+    const page = Math.max(1, Math.floor(filters.page ?? 1));
+    const rawPageSize = Math.max(1, Math.floor(filters.pageSize ?? 25));
+    const pageSize = Math.min(rawPageSize, 50);
+
+    let orders = Array.from(this.orders.values());
+    if (filters?.status) {
+      orders = orders.filter((o) => o.status === filters.status);
+    }
+    orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    const total = orders.length;
+    const skip = (page - 1) * pageSize;
+    const paginated = orders.slice(skip, skip + pageSize);
+    return Result.ok({ orders: paginated, total, page, pageSize });
+  }
+
   // STORY-062: admin list of refund requests (orders with refundRequestedAt set)
   async listRefundRequests(filters: {
     status?: "pending" | "processed";

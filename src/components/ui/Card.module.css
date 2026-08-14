@@ -9,12 +9,10 @@
   /* Default border-radius: --radius-lg for marketing, --radius-md for data.
      Variant=compact uses the smaller radius. */
   border-radius: var(--radius-lg);
-  /* Lifted feel: subtle warm shadow separates cards from --surface-0 */
-  box-shadow: var(--shadow-sm);
+  /* L7 fix: per design spec §5, border IS the elevation. No shadow. */
   transition:
     border-color var(--duration-fast) var(--ease-out),
-    transform var(--duration-base) var(--ease-out),
-    box-shadow var(--duration-base) var(--ease-out);
+    transform var(--duration-base) var(--ease-out);
 }
 
 /* ── Variants ───────────────────────────────────────────────── */
@@ -29,7 +27,6 @@
 .interactive:hover {
   border-color: var(--ink-300);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
 }
 .interactive:focus-visible {
   outline: 2px solid var(--accent);

@@ -4,6 +4,7 @@
  * STORY-048c. Server component. Read-only.
  */
 
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
@@ -88,7 +89,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
   return (
     <div>
       <Link href={`/admin/courses/${courseId}/modules/${moduleId}`} className={styles.backLink}>
-        ← Back to module
+        <ArrowLeft size={16} aria-hidden />{" "}Back to module
       </Link>
 
       <TopBar

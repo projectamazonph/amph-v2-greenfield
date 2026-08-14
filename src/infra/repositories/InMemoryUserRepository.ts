@@ -32,6 +32,14 @@ export class InMemoryUserRepository implements UserRepository {
     return Result.ok(user);
   }
 
+  async findByIds(ids: readonly string[]): Promise<Result<readonly User[], UserError>> {
+    const deduped = [...new Set(ids)];
+    const found = deduped
+      .map((id) => this.users.get(id))
+      .filter((u): u is User => u !== undefined);
+    return Result.ok(found);
+  }
+
   async listAll(): Promise<Result<readonly User[], UserError>> {
     return Result.ok(Array.from(this.users.values()));
   }

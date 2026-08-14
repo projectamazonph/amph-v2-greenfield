@@ -7,6 +7,7 @@
  * simulator, so it has no registry entry.
  */
 
+import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { StudentShell } from "@/components/student/StudentShell";
 import styles from "./page.module.css";
@@ -63,9 +64,9 @@ export default async function ToolsIndexPage() {
               <li key={sim.simulatorId} className={styles.card}>
                 <h2 className={styles.cardName}>{info.name}</h2>
                 <p className={styles.cardBlurb}>{info.blurb}</p>
-                <a href={info.href} className={styles.cardLink}>
-                  Open tool →
-                </a>
+                <Link href={info.href} className={styles.cardLink} prefetch>
+                  Open tool
+                </Link>
               </li>
             );
           })}
@@ -76,9 +77,9 @@ export default async function ToolsIndexPage() {
               Embedded, live campaign console for your own Amazon Advertising account. Real data,
               real changes — not a practice simulator.
             </p>
-            <a href="/tools/ad-console" className={styles.cardLink}>
-              Open tool →
-            </a>
+            <Link href="/tools/ad-console" className={styles.cardLink}>
+              Open tool
+            </Link>
           </li>
         </ul>
       </main>

@@ -22,7 +22,7 @@
 "use server";
 
 import { Result } from "@/domain/shared/Result";
-import { setAuthCookie, clearAuthCookie } from "@/lib/auth";
+import { setAuthCookie, clearAuthCookie, getAdminSessionCookieName } from "@/lib/auth";
 
 export type StopImpersonatingActionError =
   { kind: "no_admin_session" } | { kind: "db_error"; message: string };
@@ -31,12 +31,6 @@ export type StopImpersonatingActionResult = Result<
   { restored: boolean },
   StopImpersonatingActionError
 >;
-
-function getAdminSessionCookieName(): string {
-  return process.env.NODE_ENV === "production"
-    ? "__Secure-amph_admin_session"
-    : "amph_admin_session";
-}
 
 export async function performStopImpersonating(deps: {
   cookies: {

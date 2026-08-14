@@ -161,14 +161,14 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
                     : "var(--danger)",
             }}
           >
-            Score: {result.overallScore}% — {result.feedback.overallComment}
+            Score: {result.overallScore}%: {result.feedback.overallComment}
           </div>
         ) : null}
       </div>
       {result ? <FormativeScoreNotice /> : null}
       {result?.xpAwarded ? (
         <p className={styles.xpBanner}>
-          +{result.xpAwarded} XP earned for passing in Challenge mode.
+          +{result.xpAwarded} XP earned for passing in Challenge Mode.
         </p>
       ) : null}
     </form>

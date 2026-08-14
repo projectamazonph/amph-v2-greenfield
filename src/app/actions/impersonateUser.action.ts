@@ -28,7 +28,7 @@
 
 import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
-import { getSessionUserId, setAuthCookie, getSessionCookieName } from "@/lib/auth";
+import { getSessionUserId, setAuthCookie, getSessionCookieName, getAdminSessionCookieName } from "@/lib/auth";
 import type { ImpersonateUser } from "@/usecases/ImpersonateUser";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
@@ -165,12 +165,6 @@ export async function performImpersonateUser(
  * machinery can detect "we're impersonating" by the presence of this
  * cookie.
  */
-function getAdminSessionCookieName(): string {
-  return process.env.NODE_ENV === "production"
-    ? "__Secure-amph_admin_session"
-    : "amph_admin_session";
-}
-
 // ── Action wrapper (thin shell) ──────────────────────────────────────────
 
 /**

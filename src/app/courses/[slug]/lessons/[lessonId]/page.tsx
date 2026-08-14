@@ -155,7 +155,7 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
       />
 
       {/* Main content */}
-      <main className={styles.main}>
+      <main id="lesson-content" className={styles.main}>
         <div className={styles.content}>
           {/* Breadcrumb */}
           <nav className={styles.breadcrumb} aria-label="Breadcrumb">
@@ -185,10 +185,9 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
 
           <Link
             href={`/courses/${slug}`}
-            className="btn btn-ghost"
-            style={{ fontSize: "var(--text-sm)", marginTop: "var(--space-2)" }}
+            className={styles.backBtn}
           >
-            ← Back to Course
+            Back to Course
           </Link>
 
           {/* Lesson header */}

@@ -1,6 +1,6 @@
 import type { Course } from "@/domain/entities/Course";
 import { effectivePrice } from "@/domain/entities/PricingTier";
-import type { Money } from "@/domain/values/Money";
+import { Money } from "@/domain/values/Money";
 import { Result } from "@/domain/shared/Result";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
@@ -72,8 +72,7 @@ export interface CheckoutSummary {
   courseSlug: string;
   courseTitle: string;
   offerName: string;
-  amountMinor: number;
-  currency: string;
+  price: Money;
   pricingTierSlug: string | null;
 }
 
@@ -87,8 +86,7 @@ export class GetCheckoutSummary {
       courseSlug: result.value.course.slug,
       courseTitle: result.value.course.title,
       offerName: result.value.offerName,
-      amountMinor: result.value.price.minor,
-      currency: result.value.price.currency,
+      price: result.value.price,
       pricingTierSlug: result.value.pricingTierSlug,
     });
   }

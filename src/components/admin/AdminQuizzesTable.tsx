@@ -28,7 +28,7 @@ const COLUMNS: TableColumn<QuizRow>[] = [
       <div>
         <Link
           href={`/admin/quizzes/${row.id}/edit`}
-          style={{ color: "var(--brand)", textDecoration: "none", fontWeight: 500 }}
+          style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}
         >
           {row.title}
         </Link>
@@ -70,7 +70,7 @@ const COLUMNS: TableColumn<QuizRow>[] = [
     renderCell: (row) => (
       <Link
         href={`/admin/quizzes/${row.id}/edit`}
-        style={{ color: "var(--brand)", textDecoration: "none", fontWeight: 500, fontSize: 13 }}
+        style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500, fontSize: 13 }}
       >
         Edit
       </Link>

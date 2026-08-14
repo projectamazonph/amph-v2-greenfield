@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { QuizPlayer } from "@/components/courses/QuizPlayer";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
@@ -80,7 +81,7 @@ export default async function QuizPage({ params }: Props) {
   return (
     <main className={styles.page}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <Link href={`/courses/${slug}`}>← Back to course</Link>
+        <Link href={`/courses/${slug}`}><ArrowLeft size={16} aria-hidden /> Back to course</Link>
       </nav>
       <QuizPlayer
         quizId={quiz.id}

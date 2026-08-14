@@ -21,16 +21,10 @@
  */
 
 import { cookies } from "next/headers";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser, getAdminSessionCookieName } from "@/lib/auth";
 import { userFullName } from "@/domain/entities/User";
 import { stopImpersonatingAction } from "@/app/actions/stopImpersonating.action";
 import styles from "./ImpersonationBanner.module.css";
-
-function getAdminSessionCookieName(): string {
-  return process.env.NODE_ENV === "production"
-    ? "__Secure-amph_admin_session"
-    : "amph_admin_session";
-}
 
 export async function ImpersonationBanner() {
   const cookieJar = await cookies();

@@ -32,7 +32,7 @@ export default async function CertificatesPage() {
             <p className={styles.empty}>
               Complete an enrolled course to earn a certificate of completion.
             </p>
-            <Link href="/courses" className="btn btn-secondary">
+            <Link href="/courses" className={styles.btnSecondary}>
               Continue learning
             </Link>
           </section>
@@ -59,7 +59,7 @@ export default async function CertificatesPage() {
                   ) : null}
                   <Link
                     href={`/certificates/${certificate.verificationHash}`}
-                    className="btn btn-secondary"
+                    className={styles.btnSecondary}
                   >
                     {certificate.status === "active" ? "View certificate" : "View record"}
                   </Link>

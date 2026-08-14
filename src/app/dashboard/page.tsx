@@ -10,6 +10,7 @@
  * returns a non-null user.
  */
 
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
@@ -102,16 +103,15 @@ export default async function DashboardPage() {
                 marginBottom: "var(--space-2)",
               }}
             >
-              Pick up where you left off
+              {/* M7 fix: label honestly reflects what this card shows — the
+                 most recently enrolled in-progress course. 'Your courses' was
+                 misleading because this card is only one course, not all courses. */}
+              Continue where you enrolled
             </div>
             <div style={{ fontSize: "var(--text-base)", fontWeight: 600 }}>
               {lastAccessedCourse.title}
             </div>
-            <Link
-              href={`/courses/${lastAccessedCourse.slug}`}
-              className="btn btn-primary"
-              style={{ marginTop: "var(--space-3)" }}
-            >
+            <Link href={`/courses/${lastAccessedCourse.slug}`} className={styles.continueBtn}>
               Continue
             </Link>
           </div>
@@ -152,7 +152,7 @@ export default async function DashboardPage() {
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>My courses</h2>
             <Link href="/courses" className={styles.browseLink}>
-              Browse the catalog →
+              Browse the catalog <ArrowRight size={16} aria-hidden />
             </Link>
           </div>
 
@@ -191,13 +191,13 @@ export default async function DashboardPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Quick Actions</h2>
           <div className={styles.quickActions}>
-            <Link href="/courses" className="btn btn-ghost">
+            <Link href="/courses" className={styles.quickBtn}>
               Browse Catalog
             </Link>
-            <Link href="/tools" className="btn btn-ghost">
+            <Link href="/tools" className={styles.quickBtn}>
               Simulators
             </Link>
-            <Link href="/profile" className="btn btn-ghost">
+            <Link href="/profile" className={styles.quickBtn}>
               My Profile
             </Link>
           </div>

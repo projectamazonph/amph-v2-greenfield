@@ -9,6 +9,7 @@
  */
 
 import Link from "next/link";
+import { Warning } from "@phosphor-icons/react/dist/ssr";
 import buttonStyles from "@/components/ui/Button.module.css";
 import styles from "./not-found.module.css";
 
@@ -17,20 +18,7 @@ export default function CertificateNotFound() {
     <main className={styles.page}>
       <div className={styles.center}>
         <div className={styles.iconCircle}>
-          <svg
-            className={styles.icon}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+          <Warning size={32} weight="fill" className={styles.icon} aria-hidden />
         </div>
         <h1 className={styles.title}>Certificate Not Found</h1>
         <p className={styles.subtitle}>

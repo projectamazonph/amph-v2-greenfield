@@ -101,6 +101,7 @@ describe("EnrollStudent", () => {
       getTwoFactorSecret: vi.fn(),
       setTwoFactorSecret: vi.fn(),
       anonymizeAndDelete: vi.fn(),
+      findByIds: vi.fn(),
       recordLoginAttempt: vi.fn(),
     };
     mockCourseRepo = {
@@ -132,6 +133,7 @@ describe("EnrollStudent", () => {
       update: vi.fn(),
       // P0-1 paywall fix
       findPaidForUserAndCourse: vi.fn(),
+      listPaginated: vi.fn(),
     };
     useCase = new EnrollStudent({
       userRepo: mockUserRepo,

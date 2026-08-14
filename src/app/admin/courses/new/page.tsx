@@ -7,11 +7,11 @@
  * provides module and lesson management.
  */
 
-import Link from "next/link";
-import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Card } from "@astryxdesign/core";
 import { createCourseAction } from "@/app/actions/createCourse.action";
 import type { CreateCoursePageInput } from "@/app/actions/createCourse.action";
@@ -22,8 +22,17 @@ export default async function NewCoursePage() {
 
   async function handleSubmit(formData: FormData) {
     "use server";
+    await requireAdmin();
+    const rawId = String(formData.get("id") ?? "").trim();
+    // S10 fix: auto-generate a ULID if the admin leaves the ID field blank.
+    const courseId =
+      rawId ||
+      (() => {
+        const container = buildContainer();
+        return container.idGen.newId();
+      })();
     const input: CreateCoursePageInput = {
-      id: String(formData.get("id") ?? "").trim(),
+      id: courseId,
       slug: String(formData.get("slug") ?? "").trim(),
       title: String(formData.get("title") ?? "").trim(),
       tagline: String(formData.get("tagline") ?? "").trim(),
@@ -51,11 +60,12 @@ export default async function NewCoursePage() {
 
   return (
     <div>
-      <Link href="/admin/courses" className={styles.backLink}>
-        ← Back to courses
-      </Link>
-
-      <TopBar title="Add course" subtitle="Create a new course (DRAFT by default)" />
+      <AdminSubPageHeader
+        title="Add course"
+        backHref="/admin/courses"
+        backLabel="Back to courses"
+        subtitle="Create a new course (DRAFT by default)"
+      />
 
       <form action={handleSubmit} className={styles.form}>
         <Card padding={6}>

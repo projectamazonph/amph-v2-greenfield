@@ -28,6 +28,7 @@ vi.mock("@/app/actions/checkout.action", () => ({
 
 import { renderToString } from "react-dom/server";
 import { createElement } from "react";
+import { Money } from "@/domain/values/Money";
 import CheckoutForm from "../CheckoutForm";
 
 function renderForm() {
@@ -38,8 +39,7 @@ function renderForm() {
         courseSlug: "ppc-101",
         courseTitle: "PPC 101",
         offerName: "PPC 101",
-        amountMinor: 299900,
-        currency: "PHP",
+        price: Money.php(2999),
         pricingTierSlug: null,
       },
       loadError: null,

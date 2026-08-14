@@ -51,6 +51,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
       <body>
+        {/* WCAG 2.4.1 Bypass Blocks: skip to main content */}
+        <a href="#main-content" className="skip-link">Skip to main content</a>
+
         {/* STORY-047: shown when an admin is impersonating another user.
             Server component, reads the amph_admin_session cookie, returns
             null when not impersonating. */}

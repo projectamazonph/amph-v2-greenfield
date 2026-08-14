@@ -8,6 +8,7 @@
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
+import { CaretLeft, CaretRight } from "@phosphor-icons/react/dist/ssr";
 import styles from "./LessonNavButtons.module.css";
 
 interface LessonNavButtonsProps {
@@ -53,28 +54,22 @@ export function LessonNavButtons({ courseSlug, prevLessonId, nextLessonId }: Les
 
 function ChevronLeft() {
   return (
-    <svg
+    <CaretLeft
+      size={20}
+      weight="bold"
       className={styles.chevron}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-    </svg>
+      aria-hidden
+    />
   );
 }
 
 function ChevronRight() {
   return (
-    <svg
+    <CaretRight
+      size={20}
+      weight="bold"
       className={styles.chevron}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
+      aria-hidden
+    />
   );
 }

@@ -5,7 +5,7 @@
 **Epic:** Admin panel
 **Depends on:** STORY-046 (admin shell), STORY-047 (admin users list pattern)
 **Blocks:** STORY-048b (modules CRUD + reorder), STORY-048c (lessons CRUD + MDX editor)
-**Status:** ✅ Done (PR #048a, commit `0a038f9` — `feat(admin): STORY-048a admin courses CRUD (no modules/lessons editing yet)`; `src/app/admin/courses/` lives)
+**Status:** ✅ Done (PR #048a, commit `0a038f9` — `feat(admin): STORY-048a admin courses CRUD (no modules/lessons editing yet)`; `src/app/admin/courses/` lives) **Follow-up 2026-08-14 (S10):** `admin/courses/new/page.tsx` now auto-generates a ULID for the course ID field when the admin leaves it blank, preventing ULID collision between concurrent admins. Touched: `src/app/admin/courses/new/page.tsx`. **Follow-up 2026-08-14 (L5):** extracted the repeated back-link + `TopBar` pattern into `AdminSubPageHeader` component. Applied to `admin/users/new`, `admin/courses/new`, `admin/users/[id]`, `admin/simulators/[id]/versions`. Touched: `src/components/admin/AdminSubPageHeader.tsx`, `src/components/admin/AdminSubPageHeader.module.css`, `src/app/admin/users/new/page.tsx`, `src/app/admin/courses/new/page.tsx`, `src/app/admin/users/[id]/page.tsx`, `src/app/admin/simulators/[id]/versions/page.tsx`.
 
 ## Goal
 
@@ -23,11 +23,11 @@ Ship the course-level admin surface. After this story:
 
 This is the first of three stories that together make up the original STORY-048 from the sprint plan. Splitting per the plan's own "When a Story Splits" rule (Code shape > ~150 lines = split). The original 1-pt story was ~3 stories worth of work:
 
-| Story | Scope | Realistic effort |
-|-------|-------|-----------------|
-| **STORY-048a (this)** | Course CRUD, no curriculum editing | 1-1.5 hours |
-| **STORY-048b** | Module entity + admin modules CRUD + reorder | 1.5-2 hours |
-| **STORY-048c** | Lesson entity + admin lessons CRUD + MDX editor | 2-3 hours |
+| Story                 | Scope                                           | Realistic effort |
+| --------------------- | ----------------------------------------------- | ---------------- |
+| **STORY-048a (this)** | Course CRUD, no curriculum editing              | 1-1.5 hours      |
+| **STORY-048b**        | Module entity + admin modules CRUD + reorder    | 1.5-2 hours      |
+| **STORY-048c**        | Lesson entity + admin lessons CRUD + MDX editor | 2-3 hours        |
 
 This story ships the highest-leverage part (course-level CRUD) without blocking on the curriculum model. STORY-048b and -c can land in their own PRs without rewriting 048a.
 
@@ -199,6 +199,7 @@ DATABASE_URL="postgresql://test:test@localhost:5432/amph_test" \
 ```
 
 Manual smoke (in a follow-up, not this PR):
+
 - Sign in as admin
 - Visit `/admin/courses` — see seeded courses (or "No courses")
 - Click "Add course" — fill the form — submit

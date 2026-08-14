@@ -39,6 +39,9 @@ import { buildContainer } from "@/composition/container";
 const SESSION_COOKIE_DEV = "amph_session";
 const SESSION_COOKIE_PROD = "__Secure-amph_session";
 
+const ADMIN_SESSION_COOKIE_DEV = "amph_admin_session";
+const ADMIN_SESSION_COOKIE_PROD = "__Secure-amph_admin_session";
+
 /**
  * Read the session cookie name from the CURRENT env. This is a
  * per-call function (not a module-level constant) so that flipping
@@ -64,6 +67,19 @@ export function getSessionCookieName(isHttps?: boolean): string {
     return isHttps ? SESSION_COOKIE_PROD : SESSION_COOKIE_DEV;
   }
   return process.env.NODE_ENV === "production" ? SESSION_COOKIE_PROD : SESSION_COOKIE_DEV;
+}
+
+/**
+ * Same HTTPS-aware pattern as `getSessionCookieName` but for the admin
+ * impersonation cookie. The `__Secure-` prefix mirrors the same constraint
+ * (browsers require HTTPS when the Secure flag is set). Single source of
+ * truth prevents the secure/name drift bug seen in S3.
+ */
+export function getAdminSessionCookieName(isHttps?: boolean): string {
+  if (typeof isHttps === "boolean") {
+    return isHttps ? ADMIN_SESSION_COOKIE_PROD : ADMIN_SESSION_COOKIE_DEV;
+  }
+  return process.env.NODE_ENV === "production" ? ADMIN_SESSION_COOKIE_PROD : ADMIN_SESSION_COOKIE_DEV;
 }
 
 /** 7 days — matches the Session entity's expected lifetime. */
@@ -237,12 +253,13 @@ export async function setAuthCookie(
   target?: CookieTarget,
   options?: { secure?: boolean; isHttps?: boolean },
 ): Promise<void> {
-  // Derive both Secure and the cookie name from a single `isHttps`
-  // signal when available. The two MUST agree (see comment above).
-  const secure =
-    options?.secure ??
-    (typeof options?.isHttps === "boolean" ? options.isHttps : SESSION_COOKIE_OPTIONS.secure);
-  const name = getSessionCookieName(options?.isHttps);
+  // Derive both the Secure flag and the cookie name from a single `isHttps`
+  // signal. The two MUST agree — browsers enforce that a `__Secure-` cookie
+  // is dropped unless Secure is set, and a non-prefixed cookie with Secure
+  // set cannot be set over HTTP. Compute both from the same source.
+  const isHttps = options?.isHttps ?? SESSION_COOKIE_OPTIONS.secure;
+  const secure = options?.secure ?? isHttps;
+  const name = getSessionCookieName(isHttps);
   const cookie = {
     name,
     value: token,

@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/Button";
 import buttonStyles from "@/components/ui/Button.module.css";
 import { studentErrorCopy } from "@/lib/studentErrorCopy";
 import styles from "./EnrollButton.module.css";
+import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 
 type EnrollState = EnrollStudentActionResult | null;
 
@@ -75,15 +76,12 @@ export function EnrollButton({
   if (state && state.ok) {
     return (
       <div className={styles.success} role="status">
-        <svg
+        <CheckCircle
+          size={24}
+          weight="fill"
           className={styles.successIcon}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
+          aria-hidden
+        />
         Enrolled! Check your dashboard.
       </div>
     );

@@ -15,6 +15,7 @@
  *  - Cursor-based pagination
  */
 
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -181,10 +182,10 @@ export default async function AdminRefundsPage({ searchParams }: PageProps) {
           </span>
           {nextLink !== null ? (
             <Link href={nextLink} className={styles.nextButton}>
-              Next →
+              Next{" "}<ArrowRight size={16} aria-hidden />
             </Link>
           ) : (
-            <span className={styles.nextButtonDisabled}>Next →</span>
+            <span className={styles.nextButtonDisabled}>Next{" "}<ArrowRight size={16} aria-hidden /></span>
           )}
         </div>
       </Card>

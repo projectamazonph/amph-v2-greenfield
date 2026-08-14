@@ -49,13 +49,22 @@ export default async function AdminAuditLogPage({ searchParams }: PageProps) {
 
   const container = buildContainer();
 
+  // M9 fix: validate date range before passing to the use case
+  let dateRangeError: string | null = null;
+  const parsedFrom = params.from ? new Date(params.from) : undefined;
+  const parsedTo = params.to ? new Date(params.to) : undefined;
+  if (parsedFrom && parsedTo && parsedFrom > parsedTo) {
+    dateRangeError = "Start date must be before or on the end date.";
+  }
+
   const filters = {
     actorId: params.actorId || undefined,
     action: params.action && isAuditAction(params.action) ? params.action : undefined,
     targetType: params.targetType || undefined,
     targetId: params.targetId || undefined,
-    from: params.from ? new Date(params.from) : undefined,
-    to: params.to ? new Date(params.to) : undefined,
+    // Only apply date filters if validation passes
+    from: dateRangeError ? undefined : parsedFrom,
+    to: dateRangeError ? undefined : parsedTo,
     cursor: params.cursor || undefined,
     limit: 50,
   };
@@ -73,19 +82,15 @@ export default async function AdminAuditLogPage({ searchParams }: PageProps) {
     );
   }
 
-  // Batch-fetch actor emails for all distinct actorIds in this page
-  const actorIds = [...new Set(result.value.entries.map((e) => e.actorId))];
+  // Batch-fetch actor emails for all distinct actorIds in this page (H3 fix: single query, not N)
+  const actorIds = [...new Set(result.value.entries.map((e) => e.actorId))].filter(Boolean) as string[];
+  const actorResult = actorIds.length > 0 ? await container.userRepo.findByIds(actorIds) : { ok: true as const, value: [] as const };
   const actorEmails = new Map<string, string>();
-  await Promise.all(
-    actorIds.map(async (id) => {
-      if (id) {
-        const userResult = await container.userRepo.findById(id);
-        if (userResult.ok) {
-          actorEmails.set(id, userResult.value.email);
-        }
-      }
-    }),
-  );
+  if (actorResult.ok) {
+    for (const user of actorResult.value) {
+      actorEmails.set(user.id, user.email);
+    }
+  }
 
   const rows: AuditLogRow[] = result.value.entries.map((e) => ({
     id: e.id,
@@ -111,6 +116,12 @@ export default async function AdminAuditLogPage({ searchParams }: PageProps) {
   return (
     <div>
       <TopBar title="Audit Log" subtitle={`${result.value.total.toLocaleString()} total entries`} />
+
+      {dateRangeError && (
+        <p className={styles.error} role="alert">
+          {dateRangeError}
+        </p>
+      )}
 
       <form method="get" className={styles.filters}>
         <div className={styles.filterRow}>

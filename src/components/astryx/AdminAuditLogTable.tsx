@@ -11,6 +11,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { Table, type TableColumn, Badge } from "@astryxdesign/core";
 import type { AuditAction } from "@/domain/values/AuditAction";
@@ -56,7 +57,7 @@ function buildColumns(
       renderCell: (row) => {
         const d = new Date(row.occurredAt);
         return (
-          <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
             {d.toLocaleDateString("en-US", { dateStyle: "short" })}&nbsp;
             {d.toLocaleTimeString("en-US", { timeStyle: "short", hour12: false })}
           </span>
@@ -69,9 +70,7 @@ function buildColumns(
       width: { type: "proportional", value: 1.5 },
       renderCell: (row) =>
         row.actorEmail ? (
-          <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
-            {row.actorEmail}
-          </span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.actorEmail}</span>
         ) : (
           <span style={{ color: "var(--ink-500)", fontStyle: "italic", fontSize: 12 }}>
             {row.actorId}
@@ -89,9 +88,7 @@ function buildColumns(
       header: "Target Type",
       width: { type: "pixel", value: 110 },
       renderCell: (row) => (
-        <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
-          {row.targetType}
-        </span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.targetType}</span>
       ),
     },
     {
@@ -99,7 +96,7 @@ function buildColumns(
       header: "Target ID",
       width: { type: "pixel", value: 140 },
       renderCell: (row) => (
-        <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.targetId}</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.targetId}</span>
       ),
     },
     {
@@ -181,7 +178,11 @@ export function AdminAuditLogTable({
     : null;
 
   return (
-    <div>
+    // L11 fix: <figcaption> provides WCAG 1.3.1 accessible name for the table.
+    // Visually hidden (sr-only) so it doesn't disrupt the layout. The scope="col"
+    // on header cells is set by the TableColumn definition (Astryx Table handles this).
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Audit log entries</figcaption>
       <Table
         data={rows}
         columns={buildColumns(expandedId, setExpandedId)}
@@ -214,7 +215,7 @@ export function AdminAuditLogTable({
                 padding: "var(--space-4)",
                 background: "var(--surface-2)",
                 borderBottom: "1px solid var(--border)",
-                fontFamily: "var(--font-family-code)",
+                fontFamily: "var(--font-mono)",
                 fontSize: 12,
               }}
             >
@@ -272,7 +273,7 @@ export function AdminAuditLogTable({
                   fontSize: 13,
                 }}
               >
-                ← Previous
+                <ArrowLeft size={16} aria-hidden /> Previous
               </Link>
             ) : (
               <span
@@ -285,7 +286,7 @@ export function AdminAuditLogTable({
                   fontSize: 13,
                 }}
               >
-                ← Previous
+                <ArrowLeft size={16} aria-hidden /> Previous
               </span>
             )}
             {nextParams !== null ? (
@@ -301,7 +302,7 @@ export function AdminAuditLogTable({
                   fontSize: 13,
                 }}
               >
-                Next →
+                Next <ArrowRight size={16} aria-hidden />
               </Link>
             ) : (
               <span
@@ -314,12 +315,12 @@ export function AdminAuditLogTable({
                   fontSize: 13,
                 }}
               >
-                Next →
+                Next <ArrowRight size={16} aria-hidden />
               </span>
             )}
           </div>
         </div>
       )}
-    </div>
+    </figure>
   );
 }

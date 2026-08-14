@@ -7,6 +7,7 @@
  * remains on the course detail page so course metadata saves stay focused.
  */
 
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
@@ -63,7 +64,7 @@ export default async function EditCoursePage({ params }: PageProps) {
   return (
     <div>
       <Link href={`/admin/courses/${id}`} className={styles.backLink}>
-        ← Back to course
+        <ArrowLeft size={16} aria-hidden />{" "}Back to course
       </Link>
 
       <TopBar title={`Edit: ${course.title}`} subtitle={course.slug} />

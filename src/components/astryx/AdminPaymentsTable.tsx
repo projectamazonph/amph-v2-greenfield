@@ -8,6 +8,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Table,
   type TableColumn,
@@ -34,6 +35,11 @@ interface AdminPaymentsTableProps {
   filters: {
     status?: PaymentStatus;
     email?: string;
+  };
+  pagination: {
+    total: number;
+    page: number;
+    pageSize: number;
   };
 }
 
@@ -71,7 +77,7 @@ const COLUMNS: TableColumn<PaymentRow>[] = [
     header: "User",
     width: { type: "proportional", value: 2 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.userEmail}</span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.userEmail}</span>
     ),
   },
   {
@@ -79,7 +85,7 @@ const COLUMNS: TableColumn<PaymentRow>[] = [
     header: "Course",
     width: { type: "proportional", value: 1 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.courseId}</span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.courseId}</span>
     ),
   },
   {
@@ -87,7 +93,7 @@ const COLUMNS: TableColumn<PaymentRow>[] = [
     header: "Amount",
     width: { type: "pixel", value: 100 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
         {formatPhp(row.totalMinor)}
       </span>
     ),
@@ -130,24 +136,35 @@ const COLUMNS: TableColumn<PaymentRow>[] = [
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function AdminPaymentsTable({ payments, filters }: AdminPaymentsTableProps) {
-  const totalCount = payments.length;
-  const pageSize = 25;
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const page = 1;
+export function AdminPaymentsTable({ payments, filters, pagination }: AdminPaymentsTableProps) {
+  const router = useRouter();
+
+  function buildPageUrl(newPage: number) {
+    const p = new URLSearchParams();
+    if (filters.status) p.set("status", filters.status);
+    if (filters.email) p.set("email", filters.email);
+    if (newPage > 1) p.set("page", String(newPage));
+    return `/admin/payments?${p.toString()}`;
+  }
+
+  function handlePageChange(newPage: number) {
+    router.push(buildPageUrl(newPage));
+  }
 
   const paginationPlugin = useTablePagination({
-    page,
-    onPageChange: () => {},
-    totalItems: totalCount,
-    pageSize,
+    page: pagination.page,
+    onPageChange: handlePageChange,
+    totalItems: pagination.total,
+    pageSize: pagination.pageSize,
     variant: "pages",
     position: "below",
     align: "center",
   }) as unknown as TablePlugin<PaymentRow>;
 
   return (
-    <>
+    // L11 fix: <figcaption> provides WCAG 1.3.1 accessible name for the table.
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Payment orders</figcaption>
       <Table
         data={payments}
         columns={COLUMNS}
@@ -170,6 +187,6 @@ export function AdminPaymentsTable({ payments, filters }: AdminPaymentsTableProp
           No orders match the current filters.
         </p>
       )}
-    </>
+    </figure>
   );
 }

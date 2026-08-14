@@ -114,6 +114,42 @@ export class PrismaOrderRepository implements IOrderRepository {
     }
   }
 
+  async listPaginated(filters: {
+    status?: PaymentStatus;
+    page?: number;
+    pageSize?: number;
+  }): Promise<
+    Result<{ orders: readonly Order[]; total: number; page: number; pageSize: number }, OrderError>
+  > {
+    const page = Math.max(1, Math.floor(filters.page ?? 1));
+    const rawPageSize = Math.max(1, Math.floor(filters.pageSize ?? 25));
+    // Cap pageSize at 50 server-side to prevent runaway queries
+    const pageSize = Math.min(rawPageSize, 50);
+    const skip = (page - 1) * pageSize;
+
+    try {
+      const [rows, total] = await Promise.all([
+        this.db.order.findMany({
+          where: filters.status ? { status: filters.status } : undefined,
+          orderBy: { createdAt: "desc" },
+          take: pageSize,
+          skip,
+        }),
+        this.db.order.count({
+          where: filters.status ? { status: filters.status } : undefined,
+        }),
+      ]);
+      return Result.ok({
+        orders: rows.map((r) => this.mapRow(r)),
+        total,
+        page,
+        pageSize,
+      });
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   // STORY-062: admin list of refund requests. A refund request is any
   // order with refundRequestedAt IS NOT NULL. Filter by `status` to
   // distinguish pending (no refundProcessedAt) from processed
