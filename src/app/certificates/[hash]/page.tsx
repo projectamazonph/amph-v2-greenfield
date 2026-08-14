@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!result.ok) {
     return {
-      title: "Certificate Not Found — Project Amazon PH Academy",
+      title: "Certificate Not Found | Project Amazon PH Academy",
       description: "This certificate could not be verified.",
     };
   }
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const fullName = `${user.firstName} ${user.lastName}`.trim();
 
   return {
-    title: `${fullName} — ${course.title} Certificate | Project Amazon PH Academy`,
+    title: `${fullName} | ${course.title} Certificate | Project Amazon PH Academy`,
     description: `Certificate of completion for ${course.title}, awarded to ${fullName}.`,
     robots: { index: true, follow: true },
   };

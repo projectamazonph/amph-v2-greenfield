@@ -6,6 +6,7 @@
  * existing questions/options as `initial`, and posts to updateQuizAction.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -64,7 +65,7 @@ export default async function EditQuizPage({ params, searchParams }: PageProps) 
   return (
     <div>
       <Link href="/admin/quizzes" className={styles.backLink}>
-        ← Back to quizzes
+        <ArrowLeft size={16} aria-hidden /> Back to quizzes
       </Link>
 
       <TopBar

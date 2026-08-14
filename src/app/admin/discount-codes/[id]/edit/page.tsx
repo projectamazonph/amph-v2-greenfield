@@ -4,6 +4,7 @@
  * STORY-050d. Server component.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -46,7 +47,7 @@ export default async function EditDiscountCodePage({ params, searchParams }: Pag
   return (
     <div>
       <Link href="/admin/discount-codes" className={styles.backLink}>
-        ← Back to discount codes
+        <ArrowLeft size={16} aria-hidden /> Back to discount codes
       </Link>
 
       <TopBar title={`Edit: ${dc.code}`} subtitle={dc.id} />

@@ -14,6 +14,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -75,7 +76,7 @@ export default async function AdminCertificateDetailPage({ params, searchParams 
   return (
     <div>
       <Link href="/admin/certificates" className={styles.backLink}>
-        ← Back to certificates
+        <ArrowLeft size={16} aria-hidden /> Back to certificates
       </Link>
 
       <TopBar
@@ -104,7 +105,7 @@ export default async function AdminCertificateDetailPage({ params, searchParams 
           <p className={styles.success}>
             <strong>Certificate revoked.</strong>{" "}
             {sp.wasAlready
-              ? "(It was already revoked before — the audit log entry is recorded for traceability.)"
+              ? "(It was already revoked before, the audit log entry is recorded for traceability.)"
               : "Public verification page now reflects the revoked status."}
           </p>
         </Card>
@@ -137,7 +138,7 @@ export default async function AdminCertificateDetailPage({ params, searchParams 
                   })}
                 </dd>
                 <dt>Revoked reason</dt>
-                <dd>{certificate.revokedReason ?? "—"}</dd>
+                <dd>{certificate.revokedReason ?? "(none)"}</dd>
               </>
             )}
           </dl>
@@ -209,7 +210,7 @@ export default async function AdminCertificateDetailPage({ params, searchParams 
                 })}
               </strong>{" "}
               for: <strong>{certificate.revokedReason ?? "(no reason recorded)"}</strong>. The
-              action is idempotent — re-revoking does nothing destructive.
+              action is idempotent; re-revoking does nothing destructive.
             </p>
           </Card>
         )}

@@ -143,9 +143,9 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
             <dt>Slug</dt>
             <dd className={styles.mono}>{course.slug}</dd>
             <dt>Tagline</dt>
-            <dd>{course.tagline || <em className={styles.muted}>—</em>}</dd>
+            <dd>{course.tagline || <em className={styles.muted}>(none)</em>}</dd>
             <dt>Description</dt>
-            <dd>{course.description || <em className={styles.muted}>—</em>}</dd>
+            <dd>{course.description || <em className={styles.muted}>(none)</em>}</dd>
             <dt>Created</dt>
             <dd className={styles.mono}>{createdDate}</dd>
           </dl>
@@ -169,7 +169,7 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
                   {course.coverImage}
                 </a>
               ) : (
-                <em className={styles.muted}>—</em>
+                <em className={styles.muted}>(none)</em>
               )}
             </dd>
           </dl>

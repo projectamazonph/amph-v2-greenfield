@@ -38,7 +38,7 @@ export function SignupForm({
   const errorText = errorKind ? (errorMessage[errorKind] ?? null) : null;
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.logo}>Project Amazon PH Academy</div>

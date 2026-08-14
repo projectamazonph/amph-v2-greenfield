@@ -291,7 +291,7 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
                 {attempt.keywords.map((k) => (
                   <tr key={k.normalizedTerm}>
                     <td className={styles.tdKw}>{k.term}</td>
-                    <td>{k.userIntent ?? "—"}</td>
+                    <td>{k.userIntent ?? "(none)"}</td>
                     <td>{k.groundTruthIntent}</td>
                     <td>
                       <span

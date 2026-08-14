@@ -41,7 +41,7 @@ export default async function PricingPage() {
   const tiers = result.ok ? result.value.tiers : [];
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <header className={styles.header}>
         <span className={styles.eyebrow}>Pricing</span>
         <h1 className={styles.title}>Three tiers, one-time payment.</h1>

@@ -5,6 +5,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -44,12 +45,12 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
   return (
     <div>
       <Link href="/admin/simulators" className={formStyles.backLink}>
-        ← Back to scenarios
+        <ArrowLeft size={16} aria-hidden /> Back to scenarios
       </Link>
 
       <TopBar
         title="Add scenario"
-        subtitle="Creates a new draft scenario family — publish it from the version history view to make it live"
+        subtitle="Creates a new draft scenario family. Publish it from the version history view to make it live."
       />
 
       {errorMsg && (
@@ -79,7 +80,7 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
           <label className={formStyles.field}>
             <span className={formStyles.label}>Simulator *</span>
             <select name="simulatorId" required className={formStyles.select}>
-              <option value="">— Select simulator —</option>
+              <option value="">Select simulator</option>
               {SIMULATOR_IDS.map((id) => (
                 <option key={id} value={id}>
                   {id}
@@ -114,7 +115,7 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
           <label className={formStyles.field}>
             <span className={formStyles.label}>Difficulty *</span>
             <select name="difficulty" required className={formStyles.select}>
-              <option value="">— Select difficulty —</option>
+              <option value="">Select difficulty</option>
               {DIFFICULTIES.map((d) => (
                 <option key={d} value={d}>
                   {d}

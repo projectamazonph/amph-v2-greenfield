@@ -37,10 +37,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const container = buildContainer();
   const result = await container.getCatalogCourse.execute(slug);
-  if (!result.ok) return { title: "Course Not Found — Project Amazon PH Academy" };
+  if (!result.ok) return { title: "Course Not Found | Project Amazon PH Academy" };
   const detail = result.value;
   return {
-    title: `${detail.title} — Project Amazon PH Academy`,
+    title: `${detail.title} | Project Amazon PH Academy`,
     description: detail.tagline || detail.description.slice(0, 160),
   };
 }

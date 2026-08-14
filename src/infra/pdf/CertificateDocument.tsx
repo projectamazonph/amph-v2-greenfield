@@ -112,7 +112,7 @@ export function CertificateDocument({ input }: { input: CertificateRenderInput }
         <View style={styles.border}>
           <Text style={styles.brand}>PROJECT AMAZON PH ACADEMY</Text>
           <Text style={styles.title}>Certificate of Completion</Text>
-          <Text style={styles.subtitle}>— awarded for excellence —</Text>
+          <Text style={styles.subtitle}>awarded for excellence</Text>
 
           <Text style={styles.preamble}>This is to certify that</Text>
           <Text style={styles.recipient}>{fullName}</Text>

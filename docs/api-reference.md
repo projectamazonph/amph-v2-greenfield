@@ -1,6 +1,6 @@
 # API and runtime inventory
 
-**Reviewed:** 2026-08-12 against `ee1737a`
+**Reviewed:** 2026-08-14 against `6c61fc3`
 **Application:** Project Amazon PH Academy v2  
 **Source of truth:** `src/app/`, `src/app/actions/`, `src/usecases/`, `src/ports/`, `src/composition/container.ts`, and `prisma/schema.prisma`.
 
@@ -38,52 +38,61 @@ The ESLint boundary tests enforce the direction. `src/composition/container.ts` 
 
 ### Public and account pages
 
-| Path                      | File                                      |
-| ------------------------- | ----------------------------------------- |
-| `/`                       | `src/app/page.tsx`                        |
-| `/pricing`                | `src/app/pricing/page.tsx`                |
-| `/courses`                | `src/app/courses/page.tsx`                |
-| `/courses/[slug]`         | `src/app/courses/[slug]/page.tsx`         |
-| `/signup`                 | `src/app/signup/page.tsx`                 |
-| `/login`                  | `src/app/login/page.tsx`                  |
-| `/admin-login`            | `src/app/admin-login/page.tsx`            |
-| `/verify-email`           | `src/app/verify-email/page.tsx`           |
-| `/verify-email/sent`      | `src/app/verify-email/sent/page.tsx`      |
-| `/reset-password`         | `src/app/reset-password/page.tsx`         |
-| `/reset-password/[token]` | `src/app/reset-password/[token]/page.tsx` |
-| `/checkout`               | `src/app/checkout/page.tsx`               |
-| `/checkout/success`       | `src/app/checkout/success/page.tsx`       |
-| `/checkout/failed`        | `src/app/checkout/failed/page.tsx`        |
-| `/certificates/[hash]`    | `src/app/certificates/[hash]/page.tsx`    |
+| Path                               | File                                               |
+| ---------------------------------- | -------------------------------------------------- |
+| `/`                                | `src/app/page.tsx`                                 |
+| `/pricing`                         | `src/app/pricing/page.tsx`                         |
+| `/courses`                         | `src/app/courses/page.tsx`                         |
+| `/courses/[slug]`                  | `src/app/courses/[slug]/page.tsx`                  |
+| `/signup`                          | `src/app/signup/page.tsx`                          |
+| `/login`                           | `src/app/login/page.tsx`                           |
+| `/admin-login`                     | `src/app/admin-login/page.tsx`                     |
+| `/verify-email`                    | `src/app/verify-email/page.tsx`                    |
+| `/verify-email/sent`               | `src/app/verify-email/sent/page.tsx`               |
+| `/reset-password`                  | `src/app/reset-password/page.tsx`                  |
+| `/reset-password/[token]`          | `src/app/reset-password/[token]/page.tsx`          |
+| `/checkout`                        | `src/app/checkout/page.tsx`                        |
+| `/checkout/success`                | `src/app/checkout/success/page.tsx`                |
+| `/checkout/failed`                 | `src/app/checkout/failed/page.tsx`                 |
+| `/certificates/[hash]`             | `src/app/certificates/[hash]/page.tsx`             |
+| `/faq`                             | `src/app/faq/page.tsx`                             |
+| `/courses/[slug]/quizzes/[quizId]` | `src/app/courses/[slug]/quizzes/[quizId]/page.tsx` |
 
 ### Student pages
 
 - `/dashboard`
-- `/profile`
+- `/profile`, `/profile/data`, `/profile/purchases`, `/profile/security`, `/profile/security/2fa-setup`
+- `/certificates` — student-facing list of issued certificates
+- `/resources` — download center (STORY-098): guides, templates, automation tools, handouts, cheat sheets, grouped by category and gated by `CourseAccessTier`
+- `/live-classes`, `/live-classes/[id]` — student-facing schedule and join link
 - `/courses/[slug]/lessons/[lessonId]`
-- `/courses/[slug]/lessons/[lessonId]/quiz`
-- `/tools`
+- `/courses/[slug]/lessons/[lessonId]/quiz` — legacy redirect to `/courses/[slug]/quizzes/[quizId]`
+- `/courses/[slug]/quizzes/[quizId]` — canonical quiz-attempt page
+- `/tools` — practice-simulator index
 - `/tools/bid-elevator`
 - `/tools/str-triage`
 - `/tools/campaign-builder`
 - `/tools/listing-audit`
 - `/tools/keyword-research`
-- `/resources` — download center (STORY-098): guides, templates, automation tools, handouts, cheat sheets, grouped by category and gated by `CourseAccessTier`
+- `/tools/ad-console` — iframe embed of the external Amazon Ad Console (not a simulator; AMPH does not proxy or store anything entered inside it)
 
 ### Admin pages
 
 All pages under `/admin` inherit `requireAdmin()` from `src/app/admin/layout.tsx`.
 
 - `/admin`
-- `/admin/users`, `/admin/users/[id]`
+- `/admin/users`, `/admin/users/new`, `/admin/users/[id]`
 - `/admin/courses`, `/admin/courses/new`, `/admin/courses/[id]`, `/admin/courses/[id]/edit`
 - `/admin/courses/[id]/modules/new`
 - `/admin/courses/[id]/modules/[moduleId]`, `/edit`
 - `/admin/courses/[id]/modules/[moduleId]/lessons/new`
 - `/admin/courses/[id]/modules/[moduleId]/lessons/[lessonId]`, `/edit`
+- `/admin/quizzes`, `/admin/quizzes/new`, `/admin/quizzes/[quizId]/edit` — quiz CRUD
+- `/admin/certificates`, `/admin/certificates/[id]` — admin list with active/revoked tabs and per-row revoke flow
+- `/admin/content` — counts dashboard (courses, modules, lessons, quizzes, downloads)
 - `/admin/payments`, `/admin/payments/[id]`
 - `/admin/refunds`, `/admin/refunds/[orderId]`
-- `/admin/simulators`, `/admin/simulators/new`, `/admin/simulators/[id]/edit`
+- `/admin/simulators`, `/admin/simulators/new`, `/admin/simulators/[id]/edit`, `/admin/simulators/[id]/versions` — version history
 - `/admin/live-classes`, `/admin/live-classes/new`, `/admin/live-classes/[id]/edit`
 - `/admin/resources`, `/admin/resources/new`, `/admin/resources/[id]/edit` — download-center CRUD (STORY-098)
 - `/admin/discount-codes`, `/new`, `/[id]/edit`
@@ -102,10 +111,12 @@ Email-template UI routes are `/admin/email-templates` and `/admin/email-template
 | `POST /api/auth/admin-login`               | Login with an admin-role check                                                                                                         |
 | `POST /api/auth/logout`                    | Clear the session cookie                                                                                                               |
 | `GET /api/health`                          | Liveness response and version; no database probe                                                                                       |
+| `GET /api/health/ready`                    | Readiness probe: connects to Postgres through the database health-check port                                                           |
 | `GET, POST /api/cron/live-class-reminders` | Cron health check and protected reminder execution                                                                                     |
 | `POST /api/quizzes/[quizId]/attempt`       | Quiz attempt submission                                                                                                                |
 | `GET /api/resources/[id]/download`         | Re-checks access, records the download, 302-redirects to the resource's `fileUrl` (relative paths resolved against the request origin) |
 | `POST /api/webhooks/paymongo`              | Signature-verified PayMongo webhook processing                                                                                         |
+| `POST /api/webhooks/resend/webhook`        | Inbound Resend delivery/bounce/spam events; updates message rows                                                                       |
 | `POST /actions/verifyEmail`                | Email verification action route                                                                                                        |
 | `GET /admin/audit-log/export`              | CSV audit-log export                                                                                                                   |
 | `GET /certificates/[hash]/pdf`             | Certificate PDF response                                                                                                               |

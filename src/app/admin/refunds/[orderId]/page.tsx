@@ -7,6 +7,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -60,7 +61,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Pa
   return (
     <div>
       <Link href="/admin/refunds" className={styles.backLink}>
-        ← Back to refund requests
+        <ArrowLeft size={16} aria-hidden /> Back to refund requests
       </Link>
 
       <TopBar
@@ -112,7 +113,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Pa
                     dateStyle: "medium",
                     timeStyle: "short",
                   })
-                : "—"}
+                : "(none)"}
             </dd>
             <dt>Student reason</dt>
             <dd>{order.refundReason ?? <span className={styles.muted}>(none provided)</span>}</dd>
@@ -129,7 +130,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Pa
                 <dd className={styles.mono}>
                   {order.refundAmountMinor !== null
                     ? formatPhp(order.refundAmountMinor / 100)
-                    : "—"}
+                    : "(none)"}
                 </dd>
               </>
             )}
@@ -203,7 +204,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Pa
             </p>
             <form action={handleProcessRefund} className={styles.form}>
               <button type="submit" className={styles.refundButton}>
-                Process refund — {formatPhp(order.totalMinor / 100)}
+                Process refund: {formatPhp(order.totalMinor / 100)}
               </button>
             </form>
           </Card>
@@ -220,7 +221,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Pa
               })}{" "}
               for{" "}
               <strong>
-                {order.refundAmountMinor !== null ? formatPhp(order.refundAmountMinor / 100) : "—"}
+                {order.refundAmountMinor !== null ? formatPhp(order.refundAmountMinor / 100) : "(none)"}
               </strong>
               .
             </p>
@@ -229,7 +230,7 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Pa
 
         <div className={styles.fullSpan}>
           <Link href={`/admin/payments/${order.id}`} className={styles.viewOrderLink}>
-            View full order →
+            <ArrowRight size={16} weight="bold" aria-hidden="true" /> View full order
           </Link>
         </div>
       </div>

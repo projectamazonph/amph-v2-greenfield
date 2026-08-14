@@ -106,7 +106,7 @@ function buildColumns(
       renderCell: (row) => {
         const keys = Object.keys(row.metadata ?? {});
         if (keys.length === 0) {
-          return <span style={{ color: "var(--ink-500)", fontSize: 12 }}>—</span>;
+          return <span style={{ color: "var(--ink-500)", fontSize: 12 }}>(none)</span>;
         }
         const isExpanded = expandedId === row.id;
         return (
@@ -229,7 +229,7 @@ export function AdminAuditLogTable({
                   letterSpacing: "0.05em",
                 }}
               >
-                Metadata — {row.id}
+                Metadata ({row.id})
               </div>
               <pre
                 style={{

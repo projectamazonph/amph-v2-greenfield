@@ -29,7 +29,7 @@ export default function HomePage() {
       <div className={shared.contentLayer}>
         <TopBar />
         <Ticker />
-        <main>
+        <main id="main-content" tabIndex={-1}>
           <Hero />
           <StatsStrip />
           <Method />

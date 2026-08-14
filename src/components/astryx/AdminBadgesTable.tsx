@@ -33,7 +33,7 @@ const COLUMNS: TableColumn<BadgeRow>[] = [
     header: "Slug",
     width: { type: "proportional", value: 1 },
     renderCell: (row) => (
-      <code style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.slug}</code>
+      <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.slug}</code>
     ),
   },
   {
@@ -56,7 +56,7 @@ const COLUMNS: TableColumn<BadgeRow>[] = [
     header: "Icon",
     width: { type: "pixel", value: 80 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.iconName}</span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.iconName}</span>
     ),
   },
   {
@@ -64,7 +64,7 @@ const COLUMNS: TableColumn<BadgeRow>[] = [
     header: "XP",
     width: { type: "pixel", value: 60 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>+{row.xpReward}</span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>+{row.xpReward}</span>
     ),
   },
   {

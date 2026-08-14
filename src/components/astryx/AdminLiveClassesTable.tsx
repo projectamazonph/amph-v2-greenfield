@@ -51,7 +51,7 @@ const COLUMNS: TableColumn<LiveClassRow>[] = [
     header: "Course",
     width: { type: "proportional", value: 1 },
     renderCell: (row) => (
-      <code style={{ fontFamily: "var(--font-family-code)", fontSize: 12 }}>{row.courseId}</code>
+      <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.courseId}</code>
     ),
   },
   {

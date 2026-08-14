@@ -45,7 +45,7 @@ export function LoginForm({
   const needsTotp = errorKind === "totp_required" || errorKind === "invalid_totp_code";
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.logo}>Project Amazon PH Academy</div>

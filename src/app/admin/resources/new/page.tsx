@@ -4,6 +4,7 @@
  * STORY-098. Server component.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { createResourceAction } from "@/app/actions/createResource.action";
 import { requireAdmin } from "@/lib/auth";
@@ -51,7 +52,7 @@ export default async function NewResourcePage({ searchParams }: PageProps) {
   return (
     <div>
       <Link href="/admin/resources" className={styles.backLink}>
-        ← Back to download center
+        <ArrowLeft size={16} aria-hidden /> Back to download center
       </Link>
 
       <TopBar

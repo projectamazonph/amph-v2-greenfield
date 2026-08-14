@@ -4,6 +4,18 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-14: Architecture documentation refresh
+
+- Synced `docs/architecture/03-site-map.md`, `docs/architecture/02-admin-panel-wiring.md`,
+  `docs/architecture/01-layer-wiring.md`, the architecture README, and
+  `docs/api-reference.md` against the App Router tree and route handlers as of
+  `6c61fc3`. Added the previously undocumented routes for student profile
+  sub-pages, student certificates list, student live-classes, the
+  `/courses/[slug]/quizzes/[quizId]` canonical quiz page, the `/tools/ad-console`
+  external embed, admin user create, admin quiz CRUD, admin certificates, admin
+  content dashboard, admin simulator version history, the resource download
+  endpoint, the Resend webhook, and the readiness probe. No code changes.
+
 ### 2026-08-13: Admin event boundary coverage
 
 - Added direct boundary tests for admin course, module, lesson, simulator,

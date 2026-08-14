@@ -79,7 +79,7 @@ export default async function EmailTemplatesPage() {
                     </span>
                   </td>
                   <td className={styles.date}>
-                    {row.template ? row.template.updatedAt.toLocaleDateString() : "—"}
+                    {row.template ? row.template.updatedAt.toLocaleDateString() : "Never"}
                   </td>
                   <td className={styles.actions}>
                     <Link

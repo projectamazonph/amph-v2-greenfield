@@ -69,8 +69,13 @@ describe("public accessibility release gates", () => {
     const login = await source("src/app/login/LoginForm.tsx");
     const signup = await source("src/app/signup/SignupForm.tsx");
 
-    expect(login).toContain("<main className={styles.page}>");
-    expect(signup).toContain("<main className={styles.page}>");
+    // Accept either the plain landmark form or the variant that exposes
+    // the skip-link target (id="main-content" tabIndex={-1}) — both keep
+    // the form inside a <main> landmark and satisfy WCAG 2.4.1. The
+    // accessible variant is preferred so the layout's skip-link lands
+    // on the form's main region instead of an off-screen anchor.
+    expect(login).toMatch(/<main\b[^>]*className=\{styles\.page\}/);
+    expect(signup).toMatch(/<main\b[^>]*className=\{styles\.page\}/);
   });
 
   it("keeps the course catalog error state headed", async () => {

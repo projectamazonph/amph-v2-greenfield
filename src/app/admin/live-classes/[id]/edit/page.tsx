@@ -4,6 +4,7 @@
  * STORY-050c. Server component.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -51,7 +52,7 @@ export default async function EditLiveClassPage({ params, searchParams }: PagePr
   return (
     <div>
       <Link href="/admin/live-classes" className={styles.backLink}>
-        ← Back to live classes
+        <ArrowLeft size={16} aria-hidden /> Back to live classes
       </Link>
 
       <TopBar title={`Edit: ${lc.title}`} subtitle={lc.id} />

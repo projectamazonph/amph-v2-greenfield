@@ -10,6 +10,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
@@ -21,9 +22,9 @@ import styles from "./page.module.css";
 
 const errorMessage: Record<string, string> = {
   invalid_code: "That code didn't match. Check your authenticator app and try again.",
-  no_pending_secret: "No pending setup found — start over below.",
-  user_not_found: "Something went wrong — please try again.",
-  db_error: "Something went wrong — please try again.",
+  no_pending_secret: "No pending setup found. Start over below.",
+  user_not_found: "Something went wrong. Please try again.",
+  db_error: "Something went wrong. Please try again.",
 };
 
 export default async function TwoFactorSetupPage({
@@ -57,7 +58,7 @@ export default async function TwoFactorSetupPage({
   return (
     <div>
       <Link href="/admin/settings" className={styles.backLink}>
-        ← Back to settings
+        <ArrowLeft size={16} aria-hidden /> Back to settings
       </Link>
 
       <TopBar

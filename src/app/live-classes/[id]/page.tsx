@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Class not found" };
   }
   return {
-    title: `${r.value.title} — Live class — Project Amazon PH Academy`,
+    title: `${r.value.title} | Live class | Project Amazon PH Academy`,
     description: `${r.value.durationMinutes} minute live class on ${r.value.scheduledAt.toLocaleString("en-US", { dateStyle: "long" })}.`,
   };
 }

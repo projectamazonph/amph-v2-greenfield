@@ -5,6 +5,7 @@
  */
 
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
@@ -56,7 +57,7 @@ export default async function EditModulePage({ params }: PageProps) {
   return (
     <div>
       <Link href={`/admin/courses/${courseId}/modules/${moduleId}`} className={styles.backLink}>
-        ← Back to module
+        <ArrowLeft size={16} aria-hidden /> Back to module
       </Link>
 
       <TopBar title={`Edit "${moduleEntity.title}"`} />

@@ -4,6 +4,7 @@
  * STORY-050c. Server component.
  */
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { createLiveClassAction } from "@/app/actions/createLiveClass.action";
 import { requireAdmin } from "@/lib/auth";
@@ -33,7 +34,7 @@ export default async function NewLiveClassPage({ searchParams }: PageProps) {
   return (
     <div>
       <Link href="/admin/live-classes" className={styles.backLink}>
-        ← Back to live classes
+        <ArrowLeft size={16} aria-hidden /> Back to live classes
       </Link>
 
       <TopBar title="Add live class" subtitle="Schedule a new live class session" />
@@ -67,7 +68,7 @@ export default async function NewLiveClassPage({ searchParams }: PageProps) {
               required
               maxLength={120}
               className={styles.input}
-              placeholder="e.g. Advanced PPC Strategies — Q&A"
+              placeholder="e.g. Advanced PPC Strategies, Q&A session"
             />
           </label>
 
