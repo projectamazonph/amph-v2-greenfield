@@ -163,7 +163,7 @@ function CourseCard({
               letterSpacing: "0.05em",
               padding: "2px 6px",
               background: "var(--success-soft)",
-              color: "var(--success-text)",
+              color: "var(--success)",
               borderRadius: "4px",
               marginBottom: "var(--space-2)",
             }}

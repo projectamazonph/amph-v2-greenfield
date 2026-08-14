@@ -125,7 +125,7 @@ const PAGE_STYLES: Record<string, React.CSSProperties> = {
   alertError: {
     background: "var(--danger-soft)",
     color: "var(--danger)",
-    borderColor: "var(--color-error)",
+    borderColor: "var(--danger)",
   },
   alertInfo: {
     background: "var(--accent-soft)",
