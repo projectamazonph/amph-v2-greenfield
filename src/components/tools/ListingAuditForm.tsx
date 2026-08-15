@@ -198,7 +198,12 @@ export function ListingAuditForm({
       ) : null}
       <div className={styles.footer}>
         {isEditing ? (
-          <button type="submit" className={styles.submit} disabled={pending}>
+          <button
+            type="submit"
+            className={styles.submit}
+            disabled={pending}
+            aria-busy={pending}
+          >
             {pending ? "Auditing…" : "Run audit"}
           </button>
         ) : (
@@ -209,6 +214,7 @@ export function ListingAuditForm({
                 className={styles.submit}
                 onClick={onSubmitForGrading}
                 disabled={pending}
+                aria-busy={pending}
               >
                 {pending ? "Grading…" : "Submit for grading"}
               </button>

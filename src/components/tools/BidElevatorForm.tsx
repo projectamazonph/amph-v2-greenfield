@@ -127,7 +127,12 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           {error}
         </p>
       ) : null}
-      <button type="submit" className={styles.submit} disabled={pending}>
+      <button
+        type="submit"
+        className={styles.submit}
+        disabled={pending}
+        aria-busy={pending}
+      >
         {pending ? "Running…" : "Run simulation"}
       </button>
       {simResult ? (
