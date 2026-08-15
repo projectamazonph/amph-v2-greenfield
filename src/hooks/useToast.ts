@@ -15,7 +15,7 @@
  */
 
 import { useState, useCallback, useRef } from "react";
-import type { ToastType } from "@/components/ui/Toast";
+import type { ToastType } from "@/components/ui";
 
 export interface ToastItem {
   id: string;
