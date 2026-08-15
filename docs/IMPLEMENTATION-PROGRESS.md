@@ -253,6 +253,7 @@ ships as its own sub-commit so the diff stays reviewable.
 | 18 | FAQ link on the failed checkout page so stuck students can self-serve | `feat(checkout)` |
 | 19 | Move the action buttons inline style on `/profile` into the CSS module | `refactor(profile)` |
 | 20 | Swap badge dots for real Phosphor icons with slug-based tier color | `polish(profile)` |
+| 21 | Bare "Quiz not found" text on the quiz page replaced with the shared `EmptyState` | `polish(quiz)` |
 
 ### Cancelled
 
@@ -274,6 +275,6 @@ ships as its own sub-commit so the diff stays reviewable.
 |------|------|-------|
 | 2026-07-31 P0/P1/P2 | 59 | 59 |
 | 2026-07-31 P3 enhancement | 34 | 40 |
-| 2026-08-15 student-facing UI | 20 | 20 |
-| **Combined** | **114** | **120** |
+| 2026-08-15 student-facing UI | 21 | 21 |
+| **Combined** | **115** | **121** |
 
