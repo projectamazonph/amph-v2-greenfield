@@ -54,6 +54,10 @@ export default async function CheckoutFailedPage({
           </Link>
         </div>
         {orderId && <p className={styles.orderId}>Order reference: {orderId}</p>}
+        <p className={styles.helpLine}>
+          Still stuck? <Link href="/faq" className={styles.linkSecondary}>Read the FAQ</Link> or
+          reach out. Your order is saved, so we can sort it out together.
+        </p>
       </div>
     </div>
   );
