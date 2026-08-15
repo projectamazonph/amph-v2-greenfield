@@ -34,7 +34,8 @@
   z-index: 999;
   border: 0;
   background: rgba(23, 23, 23, 0.42);
-  backdrop-filter: blur(2px);
+  /* H-04 fix: Field Manual bans glassmorphism / decorative blurs. Drop the
+     blur and let the dim background alone handle the visual separation. */
 }
 
 @media (max-width: 1023px) {

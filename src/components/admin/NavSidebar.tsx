@@ -138,17 +138,7 @@ export function NavSidebar({ user }: NavSidebarProps) {
                   </span>
                   <span className={styles.label}>{item.label}</span>
                   {item.badge ? (
-                    <span
-                      style={{
-                        marginLeft: "auto",
-                        fontSize: "10px",
-                        fontFamily: "var(--font-mono)",
-                        background: "var(--accent)",
-                        color: "var(--accent-ink)",
-                        padding: "1px 6px",
-                        borderRadius: "10px",
-                      }}
-                    >
+                    <span className={styles.badge} aria-label={`${item.badge} pending`}>
                       {item.badge}
                     </span>
                   ) : null}

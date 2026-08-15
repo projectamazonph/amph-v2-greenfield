@@ -181,6 +181,20 @@
   text-overflow: ellipsis;
 }
 
+/* H-17 fix: count badge on a nav item. Token-driven (no raw px, no
+   inline hex). Pill shape with monospaced font to match the section
+   labels. */
+.badge {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  padding: var(--space-1) var(--space-2);
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
 .footer {
   padding: var(--space-4);
   border-top: 1px solid var(--border);
