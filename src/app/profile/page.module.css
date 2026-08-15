@@ -124,6 +124,14 @@
   margin: 0;
 }
 
+/* Action buttons row */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
 /* Buttons */
 
 .btnPrimary {
@@ -143,7 +151,6 @@
   white-space: nowrap;
   transition: background-color var(--duration-base) var(--ease-out),
     box-shadow var(--duration-base) var(--ease-out);
-  margin-top: var(--space-4);
 }
 
 .btnPrimary:hover {

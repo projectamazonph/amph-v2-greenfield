@@ -65,7 +65,7 @@ export default async function ProfilePage() {
             )}
           </section>
         </div>
-        <div style={{ marginTop: "var(--space-8)", display: "flex", gap: "var(--space-3)" }}>
+        <div className={styles.actions}>
           <Link href="/reset-password" className={styles.btnGhost}>
             Change Password
           </Link>
