@@ -1,5 +1,8 @@
 /* ConfirmDialog — native <dialog>-based confirmation prompt.
- * Tokens only. No raw colors. Focus rings on buttons. Backdrop blur. */
+ * Tokens only. No raw colors. Focus rings on buttons. Dim background only.
+ * Field Manual §6 (docs/design-brief.md:15-16 "What This Is NOT") bans
+ * glassmorphism and decorative blurs; the dialog backdrop relies on a flat
+ * 50% ink dim alone for separation, with no backdrop-filter blur applied. */
 
 .dialog {
   border: 1px solid var(--border);
@@ -14,7 +17,8 @@
 
 .dialog::backdrop {
   background: rgba(20, 20, 20, 0.5);
-  backdrop-filter: blur(2px);
+  /* M-R18 fix: Field Manual §6 forbids backdrop-filter (decorative blur).
+     The dim layer alone handles separation. */
 }
 
 .body {
