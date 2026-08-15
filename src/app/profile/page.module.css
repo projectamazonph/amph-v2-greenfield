@@ -107,7 +107,7 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .badgeIcon[data-slug="5-day-streak"] {
