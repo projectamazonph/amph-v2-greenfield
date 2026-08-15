@@ -4,6 +4,14 @@
  * Submits to requestPasswordResetAction. On success, shows
  * "check your email" copy (regardless of whether the email
  * exists, to prevent enumeration).
+ *
+ * M-16 fix: the email field now uses the shared `Input` primitive so
+ * the visual treatment (label / focus ring / height / error styling)
+ * matches the rest of the auth surface (LoginForm, SignupForm,
+ * AdminLoginForm). The form-level error message still renders as its
+ * own alert paragraph because the server action returns a kind
+ * ("rate_limited", "validation_failed") that is independent of the
+ * field state.
  */
 
 "use client";
@@ -13,6 +21,7 @@ import {
   requestPasswordResetAction,
   initialRequestResetState,
 } from "@/app/actions/authPasswordReset.action";
+import { Input } from "@/components/ui";
 import styles from "./ResetRequestForm.module.css";
 
 export function ResetRequestForm() {
@@ -31,17 +40,7 @@ export function ResetRequestForm() {
 
   return (
     <form action={formAction} className={styles.form}>
-      <label className={styles.label} htmlFor="rp-email">
-        Email
-      </label>
-      <input
-        id="rp-email"
-        name="email"
-        type="email"
-        required
-        className={styles.input}
-        autoComplete="email"
-      />
+      <Input name="email" label="Email" type="email" required autoComplete="email" size="md" />
       {state.message ? (
         <p className={styles.error} role="alert">
           {state.message}

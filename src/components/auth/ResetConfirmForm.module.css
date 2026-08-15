@@ -6,32 +6,12 @@
   margin-top: var(--space-2);
 }
 
-.label {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-700);
-}
-
-.input {
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  color: var(--ink-900);
-  height: 40px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface-1);
-  width: 100%;
-}
-
-.input:focus {
-  outline: 0;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-soft);
-}
+/* M-16 fix: the .label and .input rules below were inlined copies of
+   the design tokens that the shared `Input` primitive now provides.
+   Removing them keeps the form stylesheet to only what the form
+   actually owns (form layout, form-level error, submit button, success
+   block). The Input primitive's own .module.css owns the field
+   treatment. */
 
 .error {
   font-size: var(--text-sm);
