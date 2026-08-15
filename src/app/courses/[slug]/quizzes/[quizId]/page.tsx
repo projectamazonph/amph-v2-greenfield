@@ -3,6 +3,7 @@ import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { QuizPlayer } from "@/components/courses/QuizPlayer";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 import styles from "../../lessons/[lessonId]/quiz/page.module.css";
@@ -78,10 +79,15 @@ export default async function QuizPage({ params }: Props) {
   }
 
   const quiz = quizResult.value;
+  const course = courseResult.value;
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <Link href={`/courses/${slug}`}><ArrowLeft size={16} aria-hidden /> Back to course</Link>
+        <Link href={`/courses/${slug}`} className={styles.crumbLink}>
+          <ArrowLeft size={16} aria-hidden /> {course.title}
+        </Link>
+        <span className={styles.crumbSep} aria-hidden="true">/</span>
+        <span className={styles.crumbCurrent} aria-current="page">{quiz.title}</span>
       </nav>
       <QuizPlayer
         quizId={quiz.id}
@@ -102,10 +108,12 @@ export default async function QuizPage({ params }: Props) {
 
 function NotFoundMessage({ slug }: { slug: string }) {
   return (
-    <main className={styles.page}>
-      <h1 className={styles.title}>Quiz not found</h1>
-      <p>This quiz is not available for the selected course.</p>
-      <Link href={`/courses/${slug}`}>Back to course</Link>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
+      <EmptyState
+        title="Quiz not found"
+        description="This quiz is not available for the selected course."
+        action={<Link href={`/courses/${slug}`}>Back to course</Link>}
+      />
     </main>
   );
 }

@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 export default function ResetRequestPage() {
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <h1 className={styles.title}>Forgot your password?</h1>
       <p className={styles.body}>
         Enter the email you used to sign up. If the account exists,

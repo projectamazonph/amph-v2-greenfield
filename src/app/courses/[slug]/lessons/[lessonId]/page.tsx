@@ -11,12 +11,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { Clock, ListChecks, Play } from "@phosphor-icons/react/dist/ssr";
 
 import { buildContainer } from "@/composition/container";
 import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
 import { getLessonData, withCatalogCurriculum } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
+import type { Lesson as CatalogLesson } from "@/domain/entities/Course";
 import type { Lesson } from "@/domain/entities/Lesson";
 import { LessonSidebar } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
@@ -24,6 +26,35 @@ import { Button } from "@/components/ui/Button";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
 import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.action";
 import styles from "./page.module.css";
+
+function estimateReadingMinutes(lesson: CatalogLesson): { minutes: number; kind: "video" | "reading" | "quiz" } {
+  const content = lesson.content;
+  if (lesson.type === "VIDEO") {
+    const duration =
+      typeof content === "object" && content !== null && "durationMinutes" in content
+        ? Number((content as { durationMinutes: unknown }).durationMinutes)
+        : 0;
+    if (!Number.isFinite(duration) || duration <= 0) return { minutes: 1, kind: "video" };
+    return { minutes: Math.max(1, Math.round(duration)), kind: "video" };
+  }
+  if (lesson.type === "QUIZ") {
+    const questions =
+      typeof content === "object" && content !== null && "questions" in content &&
+      Array.isArray((content as { questions: unknown }).questions)
+        ? (content as { questions: unknown[] }).questions.length
+        : 0;
+    return { minutes: Math.max(1, questions), kind: "quiz" };
+  }
+  // TEXT: estimate from word count (avg 200 wpm)
+  const body =
+    typeof content === "object" && content !== null && "body" in content &&
+    typeof (content as { body: unknown }).body === "string"
+      ? (content as { body: string }).body.trim()
+      : "";
+  if (!body) return { minutes: 1, kind: "reading" };
+  const words = body.split(/\s+/).filter(Boolean).length;
+  return { minutes: Math.max(1, Math.round(words / 200)), kind: "reading" };
+}
 
 interface PageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -155,7 +186,7 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
       />
 
       {/* Main content */}
-      <main id="lesson-content" className={styles.main}>
+      <main id="main-content" tabIndex={-1} className={styles.main}>
         <div className={styles.content}>
           {/* Breadcrumb */}
           <nav className={styles.breadcrumb} aria-label="Breadcrumb">
@@ -194,10 +225,28 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           <div className={styles.lessonHeader}>
             <p className={styles.sectionLabel}>{sectionTitle}</p>
             <h1 className={styles.lessonTitle}>{lesson.title}</h1>
+            {(() => {
+              const est = estimateReadingMinutes(lesson);
+              const label =
+                est.kind === "video"
+                  ? `${est.minutes} min video`
+                  : est.kind === "quiz"
+                    ? `~${est.minutes} min quiz`
+                    : `${est.minutes} min read`;
+              const Icon = est.kind === "video" ? Play : est.kind === "quiz" ? ListChecks : Clock;
+              return (
+                <div className={styles.lessonMeta}>
+                  <span className={styles.lessonMetaItem}>
+                    <Icon size={14} aria-hidden className={styles.lessonMetaIcon} />
+                    {label}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Lesson body */}
-          <LessonContent lesson={lesson as Lesson} courseSlug={slug} />
+          <LessonContent lesson={selectedLessonResult.value} courseSlug={slug} />
 
           {completionStatus.completed === "1" ? (
             <p className="alert-success" role="status">

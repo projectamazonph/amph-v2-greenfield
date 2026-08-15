@@ -48,7 +48,7 @@ export default async function ToolsIndexPage() {
 
   return (
     <StudentShell>
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <header className={styles.header}>
           <span className={styles.eyebrow}>Practice + Live</span>
           <h1 className={styles.title}>Tools</h1>

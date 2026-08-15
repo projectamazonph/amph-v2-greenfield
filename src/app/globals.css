@@ -402,6 +402,27 @@ textarea:focus-visible {
   border-color: var(--accent);
 }
 
+/* Global focus-visible ring for interactive elements (links, buttons,
+   summary, [role=button], [tabindex]). Matches the accent color so the
+   focus state reads as part of the Field Manual, not the browser default. */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[role="link"]:focus-visible,
+[role="menuitem"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.btn:focus-visible {
+  /* The button class sets outline: none; restore a visible ring here. */
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
 /* Consistent display font for page titles */
 h1 {
   font-family: var(--font-display);

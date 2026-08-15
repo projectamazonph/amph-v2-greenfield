@@ -103,6 +103,21 @@
   background: var(--surface-2);
 }
 
+.badgeIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--accent-text);
+}
+
+.badgeIcon[data-slug="5-day-streak"] {
+  color: var(--danger, var(--accent));
+}
+
+.badgeIcon[data-slug="all-3-courses-enrolled"] {
+  color: var(--info, var(--accent));
+}
+
 .badgeDot {
   width: 12px;
   height: 12px;
@@ -124,6 +139,14 @@
   margin: 0;
 }
 
+/* Action buttons row */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
 /* Buttons */
 
 .btnPrimary {
@@ -143,7 +166,6 @@
   white-space: nowrap;
   transition: background-color var(--duration-base) var(--ease-out),
     box-shadow var(--duration-base) var(--ease-out);
-  margin-top: var(--space-4);
 }
 
 .btnPrimary:hover {

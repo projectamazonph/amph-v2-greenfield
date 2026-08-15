@@ -222,7 +222,7 @@
   flex-shrink: 0;
 }
 
-.lessonItem:last-child:not(:has(+ .lessonItem)) .lessonIcon {
+.lessonItem:last-child .lessonIcon {
   color: var(--ink-500);
 }
 

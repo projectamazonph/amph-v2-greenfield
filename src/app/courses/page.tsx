@@ -103,10 +103,8 @@ export default async function CoursesPage() {
             ))}
           </div>
           {courses.length === 0 && (
-            <div
-              style={{ textAlign: "center", padding: "var(--space-10)", color: "var(--ink-500)" }}
-            >
-              <p>
+            <div className={styles.emptyState}>
+              <p className={styles.emptyText}>
                 No published courses are available yet. Check back after the next content release.
               </p>
             </div>
@@ -143,47 +141,13 @@ function CourseCard({
       />
 
       <div className={styles.cardBody}>
-        {isFeatured && (
-          <span
-            style={{
-              display: "inline-block",
-              fontSize: "10px",
-              fontFamily: "var(--font-mono)",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              padding: "2px 6px",
-              background: "var(--accent-soft)",
-              color: "var(--accent-text)",
-              borderRadius: "4px",
-              marginBottom: "var(--space-2)",
-            }}
-          >
-            Featured
-          </span>
-        )}
+        {isFeatured && <span className={styles.badgeFeatured}>Featured</span>}
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>{course.title}</h2>
           <span className={styles.cardPrice}>{priceDisplay}</span>
         </div>
 
-        {isEnrolled && (
-          <span
-            style={{
-              display: "inline-block",
-              fontSize: "10px",
-              fontFamily: "var(--font-mono)",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              padding: "2px 6px",
-              background: "var(--success-soft)",
-              color: "var(--success)",
-              borderRadius: "4px",
-              marginBottom: "var(--space-2)",
-            }}
-          >
-            Enrolled
-          </span>
-        )}
+        {isEnrolled && <span className={styles.badgeEnrolled}>Enrolled</span>}
 
         {course.tagline && <p className={styles.cardTagline}>{course.tagline}</p>}
 

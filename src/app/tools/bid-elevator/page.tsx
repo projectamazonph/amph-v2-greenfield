@@ -22,12 +22,12 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 import { BidElevatorForm } from "@/components/tools/BidElevatorForm";
 import { StudentShell } from "@/components/student/StudentShell";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { bidElevatorScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
@@ -59,18 +59,13 @@ export default async function BidElevatorPage() {
 
   return (
     <StudentShell>
-      <main className={styles.page}>
-        <nav className={styles.breadcrumb}>
-          <Link href="/tools"><ArrowLeft size={16} aria-hidden /> Tools</Link>
-          <span aria-hidden="true"> / </span>
-          <span>Bid Elevator</span>
-          <Link
-            href="/tools/bid-elevator"
-            className={styles.resetBtn}
-          >
+      <main id="main-content" tabIndex={-1} className={styles.page}>
+        <div className={styles.breadcrumbRow}>
+          <Breadcrumb items={[{ href: "/tools", label: "Tools" }, { label: "Bid Elevator" }]} />
+          <Link href="/tools/bid-elevator" className={styles.resetBtn}>
             Reset
           </Link>
-        </nav>
+        </div>
         <header className={styles.header}>
           <span className={styles.eyebrow}>Simulator</span>
           <h1 className={styles.title}>{scenario.name}</h1>

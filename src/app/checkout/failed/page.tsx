@@ -33,9 +33,8 @@ export default async function CheckoutFailedPage({
       <div className={styles.card}>
         <div className={styles.logo}>Project Amazon PH Academy</div>
         <XCircle
-          className={styles.checkmark}
+          className={`${styles.checkmark} ${styles.danger}`.trim()}
           weight="duotone"
-          style={{ color: "var(--danger)" }}
           aria-hidden="true"
         />
         <h1 className={styles.title}>Payment not completed</h1>
@@ -55,6 +54,10 @@ export default async function CheckoutFailedPage({
           </Link>
         </div>
         {orderId && <p className={styles.orderId}>Order reference: {orderId}</p>}
+        <p className={styles.helpLine}>
+          Still stuck? <Link href="/faq" className={styles.linkSecondary}>Read the FAQ</Link> or
+          reach out. Your order is saved, so we can sort it out together.
+        </p>
       </div>
     </div>
   );

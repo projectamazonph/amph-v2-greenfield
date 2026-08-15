@@ -20,6 +20,7 @@
 import Link from "next/link";
 import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 import styles from "../checkout-status.module.css";
+import { RedirectCountdown } from "./RedirectCountdown";
 
 export default async function CheckoutSuccessPage({
   searchParams,
@@ -37,6 +38,9 @@ export default async function CheckoutSuccessPage({
         <p className={styles.body}>
           Thanks for your purchase. We're confirming your enrollment — it usually takes a few
           seconds. Head to your dashboard to start learning.
+        </p>
+        <p className={styles.body}>
+          <RedirectCountdown to="/dashboard" seconds={5} />
         </p>
         <div className={styles.cta}>
           <Link

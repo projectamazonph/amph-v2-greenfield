@@ -93,7 +93,7 @@ export default async function CertificatePage({ params }: PageProps) {
           }),
         }}
       />
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <div className={styles.container}>
           {/* Status badge */}
           <div className={styles.statusRow}>

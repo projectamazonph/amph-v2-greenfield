@@ -31,7 +31,7 @@ export default async function ProfileDataPage({ searchParams }: PageProps) {
 
   return (
     <StudentShell user={session}>
-      <main style={{ padding: "var(--space-8) var(--side-pad)", maxWidth: 640 }}>
+      <main id="main-content" tabIndex={-1} style={{ padding: "var(--space-8) var(--side-pad)", maxWidth: 640 }}>
         <h1
           style={{
             fontFamily: "var(--font-display)",

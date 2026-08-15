@@ -1,42 +1,42 @@
 /**
- * /certificates/[hash] not-found view
- * STORY-043
+ * not-found.tsx — Root 404 page.
  *
- * Shown when the verification hash doesn't match any certificate
- * (or is malformed — Next.js routes here from any notFound() call).
+ * Renders when no other route's notFound() handler catches the
+ * unmatched URL. Field Manual layout: centered card, off-white
+ * surface, mono "404" mark, two clear next-step links.
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
 import Link from "next/link";
-import { Warning } from "@phosphor-icons/react/dist/ssr";
 import buttonStyles from "@/components/ui/Button.module.css";
 import styles from "./not-found.module.css";
 
-export default function CertificateNotFound() {
+export default function NotFound() {
   return (
     <main id="main-content" tabIndex={-1} className={styles.page}>
       <div className={styles.center}>
-        <div className={styles.iconCircle}>
-          <Warning size={32} weight="fill" className={styles.icon} aria-hidden />
-        </div>
-        <h1 className={styles.title}>Certificate Not Found</h1>
+        <p className={styles.eyebrow}>Page not found</p>
+        <p className={styles.code} aria-hidden="true">
+          404
+        </p>
+        <h1 className={styles.title}>This page doesn&apos;t exist</h1>
         <p className={styles.subtitle}>
-          The verification link is invalid, malformed, or the certificate has been removed.
-          Double-check the URL or contact the issuer.
+          The link may be broken or the page may have been moved. Try the catalog or head
+          back to the dashboard.
         </p>
         <div className={styles.actions}>
           <Link
             href="/courses"
             className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg].join(" ")}
           >
-            Browse Courses
+            Browse courses
           </Link>
           <Link
-            href="/"
+            href="/dashboard"
             className={[buttonStyles.btn, buttonStyles.secondary, buttonStyles.lg].join(" ")}
           >
-            Go Home
+            Go to dashboard
           </Link>
         </div>
       </div>

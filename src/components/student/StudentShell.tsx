@@ -42,6 +42,7 @@ import { StudentSidebar } from "./StudentSidebar";
 import { PublicCatalogHeader } from "./PublicCatalogHeader";
 import { MobileNavToggle } from "@/components/ui/MobileNavToggle";
 import { CommandPalette } from "@/components/ui/CommandPalette";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import styles from "./StudentShell.module.css";
 
 export interface StudentShellProps {
@@ -110,6 +111,7 @@ export async function StudentShell({
         {children}
       </div>
       <CommandPalette items={COMMAND_PALETTE_ITEMS} />
+      <ScrollToTop />
     </div>
   );
 }
