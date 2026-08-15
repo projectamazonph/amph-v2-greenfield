@@ -391,13 +391,19 @@ export function CampaignBuilderForm({
         {campaigns.map((campaign, ci) => (
           <div key={campaign.id} className={styles.campaign}>
             <div className={styles.campaignFieldsRow}>
+              {/* C-04 fix: pair the campaign name input with a real <label>
+                  (visually hidden so the placeholder keeps its inline-hint
+                  role) instead of relying on placeholder as the only label. */}
+              <label htmlFor={`cb-campaign-${ci}-name`} className="sr-only">
+                Campaign {ci + 1} name
+              </label>
               <input
+                id={`cb-campaign-${ci}-name`}
                 className={styles.input}
                 placeholder="Campaign name, e.g. SP | Manual | wireless earbuds"
                 value={campaign.name}
                 onChange={(e) => updateCampaign(ci, { name: e.target.value })}
                 disabled={graded}
-                aria-label={`Campaign ${ci + 1} name`}
               />
               <select
                 className={styles.select}
@@ -434,13 +440,18 @@ export function CampaignBuilderForm({
             {campaign.adGroups.map((adGroup, ai) => (
               <div key={adGroup.id} className={styles.adGroup}>
                 <div className={styles.adGroupFieldsRow}>
+                  {/* C-04 fix: ad group name input gets a real <label>, not
+                      placeholder as the only label. */}
+                  <label htmlFor={`cb-campaign-${ci}-adgroup-${ai}-name`} className="sr-only">
+                    Ad group {ai + 1} name in campaign {ci + 1}
+                  </label>
                   <input
+                    id={`cb-campaign-${ci}-adgroup-${ai}-name`}
                     className={styles.input}
                     placeholder="Ad group name, e.g. Core - Exact"
                     value={adGroup.name}
                     onChange={(e) => updateAdGroup(ci, ai, { name: e.target.value })}
                     disabled={graded}
-                    aria-label={`Ad group ${ai + 1} name in campaign ${ci + 1}`}
                   />
                   <span className={styles.inputWrap}>
                     <span className={styles.prefix}>₱</span>
@@ -472,13 +483,21 @@ export function CampaignBuilderForm({
                 <ul className={styles.keywordList}>
                   {adGroup.keywords.map((kw, ki) => (
                     <li key={kw.id} className={styles.keywordRow}>
+                      {/* C-04 fix: keyword input gets a real <label>, not
+                          placeholder as the only label. */}
+                      <label
+                        htmlFor={`cb-campaign-${ci}-adgroup-${ai}-keyword-${ki}`}
+                        className="sr-only"
+                      >
+                        Keyword {ki + 1} in ad group {ai + 1} of campaign {ci + 1}
+                      </label>
                       <input
+                        id={`cb-campaign-${ci}-adgroup-${ai}-keyword-${ki}`}
                         className={styles.input}
                         placeholder="Keyword"
                         value={kw.keyword}
                         onChange={(e) => updateKeyword(ci, ai, ki, { keyword: e.target.value })}
                         disabled={graded}
-                        aria-label={`Keyword ${ki + 1} in ad group ${ai + 1} of campaign ${ci + 1}`}
                       />
                       <select
                         className={styles.select}
@@ -546,13 +565,18 @@ export function CampaignBuilderForm({
               <ul className={styles.negativesList}>
                 {campaign.negativeKeywords.map((neg, ni) => (
                   <li key={neg.id} className={styles.negativeRow}>
+                    {/* C-04 fix: negative keyword text input gets a real
+                        <label>, not placeholder as the only label. */}
+                    <label htmlFor={`cb-campaign-${ci}-negative-${ni}-text`} className="sr-only">
+                      Negative keyword {ni + 1} text in campaign {ci + 1}
+                    </label>
                     <input
+                      id={`cb-campaign-${ci}-negative-${ni}-text`}
                       className={styles.input}
                       placeholder="Negative keyword text"
                       value={neg.text}
                       onChange={(e) => updateNegative(ci, ni, { text: e.target.value })}
                       disabled={graded}
-                      aria-label={`Negative keyword ${ni + 1} text in campaign ${ci + 1}`}
                     />
                     <select
                       className={styles.select}
@@ -578,13 +602,18 @@ export function CampaignBuilderForm({
                       <option value="campaign">campaign-level</option>
                       <option value="adGroup">ad-group-level</option>
                     </select>
+                    {/* C-04 fix: negative keyword reason input gets a real
+                        <label>, not placeholder as the only label. */}
+                    <label htmlFor={`cb-campaign-${ci}-negative-${ni}-reason`} className="sr-only">
+                      Reason for negative keyword {ni + 1} in campaign {ci + 1}
+                    </label>
                     <input
+                      id={`cb-campaign-${ci}-negative-${ni}-reason`}
                       className={styles.input}
                       placeholder="Reason (why this negative?)"
                       value={neg.reason}
                       onChange={(e) => updateNegative(ci, ni, { reason: e.target.value })}
                       disabled={graded}
-                      aria-label={`Reason for negative keyword ${ni + 1} in campaign ${ci + 1}`}
                     />
                     {!graded ? (
                       <Button
