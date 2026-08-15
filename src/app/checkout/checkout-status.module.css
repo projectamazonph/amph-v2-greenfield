@@ -38,6 +38,28 @@
   height: 64px;
   margin: 0 auto;
   color: var(--success);
+  animation: scale-in 420ms var(--ease-out) both;
+}
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkmark {
+    animation: none;
+  }
 }
 
 .danger {
