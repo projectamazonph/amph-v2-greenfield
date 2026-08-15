@@ -31,7 +31,7 @@ describe("admin event controls", () => {
 
     const source = readFileSync(new URL("../ConfirmSubmitButton.tsx", import.meta.url), "utf8");
     // Uses Astryx Dialog component (not native window.confirm)
-    expect(source).toContain("from \"@astryxdesign/core/Dialog\"");
+    expect(source).toContain('from "@astryxdesign/core/Dialog"');
     expect(source).toContain('purpose="required"');
     // Uses programmatic form submission after confirmation
     expect(source).toContain("requestSubmit");
@@ -50,13 +50,24 @@ describe("admin event controls", () => {
 
     it("renders the stop-impersonating form for an active impersonation", async () => {
       mocks.cookies.mockResolvedValue({ get: vi.fn(() => ({ value: "admin-token" })) });
-      mocks.getSessionUser.mockResolvedValue({ email: "student@example.com", firstName: "Student", lastName: "User" });
+      mocks.getSessionUser.mockResolvedValue({
+        email: "student@example.com",
+        firstName: "Student",
+        lastName: "User",
+      });
       const element = await ImpersonationBanner();
       expect(element).not.toBeNull();
       expect(element?.props.role).toBe("status");
-      expect(element?.props.children.props.children[1].props.children).toContain("student@example.com");
-      expect(element?.props.children.props.children[2].props.children.props.children).toBe("Stop impersonating");
-      expect(typeof element?.props.children.props.children[2].props.action).toBe("function");
+      const markup = renderToString(element as React.ReactElement);
+      expect(markup).toContain("student@example.com");
+      expect(markup).toContain("Stop impersonating");
+      expect(markup).toContain("Impersonation active");
+      const children = element?.props.children.props.children as ReadonlyArray<{
+        props: { children?: unknown; action?: unknown };
+      }>;
+      const form = children.find((c) => typeof c.props.action === "function");
+      expect(form).toBeDefined();
+      expect(form?.props.action).toBeTypeOf("function");
     });
   });
 });

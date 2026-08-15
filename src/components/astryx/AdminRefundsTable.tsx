@@ -96,7 +96,7 @@ const COLUMNS: TableColumn<RefundRequestRow>[] = [
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
           fontSize: 12,
-          color: row.refundReason ? "var(--text)" : "var(--ink-500)",
+          color: row.refundReason ? "var(--ink-900)" : "var(--ink-500)",
         }}
       >
         {truncate(row.refundReason, 80)}

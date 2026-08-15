@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { CheckIcon } from "./Icons";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
@@ -25,12 +26,12 @@ export function Hero() {
             Built for VAs aiming at <b>₱60k–₱80k / month</b>, not staying at ₱25k.
           </p>
           <div className={styles.ctaRow}>
-            <a href="#pricing" className={[shared.btn, shared.btnPrimary].join(" ")}>
+            <Link href="/#pricing" className={[shared.btn, shared.btnPrimary].join(" ")}>
               See the three tiers <span className={shared.arr}>→</span>
-            </a>
-            <a href="#simulator" className={[shared.btn, shared.btnGhost].join(" ")}>
+            </Link>
+            <Link href="/#simulator" className={[shared.btn, shared.btnGhost].join(" ")}>
               Preview a simulator
-            </a>
+            </Link>
           </div>
           <p className={styles.note}>
             <CheckIcon />

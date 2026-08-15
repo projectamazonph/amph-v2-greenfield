@@ -8,7 +8,7 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface EditorOption {
   id: string;
@@ -51,8 +51,10 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
   function update(next: EditorQuestion[]) {
     setQuestions(next);
     // Keep the hidden input in sync so server actions can read it.
-    const input = document.querySelector<HTMLInputElement>(`input[name="${name}"]`);
-    if (input) input.value = JSON.stringify(next);
+    if (typeof document !== "undefined") {
+      const input = document.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+      if (input) input.value = JSON.stringify(next);
+    }
   }
 
   function addQuestion() {
@@ -118,18 +120,22 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
     update(next);
   }
 
-  // Initialize the hidden input on first render.
-  if (typeof document !== "undefined") {
+  // Seed the hidden input once on mount. Side effects during render are
+  // undefined behavior in concurrent mode, so this lives in useEffect.
+  // We intentionally only seed on mount; subsequent updates flow through
+  // `update()` which writes the hidden input synchronously.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
     const input = document.querySelector<HTMLInputElement>(`input[name="${name}"]`);
     if (input && !input.value) {
       input.value = JSON.stringify(questions);
     }
-  }
+  }, [name, questions]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0, color: "var(--ink-800)" }}>
+        <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0, color: "var(--ink-700)" }}>
           Questions ({questions.length})
         </h3>
         <button
@@ -138,7 +144,7 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
           style={{
             padding: "0.375rem 0.75rem",
             background: "var(--surface-2, #f4f4f5)",
-            color: "var(--ink-800)",
+            color: "var(--ink-700)",
             border: "1px solid var(--border, #d4d4d8)",
             borderRadius: "0.375rem",
             fontSize: "0.8125rem",
@@ -164,13 +170,20 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
           }}
         >
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <span style={{ fontWeight: 600, color: "var(--ink-700)" }}>Q{qIndex + 1}</span>
+            <label
+              htmlFor={`q-${qIndex}-text`}
+              style={{ fontWeight: 600, color: "var(--ink-700)" }}
+            >
+              Q{qIndex + 1}
+            </label>
             <input
+              id={`q-${qIndex}-text`}
               type="text"
               value={q.questionText}
               onChange={(e) => patchQuestion(qIndex, { questionText: e.target.value })}
               placeholder="Question text…"
               required
+              aria-label={`Question ${qIndex + 1} text`}
               style={{
                 flex: 1,
                 padding: "0.5rem 0.75rem",
@@ -219,18 +232,21 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
             {q.options.map((o, oIndex) => (
               <div key={o.id} style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                 <input
+                  id={`q-${qIndex}-opt-${oIndex}-correct`}
                   type="radio"
                   name={`correct-${qIndex}`}
                   checked={o.isCorrect}
                   onChange={() => markCorrect(qIndex, oIndex)}
-                  aria-label="Mark as correct answer"
+                  aria-label={`Mark option ${oIndex + 1} as correct for question ${qIndex + 1}`}
                 />
                 <input
+                  id={`q-${qIndex}-opt-${oIndex}-text`}
                   type="text"
                   value={o.optionText}
                   onChange={(e) => patchOption(qIndex, oIndex, { optionText: e.target.value })}
                   placeholder={`Option ${oIndex + 1} text…`}
                   required
+                  aria-label={`Option ${oIndex + 1} text for question ${qIndex + 1}`}
                   style={{
                     flex: 1,
                     padding: "0.375rem 0.625rem",
@@ -244,7 +260,7 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
                   type="button"
                   onClick={() => removeOption(qIndex, oIndex)}
                   disabled={q.options.length <= 2}
-                  aria-label="Remove option"
+                  aria-label={`Remove option ${oIndex + 1} from question ${qIndex + 1}`}
                   style={iconButtonStyle(q.options.length <= 2)}
                 >
                   ✕

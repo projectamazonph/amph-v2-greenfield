@@ -21,6 +21,7 @@
  */
 
 import { cookies } from "next/headers";
+import { Warning } from "@phosphor-icons/react/dist/ssr";
 import { getSessionUser, getAdminSessionCookieName } from "@/lib/auth";
 import { userFullName } from "@/domain/entities/User";
 import { stopImpersonatingAction } from "@/app/actions/stopImpersonating.action";
@@ -47,8 +48,9 @@ export async function ImpersonationBanner() {
     <div className={styles.banner} role="status" aria-live="polite">
       <div className={styles.content}>
         <span className={styles.icon} aria-hidden>
-          ⚠
+          <Warning size={18} weight="fill" />
         </span>
+        <h2 className="sr-only">Impersonation active</h2>
         <span className={styles.text}>
           You are impersonating <strong>{targetName}</strong> ({targetUser.email}).
         </span>

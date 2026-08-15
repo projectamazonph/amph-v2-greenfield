@@ -397,6 +397,7 @@ export function CampaignBuilderForm({
                 value={campaign.name}
                 onChange={(e) => updateCampaign(ci, { name: e.target.value })}
                 disabled={graded}
+                aria-label={`Campaign ${ci + 1} name`}
               />
               <select
                 className={styles.select}
@@ -439,6 +440,7 @@ export function CampaignBuilderForm({
                     value={adGroup.name}
                     onChange={(e) => updateAdGroup(ci, ai, { name: e.target.value })}
                     disabled={graded}
+                    aria-label={`Ad group ${ai + 1} name in campaign ${ci + 1}`}
                   />
                   <span className={styles.inputWrap}>
                     <span className={styles.prefix}>₱</span>
@@ -476,6 +478,7 @@ export function CampaignBuilderForm({
                         value={kw.keyword}
                         onChange={(e) => updateKeyword(ci, ai, ki, { keyword: e.target.value })}
                         disabled={graded}
+                        aria-label={`Keyword ${ki + 1} in ad group ${ai + 1} of campaign ${ci + 1}`}
                       />
                       <select
                         className={styles.select}
@@ -549,6 +552,7 @@ export function CampaignBuilderForm({
                       value={neg.text}
                       onChange={(e) => updateNegative(ci, ni, { text: e.target.value })}
                       disabled={graded}
+                      aria-label={`Negative keyword ${ni + 1} text in campaign ${ci + 1}`}
                     />
                     <select
                       className={styles.select}
@@ -580,6 +584,7 @@ export function CampaignBuilderForm({
                       value={neg.reason}
                       onChange={(e) => updateNegative(ci, ni, { reason: e.target.value })}
                       disabled={graded}
+                      aria-label={`Reason for negative keyword ${ni + 1} in campaign ${ci + 1}`}
                     />
                     {!graded ? (
                       <Button

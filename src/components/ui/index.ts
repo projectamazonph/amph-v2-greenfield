@@ -23,3 +23,6 @@ export type { InputProps, InputSize } from "./Input";
 
 export { Badge } from "./Badge";
 export type { BadgeProps, BadgeVariant, BadgeShape } from "./Badge";
+
+export { SubmitButton } from "./SubmitButton";
+export type { SubmitButtonProps } from "./SubmitButton";

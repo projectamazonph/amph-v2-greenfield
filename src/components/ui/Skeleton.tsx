@@ -50,7 +50,13 @@ export function SkeletonBlock({
 
 export function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
-    <div className={className}>
+    <div
+      className={className}
+      aria-busy="true"
+      aria-live="polite"
+      role="status"
+      aria-label="Loading text"
+    >
       {Array.from({ length: lines }).map((_, i) => (
         <SkeletonBlock
           key={i}
@@ -70,7 +76,13 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
 
 export function SkeletonRow({ columns = 4 }: { columns?: number }) {
   return (
-    <div className={styles.row}>
+    <div
+      className={styles.row}
+      aria-busy="true"
+      aria-live="polite"
+      role="status"
+      aria-label="Loading row"
+    >
       {Array.from({ length: columns }).map((_, i) => (
         <SkeletonBlock key={i} width={i === 0 ? "40%" : "20%"} height="0.75rem" variant="text" />
       ))}
@@ -84,7 +96,13 @@ export function SkeletonRow({ columns = 4 }: { columns?: number }) {
 
 export function SkeletonCard({ lines = 2, className }: { lines?: number; className?: string }) {
   return (
-    <div className={`${styles.card} ${className ?? ""}`}>
+    <div
+      className={`${styles.card} ${className ?? ""}`}
+      aria-busy="true"
+      aria-live="polite"
+      role="status"
+      aria-label="Loading content"
+    >
       <SkeletonBlock width="60%" height="1rem" variant="text" />
       {Array.from({ length: lines }).map((_, i) => (
         <SkeletonBlock
@@ -127,7 +145,13 @@ export function SkeletonTable({ columns = 4, rows = 5 }: { columns?: number; row
 
 export function SkeletonStatTile({ className }: { className?: string }) {
   return (
-    <div className={`${styles.statTile} ${className ?? ""}`}>
+    <div
+      className={`${styles.statTile} ${className ?? ""}`}
+      aria-busy="true"
+      aria-live="polite"
+      role="status"
+      aria-label="Loading metric"
+    >
       <SkeletonBlock width="3rem" height="2rem" variant="rect" />
       <SkeletonBlock width="60%" height="0.75rem" variant="text" className={styles.textLine} />
     </div>
