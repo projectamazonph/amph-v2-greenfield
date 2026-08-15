@@ -226,7 +226,7 @@ See `docs/REMAINING-P3-FEATURES.md` for full implementation specs.
 ## Student-Facing UI Pass — 2026-08-15
 
 Following the 2026-07-31 audit, a focused enhancement pass identified and
-shipped 14 additional improvements to the student-facing surface. Each
+shipped 20 additional improvements to the student-facing surface. Each
 ships as its own sub-commit so the diff stays reviewable.
 
 ### Shipped
@@ -249,6 +249,10 @@ ships as its own sub-commit so the diff stays reviewable.
 | 14 | Move the trailing inline style on `/checkout/failed` into the shared checkout-status CSS module | `fix(checkout)` |
 | 15 | Branded root `not-found.tsx` so unmatched routes match the Field Manual | `feat(app)` |
 | 16 | Hover-lift micro-interaction on the catalog and tools card grids, with `prefers-reduced-motion` guard | `polish(cards)` |
+| 17 | Scale-in animation on the checkout success and failed checkmark, with `prefers-reduced-motion` guard | `polish(checkout)` |
+| 18 | FAQ link on the failed checkout page so stuck students can self-serve | `feat(checkout)` |
+| 19 | Move the action buttons inline style on `/profile` into the CSS module | `refactor(profile)` |
+| 20 | Swap badge dots for real Phosphor icons with slug-based tier color | `polish(profile)` |
 
 ### Cancelled
 
@@ -270,6 +274,6 @@ ships as its own sub-commit so the diff stays reviewable.
 |------|------|-------|
 | 2026-07-31 P0/P1/P2 | 59 | 59 |
 | 2026-07-31 P3 enhancement | 34 | 40 |
-| 2026-08-15 student-facing UI | 16 | 16 |
-| **Combined** | **110** | **116** |
+| 2026-08-15 student-facing UI | 20 | 20 |
+| **Combined** | **114** | **120** |
 
