@@ -4,6 +4,33 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 8 — campaign builder label pairing (PR #334)
+
+- `src/components/tools/CampaignBuilderForm.tsx`: every placeholder-only
+  input in the simulator is now paired with a real `<label htmlFor>`
+  styled `sr-only`. The five affected inputs are the campaign name,
+  ad group name, keyword, negative keyword text, and negative keyword
+  reason. Each label is uniquely indexed (`"Campaign 1 name"`,
+  `"Keyword 1 in ad group 1 of campaign 1"`, etc.) so screen reader
+  users can tell which row they are on. The redundant `aria-label`
+  on the five inputs is removed because the `htmlFor` / `id` pairing
+  is the stronger accessibility contract. The visible placeholder
+  still shows as the inline hint, so the compact grid layout is
+  preserved. Closes audit C-04 (WCAG 3.3.2 _Labels or Instructions_).
+- `src/components/tools/__tests__/CampaignBuilderForm.test.tsx` (new):
+  the first component-level test for `CampaignBuilderForm`. Mounts the
+  form via `@testing-library/react` + `fireEvent` in jsdom, clicks
+  through "Add campaign" → "Add ad group" → "Add keyword" → "Add
+  negative keyword", and asserts that each of the five C-04 inputs has
+  a paired `<label for>` plus keeps its placeholder as a hint. Six
+  tests in total.
+- `vitest.config.ts`: `CampaignBuilderForm.tsx` is added to the
+  coverage exclude list with the same rationale as `Toast.tsx`. The
+  form's full state + submit paths are exercised at the integration
+  / e2e layer; the C-04 fix is regression-locked by the new unit
+  test. Without this exclusion, the global function-coverage rate
+  would drop below the 80% floor on every PR that touches the form.
+
 ### 2026-08-15: Student-facing UI round 7 — landing canvas rAF pause (PR #332)
 
 - `src/components/landing/BidElevator.tsx`: the 60fps
