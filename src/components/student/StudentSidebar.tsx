@@ -23,8 +23,10 @@ import {
   SignOut,
   DownloadSimple,
 } from "@phosphor-icons/react/dist/ssr";
-import styles from "./StudentSidebar.module.css";
 import type { ComponentType, SVGProps } from "react";
+import { useState } from "react";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import styles from "./StudentSidebar.module.css";
 
 interface NavItem {
   href: string;
@@ -60,6 +62,16 @@ function initials(firstName: string, lastName?: string | null): string {
 
 export function StudentSidebar({ user }: StudentSidebarProps) {
   const pathname = usePathname() ?? "/";
+  const [signOutOpen, setSignOutOpen] = useState(false);
+
+  function performSignOut() {
+    setSignOutOpen(false);
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/api/auth/logout";
+    document.body.appendChild(form);
+    form.submit();
+  }
 
   return (
     <aside id="student-sidebar" className={styles.sidebar} aria-label="Student navigation">
@@ -112,18 +124,25 @@ export function StudentSidebar({ user }: StudentSidebarProps) {
             </div>
             <div className={styles.userRole}>{user.role}</div>
           </div>
-          <form action="/api/auth/logout" method="post" className={styles.logoutForm}>
-            <button
-              type="submit"
-              className={styles.logoutButton}
-              aria-label="Log out"
-              title="Log out"
-            >
-              <SignOut size={16} weight="bold" />
-            </button>
-          </form>
+          <button
+            type="button"
+            className={styles.logoutButton}
+            aria-label="Log out"
+            title="Log out"
+            onClick={() => setSignOutOpen(true)}
+          >
+            <SignOut size={16} weight="bold" />
+          </button>
         </div>
       </div>
+      <ConfirmDialog
+        open={signOutOpen}
+        title="Sign out?"
+        description="You will need to sign back in to continue your learning."
+        confirmLabel="Sign out"
+        onConfirm={performSignOut}
+        onCancel={() => setSignOutOpen(false)}
+      />
     </aside>
   );
 }
