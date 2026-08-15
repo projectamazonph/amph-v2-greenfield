@@ -152,7 +152,9 @@
   border: 1px solid var(--border);
   background: var(--surface-1);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  /* M-R21 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
+     box-shadow. The 1px --border is the elevation on the curriculum
+     <details> section card. */
 }
 
 .sectionSummary {
@@ -267,7 +269,9 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-1);
-  box-shadow: var(--shadow-sm);
+  /* M-R21 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
+     box-shadow. The 1px --border is the elevation on the per-quiz
+     card in the course detail curriculum block. */
 }
 
 .quizTitle {
