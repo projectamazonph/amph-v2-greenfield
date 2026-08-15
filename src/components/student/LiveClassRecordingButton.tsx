@@ -11,10 +11,12 @@
  */
 
 import { useState, useTransition } from "react";
+import { Check } from "@phosphor-icons/react/dist/ssr";
 import { markLiveClassRecordingWatchedAction } from "@/app/actions/markLiveClassRecordingWatched.action";
 import { Button } from "@/components/ui/Button";
 import buttonStyles from "@/components/ui/Button.module.css";
 import { studentErrorCopy } from "@/lib/studentErrorCopy";
+import styles from "./LiveClassRecordingButton.module.css";
 
 export interface LiveClassRecordingButtonProps {
   liveClassId: string;
@@ -50,7 +52,7 @@ export function LiveClassRecordingButton({
   }
 
   return (
-    <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
+    <div className={styles.row}>
       {/*
         A native <button> (what Button always renders) can't legally nest
         inside an <a> — invalid interactive-in-interactive HTML, broken
@@ -67,12 +69,9 @@ export function LiveClassRecordingButton({
         Watch recording
       </a>
       {watched ? (
-        <span
-          data-testid="live-class-recording-watched"
-          role="status"
-          style={{ color: "var(--ink-500)" }}
-        >
-          ✓ Marked as watched
+        <span data-testid="live-class-recording-watched" role="status" className={styles.watched}>
+          <Check size={14} weight="bold" aria-hidden />
+          Marked as watched
         </span>
       ) : (
         <Button
@@ -81,6 +80,7 @@ export function LiveClassRecordingButton({
           size="md"
           onClick={handleMarkWatched}
           disabled={isPending}
+          aria-busy={isPending}
           data-testid="live-class-mark-watched"
         >
           {isPending ? "Saving..." : `Mark as watched (+${xpAmount} XP)`}

@@ -1,0 +1,17 @@
+/* LiveClassRecordingButton.module.css — Field Manual layout.
+   Container is a flex row; the watched-state span uses tone token. */
+
+.row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.watched {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+}

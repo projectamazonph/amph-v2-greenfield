@@ -10,6 +10,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { submitQuizAttemptAction } from "@/app/actions/submitQuizAttempt.action";
 import { studentErrorCopy } from "@/lib/studentErrorCopy";
 import styles from "./QuizPlayer.module.css";
@@ -98,7 +99,7 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
     const questionById = new Map(questions.map((q) => [q.id, q]));
     return (
       <>
-        <div className={styles.resultPanel}>
+        <div className={styles.resultPanel} role="status" aria-live="polite">
           <h2 className={styles.resultTitle}>{passed ? "You passed" : "You did not pass"}</h2>
           <div
             className={styles.resultScore}
@@ -115,9 +116,9 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
           {passed && result.xpAwarded ? (
             <p className={styles.xpLine}>+{result.xpAwarded} XP awarded</p>
           ) : null}
-          <a href="/dashboard" className={styles.backLink}>
+          <Link href="/dashboard" className={styles.backLink}>
             Back to dashboard
-          </a>
+          </Link>
         </div>
         {result.review && result.review.length > 0 ? (
           <div className={styles.review}>

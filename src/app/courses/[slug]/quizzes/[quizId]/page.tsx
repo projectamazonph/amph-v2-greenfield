@@ -86,8 +86,12 @@ export default async function QuizPage({ params }: Props) {
         <Link href={`/courses/${slug}`} className={styles.crumbLink}>
           <ArrowLeft size={16} aria-hidden /> {course.title}
         </Link>
-        <span className={styles.crumbSep} aria-hidden="true">/</span>
-        <span className={styles.crumbCurrent} aria-current="page">{quiz.title}</span>
+        <span className={styles.crumbSep} aria-hidden="true">
+          /
+        </span>
+        <span className={styles.crumbCurrent} aria-current="page">
+          {quiz.title}
+        </span>
       </nav>
       <QuizPlayer
         quizId={quiz.id}
@@ -110,6 +114,7 @@ function NotFoundMessage({ slug }: { slug: string }) {
   return (
     <main id="main-content" tabIndex={-1} className={styles.page}>
       <EmptyState
+        headingLevel="h2"
         title="Quiz not found"
         description="This quiz is not available for the selected course."
         action={<Link href={`/courses/${slug}`}>Back to course</Link>}

@@ -116,7 +116,7 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
                         className={styles.resultBadge}
                         data-correct={graded.isCorrect ? "true" : "false"}
                       >
-                        {graded.isCorrect ? "✓ correct" : `✗ was ${graded.groundTruth}`}
+                        {graded.isCorrect ? "Correct" : `Was: ${graded.groundTruth}`}
                       </span>
                     ) : (
                       <select
@@ -152,6 +152,8 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
         {result ? (
           <div
             className={styles.score}
+            role="status"
+            aria-live="polite"
             style={{
               color:
                 result.overallScore >= 80
