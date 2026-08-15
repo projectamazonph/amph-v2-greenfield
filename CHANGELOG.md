@@ -4,6 +4,36 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 10 — Input primitive on reset forms (PR #338)
+
+- `src/components/auth/ResetRequestForm.tsx`: the email field is now
+  `<Input name="email" label="Email" type="email" required
+autoComplete="email" size="md" />`. The form-level error message
+  remains its own `<p role="alert">` between the field and the submit
+  button because the server action returns a kind like `rate_limited`
+  or `validation_failed` that is independent of the field state.
+- `src/components/auth/ResetConfirmForm.tsx`: same pattern with
+  `<Input name="newPassword" label="New password" type="password"
+required autoComplete="new-password" minLength={8} size="md" />`.
+  The hidden `token` input is preserved.
+- `src/components/auth/ResetRequestForm.module.css` and
+  `ResetConfirmForm.module.css`: the inlined `.label` / `.input` /
+  `.input:focus` rules are removed because they are exact duplicates
+  of the tokens the `Input` primitive already owns. A short comment
+  documents the removal so future contributors do not re-add them.
+- `src/components/auth/__tests__/ResetRequestForm.test.tsx` (new,
+  3 tests) and `src/components/auth/__tests__/ResetConfirmForm.test.tsx`
+  (new, 4 tests) cover the migration. Both files use `vi.mock` on
+  `@/app/actions/authPasswordReset.action` so they run in the node
+  environment without pulling in `next/headers` and the composition
+  container, mirroring the `SignupForm` page test pattern.
+- No behavioural change. Submit button copy (`"Send reset link"`,
+  `"Set new password"`, pending states `"Sending…"`, `"Saving…"`) is
+  unchanged. The submit button still uses an inline `.submit` style
+  for now; converting it to the `Button` primitive is a separate
+  concern that would change copy / focus / size behaviour and is
+  out of scope for this round. Closes audit M-16.
+
 ### 2026-08-15: Student-facing UI round 9 — UI barrel completeness (PR #336)
 
 - `src/components/ui/index.ts`: the public barrel of `@/components/ui`
