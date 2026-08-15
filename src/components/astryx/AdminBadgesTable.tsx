@@ -103,7 +103,8 @@ const COLUMNS: TableColumn<BadgeRow>[] = [
 
 export function AdminBadgesTable({ badges }: AdminBadgesTableProps) {
   return (
-    <>
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Achievement badges</figcaption>
       <Table
         data={badges}
         columns={COLUMNS}
@@ -124,6 +125,6 @@ export function AdminBadgesTable({ badges }: AdminBadgesTableProps) {
           No badges yet.
         </p>
       )}
-    </>
+    </figure>
   );
 }

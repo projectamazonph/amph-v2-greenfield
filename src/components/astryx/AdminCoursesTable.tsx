@@ -151,7 +151,8 @@ export function AdminCoursesTable({
   }) as unknown as TablePlugin<CourseRow>;
 
   return (
-    <>
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Courses</figcaption>
       <Table
         data={courses}
         columns={COLUMNS}
@@ -197,9 +198,9 @@ export function AdminCoursesTable({
               cursor: page > 1 ? "pointer" : "default",
             }}
           >
-            <ArrowLeft size={16} aria-hidden />{" "}Prev
+            <ArrowLeft size={16} aria-hidden /> Prev
           </Link>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>
+          <span aria-live="polite" style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>
             Page {page} of {totalPages}
           </span>
           <Link
@@ -211,10 +212,10 @@ export function AdminCoursesTable({
               cursor: page < totalPages ? "pointer" : "default",
             }}
           >
-            Next{" "}<ArrowRight size={16} aria-hidden />
+            Next <ArrowRight size={16} aria-hidden />
           </Link>
         </nav>
       )}
-    </>
+    </figure>
   );
 }

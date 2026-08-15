@@ -35,10 +35,15 @@ export function CourseCover({
   fetchPriority,
 }: CourseCoverProps) {
   return (
+    // L-07 fix: the course title is rendered as the adjacent heading (h1 on
+    // detail page, h2 on the catalog card), so the alt text would be read
+    // twice by screen readers. Mark the image as decorative via alt="" so
+    // assistive tech skips it.
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={getCourseCoverImage(slug, coverImage)}
-      alt={title}
+      alt=""
+      role="presentation"
       width={width}
       height={height}
       loading={loading}

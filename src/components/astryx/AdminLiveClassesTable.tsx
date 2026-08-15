@@ -104,7 +104,8 @@ const COLUMNS: TableColumn<LiveClassRow>[] = [
 
 export function AdminLiveClassesTable({ liveClasses }: AdminLiveClassesTableProps) {
   return (
-    <>
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Live classes</figcaption>
       <Table
         data={liveClasses}
         columns={COLUMNS}
@@ -125,6 +126,6 @@ export function AdminLiveClassesTable({ liveClasses }: AdminLiveClassesTableProp
           No live classes scheduled yet.
         </p>
       )}
-    </>
+    </figure>
   );
 }

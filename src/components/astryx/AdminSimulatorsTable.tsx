@@ -108,9 +108,7 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
     header: "Est. (min)",
     width: { type: "pixel", value: 90 },
     renderCell: (row) => (
-      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
-        {row.estimatedMinutes}
-      </span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{row.estimatedMinutes}</span>
     ),
   },
   {
@@ -170,7 +168,8 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
 
 export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSimulatorsTableProps) {
   return (
-    <>
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Simulator scenarios</figcaption>
       {/* SimulatorId filter chips */}
       <div
         style={{
@@ -248,6 +247,6 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
           No scenarios found.
         </p>
       )}
-    </>
+    </figure>
   );
 }
