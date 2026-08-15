@@ -254,6 +254,8 @@ ships as its own sub-commit so the diff stays reviewable.
 | 19 | Move the action buttons inline style on `/profile` into the CSS module | `refactor(profile)` |
 | 20 | Swap badge dots for real Phosphor icons with slug-based tier color | `polish(profile)` |
 | 21 | Bare "Quiz not found" text on the quiz page replaced with the shared `EmptyState` | `polish(quiz)` |
+| 22 | `<meta name="theme-color">` so mobile browsers tint the chrome to the Field Manual surface | `feat(app)` |
+| 23 | Brand-tinted focus-visible ring across links, buttons, and `.btn` (accent outline + soft halo) | `polish(a11y)` |
 
 ### Cancelled
 
@@ -275,6 +277,6 @@ ships as its own sub-commit so the diff stays reviewable.
 |------|------|-------|
 | 2026-07-31 P0/P1/P2 | 59 | 59 |
 | 2026-07-31 P3 enhancement | 34 | 40 |
-| 2026-08-15 student-facing UI | 21 | 21 |
-| **Combined** | **115** | **121** |
+| 2026-08-15 student-facing UI | 23 | 23 |
+| **Combined** | **117** | **123** |
 
