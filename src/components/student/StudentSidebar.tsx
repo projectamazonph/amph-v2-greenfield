@@ -39,13 +39,34 @@ interface NavItem {
   >;
 }
 
-const NAV_ITEMS: readonly NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: SquaresFour },
-  { href: "/courses", label: "My Courses", icon: BookOpen },
-  { href: "/tools", label: "Simulators", icon: GameController },
-  { href: "/resources", label: "Download center", icon: DownloadSimple },
-  { href: "/certificates", label: "Certificates", icon: Certificate },
-  { href: "/profile", label: "Profile", icon: UserCircle },
+interface NavSection {
+  label: string;
+  items: readonly NavItem[];
+}
+
+const NAV_SECTIONS: readonly NavSection[] = [
+  {
+    label: "Learn",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: SquaresFour },
+      { href: "/courses", label: "My Courses", icon: BookOpen },
+    ],
+  },
+  {
+    label: "Practice",
+    items: [{ href: "/tools", label: "Simulators", icon: GameController }],
+  },
+  {
+    label: "Resources",
+    items: [
+      { href: "/resources", label: "Download center", icon: DownloadSimple },
+      { href: "/certificates", label: "Certificates", icon: Certificate },
+    ],
+  },
+  {
+    label: "Account",
+    items: [{ href: "/profile", label: "Profile", icon: UserCircle }],
+  },
 ] as const;
 
 export interface StudentSidebarProps {
@@ -90,26 +111,33 @@ export function StudentSidebar({ user }: StudentSidebarProps) {
 
       {/* Nav */}
       <nav className={styles.nav}>
-        {NAV_ITEMS.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              data-active={isActive}
-              className={[styles.item, isActive ? styles.active : ""].filter(Boolean).join(" ")}
-              aria-current={isActive ? "page" : undefined}
-            >
-              <span className={styles.icon} aria-hidden>
-                <Icon size={18} weight={isActive ? "fill" : "regular"} />
-              </span>
-              <span className={styles.label}>{item.label}</span>
-            </Link>
-          );
-        })}
+        {NAV_SECTIONS.map((section) => (
+          <div key={section.label} className={styles.sectionGroup}>
+            <div className={styles.sectionLabel} aria-hidden>
+              {section.label}
+            </div>
+            {section.items.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  data-active={isActive}
+                  className={[styles.item, isActive ? styles.active : ""].filter(Boolean).join(" ")}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <span className={styles.icon} aria-hidden>
+                    <Icon size={18} weight={isActive ? "fill" : "regular"} />
+                  </span>
+                  <span className={styles.label}>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* User card at bottom */}
