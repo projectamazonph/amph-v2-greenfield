@@ -46,3 +46,22 @@
   min-width: 0;
   max-width: 100%;
 }
+
+/* Print: hide shell chrome so only the page content reaches the printer. */
+
+@media print {
+  .shell > :first-child,
+  .publicShell > :first-child {
+    display: none;
+  }
+
+  .shell {
+    display: block;
+    min-height: auto;
+  }
+
+  .publicShell {
+    display: block;
+    min-height: auto;
+  }
+}

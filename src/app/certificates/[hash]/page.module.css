@@ -255,3 +255,34 @@
   font-size: var(--text-xs);
   color: var(--ink-500);
 }
+
+/* Print stylesheet — hide chrome, let the certificate fill the page */
+
+@media print {
+  .page {
+    background: white;
+    padding: 0;
+    min-height: auto;
+  }
+
+  .container {
+    max-width: none;
+  }
+
+  .certCard {
+    border: 4px solid var(--info);
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  .certCard:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
+  .actions,
+  .hashLine,
+  .hashNote {
+    display: none;
+  }
+}
