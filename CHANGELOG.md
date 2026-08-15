@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 15 — Submit-button pending state announced to screen readers (PR #348)
+
+- `src/components/tools/BidElevatorForm.tsx`, `src/components/tools/KeywordResearchForm.tsx` (2 buttons), `src/components/tools/StrTriageForm.tsx`, `src/components/tools/ListingAuditForm.tsx` (2 buttons), and `src/components/tools/CampaignBuilderForm.tsx`: each of the seven submit buttons driving a `useTransition` graded simulator now exposes `aria-busy={pending}` alongside the existing `disabled={pending}` and "Running… / Grading… / Auditing…" label swap. The visible affordance already existed, but assistive tech only saw the `disabled` flip without an explanation — `aria-busy` is the ARIA 1.2 semantic that signals "this control is being modified and will not accept input until the change is complete", the WCAG-recommended adjunct to `disabled` for transition-driven submits. Closes audit M-08.
+- `src/components/tools/__tests__/aria-busy-tool-forms.test.ts` (new, 7 tests): source-string assertions that pin the `aria-busy` wiring on each submit button (one per form, plus a sanity case for the shared `<Button>` pass-through on `CampaignBuilderForm`). The five simulators are client components with rich state trees; pre-rendering them under the legacy Vitest renderer would pull the global function-coverage rate under the 80% floor, so the structural contract is locked on the JSX source, matching the `live-classes` skip-link pattern from PR #344. Tests count: 4,000 passed (was 3,993).
+
 ### 2026-08-15: Student-facing UI round 14 — Skip-link target wired on checkout flow (PR #346)
 
 - `src/app/checkout/CheckoutForm.tsx` (both root branches at L191 and L215), `src/app/checkout/success/page.tsx`, and `src/app/checkout/failed/page.tsx`: each root `<div>` wrapper now renders as `<main id="main-content" tabIndex={-1}>` instead. The skip-link in the root layout points at `#main-content` (WCAG 2.4.1 Bypass Blocks Level A); before this change the link was a no-op across the entire student purchase journey, so keyboard-only users landed on the first interactive element in the chrome instead of the order summary, the payment confirmation, or the failure message. This matches the canonical pattern already used by 25+ other student-facing pages.
