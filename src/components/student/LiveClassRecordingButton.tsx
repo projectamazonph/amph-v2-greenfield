@@ -87,6 +87,20 @@ export function LiveClassRecordingButton({
         </Button>
       )}
       {error ? <p role="alert">{error}</p> : null}
+      {/*
+        M-14: a visually-hidden `aria-live="polite"` region so screen
+        readers announce the loading transition. The button text changes
+        from "Mark as watched (+N XP)" to "Saving..." during the
+        transition, but sighted users see that change while screen reader
+        users only hear the button text when they re-focus it. The live
+        region copies the same wording so AT users hear "Saving..."
+        immediately on click and "Saved" once the transition completes.
+        The region is empty in the idle state so it does not pollute the
+        announcement queue at page load.
+      */}
+      <span className={styles.visuallyHidden} role="status" aria-live="polite">
+        {isPending ? "Saving your watch progress..." : ""}
+      </span>
     </div>
   );
 }

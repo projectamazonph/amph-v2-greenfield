@@ -15,3 +15,19 @@
   color: var(--ink-500);
   font-size: var(--text-sm);
 }
+
+/* M-14: visually-hidden helper for the aria-live announcement region.
+   Mirrors the standard sr-only pattern (1px clipped, absolute,
+   non-interactive). Kept local to the component instead of importing a
+   global utility so the bundle stays self-contained. */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
