@@ -622,6 +622,8 @@ export function CampaignBuilderForm({
                   ? styles.scoreWarning
                   : styles.scoreDanger
             }`}
+            role="status"
+            aria-live="polite"
           >
             Score: {gradedValue.overallScore}%
           </div>
@@ -634,9 +636,7 @@ export function CampaignBuilderForm({
         </p>
       ) : null}
       {gradedValue && gradedValue.feedback ? (
-        <p className={styles.error} style={{ color: "var(--ink-700)" }}>
-          {gradedValue.feedback.overallComment}
-        </p>
+        <p className={styles.feedback}>{gradedValue.feedback.overallComment}</p>
       ) : null}
     </form>
   );

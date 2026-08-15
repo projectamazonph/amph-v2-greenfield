@@ -138,6 +138,7 @@
 }
 
 .error { font-size: var(--text-sm); color: var(--danger); margin: 0; }
+.feedback { font-size: var(--text-sm); color: var(--ink-700); margin: 0; }
 
 .xpBanner { font-size: var(--text-sm); font-weight: 600; color: var(--success); margin: 0; }
 

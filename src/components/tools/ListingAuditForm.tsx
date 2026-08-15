@@ -227,6 +227,8 @@ export function ListingAuditForm({
         {gradeResult && gradeResult.ok ? (
           <div
             className={styles.score}
+            role="status"
+            aria-live="polite"
             style={{
               color:
                 gradeResult.value.overallScore >= 80
@@ -247,14 +249,12 @@ export function ListingAuditForm({
         </p>
       ) : null}
       {gradeResult && gradeResult.ok ? (
-        <p className={styles.error} style={{ color: "var(--ink-700)" }}>
-          {gradeResult.value.feedback.overallComment}
-        </p>
+        <p className={styles.feedback}>{gradeResult.value.feedback.overallComment}</p>
       ) : null}
       {stage !== "editing" ? (
         <div className={styles.findings}>
           <h3 className={styles.findingsTitle}>
-            Findings — triage each one as fix now, defer, skip, or escalate
+            Findings: triage each one as fix now, defer, skip, or escalate
           </h3>
           <ul className={styles.findingsList}>
             {findings.map((f) => {
@@ -272,7 +272,7 @@ export function ListingAuditForm({
                       data-correct={graded.isCorrect ? "true" : "false"}
                       title={graded.rationale}
                     >
-                      {graded.isCorrect ? "✓ correct" : `✗ expected ${graded.expectedAction}`}
+                      {graded.isCorrect ? "Correct" : `Expected: ${graded.expectedAction}`}
                     </span>
                   ) : (
                     <select

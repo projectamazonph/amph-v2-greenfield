@@ -213,6 +213,7 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
                               intent: e.target.value as KeywordIntent,
                             })
                           }
+                          aria-label={`Intent for ${k.term}`}
                         >
                           <option value="" disabled>
                             Choose…
@@ -253,7 +254,7 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
       ) : null}
 
       {attempt ? (
-        <div className={styles.results}>
+        <div className={styles.results} role="status" aria-live="polite">
           <div className={styles.summary}>
             <span className={styles.summaryItem}>
               <span className={styles.summaryLabel}>Score</span>

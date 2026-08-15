@@ -12,6 +12,12 @@
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+  }
+}
+
 .textLine {
   margin-bottom: var(--space-2);
 }

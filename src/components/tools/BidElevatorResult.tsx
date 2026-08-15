@@ -36,7 +36,12 @@ function confidenceLabel(confidence: "high" | "medium" | "low"): string {
 
 export function BidElevatorResult({ result, targetRoas, xpAwarded }: Props) {
   return (
-    <section className={styles.panel} aria-labelledby="bid-result-heading">
+    <section
+      className={styles.panel}
+      aria-labelledby="bid-result-heading"
+      role="status"
+      aria-live="polite"
+    >
       <header className={styles.header}>
         <h2 id="bid-result-heading" className={styles.heading}>
           Result
