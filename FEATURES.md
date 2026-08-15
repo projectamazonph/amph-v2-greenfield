@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-15 against the student-facing UI round 8 branch (PR #334 merged at ae5c1be)
+**Last reviewed:** 2026-08-15 against the student-facing UI round 9 branch (PR #336 merged at ae011c9)
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
@@ -149,7 +149,7 @@ On 2026-08-15:
 - TypeScript: pass.
 - ESLint: pass.
 - Next.js production build: pass.
-- Full Vitest run: 3,929 passing, 3 skipped.
+- Full Vitest run: 3,954 passing, 3 skipped.
 - Architecture suite: 669 passing.
 - Prisma schema and migration contract tests: pass as part of the full suite.
 - Playwright E2E: pass.

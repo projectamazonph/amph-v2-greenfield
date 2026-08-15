@@ -4,6 +4,32 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 9 — UI barrel completeness (PR #336)
+
+- `src/components/ui/index.ts`: the public barrel of `@/components/ui`
+  now exposes every UI primitive shipped in the design system.
+  `Breadcrumb` (+ `BreadcrumbItem`, `BreadcrumbProps`),
+  `CommandPalette` (+ `CommandItem`, `CommandPaletteProps`),
+  `ConfirmDialog` (+ `ConfirmDialogProps`), `EmptyState` (+ `EmptyStateProps`),
+  `MobileNavToggle` (+ `MobileNavToggleProps`), `PrintButton`,
+  `RouteError`, `ScrollToTop`, and every Skeleton primitive
+  (`SkeletonBlock`, `SkeletonText`, `SkeletonRow`, `SkeletonCard`,
+  `SkeletonTable`, `SkeletonStatTile`, `SkeletonForm` + `SkeletonBlockProps`)
+  are added. `RouteErrorProps` is intentionally kept internal because
+  only the wrapper itself needs the `digest` / `withinMain` shape, and
+  re-exporting it would leak implementation detail into the public
+  surface for no consumer benefit. Closes audit H-07.
+- `src/components/ui/__tests__/index.test.tsx`: the round 6 barrel
+  smoke test is extended with three assertion blocks (one per group
+  of new exports) and six render tests that exercise `Breadcrumb`,
+  `EmptyState`, `PrintButton`, `SkeletonBlock`, `SkeletonText`, and
+  `SkeletonTable` through the barrel to confirm the wiring survives
+  the hop. Nine tests in total — the `index.test.tsx` file grows from
+  49 to 144 lines.
+- No consumer code is changed. Existing deep imports
+  (`@/components/ui/<Name>`) continue to work; the barrel is purely
+  additive. Future consumer code should import from the barrel.
+
 ### 2026-08-15: Student-facing UI round 8 — campaign builder label pairing (PR #334)
 
 - `src/components/tools/CampaignBuilderForm.tsx`: every placeholder-only

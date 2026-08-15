@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-15 against the student-facing UI round 8 branch (PR #334 merged at ae5c1be)
+**Last verified:** 2026-08-15 against the student-facing UI round 9 branch (PR #336 merged at ae011c9)
 
 **Repository:** `amph-v2-greenfield`
 
@@ -38,7 +38,7 @@ checks, TypeScript, ESLint, production build, Playwright, and Lighthouse.
 
 - TypeScript: pass.
 - ESLint: pass.
-- Full Vitest suite: 3,945 passing and 3 intentionally skipped.
+- Full Vitest suite: 3,954 passing and 3 intentionally skipped.
 - Student event boundary coverage is documented in
   `docs/STUDENT-EVENT-COVERAGE.md`.
 - Architecture suite: 669 passing, including design-token and loading-state
