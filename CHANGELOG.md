@@ -4,6 +4,35 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing a11y round 5 on tables, skeletons, and course covers (PR #328)
+
+- `src/components/student/CourseCover.tsx`: the course cover image is
+  now marked decorative (`alt=""` + `role="presentation"`) because the
+  course title is rendered as the adjacent heading on both the catalog
+  card (`h2`) and the detail page (`h1`). Screen readers no longer read
+  the title twice. Test updated accordingly. Closes audit L-07.
+- `src/components/ui/Skeleton.tsx` and
+  `src/components/ui/Skeleton.module.css`: `SkeletonTable` now uses real
+  table semantics (`<table>` / `<thead>` / `<tbody>` / `<tr>` / `<th>`
+  / `<td>`) so the loading placeholder mirrors the table that will
+  replace it. The wrapper still carries `aria-busy="true"`,
+  `aria-live="polite"`, and `role="status"`. Header cells use
+  `scope="col"` per WCAG 1.3.1. Closes audit L-11.
+- `src/components/astryx/AdminUsersTable.tsx`,
+  `src/components/astryx/AdminResourcesTable.tsx`, and
+  `src/components/astryx/AdminCoursesTable.tsx`: the page-count `<span>`
+  in each pagination block now carries `aria-live="polite"` so screen
+  readers announce page changes. Closes audit M-13.
+- `src/components/astryx/AdminBadgesTable.tsx`,
+  `src/components/astryx/AdminCoursesTable.tsx`,
+  `src/components/astryx/AdminDiscountCodesTable.tsx`,
+  `src/components/astryx/AdminLiveClassesTable.tsx`,
+  `src/components/astryx/AdminResourcesTable.tsx`, and
+  `src/components/astryx/AdminSimulatorsTable.tsx`: each table now wraps
+  its `<Table>` in a `<figure>` + `<figcaption className="sr-only">` for
+  an accessible name. Brings the full set to 10/10 admin tables with a
+  figcaption accessible name. Closes audit C-08.
+
 ### 2026-08-15: Student-facing UI round 4 — field manual compliance + landing link wiring (PR #326)
 
 - `src/components/ui/MobileNavToggle.module.css`: the mobile nav
