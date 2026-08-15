@@ -223,8 +223,50 @@ See `docs/REMAINING-P3-FEATURES.md` for full implementation specs.
 | P3-86 | PDF certificate download | `@react-pdf/renderer` (already in package.json)              |
 | P3-87 | In-app notifications     | Schema migration                                             |
 
-### Recommendation
+## Student-Facing UI Pass — 2026-08-15
 
-1. Open a fast-follow PR to fix the Typecheck issue (likely a 1-2 line fix).
-2. Then open a follow-up PR for the 6 deferred P3 features.
-3. Schedule a code review session to walk through the new shared components and hooks.
+Following the 2026-07-31 audit, a focused enhancement pass identified and
+shipped 14 additional improvements to the student-facing surface. Each
+ships as its own sub-commit so the diff stays reviewable.
+
+### Shipped
+
+| # | Task | Commit area |
+|---|------|-------------|
+| 1 | `ConfirmDialog` primitive (native `<dialog>`), 10 tests | `feat(ui)` |
+| 2 | Sign-out confirm dialog wired into `StudentSidebar` | `feat(student)` |
+| 3 | 2FA setup step indicator on `profile/security/2fa-setup` | `feat(profile)` |
+| 4 | Replace `:has()` selector in course detail | `fix(courses)` |
+| 5 | Reset-password form wrapped in a card | `feat(auth)` |
+| 6 | `id="main-content" tabIndex={-1}` on every student `<main>` so the skip-link target is universal | `feat(a11y)` |
+| 7 | Inline badge styles on `/courses` moved into the page CSS module | `refactor(courses)` |
+| 8 | Print stylesheet hides chrome and lets the certificate fill the page | `feat(certificates)` |
+| 9 | Student sidebar nav reorganised into Learn / Practice / Resources / Account section groups | `feat(student)` |
+| 10 | Estimated reading time row on the lesson header (video / quiz / read) | `feat(ui)` |
+| 11 | Shared `Breadcrumb` component used across every `/tools/*` page | `feat(ui)` |
+| 12 | `ScrollToTop` FAB mounted in `StudentShell`, 8 tests | `feat(student)` |
+| 13 | Type correction so the lesson meta helper compiles against the curriculum `Lesson` shape | `fix(lessons)` |
+
+### Cancelled
+
+- **Confetti on lesson completion** — `canvas-confetti` is not in the
+  dependency graph. AGENTS.md forbids adding packages without updating
+  `pnpm-lock.yaml`. Deferred to a separate cleanup PR if a follow-up
+  wants to introduce the dependency.
+
+### Verification (2026-08-15)
+
+- `npx tsc --noEmit` — zero type errors
+- `npx eslint .` — zero ESLint errors
+- `npx vitest run` — 3929 tests pass, 3 skipped
+- `npx next build` — production build succeeds, 52 static pages generated
+
+### Total fixes shipped to date
+
+| Pass | Done | Total |
+|------|------|-------|
+| 2026-07-31 P0/P1/P2 | 59 | 59 |
+| 2026-07-31 P3 enhancement | 34 | 40 |
+| 2026-08-15 student-facing UI | 14 | 14 |
+| **Combined** | **107** | **113** |
+
