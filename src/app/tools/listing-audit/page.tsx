@@ -8,12 +8,12 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 import { ListingAuditForm } from "@/components/tools/ListingAuditForm";
 import { StudentShell } from "@/components/student/StudentShell";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { listingAuditScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
@@ -46,13 +46,7 @@ export default async function ListingAuditPage() {
   return (
     <StudentShell>
       <main id="main-content" tabIndex={-1} className={styles.page}>
-        <nav className={styles.breadcrumb}>
-          <Link href="/tools">
-            <ArrowLeft size={16} aria-hidden /> Tools
-          </Link>
-          <span aria-hidden="true"> / </span>
-          <span>Listing Audit</span>
-        </nav>
+        <Breadcrumb items={[{ href: "/tools", label: "Tools" }, { label: "Listing Audit" }]} />
         <header className={styles.header}>
           <span className={styles.eyebrow}>Simulator</span>
           <h1 className={styles.title}>{scenario.name}</h1>

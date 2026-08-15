@@ -11,6 +11,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { Clock, ListChecks, Play } from "@phosphor-icons/react/dist/ssr";
 
 import { buildContainer } from "@/composition/container";
 import { courseIsAvailable } from "@/domain/entities/Course";
@@ -24,6 +25,18 @@ import { Button } from "@/components/ui/Button";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
 import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.action";
 import styles from "./page.module.css";
+
+function estimateReadingMinutes(lesson: Lesson): { minutes: number; kind: "video" | "reading" | "quiz" } {
+  if (lesson.type === "VIDEO") {
+    return { minutes: Math.max(1, Math.round(lesson.content.durationMinutes)), kind: "video" };
+  }
+  if (lesson.type === "QUIZ") {
+    return { minutes: Math.max(1, lesson.content.questions.length * 1), kind: "quiz" };
+  }
+  // TEXT: estimate from word count (avg 200 wpm)
+  const words = lesson.content.body.trim().split(/\s+/).filter(Boolean).length;
+  return { minutes: Math.max(1, Math.round(words / 200)), kind: "reading" };
+}
 
 interface PageProps {
   params: Promise<{ slug: string; lessonId: string }>;
@@ -194,6 +207,24 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           <div className={styles.lessonHeader}>
             <p className={styles.sectionLabel}>{sectionTitle}</p>
             <h1 className={styles.lessonTitle}>{lesson.title}</h1>
+            {(() => {
+              const est = estimateReadingMinutes(lesson);
+              const label =
+                est.kind === "video"
+                  ? `${est.minutes} min video`
+                  : est.kind === "quiz"
+                    ? `~${est.minutes} min quiz`
+                    : `${est.minutes} min read`;
+              const Icon = est.kind === "video" ? Play : est.kind === "quiz" ? ListChecks : Clock;
+              return (
+                <div className={styles.lessonMeta}>
+                  <span className={styles.lessonMetaItem}>
+                    <Icon size={14} aria-hidden className={styles.lessonMetaIcon} />
+                    {label}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Lesson body */}
