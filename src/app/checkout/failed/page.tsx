@@ -33,9 +33,8 @@ export default async function CheckoutFailedPage({
       <div className={styles.card}>
         <div className={styles.logo}>Project Amazon PH Academy</div>
         <XCircle
-          className={styles.checkmark}
+          className={`${styles.checkmark} ${styles.danger}`.trim()}
           weight="duotone"
-          style={{ color: "var(--danger)" }}
           aria-hidden="true"
         />
         <h1 className={styles.title}>Payment not completed</h1>
