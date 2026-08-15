@@ -15,6 +15,23 @@ import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { Flame, Medal, Star, Trophy } from "@phosphor-icons/react/dist/ssr";
+import type { Icon } from "@phosphor-icons/react/dist/lib/types";
+
+// Each badge's iconName is a Phosphor icon name (free entry by admin).
+// We map the three seeded slugs to real icons; anything else falls
+// back to Medal so the badge still renders a glyph instead of a dot.
+const BADGE_ICONS: Record<string, Icon> = {
+  Trophy,
+  Flame,
+  Star,
+  Medal,
+};
+
+function BadgeIcon({ iconName, slug }: { iconName: string; slug: string }) {
+  const IconComponent = BADGE_ICONS[iconName] ?? Medal;
+  return <IconComponent className={styles.badgeIcon} weight="duotone" aria-hidden="true" data-slug={slug} />;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -56,8 +73,8 @@ export default async function ProfilePage() {
             ) : (
               <ul className={styles.badgeGrid}>
                 {badges.map((b) => (
-                  <li key={b.awardId} className={styles.badge} title={b.name}>
-                    <span className={styles.badgeDot} />
+                  <li key={b.awardId} className={styles.badge} title={b.description}>
+                    <BadgeIcon iconName={b.iconName} slug={b.slug} />
                     <span className={styles.badgeName}>{b.name}</span>
                   </li>
                 ))}

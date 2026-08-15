@@ -103,6 +103,21 @@
   background: var(--surface-2);
 }
 
+.badgeIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.badgeIcon[data-slug="5-day-streak"] {
+  color: var(--danger, var(--accent));
+}
+
+.badgeIcon[data-slug="all-3-courses-enrolled"] {
+  color: var(--info, var(--accent));
+}
+
 .badgeDot {
   width: 12px;
   height: 12px;
