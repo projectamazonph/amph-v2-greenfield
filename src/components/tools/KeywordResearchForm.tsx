@@ -144,7 +144,12 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
               maxLength={120}
             />
           </div>
-          <button type="submit" className={styles.submit} disabled={pending}>
+          <button
+            type="submit"
+            className={styles.submit}
+            disabled={pending}
+            aria-busy={pending}
+          >
             {pending ? "Loading…" : "Generate keywords"}
           </button>
         </div>
@@ -247,6 +252,7 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
             className={styles.submit}
             disabled={pending || classifiedCount < preview.keywords.length}
             onClick={onSubmitForGrading}
+            aria-busy={pending}
           >
             {pending ? "Grading…" : "Submit for grading"}
           </button>

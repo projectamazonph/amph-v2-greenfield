@@ -146,7 +146,12 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
         </p>
       ) : null}
       <div className={styles.footer}>
-        <button type="submit" className={styles.submit} disabled={pending || result !== null}>
+        <button
+          type="submit"
+          className={styles.submit}
+          disabled={pending || result !== null}
+          aria-busy={pending}
+        >
           {pending ? "Grading…" : result ? "Graded" : "Grade my triage"}
         </button>
         {result ? (

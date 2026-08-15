@@ -644,7 +644,12 @@ export function CampaignBuilderForm({
         </p>
       ) : null}
       <div className={styles.footer}>
-        <Button type="submit" variant="primary" disabled={pending || graded}>
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={pending || graded}
+          aria-busy={pending}
+        >
           {pending ? "Grading…" : graded ? "Graded" : "Submit for grading"}
         </Button>
         {gradedValue ? (
