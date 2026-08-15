@@ -4,6 +4,41 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI pass — 25 entries (PR #320)
+
+- Shipped 25 small, reviewable student-facing UI improvements across the auth,
+  course, lesson, quiz, simulator, profile, checkout, and app-shell surfaces.
+- New primitives: `ConfirmDialog` (native `<dialog>`, 10 tests), `Breadcrumb`
+  shared across `/tools/*`, and `ScrollToTop` FAB mounted in `StudentShell`
+  with 8 tests.
+- New accessibility behaviors: `id="main-content" tabIndex={-1}` on every
+  student `<main>`, brand-tinted focus-visible ring across links, buttons,
+  and `.btn`, and `<meta name="theme-color">` so mobile browsers tint the
+  chrome.
+- Lesson, quiz, and profile polish: estimated reading time on the lesson
+  header, real Phosphor icons on profile badges with slug-based tier color,
+  quiz page breadcrumb showing the course title and the current quiz title,
+  and the bare "Quiz not found" text replaced with the shared `EmptyState`.
+- Student sidebar nav reorganised into Learn/Practice/Resources/Account.
+- Checkout polish: scaled-in success/failed checkmark animation, FAQ link on
+  the failed checkout page so stuck students can self-serve, and a 5-second
+  auto-redirect countdown on the success page.
+- Cleanup: inline styles on `/checkout/failed`, `/profile`, and the trailing
+  inline style on the catalog cards moved into the page CSS modules; the
+  `:has()` selector and the hanging inline badge styles on `/courses` were
+  removed.
+- Branded root `not-found.tsx` so unmatched routes match the Field Manual.
+- Print stylesheet hides chrome and lets the certificate fill the page.
+- 2FA setup step indicator on `/profile/security/2fa-setup`.
+- Reset-password form wrapped in a card.
+- Cancelled: confetti on lesson completion. `canvas-confetti` is not in the
+  dependency graph. AGENTS.md forbids adding packages without updating
+  `pnpm-lock.yaml`. Deferred to a separate cleanup PR if a follow-up wants
+  to introduce the dependency.
+- Verified 3,929 Vitest tests passing with 3 skipped, 669 architecture
+  checks passing, clean TypeScript and ESLint, and a successful Next.js
+  production build.
+
 ### 2026-08-14: Architecture documentation refresh
 
 - Synced `docs/architecture/03-site-map.md`, `docs/architecture/02-admin-panel-wiring.md`,

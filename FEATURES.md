@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-13 against the admin-event coverage branch
+**Last reviewed:** 2026-08-15 against the student-facing UI pass branch (PR #320)
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
@@ -144,15 +144,13 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 
 ## Verification snapshot
 
-On 2026-08-13:
+On 2026-08-15:
 
 - TypeScript: pass.
 - ESLint: pass.
 - Next.js production build: pass.
-- Full Vitest run: 3,869 passing, 2 skipped.
-- Coverage run: 80.21% statements, 74.17% branches, 81.46% functions, and
-  81.56% lines.
-- Architecture suite: 665 passing.
+- Full Vitest run: 3,929 passing, 3 skipped.
+- Architecture suite: 669 passing.
 - Prisma schema and migration contract tests: pass as part of the full suite.
 - Playwright E2E: pass.
 - Lighthouse: pass.
