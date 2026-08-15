@@ -41,7 +41,7 @@ export default async function PurchasesPage({ searchParams }: Props) {
 
   return (
     <StudentShell user={user}>
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <header className={styles.header}>
           <h1 className={styles.title}>Purchases and refunds</h1>
           <p className={styles.email}>Review payment status and request eligible refunds.</p>

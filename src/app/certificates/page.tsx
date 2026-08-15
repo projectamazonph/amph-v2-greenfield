@@ -20,7 +20,7 @@ export default async function CertificatesPage() {
 
   return (
     <StudentShell user={user}>
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <header className={styles.header}>
           <h1 className={styles.title}>Certificates</h1>
           <p className={styles.email}>View, verify, and download your course certificates.</p>

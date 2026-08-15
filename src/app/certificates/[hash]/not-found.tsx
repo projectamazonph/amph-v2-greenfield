@@ -15,7 +15,7 @@ import styles from "./not-found.module.css";
 
 export default function CertificateNotFound() {
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <div className={styles.center}>
         <div className={styles.iconCircle}>
           <Warning size={32} weight="fill" className={styles.icon} aria-hidden />

@@ -2,7 +2,7 @@ import { SkeletonBlock, SkeletonText, SkeletonCard } from "@/components/ui/Skele
 
 export default function LessonDetailLoading() {
   return (
-    <main aria-busy="true">
+    <main id="main-content" tabIndex={-1} aria-busy="true">
       <div style={{ padding: "var(--space-10) var(--side-pad)", maxWidth: 720 }}>
         <SkeletonBlock width="40%" height="1.25rem" variant="text" />
         <div style={{ marginTop: "var(--space-4)" }}>

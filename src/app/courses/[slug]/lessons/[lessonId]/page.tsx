@@ -155,7 +155,7 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
       />
 
       {/* Main content */}
-      <main id="lesson-content" className={styles.main}>
+      <main id="main-content" tabIndex={-1} className={styles.main}>
         <div className={styles.content}>
           {/* Breadcrumb */}
           <nav className={styles.breadcrumb} aria-label="Breadcrumb">

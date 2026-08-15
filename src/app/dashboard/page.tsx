@@ -72,7 +72,7 @@ export default async function DashboardPage() {
 
   return (
     <StudentShell user={user}>
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         {/* Welcome */}
         <header className={styles.hero}>
           <h1 className={styles.heroTitle}>Welcome back, {user.firstName}.</h1>

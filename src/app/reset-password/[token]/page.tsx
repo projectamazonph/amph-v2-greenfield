@@ -18,7 +18,7 @@ interface Props {
 export default async function ResetConfirmPage({ params }: Props) {
   const { token } = await params;
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <h1 className={styles.title}>Set a new password</h1>
       <p className={styles.body}>
         Choose a password at least 8 characters long with a mix of

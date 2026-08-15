@@ -50,7 +50,7 @@ export default async function ResourcesPage() {
   if (!result.ok) {
     return (
       <StudentShell user={user}>
-        <main>
+        <main id="main-content" tabIndex={-1}>
           <div className={styles.header}>
             <h1 className={styles.title}>Download center</h1>
           </div>
@@ -76,7 +76,7 @@ export default async function ResourcesPage() {
 
   return (
     <StudentShell user={user}>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <div className={styles.header}>
           <h1 className={styles.title}>Download center</h1>
           <p className={styles.subtitle}>

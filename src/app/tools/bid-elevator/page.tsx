@@ -59,7 +59,7 @@ export default async function BidElevatorPage() {
 
   return (
     <StudentShell>
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <nav className={styles.breadcrumb}>
           <Link href="/tools"><ArrowLeft size={16} aria-hidden /> Tools</Link>
           <span aria-hidden="true"> / </span>
