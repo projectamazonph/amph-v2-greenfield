@@ -1,0 +1,123 @@
+/* QuizEditor.module.css — admin question/option editor.
+   Field Manual · utilitarian, dense, borders-as-elevation. No shadows.
+   Replaces the inline style blocks that lived on each element in
+   QuizEditor.tsx; tokens live here so the spacing scale stays consistent
+   with the rest of the design system (H-18). */
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin: 0;
+  color: var(--ink-700);
+}
+
+.addQuestionButton {
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface-2);
+  color: var(--ink-700);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.questionCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.questionRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.questionLabel {
+  font-weight: 600;
+  color: var(--ink-700);
+}
+
+.questionInput {
+  flex: 1;
+  padding: var(--space-2) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  background: var(--surface-0);
+}
+
+.optionsStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-6);
+}
+
+.optionRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.optionInput {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  background: var(--surface-0);
+}
+
+.iconButton {
+  width: var(--space-6);
+  height: var(--space-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-0);
+  color: var(--ink-700);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.iconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.iconButtonDanger {
+  color: var(--danger);
+}
+
+.addOptionButton {
+  align-self: flex-start;
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  color: var(--accent);
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: var(--space-1);
+}

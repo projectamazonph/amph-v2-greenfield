@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { COURSES_URL } from "./constants";
 import { Logo } from "./Logo";
 import shared from "./shared.module.css";
@@ -48,7 +49,7 @@ export function Footer() {
               See the courses
             </a>
             <a href="#curriculum">See what&rsquo;s inside</a>
-            <a href="/login">Sign in</a>
+            <Link href="/login">Sign in</Link>
             <a href="#top">Back to top</a>
           </div>
         </div>

@@ -380,17 +380,18 @@ table tbody tr:hover {
   background: var(--surface-2);
 }
 
-/* Card hover lift */
-.astryx-card,
-[class*="card"] {
+/* Card hover lift
+   H-03 fix: Field Manual spec §5 says "borders as elevation; cards are
+   static at rest". The previous `[class*="card"]:hover` selector matched
+   every element that happened to contain "card" in its class (sidebar
+   items, stat tiles, discard buttons, etc.) and silently lifted them.
+   The interactive variant in src/components/ui/Card.module.css already
+   handles the hover state for genuine interactive cards; this rule
+   should be a no-op. */
+.astryx-card {
   transition:
     transform var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
-}
-.astryx-card:hover,
-[class*="card"]:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* Consistent focus ring for form inputs */

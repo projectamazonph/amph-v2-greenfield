@@ -9,6 +9,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styles from "./QuizEditor.module.css";
 
 export interface EditorOption {
   id: string;
@@ -133,47 +134,18 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
   }, [name, questions]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <h3 style={{ fontSize: "1rem", fontWeight: 600, margin: 0, color: "var(--ink-700)" }}>
-          Questions ({questions.length})
-        </h3>
-        <button
-          type="button"
-          onClick={addQuestion}
-          style={{
-            padding: "0.375rem 0.75rem",
-            background: "var(--surface-2, #f4f4f5)",
-            color: "var(--ink-700)",
-            border: "1px solid var(--border, #d4d4d8)",
-            borderRadius: "0.375rem",
-            fontSize: "0.8125rem",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
+    <div className={styles.editor}>
+      <div className={styles.header}>
+        <h3 className={styles.headerTitle}>Questions ({questions.length})</h3>
+        <button type="button" onClick={addQuestion} className={styles.addQuestionButton}>
           + Add question
         </button>
       </div>
 
       {questions.map((q, qIndex) => (
-        <div
-          key={q.id}
-          style={{
-            border: "1px solid var(--border, #e4e4e7)",
-            borderRadius: "0.5rem",
-            padding: "1rem",
-            background: "var(--surface-2, #fafafa)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.75rem",
-          }}
-        >
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <label
-              htmlFor={`q-${qIndex}-text`}
-              style={{ fontWeight: 600, color: "var(--ink-700)" }}
-            >
+        <div key={q.id} className={styles.questionCard}>
+          <div className={styles.questionRow}>
+            <label htmlFor={`q-${qIndex}-text`} className={styles.questionLabel}>
               Q{qIndex + 1}
             </label>
             <input
@@ -184,21 +156,14 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
               placeholder="Question text…"
               required
               aria-label={`Question ${qIndex + 1} text`}
-              style={{
-                flex: 1,
-                padding: "0.5rem 0.75rem",
-                border: "1px solid var(--border, #d4d4d8)",
-                borderRadius: "0.375rem",
-                fontSize: "0.875rem",
-                background: "white",
-              }}
+              className={styles.questionInput}
             />
             <button
               type="button"
               onClick={() => moveQuestion(qIndex, -1)}
               disabled={qIndex === 0}
               aria-label="Move question up"
-              style={iconButtonStyle(qIndex === 0)}
+              className={styles.iconButton}
             >
               ↑
             </button>
@@ -207,7 +172,7 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
               onClick={() => moveQuestion(qIndex, 1)}
               disabled={qIndex === questions.length - 1}
               aria-label="Move question down"
-              style={iconButtonStyle(qIndex === questions.length - 1)}
+              className={styles.iconButton}
             >
               ↓
             </button>
@@ -215,22 +180,15 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
               type="button"
               onClick={() => removeQuestion(qIndex)}
               aria-label="Remove question"
-              style={{ ...iconButtonStyle(false), color: "var(--danger)" }}
+              className={`${styles.iconButton} ${styles.iconButtonDanger}`}
             >
               ✕
             </button>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.375rem",
-              paddingLeft: "1.5rem",
-            }}
-          >
+          <div className={styles.optionsStack}>
             {q.options.map((o, oIndex) => (
-              <div key={o.id} style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <div key={o.id} className={styles.optionRow}>
                 <input
                   id={`q-${qIndex}-opt-${oIndex}-correct`}
                   type="radio"
@@ -247,21 +205,14 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
                   placeholder={`Option ${oIndex + 1} text…`}
                   required
                   aria-label={`Option ${oIndex + 1} text for question ${qIndex + 1}`}
-                  style={{
-                    flex: 1,
-                    padding: "0.375rem 0.625rem",
-                    border: "1px solid var(--border, #d4d4d8)",
-                    borderRadius: "0.375rem",
-                    fontSize: "0.8125rem",
-                    background: "white",
-                  }}
+                  className={styles.optionInput}
                 />
                 <button
                   type="button"
                   onClick={() => removeOption(qIndex, oIndex)}
                   disabled={q.options.length <= 2}
                   aria-label={`Remove option ${oIndex + 1} from question ${qIndex + 1}`}
-                  style={iconButtonStyle(q.options.length <= 2)}
+                  className={styles.iconButton}
                 >
                   ✕
                 </button>
@@ -270,18 +221,7 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
             <button
               type="button"
               onClick={() => addOption(qIndex)}
-              style={{
-                alignSelf: "flex-start",
-                padding: "0.25rem 0.625rem",
-                background: "transparent",
-                color: "var(--accent)",
-                border: "1px dashed var(--accent)",
-                borderRadius: "0.375rem",
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                marginTop: "0.25rem",
-              }}
+              className={styles.addOptionButton}
             >
               + Add option
             </button>
@@ -290,21 +230,4 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
       ))}
     </div>
   );
-}
-
-function iconButtonStyle(disabled: boolean): React.CSSProperties {
-  return {
-    width: "1.75rem",
-    height: "1.75rem",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "white",
-    color: "var(--ink-700)",
-    border: "1px solid var(--border, #d4d4d8)",
-    borderRadius: "0.25rem",
-    fontSize: "0.875rem",
-    cursor: disabled ? "not-allowed" : "pointer",
-    opacity: disabled ? 0.4 : 1,
-  };
 }

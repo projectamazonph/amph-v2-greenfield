@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { COURSES_URL } from "./constants";
 import { Logo } from "./Logo";
 import shared from "./shared.module.css";
@@ -72,13 +73,13 @@ export function TopBar() {
                 {link.label}
               </a>
             ))}
-            <a
+            <Link
               href={loginLink.href}
               className={styles.loginLink}
               onClick={() => setMenuOpen(false)}
             >
               {loginLink.label}
-            </a>
+            </Link>
             <a
               className={[shared.btn, shared.btnPrimary, styles.navCtaMobile].join(" ")}
               href={COURSES_URL}
