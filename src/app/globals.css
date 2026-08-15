@@ -199,13 +199,27 @@ video {
 }
 
 /* =========================================================================
-   Astryx Card overrides — lifted feel for AMPH Field Manual.
-   The base Astryx Card has no shadow; AMPH admin needs a subtle warm
-   shadow to separate cards from the off-white surface.
+   Astryx Card overrides — Field Manual §5 honors the design-brief.
+   design-brief.md:142 says: "Shadow: none (the border is the elevation;
+   shadow would fight the manual aesthetic)". The shared Card primitive
+   in src/components/ui/Card.module.css already drops the default
+   shadow (L7 fix) and adds a 1px translateY lift on .interactive:hover.
+   This rule therefore must NOT add a default box-shadow: every Card
+   on every student-facing page (live-classes, profile, etc.) and every
+   admin page (refunds, email-templates, etc.) inherits from here.
+   The `.interactive:hover` border-color and translateY are handled in
+   Card.module.css. The [data-variant="transparent"] block is kept as
+   a defensive guard for callers that opt in to a shadow explicitly.
    ========================================================================= */
 
 .astryx-card {
-  box-shadow: var(--shadow-sm);
+  /* M-R17 fix: design-brief.md:142 bans shadow on cards. The border
+     is the elevation. Previously this rule re-added a soft
+     box-shadow on every Card, which contradicted the L7 fix in
+     Card.module.css line 12 and silently violated the Field Manual
+     §5 contract on 12+ usages across live-classes (student),
+     profile (student), admin/refunds (admin), and admin/email-templates
+     (admin). */
 }
 
 .astryx-card[data-variant="transparent"] {
