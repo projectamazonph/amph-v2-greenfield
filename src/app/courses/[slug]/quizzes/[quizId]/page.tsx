@@ -3,6 +3,7 @@ import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { QuizPlayer } from "@/components/courses/QuizPlayer";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 import styles from "../../lessons/[lessonId]/quiz/page.module.css";
@@ -103,9 +104,11 @@ export default async function QuizPage({ params }: Props) {
 function NotFoundMessage({ slug }: { slug: string }) {
   return (
     <main id="main-content" tabIndex={-1} className={styles.page}>
-      <h1 className={styles.title}>Quiz not found</h1>
-      <p>This quiz is not available for the selected course.</p>
-      <Link href={`/courses/${slug}`}>Back to course</Link>
+      <EmptyState
+        title="Quiz not found"
+        description="This quiz is not available for the selected course."
+        action={<Link href={`/courses/${slug}`}>Back to course</Link>}
+      />
     </main>
   );
 }
