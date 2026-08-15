@@ -19,6 +19,17 @@ describe("/checkout/success", () => {
     expect(html).toMatch(/href="\/dashboard"/);
   });
 
+  // H-08: skip-link target. The skip-link in the root layout points at
+  // #main-content. The page must expose that id (plus tabIndex=-1 so the
+  // link target is focusable) on a <main> tag. Without this, keyboard-only
+  // users cannot reach the confirmation card via the skip link.
+  it("renders the skip-link target on a <main> landmark", async () => {
+    const html = renderToString(
+      await SuccessPage({ searchParams: Promise.resolve({ orderId: "ord_123" }) }),
+    );
+    expect(html).toMatch(/<main[^>]*\bid="main-content"[^>]*\btabindex="-1"[^>]*>/i);
+  });
+
   it("shows the orderId reference when present", async () => {
     const html = renderToString(
       await SuccessPage({ searchParams: Promise.resolve({ orderId: "ord_xyz" }) }),

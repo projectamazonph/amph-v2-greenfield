@@ -29,7 +29,7 @@ export default async function CheckoutFailedPage({
     ? `/checkout?courseSlug=${encodeURIComponent(courseSlug)}`
     : "/courses";
   return (
-    <div className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>Project Amazon PH Academy</div>
         <XCircle
@@ -43,10 +43,7 @@ export default async function CheckoutFailedPage({
           whenever you're ready — your spot in the catalog is still open.
         </p>
         <div className={styles.cta}>
-          <Link
-            href={retryHref}
-            className={styles.btnPrimary}
-          >
+          <Link href={retryHref} className={styles.btnPrimary}>
             Try again
           </Link>
           <Link href="/courses" className={styles.link}>
@@ -55,10 +52,13 @@ export default async function CheckoutFailedPage({
         </div>
         {orderId && <p className={styles.orderId}>Order reference: {orderId}</p>}
         <p className={styles.helpLine}>
-          Still stuck? <Link href="/faq" className={styles.linkSecondary}>Read the FAQ</Link> or
-          reach out. Your order is saved, so we can sort it out together.
+          Still stuck?{" "}
+          <Link href="/faq" className={styles.linkSecondary}>
+            Read the FAQ
+          </Link>{" "}
+          or reach out. Your order is saved, so we can sort it out together.
         </p>
       </div>
-    </div>
+    </main>
   );
 }

@@ -188,7 +188,7 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
 
   if (!offer || !summary) {
     return (
-      <div style={PAGE_STYLES.page}>
+      <main id="main-content" tabIndex={-1} style={PAGE_STYLES.page}>
         <div style={PAGE_STYLES.card}>
           <div style={PAGE_STYLES.header}>
             <div style={PAGE_STYLES.logo}>Project Amazon PH Academy</div>
@@ -202,7 +202,7 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
             to start checkout.
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -212,7 +212,7 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
   const formattedTotal = summary.price.format("en-PH");
 
   return (
-    <div style={PAGE_STYLES.page}>
+    <main id="main-content" tabIndex={-1} style={PAGE_STYLES.page}>
       <div style={PAGE_STYLES.card}>
         <div style={PAGE_STYLES.header}>
           <div style={PAGE_STYLES.logo}>Project Amazon PH Academy</div>
@@ -331,7 +331,7 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
           </Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }
 
