@@ -230,11 +230,17 @@ export function BidElevator() {
   }, []);
 
   // The interpolation + redraw loop runs continuously so KPI numbers and
-  // bars ease toward whatever the sliders currently target.
+  // bars ease toward whatever the sliders currently target. Pause the
+  // loop while the canvas is offscreen so the page does not pay for a
+  // 60fps draw it cannot show. Resumes on the next visible observation.
+  // Falls back to a continuous loop when IntersectionObserver is not
+  // available (older browsers, tests, SSR) so the demo still animates.
   useEffect(() => {
     let raf = 0;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     function frame() {
+      raf = 0;
       const t = reduced ? 1 : 0.16;
       const { metrics } = targetRef.current;
       const disp = dispRef.current;
@@ -250,8 +256,44 @@ export function BidElevator() {
       drawChart(metrics, targetRef.current.tgt);
       raf = requestAnimationFrame(frame);
     }
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+
+    function start() {
+      if (raf === 0) raf = requestAnimationFrame(frame);
+    }
+
+    function stop() {
+      if (raf !== 0) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+    }
+
+    if (typeof IntersectionObserver === "undefined") {
+      start();
+      return stop;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      start();
+      return stop;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) start();
+          else stop();
+        }
+      },
+      { threshold: 0.01 },
+    );
+    observer.observe(canvas);
+
+    return () => {
+      observer.disconnect();
+      stop();
+    };
   }, [writeKpis, drawChart]);
 
   function setRowState(id: string, s: TermState) {
