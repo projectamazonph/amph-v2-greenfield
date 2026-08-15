@@ -4,6 +4,43 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 4 — field manual compliance + landing link wiring (PR #326)
+
+- `src/components/ui/MobileNavToggle.module.css`: the mobile nav
+  backdrop drops its `backdrop-filter: blur(2px)` so it no longer
+  carries a decorative blur. Field Manual bans glassmorphism; the
+  dim background alone handles the visual separation. Closes audit H-04.
+- `src/components/landing/TopBar.tsx` and
+  `src/components/landing/Footer.tsx`: the `/login` route change is
+  now rendered with `next/link` `<Link>` so client-side routing kicks
+  in instead of a full page reload. Closes audit H-08 for the landing
+  chrome.
+- `src/app/globals.css`: the overly broad `.astryx-card,
+[class*="card"]:hover` selector is removed. The previous selector
+  matched every element that happened to contain "card" in its class
+  (sidebar items, stat tiles, discard buttons, etc.) and silently
+  lifted them on hover, contradicting the Field Manual spec which
+  says borders ARE elevation. The interactive variant in
+  `Card.module.css` already handles the hover state for genuine
+  interactive cards. Closes audit H-03.
+- `src/components/admin/NavSidebar.module.css` and
+  `src/components/admin/NavSidebar.tsx`: the count badge on a nav item
+  moves from an inline `style` block (raw px, `var()` references) to a
+  dedicated `.badge` class in the sidebar's CSS module. The badge now
+  reads from `--font-mono`, `--accent`, `--accent-ink`, and the
+  `--space-*` scale. Added an `aria-label` so screen readers hear
+  "N pending" instead of just the number. Closes audit H-17.
+- `src/components/admin/QuizEditor.module.css` (new) and
+  `src/components/admin/QuizEditor.tsx`: every inline style block in
+  the question/option editor (raw rem values, hard-coded `#d4d4d8`
+  fallbacks, the `iconButtonStyle` helper) moves into a dedicated CSS
+  module. The spacing scale and colors now match the rest of the
+  design system, and the architecture token-contract test passes
+  against the new file. Bug fix: the "remove option" button was
+  reading `o.options.length` instead of `q.options.length` — the inner
+  option object has no `options` field, so the button was effectively
+  never disabled. Now reads correctly. Closes audit H-18.
+
 ### 2026-08-15: Student-facing a11y and design-token round 3 (PR #324)
 
 - `src/components/ui/Skeleton.tsx`: every variant (SkeletonCard,
