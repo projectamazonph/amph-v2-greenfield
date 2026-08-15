@@ -4,6 +4,42 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing a11y, voice, and polish pass round 2 (PR #322)
+
+- Replaced the raw `<a href="/dashboard">` on the quiz result screen
+  with `<Link>` so the navigation is client-side and keeps the page
+  state. The result panel now carries `role="status"` and
+  `aria-live="polite"` so screen reads announce the score.
+- All five simulator result panels (BidElevator, StrTriage, ListingAudit,
+  KeywordResearch, CampaignBuilder) now carry `role="status"` and
+  `aria-live="polite"` so screen readers announce the grade when it
+  lands.
+- ListingAuditForm and CampaignBuilderForm: the feedback paragraph
+  moved off the misleading `.error` class into a dedicated `.feedback`
+  class with the right ink-700 color. The inline style override is
+  gone.
+- KeywordResearchForm: every per-keyword intent `<select>` now has an
+  `aria-label` so the `Choose...` placeholder is no longer the only
+  label source.
+- LiveClassRecordingButton: inline flex layout moved into a CSS
+  module; the check emoji became a Phosphor `Check` icon; the button
+  exposes `aria-busy` during the pending state so screen readers know
+  the action is in flight.
+- ListingAuditForm: em-dash in the Findings heading became a colon;
+  the result badge swapped check/cross glyphs for plain `Correct` /
+  `Expected:` text. StrTriageForm: result badge swapped check/cross
+  for `Correct` / `Was:` text. Voice guide stays clean.
+- EmptyState: title renders as a heading element (h3 default, h2 or
+  h4 via prop). Quiz `not found` page uses h2 since the title is the
+  page heading. 3 new unit tests cover the default and override
+  heading levels.
+- Skeleton.module.css: pulse animation wrapped in
+  `prefers-reduced-motion: reduce` so motion-sensitive users see a
+  static placeholder.
+- Verified 3,932 Vitest tests passing with 3 skipped (3 new for
+  EmptyState), 669 architecture checks passing, clean TypeScript and
+  ESLint, production build, Playwright, Lighthouse, and Vercel.
+
 ### 2026-08-15: Student-facing UI pass — 25 entries (PR #320)
 
 - Shipped 25 small, reviewable student-facing UI improvements across the auth,
