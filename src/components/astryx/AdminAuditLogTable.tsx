@@ -236,7 +236,7 @@ export function AdminAuditLogTable({
                   margin: 0,
                   whiteSpace: "pre-wrap",
                   wordBreak: "break-word",
-                  color: "var(--ink-800)",
+                  color: "var(--ink-700)",
                 }}
               >
                 {JSON.stringify(row.metadata, null, 2)}
@@ -269,7 +269,7 @@ export function AdminAuditLogTable({
                   border: "1px solid var(--border)",
                   borderRadius: "var(--radius-sm)",
                   textDecoration: "none",
-                  color: "var(--text)",
+                  color: "var(--ink-900)",
                   fontSize: 13,
                 }}
               >
@@ -282,7 +282,7 @@ export function AdminAuditLogTable({
                   background: "var(--surface-1)",
                   border: "1px solid var(--border)",
                   borderRadius: "var(--radius-sm)",
-                  color: "var(--ink-400)",
+                  color: "var(--ink-500)",
                   fontSize: 13,
                 }}
               >
@@ -311,7 +311,7 @@ export function AdminAuditLogTable({
                   background: "var(--surface-1)",
                   border: "1px solid var(--border)",
                   borderRadius: "var(--radius-sm)",
-                  color: "var(--ink-400)",
+                  color: "var(--ink-500)",
                   fontSize: 13,
                 }}
               >
