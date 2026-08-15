@@ -4,6 +4,43 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 12 — LiveClassRecordingButton loading state announced to screen readers (PR #342)
+
+- `src/components/student/LiveClassRecordingButton.tsx`: adds a
+  visually-hidden `role="status" aria-live="polite"` region after the
+  error paragraph. The region's text is `"Saving your watch
+  progress..."` while `isPending` is true and empty in the idle state.
+  Sighted users already see the button text change from
+  `"Mark as watched (+N XP)"` to `"Saving..."`; the live region copies
+  the same wording so screen-reader users hear the same transition
+  immediately on click, without having to re-focus the button. The
+  existing `aria-busy={isPending}` attribute on the button is preserved.
+- `src/components/student/LiveClassRecordingButton.module.css`: adds
+  `.visuallyHidden` (the standard sr-only pattern: 1px clipped,
+  absolute, non-interactive). Scoped to the component's CSS module so
+  the bundle stays self-contained rather than importing a global
+  utility. The class is `position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;`.
+- `src/components/student/__tests__/LiveClassRecordingButton.test.tsx`:
+  new focused test file (6 tests) covering the M-14 contract:
+  - `data-testid="live-class-mark-watched"` button has `aria-busy="false"`
+    in the idle render.
+  - The aria-live region is always rendered (not conditional) so the
+    live region is attached to the DOM before the click event fires.
+  - The region applies the `visuallyHidden` class so sighted users
+    never see the announcement text.
+  - The region is empty in the idle render so it does not pollute the
+    announcement queue at page load.
+  - The watched-state status span keeps rendering when `alreadyWatched`
+    is true, alongside the new polite live region.
+  - The recording link still has the correct `target="_blank"` and
+    `rel="noopener noreferrer"` attributes.
+- The pre-existing test in
+  `src/components/student/__tests__/student-event-controls.test.tsx`
+  is unchanged; the existing assertions already cover the watched and
+  unwatched state structure. Closes audit M-14.
+
 ### 2026-08-15: Student-facing UI round 11 — CourseCover routes through next/image (PR #340)
 
 - `src/components/student/CourseCover.tsx`: swaps the raw `<img>`
