@@ -87,7 +87,7 @@ export function Pricing() {
           </div>
           <p className={shared.secLede}>
             Pay once, get the content forever. <b>No subscription, no upsells later.</b> Prices
-            below are the documented figures from projectamazonph.online, identical on every
+            below are the documented figures from projectamazonph.vercel.app, identical on every
             surface.
           </p>
         </div>

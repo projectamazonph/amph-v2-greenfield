@@ -1,1 +1,1 @@
-export const COURSES_URL = "https://projectamazonph.online";
+export const COURSES_URL = "https://projectamazonph.vercel.app";

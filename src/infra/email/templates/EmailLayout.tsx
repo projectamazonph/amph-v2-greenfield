@@ -83,7 +83,7 @@ export function EmailLayout({
   preview,
   eyebrow,
   children,
-  homeUrl = "https://projectamazonph.online",
+  homeUrl = "https://projectamazonph.vercel.app",
 }: EmailLayoutProps) {
   return (
     <Html>
