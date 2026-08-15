@@ -256,6 +256,8 @@ ships as its own sub-commit so the diff stays reviewable.
 | 21 | Bare "Quiz not found" text on the quiz page replaced with the shared `EmptyState` | `polish(quiz)` |
 | 22 | `<meta name="theme-color">` so mobile browsers tint the chrome to the Field Manual surface | `feat(app)` |
 | 23 | Brand-tinted focus-visible ring across links, buttons, and `.btn` (accent outline + soft halo) | `polish(a11y)` |
+| 24 | 5-second auto-redirect countdown on the checkout success page so the student lands on the dashboard without an extra click | `feat(checkout)` |
+| 25 | Quiz page breadcrumb shows the course title and the current quiz title so the student keeps course context | `polish(quiz)` |
 
 ### Cancelled
 
@@ -277,6 +279,6 @@ ships as its own sub-commit so the diff stays reviewable.
 |------|------|-------|
 | 2026-07-31 P0/P1/P2 | 59 | 59 |
 | 2026-07-31 P3 enhancement | 34 | 40 |
-| 2026-08-15 student-facing UI | 23 | 23 |
-| **Combined** | **117** | **123** |
+| 2026-08-15 student-facing UI | 25 | 25 |
+| **Combined** | **119** | **125** |
 
