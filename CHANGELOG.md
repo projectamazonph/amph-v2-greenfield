@@ -4,6 +4,50 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing a11y and design-token round 3 (PR #324)
+
+- `src/components/ui/Skeleton.tsx`: every variant (SkeletonCard,
+  SkeletonStatTile, SkeletonText, SkeletonRow) now carries
+  `role="status"`, `aria-busy="true"`, `aria-live="polite"`, and an
+  `aria-label` so screen readers announce loading state. (SkeletonTable
+  and SkeletonForm already had it.) Closes audit C-07.
+- `src/components/admin/ImpersonationBanner.tsx`: the `⚠` Unicode
+  glyph is replaced with a Phosphor `Warning` icon (H-12). Added an
+  `<h2 className="sr-only">Impersonation active</h2>` heading so screen
+  reader navigation reaches the banner (H-15, M-05).
+- `src/components/admin/UserCard.module.css`: the logout button moves
+  from 30x30 to `min-width: 44px; min-height: 44px` to meet WCAG 2.5.5
+  touch target. Closes audit C-05.
+- `src/components/tools/CampaignBuilderForm.tsx`: every input that
+  relied on `placeholder` only (campaign name, ad group name, keyword,
+  negative keyword text, reason) now has an `aria-label` that names the
+  row context. Closes audit C-04.
+- `src/components/admin/QuizEditor.tsx`: the per-option "mark as
+  correct" radio now has a unique `aria-label` (option + question)
+  instead of the shared `aria-label="Mark as correct answer"` (C-02).
+  Question text input has `<label htmlFor>` and `id`, and the option
+  text input has `aria-label` (C-03). The hidden-input seed moves from
+  a render side effect into a `useEffect` keyed on `[name, questions]`
+  (H-16). Replaced `var(--ink-800)` with `var(--ink-700)` (H-05).
+- `src/components/landing/Hero.tsx`: the CTAs are scoped to
+  `/#pricing` and `/#simulator` and switched from raw `<a>` to `<Link>`
+  so the landing page works from any entry point. Closes audit M-15.
+- `src/components/astryx/AdminAuditLogTable.tsx` and
+  `src/components/astryx/AdminRefundsTable.tsx`: replaced undefined
+  tokens (`var(--ink-800)`, `var(--text)`, `var(--ink-400)`) with the
+  defined scale (`var(--ink-700)`, `var(--ink-900)`, `var(--ink-500)`).
+  Closes audit H-05.
+- `src/components/ui/SubmitButton.tsx`: switched to double quotes
+  across the file to match the codebase convention (H-14). Exported
+  `SubmitButton` and `SubmitButtonProps` from the design-system barrel
+  (`src/components/ui/index.ts`) (H-07).
+- `src/components/admin/__tests__/admin-event-controls.test.tsx`:
+  replaced the brittle `children[1] / children[2]` index checks in the
+  ImpersonationBanner test with structural assertions that grep the
+  rendered HTML for the student email, the "Stop impersonating" button,
+  and the new `Impersonation active` heading. The form action is still
+  asserted to be a function.
+
 ### 2026-08-15: Student-facing a11y, voice, and polish pass round 2 (PR #322)
 
 - Replaced the raw `<a href="/dashboard">` on the quiz result screen
