@@ -62,7 +62,7 @@ export default async function StudentTwoFactorSetupPage({
 
   return (
     <StudentShell user={session}>
-      <main style={{ padding: "var(--space-8) var(--side-pad)", maxWidth: 640 }}>
+      <main id="main-content" tabIndex={-1} style={{ padding: "var(--space-8) var(--side-pad)", maxWidth: 640 }}>
         <Link href="/profile/security" className={styles.backLink}>
           <ArrowLeft size={16} aria-hidden /> Back to security
         </Link>
@@ -77,6 +77,17 @@ export default async function StudentTwoFactorSetupPage({
           Set up two-factor authentication
         </h1>
         <p className={styles.help}>Scan the code, then confirm with a 6-digit code to finish.</p>
+
+        <ol className={styles.steps} aria-label="2FA setup progress">
+          <li className={`${styles.step} ${styles.stepActive}`} aria-current="step">
+            <span className={styles.stepNumber}>1</span>
+            <span className={styles.stepLabel}>Scan QR code</span>
+          </li>
+          <li className={`${styles.step} ${styles.stepActive}`} aria-current="step">
+            <span className={styles.stepNumber}>2</span>
+            <span className={styles.stepLabel}>Verify code</span>
+          </li>
+        </ol>
 
         {errorText && (
           <p className={styles.error} role="alert">
