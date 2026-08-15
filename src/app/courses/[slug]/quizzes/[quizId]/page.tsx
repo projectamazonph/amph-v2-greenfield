@@ -79,10 +79,15 @@ export default async function QuizPage({ params }: Props) {
   }
 
   const quiz = quizResult.value;
+  const course = courseResult.value;
   return (
     <main id="main-content" tabIndex={-1} className={styles.page}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <Link href={`/courses/${slug}`}><ArrowLeft size={16} aria-hidden /> Back to course</Link>
+        <Link href={`/courses/${slug}`} className={styles.crumbLink}>
+          <ArrowLeft size={16} aria-hidden /> {course.title}
+        </Link>
+        <span className={styles.crumbSep} aria-hidden="true">/</span>
+        <span className={styles.crumbCurrent} aria-current="page">{quiz.title}</span>
       </nav>
       <QuizPlayer
         quizId={quiz.id}
