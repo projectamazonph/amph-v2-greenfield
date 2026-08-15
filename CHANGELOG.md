@@ -4,6 +4,41 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 11 — CourseCover routes through next/image (PR #340)
+
+- `src/components/student/CourseCover.tsx`: swaps the raw `<img>`
+  with `eslint-disable-next-line @next/next/no-img-element` for
+  `<Image>` from `next/image`. The three local PNGs in
+  `public/courses/` now go through the Next.js image optimizer
+  (`/_next/image?url=…`) with a 1x/2x `srcSet`, `data-nimg` marker,
+  and intrinsic `width`/`height` to prevent layout shift. The
+  previous hand-rolled `loading="lazy"` / `decoding="async"` /
+  `fetchPriority` props survive because `Image` accepts them as-is;
+  `decoding="async"` is now implicit. The L-07 decorative contract
+  (`alt=""` + `role="presentation"`) is preserved so the adjacent
+  heading (h1 on the detail page, h2 on the catalog card) keeps
+  owning the title for both sighted users and assistive tech.
+- External cover URLs supplied via the database `coverImage` field
+  opt out of optimization via the per-instance `unoptimized` prop.
+  The database can hold any CDN host, so whitelisting every possible
+  host in `next.config.ts#images.remotePatterns` is not a realistic
+  config; the `unoptimized` flag keeps the previous "render whatever
+  URL is in the database" behaviour without adding maintenance
+  surface. A new helper `isExternalCoverUrl` detects `http://`,
+  `https://`, or protocol-relative `//` prefixes.
+- `src/components/student/__tests__/CourseCover.test.tsx` grows
+  from 4 tests to 6: the L-07 decorative test is rewritten to
+  check for the substring `ppc-foundations.png` (the optimizer
+  rewrites `src`), a new test asserts the local PNG routes through
+  the optimizer with a 1x/2x `srcSet` and `data-nimg`, and a new
+  test asserts an external CDN URL bypasses the optimizer with no
+  `srcSet` and no `/_next/image?url=` substring.
+- No call site changes. The catalog card
+  (`src/app/courses/page.tsx`) and the detail header
+  (`src/app/courses/[slug]/page.tsx`) keep their existing prop
+  interface — `width`, `height`, `className`, `fetchPriority` all
+  pass through unchanged. Closes audit M-10.
+
 ### 2026-08-15: Student-facing UI round 10 — Input primitive on reset forms (PR #338)
 
 - `src/components/auth/ResetRequestForm.tsx`: the email field is now
