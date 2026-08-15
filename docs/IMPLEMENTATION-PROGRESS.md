@@ -246,6 +246,9 @@ ships as its own sub-commit so the diff stays reviewable.
 | 11 | Shared `Breadcrumb` component used across every `/tools/*` page | `feat(ui)` |
 | 12 | `ScrollToTop` FAB mounted in `StudentShell`, 8 tests | `feat(student)` |
 | 13 | Type correction so the lesson meta helper compiles against the curriculum `Lesson` shape | `fix(lessons)` |
+| 14 | Move the trailing inline style on `/checkout/failed` into the shared checkout-status CSS module | `fix(checkout)` |
+| 15 | Branded root `not-found.tsx` so unmatched routes match the Field Manual | `feat(app)` |
+| 16 | Hover-lift micro-interaction on the catalog and tools card grids, with `prefers-reduced-motion` guard | `polish(cards)` |
 
 ### Cancelled
 
@@ -267,6 +270,6 @@ ships as its own sub-commit so the diff stays reviewable.
 |------|------|-------|
 | 2026-07-31 P0/P1/P2 | 59 | 59 |
 | 2026-07-31 P3 enhancement | 34 | 40 |
-| 2026-08-15 student-facing UI | 14 | 14 |
-| **Combined** | **107** | **113** |
+| 2026-08-15 student-facing UI | 16 | 16 |
+| **Combined** | **110** | **116** |
 
