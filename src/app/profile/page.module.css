@@ -41,7 +41,9 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
+  /* M-R23 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
+     box-shadow. The 1px --border is the elevation indicator on the
+     profile page section card. */
 }
 
 .sectionTitle {
