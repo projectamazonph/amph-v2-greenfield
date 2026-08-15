@@ -18,6 +18,7 @@ import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
 import { getLessonData, withCatalogCurriculum } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
+import type { Lesson as CatalogLesson } from "@/domain/entities/Course";
 import type { Lesson } from "@/domain/entities/Lesson";
 import { LessonSidebar } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
@@ -26,15 +27,32 @@ import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
 import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.action";
 import styles from "./page.module.css";
 
-function estimateReadingMinutes(lesson: Lesson): { minutes: number; kind: "video" | "reading" | "quiz" } {
+function estimateReadingMinutes(lesson: CatalogLesson): { minutes: number; kind: "video" | "reading" | "quiz" } {
+  const content = lesson.content;
   if (lesson.type === "VIDEO") {
-    return { minutes: Math.max(1, Math.round(lesson.content.durationMinutes)), kind: "video" };
+    const duration =
+      typeof content === "object" && content !== null && "durationMinutes" in content
+        ? Number((content as { durationMinutes: unknown }).durationMinutes)
+        : 0;
+    if (!Number.isFinite(duration) || duration <= 0) return { minutes: 1, kind: "video" };
+    return { minutes: Math.max(1, Math.round(duration)), kind: "video" };
   }
   if (lesson.type === "QUIZ") {
-    return { minutes: Math.max(1, lesson.content.questions.length * 1), kind: "quiz" };
+    const questions =
+      typeof content === "object" && content !== null && "questions" in content &&
+      Array.isArray((content as { questions: unknown }).questions)
+        ? (content as { questions: unknown[] }).questions.length
+        : 0;
+    return { minutes: Math.max(1, questions), kind: "quiz" };
   }
   // TEXT: estimate from word count (avg 200 wpm)
-  const words = lesson.content.body.trim().split(/\s+/).filter(Boolean).length;
+  const body =
+    typeof content === "object" && content !== null && "body" in content &&
+    typeof (content as { body: unknown }).body === "string"
+      ? (content as { body: string }).body.trim()
+      : "";
+  if (!body) return { minutes: 1, kind: "reading" };
+  const words = body.split(/\s+/).filter(Boolean).length;
   return { minutes: Math.max(1, Math.round(words / 200)), kind: "reading" };
 }
 
@@ -228,7 +246,7 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           </div>
 
           {/* Lesson body */}
-          <LessonContent lesson={lesson as Lesson} courseSlug={slug} />
+          <LessonContent lesson={selectedLessonResult.value} courseSlug={slug} />
 
           {completionStatus.completed === "1" ? (
             <p className="alert-success" role="status">
