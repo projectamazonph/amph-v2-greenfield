@@ -54,7 +54,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
   if (error) {
     const message = ERROR_MESSAGES[error] ?? ERROR_MESSAGES["unexpected"]!;
     return (
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>{message.title}</h1>
         <p className={styles.body}>{message.body}</p>
         <Link href="/verify-email/sent" className={styles.cta}>
@@ -72,7 +72,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
     // set on the `x-nonce` request header.
     const nonce = (await headers()).get("x-nonce") ?? undefined;
     return (
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>Verifying your email…</h1>
         <p className={styles.body}>
           Hold on a second. We'll redirect you when verification is done.
@@ -100,7 +100,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
 
   // No token, no error — generic prompt.
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <h1 className={styles.title}>Check your email</h1>
       <p className={styles.body}>
         We sent a verification email when you signed up. Click the link in that email to verify your

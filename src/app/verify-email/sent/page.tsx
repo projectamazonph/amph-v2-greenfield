@@ -26,7 +26,7 @@ export default async function SentPage({ searchParams }: Props) {
 
   if (status === "sent") {
     return (
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>New email sent</h1>
         <p className={styles.body}>
           Check your inbox. The link in this email is valid for 24 hours.
@@ -38,7 +38,7 @@ export default async function SentPage({ searchParams }: Props) {
 
   if (status === "already-verified") {
     return (
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>Already verified</h1>
         <p className={styles.body}>
           Your email is already verified. You can sign in.
@@ -52,7 +52,7 @@ export default async function SentPage({ searchParams }: Props) {
 
   if (status === "rate-limited" && retryAfter) {
     return (
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>Wait a moment</h1>
         <p className={styles.body}>
           We just sent you a verification email. You can request a new one
@@ -65,7 +65,7 @@ export default async function SentPage({ searchParams }: Props) {
 
   if (status === "error") {
     return (
-      <main className={styles.page}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>Couldn't resend</h1>
         <p className={styles.body}>
           Something went wrong. Try again in a moment.
@@ -76,7 +76,7 @@ export default async function SentPage({ searchParams }: Props) {
   }
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <h1 className={styles.title}>Check your email</h1>
       <p className={styles.body}>
         We sent a verification link to your email. Click the link to
