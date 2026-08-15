@@ -75,4 +75,40 @@ describe("/verify-email", () => {
     expect(html.toLowerCase()).not.toContain("leverage");
     expect(html.toLowerCase()).not.toContain("seamless");
   });
+
+  // H-08: skip-link target. The skip-link in the root layout points
+  // at #main-content. Every student-facing page must expose that id
+  // on its <main> tag (plus tabIndex=-1 so the link target is
+  // focusable). Each branch — token, error, default — returns its
+  // own <main>, so each must carry the id.
+  it("renders <main id='main-content' tabIndex={-1}> on the default branch", async () => {
+    const html = renderToString(
+      await VerifyEmailPage({ searchParams: Promise.resolve({}) }),
+    );
+    expect(html).toMatch(
+      /<main[^>]*\bid="main-content"[^>]*\btabindex="-1"[^>]*>/i,
+    );
+  });
+
+  it("renders <main id='main-content' tabIndex={-1}> on the error branch", async () => {
+    const html = renderToString(
+      await VerifyEmailPage({
+        searchParams: Promise.resolve({ error: "expired" }),
+      }),
+    );
+    expect(html).toMatch(
+      /<main[^>]*\bid="main-content"[^>]*\btabindex="-1"[^>]*>/i,
+    );
+  });
+
+  it("renders <main id='main-content' tabIndex={-1}> on the token branch", async () => {
+    const html = renderToString(
+      await VerifyEmailPage({
+        searchParams: Promise.resolve({ token: "abc123" }),
+      }),
+    );
+    expect(html).toMatch(
+      /<main[^>]*\bid="main-content"[^>]*\btabindex="-1"[^>]*>/i,
+    );
+  });
 });

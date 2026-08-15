@@ -88,7 +88,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
 
   return (
     <StudentShell user={user}>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <div className={styles.breadcrumb}>
           <Link href="/live-classes" className={styles.breadcrumbLink}>
             <ArrowLeft size={16} aria-hidden />{" "}All live classes

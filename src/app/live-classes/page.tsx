@@ -26,7 +26,7 @@ export default async function LiveClassesPage() {
 
   return (
     <StudentShell user={user}>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <div className={styles.header}>
           <h1 className={styles.title}>Live classes</h1>
           <p className={styles.subtitle}>Upcoming scheduled sessions for your enrolled courses.</p>
