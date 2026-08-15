@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const COURSE_COVER_BY_SLUG: Readonly<Record<string, string>> = {
   "ppc-foundations": "/courses/ppc-foundations.png",
   "accelerated-mastery": "/courses/accelerated-mastery.png",
@@ -24,6 +26,27 @@ export function getCourseCoverImage(slug: string, coverImage: string | null): st
   return COURSE_COVER_BY_SLUG[slug] ?? DEFAULT_COURSE_COVER;
 }
 
+/**
+ * CourseCover renders the catalog card and detail-page artwork for a
+ * course. The component was previously a raw `<img>` with an
+ * `eslint-disable-next-line @next/next/no-img-element` comment; M-10
+ * migrates it to `next/image` so the three local PNGs in
+ * `public/courses/` get the Next.js image pipeline (responsive
+ * `srcset`, AVIF/WebP variants, intrinsic `width`/`height` to prevent
+ * layout shift).
+ *
+ * External cover images supplied via the database `coverImage` field
+ * opt out of optimization via the per-instance `unoptimized` prop. The
+ * database can hold any CDN host, so whitelisting every possible host
+ * in `next.config.ts#images.remotePatterns` is not a realistic config;
+ * the `unoptimized` flag keeps the current "render whatever URL is in
+ * the database" behaviour without adding maintenance surface.
+ *
+ * The L-07 decorative contract (`alt=""` + `role="presentation"`)
+ * survives the migration unchanged: the adjacent heading (h1 on the
+ * detail page, h2 on the catalog card) carries the title, so assistive
+ * tech must skip the image rather than announce the title twice.
+ */
 export function CourseCover({
   title,
   slug,
@@ -34,22 +57,28 @@ export function CourseCover({
   loading = "lazy",
   fetchPriority,
 }: CourseCoverProps) {
+  const src = getCourseCoverImage(slug, coverImage);
+  const unoptimized = isExternalCoverUrl(src);
+  // `title` is accepted as a prop so callers can pass the course name
+  // for parity with the previous API. It is intentionally not rendered:
+  // the L-07 contract keeps the image decorative and the adjacent
+  // heading owns the title for screen readers and sighted users alike.
+  void title;
   return (
-    // L-07 fix: the course title is rendered as the adjacent heading (h1 on
-    // detail page, h2 on the catalog card), so the alt text would be read
-    // twice by screen readers. Mark the image as decorative via alt="" so
-    // assistive tech skips it.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={getCourseCoverImage(slug, coverImage)}
+    <Image
+      src={src}
       alt=""
       role="presentation"
       width={width}
       height={height}
       loading={loading}
       fetchPriority={fetchPriority}
-      decoding="async"
       className={className}
+      unoptimized={unoptimized}
     />
   );
+}
+
+function isExternalCoverUrl(src: string): boolean {
+  return src.startsWith("http://") || src.startsWith("https://") || src.startsWith("//");
 }
