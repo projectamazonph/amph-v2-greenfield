@@ -4,6 +4,46 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 13 — Skip-link target wired on live-classes and verify-email pages (PR #344)
+
+- `src/app/live-classes/page.tsx`,
+  `src/app/live-classes/[id]/page.tsx`,
+  `src/app/verify-email/page.tsx` (3 return branches), and
+  `src/app/verify-email/sent/page.tsx` (5 return branches): each
+  `<main>` now carries `id="main-content" tabIndex={-1}`, matching
+  the pattern already used by the rest of the student-facing app
+  shell. The skip-link in the root layout points at `#main-content`
+  (WCAG 2.4.1 Bypass Blocks Level A); before this change the link
+  was a no-op on these routes so keyboard-only users landed on
+  the first interactive element in the chrome instead of the
+  page content.
+- `src/app/verify-email/__tests__/page.test.tsx` grows from 5 to 8
+  tests: one per branch of the verify-email page (token, error,
+  default) asserting the rendered HTML contains
+  `<main id="main-content" tabIndex={-1}>`.
+- `src/app/verify-email/sent/__tests__/page.test.tsx` grows from 6
+  to 11 tests: one per branch of the verify-email sent page
+  (default, sent, already-verified, rate-limited, error), all
+  asserting the skip-link target is present in the rendered
+  HTML.
+- `src/app/live-classes/__tests__/page.test.tsx` (new, 6 tests)
+  covers the live-classes list page. Mocked `requireAuth` +
+  `buildContainer.listLiveClassesForStudent`. The skip-link
+  contract is enforced via a source-string assertion against
+  `page.tsx` because the route is a React 19 async server
+  component and the legacy vitest renderer cannot prerender it.
+- `src/app/live-classes/[id]/__tests__/page.test.tsx` (new, 7
+  tests) covers the live-class detail page. Same source-string
+  structural assertion for the skip-link target; also calls
+  `generateMetadata` against mocked deps so the routing contract
+  is exercised at the unit layer (the metadata title is asserted
+  to match the live-class title).
+- `vitest.config.ts`: the two new `page.tsx` files are added to
+  the coverage exclude list, with the same rationale used for
+  `Toast.tsx` and `CampaignBuilderForm.tsx` (React 19 async server
+  components the unit-test renderer cannot fully execute). Closes
+  audit H-08.
+
 ### 2026-08-15: Student-facing UI round 12 — LiveClassRecordingButton loading state announced to screen readers (PR #342)
 
 - `src/components/student/LiveClassRecordingButton.tsx`: adds a
