@@ -19,6 +19,17 @@ describe("/checkout/failed", () => {
     expect(html).toMatch(/try again/i);
   });
 
+  // H-08: skip-link target. The skip-link in the root layout points at
+  // #main-content. The page must expose that id (plus tabIndex=-1 so the
+  // link target is focusable) on a <main> tag. Without this, keyboard-only
+  // users cannot reach the failure card via the skip link.
+  it("renders the skip-link target on a <main> landmark", async () => {
+    const html = renderToString(
+      await FailedPage({ searchParams: Promise.resolve({ orderId: "ord_1" }) }),
+    );
+    expect(html).toMatch(/<main[^>]*\bid="main-content"[^>]*\btabindex="-1"[^>]*>/i);
+  });
+
   it("deep-links back to /checkout with the original courseSlug when known", async () => {
     const html = renderToString(
       await FailedPage({

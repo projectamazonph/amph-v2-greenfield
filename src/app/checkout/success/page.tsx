@@ -30,7 +30,7 @@ export default async function CheckoutSuccessPage({
   const params = await searchParams;
   const orderId = params.orderId?.trim() ?? "";
   return (
-    <div className={styles.page}>
+    <main id="main-content" tabIndex={-1} className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>Project Amazon PH Academy</div>
         <CheckCircle className={styles.checkmark} weight="duotone" aria-hidden="true" />
@@ -43,10 +43,7 @@ export default async function CheckoutSuccessPage({
           <RedirectCountdown to="/dashboard" seconds={5} />
         </p>
         <div className={styles.cta}>
-          <Link
-            href="/dashboard"
-            className={styles.btnPrimary}
-          >
+          <Link href="/dashboard" className={styles.btnPrimary}>
             Go to dashboard
           </Link>
           <Link href="/courses" className={styles.link}>
@@ -55,6 +52,6 @@ export default async function CheckoutSuccessPage({
         </div>
         {orderId && <p className={styles.orderId}>Order reference: {orderId}</p>}
       </div>
-    </div>
+    </main>
   );
 }

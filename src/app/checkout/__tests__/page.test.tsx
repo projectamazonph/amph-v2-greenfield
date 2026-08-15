@@ -16,6 +16,8 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 vi.mock("server-only", () => ({}));
 // The action is mocked at the module level because the test only
@@ -88,5 +90,17 @@ describe("/checkout", () => {
     expect(html).not.toMatch(/class="[^"]*\bbg-\w+/);
     expect(html).not.toMatch(/class="[^"]*\btext-\[/);
     expect(html).not.toMatch(/class="[^"]*\bp-\d/);
+  });
+
+  // H-08: skip-link target. The skip-link in the root layout points at
+  // #main-content. The form's render root must expose that id (plus
+  // tabIndex=-1 so the link target is focusable) on a <main> tag.
+  // Without this, keyboard-only users cannot reach the checkout form
+  // via the skip link. Because CheckoutForm is a client component, the
+  // legacy vitest renderer cannot pre-render it; we lock the contract
+  // on the JSX source instead (matches the live-classes pattern).
+  it("contains <main id='main-content' tabIndex={-1}> in its JSX source", () => {
+    const source = readFileSync(resolve(__dirname, "../CheckoutForm.tsx"), "utf8");
+    expect(source).toMatch(/<main[^>]*\bid="main-content"[^>]*\btabIndex=\{-1\}/);
   });
 });
