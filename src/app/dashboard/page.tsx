@@ -84,33 +84,14 @@ export default async function DashboardPage() {
         </header>
 
         {lastAccessedCourse && (
-          <div
-            style={{
-              background: "var(--surface-1)",
-              border: "1px solid var(--accent)",
-              borderRadius: "var(--radius-md)",
-              padding: "var(--space-5)",
-              marginBottom: "var(--space-8)",
-            }}
-          >
-            <div
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "10px",
-                color: "var(--accent-text)",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                marginBottom: "var(--space-2)",
-              }}
-            >
+          <div className={styles.continueCard}>
+            <div className={styles.continueEyebrow}>
               {/* M7 fix: label honestly reflects what this card shows — the
                  most recently enrolled in-progress course. 'Your courses' was
                  misleading because this card is only one course, not all courses. */}
               Continue where you enrolled
             </div>
-            <div style={{ fontSize: "var(--text-base)", fontWeight: 600 }}>
-              {lastAccessedCourse.title}
-            </div>
+            <div className={styles.continueTitle}>{lastAccessedCourse.title}</div>
             <Link href={`/courses/${lastAccessedCourse.slug}`} className={styles.continueBtn}>
               Continue
             </Link>

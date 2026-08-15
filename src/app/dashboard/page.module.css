@@ -310,6 +310,31 @@
   flex-wrap: wrap;
 }
 
+/* Continue where you enrolled (dashboard hero card) */
+
+.continueCard {
+  background: var(--surface-1);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+
+.continueEyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.continueTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
 /* Buttons */
 
 .continueBtn {
