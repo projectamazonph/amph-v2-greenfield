@@ -32,6 +32,10 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafaf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
+  ],
   openGraph: {
     title: "Project Amazon PH Academy",
     description: "Master Amazon PPC and seller central, built for Filipino VAs.",
