@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-15 against the student-facing UI round 6 branch (PR #330 merged at 3ccc842)
+**Last verified:** 2026-08-15 against the student-facing UI round 7 branch (PR #332 merged at 977b853)
 
 **Repository:** `amph-v2-greenfield`
 

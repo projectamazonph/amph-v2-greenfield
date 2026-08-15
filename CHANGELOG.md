@@ -4,6 +4,25 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 7 — landing canvas rAF pause (PR #332)
+
+- `src/components/landing/BidElevator.tsx`: the 60fps
+  `requestAnimationFrame` interpolation + canvas redraw loop now pauses
+  whenever the canvas is not intersecting the viewport. An
+  `IntersectionObserver` (threshold `0.01`) cancels the scheduled frame
+  on the next paint when the entry scrolls out, and re-arms the loop on
+  the next animation frame when the entry scrolls back in. Browsers
+  without `IntersectionObserver` fall back to the original continuous
+  loop so the demo still animates. Closes audit M-11.
+- `src/components/landing/__tests__/BidElevator.test.tsx` (new): the
+  first component-level test for `BidElevator`. Mounts the widget in
+  jsdom with a mock `IntersectionObserver`, then asserts the observer
+  is constructed against the canvas, uses a low threshold (≤ 0.05) so
+  the loop pauses on the first pixel out of view rather than waiting
+  for 50% visibility, and is disconnected on unmount. The previous
+  test surface covered the pure domain logic in `bidElevator.logic`
+  but never the lifecycle hooks.
+
 ### 2026-08-15: Student-facing UI round 6 — Toast barrel export (PR #330)
 
 - `src/components/ui/index.ts`: `Toast`, `ToastContainer`, `ToastType`,

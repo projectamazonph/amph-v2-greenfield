@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-15 against the student-facing UI round 6 branch (PR #330 merged at 3ccc842)
+**Last reviewed:** 2026-08-15 against the student-facing UI round 7 branch (PR #332 merged at 977b853)
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
