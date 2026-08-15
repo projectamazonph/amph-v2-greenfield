@@ -105,7 +105,8 @@ const COLUMNS: TableColumn<DiscountCodeRow>[] = [
 
 export function AdminDiscountCodesTable({ codes }: AdminDiscountCodesTableProps) {
   return (
-    <>
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Discount codes</figcaption>
       <Table data={codes} columns={COLUMNS} idKey="id" density="compact" dividers="rows" hasHover />
       {codes.length === 0 && (
         <p
@@ -119,6 +120,6 @@ export function AdminDiscountCodesTable({ codes }: AdminDiscountCodesTableProps)
           No discount codes yet.
         </p>
       )}
-    </>
+    </figure>
   );
 }

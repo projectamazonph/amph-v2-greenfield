@@ -217,9 +217,10 @@ export function AdminUsersTable({
               cursor: page > 1 ? "pointer" : "default",
             }}
           >
-            <ArrowLeft size={16} aria-hidden />{" "}Prev
+            <ArrowLeft size={16} aria-hidden /> Prev
           </Link>
           <span
+            aria-live="polite"
             style={{
               fontFamily: "var(--font-mono)",
               fontSize: 13,
@@ -236,7 +237,7 @@ export function AdminUsersTable({
               cursor: page < totalPages ? "pointer" : "default",
             }}
           >
-            Next{" "}<ArrowRight size={16} aria-hidden />
+            Next <ArrowRight size={16} aria-hidden />
           </Link>
         </nav>
       )}

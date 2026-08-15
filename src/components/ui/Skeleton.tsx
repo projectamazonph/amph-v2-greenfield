@@ -122,20 +122,39 @@ export function SkeletonCard({ lines = 2, className }: { lines?: number; classNa
 /* ------------------------------------------------------------------ */
 
 export function SkeletonTable({ columns = 4, rows = 5 }: { columns?: number; rows?: number }) {
-  // L10 fix: the region wrapper signals to assistive tech that content
-  // is loading. The inner skeleton blocks use aria-hidden so they don't
-  // create noise; the region announces the busy state instead.
+  // L-11 fix: the table placeholder mirrors the real table that will replace
+  // it (proper <table> / <thead> / <tbody> / <tr> / <th> / <td>) so assistive
+  // tech sees consistent structure during loading. The <table> wrapper
+  // carries aria-busy so the live region announces the loading state.
   return (
-    <div className={styles.table} aria-busy="true" aria-live="polite" role="status">
-      <div className={styles.tableHeader}>
-        {Array.from({ length: columns }).map((_, i) => (
-          <SkeletonBlock key={i} width="20%" height="0.625rem" variant="text" />
+    <table
+      className={styles.table}
+      aria-busy="true"
+      aria-live="polite"
+      role="status"
+      aria-label="Loading table"
+    >
+      <thead>
+        <tr className={styles.tableHeaderRow}>
+          {Array.from({ length: columns }).map((_, i) => (
+            <th key={i} scope="col" className={styles.tableHeaderCell}>
+              <SkeletonBlock width="60%" height="0.625rem" variant="text" />
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: rows }).map((_, i) => (
+          <tr key={i} className={styles.tableRow}>
+            {Array.from({ length: columns }).map((_, j) => (
+              <td key={j} className={styles.tableCell}>
+                <SkeletonBlock width={j === 0 ? "40%" : "60%"} height="0.75rem" variant="text" />
+              </td>
+            ))}
+          </tr>
         ))}
-      </div>
-      {Array.from({ length: rows }).map((_, i) => (
-        <SkeletonRow key={i} columns={columns} />
-      ))}
-    </div>
+      </tbody>
+    </table>
   );
 }
 

@@ -42,17 +42,41 @@
 }
 
 .table {
+  width: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--surface-0);
 }
 
-.tableHeader {
-  display: flex;
-  gap: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 2px solid var(--border);
+/* L-11: SkeletonTable now uses real <table> / <tr> / <th> / <td> instead
+   of <div> placeholders so the loading state mirrors the real table that
+   replaces it. The header row carries a thicker bottom border, body rows
+   use the standard Field Manual row divider. */
+.tableHeaderRow {
   background: var(--surface-1);
+}
+
+.tableHeaderCell {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  font-weight: 600;
+}
+
+.tableRow {
+  background: var(--surface-0);
+}
+
+.tableRow + .tableRow .tableCell {
+  border-top: 1px solid var(--border);
+}
+
+.tableCell {
+  padding: var(--space-3) var(--space-4);
+  vertical-align: middle;
 }
 
 .statTile {
