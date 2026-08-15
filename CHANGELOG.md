@@ -4,6 +4,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-15: Student-facing UI round 14 — Skip-link target wired on checkout flow (PR #346)
+
+- `src/app/checkout/CheckoutForm.tsx` (both root branches at L191 and L215), `src/app/checkout/success/page.tsx`, and `src/app/checkout/failed/page.tsx`: each root `<div>` wrapper now renders as `<main id="main-content" tabIndex={-1}>` instead. The skip-link in the root layout points at `#main-content` (WCAG 2.4.1 Bypass Blocks Level A); before this change the link was a no-op across the entire student purchase journey, so keyboard-only users landed on the first interactive element in the chrome instead of the order summary, the payment confirmation, or the failure message. This matches the canonical pattern already used by 25+ other student-facing pages.
+- `src/app/checkout/success/__tests__/page.test.tsx` grows from 6 to 7 tests: a new `renderToString` assertion confirms the server-rendered HTML contains `<main id="main-content" tabindex="-1"`.
+- `src/app/checkout/failed/__tests__/page.test.tsx` grows from 5 to 6 tests: same assertion against the failure page.
+- `src/app/checkout/__tests__/page.test.tsx` grows from 6 to 7 tests: a new source-string assertion against `CheckoutForm.tsx` (the form is a client component using `useActionState` and cannot be rendered under the legacy vitest renderer; we lock the contract on the JSX source, matching the `live-classes` pattern from PR #344). The page wrapper file (`/checkout/page.tsx`) already delegates to `<CheckoutForm />` and needed no edit — the JSX root lives in the form.
+- `scripts/verify-main-id.cjs` confirms 0 remaining student-facing `<main>` tags without the id (the only remaining gap is the admin layout, which is out of scope and rebuilt separately). Closes audit H-08 for the checkout flow.
+
 ### 2026-08-15: Student-facing UI round 13 — Skip-link target wired on live-classes and verify-email pages (PR #344)
 
 - `src/app/live-classes/page.tsx`,
@@ -49,7 +57,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 - `src/components/student/LiveClassRecordingButton.tsx`: adds a
   visually-hidden `role="status" aria-live="polite"` region after the
   error paragraph. The region's text is `"Saving your watch
-  progress..."` while `isPending` is true and empty in the idle state.
+progress..."` while `isPending` is true and empty in the idle state.
   Sighted users already see the button text change from
   `"Mark as watched (+N XP)"` to `"Saving..."`; the live region copies
   the same wording so screen-reader users hear the same transition
@@ -60,8 +68,8 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
   absolute, non-interactive). Scoped to the component's CSS module so
   the bundle stays self-contained rather than importing a global
   utility. The class is `position: absolute; width: 1px; height: 1px;
-  padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
-  white-space: nowrap; border: 0;`.
+padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
+white-space: nowrap; border: 0;`.
 - `src/components/student/__tests__/LiveClassRecordingButton.test.tsx`:
   new focused test file (6 tests) covering the M-14 contract:
   - `data-testid="live-class-mark-watched"` button has `aria-busy="false"`
