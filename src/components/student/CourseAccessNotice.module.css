@@ -13,7 +13,10 @@
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  /* M-R22 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
+     box-shadow. The 1px --border is the elevation indicator on the
+     per-lesson and per-quiz access notice card (rendered on 4 call sites
+     across /courses/[slug]/lessons/[lessonId] and /courses/[slug]/quizzes/[quizId]). */
 }
 
 .iconWrap {
