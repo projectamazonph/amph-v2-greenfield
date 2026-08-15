@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { WebVitalsReporter } from "./WebVitalsReporter";
@@ -32,10 +32,6 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafaf7" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
-  ],
   openGraph: {
     title: "Project Amazon PH Academy",
     description: "Master Amazon PPC and seller central, built for Filipino VAs.",
@@ -45,6 +41,13 @@ export const metadata: Metadata = {
     title: "Project Amazon PH Academy",
     description: "Master Amazon PPC and seller central, built for Filipino VAs.",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafaf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
