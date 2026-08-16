@@ -119,9 +119,9 @@ export function Mentor() {
             <h2 className={shared.secTitle}>Direct, grounded in real account work.</h2>
           </div>
           <p className={shared.secLede}>
-            Ryan Roland Dabao leads the mentorship and the weekly live classes in the Ultimate tier.
-            The voice you get is a working operator&rsquo;s: plain, specific, and honest about what
-            the data can and can&rsquo;t promise.
+            Ryan Roland Dabao leads the mentorship and the weekly live classes in the Ultimate
+            tier. The voice you get is a working operator&rsquo;s: plain, specific, honest about
+            what the data can and can&rsquo;t promise.
           </p>
         </div>
 
@@ -156,7 +156,7 @@ export function Mentor() {
             <div className={styles.points}>
               <div className={styles.point}>
                 <small>Live classes</small>
-                <p>Ultimate tier: live with Ryan, every week. Real accounts, real calls.</p>
+                <p>Ultimate tier: live with Ryan, every week. Real accounts, real decisions.</p>
               </div>
               <div className={styles.point}>
                 <small>1:1 review</small>
@@ -169,7 +169,7 @@ export function Mentor() {
               <div className={styles.point}>
                 <small>Certificate</small>
                 <p>
-                  Listed on your profile and recognized in our hiring pipeline. We hire from this
+                  Listed on your profile and recognized by our hiring team. We hire from this
                   audience.
                 </p>
               </div>

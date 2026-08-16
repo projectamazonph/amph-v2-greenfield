@@ -16,8 +16,8 @@ export function Proof() {
           </div>
           <p className={shared.secLede}>
             On completion you get a certificate listed on your profile and{" "}
-            <b>recognized in our hiring pipeline</b>, plus the artefacts below: real, reviewable
-            work a hiring manager or client can open and judge for themselves.
+            <b>recognized by our hiring team</b>, plus the artefacts below: real, reviewable work
+            a hiring manager or client can open and judge for themselves.
           </p>
         </div>
 

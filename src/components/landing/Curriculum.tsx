@@ -27,12 +27,12 @@ export function Curriculum() {
         <div className={shared.secHead}>
           <div className={shared.stickyCol}>
             <span className={shared.secNum}>§03 / THE CURRICULUM</span>
-            <h2 className={shared.secTitle}>Eight modules, in order. No surprises.</h2>
+            <h2 className={shared.secTitle}>Eight modules, in order. No hidden gates.</h2>
           </div>
           <p className={shared.secLede}>
-            Modules 1–5 are <b>Foundations</b>; 6–8 are <b>Mastery</b>. No jumping around, no hidden
-            &ldquo;advanced&rdquo; paywall mid-course. The tier you pick decides how far you go, not
-            whether you can see the map.
+            Modules 1&ndash;5 are <b>Foundations</b>; 6&ndash;8 are <b>Mastery</b>. The tier you
+            pick decides how far you go. No jumping around, no hidden &ldquo;advanced&rdquo;
+            paywall mid-course.
           </p>
         </div>
 

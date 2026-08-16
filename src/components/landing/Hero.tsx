@@ -14,16 +14,16 @@ export function Hero() {
             Amazon ads training · for Filipino VAs
           </span>
           <h1 id="hero-headline" className={styles.headline}>
-            Learn PPC by
+            Amazon ads,
             <br />
-            <span className={styles.pen}>doing the work.</span>
+            <span className={styles.pen}>taught for VAs new to the platform.</span>
           </h1>
           <p className={styles.body}>
-            Three tiers, one-time payment, no subscription. Build real campaign decisions across
-            eight modules and five scored simulators before a client account is on the line.
+            Eight modules and five practice tools. You work with real campaign shapes before a
+            client sees your work.
           </p>
           <p className={styles.hook}>
-            Built for VAs aiming at <b>₱60k–₱80k / month</b>, not staying at ₱25k.
+            If you&rsquo;re at <b>₱25k / month now</b>, the next step is ₱60k&ndash;₱80k. This is the path.
           </p>
           <div className={styles.ctaRow}>
             <Link href="/#pricing" className={[shared.btn, shared.btnPrimary].join(" ")}>
@@ -35,8 +35,8 @@ export function Hero() {
           </div>
           <p className={styles.note}>
             <CheckIcon />
-            Certificates recognized in our hiring pipeline · agency-side work · PayMongo (Card +
-            GCash).
+            Certificate recognized by our hiring team · skills for VAs who run ads for clients ·
+            PayMongo (Card + GCash).
           </p>
           <div className={styles.chips}>
             <span className={shared.chip}>

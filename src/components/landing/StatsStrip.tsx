@@ -15,7 +15,7 @@ const STATS: Stat[] = [
   { to: 8, label: "Modules", sub: "Foundations + Mastery, in order" },
   { to: 5, label: "Practice tools", sub: "Scored simulators" },
   { to: 40, prefix: "~", suffix: "h", label: "To complete", sub: "At 5–8 hrs / week" },
-  { to: 2500, prefix: "₱", label: "First-client lift", sub: "Junior → specialist gap" },
+  { to: 2500, prefix: "₱", label: "Specialist lift", sub: "What specialists charge over juniors" },
 ];
 
 function CountUp({ to }: { to: number }) {

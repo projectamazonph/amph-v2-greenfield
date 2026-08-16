@@ -14,8 +14,8 @@ const STEPS = [
   {
     n: "02",
     tag: "Decide",
-    title: "Make the call in a simulator",
-    body: "Set bids, triage search terms, build a campaign from a brief, all on safe, illustrative data. Wrong moves cost nothing here.",
+    title: "Try a decision in a simulator",
+    body: "Set bids, sort search terms, build a campaign from a brief, all on safe, illustrative data. Wrong moves cost nothing here.",
     outLabel: "You produce",
     out: "A bid log with your reasoning written down",
   },
@@ -30,10 +30,10 @@ const STEPS = [
   {
     n: "04",
     tag: "Repeat",
-    title: "Carry the instinct to client work",
-    body: "By the time a real account is on the line, the pattern is muscle memory, not a screenshot you memorised.",
+    title: "Carry the pattern to client work",
+    body: "By the time a real account is in your hands, the pattern is already there. It isn&rsquo;t something you memorised from a screenshot.",
     outLabel: "You carry",
-    out: "A certificate recognized in our hiring pipeline",
+    out: "A certificate recognized by our hiring team",
   },
 ];
 
@@ -44,12 +44,12 @@ export function Method() {
         <div className={shared.secHead}>
           <div className={shared.stickyCol}>
             <span className={shared.secNum}>§01 / THE METHOD</span>
-            <h2 className={shared.secTitle}>You don&rsquo;t just watch lessons.</h2>
+            <h2 className={shared.secTitle}>Reading isn&rsquo;t enough.</h2>
           </div>
           <p className={shared.secLede}>
-            Five interactive simulators: the same tools we use on real client accounts. Practice
-            with real data, <b>get scored instantly</b>, then carry the instinct into paid work.
-            Here is the loop every module runs.
+            Five practice tools. Same ones we use on real client accounts. You work with real data
+            and <b>get scored on the spot</b>, so the pattern is already in your hands when a
+            client account is. Here is the loop every module runs.
           </p>
         </div>
 
