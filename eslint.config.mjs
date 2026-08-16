@@ -24,8 +24,10 @@ const config = [
       "dist/**",
       "node_modules/**",
       "coverage/**",
+      "cov-r*/**",
       "playwright-report/**",
       "test-results/**",
+      ".worktrees/**",
     ],
   },
 
@@ -39,9 +41,11 @@ const config = [
       "dist/**",
       "node_modules/**",
       "coverage/**",
+      "cov-r*/**",
       "playwright-report/**",
       "test-results/**",
       "prisma/migrations/**",
+      ".worktrees/**",
     ],
   },
 
@@ -146,7 +150,7 @@ const config = [
   // ── Local rules ─────────────────────────────────
   {
     files: ["src/**/*.{ts,tsx,js,jsx}"],
-    ignores: [".next/**", "node_modules/**", "build/**", "dist/**", "out/**", "coverage/**", "playwright-report/**", "test-results/**"],
+    ignores: [".next/**", "node_modules/**", "build/**", "dist/**", "out/**", "coverage/**", "cov-r*/**", "playwright-report/**", "test-results/**", ".worktrees/**"],
     plugins: {
       local: {
         rules: {
