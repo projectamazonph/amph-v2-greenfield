@@ -82,15 +82,15 @@ other six templates. Uncustomized emails keep their original fallback copy.
   multi-signature inputs instead of reimplementing a disconnected algorithm.
 - All nine transactional scenarios now render through a unified, email-client-safe HTML system
   with a consistent brand frame, readable hierarchy, structured details, and clear notices. The
-  non-editable password-changed message is included, and `NotifyPaymentFailure` makes the
-  payment-failed retry email live when an authenticated buyer returns from a failed checkout.
+  non-editable password-changed and payment-failed messages are included; the payment-failed
+  template remains reserved for provider-authoritative payment-failure events.
 
 ## Explicitly out of scope
 
 - **`PasswordChangedEmail` and `PaymentFailedEmail` are not admin-editable** — neither has an
   `EmailTemplateType` slot (`EMAIL_TEMPLATE_TYPES` intentionally has exactly 7 values). Both
-  use the shared HTML system; payment-failed delivery is live through the failed-checkout flow,
-  but its message copy is intentionally application-controlled.
+  use the shared HTML system; payment-failed delivery remains provider-authoritative, and its
+  message copy is intentionally application-controlled.
 - **A dedicated unit test for `sendReceiptEmail()`'s template-override branch** — the
   webhook route handler had zero unit test coverage of this function before this story
   (a pre-existing gap, not introduced here); the other 4 tested call sites (verification,
