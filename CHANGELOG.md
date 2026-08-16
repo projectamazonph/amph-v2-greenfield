@@ -4,6 +4,13 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### LEARN-021 — Complete Module 0 onboarding lesson pass
+
+- Add the missing decision, active attempt, feedback, and worked-example blocks
+  to the first two onboarding lessons.
+- Reconcile the welcome lesson with the current two-course offer so a beginner
+  is not taught an unavailable Ultimate Transformation tier.
+
 ### LEARN-020 — Define the lintable lesson production contract
 
 - Add a non-blocking lesson-production report (with opt-in `--strict` mode) for
