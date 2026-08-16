@@ -79,4 +79,12 @@ describe("Landing page", () => {
     expect(html).not.toContain("try the simulator");
     expect(html).not.toContain("practice now");
   });
+
+  it("labels public preview and enrolled practice separately", () => {
+    const html = renderToString(createElement(HomePage));
+
+    expect(html).toContain("Live preview");
+    expect(html).toContain("Enrolled practice");
+    expect(html).toContain("Availability follows the reviewed curriculum claim contract");
+  });
 });
