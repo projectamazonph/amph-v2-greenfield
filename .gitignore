@@ -68,3 +68,6 @@ skills-lock.json
 .claude/
 agent/
 node_modules/
+
+# git worktrees (created by AI agents working in isolation)
+.worktrees/
