@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** In progress on the release-gate branch.
+**Status:** In review in PR #389.
 
 ## Goal
 
