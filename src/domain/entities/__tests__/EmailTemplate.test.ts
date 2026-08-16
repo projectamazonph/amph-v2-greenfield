@@ -8,7 +8,9 @@
 import { describe, it, expect } from "vitest";
 import {
   createEmailTemplate,
+  EMAIL_TEMPLATE_VARIABLES,
   updateEmailTemplate,
+  interpolateEmailTemplate,
   isEmailTemplateType,
   EMAIL_TEMPLATE_TYPES,
 } from "@/domain/entities/EmailTemplate";
@@ -33,6 +35,60 @@ describe("EmailTemplate — isEmailTemplateType", () => {
   it("rejects unknown types", () => {
     expect(isEmailTemplateType("not_a_real_type")).toBe(false);
     expect(isEmailTemplateType("")).toBe(false);
+  });
+});
+
+describe("EmailTemplate — placeholders", () => {
+  it("publishes a documented placeholder list for every known template type", () => {
+    for (const type of EMAIL_TEMPLATE_TYPES) {
+      expect(EMAIL_TEMPLATE_VARIABLES[type].length).toBeGreaterThan(0);
+    }
+  });
+
+  it("rejects a placeholder that is not available for the template type", () => {
+    const r = createEmailTemplate({
+      ...VALID_PARAMS,
+      introBody: "Use this link: {{resetUrl}}",
+    });
+
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error.message).toMatch(/resetUrl/);
+  });
+
+  it("rejects malformed placeholders instead of sending broken copy", () => {
+    const r = createEmailTemplate({
+      ...VALID_PARAMS,
+      headline: "Welcome, {{firstName}!",
+    });
+
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error.message).toMatch(/placeholder/i);
+  });
+
+  it("resolves supported placeholders in every editable field", () => {
+    const templateResult = createEmailTemplate({
+      ...VALID_PARAMS,
+      subject: "Hi {{ firstName }}",
+      headline: "Welcome, {{firstName}}!",
+      introBody: "Use {{verificationUrl}} within {{expiresInHours}} hours.",
+      ctaLabel: "Verify {{firstName}}",
+    });
+    if (!templateResult.ok) throw new Error("seed failed");
+
+    const resolved = interpolateEmailTemplate(templateResult.value, {
+      firstName: "Ana",
+      verificationUrl: "https://example.test/verify?token=abc",
+      expiresInHours: "24",
+    });
+
+    expect(resolved).toEqual({
+      subject: "Hi Ana",
+      headlineOverride: "Welcome, Ana!",
+      introBodyOverride: "Use https://example.test/verify?token=abc within 24 hours.",
+      ctaLabelOverride: "Verify Ana",
+    });
   });
 });
 
@@ -214,6 +270,19 @@ describe("updateEmailTemplate", () => {
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.message).toMatch(/ctaLabel/);
+  });
+
+  it("rejects an unsupported placeholder via patch", () => {
+    const original = makeTemplate();
+    const r = updateEmailTemplate(
+      original,
+      { ctaLabel: "Reset with {{resetUrl}}" },
+      "admin_2",
+      newDate,
+    );
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error.message).toMatch(/resetUrl/);
   });
 
   it("does not mutate the original instance", () => {

@@ -52,6 +52,7 @@ import { CertificateEmailTemplateRenderer } from "@/infra/email/templates/Certif
 import type { ReceiptRenderer } from "@/ports/email/ReceiptRenderer";
 import { ReceiptTemplateRenderer } from "@/infra/email/templates/ReceiptRenderer";
 import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
+import { PaymentFailedTemplateRenderer } from "@/infra/email/templates/PaymentFailedRenderer";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryModuleRepository } from "@/infra/repositories/InMemoryModuleRepository";
 import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRepository";
@@ -95,6 +96,7 @@ import { EnableTwoFactor } from "@/usecases/EnableTwoFactor";
 import { ConfirmTwoFactor } from "@/usecases/ConfirmTwoFactor";
 import { DisableTwoFactor } from "@/usecases/DisableTwoFactor";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
+import { NotifyPaymentFailure } from "@/usecases/NotifyPaymentFailure";
 import { GetCheckoutSummary } from "@/usecases/GetCheckoutSummary";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -307,6 +309,7 @@ export function buildTestContainer(): TestContainer {
   const certificateEmailRenderer = new CertificateEmailTemplateRenderer();
   const receiptEmailRenderer = new ReceiptTemplateRenderer();
   const refundEmailRenderer = new RefundTemplateRenderer();
+  const paymentFailedEmailRenderer = new PaymentFailedTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
@@ -423,6 +426,13 @@ export function buildTestContainer(): TestContainer {
       paymentGateway,
       baseUrl: "https://test.amph.example.com",
     }),
+    notifyPaymentFailure: new NotifyPaymentFailure({
+      orderRepo,
+      userRepo,
+      courseRepo,
+      emailSender,
+      paymentFailedEmailRenderer,
+    }),
     getCheckoutSummary: new GetCheckoutSummary({ courseRepo, pricingTierRepo }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
     // P0-5: per-lesson access decision
@@ -456,6 +466,7 @@ export function buildTestContainer(): TestContainer {
     mdxRenderer,
     emailSender,
     receiptEmailRenderer,
+    paymentFailedEmailRenderer,
     accessPolicy,
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,

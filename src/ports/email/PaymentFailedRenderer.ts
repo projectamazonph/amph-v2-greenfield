@@ -1,6 +1,5 @@
 /**
- * PaymentFailedRenderer port. Not consumed by any usecase yet — see
- * src/infra/email/templates/PaymentFailedEmail.tsx for why.
+ * PaymentFailedRenderer port for the authenticated failed-checkout flow.
  */
 
 import type { ReactElement } from "react";

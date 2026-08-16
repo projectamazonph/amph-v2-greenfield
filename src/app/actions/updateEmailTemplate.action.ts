@@ -16,7 +16,7 @@ export interface UpdateEmailTemplatePageInput {
 
 export async function updateEmailTemplateAction(
   input: UpdateEmailTemplatePageInput,
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ ok: true } | { ok: false; error: string; message?: string }> {
   const session = await requireAdmin();
   const container = buildContainer();
 
@@ -26,7 +26,11 @@ export async function updateEmailTemplateAction(
   });
 
   if (!r.ok) {
-    return { ok: false, error: r.error.kind };
+    return {
+      ok: false,
+      error: r.error.kind,
+      message: r.error.kind === "invalid_input" ? r.error.message : undefined,
+    };
   }
 
   return { ok: true };

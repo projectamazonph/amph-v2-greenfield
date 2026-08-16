@@ -4,6 +4,23 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-16: Complete editable transactional email templates (STORY-095.5)
+
+- Admin email templates now support documented, type-specific `{{variables}}` in the subject,
+  headline, intro body, and CTA label. Unsupported or malformed variables are rejected before
+  saving, and the form returns the exact validation message.
+- All seven transactional paths resolve those values at send time: verification, password reset,
+  welcome, receipt, refund, certificate, and live-class reminders. Uncustomized messages keep
+  their original copy.
+- Refund confirmations now render the editable CTA label with a safe dashboard destination.
+- Resend webhook verification now uses the provider's Svix headers and raw payload contract,
+  with a replay-tolerance check and direct regression tests for valid, invalid, stale, tampered,
+  and multi-signature requests.
+- All nine transactional messages now share a polished, email-client-safe HTML layout with
+  structured detail cards, accessible hierarchy, and clear action or security notices. The
+  password-changed and payment-failed messages are included. The checkout failure redirect remains
+  non-authoritative, so a payment-failed email must originate from verified provider evidence.
+
 ### 2026-08-16: Student-facing UI round 29 — QuizEditor question/option text inputs ship real `<label>` instead of `aria-label` override (WCAG 3.3.2 / 4.1.2) (PR #379)
 
 - `src/components/admin/QuizEditor.tsx`: the question text input no longer carries `aria-label={`Question ${qIndex + 1} text`}`. The interim fix used `aria-label` to satisfy the WCAG 3.3.2 *Labels or Instructions* audit, but `aria-label` is a screen-reader-only patch — sighted keyboard/mouse users cannot click the label to focus the input, voice-control software (Dragon, Voice Control) cannot say "click Question 1 text", browser autofill heuristics prefer real `<label>`, and every a11y lint tool (eslint-plugin-jsx-a11y/label-has-associated-control) checks for the `<label>` association. Round 29 replaces the `aria-label` override with a proper `<label className="sr-only" htmlFor={`q-${qIndex}-text`}>Question {qIndex + 1} text</label>` so the accessible name comes from the canonical `<label>` mechanism. The visible "Q{n}" badge stays as `<label aria-hidden>` so it remains a row marker without competing for the screen-reader announcement. WCAG 3.3.2 / 4.1.2.

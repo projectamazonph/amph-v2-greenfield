@@ -5,7 +5,7 @@
  */
 
 import { Button, Heading, Text } from "@react-email/components";
-import { EmailLayout } from "./EmailLayout";
+import { EmailLayout, EmailNotice, emailStyles } from "./EmailLayout";
 import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface PasswordResetEmailProps extends EmailTemplateOverride {
@@ -24,41 +24,26 @@ export function PasswordResetEmail({
 }: PasswordResetEmailProps) {
   return (
     <EmailLayout preview="Reset your Project Amazon PH Academy password" eyebrow="Password reset">
-      <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
+      <Heading as="h1" style={emailStyles.title}>
         {headlineOverride ?? "Reset your password"}
       </Heading>
-      <Text style={{ margin: "0 0 8px 0", color: "#404040" }}>
+      <Text style={{ ...emailStyles.body, marginBottom: "8px" }}>
         {introBodyOverride ??
           `Hi ${firstName}, we received a request to reset the password for your Project Amazon PH Academy account.`}
       </Text>
-      <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
+      <Text style={emailStyles.body}>
         Click the button below to choose a new password. If you didn't request this, you can safely
         ignore this email.
       </Text>
 
-      <Button
-        href={resetUrl}
-        style={{
-          backgroundColor: "#FF6B35",
-          color: "#ffffff",
-          fontSize: "15px",
-          fontWeight: 600,
-          textDecoration: "none",
-          padding: "12px 24px",
-          borderRadius: "6px",
-          display: "inline-block",
-        }}
-      >
+      <Button href={resetUrl} style={emailStyles.button}>
         {ctaLabelOverride ?? "Reset Password"}
       </Button>
 
-      <Text style={{ margin: "24px 0 8px 0", color: "#737373", fontSize: "13px" }}>
-        This link expires in {expiresInMinutes} minutes.
-      </Text>
-      <Text style={{ margin: 0, color: "#737373", fontSize: "13px" }}>
-        For your security, this link can only be used once. If it expires, request a new one from
-        the login page.
-      </Text>
+      <EmailNotice tone="warning">
+        For your security, this one-time link expires in {expiresInMinutes} minutes. If you did not
+        request it, you can safely ignore this email.
+      </EmailNotice>
     </EmailLayout>
   );
 }

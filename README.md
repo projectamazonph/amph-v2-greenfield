@@ -97,7 +97,6 @@ Not exhaustive — `CLAUDE.md`'s "Known gaps" section is the dated, actively-mai
 
 - **Keyword Research** dataset covers 4 of the story's 12 launch niches, and every dataset is `synthetic_calibrated` — credential-mode attempts are rejected pending real seller-export data (STORY-081b, unplanned).
 - **Listing Audit's difficulty-scaled finding-volume** acceptance criterion (STORY-080) is not implemented.
-- **Email template placeholders**: an admin-customized email field replaces the default copy verbatim; there is no `{{firstName}}`-style interpolation. `RefundEmail`'s `ctaLabel` field has no corresponding UI to render it.
 - **Admin two-factor authentication** is opt-in. Login lockout and session-row revocation are enforced, but 2FA enrollment is not mandatory.
 - **Local file storage** (`LocalFileStorage`, used when `BLOB_READ_WRITE_TOKEN` is unset) does not persist on Vercel's read-only serverless filesystem; production fails closed instead of silently falling back to it.
 

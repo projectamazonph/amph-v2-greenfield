@@ -42,6 +42,7 @@ import type { LiveClassReminderRenderer } from "@/ports/email/LiveClassReminderR
 import type { Clock } from "@/ports/system/Clock";
 import type { Logger } from "@/ports/observability/Logger";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
+import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
 
 const DEFAULT_WINDOW_MINUTES = 60;
 
@@ -127,6 +128,15 @@ export class SendLiveClassReminders {
 
       classesProcessed += 1;
       const minutesUntilStart = Math.round((cls.scheduledAt.getTime() - now.getTime()) / 60_000);
+      const startsAt = cls.scheduledAt.toLocaleString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        timeZoneName: "short",
+      });
 
       for (const studentId of studentIds) {
         // 4. Idempotency: skip if we already sent a reminder for this
@@ -151,21 +161,31 @@ export class SendLiveClassReminders {
         }
         const user = userResult.value;
 
+        const resolvedTemplate = template
+          ? interpolateEmailTemplate(template, {
+              firstName: user.firstName,
+              classTitle: cls.title,
+              startsAt,
+              joinUrl: cls.meetingUrl,
+              minutesUntilStart: String(minutesUntilStart),
+            })
+          : null;
+
         const react = this.deps.renderer.render({
           firstName: user.firstName,
           classTitle: cls.title,
           startsAt: cls.scheduledAt,
           joinUrl: cls.meetingUrl,
           minutesUntilStart,
-          headlineOverride: template?.headline,
-          introBodyOverride: template?.introBody,
-          ctaLabelOverride: template?.ctaLabel,
+          headlineOverride: resolvedTemplate?.headlineOverride,
+          introBodyOverride: resolvedTemplate?.introBodyOverride,
+          ctaLabelOverride: resolvedTemplate?.ctaLabelOverride,
         });
 
         const sendResult = await this.deps.email.send({
           to: user.email,
           subject:
-            template?.subject ?? `Reminder: ${cls.title} starts in ${minutesUntilStart} minutes`,
+            resolvedTemplate?.subject ?? `Reminder: ${cls.title} starts in ${minutesUntilStart} minutes`,
           react,
         });
         if (sendResult.ok) {

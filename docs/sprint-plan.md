@@ -252,7 +252,7 @@ gap audit, closed across two sessions.
 | STORY-097   | Student 2FA at `/profile/security`         | 1   | ✅ done — 2026-08-02, reuses the admin flow's role-agnostic use cases                                                                                        |
 | STORY-094   | Lesson-to-quiz transition wiring           | 1   | ✅ done — PR #267                                                                                                                                            |
 | STORY-095   | Admin email-template editor page           | 1   | ✅ done — 2026-08-02; wired into the send path by STORY-095.5, 2026-08-03                                                                                    |
-| STORY-095.5 | Wire email templates into Resend send path | 1   | ✅ done — 2026-08-03, see `docs/stories/STORY-095.5.md`                                                                                                      |
+| STORY-095.5 | Wire email templates into Resend send path | 1   | ✅ done — 2026-08-03; personalization, refund CTA, all-scenario HTML templates, payment-failure delivery, and Resend Svix webhook verification added 2026-08-16, see `docs/stories/STORY-095.5.md` |
 | STORY-096   | Account deletion + data export             | 1   | ✅ done; PR #305 added quiz and simulator attempt history                                                                                                    |
 | STORY-100   | Live-class recording + post-class XP       | 1   | ✅ done — 2026-08-03, see `docs/stories/STORY-100.md` (renumbered from STORY-092, which was already in use for a shipped, unrelated certificate-admin story) |
 

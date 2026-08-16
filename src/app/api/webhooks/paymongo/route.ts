@@ -32,8 +32,62 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildContainer } from "@/composition/container";
 import { Result } from "@/domain/shared/Result";
 import { buildAppUrl } from "@/domain/shared/AppUrl";
+import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
 
 const PROVIDER = "paymongo";
+const PAID_CHECKOUT_EVENT_TYPES = new Set([
+  "checkout_session.completed",
+  "checkout_session.payment.paid",
+]);
+
+interface NormalizedPayMongoWebhookEvent {
+  readonly eventType: string;
+  readonly providerEventId: string;
+  readonly checkoutSessionId: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+/**
+ * Supports PayMongo's current event envelope and the legacy checkout event
+ * shape retained by existing integrations. The app stores the checkout
+ * session id on an order, so only checkout-session payment events can mark
+ * that order paid.
+ */
+export function normalizePayMongoWebhookEvent(
+  payload: unknown,
+): NormalizedPayMongoWebhookEvent | null {
+  if (!isRecord(payload) || !isRecord(payload.data)) return null;
+  const data = payload.data;
+
+  if (data.type === "event" && typeof data.id === "string" && isRecord(data.attributes)) {
+    const attributes = data.attributes;
+    const resource = attributes.data;
+    if (
+      typeof attributes.type === "string" &&
+      isRecord(resource) &&
+      typeof resource.id === "string"
+    ) {
+      return {
+        eventType: attributes.type,
+        providerEventId: data.id,
+        checkoutSessionId: resource.id,
+      };
+    }
+  }
+
+  if (typeof payload.type === "string" && typeof data.id === "string") {
+    return {
+      eventType: payload.type,
+      providerEventId: data.id,
+      checkoutSessionId: data.id,
+    };
+  }
+
+  return null;
+}
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const signature = req.headers.get("paymongo-signature") ?? "";
@@ -62,9 +116,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let peekType = "unknown";
   let peekId: string | undefined;
   try {
-    const peeked = JSON.parse(rawBody) as { type?: string; data?: { id?: string } };
-    if (typeof peeked.type === "string") peekType = peeked.type;
-    if (typeof peeked.data?.id === "string") peekId = peeked.data.id;
+    const normalized = normalizePayMongoWebhookEvent(JSON.parse(rawBody));
+    if (normalized) {
+      peekType = normalized.eventType;
+      peekId = normalized.providerEventId;
+    }
   } catch {
     peekType = "invalid_json";
   }
@@ -94,19 +150,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   // ── 4. Parse event ──────────────────────────────────────────
-  let event: { type: string; data: { id: string; attributes: Record<string, unknown> } };
+  let event: NormalizedPayMongoWebhookEvent | null;
   try {
-    event = JSON.parse(rawBody);
+    event = normalizePayMongoWebhookEvent(JSON.parse(rawBody));
   } catch {
     return finish(NextResponse.json({ error: "Invalid JSON" }, { status: 400 }), "invalid_json");
   }
+  if (!event) {
+    return finish(
+      NextResponse.json({ error: "Invalid webhook event" }, { status: 400 }),
+      "invalid_event",
+    );
+  }
 
-  // We only care about checkout session completion events
-  if (event.type !== "checkout_session.completed") {
+  // A payment resource event does not contain the checkout-session id stored
+  // on the local order, so it cannot safely drive fulfillment here.
+  if (!PAID_CHECKOUT_EVENT_TYPES.has(event.eventType)) {
     return finish(NextResponse.json({ received: true }));
   }
 
-  const sessionId = event.data.id;
+  const sessionId = event.checkoutSessionId;
 
   // ── 5. Find the order (via the container's orderRepo) ─────
   const orderResult = await container.orderRepo.findByPaymongoPaymentId(sessionId);
@@ -196,20 +259,39 @@ async function sendReceiptEmail(
 
     const templateResult = await container.emailTemplateRepo.findByType("receipt");
     const template = templateResult.ok ? templateResult.value : null;
+    const paidAt = order.paymongoPaidAt ?? new Date();
+    const receiptUrl = buildAppUrl("/dashboard");
+    const resolvedTemplate = template
+      ? interpolateEmailTemplate(template, {
+          firstName: userResult.value.firstName,
+          orderNumber: order.id,
+          courseTitle: courseResult.value.title,
+          amount: new Intl.NumberFormat("en-PH", {
+            style: "currency",
+            currency: order.currency,
+          }).format(order.totalMinor / 100),
+          paidAt: paidAt.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          receiptUrl,
+        })
+      : null;
     const sendResult = await container.emailSender.send({
       to: userResult.value.email,
-      subject: template?.subject ?? `Receipt for ${order.id}: ${courseResult.value.title}`,
+      subject: resolvedTemplate?.subject ?? `Receipt for ${order.id}: ${courseResult.value.title}`,
       react: container.receiptEmailRenderer.render({
         firstName: userResult.value.firstName,
         orderNumber: order.id,
         courseTitle: courseResult.value.title,
         amountMinor: order.totalMinor,
         currency: order.currency,
-        paidAt: order.paymongoPaidAt ?? new Date(),
-        receiptUrl: buildAppUrl("/dashboard"),
-        headlineOverride: template?.headline,
-        introBodyOverride: template?.introBody,
-        ctaLabelOverride: template?.ctaLabel,
+        paidAt,
+        receiptUrl,
+        headlineOverride: resolvedTemplate?.headlineOverride,
+        introBodyOverride: resolvedTemplate?.introBodyOverride,
+        ctaLabelOverride: resolvedTemplate?.ctaLabelOverride,
       }),
     });
     if (!sendResult.ok) {

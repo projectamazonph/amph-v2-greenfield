@@ -12,6 +12,8 @@
  */
 
 import { Result } from "@/domain/shared/Result";
+import { buildAppUrl } from "@/domain/shared/AppUrl";
+import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
 import { isWithinRefundWindow } from "@/domain/values/OrderRefund";
 import type { Order } from "@/domain/entities/Order";
 import type { IOrderRepository, OrderError } from "@/ports/repositories/OrderRepository";
@@ -151,19 +153,41 @@ export async function sendRefundEmail(
 
   const templateResult = await deps.emailTemplateRepo.findByType("refund");
   const template = templateResult.ok ? templateResult.value : null;
+  const refundedAt = order.refundProcessedAt ?? new Date();
+  const dashboardUrl = buildAppUrl("/dashboard");
+  const resolvedTemplate = template
+    ? interpolateEmailTemplate(template, {
+        firstName: userResult.value.firstName,
+        orderNumber: order.id,
+        courseTitle: courseResult.value.title,
+        amount: new Intl.NumberFormat("en-PH", {
+          style: "currency",
+          currency: order.currency,
+        }).format((order.refundAmountMinor ?? order.totalMinor) / 100),
+        refundedAt: refundedAt.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        reason,
+        dashboardUrl,
+      })
+    : null;
   const sendResult = await deps.emailSender.send({
     to: userResult.value.email,
-    subject: template?.subject ?? `Refund processed for ${order.id}`,
+    subject: resolvedTemplate?.subject ?? `Refund processed for ${order.id}`,
     react: deps.refundEmailRenderer.render({
       firstName: userResult.value.firstName,
       orderNumber: order.id,
       courseTitle: courseResult.value.title,
       amountMinor: order.refundAmountMinor ?? order.totalMinor,
       currency: order.currency,
-      refundedAt: order.refundProcessedAt ?? new Date(),
+      refundedAt,
       reason,
-      headlineOverride: template?.headline,
-      introBodyOverride: template?.introBody,
+      dashboardUrl,
+      headlineOverride: resolvedTemplate?.headlineOverride,
+      introBodyOverride: resolvedTemplate?.introBodyOverride,
+      ctaLabelOverride: resolvedTemplate?.ctaLabelOverride,
     }),
   });
   if (!sendResult.ok) {
