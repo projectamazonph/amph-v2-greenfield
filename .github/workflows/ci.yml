@@ -171,13 +171,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma migrate deploy
       - run: pnpm prisma generate
-      # Seed the SimulatorScenario rows that StartSimulatorAttempt /
-      # GradeSimulatorAttempt call scenarioRepo.findPublished() against.
-      # No migration ever created these rows, so without this seed the
-      # /tools/<simulator> server components surface scenario_not_found
-      # as "Something went wrong" to authenticated students. Idempotent
-      # (upsert on id), so re-running across CI reruns is safe.
+      # Seed both runtime inputs required by the simulator journey. Pages
+      # need a published SimulatorScenario, while grading also needs the
+      # matching ScorePolicy for the scenario difficulty and practice mode.
+      # Both scripts use upserts, so CI reruns remain safe.
       - run: pnpm db:seed:scenarios
+      - run: pnpm db:seed:policies
       # Install ALL Playwright browser dependencies + system deps.
       # Specifying only `chromium` was leaving the worker process unable to
       # launch the bundled browser (the error mentions a `webkit-2311`
