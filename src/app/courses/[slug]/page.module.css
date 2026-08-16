@@ -302,14 +302,17 @@
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: background-color var(--duration-base) var(--ease-out),
-    box-shadow var(--duration-base) var(--ease-out);
+  transition: background-color var(--duration-base) var(--ease-out);
+  /* M-R28 fix: Field Manual §5 (docs/design-brief.md:142) — Button has no
+     box-shadow. The 1px border is the elevation; the previous
+     `, box-shadow var(--duration-base) var(--ease-out)` term was dead code
+     (no box-shadow declaration on the button) and the `box-shadow: none`
+     on hover was a freeze. Both are removed. */
   flex-shrink: 0;
 }
 
 .quizCta:hover {
   background: color-mix(in srgb, var(--accent) 90%, var(--ink-900));
-  box-shadow: none;
 }
 
 /* Mobile */

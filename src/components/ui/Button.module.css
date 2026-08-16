@@ -16,8 +16,12 @@
   text-decoration: none;
   transition:
     background var(--duration-fast) var(--ease-out),
-    transform 80ms var(--ease-out),
-    box-shadow var(--duration-fast) var(--ease-out);
+    transform 80ms var(--ease-out);
+  /* M-R28 fix: Field Manual §5 (docs/design-brief.md:142) — Button has no
+     box-shadow. The 1px border is the elevation; shadow would fight the
+     manual aesthetic. The previous `, box-shadow var(--duration-fast)
+     var(--ease-out)` term was dead code (no box-shadow declaration
+     anywhere on the button), so it is removed rather than frozen. */
 }
 
 .btn:disabled {
