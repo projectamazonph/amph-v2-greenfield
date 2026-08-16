@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** Done. Merged in PR #TBD.
+**Status:** In review in PR #387.
 
 ## Goal
 
