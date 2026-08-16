@@ -3,6 +3,13 @@
  *
  * STORY-091 (US-006). "use client" only because Table's renderCell
  * prop is a function. No pagination — quiz list is small.
+ *
+ * M-R30 fix: <figcaption className="sr-only"> provides WCAG 1.3.1
+ * accessible name for the table (mirrors AdminUsersTable, AdminBadges,
+ * AdminCourses, AdminDiscountCodes, AdminLiveClasses, AdminPayments,
+ * AdminRefunds, AdminResources, AdminSimulators, AdminAuditLogTable,
+ * AdminCertificatesTable). The Astryx <Table> sets scope="col" on
+ * every header automatically.
  */
 
 "use client";
@@ -80,13 +87,16 @@ const COLUMNS: TableColumn<QuizRow>[] = [
 
 export function AdminQuizzesTable({ quizzes }: { quizzes: readonly QuizRow[] }) {
   return (
-    <Table
-      data={quizzes as QuizRow[]}
-      columns={COLUMNS}
-      idKey="id"
-      density="compact"
-      dividers="rows"
-      hasHover
-    />
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Quizzes</figcaption>
+      <Table
+        data={quizzes as QuizRow[]}
+        columns={COLUMNS}
+        idKey="id"
+        density="compact"
+        dividers="rows"
+        hasHover
+      />
+    </figure>
   );
 }

@@ -4,6 +4,12 @@
  * STORY-092 (US-009). "use client" only because Table's renderCell
  * prop is a function. No pagination — certificate list is small enough
  * to fit in one view (active + revoked).
+ *
+ * M-R30 fix: <figcaption className="sr-only"> provides WCAG 1.3.1
+ * accessible name for the table (mirrors AdminUsersTable, AdminBadges,
+ * AdminCourses, AdminDiscountCodes, AdminLiveClasses, AdminPayments,
+ * AdminRefunds, AdminResources, AdminSimulators, AdminAuditLogTable).
+ * The Astryx <Table> sets scope="col" on every header automatically.
  */
 
 "use client";
@@ -127,13 +133,16 @@ export function AdminCertificatesTable({
   certificates: readonly CertificateRow[];
 }) {
   return (
-    <Table
-      data={certificates as CertificateRow[]}
-      columns={COLUMNS}
-      idKey="id"
-      density="compact"
-      dividers="rows"
-      hasHover
-    />
+    <figure style={{ margin: 0 }}>
+      <figcaption className="sr-only">Certificates</figcaption>
+      <Table
+        data={certificates as CertificateRow[]}
+        columns={COLUMNS}
+        idKey="id"
+        density="compact"
+        dividers="rows"
+        hasHover
+      />
+    </figure>
   );
 }

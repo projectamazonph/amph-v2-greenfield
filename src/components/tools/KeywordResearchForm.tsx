@@ -190,14 +190,18 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
             tabIndex={0}
           >
             <table className={styles.table}>
+              {/* M-R30 fix: scope="col" on every header so screen readers
+                  associate cells with their column header (WCAG 1.3.1).
+                  The parent role="region" aria-label="Keyword classification"
+                  supplies the accessible name. */}
               <thead>
                 <tr>
-                  <th>Keyword</th>
-                  <th className={styles.thNum}>Volume/mo</th>
-                  <th className={styles.thNum}>Competition</th>
-                  <th className={styles.thNum}>Median bid</th>
-                  <th>Intent</th>
-                  <th>Negative</th>
+                  <th scope="col">Keyword</th>
+                  <th scope="col" className={styles.thNum}>Volume/mo</th>
+                  <th scope="col" className={styles.thNum}>Competition</th>
+                  <th scope="col" className={styles.thNum}>Median bid</th>
+                  <th scope="col">Intent</th>
+                  <th scope="col">Negative</th>
                 </tr>
               </thead>
               <tbody>
@@ -286,12 +290,16 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
             tabIndex={0}
           >
             <table className={styles.table}>
+              {/* M-R30 fix: scope="col" on every header so screen readers
+                  associate cells with their column header (WCAG 1.3.1).
+                  The parent role="region" aria-label="Keyword grading results"
+                  supplies the accessible name. */}
               <thead>
                 <tr>
-                  <th>Keyword</th>
-                  <th>Your intent</th>
-                  <th>Correct intent</th>
-                  <th>Result</th>
+                  <th scope="col">Keyword</th>
+                  <th scope="col">Your intent</th>
+                  <th scope="col">Correct intent</th>
+                  <th scope="col">Result</th>
                 </tr>
               </thead>
               <tbody>
