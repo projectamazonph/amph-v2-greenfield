@@ -4,6 +4,13 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### LEARN-006 — Repair lesson content spacing and responsive layout
+
+- Give Markdown tables a readable, aligned treatment that contains overflow on
+  narrow screens instead of widening the entire lesson page.
+- Normalize lesson block spacing and wrap long code, images, blockquotes, and
+  quiz prompts so content does not overlap or escape the reading column.
+
 ### 2026-08-16: Reconcile public curriculum and certificate claims (LEARN-003)
 
 - Landing curriculum, tier cards, programme statistics, and simulator availability now read a
