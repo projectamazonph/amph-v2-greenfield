@@ -131,7 +131,7 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 | PayMongo refunds             | Implemented          | `PayMongoAdapter.refund()` calls the real PayMongo Refunds API (fixed 2026-08-02, STORY-049.5); `ProcessRefund`/`RefundOverride` work against production PayMongo.                                                                |
 | Admin settings               | Partial              | TOTP is implemented; general site settings and maintenance controls remain “Coming soon”.                                                                                                                                         |
 | Admin seed smoke test        | Implemented          | `scripts/seed-admin-user.mjs` uses the shared PrismaPg adapter path (fixed prior to 2026-07-27).                                                                                                                                  |
-| Learning-experience uplift   | Planned              | `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md` defines the atomic work to align public claims, add zero-to-one onboarding, connect practice to saved evidence, and deliver a rubric-backed capstone. Existing simulator scores remain formative. |
+| Learning-experience uplift   | Partial              | Wave 0 now has a checked-in curriculum inventory and durable planned learner time for catalog/detail/lesson surfaces (`STORY-111`, `STORY-112`). Zero-to-one onboarding, evidence-linked practice, and the rubric-backed capstone remain in the build plan. Existing simulator scores remain formative. |
 
 ## Deliberately out of scope
 

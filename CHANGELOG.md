@@ -4,6 +4,15 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-16: Persist planned learner time across lesson surfaces (LEARN-002)
+
+- `Lesson.plannedMinutes` is now a persisted, type-agnostic learner-time contract with a
+  Prisma migration that backfills legacy video rows from their media duration.
+- Catalog lists, course detail, lesson headers, and lesson sidebars read the same planned value;
+  text and quiz lessons no longer disappear from course-time totals.
+- Negative and fractional planned durations are rejected at the domain boundary, while legacy
+  callers retain a safe default until their source content is re-imported.
+
 ### 2026-08-16: P1 — simulator scenarios missing in production (readiness probe + production seed + runbook + e2e)
 
 Production students hit the generic "Something went wrong" page on every `/tools/<simulator>` route when the `SimulatorScenario` table has no row with `status='published'` for the simulator id. `StartSimulatorAttempt` fails with `scenario_not_found` and the error bubbles up to Next.js's error boundary. Without a probe, this only surfaces from a user report.

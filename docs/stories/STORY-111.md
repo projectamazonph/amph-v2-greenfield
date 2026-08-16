@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** In progress. LEARN-001 implementation is on the dedicated branch.
+**Status:** Done. Merged in PR #383 (`bc97101`) on 2026-08-16.
 
 ## Goal
 
@@ -33,4 +33,4 @@ Give the course team one checked-in contract for what a beginner can actually st
 
 - A dependency-free source and manifest check passes for all 31 lessons and 31 inventory rows.
 - Unit tests cover enrichment, duplicate source slugs, missing minutes, missing tier mappings, missing simulator targets, and orphan manifest rows.
-- `pnpm validate:curriculum` and the focused Vitest file are pending because this checkout has no installed `node_modules`; no network bootstrap was performed.
+- `pnpm validate:curriculum` and the focused Vitest file passed in PR #383 CI.

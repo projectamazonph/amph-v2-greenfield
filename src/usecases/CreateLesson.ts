@@ -23,6 +23,7 @@ export interface CreateLessonInput {
   title: string;
   type: LessonType;
   content: LessonContent;
+  plannedMinutes?: number;
   actorId: string;
 }
 
@@ -75,6 +76,7 @@ export class CreateLesson {
       title: input.title,
       type: input.type,
       content: input.content,
+      plannedMinutes: input.plannedMinutes,
       displayOrder: nextOrder,
       createdAt: now,
       updatedAt: now,

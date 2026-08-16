@@ -22,6 +22,7 @@ function makeLesson(type: Lesson["type"], content: LessonContentDomain): Lesson 
     title: "Test Lesson",
     type,
     content,
+    plannedMinutes: type === "VIDEO" ? 10 : 0,
     displayOrder: 1,
     createdAt: FIXED_DATE,
     updatedAt: FIXED_DATE,
