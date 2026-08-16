@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "courses": {
+    "ppc-foundations": { "tier": "pp-foundations" },
+    "accelerated-mastery": { "tier": "accelerated-mastery" }
+  },
+  "lessons": [
+    { "slug": "0.1-welcome", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:0.1-welcome"], "finalDeliverable": "A written Amazon PPC work goal" },
+    { "slug": "0.2-platform-tour", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:0.2-platform-tour"], "finalDeliverable": "A saved map of the platform work loop" },
+    { "slug": "0.3-first-simulation", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:0.3-first-simulation"], "finalDeliverable": "A first client-brief decision note" },
+    { "slug": "1.1-read-ppc-data-before-you-change-it", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:1.1-read-ppc-data-before-you-change-it"], "finalDeliverable": "A one-line decision note" },
+    { "slug": "1.2-cpc-ctr", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:1.2-cpc-ctr"], "finalDeliverable": "A CPC and CTR interpretation" },
+    { "slug": "1.3-acos-tacos-profitability", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:1.3-acos-tacos-profitability"], "finalDeliverable": "A profitability calculation" },
+    { "slug": "1.4-roas-measuring-return", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:1.4-roas-measuring-return"], "finalDeliverable": "A ROAS calculation" },
+    { "slug": "1.5-metrics-in-practice", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:1.5-metrics-in-practice"], "finalDeliverable": "A metrics-based account decision" },
+    { "slug": "2.1-match-types", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:2.1-match-types"], "finalDeliverable": "A match-type choice with a reason" },
+    { "slug": "2.2-keyword-research-workflow", "toolBridge": { "kind": "simulator", "target": "keyword-research" }, "resourceRefs": ["mdx:2.2-keyword-research-workflow"], "finalDeliverable": "A first keyword research shortlist" },
+    { "slug": "2.3-negative-keywords", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:2.3-negative-keywords"], "finalDeliverable": "A negative keyword list" },
+    { "slug": "2.4-keyword-grouping", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:2.4-keyword-grouping"], "finalDeliverable": "A grouped keyword plan" },
+    { "slug": "3.1-listing-quality-score", "toolBridge": { "kind": "simulator", "target": "listing-audit" }, "resourceRefs": ["mdx:3.1-listing-quality-score"], "finalDeliverable": "A listing relevance finding" },
+    { "slug": "3.2-listing-anatomy", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:3.2-listing-anatomy"], "finalDeliverable": "A listing anatomy checklist" },
+    { "slug": "3.3-aplus-content", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:3.3-aplus-content"], "finalDeliverable": "An A+ content improvement note" },
+    { "slug": "4.1-sponsored-products", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:4.1-sponsored-products"], "finalDeliverable": "A Sponsored Products format choice" },
+    { "slug": "4.2-sponsored-brands-display", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:4.2-sponsored-brands-display"], "finalDeliverable": "An ad-format recommendation" },
+    { "slug": "4.3-campaign-structure", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:4.3-campaign-structure"], "finalDeliverable": "A campaign naming and structure plan" },
+    { "slug": "4.4-campaign-architecture-practice", "toolBridge": { "kind": "simulator", "target": "campaign-builder" }, "resourceRefs": ["mdx:4.4-campaign-architecture-practice"], "finalDeliverable": "A completed campaign architecture" },
+    { "slug": "5.1-campaign-portfolios", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:5.1-campaign-portfolios"], "finalDeliverable": "A portfolio organization plan" },
+    { "slug": "5.2-budget-pacing", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:5.2-budget-pacing"], "finalDeliverable": "A budget pacing decision" },
+    { "slug": "5.3-seasonal-strategy", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:5.3-seasonal-strategy"], "finalDeliverable": "A seasonal planning note" },
+    { "slug": "6.1-bid-strategies", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:6.1-bid-strategies"], "finalDeliverable": "A bid strategy recommendation" },
+    { "slug": "6.2-placement-adjustments", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:6.2-placement-adjustments"], "finalDeliverable": "A placement adjustment decision" },
+    { "slug": "6.3-bid-elevator-prep", "toolBridge": { "kind": "simulator", "target": "bid-elevator" }, "resourceRefs": ["mdx:6.3-bid-elevator-prep"], "finalDeliverable": "A completed bid decision" },
+    { "slug": "7.1-search-term-analysis", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:7.1-search-term-analysis"], "finalDeliverable": "A search-term performance finding" },
+    { "slug": "7.2-negative-keywords", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:7.2-negative-keywords"], "finalDeliverable": "An advanced negative keyword decision" },
+    { "slug": "7.3-str-triage-prep", "toolBridge": { "kind": "simulator", "target": "str-triage" }, "resourceRefs": ["mdx:7.3-str-triage-prep"], "finalDeliverable": "A completed search-term triage" },
+    { "slug": "8.1-brand-analytics", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:8.1-brand-analytics"], "finalDeliverable": "A Brand Analytics finding" },
+    { "slug": "8.2-share-of-voice", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:8.2-share-of-voice"], "finalDeliverable": "A share-of-voice comparison" },
+    { "slug": "8.3-competitor-benchmarking", "toolBridge": { "kind": "none" }, "resourceRefs": ["mdx:8.3-competitor-benchmarking"], "finalDeliverable": "A competitor benchmark action" }
+  ]
+}

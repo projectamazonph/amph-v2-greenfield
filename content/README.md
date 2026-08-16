@@ -1,6 +1,6 @@
 # Content — Curriculum Source
 
-This directory holds the curriculum content (lesson MDX files and quiz fixture) for the Project Amazon PH Academy platform. It is the **source of truth** that `scripts/import-amph-content.ts` reads to populate module and lesson rows.
+This directory holds the curriculum content (lesson MDX files and quiz fixture) for the Project Amazon PH Academy platform. The MDX files are the source of truth for lesson content. `curriculum/inventory.json` is the reviewed learning contract that checks every published lesson's course tier, planned work, tool bridge, resources, and final deliverable before release.
 
 ## Layout
 
@@ -18,7 +18,8 @@ content/
     │   ├── 6-bidding-lab/         # 3 lessons: bid strategies, placement, bid-elevator prep
     │   ├── 7-search-term-triage/  # 3 lessons: search-term analysis, negatives, STR triage prep
     │   └── 8-competitive-intelligence/  # 3 lessons: brand analytics, share-of-voice, benchmarking
-    └── quiz-questions.json        # 7 module-final quizzes (knowledge checks)
+    ├── inventory.json              # checked-in course and lesson release contract
+    └── quiz-questions.json         # 7 module-final quizzes (knowledge checks)
 ```
 
 ## Source & history
@@ -44,9 +45,21 @@ The content was **migrated from the original `amph-v2` repo** (`content/curricul
 | `content/curriculum/modules/*`           | scrubbed + fact-card-augmented content, fetched 2026-07-18                                              |
 | `content/curriculum/quiz-questions.json` | original v1 `project/fixtures/quiz-questions.json` (unchanged — quiz text was never the legacy problem) |
 
+## Inventory release gate
+
+Run the inventory check after changing lesson frontmatter or the learning contract:
+
+```bash
+pnpm validate:curriculum
+```
+
+The check reads the real MDX tree and fails on duplicate slugs, missing planned minutes, missing course tier mappings, missing tool targets, missing manifest rows, or orphan manifest rows. It is the first release gate for the learning-experience uplift plan in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`.
+
 ## Content import workflow
 
-The importer:
+The importer is `scripts/import-amph-content.ts` (STORY-013). It reads the same repo-relative source that the inventory validator checks.
+
+It:
 
 1. Read every `*.mdx` file under `content/curriculum/modules/<module-slug>/<lesson-slug>.mdx`.
 2. Parse the frontmatter (`title`, `slug`, `moduleNumber`, `lessonNumber`, `type`, `estimatedMinutes`, `xpReward`).
@@ -56,8 +69,8 @@ The importer:
 
 The greenfield importer differs from the parent implementation in these important ways:
 
-- Resolves paths repo-relatively through `NodeContentReader`, not through the hard-coded device path used by the parent.
-- Uses the existing Prisma repositories and the `ImportAmphContent` use case. The CLI stays outside the request container because it runs without an HTTP request scope.
+- Will resolve paths via `import.meta.url` (repo-relative), not the hard-coded device path the parent once had.
+- Will use the existing `JoseJwtService` and the SOLID five-layer architecture (the parent did not have the SOLID architecture, so its import script is a one-off CLI tool — the greenfield's can be cleaner).
 - Does not regenerate module 5–8 slugs from `amph-foundations-*` to `accelerated-mastery-*`; the source already uses the post-split slugs.
 
 ## Content audit & corrections (carried forward from parent)
@@ -86,6 +99,9 @@ Each fix added an Amazon Ads Fact Card (source URL, scope, owner/date placeholde
 ```bash
 # All 31 MDX files are present
 find content/curriculum/modules -name "*.mdx" | wc -l   # 31
+
+# The checked-in learning contract matches the MDX source
+pnpm validate:curriculum
 
 # Quiz JSON is parseable
 python3 -c "import json; json.load(open('content/curriculum/quiz-questions.json'))"
