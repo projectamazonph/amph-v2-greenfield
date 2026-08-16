@@ -13,16 +13,16 @@ describe("Landing page", () => {
   it("renders the section headings in order", () => {
     const html = renderToString(createElement(HomePage));
     const headlines = [
-      "Learn PPC by", // Hero
-      "just watch lessons", // Method
+      "Amazon ads,", // Hero
+      "Reading isn\u2019t enough", // Method
       "Move a bid. Watch the account breathe.", // SimulatorSection
-      "Eight modules, in order. No surprises.", // Curriculum
-      "A paid course. We think it should be.", // WhoFor
+      "Eight modules, in order. No hidden gates.", // Curriculum
+      "A paid course.", // WhoFor
       "Three tiers, one-time payment.", // Pricing
       "Direct, grounded in real account work.", // Mentor
       "A certificate that opens doors, not one that sits idle.", // Proof
       "Plain answers.", // FAQSection
-      "Stop watching.", // DarkCTA
+      "Build the skill.", // DarkCTA
     ];
     let lastIndex = -1;
     for (const headline of headlines) {

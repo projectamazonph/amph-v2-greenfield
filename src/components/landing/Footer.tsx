@@ -22,8 +22,8 @@ export function Footer() {
           <div className={styles.brand}>
             <Logo />
             <p>
-              Amazon ads training that helps Filipino VAs become specialists clients can see:
-              competence, not hype. One-time payment, no subscription.
+              Amazon ads training that helps Filipino VAs become specialists clients can see.
+              One-time payment, no subscription.
             </p>
           </div>
 
@@ -56,11 +56,15 @@ export function Footer() {
 
         <div className={styles.arch}>
           <table>
+            {/* M-R30 fix: <caption className="sr-only"> provides WCAG 1.3.1
+                accessible name; scope="col" on every header associates cells
+                with their column header for screen readers. */}
+            <caption className="sr-only">Project architecture — what each level is used for</caption>
             <thead>
               <tr>
-                <th>Level</th>
-                <th>Name</th>
-                <th>Used for</th>
+                <th scope="col">Level</th>
+                <th scope="col">Name</th>
+                <th scope="col">Used for</th>
               </tr>
             </thead>
             <tbody>

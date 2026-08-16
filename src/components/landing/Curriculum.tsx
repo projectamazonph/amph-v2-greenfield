@@ -27,23 +27,27 @@ export function Curriculum() {
         <div className={shared.secHead}>
           <div className={shared.stickyCol}>
             <span className={shared.secNum}>§03 / THE CURRICULUM</span>
-            <h2 className={shared.secTitle}>Eight modules, in order. No surprises.</h2>
+            <h2 className={shared.secTitle}>Eight modules, in order. No hidden gates.</h2>
           </div>
           <p className={shared.secLede}>
-            Modules 1–5 are <b>Foundations</b>; 6–8 are <b>Mastery</b>. No jumping around, no hidden
-            &ldquo;advanced&rdquo; paywall mid-course. The tier you pick decides how far you go, not
-            whether you can see the map.
+            Modules 1&ndash;5 are <b>Foundations</b>; 6&ndash;8 are <b>Mastery</b>. The tier you
+            pick decides how far you go. No jumping around, no hidden &ldquo;advanced&rdquo;
+            paywall mid-course.
           </p>
         </div>
 
         <Reveal className={styles.tableScroll}>
           <table className={styles.table}>
+            {/* M-R30 fix: <caption className="sr-only"> provides WCAG 1.3.1
+                accessible name; scope="col" on every header associates cells
+                with their column header for screen readers. */}
+            <caption className="sr-only">Curriculum modules, tier, and time</caption>
             <thead>
               <tr>
-                <th style={{ width: 58 }}>Mod</th>
-                <th>Topic</th>
-                <th>Tier</th>
-                <th className={styles.right}>Time</th>
+                <th scope="col" style={{ width: 58 }}>Mod</th>
+                <th scope="col">Topic</th>
+                <th scope="col">Tier</th>
+                <th scope="col" className={styles.right}>Time</th>
               </tr>
             </thead>
             <tbody>

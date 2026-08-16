@@ -88,14 +88,18 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
         tabIndex={0}
       >
         <table className={styles.table}>
+          {/* M-R30 fix: scope="col" on every header so screen readers
+              associate cells with their column header (WCAG 1.3.1).
+              The parent role="region" aria-label="Search term triage"
+              supplies the accessible name. */}
           <thead>
             <tr>
-              <th>Search term</th>
-              <th className={styles.thNum}>Spend</th>
-              <th className={styles.thNum}>Sales</th>
-              <th className={styles.thNum}>Orders</th>
-              <th className={styles.thNum}>ROAS</th>
-              <th className={styles.thAction}>Action</th>
+              <th scope="col">Search term</th>
+              <th scope="col" className={styles.thNum}>Spend</th>
+              <th scope="col" className={styles.thNum}>Sales</th>
+              <th scope="col" className={styles.thNum}>Orders</th>
+              <th scope="col" className={styles.thNum}>ROAS</th>
+              <th scope="col" className={styles.thAction}>Action</th>
             </tr>
           </thead>
           <tbody>

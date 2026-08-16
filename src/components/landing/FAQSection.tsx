@@ -18,7 +18,7 @@ const FAQ: readonly QA[] = [
     a: (
       <>
         Yes, on completion. We list it on your profile, and it&rsquo;s{" "}
-        <span className={styles.tl}>recognized in our hiring pipeline</span>. We hire from this
+        <span className={styles.tl}>recognized by our hiring team</span>. We hire from this
         audience ourselves.
       </>
     ),

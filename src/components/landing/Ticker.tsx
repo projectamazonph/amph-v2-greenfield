@@ -4,7 +4,7 @@ const METRICS = [
   { label: "ACoS", value: "24.3% ▼" },
   { label: "TACoS", value: "11.8%" },
   { label: "CTR", value: "0.41%" },
-  { label: "CPC", value: "$0.78" },
+  { label: "CPC", value: "₱45.00" },
   { label: "CVR", value: "12.6%" },
   { label: "Impressions", value: "48,210" },
   { label: "Search terms triaged", value: "312" },
