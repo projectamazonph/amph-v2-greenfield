@@ -18,6 +18,7 @@ Use this page to distinguish current operating guidance from retained history.
 | Database                                | [`db-schema.md`](db-schema.md)                                                                             |
 | Operations                              | [`runbooks/README.md`](runbooks/README.md), [`DISASTER-RECOVERY-RUNBOOK.md`](DISASTER-RECOVERY-RUNBOOK.md) |
 | Delivery history                        | [`../CHANGELOG.md`](../CHANGELOG.md), [`sprint-plan.md`](sprint-plan.md)                                   |
+| Learning-experience roadmap             | [`LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`](LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md)                           |
 
 ## Current baseline
 

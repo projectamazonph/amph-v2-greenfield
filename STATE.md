@@ -4,6 +4,14 @@
 **Reviewed:** 2026-08-14
 **Main:** `ee1737a`
 
+## Current learning-experience priority
+
+The next product investment is the zero-to-one student journey. The atomic
+backlog, dependencies, evidence model, and release gates are in
+[`docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`](docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md).
+Start with the truth-and-release contract before adding lessons or making new
+job-readiness claims. Existing simulator scores remain formative.
+
 ## Production
 
 - Canonical URL: <https://projectamazonph.vercel.app>
