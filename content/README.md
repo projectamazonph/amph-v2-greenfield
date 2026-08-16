@@ -19,6 +19,7 @@ content/
     │   ├── 7-search-term-triage/  # 3 lessons: search-term analysis, negatives, STR triage prep
     │   └── 8-competitive-intelligence/  # 3 lessons: brand analytics, share-of-voice, benchmarking
     ├── inventory.json              # checked-in course and lesson release contract
+    ├── public-claims.json          # reviewed public counts, tiers, tools, and certificate wording
     └── quiz-questions.json         # 7 module-final quizzes (knowledge checks)
 ```
 
@@ -54,6 +55,10 @@ pnpm validate:curriculum
 ```
 
 The check reads the real MDX tree and fails on duplicate slugs, missing planned minutes, missing course tier mappings, missing tool targets, missing manifest rows, or orphan manifest rows. It is the first release gate for the learning-experience uplift plan in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`.
+
+Public landing and offer copy reads `public-claims.json`. Its contract test joins
+the reviewed values back to `inventory.json` and the MDX frontmatter, so a lesson
+count or planned-minute change must update the claim deliberately before it can ship.
 
 ## Content import workflow
 

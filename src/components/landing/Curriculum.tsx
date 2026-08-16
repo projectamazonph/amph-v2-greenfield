@@ -1,24 +1,30 @@
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Curriculum.module.css";
+import {
+  formatPlannedMinutes,
+  PUBLIC_CURRICULUM_CLAIMS,
+  publicCourseClaims,
+} from "@/domain/curriculum/PublicCurriculumClaims";
 
 interface Module {
   n: string;
   name: string;
   tier: "Foundations" | "Mastery";
-  hours: string;
+  time: string;
 }
 
-const MODULES: Module[] = [
-  { n: "01", name: "Amazon Ads fundamentals", tier: "Foundations", hours: "2h" },
-  { n: "02", name: "Sponsored Products structure", tier: "Foundations", hours: "3h" },
-  { n: "03", name: "Search-term triage and negation", tier: "Foundations", hours: "3h" },
-  { n: "04", name: "Bidding and budget pacing", tier: "Foundations", hours: "3h" },
-  { n: "05", name: "Reporting and client comms", tier: "Foundations", hours: "3h" },
-  { n: "06", name: "Sponsored Brands and Display", tier: "Mastery", hours: "4h" },
-  { n: "07", name: "Listing audit and on-page fixes", tier: "Mastery", hours: "4h" },
-  { n: "08", name: "Keyword research for new products", tier: "Mastery", hours: "4h" },
-];
+const MODULES: Module[] = PUBLIC_CURRICULUM_CLAIMS.modules.map((module) => ({
+  n: String(module.moduleNumber).padStart(2, "0"),
+  name: module.name,
+  tier: module.courseSlug === "ppc-foundations" ? "Foundations" : "Mastery",
+  time: formatPlannedMinutes(module.plannedMinutes),
+}));
+
+const FOUNDATIONS = publicCourseClaims("ppc-foundations");
+const MASTERY = publicCourseClaims("accelerated-mastery");
+const TOTAL_LESSONS = FOUNDATIONS.lessonCount + MASTERY.lessonCount;
+const TOTAL_MINUTES = FOUNDATIONS.plannedMinutes + MASTERY.plannedMinutes;
 
 export function Curriculum() {
   return (
@@ -27,10 +33,12 @@ export function Curriculum() {
         <div className={shared.secHead}>
           <div className={shared.stickyCol}>
             <span className={shared.secNum}>§03 / THE CURRICULUM</span>
-            <h2 className={shared.secTitle}>Eight modules, in order. No hidden gates.</h2>
+            <h2 className={shared.secTitle}>
+              {PUBLIC_CURRICULUM_CLAIMS.modules.length} modules, in order. No hidden gates.
+            </h2>
           </div>
           <p className={shared.secLede}>
-            Modules 1&ndash;5 are <b>Foundations</b>; 6&ndash;8 are <b>Mastery</b>. The tier you
+            Modules 0&ndash;4 are <b>Foundations</b>; 5&ndash;8 are <b>Mastery</b>. The tier you
             pick decides how far you go. No jumping around, no hidden &ldquo;advanced&rdquo;
             paywall mid-course.
           </p>
@@ -69,24 +77,28 @@ export function Curriculum() {
                     </span>
                   </td>
                   <td className={styles.hours} data-l="Time">
-                    {m.hours}
+                    {m.time}
                   </td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr>
-                <td colSpan={3}>8 modules · Foundations (1–5) + Mastery (6–8)</td>
+                <td colSpan={3}>
+                  {PUBLIC_CURRICULUM_CLAIMS.modules.length} modules · Foundations (0–4) + Mastery
+                  (5–8)
+                </td>
                 <td className={styles.right}>
-                  <b>26h</b> of lessons
+                  <b>{formatPlannedMinutes(TOTAL_MINUTES)}</b> of lessons
                 </td>
               </tr>
             </tfoot>
           </table>
         </Reveal>
         <p className={styles.note}>
-          <b>~40h</b> realistic completion once you include the simulators, quizzes and templates ·
-          most students finish Foundations in 4–6 weeks at 5–8 hrs/week; Mastery adds 2–3 weeks.
+          <b>{TOTAL_LESSONS} lessons</b> · {formatPlannedMinutes(TOTAL_MINUTES)} of planned lesson
+          time. Practice, quizzes, and templates add time; the public figure is the source lesson
+          estimate, not a promise of job readiness.
         </p>
       </div>
     </section>

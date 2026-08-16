@@ -4,6 +4,7 @@ import { CheckIcon } from "./Icons";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Hero.module.css";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 
 export function Hero() {
   return (
@@ -19,8 +20,8 @@ export function Hero() {
             <span className={styles.pen}>taught for VAs new to the platform.</span>
           </h1>
           <p className={styles.body}>
-            Eight modules and five practice tools. You work with real campaign shapes before a
-            client sees your work.
+            {PUBLIC_CURRICULUM_CLAIMS.modules.length} modules and {Object.keys(PUBLIC_CURRICULUM_CLAIMS.simulators).length} practice
+            tools. You work with illustrative campaign shapes before a client sees your work.
           </p>
           <p className={styles.hook}>
             If you&rsquo;re at <b>₱25k / month now</b>, the next step is ₱60k&ndash;₱80k. This is the path.
@@ -35,7 +36,7 @@ export function Hero() {
           </div>
           <p className={styles.note}>
             <CheckIcon />
-            Certificate recognized by our hiring team · skills for VAs who run ads for clients ·
+            {PUBLIC_CURRICULUM_CLAIMS.certificate.label} · skills for VAs who run ads for clients ·
             PayMongo (Card + GCash).
           </p>
           <div className={styles.chips}>
