@@ -87,6 +87,36 @@ describe("CurriculumInventory", () => {
     });
   });
 
+  it("keeps inventory rows ordered by module and lesson number", () => {
+    const laterLesson = {
+      ...lessonContract,
+      slug: "2.1-match-types",
+      moduleNumber: 2,
+      lessonNumber: 1,
+    };
+    const earlierLesson = {
+      ...lessonContract,
+      slug: "0.1-welcome",
+      moduleNumber: 0,
+      lessonNumber: 1,
+    };
+
+    const result = buildCurriculumInventory(
+      [
+        sourceGroup("ppc-foundations", [laterLesson, earlierLesson]),
+      ],
+      manifest([laterLesson, earlierLesson]),
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.value.lessons.map((lesson) => lesson.slug)).toEqual([
+      "0.1-welcome",
+      "2.1-match-types",
+    ]);
+  });
+
   it("rejects duplicate source slugs and missing source minutes", () => {
     const result = buildCurriculumInventory(
       [
