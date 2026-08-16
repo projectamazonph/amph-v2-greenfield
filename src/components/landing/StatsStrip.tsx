@@ -37,7 +37,9 @@ const STATS: Stat[] = [
 
 function CountUp({ to }: { to: number }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [display, setDisplay] = useState("0");
+  // The server-rendered value is also the no-JavaScript and assistive-technology
+  // fallback. Never show a fabricated zero while the count-up observer starts.
+  const [display, setDisplay] = useState(() => Math.round(to).toLocaleString("en-US"));
 
   useEffect(() => {
     const el = ref.current;

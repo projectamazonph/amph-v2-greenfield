@@ -181,3 +181,12 @@
     right: 8px;
   }
 }
+
+/* The highlighted headline must wrap inside the 390px mobile content rail.
+   Keeping the desktop no-wrap treatment at phone widths makes the grid's
+   intrinsic width wider than the viewport and introduces horizontal scroll. */
+@media (max-width: 600px) {
+  .pen {
+    white-space: normal;
+  }
+}
