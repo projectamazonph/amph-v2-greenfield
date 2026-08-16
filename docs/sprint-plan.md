@@ -240,6 +240,20 @@ exists to remove.
 | STORY-088 | Challenge progression                             | 1   | ✅ done — 2026-08-04, minimal scope, see `docs/stories/STORY-088.md`                            |
 | STORY-089 | Connected-account simulator                       | 1   | ⏳ Planned                                                                                      |
 
+## Next planning track — Learning experience 8.5
+
+The completed Sprint 16 work establishes simulator and assessment foundations.
+The next learner-facing roadmap is intentionally dependency-ordered rather than
+assigned a sprint number before its platform contracts are settled. See
+[`LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`](LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md)
+for the atomic backlog.
+
+It begins by making public curriculum, time, tier, and tool claims verifiable,
+then builds beginner onboarding, consistent active lessons, saved learner
+evidence, a capstone, and a measured beta. STORY-107 and STORY-108 remain
+inputs to this track; STORY-109 is already shipped. Formative simulator scores
+remain outside certificate and job-readiness claims.
+
 ## Student-facing gap closure (2026-08-01/02, see docs/STUDENT-FEATURE-GAP-ANALYSIS.md)
 
 Not an original numbered sprint — stories recommended by the 2026-08-01 student-feature
