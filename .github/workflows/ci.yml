@@ -171,6 +171,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma migrate deploy
       - run: pnpm prisma generate
+      # Seed both runtime inputs required by the simulator journey. Pages
+      # need a published SimulatorScenario, while grading also needs the
+      # matching ScorePolicy for the scenario difficulty and practice mode.
+      # Both scripts use upserts, so CI reruns remain safe.
+      - run: pnpm db:seed:scenarios
+      - run: pnpm db:seed:policies
       # Install ALL Playwright browser dependencies + system deps.
       # Specifying only `chromium` was leaving the worker process unable to
       # launch the bundled browser (the error mentions a `webkit-2311`
