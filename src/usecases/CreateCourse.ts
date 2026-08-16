@@ -86,6 +86,7 @@ export class CreateCourse {
       id: lessonId,
       title: input.defaultCurriculum.lessonTitle,
       type: "TEXT",
+      plannedMinutes: 0,
       content: "",
     };
     const curriculum: Curriculum = {

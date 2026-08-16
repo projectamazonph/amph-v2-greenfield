@@ -40,6 +40,7 @@ export function withCatalogCurriculum(
           id: lesson.id,
           title: lesson.title,
           type: lesson.type as LessonType,
+          plannedMinutes: lesson.estimatedMinutes,
           content: lesson.id === selectedLesson.id ? selectedLesson.content : {},
         })),
       })),

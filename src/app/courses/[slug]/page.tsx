@@ -132,7 +132,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                         <span className={styles.metaItem}>
                           <Clock size={16} weight="regular" className={styles.metaIcon} aria-hidden />
                           {hours > 0 ? `${hours}h ` : ""}
-                          {minutes}m video
+                          {minutes}m learning time
                         </span>
                       )}
                     </>

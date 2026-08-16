@@ -28,6 +28,12 @@ import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.actio
 import styles from "./page.module.css";
 
 function estimateReadingMinutes(lesson: CatalogLesson): { minutes: number; kind: "video" | "reading" | "quiz" } {
+  if (typeof lesson.plannedMinutes === "number" && lesson.plannedMinutes > 0) {
+    return {
+      minutes: lesson.plannedMinutes,
+      kind: lesson.type === "VIDEO" ? "video" : lesson.type === "QUIZ" ? "quiz" : "reading",
+    };
+  }
   const content = lesson.content;
   if (lesson.type === "VIDEO") {
     const duration =

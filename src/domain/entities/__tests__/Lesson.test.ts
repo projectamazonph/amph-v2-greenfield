@@ -24,6 +24,35 @@ describe("Lesson entity", () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.value.title).toBe("Intro");
+    expect(r.value.plannedMinutes).toBe(0);
+  });
+
+  it("persists planned learner time for a text lesson", () => {
+    const r = createLesson({
+      id: "l1",
+      moduleId: "m1",
+      title: "Read the report",
+      type: "TEXT",
+      content: { body: "Read this first." },
+      plannedMinutes: 12,
+      displayOrder: 1,
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.plannedMinutes).toBe(12);
+  });
+
+  it("rejects a fractional or negative planned duration", () => {
+    const base = {
+      id: "l1",
+      moduleId: "m1",
+      title: "Read this",
+      type: "TEXT" as const,
+      content: { body: "Read this." },
+      displayOrder: 1,
+    };
+    expect(createLesson({ ...base, plannedMinutes: 1.5 }).ok).toBe(false);
+    expect(createLesson({ ...base, plannedMinutes: -1 }).ok).toBe(false);
   });
 
   it("rejects an empty id", () => {
@@ -163,6 +192,25 @@ describe("Lesson entity", () => {
     if (!r.ok) return;
     expect(r.value.title).toBe("Y");
     expect(r.value.type).toBe("VIDEO");
+  });
+
+  it("updates planned learner time without changing lesson content", () => {
+    const orig = createLesson({
+      id: "l1",
+      moduleId: "m1",
+      title: "Read",
+      type: "TEXT",
+      content: { body: "hi" },
+      plannedMinutes: 5,
+      displayOrder: 1,
+    });
+    expect(orig.ok).toBe(true);
+    if (!orig.ok) return;
+    const r = updateLesson(orig.value, { plannedMinutes: 9 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.plannedMinutes).toBe(9);
+    expect(r.value.content).toEqual({ body: "hi" });
   });
 
   it("updateLesson re-validates content when type changes", () => {

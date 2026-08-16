@@ -14,6 +14,7 @@
  *     TEXT:  { body: string (non-empty) }
  *     QUIZ:  { questions: Question[] (>=1) }
  * - displayOrder is a positive integer (1-indexed per module)
+ * - plannedMinutes is a non-negative integer used by every lesson type
  * - moduleId and id must be non-empty
  */
 
@@ -48,6 +49,8 @@ export interface Lesson {
   readonly title: string;
   readonly type: LessonType;
   readonly content: LessonContent;
+  /** Planned learner time from curriculum frontmatter, independent of media type. */
+  readonly plannedMinutes: number;
   readonly displayOrder: number;
   readonly createdAt: Date;
   readonly updatedAt: Date;
@@ -167,6 +170,8 @@ export interface CreateLessonParams {
   title: string;
   type: LessonType;
   content: unknown;
+  /** Planned learner time. Legacy callers may omit it; VIDEO falls back to media duration. */
+  plannedMinutes?: number;
   displayOrder: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -190,6 +195,21 @@ export function createLesson(
       message: "displayOrder must be a positive integer",
     });
   }
+  const plannedMinutes =
+    params.plannedMinutes ??
+    (params.type === "VIDEO" &&
+    typeof params.content === "object" &&
+    params.content !== null &&
+    "durationMinutes" in params.content &&
+    typeof (params.content as { durationMinutes?: unknown }).durationMinutes === "number"
+      ? (params.content as { durationMinutes: number }).durationMinutes
+      : 0);
+  if (!Number.isInteger(plannedMinutes) || plannedMinutes < 0) {
+    return Result.err({
+      kind: "invalid_input",
+      message: "plannedMinutes must be a non-negative integer",
+    });
+  }
   const contentResult = validateLessonContent(params.type, params.content);
   if (!contentResult.ok) {
     return Result.err(contentResult.error);
@@ -201,6 +221,7 @@ export function createLesson(
     title: params.title.trim(),
     type: params.type,
     content: contentResult.value,
+    plannedMinutes,
     displayOrder: params.displayOrder,
     createdAt: params.createdAt ?? now,
     updatedAt: params.updatedAt ?? now,
@@ -213,6 +234,7 @@ export interface UpdateLessonPatch {
   title?: string;
   type?: LessonType;
   content?: unknown;
+  plannedMinutes?: number;
 }
 
 export function updateLesson(
@@ -227,6 +249,7 @@ export function updateLesson(
     title: patch.title ?? lesson.title,
     type: nextType,
     content: nextContent,
+    plannedMinutes: patch.plannedMinutes ?? lesson.plannedMinutes,
     displayOrder: lesson.displayOrder,
     createdAt: lesson.createdAt,
     updatedAt: new Date(),

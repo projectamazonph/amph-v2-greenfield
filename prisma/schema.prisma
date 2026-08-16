@@ -227,6 +227,7 @@ model Lesson {
   title        String
   type         String // VIDEO | TEXT | QUIZ
   content      Json
+  plannedMinutes Int @default(0) // planned learner time for every lesson type
   displayOrder Int
 
   createdAt DateTime @default(now())

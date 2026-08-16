@@ -41,7 +41,7 @@ export interface CatalogLesson {
   readonly id: string;
   readonly title: string;
   readonly type: string;
-  /** Duration in minutes for VIDEO lessons, 0 otherwise. */
+  /** Planned learner time in minutes for every lesson type. */
   readonly estimatedMinutes: number;
   readonly displayOrder: number;
 }
@@ -139,16 +139,8 @@ export class GetCatalogCourse {
       totalLessonCount += lessons.length;
 
       const catalogLessons: CatalogLesson[] = lessons.map((l) => {
-        let estimatedMinutes = 0;
-        if (
-          l.type === "VIDEO" &&
-          typeof l.content === "object" &&
-          l.content !== null &&
-          "durationMinutes" in l.content
-        ) {
-          estimatedMinutes = (l.content as { durationMinutes: number }).durationMinutes;
-          totalEstimatedMinutes += estimatedMinutes;
-        }
+        const estimatedMinutes = l.plannedMinutes;
+        totalEstimatedMinutes += estimatedMinutes;
         return {
           id: l.id,
           title: l.title,

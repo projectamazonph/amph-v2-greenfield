@@ -85,6 +85,7 @@ function makeLesson(
     title: string;
     type: "VIDEO" | "TEXT" | "QUIZ";
     durationMinutes?: number;
+    plannedMinutes?: number;
     displayOrder: number;
   }> = {},
 ): Lesson {
@@ -102,7 +103,8 @@ function makeLesson(
           : {
               questions: [{ id: "q1", prompt: "Q1?", options: ["A", "B"], correctOptionIndex: 0 }],
             },
-    displayOrder: overrides.displayOrder ?? 1,
+      displayOrder: overrides.displayOrder ?? 1,
+      plannedMinutes: overrides.plannedMinutes,
   });
   if (!result.ok) throw new Error(`Test setup error: createLesson failed: ${result.error.kind}`);
   return result.value;
@@ -150,6 +152,7 @@ describe("ListCatalogCourses", () => {
       moduleId: "mod-1",
       title: "Reading Material",
       type: "TEXT",
+      plannedMinutes: 6,
       displayOrder: 2,
     });
     await lessonRepo.create(videoLesson);
@@ -165,11 +168,11 @@ describe("ListCatalogCourses", () => {
     expect(courses[0]!.course.id).toBe("course-1");
     expect(courses[0]!.moduleCount).toBe(1);
     expect(courses[0]!.lessonCount).toBe(2);
-    expect(courses[0]!.estimatedMinutes).toBe(8); // only VIDEO counts
+    expect(courses[0]!.estimatedMinutes).toBe(14); // video + text planned time
     expect(courses[0]!.modules).toHaveLength(1);
     expect(courses[0]!.modules[0]!.title).toBe("Getting Started");
     expect(courses[0]!.modules[0]!.lessonCount).toBe(2);
-    expect(courses[0]!.modules[0]!.estimatedMinutes).toBe(8);
+    expect(courses[0]!.modules[0]!.estimatedMinutes).toBe(14);
   });
 
   it("returns empty list when no published courses exist", async () => {

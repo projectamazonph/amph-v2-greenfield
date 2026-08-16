@@ -16,6 +16,7 @@ interface LessonRow {
   title: string;
   type: string;
   content: unknown;
+  plannedMinutes: number;
   displayOrder: number;
   createdAt: Date;
   updatedAt: Date;
@@ -77,6 +78,7 @@ function makeLesson(overrides: Partial<Lesson> = {}): Lesson {
     title: overrides.title ?? "Lesson One",
     type: overrides.type ?? "TEXT",
     content: overrides.content ?? { body: "Hello, VA." },
+    plannedMinutes: overrides.plannedMinutes ?? 8,
     displayOrder: overrides.displayOrder ?? 1,
     createdAt: overrides.createdAt ?? new Date(),
     updatedAt: overrides.updatedAt ?? new Date(),
@@ -102,6 +104,7 @@ describe("PrismaLessonRepository", () => {
     expect(found.value.title).toBe("Lesson One");
     expect(found.value.type).toBe("TEXT");
     expect(found.value.content).toEqual({ body: "Hello, VA." });
+    expect(found.value.plannedMinutes).toBe(8);
   });
 
   it("findById returns not_found for an unknown id", async () => {
@@ -140,7 +143,7 @@ describe("PrismaLessonRepository", () => {
   });
 
   it("round-trips a VIDEO lesson's content", async () => {
-    await repo.create(makeLesson({ id: "les_1", type: "VIDEO", content: { durationMinutes: 12 } }));
+    await repo.create(makeLesson({ id: "les_1", type: "VIDEO", content: { durationMinutes: 12 }, plannedMinutes: 12 }));
     const found = await repo.findById("les_1");
     expect(found.ok).toBe(true);
     if (!found.ok) return;
@@ -231,6 +234,7 @@ describe("PrismaLessonRepository", () => {
       title: "Corrupt Lesson",
       type: "NOT_A_TYPE",
       content: { body: "irrelevant" },
+      plannedMinutes: 0,
       displayOrder: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -248,6 +252,7 @@ describe("PrismaLessonRepository", () => {
       title: "Corrupt Lesson",
       type: "VIDEO",
       content: { body: "this is TEXT content, not VIDEO" },
+      plannedMinutes: 0,
       displayOrder: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
