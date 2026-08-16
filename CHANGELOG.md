@@ -4,6 +4,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### LEARN-020 — Define the lintable lesson production contract
+
+- Add a non-blocking lesson-production report (with opt-in `--strict` mode) for
+  outcomes, decisions, worked examples, active attempts, feedback, evidence,
+  and retrieval cues.
+- Upload the JSON gap report from the Learning release gate so module passes
+  can close explicit content gaps instead of relying on prose review alone.
+
 ### LEARN-006 — Repair lesson content spacing and responsive layout
 
 - Give Markdown tables a readable, aligned treatment that contains overflow on

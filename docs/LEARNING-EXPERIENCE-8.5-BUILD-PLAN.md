@@ -91,7 +91,7 @@ The content contract is deliberately small. Every lesson must include: a job sit
 
 | ID | Atomic outcome | Depends on | Likely surfaces | Acceptance evidence |
 | --- | --- | --- | --- | --- |
-| LEARN-020 | Define the lesson production schema and lintable content checklist. | LEARN-001 | MDX conventions, parser/validation tests, author guide | CI reports missing required lesson blocks and invalid links without checking prose style mechanically. |
+| LEARN-020 | Define the lesson production schema and lintable content checklist. | LEARN-001 | MDX conventions, parser/validation tests, author guide | CI reports missing required lesson blocks and invalid links without checking prose style mechanically. Implemented in `scripts/validate-lesson-production.ts` and the uploaded CI report. |
 | LEARN-021 | Ship the voice and active-practice pass for Module 0. | LEARN-020 | Module 0 content | All onboarding lessons follow the production schema and pass the read-aloud review. |
 | LEARN-022 | Ship the voice and active-practice pass for Module 1. | LEARN-020 | Module 1 content | Every quantitative concept has a worked calculation and an independent calculation. |
 | LEARN-023 | Ship the voice, visual, and practice pass for Module 2. | LEARN-020 | Module 2 content, match-type visual | Keyword lessons finish with a usable keyword grouping decision. |

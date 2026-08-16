@@ -208,6 +208,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Validate source inventory and public claims
         run: pnpm validate:learning-release
+      - name: Report lesson production contract
+        run: pnpm validate:lesson-production -- --report=lesson-production-report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lesson-production-report
+          path: lesson-production-report.json
       - name: Record learner smoke prerequisite
         run: |
           echo "Learner smoke prerequisite: E2E (Playwright) passed in this workflow."
