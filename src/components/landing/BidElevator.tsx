@@ -464,14 +464,18 @@ export function BidElevator() {
             </h3>
             <div className={styles.tableWrap}>
               <table className={styles.table}>
+                {/* M-R30 fix: <caption className="sr-only"> provides WCAG 1.3.1
+                    accessible name; scope="col" on every header associates cells
+                    with their column header for screen readers. */}
+                <caption className="sr-only">Search-term harvest — promote winners, cut the waste</caption>
                 <thead>
                   <tr>
-                    <th>Search term</th>
-                    <th>Clk</th>
-                    <th>Spend</th>
-                    <th>Sales</th>
-                    <th>ACoS</th>
-                    <th>Action</th>
+                    <th scope="col">Search term</th>
+                    <th scope="col">Clk</th>
+                    <th scope="col">Spend</th>
+                    <th scope="col">Sales</th>
+                    <th scope="col">ACoS</th>
+                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>

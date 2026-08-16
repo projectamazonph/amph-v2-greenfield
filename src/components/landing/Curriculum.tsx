@@ -38,12 +38,16 @@ export function Curriculum() {
 
         <Reveal className={styles.tableScroll}>
           <table className={styles.table}>
+            {/* M-R30 fix: <caption className="sr-only"> provides WCAG 1.3.1
+                accessible name; scope="col" on every header associates cells
+                with their column header for screen readers. */}
+            <caption className="sr-only">Curriculum modules, tier, and time</caption>
             <thead>
               <tr>
-                <th style={{ width: 58 }}>Mod</th>
-                <th>Topic</th>
-                <th>Tier</th>
-                <th className={styles.right}>Time</th>
+                <th scope="col" style={{ width: 58 }}>Mod</th>
+                <th scope="col">Topic</th>
+                <th scope="col">Tier</th>
+                <th scope="col" className={styles.right}>Time</th>
               </tr>
             </thead>
             <tbody>
