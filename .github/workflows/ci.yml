@@ -193,6 +193,26 @@ jobs:
           name: playwright-report
           path: playwright-report/
 
+  learning-release-gate:
+    name: Learning release gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [quality, unit, e2e]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Validate source inventory and public claims
+        run: pnpm validate:learning-release
+      - name: Record learner smoke prerequisite
+        run: |
+          echo "Learner smoke prerequisite: E2E (Playwright) passed in this workflow."
+          echo "Release operators must attach the staging import output and logged-in smoke URL before production promotion."
+
   build:
     name: Build
     runs-on: ubuntu-latest
