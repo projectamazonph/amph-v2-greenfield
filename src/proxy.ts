@@ -79,9 +79,17 @@ export async function proxy(request: NextRequest) {
   // "nodejs"`), and btoa is the Web-standard API guaranteed there,
   // vs. relying on Buffer's Edge Runtime polyfill.
   const nonce = btoa(crypto.randomUUID());
+  // React 19's RSC streaming runtime uses eval() to decode the
+  // `$RS(slot,promise)` payload that moves streamed content out of the
+  // hidden `<div id="S:n">` slot on hydration. Without 'unsafe-eval'
+  // on script-src, hydration fails silently and every page is stuck on
+  // its loading skeleton (confirmed on /admin/resources in dev).
+  // Production builds tree-shake the dev eval() shim, so the directive
+  // is omitted there to keep the strict Proposal 2 CSP intact.
+  const isDev = process.env.NODE_ENV !== "production";
   const cspHeaderValue = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}'`,
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     // https: (not scoped to a single host) because Course.coverImage is a
     // free-text admin-entered URL, not restricted to one CDN — see
