@@ -51,15 +51,15 @@ describe("public curriculum claim contract", () => {
     expect(PUBLIC_CURRICULUM_CLAIMS.modules).toHaveLength(
       new Set(inventoryResult.value.lessons.map((lesson) => lesson.moduleNumber)).size,
     );
-    for (const module of PUBLIC_CURRICULUM_CLAIMS.modules) {
+    for (const moduleClaim of PUBLIC_CURRICULUM_CLAIMS.modules) {
       const lessons = inventoryResult.value.lessons.filter(
-        (lesson) => lesson.moduleNumber === module.moduleNumber,
+        (lesson) => lesson.moduleNumber === moduleClaim.moduleNumber,
       );
-      expect(lessons).toHaveLength(module.lessonCount);
+      expect(lessons).toHaveLength(moduleClaim.lessonCount);
       expect(lessons.reduce((total, lesson) => total + lesson.plannedMinutes, 0)).toBe(
-        module.plannedMinutes,
+        moduleClaim.plannedMinutes,
       );
-      expect(lessons.every((lesson) => lesson.courseSlug === module.courseSlug)).toBe(true);
+      expect(lessons.every((lesson) => lesson.courseSlug === moduleClaim.courseSlug)).toBe(true);
     }
     const inventoryTools = new Set(
       inventoryResult.value.lessons.flatMap((lesson) =>

@@ -4,6 +4,8 @@ import shared from "./shared.module.css";
 import styles from "./Proof.module.css";
 import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 
+const CERTIFICATE_HEADLINE = `${PUBLIC_CURRICULUM_CLAIMS.certificate.label} that records the work.`;
+
 export function Proof() {
   return (
     <section className={shared.sec} id="proof">
@@ -12,7 +14,7 @@ export function Proof() {
           <div className={shared.stickyCol}>
             <span className={shared.secNum}>§07 / WHAT YOU CAN SHOW</span>
             <h2 className={shared.secTitle}>
-              {PUBLIC_CURRICULUM_CLAIMS.certificate.label} that records the work.
+              {CERTIFICATE_HEADLINE}
             </h2>
           </div>
           <p className={shared.secLede}>
