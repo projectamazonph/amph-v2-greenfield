@@ -82,7 +82,6 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 ## Remaining known limitations
 
 - Simulator scores are formative, not certification or hiring evidence.
-- Email-template overrides do not interpolate placeholders. `RefundEmail.ctaLabel` has no rendered button.
 - Admin 2FA is opt-in.
 - Live backup/restore, payment-webhook rotation, and external uptime checks require operator execution.
 - A PayMongo event can be stored as PAID before enrollment fails. Because replay exits early for an already-paid order, use the audited admin tier-grant flow to repair a confirmed-paid partial state.

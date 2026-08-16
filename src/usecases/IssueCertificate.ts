@@ -36,6 +36,7 @@ import type { EmailSender } from "@/ports/email/EmailSender";
 import type { CertificateEmailRenderer } from "@/ports/email/CertificateEmailRenderer";
 import type { Logger } from "@/ports/observability/Logger";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
+import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
 
 // ── Input / Output types ───────────────────────────────────────────────────
 
@@ -178,17 +179,25 @@ export class IssueCertificate {
 
     const templateResult = await this.deps.emailTemplateRepo.findByType("certificate");
     const template = templateResult.ok ? templateResult.value : null;
+    const resolvedTemplate = template
+      ? interpolateEmailTemplate(template, {
+          firstName: user.firstName,
+          courseTitle,
+          verificationHash: certificate.verificationHash,
+          verifyUrl,
+        })
+      : null;
     const sendResult = await this.deps.emailSender.send({
       to: user.email,
-      subject: template?.subject ?? `Certificate earned — ${courseTitle}`,
+      subject: resolvedTemplate?.subject ?? `Certificate earned — ${courseTitle}`,
       react: this.deps.certificateEmailRenderer.render({
         firstName: user.firstName,
         courseTitle,
         verificationHash: certificate.verificationHash,
         verifyUrl,
-        headlineOverride: template?.headline,
-        introBodyOverride: template?.introBody,
-        ctaLabelOverride: template?.ctaLabel,
+        headlineOverride: resolvedTemplate?.headlineOverride,
+        introBodyOverride: resolvedTemplate?.introBodyOverride,
+        ctaLabelOverride: resolvedTemplate?.ctaLabelOverride,
       }),
     });
     if (!sendResult.ok) {

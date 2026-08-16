@@ -296,14 +296,14 @@ describe("ProcessRefund", () => {
     expect(emailSender.sent[0]?.subject).toContain("o1");
   });
 
-  it("uses the admin-customized subject/headline/introBody when a 'refund' template exists; ctaLabel has no effect (no button on this email) (STORY-095.5)", async () => {
+  it("personalizes the refund template and renders its CTA", async () => {
     const templateResult = createEmailTemplate({
       id: "tpl-refund",
       type: "refund",
-      subject: "Custom refund subject",
-      headline: "Custom refund headline",
-      introBody: "Custom refund intro.",
-      ctaLabel: "Unused CTA",
+      subject: "Refund {{orderNumber}} for {{firstName}}",
+      headline: "Custom refund headline for {{firstName}}",
+      introBody: "Custom refund intro for {{courseTitle}}. Reason: {{reason}}.",
+      ctaLabel: "Review your account",
       updatedById: "admin-1",
     });
     if (!templateResult.ok) throw new Error("seed");
@@ -351,13 +351,12 @@ describe("ProcessRefund", () => {
 
     expect(r.ok).toBe(true);
     expect(emailSender.sent).toHaveLength(1);
-    expect(emailSender.sent[0]?.subject).toBe("Custom refund subject");
+    expect(emailSender.sent[0]?.subject).toBe("Refund o1 for Ana");
     const html = emailSender.sent[0]!.html;
-    expect(html).toContain("Custom refund headline");
-    expect(html).toContain("Custom refund intro.");
-    // RefundEmail has no CTA button — the override is accepted for
-    // interface consistency but has nothing to render.
-    expect(html).not.toContain("Unused CTA");
+    expect(html).toContain("Custom refund headline for Ana");
+    expect(html).toContain("Custom refund intro for PPC Foundations. Reason: Customer requested.");
+    expect(html).toContain("Review your account");
+    expect(html).not.toContain("{{");
   });
 
   it("does not fail the refund when the user/course lookup fails for the email step", async () => {

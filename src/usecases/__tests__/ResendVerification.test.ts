@@ -179,16 +179,16 @@ describe("ResendVerification", () => {
     expect(rateLimiter.calls[0]!.key).toBe("user-1");
   });
 
-  it("uses the admin-customized subject/headline/introBody/ctaLabel when a template exists (STORY-095.5)", async () => {
+  it("personalizes supported placeholders in the admin-customized template", async () => {
     await seedUnverifiedUser();
     const emailTemplateRepo = new InMemoryEmailTemplateRepository();
     const templateResult = createEmailTemplate({
       id: "tpl-1",
       type: "email_verification",
-      subject: "Custom subject line",
-      headline: "Custom headline",
-      introBody: "Custom intro body copy.",
-      ctaLabel: "Custom CTA",
+      subject: "Hello {{firstName}}, verify your email",
+      headline: "Custom headline for {{firstName}}",
+      introBody: "Use {{verificationUrl}} within {{expiresInHours}} hours.",
+      ctaLabel: "Verify {{firstName}}",
       updatedById: "admin-1",
     });
     if (!templateResult.ok) throw new Error("seed");
@@ -199,16 +199,15 @@ describe("ResendVerification", () => {
 
     expect(result.ok).toBe(true);
     expect(emailSender.sent).toHaveLength(1);
-    expect(emailSender.sent[0]!.subject).toBe("Custom subject line");
+    expect(emailSender.sent[0]!.subject).toBe("Hello Alice, verify your email");
 
     const { renderToStaticMarkup } = await import("react-dom/server");
     const html = renderToStaticMarkup(emailSender.sent[0]!.react as React.ReactElement);
-    expect(html).toContain("Custom headline");
-    expect(html).toContain("Custom intro body copy.");
-    expect(html).toContain("Custom CTA");
-    // Overridden copy replaces the hardcoded default entirely (no
-    // {{placeholder}} interpolation support on EmailTemplate).
-    expect(html).not.toContain("Welcome, Alice!");
+    expect(html).toContain("Custom headline for Alice");
+    expect(html).toContain("within 24 hours.");
+    expect(html).toContain("Verify Alice");
+    expect(html).toContain("/verify-email?token=raw-token-fixed-for-tests");
+    expect(html).not.toContain("{{");
   });
 
   // ── error paths ─────────────────────────────────────────────

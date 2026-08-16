@@ -34,6 +34,7 @@ import type { Clock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Logger } from "@/ports/observability/Logger";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
+import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
 
 const EMAIL_LIMIT = 5;
 const EMAIL_WINDOW_SECONDS = 3600;
@@ -140,16 +141,23 @@ export class RequestPasswordReset {
     const resetUrl = this.buildResetUrl(rawToken);
     const templateResult = await this.deps.emailTemplateRepo.findByType("password_reset");
     const template = templateResult.ok ? templateResult.value : null;
+    const resolvedTemplate = template
+      ? interpolateEmailTemplate(template, {
+          firstName: user.firstName,
+          resetUrl,
+          expiresInMinutes: String(TOKEN_TTL_HOURS * 60),
+        })
+      : null;
     const sendResult = await this.deps.email.send({
       to: user.email,
-      subject: template?.subject ?? "Reset your Project Amazon PH Academy password",
+      subject: resolvedTemplate?.subject ?? "Reset your Project Amazon PH Academy password",
       react: this.deps.passwordResetEmailRenderer.render({
         firstName: user.firstName,
         resetUrl,
         expiresInMinutes: TOKEN_TTL_HOURS * 60,
-        headlineOverride: template?.headline,
-        introBodyOverride: template?.introBody,
-        ctaLabelOverride: template?.ctaLabel,
+        headlineOverride: resolvedTemplate?.headlineOverride,
+        introBodyOverride: resolvedTemplate?.introBodyOverride,
+        ctaLabelOverride: resolvedTemplate?.ctaLabelOverride,
       }),
     });
     if (!sendResult.ok) {

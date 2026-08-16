@@ -36,6 +36,65 @@ export const EMAIL_TEMPLATE_TYPES = [
 
 export type EmailTemplateType = (typeof EMAIL_TEMPLATE_TYPES)[number];
 
+export interface EmailTemplateVariable {
+  readonly name: string;
+  readonly label: string;
+}
+
+/**
+ * Variables an admin can use inside `{{doubleBraces}}` for each template.
+ * Values are escaped by React Email when rendered, so dynamic values remain
+ * text even when an admin places them in body copy.
+ */
+export const EMAIL_TEMPLATE_VARIABLES: Readonly<
+  Record<EmailTemplateType, readonly EmailTemplateVariable[]>
+> = Object.freeze({
+  email_verification: [
+    { name: "firstName", label: "Student first name" },
+    { name: "verificationUrl", label: "Verification link" },
+    { name: "expiresInHours", label: "Link expiry (hours)" },
+  ],
+  password_reset: [
+    { name: "firstName", label: "Student first name" },
+    { name: "resetUrl", label: "Password reset link" },
+    { name: "expiresInMinutes", label: "Link expiry (minutes)" },
+  ],
+  welcome: [
+    { name: "firstName", label: "Student first name" },
+    { name: "dashboardUrl", label: "Dashboard link" },
+  ],
+  receipt: [
+    { name: "firstName", label: "Student first name" },
+    { name: "orderNumber", label: "Order number" },
+    { name: "courseTitle", label: "Course title" },
+    { name: "amount", label: "Amount paid" },
+    { name: "paidAt", label: "Payment date" },
+    { name: "receiptUrl", label: "Receipt link" },
+  ],
+  refund: [
+    { name: "firstName", label: "Student first name" },
+    { name: "orderNumber", label: "Order number" },
+    { name: "courseTitle", label: "Course title" },
+    { name: "amount", label: "Refund amount" },
+    { name: "refundedAt", label: "Refund date" },
+    { name: "reason", label: "Refund reason" },
+    { name: "dashboardUrl", label: "Dashboard link" },
+  ],
+  certificate: [
+    { name: "firstName", label: "Student first name" },
+    { name: "courseTitle", label: "Course title" },
+    { name: "verificationHash", label: "Certificate verification hash" },
+    { name: "verifyUrl", label: "Public certificate link" },
+  ],
+  live_class_reminder: [
+    { name: "firstName", label: "Student first name" },
+    { name: "classTitle", label: "Live class title" },
+    { name: "startsAt", label: "Class start time" },
+    { name: "joinUrl", label: "Class join link" },
+    { name: "minutesUntilStart", label: "Minutes until start" },
+  ],
+});
+
 export interface EmailTemplate {
   readonly id: string;
   readonly type: EmailTemplateType;
@@ -48,6 +107,59 @@ export interface EmailTemplate {
   readonly ctaLabel: string;
   readonly updatedAt: Date;
   readonly updatedById: string;
+}
+
+export interface ResolvedEmailTemplate {
+  readonly subject: string;
+  readonly headlineOverride: string;
+  readonly introBodyOverride: string;
+  readonly ctaLabelOverride: string;
+}
+
+const PLACEHOLDER_PATTERN = /\{\{\s*([a-z][a-zA-Z0-9]*)\s*\}\}/g;
+
+function validatePlaceholders(type: EmailTemplateType, field: string, value: string): string | null {
+  const withoutPlaceholders = value.replace(PLACEHOLDER_PATTERN, "");
+  if (withoutPlaceholders.includes("{{") || withoutPlaceholders.includes("}}")) {
+    return `${field} has a malformed placeholder. Use {{variableName}}.`;
+  }
+
+  const allowed = new Set(EMAIL_TEMPLATE_VARIABLES[type].map((variable) => variable.name));
+  for (const match of value.matchAll(PLACEHOLDER_PATTERN)) {
+    const name = match[1];
+    if (!name || !allowed.has(name)) {
+      return `${field} uses {{${name ?? ""}}}, which is not available for the ${type} template.`;
+    }
+  }
+
+  return null;
+}
+
+function validateTemplatePlaceholders(
+  type: EmailTemplateType,
+  fields: Pick<EmailTemplate, "subject" | "headline" | "introBody" | "ctaLabel">,
+): string | null {
+  for (const [field, value] of Object.entries(fields)) {
+    const error = validatePlaceholders(type, field, value);
+    if (error) return error;
+  }
+  return null;
+}
+
+/** Resolve the template's validated placeholders for one recipient. */
+export function interpolateEmailTemplate(
+  template: Pick<EmailTemplate, "subject" | "headline" | "introBody" | "ctaLabel">,
+  variables: Readonly<Record<string, string>>,
+): ResolvedEmailTemplate {
+  const interpolate = (value: string) =>
+    value.replace(PLACEHOLDER_PATTERN, (match, name: string) => variables[name] ?? match);
+
+  return Object.freeze({
+    subject: interpolate(template.subject),
+    headlineOverride: interpolate(template.headline),
+    introBodyOverride: interpolate(template.introBody),
+    ctaLabelOverride: interpolate(template.ctaLabel),
+  });
 }
 
 export type CreateEmailTemplateError = { kind: "invalid_input"; message: string };
@@ -102,6 +214,16 @@ export function createEmailTemplate(
   const ctaLabel = params.ctaLabel.trim();
   if (!ctaLabel) {
     return Result.err({ kind: "invalid_input", message: "ctaLabel must not be empty" });
+  }
+
+  const placeholderError = validateTemplatePlaceholders(params.type, {
+    subject,
+    headline,
+    introBody,
+    ctaLabel,
+  });
+  if (placeholderError) {
+    return Result.err({ kind: "invalid_input", message: placeholderError });
   }
 
   return Result.ok(
@@ -165,6 +287,16 @@ export function updateEmailTemplate(
   const ctaLabel = patch.ctaLabel !== undefined ? patch.ctaLabel.trim() : original.ctaLabel;
   if (!ctaLabel) {
     return Result.err({ kind: "invalid_input", message: "ctaLabel must not be empty" });
+  }
+
+  const placeholderError = validateTemplatePlaceholders(original.type, {
+    subject,
+    headline,
+    introBody,
+    ctaLabel,
+  });
+  if (placeholderError) {
+    return Result.err({ kind: "invalid_input", message: placeholderError });
   }
 
   return Result.ok(

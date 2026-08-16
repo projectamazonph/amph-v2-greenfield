@@ -29,7 +29,7 @@ export interface UpdateEmailTemplateInput {
 }
 
 export type UpdateEmailTemplateError =
-  | { kind: "invalid_type" }
+  | { kind: "invalid_type"; message: string }
   | { kind: "invalid_input"; message: string }
   | { kind: "db_error"; message: string };
 export type UpdateEmailTemplateResult = Result<
@@ -49,7 +49,7 @@ export class UpdateEmailTemplate {
 
   async execute(input: UpdateEmailTemplateInput): Promise<UpdateEmailTemplateResult> {
     if (!isEmailTemplateType(input.type)) {
-      return Result.err({ kind: "invalid_type" });
+      return Result.err({ kind: "invalid_type", message: "Unknown email template type." });
     }
 
     const found = await this.deps.emailTemplateRepo.findByType(input.type);

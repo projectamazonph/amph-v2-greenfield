@@ -5,12 +5,11 @@
  * Currently a stub — events are logged but no business logic is triggered.
  * Extend by adding handlers in the switch below.
  *
- * Security: HMAC-SHA256 signature verification using RESEND_WEBHOOK_SECRET.
+ * Security: Svix HMAC-SHA256 signature verification using RESEND_WEBHOOK_SECRET.
  * Every inbound request is recorded in the webhook event log before any
  * further processing, so a webhook that fails verification still leaves
  * a durable trace for replay/forensics.
  *
- * Auth header: `Resend` (Resend sends this header for all webhooks).
  */
 
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -19,41 +18,47 @@ import { buildContainer } from "@/composition/container";
 import { Result } from "@/domain/shared/Result";
 
 const PROVIDER = "resend";
-const EXPECTED_AUTH_HEADER = "Resend";
+const SIGNATURE_TOLERANCE_SECONDS = 300;
 
 interface ResendWebhookPayload {
   type: string;
   data: {
-    id: string;
+    email_id?: string;
+    id?: string;
     [key: string]: unknown;
   };
 }
 
 /**
- * Verify Resend webhook signature.
- * Resend signs the raw body with HMAC-SHA256 using the webhook secret.
- * The signature is sent in the `Resend-Signature` header as: t=<timestamp>,v1=<sig>
+ * Verify Resend's Svix-signed webhook payload without parsing or changing the
+ * body. The timestamp tolerance rejects stale replay attempts.
  */
-function verifySignature(rawBody: string, header: string, secret: string): boolean {
-  if (!header || !secret) return false;
+export function verifyResendWebhookSignature(
+  rawBody: string,
+  headers: { id: string; timestamp: string; signature: string },
+  secret: string,
+  now = Date.now(),
+): boolean {
+  if (!headers.id || !headers.timestamp || !headers.signature || !secret) return false;
 
-  const parts = Object.fromEntries(header.split(",").map((p) => p.split("=") as [string, string]));
-  const timestamp = parts["t"];
-  const signature = parts["v1"];
+  const timestamp = Number(headers.timestamp);
+  if (!Number.isFinite(timestamp)) return false;
+  if (Math.abs(now / 1000 - timestamp) > SIGNATURE_TOLERANCE_SECONDS) return false;
 
-  if (!timestamp || !signature) return false;
+  const secretPayload = secret.startsWith("whsec_") ? secret.slice("whsec_".length) : secret;
+  if (!secretPayload) return false;
 
-  // Reject if the timestamp is too old (> 5 minutes)
-  const age = Math.abs(Date.now() / 1000 - Number(timestamp));
-  if (age > 300) return false;
+  const expected = createHmac("sha256", Buffer.from(secretPayload, "base64"))
+    .update(`${headers.id}.${headers.timestamp}.${rawBody}`)
+    .digest();
 
-  const expectedSig = createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
+  return headers.signature.split(" ").some((candidate) => {
+    const [version, signature] = candidate.split(",", 2);
+    if (version !== "v1" || !signature) return false;
 
-  try {
-    return timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig));
-  } catch {
-    return false;
-  }
+    const received = Buffer.from(signature, "base64");
+    return received.length === expected.length && timingSafeEqual(received, expected);
+  });
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -61,9 +66,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const container = buildContainer();
 
   // ── 1. Signature verification ────────────────────────────────────
-  const signatureHeader = req.headers.get("resend-signature") ?? "";
   const webhookSecret = process.env.RESEND_WEBHOOK_SECRET ?? "";
-  const signatureValid = verifySignature(rawBody, signatureHeader, webhookSecret);
+  const signatureValid = verifyResendWebhookSignature(
+    rawBody,
+    {
+      id: req.headers.get("svix-id") ?? "",
+      timestamp: req.headers.get("svix-timestamp") ?? "",
+      signature: req.headers.get("svix-signature") ?? "",
+    },
+    webhookSecret,
+  );
 
   // ── 2. Record the raw event ───────────────────────────────────────
   let peekType = "unknown";
@@ -71,7 +83,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const payload = JSON.parse(rawBody) as ResendWebhookPayload;
     if (typeof payload.type === "string") peekType = payload.type;
-    if (typeof payload.data?.id === "string") peekId = payload.data.id;
+    if (typeof payload.data?.email_id === "string") {
+      peekId = payload.data.email_id;
+    } else if (typeof payload.data?.id === "string") {
+      peekId = payload.data.id;
+    }
   } catch {
     peekType = "invalid_json";
   }

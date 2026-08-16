@@ -18,6 +18,7 @@ export interface RefundRenderer {
       currency: string;
       refundedAt: Date;
       reason: string;
+      dashboardUrl: string;
     } & EmailTemplateOverride,
   ): ReactElement;
 }
