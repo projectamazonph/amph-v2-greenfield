@@ -22,8 +22,8 @@ export function Footer() {
           <div className={styles.brand}>
             <Logo />
             <p>
-              Amazon ads training that helps Filipino VAs become specialists clients can see:
-              competence, not hype. One-time payment, no subscription.
+              Amazon ads training that helps Filipino VAs become specialists clients can see.
+              One-time payment, no subscription.
             </p>
           </div>
 

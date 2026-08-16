@@ -12,14 +12,13 @@ export function DarkCTA() {
           <Reveal>
             <span className={[shared.label, styles.label].join(" ")}>Pick your tier</span>
             <h2 className={styles.h2}>
-              Stop watching.
+              Build the skill.
               <br />
-              <em>Start deciding.</em>
+              <em>Show the work.</em>
             </h2>
             <p className={styles.p}>
-              Pay once, get the content forever. Build Amazon ads skills you can actually show:
-              guided modules, five scored simulators, and a certificate recognized in our hiring
-              pipeline.
+              Pay once, get the content forever. Build Amazon ads skills you can show: guided
+              modules, five practice tools, and a certificate recognized by our hiring team.
             </p>
             <div className={styles.ctaRow}>
               <a
@@ -56,7 +55,7 @@ export function DarkCTA() {
               </li>
               <li>
                 <CheckIcon />
-                Recognized in our hiring pipeline
+                Recognized by our hiring team
               </li>
               <li>
                 <CheckIcon />

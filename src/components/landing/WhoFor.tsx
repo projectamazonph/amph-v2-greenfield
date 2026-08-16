@@ -11,7 +11,7 @@ const YES: React.ReactNode[] = [
     You can commit <b>5–8 hours a week for 8 weeks</b>.
   </>,
   <>
-    You want to charge <b>₱60k–₱80k / month</b>, not stay at ₱25k.
+    You want to move from <b>₱25k to ₱60k&ndash;₱80k / month</b>.
   </>,
 ];
 
@@ -33,11 +33,11 @@ export function WhoFor() {
         <div className={shared.secHead}>
           <div className={shared.stickyCol}>
             <span className={shared.secNum}>§04 / WHO IT&rsquo;S FOR</span>
-            <h2 className={shared.secTitle}>A paid course. We think it should be.</h2>
+            <h2 className={shared.secTitle}>A paid course.</h2>
           </div>
           <p className={shared.secLede}>
-            Skin in the game changes how you show up. This is built for VAs ready to specialize, and
-            it&rsquo;s honest about who should wait.
+            A paid course changes how you show up. You finish it because you paid for it. This
+            is built for VAs ready to specialize, and it&rsquo;s honest about who should wait.
           </p>
         </div>
 

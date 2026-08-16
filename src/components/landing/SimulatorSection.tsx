@@ -27,7 +27,7 @@ const TOOLS: Tool[] = [
   },
   {
     name: "Search Term Triage",
-    desc: "Triage 20 terms from a real report: keep · optimize · pause · negate.",
+    desc: "Sort 20 real search terms into keep, optimize, pause, or negate.",
     status: "in-course",
     statusLabel: "In-course",
   },
@@ -56,9 +56,9 @@ export function SimulatorSection() {
           </div>
           <p className={shared.secLede}>
             This is a <b>public preview</b> of the Bid Elevator plus a search-term harvest. Drag the
-            budget and bid, then triage the table: promote winners to exact, cut the waste, and
-            watch projected ACoS respond. The full scored versions of all five tools ship inside
-            every tier.
+            budget and bid, then triage the table: promote winners to exact match, cut the waste,
+            and watch the projected ACoS (Advertising Cost of Sales) respond. The full scored
+            versions of all five tools ship inside every tier.
           </p>
         </div>
 
