@@ -62,9 +62,9 @@ describe("public curriculum claim contract", () => {
       expect(lessons.every((lesson) => lesson.courseSlug === module.courseSlug)).toBe(true);
     }
     const inventoryTools = new Set(
-      inventoryResult.value.lessons
-        .filter((lesson) => lesson.toolBridge.kind === "simulator")
-        .map((lesson) => lesson.toolBridge.target),
+      inventoryResult.value.lessons.flatMap((lesson) =>
+        lesson.toolBridge.kind === "simulator" ? [lesson.toolBridge.target] : [],
+      ),
     );
     expect(Object.keys(PUBLIC_CURRICULUM_CLAIMS.simulators).sort()).toEqual(
       [...inventoryTools].sort(),

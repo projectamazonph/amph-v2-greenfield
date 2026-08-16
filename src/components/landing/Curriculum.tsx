@@ -25,6 +25,7 @@ const FOUNDATIONS = publicCourseClaims("ppc-foundations");
 const MASTERY = publicCourseClaims("accelerated-mastery");
 const TOTAL_LESSONS = FOUNDATIONS.lessonCount + MASTERY.lessonCount;
 const TOTAL_MINUTES = FOUNDATIONS.plannedMinutes + MASTERY.plannedMinutes;
+const CURRICULUM_HEADLINE = `${PUBLIC_CURRICULUM_CLAIMS.modules.length} modules, in order. No hidden gates.`;
 
 export function Curriculum() {
   return (
@@ -33,9 +34,7 @@ export function Curriculum() {
         <div className={shared.secHead}>
           <div className={shared.stickyCol}>
             <span className={shared.secNum}>§03 / THE CURRICULUM</span>
-            <h2 className={shared.secTitle}>
-              {PUBLIC_CURRICULUM_CLAIMS.modules.length} modules, in order. No hidden gates.
-            </h2>
+            <h2 className={shared.secTitle}>{CURRICULUM_HEADLINE}</h2>
           </div>
           <p className={shared.secLede}>
             Modules 0&ndash;4 are <b>Foundations</b>; 5&ndash;8 are <b>Mastery</b>. The tier you
