@@ -5,6 +5,7 @@
 
 .prose {
   max-width: none;
+  min-width: 0;
   color: var(--ink-900);
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -13,6 +14,14 @@
 
 .prose p {
   margin: 0 0 var(--space-4) 0;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
 }
 
 .prose h1,
@@ -48,6 +57,7 @@
   padding: 0.125em 0.375em;
   font-family: var(--font-mono);
   font-size: 0.9em;
+  overflow-wrap: anywhere;
 }
 
 .prose pre {
@@ -59,6 +69,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
+  margin: 0 0 var(--space-5);
 }
 
 .prose pre code {
@@ -74,6 +85,44 @@
   padding-left: var(--space-6);
 }
 
+/* GFM tables are common in the curriculum. Keep their columns aligned and
+   let narrow screens scroll the table itself instead of widening the lesson
+   page or letting cells overlap one another. */
+.prose table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.prose th,
+.prose td {
+  min-width: 9rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.prose th {
+  background: var(--surface-2);
+  color: var(--ink-900);
+  font-weight: 700;
+}
+
+.prose td {
+  background: var(--surface-1);
+}
+
+.prose tr:nth-child(even) td {
+  background: var(--surface-0);
+}
+
 .prose li {
   margin-bottom: var(--space-1);
 }
@@ -84,11 +133,14 @@
   margin: 0 0 var(--space-4) 0;
   color: var(--ink-500);
   font-style: italic;
+  overflow-wrap: anywhere;
 }
 
 .prose img {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin: 0 0 var(--space-5);
   border-radius: var(--radius-sm);
 }
 
@@ -212,6 +264,7 @@
 
 .quizMeta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4);
   font-size: var(--text-sm);
@@ -263,9 +316,11 @@
 
 .quizQuestionPrompt {
   flex: 1;
+  min-width: 0;
   font-size: var(--text-base);
   color: var(--ink-900);
   line-height: var(--leading-normal);
+  overflow-wrap: anywhere;
 }
 
 .quizQuestionOptions {
