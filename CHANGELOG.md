@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### LEARN-022 — Add independent calculations to Module 1
+
+- Label a fresh calculation/diagnosis step in every quantitative Module 1
+  lesson, separating the worked example from the learner's own attempt.
+
 ### LEARN-021 — Complete Module 0 onboarding lesson pass
 
 - Add the missing decision, active attempt, feedback, and worked-example blocks
