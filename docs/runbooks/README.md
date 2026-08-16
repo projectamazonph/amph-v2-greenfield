@@ -14,6 +14,7 @@ A row is marked **authored** only when the corresponding file exists. The remain
 | `db-backup-restore.md`     | Reviewed 2026-08-12, not drilled | A Neon database restore is required                               |
 | `admin-access-recovery.md` | Reviewed 2026-08-12              | No usable admin account exists or an admin account is compromised |
 | `simulator-scenario-missing.md` | Reviewed 2026-08-16          | `/api/health/ready` returns 503 `missing_scenarios`; simulators render "Something went wrong" |
+| `learning-release-gate.md` | Reviewed 2026-08-16              | A curriculum or public-claim change is being promoted |
 
 The database restore procedure has not been exercised against a real backup. Treat its timing and operator commands as unverified until a staging drill is completed.
 
