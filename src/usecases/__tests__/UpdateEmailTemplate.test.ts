@@ -104,6 +104,22 @@ describe("UpdateEmailTemplate", () => {
     expect(r.error.kind).toBe("invalid_input");
   });
 
+  it("rejects a placeholder that is unavailable to the selected template", async () => {
+    const r = await useCase.execute({
+      type: "welcome",
+      subject: "Welcome {{firstName}}",
+      headline: "Welcome",
+      introBody: "Use {{resetUrl}} to get started.",
+      ctaLabel: "Open dashboard",
+      actorId: "admin_1",
+    });
+
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error.kind).toBe("invalid_input");
+    expect(r.error.message).toMatch(/resetUrl/);
+  });
+
   it("writes an audit log entry on success", async () => {
     await useCase.execute({
       type: "welcome",

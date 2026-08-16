@@ -6,7 +6,7 @@
  */
 
 import { Button, Heading, Text } from "@react-email/components";
-import { EmailLayout } from "./EmailLayout";
+import { EmailDetailsCard, EmailDetail, EmailLayout, emailStyles } from "./EmailLayout";
 import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface WelcomeEmailProps extends EmailTemplateOverride {
@@ -26,27 +26,19 @@ export function WelcomeEmail({
       preview={`Welcome, ${firstName} — your account is ready`}
       eyebrow="Account verified"
     >
-      <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
+      <Heading as="h1" style={emailStyles.title}>
         {headlineOverride ?? `Welcome, ${firstName}!`}
       </Heading>
-      <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
+      <Text style={emailStyles.body}>
         {introBodyOverride ??
           "Your email is verified and your account is ready. Head to your dashboard to start your first course, track your XP, and unlock the practice simulators."}
       </Text>
 
-      <Button
-        href={dashboardUrl}
-        style={{
-          backgroundColor: "#FF6B35",
-          color: "#ffffff",
-          fontSize: "15px",
-          fontWeight: 600,
-          textDecoration: "none",
-          padding: "12px 24px",
-          borderRadius: "6px",
-          display: "inline-block",
-        }}
-      >
+      <EmailDetailsCard>
+        <EmailDetail label="Your account">Verified and ready to learn</EmailDetail>
+        <EmailDetail label="Next step">Choose a course and start your first lesson</EmailDetail>
+      </EmailDetailsCard>
+      <Button href={dashboardUrl} style={emailStyles.button}>
         {ctaLabelOverride ?? "Go to your dashboard"}
       </Button>
     </EmailLayout>

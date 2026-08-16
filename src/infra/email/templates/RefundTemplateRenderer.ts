@@ -22,6 +22,7 @@ export class RefundTemplateRenderer implements IRefundRenderer {
       currency: string;
       refundedAt: Date;
       reason: string;
+      dashboardUrl: string;
     } & EmailTemplateOverride,
   ): ReactElement {
     return RefundEmail(args);

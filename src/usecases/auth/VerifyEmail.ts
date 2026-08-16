@@ -33,6 +33,7 @@ import { buildAppUrl } from "@/domain/shared/AppUrl";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { WelcomeRenderer } from "@/ports/email/WelcomeRenderer";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
+import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
 
 export type VerifyEmailInput = { token: string };
 export type VerifyEmailOutput = { user: User };
@@ -116,16 +117,24 @@ export class VerifyEmail {
     // Welcome email (best-effort — never blocks verification itself).
     const templateResult = await this.deps.emailTemplateRepo.findByType("welcome");
     const template = templateResult.ok ? templateResult.value : null;
+    const dashboardUrl = buildAppUrl("/dashboard");
+    const resolvedTemplate = template
+      ? interpolateEmailTemplate(template, {
+          firstName: userResult.value.firstName,
+          dashboardUrl,
+        })
+      : null;
     const sendResult = await this.deps.emailSender.send({
       to: userResult.value.email,
       subject:
-        template?.subject ?? `Welcome to Project Amazon PH Academy, ${userResult.value.firstName}!`,
+        resolvedTemplate?.subject ??
+        `Welcome to Project Amazon PH Academy, ${userResult.value.firstName}!`,
       react: this.deps.welcomeEmailRenderer.render({
         firstName: userResult.value.firstName,
-        dashboardUrl: buildAppUrl("/dashboard"),
-        headlineOverride: template?.headline,
-        introBodyOverride: template?.introBody,
-        ctaLabelOverride: template?.ctaLabel,
+        dashboardUrl,
+        headlineOverride: resolvedTemplate?.headlineOverride,
+        introBodyOverride: resolvedTemplate?.introBodyOverride,
+        ctaLabelOverride: resolvedTemplate?.ctaLabelOverride,
       }),
     });
     if (!sendResult.ok) {

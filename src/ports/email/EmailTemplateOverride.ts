@@ -5,10 +5,8 @@
  * hardcoded default copy. Shared across every renderer port whose
  * `EmailTemplateType` is admin-editable.
  *
- * Note: `EmailTemplate` has no `{{placeholder}}` syntax — an override
- * replaces the corresponding line verbatim, so per-recipient
- * interpolation (e.g. the student's first name) is lost when a field
- * is customized. That's a property of the domain model, not this type.
+ * Template content is resolved with the type-specific `{{placeholder}}`
+ * variables declared by `EmailTemplate` before reaching this port.
  */
 
 export interface EmailTemplateOverride {

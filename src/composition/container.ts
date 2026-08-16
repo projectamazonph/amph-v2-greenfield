@@ -121,6 +121,7 @@ import { NextMdxRenderer } from "@/infra/rendering/NextMdxRenderer";
 
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { ReceiptRenderer } from "@/ports/email/ReceiptRenderer";
+import type { PaymentFailedRenderer } from "@/ports/email/PaymentFailedRenderer";
 import { ResendEmailSender } from "@/infra/email/ResendEmailSender";
 // InMemoryEmailSender is NOT imported here ΓÇö it would pull in
 // react-dom/server and break `next build`. Test code uses it via
@@ -162,10 +163,12 @@ import { PasswordChangedTemplateRenderer } from "@/infra/email/templates/Passwor
 import { CertificateEmailTemplateRenderer } from "@/infra/email/templates/CertificateEmailRenderer";
 import { ReceiptTemplateRenderer } from "@/infra/email/templates/ReceiptRenderer";
 import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
+import { PaymentFailedTemplateRenderer } from "@/infra/email/templates/PaymentFailedRenderer";
 import { RequestPasswordReset } from "@/usecases/auth/RequestPasswordReset";
 import { ResetPassword } from "@/usecases/auth/ResetPassword";
 import type { PasswordResetRepository } from "@/ports/repositories/PasswordResetRepository";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
+import { NotifyPaymentFailure } from "@/usecases/NotifyPaymentFailure";
 import { GetCheckoutSummary } from "@/usecases/GetCheckoutSummary";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
 import { EnrollStudent } from "@/usecases/EnrollStudent";
@@ -364,6 +367,7 @@ export interface AppContainer {
   // directly (that route reaches into container fields for all its
   // data access rather than going through a single use case).
   receiptEmailRenderer: ReceiptRenderer;
+  paymentFailedEmailRenderer: PaymentFailedRenderer;
   jwt: JwtService;
   passwordHasher: PasswordHasher;
 
@@ -379,6 +383,7 @@ export interface AppContainer {
   confirmTwoFactor: ConfirmTwoFactor;
   disableTwoFactor: DisableTwoFactor;
   createPaymentIntent: CreatePaymentIntent;
+  notifyPaymentFailure: NotifyPaymentFailure;
   getCheckoutSummary: GetCheckoutSummary;
   checkCourseAccess: CheckCourseAccess;
   // P0-5: per-lesson access decision (single source of truth)
@@ -562,6 +567,7 @@ function buildProductionContainer(): AppContainer {
   const certificateEmailRenderer = new CertificateEmailTemplateRenderer();
   const receiptEmailRenderer = new ReceiptTemplateRenderer();
   const refundEmailRenderer = new RefundTemplateRenderer();
+  const paymentFailedEmailRenderer = new PaymentFailedTemplateRenderer();
   // STORY-050a: audit log (Postgres-backed in production via PrismaAuditLog)
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
@@ -702,6 +708,13 @@ function buildProductionContainer(): AppContainer {
       paymentGateway,
       baseUrl,
     }),
+    notifyPaymentFailure: new NotifyPaymentFailure({
+      orderRepo,
+      userRepo,
+      courseRepo,
+      emailSender,
+      paymentFailedEmailRenderer,
+    }),
     getCheckoutSummary: new GetCheckoutSummary({ courseRepo, pricingTierRepo }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
     // P0-5: per-lesson access decision
@@ -801,6 +814,7 @@ function buildProductionContainer(): AppContainer {
     mdxRenderer,
     emailSender,
     receiptEmailRenderer,
+    paymentFailedEmailRenderer,
     simulatorRegistry: buildSimulatorRegistry(),
     issueCertificate: new IssueCertificate({
       enrollmentRepo,

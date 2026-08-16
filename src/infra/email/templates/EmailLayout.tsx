@@ -1,81 +1,141 @@
 /**
- * EmailLayout — shared shell for all Project Amazon PH Academy transactional emails.
- *
- * STORY-045: EmailSender port + React Email templates.
- *
- * Provides:
- *  - Project Amazon PH Academy header (logo placeholder, brand name)
- *  - Centered content slot
- *  - Footer with company info + copyright
- *
- * Brand colors match the certificate design (STORY-042):
- *  - Navy: #1a365d
- *  - Accent orange: #FF6B35 (CSS var --accent)
- *  - Surface: #FAFAF7
- *  - Ink: #171717
- *
- * Layout is table-based for maximum email client compatibility
- * (Outlook, Gmail web/mobile, Apple Mail).
+ * Shared, email-client-safe frame and content primitives for Project Amazon
+ * PH Academy transactional messages.
  */
 
 import { Body, Container, Head, Html, Preview, Section, Text } from "@react-email/components";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 const styles = {
   body: {
-    backgroundColor: "#FAFAF7",
-    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+    backgroundColor: "#F4F3EE",
+    color: "#202124",
+    fontFamily: "Arial, Helvetica, sans-serif",
     margin: 0,
-    padding: "40px 0",
+    padding: "36px 12px",
   },
   container: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #DEDCD4",
+    borderRadius: "12px",
     margin: "0 auto",
-    maxWidth: "560px",
-    borderRadius: "8px",
-    overflow: "hidden" as const,
-    border: "1px solid #E5E5E0",
+    maxWidth: "600px",
+    overflow: "hidden",
+  },
+  accentRule: {
+    backgroundColor: "#FF6B35",
+    height: "6px",
+    lineHeight: "6px",
   },
   header: {
-    backgroundColor: "#1a365d",
-    padding: "24px 32px",
-    textAlign: "center" as const,
+    backgroundColor: "#1A365D",
+    padding: "28px 36px 26px",
   },
   brand: {
-    color: "#ffffff",
+    color: "#FFFFFF",
     fontSize: "16px",
     fontWeight: 700,
-    letterSpacing: "0.15em",
+    letterSpacing: "0.13em",
+    lineHeight: "22px",
     margin: 0,
   },
+  eyebrow: {
+    color: "#FDB89C",
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "0.12em",
+    lineHeight: "16px",
+    margin: "0 0 7px",
+    textTransform: "uppercase",
+  },
   content: {
-    padding: "40px 32px",
-    color: "#171717",
-    fontSize: "15px",
-    lineHeight: 1.6,
+    color: "#303238",
+    fontSize: "16px",
+    lineHeight: "24px",
+    padding: "38px 36px 40px",
   },
   footer: {
-    backgroundColor: "#F4F3EE",
-    padding: "20px 32px",
-    textAlign: "center" as const,
-    color: "#737373",
+    backgroundColor: "#F8F7F3",
+    borderTop: "1px solid #E8E6DF",
+    color: "#6B6B6B",
     fontSize: "12px",
-    lineHeight: 1.5,
+    lineHeight: "18px",
+    padding: "22px 36px",
+    textAlign: "center",
   },
   footerLink: {
-    color: "#FF6B35",
+    color: "#B9431B",
+    fontWeight: 700,
     textDecoration: "none",
   },
-};
+} satisfies Record<string, CSSProperties>;
+
+export const emailStyles = {
+  title: {
+    color: "#171717",
+    fontSize: "27px",
+    fontWeight: 700,
+    letterSpacing: "-0.35px",
+    lineHeight: "34px",
+    margin: "0 0 16px",
+  },
+  body: {
+    color: "#404040",
+    fontSize: "16px",
+    lineHeight: "25px",
+    margin: "0 0 24px",
+  },
+  button: {
+    backgroundColor: "#FF6B35",
+    borderRadius: "6px",
+    color: "#FFFFFF",
+    display: "inline-block",
+    fontSize: "15px",
+    fontWeight: 700,
+    lineHeight: "20px",
+    padding: "13px 22px",
+    textDecoration: "none",
+  },
+  detailCard: {
+    backgroundColor: "#F8F7F3",
+    border: "1px solid #E5E2D9",
+    borderRadius: "8px",
+    margin: "0 0 26px",
+    padding: "22px 20px 8px",
+  },
+  detailLabel: {
+    color: "#6B6B6B",
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "0.08em",
+    lineHeight: "16px",
+    margin: "0 0 4px",
+    textTransform: "uppercase",
+  },
+  detailValue: {
+    color: "#202124",
+    fontSize: "16px",
+    fontWeight: 600,
+    lineHeight: "23px",
+    margin: "0 0 17px",
+  },
+  muted: {
+    color: "#6B6B6B",
+    fontSize: "13px",
+    lineHeight: "20px",
+    margin: "24px 0 0",
+  },
+  link: {
+    color: "#1A365D",
+    fontWeight: 600,
+    textDecoration: "underline",
+  },
+} satisfies Record<string, CSSProperties>;
 
 export interface EmailLayoutProps {
-  /** Preheader text shown in inbox preview (hidden after open). */
   preview: string;
-  /** Optional accent text shown beneath the brand. */
   eyebrow?: string;
-  /** Page content. */
   children: ReactNode;
-  /** Optional URL the footer "Project Amazon PH Academy" links to. */
   homeUrl?: string;
 }
 
@@ -91,29 +151,60 @@ export function EmailLayout({
       <Preview>{preview}</Preview>
       <Body style={styles.body}>
         <Container style={styles.container}>
+          <Section style={styles.accentRule} />
           <Section style={styles.header}>
-            {eyebrow ? (
-              <Text
-                style={{ ...styles.brand, fontSize: "11px", marginBottom: "4px", opacity: 0.8 }}
-              >
-                {eyebrow}
-              </Text>
-            ) : null}
+            {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
             <Text style={styles.brand}>PROJECT AMAZON PH ACADEMY</Text>
           </Section>
           <Section style={styles.content}>{children}</Section>
           <Section style={styles.footer}>
-            <Text style={{ margin: "0 0 4px 0" }}>
+            <Text style={{ margin: "0 0 5px" }}>
               <a href={homeUrl} style={styles.footerLink}>
                 Project Amazon PH Academy
               </a>
             </Text>
             <Text style={{ margin: 0 }}>
-              You received this email because you have an account with Project Amazon PH Academy.
+              You received this transactional email because you have an account with Project Amazon
+              PH Academy.
             </Text>
           </Section>
         </Container>
       </Body>
     </Html>
   );
+}
+
+export function EmailDetailsCard({ children }: { children: ReactNode }) {
+  return <Section style={emailStyles.detailCard}>{children}</Section>;
+}
+
+export function EmailDetail({ children, label }: { children: ReactNode; label: string }) {
+  return (
+    <>
+      <Text style={emailStyles.detailLabel}>{label}</Text>
+      <Text style={emailStyles.detailValue}>{children}</Text>
+    </>
+  );
+}
+
+export function EmailNotice({
+  children,
+  tone = "neutral",
+}: {
+  children: ReactNode;
+  tone?: "neutral" | "warning";
+}) {
+  const warning = tone === "warning";
+  const noticeStyle: CSSProperties = {
+    backgroundColor: warning ? "#FFF3ED" : "#F4F7FB",
+    border: `1px solid ${warning ? "#F6C4AE" : "#D9E2F1"}`,
+    borderLeft: `4px solid ${warning ? "#D65329" : "#1A365D"}`,
+    borderRadius: "4px",
+    color: warning ? "#6B2F1C" : "#334155",
+    fontSize: "13px",
+    lineHeight: "20px",
+    margin: "24px 0 0",
+    padding: "12px 14px",
+  };
+  return <Text style={noticeStyle}>{children}</Text>;
 }

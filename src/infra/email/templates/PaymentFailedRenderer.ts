@@ -1,6 +1,6 @@
 /**
  * Default PaymentFailedRenderer — wraps the PaymentFailedEmail React Email
- * template. Not wired to any usecase yet — see PaymentFailedEmail.tsx.
+ * template for NotifyPaymentFailure.
  */
 
 import type { ReactElement } from "react";
