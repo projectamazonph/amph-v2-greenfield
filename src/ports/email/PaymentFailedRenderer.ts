@@ -1,5 +1,5 @@
 /**
- * PaymentFailedRenderer port for the authenticated failed-checkout flow.
+ * PaymentFailedRenderer port for provider-authoritative payment-failure events.
  */
 
 import type { ReactElement } from "react";

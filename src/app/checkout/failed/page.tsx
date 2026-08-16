@@ -15,7 +15,6 @@
 import Link from "next/link";
 import { XCircle } from "@phosphor-icons/react/dist/ssr";
 import styles from "../checkout-status.module.css";
-import { PaymentFailureNotifier } from "./PaymentFailureNotifier";
 
 export default async function CheckoutFailedPage({
   searchParams,
@@ -31,7 +30,6 @@ export default async function CheckoutFailedPage({
     : "/courses";
   return (
     <main id="main-content" tabIndex={-1} className={styles.page}>
-      <PaymentFailureNotifier orderId={orderId} />
       <div className={styles.card}>
         <div className={styles.logo}>Project Amazon PH Academy</div>
         <XCircle
