@@ -4,7 +4,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
-### 2026-08-16: Curriculum order consolidation — dedup match types, negative keywords, and Brand Analytics (STORY-106, PR #TBD)
+### 2026-08-16: Curriculum order consolidation — dedup match types, negative keywords, and Brand Analytics (STORY-106, PR #377)
 
 - `content/curriculum/modules/0-onboarding/0.2-platform-tour.mdx` line 39: the Module 1 row in the platform-tour table no longer names the Big Six acronyms (CPC, CTR, ACoS, TACoS, ROAS, CVR) before Module 1 defines them. The row now reads "Six metrics you'll learn to read together: the Big Six.", so the concept is referenced without the labels being attached to a Module 1 number the learner has not yet seen.
 - `content/curriculum/modules/2-keyword-research/2.2-keyword-research-workflow.mdx` lines 73-93: the "Source 2: Amazon Brand Analytics" paragraph is collapsed to a one-line forward reference ("Amazon Brand Analytics (covered in Module 8). For now, your own search term report is enough to start a keyword list."). Brand Analytics is taught in exactly one lesson (8.1) and referenced in exactly two forward references (2.2 and 3.3), per the audit's strict rule.
