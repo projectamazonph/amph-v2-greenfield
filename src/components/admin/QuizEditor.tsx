@@ -145,8 +145,14 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
       {questions.map((q, qIndex) => (
         <div key={q.id} className={styles.questionCard}>
           <div className={styles.questionRow}>
-            <label htmlFor={`q-${qIndex}-text`} className={styles.questionLabel}>
+            {/* M-R29 fix: real <label> instead of `aria-label` overrides. The
+                visible "Q{n}" badge stays as a row marker; the sr-only label
+                carries the field's accessible name. WCAG 3.3.2 / 4.1.2. */}
+            <label htmlFor={`q-${qIndex}-text`} className={styles.questionLabel} aria-hidden>
               Q{qIndex + 1}
+            </label>
+            <label htmlFor={`q-${qIndex}-text`} className="sr-only">
+              Question {qIndex + 1} text
             </label>
             <input
               id={`q-${qIndex}-text`}
@@ -155,7 +161,6 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
               onChange={(e) => patchQuestion(qIndex, { questionText: e.target.value })}
               placeholder="Question text…"
               required
-              aria-label={`Question ${qIndex + 1} text`}
               className={styles.questionInput}
             />
             <button
@@ -204,9 +209,14 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
                   onChange={(e) => patchOption(qIndex, oIndex, { optionText: e.target.value })}
                   placeholder={`Option ${oIndex + 1} text…`}
                   required
-                  aria-label={`Option ${oIndex + 1} text for question ${qIndex + 1}`}
                   className={styles.optionInput}
                 />
+                {/* M-R29 fix: real <label> for option text input (was
+                    `aria-label` override). sr-only so the row layout
+                    stays the same. WCAG 3.3.2 / 4.1.2. */}
+                <label htmlFor={`q-${qIndex}-opt-${oIndex}-text`} className="sr-only">
+                  Option {oIndex + 1} text for question {qIndex + 1}
+                </label>
                 <button
                   type="button"
                   onClick={() => removeOption(qIndex, oIndex)}
