@@ -27,6 +27,7 @@
     "gen:secret": "node scripts/gen-secret.js",
     "import:content": "tsx scripts/import-amph-content.ts",
     "validate:curriculum": "tsx scripts/validate-curriculum-inventory.ts",
+    "validate:lesson-production": "tsx scripts/validate-lesson-production.ts",
     "validate:learning-release": "pnpm validate:curriculum && pnpm exec vitest run src/domain/curriculum/__tests__/PublicCurriculumClaims.test.ts",
     "db:seed:admin": "node scripts/seed-admin-user.mjs",
     "db:seed:tiers": "tsx scripts/seed-pricing-tiers.ts",

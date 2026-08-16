@@ -60,6 +60,16 @@ Public landing and offer copy reads `public-claims.json`. Its contract test join
 the reviewed values back to `inventory.json` and the MDX frontmatter, so a lesson
 count or planned-minute change must update the claim deliberately before it can ship.
 
+## Lesson production contract
+
+`pnpm validate:lesson-production` reports whether each lesson has the agreed
+beginner-facing blocks: outcome, decision, worked example, active attempt,
+feedback or answer reveal, evidence instruction, and retrieval cue. The default
+mode is intentionally non-blocking while the existing 31 lessons are migrated;
+use `pnpm validate:lesson-production -- --strict` for a content branch that must
+meet the complete schema. CI uploads the JSON report so the next content slice
+can work from an explicit gap list.
+
 ## Content import workflow
 
 The importer is `scripts/import-amph-content.ts` (STORY-013). It reads the same repo-relative source that the inventory validator checks.
