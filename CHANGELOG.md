@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### LEARN-023 — Turn Module 2 keyword lessons into grouping decisions
+
+- Add a concrete grouping decision and rationale output to each Keyword Research
+  lesson, connecting match types, negatives, and themes to a reusable keyword map.
+
 ### LEARN-022 — Add independent calculations to Module 1
 
 - Label a fresh calculation/diagnosis step in every quantitative Module 1
