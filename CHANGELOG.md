@@ -11,6 +11,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 - Normalize lesson block spacing and wrap long code, images, blockquotes, and
   quiz prompts so content does not overlap or escape the reading column.
 
+### LEARN-004 — Truthful public loading and availability states
+
+- Render reviewed programme statistics immediately on the server so count-up
+  animation never exposes a fabricated zero to visitors, screen readers, or
+  no-JavaScript clients.
+- Keep public simulator preview and enrolled practice labels explicit and add
+  contract tests for the accessible server-rendered summary.
+
 ### 2026-08-16: Reconcile public curriculum and certificate claims (LEARN-003)
 
 - Landing curriculum, tier cards, programme statistics, and simulator availability now read a
