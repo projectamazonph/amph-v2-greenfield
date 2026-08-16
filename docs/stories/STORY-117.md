@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** In progress on the lesson-contract branch.
+**Status:** In review in PR #390.
 
 ## Goal
 
