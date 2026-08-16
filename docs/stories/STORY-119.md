@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** In progress on the Module 1 branch.
+**Status:** In review in PR #392.
 
 ## Goal
 
