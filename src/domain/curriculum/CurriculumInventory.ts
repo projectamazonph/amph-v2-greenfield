@@ -60,6 +60,13 @@ export interface CurriculumInventory {
   readonly lessons: readonly CurriculumInventoryLesson[];
 }
 
+export interface CurriculumInventorySummary {
+  readonly lessonCount: number;
+  readonly totalPlannedMinutes: number;
+  readonly totalXp: number;
+  readonly lessonsByCourse: Readonly<Record<string, number>>;
+}
+
 export type CurriculumInventoryError = Readonly<{
   kind:
     | "invalid_manifest"
@@ -323,4 +330,26 @@ export function buildCurriculumInventory(
     });
 
   return ResultFactory.ok({ schemaVersion: 1, lessons });
+}
+
+/** Returns the totals used by release checks and truthful programme claims. */
+export function summarizeCurriculumInventory(
+  inventory: CurriculumInventory,
+): CurriculumInventorySummary {
+  const lessonsByCourse: Record<string, number> = {};
+  let totalPlannedMinutes = 0;
+  let totalXp = 0;
+
+  for (const lesson of inventory.lessons) {
+    totalPlannedMinutes += lesson.plannedMinutes;
+    totalXp += lesson.xpReward;
+    lessonsByCourse[lesson.courseSlug] = (lessonsByCourse[lesson.courseSlug] ?? 0) + 1;
+  }
+
+  return {
+    lessonCount: inventory.lessons.length,
+    totalPlannedMinutes,
+    totalXp,
+    lessonsByCourse,
+  };
 }

@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import {
   buildCurriculumInventory,
   parseCurriculumInventoryManifest,
+  summarizeCurriculumInventory,
 } from "@/domain/curriculum/CurriculumInventory";
 import { NodeContentReader } from "@/infra/content/NodeContentReader";
 
@@ -48,9 +49,7 @@ if (!inventoryResult.ok) {
   process.exit(1);
 }
 
-const lessonCount = inventoryResult.value.lessons.length;
-const totalMinutes = inventoryResult.value.lessons.reduce(
-  (total, lesson) => total + lesson.plannedMinutes,
-  0,
+const summary = summarizeCurriculumInventory(inventoryResult.value);
+process.stdout.write(
+  `Curriculum inventory valid: ${summary.lessonCount} lessons, ${summary.totalPlannedMinutes} planned minutes.\n`,
 );
-process.stdout.write(`Curriculum inventory valid: ${lessonCount} lessons, ${totalMinutes} planned minutes.\n`);

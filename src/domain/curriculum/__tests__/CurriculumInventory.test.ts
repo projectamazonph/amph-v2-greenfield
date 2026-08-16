@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildCurriculumInventory,
   parseCurriculumInventoryManifest,
+  summarizeCurriculumInventory,
   type CurriculumInventoryManifest,
   type CurriculumSourceGroup,
 } from "@/domain/curriculum/CurriculumInventory";
@@ -84,6 +85,13 @@ describe("CurriculumInventory", () => {
           sourcePath: "1.1-read-ppc-data-before-you-change-it.mdx",
         },
       ],
+    });
+
+    expect(summarizeCurriculumInventory(result.value)).toEqual({
+      lessonCount: 1,
+      totalPlannedMinutes: 15,
+      totalXp: 75,
+      lessonsByCourse: { "ppc-foundations": 1 },
     });
   });
 
