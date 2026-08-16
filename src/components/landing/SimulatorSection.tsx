@@ -2,8 +2,10 @@ import { BidElevator } from "./BidElevator";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./SimulatorSection.module.css";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 
 interface Tool {
+  target: string;
   name: string;
   desc: string;
   status: "live" | "in-course" | "new";
@@ -11,39 +13,24 @@ interface Tool {
   href?: string;
 }
 
-const TOOLS: Tool[] = [
-  {
-    name: "Bid Elevator",
-    desc: "Adjust bids on a real campaign. See ACoS, sales & spend update live.",
-    status: "live",
-    statusLabel: "Live preview",
-    href: "#simulator",
-  },
-  {
-    name: "Campaign Builder",
-    desc: "5-step wizard to build a Sponsored Products campaign from a brief.",
-    status: "in-course",
-    statusLabel: "In-course",
-  },
-  {
-    name: "Search Term Triage",
-    desc: "Sort 20 real search terms into keep, optimize, pause, or negate.",
-    status: "in-course",
-    statusLabel: "In-course",
-  },
-  {
-    name: "Listing Audit",
-    desc: "Flag the issues, then revise the listing. Real product data.",
-    status: "in-course",
-    statusLabel: "In-course",
-  },
-  {
-    name: "Keyword Research",
-    desc: "Categorize a generated keyword list by intent. Filter, rank, export.",
-    status: "new",
-    statusLabel: "New",
-  },
-];
+const TOOL_DESCRIPTIONS: Record<string, string> = {
+  "bid-elevator": "Adjust bids on illustrative campaign data. See ACoS, sales, and spend update live.",
+  "campaign-builder": "Build a Sponsored Products campaign from a client brief.",
+  "str-triage": "Sort search terms into keep, optimize, pause, or negate.",
+  "listing-audit": "Flag listing issues, then write the reason for each fix.",
+  "keyword-research": "Categorize a generated keyword list by intent, filter, and rank.",
+};
+
+const TOOLS: Tool[] = Object.entries(PUBLIC_CURRICULUM_CLAIMS.simulators).map(
+  ([target, simulator]) => ({
+    target,
+    name: simulator.label,
+    desc: TOOL_DESCRIPTIONS[target] ?? "Guided Amazon PPC practice.",
+    status: simulator.availability === "public-preview" ? "live" : "in-course",
+    statusLabel: simulator.availability === "public-preview" ? "Live preview" : "Enrolled practice",
+    ...(simulator.availability === "public-preview" ? { href: "#simulator" } : {}),
+  }),
+);
 
 export function SimulatorSection() {
   return (
@@ -57,8 +44,9 @@ export function SimulatorSection() {
           <p className={shared.secLede}>
             This is a <b>public preview</b> of the Bid Elevator plus a search-term harvest. Drag the
             budget and bid, then triage the table: promote winners to exact match, cut the waste,
-            and watch the projected ACoS (Advertising Cost of Sales) respond. The full scored
-            versions of all five tools ship inside every tier.
+            and watch the projected ACoS (Advertising Cost of Sales) respond. The public preview is
+            illustrative. Enrolled tiers unlock the reviewed practice tools
+            listed below; simulator results remain formative, not job-readiness proof.
           </p>
         </div>
 
@@ -68,10 +56,10 @@ export function SimulatorSection() {
 
         <div className={styles.roster}>
           <div className={styles.rosterHead}>
-            <span className={styles.rosterTitle}>All five practice tools</span>
+            <span className={styles.rosterTitle}>All {TOOLS.length} practice tools</span>
             <span className={styles.rosterNote}>
-              Tools are built · the in-course student UI is in development · previews above run on
-              the same logic
+              Availability follows the reviewed curriculum claim contract · public preview and
+              enrolled practice are labelled separately
             </span>
           </div>
           <div className={styles.tools}>

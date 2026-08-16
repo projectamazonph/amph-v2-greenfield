@@ -1,6 +1,7 @@
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Method.module.css";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 
 const STEPS = [
   {
@@ -33,7 +34,7 @@ const STEPS = [
     title: "Carry the pattern to client work",
     body: "By the time a real account is in your hands, the pattern is already there. It isn&rsquo;t something you memorised from a screenshot.",
     outLabel: "You carry",
-    out: "A certificate recognized by our hiring team",
+    out: PUBLIC_CURRICULUM_CLAIMS.certificate.label,
   },
 ];
 

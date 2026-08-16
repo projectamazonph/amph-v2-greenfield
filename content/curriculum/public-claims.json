@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "courses": {
+    "ppc-foundations": {
+      "label": "PPC Foundations",
+      "tier": "pp-foundations",
+      "moduleNumbers": [0, 1, 2, 3, 4],
+      "lessonCount": 19,
+      "plannedMinutes": 231
+    },
+    "accelerated-mastery": {
+      "label": "Accelerated Mastery",
+      "tier": "accelerated-mastery",
+      "moduleNumbers": [5, 6, 7, 8],
+      "lessonCount": 12,
+      "plannedMinutes": 130
+    }
+  },
+  "modules": [
+    { "moduleNumber": 0, "name": "Onboarding", "courseSlug": "ppc-foundations", "lessonCount": 3, "plannedMinutes": 26 },
+    { "moduleNumber": 1, "name": "Foundations", "courseSlug": "ppc-foundations", "lessonCount": 5, "plannedMinutes": 69 },
+    { "moduleNumber": 2, "name": "Keyword Research", "courseSlug": "ppc-foundations", "lessonCount": 4, "plannedMinutes": 48 },
+    { "moduleNumber": 3, "name": "Listing Optimization", "courseSlug": "ppc-foundations", "lessonCount": 3, "plannedMinutes": 36 },
+    { "moduleNumber": 4, "name": "Campaign Architecture", "courseSlug": "ppc-foundations", "lessonCount": 4, "plannedMinutes": 52 },
+    { "moduleNumber": 5, "name": "Portfolio Strategy", "courseSlug": "accelerated-mastery", "lessonCount": 3, "plannedMinutes": 38 },
+    { "moduleNumber": 6, "name": "Bidding Lab", "courseSlug": "accelerated-mastery", "lessonCount": 3, "plannedMinutes": 36 },
+    { "moduleNumber": 7, "name": "Search Term Triage", "courseSlug": "accelerated-mastery", "lessonCount": 3, "plannedMinutes": 27 },
+    { "moduleNumber": 8, "name": "Competitive Intelligence", "courseSlug": "accelerated-mastery", "lessonCount": 3, "plannedMinutes": 29 }
+  ],
+  "simulators": {
+    "bid-elevator": { "label": "Bid Elevator", "availability": "public-preview" },
+    "campaign-builder": { "label": "Campaign Builder", "availability": "enrolled-practice" },
+    "str-triage": { "label": "Search Term Triage", "availability": "enrolled-practice" },
+    "listing-audit": { "label": "Listing Audit", "availability": "enrolled-practice" },
+    "keyword-research": { "label": "Keyword Research", "availability": "enrolled-practice" }
+  },
+  "tierSimulatorTargets": {
+    "pp-foundations": ["campaign-builder", "bid-elevator", "str-triage"],
+    "accelerated-mastery": ["campaign-builder", "bid-elevator", "str-triage", "listing-audit", "keyword-research"]
+  },
+  "certificate": {
+    "label": "Completion certificate",
+    "claim": "Evidence of completed study and submitted work; not an employment guarantee."
+  }
+}

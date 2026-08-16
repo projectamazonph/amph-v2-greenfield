@@ -3,6 +3,16 @@ import { CheckIcon } from "./Icons";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Pricing.module.css";
+import {
+  formatPlannedMinutes,
+  publicCourseClaims,
+  publicSimulatorNamesForTier,
+} from "@/domain/curriculum/PublicCurriculumClaims";
+
+const FOUNDATIONS = publicCourseClaims("ppc-foundations");
+const MASTERY = publicCourseClaims("accelerated-mastery");
+const foundationTools = publicSimulatorNamesForTier(FOUNDATIONS.tier);
+const masteryTools = publicSimulatorNamesForTier(MASTERY.tier);
 
 interface Tier {
   flag: string;
@@ -18,14 +28,14 @@ const TIERS: Tier[] = [
   {
     flag: "Tier 01",
     name: "PPC Foundations",
-    sub: "5 core modules. The full Amazon ads workflow, end to end.",
+    sub: `${FOUNDATIONS.moduleNumbers.length} core modules. The full Amazon ads workflow, end to end.`,
     price: "2,999",
     includes: [
       <>
-        <b>5 modules</b> · ~20 hours of content
+        <b>{FOUNDATIONS.moduleNumbers.length} modules</b> · {formatPlannedMinutes(FOUNDATIONS.plannedMinutes)} of planned lessons
       </>,
       <>
-        <b>Campaign Builder + Bid Elevator + STR Triage</b> simulators
+        <b>{foundationTools.join(" + ")}</b> practice tools
       </>,
       "Quizzes and badges",
       "Certificate on completion",
@@ -36,14 +46,14 @@ const TIERS: Tier[] = [
   {
     flag: "Tier 02",
     name: "Accelerated Mastery",
-    sub: "Everything in Foundations + advanced modules + all simulators.",
+    sub: `Everything in Foundations + ${MASTERY.moduleNumbers.length} advanced modules + all reviewed practice tools.`,
     price: "5,999",
     includes: [
       <>
-        <b>8 modules</b> · ~40 hours of content
+        <b>{FOUNDATIONS.moduleNumbers.length + MASTERY.moduleNumbers.length} modules</b> · {formatPlannedMinutes(FOUNDATIONS.plannedMinutes + MASTERY.plannedMinutes)} of planned lessons
       </>,
       <>
-        <b>All 5 simulators</b> (incl. Listing Audit + Keyword Research)
+        <b>{masteryTools.length} practice tools</b> ({masteryTools.join(" + ")})
       </>,
       "Scenario packs & downloadable templates",
       "Live class recordings",

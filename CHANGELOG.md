@@ -4,6 +4,15 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-16: Reconcile public curriculum and certificate claims (LEARN-003)
+
+- Landing curriculum, tier cards, programme statistics, and simulator availability now read a
+  reviewed `content/curriculum/public-claims.json` contract.
+- A contract test joins those claims to the 31 MDX lessons and 361 planned minutes, so source
+  changes cannot silently leave stale public counts or tier/tool promises.
+- Certificate copy now describes completion evidence and explicitly avoids employment or
+  job-readiness guarantees; simulator practice is labelled formative.
+
 ### 2026-08-16: Persist planned learner time across lesson surfaces (LEARN-002)
 
 - `Lesson.plannedMinutes` is now a persisted, type-agnostic learner-time contract with a

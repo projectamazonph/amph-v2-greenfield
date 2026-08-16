@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./FAQSection.module.css";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 
 interface QA {
   q: string;
@@ -17,9 +18,8 @@ const FAQ: readonly QA[] = [
     q: "Do I get a certificate?",
     a: (
       <>
-        Yes, on completion. We list it on your profile, and it&rsquo;s{" "}
-        <span className={styles.tl}>recognized by our hiring team</span>. We hire from this
-        audience ourselves.
+        Yes, on completion. We list a {PUBLIC_CURRICULUM_CLAIMS.certificate.label.toLowerCase()} on
+        your profile. {PUBLIC_CURRICULUM_CLAIMS.certificate.claim}
       </>
     ),
   },

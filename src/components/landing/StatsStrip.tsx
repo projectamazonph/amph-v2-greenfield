@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 import styles from "./StatsStrip.module.css";
 
 interface Stat {
@@ -12,9 +13,25 @@ interface Stat {
 }
 
 const STATS: Stat[] = [
-  { to: 8, label: "Modules", sub: "Foundations + Mastery, in order" },
-  { to: 5, label: "Practice tools", sub: "Scored simulators" },
-  { to: 40, prefix: "~", suffix: "h", label: "To complete", sub: "At 5–8 hrs / week" },
+  {
+    to: PUBLIC_CURRICULUM_CLAIMS.modules.length,
+    label: "Modules",
+    sub: "Foundations + Mastery, in order",
+  },
+  {
+    to: Object.keys(PUBLIC_CURRICULUM_CLAIMS.simulators).length,
+    label: "Practice tools",
+    sub: "Formative simulator practice",
+  },
+  {
+    to: Object.values(PUBLIC_CURRICULUM_CLAIMS.courses).reduce(
+      (total, course) => total + course.plannedMinutes,
+      0,
+    ),
+    suffix: "m",
+    label: "Planned lessons",
+    sub: "Source estimate; practice adds time",
+  },
   { to: 2500, prefix: "₱", label: "Specialist lift", sub: "What specialists charge over juniors" },
 ];
 

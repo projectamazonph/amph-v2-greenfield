@@ -16,11 +16,11 @@ describe("Landing page", () => {
       "Amazon ads,", // Hero
       "Reading isn\u2019t enough", // Method
       "Move a bid. Watch the account breathe.", // SimulatorSection
-      "Eight modules, in order. No hidden gates.", // Curriculum
+      "9 modules, in order. No hidden gates.", // Curriculum
       "A paid course.", // WhoFor
       "Three tiers, one-time payment.", // Pricing
       "Direct, grounded in real account work.", // Mentor
-      "A certificate that opens doors, not one that sits idle.", // Proof
+      "Completion certificate that records the work.", // Proof
       "Plain answers.", // FAQSection
       "Build the skill.", // DarkCTA
     ];
