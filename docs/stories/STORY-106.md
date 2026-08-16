@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** Planned. Phase 2 of the `2026-08-16` order and voice plan.
+**Status:** Done. Phase 2 of the `2026-08-16` order and voice plan. Shipped via PR #TBD.
 
 ## Goal
 
