@@ -84,6 +84,21 @@ describe("proxy (src/proxy.ts)", () => {
     expect(scriptSrcLine).not.toMatch(/strict-dynamic/);
   });
 
+  it("conditionally includes 'unsafe-eval' on script-src in development mode (React 19 RSC requires eval() in dev)", async () => {
+    // Without 'unsafe-eval', React 19's RSC streaming runtime cannot
+    // decode the `$RS(slot,promise)` payload and every page hydrates
+    // into the loading skeleton forever — confirmed live on
+    // /admin/resources in dev (see Session-Handover bug "Download
+    // Center still shows empty"). Production builds never call
+    // eval(), so the directive is omitted there to keep the strict
+    // Proposal 2 CSP intact.
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    const scriptSrcLine = source.match(/`script-src[^`]*`/)?.[0];
+    expect(scriptSrcLine).toBeDefined();
+    expect(scriptSrcLine).toMatch(/'unsafe-eval'/);
+    expect(source).toMatch(/NODE_ENV\s*!==?\s*["']production["']/);
+  });
+
   it("threads the nonce to Server Components via an x-nonce request header (Proposal 2)", async () => {
     const source = await fs.readFile(PROXY_PATH, "utf8");
     expect(source).toMatch(/requestHeaders\.set\("x-nonce", nonce\)/);
