@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-16 against the student-facing UI round 28 branch (PR #TBD)
+**Last reviewed:** 2026-08-17 against the curriculum voice stabilization (STORY-107 Phase 3 first half) branch (PR #TBD)
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
@@ -44,6 +44,8 @@ The public catalog and pricing pages deliberately render an empty-state message 
 
 Student-facing actions, routes, and event controls have direct boundary tests.
 See `docs/STUDENT-EVENT-COVERAGE.md` for the inventory and future test contract.
+
+Curriculum voice stabilization (STORY-107, Phase 3 first half shipped 2026-08-17): the voice template from `docs/voice-guide.md` (open with the work, drop `> **Analogy:**` / `> **Tip:**` blockquote headers, decision in one sentence, ≤ 30-word sentences, Filipino context) is now applied to all five Module 2 and Module 3 lessons (2.2, 2.4, 3.1, 3.2, 3.3). Filipino context normalization ($→₱) is complete across these five lessons. Phase 3 second half (Modules 4, 5, 6, 7, 8 voice stabilization) is queued for the next curriculum-cycle PR.
 
 Admin mutations and event controls have direct boundary contracts covering actor
 injection, authorization, input normalization, success mapping, and failure

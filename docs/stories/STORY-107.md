@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** Planned. Phase 3 of the `2026-08-16` order and voice plan.
+**Status:** In progress. Phase 3 first half shipped: Modules 2-3 (5 lessons: 2.2, 2.4, 3.1, 3.2, 3.3). Blockquote drops, Filipino context normalization ($→₱), and sentence length audit (≤ 30 words in body prose). Fact card reference metadata left intact. Phase 3 second half (Modules 4, 5, 6, 7, 8) queued.
 
 ## Goal
 
