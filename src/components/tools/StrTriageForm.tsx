@@ -160,6 +160,10 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
           {pending ? "Checking…" : result ? "Checked" : "Check my decisions"}
         </button>
         {result ? (
+          // M-R33 fix (H-11): voice guide bans em-dashes; the previous
+          // template used an em-dash separator and shipped a U+2014 to
+          // the student. A colon (or period) is the canonical
+          // voice-guide replacement.
           <div
             className={styles.score}
             role="status"

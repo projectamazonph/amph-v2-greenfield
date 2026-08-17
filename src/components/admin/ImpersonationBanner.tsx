@@ -45,6 +45,10 @@ export async function ImpersonationBanner() {
   const targetName = userFullName(targetUser);
 
   return (
+    // M-R33 fix (H-12): voice guide bans emojis in copy. The previous
+    // `\u26a0` warning glyph was replaced with a Phosphor `Warning` icon
+    // (decorative, aria-hidden) so the banner keeps its visual weight
+    // without violating the voice guide.
     <div className={styles.banner} role="status" aria-live="polite">
       <div className={styles.content}>
         <span className={styles.icon} aria-hidden>
