@@ -49,6 +49,12 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
+      # Round 31: pin next at ^16.2.10 until the Vercel deployment hook
+      # works with the 16.3.x artifact-output regression. See PR #318.
+      # When 16.3.x (or later) produces .next/next-server.js.nft.json on
+      # Vercel, remove this entry and let dependabot re-bump.
+      - dependency-name: "next"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
