@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### LEARN-025: Finish Module 4 with campaign pre-flight maps
+
+- Require every Module 4 lesson to add a build-ready campaign-map decision,
+  including its purpose, budget or eligibility constraint, and review trigger.
+
 ### LEARN-024: Finish Module 3 with listing-audit rationales
 
 - Require an evidence-backed listing-readiness decision in every Module 3
