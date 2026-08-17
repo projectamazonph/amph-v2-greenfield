@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### LEARN-024: Finish Module 3 with listing-audit rationales
+
+- Require an evidence-backed listing-readiness decision in every Module 3
+  lesson, including the recommendation, reason, and next validation check.
+
 ### LEARN-023 — Turn Module 2 keyword lessons into grouping decisions
 
 - Add a concrete grouping decision and rationale output to each Keyword Research
