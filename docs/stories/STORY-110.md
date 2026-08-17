@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** In progress. Phase 1 of the `2026-08-16` landing voice audit.
+**Status:** Done. Merged in PR #376 (`fec0a23`) on 2026-08-16. Phase 1 of the `2026-08-16` landing voice audit.
 
 ## Goal
 

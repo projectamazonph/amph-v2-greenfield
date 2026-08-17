@@ -5,7 +5,7 @@
  */
 
 import { Button, Heading, Text } from "@react-email/components";
-import { EmailLayout } from "./EmailLayout";
+import { EmailLayout, EmailNotice, emailStyles } from "./EmailLayout";
 import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface EmailVerificationEmailProps extends EmailTemplateOverride {
@@ -27,38 +27,26 @@ export function EmailVerificationEmail({
       preview="Verify your Project Amazon PH Academy email address"
       eyebrow="Welcome to Project Amazon PH Academy"
     >
-      <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
+      <Heading as="h1" style={emailStyles.title}>
         {headlineOverride ?? `Welcome, ${firstName}!`}
       </Heading>
-      <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
+      <Text style={emailStyles.body}>
         {introBodyOverride ??
           "Thanks for signing up for Project Amazon PH Academy. To get started, please verify your email address by clicking the button below."}
       </Text>
 
-      <Button
-        href={verificationUrl}
-        style={{
-          backgroundColor: "#FF6B35",
-          color: "#ffffff",
-          fontSize: "15px",
-          fontWeight: 600,
-          textDecoration: "none",
-          padding: "12px 24px",
-          borderRadius: "6px",
-          display: "inline-block",
-        }}
-      >
+      <Button href={verificationUrl} style={emailStyles.button}>
         {ctaLabelOverride ?? "Verify Email Address"}
       </Button>
 
-      <Text style={{ margin: "24px 0 8px 0", color: "#737373", fontSize: "13px" }}>
-        This link expires in {expiresInHours} hours. If it expires, you can request a new
-        verification email from the login page.
-      </Text>
-      <Text style={{ margin: 0, color: "#737373", fontSize: "13px" }}>
-        If the button doesn't work, copy and paste this link into your browser:
+      <EmailNotice>
+        This verification link expires in {expiresInHours} hours. If it expires, request a new link
+        from the login page.
+      </EmailNotice>
+      <Text style={emailStyles.muted}>
+        Button not working? Copy and paste this link into your browser:
         <br />
-        <span style={{ wordBreak: "break-all", color: "#1a365d" }}>{verificationUrl}</span>
+        <span style={{ ...emailStyles.link, wordBreak: "break-all" }}>{verificationUrl}</span>
       </Text>
     </EmailLayout>
   );

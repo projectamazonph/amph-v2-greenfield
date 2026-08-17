@@ -1,6 +1,6 @@
 # Content — Curriculum Source
 
-This directory holds the curriculum content (lesson MDX files and quiz fixture) for the Project Amazon PH Academy platform. It is the **source of truth** that the future `scripts/import-amph-content.ts` (Sprint 3 / STORY-013) will read from to populate the database.
+This directory holds the curriculum content (lesson MDX files and quiz fixture) for the Project Amazon PH Academy platform. The MDX files are the source of truth for lesson content. `curriculum/inventory.json` is the reviewed learning contract that checks every published lesson's course tier, planned work, tool bridge, resources, and final deliverable before release.
 
 ## Layout
 
@@ -18,7 +18,9 @@ content/
     │   ├── 6-bidding-lab/         # 3 lessons: bid strategies, placement, bid-elevator prep
     │   ├── 7-search-term-triage/  # 3 lessons: search-term analysis, negatives, STR triage prep
     │   └── 8-competitive-intelligence/  # 3 lessons: brand analytics, share-of-voice, benchmarking
-    └── quiz-questions.json        # 7 module-final quizzes (knowledge checks)
+    ├── inventory.json              # checked-in course and lesson release contract
+    ├── public-claims.json          # reviewed public counts, tiers, tools, and certificate wording
+    └── quiz-questions.json         # 7 module-final quizzes (knowledge checks)
 ```
 
 ## Source & history
@@ -35,7 +37,7 @@ The content was **migrated from the original `amph-v2` repo** (`content/curricul
    - Split the curriculum into two Course rows (`ppc-foundations` = modules 0–4, `accelerated-mastery` = modules 5–8) so both tiers have a course. `ultimate-transformation` deliberately has no course — its modules (10–13) don't exist yet (Release 3).
 3. **This greenfield repo** now carries forward that scrubbed + corrected version, byte-for-byte.
 
-**What you see in these files is the post-content-track version, not the raw v1.** No additional edits were made during the migration.
+**What you see in these files is based on the post-content-track version, not the raw v1.** Later curriculum work includes STORY-109's additional practice bridges. Any source change still requires the normal content import before it appears in an existing database.
 
 ## Where the content comes from (per file)
 
@@ -44,19 +46,35 @@ The content was **migrated from the original `amph-v2` repo** (`content/curricul
 | `content/curriculum/modules/*`           | scrubbed + fact-card-augmented content, fetched 2026-07-18                                              |
 | `content/curriculum/quiz-questions.json` | original v1 `project/fixtures/quiz-questions.json` (unchanged — quiz text was never the legacy problem) |
 
-## Why migrate now, before STORY-013?
+## Inventory release gate
 
-The greenfield is currently at **Sprint 9 done** (certificates + email), with Sprint 10 (admin panel) next. The curriculum import story — **STORY-013** (`Content import script (scripts/import-amph-content.ts) reading from content/curriculum/)** — is in Sprint 3 of the greenfield's `sprint-plan.md`, and hasn't been built yet.
+Run the inventory check after changing lesson frontmatter or the learning contract:
 
-**Migrating the content now means:**
+```bash
+pnpm validate:curriculum
+```
 
-1. When the greenfield catches up to Sprint 3 (either by re-running the skipped sprints or by back-filling just STORY-013), the source is already in place — no extra fetch step.
-2. The content has already been **scrubbed of the dead-product references** that would otherwise require the same content-track pass the parent already did. That's a meaningful 2-day saving.
-3. The future `import-amph-content.ts` has a fixed path to read from (`content/curriculum/`), so it can be written and tested without a separate "fetch content from v1" step.
+The check reads the real MDX tree and fails on duplicate slugs, missing planned minutes, missing course tier mappings, missing tool targets, missing manifest rows, or orphan manifest rows. It is the first release gate for the learning-experience uplift plan in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`.
 
-## What the future `import-amph-content.ts` will do
+Public landing and offer copy reads `public-claims.json`. Its contract test joins
+the reviewed values back to `inventory.json` and the MDX frontmatter, so a lesson
+count or planned-minute change must update the claim deliberately before it can ship.
 
-It will:
+## Lesson production contract
+
+`pnpm validate:lesson-production` reports whether each lesson has the agreed
+beginner-facing blocks: outcome, decision, worked example, active attempt,
+feedback or answer reveal, evidence instruction, and retrieval cue. The default
+mode is intentionally non-blocking while the existing 31 lessons are migrated;
+use `pnpm validate:lesson-production -- --strict` for a content branch that must
+meet the complete schema. CI uploads the JSON report so the next content slice
+can work from an explicit gap list.
+
+## Content import workflow
+
+The importer is `scripts/import-amph-content.ts` (STORY-013). It reads the same repo-relative source that the inventory validator checks.
+
+It:
 
 1. Read every `*.mdx` file under `content/curriculum/modules/<module-slug>/<lesson-slug>.mdx`.
 2. Parse the frontmatter (`title`, `slug`, `moduleNumber`, `lessonNumber`, `type`, `estimatedMinutes`, `xpReward`).
@@ -64,11 +82,11 @@ It will:
 4. Read `content/curriculum/quiz-questions.json`, parse the 7 quizzes, and attach each to the appropriate module's final lesson as a knowledge check.
 5. Be idempotent (re-running should not duplicate rows — use slug as natural key).
 
-The greenfield's future import script will be modeled on the parent's, but:
+The greenfield importer differs from the parent implementation in these important ways:
 
 - Will resolve paths via `import.meta.url` (repo-relative), not the hard-coded device path the parent once had.
 - Will use the existing `JoseJwtService` and the SOLID five-layer architecture (the parent did not have the SOLID architecture, so its import script is a one-off CLI tool — the greenfield's can be cleaner).
-- Will not regenerate slugs for modules 5–8 from `amph-foundations-*` to `accelerated-mastery-*` (the parent's pass did this; the greenfield's content is already on the post-split slugs since this whole folder was copied after the split).
+- Does not regenerate module 5–8 slugs from `amph-foundations-*` to `accelerated-mastery-*`; the source already uses the post-split slugs.
 
 ## Content audit & corrections (carried forward from parent)
 
@@ -86,16 +104,19 @@ Each fix added an Amazon Ads Fact Card (source URL, scope, owner/date placeholde
 
 ## What was explicitly NOT done during the migration
 
-- **No additional content rewrites** beyond the parent's content track. The greenfield content here is byte-identical to the parent's `content/curriculum/`.
+- **At migration, no additional content rewrites** were made beyond the parent's content track. Later changes, including STORY-109, are documented in their story files and the changelog.
 - **No slugs renamed.** Even where a lesson's framing changed (e.g., `3.1-listing-quality-score.mdx`, `0.3-first-simulation.mdx`), only the frontmatter `title` field was updated, not the filename. Renaming the slug would break `Lesson.slug`-keyed upserts.
-- **No lesson-production standard pass.** The 10-block lesson format (client outcome, decision card, worked case, etc.) from the parent's `docs/CURRICULUM-REDESIGN.md` is a Release 2 scope; the lessons here are not all on that format yet. That's a separate content-track pass for later.
-- **The import script was not run** — no `DATABASE_URL` was available; no row was written; the future `scripts/import-amph-content.ts` will be the first to actually load this content into the database.
+- **No complete lesson-production standard pass.** STORY-107 and STORY-108 remain planned content work. The target standard and implementation order are in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`.
+- **Source and database are separate states.** Running `pnpm import:content` against the intended database is required after approved content changes. Do not treat a committed MDX change as automatically published.
 
 ## Verification
 
 ```bash
 # All 31 MDX files are present
 find content/curriculum/modules -name "*.mdx" | wc -l   # 31
+
+# The checked-in learning contract matches the MDX source
+pnpm validate:curriculum
 
 # Quiz JSON is parseable
 python3 -c "import json; json.load(open('content/curriculum/quiz-questions.json'))"

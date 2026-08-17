@@ -123,6 +123,29 @@ describe("POST /api/webhooks/paymongo — persistence", () => {
     });
   });
 
+  it("fulfills a current PayMongo checkout-session payment event", async () => {
+    seedPendingOrder("cs_current");
+    const body = JSON.stringify({
+      data: {
+        id: "evt_current",
+        type: "event",
+        attributes: {
+          type: "checkout_session.payment.paid",
+          data: { id: "cs_current", type: "checkout_session", attributes: {} },
+        },
+      },
+    });
+
+    const res = await POST(makeRequest(body) as never);
+
+    expect(res.status).toBe(200);
+    const order = orderRepo.orders.get("order_01");
+    expect(order?.status).toBe("PAID");
+    const entries = webhookEventLog.getAll();
+    expect(entries[0]?.eventType).toBe("checkout_session.payment.paid");
+    expect(entries[0]?.providerEventId).toBe("evt_current");
+  });
+
   it("persists a record with no processingError for idempotent replays (already-paid order)", async () => {
     seedPendingOrder("cs_paid");
     const order = orderRepo.orders.get("order_01");

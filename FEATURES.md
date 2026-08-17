@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-17 against the curriculum voice stabilization (STORY-107 Phase 3 first half) branch (PR #TBD)
+**Last reviewed:** 2026-08-17 against the curriculum voice stabilization branch (PR #TBD)
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
@@ -42,10 +42,10 @@ Password-reset and transactional links use the configured application origin. Th
 
 The public catalog and pricing pages deliberately render an empty-state message when no published course or active pricing rows have been seeded. `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01) — the placeholder is gone.
 
+Curriculum voice stabilization: Phase 3 first half (STORY-107, 2026-08-17) drops the `> **Analogy:**` and `> **Tip:**` blockquote-header pattern across 5 Module 2 and Module 3 lessons (2.2, 2.4, 3.1, 3.2, 3.3). Each drop integrates the metaphor or tip into the surrounding inline prose so the lesson opens with the work, not the frame. Sentence length is held to the 30-word ceiling per the voice guide, and Filipino context (₱ currency) replaces USD. Phase 3 second half (Modules 4-8) is queued.
+
 Student-facing actions, routes, and event controls have direct boundary tests.
 See `docs/STUDENT-EVENT-COVERAGE.md` for the inventory and future test contract.
-
-Curriculum voice stabilization (STORY-107, Phase 3 first half shipped 2026-08-17): the voice template from `docs/voice-guide.md` (open with the work, drop `> **Analogy:**` / `> **Tip:**` blockquote headers, decision in one sentence, ≤ 30-word sentences, Filipino context) is now applied to all five Module 2 and Module 3 lessons (2.2, 2.4, 3.1, 3.2, 3.3). Filipino context normalization ($→₱) is complete across these five lessons. Phase 3 second half (Modules 4, 5, 6, 7, 8 voice stabilization) is queued for the next curriculum-cycle PR.
 
 Admin mutations and event controls have direct boundary contracts covering actor
 injection, authorization, input normalization, success mapping, and failure
@@ -123,7 +123,7 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 | Student account settings     | Implemented          | Profile display, password change, 2FA, complete JSON data export, account deletion, purchases, refunds, and certificates exist. Unpersisted notification checkboxes were removed instead of presenting fake settings.             |
 | All-access entitlement rules | Implemented          | Active enrollment, admin access, and eligible subscription tiers grant course access. Tier checkout resolves the linked course and effective price server-side. Live production payment verification remains operational work.    |
 | Live-class experience        | Implemented          | Student list, detail, enrollment-gated RSVP, cancellation, recording access, idempotent watched state, and XP award are implemented. Capacity limits are not part of the current model.                                           |
-| Editable email templates     | Implemented, partial | `/admin/email-templates` and its edit route are wired into all seven Resend send paths. Overrides replace default copy verbatim; placeholder interpolation is not implemented, and `RefundEmail.ctaLabel` has no rendered button. |
+| Transactional email          | Implemented          | All nine transactional scenarios use a shared polished HTML template system. `/admin/email-templates` personalizes the seven eligible send paths with type-specific `{{variables}}`; invalid tokens are rejected on save, refunds link safely to the student dashboard, and the payment-failed template remains available for provider-authoritative payment-failure events. |
 | Simulator ownership          | Implemented          | All 5 graded actions pass the authenticated `userId` from `getSessionUserId()`, not `"system"` (fixed 2026-07-31).                                                                                                                |
 | Badge administration         | Implemented          | Prisma create, update, and archive are wired; admin badge CRUD is shipped with slug-uniqueness and error handling.                                                                                                                |
 | Session revocation           | Implemented          | `getSessionUserId()` checks `SessionRepository` server-side after JWT verification when a `sessionId` is present. Login also enforces `lockedUntil`.                                                                              |
@@ -133,6 +133,7 @@ Audit writes are wired through `RecordAuditLog` and persisted by `PrismaAuditLog
 | PayMongo refunds             | Implemented          | `PayMongoAdapter.refund()` calls the real PayMongo Refunds API (fixed 2026-08-02, STORY-049.5); `ProcessRefund`/`RefundOverride` work against production PayMongo.                                                                |
 | Admin settings               | Partial              | TOTP is implemented; general site settings and maintenance controls remain “Coming soon”.                                                                                                                                         |
 | Admin seed smoke test        | Implemented          | `scripts/seed-admin-user.mjs` uses the shared PrismaPg adapter path (fixed prior to 2026-07-27).                                                                                                                                  |
+| Learning-experience uplift   | Partial              | Wave 0 has a checked-in curriculum inventory, durable planned learner time, and a public-claim contract (`STORY-111`–`STORY-113`). The lesson-production contract and content passes now cover Modules 0 through 3, including independent calculations, keyword grouping decisions, and listing-audit rationales (`STORY-117`–`STORY-121`). Evidence-linked tool practice and the rubric-backed capstone remain in the build plan. Existing simulator scores remain formative. |
 
 ## Deliberately out of scope
 

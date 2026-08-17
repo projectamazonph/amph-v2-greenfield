@@ -18,6 +18,7 @@ describe("RefundEmail", () => {
         currency: "PHP",
         refundedAt: new Date("2026-08-01T00:00:00Z"),
         reason: "30-day money-back guarantee",
+        dashboardUrl: "https://projectamazonph.vercel.app/dashboard",
       }),
     );
 
@@ -38,8 +39,28 @@ describe("RefundEmail", () => {
         currency: "PHP",
         refundedAt: new Date(),
         reason: "X",
+        dashboardUrl: "https://projectamazonph.vercel.app/dashboard",
       }),
     );
     expect(html).toContain("#DC2626");
+  });
+
+  it("renders a dashboard CTA and honors the admin-provided label", () => {
+    const html = renderToStaticMarkup(
+      RefundEmail({
+        firstName: "Maria",
+        orderNumber: "AMPH-2026-000123",
+        courseTitle: "Intro to Amazon FBA",
+        amountMinor: 199900,
+        currency: "PHP",
+        refundedAt: new Date("2026-08-01T00:00:00Z"),
+        reason: "30-day money-back guarantee",
+        dashboardUrl: "https://projectamazonph.vercel.app/dashboard",
+        ctaLabelOverride: "Review your account",
+      }),
+    );
+
+    expect(html).toContain("Review your account");
+    expect(html).toContain('href="https://projectamazonph.vercel.app/dashboard"');
   });
 });

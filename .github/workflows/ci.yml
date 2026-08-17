@@ -171,6 +171,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma migrate deploy
       - run: pnpm prisma generate
+      # Seed both runtime inputs required by the simulator journey. Pages
+      # need a published SimulatorScenario, while grading also needs the
+      # matching ScorePolicy for the scenario difficulty and practice mode.
+      # Both scripts use upserts, so CI reruns remain safe.
+      - run: pnpm db:seed:scenarios
+      - run: pnpm db:seed:policies
       # Install ALL Playwright browser dependencies + system deps.
       # Specifying only `chromium` was leaving the worker process unable to
       # launch the bundled browser (the error mentions a `webkit-2311`
@@ -186,6 +192,32 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
+
+  learning-release-gate:
+    name: Learning release gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [quality, unit, e2e]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Validate source inventory and public claims
+        run: pnpm validate:learning-release
+      - name: Report lesson production contract
+        run: pnpm validate:lesson-production -- --report=lesson-production-report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lesson-production-report
+          path: lesson-production-report.json
+      - name: Record learner smoke prerequisite
+        run: |
+          echo "Learner smoke prerequisite: E2E (Playwright) passed in this workflow."
+          echo "Release operators must attach the staging import output and logged-in smoke URL before production promotion."
 
   build:
     name: Build

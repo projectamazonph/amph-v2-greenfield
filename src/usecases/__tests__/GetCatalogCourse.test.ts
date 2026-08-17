@@ -83,6 +83,7 @@ function makeLesson(
     title: string;
     type: "VIDEO" | "TEXT" | "QUIZ";
     durationMinutes?: number;
+    plannedMinutes?: number;
     displayOrder: number;
   }> = {},
 ): Lesson {
@@ -100,7 +101,8 @@ function makeLesson(
           : {
               questions: [{ id: "q1", prompt: "Q1?", options: ["A", "B"], correctOptionIndex: 0 }],
             },
-    displayOrder: overrides.displayOrder ?? 1,
+      displayOrder: overrides.displayOrder ?? 1,
+      plannedMinutes: overrides.plannedMinutes,
   });
   if (!result.ok) throw new Error(`Test setup error: createLesson failed: ${result.error.kind}`);
   return result.value;
@@ -153,6 +155,7 @@ describe("GetCatalogCourse", () => {
       moduleId: "cd-mod-1",
       title: "Overview",
       type: "TEXT",
+      plannedMinutes: 7,
       displayOrder: 2,
     });
     const lesson3 = makeLesson({
@@ -180,7 +183,7 @@ describe("GetCatalogCourse", () => {
     expect(detail.priceMinor).toBe(499900);
     expect(detail.coverImage).toBe("https://example.com/cover.png");
     expect(detail.totalLessonCount).toBe(3);
-    expect(detail.totalEstimatedMinutes).toBe(17); // 5 + 12 (only VIDEO)
+    expect(detail.totalEstimatedMinutes).toBe(24); // 5 + 7 + 12 across all lesson types
     expect(detail.modules).toHaveLength(2);
 
     // Module 1
@@ -191,7 +194,7 @@ describe("GetCatalogCourse", () => {
     expect(detail.modules[0]!.lessons[0]!.estimatedMinutes).toBe(5);
     expect(detail.modules[0]!.lessons[1]!.title).toBe("Overview");
     expect(detail.modules[0]!.lessons[1]!.type).toBe("TEXT");
-    expect(detail.modules[0]!.lessons[1]!.estimatedMinutes).toBe(0);
+    expect(detail.modules[0]!.lessons[1]!.estimatedMinutes).toBe(7);
 
     // Module 2
     expect(detail.modules[1]!.title).toBe("Advanced Topics");

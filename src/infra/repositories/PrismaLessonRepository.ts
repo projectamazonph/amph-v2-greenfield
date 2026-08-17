@@ -25,6 +25,7 @@ interface LessonRow {
   title: string;
   type: string;
   content: Prisma.JsonValue;
+  plannedMinutes?: number;
   displayOrder: number;
   createdAt: Date;
   updatedAt: Date;
@@ -70,6 +71,7 @@ export class PrismaLessonRepository implements ILessonRepository {
           title: lesson.title,
           type: lesson.type,
           content: lesson.content as unknown as Prisma.InputJsonValue,
+          plannedMinutes: lesson.plannedMinutes,
           displayOrder: lesson.displayOrder,
         },
       });
@@ -87,6 +89,7 @@ export class PrismaLessonRepository implements ILessonRepository {
           title: lesson.title,
           type: lesson.type,
           content: lesson.content as unknown as Prisma.InputJsonValue,
+          plannedMinutes: lesson.plannedMinutes,
           displayOrder: lesson.displayOrder,
         },
       });
@@ -162,6 +165,7 @@ export class PrismaLessonRepository implements ILessonRepository {
       title: row.title,
       type: row.type as LessonType,
       content: row.content,
+      plannedMinutes: row.plannedMinutes,
       displayOrder: row.displayOrder,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

@@ -20,6 +20,8 @@ export interface Lesson {
   readonly id: string;
   readonly title: string;
   readonly type: LessonType;
+  /** Planned learner time from the authoritative lesson record. */
+  readonly plannedMinutes?: number;
   /** JSON content — shape depends on type (VIDEO has `durationMinutes`, TEXT has `body`, QUIZ has `questions`). */
   readonly content: unknown;
 }
@@ -139,12 +141,13 @@ export function courseLessonCount(course: Course): number {
   return course.curriculum.sections.reduce((total, section) => total + section.lessons.length, 0);
 }
 
-/** Sum of video lesson durations in minutes. Ignores TEXT and QUIZ lessons. */
+/** Sum of planned learner time in minutes across every lesson type. */
 export function courseTotalDurationMinutes(course: Course): number {
   return course.curriculum.sections.reduce((total, section) => {
     return (
       total +
       section.lessons.reduce((sectionTotal, lesson) => {
+        if (typeof lesson.plannedMinutes === "number") return sectionTotal + lesson.plannedMinutes;
         if (
           lesson.type === "VIDEO" &&
           typeof lesson.content === "object" &&
@@ -194,6 +197,7 @@ export function rebuildCurriculumFromModules(
       readonly id: string;
       readonly title: string;
       readonly type: LessonType;
+      readonly plannedMinutes?: number;
       readonly content: unknown;
     }[]
   >,
@@ -209,6 +213,9 @@ export function rebuildCurriculumFromModules(
         id: lesson.id,
         title: lesson.title,
         type: lesson.type,
+        ...(lesson.plannedMinutes === undefined
+          ? {}
+          : { plannedMinutes: lesson.plannedMinutes }),
         content: lesson.content,
       })),
     });

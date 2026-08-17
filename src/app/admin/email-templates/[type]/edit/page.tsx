@@ -12,7 +12,11 @@ import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
-import { isEmailTemplateType, type EmailTemplateType } from "@/domain/entities/EmailTemplate";
+import {
+  EMAIL_TEMPLATE_VARIABLES,
+  isEmailTemplateType,
+  type EmailTemplateType,
+} from "@/domain/entities/EmailTemplate";
 import { updateEmailTemplateAction } from "@/app/actions/updateEmailTemplate.action";
 import styles from "../../../badges/new/page.module.css";
 
@@ -28,7 +32,7 @@ const TEMPLATE_LABELS: Record<EmailTemplateType, string> = {
 
 interface PageProps {
   params: Promise<{ type: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; message?: string }>;
 }
 
 export default async function EditEmailTemplatePage({ params, searchParams }: PageProps) {
@@ -51,7 +55,7 @@ export default async function EditEmailTemplatePage({ params, searchParams }: Pa
   const errorMsg = sp.error
     ? {
         invalid_type: "Unknown template type.",
-        invalid_input: "All fields are required.",
+        invalid_input: sp.message ?? "Check every field, then use only the available variables below.",
         db_error: "Database error. Try again.",
       }[sp.error]
     : null;
@@ -66,13 +70,15 @@ export default async function EditEmailTemplatePage({ params, searchParams }: Pa
 
       <Card padding={6} style={{ marginBottom: "1rem" }}>
         <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--ink-500)" }}>
-          Saving here replaces the corresponding email&apos;s live copy the next time it sends
-          (STORY-095.5). There is no {"{{"}placeholder{"}}"} support, so whatever you write here
-          replaces the default text verbatim, and a per-recipient detail baked into the default
-          (like the student&apos;s first name in a headline) is lost once you customize that field.
-          {type === "refund"
-            ? " The refund email has no call-to-action button, so CTA label has no effect here."
-            : null}
+          Saving here replaces the corresponding email&apos;s live copy the next time it sends.
+          Use {"{{variableName}}"} anywhere in the subject, headline, intro body, or CTA label to
+          include the recipient&apos;s current details.
+        </p>
+        <p style={{ margin: "0.75rem 0 0", fontSize: "0.875rem", color: "var(--ink-500)" }}>
+          Available for this email: {EMAIL_TEMPLATE_VARIABLES[type]
+            .map((variable) => `{{${variable.name}}} (${variable.label})`)
+            .join(", ")}
+          .
         </p>
       </Card>
 
@@ -161,7 +167,9 @@ function handleUpdate(type: EmailTemplateType) {
     const r = await updateEmailTemplateAction({ type, subject, headline, introBody, ctaLabel });
 
     if (!r.ok) {
-      redirect(`/admin/email-templates/${type}/edit?error=${r.error}`);
+      const query = new URLSearchParams({ error: r.error });
+      if (r.message) query.set("message", r.message);
+      redirect(`/admin/email-templates/${type}/edit?${query.toString()}`);
       return;
     }
 

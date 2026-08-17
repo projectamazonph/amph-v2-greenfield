@@ -4,6 +4,14 @@
 **Reviewed:** 2026-08-14
 **Main:** `ee1737a`
 
+## Current learning-experience priority
+
+The next product investment is the zero-to-one student journey. The atomic
+backlog, dependencies, evidence model, and release gates are in
+[`docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`](docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md).
+Start with the truth-and-release contract before adding lessons or making new
+job-readiness claims. Existing simulator scores remain formative.
+
 ## Production
 
 - Canonical URL: <https://projectamazonph.vercel.app>
@@ -74,7 +82,6 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 ## Remaining known limitations
 
 - Simulator scores are formative, not certification or hiring evidence.
-- Email-template overrides do not interpolate placeholders. `RefundEmail.ctaLabel` has no rendered button.
 - Admin 2FA is opt-in.
 - Live backup/restore, payment-webhook rotation, and external uptime checks require operator execution.
 - A PayMongo event can be stored as PAID before enrollment fails. Because replay exits early for an already-paid order, use the audited admin tier-grant flow to repair a confirmed-paid partial state.

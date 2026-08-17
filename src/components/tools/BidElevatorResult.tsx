@@ -83,13 +83,17 @@ export function BidElevatorResult({ result, targetRoas, xpAwarded }: Props) {
         tabIndex={0}
       >
         <table className={styles.table}>
+          {/* M-R30 fix: scope="col" on every header so screen readers
+              associate cells with their column header (WCAG 1.3.1).
+              The parent role="region" aria-label="Bid recommendations"
+              supplies the accessible name. */}
           <thead>
             <tr>
-              <th>Keyword</th>
-              <th>Confidence</th>
-              <th className={styles.thNum}>Current</th>
-              <th className={styles.thNum}>Suggested</th>
-              <th className={styles.thNum}>Δ</th>
+              <th scope="col">Keyword</th>
+              <th scope="col">Confidence</th>
+              <th scope="col" className={styles.thNum}>Current</th>
+              <th scope="col" className={styles.thNum}>Suggested</th>
+              <th scope="col" className={styles.thNum}>Δ</th>
             </tr>
           </thead>
           <tbody>

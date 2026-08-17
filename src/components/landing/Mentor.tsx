@@ -2,6 +2,7 @@ import { Logo } from "./Logo";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Mentor.module.css";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 
 /**
  * Stand-in for a photo the brand kit doesn't include yet (BRAND-GUIDE.md
@@ -169,8 +170,8 @@ export function Mentor() {
               <div className={styles.point}>
                 <small>Certificate</small>
                 <p>
-                  Listed on your profile and recognized by our hiring team. We hire from this
-                  audience.
+                  Listed on your profile as a {PUBLIC_CURRICULUM_CLAIMS.certificate.label.toLowerCase()}.
+                  {PUBLIC_CURRICULUM_CLAIMS.certificate.claim}
                 </p>
               </div>
             </div>

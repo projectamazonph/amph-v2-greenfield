@@ -3,6 +3,7 @@ import { CheckIcon } from "./Icons";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./DarkCTA.module.css";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 
 export function DarkCTA() {
   return (
@@ -18,7 +19,7 @@ export function DarkCTA() {
             </h2>
             <p className={styles.p}>
               Pay once, get the content forever. Build Amazon ads skills you can show: guided
-              modules, five practice tools, and a certificate recognized by our hiring team.
+              modules, reviewed practice tools, and a {PUBLIC_CURRICULUM_CLAIMS.certificate.label.toLowerCase()}.
             </p>
             <div className={styles.ctaRow}>
               <a
@@ -51,11 +52,11 @@ export function DarkCTA() {
               </li>
               <li>
                 <CheckIcon />
-                Certificate on completion
+                {PUBLIC_CURRICULUM_CLAIMS.certificate.label}
               </li>
               <li>
                 <CheckIcon />
-                Recognized by our hiring team
+                {PUBLIC_CURRICULUM_CLAIMS.certificate.claim}
               </li>
               <li>
                 <CheckIcon />

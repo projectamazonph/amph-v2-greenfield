@@ -116,7 +116,7 @@ Email-template UI routes are `/admin/email-templates` and `/admin/email-template
 | `POST /api/quizzes/[quizId]/attempt`       | Quiz attempt submission                                                                                                                |
 | `GET /api/resources/[id]/download`         | Re-checks access, records the download, 302-redirects to the resource's `fileUrl` (relative paths resolved against the request origin) |
 | `POST /api/webhooks/paymongo`              | Signature-verified PayMongo webhook processing                                                                                         |
-| `POST /api/webhooks/resend/webhook`        | Inbound Resend delivery/bounce/spam events; updates message rows                                                                       |
+| `POST /api/webhooks/resend/webhook`        | Signature-verified inbound Resend events; raw payloads are recorded for replay and forensics                                           |
 | `POST /actions/verifyEmail`                | Email verification action route                                                                                                        |
 | `GET /admin/audit-log/export`              | CSV audit-log export                                                                                                                   |
 | `GET /certificates/[hash]/pdf`             | Certificate PDF response                                                                                                               |

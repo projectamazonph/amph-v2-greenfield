@@ -16,11 +16,11 @@ describe("Landing page", () => {
       "Amazon ads,", // Hero
       "Reading isn\u2019t enough", // Method
       "Move a bid. Watch the account breathe.", // SimulatorSection
-      "Eight modules, in order. No hidden gates.", // Curriculum
+      "9 modules, in order. No hidden gates.", // Curriculum
       "A paid course.", // WhoFor
       "Three tiers, one-time payment.", // Pricing
       "Direct, grounded in real account work.", // Mentor
-      "A certificate that opens doors, not one that sits idle.", // Proof
+      "Completion certificate that records the work.", // Proof
       "Plain answers.", // FAQSection
       "Build the skill.", // DarkCTA
     ];
@@ -78,5 +78,13 @@ describe("Landing page", () => {
     expect(html).not.toMatch(/simulators? (are|is) (available|ready|live|finished|complete)/);
     expect(html).not.toContain("try the simulator");
     expect(html).not.toContain("practice now");
+  });
+
+  it("labels public preview and enrolled practice separately", () => {
+    const html = renderToString(createElement(HomePage));
+
+    expect(html).toContain("Live preview");
+    expect(html).toContain("Enrolled practice");
+    expect(html).toContain("Availability follows the reviewed curriculum claim contract");
   });
 });

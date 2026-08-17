@@ -71,11 +71,12 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
                     const isCurrent = lesson.id === currentLessonId;
                     const isCompleted = completedLessonIds.includes(lesson.id);
                     const isVideo = lesson.type === "VIDEO";
-                    const duration =
-                      isVideo &&
-                      typeof lesson.content === "object" &&
-                      lesson.content !== null &&
-                      "durationMinutes" in lesson.content
+                    const duration = lesson.plannedMinutes && lesson.plannedMinutes > 0
+                      ? lesson.plannedMinutes
+                      : isVideo &&
+                          typeof lesson.content === "object" &&
+                          lesson.content !== null &&
+                          "durationMinutes" in lesson.content
                         ? (lesson.content as { durationMinutes: number }).durationMinutes
                         : null;
 

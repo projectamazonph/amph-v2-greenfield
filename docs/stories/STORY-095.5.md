@@ -7,7 +7,7 @@ consistent name for a same-epic sequel)
 
 ## Status
 
-**Status:** Done — 2026-08-03.
+**Status:** Done — 2026-08-03. Completed follow-up gaps on 2026-08-16.
 
 ## Goal
 
@@ -18,23 +18,20 @@ template in the admin UI had zero effect on what Resend actually sent. This stor
 that gap for all 7 admin-editable types (`email_verification`, `password_reset`, `welcome`,
 `receipt`, `refund`, `certificate`, `live_class_reminder`).
 
-## What `EmailTemplate` actually customizes
+## Current template behavior
 
-`EmailTemplate` has 4 editable fields: `subject`, `headline`, `introBody`, `ctaLabel`. It
-has **no `{{placeholder}}` interpolation** — the dynamic per-recipient data (amounts, dates,
-order numbers, URLs) is not part of the template row at all; it's still supplied as
-structured props to the renderer, exactly as before. This means:
+`EmailTemplate` has 4 editable fields: `subject`, `headline`, `introBody`, and `ctaLabel`.
+Each field supports the type-specific `{{variableName}}` entries displayed on the edit page.
+Variables are resolved at send time for the individual recipient. For example, a verification
+template can use `{{firstName}}`, `{{verificationUrl}}`, and `{{expiresInHours}}`, while a
+refund template can use order, course, amount, reason, and dashboard-link values.
 
-- When an admin customizes `headline`/`introBody`, the override text **replaces the default
-  verbatim** — any per-recipient detail baked into the default copy (e.g. the student's
-  first name in `"Welcome, {firstName}!"`) is lost for that field once customized. This is a
-  property of the domain model (no placeholder syntax exists), not a bug introduced here.
-  Building `{{firstName}}`-style interpolation was explicitly out of scope — see STORY-095's
-  own doc, which already flagged this as a real design decision, not an oversight.
-- `subject` has the same limitation: several use cases interpolate dynamic data into the
-  hardcoded subject line today (e.g. `SendLiveClassReminders`'s
-  `` `Reminder: ${cls.title} starts in ${minutesUntilStart} minutes` ``) — a customized
-  subject replaces that entirely with a static string.
+The domain factory rejects malformed or unavailable variables before a template is saved, so a
+customized email cannot silently send a broken token. React Email escapes resolved values as
+text. The structured blocks and CTA destinations remain controlled by the application.
+
+The refund template now has a dashboard CTA, so its editable `ctaLabel` is rendered like the
+other six templates. Uncustomized emails keep their original fallback copy.
 
 ## What shipped
 
@@ -52,8 +49,9 @@ structured props to the renderer, exactly as before. This means:
   unaffected. `CertificateEmail`'s override replaces the `<strong>{courseTitle}</strong>`
   bold-formatted default with plain text (no bold, no course-title interpolation) when set.
 - Every call site that triggers one of these 7 emails now fetches
-  `emailTemplateRepo.findByType(<type>)` before sending, and uses `template?.subject ??
-<hardcoded fallback>` for the subject plus the 3 override fields for the renderer call:
+  `emailTemplateRepo.findByType(<type>)` before sending, resolves supported variables in the
+  subject and the 3 renderer override fields, then falls back to the original hardcoded copy
+  when no template row exists:
   `ResendVerification.ts`, `VerifyEmail.ts`, `RequestPasswordReset.ts`,
   `IssueCertificate.ts`, `SendLiveClassReminders.ts` (fetches once per cron run, before the
   per-recipient loop — not once per email), the shared `sendRefundEmail()` helper in
@@ -64,26 +62,35 @@ structured props to the renderer, exactly as before. This means:
   use cases' `Deps` interfaces and wired in both `buildProductionContainer()` and
   `buildTestContainer()`.
 - Fallback behavior when no admin row exists (`findByType` returns `null`, or the repo call
-  itself errors): every call site falls back to the original hardcoded copy, so an
-  uncustomized template sends byte-for-byte the same email as before this story — confirmed
-  by the full existing test suite passing unchanged (no test needed updating; the only
-  changes were new dependency wiring, not new assertions on old behavior).
+  itself errors): every call site falls back to its original hardcoded copy. The refund email
+  intentionally adds its dashboard CTA, so its editable CTA label is rendered even without an
+  admin template.
+
+## Follow-up completion: 2026-08-16
+
+- `EmailTemplate` now owns the allowed-variable catalog and interpolation. The editor lists
+  the right variables per template, and the update action returns the validation message to
+  the admin when a token is malformed or unavailable for that email type.
+- All seven send paths resolve the stored subject and body overrides with their recipient,
+  order, class, certificate, and URL values before rendering. Focused tests cover validation,
+  verification-email interpolation, refund interpolation, and the refund CTA.
+- `RefundEmail` now renders a CTA to the student dashboard. The `ctaLabel` field is no longer
+  a dead setting.
+- The Resend webhook now verifies the documented Svix `svix-id`, `svix-timestamp`, and
+  `svix-signature` contract against the raw body, including a five-minute replay window.
+  Its tests call the production verifier with valid, invalid, tampered, stale, and
+  multi-signature inputs instead of reimplementing a disconnected algorithm.
+- All nine transactional scenarios now render through a unified, email-client-safe HTML system
+  with a consistent brand frame, readable hierarchy, structured details, and clear notices. The
+  non-editable password-changed and payment-failed messages are included; the payment-failed
+  template remains reserved for provider-authoritative payment-failure events.
 
 ## Explicitly out of scope
 
-- **`PasswordChangedEmail` and `PaymentFailedEmail`** — neither has an `EmailTemplateType`
-  slot (`EMAIL_TEMPLATE_TYPES` has exactly 7 values, matching the 7 wired here).
-  `PaymentFailedRenderer` is also still fully dead code (not called by anything, per its own
-  docblock) — unrelated to this story, not touched.
-- **`RefundEmail` has no CTA button** — a pre-existing mismatch between the domain model
-  (which requires `ctaLabel` non-empty for every type uniformly, including "refund") and the
-  actual renderer (which never had a button in its design). Admins can still fill in
-  `ctaLabel` for the refund template — the domain validation doesn't know it won't render —
-  but `RefundEmail.tsx`'s `ctaLabelOverride` prop is accepted (for interface consistency
-  with the other 6) and simply has nothing to apply to. Not fixed here: adding a button
-  would be a new UI element this story didn't ask for, not a wiring fix.
-- **`{{placeholder}}` interpolation inside custom copy** — see "What `EmailTemplate` actually
-  customizes" above. Not needed for the wiring goal; would be new functionality.
+- **`PasswordChangedEmail` and `PaymentFailedEmail` are not admin-editable** — neither has an
+  `EmailTemplateType` slot (`EMAIL_TEMPLATE_TYPES` intentionally has exactly 7 values). Both
+  use the shared HTML system; payment-failed delivery remains provider-authoritative, and its
+  message copy is intentionally application-controlled.
 - **A dedicated unit test for `sendReceiptEmail()`'s template-override branch** — the
   webhook route handler had zero unit test coverage of this function before this story
   (a pre-existing gap, not introduced here); the other 4 tested call sites (verification,

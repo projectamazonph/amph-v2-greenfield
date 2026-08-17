@@ -3,7 +3,7 @@
  *
  * Like ListCourses, but enriches each course with module metadata
  * from the Module table (module count, total lesson count, total
- * estimated video duration). This data comes from the Module+Lesson
+ * estimated learner time). This data comes from the Module+Lesson
  * tables populated by the STORY-013 import script, not from the
  * embedded Course.curriculum JSON.
  *
@@ -143,18 +143,10 @@ export class ListCatalogCourses {
         const lessons: Lesson[] = [...lessonResult.value];
         totalLessons += lessons.length;
 
-        // Sum estimatedMinutes from video lessons
+        // Sum planned learner time across every lesson type.
         let moduleMinutes = 0;
         for (const lesson of lessons) {
-          if (
-            lesson.type === "VIDEO" &&
-            typeof lesson.content === "object" &&
-            lesson.content !== null &&
-            "durationMinutes" in lesson.content
-          ) {
-            const dm = (lesson.content as { durationMinutes: number }).durationMinutes;
-            moduleMinutes += dm;
-          }
+          moduleMinutes += lesson.plannedMinutes;
         }
         totalMinutes += moduleMinutes;
 

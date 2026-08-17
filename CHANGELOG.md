@@ -4,17 +4,116 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
-### 2026-08-17: Curriculum voice stabilization — Phase 3 first half: Modules 2-3 (STORY-107)
+### 2026-08-17: Curriculum voice stabilization. Phase 3 first half: Modules 2-3 (STORY-107)
 
-- `content/curriculum/modules/2-keyword-research/2.2-keyword-research-workflow.mdx`: dropped 5 blockquote-header artifacts (`> **Analogy:**`, `> **Tip:**`) and converted each into inline prose that opens with the work, not the metaphor (the fishing-lake analogy, the budget tip, the alphabet-soup tip, the relevance tip, and the toolbox analogy are now integrated into the surrounding body text). Sentence at line 177 split to honor the 30-word ceiling. Filipino context normalization: `$10/day` → `₱500/day`, `₱14,000 over 4 weeks` added.
-- `content/curriculum/modules/2-keyword-research/2.4-keyword-grouping.mdx`: dropped 5 blockquote-header artifacts (`> **Analogy:**`, `> **Tip:**`) — hardware-store analogy, split-the-group tip, three-teams analogy, material-bids tip, and the second material-bids tip — converted each to inline prose. Filipino context normalization: `$30 yoga mat` → `₱1,500 yoga mat`.
-- `content/curriculum/modules/3-listing-optimization/3.1-listing-quality-score.mdx`: dropped 3 blockquote-header artifacts (food-stalls analogy, fix-listing-first tip, car-tuneup analogy), converted to inline prose. Three long sentences tightened (lines 13, 19, 201) to honor the 30-word ceiling. Filipino context normalization: `$24.99` → `₱1,250`, `$0.52/$0.89` → `₱26/₱45`, `$15.99` → `₱800`, `$0.68` → `₱34`, `$0.89/$0.52` → `₱45/₱26`.
-- `content/curriculum/modules/3-listing-optimization/3.2-listing-anatomy.mdx`: dropped 5 blockquote-header artifacts (storefront analogy, write-naturally tip, salesperson analogy, infographic tip, defensive-ASIN tip), converted to inline prose. Six long sentences tightened (lines 13, 17, 62, 197, 219, 227) to honor the 30-word ceiling. Filipino context normalization: `$19.99` → `₱1,000`.
-- `content/curriculum/modules/3-listing-optimization/3.3-aplus-content.mdx`: dropped 2 blockquote-header artifacts (flyer-vs-brochure analogy, website-upgrade analogy), converted to inline prose. Four long sentences tightened (lines 13, 17, 136, 160) to honor the 30-word ceiling. Filipino context normalization: `$0.75` → `₱38 CPC`, `$19.99/$29.99/$39.99/$79.99` → `₱1,000/₱1,500/₱2,000/₱4,000`, `$22` → `₱1,100`, `$0.60` → `₱30`, `$0.07×$22` → `₱0.07×₱1,100`, `$60,000/month` → `₱60,000/month` work-example math.
-- `scripts/_audit-sentence-length.cjs` (new): Node CommonJS script that scans 5 MDX files (Modules 2-3 lessons) for body-prose sentences over 30 words, skipping frontmatter, code blocks (tracks ``` state), tables, headings, lists, and blockquotes. Renamed from `.js` to `.cjs` because the repo's `package.json` declares `"type": "module"` and the script uses CommonJS `require()`. Final pass: zero over-30-word sentences in body prose. Reference metadata inside `Fact card` blocks (2.2 line 225, 2.4 line 218) is intentionally left intact — those are structured reference cards with field-style metadata, not body prose, so the voice guide's sentence-length rule does not apply.
+- `content/curriculum/modules/2-keyword-research/2.2-keyword-research-workflow.mdx`: dropped 5 blockquote-header artifacts (`> **Analogy:**`, `> **Tip:**`) and converted each into inline prose that opens with the work, not the metaphor (the fishing-lake analogy, the budget tip, the alphabet-soup tip, the relevance tip, and the toolbox analogy are now integrated into the surrounding body text). Sentence at line 177 split to honor the 30-word ceiling. Filipino context normalization: `$10/day` becomes `₱500/day`, `₱14,000 over 4 weeks` added.
+- `content/curriculum/modules/2-keyword-research/2.4-keyword-grouping.mdx`: dropped 5 blockquote-header artifacts (`> **Analogy:**`, `> **Tip:**`). Hardware-store analogy, split-the-group tip, three-teams analogy, material-bids tip, and the second material-bids tip converted to inline prose. Filipino context normalization: `$30 yoga mat` becomes `₱1,500 yoga mat`.
+- `content/curriculum/modules/3-listing-optimization/3.1-listing-quality-score.mdx`: dropped 3 blockquote-header artifacts (food-stalls analogy, fix-listing-first tip, car-tuneup analogy), converted to inline prose. Three long sentences tightened (lines 13, 19, 201) to honor the 30-word ceiling. Filipino context normalization: `$24.99` becomes `₱1,250`, `$0.52/$0.89` becomes `₱26/₱45`, `$15.99` becomes `₱800`, `$0.68` becomes `₱34`, `$0.89/$0.52` becomes `₱45/₱26`.
+- `content/curriculum/modules/3-listing-optimization/3.2-listing-anatomy.mdx`: dropped 5 blockquote-header artifacts (storefront analogy, write-naturally tip, salesperson analogy, infographic tip, defensive-ASIN tip), converted to inline prose. Six long sentences tightened (lines 13, 17, 62, 197, 219, 227) to honor the 30-word ceiling. Filipino context normalization: `$19.99` becomes `₱1,000`.
+- `content/curriculum/modules/3-listing-optimization/3.3-aplus-content.mdx`: dropped 2 blockquote-header artifacts (flyer-vs-brochure analogy, website-upgrade analogy), converted to inline prose. Four long sentences tightened (lines 13, 17, 136, 160) to honor the 30-word ceiling. Filipino context normalization: `$0.75` becomes `₱38 CPC`, `$19.99/$29.99/$39.99/$79.99` becomes `₱1,000/₱1,500/₱2,000/₱4,000`, `$22` becomes `₱1,100`, `$0.60` becomes `₱30`, `$0.07×$22` becomes `₱0.07×₱1,100`, `$60,000/month` becomes `₱60,000/month` work-example math.
+- `scripts/_audit-sentence-length.cjs` (new): Node CommonJS script that scans 5 MDX files (Modules 2-3 lessons) for body-prose sentences over 30 words, skipping frontmatter, code blocks (tracks ``` state), tables, headings, lists, and blockquotes. Renamed from `.js` to `.cjs` because the repo's `package.json` declares `"type": "module"` and the script uses CommonJS `require()`. Final pass: zero over-30-word sentences in body prose. Reference metadata inside `Fact card` blocks (2.2 line 225, 2.4 line 218) is intentionally left intact. Those are structured reference cards with field-style metadata, not body prose, so the voice guide's sentence-length rule does not apply.
 - Phase 3 second half (Modules 4, 5, 6, 7, 8 voice stabilization) is queued for the next curriculum-cycle PR. The audit's full survey counted ~70 blockquote-header violations across 19 lessons; Modules 4-8 still need the same drop + context-normalize pass.
 
-### 2026-08-16: Student-facing UI round 28 — drop dead `box-shadow` transition term on Button + 6 button-like classes (Field Manual §5) (PR #TBD)
+### LEARN-024: Finish Module 3 with listing-audit rationales
+
+- Require an evidence-backed listing-readiness decision in every Module 3
+  lesson, including the recommendation, reason, and next validation check.
+
+### LEARN-023 — Turn Module 2 keyword lessons into grouping decisions
+
+- Add a concrete grouping decision and rationale output to each Keyword Research
+  lesson, connecting match types, negatives, and themes to a reusable keyword map.
+
+### LEARN-022 — Add independent calculations to Module 1
+
+- Label a fresh calculation/diagnosis step in every quantitative Module 1
+  lesson, separating the worked example from the learner's own attempt.
+
+### LEARN-021 — Complete Module 0 onboarding lesson pass
+
+- Add the missing decision, active attempt, feedback, and worked-example blocks
+  to the first two onboarding lessons.
+- Reconcile the welcome lesson with the current two-course offer so a beginner
+  is not taught an unavailable Ultimate Transformation tier.
+
+### LEARN-020 — Define the lintable lesson production contract
+
+- Add a non-blocking lesson-production report (with opt-in `--strict` mode) for
+  outcomes, decisions, worked examples, active attempts, feedback, evidence,
+  and retrieval cues.
+- Upload the JSON gap report from the Learning release gate so module passes
+  can close explicit content gaps instead of relying on prose review alone.
+
+### LEARN-006 — Repair lesson content spacing and responsive layout
+
+- Give Markdown tables a readable, aligned treatment that contains overflow on
+  narrow screens instead of widening the entire lesson page.
+- Normalize lesson block spacing and wrap long code, images, blockquotes, and
+  quiz prompts so content does not overlap or escape the reading column.
+
+### LEARN-004 — Truthful public loading and availability states
+
+- Render reviewed programme statistics immediately on the server so count-up
+  animation never exposes a fabricated zero to visitors, screen readers, or
+  no-JavaScript clients.
+- Keep public simulator preview and enrolled practice labels explicit and add
+  contract tests for the accessible server-rendered summary.
+
+### 2026-08-16: Reconcile public curriculum and certificate claims (LEARN-003)
+
+- Landing curriculum, tier cards, programme statistics, and simulator availability now read a
+  reviewed `content/curriculum/public-claims.json` contract.
+- A contract test joins those claims to the 31 MDX lessons and 361 planned minutes, so source
+  changes cannot silently leave stale public counts or tier/tool promises.
+- Certificate copy now describes completion evidence and explicitly avoids employment or
+  job-readiness guarantees; simulator practice is labelled formative.
+
+### 2026-08-16: Persist planned learner time across lesson surfaces (LEARN-002)
+
+- `Lesson.plannedMinutes` is now a persisted, type-agnostic learner-time contract with a
+  Prisma migration that backfills legacy video rows from their media duration.
+- Catalog lists, course detail, lesson headers, and lesson sidebars read the same planned value;
+  text and quiz lessons no longer disappear from course-time totals.
+- Negative and fractional planned durations are rejected at the domain boundary, while legacy
+  callers retain a safe default until their source content is re-imported.
+
+### 2026-08-16: P1 — simulator scenarios missing in production (readiness probe + production seed + runbook + e2e)
+
+Production students hit the generic "Something went wrong" page on every `/tools/<simulator>` route when the `SimulatorScenario` table has no row with `status='published'` for the simulator id. `StartSimulatorAttempt` fails with `scenario_not_found` and the error bubbles up to Next.js's error boundary. Without a probe, this only surfaces from a user report.
+
+This PR ships these coordinated fixes:
+
+- `src/app/api/health/ready/route.ts`: extended the readiness probe to assert every simulator registered in `SimulatorRegistry` has a published `SimulatorScenario` row. When the DB ping succeeds but a registered simulator is missing its published row, the probe returns `503` with `status: "missing_scenarios"` and a `missing: [<simulatorId>, ...]` array so the on-call engineer can identify the affected simulators without re-reading the codebase. Transient `findPublished` errors after a successful ping still surface as `503 unavailable` so real DB errors are not papered over as missing data.
+- `src/app/api/health/ready/__tests__/route.test.ts` (3 new tests): the `missing_scenarios` 503 path, the `200 ok` control when every registered simulator has a published row, and the DB-failure short-circuit that proves the scenario check only runs after a successful ping. Tests count: 6 passed (was 3).
+- `vercel.json`: production build command now chains `pnpm db:seed:scenarios` after `pnpm prisma:deploy` (before `pnpm build`), gated on `$VERCEL_ENV = "production"`. The seed is idempotent (upsert on `id`), so re-running is safe. The `&&` chain aborts the build on seed failure so a misconfigured scenario list cannot ship to students. Pairs with the readiness probe to catch the issue from both the build and deploy angles.
+- `docs/runbooks/simulator-scenario-missing.md` (new, 90 lines): operator procedure for the production simulator outage — Symptoms, Diagnosis (curl the probe, list published rows directly), Mitigation (run `pnpm db:seed:scenarios` against production), Resolution (the `vercel.json` build hook above), Verification (probe green + every simulator route renders for an authenticated student), Postmortem (root-cause classification and CI guardrail hooks).
+- `docs/runbooks/README.md`: indexed the new runbook, bumped the "Reviewed" date to 2026-08-16, and added the operational note that `/api/health/ready` returns 503 `missing_scenarios` when the `SimulatorScenario` table lacks a published row for any registered simulator.
+- `tests/e2e/simulator-access.spec.ts` (new, 1 test, 135 lines): recovered from dangling commit `cff4c98` via `git reflog`. Drives the full student flow from `/signup` through `/tools` into each simulator page and submits a graded `bid-elevator` attempt so a future scenario-not-found regression fails the e2e suite before it reaches production. Serial mode (same constraint as `critical-journeys.spec.ts`); gates on `DATABASE_URL` so it does not run in the local pre-DB unit-test environment.
+- `.github/workflows/ci.yml`: the e2e job now runs `pnpm db:seed:scenarios` and `pnpm db:seed:policies` between `prisma generate` and `pnpm build`. The pages require published scenarios, while graded submission also requires a matching score policy. Without both seeds, the new `simulator-access.spec.ts` fails with either `scenario_not_found` before the page mounts or `policy_not_found` after submission. Both scripts use idempotent upserts, so CI reruns are safe.
+
+### 2026-08-16: Complete editable transactional email templates (STORY-095.5)
+
+- Admin email templates now support documented, type-specific `{{variables}}` in the subject,
+  headline, intro body, and CTA label. Unsupported or malformed variables are rejected before
+  saving, and the form returns the exact validation message.
+- All seven transactional paths resolve those values at send time: verification, password reset,
+  welcome, receipt, refund, certificate, and live-class reminders. Uncustomized messages keep
+  their original copy.
+- Refund confirmations now render the editable CTA label with a safe dashboard destination.
+- Resend webhook verification now uses the provider's Svix headers and raw payload contract,
+  with a replay-tolerance check and direct regression tests for valid, invalid, stale, tampered,
+  and multi-signature requests.
+- All nine transactional messages share a polished, email-client-safe HTML layout with structured
+  detail cards, accessible hierarchy, and clear action or security notices. The password-changed
+  and payment-failed templates are included for provider-authoritative use.
+### 2026-08-16: Student-facing UI round 29 — QuizEditor question/option text inputs ship real `<label>` instead of `aria-label` override (WCAG 3.3.2 / 4.1.2) (PR #379)
+
+- `src/components/admin/QuizEditor.tsx`: the question text input no longer carries `aria-label={`Question ${qIndex + 1} text`}`. The interim fix used `aria-label` to satisfy the WCAG 3.3.2 *Labels or Instructions* audit, but `aria-label` is a screen-reader-only patch — sighted keyboard/mouse users cannot click the label to focus the input, voice-control software (Dragon, Voice Control) cannot say "click Question 1 text", browser autofill heuristics prefer real `<label>`, and every a11y lint tool (eslint-plugin-jsx-a11y/label-has-associated-control) checks for the `<label>` association. Round 29 replaces the `aria-label` override with a proper `<label className="sr-only" htmlFor={`q-${qIndex}-text`}>Question {qIndex + 1} text</label>` so the accessible name comes from the canonical `<label>` mechanism. The visible "Q{n}" badge stays as `<label aria-hidden>` so it remains a row marker without competing for the screen-reader announcement. WCAG 3.3.2 / 4.1.2.
+- `src/components/admin/QuizEditor.tsx`: same fix on the per-option text input. The `aria-label={`Option ${oIndex + 1} text for question ${qIndex + 1}`}` override is removed; the row gets a proper `<label className="sr-only" htmlFor={`q-${qIndex}-opt-${oIndex}-text`}>Option {oIndex + 1} text for question {qIndex + 1}</label>`. The radio button that toggles "this is the correct option" keeps its `aria-label` because it has no visible text to associate with. WCAG 3.3.2 / 4.1.2.
+- The placeholder stays as an inline hint on both inputs (not the only label). The `<input>` already had `id={`q-${qIndex}-text`}` / `id={`q-${qIndex}-opt-${oIndex}-text`}` so the `<label htmlFor>` is wire-correct. Both fixes ship an M-R29 doc block citing WCAG 3.3.2 and 4.1.2 so future maintainers don't reintroduce the `aria-label` override.
+- `src/components/admin/__tests__/QuizEditor-r29-labels.test.ts` (new, 7 tests): source-string assertions that pin the WCAG contract on both inputs. The test asserts (1) the question text input has no `aria-label={`Question ...`}` on its element; (2) the sr-only `<label htmlFor={`q-${qIndex}-text`}>Question {qIndex + 1} text</label>` is present; (3) the visible Q{n} badge is `<label aria-hidden>`; (4) the option text input has no `aria-label={`Option ...`}` on its element; (5) the sr-only `<label htmlFor={`q-${qIndex}-opt-${oIndex}-text`}>Option ...` is present; (6) the radio button keeps its `aria-label={`Mark option ... as correct for question ...`}` since it has no visible label to associate with; (7) the M-R29 doc blocks cite WCAG 3.3.2 and 4.1.2. Mirrors the source-string pattern from rounds 16-28. Tests count: 4,102 passed (was 4,094; +8 from round 29; +1 from UserCard logout touch-target fix that landed in parallel).
+
+### 2026-08-16: Student-facing UI round 28 — drop dead `box-shadow` transition term on Button + 6 button-like classes (Field Manual §5) (PR #378)
 
 - `src/components/ui/Button.module.css` `.btn`: the `transition` declaration no longer carries a trailing `, box-shadow var(--duration-fast) var(--ease-out)` term. There is no `box-shadow` declaration anywhere on the design-system Button (the 1px `border: 1px solid transparent` is the only elevation), so the `box-shadow` transition term was dead code animating nothing. Dropping it removes ~50 bytes of CSS and an unnecessary paint pass per hover transition. The remaining `transition` is `background` + `transform` only — both properties the Button actually animates on `:hover` (per-variant hover bg step) and `:active` (`translateY(-1px)` tactile press).
 - `src/app/dashboard/page.module.css` `.continueBtn`: same fix — the trailing `, box-shadow var(--duration-base) var(--ease-out)` transition term is removed, and the redundant `box-shadow: none;` freeze on `.continueBtn:hover` is removed. The button's `transition: background-color ...` is the only thing the button needs; the freeze was a no-op (there was no box-shadow to freeze).

@@ -35,6 +35,7 @@ import type { EmailVerificationRenderer } from "@/ports/email/EmailVerificationR
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
+import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
 
 export type ResendVerificationInput = { userId: string };
 export type ResendVerificationOutput = { sent: true; retryAfter: Date };
@@ -119,16 +120,23 @@ export class ResendVerification {
     const verifyUrl = this.buildVerifyUrl(rawToken);
     const templateResult = await this.deps.emailTemplateRepo.findByType("email_verification");
     const template = templateResult.ok ? templateResult.value : null;
+    const resolvedTemplate = template
+      ? interpolateEmailTemplate(template, {
+          firstName: user.firstName,
+          verificationUrl: verifyUrl,
+          expiresInHours: String(TOKEN_TTL_HOURS),
+        })
+      : null;
     const sendResult = await this.deps.emailSender.send({
       to: user.email,
-      subject: template?.subject ?? "Verify your Project Amazon PH Academy email",
+      subject: resolvedTemplate?.subject ?? "Verify your Project Amazon PH Academy email",
       react: this.deps.verificationEmailRenderer.render({
         firstName: user.firstName,
         verificationUrl: verifyUrl,
         expiresInHours: TOKEN_TTL_HOURS,
-        headlineOverride: template?.headline,
-        introBodyOverride: template?.introBody,
-        ctaLabelOverride: template?.ctaLabel,
+        headlineOverride: resolvedTemplate?.headlineOverride,
+        introBodyOverride: resolvedTemplate?.introBodyOverride,
+        ctaLabelOverride: resolvedTemplate?.ctaLabelOverride,
       }),
     });
     if (!sendResult.ok) {

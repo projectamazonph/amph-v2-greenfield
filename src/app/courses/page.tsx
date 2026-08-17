@@ -160,7 +160,7 @@ function CourseCard({
               {estimatedMinutes > 0 && (
                 <span>
                   {hours > 0 ? `${hours}h ` : ""}
-                  {minutes}m video
+                  {minutes}m learning time
                 </span>
               )}
             </>

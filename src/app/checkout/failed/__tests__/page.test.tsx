@@ -7,10 +7,27 @@ import { describe, it, expect, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
+import { Children, isValidElement, type ReactNode } from "react";
 import { renderToString } from "react-dom/server";
 import FailedPage from "../page";
 
+function componentNames(node: ReactNode): string[] {
+  if (!isValidElement<{ children?: ReactNode }>(node)) return [];
+  const ownName = typeof node.type === "function" ? node.type.name : "";
+  return [ownName, ...Children.toArray(node.props.children).flatMap(componentNames)].filter(
+    Boolean,
+  );
+}
+
 describe("/checkout/failed", () => {
+  it("treats the PayMongo return URL as display-only", async () => {
+    const page = await FailedPage({ searchParams: Promise.resolve({ orderId: "ord_1" }) });
+
+    // A redirect from hosted checkout is not provider proof of a final payment state.
+    // The page must not mount a component that can mutate the order or send email.
+    expect(componentNames(page)).not.toContain("PaymentFailureNotifier");
+  });
+
   it("renders the failure title and a Try-again CTA", async () => {
     const html = renderToString(
       await FailedPage({ searchParams: Promise.resolve({ orderId: "ord_1" }) }),

@@ -4,8 +4,14 @@
  * STORY-045: EmailSender port + React Email templates.
  */
 
-import { Button, Heading, Section, Text } from "@react-email/components";
-import { EmailLayout } from "./EmailLayout";
+import { Button, Heading, Text } from "@react-email/components";
+import {
+  EmailDetail,
+  EmailDetailsCard,
+  EmailLayout,
+  EmailNotice,
+  emailStyles,
+} from "./EmailLayout";
 import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface LiveClassReminderEmailProps extends EmailTemplateOverride {
@@ -45,70 +51,28 @@ export function LiveClassReminderEmail({
 
   return (
     <EmailLayout preview={`${classTitle} starts in ${timeLabel}`} eyebrow="Live class reminder">
-      <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
+      <Heading as="h1" style={emailStyles.title}>
         {headlineOverride ?? `Your live class starts in ${timeLabel}, ${firstName}`}
       </Heading>
-      <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
+      <Text style={emailStyles.body}>
         {introBodyOverride ??
           "Get ready to join us. Make sure you have a stable internet connection and a quiet space for the next hour or two."}
       </Text>
 
-      <Section
-        style={{
-          backgroundColor: "#F4F3EE",
-          padding: "20px",
-          borderRadius: "6px",
-          margin: "0 0 24px 0",
-        }}
-      >
-        <Text
-          style={{
-            margin: "0 0 4px 0",
-            fontSize: "12px",
-            color: "#737373",
-            textTransform: "uppercase",
-          }}
-        >
-          Class
-        </Text>
-        <Text style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: 600, color: "#1a365d" }}>
-          {classTitle}
-        </Text>
-        <Text
-          style={{
-            margin: "0 0 4px 0",
-            fontSize: "12px",
-            color: "#737373",
-            textTransform: "uppercase",
-          }}
-        >
-          Starts
-        </Text>
-        <Text style={{ margin: 0, fontSize: "15px", color: "#171717" }}>
-          {formatStartsAt(startsAt)}
-        </Text>
-      </Section>
+      <EmailDetailsCard>
+        <EmailDetail label="Class">{classTitle}</EmailDetail>
+        <EmailDetail label="Starts">{formatStartsAt(startsAt)}</EmailDetail>
+        <EmailDetail label="Time remaining">{timeLabel}</EmailDetail>
+      </EmailDetailsCard>
 
-      <Button
-        href={joinUrl}
-        style={{
-          backgroundColor: "#FF6B35",
-          color: "#ffffff",
-          fontSize: "15px",
-          fontWeight: 600,
-          textDecoration: "none",
-          padding: "12px 24px",
-          borderRadius: "6px",
-          display: "inline-block",
-        }}
-      >
+      <Button href={joinUrl} style={emailStyles.button}>
         {ctaLabelOverride ?? "Join Live Class"}
       </Button>
 
-      <Text style={{ margin: "24px 0 0 0", color: "#737373", fontSize: "13px" }}>
+      <EmailNotice>
         The join link becomes active 10 minutes before the start time. If you have trouble joining,
         reply to this email.
-      </Text>
+      </EmailNotice>
     </EmailLayout>
   );
 }

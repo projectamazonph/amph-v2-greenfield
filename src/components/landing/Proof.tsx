@@ -2,6 +2,9 @@ import React from "react";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./Proof.module.css";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
+
+const CERTIFICATE_HEADLINE = `${PUBLIC_CURRICULUM_CLAIMS.certificate.label} that records the work.`;
 
 export function Proof() {
   return (
@@ -11,13 +14,13 @@ export function Proof() {
           <div className={shared.stickyCol}>
             <span className={shared.secNum}>§07 / WHAT YOU CAN SHOW</span>
             <h2 className={shared.secTitle}>
-              A certificate that opens doors, not one that sits idle.
+              {CERTIFICATE_HEADLINE}
             </h2>
           </div>
           <p className={shared.secLede}>
-            On completion you get a certificate listed on your profile and{" "}
-            <b>recognized by our hiring team</b>, plus the artefacts below: real, reviewable work
-            a hiring manager or client can open and judge for themselves.
+            On completion you get a certificate listed on your profile plus the artefacts below:
+            real, reviewable work a hiring manager or client can open and judge for themselves.
+            {" "}{PUBLIC_CURRICULUM_CLAIMS.certificate.claim}
           </p>
         </div>
 

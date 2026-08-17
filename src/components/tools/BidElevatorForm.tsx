@@ -89,12 +89,16 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
       </div>
       <div className={styles.tableScroll} role="region" aria-label="Bid inputs" tabIndex={0}>
         <table className={styles.table}>
+          {/* M-R30 fix: scope="col" on every header so screen readers
+              associate cells with their column header (WCAG 1.3.1).
+              The parent role="region" aria-label="Bid inputs" supplies
+              the accessible name. */}
           <thead>
             <tr>
-              <th>Keyword</th>
-              <th className={styles.thNum}>Impr/day</th>
-              <th className={styles.thNum}>Benchmark CPC</th>
-              <th className={styles.thNum}>Your bid</th>
+              <th scope="col">Keyword</th>
+              <th scope="col" className={styles.thNum}>Impr/day</th>
+              <th scope="col" className={styles.thNum}>Benchmark CPC</th>
+              <th scope="col" className={styles.thNum}>Your bid</th>
             </tr>
           </thead>
           <tbody>

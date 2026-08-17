@@ -8,8 +8,8 @@
  * them share the public verification page.
  */
 
-import { Button, Heading, Section, Text } from "@react-email/components";
-import { EmailLayout } from "./EmailLayout";
+import { Button, Heading, Text } from "@react-email/components";
+import { EmailDetail, EmailDetailsCard, EmailLayout, emailStyles } from "./EmailLayout";
 import type { EmailTemplateOverride } from "@/ports/email/EmailTemplateOverride";
 
 export interface CertificateEmailProps extends EmailTemplateOverride {
@@ -33,10 +33,10 @@ export function CertificateEmail({
       preview={`Your certificate for ${courseTitle} is ready`}
       eyebrow="Course completed"
     >
-      <Heading as="h1" style={{ fontSize: "22px", margin: "0 0 16px 0", color: "#171717" }}>
+      <Heading as="h1" style={emailStyles.title}>
         {headlineOverride ?? `Congratulations, ${firstName}!`}
       </Heading>
-      <Text style={{ margin: "0 0 24px 0", color: "#404040" }}>
+      <Text style={emailStyles.body}>
         {introBodyOverride ?? (
           <>
             You completed <strong>{courseTitle}</strong>. Your certificate of completion is attached
@@ -45,56 +45,27 @@ export function CertificateEmail({
         )}
       </Text>
 
-      <Section
-        style={{
-          backgroundColor: "#F4F3EE",
-          padding: "20px",
-          borderRadius: "6px",
-          margin: "0 0 24px 0",
-          textAlign: "center",
-        }}
-      >
-        <Text
-          style={{
-            margin: "0 0 8px 0",
-            fontSize: "12px",
-            color: "#737373",
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-          }}
-        >
-          Verification hash
-        </Text>
-        <Text
-          style={{
-            margin: 0,
-            fontSize: "13px",
-            color: "#1a365d",
-            fontFamily: "monospace",
-            wordBreak: "break-all",
-          }}
-        >
-          {verificationHash}
-        </Text>
-      </Section>
+      <EmailDetailsCard>
+        <EmailDetail label="Course">{courseTitle}</EmailDetail>
+        <EmailDetail label="Verification hash">
+          <span
+            style={{
+              color: "#1A365D",
+              fontFamily: "monospace",
+              fontSize: "13px",
+              wordBreak: "break-all",
+            }}
+          >
+            {verificationHash}
+          </span>
+        </EmailDetail>
+      </EmailDetailsCard>
 
-      <Button
-        href={verifyUrl}
-        style={{
-          backgroundColor: "#FF6B35",
-          color: "#ffffff",
-          fontSize: "15px",
-          fontWeight: 600,
-          textDecoration: "none",
-          padding: "12px 24px",
-          borderRadius: "6px",
-          display: "inline-block",
-        }}
-      >
+      <Button href={verifyUrl} style={emailStyles.button}>
         {ctaLabelOverride ?? "View Public Certificate"}
       </Button>
 
-      <Text style={{ margin: "24px 0 0 0", color: "#737373", fontSize: "13px" }}>
+      <Text style={emailStyles.muted}>
         Share your public certificate link with employers, on LinkedIn, or wherever you want to
         showcase your accomplishment. Anyone with the link can verify it.
       </Text>
