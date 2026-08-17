@@ -10,6 +10,35 @@ This is a read-only audit. All findings are reproduced with verified file paths,
 
 ---
 
+## Updates since 2026-08-14 audit
+
+All 9 Critical findings (C-01 through C-09) have been remediated in subsequent rounds. Each item below maps the audit bullet to the PR and commit that closed it.
+
+1. **C-01** (skip-link in root layout, WCAG 2.4.1). Closed by **PR #316**, commit `6c61fc3`. `src/app/layout.tsx` now renders `<a href="#main-content" className="skip-link">Skip to main content</a>` as the first focusable element of the document body.
+2. **C-02** (QuizEditor shared `aria-label` on radios, WCAG 1.3.1 / 4.1.2). Closed by **PR #324**, commit `5419ea1`. Every "mark as correct" radio now carries `aria-label={\`Mark option ${oIndex + 1} as correct for question ${qIndex + 1}\`}`, keyed to both indices.
+3. **C-03** (QuizEditor missing `<label>`, WCAG 3.3.2 / 4.1.2). Closed by **PR #379**, commit `ba92d5a`. Real `<label htmlFor=...>` elements now wrap each option input; the row layout uses an `sr-only` style class.
+4. **C-04** (CampaignBuilderForm fields rely on placeholders, WCAG 3.3.2 / 4.1.2). Closed by **PR #334**, commit `ae5c1be`. Every field in `src/components/tools/CampaignBuilderForm.tsx` now has an associated `<label htmlFor=...>`.
+5. **C-05** (UserCard 30x30 logout button, WCAG 2.5.5). Closed by **PR #324**, commit `5419ea1`. `.logoutButton` in `src/components/admin/UserCard.module.css` now declares `min-width: 44px; min-height: 44px;`.
+6. **C-06** (ConfirmSubmitButton uses `window.confirm`, WCAG 2.1.1 / 4.1.2). Closed by **PR #316**, commit `6c61fc3`. Replaced with the Astryx `Dialog` primitive (`<Dialog purpose="required" ...>`) and `form.requestSubmit()` to defer to the enclosing `<form action=...>`.
+7. **C-07** (Skeleton variants lack `aria-busy`, WCAG 4.1.3). Closed by **PR #324** (`5419ea1`) and **PR #328** (`0c5df08`). All six wrappers (`SkeletonText`, `SkeletonRow`, `SkeletonCard`, `SkeletonTable`, `SkeletonStatTile`, `SkeletonForm`) now carry `aria-busy="true"`, `role="status"`, and `aria-live="polite"`. `SkeletonBlock` remains decorative (`aria-hidden="true"`).
+8. **C-08** (data tables lack captions + scope, WCAG 1.3.1). Closed by **PR #380**, commit `c1e1870`. `<Table>` now renders a `<figcaption>` from the `caption` prop and `<th scope="col">` / `<th scope="row">` on its header cells.
+9. **C-09** (`var(--brand)` falls through to `currentColor`, design system regression). Closed by **PR #257**, commit `f135a84`. All references updated to `var(--accent)` (Waybill Orange, `#FF6B35`).
+
+### Contract pin tests added in round 32 (this PR)
+
+The four Critical findings that lacked a regression-pinning test now have one. Each is a source-string contract test (mirrors rounds 16–31):
+
+- `src/components/admin/__tests__/QuizEditor-r32-radios-unique-label.test.ts` — pins C-02 (unique interpolated `aria-label` on every radio).
+- `src/components/admin/__tests__/UserCard-r32-touch-target.test.ts` — pins C-05 (44×44 logout button).
+- `src/components/admin/__tests__/ConfirmSubmitButton-r32-dialog.test.ts` — pins C-06 (Astryx `Dialog`, no `window.confirm`, explicit button types, `form.requestSubmit()`).
+- `src/components/ui/__tests__/Skeleton-r32-aria-busy.test.ts` — pins C-07 (six variant wrappers carry `aria-busy` + `role="status"` + `aria-live="polite"`; `SkeletonBlock` remains `aria-hidden`).
+
+The remaining Critical findings (C-01, C-03, C-04, C-08, C-09) were already locked by prior round tests (see `src/app/__tests__/round30-*`, `src/components/admin/__tests__/QuizEditor-r29-labels.test.ts`, `src/components/admin/__tests__/UserCard.test.tsx`).
+
+High findings (H-01 through H-18) are still open and tracked separately in `docs/UI-ACCESSIBILITY-AUDIT-2026-08-14.md` and `docs/STUDENT-FEATURE-GAP-ANALYSIS.md`.
+
+---
+
 ## Executive Summary
 
 The codebase shows a clean token system and a coherent Field Manual aesthetic in *most* shared components, but execution drifts from the spec in several recurring ways:
