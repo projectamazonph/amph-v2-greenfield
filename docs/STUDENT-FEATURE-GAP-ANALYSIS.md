@@ -1,10 +1,12 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-16 against the student-facing UI round 29 branch (PR #TBD)
+**Last verified:** 2026-08-17 against the curriculum voice stabilization (STORY-107 Phase 3 first half) branch (PR #TBD)
 
 **Repository:** `amph-v2-greenfield`
 
 **Implementation story:** `docs/stories/STORY-104.md`
+
+**Curriculum tone remediation:** `docs/stories/STORY-107.md` (Phase 3 first half shipped 2026-08-17: voice template + $→₱ applied to all 5 Module 2 and Module 3 lessons; Phase 3 second half queued for Modules 4, 5, 6, 7, 8).
 
 This report replaces the 2026-08-01 gap queue. The previous open student
 journey gaps were checked against the current routes, server actions, use cases,

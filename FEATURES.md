@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-16 against the learning-experience uplift branch (PR #TBD)
+**Last reviewed:** 2026-08-17 against the curriculum voice stabilization branch (PR #TBD)
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
 
@@ -41,6 +41,8 @@ Password-reset and transactional links use the configured application origin. Th
 - Admin course, module, and lesson CRUD is available under `/admin/courses`.
 
 The public catalog and pricing pages deliberately render an empty-state message when no published course or active pricing rows have been seeded. `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01) — the placeholder is gone.
+
+Curriculum voice stabilization: Phase 3 first half (STORY-107, 2026-08-17) drops the `> **Analogy:**` and `> **Tip:**` blockquote-header pattern across 5 Module 2 and Module 3 lessons (2.2, 2.4, 3.1, 3.2, 3.3). Each drop integrates the metaphor or tip into the surrounding inline prose so the lesson opens with the work, not the frame. Sentence length is held to the 30-word ceiling per the voice guide, and Filipino context (₱ currency) replaces USD. Phase 3 second half (Modules 4-8) is queued.
 
 Student-facing actions, routes, and event controls have direct boundary tests.
 See `docs/STUDENT-EVENT-COVERAGE.md` for the inventory and future test contract.
