@@ -10,6 +10,7 @@
 import styles from "./BidElevatorResult.module.css";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
+import { SimulatorNextRep } from "./SimulatorNextRep";
 
 interface Props {
   result: BidElevatorOutput;
@@ -125,6 +126,7 @@ export function BidElevatorResult({ result, targetRoas, xpAwarded }: Props) {
           </tbody>
         </table>
       </div>
+      <SimulatorNextRep simulatorId="bid-elevator" />
     </section>
   );
 }

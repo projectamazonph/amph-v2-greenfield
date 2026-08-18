@@ -29,6 +29,7 @@ import {
 } from "@/app/tools/campaign-builder/actions";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import { SimulatorNextRep } from "./SimulatorNextRep";
 import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
@@ -341,8 +342,8 @@ export function CampaignBuilderForm({
         </div>
       </div>
 
-      <div className={styles.hint}>
-        <p className={styles.hintTitle}>How this is scored</p>
+      <details className={styles.hint}>
+        <summary className={styles.hintTitle}>What to check before you submit</summary>
         <ul className={styles.hintList}>
           <li>
             Structure quality — cover the campaign types a real launch would use, and keep one match
@@ -372,7 +373,7 @@ export function CampaignBuilderForm({
             Keyword relevance — every keyword should actually relate to the product niche above.
           </li>
         </ul>
-      </div>
+      </details>
 
       <div className={styles.builder}>
         <div className={styles.builderHeader}>
@@ -650,7 +651,7 @@ export function CampaignBuilderForm({
           disabled={pending || graded}
           aria-busy={pending}
         >
-          {pending ? "Grading…" : graded ? "Graded" : "Submit for grading"}
+          {pending ? "Checking…" : graded ? "Checked" : "Check my campaign"}
         </Button>
         {gradedValue ? (
           <div
@@ -669,6 +670,7 @@ export function CampaignBuilderForm({
         ) : null}
       </div>
       {gradedValue ? <FormativeScoreNotice /> : null}
+      {gradedValue ? <SimulatorNextRep simulatorId="campaign-builder" /> : null}
       {gradedValue && gradedValue.xpAwarded ? (
         <p className={styles.xpBanner}>
           +{gradedValue.xpAwarded} XP earned for passing in Challenge mode.

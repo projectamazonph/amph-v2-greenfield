@@ -17,7 +17,9 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 import { StudentShell } from "@/components/student/StudentShell";
+import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
 import { KeywordResearchForm } from "@/components/tools/KeywordResearchForm";
+import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { keywordResearchScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
@@ -52,11 +54,12 @@ export default async function KeywordResearchPage() {
     <StudentShell>
       <main id="main-content" tabIndex={-1} className={styles.page}>
         <Breadcrumb items={[{ href: "/tools", label: "Tools" }, { label: "Keyword Research" }]} />
-        <header className={styles.header}>
-          <span className={styles.eyebrow}>Simulator</span>
-          <h1 className={styles.title}>{scenario.name}</h1>
-          <p className={styles.brief}>{scenario.description}</p>
-        </header>
+        <SimulatorPageHeader
+          simulatorId="keyword-research"
+          title={scenario.name}
+          description={scenario.description}
+        />
+        <SimulatorCoachGuide simulatorId="keyword-research" />
         <KeywordResearchForm
           initialNiche={content.defaultNicheId}
           challengeUnlocked={challengeUnlocked}

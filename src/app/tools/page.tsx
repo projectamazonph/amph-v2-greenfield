@@ -10,34 +10,30 @@
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { StudentShell } from "@/components/student/StudentShell";
+import { getSimulatorCopy } from "@/lib/copy/simulatorCopy";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
-const TOOL_INFO: Record<string, { name: string; blurb: string; href: string }> = {
+const TOOL_INFO: Record<string, { name: string; href: string }> = {
   "bid-elevator": {
     name: "Bid Elevator",
-    blurb: "Move a slider, see how bid changes shift ACoS and sales in real time.",
     href: "/tools/bid-elevator",
   },
   "str-triage": {
     name: "Search Term Triage",
-    blurb: "Triage 20 search terms from a real report. Keep, optimize, pause, or negate.",
     href: "/tools/str-triage",
   },
   "campaign-builder": {
     name: "Campaign Builder",
-    blurb: "5-step wizard to build a Sponsored Products campaign from a brief.",
     href: "/tools/campaign-builder",
   },
   "listing-audit": {
     name: "Listing Audit",
-    blurb: "Two steps: flag the issues, then revise the listing.",
     href: "/tools/listing-audit",
   },
   "keyword-research": {
     name: "Keyword Research",
-    blurb: "Enter a niche, get a prioritized keyword list. Filter by volume and export.",
     href: "/tools/keyword-research",
   },
 };
@@ -50,10 +46,11 @@ export default async function ToolsIndexPage() {
     <StudentShell>
       <main id="main-content" tabIndex={-1} className={styles.page}>
         <header className={styles.header}>
-          <span className={styles.eyebrow}>Practice + Live</span>
+          <span className={styles.eyebrow}>Practice tools</span>
           <h1 className={styles.title}>Tools</h1>
           <p className={styles.subhead}>
-            5 practice simulators, plus a live Amazon Ad Console. Pick one to start.
+            Five practice simulators. Use the live console only when you are ready to make real
+            account changes.
           </p>
         </header>
         <ul className={styles.grid}>
@@ -63,9 +60,9 @@ export default async function ToolsIndexPage() {
             return (
               <li key={sim.simulatorId} className={styles.card}>
                 <h2 className={styles.cardName}>{info.name}</h2>
-                <p className={styles.cardBlurb}>{info.blurb}</p>
+                <p className={styles.cardBlurb}>{getSimulatorCopy(sim.simulatorId).outcome}</p>
                 <Link href={info.href} className={styles.cardLink} prefetch>
-                  Open tool
+                  Start practice
                 </Link>
               </li>
             );
@@ -74,11 +71,11 @@ export default async function ToolsIndexPage() {
           <li key="ad-console" className={styles.card}>
             <h2 className={styles.cardName}>Amazon Ad Console</h2>
             <p className={styles.cardBlurb}>
-              Embedded, live campaign console for your own Amazon Advertising account. Real data,
-              real changes — not a practice simulator.
+              A live campaign console for your own Amazon Advertising account. Changes affect real
+              data and real ad spend.
             </p>
             <Link href="/tools/ad-console" className={styles.cardLink}>
-              Open tool
+              Open live console
             </Link>
           </li>
         </ul>

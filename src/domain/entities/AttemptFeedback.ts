@@ -96,9 +96,9 @@ const DIMENSION_COMMENTS: Record<string, Record<FeedbackVerdict, DimensionCopyFn
   // bid-elevator: % of bids within the evidence-supported tolerance band
   bidAccuracy: {
     excellent: (s) =>
-      `${s}% of your bids landed in the range the data actually supported — no keywords left underfunded, none pushed past what the evidence justified.`,
+      `${s}% of your bids landed in the range the data supported. No keywords were left underfunded or pushed past the evidence.`,
     good: (s) =>
-      `${s}% of your bids were well-calibrated. The rest were probably bid on gut feel rather than the CTR/CVR evidence for that keyword — worth a second look before running this at scale.`,
+      `${s}% of your bids were well-calibrated. The rest were probably based on gut feel instead of the CTR/CVR evidence. Review them before scaling.`,
     fair: (s) =>
       `${s}% of your bids matched what the data supported. Close to half your keywords were mispriced, which in a real account means budget drifting toward the wrong terms.`,
     poor: (s) =>
@@ -107,145 +107,145 @@ const DIMENSION_COMMENTS: Record<string, Record<FeedbackVerdict, DimensionCopyFn
   // bid-elevator: how much budget was used efficiently before pacing throttled
   budgetAdherence: {
     excellent: (s) =>
-      `Your bids kept spend on pace all day (${s}%) — no early budget exhaustion, no wasted headroom sitting unspent.`,
+      `Your bids kept spend on pace all day (${s}%). The budget was neither exhausted early nor left sitting unspent.`,
     good: (s) =>
       `${s}% budget adherence. You're close, but a few bids are probably running hot enough to throttle the campaign before the day ends, or low enough to leave spend on the table.`,
     fair: (s) =>
-      `${s}% adherence means the daily budget likely ran out early (from overbidding) or under-delivered (from underbidding) — either way, real ad spend not doing its job for part of the day.`,
+      `${s}% adherence means the daily budget likely ran out early or under-delivered. Either way, real ad spend was not doing its job for part of the day.`,
     poor: (s) =>
-      `${s}% adherence is a real budget-management problem — this bid set would blow through the daily cap hours early, or barely spend it at all.`,
+      `${s}% adherence is a real budget-management problem. This bid set would spend the cap early or barely spend it at all.`,
   },
   // bid-elevator: hit target ROAS while capturing available sales, without bidding past the profitable ceiling
   roasHit: {
     excellent: () =>
-      `You hit the target ROAS while capturing the sales that were actually available — the profitable outcome, not just a passing score.`,
+      `You hit the target ROAS while capturing the sales that were available. That is the profitable outcome, not just a passing score.`,
     good: (s) =>
       `Close to target ROAS (${s}%). You're leaving some profitable sales on the table, or shaving margin thinner than the target allows.`,
     fair: (s) =>
-      `${s}% of the profitable outcome achieved. This bid set would land meaningfully under target ROAS — the kind of gap a client would ask about.`,
+      `${s}% of the profitable outcome achieved. This bid set would land meaningfully under target ROAS, which a client would ask about.`,
     poor: (s) =>
-      `${s}% — this bid set either chases sales past the point where they're profitable, or leaves so much volume uncaptured that ROAS never gets close to target.`,
+      `${s}%. This bid set either chases unprofitable sales or leaves too much useful volume uncaptured to reach target ROAS.`,
   },
   // campaign-builder: % match of campaign types + ad group coverage vs. ground truth
   structureQuality: {
     excellent: (s) =>
       `Your campaign structure covers the launch types this niche and budget actually call for (${s}%).`,
     good: (s) =>
-      `${s}% structural coverage. You're missing a campaign type a real launch plan for this niche would include — usually the gap between "runs" and "performs."`,
+      `${s}% structural coverage. You are missing a campaign type this niche would need at launch. That is often the gap between a campaign that runs and one that performs.`,
     fair: (s) =>
-      `${s}% coverage means real gaps in the structure — likely missing the auto-discovery layer, the brand-defense layer, or both.`,
+      `${s}% coverage means real gaps in the structure. You are likely missing the auto-discovery layer, the brand-defense layer, or both.`,
     poor: (s) =>
       `${s}% structural coverage is thin for this budget and niche. A structure this incomplete would leave real discovery and defense gaps from day one.`,
   },
   // campaign-builder: % of user keywords containing words from the product niche
   keywordRelevance: {
     excellent: (s) =>
-      `${s}% of your keywords are clearly on-niche — minimal risk of spend leaking to irrelevant search traffic.`,
+      `${s}% of your keywords are clearly on-niche. That leaves little risk of spend leaking to irrelevant search traffic.`,
     good: (s) =>
       `${s}% relevance. A handful of keywords look like they'd pull in traffic outside what this product actually serves.`,
     fair: (s) =>
-      `${s}% relevance means real budget risk — enough off-niche keywords here that spend would leak to searches that don't convert.`,
+      `${s}% relevance means real budget risk. Enough off-niche keywords could send spend to searches that do not convert.`,
     poor: (s) =>
-      `${s}% relevance is a real problem — this keyword set would spend meaningfully against traffic that has nothing to do with the product.`,
+      `${s}% relevance is a real problem. This keyword set would spend against traffic that has nothing to do with the product.`,
   },
   // campaign-builder: F1 of submitted negatives against the expected routing set (STORY-084)
   negativeRouting: {
     excellent: (s) =>
-      `${s}% of your negative-keyword routing matches how this structure actually needs to be protected — Auto isn't cannibalizing Manual's winners, and match types aren't competing against themselves.`,
+      `${s}% of your negative-keyword routing matches how this structure needs protection. Auto is not cannibalizing Manual's winners, and match types are not competing against themselves.`,
     good: (s) =>
-      `${s}% routing accuracy. A negative or two is missing — likely Auto quietly bidding against a keyword Manual already owns, which is wasted spend hiding in plain sight.`,
+      `${s}% routing accuracy. A negative or two is missing. Auto may be bidding against a keyword Manual already owns, which wastes spend.`,
     fair: (s) =>
-      `${s}% routing accuracy means real internal cannibalization — campaigns are bidding against each other for the same searches instead of each doing its own job.`,
+      `${s}% routing accuracy means real internal cannibalization. Campaigns are bidding against each other for the same searches.`,
     poor: (s) =>
-      `${s}% — with almost no negative routing in place, this structure would bid against itself constantly, inflating CPCs on your own best keywords.`,
+      `${s}%. With almost no negative routing, this structure would inflate CPCs by bidding against itself.`,
   },
   // campaign-builder: budget reconciliation (STORY-084)
   budgetAllocation: {
     excellent: (s) =>
-      `Your budget reconciles cleanly (${s}%) — the total matches what was actually approved, and each campaign role is funded close to how a launch this size should allocate spend.`,
+      `Your budget reconciles cleanly (${s}%). The total matches the approved amount, and each campaign role has a sensible share.`,
     good: (s) =>
       `${s}% budget accuracy. Either the total is slightly off from what was approved, or one campaign role is funded meaningfully more or less than its job calls for.`,
     fair: (s) =>
-      `${s}% accuracy is a real reconciliation problem — this is the kind of budget gap that shows up in a monthly spend report and needs explaining.`,
+      `${s}% accuracy is a real reconciliation problem. This is the kind of budget gap that shows up in a monthly spend report.`,
     poor: (s) =>
-      `${s}% — the budget here doesn't reconcile against what was approved, and the per-role split would leave some campaigns starved while others overspend with nothing left to optimize.`,
+      `${s}%. The budget does not match what was approved. Some campaigns would be starved while others overspend.`,
   },
   // campaign-builder: % of keywords correctly kept out of/confined to branded traffic (STORY-084)
   brandedIsolation: {
     excellent: (s) =>
-      `${s}% branded-traffic isolation — your own brand terms stay in Defense, and nothing here is quietly bidding on a competitor's name.`,
+      `${s}% branded-traffic isolation. Your brand terms stay in Defense, and nothing here bids on a competitor's name.`,
     good: (s) =>
       `${s}% isolation. A branded or competitor term has leaked into the wrong campaign, which either wastes spend on traffic you already own or opens a fight you didn't mean to start.`,
     fair: (s) =>
-      `${s}% isolation is a real problem — branded search traffic is landing outside Defense, or competitor terms are running without the containment they need.`,
+      `${s}% isolation is a real problem. Branded traffic is landing outside Defense, or competitor terms lack containment.`,
     poor: (s) =>
-      `${s}% — branded and competitor traffic isn't isolated at all here, which in a real account means spend leaking into searches this structure was never meant to touch.`,
+      `${s}%. Branded and competitor traffic are not isolated. Spend would leak into searches this structure was not meant to touch.`,
   },
   // campaign-builder: % of keyword targets that aren't duplicated across ad groups (STORY-084)
   duplicateControl: {
     excellent: (s) =>
-      `${s}% duplicate-free — no keyword is quietly competing against itself across two ad groups, so every dollar of bid pressure goes to one clear target.`,
+      `${s}% duplicate-free. No keyword is competing against itself across two ad groups, so bid pressure goes to one clear target.`,
     good: (s) =>
       `${s}% duplicate control. A keyword or two is targeted in more than one ad group, which means you're bidding against yourself for that search instead of Amazon's other advertisers.`,
     fair: (s) =>
-      `${s}% duplicate control means real self-cannibalization — multiple ad groups are competing for the same auction, driving your own CPC up for no reason.`,
+      `${s}% duplicate control means real self-cannibalization. Multiple ad groups are competing for the same auction and driving CPC up.`,
     poor: (s) =>
-      `${s}% — with this much duplication, a meaningful share of your budget would go toward outbidding your own ad groups instead of winning new customers.`,
+      `${s}%. A meaningful share of your budget would go toward outbidding your own ad groups instead of winning new customers.`,
   },
   // campaign-builder: % of campaigns matching the house naming convention (STORY-084)
   namingCompliance: {
     excellent: (s) =>
-      `${s}% naming compliance — every campaign follows the house convention, so anyone on the team can tell what it does and how it's funded just from the name.`,
+      `${s}% naming compliance. Anyone on the team can tell what each campaign does and how it is funded.`,
     good: (s) =>
       `${s}% compliance. Most names follow the convention; the rest would slow down anyone auditing this account later.`,
     fair: (s) =>
-      `${s}% compliance is a real gap — enough campaigns are off-convention that a teammate skimming the account couldn't reliably tell strategy from label.`,
+      `${s}% compliance is a real gap. A teammate skimming the account could not reliably tell strategy from label.`,
     poor: (s) =>
-      `${s}% — naming here wouldn't hold up in a real account. A well-named campaign structure that's strategically broken is still broken, but a broken naming convention is its own maintenance cost.`,
+      `${s}%. These names would not hold up in a real account. A broken naming convention creates its own maintenance cost.`,
   },
   // keyword-research: correctly classifying keyword intent
   intentAccuracy: {
     excellent: (s) =>
-      `${s}% correct intent calls — the foundation this niche's targeting strategy would actually be built on.`,
+      `${s}% correct intent calls. This is the foundation for the niche's targeting strategy.`,
     good: (s) =>
       `${s}% accuracy. A few keywords are probably filed under the wrong intent bucket, which would nudge match-type and campaign-role decisions downstream.`,
     fair: (s) =>
-      `${s}% correct is a real gap — misclassified intent here would send keywords into the wrong campaign role (defense vs. discovery vs. performance).`,
+      `${s}% correct is a real gap. Misclassified intent would send keywords into the wrong campaign role.`,
     poor: (s) =>
       `${s}% correct intent classification would misroute a meaningful share of this keyword list before any campaign is even built.`,
   },
   // keyword-research: flagging keywords that should be excluded
   negativeIdentification: {
     excellent: (s) =>
-      `You correctly flagged ${s}% of the keywords that don't belong in this campaign — that's spend that never gets wasted.`,
+      `You correctly flagged ${s}% of the keywords that do not belong in this campaign. That prevents wasted spend.`,
     good: (s) =>
       `${s}% of true negatives caught. The ones you missed would slip into a campaign and quietly draw clicks that were never going to convert.`,
     fair: (s) =>
-      `${s}% catch rate on negatives — real spend leakage here, keywords that should've been excluded but weren't.`,
+      `${s}% catch rate on negatives. Keywords that should have been excluded could still leak spend.`,
     poor: (s) =>
-      `${s}% — most of the keywords that needed to be flagged as negative got through, which in a live campaign means ongoing wasted spend until someone catches it manually.`,
+      `${s}%. Most of the keywords that needed to be negative got through. In a live campaign, that means ongoing wasted spend.`,
   },
   // str-triage: % terms correctly classified; listing-audit: % findings correctly triaged fix/skip
   direction: {
     excellent: (s) =>
-      `${s}% correct calls — the kind of consistency that compounds into real account performance over time.`,
+      `${s}% correct calls. That consistency compounds into better account performance over time.`,
     good: (s) =>
       `${s}% correct. The misses here are the quiet kind: a decision left standing that should have changed, or vice versa.`,
     fair: (s) =>
-      `${s}% correct is a real gap — in a live account, this error rate means decisions a manager would have to catch and reverse later.`,
+      `${s}% correct is a real gap. In a live account, a manager would have to catch and reverse these decisions.`,
     poor: (s) =>
-      `${s}% correct is below what a coin flip would get on a well-structured decision set — worth rebuilding the fundamentals before this runs on a real account.`,
+      `${s}% correct is below what a coin flip would get on this decision set. Rebuild the fundamentals before using a live account.`,
   },
   // str-triage: % of non-removal-ground-truth revenue preserved by classification choices
   profitability: {
     excellent: (s) =>
-      `Your classification choices preserved ${s}% of the revenue that should have stayed in the campaign — no winning terms wrongly cut.`,
+      `Your classification choices preserved ${s}% of the revenue that should have stayed in the campaign. No winning terms were wrongly cut.`,
     good: (s) =>
       `${s}% of revenue preserved. Somewhere in here a term that was actually earning its keep probably got paused or negated.`,
     fair: (s) =>
-      `${s}% revenue preservation means real sales left on the table — terms that were working got treated like losers.`,
+      `${s}% revenue preservation means real sales were left on the table. Working terms were treated like losers.`,
     poor: (s) =>
-      `${s}% — this decision set would cut a meaningful share of revenue-generating terms, the opposite of what triage is supposed to protect.`,
+      `${s}%. This decision set would cut a meaningful share of revenue-generating terms. That is the opposite of what triage should protect.`,
   },
   // listing-audit: severity-weighted F1 of the student's fix decisions
   priorityCoverage: {
@@ -254,9 +254,9 @@ const DIMENSION_COMMENTS: Record<string, Record<FeedbackVerdict, DimensionCopyFn
     good: (s) =>
       `${s}%. You caught most of the priority issues, but probably spent some effort on low-severity findings while a higher-priority one went untouched.`,
     fair: (s) =>
-      `${s}% priority coverage — the fix effort here isn't matched to what actually moves the listing's performance.`,
+      `${s}% priority coverage. The fix effort is not matched to what moves listing performance.`,
     poor: (s) =>
-      `${s}% — this triage would spend fix effort on the wrong findings, leaving the issues that actually hurt conversion and compliance unaddressed.`,
+      `${s}%. This triage would spend fix effort on the wrong findings and leave conversion and compliance issues unaddressed.`,
   },
 };
 
@@ -265,9 +265,9 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     excellent: () =>
       "Try a scenario with tighter evidence windows to test your calibration under more uncertainty.",
     good: () =>
-      "Before bidding, check each keyword's evidence count — low-evidence terms deserve more caution.",
+      "Before bidding, check each keyword's evidence count. Low-evidence terms deserve more caution.",
     fair: () =>
-      "Compare your bid to the benchmark CPC and the keyword's CTR/CVR before adjusting — don't bid on intuition alone.",
+      "Compare your bid to the benchmark CPC and the keyword's CTR/CVR before adjusting. Do not bid on intuition alone.",
     poor: () =>
       "Start smaller: bid one keyword at a time and check it against the evidence before moving to the next.",
   },
@@ -275,7 +275,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     excellent: () =>
       "Move to a scenario with a tighter daily budget to test your pacing discipline.",
     good: () =>
-      "Add up your projected spend across all keywords before submitting — check it against the daily cap.",
+      "Add up your projected spend across all keywords before submitting. Check it against the daily cap.",
     fair: () =>
       "Calculate estimated daily spend per keyword (bid × available impressions × CTR) and total it before submitting.",
     poor: () =>
@@ -285,7 +285,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     excellent: () =>
       "Try a scenario with a higher target ROAS to test your bidding discipline under a tighter margin.",
     good: () =>
-      "Check each bid against its economic ceiling — the highest bid that stays profitable — before finalizing.",
+      "Check each bid against its economic ceiling, the highest bid that stays profitable, before finalizing.",
     fair: () =>
       "Recalculate your target ROAS from the scenario's break-even ACoS before adjusting any bids.",
     poor: () =>
@@ -309,7 +309,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     fair: () =>
       "Re-read the product niche description and cut any keyword that doesn't clearly relate to it.",
     poor: () =>
-      "Build your keyword list starting from the niche's own words, then expand outward — not the reverse.",
+      "Build your keyword list from the niche's own words, then expand outward.",
   },
   negativeRouting: {
     excellent: () =>
@@ -335,7 +335,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     excellent: () =>
       "Try a scenario with a longer competitor-brand list to sharpen your isolation judgment.",
     good: () =>
-      "Before finalizing keywords, check each one against the brand's own names, aliases, and misspellings — and keep those confined to Defense.",
+      "Before finalizing keywords, check the brand's names, aliases, and misspellings. Keep those terms in Defense.",
     fair: () =>
       "Review which campaign is your Defense (Brand) campaign before assigning any keyword that includes the brand name.",
     poor: () =>
@@ -379,7 +379,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     fair: () =>
       "Build a checklist of what makes a keyword irrelevant for this niche, and run every keyword against it.",
     poor: () =>
-      "Focus specifically on negatives next attempt — go through the list looking only for terms that don't belong.",
+      "Focus on negatives next attempt. Look for terms that do not belong.",
   },
   direction: {
     excellent: () =>
@@ -387,7 +387,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     good: () =>
       "For each borderline case, write down the specific evidence that tipped your decision before committing to it.",
     fair: () =>
-      "Slow down on cases you're unsure about — check the underlying numbers again before deciding.",
+      "Slow down on cases you are unsure about. Check the underlying numbers again before deciding.",
     poor: () =>
       "Start with the most clear-cut cases first to rebuild the fundamentals before tackling the ambiguous ones.",
   },
@@ -395,7 +395,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     excellent: () =>
       "Try a scenario with tighter target ROAS thresholds to test your judgment under less margin for error.",
     good: () =>
-      "Double-check the ROAS on any term you're about to pause or negate — a losing-looking term can still be a real winner.",
+      "Double-check the ROAS on any term you are about to pause or negate. A losing-looking term can still be a winner.",
     fair: () =>
       "Before removing a term, confirm it's actually underperforming target ROAS, not just spending the most.",
     poor: () =>
@@ -407,7 +407,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
     good: () =>
       "Before fixing a low-severity finding, check whether a higher-severity one still needs attention.",
     fair: () =>
-      "Sort findings by severity first, then work top-down — fix effort should follow impact, not order of discovery.",
+      "Sort findings by severity first, then work top-down. Fix effort should follow impact, not discovery order.",
     poor: () =>
       "Focus on critical and warning-severity findings first next attempt; info-severity findings can usually wait.",
   },
@@ -415,28 +415,28 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
 
 const OVERALL_PASS_COMMENT = {
   "bid-elevator":
-    "Impressive work. Your bid strategy shows a strong grasp of PPC fundamentals. Ready for more advanced scenarios.",
+    "Most of your bids fit the evidence. Review the few outliers before you raise spend.",
   "str-triage":
-    "Excellent prioritization. Your triage decisions demonstrate solid campaign management instincts.",
+    "You made clear calls on the search terms. Review the misses before you repeat this with a live report.",
   "campaign-builder":
-    "Well-structured campaign build. Your keyword and match-type selections show good strategic thinking.",
+    "Your campaign structure gives the main targeting jobs a clear home. Review the weak spots before launch.",
   "listing-audit":
-    "Sharp audit skills. Your identification of listing issues and opportunities is spot-on.",
+    "You found the listing issues that matter most. Review the remaining misses before making the changes.",
   "keyword-research":
-    "Strong keyword instincts. Your intent classifications and negative-keyword calls show a good read on the niche.",
+    "Your intent calls are mostly clear. Review the terms that could send spend to the wrong audience.",
 };
 
 const OVERALL_FAIL_COMMENT = {
   "bid-elevator":
-    "Good effort. Review the bid fundamentals and try again. Focus on the dimensions marked fair or poor.",
+    "Start with the dimensions marked fair or poor. Recheck the evidence, then run the scenario again.",
   "str-triage":
-    "Review the triage priorities and try again. Consistent prioritization improves with practice.",
+    "Start with relevance and profitability. Review the misses, then run the scenario again.",
   "campaign-builder":
-    "Review the campaign-building principles and refine your structure. Each revision builds intuition.",
+    "Start with campaign roles and budget. Fix the structure, then run the scenario again.",
   "listing-audit":
-    "Audit skills improve with practice. Review the key listing factors and try again with a sharper eye.",
+    "Start with the highest-impact listing issues. Review the evidence, then run the audit again.",
   "keyword-research":
-    "Keyword judgment improves with practice. Review the intent taxonomy and look again at which terms don't fit the niche.",
+    "Start with search intent and obvious negatives. Review the misses, then run the research again.",
 };
 
 const REMEDIATION_LINKS: Record<FeedbackVerdict, readonly string[]> = {

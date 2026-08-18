@@ -43,13 +43,13 @@ describe("Tool form submit buttons — M-08 aria-busy wiring", () => {
     },
     {
       file: "../KeywordResearchForm.tsx",
-      anchor: `"Submit for grading"`,
-      expectedLabel: "Submit for grading (preview step)",
+      anchor: `"Check my keyword decisions"`,
+      expectedLabel: "Check my keyword decisions",
     },
     {
       file: "../StrTriageForm.tsx",
-      anchor: `"Grade my triage"`,
-      expectedLabel: "Grade my triage",
+      anchor: `"Check my decisions"`,
+      expectedLabel: "Check my decisions",
     },
     {
       file: "../ListingAuditForm.tsx",
@@ -58,8 +58,8 @@ describe("Tool form submit buttons — M-08 aria-busy wiring", () => {
     },
     {
       file: "../ListingAuditForm.tsx",
-      anchor: `"Submit for grading"`,
-      expectedLabel: "Submit for grading (reviewing step)",
+      anchor: `"Check my audit decisions"`,
+      expectedLabel: "Check my audit decisions",
     },
   ];
 
@@ -96,7 +96,7 @@ describe("Tool form submit buttons — M-08 aria-busy wiring", () => {
     // audit applies the same way: the submit Button must expose
     // `aria-busy={pending}` to assistive technology while grading.
     const source = readFileSync(resolve(__dirname, "../CampaignBuilderForm.tsx"), "utf8");
-    const anchor = `"Submit for grading"`;
+    const anchor = `"Check my campaign"`;
     const anchorIndex = source.lastIndexOf(anchor);
     expect(anchorIndex, `idle label anchor should appear`).toBeGreaterThan(-1);
     const opener = source.lastIndexOf("<Button", anchorIndex);

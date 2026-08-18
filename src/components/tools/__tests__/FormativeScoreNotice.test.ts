@@ -43,6 +43,6 @@ describe("FormativeScoreNotice copy", () => {
     expect(renderedText.length).toBeGreaterThan(0);
     expect(renderedText.toLowerCase()).not.toMatch(/\bis certified\b/);
     expect(renderedText.toLowerCase()).not.toMatch(/hiring ready/);
-    expect(renderedText).toMatch(/not a certification|formative|practice score only/i);
+    expect(renderedText).toMatch(/not a certification|practice|hiring signal/i);
   });
 });

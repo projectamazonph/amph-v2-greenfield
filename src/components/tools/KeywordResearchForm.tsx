@@ -14,6 +14,7 @@ import { useState, useTransition } from "react";
 import styles from "./KeywordResearchForm.module.css";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import { SimulatorNextRep } from "./SimulatorNextRep";
 import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 import {
   previewKeywordResearch,
@@ -258,7 +259,7 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
             onClick={onSubmitForGrading}
             aria-busy={pending}
           >
-            {pending ? "Grading…" : "Submit for grading"}
+            {pending ? "Checking…" : "Check my keyword decisions"}
           </button>
         </div>
       ) : null}
@@ -277,6 +278,7 @@ export function KeywordResearchForm({ initialNiche, challengeUnlocked }: Props) 
             </span>
           </div>
           <FormativeScoreNotice />
+          <SimulatorNextRep simulatorId="keyword-research" />
           {attempt.xpAwarded ? (
             <p className={styles.xpBanner}>
               +{attempt.xpAwarded} XP earned for passing in Challenge mode.

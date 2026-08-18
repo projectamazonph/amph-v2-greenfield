@@ -4,7 +4,7 @@
  * Seeds the SimulatorScenario rows that every simulator's full attempt-
  * lifecycle action (StartSimulatorAttempt) requires to exist before it will
  * grade a submission. No seed script ever created these rows, so on a
- * fresh database str-triage's "Grade my triage" (which has no legacy
+ * fresh database str-triage's "Check my decisions" (which has no legacy
  * ungated fallback, unlike the other four simulators) fails outright with
  * a scenario_not_found error surfaced straight to the student. The other
  * four simulators' *Attempt() actions reference the same missing IDs and
@@ -79,7 +79,8 @@ const SCENARIOS: ReadonlyArray<{
     id: "bid-elevator-scenario-default",
     simulatorId: "bid-elevator",
     name: "Reduce ACoS on a high-spend electronics campaign",
-    description: "Wireless earbuds campaign spending ₱800/day at 45% ACoS; target is 25%.",
+    description:
+      "Review a wireless earbuds campaign spending ₱800/day at 45% ACoS. Set bids against a 25% target.",
     difficulty: "intermediate",
     estimatedMinutes: 10,
     // Losslessly migrated from src/app/tools/bid-elevator/page.tsx's SCENARIO const.
@@ -243,7 +244,8 @@ const SCENARIOS: ReadonlyArray<{
     id: "str-triage-scenario-kitchen-products",
     simulatorId: "str-triage",
     name: "Clean up a broad match campaign for kitchen products",
-    description: "Triage 14 search terms from a broad-match kitchen products campaign.",
+    description:
+      "Review 14 search terms from a broad-match kitchen products campaign. Choose the action for each term.",
     difficulty: "intermediate",
     estimatedMinutes: 15,
     // Losslessly migrated from src/app/tools/str-triage/page.tsx's SCENARIO const.
@@ -471,7 +473,8 @@ const SCENARIOS: ReadonlyArray<{
     id: "campaign-builder-scenario-default",
     simulatorId: "campaign-builder",
     name: "Launch a Sponsored Products campaign for wireless earbuds",
-    description: "Build a complete SP campaign with manual targeting and a ₱500/day budget.",
+    description:
+      "Build a Sponsored Products structure for wireless earbuds with a ₱500/day budget.",
     difficulty: "beginner",
     estimatedMinutes: 15,
     // Losslessly migrated from src/app/tools/campaign-builder/page.tsx's SCENARIO const.
@@ -499,7 +502,8 @@ const SCENARIOS: ReadonlyArray<{
     id: "listing-audit-scenario-bamboo-cutting-board",
     simulatorId: "listing-audit",
     name: "Bamboo Cutting Board — Premium Kitchen Essential",
-    description: "Audit and revise a bamboo cutting board listing.",
+    description:
+      "Review and revise a bamboo cutting board listing. Prioritize the fixes that matter most.",
     difficulty: "beginner",
     estimatedMinutes: 10,
     // Losslessly migrated from src/app/tools/listing-audit/page.tsx's SCENARIO const.
@@ -537,7 +541,8 @@ const SCENARIOS: ReadonlyArray<{
     id: "keyword-research-scenario-default",
     simulatorId: "keyword-research",
     name: "Keyword research for bamboo cutting board niche",
-    description: "Classify intent and flag negatives across 18 keywords in the niche.",
+    description:
+      "Classify 18 bamboo cutting board keywords and flag the terms that do not belong.",
     difficulty: "beginner",
     estimatedMinutes: 10,
     // STORY-081's KeywordDataset system already owns real keyword content —

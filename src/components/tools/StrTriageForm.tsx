@@ -14,6 +14,7 @@ import styles from "./StrTriageForm.module.css";
 import { strTriageAttempt, type StrTriageAttemptResult } from "@/app/tools/str-triage/actions";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import { SimulatorNextRep } from "./SimulatorNextRep";
 import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 import type { StrTriageInput } from "@/domain/simulator/str-triage/StrTriageInput";
 import type { TriageAction } from "@/domain/simulator/str-triage/StrTriageOutput";
@@ -156,7 +157,7 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
           disabled={pending || result !== null}
           aria-busy={pending}
         >
-          {pending ? "Grading…" : result ? "Graded" : "Grade my triage"}
+          {pending ? "Checking…" : result ? "Checked" : "Check my decisions"}
         </button>
         {result ? (
           <div
@@ -177,6 +178,7 @@ export function StrTriageForm({ scenario, challengeUnlocked }: Props) {
         ) : null}
       </div>
       {result ? <FormativeScoreNotice /> : null}
+      {result ? <SimulatorNextRep simulatorId="str-triage" /> : null}
       {result?.xpAwarded ? (
         <p className={styles.xpBanner}>
           +{result.xpAwarded} XP earned for passing in Challenge Mode.

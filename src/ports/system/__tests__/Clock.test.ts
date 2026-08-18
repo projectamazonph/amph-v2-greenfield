@@ -32,7 +32,7 @@ describe("FixedClock", () => {
     const now = clock.now();
     now.setFullYear(1999);
     // The clock should still return 2026
-    expect(clock.now().getFullYear()).toBe(2026);
+    expect(clock.now().getUTCFullYear()).toBe(2026);
   });
 
   it("set() advances the clock to a new time", () => {

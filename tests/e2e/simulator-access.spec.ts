@@ -90,8 +90,8 @@ test.describe("Simulator access from root UX", () => {
     // file.
     const expectedForms: Array<{ path: string; actionLabel: RegExp }> = [
       { path: "/tools/bid-elevator", actionLabel: /run simulation/i },
-      { path: "/tools/str-triage", actionLabel: /grade my triage/i },
-      { path: "/tools/campaign-builder", actionLabel: /submit for grading/i },
+      { path: "/tools/str-triage", actionLabel: /check my decisions/i },
+      { path: "/tools/campaign-builder", actionLabel: /check my campaign/i },
       { path: "/tools/listing-audit", actionLabel: /run audit/i },
       { path: "/tools/keyword-research", actionLabel: /generate keywords/i },
     ];

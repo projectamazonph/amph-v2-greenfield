@@ -16,7 +16,8 @@ import styles from "./FormativeScoreNotice.module.css";
 export function FormativeScoreNotice() {
   return (
     <p className={styles.notice}>
-      Practice score only. Not a certification, job-readiness signal, or hiring credential.
+      This score is for practice. Use the misses to choose your next rep. It is not a certification
+      or hiring signal.
     </p>
   );
 }

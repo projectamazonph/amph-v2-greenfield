@@ -56,11 +56,11 @@ export function SimulatorModeToggle({ mode, onChange, unlocked, disabled = false
       </button>
       {!unlocked ? (
         <span id="simulator-challenge-lock-hint" className={styles.lockHint} role="status">
-          Challenge mode is locked. Pass this simulator in Practice mode once to unlock it.
+          Practice first. Challenge unlocks after you pass this simulator once.
         </span>
       ) : null}
       {mode === "challenge" ? (
-        <span className={styles.hint}>Challenge mode: passing awards a one-time bonus XP.</span>
+        <span className={styles.hint}>Pass Challenge mode to earn bonus XP.</span>
       ) : null}
     </div>
   );
