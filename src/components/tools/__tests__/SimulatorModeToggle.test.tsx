@@ -12,8 +12,8 @@ describe("SimulatorModeToggle", () => {
       />,
     );
 
-    expect(html).toContain("Challenge mode is locked");
-    expect(html).toContain("Pass this simulator in Practice mode once to unlock it");
+    expect(html).toContain("Practice first");
+    expect(html).toContain("Challenge unlocks after you pass this simulator once");
     expect(html).toContain("aria-describedby");
   });
 

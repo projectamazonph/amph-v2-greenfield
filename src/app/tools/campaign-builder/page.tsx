@@ -12,6 +12,8 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 import { CampaignBuilderForm } from "@/components/tools/CampaignBuilderForm";
+import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
+import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { campaignBuilderScenarioContentSchema } from "./scenarioContent";
@@ -47,11 +49,12 @@ export default async function CampaignBuilderPage() {
     <StudentShell>
       <main id="main-content" tabIndex={-1} className={styles.page}>
         <Breadcrumb items={[{ href: "/tools", label: "Tools" }, { label: "Campaign Builder" }]} />
-        <header className={styles.header}>
-          <span className={styles.eyebrow}>Simulator</span>
-          <h1 className={styles.title}>{scenario.name}</h1>
-          <p className={styles.brief}>{scenario.description}</p>
-        </header>
+        <SimulatorPageHeader
+          simulatorId="campaign-builder"
+          title={scenario.name}
+          description={scenario.description}
+        />
+        <SimulatorCoachGuide simulatorId="campaign-builder" />
         <CampaignBuilderForm
           productCategory={content.productCategory}
           productNiche={content.productNiche}

@@ -101,7 +101,7 @@ describe("ComposeAttemptFeedback", () => {
     expect(fb.mode).toBe("practice");
     expect(fb.overallScore).toBe(90);
     expect(fb.passed).toBe(true);
-    expect(fb.overallComment).toContain("bid strategy");
+    expect(fb.overallComment).toContain("bids");
     expect(fb.remediationLinks.length).toBeGreaterThan(0);
     expect(fb.dimensionFeedback).toHaveLength(1);
     expect(fb.dimensionFeedback[0]?.dimension).toBe("direction");
@@ -123,7 +123,7 @@ describe("ComposeAttemptFeedback", () => {
 
     const fb = r.value.feedback;
     expect(fb.passed).toBe(false);
-    expect(fb.overallComment).toContain("Review"); // fail comment
+    expect(fb.overallComment).toContain("scenario again");
     expect(fb.dimensionFeedback[0]?.verdict).toBe("poor");
   });
 
@@ -162,7 +162,7 @@ describe("ComposeAttemptFeedback", () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.value.feedback.passed).toBe(true);
-    expect(r.value.feedback.overallComment).toContain("audit");
+    expect(r.value.feedback.overallComment).toContain("listing issues");
   });
 
   it("returns attempt_not_found when the attempt is missing", async () => {

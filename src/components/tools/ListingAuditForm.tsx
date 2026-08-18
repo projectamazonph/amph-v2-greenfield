@@ -8,7 +8,7 @@
  *  2. "reviewing" — the student triages each finding as fix now / defer /
  *     skip / escalate (STORY-083), mirroring a real reviewer's workflow of
  *     deciding what to act on, what to schedule, what's a non-issue, and
- *     what needs a second opinion. "Submit for grading" calls
+ *     what needs a second opinion. "Check my audit decisions" calls
  *     listingAuditAttempt() with those decisions, which persists a real
  *     graded SimulatorAttempt.
  *  3. "graded" — shows the score, the resolved expected action + rationale
@@ -34,6 +34,7 @@ import type {
 } from "@/domain/simulator/listing-audit/ListingAuditOutput";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import { SimulatorModeToggle } from "./SimulatorModeToggle";
+import { SimulatorNextRep } from "./SimulatorNextRep";
 import type { PracticeOrChallengeMode } from "./SimulatorModeToggle";
 import { studentErrorCopy } from "@/lib/studentErrorCopy";
 
@@ -216,7 +217,7 @@ export function ListingAuditForm({
                 disabled={pending}
                 aria-busy={pending}
               >
-                {pending ? "Grading…" : "Submit for grading"}
+                {pending ? "Checking…" : "Check my audit decisions"}
               </button>
             ) : (
               <button type="button" className={styles.submit} onClick={onStartOver}>
@@ -249,6 +250,7 @@ export function ListingAuditForm({
         ) : null}
       </div>
       {gradeResult && gradeResult.ok ? <FormativeScoreNotice /> : null}
+      {gradeResult && gradeResult.ok ? <SimulatorNextRep simulatorId="listing-audit" /> : null}
       {gradeResult && gradeResult.ok && gradeResult.value.xpAwarded ? (
         <p className={styles.xpBanner}>
           +{gradeResult.value.xpAwarded} XP earned for passing in Challenge mode.
@@ -260,7 +262,7 @@ export function ListingAuditForm({
       {stage !== "editing" ? (
         <div className={styles.findings}>
           <h3 className={styles.findingsTitle}>
-            Findings: triage each one as fix now, defer, skip, or escalate
+            Review each finding and choose the first action you would take
           </h3>
           <ul className={styles.findingsList}>
             {findings.map((f) => {

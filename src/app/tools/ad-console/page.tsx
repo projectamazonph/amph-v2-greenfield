@@ -32,42 +32,37 @@ export default async function AdConsolePage() {
         <Breadcrumb items={[{ href: "/tools", label: "Tools" }, { label: "Amazon Ad Console" }]} />
 
         <header className={styles.header}>
-          <span className={styles.eyebrow}>External tool · Live account</span>
+          <span className={styles.eyebrow}>Live account tool</span>
           <h1 className={styles.title}>Amazon Ad Console</h1>
           <p className={styles.brief}>
-            A real campaign-management dashboard for your own Amazon Advertising account, not a
-            practice simulator. Sign in with your Amazon Ads credentials inside the frame below to
-            view and manage real Sponsored Products campaigns, bids, and keywords.
+            Use your own Amazon Advertising account to review and manage live campaigns, bids, and
+            keywords. This is not a practice simulator.
           </p>
         </header>
 
         <section className={styles.guide} aria-labelledby="guide-heading">
           <h2 id="guide-heading" className={styles.guideTitle}>
-            How to use this
+            Before you change anything
           </h2>
           <ol className={styles.guideList}>
             <li>
-              Sign in inside the console below with your own Amazon Advertising account. AMPH does
-              not see or store your Amazon login or ad account data. The console runs in an
-              isolated frame, separate from this site.
+              Sign in inside the console with your own Amazon Advertising account. AMPH does not
+              see or store your Amazon login or ad account data.
             </li>
             <li>
-              Open an existing campaign to review bids, search terms, and spend, or use the
-              console&apos;s own campaign builder to set one up from scratch.
+              Review the campaign, search terms, and spend before you change a bid, budget, or
+              keyword.
             </li>
             <li>
-              Practice a change in the Bid Elevator or Campaign Builder simulator first if
-              you&apos;re unsure, then apply the same logic here once you&apos;re confident.
+              If you are unsure, test the decision in Bid Elevator or Campaign Builder first.
             </li>
             <li>
-              This is a production tool. Bid, budget, and keyword changes you make here affect real
-              ad spend immediately and generally can&apos;t be undone. There&apos;s no reset button
-              like the simulators have.
+              Changes here affect real ad spend immediately. There is no simulator reset button.
             </li>
           </ol>
           <p className={styles.guideNote}>
-            If the console below appears blank or refuses to load, open it directly in a new tab
-            instead. Some external tools block being embedded inside another site&apos;s page.
+            If the console is blank, open it directly in a new tab. Some external tools block
+            embedded pages.
           </p>
         </section>
 

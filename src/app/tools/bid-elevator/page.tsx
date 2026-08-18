@@ -26,6 +26,8 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 import { BidElevatorForm } from "@/components/tools/BidElevatorForm";
+import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
+import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { bidElevatorScenarioContentSchema } from "./scenarioContent";
@@ -66,11 +68,12 @@ export default async function BidElevatorPage() {
             Reset
           </Link>
         </div>
-        <header className={styles.header}>
-          <span className={styles.eyebrow}>Simulator</span>
-          <h1 className={styles.title}>{scenario.name}</h1>
-          <p className={styles.brief}>{scenario.description}</p>
-        </header>
+        <SimulatorPageHeader
+          simulatorId="bid-elevator"
+          title={scenario.name}
+          description={scenario.description}
+        />
+        <SimulatorCoachGuide simulatorId="bid-elevator" />
         <BidElevatorForm scenario={content} challengeUnlocked={challengeUnlocked} />
       </main>
     </StudentShell>

@@ -159,6 +159,28 @@ describe("AttemptFeedback domain", () => {
       expect(result.overallComment.length).toBeGreaterThan(0);
     });
 
+    it("keeps generated feedback in the student voice", () => {
+      const attempt = makeAttempt({
+        score: 65,
+        scoreDimensions: {
+          bidAccuracy: 65,
+          budgetAdherence: 65,
+          roasHit: 65,
+        },
+      });
+      const result = composeAttemptFeedback({ attempt, policy: BASE_SCORE_POLICY });
+      const renderedCopy = [
+        result.overallComment,
+        ...result.dimensionFeedback.flatMap((dimension) => [
+          dimension.comment,
+          dimension.recommendation,
+        ]),
+      ].join(" ");
+
+      expect(renderedCopy).not.toMatch(/[—–]/);
+      expect(renderedCopy).not.toMatch(/\b(Impressive work|Good effort)\b/);
+    });
+
     it("remediationLinks is empty when not passed and no poor dimensions", () => {
       const attempt = makeAttempt({
         score: 55,

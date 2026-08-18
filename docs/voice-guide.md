@@ -19,6 +19,19 @@ If a Pinoy VA in Cebu reads this on their phone at 11pm after a 9-hour VA shift,
 2. **Use real numbers, not abstractions.** "₱2,999 one-time, unlock everything for life" not "Affordable tier-based access."
 3. **Talk to the reader, not about them.** "You'll see this every week" not "Users may encounter this scenario."
 
+## Student Load Rules
+
+The platform teaches a hard skill to people who may be tired, new to Amazon Ads, and reading on a phone. Keep the next decision easy to see.
+
+1. **One objective per screen.** State the skill the student is practicing before the controls.
+2. **One primary action per stage.** Do not make the student choose between several equal CTAs.
+3. **Three visible instructions maximum.** Put detailed scoring rules behind a disclosure control.
+4. **Context before jargon.** Define an acronym the first time it appears in a page or tool.
+5. **Coach the next rep.** After an attempt, say what happened, why it matters, and what to check next.
+6. **Keep the student moving.** Use short labels such as "Start practice", "Check my work", and "Try again".
+
+The shared simulator frame is: context, decision, action, feedback, next rep. Do not repeat the same explanation in the page header, form, and result panel.
+
 ## Banned Phrases (enforced by ESLint)
 
 These never ship. Anywhere. UI copy, lessons, error messages, marketing pages.

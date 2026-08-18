@@ -17,6 +17,8 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 import { StrTriageForm } from "@/components/tools/StrTriageForm";
+import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
+import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { strTriageScenarioContentSchema } from "./scenarioContent";
@@ -52,18 +54,19 @@ export default async function StrTriagePage() {
     <StudentShell>
       <main id="main-content" tabIndex={-1} className={styles.page}>
         <Breadcrumb items={[{ href: "/tools", label: "Tools" }, { label: "Search Term Triage" }]} />
-        <header className={styles.header}>
-          <span className={styles.eyebrow}>Simulator</span>
-          <h1 className={styles.title}>{scenario.name}</h1>
-          <p className={styles.brief}>{scenario.description}</p>
-          <p className={styles.meta}>
-            <span className={styles.metaLabel}>Target ROAS (generic)</span>
-            <span className={styles.metaValue}>{content.genericTargetRoas.toFixed(2)}×</span>
-            <span className={styles.metaDivider}>·</span>
-            <span className={styles.metaLabel}>Search terms</span>
-            <span className={styles.metaValue}>{content.rows.length}</span>
-          </p>
-        </header>
+        <SimulatorPageHeader
+          simulatorId="str-triage"
+          title={scenario.name}
+          description={scenario.description}
+        />
+        <p className={styles.meta}>
+          <span className={styles.metaLabel}>Generic target ROAS</span>
+          <span className={styles.metaValue}>{content.genericTargetRoas.toFixed(2)}×</span>
+          <span className={styles.metaDivider}>·</span>
+          <span className={styles.metaLabel}>Search terms</span>
+          <span className={styles.metaValue}>{content.rows.length}</span>
+        </p>
+        <SimulatorCoachGuide simulatorId="str-triage" />
         <StrTriageForm scenario={content} challengeUnlocked={challengeUnlocked} />
       </main>
     </StudentShell>
