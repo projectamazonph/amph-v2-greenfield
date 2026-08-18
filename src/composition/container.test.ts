@@ -66,6 +66,7 @@ import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadge
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
 import { InMemoryProgressEventRepository } from "@/infra/repositories/InMemoryProgressEventRepository";
+import { InMemoryUserStreakRepository } from "@/infra/repositories/InMemoryUserStreakRepository";
 import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionRepository";
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
@@ -295,6 +296,7 @@ export function buildTestContainer(): TestContainer {
   const emailTemplateRepo = new InMemoryEmailTemplateRepository();
   const certificateRepo = new InMemoryCertificateRepository();
   const progressEventRepo = new InMemoryProgressEventRepository();
+  const userStreakRepo = new InMemoryUserStreakRepository();
   const sessionRepo = new InMemorySessionRepository();
   const emailVerificationRepo = new InMemoryEmailVerificationRepository();
   const passwordResetRepo = new InMemoryPasswordResetRepository();
@@ -401,6 +403,7 @@ export function buildTestContainer(): TestContainer {
     rateLimiter,
     userRepo,
     sessionRepo,
+    userStreakRepo,
     courseRepo,
     moduleRepo,
     lessonRepo,

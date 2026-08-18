@@ -24,6 +24,19 @@
 
 The wrapper still has `|| true` (a soft-pass at the shell level) so a regression on a new URL doesn't block the build on the first run; the assertion results still surface in the GitHub Actions summary. Tighten to a hard-fail (drop `|| true`) once the baseline is stable.
 
+**Assertion threshold rationale (2026-08-18):** The `.lighthouserc.json` uses hard errors (`error`) for accessibility and SEO, but warnings (`warn`) for performance and best-practices. This is intentional:
+
+- **accessibility + SEO**: These are deterministic and under our direct control. A hard error ensures regressions cannot merge.
+- **performance**: Lighthouse performance scores are sensitive to CI runner variance (CPU throttling, network latency, co-located jobs). A warning lets us catch significant regressions (e.g., 0.9 → 0.3) without false positives from noise.
+- **best-practices**: Many warnings relate to third-party scripts (analytics, fonts) that require coordination to fix. A warning surfaces the issue without blocking the build.
+
+To harden performance and best-practices to hard errors, update `.lighthouserc.json`:
+
+```json
+"categories:performance": ["error", { "minScore": 0.7 }],
+"categories:best-practices": ["error", { "minScore": 0.8 }]
+```
+
 ---
 
 ## Context
