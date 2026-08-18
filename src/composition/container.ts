@@ -70,6 +70,7 @@ import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiv
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 import type { KeywordDatasetRepository } from "@/ports/repositories/KeywordDatasetRepository";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
+import type { IUserStreakRepository } from "@/ports/repositories/IUserStreakRepository";
 import type { IResourceRepository } from "@/ports/repositories/IResourceRepository";
 import type { IFileStorage } from "@/ports/storage/IFileStorage";
 
@@ -100,6 +101,7 @@ import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRep
 import { PrismaLiveClassRegistrationRepository } from "@/infra/repositories/PrismaLiveClassRegistrationRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
+import { PrismaUserStreakRepository } from "@/infra/repositories/PrismaUserStreakRepository";
 import { PrismaResourceRepository } from "@/infra/repositories/PrismaResourceRepository";
 import { VercelBlobFileStorage } from "@/infra/storage/VercelBlobFileStorage";
 import { LocalFileStorage } from "@/infra/storage/LocalFileStorage";
@@ -306,6 +308,7 @@ export interface AppContainer {
   // Repositories
   userRepo: UserRepository;
   sessionRepo: SessionRepository;
+  userStreakRepo: IUserStreakRepository;
   courseRepo: CourseRepository;
   orderRepo: IOrderRepository;
   enrollmentRepo: IEnrollmentRepository;
@@ -548,6 +551,8 @@ function buildProductionContainer(): AppContainer {
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
   // STORY-096: was never wired into either container before this fix.
   const progressEventRepo: IProgressEventRepository = new PrismaProgressEventRepository(prisma);
+  // UserStreak repository — found by port-wiring-verification.test.ts
+  const userStreakRepo: IUserStreakRepository = new PrismaUserStreakRepository(prisma);
   const sessionRepo: SessionRepository = new PrismaSessionRepository(prisma);
   const emailVerificationRepo: EmailVerificationRepository = new PrismaEmailVerificationRepository(
     prisma,
@@ -680,6 +685,7 @@ function buildProductionContainer(): AppContainer {
     logger,
     userRepo,
     sessionRepo,
+    userStreakRepo,
     courseRepo,
     orderRepo,
     enrollmentRepo,
