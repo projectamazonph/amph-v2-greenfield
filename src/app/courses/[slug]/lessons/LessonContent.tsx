@@ -17,6 +17,10 @@
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import type { ReactElement, ReactNode } from "react";
+import { TradeOffTable, ProcessDiagram, PitfallCallout, SelfCheck } from "@/components/lesson";
+import { directivePlugin } from "@/lib/mdx/directive-plugin";
 import type {
   Lesson,
   LessonContent as DomainLessonContent,
@@ -78,10 +82,97 @@ function getVimeoEmbedUrl(url: string): string | null {
 
 // ── Sub-components ───────────────────────────────────────────
 
+function parseProcessSteps(raw: string): { id: string; label: string }[] {
+  return raw
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((label, i) => ({ id: `step-${i + 1}`, label }));
+}
+
+interface AmphBlockProps {
+  "data-amph-block"?: string;
+  "data-amph-id"?: string;
+  "data-amph-title"?: string;
+  "data-amph-caption"?: string;
+  "data-amph-variant"?: string;
+  "data-amph-steps"?: string;
+  "data-amph-hint"?: string;
+  "data-amph-rows"?: string;
+  children?: ReactNode;
+}
+
+function renderAmphDiv(props: AmphBlockProps): ReactElement | null {
+  const block = props["data-amph-block"];
+  if (!block) return <div>{props.children}</div>;
+
+  if (block === "trade-off") {
+    let rows: { label: string; value: string }[] | undefined;
+    const rowsAttr = props["data-amph-rows"];
+    if (rowsAttr) {
+      try {
+        rows = JSON.parse(rowsAttr.replace(/&quot;/g, '"').replace(/&#39;/g, "'"));
+      } catch {
+        rows = undefined;
+      }
+    }
+    return (
+      <TradeOffTable
+        id={props["data-amph-id"] ?? "trade-off"}
+        title={props["data-amph-title"] ?? "Trade-off"}
+        caption={props["data-amph-caption"]}
+        columns={rows && rows.length > 0 ? ["Metric", "What it answers"] : undefined}
+        rows={rows}
+      />
+    );
+  }
+
+  if (block === "process") {
+    const steps = parseProcessSteps(props["data-amph-steps"] ?? "");
+    return (
+      <ProcessDiagram
+        id={props["data-amph-id"] ?? "process"}
+        title={props["data-amph-title"] ?? "Process"}
+        steps={steps}
+        hint={props["data-amph-hint"]}
+      />
+    );
+  }
+
+  if (block === "callout") {
+    const variant =
+      props["data-amph-variant"] === "warning" || props["data-amph-variant"] === "pitfall"
+        ? props["data-amph-variant"]
+        : "info";
+    return (
+      <PitfallCallout
+        id={props["data-amph-id"] ?? "callout"}
+        variant={variant}
+        title={props["data-amph-title"]}
+      >
+        {props.children}
+      </PitfallCallout>
+    );
+  }
+
+  return <div>{props.children}</div>;
+}
+
+const markdownComponents = {
+  div: renderAmphDiv,
+  SelfCheck,
+} as const;
+
 function TextContent({ body }: { body: string }) {
   return (
     <div className={styles.prose}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+      <ReactMarkdown
+        remarkPlugins={[directivePlugin, remarkGfm]}
+        rehypePlugins={[rehypeRaw]}
+        components={markdownComponents}
+      >
+        {body}
+      </ReactMarkdown>
     </div>
   );
 }
@@ -178,10 +269,7 @@ function QuizContent({ content, quizHref }: { content: QuizLessonContent; quizHr
         </ol>
       )}
 
-      <Link
-        href={quizHref}
-        className={styles.quizCta}
-      >
+      <Link href={quizHref} className={styles.quizCta}>
         Start Quiz
       </Link>
     </div>
@@ -189,36 +277,15 @@ function QuizContent({ content, quizHref }: { content: QuizLessonContent; quizHr
 }
 
 function VideoIcon() {
-  return (
-    <Play
-      size={16}
-      weight="fill"
-      className={styles.iconSmall}
-      aria-hidden
-    />
-  );
+  return <Play size={16} weight="fill" className={styles.iconSmall} aria-hidden />;
 }
 
 function QuizIcon() {
-  return (
-    <CheckSquare
-      size={48}
-      weight="fill"
-      className={styles.iconLarge}
-      aria-hidden
-    />
-  );
+  return <CheckSquare size={48} weight="fill" className={styles.iconLarge} aria-hidden />;
 }
 
 function QuizCountIcon() {
-  return (
-    <ChatCircleText
-      size={16}
-      weight="regular"
-      className={styles.iconSmall}
-      aria-hidden
-    />
-  );
+  return <ChatCircleText size={16} weight="regular" className={styles.iconSmall} aria-hidden />;
 }
 
 // ── Main component ──────────────────────────────────────────

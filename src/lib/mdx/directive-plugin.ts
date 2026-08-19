@@ -20,8 +20,8 @@
  * value is `<div data-amph-block="..." data-amph-id="..." ...></div>`.
  */
 
-import { visit } from "unist-util-visit";
-import type { Root, Html, Paragraph, Text } from "mdast";
+import { visit, SKIP } from "unist-util-visit";
+import type { Root, Html, Paragraph, Table, TableRow, TableCell, Text, RootContent } from "mdast";
 
 const FENCE_OPEN = /^:::([a-z-]+)(?:\{([^}]*)\})?\s*$/;
 const FENCE_CLOSE = /^:::\s*$/;
@@ -75,6 +75,30 @@ function attrsToData(attrs: Record<string, string>): string {
     .join(" ");
 }
 
+function tableCellsToRow(row: TableRow): TradeOffRow | null {
+  const cells = row.children.filter((c): c is TableCell => c.type === "tableCell");
+  if (cells.length < 2) return null;
+  const cellTexts = cells.map((cell) => {
+    const textNode = cell.children[0];
+    return textNode?.type === "text" ? textNode.value.trim() : "";
+  });
+  // Skip the markdown separator row (e.g. | --- | --- |).
+  if (cellTexts.every((t) => /^[-:\s]+$/.test(t))) return null;
+  // Skip the stray closing-fence row (GFM may parse `:::` as a 1-cell row).
+  if (cellTexts.length === 1 && cellTexts[0] === ":::") return null;
+  return { label: cellTexts[0] ?? "", value: cellTexts.slice(1).join(" — ") };
+}
+
+function tableToRows(table: Table): TradeOffRow[] {
+  const rows: TradeOffRow[] = [];
+  for (const row of table.children) {
+    if (row.type !== "tableRow") continue;
+    const parsed = tableCellsToRow(row);
+    if (parsed) rows.push(parsed);
+  }
+  return rows;
+}
+
 export function directivePlugin() {
   return (tree: Root) => {
     visit(tree, "paragraph", (node: Paragraph, index, parent) => {
@@ -86,7 +110,8 @@ export function directivePlugin() {
       const openMatch = lines[0] ? lines[0].match(FENCE_OPEN) : null;
       if (!openMatch) return;
       const name: string = openMatch[1] ?? "";
-      const attrs = parseDirectiveAttrs(openMatch[2] ?? "");
+
+      // Case A: directive occupies a single paragraph (no GFM table inside).
       let closeIdx = -1;
       for (let i = lines.length - 1; i > 0; i--) {
         const line = lines[i] ?? "";
@@ -95,34 +120,61 @@ export function directivePlugin() {
           break;
         }
       }
-      if (closeIdx === -1) return;
-      const inner = lines.slice(1, closeIdx).join("\n");
-      const attrsSerialized = attrsToData(attrs);
-
-      let value: string;
-      if (name === "trade-off") {
-        // Inner body is a markdown table. Parse it and serialize as JSON.
-        const tableLines = inner.split(/\n/).filter((l) => l.trim().startsWith("|"));
-        const rows = parseMarkdownTableRows(tableLines);
-        const dataAttr = `data-amph-rows='${JSON.stringify(rows).replace(/'/g, "&#39;")}'`;
-        value = `<div data-amph-block="${name}" ${attrsSerialized} ${dataAttr}></div>`;
-      } else {
-        // For process and callout, the inner body is just text. Pass through
-        // as an inner div so the renderer can read it from children, but the
-        // renderer reads attributes directly so we can leave the inner empty.
-        const innerEscaped = inner
-          ? inner.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-          : "";
-        value = innerEscaped
-          ? `<div data-amph-block="${name}" ${attrsSerialized}><div>${innerEscaped}</div></div>`
-          : `<div data-amph-block="${name}" ${attrsSerialized}></div>`;
+      let inner: string;
+      let replacement: Html;
+      if (closeIdx !== -1) {
+        inner = lines.slice(1, closeIdx).join("\n");
+        const attrs = parseDirectiveAttrs(openMatch[2] ?? "");
+        const attrsSerialized = attrsToData(attrs);
+        const value = buildDirectiveHtml(name, attrs, attrsSerialized, inner);
+        replacement = { type: "html", value } as unknown as Html;
+        (parent.children as unknown[])[index] = replacement;
+        return;
       }
 
-      const replacement: Html = {
-        type: "html",
-        value,
-      } as unknown as Html;
-      (parent.children as unknown[])[index] = replacement;
+      // Case B: directive opens a paragraph but the body was parsed by GFM
+      // into a separate block (e.g. a `table` for trade-off). Look at the
+      // next sibling; if it's the expected kind, fold it into the directive.
+      const nextSibling = parent.children[index + 1] as RootContent | undefined;
+      if (!nextSibling) return;
+      const attrs = parseDirectiveAttrs(openMatch[2] ?? "");
+      const attrsSerialized = attrsToData(attrs);
+
+      if (name === "trade-off" && nextSibling.type === "table") {
+        const rows = tableToRows(nextSibling as Table);
+        const dataAttr = `data-amph-rows='${JSON.stringify(rows).replace(/'/g, "&#39;")}'`;
+        const value = `<div data-amph-block="${name}" ${attrsSerialized} ${dataAttr}></div>`;
+        replacement = { type: "html", value } as unknown as Html;
+        (parent.children as unknown[])[index] = replacement;
+        (parent.children as unknown[])[index + 1] = replacement;
+        return [SKIP, index + 2] as unknown as ReturnType<typeof visit>;
+      }
+
+      // Other directives (process, callout) need their body inline; if GFM
+      // split them, we can't reconstruct — leave the paragraph alone.
     });
   };
+}
+
+function buildDirectiveHtml(
+  name: string,
+  attrs: Record<string, string>,
+  attrsSerialized: string,
+  inner: string,
+): string {
+  if (name === "trade-off") {
+    // Inner body is a markdown table. Parse it and serialize as JSON.
+    const tableLines = inner.split(/\n/).filter((l) => l.trim().startsWith("|"));
+    const rows = parseMarkdownTableRows(tableLines);
+    const dataAttr = `data-amph-rows='${JSON.stringify(rows).replace(/'/g, "&#39;")}'`;
+    return `<div data-amph-block="${name}" ${attrsSerialized} ${dataAttr}></div>`;
+  }
+  // For process and callout, the inner body is just text. Pass through as
+  // an inner div so the renderer can read it from children.
+  const innerEscaped = inner
+    ? inner.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    : "";
+  return innerEscaped
+    ? `<div data-amph-block="${name}" ${attrsSerialized}><div>${innerEscaped}</div></div>`
+    : `<div data-amph-block="${name}" ${attrsSerialized}></div>`;
 }
