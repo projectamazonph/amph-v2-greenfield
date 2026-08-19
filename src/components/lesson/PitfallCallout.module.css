@@ -1,0 +1,76 @@
+/* src/components/lesson/PitfallCallout.module.css
+   Note-style callout. WCAG AA against --surface-1. */
+
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 12px);
+  margin: var(--space-6, 24px) 0;
+  padding: var(--space-4, 16px);
+  border-radius: var(--radius-md, 6px);
+  border-left: 4px solid var(--ink-300, #d4d4d4);
+  background: var(--surface-1, #ffffff);
+  font-family: var(--font-body);
+}
+
+.iconSlot {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--surface-2, #f4f3ee);
+  color: var(--ink-700, #404040);
+}
+
+.body {
+  flex: 1 1 auto;
+}
+
+.title {
+  margin: 0 0 var(--space-2, 8px);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-base, 1rem);
+  color: var(--ink-900, #171717);
+}
+
+.content {
+  font-size: var(--text-base, 1rem);
+  color: var(--ink-700, #404040);
+  line-height: 1.6;
+}
+
+.content > :first-child {
+  margin-top: 0;
+}
+.content > :last-child {
+  margin-bottom: 0;
+}
+
+/* Variants */
+.info {
+  border-left-color: var(--accent, #ff6b35);
+}
+.info .iconSlot {
+  background: var(--accent-soft, #ffe5d9);
+  color: var(--accent, #ff6b35);
+}
+
+.warning {
+  border-left-color: var(--warning, #b45309);
+}
+.warning .iconSlot {
+  background: color-mix(in srgb, var(--warning, #b45309) 12%, var(--surface-1, #ffffff));
+  color: var(--warning, #b45309);
+}
+
+.pitfall {
+  border-left-color: var(--danger, #b91c1c);
+}
+.pitfall .iconSlot {
+  background: color-mix(in srgb, var(--danger, #b91c1c) 12%, var(--surface-1, #ffffff));
+  color: var(--danger, #b91c1c);
+}
