@@ -146,8 +146,10 @@ export function directivePlugin() {
         const value = `<div data-amph-block="${name}" ${attrsSerialized} ${dataAttr}></div>`;
         replacement = { type: "html", value } as unknown as Html;
         (parent.children as unknown[])[index] = replacement;
-        (parent.children as unknown[])[index + 1] = replacement;
-        return [SKIP, index + 2] as unknown as ReturnType<typeof visit>;
+        // Splice out the GFM-split sibling table instead of leaving a duplicate
+        // html node reference at index+1.
+        (parent.children as unknown[]).splice(index + 1, 1);
+        return [SKIP, index + 1] as unknown as ReturnType<typeof visit>;
       }
 
       // Other directives (process, callout) need their body inline; if GFM

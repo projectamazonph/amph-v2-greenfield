@@ -2,10 +2,17 @@
 import { describe, expect, it } from "vitest";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
 import { directivePlugin, parseDirectiveAttrs } from "../directive-plugin";
 
 function run(source: string) {
   const tree = unified().use(remarkParse).parse(source);
+  unified().use(directivePlugin).runSync(tree);
+  return tree;
+}
+
+function runWithGfm(source: string) {
+  const tree = unified().use(remarkParse).use(remarkGfm).parse(source);
   unified().use(directivePlugin).runSync(tree);
   return tree;
 }
@@ -67,5 +74,20 @@ describe("directivePlugin", () => {
     expect(tree.children).toHaveLength(2);
     expect((tree.children[0] as { type: string }).type).toBe("paragraph");
     expect((tree.children[1] as { type: string }).type).toBe("html");
+  });
+});
+
+describe("directivePlugin (with remark-gfm)", () => {
+  it("folds GFM-split table into :::trade-off html (Case B)", () => {
+    const tree = runWithGfm(
+      `:::trade-off{id="big-six" title="T"}\n| M | V |\n| - | - |\n| CPC | How much |\n| CTR | Click |\n:::`,
+    );
+    const types = tree.children.map((c: { type: string }) => c.type);
+    // Only one html node should remain; the GFM-split table sibling should be folded in or removed.
+    expect(types.filter((t) => t === "html")).toHaveLength(1);
+    expect(types).not.toContain("table");
+    const htmlNode = tree.children[0] as { value: string };
+    expect(htmlNode.value).toContain("data-amph-rows=");
+    expect(htmlNode.value).toMatch(/"label"\s*:\s*"CPC"/);
   });
 });
