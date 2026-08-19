@@ -61,7 +61,7 @@ function parseMarkdownTableRows(lines: string[]): TradeOffRow[] {
     if (cells.length < 2) continue;
     // Skip the markdown separator row (e.g. | --- | --- |).
     if (cells.every((c) => /^[-:\s]+$/.test(c))) continue;
-    rows.push({ label: cells[0] ?? "", value: cells.slice(1).join(" — ") });
+    rows.push({ label: cells[0] ?? "", value: cells.slice(1).join(", ") });
   }
   return rows;
 }
@@ -86,7 +86,7 @@ function tableCellsToRow(row: TableRow): TradeOffRow | null {
   if (cellTexts.every((t) => /^[-:\s]+$/.test(t))) return null;
   // Skip the stray closing-fence row (GFM may parse `:::` as a 1-cell row).
   if (cellTexts.length === 1 && cellTexts[0] === ":::") return null;
-  return { label: cellTexts[0] ?? "", value: cellTexts.slice(1).join(" — ") };
+  return { label: cellTexts[0] ?? "", value: cellTexts.slice(1).join(", ") };
 }
 
 function tableToRows(table: Table): TradeOffRow[] {
