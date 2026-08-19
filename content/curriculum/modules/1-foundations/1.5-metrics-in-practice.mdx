@@ -65,6 +65,41 @@ This is the most urgent pattern. It loses money every day it goes unfixed.
 3. **Take one action at a time.** Resist changing everything at once. Make one adjustment, wait 3–7 days for data, then evaluate.
 4. **Measure the impact.** Compare before-and-after metrics. Did the bottleneck metric improve without degrading the others?
 
+The weekly cadence that ties it together:
+
+:::process{id="weekly-review" title="Weekly metric review" steps="Pull the Big Six|Compare to last week|Spot anomalies|Decide which to act on|Log the decision" hint="If you can't name the decision, you didn't actually review."}
+:::
+
+Where to look first when a metric moves:
+
+:::trade-off{id="what-first" title="Which metric to look at first"}
+
+| Symptom                          | First place to look                                  |
+| -------------------------------- | ---------------------------------------------------- |
+| Conversion rate gone down        | Check the listing and the price first                |
+| CTR gone down                    | Check the creative and the keyword                   |
+| ACoS up, TACoS stable            | The campaign mix shifted                             |
+| Both ACoS and TACoS up           | Account-level problem                                |
+
+:::
+
+:::callout{variant="pitfall" title="Don't change five things at once"}
+Stack ranking helps. Change one bid, one keyword, or one creative at a time. Wait 7 days. Compare. Otherwise you can't tell what worked.
+:::
+
+<SelfCheck
+  id="sc-1-5"
+  prompt="ACoS rose 30% this week. TACoS is flat. What is the most likely cause?"
+  options={[
+    "A competitor drove up CPC across the account",
+    "Your campaign mix shifted toward higher-ACoS campaigns",
+    "Organic sales dropped",
+    "Your account is failing",
+  ]}
+  answerIndex={1}
+  explanation="If TACoS is flat, the account-level spend share is unchanged. The shift must be inside the mix, with campaigns rebalancing toward higher-ACoS targets."
+/>
+
 ## Scenario walkthrough: kitchen scale
 
 Product: a kitchen scale, $24.99, 30% margin, so a 30% break-even ACoS.
