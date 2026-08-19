@@ -15,6 +15,8 @@
  */
 
 import { vi } from "vitest";
+import "@testing-library/jest-dom/vitest";
+import "vitest-axe/extend-expect";
 
 process.env.DATABASE_URL ??= "postgresql://test:test@localhost:5432/test";
 process.env.JWT_SECRET ??= "test-secret-at-least-32-bytes-long-please";
@@ -71,7 +73,9 @@ const NEXT_REDIRECT = Object.assign(new Error("NEXT_REDIRECT"), { digest: "NEXT_
 
 vi.mock("@/lib/auth", () => ({
   getSessionUser: vi.fn(async () => null),
-  requireAuth: vi.fn(async () => { throw NEXT_REDIRECT; }),
+  requireAuth: vi.fn(async () => {
+    throw NEXT_REDIRECT;
+  }),
   getSessionUserId: vi.fn(async () => null),
   getSessionCookieName: vi.fn(() => "session_token"),
   SESSION_COOKIE_NAME: "session_token",

@@ -73,15 +73,16 @@
   },
   "devDependencies": {
     "@astryxdesign/cli": "^0.1.8",
-    "@commitlint/cli": "^19.7.1",
-    "@commitlint/config-conventional": "^19.7.1",
     "@cobusgreyling/loop-audit": "^1.7.0",
     "@cobusgreyling/loop-context": "^1.5.0",
     "@cobusgreyling/loop-cost": "^1.2.0",
     "@cobusgreyling/loop-sync": "^1.0.0",
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^19.7.1",
     "@eslint/eslintrc": "3",
     "@next/eslint-plugin-next": "16.2.10",
     "@playwright/test": "^1.62.0",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/jsdom": "^30.0.0",
@@ -104,7 +105,8 @@
     "tsx": "^4.23.1",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "vitest-axe": "1.0.0-pre.5"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix",
