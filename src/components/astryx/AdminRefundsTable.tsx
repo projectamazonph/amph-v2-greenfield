@@ -129,7 +129,7 @@ const COLUMNS: TableColumn<RefundRequestRow>[] = [
           color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
-          fontSize: "var(--font-size-sm)",
+          fontSize: "var(--text-sm)",
         }}
       >
         View
@@ -153,7 +153,7 @@ export function AdminRefundsTable({ rows }: AdminRefundsTableProps) {
             padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No refund requests match the current filters.

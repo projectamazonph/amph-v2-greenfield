@@ -136,7 +136,7 @@ export default async function AdminCertificatesPage({ searchParams }: PageProps)
               padding: "var(--space-8)",
               textAlign: "center",
               color: "var(--ink-500)",
-              fontSize: "var(--font-size-sm)",
+              fontSize: "var(--text-sm)",
               margin: 0,
             }}
           >

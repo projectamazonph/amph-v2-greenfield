@@ -93,7 +93,7 @@ const COLUMNS: TableColumn<UserRow>[] = [
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "var(--spacing-3)",
+          gap: "var(--space-3)",
           textDecoration: "none",
           color: "var(--ink-900)",
         }}
@@ -202,9 +202,9 @@ export function AdminUsersTable({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "var(--spacing-6)",
-            marginTop: "var(--spacing-6)",
-            fontSize: "var(--font-size-sm)",
+            gap: "var(--space-6)",
+            marginTop: "var(--space-6)",
+            fontSize: "var(--text-sm)",
             color: "var(--ink-700)",
           }}
         >
@@ -217,7 +217,9 @@ export function AdminUsersTable({
               cursor: page > 1 ? "pointer" : "default",
             }}
           >
-            <ArrowLeft size={16} aria-hidden /> Prev
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)" }}>
+              <ArrowLeft size={16} aria-hidden /> Prev
+            </span>
           </Link>
           <span
             aria-live="polite"
@@ -237,7 +239,9 @@ export function AdminUsersTable({
               cursor: page < totalPages ? "pointer" : "default",
             }}
           >
-            Next <ArrowRight size={16} aria-hidden />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)" }}>
+              Next <ArrowRight size={16} aria-hidden />
+            </span>
           </Link>
         </nav>
       )}

@@ -198,7 +198,7 @@ export function AdminAuditLogTable({
             padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No audit log entries match the current filters.

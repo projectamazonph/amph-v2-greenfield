@@ -125,7 +125,7 @@ const COLUMNS: TableColumn<PaymentRow>[] = [
           color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
-          fontSize: "var(--font-size-sm)",
+          fontSize: "var(--text-sm)",
         }}
       >
         View
@@ -178,10 +178,10 @@ export function AdminPaymentsTable({ payments, filters, pagination }: AdminPayme
       {payments.length === 0 && (
         <p
           style={{
-            padding: "var(--spacing-8)",
+            padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No orders match the current filters.
