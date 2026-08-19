@@ -91,7 +91,7 @@ const COLUMNS: TableColumn<LiveClassRow>[] = [
           color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
-          fontSize: "var(--font-size-sm)",
+          fontSize: "var(--text-sm)",
         }}
       >
         Edit
@@ -117,10 +117,10 @@ export function AdminLiveClassesTable({ liveClasses }: AdminLiveClassesTableProp
       {liveClasses.length === 0 && (
         <p
           style={{
-            padding: "var(--spacing-8)",
+            padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No live classes scheduled yet.

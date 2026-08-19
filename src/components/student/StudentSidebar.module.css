@@ -114,7 +114,9 @@
   color: var(--ink-700);
   font-size: var(--text-sm);
   font-weight: 500;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   position: relative;
 }
 
@@ -215,14 +217,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  min-width: 44px;
+  min-height: 44px;
   border: none;
   background: transparent;
   color: var(--ink-500);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .logoutButton:hover {
@@ -243,7 +247,7 @@
     top: 0;
     left: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: var(--z-dropdown);
     transform: translateX(-100%);
     transition: transform 0.2s ease;
     width: 280px;

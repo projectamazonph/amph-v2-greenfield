@@ -46,9 +46,7 @@ const COLUMNS: TableColumn<BadgeRow>[] = [
     header: "Description",
     width: { type: "proportional", value: 2 },
     renderCell: (row) => (
-      <span style={{ color: "var(--ink-700)", fontSize: "var(--font-size-sm)" }}>
-        {row.description}
-      </span>
+      <span style={{ color: "var(--ink-700)", fontSize: "var(--text-sm)" }}>{row.description}</span>
     ),
   },
   {
@@ -90,7 +88,7 @@ const COLUMNS: TableColumn<BadgeRow>[] = [
           color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
-          fontSize: "var(--font-size-sm)",
+          fontSize: "var(--text-sm)",
         }}
       >
         Edit
@@ -116,10 +114,10 @@ export function AdminBadgesTable({ badges }: AdminBadgesTableProps) {
       {badges.length === 0 && (
         <p
           style={{
-            padding: "var(--spacing-8)",
+            padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No badges yet.

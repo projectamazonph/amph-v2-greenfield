@@ -131,7 +131,7 @@ const COLUMNS: TableColumn<ResourceRow>[] = [
           color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
-          fontSize: "var(--font-size-sm)",
+          fontSize: "var(--text-sm)",
         }}
       >
         Edit
@@ -178,10 +178,10 @@ export function AdminResourcesTable({
       {resources.length === 0 && (
         <p
           style={{
-            padding: "var(--spacing-8)",
+            padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No resources found.
@@ -195,9 +195,9 @@ export function AdminResourcesTable({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "var(--spacing-6)",
-            marginTop: "var(--spacing-6)",
-            fontSize: "var(--font-size-sm)",
+            gap: "var(--space-6)",
+            marginTop: "var(--space-6)",
+            fontSize: "var(--text-sm)",
             color: "var(--ink-700)",
           }}
         >

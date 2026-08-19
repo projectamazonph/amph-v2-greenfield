@@ -136,14 +136,14 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
     width: { type: "pixel", value: 120 },
     align: "end",
     renderCell: (row) => (
-      <span style={{ display: "flex", gap: "var(--spacing-3)" }}>
+      <span style={{ display: "flex", gap: "var(--space-3)" }}>
         <Link
           href={`/admin/simulators/${row.id}/versions`}
           style={{
             color: "var(--ink-700)",
             textDecoration: "none",
             fontWeight: 500,
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           Versions
@@ -154,7 +154,7 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
             color: "var(--accent)",
             textDecoration: "none",
             fontWeight: 500,
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           Edit
@@ -174,15 +174,15 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
       <div
         style={{
           display: "flex",
-          gap: "var(--spacing-2)",
-          marginBottom: "var(--spacing-4)",
+          gap: "var(--space-2)",
+          marginBottom: "var(--space-4)",
           flexWrap: "wrap",
           alignItems: "center",
         }}
       >
         <span
           style={{
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
             color: "var(--ink-700)",
             fontWeight: 500,
           }}
@@ -194,7 +194,7 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
           style={{
             padding: "4px 10px",
             borderRadius: "var(--radius-full)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
             fontFamily: "var(--font-mono)",
             textDecoration: "none",
             background: !currentSimulatorId ? "var(--accent)" : "var(--surface-2)",
@@ -212,7 +212,7 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
             style={{
               padding: "4px 10px",
               borderRadius: "var(--radius-full)",
-              fontSize: "var(--font-size-sm)",
+              fontSize: "var(--text-sm)",
               fontFamily: "var(--font-mono)",
               textDecoration: "none",
               background: currentSimulatorId === id ? "var(--accent)" : "var(--surface-2)",
@@ -238,10 +238,10 @@ export function AdminSimulatorsTable({ scenarios, currentSimulatorId }: AdminSim
       {scenarios.length === 0 && (
         <p
           style={{
-            padding: "var(--spacing-8)",
+            padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No scenarios found.

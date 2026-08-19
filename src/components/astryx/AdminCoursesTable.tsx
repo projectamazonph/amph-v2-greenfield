@@ -166,10 +166,10 @@ export function AdminCoursesTable({
       {courses.length === 0 && (
         <p
           style={{
-            padding: "var(--spacing-8)",
+            padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No courses match the current filters.
@@ -183,9 +183,9 @@ export function AdminCoursesTable({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "var(--spacing-6)",
-            marginTop: "var(--spacing-6)",
-            fontSize: "var(--font-size-sm)",
+            gap: "var(--space-6)",
+            marginTop: "var(--space-6)",
+            fontSize: "var(--text-sm)",
             color: "var(--ink-700)",
           }}
         >

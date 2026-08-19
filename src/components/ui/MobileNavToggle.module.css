@@ -15,7 +15,7 @@
   position: fixed;
   top: var(--space-3);
   left: var(--space-3);
-  z-index: 1001;
+  z-index: var(--z-sticky);
 }
 
 .toggle:hover {
@@ -31,7 +31,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: var(--z-dropdown);
   border: 0;
   background: rgba(23, 23, 23, 0.42);
   /* H-04 fix: Field Manual bans glassmorphism / decorative blurs. Drop the

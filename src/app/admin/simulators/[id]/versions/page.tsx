@@ -73,7 +73,7 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
       )}
 
       <Card padding={6}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           {versions.map((v) => (
             <div
               key={v.id}
@@ -81,11 +81,11 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "var(--spacing-3) 0",
+                padding: "var(--space-3) 0",
                 borderBottom: "1px solid var(--border)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-3)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600 }}>
                   v{v.version}
                 </span>
@@ -99,11 +99,11 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
                 >
                   {v.id}
                 </code>
-                <span style={{ fontSize: "var(--font-size-sm)", color: "var(--ink-500)" }}>
+                <span style={{ fontSize: "var(--text-sm)", color: "var(--ink-500)" }}>
                   Updated {v.updatedAt.toLocaleDateString()}
                 </span>
               </div>
-              <div style={{ display: "flex", gap: "var(--spacing-3)", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center" }}>
                 {v.status === "draft" && (
                   <>
                     <Link
@@ -112,7 +112,7 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
                         color: "var(--accent)",
                         textDecoration: "none",
                         fontWeight: 500,
-                        fontSize: "var(--font-size-sm)",
+                        fontSize: "var(--text-sm)",
                       }}
                     >
                       Edit
@@ -136,7 +136,7 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
           ))}
 
           {versions.length === 0 && (
-            <p style={{ color: "var(--ink-500)", fontSize: "var(--font-size-sm)" }}>
+            <p style={{ color: "var(--ink-500)", fontSize: "var(--text-sm)" }}>
               No versions found.
             </p>
           )}

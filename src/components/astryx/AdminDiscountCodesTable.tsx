@@ -92,7 +92,7 @@ const COLUMNS: TableColumn<DiscountCodeRow>[] = [
           color: "var(--accent)",
           textDecoration: "none",
           fontWeight: 500,
-          fontSize: "var(--font-size-sm)",
+          fontSize: "var(--text-sm)",
         }}
       >
         Edit
@@ -111,10 +111,10 @@ export function AdminDiscountCodesTable({ codes }: AdminDiscountCodesTableProps)
       {codes.length === 0 && (
         <p
           style={{
-            padding: "var(--spacing-8)",
+            padding: "var(--space-8)",
             textAlign: "center",
             color: "var(--ink-700)",
-            fontSize: "var(--font-size-sm)",
+            fontSize: "var(--text-sm)",
           }}
         >
           No discount codes yet.

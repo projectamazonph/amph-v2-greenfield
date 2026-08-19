@@ -30,7 +30,14 @@
 
 .pen {
   position: relative;
-  white-space: nowrap;
+  /* wrap is allowed; the absolute-positioned highlight ::after still
+     pins to the first line (height: 0.34em), so the marker only covers
+     line 1 even when the text breaks across two. This was previously
+     white-space: nowrap, which forced the long Tailwind-style phrase
+     "taught for VAs new to the platform." to exceed viewport width at
+     768-1280px (the layout breakpoint that splits hero into 2 cols is
+     900px, but the underline kept the long line together past it and
+     silently introduced a horizontal scrollbar). */
 }
 
 .pen::after {
@@ -182,9 +189,11 @@
   }
 }
 
-/* The highlighted headline must wrap inside the 390px mobile content rail.
-   Keeping the desktop no-wrap treatment at phone widths makes the grid's
-   intrinsic width wider than the viewport and introduces horizontal scroll. */
+/* The .pen span now allows wrapping at every breakpoint (see the .pen
+   rule above). This block was the previous partial workaround that only
+   opened the wrap at <=600px; it is intentionally a no-op now and is
+   kept here as a guard so the wrapping behavior isn't silently changed
+   back to nowrap in a future edit without a deliberate decision. */
 @media (max-width: 600px) {
   .pen {
     white-space: normal;
