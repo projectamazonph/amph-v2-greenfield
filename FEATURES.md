@@ -1,8 +1,8 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-17 against the curriculum voice stabilization branch (PR #TBD)
-**Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.  
-**Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since)
+**Last reviewed:** 2026-08-20 against the active-lesson-primitives branch (PR not yet opened)
+**Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.
+**Related audit:** `docs/audit-2026-07-27-completeness-review.md` (see `CLAUDE.md`'s "Known gaps" 2026-08-02 addendum for what's changed since); the 2026-08-20 follow-up umbrella lives at `.audit-2026-08-20/UMBRELLA.md` and ships the still-open findings into PR #415.
 
 This file is a status inventory, not a list of promises. A route can be implemented while still requiring database seed data or an operator configuration step.
 
@@ -42,7 +42,9 @@ Password-reset and transactional links use the configured application origin. Th
 
 The public catalog and pricing pages deliberately render an empty-state message when no published course or active pricing rows have been seeded. `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01) — the placeholder is gone.
 
-Curriculum voice stabilization: Phase 3 first half (STORY-107, 2026-08-17) drops the `> **Analogy:**` and `> **Tip:**` blockquote-header pattern across 5 Module 2 and Module 3 lessons (2.2, 2.4, 3.1, 3.2, 3.3). Each drop integrates the metaphor or tip into the surrounding inline prose so the lesson opens with the work, not the frame. Sentence length is held to the 30-word ceiling per the voice guide, and Filipino context (₱ currency) replaces USD. Phase 3 second half (Modules 4-8) is queued.
+Curriculum voice stabilization: Phase 3 first half (STORY-107, 2026-08-17) drops the `> **Analogy:**` and `> **Tip:**` blockquote-header pattern across 5 Module 2 and Module 3 lessons (2.2, 2.4, 3.1, 3.2, 3.3). Each drop integrates the metaphor or tip into the surrounding inline prose so the lesson opens with the work, not the frame. Sentence length is held to the 30-word ceiling per the voice guide, and Filipino context (₱ currency) replaces USD. Phase 3 second half (Modules 4-8) ships in the same story (PR #417, 2026-08-20).
+
+Active lesson primitives (STORY-122, STORY-123, branch `feat/active-lesson-primitives`): Module 1 lessons 1.1-1.5 receive `SelfCheck` (interactive radio-group), `TradeOffTable`, `ProcessDiagram`, and `PitfallCallout` blocks. The directive plugin renders `:::trade-off{...}`, `:::process{...}`, and `:::callout{...}` fences without a new dependency. `scripts/validate-lesson-production.ts` gains Section 5.3 rules (`--strict` exits non-zero on any fence / SelfCheck violation). Totals: 5 TradeOffTable, 4 ProcessDiagram, 4 PitfallCallout, 5 SelfCheck. No session state, no grading call, no new domain entity. PR not yet opened; design spec is at `docs/superpowers/specs/2026-08-19-active-lesson-primitives-design.md`.
 
 Student-facing actions, routes, and event controls have direct boundary tests.
 See `docs/STUDENT-EVENT-COVERAGE.md` for the inventory and future test contract.
