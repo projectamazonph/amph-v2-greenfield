@@ -1,5 +1,15 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-20, audit follow-up staged + active-lesson-primitives branch ready)
+
+`main` HEAD is `1491e4b`. Five open PRs make up the 2026-08-20 audit cycle: #415 (umbrella, `+423/-0`), #417 (voice 4-8 Phase 3 second half, `+365/-168` across 19 files), #418 (S-2 displayName + S-3 unify shadow scale, `+218/-10` across 19 files), #419 (L-03 server-safe `CardProps` subset, `+297/-5`), and **#416** which currently has the wrong diff (its `fix/quizeditor-controlled-hidden-input` branch is at the same commit as the umbrella tip `ec24aa3`; no `QuizEditor.tsx` files in the diff). A comment on #416 was posted flagging the issue. Recommended merge order against `main`: #415 → #419 → #418 → #417; #416 stays held until the S-1 commit lands on its branch.
+
+`feat/active-lesson-primitives` is now ready to push and open PR. Three new local commits (`126d670`, `ed26667`, `58c6b12`) add: the active lesson primitives design spec at `docs/superpowers/specs/2026-08-19-active-lesson-primitives-design.md`; `STORY-122` (component primitives) and `STORY-123` (Module 1 active-pass) covering the four React primitives (`SelfCheck`, `TradeOffTable`, `ProcessDiagram`, `PitfallCallout`) and the directive plugin; the Section 5.3 rules in `scripts/validate-lesson-production.ts` (fence-ID checks, `<SelfCheck>` JSX shape, em-dash guard inside blocks, `--strict`, `--report=`); and the deferred audit follow-up stories `STORY-086` (instructor calibration ranges) and `STORY-089` (connected-account simulator, gated by AGENTS.md Rule 5). 31/31 lessons pass `pnpm validate:lesson-production --strict`. Local gates green: `tsc --noEmit`, `eslint`, `vitest tests/architecture` (674/674), and `vitest src/components/lesson src/lib/mdx` (26/26). All three commits used `--no-verify` per the Windows + corepack pnpm PATH workaround documented in repo memory.
+
+State updated in `STATE.md` (reviewed 2026-08-20, branch graph, deferred merge sequence), `FEATURES.md` (active lesson primitives row, Phase 3 second half under STORY-107), and `CHANGELOG.md` (new [Unreleased] entry for 2026-08-20).
+
+Outstanding for the next push: PR #419 lands first so #418's Card.tsx and theme.ts token rename compiles against the narrowed `CardProps`. Module 2-8 application of the new primitives is deferred (no STORY-124 through -127 yet for those lessons — only stories 086 and 089 were filed today).
+
 # Session update (2026-08-12, student repair follow-ups merged)
 
 The production baseline is `main` at `ee1737a`. The canonical deployment is
