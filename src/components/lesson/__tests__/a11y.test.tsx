@@ -2,6 +2,15 @@
 // @vitest-environment jsdom
 /// <reference types="@testing-library/jest-dom" />
 
+// Local matcher registration. We deliberately do NOT register
+// "vitest-axe/extend-expect" or "@testing-library/jest-dom/vitest" in
+// vitest.setup.ts: those imports flip Vitest 4.x into strict partial-mock
+// mode, which breaks src/lib/__tests__/auth.guards.test.ts because the
+// global `vi.mock("@/lib/auth", …)` does not export requireAdmin.
+// Loading the matchers per-file keeps the strict-mock regression out of
+// the suite-wide setup.
+import "vitest-axe/extend-expect";
+
 import { describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
 import { axe } from "vitest-axe";
