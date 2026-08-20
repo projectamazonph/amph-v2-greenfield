@@ -93,3 +93,10 @@ export const Input = forwardRef(function Input(
     </div>
   );
 });
+
+// S-2 fix (audit 2026-08-20, umbrella #404, child #406): explicit
+// displayName. Input already gets a name from the named function arg
+// to forwardRef, but the explicit assignment makes it survive a
+// hypothetical anonymous wrapper refactor and matches the pattern in
+// the rest of this folder.
+Input.displayName = "Input";

@@ -66,6 +66,10 @@ export function Toast({ type = "info", message, onClose, duration = 4000 }: Toas
   );
 }
 
+// S-2 fix (audit 2026-08-20, umbrella #404, child #406): explicit
+// displayName. See Button.tsx for the rationale.
+Toast.displayName = "Toast";
+
 export interface ToastContainerProps {
   children: React.ReactNode;
 }
@@ -77,3 +81,5 @@ export function ToastContainer({ children }: ToastContainerProps) {
     </div>
   );
 }
+
+ToastContainer.displayName = "ToastContainer";

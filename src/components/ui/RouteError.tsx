@@ -52,3 +52,7 @@ export function RouteError({ error, reset, withinMain = false }: RouteErrorProps
 
   return <main className={styles.wrapper}>{content}</main>;
 }
+
+// S-2 fix (audit 2026-08-20, umbrella #404, child #406): explicit
+// displayName. See Button.tsx for the rationale.
+RouteError.displayName = "RouteError";

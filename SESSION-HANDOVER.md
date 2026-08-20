@@ -1801,7 +1801,7 @@ skills/loop-triage, skills/loop-budget, skills/loop-constraints added to skills-
 
 **Phase 1: Theme setup — DONE**
 
-- `src/themes/amph-theme.ts` — AMPH brand theme extending `neutralTheme`. Valid tokens confirmed from `tokens.stylex.d.ts`. Invalid names stripped: `--color-info` (no such token), `--shadow-sm/md/lg` (should be `--shadow-low/med/high`), `--spacing-16/20` (scale ends at `--spacing-12`).
+- `src/themes/amph-theme.ts` — AMPH brand theme extending `neutralTheme`. Valid tokens confirmed from `tokens.stylex.d.ts`. Invalid names stripped: `--color-info` (no such token), `--shadow-low/med/high` (removed in S-3, audit 2026-08-20, child #407; the canonical scale is `--shadow-sm/md/lg` from `globals.css`), `--spacing-16/20` (scale ends at `--spacing-12`).
 - `src/app/providers.tsx` — `<Theme theme={amphTheme}><LinkProvider>` client wrapper.
 - `src/app/layout.tsx` — wrapped in `<Providers>`.
 - `src/app/globals.css` — added Astryx CSS imports (`reset.css` + `astryx.css`).

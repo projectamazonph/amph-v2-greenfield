@@ -53,3 +53,8 @@ export function Button({
     </button>
   );
 }
+
+// S-2 fix (audit 2026-08-20, umbrella #404, child #406): explicit
+// displayName so React DevTools shows `Button` instead of `Anonymous`
+// or the inferred arg name. Applies to every primitive in this folder.
+Button.displayName = "Button";

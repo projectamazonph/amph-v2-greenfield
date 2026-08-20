@@ -172,3 +172,7 @@ export function CommandPalette({ items }: CommandPaletteProps) {
     </div>
   );
 }
+
+// S-2 fix (audit 2026-08-20, umbrella #404, child #406): explicit
+// displayName. See Button.tsx for the rationale.
+CommandPalette.displayName = "CommandPalette";

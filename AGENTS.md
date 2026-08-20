@@ -37,7 +37,7 @@ The AMPH Astryx theme is in `src/themes/amph-theme.ts`. It extends `neutralTheme
 
 Before writing new UI, run `pnpm exec astryx build "<idea>"` for a composition kit, then `pnpm exec astryx component <Name>` for the full API. Never swizzle an Astryx component unless a brand requirement cannot be achieved via theme override.
 
-**Token guardrail**: valid `defineTheme tokens:` keys are `--color-*` (accent, background, text, border, success/error/warning), `--spacing-0` through `--spacing-12`, `--shadow-low/med/high`, `--radius-*`. Do NOT use `--shadow-sm/md/lg`, `--spacing-16/20`, or `--color-info` — TypeScript will reject them.
+**Token guardrail**: valid `defineTheme tokens:` keys are `--color-*` (accent, background, text, border, success/error/warning), `--spacing-0` through `--spacing-12`, `--shadow-sm/md/lg`, `--radius-*`. Do NOT use `--shadow-low/med/high` (removed in S-3, audit 2026-08-20, child #407), `--spacing-16/20`, or `--color-info` — TypeScript will reject them. The `--shadow-sm/md/lg` scale is the canonical shadow scale, defined in `src/app/globals.css` and used by every caller.
 
 ## The Architecture
 
