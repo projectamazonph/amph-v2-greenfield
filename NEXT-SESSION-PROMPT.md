@@ -7,7 +7,7 @@ Repository: https://github.com/projectamazonph/amph-v2-greenfield
 Branch policy: branch from main, PR to main, squash merge, auto-delete source branch
 Production: https://projectamazonph.vercel.app
 Retired origin: https://amph-v2-greenfield.vercel.app
-Main reviewed: 8988ac1 (2026-08-21)
+Main reviewed: 1baf988 (2026-08-21)
 
 Read first:
 1. AGENTS.md
@@ -18,6 +18,8 @@ Read first:
 6. SESSION-HANDOVER.md
 
 Latest repairs:
+- PR #427: LEARN-025 Module 4 campaign pre-flight maps (STORY-127). Re-cuts the closed PR #395 work with PHP-aligned rationale examples that match the post-PR-417 currency state
+- PR #426: doc-staleness sweep to refresh last-verified metadata to 8988ac1
 - PR #398: round 33 audit closure, replace 2 raw `<a>` route changes with `<Link>` and pin H-09/H-11/H-12 contracts (rebased; `.commit-msg-r33.txt` dropped)
 - PR #396: round 32 audit closure, pin C-02 / C-05 / C-06 / C-07 contracts and update audit doc (rebased)
 - PR #425: doc-staleness sweep to refresh last-verified metadata to 54b5a18
