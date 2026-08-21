@@ -15,6 +15,8 @@
  */
 
 import { vi } from "vitest";
+import "@testing-library/jest-dom/vitest";
+import "vitest-axe/extend-expect";
 
 process.env.DATABASE_URL ??= "postgresql://test:test@localhost:5432/test";
 process.env.JWT_SECRET ??= "test-secret-at-least-32-bytes-long-please";
@@ -63,20 +65,6 @@ vi.mock("next/navigation", () => ({
   Link: vi.fn(({ children }) => children),
 }));
 
-// ── Auth helpers ──────────────────────────────────────────────────────────
-
-// NEXT_REDIRECT is a Next.js internal. Tests that check redirect-on-null
-// (e.g. dashboard) expect requireAuth to THROW, not return null.
-const NEXT_REDIRECT = Object.assign(new Error("NEXT_REDIRECT"), { digest: "NEXT_REDIRECT" });
-
-vi.mock("@/lib/auth", () => ({
-  getSessionUser: vi.fn(async () => null),
-  requireAuth: vi.fn(async () => { throw NEXT_REDIRECT; }),
-  getSessionUserId: vi.fn(async () => null),
-  getSessionCookieName: vi.fn(() => "session_token"),
-  SESSION_COOKIE_NAME: "session_token",
-}));
-
 // ── Client Components ─────────────────────────────────────────────────────
 // These are imported by Server Component page trees (StudentShell, tool forms).
 // They use browser APIs (navigator, window) or React hooks and cannot render in
@@ -105,23 +93,13 @@ vi.mock("@/components/tools/BidElevatorForm", () => ({
   BidElevatorForm: vi.fn(() => null),
 }));
 
-vi.mock("@/components/tools/CampaignBuilderForm", () => ({
-  CampaignBuilderForm: vi.fn(() => null),
-}));
-
-vi.mock("@/components/tools/ListingAuditForm", () => ({
-  ListingAuditForm: vi.fn(() => null),
-}));
-
-vi.mock("@/components/tools/StrTriageForm", () => ({
-  StrTriageForm: vi.fn(() => null),
-}));
-
-// ── Common UI primitives used inside shells ───────────────────────────────
-
-vi.mock("@/components/ui/Button", () => ({
-  Button: vi.fn(({ children }) => children),
-}));
+// Note: @/components/ui/Button and @/components/tools/CampaignBuilderForm
+// are NOT mocked globally. Tests that exercise their real rendering
+// (Button.test.tsx, CampaignBuilderForm.test.tsx, EnrollButton.test.tsx,
+// LiveClassRecordingButton.test.tsx, etc.) need the real components.
+// Tests that render Server Component page trees and only care about the
+// page shape should mock these per-file using `vi.mock("@/components/ui/Button", …)`
+// before importing the page.
 
 vi.mock("@/components/ui/BadgeDisplay", () => ({
   BadgeDisplay: vi.fn(() => null),
