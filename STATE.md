@@ -2,11 +2,11 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-08-21
-**Main:** `8988ac1`
+**Main:** `1baf988`
 
 ## Active branches of interest
 
-- *None.* The 2026-08-17 carry-over PRs are now closed: PR #395 (LEARN-025, stale STORY-122 collision + stale USD pricing) closed, PRs #396 and #398 (audit rounds 32/33) merged after rebasing onto current main.
+- *None.* The 2026-08-17 carry-over PRs are now closed: PR #395 (LEARN-025, stale STORY-122 collision + stale USD pricing) closed earlier on 2026-08-21, PRs #396 and #398 (audit rounds 32/33) merged after rebasing onto current main, PR #427 (LEARN-025 re-cut under STORY-127) merged.
 
 ## Current learning-experience priority
 
@@ -27,6 +27,7 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR   | Commit    | Result                                                                                                                |
 | ---- | --------- | --------------------------------------------------------------------------------------------------------------------- |
+| #427 | `1baf988` | LEARN-025 Module 4 campaign pre-flight maps (STORY-127). Re-cuts the closed PR #395 work with PHP-aligned rationale examples that match the post-PR-417 currency state |
 | #398 | `8988ac1` | Round 33 audit closure: replace 2 raw `<a>` route changes with `<Link>` and pin H-09/H-11/H-12 contracts (rebased; `.commit-msg-r33.txt` dropped) |
 | #396 | `41cb4c3` | Round 32 audit closure: pin C-02 / C-05 / C-06 / C-07 contracts and update audit doc (rebased)                          |
 | #424 | `54b5a18` | S-1 QuizEditor owns its hidden input via `useRef`; rewrites H-16 pin test; closes `.audit-2026-08-20/UMBRELLA.md` S-1  |
@@ -101,4 +102,4 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 
 ## Next action
 
-Operate from the canonical production URL, keep runbooks current after operator drills, and verify the relevant quality gates before every merge. The 2026-08-20 audit cycle is now closed on `main` (`e278e22`): #404, #419, #420, #418, and #417 all merged on 2026-08-21. PR #416 stays held until the S-1 `QuizEditor` hidden-input commit is added to `fix/quizeditor-controlled-hidden-input`; the branch tip still mirrors the now-merged umbrella diff. Re-audit before the next major feature, and start the zero-to-one student journey work in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md` after the truth-and-release contract is in place.
+Operate from the canonical production URL, keep runbooks current after operator drills, and verify the relevant quality gates before every merge. The 2026-08-20 audit cycle is now closed on `main` (`e278e22`): #404, #419, #420, #418, and #417 all merged on 2026-08-21. PR #416 stays held until the S-1 `QuizEditor` hidden-input commit is added to `fix/quizeditor-controlled-hidden-input`; the branch tip still mirrors the now-merged umbrella diff. LEARN-025 closes Module 4 with campaign pre-flight maps (`1baf988`, PR #427, STORY-127). Re-audit before the next major feature, and start the zero-to-one student journey work in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md` after the truth-and-release contract is in place.

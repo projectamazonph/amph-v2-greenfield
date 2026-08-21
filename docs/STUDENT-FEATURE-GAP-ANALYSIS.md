@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-21 against `main` (`8988ac1`). The verified-journey table below was established 2026-08-17 against PRs #305-#308; merges since then (STORY-107 Phase 3 second half #417, audit cycle #418-#420, doc refresh #421, gitignore hygiene #422, doc-staleness sweep #423, S-1 QuizEditor `useRef` fix #424, round 32 audit pin #396, round 33 audit closure + `<Link>` swap #398) did not alter the student-facing surfaces in this table. Re-verification is due after the next student-journey change.
+**Last verified:** 2026-08-21 against `main` (`1baf988`). The verified-journey table below was established 2026-08-17 against PRs #305-#308; merges since then (STORY-107 Phase 3 second half #417, audit cycle #418-#420, doc refresh #421, gitignore hygiene #422, doc-staleness sweep #423, S-1 QuizEditor `useRef` fix #424, round 32 audit pin #396, round 33 audit closure + `<Link>` swap #398, doc-staleness sweep #426, LEARN-025 Module 4 campaign pre-flight maps #427) did not alter the student-facing surfaces in this table. Re-verification is due after the next student-journey change.
 
 **Repository:** `amph-v2-greenfield`
 
@@ -25,7 +25,10 @@ mutation, not student-facing); PR #396 pinned C-02 / C-05 / C-06 / C-07 a11y
 contracts; PR #398 swapped two raw `<a>` route links for `<Link>` and pinned
 H-09 / H-11 / H-12 hygiene contracts (admin + student UI surfaces; verified-
 journey table below unchanged because the affected routes already used
-canonical semantics). The current post-merge gate on `main`
+canonical semantics); PR #426 refreshed STATE.md, NEXT-SESSION-PROMPT.md, and
+this audit to `8988ac1`; PR #427 closed LEARN-025 (Module 4 campaign pre-flight
+maps under STORY-127, replacing the closed PR #395 / STORY-122 work with
+PHP-aligned rationale examples). The current post-merge gate on `main`
 passes 3,901 Vitest tests with 3 skipped, 669 architecture checks, TypeScript,
 ESLint, production build, Playwright, and Lighthouse.
 
