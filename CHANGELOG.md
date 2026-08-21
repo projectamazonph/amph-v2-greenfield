@@ -4,6 +4,19 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-21: LEARN-025 Module 4 campaign pre-flight maps (STORY-127)
+
+- Require every Module 4 lesson to add a build-ready campaign-map decision,
+  including its purpose, budget or eligibility constraint, and review trigger.
+  Re-numbered from STORY-122 to STORY-127 because STORY-122 now tracks the
+  active lesson primitives (PR #420) and the original STOR-122/USD-priced
+  fork (PR #395) was closed as stale on 2026-08-21.
+- All four Module 4 lessons (4.1 phone tripod, 4.2 GreenKeep, 4.3 garlic
+  press, 4.4 portable blender) gain a `## Campaign map and pre-flight
+  rationale` section. The 4.4 rationale example now uses the post-PR-417
+  PHP numbers (₱1,750 price, ₱61 exact-match CPC ceiling, ₱880 / ₱480 /
+  ₱240 daily budgets) so the worked example matches the lesson it follows.
+
 ### 2026-08-21: 2026-08-20 audit cycle closes (#404, #417, #418)
 
 The 2026-08-20 audit follow-up umbrella lands in the documented order. #404 lands first as the umbrella doc, #418 and #417 close the still-open audit findings.
