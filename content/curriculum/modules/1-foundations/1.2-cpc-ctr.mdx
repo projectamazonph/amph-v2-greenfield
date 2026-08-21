@@ -46,9 +46,17 @@ CPC, cost per click, is what you pay each time a shopper clicks your ad: `CPC = 
 | Target ACoS | 30% | 25% |
 | Maximum CPC at that target | $0.75 | $0.70 |
 
+:::comparison-table{id="cpc-product-comparison" title="Two products, two CPC ceilings"}
+{"columns":["Bamboo cutting board","Wireless earbuds"],"caption":"Compare CPC to the conversion economics, not to the category headline.","highlightedColumn":0,"rows":[{"label":"Typical CPC","values":["$0.60–$1.20","$1.50–$4.00"],"emphasis":"warning"},{"label":"CVR","values":["10%","8%"]},{"label":"Target ACoS","values":["30%","25%"]},{"label":"Maximum CPC","values":["$0.75","$0.70"],"emphasis":"positive"}]}
+:::
+
 A "cheap" CPC isn't automatically good. Paying $0.10 per click with a 1% conversion rate costs $10 per order. A $2.00 CPC with a 20% conversion rate also costs $10 per order. Same result, very different CPC.
 
 Always calculate the **maximum CPC** a target can support before judging whether a CPC is too high: `maximum CPC = average order value × CVR × target ACoS`. This is the most you can pay per click and still hit that target ACoS (advertising cost of sales). It's only your true break-even CPC if the target ACoS you used is also the product's actual break-even margin (Lesson 1.3 covers how to calculate that margin). Otherwise, treat it as the ceiling for the target you're working to, not a statement about profit.
+
+:::formula-ladder{id="max-cpc-formula" title="Calculate the maximum CPC before changing the bid"}
+{"steps":[{"label":"Start with the selling price","expression":"$24.99"},{"label":"Apply expected conversion rate","expression":"$24.99 × 10% = $2.50 expected ad sales per click","explanation":"A click is valuable only when it has a realistic path to an order."},{"label":"Apply the target ACoS","expression":"$2.50 × 30% = $0.75 maximum CPC","explanation":"This is the ceiling for the target, not a claim about profit."}],"result":{"label":"Maximum CPC","value":"$0.75","context":"Compare the actual CPC to this ceiling before deciding whether the bid is the problem."},"note":"The formula gives you a decision boundary: it does not tell you to bid the full ceiling."}
+:::
 
 ## CTR: are people clicking?
 
@@ -128,6 +136,10 @@ A high CTR with a low conversion rate means the ad attracts clicks but doesn't b
   answerIndex={1}
   explanation="CPC measures cost, not outcome. Always pair CPC with conversion rate and ACoS before declaring a campaign healthy or sick."
 />
+
+:::decision-flow{id="cpc-ctr-diagnosis" title="Diagnose the signal before touching the bid" reveal-mode="after-choice"}
+{"initialStep":0,"steps":[{"id":"attention","label":"Check attention","question":"Is CTR weak for the placement and search intent?","evidence":"Impressions, clicks, placement, title, main image, and query relevance.","action":"If CTR is weak, fix the relevance or listing surface before calling CPC the problem."},{"id":"economics","label":"Check economics","question":"Is actual CPC above the maximum-CPC ceiling?","evidence":"Actual CPC compared with AOV × CVR × target ACoS.","action":"If CPC is above the ceiling, lower the bid or move budget toward terms with better conversion economics."},{"id":"conversion","label":"Check conversion","question":"Does the click become an order at a believable rate?","evidence":"Orders, CVR, detail-page quality, price, reviews, and offer fit.","action":"If CVR is weak, improve the listing or offer before buying more traffic."},{"id":"change","label":"Choose one lever","question":"What is the smallest change that tests the diagnosis?","evidence":"One metric, one hypothesis, one review window.","action":"Change one lever, record the reason, and review after enough clicks to avoid reacting to noise."}]}
+:::
 
 ## Independent calculation
 

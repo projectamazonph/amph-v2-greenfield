@@ -97,6 +97,10 @@ Vulnerability = competitors' average ≥ 2 AND our average ≤ 1.5
 
 Most rows will be neither an opportunity nor a vulnerability by this rule. That's fine. It means the dimension is contested and needs a closer look, not an automatic action.
 
+:::competitive-gap-matrix{id="competitor-gap-matrix" title="Turn benchmark evidence into a gap worth acting on" reveal-mode="after-choice"}
+{"note":"Score comparable dimensions consistently, then separate real opportunity from a contested area that needs more evidence.","dimensions":["Brand defense","Long-tail keywords","Video ads","Weekend bidding","Sponsored Display"],"competitors":[{"id":"competitor-a","label":"Competitor A","values":["Strong","Weak","Not using","Weak","Not using"],"signal":"Competitor A is strong on brand defense but leaves long-tail and display gaps.","action":"Protect branded search, then test long-tail and display where the evidence says the field is weaker."},{"id":"competitor-b","label":"Competitor B","values":["Medium","Weak","Not using","Weak","Weak"],"signal":"Competitor B is not exploiting several controllable surfaces.","action":"Prioritize the gap only if our listing, offer, and account eligibility can support the move."},{"id":"us","label":"Us","values":["Weak","Medium","Strong","Strong","Strong"],"signal":"Our strongest positions are video, weekend rules, and Sponsored Display.","action":"Double down where we already have an execution edge while repairing brand-term defense."}]}
+:::
+
 ---
 
 ## Step 3: Convert Insights to Campaign Actions
@@ -124,6 +128,10 @@ Example:
 | New competitor enters (aggressive) | Review your brand term bids, add defensive targeting | Brand term cost |
 | Competitor has video ads, we don't | Test one Sponsored Brands video campaign | Video vs. standard CTR |
 | Seasonal competitor pauses | Fill the gap with increased bids for the season | Seasonal ROAS (return on ad spend) |
+
+:::insight-router{id="competitive-insight-router" title="Route a market observation into a measurable action" reveal-mode="after-choice"}
+{"routes":[{"id":"long-tail-gap","signal":"Competitors weak on long-tail keywords","implication":"There may be lower-contest demand that still matches the product and offer.","evidence":"Search-term data, relevance, CPC, CVR, and the competitor gap score.","action":"Create an exact-match test for the strongest long-tail terms and compare CTR and ACoS with broad discovery.","owner":"PPC strategist"},{"id":"weekend-gap","signal":"Competitors ignore weekends","implication":"Weekend demand may be under-contested, but the account must support scheduled rules.","evidence":"Day-of-week spend, CVR, placement, and schedule-control eligibility.","action":"Run a bounded weekend bid test and track weekend CVR before expanding it.","owner":"Campaign operator"},{"id":"brand-risk","signal":"Competitors dominate our brand-term defense","implication":"We are vulnerable on demand we already earned.","evidence":"Brand-term SOV, placement reports, bids, and listing eligibility.","action":"Repair brand-term bids and listing readiness before funding broader conquesting.","owner":"Account lead"}]}
+:::
 
 ---
 

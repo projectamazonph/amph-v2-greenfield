@@ -108,6 +108,18 @@ Fixed Bids is like ordering a flat-rate airport shuttle. You know exactly what y
 
 Dynamic Down Only is like a taxi driver who never charges surge prices, but might give you a discount during slow hours. You'll never pay more than the meter says, but you might pay less.
 
+:::comparison-table{id="bid-strategy-control-matrix" title="Compare bid strategies by control and risk"}
+{"caption":"The right strategy is the one whose risk profile fits the campaign's evidence and margin.","columns":["Fixed Bids","Dynamic Down Only","Dynamic Up and Down"],"rows":[{"label":"Can raise your set bid?","values":["No","No","Yes, based on conversion likelihood"]},{"label":"Cost predictability","values":["Highest","High","Lowest"],"emphasis":"positive"},{"label":"Best fit","values":["New data or thin margin","Safe optimization","Proven data and growth appetite"]},{"label":"Primary risk","values":["Missed auctions","Slower volume","Actual CPC exceeds set bid"],"emphasis":"warning"}]}
+:::
+
+:::formula-ladder{id="effective-bid-risk" title="Show how a set bid can become a larger exposure"}
+{"steps":[{"label":"Start with the base bid","expression":"₱50 set bid"},{"label":"Apply dynamic increase","expression":"₱50 × 2.0 = ₱100 at a high-conversion opportunity","explanation":"Dynamic Up and Down can increase the bid based on conversion likelihood."},{"label":"Apply placement adjustment","expression":"₱100 × 1.5 = ₱150 effective top-of-search exposure","explanation":"Placement adjustments are a separate control and stack with the dynamic strategy."}],"result":{"label":"Risk boundary","value":"Monitor realized CPC against your max CPC","context":"The effective exposure is not the same thing as the CPC you will always pay, but it explains why the strategy needs margin and data."},"note":"Treat the bid as a ceiling you control and the realized CPC as the evidence you monitor."}
+:::
+
+:::decision-flow{id="bid-strategy-routing" title="Choose the bid strategy from evidence" reveal-mode="after-choice"}
+{"initialStep":0,"steps":[{"id":"data","label":"Check data maturity","question":"Do you have enough conversion history to trust the algorithm?","evidence":"Weeks of history, conversion volume, and stability of the campaign.","action":"With little data, prefer Fixed Bids or Down Only while you establish a baseline."},{"id":"margin","label":"Check margin cushion","question":"Can the product tolerate CPC variability?","evidence":"Break-even ACoS, maximum CPC, realized CPC, and return risk.","action":"With thin margin, keep the strategy from pushing bids above the ceiling."},{"id":"goal","label":"Name the goal","question":"Are you protecting profit or buying more qualified volume?","evidence":"Launch, steady-state efficiency, defense, or seasonal growth objective.","action":"Use Up and Down only when the objective and risk tolerance justify its variability."},{"id":"review","label":"Set a review rule","question":"What evidence would make you switch strategy?","evidence":"ACoS, CVR, realized CPC, volume, and placement performance over a fixed window.","action":"Write the review date and walk-away condition before enabling the strategy."}]}
+:::
+
 ## What Would YOU Do?
 
 Before looking at the framework below, think about these scenarios yourself:

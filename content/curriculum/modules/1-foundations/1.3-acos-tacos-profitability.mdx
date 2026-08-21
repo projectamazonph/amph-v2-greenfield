@@ -107,6 +107,14 @@ The decision order that keeps all three honest:
 :::process{id="profit-decide" title="Decide if a campaign is profitable" steps="Compute ACoS|Look at TACoS|Compare to break-even|Make a call" hint="ACoS alone lies. TACoS places the spend in context."}
 :::
 
+:::comparison-table{id="profitability-lens-table" title="Read the same spend through three lenses"}
+{"caption":"Use the metric that answers the decision you are actually making.","columns":["ACoS","TACoS","ROAS"],"rows":[{"label":"Question","values":["Are the ads efficient?","Is the store healthy?","How much sales value did spend return?"]},{"label":"Formula","values":["Ad spend ÷ ad sales","Ad spend ÷ total sales","Ad sales ÷ ad spend"]},{"label":"Decision boundary","values":["Below break-even margin","Trend with organic sales","Higher is better, but not profit by itself"],"emphasis":"positive"}]}
+:::
+
+:::formula-ladder{id="break-even-acos-formula" title="Turn margin into a break-even ACoS"}
+{"steps":[{"label":"Calculate profit before ads","expression":"Selling price − product cost = $49.99 − $27.00 = $22.99"},{"label":"Convert profit to margin","expression":"$22.99 ÷ $49.99 = 46% margin","explanation":"This margin is the campaign's break-even ACoS ceiling before returns or other costs."},{"label":"Compare actual ACoS","expression":"50% actual ACoS > 46% break-even","explanation":"The campaign is losing money on ad-driven sales even if the gap looks small."}],"result":{"label":"Profitability call","value":"Lower ACoS below 46% or change the economics","context":"Use CPC, CVR, offer, and targeting evidence to choose the lever."},"note":"A launch can temporarily exceed break-even when the investment is deliberate, measured, and moving toward the target."}
+:::
+
 :::callout{id="low-acos-vanity" variant="warning" title="Low ACoS is not always good"}
 A 5% ACoS on a campaign that drives 1% of total sales is vanity. Always check TACoS and revenue contribution, not just ACoS.
 :::

@@ -123,6 +123,18 @@ A common workflow: start with broad or phrase, let them run for two to four week
 | Conversion rate | Lowest | Medium | Highest |
 | Data value | Requires work | Useful | Gold |
 
+:::comparison-table{id="match-type-role-matrix" title="Choose match type by role, not habit"}
+{"caption":"Reach is useful only when it is connected to a clear learning or profit job.","columns":["Broad","Phrase","Exact"],"rows":[{"label":"Primary job","values":["Discovery","Scaling","Protection"]},{"label":"Control","values":["Low","Medium","High"]},{"label":"Waste risk","values":["High","Medium","Low"],"emphasis":"warning"},{"label":"First evidence to review","values":["Search-term relevance","Long-tail conversion","Profitable repeatability"]}]}
+:::
+
+:::hierarchy-builder{id="match-type-layering" title="Layer discovery into scaling and protection"}
+{"note":"The hierarchy moves evidence downward: broad discovers, phrase expands, exact protects. Keep each layer in its own budget and reporting context.","root":{"id":"match-system","label":"Keyword targeting system","type":"account","children":[{"id":"broad-layer","label":"Broad Discovery","type":"campaign","detail":"Find the search terms","children":[{"id":"broad-group","label":"Broad match","type":"ad-group","detail":"Low bid · add negatives","children":[{"id":"broad-target","label":"water bottle","type":"target"}]}]},{"id":"phrase-layer","label":"Phrase Scaling","type":"campaign","detail":"Expand useful variants","children":[{"id":"phrase-group","label":"Phrase match","type":"ad-group","detail":"Medium bid","children":[{"id":"phrase-target","label":"water bottle","type":"target"}]}]},{"id":"exact-layer","label":"Exact Profit","type":"campaign","detail":"Protect proven winners","children":[{"id":"exact-group","label":"Exact match","type":"ad-group","detail":"Highest control","children":[{"id":"exact-target","label":"water bottle","type":"target"}]}]}]}}
+:::
+
+:::decision-flow{id="match-type-routing" title="Route a keyword by evidence and intent" reveal-mode="after-choice"}
+{"initialStep":0,"steps":[{"id":"intent","label":"Name the job","question":"Is this term for discovery, scaling, or protection?","evidence":"How much do you know about relevance, clicks, and conversions?","action":"Start broad for unknown opportunity, phrase for useful expansion, exact for proven demand."},{"id":"control","label":"Check the risk","question":"How much wasted spend can the campaign tolerate?","evidence":"Daily budget, margin, search-term history, and negative coverage.","action":"Move toward tighter control when the budget or margin cannot absorb noise."},{"id":"harvest","label":"Move the evidence","question":"Has a search term earned a more controlled home?","evidence":"Search-term report with enough clicks and conversion data.","action":"Harvest it into exact, add cross-campaign negatives, and preserve the role of discovery."}]}
+:::
+
 ## The Hierarchy Strategy
 
 Here is how the three match types work together in a mature account:

@@ -91,9 +91,25 @@ Does NOT block: oil for cutting board (wrong word order)
 
 Use negative phrase when you want to block an ENTIRE category of searches.
 
+:::classification-board{id="negative-routing-board" title="Route the negative candidate before you add it" reveal-mode="after-choice"}
+{"prompt":"Classify each candidate by the narrowest safe block.","categories":[{"id":"keep","label":"Keep","description":"The term converts or still fits the product."},{"id":"exact","label":"Negative exact","description":"Block one specific waste term and close variants."},{"id":"phrase","label":"Negative phrase","description":"Block a whole category of searches containing the phrase."}],"items":[{"id":"keep-term","label":"baking mat 3 pack","categoryId":"keep","rationale":"It has sales, so it is not a negative candidate."},{"id":"exact-term","label":"cutting board oil","categoryId":"exact","rationale":"A specific wrong-product term; keep other cutting-board phrasing available."},{"id":"phrase-term","label":"cheap","categoryId":"phrase","rationale":"A category-level price intent that should be blocked wherever it is irrelevant."}]}
+:::
+
 > **Analogy:** Negative exact is like telling your doorman "don't let in anyone named John Smith." Negative phrase is like saying "don't let in anyone whose name has John in it."
 
 ---
+
+:::comparison-table{id="negative-scope-matrix" title="Choose the narrowest safe negative scope"}
+{"caption":"Use exact when one term is wrong. Use phrase when the whole phrase pattern is wrong.","columns":["Negative exact","Negative phrase"],"rows":[{"label":"Blocks","values":["One specific search term","Every search containing the phrase"]},{"label":"Use when","values":["The term is irrelevant but nearby variants may still fit","The category or intent is consistently wrong"]},{"label":"Main risk","values":["Too narrow to stop the waste pattern","Too broad and removes useful traffic"],"emphasis":"warning"},{"label":"Review question","values":["Would another word order or modifier still be relevant?","Can every search containing this phrase be safely blocked?"],"emphasis":"positive"}]}
+:::
+
+:::decision-flow{id="negative-scope-routing" title="Route a waste term without over-blocking" reveal-mode="after-choice"}
+{"initialStep":0,"steps":[{"id":"relevance","label":"Confirm waste","question":"Is the search term clearly irrelevant or just unproven?","evidence":"Product fit, clicks, orders, CTR, and search-term wording.","action":"Do not negative a term merely because it has little data; confirm the mismatch first."},{"id":"scope","label":"Choose scope","question":"Is the problem one term or a whole intent pattern?","evidence":"Related search terms and word-order variants in the report.","action":"Use negative exact for one bad term and negative phrase only when the whole phrase family is wrong."},{"id":"placement","label":"Place the block","question":"Which campaign or ad group should stop serving it?","evidence":"Where the term was triggered and whether it competes with an exact campaign.","action":"Add the negative at the narrowest level that prevents the waste without blocking useful discovery."},{"id":"review","label":"Check the effect","question":"Did spend fall without taking useful sales with it?","evidence":"Before-and-after spend, orders, ACoS, and search-term mix.","action":"Keep, narrow, or remove the negative based on observed impact."}]}
+:::
+
+:::timeline-calendar{id="negative-maintenance-calendar" title="Make negative maintenance a recurring operating habit"}
+{"caption":"A negative list is a living control system, not a one-time cleanup.","note":"Use the frequency as a starting rhythm; adapt it to account size, spend velocity, and search-term volume.","periods":["Every run","Weekly","Monthly"],"rows":[{"id":"scan","label":"Scan","tone":"info","values":["Flag obvious mismatches","Sort the top spend terms","Review repeated patterns"],"note":"Read the evidence."},{"id":"action","label":"Action","tone":"accent","values":["Hold until relevance is confirmed","Add exact or phrase at the right scope","Refactor shared negatives and campaign overlap"],"note":"Change the smallest safe surface."},{"id":"review","label":"Review","tone":"success","values":["Watch the next report window","Check before-and-after spend and sales","Update the rule or owner if the pattern persists"],"note":"Prove the block worked."}]}
+:::
 
 ## The Three Sources of Negative Keywords
 

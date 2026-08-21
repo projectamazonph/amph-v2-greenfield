@@ -38,7 +38,9 @@ interface BlockIssue {
 const FENCE_OPEN = /^:::([a-z-]+)(?:\{([^}]*)\})?\s*$/;
 const FENCE_CLOSE = /^:::\s*$/;
 const ID_PATTERN = /^[a-z][a-z0-9-]*$/;
-const ALLOWED_DIRECTIVES = new Set(["trade-off", "process", "callout"]);
+const TRANCHE_ONE_DIRECTIVES = new Set(["comparison-table", "formula-ladder", "classification-board", "decision-flow", "simulation-rubric"]);
+const TRANCHE_TWO_DIRECTIVES = new Set(["annotated-listing", "hierarchy-builder", "funnel-canvas", "timeline-calendar", "competitive-gap-matrix", "insight-router", "lesson-pathway", "simulation-brief", "portfolio-map", "seasonal-calendar", "evidence-ledger", "sov-positioner"]);
+const ALLOWED_DIRECTIVES = new Set(["trade-off", "process", "callout", "visual", "slide", ...TRANCHE_ONE_DIRECTIVES, ...TRANCHE_TWO_DIRECTIVES]);
 const ALLOWED_CALLOUT_VARIANTS = new Set(["info", "warning", "pitfall"]);
 const EM_DASH = "\u2014";
 
@@ -134,6 +136,98 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
         }
       }
       const { closeIdx } = findFenceBody(lines, i + 1);
+      if (closeIdx !== -1) i = closeIdx;
+      continue;
+    }
+
+    if (name === "visual" || name === "slide") {
+      if (!attrs.title) {
+        issues.push({ file, line: lineNo, message: `${name} requires a 'title' attribute` });
+      }
+      if (!attrs.kind) {
+        issues.push({ file, line: lineNo, message: `${name} requires a 'kind' attribute` });
+      }
+      const { closeIdx, body } = findFenceBody(lines, i + 1);
+      const payload = body.join("\n").trim();
+      if (!payload) {
+        issues.push({ file, line: lineNo, message: `${name} body must contain visual data` });
+      } else {
+        try {
+          JSON.parse(payload);
+        } catch {
+          issues.push({ file, line: lineNo, message: `${name} body must be valid JSON` });
+        }
+      }
+      if (closeIdx !== -1) i = closeIdx;
+      continue;
+    }
+
+    if (TRANCHE_ONE_DIRECTIVES.has(name) || TRANCHE_TWO_DIRECTIVES.has(name)) {
+      if (!attrs.title) {
+        issues.push({ file, line: lineNo, message: `${name} requires a 'title' attribute` });
+      }
+      const { closeIdx, body } = findFenceBody(lines, i + 1);
+      const payload = body.join("\n").trim();
+      if (!payload) {
+        issues.push({ file, line: lineNo, message: `${name} body must contain JSON data` });
+      } else {
+        try {
+          const value = JSON.parse(payload) as Record<string, unknown>;
+          if (name === "comparison-table" && (!Array.isArray(value.columns) || value.columns.length < 2 || !Array.isArray(value.rows) || value.rows.length < 2)) {
+            issues.push({ file, line: lineNo, message: "comparison-table needs at least 2 columns and 2 rows" });
+          }
+          if (name === "formula-ladder" && (!Array.isArray(value.steps) || value.steps.length < 2)) {
+            issues.push({ file, line: lineNo, message: "formula-ladder needs at least 2 steps" });
+          }
+          if (name === "classification-board" && (!Array.isArray(value.categories) || value.categories.length < 2 || !Array.isArray(value.items) || value.items.length < 1)) {
+            issues.push({ file, line: lineNo, message: "classification-board needs at least 2 categories and 1 item" });
+          }
+          if (name === "decision-flow" && (!Array.isArray(value.steps) || value.steps.length < 2)) {
+            issues.push({ file, line: lineNo, message: "decision-flow needs at least 2 steps" });
+          }
+          if (name === "simulation-rubric" && (typeof value.scenario !== "string" || !Array.isArray(value.criteria) || value.criteria.length < 2)) {
+            issues.push({ file, line: lineNo, message: "simulation-rubric needs a scenario and at least 2 criteria" });
+          }
+          if (name === "annotated-listing" && (!Array.isArray(value.sections) || value.sections.length < 2)) {
+            issues.push({ file, line: lineNo, message: "annotated-listing needs at least 2 sections" });
+          }
+          if (name === "hierarchy-builder" && (!value.root || typeof value.root !== "object")) {
+            issues.push({ file, line: lineNo, message: "hierarchy-builder needs a root node" });
+          }
+          if (name === "funnel-canvas" && (!Array.isArray(value.stages) || value.stages.length < 2)) {
+            issues.push({ file, line: lineNo, message: "funnel-canvas needs at least 2 stages" });
+          }
+          if (name === "timeline-calendar" && (!Array.isArray(value.periods) || value.periods.length < 2 || !Array.isArray(value.rows) || value.rows.length < 1)) {
+            issues.push({ file, line: lineNo, message: "timeline-calendar needs at least 2 periods and 1 row" });
+          }
+          if (name === "competitive-gap-matrix" && (!Array.isArray(value.dimensions) || value.dimensions.length < 2 || !Array.isArray(value.competitors) || value.competitors.length < 2)) {
+            issues.push({ file, line: lineNo, message: "competitive-gap-matrix needs at least 2 dimensions and 2 competitors" });
+          }
+          if (name === "insight-router" && (!Array.isArray(value.routes) || value.routes.length < 2)) {
+            issues.push({ file, line: lineNo, message: "insight-router needs at least 2 routes" });
+          }
+          if (name === "lesson-pathway" && (!Array.isArray(value.steps) || value.steps.length < 2)) {
+            issues.push({ file, line: lineNo, message: "lesson-pathway needs at least 2 steps" });
+          }
+          if (name === "simulation-brief" && (!Array.isArray(value.fields) || value.fields.length < 2)) {
+            issues.push({ file, line: lineNo, message: "simulation-brief needs at least 2 fields" });
+          }
+          if (name === "portfolio-map" && (!Array.isArray(value.groups) || value.groups.length < 2)) {
+            issues.push({ file, line: lineNo, message: "portfolio-map needs at least 2 groups" });
+          }
+          if (name === "seasonal-calendar" && (!Array.isArray(value.phases) || value.phases.length < 2)) {
+            issues.push({ file, line: lineNo, message: "seasonal-calendar needs at least 2 phases" });
+          }
+          if (name === "evidence-ledger" && (!Array.isArray(value.entries) || value.entries.length < 2)) {
+            issues.push({ file, line: lineNo, message: "evidence-ledger needs at least 2 entries" });
+          }
+          if (name === "sov-positioner" && (!Array.isArray(value.bands) || value.bands.length < 2)) {
+            issues.push({ file, line: lineNo, message: "sov-positioner needs at least 2 bands" });
+          }
+        } catch {
+          issues.push({ file, line: lineNo, message: `${name} body must be valid JSON` });
+        }
+      }
       if (closeIdx !== -1) i = closeIdx;
       continue;
     }
