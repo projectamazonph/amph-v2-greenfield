@@ -29,6 +29,18 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 - `scripts/_audit-sentence-length.cjs` (new): Node CommonJS script that scans 5 MDX files (Modules 2-3 lessons) for body-prose sentences over 30 words, skipping frontmatter, code blocks (tracks ``` state), tables, headings, lists, and blockquotes. Renamed from `.js` to `.cjs` because the repo's `package.json` declares `"type": "module"` and the script uses CommonJS `require()`. Final pass: zero over-30-word sentences in body prose. Reference metadata inside `Fact card` blocks (2.2 line 225, 2.4 line 218) is intentionally left intact. Those are structured reference cards with field-style metadata, not body prose, so the voice guide's sentence-length rule does not apply.
 - Phase 3 second half (Modules 4, 5, 6, 7, 8 voice stabilization) is queued for the next curriculum-cycle PR. The audit's full survey counted ~70 blockquote-header violations across 19 lessons; Modules 4-8 still need the same drop + context-normalize pass.
 
+### 2026-08-20: Curriculum voice stabilization. Phase 3 second half: Modules 4-8 (STORY-107)
+
+- 16 lessons across Modules 4, 5, 6, 7, 8 received the same three transforms PR #397 applied to Modules 2-3: dropped `> **Analogy:**` / `> **Tip:**` / `> **Watch out:**` / `> **Key Takeaway:**` blockquote headers and converted each to inline prose; converted USD amounts to PHP at the established ~50:1 rate used by Modules 2-3; tightened body-prose sentences to honor the 30-word ceiling. Per-module highlights:
+  - Module 4 (4.1-4.4): dropped 11 blockquote headers, converted 12 USD amounts to PHP (e.g. `$29.99` → `₱1,500`, `$18.99` → `₱950`, `$34.99` → `₱1,750`), tightened 4 long sentences.
+  - Module 5 (5.1-5.3): dropped 19 blockquote headers (the heaviest of any module; 5.1 had five `> **Analogy:**` blocks), tightened 9 long sentences. Already fully Filipino-priced, so no USD conversions needed.
+  - Module 6 (6.1-6.3): dropped 9 blockquote headers, converted 41 USD amounts to PHP (the most USD-heavy module; 6.2 alone had 22), tightened 13 long sentences. The worked examples in 6.2 and 6.3 now use the same ₱-per-click ladder the Bid Elevator simulator expects.
+  - Module 7 (7.1-7.3): dropped 8 blockquote headers, converted 6 USD amounts to PHP, tightened 4 long sentences.
+  - Module 8 (8.1-8.3): no blockquote headers, no USD amounts (module was already clean on both axes from earlier rounds); tightened 8 long sentences. Module 8 is the first module where the only remaining work was sentence length.
+- `scripts/_audit-voice-phase3-m4-8.cjs` (new): Node CommonJS script that scans all 16 MDX files for the same four classes of voice-guide violations PR #397 audited on Modules 2-3. Extends `_audit-sentence-length.cjs` with USD / em-dash / blockquote-header counters. Final pass: zero USD, zero em-dashes, zero `> **Analogy|Tip|Watch out|Key Takeaway|Heads-up|Note|Warning:**` headers, zero over-30-word body sentences across the 16 files.
+- `docs/stories/STORY-107.md`: status updated to reflect Phase 3 second-half completion.
+- Refactored the audit script's sentence-splitting regex to handle the `.` followed by `"` pattern that bit 5.1's quoted question (line 227 was 31 words because the script treated `"...once." The client...` as one sentence).
+
 ### LEARN-024: Finish Module 3 with listing-audit rationales
 
 - Require an evidence-backed listing-readiness decision in every Module 3

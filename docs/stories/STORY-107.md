@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** In progress. Phase 3 first half shipped: Modules 2-3 (5 lessons: 2.2, 2.4, 3.1, 3.2, 3.3). Blockquote drops, Filipino context normalization ($→₱), and sentence length audit (≤ 30 words in body prose). Fact card reference metadata left intact. Phase 3 second half (Modules 4, 5, 6, 7, 8) queued.
+**Status:** In progress. Phase 3 first half shipped: Modules 2-3 (5 lessons: 2.2, 2.4, 3.1, 3.2, 3.3). Phase 3 second half shipped: Modules 4-8 (16 lessons: 4.1-4.4, 5.1-5.3, 6.1-6.3, 7.1-7.3, 8.1-8.3). Both halves apply the same three transforms: blockquote drops, Filipino context normalization ($→₱), and sentence length audit (≤ 30 words in body prose). Fact card reference metadata left intact across all 21 lessons.
 
 ## Goal
 
