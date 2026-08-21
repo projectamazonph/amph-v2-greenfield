@@ -42,5 +42,10 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "docs/ui-specs/refs"]
+  "exclude": [
+    "node_modules",
+    "docs/ui-specs/refs",
+    "src/**/*.fixture.tsx",
+    "src/**/*.fixture.ts"
+  ]
 }
