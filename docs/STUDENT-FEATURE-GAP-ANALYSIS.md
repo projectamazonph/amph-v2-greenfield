@@ -1,12 +1,12 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-17 against the curriculum voice stabilization (STORY-107 Phase 3 first half) branch (PR #TBD)
+**Last verified:** 2026-08-21 against `main` (`582112d`). The verified-journey table below was established 2026-08-17 against PRs #305-#308; merges since then (STORY-107 Phase 3 second half #417, audit cycle #418-#420, doc refresh #421, gitignore hygiene #422) did not alter the student-facing surfaces in this table. Re-verification is due after the next student-journey change.
 
 **Repository:** `amph-v2-greenfield`
 
 **Implementation story:** `docs/stories/STORY-104.md`
 
-**Curriculum tone remediation:** `docs/stories/STORY-107.md` (Phase 3 first half shipped 2026-08-17: voice template + $→₱ applied to all 5 Module 2 and Module 3 lessons; Phase 3 second half queued for Modules 4, 5, 6, 7, 8).
+**Curriculum tone remediation:** `docs/stories/STORY-107.md` (Phase 3 first half shipped 2026-08-17: voice template + $→₱ applied to all 5 Module 2 and Module 3 lessons. Phase 3 second half shipped 2026-08-21 in PR #417: same transforms applied to Modules 4-8, including 16 lessons, with a final-pass audit reporting zero USD, zero em-dashes, zero blockquote-header violations, and zero over-30-word body sentences across the 16 files).
 
 This report replaces the 2026-08-01 gap queue. The previous open student
 journey gaps were checked against the current routes, server actions, use cases,
@@ -17,8 +17,11 @@ verification, not missing product code.
 PR #305 merged the repair at `9096cf4`. PR #306 then repaired manually granted
 student access by creating eligible published-course enrollments. PR #307 fixed
 the admin-login redirect cookie, and PR #308 fixed forgot-password links. The
-post-merge gate passed 3,816 Vitest tests with 2 skipped, 665 architecture
-checks, TypeScript, ESLint, production build, Playwright, and Lighthouse.
+2026-08-20 audit cycle closed on 2026-08-21 with PRs #417, #418, #419, and #420;
+PR #421 refreshed STATE.md and CHANGELOG.md; PR #422 added `.qoder/` and
+`package-lock.json` to `.gitignore`. The current post-merge gate on `main`
+passes 3,901 Vitest tests with 3 skipped, 669 architecture checks, TypeScript,
+ESLint, production build, Playwright, and Lighthouse.
 
 ## Verified student journeys
 
@@ -40,7 +43,7 @@ checks, TypeScript, ESLint, production build, Playwright, and Lighthouse.
 
 - TypeScript: pass.
 - ESLint: pass.
-- Full Vitest suite: 4,063 passing and 3 intentionally skipped.
+- Full Vitest suite: 3,901 passing and 3 intentionally skipped.
 - Student event boundary coverage is documented in
   `docs/STUDENT-EVENT-COVERAGE.md`.
 - Architecture suite: 669 passing, including design-token and loading-state
@@ -48,6 +51,7 @@ checks, TypeScript, ESLint, production build, Playwright, and Lighthouse.
 - Next.js production build: pass.
 - Prisma schema and migration contracts: pass in the full test suite.
 - Playwright and Lighthouse: passed in GitHub CI.
+- Coverage: 80.42% statements / 74.19% branches / 80.71% functions / 81.80% lines.
 
 ## Release verification still required
 
