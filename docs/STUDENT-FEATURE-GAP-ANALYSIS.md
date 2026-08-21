@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-21 against `main` (`54b5a18`). The verified-journey table below was established 2026-08-17 against PRs #305-#308; merges since then (STORY-107 Phase 3 second half #417, audit cycle #418-#420, doc refresh #421, gitignore hygiene #422, doc-staleness sweep #423, S-1 QuizEditor `useRef` fix #424) did not alter the student-facing surfaces in this table. Re-verification is due after the next student-journey change.
+**Last verified:** 2026-08-21 against `main` (`8988ac1`). The verified-journey table below was established 2026-08-17 against PRs #305-#308; merges since then (STORY-107 Phase 3 second half #417, audit cycle #418-#420, doc refresh #421, gitignore hygiene #422, doc-staleness sweep #423, S-1 QuizEditor `useRef` fix #424, round 32 audit pin #396, round 33 audit closure + `<Link>` swap #398) did not alter the student-facing surfaces in this table. Re-verification is due after the next student-journey change.
 
 **Repository:** `amph-v2-greenfield`
 
@@ -21,7 +21,11 @@ the admin-login redirect cookie, and PR #308 fixed forgot-password links. The
 PR #421 refreshed STATE.md and CHANGELOG.md; PR #422 added `.qoder/` and
 `package-lock.json` to `.gitignore`; PR #423 ran a doc-staleness sweep; PR #424
 landed the S-1 `QuizEditor` `useRef` fix and rewrote the H-16 pin test (admin
-mutation, not student-facing). The current post-merge gate on `main`
+mutation, not student-facing); PR #396 pinned C-02 / C-05 / C-06 / C-07 a11y
+contracts; PR #398 swapped two raw `<a>` route links for `<Link>` and pinned
+H-09 / H-11 / H-12 hygiene contracts (admin + student UI surfaces; verified-
+journey table below unchanged because the affected routes already used
+canonical semantics). The current post-merge gate on `main`
 passes 3,901 Vitest tests with 3 skipped, 669 architecture checks, TypeScript,
 ESLint, production build, Playwright, and Lighthouse.
 
