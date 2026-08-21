@@ -14,6 +14,14 @@ The 2026-08-20 audit follow-up umbrella lands in the documented order. #404 land
 
 PR #416 (`fix/quizeditor-controlled-hidden-input`) stays held: its branch tip still mirrors the now-merged umbrella diff and the S-1 `QuizEditor` hidden-input commit was never added.
 
+### 2026-08-21: S-1 QuizEditor owns its hidden input (audit cycle closeout)
+
+- `src/components/admin/QuizEditor.tsx`: the hidden `questionsJson` input is now rendered as a sibling of the editor and held in `useRef<HTMLInputElement>(null)`. The per-update `document.querySelector` call and the mount-time `useEffect` seed are both removed. `syncHiddenInput(next)` writes through the ref whenever `update()` runs. The import line drops `useEffect` and gains `useRef`. Doc comment now states the S-1 contract.
+- `src/app/admin/quizzes/new/page.tsx`: removed the parallel `<input type="hidden" name="questionsJson" id="questionsJsonInput" />` and fixed the `<QuizEditor name="questions" ...>` to `<QuizEditor name="questionsJson" ...>`. The two names mismatched in the previous wiring, which would have produced an empty `questionsJson` form value on submit.
+- `src/app/admin/quizzes/[quizId]/edit/page.tsx`: removed the parallel hidden input. The editor already passed `name="questionsJson"` correctly; the redundant input was the only thing the S-1 fix made unnecessary on this page.
+- `src/app/__tests__/round34-tokens-fieldmanual-submit-button-pins.test.ts`: H-16 (`QuizEditor does not perform DOM side effects during render`) is rewritten to pin the S-1 contract — `useRef<HTMLInputElement>(null)` declared as `hiddenInputRef`, hidden input rendered with `ref={hiddenInputRef}` and `name={name}`, no `useEffect` import, no `useEffect(` call, no `document.querySelector(` call. The new contract replaces the round 30 / M-R30 fix that the previous test pinned.
+- `.audit-2026-08-20/UMBRELLA.md`: S-1 marked closed with the PR reference. S-2, S-3, and the voice 4-8 items already closed by PRs #418 and #417 are also marked closed for the same reason — the umbrella doc was stale on those entries. STORY-086, STORY-083, STORY-081b, STORY-089, admin 2FA enforcement, and the database backup drill remain explicitly open with their deferral rationale.
+
 ### 2026-08-20: Active lesson primitives for Module 1 (STORY-122, STORY-123)
 
 - `src/components/lesson/SelfCheck.tsx` plus `.module.css` (new): `'use client'` radio-group primitive with reveal-then-try-again UX, no `useEffect`, no `localStorage`, no grading call. Options use `role="radio"` with `aria-checked`, prompt has `aria-labelledby`, feedback uses `role="status"` + `aria-live="polite"`. Color is never the only signal.

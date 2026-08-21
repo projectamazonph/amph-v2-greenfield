@@ -124,9 +124,7 @@ export default async function NewQuizPage({ searchParams }: PageProps) {
             />
           </label>
 
-          <input type="hidden" name="questionsJson" id="questionsJsonInput" />
-
-          <QuizEditor name="questions" initial={initialQuestions} />
+          <QuizEditor name="questionsJson" initial={initialQuestions} />
 
           <div className={styles.actions}>
             <Link href="/admin/quizzes" className={styles.cancelButton}>
