@@ -4,6 +4,16 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-21: 2026-08-20 audit cycle closes (#404, #417, #418)
+
+The 2026-08-20 audit follow-up umbrella lands in the documented order. #404 lands first as the umbrella doc, #418 and #417 close the still-open audit findings.
+
+- PR #404 (`88760ed`, `chore/audit-2026-08-20-followup`, +423/-0 across 3 files): audit follow-up umbrella. `.audit-2026-08-20/UMBRELLA.md` plus the issue-filing scripts that route the still-open audit findings (S-1, S-2, S-3, L-03, voice 4-8). Doc-only.
+- PR #418 (`79befba`, `chore/s2-displayname-s3-shadows`, +218/-10 across 19 files): S-2 `displayName` on 14 UI primitives + S-3 shadow-scale unification. `src/components/ui/Card.tsx` and `src/themes/amph-theme.ts` move to the unified shadow ramp. Card lifted from a special-case to the design-system scale.
+- PR #417 (`e278e22`, `chore/voice-phase3-modules-4-8`, +365/-168 across 19 files): voice stabilization Phase 3 second half. Drops the `> **Analogy:**` and `> **Tip:**` blockquote-header artifacts across Modules 4, 5, 6, 7, 8 and converts each into inline prose. Filipino context normalization continues (`$` becomes `₱`). Closes STORY-107 last leg.
+
+PR #416 (`fix/quizeditor-controlled-hidden-input`) stays held: its branch tip still mirrors the now-merged umbrella diff and the S-1 `QuizEditor` hidden-input commit was never added.
+
 ### 2026-08-20: Active lesson primitives for Module 1 (STORY-122, STORY-123)
 
 - `src/components/lesson/SelfCheck.tsx` plus `.module.css` (new): `'use client'` radio-group primitive with reveal-then-try-again UX, no `useEffect`, no `localStorage`, no grading call. Options use `role="radio"` with `aria-checked`, prompt has `aria-labelledby`, feedback uses `role="status"` + `aria-live="polite"`. Color is never the only signal.
