@@ -45,3 +45,7 @@ export function Badge({
     </span>
   );
 }
+
+// S-2 fix (audit 2026-08-20, umbrella #404, child #406): explicit
+// displayName. See Button.tsx for the rationale.
+Badge.displayName = "Badge";

@@ -44,6 +44,10 @@ export function SkeletonBlock({
   );
 }
 
+// S-2 fix (audit 2026-08-20, umbrella #404, child #406): explicit
+// displayName. See Button.tsx for the rationale.
+SkeletonBlock.displayName = "SkeletonBlock";
+
 /* ------------------------------------------------------------------ */
 /*  Text — a multi-line text skeleton                                  */
 /* ------------------------------------------------------------------ */
@@ -70,6 +74,8 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
   );
 }
 
+SkeletonText.displayName = "SkeletonText";
+
 /* ------------------------------------------------------------------ */
 /*  Row — a table row skeleton                                         */
 /* ------------------------------------------------------------------ */
@@ -89,6 +95,8 @@ export function SkeletonRow({ columns = 4 }: { columns?: number }) {
     </div>
   );
 }
+
+SkeletonRow.displayName = "SkeletonRow";
 
 /* ------------------------------------------------------------------ */
 /*  Card — a rectangular card skeleton with optional header lines      */
@@ -116,6 +124,8 @@ export function SkeletonCard({ lines = 2, className }: { lines?: number; classNa
     </div>
   );
 }
+
+SkeletonCard.displayName = "SkeletonCard";
 
 /* ------------------------------------------------------------------ */
 /*  Table — a full table skeleton with header + rows                   */
@@ -158,6 +168,8 @@ export function SkeletonTable({ columns = 4, rows = 5 }: { columns?: number; row
   );
 }
 
+SkeletonTable.displayName = "SkeletonTable";
+
 /* ------------------------------------------------------------------ */
 /*  StatTile — a dashboard stat tile skeleton                          */
 /* ------------------------------------------------------------------ */
@@ -177,6 +189,8 @@ export function SkeletonStatTile({ className }: { className?: string }) {
   );
 }
 
+SkeletonStatTile.displayName = "SkeletonStatTile";
+
 /* ------------------------------------------------------------------ */
 /*  Form — a form skeleton with label + input pairs                    */
 /* ------------------------------------------------------------------ */
@@ -194,3 +208,5 @@ export function SkeletonForm({ fields = 4 }: { fields?: number }) {
     </div>
   );
 }
+
+SkeletonForm.displayName = "SkeletonForm";

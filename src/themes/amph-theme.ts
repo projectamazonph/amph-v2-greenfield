@@ -113,9 +113,14 @@ export const amphTheme = defineTheme({
   //            --color-success*, --color-error*, --color-warning*,
   //            and the full blue/gray/green/orange/pink/purple/red/teal/yellow scales
   //   spacing: --spacing-0 through --spacing-12 (no -16 or -20)
-  //   shadow:  --shadow-low, --shadow-med, --shadow-high,
-  //            --shadow-inset-{hover,selected,success,warning,error}
-  //   (NOT --shadow-sm/md/lg, NOT --spacing-16/20, NOT --color-info)
+  //   shadow:  --shadow-sm, --shadow-md, --shadow-lg
+  //            (the actual scale used by globals.css and every caller;
+  //            --shadow-low/med/high used to be defined here as an
+  //            experimental Astryx-aligned scale but no caller ever
+  //            adopted it, so it was removed in S-3, audit 2026-08-20,
+  //            umbrella #404, child #407. --shadow-inset-* are still
+  //            reserved for the Field Manual inset states.)
+  //   (NOT --shadow-low/med/high, NOT --spacing-16/20, NOT --color-info)
   tokens: {
     // Brand
     "--color-accent": [amphPalette.accent, amphPalette.accentHover],
@@ -152,11 +157,11 @@ export const amphTheme = defineTheme({
     "--color-on-error": "#FFFFFF",
 
     // AMPH shadow overrides — flat elevation, no shadow at rest.
-    // Uses Astryx's --shadow-low/med/high (NOT --shadow-sm/md/lg).
-    // Original Astryx values are slightly heavier; these are more field-manual.
-    "--shadow-low": "0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02)",
-    "--shadow-med": "0 2px 4px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.04)",
-    "--shadow-high": "0 4px 8px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.06)",
+    // Uses --shadow-sm/md/lg as defined in src/app/globals.css line 100.
+    // The previous --shadow-low/med/high overrides (sourced from Astryx)
+    // were removed in S-3 because no caller ever adopted that scale; the
+    // sm/md/lg scale in globals.css is the only one referenced anywhere
+    // in src/. See child #407 for the audit context.
 
     // AMPH spacing (4px base) — mirrors globals.css :root where it overlaps.
     // Astryx only provides --spacing-0 through --spacing-12.
