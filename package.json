@@ -52,7 +52,7 @@
     "@swc/helpers": "0.5.23",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
-    "@vercel/blob": "^2.6.1",
+    "@vercel/blob": "^2.8.0",
     "clsx": "^2.1.1",
     "gray-matter": "^4.0.3",
     "jose": "^6.2.3",
