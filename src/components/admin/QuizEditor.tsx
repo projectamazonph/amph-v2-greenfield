@@ -1,14 +1,19 @@
 /**
  * QuizEditor — client component for the nested question/option editor.
  *
- * STORY-091 (US-006). Serializes the questions array to a hidden
- * `questionsJson` field on submit so the server action can consume
- * a single FormData. The page is responsible for naming the hidden
- * input via the `name` prop (default: "questionsJson").
+ * STORY-091 (US-006). Renders a hidden `questionsJson` input alongside
+ * the visible editor; the input is owned by this component so the form
+ * serializes the current question state on submit. The page passes the
+ * input's `name` via the `name` prop (default: "questionsJson").
+ *
+ * S-1 fix: the previous implementation looked the hidden input up via
+ * `document.querySelector` on every keystroke. It now renders the input
+ * as a sibling and holds the node in a `useRef`. No DOM lookup, no
+ * `typeof document !== "undefined"` guard, no `useEffect` mount seed.
  */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import styles from "./QuizEditor.module.css";
 
 export interface EditorOption {
@@ -48,14 +53,20 @@ function newQuestion(): EditorQuestion {
 
 export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps) {
   const [questions, setQuestions] = useState<EditorQuestion[]>(initial);
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
+
+  // Mirror state into the hidden input through the ref. Each call to
+  // update() flows setQuestions + syncHiddenInput so the form sees the
+  // latest JSON on submit.
+  function syncHiddenInput(next: EditorQuestion[]): void {
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.value = JSON.stringify(next);
+    }
+  }
 
   function update(next: EditorQuestion[]) {
     setQuestions(next);
-    // Keep the hidden input in sync so server actions can read it.
-    if (typeof document !== "undefined") {
-      const input = document.querySelector<HTMLInputElement>(`input[name="${name}"]`);
-      if (input) input.value = JSON.stringify(next);
-    }
+    syncHiddenInput(next);
   }
 
   function addQuestion() {
@@ -121,20 +132,18 @@ export function QuizEditor({ initial, name = "questionsJson" }: QuizEditorProps)
     update(next);
   }
 
-  // Seed the hidden input once on mount. Side effects during render are
-  // undefined behavior in concurrent mode, so this lives in useEffect.
-  // We intentionally only seed on mount; subsequent updates flow through
-  // `update()` which writes the hidden input synchronously.
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const input = document.querySelector<HTMLInputElement>(`input[name="${name}"]`);
-    if (input && !input.value) {
-      input.value = JSON.stringify(questions);
-    }
-  }, [name, questions]);
-
   return (
     <div className={styles.editor}>
+      {/* The hidden input is owned by this component. The ref gives
+          update() a stable handle without a DOM lookup, and the
+          defaultValue seeds the form on first render. The parent page
+          no longer needs to render a parallel hidden input. */}
+      <input
+        ref={hiddenInputRef}
+        type="hidden"
+        name={name}
+        defaultValue={JSON.stringify(initial)}
+      />
       <div className={styles.header}>
         <h3 className={styles.headerTitle}>Questions ({questions.length})</h3>
         <button type="button" onClick={addQuestion} className={styles.addQuestionButton}>

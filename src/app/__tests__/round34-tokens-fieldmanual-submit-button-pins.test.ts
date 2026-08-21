@@ -323,56 +323,48 @@ describe("round 34 — Voice + a11y honesty (H-15, H-16)", () => {
     });
   });
 
-  describe("H-16: QuizEditor does not perform DOM side effects during render", () => {
+  describe("H-16: QuizEditor owns its hidden input via useRef (S-1)", () => {
     const FILE = "src/components/admin/QuizEditor.tsx";
 
-    it("any document.querySelector call is inside useEffect or a named handler", () => {
+    it("QuizEditor.tsx imports the useRef hook", () => {
       const src = SRC(FILE);
-      // Find every `document.querySelector` reference. For each,
-      // assert the surrounding context is inside a useEffect body
-      // or inside a named function that is only invoked from event
-      // handlers (the audit's narrow requirement is "not during
-      // render"). The simplest robust check: the `document.querySelector`
-      // call must sit inside a `useEffect(() => { ... })` block OR
-      // inside a function whose body is reachable only from event
-      // handlers (e.g., `function update(...) { ... }` and the
-      // function is referenced from onClick/onChange).
-      const matches = src.match(/document\.querySelector/g) ?? [];
-      expect(matches.length).toBeGreaterThan(0); // sanity: the call exists
-
-      for (const m of src.matchAll(/document\.querySelector/g)) {
-        const start = m.index ?? 0;
-        const before = src.slice(Math.max(0, start - 1500), start);
-        const after = src.slice(start, start + 800);
-        // Look for: useEffect(() => { ... } /* match here */ })
-        const isInUseEffect =
-          /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[\s\S]*$/.test(before) &&
-          /^\s*document\.querySelector[\s\S]*?\}\s*\)/.test(after);
-        // OR: inside a function definition that is then invoked from
-        // event handlers. The `update()` function in QuizEditor
-        // declares a `if (typeof document !== "undefined")` guard
-        // before the querySelector, which is the canonical pattern.
-        const isInGuardedFunction =
-          /function\s+\w+\s*\([^)]*\)\s*\{[\s\S]{0,1000}typeof document[\s\S]*?$/.test(
-            before,
-          );
-        expect(isInUseEffect || isInGuardedFunction).toBe(true);
-      }
+      expect(src).toMatch(/import\s+\{[^}]*\buseRef\b[^}]*\}\s+from\s+["']react["']/);
     });
 
-    it("QuizEditor.tsx imports the useEffect hook", () => {
+    it("QuizEditor.tsx does not import useEffect", () => {
       const src = SRC(FILE);
-      expect(src).toMatch(/import\s+\{[^}]*\buseEffect\b[^}]*\}\s+from\s+["']react["']/);
+      // The H-16 (S-1) contract renders the hidden input as a sibling
+      // and holds it in a ref. The mount-time `useEffect` seed that
+      // the round 30 fix added is no longer needed. Pin both the
+      // import and the call site, not the prose.
+      expect(src).not.toMatch(/import\s+\{[^}]*\buseEffect\b/);
+      expect(src).not.toMatch(/\buseEffect\s*\(/);
     });
 
-    it("the hidden-input seed lives inside a useEffect call (round 30 fix)", () => {
+    it("QuizEditor.tsx does not perform a document.querySelector DOM lookup", () => {
       const src = SRC(FILE);
-      // The audit's literal example was the `if (typeof document ...)`
-      // rail that the round 30 / M-R30 fix moved into a useEffect.
-      // Pin that the useEffect exists and contains the seed.
-      const effectBlock = src.match(/useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[\s\S]*?\}\s*,\s*\[[^\]]*\]\s*\)/);
-      expect(effectBlock).not.toBeNull();
-      expect(effectBlock?.[0] ?? "").toContain("document.querySelector");
+      // The S-1 fix removes the per-update `document.querySelector` call
+      // and the mount-time seed. The ref captures the local hidden input
+      // directly, so the DOM lookup is gone. Match the call site
+      // (with parens), not the prose.
+      expect(src).not.toMatch(/document\.querySelector\s*\(/);
+    });
+
+    it("QuizEditor.tsx declares a useRef<HTMLInputElement>(null) named hiddenInputRef", () => {
+      const src = SRC(FILE);
+      expect(src).toMatch(/useRef<HTMLInputElement>\(null\)/);
+      expect(src).toMatch(/hiddenInputRef/);
+    });
+
+    it("QuizEditor.tsx renders a hidden input wired to the ref", () => {
+      const src = SRC(FILE);
+      // The hidden input is now owned by QuizEditor. The parent's
+      // `name` prop controls the form field name; the ref gives the
+      // updater a stable handle without a DOM lookup.
+      expect(src).toMatch(/<input/);
+      expect(src).toMatch(/type="hidden"/);
+      expect(src).toMatch(/name=\{name\}/);
+      expect(src).toMatch(/ref=\{hiddenInputRef\}/);
     });
   });
 });

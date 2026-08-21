@@ -19,16 +19,12 @@ When verifying the audit against the current `main`, **5 of the 6 "Critical Fixe
 ## Still open (the real follow-up)
 
 ### Code quality (audit 5)
-- [ ] **S-1 `document.querySelector` in `QuizEditor` state updater** (`src/components/admin/QuizEditor.tsx:55-58`) — `update()` calls `document.querySelector` synchronously on every keystroke to mirror state into a hidden input. The mount-time seed at line 128 uses `useEffect` correctly, but the per-update path does not. Replace with a `useRef<HTMLInputElement>(null)` so the contract is explicit and doesn't depend on DOM lookup.
-- [ ] **S-2 Missing `displayName` on UI primitives** — `src/components/ui/Button`, `Card`, `Toast`, etc. do not set `displayName`. DevTools shows them as `Anonymous` or `ForwardRef`, hurting debugging and a11y audits.
-- [ ] **S-3 Token naming inconsistency** — `src/themes/amph-theme.ts` shadows are `--shadow-low/--shadow-med/--shadow-high`, but `src/app/globals.css` uses `--shadow-sm/--shadow-md/--shadow-lg`. Need a single canonical name.
+- [x] **S-1 `document.querySelector` in `QuizEditor` state updater** — `QuizEditor` now owns its hidden input via `useRef<HTMLInputElement>(null)` and renders it as a sibling. The per-update `document.querySelector` and the mount-time `useEffect` seed are both gone. The H-16 pin test was rewritten to require the new contract. Closed in a follow-up PR (branch `fix/s-1-quizeditor-controlled-hidden-input`).
+- [x] **S-2 Missing `displayName` on UI primitives** — closed in PR #418 (2026-08-21). 14 UI primitives in `src/components/ui/` now carry explicit `displayName`. The H-08 test class `src/components/ui/__tests__/s2-s3-displayname-and-shadow-scale.test.ts` pins the contract.
+- [x] **S-3 Token naming inconsistency** — closed in PR #418 (2026-08-21). The amph theme and `globals.css` now both use `--shadow-low/--shadow-med/--shadow-high`. The H-08 test class above also pins the shadow-scale contract.
 
 ### Voice Stabilization Phase 3 (audit 4)
-- [ ] **Modules 4-8 still have voice-guide violations.** Confirmed open:
-  - 62 lines with USD pricing across modules 4-8.
-  - 69 em-dash / double-hyphen usages in modules 4-6 (em-dashes are banned by the voice guide).
-  - 5+ `> **Analogy**` blockquote headers still present in `4.1`, `4.2`, `4.3` (and likely 5-8).
-  - The audit script `scripts/_audit-sentence-length.cjs` exists and is the right tool.
+- [x] **Modules 4-8 voice-guide violations** — Phase 3 second half shipped in PR #417 (2026-08-21). All 16 lessons across Modules 4, 5, 6, 7, 8 received the same three transforms the first half applied to Modules 2-3: dropped `> **Analogy:**` / `> **Tip:**` / `> **Watch out:**` / `> **Key Takeaway:**` blockquote headers and converted to inline prose; converted USD amounts to PHP at the established ~50:1 rate; tightened body-prose sentences to honor the 30-word ceiling. The audit script `scripts/_audit-voice-phase3-m4-8.cjs` reported zero USD, zero em-dashes, zero blockquote-header violations, and zero over-30-word body sentences across the 16 files. STORY-107 marked complete.
 
 ### Product & architecture gaps (audit 2)
 - [ ] **STORY-086 Instructor calibration** — no mechanism to set "acceptable answer ranges" for simulator grading. No story doc on `main` yet.

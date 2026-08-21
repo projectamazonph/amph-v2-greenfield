@@ -134,8 +134,6 @@ export default async function EditQuizPage({ params, searchParams }: PageProps) 
             />
           </label>
 
-          <input type="hidden" name="questionsJson" id="questionsJsonInput" />
-
           <QuizEditor name="questionsJson" initial={initial} />
 
           <div className={styles.actions}>
