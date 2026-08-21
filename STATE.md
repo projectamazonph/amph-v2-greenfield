@@ -1,17 +1,12 @@
 # Current project state
 
 **Project:** Project Amazon PH Academy v2
-**Reviewed:** 2026-08-20
-**Main:** `1491e4b`
+**Reviewed:** 2026-08-21
+**Main:** `e278e22`
 
 ## Active branches of interest
 
-- `feat/active-lesson-primitives` — local-only; 16 commits ahead of main, validator WIP complete, ready to push and open PR once CI confirms green (`docs/superpowers/specs/2026-08-19-active-lesson-primitives-design.md`, `docs/stories/STORY-122.md`, `docs/stories/STORY-123.md`).
-- `chore/audit-2026-08-20-followup` — PR #415. Doc-only umbrella (`+423/-0`). Closes the audit cycle CRITICAL plus most HIGH/L.
-- `fix/quizeditor-controlled-hidden-input` — PR #416. **Branch tip is currently the same as PR #415 (`ec24aa3`); no QuizEditor files in the diff.** Needs the S-1 commit to be added before this PR can land. Held for follow-up.
-- `chore/voice-phase3-modules-4-8` — PR #417. Phase 3 second half (19 files, `+365/-168`). Closes STORY-107 last leg.
-- `chore/s2-displayname-s3-shadows` — PR #418. S-2 `displayName` on 14 UI primitives + S-3 shadow-scale unification (19 files, `+218/-10`). Touches `src/components/ui/Card.tsx` and `src/themes/amph-theme.ts`; merge after L-03 (#419) so CardProps narrowing lands first.
-- `chore/l03-card-event-handler-safety` — PR #419. L-03 server-safe `CardProps` subset that rejects event handlers at compile time (4 files, `+297/-5`). Touches `tsconfig.json`.
+- `fix/quizeditor-controlled-hidden-input` — PR #416. Branch tip still mirrors the now-merged umbrella diff (`+423/-0`, 3 files); the S-1 `QuizEditor` hidden-input commit never landed. Held until the S-1 commit is added to the branch.
 
 ## Current learning-experience priority
 
@@ -32,12 +27,16 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR   | Commit    | Result                                                                                                                |
 | ---- | --------- | --------------------------------------------------------------------------------------------------------------------- |
+| #417 | `e278e22` | Voice stabilization Phase 3 second half (Modules 4-8). Closes STORY-107 last leg                                       |
+| #418 | `79befba` | S-2 `displayName` on 14 UI primitives + S-3 shadow-scale unification (audit 2026-08-20 follow-up)                     |
+| #420 | `9e7e6ea` | Active lesson primitives (`SelfCheck`, `TradeOffTable`, `ProcessDiagram`, `PitfallCallout`) + directive plugin + Section 5.3 validator (STORY-122, STORY-123) |
+| #419 | `9cc5db3` | L-03 server-safe `CardProps` subset that rejects event handlers at compile time                                        |
+| #404 | `88760ed` | 2026-08-20 audit follow-up umbrella. Closes the still-open audit items (S-1, S-2, S-3, L-03, voice 4-8)                |
 | #305 | `9096cf4` | Repaired the student journey, route states, navigation, data export, and accessibility coverage                       |
 | #306 | `9d80c77` | Manual paid-tier grants now create the eligible published-course enrollments students need to see courses and lessons |
 | #307 | `88d83d9` | Admin login plants the session cookie on the redirect response                                                        |
 | #308 | `ee1737a` | Password-reset emails normalize the retired deployment origin to the canonical production URL                         |
 | #402 | `1491e4b` | Field Manual round 35: align admin tables, hero, and nav z-index with the design system                                |
-| #404 | pending (`#415`) | 2026-08-20 audit follow-up umbrella. Closes the still-open audit items (S-1, S-2, S-3, L-03, voice 4-8)         |
 
 ## Audit-driven triage (2026-08-14)
 
@@ -99,4 +98,4 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 
 ## Next action
 
-Operate from the canonical production URL, keep runbooks current after operator drills, and verify the relevant quality gates before every merge. The 2026-08-20 audit cycle is staged across five open PRs (#415 umbrella, #416 S-1, #417 voice 4-8, #418 S-2/S-3, #419 L-03). #416 currently points at the umbrella commit and needs the QuizEditor files committed before it can land. The other four are mergeable as-of 2026-08-20 once sequence is right (`#415` → `#419` → `#418` → `#417` → `#416`). The `feat/active-lesson-primitives` branch ships Module 1 active-practice blocks plus the Section 5.3 validator; PR not yet opened. Re-audit before next major feature.
+Operate from the canonical production URL, keep runbooks current after operator drills, and verify the relevant quality gates before every merge. The 2026-08-20 audit cycle is now closed on `main` (`e278e22`): #404, #419, #420, #418, and #417 all merged on 2026-08-21. PR #416 stays held until the S-1 `QuizEditor` hidden-input commit is added to `fix/quizeditor-controlled-hidden-input`; the branch tip still mirrors the now-merged umbrella diff. Re-audit before the next major feature, and start the zero-to-one student journey work in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md` after the truth-and-release contract is in place.
