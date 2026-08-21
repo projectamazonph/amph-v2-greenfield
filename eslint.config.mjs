@@ -28,6 +28,14 @@ const config = [
       "playwright-report/**",
       "test-results/**",
       ".worktrees/**",
+      // Compile-time fixtures: deliberately broken source that exists so
+      // a programmatic tsc check can prove the type system rejects the
+      // bad usage. The fixture files are excluded from tsconfig.json
+      // and from the type-aware ESLint parser (which would otherwise
+      // error: "file not in any project"). Tests cover the compile
+      // behavior; lint is not appropriate for these files.
+      "src/**/*.fixture.tsx",
+      "src/**/*.fixture.ts",
     ],
   },
 
