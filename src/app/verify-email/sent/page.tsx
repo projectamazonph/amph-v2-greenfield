@@ -10,6 +10,7 @@
  */
 
 import { resendVerificationAction } from "@/app/actions/resendVerification.action";
+import Link from "next/link"; // M-R31 fix (H-08): use Next.js Link for the sign-in route change so the App Router handles client-side navigation.
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -43,9 +44,10 @@ export default async function SentPage({ searchParams }: Props) {
         <p className={styles.body}>
           Your email is already verified. You can sign in.
         </p>
-        <a href="/login" className={styles.cta}>
+        {/* M-R31 fix (H-08): <Link href=...> keeps the sign-in route change in the App Router client-side navigation. */}
+        <Link href="/login" className={styles.cta}>
           Sign in
-        </a>
+        </Link>
       </main>
     );
   }

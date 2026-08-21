@@ -11,6 +11,7 @@ import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
 import { AdminAuditLogTable, type AuditLogRow } from "@/components/astryx/AdminAuditLogTable";
+import Link from "next/link"; // M-R31 fix (H-08): use Next.js Link for the Clear filter route reset so the filter form stays in the App Router data-flow instead of doing a full document navigation.
 import { ALL_ACTIONS, isAuditAction } from "@/domain/values/AuditAction";
 import styles from "./page.module.css";
 
@@ -196,9 +197,10 @@ export default async function AdminAuditLogPage({ searchParams }: PageProps) {
             Apply Filters
           </button>
 
-          <a href="/admin/audit-log" className={styles.clearButton}>
+          {/* M-R31 fix (H-08): <Link href=...> keeps the filter reset inside the App Router client-side navigation. The export action below still uses a raw <a> because the `download` attribute is only honored on real anchor elements. */}
+          <Link href="/admin/audit-log" className={styles.clearButton}>
             Clear
-          </a>
+          </Link>
 
           <a href={exportUrl} className={styles.exportButton} download>
             Export CSV
