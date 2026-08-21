@@ -69,6 +69,10 @@ skills-lock.json
 .claude/
 agent/
 node_modules/
+.qoder/
+
+# npm lockfile drift (repo uses pnpm; packageManager: pnpm@9.15.9)
+package-lock.json
 
 # git worktrees (created by AI agents working in isolation)
 .worktrees/
