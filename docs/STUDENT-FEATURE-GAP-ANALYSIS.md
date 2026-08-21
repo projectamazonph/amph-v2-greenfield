@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-21 against `main` (`582112d`). The verified-journey table below was established 2026-08-17 against PRs #305-#308; merges since then (STORY-107 Phase 3 second half #417, audit cycle #418-#420, doc refresh #421, gitignore hygiene #422) did not alter the student-facing surfaces in this table. Re-verification is due after the next student-journey change.
+**Last verified:** 2026-08-21 against `main` (`54b5a18`). The verified-journey table below was established 2026-08-17 against PRs #305-#308; merges since then (STORY-107 Phase 3 second half #417, audit cycle #418-#420, doc refresh #421, gitignore hygiene #422, doc-staleness sweep #423, S-1 QuizEditor `useRef` fix #424) did not alter the student-facing surfaces in this table. Re-verification is due after the next student-journey change.
 
 **Repository:** `amph-v2-greenfield`
 
@@ -19,7 +19,9 @@ student access by creating eligible published-course enrollments. PR #307 fixed
 the admin-login redirect cookie, and PR #308 fixed forgot-password links. The
 2026-08-20 audit cycle closed on 2026-08-21 with PRs #417, #418, #419, and #420;
 PR #421 refreshed STATE.md and CHANGELOG.md; PR #422 added `.qoder/` and
-`package-lock.json` to `.gitignore`. The current post-merge gate on `main`
+`package-lock.json` to `.gitignore`; PR #423 ran a doc-staleness sweep; PR #424
+landed the S-1 `QuizEditor` `useRef` fix and rewrote the H-16 pin test (admin
+mutation, not student-facing). The current post-merge gate on `main`
 passes 3,901 Vitest tests with 3 skipped, 669 architecture checks, TypeScript,
 ESLint, production build, Playwright, and Lighthouse.
 

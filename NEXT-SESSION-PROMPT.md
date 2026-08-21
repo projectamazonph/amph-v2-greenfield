@@ -7,7 +7,7 @@ Repository: https://github.com/projectamazonph/amph-v2-greenfield
 Branch policy: branch from main, PR to main, squash merge, auto-delete source branch
 Production: https://projectamazonph.vercel.app
 Retired origin: https://amph-v2-greenfield.vercel.app
-Main reviewed: 582112d (2026-08-21)
+Main reviewed: 54b5a18 (2026-08-21)
 
 Read first:
 1. AGENTS.md
@@ -18,6 +18,8 @@ Read first:
 6. SESSION-HANDOVER.md
 
 Latest repairs:
+- PR #424: S-1 QuizEditor owns its hidden input via `useRef`; rewrites the H-16 pin test; closes `.audit-2026-08-20/UMBRELLA.md` S-1
+- PR #423: doc-staleness sweep (STATE.md, NEXT-SESSION-PROMPT.md, STUDENT-FEATURE-GAP-ANALYSIS.md)
 - PR #417: voice stabilization Phase 3 second half (Modules 4-8, STORY-107)
 - PR #418: S-2 displayName on UI primitives + S-3 shadow scale unification
 - PR #419: L-03 server-safe CardProps subset

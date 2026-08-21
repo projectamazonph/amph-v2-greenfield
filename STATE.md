@@ -2,11 +2,11 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-08-21
-**Main:** `582112d`
+**Main:** `54b5a18`
 
 ## Active branches of interest
 
-- `fix/quizeditor-controlled-hidden-input` — PR #416. Branch tip still mirrors the now-merged umbrella diff (`+423/-0`, 3 files); the S-1 `QuizEditor` hidden-input commit never landed. Held until the S-1 commit is added to the branch.
+- *None.* `fix/quizeditor-controlled-hidden-input` (the original S-1 branch) was closed as stale at PR #416; the S-1 fix landed as a fresh PR #424.
 
 ## Current learning-experience priority
 
@@ -27,6 +27,7 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR   | Commit    | Result                                                                                                                |
 | ---- | --------- | --------------------------------------------------------------------------------------------------------------------- |
+| #424 | `54b5a18` | S-1 QuizEditor owns its hidden input via `useRef`; rewrites H-16 pin test; closes `.audit-2026-08-20/UMBRELLA.md` S-1  |
 | #417 | `e278e22` | Voice stabilization Phase 3 second half (Modules 4-8). Closes STORY-107 last leg                                       |
 | #418 | `79befba` | S-2 `displayName` on 14 UI primitives + S-3 shadow-scale unification (audit 2026-08-20 follow-up)                     |
 | #420 | `9e7e6ea` | Active lesson primitives (`SelfCheck`, `TradeOffTable`, `ProcessDiagram`, `PitfallCallout`) + directive plugin + Section 5.3 validator (STORY-122, STORY-123) |
