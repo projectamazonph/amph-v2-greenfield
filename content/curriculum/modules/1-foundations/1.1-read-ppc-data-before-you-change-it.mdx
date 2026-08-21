@@ -29,6 +29,38 @@ The Big Six are the six calculated metrics that describe what happened between t
 
 Two more numbers feed these calculations without being part of the Big Six themselves: **impressions** (how often Amazon showed the ad) and **clicks** (how often a shopper selected it). CPC and CTR come straight from ad platform reports. TACoS is different: it needs total sales, including organic sales that happen with no ad involved, so it's a business-level number you calculate yourself, not a line in a standard ad report.
 
+A quick view of what each metric answers:
+
+:::trade-off{id="big-six" title="The Big Six metrics" caption="What each metric answers"}
+
+| Metric | What it answers                          |
+| ------ | ---------------------------------------- |
+| CPC    | How much per click                       |
+| CTR    | Share of impressions that become clicks  |
+| CVR    | Share of clicks that become orders       |
+| ACoS   | Ad spend as a share of ad sales          |
+| ROAS   | Sales returned per peso spent            |
+| TACoS  | Ad spend as a share of total store sales |
+
+:::
+
+The work loop that ties these together:
+
+:::process{id="work-loop" title="Your work loop" steps="Read|Decide|Change|Explain" hint="Same loop. Every change. Every week."}
+:::
+
+:::callout{id="bid-cut-first" variant="pitfall" title="Don't cut a bid on the first high ACoS"}
+You don't know yet whether the problem is the click or the conversion. Read the pattern first.
+:::
+
+<SelfCheck
+  id="sc-1-1"
+  prompt="Which metric answers 'how much you earn back per peso spent on ads'?"
+  options={["CPC", "CTR", "ACoS", "TACoS", "ROAS"]}
+  answerIndex={4}
+  explanation="ROAS is Sales divided by Ad Spend. ACoS is the inverse; TACoS is total store sales, not just ad sales."
+/>
+
 ## Start with one case
 
 Imagine you support a client selling a stainless-steel coffee grinder for $40.

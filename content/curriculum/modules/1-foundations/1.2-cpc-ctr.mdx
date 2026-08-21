@@ -101,6 +101,34 @@ Ad relevance signals connect CPC and CTR. Amazon doesn't publish a single inspec
 
 When you see high CPC and low CTR together, the most common root cause is keyword relevance: the targeting is too broad for the product. Fix targeting first. Raising the bid to compensate for poor relevance usually just buys more of the same low-quality clicks.
 
+A side-by-side view of the two:
+
+:::trade-off{id="cpc-vs-ctr" title="CPC vs CTR" caption="What each tells you"}
+
+| Metric | What it tells you                                                      |
+| ------ | ---------------------------------------------------------------------- |
+| CPC    | Average cost per click (higher means you pay more per click)           |
+| CTR    | Share of impressions that become clicks (higher means your ad pulls)   |
+
+:::
+
+:::callout{id="ctr-not-alone" variant="pitfall" title="Don't read CTR in isolation"}
+A high CTR with a low conversion rate means the ad attracts clicks but doesn't buy. CTR is a top-of-funnel signal. Always pair it with conversion rate and ACoS.
+:::
+
+<SelfCheck
+  id="sc-1-2"
+  prompt="Your CPC rose 20% this week. What does CPC alone tell you?"
+  options={[
+    "The ad is performing worse",
+    "Clicks now cost more; whether that's bad depends on what buyers do after the click",
+    "Sales dropped",
+    "The campaign is failing",
+  ]}
+  answerIndex={1}
+  explanation="CPC measures cost, not outcome. Always pair CPC with conversion rate and ACoS before declaring a campaign healthy or sick."
+/>
+
 ## Independent calculation
 
 Work this case without copying the numbers from either worked example. Write the formula, substitute the values, and then explain the safest next step.

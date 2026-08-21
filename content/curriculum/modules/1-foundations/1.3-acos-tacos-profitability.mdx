@@ -90,6 +90,40 @@ ACoS can mislead in a few situations:
 
 When a client is worried about high ACoS during a launch, the useful question isn't "is ACoS high." It's "is ACoS trending down week over week." If yes, the campaign is on track.
 
+Here is the same three lenses side by side:
+
+:::trade-off{id="acos-tacos-roas" title="ACoS vs TACoS vs ROAS" caption="Profitability lenses"}
+
+| Metric | What it answers                                                            |
+| ------ | -------------------------------------------------------------------------- |
+| ACoS   | Ad spend divided by ad sales (lower is better, campaign-level)              |
+| TACoS  | Ad spend divided by total store sales (lower is better, account-level)     |
+| ROAS   | Ad sales divided by ad spend (higher is better; reciprocal of ACoS)        |
+
+:::
+
+The decision order that keeps all three honest:
+
+:::process{id="profit-decide" title="Decide if a campaign is profitable" steps="Compute ACoS|Look at TACoS|Compare to break-even|Make a call" hint="ACoS alone lies. TACoS places the spend in context."}
+:::
+
+:::callout{id="low-acos-vanity" variant="warning" title="Low ACoS is not always good"}
+A 5% ACoS on a campaign that drives 1% of total sales is vanity. Always check TACoS and revenue contribution, not just ACoS.
+:::
+
+<SelfCheck
+  id="sc-1-3"
+  prompt="Which pair gives the cleanest signal of whether ads are profitable for the account as a whole?"
+  options={[
+    "ACoS only",
+    "ROAS only",
+    "ACoS plus TACoS",
+    "CPC plus CTR",
+  ]}
+  answerIndex={2}
+  explanation="ACoS shows campaign efficiency; TACoS shows ads' share of total revenue. Together they answer 'are ads profitable for the account.'"
+/>
+
 ## Worked example: full week analysis
 
 **Product:** insulated water bottle, $29.99, 35% margin.

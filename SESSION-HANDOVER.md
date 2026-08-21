@@ -1,5 +1,47 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-08-21, PR #420 Unit+integration failure blocks merge)
+
+`feat/active-lesson-primitives` PR #420 (`4282448`) cannot be merged in its current state. CI is GREEN on Typecheck + Lint, Architecture (TDD + SOLID), E2E (Playwright), Vercel preview, and CodeRabbit. CI is RED on Unit + integration: 70 failed assertions across 13 test files (4171 passed). The same Suite was RED on the branch's first push (`75cb14f`, run 32390575868); the failure set has not changed between the original state and the follow-up commit `4282448`.
+
+Failing files on the `4282448` run:
+
+- `src/lib/__tests__/auth.guards.test.ts` — 9/15 failed (`requireAdmin` missing from the global `vi.mock("@/lib/auth", ...)` factory throws `[vitest] No "X" export is defined on the mock`)
+- `src/lib/__tests__/auth.cookie-env.test.ts` — 4/5 failed
+- `src/lib/__tests__/auth.test.ts` — 2/8 failed
+- `src/app/actions/__tests__/impersonateUser.action.test.ts` — 14/16 failed
+- `src/app/api/auth/__tests__/admin-login.test.ts` — 4/4 failed
+- `src/app/api/auth/__tests__/login.test.ts` — 4/5 failed
+- `src/app/api/auth/__tests__/signup.test.ts` — 5/6 failed
+- `src/app/courses/[slug]/__tests__/EnrollButton.test.tsx` — 2/5 failed
+- `src/app/checkout/__tests__/page.test.tsx` — 1/7 failed
+- `src/components/student/__tests__/LiveClassRecordingButton.test.tsx` — 1/6 failed
+- `src/components/student/__tests__/student-event-controls.test.tsx` — 2/6 failed
+- `src/components/tools/__tests__/CampaignBuilderForm.test.tsx` — 6/6 failed
+- `src/components/ui/__tests__/Button.test.tsx` — 16/17 failed (Button mock from `vitest.setup.ts` is being applied to the relative import in this test)
+
+Investigation path:
+
+1. Suspected the new `import "@testing-library/jest-dom/vitest"` and `import "vitest-axe/extend-expect"` lines in `vitest.setup.ts` (added in commit `6c2e669`). Removed them and moved the vitest-axe registration locally to `src/components/lesson/__tests__/a11y.test.tsx` (commit `4282448`). Failure set unchanged: same 13 files, same 70 failures. Confirmed those two imports are NOT the cause.
+
+2. The genuine puzzle: the SAME vitest version (4.1.10) with the SAME setup file passes the same auth.guards + Button + admin-login tests on `origin/main` (run 32226880718, head `1491e4b`, 4171+ passing). The only material delta on the branch is the addition of `rehype-raw` and `unist-util-visit` to `dependencies` and `@testing-library/jest-dom`/`vitest-axe`/`remark-parse`/`unified` to `devDependencies` plus the lesson primitives + directive plugin + validator code. None of those touch `@/lib/auth`, `@/components/ui/Button`, or the auth-route handlers, yet a wave of mock-related assertions flips from green to red across unrelated files. Diagnosing this without being able to run `pnpm test` locally (pnpm/corepack unavailable on this Windows runner per `LoopConstraints.md`) requires pnpm-resolution level forensics that exceed the budget for this session.
+
+3. Avoided two tempting-but-wrong fixes: (a) `vi.mock("@/lib/auth", async (importOriginal) => ...)` would technically pass the strict-mock check but would force every test file to load the real `@/composition/container`, which in turn loads Prisma — that triggers `db_error` log noise we already saw in `RebuildCourseCurriculum`, `AwardBadge`, `health/ready` (all stderr from the same run, all predating my changes). (b) Adding more entries to the global mock would not reach `setAuthCookie`, `setAdminSessionCookie`, `getAdminSessionCookieName`, `clearAuthCookie`, `_testInternals`, etc., because the production call sites import those statically and a sync stub returning `undefined` would still throw at runtime, not at import.
+
+Recommendation: hold PR #420 open and file a follow-up issue in the next session. The branch's lesson-primitive feature work (component primitives, directive plugin, validator, MDX curriculum updates, STORY-122 + STORY-123) is independently valuable and the docs-only commits on the branch are merge-ready. The cleanest path is: (a) split off the docs + validator + lesson-primitive code into a fresh branch and re-test there, or (b) keep `4282448` parked, run `pnpm test -- src/lib/__tests__/auth.guards.test.ts src/components/ui/__tests__/Button.test.tsx` on a Linux box to capture the actual diff between `origin/main` and `4282448`, and fix the cascade from real evidence rather than from a Windows-without-pnpm vantage point.
+
+Audit cycle PRs are untouched. STORY-086 (instructor calibration ranges, deferred umbrella item) and STORY-089 (connected-account simulator) remain filed as `## Status Planned` with explicit acceptance criteria, ready to be picked up by the worktree handling audit follow-ups. CHANGELOG, FEATURES.md, STATE.md were updated in the prior session and remain accurate as of `75cb14f` / `4282448`.
+
+# Session update (2026-08-20, audit follow-up staged + active-lesson-primitives branch ready)
+
+`main` HEAD is `1491e4b`. Five open PRs make up the 2026-08-20 audit cycle: #415 (umbrella, `+423/-0`), #417 (voice 4-8 Phase 3 second half, `+365/-168` across 19 files), #418 (S-2 displayName + S-3 unify shadow scale, `+218/-10` across 19 files), #419 (L-03 server-safe `CardProps` subset, `+297/-5`), and **#416** which currently has the wrong diff (its `fix/quizeditor-controlled-hidden-input` branch is at the same commit as the umbrella tip `ec24aa3`; no `QuizEditor.tsx` files in the diff). A comment on #416 was posted flagging the issue. Recommended merge order against `main`: #415 → #419 → #418 → #417; #416 stays held until the S-1 commit lands on its branch.
+
+`feat/active-lesson-primitives` is now ready to push and open PR. Three new local commits (`126d670`, `ed26667`, `58c6b12`) add: the active lesson primitives design spec at `docs/superpowers/specs/2026-08-19-active-lesson-primitives-design.md`; `STORY-122` (component primitives) and `STORY-123` (Module 1 active-pass) covering the four React primitives (`SelfCheck`, `TradeOffTable`, `ProcessDiagram`, `PitfallCallout`) and the directive plugin; the Section 5.3 rules in `scripts/validate-lesson-production.ts` (fence-ID checks, `<SelfCheck>` JSX shape, em-dash guard inside blocks, `--strict`, `--report=`); and the deferred audit follow-up stories `STORY-086` (instructor calibration ranges) and `STORY-089` (connected-account simulator, gated by AGENTS.md Rule 5). 31/31 lessons pass `pnpm validate:lesson-production --strict`. Local gates green: `tsc --noEmit`, `eslint`, `vitest tests/architecture` (674/674), and `vitest src/components/lesson src/lib/mdx` (26/26). All three commits used `--no-verify` per the Windows + corepack pnpm PATH workaround documented in repo memory.
+
+State updated in `STATE.md` (reviewed 2026-08-20, branch graph, deferred merge sequence), `FEATURES.md` (active lesson primitives row, Phase 3 second half under STORY-107), and `CHANGELOG.md` (new [Unreleased] entry for 2026-08-20).
+
+Outstanding for the next push: PR #419 lands first so #418's Card.tsx and theme.ts token rename compiles against the narrowed `CardProps`. Module 2-8 application of the new primitives is deferred (no STORY-124 through -127 yet for those lessons — only stories 086 and 089 were filed today).
+
 # Session update (2026-08-12, student repair follow-ups merged)
 
 The production baseline is `main` at `ee1737a`. The canonical deployment is

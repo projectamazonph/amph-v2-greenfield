@@ -165,4 +165,58 @@ describe("LessonContent (render)", () => {
     expect(html).not.toContain("knowledge check");
     expect(html).toContain("Quick check");
   });
+
+  // ── STORY-097: directive plugin → primitive renderer ─────────
+
+  it("renders :::trade-off as a TradeOffTable", () => {
+    const lesson = makeLesson({
+      type: "TEXT",
+      content: {
+        body: `:::trade-off{id="big-six" title="The Big Six" caption="What each metric answers"}\n| Metric | What it answers |\n| --- | --- |\n| CPC | How much per click |\n| CTR | Share of impressions that become clicks |\n:::`,
+      },
+    });
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
+    expect(html).toContain("<table");
+    expect(html).toContain('id="big-six"');
+    // Body says "How much per click" — assertion matches body content.
+    expect(html).toContain("How much per click");
+    expect(html).toContain("Share of impressions that become clicks");
+  });
+
+  it("renders :::process as a ProcessDiagram", () => {
+    const lesson = makeLesson({
+      type: "TEXT",
+      content: {
+        body: `:::process{id="loop" title="Loop" steps="Read|Decide|Change|Explain"}\n:::`,
+      },
+    });
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
+    expect(html).toContain("<ol");
+    expect(html).toContain("Read");
+    expect(html).toContain("Explain");
+  });
+
+  it("renders :::callout as a PitfallCallout", () => {
+    const lesson = makeLesson({
+      type: "TEXT",
+      content: {
+        body: `:::callout{variant="warning" title="Be careful"}\nWatch this.\n:::`,
+      },
+    });
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
+    expect(html).toContain("aside");
+    expect(html).toContain('role="note"');
+    expect(html).toContain("Be careful");
+  });
+
+  it("renders plain markdown unchanged when there are no directives", () => {
+    const lesson = makeLesson({
+      type: "TEXT",
+      content: { body: `A regular paragraph with **bold** text.` },
+    });
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
+    expect(html).toContain("<strong>");
+    // No directive HTML emitted when none in body
+    expect(html).not.toContain("data-amph-block");
+  });
 });

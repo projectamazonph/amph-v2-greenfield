@@ -4,6 +4,21 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-20: Active lesson primitives for Module 1 (STORY-122, STORY-123)
+
+- `src/components/lesson/SelfCheck.tsx` plus `.module.css` (new): `'use client'` radio-group primitive with reveal-then-try-again UX, no `useEffect`, no `localStorage`, no grading call. Options use `role="radio"` with `aria-checked`, prompt has `aria-labelledby`, feedback uses `role="status"` + `aria-live="polite"`. Color is never the only signal.
+- `src/components/lesson/TradeOffTable.tsx` plus `.module.css` (new): server-rendered native `<table>` with `<caption>`, `<th scope="col">` for the rectangular form, `<th scope="row">` for the key/value pairs form. Horizontal scroll on narrow viewports via a labelled wrapper.
+- `src/components/lesson/ProcessDiagram.tsx` plus `.module.css` (new): server-rendered semantic `<ol>` rendering of pipe-delimited steps with Phosphor icon slot and optional hint.
+- `src/components/lesson/PitfallCallout.tsx` plus `.module.css` (new): `<aside role="note">` with `info | warning | pitfall` variants and decorative Phosphor icon. WCAG AA contrast against `--surface-0` and `--surface-1`.
+- `src/components/lesson/index.ts` (new): barrel for the four primitives.
+- `src/lib/mdx/directive-plugin.ts` (new): small remark-style plugin that converts `:::trade-off{...}`, `:::process{...}`, `:::callout{...}` fences into renderable directive blocks without adding a runtime dependency. Parser attribute contract mirrors the design spec.
+- `src/app/courses/[slug]/lessons/LessonContent.tsx` (changed): render the directive blocks through the existing react-markdown pipeline; `<SelfCheck>` JSX passes through unmodified.
+- `content/curriculum/modules/1-foundations/1.1-read-ppc-data-before-you-change-it.mdx`, `1.2-cpc-ctr.mdx`, `1.3-acos-tacos-profitability.mdx`, `1.4-roas-measuring-return.mdx`, `1.5-metrics-in-practice.mdx` (changed): receive the new blocks per design spec Section 8. Each block has a unique lesson-scoped kebab-case `id`. Totals: 5 TradeOffTable, 4 ProcessDiagram, 4 PitfallCallout, 5 SelfCheck.
+- `scripts/validate-lesson-production.ts` (changed): Section 5.3 rules added. Validates fence directives (`trade-off` requires `id`, `title`, ≥ 2 table rows; `process` requires `id`, `title`, ≥ 2 steps; `callout` requires `id`, `variant ∈ {info, warning, pitfall}`, non-empty body), `<SelfCheck ... />` JSX (requires `id`, kebab-case, `options.length ∈ [2,5]`, `answerIndex ∈ range`, `explanation` ≥ 12 chars), lesson-unique block IDs, and an em-dash check inside fenced block content. `--strict` exits non-zero on any issue. `--report=PATH` emits a JSON gap report.
+- `docs/superpowers/specs/2026-08-19-active-lesson-primitives-design.md` (new): design spec that justified the scope, primitives, and authoring contract. Cross-referenced from STORY-122 and STORY-123.
+- `docs/stories/STORY-122.md`, `docs/stories/STORY-123.md` (new): story docs for the component primitives and the Module 1 active-pass. Status updated to Shipped once the PR merges.
+- Vitest coverage added under `src/components/lesson/__tests__/` and `tests/unit/mdx/directive-plugin.test.ts`. No `package.json` entry added; the directive plugin is hand-rolled per the design's no-new-dependency rule.
+
 ### 2026-08-17: Curriculum voice stabilization. Phase 3 first half: Modules 2-3 (STORY-107)
 
 - `content/curriculum/modules/2-keyword-research/2.2-keyword-research-workflow.mdx`: dropped 5 blockquote-header artifacts (`> **Analogy:**`, `> **Tip:**`) and converted each into inline prose that opens with the work, not the metaphor (the fishing-lake analogy, the budget tip, the alphabet-soup tip, the relevance tip, and the toolbox analogy are now integrated into the surrounding body text). Sentence at line 177 split to honor the 30-word ceiling. Filipino context normalization: `$10/day` becomes `₱500/day`, `₱14,000 over 4 weeks` added.
