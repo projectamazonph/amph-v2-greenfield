@@ -2,11 +2,11 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-08-21
-**Main:** `54b5a18`
+**Main:** `8988ac1`
 
 ## Active branches of interest
 
-- *None.* `fix/quizeditor-controlled-hidden-input` (the original S-1 branch) was closed as stale at PR #416; the S-1 fix landed as a fresh PR #424.
+- *None.* The 2026-08-17 carry-over PRs are now closed: PR #395 (LEARN-025, stale STORY-122 collision + stale USD pricing) closed, PRs #396 and #398 (audit rounds 32/33) merged after rebasing onto current main.
 
 ## Current learning-experience priority
 
@@ -27,6 +27,8 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR   | Commit    | Result                                                                                                                |
 | ---- | --------- | --------------------------------------------------------------------------------------------------------------------- |
+| #398 | `8988ac1` | Round 33 audit closure: replace 2 raw `<a>` route changes with `<Link>` and pin H-09/H-11/H-12 contracts (rebased; `.commit-msg-r33.txt` dropped) |
+| #396 | `41cb4c3` | Round 32 audit closure: pin C-02 / C-05 / C-06 / C-07 contracts and update audit doc (rebased)                          |
 | #424 | `54b5a18` | S-1 QuizEditor owns its hidden input via `useRef`; rewrites H-16 pin test; closes `.audit-2026-08-20/UMBRELLA.md` S-1  |
 | #417 | `e278e22` | Voice stabilization Phase 3 second half (Modules 4-8). Closes STORY-107 last leg                                       |
 | #418 | `79befba` | S-2 `displayName` on 14 UI primitives + S-3 shadow-scale unification (audit 2026-08-20 follow-up)                     |
