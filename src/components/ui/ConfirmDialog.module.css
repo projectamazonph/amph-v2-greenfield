@@ -13,6 +13,8 @@
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   max-width: min(420px, calc(100vw - var(--space-6)));
   width: 100%;
+  /* Overflow protection: clip content to dialog boundary */
+  overflow: hidden;
 }
 
 .dialog::backdrop {
@@ -35,6 +37,10 @@
   margin: 0;
   color: var(--ink-900);
   letter-spacing: -0.01em;
+  /* Overflow protection: truncate long titles */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .description {
@@ -42,6 +48,9 @@
   color: var(--ink-700);
   margin: 0;
   line-height: 1.5;
+  /* Overflow protection: handle long descriptions */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .actions {

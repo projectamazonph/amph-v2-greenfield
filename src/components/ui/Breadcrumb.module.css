@@ -14,12 +14,18 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  /* Overflow protection: prevent horizontal scroll spill */
+  overflow: hidden;
 }
 
 .item {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+  /* Overflow protection: truncate long text */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .link {

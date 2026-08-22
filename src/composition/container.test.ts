@@ -71,6 +71,7 @@ import { InMemorySessionRepository } from "@/infra/repositories/InMemorySessionR
 import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
 import { InMemoryScorePolicyRepository } from "@/infra/repositories/InMemoryScorePolicyRepository";
+import { InMemorySimulatorScenarioCalibrationRepository } from "@/infra/repositories/inmemory/InMemorySimulatorScenarioCalibrationRepository";
 import { InMemoryAttemptFeedbackRepository } from "@/infra/repositories/InMemoryAttemptFeedbackRepository";
 import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClassRepository";
 import { InMemoryPricingTierRepository } from "@/infra/repositories/InMemoryPricingTierRepository";
@@ -192,6 +193,8 @@ import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
 import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
+import { SetScenarioCalibration } from "@/usecases/SetScenarioCalibration";
+import { GetScenarioCalibration } from "@/usecases/GetScenarioCalibration";
 import { ComposeAttemptFeedback } from "@/usecases/ComposeAttemptFeedback";
 import { CheckChallengeModeUnlocked } from "@/usecases/CheckChallengeModeUnlocked";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
@@ -257,6 +260,8 @@ export interface TestContainer extends AppContainer {
   scenarioRepo: InMemorySimulatorScenarioRepository;
   simulatorAttemptRepo: InMemorySimulatorAttemptRepository;
   scorePolicyRepo: InMemoryScorePolicyRepository;
+  // STORY-086: per-scenario instructor calibration ranges
+  calibrationRepo: InMemorySimulatorScenarioCalibrationRepository;
   feedbackRepo: InMemoryAttemptFeedbackRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   liveClassRegistrationRepo: InMemoryLiveClassRegistrationRepository;
@@ -339,6 +344,8 @@ export function buildTestContainer(): TestContainer {
   const simulatorAttemptRepo = new InMemorySimulatorAttemptRepository();
   // STORY-065: scoring engine
   const scorePolicyRepo = new InMemoryScorePolicyRepository();
+  // STORY-086: per-scenario instructor calibration ranges
+  const calibrationRepo = new InMemorySimulatorScenarioCalibrationRepository();
   // STORY-066: feedback composer
   const feedbackRepo = new InMemoryAttemptFeedbackRepository();
   // STORY-050c: live class repo
@@ -695,6 +702,7 @@ export function buildTestContainer(): TestContainer {
     scenarioRepo,
     simulatorAttemptRepo,
     scorePolicyRepo,
+    calibrationRepo,
     feedbackRepo,
     // STORY-050b: simulator scenario CRUD
     adminListScenarios: new AdminListScenarios({ scenarioRepo }),
@@ -728,8 +736,19 @@ export function buildTestContainer(): TestContainer {
     gradeSimulatorAttempt: new GradeSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,
+      calibrationRepo,
+      scenarioRepo,
       clock,
     }),
+    // STORY-086: instructor sets per-scenario calibration bands
+    setScenarioCalibration: new SetScenarioCalibration({
+      calibrationRepo,
+      recordAuditLog,
+      idGen,
+      clock,
+    }),
+    // STORY-086: instructor reads the existing calibration for an edit form
+    getScenarioCalibration: new GetScenarioCalibration({ calibrationRepo }),
     composeAttemptFeedback: new ComposeAttemptFeedback({
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,

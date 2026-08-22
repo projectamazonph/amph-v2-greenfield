@@ -13,6 +13,8 @@
   transition:
     border-color var(--duration-fast) var(--ease-out),
     transform var(--duration-base) var(--ease-out);
+  /* Overflow protection: clip content to card boundary */
+  overflow: hidden;
 }
 
 /* ── Variants ───────────────────────────────────────────────── */
