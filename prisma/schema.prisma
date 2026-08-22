@@ -812,6 +812,27 @@ model ScorePolicy {
   @@map("score_policies")
 }
 
+// ── STORY-086: Simulator grader - instructor calibration ranges ────────
+//
+// One calibration row per (simulatorId, scenarioKey). Bands clamp the
+// per-dimension raw score into a strict subset of [0, 100] before
+// getOverallScore runs. See SimulatorScenarioCalibration (domain) for
+// the entity-level invariants; the schema only persists JSON.
+model SimulatorScenarioCalibration {
+  id             String   @id @default(cuid())
+  simulatorId    String
+  scenarioKey    String
+  dimensionBands Json // Record<dimensionKey, { minScore, maxScore }>
+  instructorId   String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([simulatorId, scenarioKey])
+  @@index([scenarioKey])
+  @@index([instructorId])
+  @@map("simulator_scenario_calibrations")
+}
+
 // ── STORY-063: Email Templates ──────────────────────────────────────────────
 
 model EmailTemplate {

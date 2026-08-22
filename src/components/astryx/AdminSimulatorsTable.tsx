@@ -133,10 +133,21 @@ const COLUMNS: TableColumn<ScenarioRow>[] = [
   {
     key: "actions",
     header: "",
-    width: { type: "pixel", value: 120 },
+    width: { type: "pixel", value: 220 },
     align: "end",
     renderCell: (row) => (
       <span style={{ display: "flex", gap: "var(--space-3)" }}>
+        <Link
+          href={`/admin/simulators/${row.simulatorId}/${encodeURIComponent(row.scenarioKey)}/calibration`}
+          style={{
+            color: "var(--ink-700)",
+            textDecoration: "none",
+            fontWeight: 500,
+            fontSize: "var(--text-sm)",
+          }}
+        >
+          Calibrate
+        </Link>
         <Link
           href={`/admin/simulators/${row.id}/versions`}
           style={{
