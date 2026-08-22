@@ -24,6 +24,8 @@ description = "Allow test/development secrets in fixtures and docs"
 regexes = [
   '''test-secret-(at-least|must-be)-32-bytes-long[-a-z]*''',
   '''test-verification-secret''',
+  '''scenario-key''',
+  '''targetId''',
 ]
 paths = [
   '''.github/workflows/ci\.yml''',
