@@ -20,11 +20,15 @@
 .inputWrap {
   position: relative;
   display: flex;
+  min-width: 0;
   align-items: center;
 }
 
 .input {
   width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: 1px solid var(--c-border);
   border-radius: var(--r-md);
   outline: none;

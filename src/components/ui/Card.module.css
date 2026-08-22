@@ -1,6 +1,8 @@
 /* Card.module.css — Amazon PH simulator card system. */
 
 .card {
+  min-width: 0;
+  overflow: hidden;
   border: 1px solid var(--c-border);
   border-radius: var(--r-lg);
   background: var(--c-card);

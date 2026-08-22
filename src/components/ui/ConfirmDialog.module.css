@@ -3,6 +3,7 @@
 .dialog {
   width: 100%;
   max-width: min(420px, calc(100vw - var(--sp-6)));
+  overflow: hidden;
   padding: 0;
   border: 1px solid var(--c-border);
   border-radius: var(--r-lg);
@@ -17,6 +18,7 @@
 
 .body {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: var(--sp-4);
   padding: var(--sp-6);
@@ -29,6 +31,7 @@
   font-size: var(--fs-18);
   font-weight: 700;
   letter-spacing: -0.2px;
+  overflow-wrap: anywhere;
 }
 
 .description {
@@ -36,18 +39,21 @@
   color: var(--c-sub);
   font-size: var(--fs-14);
   line-height: var(--leading-normal);
+  overflow-wrap: anywhere;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--sp-3);
+  flex-wrap: wrap;
   margin-top: var(--sp-2);
 }
 
 .cancelBtn,
 .confirmBtn,
 .confirmDestructive {
+  min-width: 0;
   min-height: 36px;
   padding: 9px 16px;
   border: 1px solid var(--c-border);
