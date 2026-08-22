@@ -7,6 +7,12 @@
  *   :::trade-off{id="..." title="..."}body-as-markdown-table:::
  *   :::process{id="..." title="..." steps="A|B|C" hint="..."}body:::
  *   :::callout{variant="info|warning|pitfall" title="..."}body:::
+ *   :::visual{id="..." kind="..." title="..."}json-body:::
+ *   :::comparison-table{id="..." title="..."}json-body:::
+ *   :::formula-ladder{id="..." title="..."}json-body:::
+ *   :::classification-board{id="..." title="..."}json-body:::
+ *   :::decision-flow{id="..." title="..."}json-body:::
+ *   :::simulation-rubric{id="..." title="..."}json-body:::
  *
  * For `trade-off`, the inner body is a markdown table (per spec Section 5.1).
  * We parse the table rows into JSON and serialize them into `data-amph-rows`.
@@ -158,12 +164,38 @@ export function directivePlugin() {
   };
 }
 
+const JSON_LESSON_DIRECTIVES = new Set([
+  "visual",
+  "slide",
+  "comparison-table",
+  "formula-ladder",
+  "classification-board",
+  "decision-flow",
+  "simulation-rubric",
+  "annotated-listing",
+  "hierarchy-builder",
+  "funnel-canvas",
+  "timeline-calendar",
+  "competitive-gap-matrix",
+  "insight-router",
+  "lesson-pathway",
+  "simulation-brief",
+  "portfolio-map",
+  "seasonal-calendar",
+  "evidence-ledger",
+  "sov-positioner",
+]);
+
 function buildDirectiveHtml(
   name: string,
   attrs: Record<string, string>,
   attrsSerialized: string,
   inner: string,
 ): string {
+  if (JSON_LESSON_DIRECTIVES.has(name)) {
+    const bodyAttr = `data-amph-body="${encodeURIComponent(inner)}"`;
+    return `<div data-amph-block="${name}" ${attrsSerialized} ${bodyAttr}></div>`;
+  }
   if (name === "trade-off") {
     // Inner body is a markdown table. Parse it and serialize as JSON.
     const tableLines = inner.split(/\n/).filter((l) => l.trim().startsWith("|"));

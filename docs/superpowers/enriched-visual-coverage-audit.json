@@ -1,0 +1,1708 @@
+{
+  "summary": {
+    "lessonCount": 31,
+    "visualLessons": 31,
+    "dedicatedVisualLessons": 31,
+    "enrichedOrDeepLessons": 31,
+    "deepLessons": 8,
+    "legacyVisualLessons": 0,
+    "noVisualLessons": 0,
+    "invalidVisualPayloadLessons": 0
+  },
+  "modules": {
+    "0": {
+      "lessons": 3,
+      "depth": {
+        "enriched": 3
+      },
+      "blocks": 3,
+      "deepOrEnriched": 3
+    },
+    "1": {
+      "lessons": 5,
+      "depth": {
+        "deep": 2,
+        "enriched": 3
+      },
+      "blocks": 13,
+      "deepOrEnriched": 5
+    },
+    "2": {
+      "lessons": 4,
+      "depth": {
+        "deep": 2,
+        "enriched": 2
+      },
+      "blocks": 9,
+      "deepOrEnriched": 4
+    },
+    "3": {
+      "lessons": 3,
+      "depth": {
+        "enriched": 3
+      },
+      "blocks": 4,
+      "deepOrEnriched": 3
+    },
+    "4": {
+      "lessons": 4,
+      "depth": {
+        "enriched": 3,
+        "deep": 1
+      },
+      "blocks": 5,
+      "deepOrEnriched": 4
+    },
+    "5": {
+      "lessons": 3,
+      "depth": {
+        "enriched": 3
+      },
+      "blocks": 3,
+      "deepOrEnriched": 3
+    },
+    "6": {
+      "lessons": 3,
+      "depth": {
+        "deep": 1,
+        "enriched": 2
+      },
+      "blocks": 6,
+      "deepOrEnriched": 3
+    },
+    "7": {
+      "lessons": 3,
+      "depth": {
+        "deep": 1,
+        "enriched": 2
+      },
+      "blocks": 5,
+      "deepOrEnriched": 3
+    },
+    "8": {
+      "lessons": 3,
+      "depth": {
+        "enriched": 2,
+        "deep": 1
+      },
+      "blocks": 4,
+      "deepOrEnriched": 3
+    }
+  },
+  "lessons": [
+    {
+      "path": "content/curriculum/modules/0-onboarding/0.1-welcome.mdx",
+      "moduleNumber": "0",
+      "lessonNumber": "1",
+      "title": "Welcome. Your Path to Amazon PPC Work",
+      "slug": "0.1-welcome",
+      "directives": [
+        {
+          "name": "lesson-pathway",
+          "attrs": {
+            "id": "course-learning-loop",
+            "title": "Move through the course like an operator"
+          },
+          "line": 70,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "lesson-pathway"
+      ],
+      "interactiveTypes": [
+        "lesson-pathway"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/0-onboarding/0.2-platform-tour.mdx",
+      "moduleNumber": "0",
+      "lessonNumber": "2",
+      "title": "Platform Tour and Navigation",
+      "slug": "0.2-platform-tour",
+      "directives": [
+        {
+          "name": "lesson-pathway",
+          "attrs": {
+            "id": "platform-practice-path",
+            "title": "Move through the platform by job, not by menu"
+          },
+          "line": 91,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "lesson-pathway"
+      ],
+      "interactiveTypes": [
+        "lesson-pathway"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/0-onboarding/0.3-first-simulation.mdx",
+      "moduleNumber": "0",
+      "lessonNumber": "3",
+      "title": "Account Safety and the Client Brief",
+      "slug": "0.3-first-simulation",
+      "directives": [
+        {
+          "name": "simulation-brief",
+          "attrs": {
+            "id": "client-brief-builder",
+            "title": "Build the brief before you build the campaign"
+          },
+          "line": 39,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "simulation-brief"
+      ],
+      "interactiveTypes": [
+        "simulation-brief"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/1-foundations/1.1-read-ppc-data-before-you-change-it.mdx",
+      "moduleNumber": "1",
+      "lessonNumber": "1",
+      "title": "Read PPC Data Before You Change PPC Data",
+      "slug": "1.1-read-ppc-data-before-you-change-it",
+      "directives": [
+        {
+          "name": "visual",
+          "attrs": {
+            "id": "big-six-matrix",
+            "kind": "metric-matrix",
+            "title": "The Big Six answer different questions"
+          },
+          "line": 25,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "process",
+          "attrs": {
+            "id": "work-loop",
+            "title": "Your work loop",
+            "steps": "Read|Decide|Change|Explain",
+            "hint": "Same loop. Every change. Every week."
+          },
+          "line": 33,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "callout",
+          "attrs": {
+            "id": "bid-cut-first",
+            "variant": "pitfall",
+            "title": "Don't cut a bid on the first high ACoS"
+          },
+          "line": 36,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "visual",
+          "attrs": {
+            "id": "coffee-grinder-case",
+            "kind": "worked-example",
+            "title": "The coffee-grinder case: from raw data to a diagnosis"
+          },
+          "line": 63,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "read-before-change-flow",
+            "title": "Turn the six metrics into a safe first move",
+            "reveal-mode": "after-choice"
+          },
+          "line": 107,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "visual",
+          "attrs": {
+            "id": "practice-workbench",
+            "kind": "practice-workbench",
+            "title": "Your turn: defend the smallest safe action"
+          },
+          "line": 115,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "visual",
+          "attrs": {
+            "id": "recommendation-builder",
+            "kind": "recommendation-builder",
+            "title": "Explain the evidence, not the emotion"
+          },
+          "line": 147,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 5,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "decision-flow",
+        "visual"
+      ],
+      "interactiveTypes": [
+        "decision-flow"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "deep",
+      "visualScore": 6,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/1-foundations/1.2-cpc-ctr.mdx",
+      "moduleNumber": "1",
+      "lessonNumber": "2",
+      "title": "Is My Ad Worth Clicking? CPC and CTR",
+      "slug": "1.2-cpc-ctr",
+      "directives": [
+        {
+          "name": "comparison-table",
+          "attrs": {
+            "id": "cpc-product-comparison",
+            "title": "Two products, two CPC ceilings"
+          },
+          "line": 49,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "formula-ladder",
+          "attrs": {
+            "id": "max-cpc-formula",
+            "title": "Calculate the maximum CPC before changing the bid"
+          },
+          "line": 57,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "trade-off",
+          "attrs": {
+            "id": "cpc-vs-ctr",
+            "title": "CPC vs CTR",
+            "caption": "What each tells you"
+          },
+          "line": 114,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "callout",
+          "attrs": {
+            "id": "ctr-not-alone",
+            "variant": "pitfall",
+            "title": "Don't read CTR in isolation"
+          },
+          "line": 123,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "cpc-ctr-diagnosis",
+            "title": "Diagnose the signal before touching the bid",
+            "reveal-mode": "after-choice"
+          },
+          "line": 140,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 3,
+      "dedicatedBlockCount": 3,
+      "visualTypes": [
+        "comparison-table",
+        "decision-flow",
+        "formula-ladder"
+      ],
+      "interactiveTypes": [
+        "decision-flow"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "deep",
+      "visualScore": 6,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/1-foundations/1.3-acos-tacos-profitability.mdx",
+      "moduleNumber": "1",
+      "lessonNumber": "3",
+      "title": "Am I Making Money or Losing Money? ACoS, TACoS, and Profitability",
+      "slug": "1.3-acos-tacos-profitability",
+      "directives": [
+        {
+          "name": "trade-off",
+          "attrs": {
+            "id": "acos-tacos-roas",
+            "title": "ACoS vs TACoS vs ROAS",
+            "caption": "Profitability lenses"
+          },
+          "line": 95,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "process",
+          "attrs": {
+            "id": "profit-decide",
+            "title": "Decide if a campaign is profitable",
+            "steps": "Compute ACoS|Look at TACoS|Compare to break-even|Make a call",
+            "hint": "ACoS alone lies. TACoS places the spend in context."
+          },
+          "line": 107,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "comparison-table",
+          "attrs": {
+            "id": "profitability-lens-table",
+            "title": "Read the same spend through three lenses"
+          },
+          "line": 110,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "formula-ladder",
+          "attrs": {
+            "id": "break-even-acos-formula",
+            "title": "Turn margin into a break-even ACoS"
+          },
+          "line": 114,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "callout",
+          "attrs": {
+            "id": "low-acos-vanity",
+            "variant": "warning",
+            "title": "Low ACoS is not always good"
+          },
+          "line": 118,
+          "validJson": null,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 2,
+      "dedicatedBlockCount": 2,
+      "visualTypes": [
+        "comparison-table",
+        "formula-ladder"
+      ],
+      "interactiveTypes": [],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 4,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/1-foundations/1.4-roas-measuring-return.mdx",
+      "moduleNumber": "1",
+      "lessonNumber": "4",
+      "title": "Every Dollar In, How Many Dollars Back? ROAS",
+      "slug": "1.4-roas-measuring-return",
+      "directives": [
+        {
+          "name": "trade-off",
+          "attrs": {
+            "id": "roas-bands",
+            "title": "Reading ROAS bands"
+          },
+          "line": 69,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "callout",
+          "attrs": {
+            "id": "roas-not-profit",
+            "variant": "warning",
+            "title": "ROAS is not profit"
+          },
+          "line": 79,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "formula-ladder",
+          "attrs": {
+            "id": "roas-value-ladder",
+            "title": "Calculate return on ad spend before celebrating the ratio"
+          },
+          "line": 107,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "comparison-table",
+          "attrs": {
+            "id": "roas-scale-efficiency",
+            "title": "Choose profitable volume over an isolated ratio"
+          },
+          "line": 111,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 2,
+      "dedicatedBlockCount": 2,
+      "visualTypes": [
+        "comparison-table",
+        "formula-ladder"
+      ],
+      "interactiveTypes": [],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 4,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/1-foundations/1.5-metrics-in-practice.mdx",
+      "moduleNumber": "1",
+      "lessonNumber": "5",
+      "title": "Reading the Story Your Metrics Tell",
+      "slug": "1.5-metrics-in-practice",
+      "directives": [
+        {
+          "name": "process",
+          "attrs": {
+            "id": "weekly-review",
+            "title": "Weekly metric review",
+            "steps": "Pull the Big Six|Compare to last week|Spot anomalies|Decide which to act on|Log the decision",
+            "hint": "If you can't name the decision, you didn't actually review."
+          },
+          "line": 70,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "trade-off",
+          "attrs": {
+            "id": "what-first",
+            "title": "Which metric to look at first"
+          },
+          "line": 75,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "callout",
+          "attrs": {
+            "id": "one-change-at-a-time",
+            "variant": "pitfall",
+            "title": "Don't change five things at once"
+          },
+          "line": 86,
+          "validJson": null,
+          "closed": true
+        },
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "metric-story-flow",
+            "title": "Read the story before naming the lever"
+          },
+          "line": 162,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "decision-flow"
+      ],
+      "interactiveTypes": [
+        "decision-flow"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/2-keyword-research/2.1-match-types.mdx",
+      "moduleNumber": "2",
+      "lessonNumber": "1",
+      "title": "Match Types: Broad, Phrase, Exact",
+      "slug": "2.1-match-types",
+      "directives": [
+        {
+          "name": "comparison-table",
+          "attrs": {
+            "id": "match-type-role-matrix",
+            "title": "Choose match type by role, not habit"
+          },
+          "line": 126,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "hierarchy-builder",
+          "attrs": {
+            "id": "match-type-layering",
+            "title": "Layer discovery into scaling and protection"
+          },
+          "line": 130,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "match-type-routing",
+            "title": "Route a keyword by evidence and intent",
+            "reveal-mode": "after-choice"
+          },
+          "line": 134,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 3,
+      "dedicatedBlockCount": 3,
+      "visualTypes": [
+        "comparison-table",
+        "decision-flow",
+        "hierarchy-builder"
+      ],
+      "interactiveTypes": [
+        "decision-flow",
+        "hierarchy-builder"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "deep",
+      "visualScore": 6,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/2-keyword-research/2.2-keyword-research-workflow.mdx",
+      "moduleNumber": "2",
+      "lessonNumber": "2",
+      "title": "Keyword Research Workflow & Tools",
+      "slug": "2.2-keyword-research-workflow",
+      "directives": [
+        {
+          "name": "timeline-calendar",
+          "attrs": {
+            "id": "keyword-research-workflow",
+            "title": "Run keyword research as a repeatable evidence cycle"
+          },
+          "line": 202,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "timeline-calendar"
+      ],
+      "interactiveTypes": [
+        "timeline-calendar"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/2-keyword-research/2.3-negative-keywords.mdx",
+      "moduleNumber": "2",
+      "lessonNumber": "3",
+      "title": "Negative Keywords: Stopping Wasted Spend",
+      "slug": "2.3-negative-keywords",
+      "directives": [
+        {
+          "name": "classification-board",
+          "attrs": {
+            "id": "negative-routing-board",
+            "title": "Route the negative candidate before you add it",
+            "reveal-mode": "after-choice"
+          },
+          "line": 94,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "comparison-table",
+          "attrs": {
+            "id": "negative-scope-matrix",
+            "title": "Choose the narrowest safe negative scope"
+          },
+          "line": 102,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "negative-scope-routing",
+            "title": "Route a waste term without over-blocking",
+            "reveal-mode": "after-choice"
+          },
+          "line": 106,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "timeline-calendar",
+          "attrs": {
+            "id": "negative-maintenance-calendar",
+            "title": "Make negative maintenance a recurring operating habit"
+          },
+          "line": 110,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 4,
+      "dedicatedBlockCount": 4,
+      "visualTypes": [
+        "classification-board",
+        "comparison-table",
+        "decision-flow",
+        "timeline-calendar"
+      ],
+      "interactiveTypes": [
+        "classification-board",
+        "decision-flow",
+        "timeline-calendar"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "deep",
+      "visualScore": 6,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/2-keyword-research/2.4-keyword-grouping.mdx",
+      "moduleNumber": "2",
+      "lessonNumber": "4",
+      "title": "Keyword Grouping for Campaign Structure",
+      "slug": "2.4-keyword-grouping",
+      "directives": [
+        {
+          "name": "hierarchy-builder",
+          "attrs": {
+            "id": "keyword-grouping-tree",
+            "title": "Group keywords by intent before building campaigns"
+          },
+          "line": 192,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "hierarchy-builder"
+      ],
+      "interactiveTypes": [
+        "hierarchy-builder"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/3-listing-optimization/3.1-listing-quality-score.mdx",
+      "moduleNumber": "3",
+      "lessonNumber": "1",
+      "title": "Listing and Ad Relevance Signals",
+      "slug": "3.1-listing-quality-score",
+      "directives": [
+        {
+          "name": "annotated-listing",
+          "attrs": {
+            "id": "listing-readiness-canvas",
+            "title": "Diagnose the listing before you diagnose the bid"
+          },
+          "line": 197,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "annotated-listing"
+      ],
+      "interactiveTypes": [
+        "annotated-listing"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/3-listing-optimization/3.2-listing-anatomy.mdx",
+      "moduleNumber": "3",
+      "lessonNumber": "2",
+      "title": "Listing Anatomy: Title, Bullets, Images & PPC",
+      "slug": "3.2-listing-anatomy",
+      "directives": [
+        {
+          "name": "annotated-listing",
+          "attrs": {
+            "id": "listing-anatomy-canvas",
+            "title": "See the listing as a PPC system"
+          },
+          "line": 42,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "annotated-listing"
+      ],
+      "interactiveTypes": [
+        "annotated-listing"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/3-listing-optimization/3.3-aplus-content.mdx",
+      "moduleNumber": "3",
+      "lessonNumber": "3",
+      "title": "A+ Content & Brand Registry Advantage",
+      "slug": "3.3-aplus-content",
+      "directives": [
+        {
+          "name": "comparison-table",
+          "attrs": {
+            "id": "aplus-investment-matrix",
+            "title": "Decide whether A+ Content is the next conversion lever"
+          },
+          "line": 156,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "formula-ladder",
+          "attrs": {
+            "id": "aplus-conversion-economics",
+            "title": "Translate conversion lift into an ACoS hypothesis"
+          },
+          "line": 160,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 2,
+      "dedicatedBlockCount": 2,
+      "visualTypes": [
+        "comparison-table",
+        "formula-ladder"
+      ],
+      "interactiveTypes": [],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 4,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/4-campaign-architecture/4.1-sponsored-products.mdx",
+      "moduleNumber": "4",
+      "lessonNumber": "1",
+      "title": "Sponsored Products: Your Ad's Best Salesperson",
+      "slug": "4.1-sponsored-products",
+      "directives": [
+        {
+          "name": "funnel-canvas",
+          "attrs": {
+            "id": "sponsored-products-funnel",
+            "title": "Match Sponsored Products structure to shopper intent"
+          },
+          "line": 104,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "funnel-canvas"
+      ],
+      "interactiveTypes": [
+        "funnel-canvas"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/4-campaign-architecture/4.2-sponsored-brands-display.mdx",
+      "moduleNumber": "4",
+      "lessonNumber": "2",
+      "title": "Sponsored Brands & Display: Beyond the Basics",
+      "slug": "4.2-sponsored-brands-display",
+      "directives": [
+        {
+          "name": "funnel-canvas",
+          "attrs": {
+            "id": "full-funnel-ad-route",
+            "title": "Route each ad type to the shopper stage"
+          },
+          "line": 116,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "funnel-canvas"
+      ],
+      "interactiveTypes": [
+        "funnel-canvas"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/4-campaign-architecture/4.3-campaign-structure.mdx",
+      "moduleNumber": "4",
+      "lessonNumber": "3",
+      "title": "Campaign Structure: The Filing Cabinet Method",
+      "slug": "4.3-campaign-structure",
+      "directives": [
+        {
+          "name": "hierarchy-builder",
+          "attrs": {
+            "id": "campaign-filing-cabinet",
+            "title": "Build the campaign filing cabinet"
+          },
+          "line": 40,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "hierarchy-builder"
+      ],
+      "interactiveTypes": [
+        "hierarchy-builder"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/4-campaign-architecture/4.4-campaign-architecture-practice.mdx",
+      "moduleNumber": "4",
+      "lessonNumber": "4",
+      "title": "Campaign Architecture in Practice: Build Your First Campaign",
+      "slug": "4.4-campaign-architecture-practice",
+      "directives": [
+        {
+          "name": "simulation-rubric",
+          "attrs": {
+            "id": "campaign-builder-rubric",
+            "title": "Campaign Builder pre-flight rubric"
+          },
+          "line": 39,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "campaign-builder-sequence",
+            "title": "Build the campaign in the order the simulator evaluates it",
+            "reveal-mode": "after-choice"
+          },
+          "line": 116,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 2,
+      "dedicatedBlockCount": 2,
+      "visualTypes": [
+        "decision-flow",
+        "simulation-rubric"
+      ],
+      "interactiveTypes": [
+        "decision-flow"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "deep",
+      "visualScore": 5,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/5-portfolio-strategy/5.1-campaign-portfolios.mdx",
+      "moduleNumber": "5",
+      "lessonNumber": "1",
+      "title": "Campaign Portfolios: Organizing for Scale",
+      "slug": "5.1-campaign-portfolios",
+      "directives": [
+        {
+          "name": "portfolio-map",
+          "attrs": {
+            "id": "portfolio-control-map",
+            "title": "Map the portfolio budget without losing campaign control"
+          },
+          "line": 67,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "portfolio-map"
+      ],
+      "interactiveTypes": [
+        "portfolio-map"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/5-portfolio-strategy/5.2-budget-pacing.mdx",
+      "moduleNumber": "5",
+      "lessonNumber": "2",
+      "title": "Budget Pacing & Daily Spend Management",
+      "slug": "5.2-budget-pacing",
+      "directives": [
+        {
+          "name": "timeline-calendar",
+          "attrs": {
+            "id": "budget-pacing-calendar",
+            "title": "Inspect pacing at the time scale you are managing"
+          },
+          "line": 170,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "timeline-calendar"
+      ],
+      "interactiveTypes": [
+        "timeline-calendar"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/5-portfolio-strategy/5.3-seasonal-strategy.mdx",
+      "moduleNumber": "5",
+      "lessonNumber": "3",
+      "title": "Seasonal Strategy & Promo Planning",
+      "slug": "5.3-seasonal-strategy",
+      "directives": [
+        {
+          "name": "seasonal-calendar",
+          "attrs": {
+            "id": "seasonal-three-phase-calendar",
+            "title": "Sequence the campaign around the event"
+          },
+          "line": 112,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "seasonal-calendar"
+      ],
+      "interactiveTypes": [
+        "seasonal-calendar"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/6-bidding-lab/6.1-bid-strategies.mdx",
+      "moduleNumber": "6",
+      "lessonNumber": "1",
+      "title": "Bid Strategies: Flat-Rate, Surge Pricing, and Smart Discounts",
+      "slug": "6.1-bid-strategies",
+      "directives": [
+        {
+          "name": "comparison-table",
+          "attrs": {
+            "id": "bid-strategy-control-matrix",
+            "title": "Compare bid strategies by control and risk"
+          },
+          "line": 111,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "formula-ladder",
+          "attrs": {
+            "id": "effective-bid-risk",
+            "title": "Show how a set bid can become a larger exposure"
+          },
+          "line": 115,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "bid-strategy-routing",
+            "title": "Choose the bid strategy from evidence",
+            "reveal-mode": "after-choice"
+          },
+          "line": 119,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 3,
+      "dedicatedBlockCount": 3,
+      "visualTypes": [
+        "comparison-table",
+        "decision-flow",
+        "formula-ladder"
+      ],
+      "interactiveTypes": [
+        "decision-flow"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "deep",
+      "visualScore": 6,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/6-bidding-lab/6.2-placement-adjustments.mdx",
+      "moduleNumber": "6",
+      "lessonNumber": "2",
+      "title": "Placement Adjustments: Paying for the Front Row",
+      "slug": "6.2-placement-adjustments",
+      "directives": [
+        {
+          "name": "formula-ladder",
+          "attrs": {
+            "id": "placement-bid-ladder",
+            "title": "Separate base bid from placement exposure"
+          },
+          "line": 123,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "comparison-table",
+          "attrs": {
+            "id": "placement-tradeoff-matrix",
+            "title": "Choose a placement adjustment from evidence, not status"
+          },
+          "line": 127,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 2,
+      "dedicatedBlockCount": 2,
+      "visualTypes": [
+        "comparison-table",
+        "formula-ladder"
+      ],
+      "interactiveTypes": [],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 4,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/6-bidding-lab/6.3-bid-elevator-prep.mdx",
+      "moduleNumber": "6",
+      "lessonNumber": "3",
+      "title": "Bid Elevator Prep: Ready to Bid",
+      "slug": "6.3-bid-elevator-prep",
+      "directives": [
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "bid-elevator-flow",
+            "title": "Use the bid-elevator decision sequence"
+          },
+          "line": 98,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "decision-flow"
+      ],
+      "interactiveTypes": [
+        "decision-flow"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/7-search-term-triage/7.1-search-term-analysis.mdx",
+      "moduleNumber": "7",
+      "lessonNumber": "1",
+      "title": "Search Term Analysis: Reading the Data",
+      "slug": "7.1-search-term-analysis",
+      "directives": [
+        {
+          "name": "classification-board",
+          "attrs": {
+            "id": "search-term-action-board",
+            "title": "Route every search term to one accountable action",
+            "reveal-mode": "after-choice"
+          },
+          "line": 101,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "search-term-triage-flow",
+            "title": "Run the weekly search-term triage",
+            "reveal-mode": "after-choice"
+          },
+          "line": 105,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "timeline-calendar",
+          "attrs": {
+            "id": "search-term-weekly-cycle",
+            "title": "Make triage a weekly operating cycle"
+          },
+          "line": 109,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 3,
+      "dedicatedBlockCount": 3,
+      "visualTypes": [
+        "classification-board",
+        "decision-flow",
+        "timeline-calendar"
+      ],
+      "interactiveTypes": [
+        "classification-board",
+        "decision-flow",
+        "timeline-calendar"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "deep",
+      "visualScore": 6,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/7-search-term-triage/7.2-negative-keywords.mdx",
+      "moduleNumber": "7",
+      "lessonNumber": "2",
+      "title": "Negative Keywords: Building a Working List",
+      "slug": "7.2-negative-keywords",
+      "directives": [
+        {
+          "name": "classification-board",
+          "attrs": {
+            "id": "negative-list-builder",
+            "title": "Build the working negative list from evidence"
+          },
+          "line": 39,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "classification-board"
+      ],
+      "interactiveTypes": [
+        "classification-board"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/7-search-term-triage/7.3-str-triage-prep.mdx",
+      "moduleNumber": "7",
+      "lessonNumber": "3",
+      "title": "STR Triage Prep: Ready to Triage",
+      "slug": "7.3-str-triage-prep",
+      "directives": [
+        {
+          "name": "decision-flow",
+          "attrs": {
+            "id": "str-triage-prep-flow",
+            "title": "Prepare the STR triage in an evidence-first order"
+          },
+          "line": 163,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "decision-flow"
+      ],
+      "interactiveTypes": [
+        "decision-flow"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/8-competitive-intelligence/8.1-brand-analytics.mdx",
+      "moduleNumber": "8",
+      "lessonNumber": "1",
+      "title": "Brand Analytics: Reading the Competitive Landscape",
+      "slug": "8.1-brand-analytics",
+      "directives": [
+        {
+          "name": "evidence-ledger",
+          "attrs": {
+            "id": "brand-analytics-evidence-chain",
+            "title": "Turn each Brand Analytics report into a campaign input"
+          },
+          "line": 126,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "evidence-ledger"
+      ],
+      "interactiveTypes": [
+        "evidence-ledger"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/8-competitive-intelligence/8.2-share-of-voice.mdx",
+      "moduleNumber": "8",
+      "lessonNumber": "2",
+      "title": "Share of Voice Analysis & Strategic Positioning",
+      "slug": "8.2-share-of-voice",
+      "directives": [
+        {
+          "name": "sov-positioner",
+          "attrs": {
+            "id": "sov-strategy-positioner",
+            "title": "Let SOV determine the strategic posture"
+          },
+          "line": 68,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 1,
+      "dedicatedBlockCount": 1,
+      "visualTypes": [
+        "sov-positioner"
+      ],
+      "interactiveTypes": [
+        "sov-positioner"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "enriched",
+      "visualScore": 3,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    },
+    {
+      "path": "content/curriculum/modules/8-competitive-intelligence/8.3-competitor-benchmarking.mdx",
+      "moduleNumber": "8",
+      "lessonNumber": "3",
+      "title": "Competitor Benchmarking & Actionable Insights",
+      "slug": "8.3-competitor-benchmarking",
+      "directives": [
+        {
+          "name": "competitive-gap-matrix",
+          "attrs": {
+            "id": "competitor-gap-matrix",
+            "title": "Turn benchmark evidence into a gap worth acting on",
+            "reveal-mode": "after-choice"
+          },
+          "line": 100,
+          "validJson": true,
+          "closed": true
+        },
+        {
+          "name": "insight-router",
+          "attrs": {
+            "id": "competitive-insight-router",
+            "title": "Route a market observation into a measurable action",
+            "reveal-mode": "after-choice"
+          },
+          "line": 132,
+          "validJson": true,
+          "closed": true
+        }
+      ],
+      "visualBlockCount": 2,
+      "dedicatedBlockCount": 2,
+      "visualTypes": [
+        "competitive-gap-matrix",
+        "insight-router"
+      ],
+      "interactiveTypes": [
+        "competitive-gap-matrix",
+        "insight-router"
+      ],
+      "validVisualJson": true,
+      "visualDepth": "deep",
+      "visualScore": 5,
+      "contractSections": {
+        "outcome": true,
+        "decision": true,
+        "workedExample": true,
+        "activeAttempt": true,
+        "feedback": true,
+        "evidence": true,
+        "retrieval": true
+      },
+      "missingContractSections": []
+    }
+  ]
+}

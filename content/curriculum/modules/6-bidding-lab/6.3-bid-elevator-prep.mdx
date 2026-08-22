@@ -95,6 +95,10 @@ For each scenario, follow this flow:
 
 **Watch out.** If the market CPC is above your max CPC, you can't profitably bid on that keyword at your target ACoS. Your options are: accept a higher ACoS, improve your CVR through listing optimization, or walk away and find less competitive terms.
 
+:::decision-flow{id="bid-elevator-flow" title="Use the bid-elevator decision sequence"}
+{"initialStep":0,"steps":[{"id":"ceiling","label":"Calculate the ceiling","question":"What is the maximum CPC at the target ACoS?","evidence":"Price, expected CVR, and target ACoS from the scenario brief.","action":"Write the ceiling down before looking at the market range."},{"id":"market","label":"Compare the market","question":"Does the market CPC range sit above or below the ceiling?","evidence":"Estimated CPC range and competition level in the brief.","action":"If the range is above the ceiling, do not pretend the target is achievable without a trade-off."},{"id":"intent","label":"Adjust for intent","question":"How much confidence does the keyword carry?","evidence":"Brand, exact product, category, or broad discovery intent.","action":"Bid near the ceiling for high intent and well below it for uncertain discovery terms."},{"id":"strategy","label":"Name the trade-off","question":"Are you bidding for launch visibility or steady-state profit?","evidence":"Launch, profit, or defense context in the scenario.","action":"State the resulting ACoS, review date, and walk-away condition to the client."}]}
+:::
+
 ## Common Bidding Mistakes
 
 **Bidding without calculating max CPC.** If you don't know your ceiling, you're guessing. Always do the math first.

@@ -10,39 +10,23 @@ xpReward: 75
 
 ## What you can do after this lesson
 
-Read the six core Amazon pay-per-click (PPC) metrics together, identify the likely performance problem, and choose the first question to investigate before changing anything.
+Read the six core Amazon pay-per-click (PPC) metrics as one diagnostic system, identify the likely performance problem, and choose the first question to investigate before changing anything.
 
 ## The decision in one sentence
 
 Don't change a bid because one metric looks bad. First find out whether the issue is traffic, conversion, cost, budget, or the campaign's own objective.
 
+The path matters because each handoff answers a different operational question. A campaign can have plenty of impressions but weak traffic appeal, strong traffic but weak listing conversion, or healthy conversion with unaffordable click costs. The visible symptom is not automatically the correct lever.
+
 ## Meet the Big Six
 
-The Big Six are the six calculated metrics that describe what happened between the search result and the sale. CPC, CTR, CVR, ACoS, and ROAS are standard ad-report numbers, available per campaign, per ad group, and per keyword:
+The Big Six are the calculated metrics that describe what happened between the search result and the sale. Each metric has a job. Treating them as interchangeable is how operators cut bids before they know what broke.
 
-- **CPC, cost per click** (average advertising cost for one click): `CPC = ad spend ÷ clicks`.
-- **CTR, click-through rate** (the share of impressions that became clicks): `CTR = clicks ÷ impressions`.
-- **CVR, conversion rate** (the share of clicks that became orders): `CVR = orders ÷ clicks`.
-- **ACoS, advertising cost of sales** (advertising spend divided by ad-attributed sales): `ACoS = ad spend ÷ ad sales`.
-- **TACoS, total advertising cost of sales** (advertising spend divided by total sales, including organic sales): `TACoS = ad spend ÷ total sales`.
-- **ROAS, return on ad spend** (ad-attributed sales divided by advertising spend): `ROAS = ad sales ÷ ad spend`.
+:::visual{id="big-six-matrix" kind="metric-matrix" title="The Big Six answer different questions"}
+{"metrics":[{"label":"CPC","family":"traffic","question":"How much does one click cost?","formula":"ad spend ÷ clicks","lever":"bid and placement pressure"},{"label":"CTR","family":"traffic","question":"Does the result earn attention?","formula":"clicks ÷ impressions","lever":"query relevance, offer, image, title"},{"label":"CVR","family":"conversion","question":"Does the traffic become orders?","formula":"orders ÷ clicks","lever":"listing readiness and intent fit"},{"label":"ACoS","family":"economics","question":"What share of ad sales is spent?","formula":"ad spend ÷ ad sales","lever":"objective, CPC, conversion"},{"label":"ROAS","family":"economics","question":"How much sales return per peso?","formula":"ad sales ÷ ad spend","lever":"efficiency target and scale"},{"label":"TACoS","family":"economics","question":"What is the ad burden on the whole store?","formula":"ad spend ÷ total sales","lever":"total-store growth and mix"}]}
+:::
 
 Two more numbers feed these calculations without being part of the Big Six themselves: **impressions** (how often Amazon showed the ad) and **clicks** (how often a shopper selected it). CPC and CTR come straight from ad platform reports. TACoS is different: it needs total sales, including organic sales that happen with no ad involved, so it's a business-level number you calculate yourself, not a line in a standard ad report.
-
-A quick view of what each metric answers:
-
-:::trade-off{id="big-six" title="The Big Six metrics" caption="What each metric answers"}
-
-| Metric | What it answers                          |
-| ------ | ---------------------------------------- |
-| CPC    | How much per click                       |
-| CTR    | Share of impressions that become clicks  |
-| CVR    | Share of clicks that become orders       |
-| ACoS   | Ad spend as a share of ad sales          |
-| ROAS   | Sales returned per peso spent            |
-| TACoS  | Ad spend as a share of total store sales |
-
-:::
 
 The work loop that ties these together:
 
@@ -74,26 +58,19 @@ This week, one campaign produced:
 - $320 ad-attributed sales.
 - $800 total sales.
 
-Now calculate the metrics.
+Now calculate the metrics before reading the visual readout.
 
-- CPC is $192 divided by 160 clicks. CPC is **$1.20**.
-- CTR is 160 clicks divided by 20,000 impressions. CTR is **0.8%**.
-- CVR is 8 orders divided by 160 clicks. CVR is **5%**.
-- ACoS is $192 divided by $320. ACoS is **60%**.
-- TACoS is $192 divided by $800. TACoS is **24%**.
-- ROAS is $320 divided by $192. ROAS is **1.67x**.
+:::visual{id="coffee-grinder-case" kind="worked-example" title="The coffee-grinder case: from raw data to a diagnosis"}
+{"case":{"impressions":20000,"clicks":160,"spend":192,"orders":8,"adSales":320,"totalSales":800,"price":40,"targetAcos":30}}
+:::
 
-The ACoS is high. That's a signal. It isn't the decision yet.
+The ACoS is high. That's a signal. It isn't the decision yet. The case shows why: ACoS tells you the size of the efficiency gap, but not whether the first fix belongs to traffic, conversion, click cost, or campaign strategy.
 
 ## Ask the questions in order
 
 ### 1. What is the campaign trying to do?
 
-Check the objective before you judge the result.
-
-A launch campaign may accept a higher ACoS while it gathers search-term data. A mature exact-match campaign may need to stay close to a profitability target. A branded-defense campaign is measured differently again.
-
-Write the objective beside the data. Without it, you can't tell whether high cost is planned, temporary, or a real problem.
+Check the objective before you judge the result. A launch campaign may accept a higher ACoS while it gathers search-term data. A mature exact-match campaign may need to stay close to a profitability target. A branded-defense campaign is measured differently again.
 
 ### 2. Is there enough data?
 
@@ -101,37 +78,15 @@ Eight orders give more information than zero orders, but they don't prove a tren
 
 ### 3. Is traffic the problem?
 
-The campaign received many impressions, but only 0.8% of shoppers clicked. Start with traffic relevance and search-result appeal.
-
-Check these items:
-
-- The actual search terms that triggered the ad.
-- Whether the target is too broad for the product.
-- The main image and the visible product promise.
-- Price, coupon, shipping, and featured-offer position.
-- Whether the product is in stock.
-
-If the search terms are unrelated, negative targeting or target refinement may be the right first action. If the terms are relevant but shoppers ignore the ad, inspect the listing and offer before making a large bid change.
+The campaign received many impressions, but only 0.8% of shoppers clicked. Start with traffic relevance and search-result appeal. Check the actual search terms, target breadth, main image, visible product promise, price, coupon, shipping, featured-offer position, and stock.
 
 ### 4. Is conversion the problem?
 
-The campaign produced 160 clicks and 8 orders. A 5% conversion rate may be acceptable or weak depending on category, price, traffic intent, and account history. Compare it with the product's normal conversion rate and similar campaign traffic.
-
-When CVR is weak, inspect the product detail page:
-
-- Is the product matched to the shopper's intent?
-- Is the title clear?
-- Do the images show the product and its use clearly?
-- Is the price competitive against the shopper's alternatives?
-- Are there review, variation, stock, or delivery issues?
-
-Don't call a relevant keyword "bad" before you check whether the listing can convert the shopper you paid to bring in.
+The campaign produced 160 clicks and 8 orders. A 5% conversion rate may be acceptable or weak depending on category, price, traffic intent, and account history. Compare it with the product's normal conversion rate and similar campaign traffic. Inspect the title, images, price, reviews, variations, stock, and delivery promise before calling the keyword bad.
 
 ### 5. Is the click cost affordable?
 
-If the target ACoS is 30% and this campaign is at 60%, the cost per order is likely too high, conversion is too low, or both.
-
-Use maximum CPC to make the bid decision defensible.
+If the target ACoS is 30% and this campaign is at 60%, the cost per order is likely too high, conversion is too low, or both. Use maximum CPC to make the bid decision defensible:
 
 `maximum CPC = selling price × target ACoS × conversion rate`
 
@@ -139,40 +94,27 @@ For this case, with a $40 price, 30% target ACoS, and 5% conversion rate:
 
 `$40 × 0.30 × 0.05 = $0.60`
 
-The maximum CPC is about **$0.60**. The actual CPC is $1.20. The campaign pays about twice the CPC this combination can support.
-
-Your next action could be to lower bids, reduce placement pressure, focus on more relevant targets, or improve conversion. The correct choice depends on what you found in the earlier questions, not on this number alone.
+The maximum CPC is about **$0.60**. The actual CPC is $1.20. The campaign pays about twice the CPC this combination can support. Your next action could be to lower bids, reduce placement pressure, focus on more relevant targets, or improve conversion. The correct choice depends on what you found in the earlier questions, not on this number alone.
 
 ## Read the pattern, not one number
 
-Use these quick patterns when you investigate:
-
-- **Low impressions:** check eligibility, stock, budget, targeting coverage, and bid.
-- **High impressions with low CTR:** check query relevance, main image, price, offer, and title.
-- **Clicks with low CVR:** check listing readiness and product-search fit.
-- **Good CVR with high CPC:** check maximum CPC, bids, and placement adjustments.
-- **High ACoS with a launch objective:** check the data plan, learning goal, and guardrails before cutting spend.
-- **TACoS rising while total sales are flat or falling:** look beyond direct ad efficiency and inspect the wider sales picture.
+Use these patterns as a first-pass investigation map. They are hypotheses, not universal benchmarks.
 
 ## Independent calculation
 
 Complete the second case below without looking back at the worked coffee-grinder example. Show each formula before you decide what to change.
 
-## Your turn
+:::decision-flow{id="read-before-change-flow" title="Turn the six metrics into a safe first move" reveal-mode="after-choice"}
+{"initialStep":0,"steps":[{"id":"traffic","label":"Read traffic","question":"Are impressions and clicks arriving for the intended searches?","evidence":"Impressions, CTR, search term relevance, and placement.","action":"If the traffic is wrong, fix targeting or negatives before changing bids."},{"id":"cost","label":"Read cost","question":"Is CPC above the product's maximum-CPC ceiling?","evidence":"Actual CPC compared with price, CVR, and target ACoS.","action":"If cost is the constraint, lower the bid or move budget to stronger terms."},{"id":"conversion","label":"Read conversion","question":"Do clicks become orders at a believable rate?","evidence":"Orders, CVR, listing quality, price, reviews, and offer.","action":"If conversion is weak, improve the listing or offer before buying more traffic."},{"id":"log","label":"Log one change","question":"What is the smallest safe test?","evidence":"One hypothesis, one lever, one review window.","action":"Record the change and the next evidence check before touching the account."}]}
+:::
 
-Work this second case before checking the answer.
+## Your turn
 
 A keyword has 4,000 impressions, 120 clicks, 18 orders, $180 spend, and $900 in ad-attributed sales. The product sells for $50. The client's target is 25% ACoS.
 
-Answer these before reading further:
-
-- What is the CTR?
-- What is the CVR?
-- What is the ACoS?
-- Is traffic likely the first problem?
-- What extra information do you need before changing the bid?
-
-**Work it through:** CTR = 120 ÷ 4,000 = 3.0%. CVR = 18 ÷ 120 = 15%. ACoS = $180 ÷ $900 = 20%. Traffic isn't the first problem here: CTR is healthy and CVR is strong, and ACoS is already below the 25% target. Before touching the bid at all, you'd still want the campaign's objective and enough days of data to know this isn't one lucky week.
+:::visual{id="practice-workbench" kind="practice-workbench" title="Your turn: defend the smallest safe action"}
+{"case":{"impressions":4000,"clicks":120,"spend":180,"orders":18,"adSales":900,"totalSales":1200,"price":50,"targetAcos":25},"prompt":"Calculate CTR, CVR, and ACoS. Then name the first question you would investigate before changing the bid.","answer":"CTR is 3.0%, CVR is 15%, and ACoS is 20%, below the 25% target. Traffic is not the first problem. Confirm the campaign objective and data window before deciding whether any change is needed."}
+:::
 
 Your written answer should name the campaign objective, the data window, the maximum-CPC or break-even logic, and the next review date, not just the four calculations.
 
@@ -202,6 +144,10 @@ Lesson 1.2 adds max CPC to this sheet. 1.3 adds break-even ACoS. 1.4 adds minimu
 
 Use this structure when you explain a performance issue:
 
+:::visual{id="recommendation-builder" kind="recommendation-builder" title="Explain the evidence, not the emotion"}
+{"sentence":"|Target: current ACoS is above the supplied target|Pattern: clicks cost more than current conversion can support|Next check: search terms and listing conversion|Action boundary: no large bid reduction before evidence|Review date: document the change and inspect the next data window|"}
+:::
+
 > "This campaign spent more than the current target because clicks cost more than the product's current conversion rate can support. I'm checking the search terms and listing conversion before making a bid reduction. I'll document the action and review the result after the next data window."
 
 ## Check
@@ -223,7 +169,7 @@ Product or feature: Sponsored Products campaign performance reports (the report 
 What the learner can do: Pull impressions, clicks, spend, orders, and sales at the campaign, ad group, and keyword level, and use them to calculate CPC, CTR, CVR, ACoS, and ROAS
 Who can access it: Any Sponsored Products advertiser, through Campaign Manager or bulk report downloads
 Retailer or marketplace scope: Amazon Advertising Console (US marketplace examples used in this lesson)
-Official source URL: https://advertising.amazon.com/help — specific report-column article not verified; content owner to confirm and link at rewrite time
+Official source URL: https://advertising.amazon.com/help - specific report-column article not verified; content owner to confirm and link at rewrite time
 Last verified: pending content-owner review
 Next review due: pending content-owner review
 Owner: Ryan Roland Dabao

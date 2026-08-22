@@ -36,6 +36,10 @@ If your exact match campaign targets "[milk frother]" and your broad match campa
 
 Full worked examples, the before/after ACoS table, and the "Beyond the search term report" section (Amazon search suggestions, competitor brand terms, Measuring Impact) all live in 2.3. Use this recap as the checklist before you open the STR Triage tool.
 
+:::classification-board{id="negative-list-builder" title="Build the working negative list from evidence"}
+{"prompt":"Classify the candidate first, then choose the smallest safe negative action.","categories":[{"id":"exact","label":"Negative exact","description":"One specific search is wrong, but nearby variants may still fit."},{"id":"phrase","label":"Negative phrase","description":"The entire phrase family is irrelevant to the product."},{"id":"hold","label":"Hold for evidence","description":"The term is unproven, not clearly wrong, or lacks enough data."},{"id":"remove","label":"Remove or review","description":"The negative is blocking useful demand or was added at the wrong scope."}],"items":[{"id":"wrong-term","label":"free replacement parts","categoryId":"exact","rationale":"Specific mismatch with the product promise."},{"id":"wrong-family","label":"cheap kitchen gadgets","categoryId":"phrase","rationale":"The price-and-category intent is consistently wrong."},{"id":"low-data","label":"portable kitchen prep","categoryId":"hold","rationale":"Relevant language with too little evidence to block."},{"id":"overblock","label":"baking","categoryId":"remove","rationale":"A broad negative may block relevant product use cases."}]}
+:::
+
 ## Your turn
 
 Open this week's search term report. For each term with 5 or more clicks and zero orders, decide: negative phrase, negative exact, or leave alone because the term is relevant. Apply at least three negatives before moving to 7.3.

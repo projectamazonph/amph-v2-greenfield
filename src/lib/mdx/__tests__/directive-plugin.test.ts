@@ -42,6 +42,75 @@ describe("directivePlugin", () => {
     expect(node.value).toMatch(/"value"\s*:\s*"How much per click"/);
   });
 
+  it("converts :::visual to html with encoded JSON body", () => {
+    const tree = run(
+      `:::visual{id="map" kind="diagnostic-map" title="Read the path"}\n{"steps":[{"number":1,"title":"Impression"}]}\n:::`,
+    );
+    const node = tree.children[0] as { type: string; value: string };
+    expect(node.type).toBe("html");
+    expect(node.value).toContain('data-amph-block="visual"');
+    expect(node.value).toContain('data-amph-id="map"');
+    expect(node.value).toContain('data-amph-kind="diagnostic-map"');
+    expect(node.value).toContain("data-amph-body=");
+    expect(node.value).toContain("%7B%22steps%22");
+  });
+
+  it("converts each Tranche 1 JSON directive to an encoded html node", () => {
+    const names = ["comparison-table", "formula-ladder", "classification-board", "decision-flow", "simulation-rubric"];
+    for (const name of names) {
+      const tree = run(`:::${name}{id="x-${name}" title="Test"}\n{"steps":[{"label":"A"},{"label":"B"}]}\n:::`);
+      const node = tree.children[0] as { type: string; value: string };
+      expect(node.type).toBe("html");
+      expect(node.value).toContain(`data-amph-block="${name}"`);
+      expect(node.value).toContain("data-amph-body=");
+      expect(node.value).toContain("%7B%22steps%22");
+    }
+  });
+
+  it("converts each Tranche 2 JSON directive to an encoded html node", () => {
+    const names = ["annotated-listing", "hierarchy-builder", "funnel-canvas", "timeline-calendar"];
+    for (const name of names) {
+      const tree = run(`:::${name}{id="x-${name}" title="Test"}\n{"root":{"label":"Account"},"stages":[{"id":"a"},{"id":"b"}],"periods":["A","B"]}\n:::`);
+      const node = tree.children[0] as { type: string; value: string };
+      expect(node.type).toBe("html");
+      expect(node.value).toContain(`data-amph-block="${name}"`);
+      expect(node.value).toContain("data-amph-body=");
+      expect(node.value).toContain("%7B%22root%22");
+    }
+  });
+
+  it("preserves reveal-mode metadata on learner-first directives", () => {
+    const tree = run(`:::decision-flow{id="flow" title="Flow" reveal-mode="after-choice"}\n{"steps":[{"id":"a","label":"A","question":"Q","evidence":"E","action":"X"}]}\n:::`);
+    const node = tree.children[0] as { type: string; value: string };
+    expect(node.type).toBe("html");
+    expect(node.value).toContain('data-amph-reveal-mode="after-choice"');
+  });
+
+  it("converts next-tranche directives to encoded html nodes", () => {
+    const names = ["lesson-pathway", "simulation-brief", "portfolio-map", "seasonal-calendar", "evidence-ledger", "sov-positioner"];
+    for (const name of names) {
+      const tree = run(`:::${name}{id="x-${name}" title="Test"}\n{"steps":[{"id":"a"},{"id":"b"}],"fields":[{"id":"a"},{"id":"b"}],"groups":[{"id":"a"},{"id":"b"}],"phases":[{"id":"a"},{"id":"b"}],"entries":[{"id":"a"},{"id":"b"}],"bands":[{"id":"a"},{"id":"b"}]}\n:::`);
+      const node = tree.children[0] as { type: string; value: string };
+      expect(node.type).toBe("html");
+      expect(node.value).toContain(`data-amph-block="${name}"`);
+      expect(node.value).toContain("data-amph-body=");
+    }
+  });
+
+  it("converts competitive intelligence directives to encoded html nodes", () => {
+    const cases = [
+      ["competitive-gap-matrix", "dimensions"],
+      ["insight-router", "routes"],
+    ] as const;
+    for (const [name, key] of cases) {
+      const tree = run(`:::${name}{id="x-${name}" title="Test"}\n{"${key}":[{"id":"a"},{"id":"b"}]}\n:::`);
+      const node = tree.children[0] as { type: string; value: string };
+      expect(node.type).toBe("html");
+      expect(node.value).toContain(`data-amph-block="${name}"`);
+      expect(node.value).toContain("data-amph-body=");
+    }
+  });
+
   it("converts :::process to html node", () => {
     const tree = run(
       `:::process{id="loop" title="Your work loop" steps="Read|Decide|Change|Explain"}\n:::`,

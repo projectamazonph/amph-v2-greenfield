@@ -120,6 +120,14 @@ You've halved your traffic. This makes sense only if top-of-search converts at 2
 - Start conservative (+10–25%), gather data, then increase
 - Monitor ACoS by placement, not just position
 
+:::formula-ladder{id="placement-bid-ladder" title="Separate base bid from placement exposure"}
+{"steps":[{"label":"Start with the base bid","expression":"Base bid = ₱50"},{"label":"Apply the placement adjustment","expression":"Top-of-search +50% gives an adjusted bid of ₱75","explanation":"The placement setting changes the ceiling for that placement, not the amount you will always pay."},{"label":"Compare the economics","expression":"Actual CPC and CVR must still fit the target ACoS","explanation":"A higher placement adjustment is only useful if the added traffic creates enough incremental profit."}],"result":{"label":"Placement call","value":"Use the smallest adjustment that earns its place","context":"Review placement spend, CTR, CVR, CPC, ACoS, and incremental orders together."},"note":"Do not optimize placement from CTR alone. The business decision is whether the added placement produces profitable incremental demand."}
+:::
+
+:::comparison-table{id="placement-tradeoff-matrix" title="Choose a placement adjustment from evidence, not status"}
+{"caption":"A placement earns more budget only when the incremental quality of its clicks offsets the higher bid exposure.","columns":["No adjustment","Conservative test","Aggressive push"],"rows":[{"label":"Base-bid effect","values":["Base bid applies","Small multiplier on selected placement","Large multiplier on selected placement"]},{"label":"Traffic pattern","values":["More mixed-placement clicks","Fewer clicks, higher-priority placement","Fewer and more expensive clicks"],"emphasis":"positive"},{"label":"Evidence required","values":["New or immature campaign","Placement CTR, CVR, CPC, and ACoS","Incremental orders and profit after ad spend"],"emphasis":"positive"},{"label":"Primary risk","values":["Missed premium placement","Paying more before the signal is stable","Budget concentrated in expensive traffic"],"emphasis":"warning"},{"label":"Recommended move","values":["Collect baseline data","Start at +10–25% and review","Scale only when the placement proves its economics"]}]}
+:::
+
 ## Your turn
 
 Work this through before checking the answer.

@@ -1,0 +1,334 @@
+.block {
+  margin: var(--space-12) 0;
+  padding: var(--space-8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+}
+
+.blockHeader {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.blockHeader h3 {
+  color: var(--ink-900);
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  line-height: var(--leading-tight);
+}
+
+.eyebrow,
+.panelLabel {
+  color: var(--accent-text);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.subhead,
+.note {
+  color: var(--ink-700);
+  font-size: var(--text-sm);
+}
+
+.note {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+
+.comparisonTable,
+.rubricList {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comparisonTable caption {
+  padding: var(--space-3);
+  color: var(--ink-500);
+  font-size: var(--text-xs);
+  text-align: left;
+}
+
+.comparisonTable th,
+.comparisonTable td {
+  min-width: 160px;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.comparisonTable thead th {
+  background: var(--surface-2);
+  color: var(--ink-900);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.comparisonTable tbody th {
+  min-width: 140px;
+  color: var(--ink-900);
+  font-size: var(--text-sm);
+}
+
+.comparisonTable tbody td {
+  color: var(--ink-700);
+  font-size: var(--text-sm);
+}
+
+.highlightedHeader,
+.highlightedCell {
+  background: var(--accent-soft) !important;
+}
+
+.positive td,
+.positive th { color: var(--success) !important; }
+.warning td,
+.warning th { color: var(--warning) !important; }
+.negative td,
+.negative th { color: var(--danger) !important; }
+
+.formulaLadder {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.formulaStep {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--ink-900);
+  color: var(--ink-inverse);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.formulaCopy {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  background: var(--surface-0);
+}
+
+.formulaCopy strong { color: var(--ink-900); }
+.formulaCopy code {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  color: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.formulaCopy p {
+  color: var(--ink-700);
+  font-size: var(--text-sm);
+}
+
+.formulaResult {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+}
+
+.formulaResult span { color: var(--accent-text); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; }
+.formulaResult strong { color: var(--ink-900); font-family: var(--font-mono); font-size: var(--text-2xl); }
+.formulaResult p { color: var(--ink-700); font-size: var(--text-sm); }
+
+.classificationToolbar,
+.rubricHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+}
+
+.ghostButton {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-1);
+  color: var(--ink-900);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+.ghostButton:hover,
+.ghostButton:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+
+.classificationGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.classificationLane {
+  min-height: 190px;
+  border: 1px solid var(--border);
+  background: var(--surface-0);
+}
+
+.classificationLane header {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.classificationLane h4 { color: var(--ink-900); font-size: var(--text-lg); }
+.classificationLane header p { margin-top: var(--space-1); color: var(--ink-500); font-size: var(--text-xs); }
+.classificationLane ul { display: grid; gap: var(--space-2); padding: var(--space-3); list-style: none; }
+.classificationLane li { display: grid; gap: var(--space-1); padding: var(--space-3); border: 1px solid var(--border); background: var(--surface-1); }
+.classificationLane li strong { color: var(--ink-900); font-size: var(--text-sm); }
+.classificationLane li span { color: var(--ink-700); font-size: var(--text-xs); }
+.classificationLane .emptyLane { border-style: dashed; color: var(--ink-500); font-size: var(--text-sm); }
+
+.flowLayout {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.42fr) minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+.flowSteps {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  list-style: none;
+}
+
+.flowButton {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  background: var(--surface-0);
+  color: var(--ink-700);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition), background-color var(--transition), transform var(--transition);
+}
+
+.flowButton:hover { border-color: var(--accent); }
+.flowButton:active { transform: scale(0.99); }
+.flowButtonActive { border-color: var(--accent); background: var(--accent-soft); color: var(--ink-900); }
+
+.flowPanel {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-height: 220px;
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent);
+  background: var(--surface-0);
+}
+
+.flowPanel h4 { color: var(--ink-900); font-size: var(--text-xl); }
+.flowPanel p { color: var(--ink-700); font-size: var(--text-sm); }
+.actionLine { color: var(--accent-text) !important; }
+
+.scenarioBox {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  padding: var(--space-5);
+  border-left: 4px solid var(--info);
+  background: var(--info-soft);
+}
+
+.scenarioBox p { color: var(--ink-900); font-size: var(--text-sm); }
+.submission { padding-top: var(--space-2); border-top: 1px solid rgba(30, 64, 175, 0.2); }
+
+.rubricHeader { align-items: end; color: var(--ink-900); }
+.rubricHeader > div { flex: 1; }
+.progressTrack {
+  height: 10px;
+  margin-top: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--success);
+  transition: width var(--duration-base) var(--ease-out);
+}
+
+.progressValue { color: var(--success); font-family: var(--font-mono); font-weight: 800; }
+
+.rubricList {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+}
+
+.rubricList li {
+  border: 1px solid var(--border);
+  background: var(--surface-0);
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.rubricList li.criterionChecked { border-color: var(--success); background: var(--success-soft); }
+.rubricList label { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: var(--space-3); padding: var(--space-4); cursor: pointer; }
+.rubricList input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--success); }
+.rubricList label > span { display: grid; gap: var(--space-1); }
+.rubricList strong { color: var(--ink-900); font-size: var(--text-sm); }
+.rubricList small { color: var(--ink-700); font-size: var(--text-sm); }
+.rubricList em { color: var(--warning); font-size: var(--text-xs); font-style: normal; }
+
+.emptyState { color: var(--ink-500); }
+
+@media (max-width: 820px) {
+  .classificationGrid { grid-template-columns: 1fr; }
+  .flowLayout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .block { padding: var(--space-5); }
+  .classificationToolbar,
+  .rubricHeader { align-items: stretch; flex-direction: column; }
+  .ghostButton { align-self: flex-start; }
+  .comparisonTable { min-width: 680px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghostButton,
+  .flowButton,
+  .progressTrack span,
+  .rubricList li { transition: none; }
+}

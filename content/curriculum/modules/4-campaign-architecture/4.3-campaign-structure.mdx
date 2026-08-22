@@ -37,6 +37,10 @@ Each level serves a purpose:
 **Ad Group**: Groups related keywords together. You can set different default bids per ad group.
 **Keywords**: The actual search terms you're targeting. Each can have its own bid.
 
+:::hierarchy-builder{id="campaign-filing-cabinet" title="Build the campaign filing cabinet"}
+{"note":"Separate proven exact traffic from phrase discovery, broad research, and product targeting so each budget and bid logic stays visible.","root":{"id":"account","label":"Amazon PPC account","type":"account","detail":"Owns the course of the work","children":[{"id":"exact","label":"YB-Exact-Proven","type":"campaign","detail":"Highest confidence · highest bid","children":[{"id":"exact-group","label":"Best Keywords","type":"ad-group","detail":"Exact match","children":[{"id":"exact-target","label":"yoga block · ₱1.50 bid","type":"target"}]}]},{"id":"phrase","label":"YB-Phrase-Discovery","type":"campaign","detail":"Find new terms","children":[{"id":"phrase-group","label":"Category Terms","type":"ad-group","detail":"Phrase match","children":[{"id":"phrase-target","label":"exercise block · ₱0.80 bid","type":"target"}]}]},{"id":"broad","label":"YB-Broad-Research","type":"campaign","detail":"Lowest bid · widest net","children":[{"id":"broad-group","label":"Broad Terms","type":"ad-group","detail":"Broad match","children":[{"id":"broad-target","label":"yoga prop · ₱0.35 bid","type":"target"}]}]},{"id":"pat","label":"YB-PAT-Competitors","type":"campaign","detail":"Product targeting","children":[{"id":"pat-group","label":"Competitor ASINs","type":"ad-group","detail":"Product targets","children":[{"id":"pat-target","label":"Competitor product page","type":"target"}]}]}]}}
+:::
+
 ## Why Structure Matters: A Real Example
 
 Let's say you sell a ₱1,500 yoga block. Here's a **bad** structure:
