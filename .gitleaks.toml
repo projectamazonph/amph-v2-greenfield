@@ -28,9 +28,11 @@ regexes = [
 paths = [
   '''.github/workflows/ci\.yml''',
   '''src/.*__tests__/.*\.test\.ts$''',
+  '''src/.*__tests__/.*\.test\.tsx$''',
   '''docs/.*\.md$''',
   '''NEXT-SESSION-PROMPT\.md''',
   '''SESSION-.*\.md$''',
   '''CLAUDE\.md$''',
   '''BOOTSTRAP\.md$''',
+  '''\.github/.*''',
 ]
