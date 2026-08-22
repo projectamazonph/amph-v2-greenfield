@@ -1,0 +1,87 @@
+.page {
+  padding: var(--space-6);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--ink-600);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-2);
+}
+
+.backLink:hover {
+  color: var(--ink-900);
+  text-decoration: underline;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--ink-900);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  margin: var(--space-1) 0 0;
+}
+
+.savedBanner {
+  background: #F0FDF4;
+  border: 1px solid var(--success);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  color: #166534;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-4);
+}
+
+.dimensions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.dimensionRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+}
+
+.dimensionLabel {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--ink-800);
+  text-transform: capitalize;
+}
+
+.bandInputs {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.inputLabel {
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+}
