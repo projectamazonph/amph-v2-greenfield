@@ -18,8 +18,8 @@ import { Card } from "@astryxdesign/core";
 import { KNOWN_DIMENSIONS, type GradingDimension } from "@/domain/entities/ScorePolicy";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
 import {
-  type ScenarioCalibration,
-  type DimensionBand,
+  type SimulatorScenarioCalibration,
+  type CalibrationDimensionBand,
 } from "@/domain/entities/SimulatorScenarioCalibration";
 import { setScenarioCalibrationAction } from "@/app/actions/setScenarioCalibration.action";
 import formStyles from "../../new/page.module.css";
@@ -43,8 +43,8 @@ export default async function CalibrationPage({ params, searchParams }: PageProp
   }
 
   const container = await buildContainer();
-  const scenarioRepo = container.simulatorScenarioRepository;
-  const calibrationRepo = container.simulatorScenarioCalibrationRepository;
+  const scenarioRepo = container.scenarioRepo;
+  const calibrationRepo = container.calibrationRepo;
 
   // Resolve the scenario to get its current state.
   const scenarioResult = await scenarioRepo.findBySimulatorAndScenarioKey(id, scenarioKey);
@@ -59,10 +59,10 @@ export default async function CalibrationPage({ params, searchParams }: PageProp
   const calibration = calibrationResult.ok ? calibrationResult.value : null;
 
   // Build the initial form values from the calibration or defaults.
-  const initialBands: Record<string, DimensionBand> = calibration?.dimensionBands ?? {};
+  const initialBands: Record<string, CalibrationDimensionBand> = calibration?.dimensionBands ?? {};
 
   // Helper to extract a band for a dimension, or return a default.
-  function getBand(dim: GradingDimension): DimensionBand {
+  function getBand(dim: GradingDimension): CalibrationDimensionBand {
     return initialBands[dim] ?? { minScore: 0, maxScore: 100 };
   }
 
@@ -71,7 +71,7 @@ export default async function CalibrationPage({ params, searchParams }: PageProp
     const adminId = (await requireAdmin()).id;
 
     // Parse dimension bands from form data.
-    const bands: Record<string, DimensionBand> = {};
+    const bands: Record<string, CalibrationDimensionBand> = {};
     for (const dim of KNOWN_DIMENSIONS) {
       const minStr = formData.get(`min_${dim}`) as string;
       const maxStr = formData.get(`max_${dim}`) as string;
@@ -90,7 +90,7 @@ export default async function CalibrationPage({ params, searchParams }: PageProp
 
     // Call the use case through the server action.
     await setScenarioCalibrationAction({
-      simulatorId: id,
+      simulatorId: id as SimulatorId,
       scenarioKey,
       dimensionBands: bands,
       instructorId: adminId,
