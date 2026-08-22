@@ -49,14 +49,16 @@ export default async function ProfilePage() {
     <StudentShell user={user}>
       <main id="main-content" tabIndex={-1} className={styles.page}>
         <header className={styles.header}>
-          <h1 className={styles.title}>
+          <span className={styles.eyebrow}>Student account</span>
+          <h1 className={styles.title}>Profile</h1>
+          <p className={styles.identityName}>
             {user.firstName} {user.lastName}
-          </h1>
+          </p>
           <p className={styles.email}>{user.email}</p>
         </header>
         <div className={styles.grid}>
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Profile</h2>
+          <section className={styles.section} aria-labelledby="profile-details-title">
+            <h2 id="profile-details-title" className={styles.sectionTitle}>Account details</h2>
             <dl className={styles.fields}>
               <Field label="Role" value={user.role} />
               <Field label="Subscription" value={user.subscriptionTier} />
@@ -64,8 +66,8 @@ export default async function ProfilePage() {
               <Field label="Member since" value={user.createdAt.toISOString().slice(0, 10)} mono />
             </dl>
           </section>
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Badges</h2>
+          <section className={styles.section} aria-labelledby="profile-badges-title">
+            <h2 id="profile-badges-title" className={styles.sectionTitle}>Badges</h2>
             {badges.length === 0 ? (
               <p className={styles.empty}>
                 No badges yet. Complete a module or simulator to earn one.
@@ -82,20 +84,20 @@ export default async function ProfilePage() {
             )}
           </section>
         </div>
-        <div className={styles.actions}>
+        <nav className={styles.actions} aria-label="Profile settings">
           <Link href="/reset-password" className={styles.btnGhost}>
-            Change Password
+            Change password <span aria-hidden="true">→</span>
           </Link>
           <Link href="/profile/security" className={styles.btnGhost}>
-            Security (2FA)
+            Security (2FA) <span aria-hidden="true">→</span>
           </Link>
           <Link href="/profile/data" className={styles.btnGhost}>
-            Your data
+            Your data <span aria-hidden="true">→</span>
           </Link>
           <Link href="/profile/purchases" className={styles.btnGhost}>
-            Purchases and refunds
+            Purchases and refunds <span aria-hidden="true">→</span>
           </Link>
-        </div>
+        </nav>
       </main>
     </StudentShell>
   );
