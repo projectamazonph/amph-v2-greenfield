@@ -112,6 +112,16 @@
   border-color: var(--ink-300);
 }
 
+.card:focus-visible,
+.browseLink:focus-visible,
+.browseButton:focus-visible,
+.listLink:focus-visible,
+.continueBtn:focus-visible,
+.quickBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .completionRing {
   position: absolute;
   top: var(--space-3);
@@ -376,7 +386,7 @@
   gap: var(--space-1);
   padding: var(--space-2) var(--space-4);
   background: var(--accent);
-  color: var(--accent-text);
+  color: var(--accent-ink);
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 600;
@@ -422,4 +432,16 @@
   background: var(--surface-0);
   border-color: var(--ink-300);
   color: var(--ink-900);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressFill,
+  .browseLink,
+  .card,
+  .browseButton,
+  .listLink,
+  .continueBtn,
+  .quickBtn {
+    transition: none;
+  }
 }

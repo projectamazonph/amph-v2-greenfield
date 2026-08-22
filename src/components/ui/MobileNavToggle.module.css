@@ -46,3 +46,10 @@
     display: block;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle,
+  .backdrop {
+    transition: none;
+  }
+}
