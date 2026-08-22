@@ -74,7 +74,7 @@ export default async function ToolsIndexPage() {
                   <PlayCircle size={16} weight="bold" aria-hidden="true" />
                   Simulator
                 </div>
-                <h3 className={styles.cardName}>{info.name}</h3>
+                <h2 className={styles.cardName}>{info.name}</h2>
                 <p className={styles.cardBlurb}>{getSimulatorCopy(sim.simulatorId).outcome}</p>
                 <Link href={info.href} className={styles.cardLink} prefetch>
                   Start practice <ArrowRight size={16} weight="bold" aria-hidden="true" />
@@ -88,7 +88,7 @@ export default async function ToolsIndexPage() {
               <ShieldWarning size={16} weight="bold" aria-hidden="true" />
               Live console
             </div>
-            <h3 className={styles.cardName}>Amazon Ad Console</h3>
+            <h2 className={styles.cardName}>Amazon Ad Console</h2>
             <p className={styles.cardBlurb}>
               A live campaign console for your own Amazon Advertising account. Changes affect real
               data and real ad spend.
