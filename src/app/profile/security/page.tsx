@@ -6,14 +6,14 @@
  * EnableTwoFactor/ConfirmTwoFactor/DisableTwoFactor use cases are
  * role-agnostic.
  */
+import Link from "next/link";
 import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
-import { Card } from "@astryxdesign/core";
 import {
   disableStudentTwoFactorAction,
   enableStudentTwoFactorAction,
 } from "@/app/actions/studentTwoFactor.action";
-import styles from "../../admin/settings/page.module.css";
+import styles from "../profile-subpage.module.css";
 
 const twoFactorErrorMessage: Record<string, string> = {
   already_enabled: "Two-factor authentication is already enabled.",
@@ -46,43 +46,49 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
 
   return (
     <StudentShell user={session}>
-      <main id="main-content" tabIndex={-1} style={{ padding: "var(--space-8) var(--side-pad)", maxWidth: 640 }}>
-        <h1
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-xl)",
-            marginBottom: "var(--space-6)",
-          }}
-        >
-          Security
-        </h1>
+      <main id="main-content" tabIndex={-1} className={styles.page} aria-labelledby="security-title">
+        <Link href="/profile" className={styles.backLink}>
+          ← Back to profile
+        </Link>
+        <header className={styles.header}>
+          <span className={styles.eyebrow}>Account settings</span>
+          <h1 id="security-title" className={styles.title}>
+            Security
+          </h1>
+          <p className={styles.intro}>
+            Protect your academy account with an authenticator code in addition to your password.
+          </p>
+        </header>
 
-        <Card padding={6}>
-          <h2 className={styles.sectionTitle}>Two-factor authentication</h2>
+        <section className={styles.section} aria-labelledby="two-factor-title">
+          <p className={styles.sectionKicker}>Sign-in protection</p>
+          <h2 id="two-factor-title" className={styles.sectionTitle}>
+            Two-factor authentication
+          </h2>
           <p className={styles.help}>
-            Adds a 6-digit code from an authenticator app to your login, on top of your password.
-            Opt-in. Your account works the same either way until you turn this on.
+            Two-factor authentication adds a 6-digit code from an authenticator app to your login.
+            Your account works the same way until you choose to turn it on.
           </p>
 
-          {twoFactorNotice && (
-            <p className={styles.twoFactorNotice} role="status">
+          {twoFactorNotice ? (
+            <p className={styles.notice} role="status">
               {twoFactorNotice}
             </p>
-          )}
-          {twoFactorError && (
-            <p className={styles.twoFactorError} role="alert">
+          ) : null}
+          {twoFactorError ? (
+            <p className={styles.error} role="alert">
               {twoFactorError}
             </p>
-          )}
+          ) : null}
 
           {session.twoFactorEnabled ? (
             <>
-              <p className={styles.twoFactorStatus}>
-                <span className={`${styles.statusBadge} ${styles.set}`}>Enabled</span>
+              <p className={styles.status} role="status">
+                <span className={styles.statusBadge}>Enabled</span>
               </p>
-              <form action={disableStudentTwoFactorAction} className={styles.twoFactorForm}>
+              <form action={disableStudentTwoFactorAction} className={styles.fields}>
                 <label className={styles.field}>
-                  <span className={styles.label}>Current password</span>
+                  <span className={styles.fieldLabel}>Current password</span>
                   <input
                     type="password"
                     name="password"
@@ -92,27 +98,27 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
                     placeholder="********"
                   />
                   <span className={styles.hint}>
-                    Confirms it's really you before turning this off.
+                    Confirms it&apos;s really you before turning this off.
                   </span>
                 </label>
-                <button type="submit" className={styles.dangerButton}>
+                <button type="submit" className={styles.danger}>
                   Disable two-factor authentication
                 </button>
               </form>
             </>
           ) : (
             <>
-              <p className={styles.twoFactorStatus}>
-                <span className={`${styles.statusBadge} ${styles.unset}`}>Disabled</span>
+              <p className={styles.status} role="status">
+                <span className={styles.statusBadge}>Disabled</span>
               </p>
-              <form action={enable}>
-                <button type="submit" className={styles.submitButton}>
+              <form action={enable} className={styles.actions}>
+                <button type="submit" className={styles.primary}>
                   Enable two-factor authentication
                 </button>
               </form>
             </>
           )}
-        </Card>
+        </section>
       </main>
     </StudentShell>
   );

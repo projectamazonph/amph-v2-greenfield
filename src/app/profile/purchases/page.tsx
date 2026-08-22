@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requestRefundAction } from "@/app/actions/requestRefund.action";
 import { StudentShell } from "@/components/student/StudentShell";
 import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
-import styles from "../page.module.css";
+import styles from "../profile-subpage.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -41,25 +42,52 @@ export default async function PurchasesPage({ searchParams }: Props) {
 
   return (
     <StudentShell user={user}>
-      <main id="main-content" tabIndex={-1} className={styles.page}>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className={styles.page}
+        aria-labelledby="purchases-title"
+      >
+        <Link href="/profile" className={styles.backLink}>
+          ← Back to profile
+        </Link>
         <header className={styles.header}>
-          <h1 className={styles.title}>Purchases and refunds</h1>
-          <p className={styles.email}>Review payment status and request eligible refunds.</p>
+          <span className={styles.eyebrow}>Account settings</span>
+          <h1 id="purchases-title" className={styles.title}>
+            Purchases and refunds
+          </h1>
+          <p className={styles.intro}>
+            Review payment status, course completion, and whether a recent purchase is eligible for a
+            refund request.
+          </p>
         </header>
 
         {params.refundRequested === "1" ? (
-          <div className="alert alert-success" role="status">
+          <p className={styles.notice} role="status">
             Refund request submitted. An administrator will review it.
-          </div>
+          </p>
         ) : null}
         {params.refundError ? (
-          <div className="alert alert-error" role="alert">
+          <p className={styles.error} role="alert">
             {refundErrors[params.refundError] ?? refundErrors.db_error}
-          </div>
+          </p>
         ) : null}
 
         {orders.length === 0 ? (
-          <p className={styles.empty}>No purchases yet.</p>
+          <section className={styles.section} aria-labelledby="no-purchases-title">
+            <p className={styles.sectionKicker}>Purchase history</p>
+            <h2 id="no-purchases-title" className={styles.sectionTitle}>
+              No purchases yet
+            </h2>
+            <p className={styles.empty}>
+              Your paid course enrollments will appear here with payment and refund details.
+            </p>
+            <div className={styles.actions}>
+              <Link href="/courses" className={styles.primary}>
+                Browse courses
+              </Link>
+            </div>
+          </section>
         ) : (
           <div className={styles.grid}>
             {orders.map((order, index) => {
@@ -69,9 +97,10 @@ export default async function PurchasesPage({ searchParams }: Props) {
               }
               const courseTitle = courseResult?.ok ? courseResult.value.title : "Course purchase";
               const enrollment = enrollments[index];
+              const paidAt = order.paymongoPaidAt ?? order.createdAt;
               const withinWindow = Boolean(
                 order.paymongoPaidAt &&
-                Date.now() - order.paymongoPaidAt.getTime() <= 7 * 24 * 60 * 60 * 1000,
+                  Date.now() - order.paymongoPaidAt.getTime() <= 7 * 24 * 60 * 60 * 1000,
               );
               const underCompletionLimit = (enrollment?.progressPercent ?? 0) < 25;
               const canRequest =
@@ -79,16 +108,24 @@ export default async function PurchasesPage({ searchParams }: Props) {
                 order.refundRequestedAt === null &&
                 withinWindow &&
                 underCompletionLimit;
+              const titleId = `purchase-${order.id}-title`;
 
               return (
-                <section key={order.id} className={styles.section}>
-                  <h2 className={styles.sectionTitle}>{courseTitle}</h2>
+                <section key={order.id} className={styles.section} aria-labelledby={titleId}>
+                  <p className={styles.sectionKicker}>Purchase record</p>
+                  <h2 id={titleId} className={styles.sectionTitle}>
+                    {courseTitle}
+                  </h2>
                   <dl className={styles.fields}>
                     <Field label="Status" value={order.status} />
                     <Field label="Total" value={formatMoney(order.totalMinor, order.currency)} />
                     <Field
                       label="Purchased"
-                      value={(order.paymongoPaidAt ?? order.createdAt).toISOString().slice(0, 10)}
+                      value={
+                        <time dateTime={paidAt.toISOString()}>
+                          {paidAt.toISOString().slice(0, 10)}
+                        </time>
+                      }
                     />
                     <Field
                       label="Course completion"
@@ -97,7 +134,7 @@ export default async function PurchasesPage({ searchParams }: Props) {
                   </dl>
 
                   {order.refundRequestedAt ? (
-                    <p className={styles.empty}>
+                    <p className={styles.empty} role="status">
                       {order.refundProcessedAt
                         ? "Refund processed."
                         : `Refund requested on ${order.refundRequestedAt.toISOString().slice(0, 10)}.`}
@@ -105,18 +142,24 @@ export default async function PurchasesPage({ searchParams }: Props) {
                   ) : canRequest ? (
                     <form action={requestRefundAction} className={styles.fields}>
                       <input type="hidden" name="orderId" value={order.id} />
-                      <label className={styles.fieldLabel} htmlFor={`refund-reason-${order.id}`}>
-                        Why are you requesting a refund?
+                      <label className={styles.field} htmlFor={`refund-reason-${order.id}`}>
+                        <span className={styles.fieldLabel}>Why are you requesting a refund?</span>
+                        <textarea
+                          id={`refund-reason-${order.id}`}
+                          name="reason"
+                          minLength={10}
+                          maxLength={500}
+                          required
+                          rows={4}
+                          className={styles.textarea}
+                          aria-describedby={`refund-hint-${order.id}`}
+                        />
+                        <span id={`refund-hint-${order.id}`} className={styles.hint}>
+                          Use 10–500 characters. Refund requests must be submitted within seven days
+                          and before 25% course completion.
+                        </span>
                       </label>
-                      <textarea
-                        id={`refund-reason-${order.id}`}
-                        name="reason"
-                        minLength={10}
-                        maxLength={500}
-                        required
-                        rows={4}
-                      />
-                      <button type="submit" className={styles.btnSecondary}>
+                      <button type="submit" className={styles.secondary}>
                         Request refund
                       </button>
                     </form>
@@ -136,7 +179,7 @@ export default async function PurchasesPage({ searchParams }: Props) {
   );
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className={styles.field}>
       <dt className={styles.fieldLabel}>{label}</dt>

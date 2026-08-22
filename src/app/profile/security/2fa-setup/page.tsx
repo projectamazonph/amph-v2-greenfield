@@ -14,10 +14,9 @@ import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
 import { StudentShell } from "@/components/student/StudentShell";
-import { Card } from "@astryxdesign/core";
 import { confirmStudentTwoFactorAction } from "@/app/actions/studentTwoFactor.action";
 import { TWO_FACTOR_ISSUER } from "@/usecases/EnableTwoFactor";
-import styles from "../../../admin/settings/2fa-setup/page.module.css";
+import styles from "../../profile-subpage.module.css";
 
 const errorMessage: Record<string, string> = {
   invalid_code: "That code didn't match. Check your authenticator app and try again.",
@@ -62,73 +61,86 @@ export default async function StudentTwoFactorSetupPage({
 
   return (
     <StudentShell user={session}>
-      <main id="main-content" tabIndex={-1} style={{ padding: "var(--space-8) var(--side-pad)", maxWidth: 640 }}>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className={styles.page}
+        aria-labelledby="setup-title"
+      >
         <Link href="/profile/security" className={styles.backLink}>
           <ArrowLeft size={16} aria-hidden /> Back to security
         </Link>
 
-        <h1
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-xl)",
-            marginBottom: "var(--space-2)",
-          }}
-        >
-          Set up two-factor authentication
-        </h1>
-        <p className={styles.help}>Scan the code, then confirm with a 6-digit code to finish.</p>
+        <header className={styles.header}>
+          <span className={styles.eyebrow}>Account settings</span>
+          <h1 id="setup-title" className={styles.title}>
+            Set up two-factor authentication
+          </h1>
+          <p className={styles.intro}>
+            Scan the code, then confirm with a 6-digit code to finish protecting your account.
+          </p>
+        </header>
 
-        <ol className={styles.steps} aria-label="2FA setup progress">
+        <ol className={styles.steps} aria-label="Two-factor setup progress">
           <li className={`${styles.step} ${styles.stepActive}`} aria-current="step">
             <span className={styles.stepNumber}>1</span>
-            <span className={styles.stepLabel}>Scan QR code</span>
+            <span className={styles.stepLabel}>Add authenticator</span>
           </li>
-          <li className={`${styles.step} ${styles.stepActive}`} aria-current="step">
+          <li className={`${styles.step} ${styles.stepActive}`}>
             <span className={styles.stepNumber}>2</span>
             <span className={styles.stepLabel}>Verify code</span>
           </li>
         </ol>
 
-        {errorText && (
+        {errorText ? (
           <p className={styles.error} role="alert">
             {errorText}
           </p>
-        )}
+        ) : null}
 
-        <Card padding={6} style={{ marginBottom: "1rem" }}>
-          <h2 className={styles.sectionTitle}>1. Add this account to your authenticator app</h2>
-          <p className={styles.help}>
-            Scan the QR code below with your authenticator app (Google Authenticator, 1Password,
-            Authy, etc.), or enter the key manually if your app doesn't support scanning.
-          </p>
-          <span className={styles.label}>Manual entry key</span>
-          <code className={styles.secretKey}>{secret}</code>
-          <span className={styles.label}>Setup URI</span>
-          <code className={styles.keyUri}>{keyUri}</code>
-        </Card>
+        <div className={styles.stack}>
+          <section className={styles.section} aria-labelledby="authenticator-title">
+            <p className={styles.sectionKicker}>Step 1</p>
+            <h2 id="authenticator-title" className={styles.sectionTitle}>
+              Add this account to your authenticator app
+            </h2>
+            <p className={styles.help}>
+              Scan the QR code below with your authenticator app (Google Authenticator, 1Password,
+              Authy, or another compatible app), or enter the key manually if scanning is not
+              available.
+            </p>
+            <span className={styles.fieldLabel}>Manual entry key</span>
+            <code className={styles.secretKey}>{secret}</code>
+            <span className={styles.fieldLabel}>Setup URI</span>
+            <code className={styles.keyUri}>{keyUri}</code>
+          </section>
 
-        <Card padding={6}>
-          <h2 className={styles.sectionTitle}>2. Confirm with a code</h2>
-          <form action={confirmStudentTwoFactorAction} className={styles.form}>
-            <label className={styles.field}>
-              <span className={styles.label}>6-digit code</span>
-              <input
-                type="text"
-                name="code"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                required
-                maxLength={6}
-                className={styles.input}
-                placeholder="123456"
-                autoFocus
-              />
-            </label>
-            <button type="submit" className={styles.submitButton}>
-              Confirm and enable
-            </button>
-          </form>
-        </Card>
+          <section className={styles.section} aria-labelledby="confirm-code-title">
+            <p className={styles.sectionKicker}>Step 2</p>
+            <h2 id="confirm-code-title" className={styles.sectionTitle}>
+              Confirm with a code
+            </h2>
+            <form action={confirmStudentTwoFactorAction} className={styles.form}>
+              <label className={styles.field}>
+                <span className={styles.fieldLabel}>6-digit code</span>
+                <input
+                  type="text"
+                  name="code"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  required
+                  maxLength={6}
+                  className={styles.input}
+                  placeholder="123456"
+                  autoFocus
+                />
+              </label>
+              <button type="submit" className={styles.primary}>
+                Confirm and enable
+              </button>
+            </form>
+          </section>
+        </div>
       </main>
     </StudentShell>
   );
