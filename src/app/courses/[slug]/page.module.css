@@ -125,6 +125,105 @@
   font-size: var(--text-lg);
 }
 
+/* Progress summary */
+
+.progressPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.6fr);
+  gap: var(--space-6);
+  align-items: center;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.progressCopy {
+  min-width: 0;
+}
+
+.progressEyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.progressTitle {
+  margin: 0;
+  color: var(--ink-900);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  line-height: var(--leading-tight);
+}
+
+.progressHint {
+  margin: var(--space-2) 0 0;
+  color: var(--ink-700);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.progressAction {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+}
+
+.progressTrack {
+  grid-column: 1 / -1;
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--surface-0);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width var(--duration-base) var(--ease-out);
+}
+
+.progressValue {
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.progressCta {
+  justify-self: end;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out);
+}
+
+.progressCta:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressTrack span,
+  .progressCta {
+    transition: none;
+  }
+}
+
 /* Curriculum */
 
 .curriculumSection {
@@ -248,6 +347,20 @@
   flex-shrink: 0;
 }
 
+.lessonStatus {
+  flex-shrink: 0;
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.lessonStatus[data-complete="true"] {
+  color: var(--success);
+  font-weight: 700;
+}
+
 .quizSection {
   margin-top: var(--space-10);
 }
@@ -318,6 +431,14 @@
 /* Mobile */
 
 @media (max-width: 767px) {
+  .progressPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .progressCta {
+    justify-self: start;
+  }
+
   .headerContent {
     flex-direction: column;
   }

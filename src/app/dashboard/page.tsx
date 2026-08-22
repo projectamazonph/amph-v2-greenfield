@@ -15,6 +15,8 @@ import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
+import { nextIncompleteLesson } from "@/app/courses/[slug]/lessons/getLessonData";
+import { CourseCover } from "@/components/student/CourseCover";
 import type { Course } from "@/domain/entities/Course";
 import type { Enrollment } from "@/domain/entities/Enrollment";
 import styles from "./page.module.css";
@@ -56,19 +58,24 @@ export default async function DashboardPage() {
   // "All my courses" includes everything (active, in-progress, completed)
   const allActive = pairs.filter((p) => p.enrollment.status === "active");
 
-  // Smart suggestion: pick the most recently enrolled in-progress enrollment.
-  // (No `lastAccessedAt` field exists on Enrollment — sort by `createdAt` as
-  // the closest proxy: newest enrollment ≈ most recent activity.)
-  const lastAccessedCourse =
-    inProgress.length > 0
-      ? inProgress
-          .slice()
-          .sort(
-            (a, b) =>
-              new Date(b.enrollment.createdAt).getTime() -
-              new Date(a.enrollment.createdAt).getTime(),
-          )[0]?.course
-      : undefined;
+  // Resume the newest active course at its next incomplete lesson. If a
+  // learner has not completed anything yet, this deliberately becomes a
+  // start CTA rather than forcing them through the course overview first.
+  const resumePair = allActive
+    .filter((pair) => pair.enrollment.progressPercent < 100)
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.enrollment.createdAt).getTime() -
+        new Date(a.enrollment.createdAt).getTime(),
+    )[0];
+  const resumeLesson = resumePair
+    ? nextIncompleteLesson(
+        resumePair.course,
+        resumePair.enrollment.completedLessonIds,
+        resumePair.enrollment.lastLessonId ?? "",
+      )
+    : null;
 
   return (
     <StudentShell user={user}>
@@ -83,19 +90,26 @@ export default async function DashboardPage() {
           </p>
         </header>
 
-        {lastAccessedCourse && (
-          <div className={styles.continueCard}>
+        {resumePair && resumeLesson && (
+          <section className={styles.continueCard} aria-labelledby="continue-learning-title">
             <div className={styles.continueEyebrow}>
-              {/* M7 fix: label honestly reflects what this card shows — the
-                 most recently enrolled in-progress course. 'Your courses' was
-                 misleading because this card is only one course, not all courses. */}
-              Continue where you enrolled
+              {resumePair.enrollment.progressPercent === 0
+                ? "Start your course"
+                : "Pick up where you left off"}
             </div>
-            <div className={styles.continueTitle}>{lastAccessedCourse.title}</div>
-            <Link href={`/courses/${lastAccessedCourse.slug}`} className={styles.continueBtn}>
-              Continue
+            <h2 id="continue-learning-title" className={styles.continueTitle}>
+              {resumePair.course.title}
+            </h2>
+            <p className={styles.continueLesson}>
+              Next up: <strong>{resumeLesson.title}</strong>
+            </p>
+            <Link
+              href={`/courses/${resumePair.course.slug}/lessons/${resumeLesson.id}`}
+              className={styles.continueBtn}
+            >
+              {resumePair.enrollment.progressPercent === 0 ? "Start lesson" : "Continue learning"}
             </Link>
-          </div>
+          </section>
         )}
 
         {/* Continue learning */}
@@ -105,6 +119,14 @@ export default async function DashboardPage() {
             <div className={styles.grid}>
               {inProgress.map(({ course, enrollment }) => (
                 <Link key={enrollment.id} href={`/courses/${course.slug}`} className={styles.card}>
+                  <CourseCover
+                    title={course.title}
+                    slug={course.slug}
+                    coverImage={course.coverImage}
+                    width={640}
+                    height={240}
+                    className={styles.cardCover}
+                  />
                   <h3 className={styles.cardTitle}>{course.title}</h3>
                   <p className={styles.cardTagline}>{course.tagline}</p>
                   <div className={styles.progressBar} aria-hidden="true">

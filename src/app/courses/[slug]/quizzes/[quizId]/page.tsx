@@ -3,6 +3,7 @@ import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { QuizPlayer } from "@/components/courses/QuizPlayer";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
+import { StudentShell } from "@/components/student/StudentShell";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
@@ -30,7 +31,11 @@ export default async function QuizPage({ params }: Props) {
 
   if (!courseResult.ok) {
     if (courseResult.error.kind === "not_found") {
-      return <NotFoundMessage slug={slug} />;
+      return (
+        <StudentShell user={user}>
+          <NotFoundMessage slug={slug} />
+        </StudentShell>
+      );
     }
     throw new Error("Failed to load course");
   }
@@ -38,7 +43,11 @@ export default async function QuizPage({ params }: Props) {
     throw new Error("Failed to load quiz");
   }
   if (!quizResult.value || quizResult.value.courseId !== courseResult.value.courseId) {
-    return <NotFoundMessage slug={slug} />;
+    return (
+      <StudentShell user={user}>
+        <NotFoundMessage slug={slug} />
+      </StudentShell>
+    );
   }
 
   const accessResult = await container.checkCourseAccess.execute({
@@ -48,65 +57,72 @@ export default async function QuizPage({ params }: Props) {
   if (!accessResult.ok) {
     const reason = accessResult.error.reason;
     return (
-      <CourseAccessNotice
-        courseSlug={slug}
-        courseTitle={courseResult.value.title}
-        feature="quiz"
-        reason={
-          reason === "tier"
-            ? "plan_required"
-            : reason === "not_enrolled"
-              ? "enrollment_required"
-              : "verification_unavailable"
-        }
-        signedIn
-        userTier={accessResult.error.tier}
-        requiredTier={accessResult.error.requiredTier}
-      />
+      <StudentShell user={user}>
+        <CourseAccessNotice
+          courseSlug={slug}
+          courseTitle={courseResult.value.title}
+          feature="quiz"
+          reason={
+            reason === "tier"
+              ? "plan_required"
+              : reason === "not_enrolled"
+                ? "enrollment_required"
+                : "verification_unavailable"
+          }
+          signedIn
+          userTier={accessResult.error.tier}
+          requiredTier={accessResult.error.requiredTier}
+        />
+      </StudentShell>
     );
   }
 
   if (accessResult.value.kind !== "allowed") {
     return (
-      <CourseAccessNotice
-        courseSlug={slug}
-        courseTitle={courseResult.value.title}
-        feature="quiz"
-        reason="preview_limit"
-        signedIn
-      />
+      <StudentShell user={user}>
+        <CourseAccessNotice
+          courseSlug={slug}
+          courseTitle={courseResult.value.title}
+          feature="quiz"
+          reason="preview_limit"
+          signedIn
+        />
+      </StudentShell>
     );
   }
 
   const quiz = quizResult.value;
   const course = courseResult.value;
   return (
-    <main id="main-content" tabIndex={-1} className={styles.page}>
-      <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <Link href={`/courses/${slug}`} className={styles.crumbLink}>
-          <ArrowLeft size={16} aria-hidden /> {course.title}
-        </Link>
-        <span className={styles.crumbSep} aria-hidden="true">
-          /
-        </span>
-        <span className={styles.crumbCurrent} aria-current="page">
-          {quiz.title}
-        </span>
-      </nav>
-      <QuizPlayer
-        quizId={quiz.id}
-        title={quiz.title}
-        passingScore={quiz.passingScore}
-        questions={quiz.questions.map((question) => ({
-          id: question.id,
-          questionText: question.questionText,
-          options: question.options.map((option) => ({
-            id: option.id,
-            optionText: option.optionText,
-          })),
-        }))}
-      />
-    </main>
+    <StudentShell user={user}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
+        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+          <Link href={`/courses/${slug}`} className={styles.crumbLink}>
+            <ArrowLeft size={16} aria-hidden /> {course.title}
+          </Link>
+          <span className={styles.crumbSep} aria-hidden="true">
+            /
+          </span>
+          <span className={styles.crumbCurrent} aria-current="page">
+            {quiz.title}
+          </span>
+        </nav>
+        <QuizPlayer
+          quizId={quiz.id}
+          title={quiz.title}
+          passingScore={quiz.passingScore}
+          courseHref={`/courses/${slug}`}
+          questions={quiz.questions.map((question) => ({
+            id: question.id,
+            questionText: question.questionText,
+            options: question.options.map((option) => ({
+              id: option.id,
+              optionText: option.optionText,
+            })),
+          }))}
+        />
+      </main>
+    </StudentShell>
   );
 }
 

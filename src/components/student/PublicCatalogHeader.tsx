@@ -37,6 +37,15 @@ export function PublicCatalogHeader() {
         </Link>
 
         <nav className={styles.nav} aria-label="Public catalog navigation">
+          <Link href="/courses" className={styles.navLink}>
+            Courses
+          </Link>
+          <Link href="/live-classes" className={styles.navLink}>
+            Live classes
+          </Link>
+          <Link href="/faq" className={styles.navLink}>
+            FAQ
+          </Link>
           <Link href="/login" className={styles.signIn}>
             Sign in
           </Link>

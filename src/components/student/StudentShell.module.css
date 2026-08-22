@@ -5,6 +5,27 @@
    · overflow-x: clip on shell so wide children can't push the page
      horizontally and break the layout. */
 
+.skipLink {
+  position: fixed;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: var(--z-modal);
+  transform: translateY(-200%);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  color: var(--ink-900);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.skipLink:focus-visible {
+  transform: translateY(0);
+}
+
 .shell {
   display: flex;
   min-height: 100vh;
@@ -48,6 +69,12 @@
 }
 
 /* Print: hide shell chrome so only the page content reaches the printer. */
+
+@media (prefers-reduced-motion: reduce) {
+  .skipLink {
+    transition: none;
+  }
+}
 
 @media print {
   .shell > :first-child,
