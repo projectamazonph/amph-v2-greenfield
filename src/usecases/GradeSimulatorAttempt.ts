@@ -1,30 +1,36 @@
 ﻿/**
- * GradeSimulatorAttempt ΓÇö scores a submitted attempt against its ScorePolicy.
+ * GradeSimulatorAttempt — scores a submitted attempt against its ScorePolicy.
  *
  * STORY-065: Scoring Engine + Dimensional Policies.
+ * STORY-086: applies instructor calibration ranges before computing the
+ * overall score (clamp, not reject — see `mergeCalibrationIntoScores`).
  *
  * Rules:
  *  1. Attempt must exist and be in submitted status
  *  2. A ScorePolicy must exist for (simulatorId, difficulty, mode)
  *  3. All score dimension keys must be defined in the policy
- *  4. Overall score is computed as a weighted average of dimension scores
- *  5. Attempt transitions: submitted -> graded with score + dimensions persisted
+ *  4. Calibration (if any) clamps per-dimension raw scores into bands
+ *  5. Overall score is computed as a weighted average of clamped dimension scores
+ *  6. Attempt transitions: submitted -> graded with score + dimensions persisted
  */
 
 import { Result } from "@/domain/shared/Result";
 import type { ScorePolicy } from "@/domain/entities/ScorePolicy";
 import { getOverallScore, isPassed } from "@/domain/entities/ScorePolicy";
 import type { SimulatorAttempt, SimulatorAttemptError } from "@/domain/entities/SimulatorAttempt";
+import { mergeCalibrationIntoScores } from "@/domain/entities/SimulatorScenarioCalibration";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
+import type { ISimulatorScenarioCalibrationRepository } from "@/ports/repositories/ISimulatorScenarioCalibrationRepository";
+import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { Clock } from "@/ports/system/Clock";
 
-// ΓöÇΓöÇ Input / Output ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ── Input / Output ────────────────────────────────────────────────────────
 
 export interface GradeSimulatorAttemptInput {
   attemptId: string;
   /**
-   * Per-dimension raw scores (0ΓÇô100). Keys must match the dimension names
+   * Per-dimension raw scores (0–100). Keys must match the dimension names
    * defined in the ScorePolicy for this attempt's (simulatorId, difficulty, mode).
    */
   scoreDimensions: Record<string, number>;
@@ -33,6 +39,8 @@ export interface GradeSimulatorAttemptInput {
 export interface GradeSimulatorAttemptDeps {
   attemptRepo: ISimulatorAttemptRepository;
   scorePolicyRepo: IScorePolicyRepository;
+  calibrationRepo: ISimulatorScenarioCalibrationRepository;
+  scenarioRepo: ISimulatorScenarioRepository;
   clock: Clock;
 }
 
@@ -52,7 +60,7 @@ export interface GradeSimulatorAttemptResult {
   readonly gradedAt: Date;
 }
 
-// ΓöÇΓöÇ Use Case ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ── Use Case ──────────────────────────────────────────────────────────────
 
 export class GradeSimulatorAttempt {
   constructor(private readonly deps: GradeSimulatorAttemptDeps) {}
@@ -60,9 +68,9 @@ export class GradeSimulatorAttempt {
   async execute(
     input: GradeSimulatorAttemptInput,
   ): Promise<Result<GradeSimulatorAttemptResult, GradeSimulatorAttemptError>> {
-    const { attemptRepo, scorePolicyRepo, clock } = this.deps;
+    const { attemptRepo, scorePolicyRepo, calibrationRepo, scenarioRepo, clock } = this.deps;
 
-    // ΓöÇΓöÇ 1. Load attempt ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    // ── 1. Load attempt ───────────────────────────────────────────────────
     const attemptResult = await attemptRepo.findByAttemptId(input.attemptId);
     if (Result.isErr(attemptResult)) {
       return Result.err(mapDbError(attemptResult.error));
@@ -73,7 +81,7 @@ export class GradeSimulatorAttempt {
 
     const attempt = attemptResult.value;
 
-    // ΓöÇΓöÇ 2. Assert status is submitted ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    // ── 2. Assert status is submitted ─────────────────────────────────────
     if (attempt.status === "in_progress") {
       return Result.err({ kind: "attempt_not_submitted" });
     }
@@ -84,7 +92,7 @@ export class GradeSimulatorAttempt {
       return Result.err({ kind: "attempt_not_submitted" });
     }
 
-    // ΓöÇΓöÇ 3. Find ScorePolicy ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    // ── 3. Find ScorePolicy ───────────────────────────────────────────────
     const policyResult = await scorePolicyRepo.findBySimulatorAndDifficulty(
       attempt.simulatorId,
       attempt.difficulty,
@@ -98,7 +106,7 @@ export class GradeSimulatorAttempt {
       return Result.err({ kind: "policy_not_found" });
     }
 
-    // ΓöÇΓöÇ 4. Validate dimension keys ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    // ── 4. Validate dimension keys ────────────────────────────────────────
     const unknownKeys = Object.keys(input.scoreDimensions).filter(
       (k) => !(k in policy.dimensionConfig),
     );
@@ -106,18 +114,38 @@ export class GradeSimulatorAttempt {
       return Result.err({ kind: "invalid_dimensions", missing: unknownKeys });
     }
 
-    // ΓöÇΓöÇ 5. Compute overall score ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-    const overallScore = getOverallScore(input.scoreDimensions, policy);
+    // ── 4a. Apply instructor calibration (STORY-086) ─────────────────────
+    // Calibrations are keyed by (simulatorId, scenarioKey). Look up the
+    // scenario via scenarioRepo to get the family key, then look up the
+    // calibration. A missing scenario or missing calibration is fine — both
+    // fall through to "no calibration" and the raw scores pass through.
+    let clampedDimensions: Record<string, number> = { ...input.scoreDimensions };
+    const scenarioResult = await scenarioRepo.findById(attempt.scenarioId);
+    if (Result.isOk(scenarioResult) && scenarioResult.value !== null) {
+      const calibrationResult = await calibrationRepo.findBySimulatorAndScenarioKey(
+        attempt.simulatorId,
+        scenarioResult.value.scenarioKey,
+      );
+      if (Result.isOk(calibrationResult)) {
+        clampedDimensions = mergeCalibrationIntoScores(
+          input.scoreDimensions,
+          calibrationResult.value,
+        );
+      }
+    }
+
+    // ── 5. Compute overall score (uses clamped dimensions) ────────────────
+    const overallScore = getOverallScore(clampedDimensions, policy);
     const passed = isPassed(overallScore, policy);
     // Timestamp is the use case's responsibility (not the repo's).
     // Source: the injected Clock port, so this is deterministic
     // under test fakes and traceable to the system clock in prod.
     const gradedAt = clock.now();
 
-    // ΓöÇΓöÇ 6. Persist grade ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    // ── 6. Persist grade ─────────────────────────────────────────────────
     const updateResult = await attemptRepo.updateStatus(attempt.id, "graded", {
       score: overallScore,
-      scoreDimensions: input.scoreDimensions,
+      scoreDimensions: clampedDimensions,
       gradedAt,
     });
 
@@ -133,14 +161,14 @@ export class GradeSimulatorAttempt {
     return Result.ok({
       attemptId: attempt.attemptId,
       overallScore,
-      scoreDimensions: input.scoreDimensions,
+      scoreDimensions: clampedDimensions,
       isPassed: passed,
       gradedAt,
     });
   }
 }
 
-// ΓöÇΓöÇ Helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ── Helpers ───────────────────────────────────────────────────────────────
 
 function mapDbError(err: SimulatorAttemptError): GradeSimulatorAttemptError {
   if (err.kind === "db_error") {

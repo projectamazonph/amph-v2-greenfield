@@ -1,13 +1,18 @@
 /**
  * GradeSimulatorAttempt — applies a ScorePolicy to a submitted attempt.
- * STORY-065.
+ * STORY-065. STORY-086: clamps raw scores into per-scenario calibration
+ * bands before the weighted-average overall.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { GradeSimulatorAttempt } from "../GradeSimulatorAttempt";
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
 import { InMemoryScorePolicyRepository } from "@/infra/repositories/InMemoryScorePolicyRepository";
+import { InMemorySimulatorScenarioCalibrationRepository } from "@/infra/repositories/inmemory/InMemorySimulatorScenarioCalibrationRepository";
+import { InMemorySimulatorScenarioRepository } from "@/infra/simulator/InMemorySimulatorScenarioRepository";
 import { createSimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
 import { createScorePolicy } from "@/domain/entities/ScorePolicy";
+import { createSimulatorScenario } from "@/domain/entities/SimulatorScenario";
+import { createSimulatorScenarioCalibration } from "@/domain/entities/SimulatorScenarioCalibration";
 import { FixedClock } from "@/ports/system/Clock";
 
 function makeAttempt(status: "submitted" | "in_progress" | "graded" = "submitted") {
@@ -53,17 +58,44 @@ function makePolicyRepoWithSingleDimension(
   return repo;
 }
 
+function seedScenario(scenarioRepo: InMemorySimulatorScenarioRepository) {
+  const r = createSimulatorScenario({
+    id: "scn_1",
+    simulatorId: "bid-elevator",
+    name: "Seed scenario",
+    description: "Test",
+    inputSchema: {},
+    outputSchema: {},
+    difficulty: "beginner",
+    estimatedMinutes: 10,
+    scenarioKey: "scenario-key-1",
+  });
+  if (!r.ok) throw new Error("scenario seed failed");
+  scenarioRepo.seed(r.value);
+}
+
 describe("GradeSimulatorAttempt", () => {
   let attemptRepo: InMemorySimulatorAttemptRepository;
   let scorePolicyRepo: InMemoryScorePolicyRepository;
+  let calibrationRepo: InMemorySimulatorScenarioCalibrationRepository;
+  let scenarioRepo: InMemorySimulatorScenarioRepository;
   let clock: FixedClock;
   let useCase: GradeSimulatorAttempt;
 
   beforeEach(() => {
     attemptRepo = new InMemorySimulatorAttemptRepository();
     scorePolicyRepo = makePolicyRepoWithSingleDimension();
+    calibrationRepo = new InMemorySimulatorScenarioCalibrationRepository();
+    scenarioRepo = new InMemorySimulatorScenarioRepository();
+    seedScenario(scenarioRepo);
     clock = new FixedClock(new Date("2025-02-01T12:00:00Z"));
-    useCase = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo, clock });
+    useCase = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo,
+      calibrationRepo,
+      scenarioRepo,
+      clock,
+    });
   });
 
   it("grades a passing attempt and persists score + dimensions", async () => {
@@ -117,7 +149,13 @@ describe("GradeSimulatorAttempt", () => {
       },
       60,
     );
-    const uc = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo: repo, clock });
+    const uc = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo: repo,
+      calibrationRepo,
+      scenarioRepo,
+      clock,
+    });
     attemptRepo.create(makeAttempt("submitted"));
 
     const r = await uc.execute({
@@ -139,7 +177,13 @@ describe("GradeSimulatorAttempt", () => {
       { bidAccuracy: { weight: 1 } },
       70,
     );
-    const uc = new GradeSimulatorAttempt({ attemptRepo, scorePolicyRepo: repo, clock });
+    const uc = new GradeSimulatorAttempt({
+      attemptRepo,
+      scorePolicyRepo: repo,
+      calibrationRepo,
+      scenarioRepo,
+      clock,
+    });
     attemptRepo.create(makeAttempt("submitted"));
 
     const r = await uc.execute({
@@ -188,6 +232,8 @@ describe("GradeSimulatorAttempt", () => {
     const uc = new GradeSimulatorAttempt({
       attemptRepo,
       scorePolicyRepo: emptyPolicyRepo,
+      calibrationRepo,
+      scenarioRepo,
       clock,
     });
     attemptRepo.create(makeAttempt("submitted"));
@@ -214,5 +260,91 @@ describe("GradeSimulatorAttempt", () => {
     if (r.error.kind === "invalid_dimensions") {
       expect(r.error.missing).toContain("mystery");
     }
+  });
+
+  // ── STORY-086: calibration clamping ────────────────────────────────────
+
+  it("clamps an above-band raw score down to maxScore (STORY-086)", async () => {
+    attemptRepo.create(makeAttempt("submitted"));
+
+    // Seed a calibration band { 40..80 } for direction on scenario-key-1.
+    const cal = createSimulatorScenarioCalibration({
+      id: "cal_1",
+      simulatorId: "bid-elevator",
+      scenarioKey: "scenario-key-1",
+      dimensionBands: { direction: { minScore: 40, maxScore: 80 } },
+      instructorId: "admin_1",
+      createdAt: new Date("2025-01-01T00:00:00Z"),
+      updatedAt: new Date("2025-01-01T00:00:00Z"),
+    });
+    if (!cal.ok) throw new Error("calibration seed failed");
+    await calibrationRepo.upsert(cal.value);
+
+    const r = await useCase.execute({
+      attemptId: "ATT-ABC1234",
+      scoreDimensions: { direction: 95 }, // > maxScore 80
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.scoreDimensions).toEqual({ direction: 80 }); // clamped down
+    expect(r.value.overallScore).toBe(80);
+  });
+
+  it("clamps an below-band raw score up to minScore (STORY-086)", async () => {
+    attemptRepo.create(makeAttempt("submitted"));
+
+    const cal = createSimulatorScenarioCalibration({
+      id: "cal_1",
+      simulatorId: "bid-elevator",
+      scenarioKey: "scenario-key-1",
+      dimensionBands: { direction: { minScore: 50, maxScore: 80 } },
+      instructorId: "admin_1",
+    });
+    if (!cal.ok) throw new Error("calibration seed failed");
+    await calibrationRepo.upsert(cal.value);
+
+    const r = await useCase.execute({
+      attemptId: "ATT-ABC1234",
+      scoreDimensions: { direction: 20 }, // < minScore 50
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.scoreDimensions).toEqual({ direction: 50 });
+  });
+
+  it("passes scores inside the band through unchanged (STORY-086)", async () => {
+    attemptRepo.create(makeAttempt("submitted"));
+
+    const cal = createSimulatorScenarioCalibration({
+      id: "cal_1",
+      simulatorId: "bid-elevator",
+      scenarioKey: "scenario-key-1",
+      dimensionBands: { direction: { minScore: 40, maxScore: 90 } },
+      instructorId: "admin_1",
+    });
+    if (!cal.ok) throw new Error("calibration seed failed");
+    await calibrationRepo.upsert(cal.value);
+
+    const r = await useCase.execute({
+      attemptId: "ATT-ABC1234",
+      scoreDimensions: { direction: 75 }, // inside band
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.scoreDimensions).toEqual({ direction: 75 });
+  });
+
+  it("grades normally when the attempt's scenario has no calibration (STORY-086)", async () => {
+    // Empty calibrationRepo — no calibration rows.
+    attemptRepo.create(makeAttempt("submitted"));
+
+    const r = await useCase.execute({
+      attemptId: "ATT-ABC1234",
+      scoreDimensions: { direction: 95 },
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.scoreDimensions).toEqual({ direction: 95 });
+    expect(r.value.overallScore).toBe(95);
   });
 });

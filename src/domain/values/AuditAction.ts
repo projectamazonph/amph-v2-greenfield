@@ -70,6 +70,8 @@ export type AuditAction =
   | "simulator.published"
   | "simulator.draft_created"
   | "simulator_attempt.started"
+  // STORY-086: instructor calibration of a score policy dimension range
+  | "simulator_calibration.set"
   | "live_class.created"
   | "live_class.updated"
   | "live_class.deleted"
@@ -154,6 +156,8 @@ export const ALL_ACTIONS: AuditAction[] = [
   "simulator.published",
   "simulator.draft_created",
   "simulator_attempt.started",
+  // STORY-086: instructor calibration of a score policy dimension range
+  "simulator_calibration.set",
   "live_class.created",
   "live_class.updated",
   "live_class.deleted",
