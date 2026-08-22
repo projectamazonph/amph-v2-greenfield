@@ -295,6 +295,19 @@ describe("LessonContent (render)", () => {
     expect(html).not.toContain(":::competitive-gap-matrix");
   });
 
+  it.each([
+    ["comparison-table", `:::comparison-table{id="bad-comparison" title="Bad"}\n{"rows":[]}\n:::`],
+    ["decision-flow", `:::decision-flow{id="bad-flow" title="Bad"}\n{"initialStep":0}\n:::`],
+    ["simulation-rubric", `:::simulation-rubric{id="bad-rubric" title="Bad"}\n{"criteria":[]}\n:::`],
+    ["visual without kind", `:::visual{id="bad-visual" title="Bad"}\n{}\n:::`],
+  ])("fails closed for malformed %s payloads", (_label, body) => {
+    const lesson = makeLesson({ type: "TEXT", content: { body } });
+    const html = renderToString(<LessonContent lesson={lesson} courseSlug={courseSlug} />);
+
+    expect(html).not.toContain("data-amph-id=");
+    expect(html).not.toContain(":::");
+  });
+
   it("renders :::process as a ProcessDiagram", () => {
     const lesson = makeLesson({
       type: "TEXT",

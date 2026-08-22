@@ -199,19 +199,17 @@ export function DecisionFlow({ id, title, steps, initialStep = 0, revealMode = "
         {revealMode === "after-choice" ? <button type="button" className={styles.ghostButton} onClick={() => setShowCoach((visible) => !visible)} aria-expanded={showCoach}>{showCoach ? "Hide coach rationale" : "Reveal coach rationale"}</button> : null}
       </div>
       <div className={styles.flowLayout}>
-        <ol className={styles.flowSteps} aria-label={`${title} steps`} role="tablist" aria-orientation="vertical">
+        <div className={styles.flowSteps} aria-label={`${title} steps`} role="tablist" aria-orientation="vertical">
           {steps.map((step, index) => {
             const selected = index === activeIndex;
             return (
-              <li key={step.id}>
-                <button type="button" role="tab" aria-selected={selected} aria-controls={`${id}-panel-${step.id}`} onClick={() => setActiveIndex(index)} className={`${styles.flowButton} ${selected ? styles.flowButtonActive : ""}`}>
-                  <span className={styles.stepNumber}>{index + 1}</span>
-                  <span>{step.label}</span>
-                </button>
-              </li>
+              <button key={step.id} type="button" role="tab" aria-selected={selected} aria-controls={`${id}-panel-${step.id}`} onClick={() => setActiveIndex(index)} className={`${styles.flowButton} ${selected ? styles.flowButtonActive : ""}`}>
+                <span className={styles.stepNumber}>{index + 1}</span>
+                <span>{step.label}</span>
+              </button>
             );
           })}
-        </ol>
+        </div>
         {active ? (
           <div id={`${id}-panel-${active.id}`} className={styles.flowPanel} role="tabpanel" aria-live="polite" tabIndex={0}>
             <p className={styles.panelLabel}>Question {activeIndex + 1}</p>

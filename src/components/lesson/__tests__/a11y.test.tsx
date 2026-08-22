@@ -18,6 +18,14 @@ import { TradeOffTable } from "../TradeOffTable";
 import { PitfallCallout } from "../PitfallCallout";
 import { ProcessDiagram } from "../ProcessDiagram";
 import { SelfCheck } from "../SelfCheck";
+import {
+  ComparisonTable,
+  CompetitiveGapMatrix,
+  DecisionFlow,
+  FormulaLadder,
+  InsightRouter,
+  SimulationRubric,
+} from "../index";
 
 describe("lesson primitives a11y", () => {
   it("TradeOffTable has no axe violations", async () => {
@@ -69,6 +77,70 @@ describe("lesson primitives a11y", () => {
         answerIndex={0}
         explanation="It's cost per click."
       />,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("new tranche table and formula primitives have no axe violations", async () => {
+    const { container } = render(
+      <>
+        <ComparisonTable
+          id="a11y-comparison"
+          title="Compare"
+          columns={["Discovery", "Protection"]}
+          rows={[{ label: "Intent", values: ["Broad", "Narrow"] }]}
+        />
+        <FormulaLadder
+          id="a11y-formula"
+          title="Calculate"
+          steps={[{ label: "Spend", expression: "clicks × CPC" }]}
+          result={{ label: "ACoS", value: "30%" }}
+        />
+      </>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("new tranche decision and rubric primitives have no axe violations", async () => {
+    const { container } = render(
+      <>
+        <DecisionFlow
+          id="a11y-decision"
+          title="Decide"
+          steps={[{ id: "step-1", label: "Inspect", question: "What changed?", evidence: "Read the report", action: "Make one bounded change" }]}
+          revealMode="after-choice"
+        />
+        <SimulationRubric
+          id="a11y-rubric"
+          title="Review"
+          scenario="Prepare the campaign."
+          criteria={[{ id: "structure", label: "Structure", lookFor: "Clear naming" }]}
+        />
+      </>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("new tranche competitive insight primitives have no axe violations", async () => {
+    const { container } = render(
+      <>
+        <CompetitiveGapMatrix
+          id="a11y-gaps"
+          title="Gaps"
+          dimensions={["Visibility"]}
+          competitors={[{ id: "competitor-a", label: "Competitor A", values: ["Weak"], signal: "Low visibility", action: "Check share of voice" }]}
+          revealMode="after-choice"
+        />
+        <InsightRouter
+          id="a11y-insight"
+          title="Route"
+          routes={[{ id: "route-1", signal: "Low CTR", implication: "Relevance is weak", evidence: "Review query and listing", action: "Test the title" }]}
+          revealMode="after-choice"
+        />
+      </>,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
