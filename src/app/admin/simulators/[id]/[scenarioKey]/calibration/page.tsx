@@ -35,27 +35,28 @@ interface PageProps {
 }
 
 export default async function CalibrationPage({ params, searchParams }: PageProps) {
-  const admin = await requireAdmin();
+  await requireAdmin();
   const { id, scenarioKey } = await params;
-
-  if (!isSimulatorId(id)) {
-    return notFound();
-  }
+  const sp = await searchParams;
+  const saved = sp.saved;
 
   const container = await buildContainer();
-  const scenarioRepo = container.scenarioRepo;
-  const calibrationRepo = container.calibrationRepo;
 
-  // Resolve the scenario to get its current state.
-  const scenarioResult = await scenarioRepo.findBySimulatorAndScenarioKey(id, scenarioKey);
+  // Use the getSimulatorScenario use case to resolve the scenario.
+  const scenarioResult = await container.getSimulatorScenario.execute(id);
   if (!scenarioResult.ok) {
     return notFound();
   }
 
-  const scenario = scenarioResult.value;
+  const scenario = scenarioResult.value.scenario;
+  const simulatorId = scenario.simulatorId;
+
+  if (!isSimulatorId(simulatorId)) {
+    return notFound();
+  }
 
   // Load existing calibration (if any).
-  const calibrationResult = await calibrationRepo.findBySimulatorAndScenarioKey(id, scenarioKey);
+  const calibrationResult = await container.calibrationRepo.findBySimulatorAndScenarioKey(simulatorId, scenarioKey);
   const calibration = calibrationResult.ok ? calibrationResult.value : null;
 
   // Build the initial form values from the calibration or defaults.
@@ -90,14 +91,13 @@ export default async function CalibrationPage({ params, searchParams }: PageProp
 
     // Call the use case through the server action.
     await setScenarioCalibrationAction({
-      simulatorId: id as SimulatorId,
+      simulatorId,
       scenarioKey,
       dimensionBands: bands,
-      instructorId: adminId,
     });
 
     // Redirect back with a success indicator.
-    redirect(`/admin/simulators/${id}/${encodeURIComponent(scenarioKey)}/calibration?saved=1`);
+    redirect(`/admin/simulators/${simulatorId}/${encodeURIComponent(scenarioKey)}/calibration?saved=1`);
   }
 
   const sp = await searchParams;
@@ -108,13 +108,13 @@ export default async function CalibrationPage({ params, searchParams }: PageProp
       <TopBar title="Simulator Calibration" />
       <div className={styles.page}>
         <div className={styles.header}>
-          <Link href={`/admin/simulators/${id}/versions`} className={styles.backLink}>
+          <Link href={`/admin/simulators/${scenario.id}/versions`} className={styles.backLink}>
             <ArrowLeft weight="bold" />
             Back to versions
           </Link>
           <h1 className={styles.title}>Calibration: {scenario.name}</h1>
           <p className={styles.subtitle}>
-            {id} · scenarioKey: {scenarioKey}
+            {simulatorId} · scenarioKey: {scenarioKey}
           </p>
         </div>
 
