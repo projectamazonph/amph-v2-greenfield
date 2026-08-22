@@ -94,6 +94,9 @@ export async function StudentShell({
   if (!user) {
     return (
       <div className={styles.publicShell}>
+        <a href="#main-content" className={styles.skipLink}>
+          Skip to main content
+        </a>
         <PublicCatalogHeader />
         <div className={styles.publicMain} data-navigation-content>
           {children}
@@ -105,6 +108,9 @@ export async function StudentShell({
   // Authenticated shell: full sidebar layout (current behavior).
   return (
     <div className={styles.shell}>
+      <a href="#main-content" className={styles.skipLink}>
+        Skip to main content
+      </a>
       <MobileNavToggle sidebarId="student-sidebar" />
       <StudentSidebar user={user} />
       <div className={styles.main} data-navigation-content>
@@ -123,6 +129,7 @@ const COMMAND_PALETTE_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/courses", label: "My Courses" },
   { href: "/tools", label: "Tools" },
+  { href: "/live-classes", label: "Live classes" },
   { href: "/tools/bid-elevator", label: "Bid Elevator", section: "Tools" },
   { href: "/tools/campaign-builder", label: "Campaign Builder", section: "Tools" },
   { href: "/tools/keyword-research", label: "Keyword Research", section: "Tools" },

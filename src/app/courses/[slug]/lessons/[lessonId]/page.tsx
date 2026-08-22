@@ -127,6 +127,19 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
     notFound();
   }
   const { lesson, sectionTitle } = lessonData;
+  const lessonTargets = course.curriculum.sections.flatMap((section) =>
+    section.lessons.map((curriculumLesson) => ({
+      id: curriculumLesson.id,
+      title: curriculumLesson.title,
+      sectionTitle: section.title,
+    })),
+  );
+  const previousLesson = lessonData.prevLessonId
+    ? lessonTargets.find((target) => target.id === lessonData.prevLessonId) ?? null
+    : null;
+  const nextLesson = lessonData.nextLessonId
+    ? lessonTargets.find((target) => target.id === lessonData.nextLessonId) ?? null
+    : null;
 
   // ── Access check (P0-5) ─────────────────────────────
   // Single source of truth: AuthorizeLessonAccess decides per-lesson
@@ -277,8 +290,8 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           <div className={styles.navFooter}>
             <LessonNavButtons
               courseSlug={slug}
-              prevLessonId={lessonData.prevLessonId}
-              nextLessonId={lessonData.nextLessonId}
+              prevLesson={previousLesson}
+              nextLesson={nextLesson}
             />
           </div>
         </div>

@@ -22,6 +22,7 @@ import {
   UserCircle,
   SignOut,
   DownloadSimple,
+  VideoCamera,
 } from "@phosphor-icons/react/dist/ssr";
 import type { ComponentType, SVGProps } from "react";
 import { useState } from "react";
@@ -55,6 +56,10 @@ const NAV_SECTIONS: readonly NavSection[] = [
   {
     label: "Practice",
     items: [{ href: "/tools", label: "Simulators", icon: GameController }],
+  },
+  {
+    label: "Connect",
+    items: [{ href: "/live-classes", label: "Live classes", icon: VideoCamera }],
   },
   {
     label: "Resources",

@@ -70,7 +70,23 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-2, 8px);
+  gap: var(--space-2);
+}
+
+.navLink {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--ink-700);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.navLink:hover,
+.navLink:focus-visible {
+  background: var(--surface-2);
+  color: var(--ink-900);
 }
 
 .signIn {
@@ -105,6 +121,14 @@
   filter: brightness(1.05);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .navLink,
+  .signIn,
+  .signUp {
+    transition: none;
+  }
+}
+
 @media (max-width: 480px) {
   .inner {
     padding: var(--space-3, 12px) var(--space-4, 16px);
@@ -112,9 +136,10 @@
   .brandSub {
     display: none;
   }
+  .navLink,
   .signIn,
   .signUp {
-    padding: 6px 12px;
-    font-size: 13px;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
   }
 }

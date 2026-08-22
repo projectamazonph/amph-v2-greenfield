@@ -62,12 +62,11 @@ export default async function CourseDetailPage({ params }: PageProps) {
   }
   const quizzes = quizzesResult.value;
   const firstLessonId = detail.modules.flatMap((module) => module.lessons)[0]?.id ?? null;
+  const enrollment = user
+    ? await container.enrollmentRepo.findByUserIdAndCourseId(user.id, detail.courseId)
+    : null;
   let accessMode: "purchase" | "subscription" | "enrolled" | "admin" = "purchase";
   if (user) {
-    const enrollment = await container.enrollmentRepo.findByUserIdAndCourseId(
-      user.id,
-      detail.courseId,
-    );
     if (enrollment?.status === "active") {
       accessMode = "enrolled";
     } else if (user.role === "ADMIN") {
@@ -83,6 +82,17 @@ export default async function CourseDetailPage({ params }: PageProps) {
     }
   }
   const { totalLessonCount, totalEstimatedMinutes, modules } = detail;
+  const courseLessons = modules.flatMap((module) =>
+    module.lessons.map((lesson) => ({ ...lesson, sectionTitle: module.title })),
+  );
+  const completedLessonIds = enrollment?.status === "active" ? enrollment.completedLessonIds : [];
+  const completedLessonCount = courseLessons.filter((lesson) =>
+    completedLessonIds.includes(lesson.id),
+  ).length;
+  const progressPercent = courseLessons.length > 0
+    ? Math.floor((completedLessonCount / courseLessons.length) * 100)
+    : 0;
+  const nextLesson = courseLessons.find((lesson) => !completedLessonIds.includes(lesson.id));
   const hours = Math.floor(totalEstimatedMinutes / 60);
   const minutes = totalEstimatedMinutes % 60;
   const priceMoney = Money.of(detail.priceMinor, "PHP");
@@ -155,6 +165,45 @@ export default async function CourseDetailPage({ params }: PageProps) {
           </div>
         </div>
 
+        {accessMode !== "purchase" && totalLessonCount > 0 ? (
+            <section className={styles.progressPanel} aria-labelledby="course-progress-title">
+              <div className={styles.progressCopy}>
+                <p className={styles.progressEyebrow}>Your course progress</p>
+                <h2 id="course-progress-title" className={styles.progressTitle}>
+                  {completedLessonCount} of {courseLessons.length} lessons complete
+                </h2>
+                <p className={styles.progressHint}>
+                  {progressPercent === 100
+                    ? "You have completed the available lessons. Revisit any lesson to sharpen the system."
+                    : nextLesson
+                      ? `${nextLesson.sectionTitle} · ${nextLesson.title}`
+                      : "Your next lesson is ready."}
+                </p>
+              </div>
+              <div className={styles.progressAction}>
+                <div
+                  className={styles.progressTrack}
+                  role="progressbar"
+                  aria-label="Course progress"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={progressPercent}
+                >
+                  <span style={{ width: `${progressPercent}%` }} />
+                </div>
+                <strong className={styles.progressValue}>{progressPercent}%</strong>
+                {nextLesson ? (
+                  <Link
+                    href={`/courses/${detail.slug}/lessons/${nextLesson.id}`}
+                    className={styles.progressCta}
+                  >
+                    {progressPercent === 0 ? "Start first lesson" : "Continue next lesson"}
+                  </Link>
+                ) : null}
+              </div>
+            </section>
+          ) : null}
+
         {/* Curriculum */}
         <div className={styles.curriculumSection}>
           <h2 className={styles.curriculumTitle}>Curriculum</h2>
@@ -170,6 +219,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <ul className={styles.lessonList}>
                   {mod.lessons.map((lesson) => {
                     const vid = lesson.estimatedMinutes > 0 ? `${lesson.estimatedMinutes}m` : null;
+                    const isCompleted = completedLessonIds.includes(lesson.id);
                     return (
                       <li key={lesson.id} className={styles.lessonItem}>
                         <LessonTypeIcon type={lesson.type} />
@@ -180,6 +230,14 @@ export default async function CourseDetailPage({ params }: PageProps) {
                           {lesson.title}
                         </Link>
                         {vid && <span className={styles.lessonDuration}>{vid}</span>}
+                        {accessMode !== "purchase" && (
+                          <span
+                            className={styles.lessonStatus}
+                            data-complete={isCompleted}
+                          >
+                            {isCompleted ? "Complete" : "Not started"}
+                          </span>
+                        )}
                       </li>
                     );
                   })}

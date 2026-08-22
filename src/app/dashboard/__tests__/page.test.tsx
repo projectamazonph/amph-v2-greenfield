@@ -13,6 +13,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 
 // Mock getSessionUser so the server component can render.
 const mockGetSessionUser = vi.fn();
@@ -115,6 +117,13 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
 
   it("exports a default async function (the page module is reachable)", () => {
     expect(typeof DashboardPage).toBe("function");
+  });
+
+  it("resumes at the next incomplete lesson instead of the course root", async () => {
+    const pagePath = path.resolve(process.cwd(), "src/app/dashboard/page.tsx");
+    const source = await fs.readFile(pagePath, "utf8");
+    expect(source).toContain("nextIncompleteLesson");
+    expect(source).toMatch(/lessons\/\$\{resumeLesson\.id\}/);
   });
 
   it("queries the user's enrollments via the container", async () => {

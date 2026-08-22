@@ -1,75 +1,66 @@
 "use client";
 
 /**
- * LessonNavButtons — Previous / Next lesson navigation.
+ * LessonNavButtons — title-aware previous / next lesson navigation.
  *
- * STORY-026: Lesson page (RSC + MDX render).
- *
- * Migrated to CSS Modules + design tokens (no Tailwind classes).
+ * Keeps movement between lessons lightweight while exposing enough context
+ * for a learner to know exactly where the link will take them.
  */
 
+import Link from "next/link";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react/dist/ssr";
 import styles from "./LessonNavButtons.module.css";
 
+export interface LessonNavTarget {
+  id: string;
+  title: string;
+  sectionTitle: string;
+}
+
 interface LessonNavButtonsProps {
   courseSlug: string;
-  prevLessonId: string | null;
-  nextLessonId: string | null;
+  prevLesson: LessonNavTarget | null;
+  nextLesson: LessonNavTarget | null;
 }
 
-export function LessonNavButtons({ courseSlug, prevLessonId, nextLessonId }: LessonNavButtonsProps) {
-  const hasPrev = prevLessonId !== null;
-  const hasNext = nextLessonId !== null;
-
-  if (!hasPrev && !hasNext) return null;
+export function LessonNavButtons({ courseSlug, prevLesson, nextLesson }: LessonNavButtonsProps) {
+  if (!prevLesson && !nextLesson) return null;
 
   return (
-    <div className={styles.row}>
-      {hasPrev ? (
-        <a
-          href={`/courses/${courseSlug}/lessons/${prevLessonId}`}
+    <nav className={styles.row} aria-label="Lesson navigation">
+      {prevLesson ? (
+        <Link
+          href={`/courses/${courseSlug}/lessons/${prevLesson.id}`}
           className={styles.prevButton}
+          aria-label={`Previous lesson: ${prevLesson.title}`}
         >
-          <ChevronLeft />
-          <span>Previous</span>
-        </a>
+          <CaretLeft size={20} weight="bold" className={styles.chevron} aria-hidden />
+          <span className={styles.buttonCopy}>
+            <span className={styles.direction}>Previous</span>
+            <strong>{prevLesson.title}</strong>
+            <span className={styles.section}>{prevLesson.sectionTitle}</span>
+          </span>
+        </Link>
       ) : (
-        <div />
+        <span aria-hidden="true" />
       )}
 
-      {hasNext ? (
-        <a
-          href={`/courses/${courseSlug}/lessons/${nextLessonId}`}
+      {nextLesson ? (
+        <Link
+          href={`/courses/${courseSlug}/lessons/${nextLesson.id}`}
           className={styles.nextButton}
+          aria-label={`Next lesson: ${nextLesson.title}`}
         >
-          <span>Next Lesson</span>
-          <ChevronRight />
-        </a>
+          <span className={styles.buttonCopy}>
+            <span className={styles.direction}>Next lesson</span>
+            <strong>{nextLesson.title}</strong>
+            <span className={styles.section}>{nextLesson.sectionTitle}</span>
+          </span>
+          <CaretRight size={20} weight="bold" className={styles.chevron} aria-hidden />
+        </Link>
       ) : (
-        <div />
+        <span aria-hidden="true" />
       )}
-    </div>
-  );
-}
-
-function ChevronLeft() {
-  return (
-    <CaretLeft
-      size={20}
-      weight="bold"
-      className={styles.chevron}
-      aria-hidden
-    />
-  );
-}
-
-function ChevronRight() {
-  return (
-    <CaretRight
-      size={20}
-      weight="bold"
-      className={styles.chevron}
-      aria-hidden
-    />
+    </nav>
   );
 }

@@ -12,9 +12,11 @@
  * Migrated to CSS Modules + design tokens (no Tailwind classes).
  */
 
+import Link from "next/link";
 import type { Course } from "@/domain/entities/Course";
 import { CaretRight, CaretDown, CheckCircle, Play, Article } from "@phosphor-icons/react/dist/ssr";
 import styles from "./LessonSidebar.module.css";
+import { useEffect, useState } from "react";
 
 // Only the plain-data subset of Course this component needs. Course.price is
 // a Money class instance, and passing the full Course (server-fetched) into
@@ -33,6 +35,27 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
   const currentSectionIndex = course.curriculum.sections.findIndex((section) =>
     section.lessons.some((l) => l.id === currentLessonId),
   );
+  const currentSectionId = course.curriculum.sections[currentSectionIndex]?.id;
+  const [openSections, setOpenSections] = useState<Set<string>>(
+    () => new Set(currentSectionId ? [currentSectionId] : []),
+  );
+
+  useEffect(() => {
+    if (!currentSectionId) return;
+    setOpenSections((current) => {
+      if (current.has(currentSectionId)) return current;
+      return new Set(current).add(currentSectionId);
+    });
+  }, [currentSectionId]);
+
+  function toggleSection(sectionId: string) {
+    setOpenSections((current) => {
+      const next = new Set(current);
+      if (next.has(sectionId)) next.delete(sectionId);
+      else next.add(sectionId);
+      return next;
+    });
+  }
 
   return (
     <aside className={styles.sidebar}>
@@ -43,18 +66,25 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
       </div>
 
       {/* Sections */}
-      <nav className={styles.nav}>
+      <nav className={styles.nav} aria-label="Course curriculum">
         {course.curriculum.sections.map((section, si) => {
           const isCurrentSection = si === currentSectionIndex;
-          const isOpen = isCurrentSection;
+          const isOpen = openSections.has(section.id);
           const completedCount = section.lessons.filter((l) =>
             completedLessonIds.includes(l.id),
           ).length;
 
+          const sectionNavId = `${course.slug}-section-${section.id}`;
           return (
             <div key={section.id} className={styles.section}>
               {/* Section header */}
-              <button className={styles.sectionHeader} aria-expanded={isOpen} type="button">
+              <button
+                className={styles.sectionHeader}
+                aria-expanded={isOpen}
+                aria-controls={sectionNavId}
+                type="button"
+                onClick={() => toggleSection(section.id)}
+              >
                 <ChevronIcon expanded={isOpen} />
                 <span className={styles.sectionTitle}>
                   {si + 1}. {section.title}
@@ -65,9 +95,8 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
               </button>
 
               {/* Lessons */}
-              {isOpen && (
-                <ul className={styles.lessonList}>
-                  {section.lessons.map((lesson) => {
+              <ul id={sectionNavId} className={styles.lessonList} hidden={!isOpen}>
+                {isOpen ? section.lessons.map((lesson) => {
                     const isCurrent = lesson.id === currentLessonId;
                     const isCompleted = completedLessonIds.includes(lesson.id);
                     const isVideo = lesson.type === "VIDEO";
@@ -87,9 +116,10 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
 
                     return (
                       <li key={lesson.id}>
-                        <a
+                        <Link
                           href={`/courses/${course.slug}/lessons/${lesson.id}`}
                           className={linkClass}
+                          aria-current={isCurrent ? "page" : undefined}
                         >
                           {isCompleted ? <CheckIcon /> : isVideo ? <VideoIcon /> : <TextIcon />}
 
@@ -98,12 +128,11 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
                           {duration !== null && (
                             <span className={styles.lessonDuration}>{duration}m</span>
                           )}
-                        </a>
+                        </Link>
                       </li>
                     );
-                  })}
-                </ul>
-              )}
+                }) : null}
+              </ul>
             </div>
           );
         })}

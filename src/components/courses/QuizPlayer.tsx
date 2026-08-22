@@ -29,6 +29,7 @@ interface Props {
   title: string;
   passingScore: number;
   questions: ReadonlyArray<Question>;
+  courseHref?: string;
 }
 
 interface ReviewItem {
@@ -49,7 +50,7 @@ interface SubmitResult {
   error?: string;
 }
 
-export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
+export function QuizPlayer({ quizId, title, passingScore, questions, courseHref = "/courses" }: Props) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -116,9 +117,14 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
           {passed && result.xpAwarded ? (
             <p className={styles.xpLine}>+{result.xpAwarded} XP awarded</p>
           ) : null}
-          <Link href="/dashboard" className={styles.backLink}>
-            Back to dashboard
-          </Link>
+          <div className={styles.resultActions}>
+            <Link href={courseHref} className={styles.primaryBackLink}>
+              Back to course
+            </Link>
+            <Link href="/dashboard" className={styles.backLink}>
+              Back to dashboard
+            </Link>
+          </div>
         </div>
         {result.review && result.review.length > 0 ? (
           <div className={styles.review}>
@@ -179,6 +185,8 @@ export function QuizPlayer({ quizId, title, passingScore, questions }: Props) {
                 key={opt.id}
                 type="button"
                 className={`${styles.option} ${selected ? styles.optionSelected : ""}`}
+                aria-pressed={selected}
+                aria-label={`Answer: ${opt.optionText}`}
                 onClick={() => onChoose(current.id, opt.id)}
               >
                 <span className={styles.optionDot} />

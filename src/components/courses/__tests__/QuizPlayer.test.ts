@@ -33,6 +33,14 @@ describe("QuizPlayer — voice regression guard", () => {
     expect(source).toMatch(/Quick check/);
   });
 
+  it("returns learners to the current course after submission", async () => {
+    const componentPath = path.resolve(process.cwd(), "src/components/courses/QuizPlayer.tsx");
+    const source = await fs.readFile(componentPath, "utf8");
+    expect(source).toContain("courseHref");
+    expect(source).toContain("Back to course");
+    expect(source).toContain("aria-pressed={selected}");
+  });
+
   it("does not render raw thrown errors to the student", async () => {
     const componentPath = path.resolve(process.cwd(), "src/components/courses/QuizPlayer.tsx");
     const source = await fs.readFile(componentPath, "utf8");
