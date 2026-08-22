@@ -265,3 +265,11 @@
     overflow-x: hidden;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .logoutButton,
+  .sidebar {
+    transition: none;
+  }
+}

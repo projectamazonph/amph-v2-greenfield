@@ -129,17 +129,25 @@ export default async function DashboardPage() {
                   />
                   <h3 className={styles.cardTitle}>{course.title}</h3>
                   <p className={styles.cardTagline}>{course.tagline}</p>
-                  <div className={styles.progressBar} aria-hidden="true">
+                  <div
+                    className={styles.progressBar}
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={enrollment.progressPercent}
+                    aria-label={`${course.title} progress: ${enrollment.progressPercent}% complete`}
+                  >
                     <div
                       className={styles.progressFill}
                       style={{ width: `${enrollment.progressPercent}%` }}
+                      aria-hidden="true"
                     />
                     {[25, 50, 75].map((pct) => (
                       <span
                         key={pct}
                         className={`${styles.milestone} ${enrollment.progressPercent >= pct ? styles.reached : ""}`}
                         style={{ left: `${pct}%` }}
-                        aria-hidden
+                        aria-hidden="true"
                       />
                     ))}
                   </div>
