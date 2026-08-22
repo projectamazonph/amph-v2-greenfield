@@ -13,6 +13,8 @@
   border-radius: var(--radius-lg);
   padding: var(--space-10);
   background: var(--surface-1);
+  /* Overflow protection: clip content to card boundary */
+  overflow: hidden;
 }
 
 .emoji {

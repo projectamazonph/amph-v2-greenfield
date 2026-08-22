@@ -10,6 +10,8 @@
   font-weight: 500;
   border: 1px solid;
   animation: slideIn 0.2s ease-out;
+  /* Overflow protection: prevent toast overflow */
+  overflow: hidden;
 }
 
 @keyframes slideIn {
@@ -55,6 +57,10 @@
 
 .message {
   flex: 1;
+  /* Overflow protection: truncate long messages */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .close {

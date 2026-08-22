@@ -33,6 +33,9 @@
   transition:
     border-color var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
+  /* Overflow protection: handle long text gracefully */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .input::placeholder {
