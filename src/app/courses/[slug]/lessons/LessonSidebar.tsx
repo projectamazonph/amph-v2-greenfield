@@ -96,7 +96,7 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
 
               {/* Lessons */}
               <ul id={sectionNavId} className={styles.lessonList} hidden={!isOpen}>
-                  {section.lessons.map((lesson) => {
+                {isOpen ? section.lessons.map((lesson) => {
                     const isCurrent = lesson.id === currentLessonId;
                     const isCompleted = completedLessonIds.includes(lesson.id);
                     const isVideo = lesson.type === "VIDEO";
@@ -131,8 +131,8 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
                         </Link>
                       </li>
                     );
-                  })}
-                </ul>
+                }) : null}
+              </ul>
             </div>
           );
         })}
