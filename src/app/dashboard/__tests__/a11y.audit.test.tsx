@@ -162,6 +162,21 @@ describe("student dashboard accessibility audit", () => {
     expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.progressFill/);
   });
 
+  it("names the dashboard learning sections for landmark navigation", () => {
+    const source = readFileSync(resolve(__dirname, "../page.tsx"), "utf8");
+    expect(source).toContain('aria-labelledby="continue-learning-section-title"');
+    expect(source).toContain('id="continue-learning-section-title"');
+    expect(source).toContain('aria-labelledby="my-courses-title"');
+    expect(source).toContain('aria-labelledby="quick-actions-title"');
+  });
+
+  it("provides a visible focus contract for all dashboard action paths", () => {
+    const css = readFileSync(resolve(__dirname, "../page.module.css"), "utf8");
+    expect(css).toMatch(/\.card:focus-visible,[\s\S]*?\.quickBtn:focus-visible/);
+    expect(css).toMatch(/outline:\s*2px solid var\(--accent\)/);
+    expect(css).toMatch(/outline-offset:\s*2px/);
+  });
+
   it("documents reduced-motion coverage for the shared mobile navigation", () => {
     const sidebarCss = readFileSync(
       resolve(process.cwd(), "src/components/student/StudentSidebar.module.css"),

@@ -114,8 +114,10 @@ export default async function DashboardPage() {
 
         {/* Continue learning */}
         {inProgress.length > 0 && (
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Continue learning</h2>
+          <section className={styles.section} aria-labelledby="continue-learning-section-title">
+            <h2 id="continue-learning-section-title" className={styles.sectionTitle}>
+              Continue learning
+            </h2>
             <div className={styles.grid}>
               {inProgress.map(({ course, enrollment }) => (
                 <Link key={enrollment.id} href={`/courses/${course.slug}`} className={styles.card}>
@@ -159,9 +161,9 @@ export default async function DashboardPage() {
         )}
 
         {/* My courses */}
-        <section className={styles.section}>
+        <section className={styles.section} aria-labelledby="my-courses-title">
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>My courses</h2>
+            <h2 id="my-courses-title" className={styles.sectionTitle}>My courses</h2>
             <Link href="/courses" className={styles.browseLink}>
               Browse the catalog <ArrowRight size={16} aria-hidden />
             </Link>
@@ -199,8 +201,8 @@ export default async function DashboardPage() {
         </section>
 
         {/* Quick Actions */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Quick Actions</h2>
+        <section className={styles.section} aria-labelledby="quick-actions-title">
+          <h2 id="quick-actions-title" className={styles.sectionTitle}>Quick Actions</h2>
           <div className={styles.quickActions}>
             <Link href="/courses" className={styles.quickBtn}>
               Browse Catalog

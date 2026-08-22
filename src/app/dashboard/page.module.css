@@ -112,6 +112,16 @@
   border-color: var(--ink-300);
 }
 
+.card:focus-visible,
+.browseLink:focus-visible,
+.browseButton:focus-visible,
+.listLink:focus-visible,
+.continueBtn:focus-visible,
+.quickBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .completionRing {
   position: absolute;
   top: var(--space-3);
