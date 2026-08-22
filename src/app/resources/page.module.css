@@ -1,7 +1,26 @@
 /* /resources — student download center. Field Manual tokens only. */
 
 .header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
   margin-bottom: var(--space-6);
+}
+
+.headerCopy {
+  min-width: 0;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .title {
@@ -16,6 +35,27 @@
   font-size: var(--text-sm);
   color: var(--ink-500);
   margin: 0;
+  max-width: 58ch;
+}
+
+.headerSummary {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-left: 2px solid var(--accent);
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.headerSummary strong {
+  color: var(--ink-900);
+  font-size: var(--text-2xl);
+  line-height: 1;
 }
 
 .empty {
@@ -25,8 +65,35 @@
   text-align: center;
 }
 
+.stateBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.stateLink {
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.stateLink:hover {
+  text-decoration: underline;
+}
+
 .section {
   margin-bottom: var(--space-8);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .sectionTitle {
@@ -35,7 +102,13 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ink-500);
-  margin: 0 0 var(--space-3) 0;
+  margin: 0;
+}
+
+.sectionCount {
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 
 .list {
@@ -53,15 +126,26 @@
 
 .row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-4) var(--space-4);
+  padding: var(--space-4);
   border-bottom: 1px solid var(--border);
 }
 
 .row:last-child {
   border-bottom: 0;
+}
+
+.resourceIcon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--accent-text);
+  background: var(--surface-2);
 }
 
 .cellBody {
@@ -99,15 +183,24 @@
   text-align: right;
 }
 
-.downloadLink {
-  display: inline-block;
-  padding: var(--space-2) var(--space-4);
-  background-color: var(--accent);
-  color: var(--accent-ink);
+.downloadLink,
+.upgradeLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
   border-radius: var(--radius-md);
   text-decoration: none;
   font-size: var(--text-sm);
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.downloadLink {
+  background-color: var(--accent);
+  color: var(--accent-ink);
   transition: background-color var(--duration-fast) var(--ease-out);
 }
 
@@ -116,18 +209,61 @@
 }
 
 .upgradeLink {
-  display: inline-block;
-  padding: var(--space-2) var(--space-4);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   color: var(--ink-500);
-  text-decoration: none;
-  font-size: var(--text-sm);
-  font-weight: 600;
   transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .upgradeLink:hover {
   border-color: var(--accent);
   color: var(--accent-text);
+}
+
+@media (max-width: 767px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .headerSummary {
+    flex-direction: row;
+    align-items: baseline;
+    width: 100%;
+    border-top: 1px solid var(--border);
+    border-left: 0;
+    padding: var(--space-3) 0 0 0;
+  }
+
+  .headerSummary strong {
+    font-size: var(--text-xl);
+  }
+
+  .row {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-3);
+  }
+
+  .cellMeta,
+  .cellAction {
+    grid-column: 2;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .cellAction {
+    width: 100%;
+  }
+
+  .downloadLink,
+  .upgradeLink {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .downloadLink,
+  .upgradeLink {
+    transition: none;
+  }
 }

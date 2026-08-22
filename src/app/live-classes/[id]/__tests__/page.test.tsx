@@ -175,6 +175,27 @@ describe("/live-classes/[id]", () => {
     expect(source).toMatch(/<main[^>]*\bid="main-content"[^>]*\btabIndex=\{-1\}/);
   });
 
+  it("provides a status-aware learner next-step block", () => {
+    const source = readFileSync(resolve(__dirname, "../page.tsx"), "utf8");
+    expect(source).toContain("live-class-next-step");
+    expect(source).toContain("Reserve your place");
+    expect(source).toContain("Turn the recording into a takeaway");
+    expect(source).toContain("Unlock this session");
+  });
+
+  it("uses semantic date metadata and keeps access actions explicit", () => {
+    const source = readFileSync(resolve(__dirname, "../page.tsx"), "utf8");
+    expect(source).toContain("<time dateTime={liveClass.scheduledAt.toISOString()}");
+    expect(source).toContain("Access required");
+    expect(source).toContain("Browse courses");
+  });
+
+  it("keeps detail actions usable on narrow screens", () => {
+    const css = readFileSync(resolve(__dirname, "../page.module.css"), "utf8");
+    expect(css).toMatch(/@media\s*\(max-width:\s*767px\)/);
+    expect(css).toMatch(/\.actions\s*\{[\s\S]*?flex-wrap:\s*wrap;/);
+  });
+
   it("does not contain banned marketing phrases in its JSX source", () => {
     const source = readFileSync(resolve(__dirname, "../page.tsx"), "utf8").toLowerCase();
     expect(source).not.toContain("delve");
