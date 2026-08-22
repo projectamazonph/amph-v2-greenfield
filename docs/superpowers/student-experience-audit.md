@@ -29,6 +29,12 @@ The platform already has a reusable authenticated `StudentShell`, a public optio
 4. Replace generic lesson prev/next controls with title-aware controls.
 5. Add targeted route and component tests, then run the full project QA suite.
 
+## Second-tranche status
+
+The resources and live-class visual refinement tranche is now implemented on top of the shared shell. The download center has a stronger heading hierarchy, resource counts, file and lock cues, responsive rows, explicit download or upgrade actions, and action-oriented empty and error states. The live-class index now promotes the next session, uses semantic time metadata, makes UTC treatment explicit, improves session action labels, and switches to a responsive narrow-screen composition. The live-class detail view now provides status-aware learner guidance, semantic date and duration metadata, clearer access-required copy, and responsive action groups.
+
+The remaining work is primarily breadth: render-level route tests for resources and live classes, deeper mobile interaction coverage, and similar visual refinement for profile, certificates, simulator index, and individual simulator surfaces. The current tranche intentionally avoids adding new persistence fields, search infrastructure, analytics, or external dependencies.
+
 ## Non-goals for the first tranche
 
 This pass does not introduce a new data model, analytics system, search index, or external dependency. It uses the existing repository interfaces and design tokens, and it avoids changing business authorization rules.

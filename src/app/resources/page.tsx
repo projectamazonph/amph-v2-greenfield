@@ -14,6 +14,7 @@
  */
 
 import Link from "next/link";
+import { ArrowUpRight, DownloadSimple, FileText, LockKey } from "@phosphor-icons/react/dist/ssr";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Card, Badge } from "@astryxdesign/core";
 import { buildContainer } from "@/composition/container";
@@ -51,14 +52,22 @@ export default async function ResourcesPage() {
     return (
       <StudentShell user={user}>
         <main id="main-content" tabIndex={-1}>
-          <div className={styles.header}>
-            <h1 className={styles.title}>Download center</h1>
-          </div>
+          <header className={styles.header}>
+            <div>
+              <span className={styles.eyebrow}>Student resources</span>
+              <h1 className={styles.title}>Download center</h1>
+            </div>
+          </header>
           <Card padding={6}>
-            <p className={styles.empty} role="alert">
-              We couldn&apos;t load your download center right now. Your access and files are
-              unchanged. Refresh to try again.
-            </p>
+            <div className={styles.stateBlock}>
+              <p className={styles.empty} role="alert">
+                We couldn&apos;t load your download center right now. Your access and files are
+                unchanged. Refresh to try again.
+              </p>
+              <Link href="/dashboard" className={styles.stateLink}>
+                Return to dashboard
+              </Link>
+            </div>
           </Card>
         </main>
       </StudentShell>
@@ -76,29 +85,51 @@ export default async function ResourcesPage() {
 
   return (
     <StudentShell user={user}>
-      <main id="main-content" tabIndex={-1}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Download center</h1>
-          <p className={styles.subtitle}>
-            Guides, templates, automation tools, and handouts you can use on the job.
-          </p>
-        </div>
+        <main id="main-content" tabIndex={-1}>
+        <header className={styles.header}>
+          <div className={styles.headerCopy}>
+            <span className={styles.eyebrow}>Student resources</span>
+            <h1 className={styles.title}>Download center</h1>
+            <p className={styles.subtitle}>
+              Guides, templates, automation tools, and handouts you can use on the job.
+            </p>
+          </div>
+          <div className={styles.headerSummary} aria-label={`${items.length} resources available`}>
+            <strong>{items.length}</strong>
+            <span>resources available</span>
+          </div>
+        </header>
 
         {items.length === 0 ? (
           <Card padding={6}>
-            <p className={styles.empty}>No resources are published yet. Check back soon.</p>
+            <div className={styles.stateBlock}>
+              <p className={styles.empty}>No resources are published yet. Check back soon.</p>
+              <Link href="/courses" className={styles.stateLink}>
+                Continue learning
+              </Link>
+            </div>
           </Card>
         ) : (
           CATEGORY_ORDER.filter((category) => byCategory.has(category)).map((category) => (
             <section
               key={category}
               className={styles.section}
-              aria-label={CATEGORY_LABELS[category]}
+              aria-labelledby={`${category}-heading`}
             >
-              <h2 className={styles.sectionTitle}>{CATEGORY_LABELS[category]}</h2>
+              <div className={styles.sectionHeading}>
+                <h2 id={`${category}-heading`} className={styles.sectionTitle}>
+                  {CATEGORY_LABELS[category]}
+                </h2>
+                <span className={styles.sectionCount}>
+                  {byCategory.get(category)!.length} {byCategory.get(category)!.length === 1 ? "item" : "items"}
+                </span>
+              </div>
               <ul className={styles.list}>
                 {byCategory.get(category)!.map(({ resource, locked }) => (
                   <li key={resource.id} className={styles.row}>
+                    <div className={styles.resourceIcon} aria-hidden="true">
+                      {locked ? <LockKey size={20} weight="bold" /> : <FileText size={20} weight="bold" />}
+                    </div>
                     <div className={styles.cellBody}>
                       <h3 className={styles.resourceTitle}>{resource.title}</h3>
                       <p className={styles.resourceDescription}>{resource.description}</p>
@@ -110,14 +141,14 @@ export default async function ResourcesPage() {
                     <div className={styles.cellAction}>
                       {locked ? (
                         <Link href="/pricing" className={styles.upgradeLink}>
-                          Upgrade to unlock
+                          Upgrade <ArrowUpRight size={14} weight="bold" aria-hidden="true" />
                         </Link>
                       ) : (
                         <a
                           href={`/api/resources/${resource.id}/download`}
                           className={styles.downloadLink}
                         >
-                          Download
+                          Download <DownloadSimple size={14} weight="bold" aria-hidden="true" />
                         </a>
                       )}
                     </div>

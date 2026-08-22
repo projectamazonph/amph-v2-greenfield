@@ -20,7 +20,7 @@ import { LiveClassRsvpButton } from "@/components/student/LiveClassRsvpButton";
 import { LiveClassRecordingButton } from "@/components/student/LiveClassRecordingButton";
 import buttonStyles from "@/components/ui/Button.module.css";
 import { XPService } from "@/domain/services/XPService";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft, CalendarBlank, Clock } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
@@ -107,32 +107,67 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
               )}
               {isRegistered && <Badge variant="success" label="You are RSVPd" />}
             </div>
+            <span className={styles.eyebrow}>Live session</span>
             <h1 className={styles.title}>{liveClass.title}</h1>
+            <p className={styles.intro}>
+              {isCompleted
+                ? "Review the recording and capture the operating decisions that matter to your work."
+                : isCancelled
+                  ? "This session is no longer available for attendance."
+                  : "Reserve your place, join from this page, and return here when the session is complete."}
+            </p>
           </header>
 
           <dl className={styles.meta}>
             <div className={styles.metaRow}>
               <dt className={styles.metaLabel}>When</dt>
               <dd className={styles.metaValue}>
-                {liveClass.scheduledAt.toLocaleString("en-US", {
-                  dateStyle: "full",
-                  timeStyle: "short",
-                  timeZone: "UTC",
-                })}{" "}
-                UTC
+                <time dateTime={liveClass.scheduledAt.toISOString()}>
+                  <CalendarBlank size={16} weight="bold" aria-hidden="true" />
+                  {liveClass.scheduledAt.toLocaleString("en-US", {
+                    dateStyle: "full",
+                    timeStyle: "short",
+                    timeZone: "UTC",
+                  })}{" "}
+                  UTC
+                </time>
               </dd>
             </div>
             <div className={styles.metaRow}>
               <dt className={styles.metaLabel}>Duration</dt>
-              <dd className={styles.metaValue}>{liveClass.durationMinutes} minutes</dd>
+              <dd className={styles.metaValue}>
+                <span>
+                  <Clock size={16} weight="bold" aria-hidden="true" />
+                  {liveClass.durationMinutes} minutes
+                </span>
+              </dd>
             </div>
           </dl>
 
+          {!isCancelled && (
+            <section className={styles.nextStep} aria-labelledby="live-class-next-step">
+              <span className={styles.eyebrow}>{isCompleted ? "After the session" : "Next step"}</span>
+              <h2 id="live-class-next-step" className={styles.nextStepTitle}>
+                {isCompleted ? "Turn the recording into a takeaway" : isEnrolled ? "Reserve your place" : "Unlock this session"}
+              </h2>
+              <p className={styles.nextStepText}>
+                {isCompleted
+                  ? "Watch the recording, mark it as watched, and capture one operating decision you can apply next."
+                  : isEnrolled
+                    ? "RSVP now so the session is easy to find when it starts. Your meeting link appears after you register."
+                    : "Enroll in the associated course to RSVP and access the meeting link for this session."}
+              </p>
+            </section>
+          )}
+
           {!isEnrolled && !isCancelled ? (
             <div className={styles.notice}>
-              <p className={styles.noticeText}>
-                You must be enrolled in the course to RSVP for this live class.
-              </p>
+              <div>
+                <span className={styles.noticeKicker}>Access required</span>
+                <p className={styles.noticeText}>
+                  You must be enrolled in the course to RSVP for this live class.
+                </p>
+              </div>
               <Link
                 href="/courses"
                 className={[

@@ -129,6 +129,26 @@ describe("/live-classes", () => {
     expect(source).toMatch(/<main[^>]*\bid="main-content"[^>]*\btabIndex=\{-1\}/);
   });
 
+  it("promotes the next session and uses descriptive session actions", () => {
+    const source = readFileSync(resolve(__dirname, "../page.tsx"), "utf8");
+    expect(source).toContain("next-session-title");
+    expect(source).toContain("View next session");
+    expect(source).toContain("View session");
+    expect(source).toContain("aria-label={`View session: ${liveClass.title}`}");
+  });
+
+  it("uses semantic time metadata and an explicit UTC schedule label", () => {
+    const source = readFileSync(resolve(__dirname, "../page.tsx"), "utf8");
+    expect(source).toContain("<time dateTime={liveClass.scheduledAt.toISOString()}");
+    expect(source).toContain("All times shown in UTC");
+  });
+
+  it("keeps the session list responsive instead of desktop-only", () => {
+    const css = readFileSync(resolve(__dirname, "../page.module.css"), "utf8");
+    expect(css).toMatch(/@media\s*\(max-width:\s*767px\)/);
+    expect(css).toMatch(/\.row\s*\{[\s\S]*?grid-template-columns:/);
+  });
+
   it("does not contain banned marketing phrases in its JSX source", () => {
     const source = readFileSync(resolve(__dirname, "../page.tsx"), "utf8").toLowerCase();
     expect(source).not.toContain("delve");
