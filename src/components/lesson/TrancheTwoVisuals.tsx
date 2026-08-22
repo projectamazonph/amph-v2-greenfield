@@ -56,13 +56,13 @@ export function AnnotatedListingCanvas({ id, title, sections, prompt }: Annotate
             })}
           </div>
           {active ? (
-            <article id={`${id}-annotation-${active.id}`} className={styles.annotationDetail} role="tabpanel" tabIndex={0} aria-live="polite">
+              <div id={`${id}-annotation-${active.id}`} className={styles.annotationDetail} role="tabpanel" tabIndex={0} aria-live="polite">
               <p className={styles.panelLabel}>{active.role}</p>
               <h4>{active.label}</h4>
               <p><strong>Current pattern:</strong> {active.content}</p>
               <p className={styles.effectLine}><strong>PPC job:</strong> {active.effect}</p>
-            </article>
-          ) : <p className={styles.emptyState}>Add a listing section to annotate.</p>}
+              </div>
+            ) : <p className={styles.emptyState}>Add a listing section to annotate.</p>}
         </div>
       </div>
     </section>
