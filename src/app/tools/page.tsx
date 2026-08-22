@@ -8,6 +8,7 @@
  */
 
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight, PlayCircle, ShieldWarning } from "@phosphor-icons/react/dist/ssr";
 import { buildContainer } from "@/composition/container";
 import { StudentShell } from "@/components/student/StudentShell";
 import { getSimulatorCopy } from "@/lib/copy/simulatorCopy";
@@ -49,36 +50,55 @@ export default async function ToolsIndexPage() {
           <span className={styles.eyebrow}>Practice tools</span>
           <h1 className={styles.title}>Tools</h1>
           <p className={styles.subhead}>
-            Five practice simulators. Use the live console only when you are ready to make real
-            account changes.
+            Practice campaign decisions in a safe environment. Use the live console only when you
+            are ready to make real account changes.
           </p>
+          <div className={styles.headerMeta} aria-label="Tool library summary">
+            <span>5 simulators</span>
+            <span className={styles.headerDivider} aria-hidden="true">·</span>
+            <span>1 live console</span>
+          </div>
         </header>
-        <ul className={styles.grid}>
+        <section aria-labelledby="practice-library-title">
+          <div className={styles.sectionHeading}>
+            <h2 id="practice-library-title" className={styles.sectionTitle}>Practice library</h2>
+            <span className={styles.sectionCount}>Choose a bounded exercise</span>
+          </div>
+          <ul className={styles.grid}>
           {registered.map((sim) => {
             const info = TOOL_INFO[sim.simulatorId];
             if (!info) return null;
             return (
-              <li key={sim.simulatorId} className={styles.card}>
-                <h2 className={styles.cardName}>{info.name}</h2>
+                <li key={sim.simulatorId} className={styles.card}>
+                <div className={styles.cardKicker}>
+                  <PlayCircle size={16} weight="bold" aria-hidden="true" />
+                  Simulator
+                </div>
+                <h3 className={styles.cardName}>{info.name}</h3>
                 <p className={styles.cardBlurb}>{getSimulatorCopy(sim.simulatorId).outcome}</p>
                 <Link href={info.href} className={styles.cardLink} prefetch>
-                  Start practice
+                  Start practice <ArrowRight size={16} weight="bold" aria-hidden="true" />
                 </Link>
               </li>
             );
           })}
           {/* Amazon Ad Console — embedded external tool, not a registered simulator */}
-          <li key="ad-console" className={styles.card}>
-            <h2 className={styles.cardName}>Amazon Ad Console</h2>
+          <li key="ad-console" className={`${styles.card} ${styles.liveCard}`}>
+            <div className={styles.cardKicker}>
+              <ShieldWarning size={16} weight="bold" aria-hidden="true" />
+              Live console
+            </div>
+            <h3 className={styles.cardName}>Amazon Ad Console</h3>
             <p className={styles.cardBlurb}>
               A live campaign console for your own Amazon Advertising account. Changes affect real
               data and real ad spend.
             </p>
             <Link href="/tools/ad-console" className={styles.cardLink}>
-              Open live console
+              Open live console <ArrowUpRight size={16} weight="bold" aria-hidden="true" />
             </Link>
           </li>
         </ul>
+        </section>
       </main>
     </StudentShell>
   );
