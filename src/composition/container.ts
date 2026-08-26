@@ -65,6 +65,7 @@ import type { IWebhookEventLog } from "@/ports/repositories/IWebhookEventLog";
 import type { ISimulatorScenarioRepository } from "@/ports/repositories/ISimulatorScenarioRepository";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { IScorePolicyRepository } from "@/ports/repositories/IScorePolicyRepository";
+import type { ISimulatorScenarioCalibrationRepository } from "@/ports/repositories/ISimulatorScenarioCalibrationRepository";
 import type { IAttemptFeedbackRepository } from "@/ports/repositories/IAttemptFeedbackRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiveClassRegistrationRepository";
@@ -98,6 +99,7 @@ import { PrismaWebhookEventLog } from "@/infra/repositories/PrismaWebhookEventLo
 import { PrismaSimulatorScenarioRepository } from "@/infra/simulator/PrismaSimulatorScenarioRepository";
 import { PrismaSimulatorAttemptRepository } from "@/infra/repositories/PrismaSimulatorAttemptRepository";
 import { PrismaScorePolicyRepository } from "@/infra/repositories/PrismaScorePolicyRepository";
+import { PrismaSimulatorScenarioCalibrationRepository } from "@/infra/repositories/PrismaSimulatorScenarioCalibrationRepository";
 import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAttemptFeedbackRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { PrismaLiveClassRegistrationRepository } from "@/infra/repositories/PrismaLiveClassRegistrationRepository";
@@ -268,6 +270,8 @@ import { StartSimulatorAttempt } from "@/usecases/StartSimulatorAttempt";
 import { SaveSimulatorDecision } from "@/usecases/SaveSimulatorDecision";
 import { SubmitSimulatorAttempt } from "@/usecases/SubmitSimulatorAttempt";
 import { GradeSimulatorAttempt } from "@/usecases/GradeSimulatorAttempt";
+import { SetScenarioCalibration } from "@/usecases/SetScenarioCalibration";
+import { GetScenarioCalibration } from "@/usecases/GetScenarioCalibration";
 import { ComposeAttemptFeedback } from "@/usecases/ComposeAttemptFeedback";
 import { CheckChallengeModeUnlocked } from "@/usecases/CheckChallengeModeUnlocked";
 import { AdminListLiveClasses } from "@/usecases/AdminListLiveClasses";
@@ -331,6 +335,8 @@ export interface AppContainer {
   simulatorAttemptRepo: ISimulatorAttemptRepository;
   // STORY-065: scoring engine + dimensional policies
   scorePolicyRepo: IScorePolicyRepository;
+  // STORY-086: per-scenario instructor calibration ranges
+  calibrationRepo: ISimulatorScenarioCalibrationRepository;
   // STORY-066: feedback composer + remediation
   feedbackRepo: IAttemptFeedbackRepository;
   // STORY-050c: live class admin CRUD
@@ -484,6 +490,10 @@ export interface AppContainer {
   submitSimulatorAttempt: SubmitSimulatorAttempt;
   // STORY-065: scoring engine
   gradeSimulatorAttempt: GradeSimulatorAttempt;
+  // STORY-086: instructor sets calibration bands on a scenario family
+  setScenarioCalibration: SetScenarioCalibration;
+  // STORY-086: instructor reads an existing calibration band map
+  getScenarioCalibration: GetScenarioCalibration;
   composeAttemptFeedback: ComposeAttemptFeedback;
   // STORY-088: challenge mode unlock
   checkChallengeModeUnlocked: CheckChallengeModeUnlocked;
@@ -584,6 +594,9 @@ function buildProductionContainer(): AppContainer {
   );
   // STORY-065: scoring engine
   const scorePolicyRepo: IScorePolicyRepository = new PrismaScorePolicyRepository(prisma);
+  // STORY-086: per-scenario instructor calibration ranges
+  const calibrationRepo: ISimulatorScenarioCalibrationRepository =
+    new PrismaSimulatorScenarioCalibrationRepository(prisma);
   // STORY-066: feedback composer + remediation
   const feedbackRepo: IAttemptFeedbackRepository = new PrismaAttemptFeedbackRepository(prisma);
   const liveClassRepo: ILiveClassRepository = new PrismaLiveClassRepository(prisma);
@@ -980,6 +993,7 @@ function buildProductionContainer(): AppContainer {
     scenarioRepo,
     simulatorAttemptRepo,
     scorePolicyRepo,
+    calibrationRepo,
     feedbackRepo,
     // STORY-064: simulator attempt lifecycle
     startSimulatorAttempt: new StartSimulatorAttempt({
@@ -998,8 +1012,19 @@ function buildProductionContainer(): AppContainer {
     gradeSimulatorAttempt: new GradeSimulatorAttempt({
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,
+      calibrationRepo,
+      scenarioRepo,
       clock,
     }),
+    // STORY-086: instructor sets per-scenario calibration bands
+    setScenarioCalibration: new SetScenarioCalibration({
+      calibrationRepo,
+      recordAuditLog,
+      idGen,
+      clock,
+    }),
+    // STORY-086: instructor reads the existing calibration for an edit form
+    getScenarioCalibration: new GetScenarioCalibration({ calibrationRepo }),
     composeAttemptFeedback: new ComposeAttemptFeedback({
       attemptRepo: simulatorAttemptRepo,
       scorePolicyRepo,
