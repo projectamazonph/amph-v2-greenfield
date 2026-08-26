@@ -651,7 +651,7 @@ function buildProductionContainer(): AppContainer {
   const useCiInMemoryRateLimiter =
     process.env.CI === "true" && process.env.RATE_LIMITER_MODE === "in-memory";
   const rateLimiter: RateLimiter = useCiInMemoryRateLimiter
-    ? new InMemoryRateLimiter()
+    ? new InMemoryRateLimiter(false)
     : new UpstashRateLimiter(
         process.env.UPSTASH_REDIS_REST_URL ?? "",
         process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
