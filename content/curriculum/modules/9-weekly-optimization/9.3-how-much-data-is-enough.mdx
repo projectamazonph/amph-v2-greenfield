@@ -30,6 +30,10 @@ A threshold is a working boundary, not a promise that a result is true. Relevanc
 
 A term has 15 clicks, no orders, and a CPC above the product ceiling. The evidence supports a small review, not an automatic pause. Check relevance, compare the spend with the margin, choose one controlled bid action if the term still fits, and set a new review date.
 
+:::evidence-ledger{id="data-sufficiency-evidence" title="Match the size of the action to the strength of the evidence"}
+{"note":"Small data can support an obvious safety action; it should not support a confident optimization claim.","entries":[{"id":"safety","source":"Relevance and risk","signal":"The traffic is clearly wrong or unsafe.","implication":"Act on the bounded safety issue even before the optimization sample is large.","nextCheck":"Verify that the block stopped waste without blocking relevant variants."},{"id":"learning","source":"Early signal","signal":"The term or campaign has a plausible pattern but limited clicks.","implication":"Keep the test stable and set a decision date instead of declaring a winner.","nextCheck":"Recheck the same metric after more representative traffic."},{"id":"optimization","source":"Stable sample","signal":"The evidence window has enough clicks and conversions for the intended decision.","implication":"Make one controlled change and attach the comparison window.","nextCheck":"Review the expected signal and record whether the hypothesis held."}] }
+:::
+
 ## Your turn
 
 A relevant keyword has 15 clicks, no orders, and a high CPC. Write the first question you would ask before lowering the bid. Then state what evidence would make you wait another week.
