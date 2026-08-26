@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Document target lessons that intentionally extend or synthesize the source teaching-deck curriculum without a one-to-one source-slide assignment.",
+  "sourceManifest": "teaching-deck-slide-map.json",
+  "targetRepository": "projectamazonph/amph-v2-greenfield",
+  "sourceRepository": "projectamazonph/amazon-ph-simulators",
+  "recordCount": 7,
+  "records": [
+    {
+      "targetLessonSlug": "5.1-campaign-portfolios",
+      "targetModuleSlug": "5-portfolio-strategy",
+      "title": "Campaign Portfolios: Organizing for Scale",
+      "classification": "target-specific-extension",
+      "directSourceSlideAssignment": false,
+      "sourceRelationship": "Adds an account-level portfolio abstraction that organizes campaign, budget, and pacing ideas from the source deck.",
+      "relatedSourceRoles": [
+        {
+          "sourceModule": 3,
+          "sourceSlides": [2, 3, 4, 8],
+          "roles": ["Campaign", "Ad Group", "Target", "Naming Convention"],
+          "rationale": "Portfolio grouping sits above these campaign-structure objects and gives them a scalable operating boundary."
+        },
+        {
+          "sourceModule": 6,
+          "sourceSlides": [6, 7, 8],
+          "roles": ["Daily Budget", "Four-Week Plan", "Safe Scale"],
+          "rationale": "Portfolio budgets provide the account-level home for pacing and controlled scale."
+        },
+        {
+          "sourceModule": 7,
+          "sourceSlides": [3, 4, 7, 8],
+          "roles": ["Daily Budget", "Pacing", "Review Window", "Change Log"],
+          "rationale": "The portfolio lesson aggregates budget control and review evidence without replacing campaign-level controls."
+        }
+      ],
+      "nativeLearningAids": ["portfolio-map"],
+      "evidenceOutputs": ["Budget Decision Log", "portfolio allocation rationale"],
+      "status": "reviewed",
+      "reviewNotes": "Keep as a strategic extension. Do not force it into a source-slide row; use related source roles for provenance instead."
+    },
+    {
+      "targetLessonSlug": "5.3-seasonal-strategy",
+      "targetModuleSlug": "5-portfolio-strategy",
+      "title": "Seasonal Strategy & Promo Planning",
+      "classification": "target-specific-extension",
+      "directSourceSlideAssignment": false,
+      "sourceRelationship": "Adds a planning horizon above weekly optimization and controlled bid/budget changes.",
+      "relatedSourceRoles": [
+        {
+          "sourceModule": 7,
+          "sourceSlides": [3, 4, 5, 6, 7, 8],
+          "roles": [
+            "Daily Budget",
+            "Pacing",
+            "Controlled Change",
+            "Safety Limits",
+            "Review Window",
+            "Change Log"
+          ],
+          "rationale": "Seasonal work uses the same pacing, safety, one-change, and evidence disciplines on a longer calendar."
+        },
+        {
+          "sourceModule": 9,
+          "sourceSlides": [2, 5, 6, 7, 8],
+          "roles": [
+            "Weekly Routine",
+            "One Variable",
+            "Confidence",
+            "Observation Window",
+            "Change Log"
+          ],
+          "rationale": "Seasonal decisions still require a repeatable weekly operating rhythm and a readable experiment record."
+        }
+      ],
+      "nativeLearningAids": ["seasonal-calendar"],
+      "evidenceOutputs": [
+        "seasonal PPC calendar",
+        "promotion budget rationale",
+        "post-event review"
+      ],
+      "status": "reviewed",
+      "reviewNotes": "Keep as a planning extension. Recheck that seasonal advice remains qualified by inventory, margin, and measured performance."
+    },
+    {
+      "targetLessonSlug": "6.2-placement-adjustments",
+      "targetModuleSlug": "6-bidding-lab",
+      "title": "Placement Adjustments: Paying for the Front Row",
+      "classification": "target-specific-extension",
+      "directSourceSlideAssignment": false,
+      "sourceRelationship": "Adds standalone placement-multiplier depth to the source deck's general bid, budget, pacing, and safety material.",
+      "relatedSourceRoles": [
+        {
+          "sourceModule": 7,
+          "sourceSlides": [2, 3, 4, 5, 6, 7, 8],
+          "roles": [
+            "Bid",
+            "Daily Budget",
+            "Pacing",
+            "Controlled Change",
+            "Safety Limits",
+            "Review Window",
+            "Change Log"
+          ],
+          "rationale": "Placement exposure should be taught as a controlled bid and budget change with a ceiling, review window, and rollback record."
+        },
+        {
+          "sourceModule": 6,
+          "sourceSlides": [8],
+          "roles": ["Safe Scale"],
+          "rationale": "The target lesson operationalizes safe scale at the placement level."
+        }
+      ],
+      "nativeLearningAids": ["formula-ladder", "comparison-table", "evidence-ledger"],
+      "evidenceOutputs": [
+        "maximum-CPC calculation",
+        "placement adjustment decision",
+        "rollback condition"
+      ],
+      "status": "reviewed",
+      "reviewNotes": "Keep separate from bid strategy and Bid Elevator prep. Preserve the distinction between a base bid, placement multiplier, realized CPC, and total exposure."
+    },
+    {
+      "targetLessonSlug": "8.1-brand-analytics",
+      "targetModuleSlug": "8-competitive-intelligence",
+      "title": "Brand Analytics: Reading the Competitive Landscape",
+      "classification": "target-specific-extension",
+      "directSourceSlideAssignment": false,
+      "sourceRelationship": "Introduces Brand Analytics, search-demand context, Market Basket Analysis, demographics, and access constraints; source M8 is Search Terms & Negatives rather than Brand Analytics.",
+      "relatedSourceRoles": [
+        {
+          "sourceModule": 8,
+          "sourceSlides": [2, 3, 4, 5, 6, 7, 8],
+          "roles": [
+            "Search report",
+            "Winner",
+            "Waste",
+            "Maybe",
+            "Exact keyword",
+            "Negative keyword",
+            "Harvest loop"
+          ],
+          "rationale": "The target lesson extends the source's evidence-first search-gap logic into market-level demand and product-targeting inputs."
+        },
+        {
+          "sourceModule": 10,
+          "sourceSlides": [4, 8, 11],
+          "roles": ["Driver", "Next Action", "Evidence"],
+          "rationale": "Brand Analytics findings need the same driver, action, and evidence discipline as operational reporting."
+        }
+      ],
+      "nativeLearningAids": ["evidence-ledger", "insight-router"],
+      "evidenceOutputs": [
+        "Competitor Gap-Analysis Worksheet",
+        "market-signal action",
+        "access verification"
+      ],
+      "status": "reviewed",
+      "reviewNotes": "Keep as a distinct market-intelligence lesson. Do not claim that Brand Analytics is a direct continuation of the search-term report or that correlation proves profitability."
+    },
+    {
+      "targetLessonSlug": "8.2-share-of-voice",
+      "targetModuleSlug": "8-competitive-intelligence",
+      "title": "Share of Voice Analysis & Strategic Positioning",
+      "classification": "target-specific-extension",
+      "directSourceSlideAssignment": false,
+      "sourceRelationship": "Adds competitive impression-share measurement and strategic posture selection, which are absent as standalone topics from the source deck.",
+      "relatedSourceRoles": [
+        {
+          "sourceModule": 8,
+          "sourceSlides": [2, 3, 4, 8],
+          "roles": ["Search report", "Winner", "Waste", "Harvest loop"],
+          "rationale": "SOV posture uses the same search and opportunity signals but applies them to competitive visibility rather than term-level routing."
+        },
+        {
+          "sourceModule": 10,
+          "sourceSlides": [4, 8],
+          "roles": ["Driver", "Next Action"],
+          "rationale": "SOV is useful only when the driver leads to a bounded strategic action."
+        }
+      ],
+      "nativeLearningAids": ["sov-positioner", "comparison-table"],
+      "evidenceOutputs": ["SOV estimate", "strategic posture", "bounded action rationale"],
+      "status": "reviewed",
+      "reviewNotes": "Keep as a strategic extension. Do not turn SOV into a command to outbid competitors everywhere; preserve the posture and economic guardrails."
+    },
+    {
+      "targetLessonSlug": "8.3-competitor-benchmarking",
+      "targetModuleSlug": "8-competitive-intelligence",
+      "title": "Competitor Benchmarking & Actionable Insights",
+      "classification": "target-specific-extension",
+      "directSourceSlideAssignment": false,
+      "sourceRelationship": "Adds competitor selection, gap scoring, dashboard construction, and market-to-campaign translation as an applied synthesis layer.",
+      "relatedSourceRoles": [
+        {
+          "sourceModule": 8,
+          "sourceSlides": [2, 3, 4, 5, 6, 7, 8],
+          "roles": [
+            "Search report",
+            "Winner",
+            "Waste",
+            "Maybe",
+            "Exact keyword",
+            "Negative keyword",
+            "Harvest loop"
+          ],
+          "rationale": "Benchmarking reuses the source deck's evidence classification discipline at competitor and market level."
+        },
+        {
+          "sourceModule": 3,
+          "sourceSlides": [5, 6, 7, 8],
+          "roles": [
+            "Sponsored Products",
+            "Sponsored Brands",
+            "Sponsored Display",
+            "Naming Convention"
+          ],
+          "rationale": "Competitive insights must be routed into the correct ad type and a readable campaign structure."
+        }
+      ],
+      "nativeLearningAids": ["competitive-gap-matrix", "insight-router"],
+      "evidenceOutputs": [
+        "Competitor Gap-Analysis Worksheet",
+        "gap score",
+        "campaign action rationale"
+      ],
+      "status": "reviewed",
+      "reviewNotes": "Keep as the applied capstone of the Competitive Intelligence module. Avoid duplicating the SOV definition; focus on gap-to-action translation."
+    },
+    {
+      "targetLessonSlug": "10.2-explaining-numbers",
+      "targetModuleSlug": "10-reporting-troubleshooting",
+      "title": "Explaining Numbers in Human Words",
+      "classification": "synthesized-from-adjacent-source-roles",
+      "directSourceSlideAssignment": false,
+      "sourceRelationship": "Synthesizes the source reporting sequence into a client-language skill rather than matching one source slide.",
+      "relatedSourceRoles": [
+        {
+          "sourceModule": 10,
+          "sourceSlides": [2, 3, 4, 7, 8, 11],
+          "roles": ["Report", "Result", "Driver", "Check Order", "Next Action", "Evidence"],
+          "rationale": "The lesson turns these distributed reporting roles into a single metric-to-meaning-to-lever workflow."
+        }
+      ],
+      "nativeLearningAids": ["visual", "formula-ladder", "decision-flow"],
+      "evidenceOutputs": [
+        "plain-language metric translation",
+        "client-ready recommendation",
+        "metric context note"
+      ],
+      "status": "reviewed",
+      "reviewNotes": "Keep as synthesized content. Do not assign it to one direct source slide; retain the adjacent-role provenance so future editors know what was consolidated."
+    }
+  ]
+}

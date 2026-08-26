@@ -30,6 +30,10 @@ ACoS is ad spend divided by ad sales. CTR is clicks divided by impressions. Conv
 {"steps":[{"label":"Name the number","expression":"ACoS = 22%","explanation":"The ad spent 22 cents for each peso of ad-attributed sales."},{"label":"Compare the number","expression":"Target ACoS = 25%","explanation":"The current result is below the supplied target, but margin and objective still matter."},{"label":"Name the next check","expression":"Check trend, search terms, and margin","explanation":"A single period does not prove that the result will hold."}],"result":{"label":"Client sentence","value":"ACoS is 22%, below the 25% target this period. I will check the trend and protect the terms creating the sales.","context":"Use a claim, a comparison, and a next action."},"note":"A metric is a clue. It is not the whole diagnosis."}
 :::
 
+:::decision-flow{id="metric-to-meaning-router" title="Translate a metric before choosing a lever" reveal-mode="after-choice"}
+{"initialStep":0,"steps":[{"id":"metric","label":"Name the metric","question":"What exactly moved, and over what date range?","evidence":"Metric definition, current value, comparison value, and denominator.","action":"Write the number and comparison before adding an explanation."},{"id":"meaning","label":"Explain the meaning","question":"What does the movement say about traffic, conversion, or economics?","evidence":"Related metrics, search terms, listing, offer, stock, and objective.","action":"Use plain language and label the explanation as a hypothesis when evidence is incomplete."},{"id":"lever","label":"Choose one lever","question":"What is the smallest safe action that tests the explanation?","evidence":"Permissions, risk, expected signal, and review window.","action":"Change one lever, record the reason, and avoid treating correlation as proof."}]}
+:::
+
 ## Your turn
 
 Explain a 0.5% CTR without using the acronym. Then explain what you would check before changing the bid.

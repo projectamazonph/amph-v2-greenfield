@@ -63,7 +63,9 @@ const QUIZ_LESSON = makeLesson("QUIZ", {
 describe("LessonContent", () => {
   describe("TEXT lessons", () => {
     it("renders the markdown body content", () => {
-      const html = renderToString(<LessonContent lesson={TEXT_LESSON} courseSlug="ppc-foundations" />);
+      const html = renderToString(
+        <LessonContent lesson={TEXT_LESSON} courseSlug="ppc-foundations" />,
+      );
       expect(html).toContain("Hello");
       expect(html).toContain("bold");
     });
@@ -74,6 +76,16 @@ describe("LessonContent", () => {
       } as unknown as LessonContentDomain);
       const html = renderToString(<LessonContent lesson={lesson} courseSlug="ppc-foundations" />);
       expect(html).toContain("regular paragraph");
+    });
+
+    it("suppresses a leading body H1 when it duplicates the page lesson title", () => {
+      const lesson = makeLesson("TEXT", {
+        body: "# Test Lesson\n\n## What you can do after this lesson\n\nRead the evidence first.",
+      } as unknown as LessonContentDomain);
+      const html = renderToString(<LessonContent lesson={lesson} courseSlug="ppc-foundations" />);
+      expect(html).not.toContain("<h1");
+      expect(html).toContain("What you can do after this lesson");
+      expect(html).toContain("Read the evidence first.");
     });
 
     it("renders headings", () => {
@@ -87,25 +99,33 @@ describe("LessonContent", () => {
 
   describe("VIDEO lessons", () => {
     it("renders YouTube iframe with embed URL", () => {
-      const html = renderToString(<LessonContent lesson={VIDEO_LESSON_YOUTUBE} courseSlug="ppc-foundations" />);
+      const html = renderToString(
+        <LessonContent lesson={VIDEO_LESSON_YOUTUBE} courseSlug="ppc-foundations" />,
+      );
       expect(html).toContain("youtube.com/embed");
       expect(html).toContain("dQw4w9WgXcQ");
     });
 
     it("renders Vimeo iframe with embed URL", () => {
-      const html = renderToString(<LessonContent lesson={VIDEO_LESSON_VIMEO} courseSlug="ppc-foundations" />);
+      const html = renderToString(
+        <LessonContent lesson={VIDEO_LESSON_VIMEO} courseSlug="ppc-foundations" />,
+      );
       expect(html).toContain("player.vimeo.com/video");
       expect(html).toContain("123456789");
     });
 
     it("renders native video element for direct MP4 URLs", () => {
-      const html = renderToString(<LessonContent lesson={VIDEO_LESSON_DIRECT} courseSlug="ppc-foundations" />);
+      const html = renderToString(
+        <LessonContent lesson={VIDEO_LESSON_DIRECT} courseSlug="ppc-foundations" />,
+      );
       expect(html).toContain("<video");
       expect(html).toContain("video.mp4");
     });
 
     it("shows duration badge", () => {
-      const html = renderToString(<LessonContent lesson={VIDEO_LESSON_YOUTUBE} courseSlug="ppc-foundations" />);
+      const html = renderToString(
+        <LessonContent lesson={VIDEO_LESSON_YOUTUBE} courseSlug="ppc-foundations" />,
+      );
       // React may render adjacent text nodes as "10<!-- -->m"
       expect(html).toMatch(/10.*m/);
     });
@@ -113,13 +133,17 @@ describe("LessonContent", () => {
 
   describe("QUIZ lessons", () => {
     it("renders the Start Quiz CTA linking to the quiz route", () => {
-      const html = renderToString(<LessonContent lesson={QUIZ_LESSON} courseSlug="ppc-foundations" />);
+      const html = renderToString(
+        <LessonContent lesson={QUIZ_LESSON} courseSlug="ppc-foundations" />,
+      );
       expect(html).toContain("Start Quiz");
       expect(html).toContain("/courses/ppc-foundations/lessons/lesson_01/quiz");
     });
 
     it("renders a question preview for the QUIZ content", () => {
-      const html = renderToString(<LessonContent lesson={QUIZ_LESSON} courseSlug="ppc-foundations" />);
+      const html = renderToString(
+        <LessonContent lesson={QUIZ_LESSON} courseSlug="ppc-foundations" />,
+      );
       expect(html).toContain("What is ACoS?");
       expect(html).toContain("1 question in this lesson");
     });
@@ -131,7 +155,9 @@ describe("LessonContent", () => {
         ...TEXT_LESSON,
         content: { type: "PODCAST", data: "some data" } as unknown as LessonContentDomain, // unknown content type
       };
-      const html = renderToString(<LessonContent lesson={unknownLesson} courseSlug="ppc-foundations" />);
+      const html = renderToString(
+        <LessonContent lesson={unknownLesson} courseSlug="ppc-foundations" />,
+      );
       expect(html).toContain("unavailable");
     });
   });

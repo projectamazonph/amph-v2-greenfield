@@ -30,6 +30,10 @@ Routine work can include downloading reports, cleaning data, adding negatives fr
 {"fields":[{"id":"signal","label":"Signal","prompt":"What changed?","example":"Sales fell 35% today while spend stayed flat.","required":true},{"id":"checks","label":"Checks","prompt":"What did you verify first?","example":"Stock, price, reviews, competitors, and campaign status.","required":true},{"id":"ask","label":"Approval ask","prompt":"What is the smallest decision the manager must approve?","example":"Approve a temporary bid reduction on one campaign for seven days.","required":true},{"id":"risk","label":"Risk and review","prompt":"What could go wrong, and when will you review it?","example":"Traffic may fall. Review Friday with spend, sales, and CVR.","required":true}]}
 :::
 
+:::decision-flow{id="permissions-escalation-router" title="Route a task to action or approval" reveal-mode="after-choice"}
+{"initialStep":0,"steps":[{"id":"routine","label":"Routine and reversible","question":"Is the task within the written SOP and reversible?","evidence":"Approved limits, existing naming rules, and rollback path.","action":"Complete it, record the change, and link the evidence."},{"id":"bounded","label":"Bounded but material","question":"Does it change bids, budgets, targeting, or a client-facing output beyond the routine limit?","evidence":"Impact estimate, objective, target, and approval threshold.","action":"Prepare the recommendation and request approval before execution."},{"id":"high-risk","label":"High-risk or unclear","question":"Could the task affect policy, access, major spend, or account ownership?","evidence":"Permission boundary, risk, missing information, and responsible owner.","action":"Pause, escalate, and do not improvise around the boundary."}]}
+:::
+
 ## Your turn
 
 Classify these actions as independent or approval-required: add a negative from a written rule, change the daily budget, download a report, pause a whole campaign, and move a proven term to Exact. State the evidence you would attach to one approval request.

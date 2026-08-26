@@ -163,6 +163,10 @@ Diagnose the new pattern below without looking back at the kitchen-scale walkthr
 {"initialStep":0,"steps":[{"id":"attention","label":"Attention","question":"Are shoppers seeing and clicking the ad?","evidence":"Impressions, CTR, placement, query relevance, and main image.","action":"If attention is weak, inspect relevance and the listing surface."},{"id":"economics","label":"Economics","question":"Can the click cost fit the product economics?","evidence":"CPC, AOV, CVR, target ACoS, and break-even margin.","action":"If the ceiling is exceeded, inspect bids, match type, and waste."},{"id":"conversion","label":"Conversion","question":"Does the detail page close the sale?","evidence":"CVR, price, reviews, offer, bullets, and images.","action":"If clicks are healthy but orders are weak, fix the conversion surface."},{"id":"action","label":"Action","question":"Which one lever best tests the diagnosis?","evidence":"The weakest stage in the impression-to-order path.","action":"Change one lever, document the hypothesis, and set a review date."}]}
 :::
 
+:::decision-flow{id="metrics-first-move" title="Route the symptom to the first question" reveal-mode="after-choice"}
+{"initialStep":0,"steps":[{"id":"traffic","label":"Traffic","question":"Are the impressions and clicks for the intended searches?","evidence":"Impressions, CTR, search terms, and placement.","action":"If traffic is wrong, check relevance and negatives before changing the bid."},{"id":"conversion","label":"Conversion","question":"Do relevant clicks become orders?","evidence":"CVR, listing, price, reviews, stock, and offer.","action":"If conversion is weak, inspect the listing or offer before buying more traffic."},{"id":"economics","label":"Economics","question":"Can the current CPC fit the target?","evidence":"CPC, ACoS, target ACoS, margin, and objective.","action":"If cost is the constraint, choose one controlled bid or budget test."}]}
+:::
+
 ## Your turn
 
 Diagnose this pattern before reading further.

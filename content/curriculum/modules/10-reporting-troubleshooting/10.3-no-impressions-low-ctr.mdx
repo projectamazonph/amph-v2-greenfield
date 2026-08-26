@@ -34,6 +34,10 @@ For no impressions, check campaign status, review state, budget, stock, and targ
 
 A campaign shows no impressions and the status says In Review. The correct first action is to save the status, confirm product eligibility and budget, and wait for the review to clear. Do not double the bid while the ad cannot serve.
 
+:::simulation-rubric{id="top-funnel-diagnosis-submission" title="Submit a top-of-funnel diagnosis"}
+{"scenario":"A campaign has no impressions or low CTR. Diagnose the first broken handoff before recommending a bid or budget change.","criteria":[{"id":"eligibility","label":"Eligibility checked","lookFor":"Status, schedule, budget, stock, offer, and policy state are checked first.","commonError":"Raising the bid before confirming the campaign can serve."},{"id":"relevance","label":"Relevance checked","lookFor":"Search intent, targeting, title, main image, price, and reviews are compared.","commonError":"Calling low CTR a bid problem when the query is a poor fit."},{"id":"action","label":"Action is bounded","lookFor":"The recommendation names one lever, owner, expected signal, and review window.","commonError":"Changing targeting, listing, bid, and budget together."}],"submission":"Submit the symptom, evidence, first action, and next review date in the troubleshooting log."}
+:::
+
 ## Your turn
 
 An ad has no impressions and the campaign is still in review. Write the first check, the action you will not take yet, and the evidence you will wait for.
