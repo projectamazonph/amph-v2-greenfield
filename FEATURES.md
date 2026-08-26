@@ -36,6 +36,7 @@ Password-reset and transactional links use the configured application origin. Th
 - `/courses` lists published catalog rows from Postgres.
 - `/courses/[slug]` renders course detail and module metadata.
 - `/courses/[slug]/lessons/[lessonId]` renders MDX lesson content and navigation.
+- The shared lesson route presents every module through an outcome-first hero, course-progress route map, structured learning workspace, and explicit completion and next-step areas without changing the native MDX lesson inventory.
 - `/courses/[slug]/quizzes/[quizId]` is the canonical access-controlled quiz route. The legacy lesson quiz URL redirects to it, and both the page and mutation enforce course access.
 - `scripts/import-amph-content.ts` imports the MDX curriculum under `content/curriculum/` into module and lesson rows.
 - Admin course, module, and lesson CRUD is available under `/admin/courses`.

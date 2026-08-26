@@ -7,6 +7,10 @@
 - **Points**: 1
   **Status:** ✅ Done (PR #26, commit `9b0d0d6` — `feat(story-026): Lesson page (RSC + MDX render)`)
 
+### 2026-08-27 enhancement: all-module evidence pathways view
+
+The shared lesson shell and sidebar now give every native MDX lesson an outcome-first hero, a structured learning workspace, course-level progress context, deliberate completion treatment, and a clearer next-step area. The change preserves the existing route, enrollment authorization, completion action, MDX directive pipeline, quiz route, and accessible collapsible navigation. It applies once to all curriculum modules because the update is contained in the shared lesson route components and styles.
+
 ## Overview
 
 Create a standalone lesson page that renders course content. This is the student's primary reading/watching experience. Includes a lesson sidebar for navigation between lessons in the same course.

@@ -4,6 +4,12 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-08-27: Evidence pathways lesson view for all modules (STORY-026)
+
+- Restyle the shared student lesson shell and route map for every native MDX lesson. The view now prioritizes a clear outcome, visible course progress, distinct learning workspace, native interactive directives, completion action, and next-step navigation.
+- Preserve course slugs, curriculum inventory, enrollment access, completion actions, MDX directives, quiz routing, and existing accessibility behavior. The change is scoped to shared lesson presentation and does not duplicate or rewrite the 42 lesson files.
+- Add sidebar progress assertions and an all-module learning-flow contract to the native lesson tests. Focused lesson tests, curriculum inventory validation, lesson-production validation, type checking, and targeted lint pass locally.
+
 ### 2026-08-21: LEARN-025 Module 4 campaign pre-flight maps (STORY-127)
 
 - Require every Module 4 lesson to add a build-ready campaign-map decision,

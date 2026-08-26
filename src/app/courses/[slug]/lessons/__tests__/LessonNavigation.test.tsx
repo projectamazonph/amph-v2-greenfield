@@ -50,6 +50,8 @@ describe("LessonSidebar", () => {
       "aria-expanded",
       "false",
     );
+    expect(screen.getByLabelText("Course progress: 0%")).toBeInTheDocument();
+    expect(screen.getByText("0 of 3 lessons")).toBeInTheDocument();
   });
 
   it("allows students to collapse one section and open another", async () => {

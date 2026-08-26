@@ -77,3 +77,18 @@ describe("P0-5: lesson page uses AuthorizeLessonAccess", () => {
     expect(source).toMatch(/new AuthorizeLessonAccess\(/);
   });
 });
+
+describe("shared lesson-view shell", () => {
+  it("keeps the native lesson renderer inside an outcome-first workspace", async () => {
+    const p = path.resolve(
+      process.cwd(),
+      "src/app/courses/[slug]/lessons/[lessonId]/page.tsx",
+    );
+    const source = await fs.readFile(p, "utf8");
+
+    expect(source).toMatch(/className=\{styles\.lessonHeader\}/);
+    expect(source).toMatch(/className=\{styles\.lessonWorkspace\}/);
+    expect(source).toMatch(/<LessonContent lesson=\{selectedLessonResult\.value\} courseSlug=\{slug\} \/>/);
+    expect(source).toMatch(/className=\{styles\.completionCard\}/);
+  });
+});

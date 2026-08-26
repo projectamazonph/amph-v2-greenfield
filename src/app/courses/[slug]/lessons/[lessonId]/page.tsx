@@ -246,9 +246,15 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           </Link>
 
           {/* Lesson header */}
-          <div className={styles.lessonHeader}>
-            <p className={styles.sectionLabel}>{sectionTitle}</p>
-            <h1 className={styles.lessonTitle}>{lesson.title}</h1>
+          <section className={styles.lessonHeader} aria-labelledby="lesson-title">
+            <div className={styles.heroKicker}>
+              <span>Learning step</span>
+              <span>{sectionTitle}</span>
+            </div>
+            <h1 id="lesson-title" className={styles.lessonTitle}>{lesson.title}</h1>
+            <p className={styles.lessonOutcome}>
+              Use this lesson to make one clearer next decision in your PPC workflow.
+            </p>
             {(() => {
               const est = estimateReadingMinutes(lesson);
               const label =
@@ -264,13 +270,20 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
                     <Icon size={14} aria-hidden className={styles.lessonMetaIcon} />
                     {label}
                   </span>
+                  <span className={styles.lessonMetaItem}>Read, decide, then apply</span>
                 </div>
               );
             })()}
-          </div>
+          </section>
 
           {/* Lesson body */}
-          <LessonContent lesson={selectedLessonResult.value} courseSlug={slug} />
+          <section className={styles.lessonWorkspace} aria-label="Lesson workspace">
+            <div className={styles.workspaceHeading}>
+              <span>Lesson workspace</span>
+              <p>Work through one idea, then use the evidence before your next move.</p>
+            </div>
+            <LessonContent lesson={selectedLessonResult.value} courseSlug={slug} />
+          </section>
 
           {completionStatus.completed === "1" ? (
             <p className="alert-success" role="status">
@@ -286,15 +299,29 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           ) : null}
 
           {hasActiveEnrollment ? (
-            <form action={completeLesson} className={styles.completionForm}>
-              <Button variant={isCompleted ? "secondary" : "primary"} size="md" type="submit">
-                {isCompleted ? "Completed" : "Mark as Complete"}
-              </Button>
-            </form>
+            <section className={styles.completionCard} aria-label="Lesson completion">
+              <div>
+                <p className={styles.completionEyebrow}>Apply the learning</p>
+                <h2 className={styles.completionTitle}>
+                  {isCompleted ? "This step is recorded." : "Ready to close this step?"}
+                </h2>
+                <p className={styles.completionText}>
+                  {isCompleted
+                    ? "Your progress is updated. Continue when you are ready for the next decision."
+                    : "Mark this lesson complete after you have worked through the evidence and practice."}
+                </p>
+              </div>
+              <form action={completeLesson} className={styles.completionForm}>
+                <Button variant={isCompleted ? "secondary" : "primary"} size="md" type="submit">
+                  {isCompleted ? "Completed" : "Mark as Complete"}
+                </Button>
+              </form>
+            </section>
           ) : null}
 
           {/* Prev / Next navigation */}
           <div className={styles.navFooter}>
+            <p className={styles.navFooterLabel}>Continue your pathway</p>
             <LessonNavButtons
               courseSlug={slug}
               prevLesson={previousLesson}
