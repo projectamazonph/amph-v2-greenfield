@@ -23,4 +23,10 @@ describe("lesson content layout contract", () => {
     expect(source).toContain(".prose > :first-child");
     expect(source).toContain(".prose > :last-child");
   });
+
+  it("keeps fenced lesson text readable on the inverse code-block surface", () => {
+    expect(source).toMatch(/\.prose pre\s*\{[^}]*background:\s*var\(--surface-3\);/);
+    expect(source).toMatch(/\.prose pre\s*\{[^}]*color:\s*var\(--ink-inverse\);/);
+    expect(source).not.toMatch(/\.prose pre\s*\{[^}]*color:\s*var\(--accent-ink\);/);
+  });
 });
