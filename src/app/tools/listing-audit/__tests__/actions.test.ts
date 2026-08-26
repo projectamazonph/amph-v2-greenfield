@@ -402,6 +402,7 @@ describe("listingAuditAttempt", () => {
       amount: 25,
       reason: "simulator_challenge_passed",
       refId: "ATT-XYZ789",
+      idempotencyKey: "simulator_challenge_passed:user_123:ATT-XYZ789",
     });
     expect(result.value.xpAwarded).toBe(25);
   });

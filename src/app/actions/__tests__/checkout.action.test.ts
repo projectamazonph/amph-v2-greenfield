@@ -16,6 +16,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { rateLimitKey } from "@/ports/security/rateLimitKey";
 
 // ── Mocks ────────────────────────────────────────────────
 
@@ -111,9 +112,8 @@ describe("startCheckout (server action)", () => {
     await startCheckout({ kind: "idle" }, makeFormData({ courseSlug: "ppc-101" }));
 
     expect(mockRateLimiter).toHaveBeenCalledWith({
-      key: "checkout:user:user-1",
-      limit: 10,
-      windowSeconds: 3600,
+      key: rateLimitKey("checkout:user", "user-1"),
+      policy: "checkout_user",
     });
   });
 

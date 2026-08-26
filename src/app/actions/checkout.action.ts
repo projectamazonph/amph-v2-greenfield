@@ -28,6 +28,7 @@
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import type { CreatePaymentIntentError } from "@/usecases/CreatePaymentIntent";
+import { rateLimitKey } from "@/ports/security/rateLimitKey";
 
 export type CheckoutActionState =
   | { kind: "idle" }
@@ -40,9 +41,8 @@ export type CheckoutActionState =
   | { kind: "already_enrolled" }
   | { kind: "payment_error"; message: string }
   | { kind: "rate_limited"; retryAfterSeconds: number }
+  | { kind: "rate_limiter_unavailable" }
   | { kind: "redirect"; checkoutUrl: string; orderId: string };
-
-const CHECKOUT_RATE_LIMIT = { limit: 10, windowSeconds: 3600 }; // 10 per hour
 
 const INITIAL: CheckoutActionState = { kind: "idle" };
 export const CHECKOUT_INITIAL_STATE = INITIAL;
@@ -77,14 +77,18 @@ export async function startCheckout(
 
   // Rate limit checkout attempts per authenticated user
   const limitResult = await container.rateLimiter.check({
-    key: `checkout:user:${userId}`,
-    ...CHECKOUT_RATE_LIMIT,
+    key: rateLimitKey("checkout:user", userId),
+    policy: "checkout_user",
   });
   if (limitResult.ok && !limitResult.value.allowed) {
     return { kind: "rate_limited", retryAfterSeconds: limitResult.value.resetSeconds };
   }
   if (!limitResult.ok) {
-    console.error("[startCheckout] rate limiter error:", limitResult.error.message);
+    console.error("[startCheckout] rate limiter error:", {
+      kind: limitResult.error.kind,
+      message: limitResult.error.message,
+    });
+    return { kind: "rate_limiter_unavailable" };
   }
   const result = await container.createPaymentIntent.execute({
     userId,

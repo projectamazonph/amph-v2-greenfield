@@ -34,7 +34,7 @@ import type { EmailSender } from "@/ports/email/EmailSender";
 import { EmailVerificationTemplateRenderer } from "@/infra/email/templates/EmailVerificationRenderer";
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import { createEmailTemplate } from "@/domain/entities/EmailTemplate";
-import type { RateLimiter, RateLimitResult } from "@/ports/security/RateLimiter";
+import type { RateLimiter, RateLimitInput, RateLimitResult } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
 class SilentLogger implements Logger {
@@ -69,13 +69,9 @@ class StubEmailSender implements EmailSender {
 }
 
 class StubRateLimiter implements RateLimiter {
-  public calls: Array<{ key: string; limit: number; windowSeconds: number }> = [];
+  public calls: RateLimitInput[] = [];
   constructor(private readonly allowed: boolean) {}
-  async check(input: {
-    key: string;
-    limit: number;
-    windowSeconds: number;
-  }): Promise<Result<RateLimitResult, never>> {
+  async check(input: RateLimitInput): Promise<Result<RateLimitResult, never>> {
     this.calls.push(input);
     return Result.ok({
       allowed: this.allowed,
@@ -176,7 +172,8 @@ describe("ResendVerification", () => {
 
     // A token record was persisted (hashed)
     expect(rateLimiter.calls).toHaveLength(1);
-    expect(rateLimiter.calls[0]!.key).toBe("user-1");
+    expect(rateLimiter.calls[0]!.key).toMatch(/^amph:verification-resend:user:[a-f0-9]{64}$/);
+    expect(rateLimiter.calls[0]!.policy).toBe("verification_resend_user");
   });
 
   it("personalizes supported placeholders in the admin-customized template", async () => {

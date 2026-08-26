@@ -7,7 +7,7 @@
  * 1. Find badge by slug → badge_not_found
  * 2. Check if already awarded → already_awarded
  * 3. Create BadgeAward row
- * 4. Award badge.xpReward XP (fire-and-forget)
+ * 4. Award badge.xpReward XP through the atomic idempotent writer
  * 5. Return { badgeAward, xpAwarded }
  */
 
@@ -100,20 +100,30 @@ export class AwardBadge {
     }
     const badgeAward = persistResult.value;
 
-    // ── 4. Award XP (fire-and-forget) ─────────────────────────
+    // ── 4. Award XP through the atomic idempotent writer ────────────
+    let xpAwarded = 0;
     if (badge.xpReward > 0) {
-      this.deps.awardXp
-        .execute({
+      try {
+        const xpResult = await this.deps.awardXp.execute({
           userId: input.userId,
           amount: badge.xpReward,
           reason: "badge_awarded",
           refId: badgeAward.id,
-        })
-        .catch((err: unknown) => {
-          console.error("[AwardBadge] Failed to award badge XP:", err);
+          idempotencyKey: `badge_awarded:${input.userId}:${badge.slug}`,
         });
+        if (xpResult.ok) {
+          xpAwarded = badge.xpReward;
+        } else {
+          // The badge row is already durable. Keep the successful badge result
+          // but surface the failure in logs; reconciliation can retry the
+          // stable idempotency key without duplicating XP.
+          console.error("[AwardBadge] Failed to award badge XP:", xpResult.error);
+        }
+      } catch (err: unknown) {
+        console.error("[AwardBadge] Failed to award badge XP:", err);
+      }
     }
 
-    return Result.ok({ badgeAward, xpAwarded: badge.xpReward });
+    return Result.ok({ badgeAward, xpAwarded });
   }
 }

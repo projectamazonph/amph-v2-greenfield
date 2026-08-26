@@ -35,11 +35,7 @@ import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Logger } from "@/ports/observability/Logger";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
-
-const EMAIL_LIMIT = 5;
-const EMAIL_WINDOW_SECONDS = 3600;
-const IP_LIMIT = 20;
-const IP_WINDOW_SECONDS = 3600;
+import { rateLimitKey } from "@/ports/security/rateLimitKey";
 const TOKEN_TTL_HOURS = 1;
 
 const emailSchema = z.string().email();
@@ -47,7 +43,9 @@ const emailSchema = z.string().email();
 export type RequestPasswordResetInput = { email: string; ip: string };
 export type RequestPasswordResetOutput = { sent: true };
 export type RequestPasswordResetError =
-  { kind: "rate_limited"; resetAt: Date } | { kind: "validation_failed"; message: string };
+  | { kind: "rate_limited"; resetAt: Date }
+  | { kind: "validation_failed"; message: string }
+  | { kind: "rate_limiter_unavailable" };
 
 export interface RequestPasswordResetDeps {
   users: UserRepository;
@@ -83,9 +81,8 @@ export class RequestPasswordReset {
 
     // 2. Rate-limit by email.
     const emailRL = await this.deps.rateLimiter.check({
-      key: `email:${email}`,
-      limit: EMAIL_LIMIT,
-      windowSeconds: EMAIL_WINDOW_SECONDS,
+      key: rateLimitKey("password-reset:email", email),
+      policy: "password_reset_email",
     });
     if (emailRL.ok && !emailRL.value.allowed) {
       return Result.err({
@@ -93,18 +90,31 @@ export class RequestPasswordReset {
         resetAt: new Date(this.deps.clock.now().getTime() + emailRL.value.resetSeconds * 1000),
       });
     }
+    if (!emailRL.ok) {
+      this.deps.logger.error("request_password_reset.rate_limiter_unavailable", {
+        kind: emailRL.error.kind,
+        message: emailRL.error.message,
+      });
+      return Result.err({ kind: "rate_limiter_unavailable" });
+    }
 
     // 3. Rate-limit by IP.
     const ipRL = await this.deps.rateLimiter.check({
-      key: `ip:${input.ip}`,
-      limit: IP_LIMIT,
-      windowSeconds: IP_WINDOW_SECONDS,
+      key: rateLimitKey("password-reset:ip", input.ip),
+      policy: "password_reset_ip",
     });
     if (ipRL.ok && !ipRL.value.allowed) {
       return Result.err({
         kind: "rate_limited",
         resetAt: new Date(this.deps.clock.now().getTime() + ipRL.value.resetSeconds * 1000),
       });
+    }
+    if (!ipRL.ok) {
+      this.deps.logger.error("request_password_reset.rate_limiter_unavailable", {
+        kind: ipRL.error.kind,
+        message: ipRL.error.message,
+      });
+      return Result.err({ kind: "rate_limiter_unavailable" });
     }
 
     // 4. Look up user (case-insensitive).

@@ -61,6 +61,7 @@ import { InMemoryDiscountCodeRepository } from "@/infra/repositories/InMemoryDis
 import { InMemoryQuizRepository } from "@/infra/repositories/InMemoryQuizRepository";
 import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
 import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
+import { InMemoryXPAwardRepository } from "@/infra/repositories/InMemoryXPAwardRepository";
 import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepository";
 import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
@@ -242,6 +243,7 @@ export interface TestContainer extends AppContainer {
   quizRepo: InMemoryQuizRepository;
   quizAttemptRepo: InMemoryQuizAttemptRepository;
   xpEventRepo: InMemoryXPEventRepository;
+  xpAwardRepo: InMemoryXPAwardRepository;
   badgeRepo: InMemoryBadgeRepository;
   badgeAwardRepo: InMemoryBadgeAwardRepository;
   emailTemplateRepo: InMemoryEmailTemplateRepository;
@@ -291,6 +293,7 @@ export function buildTestContainer(): TestContainer {
   const quizRepo = new InMemoryQuizRepository();
   const quizAttemptRepo = new InMemoryQuizAttemptRepository();
   const xpEventRepo = new InMemoryXPEventRepository();
+  const xpAwardRepo = new InMemoryXPAwardRepository(userRepo);
   const badgeRepo = new InMemoryBadgeRepository();
   const badgeAwardRepo = new InMemoryBadgeAwardRepository();
   const emailTemplateRepo = new InMemoryEmailTemplateRepository();
@@ -310,6 +313,7 @@ export function buildTestContainer(): TestContainer {
   const receiptEmailRenderer = new ReceiptTemplateRenderer();
   const refundEmailRenderer = new RefundTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
+  const awardXp = new AwardXP({ xpAwardRepo, idGen, clock });
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new StaticCertificateRenderer();
@@ -450,6 +454,7 @@ export function buildTestContainer(): TestContainer {
     quizRepo,
     quizAttemptRepo,
     xpEventRepo,
+    xpAwardRepo,
     badgeRepo,
     badgeAwardRepo,
     certificateRepo,
@@ -463,17 +468,16 @@ export function buildTestContainer(): TestContainer {
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,
       quizAttemptRepo,
-      xpEventRepo,
-      userRepo,
+      awardXp,
       idGen,
       clock,
       accessPolicy,
     }),
-    awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+    awardXp,
     awardBadge: new AwardBadge({
       badgeRepo,
       badgeAwardRepo,
-      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+      awardXp,
       idGen,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
@@ -823,7 +827,7 @@ export function buildTestContainer(): TestContainer {
       liveClassRepo,
       liveClassRegistrationRepo,
       enrollmentRepo,
-      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+      awardXp,
       clock,
     }),
     // STORY-098: download center resources

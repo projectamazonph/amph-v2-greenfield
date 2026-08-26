@@ -59,7 +59,7 @@ describe("MarkLiveClassRecordingWatched", () => {
     mockAwardXp.execute.mockClear();
     mockAwardXp.execute.mockResolvedValue({
       ok: true,
-      value: { xpEvent: null as unknown, totalXp: 15 },
+      value: { xpEvent: null as unknown, totalXp: 15, applied: true },
     });
   });
 
@@ -89,10 +89,11 @@ describe("MarkLiveClassRecordingWatched", () => {
       amount: 15,
       reason: "live_class_attended",
       refId: "lc-1",
+      idempotencyKey: "live_class_attended:u-2:lc-1",
     });
   });
 
-  it("is idempotent — a second call does not re-award XP", async () => {
+  it("is idempotent — a second call retries the same XP award key", async () => {
     const liveClassRepo = makeRepo();
     const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
     const seed = createLiveClassRegistration({ id: "r-1", userId: "u-2", liveClassId: "lc-1" });
@@ -112,7 +113,13 @@ describe("MarkLiveClassRecordingWatched", () => {
     const r = await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.value.watchedRecordingAt).toEqual(new Date("2026-08-03T00:00:00Z"));
-    expect(mockAwardXp.execute).not.toHaveBeenCalled();
+    expect(mockAwardXp.execute).toHaveBeenCalledWith({
+      userId: "u-2",
+      amount: 15,
+      reason: "live_class_attended",
+      refId: "lc-1",
+      idempotencyKey: "live_class_attended:u-2:lc-1",
+    });
   });
 
   it("is race-safe — two concurrent calls award XP exactly once", async () => {
@@ -144,7 +151,13 @@ describe("MarkLiveClassRecordingWatched", () => {
 
     expect(r1.ok).toBe(true);
     expect(r2.ok).toBe(true);
-    expect(mockAwardXp.execute).toHaveBeenCalledTimes(1);
+    expect(mockAwardXp.execute).toHaveBeenCalledTimes(2);
+    expect(mockAwardXp.execute.mock.calls[0]![0].idempotencyKey).toBe(
+      "live_class_attended:u-2:lc-1",
+    );
+    expect(mockAwardXp.execute.mock.calls[1]![0].idempotencyKey).toBe(
+      "live_class_attended:u-2:lc-1",
+    );
   });
 
   it("returns not_found when the live class does not exist", async () => {

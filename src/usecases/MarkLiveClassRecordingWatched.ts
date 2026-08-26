@@ -2,15 +2,15 @@
  * `MarkLiveClassRecordingWatched` — STORY-100.
  *
  * A student marks a completed live class's posted recording as watched.
- * Awards `XPService.LIVE_CLASS_ATTENDED_XP` once per (user, live class),
- * fire-and-forget, mirroring `AwardBadge`'s XP-award pattern.
+ * Awards `XPService.LIVE_CLASS_ATTENDED_XP` once per (user, live class)
+ * through an atomic, idempotent XP writer.
  *
  * Rules:
  *  1. Live class must exist → not_found
  *  2. Live class must be completed and have a recording → recording_not_available
  *  3. Caller must have an RSVP row for this class → not_registered
- *  4. Idempotent: if already watched, returns the existing registration
- *     without re-awarding XP.
+ *  4. Idempotent: if already watched, ensures the XP award exists and
+ *     returns the existing registration.
  *
  * Race safety: the "already watched?" guard used to be a plain read
  * (`findByUserAndClass`) followed by an unconditional `update()` — two
@@ -93,8 +93,9 @@ export class MarkLiveClassRecordingWatched {
     }
 
     if (registration.watchedRecordingAt) {
-      // Already watched — idempotent no-op, no duplicate XP. Read-avoidance
-      // fast path only; the atomic call below is the real guard.
+      // Retry the idempotent award so a prior process failure between the
+      // registration update and reward write can repair itself.
+      await this.ensureXpAwarded(input.userId, liveClass.id);
       return Result.ok(registration);
     }
 
@@ -113,8 +114,8 @@ export class MarkLiveClassRecordingWatched {
 
     if (!markResult.value) {
       // Someone else won the race between our read above and this write —
-      // it's already watched. Re-fetch for the accurate persisted state
-      // rather than fabricating one; no XP award, same as the fast path.
+      // it's already watched. Re-fetch for the accurate persisted state and
+      // ensure the idempotent reward exists.
       const refetch = await this.deps.liveClassRegistrationRepo.findByUserAndClass(
         input.userId,
         input.liveClassId,
@@ -122,22 +123,26 @@ export class MarkLiveClassRecordingWatched {
       if (!refetch.ok || !refetch.value) {
         return Result.err({ kind: "db_error", message: "registration lookup failed" });
       }
+      await this.ensureXpAwarded(input.userId, liveClass.id);
       return Result.ok(refetch.value);
     }
 
     const updated = markRecordingWatched(registration, now);
-
-    this.deps.awardXp
-      .execute({
-        userId: input.userId,
-        amount: XPService.LIVE_CLASS_ATTENDED_XP,
-        reason: "live_class_attended",
-        refId: liveClass.id,
-      })
-      .catch((err: unknown) => {
-        console.error("[MarkLiveClassRecordingWatched] Failed to award XP:", err);
-      });
+    await this.ensureXpAwarded(input.userId, liveClass.id);
 
     return Result.ok(updated);
+  }
+
+  private async ensureXpAwarded(userId: string, liveClassId: string): Promise<void> {
+    const xpResult = await this.deps.awardXp.execute({
+      userId,
+      amount: XPService.LIVE_CLASS_ATTENDED_XP,
+      reason: "live_class_attended",
+      refId: liveClassId,
+      idempotencyKey: `live_class_attended:${userId}:${liveClassId}`,
+    });
+    if (!xpResult.ok) {
+      console.error("[MarkLiveClassRecordingWatched] Failed to award XP:", xpResult.error);
+    }
   }
 }

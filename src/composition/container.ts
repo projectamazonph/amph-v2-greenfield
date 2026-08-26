@@ -54,6 +54,7 @@ import type { IDiscountCodeRepository } from "@/ports/repositories/IDiscountCode
 import type { IQuizRepository } from "@/ports/repositories/IQuizRepository";
 import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRepository";
 import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
+import type { IXPAwardRepository } from "@/ports/repositories/IXPAwardRepository";
 import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
 import type { ICertificateRepository } from "@/ports/repositories/ICertificateRepository";
@@ -87,6 +88,7 @@ import { PrismaDiscountCodeRepository } from "@/infra/repositories/PrismaDiscoun
 import { PrismaQuizRepository } from "@/infra/repositories/PrismaQuizRepository";
 import { PrismaQuizAttemptRepository } from "@/infra/repositories/PrismaQuizAttemptRepository";
 import { PrismaXPEventRepository } from "@/infra/repositories/PrismaXPEventRepository";
+import { PrismaXPAwardRepository } from "@/infra/repositories/PrismaXPAwardRepository";
 import { PrismaBadgeRepository } from "@/infra/repositories/PrismaBadgeRepository";
 import { PrismaBadgeAwardRepository } from "@/infra/repositories/PrismaBadgeAwardRepository";
 import { PrismaCertificateRepository } from "@/infra/repositories/PrismaCertificateRepository";
@@ -546,6 +548,7 @@ function buildProductionContainer(): AppContainer {
   const quizRepo: IQuizRepository = new PrismaQuizRepository(prisma);
   const quizAttemptRepo: IQuizAttemptRepository = new PrismaQuizAttemptRepository(prisma);
   const xpEventRepo: IXPEventRepository = new PrismaXPEventRepository(prisma);
+  const xpAwardRepo: IXPAwardRepository = new PrismaXPAwardRepository(prisma);
   const badgeRepo: IBadgeRepository = new PrismaBadgeRepository(prisma);
   const badgeAwardRepo: IBadgeAwardRepository = new PrismaBadgeAwardRepository(prisma);
   const certificateRepo: ICertificateRepository = new PrismaCertificateRepository(prisma);
@@ -678,6 +681,8 @@ function buildProductionContainer(): AppContainer {
     emailTemplateRepo,
   });
 
+  const awardXp = new AwardXP({ xpAwardRepo, idGen, clock });
+
   return {
     clock,
     idGen,
@@ -786,17 +791,16 @@ function buildProductionContainer(): AppContainer {
     recordQuizAttempt: new RecordQuizAttempt({
       quizRepo,
       quizAttemptRepo,
-      xpEventRepo,
-      userRepo,
+      awardXp,
       idGen,
       clock,
       accessPolicy,
     }),
-    awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+    awardXp,
     awardBadge: new AwardBadge({
       badgeRepo,
       badgeAwardRepo,
-      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+      awardXp,
       idGen,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
@@ -1101,7 +1105,7 @@ function buildProductionContainer(): AppContainer {
       liveClassRepo,
       liveClassRegistrationRepo,
       enrollmentRepo,
-      awardXp: new AwardXP({ xpEventRepo, userRepo, idGen, clock }),
+      awardXp,
       clock,
     }),
     // STORY-098: download center resources
@@ -1174,6 +1178,14 @@ export function validateRequiredEnvVars(): void {
         "without it, resource file storage silently falls back to LocalFileStorage, which does " +
         "not persist on Vercel's serverless filesystem)",
     );
+  }
+  if (process.env.NODE_ENV === "production") {
+    if (!process.env.UPSTASH_REDIS_REST_URL) {
+      throw new Error("Missing required environment variable: UPSTASH_REDIS_REST_URL");
+    }
+    if (!process.env.UPSTASH_REDIS_REST_TOKEN) {
+      throw new Error("Missing required environment variable: UPSTASH_REDIS_REST_TOKEN");
+    }
   }
 }
 
