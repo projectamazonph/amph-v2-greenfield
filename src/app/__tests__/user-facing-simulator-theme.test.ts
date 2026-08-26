@@ -32,6 +32,15 @@ describe("user-facing simulator theme", () => {
     expect(css).toMatch(/^\.signUp\s*\{[\s\S]*?background:\s*var\(--c-orange\)/m);
   });
 
+  it("uses a compact public header and two-column plan grid before desktop widths", () => {
+    const headerCss = source("src/components/student/PublicCatalogHeader.module.css");
+    const pricingCss = source("src/app/pricing/page.module.css");
+
+    expect(headerCss).toMatch(/@media\s*\(max-width:\s*640px\)[\s\S]*?\.navLink\s*\{\s*display:\s*none/);
+    expect(pricingCss).toMatch(/@media\s*\(min-width:\s*640px\)[\s\S]*?grid-template-columns:\s*1fr\s+1fr/);
+    expect(pricingCss).toMatch(/@media\s*\(min-width:\s*1024px\)[\s\S]*?grid-template-columns:\s*1fr\s+1fr\s+1fr/);
+  });
+
   it("gives login and signup cards the white simulator surface and restrained elevation", () => {
     for (const file of [
       "src/app/login/LoginForm.module.css",

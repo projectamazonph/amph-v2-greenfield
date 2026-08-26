@@ -140,7 +140,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .inner {
     padding: var(--sp-3) var(--sp-4);
   }
