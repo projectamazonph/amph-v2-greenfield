@@ -2303,7 +2303,8 @@
       "evidenceOutput": "Lesson artifact for 10.1-simple-report-structure",
       "disposition": "merged",
       "mergeReason": "Source orientation content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-2",
@@ -2321,7 +2322,8 @@
       "evidenceOutput": "Lesson artifact for 10.1-simple-report-structure",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-3",
@@ -2339,7 +2341,8 @@
       "evidenceOutput": "Lesson artifact for 10.1-simple-report-structure",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-4",
@@ -2357,7 +2360,8 @@
       "evidenceOutput": "Lesson artifact for 10.1-simple-report-structure",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-5",
@@ -2375,7 +2379,8 @@
       "evidenceOutput": "Lesson artifact for 10.3-no-impressions-low-ctr",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-6",
@@ -2393,7 +2398,8 @@
       "evidenceOutput": "Lesson artifact for 10.3-no-impressions-low-ctr",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-7",
@@ -2411,7 +2417,8 @@
       "evidenceOutput": "Lesson artifact for 10.3-no-impressions-low-ctr",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-8",
@@ -2429,7 +2436,8 @@
       "evidenceOutput": "Lesson artifact for 10.4-clicks-no-sales-high-acos",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-9",
@@ -2447,7 +2455,8 @@
       "evidenceOutput": "Decision note for 10.4-clicks-no-sales-high-acos",
       "disposition": "merged",
       "mergeReason": "Source practice content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-10",
@@ -2465,7 +2474,8 @@
       "evidenceOutput": "Safety boundary and escalation note",
       "disposition": "merged",
       "mergeReason": "Source safety content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-11",
@@ -2483,7 +2493,8 @@
       "evidenceOutput": "Evidence row with date, signal, action, and next review",
       "disposition": "merged",
       "mergeReason": "Source evidence content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m10-slide-12",
@@ -2501,7 +2512,8 @@
       "evidenceOutput": "Module-final quiz attempt and next simulator action",
       "disposition": "merged",
       "mergeReason": "Source assessment content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-1",
@@ -2519,7 +2531,8 @@
       "evidenceOutput": "Lesson artifact for 11.1-tasks-by-cadence",
       "disposition": "merged",
       "mergeReason": "Source orientation content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-2",
@@ -2537,7 +2550,8 @@
       "evidenceOutput": "Lesson artifact for 11.1-tasks-by-cadence",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-3",
@@ -2555,7 +2569,8 @@
       "evidenceOutput": "Lesson artifact for 11.2-permissions-ladder",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-4",
@@ -2573,7 +2588,8 @@
       "evidenceOutput": "Lesson artifact for 11.3-sops-change-log",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-5",
@@ -2591,7 +2607,8 @@
       "evidenceOutput": "Lesson artifact for 11.3-sops-change-log",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-6",
@@ -2609,7 +2626,8 @@
       "evidenceOutput": "Lesson artifact for 11.2-permissions-ladder",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-7",
@@ -2627,7 +2645,8 @@
       "evidenceOutput": "Lesson artifact for 11.4-client-communication-capstone",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-8",
@@ -2645,7 +2664,8 @@
       "evidenceOutput": "Lesson artifact for 11.4-client-communication-capstone",
       "disposition": "merged",
       "mergeReason": "Source concept content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-9",
@@ -2663,7 +2683,8 @@
       "evidenceOutput": "Decision note for 11.4-client-communication-capstone",
       "disposition": "merged",
       "mergeReason": "Source practice content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-10",
@@ -2681,7 +2702,8 @@
       "evidenceOutput": "Safety boundary and escalation note",
       "disposition": "merged",
       "mergeReason": "Source safety content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-11",
@@ -2699,7 +2721,8 @@
       "evidenceOutput": "Evidence row with date, signal, action, and next review",
       "disposition": "merged",
       "mergeReason": "Source evidence content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     },
     {
       "sourceId": "m11-slide-12",
@@ -2717,7 +2740,8 @@
       "evidenceOutput": "Module-final quiz attempt and next simulator action",
       "disposition": "merged",
       "mergeReason": "Source assessment content is consolidated into the target lesson's native MDX learning sequence; preserve the concept, action, and evidence payload without recreating a standalone slide page.",
-      "editorialStatus": "queued"
+      "editorialStatus": "ported",
+      "editorialNotes": "Wave 4 operational parity port applied: the target lesson contains a native report, diagnostic, permissions, evidence, or capstone representation of this source teaching role; final side-by-side editorial review remains open."
     }
   ]
 }
