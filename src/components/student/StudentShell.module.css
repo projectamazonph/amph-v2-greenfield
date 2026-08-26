@@ -58,6 +58,13 @@
     flex-direction: column;
     overflow-x: hidden;
   }
+
+  /* The fixed mobile drawer control occupies the first 52px of the viewport.
+     Match the admin shell’s safe content start so learner-page titles and
+     actions cannot sit beneath the toggle. */
+  .main {
+    padding-top: 72px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

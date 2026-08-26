@@ -19,6 +19,12 @@ describe("user-facing simulator theme", () => {
     expect(css).toMatch(/\.active::before\s*\{[\s\S]*?background:\s*var\(--c-orange\)/);
   });
 
+  it("reserves a mobile content safe area beneath the fixed learner navigation toggle", () => {
+    const css = source("src/components/student/StudentShell.module.css");
+
+    expect(css).toMatch(/@media\s*\(max-width:\s*1023px\)[\s\S]*?\.main\s*\{[\s\S]*?padding-top:\s*72px/);
+  });
+
   it("uses simulator shell chrome in the anonymous catalog header", () => {
     const css = source("src/components/student/PublicCatalogHeader.module.css");
 
