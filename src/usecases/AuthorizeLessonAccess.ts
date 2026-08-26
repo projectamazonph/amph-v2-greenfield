@@ -22,6 +22,11 @@ import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { Course } from "@/domain/entities/Course";
 import { subscriptionMeetsCourseTier } from "@/domain/values/CourseAccessTier";
+import {
+  isLessonUnlocked,
+  orderLearnerModules,
+  prerequisiteForLesson,
+} from "@/domain/curriculum/GuidedFlow";
 
 export type AuthorizeLessonAccessInput = {
   /** Empty string = anonymous. */
@@ -33,7 +38,11 @@ export type AuthorizeLessonAccessInput = {
 export type AuthorizeLessonAccessDecision =
   | { readonly kind: "allowed" }
   | { readonly kind: "allowed_preview"; readonly previewLessonCount: number }
-  | { readonly kind: "denied"; readonly reason: "preview_limit" | "not_enrolled" };
+  | {
+      readonly kind: "denied";
+      readonly reason: "preview_limit" | "not_enrolled" | "prerequisite";
+      readonly previousLessonTitle?: string;
+    };
 
 export type AuthorizeLessonAccessError =
   { kind: "course_not_found" } | { kind: "lesson_not_found" } | { kind: "user_not_found" };
@@ -94,18 +103,35 @@ export class AuthorizeLessonAccess {
       input.courseId,
     );
     if (enrollment !== null && enrollment.status === "active") {
-      return Result.ok({ kind: "allowed" });
+      return this.guidedDecision(course, input.lessonId, enrollment.completedLessonIds);
     }
 
     if (
       course.courseTier !== "PREVIEW" &&
       subscriptionMeetsCourseTier(user.subscriptionTier, course.courseTier)
     ) {
-      return Result.ok({ kind: "allowed" });
+      return this.guidedDecision(course, input.lessonId, enrollment?.completedLessonIds ?? []);
     }
 
     // 7. Not enrolled (or refunded) → preview window only.
     return Result.ok(this.previewDecision(course, lessonIndex));
+  }
+
+  private guidedDecision(
+    course: Course,
+    lessonId: string,
+    completedLessonIds: readonly string[],
+  ): AuthorizeLessonAccessResult {
+    const guidedSections = orderLearnerModules(course.curriculum.sections);
+    if (isLessonUnlocked(guidedSections, completedLessonIds, lessonId)) {
+      return Result.ok({ kind: "allowed" });
+    }
+    const prerequisite = prerequisiteForLesson(guidedSections, lessonId);
+    return Result.ok({
+      kind: "denied",
+      reason: "prerequisite",
+      previousLessonTitle: prerequisite?.title,
+    });
   }
 
   private previewDecision(course: Course, lessonIndex: number): AuthorizeLessonAccessDecision {

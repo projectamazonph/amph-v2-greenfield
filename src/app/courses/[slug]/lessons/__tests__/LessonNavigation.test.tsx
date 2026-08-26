@@ -16,15 +16,19 @@ const course = {
         title: "Foundations",
         lessons: [
           { id: "lesson-1", title: "Account structure", type: "TEXT" as const, content: {} },
-          { id: "lesson-2", title: "Search intent", type: "VIDEO" as const, plannedMinutes: 12, content: {} },
+          {
+            id: "lesson-2",
+            title: "Search intent",
+            type: "VIDEO" as const,
+            plannedMinutes: 12,
+            content: {},
+          },
         ],
       },
       {
         id: "section-2",
         title: "Optimization",
-        lessons: [
-          { id: "lesson-3", title: "Bid decisions", type: "TEXT" as const, content: {} },
-        ],
+        lessons: [{ id: "lesson-3", title: "Bid decisions", type: "TEXT" as const, content: {} }],
       },
     ],
   },
@@ -32,13 +36,7 @@ const course = {
 
 describe("LessonSidebar", () => {
   it("keeps the current section open and exposes the current lesson", () => {
-    render(
-      <LessonSidebar
-        course={course}
-        currentLessonId="lesson-1"
-        completedLessonIds={[]}
-      />,
-    );
+    render(<LessonSidebar course={course} currentLessonId="lesson-1" completedLessonIds={[]} />);
 
     expect(screen.getByRole("button", { name: /1\. Foundations/ })).toHaveAttribute(
       "aria-expanded",
@@ -56,19 +54,15 @@ describe("LessonSidebar", () => {
 
   it("allows students to collapse one section and open another", async () => {
     const user = userEvent.setup();
-    render(
-      <LessonSidebar
-        course={course}
-        currentLessonId="lesson-1"
-        completedLessonIds={[]}
-      />,
-    );
+    render(<LessonSidebar course={course} currentLessonId="lesson-1" completedLessonIds={[]} />);
 
     await user.click(screen.getByRole("button", { name: /1\. Foundations/ }));
     expect(screen.queryByRole("link", { name: "Account structure" })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /2\. Optimization/ }));
-    expect(screen.getByRole("link", { name: "Bid decisions" })).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Bid decisions locked until the previous lesson is complete"),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /2\. Optimization/ })).toHaveAttribute(
       "aria-controls",
       "foundations-section-section-2",

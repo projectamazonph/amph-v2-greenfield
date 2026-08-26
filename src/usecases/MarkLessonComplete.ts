@@ -7,6 +7,7 @@ import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepo
 import type { IProgressEventRepository } from "@/ports/repositories/IProgressEventRepository";
 import type { Clock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
+import { orderLearnerModules, prerequisiteForLesson } from "@/domain/curriculum/GuidedFlow";
 
 export interface MarkLessonCompleteInput {
   userId: string;
@@ -27,6 +28,7 @@ export type MarkLessonCompleteError =
   | { kind: "enrollment_not_active" }
   | { kind: "course_not_found" }
   | { kind: "lesson_not_in_course" }
+  | { kind: "prerequisite_locked"; previousLessonId: string }
   | { kind: "db_error" };
 
 export interface MarkLessonCompleteValue {
@@ -71,6 +73,15 @@ export class MarkLessonComplete {
     }
 
     const completedNow = !enrollment.completedLessonIds.includes(input.lessonId);
+    if (completedNow) {
+      const prerequisite = prerequisiteForLesson(
+        orderLearnerModules(course.curriculum.sections),
+        input.lessonId,
+      );
+      if (prerequisite && !enrollment.completedLessonIds.includes(prerequisite.id)) {
+        return Result.err({ kind: "prerequisite_locked", previousLessonId: prerequisite.id });
+      }
+    }
     enrollment.markLessonComplete(input.lessonId, courseLessonCount(course));
 
     const updateResult = await this.deps.enrollmentRepo.update(enrollment);

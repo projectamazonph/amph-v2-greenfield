@@ -90,6 +90,20 @@ describe("MarkLessonComplete", () => {
     expect(events.create).toHaveBeenCalledTimes(1);
   });
 
+  it("rejects completion of a later lesson before its prerequisite", async () => {
+    const { useCase } = await setup();
+
+    const result = await useCase.execute({
+      userId: "student-1",
+      courseId: course.id,
+      lessonId: "lesson-2",
+    });
+
+    expect(result).toEqual(
+      Result.err({ kind: "prerequisite_locked", previousLessonId: "lesson-1" }),
+    );
+  });
+
   it("is idempotent when the same lesson is submitted twice", async () => {
     const { enrollmentRepo, events, useCase } = await setup();
     const input = { userId: "student-1", courseId: course.id, lessonId: "lesson-1" };

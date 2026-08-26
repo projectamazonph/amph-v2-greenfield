@@ -202,7 +202,7 @@ describe("AuthorizeLessonAccess (P0-5: preview-leak fix)", () => {
     expect(r.value.kind).toBe("denied");
   });
 
-  it("subscription tier: allows a PRO student to open a PRO lesson without a course purchase", async () => {
+  it("subscription tier: opens the first lesson but locks later lessons until the path is completed", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(
       Result.ok(makeUser({ subscriptionTier: "PRO" })),
     );
@@ -217,16 +217,22 @@ describe("AuthorizeLessonAccess (P0-5: preview-leak fix)", () => {
       lessonId: "l5",
     });
 
-    expect(r).toEqual(Result.ok({ kind: "allowed" }));
+    expect(r).toEqual(
+      Result.ok({
+        kind: "denied",
+        reason: "prerequisite",
+        previousLessonTitle: "Lesson 4",
+      }),
+    );
   });
 
   // ── Enrolled ───────────────────────────────────────
 
-  it("enrolled (active Enrollment): allows ANY lesson", async () => {
+  it("enrolled (active Enrollment): allows a later lesson after its prerequisite is complete", async () => {
     vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
     vi.mocked(mockCourseRepo.findById).mockResolvedValue(Result.ok(makeCourse()));
     vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(
-      makeEnrollment({ status: "active" }),
+      makeEnrollment({ status: "active", completedLessonIds: ["l1", "l2", "l3", "l4"] }),
     );
     const r = await useCase.execute({ userId: "user_01", courseId: "course_01", lessonId: "l5" });
     expect(r.ok).toBe(true);
