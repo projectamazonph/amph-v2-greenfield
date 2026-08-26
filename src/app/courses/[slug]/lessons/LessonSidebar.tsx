@@ -17,6 +17,7 @@ import type { Course } from "@/domain/entities/Course";
 import { CaretRight, CaretDown, CheckCircle, Play, Article } from "@phosphor-icons/react/dist/ssr";
 import styles from "./LessonSidebar.module.css";
 import { useEffect, useState } from "react";
+import { isLessonUnlocked } from "@/domain/curriculum/GuidedFlow";
 
 // Only the plain-data subset of Course this component needs. Course.price is
 // a Money class instance, and passing the full Course (server-fetched) into
@@ -96,42 +97,60 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
 
               {/* Lessons */}
               <ul id={sectionNavId} className={styles.lessonList} hidden={!isOpen}>
-                {isOpen ? section.lessons.map((lesson) => {
-                    const isCurrent = lesson.id === currentLessonId;
-                    const isCompleted = completedLessonIds.includes(lesson.id);
-                    const isVideo = lesson.type === "VIDEO";
-                    const duration = lesson.plannedMinutes && lesson.plannedMinutes > 0
-                      ? lesson.plannedMinutes
-                      : isVideo &&
-                          typeof lesson.content === "object" &&
-                          lesson.content !== null &&
-                          "durationMinutes" in lesson.content
-                        ? (lesson.content as { durationMinutes: number }).durationMinutes
-                        : null;
+                {isOpen
+                  ? section.lessons.map((lesson) => {
+                      const isCurrent = lesson.id === currentLessonId;
+                      const isCompleted = completedLessonIds.includes(lesson.id);
+                      const isUnlocked =
+                        isCurrent ||
+                        isCompleted ||
+                        isLessonUnlocked(course.curriculum.sections, completedLessonIds, lesson.id);
+                      const isVideo = lesson.type === "VIDEO";
+                      const duration =
+                        lesson.plannedMinutes && lesson.plannedMinutes > 0
+                          ? lesson.plannedMinutes
+                          : isVideo &&
+                              typeof lesson.content === "object" &&
+                              lesson.content !== null &&
+                              "durationMinutes" in lesson.content
+                            ? (lesson.content as { durationMinutes: number }).durationMinutes
+                            : null;
 
-                    const linkClass = [
-                      styles.lessonLink,
-                      isCurrent ? styles.lessonLinkCurrent : styles.lessonLinkDefault,
-                    ].join(" ");
+                      const linkClass = [
+                        styles.lessonLink,
+                        isCurrent ? styles.lessonLinkCurrent : styles.lessonLinkDefault,
+                      ].join(" ");
 
-                    return (
-                      <li key={lesson.id}>
-                        <Link
-                          href={`/courses/${course.slug}/lessons/${lesson.id}`}
-                          className={linkClass}
-                          aria-current={isCurrent ? "page" : undefined}
-                        >
-                          {isCompleted ? <CheckIcon /> : isVideo ? <VideoIcon /> : <TextIcon />}
-
-                          <span className={styles.lessonTitle}>{lesson.title}</span>
-
-                          {duration !== null && (
-                            <span className={styles.lessonDuration}>{duration}m</span>
+                      return (
+                        <li key={lesson.id}>
+                          {isUnlocked ? (
+                            <Link
+                              href={`/courses/${course.slug}/lessons/${lesson.id}`}
+                              className={linkClass}
+                              aria-current={isCurrent ? "page" : undefined}
+                            >
+                              {isCompleted ? <CheckIcon /> : isVideo ? <VideoIcon /> : <TextIcon />}
+                              <span className={styles.lessonTitle}>{lesson.title}</span>
+                              {duration !== null && (
+                                <span className={styles.lessonDuration}>{duration}m</span>
+                              )}
+                            </Link>
+                          ) : (
+                            <span
+                              className={`${linkClass} ${styles.lessonLinkLocked}`}
+                              aria-label={`${lesson.title} locked until the previous lesson is complete`}
+                            >
+                              <LockIcon />
+                              <span className={styles.lessonTitle}>{lesson.title}</span>
+                              {duration !== null && (
+                                <span className={styles.lessonDuration}>{duration}m</span>
+                              )}
+                            </span>
                           )}
-                        </Link>
-                      </li>
-                    );
-                }) : null}
+                        </li>
+                      );
+                    })
+                  : null}
               </ul>
             </div>
           );
@@ -176,6 +195,14 @@ function VideoIcon() {
       className={`${styles.iconSmall} ${styles.iconAccent}`}
       aria-hidden
     />
+  );
+}
+
+function LockIcon() {
+  return (
+    <span aria-hidden className={styles.iconSmall}>
+      🔒
+    </span>
   );
 }
 

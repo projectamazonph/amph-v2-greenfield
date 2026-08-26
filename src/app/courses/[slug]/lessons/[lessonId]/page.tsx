@@ -27,7 +27,10 @@ import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
 import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.action";
 import styles from "./page.module.css";
 
-function estimateReadingMinutes(lesson: CatalogLesson): { minutes: number; kind: "video" | "reading" | "quiz" } {
+function estimateReadingMinutes(lesson: CatalogLesson): {
+  minutes: number;
+  kind: "video" | "reading" | "quiz";
+} {
   if (typeof lesson.plannedMinutes === "number" && lesson.plannedMinutes > 0) {
     return {
       minutes: lesson.plannedMinutes,
@@ -45,7 +48,9 @@ function estimateReadingMinutes(lesson: CatalogLesson): { minutes: number; kind:
   }
   if (lesson.type === "QUIZ") {
     const questions =
-      typeof content === "object" && content !== null && "questions" in content &&
+      typeof content === "object" &&
+      content !== null &&
+      "questions" in content &&
       Array.isArray((content as { questions: unknown }).questions)
         ? (content as { questions: unknown[] }).questions.length
         : 0;
@@ -53,7 +58,9 @@ function estimateReadingMinutes(lesson: CatalogLesson): { minutes: number; kind:
   }
   // TEXT: estimate from word count (avg 200 wpm)
   const body =
-    typeof content === "object" && content !== null && "body" in content &&
+    typeof content === "object" &&
+    content !== null &&
+    "body" in content &&
     typeof (content as { body: unknown }).body === "string"
       ? (content as { body: string }).body.trim()
       : "";
@@ -135,10 +142,10 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
     })),
   );
   const previousLesson = lessonData.prevLessonId
-    ? lessonTargets.find((target) => target.id === lessonData.prevLessonId) ?? null
+    ? (lessonTargets.find((target) => target.id === lessonData.prevLessonId) ?? null)
     : null;
   const nextLesson = lessonData.nextLessonId
-    ? lessonTargets.find((target) => target.id === lessonData.nextLessonId) ?? null
+    ? (lessonTargets.find((target) => target.id === lessonData.nextLessonId) ?? null)
     : null;
 
   // ── Access check (P0-5) ─────────────────────────────
@@ -182,7 +189,8 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
         courseSlug={slug}
         courseTitle={course.title}
         feature="lesson"
-        reason="preview_limit"
+        reason={authResult.value.reason === "prerequisite" ? "prerequisite" : "preview_limit"}
+        previousLessonTitle={authResult.value.previousLessonTitle}
         signedIn={Boolean(userId)}
       />
     );
@@ -233,10 +241,7 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
             </ol>
           </nav>
 
-          <Link
-            href={`/courses/${slug}`}
-            className={styles.backBtn}
-          >
+          <Link href={`/courses/${slug}`} className={styles.backBtn}>
             Back to Course
           </Link>
 
@@ -274,7 +279,9 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           ) : null}
           {completionStatus.completeError ? (
             <p className="alert-error" role="alert">
-              We could not update your progress. Refresh the page and try again.
+              {completionStatus.completeError === "prerequisite_locked"
+                ? "Finish the previous lesson before marking this one complete."
+                : "We could not update your progress. Refresh the page and try again."}
             </p>
           ) : null}
 

@@ -8,6 +8,7 @@
 import type { Course, Lesson } from "@/domain/entities/Course";
 import type { Lesson as PersistedLesson, LessonType } from "@/domain/entities/Lesson";
 import type { CatalogCourseDetail } from "@/usecases/GetCatalogCourse";
+import { orderLearnerModules } from "@/domain/curriculum/GuidedFlow";
 
 export interface LessonData {
   /** The lesson being viewed. */
@@ -33,7 +34,7 @@ export function withCatalogCurriculum(
   return {
     ...course,
     curriculum: {
-      sections: detail.modules.map((module) => ({
+      sections: orderLearnerModules(detail.modules).map((module) => ({
         id: module.id,
         title: module.title,
         lessons: module.lessons.map((lesson) => ({

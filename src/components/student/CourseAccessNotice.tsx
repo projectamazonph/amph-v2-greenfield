@@ -4,7 +4,11 @@ import styles from "./CourseAccessNotice.module.css";
 
 export type CourseAccessNoticeFeature = "lesson" | "quiz";
 export type CourseAccessNoticeReason =
-  "preview_limit" | "plan_required" | "enrollment_required" | "verification_unavailable";
+  | "preview_limit"
+  | "plan_required"
+  | "enrollment_required"
+  | "verification_unavailable"
+  | "prerequisite";
 
 export interface CourseAccessNoticeProps {
   courseSlug: string;
@@ -14,6 +18,7 @@ export interface CourseAccessNoticeProps {
   signedIn: boolean;
   userTier?: string;
   requiredTier?: string;
+  previousLessonTitle?: string;
 }
 
 export function CourseAccessNotice({
@@ -24,6 +29,7 @@ export function CourseAccessNotice({
   signedIn,
   userTier,
   requiredTier,
+  previousLessonTitle,
 }: CourseAccessNoticeProps) {
   const courseHref = `/courses/${courseSlug}`;
   const copy = getNoticeCopy({
@@ -33,6 +39,7 @@ export function CourseAccessNotice({
     signedIn,
     userTier,
     requiredTier,
+    previousLessonTitle,
   });
 
   return (
@@ -72,7 +79,15 @@ function getNoticeCopy({
   signedIn,
   userTier,
   requiredTier,
+  previousLessonTitle,
 }: Omit<CourseAccessNoticeProps, "courseSlug">): { title: string; body: string } {
+  if (reason === "prerequisite") {
+    return {
+      title: "Follow the guided lesson path",
+      body: `Finish ${previousLessonTitle ?? "the previous lesson"} first. This course is designed to build vocabulary, evidence, and safe decisions in order.`,
+    };
+  }
+
   if (reason === "verification_unavailable") {
     return {
       title: "We couldn't verify your course access",

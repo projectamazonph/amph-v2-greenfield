@@ -145,6 +145,7 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 // STORY-054: rate limiting
 import type { RateLimiter } from "@/ports/security/RateLimiter";
 import { UpstashRateLimiter } from "@/infra/security/UpstashRateLimiter";
+import { InMemoryRateLimiter } from "@/infra/security/InMemoryRateLimiter";
 
 // ΓöÇΓöÇ Use cases ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
@@ -647,10 +648,14 @@ function buildProductionContainer(): AppContainer {
   );
   const passwordHasher: PasswordHasher = new Argon2PasswordHasher();
   const totpService: TotpService = new OtpauthTotpService();
-  const rateLimiter: RateLimiter = new UpstashRateLimiter(
-    process.env.UPSTASH_REDIS_REST_URL ?? "",
-    process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
-  );
+  const useCiInMemoryRateLimiter =
+    process.env.CI === "true" && process.env.RATE_LIMITER_MODE === "in-memory";
+  const rateLimiter: RateLimiter = useCiInMemoryRateLimiter
+    ? new InMemoryRateLimiter(false)
+    : new UpstashRateLimiter(
+        process.env.UPSTASH_REDIS_REST_URL ?? "",
+        process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
+      );
 
   // STORY-008: password reset. Hoisted (not built inline in the returned
   // object below) so adminGrantSubscription can reuse this same instance
@@ -1204,7 +1209,9 @@ export function validateRequiredEnvVars(): void {
         "not persist on Vercel's serverless filesystem)",
     );
   }
-  if (process.env.NODE_ENV === "production") {
+  const useCiInMemoryRateLimiter =
+    process.env.CI === "true" && process.env.RATE_LIMITER_MODE === "in-memory";
+  if (process.env.NODE_ENV === "production" && !useCiInMemoryRateLimiter) {
     if (!process.env.UPSTASH_REDIS_REST_URL) {
       throw new Error("Missing required environment variable: UPSTASH_REDIS_REST_URL");
     }

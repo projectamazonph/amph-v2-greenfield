@@ -161,6 +161,12 @@ jobs:
       # shell env), but this is CI, not a real deploy — same treatment as
       # every other secret above.
       BLOB_READ_WRITE_TOKEN: vercel_blob_rw_test_dummy
+      # Dummy values keep the production rate-limit wiring fail-closed without
+      # requiring a real Upstash account in CI. E2E exercises signup and API
+      # routes that construct the Redis-backed limiter.
+      UPSTASH_REDIS_REST_URL: https://example-upstash.test
+      UPSTASH_REDIS_REST_TOKEN: test-upstash-token
+      RATE_LIMITER_MODE: in-memory
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -326,6 +332,8 @@ jobs:
       # fail-closed check needs something here even though the pages this
       # job scores don't touch the DB/container at render time today.
       BLOB_READ_WRITE_TOKEN: vercel_blob_rw_test_dummy
+      UPSTASH_REDIS_REST_URL: https://example-upstash.test
+      UPSTASH_REDIS_REST_TOKEN: test-upstash-token
     steps:
       - uses: actions/checkout@v4
 

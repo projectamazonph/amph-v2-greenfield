@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { QuizPlayer } from "@/components/courses/QuizPlayer";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
 import { StudentShell } from "@/components/student/StudentShell";
+import { isModuleComplete, orderLearnerModules } from "@/domain/curriculum/GuidedFlow";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
@@ -93,6 +94,36 @@ export default async function QuizPage({ params }: Props) {
 
   const quiz = quizResult.value;
   const course = courseResult.value;
+  const enrollment = await container.enrollmentRepo?.findByUserIdAndCourseId(
+    user.id,
+    course.courseId,
+  );
+  const completedLessonIds = enrollment?.status === "active" ? enrollment.completedLessonIds : [];
+  const guidedModule = Array.isArray(course.modules)
+    ? orderLearnerModules(course.modules).find((candidate) =>
+        quizBelongsToModule(quiz.title, candidate.title),
+      )
+    : undefined;
+  if (
+    guidedModule &&
+    !isModuleComplete(
+      [{ id: guidedModule.id, title: guidedModule.title, lessons: guidedModule.lessons }],
+      completedLessonIds,
+    )
+  ) {
+    return (
+      <StudentShell user={user}>
+        <CourseAccessNotice
+          courseSlug={slug}
+          courseTitle={course.title}
+          feature="quiz"
+          reason="prerequisite"
+          previousLessonTitle={guidedModule.lessons[guidedModule.lessons.length - 1]?.title}
+          signedIn
+        />
+      </StudentShell>
+    );
+  }
   return (
     <StudentShell user={user}>
       <main id="main-content" tabIndex={-1} className={styles.page}>
@@ -124,6 +155,27 @@ export default async function QuizPage({ params }: Props) {
       </main>
     </StudentShell>
   );
+}
+
+function quizBelongsToModule(quizTitle: string, moduleTitle: string): boolean {
+  const quiz = quizTitle.toLowerCase();
+  const moduleLabel = moduleTitle.toLowerCase();
+  const aliases: Record<string, string[]> = {
+    onboarding: ["onboarding"],
+    foundations: ["foundations"],
+    "keyword research": ["keyword research"],
+    "listing optimization": ["listing optimization"],
+    "campaign architecture": ["campaign architecture"],
+    "portfolio strategy": ["portfolio strategy"],
+    "bidding lab": ["bidding lab"],
+    "search term triage": ["search term triage"],
+    "competitive intelligence": ["competitive intelligence"],
+    "weekly optimization": ["weekly optimization"],
+    "reporting troubleshooting": ["reporting and troubleshooting", "reporting troubleshooting"],
+    "va workflow capstone": ["va workflow and capstone", "va workflow capstone"],
+  };
+  const key = Object.keys(aliases).find((candidate) => moduleLabel.includes(candidate));
+  return key ? aliases[key]!.some((alias) => quiz.includes(alias)) : quiz.includes(moduleLabel);
 }
 
 function NotFoundMessage({ slug }: { slug: string }) {

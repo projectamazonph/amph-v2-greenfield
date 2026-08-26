@@ -22,6 +22,8 @@ interface Bucket {
 export class InMemoryRateLimiter implements RateLimiter {
   private buckets = new Map<string, Bucket>();
 
+  constructor(private readonly enforceLimits = true) {}
+
   async check(input: RateLimitInput): Promise<Result<RateLimitResult, RateLimitError>> {
     const policy = RATE_LIMIT_POLICIES[input.policy];
     if (!policy) {
@@ -32,6 +34,14 @@ export class InMemoryRateLimiter implements RateLimiter {
     }
     if (!input.key.trim()) {
       return Result.err({ kind: "configuration_error", message: "Rate-limit key is empty" });
+    }
+
+    if (!this.enforceLimits) {
+      return Result.ok({
+        allowed: true,
+        remaining: policy.limit,
+        resetSeconds: 0,
+      });
     }
 
     const now = Date.now();

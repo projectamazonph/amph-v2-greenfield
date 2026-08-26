@@ -10,6 +10,8 @@
 
 **Status:** Done. Merged in PR #383 (`bc97101`) on 2026-08-16.
 
+> **Historical snapshot.** This story records the original 31-lesson inventory. The current reviewed contract covers 42 lessons; use `content/curriculum/inventory.json` and `pnpm validate:curriculum` for the active inventory.
+
 ## Goal
 
 Give the course team one checked-in contract for what a beginner can actually study. The contract joins MDX frontmatter with the course tier, tool bridge, supporting resource references, and final deliverable for every published lesson.

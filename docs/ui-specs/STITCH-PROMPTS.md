@@ -2,6 +2,8 @@
 
 ## Instructions for Use
 
+> **Current curriculum contract — August 2026.** The learner experience now uses 12 modules and 42 lessons across three course tiers, with a guided zero-knowledge order and sequential lesson and quiz prerequisites. Any older mockup copy in this design-prompt archive should be treated as a visual placeholder and reconciled with the canonical syllabus and runtime before reuse.
+
 This document contains Stitch prompts for every page/screen of Project Amazon PH Academy v2. Feed each prompt section into Google Stitch (stitch.withgoogle.com) individually. Stitch generates HTML/CSS with Tailwind — we will convert the output to CSS Modules + design tokens for the Next.js project.
 
 **Strategy:** Generate one screen at a time. Start with the landing page (most complex marketing surface), then auth pages, pricing, dashboard, course flow, tools, admin, and utility pages.
@@ -242,7 +244,7 @@ Page structure:
    - Right smaller card: Ultimate Transformation — ₱9,999
    Each card: white background, 1px border #E5E5E0, radius 6px, padding 32px (featured card: padding 40px)
    Motion: Cards stagger in from bottom with 100ms delay between each. Featured card scales from 0.97 to 1.0.
-   
+
    a. PPC FOUNDATIONS — ₱2,999
       - Eyebrow: "PPC FOUNDATIONS" (uppercase, 0.75rem, #737373)
       - Price: ₱2,999 (JetBrains Mono, 2.25rem, #171717) with "one-time" label (#737373)
@@ -264,7 +266,7 @@ Page structure:
       - Price: ₱5,999
       - Description: "The fastest path to Amazon ads specialist. Everything in Foundations plus the advanced tools."
       - Feature bullets:
-        - 8 modules (31 lessons)
+        - 6 modules (19 lessons)
         - All 5 interactive tools (full scenario packs)
         - All downloadable resources
         - Session recordings
@@ -319,15 +321,15 @@ Layout: Full-width with sidebar navigation on the left (collapsible on mobile).
    - Bottom: "Sign out" link
 
 2. MAIN CONTENT (padding 32px, background #FAFAF7):
-   - Header: "Welcome, [Name]" (h1) + progress summary below: "12 of 31 lessons complete • 3 in progress" (#737373)
-   
+   - Header: "Welcome, [Name]" (h1) + progress summary below: "12 of 42 lessons complete • 3 in progress" (#737373)
+
    - STATS ROW (4 cards in a row, each card: white, border, radius 6px, padding 20px):
      a. "2,450" (Space Grotesk 600, 1.75rem) + "XP earned" (#737373)
      b. "Level 4" + "Current level"
      c. "12" + "Day streak"
      d. "3" + "Courses"
      Motion: Cards stagger in from bottom with 80ms delay. Numbers count up from 0 over 600ms ease-out.
-   
+
    - COURSES SECTION:
      - Heading: "Courses" (h2, margin-bottom 16px)
      - Course cards in a grid (repeat(auto-fit, minmax(320px, 1fr))):
@@ -335,9 +337,9 @@ Layout: Full-width with sidebar navigation on the left (collapsible on mobile).
        - Top row: Course title (h3) + difficulty badge (right-aligned)
        - Description text (#404040)
        - Progress bar: thin bar (4px height, #F4F3EE background, #FF6B35 fill, radius 2px). Animate width from 0 on mount.
-       - Below bar: "12 / 31 lessons" (left) + "39% complete" (right) — both #737373
+       - Below bar: "12 / 42 lessons" (left) + "39% complete" (right) — both #737373
        Motion: Cards stagger in with 80ms delay between each.
-   
+
    - TOOLS SECTION:
      - Heading: "Tools" (h2)
      - Description: "Practice real Amazon Advertising Console workflows with synthetic data." (#737373)
@@ -361,7 +363,7 @@ Layout: Full-width with sidebar (same as dashboard), main content area.
      - Title: "PPC Foundations" (h1)
      - Description: "Master the fundamentals of Amazon Sponsored Products advertising."
      - Meta row: "Beginner" badge (default) + "5 modules" badge + "15 lessons" badge + "₱2,999 tier" badge
-   
+
    - MODULE LIST (vertical, each module is a section):
      Each module:
      - Module heading: "Module 1: Understanding Amazon Ads" (h2, with module number)
@@ -372,7 +374,7 @@ Layout: Full-width with sidebar (same as dashboard), main content area.
        - If locked: Lock icon + "Unlock with PPC Foundations" (#737373)
        - Divider between lessons (1px #E5E5E0)
      - Separator between modules (thicker divider or spacing)
-   
+
    - PROGRESS SECTION (at bottom):
      - "Your progress" heading
      - Progress bar (same style as dashboard)
@@ -395,7 +397,7 @@ Layout: Full-width with sidebar, main content with constrained reading width.
    - Header:
      - Badges row: "Module 1 · Lesson 3" (default) + "8 min" (info) + "+50 XP" (success)
      - Title: "Sponsored Products: Your First Campaign Type" (h1)
-   
+
    - Article body (reading-optimized):
      - Max-width 65ch
      - Font: Space Grotesk 400, 1rem, line-height 1.6
@@ -404,17 +406,17 @@ Layout: Full-width with sidebar, main content with constrained reading width.
      - Lists: standard, with 8px spacing
      - Links: #FF6B35
      - Strong text: font-weight 600
-   
+
    - Actions section:
      - If incomplete: "Mark as complete (+50 XP)" button (primary, #FF6B35)
      - If complete: "Lesson complete" badge (success, green)
-   
+
    - Quiz card (if lesson has quiz):
      - White card, border, padding 24px
      - "Knowledge check" heading
      - "This lesson has a quiz. Pass with 80% or higher to count this lesson as complete." (#404040)
      - "Take the quiz →" button (primary)
-   
+
    - Prev/Next navigation (bottom):
      - Two columns: "Previous" (left) and "Next" (right)
      - Each: direction label (small, #737373) + lesson title (Space Grotesk 500)
@@ -438,7 +440,7 @@ Layout: Full-width with sidebar, centered content.
      - "Module 1 · Lesson 3" badge
      - "Knowledge check" (h1)
      - "Answer all 5 questions. Pass with 80% or higher to earn completion credit." (#404040)
-   
+
    - Question cards (one per question, vertical stack):
      Each question:
      - Question number + text: "1. What does ACoS measure?" (Space Grotesk 500)
@@ -452,7 +454,7 @@ Layout: Full-width with sidebar, centered content.
      - Correct answer (after submit): green border #0E7C3A, background #DCFCE7
      - Wrong answer (after submit): red border #B91C1C, background #FEE2E2, with explanation text below
      - Explanation text (after submit): "#404040, font-size 0.875rem, margin-top 8px"
-   
+
    - Submit section:
      - "Submit answers" button (primary, full width, disabled until all questions answered). Tactile -1px translateY on :active.
      - After submit: show score "4/5 — 80% — Passed!" or "3/5 — 60% — Not quite"
@@ -476,7 +478,7 @@ Layout: Full-width with sidebar, main content.
    - Header:
      - "Tools" (h1)
      - "Practice real Amazon Advertising Console workflows with synthetic data." (#404040)
-   
+
    - Tool cards (2-column asymmetric grid — NOT equal cards):
      Layout: First tool (Campaign Builder) takes full width as a hero card. Remaining 4 tools in 2x2 grid below.
      Hero card: white, border, radius 6px, padding 32px, interactive (hover lift + shadow-sm)
@@ -486,7 +488,7 @@ Layout: Full-width with sidebar, main content.
      - "Open tool →" link (#FF6B35)
      Grid cards: white, border, radius 6px, padding 24px, interactive
      Motion: Hero card fades in first. Grid cards stagger in with 80ms delay.
-   
+
    - Five tools:
      1. Campaign Builder — "Build SP, SB, SD, and BTV campaign structures step by step." — 5 scenarios
      2. Bid Elevator — "Practice bid optimization across 10 real-world scenarios." — 10 scenarios
@@ -512,14 +514,14 @@ Layout: Full-width with sidebar, main content.
      - "Campaign Builder" (h1)
      - "Scenario: Launch a new Sponsored Products campaign for a wireless earbuds product" (subtitle, #404040)
      - Meta: "Step 2 of 5" progress indicator
-   
+
    - PROGRESS STEPS (horizontal, 5 steps):
      Steps: "Campaign type" → "Campaign settings" → "Ad group" → "Keywords" → "Review"
      Current step: #FF6B35 with filled circle
      Completed steps: #0E7C3A with checkmark
      Upcoming: #D4D4D4 with empty circle
      Connected by a thin line between circles
-   
+
    - WIZARD CONTENT (white card, padding 32px):
      - "Campaign settings" heading (h2)
      - Form fields:
@@ -528,11 +530,11 @@ Layout: Full-width with sidebar, main content.
        - Start date: date input
        - Targeting: radio group ("Automatic" / "Manual")
      - Helper text below fields in #737373 where needed
-   
+
    - NAVIGATION (bottom of card):
      - "Back" (secondary button, left)
      - "Continue to ad group →" (primary button, right)
-   
+
    - SIMULATION PANEL (right side or below, if room):
      - "Your campaign so far" summary
      - Campaign type: "Sponsored Products"
@@ -566,14 +568,14 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT (padding 32px, #FAFAF7):
    - Header: "Admin Dashboard" (h1) + "Welcome, Ryan" subtitle
-   
+
    - STATS ROW (4 cards):
      a. "127" + "Total users"
      b. "3" + "Published courses"
      c. "5" + "Badges"
      d. "₱284,500" + "Total revenue"
      Motion: Cards stagger in from bottom with 80ms delay. Numbers count up from 0 over 600ms ease-out.
-   
+
    - RECENT ACTIVITY TABLE:
      - Heading: "Recent payments"
      - Table (compact, 40px rows):
@@ -583,7 +585,7 @@ Layout: Full-width with admin sidebar, main content.
        - "Maria S." | "PPC Foundations" | "₱2,999" | "Jul 10, 2026" | "Paid"
        - "Ana R." | "Ultimate" | "₱9,999" | "Jul 9, 2026" | "Paid"
      - Table style: header has bottom border only, left-aligned text, right-aligned numbers, no zebra striping
-   
+
    - QUICK LINKS:
      - "View all users →" | "Manage courses →" | "Review refunds →"
 ```
@@ -603,7 +605,7 @@ Layout: Full-width with admin sidebar, main content.
    - Header row:
      - Left: "Users" (h1) + "127 total" count
      - Right: Search input (with magnifying glass icon) + filter dropdown ("All roles" / "Students" / "Admins")
-   
+
    - USERS TABLE:
      Columns: "Name" | "Email" | "Role" | "Level" | "XP" | "Joined" | "Status" | "Actions"
      Rows (5 examples):
@@ -612,7 +614,7 @@ Layout: Full-width with admin sidebar, main content.
      - "Ryan Dabao" | "ryan@projectamazonph.com" | "Admin" (info badge) | "1" | "0" | "Jul 1, 2026" | "Active" | "Edit"
      - "Ana Reyes" | "ana@email.com" | "Student" | "2" | "890" | "Jul 5, 2026" | "Active" | "Edit"
      - "Pedro Cruz" | "pedro@email.com" | "Student" | "1" | "150" | "Jul 8, 2026" | "Suspended" (danger badge) | "Edit"
-   
+
    - Pagination: "Showing 1–10 of 127" + "← Previous" "Next →" buttons
 ```
 
@@ -629,7 +631,7 @@ Layout: Full-width with sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Payments" (h1) + "Your purchase history" subtitle
-   
+
    - PAYMENT CARDS (vertical stack):
      Each payment: white card, border, padding 24px
      - Top row: Tier name (h3) + Status badge ("Paid" green / "Refunded" danger / "Pending" warning)
@@ -637,7 +639,7 @@ Layout: Full-width with sidebar, main content.
      - Date: "July 10, 2026" + Payment ID: "pay_xxxxx"
      - Payment method: "GCash" or "Maya" or "Credit Card"
      - Actions: "Download receipt" (ghost button) + "Request refund" (ghost button, danger text)
-   
+
    - Empty state (if no payments):
      - "No payments yet" (heading)
      - "Enroll in a course to get started. Pick the tier that matches where you are." (#404040)
@@ -657,14 +659,14 @@ Layout: Full-width with sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Certificates" (h1) + "Your completed course certificates"
-   
+
    - CERTIFICATE CARDS (grid: repeat(auto-fit, minmax(320px, 1fr))):
      Each card: white, border, padding 24px
      - Certificate title: "PPC Foundations — Completed"
      - Date: "Completed July 8, 2026"
      - Verification hash: "abc123def456" (JetBrains Mono, small, #737373)
      - Actions: "Download PDF" (primary button) + "Verify online" (ghost link)
-   
+
    - Empty state:
      - "No certificates yet"
      - "Complete a course to earn your certificate. Each certificate has a unique verification code."
@@ -684,7 +686,7 @@ Layout: Centered, max-width 480px, vertically centered.
 - Card: white, border, padding 48px, radius 6px, centered
 - Success checkmark icon (large, #0E7C3A, centered)
 - "Payment received" (h1, centered, Space Grotesk 600)
-- "Your enrollment in Accelerated Mastery is active. You now have access to all 8 modules, 5 tools, and every resource in the tier." (#404040, centered)
+- "Your enrollment in Accelerated Mastery is active. You now have access to all modules in the tier, 5 tools, and every resource in the tier." (#404040, centered)
 - "₱5,999 paid via GCash" (JetBrains Mono, small, #737373)
 - "Go to dashboard →" button (primary, centered)
 - "Download receipt" link below (#FF6B35)
@@ -703,7 +705,7 @@ Layout: Full-width with sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Live Classes" (h1) + "Weekly coaching sessions with Ryan" subtitle
-   
+
    - UPCOMING CLASSES:
      Class card: white, border, padding 24px
      - Title: "Campaign Optimization Workshop"
@@ -711,7 +713,7 @@ Layout: Full-width with sidebar, main content.
      - Description: "Bring your campaign data. We'll review real accounts and optimize live."
      - Status badge: "Upcoming" (info) or "Live now" (success, pulsing)
      - "Register" button (primary) if not registered, "Registered" badge if already registered
-   
+
    - PAST RECORDINGS (if Ultimate tier):
      - "Recordings" heading
      - List of past sessions with "Watch recording" link
@@ -731,11 +733,11 @@ Layout: Full-width with sidebar, centered content.
 2. MAIN CONTENT (max-width 560px, centered):
    - Back link: "← Payments"
    - Header: "Request a refund" (h1)
-   
+
    - Payment summary card:
      - "Accelerated Mastery — ₱5,999"
      - "Paid July 10, 2026 via GCash"
-   
+
    - Form:
      - Reason field: textarea (label "Reason for refund", placeholder "Tell us why you're requesting a refund")
      - "Submit refund request" button (primary)
@@ -831,7 +833,7 @@ Layout: Full-width with student sidebar, main content area.
      Labels below circles (0.75rem, current step bold)
 
    - STEP CONTENT (white card, padding 32px):
-     
+
      Step 1 — Campaign settings:
      - Campaign name: text input (label above, placeholder "e.g. Bamboo Cutting Board — Exact Match")
      - Campaign type: 4 selectable cards in a 2x2 grid:
@@ -844,14 +846,14 @@ Layout: Full-width with student sidebar, main content area.
      - End date: date input with "(required)" hint
      - Daily budget: number input with ₱ prefix, hint "Allowed: ₱300 – ₱2,000"
      - Targeting type: select dropdown ("Manual" / "Auto")
-     
+
      Step 2 — Bidding:
      - Bid strategy: select dropdown (filtered by scenario constraints)
      - Default bid: number input with ₱ prefix
-     
+
      Step 3 — Ad group:
      - Ad group name: text input (default "Ad Group 1")
-     
+
      Step 4 — Targets (non-BTV):
      - Keywords section:
        - "Add at least 3 keywords" heading
@@ -861,12 +863,12 @@ Layout: Full-width with student sidebar, main content area.
        - "Add at least 1 product target" heading
        - ASIN input + bid input + remove button
        - "+ Add product target" ghost button
-     
+
      Step 4 — Audiences (BTV only):
      - Audience category: select (In-Market / Lifestyle / Interests / Lookalike / Contextual)
      - Audience details: key-value pair inputs
      - "+ Add audience" ghost button
-     
+
      Step 5 — Review:
      - Summary of all settings in a definition list:
        Campaign name, Type, Budget, Bid strategy, Default bid, Ad group, Keywords count, Product targets count
@@ -892,7 +894,7 @@ Layout: Full-width with student sidebar, main content.
 
 2. MAIN CONTENT:
    - Breadcrumb: "← Tools" + "Bid Elevator"
-   
+
    - Scenario header card (white, border, padding 24px):
      - Badge: "Bid Elevator" (info)
      - Title: "Reduce ACoS on a high-spend electronics campaign"
@@ -912,7 +914,7 @@ Layout: Full-width with student sidebar, main content.
      - "earbuds for iphone" | Exact | ₱20 | 5,600 | 140 | 22 | ₱2,800 | ₱22,000 | 12.7% | [input ₱22]
      - "cheap earbuds" | Phrase | ₱18 | 15,300 | 306 | 2 | ₱4,590 | ₱2,000 | 229.5% | [input ₱3]
      - etc.
-   
+
      Table styling:
      - 40px row height, left-aligned text, right-aligned numbers
      - Header: bottom border only, #737373 text, 0.875rem
@@ -945,7 +947,7 @@ Layout: Full-width with student sidebar, main content.
 
 2. MAIN CONTENT:
    - Breadcrumb: "← Tools" + "Search Term Triage"
-   
+
    - Scenario header card (white, border, padding 24px):
      - Badge: "Search terms" (info)
      - Title: "Clean up a broad match campaign for kitchen products"
@@ -967,7 +969,7 @@ Layout: Full-width with student sidebar, main content.
        - Below term: match type badge (Broad/Phrase/Exact) + "via [matched keyword]" in #737373
        - Right: metric chips in a row:
          Impr: 3,200 | Clicks: 85 | CTR: 2.6% | Spend: ₱1,275 | CPC: ₱15 | Orders: 0 | Sales: ₱0 | ACoS: —
-     
+
      - ACTION ROW (5 buttons in a horizontal group):
        - "Keep" (ghost, default)
        - "Optimize bid" (ghost, default)
@@ -975,11 +977,11 @@ Layout: Full-width with student sidebar, main content.
        - "Negate exact" (ghost, default)
        - "Negate phrase" (ghost, default)
        Selected button: filled with variant color (Keep=green wash, Optimize=blue wash, Pause=gray wash, Negate=amber wash)
-     
+
      - SUB-FIELD (appears conditionally):
        - If "Optimize bid": number input "New bid (₱)" with ₱ prefix
        - If "Negate exact/phrase": text input "Negative keyword to add" pre-filled with the search term
-     
+
      - Card border-left changes color based on decision: green=keep, blue=optimize, gray=pause, amber=negate, default=no decision
 
    - SUBMIT ROW:
@@ -1001,7 +1003,7 @@ Layout: Full-width with student sidebar, main content.
 
 2. MAIN CONTENT:
    - Breadcrumb: "← Tools" + "Listing Audit"
-   
+
    - CURRENT LISTING card (white, border, padding 24px):
      - Badge: "Current listing" (info)
      - Title: "Bamboo Cutting Board — Premium Kitchen Essential"
@@ -1060,7 +1062,7 @@ Layout: Full-width with student sidebar, main content.
 
 2. MAIN CONTENT:
    - Breadcrumb: "← Tools" + "Keyword Research"
-   
+
    - Seed term card (white, border, padding 24px):
      - Badge: "Seed term" (info)
      - Title: "bamboo cutting board" (JetBrains Mono)
@@ -1114,25 +1116,25 @@ Layout: Full-width with student sidebar, centered content.
      - Label: "/ 100" (#737373)
      - Below: "Passed!" badge (success, green) or "Not quite" badge (danger, red)
      - Motion: Number counts up from 0 to 85 over 800ms ease-out. Badge fades in after count completes (800ms delay).
-   
+
    - Overall feedback card (white, border, padding 24px):
      - "Campaign Builder — Launch a wireless earbuds SP campaign"
      - Feedback text: "Strong campaign structure. Your keyword selection covers the main search terms well. The bid strategy matches the scenario constraints. Two areas to improve: add one more product target, and consider phrase match for the broad keywords."
-   
+
    - CRITERIA BREAKDOWN (vertical stack):
      Each criterion (border-bottom separator):
      - Left: criterion name + passed/failed icon
      - Right: score "18 / 20" (JetBrains Mono)
      - Below: feedback text (#404040, 0.875rem)
      Motion: Criteria cascade in with 60ms stagger between each. Each slides up from 4px below + fades in.
-     
+
      Example criteria:
      - ✓ Campaign type correct (20/20)
      - ✓ Budget within range (20/20)
      - ✓ Bid strategy appropriate (18/20) — "FIXED_BIDS works but DYNAMIC_BIDS_DOWN_ONLY is more common for new SP campaigns"
      - ✓ Keyword count meets minimum (15/20) — "Add one more keyword to reach the scenario minimum of 4"
      - ✗ Product targets (12/20) — "Only 1 product target. The scenario recommends 2+ for SP campaigns"
-   
+
    - ACTIONS:
      - "Try again" secondary button (left)
      - "Back to tools →" ghost link (right)
@@ -1156,13 +1158,13 @@ Layout: Full-width with admin sidebar, main content.
    - Header row:
      - Left: "Users" (h1) + "127 total" (#737373)
      - Right: "Add user" primary button (ghost style — secondary)
-   
+
    - FILTER BAR:
      - Search input (magnifying glass icon, placeholder "Search by name or email...")
      - Filter dropdown: "All roles" / "Students" / "Instructors" / "Admins"
      - Filter dropdown: "All statuses" / "Active" / "Suspended" / "Deleted"
      - Date range: "From" date + "To" date
-   
+
    - USERS TABLE (white card, full width):
      Columns: ☐ (checkbox) | Name | Email | Role | Level | XP | Joined | Status | ⋮ (actions)
      10 rows with realistic data:
@@ -1172,20 +1174,20 @@ Layout: Full-width with admin sidebar, main content.
      - ☐ "Ana Reyes" | "ana@email.com" | Student | "2" | "890" | "Jul 5, 2026" | Active | ⋮
      - ☐ "Pedro Cruz" | "pedro@email.com" | Student | "1" | "150" | "Jul 8, 2026" | Suspended (danger) | ⋮
      - etc.
-     
+
      Table styling:
      - 40px rows, left-aligned text, right-aligned numbers
      - Header: bottom border only, #737373
      - Checkbox column: 40px width
      - Actions column: three-dot menu (ghost button)
      - Hover row: #F4F3EE wash
-   
+
    - BULK ACTIONS BAR (appears when items selected):
      - "12 users selected" label
      - "Export CSV" ghost button
      - "Suspend" ghost button (danger text)
      - "Delete" ghost button (danger text)
-   
+
    - PAGINATION:
      - "Showing 1–10 of 127" (#737373)
      - "← Previous" "Next →" buttons (secondary, disabled as needed)
@@ -1205,38 +1207,38 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Breadcrumb: "Users / Maria Santos"
-   
+
    - Header row:
      - Left: "Maria Santos" (h1) + metadata: "maria@email.com • Student • Active since May 2026"
      - Right: "Edit" secondary button + "Suspend" ghost button (danger text) + "Delete" ghost button (danger text)
-   
+
    - TABS:
      [Overview] [Enrollments] [Progress] [Activity]
      Active tab: #FF6B35 bottom border, bold text
-   
+
    - TAB CONTENT (Overview):
      - Stats row (4 cards):
        a. "Level 7" + "Current level"
        b. "8,200" + "Total XP"
        c. "45" + "Day streak"
        d. "2" + "Courses enrolled"
-     
+
      - Account info card:
        Email verified: Yes (green badge)
        Last active: July 10, 2026 at 3:45 PM
        Role: Student
        Status: Active
-   
+
    - TAB CONTENT (Enrollments):
      - Table: Course | Tier | Enrolled | Status | Amount
      - "PPC Foundations" | "PPC Foundations" | "Jun 1, 2026" | "Active" | "₱2,999"
      - "Accelerated Mastery" | "Accelerated Mastery" | "Jul 5, 2026" | "Active" | "₱5,999"
-   
+
    - TAB CONTENT (Progress):
      - Course progress bars with lesson completion
      - Badges earned list
      - Certificates list
-   
+
    - TAB CONTENT (Activity):
      - Audit log entries for this user
      - Table: Action | Details | Timestamp
@@ -1257,18 +1259,18 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Courses" (h1) + "Create course" primary button
-   
+
    - COURSE CARDS (vertical stack, not grid):
      Each course (white card, border, padding 24px):
      - Top row: Course title (h3) + Status badge ("Published" green / "Draft" warning) + Difficulty badge
      - Description text (#404040)
-     - Stats row: "9 modules" · "31 lessons" · "127 enrollments" · "₱2,999"
+     - Stats row: "5 modules" · "19 lessons" · "127 enrollments" · "₱2,999" (use the selected course's actual counts)
      - Actions: "Edit" secondary button + "View" ghost link + "Manage modules" ghost link
-   
+
    - Three courses:
-     1. "PPC Foundations" — Published · Beginner · 9 modules, 31 lessons, 127 enrollments, ₱2,999
-     2. "Accelerated Mastery" — Published · Intermediate · 12 modules, 45 lessons, 89 enrollments, ₱5,999
-     3. "Ultimate Transformation" — Published · Advanced · 15 modules, 60 lessons, 34 enrollments, ₱9,999
+     1. "PPC Foundations" — Published · Beginner · 5 modules, 19 lessons, 127 enrollments, ₱2,999
+     2. "Accelerated Mastery" — Published · Intermediate · 6 modules, 19 lessons, 89 enrollments, ₱5,999
+     3. "Ultimate Transformation" — Published · Advanced · 1 module, 4 lessons, 34 enrollments, ₱9,999
 ```
 
 ---
@@ -1284,11 +1286,11 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Breadcrumb: "Courses / PPC Foundations"
-   
+
    - Header: "PPC Foundations" (h1) + "Edit" button + "Published" badge + "Preview" ghost link
-   
+
    - TABS: [Overview] [Modules] [Lessons] [Pricing]
-   
+
    - TAB CONTENT (Modules):
      - Module list (vertical, drag-to-reorder handle on left):
        Each module:
@@ -1297,9 +1299,9 @@ Layout: Full-width with admin sidebar, main content.
        - "Module 2: Your First Campaign" · 3 lessons · Edit · Delete
        - "Module 3: Keyword Research" · 4 lessons · Edit · Delete
        - etc.
-     
+
      - "+ Add module" ghost button at bottom
-   
+
    - TAB CONTENT (Lessons — for Module 1):
      - Module heading: "Module 1: Understanding Amazon Ads"
      - Lesson list:
@@ -1309,7 +1311,7 @@ Layout: Full-width with admin sidebar, main content.
        - "1.2 Sponsored Products vs Sponsored Brands" · Published · Edit
        - "1.3 Your First Campaign Type" · Published · Edit
        - "1.4 Common Mistakes to Avoid" · Draft · Edit
-     
+
      - "+ Add lesson" ghost button
 ```
 
@@ -1326,13 +1328,13 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Payments" (h1) + stats: "₱284,500 total revenue" · "23 transactions" · "3 refunds"
-   
+
    - FILTER BAR:
      - Search: "Search by student or transaction ID..."
      - Filter: "All tiers" / "PPC Foundations" / "Accelerated Mastery" / "Ultimate"
      - Filter: "All statuses" / "Paid" / "Refunded" / "Pending"
      - Date range
-   
+
    - PAYMENTS TABLE:
      Columns: Student | Tier | Amount | Method | Date | Status | ⋮
      Rows:
@@ -1341,7 +1343,7 @@ Layout: Full-width with admin sidebar, main content.
      - "Ana R." | "Ultimate" | "₱9,999" | "Credit Card" | "Jul 9, 2026" | Paid | ⋮
      - "Pedro C." | "PPC Foundations" | "₱2,999" | "GCash" | "Jul 8, 2026" | Refunded (danger) | ⋮
      - etc.
-   
+
    - Pagination
 ```
 
@@ -1358,7 +1360,7 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Refunds" (h1) + "5 pending" warning badge + "12 processed"
-   
+
    - REFUNDS TABLE:
      Columns: Student | Tier | Amount | Reason | Requested | Status | ⋮
      Rows:
@@ -1373,7 +1375,7 @@ Layout: Full-width with admin sidebar, main content.
    - Payment info: "PPC Foundations • ₱2,999 • Paid July 8, 2026 via GCash"
    - Reason: "Course didn't match expectations. I thought it would cover Sponsored Brands in depth."
    - Requested: "July 9, 2026 at 2:15 PM"
-   
+
    - DECISION FORM:
      - "Approve" primary button (green) + "Deny" secondary button (danger)
      - Admin notes textarea: "Add notes about this decision..."
@@ -1393,18 +1395,18 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Analytics" (h1) + date range selector: "Last 30 days" / "Last 7 days" / "All time"
-   
+
    - SUB-NAV: [Enrollments] [Engagement] [Content] [Revenue]
-   
+
    - ENROLLMENTS TAB:
      - Funnel visualization (horizontal bars):
        Visits: 2,450 → Signups: 312 (12.7%) → Paid: 127 (40.7%) → Active: 89 (70.1%)
        Each stage: label, count, percentage, horizontal bar (width proportional)
-     
+
      - Tier breakdown:
        PPC Foundations: 67 (53%) | Accelerated Mastery: 42 (33%) | Ultimate: 18 (14%)
        Horizontal stacked bar chart
-   
+
    - REVENUE TAB:
      - MRR card: "₱284,500" (total revenue)
      - Revenue by tier (bar chart):
@@ -1413,7 +1415,7 @@ Layout: Full-width with admin sidebar, main content.
        Ultimate: ₱179,982
      - Refund rate: "2.4%" (green, below 5% target)
      - Recent transactions list (last 5)
-   
+
    - CONTENT TAB:
      - Module completion rates (bar chart):
        Module 1: 89% | Module 2: 72% | Module 3: 65% | Module 4: 58% | Module 5: 45%
@@ -1434,7 +1436,7 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Badges" (h1) + "Create badge" primary button
-   
+
    - BADGE CARDS (grid: repeat(auto-fit, minmax(280px, 1fr))):
      Each badge card (white, border, padding 24px):
      - Badge icon (48x48, colored circle with Phosphor icon)
@@ -1444,7 +1446,7 @@ Layout: Full-width with admin sidebar, main content.
      - Tier: "PPC Foundations" badge
      - Earned by: "89 students"
      - Actions: "Edit" ghost button + "Delete" ghost button (danger)
-   
+
    - 5 seeded badges:
      1. "Campaign Builder" — "Build 3 complete campaign structures" — 89 earned
      2. "Bid Master" — "Complete 5 Bid Elevator scenarios" — 67 earned
@@ -1466,12 +1468,12 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Live Classes" (h1) + "Schedule class" primary button
-   
+
    - UPCOMING CLASSES:
      Table: Title | Date | Time | Registrations | Status | ⋮
      - "Campaign Optimization Workshop" | "Jul 17, 2026" | "7:00 PM PST" | "12 / 30" | Upcoming (info) | ⋮
      - "Keyword Research Deep Dive" | "Jul 24, 2026" | "7:00 PM PST" | "8 / 30" | Upcoming | ⋮
-   
+
    - PAST CLASSES:
      Table: Title | Date | Attendees | Recording | ⋮
      - "Sponsored Brands Masterclass" | "Jul 10, 2026" | "18" | "View recording" | ⋮
@@ -1491,15 +1493,15 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Settings" (h1)
-   
+
    - SUB-NAV: [Branding] [Pricing] [Email] [Integrations]
-   
+
    - BRANDING TAB:
      - Logo upload area (dashed border, 200x80px)
      - Primary color: color picker (#FF6B35)
      - App name: "Project Amazon PH Academy" text input
      - Tagline: "Amazon advertising training for Filipino VAs" textarea
-   
+
    - PRICING TAB:
      - Tier editor (3 cards):
        Each tier:
@@ -1508,12 +1510,12 @@ Layout: Full-width with admin sidebar, main content.
        - Features textarea (one per line)
        - "Save changes" button per tier
      - Warning: "Price changes only affect new purchases. Existing enrollments keep their original price."
-   
+
    - EMAIL TAB:
      - Sender name: "Project Amazon PH Academy"
      - Sender email: "noreply@amphacademy.ph"
      - Template previews: Welcome, Payment confirmation, Refund approved
-   
+
    - INTEGRATIONS TAB:
      - PayMongo: API key input (masked), Webhook secret input (masked), "Test connection" button
      - Sentry: DSN input, "Test connection" button
@@ -1533,13 +1535,13 @@ Layout: Full-width with admin sidebar, main content.
 
 2. MAIN CONTENT:
    - Header: "Audit Log" (h1) + "Export CSV" ghost button
-   
+
    - FILTER BAR:
      - Search: "Search by action or entity..."
      - Filter: "All actions" / "user.*" / "course.*" / "payment.*" / "refund.*"
      - Filter: "All actors" (dropdown of admin users)
      - Date range
-   
+
    - AUDIT TABLE:
      Columns: Timestamp | Actor | Action | Entity | Details | IP
      Rows:
@@ -1547,7 +1549,7 @@ Layout: Full-width with admin sidebar, main content.
      - "Jul 10, 2:15 PM" | "Ryan D." | "refund.approve" | "Payment: pay_xxx" | "₱2,999 refunded via GCash" | "192.168.1.1"
      - "Jul 10, 1:30 PM" | "System" | "enrollment.create" | "User: Ana R." | "PPC Foundations, ₱2,999" | "—"
      - "Jul 9, 11:00 AM" | "Ryan D." | "course.publish" | "Course: PPC Foundations" | "Status: draft → published" | "192.168.1.1"
-   
+
    - Timestamp: JetBrains Mono, #737373
    - Actor: name + role badge
    - Action: monospace, color-coded by namespace (user=info, payment=success, refund=warning, course=default)
