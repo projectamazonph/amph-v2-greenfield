@@ -39,6 +39,13 @@ describe("user-facing simulator theme", () => {
     expect(css).toMatch(/^\.signUp\s*\{[\s\S]*?background:\s*var\(--c-orange\)/m);
   });
 
+  it("keeps orange landing navigation calls to action readable in the simulator shell", () => {
+    const css = source("src/components/landing/TopBar.module.css");
+
+    expect(css).toMatch(/\.navCta,\s*\.nav a\.navCtaMobile\s*\{[\s\S]*?background:\s*var\(--c-orange\)[\s\S]*?color:\s*var\(--c-navy-1\)/);
+    expect(css).toMatch(/\.navCta:hover,\s*\.nav a\.navCtaMobile:hover\s*\{[\s\S]*?color:\s*var\(--c-navy-1\)/);
+  });
+
   it("uses a compact public header and two-column plan grid before desktop widths", () => {
     const headerCss = source("src/components/student/PublicCatalogHeader.module.css");
     const pricingCss = source("src/app/pricing/page.module.css");

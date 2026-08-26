@@ -132,6 +132,21 @@
   display: none;
 }
 
+/* Preserve readable primary-action contrast inside the shell navigation. */
+.navCta,
+.nav a.navCtaMobile {
+  border-color: var(--c-orange);
+  background: var(--c-orange);
+  color: var(--c-navy-1);
+}
+
+.navCta:hover,
+.nav a.navCtaMobile:hover {
+  border-color: var(--c-orange-h);
+  background: var(--c-orange-h);
+  color: var(--c-navy-1);
+}
+
 .burger {
   display: none;
   width: 40px;
