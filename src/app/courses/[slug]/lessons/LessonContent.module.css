@@ -62,7 +62,7 @@
 
 .prose pre {
   background: var(--surface-3);
-  color: var(--accent-ink);
+  color: var(--ink-inverse);
   padding: var(--space-4);
   border-radius: var(--radius-sm);
   overflow-x: auto;
