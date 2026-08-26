@@ -166,6 +166,7 @@ jobs:
       # routes that construct the Redis-backed limiter.
       UPSTASH_REDIS_REST_URL: https://example-upstash.test
       UPSTASH_REDIS_REST_TOKEN: test-upstash-token
+      RATE_LIMITER_MODE: in-memory
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
