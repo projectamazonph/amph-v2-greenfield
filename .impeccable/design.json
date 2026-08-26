@@ -1,176 +1,73 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-20T00:00:00Z",
+  "generatedAt": "2026-08-26T00:00:00Z",
   "title": "Design System: Project Amazon PH Academy v2",
   "extensions": {
     "colorMeta": {
-      "accent": {
+      "amazon-orange": {
         "role": "primary",
-        "displayName": "Waybill Orange",
-        "canonical": "#FF6B35",
-        "tonalRamp": [
-          "#4A1F0F",
-          "#7A3319",
-          "#A84A24",
-          "#D65E2C",
-          "#FF6B35",
-          "#FF8F63",
-          "#FFB899",
-          "#FFE5D9"
-        ]
+        "displayName": "Amazon Orange",
+        "canonical": "#FF9900",
+        "tonalRamp": ["#131921", "#232F3E", "#9B3E00", "#C7511F", "#FF9900", "#FFA41C", "#FCE3C2", "#FEF3E7"]
       },
-      "manual-paper": {
+      "navy-shell": {
         "role": "neutral",
-        "displayName": "Manual Paper",
-        "canonical": "#FAFAF7",
-        "tonalRamp": [
-          "#3D3D38",
-          "#5C5C54",
-          "#7A7A70",
-          "#A3A398",
-          "#C4C4B8",
-          "#E5E5DC",
-          "#F4F3EE",
-          "#FAFAF7"
-        ]
+        "displayName": "Navy Shell",
+        "canonical": "#131921",
+        "tonalRamp": ["#0F1419", "#131921", "#232F3E", "#37475A", "#485769", "#99A5B4", "#E9EFF8", "#FFFFFF"]
       },
-      "ink-primary": {
+      "cool-surface": {
         "role": "neutral",
-        "displayName": "Primary Ink",
-        "canonical": "#171717",
-        "tonalRamp": [
-          "#171717",
-          "#262626",
-          "#404040",
-          "#595959",
-          "#737373",
-          "#A3A3A3",
-          "#D4D4D4",
-          "#FAFAF7"
-        ]
+        "displayName": "Cool Work Surface",
+        "canonical": "#F7F8FA",
+        "tonalRamp": ["#0F1111", "#232F3E", "#565959", "#626A6A", "#B1B6BC", "#D5D9D9", "#EEF1F4", "#F7F8FA"]
       },
       "success": {
         "role": "tertiary",
-        "displayName": "Passed Green",
-        "canonical": "#0E7C3A",
-        "tonalRamp": [
-          "#052E16",
-          "#0A4A24",
-          "#0E7C3A",
-          "#16A34A",
-          "#4ADE80",
-          "#86EFAC",
-          "#BBF7D0",
-          "#DCFCE7"
-        ]
+        "displayName": "Success Green",
+        "canonical": "#067D62",
+        "tonalRamp": ["#054A3A", "#067D62", "#E6F4F0", "#FFFFFF"]
       },
       "warning": {
         "role": "tertiary",
         "displayName": "Attention Amber",
-        "canonical": "#B45309",
-        "tonalRamp": [
-          "#451A03",
-          "#78350F",
-          "#93420A",
-          "#B45309",
-          "#D97706",
-          "#F59E0B",
-          "#FCD34D",
-          "#FEF3C7"
-        ]
+        "canonical": "#C45500",
+        "tonalRamp": ["#8A5300", "#C45500", "#FFF4E5", "#FFFFFF"]
       },
       "danger": {
         "role": "tertiary",
         "displayName": "Error Red",
-        "canonical": "#B91C1C",
-        "tonalRamp": [
-          "#450A0A",
-          "#7F1D1D",
-          "#991313",
-          "#B91C1C",
-          "#DC2626",
-          "#EF4444",
-          "#FCA5A5",
-          "#FEE2E2"
-        ]
+        "canonical": "#B12704",
+        "tonalRamp": ["#8A1F00", "#B12704", "#FDEDED", "#FFFFFF"]
       },
       "info": {
         "role": "tertiary",
-        "displayName": "Info Blue",
-        "canonical": "#1E40AF",
-        "tonalRamp": [
-          "#0F1E4D",
-          "#173296",
-          "#1E40AF",
-          "#2563EB",
-          "#3B82F6",
-          "#60A5FA",
-          "#93C5FD",
-          "#DBEAFE"
-        ]
+        "displayName": "Information Blue",
+        "canonical": "#007185",
+        "tonalRamp": ["#054A5A", "#007185", "#E7F3F4", "#FFFFFF"]
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Display",
-        "purpose": "Marketing hero only. One per page, maximum."
-      },
-      "headline": { "displayName": "Headline", "purpose": "Page and section titles." },
-      "title": { "displayName": "Title", "purpose": "Card headers, subsection titles." },
-      "body": {
-        "displayName": "Body",
-        "purpose": "Default reading copy, 72ch max for lessons, 60ch for UI text."
-      },
-      "label": {
-        "displayName": "Label",
-        "purpose": "Buttons, form labels, nav items, table headers."
-      },
-      "mono": { "displayName": "Mono", "purpose": "Tabular numbers, bid values, hashes, code." }
+      "display": { "displayName": "Archivo", "purpose": "Page and section headings, control labels, and table headers." },
+      "headline": { "displayName": "Archivo", "purpose": "Page and section titles." },
+      "title": { "displayName": "Archivo", "purpose": "Card headers and subsection titles." },
+      "body": { "displayName": "PT Sans", "purpose": "Default reading copy and form text." },
+      "label": { "displayName": "Archivo", "purpose": "Buttons, form labels, navigation items, and table headers." },
+      "mono": { "displayName": "IBM Plex Mono", "purpose": "Tabular numbers, bid values, hashes, identifiers, and code." }
     },
     "shadows": [
-      {
-        "name": "shadow-sm",
-        "value": "0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02)",
-        "purpose": "Ambient lift on interactive card hover."
-      },
-      {
-        "name": "shadow-md",
-        "value": "0 2px 4px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.04)",
-        "purpose": "Dropdowns and popovers."
-      },
-      {
-        "name": "shadow-lg",
-        "value": "0 4px 8px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.06)",
-        "purpose": "Modals — the deepest shadow in the system."
-      }
+      { "name": "shadow-sm", "value": "0 1px 2px rgba(15,17,17,0.08)", "purpose": "Resting cards and panels." },
+      { "name": "shadow-md", "value": "0 2px 6px rgba(15,17,17,0.10)", "purpose": "Interactive cards and menus." },
+      { "name": "shadow-lg", "value": "0 4px 14px rgba(15,17,17,0.12)", "purpose": "Elevated overlays." },
+      { "name": "shadow-xl", "value": "0 8px 24px rgba(15,17,17,0.16)", "purpose": "Dialogs and critical overlays." }
     ],
     "motion": [
-      {
-        "name": "duration-fast",
-        "value": "120ms",
-        "purpose": "Hover, focus, active color transitions."
-      },
-      {
-        "name": "duration-base",
-        "value": "220ms",
-        "purpose": "Fade-ins, default state transitions."
-      },
-      { "name": "duration-slow", "value": "400ms", "purpose": "Slide-up for modals and drawers." },
-      {
-        "name": "ease-out",
-        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Default easing — content appearing, modals opening."
-      },
-      {
-        "name": "ease-in",
-        "value": "cubic-bezier(0.7, 0, 0.84, 0)",
-        "purpose": "Content leaving/dismissing."
-      },
-      {
-        "name": "ease-in-out",
-        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
-        "purpose": "Reversible state transitions."
-      }
+      { "name": "duration-fast", "value": "120ms", "purpose": "Hover, focus, and active color transitions." },
+      { "name": "duration-base", "value": "180ms", "purpose": "Default state transitions." },
+      { "name": "duration-slow", "value": "280ms", "purpose": "Drawers and overlay entry." },
+      { "name": "ease-out", "value": "cubic-bezier(0.2,0.7,0.3,1)", "purpose": "Default appearing motion." },
+      { "name": "ease-in", "value": "cubic-bezier(0.7,0,0.84,1)", "purpose": "Dismissal motion." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.2,0.7,0.3,1)", "purpose": "Reversible state transitions." }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },
@@ -185,121 +82,96 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The one high-emphasis action per view. Dark ink text on Waybill Orange, presses down 1px on click.",
+      "description": "High-emphasis action with navy text on Amazon Orange, compact 40px height, and an accessible orange focus ring.",
       "html": "<button class=\"ds-btn ds-btn-primary\">Continue</button>",
-      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 16px; font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 500; font-size: 0.875rem; border: 1px solid transparent; border-radius: 6px; cursor: pointer; transition: background 120ms cubic-bezier(0.16,1,0.3,1), transform 80ms cubic-bezier(0.16,1,0.3,1); } .ds-btn:active { transform: translateY(-1px); } .ds-btn:focus-visible { outline: 2px solid #FF6B35; outline-offset: 2px; } .ds-btn-primary { background: #FF6B35; color: #1A1A2E; } .ds-btn-primary:hover { background: #E55A2B; }"
+      "css": ".ds-btn { display:inline-flex; min-height:40px; align-items:center; justify-content:center; gap:8px; padding:8px 16px; font-family:'Archivo',system-ui,sans-serif; font-weight:700; font-size:13px; border:1px solid transparent; border-radius:6px; cursor:pointer; transition:background 120ms cubic-bezier(0.2,0.7,0.3,1),transform 120ms cubic-bezier(0.2,0.7,0.3,1),box-shadow 120ms cubic-bezier(0.2,0.7,0.3,1); } .ds-btn:active { transform:translateY(1px); } .ds-btn:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(255,153,0,0.35); } .ds-btn-primary { background:#FF9900; border-color:#FF9900; color:#131921; } .ds-btn-primary:hover { background:#FFA41C; border-color:#FFA41C; box-shadow:0 1px 2px rgba(15,17,17,0.08); }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Bordered, white background — the fallback action beside a primary button.",
+      "description": "Bordered work-surface action beside a primary control.",
       "html": "<button class=\"ds-btn ds-btn-secondary\">Cancel</button>",
-      "css": ".ds-btn-secondary { background: #FFFFFF; color: #171717; border: 1px solid #E5E5E0; } .ds-btn-secondary:hover { background: #F4F3EE; border-color: #A3A3A3; }"
+      "css": ".ds-btn-secondary { background:#FFFFFF; color:#007185; border:1px solid #485769; } .ds-btn-secondary:hover { background:#E7F3F4; border-color:#007185; color:#054A5A; }"
     },
     {
       "name": "Ghost Button",
       "kind": "button",
       "refersTo": "button-ghost",
-      "description": "Transparent, lowest-emphasis action.",
+      "description": "Transparent, lowest-emphasis action that retains a visible focus treatment.",
       "html": "<button class=\"ds-btn ds-btn-ghost\">Skip</button>",
-      "css": ".ds-btn-ghost { background: transparent; color: #404040; } .ds-btn-ghost:hover { background: #F4F3EE; }"
+      "css": ".ds-btn-ghost { background:transparent; color:#007185; } .ds-btn-ghost:hover { background:#E7F3F4; color:#054A5A; }"
     },
     {
       "name": "Default Card",
       "kind": "card",
       "refersTo": "card-default",
-      "description": "Static card. Border is the elevation; no shadow at rest.",
+      "description": "Work-surface card with a standard border and restrained resting elevation.",
       "html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">Module 3: Bid Strategy</h3><p class=\"ds-card-body\">Learn how to read search term reports and adjust bids with confidence.</p></div>",
-      "css": ".ds-card { background: #FFFFFF; border: 1px solid #E5E5E0; border-radius: 10px; padding: 16px; font-family: 'Space Grotesk', system-ui, sans-serif; transition: border-color 120ms cubic-bezier(0.16,1,0.3,1), transform 220ms cubic-bezier(0.16,1,0.3,1), box-shadow 220ms cubic-bezier(0.16,1,0.3,1); } .ds-card-title { font-size: 1.125rem; font-weight: 600; color: #171717; margin-bottom: 8px; } .ds-card-body { font-size: 1rem; color: #404040; line-height: 1.5; }"
+      "css": ".ds-card { background:#FFFFFF; border:1px solid #D5D9D9; border-radius:8px; padding:16px; box-shadow:0 1px 2px rgba(15,17,17,0.08); font-family:'PT Sans',system-ui,sans-serif; transition:border-color 120ms cubic-bezier(0.2,0.7,0.3,1),transform 120ms cubic-bezier(0.2,0.7,0.3,1),box-shadow 120ms cubic-bezier(0.2,0.7,0.3,1); } .ds-card-title { font-family:'Archivo',system-ui,sans-serif; font-size:18px; font-weight:700; color:#232F3E; margin-bottom:8px; } .ds-card-body { font-size:14px; color:#565959; line-height:1.55; }"
     },
     {
       "name": "Interactive Card",
       "kind": "card",
       "refersTo": "card-interactive",
-      "description": "Clickable card. Hover lifts 1px, border strengthens, ambient shadow appears.",
+      "description": "Clickable card with a gentle hover lift, orange-tinted border, and strengthened elevation.",
       "html": "<div class=\"ds-card ds-card-interactive\" tabindex=\"0\"><h3 class=\"ds-card-title\">Campaign Builder</h3><p class=\"ds-card-body\">Practice building a Sponsored Products campaign end to end.</p></div>",
-      "css": ".ds-card-interactive { cursor: pointer; } .ds-card-interactive:hover { border-color: #D4D4D4; transform: translateY(-1px); box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02); } .ds-card-interactive:focus-visible { outline: 2px solid #FF6B35; outline-offset: 2px; }"
+      "css": ".ds-card-interactive { cursor:pointer; } .ds-card-interactive:hover { border-color:#FCE3C2; transform:translateY(-1px); box-shadow:0 2px 6px rgba(15,17,17,0.10); } .ds-card-interactive:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(255,153,0,0.35); }"
     },
     {
       "name": "Text Input",
       "kind": "input",
       "refersTo": "input-default",
-      "description": "Default form field. Orange border and soft ring on focus.",
+      "description": "White work-surface field with a standard border, 40px height, and orange focus treatment.",
       "html": "<div class=\"ds-field\"><label class=\"ds-label\">Email</label><input class=\"ds-input\" type=\"email\" placeholder=\"you@example.com\" /></div>",
-      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-family: 'Space Grotesk', system-ui, sans-serif; } .ds-label { font-size: 0.875rem; font-weight: 500; color: #404040; letter-spacing: 0.01em; } .ds-input { height: 40px; padding: 0 14px; background: #FFFFFF; border: 1.5px solid #E5E5E0; border-radius: 6px; color: #171717; outline: none; transition: border-color 120ms cubic-bezier(0.16,1,0.3,1), box-shadow 120ms cubic-bezier(0.16,1,0.3,1); } .ds-input::placeholder { color: #D4D4D4; } .ds-input:focus-visible { border-color: #FF6B35; box-shadow: 0 0 0 3px #FFE5D9; }"
+      "css": ".ds-field { display:flex; flex-direction:column; gap:6px; font-family:'PT Sans',system-ui,sans-serif; } .ds-label { font-family:'Archivo',system-ui,sans-serif; font-size:13px; font-weight:600; color:#232F3E; } .ds-input { height:40px; padding:0 12px; background:#FFFFFF; border:1px solid #D5D9D9; border-radius:6px; color:#0F1111; outline:none; transition:border-color 120ms cubic-bezier(0.2,0.7,0.3,1),box-shadow 120ms cubic-bezier(0.2,0.7,0.3,1); } .ds-input::placeholder { color:#B1B6BC; } .ds-input:focus-visible { border-color:#9B3E00; box-shadow:0 0 0 3px rgba(255,153,0,0.35); }"
     },
     {
       "name": "Accent Badge",
       "kind": "chip",
       "refersTo": "badge-accent",
-      "description": "Status pill — soft background, saturated text, never the reverse.",
+      "description": "Compact selected-context chip with readable dark orange text on a soft orange surface.",
       "html": "<span class=\"ds-badge\">In Progress</span>",
-      "css": ".ds-badge { display: inline-flex; align-items: center; height: 22px; padding: 0 12px; border-radius: 9999px; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; background: #FFE5D9; color: #FF6B35; }"
+      "css": ".ds-badge { display:inline-flex; align-items:center; min-height:24px; padding:0 10px; border-radius:999px; font-family:'Archivo',system-ui,sans-serif; font-size:12px; font-weight:700; background:#FEF3E7; color:#9B3E00; }"
     },
     {
       "name": "Sidebar Nav Item",
       "kind": "nav",
       "refersTo": "nav-item-active",
-      "description": "Fixed sidebar nav row. Active state: soft orange background, orange text, left-border indicator.",
+      "description": "Navy-shell navigation row with orange selected state and leading indicator.",
       "html": "<a class=\"ds-nav-item ds-nav-item-active\" href=\"#\"><span class=\"ds-nav-icon\">&#9679;</span><span>Courses</span></a>",
-      "css": ".ds-nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 6px; color: #404040; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; text-decoration: none; border-left: 2px solid transparent; transition: background 120ms cubic-bezier(0.16,1,0.3,1), color 120ms cubic-bezier(0.16,1,0.3,1); } .ds-nav-item:hover { background: #F4F3EE; color: #171717; } .ds-nav-item-active { background: #FFE5D9; color: #FF6B35; border-left-color: #FF6B35; font-weight: 600; } .ds-nav-icon { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }"
+      "css": ".ds-nav-item { display:flex; align-items:center; gap:12px; min-height:40px; padding:8px 12px; border:1px solid transparent; border-radius:6px; color:#99A5B4; font-family:'Archivo',system-ui,sans-serif; font-size:13px; font-weight:600; text-decoration:none; transition:background 120ms cubic-bezier(0.2,0.7,0.3,1),color 120ms cubic-bezier(0.2,0.7,0.3,1); } .ds-nav-item:hover { background:rgba(255,255,255,0.04); color:#E9EFF8; } .ds-nav-item-active { background:rgba(255,153,0,0.08); border-color:rgba(255,153,0,0.30); color:#FF9900; font-weight:700; } .ds-nav-icon { width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; }"
     }
   ],
   "narrative": {
-    "northStar": "The Field Manual",
-    "overview": "This system reads like a 1970s technical service manual or a Federal Express waybill, not a SaaS landing page: dense, hierarchical, typographically clear, built for someone who needs to find one specific piece of information under pressure. Every screen assumes the reader is a tired VA on a phone at 2am who needs to find the quiz retry button — not a visitor who needs to be sold, delighted, or slowed down with hero copy. Density is the point, not a compromise.\n\nThe palette stays disciplined on purpose: warm paper neutrals and near-black ink carry almost every surface, and Waybill Orange is spent like a rationed resource — one accent element per viewport, two at the absolute limit. Borders do the elevation work that shadows do everywhere else; nothing floats or glows without a state (hover, focus, error) earning it.\n\nThis system explicitly rejects glassmorphism with gradient orbs, cyan-on-dark neon, oversized-hero portfolio layouts with 80% white space, and the generic \"AI-built SaaS\" template look. It is not decorated. It is used.",
+    "northStar": "The Amazon PH Simulator System",
+    "overview": "This system is an operational training interface: a navy global shell, cool-gray work canvas, white cards, compact controls, and Amazon Orange reserved for primary action and selected context. It is designed for fast scanning and confident decisions across lessons, simulators, and administration. The interface uses soft, purposeful elevation to establish work-surface hierarchy, with semantic colors supporting success, warning, error, and information states. Decorative print effects, warm-paper metaphors, and unrelated visual languages are outside the system.",
     "keyCharacteristics": [
-      "Warm off-white paper base, never pure white as the app background",
-      "One disciplined accent (Waybill Orange), spent sparingly and deliberately",
-      "Borders as elevation; shadows only as a response to interaction, never at rest",
-      "Space Grotesk for everything read as language; JetBrains Mono for everything read as data",
-      "Motion limited to three moves: fade, slide-up, color transition — nothing else"
+      "Navy shell chrome with cool work surfaces and white cards",
+      "Amazon Orange for primary action, focus, and selected context",
+      "Archivo for headings and controls, PT Sans for body copy, IBM Plex Mono for data",
+      "Subtle resting elevation with stronger interactive elevation",
+      "Compact, accessible controls with 44px mobile targets where touch is primary"
     ],
     "rules": [
-      {
-        "name": "The Rationed Accent Rule",
-        "body": "Waybill Orange appears on at most two elements per viewport. Its rarity is what makes it readable as \"this matters\" — spread it across a whole screen and it stops meaning anything.",
-        "section": "colors"
-      },
-      {
-        "name": "The Contrast-Over-Convention Rule",
-        "body": "Primary-button text is dark ink on orange (#1A1A2E, 6.0:1 contrast), not the \"obvious\" white — white on this orange fails AA (2.83:1). Check contrast, don't assume the convention.",
-        "section": "colors"
-      },
-      {
-        "name": "The One Display Rule",
-        "body": "Exactly one display-sized element exists per page — the marketing hero. Everything else, no matter how important, is headline or smaller.",
-        "section": "typography"
-      },
-      {
-        "name": "The No-900-Weight Rule",
-        "body": "Nothing goes above weight 700. Heaviness is signaled by scale and spacing, not by maxing out the weight axis.",
-        "section": "typography"
-      },
-      {
-        "name": "The Border-Is-Elevation Rule",
-        "body": "A static card, input, or panel is distinguished from its background by a 1px border, never a shadow. Shadow appears only when something is actively lifted.",
-        "section": "elevation"
-      }
+      { "name": "Action Hierarchy Rule", "body": "Use Amazon Orange for the local primary action, active navigation, keyboard focus, and selected state. Supporting actions use blue or neutral work-surface treatments.", "section": "colors" },
+      { "name": "Accessible Contrast Rule", "body": "Use dark navy text on Amazon Orange controls and the dark-orange token for orange text on light surfaces. Verify contrast instead of assuming a conventional color pairing is accessible.", "section": "colors" },
+      { "name": "Defined Type Roles Rule", "body": "Archivo establishes hierarchy and controls, PT Sans supports reading, and IBM Plex Mono is reserved for fixed-width data. Do not introduce substitute global typefaces.", "section": "typography" },
+      { "name": "Controlled Elevation Rule", "body": "Cards and panels use a subtle resting shadow; interactive elements strengthen elevation only when a state change communicates affordance.", "section": "elevation" }
     ],
     "dos": [
-      "Do keep the app background warm off-white (#FAFAF7), never pure white — pure white is reserved for cards and panels sitting on top of it.",
-      "Do spend Waybill Orange like a rationed resource: one accent element per viewport, two maximum.",
-      "Do use a 1px border as the elevation signal for any static card, input, or panel.",
-      "Do reserve shadows for elements actually being lifted by interaction — never at rest.",
-      "Do pair every error and success state with text + icon + color, never color alone.",
-      "Do keep tap targets at least 44×44px on mobile, and every focus state a visible 2px Waybill Orange ring.",
-      "Do cap line length at 72ch for lesson body text, 60ch for UI copy."
+      "Do use the navy shell, cool-gray work canvas, white cards, and Amazon Orange primary actions.",
+      "Do use the shared four-pixel spacing scale and 4–12px radius family.",
+      "Do pair every semantic status with text, icon, and color where the state needs explanation.",
+      "Do keep touch-critical targets at least 44×44px on mobile and preserve a visible orange focus ring.",
+      "Do use restrained elevation to clarify card and overlay hierarchy."
     ],
     "donts": [
-      "Don't use glassmorphism, gradient orbs, or backdrop-blur decoration.",
-      "Don't use cyan-on-dark neon accents.",
-      "Don't build oversized hero sections with 80% white space in the portfolio-site style.",
-      "Don't reach for the generic \"AI-built SaaS\" template look: gradient-text headlines, identical icon-card grids, hero-metric stat blocks.",
-      "Don't use font weight 800 or 900 anywhere.",
-      "Don't put white text on the primary accent button — it fails AA contrast.",
-      "Don't add a shadow to a card, input, or panel that isn't actively being interacted with."
+      "Don't add warm-paper textures, print motifs, decorative noise, or arbitrary visual metaphors.",
+      "Don't use glassmorphism, gradient orbs, cyan-on-dark neon accents, or decorative motion.",
+      "Don't create oversized marketing whitespace or generic portfolio-style hero treatment.",
+      "Don't use font weight 800 or 900 for hierarchy.",
+      "Don't put white text on the primary orange button or introduce hard-coded component palettes."
     ]
   }
 }

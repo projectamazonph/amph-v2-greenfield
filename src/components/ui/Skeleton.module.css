@@ -1,5 +1,5 @@
 /* Skeleton.module.css — shared loading placeholders.
-   Field Manual: pulse animation, warm neutrals, subtle motion. */
+   Amazon PH simulator: pulse animation, warm neutrals, subtle motion. */
 
 @keyframes pulse {
   0%, 100% { opacity: 0.4; }
@@ -54,7 +54,7 @@
 /* L-11: SkeletonTable now uses real <table> / <tr> / <th> / <td> instead
    of <div> placeholders so the loading state mirrors the real table that
    replaces it. The header row carries a thicker bottom border, body rows
-   use the standard Field Manual row divider. */
+   use the standard Amazon PH simulator row divider. */
 .tableHeaderRow {
   background: var(--surface-1);
 }

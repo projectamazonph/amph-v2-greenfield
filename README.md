@@ -2,7 +2,7 @@
 
 Amazon PPC training for Filipino virtual assistants.
 
-Three courses, practical tools, and a Field Manual interface. The repository contains the Next.js application, Prisma schema and migrations, curriculum importer, payment integration, admin panel, and automated tests.
+Three courses, practical tools, and an Amazon PH simulator interface. The repository contains the Next.js application, Prisma schema and migrations, curriculum importer, payment integration, admin panel, and automated tests.
 
 **Production:** <https://projectamazonph.vercel.app>. The retired `amph-v2-greenfield.vercel.app` origin must not be used for new links. Deployment configuration, database contents, payment webhooks, and live email delivery remain operator-owned checks.
 

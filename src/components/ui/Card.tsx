@@ -1,5 +1,5 @@
 /**
- * Card — Field Manual container.
+ * Card — Amazon PH simulator container.
  *
  * Per design spec §5: no shadow by default (the border is the elevation);
  * hover (interactive only) lifts + strengthens border; never nest cards

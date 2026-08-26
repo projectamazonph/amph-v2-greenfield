@@ -26,7 +26,7 @@ tasks:
       - src/infra/simulator/buildSimulatorRegistry.ts (registry of 4)
       - src/composition/container.ts (DI container — simulatorRegistry is in test container; you need to add it to prod container too)
       - src/composition/container.test.ts (test container)
-      - docs/ui-specs/wireframes/assets/tokens.css (Field Manual design system)
+      - DESIGN.md and src/app/globals.css (Amazon PH simulator design system)
 
       ENVIRONMENT:
       - Work in a worktree: `git worktree add .worktrees/feat-tools-pages -b feat/tools-pages origin/feat/ui-wiring`

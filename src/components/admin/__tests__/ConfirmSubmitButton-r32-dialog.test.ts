@@ -7,7 +7,7 @@
  *    Native `window.confirm()` is implemented by the browser, is not
  *    part of the page DOM, and is not announced reliably by screen
  *    readers in all browsers. It also blocks the main thread, freezes
- *    animation, and cannot be styled to match the Field Manual.
+ *    animation, and cannot be styled to match the simulator interface.
  *    Fix: Replace with a real `<dialog>` (or Astryx `Modal`) backed
  *    by `useState` for open state. Render confirm/cancel buttons with
  *    `type=\"button\"`, focus-trap the modal, restore focus to the

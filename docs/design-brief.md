@@ -18,7 +18,7 @@ A focused Amazon training platform with a navy operating shell, cool-gray work s
 
 This application is part of the Project Amazon PH Academy ecosystem. It should feel at home beside the simulator platform: clear, practical, dense enough for real workflows, and consistently themed from student-facing routes through the admin console. The interface helps learners and operators act with confidence; it does not imitate a paper manual or a generic SaaS dashboard.
 
-The retired **Field Manual** direction no longer governs design decisions. Do not use warm paper neutrals, Waybill Orange (`#FF6B35`), Space Grotesk, JetBrains Mono, or a global no-shadow rule. The full token system and migration guidance are maintained in [`DESIGN.md`](../DESIGN.md).
+Use the Amazon PH simulator system throughout: cool work surfaces, navy shell context, Amazon Orange action hierarchy, defined typography roles, and restrained resting elevation. The full token system and implementation guidance are maintained in [`DESIGN.md`](../DESIGN.md).
 
 ## Visual Reference
 
@@ -52,7 +52,7 @@ All values are defined in `src/app/globals.css`. New work uses canonical `--c-*`
 | `--c-ink` | `#0F1111` | Primary content text. |
 | `--c-ink-2` | `#232F3E` | Headings. |
 | `--c-sub` | `#565959` | Supporting copy. |
-| `--c-faint` | `#767B7B` | Metadata. |
+| `--c-faint` | `#626A6A` | Accessible metadata. |
 | `--c-link` | `#007185` | Text links and ghost actions. |
 
 ### Semantic states
@@ -74,7 +74,7 @@ All values are defined in `src/app/globals.css`. New work uses canonical `--c-*`
 | Tight secondary label | Barlow Condensed | 500–700 | Use sparingly when constrained. |
 | IDs, amounts, code, timestamps | IBM Plex Mono | 400–600 | Use only when fixed-width scanning adds value. |
 
-Use fluid `--fs-h1`, `--fs-h2`, `--fs-h3`, and `--fs-body` values. No weight above 700. Do not reintroduce Space Grotesk or JetBrains Mono.
+Use fluid `--fs-h1`, `--fs-h2`, `--fs-h3`, and `--fs-body` values. No weight above 700. Keep Archivo, PT Sans, Barlow Condensed, and IBM Plex Mono within their documented roles.
 
 ## Spacing, Shape, and Elevation
 

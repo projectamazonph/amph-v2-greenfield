@@ -4,7 +4,7 @@
  * Client component that wraps the application in Astryx's Theme provider.
  * Must be used in every page that uses Astryx components.
  *
- * The AMPH brand theme (Waybill Orange, Space Grotesk, flat elevation)
+ * The AMPH brand theme (Amazon Orange, Archivo and PT Sans, soft operational elevation)
  * is applied here so all child components pick it up automatically.
  *
  * Usage in layout.tsx:

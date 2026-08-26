@@ -1,5 +1,5 @@
 /* checkout-status.module.css — shared styles for /checkout/success and /checkout/failed.
-   Field Manual tokens, centered card layout, responsive. */
+   Amazon PH simulator tokens, centered card layout, responsive. */
 
 .page {
   min-height: 100vh;
@@ -143,7 +143,7 @@
   text-decoration: none;
   white-space: nowrap;
   transition: background-color var(--duration-base) var(--ease-out);
-  /* M-R28 fix: Field Manual §5 (docs/design-brief.md:142) — Button has no
+  /* M-R28 fix: Amazon PH simulator §5 (docs/design-brief.md:142) — Button has no
      box-shadow. The 1px border is the elevation; the previous
      `, box-shadow var(--duration-base) var(--ease-out)` term was dead code
      (no box-shadow declaration on the button) and the `box-shadow: none`

@@ -71,9 +71,9 @@
 }
 
 .logoutButton:hover {
-  border-color: rgba(177, 39, 4, 0.5);
-  background: rgba(177, 39, 4, 0.16);
-  color: #ffb3a8;
+  border-color: color-mix(in srgb, var(--c-red) 56%, transparent);
+  background: color-mix(in srgb, var(--c-red) 20%, transparent);
+  color: var(--c-red-bg);
 }
 
 .logoutButton:focus-visible {

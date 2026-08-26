@@ -1,6 +1,6 @@
 // src/components/lesson/PitfallCallout.tsx
 /**
- * PitfallCallout - Field Manual callout: info | warning | pitfall.
+ * PitfallCallout - Amazon PH simulator callout: info | warning | pitfall.
  *
  * Server component. Renders <aside role="note"> with token-driven color and
  * a Phosphor icon (decorative). Not dismissible - these are part of the lesson.

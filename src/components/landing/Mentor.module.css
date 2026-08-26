@@ -31,24 +31,27 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
 }
 
-.stamp {
+.credential {
   position: absolute;
-  left: -12px;
-  bottom: -12px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 10px 14px;
+  bottom: -14px;
+  left: var(--space-4);
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--c-navy-3);
   border-radius: var(--radius-md);
-  box-shadow: 3px 3px 0 var(--ink-900);
-  transform: rotate(-3deg);
+  background: var(--c-navy-2);
+  box-shadow: var(--sh-2);
+  color: var(--c-shell-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .quote {

@@ -8,7 +8,7 @@ Conventions for AI coding assistants and developers working on this codebase.
 
 1. **Zero AI features.** No `openai`, `anthropic`, `langchain`, or any LLM API. No mentor chat, no AI mistake analysis. ADR-003.
 2. **One icon set.** Phosphor (light) only. No Heroicons, no Lucide.
-3. **One font pairing.** Space Grotesk + JetBrains Mono. No Inter, no system fonts in product UI.
+3. **Defined typography roles.** Archivo for headings and controls, PT Sans for body copy, Barlow Condensed for tightly constrained labels, and IBM Plex Mono for data. No substitute global fonts in product UI.
 4. **Server actions for mutations.** Reserve API routes for webhooks, file uploads, third-party.
 5. **Every admin action logs to AuditLog.** No exceptions.
 6. **Dependency direction is inward.** `app/`, `infra/`, `composition/` import from `ports/`. `usecases/` import from `ports/` and `domain/`. `domain/` and `ports/` import nothing from `app/`, `infra/`, or any framework. Enforced by ESLint boundary rules. ADR-016.
@@ -19,7 +19,7 @@ Direct, plain-spoken, Filipino VA audience. No jargon without definition. No AI-
 
 ## The Design System
 
-Field Manual. Dense, scannable, utilitarian. Off-white surface. Orange accent (#FF6B35). Type-led hierarchy. No glassmorphism, no gradient orbs, no decorative blurs. See `docs/design-brief.md`.
+Amazon PH simulator system. Dense, scannable, and operational, with a navy shell, cool work surfaces, white cards, Amazon Orange action hierarchy, and restrained elevation. No glassmorphism, gradient orbs, decorative print effects, or decorative blurs. See `docs/design-brief.md`.
 
 ## UI Components — Astryx
 
@@ -33,7 +33,7 @@ import { Button, Card, Input, Badge } from "@/components/ui";
 import { Table } from "@astryxdesign/core/Table";
 ```
 
-The AMPH Astryx theme is in `src/themes/amph-theme.ts`. It extends `neutralTheme` with Waybill Orange (#FF6B35), Space Grotesk + JetBrains Mono, the AMPH surface/ink/semantic token ramp, and flat-shadow overrides. Theme is applied via `<Providers>` in `src/app/layout.tsx` — every page gets it automatically.
+The AMPH Astryx theme is in `src/themes/amph-theme.ts`. It extends `neutralTheme` with the Amazon Orange, navy-shell, cool-surface, semantic, and restrained-elevation token ramp. Theme is applied via `<Providers>` in `src/app/layout.tsx` — every page gets it automatically.
 
 Before writing new UI, run `pnpm exec astryx build "<idea>"` for a composition kit, then `pnpm exec astryx component <Name>` for the full API. Never swizzle an Astryx component unless a brand requirement cannot be achieved via theme override.
 

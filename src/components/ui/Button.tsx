@@ -1,5 +1,5 @@
 /**
- * Button — Field Manual primary control.
+ * Button — Amazon PH simulator primary control.
  *
  * Per design spec §5: tactile -1px translateY on :active, ONE primary per
  * viewport, focus ring is 2px --accent with 2px offset. Default type is

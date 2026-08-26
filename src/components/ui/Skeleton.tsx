@@ -2,7 +2,7 @@
  * Skeleton — shared loading placeholder.
  *
  * Composable primitives for building page-level loading states.
- * Uses the Field Manual pulse animation (opacity 0.4 → 1 → 0.4).
+ * Uses the Amazon PH simulator pulse animation (opacity 0.4 → 1 → 0.4).
  *
  * Usage:
  *   <SkeletonBlock width="100%" height="2rem" />
