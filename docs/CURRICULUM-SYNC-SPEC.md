@@ -14,7 +14,7 @@ The target is not a byte-for-byte copy. The greenfield content remains the sourc
 | Accelerated Mastery     | 5–10    | Portfolio strategy, bidding, search-term triage, competitive intelligence, weekly optimization, reporting/troubleshooting |
 | Ultimate Transformation | 11      | VA workflow, client communication, capstone evidence                                                                      |
 
-This produces 12 modules and 40 lessons. Module and lesson slugs remain stable for existing content. New lessons use the source repository’s `m9l1` through `m11l4` sequence with greenfield-compatible filenames and frontmatter.
+This produces 12 modules and 42 lessons. Module and lesson slugs remain stable for existing content. New lessons use the source repository’s `m9l1` through `m11l4` sequence with greenfield-compatible filenames and frontmatter.
 
 ## Content and tone rules
 

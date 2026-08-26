@@ -1,5 +1,7 @@
 # Lesson 1.1 Enrichment QA
 
+> **Historical snapshot.** This QA record predates the synchronized 12-module, 42-lesson curriculum. Its Lesson 1.1 measurements describe the earlier release.
+
 The enriched Lesson 1.1 source contains seven visual blocks: a diagnostic map, metric matrix, worked-example panel, decision sequence, pattern board, practice workbench, and recommendation builder. The visuals are authored in MDX through the `:::visual` directive and rendered by `VisualLessonBlock`.
 
 The dependency-free visual contract check reports `7 blocks valid`. Strict lesson-production validation reports `31/31 lessons complete`. The focused parser and renderer suite reports `22 tests passed`, including the visual JSON transport test, diagnostic-map rendering test, and worked-example calculation test. TypeScript typechecking passes. Architecture tests pass with `674 tests passed`.

@@ -10,6 +10,8 @@
 
 **Status:** In progress on `feat/active-lesson-primitives`. Component primitives, directive plugin, validator, and Module 1 application are committed. Section 5.3 validator rules (fence IDs, SelfCheck shape, em-dash check inside blocks, `--strict` mode) ship with `pnpm validate:lesson-production`. PR not yet opened.
 
+> **Historical snapshot.** This story describes the original 31-lesson visual-primitives tranche. The current curriculum has 42 lessons and additional native directives; use `docs/CURRICULUM-SYNC-SPEC.md` and `content/README.md` for the active authoring contract.
+
 ## Goal
 
 Replace passive read-only prose in Module 1 lessons with one interactive primitive

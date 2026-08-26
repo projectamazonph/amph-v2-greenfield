@@ -1,5 +1,7 @@
 # Priority Lesson Deep-Enrichment QA
 
+> **Historical snapshot.** This QA record predates the synchronized 12-module, 42-lesson curriculum. Its six-lesson deep-enrichment measurements describe the earlier release.
+
 ## Implemented
 
 Six lessons received deeper coordinated visual sequences: 1.2, 1.3, 2.1, 2.3, 6.1, and 7.1. Lesson 8.3 now exercises the bespoke competitive-intelligence components.

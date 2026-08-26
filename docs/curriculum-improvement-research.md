@@ -2,7 +2,9 @@
 
 ## Overview
 
-This report maps the gaps and improvement opportunities across four dimensions of the AMPH v2 curriculum — lesson content, practical exercises, quizzes, and downloadable resources — grounded in the current state of the platform's 9 modules and 31 lessons, benchmarked against what established competitors deliver, and informed by e-learning design literature.
+> **Status note — August 2026.** This document is a historical research baseline captured before curriculum synchronization. The current implementation has 12 modules and 42 lessons, including weekly optimization, reporting and troubleshooting, VA workflow, SOPs, client communication, and capstone content. For the current source of truth, use `CURRICULUM-SYLLABUS.md`, `content/CURRICULUM-INDEX.md`, and the migration artifacts under `content/migration/`.
+
+This report maps the gaps and improvement opportunities across four dimensions of the AMPH v2 curriculum — lesson content, practical exercises, quizzes, and downloadable resources — grounded in the pre-synchronization state of the platform's 9 modules and 31 lessons, benchmarked against what established competitors delivered at the time, and informed by e-learning design literature.
 
 The core finding is that AMPH v2 teaches the mechanics of Amazon PPC well but leaves a significant gap in the _client-deliverable layer_: the templates, SOPs, reference sheets, and reporting formats that turn a student who understands PPC into a VA who can produce billable work for a real client. That gap sits across every dimension — content, exercises, quizzes, and resources — and closing it is the highest-leverage improvement available.
 
@@ -10,16 +12,16 @@ The core finding is that AMPH v2 teaches the mechanics of Amazon PPC well but le
 
 ## Content Gaps and Lesson Improvements
 
-### Current State
+### Historical Current State
 
-AMPH v2's curriculum covers 9 modules (0–8) with 31 lessons spanning:
+At the time of this research, AMPH v2's curriculum covered 9 modules (0–8) with 31 lessons spanning:
 
 - **Modules 0–4** (foundations tier): onboarding, PPC metrics, keyword research, listing optimization, campaign architecture
 - **Modules 5–8** (accelerated-mastery tier): portfolio strategy, bidding lab, search term triage, competitive intelligence
 
 The content is well-structured for its intended audience (Filipino VAs entering Amazon PPC work), uses a consistent pedagogical voice, and has had five factual corrections applied (portfolio mechanics, attribution windows, auction behavior, listing quality signals, dayparting eligibility). The lessons include worked cases, "Your turn" calculation exercises, client-language framing, and quick-check questions at the end of most lessons.
 
-What the curriculum does not yet cover is the client-deliverable and operational layer — the actual output a VA produces for a paying client.
+At the time of this research, the curriculum did not yet cover the client-deliverable and operational layer — the actual output a VA produces for a paying client. The synchronized curriculum now covers reporting, troubleshooting, VA workflow, SOPs, client communication, and capstone evidence.
 
 ### Missing Topic Areas
 
@@ -137,7 +139,7 @@ The production cost for most of these resources is low relative to their impact.
 
 ### Text-Only Is Sufficient for Theory, Insufficient for Procedure
 
-The current AMPH v2 curriculum is entirely text-based (MDX files). This is an efficient production model — text is fast to write, easy to update, and accessible across devices — and for teaching concepts and frameworks, it is as effective as video.
+The pre-synchronization AMPH v2 curriculum was entirely text-based (MDX files). The current implementation has since added native visual blocks, evidence ledgers, decision flows, report artifacts, diagnostic paths, and other interactive learning aids while retaining MDX as the source format.
 
 The research is clear on one point: for teaching _practical procedures_ — how to use a tool, how to complete a workflow — video is measurably superior to text in controlled studies. Vocational learners who watched procedural videos performed significantly better on practical examinations than those who read illustrated text [11]. A study comparing video and PDF tutorials for software procedure training found video produced higher factual and procedural knowledge scores, with higher learner satisfaction [12].
 

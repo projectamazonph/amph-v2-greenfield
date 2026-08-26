@@ -1,5 +1,7 @@
 # STORY-013 — Content Import Script
 
+> **Historical snapshot.** This story records the original two-course import scope. The current implementation supports three courses and maps modules 0–4, 5–10, and 11 through `NodeContentReader` and the current seed scripts.
+
 ## Goal
 
 Read MDX lesson files from the Project Amazon PH Academy curriculum source directory, parse frontmatter, and upsert Module + Lesson rows into the Postgres database. This seeds the public catalog with real curriculum content in a single runnable command.
