@@ -12,14 +12,14 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  color: var(--ink-600);
+  color: var(--c-sub);
   text-decoration: none;
   font-size: var(--text-sm);
   margin-bottom: var(--space-2);
 }
 
 .backLink:hover {
-  color: var(--ink-900);
+  color: var(--c-ink-2);
   text-decoration: underline;
 }
 
@@ -27,22 +27,22 @@
   font-family: var(--font-display);
   font-size: var(--text-xl);
   font-weight: 600;
-  color: var(--ink-900);
+  color: var(--c-ink-2);
   margin: 0;
 }
 
 .subtitle {
   font-size: var(--text-sm);
-  color: var(--ink-500);
+  color: var(--c-faint);
   margin: var(--space-1) 0 0;
 }
 
 .savedBanner {
-  background: #F0FDF4;
-  border: 1px solid var(--success);
+  background: var(--c-green-bg);
+  border: 1px solid var(--c-green);
   border-radius: var(--radius-md);
   padding: var(--space-3) var(--space-4);
-  color: #166534;
+  color: var(--c-green-text);
   font-size: var(--text-sm);
   margin-bottom: var(--space-4);
 }
@@ -66,7 +66,7 @@
 .dimensionLabel {
   font-weight: 600;
   font-size: var(--text-sm);
-  color: var(--ink-800);
+  color: var(--c-ink-2);
   text-transform: capitalize;
 }
 
@@ -83,5 +83,5 @@
 
 .inputLabel {
   font-size: var(--text-xs);
-  color: var(--ink-500);
+  color: var(--c-faint);
 }

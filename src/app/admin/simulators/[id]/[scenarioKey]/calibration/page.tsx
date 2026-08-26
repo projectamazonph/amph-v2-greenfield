@@ -22,7 +22,7 @@ import {
   type CalibrationDimensionBand,
 } from "@/domain/entities/SimulatorScenarioCalibration";
 import { setScenarioCalibrationAction } from "@/app/actions/setScenarioCalibration.action";
-import formStyles from "../../new/page.module.css";
+import formStyles from "../../../new/page.module.css";
 import styles from "./page.module.css";
 
 function isSimulatorId(s: string): s is SimulatorId {
