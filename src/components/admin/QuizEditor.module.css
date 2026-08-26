@@ -1,123 +1,243 @@
-/* QuizEditor.module.css — admin question/option editor.
-   Field Manual · utilitarian, dense, borders-as-elevation. No shadows.
-   Replaces the inline style blocks that lived on each element in
-   QuizEditor.tsx; tokens live here so the spacing scale stays consistent
-   with the rest of the design system (H-18). */
+/* QuizEditor — Amazon PH simulator authoring workspace. */
 
 .editor {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-4);
 }
 
 .headerTitle {
-  font-size: var(--text-base);
-  font-weight: 600;
   margin: 0;
-  color: var(--ink-700);
+  color: var(--ink-900);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.addQuestionButton,
+.addOptionButton,
+.iconButton {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1;
+  transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 
 .addQuestionButton {
-  padding: var(--space-1) var(--space-2);
-  background: var(--surface-2);
-  color: var(--ink-700);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  cursor: pointer;
+  padding: var(--space-2) var(--space-4);
+  border-color: var(--c-orange);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+}
+
+.addQuestionButton:hover {
+  border-color: var(--c-orange-h);
+  background: var(--c-orange-h);
+  box-shadow: var(--sh-1);
 }
 
 .questionCard {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  background: var(--surface-2);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+  box-shadow: var(--sh-1);
 }
 
 .questionRow {
-  display: flex;
-  gap: var(--space-2);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) repeat(3, 40px);
   align-items: center;
+  gap: var(--space-2);
 }
 
 .questionLabel {
-  font-weight: 600;
-  color: var(--ink-700);
+  display: inline-flex;
+  min-width: 32px;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--c-orange-soft);
+  color: var(--c-orange-d);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
 }
 
-.questionInput {
-  flex: 1;
-  padding: var(--space-2) var(--space-2);
+.questionInput,
+.optionInput {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
   background: var(--surface-0);
+  color: var(--ink-900);
+  font: inherit;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.questionInput::placeholder,
+.optionInput::placeholder {
+  color: var(--ink-500);
+}
+
+.questionInput:hover,
+.optionInput:hover {
+  border-color: var(--border-strong);
+}
+
+.questionInput:focus-visible,
+.optionInput:focus-visible {
+  outline: none;
+  border-color: var(--c-orange-d);
+  box-shadow: var(--sh-focus);
 }
 
 .optionsStack {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  padding-left: var(--space-6);
+  gap: var(--space-2);
+  padding: var(--space-4) 0 0 var(--space-5);
+  border-top: 1px solid var(--border);
 }
 
 .optionRow {
-  display: flex;
-  gap: var(--space-2);
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 40px;
   align-items: center;
+  gap: var(--space-2);
 }
 
-.optionInput {
-  flex: 1;
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  background: var(--surface-0);
+.optionRow input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--c-orange-d);
+}
+
+.optionRow input[type="radio"]:focus-visible {
+  outline: 2px solid var(--c-orange);
+  outline-offset: 2px;
 }
 
 .iconButton {
-  width: var(--space-6);
-  height: var(--space-6);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface-0);
+  width: 40px;
+  padding: 0;
+  border-color: var(--border);
+  background: var(--surface-1);
   color: var(--ink-700);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  cursor: pointer;
+}
+
+.iconButton:hover:not(:disabled) {
+  border-color: var(--c-link);
+  background: var(--c-blue-bg);
+  color: var(--c-blue-text);
 }
 
 .iconButton:disabled {
+  background: var(--surface-2);
+  color: var(--ink-300);
   cursor: not-allowed;
-  opacity: 0.4;
 }
 
 .iconButtonDanger {
-  color: var(--danger);
+  color: var(--c-red-text);
+}
+
+.iconButtonDanger:hover:not(:disabled) {
+  border-color: var(--c-red);
+  background: var(--c-red-bg);
+  color: var(--c-red-text);
 }
 
 .addOptionButton {
   align-self: flex-start;
-  padding: var(--space-1) var(--space-2);
-  background: transparent;
-  color: var(--accent);
-  border: 1px dashed var(--accent);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-color: var(--c-link);
+  background: var(--surface-1);
+  color: var(--c-link);
+}
+
+.addOptionButton:hover {
+  background: var(--c-blue-bg);
+  color: var(--c-blue-text);
+}
+
+.addQuestionButton:focus-visible,
+.addOptionButton:focus-visible,
+.iconButton:focus-visible {
+  outline: none;
+  box-shadow: var(--sh-focus);
+}
+
+.addQuestionButton:active,
+.addOptionButton:active,
+.iconButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+@media (max-width: 640px) {
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .addQuestionButton {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .questionCard {
+    padding: var(--space-4);
+  }
+
+  .questionRow {
+    grid-template-columns: auto minmax(0, 1fr) repeat(3, 36px);
+  }
+
+  .optionsStack {
+    padding-left: 0;
+  }
+
+  .iconButton {
+    width: 36px;
+    min-height: 40px;
+  }
+
+  .addOptionButton {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .addQuestionButton,
+  .addOptionButton,
+  .iconButton,
+  .questionInput,
+  .optionInput {
+    transition: none;
+  }
 }

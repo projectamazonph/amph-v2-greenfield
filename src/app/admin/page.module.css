@@ -1,6 +1,6 @@
 /* /admin page styles.
    Hallmark · macrostructure: Stat-Led + Workbench sub-section
-   · tone: utilitarian · anchor hue: ink+accent (Waybill Orange)
+   · tone: utilitarian · anchor hue: ink+accent (Amazon Orange)
    · stat tiles use a hairline left accent + tabular mono numbers
    · empty states use Phosphor icons, not dashed-border wireframes
    · the eyebrow above the title is a small accent square + label
@@ -33,7 +33,7 @@
   border-radius: var(--radius-md);
   min-width: 0; /* honor minmax(0, 1fr) at the cell level */
   cursor: pointer;
-  /* Field Manual §4 (docs/design-brief.md:209): the 1px border is the
+  /* Amazon PH simulator §4 (docs/design-brief.md:209): the 1px border is the
      elevation; a static at-rest card, input, or panel must not carry a
      box-shadow. Shadow appears only on interaction (the .tile:hover
      state below keeps the 1px translateY lift + a faint warm shadow,
@@ -102,9 +102,8 @@
 }
 
 /* Currency symbol: smaller than the number, tucked to its left.
-   The peso glyph ₱ (U+20B1) falls back to a system font in
-   JetBrains Mono, so we give it room and a slightly muted color
-   to keep the typographic rhythm of the row. */
+   The peso glyph ₱ (U+20B1) uses the body face so it remains clear
+   beside IBM Plex Mono figures and keeps the row rhythm balanced. */
 .currency {
   font-family: var(--font-body);
   font-size: 0.6em;

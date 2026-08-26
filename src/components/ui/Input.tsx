@@ -1,5 +1,5 @@
 /**
- * Input — Field Manual form field.
+ * Input — Amazon PH simulator form field.
  *
  * Per design spec §5: label above input, hint below input, error below hint.
  * Focus ring is 2px --accent + 2px --accent-soft outline-offset. Border

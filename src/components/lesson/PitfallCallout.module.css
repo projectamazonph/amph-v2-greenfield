@@ -1,76 +1,88 @@
-/* src/components/lesson/PitfallCallout.module.css
-   Note-style callout. WCAG AA against --surface-1. */
+/* PitfallCallout — Amazon PH simulator lesson annotation. */
 
 .callout {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-3, 12px);
-  margin: var(--space-6, 24px) 0;
-  padding: var(--space-4, 16px);
-  border-radius: var(--radius-md, 6px);
-  border-left: 4px solid var(--ink-300, #d4d4d4);
-  background: var(--surface-1, #ffffff);
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--c-border-2);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  box-shadow: var(--sh-1);
   font-family: var(--font-body);
 }
 
 .iconSlot {
-  flex: 0 0 auto;
   display: inline-flex;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm, 4px);
-  background: var(--surface-2, #f4f3ee);
-  color: var(--ink-700, #404040);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink-700);
 }
 
 .body {
+  min-width: 0;
   flex: 1 1 auto;
 }
 
 .title {
-  margin: 0 0 var(--space-2, 8px);
+  margin: 0 0 var(--space-2);
+  color: var(--ink-900);
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: var(--text-base, 1rem);
-  color: var(--ink-900, #171717);
+  font-size: var(--text-base);
+  font-weight: 700;
+  line-height: var(--leading-snug);
 }
 
 .content {
-  font-size: var(--text-base, 1rem);
-  color: var(--ink-700, #404040);
-  line-height: 1.6;
+  color: var(--ink-700);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
 }
 
 .content > :first-child {
   margin-top: 0;
 }
+
 .content > :last-child {
   margin-bottom: 0;
 }
 
-/* Variants */
 .info {
-  border-left-color: var(--accent, #ff6b35);
+  border-left-color: var(--c-blue);
 }
+
 .info .iconSlot {
-  background: var(--accent-soft, #ffe5d9);
-  color: var(--accent, #ff6b35);
+  background: var(--c-blue-bg);
+  color: var(--c-blue-text);
 }
 
 .warning {
-  border-left-color: var(--warning, #b45309);
+  border-left-color: var(--c-amber);
 }
+
 .warning .iconSlot {
-  background: color-mix(in srgb, var(--warning, #b45309) 12%, var(--surface-1, #ffffff));
-  color: var(--warning, #b45309);
+  background: var(--c-amber-bg);
+  color: var(--c-amber-text);
 }
 
 .pitfall {
-  border-left-color: var(--danger, #b91c1c);
+  border-left-color: var(--c-red);
 }
+
 .pitfall .iconSlot {
-  background: color-mix(in srgb, var(--danger, #b91c1c) 12%, var(--surface-1, #ffffff));
-  color: var(--danger, #b91c1c);
+  background: var(--c-red-bg);
+  color: var(--c-red-text);
+}
+
+@media (max-width: 480px) {
+  .callout {
+    padding: var(--space-3);
+  }
 }

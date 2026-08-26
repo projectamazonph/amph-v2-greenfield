@@ -2,7 +2,7 @@
  * not-found.tsx — Root 404 page.
  *
  * Renders when no other route's notFound() handler catches the
- * unmatched URL. Field Manual layout: centered card, off-white
+ * unmatched URL. Amazon PH simulator layout: centered card, off-white
  * surface, mono "404" mark, two clear next-step links.
  *
  * Migrated to CSS Modules + design tokens (no Tailwind classes).

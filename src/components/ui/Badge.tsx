@@ -1,5 +1,5 @@
 /**
- * Badge — Field Manual status pill.
+ * Badge — Amazon PH simulator status pill.
  *
  * Per design spec §5: variants neutral/success/warning/danger/info/accent.
  * Border-radius --radius-sm (4px) for status, --radius-full for count.

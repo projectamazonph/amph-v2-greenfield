@@ -1,38 +1,41 @@
-/* ImpersonationBanner — sticky top banner. */
+/* ImpersonationBanner — Amazon PH simulator account-state warning. */
 
 .banner {
   position: sticky;
   top: 0;
-  z-index: 50;
-  background: var(--danger-soft, #fef2f2);
-  border-bottom: 1px solid var(--danger, #b91c1c);
+  z-index: var(--z-sticky);
   padding: var(--space-3) var(--space-6);
-  font-size: 13px;
-  color: var(--ink-900);
+  border-bottom: 1px solid var(--c-red);
+  background: var(--c-red-bg);
+  color: var(--c-red-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
 }
 
 .content {
   display: flex;
+  max-width: 1400px;
   align-items: center;
   gap: var(--space-4);
-  max-width: 1400px;
   margin: 0 auto;
 }
 
 .icon {
-  color: var(--danger);
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
-  flex-shrink: 0;
+  color: var(--c-red-text);
 }
 
 .text {
+  min-width: 0;
   flex: 1;
-  color: var(--ink-900);
+  color: var(--c-red-text);
+  line-height: var(--leading-normal);
 }
 
 .text strong {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .form {
@@ -41,19 +44,59 @@
 }
 
 .stopButton {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
   padding: var(--space-2) var(--space-4);
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--surface-0);
-  color: var(--danger);
-  border: 1px solid var(--danger);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--c-red);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  color: var(--c-red-text);
   cursor: pointer;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
   white-space: nowrap;
+  transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 
 .stopButton:hover {
-  background: var(--danger);
-  color: var(--surface-0);
+  background: var(--c-red);
+  color: var(--c-card);
+}
+
+.stopButton:focus-visible {
+  outline: none;
+  box-shadow: var(--sh-focus);
+}
+
+.stopButton:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 640px) {
+  .banner {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .content {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .text {
+    flex-basis: calc(100% - 42px);
+  }
+
+  .form {
+    width: 100%;
+  }
+
+  .stopButton {
+    width: 100%;
+    min-height: 44px;
+  }
 }

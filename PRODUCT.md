@@ -4,7 +4,7 @@
 
 product
 
-Note: `src/app/page.tsx` (the marketing landing page) is the one brand-register exception on this site. Per `docs/design-brief.md`, it still follows the same dense, utilitarian Field Manual system rather than a typical glossy marketing treatment — but if a future task asks to design or critique it specifically as a conversion surface, treat that one route under the brand register rather than this file's product default.
+`src/app/page.tsx` is the marketing conversion surface, but it uses the same simulator system as the product: navy operating context, cool work surfaces, white cards, clear action hierarchy, and restrained motion. When designing or critiquing it as a conversion surface, preserve those shared visual rules rather than introducing a disconnected marketing style.
 
 ## Platform
 
@@ -28,7 +28,7 @@ Three courses, one outcome: the VA becomes the Amazon ads specialist clients ret
 
 ## Brand Personality
 
-Utilitarian, dense, no-nonsense. The "Field Manual" direction: a 1970s technical reference manual or trading-terminal density, built for someone who needs the information at 2am and has no patience for decoration. The interface should evoke competence and confidence, never admiration — the student is here to work, not to look at the design.
+Operational, capable, and direct. The simulator system gives learners a familiar navy shell, cool work surfaces, clear white cards, compact controls, and deliberate Amazon Orange actions. The interface should evoke competence and confidence while maintaining enough hierarchy and elevation for fast, low-friction work.
 
 ## Anti-references
 
@@ -36,7 +36,7 @@ Not glassmorphism with gradient orbs. Not cyan-on-dark with neon accents. Not a 
 
 ## Design Principles
 
-Density is a feature, not a bug — get out of the way of the content. The 2am rule: a tired student on their phone needs to find the quiz retry button without hunting, hero text, or a "we're here to help" interstitial. Information first, decoration last — hierarchy comes from type scale and spacing, not gradients or shadows. Use the accent color with discipline: one element per viewport when possible, two maximum.
+Density is a feature, not a bug — get out of the way of the content. The 2am rule: a tired student on their phone needs to find the quiz retry button without hunting or unnecessary interruption. Information comes first; hierarchy comes from defined type roles, cool work surfaces, border rhythm, and restrained elevation. Use Amazon Orange deliberately for primary actions, selected context, and focus.
 
 ## Accessibility & Inclusion
 

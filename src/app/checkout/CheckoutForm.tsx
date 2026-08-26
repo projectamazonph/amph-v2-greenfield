@@ -29,7 +29,7 @@
  * (React 19's useFormState successor) for the form state. The server
  * work is delegated to the startCheckout server action.
  *
- * No Tailwind. Field Manual design system tokens.
+ * No Tailwind. Amazon PH simulator design system tokens.
  */
 
 "use client";

@@ -42,14 +42,14 @@ radius:
 
 **Creative north star: the Amazon PH Academy simulator system.** The product is a practical training environment with a recognisable Amazon-adjacent interface: a dark navy operating shell, clear white and cool-gray work surfaces, compact control density, and Amazon orange used for the actions and states that need attention. The application should feel consistent with the simulator platform, whether a learner is reading a lesson, completing a workflow, or an administrator is managing content.
 
-This direction supersedes the prior **Field Manual** aesthetic. Warm-paper surfaces, Waybill Orange (`#FF6B35`), Space Grotesk, JetBrains Mono, and a default no-shadow policy are retired. The interface now uses the shared simulator hierarchy: **navy for global context, white for work, orange for action, and a small semantic palette for status**.
+The interface uses the shared simulator hierarchy: **navy for global context, white for work, orange for action, and a small semantic palette for status**. Warm-paper framing, decorative print motifs, substitute typography, and flat-only elevation are outside this system.
 
 | Principle | Application |
 |---|---|
 | **Operational clarity** | Favor familiar controls, visible hierarchy, compact data tables, and clear action states over decorative experimentation. |
 | **Shared Academy identity** | Use the exact simulator palette, type roles, spacing scale, radii, elevation, and responsive behavior. |
 | **Action hierarchy** | Orange identifies primary actions, active navigation, keyboard focus, and the most important status transition in a local context. |
-| **Controlled density** | Keep information efficient and scan-friendly without returning to the prior deliberately austere field-manual treatment. |
+| **Controlled density** | Keep information efficient and scan-friendly while preserving a clear work-surface hierarchy. |
 | **Accessible predictability** | Preserve semantic markup, focus visibility, readable contrast, reduced-motion support, and 44px mobile targets. |
 
 ## 2. Source of Truth and Token Contract
@@ -73,7 +73,7 @@ New CSS must use the canonical `--c-*`, `--sp-*`, `--r-*`, `--sh-*`, and typogra
 | `--c-navy-5` | `#485769` | Shell hover line and emphasized border. |
 | `--c-orange` | `#FF9900` | Primary action, focus, active navigation, selected state. |
 | `--c-orange-h` | `#FFA41C` | Primary-action hover state. |
-| `--c-orange-d` | `#E47911` | Pressed state and darker orange detail. |
+| `--c-orange-d` | `#9B3E00` | Accessible dark-orange detail and selected control state. |
 | `--c-orange-soft` | `#FEF3E7` | Selection wash and row hover. |
 | `--c-orange-tint` | `#FCE3C2` | Orange-tinted border and tag treatment. |
 
@@ -90,7 +90,7 @@ New CSS must use the canonical `--c-*`, `--sp-*`, `--r-*`, `--sh-*`, and typogra
 | `--c-ink` | `#0F1111` | Default content text. |
 | `--c-ink-2` | `#232F3E` | Heading and high-emphasis text. |
 | `--c-sub` | `#565959` | Supporting text and labels. |
-| `--c-faint` | `#767B7B` | Metadata and tertiary text. |
+| `--c-faint` | `#626A6A` | Accessible metadata and tertiary text. |
 | `--c-disabled` | `#B1B6BC` | Disabled text and placeholders. |
 | `--c-link` | `#007185` | Link and ghost-action text. |
 | `--c-link-h` | `#C7511F` | Link hover. |
@@ -147,7 +147,7 @@ Primary actions use `--c-orange` with `--c-navy-2` text, `--r-md` corners, an Ar
 
 ### Cards and panels
 
-Cards use `--c-card`, a 1px `--c-border`, `--r-lg`, and `--sh-1`. Interactive cards transition to `--c-card-hi`, use an `--c-orange-tint` border, lift one pixel, and gain `--sh-2`. This is a deliberate replacement for the retired no-shadow field-manual rule.
+Cards use `--c-card`, a 1px `--c-border`, `--r-lg`, and `--sh-1`. Interactive cards transition to `--c-card-hi`, use an `--c-orange-tint` border, lift one pixel, and gain `--sh-2`.
 
 ### Inputs and forms
 
@@ -184,8 +184,8 @@ The following rules apply to every route, including admin pages:
 
 | Do | Do not |
 |---|---|
-| Use navy shell chrome, cool-gray work surfaces, white cards, and Amazon orange primary actions. | Reintroduce warm paper surfaces, Waybill Orange, or the Field Manual palette. |
-| Use Archivo for headings and controls; PT Sans for body text; IBM Plex Mono only for data. | Use Space Grotesk or JetBrains Mono as global fonts. |
+| Use navy shell chrome, cool-gray work surfaces, white cards, and Amazon orange primary actions. | Reintroduce warm paper surfaces, print-inspired decoration, or an alternate palette. |
+| Use Archivo for headings and controls; PT Sans for body text; IBM Plex Mono only for data. | Introduce substitute global fonts outside the defined type roles. |
 | Use subtle card shadows that strengthen only for interactive elevation. | Treat every element as flat by default or apply large decorative shadows. |
 | Use the shared four-pixel spacing scale and compact 4–12px radius family. | Add arbitrary spacing, oversized radii, or unbounded hero whitespace. |
 | Use orange deliberately for primary action, focus, and selected context. | Use orange as generic text or spread it across every control. |

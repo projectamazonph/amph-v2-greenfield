@@ -7,40 +7,39 @@ import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumCl
 /**
  * Stand-in for a photo the brand kit doesn't include yet (BRAND-GUIDE.md
  * explicitly steers away from generic headshot stock imagery anyway), a
- * rendered "working notebook" sketch: a campaign structure tree, a spend
- * bar chart, and a search-term checklist, in the same ink/orange line
- * language as the rest of the page.
+ * rendered operator diagram: a campaign structure tree, a spend bar chart,
+ * and a search-term checklist in the shared simulator visual language.
  */
-function NotebookSketch() {
+function OperatorDiagram() {
   return (
     <svg
       viewBox="0 0 320 260"
       className={styles.sketch}
       role="img"
-      aria-label="A sketched campaign structure tree, a small bar chart, and a search-term checklist, as if drawn in a working notebook."
+      aria-label="A campaign structure tree, a small bar chart, and a search-term checklist."
     >
-      <rect x="0" y="0" width="320" height="260" fill="#FFFFFF" />
+      <rect x="0" y="0" width="320" height="260" fill="var(--c-card)" />
       {[36, 66, 96, 126, 156, 186, 216, 246].map((y) => (
-        <line key={y} x1="0" y1={y} x2="320" y2={y} stroke="#E5E5E0" strokeWidth="1" />
+        <line key={y} x1="0" y1={y} x2="320" y2={y} stroke="var(--c-border-2)" strokeWidth="1" />
       ))}
-      <line x1="34" y1="0" x2="34" y2="260" stroke="#FFE5D9" strokeWidth="2" />
+      <line x1="34" y1="0" x2="34" y2="260" stroke="var(--c-orange-tint)" strokeWidth="2" />
 
       {/* campaign structure tree */}
-      <g stroke="#171717" strokeWidth="1.6" fill="none" strokeLinecap="round">
-        <circle cx="72" cy="46" r="5" fill="#171717" />
+      <g stroke="var(--c-ink)" strokeWidth="1.6" fill="none" strokeLinecap="round">
+        <circle cx="72" cy="46" r="5" fill="var(--c-ink)" />
         <path d="M72 51 V70" />
         <path d="M72 70 H132" />
         <path d="M72 70 V88" />
         <path d="M132 70 V88" />
         <circle cx="72" cy="90" r="4" />
-        <circle cx="132" cy="90" r="4" fill="#FF6B35" stroke="#FF6B35" />
+        <circle cx="132" cy="90" r="4" fill="var(--c-orange)" stroke="var(--c-orange)" />
         <path d="M132 94 V108 H182" />
         <circle cx="182" cy="110" r="4" />
       </g>
-      <text x="86" y="49" fontFamily="JetBrains Mono, monospace" fontSize="8" fill="#737373">
+      <text x="86" y="49" fontFamily="var(--font-mono)" fontSize="8" fill="var(--c-faint)">
         campaign
       </text>
-      <text x="138" y="93" fontFamily="JetBrains Mono, monospace" fontSize="7.5" fill="#E55A2B">
+      <text x="138" y="93" fontFamily="var(--font-mono)" fontSize="7.5" fill="var(--c-orange-d)">
         ad group · exact
       </text>
 
@@ -60,12 +59,12 @@ function NotebookSketch() {
             y={148 - bar.h}
             width="10"
             height={bar.h}
-            fill={i % 2 === 0 ? "#171717" : "#FF6B35"}
+            fill={i % 2 === 0 ? "var(--c-ink)" : "var(--c-orange)"}
           />
         ))}
-        <line x1="40" y1="150" x2="140" y2="150" stroke="#E5E5E0" strokeWidth="1" />
+        <line x1="40" y1="150" x2="140" y2="150" stroke="var(--c-border-2)" strokeWidth="1" />
       </g>
-      <text x="150" y="132" fontFamily="JetBrains Mono, monospace" fontSize="7.5" fill="#737373">
+      <text x="150" y="132" fontFamily="var(--font-mono)" fontSize="7.5" fill="var(--c-faint)">
         spend vs
         <tspan x="150" dy="9">
           sales, wk
@@ -73,7 +72,7 @@ function NotebookSketch() {
       </text>
 
       {/* search-term checklist */}
-      <g fontFamily="JetBrains Mono, monospace" fontSize="8" fill="#404040">
+      <g fontFamily="var(--font-mono)" fontSize="8" fill="var(--c-sub)">
         {[
           { y: 182, done: true, label: "running shoes men → exact" },
           { y: 198, done: true, label: "sponsored products bid → exact" },
@@ -84,7 +83,7 @@ function NotebookSketch() {
             {row.done ? (
               <path
                 d={`M44 ${row.y - 3} l3 3 l6 -6`}
-                stroke="#FF6B35"
+                stroke="var(--c-orange)"
                 strokeWidth="1.6"
                 fill="none"
                 strokeLinecap="round"
@@ -95,7 +94,7 @@ function NotebookSketch() {
                 cx="49"
                 cy={row.y - 1}
                 r="4.5"
-                stroke="#737373"
+                stroke="var(--c-faint)"
                 strokeWidth="1.4"
                 fill="none"
               />
@@ -133,12 +132,12 @@ export function Mentor() {
               <span className={[shared.corner, shared.cornerTr].join(" ")} />
               <span className={[shared.corner, shared.cornerBl].join(" ")} />
               <span className={[shared.corner, shared.cornerBr].join(" ")} />
-              <NotebookSketch />
+              <OperatorDiagram />
               <figcaption className={shared.plateCap}>
-                FIG. 02: a mentor&rsquo;s working notebook
+                OPERATOR VIEW · live account mentorship
               </figcaption>
             </figure>
-            <div className={styles.stamp}>Field notes, not slides</div>
+            <div className={styles.credential}>Live account operator</div>
           </div>
 
           <div>

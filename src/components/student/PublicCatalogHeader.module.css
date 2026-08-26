@@ -4,7 +4,7 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid var(--c-navy-1);
   background: linear-gradient(180deg, var(--c-navy-2) 0%, var(--c-navy-3) 100%);
   box-shadow: var(--sh-2);
   color: var(--c-shell-ink);

@@ -33,8 +33,8 @@
  *      `aria-label` since it has no visible text to associate with
  *   5. The M-R29 doc block cites WCAG 3.3.2 and 4.1.2
  *
- * Mirrors the source-string pattern from rounds 16-28 (Field Manual §5
- * box-shadow sweep, etc.). Tests are co-located next to the component under
+ * Mirrors the source-string pattern from earlier UI-accessibility rounds.
+ * Tests are co-located next to the component under
  * test because the round's central change is in `src/components/admin/
  * QuizEditor.tsx`.
  */
