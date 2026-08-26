@@ -4,10 +4,10 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   typedRoutes: false,
-  // STORY-0026 follow-up: build a self-contained production artifact
-  // so the lighthouse job (and any other consumer) can start the
-  // server without the broken pnpm-store symlinks in .next/.
-  output: "standalone",
+  // Local CI needs a self-contained server artifact, while Vercel uses
+  // its native trace layout. Enabling standalone on Vercel omits the trace
+  // manifest expected by the deployment builder after newer Next upgrades.
+  output: process.env.VERCEL ? undefined : "standalone",
   // The generated Prisma client (query compiler WASM + generated JS)
   // lives in node_modules/.prisma/client, a dot-prefixed directory that
   // @prisma/client requires via a computed path rather than a literal
