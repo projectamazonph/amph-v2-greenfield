@@ -11,6 +11,13 @@ const rule = (css: string, selector: string): string => {
 };
 
 describe("user-facing simulator theme", () => {
+  it("keeps muted and dark-orange simulator text accessible on light surfaces", () => {
+    const css = source("src/app/globals.css");
+
+    expect(css).toMatch(/--c-orange-d:\s*#9b3e00/);
+    expect(css).toMatch(/--c-faint:\s*#626a6a/);
+  });
+
   it("uses the navy simulator shell and orange active state in learner navigation", () => {
     const css = source("src/components/student/StudentSidebar.module.css");
 
