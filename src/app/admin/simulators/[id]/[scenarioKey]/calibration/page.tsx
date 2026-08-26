@@ -100,9 +100,6 @@ export default async function CalibrationPage({ params, searchParams }: PageProp
     redirect(`/admin/simulators/${simulatorId}/${encodeURIComponent(scenarioKey)}/calibration?saved=1`);
   }
 
-  const sp = await searchParams;
-  const saved = sp.saved;
-
   return (
     <>
       <TopBar title="Simulator Calibration" />
