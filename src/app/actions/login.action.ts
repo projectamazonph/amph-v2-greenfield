@@ -34,9 +34,7 @@ import { buildContainer } from "@/composition/container";
 import { setAuthCookie } from "@/lib/auth";
 import { Login, type LoginOutput } from "@/usecases/Login";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
-
-const LOGIN_EMAIL_RATE_LIMIT = { limit: 5, windowSeconds: 900 }; // 5 per 15 min
-const LOGIN_IP_RATE_LIMIT = { limit: 20, windowSeconds: 900 }; // 20 per 15 min
+import { rateLimitKey } from "@/ports/security/rateLimitKey";
 
 async function clientIp(): Promise<string | undefined> {
   const h = await headers();
@@ -76,7 +74,8 @@ export type LoginResult =
     }
   | { kind: "redirect_to_login"; errorKind: string }
   | { kind: "invalid_input" }
-  | { kind: "rate_limited"; retryAfterSeconds: number };
+  | { kind: "rate_limited"; retryAfterSeconds: number }
+  | { kind: "rate_limiter_unavailable" };
 
 export async function performLogin(
   container: { login: Login; rateLimiter: RateLimiter },
@@ -92,28 +91,37 @@ export async function performLogin(
 
   // Rate limit every login by normalized email, then apply the broader IP
   // bucket when the request has a trusted client IP.
+  const normalizedEmail = input.email.trim().toLowerCase();
   const emailLimitResult = await container.rateLimiter.check({
-    key: `login:email:${input.email.toLowerCase()}`,
-    ...LOGIN_EMAIL_RATE_LIMIT,
+    key: rateLimitKey("login:email", normalizedEmail),
+    policy: "login_email",
   });
   if (emailLimitResult.ok && !emailLimitResult.value.allowed) {
     return { kind: "rate_limited", retryAfterSeconds: emailLimitResult.value.resetSeconds };
   }
   if (!emailLimitResult.ok) {
-    console.error("[performLogin] email rate limiter error:", emailLimitResult.error.message);
+    console.error("[performLogin] email rate limiter error:", {
+      kind: emailLimitResult.error.kind,
+      message: emailLimitResult.error.message,
+    });
+    return { kind: "rate_limiter_unavailable" };
   }
 
   const ip = await deps.getClientIp();
   if (ip) {
     const ipLimitResult = await container.rateLimiter.check({
-      key: `login:ip:${ip}`,
-      ...LOGIN_IP_RATE_LIMIT,
+      key: rateLimitKey("login:ip", ip),
+      policy: "login_ip",
     });
     if (ipLimitResult.ok && !ipLimitResult.value.allowed) {
       return { kind: "rate_limited", retryAfterSeconds: ipLimitResult.value.resetSeconds };
     }
     if (!ipLimitResult.ok) {
-      console.error("[performLogin] IP rate limiter error:", ipLimitResult.error.message);
+      console.error("[performLogin] IP rate limiter error:", {
+        kind: ipLimitResult.error.kind,
+        message: ipLimitResult.error.message,
+      });
+      return { kind: "rate_limiter_unavailable" };
     }
   }
 

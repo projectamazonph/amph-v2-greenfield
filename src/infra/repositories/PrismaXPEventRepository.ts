@@ -21,6 +21,7 @@ export class PrismaXPEventRepository implements IXPEventRepository {
           amount: event.amount,
           reason: event.reason,
           refId: event.refId ?? null,
+          awardKey: `legacy:${event.id}`,
         },
       });
       return Result.ok(this.mapRow(row));

@@ -371,6 +371,7 @@ describe("campaignBuilderAttempt", () => {
       amount: 25,
       reason: "simulator_challenge_passed",
       refId: "ATT-CB001",
+      idempotencyKey: "simulator_challenge_passed:user_123:ATT-CB001",
     });
     expect(result.value.xpAwarded).toBe(25);
   });

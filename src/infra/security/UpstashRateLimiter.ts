@@ -2,17 +2,21 @@
  * UpstashRateLimiter — STORY-054.
  *
  * Production adapter for the RateLimiter port. Lazy-initializes the
- * Upstash Redis client and ratelimit instance so builds don't require
- * Redis env vars.
+ * Upstash Redis client and one ratelimit instance per named policy.
+ * Missing production credentials are an error, never a permissive no-op.
  */
 
 import { Result } from "@/domain/shared/Result";
-import type {
-  RateLimiter,
-  RateLimitInput,
-  RateLimitResult,
-  RateLimitError,
+import {
+  RATE_LIMIT_POLICIES,
+  type RateLimiter,
+  type RateLimitInput,
+  type RateLimitPolicy,
+  type RateLimitResult,
+  type RateLimitError,
 } from "@/ports/security/RateLimiter";
+
+type UpstashRedis = InstanceType<typeof import("@upstash/redis").Redis>;
 
 type RatelimitInstance = {
   limit: (key: string) => Promise<{
@@ -24,43 +28,66 @@ type RatelimitInstance = {
 };
 
 export class UpstashRateLimiter implements RateLimiter {
-  private instance: RatelimitInstance | null = null;
+  private readonly instances = new Map<RateLimitPolicy, RatelimitInstance>();
+  private redis: UpstashRedis | null = null;
 
   constructor(
     private readonly url: string,
     private readonly token: string,
   ) {}
 
-  private getClient(): RatelimitInstance {
-    if (this.instance) return this.instance;
+  private getClient(policyName: RateLimitPolicy): Result<RatelimitInstance, RateLimitError> {
+    const cached = this.instances.get(policyName);
+    if (cached) return Result.ok(cached);
+
+    const policy = RATE_LIMIT_POLICIES[policyName];
+    if (!policy) {
+      return Result.err({
+        kind: "configuration_error",
+        message: `Unknown rate-limit policy: ${String(policyName)}`,
+      });
+    }
     if (!this.url || !this.token) {
-      // Return a permissive no-op when not configured.
-      this.instance = {
-        limit: async () => ({
-          success: true,
-          limit: 100,
-          remaining: 100,
-          reset: 0,
-        }),
-      };
-      return this.instance;
+      return Result.err({
+        kind: "configuration_error",
+        message: "Upstash rate limiter is not configured",
+      });
     }
 
-    const { Redis } = require("@upstash/redis") as typeof import("@upstash/redis");
-    const { Ratelimit } = require("@upstash/ratelimit") as typeof import("@upstash/ratelimit");
+    try {
+      const { Redis } = require("@upstash/redis") as typeof import("@upstash/redis");
+      const { Ratelimit } = require("@upstash/ratelimit") as typeof import("@upstash/ratelimit");
 
-    const redis = new Redis({ url: this.url, token: this.token });
-    this.instance = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(100, "1 m"),
-      analytics: true,
-    }) as RatelimitInstance;
-    return this.instance;
+      if (!this.redis) {
+        this.redis = new Redis({ url: this.url, token: this.token });
+      }
+
+      const instance = new Ratelimit({
+        redis: this.redis,
+        limiter: Ratelimit.slidingWindow(policy.limit, `${policy.windowSeconds} s`),
+        prefix: `amph:ratelimit:${policyName}`,
+        analytics: true,
+      }) as RatelimitInstance;
+      this.instances.set(policyName, instance);
+      return Result.ok(instance);
+    } catch (err) {
+      return Result.err({
+        kind: "configuration_error",
+        message: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
 
   async check(input: RateLimitInput): Promise<Result<RateLimitResult, RateLimitError>> {
+    if (!input.key.trim()) {
+      return Result.err({ kind: "configuration_error", message: "Rate-limit key is empty" });
+    }
+
+    const clientResult = this.getClient(input.policy);
+    if (!clientResult.ok) return clientResult;
+
     try {
-      const result = await this.getClient().limit(input.key);
+      const result = await clientResult.value.limit(input.key);
       return Result.ok({
         allowed: result.success,
         remaining: result.remaining,

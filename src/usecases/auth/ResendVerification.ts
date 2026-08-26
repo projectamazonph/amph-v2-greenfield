@@ -36,13 +36,16 @@ import type { RateLimiter } from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
 import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
+import { rateLimitKey } from "@/ports/security/rateLimitKey";
+import { RATE_LIMIT_POLICIES } from "@/ports/security/RateLimiter";
 
 export type ResendVerificationInput = { userId: string };
 export type ResendVerificationOutput = { sent: true; retryAfter: Date };
 export type ResendVerificationError =
   | { kind: "user_not_found" }
   | { kind: "already_verified" }
-  | { kind: "rate_limited"; retryAfter: Date };
+  | { kind: "rate_limited"; retryAfter: Date }
+  | { kind: "rate_limiter_unavailable" };
 
 export interface ResendVerificationDeps {
   users: UserRepository;
@@ -56,7 +59,6 @@ export interface ResendVerificationDeps {
   emailTemplateRepo: IEmailTemplateRepository;
 }
 
-const RESEND_WINDOW_SECONDS = 60;
 const TOKEN_TTL_HOURS = 24;
 
 function sha256(input: string): string {
@@ -84,9 +86,8 @@ export class ResendVerification {
 
     // Rate-limit per-user. 1 request per 60s.
     const rl = await this.deps.rateLimiter.check({
-      key: user.id,
-      limit: 1,
-      windowSeconds: RESEND_WINDOW_SECONDS,
+      key: rateLimitKey("verification-resend:user", user.id),
+      policy: "verification_resend_user",
     });
     if (rl.ok && !rl.value.allowed) {
       const retryAfter = new Date(this.deps.clock.now().getTime() + rl.value.resetSeconds * 1000);
@@ -95,6 +96,13 @@ export class ResendVerification {
         retryAfter: retryAfter.toISOString(),
       });
       return Result.err({ kind: "rate_limited", retryAfter });
+    }
+    if (!rl.ok) {
+      this.deps.logger.error("resend_verification.rate_limiter_unavailable", {
+        kind: rl.error.kind,
+        message: rl.error.message,
+      });
+      return Result.err({ kind: "rate_limiter_unavailable" });
     }
 
     // Generate a fresh token, hash it, persist it.
@@ -152,7 +160,9 @@ export class ResendVerification {
 
     return Result.ok({
       sent: true,
-      retryAfter: new Date(now.getTime() + RESEND_WINDOW_SECONDS * 1000),
+      retryAfter: new Date(
+        now.getTime() + RATE_LIMIT_POLICIES.verification_resend_user.windowSeconds * 1000,
+      ),
     });
   }
 

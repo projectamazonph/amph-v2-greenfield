@@ -78,7 +78,7 @@ describe("AwardBadge", () => {
     mockAwardXp.execute.mockClear();
     mockAwardXp.execute.mockResolvedValue({
       ok: true,
-      value: { xpEvent: null as unknown, totalXp: 25 },
+      value: { xpEvent: null as unknown, totalXp: 25, applied: true },
     });
   });
 
@@ -112,6 +112,7 @@ describe("AwardBadge", () => {
       amount: 25,
       reason: "badge_awarded",
       refId: "award_test_01",
+      idempotencyKey: "badge_awarded:user_01:first-quiz-pass",
     });
   });
 
@@ -172,7 +173,7 @@ describe("AwardBadge", () => {
     expect(mockAwardXp.execute).not.toHaveBeenCalled();
   });
 
-  it("does not fail the request when XP award fails (fire-and-forget)", async () => {
+  it("does not fail the request when the atomic XP award fails", async () => {
     const badge = makeBadge({ slug: "first-quiz-pass", xpReward: 25 });
     const badgeRepo = buildBadgeRepo({ ok: true, value: badge });
     const badgeAwardRepo = buildBadgeAwardRepo(

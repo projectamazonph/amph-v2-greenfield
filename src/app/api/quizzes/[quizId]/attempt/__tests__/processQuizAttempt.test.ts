@@ -12,7 +12,9 @@ import { processQuizAttempt } from "@/app/api/quizzes/[quizId]/attempt/processQu
 import { InMemoryQuizRepository } from "@/infra/repositories/InMemoryQuizRepository";
 import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
 import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
+import { InMemoryXPAwardRepository } from "@/infra/repositories/InMemoryXPAwardRepository";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { AwardXP } from "@/usecases/AwardXP";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { FixedClock } from "@/ports/system/Clock";
 import { createQuiz } from "@/domain/entities/Quiz";
@@ -67,6 +69,7 @@ interface Deps {
   idGen: InMemoryIdGenerator;
   clock: FixedClock;
   accessPolicy: IAccessPolicy;
+  awardXp: AwardXP;
 }
 
 function buildDeps(): Deps {
@@ -80,14 +83,22 @@ function buildDeps(): Deps {
       lastName: "User",
     },
   ]);
+  const idGen = new InMemoryIdGenerator();
+  const clock = new FixedClock(new Date("2026-01-01T00:00:00Z"));
+  const awardXp = new AwardXP({
+    xpAwardRepo: new InMemoryXPAwardRepository(userRepo),
+    idGen,
+    clock,
+  });
   return {
     quizRepo: new InMemoryQuizRepository(),
     quizAttemptRepo: new InMemoryQuizAttemptRepository(),
     xpEventRepo: new InMemoryXPEventRepository(),
     userRepo,
-    idGen: new InMemoryIdGenerator(),
-    clock: new FixedClock(new Date("2026-01-01T00:00:00Z")),
+    idGen,
+    clock,
     accessPolicy: { canAccess: vi.fn(async () => ({ kind: "allowed" as const })) },
+    awardXp,
   };
 }
 
@@ -363,13 +374,13 @@ describe("processQuizAttempt", () => {
     });
   });
 
-  // ── XP fire-and-forget ────────────────────────────────────
+  // ── XP award failure ─────────────────────────────────────
 
-  it("does not fail the request when XP award fails (fire-and-forget)", async () => {
+  it("does not fail the request when the atomic XP award fails", async () => {
     deps.quizRepo.seed(makeQuiz());
 
-    // Use a user repo whose updateTotalXp returns an error — AwardXP
-    // will fail, but the quiz attempt result should still come back 200.
+    // The source attempt is durable even when the atomic XP write fails;
+    // reconciliation can retry the stable award key later.
     vi.spyOn(deps.userRepo, "updateTotalXp").mockResolvedValue({
       ok: false,
       error: { kind: "db_error", message: "boom" },
@@ -387,13 +398,10 @@ describe("processQuizAttempt", () => {
       },
     });
 
-    // Wait a tick for the fire-and-forget promise to settle
-    await new Promise((r) => setImmediate(r));
-
     expect(result).toMatchObject({
       ok: true,
       status: 200,
-      value: { passed: true, xpAwarded: 20 },
+      value: { passed: true, xpAwarded: 0 },
     });
   });
 });

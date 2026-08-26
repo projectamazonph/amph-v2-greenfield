@@ -275,6 +275,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
         amount: XPService.SIMULATOR_CHALLENGE_PASSED_XP,
         reason: "simulator_challenge_passed",
         refId: attemptId,
+        idempotencyKey: `simulator_challenge_passed:${userId}:${attemptId}`,
       });
       if (Result.isOk(xpResult)) {
         xpAwarded = XPService.SIMULATOR_CHALLENGE_PASSED_XP;

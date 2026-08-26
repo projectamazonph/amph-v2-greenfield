@@ -544,7 +544,8 @@ model XPEvent {
   userId String
   amount Int
   reason String // lesson_completed | course_completed | quiz_passed | streak_bonus
-  refId  String? // lessonId, courseId, quizAttemptId, etc.
+  refId    String? // lessonId, courseId, quizAttemptId, etc.
+  awardKey String  @unique // stable business-event idempotency key
 
   createdAt DateTime @default(now())
 

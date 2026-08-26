@@ -12,8 +12,7 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { RateLimiter } from "@/ports/security/RateLimiter";
-
-const SIGNUP_RATE_LIMIT = { limit: 10, windowSeconds: 3600 };
+import { rateLimitKey } from "@/ports/security/rateLimitKey";
 
 async function clientIp(): Promise<string | undefined> {
   const h = await headers();
@@ -50,6 +49,7 @@ export type SignUpResult =
     }
   | { kind: "invalid_input" }
   | { kind: "rate_limited"; retryAfterSeconds: number }
+  | { kind: "rate_limiter_unavailable" }
   /**
    * Signup succeeded and the verification email was queued, but the
    * post-signup auto-login did not produce a session. New accounts sit in
@@ -91,14 +91,18 @@ export async function performSignUp(
   const ip = await deps.getClientIp();
   if (ip) {
     const limitResult = await container.rateLimiter.check({
-      key: `signup:ip:${ip}`,
-      ...SIGNUP_RATE_LIMIT,
+      key: rateLimitKey("signup:ip", ip),
+      policy: "signup_ip",
     });
     if (limitResult.ok && !limitResult.value.allowed) {
       return { kind: "rate_limited", retryAfterSeconds: limitResult.value.resetSeconds };
     }
     if (!limitResult.ok) {
-      console.error("[performSignUp] rate limiter error:", limitResult.error.message);
+      console.error("[performSignUp] rate limiter error:", {
+        kind: limitResult.error.kind,
+        message: limitResult.error.message,
+      });
+      return { kind: "rate_limiter_unavailable" };
     }
   }
   let signUpResult: SignUpOutput;

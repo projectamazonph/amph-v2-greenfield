@@ -16,13 +16,12 @@
 
 import { z } from "zod";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
+import type { AwardXP } from "@/usecases/AwardXP";
 import type { RecordQuizAttemptError } from "@/usecases/RecordQuizAttempt";
 import type { QuizAttempt } from "@/domain/entities/QuizAttempt";
 import type { QuizAttemptReviewItem } from "@/domain/entities/QuizAttemptReview";
 import type { IQuizRepository } from "@/ports/repositories/IQuizRepository";
 import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRepository";
-import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
-import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
@@ -47,8 +46,7 @@ export type AttemptBody = z.infer<typeof AttemptBodySchema>;
 export interface ProcessQuizAttemptDeps {
   quizRepo: IQuizRepository;
   quizAttemptRepo: IQuizAttemptRepository;
-  xpEventRepo: IXPEventRepository;
-  userRepo: UserRepository;
+  awardXp: AwardXP;
   idGen: IdGenerator;
   clock: Clock;
   accessPolicy: IAccessPolicy;

@@ -24,7 +24,8 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 // Mock server-only so src/lib/auth.ts can be imported.
 vi.mock("server-only", () => ({}));
 
-import { performLogin } from "../login.action";
+import { performLogin } from "@/app/actions/login.action";
+import { rateLimitKey } from "@/ports/security/rateLimitKey";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
 import { buildTestContainer } from "@/composition/container.test";
 
@@ -296,14 +297,12 @@ describe("performLogin", () => {
 
     expect(result).toEqual({ kind: "redirect_to_login", errorKind: "invalid_credentials" });
     expect(check).toHaveBeenNthCalledWith(1, {
-      key: "login:email:student@example.com",
-      limit: 5,
-      windowSeconds: 900,
+      key: rateLimitKey("login:email", "student@example.com"),
+      policy: "login_email",
     });
     expect(check).toHaveBeenNthCalledWith(2, {
-      key: "login:ip:203.0.113.21",
-      limit: 20,
-      windowSeconds: 900,
+      key: rateLimitKey("login:ip", "203.0.113.21"),
+      policy: "login_ip",
     });
   });
 
@@ -325,9 +324,8 @@ describe("performLogin", () => {
     expect(result).toEqual({ kind: "redirect_to_login", errorKind: "invalid_credentials" });
     expect(check).toHaveBeenCalledTimes(1);
     expect(check).toHaveBeenCalledWith({
-      key: "login:email:no-ip@example.com",
-      limit: 5,
-      windowSeconds: 900,
+      key: rateLimitKey("login:email", "no-ip@example.com"),
+      policy: "login_email",
     });
   });
 });

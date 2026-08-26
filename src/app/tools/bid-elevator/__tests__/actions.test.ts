@@ -386,6 +386,7 @@ describe("bidElevatorAttempt", () => {
       amount: 25,
       reason: "simulator_challenge_passed",
       refId: "ATT-BID001",
+      idempotencyKey: "simulator_challenge_passed:user_123:ATT-BID001",
     });
     expect(result.value.xpAwarded).toBe(25);
   });

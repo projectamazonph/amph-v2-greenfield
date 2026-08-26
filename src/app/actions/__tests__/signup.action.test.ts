@@ -23,6 +23,7 @@ vi.mock("server-only", () => ({}));
 
 import { performSignUp } from "../signup.action";
 import { buildTestContainer } from "@/composition/container.test";
+import { rateLimitKey } from "@/ports/security/rateLimitKey";
 
 type MockPlantCookie = Mock<(token: string, expiresAt: Date) => Promise<void>>;
 type MockGetClientIp = Mock<() => Promise<string | undefined>>;
@@ -144,9 +145,8 @@ describe("performSignUp", () => {
     );
     expect(result).toEqual({ kind: "rate_limited", retryAfterSeconds: 600 });
     expect(check).toHaveBeenCalledWith({
-      key: "signup:ip:203.0.113.20",
-      limit: 10,
-      windowSeconds: 3600,
+      key: rateLimitKey("signup:ip", "203.0.113.20"),
+      policy: "signup_ip",
     });
   });
 

@@ -288,6 +288,7 @@ describe("strTriageAttempt", () => {
       amount: 25,
       reason: "simulator_challenge_passed",
       refId: "ATT-STR1234",
+      idempotencyKey: "simulator_challenge_passed:user_123:ATT-STR1234",
     });
     expect(result.value.xpAwarded).toBe(25);
   });

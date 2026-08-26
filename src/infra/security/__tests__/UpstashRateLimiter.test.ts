@@ -1,215 +1,157 @@
 /**
- * UpstashRateLimiter test — STORY-010.
+ * UpstashRateLimiter tests — STORY-054.
  *
- * The class lazy-initializes the Upstash client. With empty URL/token
- * (the build-time default), it returns a permissive no-op. With a
- * configured client, the rate limit result is forwarded as-is.
- *
- * The actual @upstash/redis + @upstash/ratelimit SDK is mocked via
- * `require.cache` shimming because the adapter uses CommonJS
- * `require()` to defer the SDK load (so builds without env vars
- * don't crash).
+ * The SDK is mocked through CommonJS loading because the adapter defers SDK
+ * loading until a configured limiter is actually used.
  */
 
-import { describe, it, expect, afterEach } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { UpstashRateLimiter } from "@/infra/security/UpstashRateLimiter";
 
+type FakeResult = {
+  success: boolean;
+  limit: number;
+  remaining: number;
+  reset: number;
+};
+
+function installSdkMocks(options: {
+  result?: FakeResult;
+  throwOnLimit?: boolean;
+  constructed?: Array<{ limit: number; window: string; prefix: string }>;
+}) {
+  const Module = require("node:module") as {
+    _load: (request: string, parent: unknown) => unknown;
+  };
+  const originalLoad = Module._load;
+  const constructed = options.constructed ?? [];
+
+  class FakeRatelimit {
+    constructor(config: { limiter: { limit: number; window: string }; prefix: string }) {
+      constructed.push({
+        limit: config.limiter.limit,
+        window: config.limiter.window,
+        prefix: config.prefix,
+      });
+    }
+
+    static slidingWindow(limit: number, window: string) {
+      return { limit, window };
+    }
+
+    async limit(): Promise<FakeResult> {
+      if (options.throwOnLimit) throw new Error("Redis down");
+      return (
+        options.result ?? {
+          success: true,
+          limit: 5,
+          remaining: 4,
+          reset: Date.now() + 30_000,
+        }
+      );
+    }
+  }
+
+  Module._load = function (request: string, parent: unknown) {
+    if (request === "@upstash/redis") {
+      return {
+        Redis: class {
+          constructor(_config: unknown) {}
+        },
+      };
+    }
+    if (request === "@upstash/ratelimit") return { Ratelimit: FakeRatelimit };
+    return originalLoad.call(this, request, parent);
+  };
+
+  return {
+    constructed,
+    restore: () => {
+      Module._load = originalLoad;
+    },
+  };
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe("UpstashRateLimiter", () => {
-  // Reset require cache so each test can install its own mock.
-  afterEach(() => {
-    const cache = require.cache as Record<string, unknown>;
-    for (const key of Object.keys(cache)) {
-      if (key.includes("@upstash/")) {
-        delete cache[key];
-      }
-    }
-  });
-
-  // ── no-op mode (no env configured) ──────────────────
-
-  it("returns a permissive result when URL and token are empty", async () => {
+  it("fails closed when URL and token are empty", async () => {
     const limiter = new UpstashRateLimiter("", "");
-    const result = await limiter.check({
-      key: "user-1",
-      limit: 5,
-      windowSeconds: 60,
+    const result = await limiter.check({ key: "user-1", policy: "login_email" });
+
+    expect(result).toEqual({
+      ok: false,
+      error: {
+        kind: "configuration_error",
+        message: "Upstash rate limiter is not configured",
+      },
     });
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.allowed).toBe(true);
-    expect(result.value.remaining).toBe(100);
   });
 
-  // ── configured mode (SDK mocked) ─────────────────────
-
-  it("forwards success=true from the Upstash client", async () => {
-    // Install a fake @upstash/redis module.
-    const cache = require.cache as Record<string, unknown>;
-    cache["/fake/@upstash/redis"] = {
-      id: "/fake/@upstash/redis",
-      filename: "/fake/@upstash/redis.js",
-      loaded: true,
-      exports: {
-        Redis: class {
-          constructor(_opts: unknown) {}
-        },
-      },
-    };
-    cache["/fake/@upstash/ratelimit"] = {
-      id: "/fake/@upstash/ratelimit",
-      filename: "/fake/@upstash/ratelimit.js",
-      loaded: true,
-      exports: {
-        Ratelimit: class {
-          constructor(_opts: unknown) {}
-          static slidingWindow(_limit: number, _window: string) {
-            return { type: "sliding" };
-          }
-          async limit(key: string) {
-            return {
-              success: true,
-              limit: 100,
-              remaining: 99,
-              reset: Date.now() + 30_000,
-              _key: key,
-            };
-          }
-        },
-      },
-    };
-
-    // Patch the require to return our fakes
-    const Module = require("node:module") as { _load: (req: string, parent: unknown) => unknown };
-    const originalLoad = Module._load;
-    Module._load = function (req: string, parent: unknown) {
-      if (req === "@upstash/redis") return (cache["/fake/@upstash/redis"] as { exports: unknown }).exports;
-      if (req === "@upstash/ratelimit") return (cache["/fake/@upstash/ratelimit"] as { exports: unknown }).exports;
-      return originalLoad.call(this, req, parent);
-    };
-
+  it("constructs the limiter from the selected server-owned policy", async () => {
+    const sdk = installSdkMocks({ constructed: [] });
     try {
       const limiter = new UpstashRateLimiter("https://example.com", "token-abc");
-      const result = await limiter.check({
-        key: "user-1",
-        limit: 5,
-        windowSeconds: 60,
-      });
+      const result = await limiter.check({ key: "user-1", policy: "login_email" });
+
       expect(result.ok).toBe(true);
-      if (!result.ok) return;
-      expect(result.value.allowed).toBe(true);
-      expect(result.value.remaining).toBe(99);
+      expect(sdk.constructed).toEqual([
+        { limit: 5, window: "900 s", prefix: "amph:ratelimit:login_email" },
+      ]);
     } finally {
-      Module._load = originalLoad;
+      sdk.restore();
     }
   });
 
-  it("forwards success=false when the rate limit is exceeded", async () => {
-    const cache = require.cache as Record<string, unknown>;
-    cache["/fake/@upstash/redis"] = {
-      id: "/fake/@upstash/redis",
-      filename: "/fake/@upstash/redis.js",
-      loaded: true,
-      exports: {
-        Redis: class {
-          constructor(_opts: unknown) {}
-        },
-      },
-    };
-    cache["/fake/@upstash/ratelimit"] = {
-      id: "/fake/@upstash/ratelimit",
-      filename: "/fake/@upstash/ratelimit.js",
-      loaded: true,
-      exports: {
-        Ratelimit: class {
-          constructor(_opts: unknown) {}
-          static slidingWindow() {
-            return { type: "sliding" };
-          }
-          async limit() {
-            return {
-              success: false,
-              limit: 100,
-              remaining: 0,
-              reset: Date.now() + 30_000,
-            };
-          }
-        },
-      },
-    };
-
-    const Module = require("node:module") as { _load: (req: string, parent: unknown) => unknown };
-    const originalLoad = Module._load;
-    Module._load = function (req: string, parent: unknown) {
-      if (req === "@upstash/redis") return (cache["/fake/@upstash/redis"] as { exports: unknown }).exports;
-      if (req === "@upstash/ratelimit") return (cache["/fake/@upstash/ratelimit"] as { exports: unknown }).exports;
-      return originalLoad.call(this, req, parent);
-    };
-
+  it("caches per policy but does not share instances across policies", async () => {
+    const sdk = installSdkMocks({ constructed: [] });
     try {
       const limiter = new UpstashRateLimiter("https://example.com", "token-abc");
-      const result = await limiter.check({
-        key: "user-1",
-        limit: 5,
-        windowSeconds: 60,
-      });
-      expect(result.ok).toBe(true);
-      if (!result.ok) return;
-      expect(result.value.allowed).toBe(false);
-      expect(result.value.remaining).toBe(0);
+      await limiter.check({ key: "user-1", policy: "login_email" });
+      await limiter.check({ key: "user-1", policy: "login_email" });
+      await limiter.check({ key: "user-1", policy: "checkout_user" });
+
+      expect(sdk.constructed).toEqual([
+        { limit: 5, window: "900 s", prefix: "amph:ratelimit:login_email" },
+        { limit: 10, window: "3600 s", prefix: "amph:ratelimit:checkout_user" },
+      ]);
     } finally {
-      Module._load = originalLoad;
+      sdk.restore();
     }
   });
 
-  it("returns rate_limiter_error when the underlying client throws", async () => {
-    const cache = require.cache as Record<string, unknown>;
-    cache["/fake/@upstash/redis"] = {
-      id: "/fake/@upstash/redis",
-      filename: "/fake/@upstash/redis.js",
-      loaded: true,
-      exports: {
-        Redis: class {
-          constructor(_opts: unknown) {}
-        },
+  it("forwards an exceeded result", async () => {
+    const sdk = installSdkMocks({
+      result: {
+        success: false,
+        limit: 5,
+        remaining: 0,
+        reset: Date.now() + 30_000,
       },
-    };
-    cache["/fake/@upstash/ratelimit"] = {
-      id: "/fake/@upstash/ratelimit",
-      filename: "/fake/@upstash/ratelimit.js",
-      loaded: true,
-      exports: {
-        Ratelimit: class {
-          constructor(_opts: unknown) {}
-          static slidingWindow() {
-            return { type: "sliding" };
-          }
-          async limit() {
-            throw new Error("Redis down");
-          }
-        },
-      },
-    };
-
-    const Module = require("node:module") as { _load: (req: string, parent: unknown) => unknown };
-    const originalLoad = Module._load;
-    Module._load = function (req: string, parent: unknown) {
-      if (req === "@upstash/redis") return (cache["/fake/@upstash/redis"] as { exports: unknown }).exports;
-      if (req === "@upstash/ratelimit") return (cache["/fake/@upstash/ratelimit"] as { exports: unknown }).exports;
-      return originalLoad.call(this, req, parent);
-    };
-
+    });
     try {
       const limiter = new UpstashRateLimiter("https://example.com", "token-abc");
-      const result = await limiter.check({
-        key: "user-1",
-        limit: 5,
-        windowSeconds: 60,
-      });
+      const result = await limiter.check({ key: "user-1", policy: "login_email" });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.value.allowed).toBe(false);
+    } finally {
+      sdk.restore();
+    }
+  });
+
+  it("maps provider failures to rate_limiter_error", async () => {
+    const sdk = installSdkMocks({ throwOnLimit: true });
+    try {
+      const limiter = new UpstashRateLimiter("https://example.com", "token-abc");
+      const result = await limiter.check({ key: "user-1", policy: "login_email" });
+
       expect(result.ok).toBe(false);
-      if (result.ok) return;
-      expect(result.error.kind).toBe("rate_limiter_error");
+      if (!result.ok) expect(result.error.kind).toBe("rate_limiter_error");
     } finally {
-      Module._load = originalLoad;
+      sdk.restore();
     }
   });
 });

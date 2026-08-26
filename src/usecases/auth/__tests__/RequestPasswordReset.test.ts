@@ -29,7 +29,13 @@ import type { Logger } from "@/ports/observability/Logger";
 import type { EmailSender } from "@/ports/email/EmailSender";
 import type { PasswordResetRenderer } from "@/ports/email/PasswordResetRenderer";
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
-import type { RateLimiter, RateLimitResult } from "@/ports/security/RateLimiter";
+import {
+  RATE_LIMIT_POLICIES,
+  type RateLimiter,
+  type RateLimitInput,
+  type RateLimitResult,
+  type RateLimitPolicy,
+} from "@/ports/security/RateLimiter";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 
 class SilentLogger implements Logger {
@@ -74,24 +80,21 @@ class StubPasswordResetRenderer implements PasswordResetRenderer {
 }
 
 class StubRateLimiter implements RateLimiter {
-  public calls: Array<{ key: string; limit: number; windowSeconds: number }> = [];
-  // By default, allow everything. Tests override per-key.
-  private blocks = new Set<string>();
+  public calls: RateLimitInput[] = [];
+  // By default, allow everything. Tests override per policy.
+  private blocks = new Set<RateLimitPolicy>();
 
-  blockKey(key: string): void {
-    this.blocks.add(key);
+  blockPolicy(policy: RateLimitPolicy): void {
+    this.blocks.add(policy);
   }
 
-  async check(args: {
-    key: string;
-    limit: number;
-    windowSeconds: number;
-  }): Promise<Result<RateLimitResult, never>> {
+  async check(args: RateLimitInput): Promise<Result<RateLimitResult, never>> {
     this.calls.push(args);
-    if (this.blocks.has(args.key)) {
-      return Result.ok({ allowed: false, remaining: 0, resetSeconds: args.windowSeconds });
+    const policy = RATE_LIMIT_POLICIES[args.policy];
+    if (this.blocks.has(args.policy)) {
+      return Result.ok({ allowed: false, remaining: 0, resetSeconds: policy.windowSeconds });
     }
-    return Result.ok({ allowed: true, remaining: args.limit, resetSeconds: 0 });
+    return Result.ok({ allowed: true, remaining: policy.limit, resetSeconds: 0 });
   }
 }
 
@@ -175,7 +178,7 @@ describe("RequestPasswordReset", () => {
   });
 
   it("returns rate_limited when the email rate limit is hit", async () => {
-    rateLimiter.blockKey("email:alice@example.com");
+    rateLimiter.blockPolicy("password_reset_email");
     const result = await useCase.execute({
       email: "alice@example.com",
       ip: "1.2.3.4",
@@ -199,7 +202,7 @@ describe("RequestPasswordReset", () => {
 
   it("returns rate_limited when the IP rate limit is hit (not the email)", async () => {
     // Block the IP key, not the email key.
-    rateLimiter.blockKey("ip:9.9.9.9");
+    rateLimiter.blockPolicy("password_reset_ip");
     const result = await useCase.execute({
       email: "alice@example.com",
       ip: "9.9.9.9",

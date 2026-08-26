@@ -2,16 +2,17 @@
  * InMemoryRateLimiter — STORY-054.
  *
  * Test fake for the RateLimiter port. Uses a simple sliding-window
- * counter per key. Safe for parallel tests because each container
- * gets its own instance.
+ * counter per policy and key. Safe for parallel tests because each
+ * container gets its own instance.
  */
 
 import { Result } from "@/domain/shared/Result";
-import type {
-  RateLimiter,
-  RateLimitInput,
-  RateLimitResult,
-  RateLimitError,
+import {
+  RATE_LIMIT_POLICIES,
+  type RateLimiter,
+  type RateLimitInput,
+  type RateLimitResult,
+  type RateLimitError,
 } from "@/ports/security/RateLimiter";
 
 interface Bucket {
@@ -22,25 +23,39 @@ export class InMemoryRateLimiter implements RateLimiter {
   private buckets = new Map<string, Bucket>();
 
   async check(input: RateLimitInput): Promise<Result<RateLimitResult, RateLimitError>> {
-    const now = Date.now();
-    const windowStart = now - input.windowSeconds * 1000;
+    const policy = RATE_LIMIT_POLICIES[input.policy];
+    if (!policy) {
+      return Result.err({
+        kind: "configuration_error",
+        message: `Unknown rate-limit policy: ${input.policy}`,
+      });
+    }
+    if (!input.key.trim()) {
+      return Result.err({ kind: "configuration_error", message: "Rate-limit key is empty" });
+    }
 
-    const bucket = this.buckets.get(input.key) ?? { requests: [] };
+    const now = Date.now();
+    const windowStart = now - policy.windowSeconds * 1000;
+    const bucketKey = `${input.policy}:${input.key}`;
+    const bucket = this.buckets.get(bucketKey) ?? { requests: [] };
     const recent = bucket.requests.filter((t) => t > windowStart);
-    const allowed = recent.length < input.limit;
+    const allowed = recent.length < policy.limit;
 
     if (allowed) {
       recent.push(now);
     }
 
-    this.buckets.set(input.key, { requests: recent });
+    this.buckets.set(bucketKey, { requests: recent });
 
     const oldest = recent[0] ?? now;
-    const resetSeconds = Math.max(0, Math.ceil((oldest + input.windowSeconds * 1000 - now) / 1000));
+    const resetSeconds = Math.max(
+      0,
+      Math.ceil((oldest + policy.windowSeconds * 1000 - now) / 1000),
+    );
 
     return Result.ok({
       allowed,
-      remaining: Math.max(0, input.limit - recent.length),
+      remaining: Math.max(0, policy.limit - recent.length),
       resetSeconds,
     });
   }

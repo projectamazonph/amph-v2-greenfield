@@ -24,6 +24,8 @@ describe("validateRequiredEnvVars", () => {
     vi.stubEnv("RESEND_API_KEY", "re_x");
     vi.stubEnv("JWT_SECRET", "test-secret-at-least-32-bytes-long-please");
     vi.stubEnv("DATABASE_URL", "postgresql://test:test@localhost:5432/amph_test");
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "https://redis.example.com");
+    vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "test-token");
   });
 
   afterEach(() => {

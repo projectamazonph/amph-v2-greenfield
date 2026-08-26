@@ -7,7 +7,7 @@
  * 1. Fetch quiz → quiz_not_found
  * 2. Validate all answers (questionId + optionId)
  * 3. Start attempt, answer all questions
- * 4. If all questions answered → complete + score + award XP (fire-and-forget)
+ * 4. If all questions answered → complete + score + persist + award XP
  * 5. If some unanswered → persist in-progress attempt
  * 6. Return attempt + score + passed + xpAwarded
  */
@@ -24,11 +24,9 @@ import {
 } from "@/domain/entities/QuizAttempt";
 import type { QuizAttempt } from "@/domain/entities/QuizAttempt";
 import { XPService } from "@/domain/services/XPService";
-import { AwardXP } from "@/usecases/AwardXP";
+import type { AwardXP } from "@/usecases/AwardXP";
 import type { IQuizRepository } from "@/ports/repositories/IQuizRepository";
 import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRepository";
-import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
-import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type {
@@ -50,8 +48,7 @@ export type RecordQuizAttemptInput = {
 export type RecordQuizAttemptDeps = {
   quizRepo: IQuizRepository;
   quizAttemptRepo: IQuizAttemptRepository;
-  xpEventRepo: IXPEventRepository;
-  userRepo: UserRepository;
+  awardXp: AwardXP;
   idGen: IdGenerator;
   clock: Clock;
   accessPolicy: IAccessPolicy;
@@ -86,7 +83,7 @@ export class RecordQuizAttempt {
   constructor(private readonly deps: RecordQuizAttemptDeps) {}
 
   async execute(input: RecordQuizAttemptInput): Promise<RecordQuizAttemptResult> {
-    const { quizRepo, quizAttemptRepo, xpEventRepo, userRepo, idGen, clock } = this.deps;
+    const { quizRepo, quizAttemptRepo, idGen, clock } = this.deps;
 
     // ── 1. Fetch quiz ───────────────────────────────────────────────────
     const quizResult = await quizRepo.findById(input.quizId);
@@ -163,19 +160,26 @@ export class RecordQuizAttempt {
       score = attempt.score;
       passed = attempt.passed;
 
-      // ── 5b. Award XP if passed (fire-and-forget) ────────────────────
-      if (attempt.passed) {
-        xpAwarded = XPService.QUIZ_PASSED_XP;
-        this.awardXpFireAndForget({
-          userId: input.userId,
-          amount: xpAwarded,
-          refId: attempt.id,
-        });
-      }
-
       const persisted = await quizAttemptRepo.create(attempt);
       if (!persisted.ok) return persisted;
       attempt = persisted.value;
+
+      // Persist the source attempt before awarding XP. The award itself is
+      // atomic and idempotent, so a retry for this attempt cannot duplicate it.
+      if (attempt.passed) {
+        const xpResult = await this.deps.awardXp.execute({
+          userId: input.userId,
+          amount: XPService.QUIZ_PASSED_XP,
+          reason: "quiz_passed",
+          refId: attempt.id,
+          idempotencyKey: `quiz_passed:${input.userId}:${attempt.id}`,
+        });
+        if (xpResult.ok) {
+          xpAwarded = XPService.QUIZ_PASSED_XP;
+        } else {
+          console.error("[RecordQuizAttempt] Failed to award quiz XP:", xpResult.error);
+        }
+      }
 
       const review = buildQuizAttemptReview(quiz, attempt.answers);
 
@@ -209,24 +213,5 @@ export class RecordQuizAttempt {
       totalQuestions: null,
       review: null,
     });
-  }
-
-  private awardXpFireAndForget(params: { userId: string; amount: number; refId: string }): void {
-    const awardXp = new AwardXP({
-      xpEventRepo: this.deps.xpEventRepo,
-      userRepo: this.deps.userRepo,
-      idGen: this.deps.idGen,
-      clock: this.deps.clock,
-    });
-    awardXp
-      .execute({
-        userId: params.userId,
-        amount: params.amount,
-        reason: "quiz_passed",
-        refId: params.refId,
-      })
-      .catch((err: unknown) => {
-        console.error("[RecordQuizAttempt] Failed to award quiz XP:", err);
-      });
   }
 }

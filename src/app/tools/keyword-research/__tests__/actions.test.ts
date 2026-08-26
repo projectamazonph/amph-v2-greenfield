@@ -415,6 +415,7 @@ describe("keywordResearchAttempt", () => {
       amount: 25,
       reason: "simulator_challenge_passed",
       refId: "ATT-KW12345",
+      idempotencyKey: "simulator_challenge_passed:user_123:ATT-KW12345",
     });
     expect(result.value.xpAwarded).toBe(25);
   });

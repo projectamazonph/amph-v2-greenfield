@@ -15,12 +15,15 @@ import { createQuiz } from "@/domain/entities/Quiz";
 import { InMemoryQuizRepository } from "@/infra/repositories/InMemoryQuizRepository";
 import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
 import { InMemoryXPEventRepository } from "@/infra/repositories/InMemoryXPEventRepository";
+import { InMemoryXPAwardRepository } from "@/infra/repositories/InMemoryXPAwardRepository";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { AwardXP } from "@/usecases/AwardXP";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { FixedClock } from "@/ports/system/Clock";
 import type { IQuizRepository } from "@/ports/repositories/IQuizRepository";
 import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRepository";
 import type { IXPEventRepository } from "@/ports/repositories/IXPEventRepository";
+import type { IXPAwardRepository } from "@/ports/repositories/IXPAwardRepository";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
@@ -69,11 +72,18 @@ function buildUseCase(
     userRepo: UserRepository;
     idGen: IdGenerator;
     clock: Clock;
+    xpAwardRepo?: IXPAwardRepository;
   },
   accessDecision: AccessDecision = { kind: "allowed" },
 ) {
+  const xpAwardRepo = deps.xpAwardRepo ?? new InMemoryXPAwardRepository(deps.userRepo);
+  const awardXp = new AwardXP({ xpAwardRepo, idGen: deps.idGen, clock: deps.clock });
   return new RecordQuizAttempt({
-    ...deps,
+    quizRepo: deps.quizRepo,
+    quizAttemptRepo: deps.quizAttemptRepo,
+    awardXp,
+    idGen: deps.idGen,
+    clock: deps.clock,
     accessPolicy: { canAccess: vi.fn(async () => accessDecision) },
   });
 }
@@ -93,6 +103,15 @@ describe("RecordQuizAttempt", () => {
     quizAttemptRepo = new InMemoryQuizAttemptRepository();
     xpEventRepo = new InMemoryXPEventRepository();
     userRepo = new InMemoryUserRepository();
+    userRepo.seed([
+      {
+        id: USER_ID,
+        email: "student@example.com",
+        passwordHash: "hash",
+        firstName: "Test",
+        lastName: "Student",
+      },
+    ]);
     idGen = new InMemoryIdGenerator();
     clock = new FixedClock(new Date("2026-01-01T00:00:00Z"));
   });
@@ -266,7 +285,7 @@ describe("RecordQuizAttempt", () => {
       });
     });
 
-    it("awards XP fire-and-forget when passed", async () => {
+    it("awards XP after persisting a passed attempt", async () => {
       const quiz = makeQuiz();
       quizRepo.seed(quiz);
 
@@ -424,23 +443,21 @@ describe("RecordQuizAttempt", () => {
       const quiz = makeQuiz();
       quizRepo.seed(quiz);
 
-      // Inject a broken xpRepo
-      const brokenXpRepo = {
-        async create() {
+      // Inject a broken atomic XP repository.
+      const brokenXpRepo: IXPAwardRepository = {
+        async award() {
           throw new Error("XP DB down");
         },
-        async findByUserId() {
-          return Result.ok([]);
-        },
-      } as unknown as IXPEventRepository;
+      };
 
       const useCase = buildUseCase({
         quizRepo,
         quizAttemptRepo,
-        xpEventRepo: brokenXpRepo,
+        xpEventRepo,
         userRepo,
         idGen,
         clock,
+        xpAwardRepo: brokenXpRepo,
       });
 
       const result = await useCase.execute({
@@ -452,7 +469,8 @@ describe("RecordQuizAttempt", () => {
         ],
       });
 
-      // The use case should still succeed — XP failure is fire-and-forget
+      // The use case should still succeed even though the reward write failed;
+      // the source attempt is already durable and reconciliation can retry it.
       expect(result.ok).toBe(true);
     });
   });
