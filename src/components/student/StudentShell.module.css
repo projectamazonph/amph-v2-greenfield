@@ -1,44 +1,56 @@
-/* StudentShell.module.css — fixed-left sidebar + flex content.
-   Mirrors admin layout.module.css for consistency.
-   Per design spec §9.1: 240px sidebar, no overlap, no absolute stacking.
-   Hallmark · macrostructure: Sidebar-Layout (N3) · tone: utilitarian
-   · overflow-x: clip on shell so wide children can't push the page
-     horizontally and break the layout. */
+/* StudentShell.module.css — shared Amazon PH simulator workspace shell. */
 
 .skipLink {
   position: fixed;
-  top: var(--space-3);
-  left: var(--space-3);
+  top: var(--sp-2);
+  left: var(--sp-2);
   z-index: var(--z-modal);
-  transform: translateY(-200%);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-sm);
-  background: var(--surface-1);
-  color: var(--ink-900);
-  font-size: var(--text-sm);
+  padding: var(--sp-2) var(--sp-4);
+  transform: translateY(calc(-100% - var(--sp-4)));
+  border: 2px solid var(--c-navy-2);
+  border-radius: var(--r-md);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
   font-weight: 700;
   text-decoration: none;
-  transition: transform var(--duration-fast) var(--ease-out);
+  transition: transform var(--transition);
 }
 
 .skipLink:focus-visible {
   transform: translateY(0);
+  outline: 2px solid var(--c-card);
+  outline-offset: 2px;
 }
 
 .shell {
   display: flex;
   min-height: 100vh;
-  background: var(--surface-0);
-  font-family: var(--font-body);
   overflow-x: clip;
+  background: var(--c-bg);
+  font-family: var(--font-body);
 }
 
 .main {
-  flex: 1;
-  min-width: 0; /* prevent flex item from overflowing */
+  min-width: 0;
   max-width: 100%;
+  flex: 1;
   overflow-x: clip;
+}
+
+.publicShell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background: var(--c-bg);
+  font-family: var(--font-body);
+}
+
+.publicMain {
+  min-width: 0;
+  max-width: 100%;
+  flex: 1;
 }
 
 @media (max-width: 1023px) {
@@ -46,29 +58,14 @@
     flex-direction: column;
     overflow-x: hidden;
   }
+
+  /* The fixed mobile drawer control occupies the first 52px of the viewport.
+     Match the admin shell’s safe content start so learner-page titles and
+     actions cannot sit beneath the toggle. */
+  .main {
+    padding-top: 72px;
+  }
 }
-
-/* Public-shell layout (requireAuth={false}).
-   A single-column flow with a sticky top header and the main content
-   directly under it. No sidebar, no command palette, no mobile
-   nav-toggle. This is the layout used by anonymous visitors on the
-   course catalog + course detail pages. */
-
-.publicShell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: var(--surface-0);
-  font-family: var(--font-body);
-}
-
-.publicMain {
-  flex: 1;
-  min-width: 0;
-  max-width: 100%;
-}
-
-/* Print: hide shell chrome so only the page content reaches the printer. */
 
 @media (prefers-reduced-motion: reduce) {
   .skipLink {
@@ -82,11 +79,7 @@
     display: none;
   }
 
-  .shell {
-    display: block;
-    min-height: auto;
-  }
-
+  .shell,
   .publicShell {
     display: block;
     min-height: auto;

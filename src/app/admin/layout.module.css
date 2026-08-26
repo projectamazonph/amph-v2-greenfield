@@ -1,46 +1,47 @@
-/* Admin layout — fixed-left sidebar + flex content.
-   Per design spec §9.1: 240px sidebar, no overlap, no absolute stacking.
-   Hallmark · macrostructure: Sidebar-Layout (N3) · tone: utilitarian
-   · overflow-x: clip on shell so wide children can't push the page
-     horizontally and break the layout. */
+/* Admin layout — Amazon PH simulator shell and content canvas. */
 
 .shell {
   display: flex;
   min-height: 100vh;
-  background: var(--surface-0);
-  font-family: var(--font-body);
   overflow-x: clip;
+  background: var(--c-bg);
+  font-family: var(--font-body);
 }
 
 .main {
-  flex: 1;
-  min-width: 0; /* prevent flex item from overflowing */
-  padding: var(--space-8) var(--space-8);
+  min-width: 0;
   max-width: 100%;
+  flex: 1;
   overflow-x: clip;
+  padding: var(--content-px) var(--content-px) var(--content-pb);
+}
+
+.main > * {
+  width: min(100%, var(--max-content));
+  margin-inline: auto;
 }
 
 .main :global(.astryx-card) {
-  max-width: 100%;
   min-width: 0;
+  max-width: 100%;
 }
 
 @media (max-width: 1023px) {
-  /* Below the desktop breakpoint, the sidebar collapses to a topbar.
-     For now, just stack the layout vertically. The full mobile
-     bottom-nav is a Sprint 9 carry-over and is out of scope. */
   .shell {
     flex-direction: column;
     overflow-x: hidden;
   }
+
   .main {
-    padding: 72px var(--space-4) var(--space-8);
     overflow-x: hidden;
+    padding: 72px var(--sp-4) var(--sp-12);
   }
+
   .main :global(.astryx-card) {
     overflow-x: auto;
     overscroll-behavior-inline: contain;
   }
+
   .main :global(.astryx-table) {
     min-width: 680px;
   }

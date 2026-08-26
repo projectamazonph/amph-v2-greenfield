@@ -1,82 +1,128 @@
 /* =========================================================================
-   Astryx base — must be first per CSS spec; AMPH tokens below override.
+   Amazon PH Academy simulator theme
+   Source of truth: amazon-ph-simulators/assets/tokens.css + skin.css.
+   The aliases below preserve existing component contracts while moving every
+   route to the shared Amazon navy, orange, cool-surface visual language.
    ========================================================================= */
 
 @import "@astryxdesign/core/reset.css";
 @import "@astryxdesign/core/astryx.css";
 
-/* =========================================================================
-   Design tokens — Field Manual system
-   Source: docs/ui-specs/DESIGN-SPEC.md §1–§4
-   STORY-046-prep-1
-
-   All UI components must consume these tokens via var(--token-name).
-   Never hardcode hex values in component CSS.
-   ========================================================================= */
-
 :root {
-  /* ── Surfaces ────────────────────────────────────────────── */
-  --surface-0: #fafaf7;
-  --surface-1: #ffffff; /* cards, panels, elevated content (was #F4F3EE — bug fix) */
-  --surface-2: #f4f3ee;
-  --surface-3: #1a1a1a;
+  /* Brand */
+  --c-navy-1: #0f1419;
+  --c-navy-2: #131921;
+  --c-navy-3: #232f3e;
+  --c-navy-4: #37475a;
+  --c-navy-5: #485769;
+  --c-orange: #ff9900;
+  --c-orange-h: #ffa41c;
+  --c-orange-d: #9b3e00;
+  --c-orange-soft: #fef3e7;
+  --c-orange-tint: #fce3c2;
 
-  /* ── Ink (text) ──────────────────────────────────────────── */
-  --ink-900: #171717;
-  --ink-700: #404040;
-  --ink-500: #737373;
-  --ink-300: #d4d4d4;
-  --ink-inverse: #fafaf7;
+  /* Surfaces */
+  --c-bg: #f7f8fa;
+  --c-bg-2: #eef1f4;
+  --c-card: #ffffff;
+  --c-card-hi: #fafbfc;
+  --c-border: #d5d9d9;
+  --c-border-2: #e7e7e7;
+  --c-line-soft: #eef1f4;
 
-  /* ── Border ──────────────────────────────────────────────── */
-  --border: #e5e5e0;
-  --border-strong: #a3a3a3;
+  /* Ink and shell */
+  --c-ink: #0f1111;
+  --c-ink-2: #232f3e;
+  --c-sub: #565959;
+  --c-faint: #626a6a;
+  --c-disabled: #b1b6bc;
+  --c-link: #007185;
+  --c-link-h: #c7511f;
+  --c-shell-ink: #e9eff8;
+  --c-shell-dim: #99a5b4;
+  --c-shell-faint: #6e7b8b;
+  --c-shell-line: #2a3543;
 
-  /* ── Brand ───────────────────────────────────────────────── */
-  --accent: #ff6b35;
-  --accent-hover: #e55a2b;
-  --accent-text: #a63c18; /* 6.4:1 on white; use for accent-colored text on light surfaces */
-  --accent-inverse: #ff9a75; /* 8.7:1 on --ink-900; use on inverse surfaces */
-  --accent-soft: #ffe5d9;
-  --accent-ink: #1a1a2e; /* 6.0:1 contrast on --accent; use as primary button text */
+  /* Semantic */
+  --c-green: #067d62;
+  --c-green-bg: #e6f4f0;
+  --c-green-text: #054a3a;
+  --c-amber: #c45500;
+  --c-amber-bg: #fff4e5;
+  --c-amber-text: #8a5300;
+  --c-red: #b12704;
+  --c-red-bg: #fdeded;
+  --c-red-text: #8a1f00;
+  --c-blue: #007185;
+  --c-blue-bg: #e7f3f4;
+  --c-blue-text: #054a5a;
+  --c-gold: #ffd166;
+  --c-purple: #6b3fa0;
+  --c-purple-bg: #f0e8ff;
 
-  /* ── Semantic ────────────────────────────────────────────── */
-  --success: #0e7c3a;
-  --success-soft: #dcfce7;
-  --success-hover: #0a6630;
-  --warning: #b45309;
-  --warning-soft: #fef3c7;
-  --warning-hover: #93420a;
-  --danger: #b91c1c;
-  --danger-soft: #fee2e2;
-  --danger-hover: #991313;
-  --info: #1e40af;
-  --info-soft: #dbeafe;
-  --info-hover: #173296;
+  /* Existing token contracts, now mapped to the simulator system. */
+  --surface-0: var(--c-bg);
+  --surface-1: var(--c-card);
+  --surface-2: var(--c-bg-2);
+  --surface-3: var(--c-navy-2);
+  --ink-900: var(--c-ink);
+  --ink-700: var(--c-sub);
+  --ink-500: var(--c-faint);
+  --ink-300: var(--c-disabled);
+  --ink-inverse: var(--c-card);
+  --border: var(--c-border);
+  --border-strong: var(--c-navy-5);
+  --accent: var(--c-orange);
+  --accent-hover: var(--c-orange-h);
+  --accent-text: var(--c-link);
+  --accent-inverse: var(--c-orange);
+  --accent-soft: var(--c-orange-soft);
+  --accent-ink: var(--c-navy-2);
+  --success: var(--c-green);
+  --success-soft: var(--c-green-bg);
+  --success-hover: var(--c-green-text);
+  --warning: var(--c-amber);
+  --warning-soft: var(--c-amber-bg);
+  --warning-hover: var(--c-amber-text);
+  --danger: var(--c-red);
+  --danger-soft: var(--c-red-bg);
+  --danger-hover: var(--c-red-text);
+  --info: var(--c-blue);
+  --info-soft: var(--c-blue-bg);
+  --info-hover: var(--c-blue-text);
 
-  /* ── Typography ──────────────────────────────────────────── */
-  /* next/font provides --font-display (Space Grotesk) and --font-mono
-     (JetBrains Mono) on the <html> element. --font-body aliases
-     --font-display; --font-sans is a back-compat alias for older
-     utility classes that pre-date the display/body split. */
-  --font-body: var(--font-display);
+  /* Typography. Font variables are supplied by next/font in layout.tsx. */
+  --font-disp: var(--font-display);
   --font-sans: var(--font-body);
-
   --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.375rem;
-  --text-2xl: 1.75rem;
-  --text-3xl: 2.25rem;
-  --text-4xl: 3rem;
-
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-15: 15px;
+  --fs-16: 16px;
+  --fs-18: 18px;
+  --fs-20: 20px;
+  --fs-24: 24px;
+  --fs-32: 32px;
+  --fs-40: 40px;
+  --fs-body: clamp(0.875rem, 0.8rem + 0.4vw, 1rem);
+  --fs-body-sm: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);
+  --fs-h1: clamp(1.75rem, 1.2rem + 2.6vw, 2.5rem);
+  --fs-h2: clamp(1.25rem, 1rem + 1.2vw, 1.5rem);
+  --fs-h3: clamp(1.0625rem, 0.95rem + 0.6vw, 1.25rem);
   --leading-tight: 1.15;
-  --leading-snug: 1.35;
-  --leading-normal: 1.5;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
   --leading-loose: 1.7;
 
-  /* ── Spacing (4px base) ──────────────────────────────────── */
+  /* Spacing, radius, elevation, and motion. */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -88,98 +134,138 @@
   --space-12: 48px;
   --space-16: 64px;
   --space-20: 80px;
-
-  /* ── Radius ──────────────────────────────────────────────── */
+  --sp-1: var(--space-1);
+  --sp-2: var(--space-2);
+  --sp-3: var(--space-3);
+  --sp-4: var(--space-4);
+  --sp-5: var(--space-5);
+  --sp-6: var(--space-6);
+  --sp-8: var(--space-8);
+  --sp-10: var(--space-10);
+  --sp-12: var(--space-12);
+  --sp-16: var(--space-16);
   --radius-sm: 4px;
   --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-full: 9999px;
-  --radius: var(--radius-sm); /* back-compat for older utility classes */
-
-  /* ── Shadow ──────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.04), 0 12px 24px rgba(0, 0, 0, 0.06);
-
-  /* ── Motion ──────────────────────────────────────────────── */
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 999px;
+  --radius: var(--radius-sm);
+  --r-xs: 2px;
+  --r-sm: var(--radius-sm);
+  --r-md: var(--radius-md);
+  --r-lg: var(--radius-lg);
+  --r-xl: var(--radius-xl);
+  --r-pill: var(--radius-full);
+  --shadow-sm: 0 1px 2px rgba(15, 17, 17, 0.08);
+  --shadow-md: 0 2px 6px rgba(15, 17, 17, 0.1);
+  --shadow-lg: 0 4px 14px rgba(15, 17, 17, 0.12);
+  --shadow-xl: 0 8px 24px rgba(15, 17, 17, 0.16);
+  --sh-1: var(--shadow-sm);
+  --sh-2: var(--shadow-md);
+  --sh-3: var(--shadow-lg);
+  --sh-4: var(--shadow-xl);
+  --sh-focus: 0 0 0 3px rgba(255, 153, 0, 0.35);
   --duration-fast: 120ms;
-  --duration-base: 220ms;
-  --duration-slow: 400ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-base: 180ms;
+  --duration-slow: 280ms;
+  --d-fast: var(--duration-fast);
+  --d-base: var(--duration-base);
+  --d-slow: var(--duration-slow);
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --transition: var(--duration-fast) var(--ease-out); /* back-compat */
+  --ease-in-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease: var(--ease-out);
+  --transition: var(--duration-fast) var(--ease-out);
 
-  /* ── Z-index scale ───────────────────────────────────────── */
+  /* Shared layout. */
+  --topbar-h: 56px;
+  --sidenav-w: 240px;
+  --content-px: 24px;
+  --content-pb: 96px;
+  --max-content: 1100px;
+  --max-reading: 720px;
+  --max-form: 640px;
+  --side-pad: clamp(16px, 4vw, 48px);
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-modal-backdrop: 300;
   --z-modal: 400;
   --z-toast: 500;
   --z-tooltip: 600;
-
-  /* ── Container widths ────────────────────────────────────── */
-  --max-content: 1200px;
-  --max-reading: 720px;
-  --max-form: 640px;
-  --side-pad: clamp(16px, 4vw, 48px);
-
-  /* ── Breakpoints (documentation only — not used in @media
-        via CSS vars; @media is the only way to use these) ── */
-  /* --bp-sm: 640px; --bp-md: 768px; --bp-lg: 1024px; --bp-xl: 1280px; --bp-2xl: 1536px; */
 }
-
-/* =========================================================================
-   Dark mode — placeholder until the dark-mode-toggle story lands.
-   The selector exists so the token system is dark-mode-ready.
-   ========================================================================= */
 
 [data-theme="dark"] {
-  --surface-0: #1a1a1a;
-  --surface-1: #2a2a2a;
-  --surface-2: #1f1f1f;
-  --ink-900: #fafaf7;
-  --ink-700: #d4d4d4;
-  --ink-500: #a3a3a3;
-  --border: #404040;
-  --accent-text: #ff9a75;
-  --accent-inverse: #a63c18;
-  --accent-ink: #fafaf7;
+  --surface-0: var(--c-navy-1);
+  --surface-1: var(--c-navy-3);
+  --surface-2: var(--c-navy-4);
+  --ink-900: var(--c-shell-ink);
+  --ink-700: var(--c-shell-dim);
+  --ink-500: var(--c-shell-faint);
+  --border: var(--c-shell-line);
+  --border-strong: var(--c-navy-5);
 }
-
-/* =========================================================================
-   Base reset
-   ========================================================================= */
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
-html,
+html {
+  background: var(--c-bg);
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: var(--font-body);
-  background: var(--surface-0);
-  color: var(--ink-900);
+  min-width: 320px;
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--font-body), system-ui, -apple-system, sans-serif;
+  font-size: var(--fs-body);
   line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  color: var(--c-ink-2);
+  font-family: var(--font-disp), system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: var(--leading-tight);
 }
+
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); }
+
+p { margin: 0; color: var(--c-sub); }
+
+a {
+  color: var(--c-link);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover { color: var(--c-link-h); }
 
 button,
 input,
 select,
 textarea {
-  font: inherit;
   color: inherit;
+  font: inherit;
 }
+
+button,
+[role="button"] { cursor: pointer; }
 
 img,
 svg,
@@ -189,51 +275,46 @@ video {
   height: auto;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0ms !important;
-    animation-duration: 0ms !important;
-  }
+::selection {
+  background: var(--c-orange-soft);
+  color: var(--c-ink-2);
 }
 
-/* =========================================================================
-   Astryx Card overrides — Field Manual §5 honors the design-brief.
-   design-brief.md:142 says: "Shadow: none (the border is the elevation;
-   shadow would fight the manual aesthetic)". The shared Card primitive
-   in src/components/ui/Card.module.css already drops the default
-   shadow (L7 fix) and adds a 1px translateY lift on .interactive:hover.
-   This rule therefore must NOT add a default box-shadow: every Card
-   on every student-facing page (live-classes, profile, etc.) and every
-   admin page (refunds, email-templates, etc.) inherits from here.
-   The `.interactive:hover` border-color and translateY are handled in
-   Card.module.css. The [data-variant="transparent"] block is kept as
-   a defensive guard for callers that opt in to a shadow explicitly.
-   ========================================================================= */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--c-border);
+  border: 2px solid var(--c-bg);
+  border-radius: var(--radius-md);
+}
+::-webkit-scrollbar-track { background: transparent; }
 
+:focus-visible {
+  outline: 2px solid var(--c-orange);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--c-orange);
+  box-shadow: var(--sh-focus);
+}
+
+/* Astryx components inherit the same surface, radius, and elevation system. */
 .astryx-card {
-  /* M-R17 fix: design-brief.md:142 bans shadow on cards. The border
-     is the elevation. Previously this rule re-added a soft
-     box-shadow on every Card, which contradicted the L7 fix in
-     Card.module.css line 12 and silently violated the Field Manual
-     §5 contract on 12+ usages across live-classes (student),
-     profile (student), admin/refunds (admin), and admin/email-templates
-     (admin). */
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--sh-1) !important;
+  color: var(--c-ink) !important;
+  padding: var(--sp-5) !important;
 }
 
 .astryx-card[data-variant="transparent"] {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
-/* =========================================================================
-   Legacy utility classes — preserved for back-compat with the existing
-   pages (signup, etc.) that pre-date the CSS Modules migration.
-   TODO: migrate to src/components/ui/ in STORY-046-prep-3.
-   ========================================================================= */
-
-/* ── Form base ─────────────────────────────────────────────── */
-
+/* Legacy global utility classes remain supported for older pages. */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -241,258 +322,201 @@ video {
 }
 
 .form-label {
-  font-size: 13px;
+  color: var(--c-ink-2);
+  font-family: var(--font-disp), sans-serif;
+  font-size: var(--fs-13);
   font-weight: 600;
-  color: var(--ink-700);
-  letter-spacing: 0.01em;
 }
 
 .form-input {
-  padding: 10px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 15px;
-  color: var(--ink-900);
-  background: var(--surface-1);
-  transition:
-    border-color var(--transition),
-    box-shadow var(--transition);
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
   outline: none;
+  background: var(--c-card);
+  color: var(--c-ink);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .form-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--c-orange);
+  box-shadow: var(--sh-focus);
 }
 
-.form-input::placeholder {
-  color: var(--ink-300);
-}
+.form-input::placeholder { color: var(--c-disabled); }
 
-/* Grows to fit the value (up to the row's full width) instead of
-   staying fixed-width — opts out of .form-group's flex-stretch so
-   field-sizing can take over. Picked via /impeccable live on the
-   signup last-name field to handle long/compound surnames. */
 .form-input-grow {
-  field-sizing: content;
   align-self: flex-start;
   min-width: 120px;
   max-width: 100%;
+  field-sizing: content;
 }
 
-.form-error {
-  font-size: 12px;
-  color: var(--danger);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* ── Buttons ─────────────────────────────────────────────── */
+.form-error,
+.error-text { color: var(--c-red); }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 15px;
+  min-height: 36px;
+  gap: 6px;
+  padding: 9px 16px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-card);
+  color: var(--c-ink);
+  font-family: var(--font-disp), sans-serif;
+  font-size: var(--fs-13);
   font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.1s ease;
-  border: none;
+  line-height: 1.2;
+  transition: background var(--transition), border-color var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.btn:hover {
+  border-color: var(--c-faint);
+  background: var(--c-bg-2);
+  color: var(--c-ink);
+}
+
+.btn:focus-visible {
+  border-color: var(--c-orange);
+  box-shadow: var(--sh-focus);
   outline: none;
 }
 
-.btn:active {
-  transform: scale(0.98);
-}
+.btn:active { transform: translateY(1px); }
 
 .btn-primary {
-  background: var(--accent);
-  /* Per spec §1 "Color rule": primary button text must be --accent-ink
-     (6.0:1 contrast) not white (2.83:1, fails AA). */
-  color: var(--accent-ink);
+  border-color: var(--c-orange);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
 }
 
 .btn-primary:hover {
-  background: var(--accent-hover);
+  border-color: var(--c-orange-h);
+  background: var(--c-orange-h);
+  color: var(--c-navy-2);
 }
 
-.btn-primary:disabled {
-  opacity: 0.5;
+.btn-primary:disabled,
+.btn:disabled {
   cursor: not-allowed;
+  opacity: 0.55;
   transform: none;
 }
 
 .btn-ghost {
+  border-color: transparent;
   background: transparent;
-  color: var(--ink-700);
-  border: 1.5px solid var(--border);
+  color: var(--c-link);
 }
 
 .btn-ghost:hover {
-  background: var(--surface-2);
+  border-color: transparent;
+  background: var(--c-bg-2);
+  color: var(--c-link-h);
 }
 
-/* ── Alert ─────────────────────────────────────────────────── */
-
 .alert {
-  padding: 12px 16px;
-  border-radius: var(--radius);
-  font-size: 14px;
+  padding: var(--sp-3) var(--sp-4);
   border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font-size: var(--fs-14);
 }
 
 .alert-error {
-  background: var(--danger-soft);
-  color: var(--danger);
-  border-color: #fecaca;
+  border-color: color-mix(in srgb, var(--c-red) 25%, transparent);
+  background: var(--c-red-bg);
+  color: var(--c-red-text);
 }
 
 .alert-success {
-  background: var(--success-soft);
-  color: var(--success);
-  border-color: #a7f3d0;
+  border-color: color-mix(in srgb, var(--c-green) 25%, transparent);
+  background: var(--c-green-bg);
+  color: var(--c-green-text);
 }
-
-/* ── Divider ───────────────────────────────────────────────── */
 
 .divider {
   display: flex;
   align-items: center;
-  gap: 16px;
-  color: var(--ink-500);
-  font-size: 13px;
+  gap: var(--sp-4);
+  color: var(--c-faint);
+  font-size: var(--fs-13);
 }
 
 .divider::before,
 .divider::after {
-  content: "";
-  flex: 1;
   height: 1px;
-  background: var(--border);
+  flex: 1;
+  background: var(--c-border);
+  content: "";
 }
 
-/* ── Table row hover — global for all admin/data tables ──── */
-
-.table tbody tr,
-table tbody tr {
-  transition: background var(--duration-fast) var(--ease-out);
+table {
+  width: 100%;
+  border: 1px solid var(--c-border);
+  border-collapse: collapse;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--c-card);
+  color: var(--c-ink);
+  font-size: var(--fs-13);
 }
 
-.table tbody tr:hover,
-table tbody tr:hover {
-  background: var(--surface-2);
+thead th,
+thead td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-bg-2);
+  color: var(--c-sub);
+  font-family: var(--font-disp), sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* Card hover lift
-   H-03 fix: Field Manual spec §5 says "borders as elevation; cards are
-   static at rest". The previous `[class*="card"]:hover` selector matched
-   every element that happened to contain "card" in its class (sidebar
-   items, stat tiles, discard buttons, etc.) and silently lifted them.
-   The interactive variant in src/components/ui/Card.module.css already
-   handles the hover state for genuine interactive cards; this rule
-   should be a no-op. */
-.astryx-card {
-  transition:
-    transform var(--duration-fast) var(--ease-out),
-    box-shadow var(--duration-fast) var(--ease-out);
+tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--c-line-soft);
+  background: var(--c-card);
+  vertical-align: middle;
 }
 
-/* Consistent focus ring for form inputs */
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-  border-color: var(--accent);
-}
+tbody tr { transition: background var(--transition); }
+tbody tr:hover td { background: var(--c-orange-soft); }
+tbody tr:last-child td { border-bottom: 0; }
 
-/* Global focus-visible ring for interactive elements (links, buttons,
-   summary, [role=button], [tabindex]). Matches the accent color so the
-   focus state reads as part of the Field Manual, not the browser default. */
-a:focus-visible,
-button:focus-visible,
-summary:focus-visible,
-[role="button"]:focus-visible,
-[role="link"]:focus-visible,
-[role="menuitem"]:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-.btn:focus-visible {
-  /* The button class sets outline: none; restore a visible ring here. */
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--accent-soft);
-}
-
-/* Consistent display font for page titles */
-h1 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-/* Zebra striping for admin tables */
-.table tbody tr:nth-child(even),
-table tbody tr:nth-child(even) {
-  background: var(--surface-1);
-}
-
-/* Monospace utility for numeric data */
 .mono {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
 
-/* Skip-to-content link for accessibility */
 .skip-link {
-  position: absolute;
-  left: -9999px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-.skip-link:focus {
   position: fixed;
-  top: var(--space-2);
-  left: var(--space-2);
-  width: auto;
-  height: auto;
+  top: var(--sp-2);
+  left: var(--sp-2);
   z-index: 9999;
-  background: var(--accent);
-  color: var(--accent-ink);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  font-weight: 600;
+  padding: var(--sp-2) var(--sp-4);
+  transform: translateY(calc(-100% - var(--sp-4)));
+  border: 2px solid var(--c-navy-2);
+  border-radius: var(--r-md);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-family: var(--font-disp), sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 700;
+  transition: transform var(--transition);
 }
 
-/* Consistent spacing override */
-.astryx-card {
-  padding: var(--space-5) !important;
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--c-card);
+  outline-offset: 2px;
 }
 
-/* Consistent border-radius override */
-.astryx-card {
-  border-radius: var(--radius-md) !important;
-}
-
-/* Screen-reader only — visually hidden but announced by assistive tech.
-   Used for <caption> and other a11y labels that should not affect layout. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -503,4 +527,15 @@ table tbody tr:nth-child(even) {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

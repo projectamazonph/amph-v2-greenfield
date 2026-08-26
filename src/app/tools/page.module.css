@@ -95,16 +95,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  /* M-R20 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
-     box-shadow. The 1px --border is the elevation; hover steps the same
-     border to --accent. Only border-color and transform transition. */
+  box-shadow: var(--sh-1);
   transition:
-    border-color var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
 }
 
 .card:hover {
-  border-color: var(--accent);
+  border-color: var(--c-orange-tint);
+  box-shadow: var(--sh-2);
   transform: translateY(-2px);
 }
 

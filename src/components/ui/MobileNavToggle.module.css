@@ -1,47 +1,50 @@
-/* MobileNavToggle.module.css — hamburger button visible on mobile only. */
+/* MobileNavToggle.module.css — simulator-themed mobile admin chrome. */
 
 .toggle {
+  position: fixed;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  z-index: var(--z-sticky);
   display: none;
-  align-items: center;
-  justify-content: center;
   width: 40px;
   height: 40px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-1);
-  color: var(--ink-900);
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--c-shell-line);
+  border-radius: var(--r-md);
+  background: var(--c-navy-2);
+  box-shadow: var(--sh-2);
+  color: var(--c-shell-ink);
   cursor: pointer;
-  transition: background 0.15s ease;
-  position: fixed;
-  top: var(--space-3);
-  left: var(--space-3);
-  z-index: var(--z-sticky);
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .toggle:hover {
-  background: var(--surface-2);
+  border-color: var(--c-orange);
+  background: var(--c-navy-3);
+  color: var(--c-orange);
 }
 
 .toggle:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--c-orange);
   outline-offset: 2px;
 }
 
 .backdrop {
-  display: none;
   position: fixed;
-  inset: 0;
   z-index: var(--z-dropdown);
+  display: none;
+  inset: 0;
   border: 0;
-  background: rgba(23, 23, 23, 0.42);
-  /* H-04 fix: Field Manual bans glassmorphism / decorative blurs. Drop the
-     blur and let the dim background alone handle the visual separation. */
+  background: rgba(15, 20, 25, 0.62);
 }
 
 @media (max-width: 1023px) {
-  .toggle {
+  .toggle,
+  .backdrop {
     display: flex;
   }
+
   .backdrop {
     display: block;
   }

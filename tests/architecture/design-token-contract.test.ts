@@ -3,7 +3,12 @@ import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const SRC = join(process.cwd(), "src");
-const RUNTIME_TOKENS = new Set(["--font-display", "--font-mono"]);
+const RUNTIME_TOKENS = new Set([
+  "--font-display",
+  "--font-body",
+  "--font-cond",
+  "--font-mono",
+]);
 
 function cssFiles(directory: string): string[] {
   return readdirSync(directory).flatMap((entry) => {

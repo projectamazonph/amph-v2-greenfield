@@ -38,20 +38,23 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--sh-1);
   transition:
-    transform 250ms ease,
-    box-shadow 250ms ease;
+    transform var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 48px -30px rgba(23, 23, 23, 0.5);
+  border-color: var(--c-orange-tint);
+  box-shadow: var(--sh-2);
+  transform: translateY(-2px);
 }
 
 .featured {
-  background: var(--ink-900);
-  color: var(--surface-0);
-  border-color: var(--ink-900);
+  border-color: var(--c-shell-line);
+  background: linear-gradient(180deg, var(--c-navy-2) 0%, var(--c-navy-3) 100%);
+  color: var(--c-shell-ink);
   transform: translateY(-8px);
 }
 
@@ -109,7 +112,7 @@
 }
 
 .featured .sub {
-  color: #cfcfcf;
+  color: var(--c-shell-dim);
 }
 
 .priceLine {
@@ -143,7 +146,7 @@
 }
 
 .featured .priceLine small {
-  color: #9a9a9a;
+  color: var(--c-shell-faint);
 }
 
 .featured .flag,
@@ -160,7 +163,7 @@
 }
 
 .featured .payMini {
-  color: #9a9a9a;
+  color: var(--c-shell-faint);
 }
 
 .incl {
@@ -181,7 +184,7 @@
 }
 
 .featured .incl li {
-  color: #e6e6e6;
+  color: var(--c-shell-ink);
 }
 
 .incl li svg {
@@ -200,7 +203,7 @@
 }
 
 .featured .incl li b {
-  color: var(--surface-0);
+  color: var(--c-shell-ink);
 }
 
 .card > a {

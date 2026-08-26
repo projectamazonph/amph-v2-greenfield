@@ -1,56 +1,55 @@
-/* Card.module.css — Field Manual card system.
-   Per design spec §5: border IS the elevation; never shadow by default. */
+/* Card.module.css — Amazon PH simulator card system. */
 
 .card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  color: var(--ink-900);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  background: var(--c-card);
+  box-shadow: var(--sh-1);
+  color: var(--c-ink);
   font-family: var(--font-body);
-  /* Default border-radius: --radius-lg for marketing, --radius-md for data.
-     Variant=compact uses the smaller radius. */
-  border-radius: var(--radius-lg);
-  /* L7 fix: per design spec §5, border IS the elevation. No shadow. */
   transition:
-    border-color var(--duration-fast) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition),
+    background var(--transition);
 }
 
-/* ── Variants ───────────────────────────────────────────────── */
-
 .default {
-  /* Static card. No hover effect. */
+  padding: var(--sp-4);
 }
 
 .interactive {
   cursor: pointer;
 }
+
 .interactive:hover {
-  border-color: var(--ink-300);
+  border-color: var(--c-orange-tint);
+  background: var(--c-card-hi);
+  box-shadow: var(--sh-2);
   transform: translateY(-1px);
 }
+
 .interactive:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--c-orange);
   outline-offset: 2px;
 }
+
 .interactive:active {
   transform: translateY(0);
 }
 
 .compact {
-  border-radius: var(--radius-md);
+  border-radius: var(--r-md);
 }
-
-/* ── Padding scale ──────────────────────────────────────────── */
 
 .tight {
-  padding: var(--space-3);
+  padding: var(--sp-3);
 }
-.default {
-  padding: var(--space-4);
-}
+
 .comfortable {
-  padding: var(--space-6);
+  padding: var(--sp-6);
 }
+
 .hero {
-  padding: var(--space-8);
+  padding: var(--sp-8);
 }
