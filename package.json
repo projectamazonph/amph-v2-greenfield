@@ -77,7 +77,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@astryxdesign/cli": "^0.1.8",
+    "@astryxdesign/cli": "^0.4.7",
     "@cobusgreyling/loop-audit": "^1.7.0",
     "@cobusgreyling/loop-context": "^1.5.0",
     "@cobusgreyling/loop-cost": "^1.2.0",
