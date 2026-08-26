@@ -36,6 +36,12 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
     section.lessons.some((l) => l.id === currentLessonId),
   );
   const currentSectionId = course.curriculum.sections[currentSectionIndex]?.id;
+  const totalLessonCount = courseLessonCount(course);
+  const completedLessonCount = course.curriculum.sections.flatMap((section) => section.lessons)
+    .filter((lesson) => completedLessonIds.includes(lesson.id)).length;
+  const courseProgress = totalLessonCount === 0
+    ? 0
+    : Math.round((completedLessonCount / totalLessonCount) * 100);
   const [openSections, setOpenSections] = useState<Set<string>>(
     () => new Set(currentSectionId ? [currentSectionId] : []),
   );
@@ -61,8 +67,19 @@ export function LessonSidebar({ course, currentLessonId, completedLessonIds }: L
     <aside className={styles.sidebar}>
       {/* Course title header */}
       <div className={styles.header}>
+        <p className={styles.routeLabel}>Learning route</p>
         <h2 className={styles.headerTitle}>{course.title}</h2>
-        <p className={styles.headerSubtitle}>{courseLessonCount(course)} lessons</p>
+        <div className={styles.courseProgressSummary}>
+          <span>{completedLessonCount} of {totalLessonCount} lessons</span>
+          <strong>{courseProgress}%</strong>
+        </div>
+        <div
+          className={styles.courseProgressTrack}
+          aria-label={`Course progress: ${courseProgress}%`}
+        >
+          <span style={{ width: `${courseProgress}%` }} />
+        </div>
+        <p className={styles.headerSubtitle}>Read, decide, then apply.</p>
       </div>
 
       {/* Sections */}
