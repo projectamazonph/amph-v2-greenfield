@@ -1,124 +1,135 @@
-/* PublicCatalogHeader.module.css — slim top bar shown on
-   requireAuth={false} student pages (course catalog, course detail).
-   Mirrors the visual identity of StudentSidebar.brand but rendered as
-   a horizontal header so anonymous visitors get a marketing-friendly
-   nav instead of the authenticated sidebar. */
+/* PublicCatalogHeader.module.css — Amazon PH simulator public shell. */
 
 .bar {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--surface-1, #ffffff);
-  border-bottom: 1px solid var(--border);
-  font-family: var(--font-body);
+  border-bottom: 1px solid #000;
+  background: linear-gradient(180deg, var(--c-navy-2) 0%, var(--c-navy-3) 100%);
+  box-shadow: var(--sh-2);
+  color: var(--c-shell-ink);
+  font-family: var(--font-disp);
 }
 
 .inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--space-4, 16px) var(--space-6, 24px);
   display: flex;
+  max-width: 1200px;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4, 16px);
+  gap: var(--sp-4);
+  margin: 0 auto;
+  padding: var(--sp-3) var(--sp-6);
 }
 
 .brand {
   display: flex;
+  min-width: 0;
   align-items: center;
-  gap: var(--space-3, 12px);
-  color: var(--ink-900, #1a1a1a);
+  gap: var(--sp-3);
+  color: var(--c-shell-ink);
   text-decoration: none;
 }
 
+.brand:hover {
+  color: var(--c-shell-ink);
+}
+
 .brandMark {
-  display: inline-grid;
-  grid-template-columns: repeat(2, 8px);
-  grid-template-rows: repeat(2, 8px);
-  gap: 2px;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--c-orange) 0%, var(--c-orange-d) 100%);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  color: var(--c-navy-2);
+  font-size: var(--fs-14);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.brandMark::after {
+  content: "P";
 }
 
 .brandMarkSquare {
-  display: block;
-  width: 8px;
-  height: 8px;
-  background: var(--accent, #ff6b1a);
-  border-radius: 1px;
+  display: none;
 }
 
 .brandText {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   line-height: 1.1;
 }
 
 .brandName {
+  overflow: hidden;
+  font-size: var(--fs-13);
   font-weight: 700;
-  font-size: 14px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.2px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brandSub {
-  font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  margin-top: 1px;
+  color: var(--c-shell-faint);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-500, #6b6b6b);
-  margin-top: 2px;
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--sp-2);
 }
 
-.navLink {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  color: var(--ink-700);
-  font-size: var(--text-sm);
+.navLink,
+.signIn,
+.signUp {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
+}
+
+.navLink,
+.signIn {
+  color: var(--c-shell-dim);
 }
 
 .navLink:hover,
-.navLink:focus-visible {
-  background: var(--surface-2);
-  color: var(--ink-900);
-}
-
-.signIn {
-  padding: var(--space-2, 8px) var(--space-4, 16px);
-  border-radius: 6px;
-  color: var(--ink-900, #1a1a1a);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 14px;
-  border: 1px solid var(--border);
-  background: transparent;
-  transition: background-color 120ms ease;
-}
-
-.signIn:hover {
-  background: var(--surface-2, #f5f3ee);
+.navLink:focus-visible,
+.signIn:hover,
+.signIn:focus-visible {
+  border-color: var(--c-shell-line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--c-shell-ink);
 }
 
 .signUp {
-  padding: var(--space-2, 8px) var(--space-4, 16px);
-  border-radius: 6px;
-  color: var(--accent-ink, #1a1a2e);
-  background: var(--accent, #ff6b1a);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  border: 1px solid var(--accent, #ff6b1a);
-  transition: filter 120ms ease;
+  border-color: var(--c-orange);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
 }
 
-.signUp:hover {
-  filter: brightness(1.05);
+.signUp:hover,
+.signUp:focus-visible {
+  border-color: var(--c-orange-h);
+  background: var(--c-orange-h);
+  color: var(--c-navy-2);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -131,15 +142,17 @@
 
 @media (max-width: 480px) {
   .inner {
-    padding: var(--space-3, 12px) var(--space-4, 16px);
+    padding: var(--sp-3) var(--sp-4);
   }
-  .brandSub {
+
+  .brandSub,
+  .navLink {
     display: none;
   }
-  .navLink,
+
   .signIn,
   .signUp {
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-xs);
+    padding: 0 var(--sp-3);
+    font-size: 11.5px;
   }
 }

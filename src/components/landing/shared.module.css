@@ -1,9 +1,4 @@
-/**
- * Shared primitives for the marketing landing page.
- * The landing page is the documented brand-register exception (PRODUCT.md) —
- * it still draws from the same tokens in globals.css, just spends the accent
- * (and the flat "waybill stamp" shadow) far more liberally than the product UI.
- */
+/* Shared landing primitives — Amazon PH simulator visual system. */
 
 .contentLayer {
   position: relative;
@@ -17,15 +12,15 @@
 }
 
 .sec {
-  padding: clamp(64px, 9vw, 120px) 0;
   position: relative;
+  padding: clamp(64px, 9vw, 120px) 0;
 }
 
 .secHead {
   display: grid;
   grid-template-columns: minmax(180px, 260px) 1fr;
-  gap: clamp(24px, 4vw, 56px);
   align-items: start;
+  gap: clamp(24px, 4vw, 56px);
   margin-bottom: clamp(34px, 5vw, 60px);
 }
 
@@ -34,126 +29,110 @@
   top: 96px;
 }
 
-@media (max-width: 760px) {
-  .secHead {
-    grid-template-columns: 1fr;
-  }
-  .stickyCol {
-    position: static;
-  }
-}
-
-.secNum {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--accent-text);
-  font-weight: 700;
-}
-
-.secTitle {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(1.5rem, 3vw, 2.3rem);
-  letter-spacing: -0.02em;
-  line-height: 1.08;
-  margin-top: 12px;
-}
-
-.secLede {
-  font-family: var(--font-body);
-  color: var(--ink-700);
-  font-size: clamp(15px, 1.5vw, 18px);
-  max-width: 60ch;
-}
-
-.secLede b {
-  color: var(--ink-900);
-  font-weight: 600;
-}
-
+.secNum,
 .label {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--ink-500);
   display: inline-flex;
   align-items: center;
   gap: 9px;
+  color: var(--c-orange-d);
+  font-family: var(--font-disp);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.secTitle {
+  margin-top: var(--sp-3);
+  color: var(--c-ink-2);
+  font-family: var(--font-disp);
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: var(--leading-tight);
+}
+
+.secLede {
+  max-width: 60ch;
+  color: var(--c-sub);
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.5vw, 18px);
+}
+
+.secLede b {
+  color: var(--c-ink-2);
+  font-weight: 700;
+}
+
+.label {
+  color: var(--c-faint);
+  letter-spacing: 0.18em;
 }
 
 .label::before {
-  content: "";
   width: 22px;
-  height: 1.5px;
-  background: var(--accent);
+  height: 2px;
+  background: var(--c-orange);
+  content: "";
 }
 
-/* ── Buttons — the one place the landing page keeps its own "stamped"
-   hard-offset shadow instead of globals.css's ambient/at-rest-flat rule;
-   it is the visual anchor of the Waybill Orange identity. ── */
-
 .btn {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition:
-    transform 140ms ease,
-    box-shadow 140ms ease,
-    background 200ms ease,
-    color 200ms ease;
+  gap: var(--sp-2);
+  min-height: 40px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition), transform var(--transition);
   white-space: nowrap;
 }
 
 .btnPrimary {
-  background: var(--accent);
-  color: var(--accent-ink);
-  padding: 11px 18px;
-  box-shadow: 3px 3px 0 var(--ink-900);
+  padding: 9px 18px;
+  border-color: var(--c-orange);
+  background: var(--c-orange);
+  box-shadow: var(--sh-1);
+  color: var(--c-navy-2);
 }
 
 .btnPrimary:hover {
-  background: var(--accent-hover);
-  transform: translate(-1px, -1px);
-  box-shadow: 5px 5px 0 var(--ink-900);
+  border-color: var(--c-orange-h);
+  background: var(--c-orange-h);
+  box-shadow: var(--sh-2);
+  color: var(--c-navy-2);
+  transform: translateY(-1px);
 }
 
 .btnPrimary:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0 var(--ink-900);
+  box-shadow: var(--sh-1);
+  transform: translateY(1px);
 }
 
 .btnGhost {
-  background: transparent;
-  color: var(--ink-900);
-  border-color: var(--ink-900);
-  padding: 10px 16px;
+  padding: 9px 16px;
+  background: var(--c-card);
+  color: var(--c-link);
 }
 
 .btnGhost:hover {
-  background: var(--ink-900);
-  color: var(--surface-0);
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 var(--accent);
+  border-color: var(--c-faint);
+  background: var(--c-bg-2);
+  color: var(--c-link-h);
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--sh-focus);
 }
 
 .arr {
-  transition: transform 200ms ease;
   display: inline-block;
+  transition: transform var(--transition);
 }
 
 .btn:hover .arr {
@@ -161,45 +140,43 @@
 }
 
 .chip {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-700);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
   padding: 6px 12px;
-  background: var(--surface-1);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-pill);
+  background: var(--c-card);
+  color: var(--c-sub);
+  font-family: var(--font-disp);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .chip b {
-  color: var(--accent-text);
+  color: var(--c-amber-text);
 }
-
-/* ── Photo plate — bordered frame with corner brackets, used for the hero
-   image. ── */
 
 .plate {
   position: relative;
-  border: 1px solid var(--border);
-  background: var(--surface-1);
-  border-radius: var(--radius-lg);
   padding: 10px;
-  box-shadow: 0 30px 60px -38px rgba(23, 23, 23, 0.55);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  background: var(--c-card);
+  box-shadow: var(--sh-3);
 }
 
 .plateImg {
-  border-radius: var(--radius-md);
-  width: 100%;
-  object-fit: cover;
   display: block;
+  width: 100%;
+  border-radius: var(--r-md);
+  object-fit: cover;
 }
 
 .corner {
   position: absolute;
   width: 14px;
   height: 14px;
-  border: 1.5px solid var(--accent);
+  border: 1.5px solid var(--c-orange);
 }
 
 .cornerTl {
@@ -212,35 +189,46 @@
 .cornerTr {
   top: -1px;
   right: -1px;
-  border-left: 0;
   border-bottom: 0;
+  border-left: 0;
 }
 
 .cornerBl {
   bottom: -1px;
   left: -1px;
-  border-right: 0;
   border-top: 0;
+  border-right: 0;
 }
 
 .cornerBr {
-  bottom: -1px;
   right: -1px;
-  border-left: 0;
+  bottom: -1px;
   border-top: 0;
+  border-left: 0;
 }
 
 .plateCap {
   position: absolute;
-  left: 18px;
   bottom: 18px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: var(--ink-900);
-  background: rgba(250, 250, 247, 0.92);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  left: 18px;
   padding: 6px 10px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--c-card) 92%, transparent);
+  color: var(--c-ink-2);
+  font-family: var(--font-disp);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .secHead {
+    grid-template-columns: 1fr;
+  }
+
+  .stickyCol {
+    position: static;
+  }
 }

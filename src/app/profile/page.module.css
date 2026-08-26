@@ -56,9 +56,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
-  /* M-R23 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
-     box-shadow. The 1px --border is the elevation indicator on the
-     profile page section card. */
+  box-shadow: var(--sh-1);
 }
 
 .sectionTitle {
@@ -182,15 +180,12 @@
   text-decoration: none;
   white-space: nowrap;
   transition: background-color var(--duration-base) var(--ease-out);
-  /* M-R28 fix: Field Manual §5 (docs/design-brief.md:142) — Button has no
-     box-shadow. The 1px border is the elevation; the previous
-     `, box-shadow var(--duration-base) var(--ease-out)` term was dead code
-     (no box-shadow declaration on the button) and the `box-shadow: none`
-     on hover was a freeze. Both are removed. */
+  box-shadow: var(--sh-1);
 }
 
 .btnPrimary:hover {
-  background: color-mix(in srgb, var(--accent) 90%, var(--ink-900));
+  background: var(--c-orange-h);
+  box-shadow: var(--sh-2);
 }
 
 .btnSecondary {

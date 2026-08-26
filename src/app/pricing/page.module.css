@@ -69,16 +69,12 @@
   flex-direction: column;
   gap: var(--space-4);
   position: relative;
-  /* M-R26 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
-     box-shadow. The 1px `var(--border)` is the elevation indicator on
-     the pricing tier card. */
+  box-shadow: var(--sh-1);
 }
 
 .cardHighlighted {
   border: 2px solid var(--accent);
-  /* M-R26 fix: Field Manual §5 — the `0 0 0 4px var(--accent-soft)`
-     halo is a box-shadow variant; removed. The 2px `var(--accent)`
-     border is the highlighted-tier indicator. */
+  box-shadow: var(--sh-2);
 }
 
 .ribbon {

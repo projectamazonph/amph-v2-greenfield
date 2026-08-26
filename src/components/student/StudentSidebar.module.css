@@ -1,212 +1,233 @@
-/* StudentSidebar.module.css — student fixed-left sidebar.
-   Mirrors admin NavSidebar with student-appropriate nav items.
-   Hallmark · macrostructure: Nav-Sidebar (N3) · tone: utilitarian
-   · per Hallmark: brand wordmark first, then nav, then user card
-   · active state is a full pill (not just a left border) so the
-     current location reads at a glance · Phosphor icons via JSX. */
+/* StudentSidebar.module.css — Amazon PH simulator learner navigation. */
 
 .sidebar {
-  width: 240px;
-  flex-shrink: 0;
-  background: var(--surface-1);
-  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
   display: flex;
-  flex-direction: column;
+  width: var(--sidenav-w);
   min-height: 100vh;
+  flex-shrink: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--c-shell-line);
+  background: linear-gradient(180deg, var(--c-navy-2) 0%, var(--c-navy-3) 100%);
+  box-shadow: var(--sh-2);
 }
-
-/* ---- Brand ---- */
 
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-6) var(--space-5);
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--c-shell-line);
+  color: var(--c-shell-ink);
   text-decoration: none;
-  color: inherit;
-  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+.brand:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--c-shell-ink);
 }
 
 .brand:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--c-orange);
   outline-offset: -2px;
 }
 
 .brandMark {
-  display: flex;
-  gap: 2px;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--c-orange) 0%, var(--c-orange-d) 100%);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  color: var(--c-navy-2);
+  font-family: var(--font-disp);
+  font-size: var(--fs-14);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.brandMark::after {
+  content: "P";
 }
 
 .brandMarkSquare {
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
-  border-radius: 2px;
-}
-
-.brandMarkSquare:nth-child(2) {
-  opacity: 0.6;
-}
-
-.brandMarkSquare:nth-child(3) {
-  opacity: 0.3;
+  display: none;
 }
 
 .brandText {
   display: flex;
-  flex-direction: column;
   min-width: 0;
+  flex-direction: column;
 }
 
 .brandName {
-  font-family: var(--font-display);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--ink-900);
-  white-space: nowrap;
   overflow: hidden;
+  color: var(--c-shell-ink);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brandSub {
-  font-size: var(--text-xs);
-  color: var(--ink-500);
-  font-family: var(--font-mono);
+  margin-top: 1px;
+  color: var(--c-shell-faint);
+  font-family: var(--font-disp);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-/* ---- Navigation ---- */
-
 .nav {
-  flex: 1;
   display: flex;
+  min-height: 0;
+  flex: 1;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-3);
+  gap: var(--sp-4);
   overflow-y: auto;
+  padding: var(--sp-4) var(--sp-3);
 }
 
 .sectionLabel {
+  margin-bottom: var(--sp-1);
+  padding: 0 var(--sp-3);
+  color: var(--c-shell-faint);
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-500);
-  padding: 0 var(--space-3);
-  margin-bottom: var(--space-1);
 }
 
 .sectionGroup {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 2px;
 }
 
 .item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  color: var(--ink-700);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
   position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  margin: 1px 0;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--c-shell-dim);
+  font-family: var(--font-body);
+  font-size: var(--fs-13);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .item:hover {
-  background: var(--surface-2);
-  color: var(--ink-900);
+  border-color: var(--c-shell-line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--c-shell-ink);
 }
 
 .item:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--c-orange);
+  outline-offset: -2px;
 }
 
-/* Active state — full accent pill */
-.active {
-  background: var(--accent-soft);
-  color: var(--accent-text);
-  font-weight: 600;
-}
-
+.active,
 .active:hover {
-  background: var(--accent-soft);
-  color: var(--accent-text);
+  border-color: rgba(255, 153, 0, 0.3);
+  background: rgba(255, 153, 0, 0.08);
+  color: var(--c-orange);
+  font-weight: 700;
+}
+
+.active::before {
+  width: 3px;
+  height: 16px;
+  margin-right: 4px;
+  margin-left: -8px;
+  border-radius: var(--r-xs);
+  background: var(--c-orange);
+  content: "";
 }
 
 .icon {
   display: flex;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
 }
 
 .label {
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ---- Footer / User card ---- */
-
 .footer {
-  padding: var(--space-4) var(--space-3);
-  border-top: 1px solid var(--border);
+  padding: var(--sp-3);
+  border-top: 1px solid var(--c-shell-line);
+  background: rgba(15, 20, 25, 0.32);
 }
 
 .userCard {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
+  gap: var(--sp-3);
+  padding: var(--sp-2);
+  border: 1px solid var(--c-shell-line);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .avatar {
+  display: flex;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-full);
-  background: var(--accent-soft);
-  color: var(--accent-text);
-  display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  border-radius: var(--r-pill);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
   font-weight: 700;
-  flex-shrink: 0;
 }
 
 .userInfo {
-  flex: 1;
   min-width: 0;
+  flex: 1;
 }
 
 .userName {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink-900);
-  white-space: nowrap;
   overflow: hidden;
+  color: var(--c-shell-ink);
+  font-size: var(--fs-13);
+  font-weight: 600;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .userRole {
-  font-size: var(--text-xs);
-  color: var(--ink-500);
-  font-family: var(--font-mono);
+  color: var(--c-shell-faint);
+  font-family: var(--font-disp);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .logoutForm {
@@ -215,54 +236,44 @@
 
 .logoutButton {
   display: flex;
+  min-width: 36px;
+  min-height: 36px;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  border: none;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
   background: transparent;
-  color: var(--ink-500);
-  border-radius: var(--radius-sm);
+  color: var(--c-shell-dim);
   cursor: pointer;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .logoutButton:hover {
-  background: var(--surface-2);
-  color: var(--ink-900);
+  border-color: rgba(177, 39, 4, 0.5);
+  background: rgba(177, 39, 4, 0.16);
+  color: #ffb3a8;
 }
 
 .logoutButton:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
+  outline: 2px solid var(--c-orange);
+  outline-offset: 2px;
 }
-
-/* ---- Mobile responsive (drawer controlled by data-open attribute) ---- */
 
 @media (max-width: 1023px) {
   .sidebar {
     position: fixed;
     top: 0;
-    left: 0;
     bottom: 0;
+    left: 0;
     z-index: var(--z-dropdown);
-    transform: translateX(-100%);
-    transition: transform 0.2s ease;
-    width: 280px;
+    width: min(280px, calc(100vw - var(--sp-6)));
     min-height: 100vh;
-    border-right: 1px solid var(--border);
+    transform: translateX(-100%);
+    transition: transform var(--d-base) var(--ease);
   }
 
   .sidebar[data-open="true"] {
     transform: translateX(0);
-  }
-
-  .nav {
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
   }
 }
 

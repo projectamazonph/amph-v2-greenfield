@@ -1,15 +1,16 @@
-/* Toast.module.css — notification banners */
+/* Toast.module.css — Amazon PH simulator status notifications. */
 
 .toast {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
   border: 1px solid;
-  animation: slideIn 0.2s ease-out;
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-2);
+  font-size: var(--fs-13);
+  font-weight: 500;
+  animation: slideIn var(--d-base) var(--ease);
 }
 
 @keyframes slideIn {
@@ -17,6 +18,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -24,33 +26,33 @@
 }
 
 .success {
-  background: #F0FDF4;
-  border-color: var(--success);
-  color: #166534;
+  border-color: color-mix(in srgb, var(--c-green) 35%, transparent);
+  background: var(--c-green-bg);
+  color: var(--c-green-text);
 }
 
 .error {
-  background: #FEF2F2;
-  border-color: var(--danger);
-  color: #991B1B;
+  border-color: color-mix(in srgb, var(--c-red) 35%, transparent);
+  background: var(--c-red-bg);
+  color: var(--c-red-text);
 }
 
 .info {
-  background: #EFF6FF;
-  border-color: #3B82F6;
-  color: #1E40AF;
+  border-color: color-mix(in srgb, var(--c-blue) 35%, transparent);
+  background: var(--c-blue-bg);
+  color: var(--c-blue-text);
 }
 
 .warning {
-  background: #FFFBEB;
-  border-color: #F59E0B;
-  color: #92400E;
+  border-color: color-mix(in srgb, var(--c-amber) 35%, transparent);
+  background: var(--c-amber-bg);
+  color: var(--c-amber-text);
 }
 
 .icon {
   display: flex;
-  align-items: center;
   flex-shrink: 0;
+  align-items: center;
 }
 
 .message {
@@ -59,24 +61,32 @@
 
 .close {
   display: flex;
-  align-items: center;
-  justify-content: center;
   width: 24px;
   height: 24px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  opacity: 0.6;
-  border-radius: var(--radius-sm);
-  transition: opacity 0.15s ease;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: background var(--transition), opacity var(--transition);
 }
 
 .close:hover {
+  background: color-mix(in srgb, currentColor 9%, transparent);
   opacity: 1;
 }
 
 .close:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--c-orange);
   outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
 }

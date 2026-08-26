@@ -116,9 +116,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  /* M-R27 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
-     box-shadow. The 1px `var(--border)` is the elevation indicator on
-     the ad-console iframe wrapper. */
+  box-shadow: var(--sh-2);
   height: calc(100vh - 220px);
   min-height: 600px;
 }

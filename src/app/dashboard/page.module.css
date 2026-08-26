@@ -82,10 +82,8 @@
   border-radius: var(--radius-lg);
   text-decoration: none;
   color: inherit;
-  /* M-R19 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
-     box-shadow. The 1px --border is the elevation; hover steps the same
-     border to --ink-300. Only border-color transitions. */
-  transition: border-color var(--duration-fast) var(--ease-out);
+  box-shadow: var(--sh-1);
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
   min-width: 0;
 }
 
@@ -109,7 +107,9 @@
 }
 
 .card:hover {
-  border-color: var(--ink-300);
+  border-color: var(--c-orange-tint);
+  box-shadow: var(--sh-2);
+  transform: translateY(-1px);
 }
 
 .card:focus-visible,

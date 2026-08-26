@@ -9,9 +9,7 @@
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  /* M-R25 fix: Field Manual §5 (docs/design-brief.md:142) — Card has no
-     box-shadow. The 1px `var(--border)` is the elevation indicator on
-     the reset-password page card. */
+  box-shadow: var(--sh-2);
   font-family: var(--font-body);
 }
 

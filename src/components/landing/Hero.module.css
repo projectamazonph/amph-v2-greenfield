@@ -142,13 +142,13 @@
   position: absolute;
   right: -10px;
   top: 26px;
-  background: var(--ink-900);
-  color: var(--surface-0);
+  background: var(--c-navy-2);
+  color: var(--c-shell-ink);
   border-radius: var(--radius-md);
   padding: 10px 14px;
   font-family: var(--font-mono);
   transform: rotate(2deg);
-  box-shadow: 0 14px 30px -16px rgba(23, 23, 23, 0.7);
+  box-shadow: var(--sh-3);
   animation: floaty 5s ease-in-out infinite;
 }
 
@@ -156,19 +156,19 @@
   display: block;
   font-size: 8.5px;
   letter-spacing: 0.2em;
-  color: #bdbdbd;
+  color: var(--c-shell-dim);
   text-transform: uppercase;
 }
 
 .stat b {
   font-size: 18px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--c-orange);
 }
 
 .statDelta {
   font-size: 10px;
-  color: #9be8b4;
+  color: var(--c-orange);
 }
 
 @keyframes floaty {
