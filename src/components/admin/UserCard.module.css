@@ -1,51 +1,54 @@
-/* UserCard.module.css — sidebar footer card. */
+/* UserCard.module.css — simulator-themed sidebar account summary. */
 
 .card {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
+  gap: var(--sp-3);
+  padding: var(--sp-2);
+  border: 1px solid var(--c-shell-line);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .avatar {
+  display: flex;
   width: 32px;
   height: 32px;
   flex-shrink: 0;
-  display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: var(--text-sm);
+  border-radius: var(--r-pill);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
+  font-weight: 700;
   letter-spacing: 0.01em;
 }
 
 .info {
-  flex: 1;
-  min-width: 0;
   display: flex;
+  min-width: 0;
+  flex: 1;
   flex-direction: column;
   gap: 1px;
 }
 
 .name {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--ink-900);
-  white-space: nowrap;
   overflow: hidden;
+  color: var(--c-shell-ink);
+  font-size: var(--fs-13);
+  font-weight: 600;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .role {
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--ink-500);
-  letter-spacing: 0.04em;
+  color: var(--c-shell-faint);
+  font-family: var(--font-disp);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -54,27 +57,26 @@
 }
 
 .logoutButton {
-  min-width: 44px;
-  min-height: 44px;
   display: inline-flex;
+  min-width: 36px;
+  min-height: 36px;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
   background: transparent;
-  border-radius: var(--radius-sm);
+  color: var(--c-shell-dim);
   cursor: pointer;
-  color: var(--ink-500);
-  transition:
-    background var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .logoutButton:hover {
-  background: var(--danger-soft);
-  color: var(--danger);
+  border-color: rgba(177, 39, 4, 0.5);
+  background: rgba(177, 39, 4, 0.16);
+  color: #ffb3a8;
 }
 
 .logoutButton:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--c-orange);
   outline-offset: 2px;
 }

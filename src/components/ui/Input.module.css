@@ -1,19 +1,20 @@
-/* Input.module.css — Field Manual form field. */
+/* Input.module.css — Amazon PH simulator form field. */
 
 .field {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: 6px;
-  font-family: var(--font-body);
   box-sizing: border-box;
-  min-width: 0;
+  font-family: var(--font-body);
 }
 
 .label {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--ink-700);
-  letter-spacing: 0.01em;
+  color: var(--c-ink-2);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .inputWrap {
@@ -24,80 +25,73 @@
 
 .input {
   width: 100%;
-  background: var(--surface-1);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--ink-900);
-  font-family: var(--font-body);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
   outline: none;
-  transition:
-    border-color var(--duration-fast) var(--ease-out),
-    box-shadow var(--duration-fast) var(--ease-out);
+  background: var(--c-card);
+  color: var(--c-ink);
+  font-family: var(--font-body);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
 }
 
 .input::placeholder {
-  color: var(--ink-300);
+  color: var(--c-disabled);
 }
 
 .input:focus-visible {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--c-orange);
+  box-shadow: var(--sh-focus);
 }
 
 .input:disabled {
-  background: var(--surface-2);
-  color: var(--ink-300);
   cursor: not-allowed;
+  background: var(--c-bg-2);
+  color: var(--c-disabled);
 }
 
-/* ── Sizes ──────────────────────────────────────────────────── */
-
 .sm {
-  height: 32px;
+  min-height: 32px;
   padding: 0 10px;
-  font-size: var(--text-sm);
+  font-size: var(--fs-13);
 }
 
 .md {
-  height: 40px;
-  padding: 0 14px;
-  font-size: var(--text-base);
+  min-height: 36px;
+  padding: 0 11px;
+  font-size: var(--fs-14);
 }
 
 .lg {
-  height: 48px;
+  min-height: 44px;
   padding: 0 16px;
-  font-size: var(--text-base);
+  font-size: var(--fs-16);
 }
-
-/* ── Error state ────────────────────────────────────────────── */
 
 .error {
-  border-color: var(--danger);
+  border-color: var(--c-red);
 }
+
 .error:focus-visible {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 3px var(--danger-soft);
+  border-color: var(--c-red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-red) 22%, transparent);
 }
 
 .hint {
-  font-size: var(--text-xs);
-  color: var(--ink-500);
+  color: var(--c-faint);
+  font-size: var(--fs-12);
 }
 
 .errorText {
-  font-size: var(--text-xs);
-  color: var(--danger);
   display: flex;
   align-items: center;
   gap: 4px;
+  color: var(--c-red);
+  font-size: var(--fs-12);
 }
-
-/* ── Adornment (e.g., show/hide password toggle) ─────────────── */
 
 .adornment {
   position: absolute;
-  right: var(--space-3);
+  right: var(--sp-3);
   display: flex;
   align-items: center;
   pointer-events: auto;

@@ -1,20 +1,17 @@
 /**
- * Round 34 — Audit token-discipline + Field Manual §6 + SubmitButton
- * pin tests (H-01, H-02, H-03, H-04, H-05, H-06, H-07, H-14, H-15,
- * H-16, H-17).
+ * Round 34 — token discipline, simulator-theme, and SubmitButton pin tests
+ * (H-01, H-02, H-03, H-04, H-05, H-06, H-07, H-14, H-15, H-16, H-17).
  *
  * Source-string contract pin tests, mirroring the round 16-33 pattern.
- * None of these findings require a code change in this round; they
- * are all already fixed in earlier PRs. The pin tests prevent
- * regression of the design-system token contracts and the Field
- * Manual §6 promises.
+ * They preserve token discipline, the simulator visual system, and the
+ * existing component and accessibility guarantees.
  *
  * Audit: docs/UI-ACCESSIBILITY-AUDIT-2026-08-14.md
  *
  *   H-01 lines 130-140 — var(--font-family-code) is not a defined token.
  *     Code, IDs, hashes, and timestamps must use var(--font-mono).
- *   H-02 lines 142-146 — Card default must not have box-shadow
- *     (Field Manual §5: border IS the elevation).
+ *   H-02 lines 142-146 — Cards use simulator surface, border, and shadow
+ *     tokens consistently at rest.
  *   H-03 lines 148-154 — globals.css must not lift cards on hover via
  *     a broad `[class*="card"]:hover` selector.
  *   H-04 lines 156-160 — MobileNavToggle backdrop must not use
@@ -161,24 +158,21 @@ describe("round 34 — Token Discipline (H-01, H-05, H-17)", () => {
   });
 });
 
-describe("round 34 — Field Manual §6 Cleanup (H-02, H-03, H-04)", () => {
-  describe("H-02: Card default has no box-shadow", () => {
+describe("round 34 — Simulator visual-system contracts (H-02, H-03, H-04)", () => {
+  describe("H-02: Card default uses simulator elevation", () => {
     const FILE = "src/components/ui/Card.module.css";
 
-    it("Card.module.css default .card rule does not declare box-shadow", () => {
+    it("Card.module.css default .card rule uses the simulator resting shadow", () => {
       const css = SRC(FILE);
-      // The default block lives between `.card {` and the first
-      // closing brace. We assert the substring between those
-      // markers does not mention box-shadow.
       const defaultBlock = css.match(/\.card\s*\{[\s\S]*?\}/);
       expect(defaultBlock).not.toBeNull();
-      expect(defaultBlock?.[0] ?? "").not.toMatch(/box-shadow/);
+      expect(defaultBlock?.[0] ?? "").toMatch(/box-shadow\s*:\s*var\(--sh-1\)/);
     });
 
-    it("Card.module.css cites the L7 / Field Manual §5 fix", () => {
+    it("Card.module.css identifies the Amazon PH simulator card system", () => {
       const css = SRC(FILE);
-      expect(css).toMatch(/L7 fix/);
-      expect(css).toMatch(/design spec \u00a75/);
+      expect(css).toMatch(/Amazon PH simulator card system/);
+      expect(css).toMatch(/var\(--c-card\)/);
     });
   });
 
@@ -193,12 +187,10 @@ describe("round 34 — Field Manual §6 Cleanup (H-02, H-03, H-04)", () => {
       expect(stripped).not.toMatch(/\[class\*="card"\]:hover/);
     });
 
-    it("globals.css keeps the .astryx-card rule as a no-op (allows opt-in border)", () => {
-      // The Card.module.css owns the hover; globals.css must not
-      // double-apply. The .astryx-card rule is preserved for the
-      // R17 contract that the box-shadow was dropped.
+    it("globals.css defines an Astryx card bridge for the simulator tokens", () => {
       const css = SRC(FILE);
       expect(css).toMatch(/\.astryx-card\s*\{/);
+      expect(css).toMatch(/box-shadow\s*:\s*var\(--sh-1\)/);
     });
   });
 
@@ -210,10 +202,10 @@ describe("round 34 — Field Manual §6 Cleanup (H-02, H-03, H-04)", () => {
       expect(css).not.toMatch(/backdrop-filter/);
     });
 
-    it("MobileNavToggle.module.css cites the H-04 / design-brief fix", () => {
+    it("MobileNavToggle.module.css uses the simulator navy shell controls", () => {
       const css = SRC(FILE);
-      expect(css).toMatch(/H-04 fix/);
-      expect(css).toMatch(/Field Manual bans glassmorphism/);
+      expect(css).toMatch(/background\s*:\s*var\(--c-navy-2\)/);
+      expect(css).toMatch(/color\s*:\s*var\(--c-shell-ink\)/);
     });
 
     it("MobileNavToggle backdrop background uses the dim rgba, not a blur", () => {

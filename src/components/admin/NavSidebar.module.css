@@ -1,109 +1,113 @@
-/* NavSidebar.module.css — admin fixed-left sidebar.
-   Hallmark · macrostructure: Nav-Sidebar (N3) · tone: utilitarian
-   · per Hallmark: brand wordmark first, then nav, then user card
-   · active state is a full pill (not just a left border) so the
-     current location reads at a glance · Phosphor icons via JSX. */
+/* NavSidebar.module.css — Amazon PH simulator admin shell. */
 
 .sidebar {
-  width: 240px;
-  flex-shrink: 0;
-  background: var(--surface-1);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
   position: sticky;
   top: 0;
+  display: flex;
+  width: var(--sidenav-w);
+  height: 100vh;
+  flex-shrink: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--c-shell-line);
+  background: linear-gradient(180deg, var(--c-navy-2) 0%, var(--c-navy-3) 100%);
+  box-shadow: var(--sh-2);
 }
 
 .brand {
-  padding: var(--space-5) var(--space-6);
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  border-bottom: 1px solid var(--border);
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--c-shell-line);
+  color: var(--c-shell-ink);
   text-decoration: none;
-  color: inherit;
-  transition: background var(--duration-fast) var(--ease-out);
+  transition: background var(--transition);
 }
 
 .brand:hover {
-  background: var(--surface-2);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--c-shell-ink);
 }
 
-/* 2x2 grid of small accent squares — the AMPH geometric mark.
-   Three squares filled in gives a precise, deliberate rhythm;
-   the empty fourth creates negative space. Field-Manual aesthetic. */
 .brandMark {
   display: grid;
-  grid-template-columns: repeat(2, 6px);
-  grid-template-rows: repeat(2, 6px);
-  gap: 2px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
-  margin-top: 2px;
+  place-items: center;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--c-orange) 0%, var(--c-orange-d) 100%);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  color: var(--c-navy-2);
+  font-family: var(--font-disp);
+  font-size: var(--fs-14);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.brandMark::after {
+  content: "P";
 }
 
 .brandMarkSquare {
-  background: var(--accent);
-  border-radius: 1px;
-}
-
-.brandMarkSquare:nth-child(4) {
-  background: transparent;
-  border: 1px solid var(--accent);
+  display: none;
 }
 
 .brandText {
   display: flex;
+  min-width: 0;
+  flex: 1;
   flex-direction: column;
   gap: 1px;
-  flex: 1;
-  min-width: 0;
 }
 
 .brandName {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: var(--text-base);
-  color: var(--ink-900);
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  /* Brand can wrap on narrow sidebar widths; keep it readable. */
-  word-break: break-word;
+  overflow: hidden;
+  color: var(--c-shell-ink);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brandSub {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--ink-500);
-  letter-spacing: 0.08em;
+  color: var(--c-shell-faint);
+  font-family: var(--font-disp);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .adminBadge {
   display: inline-flex;
-  align-items: center;
   height: 20px;
-  padding: 0 var(--space-2);
-  font-size: 11px;
-  font-weight: 600;
-  background: var(--danger-soft);
-  color: var(--danger);
-  border-radius: var(--radius-sm);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   flex-shrink: 0;
+  align-items: center;
+  padding: 0 var(--sp-2);
+  border: 1px solid rgba(255, 153, 0, 0.3);
+  border-radius: var(--r-sm);
+  background: rgba(255, 153, 0, 0.08);
+  color: var(--c-orange);
+  font-family: var(--font-disp);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .nav {
-  flex: 1;
-  padding: var(--space-4) var(--space-3);
   display: flex;
+  min-height: 0;
+  flex: 1;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--sp-4);
   overflow-y: auto;
-  min-height: 0; /* allow inner scroll within flex parent */
+  padding: var(--sp-4) var(--sp-3);
 }
 
 .section {
@@ -113,112 +117,113 @@
 }
 
 .sectionLabel {
+  margin-bottom: var(--sp-1);
+  padding: var(--sp-1) var(--sp-3);
+  color: var(--c-shell-faint);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  color: var(--ink-500);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: var(--space-1) var(--space-3);
-  margin-bottom: var(--space-1);
-  border-bottom: 1px solid var(--border);
 }
 
 .item {
+  position: relative;
   display: flex;
+  min-width: 0;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  color: var(--ink-700);
-  font-size: var(--text-sm);
+  gap: 10px;
+  margin: 1px 0;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--c-shell-dim);
+  font-family: var(--font-body);
+  font-size: var(--fs-13);
   font-weight: 500;
   text-decoration: none;
-  transition:
-    background var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
-  position: relative;
-  /* keep the row from clipping its icon on small widths */
-  min-width: 0;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .item:hover {
-  background: var(--surface-2);
-  color: var(--ink-900);
+  border-color: var(--c-shell-line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--c-shell-ink);
 }
 
 .item:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--c-orange);
   outline-offset: -2px;
 }
 
-.active {
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-weight: 600;
+.active,
+.active:hover {
+  border-color: rgba(255, 153, 0, 0.3);
+  background: rgba(255, 153, 0, 0.08);
+  color: var(--c-orange);
+  font-weight: 700;
 }
 
-.active:hover {
-  background: var(--accent-soft);
-  color: var(--accent);
+.active::before {
+  width: 3px;
+  height: 16px;
+  margin-left: -8px;
+  margin-right: 4px;
+  border-radius: var(--r-xs);
+  background: var(--c-orange);
+  content: "";
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
   display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   color: currentColor;
 }
 
 .label {
-  flex: 1;
   min-width: 0;
-  white-space: nowrap;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* H-17 fix: count badge on a nav item. Token-driven (no raw px, no
-   inline hex). Pill shape with monospaced font to match the section
-   labels. */
 .badge {
   margin-left: auto;
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px solid rgba(255, 153, 0, 0.3);
+  border-radius: var(--r-pill);
+  background: rgba(255, 153, 0, 0.08);
+  color: var(--c-orange);
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1;
-  padding: var(--space-1) var(--space-2);
-  border-radius: 10px;
-  background: var(--accent);
-  color: var(--accent-ink);
 }
 
 .footer {
-  padding: var(--space-4);
-  border-top: 1px solid var(--border);
-  background: var(--surface-1);
+  padding: var(--sp-3);
+  border-top: 1px solid var(--c-shell-line);
+  background: rgba(15, 20, 25, 0.32);
 }
 
 @media (max-width: 1023px) {
   .sidebar {
     position: fixed;
     top: 0;
-    left: 0;
     bottom: 0;
+    left: 0;
     z-index: 1000;
-    transform: translateX(-100%);
-    transition: transform 0.2s ease;
-    width: 280px;
+    width: min(280px, calc(100vw - var(--sp-6)));
     min-height: 100vh;
+    transform: translateX(-100%);
+    transition: transform var(--d-base) var(--ease);
   }
+
   .sidebar[data-open="true"] {
     transform: translateX(0);
-  }
-  .nav {
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
   }
 }

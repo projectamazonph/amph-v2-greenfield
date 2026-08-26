@@ -108,20 +108,20 @@
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  /* M-R16 fix: Field Manual design-brief.md:142 says "Shadow: none (the
-     border is the elevation; shadow would fight the manual aesthetic)".
-     The catalog card now mirrors the shared `<Card variant="interactive">`
-     primitive — border is the elevation at rest, hover borrows the
-     `.interactive` lift and border-accent pattern. The previous soft shadow
-     was the audit's "no hover lift on course cards" fix from July that
-     overshot by also adding a default shadow. */
+  /* Simulator cards use a subtle resting elevation and a stronger hover
+     affordance so linked content reads as actionable without visual noise. */
+  box-shadow: var(--sh-1);
   transition:
-    border-color var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
+    border-color var(--transition),
+    background var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
 }
 
 .card:hover {
-  border-color: var(--accent);
+  border-color: var(--c-orange-tint);
+  background: var(--c-card-hi);
+  box-shadow: var(--sh-2);
   transform: translateY(-2px);
 }
 

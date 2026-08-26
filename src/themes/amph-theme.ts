@@ -1,170 +1,88 @@
-/**
- * src/themes/amph-theme.ts
- *
- * AMPH brand theme for Astryx.
- *
- * Built on top of @astryxdesign/theme-neutral so Astryx components get
- * the correct brand tokens without having to swizzle anything.
- *
- * Override order (last wins):
- *   neutralTheme defaults  →  defineTheme color/typography/radius scales
- *   → explicit tokens     →  AMPH token overrides
- *
- * Key AMPH design decisions baked in here:
- *   - Waybill Orange (#FF6B35) accent, not Astryx blue
- *   - Warm off-white body background (#FAFAF7), not cool gray
- *   - Space Grotesk + JetBrains Mono, not system fonts
- *   - Flat elevation: no shadow at rest (border = elevation signal)
- *   - Shadow tokens set to AMPH's light-touch values
- *   - Motion: 120ms fast / 220ms medium, AMPH easing curves
- */
-
 import { defineTheme } from "@astryxdesign/core/theme";
 import { neutralTheme } from "@astryxdesign/theme-neutral";
 
 /**
- * The AMPH palette — single source of truth for every hex value.
- * Exported so other files (e.g. email templates) can reference it
- * without importing the full theme object.
+ * Amazon PH simulators palette. This adapter keeps Astryx components aligned
+ * with the shared application tokens in src/app/globals.css.
  */
 export const amphPalette = {
-  // Surfaces
-  surfacePaper: "#FAFAF7",
+  navyDeep: "#0F1419",
+  navy: "#131921",
+  navySecondary: "#232F3E",
+  navyTertiary: "#37475A",
+  orange: "#FF9900",
+  orangeHover: "#FFA41C",
+  orangeDark: "#E47911",
+  orangeSoft: "#FEF3E7",
+  orangeTint: "#FCE3C2",
+  surfaceBody: "#F7F8FA",
+  surfaceMuted: "#EEF1F4",
   surfaceCard: "#FFFFFF",
-  surfaceSubtle: "#F4F3EE",
-  surfaceDark: "#1A1A1A",
-  // Ink
-  inkPrimary: "#171717",
-  inkSecondary: "#404040",
-  inkTertiary: "#737373",
-  inkDisabled: "#D4D4D4",
-  inkInverse: "#FAFAF7",
-  // Borders
-  border: "#E5E5E0",
-  borderStrong: "#A3A3A3",
-  // Brand
-  accent: "#FF6B35",
-  accentHover: "#E55A2B",
-  accentSoft: "#FFE5D9",
-  accentInk: "#1A1A2E", // 6.0:1 contrast on --accent — use as button text
-  // Semantic
-  success: "#0E7C3A",
-  successSoft: "#DCFCE7",
-  successHover: "#0A6630",
-  warning: "#B45309",
-  warningSoft: "#FEF3C7",
-  warningHover: "#93420A",
-  danger: "#B91C1C",
-  dangerSoft: "#FEE2E2",
-  dangerHover: "#991313",
+  surfaceHover: "#FAFBFC",
+  border: "#D5D9D9",
+  borderSoft: "#E7E7E7",
+  ink: "#0F1111",
+  inkHeading: "#232F3E",
+  inkSecondary: "#565959",
+  inkDisabled: "#B1B6BC",
+  success: "#067D62",
+  successMuted: "#E6F4F0",
+  warning: "#C45500",
+  warningMuted: "#FFF4E5",
+  error: "#B12704",
+  errorMuted: "#FDEDED",
 } as const;
 
 export const amphTheme = defineTheme({
-  name: "amph",
+  name: "amazon-ph-simulators",
   extends: neutralTheme,
-
-  // ── Color ────────────────────────────────────────────────────────────────
-  // Accent + neutralStyle=neutral to avoid Astryx's blue generation.
-  // AMPH surfaces (ink/warm) are set via explicit token overrides below.
   color: {
-    accent: amphPalette.accent,
+    accent: amphPalette.orange,
     neutralStyle: "neutral",
   },
-
-  // ── Typography ────────────────────────────────────────────────────────────
   typography: {
     body: {
-      family: "Space Grotesk",
-      fallbacks: "system-ui, sans-serif",
+      family: "PT Sans",
+      fallbacks: "system-ui, -apple-system, sans-serif",
     },
     heading: {
-      family: "Space Grotesk",
-      fallbacks: "system-ui, sans-serif",
+      family: "Archivo",
+      fallbacks: "system-ui, -apple-system, sans-serif",
     },
     code: {
-      family: "JetBrains Mono",
-      fallbacks: "ui-monospace, monospace",
+      family: "IBM Plex Mono",
+      fallbacks: "ui-monospace, Menlo, monospace",
     },
   },
-
-  // ── Radius ───────────────────────────────────────────────────────────────
-  // AMPH --radius-md = 6px. ratio=1.67 gives: 4px / 6px / 10px / 16px / 24px.
-  radius: { base: 6, multiplier: 1.67 },
-
-  // ── Motion ───────────────────────────────────────────────────────────────
-  // fast/medium/ratio are valid defineTheme motion keys.
-  // Note: they don't emit --duration-* vars — motion configures animation speeds
-  // for components internally; duration tokens come from durationDefaults and
-  // can be overridden in the tokens block using the exact names from tokens.stylex.d.ts.
+  radius: { base: 6, multiplier: 1.5 },
   motion: {
     fast: 120,
-    medium: 220,
+    medium: 180,
     ratio: 0.65,
   },
-
-  // ── Explicit token overrides ─────────────────────────────────────────────
-  // These take precedence over everything above.
-  // Only tokens whose names appear in Astryx's TokenName type are valid here.
-  // Confirmed valid from @astryxdesign/core/dist/theme/tokens.stylex.d.ts:
-  //   color:   --color-accent, --color-accent-muted, --color-on-accent,
-  //            --color-background-{body,surface,muted,card,popover,...},
-  //            --color-text-{primary,secondary,disabled},
-  //            --color-border, --color-border-emphasized,
-  //            --color-success*, --color-error*, --color-warning*,
-  //            and the full blue/gray/green/orange/pink/purple/red/teal/yellow scales
-  //   spacing: --spacing-0 through --spacing-12 (no -16 or -20)
-  //   shadow:  --shadow-sm, --shadow-md, --shadow-lg
-  //            (the actual scale used by globals.css and every caller;
-  //            --shadow-low/med/high used to be defined here as an
-  //            experimental Astryx-aligned scale but no caller ever
-  //            adopted it, so it was removed in S-3, audit 2026-08-20,
-  //            umbrella #404, child #407. --shadow-inset-* are still
-  //            reserved for the Field Manual inset states.)
-  //   (NOT --shadow-low/med/high, NOT --spacing-16/20, NOT --color-info)
   tokens: {
-    // Brand
-    "--color-accent": [amphPalette.accent, amphPalette.accentHover],
-    "--color-accent-muted": amphPalette.accentSoft,
-    "--color-on-accent": amphPalette.accentInk,
-
-    // AMPH surfaces — warm off-white, not cool gray
-    "--color-background-body": amphPalette.surfacePaper,
+    "--color-accent": [amphPalette.orange, amphPalette.orangeHover],
+    "--color-accent-muted": amphPalette.orangeSoft,
+    "--color-on-accent": amphPalette.navy,
+    "--color-background-body": amphPalette.surfaceBody,
     "--color-background-surface": amphPalette.surfaceCard,
     "--color-background-card": amphPalette.surfaceCard,
     "--color-background-popover": amphPalette.surfaceCard,
-    "--color-background-muted": amphPalette.surfaceSubtle,
-
-    // AMPH ink ramp
-    "--color-text-primary": amphPalette.inkPrimary,
+    "--color-background-muted": amphPalette.surfaceMuted,
+    "--color-text-primary": amphPalette.ink,
     "--color-text-secondary": amphPalette.inkSecondary,
     "--color-text-disabled": amphPalette.inkDisabled,
-
-    // Borders
     "--color-border": amphPalette.border,
-    "--color-border-emphasized": amphPalette.borderStrong,
-
-    // Semantic colors
+    "--color-border-emphasized": amphPalette.navyTertiary,
     "--color-success": amphPalette.success,
-    "--color-success-muted": amphPalette.successSoft,
+    "--color-success-muted": amphPalette.successMuted,
     "--color-on-success": "#FFFFFF",
-
     "--color-warning": amphPalette.warning,
-    "--color-warning-muted": amphPalette.warningSoft,
+    "--color-warning-muted": amphPalette.warningMuted,
     "--color-on-warning": "#FFFFFF",
-
-    "--color-error": amphPalette.danger,
-    "--color-error-muted": amphPalette.dangerSoft,
+    "--color-error": amphPalette.error,
+    "--color-error-muted": amphPalette.errorMuted,
     "--color-on-error": "#FFFFFF",
-
-    // AMPH shadow overrides — flat elevation, no shadow at rest.
-    // Uses --shadow-sm/md/lg as defined in src/app/globals.css line 100.
-    // The previous --shadow-low/med/high overrides (sourced from Astryx)
-    // were removed in S-3 because no caller ever adopted that scale; the
-    // sm/md/lg scale in globals.css is the only one referenced anywhere
-    // in src/. See child #407 for the audit context.
-
-    // AMPH spacing (4px base) — mirrors globals.css :root where it overlaps.
-    // Astryx only provides --spacing-0 through --spacing-12.
     "--spacing-1": "4px",
     "--spacing-2": "8px",
     "--spacing-3": "12px",

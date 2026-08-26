@@ -1,74 +1,77 @@
-/* TopBar.module.css — admin page header. */
+/* TopBar.module.css — Amazon PH simulator admin page heading. */
 
 .header {
-  padding: var(--space-8) 0 var(--space-6);
-  border-bottom: 1px solid var(--border);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-2) 0 var(--sp-6);
+  border-bottom: 1px solid var(--c-border);
 }
 
 .breadcrumb {
-  font-size: var(--text-sm);
-  color: var(--ink-500);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--sp-2);
+  color: var(--c-faint);
+  font-size: var(--fs-13);
 }
 
 .row {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-6);
-  flex-wrap: wrap;
+  gap: var(--sp-6);
 }
 
 .titleBlock {
-  flex: 1;
   min-width: 0;
+  flex: 1;
 }
 
 .title {
-  font-family: var(--font-display);
-  font-size: var(--text-3xl);
-  font-weight: 600;
-  color: var(--ink-900);
-  letter-spacing: -0.01em;
-  line-height: var(--leading-tight);
   margin: 0;
+  color: var(--c-ink-2);
+  font-family: var(--font-disp);
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: var(--leading-tight);
 }
 
 .subtitle {
-  margin-top: var(--space-2);
-  font-size: var(--text-base);
-  color: var(--ink-700);
+  margin-top: var(--sp-2);
+  color: var(--c-sub);
+  font-size: var(--fs-body);
   line-height: var(--leading-normal);
 }
 
 .actions {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
   flex-shrink: 0;
+  align-items: center;
+  gap: var(--sp-3);
 }
 
 @media (max-width: 640px) {
   .header {
-    padding: 0 0 var(--space-5);
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--sp-5);
+    padding: 0 0 var(--sp-5);
   }
+
   .row {
-    gap: var(--space-4);
+    gap: var(--sp-4);
   }
+
   .title {
-    font-size: var(--text-2xl);
-    line-height: 1.1;
     overflow-wrap: anywhere;
   }
+
   .subtitle {
-    margin-top: var(--space-2);
-    font-size: var(--text-sm);
+    margin-top: var(--sp-2);
+    font-size: var(--fs-body-sm);
   }
+
   .actions {
     width: 100%;
   }
+
   .actions > * {
     flex: 1;
     text-align: center;

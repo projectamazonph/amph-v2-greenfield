@@ -1,113 +1,129 @@
-/* Button.module.css — Field Manual button system.
-   Per design spec §5. All colors via var(--token-name). */
+/* Button.module.css — Amazon PH simulator control system. */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  font-family: var(--font-body);
-  font-weight: 500;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  gap: var(--sp-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-card);
+  color: var(--c-ink);
   cursor: pointer;
-  white-space: nowrap;
-  user-select: none;
+  font-family: var(--font-disp);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
   text-decoration: none;
+  user-select: none;
+  white-space: nowrap;
   transition:
-    background var(--duration-fast) var(--ease-out),
-    transform 80ms var(--ease-out);
-  /* M-R28 fix: Field Manual §5 (docs/design-brief.md:142) — Button has no
-     box-shadow. The 1px border is the elevation; shadow would fight the
-     manual aesthetic. The previous `, box-shadow var(--duration-fast)
-     var(--ease-out)` term was dead code (no box-shadow declaration
-     anywhere on the button), so it is removed rather than frozen. */
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
 }
 
 .btn:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.55;
   transform: none;
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  border-color: var(--c-orange);
+  box-shadow: var(--sh-focus);
+  outline: none;
 }
 
 .btn:not(:disabled):active {
-  /* Tactile press-down: per spec §5, every button has -1px on :active */
-  transform: translateY(-1px);
+  transform: translateY(1px);
 }
 
-/* ── Sizes ──────────────────────────────────────────────────── */
-
 .sm {
-  height: 28px;
-  padding: 0 var(--space-3);
-  font-size: var(--text-sm);
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: var(--r-sm);
+  font-size: 11.5px;
 }
 
 .md {
-  height: 36px;
-  padding: 0 var(--space-4);
-  font-size: var(--text-sm);
+  min-height: 36px;
+  padding: 9px 16px;
+  font-size: var(--fs-13);
 }
 
 .lg {
-  height: 44px;
-  padding: 0 var(--space-4);
-  font-size: var(--text-base);
+  min-height: 44px;
+  padding: 10px 20px;
+  font-size: var(--fs-14);
 }
-
-/* ── Variants ───────────────────────────────────────────────── */
 
 .primary {
-  background: var(--accent);
-  color: var(--accent-ink);
+  border-color: var(--c-orange);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
 }
+
 .primary:not(:disabled):hover {
-  background: var(--accent-hover);
+  border-color: var(--c-orange-h);
+  background: var(--c-orange-h);
+  color: var(--c-navy-2);
 }
 
 .secondary {
-  background: var(--surface-1);
-  color: var(--ink-900);
-  border-color: var(--border);
+  border-color: var(--c-border);
+  background: var(--c-card);
+  color: var(--c-ink);
 }
+
 .secondary:not(:disabled):hover {
-  background: var(--surface-2);
-  border-color: var(--border-strong);
+  border-color: var(--c-faint);
+  background: var(--c-bg-2);
 }
 
 .ghost {
+  border-color: transparent;
   background: transparent;
-  color: var(--ink-700);
+  color: var(--c-link);
 }
+
 .ghost:not(:disabled):hover {
-  background: var(--surface-2);
+  border-color: transparent;
+  background: var(--c-bg-2);
+  color: var(--c-link-h);
 }
 
 .danger {
-  background: var(--danger);
-  color: var(--ink-inverse);
+  border-color: var(--c-red);
+  background: var(--c-card);
+  color: var(--c-red);
 }
+
 .danger:not(:disabled):hover {
-  background: var(--danger-hover);
+  background: var(--c-red-bg);
+  color: var(--c-red-text);
 }
 
 .success {
-  background: var(--success);
-  color: var(--ink-inverse);
+  border-color: var(--c-green);
+  background: var(--c-green);
+  color: var(--c-card);
 }
+
 .success:not(:disabled):hover {
-  background: var(--success-hover);
+  border-color: var(--c-green-text);
+  background: var(--c-green-text);
 }
 
 .info {
-  background: var(--info);
-  color: var(--ink-inverse);
+  border-color: var(--c-blue);
+  background: var(--c-blue);
+  color: var(--c-card);
 }
+
 .info:not(:disabled):hover {
-  background: var(--info-hover);
+  border-color: var(--c-blue-text);
+  background: var(--c-blue-text);
 }

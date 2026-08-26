@@ -1,21 +1,35 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Archivo, Barlow_Condensed, IBM_Plex_Mono, PT_Sans } from "next/font/google";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { WebVitalsReporter } from "./WebVitalsReporter";
 import { Providers } from "./providers";
 import { buildAppUrl } from "@/domain/shared/AppUrl";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const archivo = Archivo({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-display",
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const ptSans = PT_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-cond",
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-mono",
   display: "swap",
 });
@@ -45,8 +59,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafaf7" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f8fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#131921" },
   ],
 };
 
@@ -55,15 +69,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       data-theme="light"
-      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+      className={`${archivo.variable} ${ptSans.variable} ${barlowCondensed.variable} ${ibmPlexMono.variable}`}
     >
       <body>
-        {/* WCAG 2.4.1 Bypass Blocks: skip to main content */}
         <a href="#main-content" className="skip-link">Skip to main content</a>
-
-        {/* STORY-047: shown when an admin is impersonating another user.
-            Server component, reads the amph_admin_session cookie, returns
-            null when not impersonating. */}
         <ImpersonationBanner />
         <WebVitalsReporter />
         <Providers>{children}</Providers>

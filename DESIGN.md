@@ -1,281 +1,201 @@
 ---
 name: Project Amazon PH Academy v2
-description: A dense, utilitarian training-platform interface — a field manual for Amazon PPC, not a SaaS showroom.
+description: The Amazon PH Academy simulator visual system — cool operational surfaces, navy shell chrome, Amazon orange actions, and compact training-platform density.
+reference: projectamazonph/amazon-ph-simulators
 colors:
-  manual-paper: "#FAFAF7"
-  surface-card: "#FFFFFF"
-  surface-subtle: "#F4F3EE"
-  surface-dark: "#1A1A1A"
-  ink-primary: "#171717"
-  ink-secondary: "#404040"
-  ink-tertiary: "#737373"
-  ink-disabled: "#D4D4D4"
-  ink-inverse: "#FAFAF7"
-  border: "#E5E5E0"
-  border-strong: "#A3A3A3"
-  accent: "#FF6B35"
-  accent-hover: "#E55A2B"
-  accent-soft: "#FFE5D9"
-  accent-ink: "#1A1A2E"
-  success: "#0E7C3A"
-  success-soft: "#DCFCE7"
-  success-hover: "#0A6630"
-  warning: "#B45309"
-  warning-soft: "#FEF3C7"
-  warning-hover: "#93420A"
-  danger: "#B91C1C"
-  danger-soft: "#FEE2E2"
-  danger-hover: "#991313"
-  info: "#1E40AF"
-  info-soft: "#DBEAFE"
-  info-hover: "#173296"
+  navy-deep: "#0F1419"
+  navy-primary: "#131921"
+  navy-secondary: "#232F3E"
+  navy-tertiary: "#37475A"
+  orange: "#FF9900"
+  orange-hover: "#FFA41C"
+  orange-pressed: "#E47911"
+  background: "#F7F8FA"
+  background-alt: "#EEF1F4"
+  card: "#FFFFFF"
+  border: "#D5D9D9"
+  ink: "#0F1111"
+  ink-heading: "#232F3E"
+  link: "#007185"
+  success: "#067D62"
+  warning: "#C45500"
+  danger: "#B12704"
 typography:
-  display:
-    fontFamily: "Space Grotesk, system-ui, sans-serif"
-    fontSize: "3rem"
-    fontWeight: 700
-    lineHeight: 1.15
-    letterSpacing: "-0.01em"
-  headline:
-    fontFamily: "Space Grotesk, system-ui, sans-serif"
-    fontSize: "1.75rem"
-    fontWeight: 600
-    lineHeight: 1.15
-    letterSpacing: "normal"
-  title:
-    fontFamily: "Space Grotesk, system-ui, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 600
-    lineHeight: 1.35
-    letterSpacing: "normal"
-  body:
-    fontFamily: "Space Grotesk, system-ui, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 400
-    lineHeight: 1.5
-    letterSpacing: "normal"
-  label:
-    fontFamily: "Space Grotesk, system-ui, sans-serif"
-    fontSize: "0.875rem"
-    fontWeight: 500
-    lineHeight: 1.35
-    letterSpacing: "0.01em"
-  mono:
-    fontFamily: "JetBrains Mono, ui-monospace, monospace"
-    fontSize: "0.875rem"
-    fontWeight: 400
-    lineHeight: 1.35
-    letterSpacing: "normal"
-rounded:
+  display: "Archivo, system-ui, -apple-system, sans-serif"
+  body: "PT Sans, system-ui, -apple-system, sans-serif"
+  condensed: "Barlow Condensed, Archivo, sans-serif"
+  mono: "IBM Plex Mono, ui-monospace, Menlo, monospace"
+spacing:
+  base: "4px"
+  scale: "4px, 8px, 12px, 16px, 20px, 24px, 32px, 40px, 48px, 64px"
+radius:
+  xs: "2px"
   sm: "4px"
   md: "6px"
-  lg: "10px"
-  full: "9999px"
-spacing:
-  "1": "4px"
-  "2": "8px"
-  "3": "12px"
-  "4": "16px"
-  "5": "20px"
-  "6": "24px"
-  "8": "32px"
-  "10": "40px"
-  "12": "48px"
-  "16": "64px"
-  "20": "80px"
-components:
-  button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.accent-ink}"
-    rounded: "{rounded.md}"
-    height: "36px"
-    padding: "0 16px"
-  button-primary-hover:
-    backgroundColor: "{colors.accent-hover}"
-  button-secondary:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink-primary}"
-    rounded: "{rounded.md}"
-    height: "36px"
-    padding: "0 16px"
-  button-ghost:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink-secondary}"
-    rounded: "{rounded.md}"
-    height: "36px"
-    padding: "0 16px"
-  card-default:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink-primary}"
-    rounded: "{rounded.lg}"
-    padding: "16px"
-  card-interactive:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink-primary}"
-    rounded: "{rounded.lg}"
-    padding: "16px"
-  input-default:
-    backgroundColor: "{colors.surface-card}"
-    textColor: "{colors.ink-primary}"
-    rounded: "{rounded.md}"
-    height: "40px"
-    padding: "0 14px"
-  badge-accent:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent}"
-    rounded: "{rounded.full}"
-    height: "22px"
-    padding: "0 12px"
+  lg: "8px"
+  xl: "12px"
 ---
 
 # Design System: Project Amazon PH Academy v2
 
-## 1. Overview
+## 1. Direction
 
-**Creative North Star: "The Field Manual"**
+**Creative north star: the Amazon PH Academy simulator system.** The product is a practical training environment with a recognisable Amazon-adjacent interface: a dark navy operating shell, clear white and cool-gray work surfaces, compact control density, and Amazon orange used for the actions and states that need attention. The application should feel consistent with the simulator platform, whether a learner is reading a lesson, completing a workflow, or an administrator is managing content.
 
-This system reads like a 1970s technical service manual or a Federal Express waybill, not a SaaS landing page: dense, hierarchical, typographically clear, built for someone who needs to find one specific piece of information under pressure. Every screen assumes the reader is a tired VA on a phone at 2am who needs to find the quiz retry button — not a visitor who needs to be sold, delighted, or slowed down with hero copy. Density is the point, not a compromise.
+This direction supersedes the prior **Field Manual** aesthetic. Warm-paper surfaces, Waybill Orange (`#FF6B35`), Space Grotesk, JetBrains Mono, and a default no-shadow policy are retired. The interface now uses the shared simulator hierarchy: **navy for global context, white for work, orange for action, and a small semantic palette for status**.
 
-The palette stays disciplined on purpose: warm paper neutrals and near-black ink carry almost every surface, and Waybill Orange is spent like a rationed resource — one accent element per viewport, two at the absolute limit. Borders do the elevation work that shadows do everywhere else; nothing floats or glows without a state (hover, focus, error) earning it.
+| Principle | Application |
+|---|---|
+| **Operational clarity** | Favor familiar controls, visible hierarchy, compact data tables, and clear action states over decorative experimentation. |
+| **Shared Academy identity** | Use the exact simulator palette, type roles, spacing scale, radii, elevation, and responsive behavior. |
+| **Action hierarchy** | Orange identifies primary actions, active navigation, keyboard focus, and the most important status transition in a local context. |
+| **Controlled density** | Keep information efficient and scan-friendly without returning to the prior deliberately austere field-manual treatment. |
+| **Accessible predictability** | Preserve semantic markup, focus visibility, readable contrast, reduced-motion support, and 44px mobile targets. |
 
-This system explicitly rejects glassmorphism with gradient orbs, cyan-on-dark neon, oversized-hero portfolio layouts with 80% white space, and the generic "AI-built SaaS" template look. It is not decorated. It is used.
+## 2. Source of Truth and Token Contract
 
-**Key Characteristics:**
+The canonical visual reference is [`amazon-ph-simulators`](https://github.com/projectamazonph/amazon-ph-simulators): its `assets/tokens.css` establishes the values, while its shared skin and shell demonstrate their application. In this application, `src/app/globals.css` is the runtime token source of truth and `src/themes/amph-theme.ts` maps the same palette into Astryx components.
 
-- Warm off-white paper base, never pure white as the app background
-- One disciplined accent (Waybill Orange), spent sparingly and deliberately
-- Borders as elevation; shadows only as a response to interaction, never at rest
-- Space Grotesk for everything read as language; JetBrains Mono for everything read as data
-- Motion limited to three moves: fade, slide-up, color transition — nothing else
+New CSS must use the canonical `--c-*`, `--sp-*`, `--r-*`, `--sh-*`, and typography tokens. Legacy aliases such as `--surface-0`, `--ink-900`, and `--accent` remain temporarily for existing CSS Modules; they resolve to the simulator values and must not be assigned new values locally.
 
-## 2. Colors
+> **Token rule:** Do not add hard-coded colors, one-off spacing, or substitute fonts in page-level CSS. Extend the shared token system first, then consume the token everywhere.
 
-The palette is a small, disciplined set: warm paper neutrals for structure, near-black ink for text, and exactly one saturated accent, spent like a rationed resource.
+## 3. Color System
 
-### Primary
+### 3.1 Brand and shell
 
-- **Waybill Orange** (`#FF6B35`): The one accent. Primary buttons, active nav states, focus rings, links that must be noticed. Used sparingly — one element per viewport when possible, two maximum. Hover state darkens to `#E55A2B`; a soft wash (`#FFE5D9`) backs badges and subtle highlights. Primary-button text sits on the accent as `#1A1A2E` (Accent Ink), not white — white fails AA contrast on this orange.
+| Token | Value | Role |
+|---|---:|---|
+| `--c-navy-1` | `#0F1419` | Deepest shell and overlay tone. |
+| `--c-navy-2` | `#131921` | Primary navy for the admin sidebar and shell chrome. |
+| `--c-navy-3` | `#232F3E` | Secondary navy and shell gradient end. |
+| `--c-navy-4` | `#37475A` | Tertiary navy and emphasized shell detail. |
+| `--c-navy-5` | `#485769` | Shell hover line and emphasized border. |
+| `--c-orange` | `#FF9900` | Primary action, focus, active navigation, selected state. |
+| `--c-orange-h` | `#FFA41C` | Primary-action hover state. |
+| `--c-orange-d` | `#E47911` | Pressed state and darker orange detail. |
+| `--c-orange-soft` | `#FEF3E7` | Selection wash and row hover. |
+| `--c-orange-tint` | `#FCE3C2` | Orange-tinted border and tag treatment. |
 
-### Neutral
+### 3.2 Work surfaces and text
 
-- **Manual Paper** (`#FAFAF7`): The app background. Warm, never sterile white — this is the "paper" the manual is printed on.
-- **Surface Card** (`#FFFFFF`): Cards, panels, elevated content — the one true white in the system, reserved for things sitting "on top of" the paper.
-- **Surface Subtle** (`#F4F3EE`): Hover washes, subtle section differentiation, table header backgrounds.
-- **Surface Dark** (`#1A1A1A`): Reserved for the (currently placeholder) dark theme background.
-- **Ink Primary** (`#171717`): Body text, headings — the default reading color.
-- **Ink Secondary** (`#404040`): Secondary text, labels, supporting copy.
-- **Ink Tertiary** (`#737373`): Metadata, timestamps, placeholder text, captions.
-- **Ink Disabled** (`#D4D4D4`): Disabled text, dividers — the quietest ink on the ramp.
-- **Border** (`#E5E5E0`): The default 1px border everywhere — cards, inputs, table rows, sidebar rule.
-- **Border Strong** (`#A3A3A3`): Hover state for interactive borders (secondary button hover, interactive card hover uses Ink Disabled instead — see Components).
+| Token | Value | Role |
+|---|---:|---|
+| `--c-bg` | `#F7F8FA` | Global page background. |
+| `--c-bg-2` | `#EEF1F4` | Muted surface, table header, neutral hover. |
+| `--c-card` | `#FFFFFF` | Cards, panels, tables, and form controls. |
+| `--c-card-hi` | `#FAFBFC` | Interactive-card hover surface. |
+| `--c-border` | `#D5D9D9` | Standard border and table frame. |
+| `--c-border-2` | `#E7E7E7` | Soft separator. |
+| `--c-ink` | `#0F1111` | Default content text. |
+| `--c-ink-2` | `#232F3E` | Heading and high-emphasis text. |
+| `--c-sub` | `#565959` | Supporting text and labels. |
+| `--c-faint` | `#767B7B` | Metadata and tertiary text. |
+| `--c-disabled` | `#B1B6BC` | Disabled text and placeholders. |
+| `--c-link` | `#007185` | Link and ghost-action text. |
+| `--c-link-h` | `#C7511F` | Link hover. |
 
-### Semantic
+### 3.3 Semantic states
 
-- **Success** (`#0E7C3A` / soft `#DCFCE7`): Completed lessons, correct quiz answers, passed checks.
-- **Warning** (`#B45309` / soft `#FEF3C7`): Pending states, attention-needed flags.
-- **Danger** (`#B91C1C` / soft `#FEE2E2`): Errors, destructive actions, wrong quiz answers.
-- **Info** (`#1E40AF` / soft `#DBEAFE`): Neutral informational callouts.
+| State | Main token | Background token | Text token | Intended use |
+|---|---|---|---|---|
+| Success | `--c-green` | `--c-green-bg` | `--c-green-text` | Completion, passed outcomes, confirmed saves. |
+| Warning | `--c-amber` | `--c-amber-bg` | `--c-amber-text` | Pending or attention-needed states. |
+| Error | `--c-red` | `--c-red-bg` | `--c-red-text` | Validation errors, failed operations, destructive feedback. |
+| Information | `--c-blue` | `--c-blue-bg` | `--c-blue-text` | Neutral help and supporting operational guidance. |
 
-### Named Rules
+Color is never the sole carrier of meaning. Status surfaces must include readable text and, where the UI would otherwise be ambiguous, an icon or label.
 
-**The Rationed Accent Rule.** Waybill Orange appears on at most two elements per viewport. Its rarity is what makes it readable as "this matters" — spread it across a whole screen and it stops meaning anything.
+## 4. Typography
 
-**The Contrast-Over-Convention Rule.** Primary-button text is dark ink on orange (`#1A1A2E`, 6.0:1 contrast), not the "obvious" white — white on this orange fails AA (2.83:1). Check contrast, don't assume the convention.
+The simulator pairing assigns a distinct role to each face. **Archivo** gives headings, buttons, table headers, and other high-attention UI a crisp operational hierarchy. **PT Sans** carries ordinary reading and form copy. **Barlow Condensed** is available for tightly constrained labels only, not as default body text. **IBM Plex Mono** is reserved for identifiers, timestamps, fixed-width numerical data, hashes, and code.
 
-## 3. Typography
+| Role | Token | Family | Size and line-height |
+|---|---|---|---|
+| Page heading | `--fs-h1` | Archivo | `clamp(1.75rem, 1.2rem + 2.6vw, 2.5rem)` / `1.15` |
+| Section heading | `--fs-h2` | Archivo | `clamp(1.25rem, 1rem + 1.2vw, 1.5rem)` / `1.15` |
+| Card heading | `--fs-h3` | Archivo | `clamp(1.0625rem, 0.95rem + 0.6vw, 1.25rem)` / `1.15` |
+| Body | `--fs-body` | PT Sans | `clamp(0.875rem, 0.8rem + 0.4vw, 1rem)` / `1.55` |
+| Small body | `--fs-body-sm` | PT Sans | `clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem)` / `1.55` |
+| Control label | `--fs-13` | Archivo | 13px / `1.3`, weight 600 |
+| Table header | 11.5px | Archivo | Uppercase, `0.06em` tracking, weight 600 |
+| Data / code | Contextual | IBM Plex Mono | Tabular numbers where appropriate |
 
-**Display/Body Font:** Space Grotesk (with system-ui, sans-serif fallback)
-**Mono Font:** JetBrains Mono (with ui-monospace, monospace fallback)
+Avoid weights above 700. Use size, spacing, contrast, and color—not excessive boldness—to establish hierarchy.
 
-**Character:** One geometric sans carries every role from hero to caption — headings step up in weight, never in a different family. JetBrains Mono breaks in only where the content is genuinely tabular or technical: bid amounts, ACOS percentages, code, certificate hashes. The pairing reads as "one voice, two registers" — language and data.
+## 5. Spacing, Radius, Elevation, and Motion
 
-### Hierarchy
+The system uses a four-pixel base scale. Select the nearest token rather than creating arbitrary values. The preferred sequence is `--sp-1` (4px), `--sp-2` (8px), `--sp-3` (12px), `--sp-4` (16px), `--sp-5` (20px), `--sp-6` (24px), `--sp-8` (32px), `--sp-10` (40px), `--sp-12` (48px), and `--sp-16` (64px).
 
-- **Display** (700, 3rem / 48px, line-height 1.15): Marketing hero only. One per page, maximum. Letter-spacing tightened slightly (-0.01em) to avoid looking loose at this size.
-- **Headline** (600, 1.75rem / 28px, line-height 1.15): Page and section titles (h1/h2 territory).
-- **Title** (600, 1.125rem / 18px, line-height 1.35): Card headers, subsection titles.
-- **Body** (400, 1rem / 16px, line-height 1.5): Default reading copy. Max line length 72ch for lesson body, 60ch for UI text.
-- **Label** (500, 0.875rem / 14px, letter-spacing 0.01em): Buttons, form labels, nav items, table headers (headers additionally go uppercase with 0.04em tracking).
-- **Mono** (400, 0.875rem / 14px): Tabular numbers, bid values, hashes, code — anywhere data needs fixed-width alignment.
+| Concern | Tokens | Default |
+|---|---|---|
+| Control radius | `--r-sm`, `--r-md` | 4px–6px for buttons, inputs, and compact tables. |
+| Card radius | `--r-lg`, `--r-xl` | 8px by default; 12px only for larger panels. |
+| Resting elevation | `--sh-1` | Cards and panels receive a subtle `0 1px 2px` shadow. |
+| Interactive elevation | `--sh-2` | Interactive cards lift 1px and strengthen their shadow on hover. |
+| Overlay elevation | `--sh-3`, `--sh-4` | Menus and modals only. |
+| Focus treatment | `--sh-focus` | Orange 3px focus ring paired with an orange border. |
+| Motion | `--d-fast`, `--d-base` | 120ms and 180ms, using `--ease`. |
 
-### Named Rules
+Motion supports comprehension rather than decoration. Use color, opacity, and small transforms for state changes, keep keyboard-triggered actions immediate, and respect `prefers-reduced-motion`.
 
-**The One Display Rule.** Exactly one `display`-sized element exists per page — the marketing hero. Everything else, no matter how important, is `headline` or smaller. A page with two "hero-sized" headings has stopped having a hierarchy.
-
-**The No-900-Weight Rule.** Nothing goes above weight 700. Extra-bold and black weights read as shouting in this system — heaviness is signaled by scale and spacing, not by maxing out the weight axis.
-
-## 4. Elevation
-
-This system is flat by default. Borders — not shadows — carry the elevation signal: a 1px `--border` line is what separates a card from the page underneath it. Shadows exist only as a direct response to interaction state (hover, drag), never applied to a static, at-rest element. This keeps the "manual" feel: printed pages don't cast shadows on each other.
-
-### Shadow Vocabulary
-
-- **Ambient hover** (`box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02)`): The lift an interactive card gets on hover, paired with a 1px `translateY` and a border-color shift to Ink Disabled.
-- **Panel** (`box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.04)`): Dropdowns, popovers — content that's genuinely floating above the page.
-- **Overlay** (`box-shadow: 0 4px 8px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.06)`): Modals — the deepest shadow in the system, reserved for the one thing that's actually blocking the rest of the page.
-
-### Named Rules
-
-**The Border-Is-Elevation Rule.** A static card, input, or panel is distinguished from its background by a 1px border, never a shadow. Shadow appears only when something is actively lifted (hover, drag, an open overlay) — never as decoration on something sitting still.
-
-## 5. Components
-
-Buttons, cards, and inputs all read as tactile and matter-of-fact: they press down 1px when clicked, they don't float unless something (hover, an open menu) is actually lifting them, and every state change is a quick, quiet transition rather than a flourish.
+## 6. Component Patterns
 
 ### Buttons
 
-- **Shape:** 6px radius (`--radius-md`) at every size.
-- **Sizes:** 28px (compact), 36px (default), 44px (large); horizontal padding scales from 12px to 16px.
-- **Primary:** Waybill Orange background, Accent Ink text (`#1A1A2E`) — never white. Hover darkens to `#E55A2B`.
-- **Secondary:** White background, 1px `--border`, Ink Primary text. Hover: background shifts to Surface Subtle, border strengthens to Border Strong.
-- **Ghost:** Transparent, Ink Secondary text. Hover: Surface Subtle background only, no border.
-- **Danger / Success / Info:** Same shape and sizing, solid semantic-color background with white text.
-- **Every variant** presses down 1px (`translateY(-1px)` reversed on active — a genuine tactile press) and shows a 2px Waybill Orange focus ring on keyboard focus. Disabled state: 50% opacity, no press.
+Primary actions use `--c-orange` with `--c-navy-2` text, `--r-md` corners, an Archivo 600 label, and a compact 36px default height. Hover changes the fill to `--c-orange-h`; active presses down by 1px. Secondary controls remain white with a standard border, while ghost controls use `--c-link` text and a transparent surface. Destructive actions are outlined red on white and gain a red soft surface on hover.
 
-### Cards
+### Cards and panels
 
-- **Corner style:** 10px radius (`--radius-lg`) by default; a `compact` variant drops to 6px (`--radius-md`) for dense data contexts.
-- **Background:** Surface Card (white) on Manual Paper.
-- **Border:** 1px `--border` at rest — this is the elevation (see §4).
-- **Interactive variant:** on hover, border shifts to Ink Disabled, the card lifts 1px, and the Ambient hover shadow appears. Static (`default`) cards never get a shadow.
-- **Padding scale:** tight (12px) → default (16px) → comfortable (24px) → hero (32px), chosen per content density, not per whim.
+Cards use `--c-card`, a 1px `--c-border`, `--r-lg`, and `--sh-1`. Interactive cards transition to `--c-card-hi`, use an `--c-orange-tint` border, lift one pixel, and gain `--sh-2`. This is a deliberate replacement for the retired no-shadow field-manual rule.
 
-### Inputs
+### Inputs and forms
 
-- **Style:** White background, 1.5px `--border`, 6px radius.
-- **Focus:** Border shifts to Waybill Orange with a 3px accent-soft ring (`box-shadow: 0 0 0 3px #FFE5D9`) — never a bare outline.
-- **Error:** Border and focus ring both shift to Danger / Danger-soft. Error text pairs a danger-colored message with an icon, never color alone.
-- **Disabled:** Surface Subtle background, Ink Disabled text, no pointer.
-- **Placeholder:** Ink Disabled (`#D4D4D4`) — deliberately the quietest ink on the ramp, since a placeholder should read as "not yet filled," not as real content.
+Inputs use a white surface, 1px `--c-border`, `--r-md`, and PT Sans at 14px. The default minimum height is 36px; use 44px only for large or touch-critical actions. Focus uses `--c-orange` plus `--sh-focus`. Labels use Archivo 13px/600 and `--c-ink-2`; placeholders use `--c-disabled`.
 
-### Badges / Tags
+### Tables
 
-- **Style:** Small pill (22px height) or square (4px radius) depending on context. Background is always a semantic `-soft` tone with the matching saturated color as text — never a saturated background with white text (that reads as a button, not a status tag).
+Tables sit on a white card surface with a standard border and compact `--r-md` corners. Headers use `--c-bg-2`, Archivo 600, uppercase 11.5px labels, and `0.06em` tracking. Rows receive soft separators and change to `--c-orange-soft` on hover. Preserve a visible caption or other accessible context and wrap wide tables so mobile users can scroll them horizontally.
 
-### Navigation (Sidebar, ≥1024px)
+### Badges and status chips
 
-- **Style:** Fixed 240px left sidebar, Surface Card background, 1px right border. Nav items are Label-weight text with 20px icons, 6px radius, gap-based layout.
-- **Active state:** Accent Soft background, Waybill Orange text and icon, weight bumped to 600.
-- **Mobile (<1024px):** Sidebar collapses to a horizontal scrolling bar; the active indicator moves from a left border to a bottom border.
+Badges use an inline, compact pill shape with a soft semantic background and its dark readable text token. They are status indicators—not miniature action buttons. The orange treatment is reserved for selected or primary context; success, warning, and error badges retain their semantic color families.
 
-## 6. Do's and Don'ts
+## 7. Admin Shell
 
-### Do:
+Admin pages use a 240px sticky navy sidebar on desktop. It is the application’s equivalent of the simulator shell: `--c-navy-2` fading into `--c-navy-3`, with `--c-shell-ink` for high-emphasis content, `--c-shell-dim` for default navigation, and `--c-shell-faint` for section labels. The brand mark and primary active indicator use `--c-orange`.
 
-- **Do** keep the app background warm off-white (`#FAFAF7`), never pure white — pure white is reserved for cards and panels sitting on top of it.
-- **Do** spend Waybill Orange like a rationed resource: one accent element per viewport, two maximum.
-- **Do** use a 1px border as the elevation signal for any static card, input, or panel.
-- **Do** reserve shadows for elements actually being lifted by interaction (hover, drag, an open overlay) — never at rest.
-- **Do** pair every error and success state with text + icon + color, never color alone.
-- **Do** keep tap targets at least 44×44px on mobile, and every focus state a visible 2px Waybill Orange ring.
-- **Do** cap line length at 72ch for lesson body text, 60ch for UI copy.
+Navigation items are compact but comfortably targetable. The active item uses a transparent orange wash, an orange-tinted border, orange text, and a 3px orange leading indicator. On small screens, the same shell becomes a drawer controlled by a navy mobile toggle; the content canvas stays `--c-bg` with 16px side padding.
 
-### Don't:
+The content area has a maximum working width of 1100px, 24px desktop padding, and 96px bottom padding. Page headings use Archivo, a muted breadcrumb, and a subtle bottom divider. Action buttons remain aligned with the title row when space allows and wrap beneath it on small screens.
 
-- **Don't** use glassmorphism, gradient orbs, or backdrop-blur decoration — this system is flat and matter-of-fact, not a glass panel.
-- **Don't** use cyan-on-dark neon accents. The only accent is Waybill Orange, and it isn't neon.
-- **Don't** build oversized hero sections with 80% white space in the portfolio-site style — the one marketing hero on this site is still dense, per the Field Manual direction.
-- **Don't** reach for the generic "AI-built SaaS" template look: gradient-text headlines, identical icon-card grids, hero-metric stat blocks.
-- **Don't** use font weight 800 or 900 anywhere — nothing above 700. Heaviness comes from scale, not from maxing out the weight axis.
-- **Don't** put white text on the primary accent button — it fails AA contrast (2.83:1). Use Accent Ink (`#1A1A2E`, 6.0:1) instead.
-- **Don't** add a shadow to a card, input, or panel that isn't actively being interacted with.
+## 8. Responsive and Accessibility Rules
+
+The following rules apply to every route, including admin pages:
+
+- Keep interactive targets at least 44px where touch operation is primary; compact table actions may be visually smaller only when the effective hit area remains accessible.
+- Maintain visible keyboard focus using the orange outline and focus shadow. Do not suppress it without providing an equivalent indicator.
+- Preserve `prefers-reduced-motion` support; transitions and animations must become effectively instantaneous when requested.
+- Never rely on hover alone to reveal essential controls or information.
+- Prevent horizontal page overflow. Tables, cards, long labels, and action groups must either wrap, truncate safely, or scroll in a contained region.
+- Use the existing semantic structure, labels, captions, and ARIA behavior. A theme refactor must not weaken the established accessibility contracts.
+
+## 9. Do and Do Not
+
+| Do | Do not |
+|---|---|
+| Use navy shell chrome, cool-gray work surfaces, white cards, and Amazon orange primary actions. | Reintroduce warm paper surfaces, Waybill Orange, or the Field Manual palette. |
+| Use Archivo for headings and controls; PT Sans for body text; IBM Plex Mono only for data. | Use Space Grotesk or JetBrains Mono as global fonts. |
+| Use subtle card shadows that strengthen only for interactive elevation. | Treat every element as flat by default or apply large decorative shadows. |
+| Use the shared four-pixel spacing scale and compact 4–12px radius family. | Add arbitrary spacing, oversized radii, or unbounded hero whitespace. |
+| Use orange deliberately for primary action, focus, and selected context. | Use orange as generic text or spread it across every control. |
+| Preserve no-blur overlays and minimal, functional animation. | Add glassmorphism, gradient orbs, neon effects, or decorative motion. |
+
+## 10. Implementation Checklist
+
+1. Start with `src/app/globals.css` and the canonical simulator tokens before changing page-level CSS.
+2. Keep the legacy alias bridge working while page modules are migrated; do not duplicate a second theme.
+3. Update Astryx tokens in `src/themes/amph-theme.ts` whenever a shared simulator token changes.
+4. Route shared patterns through the UI primitives instead of adding per-page button, input, or card variants.
+5. Confirm type checking, linting, token-contract tests, key UI regression tests, and responsive visual checks before merging.
+6. Treat this document and `docs/design-brief.md` as aligned design guidance; changes to either require the other to remain consistent.
