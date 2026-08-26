@@ -10,12 +10,10 @@
  *      inferred its name; the explicit assignment there is for
  *      consistency, not for the bug fix.)
  *
- * S-3: only one shadow-token scale is used in the codebase. The
- *      canonical scale is --shadow-sm / --shadow-md / --shadow-lg,
- *      defined in src/app/globals.css and used by every caller. The
- *      legacy --shadow-low / --shadow-med / --shadow-high scale
- *      (Astryx-aligned, defined in src/themes/amph-theme.ts) was
- *      never adopted by any caller and was removed in this round.
+ * S-3: the simulator design system uses a single shared elevation scale:
+ *      --sh-1 / --sh-2 / --sh-3 / --sh-4 in src/app/globals.css. The Astryx adapter
+ *      inherits that application-level system rather than defining a second
+ *      competing shadow scale.
  *
  * This test pins both invariants. If either regresses, the build
  * fails.
@@ -83,7 +81,7 @@ describe("S-2: UI primitives ship explicit displayName (audit 2026-08-20, #406)"
   });
 });
 
-describe("S-3: single shadow-token scale (audit 2026-08-20, #407)", () => {
+describe("S-3: single simulator elevation-token scale", () => {
   it("no \`var(--shadow-low|med|high)\` reference remains anywhere under src/", () => {
     // Walk every file under src/ and assert none references the legacy
     // Astryx-aligned scale. Mirrors the round-34 H-01 pattern that
@@ -108,18 +106,17 @@ describe("S-3: single shadow-token scale (audit 2026-08-20, #407)", () => {
     expect(src).not.toMatch(/"--shadow-high"\s*:/);
   });
 
-  it("amph-theme.ts comment block lists the canonical sm/md/lg scale", () => {
-    // The token-contract comment at the top of the tokens block was
-    // updated to point at the actual scale in use. Regression here
-    // would mean the comment drifted away from the real tokens again.
+  it("keeps the Astryx adapter on the Amazon PH simulator system without local shadow aliases", () => {
     const src = SRC("src/themes/amph-theme.ts");
-    expect(src).toMatch(/shadow:\s+--shadow-sm,\s+--shadow-md,\s+--shadow-lg/);
+    expect(src).toMatch(/name:\s*"amazon-ph-simulators"/);
+    expect(src).not.toMatch(/"--(?:shadow|sh)-/);
   });
 
-  it("the canonical sm/md/lg scale is still defined in globals.css", () => {
+  it("defines the canonical simulator elevation scale in globals.css", () => {
     const src = SRC("src/app/globals.css");
-    expect(src).toMatch(/--shadow-sm:/);
-    expect(src).toMatch(/--shadow-md:/);
-    expect(src).toMatch(/--shadow-lg:/);
+    expect(src).toMatch(/--sh-1:/);
+    expect(src).toMatch(/--sh-2:/);
+    expect(src).toMatch(/--sh-3:/);
+    expect(src).toMatch(/--sh-4:/);
   });
 });
