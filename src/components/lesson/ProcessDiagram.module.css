@@ -1,40 +1,41 @@
-/* src/components/lesson/ProcessDiagram.module.css
-   Ordered step row that wraps on mobile. */
+/* ProcessDiagram — Amazon PH simulator workflow sequence. */
 
 .figure {
-  margin: var(--space-6, 24px) 0;
-  font-family: var(--font-body, "Space Grotesk", sans-serif);
+  margin: var(--space-6) 0;
+  font-family: var(--font-body);
 }
 
 .title {
-  font-family: var(--font-display, "Space Grotesk", sans-serif);
-  font-weight: 600;
-  font-size: var(--text-lg, 1.125rem);
-  margin: 0 0 var(--space-2, 8px);
-  color: var(--ink-900, #171717);
+  margin: 0 0 var(--space-2);
+  color: var(--ink-900);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
 }
 
 .hint {
-  font-size: var(--text-sm, 0.875rem);
-  color: var(--ink-500, #737373);
-  margin: 0 0 var(--space-3, 12px);
+  margin: 0 0 var(--space-3);
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
 }
 
 .list {
   display: flex;
   align-items: stretch;
-  list-style: none;
-  padding: var(--space-3, 12px);
+  gap: var(--space-2);
   margin: 0;
-  gap: var(--space-2, 8px);
-  border: 1px solid var(--border, #e5e5e5);
-  border-radius: var(--radius-md, 8px);
-  background: var(--surface-1, #fafaf9);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+  box-shadow: var(--sh-1);
+  list-style: none;
 }
 
 .horizontal {
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
 }
 
 .vertical {
@@ -43,48 +44,62 @@
 
 .item {
   display: inline-flex;
+  min-width: 0;
+  flex: 1 1 180px;
   align-items: center;
-  gap: var(--space-2, 8px);
-  padding: var(--space-2, 8px) var(--space-3, 12px);
-  background: var(--surface-2, #f5f5f4);
-  border-radius: var(--radius-sm, 6px);
-  color: var(--ink-900, #171717);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-0);
+  color: var(--ink-900);
 }
 
 .bullet {
   display: inline-flex;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: var(--text-xs, 0.75rem);
-  background: var(--accent-soft, #fff1eb);
-  color: var(--accent, #ff6b35);
-  font-weight: 600;
+  border-radius: var(--radius-full);
+  background: var(--c-orange-soft);
+  color: var(--c-orange-d);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
 }
 
 .label {
-  font-size: var(--text-base, 1rem);
-  font-weight: 500;
+  min-width: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: var(--leading-snug);
 }
 
 .connector {
-  color: var(--ink-300, #d4d4d4);
-  margin: 0 var(--space-1, 4px);
+  align-self: center;
+  color: var(--c-orange-d);
+  margin: 0 var(--space-1);
 }
 
 @media (max-width: 640px) {
+  .list,
   .horizontal {
     flex-direction: column;
     align-items: stretch;
   }
+
+  .item {
+    flex-basis: auto;
+  }
+
   .connector {
     display: none;
   }
+
   .horizontal .item + .item {
-    border-top: 1px dashed var(--border, #e5e5e5);
+    border-top: 1px dashed var(--border-strong);
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }

@@ -1,122 +1,149 @@
-/* src/components/lesson/SelfCheck.module.css
-   Workbook-style check box. Not a graded quiz. */
+/* SelfCheck — Amazon PH simulator learning checkpoint. */
 
 .selfCheck {
-  margin: var(--space-6, 24px) 0;
-  padding: var(--space-5, 20px);
-  border: 1px solid var(--border, #e5e5e5);
-  border-radius: var(--radius-md, 8px);
-  background: var(--surface-1, #fafaf9);
-  font-family: var(--font-body, "Space Grotesk", sans-serif);
+  margin: var(--space-6) 0;
+  padding: var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+  box-shadow: var(--sh-1);
+  font-family: var(--font-body);
 }
 
 .prompt {
-  margin: 0 0 var(--space-4, 16px);
-  font-family: var(--font-display, "Space Grotesk", sans-serif);
-  font-weight: 600;
-  font-size: var(--text-base, 1rem);
-  color: var(--ink-900, #171717);
-  line-height: 1.4;
+  margin: 0 0 var(--space-4);
+  color: var(--ink-900);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
 }
 
 .fieldset {
-  border: 0;
-  padding: 0;
-  margin: 0 0 var(--space-4, 16px);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2, 8px);
+  gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  border: 0;
 }
 
 .option {
   display: flex;
   align-items: center;
-  gap: var(--space-3, 12px);
-  padding: var(--space-3, 12px) var(--space-4, 16px);
-  border: 1px solid var(--border, #e5e5e5);
-  border-radius: var(--radius-sm, 6px);
-  background: var(--surface-2, #f5f5f4);
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-0);
+  color: var(--ink-900);
   cursor: pointer;
-  font-size: var(--text-base, 1rem);
-  color: var(--ink-900, #171717);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
 .option:hover {
-  border-color: var(--ink-300, #d4d4d4);
+  border-color: var(--c-orange);
+  background: var(--accent-soft);
+}
+
+.option:has(input:checked) {
+  border-color: var(--c-orange-d);
+  background: var(--c-orange-soft);
+  box-shadow: inset 3px 0 0 var(--c-orange);
 }
 
 .option input[type="radio"] {
-  flex: 0 0 auto;
-  accent-color: var(--accent, #ff6b35);
   width: 18px;
   height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--c-orange-d);
 }
 
 .option input[type="radio"]:focus-visible {
-  outline: 2px solid var(--accent, #ff6b35);
+  outline: 2px solid var(--c-orange);
   outline-offset: 2px;
 }
 
 .actions {
   display: flex;
-  gap: var(--space-2, 8px);
-  margin-bottom: var(--space-3, 12px);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.submit,
+.reset {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 
 .submit {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2, 8px);
-  padding: var(--space-2, 8px) var(--space-4, 16px);
-  border: 1px solid var(--accent, #ff6b35);
-  border-radius: var(--radius-sm, 6px);
-  background: var(--accent, #ff6b35);
-  color: var(--surface-1, #fafaf9);
-  font-family: var(--font-display, "Space Grotesk", sans-serif);
-  font-weight: 600;
-  font-size: var(--text-sm, 0.875rem);
-  cursor: pointer;
+  border-color: var(--c-orange);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
 }
 
-.submit:hover {
-  background: color-mix(in srgb, var(--accent, #ff6b35) 88%, var(--ink-900, #171717));
+.submit:hover:not(:disabled) {
+  border-color: var(--c-orange-h);
+  background: var(--c-orange-h);
+  box-shadow: var(--sh-1);
+}
+
+.submit:active:not(:disabled),
+.reset:active {
+  transform: translateY(1px);
 }
 
 .submit:disabled {
-  background: var(--surface-2, #f5f5f4);
-  border-color: var(--border, #e5e5e5);
-  color: var(--ink-500, #737373);
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--ink-500);
   cursor: not-allowed;
 }
 
 .reset {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2, 8px);
-  padding: var(--space-2, 8px) var(--space-4, 16px);
-  border: 1px solid var(--accent, #ff6b35);
-  border-radius: var(--radius-sm, 6px);
-  background: var(--surface-1, #fafaf9);
-  color: var(--accent, #ff6b35);
-  font-family: var(--font-display, "Space Grotesk", sans-serif);
-  font-weight: 600;
-  font-size: var(--text-sm, 0.875rem);
-  cursor: pointer;
+  border-color: var(--border-strong);
+  background: var(--surface-1);
+  color: var(--accent-text);
 }
 
 .reset:hover {
-  background: var(--accent-soft, #fff1eb);
+  border-color: var(--c-link);
+  background: var(--c-blue-bg);
+  color: var(--c-blue-text);
+}
+
+.submit:focus-visible,
+.reset:focus-visible {
+  outline: none;
+  box-shadow: var(--sh-focus);
 }
 
 .feedback {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-2, 8px);
+  gap: var(--space-2);
   margin: 0;
-  padding: var(--space-3, 12px);
-  border-radius: var(--radius-sm, 6px);
-  font-size: var(--text-sm, 0.875rem);
-  line-height: 1.5;
+  padding: var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
 }
 
 .feedback svg {
@@ -125,30 +152,48 @@
 }
 
 .correct .feedback {
-  background: color-mix(in srgb, var(--success, #16a34a) 12%, var(--surface-1, #fafaf9));
-  color: var(--success, #16a34a);
-  border: 1px solid var(--success, #16a34a);
+  border-color: var(--c-green);
+  background: var(--c-green-bg);
+  color: var(--c-green-text);
 }
 
 .incorrect .feedback {
-  background: color-mix(in srgb, var(--danger, #dc2626) 12%, var(--surface-1, #fafaf9));
-  color: var(--danger, #dc2626);
-  border: 1px solid var(--danger, #dc2626);
+  border-color: var(--c-red);
+  background: var(--c-red-bg);
+  color: var(--c-red-text);
 }
 
-/* After a correct answer, dim the wrong options for clarity */
 .correct .option:has(input:not(:checked)) {
-  opacity: 0.5;
+  opacity: 0.56;
 }
 
 .visuallyHidden {
   position: absolute;
   width: 1px;
   height: 1px;
-  padding: 0;
   margin: -1px;
+  padding: 0;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
   border: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .selfCheck {
+    padding: var(--space-4);
+  }
+
+  .submit,
+  .reset {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option,
+  .submit,
+  .reset {
+    transition: none;
+  }
 }

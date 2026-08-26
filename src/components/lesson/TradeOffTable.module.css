@@ -1,58 +1,64 @@
-/* src/components/lesson/TradeOffTable.module.css
-   Field Manual workbook row: dense type, off-white, 1px border separator. */
+/* TradeOffTable — Amazon PH simulator comparison surface. */
 
 .figure {
-  margin: var(--space-6, 24px) 0;
+  margin: var(--space-6) 0;
   font-family: var(--font-body);
 }
 
 .title {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-900);
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: var(--text-lg, 1.125rem);
-  margin: 0 0 var(--space-2, 8px);
-  color: var(--ink-900, #171717);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
 }
 
 .caption {
+  padding: 0 0 var(--space-2);
+  color: var(--ink-500);
   caption-side: top;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-align: left;
-  color: var(--ink-500, #737373);
-  font-size: var(--text-xs, 0.75rem);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0 0 var(--space-2, 8px);
 }
 
 .tableWrap {
   overflow-x: auto;
-  border: 1px solid var(--border, #e5e5e0);
-  border-radius: var(--radius-md, 6px);
-  background: var(--surface-1, #ffffff);
+  overscroll-behavior-inline: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+  box-shadow: var(--sh-1);
 }
 
 .table {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
-  font-size: var(--text-base, 1rem);
+  font-size: var(--text-base);
 }
 
 .table th,
 .table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
   text-align: left;
-  padding: var(--space-3, 12px) var(--space-4, 16px);
-  border-bottom: 1px solid var(--border, #e5e5e0);
   vertical-align: top;
 }
 
 .table thead th {
-  background: var(--surface-2, #f4f3ee);
-  color: var(--ink-500, #737373);
-  font-weight: 500;
-  font-size: var(--text-xs, 0.75rem);
+  border-bottom-color: var(--c-navy-3);
+  background: var(--c-navy-2);
+  color: var(--c-shell-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--border, #e5e5e0);
 }
 
 .table tbody tr:last-child th,
@@ -60,26 +66,33 @@
   border-bottom: 0;
 }
 
+.table tbody tr:nth-child(even) {
+  background: var(--surface-0);
+}
+
 .table tbody th {
-  font-weight: 500;
-  color: var(--ink-900, #171717);
+  color: var(--ink-900);
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .table tbody td {
-  color: var(--ink-700, #404040);
+  color: var(--ink-700);
+  line-height: var(--leading-normal);
 }
 
 .placeholder {
-  border: 1px dashed var(--border, #e5e5e0);
-  border-radius: var(--radius-md, 6px);
-  padding: var(--space-4, 16px);
-  margin: var(--space-6, 24px) 0;
-  background: var(--surface-2, #f4f3ee);
-  color: var(--ink-500, #737373);
+  margin: var(--space-6) 0;
+  padding: var(--space-5);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  color: var(--ink-700);
 }
 
 .empty {
-  margin: var(--space-2, 8px) 0 0;
-  font-size: var(--text-sm, 0.875rem);
+  margin: var(--space-2) 0 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
 }
