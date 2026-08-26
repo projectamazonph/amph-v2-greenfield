@@ -10,21 +10,27 @@ import {
 interface Module {
   n: string;
   name: string;
-  tier: "Foundations" | "Mastery";
+  tier: "Foundations" | "Mastery" | "Capstone";
   time: string;
 }
 
 const MODULES: Module[] = PUBLIC_CURRICULUM_CLAIMS.modules.map((module) => ({
   n: String(module.moduleNumber).padStart(2, "0"),
   name: module.name,
-  tier: module.courseSlug === "ppc-foundations" ? "Foundations" : "Mastery",
+  tier:
+    module.courseSlug === "ppc-foundations"
+      ? "Foundations"
+      : module.courseSlug === "ultimate-transformation"
+        ? "Capstone"
+        : "Mastery",
   time: formatPlannedMinutes(module.plannedMinutes),
 }));
 
 const FOUNDATIONS = publicCourseClaims("ppc-foundations");
 const MASTERY = publicCourseClaims("accelerated-mastery");
-const TOTAL_LESSONS = FOUNDATIONS.lessonCount + MASTERY.lessonCount;
-const TOTAL_MINUTES = FOUNDATIONS.plannedMinutes + MASTERY.plannedMinutes;
+const CAPSTONE = publicCourseClaims("ultimate-transformation");
+const TOTAL_LESSONS = FOUNDATIONS.lessonCount + MASTERY.lessonCount + CAPSTONE.lessonCount;
+const TOTAL_MINUTES = FOUNDATIONS.plannedMinutes + MASTERY.plannedMinutes + CAPSTONE.plannedMinutes;
 const CURRICULUM_HEADLINE = `${PUBLIC_CURRICULUM_CLAIMS.modules.length} modules, in order. No hidden gates.`;
 
 export function Curriculum() {
@@ -37,9 +43,9 @@ export function Curriculum() {
             <h2 className={shared.secTitle}>{CURRICULUM_HEADLINE}</h2>
           </div>
           <p className={shared.secLede}>
-            Modules 0&ndash;4 are <b>Foundations</b>; 5&ndash;8 are <b>Mastery</b>. The tier you
-            pick decides how far you go. No jumping around, no hidden &ldquo;advanced&rdquo;
-            paywall mid-course.
+            Modules 0&ndash;4 are <b>Foundations</b>; 5&ndash;10 are <b>Mastery</b>; 11 is the{" "}
+            <b>Capstone</b>. The tier you pick decides how far you go. No jumping around, no hidden
+            &ldquo;advanced&rdquo; paywall mid-course.
           </p>
         </div>
 
@@ -51,10 +57,14 @@ export function Curriculum() {
             <caption className="sr-only">Curriculum modules, tier, and time</caption>
             <thead>
               <tr>
-                <th scope="col" style={{ width: 58 }}>Mod</th>
+                <th scope="col" style={{ width: 58 }}>
+                  Mod
+                </th>
                 <th scope="col">Topic</th>
                 <th scope="col">Tier</th>
-                <th scope="col" className={styles.right}>Time</th>
+                <th scope="col" className={styles.right}>
+                  Time
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -85,7 +95,7 @@ export function Curriculum() {
               <tr>
                 <td colSpan={3}>
                   {PUBLIC_CURRICULUM_CLAIMS.modules.length} modules · Foundations (0–4) + Mastery
-                  (5–8)
+                  (5–10) + Capstone (11)
                 </td>
                 <td className={styles.right}>
                   <b>{formatPlannedMinutes(TOTAL_MINUTES)}</b> of lessons

@@ -60,7 +60,8 @@ function deriveTitle(dirSlug) {
 
 function courseSlugForModule(n) {
   if (n >= 0 && n <= 4) return "ppc-foundations";
-  if (n >= 5 && n <= 8) return "accelerated-mastery";
+  if (n >= 5 && n <= 10) return "accelerated-mastery";
+  if (n === 11) return "ultimate-transformation";
   return null;
 }
 
@@ -180,7 +181,7 @@ let lessonsCreated = 0;
 // populated below are a separate, admin-facing read model (STORY-048) and are
 // not consulted by that flow. Without this, Course.curriculum stays the
 // placeholder stub set in Step 1 and every lesson link 404s.
-const curriculumSectionsByCourse = { "ppc-foundations": [], "accelerated-mastery": [] };
+const curriculumSectionsByCourse = { "ppc-foundations": [], "accelerated-mastery": [], "ultimate-transformation": [] };
 
 for (const dirName of moduleDirs.sort()) {
   const dirPath = join(CONTENT_ROOT, dirName);
@@ -306,9 +307,11 @@ if (!existsSync(quizPath)) {
     const courseSlug =
       quizDef.moduleNumber >= 0 && quizDef.moduleNumber <= 4
         ? "ppc-foundations"
-        : quizDef.moduleNumber >= 5 && quizDef.moduleNumber <= 8
+        : quizDef.moduleNumber >= 5 && quizDef.moduleNumber <= 10
           ? "accelerated-mastery"
-          : null;
+          : quizDef.moduleNumber === 11
+            ? "ultimate-transformation"
+            : null;
 
     if (!courseSlug) {
       console.log(`  [skip] quiz module ${quizDef.moduleNumber} — unknown course`);

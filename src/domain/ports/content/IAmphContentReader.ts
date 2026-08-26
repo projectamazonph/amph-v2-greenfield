@@ -14,7 +14,7 @@ import type { Result } from "@/domain/shared/Result";
 export interface MdxFrontmatter {
   readonly title: string;
   readonly slug: string; // e.g. "1.1-read-ppc-data-before-you-change-it"
-  readonly moduleNumber: number; // 0–8
+  readonly moduleNumber: number; // 0–11
   readonly lessonNumber: number; // 1–N
   readonly type: string; // "reading" → TEXT, "video" → VIDEO, etc.
   readonly estimatedMinutes: number;
@@ -42,11 +42,11 @@ export interface IAmphContentReader {
    *
    * The `courseSlug` is derived from the module number:
    *   0–4 → "ppc-foundations"
-   *   5–8 → "accelerated-mastery"
+   *   5–10 → "accelerated-mastery"
+   *   11 → "ultimate-transformation"
    *
-   * Files whose moduleNumber falls outside both ranges are skipped
-   * (they are not an error — the source content may grow beyond the
-   * current two-course structure).
+   * Files whose moduleNumber falls outside these ranges are skipped
+   * (they are not an error — future content may add later modules).
    *
    * Implementations read the content root from their own configuration
    * (e.g. env var or constructor argument), not from this method.

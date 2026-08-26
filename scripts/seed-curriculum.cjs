@@ -93,11 +93,15 @@ async function main() {
     "6-bidding-lab": "Bidding Lab",
     "7-search-term-triage": "Search Term Triage",
     "8-competitive-intelligence": "Competitive Intelligence",
+    "9-weekly-optimization": "Weekly Optimization",
+    "10-reporting-troubleshooting": "Reporting and Troubleshooting",
+    "11-va-workflow-capstone": "VA Workflow and Capstone",
   };
 
   function moduleToCourseSlug(num) {
-    if (num <= 0) return "ppc-foundations";
-    if (num <= 3) return "accelerated-mastery";
+    if (num >= 0 && num <= 4) return "ppc-foundations";
+    if (num >= 5 && num <= 10) return "accelerated-mastery";
+    if (num === 11) return "ultimate-transformation";
     return "ultimate-transformation";
   }
 

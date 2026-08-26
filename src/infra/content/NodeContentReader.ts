@@ -23,11 +23,13 @@ import type { ContentReadError } from "@/domain/ports/content/IAmphContentReader
 /**
  * Maps a module number to the owning course slug.
  *   0–4 → "ppc-foundations"
- *   5–8 → "accelerated-mastery"
+ *   5–10 → "accelerated-mastery"
+ *   11 → "ultimate-transformation"
  */
 function courseSlugForModule(moduleNumber: number): string | null {
   if (moduleNumber >= 0 && moduleNumber <= 4) return "ppc-foundations";
-  if (moduleNumber >= 5 && moduleNumber <= 8) return "accelerated-mastery";
+  if (moduleNumber >= 5 && moduleNumber <= 10) return "accelerated-mastery";
+  if (moduleNumber === 11) return "ultimate-transformation";
   return null;
 }
 

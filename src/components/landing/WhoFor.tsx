@@ -8,7 +8,7 @@ const YES: React.ReactNode[] = [
     You do <b>VA work now</b> and want to specialize into Amazon ads.
   </>,
   <>
-    You can commit <b>5–8 hours a week for 8 weeks</b>.
+    You can commit <b>5–8 hours a week for 11 weeks</b>.
   </>,
   <>
     You want to move from <b>₱25k to ₱60k&ndash;₱80k / month</b>.
@@ -36,8 +36,8 @@ export function WhoFor() {
             <h2 className={shared.secTitle}>A paid course.</h2>
           </div>
           <p className={shared.secLede}>
-            A paid course changes how you show up. You finish it because you paid for it. This
-            is built for VAs ready to specialize, and it&rsquo;s honest about who should wait.
+            A paid course changes how you show up. You finish it because you paid for it. This is
+            built for VAs ready to specialize, and it&rsquo;s honest about who should wait.
           </p>
         </div>
 

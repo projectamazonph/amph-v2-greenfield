@@ -16,7 +16,7 @@ const STATS: Stat[] = [
   {
     to: PUBLIC_CURRICULUM_CLAIMS.modules.length,
     label: "Modules",
-    sub: "Foundations + Mastery, in order",
+    sub: "Foundations + Mastery + Capstone, in order",
   },
   {
     to: Object.keys(PUBLIC_CURRICULUM_CLAIMS.simulators).length,
