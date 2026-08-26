@@ -2,7 +2,7 @@
 
 **Source:** `content/curriculum/modules/`
 **Status:** Migrated 2026-07-18 from `projectamazonph/amph-v2` `content/curriculum/`
-**Total:** 9 modules · 31 lessons · 7 module-final quizzes
+**Total:** 12 modules · 42 lessons · 12 module-final quizzes
 
 This is the post-content-track version: legacy product references (AdCraft, AI Mentor, Formula Calculator, "three simulations") have been stripped, and 5 factual corrections have been applied with Amazon Ads Fact Cards.
 
@@ -120,17 +120,55 @@ This is the post-content-track version: legacy product references (AdCraft, AI M
 
 ---
 
+## Module 9 — Weekly Optimization (`9-weekly-optimization/`) → `accelerated-mastery` course
+
+| #   | Lesson                                    | Type    | Min | XP  |
+| --- | ----------------------------------------- | ------- | --- | --- |
+| 9.1 | The Weekly Routine: Keep the Account Calm | reading | 7   | 100 |
+| 9.2 | One Change at a Time: Know What Worked    | reading | 6   | 100 |
+| 9.3 | How Much Data Is Enough?                  | reading | 7   | 100 |
+
+**Purpose:** establish a repeatable operating rhythm and match action strength to evidence strength.
+
+---
+
+## Module 10 — Reporting and Troubleshooting (`10-reporting-troubleshooting/`) → `accelerated-mastery` course
+
+| #    | Lesson                                                        | Type    | Min | XP  |
+| ---- | ------------------------------------------------------------- | ------- | --- | --- |
+| 10.1 | The Simple Report Structure: Numbers to Next Steps            | reading | 7   | 100 |
+| 10.2 | Explaining Numbers in Human Words                             | reading | 7   | 100 |
+| 10.3 | Troubleshooting: No Impressions and Low CTR                   | reading | 8   | 100 |
+| 10.4 | Troubleshooting: Clicks, No Sales, High ACoS, and Sales Drops | reading | 9   | 100 |
+
+**Purpose:** turn account signals into client-readable reports and safe diagnostic actions.
+
+---
+
+## Module 11 — VA Workflow and Capstone (`11-va-workflow-capstone/`) → `ultimate-transformation` course
+
+| #    | Lesson                                                | Type    | Min | XP  |
+| ---- | ----------------------------------------------------- | ------- | --- | --- |
+| 11.1 | Tasks by Cadence: Know What Happens When              | reading | 7   | 100 |
+| 11.2 | The Permissions Ladder: Small Changes, Clear Approval | reading | 8   | 100 |
+| 11.3 | SOPs and the Change Log: Make Good Work Repeatable    | reading | 7   | 100 |
+| 11.4 | Client Communication and the Capstone                 | reading | 9   | 100 |
+
+**Purpose:** produce reviewable client-work evidence while keeping simulator scores formative.
+
+---
+
 ## Course → Tier mapping
 
-| Course                | Tier                    | Modules                          | Lessons | Total XP |
-| --------------------- | ----------------------- | -------------------------------- | ------- | -------- |
-| `ppc-foundations`     | pp-foundations          | 0–4                              | 18      | ~1,450   |
-| `accelerated-mastery` | accelerated-mastery     | 5–8                              | 13      | ~1,250   |
-| (no course)           | ultimate-transformation | (none yet — 10–13 are Release 3) | 0       | 0        |
+| Course                    | Tier                | Modules | Lessons | Planned minutes |
+| ------------------------- | ------------------- | ------- | ------: | --------------: |
+| `ppc-foundations`         | pp-foundations      | 0–4     |      19 |             231 |
+| `accelerated-mastery`     | accelerated-mastery | 5–10    |      19 |             181 |
+| `ultimate-transformation` | ultimate            | 11      |       4 |              31 |
 
 ## Quizzes (`curriculum/quiz-questions.json`)
 
-7 module-final quizzes, one per module. Each is a knowledge check attached to the module's final lesson. 70% pass threshold, 100 XP per pass. Question counts vary by module.
+12 module-final quizzes, one per module. Each is a knowledge check attached to the module's final lesson. The pass threshold is 70%, with 100 XP per pass. Question counts vary by module.
 
 ## Why this index exists
 
@@ -142,7 +180,6 @@ When you're building STORY-013 (the import script) or STORY-026 (the lesson page
 
 ## What's not in this curriculum yet
 
-- **Release 2 lessons** (per the parent's `docs/CURRICULUM-REDESIGN.md`): career skills, client delivery, advanced reporting. Not authored, not imported, not on the roadmap for the greenfield.
-- **Release 3 lessons** (modules 10–13 for `ultimate-transformation` tier): not authored.
+- **Future modules beyond 11** for the ultimate-transformation tier are not authored yet.
 - **Localization**: all content is English. Tagalog/Filipino versions are a separate, larger scope.
-- **10-block lesson-production standard rewrite** (per parent `docs/CURRICULUM-REDESIGN.md`): the lessons here are not all on the formal 10-block format (client outcome, decision card, worked case, etc.). The parent's content track only did the 5 factual corrections + legacy scrub; the full 10-block rewrite is a future content-track pass.
+- **Full saved-artifact workflow**: lesson evidence is now specified and recorded in content, while persistent learner-owned artifact storage and export remain a separate platform workstream.

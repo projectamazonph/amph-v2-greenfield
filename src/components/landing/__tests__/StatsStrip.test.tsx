@@ -7,9 +7,9 @@ describe("StatsStrip truthful initial state", () => {
   it("renders reviewed programme values before client animation starts", () => {
     const html = renderToString(createElement(StatsStrip));
 
-    expect(html).toContain(">9</span>");
+    expect(html).toContain(">12</span>");
     expect(html).toContain(">5</span>");
-    expect(html).toContain(">361</span>");
+    expect(html).toContain(">443</span>");
     expect(html).toContain(">2,500</span>");
     expect(html).not.toContain(">0</span>");
   });

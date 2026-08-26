@@ -34,8 +34,8 @@ The content was **migrated from the original `amph-v2` repo** (`content/curricul
    - Stripped legacy product references: **AdCraft**, **AI Mentor**, **Formula Calculator**, "STR Triage Arena", and the "three simulations" framing — none of which exist in v2.
    - Replaced them with the real v2 platform: Project Amazon PH Academy, the actual 4-tab bottom nav (Home/Courses/Tools/Profile), and the five real tools from the engine registry.
    - Added 5 factual corrections (portfolios, attribution, auction, listing quality score, dayparting) with Amazon Ads Fact Cards (source URL + scope + owner/date placeholders).
-   - Split the curriculum into two Course rows (`ppc-foundations` = modules 0–4, `accelerated-mastery` = modules 5–8) so both tiers have a course. `ultimate-transformation` deliberately has no course — its modules (10–13) don't exist yet (Release 3).
-3. **This greenfield repo** now carries forward that scrubbed + corrected version, byte-for-byte.
+   - Split the curriculum into three Course rows (`ppc-foundations` = modules 0–4, `accelerated-mastery` = modules 5–10, `ultimate-transformation` = module 11) so the operational and capstone layers have explicit homes.
+3. **This greenfield repo** carries forward the scrubbed and corrected foundation, then adds the synchronized operational and capstone lessons from `projectamazonph/amazon-ph-simulators` using native MDX visual directives.
 
 **What you see in these files is based on the post-content-track version, not the raw v1.** Later curriculum work includes STORY-109's additional practice bridges. Any source change still requires the normal content import before it appears in an existing database.
 
@@ -65,7 +65,7 @@ count or planned-minute change must update the claim deliberately before it can 
 `pnpm validate:lesson-production` reports whether each lesson has the agreed
 beginner-facing blocks: outcome, decision, worked example, active attempt,
 feedback or answer reveal, evidence instruction, and retrieval cue. The default
-mode is intentionally non-blocking while the existing 31 lessons are migrated;
+mode is intentionally non-blocking while the existing 42 lessons are maintained;
 use `pnpm validate:lesson-production -- --strict` for a content branch that must
 meet the complete schema. CI uploads the JSON report so the next content slice
 can work from an explicit gap list.
@@ -78,15 +78,15 @@ It:
 
 1. Read every `*.mdx` file under `content/curriculum/modules/<module-slug>/<lesson-slug>.mdx`.
 2. Parse the frontmatter (`title`, `slug`, `moduleNumber`, `lessonNumber`, `type`, `estimatedMinutes`, `xpReward`).
-3. Upsert `Module` and `Lesson` rows in the `Course` bound to `ppc-foundations` tier (modules 0–4) and `accelerated-mastery` tier (modules 5–8).
-4. Read `content/curriculum/quiz-questions.json`, parse the 7 quizzes, and attach each to the appropriate module's final lesson as a knowledge check.
+3. Upsert `Module` and `Lesson` rows in the `Course` bound to `ppc-foundations` tier (modules 0–4), `accelerated-mastery` tier (modules 5–10), and `ultimate-transformation` tier (module 11).
+4. Read `content/curriculum/quiz-questions.json`, parse the 12 module quizzes, and attach each to the appropriate module's final lesson as a knowledge check.
 5. Be idempotent (re-running should not duplicate rows — use slug as natural key).
 
 The greenfield importer differs from the parent implementation in these important ways:
 
 - Will resolve paths via `import.meta.url` (repo-relative), not the hard-coded device path the parent once had.
 - Will use the existing `JoseJwtService` and the SOLID five-layer architecture (the parent did not have the SOLID architecture, so its import script is a one-off CLI tool — the greenfield's can be cleaner).
-- Does not regenerate module 5–8 slugs from `amph-foundations-*` to `accelerated-mastery-*`; the source already uses the post-split slugs.
+- Does not regenerate module 5–10 slugs from `amph-foundations-*` to `accelerated-mastery-*`; the source already uses the post-split slugs.
 
 ## Content audit & corrections (carried forward from parent)
 

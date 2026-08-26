@@ -11,21 +11,103 @@
     "accelerated-mastery": {
       "label": "Accelerated Mastery",
       "tier": "accelerated-mastery",
-      "moduleNumbers": [5, 6, 7, 8],
-      "lessonCount": 12,
-      "plannedMinutes": 130
+      "moduleNumbers": [5, 6, 7, 8, 9, 10],
+      "lessonCount": 19,
+      "plannedMinutes": 181
+    },
+    "ultimate-transformation": {
+      "label": "Ultimate Transformation",
+      "tier": "ultimate-transformation",
+      "moduleNumbers": [11],
+      "lessonCount": 4,
+      "plannedMinutes": 31
     }
   },
   "modules": [
-    { "moduleNumber": 0, "name": "Onboarding", "courseSlug": "ppc-foundations", "lessonCount": 3, "plannedMinutes": 26 },
-    { "moduleNumber": 1, "name": "Foundations", "courseSlug": "ppc-foundations", "lessonCount": 5, "plannedMinutes": 69 },
-    { "moduleNumber": 2, "name": "Keyword Research", "courseSlug": "ppc-foundations", "lessonCount": 4, "plannedMinutes": 48 },
-    { "moduleNumber": 3, "name": "Listing Optimization", "courseSlug": "ppc-foundations", "lessonCount": 3, "plannedMinutes": 36 },
-    { "moduleNumber": 4, "name": "Campaign Architecture", "courseSlug": "ppc-foundations", "lessonCount": 4, "plannedMinutes": 52 },
-    { "moduleNumber": 5, "name": "Portfolio Strategy", "courseSlug": "accelerated-mastery", "lessonCount": 3, "plannedMinutes": 38 },
-    { "moduleNumber": 6, "name": "Bidding Lab", "courseSlug": "accelerated-mastery", "lessonCount": 3, "plannedMinutes": 36 },
-    { "moduleNumber": 7, "name": "Search Term Triage", "courseSlug": "accelerated-mastery", "lessonCount": 3, "plannedMinutes": 27 },
-    { "moduleNumber": 8, "name": "Competitive Intelligence", "courseSlug": "accelerated-mastery", "lessonCount": 3, "plannedMinutes": 29 }
+    {
+      "moduleNumber": 0,
+      "name": "Onboarding",
+      "courseSlug": "ppc-foundations",
+      "lessonCount": 3,
+      "plannedMinutes": 26
+    },
+    {
+      "moduleNumber": 1,
+      "name": "Foundations",
+      "courseSlug": "ppc-foundations",
+      "lessonCount": 5,
+      "plannedMinutes": 69
+    },
+    {
+      "moduleNumber": 2,
+      "name": "Keyword Research",
+      "courseSlug": "ppc-foundations",
+      "lessonCount": 4,
+      "plannedMinutes": 48
+    },
+    {
+      "moduleNumber": 3,
+      "name": "Listing Optimization",
+      "courseSlug": "ppc-foundations",
+      "lessonCount": 3,
+      "plannedMinutes": 36
+    },
+    {
+      "moduleNumber": 4,
+      "name": "Campaign Architecture",
+      "courseSlug": "ppc-foundations",
+      "lessonCount": 4,
+      "plannedMinutes": 52
+    },
+    {
+      "moduleNumber": 5,
+      "name": "Portfolio Strategy",
+      "courseSlug": "accelerated-mastery",
+      "lessonCount": 3,
+      "plannedMinutes": 38
+    },
+    {
+      "moduleNumber": 6,
+      "name": "Bidding Lab",
+      "courseSlug": "accelerated-mastery",
+      "lessonCount": 3,
+      "plannedMinutes": 36
+    },
+    {
+      "moduleNumber": 7,
+      "name": "Search Term Triage",
+      "courseSlug": "accelerated-mastery",
+      "lessonCount": 3,
+      "plannedMinutes": 27
+    },
+    {
+      "moduleNumber": 8,
+      "name": "Competitive Intelligence",
+      "courseSlug": "accelerated-mastery",
+      "lessonCount": 3,
+      "plannedMinutes": 29
+    },
+    {
+      "moduleNumber": 9,
+      "name": "Weekly Optimization",
+      "courseSlug": "accelerated-mastery",
+      "lessonCount": 3,
+      "plannedMinutes": 20
+    },
+    {
+      "moduleNumber": 10,
+      "name": "Reporting and Troubleshooting",
+      "courseSlug": "accelerated-mastery",
+      "lessonCount": 4,
+      "plannedMinutes": 31
+    },
+    {
+      "moduleNumber": 11,
+      "name": "VA Workflow and Capstone",
+      "courseSlug": "ultimate-transformation",
+      "lessonCount": 4,
+      "plannedMinutes": 31
+    }
   ],
   "simulators": {
     "bid-elevator": { "label": "Bid Elevator", "availability": "public-preview" },
@@ -36,7 +118,20 @@
   },
   "tierSimulatorTargets": {
     "pp-foundations": ["campaign-builder", "bid-elevator", "str-triage"],
-    "accelerated-mastery": ["campaign-builder", "bid-elevator", "str-triage", "listing-audit", "keyword-research"]
+    "accelerated-mastery": [
+      "campaign-builder",
+      "bid-elevator",
+      "str-triage",
+      "listing-audit",
+      "keyword-research"
+    ],
+    "ultimate-transformation": [
+      "campaign-builder",
+      "bid-elevator",
+      "str-triage",
+      "listing-audit",
+      "keyword-research"
+    ]
   },
   "certificate": {
     "label": "Completion certificate",

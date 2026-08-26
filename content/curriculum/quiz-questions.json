@@ -454,93 +454,6 @@
     {
       "moduleNumber": 5,
       "title": "Portfolio Strategy Knowledge Check",
-      "description": "Test your understanding of campaign portfolios, budget pacing, and seasonal strategy.",
-      "questions": [
-        {
-          "order": 1,
-          "question": "At roughly what campaign count does it make sense to move from managing campaigns individually to grouping them into portfolios?",
-          "optionA": "2-3 campaigns",
-          "optionB": "10 or more campaigns",
-          "optionC": "100 or more campaigns",
-          "optionD": "Never — always manage every campaign individually",
-          "correctAnswer": "B",
-          "explanation": "Below roughly 10 campaigns, managing each one individually is still practical. Past that point, shared budgeting and consolidated reporting through portfolios save real time."
-        },
-        {
-          "order": 2,
-          "question": "A portfolio has a ₱60,000 monthly budget. Campaigns inside it have spent ₱57,000 combined with a few days left in the month. What happens once the portfolio's ₱60,000 is fully spent?",
-          "optionA": "Only the highest-spending campaign inside the portfolio pauses",
-          "optionB": "Every campaign inside the portfolio stops serving for the rest of the period, regardless of each one's own remaining budget",
-          "optionC": "The portfolio automatically raises its own budget to keep campaigns running",
-          "optionD": "Nothing — portfolio budgets are informational only and don't cap spend",
-          "correctAnswer": "B",
-          "explanation": "A portfolio budget is a spend cap for the whole group over the period. Once it's exhausted, every campaign inside stops serving, even one that still had room left on its own individual budget."
-        },
-        {
-          "order": 3,
-          "question": "Do negative keywords and bid adjustments apply across every campaign in a portfolio automatically?",
-          "optionA": "Yes — portfolios manage negatives and bids for every campaign inside them",
-          "optionB": "No — negatives and bid adjustments are campaign-level controls, so each campaign in a portfolio still needs its own",
-          "optionC": "Only bids are shared across the portfolio, not negatives",
-          "optionD": "Only negatives are shared across the portfolio, not bids",
-          "correctAnswer": "B",
-          "explanation": "Portfolios group campaigns for shared budgeting and reporting only. Negative keywords and bid adjustments stay campaign-level, so a new campaign added to a portfolio still needs its own negative list built or copied over."
-        },
-        {
-          "order": 4,
-          "question": "A campaign with a ₱1,500 daily budget has spent 80% of it by 11AM, three days running. What does this pattern indicate, and what's the fix?",
-          "optionA": "Normal pacing — no action needed",
-          "optionB": "Budget is too low for demand; raise the daily budget",
-          "optionC": "Budget is too high for demand; lower it",
-          "optionD": "The campaign should be paused immediately",
-          "correctAnswer": "B",
-          "explanation": "A good pacing target is 80-90% of the daily budget spent by end of day. Hitting 80% by 11AM repeatedly means the campaign is burning through budget in a few hours and going dark for the rest of the day — a sign to raise the budget, not a curiosity to ignore."
-        },
-        {
-          "order": 5,
-          "question": "Over what period is Amazon's stated daily budget actually averaged, and what does that mean for a single day's spend?",
-          "optionA": "Averaged over the calendar month; a single day can legitimately spend above the daily budget, up to an account-set over-delivery cap",
-          "optionB": "Averaged over a single week only",
-          "optionC": "It's a hard per-day cap that can never be exceeded",
-          "optionD": "Averaged over the product's entire lifetime on Amazon",
-          "correctAnswer": "A",
-          "explanation": "The daily budget is averaged over the calendar month, and Amazon allows a single high-traffic day to spend above that average, capped at either 25% or 100% over depending on the account's setting, as long as the month's total doesn't exceed daily budget times days in the month."
-        },
-        {
-          "order": 6,
-          "question": "ACoS rises from 20% to 32% during a seasonal push while margin stays flat and ad spend grows substantially. What should decide whether this is actually a problem?",
-          "optionA": "ACoS alone — any increase is a red flag that should be reversed",
-          "optionB": "Whether profit after ad spend (sales times margin, minus ad spend) still increases despite the higher ACoS",
-          "optionC": "Whether the client feels nervous about the number",
-          "optionD": "The absolute peso size of the ad spend increase, regardless of sales",
-          "correctAnswer": "B",
-          "explanation": "A higher ACoS during a seasonal push is expected and can still mean more money for the client, as long as the sales-volume increase outpaces the efficiency drop. Profit after ad spend is the number that actually answers whether the trade-off is worth it, not ACoS on its own."
-        },
-        {
-          "order": 7,
-          "question": "Per this module's seasonal calendar, when should Q4 (Christmas) PPC preparation start?",
-          "optionA": "October 1, when Q4 officially begins",
-          "optionB": "August, roughly two months ahead of the peak spending window",
-          "optionC": "The day after Black Friday",
-          "optionD": "Whenever the client happens to remember to ask",
-          "correctAnswer": "B",
-          "explanation": "Christmas prep starts in August: researching seasonal keywords, launching discovery campaigns, and testing seasonal messaging well before the November-December peak window."
-        },
-        {
-          "order": 8,
-          "question": "A seasonal profit-after-ad-spend calculation assumes margin stays flat between a normal month and a promotional month. What should you check before trusting that calculation?",
-          "optionA": "Nothing — margin never changes seasonally",
-          "optionB": "Whether the seller is running discounts or lower prices during the promotional push, which would lower the actual margin used in the calculation",
-          "optionC": "Whether the client has approved the calculation in writing",
-          "optionD": "Whether ACoS stays below 50% throughout the season",
-          "correctAnswer": "B",
-          "explanation": "Sellers often discount or run promotions during peak season, which lowers the actual margin. A profit-after-ad-spend projection built on a flat margin assumption needs to be redone with the real promotional margin, not treated as guaranteed."
-        }
-      ]
-    },
-    {
-      "moduleNumber": 5,
-      "title": "Portfolio Strategy Knowledge Check",
       "description": "Test your understanding of campaign portfolios, budget pacing, and seasonal strategy — the account-level skills for managing scale.",
       "questions": [
         {
@@ -782,53 +695,6 @@
     {
       "moduleNumber": 8,
       "title": "Competitive Intelligence Knowledge Check",
-      "description": "Test your understanding of Brand Analytics, share of voice, and competitor benchmarking.",
-      "questions": [
-        {
-          "order": 1,
-          "question": "What does Amazon Brand Analytics' Search Frequency Rank actually tell you about a search term?",
-          "optionA": "The exact number of monthly searches for that term",
-          "optionB": "A relative ranking against every other search term in the period — rank 1 is the most-searched, but the gap between ranks isn't a fixed size",
-          "optionC": "How many advertisers are currently bidding on that term",
-          "optionD": "The term's average CPC across the category",
-          "correctAnswer": "B",
-          "explanation": "Search Frequency Rank is relative, not absolute. Rank 1 is the single most-searched term in the period, and higher numbers mean less popular, but Amazon doesn't disclose actual search counts, and the gap between rank 5 and 6 isn't the same size as between rank 100 and 101."
-        },
-        {
-          "order": 2,
-          "question": "Per this lesson, what does a seller need beyond Brand Registry enrollment to actually access Amazon Brand Analytics?",
-          "optionA": "Nothing more — Brand Registry enrollment alone is sufficient",
-          "optionB": "An active Professional selling account and Brand Representative access assigned for the enrolled brand",
-          "optionC": "At least $10,000 in monthly ad spend",
-          "optionD": "A minimum of 100 product reviews",
-          "correctAnswer": "B",
-          "explanation": "Brand Registry enrollment alone isn't enough to see Brand Analytics. The account also needs an active Professional selling account and Brand Representative access assigned for that brand — confirm both before promising a client this data."
-        },
-        {
-          "order": 3,
-          "question": "Share of voice measures which of the following?",
-          "optionA": "How much a brand spends on advertising in total dollars",
-          "optionB": "A brand's visibility relative to competitors for a given keyword or category, not an absolute spend figure",
-          "optionC": "The number of five-star reviews a product has",
-          "optionD": "How many Sponsored Brands campaigns an account is running",
-          "correctAnswer": "B",
-          "explanation": "Share of voice is a relative visibility measure — how often a brand shows up for a keyword or category compared to competitors — not a dollar figure or a review count."
-        },
-        {
-          "order": 4,
-          "question": "A gap analysis dimension shows competitors averaging 2.5 (Strong/Medium) and you averaging 1.0 (Weak). Using the matrix's scoring rule (Opportunity = competitors' average at or below 1.5 and yours at or above 2; Vulnerability = competitors' average at or above 2 and yours at or below 1.5), what does this dimension represent?",
-          "optionA": "Opportunity — double down since you're clearly ahead of competitors here",
-          "optionB": "Vulnerability — competitors are strong here and you're weak, so this needs shoring up",
-          "optionC": "Neither — this dimension needs no action",
-          "optionD": "Not enough information — the four-point scale doesn't apply to this dimension",
-          "correctAnswer": "B",
-          "explanation": "This clears the vulnerability rule exactly: competitors' average (2.5) is at or above 2, and your average (1.0) is at or below 1.5. That combination means competitors are winning where you're weak — a gap to shore up, not one to leave for later."
-        }
-      ]
-    },
-    {
-      "moduleNumber": 8,
-      "title": "Competitive Intelligence Knowledge Check",
       "description": "Test your understanding of Brand Analytics, Share of Voice, and competitor benchmarking — turning competitive data into specific campaign actions.",
       "questions": [
         {
@@ -910,6 +776,147 @@
           "optionD": "New product launches are excluded from competitive analysis entirely",
           "correctAnswer": "B",
           "explanation": "Speed to market is a different thing from execution quality — a competitor can launch fast and badly, or slowly and well. Track it as a qualitative note rather than forcing it into the four-point score."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 9,
+      "title": "Weekly Optimization Knowledge Check",
+      "description": "Check your understanding of weekly routines, one-change testing, and evidence thresholds.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "How often should the deep optimization pass happen?",
+          "optionA": "Every hour",
+          "optionB": "Weekly",
+          "optionC": "Once a year",
+          "optionD": "Never",
+          "correctAnswer": "B",
+          "explanation": "A weekly review gives the account a repeatable rhythm without encouraging random daily changes."
+        },
+        {
+          "order": 2,
+          "question": "Why change one variable at a time?",
+          "optionA": "It makes work look slower",
+          "optionB": "So you can tell what worked",
+          "optionC": "Amazon requires it",
+          "optionD": "It always lowers CPC",
+          "correctAnswer": "B",
+          "explanation": "One variable creates a readable before-and-after result. Multiple changes make the result hard to interpret."
+        },
+        {
+          "order": 3,
+          "question": "A relevant term has 3 clicks and no orders. What is the safest default?",
+          "optionA": "Pause it",
+          "optionB": "Double the bid",
+          "optionC": "Watch and set a review date",
+          "optionD": "Add ten keywords",
+          "correctAnswer": "C",
+          "explanation": "Three clicks is a small sample. Watch the term unless the search is clearly irrelevant or risky."
+        },
+        {
+          "order": 4,
+          "question": "What belongs in a useful change log?",
+          "optionA": "Only the new bid",
+          "optionB": "Date, change, reason, owner, result, and review date",
+          "optionC": "The campaign password",
+          "optionD": "A screenshot with no context",
+          "correctAnswer": "B",
+          "explanation": "The record should let another person understand what changed, why, and what happens next."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 10,
+      "title": "Reporting and Troubleshooting Knowledge Check",
+      "description": "Check your understanding of client reporting and safe troubleshooting order.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "What should a client report include after the numbers?",
+          "optionA": "Only raw exports",
+          "optionB": "Trend, meaning, and next steps",
+          "optionC": "A new campaign promise",
+          "optionD": "Every search term",
+          "correctAnswer": "B",
+          "explanation": "A useful report connects the current numbers to a comparison, an interpretation, and a proposed action."
+        },
+        {
+          "order": 2,
+          "question": "An ad has no impressions. What should you check first?",
+          "optionA": "Campaign status, review state, eligibility, budget, and stock",
+          "optionB": "Double every bid",
+          "optionC": "Add ten new keywords",
+          "optionD": "Change the logo",
+          "correctAnswer": "A",
+          "explanation": "Confirm the ad can serve before changing traffic volume or economics."
+        },
+        {
+          "order": 3,
+          "question": "An ad has strong CTR but weak conversion. What is the most useful next question?",
+          "optionA": "Should you double the bid?",
+          "optionB": "Are the search terms relevant and is the listing ready?",
+          "optionC": "Should you pause every campaign?",
+          "optionD": "Should you ignore the result?",
+          "correctAnswer": "B",
+          "explanation": "Strong attention with weak orders points to search fit, listing, offer, price, or reviews before a larger bid change."
+        },
+        {
+          "order": 4,
+          "question": "Sales suddenly drop today. What should you check before changing bids?",
+          "optionA": "Stock, price, reviews, and competitors",
+          "optionB": "The campaign name",
+          "optionC": "The office Wi-Fi",
+          "optionD": "The highest suggested bid",
+          "correctAnswer": "A",
+          "explanation": "An offer or product problem can look like an ad problem. Check the boring basics first."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 11,
+      "title": "VA Workflow and Capstone Knowledge Check",
+      "description": "Check your understanding of cadence, permissions, SOPs, client communication, and capstone evidence.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "Which action normally needs manager approval?",
+          "optionA": "Downloading a report",
+          "optionB": "Pausing a whole campaign",
+          "optionC": "Adding a negative from a written rule",
+          "optionD": "Making an approved small bid move",
+          "correctAnswer": "B",
+          "explanation": "A whole-campaign pause is a large lever that can erase useful evidence and needs approval."
+        },
+        {
+          "order": 2,
+          "question": "What is a change log?",
+          "optionA": "A password list",
+          "optionB": "A record of changes with reasons and review",
+          "optionC": "A client invoice",
+          "optionD": "A keyword dump",
+          "correctAnswer": "B",
+          "explanation": "The log preserves the date, scope, evidence, reason, result, owner, and next review."
+        },
+        {
+          "order": 3,
+          "question": "What should a client update contain?",
+          "optionA": "Only good news",
+          "optionB": "Data, actions, risks, and next steps",
+          "optionC": "Every raw row",
+          "optionD": "An employment promise",
+          "correctAnswer": "B",
+          "explanation": "A professional update is short, truthful, forward-looking, and clear about risk."
+        },
+        {
+          "order": 4,
+          "question": "What makes capstone evidence useful?",
+          "optionA": "A high simulator score alone",
+          "optionB": "A long explanation with no source",
+          "optionC": "Source evidence, decision, rationale, owner, and review date",
+          "optionD": "A screenshot with no date",
+          "correctAnswer": "C",
+          "explanation": "A reviewer should be able to trace the recommendation from source evidence to action and follow-up."
         }
       ]
     }
