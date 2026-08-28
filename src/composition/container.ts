@@ -206,6 +206,7 @@ import { ToggleMaintenance } from "@/usecases/LMS/ToggleMaintenance";
 import { GetAnnouncements } from "@/usecases/LMS/GetAnnouncements";
 import { CreateAnnouncement } from "@/usecases/LMS/CreateAnnouncement";
 import { DismissAnnouncement } from "@/usecases/LMS/DismissAnnouncement";
+import { UpdateAnnouncement } from "@/usecases/LMS/UpdateAnnouncement";
 import { AdminListQuizzes } from "@/usecases/AdminListQuizzes";
 import { AdminGetQuiz } from "@/usecases/AdminGetQuiz";
 import { AdminCreateQuiz } from "@/usecases/AdminCreateQuiz";
@@ -385,6 +386,7 @@ export interface AppContainer {
   getAnnouncements: GetAnnouncements;
   createAnnouncement: CreateAnnouncement;
   dismissAnnouncement: DismissAnnouncement;
+  updateAnnouncement: UpdateAnnouncement;
 
   // External services
   paymentGateway: IPaymentGateway;
