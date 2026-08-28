@@ -62,6 +62,8 @@ import type {
   ListingAuditInput,
   ListingImage,
 } from "@/domain/simulator/listing-audit/ListingAuditInput";
+// STORY-083: Listing Audit Rule
+import type { ListingAuditRule } from "@/domain/entities/ListingAuditRule";
 import type {
   ListingAuditOutput,
   FindingAction,
@@ -316,6 +318,15 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
 
   let simOutput: ListingAuditOutput;
   try {
+    // STORY-083: Fetch ListingAuditRule for context-aware ground truth
+    let listingAuditRules: any[] = [];
+    if (container.listingAuditRuleRepo) {
+      const rulesResult = await container.listingAuditRuleRepo.listActive();
+      if (rulesResult.ok) {
+        listingAuditRules = rulesResult.value;
+      }
+    }
+
     const simInput: ListingAuditInput = {
       title,
       bullets,
@@ -331,6 +342,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
       primaryKeywords: scenario.content.primaryKeywords,
       complianceEvidence: scenario.content.complianceEvidence,
       userFindingActions: { ...userFindingActions },
+      listingAuditRules, // STORY-083: pass rules to simulator
     };
     simOutput = (await sim.run(simInput)) as ListingAuditOutput;
   } catch (err) {

@@ -1186,6 +1186,29 @@ model UserSkill {
 // This is implemented via environment variable, not a database model
 // The Maintenance model tracks maintenance windows and messages
 
+model ListingAuditRule {
+  id                   String    @id @default(cuid())
+  ruleId               String
+  dimension            String
+  severity             String
+  applicableCategories String[]  @default([])
+  conditions           Json
+  action               Json
+  priority             Int       @default(0)
+  isActive             Boolean   @default(true)
+  createdBy            String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@unique([ruleId, dimension, severity, priority])
+  @@index([ruleId])
+  @@index([dimension])
+  @@index([severity])
+  @@index([isActive])
+  @@index([priority])
+  @@map("listing_audit_rules")
+}
+
 model Maintenance {
   id              String    @id @default(cuid())
   isActive        Boolean   @default(false)

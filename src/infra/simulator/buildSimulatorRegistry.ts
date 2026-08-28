@@ -14,6 +14,8 @@ import { BidElevatorSimulator } from "@/domain/simulator/bid-elevator/BidElevato
 import { StrTriageSimulator } from "@/domain/simulator/str-triage/StrTriageSimulator";
 import { CampaignBuilderSimulator } from "@/domain/simulator/campaign-builder/CampaignBuilderSimulator";
 import { ListingAuditSimulator } from "@/domain/simulator/listing-audit/ListingAuditSimulator";
+// STORY-089: Connected Account Simulator
+import { ConnectedAccountSimulator } from "@/domain/simulator/connected-account/ConnectedAccountSimulator";
 import { KeywordResearchSimulator } from "@/domain/simulator/keyword-research/KeywordResearchSimulator";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 

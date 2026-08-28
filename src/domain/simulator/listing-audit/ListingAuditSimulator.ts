@@ -862,23 +862,67 @@ const OVERRIDE_RESOLVERS: Readonly<
 export function resolveExpectedAction(
   finding: AuditFinding,
   ctx: RuleContext,
+  databaseRules: readonly import("@/domain/entities/ListingAuditRule").ListingAuditRule[] = [],
 ): ExpectedActionResult {
   const criticalGateResult = resolveCriticalGate(finding, ctx);
   if (criticalGateResult) return criticalGateResult;
 
+  // STORY-083: Check database rules first (persisted ListingAuditRule)
+  const ruleBasedResult = resolveFromDatabaseRules(finding, ctx, databaseRules);
+  if (ruleBasedResult) return ruleBasedResult;
+
+  // STORY-083: Fall back to hardcoded OVERRIDE_RESOLVERS
   const override = OVERRIDE_RESOLVERS[finding.ruleId]?.(finding, ctx);
   if (override) return override;
 
   return defaultResolution(finding);
 }
 
+/**
+ * STORY-083: Resolve action from persisted ListingAuditRule entities.
+ * Returns the first matching rule's action, or null if no rule matches.
+ */
+function resolveFromDatabaseRules(
+  finding: AuditFinding,
+  ctx: RuleContext,
+  rules: readonly import("@/domain/entities/ListingAuditRule").ListingAuditRule[],
+): ExpectedActionResult | null {
+  const context = {
+    category: finding.category,
+    imagesCount: ctx.images.length,
+    hasAPlus: ctx.hasAPlus,
+    hasVideo: ctx.hasVideo,
+    price: ctx.price,
+    seasonalPeriod: ctx.seasonalPeriod,
+    attributes: ctx.structuredAttributes,
+  };
+
+  const result = import("@/domain/entities/ListingAuditRule").resolveExpectedAction(
+    rules,
+    {
+      ruleId: finding.ruleId,
+      dimension: finding.dimension,
+      severity: finding.severity,
+    },
+    context,
+  );
+
+  return {
+    expectedAction: result.expectedAction,
+    acceptedActions: result.acceptedActions,
+    rationale: result.rationale,
+    evidenceRefs: [],
+  };
+}
+
 function buildGradedFindings(
   findings: readonly AuditFinding[],
   userFindingActions: Readonly<Record<string, FindingAction>> | undefined,
   ctx: RuleContext,
+  databaseRules: readonly import("@/domain/entities/ListingAuditRule").ListingAuditRule[] = [],
 ): GradedFinding[] {
   return findings.map((f) => {
-    const resolution = resolveExpectedAction(f, ctx);
+    const resolution = resolveExpectedAction(f, ctx, databaseRules);
     const userChoice = userFindingActions?.[f.id];
     const isCorrect = userChoice !== undefined && resolution.acceptedActions.includes(userChoice);
     return {

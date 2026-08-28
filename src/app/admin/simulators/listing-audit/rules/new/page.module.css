@@ -1,0 +1,155 @@
+/* New rule page styles */
+
+.card {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: var(--fs-24);
+  font-weight: 700;
+  margin-bottom: var(--sp-2);
+  color: var(--c-shell-ink);
+}
+
+.description {
+  color: var(--c-shell-faint);
+  margin-bottom: var(--sp-6);
+  font-size: var(--fs-15);
+  line-height: 1.6;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.sectionTitle {
+  font-size: var(--fs-16);
+  font-weight: 700;
+  color: var(--c-shell-ink);
+}
+
+.sectionDescription {
+  font-size: var(--fs-14);
+  color: var(--c-shell-faint);
+  line-height: 1.5;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.label {
+  font-weight: 600;
+  font-size: var(--fs-14);
+  color: var(--c-shell-ink);
+}
+
+.input,
+.select,
+.textarea {
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-shell-line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--c-shell-ink);
+  font-size: var(--fs-15);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--c-orange);
+  box-shadow: 0 0 0 2px var(--c-orange-soft);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  cursor: pointer;
+  font-size: var(--fs-14);
+  color: var(--c-shell-ink);
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--c-orange);
+}
+
+.conditionsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.conditionRow {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+}
+
+.addButton {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-weight: 600;
+  font-size: var(--fs-13);
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.addButton:hover {
+  background: var(--c-orange-light);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--sp-2);
+}
+
+.submitButton {
+  padding: var(--sp-3) var(--sp-8);
+  border-radius: var(--r-md);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-weight: 700;
+  font-size: var(--fs-15);
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.submitButton:hover {
+  background: var(--c-orange-light);
+}
