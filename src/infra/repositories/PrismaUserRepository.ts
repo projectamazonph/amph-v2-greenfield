@@ -81,6 +81,7 @@ export class PrismaUserRepository implements UserRepository {
           simulatorAccess: "NONE",
           enrolledCourseIds: [],
           twoFactorEnabled: false,
+          requires2FA: false,
         },
       });
       return Result.ok(this.mapRow(row));
@@ -109,6 +110,7 @@ export class PrismaUserRepository implements UserRepository {
       emailVerifiedAt: Date | null;
       passwordHash: string;
       twoFactorEnabled: boolean;
+      requires2FA: boolean;
       subscriptionTier: SubscriptionTier;
     }>,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
@@ -335,6 +337,7 @@ export class PrismaUserRepository implements UserRepository {
       verificationStatus: row.verificationStatus,
       enrolledCourseIds: Object.freeze([...row.enrolledCourseIds]),
       twoFactorEnabled: row.twoFactorEnabled,
+      requires2FA: row.requires2FA,
       createdAt: row.createdAt,
       totalXp: row.totalXp,
       emailVerifiedAt: row.emailVerifiedAt,

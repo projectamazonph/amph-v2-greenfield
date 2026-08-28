@@ -76,6 +76,7 @@ export class InMemoryUserRepository implements UserRepository {
       verificationStatus: "UNVERIFIED" as const,
       enrolledCourseIds: Object.freeze([]),
       twoFactorEnabled: false,
+      requires2FA: false,
       createdAt: new Date(),
       totalXp: 0,
       emailVerifiedAt: null,
@@ -99,6 +100,7 @@ export class InMemoryUserRepository implements UserRepository {
       lastName: string;
       avatarUrl: string;
       bio: string;
+      requires2FA: boolean;
       enrolledCourseIds: readonly string[];
       emailVerifiedAt: Date | null;
       passwordHash: string;

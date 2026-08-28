@@ -42,6 +42,12 @@ export interface User {
    * hash — see UserRepository.getTwoFactorSecret()/setTwoFactorSecret().
    */
   readonly twoFactorEnabled: boolean;
+  /**
+   * Whether this user is required to have 2FA enabled to access admin routes.
+   * Default false for existing users; new ADMIN users get true.
+   * Enforced in proxy.ts and requireAdmin().
+   */
+  readonly requires2FA: boolean;
   readonly createdAt: Date;
   /** Total XP earned by the user (mutable, updated via XPService). */
   totalXp: number;
@@ -82,6 +88,7 @@ export function createUser(params: {
   verificationStatus?: VerificationStatus;
   enrolledCourseIds?: readonly string[];
   twoFactorEnabled?: boolean;
+  requires2FA?: boolean;
   createdAt?: Date;
   totalXp?: number;
   emailVerifiedAt?: Date | null;
@@ -105,6 +112,7 @@ export function createUser(params: {
       verificationStatus: params.verificationStatus ?? "UNVERIFIED",
       enrolledCourseIds: Object.freeze([...(params.enrolledCourseIds ?? [])]),
       twoFactorEnabled: params.twoFactorEnabled ?? false,
+      requires2FA: params.requires2FA ?? false,
       createdAt: params.createdAt ?? new Date(),
       totalXp: params.totalXp ?? 0,
       emailVerifiedAt: params.emailVerifiedAt ?? null,

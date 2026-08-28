@@ -18,6 +18,7 @@ const ADMIN: User = {
   verificationStatus: "VERIFIED",
   enrolledCourseIds: [],
   twoFactorEnabled: false,
+  requires2FA: false,
   createdAt: new Date(),
   totalXp: 0,
   emailVerifiedAt: null,
@@ -67,5 +68,21 @@ describe("UserCard", () => {
     // The avatar div has the _avatar_* class; we just verify the
     // element exists with some class.
     expect(html).toMatch(/<div class="[^"]*avatar[^"]*"/);
+  });
+
+  it("renders 2FA badge when twoFactorEnabled is true", () => {
+    const userWith2FA: User = {
+      ...ADMIN,
+      twoFactorEnabled: true,
+      requires2FA: true,
+    };
+    const html = render(userWith2FA);
+    expect(html).toContain("2FA");
+    expect(html).toContain('title="Two-factor authentication enabled"');
+  });
+
+  it("does not render 2FA badge when twoFactorEnabled is false", () => {
+    const html = render();
+    expect(html).not.toContain("2FA");
   });
 });
