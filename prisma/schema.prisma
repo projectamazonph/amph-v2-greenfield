@@ -899,3 +899,303 @@ model Resource {
   @@index([accessTier])
   @@map("resources")
 }
+
+
+// =============================================================================
+// P4 LMS Models (PR-A)
+// =============================================================================
+
+// --- P0: Payments & Invoicing ---
+
+model Payment {
+  id              String    @id @default(cuid())
+  orderId         String
+  amount          Int       // Stored as cents (PHP)
+  currency        String    @default("PHP")
+  paymentMethod   String    // gcash, maya, card, bank_transfer
+  transactionId   String?   // External payment provider transaction ID
+  status          String    @default("pending") // pending, completed, failed, refunded
+  metadata        Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([orderId])
+  @@index([transactionId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Invoice {
+  id              String    @id @default(cuid())
+  orderId         String    @unique
+  userId          String
+  amount          Int       // Stored as cents (PHP)
+  taxAmount       Int       @default(0)
+  totalAmount     Int       // amount + taxAmount
+  status          String    @default("draft") // draft, sent, paid, cancelled, void
+  invoiceNumber   String    @unique
+  dueDate         DateTime?
+  paidAt          DateTime?
+  birFormType     String?   // For Philippine BIR compliance
+  birReference     String?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@map("invoices")
+}
+
+// --- P1: Learning Management ---
+
+model Prerequisite {
+  id              String    @id @default(cuid())
+  courseId        String
+  requiredCourseId String
+  // A prerequisite can be: complete course, pass quiz, achieve badge
+  type            String    @default("course_completion") // course_completion, quiz_pass, badge_earned
+  minimumScore    Int?      // For quiz_pass type
+  createdAt       DateTime  @default(now())
+
+  @@unique([courseId, requiredCourseId, type])
+  @@index([courseId])
+  @@index([requiredCourseId])
+  @@map("prerequisites")
+}
+
+model Assignment {
+  id              String    @id @default(cuid())
+  userId          String
+  courseId        String
+  moduleId        String?
+  lessonId        String?
+  assignedById    String
+  assignedAt      DateTime  @default(now())
+  dueAt           DateTime?
+  status          String    @default("assigned") // assigned, in_progress, submitted, graded, overdue
+  submissionUrl   String?
+  feedback        String?
+  grade           Int?
+  maxGrade        Int       @default(100)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([status])
+  @@map("assignments")
+}
+
+// Note: Resource model already exists above
+
+model OAuthAccount {
+  id              String    @id @default(cuid())
+  userId          String
+  provider        String    // google, facebook, github, etc.
+  providerAccountId String
+  accessToken     String?
+  refreshToken    String?
+  expiresAt       DateTime?
+  tokenType       String?
+  scope           String?
+  sessionState    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
+
+model Setting {
+  id              String    @id @default(cuid())
+  key             String    @unique
+  value           Json?
+  description     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([key])
+  @@map("settings")
+}
+
+// Note: EmailTemplate model already exists
+
+model Announcement {
+  id              String    @id @default(cuid())
+  title           String
+  content         String
+  severity        String    @default("info") // info, warning, critical
+  isActive        Boolean   @default(true)
+  startAt         DateTime?
+  endAt           DateTime?
+  createdById     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([startAt])
+  @@index([endAt])
+  @@map("announcements")
+}
+
+model Leaderboard {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  type            String    @default("xp") // xp, completion, quiz_score
+  timeframe       String    @default("all_time") // all_time, weekly, monthly
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([type])
+  @@map("leaderboards")
+}
+
+model LeaderboardEntry {
+  id              String    @id @default(cuid())
+  leaderboardId   String
+  userId          String
+  rank            Int
+  score           Int
+  metadata        Json?
+  periodStart     DateTime
+  periodEnd       DateTime
+  createdAt       DateTime  @default(now())
+
+  @@unique([leaderboardId, userId, periodStart])
+  @@index([leaderboardId])
+  @@index([userId])
+  @@index([rank])
+  @@map("leaderboard_entries")
+}
+
+model DropOff {
+  id              String    @id @default(cuid())
+  userId          String
+  courseId        String?
+  moduleId        String?
+  lessonId        String?
+  droppedAt       DateTime  @default(now())
+  resumedAt       DateTime?
+  reason          String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([droppedAt])
+  @@map("drop_offs")
+}
+
+model QuizBank {
+  id              String    @id @default(cuid())
+  question        String
+  options         Json      // Array of option objects
+  correctAnswer   Json      // Array of correct option indices or IDs
+  explanation     String?
+  difficulty      String    @default("medium") // easy, medium, hard
+  category        String?
+  tags            String[]  @default([])
+  isPublished     Boolean   @default(false)
+  createdById     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([isPublished])
+  @@index([category])
+  @@index([difficulty])
+  @@map("quiz_bank")
+}
+
+model Affiliate {
+  id              String    @id @default(cuid())
+  userId          String?   // Optional: if affiliate is a registered user
+  code            String    @unique
+  name            String
+  email           String?
+  commissionRate  Float     @default(0.1) // 10% default
+  payoutMethod    String?   // gcash, paypal, bank
+  payoutDetails   Json?     // Bank account, PayPal email, etc.
+  totalEarnings   Int       @default(0) // Stored as cents
+  paidEarnings    Int       @default(0)
+  status          String    @default("active") // active, suspended, terminated
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([code])
+  @@index([status])
+  @@map("affiliates")
+}
+
+model AffiliateConversion {
+  id              String    @id @default(cuid())
+  affiliateId     String
+  userId          String
+  orderId         String?
+  amount          Int       // Conversion amount in cents
+  commission      Int       // Commission earned in cents
+  status          String    @default("pending") // pending, paid, cancelled
+  paidAt          DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([affiliateId])
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+  @@map("affiliate_conversions")
+}
+
+model SkillMap {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  skills          Json      // Hierarchical skill structure
+  version         Int       @default(1)
+  isPublished     Boolean   @default(false)
+  createdById     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([isPublished])
+  @@map("skill_maps")
+}
+
+model UserSkill {
+  id              String    @id @default(cuid())
+  userId          String
+  skillMapId      String
+  skillId         String    // Reference to skill in the skill map
+  proficiency     Int       @default(0) // 0-100
+  lastAssessedAt  DateTime?
+  evidenceUrl     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([userId, skillMapId, skillId])
+  @@index([userId])
+  @@index([skillMapId])
+  @@map("user_skills")
+}
+
+// --- P1-08: Maintenance Mode ---
+
+// This is implemented via environment variable, not a database model
+// The Maintenance model tracks maintenance windows and messages
+
+model Maintenance {
+  id              String    @id @default(cuid())
+  isActive        Boolean   @default(false)
+  message         String?
+  startAt         DateTime?
+  endAt           DateTime?
+  createdById     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([isActive])
+  @@map("maintenance")
+}
