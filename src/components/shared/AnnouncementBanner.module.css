@@ -1,0 +1,55 @@
+/* AnnouncementBanner styles */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  border: 1px solid;
+  border-radius: var(--r-md);
+}
+
+.content {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-4);
+  flex: 1;
+  overflow: hidden;
+}
+
+.title {
+  font-weight: 700;
+  font-size: var(--fs-15);
+  color: var(--c-shell-ink);
+}
+
+.message {
+  font-size: var(--fs-14);
+  color: var(--c-shell-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dismiss {
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-size: var(--fs-20);
+  color: var(--c-shell-ink);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  line-height: 1;
+}
+
+.dismiss:hover {
+  opacity: 1;
+}
