@@ -40,7 +40,10 @@ export class AdminUpdateDiscountCode {
   async execute(input: AdminUpdateDiscountCodeInput): Promise<AdminUpdateDiscountCodeResult> {
     const findResult = await this.deps.discountCodeRepo.findById(input.id);
     if (!findResult.ok) {
-      return findResult as unknown as AdminUpdateDiscountCodeResult;
+      const validationErrors = findResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as DiscountCodeError | DiscountCodeRepositoryError);
     }
     if (findResult.value === null) {
       void this.deps.recordAuditLog.execute({
@@ -62,7 +65,10 @@ export class AdminUpdateDiscountCode {
         targetType: "discount_code",
         metadata: { error: updateResult.error.kind },
       });
-      return updateResult as unknown as AdminUpdateDiscountCodeResult;
+      const validationErrors = updateResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as DiscountCodeError | DiscountCodeRepositoryError);
     }
 
     const persistResult = await this.deps.discountCodeRepo.update(updateResult.value);
@@ -74,7 +80,10 @@ export class AdminUpdateDiscountCode {
         targetType: "discount_code",
         metadata: { error: persistResult.error.kind === "db_error" ? persistResult.error.message : persistResult.error.kind },
       });
-      return persistResult as unknown as AdminUpdateDiscountCodeResult;
+      const validationErrors = persistResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as DiscountCodeError | DiscountCodeRepositoryError);
     }
 
     void this.deps.recordAuditLog.execute({

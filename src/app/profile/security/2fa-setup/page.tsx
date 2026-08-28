@@ -42,10 +42,7 @@ export default async function StudentTwoFactorSetupPage({
   const container = buildContainer();
   const secretResult = await container.userRepo.getTwoFactorSecret(session.id);
   if (!secretResult.ok) {
-    if (secretResult.error.kind === "not_found") {
-      redirect("/profile/security");
-    }
-    throw new Error("Failed to load two-factor setup");
+    redirect("/profile/security");
   }
   const secret = secretResult.value;
 

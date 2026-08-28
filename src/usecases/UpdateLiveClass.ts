@@ -37,7 +37,7 @@ export class UpdateLiveClass {
   async execute(input: UpdateLiveClassInput): Promise<UpdateLiveClassResult> {
     const findResult = await this.deps.liveClassRepo.findById(input.id);
     if (!findResult.ok) {
-      return findResult as unknown as UpdateLiveClassResult;
+      return findResult;
     }
     if (findResult.value === null) {
       void this.deps.recordAuditLog.execute({
@@ -59,7 +59,10 @@ export class UpdateLiveClass {
         targetType: "live_class",
         metadata: { error: updateResult.error.kind },
       });
-      return updateResult as unknown as UpdateLiveClassResult;
+      const validationErrors = updateResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as LiveClassError | LiveClassRepositoryError);
     }
 
     const persistResult = await this.deps.liveClassRepo.update(
@@ -77,7 +80,7 @@ export class UpdateLiveClass {
             : persistResult.error.kind,
         },
       });
-      return persistResult as unknown as UpdateLiveClassResult;
+      return persistResult;
     }
 
     void this.deps.recordAuditLog.execute({

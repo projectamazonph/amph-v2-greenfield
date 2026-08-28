@@ -12,7 +12,11 @@ export default async function CertificatesPage() {
   if (!user) redirect("/login?redirect=%2Fcertificates");
   const container = buildContainer();
   const certificatesResult = await container.certificateRepo.findByUserId(user.id);
-  if (!certificatesResult.ok) throw new Error("Failed to load certificates");
+  if (!certificatesResult.ok) return <StudentShell user={user}>
+    <main id="main-content" className={styles.page}>
+      <p>Failed to load certificates. Please try again later.</p>
+    </main>
+  </StudentShell>;
   const certificates = certificatesResult.value;
   const courseResults = await Promise.all(
     certificates.map((certificate) => container.courseRepo.findById(certificate.courseId)),
@@ -39,9 +43,12 @@ export default async function CertificatesPage() {
         ) : (
           <div className={styles.grid}>
             {certificates.map((certificate, index) => {
+
+              if (!certificate) return null;
               const courseResult = courseResults[index];
               if (!courseResult?.ok && courseResult?.error.kind === "db_error") {
-                throw new Error("Failed to load certificate course");
+        // Skip this certificate if course lookup fails
+        return null;
               }
               const courseTitle = courseResult?.ok ? courseResult.value.title : "Completed course";
               return (
@@ -65,7 +72,7 @@ export default async function CertificatesPage() {
                   </Link>
                 </article>
               );
-            })}
+            }).filter(Boolean)
           </div>
         )}
       </main>

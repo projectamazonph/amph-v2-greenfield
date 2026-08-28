@@ -36,7 +36,7 @@ export class DeleteResource {
         targetType: "resource",
         metadata: { error: findResult.error.kind },
       });
-      return findResult as unknown as DeleteResourceResult;
+      return findResult;
     }
 
     const alreadyUnpublished = findResult.value === null || !findResult.value.isPublished;
@@ -51,7 +51,7 @@ export class DeleteResource {
           targetType: "resource",
           metadata: { error: deleteResult.error.kind },
         });
-        return deleteResult as unknown as DeleteResourceResult;
+        return deleteResult;
       }
 
       void this.deps.recordAuditLog.execute({

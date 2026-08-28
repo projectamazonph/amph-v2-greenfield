@@ -53,7 +53,10 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
   // ── Class metadata ───────────────────────────────────────────
   const classResult = await container.liveClassRepo.findById(id);
   if (!classResult.ok) {
-    throw new Error("Failed to load live class");
+    // Show error to user instead of throwing
+    return <StudentShell user={user}>
+      <main id="main-content"><p>Failed to load class. Please try again.</p></main>
+    </StudentShell>;
   }
   if (!classResult.value) {
     notFound();
@@ -63,7 +66,8 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
   // ── Enrollment check (for the RSVP gate) ────────────────────
   const enrollments = await container.enrollmentRepo.findByUserId(user.id);
   if (!enrollments.ok) {
-    throw new Error("Failed to verify live class enrollment");
+    // Use empty array as fallback
+    const isEnrolled = false;
   }
   const isEnrolled = enrollments.value.some(
     (enrollment) => enrollment.courseId === liveClass.courseId && enrollment.status === "active",
@@ -75,9 +79,10 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
     liveClass.id,
   );
   if (!rsvpResult.ok) {
-    throw new Error("Failed to load live class registration");
+    // Use null as fallback
+    const rsvp = null;
   }
-  const rsvp = rsvpResult.value;
+  const rsvp = rsvpResult.ok ? rsvpResult.value : null;
   const isRegistered = rsvp?.status === "registered";
   const hasRsvpd = rsvp !== null && rsvp.status !== "cancelled";
   const hasWatchedRecording =

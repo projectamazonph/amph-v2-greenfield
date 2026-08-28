@@ -18,11 +18,13 @@ import type { Lesson } from "@/domain/entities/Lesson";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IModuleRepository } from "@/ports/repositories/IModuleRepository";
 import type { ILessonRepository } from "@/ports/repositories/ILessonRepository";
+import type { Logger } from "@/ports/observability/Logger";
 
 export interface RebuildCourseCurriculumDeps {
   courseRepo: CourseRepository;
   moduleRepo: IModuleRepository;
   lessonRepo: ILessonRepository;
+  logger: Logger;
 }
 
 export interface RebuildCourseCurriculumResult {
@@ -35,19 +37,19 @@ export class RebuildCourseCurriculum {
   async execute(courseId: string): Promise<RebuildCourseCurriculumResult> {
     const courseResult = await this.deps.courseRepo.findById(courseId);
     if (!courseResult.ok) {
-      console.error(
-        `[RebuildCourseCurriculum] course ${courseId} not found, skipping rebuild:`,
-        courseResult.error,
-      );
+      this.deps.logger.error("RebuildCourseCurriculum: course not found, skipping rebuild", {
+        courseId,
+        error: courseResult.error,
+      });
       return { rebuilt: false };
     }
 
     const modulesResult = await this.deps.moduleRepo.findByCourseId(courseId);
     if (!modulesResult.ok) {
-      console.error(
-        `[RebuildCourseCurriculum] failed to load modules for course ${courseId}:`,
-        modulesResult.error,
-      );
+      this.deps.logger.error("RebuildCourseCurriculum: failed to load modules", {
+        courseId,
+        error: modulesResult.error,
+      });
       return { rebuilt: false };
     }
 
@@ -55,10 +57,10 @@ export class RebuildCourseCurriculum {
     for (const mod of modulesResult.value) {
       const lessonsResult = await this.deps.lessonRepo.findByModuleId(mod.id);
       if (!lessonsResult.ok) {
-        console.error(
-          `[RebuildCourseCurriculum] failed to load lessons for module ${mod.id}:`,
-          lessonsResult.error,
-        );
+        this.deps.logger.error("RebuildCourseCurriculum: failed to load lessons", {
+          moduleId: mod.id,
+          error: lessonsResult.error,
+        });
         return { rebuilt: false };
       }
       lessonsByModuleId.set(mod.id, lessonsResult.value);
@@ -74,10 +76,10 @@ export class RebuildCourseCurriculum {
       curriculum,
     });
     if (!updateResult.ok) {
-      console.error(
-        `[RebuildCourseCurriculum] failed to persist rebuilt curriculum for course ${courseId}:`,
-        updateResult.error,
-      );
+      this.deps.logger.error("RebuildCourseCurriculum: failed to persist rebuilt curriculum", {
+        courseId,
+        error: updateResult.error,
+      });
       return { rebuilt: false };
     }
 
