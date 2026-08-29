@@ -16,6 +16,8 @@ const twoFactorErrorMessage: Record<string, string> = {
   wrong_password: "Incorrect password. Two-factor authentication was not disabled.",
   user_not_found: "Something went wrong. Please try again.",
   db_error: "Something went wrong. Please try again.",
+  twoFactorRequired:
+    "Two-factor authentication is required for all admin accounts. Please enable it below.",
 };
 
 export default async function SettingsPage({
@@ -23,7 +25,7 @@ export default async function SettingsPage({
 }: {
   searchParams: Promise<{ error?: string; "2fa"?: string }>;
 }) {
-  const session = await requireAdmin();
+  const session = await requireAdmin(undefined, true);
   const sp = await searchParams;
   const twoFactorNotice =
     sp["2fa"] === "enabled"
@@ -119,7 +121,7 @@ export default async function SettingsPage({
         <h2 className={styles.sectionTitle}>Two-factor authentication</h2>
         <p className={styles.help}>
           Adds a 6-digit code from an authenticator app to your login, on top of your password.
-          Opt-in — other admin accounts are unaffected until they enable it themselves.
+          Required for all admin accounts.
         </p>
 
         {twoFactorNotice && <p className={styles.twoFactorNotice}>{twoFactorNotice}</p>}
