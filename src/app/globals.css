@@ -20,6 +20,7 @@
   --c-orange-d: #9b3e00;
   --c-orange-soft: #fef3e7;
   --c-orange-tint: #fce3c2;
+  --c-orange-light: #fff2e6;
 
   /* Surfaces */
   --c-bg: #f7f8fa;
@@ -90,6 +91,14 @@
   --info: var(--c-blue);
   --info-soft: var(--c-blue-bg);
   --info-hover: var(--c-blue-text);
+  --c-success: var(--c-green);
+  --c-info: var(--c-blue);
+  --c-warning: var(--c-amber);
+  --c-error: var(--c-red);
+  --c-success-soft: var(--c-green-bg);
+  --c-info-soft: var(--c-blue-bg);
+  --c-warning-soft: var(--c-amber-bg);
+  --c-error-soft: var(--c-red-bg);
 
   /* Typography. Font variables are supplied by next/font in layout.tsx. */
   --font-disp: var(--font-display);
@@ -103,6 +112,8 @@
   --text-3xl: 2rem;
   --text-4xl: 2.5rem;
   --fs-12: 12px;
+  --fs-10: 10px;
+  --fs-11: 11px;
   --fs-13: 13px;
   --fs-14: 14px;
   --fs-15: 15px;

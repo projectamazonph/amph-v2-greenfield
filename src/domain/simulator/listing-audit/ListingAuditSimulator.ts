@@ -34,6 +34,9 @@ import type {
   CategoryVariant,
 } from "./ListingAuditOutput";
 
+import type { ListingAuditRule } from "@/domain/entities/ListingAuditRule";
+import { resolveExpectedAction as resolveExpectedActionFromRule } from "@/domain/entities/ListingAuditRule";
+
 // ── Category variants ──────────────────────────────────────────────────────
 
 interface CategoryVariantConfig {
@@ -862,7 +865,7 @@ const OVERRIDE_RESOLVERS: Readonly<
 export function resolveExpectedAction(
   finding: AuditFinding,
   ctx: RuleContext,
-  databaseRules: readonly import("@/domain/entities/ListingAuditRule").ListingAuditRule[] = [],
+  databaseRules: readonly ListingAuditRule[] = [],
 ): ExpectedActionResult {
   const criticalGateResult = resolveCriticalGate(finding, ctx);
   if (criticalGateResult) return criticalGateResult;
@@ -885,7 +888,7 @@ export function resolveExpectedAction(
 function resolveFromDatabaseRules(
   finding: AuditFinding,
   ctx: RuleContext,
-  rules: readonly import("@/domain/entities/ListingAuditRule").ListingAuditRule[],
+  rules: readonly ListingAuditRule[],
 ): ExpectedActionResult | null {
   const context = {
     category: finding.category,
@@ -897,7 +900,7 @@ function resolveFromDatabaseRules(
     attributes: ctx.structuredAttributes,
   };
 
-  const result = import("@/domain/entities/ListingAuditRule").resolveExpectedAction(
+  const result = resolveExpectedActionFromRule(
     rules,
     {
       ruleId: finding.ruleId,
@@ -906,6 +909,17 @@ function resolveFromDatabaseRules(
     },
     context,
   );
+
+  // Only return a result if a rule matched; otherwise return null
+  // to fall through to OVERRIDE_RESOLVERS
+  const matchingRules = rules.filter(
+    (r) =>
+      r.ruleId === finding.ruleId &&
+      r.dimension === finding.dimension &&
+      r.severity === finding.severity,
+  );
+
+  if (matchingRules.length === 0) return null;
 
   return {
     expectedAction: result.expectedAction,
@@ -919,7 +933,7 @@ function buildGradedFindings(
   findings: readonly AuditFinding[],
   userFindingActions: Readonly<Record<string, FindingAction>> | undefined,
   ctx: RuleContext,
-  databaseRules: readonly import("@/domain/entities/ListingAuditRule").ListingAuditRule[] = [],
+  databaseRules: readonly ListingAuditRule[] = [],
 ): GradedFinding[] {
   return findings.map((f) => {
     const resolution = resolveExpectedAction(f, ctx, databaseRules);

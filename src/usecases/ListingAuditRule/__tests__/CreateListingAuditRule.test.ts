@@ -8,7 +8,7 @@ import { Result } from "@/domain/shared/Result";
 import { InMemoryListingAuditRuleRepository } from "@/infra/repositories/InMemoryListingAuditRuleRepository";
 import { CreateListingAuditRule } from "@/usecases/ListingAuditRule/CreateListingAuditRule";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
-import { SystemClock } from "@/infra/system/SystemClock";
+import { SystemClock } from "@/ports/system/Clock";
 
 describe("CreateListingAuditRule", () => {
   let repo: InMemoryListingAuditRuleRepository;

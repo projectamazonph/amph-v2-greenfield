@@ -9,7 +9,7 @@ import { InMemoryListingAuditRuleRepository } from "@/infra/repositories/InMemor
 import { ListListingAuditRules } from "@/usecases/ListingAuditRule/ListListingAuditRules";
 import { createListingAuditRule } from "@/domain/entities/ListingAuditRule";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
-import { SystemClock } from "@/infra/system/SystemClock";
+import { SystemClock } from "@/ports/system/Clock";
 
 describe("ListListingAuditRules", () => {
   let repo: InMemoryListingAuditRuleRepository;
@@ -29,7 +29,7 @@ describe("ListListingAuditRules", () => {
   it("should return all rules", async () => {
     const idGen = new InMemoryIdGenerator();
     const clock = new SystemClock();
-    
+
     const rule1 = createListingAuditRule({
       id: idGen.newId(),
       ruleId: "rule1",
@@ -44,7 +44,7 @@ describe("ListListingAuditRules", () => {
       createdAt: clock.now(),
       updatedAt: clock.now(),
     });
-    
+
     const rule2 = createListingAuditRule({
       id: idGen.newId(),
       ruleId: "rule2",

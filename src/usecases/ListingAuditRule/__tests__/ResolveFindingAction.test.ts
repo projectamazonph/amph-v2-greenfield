@@ -9,7 +9,7 @@ import { InMemoryListingAuditRuleRepository } from "@/infra/repositories/InMemor
 import { ResolveFindingAction } from "@/usecases/ListingAuditRule/ResolveFindingAction";
 import { createListingAuditRule } from "@/domain/entities/ListingAuditRule";
 import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
-import { SystemClock } from "@/infra/system/SystemClock";
+import { SystemClock } from "@/ports/system/Clock";
 
 describe("ResolveFindingAction", () => {
   let repo: InMemoryListingAuditRuleRepository;
@@ -42,7 +42,7 @@ describe("ResolveFindingAction", () => {
   it("should return rule action when rule matches", async () => {
     const idGen = new InMemoryIdGenerator();
     const clock = new SystemClock();
-    
+
     const rule = createListingAuditRule({
       id: idGen.newId(),
       ruleId: "test_rule",
@@ -50,10 +50,10 @@ describe("ResolveFindingAction", () => {
       severity: "critical",
       applicableCategories: ["general_home"],
       conditions: [],
-      action: { 
-        action: "defer", 
-        acceptedActions: ["defer", "fixNow"], 
-        rationale: "Test rationale" 
+      action: {
+        action: "defer",
+        acceptedActions: ["defer", "fixNow"],
+        rationale: "Test rationale",
       },
       priority: 0,
       isActive: true,
