@@ -79,7 +79,9 @@ export function getAdminSessionCookieName(isHttps?: boolean): string {
   if (typeof isHttps === "boolean") {
     return isHttps ? ADMIN_SESSION_COOKIE_PROD : ADMIN_SESSION_COOKIE_DEV;
   }
-  return process.env.NODE_ENV === "production" ? ADMIN_SESSION_COOKIE_PROD : ADMIN_SESSION_COOKIE_DEV;
+  return process.env.NODE_ENV === "production"
+    ? ADMIN_SESSION_COOKIE_PROD
+    : ADMIN_SESSION_COOKIE_DEV;
 }
 
 /** 7 days — matches the Session entity's expected lifetime. */
@@ -165,16 +167,25 @@ export async function requireAuth(currentPath?: string): Promise<User> {
 }
 
 /**
- * Page-level guard. Requires an authenticated user with `role === 'ADMIN'`.
- * Redirects to `/login` if not authenticated, `/dashboard?error=forbidden`
- * if authenticated but not admin.
+ * Page-level guard. Requires an authenticated user with `role === 'ADMIN'`
+ * and 2FA enabled. Redirects to `/login` if not authenticated,
+ * `/dashboard?error=forbidden` if authenticated but not admin,
+ * `/admin/settings?error=2fa_required` if admin but 2FA not enabled.
  *
  * Use at the top of every `/admin/*` page.
+ *
+ * @param skip2FA - Skip 2FA enforcement check (used by /admin/settings page
+ *   to avoid redirect loop when admin needs to enable 2FA)
  */
-export async function requireAdmin(currentPath?: string): Promise<User> {
+export async function requireAdmin(currentPath?: string, skip2FA?: boolean): Promise<User> {
   const user = await requireAuth(currentPath);
   if (user.role !== "ADMIN") {
     redirect("/dashboard?error=forbidden");
+  }
+  // Enforce 2FA for all admin accounts (STORY-097 follow-up)
+  // Skip check on /admin/settings to avoid redirect loop
+  if (!skip2FA && !user.twoFactorEnabled) {
+    redirect("/admin/settings?error=2fa_required");
   }
   return user;
 }

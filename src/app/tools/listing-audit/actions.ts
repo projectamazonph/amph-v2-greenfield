@@ -80,7 +80,7 @@ async function resolvePublishedScenario(container: AppContainer) {
   if (!parsed.success) {
     return null;
   }
-  return { scenarioId: result.value.id, content: parsed.data };
+  return { scenarioId: result.value.id, content: parsed.data, difficulty: result.value.difficulty };
 }
 
 export type AuditListingInput = {
@@ -142,6 +142,7 @@ export async function auditListing(input: AuditListingInput): Promise<AuditListi
     primaryCustomerIntent: scenario.content.primaryCustomerIntent,
     primaryKeywords: scenario.content.primaryKeywords,
     complianceEvidence: scenario.content.complianceEvidence,
+    difficulty: scenario.difficulty,
   };
   try {
     const output = (await sim.run(domainInput)) as ListingAuditOutput;
@@ -331,6 +332,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
       primaryKeywords: scenario.content.primaryKeywords,
       complianceEvidence: scenario.content.complianceEvidence,
       userFindingActions: { ...userFindingActions },
+      difficulty: scenario.difficulty,
     };
     simOutput = (await sim.run(simInput)) as ListingAuditOutput;
   } catch (err) {

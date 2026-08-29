@@ -276,7 +276,7 @@ describe("finding generation", () => {
     expect(dimensions.size).toBeGreaterThan(1);
   });
 
-  it("produces a rich finding set (>=10) for a poor listing", async () => {
+  it("produces a rich finding set (>=10) for a poor listing with advanced difficulty", async () => {
     const result = await simulator.run(
       greatListing({
         title: "x",
@@ -285,6 +285,7 @@ describe("finding generation", () => {
         images: [],
         hasVideo: false,
         hasAPlus: false,
+        difficulty: "advanced",
       }),
     );
     expect(result.audit.findings.length).toBeGreaterThanOrEqual(10);
