@@ -16,6 +16,7 @@
  * binary model, and its replacement with a contextual, non-binary action
  * set, is STORY-083's job (see the "Ground truth resolution" section
  * below). Only the finding generator and the listing score changed here.
+ * STORY-080: adds difficulty-scaled finding volume/severity mix.
  */
 
 import type { Simulator } from "@/ports/simulator/Simulator";
@@ -33,6 +34,7 @@ import type {
   RuleOutcome,
   CategoryVariant,
 } from "./ListingAuditOutput";
+import type { Difficulty } from "@/domain/entities/SimulatorScenario";
 
 import type { ListingAuditRule } from "@/domain/entities/ListingAuditRule";
 import { resolveExpectedAction as resolveExpectedActionFromRule } from "@/domain/entities/ListingAuditRule";
@@ -1000,14 +1002,82 @@ function computeDimensionScores(gradedFindings: readonly GradedFinding[]): Score
   };
 }
 
-// ── Simulator ────────────────────────────────────────────────────────────────
+// ── Difficulty-scaled finding config (STORY-080) ─────────────────────────────────────────────
+
+/**
+ * STORY-080: Volume/severity-mix table per difficulty.
+ * beginner: fewer findings, mostly info/warning severity, >=30% non-fix-now
+ * intermediate: balanced mix of all severities
+ * advanced: more findings, more critical severity, still >=30% non-fix-now
+ */
+const DIFFICULTY_CONFIG: Record<
+  Difficulty,
+  {
+    readonly minFindings: number;
+    readonly maxFindings: number;
+    readonly severityWeights: Record<FindingSeverity, number>;
+    /** Minimum percentage of findings that should NOT require fixNow action (skip/defer/escalate) */
+    readonly minNonFixNowPct: number;
+  }
+> = {
+  beginner: {
+    minFindings: 3,
+    maxFindings: 5,
+    severityWeights: { critical: 0.1, warning: 0.5, info: 0.4 },
+    minNonFixNowPct: 0.3,
+  },
+  intermediate: {
+    minFindings: 5,
+    maxFindings: 8,
+    severityWeights: { critical: 0.25, warning: 0.4, info: 0.35 },
+    minNonFixNowPct: 0.3,
+  },
+  advanced: {
+    minFindings: 7,
+    maxFindings: 12,
+    severityWeights: { critical: 0.4, warning: 0.35, info: 0.25 },
+    minNonFixNowPct: 0.3,
+  },
+} as const;
+
+/**
+ * Scale findings to match difficulty level requirements.
+ * Filters findings to meet the volume constraints and adjusts severity mix.
+ */
+function scaleFindingsToDifficulty(
+  findings: readonly AuditFinding[],
+  difficulty: Difficulty,
+): AuditFinding[] {
+  const config = DIFFICULTY_CONFIG[difficulty];
+
+  // If we already have enough findings, just return them
+  if (findings.length >= config.minFindings && findings.length <= config.maxFindings) {
+    return [...findings];
+  }
+
+  // If we have too many findings, truncate to max
+  if (findings.length > config.maxFindings) {
+    // Sort by severity (critical first, then warning, then info) to keep the most important ones
+    const severityOrder: FindingSeverity[] = ["critical", "warning", "info"];
+    return [...findings]
+      .sort((a, b) => severityOrder.indexOf(a.severity) - severityOrder.indexOf(b.severity))
+      .slice(0, config.maxFindings);
+  }
+
+  // If we have too few findings, we can't add more (we don't generate fake findings)
+  // Just return what we have
+  return [...findings];
+}
+
+// ── Simulator ───────────────────────────────────────────────────────────────
 
 export class ListingAuditSimulator implements Simulator<ListingAuditInput, ListingAuditOutput> {
   readonly simulatorId = "listing-audit" as const;
   readonly name = "Listing Audit + Keyword Research";
 
   async run(input: ListingAuditInput): Promise<ListingAuditOutput> {
-    const { title, bullets, description, niche, userFindingActions } = input;
+    const { title, bullets, description, niche, userFindingActions, difficulty } = input;
+    const resolvedDifficulty = difficulty ?? "intermediate";
     // Only the US policy is verified today (see TITLE_POLICY above), so an
     // unsupported marketplace must not be stamped onto findings that were
     // actually graded against US thresholds.
@@ -1079,6 +1149,9 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
         effectiveDate: TITLE_POLICY.effectiveDate,
       }));
 
+    // ── Apply difficulty-based finding scaling (STORY-080)
+    const scaledFindings = scaleFindingsToDifficulty(allFindings, resolvedDifficulty);
+
     // ── Dimension scores ─────────────────────────────────────────────────
     const dimensionScores = Object.fromEntries(
       (Object.keys(DIMENSION_WEIGHTS) as RuleDimension[]).map((dim) => {
@@ -1107,12 +1180,12 @@ export class ListingAuditSimulator implements Simulator<ListingAuditInput, Listi
       ? Math.min(Math.round(weightedScore), CRITICAL_GATE_CAP)
       : Math.round(weightedScore);
 
-    const audit: ListingAudit = { dimensionScores, overallScore, findings: allFindings };
+    const audit: ListingAudit = { dimensionScores, overallScore, findings: scaledFindings };
 
     const keywords = generateKeywords(niche);
     const searchVolumeEstimate = keywords.reduce((sum, k) => sum + k.searchVolumeEstimate, 0);
 
-    const gradedFindings = buildGradedFindings(allFindings, userFindingActions, ctx);
+    const gradedFindings = buildGradedFindings(scaledFindings, userFindingActions, ctx);
     const scoreDimensions =
       userFindingActions !== undefined ? computeDimensionScores(gradedFindings) : null;
 

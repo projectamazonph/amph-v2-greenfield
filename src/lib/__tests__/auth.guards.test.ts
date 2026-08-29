@@ -237,7 +237,7 @@ describe("requireAdmin", () => {
   it("returns the User when the session is valid and the role is ADMIN", async () => {
     await seedUser({ id: "u-admin", role: "ADMIN", email: "admin@test.example.com" });
     await seedSessionCookie("u-admin", "ADMIN");
-    const user = await requireAdmin();
+    const user = await requireAdmin(undefined, true);
     expect(user.id).toBe("u-admin");
     expect(user.role).toBe("ADMIN");
   });

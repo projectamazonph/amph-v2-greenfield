@@ -12,6 +12,7 @@
  */
 
 import { Result } from "@/domain/shared/Result";
+import type { Logger } from "@/ports/observability/Logger";
 import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
@@ -40,10 +41,13 @@ export type AwardBadgeResult = Result<
 // ── Dependencies ─────────────────────────────────────────────────────────────
 
 export interface AwardBadgeDeps {
+  
   badgeRepo: IBadgeRepository;
   badgeAwardRepo: IBadgeAwardRepository;
   awardXp: AwardXP; // shared AwardXP instance for XP awards
   idGen: IdGenerator;
+
+  logger: Logger;
 }
 
 // ── Use Case ─────────────────────────────────────────────────────────────────
@@ -117,10 +121,10 @@ export class AwardBadge {
           // The badge row is already durable. Keep the successful badge result
           // but surface the failure in logs; reconciliation can retry the
           // stable idempotency key without duplicating XP.
-          console.error("[AwardBadge] Failed to award badge XP:", xpResult.error);
+          this.deps.logger.error("[AwardBadge] Failed to award badge XP:", { error: xpResult.error });
         }
       } catch (err: unknown) {
-        console.error("[AwardBadge] Failed to award badge XP:", err);
+        this.deps.logger.error("[AwardBadge] Failed to award badge XP:", { error: String(err) });
       }
     }
 

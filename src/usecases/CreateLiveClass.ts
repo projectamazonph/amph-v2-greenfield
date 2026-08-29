@@ -61,7 +61,10 @@ export class CreateLiveClass {
         targetType: "live_class",
         metadata: { error: liveClassResult.error.kind },
       });
-      return liveClassResult as unknown as CreateLiveClassResult;
+      const validationErrors = liveClassResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as LiveClassError | LiveClassRepositoryError);
     }
 
     const persistResult = await this.deps.liveClassRepo.create(
@@ -80,7 +83,7 @@ export class CreateLiveClass {
             : persistResult.error.kind,
         },
       });
-      return persistResult as unknown as CreateLiveClassResult;
+      return persistResult;
     }
 
     void this.deps.recordAuditLog.execute({

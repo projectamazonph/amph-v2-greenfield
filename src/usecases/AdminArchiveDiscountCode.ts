@@ -41,7 +41,10 @@ export class AdminArchiveDiscountCode {
         targetType: "discount_code",
         metadata: { error: findResult.error.kind },
       });
-      return findResult as unknown as AdminArchiveDiscountCodeResult;
+      const validationErrors = findResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as DiscountCodeError | DiscountCodeRepositoryError);
     }
 
     const wasAlreadyArchived = findResult.value === null;
@@ -56,7 +59,10 @@ export class AdminArchiveDiscountCode {
           targetType: "discount_code",
           metadata: { error: archiveResult.error.kind },
         });
-        return archiveResult as unknown as AdminArchiveDiscountCodeResult;
+        const validationErrors = archiveResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as DiscountCodeError | DiscountCodeRepositoryError);
       }
 
       void this.deps.recordAuditLog.execute({

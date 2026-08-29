@@ -46,7 +46,7 @@ export default async function EditQuizPage({ params, searchParams }: PageProps) 
 
   if (!result.ok) {
     if (result.error.kind === "quiz_not_found") notFound();
-    throw new Error(`Failed to load quiz: ${result.error.kind}`);
+    notFound();
   }
   const { quiz, course } = result.value;
 
@@ -242,7 +242,7 @@ async function loadCourseId(quizId: string): Promise<string> {
   const container = buildContainer();
   const result = await container.quizRepo.findById(quizId);
   if (!result.ok || !result.value) {
-    throw new Error("Quiz disappeared during update");
+    redirect("/admin/quizzes");
   }
   return result.value.courseId;
 }

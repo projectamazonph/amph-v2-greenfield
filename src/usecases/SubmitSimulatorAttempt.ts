@@ -84,7 +84,7 @@ export class SubmitSimulatorAttempt {
       submittedAt,
     });
     return this.mapToSubmitResult(
-      updateResult as unknown as Result<SimulatorAttempt, SubmitSimulatorAttemptError>,
+      updateResult,
     );
   }
 

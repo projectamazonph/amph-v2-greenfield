@@ -33,7 +33,8 @@ export default async function EditCoursePage({ params }: PageProps) {
     if (result.error.kind === "course_not_found") {
       notFound();
     }
-    throw new Error(result.error.message);
+    // For other errors, redirect to admin courses list
+    redirect("/admin/courses");
   }
   const course = result.value.course;
 

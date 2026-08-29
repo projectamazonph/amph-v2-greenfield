@@ -68,7 +68,10 @@ export class AdminCreateDiscountCode {
         targetType: "discount_code",
         metadata: { error: createResult.error.kind },
       });
-      return createResult as unknown as AdminCreateDiscountCodeResult;
+      const validationErrors = createResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as DiscountCodeError | DiscountCodeRepositoryError);
     }
 
     const persistResult = await this.deps.discountCodeRepo.create(
@@ -87,7 +90,10 @@ export class AdminCreateDiscountCode {
             : "db_error",
         },
       });
-      return persistResult as unknown as AdminCreateDiscountCodeResult;
+      const validationErrors = persistResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as DiscountCodeError | DiscountCodeRepositoryError);
     }
 
     void this.deps.recordAuditLog.execute({

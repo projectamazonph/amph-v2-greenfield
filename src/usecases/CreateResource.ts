@@ -54,7 +54,10 @@ export class CreateResource {
         targetType: "resource",
         metadata: { error: resourceResult.error.kind },
       });
-      return resourceResult as unknown as CreateResourceResult;
+      const validationErrors = resourceResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as ResourceError | ResourceRepositoryError);
     }
 
     const persistResult = await this.deps.resourceRepo.create(resourceResult.value);
@@ -71,7 +74,7 @@ export class CreateResource {
               : persistResult.error.kind,
         },
       });
-      return persistResult as unknown as CreateResourceResult;
+      return persistResult;
     }
 
     void this.deps.recordAuditLog.execute({

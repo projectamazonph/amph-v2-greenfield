@@ -587,6 +587,7 @@ function buildProductionContainer(): AppContainer {
     courseRepo,
     moduleRepo,
     lessonRepo,
+    logger,
   });
   const orderRepo: IOrderRepository = new PrismaOrderRepository(prisma);
 
@@ -619,7 +620,7 @@ function buildProductionContainer(): AppContainer {
   const refundEmailRenderer = new RefundTemplateRenderer();
   // STORY-050a: audit log (Postgres-backed in production via PrismaAuditLog)
   const auditLog: IAuditLog = new PrismaAuditLog(prisma);
-  const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock, logger });
   // Audit hardening: persistent webhook event log (Postgres-backed in production)
   const webhookEventLog: IWebhookEventLog = new PrismaWebhookEventLog(prisma);
   const listAuditLogs = new ListAuditLogs({ auditLog });

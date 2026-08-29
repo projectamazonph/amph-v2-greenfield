@@ -39,7 +39,7 @@ export class DeleteLiveClass {
         targetType: "live_class",
         metadata: { error: findResult.error.kind },
       });
-      return findResult as unknown as DeleteLiveClassResult;
+      return findResult;
     }
 
     const wasCancelled = findResult.value === null || findResult.value.status === "cancelled";
@@ -54,7 +54,7 @@ export class DeleteLiveClass {
           targetType: "live_class",
           metadata: { error: deleteResult.error.kind },
         });
-        return deleteResult as unknown as DeleteLiveClassResult;
+        return deleteResult;
       }
 
       void this.deps.recordAuditLog.execute({
