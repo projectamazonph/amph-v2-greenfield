@@ -13,6 +13,7 @@
  */
 
 import { Result } from "@/domain/shared/Result";
+import type { Logger } from "@/ports/observability/Logger";
 import { quizQuestionCount } from "@/domain/entities/Quiz";
 import type { Quiz } from "@/domain/entities/Quiz";
 import type { QuizAttemptReviewItem } from "@/domain/entities/QuizAttemptReview";
@@ -177,7 +178,7 @@ export class RecordQuizAttempt {
         if (xpResult.ok) {
           xpAwarded = XPService.QUIZ_PASSED_XP;
         } else {
-          console.error("[RecordQuizAttempt] Failed to award quiz XP:", xpResult.error);
+          this.deps.logger.error("[RecordQuizAttempt] Failed to award quiz XP:", { error: xpResult.error });
         }
       }
 

@@ -25,6 +25,7 @@
  */
 
 import { Result } from "@/domain/shared/Result";
+import type { Logger } from "@/ports/observability/Logger";
 import { markRecordingWatched } from "@/domain/entities/LiveClassRegistration";
 import type { LiveClassRegistration } from "@/domain/entities/LiveClassRegistration";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
@@ -47,11 +48,14 @@ export interface MarkLiveClassRecordingWatchedInput {
 }
 
 export interface MarkLiveClassRecordingWatchedDeps {
+  
   liveClassRepo: ILiveClassRepository;
   liveClassRegistrationRepo: ILiveClassRegistrationRepository;
   enrollmentRepo: IEnrollmentRepository;
   awardXp: AwardXP;
   clock: Clock;
+
+  logger: Logger;
 }
 
 export class MarkLiveClassRecordingWatched {
@@ -142,7 +146,7 @@ export class MarkLiveClassRecordingWatched {
       idempotencyKey: `live_class_attended:${userId}:${liveClassId}`,
     });
     if (!xpResult.ok) {
-      console.error("[MarkLiveClassRecordingWatched] Failed to award XP:", xpResult.error);
+      this.deps.logger.error("[MarkLiveClassRecordingWatched] Failed to award XP:", { error: xpResult.error });
     }
   }
 }

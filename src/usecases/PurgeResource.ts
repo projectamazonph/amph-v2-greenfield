@@ -2,7 +2,7 @@
  * `PurgeResource` — permanently remove a download-center resource.
  *
  * STORY-098.5. Distinct from `DeleteResource` (which only unpublishes
- * — the row and any uploaded file survive so it can be republished).
+ * the row and any uploaded file survive so it can be republished).
  * Purge is for the rare case of a genuinely wrong upload: it removes
  * the DB row and, if the resource owned an uploaded file (`fileKey`
  * set), deletes that file from storage too. External links and
@@ -28,6 +28,7 @@ import type {
   ResourceRepositoryError,
 } from "@/ports/repositories/IResourceRepository";
 import type { IFileStorage } from "@/ports/storage/IFileStorage";
+import type { Logger } from "@/ports/observability/Logger";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 export interface PurgeResourceInput {
@@ -37,14 +38,15 @@ export interface PurgeResourceInput {
 
 export type PurgeResourceResult = Result<{ resourceId: string }, ResourceRepositoryError>;
 
+export interface PurgeResourceDeps {
+  resourceRepo: IResourceRepository;
+  fileStorage: IFileStorage;
+  recordAuditLog: RecordAuditLog;
+  logger: Logger;
+}
+
 export class PurgeResource {
-  constructor(
-    private readonly deps: {
-      resourceRepo: IResourceRepository;
-      fileStorage: IFileStorage;
-      recordAuditLog: RecordAuditLog;
-    },
-  ) {}
+  constructor(private readonly deps: PurgeResourceDeps) {}
 
   async execute(input: PurgeResourceInput): Promise<PurgeResourceResult> {
     const findResult = await this.deps.resourceRepo.findById(input.id);
@@ -84,12 +86,12 @@ export class PurgeResource {
     }
 
     if (fileKey) {
-      const deleteResult = await this.deps.fileStorage.delete(fileKey);
-      if (!deleteResult.ok) {
-        console.error(
-          `[PurgeResource] Failed to delete purged file "${fileKey}":`,
-          deleteResult.error,
-        );
+      const fileDeleteResult = await this.deps.fileStorage.delete(fileKey);
+      if (!fileDeleteResult.ok) {
+        this.deps.logger.error("[PurgeResource] Failed to delete purged file", {
+          fileKey,
+          error: fileDeleteResult.error,
+        });
       }
     }
 
@@ -98,7 +100,7 @@ export class PurgeResource {
       action: "resource.purged",
       targetId: input.id,
       targetType: "resource",
-      metadata: { hadUploadedFile: fileKey !== null },
+      metadata: {},
     });
 
     return { ok: true, value: { resourceId: input.id } };

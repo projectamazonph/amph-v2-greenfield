@@ -17,6 +17,7 @@ import type { AuditAction } from "@/domain/values/AuditAction";
 import type { IAuditLog } from "@/ports/repositories/IAuditLog";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
+import type { Logger } from "@/ports/observability/Logger";
 
 export interface RecordAuditLogInput {
   actorId: string;
@@ -34,6 +35,7 @@ export interface RecordAuditLogDeps {
   auditLog: IAuditLog;
   idGen: IdGenerator;
   clock: Clock;
+  logger: Logger;
 }
 
 export class RecordAuditLog {
@@ -59,16 +61,13 @@ export class RecordAuditLog {
     });
 
     if (!buildResult.ok) {
-      console.error("[RecordAuditLog] invalid input, skipping record:", buildResult.error);
+      this.deps.logger.error("[RecordAuditLog] invalid input, skipping record", { error: buildResult.error });
       return { recorded: false };
     }
 
     const recordResult = await this.deps.auditLog.record(buildResult.value);
     if (!recordResult.ok) {
-      console.error(
-        "[RecordAuditLog] failed to persist entry, swallowing error:",
-        recordResult.error,
-      );
+      this.deps.logger.error("[RecordAuditLog] failed to persist entry, swallowing error", { error: recordResult.error });
       return { recorded: false };
     }
 

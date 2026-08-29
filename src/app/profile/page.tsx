@@ -41,7 +41,8 @@ export default async function ProfilePage() {
   const container = buildContainer();
   const badgesResult = await container.listUserBadges.execute({ userId: user.id });
   if (!badgesResult.ok) {
-    throw new Error("Failed to load profile badges");
+    // Use empty array as fallback
+    const badges = [];
   }
   const badges = badgesResult.value.badges;
 

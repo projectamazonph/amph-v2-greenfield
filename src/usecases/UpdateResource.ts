@@ -18,6 +18,7 @@
  * of invisible.
  */
 import { Result } from "@/domain/shared/Result";
+import type { Logger } from "@/ports/observability/Logger";
 import {
   updateResource,
   type UpdateResourcePatch,
@@ -41,29 +42,20 @@ export type UpdateResourceResult = Result<
   ResourceError | ResourceRepositoryError
 >;
 
+export interface UpdateResourceDeps {
+  resourceRepo: IResourceRepository;
+  fileStorage: IFileStorage;
+  recordAuditLog: RecordAuditLog;
+  logger: Logger;
+}
+
 export class UpdateResource {
-  constructor(
-    private readonly deps: {
-      resourceRepo: IResourceRepository;
-      fileStorage: IFileStorage;
-      recordAuditLog: RecordAuditLog;
-    },
-  ) {}
+  constructor(private readonly deps: UpdateResourceDeps) {}
 
   async execute(input: UpdateResourceInput): Promise<UpdateResourceResult> {
     const findResult = await this.deps.resourceRepo.findById(input.id);
     if (!findResult.ok) {
-      return findResult as unknown as UpdateResourceResult;
-    }
-    if (findResult.value === null) {
-      await this.deps.recordAuditLog.execute({
-        actorId: input.actorId,
-        action: "resource.update_failed",
-        targetId: input.id,
-        targetType: "resource",
-        metadata: { error: "not_found" },
-      });
-      return { ok: false, error: { kind: "not_found" } };
+      return findResult;
     }
 
     const updateResult = updateResource(findResult.value, input.patch, input.actorId);
@@ -75,7 +67,10 @@ export class UpdateResource {
         targetType: "resource",
         metadata: { error: updateResult.error.kind },
       });
-      return updateResult as unknown as UpdateResourceResult;
+      const validationErrors = updateResult.error;
+      return Result.err({
+        kind: validationErrors.kind,
+      } as ResourceError | ResourceRepositoryError);
     }
 
     const persistResult = await this.deps.resourceRepo.update(updateResult.value);
@@ -92,7 +87,7 @@ export class UpdateResource {
               : persistResult.error.kind,
         },
       });
-      return persistResult as unknown as UpdateResourceResult;
+      return persistResult;
     }
 
     await this.deps.recordAuditLog.execute({
@@ -108,10 +103,7 @@ export class UpdateResource {
     if (oldFileKey && oldFileKey !== newFileKey) {
       const deleteResult = await this.deps.fileStorage.delete(oldFileKey);
       if (!deleteResult.ok) {
-        console.error(
-          `[UpdateResource] Failed to delete orphaned file "${oldFileKey}":`,
-          deleteResult.error,
-        );
+        this.deps.logger.error("[UpdateResource] Failed to delete orphaned file", { fileKey: oldFileKey, error: deleteResult.error });
       }
     }
 

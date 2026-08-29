@@ -32,18 +32,22 @@ async function loadEnrollmentsWithCourses(userId: string): Promise<CourseWithEnr
   const container = buildContainer();
   const enrollmentsResult = await container.enrollmentRepo.findByUserId(userId);
   if (!enrollmentsResult.ok) {
-    throw new Error("Failed to load enrollments");
+    // Return empty array on error - dashboard will show empty state
+    return [];
   }
   const enrollments = enrollmentsResult.value;
-  return Promise.all(
-    enrollments.map(async (enrollment): Promise<CourseWithEnrollment> => {
+  const results = await Promise.all(
+    enrollments.map(async (enrollment): Promise<CourseWithEnrollment | null> => {
       const courseResult = await container.courseRepo.findById(enrollment.courseId);
       if (!courseResult.ok) {
-        throw new Error("Failed to load an enrolled course");
+        // Skip this enrollment if course lookup fails
+        return null;
       }
       return { course: courseResult.value, enrollment };
     }),
   );
+  // Filter out any failed lookups
+  return results.filter((r): r is CourseWithEnrollment => r !== null);
 }
 
 export default async function DashboardPage() {

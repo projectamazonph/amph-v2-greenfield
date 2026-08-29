@@ -31,17 +31,14 @@ export default async function QuizPage({ params }: Props) {
   ]);
 
   if (!courseResult.ok) {
-    if (courseResult.error.kind === "not_found") {
-      return (
-        <StudentShell user={user}>
-          <NotFoundMessage slug={slug} />
-        </StudentShell>
-      );
-    }
-    throw new Error("Failed to load course");
+    return (
+      <StudentShell user={user}>
+        <NotFoundMessage slug={slug} />
+      </StudentShell>
+    );
   }
   if (!quizResult.ok) {
-    throw new Error("Failed to load quiz");
+    notFound();
   }
   if (!quizResult.value || quizResult.value.courseId !== courseResult.value.courseId) {
     return (
