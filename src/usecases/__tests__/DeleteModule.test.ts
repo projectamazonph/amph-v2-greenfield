@@ -12,12 +12,14 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeRecordAuditLog(): RecordAuditLog {
   return new RecordAuditLog({
     auditLog: new InMemoryAuditLog(),
     idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 
@@ -49,6 +51,7 @@ describe("DeleteModule", () => {
       courseRepo: new InMemoryCourseRepository(),
       moduleRepo,
       lessonRepo: new InMemoryLessonRepository(),
+      logger: new SilentLogger(),
     });
     useCase = new DeleteModule({ moduleRepo, recordAuditLog, rebuildCourseCurriculum });
   });

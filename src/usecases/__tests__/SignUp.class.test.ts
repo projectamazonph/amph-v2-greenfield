@@ -13,6 +13,7 @@ import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import { Result as R } from "@/domain/shared/Result";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 /** Fast stub hasher for unit tests — no Argon2 overhead. */
 class StubHasher implements PasswordHasher {
@@ -35,7 +36,12 @@ describe("SignUp (class)", () => {
     userRepo = new InMemoryUserRepository();
     clock = new FixedClock(new Date("2026-01-01T00:00:00Z"));
     idGen = new InMemoryIdGenerator();
-    recordAuditLog = new RecordAuditLog({ auditLog: new InMemoryAuditLog(), idGen, clock });
+    recordAuditLog = new RecordAuditLog({
+      auditLog: new InMemoryAuditLog(),
+      idGen,
+      clock,
+      logger: new SilentLogger(),
+    });
     signUp = new SignUp(userRepo, idGen, clock, new StubHasher(), recordAuditLog);
   });
 

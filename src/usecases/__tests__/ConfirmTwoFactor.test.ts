@@ -9,6 +9,7 @@ import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserReposit
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FakeTotpService } from "@/infra/security/FakeTotpService";
 import { FixedClock } from "@/ports/system/Clock";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 describe("ConfirmTwoFactor", () => {
   let userRepo: InMemoryUserRepository;
@@ -25,6 +26,7 @@ describe("ConfirmTwoFactor", () => {
       auditLog,
       idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     useCase = new ConfirmTwoFactor({ userRepo, totpService, recordAuditLog });
 

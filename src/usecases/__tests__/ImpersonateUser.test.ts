@@ -18,6 +18,7 @@ import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { User } from "@/domain/entities/User";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { SessionRepository } from "@/ports/repositories/SessionRepository";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 // ── Fixtures ───────────────────────────────────────────────────────────────
 
@@ -123,6 +124,7 @@ function buildDeps(
         auditLog: new InMemoryAuditLog(),
         idGen,
         clock,
+        logger: new SilentLogger(),
       }),
   };
 }

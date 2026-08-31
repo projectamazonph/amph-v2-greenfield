@@ -12,6 +12,7 @@ import type { Badge, BadgeSlug } from "@/domain/entities/Badge";
 import type { BadgeAward } from "@/domain/entities/BadgeAward";
 import type { IBadgeRepository } from "@/ports/repositories/IBadgeRepository";
 import type { IBadgeAwardRepository } from "@/ports/repositories/IBadgeAwardRepository";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 const USER_ID = "user_01";
 const NOW = new Date("2025-07-01T00:00:00Z");
@@ -70,6 +71,7 @@ function buildUseCase(badgeRepo: IBadgeRepository, badgeAwardRepo: IBadgeAwardRe
       paymentRef: () => "pref_test_01",
       receiptNumber: () => "rct_test_01",
     },
+    logger: new SilentLogger(),
   });
 }
 

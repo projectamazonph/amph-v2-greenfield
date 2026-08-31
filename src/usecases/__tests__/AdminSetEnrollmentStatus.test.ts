@@ -9,6 +9,7 @@ import { FixedClock } from "@/ports/system/Clock";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { createCourse } from "@/domain/entities/Course";
 import { createEnrollment } from "@/domain/entities/Enrollment";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 describe("AdminSetEnrollmentStatus", () => {
   const userId = "student-1";
@@ -64,7 +65,12 @@ describe("AdminSetEnrollmentStatus", () => {
       enrollmentRepo: enrollments,
       idGen: ids,
       clock,
-      recordAuditLog: new RecordAuditLog({ auditLog: audit, idGen: ids, clock }),
+      recordAuditLog: new RecordAuditLog({
+        auditLog: audit,
+        idGen: ids,
+        clock,
+        logger: new SilentLogger(),
+      }),
     });
   });
 

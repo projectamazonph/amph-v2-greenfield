@@ -10,6 +10,7 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeIdGen(prefix = "draft"): IdGenerator {
   let n = 0;
@@ -21,6 +22,7 @@ function makeRecordAuditLog(): RecordAuditLog {
     auditLog: new InMemoryAuditLog(),
     idGen: makeIdGen("audit"),
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 

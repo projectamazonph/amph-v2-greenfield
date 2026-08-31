@@ -79,13 +79,15 @@ class FindByEmailFailsRepo extends InMemoryUserRepository {
 
 // ── Test data factories ──────────────────────────────────────────────────────
 
-function makeCourse(overrides: {
-  id?: string;
-  slug?: string;
-  courseTier?: CourseAccessTier;
-  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  priceMinor?: number;
-} = {}): Course {
+function makeCourse(
+  overrides: {
+    id?: string;
+    slug?: string;
+    courseTier?: CourseAccessTier;
+    status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+    priceMinor?: number;
+  } = {},
+): Course {
   const result = createCourse({
     id: overrides.id ?? "course-id",
     slug: overrides.slug ?? "course-slug",
@@ -141,7 +143,12 @@ describe("AdminGrantSubscription", () => {
   });
 
   function build(userRepo: InMemoryUserRepository = users) {
-    const recordAuditLog = new RecordAuditLog({ auditLog: audit, idGen, clock });
+    const recordAuditLog = new RecordAuditLog({
+      auditLog: audit,
+      idGen,
+      clock,
+      logger: new TestLogger(),
+    });
     const requestPasswordReset = new RequestPasswordReset({
       users: userRepo,
       passwordResets,
@@ -520,7 +527,12 @@ describe("AdminGrantSubscription", () => {
     // would refuse `entitlement: "free"` here; the grant path uses
     // `entitlement: "admin_grant"`, which is trusted.
     courseRepo.seed([
-      makeCourse({ id: "c-paid-starter", slug: "paid-starter", courseTier: "STARTER", priceMinor: 299900 }),
+      makeCourse({
+        id: "c-paid-starter",
+        slug: "paid-starter",
+        courseTier: "STARTER",
+        priceMinor: 299900,
+      }),
     ]);
 
     const useCase = build();
@@ -565,7 +577,9 @@ describe("AdminGrantSubscription", () => {
     expect(second.ok).toBe(true);
 
     // Still exactly one enrollment row per course, not two.
-    const enrollmentsResult = await enrollmentRepo.findByUserId(first.ok ? first.value.userId : "x");
+    const enrollmentsResult = await enrollmentRepo.findByUserId(
+      first.ok ? first.value.userId : "x",
+    );
     expect(enrollmentsResult.ok).toBe(true);
     if (!enrollmentsResult.ok) return;
     expect(enrollmentsResult.value).toHaveLength(2);

@@ -19,6 +19,8 @@ import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { FixedClock } from "@/ports/system/Clock";
 import { createQuiz } from "@/domain/entities/Quiz";
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
+import type { Logger } from "@/ports/observability/Logger";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 const USER_ID = "user-1";
 const QUIZ_ID = "quiz-1";
@@ -70,6 +72,7 @@ interface Deps {
   clock: FixedClock;
   accessPolicy: IAccessPolicy;
   awardXp: AwardXP;
+  logger: Logger;
 }
 
 function buildDeps(): Deps {
@@ -99,6 +102,7 @@ function buildDeps(): Deps {
     clock,
     accessPolicy: { canAccess: vi.fn(async () => ({ kind: "allowed" as const })) },
     awardXp,
+    logger: new SilentLogger(),
   };
 }
 

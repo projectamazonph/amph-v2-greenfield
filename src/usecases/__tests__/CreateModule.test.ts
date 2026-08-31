@@ -13,6 +13,7 @@ import type { IdGenerator } from "@/ports/system/IdGenerator";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeIdGen(): IdGenerator {
   let n = 0;
@@ -28,6 +29,7 @@ function makeRecordAuditLog(): RecordAuditLog {
     auditLog: new InMemoryAuditLog(),
     idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 
@@ -44,6 +46,7 @@ describe("CreateModule", () => {
       courseRepo: new InMemoryCourseRepository(),
       moduleRepo,
       lessonRepo: new InMemoryLessonRepository(),
+      logger: new SilentLogger(),
     });
     useCase = new CreateModule({
       moduleRepo,

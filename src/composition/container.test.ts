@@ -851,6 +851,7 @@ export function buildTestContainer(): TestContainer {
       enrollmentRepo,
       awardXp,
       clock,
+      logger: new TestLogger(),
     }),
     // STORY-098: download center resources
     resourceRepo,

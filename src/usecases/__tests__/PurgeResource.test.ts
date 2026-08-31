@@ -7,6 +7,7 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { createResource } from "@/domain/entities/Resource";
 import type { IFileStorage } from "@/ports/storage/IFileStorage";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 describe("PurgeResource", () => {
   let repo: InMemoryResourceRepository;
@@ -21,8 +22,14 @@ describe("PurgeResource", () => {
       auditLog: new InMemoryAuditLog(),
       idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
-    useCase = new PurgeResource({ resourceRepo: repo, fileStorage, recordAuditLog });
+    useCase = new PurgeResource({
+      resourceRepo: repo,
+      fileStorage,
+      recordAuditLog,
+      logger: new SilentLogger(),
+    });
   });
 
   it("removes the row entirely for a resource with an uploaded file, and deletes the file", async () => {
@@ -121,6 +128,7 @@ describe("PurgeResource", () => {
       resourceRepo: repo,
       fileStorage: slowStorage,
       recordAuditLog,
+      logger: new SilentLogger(),
     });
 
     await fileStorage.upload({

@@ -5,6 +5,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { createDiscountCode } from "@/domain/entities/DiscountCode";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 interface MakeInput {
   code: string;
@@ -41,6 +42,7 @@ describe("AdminCreateDiscountCode", () => {
       auditLog: new InMemoryAuditLog(),
       idGen: { newId: () => "audit_1", paymentRef: () => "x", receiptNumber: () => "x" },
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     useCase = new AdminCreateDiscountCode({
       discountCodeRepo: repo,

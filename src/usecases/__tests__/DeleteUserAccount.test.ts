@@ -6,12 +6,14 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeRecordAuditLog(audit: InMemoryAuditLog) {
   return new RecordAuditLog({
     auditLog: audit,
     idGen: { newId: () => "audit_1", paymentRef: () => "x", receiptNumber: () => "x" },
     clock: new FixedClock(new Date("2026-01-01T00:00:00Z")),
+    logger: new SilentLogger(),
   });
 }
 

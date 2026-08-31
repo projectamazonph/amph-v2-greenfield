@@ -12,6 +12,7 @@ import { createLesson, type Lesson } from "@/domain/entities/Lesson";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 async function seedLesson(
   repo: InMemoryLessonRepository,
@@ -36,6 +37,7 @@ function makeRecordAuditLog(): RecordAuditLog {
     auditLog: new InMemoryAuditLog(),
     idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 
@@ -54,6 +56,7 @@ describe("UpdateLesson", () => {
       courseRepo: new InMemoryCourseRepository(),
       moduleRepo,
       lessonRepo,
+      logger: new SilentLogger(),
     });
     useCase = new UpdateLesson({
       lessonRepo,

@@ -5,6 +5,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { createResource } from "@/domain/entities/Resource";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 describe("DeleteResource", () => {
   let repo: InMemoryResourceRepository;
@@ -17,6 +18,7 @@ describe("DeleteResource", () => {
       auditLog: new InMemoryAuditLog(),
       idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     useCase = new DeleteResource({ resourceRepo: repo, recordAuditLog });
 

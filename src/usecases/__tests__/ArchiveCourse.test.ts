@@ -14,6 +14,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createCourse, type Course } from "@/domain/entities/Course";
 import { Result } from "@/domain/shared/Result";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 // ── Fixtures ───────────────────────────────────────────────────────────────
 
@@ -27,7 +28,11 @@ function makeCourse(overrides: Partial<Course> = {}): Course {
     priceMinor: 1000,
     curriculum: {
       sections: [
-        { id: "s1", title: "Section 1", lessons: [{ id: "l1", title: "Lesson 1", type: "TEXT", content: "" }] },
+        {
+          id: "s1",
+          title: "Section 1",
+          lessons: [{ id: "l1", title: "Lesson 1", type: "TEXT", content: "" }],
+        },
       ],
     },
     ...overrides,
@@ -38,12 +43,16 @@ function makeCourse(overrides: Partial<Course> = {}): Course {
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 
-
 function makeRecordAuditLog(): RecordAuditLog {
   return new RecordAuditLog({
     auditLog: new InMemoryAuditLog(),
-    idGen: { newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`, paymentRef: () => "x", receiptNumber: () => "x" },
+    idGen: {
+      newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`,
+      paymentRef: () => "x",
+      receiptNumber: () => "x",
+    },
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 
@@ -61,7 +70,8 @@ describe("ArchiveCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-       courseId: "course_01" });
+      courseId: "course_01",
+    });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -74,7 +84,8 @@ describe("ArchiveCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-       courseId: "course_01" });
+      courseId: "course_01",
+    });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -87,7 +98,8 @@ describe("ArchiveCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-       courseId: "course_01" });
+      courseId: "course_01",
+    });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -98,7 +110,8 @@ describe("ArchiveCourse", () => {
   it("returns course_not_found when the course does not exist", async () => {
     const result = await useCase.execute({
       actorId: "admin_1",
-       courseId: "missing" });
+      courseId: "missing",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -110,7 +123,8 @@ describe("ArchiveCourse", () => {
 
     await useCase.execute({
       actorId: "admin_1",
-       courseId: "course_01" });
+      courseId: "course_01",
+    });
 
     const persisted = await courseRepo.findById("course_01");
     expect(persisted.ok).toBe(true);
@@ -131,7 +145,8 @@ describe("ArchiveCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-       courseId: "course_01" });
+      courseId: "course_01",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -150,7 +165,8 @@ describe("ArchiveCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-       courseId: "course_01" });
+      courseId: "course_01",
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
