@@ -133,7 +133,11 @@ export class StartSimulatorAttempt {
 
     const createResult = await attemptRepo.create(attempt);
     if (Result.isErr(createResult)) {
-      return Result.err({ kind: "db_error", message: createResult.error.message } as StartSimulatorAttemptError);
+      const err = createResult.error;
+      return Result.err({
+        kind: "db_error",
+        message: err.kind === "db_error" ? err.message : String(err),
+      });
     }
 
     // ΓöÇΓöÇ 5. Audit log ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ

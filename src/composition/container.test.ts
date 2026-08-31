@@ -291,6 +291,7 @@ export function buildTestContainer(): TestContainer {
     courseRepo,
     moduleRepo,
     lessonRepo,
+    logger,
   });
   const orderRepo = new InMemoryOrderRepository();
   const enrollmentRepo = new InMemoryEnrollmentRepository();
@@ -337,7 +338,7 @@ export function buildTestContainer(): TestContainer {
   const totpService: TotpService = new FakeTotpService();
   // STORY-050a: audit log
   const auditLog = new InMemoryAuditLog();
-  const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock });
+  const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock, logger });
   const webhookEventLog = new InMemoryWebhookEventLog();
   // STORY-061: audit log viewer + CSV export
   const listAuditLogs = new ListAuditLogs({ auditLog });
@@ -479,6 +480,7 @@ export function buildTestContainer(): TestContainer {
       idGen,
       clock,
       accessPolicy,
+      logger,
     }),
     awardXp,
     awardBadge: new AwardBadge({
@@ -486,6 +488,7 @@ export function buildTestContainer(): TestContainer {
       badgeAwardRepo,
       awardXp,
       idGen,
+      logger,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
     issueCertificate: new IssueCertificate({
@@ -853,14 +856,13 @@ export function buildTestContainer(): TestContainer {
     resourceRepo,
     fileStorage,
     createResource: new CreateResource({ resourceRepo, recordAuditLog }),
-    updateResource: new UpdateResource({ resourceRepo, fileStorage, recordAuditLog }),
+    updateResource: new UpdateResource({ resourceRepo, fileStorage, recordAuditLog, logger }),
     deleteResource: new DeleteResource({ resourceRepo, recordAuditLog }),
     adminListResources: new AdminListResources({ resourceRepo }),
     adminGetResource: new AdminGetResource({ resourceRepo }),
     listAvailableResources: new ListAvailableResources({ resourceRepo }),
     recordResourceDownload: new RecordResourceDownload({ resourceRepo, recordAuditLog }),
-    // STORY-098.5: download center file upload/management
-    purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog }),
+    purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog, logger }),
     uploadFile: new UploadFile({ fileStorage }),
     deleteFile: new DeleteFile({ fileStorage }),
   };

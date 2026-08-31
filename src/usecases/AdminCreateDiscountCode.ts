@@ -4,10 +4,7 @@
  * STORY-050d.
  */
 import { Result } from "@/domain/shared/Result";
-import {
-  createDiscountCode,
-  type DiscountType,
-} from "@/domain/entities/DiscountCode";
+import { createDiscountCode, type DiscountType } from "@/domain/entities/DiscountCode";
 import type {
   IDiscountCodeRepository,
   DiscountCodeRepositoryError,
@@ -44,9 +41,7 @@ export class AdminCreateDiscountCode {
     },
   ) {}
 
-  async execute(
-    input: AdminCreateDiscountCodeInput,
-  ): Promise<AdminCreateDiscountCodeResult> {
+  async execute(input: AdminCreateDiscountCodeInput): Promise<AdminCreateDiscountCodeResult> {
     const id = this.deps.idGen.newId();
 
     const createResult = createDiscountCode({
@@ -68,15 +63,10 @@ export class AdminCreateDiscountCode {
         targetType: "discount_code",
         metadata: { error: createResult.error.kind },
       });
-      const validationErrors = createResult.error;
-      return Result.err({
-        kind: validationErrors.kind,
-      } as DiscountCodeError | DiscountCodeRepositoryError);
+      return Result.err(createResult.error);
     }
 
-    const persistResult = await this.deps.discountCodeRepo.create(
-      createResult.value,
-    );
+    const persistResult = await this.deps.discountCodeRepo.create(createResult.value);
 
     if (!persistResult.ok) {
       void this.deps.recordAuditLog.execute({
@@ -85,15 +75,10 @@ export class AdminCreateDiscountCode {
         targetId: id,
         targetType: "discount_code",
         metadata: {
-          error: persistResult.error.kind === "code_taken"
-            ? "code_taken"
-            : "db_error",
+          error: persistResult.error.kind === "code_taken" ? "code_taken" : "db_error",
         },
       });
-      const validationErrors = persistResult.error;
-      return Result.err({
-        kind: validationErrors.kind,
-      } as DiscountCodeError | DiscountCodeRepositoryError);
+      return Result.err(persistResult.error);
     }
 
     void this.deps.recordAuditLog.execute({

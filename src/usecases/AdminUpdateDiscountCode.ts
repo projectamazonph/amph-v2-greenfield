@@ -4,10 +4,7 @@
  * STORY-050d.
  */
 import { Result } from "@/domain/shared/Result";
-import {
-  updateDiscountCode,
-  type UpdateDiscountCodePatch,
-} from "@/domain/entities/DiscountCode";
+import { updateDiscountCode, type UpdateDiscountCodePatch } from "@/domain/entities/DiscountCode";
 import type {
   IDiscountCodeRepository,
   DiscountCodeRepositoryError,
@@ -40,10 +37,7 @@ export class AdminUpdateDiscountCode {
   async execute(input: AdminUpdateDiscountCodeInput): Promise<AdminUpdateDiscountCodeResult> {
     const findResult = await this.deps.discountCodeRepo.findById(input.id);
     if (!findResult.ok) {
-      const validationErrors = findResult.error;
-      return Result.err({
-        kind: validationErrors.kind,
-      } as DiscountCodeError | DiscountCodeRepositoryError);
+      return Result.err(findResult.error);
     }
     if (findResult.value === null) {
       void this.deps.recordAuditLog.execute({
@@ -65,10 +59,7 @@ export class AdminUpdateDiscountCode {
         targetType: "discount_code",
         metadata: { error: updateResult.error.kind },
       });
-      const validationErrors = updateResult.error;
-      return Result.err({
-        kind: validationErrors.kind,
-      } as DiscountCodeError | DiscountCodeRepositoryError);
+      return Result.err(updateResult.error);
     }
 
     const persistResult = await this.deps.discountCodeRepo.update(updateResult.value);
@@ -78,12 +69,14 @@ export class AdminUpdateDiscountCode {
         action: "discount_code.update_failed",
         targetId: input.id,
         targetType: "discount_code",
-        metadata: { error: persistResult.error.kind === "db_error" ? persistResult.error.message : persistResult.error.kind },
+        metadata: {
+          error:
+            persistResult.error.kind === "db_error"
+              ? persistResult.error.message
+              : persistResult.error.kind,
+        },
       });
-      const validationErrors = persistResult.error;
-      return Result.err({
-        kind: validationErrors.kind,
-      } as DiscountCodeError | DiscountCodeRepositoryError);
+      return Result.err(persistResult.error);
     }
 
     void this.deps.recordAuditLog.execute({

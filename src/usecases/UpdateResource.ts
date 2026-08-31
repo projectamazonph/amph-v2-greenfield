@@ -57,8 +57,12 @@ export class UpdateResource {
     if (!findResult.ok) {
       return findResult;
     }
+    if (findResult.value === null) {
+      return Result.err({ kind: "not_found" });
+    }
+    const existing = findResult.value;
 
-    const updateResult = updateResource(findResult.value, input.patch, input.actorId);
+    const updateResult = updateResource(existing, input.patch, input.actorId);
     if (!updateResult.ok) {
       await this.deps.recordAuditLog.execute({
         actorId: input.actorId,
@@ -67,10 +71,7 @@ export class UpdateResource {
         targetType: "resource",
         metadata: { error: updateResult.error.kind },
       });
-      const validationErrors = updateResult.error;
-      return Result.err({
-        kind: validationErrors.kind,
-      } as ResourceError | ResourceRepositoryError);
+      return Result.err(updateResult.error);
     }
 
     const persistResult = await this.deps.resourceRepo.update(updateResult.value);
@@ -98,12 +99,15 @@ export class UpdateResource {
       metadata: { patch: input.patch },
     });
 
-    const oldFileKey = findResult.value.fileKey;
+    const oldFileKey = existing.fileKey;
     const newFileKey = updateResult.value.fileKey;
     if (oldFileKey && oldFileKey !== newFileKey) {
       const deleteResult = await this.deps.fileStorage.delete(oldFileKey);
       if (!deleteResult.ok) {
-        this.deps.logger.error("[UpdateResource] Failed to delete orphaned file", { fileKey: oldFileKey, error: deleteResult.error });
+        this.deps.logger.error("[UpdateResource] Failed to delete orphaned file", {
+          fileKey: oldFileKey,
+          error: deleteResult.error,
+        });
       }
     }
 

@@ -3,7 +3,7 @@
  *
  * STORY-050d.
  */
-import type { Result } from "@/domain/shared/Result";
+import { Result } from "@/domain/shared/Result";
 import type {
   IDiscountCodeRepository,
   DiscountCodeRepositoryError,
@@ -28,9 +28,7 @@ export class AdminArchiveDiscountCode {
     },
   ) {}
 
-  async execute(
-    input: AdminArchiveDiscountCodeInput,
-  ): Promise<AdminArchiveDiscountCodeResult> {
+  async execute(input: AdminArchiveDiscountCodeInput): Promise<AdminArchiveDiscountCodeResult> {
     // Idempotent: if not found, return success
     const findResult = await this.deps.discountCodeRepo.findById(input.id);
     if (!findResult.ok) {
@@ -41,10 +39,7 @@ export class AdminArchiveDiscountCode {
         targetType: "discount_code",
         metadata: { error: findResult.error.kind },
       });
-      const validationErrors = findResult.error;
-      return Result.err({
-        kind: validationErrors.kind,
-      } as DiscountCodeError | DiscountCodeRepositoryError);
+      return Result.err(findResult.error);
     }
 
     const wasAlreadyArchived = findResult.value === null;
@@ -59,10 +54,7 @@ export class AdminArchiveDiscountCode {
           targetType: "discount_code",
           metadata: { error: archiveResult.error.kind },
         });
-        const validationErrors = archiveResult.error;
-      return Result.err({
-        kind: validationErrors.kind,
-      } as DiscountCodeError | DiscountCodeRepositoryError);
+        return Result.err(archiveResult.error);
       }
 
       void this.deps.recordAuditLog.execute({
