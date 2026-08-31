@@ -13,6 +13,7 @@ import { FixedClock } from "@/ports/system/Clock";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createCourse, type Course } from "@/domain/entities/Course";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeInput(overrides: Partial<CreateCourseInput> = {}) {
   return {
@@ -42,18 +43,26 @@ function makeExistingCourse(): Course {
     tagline: "T",
     description: "D",
     priceMinor: 1000,
-    curriculum: { sections: [{ id: "s1", title: "S", lessons: [{ id: "l1", title: "L", type: "TEXT", content: "" }] }] },
+    curriculum: {
+      sections: [
+        { id: "s1", title: "S", lessons: [{ id: "l1", title: "L", type: "TEXT", content: "" }] },
+      ],
+    },
   });
   if (!r.ok) throw new Error("seed failed");
   return r.value;
 }
 
-
 function makeRecordAuditLog(): RecordAuditLog {
   return new RecordAuditLog({
     auditLog: new InMemoryAuditLog(),
-    idGen: { newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`, paymentRef: () => "x", receiptNumber: () => "x" },
+    idGen: {
+      newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`,
+      paymentRef: () => "x",
+      receiptNumber: () => "x",
+    },
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 

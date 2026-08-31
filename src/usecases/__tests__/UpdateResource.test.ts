@@ -7,6 +7,7 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { createResource } from "@/domain/entities/Resource";
 import type { IFileStorage } from "@/ports/storage/IFileStorage";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 describe("UpdateResource", () => {
   let repo: InMemoryResourceRepository;
@@ -21,8 +22,14 @@ describe("UpdateResource", () => {
       auditLog: new InMemoryAuditLog(),
       idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
-    useCase = new UpdateResource({ resourceRepo: repo, fileStorage, recordAuditLog });
+    useCase = new UpdateResource({
+      resourceRepo: repo,
+      fileStorage,
+      recordAuditLog,
+      logger: new SilentLogger(),
+    });
 
     const seed = createResource({
       id: "res_1",
@@ -174,6 +181,7 @@ describe("UpdateResource", () => {
       resourceRepo: repo,
       fileStorage: slowStorage,
       recordAuditLog,
+      logger: new SilentLogger(),
     });
 
     await fileStorage.upload({

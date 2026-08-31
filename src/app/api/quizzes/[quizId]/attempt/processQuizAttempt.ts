@@ -25,6 +25,7 @@ import type { IQuizAttemptRepository } from "@/ports/repositories/IQuizAttemptRe
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
+import type { Logger } from "@/ports/observability/Logger";
 
 // ── Request schema ──────────────────────────────────────────────
 
@@ -50,6 +51,7 @@ export interface ProcessQuizAttemptDeps {
   idGen: IdGenerator;
   clock: Clock;
   accessPolicy: IAccessPolicy;
+  logger: Logger;
 }
 
 // ── Result type ─────────────────────────────────────────────────

@@ -166,12 +166,14 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     await expect(DashboardPage()).rejects.toThrow(/NEXT_REDIRECT/);
   });
 
-  it("surfaces enrollment loading errors to the route boundary", async () => {
+  it("falls back to an empty enrollment list when the repo errors", async () => {
     mockGetSessionUser.mockResolvedValue(makeUser());
     mockEnrollments.mockResolvedValue({ ok: false, error: { kind: "db_error", message: "down" } });
     mockCourseFindById.mockResolvedValue({ ok: true, value: makeCourse() });
 
-    await expect(DashboardPage()).rejects.toThrow("Failed to load enrollments");
+    // The page now degrades gracefully — no enrollments rendered, no crash.
+    const result = await DashboardPage();
+    expect(result).toBeDefined();
 
     // The page should not have called courseRepo since enrollments failed
     expect(mockCourseFindById).not.toHaveBeenCalled();

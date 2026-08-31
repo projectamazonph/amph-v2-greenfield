@@ -4,6 +4,7 @@ import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepos
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeRepo() {
   return {
@@ -17,6 +18,7 @@ function makeRecordAuditLog(audit: InMemoryAuditLog) {
     auditLog: audit,
     idGen: { newId: () => "audit_1", paymentRef: () => "x", receiptNumber: () => "x" },
     clock: new FixedClock(new Date("2025-01-01T00:00:00Z")),
+    logger: new SilentLogger(),
   });
 }
 

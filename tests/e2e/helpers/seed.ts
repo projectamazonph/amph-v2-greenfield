@@ -124,11 +124,13 @@ export async function seedAdminUser(
         lastName: "Admin",
         role: "ADMIN",
         verificationStatus: "VERIFIED",
+        twoFactorEnabled: true,
       },
       update: {
         password: passwordHash,
         role: "ADMIN",
         verificationStatus: "VERIFIED",
+        twoFactorEnabled: true,
       },
     });
     return { email, password };

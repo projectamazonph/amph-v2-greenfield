@@ -35,6 +35,7 @@ describe("RefundOverride", () => {
       auditLog,
       idGen: { newId: () => `ale_${Date.now()}`, paymentRef: () => "x", receiptNumber: () => "x" },
       clock: new SystemClock(),
+      logger: new TestLogger(),
     });
     useCase = new RefundOverride({
       orderRepo,

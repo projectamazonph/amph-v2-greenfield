@@ -12,6 +12,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 async function seedLesson(
   repo: InMemoryLessonRepository,
@@ -36,6 +37,7 @@ function makeRecordAuditLog(): RecordAuditLog {
     auditLog: new InMemoryAuditLog(),
     idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 
@@ -52,6 +54,7 @@ describe("DeleteLesson", () => {
       courseRepo: new InMemoryCourseRepository(),
       moduleRepo,
       lessonRepo,
+      logger: new SilentLogger(),
     });
     useCase = new DeleteLesson({ lessonRepo, moduleRepo, recordAuditLog, rebuildCourseCurriculum });
   });

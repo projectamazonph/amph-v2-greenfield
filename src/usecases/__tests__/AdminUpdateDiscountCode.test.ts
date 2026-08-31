@@ -5,6 +5,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { createDiscountCode } from "@/domain/entities/DiscountCode";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeDiscountCode(overrides: Partial<Parameters<typeof createDiscountCode>[0]> = {}) {
   const r = createDiscountCode({
@@ -29,6 +30,7 @@ describe("AdminUpdateDiscountCode", () => {
       auditLog: new InMemoryAuditLog(),
       idGen: { newId: () => "audit_1", paymentRef: () => "x", receiptNumber: () => "x" },
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     useCase = new AdminUpdateDiscountCode({
       discountCodeRepo: repo,
@@ -62,7 +64,11 @@ describe("AdminUpdateDiscountCode", () => {
   });
 
   it("returns not_found when the code does not exist", async () => {
-    const r = await useCase.execute({ id: "nonexistent", patch: { value: 30 }, actorId: "admin_1" });
+    const r = await useCase.execute({
+      id: "nonexistent",
+      patch: { value: 30 },
+      actorId: "admin_1",
+    });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("not_found");
@@ -70,7 +76,11 @@ describe("AdminUpdateDiscountCode", () => {
 
   it("fails validation when updated code is invalid", async () => {
     await seed();
-    const r = await useCase.execute({ id: "dc_1", patch: { code: "bad code!" }, actorId: "admin_1" });
+    const r = await useCase.execute({
+      id: "dc_1",
+      patch: { code: "bad code!" },
+      actorId: "admin_1",
+    });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("invalid_code");

@@ -15,6 +15,7 @@ import { InMemoryLiveClassRepository } from "@/infra/live-class/InMemoryLiveClas
 import { FixedClock } from "@/ports/system/Clock";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 const activeEnrollmentRepo = {
   findByUserIdAndCourseId: async () => ({ status: "active" }),
@@ -76,6 +77,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date("2026-08-03T00:00:00Z")),
+      logger: new SilentLogger(),
     });
     const r = await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });
 
@@ -106,6 +108,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date("2026-08-03T00:00:00Z")),
+      logger: new SilentLogger(),
     });
     await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });
     mockAwardXp.execute.mockClear();
@@ -142,6 +145,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date("2026-08-03T00:00:00Z")),
+      logger: new SilentLogger(),
     });
 
     const [r1, r2] = await Promise.all([
@@ -169,6 +173,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     const r = await useCase.execute({ userId: "u-2", liveClassId: "missing" });
     expect(r.ok).toBe(false);
@@ -201,6 +206,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     const r = await useCase.execute({ userId: "u-2", liveClassId: "lc-2" });
     expect(r.ok).toBe(false);
@@ -236,6 +242,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     const r = await useCase.execute({ userId: "u-2", liveClassId: "lc-3" });
     expect(r.ok).toBe(false);
@@ -251,6 +258,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     const r = await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });
     expect(r.ok).toBe(false);
@@ -275,6 +283,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       enrollmentRepo: activeEnrollmentRepo,
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     const r = await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });
     expect(r.ok).toBe(false);
@@ -296,6 +305,7 @@ describe("MarkLiveClassRecordingWatched", () => {
       },
       awardXp: mockAwardXp,
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
 
     const result = await useCase.execute({ userId: "u-2", liveClassId: "lc-1" });

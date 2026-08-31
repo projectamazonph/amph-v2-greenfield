@@ -81,7 +81,11 @@ export class SaveSimulatorDecision {
 
     const addResult = await attemptRepo.addDecision(attempt.id, decision);
     if (Result.isErr(addResult)) {
-      return Result.err({ kind: addResult.error.kind, message: addResult.error.message } as SaveSimulatorDecisionError);
+      const err = addResult.error;
+      return Result.err({
+        kind: "db_error",
+        message: err.kind === "db_error" ? err.message : String(err),
+      });
     }
 
     // ── 4. Return revision info ─────────────────────────────────

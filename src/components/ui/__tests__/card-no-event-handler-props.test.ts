@@ -60,8 +60,8 @@ function tscOnFixture(): { ok: boolean; output: string } {
   const projectRoot = process.cwd();
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "amph-tsc-"));
   const tsconfig = path.join(tmp, "tsconfig.json");
-  const cardAbs = path.join(projectRoot, "src/components/ui/Card.tsx");
-  const fixtureAbs = path.join(
+  const cardAbs = path.resolve(projectRoot, "src/components/ui/Card.tsx");
+  const fixtureAbs = path.resolve(
     projectRoot,
     "src/components/ui/__tests__/card-event-handler-rejection.fixture.tsx",
   );
@@ -87,7 +87,10 @@ function tscOnFixture(): { ok: boolean; output: string } {
     }),
   );
 
-  const result = spawnSync("npx", ["tsc", "--noEmit", "-p", tsconfig], {
+  // Use node + the tsc JS entry instead of `npx tsc` — `npx` resolution
+  // can swallow stderr on Windows when the binary is a shell wrapper.
+  const tscEntry = path.resolve(projectRoot, "node_modules", "typescript", "lib", "tsc.js");
+  const result = spawnSync(process.execPath, [tscEntry, "--noEmit", "-p", tsconfig], {
     cwd: projectRoot,
     encoding: "utf8",
   });
@@ -193,10 +196,7 @@ describe("L-03: Card is a server component and must reject event-handler props a
       // test will fail.
       const { ok, output } = tscOnFixture();
       expect(ok, `tsc unexpectedly passed. Output:\n${output}`).toBe(false);
-      expect(
-        output,
-        `tsc output must mention onClick. Output:\n${output}`,
-      ).toMatch(/onClick/);
+      expect(output, `tsc output must mention onClick. Output:\n${output}`).toMatch(/onClick/);
     });
   });
 });

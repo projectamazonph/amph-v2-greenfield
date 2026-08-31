@@ -6,6 +6,7 @@ import type { RecordAuditLog as RecordAuditLogType } from "@/usecases/RecordAudi
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { createLiveClass } from "@/domain/entities/LiveClass";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 const futureDate = new Date("2026-09-01T10:00:00Z");
 
@@ -32,7 +33,12 @@ describe("UpdateLiveClass", () => {
 
   beforeEach(() => {
     repo = new InMemoryLiveClassRepository();
-    recordAuditLog = new RecordAuditLog({ auditLog: new InMemoryAuditLog(), idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" }, clock: new FixedClock(new Date()) });
+    recordAuditLog = new RecordAuditLog({
+      auditLog: new InMemoryAuditLog(),
+      idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
+      clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
+    });
     useCase = new UpdateLiveClass({ liveClassRepo: repo, recordAuditLog });
   });
 

@@ -9,6 +9,7 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeIdGen(): IdGenerator {
   let n = 0;
@@ -24,10 +25,13 @@ function makeRecordAuditLog(): RecordAuditLog {
     auditLog: new InMemoryAuditLog(),
     idGen: makeIdGen(),
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 
-function makeInput(overrides: Partial<Parameters<typeof CreateSimulatorScenario.prototype.execute>[0]> = {}) {
+function makeInput(
+  overrides: Partial<Parameters<typeof CreateSimulatorScenario.prototype.execute>[0]> = {},
+) {
   return {
     id: "s_new",
     simulatorId: "bid-elevator" as const,

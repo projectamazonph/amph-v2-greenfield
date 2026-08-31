@@ -42,6 +42,7 @@ describe("AdminProcessRefund", () => {
       auditLog,
       idGen: new InMemoryIdGenerator(),
       clock: new FixedClock(new Date()),
+      logger: new TestLogger(),
     });
     refundOverride = new RefundOverride({
       orderRepo,

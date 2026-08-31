@@ -12,12 +12,14 @@ import { createModule, type Module } from "@/domain/entities/Module";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeRecordAuditLog(): RecordAuditLog {
   return new RecordAuditLog({
     auditLog: new InMemoryAuditLog(),
     idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 
@@ -50,6 +52,7 @@ describe("UpdateModule", () => {
       courseRepo: new InMemoryCourseRepository(),
       moduleRepo,
       lessonRepo: new InMemoryLessonRepository(),
+      logger: new SilentLogger(),
     });
     useCase = new UpdateModule({
       moduleRepo,

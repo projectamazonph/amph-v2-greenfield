@@ -11,6 +11,7 @@ import { InMemoryLessonRepository } from "@/infra/repositories/InMemoryLessonRep
 import { createCourse } from "@/domain/entities/Course";
 import { createModule } from "@/domain/entities/Module";
 import { createLesson } from "@/domain/entities/Lesson";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function seedCourse(repo: InMemoryCourseRepository) {
   const r = createCourse({
@@ -81,7 +82,12 @@ describe("RebuildCourseCurriculum", () => {
     courseRepo = new InMemoryCourseRepository();
     moduleRepo = new InMemoryModuleRepository();
     lessonRepo = new InMemoryLessonRepository();
-    useCase = new RebuildCourseCurriculum({ courseRepo, moduleRepo, lessonRepo });
+    useCase = new RebuildCourseCurriculum({
+      courseRepo,
+      moduleRepo,
+      lessonRepo,
+      logger: new SilentLogger(),
+    });
   });
 
   it("rebuilds curriculum from the current Module/Lesson rows and persists it", async () => {

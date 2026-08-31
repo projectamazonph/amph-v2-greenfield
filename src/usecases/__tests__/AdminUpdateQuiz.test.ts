@@ -6,12 +6,14 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { Result } from "@/domain/shared/Result";
 import { createQuiz, type Quiz } from "@/domain/entities/Quiz";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeRecordAuditLog(audit: InMemoryAuditLog) {
   return new RecordAuditLog({
     auditLog: audit,
     idGen: { newId: () => "audit_1", paymentRef: () => "x", receiptNumber: () => "x" },
     clock: new FixedClock(new Date("2025-01-01T00:00:00Z")),
+    logger: new SilentLogger(),
   });
 }
 

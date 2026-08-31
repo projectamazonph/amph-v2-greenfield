@@ -53,6 +53,7 @@ export type RecordQuizAttemptDeps = {
   idGen: IdGenerator;
   clock: Clock;
   accessPolicy: IAccessPolicy;
+  logger: Logger;
 };
 
 export type RecordQuizAttemptError =
@@ -178,7 +179,9 @@ export class RecordQuizAttempt {
         if (xpResult.ok) {
           xpAwarded = XPService.QUIZ_PASSED_XP;
         } else {
-          this.deps.logger.error("[RecordQuizAttempt] Failed to award quiz XP:", { error: xpResult.error });
+          this.deps.logger.error("[RecordQuizAttempt] Failed to award quiz XP:", {
+            error: xpResult.error,
+          });
         }
       }
 

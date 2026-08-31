@@ -9,6 +9,7 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeIdGen(): IdGenerator {
   let n = 0;
@@ -25,13 +26,12 @@ function makeRecordAuditLog(): { useCase: RecordAuditLog; auditLog: InMemoryAudi
     auditLog,
     idGen: makeIdGen(),
     clock: new FixedClock(new Date("2026-08-21T10:00:00Z")),
+    logger: new SilentLogger(),
   });
   return { useCase, auditLog };
 }
 
-function makeInput(
-  overrides: Partial<Parameters<SetScenarioCalibration["execute"]>[0]> = {},
-) {
+function makeInput(overrides: Partial<Parameters<SetScenarioCalibration["execute"]>[0]> = {}) {
   return {
     simulatorId: "bid-elevator" as const,
     scenarioKey: "scenario-key-1",
@@ -117,9 +117,7 @@ describe("SetScenarioCalibration", () => {
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error.kind).toBe("unknown_dimension");
-    expect(r.error.kind === "unknown_dimension" && r.error.dimension).toBe(
-      "not_a_real_dimension",
-    );
+    expect(r.error.kind === "unknown_dimension" && r.error.dimension).toBe("not_a_real_dimension");
   });
 
   it("upserts: a second call with the same key replaces the band map", async () => {

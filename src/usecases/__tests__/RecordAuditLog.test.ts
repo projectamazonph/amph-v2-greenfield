@@ -10,6 +10,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
+import { TestLogger } from "@/infra/observability/TestLogger";
 
 function makeIdGen(): IdGenerator {
   let n = 0;
@@ -23,13 +24,16 @@ function makeIdGen(): IdGenerator {
 describe("RecordAuditLog", () => {
   let auditLog: InMemoryAuditLog;
   let useCase: RecordAuditLog;
+  let logger: TestLogger;
 
   beforeEach(() => {
     auditLog = new InMemoryAuditLog();
+    logger = new TestLogger();
     useCase = new RecordAuditLog({
       auditLog,
       idGen: makeIdGen(),
       clock: new FixedClock(new Date("2026-07-19T00:00:00Z")),
+      logger,
     });
   });
 
@@ -65,6 +69,7 @@ describe("RecordAuditLog", () => {
       auditLog,
       idGen,
       clock: new FixedClock(new Date()),
+      logger: new TestLogger(),
     });
 
     await useCase.execute({
@@ -83,6 +88,7 @@ describe("RecordAuditLog", () => {
       auditLog,
       idGen: makeIdGen(),
       clock: new FixedClock(t0),
+      logger: new TestLogger(),
     });
 
     await useCase.execute({
@@ -102,14 +108,13 @@ describe("RecordAuditLog", () => {
         error: { kind: "db_error" as const, message: "store down" },
       })),
     };
+    const failingLogger = new TestLogger();
     useCase = new RecordAuditLog({
       auditLog: failingLog as never,
       idGen: makeIdGen(),
       clock: new FixedClock(new Date()),
+      logger: failingLogger,
     });
-
-    // Suppress console.error for this test
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const r = await useCase.execute({
       actorId: "u1",
@@ -119,12 +124,17 @@ describe("RecordAuditLog", () => {
     });
 
     expect(r.recorded).toBe(false);
-    expect(consoleError).toHaveBeenCalled();
-    consoleError.mockRestore();
+    expect(failingLogger.entries.some((e) => e.level === "error")).toBe(true);
   });
 
   it("DOES NOT throw on invalid input — returns recorded: false", async () => {
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const failingLogger = new TestLogger();
+    useCase = new RecordAuditLog({
+      auditLog,
+      idGen: makeIdGen(),
+      clock: new FixedClock(new Date()),
+      logger: failingLogger,
+    });
 
     const r = await useCase.execute({
       actorId: "  ", // whitespace-only
@@ -134,7 +144,6 @@ describe("RecordAuditLog", () => {
     });
 
     expect(r.recorded).toBe(false);
-    expect(consoleError).toHaveBeenCalled();
-    consoleError.mockRestore();
+    expect(failingLogger.entries.some((e) => e.level === "error")).toBe(true);
   });
 });

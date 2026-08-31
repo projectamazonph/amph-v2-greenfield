@@ -12,7 +12,7 @@
  */
 
 import { Result } from "@/domain/shared/Result";
-import type { SimulatorAttempt } from "@/domain/entities/SimulatorAttempt";
+import type { SimulatorAttempt, SimulatorAttemptError } from "@/domain/entities/SimulatorAttempt";
 import type { ISimulatorAttemptRepository } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { Clock } from "@/ports/system/Clock";
 
@@ -83,13 +83,11 @@ export class SubmitSimulatorAttempt {
     const updateResult = await attemptRepo.updateStatus(attempt.id, "submitted", {
       submittedAt,
     });
-    return this.mapToSubmitResult(
-      updateResult,
-    );
+    return this.mapToSubmitResult(updateResult);
   }
 
   private mapToSubmitResult(
-    result: Result<SimulatorAttempt, SubmitSimulatorAttemptError>,
+    result: Result<SimulatorAttempt, SimulatorAttemptError>,
   ): Result<SubmitSimulatorAttemptResult, SubmitSimulatorAttemptError> {
     if (Result.isErr(result)) {
       if (result.error.kind === "already_submitted") {

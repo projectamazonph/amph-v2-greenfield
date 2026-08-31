@@ -30,7 +30,14 @@ const BADGE_ICONS: Record<string, Icon> = {
 
 function BadgeIcon({ iconName, slug }: { iconName: string; slug: string }) {
   const IconComponent = BADGE_ICONS[iconName] ?? Medal;
-  return <IconComponent className={styles.badgeIcon} weight="duotone" aria-hidden="true" data-slug={slug} />;
+  return (
+    <IconComponent
+      className={styles.badgeIcon}
+      weight="duotone"
+      aria-hidden="true"
+      data-slug={slug}
+    />
+  );
 }
 
 export const dynamic = "force-dynamic";
@@ -40,11 +47,7 @@ export default async function ProfilePage() {
 
   const container = buildContainer();
   const badgesResult = await container.listUserBadges.execute({ userId: user.id });
-  if (!badgesResult.ok) {
-    // Use empty array as fallback
-    const badges = [];
-  }
-  const badges = badgesResult.value.badges;
+  const badges = badgesResult.ok ? badgesResult.value.badges : [];
 
   return (
     <StudentShell user={user}>
@@ -59,7 +62,9 @@ export default async function ProfilePage() {
         </header>
         <div className={styles.grid}>
           <section className={styles.section} aria-labelledby="profile-details-title">
-            <h2 id="profile-details-title" className={styles.sectionTitle}>Account details</h2>
+            <h2 id="profile-details-title" className={styles.sectionTitle}>
+              Account details
+            </h2>
             <dl className={styles.fields}>
               <Field label="Role" value={user.role} />
               <Field label="Subscription" value={user.subscriptionTier} />
@@ -68,7 +73,9 @@ export default async function ProfilePage() {
             </dl>
           </section>
           <section className={styles.section} aria-labelledby="profile-badges-title">
-            <h2 id="profile-badges-title" className={styles.sectionTitle}>Badges</h2>
+            <h2 id="profile-badges-title" className={styles.sectionTitle}>
+              Badges
+            </h2>
             {badges.length === 0 ? (
               <p className={styles.empty}>
                 No badges yet. Complete a module or simulator to earn one.

@@ -814,6 +814,7 @@ function buildProductionContainer(): AppContainer {
       idGen,
       clock,
       accessPolicy,
+      logger,
     }),
     awardXp,
     awardBadge: new AwardBadge({
@@ -821,6 +822,7 @@ function buildProductionContainer(): AppContainer {
       badgeAwardRepo,
       awardXp,
       idGen,
+      logger,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
     certificateRepo,
@@ -1138,19 +1140,20 @@ function buildProductionContainer(): AppContainer {
       enrollmentRepo,
       awardXp,
       clock,
+      logger,
     }),
     // STORY-098: download center resources
     resourceRepo,
     fileStorage,
     createResource: new CreateResource({ resourceRepo, recordAuditLog }),
-    updateResource: new UpdateResource({ resourceRepo, fileStorage, recordAuditLog }),
+    updateResource: new UpdateResource({ resourceRepo, fileStorage, recordAuditLog, logger }),
     deleteResource: new DeleteResource({ resourceRepo, recordAuditLog }),
     adminListResources: new AdminListResources({ resourceRepo }),
     adminGetResource: new AdminGetResource({ resourceRepo }),
     listAvailableResources: new ListAvailableResources({ resourceRepo }),
     recordResourceDownload: new RecordResourceDownload({ resourceRepo, recordAuditLog }),
     // STORY-098.5: download center file upload/management
-    purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog }),
+    purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog, logger }),
     uploadFile: new UploadFile({ fileStorage }),
     deleteFile: new DeleteFile({ fileStorage }),
   };

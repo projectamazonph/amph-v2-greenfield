@@ -27,12 +27,11 @@ export default async function PurchasesPage({ searchParams }: Props) {
   const params = await searchParams;
   const container = buildContainer();
   const ordersResult = await container.orderRepo.findByUserId(user.id);
-  if (!ordersResult.ok) {
-    // Use empty array as fallback
-    const orders = [];
-  const orders = ordersResult.ok ? [...ordersResult.value].sort(
-    (left, right) => right.createdAt.getTime() - left.createdAt.getTime(),
-  );
+  const orders = !ordersResult.ok
+    ? []
+    : [...ordersResult.value].sort(
+        (left, right) => right.createdAt.getTime() - left.createdAt.getTime(),
+      );
   const [courseResults, enrollments] = await Promise.all([
     Promise.all(orders.map((order) => container.courseRepo.findById(order.courseId))),
     Promise.all(
@@ -59,8 +58,8 @@ export default async function PurchasesPage({ searchParams }: Props) {
             Purchases and refunds
           </h1>
           <p className={styles.intro}>
-            Review payment status, course completion, and whether a recent purchase is eligible for a
-            refund request.
+            Review payment status, course completion, and whether a recent purchase is eligible for
+            a refund request.
           </p>
         </header>
 
@@ -93,19 +92,16 @@ export default async function PurchasesPage({ searchParams }: Props) {
         ) : (
           <div className={styles.grid}>
             {orders.map((order, index) => {
-
-              if (!order) return null;
               const courseResult = courseResults[index];
               if (!courseResult?.ok && courseResult?.error.kind === "db_error") {
-        // Skip this order
-        return null;
+                return null;
               }
               const courseTitle = courseResult?.ok ? courseResult.value.title : "Course purchase";
               const enrollment = enrollments[index];
               const paidAt = order.paymongoPaidAt ?? order.createdAt;
               const withinWindow = Boolean(
                 order.paymongoPaidAt &&
-                  Date.now() - order.paymongoPaidAt.getTime() <= 7 * 24 * 60 * 60 * 1000,
+                Date.now() - order.paymongoPaidAt.getTime() <= 7 * 24 * 60 * 60 * 1000,
               );
               const underCompletionLimit = (enrollment?.progressPercent ?? 0) < 25;
               const canRequest =
@@ -176,7 +172,7 @@ export default async function PurchasesPage({ searchParams }: Props) {
                   ) : null}
                 </section>
               );
-            }).filter(Boolean)
+            })}
           </div>
         )}
       </main>

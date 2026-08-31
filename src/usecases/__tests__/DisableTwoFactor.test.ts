@@ -10,6 +10,7 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import type { PasswordHasher } from "@/ports/security/PasswordHasher";
 import { Result } from "@/domain/shared/Result";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 class StubHasher implements PasswordHasher {
   async hash(password: string) {
@@ -35,6 +36,7 @@ describe("DisableTwoFactor", () => {
       auditLog,
       idGen: { newId: () => "ale_1", paymentRef: () => "x", receiptNumber: () => "x" },
       clock: new FixedClock(new Date()),
+      logger: new SilentLogger(),
     });
     useCase = new DisableTwoFactor({ userRepo, hasher, recordAuditLog });
 

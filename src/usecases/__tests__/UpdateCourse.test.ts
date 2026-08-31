@@ -13,6 +13,7 @@ import { FixedClock } from "@/ports/system/Clock";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { createCourse, type Course } from "@/domain/entities/Course";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 function makeCourse(overrides: Partial<Course> = {}): Course {
   const r = createCourse({
@@ -22,19 +23,31 @@ function makeCourse(overrides: Partial<Course> = {}): Course {
     tagline: "Tagline",
     description: "Description",
     priceMinor: 1000,
-    curriculum: { sections: [{ id: "s1", title: "Section 1", lessons: [{ id: "l1", title: "Lesson 1", type: "TEXT", content: "" }] }] },
+    curriculum: {
+      sections: [
+        {
+          id: "s1",
+          title: "Section 1",
+          lessons: [{ id: "l1", title: "Lesson 1", type: "TEXT", content: "" }],
+        },
+      ],
+    },
     ...overrides,
   });
   if (!r.ok) throw new Error("seed failed");
   return r.value;
 }
 
-
 function makeRecordAuditLog(): RecordAuditLog {
   return new RecordAuditLog({
     auditLog: new InMemoryAuditLog(),
-    idGen: { newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`, paymentRef: () => "x", receiptNumber: () => "x" },
+    idGen: {
+      newId: () => `ale_${Math.random().toString(36).slice(2, 8)}`,
+      paymentRef: () => "x",
+      receiptNumber: () => "x",
+    },
     clock: new FixedClock(new Date()),
+    logger: new SilentLogger(),
   });
 }
 
@@ -52,7 +65,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { title: "Updated Title" },
     });
@@ -70,7 +83,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { title: "New Title", priceMinor: 2000, isFeatured: true },
     });
@@ -87,7 +100,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { slug: "new-slug" },
     });
@@ -102,7 +115,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { slug: "test-course", title: "Updated" },
     });
@@ -113,7 +126,7 @@ describe("UpdateCourse", () => {
   it("returns course_not_found when the course does not exist", async () => {
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "missing",
       patch: { title: "X" },
     });
@@ -129,7 +142,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "c1",
       patch: { slug: "slug-b" },
     });
@@ -144,7 +157,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { slug: "Has Spaces" },
     });
@@ -159,7 +172,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { priceMinor: -100 },
     });
@@ -179,7 +192,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { title: "X" },
     });
@@ -200,7 +213,7 @@ describe("UpdateCourse", () => {
 
     const result = await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { title: "X" },
     });
@@ -214,7 +227,7 @@ describe("UpdateCourse", () => {
     await courseRepo.create(makeCourse());
     await useCase.execute({
       actorId: "admin_1",
-      
+
       courseId: "course_01",
       patch: { title: "Persisted" },
     });

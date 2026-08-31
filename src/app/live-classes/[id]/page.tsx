@@ -53,10 +53,13 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
   // ── Class metadata ───────────────────────────────────────────
   const classResult = await container.liveClassRepo.findById(id);
   if (!classResult.ok) {
-    // Show error to user instead of throwing
-    return <StudentShell user={user}>
-      <main id="main-content"><p>Failed to load class. Please try again.</p></main>
-    </StudentShell>;
+    return (
+      <StudentShell user={user}>
+        <main id="main-content">
+          <p>Failed to load class. Please try again.</p>
+        </main>
+      </StudentShell>
+    );
   }
   if (!classResult.value) {
     notFound();
@@ -65,23 +68,18 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
 
   // ── Enrollment check (for the RSVP gate) ────────────────────
   const enrollments = await container.enrollmentRepo.findByUserId(user.id);
-  if (!enrollments.ok) {
-    // Use empty array as fallback
-    const isEnrolled = false;
-  }
-  const isEnrolled = enrollments.value.some(
-    (enrollment) => enrollment.courseId === liveClass.courseId && enrollment.status === "active",
-  );
+  const isEnrolled = enrollments.ok
+    ? enrollments.value.some(
+        (enrollment) =>
+          enrollment.courseId === liveClass.courseId && enrollment.status === "active",
+      )
+    : false;
 
   // ── Current RSVP for the user ────────────────────────────────
   const rsvpResult = await container.liveClassRegistrationRepo.findByUserAndClass(
     user.id,
     liveClass.id,
   );
-  if (!rsvpResult.ok) {
-    // Use null as fallback
-    const rsvp = null;
-  }
   const rsvp = rsvpResult.ok ? rsvpResult.value : null;
   const isRegistered = rsvp?.status === "registered";
   const hasRsvpd = rsvp !== null && rsvp.status !== "cancelled";
@@ -96,7 +94,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
       <main id="main-content" tabIndex={-1}>
         <div className={styles.breadcrumb}>
           <Link href="/live-classes" className={styles.breadcrumbLink}>
-            <ArrowLeft size={16} aria-hidden />{" "}All live classes
+            <ArrowLeft size={16} aria-hidden /> All live classes
           </Link>
         </div>
 
@@ -151,9 +149,15 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
 
           {!isCancelled && (
             <section className={styles.nextStep} aria-labelledby="live-class-next-step">
-              <span className={styles.eyebrow}>{isCompleted ? "After the session" : "Next step"}</span>
+              <span className={styles.eyebrow}>
+                {isCompleted ? "After the session" : "Next step"}
+              </span>
               <h2 id="live-class-next-step" className={styles.nextStepTitle}>
-                {isCompleted ? "Turn the recording into a takeaway" : isEnrolled ? "Reserve your place" : "Unlock this session"}
+                {isCompleted
+                  ? "Turn the recording into a takeaway"
+                  : isEnrolled
+                    ? "Reserve your place"
+                    : "Unlock this session"}
               </h2>
               <p className={styles.nextStepText}>
                 {isCompleted

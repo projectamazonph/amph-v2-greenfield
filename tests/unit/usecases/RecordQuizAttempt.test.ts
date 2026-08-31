@@ -28,6 +28,7 @@ import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { IdGenerator } from "@/ports/system/IdGenerator";
 import type { Clock } from "@/ports/system/Clock";
 import type { AccessDecision } from "@/domain/values/AccessDecision";
+import { SilentLogger } from "@/infra/observability/SilentLogger";
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -85,6 +86,7 @@ function buildUseCase(
     idGen: deps.idGen,
     clock: deps.clock,
     accessPolicy: { canAccess: vi.fn(async () => accessDecision) },
+    logger: new SilentLogger(),
   });
 }
 
