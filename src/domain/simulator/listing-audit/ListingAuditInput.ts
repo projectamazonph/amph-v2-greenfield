@@ -14,7 +14,8 @@
  */
 
 import type { FindingAction } from "./ListingAuditOutput";
-import type { Difficulty } from "@/domain/entities/SimulatorScenario";
+// STORY-083: Listing Audit Rule
+import type { ListingAuditRule } from "@/domain/entities/ListingAuditRule";
 
 export type ImageRole =
   "main" | "lifestyle" | "infographic" | "dimensions" | "comparison" | "packaging" | "other";
@@ -63,8 +64,7 @@ export interface ListingAuditInput {
   readonly currentPerformance?: Readonly<Record<string, unknown>>;
   /** Defaults to {}. Keyed by ruleId -- see ListingScenarioContext.complianceEvidence. */
   readonly complianceEvidence?: Readonly<Record<string, string>>;
-
-  // STORY-080: difficulty-scaled finding volume/severity mix
-  /** Defaults to "intermediate". Used to scale the number and severity mix of findings. */
-  readonly difficulty?: Difficulty;
+  // STORY-083: Context-aware ground truth rules
+  /** Optional rules from ListingAuditRuleRepository. When provided, used for ground-truth resolution. */
+  readonly listingAuditRules?: readonly ListingAuditRule[];
 }

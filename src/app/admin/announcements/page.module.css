@@ -1,0 +1,142 @@
+/* Announcements page styles */
+
+.card {
+  max-width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-6);
+}
+
+.title {
+  font-size: var(--fs-24);
+  font-weight: 700;
+  color: var(--c-shell-ink);
+}
+
+.createButton {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-weight: 600;
+  font-size: var(--fs-14);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.createButton:hover {
+  background: var(--c-orange-light);
+}
+
+.description {
+  color: var(--c-shell-faint);
+  margin-bottom: var(--sp-6);
+  font-size: var(--fs-15);
+  line-height: 1.6;
+}
+
+.empty {
+  color: var(--c-shell-faint);
+  text-align: center;
+  padding: var(--sp-8);
+  font-size: var(--fs-15);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--c-shell-line);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-2);
+}
+
+.itemTitle {
+  font-weight: 600;
+  font-size: var(--fs-16);
+  color: var(--c-shell-ink);
+}
+
+.itemStatusActive {
+  padding: 4px 12px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  text-transform: uppercase;
+  background: var(--c-success-soft);
+  color: var(--c-success);
+}
+
+.itemStatusInactive {
+  padding: 4px 12px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--c-shell-faint);
+}
+
+.itemContent {
+  color: var(--c-shell-ink);
+  font-size: var(--fs-14);
+  line-height: 1.5;
+  margin-bottom: var(--sp-3);
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-3);
+}
+
+.itemSeverityinfo {
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-11);
+  font-weight: 600;
+  text-transform: uppercase;
+  background: var(--c-info-soft);
+  color: var(--c-info);
+}
+
+.itemSeveritywarning {
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-11);
+  font-weight: 600;
+  text-transform: uppercase;
+  background: var(--c-warning-soft);
+  color: var(--c-warning);
+}
+
+.itemSeveritycritical {
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-11);
+  font-weight: 600;
+  text-transform: uppercase;
+  background: var(--c-error-soft);
+  color: var(--c-error);
+}
+
+.itemCreated {
+  font-size: var(--fs-12);
+  color: var(--c-shell-faint);
+}

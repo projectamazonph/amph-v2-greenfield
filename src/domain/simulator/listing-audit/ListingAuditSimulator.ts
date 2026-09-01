@@ -36,6 +36,9 @@ import type {
 } from "./ListingAuditOutput";
 import type { Difficulty } from "@/domain/entities/SimulatorScenario";
 
+import type { ListingAuditRule } from "@/domain/entities/ListingAuditRule";
+import { resolveExpectedAction as resolveExpectedActionFromRule } from "@/domain/entities/ListingAuditRule";
+
 // ── Category variants ──────────────────────────────────────────────────────
 
 interface CategoryVariantConfig {
@@ -864,23 +867,78 @@ const OVERRIDE_RESOLVERS: Readonly<
 export function resolveExpectedAction(
   finding: AuditFinding,
   ctx: RuleContext,
+  databaseRules: readonly ListingAuditRule[] = [],
 ): ExpectedActionResult {
   const criticalGateResult = resolveCriticalGate(finding, ctx);
   if (criticalGateResult) return criticalGateResult;
 
+  // STORY-083: Check database rules first (persisted ListingAuditRule)
+  const ruleBasedResult = resolveFromDatabaseRules(finding, ctx, databaseRules);
+  if (ruleBasedResult) return ruleBasedResult;
+
+  // STORY-083: Fall back to hardcoded OVERRIDE_RESOLVERS
   const override = OVERRIDE_RESOLVERS[finding.ruleId]?.(finding, ctx);
   if (override) return override;
 
   return defaultResolution(finding);
 }
 
+/**
+ * STORY-083: Resolve action from persisted ListingAuditRule entities.
+ * Returns the first matching rule's action, or null if no rule matches.
+ */
+function resolveFromDatabaseRules(
+  finding: AuditFinding,
+  ctx: RuleContext,
+  rules: readonly ListingAuditRule[],
+): ExpectedActionResult | null {
+  const context = {
+    category: finding.category,
+    imagesCount: ctx.images.length,
+    hasAPlus: ctx.hasAPlus,
+    hasVideo: ctx.hasVideo,
+    price: ctx.price,
+    seasonalPeriod: ctx.seasonalPeriod,
+    attributes: ctx.structuredAttributes,
+  };
+
+  const result = resolveExpectedActionFromRule(
+    rules,
+    {
+      ruleId: finding.ruleId,
+      dimension: finding.dimension,
+      severity: finding.severity,
+    },
+    context,
+  );
+
+  // Only return a result if a rule matched; otherwise return null
+  // to fall through to OVERRIDE_RESOLVERS
+  const matchingRules = rules.filter(
+    (r) =>
+      r.ruleId === finding.ruleId &&
+      r.dimension === finding.dimension &&
+      r.severity === finding.severity,
+  );
+
+  if (matchingRules.length === 0) return null;
+
+  return {
+    expectedAction: result.expectedAction,
+    acceptedActions: result.acceptedActions,
+    rationale: result.rationale,
+    evidenceRefs: [],
+  };
+}
+
 function buildGradedFindings(
   findings: readonly AuditFinding[],
   userFindingActions: Readonly<Record<string, FindingAction>> | undefined,
   ctx: RuleContext,
+  databaseRules: readonly ListingAuditRule[] = [],
 ): GradedFinding[] {
   return findings.map((f) => {
-    const resolution = resolveExpectedAction(f, ctx);
+    const resolution = resolveExpectedAction(f, ctx, databaseRules);
     const userChoice = userFindingActions?.[f.id];
     const isCorrect = userChoice !== undefined && resolution.acceptedActions.includes(userChoice);
     return {

@@ -1,0 +1,105 @@
+/* Maintenance page styles */
+
+.card {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: var(--fs-24);
+  font-weight: 700;
+  margin-bottom: var(--sp-2);
+  color: var(--c-shell-ink);
+}
+
+.description {
+  color: var(--c-shell-faint);
+  margin-bottom: var(--sp-6);
+  font-size: var(--fs-15);
+  line-height: 1.6;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: var(--sp-4);
+}
+
+.statusLabel {
+  font-weight: 600;
+  color: var(--c-shell-faint);
+  font-size: var(--fs-14);
+}
+
+.statusActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--r-sm);
+  background: var(--c-error-soft);
+  color: var(--c-error);
+  font-weight: 700;
+  font-size: var(--fs-14);
+  text-transform: uppercase;
+}
+
+.statusInactive {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--r-sm);
+  background: var(--c-success-soft);
+  color: var(--c-success);
+  font-weight: 700;
+  font-size: var(--fs-14);
+  text-transform: uppercase;
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: var(--sp-6);
+}
+
+.messageLabel {
+  font-weight: 600;
+  color: var(--c-shell-faint);
+  font-size: var(--fs-14);
+  min-width: 80px;
+}
+
+.message span:last-child {
+  flex: 1;
+  color: var(--c-shell-ink);
+}
+
+.form {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.button {
+  padding: var(--sp-3) var(--sp-8);
+  border-radius: var(--r-md);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-weight: 700;
+  font-size: var(--fs-15);
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background: var(--c-orange-light);
+}

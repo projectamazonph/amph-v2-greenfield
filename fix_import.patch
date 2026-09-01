@@ -1,0 +1,19 @@
+--- a/src/domain/simulator/listing-audit/ListingAuditSimulator.ts
++++ b/src/domain/simulator/listing-audit/ListingAuditSimulator.ts
+@@ -21,6 +21,8 @@ import type { Simulator } from "@/ports/simulator/Simulator";
+ import type { ListingAuditInput, ListingImage, ImageRole } from "./ListingAuditInput";
+ import type {
+   ListingAuditOutput,
++  ListingAudit,
++  AuditFinding,
+   FindingSeverity,
+   FindingAction,
+   GradedFinding,
+@@ -31,7 +33,10 @@ import type {
+   RuleOutcome,
+   CategoryVariant,
+ } from "./ListingAuditOutput";
++import type { ListingAuditRule } from "@/domain/entities/ListingAuditRule";
++import { resolveExpectedAction as resolveExpectedActionFromRule } from "@/domain/entities/ListingAuditRule";
+ 
+ // [90m Category variants [39m [90m[90m[90m

@@ -183,6 +183,18 @@ export async function proxy(request: NextRequest) {
     res.headers.set("x-amph-role", String(jwtResult.value.role ?? "STUDENT"));
   }
 
+  // P1-08: Maintenance mode check
+  // Check if maintenance mode is active and redirect non-admin users
+  const isAdminPath = pathname.startsWith("/admin");
+  const { maintenanceRepo } = buildContainer();
+  const maintenanceResult = await maintenanceRepo.getActive();
+  if (maintenanceResult.ok && maintenanceResult.value?.isActive) {
+    // Maintenance is active - block non-admin users
+    if (!isAdminPath) {
+      return new NextResponse("Service Unavailable - Maintenance Mode", { status: 503 });
+    }
+  }
+
   // No root redirect: `/` is the public marketing landing page
   // and must render for unauthenticated visitors.
 

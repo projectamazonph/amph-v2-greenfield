@@ -75,6 +75,11 @@ import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTempla
 import type { IUserStreakRepository } from "@/ports/repositories/IUserStreakRepository";
 import type { IResourceRepository } from "@/ports/repositories/IResourceRepository";
 import type { IFileStorage } from "@/ports/storage/IFileStorage";
+// P4 PR-A: LMS port types
+import type { MaintenanceRepository } from "@/ports/repositories/LMS/MaintenanceRepository";
+import type { AnnouncementRepository } from "@/ports/repositories/LMS/AnnouncementRepository";
+// STORY-083: Listing Audit Rule
+import type { ListingAuditRuleRepository } from "@/ports/repositories/ListingAuditRuleRepository";
 
 // ΓöÇΓöÇ Production adapters (only the prod ones) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
@@ -108,6 +113,11 @@ import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailT
 import { PrismaUserStreakRepository } from "@/infra/repositories/PrismaUserStreakRepository";
 import { PrismaResourceRepository } from "@/infra/repositories/PrismaResourceRepository";
 import { VercelBlobFileStorage } from "@/infra/storage/VercelBlobFileStorage";
+// P4 PR-A: LMS repositories
+import { PrismaMaintenanceRepository } from "@/infra/repositories/LMS/PrismaMaintenanceRepository";
+import { PrismaAnnouncementRepository } from "@/infra/repositories/LMS/PrismaAnnouncementRepository";
+// STORY-083: Listing Audit Rule
+import { PrismaListingAuditRuleRepository } from "@/infra/repositories/PrismaListingAuditRuleRepository";
 import { LocalFileStorage } from "@/infra/storage/LocalFileStorage";
 import { prisma } from "@/infra/database/prisma";
 import { buildSimulatorRegistry } from "@/infra/simulator/buildSimulatorRegistry";
@@ -194,6 +204,20 @@ import { GetEmailTemplate } from "@/usecases/GetEmailTemplate";
 import { UpdateEmailTemplate } from "@/usecases/UpdateEmailTemplate";
 import { DeleteUserAccount } from "@/usecases/DeleteUserAccount";
 import { ExportUserData } from "@/usecases/ExportUserData";
+// P4 PR-A: LMS use cases
+import { GetMaintenance } from "@/usecases/LMS/GetMaintenance";
+import { ToggleMaintenance } from "@/usecases/LMS/ToggleMaintenance";
+import { GetAnnouncements } from "@/usecases/LMS/GetAnnouncements";
+import { CreateAnnouncement } from "@/usecases/LMS/CreateAnnouncement";
+import { DismissAnnouncement } from "@/usecases/LMS/DismissAnnouncement";
+// STORY-083: Listing Audit Rule use cases
+import { CreateListingAuditRule } from "@/usecases/ListingAuditRule/CreateListingAuditRule";
+import { GetListingAuditRule } from "@/usecases/ListingAuditRule/GetListingAuditRule";
+import { ListListingAuditRules } from "@/usecases/ListingAuditRule/ListListingAuditRules";
+import { UpdateListingAuditRule } from "@/usecases/ListingAuditRule/UpdateListingAuditRule";
+import { DeleteListingAuditRule } from "@/usecases/ListingAuditRule/DeleteListingAuditRule";
+import { ResolveFindingAction } from "@/usecases/ListingAuditRule/ResolveFindingAction";
+import { UpdateAnnouncement } from "@/usecases/LMS/UpdateAnnouncement";
 import { AdminListQuizzes } from "@/usecases/AdminListQuizzes";
 import { AdminGetQuiz } from "@/usecases/AdminGetQuiz";
 import { AdminCreateQuiz } from "@/usecases/AdminCreateQuiz";
@@ -350,6 +374,11 @@ export interface AppContainer {
   fileStorage: IFileStorage;
   // STORY-011: pricing tier repo
   pricingTierRepo: IPricingTierRepository;
+  // P4 PR-A: LMS repositories
+  maintenanceRepo: MaintenanceRepository;
+  announcementRepo: AnnouncementRepository;
+  // STORY-083: Listing Audit Rule
+  listingAuditRuleRepo: ListingAuditRuleRepository;
   // STORY-048b/c: module + lesson repos (also used by public catalog)
   moduleRepo: IModuleRepository;
   lessonRepo: ILessonRepository;
@@ -364,6 +393,13 @@ export interface AppContainer {
   // STORY-096: account deletion + data export
   deleteUserAccount: DeleteUserAccount;
   exportUserData: ExportUserData;
+  // P4 PR-A: LMS use cases
+  getMaintenance: GetMaintenance;
+  toggleMaintenance: ToggleMaintenance;
+  getAnnouncements: GetAnnouncements;
+  createAnnouncement: CreateAnnouncement;
+  dismissAnnouncement: DismissAnnouncement;
+  updateAnnouncement: UpdateAnnouncement;
 
   // External services
   paymentGateway: IPaymentGateway;

@@ -1,0 +1,5 @@
+"checksum": "b8e9f7d3a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8",
+"migration_name": "20260828150000_add_lms_maintenance_announcement",
+"migration_id": "20260828150000",
+"schema": "prisma/schema.prisma",
+"applied": "2026-08-28T15:00:00Z"
