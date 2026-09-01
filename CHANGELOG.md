@@ -4,6 +4,51 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-09-01: Repair deployment broken by #453 throw-elimination conversion (PR #466)
+
+The throw-elimination refactor in #453 (commit `730e3bd`) shipped malformed code across 13 production files and 50+ test files. The build was green locally for whoever wrote it but `pnpm build` failed in CI, `pnpm tsc --noEmit` flagged 86 missing `logger` deps in test setups, and a pre-existing E2E test for admin actions hit the freshly enforced `requireAdmin()` 2FA gate. This PR makes `pnpm build`, `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test`, and the full CI gate green again so the deploy can ship.
+
+Production fixes:
+
+- Restored 5 tools/* simulator pages (`bid-elevator`, `campaign-builder`, `keyword-research`, `listing-audit`, `str-triage`) from `dcce90d`. The original PR replaced ~3000 lines per file with garbled editor output. The throws there remain; a follow-up can do the graceful `notFound()` conversion properly.
+- Rewrote malformed fallback blocks in `profile/purchases`, `live-classes/[id]`, `profile`, `certificates` page.tsx — redeclared `const`, missing close braces, JSX returned across lines without parens that Turbopack parsed as a regex literal. All four now use ternaries that the parser is happy with.
+- Wired `logger` into `container.ts` for `AwardBadge`, `MarkLiveClassRecordingWatched`, `RecordQuizAttempt`, `UpdateResource`, `PurgeResource`, `RecordAuditLog`, `RebuildCourseCurriculum`, `RefundOverride`, `SendLiveClassReminders`. All deps interfaces already had `logger: Logger`; the constructor calls just needed it passed through.
+- Fixed `processResult` deps to take a `Logger` so the `RecordQuizAttempt` it constructs has one. The original `processResult` deps didn't, so `RecordQuizAttempt.execute` would have crashed on `this.deps.logger.error` after a failed XP award.
+- Replaced broken `as unknown as` error casts with direct `Result.err(originalError)` in `AdminArchiveDiscountCode`, `AdminCreateDiscountCode`, `AdminUpdateDiscountCode`. The original `Result<X, YError>` already contains the variant set the use case advertises — no cast needed. Also switched those three from `import type { Result } }` to `import { Result } }` since they call `Result.err(...)` as a value.
+- Same `Result.err(originalError)` cleanup in `SaveSimulatorDecision`, `StartSimulatorAttempt`, `SubmitSimulatorAttempt`. The PR's `Result.err({ kind: ..., message: ... })` pattern produced unions that didn't fit `SimulatorAttemptError` (missing `message` on `not_found`, etc). Also widened `SubmitSimulatorAttempt.mapToSubmitResult` to accept `Result<…, SimulatorAttemptError>` instead of `Result<…, SubmitSimulatorAttemptError>` so the repo's union can flow through.
+- Added the missing `logger` field to `RecordQuizAttemptDeps` and threaded `logger` through `processQuizAttempt`'s deps and container instantiation.
+- Added the missing `notFound` import to `src/app/courses/[slug]/quizzes/[quizId]/page.tsx` (was called but not imported).
+- Added the missing `findResult.value === null` branch to `UpdateResource.execute` (the `Resource | null` from `findById` was being dereferenced without a null check).
+
+Test fixes:
+
+- New `src/infra/observability/SilentLogger.ts` — no-op `Logger` port adapter. Lives alongside `TestLogger` (which buffers entries) so tests can opt into silence vs. assertion.
+- Wired `logger: new SilentLogger()` into 50 test files that instantiated use cases requiring it. All `RecordAuditLog`, `AwardBadge`, `MarkLiveClassRecordingWatched`, `UpdateResource`, `PurgeResource`, `RebuildCourseCurriculum`, `RecordQuizAttempt`, `SaveSimulatorDecision`, `StartSimulatorAttempt`, `SubmitSimulatorAttempt` instantiations now have the dep.
+- `processQuizAttempt.test.ts`: added `Logger` to `Deps` interface and `logger: new SilentLogger()` to the `buildDeps()` factory return value.
+- `container.test.ts`: passes `logger` through to the production-shape container test setup.
+- `RecordAuditLog.test.ts`: replaced `console.error` spy assertions with `TestLogger` entry assertions. The refactor moved to `this.deps.logger.error`; the test was pinning the old console.
+- `dashboard/page.test.tsx`: the page now degrades gracefully on enrollment repo errors instead of throwing — the test was pinning the old throw behavior. Renamed to "falls back to an empty enrollment list".
+- `card-no-event-handler-props.test.ts`: programmatic tsc spawn used `npx tsc` which on Windows swallows stderr when the binary is a shell wrapper. Switched to spawning `node` directly with `node_modules/typescript/lib/tsc.js`. Use `path.resolve` instead of `path.join` for absolute paths.
+- `tests/e2e/helpers/seed.ts`: set `twoFactorEnabled: true` on seeded admin users. The pre-existing `journey 3: admin login and create discount code` test was timing out because `requireAdmin()` (which enforces 2FA since the June 2026 `6c61fc3` commit) redirected the un-2FA seeded admin to `/admin/settings?error=2fa_required`. With 2FA enabled on the seed, `requireAdmin()` lets the test through and the test reaches the discount-codes form.
+
+Verification:
+
+```
+pnpm build          PASS
+pnpm lint           PASS (3 pre-existing MobileNavToggle warnings only)
+pnpm tsc --noEmit   PASS 0 errors
+pnpm test           PASS 4392 passed | 3 skipped (4395)
+pnpm test:arch      PASS 688 passed (17 files)
+E2E (Playwright)    PASS
+Lighthouse CI       PASS
+Vercel deploy       PASS
+```
+
+Follow-ups left for the next round:
+
+- The 5 `tools/*` pages still throw on missing scenario. Convert to `notFound()` properly and a regression-pin via source-string test.
+- The `card-no-event-handler-props` programmatic tsc fixture's source-string pins are now decoupled from the `card.tsx` source-string checks. Consider merging them so a regression in `CardProps` shape shows up at exactly one test name.
+
 ### 2026-08-27: Evidence pathways lesson view for all modules (STORY-026)
 
 - Restyle the shared student lesson shell and route map for every native MDX lesson. The view now prioritizes a clear outcome, visible course progress, distinct learning workspace, native interactive directives, completion action, and next-step navigation.
@@ -19,7 +64,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
   fork (PR #395) was closed as stale on 2026-08-21.
 - All four Module 4 lessons (4.1 phone tripod, 4.2 GreenKeep, 4.3 garlic
   press, 4.4 portable blender) gain a `## Campaign map and pre-flight
-  rationale` section. The 4.4 rationale example now uses the post-PR-417
+rationale` section. The 4.4 rationale example now uses the post-PR-417
   PHP numbers (₱1,750 price, ₱61 exact-match CPC ceiling, ₱880 / ₱480 /
   ₱240 daily budgets) so the worked example matches the lesson it follows.
 
@@ -170,6 +215,7 @@ This PR ships these coordinated fixes:
 - All nine transactional messages share a polished, email-client-safe HTML layout with structured
   detail cards, accessible hierarchy, and clear action or security notices. The password-changed
   and payment-failed templates are included for provider-authoritative use.
+
 ### 2026-08-16: Student-facing UI round 29 — QuizEditor question/option text inputs ship real `<label>` instead of `aria-label` override (WCAG 3.3.2 / 4.1.2) (PR #379)
 
 - `src/components/admin/QuizEditor.tsx`: the question text input no longer carries `aria-label={`Question ${qIndex + 1} text`}`. The interim fix used `aria-label` to satisfy the WCAG 3.3.2 *Labels or Instructions* audit, but `aria-label` is a screen-reader-only patch — sighted keyboard/mouse users cannot click the label to focus the input, voice-control software (Dragon, Voice Control) cannot say "click Question 1 text", browser autofill heuristics prefer real `<label>`, and every a11y lint tool (eslint-plugin-jsx-a11y/label-has-associated-control) checks for the `<label>` association. Round 29 replaces the `aria-label` override with a proper `<label className="sr-only" htmlFor={`q-${qIndex}-text`}>Question {qIndex + 1} text</label>` so the accessible name comes from the canonical `<label>` mechanism. The visible "Q{n}" badge stays as `<label aria-hidden>` so it remains a row marker without competing for the screen-reader announcement. WCAG 3.3.2 / 4.1.2.
@@ -230,7 +276,7 @@ This PR ships these coordinated fixes:
 ### 2026-08-15: Student-facing UI round 22 — CourseAccessNotice `.card` honors Field Manual §5 (no default shadow) (PR #364)
 
 - `src/components/student/CourseAccessNotice.module.css`: the shared `.card` rule no longer declares `box-shadow: var(--shadow-sm)`. The Field Manual design brief (`docs/design-brief.md:142`) is explicit: "Shadow: none (the border is the elevation; shadow would fight the manual aesthetic)". The `<CourseAccessNotice>` shared component renders the same centered Card-style paywall/notice on 4 call sites — `/courses/[slug]/lessons/[lessonId]` (gated + not-enrolled branches) and `/courses/[slug]/quizzes/[quizId]` (gated + not-enrolled branches) — so a single fix removes the Field Manual §5 violation from every paywall/notice surface in the curriculum block. The 1px `var(--border)` is preserved as the elevation indicator, and the new comment block cites Field Manual §5 + `design-brief.md:142` + "border IS the elevation" + the 4 call-site note so future maintainers don't reintroduce the shadow. Closes the sixth portion of audit Finding 4 (round 16 closed the catalog card; round 17 closed the global `.astryx-card` override; round 19 closed the dashboard `.card`; round 20 closed the `/tools` `.card`; round 21 closed the course detail `.section` + `.quizItem`; this commit closes the shared `CourseAccessNotice` card).
-- `src/components/student/__tests__/course-access-notice-card-no-box-shadow.test.ts` (new, 4 tests): source-string assertions that pin the no-shadow contract on `.card`, confirm the 1px `--border` is still the elevation indicator, confirm the doc-block cites the design brief, and run a sanity sweep across every rule in the file to guard against a future contributor pasting a Card-style `box-shadow: var(--shadow-` back in. Mirrors the source-string pattern from rounds 16 (catalog card), 17 (astryx-card globals), 19 (dashboard `.card`), 20 (`/tools` `.card`), and 21 (`/courses/[slug] `.section` + `.quizItem`). Tests count: 4,037 passed (was 4,033).
+- `src/components/student/__tests__/course-access-notice-card-no-box-shadow.test.ts` (new, 4 tests): source-string assertions that pin the no-shadow contract on `.card`, confirm the 1px `--border` is still the elevation indicator, confirm the doc-block cites the design brief, and run a sanity sweep across every rule in the file to guard against a future contributor pasting a Card-style `box-shadow: var(--shadow-` back in. Mirrors the source-string pattern from rounds 16 (catalog card), 17 (astryx-card globals), 19 (dashboard `.card`), 20 (`/tools` `.card`), and 21 (`/courses/[slug] `.section`+`.quizItem`). Tests count: 4,037 passed (was 4,033).
 
 ### 2026-08-15: Student-facing UI round 21 — Course detail `.section` and `.quizItem` honor Field Manual §5 (no default shadow) (PR #362)
 
