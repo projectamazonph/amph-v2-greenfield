@@ -67,9 +67,13 @@ amph-v2-greenfield/
 skills-lock.json
 .agents/
 .claude/
+.ijfw/
 agent/
 node_modules/
 .qoder/
+
+# ijfw top-level runtime data (dump/memory/sessions/wiki)
+ijfw/
 
 # npm lockfile drift (repo uses pnpm; packageManager: pnpm@9.15.9)
 package-lock.json
