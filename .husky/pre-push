@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run curriculum validation before pushing
+# This prevents broken content from being pushed to remote
+
+echo "Running pre-push validation..."
+
+# Validate curriculum inventory
+if ! pnpm validate:curriculum; then
+  echo "❌ Curriculum validation failed. Please fix the issues before pushing."
+  exit 1
+fi
+
+# Validate lesson production structure
+if ! pnpm validate:lesson-production; then
+  echo "❌ Lesson production validation failed. Please fix the issues before pushing."
+  exit 1
+fi
+
+echo "✅ All pre-push validations passed!"
+exit 0

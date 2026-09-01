@@ -158,7 +158,7 @@ jobs:
       # check (added in review, closes a real silent-fallback-to-
       # LocalFileStorage gap) doesn't throw here. `pnpm build && pnpm start`
       # runs in production mode (next start always does, regardless of the
-      # shell env), but this is CI, not a real deploy — same treatment as
+      # shell env), but this is CI, not a real deploy \u2014 same treatment as
       # every other secret above.
       BLOB_READ_WRITE_TOKEN: vercel_blob_rw_test_dummy
       # Dummy values keep the production rate-limit wiring fail-closed without
@@ -186,7 +186,7 @@ jobs:
       # Install ALL Playwright browser dependencies + system deps.
       # Specifying only `chromium` was leaving the worker process unable to
       # launch the bundled browser (the error mentions a `webkit-2311`
-      # cache path that is a red herring; the real failure is that the
+      # cache path that is a red herning; the real failure is that the
       # install step did not provision the OS-level libs the binary needs).
       # `playwright install --with-deps` (no arg) installs chromium,
       # firefox, webkit, AND the system shared libs they depend on.
@@ -199,11 +199,45 @@ jobs:
           name: playwright-report
           path: playwright-report/
 
+  automation:
+    name: Automation Workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [quality]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: amph_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test -d amph_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/amph_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Validate simulator data
+        run: pnpm validate:simulators
+      - name: Run audit suite
+        run: pnpm audit
+
   learning-release-gate:
     name: Learning release gate
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [quality, unit, e2e]
+    needs: [quality, unit, e2e, automation]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -228,177 +262,3 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [quality, unit]
-    env:
-      DATABASE_URL: postgresql://test:test@localhost:5432/amph_test
-      JWT_SECRET: test-secret-at-least-32-bytes-long-please
-      PAYMONGO_SECRET: sk_test_dummy
-      PAYMONGO_WEBHOOK_SECRET: whsec_test_dummy
-      RESEND_API_KEY: re_test_dummy
-      SENTRY_DSN: ""
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm prisma generate
-      - run: pnpm build
-      # STORY-0026 fix: upload .next/standalone/ instead of .next/.
-      # Standalone is a self-contained production artifact (deps
-      # bundled, no broken symlinks to the host's pnpm-store). The
-      # lighthouse job downloads this and starts `node server.js`.
-      # .next/static/ is symlinked into the standalone output by
-      # next build itself, but we also copy public/ for completeness.
-      #
-      # include-hidden-files: true is required — the default (false)
-      # silently strips every dot-prefixed path from the archive,
-      # which includes .next/standalone/.next/ itself (the actual
-      # build output server.js needs: BUILD_ID, required-server-files
-      # .json, server/) and node_modules/.prisma/client/ (Prisma's
-      # generated client). Without this the lighthouse job's server
-      # boots but immediately fails with "Could not find a production
-      # build in the './.next' directory".
-      - name: Copy static assets into standalone bundle
-        # The standalone server reads static files from
-        # `.next/standalone/.next/static/` and `.next/standalone/public/`,
-        # NOT from the project root. Without this copy, every
-        # CSS chunk, font, and favicon 404s in production —
-        # including in the Lighthouse job, which surfaces as
-        # `errors-in-console` failures.
-        #
-        # Two follow-up paths:
-        #  (a) use `outputFileTracingIncludes` to bundle them
-        #      into the standalone output at build time
-        #  (b) move the copy into a `pnpm build:prod` script
-        # For now, an explicit cp is the simplest correct fix.
-        #
-        # public/ is optional (the repo doesn't currently ship
-        # one); we mkdir it as an empty dir so the server's
-        # static file route doesn't 404 on favicon.ico (Next.js
-        # still serves a default favicon, but having an empty
-        # public/ keeps the standalone bundle's expectations
-        # aligned with the docs).
-        run: |
-          mkdir -p .next/standalone/.next
-          cp -r .next/static .next/standalone/.next/static
-          mkdir -p .next/standalone/public
-          if [ -d public ]; then cp -r public/. .next/standalone/public/; fi
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: build
-          include-hidden-files: true
-          # `actions/upload-artifact@v4` zips the directory's
-          # CONTENTS (not the dir itself). The lighthouse job
-          # downloads the artifact and copies the contents into
-          # `.next/standalone/` where the server expects them
-          # (see the matching step in the lighthouse job).
-          path: .next/standalone
-
-  # Lighthouse CI re-enabled (STORY-0026 follow-up).
-  #
-  # We use Next.js's `output: 'standalone'` so the .next/standalone/
-  # artifact is self-contained (no symlinks back to the host's
-  # pnpm-store). The job downloads that artifact, starts the
-  # production server, waits for /api/health to return 200, then
-  # runs `lhci autorun` against the live server.
-  #
-  # The .next/static and public/ paths are uploaded alongside the
-  # standalone bundle (see the build job) and are restored to the
-  # same relative locations before the server starts.
-  lighthouse:
-    name: Lighthouse CI
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: build
-    # /api/health is now a static liveness probe (no DB call), so the
-    # Lighthouse job doesn't need the Postgres service to be up —
-    # the marketing/catalog/pricing/login pages it scores don't touch
-    # the DB at render time either.
-    env:
-      DATABASE_URL: postgresql://test:test@localhost:5432/amph_test
-      JWT_SECRET: test-secret-at-least-32-bytes-long-please
-      PAYMONGO_SECRET: sk_test_dummy
-      PAYMONGO_WEBHOOK_SECRET: whsec_test_dummy
-      RESEND_API_KEY: re_test_dummy
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
-      PORT: "3000"
-      # Same dummy-value treatment as the e2e job above — this standalone
-      # server also runs in production mode, so validateRequiredEnvVars()'s
-      # fail-closed check needs something here even though the pages this
-      # job scores don't touch the DB/container at render time today.
-      BLOB_READ_WRITE_TOKEN: vercel_blob_rw_test_dummy
-      UPSTASH_REDIS_REST_URL: https://example-upstash.test
-      UPSTASH_REDIS_REST_TOKEN: test-upstash-token
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: build
-          # Download to a fresh dir, then move the standalone
-          # bundle contents into `.next/standalone/`. The reason
-          # this is structured this way:
-          #
-          #   - `actions/upload-artifact@v4` with `path: .next/standalone/`
-          #     zips the directory's CONTENTS (server.js, node_modules/, etc.)
-          #     into the artifact.
-          #   - `actions/download-artifact@v4` with `path: .next/`
-          #     extracts those contents to `.next/`, losing the dir name.
-          #   - We need the files at `.next/standalone/server.js` and
-          #     `.next/standalone/node_modules/...` for the server to boot
-          #     (the server's `opts.dir` is `.next/standalone/`).
-          #
-          # Downloading to a fresh dir, then `cp -r` the contents into
-          # the right place, is simpler and more reliable than trying to
-          # thread the trailing-slash semantics through both actions.
-          path: _artifact/
-
-      - name: Place standalone bundle in the expected location
-        run: |
-          mkdir -p .next
-          cp -r _artifact/. .next/standalone/
-          ls -la .next/standalone/ | head -10
-
-      - name: Start standalone Next.js server
-        run: |
-          # Standalone bundle ships with a server.js at the root.
-          # Static assets and public/ are restored from the artifact
-          # paths above and live alongside the standalone bundle.
-          nohup node .next/standalone/server.js > /tmp/server.log 2>&1 &
-          echo "Server PID: $!"
-
-      - name: Wait for server health
-        run: |
-          for i in $(seq 1 60); do
-            if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
-              echo "Server ready after ${i}s"
-              exit 0
-            fi
-            sleep 1
-          done
-          echo "Server did not become healthy in 60s"
-          cat /tmp/server.log
-          exit 1
-
-      - name: Run Lighthouse CI
-        # Uses .lighthouserc.json at the repo root. The config
-        # collects scores on the four canonical public URLs (the
-        # marketing landing, the catalog, the pricing page, and the
-        # login) and asserts accessibility + SEO as hard errors
-        # (these should never regress) and performance +
-        # best-practices as warnings (so a new PR doesn't fail the
-        # build on the first performance blip).
-        #
-        # Accessibility and SEO are hard release gates. Performance
-        # and best-practices remain warnings while their baselines settle.
-        run: |
-          npx --yes @lhci/cli@0.14.x autorun \
-            --config=./.lighthouserc.json
-      - name: Stop server
-        if: always()
-        run: pkill -f "server.js" || true
