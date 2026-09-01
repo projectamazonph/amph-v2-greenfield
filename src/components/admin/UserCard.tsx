@@ -33,6 +33,11 @@ export function UserCard({ user }: UserCardProps) {
           {user.firstName} {user.lastName}
         </div>
         <div className={styles.role}>{user.role}</div>
+      {user.twoFactorEnabled && (
+        <div className={styles.twoFactorBadge} title="Two-factor authentication enabled">
+          2FA
+        </div>
+      )}
       </div>
       <form action="/api/auth/logout" method="post" className={styles.logoutForm}>
         <button type="submit" className={styles.logoutButton} aria-label="Log out" title="Log out">

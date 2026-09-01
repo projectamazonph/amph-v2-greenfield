@@ -86,6 +86,11 @@ model User {
   twoFactorSecret  String?
   twoFactorEnabled Boolean @default(false)
 
+  // 2FA enforcement policy (STORY-ops-2fa-enforce / #413)
+  // When true, the user MUST have twoFactorEnabled=true to access admin routes.
+  // Default false for existing users; new ADMIN users get true.
+  requires2FA Boolean @default(false)
+
   // Audit
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

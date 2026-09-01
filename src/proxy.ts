@@ -181,6 +181,20 @@ export async function proxy(request: NextRequest) {
     res.headers.set("x-amph-user-id", String(jwtResult.value.sub));
     res.headers.set("x-amph-session-id", String(sessionId ?? ""));
     res.headers.set("x-amph-role", String(jwtResult.value.role ?? "STUDENT"));
+
+    // 2FA enforcement for admin routes (STORY-ops-2fa-enforce / #413)
+    // If user is accessing admin routes and requires2FA is true, verify 2FA is enabled
+    if (pathname.startsWith("/admin")) {
+      const { userRepo } = buildContainer();
+      const userResult = await userRepo.findById(jwtResult.value.sub);
+      if (userResult.ok && userResult.value.requires2FA && !userResult.value.twoFactorEnabled) {
+        // User is required to have 2FA but doesn't have it enabled
+        // Redirect to 2FA enrollment flow
+        const setupUrl = new URL("/admin/settings/2fa-setup", request.url);
+        setupUrl.searchParams.set("redirect", pathname);
+        return NextResponse.redirect(setupUrl);
+      }
+    }
   }
 
   // No root redirect: `/` is the public marketing landing page
