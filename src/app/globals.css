@@ -459,7 +459,8 @@ table {
   border: 1px solid var(--c-border);
   border-collapse: collapse;
   border-radius: var(--r-md);
-  overflow: hidden;
+  overflow-x: auto;
+  display: block;
   background: var(--c-card);
   color: var(--c-ink);
   font-size: var(--fs-13);
