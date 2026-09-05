@@ -8,7 +8,7 @@ import { FixedClock } from "@/ports/system/Clock";
 import { createLiveClass } from "@/domain/entities/LiveClass";
 import { SilentLogger } from "@/infra/observability/SilentLogger";
 
-const futureDate = new Date("2026-09-01T10:00:00Z");
+const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
 function makeLiveClass(overrides: Partial<Parameters<typeof createLiveClass>[0]> = {}) {
   const r = createLiveClass({
