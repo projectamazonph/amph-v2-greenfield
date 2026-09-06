@@ -1,5 +1,13 @@
 /* /live-classes — student list page. Amazon PH simulator tokens only. */
 
+.page {
+  width: 100%;
+  max-width: var(--max-content);
+  margin: 0 auto;
+  padding: var(--space-8) var(--side-pad) var(--space-12);
+  box-sizing: border-box;
+}
+
 .header {
   display: flex;
   align-items: flex-end;

@@ -27,7 +27,7 @@ export default async function LiveClassesPage() {
 
   return (
     <StudentShell user={user}>
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <header className={styles.header}>
           <div className={styles.headerCopy}>
             <span className={styles.eyebrow}>Learn live</span>

@@ -105,10 +105,6 @@
   margin-right: var(--space-5);
 }
 
-.cardTitle {
-  margin-top: var(--space-5);
-}
-
 .card:hover {
   border-color: var(--c-orange-tint);
   box-shadow: var(--sh-2);
@@ -147,7 +143,7 @@
   font-size: clamp(0.875rem, 2vw, var(--text-base));
   font-weight: 600;
   color: var(--ink-900);
-  margin: 0 0 var(--space-1) 0;
+  margin: var(--space-5) var(--space-5) var(--space-1);
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -155,13 +151,14 @@
 .cardTagline {
   font-size: clamp(0.75rem, 1.8vw, var(--text-sm));
   color: var(--ink-700);
-  margin: 0 0 var(--space-4) 0;
+  margin: 0 var(--space-5) var(--space-4);
   line-height: 1.5;
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
 .progressBar {
+  position: relative;
   height: 6px;
   background: var(--surface-2);
   border-radius: var(--radius-full);
@@ -201,7 +198,7 @@
 .progressLabel {
   font-size: clamp(0.625rem, 1.2vw, var(--text-xs));
   color: var(--ink-500);
-  margin: 0;
+  margin: 0 var(--space-5) var(--space-5);
   font-weight: 500;
 }
 
