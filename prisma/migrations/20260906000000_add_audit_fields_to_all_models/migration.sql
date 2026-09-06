@@ -9,147 +9,147 @@
 -- the existing precedents in this schema for a "who did this" column.
 -- Nullable since rows created before these migrations have neither.
 
--- ── User: already has deletedAt; add createdById + updatedById ─────────
+-- User: already has deletedAt; add createdById + updatedById
 ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── Session ───────────────────────────────────────────────────────────
+-- Session
 ALTER TABLE "sessions" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "sessions" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "sessions" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── SimulatorScenario ─────────────────────────────────────────────────
+-- SimulatorScenario
 ALTER TABLE "simulator_scenarios" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "simulator_scenarios" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "simulator_scenarios" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── LiveClass ─────────────────────────────────────────────────────────
+-- LiveClass
 ALTER TABLE "live_classes" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "live_classes" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "live_classes" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── LiveClassRegistration ─────────────────────────────────────────────
+-- LiveClassRegistration
 ALTER TABLE "live_class_registrations" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "live_class_registrations" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "live_class_registrations" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── Order ─────────────────────────────────────────────────────────────
+-- Order
 ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "orders" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── PpcCampaign ───────────────────────────────────────────────────────
+-- PpcCampaign
 ALTER TABLE "ppc_campaigns" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "ppc_campaigns" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "ppc_campaigns" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── AuditLog ──────────────────────────────────────────────────────────
+-- AuditLog
 ALTER TABLE "audit_logs" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "audit_logs" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "audit_logs" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── WebhookEvent ──────────────────────────────────────────────────────
+-- WebhookEvent
 ALTER TABLE "webhook_events" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "webhook_events" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "webhook_events" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── XPEvent ───────────────────────────────────────────────────────────
+-- XPEvent
 ALTER TABLE "xp_events" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "xp_events" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "xp_events" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── ProgressEvent ─────────────────────────────────────────────────────
+-- ProgressEvent
 ALTER TABLE "progress_events" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "progress_events" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "progress_events" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── UserStreak ────────────────────────────────────────────────────────
+-- UserStreak
 ALTER TABLE "user_streaks" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "user_streaks" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "user_streaks" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── Quiz ──────────────────────────────────────────────────────────────
+-- Quiz
 ALTER TABLE "quizzes" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "quizzes" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "quizzes" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── QuizQuestion ──────────────────────────────────────────────────────
+-- QuizQuestion
 ALTER TABLE "quiz_questions" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "quiz_questions" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "quiz_questions" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── QuizOption ────────────────────────────────────────────────────────
+-- QuizOption
 ALTER TABLE "quiz_options" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "quiz_options" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "quiz_options" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── QuizAttempt ───────────────────────────────────────────────────────
+-- QuizAttempt
 ALTER TABLE "quiz_attempts" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "quiz_attempts" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "quiz_attempts" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── QuizAttemptAnswer ─────────────────────────────────────────────────
+-- QuizAttemptAnswer
 ALTER TABLE "quiz_attempt_answers" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "quiz_attempt_answers" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "quiz_attempt_answers" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── BadgeAward ────────────────────────────────────────────────────────
+-- BadgeAward
 ALTER TABLE "badge_awards" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "badge_awards" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "badge_awards" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── EmailVerification ─────────────────────────────────────────────────
+-- EmailVerification
 ALTER TABLE "email_verifications" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "email_verifications" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "email_verifications" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── PasswordReset ─────────────────────────────────────────────────────
+-- PasswordReset
 ALTER TABLE "password_resets" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "password_resets" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "password_resets" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── SentReminder ──────────────────────────────────────────────────────
+-- SentReminder
 ALTER TABLE "sent_reminders" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "sent_reminders" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "sent_reminders" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── SimulatorAttempt ──────────────────────────────────────────────────
+-- SimulatorAttempt
 ALTER TABLE "simulator_attempts" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "simulator_attempts" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "simulator_attempts" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── SimulatorDecision ─────────────────────────────────────────────────
+-- SimulatorDecision
 ALTER TABLE "simulator_decisions" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "simulator_decisions" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "simulator_decisions" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── ScorePolicy ───────────────────────────────────────────────────────
+-- ScorePolicy
 ALTER TABLE "score_policies" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "score_policies" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "score_policies" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── SimulatorScenarioCalibration ──────────────────────────────────────
+-- SimulatorScenarioCalibration
 ALTER TABLE "simulator_scenario_calibrations" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "simulator_scenario_calibrations" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "simulator_scenario_calibrations" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
-── EmailTemplate: already has updatedById; add deletedAt + createdById ──
+-- EmailTemplate: already has updatedById; add deletedAt + createdById
 ALTER TABLE "email_templates" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "email_templates" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 
-── AttemptFeedback ───────────────────────────────────────────────────
+-- AttemptFeedback
 ALTER TABLE "attempt_feedbacks" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "attempt_feedbacks" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "attempt_feedbacks" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
 
-── Certificate ───────────────────────────────────────────────────────
+-- Certificate
 ALTER TABLE "certificates" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "certificates" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "certificates" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
 
 
-── EmailLog ──────────────────────────────────────────────────────────
+-- EmailLog
 ALTER TABLE "email_logs" ADD COLUMN IF NOT EXISTS "deletedAt" TIMESTAMP(3);
 ALTER TABLE "email_logs" ADD COLUMN IF NOT EXISTS "createdById" TEXT;
 ALTER TABLE "email_logs" ADD COLUMN IF NOT EXISTS "updatedById" TEXT;
