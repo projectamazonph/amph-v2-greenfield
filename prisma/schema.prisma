@@ -90,6 +90,8 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  createdById String?
+  updatedById String?
 
   // Relations
   sessions               Session[]
@@ -121,6 +123,9 @@ model Session {
   rotatedFrom String? @unique
 
   createdAt DateTime @default(now())
+  deletedAt DateTime?
+  createdById String?
+  updatedById String?
 
   @@index([userId])
   @@index([tokenHash])
@@ -273,6 +278,10 @@ model SimulatorScenario {
   @@index([archivedAt])
   @@index([scenarioKey])
   @@index([status])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("simulator_scenarios")
 }
 
@@ -296,6 +305,10 @@ model LiveClass {
   @@index([courseId])
   @@index([status])
   @@index([scheduledAt])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("live_classes")
 }
 
@@ -316,6 +329,10 @@ model LiveClassRegistration {
   @@index([userId])
   @@index([liveClassId])
   @@index([status])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("live_class_registrations")
 }
 
@@ -405,6 +422,10 @@ model Order {
   @@index([status, createdAt])
   @@index([refundRequestedAt, id])
   @@index([userId, courseId, status])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("orders")
 }
 
@@ -433,6 +454,10 @@ model PpcCampaign {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("ppc_campaigns")
 }
 
@@ -464,6 +489,10 @@ model AuditLog {
   // [createdAt desc, id desc] — a single-column createdAt index can't
   // fully satisfy either the tie-break comparison or the sort.
   @@index([createdAt, id])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("audit_logs")
 }
 
@@ -490,6 +519,10 @@ model WebhookEvent {
   @@index([provider, eventType])
   @@index([providerEventId])
   @@index([createdAt])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("webhook_events")
 }
 
@@ -511,6 +544,10 @@ model EmailLog {
 
   @@index([to])
   @@index([status])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("email_logs")
 }
 
@@ -550,6 +587,10 @@ model XPEvent {
   createdAt DateTime @default(now())
 
   @@index([userId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("xp_events")
 }
 
@@ -572,6 +613,10 @@ model ProgressEvent {
   // each filter on one column and sort by createdAt desc.
   @@index([userId, createdAt])
   @@index([courseId, createdAt])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("progress_events")
 }
 
@@ -587,6 +632,10 @@ model UserStreak {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("user_streaks")
 }
 
@@ -600,6 +649,10 @@ model Quiz {
   questions    QuizQuestion[]
   createdAt    DateTime       @default(now())
 
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("quizzes")
 }
 
@@ -612,6 +665,10 @@ model QuizQuestion {
   options      QuizOption[]
   order        Int          @default(0)
 
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("quiz_questions")
 }
 
@@ -622,6 +679,10 @@ model QuizOption {
   optionText String
   isCorrect  Boolean      @default(false)
   order      Int          @default(0)
+
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
 
   @@map("quiz_options")
 }
@@ -643,6 +704,10 @@ model QuizAttempt {
   // without an extra step.
   @@index([userId, quizId, startedAt])
   @@index([quizId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("quiz_attempts")
 }
 
@@ -654,6 +719,10 @@ model QuizAttemptAnswer {
   selectedOptionId String
 
   @@unique([attemptId, questionId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("quiz_attempt_answers")
 }
 
@@ -680,6 +749,10 @@ model BadgeAward {
 
   @@unique([userId, badgeSlug])
   @@index([userId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("badge_awards")
 }
 
@@ -701,6 +774,10 @@ model Certificate {
   @@unique([userId, courseId]) // one cert per (user, course)
   @@index([userId])
   @@index([verificationHash])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("certificates")
 }
 
@@ -718,6 +795,10 @@ model EmailVerification {
 
   @@index([userId])
   @@index([tokenHash])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("email_verifications")
 }
 
@@ -734,6 +815,10 @@ model PasswordReset {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("password_resets")
 }
 
@@ -751,6 +836,10 @@ model SentReminder {
   // so the email was already sent on a prior cron run).
   @@unique([liveClassId, userId])
   @@index([liveClassId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("sent_reminders")
 }
 
@@ -778,6 +867,10 @@ model SimulatorAttempt {
   @@index([simulatorId])
   @@index([status])
   @@index([userId, simulatorId, status])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("simulator_attempts")
 }
 
@@ -790,6 +883,10 @@ model SimulatorDecision {
   submittedAt  DateTime         @default(now())
 
   @@unique([attemptId, revision])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("simulator_decisions")
 }
 
@@ -810,6 +907,10 @@ model ScorePolicy {
 
   @@unique([simulatorId, difficulty, mode])
   @@index([simulatorId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("score_policies")
 }
 
@@ -831,6 +932,10 @@ model SimulatorScenarioCalibration {
   @@unique([simulatorId, scenarioKey])
   @@index([scenarioKey])
   @@index([instructorId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("simulator_scenario_calibrations")
 }
 
@@ -845,6 +950,8 @@ model EmailTemplate {
   ctaLabel    String
   updatedAt   DateTime @updatedAt
   updatedById String
+  deletedAt   DateTime?
+  createdById String?
 
   @@map("email_templates")
 }
@@ -867,6 +974,10 @@ model AttemptFeedback {
   completedAt       DateTime @default(now())
 
   @@index([userId])
+    deletedAt DateTime?
+  createdById String?
+  updatedById String?
+
   @@map("attempt_feedbacks")
 }
 
