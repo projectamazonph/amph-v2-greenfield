@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-09-05: LEARN-026 Module 5 weekly client readouts (STORY-128)
+
+All three Module 5 lessons gain a `## Weekly client readout` section following the LEARN-025 pattern. 5.1 turns the portfolio split into a readout with campaign-level controls and a review trigger (16-campaign account at ₱90,000 / ₱37,500 / ₱22,500). 5.2 turns the burn rate read into a pacing readout that protects the 8PM to 12AM peak window (phone-case campaign at ₱1,500 daily, 80% by 11AM). 5.3 turns the seasonal profit call into a readout with an escalation line for stockout, margin, and cap breaches (lunch-box Back to School at ₱37,500 vs ₱60,938 profit after ad spend). Existing practice, feedback, worksheet, fact-card, and client-language blocks are untouched. Lesson-production strict report stays 42/42.
+
 ### 2026-09-01: Repair deployment broken by #453 throw-elimination conversion (PR #466)
 
 The throw-elimination refactor in #453 (commit `730e3bd`) shipped malformed code across 13 production files and 50+ test files. The build was green locally for whoever wrote it but `pnpm build` failed in CI, `pnpm tsc --noEmit` flagged 86 missing `logger` deps in test setups, and a pre-existing E2E test for admin actions hit the freshly enforced `requireAdmin()` 2FA gate. This PR makes `pnpm build`, `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test`, and the full CI gate green again so the deploy can ship.
