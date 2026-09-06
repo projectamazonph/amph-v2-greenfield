@@ -1,8 +1,7 @@
 /* ImpersonationBanner — Amazon PH simulator account-state warning. */
 
 .banner {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: var(--z-sticky);
   padding: var(--space-3) var(--space-6);
   border-bottom: 1px solid var(--c-red);

@@ -214,6 +214,15 @@
 html {
   background: var(--c-bg);
   scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+/* Fallback for browsers without overflow: clip support. */
+@supports not (overflow: clip) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
 }
 
 body {
@@ -454,13 +463,17 @@ textarea:focus-visible {
   content: "";
 }
 
+.tableScroll {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
 table {
   width: 100%;
   border: 1px solid var(--c-border);
   border-collapse: collapse;
   border-radius: var(--r-md);
-  overflow-x: auto;
-  display: block;
   background: var(--c-card);
   color: var(--c-ink);
   font-size: var(--fs-13);
@@ -499,7 +512,7 @@ tbody tr:last-child td { border-bottom: 0; }
   position: fixed;
   top: var(--sp-2);
   left: var(--sp-2);
-  z-index: 9999;
+  z-index: var(--z-tooltip);
   padding: var(--sp-2) var(--sp-4);
   transform: translateY(calc(-100% - var(--sp-4)));
   border: 2px solid var(--c-navy-2);

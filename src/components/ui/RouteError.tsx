@@ -17,6 +17,7 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
+import Link from "next/link";
 import { useEffect } from "react";
 import styles from "./RouteError.module.css";
 
@@ -43,6 +44,11 @@ export function RouteError({ error, reset, withinMain = false }: RouteErrorProps
       <button type="button" className={styles.retry} onClick={reset}>
         Try again
       </button>
+      <p className={styles.message}>
+        <Link href="/dashboard">Go to dashboard</Link>
+        {" · "}
+        <Link href="/courses">Browse courses</Link>
+      </p>
     </div>
   );
 

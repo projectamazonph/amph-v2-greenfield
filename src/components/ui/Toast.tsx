@@ -53,12 +53,7 @@ export function Toast({ type = "info", message, onClose, duration = 4000 }: Toas
       </span>
       <span className={styles.message}>{message}</span>
       {onClose && (
-        <button
-          type="button"
-          className={styles.close}
-          onClick={dismiss}
-          aria-label="Dismiss"
-        >
+        <button type="button" className={styles.close} onClick={dismiss} aria-label="Dismiss">
           <X size={14} weight="bold" />
         </button>
       )}
@@ -76,7 +71,21 @@ export interface ToastContainerProps {
 
 export function ToastContainer({ children }: ToastContainerProps) {
   return (
-    <div style={{ position: 'fixed', top: 'var(--space-4)', right: 'var(--space-4)', zIndex: 9998, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', maxWidth: 400, width: '100%' }}>
+    <div
+      style={{
+        position: "fixed",
+        top: "var(--space-4)",
+        right: "var(--space-4)",
+        left: "var(--space-4)",
+        zIndex: "var(--z-toast)",
+        display: "flex",
+        flexDirection: "column",
+        gap: "var(--space-2)",
+        maxWidth: "min(400px, calc(100vw - 32px))",
+        marginLeft: "auto",
+        width: "100%",
+      }}
+    >
       {children}
     </div>
   );

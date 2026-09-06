@@ -117,8 +117,14 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--sh-2);
-  height: calc(100vh - 220px);
-  min-height: 600px;
+  height: calc(100dvh - 220px);
+  min-height: min(600px, calc(100dvh - 240px));
+}
+
+@media (max-width: 767px) {
+  .frameWrap {
+    min-height: 420px;
+  }
 }
 
 .frame {

@@ -113,7 +113,7 @@
   font-weight: 800;
 }
 
-.pathArrow { top: 50%; right: -19px; transform: translateY(-50%); }
+.pathArrow { top: 50%; right: -13px; transform: translateY(-50%); }
 
 .visualTakeaway {
   margin-top: var(--space-5);
@@ -254,7 +254,7 @@
 .funnelNumber { color: var(--ink-900); font-family: var(--font-mono); font-size: var(--text-xl); font-weight: 800; }
 .funnelStage strong { font-size: var(--text-sm); }
 .funnelStage span:not(.funnelArrow) { color: var(--ink-500); font-size: var(--text-xs); }
-.funnelArrow { top: 50%; right: -20px; transform: translateY(-50%); }
+.funnelArrow { top: 50%; right: -13px; transform: translateY(-50%); }
 
 .decisionList {
   display: grid;

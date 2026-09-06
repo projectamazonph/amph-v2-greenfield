@@ -51,7 +51,7 @@ export default async function ResourcesPage() {
   if (!result.ok) {
     return (
       <StudentShell user={user}>
-        <main id="main-content" tabIndex={-1}>
+        <main id="main-content" tabIndex={-1} className={styles.page}>
           <header className={styles.header}>
             <div>
               <span className={styles.eyebrow}>Student resources</span>
@@ -85,7 +85,7 @@ export default async function ResourcesPage() {
 
   return (
     <StudentShell user={user}>
-        <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <header className={styles.header}>
           <div className={styles.headerCopy}>
             <span className={styles.eyebrow}>Student resources</span>
@@ -121,14 +121,19 @@ export default async function ResourcesPage() {
                   {CATEGORY_LABELS[category]}
                 </h2>
                 <span className={styles.sectionCount}>
-                  {byCategory.get(category)!.length} {byCategory.get(category)!.length === 1 ? "item" : "items"}
+                  {byCategory.get(category)!.length}{" "}
+                  {byCategory.get(category)!.length === 1 ? "item" : "items"}
                 </span>
               </div>
               <ul className={styles.list}>
                 {byCategory.get(category)!.map(({ resource, locked }) => (
                   <li key={resource.id} className={styles.row}>
                     <div className={styles.resourceIcon} aria-hidden="true">
-                      {locked ? <LockKey size={20} weight="bold" /> : <FileText size={20} weight="bold" />}
+                      {locked ? (
+                        <LockKey size={20} weight="bold" />
+                      ) : (
+                        <FileText size={20} weight="bold" />
+                      )}
                     </div>
                     <div className={styles.cellBody}>
                       <h3 className={styles.resourceTitle}>{resource.title}</h3>

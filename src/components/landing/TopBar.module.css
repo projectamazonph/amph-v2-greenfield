@@ -206,6 +206,8 @@
     border-bottom: 1px solid var(--c-shell-line);
     background: var(--c-navy-3);
     box-shadow: var(--sh-2);
+    max-height: calc(100dvh - 56px);
+    overflow-y: auto;
   }
 
   .navOpen a {

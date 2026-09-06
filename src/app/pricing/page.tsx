@@ -10,6 +10,7 @@
 
 import { buildContainer } from "@/composition/container";
 import { ListPricingTiers } from "@/usecases/ListPricingTiers";
+import { StudentShell } from "@/components/student/StudentShell";
 import styles from "./page.module.css";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -41,82 +42,84 @@ export default async function PricingPage() {
   const tiers = result.ok ? result.value.tiers : [];
 
   return (
-    <main id="main-content" tabIndex={-1} className={styles.page}>
-      <header className={styles.header}>
-        <span className={styles.eyebrow}>Pricing</span>
-        <h1 className={styles.title}>Three tiers, one-time payment.</h1>
-        <p className={styles.subhead}>
-          Pay once, get the content forever. No subscription, no upsells later.
-        </p>
-      </header>
+    <StudentShell requireAuth={false}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
+        <header className={styles.header}>
+          <span className={styles.eyebrow}>Pricing</span>
+          <h1 className={styles.title}>Three tiers, one-time payment.</h1>
+          <p className={styles.subhead}>
+            Pay once, get the content forever. No subscription, no upsells later.
+          </p>
+        </header>
 
-      {loadError ? (
-        <p className={styles.error} role="alert">
-          {loadError}
-        </p>
-      ) : tiers.length === 0 ? (
-        <p className={styles.note}>No active pricing plans are published yet. Check back soon.</p>
-      ) : (
-        <ul className={styles.grid}>
-          {tiers.map((tier) => (
-            <li
-              key={tier.id}
-              className={`${styles.card} ${tier.slug === "mastery" ? styles.cardHighlighted : ""}`}
-            >
-              {tier.slug === "mastery" ? (
-                <span className={styles.ribbon}>Most students pick this</span>
-              ) : null}
+        {loadError ? (
+          <p className={styles.error} role="alert">
+            {loadError}
+          </p>
+        ) : tiers.length === 0 ? (
+          <p className={styles.note}>No active pricing plans are published yet. Check back soon.</p>
+        ) : (
+          <ul className={styles.grid}>
+            {tiers.map((tier) => (
+              <li
+                key={tier.id}
+                className={`${styles.card} ${tier.slug === "mastery" ? styles.cardHighlighted : ""}`}
+              >
+                {tier.slug === "mastery" ? (
+                  <span className={styles.ribbon}>Most students pick this</span>
+                ) : null}
 
-              {/* Early-bird badge */}
-              {tier.isEarlyBird && (
-                <span className={styles.earlyBirdBadge}>
-                  Early Bird · {formatCountdown(tier.earlyBirdMinutesRemaining)} left
-                </span>
-              )}
-
-              <h2 className={styles.tierName}>{tier.name}</h2>
-
-              <div className={styles.priceRow}>
-                {tier.isEarlyBird && tier.originalPrice ? (
-                  <>
-                    <span className={styles.price}>{tier.displayPrice.format()}</span>
-                    <span className={styles.originalPrice}>{tier.originalPrice.format()}</span>
-                  </>
-                ) : (
-                  <span className={styles.price}>{tier.displayPrice.format()}</span>
+                {/* Early-bird badge */}
+                {tier.isEarlyBird && (
+                  <span className={styles.earlyBirdBadge}>
+                    Early Bird · {formatCountdown(tier.earlyBirdMinutesRemaining)} left
+                  </span>
                 )}
-                <span className={styles.priceSuffix}>one-time</span>
-              </div>
 
-              {/* Countdown timer for early-bird tiers */}
-              {tier.isEarlyBird && tier.earlyBirdMinutesRemaining > 0 && (
-                <p className={styles.countdown}>
-                  Early-bird ends in{" "}
-                  <strong>{formatCountdown(tier.earlyBirdMinutesRemaining)}</strong>
-                </p>
-              )}
+                <h2 className={styles.tierName}>{tier.name}</h2>
 
-              {tier.courseSlug ? (
-                <a
-                  href={`/signup?tier=${tier.slug}`}
-                  className={`${styles.cta} ${tier.slug === "mastery" ? styles.ctaPrimary : styles.ctaSecondary}`}
-                >
-                  Enroll in {tier.name}
-                </a>
-              ) : (
-                <span className={`${styles.cta} ${styles.ctaSecondary}`} aria-disabled="true">
-                  Not currently available
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+                <div className={styles.priceRow}>
+                  {tier.isEarlyBird && tier.originalPrice ? (
+                    <>
+                      <span className={styles.price}>{tier.displayPrice.format()}</span>
+                      <span className={styles.originalPrice}>{tier.originalPrice.format()}</span>
+                    </>
+                  ) : (
+                    <span className={styles.price}>{tier.displayPrice.format()}</span>
+                  )}
+                  <span className={styles.priceSuffix}>one-time</span>
+                </div>
 
-      <p className={styles.note}>
-        Payment via PayMongo. Card and GCash accepted. 7-day money-back guarantee on less than 25%
-        course completion.
-      </p>
-    </main>
+                {/* Countdown timer for early-bird tiers */}
+                {tier.isEarlyBird && tier.earlyBirdMinutesRemaining > 0 && (
+                  <p className={styles.countdown}>
+                    Early-bird ends in{" "}
+                    <strong>{formatCountdown(tier.earlyBirdMinutesRemaining)}</strong>
+                  </p>
+                )}
+
+                {tier.courseSlug ? (
+                  <a
+                    href={`/signup?tier=${tier.slug}`}
+                    className={`${styles.cta} ${tier.slug === "mastery" ? styles.ctaPrimary : styles.ctaSecondary}`}
+                  >
+                    Enroll in {tier.name}
+                  </a>
+                ) : (
+                  <span className={`${styles.cta} ${styles.ctaSecondary}`} aria-disabled="true">
+                    Not currently available
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p className={styles.note}>
+          Payment via PayMongo. Card and GCash accepted. 7-day money-back guarantee on less than 25%
+          course completion.
+        </p>
+      </main>
+    </StudentShell>
   );
 }

@@ -6,6 +6,7 @@
  * resetPasswordAction with the new password.
  */
 
+import Link from "next/link";
 import { ResetConfirmForm } from "@/components/auth/ResetConfirmForm";
 import styles from "./page.module.css";
 
@@ -21,10 +22,15 @@ export default async function ResetConfirmPage({ params }: Props) {
     <main id="main-content" tabIndex={-1} className={styles.page}>
       <h1 className={styles.title}>Set a new password</h1>
       <p className={styles.body}>
-        Choose a password at least 8 characters long with a mix of
-        letters, numbers, and ideally a symbol.
+        Choose a password at least 8 characters long with a mix of letters, numbers, and ideally a
+        symbol.
       </p>
       <ResetConfirmForm token={token} />
+      <p className={styles.body}>
+        <Link href="/login">Back to sign in</Link>
+        {" · "}
+        <Link href="/reset-password">Request a new reset link</Link>
+      </p>
     </main>
   );
 }

@@ -12,8 +12,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const SRC = (rel: string): string =>
-  readFileSync(resolve(process.cwd(), rel), "utf8");
+const SRC = (rel: string): string => readFileSync(resolve(process.cwd(), rel), "utf8");
 
 const ALL_TS = [
   // Admin Astryx <Table> consumers
@@ -46,18 +45,9 @@ const ADMIN_ASTRYX_NEEDS_FIGCAPTION = [
 ] as const;
 
 const LANDING_NEEDS_CAPTION = [
-  [
-    "src/components/landing/BidElevator.tsx",
-    "Search-term harvest",
-  ],
-  [
-    "src/components/landing/Curriculum.tsx",
-    "Curriculum modules",
-  ],
-  [
-    "src/components/landing/Footer.tsx",
-    "Project architecture",
-  ],
+  ["src/components/landing/BidElevator.tsx", "Search-term harvest"],
+  ["src/components/landing/Curriculum.tsx", "Curriculum modules"],
+  ["src/components/landing/Footer.tsx", "Project architecture"],
 ] as const;
 
 const LANDING_NEEDS_SCOPE = [
@@ -74,7 +64,7 @@ const TOOLS_NEEDS_SCOPE = [
 ] as const;
 
 describe("round 30 — C-08 tables ship accessible name + scope", () => {
-  describe("every <th> in scope files carries scope=\"col\"", () => {
+  describe('every <th> in scope files carries scope="col"', () => {
     // For each file, find every <th ...> opening tag (not <thead> or <th/>)
     // and assert each one contains scope="col".
     const thTagRe = /<th\b(?![a-zA-Z])[^>]*>/g;
@@ -105,22 +95,20 @@ describe("round 30 — C-08 tables ship accessible name + scope", () => {
         // Wrapped in <figure>
         expect(src).toMatch(/<figure\b/);
         // sr-only figcaption with the expected accessible name
-        expect(src).toMatch(
-          new RegExp(`<figcaption\\s+className="sr-only">${label}</figcaption>`),
-        );
+        expect(src).toMatch(new RegExp(`<figcaption\\s+className="sr-only">${label}</figcaption>`));
         // M-R30 doc block cites WCAG 1.3.1
         expect(src).toMatch(/WCAG\s+1\.3\.1/);
       });
     }
   });
 
-  describe("landing tables ship sr-only <caption> + scope=\"col\"", () => {
+  describe('landing tables ship sr-only <caption> + scope="col"', () => {
     for (const [file, label] of LANDING_NEEDS_CAPTION) {
       it(`${file} has <caption className="sr-only"> mentioning "${label}"`, () => {
         const src = SRC(file);
-        expect(src).toMatch(
-          new RegExp(`<caption\\s+className="sr-only">${label}`),
-        );
+        // \s* tolerates prettier wrapping the caption text onto its own
+        // line (Footer arch region, scrollable-region-focusable fix).
+        expect(src).toMatch(new RegExp(`<caption\\s+className="sr-only">\\s*${label}`));
       });
     }
 
@@ -136,7 +124,7 @@ describe("round 30 — C-08 tables ship accessible name + scope", () => {
     }
   });
 
-  describe("tools tables ship scope=\"col\" + M-R30 doc block", () => {
+  describe('tools tables ship scope="col" + M-R30 doc block', () => {
     for (const file of TOOLS_NEEDS_SCOPE) {
       it(`${file} has scope="col" on every <th> and cites WCAG 1.3.1`, () => {
         const src = SRC(file);
@@ -151,5 +139,4 @@ describe("round 30 — C-08 tables ship accessible name + scope", () => {
       });
     }
   });
-
-  });
+});

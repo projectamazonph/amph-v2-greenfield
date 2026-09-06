@@ -33,6 +33,9 @@ export default async function SentPage({ searchParams }: Props) {
           Check your inbox. The link in this email is valid for 24 hours.
         </p>
         <ResendForm />
+        <p className={styles.body}>
+          <Link href="/login">Sign in</Link>
+        </p>
       </main>
     );
   }
@@ -41,9 +44,7 @@ export default async function SentPage({ searchParams }: Props) {
     return (
       <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>Already verified</h1>
-        <p className={styles.body}>
-          Your email is already verified. You can sign in.
-        </p>
+        <p className={styles.body}>Your email is already verified. You can sign in.</p>
         {/* M-R31 fix (H-08): <Link href=...> keeps the sign-in route change in the App Router client-side navigation. */}
         <Link href="/login" className={styles.cta}>
           Sign in
@@ -57,10 +58,12 @@ export default async function SentPage({ searchParams }: Props) {
       <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>Wait a moment</h1>
         <p className={styles.body}>
-          We just sent you a verification email. You can request a new one
-          in 60 seconds.
+          We just sent you a verification email. You can request a new one in 60 seconds.
         </p>
         <ResendForm disabled />
+        <p className={styles.body}>
+          <Link href="/login">Sign in</Link>
+        </p>
       </main>
     );
   }
@@ -69,10 +72,11 @@ export default async function SentPage({ searchParams }: Props) {
     return (
       <main id="main-content" tabIndex={-1} className={styles.page}>
         <h1 className={styles.title}>Couldn't resend</h1>
-        <p className={styles.body}>
-          Something went wrong. Try again in a moment.
-        </p>
+        <p className={styles.body}>Something went wrong. Try again in a moment.</p>
         <ResendForm />
+        <p className={styles.body}>
+          <Link href="/login">Sign in</Link>
+        </p>
       </main>
     );
   }
@@ -81,11 +85,13 @@ export default async function SentPage({ searchParams }: Props) {
     <main id="main-content" tabIndex={-1} className={styles.page}>
       <h1 className={styles.title}>Check your email</h1>
       <p className={styles.body}>
-        We sent a verification link to your email. Click the link to
-        verify your address. If you don't see it, check your spam
-        folder, or send a new one.
+        We sent a verification link to your email. Click the link to verify your address. If you
+        don't see it, check your spam folder, or send a new one.
       </p>
       <ResendForm />
+      <p className={styles.body}>
+        <Link href="/login">Sign in</Link>
+      </p>
     </main>
   );
 }
@@ -93,11 +99,7 @@ export default async function SentPage({ searchParams }: Props) {
 function ResendForm({ disabled = false }: { disabled?: boolean }) {
   return (
     <form action={resendVerificationAction} className={styles.form}>
-      <button
-        type="submit"
-        className={styles.cta}
-        disabled={disabled}
-      >
+      <button type="submit" className={styles.cta} disabled={disabled}>
         Resend verification email
       </button>
     </form>

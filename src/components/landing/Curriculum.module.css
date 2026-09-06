@@ -130,7 +130,7 @@
 
   .table td {
     border: 0;
-    padding: 5px 18px;
+    padding: 10px 18px;
   }
 
   .hours {
@@ -149,7 +149,7 @@
   }
 
   .table tfoot td {
-    display: inline-block;
-    width: auto;
+    display: block;
+    width: 100%;
   }
 }
