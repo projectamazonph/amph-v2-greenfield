@@ -68,8 +68,29 @@
 .table {
   width: 100%;
   min-width: 700px;
+  border: 0;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: var(--text-sm);
+}
+
+.table th:first-child,
+.table td:first-child {
+  width: 30%;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 16%;
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3),
+.table th:nth-child(4),
+.table td:nth-child(4),
+.table th:nth-child(5),
+.table td:nth-child(5) {
+  width: 18%;
 }
 
 .tableScroll {
@@ -97,6 +118,9 @@
   text-align: left;
   padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .thNum { text-align: right; }
@@ -107,9 +131,27 @@
   color: var(--ink-700);
 }
 
-.tdKw { color: var(--ink-900); overflow-wrap: anywhere; }
-.tdNum { text-align: right; font-family: var(--font-mono); }
-.tdNumStrong { text-align: right; font-family: var(--font-mono); color: var(--ink-900); font-weight: 600; }
+.tdKw {
+  color: var(--ink-900);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tdNum {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tdNumStrong {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ink-900);
+  font-weight: 600;
+}
 
 .table tr:last-child td { border-bottom: 0; }
 
