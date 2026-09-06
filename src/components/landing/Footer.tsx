@@ -54,12 +54,19 @@ export function Footer() {
           </div>
         </div>
 
-        <div className={styles.arch}>
+        <div
+          className={styles.arch}
+          role="region"
+          aria-label="Project architecture table, scrollable on small screens"
+          tabIndex={0}
+        >
           <table>
             {/* M-R30 fix: <caption className="sr-only"> provides WCAG 1.3.1
                 accessible name; scope="col" on every header associates cells
                 with their column header for screen readers. */}
-            <caption className="sr-only">Project architecture — what each level is used for</caption>
+            <caption className="sr-only">
+              Project architecture — what each level is used for
+            </caption>
             <thead>
               <tr>
                 <th scope="col">Level</th>
