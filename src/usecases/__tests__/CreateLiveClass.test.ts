@@ -8,7 +8,7 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { FixedClock } from "@/ports/system/Clock";
 import { SilentLogger } from "@/infra/observability/SilentLogger";
 
-const futureDate = new Date("2026-09-01T10:00:00Z");
+const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
 interface MakeInput {
   id: string;
