@@ -17,7 +17,7 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: var(--shadow-md);
-  z-index: 900;
+  z-index: var(--z-sticky);
   opacity: 0;
   pointer-events: none;
   transform: translateY(8px);

@@ -265,7 +265,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: var(--z-dropdown);
+    z-index: var(--z-modal-backdrop);
     width: min(280px, calc(100vw - var(--sp-6)));
     min-height: 100vh;
     transform: translateX(-100%);

@@ -75,6 +75,7 @@
 
 .card {
   display: block;
+  position: relative;
   padding: 0;
   overflow: hidden;
   background: var(--surface-1);
@@ -90,7 +91,9 @@
 .cardCover {
   display: block;
   width: 100%;
-  height: 148px;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  max-height: 148px;
   object-fit: cover;
 }
 

@@ -58,6 +58,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f7f8fa" },
     { media: "(prefers-color-scheme: dark)", color: "#131921" },
@@ -72,7 +74,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${archivo.variable} ${ptSans.variable} ${barlowCondensed.variable} ${ibmPlexMono.variable}`}
     >
       <body>
-        <a href="#main-content" className="skip-link">Skip to main content</a>
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <ImpersonationBanner />
         <WebVitalsReporter />
         <Providers>{children}</Providers>

@@ -62,11 +62,13 @@
   margin-top: 36px;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
 }
 
 .arch table {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   font-size: 13px;
 }

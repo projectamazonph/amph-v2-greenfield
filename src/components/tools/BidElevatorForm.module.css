@@ -8,6 +8,12 @@
   gap: var(--space-4);
 }
 
+@media (max-width: 480px) {
+  .form {
+    padding: var(--space-4);
+  }
+}
+
 .metaRow {
   display: flex;
   gap: var(--space-6);
@@ -105,7 +111,7 @@
 }
 
 .input {
-  width: 70px;
+  width: clamp(88px, 12vw, 110px);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   color: var(--ink-900);

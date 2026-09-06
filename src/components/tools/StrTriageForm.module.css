@@ -8,6 +8,12 @@
   gap: var(--space-4);
 }
 
+@media (max-width: 480px) {
+  .form {
+    padding: var(--space-4);
+  }
+}
+
 .table {
   width: 100%;
   min-width: 720px;

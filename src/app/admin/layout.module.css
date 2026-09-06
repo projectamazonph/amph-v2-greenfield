@@ -24,6 +24,12 @@
 .main :global(.astryx-card) {
   min-width: 0;
   max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.main :global(.astryx-table) {
+  min-width: 680px;
 }
 
 @media (max-width: 1023px) {
@@ -37,12 +43,4 @@
     padding: 72px var(--sp-4) var(--sp-12);
   }
 
-  .main :global(.astryx-card) {
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-  }
-
-  .main :global(.astryx-table) {
-    min-width: 680px;
-  }
 }

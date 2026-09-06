@@ -41,8 +41,15 @@
 .actions {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: var(--sp-3);
   margin-top: var(--sp-2);
+}
+
+@media (max-width: 480px) {
+  .body {
+    padding: var(--sp-5);
+  }
 }
 
 .cancelBtn,
