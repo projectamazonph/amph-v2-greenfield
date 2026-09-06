@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-09-06: Seed production download center (STORY-098, STORY-099)
+
+Production `/resources` showed the "No resources are published yet" empty state because the `resources` table had zero rows. The Vercel build runs `prisma migrate deploy` but never seeds, and the 26 pre-installed `ResourceDef` entries in `scripts/seed-resources.ts` only load when an operator runs `pnpm db:seed:resources`. Ran the seeder against production. Result was 26 `[CREATE]` rows (5 guides, 6 templates, 5 automation tools, 5 cheat sheets, 5 handouts), all `isPublished: true`. No code changes. Operator note: rerun the seeder after any database reset or restore, then confirm `/admin/resources` lists 26 rows before closing the check.
+
 ### 2026-09-05: LEARN-026 Module 5 weekly client readouts (STORY-128)
 
 All three Module 5 lessons gain a `## Weekly client readout` section following the LEARN-025 pattern. 5.1 turns the portfolio split into a readout with campaign-level controls and a review trigger (16-campaign account at ₱90,000 / ₱37,500 / ₱22,500). 5.2 turns the burn rate read into a pacing readout that protects the 8PM to 12AM peak window (phone-case campaign at ₱1,500 daily, 80% by 11AM). 5.3 turns the seasonal profit call into a readout with an escalation line for stockout, margin, and cap breaches (lunch-box Back to School at ₱37,500 vs ₱60,938 profit after ad spend). Existing practice, feedback, worksheet, fact-card, and client-language blocks are untouched. Lesson-production strict report stays 42/42.
