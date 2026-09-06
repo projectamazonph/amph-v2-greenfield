@@ -7,6 +7,8 @@
 
 **Status:** Done — 2026-08-03.
 
+**Operations note (2026-09-06):** production `/resources` was empty because the `resources` table had no rows. The deploy pipeline migrates but does not seed. Running `pnpm db:seed:resources` against production created all 26 rows. Rerun the seeder after any database reset or restore.
+
 ## Goal
 
 STORY-098/098.5 shipped the download center feature end-to-end with 10
