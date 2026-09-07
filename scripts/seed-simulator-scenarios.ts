@@ -11,26 +11,37 @@
  * would fail identically once wired to their pages. Idempotent: re-running
  * safely upserts existing scenarios.
  *
- * STORY-085: each scenario now carries real `inputSchema` content —
+ * STORY-085: each scenario now carries real `inputSchema` content
  * losslessly migrated from the hardcoded `SCENARIO` const each simulator's
- * page.tsx used to own — and seeds as `status: "published", version: 1`.
+ * page.tsx used to own  and seeds as `status: "published", version: 1`.
  * This is what makes the per-simulator server-side rewire (fetching
- * published scenario content instead of trusting hardcoded/client-echoed
+ * published scenario content instead of hardcoded/client-echoed
  * data) actually load real content instead of an empty {}.
  *
  * Usage:
  *   pnpm db:seed:scenarios
+ *   pnpm db:seed:scenarios --dry-run    # Print what would be done without writing
  *
  * Requires DATABASE_URL in .env.local or .env. Run after
  * `pnpm prisma migrate deploy`.
  */
 
 import { existsSync, readFileSync } from "node:fs";
+import { parseArgs } from "node:util";
 import { prisma } from "@/infra/database/prisma";
 import { createSimulatorScenario } from "@/domain/entities/SimulatorScenario";
 import type { SimulatorScenario } from "@/domain/entities/SimulatorScenario";
 
-// ── .env loader ──────────────────────────────────────────────────────────
+// ANSI color codes
+const colors = {
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  red: "\x1b[31m",
+  cyan: "\x1b[36m",
+  reset: "\x1b[0m",
+};
+
+// [32m[33m[31m[36m[34m[0m
 
 function loadEnvFile(path: string): void {
   if (!existsSync(path)) return;
@@ -62,7 +73,7 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
-// ── Scenarios ────────────────────────────────────────────────────────────
+// [32m[33m[31m[36m[0m
 // IDs must match the DEFAULT_SCENARIO_ID / hardcoded scenarioId in each
 // simulator's src/app/tools/<name>/actions.ts.
 
@@ -80,7 +91,7 @@ const SCENARIOS: ReadonlyArray<{
     simulatorId: "bid-elevator",
     name: "Reduce ACoS on a high-spend electronics campaign",
     description:
-      "Review a wireless earbuds campaign spending ₱800/day at 45% ACoS. Set bids against a 25% target.",
+      "Review a wireless earbuds campaign spending 800/day at 45% ACoS. Set bids against a 25% target.",
     difficulty: "intermediate",
     estimatedMinutes: 10,
     // Losslessly migrated from src/app/tools/bid-elevator/page.tsx's SCENARIO const.
@@ -474,7 +485,7 @@ const SCENARIOS: ReadonlyArray<{
     simulatorId: "campaign-builder",
     name: "Launch a Sponsored Products campaign for wireless earbuds",
     description:
-      "Build a Sponsored Products structure for wireless earbuds with a ₱500/day budget.",
+      "Build a Sponsored Products structure for wireless earbuds with a \u0001500/day budget.",
     difficulty: "beginner",
     estimatedMinutes: 15,
     // Losslessly migrated from src/app/tools/campaign-builder/page.tsx's SCENARIO const.
@@ -482,7 +493,7 @@ const SCENARIOS: ReadonlyArray<{
     // constants; STORY-084 added the brand-taxonomy/ASIN/budget-
     // reconciliation fields below so the 4 new grading dimensions have
     // scenario context (agent-authored scenario content, not requiring
-    // Ryan's per-scenario authoring — same reasoning as STORY-083's seed
+    // Ryan's per-scenario authoring  same reasoning as STORY-083's seed
     // update).
     inputSchema: {
       productCategory: "Electronics",
@@ -501,17 +512,17 @@ const SCENARIOS: ReadonlyArray<{
   {
     id: "listing-audit-scenario-bamboo-cutting-board",
     simulatorId: "listing-audit",
-    name: "Bamboo Cutting Board — Premium Kitchen Essential",
+    name: "Bamboo Cutting Board  Premium Kitchen Essential",
     description:
       "Review and revise a bamboo cutting board listing. Prioritize the fixes that matter most.",
     difficulty: "beginner",
     estimatedMinutes: 10,
     // Losslessly migrated from src/app/tools/listing-audit/page.tsx's SCENARIO const.
     // `images`/`hasVideo`/`hasAPlus`/`marketplace` were implicit defaults on the
-    // page before — made explicit here. `name` above doubles as the initial
+    // page before  made explicit here. `name` above doubles as the initial
     // listing title (the page's SCENARIO.title served both roles already).
     // STORY-083: structuredAttributes/primaryCustomerIntent/primaryKeywords/
-    // complianceEvidence are new ground-truth resolver context — reasonable,
+    // complianceEvidence are new ground-truth resolver context  reasonable,
     // documented scenario content, not requiring Ryan's per-scenario
     // authoring (only the engine *rules* needed his judgment).
     inputSchema: {
@@ -520,7 +531,7 @@ const SCENARIOS: ReadonlyArray<{
       bullets: [
         "100% organic bamboo, sustainable and food-safe",
         "Knife-friendly surface that won't dull your blades",
-        "Easy to clean — hand wash with soap and water",
+        "Easy to clean  hand wash with soap and water",
       ],
       description:
         "High-quality bamboo cutting board for home cooks and professional chefs. Durable, knife-friendly, and naturally beautiful.",
@@ -541,11 +552,10 @@ const SCENARIOS: ReadonlyArray<{
     id: "keyword-research-scenario-default",
     simulatorId: "keyword-research",
     name: "Keyword research for bamboo cutting board niche",
-    description:
-      "Classify 18 bamboo cutting board keywords and flag the terms that do not belong.",
+    description: "Classify 18 bamboo cutting board keywords and flag the terms that do not belong.",
     difficulty: "beginner",
     estimatedMinutes: 10,
-    // STORY-081's KeywordDataset system already owns real keyword content —
+    // STORY-081's KeywordDataset system already owns real keyword content 
     // this scenario intentionally does not duplicate it. "Publishing a new
     // version" here means changing which niche is pre-filled by default.
     inputSchema: {
@@ -554,10 +564,21 @@ const SCENARIOS: ReadonlyArray<{
   },
 ];
 
-// ── Main ─────────────────────────────────────────────────────────────────
+// [32m[33m[31m[36m[0m
+// Main [32m[33m[31m[36m[0m
 
 async function main() {
+  const { values } = parseArgs({
+    options: {
+      "dry-run": { type: "boolean", default: false },
+    },
+    allowPositionals: true,
+  });
+
+  const dryRun = values["dry-run"] === true;
+
   console.log(`Seeding ${SCENARIOS.length} SimulatorScenario records...\n`);
+  console.log(`  Mode: ${dryRun ? "DRY RUN (no writes)" : "LIVE"}\n`);
 
   const validated: SimulatorScenario[] = [];
   const invalid: string[] = [];
@@ -579,7 +600,7 @@ async function main() {
     if (!result.ok) {
       invalid.push(`  ${scenario.id}: ${JSON.stringify(result.error)}`);
     } else {
-      // createSimulatorScenario() always produces status:"draft" — the seed
+      // createSimulatorScenario() always produces status:"draft"  the seed
       // script's rows are meant to be immediately live, so override it here
       // rather than teach the factory a "seed mode".
       validated.push({ ...result.value, status: "published" });
@@ -594,6 +615,18 @@ async function main() {
   }
 
   console.log(`All ${validated.length} scenarios passed createSimulatorScenario() validation.\n`);
+
+  if (dryRun) {
+    console.log(`${colors.cyan}Dry run mode - showing what would be seeded:${colors.reset}\n`);
+    for (const scenario of validated) {
+      console.log(`  [DRY]   ${scenario.simulatorId}/${scenario.id}`);
+    }
+    console.log(
+      `\n${colors.cyan}Done: ${validated.length} scenarios would be seeded.${colors.reset}\n`,
+    );
+    await prisma.$disconnect();
+    return;
+  }
 
   let created = 0;
   let upserted = 0;
@@ -644,7 +677,7 @@ async function main() {
   console.log(`\nDone: ${created} created, ${upserted} upserted, ${failed} failed.`);
   await prisma.$disconnect();
   // A partial failure here must not look like success to a setup chain or
-  // CI job — that's exactly how the scenario_not_found bug this script
+  // CI job  that's exactly how the scenario_not_found bug this script
   // fixes would go unnoticed and recur.
   if (failed > 0) process.exit(1);
 }

@@ -7,6 +7,7 @@
  *
  * Usage:
  *   pnpm db:seed:policies
+ *   pnpm db:seed:policies --dry-run    # Print what would be done without writing
  *
  * Requires DATABASE_URL in .env.local. Run after `pnpm prisma migrate deploy`.
  *
@@ -14,12 +15,13 @@
  */
 
 import { existsSync, readFileSync } from "node:fs";
+import { parseArgs } from "node:util";
 import { prisma } from "@/infra/database/prisma";
 import { createScorePolicy, type ScorePolicy } from "@/domain/entities/ScorePolicy";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
 import type { Difficulty, SimulatorMode } from "@/domain/entities/SimulatorAttempt";
 
-// ── .env loader ──────────────────────────────────────────────────────────────
+// [32m[33m[31m[36m[34m[0m
 
 function loadEnvFile(path: string): void {
   if (!existsSync(path)) return;
@@ -53,6 +55,15 @@ if (!process.env.DATABASE_URL) {
 
 import { POLICIES } from "./simulator-policies";
 
+// ANSI color codes
+const colors = {
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  red: "\x1b[31m",
+  cyan: "\x1b[36m",
+  reset: "\x1b[0m",
+};
+
 /**
  * The DB stores `Record<string, { weight }>` to match DimensionConfig. The
  * table above uses bare numbers because a weight is all a policy carries now
@@ -62,10 +73,20 @@ function toPersistedConfig(cfg: Record<string, number>): Record<string, { weight
   return Object.fromEntries(Object.entries(cfg).map(([dim, weight]) => [dim, { weight }]));
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────
+// [32m[33m[31m[36m[0m
 
 async function main() {
+  const { values } = parseArgs({
+    options: {
+      "dry-run": { type: "boolean", default: false },
+    },
+    allowPositionals: true,
+  });
+
+  const dryRun = values["dry-run"] === true;
+
   console.log(`Seeding ${POLICIES.length} ScorePolicy records...\n`);
+  console.log(`  Mode: ${dryRun ? "DRY RUN (no writes)" : "LIVE"}\n`);
 
   // Validate EVERY policy through the domain factory before writing any of
   // them. This script used to call prisma.upsert directly, which bypassed
@@ -104,6 +125,18 @@ async function main() {
   }
 
   console.log(`All ${validated.length} policies passed createScorePolicy() validation.\n`);
+
+  if (dryRun) {
+    console.log(`${colors.cyan}Dry run mode - showing what would be seeded:${colors.reset}\n`);
+    for (const policy of POLICIES) {
+      console.log(`  [DRY]   ${policy.simulatorId}/${policy.difficulty}/${policy.mode}`);
+    }
+    console.log(
+      `\n${colors.cyan}Done: ${POLICIES.length} policies would be seeded.${colors.reset}\n`,
+    );
+    await prisma.$disconnect();
+    return;
+  }
 
   let created = 0;
   let upserted = 0;

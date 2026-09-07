@@ -39,7 +39,16 @@
     "db:seed:resources": "tsx scripts/seed-resources.ts",
     "format": "prettier --write .",
     "prepare": "husky",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:seed:curriculum": "node scripts/seed-curriculum.cjs",
+    "db:seed": "tsx scripts/seed-orchestrator.ts",
+    "db:setup": "pnpm prisma:migrate && pnpm db:seed",
+    "enrich:apply": "tsx scripts/apply-enrichment.ts",
+    "enrich:apply --dry-run": "tsx scripts/apply-enrichment.ts --dry-run",
+    "audit": "tsx scripts/audit-runner.ts",
+    "audit:strict": "tsx scripts/audit-runner.ts --strict",
+    "audit:fix": "tsx scripts/audit-runner.ts --fix",
+    "validate:simulators": "tsx scripts/validate-simulator-data.ts"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.1.8",
