@@ -83,24 +83,61 @@ async function disconnect(
 }
 
 /**
+ * Counterpart to OtpauthTotpService.generateSecret() for the E2E seed
+ * below — same library, same params (20-byte secret, base32). Kept as
+ * a module-level function (not a method on the production service, which
+ * has no "generate a code" API by design) so specs can mint the current
+ * TOTP code for a seeded admin at submit time.
+ */
+export async function currentTotpCode(secret: string): Promise<string> {
+  const { TOTP, Secret } = await import("otpauth");
+  return new TOTP({
+    secret: Secret.fromBase32(secret),
+    algorithm: "SHA1",
+    digits: 6,
+    period: 30,
+  }).generate();
+}
+
+/**
  * Seed (or promote) an ADMIN user directly via Prisma, bypassing
  * UserRepository.create() (hardcodes role: "STUDENT") — same
  * rationale and Argon2 params as scripts/seed-admin-user.mjs, so the
  * result is a login-compatible hash. Idempotent: re-running against
  * the same email just promotes/updates the password.
  *
- * Returns the plaintext credentials the E2E spec should submit
- * through the /admin-login form.
+ * 2FA is fully configured, not just flagged: the user gets a real
+ * TOTP secret (same generation params as OtpauthTotpService) with
+ * twoFactorEnabled=true, because requireAdmin() redirects admins
+ * without 2FA to /admin/settings and Login returns totp_required
+ * without a submitted code. Seeding the flag alone (the previous
+ * behavior) made every admin-login journey bounce back to
+ * /admin-login — and the journey's `toHaveURL(/\/admin/)` assertion
+ * passed spuriously on the "/admin-login" substring, so the failure
+ * surfaced 30s later as a missing-form timeout instead of at login.
+ *
+ * Returns the plaintext credentials plus the TOTP secret — the E2E
+ * spec must submit `currentTotpCode(totpSecret)` in the form's
+ * "Two-factor code" field alongside email + password.
  */
 export async function seedAdminUser(
   databaseUrl: string,
   overrides: { email?: string; password?: string } = {},
-): Promise<{ email: string; password: string } | null> {
+): Promise<{ email: string; password: string; totpSecret: string } | null> {
   const email = overrides.email ?? `e2e-admin-${Date.now()}@example.com`;
   const password = overrides.password ?? "AdminStr0ngP@ss!";
 
   const conn = await connectForSeed(databaseUrl, "seedAdminUser");
   if (!conn) return null;
+  let totpSecret: string;
+  try {
+    const { Secret } = await import("otpauth");
+    totpSecret = new Secret({ size: 20 }).base32;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("[seedAdminUser] TOTP secret generation failed:", err);
+    return null;
+  }
   try {
     // argon2 is CJS-only — createRequire matches the interop trick
     // used by src/infra/security/Argon2PasswordHasher.ts and
@@ -125,15 +162,17 @@ export async function seedAdminUser(
         role: "ADMIN",
         verificationStatus: "VERIFIED",
         twoFactorEnabled: true,
+        twoFactorSecret: totpSecret,
       },
       update: {
         password: passwordHash,
         role: "ADMIN",
         verificationStatus: "VERIFIED",
         twoFactorEnabled: true,
+        twoFactorSecret: totpSecret,
       },
     });
-    return { email, password };
+    return { email, password, totpSecret };
   } catch (err) {
     // eslint-disable-next-line no-console
     console.warn("[seedAdminUser] failed (non-fatal):", err);

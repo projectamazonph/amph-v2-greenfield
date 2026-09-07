@@ -9,6 +9,7 @@ import { test, expect } from "@playwright/test";
 import {
   clearE2EUsers,
   clearE2ESeedData,
+  currentTotpCode,
   seedAdminAccessScenario,
   seedAdminUser,
   seedCertificate,
@@ -80,8 +81,15 @@ test.describe("Critical journeys", () => {
     await page.goto(`${BASE}/admin-login`);
     await page.getByLabel(/admin email/i).fill(admin.email);
     await page.getByLabel(/^password$/i).fill(admin.password);
+    // Seeded admins are fully 2FA-enrolled: submit the current TOTP
+    // code in the same POST, otherwise Login returns totp_required and
+    // no session is created.
+    await page.getByLabel(/two-factor code/i).fill(await currentTotpCode(admin.totpSecret));
     await page.getByRole("button", { name: /sign in/i }).click();
-    await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
+    // Exact end-anchor: a bare /\/admin/ also matches "/admin-login",
+    // which masked the totp_required bounce as a passing login and
+    // surfaced 30s later as a missing-form timeout (journey 3, 2026-09).
+    await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 });
 
     await page.goto(`${BASE}/admin/discount-codes/new`);
     const code = `E2E${Date.now()}`;
@@ -101,8 +109,10 @@ test.describe("Critical journeys", () => {
     await page.goto(`${BASE}/admin-login`);
     await page.getByLabel(/admin email/i).fill(admin.email);
     await page.getByLabel(/^password$/i).fill(admin.password);
+    // Seeded admins are fully 2FA-enrolled (see journey 3 note).
+    await page.getByLabel(/two-factor code/i).fill(await currentTotpCode(admin.totpSecret));
     await page.getByRole("button", { name: /sign in/i }).click();
-    await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 });
 
     await page.goto(`${BASE}/admin/courses/new`);
     const suffix = Date.now();
@@ -131,8 +141,10 @@ test.describe("Critical journeys", () => {
     await page.goto(`${BASE}/admin-login`);
     await page.getByLabel(/admin email/i).fill(admin.email);
     await page.getByLabel(/^password$/i).fill(admin.password);
+    // Seeded admins are fully 2FA-enrolled (see journey 3 note).
+    await page.getByLabel(/two-factor code/i).fill(await currentTotpCode(admin.totpSecret));
     await page.getByRole("button", { name: /sign in/i }).click();
-    await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 });
 
     const adminPages = [
       ["/admin/content", "Content"],
