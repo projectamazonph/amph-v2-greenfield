@@ -1,6 +1,6 @@
 # Project Amazon PH Academy v2 — Comprehensive Curriculum Syllabus
 
-**Last Updated:** 2026-08-26
+**Last Updated:** 2026-09-07
 **Based On:** `content/CURRICULUM-INDEX.md` and `content/curriculum/modules/`
 **Total Planned Reading Time:** 443 minutes (~7 hours 23 minutes)
 **Total XP:** 3,730 points, excluding optional practice time
@@ -31,15 +31,15 @@ The curriculum is divided into **three connected courses**:
 
 ## 📖 Module Breakdown
 
-### **Module 0: Onboarding** (3 lessons, ~21 minutes, 150 XP)
+### **Module 0: Onboarding** (3 lessons, ~26 minutes, 150 XP)
 
 **Purpose:** Orient new VAs to the platform and establish the learning workflow.
 
-| #   | Lesson                                | Type    | Duration | XP  | Learning Objectives                              |
-| --- | ------------------------------------- | ------- | -------- | --- | ------------------------------------------------ |
-| 0.1 | Welcome: Your Path to Amazon PPC Work | Reading | 8 min    | 50  | Understand the learning journey and expectations |
-| 0.2 | Platform Tour                         | Reading | 6 min    | 50  | Navigate the AMPH Academy platform effectively   |
-| 0.3 | First Simulation                      | Reading | 7 min    | 50  | Experience the first interactive simulation      |
+| #   | Lesson                                | Type    | Duration | XP  | Learning Objectives                                        |
+| --- | ------------------------------------- | ------- | -------- | --- | ---------------------------------------------------------- |
+| 0.1 | Welcome. Your Path to Amazon PPC Work | Reading | 8 min    | 50  | Understand the learning journey and expectations           |
+| 0.2 | Platform Tour and Navigation          | Reading | 8 min    | 50  | Navigate the AMPH Academy platform effectively             |
+| 0.3 | Account Safety and the Client Brief   | Reading | 10 min   | 50  | Confirm facts and complete a client-brief intake checklist |
 
 **Key Concepts:**
 
@@ -49,17 +49,17 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
-### **Module 1: Foundations** (5 lessons, ~54 minutes, 375 XP)
+### **Module 1: Foundations** (5 lessons, ~69 minutes, 425 XP)
 
 **Purpose:** Build the metric vocabulary essential for Amazon PPC.
 
-| #   | Lesson                     | Type    | Duration | XP  | Learning Objectives                                  |
-| --- | -------------------------- | ------- | -------- | --- | ---------------------------------------------------- |
-| 1.1 | What is PPC                | Reading | 12 min   | 75  | Understand Pay-Per-Click advertising fundamentals    |
-| 1.2 | CPC & CTR                  | Reading | 10 min   | 75  | Master Cost-Per-Click and Click-Through Rate metrics |
-| 1.3 | ACoS, TACoS, Profitability | Reading | 12 min   | 75  | Analyze Advertising Cost of Sales and total ACOS     |
-| 1.4 | ROAS — Measuring Return    | Reading | 8 min    | 75  | Calculate and interpret Return on Ad Spend           |
-| 1.5 | Metrics in Practice        | Reading | 12 min   | 75  | Apply metrics in real-world scenarios                |
+| #   | Lesson                                                            | Type    | Duration | XP  | Learning Objectives                                                         |
+| --- | ----------------------------------------------------------------- | ------- | -------- | --- | --------------------------------------------------------------------------- |
+| 1.1 | Read PPC Data Before You Change PPC Data                          | Reading | 15 min   | 75  | Read the six core metrics as one diagnostic system before changing anything |
+| 1.2 | Is My Ad Worth Clicking? CPC and CTR                              | Reading | 12 min   | 75  | Master Cost-Per-Click and Click-Through Rate metrics                        |
+| 1.3 | Am I Making Money or Losing Money? ACoS, TACoS, and Profitability | Reading | 15 min   | 100 | Calculate break-even ACoS and read TACoS alongside it                       |
+| 1.4 | Every Dollar In, How Many Dollars Back? ROAS                      | Reading | 12 min   | 75  | Calculate and interpret Return on Ad Spend                                  |
+| 1.5 | Reading the Story Your Metrics Tell                               | Reading | 15 min   | 100 | Apply metrics in real-world scenarios                                       |
 
 **Key Concepts:**
 
@@ -69,16 +69,16 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
-### **Module 2: Keyword Research** (4 lessons, ~47 minutes, 350 XP)
+### **Module 2: Keyword Research** (4 lessons, ~48 minutes, 350 XP)
 
 **Purpose:** Learn to find, qualify, and structure search terms for bidding.
 
-| #   | Lesson                    | Type    | Duration | XP  | Learning Objectives                                  |
-| --- | ------------------------- | ------- | -------- | --- | ---------------------------------------------------- |
-| 2.1 | Match Types               | Reading | 10 min   | 75  | Understand Broad, Phrase, and Exact match types      |
-| 2.2 | Keyword Research Workflow | Reading | 15 min   | 100 | Execute a systematic keyword research process        |
-| 2.3 | Negative Keywords         | Reading | 10 min   | 75  | Identify and implement negative keywords effectively |
-| 2.4 | Keyword Grouping          | Reading | 12 min   | 100 | Structure keywords into logical groups for campaigns |
+| #   | Lesson                                   | Type    | Duration | XP  | Learning Objectives                                  |
+| --- | ---------------------------------------- | ------- | -------- | --- | ---------------------------------------------------- |
+| 2.1 | Match Types: Broad, Phrase, Exact        | Reading | 12 min   | 75  | Understand Broad, Phrase, and Exact match types      |
+| 2.2 | Keyword Research Workflow & Tools        | Reading | 14 min   | 100 | Execute a systematic keyword research process        |
+| 2.3 | Negative Keywords: Stopping Wasted Spend | Reading | 12 min   | 100 | Identify and implement negative keywords effectively |
+| 2.4 | Keyword Grouping for Campaign Structure  | Reading | 10 min   | 75  | Structure keywords into logical groups for campaigns |
 
 **Key Concepts:**
 
@@ -89,15 +89,15 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
-### **Module 3: Listing Optimization** (3 lessons, ~40 minutes, 300 XP)
+### **Module 3: Listing Optimization** (3 lessons, ~36 minutes, 250 XP)
 
 **Purpose:** Master the conversion side of Amazon advertising.
 
-| #   | Lesson                | Type    | Duration | XP  | Learning Objectives                         |
-| --- | --------------------- | ------- | -------- | --- | ------------------------------------------- |
-| 3.1 | Listing Quality Score | Reading | 12 min   | 100 | Understand listing and ad relevance signals |
-| 3.2 | Listing Anatomy       | Reading | 14 min   | 100 | Deconstruct high-converting Amazon listings |
-| 3.3 | A+ Content            | Reading | 14 min   | 100 | Create compelling enhanced brand content    |
+| #   | Lesson                                        | Type    | Duration | XP  | Learning Objectives                         |
+| --- | --------------------------------------------- | ------- | -------- | --- | ------------------------------------------- |
+| 3.1 | Listing and Ad Relevance Signals              | Reading | 14 min   | 100 | Understand listing and ad relevance signals |
+| 3.2 | Listing Anatomy: Title, Bullets, Images & PPC | Reading | 12 min   | 75  | Deconstruct high-converting Amazon listings |
+| 3.3 | A+ Content & Brand Registry Advantage         | Reading | 10 min   | 75  | Create compelling enhanced brand content    |
 
 **Key Concepts:**
 
@@ -107,16 +107,16 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
-### **Module 4: Campaign Architecture** (4 lessons, ~38 minutes, 375 XP)
+### **Module 4: Campaign Architecture** (4 lessons, ~52 minutes, 400 XP)
 
 **Purpose:** Learn to organize campaigns for long-term operability.
 
-| #   | Lesson                         | Type    | Duration | XP  | Learning Objectives                              |
-| --- | ------------------------------ | ------- | -------- | --- | ------------------------------------------------ |
-| 4.1 | Sponsored Products             | Reading | 10 min   | 100 | Master Amazon's primary advertising format       |
-| 4.2 | Sponsored Brands & Display     | Reading | 8 min    | 75  | Understand brand and display advertising options |
-| 4.3 | Campaign Structure             | Reading | 10 min   | 100 | Design effective campaign structures             |
-| 4.4 | Campaign Architecture Practice | Reading | 10 min   | 100 | Apply architecture principles in practice        |
+| #   | Lesson                                                       | Type            | Duration | XP  | Learning Objectives                              |
+| --- | ------------------------------------------------------------ | --------------- | -------- | --- | ------------------------------------------------ |
+| 4.1 | Sponsored Products: Your Ad's Best Salesperson               | Reading         | 15 min   | 100 | Master Amazon's primary advertising format       |
+| 4.2 | Sponsored Brands & Display: Beyond the Basics                | Reading         | 12 min   | 100 | Understand brand and display advertising options |
+| 4.3 | Campaign Structure: The Filing Cabinet Method                | Reading         | 15 min   | 100 | Design effective campaign structures             |
+| 4.4 | Campaign Architecture in Practice: Build Your First Campaign | Simulation prep | 10 min   | 100 | Apply architecture principles in practice        |
 
 **Key Concepts:**
 
@@ -126,15 +126,15 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
-### **Module 5: Portfolio Strategy** (3 lessons, ~38 minutes, 300 XP)
+### **Module 5: Portfolio Strategy** (3 lessons, 38 minutes, 300 XP)
 
 **Purpose:** View campaigns from a portfolio/account perspective.
 
-| #   | Lesson              | Type    | Duration | XP  | Learning Objectives                         |
-| --- | ------------------- | ------- | -------- | --- | ------------------------------------------- |
-| 5.1 | Campaign Portfolios | Reading | 12 min   | 100 | Manage campaigns at the portfolio level     |
-| 5.2 | Budget Pacing       | Reading | 12 min   | 100 | Optimize budget allocation across campaigns |
-| 5.3 | Seasonal Strategy   | Reading | 14 min   | 100 | Adapt strategies for seasonal trends        |
+| #   | Lesson                                    | Type    | Duration | XP  | Learning Objectives                         |
+| --- | ----------------------------------------- | ------- | -------- | --- | ------------------------------------------- |
+| 5.1 | Campaign Portfolios: Organizing for Scale | Reading | 12 min   | 100 | Manage campaigns at the portfolio level     |
+| 5.2 | Budget Pacing & Daily Spend Management    | Reading | 14 min   | 100 | Optimize budget allocation across campaigns |
+| 5.3 | Seasonal Strategy & Promo Planning        | Reading | 12 min   | 100 | Adapt strategies for seasonal trends        |
 
 **Key Concepts:**
 
@@ -144,15 +144,15 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
-### **Module 6: Bidding Lab** (3 lessons, ~34 minutes, 275 XP)
+### **Module 6: Bidding Lab** (3 lessons, ~36 minutes, 300 XP)
 
 **Purpose:** Master the mechanics of Amazon bidding.
 
-| #   | Lesson                       | Type    | Duration | XP  | Learning Objectives                               |
-| --- | ---------------------------- | ------- | -------- | --- | ------------------------------------------------- |
-| 6.1 | Bid Strategies               | Reading | 14 min   | 100 | Understand auction mechanics and bid optimization |
-| 6.2 | Placement Adjustments        | Reading | 10 min   | 75  | Optimize bids for different ad placements         |
-| 6.3 | Bid Elevator Prep (hands-on) | Reading | 10 min   | 100 | Prepare for hands-on bid optimization practice    |
+| #   | Lesson                                                        | Type            | Duration | XP  | Learning Objectives                               |
+| --- | ------------------------------------------------------------- | --------------- | -------- | --- | ------------------------------------------------- |
+| 6.1 | Bid Strategies: Flat-Rate, Surge Pricing, and Smart Discounts | Reading         | 14 min   | 100 | Understand auction mechanics and bid optimization |
+| 6.2 | Placement Adjustments: Paying for the Front Row               | Reading         | 14 min   | 100 | Optimize bids for different ad placements         |
+| 6.3 | Bid Elevator Prep: Ready to Bid                               | Simulation prep | 8 min    | 100 | Prepare for hands-on bid optimization practice    |
 
 **Key Concepts:**
 
@@ -162,15 +162,15 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
-### **Module 7: Search Term Triage** (3 lessons, ~36 minutes, 300 XP)
+### **Module 7: Search Term Triage** (3 lessons, ~27 minutes, 275 XP)
 
 **Purpose:** Master the maintenance loop for live accounts.
 
-| #   | Lesson                       | Type    | Duration | XP  | Learning Objectives                             |
-| --- | ---------------------------- | ------- | -------- | --- | ----------------------------------------------- |
-| 7.1 | Search Term Analysis         | Reading | 14 min   | 100 | Analyze search term performance and attribution |
-| 7.2 | Negative Keywords (advanced) | Reading | 12 min   | 100 | Implement advanced negative keyword strategies  |
-| 7.3 | STR Triage Prep (hands-on)   | Reading | 10 min   | 100 | Prepare for search term triage practice         |
+| #   | Lesson                                     | Type            | Duration | XP  | Learning Objectives                                      |
+| --- | ------------------------------------------ | --------------- | -------- | --- | -------------------------------------------------------- |
+| 7.1 | Search Term Analysis: Reading the Data     | Reading         | 14 min   | 125 | Analyze search term performance and attribution          |
+| 7.2 | Negative Keywords: Building a Working List | Reading         | 5 min    | 50  | Apply the negative-keyword rules to a search term report |
+| 7.3 | STR Triage Prep: Ready to Triage           | Simulation prep | 8 min    | 100 | Prepare for search term triage practice                  |
 
 **Key Concepts:**
 
@@ -180,15 +180,15 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
-### **Module 8: Competitive Intelligence** (3 lessons, ~28 minutes, 250 XP)
+### **Module 8: Competitive Intelligence** (3 lessons, ~29 minutes, 180 XP)
 
 **Purpose:** Read the market, not just your account.
 
-| #   | Lesson                  | Type    | Duration | XP  | Learning Objectives                          |
-| --- | ----------------------- | ------- | -------- | --- | -------------------------------------------- |
-| 8.1 | Brand Analytics         | Reading | 8 min    | 75  | Leverage Amazon's brand analytics tools      |
-| 8.2 | Share of Voice          | Reading | 8 min    | 75  | Measure and improve market visibility        |
-| 8.3 | Competitor Benchmarking | Reading | 12 min   | 100 | Analyze and learn from competitor strategies |
+| #   | Lesson                                             | Type    | Duration | XP  | Learning Objectives                          |
+| --- | -------------------------------------------------- | ------- | -------- | --- | -------------------------------------------- |
+| 8.1 | Brand Analytics: Reading the Competitive Landscape | Reading | 9 min    | 60  | Leverage Amazon's brand analytics tools      |
+| 8.2 | Share of Voice Analysis & Strategic Positioning    | Reading | 9 min    | 60  | Measure and improve market visibility        |
+| 8.3 | Competitor Benchmarking & Actionable Insights      | Reading | 11 min   | 60  | Analyze and learn from competitor strategies |
 
 **Key Concepts:**
 

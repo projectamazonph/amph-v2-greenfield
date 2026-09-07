@@ -1,7 +1,7 @@
 import { access, readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 
-const TARGET_ROOT = "/home/ubuntu/amph-v2-greenfield";
+const TARGET_ROOT = process.env.AMPH_TARGET_ROOT ?? process.env.AMPH_REPO_ROOT ?? process.cwd();
 const SOURCE_ROOT = process.env.AMPH_SOURCE_REPO ?? "/home/ubuntu/amazon-ph-simulators";
 const MANIFEST_PATH = join(TARGET_ROOT, "content", "migration", "teaching-deck-slide-map.json");
 const requireSource = process.argv.includes("--require-source");

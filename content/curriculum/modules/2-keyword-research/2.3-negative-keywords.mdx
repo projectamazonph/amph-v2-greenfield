@@ -18,7 +18,7 @@ A search term with real spend and no sales is a negative candidate; whether it's
 
 Negative keywords are the terms you tell Amazon not to show your ad for. They are one of the fastest ways to reduce wasted spend, often a 15-25% reduction with zero sales impact. The first place to look for them is a search term report from a campaign that has been running for at least two weeks.
 
-> **Plain language:** A negative keyword is a search term you have decided your ad should never show for. Adding 'cheap' as a negative phrase means your ad will not appear for 'cheap milk frother,' 'cheap kitchen gadgets,' or any other search containing 'cheap.' The result is fewer irrelevant clicks and a lower ACoS.
+A negative keyword is a search term you have decided your ad should never show for. Adding 'cheap' as a negative phrase means your ad will not appear for 'cheap milk frother,' 'cheap kitchen gadgets,' or any other search containing 'cheap.' The result is fewer irrelevant clicks and a lower ACoS.
 
 ---
 
@@ -30,29 +30,29 @@ Let's look at a real example. A cutting board seller runs a broad match campaign
 
 | Search Term | Clicks | Spend | Sales | ACoS |
 |-------------|--------|-------|-------|------|
-| cutting board | 45 | $30.15 | $74.97 | 40% |
-| bamboo cutting board | 38 | $25.46 | $99.96 | 25% |
-| *cutting board accessories* | *22* | *$14.74* | *$0* | *no sales* |
-| *how to clean cutting board* | *18* | *$12.06* | *$0* | *no sales* |
-| *cutting board oil* | *15* | *$10.05* | *$0* | *no sales* |
-| *cutting board for kids craft* | *12* | *$8.04* | *$0* | *no sales* |
-| large cutting board with juice groove | 28 | $18.76 | $49.98 | 38% |
-| **Total** | **178** | **$119.26** | **$224.91** | **53%** |
+| cutting board | 45 | ₱30.15 | ₱74.97 | 40% |
+| bamboo cutting board | 38 | ₱25.46 | ₱99.96 | 25% |
+| *cutting board accessories* | *22* | *₱14.74* | *₱0* | *no sales* |
+| *how to clean cutting board* | *18* | *₱12.06* | *₱0* | *no sales* |
+| *cutting board oil* | *15* | *₱10.05* | *₱0* | *no sales* |
+| *cutting board for kids craft* | *12* | *₱8.04* | *₱0* | *no sales* |
+| large cutting board with juice groove | 28 | ₱18.76 | ₱49.98 | 38% |
+| **Total** | **178** | **₱5,963** | **₱224.91** | **53%** |
 
-Notice those shaded rows? ACoS is spend divided by sales, so it's undefined when sales are $0, not "100%." Read "no sales" as its own signal: pure waste, $44.89 burned on searches that showed zero conversions in this sample.
+Notice those shaded rows? ACoS is spend divided by sales, so it's undefined when sales are ₱0 not "100%." Read "no sales" as its own signal: pure waste, ₱2,245 burned on searches that showed zero conversions in this sample.
 
 **After negatives, block the waste:**
 
 | Search Term | Clicks | Spend | Sales | ACoS |
 |-------------|--------|-------|-------|------|
-| cutting board | 45 | $30.15 | $74.97 | 40% |
-| bamboo cutting board | 38 | $25.46 | $99.96 | 25% |
-| large cutting board with juice groove | 28 | $18.76 | $49.98 | 38% |
-| **Total** | **111** | **$74.37** | **$224.91** | **33%** |
+| cutting board | 45 | ₱30.15 | ₱74.97 | 40% |
+| bamboo cutting board | 38 | ₱25.46 | ₱99.96 | 25% |
+| large cutting board with juice groove | 28 | ₱18.76 | ₱49.98 | 38% |
+| **Total** | **111** | **₱74.37** | **₱224.91** | **33%** |
 
 The ACoS dropped from **53% to 33%** (a 20 percentage point improvement) just by blocking 4 types of search terms. Same sales. Less spend.
 
-> **Tip:** That $44.89 in wasted spend was 37.6% of this week's $119.26 total. Scale that same waste rate to an account spending ₱500,000/month and you're burning roughly ₱188,000/month on clicks that will never convert. That's real money, and it's exactly the kind of leak negatives are built to stop.
+That ₱2,245 in wasted spend was 37.6% of this week's ₱5,963 total. Scale that same waste rate to an account spending ₱500,000/month and you're burning roughly ₱188,000/month on clicks that will never convert. That's real money, and it's exactly the kind of leak negatives are built to stop.
 
 ---
 
@@ -95,7 +95,7 @@ Use negative phrase when you want to block an ENTIRE category of searches.
 {"prompt":"Classify each candidate by the narrowest safe block.","categories":[{"id":"keep","label":"Keep","description":"The term converts or still fits the product."},{"id":"exact","label":"Negative exact","description":"Block one specific waste term and close variants."},{"id":"phrase","label":"Negative phrase","description":"Block a whole category of searches containing the phrase."}],"items":[{"id":"keep-term","label":"baking mat 3 pack","categoryId":"keep","rationale":"It has sales, so it is not a negative candidate."},{"id":"exact-term","label":"cutting board oil","categoryId":"exact","rationale":"A specific wrong-product term; keep other cutting-board phrasing available."},{"id":"phrase-term","label":"cheap","categoryId":"phrase","rationale":"A category-level price intent that should be blocked wherever it is irrelevant."}]}
 :::
 
-> **Analogy:** Negative exact is like telling your doorman "don't let in anyone named John Smith." Negative phrase is like saying "don't let in anyone whose name has John in it."
+Negative exact is like telling your doorman "don't let in anyone named John Smith." Negative phrase is like saying "don't let in anyone whose name has John in it."
 
 ---
 
@@ -119,7 +119,7 @@ This is your primary negative keyword source. Run the search term report weekly 
 
 | Category | What to Look For | Action |
 |----------|-----------------|--------|
-| **High Spend, No Sales** | Spent > $10 with 0 sales | Add as negative phrase |
+| **High Spend, No Sales** | Spent > ₱10 with 0 sales | Add as negative phrase |
 | **Wrong Product** | Search for a different product than yours | Add as negative phrase |
 | **Research Intent** | "how to," "what is," "tutorial," "review" | Add as negative phrase |
 | **Competitor Brands** | Other brand names you can't compete with | Add as negative exact |
@@ -148,7 +148,7 @@ Before you even launch a campaign, think about what terms are obviously wrong:
 | DIY | Makes their own, won't buy |
 | paper | Different material entirely |
 
-> **Tip:** Add pre-emptive negatives BEFORE launching, using common sense and the obvious-irrelevant list above rather than a fixed count; how many you need depends on the product. This is called **pre-emptive negation** and it saves you from burning money on day one.
+Add pre-emptive negatives BEFORE launching, using common sense and the obvious-irrelevant list above rather than a fixed count; how many you need depends on the product. This is called **pre-emptive negation** and it saves you from burning money on day one.
 
 ---
 
@@ -197,16 +197,16 @@ If your exact match campaign targets "milk frother" and your broad match campaig
 After adding negatives, compare one week before and four weeks after:
 
 **Before negatives:**
-- Spend: $500/week
-- Sales: $1,500/week
+- Spend: ₱500/week
+- Sales: ₱1,500/week
 - ACoS: 33%
 
 **After negatives (4 weeks later):**
-- Spend: $400/week (20% reduction)
-- Sales: $1,450/week (3% decrease)
+- Spend: ₱400/week (20% reduction)
+- Sales: ₱1,450/week (3% decrease)
 - ACoS: 28%
 
-Spend fell 20% while sales only fell 3%, a net improvement of $50/week in profit and a 5-point ACoS improvement. If your after-results look like that, the negatives are working. If sales drop more than spend, the negatives are too aggressive.
+Spend fell 20% while sales only fell 3%, a net improvement of ₱50/week in profit and a 5-point ACoS improvement. If your after-results look like that, the negatives are working. If sales drop more than spend, the negatives are too aggressive.
 
 ---
 
@@ -221,19 +221,18 @@ Spend fell 20% while sales only fell 3%, a net improvement of $50/week in profit
 
 The first two weeks are critical. This is when new search terms flood in and you need to block the junk before it accumulates.
 
-> **Key Takeaways:**
-> - Negative keywords are your **fastest ACoS improvement lever** (often drops 10-20% in one session).
-> - Add **pre-emptive negatives** before launching. Block the obvious waste from day one.
-> - Run the search term report **weekly**. Look for high-spend, no-sales terms.
-> - Use **negative phrase** for broad categories, **negative exact** for specific terms.
-> - Put **campaign-level** negatives where they apply everywhere, **ad group-level** for theme-specific blocks.
-> - A well-maintained negative list grows over time and keeps your campaigns efficient as they scale.
+- Negative keywords are your **fastest ACoS improvement lever** (often drops 10-20% in one session).
+- Add **pre-emptive negatives** before launching. Block the obvious waste from day one.
+- Run the search term report **weekly**. Look for high-spend, no-sales terms.
+- Use **negative phrase** for broad categories, **negative exact** for specific terms.
+- Put **campaign-level** negatives where they apply everywhere, **ad group-level** for theme-specific blocks.
+- A well-maintained negative list grows over time and keeps your campaigns efficient as they scale.
 
 ## Your turn
 
 Work this through before checking the answer.
 
-A search term report for a $19.99 silicone baking mat shows two terms: "baking mat 3 pack" (12 clicks, $9 spend, 2 sales) and "microwave splatter cover" (20 clicks, $16 spend, 0 sales, and it's clearly a different product).
+A search term report for a ₱19.99 silicone baking mat shows two terms: "baking mat 3 pack" (12 clicks, ₱9 spend, 2 sales) and "microwave splatter cover" (20 clicks, ₱16 spend, 0 sales, and it's clearly a different product).
 
 Before reading further: what do you do with each term, and at what level?
 
@@ -253,10 +252,10 @@ Which negatives are campaign-level vs. ad-group-level, and why: ________________
 
 ```text
 Product or feature: Negative match types (negative exact, negative phrase)
-What the learner can do: Know Amazon supports only negative exact and negative phrase for negative keywords — there is no negative broad match
+What the learner can do: Know Amazon supports only negative exact and negative phrase for negative keywords. There is no negative broad match.
 Who can access it: All Sponsored Products advertisers
 Retailer or marketplace scope: Amazon Advertising Console
-Official source URL: https://advertising.amazon.com/help — specific negative-keyword article not verified; content owner to confirm and link at rewrite time
+Official source URL: https://advertising.amazon.com/help, specific negative-keyword article not verified; content owner to confirm and link at rewrite time
 Last verified: pending content-owner review
 Next review due: pending content-owner review
 Owner: Ryan Roland Dabao
@@ -279,7 +278,7 @@ Use this when a client asks why you're blocking search terms instead of just low
 3. Using "cutting board oil" as the negative, what's the difference between negative exact and negative phrase?
 4. What's the practice called where you add negatives based on common sense before a campaign ever launches, and why isn't it built around a fixed keyword count?
 
-**Answers:** (1) From 53% to 33%, a 20 percentage point improvement. (2) ACoS is spend divided by sales, so it's undefined (not 100%) when sales are $0. "No sales" is the honest read: pure wasted spend. (3) Negative exact blocks "cutting board oil" and Amazon's close variations of it (like a plural or minor misspelling), but not longer searches that merely contain the phrase; negative phrase blocks any search containing that phrase in that order, like "cutting board oil for wood" or "best cutting board oil." (4) Pre-emptive negation: block obviously irrelevant terms before launch based on the product and common sense. How many you need depends on the product, not a universal number.
+**Answers:** (1) From 53% to 33%, a 20 percentage point improvement. (2) ACoS is spend divided by sales, so it's undefined (not 100%) when sales are ₱0. "No sales" is the honest read: pure wasted spend. (3) Negative exact blocks "cutting board oil" and Amazon's close variations of it (like a plural or minor misspelling), but not longer searches that merely contain the phrase; negative phrase blocks any search containing that phrase in that order, like "cutting board oil for wood" or "best cutting board oil." (4) Pre-emptive negation: block obviously irrelevant terms before launch based on the product and common sense. How many you need depends on the product, not a universal number.
 
 ## What to read next
 
