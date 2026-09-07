@@ -8,19 +8,22 @@ This directory holds the curriculum content (lesson MDX files and quiz fixture) 
 content/
 ├── README.md                      # this file
 └── curriculum/
-    ├── modules/                   # 31 lesson MDX files across 9 modules
-    │   ├── 0-onboarding/          # 3 lessons: welcome, platform tour, first sim
-    │   ├── 1-foundations/         # 5 lessons: what is PPC, CPC/CTR, ACoS/TACoS, ROAS, metrics in practice
+    ├── modules/                   # 42 lesson MDX files across 12 modules
+    │   ├── 0-onboarding/          # 3 lessons: welcome, platform tour, client brief
+    │   ├── 1-foundations/         # 5 lessons: read PPC data, CPC/CTR, ACoS/TACoS, ROAS, metrics patterns
     │   ├── 2-keyword-research/    # 4 lessons: match types, workflow, negatives, grouping
-    │   ├── 3-listing-optimization/# 3 lessons: listing quality, anatomy, A+ content
+    │   ├── 3-listing-optimization/# 3 lessons: relevance signals, anatomy, A+ content
     │   ├── 4-campaign-architecture/  # 4 lessons: SP, SB/SD, structure, practice
     │   ├── 5-portfolio-strategy/  # 3 lessons: portfolios, budget pacing, seasonal
     │   ├── 6-bidding-lab/         # 3 lessons: bid strategies, placement, bid-elevator prep
     │   ├── 7-search-term-triage/  # 3 lessons: search-term analysis, negatives, STR triage prep
-    │   └── 8-competitive-intelligence/  # 3 lessons: brand analytics, share-of-voice, benchmarking
+    │   ├── 8-competitive-intelligence/  # 3 lessons: brand analytics, share-of-voice, benchmarking
+    │   ├── 9-weekly-optimization/  # 3 lessons: weekly routine, one change at a time, data sufficiency
+    │   ├── 10-reporting-troubleshooting/  # 4 lessons: report structure, explaining numbers, troubleshooting
+    │   └── 11-va-workflow-capstone/  # 4 lessons: cadence, permissions, SOPs, capstone
     ├── inventory.json              # checked-in course and lesson release contract
     ├── public-claims.json          # reviewed public counts, tiers, tools, and certificate wording
-    └── quiz-questions.json         # 7 module-final quizzes (knowledge checks)
+    └── quiz-questions.json         # 12 module-final quizzes (knowledge checks)
 ```
 
 ## Source & history
@@ -112,8 +115,8 @@ Each fix added an Amazon Ads Fact Card (source URL, scope, owner/date placeholde
 ## Verification
 
 ```bash
-# All 31 MDX files are present
-find content/curriculum/modules -name "*.mdx" | wc -l   # 31
+# All 42 MDX files are present
+find content/curriculum/modules -name "*.mdx" | wc -l   # 42
 
 # The checked-in learning contract matches the MDX source
 pnpm validate:curriculum
@@ -124,6 +127,6 @@ python3 -c "import json; json.load(open('content/curriculum/quiz-questions.json'
 # No legacy product references survive
 grep -rE "AdCraft|AI Mentor|Formula Calculator" content/  # (no output)
 
-# All 9 modules present
-ls content/curriculum/modules/   # 0-onboarding ... 8-competitive-intelligence
+# All 12 modules present
+ls content/curriculum/modules/   # 0-onboarding ... 11-va-workflow-capstone
 ```

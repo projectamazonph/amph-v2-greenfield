@@ -1,7 +1,7 @@
 import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-const root = "/home/ubuntu/amph-v2-greenfield";
+const root = process.env.AMPH_TARGET_ROOT ?? process.env.AMPH_REPO_ROOT ?? process.cwd();
 const registerPath = join(root, "content/migration/target-provenance.json");
 const manifestPath = join(root, "content/migration/teaching-deck-slide-map.json");
 const allowedClassifications = new Set(["target-specific-extension", "synthesized-from-adjacent-source-roles"]);
