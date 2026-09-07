@@ -42,6 +42,121 @@ function isAdminLoginPath(pathname: string): boolean {
   return ADMIN_LOGIN_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
+/** Paths that the maintenance-mode 503 page itself lives under. */
+const MAINTENANCE_PAGE_PREFIXES = ["/maintenance"];
+
+function isMaintenancePagePath(pathname: string): boolean {
+  return MAINTENANCE_PAGE_PREFIXES.some((p) => pathname.startsWith(p));
+}
+
+/**
+ * P1-08 (P4 PR-A): maintenance-mode kill switch decision.
+ *
+ * Order of precedence — strictest first, so the env kill switch
+ * always wins even if the DB is on fire:
+ *
+ *   1. `MAINTENANCE_MODE` env var === "true" -> 503 for everyone,
+ *      no bypass, no DB read. The emergency kill switch the brief
+ *      asks for; flipping it does not require touching the DB.
+ *   2. `MAINTENANCE_BYPASS_TOKEN` cookie matches the same env var
+ *      -> let the request through. The brief-recommended escape
+ *      hatch: paste the token into the browser cookie store and
+ *      keep working.
+ *   3. DB-backed toggle via `getMaintenanceStatus`:
+ *      - enabled + admin role JWT -> let through (the admin
+ *        override). The JWT role is read from the cookie just
+ *        like the existing route-protection block does, so no new
+ *        auth surface is added.
+ *      - enabled + no role (or non-admin) -> 503.
+ *      - disabled -> let through.
+ *
+ * Any DB read failure degrades to "site is up" -- a transient DB
+ * outage must not lock everyone out via a hard 503.
+ */
+async function checkMaintenanceMode(
+  request: NextRequest,
+): Promise<NextResponse | null> {
+  // The maintenance page itself is always reachable so the user
+  // sees the explanation.
+  if (isMaintenancePagePath(request.nextUrl.pathname)) return null;
+
+  // 1. Emergency env kill switch.
+  if (process.env.MAINTENANCE_MODE === "true") {
+    return NextResponse.rewrite(new URL("/maintenance", request.url), {
+      status: 503,
+    });
+  }
+
+  // 2. Bypass-token cookie. Compared in constant time so a guessed
+  //    half-token can't be timed. Empty env var means the bypass
+  //    is disabled -- matching the dev default.
+  const bypassToken = process.env.MAINTENANCE_BYPASS_TOKEN ?? "";
+  if (bypassToken.length > 0) {
+    const cookieValue =
+      request.cookies.get("amph_maintenance_bypass")?.value ?? "";
+    if (
+      cookieValue.length > 0 &&
+      timingSafeEqual(cookieValue, bypassToken)
+    ) {
+      return null;
+    }
+  }
+
+  // 3. DB-backed toggle.
+  const { getMaintenanceStatus } = buildContainer();
+  const statusResult = await getMaintenanceStatus.execute();
+  // Degrade gracefully on DB errors: "the site is up" rather than
+  // locking everyone out via a hard 503 from a transient outage.
+  if (!statusResult.ok) return null;
+  if (!statusResult.value.enabled) return null;
+
+  // Admin override: read the role from the JWT exactly the same way
+  // the route-protection block does below. We don't re-verify the
+  // session row here -- the bypass is best-effort (the proxy does the
+  // full check in the next stage); this is just to keep an admin's
+  // browser functional during an incident while a non-admin's browser
+  // is locked out.
+  const role = await readRoleFromCookie(request);
+  if (role === "ADMIN") return null;
+
+  return NextResponse.rewrite(new URL("/maintenance", request.url), {
+    status: 503,
+  });
+}
+
+/** Constant-time string comparison; same length and bytes -> match. */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+/**
+ * Best-effort role read from the session JWT, without re-fetching
+ * the user row. Returns null on any decode error. Used only to
+ * decide the admin override during maintenance; the authoritative
+ * role check still happens in the route-protection block.
+ */
+async function readRoleFromCookie(request: NextRequest): Promise<string | null> {
+  const sessionToken =
+    request.cookies.get("amph_session")?.value ??
+    request.cookies.get("__Secure-amph_session")?.value;
+  if (!sessionToken) return null;
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return null;
+  try {
+    const { jwt } = buildContainer();
+    const r = await jwt.verify(sessionToken);
+    if (!r.ok) return null;
+    return typeof r.value.role === "string" ? r.value.role : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -121,6 +236,14 @@ export async function proxy(request: NextRequest) {
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   res.headers.set("Content-Security-Policy", cspHeaderValue);
+
+  // ── Maintenance mode (P1-08) ─────────────────────────────
+  // Must run before route protection so a maintenance-on request
+  // never accidentally triggers a redirect to /login. Admin
+  // override is decided here using the JWT role, so an admin
+  // browser stays functional during an incident.
+  const maintenanceResponse = await checkMaintenanceMode(request);
+  if (maintenanceResponse) return maintenanceResponse;
 
   // ── Route protection ─────────────────────────────────────
   const isProtected = isProtectedPath(pathname) && !isAdminLoginPath(pathname);

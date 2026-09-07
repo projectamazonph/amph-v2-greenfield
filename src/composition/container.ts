@@ -75,6 +75,7 @@ import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTempla
 import type { IUserStreakRepository } from "@/ports/repositories/IUserStreakRepository";
 import type { IResourceRepository } from "@/ports/repositories/IResourceRepository";
 import type { IFileStorage } from "@/ports/storage/IFileStorage";
+import type { IMaintenanceSettingRepository } from "@/ports/repositories/IMaintenanceSettingRepository";
 
 // ΓöÇΓöÇ Production adapters (only the prod ones) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
@@ -107,6 +108,7 @@ import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingT
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { PrismaUserStreakRepository } from "@/infra/repositories/PrismaUserStreakRepository";
 import { PrismaResourceRepository } from "@/infra/repositories/PrismaResourceRepository";
+import { PrismaMaintenanceSettingRepository } from "@/infra/repositories/PrismaMaintenanceSettingRepository";
 import { VercelBlobFileStorage } from "@/infra/storage/VercelBlobFileStorage";
 import { LocalFileStorage } from "@/infra/storage/LocalFileStorage";
 import { prisma } from "@/infra/database/prisma";
@@ -295,6 +297,8 @@ import { RecordResourceDownload } from "@/usecases/RecordResourceDownload";
 import { UploadFile } from "@/usecases/UploadFile";
 import { DeleteFile } from "@/usecases/DeleteFile";
 import { PurgeResource } from "@/usecases/PurgeResource";
+import { AdminToggleMaintenance } from "@/usecases/AdminToggleMaintenance";
+import { GetMaintenanceStatus } from "@/usecases/GetMaintenanceStatus";
 import type { SentReminderRepository } from "@/ports/repositories/SentReminderRepository";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
@@ -358,6 +362,8 @@ export interface AppContainer {
   keywordDatasetRepo: KeywordDatasetRepository;
   // STORY-095: admin email template editor
   emailTemplateRepo: IEmailTemplateRepository;
+  // P1-08 (P4 PR-A): maintenance mode / kill switch
+  maintenanceRepo: IMaintenanceSettingRepository;
   listEmailTemplates: ListEmailTemplates;
   getEmailTemplate: GetEmailTemplate;
   updateEmailTemplate: UpdateEmailTemplate;
@@ -529,6 +535,9 @@ export interface AppContainer {
   purgeResource: PurgeResource;
   uploadFile: UploadFile;
   deleteFile: DeleteFile;
+  // P1-08 (P4 PR-A): maintenance mode / kill switch
+  adminToggleMaintenance: AdminToggleMaintenance;
+  getMaintenanceStatus: GetMaintenanceStatus;
 }
 
 // ΓöÇΓöÇ Production container builder ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -623,6 +632,8 @@ function buildProductionContainer(): AppContainer {
   const keywordDatasetRepo: KeywordDatasetRepository = new StaticKeywordDatasetRepository();
   // STORY-095: admin email template editor
   const emailTemplateRepo: IEmailTemplateRepository = new PrismaEmailTemplateRepository(prisma);
+  // P1-08 (P4 PR-A): maintenance mode / kill switch
+  const maintenanceRepo: IMaintenanceSettingRepository = new PrismaMaintenanceSettingRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -770,6 +781,8 @@ function buildProductionContainer(): AppContainer {
     adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
     adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
     emailTemplateRepo,
+    // P1-08 (P4 PR-A): maintenance mode / kill switch
+    maintenanceRepo,
     listEmailTemplates: new ListEmailTemplates({ emailTemplateRepo }),
     getEmailTemplate: new GetEmailTemplate({ emailTemplateRepo }),
     updateEmailTemplate: new UpdateEmailTemplate({
@@ -1156,6 +1169,9 @@ function buildProductionContainer(): AppContainer {
     purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog, logger }),
     uploadFile: new UploadFile({ fileStorage }),
     deleteFile: new DeleteFile({ fileStorage }),
+    // P1-08 (P4 PR-A): maintenance mode / kill switch
+    adminToggleMaintenance: new AdminToggleMaintenance({ maintenanceRepo, recordAuditLog, clock }),
+    getMaintenanceStatus: new GetMaintenanceStatus({ maintenanceRepo }),
   };
 }
 

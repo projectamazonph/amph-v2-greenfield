@@ -1208,6 +1208,29 @@ model Setting {
   @@map("settings")
 }
 
+// ── P1-08 (P4 PR-A): Maintenance mode / kill switch ──────────────────────────
+//
+// A single-row table holding the current maintenance-mode toggle. Read by
+// the Next.js proxy (`src/proxy.ts`) on every request to decide whether
+// to serve a 503; written by `AdminToggleMaintenance` from
+// /admin/maintenance. The proxy also honours the
+// `MAINTENANCE_BYPASS_TOKEN` env var and the `MAINTENANCE_MODE` env var
+// (emergency kill switch) before consulting this table.
+
+model MaintenanceSetting {
+  id              String    @id @default(cuid())
+  enabled         Boolean   @default(false)
+  message         String?
+  allowedAdminIds String[]  @default([])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  createdById     String?
+  updatedById     String?
+
+  @@map("maintenance_settings")
+}
+
 // ── Announcements (site-wide banners + per-user state) ────────────────
 
 model Announcement {
