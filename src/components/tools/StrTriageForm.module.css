@@ -17,8 +17,31 @@
 .table {
   width: 100%;
   min-width: 720px;
+  border: 0;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: var(--text-sm);
+}
+
+.table th:first-child,
+.table td:first-child {
+  width: 30%;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2),
+.table th:nth-child(3),
+.table td:nth-child(3),
+.table th:nth-child(4),
+.table td:nth-child(4),
+.table th:nth-child(5),
+.table td:nth-child(5) {
+  width: 11%;
+}
+
+.table th:nth-child(6),
+.table td:nth-child(6) {
+  width: 26%;
 }
 
 .tableScroll {
@@ -46,6 +69,9 @@
   text-align: left;
   padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .thNum, .thAction { text-align: right; }
@@ -56,15 +82,30 @@
   color: var(--ink-700);
 }
 
-.tdKw { color: var(--ink-900); overflow-wrap: anywhere; }
-.tdNum { text-align: right; font-family: var(--font-mono); }
-.tdAction { text-align: right; }
+.tdKw {
+  color: var(--ink-900);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tdNum {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tdAction {
+  text-align: right;
+  min-width: 0;
+}
 
 .select {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: 500;
   height: 32px;
+  max-width: 100%;
   padding: 0 var(--space-2);
   border: 1px solid var(--border);
   border-radius: 4px;

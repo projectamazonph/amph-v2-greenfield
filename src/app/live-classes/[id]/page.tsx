@@ -55,7 +55,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
   if (!classResult.ok) {
     return (
       <StudentShell user={user}>
-        <main id="main-content">
+        <main id="main-content" tabIndex={-1} className={styles.page}>
           <p>Failed to load class. Please try again.</p>
         </main>
       </StudentShell>
@@ -91,7 +91,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
 
   return (
     <StudentShell user={user}>
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} className={styles.page}>
         <div className={styles.breadcrumb}>
           <Link href="/live-classes" className={styles.breadcrumbLink}>
             <ArrowLeft size={16} aria-hidden /> All live classes

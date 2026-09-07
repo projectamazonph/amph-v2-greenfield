@@ -1,5 +1,13 @@
 /* /live-classes/[id] — student detail page. Amazon PH simulator tokens only. */
 
+.page {
+  width: 100%;
+  max-width: var(--max-content);
+  margin: 0 auto;
+  padding: var(--space-8) var(--side-pad) var(--space-12);
+  box-sizing: border-box;
+}
+
 .breadcrumb {
   margin-bottom: var(--space-4);
 }
@@ -49,6 +57,8 @@
   font-weight: 700;
   color: var(--ink-900);
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .intro {
