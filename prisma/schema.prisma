@@ -87,9 +87,9 @@ model User {
   twoFactorEnabled Boolean @default(false)
 
   // Audit
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
@@ -122,8 +122,8 @@ model Session {
   // Rotation
   rotatedFrom String? @unique
 
-  createdAt DateTime @default(now())
-  deletedAt DateTime?
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
@@ -229,11 +229,11 @@ model Lesson {
   moduleId String
   module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
-  title        String
-  type         String // VIDEO | TEXT | QUIZ
-  content      Json
-  plannedMinutes Int @default(0) // planned learner time for every lesson type
-  displayOrder Int
+  title          String
+  type           String // VIDEO | TEXT | QUIZ
+  content        Json
+  plannedMinutes Int    @default(0) // planned learner time for every lesson type
+  displayOrder   Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -271,17 +271,16 @@ model SimulatorScenario {
   // transitioning to "archived" but not read on its own.
   archivedAt DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
   @@index([simulatorId])
   @@index([archivedAt])
   @@index([scenarioKey])
   @@index([status])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("simulator_scenarios")
 }
 
@@ -301,14 +300,13 @@ model LiveClass {
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt
   registrations   LiveClassRegistration[]
+  deletedAt       DateTime?
+  createdById     String?
+  updatedById     String?
 
   @@index([courseId])
   @@index([status])
   @@index([scheduledAt])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("live_classes")
 }
 
@@ -324,15 +322,14 @@ model LiveClassRegistration {
   watchedRecordingAt DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  createdById        String?
+  updatedById        String?
 
   @@unique([userId, liveClassId])
   @@index([userId])
   @@index([liveClassId])
   @@index([status])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("live_class_registrations")
 }
 
@@ -404,8 +401,11 @@ model Order {
   receiptNumber String? @unique
 
   // Audit
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
   @@index([userId])
   @@index([courseId])
@@ -422,10 +422,6 @@ model Order {
   @@index([status, createdAt])
   @@index([refundRequestedAt, id])
   @@index([userId, courseId, status])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("orders")
 }
 
@@ -450,14 +446,13 @@ model PpcCampaign {
 
   status String @default("active") // active | paused | exhausted | ended
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-    deletedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
+  @@index([userId])
   @@map("ppc_campaigns")
 }
 
@@ -479,7 +474,10 @@ model AuditLog {
   // Details
   payload Json @default("{}")
 
-  createdAt DateTime @default(now())
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
   @@index([userId])
   @@index([action])
@@ -489,10 +487,6 @@ model AuditLog {
   // [createdAt desc, id desc] — a single-column createdAt index can't
   // fully satisfy either the tie-break comparison or the sort.
   @@index([createdAt, id])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("audit_logs")
 }
 
@@ -514,15 +508,14 @@ model WebhookEvent {
   processedAt     DateTime?
   processingError String?
 
-  createdAt DateTime @default(now())
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
   @@index([provider, eventType])
   @@index([providerEventId])
   @@index([createdAt])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("webhook_events")
 }
 
@@ -539,15 +532,14 @@ model EmailLog {
   resendId String? @unique
 
   // Audit
-  createdAt DateTime  @default(now())
-  sentAt    DateTime?
-
-  @@index([to])
-  @@index([status])
-    deletedAt DateTime?
+  createdAt   DateTime  @default(now())
+  sentAt      DateTime?
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
+  @@index([to])
+  @@index([status])
   @@map("email_logs")
 }
 
@@ -577,20 +569,19 @@ model DiscountCode {
 // ── STORY-028: XP Events ────────────────────────────────
 
 model XPEvent {
-  id     String  @id @default(cuid())
-  userId String
-  amount Int
-  reason String // lesson_completed | course_completed | quiz_passed | streak_bonus
+  id       String  @id @default(cuid())
+  userId   String
+  amount   Int
+  reason   String // lesson_completed | course_completed | quiz_passed | streak_bonus
   refId    String? // lessonId, courseId, quizAttemptId, etc.
   awardKey String  @unique // stable business-event idempotency key
 
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-    deletedAt DateTime?
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
+  @@index([userId])
   @@map("xp_events")
 }
 
@@ -604,7 +595,10 @@ model ProgressEvent {
   type     String // lesson_completed | course_started | course_completed
   metadata Json    @default("{}")
 
-  createdAt DateTime @default(now())
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
   @@index([userId])
   @@index([courseId])
@@ -613,10 +607,6 @@ model ProgressEvent {
   // each filter on one column and sort by createdAt desc.
   @@index([userId, createdAt])
   @@index([courseId, createdAt])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("progress_events")
 }
 
@@ -632,7 +622,7 @@ model UserStreak {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-    deletedAt DateTime?
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
@@ -649,7 +639,7 @@ model Quiz {
   questions    QuizQuestion[]
   createdAt    DateTime       @default(now())
 
-    deletedAt DateTime?
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
@@ -665,7 +655,7 @@ model QuizQuestion {
   options      QuizOption[]
   order        Int          @default(0)
 
-    deletedAt DateTime?
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
@@ -680,7 +670,7 @@ model QuizOption {
   isCorrect  Boolean      @default(false)
   order      Int          @default(0)
 
-    deletedAt DateTime?
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
@@ -697,6 +687,9 @@ model QuizAttempt {
   startedAt   DateTime            @default(now())
   completedAt DateTime?
   answers     QuizAttemptAnswer[]
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
   // Proposal 7: widened from [userId, quizId] — findByUserAndQuiz() and
   // findLatestByUserAndQuiz() both filter on {userId, quizId} and sort
@@ -704,10 +697,6 @@ model QuizAttempt {
   // without an extra step.
   @@index([userId, quizId, startedAt])
   @@index([quizId])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("quiz_attempts")
 }
 
@@ -717,12 +706,11 @@ model QuizAttemptAnswer {
   attempt          QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
   questionId       String
   selectedOptionId String
+  deletedAt        DateTime?
+  createdById      String?
+  updatedById      String?
 
   @@unique([attemptId, questionId])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("quiz_attempt_answers")
 }
 
@@ -741,18 +729,17 @@ model Badge {
 }
 
 model BadgeAward {
-  id        String   @id @default(cuid())
-  userId    String
-  badgeSlug String
-  awardedAt DateTime @default(now())
-  badge     Badge    @relation(fields: [badgeSlug], references: [slug])
-
-  @@unique([userId, badgeSlug])
-  @@index([userId])
-    deletedAt DateTime?
+  id          String    @id @default(cuid())
+  userId      String
+  badgeSlug   String
+  awardedAt   DateTime  @default(now())
+  badge       Badge     @relation(fields: [badgeSlug], references: [slug])
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
+  @@unique([userId, badgeSlug])
+  @@index([userId])
   @@map("badge_awards")
 }
 
@@ -768,16 +755,15 @@ model Certificate {
   revokedReason    String?
   status           String    @default("active") // active | revoked
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
   @@unique([userId, courseId]) // one cert per (user, course)
   @@index([userId])
   @@index([verificationHash])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("certificates")
 }
 
@@ -791,14 +777,13 @@ model EmailVerification {
   usedAt    DateTime?
   createdAt DateTime  @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([tokenHash])
-    deletedAt DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
+  @@index([userId])
+  @@index([tokenHash])
   @@map("email_verifications")
 }
 
@@ -812,23 +797,25 @@ model PasswordReset {
   usedAt    DateTime?
   createdAt DateTime  @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-    deletedAt DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deletedAt   DateTime?
   createdById String?
   updatedById String?
 
+  @@index([userId])
   @@map("password_resets")
 }
 
 // ── Live class reminder log (P0-7 follow-up) ───────────────────────
 
 model SentReminder {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   liveClassId String
   userId      String
-  sentAt      DateTime @default(now())
+  sentAt      DateTime  @default(now())
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
 
   // Unique on the (liveClassId, userId) pair so the database itself
   // enforces "you can't send the same reminder twice". The use case
@@ -836,10 +823,6 @@ model SentReminder {
   // so the email was already sent on a prior cron run).
   @@unique([liveClassId, userId])
   @@index([liveClassId])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("sent_reminders")
 }
 
@@ -862,15 +845,14 @@ model SimulatorAttempt {
   submittedAt     DateTime?
   gradedAt        DateTime?
   decisions       SimulatorDecision[]
+  deletedAt       DateTime?
+  createdById     String?
+  updatedById     String?
 
   @@index([userId])
   @@index([simulatorId])
   @@index([status])
   @@index([userId, simulatorId, status])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("simulator_attempts")
 }
 
@@ -881,19 +863,18 @@ model SimulatorDecision {
   revision     Int              @default(1)
   decisionData Json
   submittedAt  DateTime         @default(now())
+  deletedAt    DateTime?
+  createdById  String?
+  updatedById  String?
 
   @@unique([attemptId, revision])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("simulator_decisions")
 }
 
 // ── STORY-065: Scoring Engine ───────────────────────────────────────────
 
 model ScorePolicy {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   simulatorId     String
   difficulty      String
   mode            String
@@ -901,16 +882,15 @@ model ScorePolicy {
    * JSON: Record<string, { weight: number; passingThreshold: number }>
    */
   dimensionConfig Json
-  passingScore    Int      @default(70)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  passingScore    Int       @default(70)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  createdById     String?
+  updatedById     String?
 
   @@unique([simulatorId, difficulty, mode])
   @@index([simulatorId])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("score_policies")
 }
 
@@ -921,34 +901,33 @@ model ScorePolicy {
 // getOverallScore runs. See SimulatorScenarioCalibration (domain) for
 // the entity-level invariants; the schema only persists JSON.
 model SimulatorScenarioCalibration {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   simulatorId    String
   scenarioKey    String
   dimensionBands Json // Record<dimensionKey, { minScore, maxScore }>
   instructorId   String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+  createdById    String?
+  updatedById    String?
 
   @@unique([simulatorId, scenarioKey])
   @@index([scenarioKey])
   @@index([instructorId])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("simulator_scenario_calibrations")
 }
 
 // ── STORY-063: Email Templates ──────────────────────────────────────────────
 
 model EmailTemplate {
-  id          String   @id @default(cuid())
-  type        String   @unique // EmailTemplateType discriminator (one row per type)
+  id          String    @id @default(cuid())
+  type        String    @unique // EmailTemplateType discriminator (one row per type)
   subject     String
   headline    String
   introBody   String
   ctaLabel    String
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime  @updatedAt
   updatedById String
   deletedAt   DateTime?
   createdById String?
@@ -959,8 +938,8 @@ model EmailTemplate {
 // ── STORY-066: Feedback Composer ─────────────────────────────────────────────
 
 model AttemptFeedback {
-  id                String   @id @default(cuid())
-  attemptId         String   @unique
+  id                String    @id @default(cuid())
+  attemptId         String    @unique
   userId            String
   simulatorId       String
   scenarioId        String
@@ -971,13 +950,12 @@ model AttemptFeedback {
   overallComment    String
   remediationLinks  Json
   dimensionFeedback Json
-  completedAt       DateTime @default(now())
+  completedAt       DateTime  @default(now())
+  deletedAt         DateTime?
+  createdById       String?
+  updatedById       String?
 
   @@index([userId])
-    deletedAt DateTime?
-  createdById String?
-  updatedById String?
-
   @@map("attempt_feedbacks")
 }
 
@@ -1009,4 +987,462 @@ model Resource {
   @@index([isPublished])
   @@index([accessTier])
   @@map("resources")
+}
+
+// ── P4 W0-01 (#403): unified schema migration for all P0/P1/P2 features.
+//
+// One migration, one schema pass: payments, invoices, prerequisites,
+// assignments, oauth, settings, announcements, leaderboards, dropoff,
+// quiz-bank, affiliates, skill-map. Resource (existing) and
+// EmailTemplate (existing) are intentionally NOT redefined here.
+//
+// Conventions matched to baseline:
+//   - id is cuid(); `@@map` to snake_case plural.
+//   - Mutable tables carry deletedAt/createdById/updatedById.
+//   - FK columns are bare Strings (no @relation) — the same shape as
+//     QuizAttempt/ProgressEvent/XPEvent/SentReminder, which keeps us
+//     from having to add inverse relations on the User/Course/Order
+//     models (those are owned by other agents and out of scope).
+//     FK integrity is enforced at the DB level via CREATE TABLE
+//     constraints and ON DELETE actions in the matching migration.sql.
+//   - Status / provider / method / level / scope / window / difficulty
+//     are kept as String to mirror the existing state-machine
+//     convention (Order.status, Course.status, Badge.archived). The
+//     domain layer narrows the value set at runtime; the schema stays
+//     loose so adding a new state is a one-line change.
+//   - Money in minor units (Int).
+
+// ── Payments (granular PayMongo event log, keyed by orderId) ────────────────
+
+model Payment {
+  id String @id @default(cuid())
+
+  orderId           String
+  // FK to orders — defined in migration.sql; RESTRICT matches the
+  // existing orders -> users FK action (no cascade) so a paid order
+  // can't be silently deleted while invoices/audit trail still reference
+  // its payment events.
+  provider          String @default("paymongo")
+  providerPaymentId String @unique
+
+  amountMinor    Int
+  currency       String @default("PHP")
+  status         String @default("PENDING") // PENDING | PAID | FAILED | EXPIRED | REFUNDED
+  method         String @default("gcash") // gcash | maya | card | bank
+  feeMinor       Int    @default(0)
+  netAmountMinor Int
+
+  paidAt              DateTime?
+  failedAt            DateTime?
+  failureReason       String?
+  rawProviderResponse Json?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  @@index([orderId])
+  @@index([status])
+  @@map("payments")
+}
+
+// ── Invoices (BIR-compliant receipt header + line items) ────────────────────
+
+model Invoice {
+  id String @id @default(cuid())
+
+  orderId String @unique
+  userId  String
+
+  invoiceNumber String @unique // human-readable, e.g. "INV-2026-00001"
+
+  issuedAt DateTime
+  dueAt    DateTime
+
+  status String @default("DRAFT") // DRAFT | ISSUED | PAID | VOIDED
+
+  // BIR-registered taxpayer snapshot — captured at issuance time
+  // so later edits to the buyer's profile don't rewrite the receipt.
+  birTin       String?
+  businessName String?
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  province     String
+  postalCode   String
+
+  // Money (always minor units)
+  subtotalMinor Int
+  taxMinor      Int    @default(0)
+  totalMinor    Int
+  currency      String @default("PHP")
+
+  pdfUrl String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  lineItems InvoiceLineItem[]
+
+  @@index([userId])
+  @@index([orderId])
+  @@map("invoices")
+}
+
+model InvoiceLineItem {
+  id String @id @default(cuid())
+
+  invoiceId      String
+  // FK to invoices — cascade: a voided/refunded invoice deletes its
+  // line items along with it. matches the parent-child pattern used
+  // by quiz_questions -> quiz_options.
+  description    String
+  quantity       Int
+  unitPriceMinor Int
+  totalMinor     Int
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_line_items")
+}
+
+// ── Prerequisites (course/lesson prerequisite graph) ────────────────────
+
+model Prerequisite {
+  id String @id @default(cuid())
+
+  courseId         String
+  requiresCourseId String
+  requiresLessonId String?
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@unique([courseId, requiresCourseId, requiresLessonId])
+  @@index([courseId])
+  @@index([requiresCourseId])
+  @@map("prerequisites")
+}
+
+// ── Assignments (instructor-assigned student work) ──────────────────────
+
+model Assignment {
+  id String @id @default(cuid())
+
+  courseId String
+  userId   String
+
+  title       String
+  description String // long-form
+
+  dueAt  DateTime
+  status String   @default("PENDING") // PENDING | SUBMITTED | GRADED | OVERDUE
+
+  submittedAt DateTime?
+  gradedAt    DateTime?
+  grade       Int?
+  graderId    String? // FK to users; nullable until graded
+  feedback    String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  @@index([courseId])
+  @@index([userId])
+  @@index([status, dueAt])
+  @@map("assignments")
+}
+
+// ── OAuth (social-login linkage) ─────────────────────────────────
+
+model OAuthAccount {
+  id String @id @default(cuid())
+
+  userId String
+  // FK to users — cascade: deleting a user purges their OAuth links.
+  // Same as sessions/email_verifications/password_resets.
+
+  provider       String // google | facebook | github
+  providerUserId String
+
+  accessToken  String?
+  refreshToken String?
+  expiresAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
+
+// ── Settings (global key/value store) ───────────────────────────────
+
+model Setting {
+  id String @id @default(cuid())
+
+  key         String  @unique
+  value       Json
+  description String?
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  createdById String?
+
+  @@map("settings")
+}
+
+// ── Announcements (site-wide banners + per-user state) ────────────────
+
+model Announcement {
+  id String @id @default(cuid())
+
+  title String
+  body  String // long-form
+
+  level String @default("INFO") // INFO | WARNING | CRITICAL
+
+  isActive Boolean   @default(false)
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  dismissible Boolean @default(true)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  dismissals AnnouncementDismissal[]
+
+  @@index([isActive, startsAt, endsAt])
+  @@map("announcements")
+}
+
+model AnnouncementDismissal {
+  id String @id @default(cuid())
+
+  userId         String
+  announcementId String
+  dismissedAt    DateTime @default(now())
+
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, announcementId])
+  @@index([userId])
+  @@map("announcement_dismissals")
+}
+
+model AnnouncementOptOut {
+  id String @id @default(cuid())
+
+  userId   String   @unique
+  optOutAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@map("announcement_opt_outs")
+}
+
+// ── Leaderboards (definition + ranked entries) ────────────────────────
+
+model Leaderboard {
+  id String @id @default(cuid())
+
+  slug        String @unique
+  title       String
+  description String
+
+  scope    String  @default("GLOBAL") // GLOBAL | COURSE | COHORT
+  courseId String?
+
+  window   String  @default("ALL_TIME") // ALL_TIME | MONTHLY | WEEKLY
+  isActive Boolean @default(true)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  entries LeaderboardEntry[]
+
+  @@index([isActive, scope])
+  @@map("leaderboards")
+}
+
+model LeaderboardEntry {
+  id String @id @default(cuid())
+
+  leaderboardId String
+  userId        String
+  score         Int
+  rank          Int
+
+  computedAt DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  leaderboard Leaderboard @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+
+  @@unique([leaderboardId, userId])
+  @@index([leaderboardId, rank])
+  @@map("leaderboard_entries")
+}
+
+// ── Dropoff telemetry ───────────────────────────────────
+
+model DropoffEvent {
+  id String @id @default(cuid())
+
+  userId   String?
+  courseId String?
+  lessonId String?
+
+  eventType String // lesson_started | lesson_paused | session_ended | …
+  metadata  Json   @default("{}")
+
+  occurredAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([occurredAt])
+  @@map("dropoff_events")
+}
+
+// ── Question Bank (reusable quiz items, decoupled from any Quiz) ───────────
+
+model QuestionBankItem {
+  id String @id @default(cuid())
+
+  courseId   String?
+  topic      String
+  difficulty String  @default("BEGINNER") // BEGINNER | INTERMEDIATE | ADVANCED
+
+  questionText String
+  explanation  String   @default("")
+  options      Json // array of { text: string, isCorrect: boolean }
+  tags         String[] @default([])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  @@index([courseId])
+  @@index([topic])
+  @@index([difficulty])
+  @@map("question_bank_items")
+}
+
+// ── Affiliates (partner accounts + per-referral attribution) ───────────
+
+model AffiliatePartner {
+  id String @id @default(cuid())
+
+  userId String @unique
+
+  slug              String  @unique
+  displayName       String
+  commissionPercent Int     @default(10)
+  payoutEmail       String
+  isActive          Boolean @default(true)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  referrals AffiliateReferral[]
+
+  @@map("affiliate_partners")
+}
+
+model AffiliateReferral {
+  id String @id @default(cuid())
+
+  affiliatePartnerId String
+  refereeUserId      String
+  orderId            String?
+
+  status          String    @default("PENDING") // PENDING | CONVERTED | PAID | REVOKED
+  commissionMinor Int       @default(0)
+  currency        String    @default("PHP")
+  convertedAt     DateTime?
+  paidAt          DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  affiliatePartner AffiliatePartner @relation(fields: [affiliatePartnerId], references: [id], onDelete: Cascade)
+
+  @@unique([affiliatePartnerId, refereeUserId])
+  @@index([refereeUserId])
+  @@index([orderId])
+  @@map("affiliate_referrals")
+}
+
+// ── Skill Map (skill definitions + per-user mastery) ──────────────────
+
+model SkillMap {
+  id String @id @default(cuid())
+
+  slug         String @unique
+  name         String
+  description  String
+  category     String
+  displayOrder Int    @default(0)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  progress SkillProgress[]
+
+  @@map("skill_maps")
+}
+
+model SkillProgress {
+  id String @id @default(cuid())
+
+  userId     String
+  skillMapId String
+  level      Int    @default(0) // 0 = novice, 100 = mastered
+
+  lastAssessedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  skillMap SkillMap @relation(fields: [skillMapId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, skillMapId])
+  @@index([userId])
+  @@map("skill_progress")
 }
