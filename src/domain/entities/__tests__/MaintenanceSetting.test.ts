@@ -12,7 +12,7 @@ import {
   isAdminAllowed,
   getMaintenanceMessage,
   type MaintenanceSetting,
-} from "./MaintenanceSetting";
+} from "../MaintenanceSetting";
 
 const FIXED_DATE = new Date("2026-01-15T08:00:00.000Z");
 

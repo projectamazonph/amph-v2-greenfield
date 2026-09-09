@@ -66,6 +66,9 @@ import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepos
 import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
 import { InMemoryMaintenanceSettingRepository } from "@/infra/repositories/inmemory/InMemoryMaintenanceSettingRepository";
+import { InMemoryAnnouncementRepository } from "@/infra/repositories/inmemory/InMemoryAnnouncementRepository";
+import { InMemoryAnnouncementDismissalRepository } from "@/infra/repositories/inmemory/InMemoryAnnouncementDismissalRepository";
+import { InMemoryAnnouncementOptOutRepository } from "@/infra/repositories/inmemory/InMemoryAnnouncementOptOutRepository";
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
 import { InMemoryProgressEventRepository } from "@/infra/repositories/InMemoryProgressEventRepository";
 import { InMemoryUserStreakRepository } from "@/infra/repositories/InMemoryUserStreakRepository";
@@ -184,6 +187,12 @@ import { AdminListQuizzes } from "@/usecases/AdminListQuizzes";
 import { AdminGetQuiz } from "@/usecases/AdminGetQuiz";
 import { AdminCreateQuiz } from "@/usecases/AdminCreateQuiz";
 import { AdminUpdateQuiz } from "@/usecases/AdminUpdateQuiz";
+import { AdminCreateAnnouncement } from "@/usecases/AdminCreateAnnouncement";
+import { AdminUpdateAnnouncement } from "@/usecases/AdminUpdateAnnouncement";
+import { AdminSetAnnouncementActive } from "@/usecases/AdminSetAnnouncementActive";
+import { GetActiveAnnouncementsForUser } from "@/usecases/GetActiveAnnouncementsForUser";
+import { DismissAnnouncement } from "@/usecases/DismissAnnouncement";
+import { SetAnnouncementOptOut } from "@/usecases/SetAnnouncementOptOut";
 import { AdminDeleteQuiz } from "@/usecases/AdminDeleteQuiz";
 import { AdminListScenarios } from "@/usecases/AdminListScenarios";
 import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
@@ -873,6 +882,37 @@ export function buildTestContainer(): TestContainer {
     uploadFile: new UploadFile({ fileStorage }),
     deleteFile: new DeleteFile({ fileStorage }),
     adminToggleMaintenance: new AdminToggleMaintenance({ maintenanceRepo, recordAuditLog, clock }),
+    // P1-07 (P4 PR-A): announcement banners (in-memory)
+    announcementRepo: new InMemoryAnnouncementRepository(),
+    announcementDismissalRepo: new InMemoryAnnouncementDismissalRepository(),
+    announcementOptOutRepo: new InMemoryAnnouncementOptOutRepository(),
+    adminCreateAnnouncement: new AdminCreateAnnouncement({
+      announcementRepo: new InMemoryAnnouncementRepository(),
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    adminUpdateAnnouncement: new AdminUpdateAnnouncement({
+      announcementRepo: new InMemoryAnnouncementRepository(),
+      recordAuditLog,
+    }),
+    adminSetAnnouncementActive: new AdminSetAnnouncementActive({
+      announcementRepo: new InMemoryAnnouncementRepository(),
+      recordAuditLog,
+    }),
+    getActiveAnnouncementsForUser: new GetActiveAnnouncementsForUser({
+      announcementRepo: new InMemoryAnnouncementRepository(),
+      dismissalRepo: new InMemoryAnnouncementDismissalRepository(),
+      optOutRepo: new InMemoryAnnouncementOptOutRepository(),
+      clock,
+    }),
+    dismissAnnouncement: new DismissAnnouncement({
+      dismissalRepo: new InMemoryAnnouncementDismissalRepository(),
+    }),
+    setAnnouncementOptOut: new SetAnnouncementOptOut({
+      optOutRepo: new InMemoryAnnouncementOptOutRepository(),
+    }),
+
     getMaintenanceStatus: new GetMaintenanceStatus({ maintenanceRepo }),
   };
 }

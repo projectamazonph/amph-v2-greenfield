@@ -100,7 +100,12 @@ export type AuditAction =
   | "resource.purged"
   | "resource.purge_failed"
   // P1-08 (P4 PR-A): admin toggles the maintenance-mode kill switch
-  | "maintenance.toggled";
+  | "maintenance.toggled"
+| "announcement.created"
+| "announcement.create_failed"
+| "announcement.updated"
+| "announcement.update_failed"
+| "announcement.toggled";
 
 /**
  * STORY-061. All valid AuditAction values as an array.

@@ -1,0 +1,66 @@
+/* P1-07 — site-wide announcement banner */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 12px);
+  padding: var(--space-3, 12px) var(--space-6, 24px);
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.5;
+}
+
+.banner_INFO {
+  background: var(--c-blue-bg, #e0f2fe);
+  color: var(--c-blue-text, #075985);
+  border-bottom-color: var(--c-blue-border, #bae6fd);
+}
+
+.banner_WARNING {
+  background: var(--c-amber-bg, #fef3c7);
+  color: var(--c-amber-text, #92400e);
+  border-bottom-color: var(--c-amber-border, #fde68a);
+}
+
+.banner_CRITICAL {
+  background: var(--c-red-bg, #fee2e2);
+  color: var(--c-red-text, #991b1b);
+  border-bottom-color: var(--c-red-border, #fecaca);
+}
+
+.icon { flex-shrink: 0; margin-top: 2px; }
+
+.body { flex: 1; min-width: 0; }
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm, 0.875rem);
+  margin: 0 0 2px;
+}
+
+.message {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.dismiss {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm, 4px);
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 120ms ease;
+}
+
+.dismiss:hover { opacity: 1; }

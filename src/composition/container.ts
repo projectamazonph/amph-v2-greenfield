@@ -298,6 +298,19 @@ import { UploadFile } from "@/usecases/UploadFile";
 import { DeleteFile } from "@/usecases/DeleteFile";
 import { PurgeResource } from "@/usecases/PurgeResource";
 import { AdminToggleMaintenance } from "@/usecases/AdminToggleMaintenance";
+import type { IAnnouncementRepository } from "@/ports/repositories/IAnnouncementRepository";
+import type { IAnnouncementDismissalRepository } from "@/ports/repositories/IAnnouncementDismissalRepository";
+import type { IAnnouncementOptOutRepository } from "@/ports/repositories/IAnnouncementOptOutRepository";
+import { PrismaAnnouncementRepository } from "@/infra/repositories/PrismaAnnouncementRepository";
+import { PrismaAnnouncementDismissalRepository } from "@/infra/repositories/PrismaAnnouncementDismissalRepository";
+import { PrismaAnnouncementOptOutRepository } from "@/infra/repositories/PrismaAnnouncementOptOutRepository";
+import { AdminCreateAnnouncement } from "@/usecases/AdminCreateAnnouncement";
+import { AdminUpdateAnnouncement } from "@/usecases/AdminUpdateAnnouncement";
+import { AdminSetAnnouncementActive } from "@/usecases/AdminSetAnnouncementActive";
+import { GetActiveAnnouncementsForUser } from "@/usecases/GetActiveAnnouncementsForUser";
+import { DismissAnnouncement } from "@/usecases/DismissAnnouncement";
+import { SetAnnouncementOptOut } from "@/usecases/SetAnnouncementOptOut";
+
 import { GetMaintenanceStatus } from "@/usecases/GetMaintenanceStatus";
 import type { SentReminderRepository } from "@/ports/repositories/SentReminderRepository";
 
@@ -537,6 +550,17 @@ export interface AppContainer {
   deleteFile: DeleteFile;
   // P1-08 (P4 PR-A): maintenance mode / kill switch
   adminToggleMaintenance: AdminToggleMaintenance;
+  // P1-07 (P4 PR-A): site-wide announcement banners
+  announcementRepo: IAnnouncementRepository;
+  announcementDismissalRepo: IAnnouncementDismissalRepository;
+  announcementOptOutRepo: IAnnouncementOptOutRepository;
+  adminCreateAnnouncement: AdminCreateAnnouncement;
+  adminUpdateAnnouncement: AdminUpdateAnnouncement;
+  adminSetAnnouncementActive: AdminSetAnnouncementActive;
+  getActiveAnnouncementsForUser: GetActiveAnnouncementsForUser;
+  dismissAnnouncement: DismissAnnouncement;
+  setAnnouncementOptOut: SetAnnouncementOptOut;
+
   getMaintenanceStatus: GetMaintenanceStatus;
 }
 
@@ -1171,6 +1195,37 @@ function buildProductionContainer(): AppContainer {
     deleteFile: new DeleteFile({ fileStorage }),
     // P1-08 (P4 PR-A): maintenance mode / kill switch
     adminToggleMaintenance: new AdminToggleMaintenance({ maintenanceRepo, recordAuditLog, clock }),
+    // P1-07 (P4 PR-A): announcement banners
+    announcementRepo: new PrismaAnnouncementRepository(prisma),
+    announcementDismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),
+    announcementOptOutRepo: new PrismaAnnouncementOptOutRepository(prisma),
+    adminCreateAnnouncement: new AdminCreateAnnouncement({
+      announcementRepo: new PrismaAnnouncementRepository(prisma),
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    adminUpdateAnnouncement: new AdminUpdateAnnouncement({
+      announcementRepo: new PrismaAnnouncementRepository(prisma),
+      recordAuditLog,
+    }),
+    adminSetAnnouncementActive: new AdminSetAnnouncementActive({
+      announcementRepo: new PrismaAnnouncementRepository(prisma),
+      recordAuditLog,
+    }),
+    getActiveAnnouncementsForUser: new GetActiveAnnouncementsForUser({
+      announcementRepo: new PrismaAnnouncementRepository(prisma),
+      dismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),
+      optOutRepo: new PrismaAnnouncementOptOutRepository(prisma),
+      clock,
+    }),
+    dismissAnnouncement: new DismissAnnouncement({
+      dismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),
+    }),
+    setAnnouncementOptOut: new SetAnnouncementOptOut({
+      optOutRepo: new PrismaAnnouncementOptOutRepository(prisma),
+    }),
+
     getMaintenanceStatus: new GetMaintenanceStatus({ maintenanceRepo }),
   };
 }
