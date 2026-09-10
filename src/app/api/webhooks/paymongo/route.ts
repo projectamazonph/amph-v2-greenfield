@@ -228,7 +228,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     enrollError = `enrollment_threw: ${String(err)}`;
   }
 
-  return finish(NextResponse.json({ received: true }), enrollError);
+  // ── 10. Auto-issue the BIR invoice (P0-02, best-effort) ──────
+  // The order is PAID at this point regardless of the enrollment
+  // outcome above: the invoice is a fiscal record of the payment,
+  // not of the enrollment. Flag-gated; failures are logged and
+  // recorded on the event log but never fail the webhook.
+  let invoiceError: string | undefined;
+  if (container.flags.invoicingEnabled) {
+    try {
+      const invoiceResult = await container.issueInvoice.execute({ orderId: order.id });
+      if (!invoiceResult.ok) {
+        console.warn(`[webhook] Invoice issue failed for order ${order.id}:`, invoiceResult.error);
+        invoiceError = `invoice_failed: ${JSON.stringify(invoiceResult.error)}`;
+      }
+    } catch (err) {
+      console.error(`[webhook] Invoice issue error for order ${order.id}:`, err);
+      invoiceError = `invoice_threw: ${String(err)}`;
+    }
+  }
+
+  return finish(NextResponse.json({ received: true }), enrollError ?? invoiceError);
 }
 
 /**

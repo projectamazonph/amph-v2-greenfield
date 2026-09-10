@@ -16,6 +16,7 @@ vi.mock("../CheckoutForm", () => ({
 
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
+    flags: { installmentsEnabled: false, invoicingEnabled: false },
     getCheckoutSummary: {
       execute: vi.fn(async () => ({
         ok: true,
