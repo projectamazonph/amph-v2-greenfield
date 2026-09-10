@@ -21,20 +21,38 @@ export type PaymentGatewayError =
   | { kind: "invalid_course"; message: string }
   | { kind: "paymongo_error"; code: string; message: string };
 
+export interface CreateCheckoutSessionParams {
+  courseId: string;
+  courseTitle: string;
+  amountMinor: number; // integer minor units (centavos)
+  currency: string; // "PHP"
+  successUrl: string;
+  failedUrl: string;
+  metadata: Record<string, string>; // { orderId, userId, courseId }
+  /**
+   * P0-01: card installments. When present, the adapter enables
+   * `payment_method_options.card.installments` on the PayMongo side
+   * so the hosted page offers the bank installment choice.
+   *
+   * `terms` records the tenure(s) our ledger validated
+   * (InstallmentPlan: 3/6/12 months). PayMongo's hosted page offers
+   * bank terms to the student; the chosen tenure is persisted on our
+   * Order, not negotiated through this field.
+   *
+   * Postconditions: absent means pay in full; present must carry at
+   * least one validated term.
+   */
+  installments?: { terms: number[] };
+}
+
 export interface IPaymentGateway {
   /**
    * Create a PayMongo Checkout Session for a given course.
    * Returns the hosted checkout URL to redirect the student to.
    */
-  createCheckoutSession(params: {
-    courseId: string;
-    courseTitle: string;
-    amountMinor: number; // integer minor units (centavos)
-    currency: string; // "PHP"
-    successUrl: string;
-    failedUrl: string;
-    metadata: Record<string, string>; // { orderId, userId, courseId }
-  }): Promise<Result<CheckoutSession, PaymentGatewayError>>;
+  createCheckoutSession(
+    params: CreateCheckoutSessionParams,
+  ): Promise<Result<CheckoutSession, PaymentGatewayError>>;
 
   /**
    * Retrieve a Checkout Session by its PayMongo ID.

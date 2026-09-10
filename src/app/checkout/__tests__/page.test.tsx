@@ -33,7 +33,7 @@ import { createElement } from "react";
 import { Money } from "@/domain/values/Money";
 import CheckoutForm from "../CheckoutForm";
 
-function renderForm() {
+function renderForm(props: { pricePesos?: number; installmentsEnabled?: boolean } = {}) {
   return renderToString(
     createElement(CheckoutForm, {
       offer: { courseSlug: "ppc-101" },
@@ -41,10 +41,11 @@ function renderForm() {
         courseSlug: "ppc-101",
         courseTitle: "PPC 101",
         offerName: "PPC 101",
-        price: Money.php(2999),
+        price: Money.php(props.pricePesos ?? 2999),
         pricingTierSlug: null,
       },
       loadError: null,
+      installmentsEnabled: props.installmentsEnabled ?? false,
     }),
   );
 }
@@ -102,5 +103,23 @@ describe("/checkout", () => {
   it("contains <main id='main-content' tabIndex={-1}> in its JSX source", () => {
     const source = readFileSync(resolve(__dirname, "../CheckoutForm.tsx"), "utf8");
     expect(source).toMatch(/<main[^>]*\bid="main-content"[^>]*\btabIndex=\{-1\}/);
+  });
+
+  // P0-01: installment selector
+  it("hides the installment selector when the flag is off", () => {
+    const html = renderForm({ pricePesos: 5999, installmentsEnabled: false });
+    expect(html).not.toMatch(/name="installmentMonths"/);
+  });
+
+  it("shows tenures with monthly amounts when the flag is on and the total qualifies", () => {
+    const html = renderForm({ pricePesos: 5999, installmentsEnabled: true });
+    expect(html).toMatch(/name="installmentMonths"/);
+    expect(html).toMatch(/value="6"/);
+    expect(html).toMatch(/Pay in full/);
+  });
+
+  it("hides the selector when the total is below the installment floor", () => {
+    const html = renderForm({ pricePesos: 2999, installmentsEnabled: true });
+    expect(html).not.toMatch(/name="installmentMonths"/);
   });
 });

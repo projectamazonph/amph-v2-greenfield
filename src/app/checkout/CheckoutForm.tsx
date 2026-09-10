@@ -43,6 +43,8 @@ import {
 } from "@/app/actions/checkout.action";
 import type { CheckoutSummary } from "@/usecases/GetCheckoutSummary";
 import { Button } from "@/components/ui/Button";
+import { INSTALLMENT_TERMS, InstallmentPlan } from "@/domain/values/InstallmentPlan";
+import { Money } from "@/domain/values/Money";
 
 const PAGE_STYLES: Record<string, React.CSSProperties> = {
   page: {
@@ -164,9 +166,21 @@ interface CheckoutFormProps {
     | "pricing_tier_not_found"
     | "pricing_tier_unavailable"
     | null;
+  /**
+   * P0-01: show the card-installment choice. Wired from the
+   * INSTALLMENTS_ENABLED flag by the server page. Off means the
+   * selector never renders and the action rejects any submitted
+   * installmentMonths.
+   */
+  installmentsEnabled?: boolean;
 }
 
-export default function CheckoutForm({ offer, summary, loadError }: CheckoutFormProps) {
+export default function CheckoutForm({
+  offer,
+  summary,
+  loadError,
+  installmentsEnabled = false,
+}: CheckoutFormProps) {
   const [state, formAction, isPending] = useActionState<CheckoutActionState, FormData>(
     startCheckout,
     CHECKOUT_INITIAL_STATE,
@@ -210,6 +224,17 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
     ? `/checkout?pricingTier=${summary.pricingTierSlug}`
     : `/checkout?courseSlug=${summary.courseSlug}`;
   const formattedTotal = summary.price.format("en-PH");
+
+  // P0-01: tenures the total qualifies for. Empty (e.g. below the
+  // PHP 3,000 floor) means pay in full even with the flag on.
+  const installmentOptions = installmentsEnabled
+    ? INSTALLMENT_TERMS.flatMap((months) => {
+        const plan = InstallmentPlan.create({ totalMinor: summary.price.minor, months });
+        return plan.ok
+          ? [{ months: plan.value.months, monthlyMinor: plan.value.monthlyMinor }]
+          : [];
+      })
+    : [];
 
   return (
     <main id="main-content" tabIndex={-1} style={PAGE_STYLES.page}>
@@ -271,6 +296,16 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
             Too many checkout attempts. Please wait a few minutes before trying again.
           </div>
         )}
+        {state.kind === "invalid_input" && (
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
+            {state.message}
+          </div>
+        )}
+        {state.kind === "installments_unavailable" && (
+          <div style={{ ...PAGE_STYLES.alert, ...PAGE_STYLES.alertError }} role="alert">
+            Card installments are not available right now. Please pay in full.
+          </div>
+        )}
 
         {/* Order summary */}
         <div style={PAGE_STYLES.summary}>
@@ -308,6 +343,37 @@ export default function CheckoutForm({ offer, summary, loadError }: CheckoutForm
             <input type="hidden" name="pricingTierSlug" value={offer.pricingTierSlug} />
           ) : (
             <input type="hidden" name="courseSlug" value={offer.courseSlug} />
+          )}
+          {installmentOptions.length > 0 && (
+            <div>
+              <label htmlFor="installmentMonths" style={{ ...PAGE_STYLES.hint, fontWeight: 600 }}>
+                How do you want to pay?
+              </label>
+              <select
+                id="installmentMonths"
+                name="installmentMonths"
+                defaultValue=""
+                style={{
+                  width: "100%",
+                  marginTop: 6,
+                  padding: "10px 12px",
+                  fontSize: 14,
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  background: "white",
+                  color: "var(--ink-900)",
+                }}
+              >
+                <option value="">Pay in full ({formattedTotal})</option>
+                {installmentOptions.map((option) => (
+                  <option key={option.months} value={String(option.months)}>
+                    {option.months} months at {Money.php(option.monthlyMinor).format("en-PH")} per
+                    month
+                  </option>
+                ))}
+              </select>
+              <p style={PAGE_STYLES.hint}>Card installments are charged monthly by your bank.</p>
+            </div>
           )}
           <Button
             variant="primary"

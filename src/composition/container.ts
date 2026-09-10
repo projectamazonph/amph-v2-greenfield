@@ -377,6 +377,10 @@ export interface AppContainer {
   emailTemplateRepo: IEmailTemplateRepository;
   // P1-08 (P4 PR-A): maintenance mode / kill switch
   maintenanceRepo: IMaintenanceSettingRepository;
+  // P4 PR-B: feature flags (INSTALLMENTS_ENABLED, INVOICING_ENABLED).
+  // Read once from env per container build; pages, routes, and use
+  // cases observe the same value.
+  flags: { installmentsEnabled: boolean; invoicingEnabled: boolean };
   listEmailTemplates: ListEmailTemplates;
   getEmailTemplate: GetEmailTemplate;
   updateEmailTemplate: UpdateEmailTemplate;
@@ -657,12 +661,21 @@ function buildProductionContainer(): AppContainer {
   // STORY-095: admin email template editor
   const emailTemplateRepo: IEmailTemplateRepository = new PrismaEmailTemplateRepository(prisma);
   // P1-08 (P4 PR-A): maintenance mode / kill switch
-  const maintenanceRepo: IMaintenanceSettingRepository = new PrismaMaintenanceSettingRepository(prisma);
+  const maintenanceRepo: IMaintenanceSettingRepository = new PrismaMaintenanceSettingRepository(
+    prisma,
+  );
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
     process.env.PAYMONGO_WEBHOOK_SECRET,
   );
+
+  // P4 PR-B: feature flags. Both default off. Read once here so every
+  // consumer (use cases, routes, pages) observes the same value within
+  // a single container build.
+  const installmentsEnabled = process.env.INSTALLMENTS_ENABLED === "true";
+  const invoicingEnabled = process.env.INVOICING_ENABLED === "true";
+  const flags = { installmentsEnabled, invoicingEnabled };
 
   const baseUrl = buildAppUrl("").replace(/\/$/, "");
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo, enrollmentRepo);
@@ -742,6 +755,7 @@ function buildProductionContainer(): AppContainer {
     idGen,
     databaseHealthCheck,
     logger,
+    flags,
     userRepo,
     sessionRepo,
     userStreakRepo,
@@ -766,6 +780,7 @@ function buildProductionContainer(): AppContainer {
       orderRepo,
       paymentGateway,
       baseUrl,
+      installmentsEnabled,
     }),
     getCheckoutSummary: new GetCheckoutSummary({ courseRepo, pricingTierRepo }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),

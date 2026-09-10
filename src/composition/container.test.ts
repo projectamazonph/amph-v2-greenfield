@@ -333,6 +333,10 @@ export function buildTestContainer(): TestContainer {
   const receiptEmailRenderer = new ReceiptTemplateRenderer();
   const refundEmailRenderer = new RefundTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
+  // P4 PR-B: feature flags default off in tests. Suites that exercise
+  // flagged behavior construct the use case directly with the flag on
+  // (see tests/unit/usecases/CreatePaymentIntent.test.ts).
+  const flags = { installmentsEnabled: false, invoicingEnabled: false };
   const awardXp = new AwardXP({ xpAwardRepo, idGen, clock });
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
@@ -423,6 +427,7 @@ export function buildTestContainer(): TestContainer {
     clock,
     idGen,
     databaseHealthCheck,
+    flags,
     emailVerificationRepo,
     passwordResetRepo,
     logger,
@@ -451,6 +456,7 @@ export function buildTestContainer(): TestContainer {
       orderRepo,
       paymentGateway,
       baseUrl: "https://test.amph.example.com",
+      installmentsEnabled: false,
     }),
     getCheckoutSummary: new GetCheckoutSummary({ courseRepo, pricingTierRepo }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),

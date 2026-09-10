@@ -23,13 +23,15 @@ export default async function CheckoutPage({ searchParams }: Props) {
   }
 
   const offer = pricingTierSlug ? { pricingTierSlug } : { courseSlug: courseSlug! };
-  const result = await buildContainer().getCheckoutSummary.execute(offer);
+  const container = buildContainer();
+  const result = await container.getCheckoutSummary.execute(offer);
 
   return (
     <CheckoutForm
       offer={offer}
       summary={result.ok ? result.value : null}
       loadError={result.ok ? null : result.error.kind}
+      installmentsEnabled={container.flags.installmentsEnabled}
     />
   );
 }
