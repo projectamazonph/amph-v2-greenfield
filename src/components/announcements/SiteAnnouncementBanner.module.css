@@ -11,28 +11,28 @@
   align-items: flex-start;
   gap: var(--space-3, 12px);
   padding: var(--space-3, 12px) var(--space-6, 24px);
-  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  border-bottom: 1px solid var(--border, #e5e7eb);
   font-family: var(--font-body);
   font-size: var(--text-sm, 0.875rem);
   line-height: 1.5;
 }
 
 .banner_INFO {
-  background: var(--c-blue-bg, #e0f2fe);
-  color: var(--c-blue-text, #075985);
-  border-bottom-color: var(--c-blue-border, #bae6fd);
+  background: var(--info-soft, #e0f2fe);
+  color: var(--info, #075985);
+  border-bottom-color: var(--info-soft, #bae6fd);
 }
 
 .banner_WARNING {
-  background: var(--c-amber-bg, #fef3c7);
-  color: var(--c-amber-text, #92400e);
-  border-bottom-color: var(--c-amber-border, #fde68a);
+  background: var(--warning-soft, #fef3c7);
+  color: var(--warning, #92400e);
+  border-bottom-color: var(--warning-soft, #fde68a);
 }
 
 .banner_CRITICAL {
-  background: var(--c-red-bg, #fee2e2);
-  color: var(--c-red-text, #991b1b);
-  border-bottom-color: var(--c-red-border, #fecaca);
+  background: var(--danger-soft, #fee2e2);
+  color: var(--danger, #991b1b);
+  border-bottom-color: var(--danger-soft, #fecaca);
 }
 
 .icon { flex-shrink: 0; margin-top: 2px; }

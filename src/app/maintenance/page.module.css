@@ -6,13 +6,13 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 1.5rem;
-  background: var(--color-background, #f6f7f9);
+  background: var(--surface-1, #f6f7f9);
 }
 
 .card {
   max-width: 32rem;
   background: #ffffff;
-  border: 1px solid var(--color-border, #e3e6ec);
+  border: 1px solid var(--border, #e3e6ec);
   border-radius: 12px;
   padding: 2.5rem 2rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
@@ -25,7 +25,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-warning, #b45309);
+  color: var(--warning, #b45309);
 }
 
 .heading {
@@ -33,7 +33,7 @@
   font-family: var(--font-display, "Archivo", sans-serif);
   font-size: 2rem;
   font-weight: 700;
-  color: var(--color-text, #0f172a);
+  color: var(--ink-900, #0f172a);
 }
 
 .body {
@@ -41,11 +41,11 @@
   font-family: var(--font-body, "PT Sans", sans-serif);
   font-size: 1rem;
   line-height: 1.55;
-  color: var(--color-text, #1f2937);
+  color: var(--ink-900, #1f2937);
 }
 
 .link {
-  color: var(--color-accent, #f08c1f);
+  color: var(--accent, #f08c1f);
   text-decoration: underline;
 }
 
@@ -53,5 +53,5 @@
   margin: 1.5rem 0 0;
   font-family: var(--font-body, "PT Sans", sans-serif);
   font-size: 0.95rem;
-  color: var(--color-text, #1f2937);
+  color: var(--ink-900, #1f2937);
 }
