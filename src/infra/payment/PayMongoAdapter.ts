@@ -66,6 +66,7 @@ export class PayMongoAdapter implements IPaymentGateway {
     successUrl: string;
     failedUrl: string;
     metadata: Record<string, string>;
+    installments?: { terms: number[] };
   }): Promise<Result<CheckoutSession, PaymentGatewayError>> {
     try {
       const res = await fetch(`${this.baseUrl}/checkout_sessions`, {
@@ -87,6 +88,12 @@ export class PayMongoAdapter implements IPaymentGateway {
               failed_url: params.failedUrl,
               metadata: params.metadata,
               description: `Project Amazon PH Academy: ${params.courseTitle}`,
+              // P0-01: enable the bank installment choice on the hosted
+              // page. Tenure validation lives in domain (InstallmentPlan);
+              // PayMongo only needs the enabled flag.
+              ...(params.installments
+                ? { payment_method_options: { card: { installments: { enabled: true } } } }
+                : {}),
             },
           },
         }),

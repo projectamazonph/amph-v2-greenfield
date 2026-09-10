@@ -94,6 +94,35 @@ describe("Order — payment state transitions", () => {
     });
   });
 
+  describe("setInstallmentPlan() (P0-01)", () => {
+    it("records the plan on a DRAFT order", () => {
+      const order = makeDraft();
+      const result = order.setInstallmentPlan(6, 99983);
+      expect(result.ok).toBe(true);
+      expect(order.installmentMonths).toBe(6);
+      expect(order.installmentMonthlyMinor).toBe(99983);
+      expect(order.isInstallment()).toBe(true);
+    });
+
+    it("defaults to pay in full", () => {
+      const order = makeDraft();
+      expect(order.installmentMonths).toBeNull();
+      expect(order.installmentMonthlyMinor).toBeNull();
+      expect(order.isInstallment()).toBe(false);
+    });
+
+    it("returns error if not DRAFT", () => {
+      const order = makeDraft();
+      order.markPending("cs_1", "https://example.com");
+      const result = order.setInstallmentPlan(6, 99983);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe("invalid_transition");
+      }
+      expect(order.installmentMonths).toBeNull();
+    });
+  });
+
   describe("markPaid()", () => {
     it("transitions PENDING → PAID", () => {
       const order = makeDraft();
@@ -270,6 +299,8 @@ describe("Order: hydrate() (reconstruction from persistence)", () => {
       paymongoCheckoutUrl: "https://checkout.paymongo.com/cs_abc123",
       paymongoStatus: "paid",
       paymongoPaidAt: new Date("2026-07-01T12:00:00Z"),
+      installmentMonths: null,
+      installmentMonthlyMinor: null,
       refundReason: null,
       refundRequestedAt: null,
       refundProcessedAt: null,

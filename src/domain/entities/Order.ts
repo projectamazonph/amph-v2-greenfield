@@ -29,6 +29,8 @@ export interface OrderCreateParams {
   readonly discountMinor: number;
   readonly totalMinor: number;
   readonly currency: string;
+  readonly installmentMonths?: number | null;
+  readonly installmentMonthlyMinor?: number | null;
 }
 
 /**
@@ -42,6 +44,8 @@ export interface OrderHydrateParams extends OrderCreateParams {
   readonly paymongoCheckoutUrl: string | null;
   readonly paymongoStatus: string | null;
   readonly paymongoPaidAt: Date | null;
+  readonly installmentMonths: number | null;
+  readonly installmentMonthlyMinor: number | null;
   readonly refundReason: string | null;
   readonly refundRequestedAt: Date | null;
   readonly refundProcessedAt: Date | null;
@@ -66,6 +70,12 @@ export class Order {
   public paymongoCheckoutUrl: string | null;
   public paymongoStatus: string | null;
   public paymongoPaidAt: Date | null;
+
+  // ── Installment fields (P0-01) ────────────────────────────────
+  // Null pair means pay in full. Set once via setInstallmentPlan()
+  // while DRAFT; never changed after the checkout session exists.
+  public installmentMonths: number | null;
+  public installmentMonthlyMinor: number | null;
 
   // ── Refund fields ──────────────────────────────────────────
   public refundReason: string | null;
@@ -92,6 +102,9 @@ export class Order {
     this.paymongoCheckoutUrl = hydrated?.paymongoCheckoutUrl ?? null;
     this.paymongoStatus = hydrated?.paymongoStatus ?? null;
     this.paymongoPaidAt = hydrated?.paymongoPaidAt ?? null;
+    this.installmentMonths = hydrated?.installmentMonths ?? params.installmentMonths ?? null;
+    this.installmentMonthlyMinor =
+      hydrated?.installmentMonthlyMinor ?? params.installmentMonthlyMinor ?? null;
     this.refundReason = hydrated?.refundReason ?? null;
     this.refundRequestedAt = hydrated?.refundRequestedAt ?? null;
     this.refundProcessedAt = hydrated?.refundProcessedAt ?? null;
@@ -112,6 +125,23 @@ export class Order {
   }
 
   // ── State transitions ──────────────────────────────────────
+
+  /**
+   * Record the card-installment plan chosen at checkout (P0-01).
+   * Only valid from DRAFT, before any checkout session exists.
+   */
+  setInstallmentPlan(months: number, monthlyMinor: number): Result<void, OrderTransitionError> {
+    if (this.status !== "DRAFT") {
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot set installment plan: order is ${this.status}. Can only set on DRAFT.`,
+      });
+    }
+    this.installmentMonths = months;
+    this.installmentMonthlyMinor = monthlyMinor;
+    this.updatedAt = new Date();
+    return Result.ok(undefined);
+  }
 
   /**
    * Transition to PENDING: PayMongo checkout session has been created.
@@ -221,6 +251,11 @@ export class Order {
 
   isPaid(): boolean {
     return _PaymentStatusValues.isPaid(this.status);
+  }
+
+  /** True when the student chose a card-installment plan (P0-01). */
+  isInstallment(): boolean {
+    return this.installmentMonths !== null;
   }
 
   canTransitionTo(next: PaymentStatus): boolean {

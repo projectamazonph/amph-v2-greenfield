@@ -87,6 +87,9 @@ import { StubPaymentGateway } from "@/infra/payment/StubPaymentGateway";
 import { StubAccessPolicy } from "@/infra/access/StubAccessPolicy";
 import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHashGenerator";
 import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer";
+import { StaticInvoiceRenderer } from "@/infra/pdf/StaticInvoiceRenderer";
+import { InMemoryInvoiceRepository } from "@/infra/repositories/inmemory/InMemoryInvoiceRepository";
+import type { InvoiceRenderer } from "@/ports/rendering/InvoiceRenderer";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
 import { Argon2PasswordHasher } from "@/infra/security/Argon2PasswordHasher";
@@ -113,6 +116,7 @@ import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
 import { ListUserBadges } from "@/usecases/ListUserBadges";
 import { IssueCertificate } from "@/usecases/IssueCertificate";
+import { IssueInvoice } from "@/usecases/IssueInvoice";
 import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
 import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 import { RevokeCertificate } from "@/usecases/RevokeCertificate";
@@ -266,6 +270,9 @@ export interface TestContainer extends AppContainer {
   certificateRepo: InMemoryCertificateRepository;
   progressEventRepo: InMemoryProgressEventRepository;
   certificateRenderer: StaticCertificateRenderer;
+  // P0-02 (P4 PR-B): BIR invoicing fakes
+  invoiceRepo: InMemoryInvoiceRepository;
+  invoiceRenderer: StaticInvoiceRenderer;
   // STORY-012: tests share NextMdxRenderer with production.
   mdxRenderer: IMdxContentRenderer;
   accessPolicy: StubAccessPolicy;
@@ -333,10 +340,17 @@ export function buildTestContainer(): TestContainer {
   const receiptEmailRenderer = new ReceiptTemplateRenderer();
   const refundEmailRenderer = new RefundTemplateRenderer();
   const paymentGateway: IPaymentGateway = new StubPaymentGateway();
+  // P4 PR-B: feature flags default off in tests. Suites that exercise
+  // flagged behavior construct the use case directly with the flag on
+  // (see tests/unit/usecases/CreatePaymentIntent.test.ts).
+  const flags = { installmentsEnabled: false, invoicingEnabled: false };
   const awardXp = new AwardXP({ xpAwardRepo, idGen, clock });
   const accessPolicy = new StubAccessPolicy();
   const certificateHashGen: CertificateHashGenerator = new FakeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new StaticCertificateRenderer();
+  // P0-02 (P4 PR-B): BIR invoicing fakes
+  const invoiceRepo = new InMemoryInvoiceRepository();
+  const invoiceRenderer: InvoiceRenderer = new StaticInvoiceRenderer();
   // STORY-012: same NextMdxRenderer as production. No IO, no
   // stub needed ΓÇö the test container just hands every test a
   // shared, fresh instance with no state leaking between suites.
@@ -423,6 +437,7 @@ export function buildTestContainer(): TestContainer {
     clock,
     idGen,
     databaseHealthCheck,
+    flags,
     emailVerificationRepo,
     passwordResetRepo,
     logger,
@@ -451,6 +466,7 @@ export function buildTestContainer(): TestContainer {
       orderRepo,
       paymentGateway,
       baseUrl: "https://test.amph.example.com",
+      installmentsEnabled: false,
     }),
     getCheckoutSummary: new GetCheckoutSummary({ courseRepo, pricingTierRepo }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
@@ -532,6 +548,21 @@ export function buildTestContainer(): TestContainer {
     revokeCertificate: new RevokeCertificate({
       certificateRepo,
       clock,
+    }),
+    // P0-02 (P4 PR-B): BIR invoicing (flag off in tests; suites that
+    // exercise issuance construct IssueInvoice directly)
+    invoiceRepo,
+    invoiceRenderer,
+    issueInvoice: new IssueInvoice({
+      orderRepo,
+      userRepo,
+      courseRepo,
+      invoiceRepo,
+      renderer: invoiceRenderer,
+      fileStorage,
+      idGen,
+      clock,
+      invoicingEnabled: false,
     }),
     // STORY-092 (US-008): admin certificate list + detail
     adminListCertificates: new AdminListCertificates({

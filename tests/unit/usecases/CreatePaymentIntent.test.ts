@@ -60,8 +60,20 @@ describe("CreatePaymentIntent", () => {
       orderRepo,
       paymentGateway,
       baseUrl: BASE_URL,
+      installmentsEnabled: false,
     });
   });
+
+  function enableInstallments(): void {
+    useCase = new CreatePaymentIntent({
+      courseRepo,
+      pricingTierRepo,
+      orderRepo,
+      paymentGateway,
+      baseUrl: BASE_URL,
+      installmentsEnabled: true,
+    });
+  }
 
   it("charges the active tier's effective price for its linked course", async () => {
     courseRepo.seed([makeCourse({ id: "course_01", slug: COURSE_SLUG, priceMinor: 599900 })]);
@@ -272,5 +284,115 @@ describe("CreatePaymentIntent", () => {
     if (!result.ok) return;
     expect(result.checkoutUrl).toBe("https://checkout.paymongo.com/cs_existing");
     expect(paymentGateway.calls).toHaveLength(0); // no new PayMongo call
+  });
+
+  // ── P0-01 installments ──────────────────────────────────────
+
+  it("rejects installments when the flag is off", async () => {
+    const course = makeCourse({ id: "course_01", slug: COURSE_SLUG, priceMinor: 599900 });
+    courseRepo.seed([course]);
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseSlug: COURSE_SLUG,
+      installmentMonths: 6,
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("installments_disabled");
+    expect(paymentGateway.calls).toHaveLength(0);
+  });
+
+  it("creates an installment order and enables installments on the PayMongo session", async () => {
+    enableInstallments();
+    const course = makeCourse({ id: "course_01", slug: COURSE_SLUG, priceMinor: 599900 });
+    courseRepo.seed([course]);
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseSlug: COURSE_SLUG,
+      installmentMonths: 6,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.installmentMonths).toBe(6);
+    const order = orderRepo.getAll()[0]!;
+    expect(order.installmentMonths).toBe(6);
+    expect(order.installmentMonthlyMinor).toBe(Math.floor(599900 / 6));
+    const call = paymentGateway.calls[0]!;
+    expect(call.params.installments).toEqual({ terms: [6] });
+    expect(call.params.metadata.installmentMonths).toBe("6");
+  });
+
+  it("rejects an unsupported tenure", async () => {
+    enableInstallments();
+    const course = makeCourse({ id: "course_01", slug: COURSE_SLUG, priceMinor: 599900 });
+    courseRepo.seed([course]);
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseSlug: COURSE_SLUG,
+      installmentMonths: 5,
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "invalid_installment_term", months: 5 });
+  });
+
+  it("rejects installments below the PayMongo floor", async () => {
+    enableInstallments();
+    const course = makeCourse({ id: "course_01", slug: COURSE_SLUG, priceMinor: 299900 });
+    courseRepo.seed([course]);
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseSlug: COURSE_SLUG,
+      installmentMonths: 3,
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("installment_below_minimum");
+  });
+
+  it("does not reuse a full-payment pending order for an installment request", async () => {
+    enableInstallments();
+    const course = makeCourse({ id: "course_01", slug: COURSE_SLUG, priceMinor: 599900 });
+    courseRepo.seed([course]);
+
+    await orderRepo.seedPendingOrder({
+      id: "pending_order",
+      userId: USER_ID,
+      courseId: "course_01",
+      paymongoPaymentId: "cs_existing",
+      paymongoCheckoutUrl: "https://checkout.paymongo.com/cs_existing",
+      totalMinor: 599900,
+    });
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseSlug: COURSE_SLUG,
+      installmentMonths: 6,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.checkoutUrl).toBe("https://checkout.paymongo.com/cs_test_123");
+    expect(paymentGateway.calls).toHaveLength(1);
+  });
+
+  it("returns pay-in-full output with null installment months by default", async () => {
+    const course = makeCourse({ id: "course_01", slug: COURSE_SLUG });
+    courseRepo.seed([course]);
+
+    const result = await useCase.execute({ userId: USER_ID, courseSlug: COURSE_SLUG });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.installmentMonths).toBeNull();
+    expect(paymentGateway.calls[0]?.params.installments).toBeUndefined();
   });
 });

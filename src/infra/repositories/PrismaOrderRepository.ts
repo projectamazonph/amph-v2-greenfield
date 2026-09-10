@@ -34,6 +34,8 @@ interface PrismaOrderRow {
   paymongoCheckoutUrl: string | null;
   paymongoStatus: string | null;
   paymongoPaidAt: Date | null;
+  installmentMonths: number | null;
+  installmentMonthlyMinor: number | null;
   refundReason: string | null;
   refundRequestedAt: Date | null;
   refundProcessedAt: Date | null;
@@ -61,6 +63,8 @@ export class PrismaOrderRepository implements IOrderRepository {
           paymongoCheckoutUrl: order.paymongoCheckoutUrl,
           paymongoStatus: order.paymongoStatus,
           paymongoPaidAt: order.paymongoPaidAt,
+          installmentMonths: order.installmentMonths,
+          installmentMonthlyMinor: order.installmentMonthlyMinor,
           refundReason: order.refundReason,
           refundRequestedAt: order.refundRequestedAt,
           refundProcessedAt: order.refundProcessedAt,
@@ -247,6 +251,8 @@ export class PrismaOrderRepository implements IOrderRepository {
           paymongoCheckoutUrl: order.paymongoCheckoutUrl,
           paymongoStatus: order.paymongoStatus,
           paymongoPaidAt: order.paymongoPaidAt,
+          installmentMonths: order.installmentMonths,
+          installmentMonthlyMinor: order.installmentMonthlyMinor,
           refundReason: order.refundReason,
           refundRequestedAt: order.refundRequestedAt,
           refundProcessedAt: order.refundProcessedAt,
@@ -302,6 +308,8 @@ export class PrismaOrderRepository implements IOrderRepository {
       paymongoCheckoutUrl: row.paymongoCheckoutUrl,
       paymongoStatus: row.paymongoStatus,
       paymongoPaidAt: row.paymongoPaidAt,
+      installmentMonths: row.installmentMonths,
+      installmentMonthlyMinor: row.installmentMonthlyMinor,
       refundReason: row.refundReason,
       refundRequestedAt: row.refundRequestedAt,
       refundProcessedAt: row.refundProcessedAt,

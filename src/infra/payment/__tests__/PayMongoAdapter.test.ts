@@ -90,6 +90,65 @@ describe("PayMongoAdapter", () => {
       expect(result.value.expiresAt).toBeInstanceOf(Date);
     });
 
+    it("sends payment_method_options with installments enabled when requested (P0-01)", async () => {
+      mockResponse({
+        data: {
+          id: "cs_inst_1",
+          attributes: {
+            checkout_url: "https://checkout.paymongo.com/cs_inst_1",
+            created_at: 1752787200,
+            expires_at: 1752873600,
+          },
+        },
+      });
+
+      adapter = new PayMongoAdapter("sk_test_secret", "whsec_test");
+      const result = await adapter.createCheckoutSession({
+        courseId: "c1",
+        courseTitle: "Course",
+        amountMinor: 599900,
+        currency: "PHP",
+        successUrl: "https://ok.com/s",
+        failedUrl: "https://ok.com/f",
+        metadata: {},
+        installments: { terms: [6] },
+      });
+
+      expect(result.ok).toBe(true);
+      const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+      expect(body.data.attributes.payment_method_options).toEqual({
+        card: { installments: { enabled: true } },
+      });
+    });
+
+    it("omits payment_method_options for pay-in-full sessions (P0-01)", async () => {
+      mockResponse({
+        data: {
+          id: "cs_full_1",
+          attributes: {
+            checkout_url: "https://checkout.paymongo.com/cs_full_1",
+            created_at: 1752787200,
+            expires_at: 1752873600,
+          },
+        },
+      });
+
+      adapter = new PayMongoAdapter("sk_test_secret", "whsec_test");
+      const result = await adapter.createCheckoutSession({
+        courseId: "c1",
+        courseTitle: "Course",
+        amountMinor: 100000,
+        currency: "PHP",
+        successUrl: "https://ok.com/s",
+        failedUrl: "https://ok.com/f",
+        metadata: {},
+      });
+
+      expect(result.ok).toBe(true);
+      const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+      expect(body.data.attributes.payment_method_options).toBeUndefined();
+    });
+
     it("returns paymongo_error on API error response", async () => {
       mockResponse(
         {

@@ -215,4 +215,65 @@ describe("startCheckout (server action)", () => {
       courseSlug: "ppc-101",
     });
   });
+
+  // ── P0-01 installments ──────────────────────────────────────
+
+  it("passes a valid installment choice to the use case", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    mockCreatePaymentIntent.mockResolvedValueOnce({
+      ok: true,
+      checkoutUrl: "https://paymongo.com/cs_test",
+      orderId: "ord_1",
+      installmentMonths: 6,
+    });
+    const result = await startCheckout(
+      { kind: "idle" },
+      makeFormData({ courseSlug: "ppc-101", installmentMonths: "6" }),
+    );
+    expect(result.kind).toBe("redirect");
+    expect(mockCreatePaymentIntent).toHaveBeenCalledWith({
+      userId: "user-1",
+      courseSlug: "ppc-101",
+      installmentMonths: 6,
+    });
+  });
+
+  it("rejects a forged installment value without calling the use case", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    const result = await startCheckout(
+      { kind: "idle" },
+      makeFormData({ courseSlug: "ppc-101", installmentMonths: "24" }),
+    );
+    expect(result.kind).toBe("invalid_input");
+    expect(mockCreatePaymentIntent).not.toHaveBeenCalled();
+  });
+
+  it("maps installments_disabled to installments_unavailable", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    mockCreatePaymentIntent.mockResolvedValueOnce({
+      ok: false,
+      error: { kind: "installments_disabled" },
+    });
+    const result = await startCheckout(
+      { kind: "idle" },
+      makeFormData({ courseSlug: "ppc-101", installmentMonths: "6" }),
+    );
+    expect(result.kind).toBe("installments_unavailable");
+  });
+
+  it("maps installment_below_minimum to invalid_input with the floor", async () => {
+    mockGetSessionUserId.mockResolvedValueOnce("user-1");
+    mockCreatePaymentIntent.mockResolvedValueOnce({
+      ok: false,
+      error: { kind: "installment_below_minimum", totalMinor: 299900, minimumMinor: 300000 },
+    });
+    const result = await startCheckout(
+      { kind: "idle" },
+      makeFormData({ courseSlug: "ppc-101", installmentMonths: "3" }),
+    );
+    expect(result.kind).toBe("invalid_input");
+    if (result.kind === "invalid_input") {
+      expect(result.message).toMatch(/3,000/);
+    }
+  });
 });

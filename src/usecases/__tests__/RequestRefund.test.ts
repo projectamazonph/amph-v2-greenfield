@@ -20,6 +20,8 @@ function paidOrder(overrides: Partial<Parameters<typeof Order.hydrate>[0]> = {})
     paymongoCheckoutUrl: null,
     paymongoStatus: "paid",
     paymongoPaidAt: new Date("2026-08-05T00:00:00Z"),
+    installmentMonths: null,
+    installmentMonthlyMinor: null,
     refundReason: null,
     refundRequestedAt: null,
     refundProcessedAt: null,

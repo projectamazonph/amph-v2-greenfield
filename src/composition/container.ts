@@ -122,6 +122,11 @@ import { NodeCertificateHashGenerator } from "@/infra/security/NodeCertificateHa
 
 import type { CertificateRenderer } from "@/ports/rendering/CertificateRenderer";
 import { ReactPdfCertificateRenderer } from "@/infra/pdf/ReactPdfCertificateRenderer";
+// P0-02 (P4 PR-B): BIR invoicing
+import type { IInvoiceRepository } from "@/ports/repositories/IInvoiceRepository";
+import { PrismaInvoiceRepository } from "@/infra/repositories/PrismaInvoiceRepository";
+import type { InvoiceRenderer } from "@/ports/rendering/InvoiceRenderer";
+import { ReactPdfInvoiceRenderer } from "@/infra/pdf/ReactPdfInvoiceRenderer";
 
 // STORY-012: MDX content renderer port + adapter
 import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
@@ -207,6 +212,7 @@ import { AwardBadge } from "@/usecases/AwardBadge";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 import { ListUserBadges } from "@/usecases/ListUserBadges";
 import { IssueCertificate } from "@/usecases/IssueCertificate";
+import { IssueInvoice } from "@/usecases/IssueInvoice";
 import { RenderCertificatePdf } from "@/usecases/RenderCertificatePdf";
 import { VerifyCertificate } from "@/usecases/VerifyCertificate";
 import { RevokeCertificate } from "@/usecases/RevokeCertificate";
@@ -377,6 +383,10 @@ export interface AppContainer {
   emailTemplateRepo: IEmailTemplateRepository;
   // P1-08 (P4 PR-A): maintenance mode / kill switch
   maintenanceRepo: IMaintenanceSettingRepository;
+  // P4 PR-B: feature flags (INSTALLMENTS_ENABLED, INVOICING_ENABLED).
+  // Read once from env per container build; pages, routes, and use
+  // cases observe the same value.
+  flags: { installmentsEnabled: boolean; invoicingEnabled: boolean };
   listEmailTemplates: ListEmailTemplates;
   getEmailTemplate: GetEmailTemplate;
   updateEmailTemplate: UpdateEmailTemplate;
@@ -443,6 +453,10 @@ export interface AppContainer {
   renderCertificatePdf: RenderCertificatePdf;
   verifyCertificate: VerifyCertificate;
   revokeCertificate: RevokeCertificate;
+  // P0-02 (P4 PR-B): BIR invoicing
+  invoiceRepo: IInvoiceRepository;
+  invoiceRenderer: InvoiceRenderer;
+  issueInvoice: IssueInvoice;
   // STORY-092 (US-008): admin certificate list + detail
   adminListCertificates: AdminListCertificates;
   adminGetCertificate: AdminGetCertificate;
@@ -657,17 +671,29 @@ function buildProductionContainer(): AppContainer {
   // STORY-095: admin email template editor
   const emailTemplateRepo: IEmailTemplateRepository = new PrismaEmailTemplateRepository(prisma);
   // P1-08 (P4 PR-A): maintenance mode / kill switch
-  const maintenanceRepo: IMaintenanceSettingRepository = new PrismaMaintenanceSettingRepository(prisma);
+  const maintenanceRepo: IMaintenanceSettingRepository = new PrismaMaintenanceSettingRepository(
+    prisma,
+  );
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
     process.env.PAYMONGO_WEBHOOK_SECRET,
   );
 
+  // P4 PR-B: feature flags. Both default off. Read once here so every
+  // consumer (use cases, routes, pages) observes the same value within
+  // a single container build.
+  const installmentsEnabled = process.env.INSTALLMENTS_ENABLED === "true";
+  const invoicingEnabled = process.env.INVOICING_ENABLED === "true";
+  const flags = { installmentsEnabled, invoicingEnabled };
+
   const baseUrl = buildAppUrl("").replace(/\/$/, "");
   const accessPolicy: IAccessPolicy = new TierAccessPolicy(userRepo, courseRepo, enrollmentRepo);
   const certificateHashGen: CertificateHashGenerator = new NodeCertificateHashGenerator();
   const certificateRenderer: CertificateRenderer = new ReactPdfCertificateRenderer();
+  // P0-02 (P4 PR-B): BIR invoicing
+  const invoiceRepo: IInvoiceRepository = new PrismaInvoiceRepository(prisma);
+  const invoiceRenderer: InvoiceRenderer = new ReactPdfInvoiceRenderer();
   // STORY-012: bounded LRU cache (default 500 entries). Each entry
   // is a React element + frontmatter + HTML; 500 is a generous
   // upper bound for the AMPH catalog (9 modules * ~5 lessons = 45
@@ -742,6 +768,7 @@ function buildProductionContainer(): AppContainer {
     idGen,
     databaseHealthCheck,
     logger,
+    flags,
     userRepo,
     sessionRepo,
     userStreakRepo,
@@ -766,6 +793,7 @@ function buildProductionContainer(): AppContainer {
       orderRepo,
       paymentGateway,
       baseUrl,
+      installmentsEnabled,
     }),
     getCheckoutSummary: new GetCheckoutSummary({ courseRepo, pricingTierRepo }),
     checkCourseAccess: new CheckCourseAccess(accessPolicy),
@@ -888,6 +916,20 @@ function buildProductionContainer(): AppContainer {
       userRepo,
       courseRepo,
       renderer: certificateRenderer,
+    }),
+    // P0-02 (P4 PR-B): BIR invoicing, gated by INVOICING_ENABLED
+    invoiceRepo,
+    invoiceRenderer,
+    issueInvoice: new IssueInvoice({
+      orderRepo,
+      userRepo,
+      courseRepo,
+      invoiceRepo,
+      renderer: invoiceRenderer,
+      fileStorage,
+      idGen,
+      clock,
+      invoicingEnabled,
     }),
     verifyCertificate: new VerifyCertificate({
       certificateRepo,

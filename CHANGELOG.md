@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### P4 PR-B: PayMongo installments + BIR invoicing behind flags (PR #487)
+
+Tracks #486, follows #403 (PR-A merged as #485). P0-01: 3/6/12-month card installments with a PHP 3,000 floor, validated in domain (`InstallmentPlan`), enabled on the PayMongo hosted page via `payment_method_options`, persisted on the order, and offered in checkout only when `INSTALLMENTS_ENABLED` is on. P0-02: BIR sales invoices (`INV-YYYY-NNNNN`) issued idempotently for paid orders with PDF render + file storage, auto-issued best-effort by the PayMongo webhook when `INVOICING_ENABLED` is on. Tax stays 0 until finance confirms VAT treatment; buyer address defaults to null until the profile story lands. No admin UI in this slice (PR-C scope). Full scope in `docs/stories/P4-PR-B.md`.
+
 ### 2026-09-07: E2E admin-login TOTP fix, journey 3 root cause (PR #482)
 
 Journey 3 (admin login and create discount code) failed deterministically in CI at the discount-code form fill, and serial mode then skipped journeys 4 through 6 (the 9 did-not-run). Root cause, in three parts. First, `seedAdminUser` set `twoFactorEnabled=true` with no stored secret, so `Login` returned `totp_required` and created no session; the earlier PR #466 diagnosis of a `requireAdmin` redirect was wrong, the bounce came from the proxy on a missing session. Second, the journey asserted `toHaveURL(/\/admin/)`, which matches the `/admin-login` substring, so the failed login passed spuriously and the failure surfaced 30s later as a missing-form timeout. Third, serial mode skips everything after a failure in the file.

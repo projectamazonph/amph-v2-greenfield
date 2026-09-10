@@ -386,6 +386,12 @@ model Order {
   paymongoStatus      String? // pending | paid | failed | expired | refunded | partially_refunded
   paymongoPaidAt      DateTime?
 
+  // P0-01 (P4 PR-B): card-installment plan chosen at checkout.
+  // Null means pay in full. Tenure is validated in domain
+  // (InstallmentPlan: 3/6/12 months, PHP 3,000 floor).
+  installmentMonths      Int?
+  installmentMonthlyMinor Int?
+
   // Manual override (e.g. affiliate free enrollment)
   manuallySetBy     String?
   manuallySetReason String?
@@ -1065,13 +1071,16 @@ model Invoice {
 
   // BIR-registered taxpayer snapshot — captured at issuance time
   // so later edits to the buyer's profile don't rewrite the receipt.
+  // P0-02 (P4 PR-B): address capture is a follow-up profile story, so
+  // the address columns are nullable. Webhook-issued invoices carry a
+  // null snapshot and are keyed by userId/orderId instead.
   birTin       String?
   businessName String?
-  addressLine1 String
+  addressLine1 String?
   addressLine2 String?
-  city         String
-  province     String
-  postalCode   String
+  city         String?
+  province     String?
+  postalCode   String?
 
   // Money (always minor units)
   subtotalMinor Int

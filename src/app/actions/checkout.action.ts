@@ -39,6 +39,7 @@ export type CheckoutActionState =
   | { kind: "pricing_tier_not_found" }
   | { kind: "pricing_tier_unavailable" }
   | { kind: "already_enrolled" }
+  | { kind: "installments_unavailable" }
   | { kind: "payment_error"; message: string }
   | { kind: "rate_limited"; retryAfterSeconds: number }
   | { kind: "rate_limiter_unavailable" }
@@ -57,6 +58,7 @@ export async function startCheckout(
 ): Promise<CheckoutActionState> {
   const slug = String(formData.get("courseSlug") ?? "").trim();
   const pricingTierSlug = String(formData.get("pricingTierSlug") ?? "").trim();
+  const rawMonths = String(formData.get("installmentMonths") ?? "").trim();
   const validSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   if (
     (!slug && !pricingTierSlug) ||
@@ -64,6 +66,15 @@ export async function startCheckout(
     (pricingTierSlug && !validSlug.test(pricingTierSlug))
   ) {
     return { kind: "invalid_input", message: "Missing course" };
+  }
+  // P0-01: the select only offers 3/6/12, but the client is never
+  // trusted — anything else is rejected here before the use case.
+  let installmentMonths: number | undefined;
+  if (rawMonths) {
+    if (!/^(3|6|12)$/.test(rawMonths)) {
+      return { kind: "invalid_input", message: "Invalid installment choice" };
+    }
+    installmentMonths = Number(rawMonths);
   }
 
   // Fail fast: not signed in → return unauthorized state. The page
@@ -93,6 +104,7 @@ export async function startCheckout(
   const result = await container.createPaymentIntent.execute({
     userId,
     ...(pricingTierSlug ? { pricingTierSlug } : { courseSlug: slug }),
+    ...(installmentMonths !== undefined ? { installmentMonths } : {}),
   });
 
   if (result.ok) {
@@ -118,6 +130,15 @@ function mapPaymentError(err: CreatePaymentIntentError): CheckoutActionState {
       return { kind: "pricing_tier_unavailable" };
     case "already_enrolled":
       return { kind: "already_enrolled" };
+    case "installments_disabled":
+      return { kind: "installments_unavailable" };
+    case "invalid_installment_term":
+      return { kind: "invalid_input", message: "That installment plan is not available." };
+    case "installment_below_minimum":
+      return {
+        kind: "invalid_input",
+        message: `Card installments need a total of at least ₱${(err.minimumMinor / 100).toLocaleString("en-PH")}.`,
+      };
     case "payment_error":
       return { kind: "payment_error", message: err.message };
     default:

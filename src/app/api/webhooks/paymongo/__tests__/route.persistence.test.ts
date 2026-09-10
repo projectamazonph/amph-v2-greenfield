@@ -14,9 +14,11 @@ import { Order } from "@/domain/entities/Order";
 import { Result } from "@/domain/shared/Result";
 
 let signatureShouldFail = false;
+let invoicingEnabled = false;
 let webhookEventLog: InMemoryWebhookEventLog;
 let orderRepo: InMemoryOrderRepository;
 let enrollStudentExecute: ReturnType<typeof vi.fn>;
+let issueInvoiceExecute: ReturnType<typeof vi.fn>;
 
 function seedPendingOrder(paymongoPaymentId: string) {
   const order = Order.create({
@@ -47,6 +49,8 @@ vi.mock("@/composition/container", () => ({
     orderRepo,
     webhookEventLog,
     enrollStudent: { execute: enrollStudentExecute },
+    flags: { installmentsEnabled: false, invoicingEnabled },
+    issueInvoice: { execute: issueInvoiceExecute },
   }),
 }));
 
@@ -63,9 +67,11 @@ function makeRequest(body: string, signature = "t=1,v1=valid"): Request {
 describe("POST /api/webhooks/paymongo — persistence", () => {
   beforeEach(() => {
     signatureShouldFail = false;
+    invoicingEnabled = false;
     webhookEventLog = new InMemoryWebhookEventLog();
     orderRepo = new InMemoryOrderRepository();
     enrollStudentExecute = vi.fn(async () => Result.ok(undefined));
+    issueInvoiceExecute = vi.fn(async () => Result.ok({ ok: true }));
   });
 
   it("persists a record with signatureValid=false and processingError=invalid_signature on bad signature", async () => {
@@ -170,5 +176,44 @@ describe("POST /api/webhooks/paymongo — persistence", () => {
     const entries = webhookEventLog.getAll();
     expect(entries[0]?.eventType).toBe("payment.paid");
     expect(entries[0]?.processingError).toBeNull();
+  });
+
+  // ── P0-02 invoice auto-issue ──────────────────────────────
+
+  it("skips invoice issuance when the invoicing flag is off", async () => {
+    seedPendingOrder("cs_noinv");
+    const res = await POST(
+      makeRequest('{"type":"checkout_session.completed","data":{"id":"cs_noinv"}}') as never,
+    );
+
+    expect(res.status).toBe(200);
+    expect(issueInvoiceExecute).not.toHaveBeenCalled();
+    expect(webhookEventLog.getAll()[0]?.processingError).toBeNull();
+  });
+
+  it("issues the invoice when the invoicing flag is on", async () => {
+    invoicingEnabled = true;
+    seedPendingOrder("cs_inv");
+    const res = await POST(
+      makeRequest('{"type":"checkout_session.completed","data":{"id":"cs_inv"}}') as never,
+    );
+
+    expect(res.status).toBe(200);
+    expect(issueInvoiceExecute).toHaveBeenCalledWith({ orderId: "order_01" });
+    expect(webhookEventLog.getAll()[0]?.processingError).toBeNull();
+  });
+
+  it("records invoice failures on the event log without failing the webhook", async () => {
+    invoicingEnabled = true;
+    issueInvoiceExecute.mockResolvedValueOnce(
+      Result.err({ kind: "render_error", message: "font missing" }),
+    );
+    seedPendingOrder("cs_invfail");
+    const res = await POST(
+      makeRequest('{"type":"checkout_session.completed","data":{"id":"cs_invfail"}}') as never,
+    );
+
+    expect(res.status).toBe(200);
+    expect(webhookEventLog.getAll()[0]?.processingError).toMatch(/invoice_failed/);
   });
 });
