@@ -79,7 +79,12 @@ describe("InMemoryInvoiceRepository", () => {
       makeInvoice({ id: "inv_2", orderId: "ord_2", invoiceNumber: "INV-2026-00001" }),
     );
     expect(duplicate.ok).toBe(false);
-    if (!duplicate.ok) expect(duplicate.error.message).toMatch(/invoiceNumber/);
+    if (!duplicate.ok) {
+      expect(duplicate.error.kind).toBe("db_error");
+      if (duplicate.error.kind === "db_error") {
+        expect(duplicate.error.message).toMatch(/invoiceNumber/);
+      }
+    }
   });
 
   it("finds the invoice for an order", async () => {
