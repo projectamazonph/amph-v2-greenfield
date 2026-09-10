@@ -75,6 +75,7 @@ import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTempla
 import type { IUserStreakRepository } from "@/ports/repositories/IUserStreakRepository";
 import type { IResourceRepository } from "@/ports/repositories/IResourceRepository";
 import type { IFileStorage } from "@/ports/storage/IFileStorage";
+import type { IMaintenanceSettingRepository } from "@/ports/repositories/IMaintenanceSettingRepository";
 
 // ΓöÇΓöÇ Production adapters (only the prod ones) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
@@ -107,6 +108,7 @@ import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingT
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { PrismaUserStreakRepository } from "@/infra/repositories/PrismaUserStreakRepository";
 import { PrismaResourceRepository } from "@/infra/repositories/PrismaResourceRepository";
+import { PrismaMaintenanceSettingRepository } from "@/infra/repositories/PrismaMaintenanceSettingRepository";
 import { VercelBlobFileStorage } from "@/infra/storage/VercelBlobFileStorage";
 import { LocalFileStorage } from "@/infra/storage/LocalFileStorage";
 import { prisma } from "@/infra/database/prisma";
@@ -295,6 +297,21 @@ import { RecordResourceDownload } from "@/usecases/RecordResourceDownload";
 import { UploadFile } from "@/usecases/UploadFile";
 import { DeleteFile } from "@/usecases/DeleteFile";
 import { PurgeResource } from "@/usecases/PurgeResource";
+import { AdminToggleMaintenance } from "@/usecases/AdminToggleMaintenance";
+import type { IAnnouncementRepository } from "@/ports/repositories/IAnnouncementRepository";
+import type { IAnnouncementDismissalRepository } from "@/ports/repositories/IAnnouncementDismissalRepository";
+import type { IAnnouncementOptOutRepository } from "@/ports/repositories/IAnnouncementOptOutRepository";
+import { PrismaAnnouncementRepository } from "@/infra/repositories/PrismaAnnouncementRepository";
+import { PrismaAnnouncementDismissalRepository } from "@/infra/repositories/PrismaAnnouncementDismissalRepository";
+import { PrismaAnnouncementOptOutRepository } from "@/infra/repositories/PrismaAnnouncementOptOutRepository";
+import { AdminCreateAnnouncement } from "@/usecases/AdminCreateAnnouncement";
+import { AdminUpdateAnnouncement } from "@/usecases/AdminUpdateAnnouncement";
+import { AdminSetAnnouncementActive } from "@/usecases/AdminSetAnnouncementActive";
+import { GetActiveAnnouncementsForUser } from "@/usecases/GetActiveAnnouncementsForUser";
+import { DismissAnnouncement } from "@/usecases/DismissAnnouncement";
+import { SetAnnouncementOptOut } from "@/usecases/SetAnnouncementOptOut";
+
+import { GetMaintenanceStatus } from "@/usecases/GetMaintenanceStatus";
 import type { SentReminderRepository } from "@/ports/repositories/SentReminderRepository";
 
 import type { IAccessPolicy } from "@/ports/access/IAccessPolicy";
@@ -358,6 +375,8 @@ export interface AppContainer {
   keywordDatasetRepo: KeywordDatasetRepository;
   // STORY-095: admin email template editor
   emailTemplateRepo: IEmailTemplateRepository;
+  // P1-08 (P4 PR-A): maintenance mode / kill switch
+  maintenanceRepo: IMaintenanceSettingRepository;
   listEmailTemplates: ListEmailTemplates;
   getEmailTemplate: GetEmailTemplate;
   updateEmailTemplate: UpdateEmailTemplate;
@@ -529,6 +548,20 @@ export interface AppContainer {
   purgeResource: PurgeResource;
   uploadFile: UploadFile;
   deleteFile: DeleteFile;
+  // P1-08 (P4 PR-A): maintenance mode / kill switch
+  adminToggleMaintenance: AdminToggleMaintenance;
+  // P1-07 (P4 PR-A): site-wide announcement banners
+  announcementRepo: IAnnouncementRepository;
+  announcementDismissalRepo: IAnnouncementDismissalRepository;
+  announcementOptOutRepo: IAnnouncementOptOutRepository;
+  adminCreateAnnouncement: AdminCreateAnnouncement;
+  adminUpdateAnnouncement: AdminUpdateAnnouncement;
+  adminSetAnnouncementActive: AdminSetAnnouncementActive;
+  getActiveAnnouncementsForUser: GetActiveAnnouncementsForUser;
+  dismissAnnouncement: DismissAnnouncement;
+  setAnnouncementOptOut: SetAnnouncementOptOut;
+
+  getMaintenanceStatus: GetMaintenanceStatus;
 }
 
 // ΓöÇΓöÇ Production container builder ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -623,6 +656,8 @@ function buildProductionContainer(): AppContainer {
   const keywordDatasetRepo: KeywordDatasetRepository = new StaticKeywordDatasetRepository();
   // STORY-095: admin email template editor
   const emailTemplateRepo: IEmailTemplateRepository = new PrismaEmailTemplateRepository(prisma);
+  // P1-08 (P4 PR-A): maintenance mode / kill switch
+  const maintenanceRepo: IMaintenanceSettingRepository = new PrismaMaintenanceSettingRepository(prisma);
 
   const paymentGateway: IPaymentGateway = new PayMongoAdapter(
     process.env.PAYMONGO_SECRET ?? "",
@@ -770,6 +805,8 @@ function buildProductionContainer(): AppContainer {
     adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
     adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
     emailTemplateRepo,
+    // P1-08 (P4 PR-A): maintenance mode / kill switch
+    maintenanceRepo,
     listEmailTemplates: new ListEmailTemplates({ emailTemplateRepo }),
     getEmailTemplate: new GetEmailTemplate({ emailTemplateRepo }),
     updateEmailTemplate: new UpdateEmailTemplate({
@@ -1156,6 +1193,40 @@ function buildProductionContainer(): AppContainer {
     purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog, logger }),
     uploadFile: new UploadFile({ fileStorage }),
     deleteFile: new DeleteFile({ fileStorage }),
+    // P1-08 (P4 PR-A): maintenance mode / kill switch
+    adminToggleMaintenance: new AdminToggleMaintenance({ maintenanceRepo, recordAuditLog, clock }),
+    // P1-07 (P4 PR-A): announcement banners
+    announcementRepo: new PrismaAnnouncementRepository(prisma),
+    announcementDismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),
+    announcementOptOutRepo: new PrismaAnnouncementOptOutRepository(prisma),
+    adminCreateAnnouncement: new AdminCreateAnnouncement({
+      announcementRepo: new PrismaAnnouncementRepository(prisma),
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    adminUpdateAnnouncement: new AdminUpdateAnnouncement({
+      announcementRepo: new PrismaAnnouncementRepository(prisma),
+      recordAuditLog,
+    }),
+    adminSetAnnouncementActive: new AdminSetAnnouncementActive({
+      announcementRepo: new PrismaAnnouncementRepository(prisma),
+      recordAuditLog,
+    }),
+    getActiveAnnouncementsForUser: new GetActiveAnnouncementsForUser({
+      announcementRepo: new PrismaAnnouncementRepository(prisma),
+      dismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),
+      optOutRepo: new PrismaAnnouncementOptOutRepository(prisma),
+      clock,
+    }),
+    dismissAnnouncement: new DismissAnnouncement({
+      dismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),
+    }),
+    setAnnouncementOptOut: new SetAnnouncementOptOut({
+      optOutRepo: new PrismaAnnouncementOptOutRepository(prisma),
+    }),
+
+    getMaintenanceStatus: new GetMaintenanceStatus({ maintenanceRepo }),
   };
 }
 

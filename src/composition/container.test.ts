@@ -65,6 +65,10 @@ import { InMemoryXPAwardRepository } from "@/infra/repositories/InMemoryXPAwardR
 import { InMemoryBadgeRepository } from "@/infra/repositories/InMemoryBadgeRepository";
 import { InMemoryBadgeAwardRepository } from "@/infra/repositories/InMemoryBadgeAwardRepository";
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
+import { InMemoryMaintenanceSettingRepository } from "@/infra/repositories/inmemory/InMemoryMaintenanceSettingRepository";
+import { InMemoryAnnouncementRepository } from "@/infra/repositories/inmemory/InMemoryAnnouncementRepository";
+import { InMemoryAnnouncementDismissalRepository } from "@/infra/repositories/inmemory/InMemoryAnnouncementDismissalRepository";
+import { InMemoryAnnouncementOptOutRepository } from "@/infra/repositories/inmemory/InMemoryAnnouncementOptOutRepository";
 import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCertificateRepository";
 import { InMemoryProgressEventRepository } from "@/infra/repositories/InMemoryProgressEventRepository";
 import { InMemoryUserStreakRepository } from "@/infra/repositories/InMemoryUserStreakRepository";
@@ -159,6 +163,8 @@ import { ListRefundRequests } from "@/usecases/ListRefundRequests";
 import { AdminProcessRefund } from "@/usecases/AdminProcessRefund";
 import { RequestRefund } from "@/usecases/RequestRefund";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
+import { AdminToggleMaintenance } from "@/usecases/AdminToggleMaintenance";
+import { GetMaintenanceStatus } from "@/usecases/GetMaintenanceStatus";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 import { ListAuditLogs } from "@/usecases/ListAuditLogs";
 import { ExportAuditLogs } from "@/usecases/ExportAuditLogs";
@@ -181,6 +187,12 @@ import { AdminListQuizzes } from "@/usecases/AdminListQuizzes";
 import { AdminGetQuiz } from "@/usecases/AdminGetQuiz";
 import { AdminCreateQuiz } from "@/usecases/AdminCreateQuiz";
 import { AdminUpdateQuiz } from "@/usecases/AdminUpdateQuiz";
+import { AdminCreateAnnouncement } from "@/usecases/AdminCreateAnnouncement";
+import { AdminUpdateAnnouncement } from "@/usecases/AdminUpdateAnnouncement";
+import { AdminSetAnnouncementActive } from "@/usecases/AdminSetAnnouncementActive";
+import { GetActiveAnnouncementsForUser } from "@/usecases/GetActiveAnnouncementsForUser";
+import { DismissAnnouncement } from "@/usecases/DismissAnnouncement";
+import { SetAnnouncementOptOut } from "@/usecases/SetAnnouncementOptOut";
 import { AdminDeleteQuiz } from "@/usecases/AdminDeleteQuiz";
 import { AdminListScenarios } from "@/usecases/AdminListScenarios";
 import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
@@ -250,6 +262,7 @@ export interface TestContainer extends AppContainer {
   badgeRepo: InMemoryBadgeRepository;
   badgeAwardRepo: InMemoryBadgeAwardRepository;
   emailTemplateRepo: InMemoryEmailTemplateRepository;
+  maintenanceRepo: InMemoryMaintenanceSettingRepository;
   certificateRepo: InMemoryCertificateRepository;
   progressEventRepo: InMemoryProgressEventRepository;
   certificateRenderer: StaticCertificateRenderer;
@@ -303,6 +316,7 @@ export function buildTestContainer(): TestContainer {
   const badgeRepo = new InMemoryBadgeRepository();
   const badgeAwardRepo = new InMemoryBadgeAwardRepository();
   const emailTemplateRepo = new InMemoryEmailTemplateRepository();
+  const maintenanceRepo = new InMemoryMaintenanceSettingRepository();
   const certificateRepo = new InMemoryCertificateRepository();
   const progressEventRepo = new InMemoryProgressEventRepository();
   const userStreakRepo = new InMemoryUserStreakRepository();
@@ -667,6 +681,7 @@ export function buildTestContainer(): TestContainer {
     adminUpdateBadge: new AdminUpdateBadge({ badgeRepo, recordAuditLog }),
     adminArchiveBadge: new AdminArchiveBadge({ badgeRepo, recordAuditLog }),
     emailTemplateRepo,
+    maintenanceRepo,
     listEmailTemplates: new ListEmailTemplates({ emailTemplateRepo }),
     getEmailTemplate: new GetEmailTemplate({ emailTemplateRepo }),
     updateEmailTemplate: new UpdateEmailTemplate({
@@ -866,5 +881,38 @@ export function buildTestContainer(): TestContainer {
     purgeResource: new PurgeResource({ resourceRepo, fileStorage, recordAuditLog, logger }),
     uploadFile: new UploadFile({ fileStorage }),
     deleteFile: new DeleteFile({ fileStorage }),
+    adminToggleMaintenance: new AdminToggleMaintenance({ maintenanceRepo, recordAuditLog, clock }),
+    // P1-07 (P4 PR-A): announcement banners (in-memory)
+    announcementRepo: new InMemoryAnnouncementRepository(),
+    announcementDismissalRepo: new InMemoryAnnouncementDismissalRepository(),
+    announcementOptOutRepo: new InMemoryAnnouncementOptOutRepository(),
+    adminCreateAnnouncement: new AdminCreateAnnouncement({
+      announcementRepo: new InMemoryAnnouncementRepository(),
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    adminUpdateAnnouncement: new AdminUpdateAnnouncement({
+      announcementRepo: new InMemoryAnnouncementRepository(),
+      recordAuditLog,
+    }),
+    adminSetAnnouncementActive: new AdminSetAnnouncementActive({
+      announcementRepo: new InMemoryAnnouncementRepository(),
+      recordAuditLog,
+    }),
+    getActiveAnnouncementsForUser: new GetActiveAnnouncementsForUser({
+      announcementRepo: new InMemoryAnnouncementRepository(),
+      dismissalRepo: new InMemoryAnnouncementDismissalRepository(),
+      optOutRepo: new InMemoryAnnouncementOptOutRepository(),
+      clock,
+    }),
+    dismissAnnouncement: new DismissAnnouncement({
+      dismissalRepo: new InMemoryAnnouncementDismissalRepository(),
+    }),
+    setAnnouncementOptOut: new SetAnnouncementOptOut({
+      optOutRepo: new InMemoryAnnouncementOptOutRepository(),
+    }),
+
+    getMaintenanceStatus: new GetMaintenanceStatus({ maintenanceRepo }),
   };
 }

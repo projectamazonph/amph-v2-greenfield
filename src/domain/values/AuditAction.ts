@@ -98,7 +98,14 @@ export type AuditAction =
   | "resource.delete_failed"
   | "resource.downloaded"
   | "resource.purged"
-  | "resource.purge_failed";
+  | "resource.purge_failed"
+  // P1-08 (P4 PR-A): admin toggles the maintenance-mode kill switch
+  | "maintenance.toggled"
+| "announcement.created"
+| "announcement.create_failed"
+| "announcement.updated"
+| "announcement.update_failed"
+| "announcement.toggled";
 
 /**
  * STORY-061. All valid AuditAction values as an array.
@@ -185,6 +192,8 @@ export const ALL_ACTIONS: AuditAction[] = [
   "resource.downloaded",
   "resource.purged",
   "resource.purge_failed",
+  // P1-08 (P4 PR-A): admin toggles the maintenance-mode kill switch
+  "maintenance.toggled",
 ];
 
 /**

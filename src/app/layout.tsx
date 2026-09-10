@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Barlow_Condensed, IBM_Plex_Mono, PT_Sans } from "next/font/google";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
+import { SiteAnnouncementBanner } from "@/components/announcements/SiteAnnouncementBanner";
 import { WebVitalsReporter } from "./WebVitalsReporter";
 import { Providers } from "./providers";
 import { buildAppUrl } from "@/domain/shared/AppUrl";
@@ -77,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
+        <SiteAnnouncementBanner />
         <ImpersonationBanner />
         <WebVitalsReporter />
         <Providers>{children}</Providers>

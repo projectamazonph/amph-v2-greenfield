@@ -1,0 +1,57 @@
+/* /maintenance — 503 page styles. Server-rendered only, no JS. */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: var(--surface-1, #f6f7f9);
+}
+
+.card {
+  max-width: 32rem;
+  background: #ffffff;
+  border: 1px solid var(--border, #e3e6ec);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.kicker {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-cond, "Barlow Condensed", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--warning, #b45309);
+}
+
+.heading {
+  margin: 0 0 1rem;
+  font-family: var(--font-display, "Archivo", sans-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ink-900, #0f172a);
+}
+
+.body {
+  margin: 0 0 1rem;
+  font-family: var(--font-body, "PT Sans", sans-serif);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink-900, #1f2937);
+}
+
+.link {
+  color: var(--accent, #f08c1f);
+  text-decoration: underline;
+}
+
+.signoff {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-body, "PT Sans", sans-serif);
+  font-size: 0.95rem;
+  color: var(--ink-900, #1f2937);
+}

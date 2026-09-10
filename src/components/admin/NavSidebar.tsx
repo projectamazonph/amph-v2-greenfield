@@ -17,6 +17,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Megaphone,
   SquaresFour,
   Users,
   BookOpen,
@@ -72,6 +73,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/admin/quizzes", label: "Quizzes", icon: Question },
       { href: "/admin/badges", label: "Badges", icon: Star },
       { href: "/admin/email-templates", label: "Email templates", icon: Envelope },
+      { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
       { href: "/admin/resources", label: "Download center", icon: DownloadSimple },
     ],
   },
