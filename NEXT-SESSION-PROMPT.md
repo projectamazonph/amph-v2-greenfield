@@ -7,7 +7,7 @@ Repository: https://github.com/projectamazonph/amph-v2-greenfield
 Branch policy: branch from main, PR to main, squash merge, auto-delete source branch
 Production: https://projectamazonph.vercel.app
 Retired origin: https://amph-v2-greenfield.vercel.app
-Main reviewed: 89909c7 (2026-09-01)
+Main reviewed: cd41fad (2026-09-11)
 
 Read first:
 1. AGENTS.md
@@ -18,6 +18,8 @@ Read first:
 6. SESSION-HANDOVER.md
 
 Latest repairs:
+- PR #487: P4 PR-B, PayMongo installments (P0-01) + BIR invoicing (P0-02) behind flags. Closes #486, follows #403 PR-A #485. No admin UI in this slice (PR-C scope)
+- PR #485: P4 PR-A, schema (W0-01) + maintenance mode (P1-08) + announcements (P1-07). Closes #403
 - PR #466: repair deployment broken by #453 throw-elimination conversion. Restores 5 tools/* simulator pages (corrupted during the editor rewrite), fixes malformed fallback blocks in 4 page.tsx files, wires `logger` into 7 use cases that added the dep, replaces broken `as unknown as` error casts with direct `Result.err(originalError)`, adds `notFound` import to quiz page, null-checks `Resource` in `UpdateResource`, wires `logger` into 50 test files (new `SilentLogger.ts` port adapter), replaces `console.error` spy with `TestLogger` entry assertion in `RecordAuditLog.test.ts`, switches dashboard's "throw on repo error" pin to a "graceful empty list" pin, fixes `card-no-event-handler-props` programmatic tsc spawn (was swallowing stderr on Windows via `npx tsc`), enables `twoFactorEnabled` on E2E-seeded admin so the pre-existing journey 3 reaches the discount-codes form
 - PR #427: LEARN-025 Module 4 campaign pre-flight maps (STORY-127). Re-cuts the closed PR #395 work with PHP-aligned rationale examples that match the post-PR-417 currency state
 - PR #426: doc-staleness sweep to refresh last-verified metadata to 8988ac1
