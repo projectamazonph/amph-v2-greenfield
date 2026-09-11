@@ -140,6 +140,12 @@ import { SubmitAssignment } from "@/usecases/SubmitAssignment";
 import { GradeAssignment } from "@/usecases/GradeAssignment";
 import { ListStudentAssignments } from "@/usecases/ListStudentAssignments";
 import { AdminListAssignments } from "@/usecases/AdminListAssignments";
+// P1-05 (PR-C slice 3): site settings
+import type { ISettingRepository } from "@/ports/repositories/ISettingRepository";
+import { PrismaSettingRepository } from "@/infra/repositories/PrismaSettingRepository";
+import { GetSetting } from "@/usecases/GetSetting";
+import { SetSetting } from "@/usecases/SetSetting";
+import { ListSettings } from "@/usecases/ListSettings";
 
 // STORY-012: MDX content renderer port + adapter
 import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
@@ -481,6 +487,11 @@ export interface AppContainer {
   gradeAssignment: GradeAssignment;
   listStudentAssignments: ListStudentAssignments;
   adminListAssignments: AdminListAssignments;
+  // P1-05 (PR-C slice 3): site settings
+  settingRepo: ISettingRepository;
+  getSetting: GetSetting;
+  setSetting: SetSetting;
+  listSettings: ListSettings;
   // STORY-092 (US-008): admin certificate list + detail
   adminListCertificates: AdminListCertificates;
   adminGetCertificate: AdminGetCertificate;
@@ -722,6 +733,8 @@ function buildProductionContainer(): AppContainer {
   const prerequisiteRepo: IPrerequisiteRepository = new PrismaPrerequisiteRepository(prisma);
   // P1-02 (PR-C slice 2): assignments
   const assignmentRepo: IAssignmentRepository = new PrismaAssignmentRepository(prisma);
+  // P1-05 (PR-C slice 3): site settings
+  const settingRepo: ISettingRepository = new PrismaSettingRepository(prisma);
   // STORY-012: bounded LRU cache (default 500 entries). Each entry
   // is a React element + frontmatter + HTML; 500 is a generous
   // upper bound for the AMPH catalog (9 modules * ~5 lessons = 45
@@ -1294,6 +1307,11 @@ function buildProductionContainer(): AppContainer {
     gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
     listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
     adminListAssignments: new AdminListAssignments({ assignmentRepo }),
+    // P1-05 (PR-C slice 3): site settings
+    settingRepo,
+    getSetting: new GetSetting({ settingRepo }),
+    setSetting: new SetSetting({ settingRepo, clock, recordAuditLog }),
+    listSettings: new ListSettings({ settingRepo }),
     // P1-07 (P4 PR-A): announcement banners
     announcementRepo: new PrismaAnnouncementRepository(prisma),
     announcementDismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),

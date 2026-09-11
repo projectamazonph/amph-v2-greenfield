@@ -2,17 +2,18 @@
  * /maintenance — P1-08 (P4 PR-A) static 503 page.
  *
  * Served by the proxy (`src/proxy.ts`) whenever the kill switch
- * is engaged. Plain HTML so the page works without the DB, the
- * admin session, or any framework state.
+ * is engaged. The support email reads from the site settings
+ * (P1-05) best-effort with a hardcoded fallback, so the page keeps
+ * working without the DB, the admin session, or any framework state.
  *
  * The page is a server component because that's the cheapest
  * path in the Next App Router — it runs through the same RSC
- * pipeline as every other page, but it does no data fetching.
- * The proxy's `NextResponse.rewrite` to this URL preserves the
- * 503 status code, so crawlers and clients see the correct
- * response code.
+ * pipeline as every other page. The proxy's `NextResponse.rewrite`
+ * to this URL preserves the 503 status code, so crawlers and
+ * clients see the correct response code.
  */
 
+import { buildContainer } from "@/composition/container";
 import styles from "./page.module.css";
 
 export const metadata = {
@@ -22,7 +23,28 @@ export const metadata = {
 
 const FALLBACK_CONTACT_EMAIL = "support@projectamazonph.online";
 
-export default function MaintenancePage() {
+/**
+ * Best-effort support email. Any failure (no row, wrong shape,
+ * database down) resolves to the fallback instead of failing a
+ * page whose whole job is rendering during an outage.
+ */
+async function readSupportEmail(): Promise<string> {
+  try {
+    const container = buildContainer();
+    const result = await container.getSetting.execute({
+      key: "support_email",
+      narrow: (value: unknown) =>
+        typeof value === "string" && value.includes("@") ? value : null,
+      defaultValue: FALLBACK_CONTACT_EMAIL,
+    });
+    return result.ok ? result.value : FALLBACK_CONTACT_EMAIL;
+  } catch {
+    return FALLBACK_CONTACT_EMAIL;
+  }
+}
+
+export default async function MaintenancePage() {
+  const contactEmail = await readSupportEmail();
   return (
     <main className={styles.page}>
       <div className={styles.card}>
@@ -35,8 +57,8 @@ export default function MaintenancePage() {
         </p>
         <p className={styles.body}>
           If you need urgent help during the window, email{" "}
-          <a className={styles.link} href={`mailto:${FALLBACK_CONTACT_EMAIL}`}>
-            {FALLBACK_CONTACT_EMAIL}
+          <a className={styles.link} href={`mailto:${contactEmail}`}>
+            {contactEmail}
           </a>
           .
         </p>
