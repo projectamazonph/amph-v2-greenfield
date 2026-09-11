@@ -33,6 +33,7 @@ import {
   Envelope,
   DownloadSimple,
   ClipboardText,
+  ListChecks,
 } from "@phosphor-icons/react/dist/ssr";
 import type { User } from "@/domain/entities/User";
 import { UserCard } from "./UserCard";
@@ -71,6 +72,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/admin/content", label: "Content", icon: Files },
       { href: "/admin/simulators", label: "Simulators", icon: GameController },
       { href: "/admin/quizzes", label: "Quizzes", icon: Question },
+      { href: "/admin/assignments", label: "Assignments", icon: ListChecks },
       { href: "/admin/badges", label: "Badges", icon: Star },
       { href: "/admin/email-templates", label: "Email templates", icon: Envelope },
       { href: "/admin/announcements", label: "Announcements", icon: Megaphone },

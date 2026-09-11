@@ -34,6 +34,19 @@ describe("StudentSidebar navigation", () => {
     );
   });
 
+  it("exposes assignments under Learn", () => {
+    render(
+      <StudentSidebar
+        user={{ firstName: "Ryan", lastName: "Dabao", role: "STUDENT" }}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Assignments" })).toHaveAttribute(
+      "href",
+      "/assignments",
+    );
+  });
+
   it("keeps course navigation active for nested lesson routes", () => {
     mockUsePathname.mockReturnValue("/courses/foundations/lessons/lesson-1");
     render(

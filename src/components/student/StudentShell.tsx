@@ -124,10 +124,11 @@ export async function StudentShell({
 
 // CommandPalette items live as a module-level constant so the
 // authenticated JSX stays close to the public shell JSX without
-// duplicating the same 10-entry array twice.
+// duplicating the same 14-entry array twice.
 const COMMAND_PALETTE_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/courses", label: "My Courses" },
+  { href: "/assignments", label: "Assignments" },
   { href: "/tools", label: "Tools" },
   { href: "/live-classes", label: "Live classes" },
   { href: "/tools/bid-elevator", label: "Bid Elevator", section: "Tools" },

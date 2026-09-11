@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### P1-02: Assignments (PR-C slice 2)
+
+Instructor-assigned student work on the `Assignment` model. Admins create (by student email), list (search, status filter, pagination), and grade (0-100 integer plus feedback) at `/admin/assignments`, all audited with new `assignment.*` actions. Students see their queue at `/assignments` (new Learn nav entry plus command palette) with due dates, overdue highlight, grades, and one-button submit; only the assignee can submit. Lifecycle is PENDING to SUBMITTED to GRADED; overdue is derived at read time and never persisted. No migration: the W0-01 table already carries every column. Full scope in `docs/stories/P1-02-assignments.md`.
+
 ### P1-01: Course prerequisites (PR-C slice 1)
 
 Explicit DB-backed course gates on the `Prerequisite` model (whole course or a single lesson). Admins manage rules at `/admin/courses/[id]/prerequisites` via audited `SetCoursePrerequisite` / `RemoveCoursePrerequisite` (cycle rejection, idempotent set, soft-delete remove, new `prerequisite.*` audit actions). `EnrollStudent` enforces the gate for every entitlement except `admin_grant` with a typed `prerequisite_not_met` error; the course page discloses the requirement before purchase and names the blocker on failure. Migration adds the missing `createdById` / `updatedById` audit columns to `prerequisites`. Full scope in `docs/stories/P1-01-prerequisites.md`.

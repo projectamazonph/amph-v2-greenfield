@@ -106,6 +106,13 @@ export type AuditAction =
   | "prerequisite.set_failed"
   | "prerequisite.removed"
   | "prerequisite.remove_failed"
+  // P1-02 (PR-C slice 2): assignment lifecycle
+  | "assignment.created"
+  | "assignment.create_failed"
+  | "assignment.submitted"
+  | "assignment.submit_failed"
+  | "assignment.graded"
+  | "assignment.grade_failed"
 | "announcement.created"
 | "announcement.create_failed"
 | "announcement.updated"
@@ -204,6 +211,13 @@ export const ALL_ACTIONS: AuditAction[] = [
   "prerequisite.set_failed",
   "prerequisite.removed",
   "prerequisite.remove_failed",
+  // P1-02 (PR-C slice 2): assignment lifecycle
+  "assignment.created",
+  "assignment.create_failed",
+  "assignment.submitted",
+  "assignment.submit_failed",
+  "assignment.graded",
+  "assignment.grade_failed",
 ];
 
 /**
