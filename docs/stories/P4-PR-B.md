@@ -1,6 +1,6 @@
 # P4 PR-B — PayMongo installments (P0-01) + BIR invoicing (P0-02)
 
-**Status:** In progress (`feat/p4-pr-b-installments-invoicing`, tracks #403)
+**Status:** Merged (`cd41fad`, PR #487, closes #486; follows #403 PR-A #485)
 **Flags:** `INSTALLMENTS_ENABLED`, `INVOICING_ENABLED` (both default off)
 
 ## Scope
