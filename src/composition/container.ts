@@ -132,6 +132,14 @@ import type { IPrerequisiteRepository } from "@/ports/repositories/IPrerequisite
 import { PrismaPrerequisiteRepository } from "@/infra/repositories/PrismaPrerequisiteRepository";
 import { SetCoursePrerequisite } from "@/usecases/SetCoursePrerequisite";
 import { RemoveCoursePrerequisite } from "@/usecases/RemoveCoursePrerequisite";
+// P1-02 (PR-C slice 2): assignments
+import type { IAssignmentRepository } from "@/ports/repositories/IAssignmentRepository";
+import { PrismaAssignmentRepository } from "@/infra/repositories/PrismaAssignmentRepository";
+import { CreateAssignment } from "@/usecases/CreateAssignment";
+import { SubmitAssignment } from "@/usecases/SubmitAssignment";
+import { GradeAssignment } from "@/usecases/GradeAssignment";
+import { ListStudentAssignments } from "@/usecases/ListStudentAssignments";
+import { AdminListAssignments } from "@/usecases/AdminListAssignments";
 
 // STORY-012: MDX content renderer port + adapter
 import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
@@ -466,6 +474,13 @@ export interface AppContainer {
   prerequisiteRepo: IPrerequisiteRepository;
   setCoursePrerequisite: SetCoursePrerequisite;
   removeCoursePrerequisite: RemoveCoursePrerequisite;
+  // P1-02 (PR-C slice 2): assignments
+  assignmentRepo: IAssignmentRepository;
+  createAssignment: CreateAssignment;
+  submitAssignment: SubmitAssignment;
+  gradeAssignment: GradeAssignment;
+  listStudentAssignments: ListStudentAssignments;
+  adminListAssignments: AdminListAssignments;
   // STORY-092 (US-008): admin certificate list + detail
   adminListCertificates: AdminListCertificates;
   adminGetCertificate: AdminGetCertificate;
@@ -705,6 +720,8 @@ function buildProductionContainer(): AppContainer {
   const invoiceRenderer: InvoiceRenderer = new ReactPdfInvoiceRenderer();
   // P1-01 (PR-C slice 1): course prerequisites
   const prerequisiteRepo: IPrerequisiteRepository = new PrismaPrerequisiteRepository(prisma);
+  // P1-02 (PR-C slice 2): assignments
+  const assignmentRepo: IAssignmentRepository = new PrismaAssignmentRepository(prisma);
   // STORY-012: bounded LRU cache (default 500 entries). Each entry
   // is a React element + frontmatter + HTML; 500 is a generous
   // upper bound for the AMPH catalog (9 modules * ~5 lessons = 45
@@ -1263,6 +1280,20 @@ function buildProductionContainer(): AppContainer {
       clock,
       recordAuditLog,
     }),
+    // P1-02 (PR-C slice 2): assignments
+    assignmentRepo,
+    createAssignment: new CreateAssignment({
+      assignmentRepo,
+      userRepo,
+      courseRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    submitAssignment: new SubmitAssignment({ assignmentRepo, clock, recordAuditLog }),
+    gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
+    listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
+    adminListAssignments: new AdminListAssignments({ assignmentRepo }),
     // P1-07 (P4 PR-A): announcement banners
     announcementRepo: new PrismaAnnouncementRepository(prisma),
     announcementDismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),

@@ -90,8 +90,14 @@ import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer
 import { StaticInvoiceRenderer } from "@/infra/pdf/StaticInvoiceRenderer";
 import { InMemoryInvoiceRepository } from "@/infra/repositories/inmemory/InMemoryInvoiceRepository";
 import { InMemoryPrerequisiteRepository } from "@/infra/repositories/inmemory/InMemoryPrerequisiteRepository";
+import { InMemoryAssignmentRepository } from "@/infra/repositories/inmemory/InMemoryAssignmentRepository";
 import { SetCoursePrerequisite } from "@/usecases/SetCoursePrerequisite";
 import { RemoveCoursePrerequisite } from "@/usecases/RemoveCoursePrerequisite";
+import { CreateAssignment } from "@/usecases/CreateAssignment";
+import { SubmitAssignment } from "@/usecases/SubmitAssignment";
+import { GradeAssignment } from "@/usecases/GradeAssignment";
+import { ListStudentAssignments } from "@/usecases/ListStudentAssignments";
+import { AdminListAssignments } from "@/usecases/AdminListAssignments";
 import type { InvoiceRenderer } from "@/ports/rendering/InvoiceRenderer";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
@@ -278,6 +284,8 @@ export interface TestContainer extends AppContainer {
   invoiceRenderer: StaticInvoiceRenderer;
   // P1-01 (PR-C slice 1): course prerequisite fakes
   prerequisiteRepo: InMemoryPrerequisiteRepository;
+  // P1-02 (PR-C slice 2): assignment fakes
+  assignmentRepo: InMemoryAssignmentRepository;
   // STORY-012: tests share NextMdxRenderer with production.
   mdxRenderer: IMdxContentRenderer;
   accessPolicy: StubAccessPolicy;
@@ -358,6 +366,8 @@ export function buildTestContainer(): TestContainer {
   const invoiceRenderer: InvoiceRenderer = new StaticInvoiceRenderer();
   // P1-01 (PR-C slice 1): course prerequisite fakes
   const prerequisiteRepo = new InMemoryPrerequisiteRepository();
+  // P1-02 (PR-C slice 2): assignment fakes
+  const assignmentRepo = new InMemoryAssignmentRepository();
   // STORY-012: same NextMdxRenderer as production. No IO, no
   // stub needed ΓÇö the test container just hands every test a
   // shared, fresh instance with no state leaking between suites.
@@ -935,6 +945,20 @@ export function buildTestContainer(): TestContainer {
       clock,
       recordAuditLog,
     }),
+    // P1-02 (PR-C slice 2): assignments (in-memory)
+    assignmentRepo,
+    createAssignment: new CreateAssignment({
+      assignmentRepo,
+      userRepo,
+      courseRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    submitAssignment: new SubmitAssignment({ assignmentRepo, clock, recordAuditLog }),
+    gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
+    listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
+    adminListAssignments: new AdminListAssignments({ assignmentRepo }),
     // P1-07 (P4 PR-A): announcement banners (in-memory)
     announcementRepo: new InMemoryAnnouncementRepository(),
     announcementDismissalRepo: new InMemoryAnnouncementDismissalRepository(),

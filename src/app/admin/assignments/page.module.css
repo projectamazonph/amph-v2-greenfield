@@ -1,0 +1,195 @@
+/**
+ * /admin/assignments styles (P1-02).
+ * Mirrors /admin/resources tokens: accent actions, surface-1 inputs,
+ * border dividers.
+ */
+
+.addButton {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.addButton:hover {
+  background-color: var(--accent-hover);
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--ink-500);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.backLink:hover {
+  color: var(--accent);
+}
+
+.notice {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.empty {
+  margin: 0;
+  color: var(--ink-500);
+  font-size: 0.9rem;
+}
+
+.filters {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.filterLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  color: var(--ink-900);
+}
+
+.select {
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  color: var(--ink-900);
+  min-width: 140px;
+}
+
+.filterButton {
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.filterButton:hover {
+  background: var(--accent-hover);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.rowLink {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.pageLink {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pageInfo {
+  color: var(--ink-500);
+  font-size: 0.85rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 560px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.detailList {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5) 0;
+}
+
+.detailList dt {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-500);
+}
+
+.detailList dd {
+  margin: var(--space-1) 0 0 0;
+  font-size: 0.9rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  margin: 0 0 var(--space-3) 0;
+}
+
+.description {
+  margin: 0;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}

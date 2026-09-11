@@ -17,6 +17,7 @@ import { usePathname } from "next/navigation";
 import {
   SquaresFour,
   BookOpen,
+  ClipboardText,
   GameController,
   Certificate,
   UserCircle,
@@ -51,6 +52,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
     items: [
       { href: "/dashboard", label: "Dashboard", icon: SquaresFour },
       { href: "/courses", label: "My Courses", icon: BookOpen },
+      { href: "/assignments", label: "Assignments", icon: ClipboardText },
     ],
   },
   {
