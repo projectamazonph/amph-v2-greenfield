@@ -127,6 +127,11 @@ import type { IInvoiceRepository } from "@/ports/repositories/IInvoiceRepository
 import { PrismaInvoiceRepository } from "@/infra/repositories/PrismaInvoiceRepository";
 import type { InvoiceRenderer } from "@/ports/rendering/InvoiceRenderer";
 import { ReactPdfInvoiceRenderer } from "@/infra/pdf/ReactPdfInvoiceRenderer";
+// P1-01 (PR-C slice 1): course prerequisites
+import type { IPrerequisiteRepository } from "@/ports/repositories/IPrerequisiteRepository";
+import { PrismaPrerequisiteRepository } from "@/infra/repositories/PrismaPrerequisiteRepository";
+import { SetCoursePrerequisite } from "@/usecases/SetCoursePrerequisite";
+import { RemoveCoursePrerequisite } from "@/usecases/RemoveCoursePrerequisite";
 
 // STORY-012: MDX content renderer port + adapter
 import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
@@ -457,6 +462,10 @@ export interface AppContainer {
   invoiceRepo: IInvoiceRepository;
   invoiceRenderer: InvoiceRenderer;
   issueInvoice: IssueInvoice;
+  // P1-01 (PR-C slice 1): course prerequisites
+  prerequisiteRepo: IPrerequisiteRepository;
+  setCoursePrerequisite: SetCoursePrerequisite;
+  removeCoursePrerequisite: RemoveCoursePrerequisite;
   // STORY-092 (US-008): admin certificate list + detail
   adminListCertificates: AdminListCertificates;
   adminGetCertificate: AdminGetCertificate;
@@ -694,6 +703,8 @@ function buildProductionContainer(): AppContainer {
   // P0-02 (P4 PR-B): BIR invoicing
   const invoiceRepo: IInvoiceRepository = new PrismaInvoiceRepository(prisma);
   const invoiceRenderer: InvoiceRenderer = new ReactPdfInvoiceRenderer();
+  // P1-01 (PR-C slice 1): course prerequisites
+  const prerequisiteRepo: IPrerequisiteRepository = new PrismaPrerequisiteRepository(prisma);
   // STORY-012: bounded LRU cache (default 500 entries). Each entry
   // is a React element + frontmatter + HTML; 500 is a generous
   // upper bound for the AMPH catalog (9 modules * ~5 lessons = 45
@@ -741,6 +752,7 @@ function buildProductionContainer(): AppContainer {
     courseRepo,
     enrollmentRepo,
     orderRepo,
+    prerequisiteRepo,
     idGen,
   });
 
@@ -1237,6 +1249,20 @@ function buildProductionContainer(): AppContainer {
     deleteFile: new DeleteFile({ fileStorage }),
     // P1-08 (P4 PR-A): maintenance mode / kill switch
     adminToggleMaintenance: new AdminToggleMaintenance({ maintenanceRepo, recordAuditLog, clock }),
+    // P1-01 (PR-C slice 1): course prerequisites
+    prerequisiteRepo,
+    setCoursePrerequisite: new SetCoursePrerequisite({
+      prerequisiteRepo,
+      courseRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    removeCoursePrerequisite: new RemoveCoursePrerequisite({
+      prerequisiteRepo,
+      clock,
+      recordAuditLog,
+    }),
     // P1-07 (P4 PR-A): announcement banners
     announcementRepo: new PrismaAnnouncementRepository(prisma),
     announcementDismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),

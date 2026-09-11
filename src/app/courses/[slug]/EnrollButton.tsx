@@ -34,12 +34,32 @@ import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 
 type EnrollState = EnrollStudentActionResult | null;
 
+export interface EnrollPrerequisiteNotice {
+  requiresCourseId: string;
+  requiresCourseTitle: string;
+  requiresLessonId: string | null;
+}
+
+/**
+ * PrerequisiteBlockerNotice — names the course blocking enrollment.
+ * Exported for render tests; EnrollButton shows it when the enroll
+ * action returns `prerequisite_not_met`.
+ */
+export function PrerequisiteBlockerNotice({ courseTitle }: { courseTitle: string }) {
+  return (
+    <p className={styles.error} role="alert">
+      Finish {courseTitle} first, then enroll here.
+    </p>
+  );
+}
+
 export function EnrollButton({
   courseId,
   courseSlug,
   priceMinor,
   accessMode = "purchase",
   firstLessonId,
+  prerequisites = [],
 }: {
   /** The course's UUID — used for free-course enroll action. */
   courseId: string;
@@ -49,6 +69,8 @@ export function EnrollButton({
   priceMinor: number;
   accessMode?: "purchase" | "subscription" | "enrolled" | "admin";
   firstLessonId?: string | null;
+  /** P1-01: rules gating this course, for naming the blocker on failure. */
+  prerequisites?: readonly EnrollPrerequisiteNotice[];
 }) {
   const [state, formAction, isPending] = useActionState<EnrollState, FormData>(
     async (_prevState: EnrollState) => {
@@ -116,6 +138,14 @@ export function EnrollButton({
         >
           Continue to checkout
         </Link>
+      );
+    }
+    if ("kind" in err && err.kind === "prerequisite_not_met") {
+      const blocker = prerequisites.find((p) => p.requiresCourseId === err.requiresCourseId);
+      return (
+        <PrerequisiteBlockerNotice
+          courseTitle={blocker?.requiresCourseTitle ?? "the required course"}
+        />
       );
     }
     return (

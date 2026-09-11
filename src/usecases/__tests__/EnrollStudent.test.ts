@@ -4,6 +4,7 @@ import { EnrollStudent } from "@/usecases/EnrollStudent";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
+import type { IPrerequisiteRepository } from "@/ports/repositories/IPrerequisiteRepository";
 import type { User } from "@/domain/entities/User";
 import type { Course } from "@/domain/entities/Course";
 
@@ -46,6 +47,7 @@ describe("EnrollStudent", () => {
   let mockUserRepo: UserRepository;
   let mockCourseRepo: CourseRepository;
   let mockEnrollmentRepo: IEnrollmentRepository;
+  let mockPrerequisiteRepo: IPrerequisiteRepository;
   let useCase: EnrollStudent;
   let idCounter = 0;
 
@@ -86,10 +88,17 @@ describe("EnrollStudent", () => {
       findById: vi.fn(),
       update: vi.fn(),
     };
+    mockPrerequisiteRepo = {
+      create: vi.fn(),
+      findRule: vi.fn(),
+      listByCourseId: vi.fn().mockResolvedValue(Result.ok([])),
+      update: vi.fn(),
+    };
     useCase = new EnrollStudent({
       userRepo: mockUserRepo,
       courseRepo: mockCourseRepo,
       enrollmentRepo: mockEnrollmentRepo,
+      prerequisiteRepo: mockPrerequisiteRepo,
       orderRepo: {
         create: vi.fn(),
         findById: vi.fn(),
@@ -339,5 +348,228 @@ describe("EnrollStudent", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.kind).toBe("already_enrolled");
+  });
+
+  // ── P1-01 prerequisite gate ────────────────────────────────
+
+  function makeEnrollmentFixture(
+    courseId: string,
+    completedLessonIds: string[],
+  ) {
+    return {
+      id: `enroll_${courseId}`,
+      userId: USER_ID,
+      courseId,
+      status: "active" as const,
+      source: "direct" as const,
+      couponCode: null,
+      couponDiscount: null,
+      createdAt: new Date(),
+      completedLessonIds,
+      lastLessonId: null,
+      progressPercent: 0,
+      markLessonComplete: vi.fn(),
+    };
+  }
+
+  function mockCourseLookup(courses: Record<string, Course>) {
+    vi.mocked(mockCourseRepo.findById).mockImplementation(async (id: string) => {
+      const course = courses[id];
+      if (!course) return Result.err({ kind: "not_found" });
+      return Result.ok(course);
+    });
+  }
+
+  it("returns prerequisite_not_met when the required course is incomplete", async () => {
+    const courseA = makeCourse({
+      id: "course-a",
+      curriculum: {
+        sections: [
+          {
+            id: "s1",
+            title: "Section 1",
+            lessons: [
+              { id: "a-l1", title: "A1", type: "TEXT", content: "" },
+              { id: "a-l2", title: "A2", type: "TEXT", content: "" },
+            ],
+          },
+        ],
+      },
+    });
+    const courseB = makeCourse({
+      id: "course-b",
+      price: { minor: 0, currency: "PHP" } as Course["price"],
+    });
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
+    mockCourseLookup({ "course-a": courseA, "course-b": courseB });
+    vi.mocked(mockPrerequisiteRepo.listByCourseId).mockResolvedValue(
+      Result.ok([
+        {
+          id: "prereq-1",
+          courseId: "course-b",
+          requiresCourseId: "course-a",
+          requiresLessonId: null,
+          createdAt: new Date(),
+          deletedAt: null,
+          createdById: "admin-1",
+          updatedById: "admin-1",
+        },
+      ]),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserId).mockResolvedValue(
+      Result.ok([makeEnrollmentFixture("course-a", ["a-l1"])]),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: "course-b",
+      entitlement: "free",
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({
+      kind: "prerequisite_not_met",
+      requiresCourseId: "course-a",
+      requiresLessonId: null,
+    });
+  });
+
+  it("enrolls when the required course is complete", async () => {
+    const courseA = makeCourse({
+      id: "course-a",
+      curriculum: {
+        sections: [
+          {
+            id: "s1",
+            title: "Section 1",
+            lessons: [{ id: "a-l1", title: "A1", type: "TEXT", content: "" }],
+          },
+        ],
+      },
+    });
+    const courseB = makeCourse({
+      id: "course-b",
+      price: { minor: 0, currency: "PHP" } as Course["price"],
+    });
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
+    mockCourseLookup({ "course-a": courseA, "course-b": courseB });
+    vi.mocked(mockPrerequisiteRepo.listByCourseId).mockResolvedValue(
+      Result.ok([
+        {
+          id: "prereq-1",
+          courseId: "course-b",
+          requiresCourseId: "course-a",
+          requiresLessonId: null,
+          createdAt: new Date(),
+          deletedAt: null,
+          createdById: "admin-1",
+          updatedById: "admin-1",
+        },
+      ]),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserId).mockResolvedValue(
+      Result.ok([makeEnrollmentFixture("course-a", ["a-l1"])]),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
+    vi.mocked(mockEnrollmentRepo.create).mockImplementation(async (e) => Result.ok(e));
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: "course-b",
+      entitlement: "free",
+    });
+
+    expect(result.ok).toBe(true);
+  });
+
+  it("enrolls on a lesson-scoped rule when the lesson is complete", async () => {
+    const courseB = makeCourse({
+      id: "course-b",
+      price: { minor: 0, currency: "PHP" } as Course["price"],
+    });
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
+    mockCourseLookup({ "course-b": courseB });
+    vi.mocked(mockPrerequisiteRepo.listByCourseId).mockResolvedValue(
+      Result.ok([
+        {
+          id: "prereq-1",
+          courseId: "course-b",
+          requiresCourseId: "course-a",
+          requiresLessonId: "a-l1",
+          createdAt: new Date(),
+          deletedAt: null,
+          createdById: "admin-1",
+          updatedById: "admin-1",
+        },
+      ]),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserId).mockResolvedValue(
+      Result.ok([makeEnrollmentFixture("course-a", ["a-l1"])]),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
+    vi.mocked(mockEnrollmentRepo.create).mockImplementation(async (e) => Result.ok(e));
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: "course-b",
+      entitlement: "free",
+    });
+
+    expect(result.ok).toBe(true);
+  });
+
+  it("admin_grant bypasses an unmet prerequisite", async () => {
+    const courseB = makeCourse({ id: "course-b" });
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
+    mockCourseLookup({ "course-b": courseB });
+    vi.mocked(mockPrerequisiteRepo.listByCourseId).mockResolvedValue(
+      Result.ok([
+        {
+          id: "prereq-1",
+          courseId: "course-b",
+          requiresCourseId: "course-a",
+          requiresLessonId: null,
+          createdAt: new Date(),
+          deletedAt: null,
+          createdById: "admin-1",
+          updatedById: "admin-1",
+        },
+      ]),
+    );
+    vi.mocked(mockEnrollmentRepo.findByUserIdAndCourseId).mockResolvedValue(null);
+    vi.mocked(mockEnrollmentRepo.create).mockImplementation(async (e) => Result.ok(e));
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: "course-b",
+      entitlement: "admin_grant",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(vi.mocked(mockEnrollmentRepo.findByUserId).mock.calls).toHaveLength(0);
+  });
+
+  it("returns db_error when the rule list fails", async () => {
+    const courseB = makeCourse({
+      id: "course-b",
+      price: { minor: 0, currency: "PHP" } as Course["price"],
+    });
+    vi.mocked(mockUserRepo.findById).mockResolvedValue(Result.ok(makeUser()));
+    mockCourseLookup({ "course-b": courseB });
+    vi.mocked(mockPrerequisiteRepo.listByCourseId).mockResolvedValue(
+      Result.err({ kind: "db_error", message: "boom" }),
+    );
+
+    const result = await useCase.execute({
+      userId: USER_ID,
+      courseId: "course-b",
+      entitlement: "free",
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toEqual({ kind: "db_error", message: "boom" });
   });
 });

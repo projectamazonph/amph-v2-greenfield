@@ -106,6 +106,29 @@ export default async function CourseDetailPage({ params }: PageProps) {
   const priceMoney = Money.of(detail.priceMinor, "PHP");
   const priceDisplay = detail.priceMinor === 0 ? "FREE" : priceMoney.ok ? priceMoney.value.format("en-PH") : "FREE";
 
+  // P1-01: surface course prerequisites before purchase so a gated
+  // enrollment is never a surprise. Best-effort: a rule-list failure
+  // hides the notice (EnrollStudent still enforces the gate).
+  const rulesResult = await container.prerequisiteRepo.listByCourseId(detail.courseId);
+  const prerequisiteNotice = [];
+  if (rulesResult.ok && rulesResult.value.length > 0) {
+    const neededIds = [...new Set(rulesResult.value.map((rule) => rule.requiresCourseId))];
+    const neededCourses = await Promise.all(
+      neededIds.map((neededId) => container.courseRepo.findById(neededId)),
+    );
+    const titles = new Map<string, string>();
+    for (const needed of neededCourses) {
+      if (needed.ok) titles.set(needed.value.id, needed.value.title);
+    }
+    for (const rule of rulesResult.value) {
+      prerequisiteNotice.push({
+        requiresCourseId: rule.requiresCourseId,
+        requiresCourseTitle: titles.get(rule.requiresCourseId) ?? "a previous course",
+        requiresLessonId: rule.requiresLessonId,
+      });
+    }
+  }
+
   return (
     <StudentShell requireAuth={false} user={user}>
       <main id="main-content" className={styles.page}>
@@ -167,7 +190,14 @@ export default async function CourseDetailPage({ params }: PageProps) {
                   priceMinor={detail.priceMinor}
                   accessMode={accessMode}
                   firstLessonId={firstLessonId}
+                  prerequisites={prerequisiteNotice}
                 />
+                {prerequisiteNotice.length > 0 && accessMode === "purchase" && (
+                  <p className={styles.tagline} role="note">
+                    Before you enroll: finish{" "}
+                    {prerequisiteNotice.map((p) => p.requiresCourseTitle).join(" and ")} first.
+                  </p>
+                )}
                 <ShareCourseButton title={detail.title} />
               </div>
             </div>

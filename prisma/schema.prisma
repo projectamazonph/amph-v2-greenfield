@@ -1136,6 +1136,9 @@ model Prerequisite {
   createdAt DateTime  @default(now())
   deletedAt DateTime?
 
+  createdById String?
+  updatedById String?
+
   @@unique([courseId, requiresCourseId, requiresLessonId])
   @@index([courseId])
   @@index([requiresCourseId])
