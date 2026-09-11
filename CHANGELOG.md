@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### P1-03: Download branding on all resources (PR-C slice 4)
+
+Content audit found all 13 PDFs branded but 0/11 workbooks and 0/2 handouts carrying any brand string. `scripts/brand-downloads.py` (rerunnable, `--check` gate) adds document properties, print footers, and a brand row to every XLSX plus header/footer branding to both DOCX files, matching the PDF footer convention. Verified zero drift: 293/293 formulas byte-identical, DOCX body counts unchanged. Full scope in `docs/stories/P1-03-resource-branding.md`.
+
 ### P1-05: Site settings (PR-C slice 3)
 
 Admin-editable key/value store on the `Setting` model, managed in a new Site settings card on `/admin/settings` (audited upserts, JSON values). First consumer: the 503 `/maintenance` page reads `support_email` best-effort and keeps its hardcoded fallback so the page renders during a database outage. No migration: the W0-01 `settings` table already carries every column. Full scope in `docs/stories/P1-05-settings.md`.
