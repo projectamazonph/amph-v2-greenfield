@@ -40,6 +40,7 @@ import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { TestLogger } from "@/infra/observability/TestLogger";
 import { PasswordResetTemplateRenderer } from "@/infra/email/templates/PasswordResetRenderer";
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
+import { InMemoryPrerequisiteRepository } from "@/infra/repositories/inmemory/InMemoryPrerequisiteRepository";
 import { FixedClock } from "@/ports/system/Clock";
 
 class StubHasher implements PasswordHasher {
@@ -165,6 +166,7 @@ describe("AdminGrantSubscription", () => {
       courseRepo,
       enrollmentRepo,
       orderRepo,
+      prerequisiteRepo: new InMemoryPrerequisiteRepository(),
       idGen,
     });
     return new AdminGrantSubscription({

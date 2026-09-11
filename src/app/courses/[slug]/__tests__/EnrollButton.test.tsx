@@ -35,7 +35,7 @@ vi.mock("@/app/actions/enroll", () => ({
 vi.mock("next/headers", () => ({}));
 vi.mock("server-only", () => ({}));
 
-import { EnrollButton } from "../EnrollButton";
+import { EnrollButton, PrerequisiteBlockerNotice } from "../EnrollButton";
 
 describe("EnrollButton (render)", () => {
   it("renders the free-enroll CTA when priceMinor === 0", () => {
@@ -115,5 +115,14 @@ describe("EnrollButton (render)", () => {
     expect(html).toContain("Continue learning");
     expect(html).toMatch(/href="\/courses\/active-course\/lessons\/lesson-1"/);
     expect(html).not.toContain("Buy now");
+  });
+
+  it("names the blocking course in the prerequisite notice (P1-01)", () => {
+    const html = renderToString(
+      createElement(PrerequisiteBlockerNotice, { courseTitle: "PPC Foundations" }),
+    );
+
+    expect(html).toMatch(/Finish.*PPC Foundations.*first, then enroll here/);
+    expect(html).toMatch(/role="alert"/);
   });
 });

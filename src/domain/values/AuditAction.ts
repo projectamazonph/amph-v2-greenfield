@@ -101,6 +101,11 @@ export type AuditAction =
   | "resource.purge_failed"
   // P1-08 (P4 PR-A): admin toggles the maintenance-mode kill switch
   | "maintenance.toggled"
+  // P1-01 (PR-C slice 1): admin sets or removes a course prerequisite
+  | "prerequisite.set"
+  | "prerequisite.set_failed"
+  | "prerequisite.removed"
+  | "prerequisite.remove_failed"
 | "announcement.created"
 | "announcement.create_failed"
 | "announcement.updated"
@@ -194,6 +199,11 @@ export const ALL_ACTIONS: AuditAction[] = [
   "resource.purge_failed",
   // P1-08 (P4 PR-A): admin toggles the maintenance-mode kill switch
   "maintenance.toggled",
+  // P1-01 (PR-C slice 1): admin sets or removes a course prerequisite
+  "prerequisite.set",
+  "prerequisite.set_failed",
+  "prerequisite.removed",
+  "prerequisite.remove_failed",
 ];
 
 /**

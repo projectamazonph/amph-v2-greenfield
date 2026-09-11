@@ -1,0 +1,129 @@
+/**
+ * /admin/courses/[id]/prerequisites styles (P1-01).
+ * Token-driven, matching the sibling course admin pages.
+ */
+
+.backLink {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--ink-500);
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.backLink:hover {
+  color: var(--accent);
+}
+
+.notice {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  margin: 0 0 var(--space-3) 0;
+}
+
+.empty {
+  color: var(--ink-500);
+  font-size: 0.9rem;
+  margin: 0 0 var(--space-5) 0;
+}
+
+.ruleList {
+  list-style: none;
+  margin: 0 0 var(--space-5) 0;
+  padding: 0;
+}
+
+.ruleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ruleText {
+  font-size: 0.9rem;
+}
+
+.removeForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.remove {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--danger, #b42318);
+}
+
+.remove:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 560px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.select {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--surface-1);
+  color: inherit;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.submit {
+  padding: 0.55rem 1.2rem;
+  background: var(--accent, #f08c1f);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.error {
+  color: var(--danger, #b42318);
+  font-size: 0.85rem;
+  margin: 0;
+}

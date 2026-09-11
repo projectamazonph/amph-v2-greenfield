@@ -89,6 +89,9 @@ import { FakeCertificateHashGenerator } from "@/infra/security/FakeCertificateHa
 import { StaticCertificateRenderer } from "@/infra/pdf/StaticCertificateRenderer";
 import { StaticInvoiceRenderer } from "@/infra/pdf/StaticInvoiceRenderer";
 import { InMemoryInvoiceRepository } from "@/infra/repositories/inmemory/InMemoryInvoiceRepository";
+import { InMemoryPrerequisiteRepository } from "@/infra/repositories/inmemory/InMemoryPrerequisiteRepository";
+import { SetCoursePrerequisite } from "@/usecases/SetCoursePrerequisite";
+import { RemoveCoursePrerequisite } from "@/usecases/RemoveCoursePrerequisite";
 import type { InvoiceRenderer } from "@/ports/rendering/InvoiceRenderer";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
@@ -273,6 +276,8 @@ export interface TestContainer extends AppContainer {
   // P0-02 (P4 PR-B): BIR invoicing fakes
   invoiceRepo: InMemoryInvoiceRepository;
   invoiceRenderer: StaticInvoiceRenderer;
+  // P1-01 (PR-C slice 1): course prerequisite fakes
+  prerequisiteRepo: InMemoryPrerequisiteRepository;
   // STORY-012: tests share NextMdxRenderer with production.
   mdxRenderer: IMdxContentRenderer;
   accessPolicy: StubAccessPolicy;
@@ -351,6 +356,8 @@ export function buildTestContainer(): TestContainer {
   // P0-02 (P4 PR-B): BIR invoicing fakes
   const invoiceRepo = new InMemoryInvoiceRepository();
   const invoiceRenderer: InvoiceRenderer = new StaticInvoiceRenderer();
+  // P1-01 (PR-C slice 1): course prerequisite fakes
+  const prerequisiteRepo = new InMemoryPrerequisiteRepository();
   // STORY-012: same NextMdxRenderer as production. No IO, no
   // stub needed ΓÇö the test container just hands every test a
   // shared, fresh instance with no state leaking between suites.
@@ -415,6 +422,7 @@ export function buildTestContainer(): TestContainer {
     courseRepo,
     enrollmentRepo,
     orderRepo,
+    prerequisiteRepo,
     idGen,
   });
 
@@ -913,6 +921,20 @@ export function buildTestContainer(): TestContainer {
     uploadFile: new UploadFile({ fileStorage }),
     deleteFile: new DeleteFile({ fileStorage }),
     adminToggleMaintenance: new AdminToggleMaintenance({ maintenanceRepo, recordAuditLog, clock }),
+    // P1-01 (PR-C slice 1): course prerequisites (in-memory)
+    prerequisiteRepo,
+    setCoursePrerequisite: new SetCoursePrerequisite({
+      prerequisiteRepo,
+      courseRepo,
+      idGen,
+      clock,
+      recordAuditLog,
+    }),
+    removeCoursePrerequisite: new RemoveCoursePrerequisite({
+      prerequisiteRepo,
+      clock,
+      recordAuditLog,
+    }),
     // P1-07 (P4 PR-A): announcement banners (in-memory)
     announcementRepo: new InMemoryAnnouncementRepository(),
     announcementDismissalRepo: new InMemoryAnnouncementDismissalRepository(),

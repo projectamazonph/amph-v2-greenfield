@@ -123,7 +123,9 @@ describe("public accessibility release gates", () => {
     const reset = await source("src/components/auth/ResetConfirmForm.tsx");
 
     expect(enrollment).toContain('className={styles.success} role="status"');
-    expect(enrollment.match(/role="alert"/g)).toHaveLength(3);
+    // not-available, unauthorized, paid-checkout, prerequisite_not_met
+    // (P1-01 names the blocking course in an alert)
+    expect(enrollment.match(/role="alert"/g)).toHaveLength(4);
     expect(recording).toContain('role="status"');
     expect(reset).toContain('className={styles.success} role="status"');
   });

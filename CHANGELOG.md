@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### P1-01: Course prerequisites (PR-C slice 1)
+
+Explicit DB-backed course gates on the `Prerequisite` model (whole course or a single lesson). Admins manage rules at `/admin/courses/[id]/prerequisites` via audited `SetCoursePrerequisite` / `RemoveCoursePrerequisite` (cycle rejection, idempotent set, soft-delete remove, new `prerequisite.*` audit actions). `EnrollStudent` enforces the gate for every entitlement except `admin_grant` with a typed `prerequisite_not_met` error; the course page discloses the requirement before purchase and names the blocker on failure. Migration adds the missing `createdById` / `updatedById` audit columns to `prerequisites`. Full scope in `docs/stories/P1-01-prerequisites.md`.
+
 ### P4 PR-B: PayMongo installments + BIR invoicing behind flags (PR #487)
 
 Tracks #486, follows #403 (PR-A merged as #485). P0-01: 3/6/12-month card installments with a PHP 3,000 floor, validated in domain (`InstallmentPlan`), enabled on the PayMongo hosted page via `payment_method_options`, persisted on the order, and offered in checkout only when `INSTALLMENTS_ENABLED` is on. P0-02: BIR sales invoices (`INV-YYYY-NNNNN`) issued idempotently for paid orders with PDF render + file storage, auto-issued best-effort by the PayMongo webhook when `INVOICING_ENABLED` is on. Tax stays 0 until finance confirms VAT treatment; buyer address defaults to null until the profile story lands. No admin UI in this slice (PR-C scope). Full scope in `docs/stories/P4-PR-B.md`.

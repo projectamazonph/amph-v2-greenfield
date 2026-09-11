@@ -4,6 +4,7 @@ import { EnrollStudent } from "@/usecases/EnrollStudent";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
+import type { IPrerequisiteRepository } from "@/ports/repositories/IPrerequisiteRepository";
 import type { IOrderRepository } from "@/ports/repositories/OrderRepository";
 import type { User } from "@/domain/entities/User";
 import type { Course } from "@/domain/entities/Course";
@@ -81,6 +82,7 @@ describe("EnrollStudent", () => {
   let mockUserRepo: UserRepository;
   let mockCourseRepo: CourseRepository;
   let mockEnrollmentRepo: IEnrollmentRepository;
+  let mockPrerequisiteRepo: IPrerequisiteRepository;
   let mockOrderRepo: IOrderRepository;
   let useCase: EnrollStudent;
   let idCounter = 0;
@@ -122,6 +124,12 @@ describe("EnrollStudent", () => {
       findById: vi.fn(),
       update: vi.fn(),
     };
+    mockPrerequisiteRepo = {
+      create: vi.fn(),
+      findRule: vi.fn(),
+      listByCourseId: vi.fn().mockResolvedValue(Result.ok([])),
+      update: vi.fn(),
+    };
     mockOrderRepo = {
       create: vi.fn(),
       findById: vi.fn(),
@@ -139,6 +147,7 @@ describe("EnrollStudent", () => {
       userRepo: mockUserRepo,
       courseRepo: mockCourseRepo,
       enrollmentRepo: mockEnrollmentRepo,
+      prerequisiteRepo: mockPrerequisiteRepo,
       orderRepo: mockOrderRepo,
       idGen: { newId: () => `enrol_${++idCounter}` },
     });
