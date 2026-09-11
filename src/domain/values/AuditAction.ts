@@ -113,6 +113,9 @@ export type AuditAction =
   | "assignment.submit_failed"
   | "assignment.graded"
   | "assignment.grade_failed"
+  // P1-05 (PR-C slice 3): admin saves a site setting
+  | "setting.saved"
+  | "setting.save_failed"
 | "announcement.created"
 | "announcement.create_failed"
 | "announcement.updated"
@@ -218,6 +221,9 @@ export const ALL_ACTIONS: AuditAction[] = [
   "assignment.submit_failed",
   "assignment.graded",
   "assignment.grade_failed",
+  // P1-05 (PR-C slice 3): admin saves a site setting
+  "setting.saved",
+  "setting.save_failed",
 ];
 
 /**

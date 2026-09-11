@@ -9,6 +9,8 @@ import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
 import { enableTwoFactorAction } from "@/app/actions/twoFactor.action";
 import { DisableTwoFactorForm } from "./DisableTwoFactorForm";
+import { SiteSettingsForm, type SiteSettingRow } from "./SiteSettingsForm";
+import { buildContainer } from "@/composition/container";
 import styles from "./page.module.css";
 
 const twoFactorErrorMessage: Record<string, string> = {
@@ -23,7 +25,7 @@ const twoFactorErrorMessage: Record<string, string> = {
 export default async function SettingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; "2fa"?: string }>;
+  searchParams: Promise<{ error?: string; "2fa"?: string; saved?: string }>;
 }) {
   const session = await requireAdmin(undefined, true);
   const sp = await searchParams;
@@ -68,9 +70,38 @@ export default async function SettingsPage({
     },
   ];
 
+  // P1-05: site settings live in the DB, edited below. A lookup
+  // failure degrades to an empty list rather than failing the page.
+  const container = buildContainer();
+  const settingsResult = await container.listSettings.execute();
+  const settingRows: SiteSettingRow[] = settingsResult.ok
+    ? settingsResult.value.rows.map((row) => ({
+        key: row.key,
+        valueJson: JSON.stringify(row.value, null, 2) ?? "null",
+        description: row.description,
+        updatedById: row.updatedById,
+        updatedAt: row.updatedAt.toLocaleString("en-PH"),
+      }))
+    : [];
+
   return (
     <div>
       <TopBar title="Settings" subtitle="System configuration and operational status" />
+
+      <Card padding={6} className={styles.cardGap}>
+        <h2 className={styles.sectionTitle}>Site settings</h2>
+        <p className={styles.help}>
+          Key/value configuration the site reads at runtime, like the
+          support email on the maintenance page. Saving a key replaces
+          its value.
+        </p>
+        {!settingsResult.ok && (
+          <p className={styles.twoFactorError} role="alert">
+            Saved settings could not be loaded. Saving still works.
+          </p>
+        )}
+        <SiteSettingsForm rows={settingRows} justSaved={sp.saved === "1"} />
+      </Card>
 
       <Card padding={6} className={styles.cardGap}>
         <h2 className={styles.sectionTitle}>Environment</h2>

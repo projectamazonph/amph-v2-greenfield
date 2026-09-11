@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### P1-05: Site settings (PR-C slice 3)
+
+Admin-editable key/value store on the `Setting` model, managed in a new Site settings card on `/admin/settings` (audited upserts, JSON values). First consumer: the 503 `/maintenance` page reads `support_email` best-effort and keeps its hardcoded fallback so the page renders during a database outage. No migration: the W0-01 `settings` table already carries every column. Full scope in `docs/stories/P1-05-settings.md`.
+
 ### P1-02: Assignments (PR-C slice 2)
 
 Instructor-assigned student work on the `Assignment` model. Admins create (by student email), list (search, status filter, pagination), and grade (0-100 integer plus feedback) at `/admin/assignments`, all audited with new `assignment.*` actions. Students see their queue at `/assignments` (new Learn nav entry plus command palette) with due dates, overdue highlight, grades, and one-button submit; only the assignee can submit. Lifecycle is PENDING to SUBMITTED to GRADED; overdue is derived at read time and never persisted. No migration: the W0-01 table already carries every column. Full scope in `docs/stories/P1-02-assignments.md`.

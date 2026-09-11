@@ -98,6 +98,10 @@ import { SubmitAssignment } from "@/usecases/SubmitAssignment";
 import { GradeAssignment } from "@/usecases/GradeAssignment";
 import { ListStudentAssignments } from "@/usecases/ListStudentAssignments";
 import { AdminListAssignments } from "@/usecases/AdminListAssignments";
+import { InMemorySettingRepository } from "@/infra/repositories/inmemory/InMemorySettingRepository";
+import { GetSetting } from "@/usecases/GetSetting";
+import { SetSetting } from "@/usecases/SetSetting";
+import { ListSettings } from "@/usecases/ListSettings";
 import type { InvoiceRenderer } from "@/ports/rendering/InvoiceRenderer";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
@@ -286,6 +290,8 @@ export interface TestContainer extends AppContainer {
   prerequisiteRepo: InMemoryPrerequisiteRepository;
   // P1-02 (PR-C slice 2): assignment fakes
   assignmentRepo: InMemoryAssignmentRepository;
+  // P1-05 (PR-C slice 3): site setting fakes
+  settingRepo: InMemorySettingRepository;
   // STORY-012: tests share NextMdxRenderer with production.
   mdxRenderer: IMdxContentRenderer;
   accessPolicy: StubAccessPolicy;
@@ -368,6 +374,8 @@ export function buildTestContainer(): TestContainer {
   const prerequisiteRepo = new InMemoryPrerequisiteRepository();
   // P1-02 (PR-C slice 2): assignment fakes
   const assignmentRepo = new InMemoryAssignmentRepository();
+  // P1-05 (PR-C slice 3): site setting fakes
+  const settingRepo = new InMemorySettingRepository();
   // STORY-012: same NextMdxRenderer as production. No IO, no
   // stub needed ΓÇö the test container just hands every test a
   // shared, fresh instance with no state leaking between suites.
@@ -959,6 +967,11 @@ export function buildTestContainer(): TestContainer {
     gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
     listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
     adminListAssignments: new AdminListAssignments({ assignmentRepo }),
+    // P1-05 (PR-C slice 3): site settings (in-memory)
+    settingRepo,
+    getSetting: new GetSetting({ settingRepo }),
+    setSetting: new SetSetting({ settingRepo, clock, recordAuditLog }),
+    listSettings: new ListSettings({ settingRepo }),
     // P1-07 (P4 PR-A): announcement banners (in-memory)
     announcementRepo: new InMemoryAnnouncementRepository(),
     announcementDismissalRepo: new InMemoryAnnouncementDismissalRepository(),
