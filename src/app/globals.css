@@ -188,6 +188,7 @@
   --side-pad: clamp(16px, 4vw, 48px);
   --z-dropdown: 100;
   --z-sticky: 200;
+  --z-progress: 210;
   --z-modal-backdrop: 300;
   --z-modal: 400;
   --z-toast: 500;
@@ -324,6 +325,10 @@ textarea:focus-visible {
 }
 
 /* Legacy global utility classes remain supported for older pages. */
+.table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
 .form-group {
   display: flex;
   flex-direction: column;

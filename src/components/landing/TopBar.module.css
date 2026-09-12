@@ -4,7 +4,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 120;
+  z-index: var(--z-progress);
   height: 2px;
   background: var(--c-orange);
   transition: width 80ms linear;
@@ -13,7 +13,7 @@
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-sticky);
   border-bottom: 1px solid var(--c-navy-1);
   background: linear-gradient(180deg, var(--c-navy-2) 0%, var(--c-navy-3) 100%);
   color: var(--c-shell-ink);

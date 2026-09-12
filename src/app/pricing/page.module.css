@@ -89,6 +89,10 @@
   position: absolute;
   top: -12px;
   right: var(--space-4);
+  max-width: calc(100% - var(--space-8));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   background: var(--accent);
   color: var(--accent-ink);
   font-family: var(--font-mono);
@@ -133,6 +137,7 @@
 .priceRow {
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: var(--space-2);
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--border);
@@ -140,7 +145,7 @@
 
 .price {
   font-family: var(--font-mono);
-  font-size: 36px;
+  font-size: clamp(28px, 8vw, 36px);
   font-weight: 600;
   color: var(--ink-900);
   line-height: 1;

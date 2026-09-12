@@ -131,7 +131,8 @@ export default async function AssignmentsPage({ searchParams }: PageProps) {
         {rows.length === 0 ? (
           <p className={styles.empty}>No assignments match these filters.</p>
         ) : (
-          <table className={styles.table}>
+          <div className="table-scroll">
+            <table className={styles.table}>
             <caption className="sr-only">Student assignments</caption>
             <thead>
               <tr>
@@ -163,7 +164,8 @@ export default async function AssignmentsPage({ searchParams }: PageProps) {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
         <nav aria-label="Assignment pages" className={styles.pagination}>
           {page > 1 && (

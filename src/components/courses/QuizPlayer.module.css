@@ -167,7 +167,7 @@
 
 .resultScore {
   font-family: var(--font-mono);
-  font-size: 64px;
+  font-size: clamp(40px, 12vw, 64px);
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;

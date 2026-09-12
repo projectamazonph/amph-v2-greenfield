@@ -42,7 +42,8 @@ export default async function AdminAnnouncementsPage() {
             No announcements yet. Create the first one to display a banner.
           </p>
         ) : (
-          <table className={styles.table}>
+          <div className="table-scroll">
+            <table className={styles.table}>
             <thead>
               <tr>
                 <th>Title</th>
@@ -88,7 +89,8 @@ export default async function AdminAnnouncementsPage() {
                 );
               })}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </Card>
     </main>
