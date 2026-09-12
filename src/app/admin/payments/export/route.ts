@@ -14,6 +14,7 @@ import { getSessionUserId } from "@/lib/auth";
 import { toCSV } from "@/lib/export-csv";
 import { formatCurrency } from "@/lib/format-date";
 import type { PaymentStatus } from "@/domain/values/PaymentStatus";
+import type { ExportPaymentRow } from "@/usecases/ExportPayments";
 
 export const runtime = "nodejs";
 
@@ -60,14 +61,14 @@ export async function GET(request: NextRequest) {
     { key: "id" as const, label: "Order ID" },
     { key: "userEmail" as const, label: "Buyer Email" },
     { key: "courseId" as const, label: "Course ID" },
-    { key: "totalMinor" as const, label: "Total (PHP)" },
+    { key: "totalFormatted" as const, label: "Total (PHP)" },
     { key: "status" as const, label: "Status" },
     { key: "createdAt" as const, label: "Created At" },
   ];
 
-  const rows = result.rows.map((r) => ({
+  const rows = result.rows.map((r: ExportPaymentRow) => ({
     ...r,
-    totalMinor: formatCurrency(r.totalMinor),
+    totalFormatted: formatCurrency(r.totalMinor),
   }));
 
   const csv = toCSV(rows, csvHeaders);

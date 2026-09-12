@@ -67,7 +67,8 @@ describe("ExportPayments", () => {
     const result = await useCase.execute({});
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(typeof result.rows[0].createdAt).toBe("string");
-    expect(result.rows[0].createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(result.rows[0]).toBeDefined();
+    expect(typeof result.rows[0]!.createdAt).toBe("string");
+    expect(result.rows[0]!.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 });
