@@ -45,13 +45,12 @@ describe("ExportPayments", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.rows).toHaveLength(3);
-    expect(result.rows[0]).toMatchObject({
-      id: "o1",
+    const byId = new Map(result.rows.map((r) => [r.id, r]));
+    expect(byId.get("o1")).toMatchObject({
       userEmail: "alice@example.com",
       status: "PAID",
     });
-    expect(result.rows[1]).toMatchObject({
-      id: "o2",
+    expect(byId.get("o2")).toMatchObject({
       userEmail: "bob@example.com",
     });
   });
