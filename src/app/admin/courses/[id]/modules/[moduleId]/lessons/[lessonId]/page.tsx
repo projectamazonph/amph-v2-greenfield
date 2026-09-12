@@ -4,12 +4,11 @@
  * STORY-048c. Server component. Read-only.
  */
 
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
 import { deleteLessonAction } from "@/app/actions/deleteLesson.action";
@@ -88,12 +87,10 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href={`/admin/courses/${courseId}/modules/${moduleId}`} className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden />{" "}Back to module
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={lesson.title}
+        backHref={`/admin/courses/${courseId}/modules/${moduleId}`}
+        backLabel="Back to module"
         subtitle={
           <span className={styles.badges}>
             <Badge variant="neutral" label={"Order " + lesson.displayOrder} />

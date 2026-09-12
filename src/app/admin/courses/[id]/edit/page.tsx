@@ -7,12 +7,11 @@
  * remains on the course detail page so course metadata saves stay focused.
  */
 
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { updateCourseAction } from "@/app/actions/updateCourse.action";
 import type { UpdateCoursePageInput } from "@/app/actions/updateCourse.action";
@@ -64,11 +63,12 @@ export default async function EditCoursePage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href={`/admin/courses/${id}`} className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden />{" "}Back to course
-      </Link>
-
-      <TopBar title={`Edit: ${course.title}`} subtitle={course.slug} />
+      <AdminSubPageHeader
+        title={`Edit: ${course.title}`}
+        backHref={`/admin/courses/${id}`}
+        backLabel="Back to course"
+        subtitle={course.slug}
+      />
 
       <form action={handleSubmit} className={styles.form}>
         <Card padding={6}>

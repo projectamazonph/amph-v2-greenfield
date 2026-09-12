@@ -4,11 +4,10 @@
  * STORY-050d. Server component.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { createDiscountCodeAction } from "@/app/actions/createDiscountCode.action";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import styles from "../new/page.module.css";
 import pageStyles from "../page.module.css";
@@ -32,11 +31,12 @@ export default async function NewDiscountCodePage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/discount-codes" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to discount codes
-      </Link>
-
-      <TopBar title="Add discount code" subtitle="Create a new promotional discount code" />
+      <AdminSubPageHeader
+        title="Add discount code"
+        backHref="/admin/discount-codes"
+        backLabel="Back to discount codes"
+        subtitle="Create a new promotional discount code"
+      />
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>

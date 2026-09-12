@@ -34,6 +34,8 @@ import {
   DownloadSimple,
   ClipboardText,
   ListChecks,
+  Tag,
+  Wrench,
 } from "@phosphor-icons/react/dist/ssr";
 import type { User } from "@/domain/entities/User";
 import { UserCard } from "./UserCard";
@@ -85,6 +87,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/admin/users", label: "Users", icon: Users },
       { href: "/admin/payments", label: "Payments", icon: CurrencyDollar },
       { href: "/admin/refunds", label: "Refunds", icon: ArrowsCounterClockwise },
+      { href: "/admin/discount-codes", label: "Discount codes", icon: Tag },
       { href: "/admin/live-classes", label: "Live Classes", icon: CalendarDots },
       { href: "/admin/certificates", label: "Certificates", icon: Certificate },
     ],
@@ -93,6 +96,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
     label: "System",
     items: [
       { href: "/admin/audit-log", label: "Audit log", icon: ClipboardText },
+      { href: "/admin/maintenance", label: "Maintenance", icon: Wrench },
       { href: "/admin/settings", label: "Settings", icon: Gear },
     ],
   },

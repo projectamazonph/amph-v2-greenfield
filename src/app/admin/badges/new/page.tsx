@@ -4,11 +4,10 @@
  * STORY-050e. Server component.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { createBadgeAction } from "@/app/actions/createBadge.action";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import styles from "./page.module.css";
 
@@ -47,11 +46,12 @@ export default async function NewBadgePage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/badges" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to badges
-      </Link>
-
-      <TopBar title="Add badge" subtitle="Create a new badge template" />
+      <AdminSubPageHeader
+        title="Add badge"
+        backHref="/admin/badges"
+        backLabel="Back to badges"
+        subtitle="Create a new badge template"
+      />
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>

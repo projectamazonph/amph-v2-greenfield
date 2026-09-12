@@ -10,11 +10,10 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card, Badge } from "@astryxdesign/core";
 import { updateSimulatorScenarioAction } from "@/app/actions/updateSimulatorScenario.action";
 import { archiveSimulatorScenarioAction } from "@/app/actions/archiveSimulatorScenario.action";
@@ -79,12 +78,10 @@ export default async function EditScenarioPage({ params, searchParams }: PagePro
 
   return (
     <div>
-      <Link href="/admin/simulators" className={formStyles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to scenarios
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={`Edit: ${scenario.name}`}
+        backHref="/admin/simulators"
+        backLabel="Back to scenarios"
         subtitle={`${scenario.id} · v${scenario.version}`}
         actions={<Badge variant={statusVariant(scenario.status)} label={scenario.status} />}
       />

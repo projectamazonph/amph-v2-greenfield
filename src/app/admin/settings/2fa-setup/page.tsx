@@ -9,12 +9,10 @@
  * new secret and invalidate whatever the admin already scanned.
  */
 
-import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { confirmTwoFactorAction } from "@/app/actions/twoFactor.action";
 import { TWO_FACTOR_ISSUER } from "@/usecases/EnableTwoFactor";
@@ -57,12 +55,10 @@ export default async function TwoFactorSetupPage({
 
   return (
     <div>
-      <Link href="/admin/settings" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to settings
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title="Set up two-factor authentication"
+        backHref="/admin/settings"
+        backLabel="Back to settings"
         subtitle="Scan the code, then confirm with a 6-digit code to finish."
       />
 

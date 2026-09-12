@@ -8,12 +8,10 @@
  * `setScenarioCalibrationAction`.
  */
 
-import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect, notFound } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { KNOWN_DIMENSIONS, type GradingDimension } from "@/domain/entities/ScorePolicy";
 import type { SimulatorId } from "@/domain/entities/SimulatorScenario";
@@ -102,13 +100,13 @@ export default async function CalibrationPage({ params, searchParams }: PageProp
 
   return (
     <>
-      <TopBar title="Simulator Calibration" />
+      <AdminSubPageHeader
+        title="Simulator Calibration"
+        backHref={`/admin/simulators/${scenario.id}/versions`}
+        backLabel="Back to versions"
+      />
       <div className={styles.page}>
         <div className={styles.header}>
-          <Link href={`/admin/simulators/${scenario.id}/versions`} className={styles.backLink}>
-            <ArrowLeft weight="bold" />
-            Back to versions
-          </Link>
           <h1 className={styles.title}>Calibration: {scenario.name}</h1>
           <p className={styles.subtitle}>
             {simulatorId} · scenarioKey: {scenarioKey}

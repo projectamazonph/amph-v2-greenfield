@@ -4,11 +4,10 @@
  * STORY-050d. Server component.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { updateDiscountCodeAction } from "@/app/actions/updateDiscountCode.action";
 import { archiveDiscountCodeAction } from "@/app/actions/archiveDiscountCode.action";
@@ -46,11 +45,12 @@ export default async function EditDiscountCodePage({ params, searchParams }: Pag
 
   return (
     <div>
-      <Link href="/admin/discount-codes" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to discount codes
-      </Link>
-
-      <TopBar title={`Edit: ${dc.code}`} subtitle={dc.id} />
+      <AdminSubPageHeader
+        title={`Edit: ${dc.code}`}
+        backHref="/admin/discount-codes"
+        backLabel="Back to discount codes"
+        subtitle={dc.id}
+      />
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>

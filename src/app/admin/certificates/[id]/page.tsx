@@ -13,12 +13,11 @@
  * pattern (STORY-062).
  */
 
-import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card, Badge } from "@astryxdesign/core";
 import { revokeCertificateAction } from "@/app/actions/revokeCertificate.action";
 import styles from "./page.module.css";
@@ -75,12 +74,10 @@ export default async function AdminCertificateDetailPage({ params, searchParams 
 
   return (
     <div>
-      <Link href="/admin/certificates" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to certificates
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={`Certificate · ${certificate.id}`}
+        backHref="/admin/certificates"
+        backLabel="Back to certificates"
         subtitle={
           <span className={styles.badges}>
             <Badge

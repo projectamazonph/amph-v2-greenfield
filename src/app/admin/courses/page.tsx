@@ -11,6 +11,7 @@
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Card } from "@astryxdesign/core";
 import { courseLessonCount } from "@/domain/entities/Course";
 import type { CourseStatus } from "@/domain/entities/Course";
@@ -53,12 +54,11 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
   if (!result.ok) {
     return (
       <div>
-        <TopBar title="Courses" subtitle="Manage all courses" />
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <Link href="/admin">Admin</Link>
-          <span> &gt; </span>
-          <span>Courses</span>
-        </nav>
+        <TopBar
+          title="Courses"
+          subtitle="Manage all courses"
+          breadcrumb={<Breadcrumb items={[{ href: "/admin", label: "Admin" }, { label: "Courses" }]} />}
+        />
         <Card padding={6}>
           <p className={styles.error}>Failed to load courses: {result.error.message}</p>
         </Card>
@@ -84,18 +84,13 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
       <TopBar
         title="Courses"
         subtitle={`${totalCount} total`}
+        breadcrumb={<Breadcrumb items={[{ href: "/admin", label: "Admin" }, { label: "Courses" }]} />}
         actions={
           <Link href="/admin/courses/new" className={styles.addButton}>
             + Add course
           </Link>
         }
       />
-
-      <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <Link href="/admin">Admin</Link>
-        <span> &gt; </span>
-        <span>Courses</span>
-      </nav>
 
       {/* Filter form — GET submission updates URL params */}
       <form className={styles.filters} method="get">

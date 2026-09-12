@@ -8,11 +8,11 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
@@ -89,12 +89,10 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/courses" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to courses
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={course.title}
+        backHref="/admin/courses"
+        backLabel="Back to courses"
         subtitle={
           <span className={styles.badges}>
             <Badge
