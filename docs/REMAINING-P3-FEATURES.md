@@ -88,6 +88,10 @@ export function fireConfetti() {
 
 ## P3-85. Real CSV Export
 
+**Status:** Implemented — `src/app/admin/payments/export/route.ts` (admin-gated, streaming, RFC 4180 via `src/lib/export-csv.ts`), `ExportPayments` use case, and the Export button on `admin/payments/page.tsx`. Audit-log export shipped earlier (STORY-061). PR #497.
+
+**No action needed.**
+
 **Goal:** Admin can export table data to CSV files.
 
 **Files to create:**
@@ -167,13 +171,12 @@ model Notification {
 
 ## Implementation Priority
 
-If tackling the remaining five, recommend this order:
+If tackling the remaining four, recommend this order:
 
-1. **P3-85 CSV Export** — Fastest win, pure utility work
-2. **P3-82 Confetti** — One component, one dependency, high delight
-3. **P3-84 Dark Mode** — Token-level work, touches every page
-4. **P3-83 Drag-and-Drop** — Needs new dependencies + schema
-5. **P3-87 Notifications** — Schema migration + polling infrastructure
+1. **P3-82 Confetti** — One component, one dependency, high delight
+2. **P3-84 Dark Mode** — Token-level work, touches every page
+3. **P3-83 Drag-and-Drop** — Needs new dependencies + schema
+4. **P3-87 Notifications** — Schema migration + polling infrastructure
 
 ---
 
@@ -184,5 +187,4 @@ If tackling the remaining five, recommend this order:
 | P3-82 | Confetti      | S           | canvas-confetti                  |
 | P3-83 | DnD reorder   | M           | @dnd-kit/core, @dnd-kit/sortable |
 | P3-84 | Dark mode     | L           | None                             |
-| P3-85 | CSV export    | S           | None                             |
 | P3-87 | Notifications | XL          | Schema migration                 |

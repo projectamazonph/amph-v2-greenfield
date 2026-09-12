@@ -20,9 +20,9 @@ All high-priority fixes done: Link migration, breadcrumbs, clickable tiles, card
 
 All medium fixes done: responsive layouts, search inputs, focus rings, button transitions, skip-link, ARIA, error messages, shared components (Skeleton, EmptyState, SubmitButton, Toast, CommandPalette, MobileNavToggle), format-date utils, unsaved changes hook.
 
-## P3 Enhancement — 35/40 ⚠️ MOSTLY COMPLETE
+## P3 Enhancement — 36/40 ⚠️ MOSTLY COMPLETE
 
-35 of 40 enhancement fixes shipped. P3-86 (PDF certificate download) ships via `src/app/certificates/[hash]/pdf/route.ts` and `RenderCertificatePdf.ts`. Remaining 5 require larger feature work: drag-and-drop reorder (P3-83), real confetti library (P3-82), dark mode (P3-84), CSV export logic (P3-85), and notifications system (P3-87).
+36 of 40 enhancement fixes shipped. P3-86 (PDF certificate download) ships via `src/app/certificates/[hash]/pdf/route.ts` and `RenderCertificatePdf.ts`. P3-85 (CSV export) ships via `src/app/admin/payments/export/route.ts`, `ExportPayments.ts`, and `src/lib/export-csv.ts`. Remaining 4 require larger feature work: drag-and-drop reorder (P3-83), real confetti library (P3-82), dark mode (P3-84), and notifications system (P3-87).
 
 ---
 
@@ -33,8 +33,8 @@ All medium fixes done: responsive layouts, search inputs, focus rings, button tr
 | P0 Critical    | 6      | 6      |
 | P1 High        | 14     | 14     |
 | P2 Medium      | 39     | 39     |
-| P3 Enhancement | 35     | 40     |
-| **Total**      | **94** | **99** |
+| P3 Enhancement | 36     | 40     |
+| **Total**      | **95** | **99** |
 
 ---
 
@@ -149,15 +149,13 @@ All medium fixes done: responsive layouts, search inputs, focus rings, button tr
 
 ---
 
-## Remaining P3 Items (6)
+## Remaining P3 Items (4)
 
 | #     | Fix                               | Blocker                           |
 | ----- | --------------------------------- | --------------------------------- |
 | P3-82 | Real confetti library             | Needs `react-confetti` or similar |
 | P3-83 | Course card drag-and-drop reorder | Needs dnd library + schema        |
 | P3-84 | Dark mode toggle                  | Needs full color token override   |
-| P3-85 | Real CSV export logic             | Needs server action               |
-| P3-86 | PDF certificate download          | Needs PDF generation library      |
 | P3-87 | Real notifications system         | Needs push notification setup     |
 
 These are feature-level work, not quick fixes.
@@ -214,14 +212,12 @@ To verify the merged changes are live:
 
 See `docs/REMAINING-P3-FEATURES.md` for full implementation specs.
 
-| #     | Feature                  | Dependency                                                   |
-| ----- | ------------------------ | ------------------------------------------------------------ |
-| P3-82 | Real confetti            | `canvas-confetti` (deps already in REMAINING-P3-FEATURES.md) |
-| P3-83 | Drag-and-drop reorder    | `@dnd-kit/core`, `@dnd-kit/sortable`                         |
-| P3-84 | Dark mode toggle         | None (token override)                                        |
-| P3-85 | Real CSV export          | None (server action)                                         |
-| P3-86 | PDF certificate download | `@react-pdf/renderer` (already in package.json)              |
-| P3-87 | In-app notifications     | Schema migration                                             |
+| #     | Feature               | Dependency                                                   |
+| ----- | --------------------- | ------------------------------------------------------------ |
+| P3-82 | Real confetti         | `canvas-confetti` (deps already in REMAINING-P3-FEATURES.md) |
+| P3-83 | Drag-and-drop reorder | `@dnd-kit/core`, `@dnd-kit/sortable`                         |
+| P3-84 | Dark mode toggle      | None (token override)                                        |
+| P3-87 | In-app notifications  | Schema migration                                             |
 
 ## Student-Facing UI Pass — 2026-08-15
 
