@@ -1,7 +1,6 @@
 # P1-04 — OAuth social login (PR-D)
 
-**Status:** In progress (`feat/p1-04-oauth`, PR-D per #403)
-**Branch policy:** branch from main, PR to main, squash merge.
+**Status:** Implemented — merged on `main`. Entity (`OAuthAccount`), ports (`IOAuthAccountRepository`, `IOAuthBroker`), Prisma + InMemory adapters, `GoogleOAuthBroker`, `StubOAuthBroker`, two use cases (`LoginWithOAuth`, `UnlinkOAuthAccount`), API routes (`/api/auth/oauth/[provider]`, `/api/auth/oauth/[provider]/callback`), server action (`unlinkOAuth.action.ts`), login page Google button, and profile security page all ship. Env-gated: no `GOOGLE_CLIENT_ID/SECRET` means no button. See `FEATURES.md` and `CHANGELOG.md` for confirmation.
 
 ## Scope
 

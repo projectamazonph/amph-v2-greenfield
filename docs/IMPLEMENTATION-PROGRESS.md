@@ -4,7 +4,7 @@
 
 **Started:** 2026-07-31  
 **Completed:** 2026-07-31  
-**Total fixes shipped:** 93/99
+**Total fixes shipped:** 94/99
 
 ---
 
@@ -20,9 +20,9 @@ All high-priority fixes done: Link migration, breadcrumbs, clickable tiles, card
 
 All medium fixes done: responsive layouts, search inputs, focus rings, button transitions, skip-link, ARIA, error messages, shared components (Skeleton, EmptyState, SubmitButton, Toast, CommandPalette, MobileNavToggle), format-date utils, unsaved changes hook.
 
-## P3 Enhancement — 34/40 ⚠️ MOSTLY COMPLETE
+## P3 Enhancement — 35/40 ⚠️ MOSTLY COMPLETE
 
-34 of 40 enhancement fixes shipped. Remaining 6 require larger feature work (drag-and-drop reorder, real confetti library, dark mode, CSV export logic, certificate download PDF generation, notifications system).
+35 of 40 enhancement fixes shipped. P3-86 (PDF certificate download) ships via `src/app/certificates/[hash]/pdf/route.ts` and `RenderCertificatePdf.ts`. Remaining 5 require larger feature work: drag-and-drop reorder (P3-83), real confetti library (P3-82), dark mode (P3-84), CSV export logic (P3-85), and notifications system (P3-87).
 
 ---
 
@@ -33,8 +33,8 @@ All medium fixes done: responsive layouts, search inputs, focus rings, button tr
 | P0 Critical    | 6      | 6      |
 | P1 High        | 14     | 14     |
 | P2 Medium      | 39     | 39     |
-| P3 Enhancement | 34     | 40     |
-| **Total**      | **93** | **99** |
+| P3 Enhancement | 35     | 40     |
+| **Total**      | **94** | **99** |
 
 ---
 
@@ -231,33 +231,33 @@ ships as its own sub-commit so the diff stays reviewable.
 
 ### Shipped
 
-| # | Task | Commit area |
-|---|------|-------------|
-| 1 | `ConfirmDialog` primitive (native `<dialog>`), 10 tests | `feat(ui)` |
-| 2 | Sign-out confirm dialog wired into `StudentSidebar` | `feat(student)` |
-| 3 | 2FA setup step indicator on `profile/security/2fa-setup` | `feat(profile)` |
-| 4 | Replace `:has()` selector in course detail | `fix(courses)` |
-| 5 | Reset-password form wrapped in a card | `feat(auth)` |
-| 6 | `id="main-content" tabIndex={-1}` on every student `<main>` so the skip-link target is universal | `feat(a11y)` |
-| 7 | Inline badge styles on `/courses` moved into the page CSS module | `refactor(courses)` |
-| 8 | Print stylesheet hides chrome and lets the certificate fill the page | `feat(certificates)` |
-| 9 | Student sidebar nav reorganised into Learn / Practice / Resources / Account section groups | `feat(student)` |
-| 10 | Estimated reading time row on the lesson header (video / quiz / read) | `feat(ui)` |
-| 11 | Shared `Breadcrumb` component used across every `/tools/*` page | `feat(ui)` |
-| 12 | `ScrollToTop` FAB mounted in `StudentShell`, 8 tests | `feat(student)` |
-| 13 | Type correction so the lesson meta helper compiles against the curriculum `Lesson` shape | `fix(lessons)` |
-| 14 | Move the trailing inline style on `/checkout/failed` into the shared checkout-status CSS module | `fix(checkout)` |
-| 15 | Branded root `not-found.tsx` so unmatched routes match the Field Manual | `feat(app)` |
-| 16 | Hover-lift micro-interaction on the catalog and tools card grids, with `prefers-reduced-motion` guard | `polish(cards)` |
-| 17 | Scale-in animation on the checkout success and failed checkmark, with `prefers-reduced-motion` guard | `polish(checkout)` |
-| 18 | FAQ link on the failed checkout page so stuck students can self-serve | `feat(checkout)` |
-| 19 | Move the action buttons inline style on `/profile` into the CSS module | `refactor(profile)` |
-| 20 | Swap badge dots for real Phosphor icons with slug-based tier color | `polish(profile)` |
-| 21 | Bare "Quiz not found" text on the quiz page replaced with the shared `EmptyState` | `polish(quiz)` |
-| 22 | `<meta name="theme-color">` so mobile browsers tint the chrome to the Field Manual surface | `feat(app)` |
-| 23 | Brand-tinted focus-visible ring across links, buttons, and `.btn` (accent outline + soft halo) | `polish(a11y)` |
-| 24 | 5-second auto-redirect countdown on the checkout success page so the student lands on the dashboard without an extra click | `feat(checkout)` |
-| 25 | Quiz page breadcrumb shows the course title and the current quiz title so the student keeps course context | `polish(quiz)` |
+| #   | Task                                                                                                                       | Commit area          |
+| --- | -------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| 1   | `ConfirmDialog` primitive (native `<dialog>`), 10 tests                                                                    | `feat(ui)`           |
+| 2   | Sign-out confirm dialog wired into `StudentSidebar`                                                                        | `feat(student)`      |
+| 3   | 2FA setup step indicator on `profile/security/2fa-setup`                                                                   | `feat(profile)`      |
+| 4   | Replace `:has()` selector in course detail                                                                                 | `fix(courses)`       |
+| 5   | Reset-password form wrapped in a card                                                                                      | `feat(auth)`         |
+| 6   | `id="main-content" tabIndex={-1}` on every student `<main>` so the skip-link target is universal                           | `feat(a11y)`         |
+| 7   | Inline badge styles on `/courses` moved into the page CSS module                                                           | `refactor(courses)`  |
+| 8   | Print stylesheet hides chrome and lets the certificate fill the page                                                       | `feat(certificates)` |
+| 9   | Student sidebar nav reorganised into Learn / Practice / Resources / Account section groups                                 | `feat(student)`      |
+| 10  | Estimated reading time row on the lesson header (video / quiz / read)                                                      | `feat(ui)`           |
+| 11  | Shared `Breadcrumb` component used across every `/tools/*` page                                                            | `feat(ui)`           |
+| 12  | `ScrollToTop` FAB mounted in `StudentShell`, 8 tests                                                                       | `feat(student)`      |
+| 13  | Type correction so the lesson meta helper compiles against the curriculum `Lesson` shape                                   | `fix(lessons)`       |
+| 14  | Move the trailing inline style on `/checkout/failed` into the shared checkout-status CSS module                            | `fix(checkout)`      |
+| 15  | Branded root `not-found.tsx` so unmatched routes match the Field Manual                                                    | `feat(app)`          |
+| 16  | Hover-lift micro-interaction on the catalog and tools card grids, with `prefers-reduced-motion` guard                      | `polish(cards)`      |
+| 17  | Scale-in animation on the checkout success and failed checkmark, with `prefers-reduced-motion` guard                       | `polish(checkout)`   |
+| 18  | FAQ link on the failed checkout page so stuck students can self-serve                                                      | `feat(checkout)`     |
+| 19  | Move the action buttons inline style on `/profile` into the CSS module                                                     | `refactor(profile)`  |
+| 20  | Swap badge dots for real Phosphor icons with slug-based tier color                                                         | `polish(profile)`    |
+| 21  | Bare "Quiz not found" text on the quiz page replaced with the shared `EmptyState`                                          | `polish(quiz)`       |
+| 22  | `<meta name="theme-color">` so mobile browsers tint the chrome to the Field Manual surface                                 | `feat(app)`          |
+| 23  | Brand-tinted focus-visible ring across links, buttons, and `.btn` (accent outline + soft halo)                             | `polish(a11y)`       |
+| 24  | 5-second auto-redirect countdown on the checkout success page so the student lands on the dashboard without an extra click | `feat(checkout)`     |
+| 25  | Quiz page breadcrumb shows the course title and the current quiz title so the student keeps course context                 | `polish(quiz)`       |
 
 ### Cancelled
 
@@ -275,10 +275,9 @@ ships as its own sub-commit so the diff stays reviewable.
 
 ### Total fixes shipped to date
 
-| Pass | Done | Total |
-|------|------|-------|
-| 2026-07-31 P0/P1/P2 | 59 | 59 |
-| 2026-07-31 P3 enhancement | 34 | 40 |
-| 2026-08-15 student-facing UI | 25 | 25 |
-| **Combined** | **119** | **125** |
-
+| Pass                         | Done    | Total   |
+| ---------------------------- | ------- | ------- |
+| 2026-07-31 P0/P1/P2          | 59      | 59      |
+| 2026-07-31 P3 enhancement    | 34      | 40      |
+| 2026-08-15 student-facing UI | 25      | 25      |
+| **Combined**                 | **119** | **125** |

@@ -1,15 +1,13 @@
 # STORY-086: Simulator grader — instructor calibration ranges
 
-**Points:** TBD
-**Epic:** Assessment Platform Maturity (Sprint 16+)
+**Points:** 1
+**Epic:** Assessment Platform Maturity (Sprint 16)
 
 **Owner:** Ryan
 
 ## Status
 
-**Status:** Planned — deferred from the 2026-08-20 audit follow-up umbrella
-(`.audit-2026-08-20/UMBRELLA.md`, "Product & architecture gaps" item 1).
-No code or story doc on `main` as of 2026-08-20.
+**Status:** Implemented — merged on `main`. Migration `20260821233428_add_scenario_calibration` creates the `simulator_scenario_calibrations` table. Entity (`SimulatorScenarioCalibration`), port (`ISimulatorScenarioCalibrationRepository`), Prisma + InMemory adapters, two use cases (`GetScenarioCalibration`, `SetScenarioCalibration`), admin page at `/admin/simulators/[id]/[scenarioKey]/calibration`, and server action (`setScenarioCalibration.action.ts`) all ship. The calibration tightens (never widens) the grade band per dimension per scenario. Every write is audited.
 
 ## Why this is open
 

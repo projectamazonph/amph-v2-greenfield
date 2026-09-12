@@ -2,7 +2,7 @@
 
 **Reviewed:** 2026-08-12 against `ee1737a`
 **Owner:** Ryan Roland Dabao  
-**Status:** Sprints 1-15 are complete. Sprint 16 has STORY-085, STORY-087, and STORY-088 complete; STORY-086 and STORY-089 remain planned. Student repair STORY-104 is merged in PR #305 with follow-ups #306-#308. Operator-owned launch and recovery drills remain.
+**Status:** Sprints 1-15 are complete. Sprint 16 has STORY-085, STORY-086, STORY-087, and STORY-088 complete; STORY-089 remains planned. Student repair STORY-104 is merged in PR #305 with follow-ups #306-#308. PR-C (P1-01 through P1-06) and PR-D (P1-04 OAuth) all ship on main. Operator-owned launch and recovery drills remain.
 
 This plan began as a 12-sprint greenfield plan. The repository has since grown to 16 planned sprints and 89 tracked stories (including the simulator remediation sequence). Historical sprint goals remain below, but a story marked done here must still be checked against its current source and story file.
 
@@ -232,17 +232,19 @@ exists to remove.
 
 ## Sprint 16 — Assessment Platform Maturity (5 pts)
 
-| ID        | Title                                             | Pts | Status                                                                                          |
-| --------- | ------------------------------------------------- | --- | ----------------------------------------------------------------------------------------------- |
-| STORY-085 | Scenario publishing + versioning                  | 1   | ✅ done — 2026-08-04, full-scope rewire (much bigger than 1pt), see `docs/stories/STORY-085.md` |
-| STORY-086 | Instructor calibration + acceptable-answer ranges | 1   | ⏳ Planned                                                                                      |
-| STORY-087 | Explicit business-impact feedback                 | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-087.md`                                           |
-| STORY-088 | Challenge progression                             | 1   | ✅ done — 2026-08-04, minimal scope, see `docs/stories/STORY-088.md`                            |
-| STORY-089 | Connected-account simulator                       | 1   | ⏳ Planned                                                                                      |
+| ID        | Title                                             | Pts | Status                                                                                                                                                                                |
+| --------- | ------------------------------------------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| STORY-085 | Scenario publishing + versioning                  | 1   | ✅ done — 2026-08-04, full-scope rewire (much bigger than 1pt), see `docs/stories/STORY-085.md`                                                                                       |
+| STORY-086 | Instructor calibration + acceptable-answer ranges | 1   | ✅ done — migration `20260821233428_add_scenario_calibration`, entity, port, 2 adapters, 2 use cases, admin calibration page, action, tests all ship. See `docs/stories/STORY-086.md` |
+| STORY-087 | Explicit business-impact feedback                 | 1   | ✅ done — 2026-08-04, see `docs/stories/STORY-087.md`                                                                                                                                 |
+| STORY-088 | Challenge progression                             | 1   | ✅ done — 2026-08-04, minimal scope, see `docs/stories/STORY-088.md`                                                                                                                  |
+| STORY-089 | Connected-account simulator                       | 1   | ⏳ Planned                                                                                                                                                                            |
 
 ## Next planning track — Learning experience 8.5
 
 The completed Sprint 16 work establishes simulator and assessment foundations.
+STORY-085, STORY-086, STORY-087, and STORY-088 are done. STORY-089 (connected-account
+simulator) remains planned.
 The next learner-facing roadmap is intentionally dependency-ordered rather than
 assigned a sprint number before its platform contracts are settled. See
 [`LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`](LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md)
@@ -259,16 +261,16 @@ remain outside certificate and job-readiness claims.
 Not an original numbered sprint — stories recommended by the 2026-08-01 student-feature
 gap audit, closed across two sessions.
 
-| ID          | Title                                      | Pts | Status                                                                                                                                                       |
-| ----------- | ------------------------------------------ | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| STORY-090   | Live-class list page (`/live-classes`)     | 1   | ✅ done — PR #268                                                                                                                                            |
-| STORY-091   | Live-class detail + RSVP                   | 1   | ✅ done — PR #268                                                                                                                                            |
-| STORY-097   | Student 2FA at `/profile/security`         | 1   | ✅ done — 2026-08-02, reuses the admin flow's role-agnostic use cases                                                                                        |
-| STORY-094   | Lesson-to-quiz transition wiring           | 1   | ✅ done — PR #267                                                                                                                                            |
-| STORY-095   | Admin email-template editor page           | 1   | ✅ done — 2026-08-02; wired into the send path by STORY-095.5, 2026-08-03                                                                                    |
+| ID          | Title                                      | Pts | Status                                                                                                                                                                                             |
+| ----------- | ------------------------------------------ | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| STORY-090   | Live-class list page (`/live-classes`)     | 1   | ✅ done — PR #268                                                                                                                                                                                  |
+| STORY-091   | Live-class detail + RSVP                   | 1   | ✅ done — PR #268                                                                                                                                                                                  |
+| STORY-097   | Student 2FA at `/profile/security`         | 1   | ✅ done — 2026-08-02, reuses the admin flow's role-agnostic use cases                                                                                                                              |
+| STORY-094   | Lesson-to-quiz transition wiring           | 1   | ✅ done — PR #267                                                                                                                                                                                  |
+| STORY-095   | Admin email-template editor page           | 1   | ✅ done — 2026-08-02; wired into the send path by STORY-095.5, 2026-08-03                                                                                                                          |
 | STORY-095.5 | Wire email templates into Resend send path | 1   | ✅ done — 2026-08-03; personalization, refund CTA, all-scenario HTML templates, payment-failure delivery, and Resend Svix webhook verification added 2026-08-16, see `docs/stories/STORY-095.5.md` |
-| STORY-096   | Account deletion + data export             | 1   | ✅ done; PR #305 added quiz and simulator attempt history                                                                                                    |
-| STORY-100   | Live-class recording + post-class XP       | 1   | ✅ done — 2026-08-03, see `docs/stories/STORY-100.md` (renumbered from STORY-092, which was already in use for a shipped, unrelated certificate-admin story) |
+| STORY-096   | Account deletion + data export             | 1   | ✅ done; PR #305 added quiz and simulator attempt history                                                                                                                                          |
+| STORY-100   | Live-class recording + post-class XP       | 1   | ✅ done — 2026-08-03, see `docs/stories/STORY-100.md` (renumbered from STORY-092, which was already in use for a shipped, unrelated certificate-admin story)                                       |
 
 ---
 

@@ -1,7 +1,6 @@
 # P1-05 — Site settings (PR-C slice 3)
 
-**Status:** In progress (`feat/p1-05-settings`, part of PR-C per #403)
-**Branch policy:** branch from main, PR to main, squash merge.
+**Status:** Implemented — merged on `main`. Entity (`Setting`), port (`ISettingRepository`), Prisma + InMemory adapters, three use cases (`GetSetting`, `SetSetting`, `ListSettings`), server action (`setting.action.ts`), admin form at `/admin/settings` (`SiteSettingsForm.tsx`), and `/maintenance` page consumer all ship. See `CHANGELOG.md` for confirmation.
 
 ## Scope
 

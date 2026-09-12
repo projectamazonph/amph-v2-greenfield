@@ -1,7 +1,6 @@
 # P1-02 — Assignments (PR-C slice 2)
 
-**Status:** In progress (`feat/p1-02-assignments`, part of PR-C per #403)
-**Branch policy:** branch from main, PR to main, squash merge.
+**Status:** Implemented — merged on `main`. Entity (`Assignment`), port (`IAssignmentRepository`), Prisma + InMemory adapters, five use cases (`CreateAssignment`, `SubmitAssignment`, `GradeAssignment`, `ListStudentAssignments`, `AdminListAssignments`), two server actions (`adminAssignment.action.ts`, `submitAssignment.action.ts`), admin pages at `/admin/assignments` (list, new, detail with grade form), and student page at `/assignments` all ship. See `FEATURES.md` and `CHANGELOG.md` for confirmation.
 
 ## Scope
 
