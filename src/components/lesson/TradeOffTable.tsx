@@ -47,7 +47,11 @@ export function TradeOffTable(props: TradeOffTableProps): ReactElement {
       <figcaption className={styles.title}>{title}</figcaption>
       <div className={styles.tableWrap}>
         <table className={styles.table}>
-          {caption ? <caption className={styles.caption}>{caption}</caption> : null}
+          {caption ? (
+            <caption className={styles.caption}>{caption}</caption>
+          ) : (
+            <caption className="sr-only">{title}</caption>
+          )}
           <thead>
             {columns ? (
               <tr>

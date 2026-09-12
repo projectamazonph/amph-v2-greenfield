@@ -30,7 +30,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     <div className={styles.shell}>
       <MobileNavToggle sidebarId="admin-sidebar" />
       <NavSidebar user={user} />
-      <main className={styles.main} data-navigation-content>
+      <main id="main-content" tabIndex={-1} className={styles.main} data-navigation-content>
         {children}
       </main>
       <CommandPalette
