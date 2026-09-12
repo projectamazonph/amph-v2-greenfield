@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Admin 2FA visibility badge (first step toward #413)
+
+The users table gains a 2FA column and the user detail header a 2FA On/Off badge, so admins can see at a glance which accounts lack two-factor protection. No enforcement: admin 2FA stays opt-in per #495. Full enforcement remains tracked in #413.
+
 ### Admin 2FA back to opt-in
 
 `requireAdmin()` no longer bounces admins without 2FA to settings. The enforcement gate (STORY-097 follow-up) locked out the operator account, which has no TOTP enrolled, and contradicts the documented opt-in policy. Login-time TOTP challenge for enrolled accounts is unchanged; only the page-level enforcement is removed, along with the now-dead `skip2FA` parameter and the "required for all admin accounts" copy. See issue #448 for the enforcement track.

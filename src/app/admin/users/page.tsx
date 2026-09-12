@@ -85,6 +85,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
     email: u.email,
     role: u.role,
     subscriptionTier: u.subscriptionTier,
+    twoFactorEnabled: u.twoFactorEnabled,
     createdAt: u.createdAt,
   }));
 

@@ -27,6 +27,7 @@ export interface UserRow extends Record<string, unknown> {
   email: string;
   role: Role;
   subscriptionTier: SubscriptionTier;
+  twoFactorEnabled: boolean;
   createdAt: Date;
 }
 
@@ -139,6 +140,14 @@ const COLUMNS: TableColumn<UserRow>[] = [
     width: { type: "pixel", value: 100 },
     renderCell: (row) => (
       <Badge variant={tierBadgeVariant(row.subscriptionTier)} label={row.subscriptionTier} />
+    ),
+  },
+  {
+    key: "twoFactor",
+    header: "2FA",
+    width: { type: "pixel", value: 90 },
+    renderCell: (row) => (
+      <Badge variant={row.twoFactorEnabled ? "success" : "neutral"} label={row.twoFactorEnabled ? "On" : "Off"} />
     ),
   },
   {
