@@ -43,7 +43,7 @@ export async function createAssignmentAction(
   _prevState: AdminAssignmentFormResult | null,
   formData: FormData,
 ): Promise<AdminAssignmentFormResult> {
-  const admin = await requireAdmin(undefined, true);
+  const admin = await requireAdmin();
 
   const container = buildContainer();
   const result = await container.createAssignment.execute({
@@ -70,7 +70,7 @@ export async function gradeAssignmentAction(
   _prevState: AdminAssignmentFormResult | null,
   formData: FormData,
 ): Promise<AdminAssignmentFormResult> {
-  const admin = await requireAdmin(undefined, true);
+  const admin = await requireAdmin();
 
   const container = buildContainer();
   const result = await container.gradeAssignment.execute({

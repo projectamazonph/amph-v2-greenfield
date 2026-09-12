@@ -52,7 +52,7 @@ export async function setPrerequisiteAction(
   _prevState: PrerequisiteFormResult | null,
   formData: FormData,
 ): Promise<PrerequisiteFormResult> {
-  const admin = await requireAdmin(undefined, true);
+  const admin = await requireAdmin();
 
   const courseId = String(formData.get("courseId") ?? "").trim();
   const requiresCourseId = String(formData.get("requiresCourseId") ?? "").trim();
@@ -80,7 +80,7 @@ export async function removePrerequisiteAction(
   _prevState: PrerequisiteFormResult | null,
   formData: FormData,
 ): Promise<PrerequisiteFormResult> {
-  const admin = await requireAdmin(undefined, true);
+  const admin = await requireAdmin();
 
   const courseId = String(formData.get("courseId") ?? "").trim();
   const requiresCourseId = String(formData.get("requiresCourseId") ?? "").trim();

@@ -47,7 +47,7 @@ export async function setSettingAction(
   _prevState: SetSettingFormResult | null,
   formData: FormData,
 ): Promise<SetSettingFormResult> {
-  const admin = await requireAdmin(undefined, true);
+  const admin = await requireAdmin();
 
   const key = String(formData.get("key") ?? "").trim();
   const descriptionRaw = formData.get("description");

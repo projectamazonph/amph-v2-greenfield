@@ -167,25 +167,20 @@ export async function requireAuth(currentPath?: string): Promise<User> {
 }
 
 /**
- * Page-level guard. Requires an authenticated user with `role === 'ADMIN'`
- * and 2FA enabled. Redirects to `/login` if not authenticated,
- * `/dashboard?error=forbidden` if authenticated but not admin,
- * `/admin/settings?error=2fa_required` if admin but 2FA not enabled.
+ * Page-level guard. Requires an authenticated user with `role === 'ADMIN'`.
+ * Redirects to `/login` if not authenticated,
+ * `/dashboard?error=forbidden` if authenticated but not admin.
+ *
+ * Admin 2FA is opt-in: accounts with 2FA enabled are challenged at
+ * login (see Login), but lacking 2FA never blocks admin pages.
+ * Enforcement was removed per operator decision; see issue #448.
  *
  * Use at the top of every `/admin/*` page.
- *
- * @param skip2FA - Skip 2FA enforcement check (used by /admin/settings page
- *   to avoid redirect loop when admin needs to enable 2FA)
  */
-export async function requireAdmin(currentPath?: string, skip2FA?: boolean): Promise<User> {
+export async function requireAdmin(currentPath?: string): Promise<User> {
   const user = await requireAuth(currentPath);
   if (user.role !== "ADMIN") {
     redirect("/dashboard?error=forbidden");
-  }
-  // Enforce 2FA for all admin accounts (STORY-097 follow-up)
-  // Skip check on /admin/settings to avoid redirect loop
-  if (!skip2FA && !user.twoFactorEnabled) {
-    redirect("/admin/settings?error=2fa_required");
   }
   return user;
 }
