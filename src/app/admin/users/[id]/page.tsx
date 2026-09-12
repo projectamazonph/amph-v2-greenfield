@@ -146,6 +146,10 @@ export default async function AdminUserDetailPage({ params, searchParams }: Page
               }
               label={user.subscriptionTier}
             />
+            <Badge
+              variant={user.twoFactorEnabled ? "success" : "neutral"}
+              label={user.twoFactorEnabled ? "2FA On" : "2FA Off"}
+            />
           </span>
         }
       />
