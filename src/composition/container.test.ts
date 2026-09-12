@@ -189,6 +189,7 @@ import { GetMaintenanceStatus } from "@/usecases/GetMaintenanceStatus";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 import { ListAuditLogs } from "@/usecases/ListAuditLogs";
 import { ExportAuditLogs } from "@/usecases/ExportAuditLogs";
+import { ExportPayments } from "@/usecases/ExportPayments";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
 import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
 import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
@@ -406,6 +407,8 @@ export function buildTestContainer(): TestContainer {
   // STORY-061: audit log viewer + CSV export
   const listAuditLogs = new ListAuditLogs({ auditLog });
   const exportAuditLogs = new ExportAuditLogs({ auditLog });
+  // P3-85: CSV export of payments
+  const exportPayments = new ExportPayments({ orderRepo, userRepo });
   // STORY-050b: simulator scenario repo
   const scenarioRepo = new InMemorySimulatorScenarioRepository();
   // STORY-064: simulator attempt repo
@@ -788,6 +791,7 @@ export function buildTestContainer(): TestContainer {
     rebuildCourseCurriculum,
     listAuditLogs,
     exportAuditLogs,
+    exportPayments,
     scenarioRepo,
     simulatorAttemptRepo,
     scorePolicyRepo,

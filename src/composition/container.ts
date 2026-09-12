@@ -294,6 +294,7 @@ import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { RebuildCourseCurriculum } from "@/usecases/RebuildCourseCurriculum";
 import { ListAuditLogs } from "@/usecases/ListAuditLogs";
 import { ExportAuditLogs } from "@/usecases/ExportAuditLogs";
+import { ExportPayments } from "@/usecases/ExportPayments";
 import { AdminListScenarios } from "@/usecases/AdminListScenarios";
 import { GetSimulatorScenario } from "@/usecases/GetSimulatorScenario";
 import { CreateSimulatorScenario } from "@/usecases/CreateSimulatorScenario";
@@ -557,6 +558,8 @@ export interface AppContainer {
   // STORY-061: audit log viewer + CSV export
   listAuditLogs: ListAuditLogs;
   exportAuditLogs: ExportAuditLogs;
+  // P3-85: CSV export of payments
+  exportPayments: ExportPayments;
   // STORY-050b: simulator scenario CRUD
   adminListScenarios: AdminListScenarios;
   getSimulatorScenario: GetSimulatorScenario;
@@ -684,6 +687,8 @@ function buildProductionContainer(): AppContainer {
   const webhookEventLog: IWebhookEventLog = new PrismaWebhookEventLog(prisma);
   const listAuditLogs = new ListAuditLogs({ auditLog });
   const exportAuditLogs = new ExportAuditLogs({ auditLog });
+  // P3-85: CSV export of payments
+  const exportPayments = new ExportPayments({ orderRepo, userRepo });
   const scenarioRepo: ISimulatorScenarioRepository = new PrismaSimulatorScenarioRepository(prisma);
   // STORY-064: simulator attempt infrastructure
   const simulatorAttemptRepo: ISimulatorAttemptRepository = new PrismaSimulatorAttemptRepository(
@@ -1145,6 +1150,7 @@ function buildProductionContainer(): AppContainer {
     recordAuditLog,
     listAuditLogs,
     exportAuditLogs,
+    exportPayments,
     webhookEventLog,
     rebuildCourseCurriculum,
     scenarioRepo,
