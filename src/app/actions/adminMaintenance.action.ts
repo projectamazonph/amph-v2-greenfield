@@ -45,7 +45,7 @@ export async function toggleMaintenanceAction(
   _prevState: ToggleMaintenanceFormResult | null,
   formData: FormData,
 ): Promise<ToggleMaintenanceFormResult> {
-  const admin = await requireAdmin(undefined, true);
+  const admin = await requireAdmin();
 
   const enabled = formData.get("enabled") === "on";
   const rawMessage = formData.get("message");

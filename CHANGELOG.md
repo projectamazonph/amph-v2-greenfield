@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Admin 2FA back to opt-in
+
+`requireAdmin()` no longer bounces admins without 2FA to settings. The enforcement gate (STORY-097 follow-up) locked out the operator account, which has no TOTP enrolled, and contradicts the documented opt-in policy. Login-time TOTP challenge for enrolled accounts is unchanged; only the page-level enforcement is removed, along with the now-dead `skip2FA` parameter and the "required for all admin accounts" copy. See issue #448 for the enforcement track.
+
 ### P1-04: OAuth social login (PR-D)
 
 Google sign-in behind `GOOGLE_CLIENT_ID/SECRET` (no credentials means no button and fallback routes). Hand-rolled OAuth2 + PKCE with no new dependencies: start and callback API routes, verified-email auto-signup, email-match linking, last-method-guarded unlinking, and 2FA-bypass refusal, with session issuance mirroring password login. Login page button plus connected-accounts management on profile security, all audited. Facebook/GitHub remain `provider_not_configured`. Full scope in `docs/stories/P1-04-oauth.md`.

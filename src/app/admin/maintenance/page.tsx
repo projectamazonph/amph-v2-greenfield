@@ -23,9 +23,7 @@ interface PageProps {
 }
 
 export default async function MaintenancePage({ searchParams }: PageProps) {
-  // skip2FA so /admin/settings style redirects don't bounce the
-  // admin out (matches the pattern used by /admin/settings).
-  await requireAdmin(undefined, true);
+  await requireAdmin();
   const sp = await searchParams;
   const justSaved = sp.saved === "1";
 

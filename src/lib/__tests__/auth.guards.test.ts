@@ -237,9 +237,17 @@ describe("requireAdmin", () => {
   it("returns the User when the session is valid and the role is ADMIN", async () => {
     await seedUser({ id: "u-admin", role: "ADMIN", email: "admin@test.example.com" });
     await seedSessionCookie("u-admin", "ADMIN");
-    const user = await requireAdmin(undefined, true);
+    const user = await requireAdmin();
     expect(user.id).toBe("u-admin");
     expect(user.role).toBe("ADMIN");
+  });
+
+  it("does not require 2FA: an admin without it still passes (opt-in policy)", async () => {
+    await seedUser({ id: "u-no2fa", role: "ADMIN", email: "no2fa@test.example.com" });
+    await seedSessionCookie("u-no2fa", "ADMIN");
+    const user = await requireAdmin();
+    expect(user.id).toBe("u-no2fa");
+    expect(user.twoFactorEnabled).toBe(false);
   });
 
   it("redirects to /login when the session is missing", async () => {
