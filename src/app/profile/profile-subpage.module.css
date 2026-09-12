@@ -111,6 +111,21 @@
   line-height: 1.6;
 }
 
+.list {
+  list-style: none;
+  margin: 0 0 var(--space-5);
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
 .fields {
   display: grid;
   gap: var(--space-4);

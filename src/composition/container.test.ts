@@ -102,6 +102,10 @@ import { InMemorySettingRepository } from "@/infra/repositories/inmemory/InMemor
 import { GetSetting } from "@/usecases/GetSetting";
 import { SetSetting } from "@/usecases/SetSetting";
 import { ListSettings } from "@/usecases/ListSettings";
+import { InMemoryOAuthAccountRepository } from "@/infra/repositories/inmemory/InMemoryOAuthAccountRepository";
+import { StubOAuthBroker } from "@/infra/auth/StubOAuthBroker";
+import { LoginWithOAuth } from "@/usecases/LoginWithOAuth";
+import { UnlinkOAuthAccount } from "@/usecases/UnlinkOAuthAccount";
 import type { InvoiceRenderer } from "@/ports/rendering/InvoiceRenderer";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { JoseJwtService } from "@/infra/security/JoseJwtService";
@@ -292,6 +296,9 @@ export interface TestContainer extends AppContainer {
   assignmentRepo: InMemoryAssignmentRepository;
   // P1-05 (PR-C slice 3): site setting fakes
   settingRepo: InMemorySettingRepository;
+  // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
+  oauthAccountRepo: InMemoryOAuthAccountRepository;
+  oauthBrokers: Readonly<Record<string, StubOAuthBroker>>;
   // STORY-012: tests share NextMdxRenderer with production.
   mdxRenderer: IMdxContentRenderer;
   accessPolicy: StubAccessPolicy;
@@ -376,6 +383,9 @@ export function buildTestContainer(): TestContainer {
   const assignmentRepo = new InMemoryAssignmentRepository();
   // P1-05 (PR-C slice 3): site setting fakes
   const settingRepo = new InMemorySettingRepository();
+  // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
+  const oauthAccountRepo = new InMemoryOAuthAccountRepository();
+  const oauthBrokers = { google: new StubOAuthBroker("google") };
   // STORY-012: same NextMdxRenderer as production. No IO, no
   // stub needed ΓÇö the test container just hands every test a
   // shared, fresh instance with no state leaking between suites.
@@ -972,6 +982,24 @@ export function buildTestContainer(): TestContainer {
     getSetting: new GetSetting({ settingRepo }),
     setSetting: new SetSetting({ settingRepo, clock, recordAuditLog }),
     listSettings: new ListSettings({ settingRepo }),
+    // P1-04 (PR-D): OAuth social login (in-memory + stub broker)
+    oauthAccountRepo,
+    oauthBrokers,
+    loginWithOAuth: new LoginWithOAuth({
+      oauthAccountRepo,
+      userRepo,
+      sessionRepo,
+      idGen,
+      clock,
+      jwt,
+      recordAuditLog,
+      configuredProviders: ["google"],
+    }),
+    unlinkOAuthAccount: new UnlinkOAuthAccount({
+      oauthAccountRepo,
+      userRepo,
+      recordAuditLog,
+    }),
     // P1-07 (P4 PR-A): announcement banners (in-memory)
     announcementRepo: new InMemoryAnnouncementRepository(),
     announcementDismissalRepo: new InMemoryAnnouncementDismissalRepository(),

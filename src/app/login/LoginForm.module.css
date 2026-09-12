@@ -105,3 +105,38 @@
   color: var(--c-red-text);
   font-size: var(--fs-13);
 }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  color: var(--c-sub);
+  font-size: var(--fs-13);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--c-border);
+}
+
+.googleButton {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-card);
+  color: var(--c-ink-2);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
+.googleButton:hover {
+  border-color: var(--c-link);
+  color: var(--c-link);
+}

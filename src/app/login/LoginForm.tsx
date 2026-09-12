@@ -32,14 +32,27 @@ const errorMessage: Record<string, string> = {
   rate_limited: "Too many login attempts. Please wait a few minutes and try again.",
   totp_required: "Enter the 6-digit code from your authenticator app to continue.",
   invalid_totp_code: "That code didn't match. Check your authenticator app and try again.",
+  oauth_unavailable: "Google sign-in is not set up right now. Use your email instead.",
+  oauth_denied: "Google sign-in was cancelled. Try again or use your email.",
+  oauth_state: "That sign-in attempt expired. Start over from this page.",
+  oauth_exchange: "Google refused the sign-in. Try again or use your email.",
+  oauth_profile: "Google did not share your profile. Try again or use your email.",
+  oauth_unverified: "Your Google email is not verified. Verify it with Google first.",
+  oauth_blocked: "This account cannot sign in right now. Contact support.",
+  oauth_2fa_required:
+    "This account uses two-factor authentication. Sign in with your email, password, and code.",
+  oauth_failed: "Google sign-in failed. Try again or use your email.",
 };
 
 export function LoginForm({
   redirectTo,
   errorKind,
+  googleEnabled = false,
 }: {
   redirectTo: string;
   errorKind: string | null;
+  /** P1-04: Google OAuth is wired (env present). Absent means hidden. */
+  googleEnabled?: boolean;
 }) {
   const errorText = errorKind ? (errorMessage[errorKind] ?? null) : null;
   const needsTotp = errorKind === "totp_required" || errorKind === "invalid_totp_code";
@@ -110,6 +123,17 @@ export function LoginForm({
             Sign in
           </Button>
         </form>
+
+        {googleEnabled && (
+          <>
+            <div className={styles.divider} aria-hidden="true">
+              <span>or</span>
+            </div>
+            <Link href="/api/auth/oauth/google" className={styles.googleButton}>
+              Continue with Google
+            </Link>
+          </>
+        )}
 
         <p className={styles.altPrompt}>
           New to Project Amazon PH Academy?{" "}

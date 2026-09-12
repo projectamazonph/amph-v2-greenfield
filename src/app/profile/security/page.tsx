@@ -13,6 +13,8 @@ import {
   disableStudentTwoFactorAction,
   enableStudentTwoFactorAction,
 } from "@/app/actions/studentTwoFactor.action";
+import { unlinkOAuthAction } from "@/app/actions/unlinkOAuth.action";
+import { buildContainer } from "@/composition/container";
 import styles from "../profile-subpage.module.css";
 
 const twoFactorErrorMessage: Record<string, string> = {
@@ -24,8 +26,22 @@ const twoFactorErrorMessage: Record<string, string> = {
     "We could not update your security settings. Your 2FA state is unchanged. Try again in a moment.",
 };
 
+const oauthErrorMessage: Record<string, string> = {
+  link_not_found: "That connection is already gone.",
+  last_auth_method:
+    "Set a password first, or this account could never sign in again. Use account recovery to set one.",
+  db_error: "We could not update your connections. Try again in a moment.",
+  oauth_unknown: "Unknown sign-in provider.",
+};
+
+const PROVIDER_LABELS: Record<string, string> = {
+  google: "Google",
+  facebook: "Facebook",
+  github: "GitHub",
+};
+
 interface PageProps {
-  searchParams: Promise<{ error?: string; "2fa"?: string }>;
+  searchParams: Promise<{ error?: string; "2fa"?: string; unlinked?: string }>;
 }
 
 export default async function StudentSecurityPage({ searchParams }: PageProps) {
@@ -38,6 +54,15 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
       : sp["2fa"] === "disabled"
         ? "Two-factor authentication has been disabled."
         : null;
+  const oauthError = sp.error ? (oauthErrorMessage[sp.error] ?? null) : null;
+  const oauthNotice = sp.unlinked === "1" ? "That sign-in connection is removed." : null;
+
+  // P1-04: linked providers plus whether Google connect is offered.
+  const container = buildContainer();
+  const linksResult = await container.oauthAccountRepo.listByUser(session.id);
+  const links = linksResult.ok ? linksResult.value : [];
+  const googleEnabled = !!process.env.GOOGLE_CLIENT_ID && !!process.env.GOOGLE_CLIENT_SECRET;
+  const googleLinked = links.some((link) => link.provider === "google");
 
   async function enable() {
     "use server";
@@ -117,6 +142,54 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
                 </button>
               </form>
             </>
+          )}
+        </section>
+
+        <section className={styles.section} aria-labelledby="connected-accounts-title">
+          <p className={styles.sectionKicker}>Sign-in options</p>
+          <h2 id="connected-accounts-title" className={styles.sectionTitle}>
+            Connected accounts
+          </h2>
+          <p className={styles.help}>
+            Sign in with a connected account instead of typing your password.
+            Removing your only sign-in method is blocked until you set a password.
+          </p>
+
+          {oauthNotice ? (
+            <p className={styles.notice} role="status">
+              {oauthNotice}
+            </p>
+          ) : null}
+          {oauthError ? (
+            <p className={styles.error} role="alert">
+              {oauthError}
+            </p>
+          ) : null}
+
+          {links.length === 0 ? (
+            <p className={styles.help}>No connected accounts yet.</p>
+          ) : (
+            <ul className={styles.list}>
+              {links.map((link) => (
+                <li key={link.provider} className={styles.row}>
+                  <span>{PROVIDER_LABELS[link.provider] ?? link.provider}</span>
+                  <form action={unlinkOAuthAction}>
+                    <input type="hidden" name="provider" value={link.provider} />
+                    <button type="submit" className={styles.danger}>
+                      Remove
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {googleEnabled && !googleLinked && (
+            <p className={styles.actions}>
+              <Link href="/api/auth/oauth/google" className={styles.primary}>
+                Connect Google
+              </Link>
+            </p>
           )}
         </section>
       </main>

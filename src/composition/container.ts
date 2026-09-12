@@ -146,6 +146,14 @@ import { PrismaSettingRepository } from "@/infra/repositories/PrismaSettingRepos
 import { GetSetting } from "@/usecases/GetSetting";
 import { SetSetting } from "@/usecases/SetSetting";
 import { ListSettings } from "@/usecases/ListSettings";
+// P1-04 (PR-D): OAuth social login
+import type { OAuthProvider } from "@/domain/entities/OAuthAccount";
+import type { IOAuthAccountRepository } from "@/ports/repositories/IOAuthAccountRepository";
+import { PrismaOAuthAccountRepository } from "@/infra/repositories/PrismaOAuthAccountRepository";
+import type { IOAuthBroker } from "@/ports/auth/IOAuthBroker";
+import { GoogleOAuthBroker } from "@/infra/auth/GoogleOAuthBroker";
+import { LoginWithOAuth } from "@/usecases/LoginWithOAuth";
+import { UnlinkOAuthAccount } from "@/usecases/UnlinkOAuthAccount";
 
 // STORY-012: MDX content renderer port + adapter
 import type { IMdxContentRenderer } from "@/ports/rendering/IMdxContentRenderer";
@@ -492,6 +500,11 @@ export interface AppContainer {
   getSetting: GetSetting;
   setSetting: SetSetting;
   listSettings: ListSettings;
+  // P1-04 (PR-D): OAuth social login
+  oauthAccountRepo: IOAuthAccountRepository;
+  oauthBrokers: Readonly<Record<string, IOAuthBroker>>;
+  loginWithOAuth: LoginWithOAuth;
+  unlinkOAuthAccount: UnlinkOAuthAccount;
   // STORY-092 (US-008): admin certificate list + detail
   adminListCertificates: AdminListCertificates;
   adminGetCertificate: AdminGetCertificate;
@@ -735,6 +748,21 @@ function buildProductionContainer(): AppContainer {
   const assignmentRepo: IAssignmentRepository = new PrismaAssignmentRepository(prisma);
   // P1-05 (PR-C slice 3): site settings
   const settingRepo: ISettingRepository = new PrismaSettingRepository(prisma);
+  // P1-04 (PR-D): OAuth social login. Google only; the broker map
+  // stays open so facebook/github adapters slot in without touching
+  // the routes. Absent credentials disable the flow (see routes).
+  const oauthAccountRepo: IOAuthAccountRepository = new PrismaOAuthAccountRepository(prisma);
+  const googleBroker =
+    process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? new GoogleOAuthBroker({
+          clientId: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        })
+      : null;
+  const oauthBrokers: Readonly<Record<string, IOAuthBroker>> = googleBroker
+    ? { google: googleBroker }
+    : {};
+  const configuredOAuthProviders: readonly OAuthProvider[] = googleBroker ? ["google"] : [];
   // STORY-012: bounded LRU cache (default 500 entries). Each entry
   // is a React element + frontmatter + HTML; 500 is a generous
   // upper bound for the AMPH catalog (9 modules * ~5 lessons = 45
@@ -1312,6 +1340,24 @@ function buildProductionContainer(): AppContainer {
     getSetting: new GetSetting({ settingRepo }),
     setSetting: new SetSetting({ settingRepo, clock, recordAuditLog }),
     listSettings: new ListSettings({ settingRepo }),
+    // P1-04 (PR-D): OAuth social login
+    oauthAccountRepo,
+    oauthBrokers,
+    loginWithOAuth: new LoginWithOAuth({
+      oauthAccountRepo,
+      userRepo,
+      sessionRepo,
+      idGen,
+      clock,
+      jwt,
+      recordAuditLog,
+      configuredProviders: configuredOAuthProviders,
+    }),
+    unlinkOAuthAccount: new UnlinkOAuthAccount({
+      oauthAccountRepo,
+      userRepo,
+      recordAuditLog,
+    }),
     // P1-07 (P4 PR-A): announcement banners
     announcementRepo: new PrismaAnnouncementRepository(prisma),
     announcementDismissalRepo: new PrismaAnnouncementDismissalRepository(prisma),
