@@ -1,7 +1,6 @@
 # P1-01 — Course prerequisites (PR-C slice 1)
 
-**Status:** In progress (`feat/p1-01-prerequisites`, part of PR-C per #403)
-**Branch policy:** branch from main, PR to main, squash merge.
+**Status:** Implemented — merged on `main`. Migration `20261009020000_p1_01_prerequisite_audit_fields` adds `createdById`/`updatedById` to `prerequisites`. Entity (`Prerequisite`), port (`IPrerequisiteRepository`), Prisma + InMemory adapters, `SetCoursePrerequisite` and `RemoveCoursePrerequisite` use cases, `prerequisite.action.ts`, admin page at `/admin/courses/[id]/prerequisites`, and `EnrollStudent` prerequisite gate all ship. See `FEATURES.md` and `CHANGELOG.md` for confirmation.
 
 ## Scope
 

@@ -12,19 +12,21 @@ These six items require feature-level work (new libraries, schema changes, or in
 **Goal:** Trigger a celebratory animation when a student marks a lesson complete.
 
 **Files to create:**
+
 - `src/components/ui/Confetti.tsx` — Client component using `canvas-confetti`
 
 **Implementation:**
+
 ```tsx
-'use client';
-import confetti from 'canvas-confetti';
+"use client";
+import confetti from "canvas-confetti";
 
 export function fireConfetti() {
   confetti({
     particleCount: 100,
     spread: 70,
     origin: { y: 0.6 },
-    colors: ['#FF6B35', '#FFA07A', '#FFD700'],
+    colors: ["#FF6B35", "#FFA07A", "#FFD700"],
   });
 }
 ```
@@ -40,9 +42,11 @@ export function fireConfetti() {
 **Goal:** Admin can drag modules within a course to reorder them.
 
 **Files to create:**
+
 - `src/components/admin/DraggableModuleList.tsx` — Client component
 
 **Implementation:** Use `@dnd-kit/core` + `@dnd-kit/sortable`:
+
 - Wrap modules in `<DndContext>` with `<SortableContext>`
 - Each module row uses `useSortable` for drag handle
 - On drag end, POST new order to `/api/admin/courses/[id]/modules/reorder`
@@ -58,17 +62,19 @@ export function fireConfetti() {
 **Goal:** Full dark mode with system preference detection + manual override.
 
 **Files to create:**
+
 - `src/components/ui/ThemeToggle.tsx` — Client component
 - `src/hooks/useTheme.ts` — Theme state management
 
 **Implementation:**
+
 1. Add dark variants for all CSS custom properties in `globals.css`:
    ```css
    [data-theme="dark"] {
-     --surface-0: #1A1A1A;
+     --surface-0: #1a1a1a;
      --surface-1: #242424;
-     --surface-2: #2E2E2E;
-     --ink-900: #FAFAF7;
+     --surface-2: #2e2e2e;
+     --ink-900: #fafaf7;
      /* etc. */
    }
    ```
@@ -85,25 +91,25 @@ export function fireConfetti() {
 **Goal:** Admin can export table data to CSV files.
 
 **Files to create:**
+
 - `src/lib/export-csv.ts` — Utility to convert arrays to CSV
 - `src/app/api/admin/payments/export/route.ts` — Payments export endpoint
 - `src/app/api/admin/audit-log/export/route.ts` — Audit log export endpoint
 
 **Implementation:**
+
 ```typescript
 // src/lib/export-csv.ts
 export function toCSV<T>(rows: T[], headers: (keyof T)[]): string {
-  const headerRow = headers.join(',');
-  const dataRows = rows.map(row =>
-    headers.map(h => JSON.stringify(row[h] ?? '')).join(',')
-  );
-  return [headerRow, ...dataRows].join('\n');
+  const headerRow = headers.join(",");
+  const dataRows = rows.map((row) => headers.map((h) => JSON.stringify(row[h] ?? "")).join(","));
+  return [headerRow, ...dataRows].join("\n");
 }
 
 export function downloadCSV(filename: string, csv: string) {
-  const blob = new Blob([csv], { type: 'text/csv' });
+  const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.click();
@@ -117,15 +123,9 @@ export function downloadCSV(filename: string, csv: string) {
 
 ## P3-86. PDF Certificate Download
 
-**Goal:** Students/admins can download certificates as PDF files.
+**Status:** Implemented — `src/app/certificates/[hash]/pdf/route.ts` exists and uses `@react-pdf/renderer`. `RenderCertificatePdf.ts` use case renders the certificate PDF. The PDF download is wired to the certificate detail page.
 
-**Files to create:**
-- `src/components/certificates/CertificatePDF.tsx` — PDF template using `@react-pdf/renderer`
-- `src/app/api/certificates/[hash]/pdf/route.ts` — PDF generation endpoint
-
-**Implementation:** `@react-pdf/renderer` is already in dependencies. Create a PDF component that mirrors the existing certificate layout (logo, title, name, course, date, verification hash). Expose via a download button on `/certificates/[hash]`.
-
-**Wire-up:** Add `<a href="/api/certificates/[hash]/pdf" download className="btn btn-primary">Download PDF</a>` next to the existing print button.
+**No action needed.**
 
 ---
 
@@ -134,11 +134,13 @@ export function downloadCSV(filename: string, csv: string) {
 **Goal:** Students see a notification bell with unread count; admins get alerts for pending refunds, new users, etc.
 
 **Files to create:**
+
 - `src/components/ui/NotificationBell.tsx` — Bell icon + dropdown
 - `src/app/api/notifications/route.ts` — Fetch + mark-as-read endpoints
 - `prisma/schema.prisma` — Add `Notification` model
 
 **Schema:**
+
 ```prisma
 model Notification {
   id        String   @id @default(cuid())
@@ -154,6 +156,7 @@ model Notification {
 ```
 
 **Implementation:**
+
 1. Server-side: emit notifications from key events (refund requested, new enrollment, etc.)
 2. Client-side: NotificationBell polls every 30s or uses Server-Sent Events
 3. Mark-as-read on click
@@ -164,24 +167,22 @@ model Notification {
 
 ## Implementation Priority
 
-If tackling all six, recommend this order:
+If tackling the remaining five, recommend this order:
 
 1. **P3-85 CSV Export** — Fastest win, pure utility work
 2. **P3-82 Confetti** — One component, one dependency, high delight
-3. **P3-86 PDF Certificates** — Dependency already installed, clean win
-4. **P3-84 Dark Mode** — Token-level work, touches every page
-5. **P3-83 Drag-and-Drop** — Needs new dependencies + schema
-6. **P3-87 Notifications** — Schema migration + polling infrastructure
+3. **P3-84 Dark Mode** — Token-level work, touches every page
+4. **P3-83 Drag-and-Drop** — Needs new dependencies + schema
+5. **P3-87 Notifications** — Schema migration + polling infrastructure
 
 ---
 
 ## Total Deferred Work
 
-| # | Feature | Est. Effort | Dependencies |
-|---|---------|------------|--------------|
-| P3-82 | Confetti | S | canvas-confetti (installed) |
-| P3-83 | DnD reorder | M | @dnd-kit/core, @dnd-kit/sortable |
-| P3-84 | Dark mode | L | None |
-| P3-85 | CSV export | S | None |
-| P3-86 | PDF cert | M | @react-pdf/renderer (installed) |
-| P3-87 | Notifications | XL | Schema migration |
+| #     | Feature       | Est. Effort | Dependencies                     |
+| ----- | ------------- | ----------- | -------------------------------- |
+| P3-82 | Confetti      | S           | canvas-confetti                  |
+| P3-83 | DnD reorder   | M           | @dnd-kit/core, @dnd-kit/sortable |
+| P3-84 | Dark mode     | L           | None                             |
+| P3-85 | CSV export    | S           | None                             |
+| P3-87 | Notifications | XL          | Schema migration                 |

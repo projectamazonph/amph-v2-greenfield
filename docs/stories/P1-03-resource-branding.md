@@ -1,7 +1,6 @@
 # P1-03 — Download branding on all resources (PR-C slice 4)
 
-**Status:** In progress (`feat/p1-03-resource-branding`, part of PR-C per #403)
-**Branch policy:** branch from main, PR to main, squash merge.
+**Status:** Implemented — merged on `main`. `scripts/brand-downloads.py` (rerunnable, `--check` gate) brands all 11 XLSX workbooks and 2 DOCX handouts to match the PDF footer convention. 293/293 formula cells byte-identical. DOCX body paragraph counts unchanged. See `CHANGELOG.md` for confirmation.
 
 ## The gap (verified against source, 2026-09-11)
 
