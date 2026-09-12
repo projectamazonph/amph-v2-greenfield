@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Production UI rules adopted in the design brief
+
+Reviewed the user-supplied "Full-Featured Sites and Apps: Complete UI Rules" reference against source and encoded it in `docs/design-brief.md` as a normative checklist: pinned families (navigation, mobile, forms, modals, loading, search, tables, color, type, spacing, motion, icons, a11y, performance, security, resilience) with AMPH mappings, deliberate exceptions (brand font stack, drawer over bottom nav, no PWA/RTL/i18n/virtualization), and one recorded gap (no sitemap/robots/canonical coverage yet). Docs only, no product code changes.
+
 ### Admin 2FA visibility badge (first step toward #413)
 
 The users table gains a 2FA column and the user detail header a 2FA On/Off badge, so admins can see at a glance which accounts lack two-factor protection. No enforcement: admin 2FA stays opt-in per #495. Full enforcement remains tracked in #413.
