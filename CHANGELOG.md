@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### P1-04: OAuth social login (PR-D)
+
+Google sign-in behind `GOOGLE_CLIENT_ID/SECRET` (no credentials means no button and fallback routes). Hand-rolled OAuth2 + PKCE with no new dependencies: start and callback API routes, verified-email auto-signup, email-match linking, last-method-guarded unlinking, and 2FA-bypass refusal, with session issuance mirroring password login. Login page button plus connected-accounts management on profile security, all audited. Facebook/GitHub remain `provider_not_configured`. Full scope in `docs/stories/P1-04-oauth.md`.
+
 ### P1-03: Download branding on all resources (PR-C slice 4)
 
 Content audit found all 13 PDFs branded but 0/11 workbooks and 0/2 handouts carrying any brand string. `scripts/brand-downloads.py` (rerunnable, `--check` gate) adds document properties, print footers, and a brand row to every XLSX plus header/footer branding to both DOCX files, matching the PDF footer convention. Verified zero drift: 293/293 formulas byte-identical, DOCX body counts unchanged. Full scope in `docs/stories/P1-03-resource-branding.md`.

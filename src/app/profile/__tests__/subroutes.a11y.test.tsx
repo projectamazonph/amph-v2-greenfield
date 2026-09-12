@@ -12,6 +12,7 @@ const mockGetSessionUser = vi.fn();
 const mockFindByUserId = vi.fn();
 const mockFindCourseById = vi.fn();
 const mockFindEnrollment = vi.fn();
+const mockListOAuthLinks = vi.fn();
 
 vi.mock("@/components/student/StudentShell", () => ({
   StudentShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -48,6 +49,7 @@ vi.mock("@/composition/container", () => ({
     orderRepo: { findByUserId: mockFindByUserId },
     courseRepo: { findById: mockFindCourseById },
     enrollmentRepo: { findByUserIdAndCourseId: mockFindEnrollment },
+    oauthAccountRepo: { listByUser: mockListOAuthLinks },
   }),
 }));
 
@@ -79,9 +81,11 @@ describe("student profile subroutes accessibility", () => {
     mockFindByUserId.mockReset();
     mockFindCourseById.mockReset();
     mockFindEnrollment.mockReset();
+    mockListOAuthLinks.mockReset();
     mockRequireAuth.mockResolvedValue(makeUser());
     mockGetSessionUser.mockResolvedValue(makeUser());
     mockFindByUserId.mockResolvedValue({ ok: true, value: [] });
+    mockListOAuthLinks.mockResolvedValue({ ok: true, value: [] });
   });
 
   it("has no axe violations on the data page", async () => {

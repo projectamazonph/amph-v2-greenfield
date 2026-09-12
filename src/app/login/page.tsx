@@ -26,6 +26,9 @@ export default async function LoginPage({
       ? params.redirect
       : "/courses";
   const errorKind = params.error ?? null;
+  // P1-04: the Google button only renders when the OAuth credentials
+  // are wired. The start route enforces the same gate server-side.
+  const googleEnabled = !!process.env.GOOGLE_CLIENT_ID && !!process.env.GOOGLE_CLIENT_SECRET;
 
-  return <LoginForm redirectTo={redirectTo} errorKind={errorKind} />;
+  return <LoginForm redirectTo={redirectTo} errorKind={errorKind} googleEnabled={googleEnabled} />;
 }

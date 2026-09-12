@@ -122,10 +122,15 @@ export class InMemoryUserRepository implements UserRepository {
     return Result.ok(this.emailIndex.has(email.toLowerCase()));
   }
 
-  /** Get the stored password hash for a user. */
+  /**
+   * Get the stored password hash for a user. Reports `not_found`
+   * only when no hash was ever stored. An empty string is a real
+   * value meaning "no password" (OAuth-created accounts), matching
+   * PrismaUserRepository which returns the stored string as-is.
+   */
   async getPasswordHash(id: string): Promise<Result<string, UserError>> {
     const hash = this.passwordHashes.get(id);
-    if (!hash) return Result.err({ kind: "not_found" });
+    if (hash === undefined) return Result.err({ kind: "not_found" });
     return Result.ok(hash);
   }
 

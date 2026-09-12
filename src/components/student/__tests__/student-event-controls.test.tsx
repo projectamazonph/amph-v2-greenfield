@@ -85,6 +85,23 @@ describe("student authentication form events", () => {
     expect(html).toMatch(/action="\/api\/auth\/login"/);
   });
 
+  it("offers Google sign-in only when the provider is wired (P1-04)", () => {
+    const enabled = renderToString(
+      createElement(LoginForm, {
+        redirectTo: "/dashboard",
+        errorKind: null,
+        googleEnabled: true,
+      }),
+    );
+    expect(enabled).toContain("Continue with Google");
+    expect(enabled).toMatch(/href="\/api\/auth\/oauth\/google"/);
+
+    const disabled = renderToString(
+      createElement(LoginForm, { redirectTo: "/dashboard", errorKind: null }),
+    );
+    expect(disabled).not.toContain("Continue with Google");
+  });
+
   it("posts signup and preserves a selected pricing tier", () => {
     const html = renderToString(
       createElement(SignupForm, { errorKind: null, tierSlug: "mastery" }),
