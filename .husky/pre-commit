@@ -1,1 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged for staged files
+echo "Running lint-staged..."
 pnpm exec lint-staged
+
+# Run curriculum validation on staged MDX files
+echo "Running curriculum validation..."
+if ! pnpm validate:curriculum; then
+  echo "❌ Curriculum validation failed. Please fix the issues before committing."
+  exit 1
+fi
+
+exit 0
