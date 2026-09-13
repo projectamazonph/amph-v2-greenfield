@@ -101,9 +101,12 @@ export default async function NewBadgePage({ searchParams }: PageProps) {
             />
           </label>
 
-          <label className={styles.field}>
-            <span className={styles.label}>Icon name *</span>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="badge-icon-name">
+              Icon name *
+            </label>
             <input
+              id="badge-icon-name"
               type="text"
               name="iconName"
               required
@@ -114,7 +117,7 @@ export default async function NewBadgePage({ searchParams }: PageProps) {
             <span className={styles.hint}>
               Any Phosphor icon name. Browse at phosphoricons.com.
             </span>
-          </label>
+          </div>
 
           <label className={styles.field}>
             <span className={styles.label}>XP reward *</span>

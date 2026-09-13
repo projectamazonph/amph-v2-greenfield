@@ -76,7 +76,7 @@ export function CommandPalette({ items }: CommandPaletteProps) {
     return items.filter(
       (item) =>
         item.label.toLowerCase().includes(lower) ||
-        (item.section?.toLowerCase().includes(lower) ?? false)
+        (item.section?.toLowerCase().includes(lower) ?? false),
     );
   }, [items, query]);
 
@@ -95,7 +95,7 @@ export function CommandPalette({ items }: CommandPaletteProps) {
         router.push(filtered[selectedIdx].href);
       }
     },
-    [filtered, selectedIdx, router]
+    [filtered, selectedIdx, router],
   );
 
   // Scroll selected item into view
@@ -113,7 +113,7 @@ export function CommandPalette({ items }: CommandPaletteProps) {
           <MagnifyingGlass size={18} className={styles.searchIcon} aria-hidden />
           <input
             ref={inputRef}
-            type="text"
+            type="search"
             className={styles.input}
             placeholder="Search pages, actions..."
             value={query}
@@ -130,9 +130,7 @@ export function CommandPalette({ items }: CommandPaletteProps) {
           <kbd className={styles.kbd}>Esc</kbd>
         </div>
         <div id="command-list" ref={listRef} className={styles.list} role="listbox">
-          {filtered.length === 0 && (
-            <div className={styles.empty}>No results found</div>
-          )}
+          {filtered.length === 0 && <div className={styles.empty}>No results found</div>}
           {filtered.map((item, i) => {
             const Icon = item.icon;
             return (
@@ -154,9 +152,7 @@ export function CommandPalette({ items }: CommandPaletteProps) {
                   </span>
                 )}
                 <span className={styles.itemLabel}>{item.label}</span>
-                {item.section && (
-                  <span className={styles.itemSection}>{item.section}</span>
-                )}
+                {item.section && <span className={styles.itemSection}>{item.section}</span>}
               </button>
             );
           })}

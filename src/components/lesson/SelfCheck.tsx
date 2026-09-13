@@ -59,9 +59,9 @@ export function SelfCheck(props: SelfCheckProps): ReactElement {
       aria-labelledby={`${id}-prompt`}
     >
       <form onSubmit={onSubmit}>
-        <h3 id={`${id}-prompt`} className={styles.prompt}>
+        <h2 id={`${id}-prompt`} className={styles.prompt}>
           {prompt}
-        </h3>
+        </h2>
         <fieldset className={styles.fieldset}>
           <legend className={styles.visuallyHidden}>Answer choices</legend>
           {options.map((option, index) => (

@@ -150,7 +150,12 @@ export default async function AdminRefundsPage({ searchParams }: PageProps) {
         </Link>
       </nav>
 
-      <form method="get" className={styles.filters}>
+      <form
+        method="get"
+        className={styles.filters}
+        role="search"
+        aria-label="Filter refund requests"
+      >
         <input type="hidden" name="status" value={status} />
         <label className={styles.searchLabel}>
           <span>Student email</span>
@@ -158,6 +163,7 @@ export default async function AdminRefundsPage({ searchParams }: PageProps) {
             type="search"
             name="email"
             placeholder="e.g. alice@example.com"
+            aria-label="Search by student email"
             defaultValue={params.email ?? ""}
             className={styles.input}
           />
@@ -172,6 +178,11 @@ export default async function AdminRefundsPage({ searchParams }: PageProps) {
           Clear
         </Link>
       </form>
+      {email && (
+        <p className={styles.resultCount} role="status">
+          {total} result(s) for &quot;{email}&quot;
+        </p>
+      )}
 
       <Card padding={0}>
         <AdminRefundsTable rows={rows} />
@@ -182,10 +193,12 @@ export default async function AdminRefundsPage({ searchParams }: PageProps) {
           </span>
           {nextLink !== null ? (
             <Link href={nextLink} className={styles.nextButton}>
-              Next{" "}<ArrowRight size={16} aria-hidden />
+              Next <ArrowRight size={16} aria-hidden />
             </Link>
           ) : (
-            <span className={styles.nextButtonDisabled}>Next{" "}<ArrowRight size={16} aria-hidden /></span>
+            <span className={styles.nextButtonDisabled}>
+              Next <ArrowRight size={16} aria-hidden />
+            </span>
           )}
         </div>
       </Card>

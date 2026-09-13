@@ -17,6 +17,11 @@
   letter-spacing: 0.02em;
 }
 
+.requiredMark {
+  color: var(--c-red-text);
+  font-weight: 700;
+}
+
 .inputWrap {
   position: relative;
   display: flex;

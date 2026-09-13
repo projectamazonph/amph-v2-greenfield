@@ -96,9 +96,15 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           <thead>
             <tr>
               <th scope="col">Keyword</th>
-              <th scope="col" className={styles.thNum}>Impr/day</th>
-              <th scope="col" className={styles.thNum}>Benchmark CPC</th>
-              <th scope="col" className={styles.thNum}>Your bid</th>
+              <th scope="col" className={styles.thNum}>
+                Impr/day
+              </th>
+              <th scope="col" className={styles.thNum}>
+                Benchmark CPC
+              </th>
+              <th scope="col" className={styles.thNum}>
+                Your bid
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -114,6 +120,7 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
                       type="number"
                       step="0.10"
                       min="0"
+                      inputMode="decimal"
                       className={styles.input}
                       value={bids[k.keywordId] ?? k.currentBid}
                       onChange={(e) => onChange(k.keywordId, Number(e.target.value))}
@@ -131,12 +138,7 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           {error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        className={styles.submit}
-        disabled={pending}
-        aria-busy={pending}
-      >
+      <button type="submit" className={styles.submit} disabled={pending} aria-busy={pending}>
         {pending ? "Running…" : "Run simulation"}
       </button>
       {simResult ? (

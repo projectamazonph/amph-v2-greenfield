@@ -37,7 +37,7 @@ export function PitfallCallout(props: PitfallCalloutProps): ReactElement {
     <aside id={id} role="note" className={`${styles.callout} ${styles[variant]}`}>
       <span className={styles.iconSlot}>{variantIcon(variant)}</span>
       <div className={styles.body}>
-        {title ? <h3 className={styles.title}>{title}</h3> : null}
+        {title ? <h2 className={styles.title}>{title}</h2> : null}
         <div className={styles.content}>{children}</div>
       </div>
     </aside>

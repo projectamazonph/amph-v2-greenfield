@@ -146,7 +146,7 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
 
           <label className={styles.field}>
             <span className={styles.label}>Replace file</span>
-            <input type="file" name="file" className={styles.input} />
+            <input type="file" name="file" className={styles.input} aria-label="Resource file" />
             <span className={styles.hint}>
               {resource.fileKey
                 ? "This resource's current file was uploaded directly. Uploading a new one replaces it and deletes the old copy from storage."

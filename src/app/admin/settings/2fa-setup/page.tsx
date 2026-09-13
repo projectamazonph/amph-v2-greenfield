@@ -87,6 +87,7 @@ export default async function TwoFactorSetupPage({
               type="text"
               name="code"
               inputMode="numeric"
+              pattern="[0-9]*"
               autoComplete="one-time-code"
               required
               maxLength={6}

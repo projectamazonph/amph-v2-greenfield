@@ -78,6 +78,7 @@ export default async function NewDiscountCodePage({ searchParams }: PageProps) {
               required
               min="1"
               max="100000"
+              inputMode="numeric"
               defaultValue="20"
               className={styles.input}
               style={{ width: "8rem" }}
@@ -93,6 +94,7 @@ export default async function NewDiscountCodePage({ searchParams }: PageProps) {
               type="number"
               name="maxUses"
               min="1"
+              inputMode="numeric"
               className={styles.input}
               style={{ width: "8rem" }}
               placeholder="e.g. 100"

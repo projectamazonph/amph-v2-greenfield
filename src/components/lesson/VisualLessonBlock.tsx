@@ -126,9 +126,9 @@ function VisualShell({
     >
       <div className={styles.visualHeader}>
         <p className={styles.eyebrow}>{eyebrow}</p>
-        <h3 id={`${id}-title`} className={styles.visualTitle}>
+        <h2 id={`${id}-title`} className={styles.visualTitle}>
           {title}
-        </h3>
+        </h2>
       </div>
       {children}
     </section>
@@ -351,7 +351,7 @@ function DecisionTree({ id, title, steps }: { id: string; title: string; steps: 
           <li key={step.number} className={styles.decisionStep}>
             <div className={styles.decisionNumber}>{step.number}</div>
             <div className={styles.decisionContent}>
-              <h4>{step.title}</h4>
+              <h3>{step.title}</h3>
               <p>
                 <strong>Ask:</strong> {step.question}
               </p>
@@ -426,7 +426,7 @@ function PracticeWorkbench({
       <div className={styles.practiceGrid}>
         <div className={styles.practiceCase}>
           <p className={styles.practiceLabel}>Case file</p>
-          <h4>{prompt}</h4>
+          <h3>{prompt}</h3>
           <dl className={styles.caseFacts}>
             <div>
               <dt>Impressions</dt>

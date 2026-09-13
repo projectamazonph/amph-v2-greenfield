@@ -112,7 +112,7 @@ export default async function NewResourcePage({ searchParams }: PageProps) {
 
           <label className={styles.field}>
             <span className={styles.label}>Upload a file</span>
-            <input type="file" name="file" className={styles.input} />
+            <input type="file" name="file" className={styles.input} aria-label="Resource file" />
             <span className={styles.hint}>
               Uploads the file directly. If you upload one, it's used instead of the link below.
             </span>

@@ -57,7 +57,9 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
         <TopBar
           title="Courses"
           subtitle="Manage all courses"
-          breadcrumb={<Breadcrumb items={[{ href: "/admin", label: "Admin" }, { label: "Courses" }]} />}
+          breadcrumb={
+            <Breadcrumb items={[{ href: "/admin", label: "Admin" }, { label: "Courses" }]} />
+          }
         />
         <Card padding={6}>
           <p className={styles.error}>Failed to load courses: {result.error.message}</p>
@@ -84,7 +86,9 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
       <TopBar
         title="Courses"
         subtitle={`${totalCount} total`}
-        breadcrumb={<Breadcrumb items={[{ href: "/admin", label: "Admin" }, { label: "Courses" }]} />}
+        breadcrumb={
+          <Breadcrumb items={[{ href: "/admin", label: "Admin" }, { label: "Courses" }]} />
+        }
         actions={
           <Link href="/admin/courses/new" className={styles.addButton}>
             + Add course
@@ -93,15 +97,21 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
       />
 
       {/* Filter form — GET submission updates URL params */}
-      <form className={styles.filters} method="get">
+      <form className={styles.filters} method="get" role="search" aria-label="Filter courses">
         <input
-          type="text"
+          type="search"
           name="search"
           defaultValue={search ?? ""}
           placeholder="Search title or slug"
+          aria-label="Search title or slug"
           className={styles.searchInput}
         />
-        <select name="status" defaultValue={status ?? ""} className={styles.select}>
+        <select
+          name="status"
+          defaultValue={status ?? ""}
+          className={styles.select}
+          aria-label="Filter by status"
+        >
           <option value="">All statuses</option>
           <option value="DRAFT">Draft</option>
           <option value="PUBLISHED">Published</option>
@@ -111,6 +121,11 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
           Apply
         </button>
       </form>
+      {search && (
+        <p className={styles.resultCount} role="status">
+          {totalCount} result(s) for &quot;{search}&quot;
+        </p>
+      )}
 
       {/* Table — client component handles renderCell (function props) */}
       <Card padding={6}>

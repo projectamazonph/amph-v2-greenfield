@@ -92,6 +92,7 @@ export default async function EditDiscountCodePage({ params, searchParams }: Pag
               required
               min="1"
               max="100000"
+              inputMode="numeric"
               defaultValue={dc.value}
               className={styles.input}
               style={{ width: "8rem" }}
@@ -104,6 +105,7 @@ export default async function EditDiscountCodePage({ params, searchParams }: Pag
               type="number"
               name="maxUses"
               min="0"
+              inputMode="numeric"
               defaultValue={dc.maxUses ?? ""}
               className={styles.input}
               style={{ width: "8rem" }}

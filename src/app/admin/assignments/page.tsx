@@ -45,7 +45,11 @@ export default async function AssignmentsPage({ searchParams }: PageProps) {
   const status = params.status && isAssignmentStatus(params.status) ? params.status : "";
   const page = parsePage(params.page);
   const notice =
-    params.saved === "1" ? "Assignment saved." : params.graded === "1" ? "Assignment graded." : null;
+    params.saved === "1"
+      ? "Assignment saved."
+      : params.graded === "1"
+        ? "Assignment graded."
+        : null;
 
   const container = buildContainer();
   const result = await container.adminListAssignments.execute({
@@ -60,9 +64,7 @@ export default async function AssignmentsPage({ searchParams }: PageProps) {
       <div>
         <TopBar title="Assignments" subtitle="Instructor-assigned student work" />
         <Card padding={6}>
-          <p className={styles.error}>
-            Assignments could not be loaded. Try again shortly.
-          </p>
+          <p className={styles.error}>Assignments could not be loaded. Try again shortly.</p>
         </Card>
       </div>
     );
@@ -79,7 +81,10 @@ export default async function AssignmentsPage({ searchParams }: PageProps) {
     (usersResult.ok ? usersResult.value : []).map((user) => [user.id, user.email]),
   );
   const courseTitles = new Map(
-    (coursesResult.ok ? coursesResult.value.courses : []).map((course) => [course.id, course.title]),
+    (coursesResult.ok ? coursesResult.value.courses : []).map((course) => [
+      course.id,
+      course.title,
+    ]),
   );
 
   return (
@@ -102,14 +107,15 @@ export default async function AssignmentsPage({ searchParams }: PageProps) {
         </Card>
       )}
 
-      <form className={styles.filters} method="get">
+      <form className={styles.filters} method="get" role="search" aria-label="Filter assignments">
         <label className={styles.filterField}>
           <span className={styles.filterLabel}>Search</span>
           <input
-            type="text"
+            type="search"
             name="search"
             defaultValue={search ?? ""}
             placeholder="Search titles"
+            aria-label="Search titles"
             className={styles.searchInput}
           />
         </label>
@@ -126,6 +132,11 @@ export default async function AssignmentsPage({ searchParams }: PageProps) {
           Apply
         </button>
       </form>
+      {search && (
+        <p className={styles.resultCount} role="status">
+          {totalCount} result(s) for &quot;{search}&quot;
+        </p>
+      )}
 
       <Card padding={6}>
         {rows.length === 0 ? (
@@ -133,37 +144,37 @@ export default async function AssignmentsPage({ searchParams }: PageProps) {
         ) : (
           <div className="table-scroll">
             <table className={styles.table}>
-            <caption className="sr-only">Student assignments</caption>
-            <thead>
-              <tr>
-                <th scope="col">Title</th>
-                <th scope="col">Student</th>
-                <th scope="col">Course</th>
-                <th scope="col">Due</th>
-                <th scope="col">Status</th>
-                <th scope="col">Grade</th>
-                <th scope="col">
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id}>
-                  <td>{row.title}</td>
-                  <td>{emails.get(row.userId) ?? row.userId}</td>
-                  <td>{courseTitles.get(row.courseId) ?? row.courseId}</td>
-                  <td>{row.dueAt.toLocaleDateString("en-PH")}</td>
-                  <td>{row.status}</td>
-                  <td>{row.grade === null ? "-" : `${row.grade}/100`}</td>
-                  <td>
-                    <Link href={`/admin/assignments/${row.id}`} className={styles.rowLink}>
-                      {row.status === "SUBMITTED" ? "Grade" : "View"}
-                    </Link>
-                  </td>
+              <caption className="sr-only">Student assignments</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Title</th>
+                  <th scope="col">Student</th>
+                  <th scope="col">Course</th>
+                  <th scope="col">Due</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Grade</th>
+                  <th scope="col">
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id}>
+                    <td>{row.title}</td>
+                    <td>{emails.get(row.userId) ?? row.userId}</td>
+                    <td>{courseTitles.get(row.courseId) ?? row.courseId}</td>
+                    <td>{row.dueAt.toLocaleDateString("en-PH")}</td>
+                    <td>{row.status}</td>
+                    <td>{row.grade === null ? "-" : `${row.grade}/100`}</td>
+                    <td>
+                      <Link href={`/admin/assignments/${row.id}`} className={styles.rowLink}>
+                        {row.status === "SUBMITTED" ? "Grade" : "View"}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         )}

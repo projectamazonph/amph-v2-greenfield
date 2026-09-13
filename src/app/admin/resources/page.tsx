@@ -108,15 +108,21 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
       />
 
       {/* Filter form — GET submission updates URL params; server re-renders */}
-      <form className={styles.filters} method="get">
+      <form className={styles.filters} method="get" role="search" aria-label="Filter resources">
         <input
-          type="text"
+          type="search"
           name="search"
           defaultValue={search ?? ""}
           placeholder="Search title or description"
+          aria-label="Search title or description"
           className={styles.searchInput}
         />
-        <select name="category" defaultValue={category ?? ""} className={styles.select}>
+        <select
+          name="category"
+          defaultValue={category ?? ""}
+          className={styles.select}
+          aria-label="Filter by category"
+        >
           <option value="">All categories</option>
           <option value="guide">Guide</option>
           <option value="template">Template</option>
@@ -124,7 +130,12 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
           <option value="cheat_sheet">Cheat sheet</option>
           <option value="handout">Handout</option>
         </select>
-        <select name="tier" defaultValue={tier ?? ""} className={styles.select}>
+        <select
+          name="tier"
+          defaultValue={tier ?? ""}
+          className={styles.select}
+          aria-label="Filter by tier"
+        >
           <option value="">All tiers</option>
           <option value="PREVIEW">Preview</option>
           <option value="STARTER">Starter</option>
@@ -134,6 +145,11 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
           Apply
         </button>
       </form>
+      {search && (
+        <p className={styles.resultCount} role="status">
+          {totalCount} result(s) for &quot;{search}&quot;
+        </p>
+      )}
 
       <Card padding={6}>
         <AdminResourcesTable

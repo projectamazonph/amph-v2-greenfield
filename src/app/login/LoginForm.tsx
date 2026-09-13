@@ -104,6 +104,8 @@ export function LoginForm({
             label="Two-factor code"
             type="text"
             inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
             autoComplete="one-time-code"
             placeholder="123456"
             hint={

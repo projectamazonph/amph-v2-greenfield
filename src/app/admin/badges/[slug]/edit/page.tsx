@@ -102,9 +102,12 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
             />
           </label>
 
-          <label className={styles.field}>
-            <span className={styles.label}>Icon name *</span>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="badge-icon-name">
+              Icon name *
+            </label>
             <input
+              id="badge-icon-name"
               type="text"
               name="iconName"
               required
@@ -112,7 +115,7 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
               defaultValue={b.iconName}
               className={styles.input}
             />
-          </label>
+          </div>
 
           <label className={styles.field}>
             <span className={styles.label}>XP reward *</span>

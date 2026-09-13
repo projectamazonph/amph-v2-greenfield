@@ -129,6 +129,8 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
               required
               min="1"
               max="240"
+              step="1"
+              inputMode="numeric"
               defaultValue="15"
               className={formStyles.input}
               style={{ width: "8rem" }}
