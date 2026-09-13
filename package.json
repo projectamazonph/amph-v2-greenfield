@@ -83,7 +83,7 @@
     "@cobusgreyling/loop-cost": "^1.2.0",
     "@cobusgreyling/loop-sync": "^1.0.0",
     "@commitlint/cli": "^19.7.1",
-    "@commitlint/config-conventional": "^19.7.1",
+    "@commitlint/config-conventional": "^21.2.2",
     "@eslint/eslintrc": "3",
     "@next/eslint-plugin-next": "16.2.10",
     "@playwright/test": "^1.62.1",
