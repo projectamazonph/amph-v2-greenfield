@@ -4,9 +4,15 @@
 
 **Owner:** Ryan Roland Dabao
 
-**Updated:** 2026-08-26
+**Updated:** 2026-09-13
 
 **Canonical reference:** `projectamazonph/amazon-ph-simulators`
+
+**Production UI rules:** the user-supplied reference
+“Full-Featured Sites and Apps: Complete UI Rules” (reviewed
+2026-09-13) is adopted as the normative checklist wherever it
+applies. Section “Adoption” below maps each rule to this codebase,
+including the deliberate exceptions.
 
 ---
 
@@ -118,3 +124,120 @@ Use 120ms transitions for common control states and 180ms for component elevatio
 - Prevent horizontal page overflow. Long labels, cards, and action groups must wrap or truncate safely; tables may scroll within a contained wrapper.
 - Never add raw colors or alternate font stacks inside CSS Modules. Update the shared token system first.
 - Use `DESIGN.md` for detailed tokens and `src/app/globals.css` as implementation truth.
+
+## Adoption of the Production UI Rules
+
+Each heading below is a rule family from the reference. Status is
+one of: pinned (already true, now documented), adapted (AMPH
+mapping differs), or out of scope (not applicable to this product).
+
+### Navigation — pinned with AMPH mappings
+
+- Sidebar is the primary app nav (student + admin), 240–280px
+  expanded, navy drawer under 1024px. Icons always ship with text
+  labels; active item uses background or left-border accent plus
+  `aria-current="page"`.
+- Breadcrumbs supplement nav on deep pages via the shared
+  `Breadcrumb` component (chevron separators, current page plain
+  text). Admin subpages use `AdminSubPageHeader` (back link +
+  `TopBar`).
+- Drawers animate, close on Escape, backdrop click, and route
+  change, trap focus while open, and return focus to the trigger.
+- Command palette (`Cmd/Ctrl+K`, `role="listbox"`) covers
+  top-level and key deep routes so rarely-visited pages stay
+  reachable without memorizing URLs.
+- Out of scope: mega menus, tabs pattern, context menus, bottom
+  navigation (drawer serves the thumb zone via the toggle),
+  hamburger on desktop (sidebar stays visible).
+
+### Mobile — pinned
+
+- Viewport meta with `device-width` and initial scale ships in the
+  root layout. Mobile-first CSS; fluid type via `clamp()`;
+  relative units everywhere; no fixed pixel widths above 320px.
+- 44px minimum touch targets with 8px separation on all nav,
+  toggles, buttons, and breadcrumb links.
+- No hover-only interactions; no `user-scalable=no`; pinch zoom
+  intact. Out of scope: PWA manifest/service worker, safe-area
+  notches (no fixed bottom bars overlap content).
+
+### Forms — pinned
+
+- Single column; `fieldset` + `legend` for groups; labels above
+  inputs (placeholders never substitute); required marked with
+  `*` + `aria-required`; inline errors below the field linked via
+  `aria-describedby`, specific and actionable.
+- Correct HTML5 input types and `inputmode` for mobile keyboards;
+  validate on blur; success/error states never by color alone.
+- One primary button per view (orange, verbs not nouns);
+  secondary ghost; destructive red with `ConfirmSubmitButton`;
+  36px default controls, 44px large and mobile variants.
+
+### Modals, loading, empty, error — pinned
+
+- `Dialog` from Astryx: backdrop, Escape/backdrop close, focus
+  trap + return, `role="dialog"` + `aria-modal`, one at a time,
+  bottom-sheet behavior on mobile.
+- Skeletons over spinners everywhere (`loading.tsx` per route,
+  `role="status"` + `aria-busy`); no blank pages; inline
+  confirmations, not success-page redirects.
+- Empty states name the cause and the next action; error copy
+  states what happened plus retry; errors log to Sentry.
+- Toast: `role="alert"` + `aria-live="polite"`, auto-dismiss with
+  manual close, max 3 stacked.
+
+### Search, tables, color, type, spacing, motion, icons — pinned
+
+- Admin lists: visible search, faceted filter, paginated, active
+  filters re-runnable from the URL; result counts; no-results
+  copy distinct from empty copy.
+- Tables: semantic markup with `<caption>`/`<th scope>`,
+  horizontal-only row borders, right-aligned `tabular-nums`,
+  orange-soft row hover, paginated past ~100 rows (no
+  virtualization), contained horizontal scroll on small screens.
+- Palette: 1 primary orange + neutrals + 4 semantic states;
+  never color alone (badge text, icons). Type: brand stack in
+  documented roles (Archivo / PT Sans / Barlow Condensed /
+  IBM Plex Mono) — deliberate exception to the reference's
+  system-stack rule; webfont loading uses `font-display: swap`.
+  Base 16px, 1.5 body line height, `clamp()` fluid headings.
+- 4px spacing scale, no arbitrary values; content max 1100px,
+  reading 720px. Motion: 120ms controls / 180ms elevation,
+  transform + opacity only, instant under
+  `prefers-reduced-motion`. Phosphor icons only, decorative
+  icons `aria-hidden`, meaningful icons labeled; content images
+  carry alt text with explicit dimensions or aspect ratio.
+
+### Accessibility contract — pinned
+
+- Semantic landmarks, skip link first, visible focus never
+  removed without replacement, ARIA only where HTML falls short,
+  4.5:1 AA minimum, zoom intact to 200%, labels bound with
+  `for`/`id`, live regions for dynamic updates.
+- Verified by `vitest-axe` pins, the architecture a11y gates,
+  Playwright axe checks on key pages, and Lighthouse CI.
+
+### Performance, security, SEO, resilience — pinned
+
+- Budgets enforced in CI: Lighthouse, `validate:learning-release`
+  gates, E2E on desktop + mobile viewports. SSR throughout;
+  images lazy with explicit dimensions; skeletons reserve layout
+  (CLS discipline).
+- CSP with nonces, HSTS, HttpOnly + Secure + SameSite session
+  cookies, rate-limited auth routes, parameterized queries,
+  audited admin mutations. Secrets in env only (gitleaks gated).
+- Root OG/Twitter cards, manifest, and icons ship in the root
+  layout; content pages (courses, lessons) set per-route titles
+  via `generateMetadata`; one `h1` per page. Gap, not claimed:
+  no sitemap.xml/robots route or per-route canonical tags yet —
+  file a story before claiming full SEO coverage.
+- Root + section error boundaries with retry; API errors typed
+  by kind (network/auth/server/validation); branded 404 and 503
+  pages. Out of scope: offline queueing, service workers.
+
+### Explicitly not adopted
+
+- Bottom navigation bar, mega menus, tab components, context
+  menus, PWA installation, RTL layouts, ICU/i18n (English-only
+  product for a Filipino VA audience), table virtualization,
+  stacked modals, multi-column mobile forms, system font stack.
