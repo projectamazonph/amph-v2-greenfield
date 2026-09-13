@@ -83,7 +83,12 @@ export function SelfCheck(props: SelfCheckProps): ReactElement {
         </fieldset>
         <div className={styles.actions}>
           {feedback === "idle" ? (
-            <button type="submit" className={styles.submit} disabled={selected === null}>
+            <button
+              type="submit"
+              className={styles.submit}
+              disabled={selected === null}
+              title={selected === null ? "Pick an option first" : undefined}
+            >
               {revealLabel}
             </button>
           ) : (

@@ -12,6 +12,7 @@ import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
 import { deleteLessonAction } from "@/app/actions/deleteLesson.action";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import styles from "../../../../../../courses.module.css";
 
 interface PageProps {
@@ -106,9 +107,12 @@ export default async function LessonDetailPage({ params }: PageProps) {
               Edit
             </Link>
             <form action={handleDelete}>
-              <button type="submit" className={styles.archiveButton}>
+              <ConfirmSubmitButton
+                confirmMessage="Delete this lesson? Students lose access to it immediately."
+                className={styles.archiveButton}
+              >
                 Delete
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </div>
         }

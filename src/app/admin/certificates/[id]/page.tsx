@@ -20,6 +20,7 @@ import { TopBar } from "@/components/admin/TopBar";
 import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card, Badge } from "@astryxdesign/core";
 import { revokeCertificateAction } from "@/app/actions/revokeCertificate.action";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -188,9 +189,12 @@ export default async function AdminCertificateDetailPage({ params, searchParams 
                   placeholder="e.g. Refund processed for order #12345 (chargeback by student)"
                 />
               </label>
-              <button type="submit" className={styles.revokeButton}>
+              <ConfirmSubmitButton
+                confirmMessage="Revoke this certificate? The student loses a credential that is hard to re-issue."
+                className={styles.revokeButton}
+              >
                 Revoke certificate
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </Card>
         )}

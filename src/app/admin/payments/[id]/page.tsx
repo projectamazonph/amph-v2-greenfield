@@ -14,6 +14,7 @@ import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
 import { formatPhp } from "@/app/admin/_lib/formatPhp";
 import { processRefundAction } from "@/app/actions/processRefund.action";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -271,9 +272,12 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
                   placeholder="e.g. Goodwill refund for escalated complaint"
                 />
               </label>
-              <button type="submit" className={styles.refundButton}>
+              <ConfirmSubmitButton
+                confirmMessage="Issue this refund? Real money moves to the student's payment method."
+                className={styles.refundButton}
+              >
                 Issue refund
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </Card>
         )}

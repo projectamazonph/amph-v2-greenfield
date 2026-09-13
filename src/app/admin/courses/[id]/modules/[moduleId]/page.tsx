@@ -15,6 +15,7 @@ import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
 import { deleteModuleAction } from "@/app/actions/deleteModule.action";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import { reorderModulesAction } from "@/app/actions/reorderModules.action";
 import { deleteLessonAction } from "@/app/actions/deleteLesson.action";
 import { reorderLessonsAction } from "@/app/actions/reorderLessons.action";
@@ -99,9 +100,12 @@ export default async function ModuleDetailPage({ params }: PageProps) {
               Edit
             </Link>
             <form action={handleDelete}>
-              <button type="submit" className={styles.archiveButton}>
+              <ConfirmSubmitButton
+                confirmMessage="Delete this module and all of its lessons? This cannot be undone."
+                className={styles.archiveButton}
+              >
                 Delete
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </div>
         }
