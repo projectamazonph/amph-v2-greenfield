@@ -135,6 +135,8 @@
   gap: 10px;
   margin: 1px 0;
   padding: 7px 10px;
+  min-height: 44px;
+  box-sizing: border-box;
   border: 1px solid transparent;
   border-radius: var(--r-sm);
   color: var(--c-shell-dim);
@@ -216,7 +218,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: 1000;
+    z-index: var(--z-modal-backdrop);
     width: min(280px, calc(100vw - var(--sp-6)));
     min-height: 100vh;
     transform: translateX(-100%);

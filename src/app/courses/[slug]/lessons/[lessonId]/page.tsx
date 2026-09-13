@@ -16,6 +16,8 @@ import { Clock, ListChecks, Play } from "@phosphor-icons/react/dist/ssr";
 import { buildContainer } from "@/composition/container";
 import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
+import { StudentShell } from "@/components/student/StudentShell";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { getLessonData, withCatalogCurriculum } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
 import type { Lesson as CatalogLesson } from "@/domain/entities/Course";
@@ -173,26 +175,30 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
 
   if (!authResult.ok) {
     return (
-      <CourseAccessNotice
-        courseSlug={slug}
-        courseTitle={course.title}
-        feature="lesson"
-        reason="verification_unavailable"
-        signedIn={Boolean(userId)}
-      />
+      <StudentShell requireAuth={false}>
+        <CourseAccessNotice
+          courseSlug={slug}
+          courseTitle={course.title}
+          feature="lesson"
+          reason="verification_unavailable"
+          signedIn={Boolean(userId)}
+        />
+      </StudentShell>
     );
   }
 
   if (authResult.value.kind === "denied") {
     return (
-      <CourseAccessNotice
-        courseSlug={slug}
-        courseTitle={course.title}
-        feature="lesson"
-        reason={authResult.value.reason === "prerequisite" ? "prerequisite" : "preview_limit"}
-        previousLessonTitle={authResult.value.previousLessonTitle}
-        signedIn={Boolean(userId)}
-      />
+      <StudentShell requireAuth={false}>
+        <CourseAccessNotice
+          courseSlug={slug}
+          courseTitle={course.title}
+          feature="lesson"
+          reason={authResult.value.reason === "prerequisite" ? "prerequisite" : "preview_limit"}
+          previousLessonTitle={authResult.value.previousLessonTitle}
+          signedIn={Boolean(userId)}
+        />
+      </StudentShell>
     );
   }
 
@@ -204,46 +210,29 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
   });
 
   return (
-    <div className={styles.layout}>
-      {/* Sidebar navigation */}
-      <LessonSidebar
-        course={{ slug: course.slug, title: course.title, curriculum: course.curriculum }}
-        currentLessonId={lessonId}
-        completedLessonIds={completedLessonIds}
-      />
+    <StudentShell requireAuth={false}>
+      <div className={styles.layout}>
+        {/* Sidebar navigation */}
+        <LessonSidebar
+          course={{ slug: course.slug, title: course.title, curriculum: course.curriculum }}
+          currentLessonId={lessonId}
+          completedLessonIds={completedLessonIds}
+        />
 
-      {/* Main content */}
-      <main id="main-content" tabIndex={-1} className={styles.main}>
-        <div className={styles.content}>
-          {/* Breadcrumb */}
-          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-            <ol className={styles.breadcrumbList}>
-              <li>
-                <Link href="/courses" className={styles.breadcrumbLink}>
-                  Courses
-                </Link>
-              </li>
-              <li aria-hidden className={styles.breadcrumbSeparator}>
-                /
-              </li>
-              <li>
-                <Link
-                  href={`/courses/${slug}`}
-                  className={`${styles.breadcrumbLink} ${styles.breadcrumbTruncate}`}
-                >
-                  {course.title}
-                </Link>
-              </li>
-              <li aria-hidden className={styles.breadcrumbSeparator}>
-                /
-              </li>
-              <li className={styles.breadcrumbCurrent}>{lesson.title}</li>
-            </ol>
-          </nav>
+        {/* Main content */}
+        <main id="main-content" tabIndex={-1} className={styles.main}>
+          <div className={styles.content}>
+            <Breadcrumb
+              items={[
+                { href: "/courses", label: "Courses" },
+                { href: `/courses/${slug}`, label: course.title },
+                { label: lesson.title },
+              ]}
+            />
 
-          <Link href={`/courses/${slug}`} className={styles.backBtn}>
-            Back to Course
-          </Link>
+            <Link href={`/courses/${slug}`} className={styles.backBtn}>
+              Back to Course
+            </Link>
 
           {/* Lesson header */}
           <section className={styles.lessonHeader} aria-labelledby="lesson-title">
@@ -328,8 +317,9 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
               nextLesson={nextLesson}
             />
           </div>
-        </div>
-      </main>
-    </div>
+          </div>
+        </main>
+      </div>
+    </StudentShell>
   );
 }

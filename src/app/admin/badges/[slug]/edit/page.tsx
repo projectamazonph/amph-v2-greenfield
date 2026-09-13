@@ -4,11 +4,10 @@
  * STORY-050e. Server component.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { updateBadgeAction } from "@/app/actions/updateBadge.action";
 import { archiveBadgeAction } from "@/app/actions/archiveBadge.action";
@@ -53,11 +52,12 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
 
   return (
     <div>
-      <Link href="/admin/badges" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to badges
-      </Link>
-
-      <TopBar title={`Edit: ${b.name}`} subtitle={b.slug} />
+      <AdminSubPageHeader
+        title={`Edit: ${b.name}`}
+        backHref="/admin/badges"
+        backLabel="Back to badges"
+        subtitle={b.slug}
+      />
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>
@@ -102,9 +102,12 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
             />
           </label>
 
-          <label className={styles.field}>
-            <span className={styles.label}>Icon name *</span>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="badge-icon-name">
+              Icon name *
+            </label>
             <input
+              id="badge-icon-name"
               type="text"
               name="iconName"
               required
@@ -112,7 +115,7 @@ export default async function EditBadgePage({ params, searchParams }: PageProps)
               defaultValue={b.iconName}
               className={styles.input}
             />
-          </label>
+          </div>
 
           <label className={styles.field}>
             <span className={styles.label}>XP reward *</span>

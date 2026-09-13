@@ -108,32 +108,34 @@ export default async function SettingsPage({
         <p className={styles.help}>
           The current values of required environment variables. Values are never displayed.
         </p>
-        <table className={styles.table}>
-          {/* L11 fix: <caption> provides WCAG 1.3.1 accessible name for the table. */}
-          <caption className="sr-only">Environment variable configuration status</caption>
-          <thead>
-            <tr>
-              <th scope="col">Variable</th>
-              <th scope="col">Status</th>
-              <th scope="col">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {config.map((c) => (
-              <tr key={c.key}>
-                <td className={styles.key}>{c.key}</td>
-                <td>
-                  {c.present ? (
-                    <span className={`${styles.statusBadge} ${styles.set}`}>Set</span>
-                  ) : (
-                    <span className={`${styles.statusBadge} ${styles.unset}`}>Missing</span>
-                  )}
-                </td>
-                <td className={styles.description}>{c.description}</td>
+        <div className="table-scroll">
+          <table className={styles.table}>
+            {/* L11 fix: <caption> provides WCAG 1.3.1 accessible name for the table. */}
+            <caption className="sr-only">Environment variable configuration status</caption>
+            <thead>
+              <tr>
+                <th scope="col">Variable</th>
+                <th scope="col">Status</th>
+                <th scope="col">Description</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {config.map((c) => (
+                <tr key={c.key}>
+                  <td className={styles.key}>{c.key}</td>
+                  <td>
+                    {c.present ? (
+                      <span className={`${styles.statusBadge} ${styles.set}`}>Set</span>
+                    ) : (
+                      <span className={`${styles.statusBadge} ${styles.unset}`}>Missing</span>
+                    )}
+                  </td>
+                  <td className={styles.description}>{c.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
       <Card padding={6} className={styles.cardGap}>

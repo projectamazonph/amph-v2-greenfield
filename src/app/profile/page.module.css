@@ -178,7 +178,10 @@
   border: none;
   cursor: pointer;
   text-decoration: none;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  min-width: 0;
+  max-width: 100%;
   transition: background-color var(--duration-base) var(--ease-out);
   box-shadow: var(--sh-1);
 }
@@ -202,7 +205,10 @@
   border: 1px solid var(--border);
   cursor: pointer;
   text-decoration: none;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  min-width: 0;
+  max-width: 100%;
   transition: background-color var(--duration-base) var(--ease-out),
     border-color var(--duration-base) var(--ease-out),
     color var(--duration-base) var(--ease-out);
@@ -228,7 +234,10 @@
   border: 1px solid var(--border);
   cursor: pointer;
   text-decoration: none;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  min-width: 0;
+  max-width: 100%;
   transition: background-color var(--duration-base) var(--ease-out),
     border-color var(--duration-base) var(--ease-out),
     color var(--duration-base) var(--ease-out);

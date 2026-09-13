@@ -117,6 +117,7 @@ export default async function NewUserPage({ searchParams }: PageProps) {
                   name="paymentAmount"
                   min="0"
                   step="0.01"
+                  inputMode="numeric"
                   className={styles.input}
                 />
               </label>

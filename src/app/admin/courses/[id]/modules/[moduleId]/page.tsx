@@ -8,14 +8,14 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
 import { deleteModuleAction } from "@/app/actions/deleteModule.action";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import { reorderModulesAction } from "@/app/actions/reorderModules.action";
 import { deleteLessonAction } from "@/app/actions/deleteLesson.action";
 import { reorderLessonsAction } from "@/app/actions/reorderLessons.action";
@@ -82,12 +82,10 @@ export default async function ModuleDetailPage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href={`/admin/courses/${courseId}`} className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to course
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={mod.title}
+        backHref={`/admin/courses/${courseId}`}
+        backLabel="Back to course"
         subtitle={
           <span className={styles.badges}>
             <Badge variant="neutral" label={"Order " + mod.displayOrder} />
@@ -102,9 +100,12 @@ export default async function ModuleDetailPage({ params }: PageProps) {
               Edit
             </Link>
             <form action={handleDelete}>
-              <button type="submit" className={styles.archiveButton}>
+              <ConfirmSubmitButton
+                confirmMessage="Delete this module and all of its lessons? This cannot be undone."
+                className={styles.archiveButton}
+              >
                 Delete
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </div>
         }

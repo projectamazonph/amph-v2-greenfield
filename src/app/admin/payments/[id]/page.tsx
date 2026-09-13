@@ -5,16 +5,16 @@
  * form (server-action based).
  */
 
-import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
 import { formatPhp } from "@/app/admin/_lib/formatPhp";
 import { processRefundAction } from "@/app/actions/processRefund.action";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -80,12 +80,10 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
 
   return (
     <div>
-      <Link href="/admin/payments" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to payments
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={`Order ${order.id}`}
+        backHref="/admin/payments"
+        backLabel="Back to payments"
         subtitle={
           <span className={styles.badges}>
             <Badge
@@ -274,9 +272,12 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
                   placeholder="e.g. Goodwill refund for escalated complaint"
                 />
               </label>
-              <button type="submit" className={styles.refundButton}>
+              <ConfirmSubmitButton
+                confirmMessage="Issue this refund? Real money moves to the student's payment method."
+                className={styles.refundButton}
+              >
                 Issue refund
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </Card>
         )}

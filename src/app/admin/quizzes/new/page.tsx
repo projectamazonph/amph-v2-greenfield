@@ -5,11 +5,10 @@
  * action that calls createQuizAction.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { createQuizAction } from "@/app/actions/createQuiz.action";
 import { QuizEditor, type EditorQuestion, type EditorOption } from "@/components/admin/QuizEditor";
@@ -55,11 +54,12 @@ export default async function NewQuizPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/quizzes" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to quizzes
-      </Link>
-
-      <TopBar title="Add quiz" subtitle="Create a new quiz for a course" />
+      <AdminSubPageHeader
+        title="Add quiz"
+        backHref="/admin/quizzes"
+        backLabel="Back to quizzes"
+        subtitle="Create a new quiz for a course"
+      />
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>

@@ -116,21 +116,32 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
       />
 
       {/* Filter form — GET submission updates URL params; server re-renders */}
-      <form className={styles.filters} method="get">
+      <form className={styles.filters} method="get" role="search" aria-label="Filter users">
         <input
-          type="text"
+          type="search"
           name="search"
           defaultValue={search ?? ""}
           placeholder="Search name or email"
+          aria-label="Search name or email"
           className={styles.searchInput}
         />
-        <select name="role" defaultValue={role ?? ""} className={styles.select}>
+        <select
+          name="role"
+          defaultValue={role ?? ""}
+          aria-label="Filter by role"
+          className={styles.select}
+        >
           <option value="">All roles</option>
           <option value="STUDENT">Student</option>
           <option value="INSTRUCTOR">Instructor</option>
           <option value="ADMIN">Admin</option>
         </select>
-        <select name="tier" defaultValue={tier ?? ""} className={styles.select}>
+        <select
+          name="tier"
+          defaultValue={tier ?? ""}
+          aria-label="Filter by tier"
+          className={styles.select}
+        >
           <option value="">All tiers</option>
           <option value="FREE">Free</option>
           <option value="STARTER">Starter</option>
@@ -140,6 +151,12 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
           Apply
         </button>
       </form>
+
+      {search ? (
+        <p className={styles.resultCount} role="status">
+          {totalCount} {totalCount === 1 ? "result" : "results"} for &ldquo;{search}&rdquo;
+        </p>
+      ) : null}
 
       {/* Table — client component handles renderCell (function props) */}
       <Card padding={6}>
@@ -155,10 +172,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
       {users.length === 0 && (
         <div style={{ textAlign: "center", padding: "var(--space-10)", color: "var(--ink-500)" }}>
           <p>No users found.</p>
-          <Link
-            href="/admin/users/new"
-            className={styles.addButton}
-          >
+          <Link href="/admin/users/new" className={styles.addButton}>
             + Create User
           </Link>
         </div>

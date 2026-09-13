@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { QuizPlayer } from "@/components/courses/QuizPlayer";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
 import { StudentShell } from "@/components/student/StudentShell";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { isModuleComplete, orderLearnerModules } from "@/domain/curriculum/GuidedFlow";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { buildContainer } from "@/composition/container";
@@ -124,17 +124,12 @@ export default async function QuizPage({ params }: Props) {
   return (
     <StudentShell user={user}>
       <main id="main-content" tabIndex={-1} className={styles.page}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <Link href={`/courses/${slug}`} className={styles.crumbLink}>
-            <ArrowLeft size={16} aria-hidden /> {course.title}
-          </Link>
-          <span className={styles.crumbSep} aria-hidden="true">
-            /
-          </span>
-          <span className={styles.crumbCurrent} aria-current="page">
-            {quiz.title}
-          </span>
-        </nav>
+        <Breadcrumb
+          items={[
+            { href: `/courses/${slug}`, label: course.title },
+            { label: quiz.title },
+          ]}
+        />
         <QuizPlayer
           quizId={quiz.id}
           title={quiz.title}

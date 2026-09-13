@@ -28,15 +28,15 @@ describe("PitfallCallout", () => {
     }
   });
 
-  it("renders title as an h3", () => {
+  it("renders title as an h2", () => {
     const html = renderToString(
       <PitfallCallout id="titled" variant="pitfall" title="Don't do this">
         <p>Because.</p>
       </PitfallCallout>,
     );
     // React 19's renderToString escapes apostrophes to &#x27;, so the regex
-    // matches either form. The contract is "title content lands in an <h3>",
+    // matches either form. The contract is "title content lands in an <h2>",
     // not the literal byte sequence.
-    expect(html).toMatch(/<h3[^>]*>Don(?:&#x27;|')t do this<\/h3>/);
+    expect(html).toMatch(/<h2[^>]*>Don(?:&#x27;|')t do this<\/h2>/);
   });
 });

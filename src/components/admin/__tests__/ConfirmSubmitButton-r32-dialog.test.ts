@@ -57,15 +57,16 @@ describe("M-R32: ConfirmSubmitButton uses Astryx Dialog, not window.confirm (WCA
 
   it("Cancel and Confirm buttons are type=\"button\" so they never submit the form unintentionally", () => {
     const src = readComponent();
-    // Both action buttons inside the dialog must carry type="button".
+    // All three buttons must carry type="button": the trigger opens the
+    // dialog only (a type="submit" trigger would submit on click and
+    // bypass confirmation), and the dialog buttons must never submit.
     const buttonMatches = src.match(/<button\b[^>]*>/g) ?? [];
     expect(buttonMatches.length).toBeGreaterThanOrEqual(3); // trigger + cancel + confirm
     for (const m of buttonMatches) {
-      // The trigger is type="submit"; the two dialog buttons are type="button".
-      if (m.includes('type="button"') || m.includes('type="submit"')) continue;
-      // Any button without an explicit type is a regression risk.
+      if (m.includes('type="button"')) continue;
+      // Any button without an explicit type="button" is a regression risk.
       throw new Error(
-        `Button missing explicit type attribute: ${m}`,
+        `Button missing explicit type="button": ${m}`,
       );
     }
   });

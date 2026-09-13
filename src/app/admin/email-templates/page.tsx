@@ -48,7 +48,8 @@ export default async function EmailTemplatesPage() {
         {rows.length === 0 ? (
           <p className={styles.empty}>No email template types found.</p>
         ) : (
-          <table className={styles.table}>
+          <div className="table-scroll">
+            <table className={styles.table}>
             <caption className={styles.caption}>
               Email templates — edit subject, headline, intro, and CTA text for transactional emails
             </caption>
@@ -92,7 +93,8 @@ export default async function EmailTemplatesPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </Card>
     </div>

@@ -5,12 +5,10 @@
  * timeline, and the grade form when the row is SUBMITTED.
  */
 
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { GradeAssignmentForm } from "./GradeAssignmentForm";
 import styles from "../page.module.css";
@@ -42,11 +40,12 @@ export default async function AssignmentDetailPage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/assignments" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to assignments
-      </Link>
-
-      <TopBar title={assignment.title} subtitle={`${studentEmail} · ${courseTitle}`} />
+      <AdminSubPageHeader
+        title={assignment.title}
+        backHref="/admin/assignments"
+        backLabel="Back to assignments"
+        subtitle={`${studentEmail} · ${courseTitle}`}
+      />
 
       <Card padding={6} style={{ marginBottom: "1rem" }}>
         <dl className={styles.detailList}>

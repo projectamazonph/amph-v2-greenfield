@@ -30,7 +30,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     <div className={styles.shell}>
       <MobileNavToggle sidebarId="admin-sidebar" />
       <NavSidebar user={user} />
-      <main className={styles.main} data-navigation-content>
+      <main id="main-content" tabIndex={-1} className={styles.main} data-navigation-content>
         {children}
       </main>
       <CommandPalette
@@ -40,15 +40,19 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           { href: "/admin/content", label: "Content", section: "Content" },
           { href: "/admin/simulators", label: "Simulators", section: "Content" },
           { href: "/admin/quizzes", label: "Quizzes", section: "Content" },
+          { href: "/admin/assignments", label: "Assignments", section: "Content" },
           { href: "/admin/badges", label: "Badges", section: "Content" },
           { href: "/admin/email-templates", label: "Email templates", section: "Content" },
+          { href: "/admin/announcements", label: "Announcements", section: "Content" },
           { href: "/admin/resources", label: "Download center", section: "Content" },
           { href: "/admin/users", label: "Users", section: "Operations" },
           { href: "/admin/payments", label: "Payments", section: "Operations" },
           { href: "/admin/refunds", label: "Refunds", section: "Operations" },
+          { href: "/admin/discount-codes", label: "Discount codes", section: "Operations" },
           { href: "/admin/live-classes", label: "Live Classes", section: "Operations" },
           { href: "/admin/certificates", label: "Certificates", section: "Operations" },
           { href: "/admin/settings", label: "Settings", section: "System" },
+          { href: "/admin/maintenance", label: "Maintenance", section: "System" },
           { href: "/admin/audit-log", label: "Audit Log", section: "System" },
           { href: "/admin/users/new", label: "Create User", section: "Quick Actions" },
           { href: "/admin/courses/new", label: "Create Course", section: "Quick Actions" },

@@ -25,8 +25,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { buildContainer } from "@/composition/container";
 
-const PROTECTED_PREFIXES = ["/dashboard/", "/admin/", "/enroll/", "/order/"];
-const PROTECTED_EXACT = ["/dashboard", "/enroll", "/order"];
+const PROTECTED_PREFIXES = ["/dashboard/", "/admin/"];
+const PROTECTED_EXACT = ["/dashboard"];
 
 /** Paths that look like /admin but are the admin login page itself. */
 const ADMIN_LOGIN_PREFIXES = ["/admin-login", "/api/auth/admin-login"];

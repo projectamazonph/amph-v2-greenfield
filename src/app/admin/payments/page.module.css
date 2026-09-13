@@ -123,3 +123,9 @@
 .viewButton:hover {
   background: var(--surface-2);
 }
+
+.resultCount {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+}

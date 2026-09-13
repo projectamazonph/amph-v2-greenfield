@@ -12,18 +12,12 @@
  * Consumers wrap it in a client component / form if they need useFormStatus.
  */
 
-import {
-  forwardRef,
-  type InputHTMLAttributes,
-  type ReactNode,
-  type Ref,
-} from "react";
+import { forwardRef, type InputHTMLAttributes, type ReactNode, type Ref } from "react";
 import styles from "./Input.module.css";
 
 export type InputSize = "sm" | "md" | "lg";
 
-export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
   label?: string;
   hint?: string;
   error?: string;
@@ -33,31 +27,28 @@ export interface InputProps
 }
 
 export const Input = forwardRef(function Input(
-  {
-    label,
-    hint,
-    error,
-    size = "md",
-    id,
-    className,
-    rightAdornment,
-    ...rest
-  }: InputProps,
+  { label, hint, error, size = "md", id, className, rightAdornment, ...rest }: InputProps,
   ref: Ref<HTMLInputElement>,
 ) {
   const inputId = id ?? rest.name ?? undefined;
-  const describedBy = [
-    hint ? `${inputId}-hint` : null,
-    error ? `${inputId}-error` : null,
-  ]
-    .filter(Boolean)
-    .join(" ") || undefined;
+  const describedBy =
+    [hint ? `${inputId}-hint` : null, error ? `${inputId}-error` : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
+  // Required is announced via aria-required (not the visual marker,
+  // which is aria-hidden so screen readers don't hear "star").
+  const isRequired = rest.required === true;
 
   return (
     <div className={styles.field}>
       {label && (
         <label htmlFor={inputId} className={styles.label}>
           {label}
+          {isRequired ? (
+            <span aria-hidden="true" className={styles.requiredMark}>
+              {" *"}
+            </span>
+          ) : null}
         </label>
       )}
       <div className={styles.inputWrap}>
@@ -65,20 +56,14 @@ export const Input = forwardRef(function Input(
           ref={ref}
           id={inputId}
           aria-invalid={error ? true : undefined}
+          aria-required={isRequired ? true : undefined}
           aria-describedby={describedBy}
-          className={[
-            styles.input,
-            styles[size],
-            error ? styles.error : "",
-            className,
-          ]
+          className={[styles.input, styles[size], error ? styles.error : "", className]
             .filter(Boolean)
             .join(" ")}
           {...rest}
         />
-        {rightAdornment && (
-          <div className={styles.adornment}>{rightAdornment}</div>
-        )}
+        {rightAdornment && <div className={styles.adornment}>{rightAdornment}</div>}
       </div>
       {hint && !error && (
         <span id={`${inputId}-hint`} className={styles.hint}>

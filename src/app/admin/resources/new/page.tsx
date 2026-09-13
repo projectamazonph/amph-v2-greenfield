@@ -4,11 +4,10 @@
  * STORY-098. Server component.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { createResourceAction } from "@/app/actions/createResource.action";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import type { ResourceCategory, ResourceFileType } from "@/domain/entities/Resource";
 import type { CourseAccessTier } from "@/domain/values/CourseAccessTier";
@@ -51,12 +50,10 @@ export default async function NewResourcePage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/resources" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to download center
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title="Add resource"
+        backHref="/admin/resources"
+        backLabel="Back to download center"
         subtitle="Publish a guide, template, automation tool, or handout to the download center"
       />
 
@@ -115,7 +112,7 @@ export default async function NewResourcePage({ searchParams }: PageProps) {
 
           <label className={styles.field}>
             <span className={styles.label}>Upload a file</span>
-            <input type="file" name="file" className={styles.input} />
+            <input type="file" name="file" className={styles.input} aria-label="Resource file" />
             <span className={styles.hint}>
               Uploads the file directly. If you upload one, it's used instead of the link below.
             </span>

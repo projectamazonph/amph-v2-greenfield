@@ -6,8 +6,8 @@
   left: var(--sp-3);
   z-index: var(--z-sticky);
   display: none;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--c-shell-line);

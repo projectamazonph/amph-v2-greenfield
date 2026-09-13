@@ -4,11 +4,10 @@
  * STORY-050c. Server component.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { createLiveClassAction } from "@/app/actions/createLiveClass.action";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import styles from "./page.module.css";
 import pageStyles from "../page.module.css";
@@ -33,11 +32,12 @@ export default async function NewLiveClassPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/live-classes" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to live classes
-      </Link>
-
-      <TopBar title="Add live class" subtitle="Schedule a new live class session" />
+      <AdminSubPageHeader
+        title="Add live class"
+        backHref="/admin/live-classes"
+        backLabel="Back to live classes"
+        subtitle="Schedule a new live class session"
+      />
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>

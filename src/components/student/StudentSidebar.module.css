@@ -122,6 +122,8 @@
   gap: 10px;
   margin: 1px 0;
   padding: 7px 10px;
+  min-height: 44px;
+  box-sizing: border-box;
   border: 1px solid transparent;
   border-radius: var(--r-sm);
   color: var(--c-shell-dim);
@@ -236,8 +238,8 @@
 
 .logoutButton {
   display: flex;
-  min-width: 36px;
-  min-height: 36px;
+  min-width: 44px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;

@@ -6,11 +6,10 @@
  * repository contract).
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import {
   EMAIL_TEMPLATE_VARIABLES,
@@ -62,11 +61,12 @@ export default async function EditEmailTemplatePage({ params, searchParams }: Pa
 
   return (
     <div>
-      <Link href="/admin/email-templates" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to email templates
-      </Link>
-
-      <TopBar title={`Edit: ${TEMPLATE_LABELS[type]}`} subtitle={type} />
+      <AdminSubPageHeader
+        title={`Edit: ${TEMPLATE_LABELS[type]}`}
+        backHref="/admin/email-templates"
+        backLabel="Back to email templates"
+        subtitle={type}
+      />
 
       <Card padding={6} style={{ marginBottom: "1rem" }}>
         <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--ink-500)" }}>
