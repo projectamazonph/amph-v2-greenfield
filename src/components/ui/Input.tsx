@@ -35,21 +35,26 @@ export const Input = forwardRef(function Input(
     [hint ? `${inputId}-hint` : null, error ? `${inputId}-error` : null]
       .filter(Boolean)
       .join(" ") || undefined;
-  // Required is announced via aria-required (not the visual marker,
-  // which is aria-hidden so screen readers don't hear "star").
+  // Required is announced via aria-required. The visual marker must stay
+  // OUTSIDE the <label> element: Playwright getByLabel (and exact
+  // accessible-name queries) match on label text, so a " *" inside the
+  // label turns "Password" into "Password *" and breaks anchored
+  // matchers like /^password$/i (E2E journey 3/4/5, 2026-09).
   const isRequired = rest.required === true;
 
   return (
     <div className={styles.field}>
       {label && (
-        <label htmlFor={inputId} className={styles.label}>
-          {label}
+        <span className={styles.labelRow}>
+          <label htmlFor={inputId} className={styles.label}>
+            {label}
+          </label>
           {isRequired ? (
             <span aria-hidden="true" className={styles.requiredMark}>
-              {" *"}
+              *
             </span>
           ) : null}
-        </label>
+        </span>
       )}
       <div className={styles.inputWrap}>
         <input

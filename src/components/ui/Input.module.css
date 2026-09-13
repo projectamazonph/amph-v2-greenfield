@@ -17,6 +17,19 @@
   letter-spacing: 0.02em;
 }
 
+/* Label + required marker row. Carries the label typography so the
+   marker (rendered outside <label> to keep label text exact) matches. */
+.labelRow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--c-ink-2);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 .requiredMark {
   color: var(--c-red-text);
   font-weight: 700;
