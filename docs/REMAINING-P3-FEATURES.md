@@ -9,32 +9,16 @@ These six items require feature-level work (new libraries, schema changes, or in
 
 ## P3-82. Confetti on Lesson Completion
 
-**Goal:** Trigger a celebratory animation when a student marks a lesson complete.
+**Status:** ✅ Implemented — PR #514
 
-**Files to create:**
+**Files created:**
 
 - `src/components/ui/Confetti.tsx` — Client component using `canvas-confetti`
+- Added `canvas-confetti` and `@types/canvas-confetti` dependencies
 
-**Implementation:**
+**Implementation:** Bilateral animation from left/right edges using brand colors (`#FF6B35`, `#FFA07A`, `#FFD700`, `#FF8C00`), 2 second duration. Triggered by `?completed=1` query param on lesson page.
 
-```tsx
-"use client";
-import confetti from "canvas-confetti";
-
-export function fireConfetti() {
-  confetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 },
-    colors: ["#FF6B35", "#FFA07A", "#FFD700"],
-  });
-}
-```
-
-**Wire-up:** In `courses/[slug]/lessons/[lessonId]/page.tsx`, after the Mark-as-Complete form action succeeds, call `fireConfetti()` from a client-side handler.
-
-**Dependencies:** `canvas-confetti` (already installed in this session)
-
+**No action needed.**
 ---
 
 ## P3-83. Drag-and-Drop Module Reorder
@@ -184,7 +168,7 @@ If tackling the remaining four, recommend this order:
 
 | #     | Feature       | Est. Effort | Dependencies                     |
 | ----- | ------------- | ----------- | -------------------------------- |
-| P3-82 | Confetti      | S           | canvas-confetti                  |
+| P3-82 | Confetti      | ✅ Done     | canvas-confetti                  |
 | P3-83 | DnD reorder   | M           | @dnd-kit/core, @dnd-kit/sortable |
 | P3-84 | Dark mode     | L           | None                             |
 | P3-87 | Notifications | XL          | Schema migration                 |
