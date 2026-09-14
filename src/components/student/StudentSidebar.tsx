@@ -28,6 +28,7 @@ import {
 import type { ComponentType, SVGProps } from "react";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import styles from "./StudentSidebar.module.css";
 
 interface NavItem {
@@ -168,6 +169,9 @@ export function StudentSidebar({ user }: StudentSidebarProps) {
           >
             <SignOut size={16} weight="bold" />
           </button>
+        </div>
+        <div className={styles.themeToggleWrapper}>
+          <ThemeToggle />
         </div>
       </div>
       <ConfirmDialog

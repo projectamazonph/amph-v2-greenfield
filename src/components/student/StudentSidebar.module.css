@@ -177,9 +177,17 @@
 }
 
 .footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
   padding: var(--sp-3);
   border-top: 1px solid var(--c-shell-line);
   background: rgba(15, 20, 25, 0.32);
+}
+
+.themeToggleWrapper {
+  display: flex;
+  justify-content: center;
 }
 
 .userCard {
