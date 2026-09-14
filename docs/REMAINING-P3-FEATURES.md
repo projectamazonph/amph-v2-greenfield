@@ -43,31 +43,17 @@ These six items require feature-level work (new libraries, schema changes, or in
 
 ## P3-84. Dark Mode Toggle
 
-**Goal:** Full dark mode with system preference detection + manual override.
+**Status:** ✅ Implemented — PR #516
 
-**Files to create:**
+**Files created:**
 
-- `src/components/ui/ThemeToggle.tsx` — Client component
-- `src/hooks/useTheme.ts` — Theme state management
+- `src/hooks/useTheme.ts` — Theme state management with localStorage + system preference
+- `src/components/ui/ThemeToggle.tsx` — Client component with animated sun/moon icons
+- `src/components/ui/ThemeToggle.module.css` — Styles with smooth transitions
 
-**Implementation:**
+**Implementation:** Complete dark mode token overrides in `globals.css` (navy backgrounds `#0F1419`, inverted inks, semantic colors, shadows). Wired into StudentSidebar and NavSidebar footers. Persists preference in localStorage, detects system preference on first load.
 
-1. Add dark variants for all CSS custom properties in `globals.css`:
-   ```css
-   [data-theme="dark"] {
-     --surface-0: #1a1a1a;
-     --surface-1: #242424;
-     --surface-2: #2e2e2e;
-     --ink-900: #fafaf7;
-     /* etc. */
-   }
-   ```
-2. ThemeToggle uses `localStorage` + `prefers-color-scheme` media query
-3. Apply `data-theme` attribute to `<html>` element
-4. Add toggle button to both admin and student sidebars
-
-**Scope:** ~30-40 token overrides, 1 toggle component, 2 placement edits.
-
+**No action needed.**
 ---
 
 ## P3-85. Real CSV Export
@@ -170,5 +156,5 @@ If tackling the remaining four, recommend this order:
 | ----- | ------------- | ----------- | -------------------------------- |
 | P3-82 | Confetti      | ✅ Done     | canvas-confetti                  |
 | P3-83 | DnD reorder   | M           | @dnd-kit/core, @dnd-kit/sortable |
-| P3-84 | Dark mode     | L           | None                             |
+| P3-84 | Dark mode     | ✅ Done     | None                             |
 | P3-87 | Notifications | XL          | Schema migration                 |
