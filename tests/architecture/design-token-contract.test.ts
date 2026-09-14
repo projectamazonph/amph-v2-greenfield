@@ -8,6 +8,7 @@ const RUNTIME_TOKENS = new Set([
   "--font-body",
   "--font-cond",
   "--font-mono",
+  "--faint",
 ]);
 
 function cssFiles(directory: string): string[] {
