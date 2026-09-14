@@ -39,6 +39,15 @@ Before writing new UI, run `pnpm exec astryx build "<idea>"` for a composition k
 
 **Token guardrail**: valid `defineTheme tokens:` keys are `--color-*` (accent, background, text, border, success/error/warning), `--spacing-0` through `--spacing-12`, `--shadow-sm/md/lg`, `--radius-*`. Do NOT use `--shadow-low/med/high` (removed in S-3, audit 2026-08-20, child #407), `--spacing-16/20`, or `--color-info` — TypeScript will reject them. The `--shadow-sm/md/lg` scale is the canonical shadow scale, defined in `src/app/globals.css` and used by every caller.
 
+**Component inventory** (as of 2026-09):
+
+- `src/components/ui/` — 22 brand primitives (Button, Card, Input, Badge, Breadcrumb, CommandPalette, ConfirmDialog, EmptyState, MobileNavToggle, PrintButton, RouteError, ScrollToTop, Skeleton, SubmitButton, Toast, etc.)
+- `src/components/astryx/` — 10 admin tables (AdminAuditLogTable, AdminBadgesTable, AdminCoursesTable, AdminDiscountCodesTable, AdminLiveClassesTable, AdminPaymentsTable, AdminRefundsTable, AdminResourcesTable, AdminSimulatorsTable, AdminUsersTable)
+- `src/components/admin/` — 11 admin-specific components (AdminSubPageHeader, ConfirmSubmitButton, ImpersonationBanner, NavSidebar, QuizEditor, TopBar, UserCard, etc.)
+- `src/components/student/` — 2 shell components (StudentShell, StudentSidebar)
+- `src/components/tools/` — 13 simulator components (BidElevatorForm, BidElevatorResult, CampaignBuilderForm, FormativeScoreNotice, KeywordResearchForm, ListingAuditForm, SimulatorCoachGuide, SimulatorModeToggle, SimulatorNextRep, SimulatorPageHeader, StrTriageForm, etc.)
+- `src/components/lesson/` — 6 active lesson primitives (SelfCheck, TradeOffTable, ProcessDiagram, PitfallCallout, TrancheOneVisuals, TrancheTwoVisuals, TrancheThreeVisuals, VisualLessonBlock) + directive plugin for MDX fences
+
 ## The Architecture
 
 Five layers, dependency direction always inward:
@@ -55,23 +64,46 @@ app/         → usecases/ → ports/ ← infra/
 - `app/` — Next.js App Router. Server components by default. Server actions are 5-line shims to usecases. Route handlers exist only for webhooks and third-party callbacks.
 - `composition/` — the DI container. The one place that knows concrete types.
 
-See `docs/build-spec.md` and `docs/decisions.md` (ADRs 013–019).
+See `docs/build-spec.md` and `docs/decisions.md` (ADRs 001–022).
 
 ## The Database
 
-PostgreSQL (dev + production). Schema uses no SQLite-specific features. Every mutable table has `deletedAt`, `createdById`, `updatedById`. See `docs/db-schema.md`.
+PostgreSQL (dev + production). Schema uses no SQLite-specific features. Every mutable table has `deletedAt`, `createdById`, `updatedById`. See `docs/db-schema.md`. Current schema: 37 models, 20+ migrations.
 
 ## The Business Layer
 
-PayMongo for payments (one-time, Philippine peso, GCash/Maya/card/bank). Three pricing tiers. Refund window 7 days. Tax-compliant receipts. See `docs/business-layer.md`.
+PayMongo for payments (one-time, Philippine peso, GCash/Maya/card/bank). Three pricing tiers. Refund window 7 days. Tax-compliant receipts. BIR invoicing behind `INVOICING_ENABLED` flag. Card installments (3/6/12 month) behind `INSTALLMENTS_ENABLED` flag. See `docs/business-layer.md`.
 
 ## The Admin Panel
 
 `/admin/*` gated by `requireAdmin()`. Every route has search, filter, pagination. Every mutation is audited. See `docs/admin-backend.md`.
 
+Admin sections implemented:
+
+- Dashboard (`/admin`)
+- Users (`/admin/users`, `/admin/users/[id]`)
+- Courses (`/admin/courses`, nested modules/lessons/prerequisites)
+- Payments (`/admin/payments`, `/admin/payments/[id]`, CSV export)
+- Refunds (`/admin/refunds`, `/admin/refunds/[orderId]`)
+- Simulators (`/admin/simulators`, scenario CRUD + versions + calibration)
+- Live Classes (`/admin/live-classes`)
+- Discount Codes (`/admin/discount-codes`)
+- Badges (`/admin/badges`)
+- Audit Log (`/admin/audit-log`, CSV export)
+- Settings (`/admin/settings`, TOTP setup, site settings)
+- Email Templates (`/admin/email-templates`)
+- Assignments (`/admin/assignments`)
+- Certificates (`/admin/certificates`)
+
 ## The Curriculum
 
 Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/curriculum/quiz-questions.json`. `scripts/import-amph-content.ts` reads from those paths (repo-relative, never device paths). Target structure: three courses (PPC Foundations, Accelerated Mastery, Ultimate Transformation) per `docs/CURRICULUM-REDESIGN.md`. Voice: `docs/voice-guide.md`. Reference lessons: `docs/0-1-welcome-to-amph.md`, `docs/1-1-read-ppc-data-before-you-change-it.md`.
+
+**Active lesson primitives** (Modules 0–5): `SelfCheck` (interactive radio-group), `TradeOffTable`, `ProcessDiagram`, `PitfallCallout` rendered via `:::trade-off{}`, `:::process{}`, `:::callout{}` MDX fences. Directive plugin in `src/lib/mdx/directive-plugin.ts`. Validation via `scripts/validate-lesson-production.ts --strict`.
+
+**Voice stabilization** (STORY-107): Phase 3 complete across Modules 2–8. Dropped `> **Analogy:**`, `> **Tip:**`, `> **Watch out:**`, `> **Key Takeaway:**` blockquote headers; converted to inline prose. USD → PHP normalization (~50:1 rate). Body sentences ≤30 words.
+
+**Public claims contract**: `content/curriculum/public-claims.json` + contract test validates landing page counts against actual MDX lessons and planned minutes.
 
 ## Code Style
 
@@ -89,9 +121,10 @@ Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/c
 - Vitest for unit + integration.
 - Playwright for E2E.
 - Tests live next to the code they test: `foo.ts` → `foo.test.ts`. Use `buildTestContainer()` from `src/composition/testContainer.ts` for usecase tests.
-- Coverage thresholds enforced in CI: 70% on `src/domain`, `src/usecases`, and `src/lib`.
+- Coverage thresholds enforced in CI: 70% on `src/domain`, `src/usecases`, and `src/lib`. Actual: ~80% statements, ~74% branches, ~81% functions, ~82% lines.
 - Domain functions: 100% branch coverage. They are pure; there is no excuse.
 - Every use case has tests with a fake gateway, fake repos, and a `FixedClock`.
+- Current test counts: ~4,400+ unit/integration tests, 6 critical E2E journeys.
 
 ## Commits
 
@@ -116,8 +149,9 @@ Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/c
 - `pnpm test:coverage` — coverage above threshold
 - `pnpm test:e2e` — Playwright suite passes
 - `pnpm build` — production build succeeds
-- Lighthouse CI — performance budget met
+- Lighthouse CI — performance budget met (re-enabled via `output: 'standalone'` per ADR-022)
 - `gitleaks detect` — no secrets in diff
+- Architecture compliance — 669+ boundary/contract tests pass
 
 ## File Dependency Chain
 
@@ -138,6 +172,10 @@ src/app/         ← Next.js routes + server actions. Thin.
    ↑
 src/components/ui/    ← AMPH brand UI primitives (Button, Card, Input, Badge). Depend on app, lib.
 src/components/astryx/ ← Astryx-based components (Table, Dialog, Toolbar, etc.). Depend on ui, app, lib.
+src/components/admin/  ← Admin-specific components (NavSidebar, QuizEditor, etc.). Depend on ui, astryx, app, lib.
+src/components/student/ ← Student shell components (StudentShell, StudentSidebar). Depend on ui, app, lib.
+src/components/tools/   ← Simulator components (BidElevatorForm, etc.). Depend on ui, astryx, app, lib.
+src/components/lesson/  ← Active lesson primitives (SelfCheck, TradeOffTable, etc.). Depend on ui, lib.
 ```
 
 Lower layers must not import from higher layers. The ESLint boundary rule blocks this at lint time. ADR-016.
@@ -303,7 +341,8 @@ If all four pass, the feature ships. If 1-3 pass, build the missing pieces. If 0
 4. Read `docs/audit-2026-07-27-completeness-review.md`.
 5. Read `docs/sprint-plan.md`.
 6. Read `docs/decisions.md` (ADRs).
-7. If still uncertain, **do not invent**. Mark the PR draft and ask.
+7. Read `docs/SHIPPED-AND-REMAINING.md`.
+8. If still uncertain, **do not invent**. Mark the PR draft and ask.
 
 ## Memoria Protocol
 
