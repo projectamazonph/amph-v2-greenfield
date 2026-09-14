@@ -24,6 +24,7 @@ import { LessonSidebar } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
 import { Button } from "@/components/ui/Button";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
+import { Confetti } from "@/components/ui/Confetti";
 import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.action";
 import styles from "./page.module.css";
 
@@ -251,7 +252,9 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
               <span>Learning step</span>
               <span>{sectionTitle}</span>
             </div>
-            <h1 id="lesson-title" className={styles.lessonTitle}>{lesson.title}</h1>
+            <h1 id="lesson-title" className={styles.lessonTitle}>
+              {lesson.title}
+            </h1>
             <p className={styles.lessonOutcome}>
               Use this lesson to make one clearer next decision in your PPC workflow.
             </p>
@@ -286,9 +289,12 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           </section>
 
           {completionStatus.completed === "1" ? (
-            <p className="alert-success" role="status">
-              Lesson complete. Your course progress is updated.
-            </p>
+            <>
+              <Confetti trigger />
+              <p className="alert-success" role="status">
+                Lesson complete. Your course progress is updated.
+              </p>
+            </>
           ) : null}
           {completionStatus.completeError ? (
             <p className="alert-error" role="alert">
