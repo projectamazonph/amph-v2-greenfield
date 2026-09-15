@@ -20,7 +20,7 @@ import { formatPhp } from "@/app/admin/_lib/formatPhp";
 import { courseLessonCount, courseTotalDurationMinutes } from "@/domain/entities/Course";
 import { archiveCourseAction } from "@/app/actions/archiveCourse.action";
 import { deleteModuleAction } from "@/app/actions/deleteModule.action";
-import { reorderModulesAction } from "@/app/actions/reorderModules.action";
+import { DraggableModuleList } from "@/components/admin/DraggableModuleList";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -69,22 +69,6 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
   async function handleDeleteModule(moduleId: string) {
     "use server";
     await deleteModuleAction({ moduleId });
-  }
-
-  async function handleMoveModule(moduleId: string, direction: "up" | "down") {
-    "use server";
-    if (modules.length < 2) return;
-    const current = [...modules].sort((a, b) => a.displayOrder - b.displayOrder);
-    const idx = current.findIndex((m) => m.id === moduleId);
-    if (idx === -1) return;
-    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= current.length) return;
-    const newOrder = [...current];
-    [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx]!, newOrder[idx]!];
-    await reorderModulesAction({
-      courseId: id,
-      moduleIds: newOrder.map((m) => m.id),
-    });
   }
 
   return (
@@ -206,60 +190,32 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
               No modules yet. Add the first module to start building the curriculum.
             </p>
           ) : (
-            <ul className={styles.moduleList}>
-              {[...modules]
-                .sort((a, b) => a.displayOrder - b.displayOrder)
-                .map((m, idx, arr) => (
-                  <li key={m.id} className={styles.moduleItem}>
-                    <div className={styles.moduleRow}>
-                      <span className={styles.moduleOrder}>{m.displayOrder}.</span>
+            <>
+              <DraggableModuleList courseId={course.id} modules={modules} />
+              <ul className={styles.moduleActionsList} aria-label="Module actions">
+                {[...modules]
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map((m) => (
+                    <li key={m.id} className={styles.moduleActionsItem}>
                       <Link
-                        href={`/admin/courses/${course.id}/modules/${m.id}`}
-                        className={styles.moduleTitle}
+                        href={`/admin/courses/${course.id}/modules/${m.id}/edit`}
+                        className={styles.editLink}
                       >
-                        {m.title}
+                        Edit {m.title}
                       </Link>
-                      <div className={styles.moduleActions}>
-                        <form action={handleMoveModule.bind(null, m.id, "up")}>
-                          <button
-                            type="submit"
-                            className={styles.reorderButton}
-                            disabled={idx === 0}
-                            aria-label={`Move ${m.title} up`}
-                          >
-                            ↑
-                          </button>
-                        </form>
-                        <form action={handleMoveModule.bind(null, m.id, "down")}>
-                          <button
-                            type="submit"
-                            className={styles.reorderButton}
-                            disabled={idx === arr.length - 1}
-                            aria-label={`Move ${m.title} down`}
-                          >
-                            ↓
-                          </button>
-                        </form>
-                        <Link
-                          href={`/admin/courses/${course.id}/modules/${m.id}/edit`}
-                          className={styles.editLink}
+                      <form action={handleDeleteModule.bind(null, m.id)}>
+                        <ConfirmSubmitButton
+                          confirmMessage="Are you sure? This cannot be undone."
+                          className={styles.deleteButton}
+                          aria-label={`Delete ${m.title}`}
                         >
-                          Edit
-                        </Link>
-                        <form action={handleDeleteModule.bind(null, m.id)}>
-                          <ConfirmSubmitButton
-                            confirmMessage="Are you sure? This cannot be undone."
-                            className={styles.deleteButton}
-                            aria-label={`Delete ${m.title}`}
-                          >
-                            Delete
-                          </ConfirmSubmitButton>
-                        </form>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-            </ul>
+                          Delete
+                        </ConfirmSubmitButton>
+                      </form>
+                    </li>
+                  ))}
+              </ul>
+            </>
           )}
         </Card>
       </div>
