@@ -6,11 +6,10 @@
  * existing questions/options as `initial`, and posts to updateQuizAction.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { updateQuizAction } from "@/app/actions/updateQuiz.action";
 import { deleteQuizAction } from "@/app/actions/deleteQuiz.action";
@@ -64,12 +63,10 @@ export default async function EditQuizPage({ params, searchParams }: PageProps) 
 
   return (
     <div>
-      <Link href="/admin/quizzes" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to quizzes
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={`Edit: ${quiz.title}`}
+        backHref="/admin/quizzes"
+        backLabel="Back to quizzes"
         subtitle={`${course.title} · ${quiz.questions.length} questions`}
       />
 

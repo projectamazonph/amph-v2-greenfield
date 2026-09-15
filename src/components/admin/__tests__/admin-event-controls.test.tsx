@@ -26,7 +26,7 @@ describe("admin event controls", () => {
         Archive
       </ConfirmSubmitButton>,
     );
-    expect(markup).toContain('type="submit"');
+    expect(markup).toContain('type="button"');
     expect(markup).toContain("Archive");
 
     const source = readFileSync(new URL("../ConfirmSubmitButton.tsx", import.meta.url), "utf8");

@@ -14,11 +14,10 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { createLessonAction } from "@/app/actions/createLesson.action";
 import styles from "../../../../../../courses.module.css";
@@ -86,12 +85,10 @@ export default async function NewLessonPage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href={`/admin/courses/${courseId}/modules/${moduleId}`} className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to module
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={`Add lesson to "${mod.title}"`}
+        backHref={`/admin/courses/${courseId}/modules/${moduleId}`}
+        backLabel="Back to module"
         subtitle="Pick a type and fill in the content (sent as JSON)."
       />
 

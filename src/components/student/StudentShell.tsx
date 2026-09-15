@@ -138,6 +138,11 @@ const COMMAND_PALETTE_ITEMS = [
   { href: "/tools/str-triage", label: "STR Triage", section: "Tools" },
   { href: "/tools/ad-console", label: "Amazon Ad Console", section: "Tools" },
   { href: "/resources", label: "Download center" },
+  { href: "/certificates", label: "Certificates" },
   { href: "/profile", label: "Profile" },
+  { href: "/profile/security", label: "Security", section: "Account" },
+  { href: "/profile/purchases", label: "Purchases", section: "Account" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/faq", label: "FAQ" },
   { href: "/courses", label: "Browse Catalog", section: "Quick Actions" },
 ] as const;

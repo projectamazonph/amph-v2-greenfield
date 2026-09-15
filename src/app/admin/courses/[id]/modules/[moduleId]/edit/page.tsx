@@ -5,11 +5,10 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { updateModuleAction } from "@/app/actions/updateModule.action";
 import styles from "../../../../../courses.module.css";
@@ -56,11 +55,11 @@ export default async function EditModulePage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href={`/admin/courses/${courseId}/modules/${moduleId}`} className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to module
-      </Link>
-
-      <TopBar title={`Edit "${moduleEntity.title}"`} />
+      <AdminSubPageHeader
+        title={`Edit "${moduleEntity.title}"`}
+        backHref={`/admin/courses/${courseId}/modules/${moduleId}`}
+        backLabel="Back to module"
+      />
 
       <Card padding={6}>
         <form action={handleSubmit} className={styles.form}>

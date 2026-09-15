@@ -142,6 +142,7 @@ export default async function NewCoursePage() {
                 type="number"
                 min="0"
                 step="1"
+                inputMode="decimal"
                 required
                 defaultValue="0"
                 className={styles.input}
@@ -165,6 +166,7 @@ export default async function NewCoursePage() {
                 type="number"
                 min="0"
                 step="1"
+                inputMode="numeric"
                 defaultValue="1"
                 className={styles.input}
               />
@@ -177,6 +179,7 @@ export default async function NewCoursePage() {
                 name="displayOrder"
                 type="number"
                 step="1"
+                inputMode="numeric"
                 defaultValue="0"
                 className={styles.input}
               />

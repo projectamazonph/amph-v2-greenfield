@@ -670,7 +670,7 @@ function QuizContent({ content, quizHref }: { content: QuizLessonContent; quizHr
     <div className={styles.quizCard}>
       <QuizIcon />
       <div className={styles.quizIntro}>
-        <h3 className={styles.quizTitle}>Quick check</h3>
+        <h2 className={styles.quizTitle}>Quick check</h2>
         <p className={styles.quizSubtitle}>
           {questionCount === 1
             ? "1 question in this lesson"

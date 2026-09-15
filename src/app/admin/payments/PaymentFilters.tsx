@@ -54,13 +54,14 @@ export function PaymentFilters({ defaultStatus, defaultEmail }: PaymentFiltersPr
   }
 
   return (
-    <div className={styles.filters}>
+    <div className={styles.filters} role="search" aria-label="Filter payments">
       <label>
         <span>Status</span>
         <select
           name="status"
           defaultValue={defaultStatus}
           className={styles.select}
+          aria-label="Filter by payment status"
           onChange={handleChange("status")}
         >
           {STATUSES.map((s) => (
@@ -76,6 +77,7 @@ export function PaymentFilters({ defaultStatus, defaultEmail }: PaymentFiltersPr
           type="search"
           name="email"
           placeholder="e.g. alice@example.com"
+          aria-label="Search by user email"
           defaultValue={defaultEmail}
           className={styles.input}
           onChange={handleChange("email")}

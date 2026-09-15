@@ -1,8 +1,12 @@
 "use client";
 
 /**
- * ConfirmSubmitButton — a submit button that shows an accessible Astryx Dialog
+ * ConfirmSubmitButton — a button that shows an accessible Astryx Dialog
  * before letting the enclosing <form action={...}> (a server action) submit.
+ *
+ * The trigger is type="button" so clicking it ONLY opens the dialog;
+ * the form submits solely via Confirm → form.requestSubmit(). A
+ * type="submit" trigger would submit on click and bypass the dialog.
  *
  * Uses purpose="required" so the user must explicitly confirm or cancel.
  * WCAG 4.1.2 compliant (replaces the inaccessible native browser dialog).
@@ -39,7 +43,7 @@ export function ConfirmSubmitButton({
   return (
     <>
       <button
-        type="submit"
+        type="button"
         className={className}
         ref={buttonRef}
         onClick={() => setIsOpen(true)}

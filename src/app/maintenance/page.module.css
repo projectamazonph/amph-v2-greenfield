@@ -31,7 +31,7 @@
 .heading {
   margin: 0 0 1rem;
   font-family: var(--font-display, "Archivo", sans-serif);
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 6vw, 2rem);
   font-weight: 700;
   color: var(--ink-900, #0f172a);
 }
