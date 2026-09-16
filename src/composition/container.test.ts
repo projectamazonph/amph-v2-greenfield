@@ -98,6 +98,10 @@ import { SubmitAssignment } from "@/usecases/SubmitAssignment";
 import { GradeAssignment } from "@/usecases/GradeAssignment";
 import { ListStudentAssignments } from "@/usecases/ListStudentAssignments";
 import { AdminListAssignments } from "@/usecases/AdminListAssignments";
+import { InMemoryArtefactRepository } from "@/infra/repositories/inmemory/InMemoryArtefactRepository";
+import { SaveArtefact } from "@/usecases/SaveArtefact";
+import { SubmitArtefact } from "@/usecases/SubmitArtefact";
+import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
 import { InMemorySettingRepository } from "@/infra/repositories/inmemory/InMemorySettingRepository";
 import { GetSetting } from "@/usecases/GetSetting";
 import { SetSetting } from "@/usecases/SetSetting";
@@ -295,6 +299,11 @@ export interface TestContainer extends AppContainer {
   prerequisiteRepo: InMemoryPrerequisiteRepository;
   // P1-02 (PR-C slice 2): assignment fakes
   assignmentRepo: InMemoryAssignmentRepository;
+  // LEARN-033 (STORY-135): learner artefact fakes
+  artefactRepo: InMemoryArtefactRepository;
+  saveArtefact: SaveArtefact;
+  submitArtefact: SubmitArtefact;
+  listStudentArtefacts: ListStudentArtefacts;
   // P1-05 (PR-C slice 3): site setting fakes
   settingRepo: InMemorySettingRepository;
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -382,6 +391,8 @@ export function buildTestContainer(): TestContainer {
   const prerequisiteRepo = new InMemoryPrerequisiteRepository();
   // P1-02 (PR-C slice 2): assignment fakes
   const assignmentRepo = new InMemoryAssignmentRepository();
+  // LEARN-033 (STORY-135): learner artefact fakes
+  const artefactRepo = new InMemoryArtefactRepository();
   // P1-05 (PR-C slice 3): site setting fakes
   const settingRepo = new InMemorySettingRepository();
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -776,6 +787,7 @@ export function buildTestContainer(): TestContainer {
       progressEventRepo,
       quizAttemptRepo,
       simulatorAttemptRepo,
+      artefactRepo,
       clock,
     }),
     // STORY-091: admin quiz CRUD
@@ -981,6 +993,11 @@ export function buildTestContainer(): TestContainer {
     gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
     listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
     adminListAssignments: new AdminListAssignments({ assignmentRepo }),
+    // LEARN-033 (STORY-135): learner artefacts (in-memory)
+    artefactRepo,
+    saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
+    submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
+    listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
     // P1-05 (PR-C slice 3): site settings (in-memory)
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),
