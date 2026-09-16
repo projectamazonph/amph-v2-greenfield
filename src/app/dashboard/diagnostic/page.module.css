@@ -9,14 +9,14 @@
 
 .header h1 {
   margin: 0 0 8px;
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-disp);
   font-size: 28px;
   line-height: 1.2;
 }
 
 .intro {
   margin: 0;
-  color: var(--color-text-muted, #5b6473);
+  color: var(--ink-700);
 }
 
 .result {
@@ -31,12 +31,12 @@
 }
 
 .resultFooter {
-  color: var(--color-text-muted, #5b6473);
+  color: var(--ink-700);
   font-size: 14px;
 }
 
 .dashboardLink {
   align-self: flex-start;
-  color: var(--color-accent, #ff6b35);
+  color: var(--accent);
   font-weight: 600;
 }

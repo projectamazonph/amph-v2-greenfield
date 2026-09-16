@@ -3,6 +3,7 @@ import { SkeletonCard } from "@/components/ui/Skeleton";
 export default function Loading() {
   return (
     <main
+      aria-busy="true"
       style={{
         maxWidth: 720,
         margin: "0 auto",
