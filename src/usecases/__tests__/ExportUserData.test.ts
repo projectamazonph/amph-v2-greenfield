@@ -11,6 +11,7 @@ import { FixedClock } from "@/ports/system/Clock";
 import { InMemoryQuizAttemptRepository } from "@/infra/repositories/InMemoryQuizAttemptRepository";
 import { InMemorySimulatorAttemptRepository } from "@/infra/repositories/InMemorySimulatorAttemptRepository";
 import { InMemoryArtefactRepository } from "@/infra/repositories/inmemory/InMemoryArtefactRepository";
+import { InMemoryRetrievalCheckRepository } from "@/infra/repositories/inmemory/InMemoryRetrievalCheckRepository";
 
 function buildUseCase(overrides: { userRepo?: InMemoryUserRepository } = {}) {
   return new ExportUserData({
@@ -24,6 +25,7 @@ function buildUseCase(overrides: { userRepo?: InMemoryUserRepository } = {}) {
     quizAttemptRepo: new InMemoryQuizAttemptRepository(),
     simulatorAttemptRepo: new InMemorySimulatorAttemptRepository(),
     artefactRepo: new InMemoryArtefactRepository(),
+    retrievalCheckRepo: new InMemoryRetrievalCheckRepository(),
     clock: new FixedClock(new Date("2026-01-01T00:00:00Z")),
   });
 }

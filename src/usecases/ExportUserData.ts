@@ -38,6 +38,7 @@ import type {
   SimulatorAttemptError,
 } from "@/ports/repositories/ISimulatorAttemptRepository";
 import type { IArtefactRepository } from "@/ports/repositories/IArtefactRepository";
+import type { IRetrievalCheckRepository } from "@/ports/repositories/IRetrievalCheckRepository";
 
 export interface ExportUserDataInput {
   userId: string;
@@ -82,6 +83,7 @@ export interface UserDataExport {
   quizAttempts: readonly JsonObject[];
   simulatorAttempts: readonly JsonObject[];
   artefacts: readonly JsonObject[];
+  retrievalCheckAttempts: readonly JsonObject[];
   notes: readonly string[];
 }
 
@@ -98,6 +100,7 @@ export interface ExportUserDataDeps {
   quizAttemptRepo: IQuizAttemptRepository;
   simulatorAttemptRepo: ISimulatorAttemptRepository;
   artefactRepo: IArtefactRepository;
+  retrievalCheckRepo: IRetrievalCheckRepository;
   clock: Clock;
 }
 
@@ -123,6 +126,7 @@ export class ExportUserData {
       quizAttempts,
       simulatorAttempts,
       artefacts,
+      retrievalCheckAttempts,
     ] = await Promise.all([
       this.deps.orderRepo.findByUserId(input.userId),
       this.deps.enrollmentRepo.findByUserId(input.userId),
@@ -133,6 +137,7 @@ export class ExportUserData {
       this.deps.quizAttemptRepo.findByUserId(input.userId),
       this.deps.simulatorAttemptRepo.findByUserId(input.userId),
       this.deps.artefactRepo.listByUser(input.userId),
+      this.deps.retrievalCheckRepo.listByUser(input.userId),
     ]);
 
     if (!orders.ok) return Result.err(orders.error);
@@ -144,6 +149,7 @@ export class ExportUserData {
     if (!quizAttempts.ok) return Result.err(quizAttempts.error);
     if (!simulatorAttempts.ok) return Result.err(simulatorAttempts.error);
     if (!artefacts.ok) return Result.err(artefacts.error);
+    if (!retrievalCheckAttempts.ok) return Result.err(retrievalCheckAttempts.error);
 
     return Result.ok({
       exportedAt: this.deps.clock.now().toISOString(),
@@ -166,6 +172,7 @@ export class ExportUserData {
       quizAttempts: toJsonRecords(quizAttempts.value),
       simulatorAttempts: toJsonRecords(simulatorAttempts.value),
       artefacts: toJsonRecords(artefacts.value),
+      retrievalCheckAttempts: toJsonRecords(retrievalCheckAttempts.value),
       notes: [],
     });
   }

@@ -102,6 +102,8 @@ import { InMemoryArtefactRepository } from "@/infra/repositories/inmemory/InMemo
 import { SaveArtefact } from "@/usecases/SaveArtefact";
 import { SubmitArtefact } from "@/usecases/SubmitArtefact";
 import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
+import { InMemoryRetrievalCheckRepository } from "@/infra/repositories/inmemory/InMemoryRetrievalCheckRepository";
+import { RecordRetrievalCheck } from "@/usecases/RecordRetrievalCheck";
 import { InMemorySettingRepository } from "@/infra/repositories/inmemory/InMemorySettingRepository";
 import { GetSetting } from "@/usecases/GetSetting";
 import { SetSetting } from "@/usecases/SetSetting";
@@ -304,6 +306,9 @@ export interface TestContainer extends AppContainer {
   saveArtefact: SaveArtefact;
   submitArtefact: SubmitArtefact;
   listStudentArtefacts: ListStudentArtefacts;
+  // LEARN-040 (STORY-138): retrieval-check fakes
+  retrievalCheckRepo: InMemoryRetrievalCheckRepository;
+  recordRetrievalCheck: RecordRetrievalCheck;
   // P1-05 (PR-C slice 3): site setting fakes
   settingRepo: InMemorySettingRepository;
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -393,6 +398,8 @@ export function buildTestContainer(): TestContainer {
   const assignmentRepo = new InMemoryAssignmentRepository();
   // LEARN-033 (STORY-135): learner artefact fakes
   const artefactRepo = new InMemoryArtefactRepository();
+  // LEARN-040 (STORY-138): retrieval-check fakes
+  const retrievalCheckRepo = new InMemoryRetrievalCheckRepository();
   // P1-05 (PR-C slice 3): site setting fakes
   const settingRepo = new InMemorySettingRepository();
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -788,6 +795,7 @@ export function buildTestContainer(): TestContainer {
       quizAttemptRepo,
       simulatorAttemptRepo,
       artefactRepo,
+      retrievalCheckRepo,
       clock,
     }),
     // STORY-091: admin quiz CRUD
@@ -998,6 +1006,9 @@ export function buildTestContainer(): TestContainer {
     saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
     submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
     listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
+    // LEARN-040 (STORY-138): retrieval-check tracking (in-memory)
+    retrievalCheckRepo,
+    recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),
     // P1-05 (PR-C slice 3): site settings (in-memory)
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),

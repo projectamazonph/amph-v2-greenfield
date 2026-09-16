@@ -104,6 +104,7 @@ model User {
   passwordResets         PasswordReset[]
   liveClassRegistrations LiveClassRegistration[]
   learnerArtefacts       LearnerArtefact[]
+  retrievalCheckAttempts RetrievalCheckAttempt[]
 
   @@index([email])
   @@index([paymongoCustomerId])
@@ -1514,4 +1515,28 @@ model LearnerArtefact {
   @@index([userId, kind])
   @@index([status])
   @@map("learner_artefacts")
+}
+
+// LEARN-040: mid-lesson retrieval check attempts. Append-only log;
+// the SelfCheck UI never blocks on a write. Read by LEARN-041
+// (targeted remediation) and LEARN-060 (learning events).
+model RetrievalCheckAttempt {
+  id String @id @default(cuid())
+
+  userId     String
+  lessonSlug String
+  checkId    String
+  correct    Boolean
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, lessonSlug])
+  @@map("retrieval_check_attempts")
 }

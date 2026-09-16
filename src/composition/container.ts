@@ -146,6 +146,10 @@ import { PrismaArtefactRepository } from "@/infra/repositories/PrismaArtefactRep
 import { SaveArtefact } from "@/usecases/SaveArtefact";
 import { SubmitArtefact } from "@/usecases/SubmitArtefact";
 import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
+// LEARN-040 (STORY-138): retrieval-check tracking
+import type { IRetrievalCheckRepository } from "@/ports/repositories/IRetrievalCheckRepository";
+import { PrismaRetrievalCheckRepository } from "@/infra/repositories/PrismaRetrievalCheckRepository";
+import { RecordRetrievalCheck } from "@/usecases/RecordRetrievalCheck";
 // P1-05 (PR-C slice 3): site settings
 import type { ISettingRepository } from "@/ports/repositories/ISettingRepository";
 import { PrismaSettingRepository } from "@/infra/repositories/PrismaSettingRepository";
@@ -507,6 +511,9 @@ export interface AppContainer {
   saveArtefact: SaveArtefact;
   submitArtefact: SubmitArtefact;
   listStudentArtefacts: ListStudentArtefacts;
+  // LEARN-040 (STORY-138): retrieval-check tracking
+  retrievalCheckRepo: IRetrievalCheckRepository;
+  recordRetrievalCheck: RecordRetrievalCheck;
   // P1-05 (PR-C slice 3): site settings
   settingRepo: ISettingRepository;
   getSetting: GetSetting;
@@ -764,6 +771,8 @@ function buildProductionContainer(): AppContainer {
   const assignmentRepo: IAssignmentRepository = new PrismaAssignmentRepository(prisma);
   // LEARN-033 (STORY-135): learner artefacts
   const artefactRepo: IArtefactRepository = new PrismaArtefactRepository(prisma);
+  // LEARN-040 (STORY-138): retrieval-check tracking
+  const retrievalCheckRepo: IRetrievalCheckRepository = new PrismaRetrievalCheckRepository(prisma);
   // P1-05 (PR-C slice 3): site settings
   const settingRepo: ISettingRepository = new PrismaSettingRepository(prisma);
   // P1-04 (PR-D): OAuth social login. Google only; the broker map
@@ -948,6 +957,7 @@ function buildProductionContainer(): AppContainer {
       quizAttemptRepo,
       simulatorAttemptRepo,
       artefactRepo,
+      retrievalCheckRepo,
       clock,
     }),
     // STORY-091: admin quiz CRUD
@@ -1360,6 +1370,9 @@ function buildProductionContainer(): AppContainer {
     saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
     submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
     listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
+    // LEARN-040 (STORY-138): retrieval-check tracking
+    retrievalCheckRepo,
+    recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),
     // P1-05 (PR-C slice 3): site settings
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),

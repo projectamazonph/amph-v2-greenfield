@@ -601,15 +601,31 @@ function stripDuplicateLeadingTitle(body: string, title: string): string {
   });
 }
 
-function TextContent({ body, title }: { body: string; title: string }) {
+function TextContent({
+  body,
+  title,
+  lessonSlug,
+}: {
+  body: string;
+  title: string;
+  lessonSlug: string;
+}) {
   const bodyWithoutDuplicateTitle = stripDuplicateLeadingTitle(body, title);
+  // LEARN-040: inject the lesson identifier into every SelfCheck so
+  // answers are tracked best-effort without changing MDX content.
+  const components = {
+    ...markdownComponents,
+    SelfCheck: (props: React.ComponentProps<typeof SelfCheck>) => (
+      <SelfCheck {...props} lessonSlug={lessonSlug} />
+    ),
+  };
 
   return (
     <div className={styles.prose}>
       <ReactMarkdown
         remarkPlugins={[directivePlugin, remarkGfm]}
         rehypePlugins={[rehypeRaw]}
-        components={markdownComponents}
+        components={components}
       >
         {bodyWithoutDuplicateTitle}
       </ReactMarkdown>
@@ -768,7 +784,7 @@ export function LessonContent({ lesson, courseSlug }: LessonContentProps) {
   }
 
   if (renderable.type === "TEXT") {
-    return <TextContent body={renderable.body} title={lesson.title} />;
+    return <TextContent body={renderable.body} title={lesson.title} lessonSlug={lesson.id} />;
   }
 
   if (renderable.type === "VIDEO") {
