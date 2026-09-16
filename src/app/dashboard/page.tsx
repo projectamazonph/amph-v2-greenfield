@@ -70,8 +70,7 @@ export default async function DashboardPage() {
     .slice()
     .sort(
       (a, b) =>
-        new Date(b.enrollment.createdAt).getTime() -
-        new Date(a.enrollment.createdAt).getTime(),
+        new Date(b.enrollment.createdAt).getTime() - new Date(a.enrollment.createdAt).getTime(),
     )[0];
   const resumeLesson = resumePair
     ? nextIncompleteLesson(
@@ -112,6 +111,9 @@ export default async function DashboardPage() {
               className={styles.continueBtn}
             >
               {resumePair.enrollment.progressPercent === 0 ? "Start lesson" : "Continue learning"}
+            </Link>
+            <Link href="/portfolio" className={styles.portfolioLink}>
+              View portfolio
             </Link>
           </section>
         )}
@@ -167,7 +169,9 @@ export default async function DashboardPage() {
         {/* My courses */}
         <section className={styles.section} aria-labelledby="my-courses-title">
           <div className={styles.sectionHeader}>
-            <h2 id="my-courses-title" className={styles.sectionTitle}>My courses</h2>
+            <h2 id="my-courses-title" className={styles.sectionTitle}>
+              My courses
+            </h2>
             <Link href="/courses" className={styles.browseLink}>
               Browse the catalog <ArrowRight size={16} aria-hidden />
             </Link>
@@ -206,7 +210,9 @@ export default async function DashboardPage() {
 
         {/* Quick Actions */}
         <section className={styles.section} aria-labelledby="quick-actions-title">
-          <h2 id="quick-actions-title" className={styles.sectionTitle}>Quick Actions</h2>
+          <h2 id="quick-actions-title" className={styles.sectionTitle}>
+            Quick Actions
+          </h2>
           <div className={styles.quickActions}>
             <Link href="/courses" className={styles.quickBtn}>
               Browse Catalog
