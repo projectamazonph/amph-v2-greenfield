@@ -1,0 +1,42 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.intro {
+  margin: 0;
+  color: var(--color-text-muted, #5b6473);
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.result h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.resultFooter {
+  color: var(--color-text-muted, #5b6473);
+  font-size: 14px;
+}
+
+.dashboardLink {
+  align-self: flex-start;
+  color: var(--color-accent, #ff6b35);
+  font-weight: 600;
+}

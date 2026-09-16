@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "title": "Tell us where to start",
+  "intro": "Three short questions. Skipping this leaves the default 'start at Module 0' emphasis in place. Your answers are private and never gate paid content or skip safety foundations.",
+  "questions": [
+    {
+      "id": "have-managed-ads",
+      "prompt": "Have you ever managed a Sponsored Products, Sponsored Brands, or Sponsored Display campaign?",
+      "options": [
+        { "value": "no", "label": "No, never" },
+        { "value": "watched", "label": "I have watched someone else run one" },
+        { "value": "ran-small", "label": "Yes, I have run a small campaign myself" },
+        { "value": "ran-many", "label": "Yes, I run campaigns regularly" }
+      ]
+    },
+    {
+      "id": "read-reports",
+      "prompt": "How comfortable are you reading ACoS, CPC, CTR, and conversion-rate reports?",
+      "options": [
+        { "value": "not-yet", "label": "I do not know those terms yet" },
+        { "value": "know-terms", "label": "I know the terms but have not used them on the job" },
+        { "value": "used-reports", "label": "I read those reports to make decisions" },
+        { "value": "train-others", "label": "I train others to read those reports" }
+      ]
+    },
+    {
+      "id": "explain-bid",
+      "prompt": "If a campaign's ACoS jumps from 25% to 40%, what is the first thing you would check before changing a bid?",
+      "options": [
+        { "value": "lower-bid", "label": "Lower the bid immediately" },
+        { "value": "stop-campaign", "label": "Stop the campaign and ask the client" },
+        {
+          "value": "read-data",
+          "label": "Read the search-term report, the listing, and the time window first, then decide"
+        },
+        {
+          "value": "compare-benchmarks",
+          "label": "Compare to last quarter and the category benchmark before deciding"
+        }
+      ]
+    }
+  ],
+  "rubric": {
+    "outcomes": [
+      {
+        "id": "new",
+        "label": "New to Amazon PPC",
+        "summary": "You are starting fresh. Spend the first 20 minutes on Module 0 to learn the daily work loop and finish one guided practice decision before moving on.",
+        "startingEmphasis": "Begin with Module 0, then complete the guided first decision in the Bid Elevator tool.",
+        "score": {
+          "have-managed-ads": ["no", "watched"],
+          "read-reports": ["not-yet", "know-terms"],
+          "explain-bid": ["lower-bid", "stop-campaign"]
+        }
+      },
+      {
+        "id": "familiar",
+        "label": "Familiar with PPC",
+        "summary": "You know the terms. Module 0 will set the safety boundaries and the client-brief intake you need before touching a live account, then Module 1 will sharpen the math behind every decision.",
+        "startingEmphasis": "Skim Module 0 for the safety checklist, then focus on Module 1 metrics and Module 2 keyword research.",
+        "score": {
+          "have-managed-ads": ["ran-small"],
+          "read-reports": ["used-reports"],
+          "explain-bid": ["read-data"]
+        }
+      },
+      {
+        "id": "experienced",
+        "label": "Experienced operator",
+        "summary": "You have run campaigns. Module 0 will reset you to the course's safety and reporting standards, and Module 5 onward will sharpen the client-facing portfolio, budget, and seasonal decisions.",
+        "startingEmphasis": "Skim Module 0, then move to Module 5 portfolio strategy and Module 10 reporting.",
+        "score": {
+          "have-managed-ads": ["ran-many"],
+          "read-reports": ["train-others"],
+          "explain-bid": ["compare-benchmarks"]
+        }
+      }
+    ],
+    "fallbackOutcome": "familiar"
+  }
+}
