@@ -2,19 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
-import {
-  loadDiagnosticManifest,
-  scoreDiagnostic,
-  type DiagnosticOutcomeView,
-} from "@/lib/diagnostic";
-
-export type {
-  DiagnosticOutcome,
-  DiagnosticOutcomeView,
-  DiagnosticManifest,
-  DiagnosticQuestion,
-} from "@/lib/diagnostic";
-export { loadDiagnosticManifest, scoreDiagnostic } from "@/lib/diagnostic";
+import { loadDiagnosticManifest, scoreDiagnostic } from "@/lib/diagnostic";
+import type { DiagnosticOutcomeView } from "@/lib/diagnostic";
 
 export type SubmitDiagnosticResult =
   { kind: "success"; outcome: DiagnosticOutcomeView } | { kind: "error"; error: string };

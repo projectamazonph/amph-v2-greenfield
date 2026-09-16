@@ -13,7 +13,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { requireAuth } from "@/lib/auth";
-import { loadDiagnosticManifest, type DiagnosticOutcome } from "@/app/actions/diagnostic.action";
+import { loadDiagnosticManifest, type DiagnosticOutcome } from "@/lib/diagnostic";
 import { DiagnosticForm } from "./DiagnosticForm";
 import { submitDiagnosticAction } from "@/app/actions/diagnostic.action";
 import styles from "./page.module.css";

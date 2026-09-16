@@ -3,7 +3,11 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import type { DiagnosticManifest, SubmitDiagnosticResult } from "@/app/actions/diagnostic.action";
+import type { DiagnosticManifest } from "@/lib/diagnostic";
+
+export type SubmitDiagnosticResult =
+  | { kind: "success"; outcome: import("@/lib/diagnostic").DiagnosticOutcomeView }
+  | { kind: "error"; error: string };
 
 const initialState: SubmitDiagnosticResult | null = null;
 
