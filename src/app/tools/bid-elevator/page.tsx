@@ -83,7 +83,11 @@ export default async function BidElevatorPage({ searchParams }: BidElevatorPageP
         />
         <FirstDecisionResultNotice visible={fromFirstDecision} />
         <SimulatorCoachGuide simulatorId="bid-elevator" />
-        <BidElevatorForm scenario={content} challengeUnlocked={challengeUnlocked} />
+        <BidElevatorForm
+          scenario={content}
+          challengeUnlocked={challengeUnlocked}
+          scenarioName={scenario.name}
+        />
       </main>
     </StudentShell>
   );

@@ -16,6 +16,16 @@ function props() {
   };
 }
 
+function saveProps() {
+  return {
+    ...props(),
+    saveAction: { save: vi.fn() },
+    artefactKind: "decision-log",
+    scenarioRef: "bid-elevator:beginner-1",
+    courseId: null,
+  };
+}
+
 describe("ToolDebrief", () => {
   it("renders all five sections", () => {
     const html = renderToString(<ToolDebrief {...props()} />);
@@ -48,5 +58,22 @@ describe("ToolDebrief", () => {
     expect(html).not.toContain("hiring");
     expect(html).not.toContain("job-ready");
     expect(html).not.toContain("job ready");
+  });
+
+  it("shows no save button without save bindings (LEARN-032 behaviour)", () => {
+    const html = renderToString(<ToolDebrief {...props()} />);
+    expect(html).not.toContain("Save to portfolio");
+  });
+
+  it("renders the save button disabled on first paint (rationale starts blank)", () => {
+    const html = renderToString(<ToolDebrief {...saveProps()} />);
+    expect(html).toContain("Save to portfolio");
+    expect(html).toContain("disabled");
+  });
+
+  it("shows neither success nor error copy on first paint", () => {
+    const html = renderToString(<ToolDebrief {...saveProps()} />);
+    expect(html).not.toContain("Saved as a draft");
+    expect(html).not.toContain("Could not save right now");
   });
 });

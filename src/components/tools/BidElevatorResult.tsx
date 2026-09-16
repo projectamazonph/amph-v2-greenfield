@@ -12,11 +12,13 @@ import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidEleva
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import { SimulatorNextRep } from "./SimulatorNextRep";
 import { ToolDebrief } from "./ToolDebrief";
+import { saveArtefactAction } from "@/app/actions/artefact.action";
 
 interface Props {
   result: BidElevatorOutput;
   targetRoas: number;
   xpAwarded?: number | null;
+  scenarioName?: string | null;
 }
 
 function scoreColor(score: number): "var(--success)" | "var(--warning)" | "var(--danger)" {
@@ -36,7 +38,7 @@ function confidenceLabel(confidence: "high" | "medium" | "low"): string {
   }
 }
 
-export function BidElevatorResult({ result, targetRoas, xpAwarded }: Props) {
+export function BidElevatorResult({ result, targetRoas, xpAwarded, scenarioName }: Props) {
   return (
     <section
       className={styles.panel}
@@ -148,6 +150,10 @@ export function BidElevatorResult({ result, targetRoas, xpAwarded }: Props) {
         lessonLabel="Revisit the Module 6 bidding lessons (PPC Foundations)"
         retryHref="/tools/bid-elevator"
         rationalePrompt={rationalePromptFor(result.score)}
+        saveAction={{ save: saveArtefactAction }}
+        artefactKind="decision-log"
+        scenarioRef={scenarioName ?? null}
+        courseId={null}
       />
     </section>
   );

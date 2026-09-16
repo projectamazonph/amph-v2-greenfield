@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import type { ArtefactActionResult, SaveArtefactActionInput } from "@/app/actions/artefact.action";
 import styles from "./ToolDebrief.module.css";
+
+export interface ToolDebriefSaveAction {
+  save: (
+    input: SaveArtefactActionInput,
+  ) => Promise<ArtefactActionResult<{ id: string; status: string }>>;
+}
 
 export interface ToolDebriefProps {
   readonly simulatorId: string;
@@ -12,10 +19,24 @@ export interface ToolDebriefProps {
   readonly lessonLabel: string;
   readonly retryHref: string;
   readonly rationalePrompt: string;
+  /**
+   * LEARN-034 save bindings. When present, the rationale block
+   * gains a "Save to portfolio" button that persists the text as a
+   * DRAFT artefact. Absent = prompt-only (the LEARN-032 behaviour).
+   * Server-action bindings flow server → client so unit tests never
+   * import a use-server module.
+   */
+  readonly saveAction?: ToolDebriefSaveAction;
+  readonly artefactKind?: string;
+  readonly scenarioRef?: string | null;
+  readonly courseId?: string | null;
 }
 
+type SaveState =
+  { kind: "idle" } | { kind: "saving" } | { kind: "saved" } | { kind: "error"; message: string };
+
 /**
- * ToolDebrief — post-attempt debrief pattern (LEARN-032).
+ * ToolDebrief — post-attempt debrief pattern (LEARN-032, LEARN-034).
  *
  * Five sections, always in this order:
  * 1. Result summary (plain language, never a certification claim).
@@ -23,7 +44,8 @@ export interface ToolDebriefProps {
  * 3. Targeted lesson revisit (link; the learner keeps the attempt record).
  * 4. Retry (link to a fresh attempt; the completed record is untouched).
  * 5. Rationale prompt (labelled textarea; the learner states the
- *    reason in their own words. Autosave to an artefact is LEARN-034).
+ *    reason in their own words, then optionally saves it to the
+ *    portfolio as a DRAFT artefact).
  */
 export function ToolDebrief({
   simulatorId,
@@ -33,9 +55,47 @@ export function ToolDebrief({
   lessonLabel,
   retryHref,
   rationalePrompt,
+  saveAction,
+  artefactKind,
+  scenarioRef,
+  courseId,
 }: ToolDebriefProps) {
   const [rationale, setRationale] = useState("");
+  const [saveState, setSaveState] = useState<SaveState>({ kind: "idle" });
   const textareaId = `debrief-rationale-${simulatorId}`;
+  const canSave =
+    saveAction !== undefined &&
+    artefactKind !== undefined &&
+    rationale.trim().length > 0 &&
+    saveState.kind !== "saving" &&
+    saveState.kind !== "saved";
+
+  async function onSave() {
+    if (!saveAction || !artefactKind || rationale.trim().length === 0) return;
+    setSaveState({ kind: "saving" });
+    try {
+      const result = await saveAction.save({
+        courseId: courseId ?? null,
+        kind: artefactKind,
+        title: `${simulatorId} rationale`,
+        scenarioRef: scenarioRef ?? null,
+        rationale: rationale.trim(),
+      });
+      if (result.ok) {
+        setSaveState({ kind: "saved" });
+      } else {
+        setSaveState({
+          kind: "error",
+          message: "Could not save right now. Your text is kept — try again.",
+        });
+      }
+    } catch {
+      setSaveState({
+        kind: "error",
+        message: "Could not save right now. Your text is kept — try again.",
+      });
+    }
+  }
 
   return (
     <section className={styles.debrief} aria-labelledby={`debrief-heading-${simulatorId}`}>
@@ -85,6 +145,31 @@ export function ToolDebrief({
           onChange={(e) => setRationale(e.target.value)}
           placeholder="Write the reason in plain client language."
         />
+        {saveAction !== undefined ? (
+          <div className={styles.saveRow}>
+            <button
+              type="button"
+              className={styles.saveButton}
+              disabled={!canSave}
+              onClick={() => void onSave()}
+            >
+              {saveState.kind === "saving" ? "Saving…" : "Save to portfolio"}
+            </button>
+            {saveState.kind === "saved" ? (
+              <p className={styles.saveSuccess} role="status">
+                Saved as a draft.{" "}
+                <Link href="/portfolio" className={styles.link}>
+                  Open portfolio
+                </Link>
+              </p>
+            ) : null}
+            {saveState.kind === "error" ? (
+              <p className={styles.saveError} role="alert">
+                {saveState.message}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </section>
   );
