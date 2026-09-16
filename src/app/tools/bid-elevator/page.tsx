@@ -26,6 +26,7 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 import { BidElevatorForm } from "@/components/tools/BidElevatorForm";
+import { FirstDecisionResultNotice } from "@/components/tools/FirstDecisionResultNotice";
 import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
 import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { StudentShell } from "@/components/student/StudentShell";
@@ -35,7 +36,11 @@ import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function BidElevatorPage() {
+interface BidElevatorPageProps {
+  readonly searchParams?: Promise<{ from?: string }> | { from?: string };
+}
+
+export default async function BidElevatorPage({ searchParams }: BidElevatorPageProps) {
   const container = buildContainer();
   const sim = container.simulatorRegistry.get("bid-elevator");
   if (!sim) {
@@ -59,6 +64,9 @@ export default async function BidElevatorPage() {
     challengeUnlocked = Result.isOk(unlockedResult) ? unlockedResult.value.unlocked : false;
   }
 
+  const resolvedParams = searchParams ? await Promise.resolve(searchParams) : {};
+  const fromFirstDecision = resolvedParams.from === "first-decision";
+
   return (
     <StudentShell>
       <main id="main-content" tabIndex={-1} className={styles.page}>
@@ -73,6 +81,7 @@ export default async function BidElevatorPage() {
           title={scenario.name}
           description={scenario.description}
         />
+        <FirstDecisionResultNotice visible={fromFirstDecision} />
         <SimulatorCoachGuide simulatorId="bid-elevator" />
         <BidElevatorForm scenario={content} challengeUnlocked={challengeUnlocked} />
       </main>

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "title": "Your first safe decision",
+  "intro": "Practice one bid change on a simulated bamboo cutting board account. No real money is on the line. The goal is to make a defensible decision and explain it in plain English, not to chase a high score.",
+  "scenarioContext": "The client sells a bamboo cutting board for ₱1,500. The target ACoS is 30 percent. There are three keywords already in the campaign. You have to decide whether to raise, lower, or leave each bid alone, and explain why.",
+  "decisionRule": "Read the keyword-level evidence in the Bid Elevator tool before touching a bid. Raise bids only on keywords whose projected ACoS stays at or below 30 percent and whose daily impression share headroom is greater than zero. Lower bids on keywords whose projected ACoS exceeds 30 percent even at the current bid. Leave a keyword alone when evidence is too thin to call.",
+  "resultExplanation": "When you finish, return to this page. A 'Strong' result means you explained the reason for every change in plain client language. A 'Mixed' result means at least one keyword needed a different call. A 'Keep practising' result means the explanation was missing or the decision ignored the evidence window."
+}
