@@ -21,6 +21,13 @@ export interface SelfCheckProps {
   explanation: string;
   revealLabel?: string;
   retryLabel?: string;
+  /**
+   * Stable lesson identifier for LEARN-040 tracking. When present,
+   * the component fires a best-effort record call on submit; a
+   * failed write never blocks the explanation. Absent = session-only
+   * (the pre-LEARN-040 behaviour).
+   */
+  lessonSlug?: string;
 }
 
 type FeedbackState = "idle" | "correct" | "incorrect";
@@ -34,6 +41,7 @@ export function SelfCheck(props: SelfCheckProps): ReactElement {
     explanation,
     revealLabel = "Check answer",
     retryLabel = "Try again",
+    lessonSlug,
   } = props;
   const baseId = useId();
   const [selected, setSelected] = useState<number | null>(null);
@@ -44,7 +52,30 @@ export function SelfCheck(props: SelfCheckProps): ReactElement {
   function onSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     if (selected === null) return;
-    setFeedback(selected === answerIndex ? "correct" : "incorrect");
+    const correct = selected === answerIndex;
+    setFeedback(correct ? "correct" : "incorrect");
+    if (lessonSlug !== undefined) {
+      // Best-effort LEARN-040 tracking: never block the explanation.
+      void recordAttempt(lessonSlug, id, correct);
+    }
+  }
+
+  /**
+   * Fire-and-forget record call. Imported lazily so the component
+   * stays renderable without the server-action module in unit tests.
+   */
+  async function recordAttempt(slug: string, checkId: string, correct: boolean): Promise<void> {
+    try {
+      const { recordRetrievalCheckAction } =
+        await import("@/app/actions/recordRetrievalCheck.action");
+      await recordRetrievalCheckAction({ lessonSlug: slug, checkId, correct });
+    } catch {
+      // Swallowed by design: a failed write must not change what the
+      // learner sees. The attempt is session-visible regardless.
+      if (process.env.NODE_ENV === "development") {
+        console.debug("[SelfCheck] retrieval record failed; continuing.");
+      }
+    }
   }
 
   function onReset(): void {
