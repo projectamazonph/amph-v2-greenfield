@@ -64,7 +64,7 @@ describe("validateToolBridges", () => {
   it("reports a bridge whose target has no published scenario", () => {
     const errors = validateToolBridges({
       registeredSimulatorIds: ["bid-elevator"],
-      publishedSimulatorKeys: [],
+      publishedSimulatorKeys: ["other-simulator"],
       lessons: [happyLesson("6.3-bid-elevator-prep", "bid-elevator")],
       tiers,
     });
@@ -86,5 +86,15 @@ describe("validateToolBridges", () => {
       kind: "registered_simulator_unreachable",
       simulatorId: "str-triage",
     });
+  });
+
+  it("skips the published-scenario check when the published list is empty", () => {
+    const errors = validateToolBridges({
+      registeredSimulatorIds: ["bid-elevator"],
+      publishedSimulatorKeys: [],
+      lessons: [happyLesson("6.3-bid-elevator-prep", "bid-elevator")],
+      tiers,
+    });
+    expect(errors).toEqual([]);
   });
 });

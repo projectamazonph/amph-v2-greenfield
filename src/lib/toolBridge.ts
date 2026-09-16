@@ -57,6 +57,10 @@ export function validateToolBridges(
   input: ToolBridgeValidationInput,
 ): readonly ToolBridgeValidationError[] {
   const registered = new Set<string>(input.registeredSimulatorIds);
+  // An empty published list means the caller skipped the
+  // published-scenario signal (filesystem-only CI). Skip the
+  // published check rather than reporting every bridge as broken.
+  const skipPublished = input.publishedSimulatorKeys.length === 0;
   const published = new Set<string>(input.publishedSimulatorKeys);
   const errors: ToolBridgeValidationError[] = [];
 
@@ -82,7 +86,7 @@ export function validateToolBridges(
       });
     }
 
-    if (!published.has(target)) {
+    if (!skipPublished && !published.has(target)) {
       errors.push({
         kind: "bridge_target_unpublished",
         slug: lesson.slug,
