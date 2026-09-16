@@ -105,6 +105,7 @@ model User {
   liveClassRegistrations LiveClassRegistration[]
   learnerArtefacts       LearnerArtefact[]
   retrievalCheckAttempts RetrievalCheckAttempt[]
+  notifications          Notification[]
 
   @@index([email])
   @@index([paymongoCustomerId])
@@ -1539,4 +1540,23 @@ model RetrievalCheckAttempt {
   @@index([userId])
   @@index([userId, lessonSlug])
   @@map("retrieval_check_attempts")
+}
+
+// P3-87: in-app notifications. Owner-scoped reads; the bell polls list.
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  type String
+  title String
+  body String
+  href String?
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdById String?
+  updatedById String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@map("notifications")
 }

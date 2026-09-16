@@ -104,6 +104,11 @@ import { SubmitArtefact } from "@/usecases/SubmitArtefact";
 import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
 import { InMemoryRetrievalCheckRepository } from "@/infra/repositories/inmemory/InMemoryRetrievalCheckRepository";
 import { RecordRetrievalCheck } from "@/usecases/RecordRetrievalCheck";
+import { InMemoryNotificationRepository } from "@/infra/repositories/inmemory/InMemoryNotificationRepository";
+import { NotifyUser } from "@/usecases/NotifyUser";
+import { ListNotifications } from "@/usecases/ListNotifications";
+import { MarkNotificationRead } from "@/usecases/MarkNotificationRead";
+import { MarkAllNotificationsRead } from "@/usecases/MarkAllNotificationsRead";
 import { InMemorySettingRepository } from "@/infra/repositories/inmemory/InMemorySettingRepository";
 import { GetSetting } from "@/usecases/GetSetting";
 import { SetSetting } from "@/usecases/SetSetting";
@@ -309,6 +314,12 @@ export interface TestContainer extends AppContainer {
   // LEARN-040 (STORY-138): retrieval-check fakes
   retrievalCheckRepo: InMemoryRetrievalCheckRepository;
   recordRetrievalCheck: RecordRetrievalCheck;
+  // P3-87 (STORY-139): notification fakes
+  notificationRepo: InMemoryNotificationRepository;
+  notifyUser: NotifyUser;
+  listNotifications: ListNotifications;
+  markNotificationRead: MarkNotificationRead;
+  markAllNotificationsRead: MarkAllNotificationsRead;
   // P1-05 (PR-C slice 3): site setting fakes
   settingRepo: InMemorySettingRepository;
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -400,6 +411,8 @@ export function buildTestContainer(): TestContainer {
   const artefactRepo = new InMemoryArtefactRepository();
   // LEARN-040 (STORY-138): retrieval-check fakes
   const retrievalCheckRepo = new InMemoryRetrievalCheckRepository();
+  // P3-87 (STORY-139): notification fakes
+  const notificationRepo = new InMemoryNotificationRepository();
   // P1-05 (PR-C slice 3): site setting fakes
   const settingRepo = new InMemorySettingRepository();
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -1009,6 +1022,12 @@ export function buildTestContainer(): TestContainer {
     // LEARN-040 (STORY-138): retrieval-check tracking (in-memory)
     retrievalCheckRepo,
     recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),
+    // P3-87 (STORY-139): in-app notifications (in-memory)
+    notificationRepo,
+    notifyUser: new NotifyUser({ notificationRepo, idGen, clock }),
+    listNotifications: new ListNotifications({ notificationRepo }),
+    markNotificationRead: new MarkNotificationRead({ notificationRepo, clock }),
+    markAllNotificationsRead: new MarkAllNotificationsRead({ notificationRepo, clock }),
     // P1-05 (PR-C slice 3): site settings (in-memory)
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),

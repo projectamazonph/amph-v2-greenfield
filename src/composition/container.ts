@@ -150,6 +150,13 @@ import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
 import type { IRetrievalCheckRepository } from "@/ports/repositories/IRetrievalCheckRepository";
 import { PrismaRetrievalCheckRepository } from "@/infra/repositories/PrismaRetrievalCheckRepository";
 import { RecordRetrievalCheck } from "@/usecases/RecordRetrievalCheck";
+// P3-87 (STORY-139): in-app notifications
+import type { INotificationRepository } from "@/ports/repositories/INotificationRepository";
+import { PrismaNotificationRepository } from "@/infra/repositories/PrismaNotificationRepository";
+import { NotifyUser } from "@/usecases/NotifyUser";
+import { ListNotifications } from "@/usecases/ListNotifications";
+import { MarkNotificationRead } from "@/usecases/MarkNotificationRead";
+import { MarkAllNotificationsRead } from "@/usecases/MarkAllNotificationsRead";
 // P1-05 (PR-C slice 3): site settings
 import type { ISettingRepository } from "@/ports/repositories/ISettingRepository";
 import { PrismaSettingRepository } from "@/infra/repositories/PrismaSettingRepository";
@@ -514,6 +521,12 @@ export interface AppContainer {
   // LEARN-040 (STORY-138): retrieval-check tracking
   retrievalCheckRepo: IRetrievalCheckRepository;
   recordRetrievalCheck: RecordRetrievalCheck;
+  // P3-87 (STORY-139): in-app notifications
+  notificationRepo: INotificationRepository;
+  notifyUser: NotifyUser;
+  listNotifications: ListNotifications;
+  markNotificationRead: MarkNotificationRead;
+  markAllNotificationsRead: MarkAllNotificationsRead;
   // P1-05 (PR-C slice 3): site settings
   settingRepo: ISettingRepository;
   getSetting: GetSetting;
@@ -773,6 +786,8 @@ function buildProductionContainer(): AppContainer {
   const artefactRepo: IArtefactRepository = new PrismaArtefactRepository(prisma);
   // LEARN-040 (STORY-138): retrieval-check tracking
   const retrievalCheckRepo: IRetrievalCheckRepository = new PrismaRetrievalCheckRepository(prisma);
+  // P3-87 (STORY-139): in-app notifications
+  const notificationRepo: INotificationRepository = new PrismaNotificationRepository(prisma);
   // P1-05 (PR-C slice 3): site settings
   const settingRepo: ISettingRepository = new PrismaSettingRepository(prisma);
   // P1-04 (PR-D): OAuth social login. Google only; the broker map
@@ -1373,6 +1388,12 @@ function buildProductionContainer(): AppContainer {
     // LEARN-040 (STORY-138): retrieval-check tracking
     retrievalCheckRepo,
     recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),
+    // P3-87 (STORY-139): in-app notifications
+    notificationRepo,
+    notifyUser: new NotifyUser({ notificationRepo, idGen, clock }),
+    listNotifications: new ListNotifications({ notificationRepo }),
+    markNotificationRead: new MarkNotificationRead({ notificationRepo, clock }),
+    markAllNotificationsRead: new MarkAllNotificationsRead({ notificationRepo, clock }),
     // P1-05 (PR-C slice 3): site settings
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),
