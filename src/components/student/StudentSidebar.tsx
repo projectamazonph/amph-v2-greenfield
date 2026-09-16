@@ -29,6 +29,7 @@ import type { ComponentType, SVGProps } from "react";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { NotificationBell } from "@/components/ui/NotificationBell";
 import styles from "./StudentSidebar.module.css";
 
 interface NavItem {
@@ -171,6 +172,7 @@ export function StudentSidebar({ user }: StudentSidebarProps) {
           </button>
         </div>
         <div className={styles.themeToggleWrapper}>
+          <NotificationBell />
           <ThemeToggle />
         </div>
       </div>
