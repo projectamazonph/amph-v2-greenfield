@@ -64,21 +64,24 @@ report link, and timestamp. A public-only check is not sufficient evidence.
 
 The release operator signs off the following checklist:
 
-| Evidence | Recorded value |
-| --- | --- |
-| Commit SHA |  |
-| Source contract output |  |
-| Staging import output and row counts |  |
-| Public-claim validation output |  |
-| Logged-in smoke URL/report |  |
-| Operator + timestamp |  |
+| Evidence                             | Recorded value |
+| ------------------------------------ | -------------- |
+| Commit SHA                           |                |
+| Source contract output               |                |
+| Staging import output and row counts |                |
+| Public-claim validation output       |                |
+| Logged-in smoke URL/report           |                |
+| Operator + timestamp                 |                |
 
 Only after all rows are complete may the production deploy run. If any step
 fails, fix or roll back the source/import in staging and restart at step 1.
 
 ## CI relationship
 
-The `Learning release gate` CI job runs source inventory and public-claim
-validation after the quality, unit, and Playwright jobs pass. CI proves the
-checked-in contract; the staging import output and logged-in URL above remain
-release evidence that must be attached by the operator.
+The `Learning release gate` CI job runs source inventory, tool-bridge
+validation, and public-claim validation after the quality, unit, and
+Playwright jobs pass. `pnpm validate:learning-release` chains
+`validate:curriculum` (LEARN-001), `validate:tool-bridges` (LEARN-030),
+and the public-claim contract test. CI proves the checked-in contract;
+the staging import output and logged-in URL above remain release
+evidence that must be attached by the operator.
