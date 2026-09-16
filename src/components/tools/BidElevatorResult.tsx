@@ -11,6 +11,7 @@ import styles from "./BidElevatorResult.module.css";
 import type { BidElevatorOutput } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import { FormativeScoreNotice } from "./FormativeScoreNotice";
 import { SimulatorNextRep } from "./SimulatorNextRep";
+import { ToolDebrief } from "./ToolDebrief";
 
 interface Props {
   result: BidElevatorOutput;
@@ -92,9 +93,15 @@ export function BidElevatorResult({ result, targetRoas, xpAwarded }: Props) {
             <tr>
               <th scope="col">Keyword</th>
               <th scope="col">Confidence</th>
-              <th scope="col" className={styles.thNum}>Current</th>
-              <th scope="col" className={styles.thNum}>Suggested</th>
-              <th scope="col" className={styles.thNum}>Δ</th>
+              <th scope="col" className={styles.thNum}>
+                Current
+              </th>
+              <th scope="col" className={styles.thNum}>
+                Suggested
+              </th>
+              <th scope="col" className={styles.thNum}>
+                Δ
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -127,6 +134,28 @@ export function BidElevatorResult({ result, targetRoas, xpAwarded }: Props) {
         </table>
       </div>
       <SimulatorNextRep simulatorId="bid-elevator" />
+      <ToolDebrief
+        simulatorId="bid-elevator"
+        scoreLabel={
+          result.score >= 80
+            ? "Strong. Every bid change stays inside the target ACoS."
+            : result.score >= 50
+              ? "Mixed. At least one keyword needs a different call."
+              : "Keep practising. Re-read the evidence window before changing a bid."
+        }
+        whyItMatters="A client keeps the VA who can explain the reason for a bid change in plain language, not the one who guesses the fastest. This score measures whether the bids match the evidence."
+        lessonHref="/courses/ppc-foundations"
+        lessonLabel="Revisit the Module 6 bidding lessons (PPC Foundations)"
+        retryHref="/tools/bid-elevator"
+        rationalePrompt={rationalePromptFor(result.score)}
+      />
     </section>
   );
+}
+
+function rationalePromptFor(score: number): string {
+  if (score >= 80) {
+    return "Write one sentence per keyword explaining why the bid is right, as you would to the client.";
+  }
+  return "Pick the keyword you are least sure about and write what evidence would change your call.";
 }

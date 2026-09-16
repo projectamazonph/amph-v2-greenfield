@@ -1,0 +1,50 @@
+.debrief {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 18px;
+  font-family: var(--font-disp);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.blockHeading {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.body {
+  margin: 0;
+  color: var(--ink-700);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.link {
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
