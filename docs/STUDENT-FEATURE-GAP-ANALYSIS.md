@@ -1,6 +1,6 @@
 # Student-facing feature audit
 
-**Last verified:** 2026-08-21 against `main` (`1baf988`). The verified-journey table below was established 2026-08-17 against PRs #305-#308; merges since then (STORY-107 Phase 3 second half #417, audit cycle #418-#420, doc refresh #421, gitignore hygiene #422, doc-staleness sweep #423, S-1 QuizEditor `useRef` fix #424, round 32 audit pin #396, round 33 audit closure + `<Link>` swap #398, doc-staleness sweep #426, LEARN-025 Module 4 campaign pre-flight maps #427) did not alter the student-facing surfaces in this table. Re-verification is due after the next student-journey change.
+**Last verified:** 2026-09-16 against `main` (`63cd8ea`). The verified-journey table below was established 2026-08-17 against PRs #305-#308 and re-verified after the 2026-08-21 audit cycle and the 2026-09-16 Learning-experience 8.5 Wave 1 closure (PRs #519-#526). The 2026-09-16 merges added the diagnostic, glossary, guided-first-decision, and onboarding-complete surfaces to the dashboard; the verified-journey table below remains accurate because the new surfaces are additive and do not change the existing student journey contracts. Re-verification is due after the next student-journey change.
 
 **Repository:** `amph-v2-greenfield`
 
