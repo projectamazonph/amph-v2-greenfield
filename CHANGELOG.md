@@ -4,6 +4,18 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Learning-experience 8.5 — Wave 1 closed
+
+- `LEARN-010` (STORY-130): optional pre-course diagnostic at `/dashboard/diagnostic`. Three fixed outcomes (new, familiar, experienced) with a fallback rubric; recommendation-only, never changes entitlement or gates paid content; pure scoring function in `src/lib/diagnostic.ts` with six Vitest tests.
+- `LEARN-013` (STORY-131): just-in-time glossary data + inline term button. `content/curriculum/glossary.json` covers the seven Module 0 terms (PPC, ACoS, TACoS, ROAS, CPC, CTR, conversion rate); `src/components/lesson/GlossaryTerm.tsx` opens a focus-and-click popover with Escape-to-close. Plain MDX remains readable without JavaScript because the parenthesised definition the author already wrote is the fallback.
+- `LEARN-014` (STORY-132): guided first-decision route at `/dashboard/first-decision`. The static brief in `content/curriculum/first-decision.json` describes the scenario context, the decision rule, and the result interpretation; a "Start the practice decision" button links to `/tools/bid-elevator?from=first-decision` and the Bid Elevator tool renders a `FirstDecisionResultNotice` reminder to read the result explanation back on the onboarding route.
+- `LEARN-015` (STORY-133): onboarding completion view at `/dashboard/onboarding-complete`. Reads the learner's PPC Foundations enrollment, asks the pure helper whether they have finished Module 0, and renders the four-section summary (pathway, next action, expected time, help link) when Module 0 is done; redirects back to the dashboard with a plain-language query string when it is not. Never grants XP, awards badges, or changes entitlement.
+- `LEARN-030` (STORY-134): lesson-to-tool bridge validator in `src/lib/toolBridge.ts` joined to the existing curriculum inventory, public-claim tier allowlist, and registered simulator ids. `pnpm validate:learning-release` now fails the release gate when a lesson points at an unregistered simulator, when a bridge target is not in any tier, or when a registered simulator is not unlocked by any tier. Filesystem-only; the published-scenario signal stays at `/api/health/ready`. Five Vitest tests cover the validator.
+
+### Drag-and-drop module reorder (P3-83)
+
+`DraggableModuleList` component (`@dnd-kit/core` + `@dnd-kit/sortable` + `@dnd-kit/utilities`) replaces the up/down buttons in `/admin/courses/[id]` with a drag handle. The reorder persists through the existing `reorderModulesAction` server action and the `reorderModules` use case.
+
 ### Production UI rules adopted in the design brief
 
 Reviewed the user-supplied "Full-Featured Sites and Apps: Complete UI Rules" reference against source and encoded it in `docs/design-brief.md` as a normative checklist: pinned families (navigation, mobile, forms, modals, loading, search, tables, color, type, spacing, motion, icons, a11y, performance, security, resilience) with AMPH mappings, deliberate exceptions (brand font stack, drawer over bottom nav, no PWA/RTL/i18n/virtualization), and one recorded gap (no sitemap/robots/canonical coverage yet). Docs only, no product code changes.
