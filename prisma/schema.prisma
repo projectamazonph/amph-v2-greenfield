@@ -103,6 +103,7 @@ model User {
   emailVerifications     EmailVerification[]
   passwordResets         PasswordReset[]
   liveClassRegistrations LiveClassRegistration[]
+  learnerArtefacts       LearnerArtefact[]
 
   @@index([email])
   @@index([paymongoCustomerId])
@@ -1480,4 +1481,37 @@ model SkillProgress {
   @@unique([userId, skillMapId])
   @@index([userId])
   @@map("skill_progress")
+}
+
+// LEARN-033: structured learner output (decision log, listing audit,
+// keyword plan, campaign map, triage report, weekly readout). Private
+// to the owner by default; read by the owner and by admins reviewing
+// a capstone (LEARN-044). DRAFT rows are revisable; SUBMITTED rows
+// are locked.
+model LearnerArtefact {
+  id String @id @default(cuid())
+
+  userId   String
+  courseId String?
+
+  kind  String // decision-log | listing-audit | keyword-plan | campaign-map | triage-report | weekly-readout
+  title String
+  scenarioRef String?
+  payload Json // { rationale, scenarioRef?, fields? }
+
+  status      String    @default("DRAFT") // DRAFT | SUBMITTED
+  submittedAt DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, kind])
+  @@index([status])
+  @@map("learner_artefacts")
 }

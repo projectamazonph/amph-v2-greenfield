@@ -37,6 +37,7 @@ import type {
   ISimulatorAttemptRepository,
   SimulatorAttemptError,
 } from "@/ports/repositories/ISimulatorAttemptRepository";
+import type { IArtefactRepository } from "@/ports/repositories/IArtefactRepository";
 
 export interface ExportUserDataInput {
   userId: string;
@@ -80,6 +81,7 @@ export interface UserDataExport {
   progressEvents: readonly JsonObject[];
   quizAttempts: readonly JsonObject[];
   simulatorAttempts: readonly JsonObject[];
+  artefacts: readonly JsonObject[];
   notes: readonly string[];
 }
 
@@ -95,6 +97,7 @@ export interface ExportUserDataDeps {
   progressEventRepo: IProgressEventRepository;
   quizAttemptRepo: IQuizAttemptRepository;
   simulatorAttemptRepo: ISimulatorAttemptRepository;
+  artefactRepo: IArtefactRepository;
   clock: Clock;
 }
 
@@ -119,6 +122,7 @@ export class ExportUserData {
       progressEvents,
       quizAttempts,
       simulatorAttempts,
+      artefacts,
     ] = await Promise.all([
       this.deps.orderRepo.findByUserId(input.userId),
       this.deps.enrollmentRepo.findByUserId(input.userId),
@@ -128,6 +132,7 @@ export class ExportUserData {
       this.deps.progressEventRepo.findByUserId(input.userId),
       this.deps.quizAttemptRepo.findByUserId(input.userId),
       this.deps.simulatorAttemptRepo.findByUserId(input.userId),
+      this.deps.artefactRepo.listByUser(input.userId),
     ]);
 
     if (!orders.ok) return Result.err(orders.error);
@@ -138,6 +143,7 @@ export class ExportUserData {
     if (!progressEvents.ok) return Result.err(progressEvents.error);
     if (!quizAttempts.ok) return Result.err(quizAttempts.error);
     if (!simulatorAttempts.ok) return Result.err(simulatorAttempts.error);
+    if (!artefacts.ok) return Result.err(artefacts.error);
 
     return Result.ok({
       exportedAt: this.deps.clock.now().toISOString(),
@@ -159,6 +165,7 @@ export class ExportUserData {
       progressEvents: toJsonRecords(progressEvents.value),
       quizAttempts: toJsonRecords(quizAttempts.value),
       simulatorAttempts: toJsonRecords(simulatorAttempts.value),
+      artefacts: toJsonRecords(artefacts.value),
       notes: [],
     });
   }

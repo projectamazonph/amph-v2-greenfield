@@ -140,6 +140,12 @@ import { SubmitAssignment } from "@/usecases/SubmitAssignment";
 import { GradeAssignment } from "@/usecases/GradeAssignment";
 import { ListStudentAssignments } from "@/usecases/ListStudentAssignments";
 import { AdminListAssignments } from "@/usecases/AdminListAssignments";
+// LEARN-033 (STORY-135): learner artefacts
+import type { IArtefactRepository } from "@/ports/repositories/IArtefactRepository";
+import { PrismaArtefactRepository } from "@/infra/repositories/PrismaArtefactRepository";
+import { SaveArtefact } from "@/usecases/SaveArtefact";
+import { SubmitArtefact } from "@/usecases/SubmitArtefact";
+import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
 // P1-05 (PR-C slice 3): site settings
 import type { ISettingRepository } from "@/ports/repositories/ISettingRepository";
 import { PrismaSettingRepository } from "@/infra/repositories/PrismaSettingRepository";
@@ -496,6 +502,11 @@ export interface AppContainer {
   gradeAssignment: GradeAssignment;
   listStudentAssignments: ListStudentAssignments;
   adminListAssignments: AdminListAssignments;
+  // LEARN-033 (STORY-135): learner artefacts
+  artefactRepo: IArtefactRepository;
+  saveArtefact: SaveArtefact;
+  submitArtefact: SubmitArtefact;
+  listStudentArtefacts: ListStudentArtefacts;
   // P1-05 (PR-C slice 3): site settings
   settingRepo: ISettingRepository;
   getSetting: GetSetting;
@@ -751,6 +762,8 @@ function buildProductionContainer(): AppContainer {
   const prerequisiteRepo: IPrerequisiteRepository = new PrismaPrerequisiteRepository(prisma);
   // P1-02 (PR-C slice 2): assignments
   const assignmentRepo: IAssignmentRepository = new PrismaAssignmentRepository(prisma);
+  // LEARN-033 (STORY-135): learner artefacts
+  const artefactRepo: IArtefactRepository = new PrismaArtefactRepository(prisma);
   // P1-05 (PR-C slice 3): site settings
   const settingRepo: ISettingRepository = new PrismaSettingRepository(prisma);
   // P1-04 (PR-D): OAuth social login. Google only; the broker map
@@ -934,6 +947,7 @@ function buildProductionContainer(): AppContainer {
       progressEventRepo,
       quizAttemptRepo,
       simulatorAttemptRepo,
+      artefactRepo,
       clock,
     }),
     // STORY-091: admin quiz CRUD
@@ -1341,6 +1355,11 @@ function buildProductionContainer(): AppContainer {
     gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
     listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
     adminListAssignments: new AdminListAssignments({ assignmentRepo }),
+    // LEARN-033 (STORY-135): learner artefacts
+    artefactRepo,
+    saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
+    submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
+    listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
     // P1-05 (PR-C slice 3): site settings
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),
