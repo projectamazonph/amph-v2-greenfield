@@ -23,21 +23,16 @@ These six items require feature-level work (new libraries, schema changes, or in
 
 ## P3-83. Drag-and-Drop Module Reorder
 
-**Goal:** Admin can drag modules within a course to reorder them.
+**Status:** ✅ Implemented — PR #519
 
-**Files to create:**
+**Files created:**
 
-- `src/components/admin/DraggableModuleList.tsx` — Client component
+- `src/components/admin/DraggableModuleList.tsx` — Client component using `@dnd-kit/core` + `@dnd-kit/sortable` + `@dnd-kit/utilities`
+- Added `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` dependencies
 
-**Implementation:** Use `@dnd-kit/core` + `@dnd-kit/sortable`:
+**Implementation:** Hamburger-icon drag handle on each module row, drop-and-reorder inside `<DndContext>` with `<SortableContext>`, edit/delete actions live in a separate actions list. The reorder persists through the existing `reorderModulesAction` server action and the `reorderModules` use case.
 
-- Wrap modules in `<DndContext>` with `<SortableContext>`
-- Each module row uses `useSortable` for drag handle
-- On drag end, POST new order to `/api/admin/courses/[id]/modules/reorder`
-
-**Dependencies needed:** `@dnd-kit/core`, `@dnd-kit/sortable`
-
-**Backend:** Add a server action `reorderModules(courseId, moduleIds[])` that updates `order` field in Prisma schema.
+**No action needed.**
 
 ---
 
@@ -155,6 +150,6 @@ If tackling the remaining four, recommend this order:
 | #     | Feature       | Est. Effort | Dependencies                     |
 | ----- | ------------- | ----------- | -------------------------------- |
 | P3-82 | Confetti      | ✅ Done     | canvas-confetti                  |
-| P3-83 | DnD reorder   | M           | @dnd-kit/core, @dnd-kit/sortable |
+| P3-83 | DnD reorder   | ✅ Done     | @dnd-kit/core, @dnd-kit/sortable |
 | P3-84 | Dark mode     | ✅ Done     | None                             |
 | P3-87 | Notifications | XL          | Schema migration                 |

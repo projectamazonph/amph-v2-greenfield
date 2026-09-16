@@ -1,12 +1,22 @@
 # Learning Experience 8.5 Build Plan
 
-**Status:** Planned
+**Status:** Wave 0 done, Wave 1 done, Wave 3 partial (LEARN-030 done)
 
 **Owner:** Ryan Roland Dabao
 
-**Date:** 2026-08-16
+**Date:** 2026-08-16 (last reviewed 2026-09-16 against `63cd8ea`)
 
 **Decision:** Build a zero-to-one, evidence-producing learning journey before adding breadth. The Academy should help a complete beginner make and explain safe PPC decisions, then leave with reviewable client-work artefacts. It must not represent formative simulator scores as job-readiness proof.
+
+## Wave progress (2026-09-16)
+
+- **Wave 0 (Truth and release contract):** Done. LEARN-001 (STORY-111, STORY-129), LEARN-002 (STORY-112), LEARN-003 (STORY-113), LEARN-004, LEARN-005, LEARN-006 all shipped.
+- **Wave 1 (Zero-to-one onboarding):** Done. LEARN-010 (STORY-130), LEARN-011 to LEARN-013 (STORY-131), LEARN-014 (STORY-132), LEARN-015 (STORY-133) all shipped.
+- **Wave 2 (Consistent lesson delivery):** Partial. LEARN-020 production schema shipped. LEARN-021 to LEARN-026 (Modules 0 to 5) shipped via STORY-117 to STORY-121, STORY-127, STORY-128. LEARN-027 to LEARN-029 (Modules 6 to 8) not started.
+- **Wave 3 (Tool practice and saved evidence):** Partial. LEARN-030 (STORY-134) shipped. LEARN-031 to LEARN-035 not started.
+- **Wave 4 (Assessment, capstone, support):** Planned.
+- **Wave 5 (Job-ready resource pack and learning home):** Planned.
+- **Wave 6 (Measurement, beta, release):** Planned.
 
 ## Why this plan exists
 
