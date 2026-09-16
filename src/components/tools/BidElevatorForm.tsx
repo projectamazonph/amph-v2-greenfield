@@ -32,9 +32,10 @@ import { studentErrorCopy } from "@/lib/studentErrorCopy";
 interface Props {
   scenario: BidElevatorScenarioContent;
   challengeUnlocked: boolean;
+  scenarioName?: string | null;
 }
 
-export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
+export function BidElevatorForm({ scenario, challengeUnlocked, scenarioName }: Props) {
   const [bids, setBids] = useState<Record<string, number>>(() =>
     Object.fromEntries(scenario.keywords.map((k) => [k.keywordId, k.currentBid])),
   );
@@ -96,9 +97,15 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           <thead>
             <tr>
               <th scope="col">Keyword</th>
-              <th scope="col" className={styles.thNum}>Impr/day</th>
-              <th scope="col" className={styles.thNum}>Benchmark CPC</th>
-              <th scope="col" className={styles.thNum}>Your bid</th>
+              <th scope="col" className={styles.thNum}>
+                Impr/day
+              </th>
+              <th scope="col" className={styles.thNum}>
+                Benchmark CPC
+              </th>
+              <th scope="col" className={styles.thNum}>
+                Your bid
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -131,12 +138,7 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           {error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        className={styles.submit}
-        disabled={pending}
-        aria-busy={pending}
-      >
+      <button type="submit" className={styles.submit} disabled={pending} aria-busy={pending}>
         {pending ? "Running…" : "Run simulation"}
       </button>
       {simResult ? (
@@ -144,6 +146,7 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           result={simResult}
           targetRoas={scenario.targetRoas}
           xpAwarded={xpAwarded}
+          scenarioName={scenarioName ?? null}
         />
       ) : null}
     </form>
