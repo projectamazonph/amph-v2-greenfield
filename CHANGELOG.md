@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-09-16: LEARN-034 save-from-debrief wiring (PR #534)
+
+- `LEARN-034` (STORY-140): `ToolDebrief` gains optional `saveAction` bindings passed down from the server shell. The Bid Elevator result view now drills `artefactKind="decision-log"`, the published scenario name as `scenarioRef`, and `saveArtefactAction` through to the debrief. A learner who types a rationale and clicks "Save to portfolio" produces a DRAFT artefact visible on `/portfolio`; failed saves keep the typed text and show an inline error. Eight component tests cover the disabled-button guard, success, error, and the LEARN-032 prompt-only fallback. The other four simulators adopt the same props in follow-ups.
+- Server-action shim tests now cover `saveArtefactAction`, `submitArtefactAction`, and `listArtefactsAction` end-to-end.
+
 ### 2026-09-16: Learning-experience 8.5 Wave 3 evidence slice + P3-87 bell (PRs #528-#532)
 
 - `LEARN-033` (STORY-135, PR #528): learner artefact domain. `LearnerArtefact` entity with six kinds and a DRAFT/SUBMITTED lifecycle (100% branch coverage); `IArtefactRepository` port with Prisma + InMemory adapters; `SaveArtefact`, `SubmitArtefact`, `ListStudentArtefacts` use cases on both containers; server actions for save/submit/list; artefacts included in the account-data export. Migration adds the `learner_artefacts` table.
