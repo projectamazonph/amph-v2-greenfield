@@ -20,9 +20,9 @@ All high-priority fixes done: Link migration, breadcrumbs, clickable tiles, card
 
 All medium fixes done: responsive layouts, search inputs, focus rings, button transitions, skip-link, ARIA, error messages, shared components (Skeleton, EmptyState, SubmitButton, Toast, CommandPalette, MobileNavToggle), format-date utils, unsaved changes hook.
 
-## P3 Enhancement — 39/40 ⚠️ MOSTLY COMPLETE
+## P3 Enhancement — 40/40 ✅ COMPLETE
 
-39 of 40 enhancement fixes shipped. P3-86 (PDF certificate download) ships via `src/app/certificates/[hash]/pdf/route.ts` and `RenderCertificatePdf.ts`. P3-85 (CSV export) ships via `src/app/admin/payments/export/route.ts`, `ExportPayments.ts`, and `src/lib/export-csv.ts`. P3-83 (drag-and-drop reorder) ships via `src/components/admin/DraggableModuleList.tsx` (PR #519). P3-82 (confetti) ships via `src/components/ui/Confetti.tsx` (PR #514). P3-84 (dark mode) ships via `src/hooks/useTheme.ts` (PR #516). Remaining: notifications system (P3-87).
+All 40 enhancement fixes shipped. P3-86 (PDF certificate download) ships via `src/app/certificates/[hash]/pdf/route.ts` and `RenderCertificatePdf.ts`. P3-85 (CSV export) ships via `src/app/admin/payments/export/route.ts`, `ExportPayments.ts`, and `src/lib/export-csv.ts`. P3-83 (drag-and-drop reorder) ships via `src/components/admin/DraggableModuleList.tsx` (PR #519). P3-82 (confetti) ships via `src/components/ui/Confetti.tsx` (PR #514). P3-84 (dark mode) ships via `src/hooks/useTheme.ts` (PR #516). P3-87 (in-app notifications) ships via `src/components/ui/NotificationBell.tsx`, four use cases, and the `notifications` table (PR #532).
 
 ---
 

@@ -1,9 +1,9 @@
 # Remaining P3 Features — Implementation Specs
 
-**Date:** 2026-07-31  
+**Date:** 2026-07-31 (closed 2026-09-16 — all six items ship)
 **Source:** IMPLEMENTATION-PLAN-P3.md (P3-82 through P3-87)
 
-These six items require feature-level work (new libraries, schema changes, or infrastructure) and were deferred from the main implementation sprint. Each spec below is ready to execute.
+These six items required feature-level work (new libraries, schema changes, or infrastructure) and were deferred from the main implementation sprint. All six now ship; the specs below are retained as the implementation record.
 
 ---
 
@@ -100,56 +100,39 @@ export function downloadCSV(filename: string, csv: string) {
 
 ## P3-87. In-App Notifications
 
-**Goal:** Students see a notification bell with unread count; admins get alerts for pending refunds, new users, etc.
+**Status:** ✅ Implemented — PR #532
 
-**Files to create:**
+**Files created:**
 
-- `src/components/ui/NotificationBell.tsx` — Bell icon + dropdown
-- `src/app/api/notifications/route.ts` — Fetch + mark-as-read endpoints
-- `prisma/schema.prisma` — Add `Notification` model
+- `src/components/ui/NotificationBell.tsx` — Client component with Phosphor bell, unread badge, dropdown, 30s polling
+- `src/app/actions/notification.action.ts` — List / mark-read / mark-all-read / notify server actions (mutations go through server actions per AGENTS.md Rule 4, not API routes)
+- `src/domain/entities/Notification.ts` — Five types (course_complete, artefact_submitted, enrollment_welcome, refund_requested, announcement)
+- `src/usecases/NotifyUser.ts`, `ListNotifications.ts`, `MarkNotificationRead.ts`, `MarkAllNotificationsRead.ts`
+- `src/ports/repositories/INotificationRepository.ts` + Prisma/InMemory adapters
+- Migration `20260916020000_p3_87_notifications` adds the `notifications` table
 
-**Schema:**
+**Implementation:** Server actions resolve the session user; the use cases own ownership checks. The bell polls `listNotificationsAction` every 30s; server-action bindings flow server → client (StudentShell → StudentSidebar → bell) so unit tests never import a use-server module. First emit hook: `markLessonCompleteAction` notifies `course_complete` at 100% progress, best-effort. Refund/enrollment emits reuse `NotifyUser` in follow-ups.
 
-```prisma
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String   // refund_pending, new_user, course_complete, etc.
-  title     String
-  body      String
-  href      String?
-  readAt    DateTime?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-}
-```
-
-**Implementation:**
-
-1. Server-side: emit notifications from key events (refund requested, new enrollment, etc.)
-2. Client-side: NotificationBell polls every 30s or uses Server-Sent Events
-3. Mark-as-read on click
-
-**Scope:** Schema migration + emit hooks + bell component + dropdown UI.
+**No action needed.**
 
 ---
 
-## Implementation Priority
+## Implementation Priority (historical — all four shipped)
 
-If tackling the remaining four, recommend this order:
+Ship order actually taken:
 
-1. **P3-82 Confetti** — One component, one dependency, high delight
-2. **P3-84 Dark Mode** — Token-level work, touches every page
-3. **P3-83 Drag-and-Drop** — Needs new dependencies + schema
-4. **P3-87 Notifications** — Schema migration + polling infrastructure
+1. **P3-82 Confetti** — PR #514
+2. **P3-84 Dark Mode** — PR #516
+3. **P3-83 Drag-and-Drop** — PR #519
+4. **P3-87 Notifications** — PR #532
 
 ---
 
 ## Total Deferred Work
 
-| #     | Feature       | Est. Effort | Dependencies                     |
-| ----- | ------------- | ----------- | -------------------------------- |
-| P3-82 | Confetti      | ✅ Done     | canvas-confetti                  |
-| P3-83 | DnD reorder   | ✅ Done     | @dnd-kit/core, @dnd-kit/sortable |
-| P3-84 | Dark mode     | ✅ Done     | None                             |
-| P3-87 | Notifications | XL          | Schema migration                 |
+| #     | Feature       | Est. Effort | Dependencies                      |
+| ----- | ------------- | ----------- | --------------------------------- |
+| P3-82 | Confetti      | ✅ Done     | canvas-confetti                   |
+| P3-83 | DnD reorder   | ✅ Done     | @dnd-kit/core, @dnd-kit/sortable  |
+| P3-84 | Dark mode     | ✅ Done     | None                              |
+| P3-87 | Notifications | ✅ Done     | Server actions + bell + migration |

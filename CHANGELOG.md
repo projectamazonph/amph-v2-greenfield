@@ -4,6 +4,14 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-09-16: Learning-experience 8.5 Wave 3 evidence slice + P3-87 bell (PRs #528-#532)
+
+- `LEARN-033` (STORY-135, PR #528): learner artefact domain. `LearnerArtefact` entity with six kinds and a DRAFT/SUBMITTED lifecycle (100% branch coverage); `IArtefactRepository` port with Prisma + InMemory adapters; `SaveArtefact`, `SubmitArtefact`, `ListStudentArtefacts` use cases on both containers; server actions for save/submit/list; artefacts included in the account-data export. Migration adds the `learner_artefacts` table.
+- `LEARN-032` (STORY-136, PR #529): tool debrief pattern. `ToolDebrief` client component with five sections (result, why-it-matters, lesson revisit, retry, rationale prompt), wired into the Bid Elevator result view as the reference implementation. Four component tests; no certification wording.
+- `LEARN-035` (STORY-137, PR #530): student portfolio page. `/portfolio` lists the caller's artefacts with kind and status; `/portfolio/[id]` renders one artefact or 404s for another student; `/portfolio/export` downloads the caller's set as JSON. Dashboard links to the portfolio.
+- `LEARN-040` (STORY-138, PR #531): tracked mid-lesson retrieval check. `RetrievalCheckAttempt` log row with Prisma + InMemory adapters; `RecordRetrievalCheck` on both containers; `SelfCheck` fires a best-effort record on submit (failures swallowed, never blocks); `LessonContent` injects the lesson id into every check. Attempts included in the account-data export. Migration adds the `retrieval_check_attempts` table.
+- `P3-87` (STORY-139, PR #532): in-app notifications, the last deferred P3 feature. `Notification` entity with five types (100% branch coverage); `INotificationRepository` with Prisma + InMemory adapters; `NotifyUser`, `ListNotifications`, `MarkNotificationRead`, `MarkAllNotificationsRead` on both containers; bell polls every 30s with dropdown and mark-read on click, mounted in the student sidebar (server actions passed as props so unit tests never import a use-server module); course-complete emit from `markLessonCompleteAction` at 100% progress, best-effort. Migration adds the `notifications` table.
+
 ### 2026-09-16: Learning-experience 8.5 Wave 1 closed + P3-83 drag-and-drop (PRs #519-#526)
 
 - `LEARN-010` (STORY-130, PR #521): optional pre-course diagnostic at `/dashboard/diagnostic`. Three fixed outcomes (new, familiar, experienced) with a fallback rubric; recommendation-only, never changes entitlement or gates paid content; pure scoring function in `src/lib/diagnostic.ts` with six Vitest tests.

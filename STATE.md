@@ -2,7 +2,7 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-16
-**Main:** `63cd8ea`
+**Main:** `5026313`
 
 ## Active branches of interest
 
@@ -29,6 +29,11 @@ job-readiness claims. Existing simulator scores remain formative.
 ## Latest merged repairs
 
 | PR | Commit | Result
+| #532 | `5026313` | P3-87 in-app notifications (STORY-139). Bell with unread count in the student sidebar, 30s polling, dropdown with mark-read. Four use cases on both containers. Course-complete emit at 100% progress. Last deferred P3 feature ships
+| #531 | `da86110` | LEARN-040 tracked retrieval check (STORY-138). SelfCheck fires best-effort record on submit; LessonContent injects lesson id; attempts in account-data export
+| #530 | `dd44fc5` | LEARN-035 student portfolio page (STORY-137). Owner-scoped list/detail/JSON export; dashboard link
+| #529 | `7b3beff` | LEARN-032 tool debrief pattern (STORY-136). Five-section debrief on the Bid Elevator result view
+| #528 | `f1deab8` | LEARN-033 learner artefact domain (STORY-135). Six kinds, DRAFT/SUBMITTED lifecycle, three use cases, export coverage
 | #526 | `63cd8ea` | Docs: log LEARN-010/013/014/015/030 + P3-83 in CHANGELOG, FEATURES, and learning-release-gate runbook
 | #525 | `d2b860a` | LEARN-030 tool-bridge validator (STORY-134). `pnpm validate:learning-release` now fails the release gate when a lesson points at an unregistered simulator, when a bridge target is not in any tier, or when a registered simulator is not unlocked by any tier. Five Vitest tests cover the validator.
 | #524 | `ff0b021` | LEARN-015 onboarding completion view (STORY-133). `/dashboard/onboarding-complete` renders the four-section summary when Module 0 is done; redirects back to the dashboard with a plain-language query string when it is not
