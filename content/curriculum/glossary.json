@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "terms": [
+    {
+      "slug": "ppc",
+      "term": "PPC",
+      "shortDefinition": "Pay-Per-Click. The seller pays each time a shopper clicks the ad.",
+      "longDefinition": "Amazon PPC is the Sponsored Products, Sponsored Brands, and Sponsored Display advertising system. The seller only pays when a shopper clicks the ad, not when it is shown. A PPC VA runs that system on a client's behalf, safely."
+    },
+    {
+      "slug": "acos",
+      "term": "ACoS",
+      "shortDefinition": "Advertising Cost of Sales. Ad spend divided by ad sales.",
+      "longDefinition": "ACoS is the percentage of every peso of ad sales that went back to ad spend. Lower is usually better, but a planned launch may accept a higher ACoS in exchange for evidence. ACoS alone never tells you whether the campaign is failing."
+    },
+    {
+      "slug": "tacos",
+      "term": "TACoS",
+      "shortDefinition": "Total Advertising Cost of Sales. Ad spend divided by total store sales.",
+      "longDefinition": "TACoS measures ad spend against the entire store's sales, not just sales from the ad. A falling TACoS while ACoS is flat usually means the ads are pulling in organic sales too."
+    },
+    {
+      "slug": "roas",
+      "term": "ROAS",
+      "shortDefinition": "Return on Ad Spend. Ad sales divided by ad spend.",
+      "longDefinition": "ROAS is the inverse of ACoS. A 4 ROAS means every peso of ad spend returned four pesos of ad sales. Both metrics tell the same story in opposite directions."
+    },
+    {
+      "slug": "cpc",
+      "term": "CPC",
+      "shortDefinition": "Cost Per Click. Ad spend divided by clicks.",
+      "longDefinition": "CPC is what the advertiser actually pays. A higher CPC for a converting keyword is often worth it; a high CPC on a non-converting keyword is wasted spend."
+    },
+    {
+      "slug": "ctr",
+      "term": "CTR",
+      "shortDefinition": "Click-Through Rate. Clicks divided by impressions.",
+      "longDefinition": "CTR measures how often shoppers who saw the ad clicked it. A low CTR usually means the listing image or title does not match what the shopper searched for."
+    },
+    {
+      "slug": "conversion-rate",
+      "term": "Conversion rate",
+      "shortDefinition": "Orders divided by clicks.",
+      "longDefinition": "Conversion rate tells you what percentage of clicks became orders. A high CPC with a low conversion rate is a sign the listing page is the real problem, not the campaign."
+    }
+  ]
+}
