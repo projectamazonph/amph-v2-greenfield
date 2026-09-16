@@ -38,6 +38,11 @@
 
 import type { ReactNode } from "react";
 import { requireAuth, getSessionUser } from "@/lib/auth";
+import {
+  listNotificationsAction,
+  markAllNotificationsReadAction,
+  markNotificationReadAction,
+} from "@/app/actions/notification.action";
 import { StudentSidebar } from "./StudentSidebar";
 import { PublicCatalogHeader } from "./PublicCatalogHeader";
 import { MobileNavToggle } from "@/components/ui/MobileNavToggle";
@@ -106,13 +111,20 @@ export async function StudentShell({
   }
 
   // Authenticated shell: full sidebar layout (current behavior).
+  // P3-87: server-action bindings flow server → client so the bell
+  // never imports a "use server" module directly.
+  const notificationActions = {
+    list: listNotificationsAction,
+    markRead: markNotificationReadAction,
+    markAllRead: markAllNotificationsReadAction,
+  };
   return (
     <div className={styles.shell}>
       <a href="#main-content" className={styles.skipLink}>
         Skip to main content
       </a>
       <MobileNavToggle sidebarId="student-sidebar" />
-      <StudentSidebar user={user} />
+      <StudentSidebar user={user} notificationActions={notificationActions} />
       <div className={styles.main} data-navigation-content>
         {children}
       </div>

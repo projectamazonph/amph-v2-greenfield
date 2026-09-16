@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Bell } from "@phosphor-icons/react";
-import {
-  listNotificationsAction,
-  markAllNotificationsReadAction,
-  markNotificationReadAction,
-  type NotificationView,
-} from "@/app/actions/notification.action";
+import type { NotificationActionResult, NotificationView } from "@/app/actions/notification.action";
 import styles from "./NotificationBell.module.css";
 
 const POLL_MS = 30_000;
@@ -18,23 +13,41 @@ interface BellState {
   unreadCount: number;
 }
 
+export interface NotificationBellActions {
+  list: () => Promise<
+    NotificationActionResult<{ notifications: NotificationView[]; unreadCount: number }>
+  >;
+  markRead: (id: string) => Promise<NotificationActionResult<{ id: string }>>;
+  markAllRead: () => Promise<NotificationActionResult<{ marked: number }>>;
+}
+
+interface NotificationBellProps {
+  /**
+   * Server-action bindings, passed down from a server parent
+   * (StudentShell). Absent in unit tests and static renders: the
+   * bell shows without a badge and never polls.
+   */
+  actions?: NotificationBellActions;
+}
+
 /**
  * NotificationBell — in-app notification bell (P3-87).
  *
- * Polls listNotificationsAction every 30s. Shows the unread count
- * as a badge; clicking an item marks it read (best-effort, the
- * dropdown closes regardless). "Mark all read" zeroes the badge.
- * Failures are silent: the bell keeps the last good state and
- * retries on the next poll.
+ * Polls the list action every 30s. Shows the unread count as a
+ * badge; clicking an item marks it read (best-effort, the dropdown
+ * closes regardless). "Mark all read" zeroes the badge. Failures
+ * are silent: the bell keeps the last good state and retries on
+ * the next poll.
  */
-export function NotificationBell() {
+export function NotificationBell({ actions }: NotificationBellProps) {
   const [state, setState] = useState<BellState>({ notifications: [], unreadCount: 0 });
   const [open, setOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refresh = useCallback(async () => {
+    if (!actions) return;
     try {
-      const result = await listNotificationsAction();
+      const result = await actions.list();
       if (result.ok) {
         setState({
           notifications: [...result.value.notifications],
@@ -44,9 +57,10 @@ export function NotificationBell() {
     } catch {
       // Silent: keep last good state, retry on next poll.
     }
-  }, []);
+  }, [actions]);
 
   useEffect(() => {
+    if (!actions) return;
     void refresh();
     timerRef.current = setInterval(() => {
       void refresh();
@@ -54,12 +68,13 @@ export function NotificationBell() {
     return () => {
       if (timerRef.current !== null) clearInterval(timerRef.current);
     };
-  }, [refresh]);
+  }, [actions, refresh]);
 
   async function onItemClick(id: string) {
     setOpen(false);
+    if (!actions) return;
     try {
-      const result = await markNotificationReadAction(id);
+      const result = await actions.markRead(id);
       if (result.ok) {
         setState((current) => ({
           notifications: current.notifications.map((n) =>
@@ -74,8 +89,9 @@ export function NotificationBell() {
   }
 
   async function onMarkAllRead() {
+    if (!actions) return;
     try {
-      const result = await markAllNotificationsReadAction();
+      const result = await actions.markAllRead();
       if (result.ok) {
         setState((current) => ({
           notifications: current.notifications.map((n) => ({

@@ -84,13 +84,20 @@ export interface StudentSidebarProps {
     lastName?: string | null;
     role: string;
   };
+  /**
+   * Notification server-action bindings, passed down from the
+   * server shell (StudentShell). Optional so unit tests can render
+   * the sidebar without a server-action module; the bell renders
+   * static (no badge, no polling) when absent.
+   */
+  notificationActions?: React.ComponentProps<typeof NotificationBell>["actions"];
 }
 
 function initials(firstName: string, lastName?: string | null): string {
   return firstName.charAt(0).toUpperCase() + (lastName?.charAt(0).toUpperCase() ?? "");
 }
 
-export function StudentSidebar({ user }: StudentSidebarProps) {
+export function StudentSidebar({ user, notificationActions }: StudentSidebarProps) {
   const pathname = usePathname() ?? "/";
   const [signOutOpen, setSignOutOpen] = useState(false);
 
@@ -172,7 +179,7 @@ export function StudentSidebar({ user }: StudentSidebarProps) {
           </button>
         </div>
         <div className={styles.themeToggleWrapper}>
-          <NotificationBell />
+          <NotificationBell actions={notificationActions} />
           <ThemeToggle />
         </div>
       </div>
