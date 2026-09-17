@@ -18,6 +18,8 @@ import { quizQuestionCount } from "@/domain/entities/Quiz";
 import type { Quiz } from "@/domain/entities/Quiz";
 import type { QuizAttemptReviewItem } from "@/domain/entities/QuizAttemptReview";
 import { buildQuizAttemptReview } from "@/domain/entities/QuizAttemptReview";
+import type { RemediationPlan } from "@/domain/services/QuizRemediation";
+import { buildQuizRemediationPlan } from "@/domain/services/QuizRemediation";
 import {
   startQuizAttempt,
   answerQuestion,
@@ -75,6 +77,8 @@ export type RecordQuizAttemptResult = Result<
     totalQuestions: number | null;
     /** Per-question learner pick, correct pick, and explanation. Null until the attempt completes. */
     review: readonly QuizAttemptReviewItem[] | null;
+    /** LEARN-041: lessons to revisit on a failed attempt. Null until the attempt completes. */
+    remediation: RemediationPlan | null;
   },
   RecordQuizAttemptError
 >;
@@ -186,6 +190,7 @@ export class RecordQuizAttempt {
       }
 
       const review = buildQuizAttemptReview(quiz, attempt.answers);
+      const remediation = buildQuizRemediationPlan(quiz, attempt);
 
       return Result.ok({
         attempt,
@@ -195,6 +200,7 @@ export class RecordQuizAttempt {
         correctCount,
         totalQuestions: qCount,
         review,
+        remediation,
       });
     }
 
@@ -216,6 +222,7 @@ export class RecordQuizAttempt {
       correctCount: null,
       totalQuestions: null,
       review: null,
+      remediation: null,
     });
   }
 }

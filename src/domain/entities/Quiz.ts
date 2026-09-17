@@ -20,6 +20,12 @@ export interface QuizQuestion {
   readonly options: readonly QuizOption[];
   /** Shown to the learner after they submit an attempt, win or lose. Empty string if none was authored. */
   readonly explanation: string;
+  /**
+   * LEARN-041: lesson slugs to revisit when the learner gets this
+   * question wrong. Empty array means "no remediation authored" — the
+   * question still scores, just contributes nothing to the plan.
+   */
+  readonly remediationRefs: readonly string[];
 }
 
 export interface Quiz {
@@ -49,6 +55,8 @@ export type CreateQuizQuestionParams = {
   options: { id: string; optionText: string; isCorrect: boolean }[];
   /** Optional — defaults to "" so existing callers that don't set it keep working. */
   explanation?: string;
+  /** LEARN-041: lesson slugs to revisit when this question is missed. Defaults to []. */
+  remediationRefs?: readonly string[];
 };
 
 export type CreateQuizParams = {
@@ -90,6 +98,9 @@ export function createQuiz(params: CreateQuizParams): Result<Quiz, CreateQuizErr
       questionText: q.questionText,
       options: q.options.map((o) => ({ ...o })),
       explanation: q.explanation ?? "",
+      remediationRefs: (q.remediationRefs ?? [])
+        .map((slug) => slug.trim())
+        .filter((slug) => slug.length > 0),
     })),
   });
 }
