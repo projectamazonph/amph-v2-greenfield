@@ -121,6 +121,20 @@ export class PrismaCapstoneRepository implements ICapstoneRepository {
     }
   }
 
+  async listByStatus(
+    status: import("@/domain/entities/CapstoneSubmission").CapstoneStatus,
+  ): Promise<Result<readonly CapstoneSubmission[], CapstoneQueryError>> {
+    try {
+      const rows = await this.db.capstoneSubmission.findMany({
+        where: { status, deletedAt: null },
+        orderBy: { createdAt: "asc" },
+      });
+      return Result.ok(rows.map(mapRow));
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async update(
     submission: CapstoneSubmission,
   ): Promise<Result<CapstoneSubmission, CapstoneRepoError>> {

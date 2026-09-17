@@ -43,6 +43,15 @@ export class InMemoryCapstoneRepository implements ICapstoneRepository {
     return Result.ok(filtered);
   }
 
+  async listByStatus(
+    status: import("@/domain/entities/CapstoneSubmission").CapstoneStatus,
+  ): Promise<Result<readonly CapstoneSubmission[], CapstoneQueryError>> {
+    const filtered = this.rows
+      .filter((r) => r.status === status && r.deletedAt === null)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    return Result.ok(filtered);
+  }
+
   async update(
     submission: CapstoneSubmission,
   ): Promise<Result<CapstoneSubmission, CapstoneRepoError>> {
