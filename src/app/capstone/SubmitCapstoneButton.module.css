@@ -1,0 +1,33 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin-top: var(--space-4);
+}
+
+.submit {
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent);
+  color: var(--accent-inverse);
+  border: 1px solid var(--accent-hover);
+  border-radius: var(--r-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--text-sm);
+}

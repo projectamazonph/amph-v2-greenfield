@@ -106,6 +106,7 @@ model User {
   learnerArtefacts       LearnerArtefact[]
   retrievalCheckAttempts RetrievalCheckAttempt[]
   notifications          Notification[]
+  capstoneSubmissions    CapstoneSubmission[]
 
   @@index([email])
   @@index([paymongoCustomerId])
@@ -1562,4 +1563,26 @@ model Notification {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId])
   @@map("notifications")
+}
+
+// LEARN-043: capstone submission lifecycle. DRAFT rows are revisable;
+// SUBMITTED rows are locked for review; PASSED rows are completion evidence.
+model CapstoneSubmission {
+  id String @id @default(cuid())
+  userId String
+  courseId String?
+  status String @default("DRAFT")
+  artefactIds String[] @default([])
+  reviewerNote String?
+  submittedAt DateTime?
+  decidedAt DateTime?
+  decidedById String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdById String?
+  updatedById String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@map("capstone_submissions")
 }

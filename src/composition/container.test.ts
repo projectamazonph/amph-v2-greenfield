@@ -109,6 +109,9 @@ import { NotifyUser } from "@/usecases/NotifyUser";
 import { ListNotifications } from "@/usecases/ListNotifications";
 import { MarkNotificationRead } from "@/usecases/MarkNotificationRead";
 import { MarkAllNotificationsRead } from "@/usecases/MarkAllNotificationsRead";
+import { InMemoryCapstoneRepository } from "@/infra/repositories/inmemory/InMemoryCapstoneRepository";
+import { SubmitCapstone } from "@/usecases/SubmitCapstone";
+import { GetCapstoneStatus } from "@/usecases/GetCapstoneStatus";
 import { InMemorySettingRepository } from "@/infra/repositories/inmemory/InMemorySettingRepository";
 import { GetSetting } from "@/usecases/GetSetting";
 import { SetSetting } from "@/usecases/SetSetting";
@@ -320,6 +323,10 @@ export interface TestContainer extends AppContainer {
   listNotifications: ListNotifications;
   markNotificationRead: MarkNotificationRead;
   markAllNotificationsRead: MarkAllNotificationsRead;
+  // LEARN-043 (STORY-143): capstone fakes
+  capstoneRepo: InMemoryCapstoneRepository;
+  submitCapstone: SubmitCapstone;
+  getCapstoneStatus: GetCapstoneStatus;
   // P1-05 (PR-C slice 3): site setting fakes
   settingRepo: InMemorySettingRepository;
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -413,6 +420,8 @@ export function buildTestContainer(): TestContainer {
   const retrievalCheckRepo = new InMemoryRetrievalCheckRepository();
   // P3-87 (STORY-139): notification fakes
   const notificationRepo = new InMemoryNotificationRepository();
+  // LEARN-043 (STORY-143): capstone fakes
+  const capstoneRepo = new InMemoryCapstoneRepository();
   // P1-05 (PR-C slice 3): site setting fakes
   const settingRepo = new InMemorySettingRepository();
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -1028,6 +1037,10 @@ export function buildTestContainer(): TestContainer {
     listNotifications: new ListNotifications({ notificationRepo }),
     markNotificationRead: new MarkNotificationRead({ notificationRepo, clock }),
     markAllNotificationsRead: new MarkAllNotificationsRead({ notificationRepo, clock }),
+    // LEARN-043 (STORY-143): capstone submission (in-memory)
+    capstoneRepo,
+    submitCapstone: new SubmitCapstone({ capstoneRepo, artefactRepo, idGen, clock }),
+    getCapstoneStatus: new GetCapstoneStatus({ capstoneRepo, artefactRepo }),
     // P1-05 (PR-C slice 3): site settings (in-memory)
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),
