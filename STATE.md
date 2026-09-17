@@ -1,8 +1,8 @@
 # Current project state
 
 **Project:** Project Amazon PH Academy v2
-**Reviewed:** 2026-09-16
-**Main:** `fcfb1c1`
+**Reviewed:** 2026-09-17
+**Main:** `aea7e2a`
 
 ## Active branches of interest
 
@@ -29,6 +29,8 @@ job-readiness claims. Existing simulator scores remain formative.
 ## Latest merged repairs
 
 | PR | Commit | Result
+| #537 | `aea7e2a` | LEARN-042 capstone brief and rubric (STORY-142). Six deliverables mapped to artefact kinds; six-criterion 0–2 rubric passing at 9 of 12; pure readiness checker
+| #536 | `7c0c73b` | LEARN-041 targeted quiz remediation (STORY-141). remediationRefs tags on questions; pure plan builder; QuizPlayer renders What to revisit list
 | #534 | `fcfb1c1` | LEARN-034 save-from-debrief wiring (STORY-140). ToolDebrief gains optional saveAction bindings; Bid Elevator passes scenarioName + decision-log kind. Failed saves keep typed text; component tests cover disabled/success/error paths
 | #532 | `5026313` | P3-87 in-app notifications (STORY-139). Bell with unread count in the student sidebar, 30s polling, dropdown with mark-read. Four use cases on both containers. Course-complete emit at 100% progress. Last deferred P3 feature ships
 | #531 | `da86110` | LEARN-040 tracked retrieval check (STORY-138). SelfCheck fires best-effort record on submit; LessonContent injects lesson id; attempts in account-data export

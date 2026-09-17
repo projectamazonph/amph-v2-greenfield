@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-09-17: LEARN-041 targeted remediation + LEARN-042 capstone brief (PRs #536-#537)
+
+- `LEARN-041` (STORY-141, PR #536): quiz questions carry `remediationRefs` lesson slugs (Prisma JSON column + migration). A pure plan builder in domain services joins missed answers to slugs. `RecordQuizAttempt` exposes the plan; the quiz player renders a "What to revisit" list with lesson links. Tags optional; empty tags contribute nothing.
+- `LEARN-042` (STORY-142, PR #537): machine-readable Foundations capstone brief (`content/curriculum/capstone.json`) with six deliverables mapped to artefact kinds, plus a six-criterion 0–2 rubric passing at 9 of 12. A pure readiness checker maps SUBMITTED artefact kinds to required kinds. No DB, no UI.
+
 ### 2026-09-16: LEARN-034 save-from-debrief wiring (PR #534)
 
 - `LEARN-034` (STORY-140): `ToolDebrief` gains optional `saveAction` bindings passed down from the server shell. The Bid Elevator result view now drills `artefactKind="decision-log"`, the published scenario name as `scenarioRef`, and `saveArtefactAction` through to the debrief. A learner who types a rationale and clicks "Save to portfolio" produces a DRAFT artefact visible on `/portfolio`; failed saves keep the typed text and show an inline error. Eight component tests cover the disabled-button guard, success, error, and the LEARN-032 prompt-only fallback. The other four simulators adopt the same props in follow-ups.
