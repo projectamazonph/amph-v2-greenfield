@@ -7,7 +7,7 @@
  */
 
 import type { Result } from "@/domain/shared/Result";
-import type { CapstoneSubmission } from "@/domain/entities/CapstoneSubmission";
+import type { CapstoneStatus, CapstoneSubmission } from "@/domain/entities/CapstoneSubmission";
 
 export type CapstoneRepoError = { kind: "not_found" } | { kind: "db_error"; message: string };
 
@@ -28,6 +28,15 @@ export interface ICapstoneRepository {
 
   /** All of one learner's rows, newest first. */
   listByUser(userId: string): Promise<Result<readonly CapstoneSubmission[], CapstoneQueryError>>;
+
+  /**
+   * Reviewer queue: every row in the given status across learners,
+   * oldest first (fair review order). Soft-deleted rows excluded.
+   * Route-gated by requireAdmin; the port takes no actor.
+   */
+  listByStatus(
+    status: CapstoneStatus,
+  ): Promise<Result<readonly CapstoneSubmission[], CapstoneQueryError>>;
 
   /**
    * Persist a transition (submit, return, pass). Errors: `not_found`.

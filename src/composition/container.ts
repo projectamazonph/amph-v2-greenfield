@@ -162,6 +162,10 @@ import type { ICapstoneRepository } from "@/ports/repositories/ICapstoneReposito
 import { PrismaCapstoneRepository } from "@/infra/repositories/PrismaCapstoneRepository";
 import { SubmitCapstone } from "@/usecases/SubmitCapstone";
 import { GetCapstoneStatus } from "@/usecases/GetCapstoneStatus";
+// LEARN-044 (STORY-144): capstone reviewer workflow
+import { ListCapstoneReviewQueue } from "@/usecases/ListCapstoneReviewQueue";
+import { ReturnCapstoneForReview } from "@/usecases/ReturnCapstoneForReview";
+import { PassCapstoneReview } from "@/usecases/PassCapstoneReview";
 // P1-05 (PR-C slice 3): site settings
 import type { ISettingRepository } from "@/ports/repositories/ISettingRepository";
 import { PrismaSettingRepository } from "@/infra/repositories/PrismaSettingRepository";
@@ -536,6 +540,10 @@ export interface AppContainer {
   capstoneRepo: ICapstoneRepository;
   submitCapstone: SubmitCapstone;
   getCapstoneStatus: GetCapstoneStatus;
+  // LEARN-044 (STORY-144): capstone reviewer workflow
+  listCapstoneReviewQueue: ListCapstoneReviewQueue;
+  returnCapstoneForReview: ReturnCapstoneForReview;
+  passCapstoneReview: PassCapstoneReview;
   // P1-05 (PR-C slice 3): site settings
   settingRepo: ISettingRepository;
   getSetting: GetSetting;
@@ -1409,6 +1417,14 @@ function buildProductionContainer(): AppContainer {
     capstoneRepo,
     submitCapstone: new SubmitCapstone({ capstoneRepo, artefactRepo, idGen, clock }),
     getCapstoneStatus: new GetCapstoneStatus({ capstoneRepo, artefactRepo }),
+    // LEARN-044 (STORY-144): capstone reviewer workflow
+    listCapstoneReviewQueue: new ListCapstoneReviewQueue({ capstoneRepo }),
+    returnCapstoneForReview: new ReturnCapstoneForReview({
+      capstoneRepo,
+      clock,
+      recordAuditLog,
+    }),
+    passCapstoneReview: new PassCapstoneReview({ capstoneRepo, clock, recordAuditLog }),
     // P1-05 (PR-C slice 3): site settings
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),

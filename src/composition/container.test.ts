@@ -112,6 +112,9 @@ import { MarkAllNotificationsRead } from "@/usecases/MarkAllNotificationsRead";
 import { InMemoryCapstoneRepository } from "@/infra/repositories/inmemory/InMemoryCapstoneRepository";
 import { SubmitCapstone } from "@/usecases/SubmitCapstone";
 import { GetCapstoneStatus } from "@/usecases/GetCapstoneStatus";
+import { ListCapstoneReviewQueue } from "@/usecases/ListCapstoneReviewQueue";
+import { ReturnCapstoneForReview } from "@/usecases/ReturnCapstoneForReview";
+import { PassCapstoneReview } from "@/usecases/PassCapstoneReview";
 import { InMemorySettingRepository } from "@/infra/repositories/inmemory/InMemorySettingRepository";
 import { GetSetting } from "@/usecases/GetSetting";
 import { SetSetting } from "@/usecases/SetSetting";
@@ -327,6 +330,10 @@ export interface TestContainer extends AppContainer {
   capstoneRepo: InMemoryCapstoneRepository;
   submitCapstone: SubmitCapstone;
   getCapstoneStatus: GetCapstoneStatus;
+  // LEARN-044 (STORY-144): capstone reviewer fakes
+  listCapstoneReviewQueue: ListCapstoneReviewQueue;
+  returnCapstoneForReview: ReturnCapstoneForReview;
+  passCapstoneReview: PassCapstoneReview;
   // P1-05 (PR-C slice 3): site setting fakes
   settingRepo: InMemorySettingRepository;
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -1041,6 +1048,14 @@ export function buildTestContainer(): TestContainer {
     capstoneRepo,
     submitCapstone: new SubmitCapstone({ capstoneRepo, artefactRepo, idGen, clock }),
     getCapstoneStatus: new GetCapstoneStatus({ capstoneRepo, artefactRepo }),
+    // LEARN-044 (STORY-144): capstone reviewer workflow (in-memory)
+    listCapstoneReviewQueue: new ListCapstoneReviewQueue({ capstoneRepo }),
+    returnCapstoneForReview: new ReturnCapstoneForReview({
+      capstoneRepo,
+      clock,
+      recordAuditLog,
+    }),
+    passCapstoneReview: new PassCapstoneReview({ capstoneRepo, clock, recordAuditLog }),
     // P1-05 (PR-C slice 3): site settings (in-memory)
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),
