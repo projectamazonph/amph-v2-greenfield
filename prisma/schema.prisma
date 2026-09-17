@@ -656,13 +656,16 @@ model Quiz {
 }
 
 model QuizQuestion {
-  id           String       @id @default(cuid())
-  quizId       String
-  quiz         Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  questionText String
-  explanation  String       @default("")
-  options      QuizOption[]
-  order        Int          @default(0)
+  id              String       @id @default(cuid())
+  quizId          String
+  quiz            Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionText    String
+  explanation     String       @default("")
+  // LEARN-041: lesson slugs to revisit when this question is missed.
+  // Empty array = no remediation authored; the question still scores.
+  remediationRefs Json         @default("[]")
+  options         QuizOption[]
+  order           Int          @default(0)
 
   deletedAt   DateTime?
   createdById String?

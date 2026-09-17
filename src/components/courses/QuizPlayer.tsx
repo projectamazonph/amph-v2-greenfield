@@ -30,6 +30,8 @@ interface Props {
   passingScore: number;
   questions: ReadonlyArray<Question>;
   courseHref?: string;
+  /** LEARN-041: lesson route prefix for the "What to revisit" list. */
+  courseSlug?: string;
 }
 
 interface ReviewItem {
@@ -37,6 +39,19 @@ interface ReviewItem {
   selectedOptionId: string;
   correctOptionId: string;
   explanation: string;
+}
+
+interface RemediationItemView {
+  questionId: string;
+  questionText: string;
+  lessonSlugs: readonly string[];
+}
+
+interface RemediationPlanView {
+  missedCount: number;
+  totalCount: number;
+  items: readonly RemediationItemView[];
+  distinctLessonSlugs: readonly string[];
 }
 
 interface SubmitResult {
@@ -47,10 +62,18 @@ interface SubmitResult {
   totalQuestions?: number | null;
   xpAwarded?: number | null;
   review?: readonly ReviewItem[] | null;
+  remediation?: RemediationPlanView | null;
   error?: string;
 }
 
-export function QuizPlayer({ quizId, title, passingScore, questions, courseHref = "/courses" }: Props) {
+export function QuizPlayer({
+  quizId,
+  title,
+  passingScore,
+  questions,
+  courseHref = "/courses",
+  courseSlug = "",
+}: Props) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -153,6 +176,29 @@ export function QuizPlayer({ quizId, title, passingScore, questions, courseHref 
                 </div>
               );
             })}
+          </div>
+        ) : null}
+        {result.remediation &&
+        result.remediation.items.length > 0 &&
+        result.remediation.distinctLessonSlugs.length > 0 ? (
+          <div className={styles.remediation}>
+            <h3 className={styles.remediationHeading}>What to revisit</h3>
+            <p className={styles.remediationIntro}>
+              You missed {result.remediation.missedCount} of {result.remediation.totalCount}{" "}
+              questions. Re-read these lessons, then retry the quiz.
+            </p>
+            <ul className={styles.remediationList}>
+              {result.remediation.distinctLessonSlugs.map((slug) => (
+                <li key={slug}>
+                  <Link
+                    href={`/courses/${courseSlug}/lessons/${slug}`}
+                    className={styles.remediationLink}
+                  >
+                    Re-read {slug}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         ) : null}
       </>
