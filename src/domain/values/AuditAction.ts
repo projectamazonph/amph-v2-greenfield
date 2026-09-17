@@ -116,15 +116,20 @@ export type AuditAction =
   // P1-05 (PR-C slice 3): admin saves a site setting
   | "setting.saved"
   | "setting.save_failed"
+  // LEARN-044 (STORY-144): capstone reviewer workflow
+  | "capstone.returned"
+  | "capstone.return_failed"
+  | "capstone.passed"
+  | "capstone.pass_failed"
   // P1-04 (PR-D): social-login linkage
   | "oauth_account.linked"
   | "oauth_account.unlinked"
   | "oauth_account.unlink_failed"
-| "announcement.created"
-| "announcement.create_failed"
-| "announcement.updated"
-| "announcement.update_failed"
-| "announcement.toggled";
+  | "announcement.created"
+  | "announcement.create_failed"
+  | "announcement.updated"
+  | "announcement.update_failed"
+  | "announcement.toggled";
 
 /**
  * STORY-061. All valid AuditAction values as an array.
@@ -228,6 +233,11 @@ export const ALL_ACTIONS: AuditAction[] = [
   // P1-05 (PR-C slice 3): admin saves a site setting
   "setting.saved",
   "setting.save_failed",
+  // LEARN-044 (STORY-144): capstone reviewer workflow
+  "capstone.returned",
+  "capstone.return_failed",
+  "capstone.passed",
+  "capstone.pass_failed",
   // P1-04 (PR-D): social-login linkage
   "oauth_account.linked",
   "oauth_account.unlinked",
