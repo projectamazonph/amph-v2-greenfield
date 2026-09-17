@@ -29,7 +29,7 @@ job-readiness claims. Existing simulator scores remain formative.
 ## Latest merged repairs
 
 | PR | Commit | Result
-| #539 | `tbd` | LEARN-043 capstone submission and readiness (STORY-143). Four guarded statuses; SubmitCapstone checks readiness before locking; /capstone page with checklist and reviewer note
+| #539 | `eb6ba22` | LEARN-043 capstone submission and readiness (STORY-143). Four guarded statuses; SubmitCapstone checks readiness before locking; /capstone page with checklist and reviewer note
 | #537 | `aea7e2a` | LEARN-042 capstone brief and rubric (STORY-142). Six deliverables mapped to artefact kinds; six-criterion 0–2 rubric passing at 9 of 12; pure readiness checker
 | #536 | `7c0c73b` | LEARN-041 targeted quiz remediation (STORY-141). remediationRefs tags on questions; pure plan builder; QuizPlayer renders What to revisit list
 | #534 | `fcfb1c1` | LEARN-034 save-from-debrief wiring (STORY-140). ToolDebrief gains optional saveAction bindings; Bid Elevator passes scenarioName + decision-log kind. Failed saves keep typed text; component tests cover disabled/success/error paths
