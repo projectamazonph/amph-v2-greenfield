@@ -1,0 +1,93 @@
+/* /capstone — Foundations status page. Amazon PH simulator tokens only. */
+
+.page {
+  width: 100%;
+  max-width: var(--max-content);
+  margin: 0 auto;
+  padding: var(--space-8) var(--side-pad) var(--space-12);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  margin-bottom: var(--space-2);
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  margin: 0;
+  max-width: 68ch;
+}
+
+.empty,
+.passed,
+.pending {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-900);
+}
+
+.cardTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.summary {
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  margin: var(--space-1) 0 0 0;
+}
+
+.note {
+  font-size: var(--text-sm);
+  color: var(--ink-900);
+  border-left: 2px solid var(--accent);
+  padding-left: var(--space-3);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.missing {
+  font-size: var(--text-sm);
+  color: var(--ink-900);
+  margin: var(--space-3) 0 0 0;
+}

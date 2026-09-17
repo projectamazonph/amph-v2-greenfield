@@ -157,6 +157,11 @@ import { NotifyUser } from "@/usecases/NotifyUser";
 import { ListNotifications } from "@/usecases/ListNotifications";
 import { MarkNotificationRead } from "@/usecases/MarkNotificationRead";
 import { MarkAllNotificationsRead } from "@/usecases/MarkAllNotificationsRead";
+// LEARN-043 (STORY-143): capstone submission
+import type { ICapstoneRepository } from "@/ports/repositories/ICapstoneRepository";
+import { PrismaCapstoneRepository } from "@/infra/repositories/PrismaCapstoneRepository";
+import { SubmitCapstone } from "@/usecases/SubmitCapstone";
+import { GetCapstoneStatus } from "@/usecases/GetCapstoneStatus";
 // P1-05 (PR-C slice 3): site settings
 import type { ISettingRepository } from "@/ports/repositories/ISettingRepository";
 import { PrismaSettingRepository } from "@/infra/repositories/PrismaSettingRepository";
@@ -527,6 +532,10 @@ export interface AppContainer {
   listNotifications: ListNotifications;
   markNotificationRead: MarkNotificationRead;
   markAllNotificationsRead: MarkAllNotificationsRead;
+  // LEARN-043 (STORY-143): capstone submission
+  capstoneRepo: ICapstoneRepository;
+  submitCapstone: SubmitCapstone;
+  getCapstoneStatus: GetCapstoneStatus;
   // P1-05 (PR-C slice 3): site settings
   settingRepo: ISettingRepository;
   getSetting: GetSetting;
@@ -788,6 +797,8 @@ function buildProductionContainer(): AppContainer {
   const retrievalCheckRepo: IRetrievalCheckRepository = new PrismaRetrievalCheckRepository(prisma);
   // P3-87 (STORY-139): in-app notifications
   const notificationRepo: INotificationRepository = new PrismaNotificationRepository(prisma);
+  // LEARN-043 (STORY-143): capstone submission
+  const capstoneRepo: ICapstoneRepository = new PrismaCapstoneRepository(prisma);
   // P1-05 (PR-C slice 3): site settings
   const settingRepo: ISettingRepository = new PrismaSettingRepository(prisma);
   // P1-04 (PR-D): OAuth social login. Google only; the broker map
@@ -1394,6 +1405,10 @@ function buildProductionContainer(): AppContainer {
     listNotifications: new ListNotifications({ notificationRepo }),
     markNotificationRead: new MarkNotificationRead({ notificationRepo, clock }),
     markAllNotificationsRead: new MarkAllNotificationsRead({ notificationRepo, clock }),
+    // LEARN-043 (STORY-143): capstone submission
+    capstoneRepo,
+    submitCapstone: new SubmitCapstone({ capstoneRepo, artefactRepo, idGen, clock }),
+    getCapstoneStatus: new GetCapstoneStatus({ capstoneRepo, artefactRepo }),
     // P1-05 (PR-C slice 3): site settings
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),
