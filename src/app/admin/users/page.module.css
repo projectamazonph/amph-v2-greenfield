@@ -67,6 +67,12 @@
   background: var(--accent-hover);
 }
 
+.resultCount {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

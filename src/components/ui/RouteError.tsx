@@ -38,7 +38,7 @@ export function RouteError({ error, reset, withinMain = false }: RouteErrorProps
       <p className={styles.emoji} aria-hidden="true">
         !
       </p>
-      <h1 className={styles.title}>Something went wrong</h1>
+      <h1 className={styles.title}>This page could not load</h1>
       <p className={styles.message}>We could not load this page. Please try again.</p>
       {error.digest && <p className={styles.digest}>Error ID: {error.digest}</p>}
       <button type="button" className={styles.retry} onClick={reset}>

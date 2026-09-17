@@ -253,6 +253,7 @@ export function QuizPlayer({
           className={styles.submit}
           onClick={onAdvance}
           disabled={!answers[current.id] || pending}
+          title={!answers[current.id] ? "Choose an answer first" : undefined}
         >
           {pending ? "Submitting…" : isLast ? "Submit answer" : "Next question"}
         </button>

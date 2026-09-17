@@ -5,11 +5,10 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { createModuleAction } from "@/app/actions/createModule.action";
 import styles from "../../../../courses.module.css";
@@ -45,12 +44,10 @@ export default async function NewModulePage({ params }: PageProps) {
 
   return (
     <div>
-      <Link href={`/admin/courses/${courseId}`} className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to course
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={`Add module to "${course.title}"`}
+        backHref={`/admin/courses/${courseId}`}
+        backLabel="Back to course"
         subtitle="Modules organize the curriculum. Each module will hold lessons (added in STORY-048c)."
       />
 

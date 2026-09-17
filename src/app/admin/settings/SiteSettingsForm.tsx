@@ -53,7 +53,8 @@ export function SiteSettingsForm({ rows, justSaved }: Props) {
         </p>
       )}
       {rows.length > 0 && (
-        <table className={styles.table}>
+        <div className="table-scroll">
+          <table className={styles.table}>
           <caption className="sr-only">Saved site settings</caption>
           <thead>
             <tr>
@@ -83,7 +84,8 @@ export function SiteSettingsForm({ rows, justSaved }: Props) {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       )}
       <form action={formAction} className={styles.twoFactorForm}>
         <label className={styles.field}>

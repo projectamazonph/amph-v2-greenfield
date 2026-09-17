@@ -7,14 +7,16 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
 import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card, Badge } from "@astryxdesign/core";
 import { formatPhp } from "@/app/admin/_lib/formatPhp";
 import { processRefundRequestAction } from "@/app/actions/processRefundRequest.action";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -60,12 +62,10 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Pa
 
   return (
     <div>
-      <Link href="/admin/refunds" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to refund requests
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title={`Refund · ${order.id}`}
+        backHref="/admin/refunds"
+        backLabel="Back to refund requests"
         subtitle={
           <span className={styles.badges}>
             <Badge
@@ -203,9 +203,12 @@ export default async function AdminRefundDetailPage({ params, searchParams }: Pa
               original payment method within 5–10 business days.
             </p>
             <form action={handleProcessRefund} className={styles.form}>
-              <button type="submit" className={styles.refundButton}>
+              <ConfirmSubmitButton
+                confirmMessage={`Process this refund of ${formatPhp(order.totalMinor / 100)}? Real money moves to the student's payment method.`}
+                className={styles.refundButton}
+              >
                 Process refund: {formatPhp(order.totalMinor / 100)}
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </Card>
         )}

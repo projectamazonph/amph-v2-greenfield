@@ -5,11 +5,10 @@
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { createSimulatorScenarioAction } from "@/app/actions/createSimulatorScenario.action";
 import type { SimulatorId, Difficulty } from "@/domain/entities/SimulatorScenario";
@@ -44,12 +43,10 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <Link href="/admin/simulators" className={formStyles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to scenarios
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title="Add scenario"
+        backHref="/admin/simulators"
+        backLabel="Back to scenarios"
         subtitle="Creates a new draft scenario family. Publish it from the version history view to make it live."
       />
 
@@ -132,6 +129,8 @@ export default async function NewScenarioPage({ searchParams }: PageProps) {
               required
               min="1"
               max="240"
+              step="1"
+              inputMode="numeric"
               defaultValue="15"
               className={formStyles.input}
               style={{ width: "8rem" }}

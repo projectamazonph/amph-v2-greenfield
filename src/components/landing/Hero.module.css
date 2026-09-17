@@ -191,6 +191,15 @@
   }
 }
 
+@media (max-width: 440px) {
+  .stat {
+    position: static;
+    transform: none;
+    margin-top: var(--sp-3);
+    width: fit-content;
+  }
+}
+
 /* The .pen span now allows wrapping at every breakpoint (see the .pen
    rule above). This block was the previous partial workaround that only
    opened the wrap at <=600px; it is intentionally a no-op now and is

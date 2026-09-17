@@ -16,7 +16,7 @@ describe("RouteError", () => {
 
     expect(html).toContain("<main");
     expect(html).toContain("<h1");
-    expect(html).toContain("Something went wrong");
+    expect(html).toContain("This page could not load");
     expect(html).toContain("Try again");
   });
 

@@ -33,6 +33,11 @@ export function ScrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  // Hidden state removes the button from the tab order AND the
+  // accessibility tree together: tabIndex -1 alone still exposes a
+  // focusable-name node to some AT. The CSS keeps it opacity-0 with
+  // pointer-events off, so it is neither seen nor clickable until
+  // the scroll threshold reveals it.
   return (
     <button
       type="button"
@@ -41,7 +46,7 @@ export function ScrollToTop() {
       title="Scroll to top"
       className={`${styles.button} ${visible ? styles.visible : ""}`}
       tabIndex={visible ? 0 : -1}
-      aria-hidden={!visible}
+      aria-hidden={!visible ? true : undefined}
     >
       <ArrowUp size={20} weight="bold" aria-hidden />
     </button>

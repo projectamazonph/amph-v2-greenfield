@@ -58,12 +58,7 @@ export default async function StudentTwoFactorSetupPage({
 
   return (
     <StudentShell user={session}>
-      <main
-        id="main-content"
-        tabIndex={-1}
-        className={styles.page}
-        aria-labelledby="setup-title"
-      >
+      <main id="main-content" tabIndex={-1} className={styles.page} aria-labelledby="setup-title">
         <Link href="/profile/security" className={styles.backLink}>
           <ArrowLeft size={16} aria-hidden /> Back to security
         </Link>
@@ -124,6 +119,7 @@ export default async function StudentTwoFactorSetupPage({
                   type="text"
                   name="code"
                   inputMode="numeric"
+                  pattern="[0-9]*"
                   autoComplete="one-time-code"
                   required
                   maxLength={6}

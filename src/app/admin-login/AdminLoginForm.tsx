@@ -70,6 +70,8 @@ export function AdminLoginForm({ errorKind }: { errorKind: string | null }) {
             label="Two-factor code"
             type="text"
             inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
             autoComplete="one-time-code"
             placeholder="123456"
             hint={
@@ -92,7 +94,7 @@ export function AdminLoginForm({ errorKind }: { errorKind: string | null }) {
 
         <p className={styles.backLink}>
           <Link href="/login" className={styles.backHref}>
-            <ArrowLeft size={16} aria-hidden />{" "}Back to student login
+            <ArrowLeft size={16} aria-hidden /> Back to student login
           </Link>
         </p>
       </div>

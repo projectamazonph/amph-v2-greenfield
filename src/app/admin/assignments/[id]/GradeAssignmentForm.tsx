@@ -16,10 +16,7 @@ import styles from "../page.module.css";
 const initialState: AdminAssignmentFormResult | null = null;
 
 export function GradeAssignmentForm({ assignmentId }: { assignmentId: string }) {
-  const [state, formAction, isPending] = useActionState(
-    gradeAssignmentAction,
-    initialState,
-  );
+  const [state, formAction, isPending] = useActionState(gradeAssignmentAction, initialState);
 
   const errorText = state?.kind === "error" ? (state.message ?? state.error) : null;
 
@@ -36,6 +33,7 @@ export function GradeAssignmentForm({ assignmentId }: { assignmentId: string }) 
           min={0}
           max={100}
           step={1}
+          inputMode="numeric"
           placeholder="85"
           className={styles.searchInput}
           disabled={isPending}
