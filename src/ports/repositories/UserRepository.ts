@@ -86,6 +86,10 @@ export interface UserRepository {
        */
       twoFactorEnabled: boolean;
       /**
+       * Whether this user is required to have 2FA enabled to access admin routes.
+       */
+      requires2FA: boolean;
+      /**
        * Set by AdminGrantSubscription, an admin manually granting a
        * student STARTER/PRO access outside the checkout flow (e.g.
        * paid by bank transfer). Also usable to correct a mistaken grant
