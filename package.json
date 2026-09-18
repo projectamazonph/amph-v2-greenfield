@@ -84,7 +84,7 @@
   },
   "devDependencies": {
     "@astryxdesign/cli": "^0.4.7",
-    "@cobusgreyling/loop-audit": "^1.7.0",
+    "@cobusgreyling/loop-audit": "^1.9.0",
     "@cobusgreyling/loop-context": "^1.5.0",
     "@cobusgreyling/loop-cost": "^1.2.0",
     "@cobusgreyling/loop-sync": "^1.0.0",
