@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### 2026-09-17: LEARN-043 capstone submission and readiness (PR #539)
+
+- `LEARN-043` (STORY-143): `CapstoneSubmission` entity with four guarded statuses (DRAFT → SUBMITTED → NEEDS_REVISION → PASSED, 100% branch coverage). `ICapstoneRepository` with Prisma + InMemory adapters and migration. `SubmitCapstone` checks readiness over SUBMITTED artefacts before locking; `GetCapstoneStatus` joins readiness with the latest row. `/capstone` page shows the brief, the readiness checklist, the reviewer note, and the submit button. Pure capstone logic moved to `domain/services` to satisfy the dependency-direction rule; `lib` keeps the filesystem loader.
+
 ### 2026-09-17: LEARN-041 targeted remediation + LEARN-042 capstone brief (PRs #536-#537)
 
 - `LEARN-041` (STORY-141, PR #536): quiz questions carry `remediationRefs` lesson slugs (Prisma JSON column + migration). A pure plan builder in domain services joins missed answers to slugs. `RecordQuizAttempt` exposes the plan; the quiz player renders a "What to revisit" list with lesson links. Tags optional; empty tags contribute nothing.
