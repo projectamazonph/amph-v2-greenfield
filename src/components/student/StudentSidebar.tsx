@@ -83,6 +83,15 @@ export interface StudentSidebarProps {
     firstName: string;
     lastName?: string | null;
     role: string;
+    /**
+     * STORY-129: timestamp of when the student finished the first-run
+     * welcome tour. When `null` and the student is still within their
+     * first week, the sidebar shows a small "?" badge next to the
+     * Dashboard link that reopens `/welcome`.
+     */
+    welcomeCompletedAt: Date | null;
+    /** Account creation timestamp; used to age the badge out after 7 days. */
+    createdAt: Date;
   };
   /**
    * Notification server-action bindings, passed down from the
@@ -93,6 +102,8 @@ export interface StudentSidebarProps {
   notificationActions?: React.ComponentProps<typeof NotificationBell>["actions"];
 }
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
 function initials(firstName: string, lastName?: string | null): string {
   return firstName.charAt(0).toUpperCase() + (lastName?.charAt(0).toUpperCase() ?? "");
 }
@@ -100,6 +111,14 @@ function initials(firstName: string, lastName?: string | null): string {
 export function StudentSidebar({ user, notificationActions }: StudentSidebarProps) {
   const pathname = usePathname() ?? "/";
   const [signOutOpen, setSignOutOpen] = useState(false);
+
+  // STORY-129: surface a "?" badge next to Dashboard for fresh students
+  // (welcome not yet completed) within their first week of signup. The
+  // 7-day window matches the design intent of "guide the very new,
+  // don't pester returning users".
+  const showNewUserBadge =
+    user.welcomeCompletedAt === null &&
+    Date.now() - new Date(user.createdAt).getTime() < SEVEN_DAYS_MS;
 
   function performSignOut() {
     setSignOutOpen(false);
@@ -149,6 +168,16 @@ export function StudentSidebar({ user, notificationActions }: StudentSidebarProp
                     <Icon size={18} weight={isActive ? "fill" : "regular"} />
                   </span>
                   <span className={styles.label}>{item.label}</span>
+                  {item.href === "/dashboard" && showNewUserBadge && (
+                    <Link
+                      href="/welcome"
+                      className={styles.newUserBadge}
+                      aria-label="Restart the welcome tour"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      ?
+                    </Link>
+                  )}
                 </Link>
               );
             })}
