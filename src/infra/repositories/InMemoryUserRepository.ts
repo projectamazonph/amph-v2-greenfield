@@ -34,9 +34,7 @@ export class InMemoryUserRepository implements UserRepository {
 
   async findByIds(ids: readonly string[]): Promise<Result<readonly User[], UserError>> {
     const deduped = [...new Set(ids)];
-    const found = deduped
-      .map((id) => this.users.get(id))
-      .filter((u): u is User => u !== undefined);
+    const found = deduped.map((id) => this.users.get(id)).filter((u): u is User => u !== undefined);
     return Result.ok(found);
   }
 
@@ -79,6 +77,7 @@ export class InMemoryUserRepository implements UserRepository {
       createdAt: new Date(),
       totalXp: 0,
       emailVerifiedAt: null,
+      welcomeCompletedAt: null,
       lockedUntil: null,
     };
 
@@ -221,6 +220,24 @@ export class InMemoryUserRepository implements UserRepository {
       this.users.set(userId, Object.freeze({ ...user, lockedUntil }));
     }
     return Result.ok({ lockedUntil });
+  }
+
+  async markWelcomeCompleted(userId: string, completedAt: Date): Promise<Result<User, UserError>> {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    if (user.welcomeCompletedAt !== null) return Result.ok(user);
+    const updated = Object.freeze({ ...user, welcomeCompletedAt: completedAt });
+    this.users.set(userId, updated);
+    return Result.ok(updated);
+  }
+
+  async resetWelcome(userId: string): Promise<Result<User, UserError>> {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    if (user.welcomeCompletedAt === null) return Result.ok(user);
+    const updated = Object.freeze({ ...user, welcomeCompletedAt: null });
+    this.users.set(userId, updated);
+    return Result.ok(updated);
   }
 
   /** Pre-load with a set of users (for integration test fixtures). */

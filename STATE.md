@@ -6,7 +6,7 @@
 
 ## Active branches of interest
 
-- _None._ Wave 1 of the Learning-experience 8.5 plan closed on `main` (`63cd8ea`); no feature branches open.
+- `onboarding` — **STORY-146 (student onboarding & first-run welcome) — READY TO MERGE.** Branch tip ahead of current `main`. Adds `welcomeCompletedAt` (User + migration with backfill), `CompleteWelcome`/`ResetWelcome` use cases (atomic `updateMany + where` idempotency), `welcome.action.ts` server actions, `/welcome` page with 5-step client stepper (URL fragment + localStorage), `NewUserDashboard` variant for fresh users, sidebar "?" badge (7-day window), profile restart link, signup-route redirect from `/dashboard` to `/welcome`, and Playwright E2E coverage. All 4 gates green (typecheck, lint, test, build); final whole-branch review verdict READY TO MERGE (post-review fixes applied per `PR #545` review). Spec at `docs/superpowers/specs/2026-09-20-student-onboarding-design.md`, plan at `docs/superpowers/plans/2026-09-20-student-onboarding.md`, SDD ledger at `.superpowers/sdd/2026-09-20-student-onboarding/progress.md`. Rebased onto current `main` (LEARN waves 3+); conflicts in `User.ts`, `container.ts`, `StudentSidebar.tsx`, and others were auto-resolved or kept cleanly.
 
 ## Current learning-experience priority
 

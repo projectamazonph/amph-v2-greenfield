@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * StudentSidebar — student-facing navigation sidebar.
@@ -13,7 +13,7 @@
  */
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   SquaresFour,
   BookOpen,
@@ -26,7 +26,7 @@ import {
   VideoCamera,
 } from "@phosphor-icons/react/dist/ssr";
 import type { ComponentType, SVGProps } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { NotificationBell } from "@/components/ui/NotificationBell";
@@ -83,6 +83,15 @@ export interface StudentSidebarProps {
     firstName: string;
     lastName?: string | null;
     role: string;
+    /**
+     * STORY-146: timestamp of when the student finished the first-run
+     * welcome tour. When `null` and the student is still within their
+     * first week, the sidebar shows a small "?" badge next to the
+     * Dashboard link that reopens `/welcome`.
+     */
+    welcomeCompletedAt: Date | null;
+    /** Account creation timestamp; used to age the badge out after 7 days. */
+    createdAt: Date;
   };
   /**
    * Notification server-action bindings, passed down from the
@@ -93,13 +102,35 @@ export interface StudentSidebarProps {
   notificationActions?: React.ComponentProps<typeof NotificationBell>["actions"];
 }
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
 function initials(firstName: string, lastName?: string | null): string {
   return firstName.charAt(0).toUpperCase() + (lastName?.charAt(0).toUpperCase() ?? "");
 }
 
 export function StudentSidebar({ user, notificationActions }: StudentSidebarProps) {
   const pathname = usePathname() ?? "/";
+  const router = useRouter();
   const [signOutOpen, setSignOutOpen] = useState(false);
+
+  // STORY-146: surface a "?" badge next to Dashboard for fresh students
+  // (welcome not yet completed) within their first week of signup. The
+  // 7-day window matches the design intent of "guide the very new,
+  // don't pester returning users".
+  //
+  // SSR/hydration safety: `Date.now()` would produce a different value on
+  // server vs. client and cause a React hydration mismatch. Initialize to
+  // `false`, then flip to the real value inside `useEffect` after mount.
+  const [showNewUserBadge, setShowNewUserBadge] = useState(false);
+  useEffect(() => {
+    if (user.welcomeCompletedAt !== null) {
+      setShowNewUserBadge(false);
+      return;
+    }
+    setShowNewUserBadge(
+      Date.now() - new Date(user.createdAt).getTime() < SEVEN_DAYS_MS,
+    );
+  }, [user.welcomeCompletedAt, user.createdAt]);
 
   function performSignOut() {
     setSignOutOpen(false);
@@ -108,6 +139,10 @@ export function StudentSidebar({ user, notificationActions }: StudentSidebarProp
     form.action = "/api/auth/logout";
     document.body.appendChild(form);
     form.submit();
+  }
+
+  function restartTour() {
+    router.push("/welcome");
   }
 
   return (
@@ -149,6 +184,19 @@ export function StudentSidebar({ user, notificationActions }: StudentSidebarProp
                     <Icon size={18} weight={isActive ? "fill" : "regular"} />
                   </span>
                   <span className={styles.label}>{item.label}</span>
+                  {item.href === "/dashboard" && showNewUserBadge && (
+                    // STORY-145: a button (not a Link) so we don't nest <a>
+                    // inside the outer Dashboard <Link> (invalid HTML5).
+                    // The router.push keeps it navigable like a Link.
+                    <button
+                      type="button"
+                      onClick={restartTour}
+                      className={styles.newUserBadge}
+                      aria-label="Restart the welcome tour"
+                    >
+                      ?
+                    </button>
+                  )}
                 </Link>
               );
             })}

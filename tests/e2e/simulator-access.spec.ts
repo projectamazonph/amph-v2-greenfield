@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Simulator access smoke test - student journey from root UX.
  *
  * Story: Investigate "students unable to access simulators."
@@ -59,7 +59,19 @@ test.describe("Simulator access from root UX", () => {
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
-    // Signup should land on the dashboard, not on a 401/403 page.
+    // Signup should land on /welcome (STORY-146 / Task 8 rerouted
+    // no-tier signups here from /dashboard), not on a 401/403 page.
+    await expect(page).toHaveURL(/\/welcome/, { timeout: 15_000 });
+
+    // This test then exercises the simulator suite, which lives past
+    // the welcome stepper. Use the stepper's "Skip tour" shortcut so
+    // the test's signup doesn't drag in 5 click-throughs unrelated to
+    // what this file is actually verifying. (The full tour has its own
+    // E2E spec at tests/e2e/welcome.spec.ts.) Both "Skip tour" and
+    // "Take me to my dashboard" call the same handleFinish() — the
+    // user lands on /dashboard with welcomeCompletedAt set.
+    await expect(page.getByText(/Welcome to AMPH Academy/i)).toBeVisible();
+    await page.getByRole("button", { name: /skip tour/i }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
 
     // ΓöÇΓöÇ 2. Navigate to /tools (the simulator index) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -117,9 +129,7 @@ test.describe("Simulator access from root UX", () => {
     // null because the session row was deleted (logout, admin revoke,
     // etc.) ΓÇö the page would still render but the submit would fail.
     await page.goto(`${BASE}/tools/bid-elevator`);
-    await expect(
-      page.getByRole("button", { name: /run simulation/i }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /run simulation/i })).toBeVisible();
     await page.getByRole("button", { name: /run simulation/i }).click();
 
     // A successful attempt renders a "Result" heading + a /100 score.

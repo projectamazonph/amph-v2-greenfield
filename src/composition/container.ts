@@ -215,6 +215,9 @@ import { Logout } from "@/usecases/Logout";
 import { EnableTwoFactor } from "@/usecases/EnableTwoFactor";
 import { ConfirmTwoFactor } from "@/usecases/ConfirmTwoFactor";
 import { DisableTwoFactor } from "@/usecases/DisableTwoFactor";
+// STORY-146: welcome step completion + reset (used by student onboarding)
+import { CompleteWelcome } from "@/usecases/CompleteWelcome";
+import { ResetWelcome } from "@/usecases/ResetWelcome";
 import { VerifyEmail } from "@/usecases/auth/VerifyEmail";
 import { ResendVerification } from "@/usecases/auth/ResendVerification";
 import type { EmailVerificationRepository } from "@/ports/repositories/EmailVerificationRepository";
@@ -473,6 +476,9 @@ export interface AppContainer {
   enableTwoFactor: EnableTwoFactor;
   confirmTwoFactor: ConfirmTwoFactor;
   disableTwoFactor: DisableTwoFactor;
+  // STORY-146: welcome step completion + reset
+  completeWelcome: CompleteWelcome;
+  resetWelcome: ResetWelcome;
   createPaymentIntent: CreatePaymentIntent;
   getCheckoutSummary: GetCheckoutSummary;
   checkCourseAccess: CheckCourseAccess;
@@ -918,6 +924,9 @@ function buildProductionContainer(): AppContainer {
     enableTwoFactor: new EnableTwoFactor({ userRepo, totpService }),
     confirmTwoFactor: new ConfirmTwoFactor({ userRepo, totpService, recordAuditLog }),
     disableTwoFactor: new DisableTwoFactor({ userRepo, hasher: passwordHasher, recordAuditLog }),
+    // STORY-146: welcome step completion + reset
+    completeWelcome: new CompleteWelcome(userRepo, clock),
+    resetWelcome: new ResetWelcome(userRepo),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       pricingTierRepo,

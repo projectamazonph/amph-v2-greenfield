@@ -1,0 +1,195 @@
+﻿/* WelcomeStepper — first-run walkthrough card. STORY-146.
+ *
+ * Centered max-width card on a neutral page surface. The dot progress
+ * bar is anchored at the top of the card; the title is a 32px display
+ * weight, body 18px, and the primary CTA is full-width on mobile.
+ * Token-based colors / spacing mirror the dashboard (--ink-*, --space-*,
+ * --radius-*). Focus rings match the dashboard pattern.
+ */
+
+.wrapper {
+  width: 100%;
+  max-width: 640px;
+  padding: var(--space-10) var(--space-8);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sh-2);
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition: background var(--transition), border-color var(--transition),
+    transform var(--transition);
+}
+
+.dotActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.15);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--ink-900);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.body {
+  margin: 0;
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--ink-700);
+  overflow-wrap: anywhere;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-5);
+  background: transparent;
+  color: var(--ink-700);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 88px;
+  transition: background var(--transition), border-color var(--transition),
+    color var(--transition);
+}
+
+.back:hover {
+  background: var(--surface-0);
+  border-color: var(--ink-300);
+  color: var(--ink-900);
+}
+
+.back:focus-visible,
+.primary:focus-visible,
+.skip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-6);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 180px;
+  white-space: nowrap;
+  transition: background-color var(--transition);
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--accent) 90%, var(--ink-900));
+}
+
+.primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.skip {
+  align-self: center;
+  background: transparent;
+  border: none;
+  color: var(--ink-500);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--space-2) var(--space-3);
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--transition);
+}
+
+.skip:hover {
+  color: var(--ink-900);
+}
+
+@media (max-width: 640px) {
+  .wrapper {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .primary {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .back {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .controls {
+    flex-direction: column-reverse;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .back,
+  .primary,
+  .skip {
+    transition: none;
+  }
+}

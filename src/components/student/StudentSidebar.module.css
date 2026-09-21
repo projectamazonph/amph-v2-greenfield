@@ -1,4 +1,4 @@
-/* StudentSidebar.module.css — Amazon PH simulator learner navigation. */
+﻿/* StudentSidebar.module.css — Amazon PH simulator learner navigation. */
 
 .sidebar {
   position: sticky;
@@ -174,6 +174,39 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* STORY-146: "?" badge that reopens the first-run welcome tour for
+   fresh students. Sits flush to the right of the Dashboard label
+   and uses the project's amber-warning palette so it reads as a
+   soft prompt, not an error. */
+.newUserBadge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: auto;
+  border-radius: var(--r-pill);
+  background: var(--c-amber-bg, #fff4e5);
+  color: var(--c-amber-text, #8a5300);
+  font-family: var(--font-disp);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+}
+
+.newUserBadge:hover {
+  background: var(--c-amber, #c45500);
+  color: var(--c-shell-ink, #e9eff8);
+}
+
+.newUserBadge:focus-visible {
+  outline: 2px solid var(--c-orange);
+  outline-offset: 2px;
 }
 
 .footer {

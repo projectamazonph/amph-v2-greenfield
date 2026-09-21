@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /dashboard — authenticated student dashboard.
  *
  * P0-4 fix: this route did not exist; signup/login redirects to
@@ -15,8 +15,10 @@ import Link from "next/link";
 import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
+import { NewUserDashboard } from "@/components/student/NewUserDashboard";
 import { nextIncompleteLesson } from "@/app/courses/[slug]/lessons/getLessonData";
 import { CourseCover } from "@/components/student/CourseCover";
+import { hasCompletedWelcome } from "@/domain/entities/User";
 import type { Course } from "@/domain/entities/Course";
 import type { Enrollment } from "@/domain/entities/Enrollment";
 import styles from "./page.module.css";
@@ -61,6 +63,25 @@ export default async function DashboardPage() {
   );
   // "All my courses" includes everything (active, in-progress, completed)
   const allActive = pairs.filter((p) => p.enrollment.status === "active");
+
+  // STORY-146 / Task 10: students who haven't completed the welcome tour
+  // AND have no active enrollments get a first-run variant instead of the
+  // regular dashboard. The session-loaded `User` already carries
+  // `welcomeCompletedAt`, but we re-fetch via `userRepo.findById` to keep
+  // parity with `/welcome` (Task 9) and to surface a stale-cookie /
+  // deleted-account case as "fall through to the regular dashboard"
+  // rather than rendering the variant with phantom data.
+  const foundFresh = await buildContainer().userRepo.findById(user.id);
+  const effectiveUser = foundFresh.ok ? foundFresh.value : user;
+  const isNewUser = !hasCompletedWelcome(effectiveUser) && allActive.length === 0;
+
+  if (isNewUser) {
+    return (
+      <StudentShell user={user}>
+        <NewUserDashboard user={user} />
+      </StudentShell>
+    );
+  }
 
   // Resume the newest active course at its next incomplete lesson. If a
   // learner has not completed anything yet, this deliberately becomes a

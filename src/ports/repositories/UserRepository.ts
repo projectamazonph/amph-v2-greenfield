@@ -1,4 +1,4 @@
-/**
+﻿/**
  * UserRepository port — the interface for persisting and retrieving users.
  *
  * Defined in src/ports/ so the domain and use-case layers can depend on
@@ -174,4 +174,16 @@ export interface UserRepository {
     outcome:
       { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date; now: Date },
   ): Promise<Result<{ lockedUntil: Date | null }, UserError>>;
+
+  /**
+   * STORY-146: stamp the user's welcome walkthrough as complete.
+   * Idempotent — calling twice keeps the first timestamp.
+   */
+  markWelcomeCompleted(userId: string, completedAt: Date): Promise<Result<User, UserError>>;
+
+  /**
+   * STORY-146: clear the welcome timestamp so the user can re-take
+   * the tour from the profile page.
+   */
+  resetWelcome(userId: string): Promise<Result<User, UserError>>;
 }

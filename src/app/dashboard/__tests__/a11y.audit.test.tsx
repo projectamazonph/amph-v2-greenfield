@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 /// <reference types="@testing-library/jest-dom" />
 
 import "vitest-axe/extend-expect";
@@ -14,6 +14,7 @@ vi.unmock("@/components/student/StudentSidebar");
 const mockRequireAuth = vi.fn();
 const mockEnrollments = vi.fn();
 const mockCourseFindById = vi.fn();
+const mockUserFindById = vi.fn();
 
 vi.mock("@/lib/auth", () => ({
   requireAuth: () => mockRequireAuth(),
@@ -23,12 +24,16 @@ vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     enrollmentRepo: { findByUserId: mockEnrollments },
     courseRepo: { findById: mockCourseFindById },
+    // STORY-146 / Task 10: the dashboard now also calls `userRepo.findById`
+    // to decide whether to render the NewUserDashboard first-run variant.
+    userRepo: { findById: mockUserFindById },
   }),
 }));
 
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(),
   usePathname: () => "/dashboard",
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 vi.mock("@/components/student/CourseCover", () => ({
@@ -49,6 +54,10 @@ function makeUser() {
     verificationStatus: "VERIFIED",
     enrolledCourseIds: [],
     createdAt: new Date("2025-01-01"),
+    // STORY-146: returning student so the sidebar "?" badge stays out of
+    // the audit's a11y scan (only relevant when welcome is incomplete
+    // and the account is < 7 days old).
+    welcomeCompletedAt: new Date("2025-01-02"),
   };
 }
 
@@ -108,7 +117,13 @@ describe("student dashboard accessibility audit", () => {
     mockRequireAuth.mockReset();
     mockEnrollments.mockReset();
     mockCourseFindById.mockReset();
+    mockUserFindById.mockReset();
     mockRequireAuth.mockResolvedValue(makeUser());
+    // Default: freshly-fetched user has already completed the welcome
+    // tour, so the existing dashboard path renders (and not the
+    // NewUserDashboard first-run variant, which would change the
+    // a11y surface for this audit).
+    mockUserFindById.mockResolvedValue({ ok: true, value: makeUser() });
   });
 
   it("has no axe violations in the empty dashboard state", async () => {
@@ -157,7 +172,9 @@ describe("student dashboard accessibility audit", () => {
 
   it("keeps the dashboard contrast and motion contracts explicit", () => {
     const css = readFileSync(resolve(__dirname, "../page.module.css"), "utf8");
-    expect(css).toMatch(/\.continueBtn\s*\{[\s\S]*?background:\s*var\(--accent\);[\s\S]*?color:\s*var\(--accent-ink\);/);
+    expect(css).toMatch(
+      /\.continueBtn\s*\{[\s\S]*?background:\s*var\(--accent\);[\s\S]*?color:\s*var\(--accent-ink\);/,
+    );
     expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
     expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.progressFill/);
   });

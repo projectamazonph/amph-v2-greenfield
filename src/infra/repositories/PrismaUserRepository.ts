@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PrismaUserRepository — Story 002.
  *
  * The production adapter for the UserRepository port.
@@ -23,7 +23,9 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
-  async findByIds(ids: readonly string[]): Promise<Result<readonly import("@/domain/entities/User").User[], UserError>> {
+  async findByIds(
+    ids: readonly string[],
+  ): Promise<Result<readonly import("@/domain/entities/User").User[], UserError>> {
     const deduped = [...new Set(ids)];
     if (deduped.length === 0) return Result.ok([]);
     try {
@@ -197,6 +199,71 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  /**
+   * STORY-146: stamp the user's welcome walkthrough as complete.
+   *
+   * Idempotent — calling twice keeps the first timestamp. Mirrors
+   * InMemoryUserRepository.markWelcomeCompleted: if the row already
+   * has a welcomeCompletedAt, this is a no-op and the existing User
+   * is returned unchanged. Implementation uses updateMany with a
+   * `welcomeCompletedAt: null` filter so the no-op happens in the
+   * database (no race against a concurrent mark), then re-reads the
+   * row to return the (possibly pre-existing) User entity.
+   */
+  async markWelcomeCompleted(
+    userId: string,
+    completedAt: Date,
+  ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
+    try {
+      await this.db.user.updateMany({
+        where: { id: userId, welcomeCompletedAt: null },
+        data: { welcomeCompletedAt: completedAt },
+      });
+      const row = await this.db.user.findUnique({ where: { id: userId } });
+      if (!row) return Result.err({ kind: "not_found" });
+      return Result.ok(this.mapRow(row));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  /**
+   * STORY-146: clear the welcome timestamp so the user can re-take
+   * the tour. Mirrors InMemoryUserRepository.resetWelcome: a no-op
+   * when welcomeCompletedAt is already null.
+   */
+  async resetWelcome(
+    userId: string,
+  ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
+    try {
+      await this.db.user.updateMany({
+        where: { id: userId, welcomeCompletedAt: { not: null } },
+        data: { welcomeCompletedAt: null },
+      });
+      const row = await this.db.user.findUnique({ where: { id: userId } });
+      if (!row) return Result.err({ kind: "not_found" });
+      return Result.ok(this.mapRow(row));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   // ── Private helpers ────────────────────────────────────────
 
   async updateTotalXp(
@@ -323,6 +390,7 @@ export class PrismaUserRepository implements UserRepository {
     createdAt: Date;
     totalXp: number;
     emailVerifiedAt: Date | null;
+    welcomeCompletedAt: Date | null;
     lockedUntil?: Date | null;
   }) {
     return Object.freeze({
@@ -338,6 +406,7 @@ export class PrismaUserRepository implements UserRepository {
       createdAt: row.createdAt,
       totalXp: row.totalXp,
       emailVerifiedAt: row.emailVerifiedAt,
+      welcomeCompletedAt: row.welcomeCompletedAt ?? null,
       lockedUntil: row.lockedUntil ?? null,
     });
   }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /api/auth/signup — STORY-066.
  *
  * Plain HTTP POST endpoint for new account registration. Same pattern
@@ -9,9 +9,11 @@
  * Flow:
  * 1. Parse formData (email, password, firstName, lastName).
  * 2. Call performSignUp() with the production container.
- * 3. On success: Set-Cookie via setAuthCookie + 303 to /dashboard.
- *    (The signup flow auto-logs-in the new user, mirroring the
- *    previous server action's behavior.)
+ * 3. On success: Set-Cookie via setAuthCookie + 303 to /welcome (no
+ *    tier) or /checkout?pricingTier=<tier> (tier selected). STORY-146
+ *    moved the no-tier destination from /dashboard to /welcome so
+ *    new students are routed through the onboarding wizard instead
+ *    of straight into the dashboard.
  * 4. On failure: 303 to /signup?error=<kind>.
  */
 
@@ -45,13 +47,14 @@ export async function POST(request: Request): Promise<Response> {
 
   if (outcome.kind === "success") {
     // Auto-login succeeded — set the session cookie on the response we
-    // return, then 303 to /dashboard. The previous flow called
-    // setAuthCookie() via cookies() (which writes to the implicit
-    // response) and then returned NextResponse.redirect() — the new
-    // response did not inherit the cookie, so users landed on
-    // /dashboard without a session and got bounced to /login by the
-    // proxy. The fix: plant the cookie on response.cookies here, where
-    // it travels with the 303 back to the browser.
+    // return, then 303 to /welcome (or /checkout when a tier was
+    // selected). The previous flow called setAuthCookie() via cookies()
+    // (which writes to the implicit response) and then returned
+    // NextResponse.redirect() — the new response did not inherit the
+    // cookie, so users landed on /dashboard without a session and got
+    // bounced to /login by the proxy. The fix: plant the cookie on
+    // response.cookies here, where it travels with the 303 back to the
+    // browser.
     //
     // `isHttps` is the single source of truth for both the Secure flag
     // AND the cookie name. Playwright's `next start` (NODE_ENV=
@@ -59,7 +62,7 @@ export async function POST(request: Request): Promise<Response> {
     // the `__Secure-` prefix are silently dropped. Real production
     // (Vercel) is always HTTPS so both stay on.
     const isHttps = new URL(request.url).protocol === "https:";
-    const destination = tier ? `/checkout?pricingTier=${encodeURIComponent(tier)}` : "/dashboard";
+    const destination = tier ? `/checkout?pricingTier=${encodeURIComponent(tier)}` : "/welcome";
     const response = NextResponse.redirect(new URL(destination, request.url), {
       status: 303,
     });

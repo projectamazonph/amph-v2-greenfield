@@ -1,0 +1,172 @@
+/* NewUserDashboard — first-run variant for students who haven't completed the
+ * welcome tour and have no enrollments. Token-based colors / spacing mirror
+ * the existing dashboard (--ink-*, --accent*, --radius-*, --space-*).
+ *
+ * Layout: centered hero with a primary CTA, a 3-up card grid that stacks
+ * on mobile, and a muted footer with a single help link.
+ */
+
+.page {
+  width: 100%;
+  padding: var(--space-10) var(--side-pad) var(--space-16);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+/* Hero: centered, big title, primary CTA below the subtitle. */
+
+.hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding-top: var(--space-8);
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 5vw, var(--text-3xl, 2.25rem));
+  font-weight: 700;
+  color: var(--ink-900);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.875rem, 2.5vw, var(--text-base));
+  color: var(--ink-700);
+  margin: 0;
+  max-width: 42ch;
+  line-height: 1.5;
+}
+
+.heroCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 700;
+  min-height: 44px;
+  min-width: 180px;
+  margin-top: var(--space-2);
+  transition: background-color var(--duration-base) var(--ease-out);
+}
+
+.heroCta:hover {
+  background: color-mix(in srgb, var(--accent) 90%, var(--ink-900));
+}
+
+.heroCta:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Card grid: 3-up on desktop, single column on mobile. */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.card {
+  display: block;
+  padding: var(--space-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--sh-1);
+  box-sizing: border-box;
+  min-width: 0;
+  transition: border-color var(--transition), box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.card:hover {
+  border-color: var(--c-orange-tint);
+  box-shadow: var(--sh-2);
+  transform: translateY(-1px);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.4vw, var(--text-lg));
+  font-weight: 700;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-2);
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.cardBody {
+  font-size: clamp(0.8125rem, 2vw, var(--text-sm));
+  color: var(--ink-700);
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* Footer: muted help text, underline-on-hover link. */
+
+.footer {
+  text-align: center;
+  font-size: clamp(0.8125rem, 2vw, var(--text-sm));
+  color: var(--ink-500);
+  margin: 0;
+}
+
+.footer a {
+  color: var(--accent-text);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.footer a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footer a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding-top: var(--space-4);
+  }
+
+  .heroCta {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroCta,
+  .card,
+  .footer a {
+    transition: none;
+  }
+}
