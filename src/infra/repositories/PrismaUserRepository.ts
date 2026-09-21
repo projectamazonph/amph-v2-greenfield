@@ -23,7 +23,9 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
-  async findByIds(ids: readonly string[]): Promise<Result<readonly import("@/domain/entities/User").User[], UserError>> {
+  async findByIds(
+    ids: readonly string[],
+  ): Promise<Result<readonly import("@/domain/entities/User").User[], UserError>> {
     const deduped = [...new Set(ids)];
     if (deduped.length === 0) return Result.ok([]);
     try {
@@ -323,6 +325,7 @@ export class PrismaUserRepository implements UserRepository {
     createdAt: Date;
     totalXp: number;
     emailVerifiedAt: Date | null;
+    welcomeCompletedAt: Date | null;
     lockedUntil?: Date | null;
   }) {
     return Object.freeze({
@@ -338,6 +341,7 @@ export class PrismaUserRepository implements UserRepository {
       createdAt: row.createdAt,
       totalXp: row.totalXp,
       emailVerifiedAt: row.emailVerifiedAt,
+      welcomeCompletedAt: row.welcomeCompletedAt ?? null,
       lockedUntil: row.lockedUntil ?? null,
     });
   }

@@ -57,6 +57,11 @@ model User {
   emailVerifiedAt        DateTime?
   verificationStatus     VerificationStatus @default(UNVERIFIED)
 
+  // STORY-129: first-run welcome walkthrough. Null until the student
+  // completes the guided tour; backfilled to createdAt for existing
+  // users so the dashboard variant doesn't appear retroactively.
+  welcomeCompletedAt     DateTime?
+
   // Subscription
   subscriptionTier             SubscriptionTier @default(FREE)
   subscriptionEndsAt           DateTime?

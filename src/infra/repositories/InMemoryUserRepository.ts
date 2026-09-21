@@ -34,9 +34,7 @@ export class InMemoryUserRepository implements UserRepository {
 
   async findByIds(ids: readonly string[]): Promise<Result<readonly User[], UserError>> {
     const deduped = [...new Set(ids)];
-    const found = deduped
-      .map((id) => this.users.get(id))
-      .filter((u): u is User => u !== undefined);
+    const found = deduped.map((id) => this.users.get(id)).filter((u): u is User => u !== undefined);
     return Result.ok(found);
   }
 
@@ -79,6 +77,7 @@ export class InMemoryUserRepository implements UserRepository {
       createdAt: new Date(),
       totalXp: 0,
       emailVerifiedAt: null,
+      welcomeCompletedAt: null,
       lockedUntil: null,
     };
 
