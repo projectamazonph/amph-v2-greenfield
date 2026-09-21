@@ -5,9 +5,15 @@
  * `ResetWelcome` use cases. The use-case logic is already covered by
  * `src/usecases/__tests__/CompleteWelcome.test.ts` and
  * `src/usecases/__tests__/ResetWelcome.test.ts`. What's covered here is
- * the action layer: session resolution, error mapping to a discriminated
- * union the page (Task 9) and the profile restart link (Task 12) can
- * consume, and forwarding the authenticated userId to the use case.
+ * the action layer: session resolution, redirect/error mapping that
+ * the page (Task 9) and the profile restart link (Task 12) consume,
+ * and forwarding the authenticated userId to the use case.
+ *
+ * `resetWelcomeAction` is now a `<form action>` target (Task 12):
+ * it returns `Promise<void>` and calls `redirect()` from
+ * `next/navigation` on every path. We mock `redirect` to throw
+ * `NEXT_REDIRECT` (same pattern as `student-event-boundaries.test.ts`
+ * and the `/welcome` page test) and assert on the target URL.
  *
  * Mirrors `markLessonComplete.action.test.ts`'s mock style
  * (`vi.hoisted` + `vi.mock` for `@/lib/auth` + `@/composition/container`).
@@ -17,11 +23,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-const { getSessionUser, completeExecute, resetExecute } = vi.hoisted(() => ({
+const { getSessionUser, completeExecute, resetExecute, redirect } = vi.hoisted(() => ({
   getSessionUser: vi.fn<() => Promise<unknown>>(),
   completeExecute: vi.fn(),
   resetExecute: vi.fn(),
+  redirect: vi.fn((url: string): never => {
+    throw Object.assign(new Error(`REDIRECT:${url}`), { digest: "NEXT_REDIRECT" });
+  }),
 }));
+
+vi.mock("next/navigation", () => ({ redirect }));
 
 vi.mock("@/lib/auth", () => ({ getSessionUser }));
 vi.mock("@/composition/container", () => ({
@@ -33,10 +44,16 @@ vi.mock("@/composition/container", () => ({
 
 import { completeWelcomeAction, resetWelcomeAction } from "../welcome.action";
 
+function formData(): FormData {
+  const form = new FormData();
+  return form;
+}
+
 beforeEach(() => {
   getSessionUser.mockReset();
   completeExecute.mockReset();
   resetExecute.mockReset();
+  redirect.mockClear();
 });
 
 describe("completeWelcomeAction", () => {
@@ -75,32 +92,45 @@ describe("completeWelcomeAction", () => {
 });
 
 describe("resetWelcomeAction", () => {
-  it("returns not_authenticated when there is no session", async () => {
+  it("redirects to /login when there is no session", async () => {
     getSessionUser.mockResolvedValue(null);
 
-    const result = await resetWelcomeAction();
-
-    expect(result).toEqual({ ok: false, error: { kind: "not_authenticated" } });
+    await expect(resetWelcomeAction(formData())).rejects.toThrow("REDIRECT:/login");
     expect(resetExecute).not.toHaveBeenCalled();
   });
 
-  it("forwards the authenticated userId and returns ok on success", async () => {
+  it("forwards the authenticated userId and redirects to /welcome on success", async () => {
     getSessionUser.mockResolvedValue({ id: "user-1", email: "u@test.example.com" });
     resetExecute.mockResolvedValue({ ok: true, value: undefined });
 
-    const result = await resetWelcomeAction();
-
+    await expect(resetWelcomeAction(formData())).rejects.toThrow("REDIRECT:/welcome");
     expect(resetExecute).toHaveBeenCalledTimes(1);
     expect(resetExecute).toHaveBeenCalledWith({ userId: "user-1" });
-    expect(result).toEqual({ ok: true, value: undefined });
   });
 
-  it("maps a use-case error to the action's error envelope", async () => {
+  it("redirects to /profile?welcome=reset_failed when the use case returns an error", async () => {
     getSessionUser.mockResolvedValue({ id: "user-1", email: "u@test.example.com" });
     resetExecute.mockResolvedValue({ ok: false, error: { kind: "not_found" } });
 
-    const result = await resetWelcomeAction();
+    await expect(resetWelcomeAction(formData())).rejects.toThrow(
+      "REDIRECT:/profile?welcome=reset_failed",
+    );
+    expect(resetExecute).toHaveBeenCalledTimes(1);
+  });
 
-    expect(result).toEqual({ ok: false, error: { kind: "error", message: "unknown" } });
+  it("ignores formData and resolves the user purely from the session", async () => {
+    // Defence-in-depth: the profile page only ever invokes this action
+    // with the default FormData (the form has no fields). Even if a
+    // caller passed extra fields, the session is the single source of
+    // truth for which user's welcome gets reset.
+    getSessionUser.mockResolvedValue({ id: "user-1", email: "u@test.example.com" });
+    resetExecute.mockResolvedValue({ ok: true, value: undefined });
+
+    const fd = new FormData();
+    fd.set("userId", "spoofed-value");
+    fd.set("welcomeCompletedAt", "never");
+
+    await expect(resetWelcomeAction(fd)).rejects.toThrow("REDIRECT:/welcome");
+    expect(resetExecute).toHaveBeenCalledWith({ userId: "user-1" });
   });
 });

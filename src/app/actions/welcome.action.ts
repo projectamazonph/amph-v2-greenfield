@@ -7,26 +7,28 @@
  * server actions so the welcome page (Task 9) and the profile
  * "restart welcome" link (Task 12) can call them from the client.
  *
- * Both actions resolve the current user via `getSessionUser()` and
- * forward `userId` to the underlying use case. They return the
- * domain `Result` directly — discriminated union on `ok` / `error.kind`
- * — so the calling component can render an inline message without
+ * `completeWelcomeAction` returns the domain `Result` directly so the
+ * client-side `WelcomeStepper` can render inline messaging without
  * throwing across the server-action boundary.
+ *
+ * `resetWelcomeAction` is wired as a `<form action>` target on the
+ * profile page (Task 12). It accepts the standard `(formData)`
+ * signature, redirects to `/welcome` on success so the user lands
+ * directly in the tour, and redirects back to `/profile` with an
+ * `?welcome=reset_failed` flag if the underlying use case errors.
+ * `redirect()` from `next/navigation` throws `NEXT_REDIRECT`, so
+ * returning `Promise<void>` is intentional.
  */
 
 "use server";
 
+import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 
 export type CompleteWelcomeActionResult = Result<
   { completedAt: Date },
-  { kind: "not_authenticated" } | { kind: "error"; message: string }
->;
-
-export type ResetWelcomeActionResult = Result<
-  void,
   { kind: "not_authenticated" } | { kind: "error"; message: string }
 >;
 
@@ -40,12 +42,27 @@ export async function completeWelcomeAction(): Promise<CompleteWelcomeActionResu
   return Result.ok(result.value);
 }
 
-export async function resetWelcomeAction(): Promise<ResetWelcomeActionResult> {
+/**
+ * Form-action entry point used by the profile "Restart the welcome
+ * tour" button. Accepts the standard Next.js `(formData: FormData)`
+ * shape — the form data is ignored because all the information the
+ * use case needs (the current user's id) is resolved from the
+ * session.
+ *
+ * On success, sends the user straight into the tour (`/welcome`). On
+ * failure, sends them back to the profile with `?welcome=reset_failed`
+ * so the page can show an inline error if it ever grows one.
+ */
+export async function resetWelcomeAction(_formData: FormData): Promise<void> {
   const user = await getSessionUser();
-  if (!user) return Result.err({ kind: "not_authenticated" });
+  if (!user) {
+    redirect("/login");
+  }
 
   const container = buildContainer();
   const result = await container.resetWelcome.execute({ userId: user.id });
-  if (!result.ok) return Result.err({ kind: "error", message: "unknown" });
-  return Result.ok(undefined);
+  if (!result.ok) {
+    redirect("/profile?welcome=reset_failed");
+  }
+  redirect("/welcome");
 }

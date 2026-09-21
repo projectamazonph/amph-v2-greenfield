@@ -9,6 +9,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockRequireAuth = vi.fn();
 const mockListUserBadges = vi.fn();
+// STORY-129 / Task 12: profile page re-reads the user via
+// `container.userRepo.findById` to decide whether to show the
+// "Restart the welcome tour" button. The a11y tests don't care
+// about that field — they only assert no axe violations — so we
+// resolve with a user whose `welcomeCompletedAt` is null (which
+// means the section is hidden and the button never enters the DOM
+// scanned by axe).
+const mockUserFindById = vi.fn(async () => ({
+  ok: true,
+  value: { welcomeCompletedAt: null },
+}));
 
 vi.mock("@/lib/auth", () => ({
   requireAuth: () => mockRequireAuth(),
@@ -17,6 +28,7 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     listUserBadges: { execute: mockListUserBadges },
+    userRepo: { findById: mockUserFindById },
   }),
 }));
 
@@ -41,7 +53,9 @@ describe("student profile accessibility", () => {
   beforeEach(() => {
     mockRequireAuth.mockReset();
     mockListUserBadges.mockReset();
+    mockUserFindById.mockReset();
     mockRequireAuth.mockResolvedValue(makeUser());
+    mockUserFindById.mockResolvedValue({ ok: true, value: { welcomeCompletedAt: null } });
   });
 
   it("has no axe violations in the empty badge state", async () => {
