@@ -7,9 +7,11 @@ vi.unmock("@/components/student/StudentSidebar");
 import { StudentSidebar } from "../StudentSidebar";
 
 const mockUsePathname = vi.fn();
+const mockUseRouterPush = vi.fn();
 
 vi.mock("next/navigation", () => ({
   usePathname: () => mockUsePathname(),
+  useRouter: () => ({ push: mockUseRouterPush }),
 }));
 
 // STORY-146: these nav tests pre-date the "?" badge; they assume a
