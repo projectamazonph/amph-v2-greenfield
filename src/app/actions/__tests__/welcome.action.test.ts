@@ -78,7 +78,7 @@ describe("completeWelcomeAction", () => {
     expect(result).toEqual({ ok: true, value: { completedAt } });
   });
 
-  it("maps a use-case error to the action's error envelope", async () => {
+  it("passes a use-case not_found through to the action envelope", async () => {
     getSessionUser.mockResolvedValue({ id: "user-1", email: "u@test.example.com" });
     completeExecute.mockResolvedValue({
       ok: false,
@@ -87,7 +87,22 @@ describe("completeWelcomeAction", () => {
 
     const result = await completeWelcomeAction();
 
-    expect(result).toEqual({ ok: false, error: { kind: "error", message: "unknown" } });
+    expect(result).toEqual({ ok: false, error: { kind: "not_found" } });
+  });
+
+  it("passes a use-case repo_error through with its message", async () => {
+    getSessionUser.mockResolvedValue({ id: "user-1", email: "u@test.example.com" });
+    completeExecute.mockResolvedValue({
+      ok: false,
+      error: { kind: "repo_error", message: "connection refused" },
+    });
+
+    const result = await completeWelcomeAction();
+
+    expect(result).toEqual({
+      ok: false,
+      error: { kind: "repo_error", message: "connection refused" },
+    });
   });
 });
 

@@ -27,9 +27,22 @@ import { buildContainer } from "@/composition/container";
 import { getSessionUser } from "@/lib/auth";
 import { Result } from "@/domain/shared/Result";
 
+/**
+ * Mirrors the use-case error shape so callers can distinguish
+ * "user no longer exists" from "DB write failed" without parsing
+ * opaque `message: "unknown"` strings. The `not_authenticated`
+ * discriminator is added at the action layer because the use case
+ * doesn't know whether there was a session — that's a transport-layer
+ * concern.
+ */
+export type CompleteWelcomeActionError =
+  | { kind: "not_authenticated" }
+  | { kind: "not_found" }
+  | { kind: "repo_error"; message: string };
+
 export type CompleteWelcomeActionResult = Result<
   { completedAt: Date },
-  { kind: "not_authenticated" } | { kind: "error"; message: string }
+  CompleteWelcomeActionError
 >;
 
 export async function completeWelcomeAction(): Promise<CompleteWelcomeActionResult> {
@@ -38,7 +51,7 @@ export async function completeWelcomeAction(): Promise<CompleteWelcomeActionResu
 
   const container = buildContainer();
   const result = await container.completeWelcome.execute({ userId: user.id });
-  if (!result.ok) return Result.err({ kind: "error", message: "unknown" });
+  if (!result.ok) return Result.err(result.error);
   return Result.ok(result.value);
 }
 
