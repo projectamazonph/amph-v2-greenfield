@@ -1,0 +1,24 @@
+/* /welcome — first-run walkthrough page shell. STORY-129.
+ *
+ * Tour owns the viewport. No sidebar. The stepper centers itself in a
+ * max-width column with generous padding, on a neutral surface that
+ * mirrors the dashboard's token system (--ink-*, --space-*, --radius-*).
+ */
+
+.page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10) var(--side-pad) var(--space-16);
+  box-sizing: border-box;
+  background: var(--surface-0);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: var(--space-6) var(--space-4) var(--space-10);
+    align-items: flex-start;
+  }
+}
