@@ -54,12 +54,15 @@ test.describe("Sign Up", () => {
     await expect(page.getByRole("heading", { name: /create your account/i })).toBeVisible();
   });
 
-  test("happy path: sign up auto-logs in and lands on /dashboard", async ({ page }) => {
+  test("happy path: sign up auto-logs in and lands on /welcome", async ({ page }) => {
     // STORY-005 happy path. The action performs SignUp + Login +
-    // plantCookie + redirect("/dashboard") in sequence. We assert
-    // the end state (URL) rather than intermediate UI, because the
-    // success state is never rendered — the action throws
-    // NEXT_REDIRECT before useActionState observes it.
+    // plantCookie + redirect("/welcome") in sequence. STORY-129 (Task 8)
+    // rerouted no-tier signups from /dashboard to /welcome so new
+    // students go through the onboarding wizard instead of dropping
+    // straight into the regular dashboard. We assert the end state
+    // (URL) rather than intermediate UI, because the success state is
+    // never rendered — the action throws NEXT_REDIRECT before
+    // useActionState observes it.
     const email = `e2e-happy-${Date.now()}@example.com`;
     await page.getByLabel(/first name/i).fill("Happy");
     await page.getByLabel(/last name/i).fill("Path");
@@ -67,7 +70,7 @@ test.describe("Sign Up", () => {
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
-    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/\/welcome/, { timeout: 15_000 });
   });
 
   test("shows email_taken error when registering the same email twice", async ({ page }) => {
@@ -81,16 +84,17 @@ test.describe("Sign Up", () => {
     await page.getByRole("button", { name: /create account/i }).click();
 
     // First signup succeeds: the route handler sets the session cookie
-    // and 303-redirects to /dashboard. Wait for the URL change AND
-    // for the dashboard page to finish loading so the next `page.goto`
-    // doesn't race a still-in-flight response.
+    // and 303-redirects to /welcome (STORY-129 / Task 8 rerouted no-tier
+    // signups here from /dashboard). Wait for the URL change AND for the
+    // welcome page to finish loading so the next `page.goto` doesn't
+    // race a still-in-flight response.
     //
     // Note: `networkidle` is unreliable here — the Next.js dev server
     // keeps a persistent WebSocket open (HMR + RSC pings) so
     // "networkidle" never fires within the 30s test budget. Use
-    // `domcontentloaded` on the dashboard page (which is what the
-    // browser actually transitions on after the 303 → /dashboard).
-    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
+    // `domcontentloaded` on the welcome page (which is what the
+    // browser actually transitions on after the 303 → /welcome).
+    await expect(page).toHaveURL(/\/welcome/, { timeout: 15_000 });
     await page.waitForLoadState("domcontentloaded");
 
     // Second signup with same email: sign out first so the first

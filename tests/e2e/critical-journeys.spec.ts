@@ -41,7 +41,11 @@ test.describe("Critical journeys", () => {
     }
   });
 
-  test("journey 1: sign up and land on dashboard", async ({ page }) => {
+  test("journey 1: sign up and land on /welcome", async ({ page }) => {
+    // STORY-129 / Task 8 rerouted no-tier signups from /dashboard to
+    // /welcome so new students go through the onboarding wizard. We
+    // assert /welcome (not /dashboard) here; the welcome flow itself
+    // has its own E2E spec at tests/e2e/welcome.spec.ts.
     await page.goto(`${BASE}/signup`);
     await page.getByLabel(/first name/i).fill("Juan");
     await page.getByLabel(/last name/i).fill("Dela Cruz");
@@ -49,10 +53,9 @@ test.describe("Critical journeys", () => {
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
-    await expect(page).toHaveURL(/dashboard/, { timeout: 15_000 });
-    // The dashboard page shows "Welcome back, {firstName}." — the
-    // first-name part is dynamic, so we match the static prefix.
-    await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
+    await expect(page).toHaveURL(/\/welcome/, { timeout: 15_000 });
+    // The welcome stepper mounts and shows step 1's heading.
+    await expect(page.getByText(/Welcome to AMPH Academy/i)).toBeVisible();
   });
 
   test("journey 2: browse courses and view course detail", async ({ page }) => {
