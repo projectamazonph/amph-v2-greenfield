@@ -199,6 +199,33 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  // ── STORY-129 placeholder (Task 2) ─────────────────────────
+  // These satisfy the UserRepository port interface added in Task 2
+  // so typecheck stays green until Task 3 replaces them with real
+  // Prisma `user.update` calls (mirroring setTwoFactorSecret /
+  // updateTotalXp above). Not yet reachable from production code —
+  // the use cases that call them (CompleteWelcome / ResetWelcome)
+  // are built in Tasks 4 and 5.
+
+  async markWelcomeCompleted(
+    _userId: string,
+    _completedAt: Date,
+  ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
+    return Result.err({
+      kind: "db_error",
+      message: "markWelcomeCompleted not yet implemented (STORY-129 / Task 3)",
+    });
+  }
+
+  async resetWelcome(
+    _userId: string,
+  ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
+    return Result.err({
+      kind: "db_error",
+      message: "resetWelcome not yet implemented (STORY-129 / Task 3)",
+    });
+  }
+
   // ── Private helpers ────────────────────────────────────────
 
   async updateTotalXp(

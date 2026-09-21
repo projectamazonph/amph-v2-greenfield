@@ -222,6 +222,24 @@ export class InMemoryUserRepository implements UserRepository {
     return Result.ok({ lockedUntil });
   }
 
+  async markWelcomeCompleted(userId: string, completedAt: Date): Promise<Result<User, UserError>> {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    if (user.welcomeCompletedAt !== null) return Result.ok(user);
+    const updated = Object.freeze({ ...user, welcomeCompletedAt: completedAt });
+    this.users.set(userId, updated);
+    return Result.ok(updated);
+  }
+
+  async resetWelcome(userId: string): Promise<Result<User, UserError>> {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    if (user.welcomeCompletedAt === null) return Result.ok(user);
+    const updated = Object.freeze({ ...user, welcomeCompletedAt: null });
+    this.users.set(userId, updated);
+    return Result.ok(updated);
+  }
+
   /** Pre-load with a set of users (for integration test fixtures). */
   seed(
     users: Array<{

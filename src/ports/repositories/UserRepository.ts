@@ -174,4 +174,16 @@ export interface UserRepository {
     outcome:
       { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date; now: Date },
   ): Promise<Result<{ lockedUntil: Date | null }, UserError>>;
+
+  /**
+   * STORY-129: stamp the user's welcome walkthrough as complete.
+   * Idempotent — calling twice keeps the first timestamp.
+   */
+  markWelcomeCompleted(userId: string, completedAt: Date): Promise<Result<User, UserError>>;
+
+  /**
+   * STORY-129: clear the welcome timestamp so the user can re-take
+   * the tour from the profile page.
+   */
+  resetWelcome(userId: string): Promise<Result<User, UserError>>;
 }
