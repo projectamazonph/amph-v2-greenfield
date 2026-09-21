@@ -1,5 +1,33 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-09-21, STORY-146 onboarding merged via PR #545)
+
+`main` HEAD is `918c532` (squash of branch `onboarding`, branch deleted). Implements STORY-146 (first-run welcome walkthrough for brand-new AMPH students — feedback that zero-experience VAs don't know how to navigate the platform).
+
+The slice adds `welcomeCompletedAt` (User + migration with backfill), `CompleteWelcome`/`ResetWelcome` use cases enforcing atomic idempotency at the DB layer via `updateMany + where: { ..., welcomeCompletedAt: null }` (same pattern as `PrismaEmailVerificationRepository.markUsed` and `PrismaLiveClassRegistrationRepository.markWatchedRecording`), `welcome.action.ts` server actions, `/welcome` page with `WelcomeStepper` client component (5 steps, URL fragment + localStorage), `NewUserDashboard` variant for fresh free-tier students, sidebar "?" badge (7-day window), profile "Restart the welcome tour" link, signup no-tier redirect from `/dashboard` to `/welcome`, and Playwright E2E coverage at `tests/e2e/welcome.spec.ts`.
+
+Renumbered from STORY-129 to STORY-146 mid-flight because main already had `STORY-129` (LEARN-001, merged in #520) and `STORY-145` (LEARN-031, merged in #543) — picked the next free number on the LEARN-numbering track so this stays out of the way of any future LEARN-145/146 picks.
+
+The branch was originally cut from `cae71f1` (2026-07). Main had progressed through LEARN waves 1–4 (artefacts, portfolio, retrieval checks, notifications, capstone brief, scenario packs) since the fork. Rebased onto current `main` (5ccb37d) by cherry-picking the 13 production commits (Tasks 1–13) and the 3 post-review fixes (Tasks 11/12 fixes), dropping the docs-only commits that would conflict; the renumbering chain (`65c8de4`, `ff8c821`) was also dropped and replaced by a single end-commit that creates `STORY-146.md` directly. Final diff was 38 files focused on onboarding only, down from 32+ ahead of `cae71f1` plus 9 unmerged LEARN-wave files.
+
+Two CI regressions caught and fixed in flight:
+1. `prisma/schema.prisma` started with a UTF-8 BOM (`EF BB BF`) after a bulk rename via PowerShell `Set-Content -Encoding UTF8`. Prisma's schema parser rejected it with `P1012: This line is invalid. It does not start with any known Prisma schema keyword.` Stripped the BOM at the byte level.
+2. `src/app/welcome/loading.tsx` was missing — the cherry-pick from `70980ee` dropped it (or it was lost in the rebase walk). Architecture's public-a11y-gates test requires every non-admin route to have a `loading.tsx` with `<main aria-busy="true">`. Re-added using the same `SkeletonBlock` pattern as `src/app/dashboard/loading.tsx`. Also caught a separate `useRouter` mock gap in `StudentSidebar` tests after the badge refactor (Task 11 fix) added `useRouter()` calls; updated `StudentNavigation.test.tsx` and `dashboard/__tests__/a11y.audit.test.tsx` mocks to export `useRouter` alongside `usePathname`.
+
+All 8 CI gates green at merge time:
+- ✅ Typecheck + Lint
+- ✅ Architecture (TDD + SOLID compliance)
+- ✅ Unit + integration (5,132 passing)
+- ✅ E2E (Playwright)
+- ✅ Build
+- ✅ Learning release gate
+- ✅ Lighthouse CI
+- ✅ Vercel preview
+
+Follow-ups (deferred, not blocking): `STORY-146.1` for any remaining a11y debt (the nested-`<Link>` fix is now in this PR); auto-redirect logged-in users with `welcomeCompletedAt === null` from `/dashboard` to `/welcome` (proxy/auth-layer hook); i18n for the welcome copy; reduced-motion variant for step transitions.
+
+`STATE.md` updated to reflect: `_None._ STORY-146 merged at 918c532`; `Main: 918c532`; `Reviewed: 2026-09-21`. `CHANGELOG.md` `[Unreleased]` entry was added before merge. `docs/stories/STORY-146.md` `Status` line updated to `Done.`.
+
 # Session update (2026-08-21, PR #420 Unit+integration failure blocks merge)
 
 `feat/active-lesson-primitives` PR #420 (`4282448`) cannot be merged in its current state. CI is GREEN on Typecheck + Lint, Architecture (TDD + SOLID), E2E (Playwright), Vercel preview, and CodeRabbit. CI is RED on Unit + integration: 70 failed assertions across 13 test files (4171 passed). The same Suite was RED on the branch's first push (`75cb14f`, run 32390575868); the failure set has not changed between the original state and the follow-up commit `4282448`.
