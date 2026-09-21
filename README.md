@@ -11,6 +11,7 @@ Three courses, practical tools, and an Amazon PH simulator interface. The reposi
 ## What is included
 
 - Authentication, email verification, password reset, optional admin TOTP, and student TOTP (`/profile/security`).
+- First-run onboarding walkthrough (`/welcome`, STORY-146): 5-step client stepper (URL fragment + localStorage), "Pick your first course" dashboard variant for fresh free-tier students, sidebar "?" badge for users within their first 7 days, and a profile "Restart the welcome tour" button.
 - Course catalog, MDX curriculum import, lessons, quizzes, XP, streaks, badges, and certificates.
 - PayMongo checkout (including real refunds through the PayMongo Refunds API), webhook processing, enrollment, discount codes, and refund workflows.
 - Five registered simulator implementations, each with a real draft → published → archived scenario lifecycle and version history, formative-only score labeling, and (for Listing Audit and Campaign Builder) a real edit/triage UI feeding graded, persisted attempts. Keyword Research is its own versioned-dataset engine.
@@ -18,7 +19,10 @@ Three courses, practical tools, and an Amazon PH simulator interface. The reposi
 - Live classes with admin CRUD, student RSVP, reminder emails, and post-class recording playback with one-time completion XP.
 - Editable email templates (`/admin/email-templates`) that are actually wired into every Resend send path, not just a CRUD screen.
 - Account data export and self-service account deletion (`/profile/data`).
-- Admin users, courses, modules, lessons, payments, refunds, scenarios (with version history), live classes, badges, resources, audit logs, and settings routes.
+- Student portfolio page (`/portfolio`) with learner artefacts (decision logs, mid-lesson retrieval checks, etc.), JSON export, and six-kind lifecycle (`STORY-135`); Foundations capstone brief + readiness checker (`STORY-142`/`STORY-143`).
+- Targeted quiz remediation (`STORY-141`): missed questions surface a "What to revisit" list with lesson links.
+- In-app notifications bell with unread count, 30s polling, dropdown and mark-read on click (`STORY-139`).
+- Admin users, courses, modules, lessons, payments, refunds, scenarios (with version history), live classes, badges, resources, audit logs, email templates, and settings routes.
 - PostgreSQL through Prisma 7, Resend email, Sentry configuration, Pino logging, Upstash rate limiting, and Vercel cron wiring.
 
 See [`FEATURES.md`](FEATURES.md) for the implemented, partial, and planned feature matrix, and [`CLAUDE.md`](CLAUDE.md)'s "Known gaps" section for the most current, dated list of what's real versus still open. Simulator scores are formative and are not certification or hiring evidence yet — see [`docs/sprint-plan.md`](docs/sprint-plan.md) Sprints 14–16 for the remediation history, and [`docs/audit-2026-07-27-completeness-review.md`](docs/audit-2026-07-27-completeness-review.md) for the last full completeness audit (several of its findings have since been closed; check `CLAUDE.md` before trusting a claim from it in isolation).
@@ -51,6 +55,10 @@ Every simulator reads its practice content from a `SimulatorScenario` row that i
 ![Search Term Triage](public/screenshots/str-triage.png)
 ![Listing Audit](public/screenshots/listing-audit.png)
 ![Keyword Research](public/screenshots/keyword-research.png)
+![Welcome stepper](public/screenshots/welcome.png)
+![NewUserDashboard variant](public/screenshots/new-user-dashboard.png)
+
+> The five simulator screenshots and the landing-page hero are dated 2026-08-29. The two welcome / new-user-dashboard screenshots are placeholders pending a fresh capture — see [Updating screenshots](#updating-screenshots).
 
 ## 📚 Curriculum Syllabus
 
@@ -70,19 +78,19 @@ For a comprehensive overview of all courses, modules, and lessons taught by the 
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Architecture                      | SOLID-layered modular monolith with a composition root                                                                |
 | Framework                         | Next.js 16 App Router, TypeScript strict                                                                              |
-| Database                          | PostgreSQL through Prisma 7, 36 models and 35 migrations                                                              |
+| Database                          | PostgreSQL through Prisma 7, 60 models and 51 migrations                                                              |
 | Payments                          | PayMongo adapter (checkout + real Refunds API) and `/api/webhooks/paymongo` route                                     |
 | Email                             | Resend adapter with React Email templates, wired to admin-editable overrides                                          |
 | Admin                             | `/admin/*` route tree gated by `requireAdmin()`, 12 sub-areas including resources                                     |
 | Simulators                        | 5 registered engines with versioned/published scenarios and formative-only scoring                                    |
 | Tests                             | Vitest unit and integration tests, Playwright E2E suite, a dedicated architecture-compliance suite (`pnpm test:arch`) |
-| Latest repository commit reviewed | `ee1737a` on 2026-08-12 (PRs #305-#308)                                                                               |
-| Verification                      | 3,816 Vitest passed, 2 skipped; 665 architecture checks; TypeScript, ESLint, build, Playwright, and Lighthouse passed |
-| Documentation review              | 2026-08-12. Start with `docs/README.md`, then `STATE.md` and `SESSION-HANDOVER.md`                                    |
+| Latest repository commit reviewed | `918c532` on 2026-09-21 (PRs #520, #528-#539, #542-#545)                                                               |
+| Verification                      | 5,133 Vitest passed, 3 skipped; 876 architecture checks; TypeScript, ESLint, build, Playwright, and Lighthouse passed   |
+| Documentation review              | 2026-09-21. Start with `STATE.md` and `SESSION-HANDOVER.md`                                                           |
 
-Sprints 1-15 are complete. Sprint 16 has STORY-085, STORY-087, and STORY-088 complete; STORY-086 and STORY-089 remain planned. The student journey repair is merged through PR #305, and the follow-up fixes for manual enrollment, admin login redirects, and password-reset links are merged through PRs #306-#308.
+Sprints 1-15 are complete; learning-experience 8.5 Wave 1 (LEARN-010..015) and Wave 3 evidence slice (LEARN-031..035, LEARN-040..045) are also merged. Sprint 16 work (STORY-085, STORY-087, STORY-088) is complete; STORY-086 (instructor calibration) and STORY-089 (connected-account simulator) remain planned. The student onboarding slice (`STORY-146`) is the latest merged work via `PR #545`.
 
-The 2026-08-12 documentation gate ran against `ee1737a`: 3,816 Vitest tests passed, 2 skipped; all 665 architecture checks passed; TypeScript, ESLint, the production build, Playwright, and Lighthouse passed.
+The 2026-09-21 documentation gate ran against `918c532`: 5,133 Vitest tests passed, 3 skipped; all 876 architecture checks passed; TypeScript, ESLint, the production build, Playwright, and Lighthouse passed.
 
 ## Planned work and known gaps
 
@@ -107,7 +115,7 @@ Not exhaustive — `CLAUDE.md`'s "Known gaps" section is the dated, actively-mai
 - Launch communications.
 - PayMongo live webhook secret rotation drills.
 
-Historical audits and session entries are retained as records. For current status, use `docs/README.md`, `STATE.md`, `FEATURES.md`, and the newest `SESSION-HANDOVER.md` entry.
+Historical audits and session entries are retained as records. For current status, use `STATE.md`, `FEATURES.md`, and the newest `SESSION-HANDOVER.md` entry.
 
 ## Read this repo in this order
 
@@ -185,6 +193,25 @@ tests/          Architecture, integration, unit, and E2E tests
 docs/           Product, architecture, operations, stories, and audit records
 public/         Brand assets and screenshots
 ```
+
+## Updating screenshots
+
+The screenshots under `public/landing/` and `public/screenshots/` are marketing collateral, not source of truth. When the UI changes materially, refresh the relevant PNGs by running the dev server locally (`pnpm dev`), signing in as a real user (admin for admin pages, fresh signup for the onboarding flow), and capturing with your OS screenshot tool.
+
+Current coverage (refresh these when the UI changes):
+
+| File | What it shows | Refresh when |
+|------|---------------|--------------|
+| `public/landing/academy-hero.png` | Public landing hero | Landing copy or hero illustration changes |
+| `public/screenshots/bid-elevator.png` | Bid Elevator tool view | Bid Elevator form/result UI changes |
+| `public/screenshots/campaign-builder.png` | Campaign Builder tool view | Campaign Builder UI changes |
+| `public/screenshots/str-triage.png` | STR Triage tool view | STR Triage UI changes |
+| `public/screenshots/listing-audit.png` | Listing Audit tool view | Listing Audit UI changes |
+| `public/screenshots/keyword-research.png` | Keyword Research tool view | Keyword Research UI changes |
+| `public/screenshots/welcome.png` | First-run `/welcome` stepper | Onboarding copy or stepper UI changes |
+| `public/screenshots/new-user-dashboard.png` | `NewUserDashboard` variant | Dashboard variant copy or hero changes |
+
+> Generated PNGs are not regenerated automatically. Update them as part of the PR that changes the UI, or file a follow-up issue if the diff is too large.
 
 ## License
 
