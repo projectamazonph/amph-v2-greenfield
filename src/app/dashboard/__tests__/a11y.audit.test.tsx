@@ -33,6 +33,7 @@ vi.mock("@/composition/container", () => ({
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(),
   usePathname: () => "/dashboard",
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 vi.mock("@/components/student/CourseCover", () => ({
