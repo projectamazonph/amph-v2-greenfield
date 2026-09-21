@@ -199,31 +199,69 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
-  // ── STORY-129 placeholder (Task 2) ─────────────────────────
-  // These satisfy the UserRepository port interface added in Task 2
-  // so typecheck stays green until Task 3 replaces them with real
-  // Prisma `user.update` calls (mirroring setTwoFactorSecret /
-  // updateTotalXp above). Not yet reachable from production code —
-  // the use cases that call them (CompleteWelcome / ResetWelcome)
-  // are built in Tasks 4 and 5.
-
+  /**
+   * STORY-129: stamp the user's welcome walkthrough as complete.
+   *
+   * Idempotent — calling twice keeps the first timestamp. Mirrors
+   * InMemoryUserRepository.markWelcomeCompleted: if the row already
+   * has a welcomeCompletedAt, this is a no-op and the existing User
+   * is returned unchanged. Implementation uses updateMany with a
+   * `welcomeCompletedAt: null` filter so the no-op happens in the
+   * database (no race against a concurrent mark), then re-reads the
+   * row to return the (possibly pre-existing) User entity.
+   */
   async markWelcomeCompleted(
-    _userId: string,
-    _completedAt: Date,
+    userId: string,
+    completedAt: Date,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
-    return Result.err({
-      kind: "db_error",
-      message: "markWelcomeCompleted not yet implemented (STORY-129 / Task 3)",
-    });
+    try {
+      await this.db.user.updateMany({
+        where: { id: userId, welcomeCompletedAt: null },
+        data: { welcomeCompletedAt: completedAt },
+      });
+      const row = await this.db.user.findUnique({ where: { id: userId } });
+      if (!row) return Result.err({ kind: "not_found" });
+      return Result.ok(this.mapRow(row));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
   }
 
+  /**
+   * STORY-129: clear the welcome timestamp so the user can re-take
+   * the tour. Mirrors InMemoryUserRepository.resetWelcome: a no-op
+   * when welcomeCompletedAt is already null.
+   */
   async resetWelcome(
-    _userId: string,
+    userId: string,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
-    return Result.err({
-      kind: "db_error",
-      message: "resetWelcome not yet implemented (STORY-129 / Task 3)",
-    });
+    try {
+      await this.db.user.updateMany({
+        where: { id: userId, welcomeCompletedAt: { not: null } },
+        data: { welcomeCompletedAt: null },
+      });
+      const row = await this.db.user.findUnique({ where: { id: userId } });
+      if (!row) return Result.err({ kind: "not_found" });
+      return Result.ok(this.mapRow(row));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
   }
 
   // ── Private helpers ────────────────────────────────────────
