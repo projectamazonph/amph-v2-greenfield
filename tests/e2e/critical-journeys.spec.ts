@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Critical user journeys — STORY-055.
  *
  * Six end-to-end journeys that exercise the most important product
@@ -42,7 +42,7 @@ test.describe("Critical journeys", () => {
   });
 
   test("journey 1: sign up and land on /welcome", async ({ page }) => {
-    // STORY-129 / Task 8 rerouted no-tier signups from /dashboard to
+    // STORY-146 / Task 8 rerouted no-tier signups from /dashboard to
     // /welcome so new students go through the onboarding wizard. We
     // assert /welcome (not /dashboard) here; the welcome flow itself
     // has its own E2E spec at tests/e2e/welcome.spec.ts.

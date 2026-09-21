@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /profile — page domain tests.
  *
  * Option B: tests the domain layer (getSessionUser, listUserBadges use case,
@@ -6,7 +6,7 @@
  * is incompatible with React 19 async Server Components; HTML output is
  * covered by E2E tests).
  *
- * STORY-129 / Task 12: also exercises `hasCompletedWelcome` against the
+ * STORY-146 / Task 12: also exercises `hasCompletedWelcome` against the
  * fresh user loaded by the page to assert that the "Restart the welcome
  * tour" button's visibility is tied to `welcomeCompletedAt !== null`,
  * matching the brief's conditional render.
@@ -51,7 +51,7 @@ const mockBadges = [
 ];
 
 // `findById` is now read twice on the profile page (once via requireAuth
-// inside lib/auth.ts, once for the STORY-129 restart-section visibility
+// inside lib/auth.ts, once for the STORY-146 restart-section visibility
 // check). We expose a getter so each test can flip the returned user's
 // `welcomeCompletedAt` without rewriting the mock. The loose return
 // type lets each test mock a different `welcomeCompletedAt` value.
@@ -132,7 +132,7 @@ describe("/profile — domain layer", () => {
   });
 });
 
-describe("/profile — STORY-129 restart-section visibility", () => {
+describe("/profile — STORY-146 restart-section visibility", () => {
   it("shows the restart section when the fresh user has welcomeCompletedAt set", async () => {
     mockFindById.mockResolvedValueOnce({
       ok: true,

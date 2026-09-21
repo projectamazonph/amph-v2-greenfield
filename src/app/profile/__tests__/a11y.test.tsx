@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 /// <reference types="@testing-library/jest-dom" />
 
 import "vitest-axe/extend-expect";
@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockRequireAuth = vi.fn();
 const mockListUserBadges = vi.fn();
-// STORY-129 / Task 12: profile page re-reads the user via
+// STORY-146 / Task 12: profile page re-reads the user via
 // `container.userRepo.findById` to decide whether to show the
 // "Restart the welcome tour" button. The a11y tests don't care
 // about that field — they only assert no axe violations — so we

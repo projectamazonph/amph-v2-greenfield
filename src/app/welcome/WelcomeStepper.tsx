@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 /**
- * WelcomeStepper — client-side 5-step first-run walkthrough (STORY-129).
+ * WelcomeStepper — client-side 5-step first-run walkthrough (STORY-146).
  *
  * State model:
  * - `step` (0..STEPS.length - 1) is the source of truth for which slide

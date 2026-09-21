@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Container wiring tests — STORY-033 / STORY-036.
  *
  * Ensures RecordQuizAttempt and SimulatorRegistry are registered on both
@@ -488,7 +488,7 @@ simDescribe("container — simulator registry wiring", () => {
   });
 });
 
-// ─── STORY-129: welcome step wiring ─────────────────────────────────────────
+// ─── STORY-146: welcome step wiring ─────────────────────────────────────────
 
 import { describe as welcomeDescribe, it as welcomeIt, expect as welcomeExpect } from "vitest";
 import { CompleteWelcome } from "@/usecases/CompleteWelcome";

@@ -1,7 +1,7 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 
 /**
- * WelcomeStepper.test.tsx — STORY-129.
+ * WelcomeStepper.test.tsx — STORY-146.
  *
  * Drives the client stepper through `@testing-library/react` in jsdom.
  * Covers the structural contract:

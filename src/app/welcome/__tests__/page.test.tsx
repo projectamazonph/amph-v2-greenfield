@@ -1,5 +1,5 @@
-/**
- * page.test.tsx — /welcome server-component domain tests (STORY-129).
+﻿/**
+ * page.test.tsx — /welcome server-component domain tests (STORY-146).
  *
  * Mirrors the Option B pattern from `src/app/dashboard/__tests__/page.test.tsx`:
  * tests the data-layer contract (requireAuth + userRepo + redirect)
@@ -126,7 +126,7 @@ describe("/welcome page", () => {
   });
 
   it("declares the correct page metadata for the welcome route", () => {
-    // Story STORY-129: page metadata drives the document <title>.
+    // Story STORY-146: page metadata drives the document <title>.
     // A regression here would change the browser tab text silently.
     expect(WelcomePageModule.metadata).toEqual({
       title: "Welcome to AMPH Academy",

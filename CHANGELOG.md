@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-146: First-run welcome walkthrough for new students
+
+Zero-experience students (especially new Filipino VAs) didn't know how to navigate the platform after signup. The slice adds a five-step `/welcome` page (URL fragment + localStorage for state), a `NewUserDashboard` variant for fresh free-tier students, a sidebar "?" badge that fades after 7 days, and a profile "Restart the welcome tour" link. No-tier signups now 303 to `/welcome` (was `/dashboard`); tier-selected signups still go to `/checkout`. New `welcomeCompletedAt` column on `User` with a backfill treating existing users as already-toured; two use cases (`CompleteWelcome`, `ResetWelcome`) enforce atomic idempotency at the DB layer via `updateMany + where: { ..., welcomeCompletedAt: null }` — same pattern as `markUsed` on email verification and `markRecordingWatched` on live-class registrations. E2E coverage at `tests/e2e/welcome.spec.ts`. Spec at `docs/superpowers/specs/2026-09-20-student-onboarding-design.md`, plan at `docs/superpowers/plans/2026-09-20-student-onboarding.md`. Post-merge follow-up quest opened for any remaining a11y debt (sidebar badge refactor is done in this PR as a `<button>` to avoid nested-`<a>` invalid HTML).
+
 ### 2026-09-17: LEARN-041 targeted remediation + LEARN-042 capstone brief (PRs #536-#537)
 
 - `LEARN-041` (STORY-141, PR #536): quiz questions carry `remediationRefs` lesson slugs (Prisma JSON column + migration). A pure plan builder in domain services joins missed answers to slugs. `RecordQuizAttempt` exposes the plan; the quiz player renders a "What to revisit" list with lesson links. Tags optional; empty tags contribute nothing.

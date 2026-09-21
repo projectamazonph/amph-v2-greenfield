@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /dashboard — authenticated student dashboard.
  *
  * P0-4 fix: this route did not exist; signup/login redirects to
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
   // "All my courses" includes everything (active, in-progress, completed)
   const allActive = pairs.filter((p) => p.enrollment.status === "active");
 
-  // STORY-129 / Task 10: students who haven't completed the welcome tour
+  // STORY-146 / Task 10: students who haven't completed the welcome tour
   // AND have no active enrollments get a first-run variant instead of the
   // regular dashboard. The session-loaded `User` already carries
   // `welcomeCompletedAt`, but we re-fetch via `userRepo.findById` to keep

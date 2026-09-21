@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PrismaUserRepository — Story 002.
  *
  * The production adapter for the UserRepository port.
@@ -200,7 +200,7 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   /**
-   * STORY-129: stamp the user's welcome walkthrough as complete.
+   * STORY-146: stamp the user's welcome walkthrough as complete.
    *
    * Idempotent — calling twice keeps the first timestamp. Mirrors
    * InMemoryUserRepository.markWelcomeCompleted: if the row already
@@ -236,7 +236,7 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   /**
-   * STORY-129: clear the welcome timestamp so the user can re-take
+   * STORY-146: clear the welcome timestamp so the user can re-take
    * the tour. Mirrors InMemoryUserRepository.resetWelcome: a no-op
    * when welcomeCompletedAt is already null.
    */

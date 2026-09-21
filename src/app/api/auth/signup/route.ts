@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /api/auth/signup — STORY-066.
  *
  * Plain HTTP POST endpoint for new account registration. Same pattern
@@ -10,7 +10,7 @@
  * 1. Parse formData (email, password, firstName, lastName).
  * 2. Call performSignUp() with the production container.
  * 3. On success: Set-Cookie via setAuthCookie + 303 to /welcome (no
- *    tier) or /checkout?pricingTier=<tier> (tier selected). STORY-129
+ *    tier) or /checkout?pricingTier=<tier> (tier selected). STORY-146
  *    moved the no-tier destination from /dashboard to /welcome so
  *    new students are routed through the onboarding wizard instead
  *    of straight into the dashboard.

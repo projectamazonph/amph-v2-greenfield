@@ -1,5 +1,5 @@
-/**
- * NewUserDashboard — first-run dashboard variant (STORY-129).
+﻿/**
+ * NewUserDashboard — first-run dashboard variant (STORY-146).
  *
  * Server component: renderToString covers the static markup and
  * preserves the SSR-friendly contract used elsewhere in this folder.

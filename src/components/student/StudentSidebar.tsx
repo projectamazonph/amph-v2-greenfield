@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * StudentSidebar — student-facing navigation sidebar.
@@ -84,7 +84,7 @@ export interface StudentSidebarProps {
     lastName?: string | null;
     role: string;
     /**
-     * STORY-129: timestamp of when the student finished the first-run
+     * STORY-146: timestamp of when the student finished the first-run
      * welcome tour. When `null` and the student is still within their
      * first week, the sidebar shows a small "?" badge next to the
      * Dashboard link that reopens `/welcome`.
@@ -113,7 +113,7 @@ export function StudentSidebar({ user, notificationActions }: StudentSidebarProp
   const router = useRouter();
   const [signOutOpen, setSignOutOpen] = useState(false);
 
-  // STORY-129: surface a "?" badge next to Dashboard for fresh students
+  // STORY-146: surface a "?" badge next to Dashboard for fresh students
   // (welcome not yet completed) within their first week of signup. The
   // 7-day window matches the design intent of "guide the very new,
   // don't pester returning users".

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Simulator access smoke test - student journey from root UX.
  *
  * Story: Investigate "students unable to access simulators."
@@ -59,7 +59,7 @@ test.describe("Simulator access from root UX", () => {
     await page.getByRole("textbox", { name: /password/i }).fill("Str0ngP@ss123!");
     await page.getByRole("button", { name: /create account/i }).click();
 
-    // Signup should land on /welcome (STORY-129 / Task 8 rerouted
+    // Signup should land on /welcome (STORY-146 / Task 8 rerouted
     // no-tier signups here from /dashboard), not on a 401/403 page.
     await expect(page).toHaveURL(/\/welcome/, { timeout: 15_000 });
 

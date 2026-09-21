@@ -1,4 +1,4 @@
-/**
+﻿/**
  * dashboard page — module + data-layer test.
  *
  * P0-4: Successful login/signup must not 404. The /dashboard route
@@ -34,7 +34,7 @@ vi.mock("@/lib/auth", () => ({
 }));
 
 // Mock the container so we can stub the enrollment + course + user queries.
-// STORY-129 / Task 10: the dashboard now also calls `userRepo.findById` to
+// STORY-146 / Task 10: the dashboard now also calls `userRepo.findById` to
 // decide whether to render the NewUserDashboard first-run variant.
 const mockEnrollments = vi.fn();
 const mockCourseFindById = vi.fn();
@@ -196,7 +196,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     expect(mockCourseFindById).not.toHaveBeenCalled();
   });
 
-  // STORY-129 / Task 10: students who haven't completed the welcome tour
+  // STORY-146 / Task 10: students who haven't completed the welcome tour
   // AND have no active enrollments see the NewUserDashboard first-run
   // variant instead of the regular dashboard.
   it("renders the NewUserDashboard variant when the user has no enrollments and hasn't completed the welcome tour", async () => {

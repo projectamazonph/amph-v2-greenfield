@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -12,7 +12,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => mockUsePathname(),
 }));
 
-// STORY-129: these nav tests pre-date the "?" badge; they assume a
+// STORY-146: these nav tests pre-date the "?" badge; they assume a
 // returning student who already completed the welcome tour so the
 // badge stays out of the rendered tree.
 const RETURNING_USER = {

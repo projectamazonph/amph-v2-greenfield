@@ -1,4 +1,4 @@
-// This is your Prisma schema file,
+﻿// This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -57,7 +57,7 @@ model User {
   emailVerifiedAt        DateTime?
   verificationStatus     VerificationStatus @default(UNVERIFIED)
 
-  // STORY-129: first-run welcome walkthrough. Null until the student
+  // STORY-146: first-run welcome walkthrough. Null until the student
   // completes the guided tour; backfilled to createdAt for existing
   // users so the dashboard variant doesn't appear retroactively.
   welcomeCompletedAt     DateTime?

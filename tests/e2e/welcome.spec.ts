@@ -1,5 +1,5 @@
-/**
- * Playwright E2E tests — STORY-129 first-run welcome tour.
+﻿/**
+ * Playwright E2E tests — STORY-146 first-run welcome tour.
  *
  * Exercises the full onboarding slice end-to-end:
  *   1. No-tier signup lands on /welcome (Task 8 rerouted /dashboard
@@ -27,7 +27,7 @@ import { clearE2EUsers } from "./helpers/seed";
 const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 const DATABASE_URL = process.env.DATABASE_URL ?? "";
 
-test.describe("Welcome tour (STORY-129)", () => {
+test.describe("Welcome tour (STORY-146)", () => {
   test.afterEach(async () => {
     if (DATABASE_URL) {
       await clearE2EUsers(DATABASE_URL);

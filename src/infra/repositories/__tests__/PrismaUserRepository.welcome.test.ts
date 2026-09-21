@@ -1,5 +1,5 @@
-/**
- * PrismaUserRepository.welcome.test.ts — STORY-129.
+﻿/**
+ * PrismaUserRepository.welcome.test.ts — STORY-146.
  *
  * Scoped to the welcome-completion surface added to PrismaUserRepository
  * (markWelcomeCompleted, resetWelcome). Mirrors the per-method test-file
@@ -98,7 +98,7 @@ class FakePrismaClient {
   };
 }
 
-describe("PrismaUserRepository — welcome (STORY-129)", () => {
+describe("PrismaUserRepository — welcome (STORY-146)", () => {
   let db: FakePrismaClient;
   let repo: PrismaUserRepository;
 

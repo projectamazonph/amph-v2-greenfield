@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 /// <reference types="@testing-library/jest-dom" />
 
 import "vitest-axe/extend-expect";
@@ -24,7 +24,7 @@ vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     enrollmentRepo: { findByUserId: mockEnrollments },
     courseRepo: { findById: mockCourseFindById },
-    // STORY-129 / Task 10: the dashboard now also calls `userRepo.findById`
+    // STORY-146 / Task 10: the dashboard now also calls `userRepo.findById`
     // to decide whether to render the NewUserDashboard first-run variant.
     userRepo: { findById: mockUserFindById },
   }),
@@ -53,7 +53,7 @@ function makeUser() {
     verificationStatus: "VERIFIED",
     enrolledCourseIds: [],
     createdAt: new Date("2025-01-01"),
-    // STORY-129: returning student so the sidebar "?" badge stays out of
+    // STORY-146: returning student so the sidebar "?" badge stays out of
     // the audit's a11y scan (only relevant when welcome is incomplete
     // and the account is < 7 days old).
     welcomeCompletedAt: new Date("2025-01-02"),

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * User entity — the canonical representation of an AMPH student or instructor.
  *
  * This is a **domain object** — no framework annotations, no database mapping.
@@ -54,7 +54,7 @@ export interface User {
    */
   readonly emailVerifiedAt: Date | null;
   /**
-   * STORY-129: timestamp of when the student completed the first-run
+   * STORY-146: timestamp of when the student completed the first-run
    * welcome walkthrough. Null until then. Once set, the dashboard
    * stops rendering the NewUserDashboard variant and the sidebar
    * "?" badge fades out.
@@ -142,7 +142,7 @@ export function isInstructor(user: User): boolean {
   return user.role === "INSTRUCTOR" || user.role === "ADMIN";
 }
 
-/** STORY-129: has this student finished the first-run welcome? */
+/** STORY-146: has this student finished the first-run welcome? */
 export function hasCompletedWelcome(user: User): boolean {
   return user.welcomeCompletedAt !== null;
 }

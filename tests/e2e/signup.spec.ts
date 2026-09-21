@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Playwright E2E tests — Story 005.
  *
  * Runs against the actual Next.js dev server.
@@ -56,7 +56,7 @@ test.describe("Sign Up", () => {
 
   test("happy path: sign up auto-logs in and lands on /welcome", async ({ page }) => {
     // STORY-005 happy path. The action performs SignUp + Login +
-    // plantCookie + redirect("/welcome") in sequence. STORY-129 (Task 8)
+    // plantCookie + redirect("/welcome") in sequence. STORY-146 (Task 8)
     // rerouted no-tier signups from /dashboard to /welcome so new
     // students go through the onboarding wizard instead of dropping
     // straight into the regular dashboard. We assert the end state
@@ -84,7 +84,7 @@ test.describe("Sign Up", () => {
     await page.getByRole("button", { name: /create account/i }).click();
 
     // First signup succeeds: the route handler sets the session cookie
-    // and 303-redirects to /welcome (STORY-129 / Task 8 rerouted no-tier
+    // and 303-redirects to /welcome (STORY-146 / Task 8 rerouted no-tier
     // signups here from /dashboard). Wait for the URL change AND for the
     // welcome page to finish loading so the next `page.goto` doesn't
     // race a still-in-flight response.

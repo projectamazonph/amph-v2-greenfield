@@ -1,5 +1,5 @@
-/**
- * NewUserDashboard — first-run dashboard variant (STORY-129).
+﻿/**
+ * NewUserDashboard — first-run dashboard variant (STORY-146).
  *
  * Renders for students who have just signed up and not yet completed the
  * welcome tour. Big "Pick your first course" hero, a what-you'll-find grid

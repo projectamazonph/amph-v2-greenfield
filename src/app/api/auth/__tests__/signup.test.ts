@@ -1,4 +1,4 @@
-/**
+﻿/**
  * signup.test.ts — TDD coverage for /api/auth/signup route (STORY-066 follow-up).
  *
  * The route is a thin shell that:
@@ -6,7 +6,7 @@
  * 2. Calls performSignUp with the production container
  * 3. Sets the auth cookie on the redirect response
  * 4. Returns 303 to /welcome (no tier) or /checkout?pricingTier=<tier>
- *    (tier selected) — STORY-129 moved the no-tier destination from
+ *    (tier selected) — STORY-146 moved the no-tier destination from
  *    /dashboard to /welcome so new students are routed through the
  *    onboarding wizard.
  *
@@ -108,7 +108,7 @@ beforeEach(() => {
 
 describe("POST /api/auth/signup — happy path", () => {
   it("returns 303 to /welcome on success when no tier is selected", async () => {
-    // STORY-129: no-tier signups are routed through the onboarding
+    // STORY-146: no-tier signups are routed through the onboarding
     // wizard at /welcome instead of straight into the dashboard.
     const request = makeSignupRequest({
       email: "u@example.com",
@@ -123,7 +123,7 @@ describe("POST /api/auth/signup — happy path", () => {
 
   it("returns 303 to /checkout?pricingTier=<tier> when a tier is selected", async () => {
     // Tier-selected signups continue to bypass /welcome and land on
-    // the purchase-intent /checkout page, unchanged by STORY-129.
+    // the purchase-intent /checkout page, unchanged by STORY-146.
     const request = makeSignupRequest({
       email: "buyer@example.com",
       password: "Str0ngP@ss123!",

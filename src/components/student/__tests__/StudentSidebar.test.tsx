@@ -1,7 +1,7 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 
 /**
- * StudentSidebar — new-user "?" badge tests (STORY-129).
+ * StudentSidebar — new-user "?" badge tests (STORY-146).
  *
  * The badge appears next to the Dashboard link when:
  *   - welcomeCompletedAt === null, AND

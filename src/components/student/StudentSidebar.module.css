@@ -1,4 +1,4 @@
-/* StudentSidebar.module.css — Amazon PH simulator learner navigation. */
+﻿/* StudentSidebar.module.css — Amazon PH simulator learner navigation. */
 
 .sidebar {
   position: sticky;
@@ -176,7 +176,7 @@
   white-space: nowrap;
 }
 
-/* STORY-129: "?" badge that reopens the first-run welcome tour for
+/* STORY-146: "?" badge that reopens the first-run welcome tour for
    fresh students. Sits flush to the right of the Dashboard label
    and uses the project's amber-warning palette so it reads as a
    soft prompt, not an error. */

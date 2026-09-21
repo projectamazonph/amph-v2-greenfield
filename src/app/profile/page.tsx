@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /profile — student profile page.
  *
  * Shows the user's profile fields, earned badges, and a link
@@ -9,7 +9,7 @@
  * from /profile to /login. The page assumes `getSessionUser()`
  * returns a non-null user.
  *
- * STORY-129 / Task 12: a "Guided tour" section appears near the
+ * STORY-146 / Task 12: a "Guided tour" section appears near the
  * bottom of the visible content for users who have already completed
  * the first-run welcome. Submitting the form fires
  * `resetWelcomeAction`, which clears the welcome timestamp and
@@ -57,7 +57,7 @@ export default async function ProfilePage() {
   const badgesResult = await container.listUserBadges.execute({ userId: user.id });
   const badges = badgesResult.ok ? badgesResult.value.badges : [];
 
-  // STORY-129 / Task 12: re-fetch the user so the restart-section
+  // STORY-146 / Task 12: re-fetch the user so the restart-section
   // visibility check reads the freshest `welcomeCompletedAt`. Mirrors
   // `/welcome` (Task 9) and `/dashboard` (Task 10), where a stale
   // session would otherwise show the tour badge/button out of sync
