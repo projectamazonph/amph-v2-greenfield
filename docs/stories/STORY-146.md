@@ -4,7 +4,7 @@
 **Points:** 8
 **Epic:** Student experience
 **Owner:** Ryan
-**Status:** Ready to merge. Branch `onboarding` ahead of current `main`. Whole-branch review verdict: **READY TO MERGE** (post-review fixes applied per `PR #545` review).
+**Status:** Done. Merged to `main` at `918c532` via `PR #545` (squash). All gates green at merge time: typecheck, lint, architecture (TDD + SOLID), unit + integration, E2E (Playwright), build, learning release gate, Lighthouse CI, Vercel preview. Branch `onboarding` deleted.
 
 ## Goal
 

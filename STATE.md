@@ -1,12 +1,12 @@
 # Current project state
 
 **Project:** Project Amazon PH Academy v2
-**Reviewed:** 2026-09-17
-**Main:** `aea7e2a`
+**Reviewed:** 2026-09-21
+**Main:** `918c532`
 
 ## Active branches of interest
 
-- `onboarding` — **STORY-146 (student onboarding & first-run welcome) — READY TO MERGE.** Branch tip ahead of current `main`. Adds `welcomeCompletedAt` (User + migration with backfill), `CompleteWelcome`/`ResetWelcome` use cases (atomic `updateMany + where` idempotency), `welcome.action.ts` server actions, `/welcome` page with 5-step client stepper (URL fragment + localStorage), `NewUserDashboard` variant for fresh users, sidebar "?" badge (7-day window), profile restart link, signup-route redirect from `/dashboard` to `/welcome`, and Playwright E2E coverage. All 4 gates green (typecheck, lint, test, build); final whole-branch review verdict READY TO MERGE (post-review fixes applied per `PR #545` review). Spec at `docs/superpowers/specs/2026-09-20-student-onboarding-design.md`, plan at `docs/superpowers/plans/2026-09-20-student-onboarding.md`, SDD ledger at `.superpowers/sdd/2026-09-20-student-onboarding/progress.md`. Rebased onto current `main` (LEARN waves 3+); conflicts in `User.ts`, `container.ts`, `StudentSidebar.tsx`, and others were auto-resolved or kept cleanly.
+- _None._ STORY-146 (student onboarding & first-run welcome walkthrough) merged via `PR #545` at `918c532`. Adds `welcomeCompletedAt` (User + migration with backfill), `CompleteWelcome`/`ResetWelcome` use cases (atomic `updateMany + where` idempotency), `welcome.action.ts` server actions, `/welcome` page with 5-step client stepper (URL fragment + localStorage), `NewUserDashboard` variant for fresh users, sidebar "?" badge (7-day window), profile restart link, signup-route redirect from `/dashboard` to `/welcome`, Playwright E2E coverage, and follow-up quest `STORY-146.1` for any remaining a11y debt. All gates green at merge time: typecheck, lint, architecture (TDD + SOLID), unit + integration, E2E (Playwright), build, learning release gate, Lighthouse CI, and Vercel preview.
 
 ## Current learning-experience priority
 
