@@ -2,8 +2,8 @@
 
 **Last Updated:** 2026-09-07
 **Based On:** `content/CURRICULUM-INDEX.md` and `content/curriculum/modules/`
-**Total Planned Reading Time:** 443 minutes (~7 hours 23 minutes)
-**Total XP:** 3,730 points, excluding optional practice time
+**Total Planned Reading Time:** 475 minutes (~7 hours 55 minutes)
+**Total XP:** 3,880 points, excluding optional practice time
 
 ---
 
@@ -23,7 +23,7 @@ The curriculum is divided into **three connected courses**:
 
 | Course                      | Tier                      | Modules | Lessons | Total XP | Planned reading |
 | --------------------------- | ------------------------- | ------- | ------: | -------: | --------------: |
-| **PPC Foundations**         | `ppc-foundations`         | 0–4     |      19 |    1,575 |     231 minutes |
+| **PPC Foundations**         | `ppc-foundations`         | -1–4    |      22 |    1,725 |     263 minutes |
 | **Accelerated Mastery**     | `accelerated-mastery`     | 5–10    |      19 |    1,755 |     181 minutes |
 | **Ultimate Transformation** | `ultimate-transformation` | 11      |       4 |      400 |      31 minutes |
 
@@ -31,13 +31,25 @@ The curriculum is divided into **three connected courses**:
 
 ## 📖 Module Breakdown
 
-### **Module 0: Onboarding** (3 lessons, ~26 minutes, 150 XP)
+### **Module -1: Amazon and the PPC job** (3 lessons, ~28 minutes, 150 XP)
+
+**Purpose:** The zero-knowledge starting point for a learner who has never bought from or sold on Amazon.
+
+| #    | Lesson                                        | Type    | Duration | XP  | Learning Objectives                                                          |
+| ---- | --------------------------------------------- | ------- | -------- | --- | ---------------------------------------------------------------------------- |
+| -1.1 | What Amazon Is and How It Makes Money         | Reading | 10 min   | 50  | Explain what Amazon is, who shops and sells there, and where its revenue comes from |
+| -1.2 | Surfaces You Will Use                         | Reading | 8 min    | 50  | Name the four surfaces a PPC VA touches, describe each one, and find each one |
+| -1.3 | The Ad Object Model                           | Reading | 10 min   | 50  | Describe the five levels of the ads hierarchy and read a campaign structure on screen |
+
+---
+
+### **Module 0: Onboarding** (3 lessons, ~30 minutes, 150 XP)
 
 **Purpose:** Orient new VAs to the platform and establish the learning workflow.
 
 | #   | Lesson                                | Type    | Duration | XP  | Learning Objectives                                        |
 | --- | ------------------------------------- | ------- | -------- | --- | ---------------------------------------------------------- |
-| 0.1 | Welcome. Your Path to Amazon PPC Work | Reading | 8 min    | 50  | Understand the learning journey and expectations           |
+| 0.1 | Welcome. Your Path to Amazon PPC Work | Reading | 12 min   | 50  | Understand the learning journey and expectations           |
 | 0.2 | Platform Tour and Navigation          | Reading | 8 min    | 50  | Navigate the AMPH Academy platform effectively             |
 | 0.3 | Account Safety and the Client Brief   | Reading | 10 min   | 50  | Confirm facts and complete a client-brief intake checklist |
 
@@ -281,7 +293,7 @@ Every lesson follows the **"Read → Decide → Change → Explain"** methodolog
 
 ### **Time Investment**
 
-- **Reading baseline:** 443 planned minutes, plus simulations, worksheets, and review
+- **Reading baseline:** 475 planned minutes, plus simulations, worksheets, and review
 - **With Practice:** The actual time depends on scenario attempts, evidence quality, and feedback cycles
 - **Mastery:** Ongoing supervised practice, not a claim guaranteed by course completion
 
@@ -337,7 +349,7 @@ Every lesson follows the **"Read → Decide → Change → Explain"** methodolog
 
 ### **Content Roadmap**
 
-- **Current:** 42 lessons across 12 modules, with 12 module quizzes and five formative simulators.
+- **Current:** 45 lessons across 13 modules, with 12 module quizzes and five formative simulators.
 - **Next:** Connect the new operational lessons to saved learner-owned artefacts and the portfolio view.
 - **Later:** Add specialization tracks only after the Foundations-to-Capstone path is measured with beginner evidence.
 
