@@ -70,13 +70,13 @@
       "questions": [
         {
           "order": 1,
-          "question": "If you spend $200 on a keyword and receive 160 clicks, what is your CPC?",
-          "optionA": "$0.80",
-          "optionB": "$1.25",
-          "optionC": "$1.60",
-          "optionD": "$3.20",
+          "question": "If you spend ₱10,000 on a keyword and receive 160 clicks, what is your CPC?",
+          "optionA": "₱40",
+          "optionB": "₱62.50",
+          "optionC": "₱80",
+          "optionD": "₱160",
           "correctAnswer": "B",
-          "explanation": "CPC = Total Spend / Total Clicks = $200 / 160 = $1.25. This is your average cost for each click received."
+          "explanation": "CPC = Total Spend / Total Clicks = ₱10,000 / 160 = ₱62.50. This is your average cost for each click received."
         },
         {
           "order": 2,
@@ -96,7 +96,7 @@
           "optionC": "The total advertising cost of your entire account",
           "optionD": "The average cost per sale across all campaigns",
           "correctAnswer": "B",
-          "explanation": "ACoS (Advertising Cost of Sales) = Ad Spend / Ad Revenue. It tells you what percentage of your ad revenue goes toward ad costs. A 25% ACoS means you spend $0.25 on ads for every $1 in ad revenue."
+          "explanation": "ACoS (Advertising Cost of Sales) = Ad Spend / Ad Revenue. It tells you what percentage of your ad revenue goes toward ad costs. A 25% ACoS means you spend ₱25 on ads for every ₱100 in ad revenue."
         },
         {
           "order": 4,
@@ -121,12 +121,12 @@
         {
           "order": 6,
           "question": "If your RoAS is 4.0x, what does that mean?",
-          "optionA": "You get 4 clicks for every dollar spent",
-          "optionB": "You earn $4 in total revenue for every $1 spent on ads",
-          "optionC": "You earn $4 in ad revenue for every $1 spent on ads",
+          "optionA": "You get 4 clicks for every peso spent",
+          "optionB": "You earn ₱4 in total revenue for every ₱1 spent on ads",
+          "optionC": "You earn ₱4 in ad revenue for every ₱1 spent on ads",
           "optionD": "Your ACoS is 4%",
           "correctAnswer": "C",
-          "explanation": "RoAS = Ad Revenue / Ad Spend. A 4.0x RoAS means for every $1 in ad spend, you generate $4 in ad-attributed revenue. It's the inverse of ACoS: RoAS = 1 / ACoS."
+          "explanation": "RoAS = Ad Revenue / Ad Spend. A 4.0x RoAS means for every ₱1 in ad spend, you generate ₱4 in ad-attributed revenue. It's the inverse of ACoS: RoAS = 1 / ACoS."
         },
         {
           "order": 7,
@@ -180,7 +180,7 @@
         },
         {
           "order": 12,
-          "question": "Amazon's suggested bid range for a keyword is $0.90 to $1.30. Your calculated maximum CPC for the target ACoS is $0.60. What should you do?",
+          "question": "Amazon's suggested bid range for a keyword is ₱45 to ₱65. Your calculated maximum CPC for the target ACoS is ₱30. What should you do?",
           "optionA": "Bid within Amazon's suggested range since Amazon knows the auction best",
           "optionB": "Treat the suggested range as a signal to compare against your maximum, and bid at or below what your numbers support",
           "optionC": "Split the difference between the suggested range and your maximum",
@@ -207,13 +207,13 @@
         },
         {
           "order": 2,
-          "question": "A search term surfacing under one of your broader keywords gets 200 clicks and $150 in ad spend, with $0 in sales. What's the right read?",
+          "question": "A search term surfacing under one of your broader keywords gets 200 clicks and ₱7,500 in ad spend, with ₱0 in sales. What's the right read?",
           "optionA": "Its ACoS (advertising cost of sales, ad spend divided by ad sales) is 100%, which is acceptable",
           "optionB": "It's a strong candidate to add as a negative keyword. With zero sales, ACoS is undefined, not a fixed percentage, and this spend is pure waste",
           "optionC": "It should be given a higher bid to try to generate a sale",
-          "optionD": "Nothing needs to change since spend is under $200",
+          "optionD": "Nothing needs to change since spend is under ₱10,000",
           "correctAnswer": "B",
-          "explanation": "ACoS is spend divided by sales, which is undefined at $0 in sales, not 100%. 200 clicks and $150 spent with zero orders on this search term is a clear signal to add it as a negative so it stops draining budget under your broader keyword."
+          "explanation": "ACoS is spend divided by sales, which is undefined at ₱0 in sales, not 100%. 200 clicks and ₱7,500 spent with zero orders on this search term is a clear signal to add it as a negative so it stops draining budget under your broader keyword."
         },
         {
           "order": 3,
@@ -294,13 +294,13 @@
         },
         {
           "order": 2,
-          "question": "Two listings for the same product get the same clicks. Listing A has a CVR (conversion rate) of 12.5% and a $0.52 CPC (cost per click). Listing B has a 6.1% CVR and an $0.89 CPC. Which gets more sales per ad dollar, and roughly by how much?",
+          "question": "Two listings for the same product get the same clicks. Listing A has a CVR (conversion rate) of 12.5% and a ₱26 CPC (cost per click). Listing B has a 6.1% CVR and a ₱45 CPC. Which gets more sales per ad peso, and roughly by how much?",
           "optionA": "Listing B, by about 2x",
           "optionB": "They perform about the same",
           "optionC": "Listing A, by about 3.5x",
           "optionD": "Listing B, by about 3.5x",
           "correctAnswer": "C",
-          "explanation": "Sales per ad dollar scales with CVR divided by CPC. (0.125 / 0.52) divided by (0.061 / 0.89) is about 3.5. A weaker listing doesn't just convert worse, it multiplies the gap because it's also paying more per click for the same targeting."
+          "explanation": "Sales per ad peso scales with CVR divided by CPC. (0.125 ÷ ₱26) divided by (0.061 ÷ ₱45) is about 3.5. A weaker listing doesn't just convert worse, it multiplies the gap because it's also paying more per click for the same targeting."
         },
         {
           "order": 3,
@@ -431,7 +431,7 @@
         },
         {
           "order": 7,
-          "question": "Your exact-match campaign already targets \"garlic press\" at a $1.10 bid with a proven 18% CVR. Your broad-match campaign for the same product is also picking up clicks on the same search term at a $0.35 bid. What fixes this?",
+          "question": "Your exact-match campaign already targets \"garlic press\" at a ₱55 bid with a proven 18% CVR. Your broad-match campaign for the same product is also picking up clicks on the same search term at a ₱18 bid. What fixes this?",
           "optionA": "Raise the exact-match bid even higher to compensate",
           "optionB": "Add \"garlic press\" as a negative exact keyword inside the broad-match campaign",
           "optionC": "Delete the broad-match campaign entirely",
@@ -545,13 +545,13 @@
         },
         {
           "order": 2,
-          "question": "You're running a campaign with 50% placement adjustment for 'Top of Search'. If your default bid is $1.00, what is your maximum bid for top of search?",
-          "optionA": "$1.00",
-          "optionB": "$1.50",
-          "optionC": "$2.00",
-          "optionD": "$0.50",
+          "question": "You're running a campaign with 50% placement adjustment for 'Top of Search'. If your default bid is ₱50, what is your maximum bid for top of search?",
+          "optionA": "₱50",
+          "optionB": "₱75",
+          "optionC": "₱100",
+          "optionD": "₱25",
           "correctAnswer": "B",
-          "explanation": "A 50% placement adjustment increases your bid by 50% for that placement: $1.00 + ($1.00 × 0.50) = $1.50 maximum bid for top of search positions."
+          "explanation": "A 50% placement adjustment increases your bid by 50% for that placement: ₱50 + (₱50 × 0.50) = ₱75 maximum bid for top of search positions."
         },
         {
           "order": 3,
@@ -575,23 +575,23 @@
         },
         {
           "order": 5,
-          "question": "Your keyword has a CPC of $2.50, CVR of 8%, and your product price is $30 with 30% profit margin. What is your approximate ACoS?",
+          "question": "Your keyword has a CPC of ₱125, CVR of 8%, and your product price is ₱1,500 with 30% profit margin. What is your approximate ACoS?",
           "optionA": "8.3%",
           "optionB": "62.5%",
           "optionC": "104.2%",
           "optionD": "42.7%",
           "correctAnswer": "C",
-          "explanation": "Cost per order = CPC / CVR = $2.50 / 0.08 = $31.25. ACoS = Ad Spend / Ad Revenue = $31.25 / $30 = 104.2%. Since this exceeds 100%, you're paying more per order than the product price — this keyword is extremely unprofitable."
+          "explanation": "Cost per order = CPC / CVR = ₱125 / 0.08 = ₱1,562.50. ACoS = Ad Spend / Ad Revenue = ₱1,562.50 / ₱1,500 = 104.2%. Since this exceeds 100%, you're paying more per order than the product price — this keyword is extremely unprofitable."
         },
         {
           "order": 6,
-          "question": "A $1.00 base bid uses Dynamic Up and Down at its maximum +100% increase, stacked with a +900% top-of-search placement adjustment. What's the maximum possible effective bid at top of search?",
-          "optionA": "$1.00, since placement adjustments replace the dynamic increase rather than stacking with it",
-          "optionB": "$10.00, from the placement adjustment alone",
-          "optionC": "$20.00, since the two multipliers stack: $1.00 × 2.0 × 10.0",
-          "optionD": "$2.00, from the dynamic increase alone",
+          "question": "A ₱50 base bid uses Dynamic Up and Down at its maximum +100% increase, stacked with a +900% top-of-search placement adjustment. What's the maximum possible effective bid at top of search?",
+          "optionA": "₱50, since placement adjustments replace the dynamic increase rather than stacking with it",
+          "optionB": "₱500, from the placement adjustment alone",
+          "optionC": "₱1,000, since the two multipliers stack: ₱50 × 2.0 × 10.0",
+          "optionD": "₱100, from the dynamic increase alone",
           "correctAnswer": "C",
-          "explanation": "Dynamic bid adjustments and placement adjustments stack multiplicatively, not additively. At their combined maximum, a $1.00 base bid can become $1.00 × 2.0 (dynamic) × 10.0 (placement) = $20.00, a 20x multiplier that catches advertisers who only account for one of the two."
+          "explanation": "Dynamic bid adjustments and placement adjustments stack multiplicatively, not additively. At their combined maximum, a ₱50 base bid can become ₱50 × 2.0 (dynamic) × 10.0 (placement) = ₱1,000, a 20x multiplier that catches advertisers who only account for one of the two."
         },
         {
           "order": 7,
@@ -642,13 +642,13 @@
         },
         {
           "order": 4,
-          "question": "A search term has 500 impressions, 2 clicks, and 0 orders with $3.50 spend. What triage action should you consider?",
+          "question": "A search term has 500 impressions, 2 clicks, and 0 orders with ₱175 spend. What triage action should you consider?",
           "optionA": "Keep bidding — it might convert with more clicks",
           "optionB": "Increase your bid to get more visibility",
           "optionC": "Add as a negative keyword — the CTR is very low and it's spending without converting",
           "optionD": "Do nothing — 2 clicks is not enough data",
           "correctAnswer": "C",
-          "explanation": "CTR of 0.4% (2/500) is extremely low and the term has $3.50 spend with zero return. This indicates the search term is irrelevant to your product. Adding it as a negative prevents further waste."
+          "explanation": "CTR of 0.4% (2/500) is extremely low and the term has ₱175 spend with zero return. This indicates the search term is irrelevant to your product. Adding it as a negative prevents further waste."
         },
         {
           "order": 5,

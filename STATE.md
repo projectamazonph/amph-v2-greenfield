@@ -1,12 +1,17 @@
 # Current project state
 
 **Project:** Project Amazon PH Academy v2
-**Reviewed:** 2026-09-21
-**Main:** `918c532`
+**Reviewed:** 2026-09-22
+**Main:** `1f8c988`
 
 ## Active branches of interest
 
-- _None._ STORY-146 (student onboarding & first-run welcome walkthrough) merged via `PR #545` at `918c532`. Adds `welcomeCompletedAt` (User + migration with backfill), `CompleteWelcome`/`ResetWelcome` use cases (atomic `updateMany + where` idempotency), `welcome.action.ts` server actions, `/welcome` page with 5-step client stepper (URL fragment + localStorage), `NewUserDashboard` variant for fresh users, sidebar "?" badge (7-day window), profile restart link, signup-route redirect from `/dashboard` to `/welcome`, Playwright E2E coverage, and follow-up quest `STORY-146.1` for any remaining a11y debt. All gates green at merge time: typecheck, lint, architecture (TDD + SOLID), unit + integration, E2E (Playwright), build, learning release gate, Lighthouse CI, and Vercel preview.
+- `feat/quiz-peso-conversion` (STORY-150): the module quiz bank and the last literal-`$`
+  lesson figures converted to pesos, plus a curriculum currency contract test chained into
+  `pnpm validate:learning-release`. Open as `PR #554`.
+- Main is at `1f8c988` (`PR #553`). The curriculum content chain #546 to #553 is recorded in
+  "Latest merged repairs" below; the earlier session note about `PR #545` / STORY-146 is in
+  the CHANGELOG.
 
 ## Current learning-experience priority
 
@@ -29,6 +34,12 @@ job-readiness claims. Existing simulator scores remain formative.
 ## Latest merged repairs
 
 | PR | Commit | Result
+| #553 | `1f8c988` | STORY-149 peso magnitude repair. Three of #549's conversions had divided correct peso answers by about 50 to meet stale dollar inputs. Whole examples scaled by 50 and every printed ratio re-derived across `1.1` to `1.5`, `2.1` to `2.4`, `3.3`, `4.3`, `9.2`, `11.4` and `-1.1` (18 files). `2.3`'s search-term rows now sum to the totals that were already scaled |
+| #552 | `a48bca8` | STORY-148 retrieval checks. Nine `<SelfCheck>` blocks (`sc-6-1` to `sc-8-3`) added to Modules 6 to 8 on the tracked-attempt path, so answers persist instead of being throwaway; build-plan wave reconciliation |
+| #551 | `e338294` | STORY-147 source checker. `scripts/check-curriculum-sources.mjs` plus `pnpm check:curriculum-sources` reports fact cards missing an `Author`, a source link or a `Last verified` date, and lessons with no fact card at all. Eight-marker fact cards on `0.1`, `0.2`, `3.3`, `8.3`; Module 0 quiz wiring and 4 diagnostic `remediationRefs` closed. Left out of CI on purpose: Amazon's public pages are bot-gated, so a link check would flake |
+| #550 | `efee2d0` | Glossary: "auto campaign" defined and inlined at its first Module 2.2 use |
+| #549 | `8f09801` | Zero-knowledge foundations. Module -1 (3 lessons: what Amazon is, where ads appear, the ad object model) for learners with no marketplace background, 23 new glossary terms, Foundations peso conversion (magnitudes repaired later by #553), and arithmetic fixes across Module 1 |
+| #546 | `77c89bb` | Docs: post-merge cleanups for STORY-146 and a refreshed README |
 | #537 | `aea7e2a` | LEARN-042 capstone brief and rubric (STORY-142). Six deliverables mapped to artefact kinds; six-criterion 0–2 rubric passing at 9 of 12; pure readiness checker
 | #536 | `7c0c73b` | LEARN-041 targeted quiz remediation (STORY-141). remediationRefs tags on questions; pure plan builder; QuizPlayer renders What to revisit list
 | #534 | `fcfb1c1` | LEARN-034 save-from-debrief wiring (STORY-140). ToolDebrief gains optional saveAction bindings; Bid Elevator passes scenarioName + decision-log kind. Failed saves keep typed text; component tests cover disabled/success/error paths

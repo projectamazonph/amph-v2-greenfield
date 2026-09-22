@@ -162,7 +162,7 @@ Prompt: Make a 60-second video overview of this lesson. 0–10s: open with the r
 Source: `content/curriculum/modules/1-foundations/1.3-acos-tacos-profitability.mdx`
 Prompt: Make a 60-second video overview of this lesson. 0–10s: open with the real fear this answers: a scary-looking ACoS on a new campaign doesn't automatically mean it's losing money. 10–45s: walk through calculating break-even ACoS for a product, then reading TACoS alongside it to see the full sales picture, including organic sales. 45–60s: close with what the learner can now do: explain to a client why a launch campaign's high ACoS isn't automatically a problem. Tone: direct, plain-spoken, real numbers, no hype.
 
-**1.4: Every Dollar In, How Many Dollars Back? ROAS**
+**1.4: Every Peso In, How Many Pesos Back? ROAS**
 Source: `content/curriculum/modules/1-foundations/1.4-roas-measuring-return.mdx`
 Prompt: Make a 60-second video overview of this lesson. 0–10s: open with the real question: ROAS and ACoS say the same thing two different ways, so when does each framing actually help. 10–45s: walk through calculating ROAS and converting between ROAS and ACoS with a real example. 45–60s: close with what the learner can now do: pick whichever framing makes the number clearer for the person they're talking to. Tone: direct, plain-spoken, real numbers, no hype.
 
