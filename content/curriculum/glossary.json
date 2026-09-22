@@ -180,6 +180,12 @@
       "term": "Launch campaign",
       "shortDefinition": "A planned-loss campaign run while a new product gathers search-term data and reviews.",
       "longDefinition": "Launch campaigns commonly run 60 to 80% ACoS in the first month. That is not failure if the trajectory is downward. Judge launch campaigns on week-over-week trend, not day-one number."
+    },
+    {
+      "slug": "auto-campaign",
+      "term": "Auto-campaign",
+      "shortDefinition": "An Amazon-managed campaign where Amazon picks which shopper searches or products to target, instead of the seller specifying keywords or ASINs.",
+      "longDefinition": "Auto-campaigns (the Amazon UI calls them 'Automatic targeting' campaigns) are the fastest way to start gathering real search-term data on a brand-new product, because Amazon decides what to bid on from your product listing. The miner then exports the search-term report and graduates the converting search terms into manual keyword campaigns. Use a tight daily budget until the report has enough rows."
     }
   ]
 }
