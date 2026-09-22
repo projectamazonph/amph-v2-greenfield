@@ -200,3 +200,10 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* CLICK-PATH-006: notice shown when the toggle moved after a run. */
+.staleResult {
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  margin: 0;
+}

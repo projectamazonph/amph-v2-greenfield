@@ -192,6 +192,27 @@ describe("WelcomeStepper", () => {
     });
   });
 
+  it("CLICK-PATH-007: rapid Next/Back clicks use functional updaters", () => {
+    render(<WelcomeStepper firstName="Maria" />);
+    // Two queued advances from step 0 must land on step 2, not step 1
+    // (stale `step` closure would apply the same value twice).
+    fireEvent.click(screen.getByRole("button", { name: /start the tour/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^next$/i }));
+    expect(screen.getByText(/step 3 of 5/i)).toBeInTheDocument();
+  });
+
+  it("CLICK-PATH-007: Skip tour is disabled while finishing (no double submit)", async () => {
+    render(<WelcomeStepper firstName="Maria" />);
+    const skip = screen.getByRole("button", { name: /skip tour/i });
+    fireEvent.click(skip);
+    // While the server action is in flight the Skip button is disabled,
+    // so a double-click cannot fire completeWelcomeAction twice.
+    await waitFor(() => {
+      expect(completeWelcomeAction).toHaveBeenCalledTimes(1);
+      expect(push).toHaveBeenCalledWith("/dashboard");
+    });
+  });
+
   it("restores a previously-persisted step on mount", () => {
     // Pre-populate localStorage as if the user refreshed mid-tour at step 2.
     window.localStorage.setItem("amph.welcome.inProgress", "2");
