@@ -42,6 +42,144 @@
       "term": "Conversion rate",
       "shortDefinition": "Orders divided by clicks.",
       "longDefinition": "Conversion rate tells you what percentage of clicks became orders. A high CPC with a low conversion rate is a sign the listing page is the real problem, not the campaign."
+    },
+    {
+      "slug": "asin",
+      "term": "ASIN",
+      "shortDefinition": "Amazon Standard Identification Number. A 10-character code that identifies every product listing on Amazon.",
+      "longDefinition": "An ASIN looks like B07PXGQC41. Every product on Amazon has one, and every product-targeting ad is bid against one. When a client says 'advertise this product,' they mean this ASIN."
+    },
+    {
+      "slug": "sponsored-products",
+      "term": "Sponsored Products",
+      "shortDefinition": "The most common Amazon ad type. Individual product listings promoted inside search results and on product pages.",
+      "longDefinition": "Sponsored Products look like organic results but carry a small 'Sponsored' label. They are the default starting point for new PPC advertisers because they show for shopper search terms."
+    },
+    {
+      "slug": "sponsored-brands",
+      "term": "Sponsored Brands",
+      "shortDefinition": "Banner-style ads that appear above Amazon search results, showing a brand logo and up to three products.",
+      "longDefinition": "Sponsored Brands are banner ads with a custom headline and a brand logo. They require brand registry and are used by sellers who want to drive awareness of the brand rather than a single product."
+    },
+    {
+      "slug": "sponsored-display",
+      "term": "Sponsored Display",
+      "shortDefinition": "Amazon ads that run both on Amazon product pages and off-Amazon across the web, used for retargeting.",
+      "longDefinition": "Sponsored Display ads follow shoppers after they view a product, reminding them to return. They cost more to set up than Sponsored Products and are usually a later-stage tactic."
+    },
+    {
+      "slug": "fba",
+      "term": "FBA",
+      "shortDefinition": "Fulfillment by Amazon. Amazon stores, packs, and ships the seller's inventory.",
+      "longDefinition": "Most ads work is for FBA sellers. Amazon charges a per-unit FBA fee on each sale. The alternative is Fulfillment by Merchant (FBM), where the seller ships orders themselves."
+    },
+    {
+      "slug": "fbm",
+      "term": "FBM",
+      "shortDefinition": "Fulfillment by Merchant. The seller stores inventory and ships orders themselves.",
+      "longDefinition": "FBM sellers handle their own storage and shipping. FBM is cheaper per unit but slower for the shopper, and ads on FBM listings tend to convert less reliably."
+    },
+    {
+      "slug": "seller-central",
+      "term": "Seller Central",
+      "shortDefinition": "The seller-side platform at sellercentral.amazon.com, where listings, inventory, and orders are managed.",
+      "longDefinition": "A VA rarely logs into Seller Central directly. The seller owns the account. VAs use it for product details, fee schedules, and the Revenue Calculator."
+    },
+    {
+      "slug": "ads-console",
+      "term": "Ads Console",
+      "shortDefinition": "The advertising platform at advertising.amazon.com, also called Campaign Manager.",
+      "longDefinition": "This is where you create campaigns, edit bids, and pull reports. The Ads Console is separate from Seller Central: campaigns live here, listings live there."
+    },
+    {
+      "slug": "search-term",
+      "term": "Search term",
+      "shortDefinition": "The actual words a shopper typed into Amazon's search box.",
+      "longDefinition": "A search term is different from a keyword. The keyword is what the advertiser bid on; the search term is what triggered the ad. The two often differ, which is why a search-term report matters."
+    },
+    {
+      "slug": "keyword",
+      "term": "Keyword",
+      "shortDefinition": "A word or phrase the advertiser bids on, chosen to match shopper searches.",
+      "longDefinition": "Keywords are organized inside campaigns and ad groups. The match type setting (exact, phrase, broad) controls how loosely the keyword must match the actual search term."
+    },
+    {
+      "slug": "match-type",
+      "term": "Match type",
+      "shortDefinition": "How tightly a keyword must match a shopper's search term to trigger the ad.",
+      "longDefinition": "Three match types: exact (only that exact search), phrase (search contains the phrase in order), broad (loosely related searches). Exact costs more per click but converts better."
+    },
+    {
+      "slug": "search-term-report",
+      "term": "Search-term report",
+      "shortDefinition": "A report from the Ads Console listing the actual shopper searches that triggered each ad.",
+      "longDefinition": "Pull this report weekly. It shows which search terms are spending money. Negative the irrelevant ones, harvest the relevant ones as new keywords."
+    },
+    {
+      "slug": "organic-sales",
+      "term": "Organic sales",
+      "shortDefinition": "Orders from shoppers who found the product without clicking an ad.",
+      "longDefinition": "Organic sales happen when a shopper finds a product through Amazon's normal search ranking or direct navigation, with no ad click. They count toward TACoS but not ACoS."
+    },
+    {
+      "slug": "featured-offer",
+      "term": "Featured offer",
+      "shortDefinition": "The listing position a shopper can add to cart from. Also called the 'buy box.'",
+      "longDefinition": "On most product pages, only one seller wins the buy box at a time. Ads do not buy the buy box; they direct shoppers to a listing that competes for it on price, stock, and seller metrics."
+    },
+    {
+      "slug": "backend-keywords",
+      "term": "Backend keywords",
+      "shortDefinition": "Search terms the seller lists in Seller Central, hidden from the customer-facing product page.",
+      "longDefinition": "Backend keywords help Amazon's search algorithm match the listing to more shopper searches. The shopper never sees them. They are part of listing optimization, not ads."
+    },
+    {
+      "slug": "bid",
+      "term": "Bid",
+      "shortDefinition": "The maximum CPC the advertiser sets for a keyword or product target.",
+      "longDefinition": "Your bid is the most you tell Amazon you are willing to pay per click. The actual CPC you pay is usually lower, because Amazon's auction charges the minimum needed to win."
+    },
+    {
+      "slug": "daily-budget",
+      "term": "Daily budget",
+      "shortDefinition": "The spend cap on a campaign per 24-hour period.",
+      "longDefinition": "Amazon pauses the campaign once the daily budget is hit. A campaign can spend up to twice its daily budget on a high-traffic day, which surprises new advertisers."
+    },
+    {
+      "slug": "campaign-status",
+      "term": "Campaign status",
+      "shortDefinition": "Whether a campaign is paused, enabled, or archived.",
+      "longDefinition": "Enabled means the campaign is running and can serve ads. Paused means ads stop but settings stay. Archived means the campaign is closed and removed from default views."
+    },
+    {
+      "slug": "impression",
+      "term": "Impression",
+      "shortDefinition": "One showing of an ad.",
+      "longDefinition": "If Amazon displays your ad and a shopper scrolls past without clicking, that is one impression and zero clicks. CTR is the ratio of clicks to impressions."
+    },
+    {
+      "slug": "click",
+      "term": "Click",
+      "shortDefinition": "One shopper selecting your ad.",
+      "longDefinition": "Amazon charges your CPC for each click. The shopper lands on the product detail page. A click is not yet an order; the conversion happens after."
+    },
+    {
+      "slug": "order-vs-sale",
+      "term": "Order vs sale",
+      "shortDefinition": "An order is what the shopper places; a sale is what the seller keeps after returns.",
+      "longDefinition": "ACoS uses ad sales, which counts orders minus returns. A 20% return rate means a reported ₱1,000 in ad sales is actually ₱800 in kept sales, and the real ACoS is worse than the report shows."
+    },
+    {
+      "slug": "returns",
+      "term": "Returns",
+      "shortDefinition": "Orders the customer sent back. Amazon refunds the sale and the seller loses product cost and referral fee.",
+      "longDefinition": "Categories like apparel have return rates of 15 to 30%. Factor expected returns into any profitability calculation for a category with high return rates."
+    },
+    {
+      "slug": "launch-campaign",
+      "term": "Launch campaign",
+      "shortDefinition": "A planned-loss campaign run while a new product gathers search-term data and reviews.",
+      "longDefinition": "Launch campaigns commonly run 60 to 80% ACoS in the first month. That is not failure if the trajectory is downward. Judge launch campaigns on week-over-week trend, not day-one number."
     }
   ]
 }

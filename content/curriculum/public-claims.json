@@ -4,32 +4,55 @@
     "ppc-foundations": {
       "label": "PPC Foundations",
       "tier": "pp-foundations",
-      "moduleNumbers": [0, 1, 2, 3, 4],
-      "lessonCount": 19,
-      "plannedMinutes": 231
+      "moduleNumbers": [
+        -1,
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "lessonCount": 22,
+      "plannedMinutes": 263
     },
     "accelerated-mastery": {
       "label": "Accelerated Mastery",
       "tier": "accelerated-mastery",
-      "moduleNumbers": [5, 6, 7, 8, 9, 10],
+      "moduleNumbers": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
       "lessonCount": 19,
       "plannedMinutes": 181
     },
     "ultimate-transformation": {
       "label": "Ultimate Transformation",
       "tier": "ultimate-transformation",
-      "moduleNumbers": [11],
+      "moduleNumbers": [
+        11
+      ],
       "lessonCount": 4,
       "plannedMinutes": 31
     }
   },
   "modules": [
     {
+      "moduleNumber": -1,
+      "name": "Amazon and the PPC job",
+      "courseSlug": "ppc-foundations",
+      "lessonCount": 3,
+      "plannedMinutes": 28
+    },
+    {
       "moduleNumber": 0,
       "name": "Onboarding",
       "courseSlug": "ppc-foundations",
       "lessonCount": 3,
-      "plannedMinutes": 26
+      "plannedMinutes": 30
     },
     {
       "moduleNumber": 1,
@@ -110,14 +133,33 @@
     }
   ],
   "simulators": {
-    "bid-elevator": { "label": "Bid Elevator", "availability": "public-preview" },
-    "campaign-builder": { "label": "Campaign Builder", "availability": "enrolled-practice" },
-    "str-triage": { "label": "Search Term Triage", "availability": "enrolled-practice" },
-    "listing-audit": { "label": "Listing Audit", "availability": "enrolled-practice" },
-    "keyword-research": { "label": "Keyword Research", "availability": "enrolled-practice" }
+    "bid-elevator": {
+      "label": "Bid Elevator",
+      "availability": "public-preview"
+    },
+    "campaign-builder": {
+      "label": "Campaign Builder",
+      "availability": "enrolled-practice"
+    },
+    "str-triage": {
+      "label": "Search Term Triage",
+      "availability": "enrolled-practice"
+    },
+    "listing-audit": {
+      "label": "Listing Audit",
+      "availability": "enrolled-practice"
+    },
+    "keyword-research": {
+      "label": "Keyword Research",
+      "availability": "enrolled-practice"
+    }
   },
   "tierSimulatorTargets": {
-    "pp-foundations": ["campaign-builder", "bid-elevator", "str-triage"],
+    "pp-foundations": [
+      "campaign-builder",
+      "bid-elevator",
+      "str-triage"
+    ],
     "accelerated-mastery": [
       "campaign-builder",
       "bid-elevator",

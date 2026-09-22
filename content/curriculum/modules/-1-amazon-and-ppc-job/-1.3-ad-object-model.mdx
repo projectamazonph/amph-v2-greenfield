@@ -1,0 +1,142 @@
+---
+title: "The Ad Object Model"
+slug: "-1.3-ad-object-model"
+moduleNumber: -1
+lessonNumber: 3
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Describe the four levels of an Amazon ads hierarchy (account > campaign > ad group > keyword/target > ad), explain what each level controls, and read a campaign structure on screen.
+
+## The decision in one sentence
+
+Every change you make happens at one of the five levels of the ads hierarchy. Pick the right level before you pick the lever.
+
+(The artifact you record from this lesson: a written record or diagram of the five-level hierarchy. That record is your evidence that you can identify which level a setting lives at before recommending a change.)
+
+## The hierarchy at a glance
+
+Amazon ads are organized like nested folders. Each level has its own settings, and changes at a higher level apply to everything below it.
+
+```
+Ads account (the seller's whole ads presence)
+└── Campaign (your budget, your bid strategy, your objective)
+    └── Ad group (your targeting: keywords or product targets)
+        └── Keyword or product target (what you bid on)
+            └── Ad (the title, image, brand the shopper sees)
+```
+
+A small account might have one campaign with one ad group with ten keywords and one ad. A large account might have 30 campaigns with hundreds of ad groups each. The shape varies, but the levels are always the same.
+
+## Level 1: the ads account
+
+The ads account is the top-level container. There is one account per seller. Your client owns it. You log into it using their credentials (or a delegated user account, depending on the seller's setup).
+
+The account holds:
+
+- Billing information (the credit card Amazon charges for ad spend).
+- User permissions (which people can log in and what they can change).
+- A list of all campaigns.
+
+You will rarely make changes at the account level. The seller sets up billing. You work inside campaigns.
+
+## Level 2: the campaign
+
+The campaign is the most important level for a PPC VA. Every change that affects budget, targeting breadth, or bid strategy happens here. A campaign has:
+
+- A name. Pick a name that describes what the campaign is doing, like "Bamboo Cutting Board - Exact Match - Launch."
+- A daily budget. The maximum the campaign will spend per day. Amazon may spend up to twice the daily budget on a high-traffic day.
+- A bid strategy. The rule Amazon uses to adjust your bid in each auction. There are three main strategies: dynamic bids (up and down), dynamic bids (down only), and fixed bids. Each behaves differently.
+- A campaign status: paused, enabled, or archived. Paused means ads stop but settings stay. Enabled means ads can run. Archived means the campaign is closed.
+- A start date (and optional end date).
+
+Changing the campaign's daily budget affects every ad group and keyword inside it. Changing the bid strategy affects how Amazon bids for every keyword inside it. This is why campaign-level changes are the most powerful and the most dangerous.
+
+## Level 3: the ad group
+
+Inside a campaign, ad groups let you group related keywords together. A common pattern is one ad group per match type (exact, phrase, broad) or one ad group per product. The ad group has:
+
+- A default bid: the bid used for any keyword in the ad group that does not have its own override.
+- A list of keywords or product targets: what the ad group bids on.
+- A list of ads: which ads Amazon can serve when the ad group wins an auction.
+
+A campaign can have one ad group or many. A common beginner pattern is one campaign with one ad group with all the keywords. That works for small accounts but limits control as the account grows.
+
+## Level 4: the keyword or product target
+
+Inside the ad group, you list the things you want to bid on. There are two kinds:
+
+- A keyword is a word or phrase. When a shopper searches for something that matches your keyword (according to the match type), Amazon considers your ad for the auction. Examples: "bamboo cutting board," "wooden cutting board large," "bamboo cutting board with handle."
+- A product target is an ASIN. When a shopper views that specific product's detail page, Amazon considers your ad for the auction. Example: ASIN B07PXGQC41.
+
+Each keyword or product target has its own bid, which overrides the ad group's default bid if set.
+
+Three match types control how loosely a keyword can match a shopper's search:
+
+- Exact: the shopper's search must be the same as your keyword. Tightest match, highest CTR, highest CPC.
+- Phrase: the shopper's search must contain your keyword in the same order. Middle ground.
+- Broad: the shopper's search can be loosely related. Widest match, lowest CPC, most irrelevant clicks.
+
+Lesson 2.1 covers match types in detail.
+
+## Level 5: the ad
+
+The ad is what the shopper sees. For Sponsored Products, an ad is built from the product listing itself (the main image, the title, the price). You do not write the ad copy for a Sponsored Products ad; the listing does. You choose which products to advertise.
+
+For Sponsored Brands, the ad includes a custom headline, a brand logo, and up to three products. You write the headline.
+
+For Sponsored Display, the ad is an image or product card that runs both on Amazon and off-Amazon.
+
+The same keyword can have multiple ads. Amazon rotates them and shows the one that historically performs best for that search. This is "dynamic creative optimization," and it happens automatically.
+
+## How a click happens
+
+When a shopper searches for "bamboo cutting board," Amazon runs an internal auction. Every ad whose keyword matches the search term (per its match type) enters the auction. Amazon scores each ad by a formula that combines the bid, the ad's relevance, and the predicted conversion rate. The winners get placed in the sponsored slots on the search results page.
+
+You will not see the auction. You see only the result: some clicks, some spend, some sales. The auction is what determines whether you pay ₱20 per click or ₱80 per click for the same keyword.
+
+## Why the hierarchy matters
+
+A common beginner mistake is to make changes at the wrong level. Examples:
+
+- Lowering the bid on one keyword when the issue is the bid strategy on the campaign. The keyword-level bid override is fighting the campaign-level strategy.
+- Adding a single keyword to an ad group when the issue is the ad group's targeting. The keyword will be drowned out by the broader targeting.
+- Raising the daily budget when the issue is the listing converting poorly. More spend will just buy more clicks that do not convert.
+
+The fix is to pick the right level before you pick the lever. Module 4 covers campaign architecture in detail.
+
+## Your turn
+
+You are looking at a Sponsored Products campaign in the Ads Console. The campaign shows three ad groups. Each ad group has between 20 and 50 keywords. One ad group has a default bid of ₱25 and one specific keyword with an override bid of ₱60.
+
+In one paragraph, explain to the client why the ₱60 keyword is more expensive than the others, what they should check before accepting that cost, and what level of the hierarchy they would change to address it.
+
+## Quick check
+
+1. Which level controls the daily budget: the account, the campaign, the ad group, or the keyword?
+2. If you want to add a new keyword to an existing campaign, which level do you edit?
+3. What is the difference between a keyword and a product target?
+4. Which Amazon ad type lets you write a custom headline: Sponsored Products, Sponsored Brands, or Sponsored Display?
+
+**Answers:** (1) The campaign. (2) The ad group, which holds the keyword list inside the campaign. (3) A keyword is a word or phrase you bid on for searches. A product target is an ASIN you bid on for product pages. (4) Sponsored Brands. Sponsored Products ads use the product listing as the creative.
+
+## Key takeaway
+
+Five levels: account > campaign > ad group > keyword or product target > ad. The campaign level is where most of your decisions live: budget, bid strategy, status. The ad group is where targeting gets specific. The keyword or product target is the actual bid. The ad is the creative the shopper sees.
+
+## Fact card
+
+```text
+Product or feature: The Amazon Ads hierarchy (account, campaign, ad group, keyword or product target, ad)
+What the learner can do: Read a campaign structure on screen, identify which level a setting lives at, and route a change to the correct level
+Who can access it: Any Sponsored Products, Sponsored Brands, or Sponsored Display advertiser
+Retailer or marketplace scope: Amazon Advertising Console, all marketplaces
+Official source URL: https://advertising.amazon.com/help - the campaign-structure article for Sponsored Products, which covers the same hierarchy
+Last verified: pending content-owner review
+Next review due: pending content-owner review
+Owner: Ryan Roland Dabao
+```
