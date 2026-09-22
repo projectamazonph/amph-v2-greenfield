@@ -27,7 +27,7 @@ This is the post-content-track version: legacy product references (AdCraft, AI M
 | 1.1 | Read PPC Data Before You Change PPC Data                          | reading | 15  | 75  |
 | 1.2 | Is My Ad Worth Clicking? CPC and CTR                              | reading | 12  | 75  |
 | 1.3 | Am I Making Money or Losing Money? ACoS, TACoS, and Profitability | reading | 15  | 100 |
-| 1.4 | Every Dollar In, How Many Dollars Back? ROAS                      | reading | 12  | 75  |
+| 1.4 | Every Peso In, How Many Pesos Back? ROAS                          | reading | 12  | 75  |
 | 1.5 | Reading the Story Your Metrics Tell                               | reading | 15  | 100 |
 
 **Purpose:** the metric vocabulary. ACoS / TACoS / ROAS / CPC / CTR are taught as a **set of trade-offs**, not as isolated formulas.

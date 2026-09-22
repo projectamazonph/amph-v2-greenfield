@@ -58,7 +58,7 @@ The curriculum is divided into **three connected courses**:
 | 1.1 | Read PPC Data Before You Change PPC Data                          | Reading | 15 min   | 75  | Read the six core metrics as one diagnostic system before changing anything |
 | 1.2 | Is My Ad Worth Clicking? CPC and CTR                              | Reading | 12 min   | 75  | Master Cost-Per-Click and Click-Through Rate metrics                        |
 | 1.3 | Am I Making Money or Losing Money? ACoS, TACoS, and Profitability | Reading | 15 min   | 100 | Calculate break-even ACoS and read TACoS alongside it                       |
-| 1.4 | Every Dollar In, How Many Dollars Back? ROAS                      | Reading | 12 min   | 75  | Calculate and interpret Return on Ad Spend                                  |
+| 1.4 | Every Peso In, How Many Pesos Back? ROAS                          | Reading | 12 min   | 75  | Calculate and interpret Return on Ad Spend                                  |
 | 1.5 | Reading the Story Your Metrics Tell                               | Reading | 15 min   | 100 | Apply metrics in real-world scenarios                                       |
 
 **Key Concepts:**

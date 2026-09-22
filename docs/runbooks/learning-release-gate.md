@@ -43,8 +43,10 @@ pnpm validate:learning-release
 ```
 
 Confirm that the landing page, tier cards, planned time, simulator availability,
-and certificate wording match the reviewed claim config. Attach the output to
-the release record.
+and certificate wording match the reviewed claim config. The same run checks the
+currency contract: every money amount a lesson body or the quiz bank states must
+carry a peso sign, never a dollar sign in front of a digit (STORY-149,
+STORY-150). Attach the output to the release record.
 
 ## 4. Run the logged-in learner smoke
 
@@ -82,6 +84,7 @@ The `Learning release gate` CI job runs source inventory, tool-bridge
 validation, and public-claim validation after the quality, unit, and
 Playwright jobs pass. `pnpm validate:learning-release` chains
 `validate:curriculum` (LEARN-001), `validate:tool-bridges` (LEARN-030),
-and the public-claim contract test. CI proves the checked-in contract;
+the public-claim contract test, and the curriculum currency contract test.
+CI proves the checked-in contract;
 the staging import output and logged-in URL above remain release
 evidence that must be attached by the operator.
