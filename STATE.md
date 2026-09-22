@@ -1,17 +1,18 @@
 # Current project state
 
 **Project:** Project Amazon PH Academy v2
-**Reviewed:** 2026-09-22
-**Main:** `1f8c988`
+**Reviewed:** 2026-09-23
+**Main:** `506c25f`
 
 ## Active branches of interest
 
-- `feat/quiz-peso-conversion` (STORY-150): the module quiz bank and the last literal-`$`
-  lesson figures converted to pesos, plus a curriculum currency contract test chained into
-  `pnpm validate:learning-release`. Open as `PR #554`.
-- Main is at `1f8c988` (`PR #553`). The curriculum content chain #546 to #553 is recorded in
-  "Latest merged repairs" below; the earlier session note about `PR #545` / STORY-146 is in
-  the CHANGELOG.
+- `fix/curriculum-doc-drift` (STORY-151): Module -1 added to the two human-facing
+  curriculum maps, their totals corrected, the `-1.3` level-count objective and the `4.3`
+  hierarchy diagram fixed, and a new test that keeps the maps pinned to lesson frontmatter.
+- Main is at `506c25f` (`PR #554`, quiz bank and lesson leftovers converted to pesos plus
+  the curriculum currency contract test). The curriculum content chain #546 to #554 is in
+  "Latest merged repairs" below; the earlier `PR #545` / STORY-146 note lives in the
+  CHANGELOG.
 
 ## Current learning-experience priority
 
@@ -34,6 +35,7 @@ job-readiness claims. Existing simulator scores remain formative.
 ## Latest merged repairs
 
 | PR | Commit | Result
+| #554 | `506c25f` | STORY-150 peso conversion for the assessment layer. The module quiz bank (52 dollar amounts across 32 fields in 11 questions) and the four literal-`$` figures `PR #553`'s peso-only scan could not see are now in pesos, and lesson 1.4 is titled "Every Peso In, How Many Pesos Back? ROAS" in all seven places instead of contradicting its own body. New `CurriculumCurrency.test.ts` fails on a dollar sign in front of a digit in any lesson body or the quiz, diagnostic, glossary and capstone data, and is chained into `pnpm validate:learning-release` |
 | #553 | `1f8c988` | STORY-149 peso magnitude repair. Three of #549's conversions had divided correct peso answers by about 50 to meet stale dollar inputs. Whole examples scaled by 50 and every printed ratio re-derived across `1.1` to `1.5`, `2.1` to `2.4`, `3.3`, `4.3`, `9.2`, `11.4` and `-1.1` (18 files). `2.3`'s search-term rows now sum to the totals that were already scaled |
 | #552 | `a48bca8` | STORY-148 retrieval checks. Nine `<SelfCheck>` blocks (`sc-6-1` to `sc-8-3`) added to Modules 6 to 8 on the tracked-attempt path, so answers persist instead of being throwaway; build-plan wave reconciliation |
 | #551 | `e338294` | STORY-147 source checker. `scripts/check-curriculum-sources.mjs` plus `pnpm check:curriculum-sources` reports fact cards missing an `Author`, a source link or a `Last verified` date, and lessons with no fact card at all. Eight-marker fact cards on `0.1`, `0.2`, `3.3`, `8.3`; Module 0 quiz wiring and 4 diagnostic `remediationRefs` closed. Left out of CI on purpose: Amazon's public pages are bot-gated, so a link check would flake |

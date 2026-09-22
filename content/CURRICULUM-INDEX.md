@@ -2,9 +2,21 @@
 
 **Source:** `content/curriculum/modules/`
 **Status:** Migrated 2026-07-18 from `projectamazonph/amph-v2` `content/curriculum/`
-**Total:** 12 modules · 42 lessons · 12 module-final quizzes
+**Total:** 13 modules · 45 lessons · 12 module-final quizzes
 
 This is the post-content-track version: legacy product references (AdCraft, AI Mentor, Formula Calculator, "three simulations") have been stripped, and 5 factual corrections have been applied with Amazon Ads Fact Cards.
+
+---
+
+## Module -1 — Amazon and the PPC job (`-1-amazon-and-ppc-job/`)
+
+| #    | Lesson                                                            | Type    | Min | XP |
+| ---- | ----------------------------------------------------------------- | ------- | --- | -- |
+| -1.1 | What Amazon Is and How It Makes Money                             | reading | 10  | 50 |
+| -1.2 | Surfaces You Will Use                                             | reading | 8   | 50 |
+| -1.3 | The Ad Object Model                                               | reading | 10  | 50 |
+
+**Purpose:** the zero-knowledge starting point, for a learner who has never bought from or sold on Amazon. What the company is and how it makes money, the four surfaces a PPC VA actually works in, and the five levels of the ads hierarchy, before any metric is defined.
 
 ---
 
@@ -12,7 +24,7 @@ This is the post-content-track version: legacy product references (AdCraft, AI M
 
 | #   | Lesson                                                                                   | Type    | Min | XP  |
 | --- | ---------------------------------------------------------------------------------------- | ------- | --- | --- |
-| 0.1 | [Welcome. Your Path to Amazon PPC Work](curriculum/modules/0-onboarding/0.1-welcome.mdx) | reading | 8   | 50  |
+| 0.1 | [Welcome. Your Path to Amazon PPC Work](curriculum/modules/0-onboarding/0.1-welcome.mdx) | reading | 12  | 50  |
 | 0.2 | Platform Tour and Navigation                                                             | reading | 8   | 50  |
 | 0.3 | Account Safety and the Client Brief                                                      | reading | 10  | 50  |
 
@@ -162,13 +174,17 @@ This is the post-content-track version: legacy product references (AdCraft, AI M
 
 | Course                    | Tier                | Modules | Lessons | Planned minutes |
 | ------------------------- | ------------------- | ------- | ------: | --------------: |
-| `ppc-foundations`         | pp-foundations      | 0–4     |      19 |             231 |
+| `ppc-foundations`         | pp-foundations      | -1–4    |      22 |             263 |
 | `accelerated-mastery`     | accelerated-mastery | 5–10    |      19 |             181 |
 | `ultimate-transformation` | ultimate            | 11      |       4 |              31 |
 
 ## Quizzes (`curriculum/quiz-questions.json`)
 
-12 module-final quizzes, one per module. Each is a knowledge check attached to the module's final lesson. The pass threshold is 70%, with 100 XP per pass. Question counts vary by module.
+12 module-final quizzes, one for each of Modules 0 through 11. Module -1 has no quiz. Each
+quiz is a knowledge check attached to the module's final lesson. The pass threshold is 70%,
+with 100 XP per pass. Question counts vary by module: 5 for Module 0, 12 for Module 1, 8 for
+Modules 2, 3, 4, 7 and 8, 7 for Modules 5 and 6, and 4 for Modules 9, 10 and 11. That is 83
+questions in the bank.
 
 ## Why this index exists
 
