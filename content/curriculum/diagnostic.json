@@ -45,8 +45,8 @@
       {
         "id": "new",
         "label": "New to Amazon PPC",
-        "summary": "You are starting fresh. Spend the first 20 minutes on Module 0 to learn the daily work loop and finish one guided practice decision before moving on.",
-        "startingEmphasis": "Begin with Module 0, then complete the guided first decision in the Bid Elevator tool.",
+        "summary": "You are starting fresh. Begin with Module -1, three short lessons on what Amazon is and where ads actually run, then Module 0 for the daily work loop and one guided practice decision.",
+        "startingEmphasis": "Begin with Module -1 (the Amazon primer), then Module 0, then complete the guided first decision in the Bid Elevator tool.",
         "score": {
           "have-managed-ads": ["no", "watched"],
           "read-reports": ["not-yet", "know-terms"],
@@ -56,7 +56,7 @@
       {
         "id": "familiar",
         "label": "Familiar with PPC",
-        "summary": "You know the terms. Module 0 will set the safety boundaries and the client-brief intake you need before touching a live account, then Module 1 will sharpen the math behind every decision.",
+        "summary": "You know the terms. Module 0 will set the safety boundaries and the client-brief intake you need before touching a live account, then Module 1 will sharpen the math behind every decision. Module -1 stays available if a primer term or surface is new to you.",
         "startingEmphasis": "Skim Module 0 for the safety checklist, then focus on Module 1 metrics and Module 2 keyword research.",
         "score": {
           "have-managed-ads": ["ran-small"],

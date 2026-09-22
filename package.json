@@ -32,6 +32,7 @@
     "generate:deck-manifest": "node scripts/generate-teaching-deck-manifest.mjs",
     "validate:deck-manifest": "node scripts/validate-teaching-deck-manifest.mjs",
     "validate:target-provenance": "node scripts/validate-target-provenance.mjs",
+    "check:curriculum-sources": "node scripts/check-curriculum-sources.mjs",
     "validate:learning-release": "pnpm validate:curriculum && pnpm validate:tool-bridges && pnpm exec vitest run src/domain/curriculum/__tests__/PublicCurriculumClaims.test.ts",
     "db:seed:admin": "node scripts/seed-admin-user.mjs",
     "db:seed:tiers": "tsx scripts/seed-pricing-tiers.ts",
