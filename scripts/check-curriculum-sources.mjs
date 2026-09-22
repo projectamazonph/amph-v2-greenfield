@@ -38,19 +38,32 @@ async function lessonFiles(dir) {
   return files.sort();
 }
 
+/** Classify the `Last verified` field so unreviewed cards are countable. */
+function verifyStyle(value) {
+  if (value === null) return "absent";
+  const v = value.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return "dated";
+  if (/pending/i.test(v)) return "pending-text";
+  if (v.includes("[") && v.includes("]")) return "bracket-todo";
+  return "other";
+}
+
 /** Collect the source URL(s) each lesson's fact card cites. */
 async function collectCitations() {
   const files = await lessonFiles(MODULES_DIR);
   const byUrl = new Map();
   const noFactCard = [];
   const noUrl = [];
+  const verification = new Map();
 
   for (const file of files) {
     const source = await readFile(file, "utf8");
     const rel = relative(process.cwd(), file).replace(/\\/g, "/");
+    const style = verifyStyle(source.match(/^Last verified:[ \t]*(.+?)[ \t]*$/m)?.[1] ?? null);
+    verification.set(rel, style);
     const line = source.match(/^Official source URL:[ \t]*(.+?)[ \t]*$/m);
     if (!line) {
-      if (!/^##\s+Fact card\b/im.test(source)) noFactCard.push(rel);
+      if (!/^##\s+.*fact card\b/im.test(source)) noFactCard.push(rel);
       continue;
     }
     const urls = line[1].match(URL_PATTERN) ?? [];
@@ -63,7 +76,7 @@ async function collectCitations() {
       byUrl.get(url).push(rel);
     }
   }
-  return { byUrl, noFactCard, noUrl, lessonCount: files.length };
+  return { byUrl, noFactCard, noUrl, verification, lessonCount: files.length };
 }
 
 /** HEAD first, GET when HEAD is refused, because help pages often reject HEAD. */
@@ -94,7 +107,7 @@ async function probe(url) {
   return { url, ok: false, status: null, attempts };
 }
 
-const { byUrl, noFactCard, noUrl, lessonCount } = await collectCitations();
+const { byUrl, noFactCard, noUrl, verification, lessonCount } = await collectCitations();
 const urls = [...byUrl.keys()].sort();
 const results = [];
 for (let i = 0; i < urls.length; i += CONCURRENCY) {
@@ -121,6 +134,22 @@ if (noUrl.length > 0) {
 if (noFactCard.length > 0) {
   console.log(`\nLessons with no fact card (${noFactCard.length}/${lessonCount}):`);
   for (const file of noFactCard) console.log(`- ${file}`);
+}
+
+// A reachable link is not a reviewed claim. Count how many cards still carry an
+// unfilled verification date, since that is the half only the content owner can do.
+const styles = new Map();
+for (const style of verification.values()) styles.set(style, (styles.get(style) ?? 0) + 1);
+const unverified = [...verification.entries()].filter(([, style]) => style === "pending-text" || style === "bracket-todo");
+console.log(
+  `\nLast verified field: ${styles.get("dated") ?? 0} dated, ` +
+    `${styles.get("pending-text") ?? 0} pending text, ` +
+    `${styles.get("bracket-todo") ?? 0} bracket todo, ` +
+    `${styles.get("absent") ?? 0} no field`,
+);
+if (unverified.length > 0) {
+  console.log(`Fact cards still awaiting a content-owner verification date (${unverified.length}):`);
+  for (const [file] of unverified.sort()) console.log(`- ${file}`);
 }
 
 if (failOnError && dead.length > 0) process.exit(1);

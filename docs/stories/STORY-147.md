@@ -97,6 +97,9 @@ and say so in the field itself.
 
 ## Follow-ups
 
+- Shipped in STORY-148: the checker now also tallies the `Last verified` field by
+  style, so the 29 cards awaiting a real date are listed rather than hidden, and
+  the `## Amazon Ads Fact Card` heading variant is detected as a card.
 - Content owner pass to replace `pending content-owner review` with real dates on
   the 19 placeholder cards, starting with `3.3-aplus-content` (trademark cost
   range, Brand Registry fee status, and the 5-17% / 8-20% lift figures are the
