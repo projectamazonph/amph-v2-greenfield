@@ -36,7 +36,7 @@ describe("lesson learning-flow coverage", () => {
   it("keeps every native lesson visibly sectioned and immediately applied", async () => {
     const lessons = await loadLessonBodies();
 
-    expect(lessons).toHaveLength(42);
+    expect(lessons).toHaveLength(45);
 
     const lessonsWithTooFewSections = lessons
       .filter((lesson) => countSections(lesson.body) < 3)

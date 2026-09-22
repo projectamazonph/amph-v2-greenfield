@@ -305,7 +305,7 @@ if (!existsSync(quizPath)) {
 
   for (const quizDef of quizData.quizzes) {
     const courseSlug =
-      quizDef.moduleNumber >= 0 && quizDef.moduleNumber <= 4
+      quizDef.moduleNumber >= -1 && quizDef.moduleNumber <= 4
         ? "ppc-foundations"
         : quizDef.moduleNumber >= 5 && quizDef.moduleNumber <= 10
           ? "accelerated-mastery"

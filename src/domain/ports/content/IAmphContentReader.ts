@@ -41,7 +41,7 @@ export interface IAmphContentReader {
    * Each group's files are sorted by (moduleNumber asc, lessonNumber asc).
    *
    * The `courseSlug` is derived from the module number:
-   *   0–4 → "ppc-foundations"
+   *   -1–4 → "ppc-foundations"
    *   5–10 → "accelerated-mastery"
    *   11 → "ultimate-transformation"
    *
