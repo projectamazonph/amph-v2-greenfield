@@ -40,7 +40,10 @@
     "db:seed:resources": "tsx scripts/seed-resources.ts",
     "format": "prettier --write .",
     "prepare": "husky",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "lint:check": "eslint .",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.1.8",
