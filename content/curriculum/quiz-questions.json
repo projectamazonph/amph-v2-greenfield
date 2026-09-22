@@ -7,6 +7,53 @@
   },
   "quizzes": [
     {
+      "moduleNumber": -1,
+      "title": "Amazon and the PPC Job Knowledge Check",
+      "description": "Check what you picked up in the Amazon primer: what Amazon is and what it charges, which surface you actually work in, and the five levels of an ad account.",
+      "questions": [
+        {
+          "order": 1,
+          "question": "A client says \"cut the daily budget on the bamboo cutting board campaign.\" Which level do you change?",
+          "optionA": "The ads account",
+          "optionB": "The campaign",
+          "optionC": "The ad group",
+          "optionD": "The keyword",
+          "correctAnswer": "B",
+          "explanation": "Daily budgets live on the campaign, the second level in the object model: account, campaign, ad group, keyword or product target, ad. Editing the account, the ad group or a keyword does not change what Amazon is willing to spend in a day."
+        },
+        {
+          "order": 2,
+          "question": "Which surface does a PPC VA spend most of the working day in?",
+          "optionA": "The Amazon Ads Console, because campaigns, bids and performance reports live there",
+          "optionB": "Seller Central, because bids and budgets live there",
+          "optionC": "The Amazon homepage, because that is where shoppers see the ad",
+          "optionD": "Project Amazon PH Academy, because that is where sales are recorded",
+          "correctAnswer": "A",
+          "explanation": "The Ads Console is where the ads live: the Campaign Manager for status and headline numbers, and Reports for the search-term data you download. Seller Central owns the listing (title, bullets, A+ Content), not the bids."
+        },
+        {
+          "order": 3,
+          "question": "A shopper clicks a Sponsored Products ad. Where do they land, and when does the seller pay?",
+          "optionA": "On the search results page, and the seller pays when the sale completes",
+          "optionB": "On the seller's storefront, and the seller pays a flat monthly fee",
+          "optionC": "On the product detail page, and the seller pays one CPC for the click, whether or not the shopper buys",
+          "optionD": "On the product detail page, and the seller pays only if the shopper buys",
+          "correctAnswer": "C",
+          "explanation": "The click takes the shopper to the product detail page, and pay-per-click means the charge happens at the click. Attribution decides whether that click also counts as an ad sale, not whether the seller already paid for the click."
+        },
+        {
+          "order": 4,
+          "question": "For a third-party seller using FBA, which two Amazon fees come out of a sale before any ad spend is considered?",
+          "optionA": "The referral fee and the FBA fulfillment fee",
+          "optionB": "The ad spend and the cost of the photography",
+          "optionC": "The onboarding fee and the monthly software subscription",
+          "optionD": "The storage fee and the cost of shipping to the port",
+          "correctAnswer": "A",
+          "explanation": "Amazon typically takes a referral fee, a percentage of the sale, plus an FBA fulfillment fee per unit on every third-party FBA order. Ad spend sits on top of those two, which is why a campaign can look profitable on revenue and still lose money."
+        }
+      ]
+    },
+    {
       "moduleNumber": 0,
       "title": "Onboarding Knowledge Check",
       "description": "Test your understanding of the Project Amazon PH Academy platform and Amazon PPC basics covered in the Onboarding module.",

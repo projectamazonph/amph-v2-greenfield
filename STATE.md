@@ -2,17 +2,17 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `506c25f`
+**Main:** `daeae42`
 
 ## Active branches of interest
 
-- `fix/curriculum-doc-drift` (STORY-151): Module -1 added to the two human-facing
-  curriculum maps, their totals corrected, the `-1.3` level-count objective and the `4.3`
-  hierarchy diagram fixed, and a new test that keeps the maps pinned to lesson frontmatter.
-- Main is at `506c25f` (`PR #554`, quiz bank and lesson leftovers converted to pesos plus
-  the curriculum currency contract test). The curriculum content chain #546 to #554 is in
-  "Latest merged repairs" below; the earlier `PR #545` / STORY-146 note lives in the
-  CHANGELOG.
+- `feat/module-minus-one-quiz` (STORY-152): the Module -1 knowledge check Ryan asked for, four
+  questions drawn from the primer's own lessons, so its 150 XP are no longer uncheckable. The
+  bank is 13 quizzes and 87 questions, and the quiz-count lines in both curriculum maps plus
+  five other documents are corrected in the same pass.
+- Main is at `daeae42` (`PR #555`, Module -1 in the curriculum maps plus the doc-count guard
+  test). The curriculum content chain #546 to #555 is in "Latest merged repairs" below; the
+  earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
 
 ## Current learning-experience priority
 
@@ -34,7 +34,9 @@ job-readiness claims. Existing simulator scores remain formative.
 
 ## Latest merged repairs
 
-| PR | Commit | Result
+| PR | Commit | Result |
+| --- | --- | --- |
+| #555 | `daeae42` | STORY-151 curriculum doc drift. Both human-facing curriculum maps still described the pre-#549 course (no Module -1, 12 modules, 42 lessons, 443 minutes, 3,580 XP, an 8-minute `0.1`). They now carry Module -1 and the real aggregates, `-1.3`'s objective says five levels instead of four, `4.3`'s diagram draws the three levels it names, and `CurriculumDocCounts.test.ts` pins both documents to the 45 lesson frontmatters row by row |
 | #554 | `506c25f` | STORY-150 peso conversion for the assessment layer. The module quiz bank (52 dollar amounts across 32 fields in 11 questions) and the four literal-`$` figures `PR #553`'s peso-only scan could not see are now in pesos, and lesson 1.4 is titled "Every Peso In, How Many Pesos Back? ROAS" in all seven places instead of contradicting its own body. New `CurriculumCurrency.test.ts` fails on a dollar sign in front of a digit in any lesson body or the quiz, diagnostic, glossary and capstone data, and is chained into `pnpm validate:learning-release` |
 | #553 | `1f8c988` | STORY-149 peso magnitude repair. Three of #549's conversions had divided correct peso answers by about 50 to meet stale dollar inputs. Whole examples scaled by 50 and every printed ratio re-derived across `1.1` to `1.5`, `2.1` to `2.4`, `3.3`, `4.3`, `9.2`, `11.4` and `-1.1` (18 files). `2.3`'s search-term rows now sum to the totals that were already scaled |
 | #552 | `a48bca8` | STORY-148 retrieval checks. Nine `<SelfCheck>` blocks (`sc-6-1` to `sc-8-3`) added to Modules 6 to 8 on the tracked-attempt path, so answers persist instead of being throwaway; build-plan wave reconciliation |

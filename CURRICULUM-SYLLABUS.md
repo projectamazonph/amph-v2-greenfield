@@ -261,7 +261,7 @@ Every lesson follows the **"Read → Decide → Change → Explain"** methodolog
 
 ### **Assessment Methods**
 
-- **Module Quizzes:** 12 module-final quizzes with a 70% pass threshold
+- **Module Quizzes:** 13 module-final quizzes with a 70% pass threshold
 - **Practical Simulations:** 5 interactive tools for hands-on practice
 - **XP System:** Experience points for engagement and progress tracking
 - **Badges:** Achievement recognition for milestone completion
@@ -349,7 +349,7 @@ Every lesson follows the **"Read → Decide → Change → Explain"** methodolog
 
 ### **Content Roadmap**
 
-- **Current:** 45 lessons across 13 modules, with 12 module quizzes and five formative simulators.
+- **Current:** 45 lessons across 13 modules, with 13 module quizzes and five formative simulators.
 - **Next:** Connect the new operational lessons to saved learner-owned artefacts and the portfolio view.
 - **Later:** Add specialization tracks only after the Foundations-to-Capstone path is measured with beginner evidence.
 
