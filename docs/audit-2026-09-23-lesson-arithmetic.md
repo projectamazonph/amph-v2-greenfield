@@ -45,7 +45,14 @@ in the session that found it.
    ₱30,000 monthly gap that the model above defines it as, and drops the annualized savings promise.
 5. `3.3:45` table prints 6%/8%/10% CVR against 50%/38%/30% ACoS with only a ₱38 CPC. The lesson's
    own formula at `:160` is ACoS = CPC ÷ (CVR × price), and no price is given in that section. The
-   ₱1,000 to ₱4,000 boards referenced at `:90` yield 63% to 16%, not 50% to 30%.
+   ₱1,000 to ₱4,000 boards referenced at `:90` yield 63% to 16%, not 50% to 30%. **Fixed:** the
+   section now states a price, and it is the ₱1,100 the lesson already uses for its ACoS math at
+   `:160`, `:167` and `:196`, not an invented one. The three cells recompute from ₱38 CPC ÷
+   (CVR × ₱1,100): 57.6% → 58%, 43.2% → 43%, 34.5% → 35%. The 20-point headline at `:51` and the
+   Quick check answer at `:225` now read 23. `1.2` prices a bamboo board at ₱1,250, which with the
+   unrounded ₱37.50 CPC does reproduce the old 50/38/30 exactly, but no such price appears anywhere
+   in `3.3`, so it was not imported here. Finding 6, about what the 6/8/10 steps are allowed to
+   claim, is untouched and still open.
 6. `3.3:43` describes the CVR steps 6% → 8% → 10% as lifts matching ranges cited in the same
    paragraph and at `:29` ("up to 8% Basic / 20% Premium", seller-reported 5-17%). The steps are
    +33% and +67% relative, or +2 and +4 points, and neither reading follows from those ranges. This
