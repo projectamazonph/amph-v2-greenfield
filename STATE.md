@@ -2,7 +2,7 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `50b34e9`
+**Main:** `ff4226a`
 
 ## Active branches of interest
 
@@ -15,7 +15,7 @@
   finding left open and says which ones need a teaching decision rather than a correction.
 - `feat/module-minus-one-quiz` merged as `PR #556`: the Module -1 knowledge check, four questions,
   so the primer's 150 XP is no longer uncheckable. Bank is 13 quizzes and 87 questions.
-- The curriculum content chain #546 to #563 is in "Latest merged repairs"
+- The curriculum content chain #546 to #570 is in "Latest merged repairs"
   below; the earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
 
 ## Current learning-experience priority
@@ -40,6 +40,10 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR | Commit | Result |
 | --- | --- | --- |
+| #570 | `ff4226a` | fix(lesson): the `3.3` ACoS table header named the ₱38 CPC but not the price, so a copied row or a cropped screenshot read as if 58% held at any price. Both inputs now sit in the header. No figure changed |
+| #568 | `8867390` | fix(curriculum): three abbreviations reached learners before any lesson spelled them out. `SOP` in the Module 0 course table, eleven modules before `11.3` calls it a standard operating procedure; `STR` as the name of the required Module 7 artifact while `7.1` only ever wrote "search term report" in full; `AOV` in the maximum-CPC decision-flow steps of `1.2` and `1.5`. First use now carries the expansion. A token-frequency scan against `glossary.json` flagged far more, but reading first-use context showed the lessons already expand `CVR`, `SOV`, `SP`, `SD`, `SB`, `PAT` and `ABA` inline, so only these three were real |
+| #566 | `e524166` | fix(curriculum): cross-checked all 38 quiz questions of Modules 5 to 10 against the lessons that claim to justify them. Module 7 Q2 keyed a negative exact as correct while `7.2` teaches you to lower the bid rather than negate, so it is rekeyed to the bid answer with its explanation rewritten. Module 7 Q4 was unanswerable as written: 500 impressions and 2 clicks put its own CTR under the low-CTR line and under both click floors the module cites, so the stem is now 6,000 impressions, 12 clicks and ₱600 spend, clearing both floors and leaving no open question about the answer. Module 6 Q4's correct option was taught nowhere in Module 6, so `6.3` gained the bullet |
+| #565 | `0e5d4de` | fix(lesson): the `9.3` evidence ladder printed overlapping ranges, "10 to 20" and "20 to 40", so a term with exactly 20 clicks fell on two rungs at once. Now exclusive at both ends: 10 to 19 and 20 to 39 |
 | #563 | `50b34e9` | fix(lesson): `3.3`'s CVR table carried no unit price, so its break-even row claimed a 36% CVR loses money and two of three cells missed the lesson's own formula. The table now runs on the ₱1,100 the same lesson's case study uses, so it is reproducible from figures printed inside the lesson, and the headline "20 percentage points" became the 23 it actually is. An independent recomputation confirmed all three cells and found no other file, quiz or snapshot quoting the old figures |
 | #562 | `08625bf` | fix(lesson): `2.2` billed a two-week, ₱500-a-day research campaign as "₱14,000 over 4 weeks" in both the prose and the takeaway. The two-week window is what the same section instructs and what the order estimate assumes, so it stays and the cost becomes ₱7,000 |
 | #560 | `a5fa9c4` | fix(lesson): the `4.3` bid ladder printed a ₱40 bid whose label crossed the line it was annotating. The worked example computes ₱30, which is where its own arithmetic had always landed |
