@@ -11,7 +11,7 @@
 
 The business layer is what turns Project Amazon PH Academy from "free course site" into "paid product business." It covers pricing tiers, the enrollment flow, payment processing via PayMongo, refunds, and tier-based content gating.
 
-**Note on entities:** There is no separate `Payment` or `Refund` table. The `Order` entity (`src/domain/entities/Order.ts`) is the single source of truth for all payment-related state. `Order.status` tracks the payment lifecycle (pending/completed/failed/expired/refunded), and `Order.paymongoStatus` mirrors PayMongo's raw status. Receipt PDF generation and Vercel Blob upload are not yet implemented (Sprint 13 placeholder). The `BusinessProfile` table for BIR compliance is also not yet implemented.
+**Note on entities:** There is no `Refund` table, but there **is** a `Payment` model (`prisma/schema.prisma:1035`, keyed by `orderId`, with a unique `providerPaymentId` and its own `status` string), so `Order` is not the only place payment state can sit. `Order.status` tracks the lifecycle documented at `prisma/schema.prisma:382` as `DRAFT | PENDING | PAID | FAILED | EXPIRED | REFUNDED`, defaulting to `DRAFT`; `Order.paymongoStatus` mirrors PayMongo's raw status. Receipt PDF generation is implemented (see Receipts). The `BusinessProfile` table for BIR compliance is not implemented.
 
 This spec assumes PayMongo as the payment provider, behind the `IPaymentGateway` port. PayMongo is the right choice because:
 
@@ -54,100 +54,134 @@ Consequence worth knowing before a launch: `--with-courses` defaults to false in
 
 ## Enrollment Flow
 
+As built, 2026-09-23. There is no `/api/checkout` route and no `HandlePaymentWebhook`
+use case: checkout runs through a server action and fulfillment is inline in the webhook
+handler.
+
 ```
-1. Visitor browses /pricing
-2. Picks tier -> POST /api/checkout (creates PayMongo Checkout Session via IPaymentGateway port)
-3. Redirected to PayMongo-hosted payment page
-4. Pays via GCash / Maya / card / bank
-5. PayMongo webhook POST /api/webhooks/paymongo -> server verifies signature
-6. HandlePaymentWebhook use case:
-   a. Verifies signature (PayMongoGateway)
-   b. Loads course (CourseRepository)
-   c. Checks idempotency via PrismaWebhookEventLog (prevents duplicate event processing)
-   d. In a single DB transaction:
-      - Create or update Order row (status = COMPLETED)
-      - Create Enrollment row
-      - Send confirmation email (EmailSender)
-      - Award first-touch XP (XPService) + "New enrollment" badge
-   e. Returns Result.ok
-7. User clicks email link -> already logged in or sent to signup -> lands in dashboard
+1. Visitor browses /pricing. ListPricingTiers returns ACTIVE tiers and quotes each one
+   through effectivePrice(tier, now), so an open early-bird window is the displayed price.
+2. The checkout form posts to src/app/actions/checkout.action.ts, which runs
+   CreatePaymentIntent. That creates a hosted Checkout Session through IPaymentGateway
+   and creates the Order row locally at the same time.
+3. Redirected to the PayMongo-hosted payment page. The adapter requests
+   payment_method_types: ["card", "gcash", "grab_pay"]. Maya is not among them, and
+   neither is the bank installment option that a P0-01 comment in the adapter mentions.
+4. PayMongo posts to /api/webhooks/paymongo. src/proxy.ts guards the prefixes in
+   PROTECTED_PREFIXES (/dashboard/, /admin/, /enroll/, /order/), so this path arrives
+   with no session attached. The signature check below is what authenticates it.
+5. The route handler (src/app/api/webhooks/paymongo/route.ts) verifies the signature
+   against the raw body, then records the event with webhookEventLog.record(). The
+   record is written before the work runs and closed with markProcessed() afterwards.
+6. The order is found by its PayMongo checkout session id. If order.isPaid() is already
+   true the handler returns early, and that check, not the event log, is what stops a
+   replay from enrolling someone twice.
+7. Order status becomes PAID. PaymentStatus has no COMPLETED member.
+8. Still inline, still in the route: enrollStudent.execute(), then sendReceiptEmail(),
+   then issueInvoice.execute() when INVOICING_ENABLED is set.
+9. No step in this path awards XP or grants a badge. XP comes from quiz attempts,
+   lessons, live-class recordings and tool use, not from purchase.
+10. These steps are sequential awaits with no $transaction wrapper around them, which is
+    why a paid event can be recorded before enrollment succeeds. See the recovery note in
+    STATE.md's known limitations.
+11. User clicks the email link, logs in or signs up, and lands in the dashboard.
 ```
 
 ### State Machine
 
 ```
-   start
-     │
-     ▼
-   [pending]  ----- expires (30 min) -----> [expired]
-     │                                        │
-     │ payment.paid                           │
-     ▼                                        │
-  [completed]  (Order COMPLETED +                 │
-     │          Enrollment + Email sent)        │
-     │                                        │
-     ├---- refund.created ----> [refunded]  (Enrollment.revoked = true)
-     │
-     └---- admin.revoke -----> [revoked]   (admin action, audit logged)
+   DRAFT -> PENDING -> PAID -> REFUNDED
 ```
 
-Each state is a column on `Order.status` and `Enrollment.status`. Discriminated unions in the domain, string enums in the database. `WebhookEvent` (stored in `PrismaWebhookEventLog`) tracks processed event IDs for idempotency.
+Written by `CreatePaymentIntent` (DRAFT), the PayMongo webhook (PAID), and `RefundOverride`
+or `ProcessRefund` (REFUNDED). The full transition table, including the two states nothing
+ever writes, is in State Machines below. Nothing on this path touches `Enrollment.status`;
+see Refund Flow.
+
+Each state is a plain `String` column on `Order.status` and `Enrollment.status`, not a database enum. The four real Postgres enums in `prisma/schema.prisma` are `Role`, `SubscriptionTier`, `VerificationStatus` and `SimulatorAccess`. The unions are enforced in the domain on read (`PaymentStatus`, `isEnrollmentStatus()`), and the database will accept a value outside them. `PrismaWebhookEventLog` stores the event, whether the signature validated, and the processing outcome. It is a trail for an operator to read, not a lock: see Idempotency.
 
 ### Idempotency
 
-- `Order.paymongoReference` is server-generated, stored on the row, sent to PayMongo as the `reference` field.
-- Replays of the same `payment.paid` webhook with the same PayMongo event ID are no-ops (the `HandlePaymentWebhook` use case checks `PrismaWebhookEventLog.processedAt` before doing anything).
-- Replays of the same `payment.paid` with a different event ID but the same `reference` (extremely rare) trigger a `WebhookError.AmbiguousEvent` to Sentry. Operator investigates.
+As built, 2026-09-23:
+
+- There is no `Order.paymongoReference` column and the adapter sends no `reference` field. Order-to-payment linkage is the PayMongo checkout session id.
+- The only replay guard is `order.isPaid()`, checked in the webhook route before it enrolls anyone. `IWebhookEventLog` exposes `record()` and `markProcessed()` and nothing that reads a row back, so no code can ask whether an event id was already processed. Replaying a stored PAID event therefore exits early because the order is paid, not because the event log said so.
+- There is no `WebhookError` type and no `AmbiguousEvent` case anywhere in `src`, so nothing is raised for a second event id pointing at the same order. `markProcessed()` does record an error string against the log row, which is what an operator reads during a replay drill. See `docs/runbooks/webhook-replay.md`.
 
 ## Refund Flow
 
-### Student request window (7 days)
+### Two refund windows are live at once (open decision)
 
 ```text
 1. User opens `/profile/purchases` and submits the refund server action.
 2. RequestRefund use case:
    a. Loads order (IOrderRepository)
-   b. Checks ownership, paid status, a 7-day window from `paymongoPaidAt`, and less than 25% course completion.
-   c. Stores the refund request for admin processing.
+   b. Checks the reason is 10-500 characters after trimming, then ownership, paid status, a 7-day window from `paymongoPaidAt`, and less than 25% course completion. The 7 days is a local constant in this use case: `const REFUND_WINDOW_MS = 7 * 24 * 60 * 60 * 1000` at `src/usecases/RequestRefund.ts:7`. The completion check reads the enrollment (`progressPercent >= 25` is refused) but never writes to it.
+   c. Stores the refund request for admin processing. It does not call PayMongo; no gateway is injected here.
 ```
+
+`src/domain/values/OrderRefund.ts` exports `REFUND_WINDOW_DAYS = 30` and `isWithinRefundWindow()`, and the only consumer is `src/usecases/ProcessRefund.ts:87`. So the student is told 7 days, and the admin-side processing step accepts 30. **Ryan to decide which one is the policy.** This document no longer describes the 7-day window as the refund rule, because as written it is only one of the two numbers in the flow.
 
 ### Outside Window (Admin Override)
 
+Both admin surfaces exist, `src/app/admin/refunds/[orderId]/page.tsx` and
+`src/app/admin/payments/[id]/page.tsx`. As built:
+
 ```text
-1. Admin opens /admin/refunds/[orderId]
-2. Clicks "Issue refund (override)"
-3. Enters reason (20+ chars, validated)
-4. RefundOverride use case:
-   a. Calls the real PayMongo Refunds API through `IPaymentGateway`.
-   b. Updates the Order and revokes course access.
-   c. Records the audited actor, target, and reason.
-   d. Sends the configured refund email.
+1. Admin opens /admin/payments/[id] (the page that carries the override reason form)
+   or /admin/refunds/[orderId] (which posts without a reason field at all).
+2. RefundOverride use case:
+   a. Checks the order is paid, and calls the real PayMongo Refunds API through
+      `IPaymentGateway`.
+   b. Validates the reason as non-empty. There is no 20-character minimum anywhere in
+      `src/usecases/RefundOverride.ts` or in either page.
+   c. order.markRefunded() + persist. The gateway call is here, not in RequestRefund.
+   d. Records the audited actor, target and reason, then sends the configured refund email.
 ```
+
+Refunding does **not** remove the learner's access. Neither `RefundOverride` nor
+`ProcessRefund` references an enrollment repository, and `AuthorizeLessonAccess.ts:105`
+grants entry whenever the enrollment status is `active`, which a refund leaves untouched.
+Access is cut by a separate deliberate action, `AdminSetEnrollmentStatus`, which moves an
+enrollment to `cancelled` and audits it as `enrollment.revoked`. That use case also refuses
+to restore an enrollment already marked `refunded`. So a refunded student keeps studying
+until the admin cancels the enrollment by hand.
+
+This is a genuine disagreement inside the code itself, not just with the old prose: the
+comment at `src/usecases/AuthorizeLessonAccess.ts:98` states that refunded, cancelled and
+expired enrollments are treated as not enrolled "intentional: a refund revokes access per
+the audit's P1-3". The access layer is therefore built on the assumption that a refund
+revokes access, while nothing in the refund path ever sets the status that assumption
+reads. One of the two is wrong. Whether a refund should revoke access automatically is
+**Ryan to decide**. `src/app/admin/users/[id]/page.tsx` is where an operator does it by
+hand today.
 
 ## Receipts
 
-> **Status: Not yet implemented.** Receipt PDF generation and Vercel Blob upload are planned for Sprint 13. The `ReactPdfCertificateRenderer` adapter exists for certificates; it can be reused for receipts once this story is picked up.
+> **Status: implemented, and this section was stale.** `src/usecases/IssueInvoice.ts` generates the invoice and uploads it, it is wired into `src/composition/container.ts`, and the webhook runs it after enrollment behind the `INVOICING_ENABLED` flag. `Invoice` and `InvoiceLineItem` are real tables in `prisma/schema.prisma`.
 
-Until then, confirmation emails serve as the primary proof of purchase. BIR-compliant receipt PDFs (with business name, TIN, address from `BusinessProfile`, customer info, line items, VAT breakdown) are a planned feature. The `BusinessProfile` table does not yet exist; it is tracked as a future admin-managed entity.
+What is still true: `BusinessProfile` does not exist as a model or a symbol anywhere, so the business name, TIN and address a BIR-compliant receipt needs are not sourced from a managed record. Confirmation emails remain a learner-facing proof alongside the generated invoice.
 
 ## Tier-Based Content Gating
 
-Implemented by the `IAccessPolicy` port (`src/ports/access/IAccessPolicy.ts`).
+Implemented by the `IAccessPolicy` port (`src/ports/access/IAccessPolicy.ts`). The port
+answers one question, about one course, for one user id (empty string = anonymous). The
+`canUseSimulator`, `canRequestRefund` and `canIssueCertificate` methods documented here do
+not exist anywhere in `src`, and there is no `UserSnapshot` type.
 
 ```ts
-export type AccessDecision =
-  | { allowed: true }
-  | {
-      allowed: false;
-      reason: "not_enrolled" | "tier_insufficient" | "enrollment_revoked" | "course_not_found";
-    };
-
+// src/ports/access/IAccessPolicy.ts: the whole interface
 export interface IAccessPolicy {
-  canAccessCourse(user: UserSnapshot, course: Course): Promise<AccessDecision>;
-  canUseSimulator(user: UserSnapshot, sim: Simulator<unknown, unknown>): Promise<AccessDecision>;
-  canRequestRefund(user: UserSnapshot, order: Order): Promise<AccessDecision>;
-  canIssueCertificate(user: UserSnapshot, course: Course): Promise<AccessDecision>;
+  canAccess(userId: string, courseId: string): Promise<AccessDecision>;
 }
+
+// src/domain/values/AccessDecision.ts: five kinds, discriminated on "kind"
+export type AccessDecision =
+  | { readonly kind: "allowed" }
+  | { readonly kind: "allowed_preview"; readonly previewLessonCount: number }
+  | { readonly kind: "denied_tier"; readonly userTier: string; readonly requiredTier: string }
+  | { readonly kind: "denied_not_enrolled" }
+  | { readonly kind: "denied_not_authenticated" };
 ```
 
 | Resource                | Foundations   | Mastery       | Ultimate      | Admin                                      |
@@ -156,74 +190,187 @@ export interface IAccessPolicy {
 | Mastery course          | no            | yes           | yes           | yes                                        |
 | Ultimate course         | no            | no            | yes           | yes                                        |
 | All-access pass holders | yes           | yes           | yes           | yes                                        |
-| Campaign Builder        | yes           | yes           | yes           | yes                                        |
-| Bid Elevator            | yes           | yes           | yes           | yes                                        |
-| STR Triage              | yes           | yes           | yes           | yes                                        |
-| Listing Audit           | no            | yes           | yes           | yes                                        |
-| Keyword Research        | no            | yes           | yes           | yes                                        |
-| Live classes (RSVP)     | no            | no            | yes           | yes                                        |
-| Recordings archive      | no            | no            | yes           | yes                                        |
+| Campaign Builder        | yes (ungated) | yes (ungated) | yes (ungated) | yes                                        |
+| Bid Elevator            | yes (ungated) | yes (ungated) | yes (ungated) | yes                                        |
+| STR Triage              | yes (ungated) | yes (ungated) | yes (ungated) | yes                                        |
+| Listing Audit           | yes (ungated) | yes (ungated) | yes (ungated) | yes                                        |
+| Keyword Research        | yes (ungated) | yes (ungated) | yes (ungated) | yes                                        |
+| Live classes (RSVP)     | see note      | see note      | see note      | yes                                        |
+| Recordings archive      | see note      | see note      | see note      | yes                                        |
 | Certificate download    | on completion | on completion | on completion | n/a                                        |
 | `/admin/*`              | no            | no            | no            | yes; ADMIN can impersonate non-admin users |
 
-The `IAccessPolicy` implementation is a single class that reads from the registry and the user's enrollments. It is the only place these rules are encoded. UI and server actions both ask it, so the rule lives in one place. ISP, DIP.
+**Why the tool rows say "ungated".** All five practice pages live under `src/app/tools/`,
+and a grep for `subscriptionTier`, `courseTier`, `enrollment`, `accessPolicy` or
+`CheckCourseAccess` across that directory returns nothing. No tool page reads the session or
+asks the policy, so every visitor reaches all five engines. The `User.simulatorAccess` enum
+does exist (`NONE` / `FORMATIVE` / `CREDENTIAL`) and `PrismaUserRepository.ts:83` writes it on
+create, but nothing reads it, so it gates nothing. What the engines do check is per-mode and
+per-scenario: a formative run may use a draft scenario, a credential run requires a published
+one. That is a scenario-lifecycle rule, not a tier rule. **Whether the tools should be
+tier-gated is an open decision.**
+
+**Why the live-class rows say "see note".** `RsvpLiveClass.ts:70` requires an enrollment in
+the class's linked course whose status is `active`, and returns `course_access_required`
+otherwise. There is no subscription fallback in that use case, and `LiveClass.courseId` is
+required (`prisma/schema.prisma:300`), so every class belongs to a course. The gate is
+therefore enrollment, not tier: a Foundations student enrolled in that course can RSVP, and an
+Ultimate subscriber who is not enrolled cannot. No "Starter and above" or "Ultimate only" rule
+exists in the code. Watching a recording takes the same access path plus a
+`watchedRecordingAt` stamp that awards XP once.
+
+**Certificates, coaching and the job board describe the offer, not a gate.** A certificate
+needs an enrollment plus a passed quiz; there is no coaching feature and no job board in the
+codebase.
+
+`TierAccessPolicy` (`src/infra/access/TierAccessPolicy.ts`) is the implementation. It injects
+a user repository, a course repository and an enrollment repository. It never sees a
+simulator registry, an order, or a refund. In order:
+
+1. Empty `userId`, or the user lookup fails → `denied_not_authenticated`
+2. Course missing or not `PUBLISHED` → also `denied_not_authenticated`. There is no
+   `course_not_found` kind; an unpublished course is reported as if the caller were anonymous
+3. `user.role === "ADMIN"` → `allowed`, before any enrollment or tier check
+4. An enrollment whose `status === "active"` → `allowed`. A thrown enrollment lookup fails
+   closed to `denied_not_authenticated` rather than surfacing a 500
+5. `course.courseTier === "PREVIEW"` → `allowed_preview`, open to any signed-in user,
+   carrying `course.previewLessonCount`
+6. `subscriptionMeetsCourseTier(user.subscriptionTier, course.courseTier)` → `allowed`
+7. Otherwise `denied_tier`, carrying both tier names for the upsell copy
+
+Two consequences the old text hid. Access is granted by a subscription row, never by a paid
+order: `TierAccessPolicy` has no order repository, so a purchase that has not also produced
+an enrollment or a subscription grants nothing here. And the ladder is `CourseAccessTier`,
+not `PricingTier` (`src/domain/values/CourseAccessTier.ts:31`: PRO satisfies anything,
+STARTER satisfies STARTER and PREVIEW, FREE satisfies PREVIEW only). The comparison is
+`User.subscriptionTier` against `Course.courseTier`. Prices do not gate lessons; a course
+priced at ₱9,999 can still be a PREVIEW tier and open to everyone.
+
+The union declares `denied_not_enrolled` and `CheckCourseAccess.ts:50` maps it to the reason
+string `not_enrolled`, but no path in `TierAccessPolicy` returns it, so that branch is
+unreachable in production. Enrollment status has no `revoked` value either: `EnrollmentStatus`
+is `active | cancelled | refunded | expired` (`src/domain/entities/Enrollment.ts:12`).
+
+This is also only the **course** gate. Lesson reading runs through a separate use case,
+`AuthorizeLessonAccess`, with its own preview window; see Refund Flow for how the two meet
+on a refunded order.
 
 ## Discount Codes
 
-| Attribute                  | Description                                                                      |
-| -------------------------- | -------------------------------------------------------------------------------- |
-| `code`                     | Unique, 4-32 chars, uppercase alphanumeric                                       |
-| `type`                     | `percent` or `fixed`                                                             |
-| `value`                    | For percent: 1-100. For fixed: integer minor units.                              |
-| `validCourseIds`           | Empty = valid for all courses. Otherwise: explicit list.                         |
-| `validFrom` / `validUntil` | Optional window. Null = no bound.                                                |
-| `maxUses`                  | Null = unlimited. Integer = max total uses.                                      |
-| `currentUses`              | Denormalized counter, incremented by `ApplyDiscountCode`.                        |
-| `singleUsePerUser`         | If true, a user can use the code once. Otherwise, subject to `maxUses`.          |
-| `stacksWithEarlyBird`      | If false, applying a discount code disables the early-bird price. Default false. |
+Two things carry this name: a domain entity at `src/domain/entities/DiscountCode.ts` and a
+Prisma model at `prisma/schema.prisma:563` (`@@map("discount_codes")`). Together:
 
-Discount codes are applied in the `CreatePaymentIntent` use case, after pricing is quoted but before the PayMongo call. The code, the original price, the discount, and the final price are stored on `Order` for audit. `Order.amount` is the final charged amount (not the list price).
+| Field        | Reality                                                                             |
+| ------------ | ----------------------------------------------------------------------------------- |
+| `code`       | unique, upper-case; `createDiscountCode` normalises with `trim().toUpperCase()`     |
+| `type`       | `DiscountType` = `PERCENTAGE` or `FIXED`. **Only two values.**                      |
+| `value`      | a percent (1-100) when `PERCENTAGE`, centavos when `FIXED`                          |
+| `maxUses`    | nullable; null = unlimited; negative rejected                                       |
+| `usedCount`  | denormalized counter, always created at 0                                           |
+| `validFrom`  | nullable start date                                                                 |
+| `validUntil` | nullable expiry date                                                                |
+| `courseIds`  | `String[]`; empty means every course                                                |
+| `archivedAt` | soft delete; hidden from `listAll()`/`findById()`, still returned by `findByCode()` |
+| `createdAt`  | database-defaulted                                                                  |
 
-Use tracking: `DiscountCode.currentUses` is a denormalized counter incremented by `ApplyDiscountCode`. There is no separate `DiscountCodeUse` table - single-use enforcement uses `DiscountCode.singleUsePerUser` checked against the user's existing order history.
+The only code-shape rule is a character class, `/^[A-Z0-9_-]+$/`, plus a non-empty check.
+There is no length bound: "4-32 chars" is wrong in both directions, and `_` and `-` are
+allowed where "alphanumeric" said they were not.
+
+`singleUsePerUser` and `stacksWithEarlyBird` do not exist, under those names or any other.
+Per-user redemption is not implemented: nothing records who used which code. Nor is there a
+stacking rule, because there is nothing to stack against: `EARLY_BIRD` is not a discount
+type. The early-bird price is a field on `PricingTier`, applied before any code is
+considered (see Pricing Tiers), so the documented "early-bird cannot combine with a
+percentage code" behaviour has no mechanism behind it. Whether it should is part of the
+checkout decision below.
+
+**No learner can redeem a code today.** `CreatePaymentIntent` takes no code parameter and
+builds its line with `discountMinor: 0` (`src/usecases/CreatePaymentIntent.ts:147`).
+`ApplyDiscountCode` is imported, typed onto the container and constructed by the composition
+container (`src/composition/container.ts:244`, `:493`, `:963`), and imported by no page,
+action, component or route. There is no coupon field on the checkout form. The use case is complete, tested, and
+disconnected. **Whether checkout should accept codes is an open decision for Ryan.**
+
+What `ApplyDiscountCode` would check, in order, if it were called: `findByCode` on the
+normalised code (so lookup is case-insensitive), then `validUntil` in the past →
+`code_expired`, `validFrom` in the future → `code_not_started`, `usedCount >= maxUses` →
+`code_maxed_out`, and a non-empty `courseIds` that omits the course → `code_not_applicable`.
+It returns `{ discountMinor, discountCodeId }` and writes nothing. Note that it does **not**
+check `archivedAt`, so an archived code still validates through this path even though the
+repository hides it from other reads.
+
+The maths, from `calculateDiscount`: `PERCENTAGE` is `Math.floor(subtotalMinor * value / 100)`
+(floored, not rounded), and `FIXED` is `Math.min(value, subtotalMinor)`, so a fixed code can
+never discount past the subtotal. A percentage above 100 is refused earlier, by
+`createDiscountCode`.
+
+The audit columns exist: `subtotalMinor`, `discountMinor`, `platformFeeMinor`, `totalMinor`
+(all integer minor units, `prisma/schema.prisma:386-389`). `totalMinor` is what the gateway is
+asked to charge, so a discount that was never applied is simply absent rather than mismatched.
+There is no `Order.amount` field, and `IssueInvoice` does not itemise a discount: it emits one
+line at `order.totalMinor` and its own comment says discounts collapse into the net amount.
+
+Use tracking: `incrementUsedCount()` is declared on the port
+(`src/ports/repositories/IDiscountCodeRepository.ts:61`) and implemented by both repositories,
+and it has **no caller outside tests**. Since no learner can redeem a code, nothing is ever
+counted: `usedCount` stays at 0 in production and `maxUses` can never be reached by real
+traffic. There is no `DiscountCodeUse` table and no order-history check.
 
 ## State Machines
 
 ### Order / Payment
 
 ```
-   [pending]  ----- payment.paid -----> [completed]  ----- refund.created -----> [refunded]
-     │                              │                                   │
-     ├- payment.failed ----> [failed]  ├- admin.fraud ----> [flagged]        ├- (terminal)
+   [PENDING]  ----- payment.paid -----> [PAID]  ----- refund created -----> [REFUNDED]
      │
-     └- checkout.expired ----> [expired]  (terminal)
+     ├- payment.failed ----> [FAILED]    markFailed() at Order.ts:186
+     └- checkout.expired --> [EXPIRED]   markExpired() at Order.ts:203
 ```
 
-Single `Order` entity. No separate `Payment` or `Refund` table. Refund state lives on `Order.status`.
+There is no `[completed]` and no `[flagged]` state. `markFailed()` and `markExpired()` exist
+on the entity and have no production caller, so nothing sets FAILED or EXPIRED today: an
+abandoned checkout stays PENDING forever, even though the PayMongo session behind it expires
+after about 24 hours. `Order.status` is a plain String and would accept either word.
+
+Refund state lives on `Order.status` plus `refundReason`, `refundRequestedAt`,
+`refundProcessedAt` and `refundAmountMinor` (`prisma/schema.prisma:410-413`). There is no
+`Refund` table. `Payment` is a separate model, but nothing in the refund path writes it.
 
 ### Enrollment
 
 ```
-   [active]  ---- refund ----> [revoked]
-     │                       │
-     ├- admin.revoke ----> [revoked]
+   [active]  ---- AdminSetEnrollmentStatus ----> [cancelled]
      │
-     └- (terminal: revoked enrollments are kept for audit but filtered from access checks)
+     └---- AdminSetEnrollmentStatus ------------> [refunded]
 ```
+
+The four values are `active | cancelled | refunded | expired`
+(`src/domain/entities/Enrollment.ts:12`, re-validated on read by `isEnrollmentStatus()` at
+`:28`; the column itself is a plain String at `prisma/schema.prisma:352`). There is no
+`revoked` enrollment status: `revokedAt` and `revokedReason` belong to `Certificate`
+(`prisma/schema.prisma:772`), whose status is `active | revoked`.
+
+`expired` is a storable value, but nothing transitions an enrollment into it and the domain
+entity carries no `expiresAt` field, so it is a label with no writer.
+
+`AdminSetEnrollmentStatus` writes the status directly with no order check, and refuses to
+restore an enrollment already marked `refunded`.
 
 ## What Lives Where
 
-| Concern                 | Domain                             | Port                      | Use case                                                    | Adapter                        |
-| ----------------------- | ---------------------------------- | ------------------------- | ----------------------------------------------------------- | ------------------------------ |
-| `Money` arithmetic      | `src/domain/values/Money.ts`       | -                         | -                                                           | -                              |
-| `Order` entity          | `src/domain/entities/Order.ts`     | -                         | -                                                           | -                              |
-| Refund policy (window)  | `src/domain/values/OrderRefund.ts` | -                         | `RequestRefund`                                             | -                              |
-| Tier <-> Course mapping | `src/domain/entities/Course.ts`    | -                         | -                                                           | -                              |
-| PayMongo call           | -                                  | `IPaymentGateway`         | `CreatePaymentIntent`                                       | `PayMongoAdapter`              |
-| Webhook handling        | -                                  | `IPaymentGateway`         | `HandlePaymentWebhook`                                      | `PayMongoAdapter`              |
-| Discount code lookup    | -                                  | `IDiscountCodeRepository` | `CreatePaymentIntent`, `ApplyDiscountCode`                  | `PrismaDiscountCodeRepository` |
-| Refund call             | -                                  | `IPaymentGateway`         | `RequestRefund`                                             | `PayMongoAdapter`              |
-| Tier-gating decisions   | -                                  | `IAccessPolicy`           | every use case                                              | `TierAccessPolicy`             |
-| PDF rendering           | -                                  | `IPdfRenderer`            | `IssueCertificate` (receipt: not yet built)                 | `ReactPdfCertificateRenderer`  |
-| Email send              | -                                  | `IEmailSender`            | `HandlePaymentWebhook`, `RequestRefund`, `IssueCertificate` | `ResendEmailSender`            |
+| Concern                 | Domain                                  | Port                                     | Use case                                           | Adapter                        |
+| ----------------------- | --------------------------------------- | ---------------------------------------- | -------------------------------------------------- | ------------------------------ |
+| `Money` arithmetic      | `src/domain/values/Money.ts`            | -                                        | -                                                  | -                              |
+| `Order` entity          | `src/domain/entities/Order.ts`          | -                                        | -                                                  | -                              |
+| Refund policy (window)  | `src/domain/values/OrderRefund.ts`      | -                                        | `RequestRefund` (7d) vs `ProcessRefund` (30d)      | -                              |
+| Tier <-> Course mapping | `src/domain/values/CourseAccessTier.ts` | -                                        | -                                                  | -                              |
+| PayMongo call           | -                                       | `IPaymentGateway`                        | `CreatePaymentIntent`                              | `PayMongoAdapter`              |
+| Webhook handling        | -                                       | `IPaymentGateway`                        | none; the route runs it inline                     | `PayMongoAdapter`              |
+| Discount code lookup    | `src/domain/entities/DiscountCode.ts`   | `IDiscountCodeRepository`                | `ApplyDiscountCode` (unreachable from checkout)    | `PrismaDiscountCodeRepository` |
+| Refund call             | -                                       | `IPaymentGateway` `refund()`             | `ProcessRefund`, `RefundOverride`                  | `PayMongoAdapter`              |
+| Tier-gating decisions   | `src/domain/values/CourseAccessTier.ts` | `IAccessPolicy`                          | `CheckCourseAccess`                                | `TierAccessPolicy`             |
+| PDF rendering           | -                                       | `CertificateRenderer`, `InvoiceRenderer` | `IssueCertificate`, `IssueInvoice`                 | `ReactPdfCertificateRenderer`  |
+| Email send              | -                                       | `EmailSender`                            | webhook route, `RequestRefund`, `IssueCertificate` | `ResendEmailSender`            |
 
 The business rules are in `domain/`. The orchestration is in `usecases/`. The outside world is in `infra/`. The wire-up is in `composition/`. Pages and actions are thin.
