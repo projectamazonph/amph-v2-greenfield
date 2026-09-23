@@ -2,7 +2,7 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `ece9823`
+**Main:** `994441b`
 
 ## Active branches of interest
 
@@ -15,15 +15,23 @@
   finding left open and says which ones need a teaching decision rather than a correction.
 - `feat/module-minus-one-quiz` merged as `PR #556`: the Module -1 knowledge check, four questions,
   so the primer's 150 XP is no longer uncheckable. Bank is 13 quizzes and 87 questions.
-- The curriculum content chain #546 to #576 is in "Latest merged repairs"
+- The curriculum content chain #546 to #586 is in "Latest merged repairs"
   below; the earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
-- Two structural gates landed beside it. `QuizBankStructure.test.ts` (#575)
+- Four structural gates landed beside it. `QuizBankStructure.test.ts` (#575)
   checks the shape of `content/curriculum/quiz-questions.json`, which nothing
   validated before even though the seeder publishes it straight to the database,
   and `SelfCheckBlocks.test.ts` (#578) does the same for the 14 in-lesson
   `<SelfCheck>` blocks, whose component has no range guard on `answerIndex`. Both
   were mutation-tested, and both are recorded in
-  `docs/audit-2026-09-23-lesson-arithmetic.md`.
+  `docs/audit-2026-09-23-lesson-arithmetic.md`. #585 added an eighth
+  `QuizBankStructure` rule for the voice guide's em-dash ban after 37 em dashes
+  were removed from the bank, and `PublishedContentVoice.test.ts` (#586) parses
+  the guide's banned-phrase list and checks all 45 lesson bodies plus the bank
+  against it. ESLint cannot reach content at all: `eslint.config.mjs:15-21` puts
+  the markdown, MDX and JSON globs in a global `ignores`, which flat config
+  applies before any `files` matcher, so the voice rule at `:133-147` was
+  structurally unable to fire on a lesson even though
+  `docs/voice-guide.md` credited it for content.
 
 ## Current learning-experience priority
 
@@ -47,6 +55,11 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR | Commit | Result |
 | --- | --- | --- |
+| #586 | `994441b` | test(curriculum): the voice guide's banned-phrase list now reaches content. `docs/voice-guide.md` credits ESLint for a rule that says these phrases never ship "Anywhere. UI copy, lessons", and for code that holds. For lessons it cannot: `eslint.config.mjs:15-21` puts the markdown, MDX and JSON globs in a global `ignores`, which flat config applies before any `files` matcher, so the voice block's own `**/*.md` entry is unreachable and 45 lesson bodies plus 87 quiz strings were unsupervised. A markdown parser is barred by the no-new-dependency spec, so `PublishedContentVoice.test.ts` parses the 94 phrases out of the guide instead of copying them, asserts it parsed at least 80 and scanned 46 files so a doc reformat cannot leave it enforcing nothing silently, and fails on any hit. Measured first: exactly 2 of the 94 were live in published content and both are fixed (`8.2:155` "the majority of clicks", quiz module 2 q1 `optionA`, the correct answer). The three phrases ESLint does ban scored zero content hits, which is what an unread rule predicts |
+| #585 | `289e346` | fix(quiz): 37 em dashes removed from the quiz bank across 36 strings (33 question and explanation fields, 3 descriptions), the one published surface still breaking `docs/voice-guide.md:148`. All 45 lesson files already carry zero occurrences, so the bank was the outlier. Substitutes measured rather than guessed: 28 became periods, 7 commas, 1 parentheses. Every `order` and `correctAnswer` byte-identical, so nothing re-keys and no historical attempt detaches. An 8th `QuizBankStructure` rule now holds the line, proved by re-injecting a single em dash and watching exactly that rule go red |
+| #584 | `ff75b38` | fix(quiz): module 6 q1's explanation called Down Only "the most conservative strategy" while the lesson that supposedly justifies it scores cost predictability Fixed = Highest and Down Only = High (`6.1:120`), and `6.1:141` and `:147` recommend "Fixed or Down Only" as a pair rather than ranking one above the other. The explanation now says what the table says: Fixed is the most predictable, Down Only adds the discount. Correct answer B, all four options and every `order` value unchanged, so the key and the re-key risk both stay where they were |
+| #583 | `4a79160` | fix(3.1): the Quick check asked "Which one has the healthier ACoS, 17% or 58%?" and answered 58%, for an ACoS the lesson's own table prints as 59% at `:111`. Recomputed from the figures in that table: ₱4,500 spend on ₱7,625 sales is 59.0%. Two lines changed, the question and its answer; the table was already right. `3.3`'s 58% was checked and left alone because there it is correct (38 ÷ 66 = 57.6%), so the same number in a neighbouring lesson is not automatically the same bug |
+| #582 | `e786231` | fix(lesson): a literal `:::` was rendering on the page underneath every `trade-off` block. The directive plugin splices a GFM table into a `:::trade-off` body and left the closing fence as a following paragraph, which `react-markdown` then emitted as text. Fixed in the parser (`isCloseFenceParagraph()` plus consuming the fence) rather than by editing content, because the closing fence is intentional and consistent across the corpus and the plugin already tolerates the same fence in its other shape. The course has exactly 4 `trade-off` blocks (1.2, 1.3, 1.4, 1.5) and all 4 leaked; after the fix a corpus-wide render through the real lesson pipeline reports 0 leaks with fences 109 == blocks 109. The only learner-visible fix in this run that needs no reseed |
 | #576 | `163d5ab` | fix(content): seven of the 30 lesson fact cards rendered literal editing scaffolding to learners, `Last verified: [content owner to fill in at rewrite time]` and `Owner: [content owner]`, while the rest already used plain wording with the owner named. Six files, one of which carries two cards. No date was invented, and `pnpm check:curriculum-sources` counted exactly 29 lessons awaiting a content-owner verification date both before and after, so the tracked debt is unchanged |
 | #570 | `ff4226a` | fix(lesson): the `3.3` ACoS table header named the ₱38 CPC but not the price, so a copied row or a cropped screenshot read as if 58% held at any price. Both inputs now sit in the header. No figure changed |
 | #568 | `8867390` | fix(curriculum): three abbreviations reached learners before any lesson spelled them out. `SOP` in the Module 0 course table, eleven modules before `11.3` calls it a standard operating procedure; `STR` as the name of the required Module 7 artifact while `7.1` only ever wrote "search term report" in full; `AOV` in the maximum-CPC decision-flow steps of `1.2` and `1.5`. First use now carries the expansion. A token-frequency scan against `glossary.json` flagged far more, but reading first-use context showed the lessons already expand `CVR`, `SOV`, `SP`, `SD`, `SB`, `PAT` and `ABA` inline, so only these three were real |
