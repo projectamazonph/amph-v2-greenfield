@@ -674,8 +674,8 @@
           "optionB": "When the term has a high ACoS above your target",
           "optionC": "When the term is completely irrelevant to your product",
           "optionD": "All of the above are valid reasons",
-          "correctAnswer": "D",
-          "explanation": "All three scenarios justify adding an exact negative: high spend with zero sales is pure waste, ACoS above target means the term is unprofitable, and completely irrelevant terms waste budget and hurt CTR."
+          "correctAnswer": "C",
+          "explanation": "Only the irrelevant term earns a negative exact. 7.1 says to use negative exact for a specific irrelevant search term and negative phrase for a whole pattern. High spend with zero sales is not enough on its own, because the term may still be relevant. A high ACoS on a term that does convert is a price problem: 7.2 tells you to lower the bid and keep the term, because negating a converter deletes demand you already own."
         },
         {
           "order": 3,
@@ -689,13 +689,13 @@
         },
         {
           "order": 4,
-          "question": "A search term has 500 impressions, 2 clicks, and 0 orders with ₱175 spend. What triage action should you consider?",
+          "question": "A search term has 6,000 impressions, 12 clicks, and 0 orders with ₱600 spend. What triage action should you consider?",
           "optionA": "Keep bidding — it might convert with more clicks",
           "optionB": "Increase your bid to get more visibility",
           "optionC": "Add as a negative keyword — the CTR is very low and it's spending without converting",
-          "optionD": "Do nothing — 2 clicks is not enough data",
+          "optionD": "Do nothing — 12 clicks is not enough data",
           "correctAnswer": "C",
-          "explanation": "CTR of 0.4% (2/500) is extremely low and the term has ₱175 spend with zero return. This indicates the search term is irrelevant to your product. Adding it as a negative prevents further waste."
+          "explanation": "CTR is 0.2% (12/6,000), below the 0.3% line that 7.3 treats as a strong relevance mismatch. Twelve clicks with zero orders also clears both negating floors this module sets, 5+ in 7.1 and 10+ in 7.3, so this is no longer too little data to act on. At ₱600 across 12 clicks the price per click is a normal ₱50, which points at the term rather than the bid. Add it as a negative."
         },
         {
           "order": 5,

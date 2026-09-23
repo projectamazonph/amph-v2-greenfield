@@ -84,10 +84,34 @@ anywhere in either module. One ambiguity turned up, and it is the only thing cha
   "20 to 39". No worked example sits on either boundary (the example uses 15 clicks, the retrieval cue
   asks about 40), so no other figure in the lesson moved.
 
+## Quiz bank cross-check, Modules 5 to 10
+
+The arithmetic passes compared quiz questions to their source lessons only for Modules -1 to 4, plus 9
+and 11. The quizzes for Modules 5, 6, 7, 8 and 10, which is 34 questions, had never been read against
+the lessons that are supposed to justify them. That pass found 31 consistent and three problems, two of
+them a wrong answer key.
+
+- Module 7 Q2 keyed "All of the above" as reasons to add a negative exact, and its explanation asserted
+  that a term with ACoS above target justifies negating. `7.2:38` says the opposite ("Lower the bid, do
+  not negate") and `7.3:141` calls it a bid problem rather than a relevance problem. Only the irrelevant
+  term is supported for negative exact, at `7.1:87`. Rekeyed to C and the explanation rewritten.
+- Module 7 Q4 keyed "add as a negative" for a term with 2 clicks, which is below both negating floors the
+  module sets (5+ at `7.1:127`, 10+ at `7.3:111`), and justified it with "CTR of 0.4% (2/500) is
+  extremely low" when `7.3:135` puts the low-CTR line at below 0.3%. The stem is now 6,000 impressions,
+  12 clicks and ₱600: CTR 0.2%, clear of both floors, and a click priced at the ₱50 the course uses as
+  its standard. Rekeying was not available here, because with 2 clicks the two remaining do-not-act
+  options become indistinguishable and the question has no single defensible answer.
+- Module 6 Q4 keys a correct answer that no sentence in Module 6 states. Nothing contradicted it, which
+  is exactly why a recompute pass misses this class of problem; the mechanism was simply never taught.
+  `6.3`'s Common Bidding Mistakes now carries a bullet for it.
+
+The 2-click question is the third place the unresolved `7.1` 5+ versus `7.3` 10+ clash reaches, so the
+replacement figures were picked to clear both numbers instead of choosing a winner between them.
+
 ## How to work through this list again
 
 The recomputations are cheap to reproduce. A read-only agent briefed with the scope, the ratio
 definitions, and the instruction to report only what the printed numbers themselves contradict,
-returns a list like this one in a single pass. All three passes used that shape, and it is worth reusing
+returns a list like this one in a single pass. All four passes used that shape, and it is worth reusing
 after any future currency or figure change, including a pass pointed at one module rather than a whole
 band of them.
