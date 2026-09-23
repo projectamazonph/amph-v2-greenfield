@@ -191,7 +191,34 @@ jobs:
       # `playwright install --with-deps` (no arg) installs chromium,
       # firefox, webkit, AND the system shared libs they depend on.
       - run: pnpm exec playwright install --with-deps
-      - run: pnpm build
+      # next/font/google fetches from fonts.gstatic.com while the build runs, and
+      # GitHub runners intermittently fail that request. The failure does not look
+      # like a network error: Turbopack reports
+      # `Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'`,
+      # which reads as a broken import in application code. Observed twice on
+      # 2026-09-23 (PR #592 then PR #594), both times in the E2E job while the
+      # Build job passed on the identical commit, and a plain re-run went green
+      # both times. Four families are involved (Archivo, Barlow_Condensed,
+      # IBM_Plex_Mono, PT_Sans in src/app/layout.tsx), so self-hosting them is a
+      # design and asset decision, not an incidental CI fix. Until that call is
+      # made, retry the build a bounded number of times. A genuine build error
+      # still fails the job, just a few minutes later, and the cache is cleared
+      # between attempts so a negatively cached fetch cannot repeat itself.
+      - name: Build (retried for the Google Fonts fetch)
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if pnpm build; then
+              exit 0
+            fi
+            echo "build attempt ${attempt} of 3 failed"
+            if [ "${attempt}" -lt 3 ]; then
+              rm -rf .next
+              sleep 20
+            fi
+          done
+          echo "build failed after 3 attempts"
+          exit 1
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v4
         if: always()
@@ -246,7 +273,34 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm prisma generate
-      - run: pnpm build
+      # next/font/google fetches from fonts.gstatic.com while the build runs, and
+      # GitHub runners intermittently fail that request. The failure does not look
+      # like a network error: Turbopack reports
+      # `Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'`,
+      # which reads as a broken import in application code. Observed twice on
+      # 2026-09-23 (PR #592 then PR #594), both times in the E2E job while the
+      # Build job passed on the identical commit, and a plain re-run went green
+      # both times. Four families are involved (Archivo, Barlow_Condensed,
+      # IBM_Plex_Mono, PT_Sans in src/app/layout.tsx), so self-hosting them is a
+      # design and asset decision, not an incidental CI fix. Until that call is
+      # made, retry the build a bounded number of times. A genuine build error
+      # still fails the job, just a few minutes later, and the cache is cleared
+      # between attempts so a negatively cached fetch cannot repeat itself.
+      - name: Build (retried for the Google Fonts fetch)
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if pnpm build; then
+              exit 0
+            fi
+            echo "build attempt ${attempt} of 3 failed"
+            if [ "${attempt}" -lt 3 ]; then
+              rm -rf .next
+              sleep 20
+            fi
+          done
+          echo "build failed after 3 attempts"
+          exit 1
       # STORY-0026 fix: upload .next/standalone/ instead of .next/.
       # Standalone is a self-contained production artifact (deps
       # bundled, no broken symlinks to the host's pnpm-store). The
