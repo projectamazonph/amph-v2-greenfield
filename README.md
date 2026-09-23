@@ -25,7 +25,7 @@ Three courses, practical tools, and an Amazon PH simulator interface. The reposi
 - Admin users, courses, modules, lessons, payments, refunds, scenarios (with version history), live classes, badges, resources, audit logs, email templates, and settings routes.
 - PostgreSQL through Prisma 7, Resend email, Sentry configuration, Pino logging, Upstash rate limiting, and Vercel cron wiring.
 
-See [`FEATURES.md`](FEATURES.md) for the implemented, partial, and planned feature matrix, and [`CLAUDE.md`](CLAUDE.md)'s "Known gaps" section for the most current, dated list of what's real versus still open. Simulator scores are formative and are not certification or hiring evidence yet — see [`docs/sprint-plan.md`](docs/sprint-plan.md) Sprints 14–16 for the remediation history, and [`docs/audit-2026-07-27-completeness-review.md`](docs/audit-2026-07-27-completeness-review.md) for the last full completeness audit (several of its findings have since been closed; check `CLAUDE.md` before trusting a claim from it in isolation).
+See [`FEATURES.md`](FEATURES.md) for the implemented, partial, and planned feature matrix, and [`CLAUDE.md`](CLAUDE.md)'s "Known gaps" section for the most current, dated list of what's real versus still open. Simulator scores are formative and are not certification or hiring evidence yet; see [`docs/sprint-plan.md`](docs/sprint-plan.md) Sprints 14–16 for the remediation history. The last full completeness audit, `docs/audit-2026-07-27-completeness-review.md`, was removed on 2026-09-14 by `e1f7352` (PR #513), and `CLAUDE.md` plus `STATE.md` carry everything from it that is still true.
 
 ## Curriculum and tools
 
@@ -86,8 +86,8 @@ For a comprehensive overview of all courses, modules, and lessons taught by the 
 | Admin                             | `/admin/*` route tree gated by `requireAdmin()`, 12 sub-areas including resources                                     |
 | Simulators                        | 5 registered engines with versioned/published scenarios and formative-only scoring                                    |
 | Tests                             | Vitest unit and integration tests, Playwright E2E suite, a dedicated architecture-compliance suite (`pnpm test:arch`) |
-| Latest repository commit reviewed | `918c532` on 2026-09-21 (PRs #520, #528-#539, #542-#545)                                                               |
-| Verification                      | 5,133 Vitest passed, 3 skipped; 876 architecture checks; TypeScript, ESLint, build, Playwright, and Lighthouse passed   |
+| Latest repository commit reviewed | `918c532` on 2026-09-21 (PRs #520, #528-#539, #542-#545)                                                              |
+| Verification                      | 5,133 Vitest passed, 3 skipped; 876 architecture checks; TypeScript, ESLint, build, Playwright, and Lighthouse passed |
 | Documentation review              | 2026-09-21. Start with `STATE.md` and `SESSION-HANDOVER.md`                                                           |
 
 Sprints 1-15 are complete; learning-experience 8.5 Wave 1 (LEARN-010..015) and Wave 3 evidence slice (LEARN-031..035, LEARN-040..045) are also merged. Sprint 16 work (STORY-085, STORY-087, STORY-088) is complete; STORY-086 (instructor calibration) and STORY-089 (connected-account simulator) remain planned. The student onboarding slice (`STORY-146`) is the latest merged work via `PR #545`.
@@ -203,16 +203,16 @@ The screenshots under `public/landing/` and `public/screenshots/` are marketing 
 
 Current coverage (refresh these when the UI changes):
 
-| File | What it shows | Refresh when |
-|------|---------------|--------------|
-| `public/landing/academy-hero.png` | Public landing hero | Landing copy or hero illustration changes |
-| `public/screenshots/bid-elevator.png` | Bid Elevator tool view | Bid Elevator form/result UI changes |
-| `public/screenshots/campaign-builder.png` | Campaign Builder tool view | Campaign Builder UI changes |
-| `public/screenshots/str-triage.png` | STR Triage tool view | STR Triage UI changes |
-| `public/screenshots/listing-audit.png` | Listing Audit tool view | Listing Audit UI changes |
-| `public/screenshots/keyword-research.png` | Keyword Research tool view | Keyword Research UI changes |
-| `public/screenshots/welcome.png` | First-run `/welcome` stepper | Onboarding copy or stepper UI changes |
-| `public/screenshots/new-user-dashboard.png` | `NewUserDashboard` variant | Dashboard variant copy or hero changes |
+| File                                        | What it shows                | Refresh when                              |
+| ------------------------------------------- | ---------------------------- | ----------------------------------------- |
+| `public/landing/academy-hero.png`           | Public landing hero          | Landing copy or hero illustration changes |
+| `public/screenshots/bid-elevator.png`       | Bid Elevator tool view       | Bid Elevator form/result UI changes       |
+| `public/screenshots/campaign-builder.png`   | Campaign Builder tool view   | Campaign Builder UI changes               |
+| `public/screenshots/str-triage.png`         | STR Triage tool view         | STR Triage UI changes                     |
+| `public/screenshots/listing-audit.png`      | Listing Audit tool view      | Listing Audit UI changes                  |
+| `public/screenshots/keyword-research.png`   | Keyword Research tool view   | Keyword Research UI changes               |
+| `public/screenshots/welcome.png`            | First-run `/welcome` stepper | Onboarding copy or stepper UI changes     |
+| `public/screenshots/new-user-dashboard.png` | `NewUserDashboard` variant   | Dashboard variant copy or hero changes    |
 
 > Generated PNGs are not regenerated automatically. Update them as part of the PR that changes the UI, or file a follow-up issue if the diff is too large.
 

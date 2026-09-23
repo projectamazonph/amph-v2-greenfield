@@ -1,6 +1,6 @@
 # Documentation index
 
-**Reviewed:** 2026-08-12 against `main` at `ee1737a`
+**Reviewed:** 2026-09-23 against `main` at `b2e7fe3`
 
 Use this page to distinguish current operating guidance from retained history.
 
@@ -24,12 +24,14 @@ Use this page to distinguish current operating guidance from retained history.
 
 - Production: <https://projectamazonph.vercel.app>
 - Retired origin: `https://amph-v2-greenfield.vercel.app`
-- Reviewed commit: `ee1737a`
-- Student repair: PR #305 (`9096cf4`)
-- Manual enrollment fix: PR #306 (`9d80c77`)
-- Admin redirect cookie fix: PR #307 (`88d83d9`)
-- Password-reset URL fix: PR #308 (`ee1737a`)
-- Verification: 3,816 Vitest passed, 2 skipped; 665 architecture checks; TypeScript, ESLint, production build, Playwright, and Lighthouse passed
+- Reviewed commit: `b2e7fe3` (2026-09-23)
+- Gate measured on CI at `2691a8d`, the commit before it: 5,208 Vitest tests passed with 3 skipped across
+  538 collected files, 892 architecture checks, TypeScript clean, ESLint 0 errors and 3 pre-existing
+  warnings, and the production build, Playwright E2E, learning-release gate and Lighthouse jobs green
+- The August student-journey fixes (PR #305 to #308, gate then 3,816 tests) are historical; `../STATE.md`
+  and `../CHANGELOG.md` carry the current line of work
+- Curriculum text does not publish on deploy. `node scripts/seed-all-content.mjs` is the only script that
+  writes lesson bodies and the quiz bank, and neither `package.json` nor `vercel.json` runs it
 
 ## Historical records
 
