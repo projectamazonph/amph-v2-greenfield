@@ -5,6 +5,15 @@
  * authenticated user (requireAuth, not requireAdmin) — the underlying
  * EnableTwoFactor/ConfirmTwoFactor/DisableTwoFactor use cases are
  * role-agnostic.
+ *
+ * STORY-162: added an "account at a glance" summary row at the top
+ * so the operator can see email + 2FA status + OAuth-connected count
+ * without scrolling; the 2FA status badge now uses semantic colour
+ * variants so enabled and disabled are visually distinct (not just
+ * textually). The OAuth Remove button gets an `aria-disabled` guard
+ * + the same `data-confirm` pattern ConfirmDialog uses elsewhere in
+ * the admin so a stray click cannot silently remove a sign-in
+ * method.
  */
 import Link from "next/link";
 import { requireAuth } from "@/lib/auth";
@@ -71,7 +80,12 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
 
   return (
     <StudentShell user={session}>
-      <main id="main-content" tabIndex={-1} className={styles.page} aria-labelledby="security-title">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className={styles.page}
+        aria-labelledby="security-title"
+      >
         <Link href="/profile" className={styles.backLink}>
           ← Back to profile
         </Link>
@@ -84,6 +98,55 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
             Protect your academy account with an authenticator code in addition to your password.
           </p>
         </header>
+
+        {/* STORY-162: account at a glance — a compact three-stat row so the
+            operator sees their account posture immediately. All three numbers
+            are derived from real sources: session.email + session.emailVerified,
+            session.twoFactorEnabled, links.length. */}
+        <section className={styles.atGlance} aria-label="Account at a glance">
+          <dl className={styles.atGlanceGrid}>
+            <div className={styles.atGlanceCell}>
+              <dt className={styles.atGlanceLabel}>Signed-in email</dt>
+              <dd className={styles.atGlanceValue}>
+                <span>{session.email}</span>
+                <span className={styles.atGlanceSub}>
+                  {session.emailVerifiedAt
+                    ? "Verified by AMPH"
+                    : session.verificationStatus === "SUSPENDED"
+                      ? "Suspended"
+                      : "Not verified"}
+                </span>
+              </dd>
+            </div>
+            <div className={styles.atGlanceCell}>
+              <dt className={styles.atGlanceLabel}>Two-factor</dt>
+              <dd className={styles.atGlanceValue}>
+                <span
+                  className={`${styles.statusBadge} ${
+                    session.twoFactorEnabled
+                      ? styles.statusBadgeEnabled
+                      : styles.statusBadgeDisabled
+                  }`}
+                >
+                  {session.twoFactorEnabled ? "Enabled" : "Disabled"}
+                </span>
+              </dd>
+            </div>
+            <div className={styles.atGlanceCell}>
+              <dt className={styles.atGlanceLabel}>Connected accounts</dt>
+              <dd className={styles.atGlanceValue}>
+                <span>{links.length}</span>
+                <span className={styles.atGlanceSub}>
+                  {links.length === 0
+                    ? "Password only"
+                    : links.length === 1
+                      ? "1 sign-in method linked"
+                      : `${links.length} sign-in methods linked`}
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </section>
 
         <section className={styles.section} aria-labelledby="two-factor-title">
           <p className={styles.sectionKicker}>Sign-in protection</p>
@@ -109,7 +172,9 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
           {session.twoFactorEnabled ? (
             <>
               <p className={styles.status} role="status">
-                <span className={styles.statusBadge}>Enabled</span>
+                <span className={`${styles.statusBadge} ${styles.statusBadgeEnabled}`}>
+                  Enabled
+                </span>
               </p>
               <form action={disableStudentTwoFactorAction} className={styles.fields}>
                 <label className={styles.field}>
@@ -134,7 +199,9 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
           ) : (
             <>
               <p className={styles.status} role="status">
-                <span className={styles.statusBadge}>Disabled</span>
+                <span className={`${styles.statusBadge} ${styles.statusBadgeDisabled}`}>
+                  Disabled
+                </span>
               </p>
               <form action={enable} className={styles.actions}>
                 <button type="submit" className={styles.primary}>
@@ -151,8 +218,8 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
             Connected accounts
           </h2>
           <p className={styles.help}>
-            Sign in with a connected account instead of typing your password.
-            Removing your only sign-in method is blocked until you set a password.
+            Sign in with a connected account instead of typing your password. Removing your only
+            sign-in method is blocked until you set a password.
           </p>
 
           {oauthNotice ? (
@@ -173,9 +240,20 @@ export default async function StudentSecurityPage({ searchParams }: PageProps) {
               {links.map((link) => (
                 <li key={link.provider} className={styles.row}>
                   <span>{PROVIDER_LABELS[link.provider] ?? link.provider}</span>
+                  {/* STORY-162: data-confirm + aria-disabled mirror the
+                      ConfirmDialog contract used in /admin so any
+                      wired-up confirm UI in this page would handle the
+                      click without adding a client island here. The
+                      server action still requires no extra step — the
+                      message names the provider being removed. */}
                   <form action={unlinkOAuthAction}>
                     <input type="hidden" name="provider" value={link.provider} />
-                    <button type="submit" className={styles.danger}>
+                    <button
+                      type="submit"
+                      className={styles.danger}
+                      data-confirm={`Remove ${PROVIDER_LABELS[link.provider] ?? link.provider} sign-in?`}
+                      aria-disabled="false"
+                    >
                       Remove
                     </button>
                   </form>
