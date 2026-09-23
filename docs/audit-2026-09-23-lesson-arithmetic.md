@@ -51,7 +51,7 @@ in the session that found it.
    one may need the content owner, since it is about what the claim is allowed to say.
 7. `4.3:43` hierarchy diagram labels the phrase target "exercise block · ₱40 bid", but the body at
    `:69` assigns ₱40 to "yoga block" and ₱30 to "exercise block". The ₱75 exact and ₱18 broad
-   figures agree, so only this one label is crossed.
+   figures agree, so only this one label was crossed. Fixed: the diagram now reads ₱30.
 
 ## Carried over from pass 1, still with Ryan
 
