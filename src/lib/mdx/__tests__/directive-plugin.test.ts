@@ -159,4 +159,33 @@ describe("directivePlugin (with remark-gfm)", () => {
     expect(htmlNode.value).toContain("data-amph-rows=");
     expect(htmlNode.value).toMatch(/"label"\s*:\s*"CPC"/);
   });
+
+  // The four trade-off blocks in content/curriculum/modules all use this shape:
+  // a blank line after the opening fence and a blank line before the close.
+  // Without this case the learner reads a literal ":::" under the table.
+  it("consumes the closing fence when blank lines split the trade-off block", () => {
+    const tree = runWithGfm(
+      `:::trade-off{id="three-lenses" title="Three lenses"}\n\n| Metric | What it answers |\n| --- | --- |\n| ACoS | Ad spend divided by ad sales |\n| TACoS | Ad spend divided by total store sales |\n\n:::\n\nThe decision order that keeps all three honest:\n`,
+    );
+    const types = tree.children.map((c: { type: string }) => c.type);
+    expect(types).toEqual(["html", "paragraph"]);
+    const htmlNode = tree.children[0] as { value: string };
+    expect(htmlNode.value).toContain('data-amph-block="trade-off"');
+    expect(htmlNode.value).toMatch(/"label"\s*:\s*"ACoS"/);
+    expect(htmlNode.value).toMatch(/"label"\s*:\s*"TACoS"/);
+    const surviving = JSON.stringify(tree.children[1]);
+    expect(surviving).not.toContain(":::");
+    expect(surviving).toContain("The decision order");
+  });
+
+  // Guards the fix from eating the wrong node. With no closing fence at all,
+  // the paragraph after the table is real prose and must stay in the tree.
+  it("leaves the paragraph after an unclosed trade-off table alone", () => {
+    const tree = runWithGfm(
+      `:::trade-off{id="no-close" title="T"}\n\n| Metric | What it answers |\n| --- | --- |\n| CPC | How much per click |\n| CTR | Share of impressions |\n\nRead the table before you touch a bid.\n`,
+    );
+    const types = tree.children.map((c: { type: string }) => c.type);
+    expect(types).toEqual(["html", "paragraph"]);
+    expect(JSON.stringify(tree.children[1])).toContain("Read the table before you touch a bid");
+  });
 });

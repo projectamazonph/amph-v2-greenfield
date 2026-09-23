@@ -105,6 +105,21 @@ function tableToRows(table: Table): TradeOffRow[] {
   return rows;
 }
 
+/**
+ * True when a paragraph holds nothing but a directive closing fence. This
+ * happens whenever an author puts a blank line before `:::`, which is how all
+ * four `:::trade-off` blocks in the curriculum are written. GFM keeps that
+ * paragraph alive after the table is folded, so it would render as a literal
+ * `:::` under the table unless the directive consumes it.
+ */
+function isCloseFenceParagraph(node: RootContent | undefined): boolean {
+  if (!node || node.type !== "paragraph") return false;
+  const kids = (node as Paragraph).children;
+  if (kids.length !== 1) return false;
+  const only = kids[0];
+  return only !== undefined && only.type === "text" && FENCE_CLOSE.test(only.value.trim());
+}
+
 export function directivePlugin() {
   return (tree: Root) => {
     visit(tree, "paragraph", (node: Paragraph, index, parent) => {
@@ -155,6 +170,12 @@ export function directivePlugin() {
         // Splice out the GFM-split sibling table instead of leaving a duplicate
         // html node reference at index+1.
         (parent.children as unknown[]).splice(index + 1, 1);
+        // The closing fence now sits in the slot the table vacated, as its own
+        // paragraph when the author left a blank line before it. Consume that
+        // fence, and only that fence, so it never reaches the learner.
+        if (isCloseFenceParagraph(parent.children[index + 1] as RootContent | undefined)) {
+          (parent.children as unknown[]).splice(index + 1, 1);
+        }
         return [SKIP, index + 1] as unknown as ReturnType<typeof visit>;
       }
 
