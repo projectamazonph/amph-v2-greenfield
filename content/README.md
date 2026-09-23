@@ -75,6 +75,19 @@ can work from an explicit gap list.
 
 ## Content import workflow
 
+**Read this section first if you are trying to publish content.** What is actually wired up today is not what the paragraphs below describe, and the difference is the reason a merged content fix can sit invisible to learners for weeks.
+
+There are two scripts in this repo that read `content/curriculum/`, and neither runs on deploy:
+
+| Script | What it writes | Status today |
+| --- | --- | --- |
+| `scripts/seed-all-content.mjs` | Courses, modules, lessons with their MDX body, the 13 quizzes from `quiz-questions.json`, badges, pricing tiers | The only script that publishes lesson text and quiz content. Run as `node scripts/seed-all-content.mjs`. Not registered as a `package.json` script. Verified to parse (`node --check`), never verified against the production database from a dev machine. |
+| `scripts/import-amph-content.ts`, exposed as `pnpm import:content` | Modules and lessons only (it wires a course, module and lesson repository, no quiz repository) | **Cannot run.** It imports `@/usecases/ImportAmphContent`, a file that `915c7ca` on 2026-07-31 deleted. It fails at module resolution before opening a connection. `src/__tests__/scriptImportsResolve.test.ts` pins this so the gap cannot hide again. |
+
+`vercel.json` runs `pnpm prisma:deploy` and `pnpm db:seed:scenarios` in production, then `pnpm build`. Neither reads `content/curriculum/`, so a deploy publishes schema and simulator scenarios but no lesson text and no quiz questions.
+
+The section below is the STORY-013 design note. It is kept because it explains the intended structure and because its future tense is the tell: step 4 assigns it the quiz bank, which the script never did, and three bullets say what the importer "will" do.
+
 The importer is `scripts/import-amph-content.ts` (STORY-013). It reads the same repo-relative source that the inventory validator checks.
 
 It:
@@ -110,7 +123,7 @@ Each fix added an Amazon Ads Fact Card (source URL, scope, owner/date placeholde
 - **At migration, no additional content rewrites** were made beyond the parent's content track. Later changes, including STORY-109, are documented in their story files and the changelog.
 - **No slugs renamed.** Even where a lesson's framing changed (e.g., `3.1-listing-quality-score.mdx`, `0.3-first-simulation.mdx`), only the frontmatter `title` field was updated, not the filename. Renaming the slug would break `Lesson.slug`-keyed upserts.
 - **No complete lesson-production standard pass.** STORY-107 and STORY-108 remain planned content work. The target standard and implementation order are in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`.
-- **Source and database are separate states.** Running `pnpm import:content` against the intended database is required after approved content changes. Do not treat a committed MDX change as automatically published.
+- **Source and database are separate states.** A committed content change is not published by a deploy. Publishing needs `node scripts/seed-all-content.mjs` run against the intended database, for the reason given in "Content import workflow" above: `pnpm import:content` does not currently run. Do not treat a committed MDX or quiz change as automatically live.
 
 ## Verification
 

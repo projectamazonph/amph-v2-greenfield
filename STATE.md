@@ -143,6 +143,7 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 
 ## Remaining known limitations
 
+- **Curriculum content does not publish on deploy, and the documented publish command is broken.** `pnpm import:content` has failed at module resolution since `915c7ca` (2026-07-31), when `src/usecases/ImportAmphContent.ts` was deleted out from under the script that imports it; `src/__tests__/scriptImportsResolve.test.ts` now pins it. `node scripts/seed-all-content.mjs` is the only script that writes lesson bodies and the quiz bank, and it is wired into neither `package.json` nor `vercel.json` (production deploy runs `prisma:deploy` and `db:seed:scenarios` only). So a merged lesson or quiz change reaches no learner until someone runs that seeder, and this repo keeps no record of when it last ran. Two consequences if you run it: it deletes and recreates each quiz's question rows, which can detach historical attempts from the questions they were graded against, and the lesson side is safe because lesson ids derive from module plus slug, not from content. Full table in `content/README.md`.
 - Simulator scores are formative, not certification or hiring evidence.
 - Admin 2FA is opt-in.
 - Live backup/restore, payment-webhook rotation, and external uptime checks require operator execution.
