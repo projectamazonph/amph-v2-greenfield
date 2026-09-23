@@ -191,6 +191,130 @@
   }
 }
 
+/* Conversion chip CTA — a small persistent arrow label that sits above
+   the eyebrow, re-confirming the conversion target. Token-only. */
+.chipCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 5px 12px 5px 10px;
+  border: 1px solid var(--c-orange-tint);
+  border-radius: var(--r-pill);
+  background: var(--c-orange-soft);
+  color: var(--c-orange-d);
+  font-family: var(--font-disp);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    transform var(--transition);
+}
+
+.chipCta:hover {
+  background: var(--c-orange-tint);
+  border-color: var(--c-orange);
+  color: var(--c-orange-d);
+  transform: translateY(-1px);
+}
+
+.chipCta:focus-visible {
+  outline: 2px solid var(--c-orange);
+  outline-offset: 2px;
+}
+
+.chipCtaArrow {
+  display: inline-block;
+  transition: transform var(--transition);
+}
+
+.chipCta:hover .chipCtaArrow {
+  transform: translateX(2px);
+}
+
+/* Preview badge — replaces the single-metric floating stat chip with a
+   navy two-metric panel that mirrors the in-app simulator chrome.
+   Sample copy is honest about being illustrative data. */
+.previewBadge {
+  position: absolute;
+  right: -14px;
+  top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 192px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-shell-line);
+  border-radius: var(--r-lg);
+  background: var(--c-navy-2);
+  color: var(--c-shell-ink);
+  font-family: var(--font-mono);
+  box-shadow: var(--sh-3);
+}
+
+.previewBadgeLabel {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--c-shell-dim);
+  text-transform: uppercase;
+}
+
+.previewBadgeRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.previewMetric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.previewMetricKey {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--c-shell-faint);
+  text-transform: uppercase;
+}
+
+.previewMetricVal {
+  font-family: var(--font-disp);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--c-orange);
+}
+
+.previewMetricDivider {
+  width: 1px;
+  height: 28px;
+  background: var(--c-shell-line);
+}
+
+@media (max-width: 900px) {
+  .previewBadge {
+    right: -8px;
+    top: 16px;
+    min-width: 168px;
+  }
+}
+
+@media (max-width: 600px) {
+  .previewBadge {
+    position: relative;
+    right: auto;
+    top: auto;
+    margin: 12px 0 0;
+    min-width: 0;
+  }
+}
+
 /* The .pen span now allows wrapping at every breakpoint (see the .pen
    rule above). This block was the previous partial workaround that only
    opened the wrap at <=600px; it is intentionally a no-op now and is
