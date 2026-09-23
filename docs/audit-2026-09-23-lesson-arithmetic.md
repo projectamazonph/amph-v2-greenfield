@@ -128,6 +128,56 @@ supposed to justify them.
 The 2-click question is the third place the unresolved `7.1` 5+ versus `7.3` 10+ clash reaches, so the
 replacement figures were picked to clear both numbers instead of choosing a winner between them.
 
+## What the later checks found, and what is now guarded
+
+Everything above is arithmetic and answer keys. Four more read-only checks ran against the same 45 lessons.
+
+- **Abbreviation coverage.** A token-frequency scan against `content/curriculum/glossary.json` suggested the
+  lessons lean on shorthand the glossary does not define. That turned out to be the wrong test. The lessons
+  expand terms inline, and `CVR`, `SOV`, `SP`, `SD`, `SB`, `PAT`, `ABA`, `VA` and `ROI` are each spelled out
+  where they first appear. Three were genuinely unexpanded and are fixed in #568: `SOP` (used in the `0.1`
+  course table, defined only in `11.3`), `STR` (names the required Module 7 artifact while `7.1` writes
+  "search term report" in full every time), and `AOV` (in the maximum-CPC decision-flow steps of `1.2` and
+  `1.5`).
+- **Directive rendering.** All 21 `:::` directive names used in lesson bodies are dispatched in
+  `src/app/courses/[slug]/lessons/LessonContent.tsx`, so no lesson leaks raw JSON where a component belongs.
+  `callout` and `process` are absent from `JSON_LESSON_DIRECTIVES` in `src/lib/mdx/directive-plugin.ts`
+  because they carry inline bodies, not because nothing handles them. One dead branch: `slide` is dispatched
+  and used by no lesson.
+- **Lesson cross-references.** 42 explicit `Lesson X.Y` pointers name 24 distinct lessons and every target
+  exists. `src/domain/curriculum/__tests__/LessonCrossReferences.test.ts` (#571) now pins that, so a renumber
+  fails CI instead of quietly stranding a learner.
+- **Links.** No lesson body contains a markdown link or an `href` anywhere, so there are no in-lesson URLs to
+  rot. The source URLs in the fact cards are bare `https://` text and are not clickable.
+
+## Unverified source citations, needs a person with Amazon access
+
+29 lessons print an "Official source URL" line. 16 of those 29 hedge it. 13 say the specific article is "not
+verified", 3 present the URL as only an "entry point" behind a login, and `3.3` sits in the second group while
+also labelling its own 5-17% and 8-20% lift figures as seller-reported:
+
+`0.1`, `1.1`, `1.3`, `1.4`, `2.1`, `2.2`, `2.3`, `2.4`, `3.3`, `4.1`, `4.2`, `4.3`, `6.2`, `7.2`, `8.1`, `8.3`.
+
+This is the same class of gap as the missing `Last verified` dates. It is not closeable from here: the pages
+sit inside login-gated Seller Central help, and writing an invented article URL into a lesson would be worse
+than the honest "not verified" that is there now. `3.3` is the sharpest case, because it already concedes that
+no official source backs the 5-17% and 8-20% lift claims.
+
+## The lesson-to-tool bridge is validated and never shown
+
+`content/curriculum/inventory.json` carries a `toolBridge` for each lesson and five point at a simulator:
+`2.2` to keyword-research, `3.1` to listing-audit, `4.4` to campaign-builder, `6.3` to bid-elevator, `7.3` to
+str-triage. `scripts/validate-tool-bridges.ts` checks those mappings and the learning-release gate runs it,
+but no file under `src/app`, `src/components`, `src/composition` or `src/infra` mentions `toolBridge`,
+`CurriculumInventory` or `inventory.json`. Read together with the link finding above, a lesson that tells the
+learner to open the Search Term Triage tool provides no clickable way to do it, while the data needed to
+build that link already exists and is already validated on every release.
+
+This is the fourth instance of a pattern worth naming: email templates, progress events, the glossary
+popover, and now the curriculum inventory. A port, dataset or adapter is real, unit tested, and wired into a
+script or a gate, and nothing in the UI ever reaches it. Checking whether a thing is *consumed* takes one
+grep and keeps coming out differently than checking whether it exists.
+
 ## How to work through this list again
 
 The recomputations are cheap to reproduce. A read-only agent briefed with the scope, the ratio
