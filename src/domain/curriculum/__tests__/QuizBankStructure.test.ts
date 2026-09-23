@@ -40,6 +40,7 @@ type QuizQuestion = {
 type Quiz = {
   moduleNumber: number;
   title?: string;
+  description?: string;
   questions?: QuizQuestion[];
 };
 
@@ -190,6 +191,37 @@ describe("quiz bank structure", () => {
       for (const question of quiz.questions ?? []) {
         if (!question.explanation || question.explanation.trim() === "") {
           bad.push(`module ${quiz.moduleNumber} q${question.order}: no explanation`);
+        }
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  /**
+   * Unlike the rules above, this one comes from the house style rather than the
+   * seeder. `docs/voice-guide.md:148` forbids em dashes and names periods,
+   * commas and parentheses as the substitutes. The rule was already honoured
+   * everywhere else in learner-facing content: a scan of all 45 lesson files in
+   * `content/curriculum/modules` finds zero em dashes, while the quiz bank held
+   * 37 across 33 strings. Explanations are what a learner reads after getting an
+   * answer wrong, so this is the most-read copy in the course.
+   */
+  it("keeps the voice rule all 45 lesson files already follow", () => {
+    const bad: string[] = [];
+    const check = (where: string, value: string | undefined) => {
+      if (value && value.includes("\u2014")) {
+        bad.push(`${where}: em dash is forbidden by docs/voice-guide.md`);
+      }
+    };
+    for (const quiz of bank) {
+      check(`module ${quiz.moduleNumber} title`, quiz.title);
+      check(`module ${quiz.moduleNumber} description`, quiz.description);
+      for (const question of quiz.questions ?? []) {
+        const at = `module ${quiz.moduleNumber} q${question.order}`;
+        check(`${at} question`, question.question);
+        check(`${at} explanation`, question.explanation);
+        for (const letter of LETTERS) {
+          check(`${at} option${letter}`, optionOf(question, letter));
         }
       }
     }
