@@ -171,6 +171,123 @@ ways the rules claim to catch, each produced exactly one red test, and the edits
 over the self-checks nearly produced a false finding: three lesson `options` arrays carry a trailing comma, which
 is valid JavaScript and invalid strict JSON, and they initially read as out-of-range answers.
 
+## Checks after the gates landed
+
+Six more read-only passes ran against the same 45 lessons and the 87-question bank,
+and five of them ended in a merged change. What each one checked, and what it found.
+
+- **Every quiz explanation recomputed against its own lesson** (all 87 questions).
+  Zero questions whose correct key is contradicted by its source lesson. Two
+  SUSPECTs, both fixed: Module 6 Q1's explanation called Dynamic Bids - Down Only
+  "the most conservative strategy" while `6.1:120` scores cost predictability as
+  Fixed = Highest and Down Only = High, and `6.1:17`, `:141` and `:147` all recommend
+  "Fixed or Down Only" as a pair (#584); and `3.1`'s Quick check asked "17% or 58%"
+  for an ACoS its own table prints as 59% at `:111`, which is #583. Module 0 Q2 was
+  reported and deliberately not changed, see "Rejected a fix" below.
+- **The trade-off closing fence leaked to learners.** `src/lib/mdx/directive-plugin.ts`
+  splices a GFM table into a `:::trade-off` body and left the closing `:::` as a
+  following paragraph, which `react-markdown` renders as literal text. All four
+  `trade-off` blocks in the course (1.2, 1.3, 1.4, 1.5) leaked it; a corpus render
+  through the real lesson pipeline now reports 0, with open fences equal to block
+  count at 109. Fixed in the parser, not the content, because the closing fence is
+  intentional and the plugin already tolerates the same fence in its other shape
+  (`tableCellsToRow:94`). #582.
+- **The voice guide's banned phrases were unenforced on content.** Not a drift
+  finding, a structural one: `eslint.config.mjs:15-21` puts the markdown, MDX and
+  JSON globs in a global `ignores`, which flat config applies before any `files`
+  matcher, so the `no-restricted-syntax` voice rule at `:133-147` can never see a
+  lesson even though it lists `**/*.md` and `docs/voice-guide.md:35` credited it for
+  content. Measured 94 phrases out of the guide against all 45 lessons plus the quiz
+  bank: 2 live violations, both fixed, and the three phrases ESLint does ban scored
+  zero content hits (#586). Before that, #585 removed the 37 em dashes in the quiz
+  bank, the one published surface that broke the guide's em-dash rule while all 45
+  lesson files already carried none.
+- **Every lesson's Quick check answer against the lesson that claims to justify it**
+  (all 45 lessons, two independent readers, split as modules -1 to 5 and 6 to 11; the
+  second pass itemised 46 separate answer items across its 20 lessons). Four real
+  defects, all merged, and none of them a wrong verdict:
+  1. `6.1:49` defined Fixed Bids as taking "No adjustments based on placement or
+     conversion likelihood", which the same lesson denies at `:58`, `:73`, `:108` and
+     `:209`, and which `6.2`'s entire multiplier math contradicts. `6.1:218` answer (1)
+     then told the learner "Dynamic Down Only guarantees your bid ceiling" while the
+     table at `:120` scores Fixed and Down Only identically on that axis, and answers
+     (3) and (4) of the same block name both strategies. #587.
+  2. `7.3:127` computed `spend x ACoS` and called the result waste: "A 50% ACoS on
+     ₱5,000 of spend wastes ₱2,500". The course defines `ACoS = ad spend ÷ ad sales ×
+     100` at `1.3:21`, so multiplying spend by the ratio names no quantity the course
+     uses, and under the lesson's own reading the spend already is the ₱5,000. The
+     figures were right and the label was wrong: read as ad sales, 0.50 x ₱5,000 is
+     ₱2,500 of spend. #588.
+  3. `2.4:168`, in the Common Mistakes table, sold theme separation as the way to
+     "optimize ad copy ... per theme", which the same lesson rules out at `:23`,
+     `:187`, `:207` and its own fact card `:224`/`:225`. #589.
+  4. `7.2:95` answered a zero-orders question "Yes" on the numbers alone, dropping the
+     relevance test that `7.2:17`, the `:38` routing table and the `:57` exercise all
+     make the discriminator; and `4.4:165` added "with budget reviewed throughout" to
+     the build order, a clause the lesson never states and whose own Step 6 puts
+     budget last. A doubled expansion, "good CVR conversion rate" at `7.2:38`, turned up
+     while quoting that routing table and is the only instance of that shape in the
+     course. #591.
+- **A title-length number Module 3 refuses to give.** `-1.2:86` told a zero-knowledge
+  learner "Amazon's rules cap it at 200 characters" and `3.1:97` printed "200 chars" in
+  a comparison table, while `3.2` states five times that the limit "varies by category
+  and change[s] over time" and must be checked in Seller Central, at `:50`, `:178`,
+  `:190`, its answer key `:229` and fact card `:240`. Both numbers removed rather than
+  replaced, because the course's own position is that the number is not knowable in the
+  abstract. #590. After this the only remaining hard length in `content/curriculum/` is
+  `3.2:186` "Backend search terms filled (250 characters, no commas)", a different
+  field that no lesson retracts.
+- **Overlapping numeric ladders, a negative result worth recording.** A scanner written
+  to hunt the boundary-overlap class #565 fixed in `9.3` reported 13 candidates across
+  the corpus. All 13 were the scanner's fault: it treated adjacent columns of a
+  comparison table as a sequence of ranges, and it modelled "Under 10" as inclusive of
+  10. No second instance of the bug class exists. The scanner was discarded rather than
+  shipped, because a gate that fires only on false positives is worse than no gate.
+
+## Rejected a fix
+
+Module 0 Q2 asks "Which Amazon ad type appears within search results and on product
+detail pages?" The audit proposed narrowing the stem with "promoting an individual
+listing" as the discriminator. That is not safe to add: Sponsored Display
+product-portrait ads also promote a single ASIN and can surface in search results, so
+the proposed wording would leave two defensible answers where one is keyed. The stem
+needs a placement fact the course teaches nowhere, which is a call for the content
+owner rather than a correction. Left exactly as it is.
+
+## Also open from these passes, needs a decision
+
+Measured and not edited, because each has two defensible resolutions and choosing
+between them changes what the course teaches. The older open items above still stand;
+these are new and do not duplicate them.
+
+- `8.3:32` and the heading `8.3:38` both call the weekly competitive review a
+  30-minute job, while the cadence table in the same lesson gives Weekly 10 min at
+  `:49` and reserves 30 min for the Quarterly deep dive at `:54`. The table's ladder
+  (2 / 10 / 15 / 30) reads as the considered artifact, but "The 30-Minute Weekly
+  Review" is a named entry in
+  `docs/superpowers/lesson-enrichment-inventory.json:1052` and
+  `docs/superpowers/lesson-enrichment-blueprint.md:108`, so renaming it edits a design
+  record as well as a lesson.
+- `5.2:126`-`:130` sets bid multipliers by part of day ("Morning (6-9AM): commuters
+  browsing on mobile", "Evening (7-11PM): peak shopping time") with no timezone
+  anywhere in the list, while `:134` says the peak window is 8PM-12AM PHT, which it
+  glosses as 7AM-11AM EST. Under a US-shopping reading the list and the sentence are
+  opposites; under a Philippine-clock reading the morning row describes commuters who
+  are not the buyers. The Quick check answer at `:246` quietly picks the PHT reading.
+- `4.4` numbers Step 5 "Add negative keywords last" at `:84` and then has a Step 6 at
+  `:86`. #591 removed the invented clause from the answer and left the step titles
+  alone, because whether budget review belongs inside the "last" claim is the same
+  teaching question.
+- `1.1:167` has a `## Check` section with five learner-facing questions and no answer
+  key anywhere in the file, and `0.1` has no Quick check at all. The heading style is
+  split: `0.3`, `1.1` and `1.5` use `## Check` while the other 20 lessons use
+  `## Quick check`. Writing the missing key means authoring five answers, which is
+  content rather than correction.
+- `0.2:117`'s answer rules the Home section out as "not the place where the lesson,
+  simulator, or payment record lives", while the tour table at `:25` grants that Home
+  shows "what to do next", and the question it answers is not inside that section at
+  all. Weakest finding in the set, and left alone on purpose.
+
 ## Unverified source citations, needs a person with Amazon access
 
 29 lessons print an "Official source URL" line. 16 of those 29 hedge it. 13 say the specific article is "not
