@@ -3,7 +3,7 @@
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
 
-- **Main:** `9953e6d` after #602 (this line's last merged PR was #600 at `0cb5130`)
+- **Main:** `eb6fa1c` after #603, this line's eighteenth PR of 2026-09-23
 
 ## Active branches of interest
 
@@ -59,6 +59,7 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR   | Commit    | Result                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ---- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #603 | `eb6fa1c` | docs(reference): the path guard from #600 extended to the fourteen subsystem reference docs (305 references over 22 files), plus a fourth assertion so an exemption cannot outlive the sentence that justified it. Seven dead paths fixed in prose: the phantom `PricingService` and `src/infra/pricing/`, `AccessPolicy.ts` for `IAccessPolicy.ts`, two audits deleted by `e1f7352` that three docs still told readers to open, `requestContainer.ts`, `src/middleware.ts`, and ADR-019's `src/domain/simulators/Simulator.ts`. Reading the pricing section against the schema surfaced four more claims a path check cannot see: three tiers against four seeded rows, `Course.priceMinor` named as the quoted price when `effectivePrice(tier)` is, an All-Access figure of 12,999 against the seeded 14,999, and `isActive = true` as the buy condition when the code needs `status === "ACTIVE"` and a linked `PUBLISHED` course. Mutation-proven five ways with a green control                                                                                                                                                                                                                                                                                                                                            |
 | #602 | `9953e6d` | feat(profile): account at a glance, a semantic 2FA badge, and the OAuth Remove confirm hook (STORY-162). From the UI/UX line, not this content chain. Recorded so the table stays complete; this session did not review it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | #601 | `1a49fe6` | feat(auth): the login form now reveals its TOTP field only when the server reports the account has 2FA on, plus a terms note on signup (STORY-161). From the UI/UX line, not this content chain. Recorded so the table stays complete; this session did not review it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | #600 | `0cb5130` | docs(guard): the first automated check that a document still points at the code it names. `src/__tests__/docPathReferences.test.ts` parses every `src/...`, `scripts/...`, `prisma/...`, `content/...` or `docs/...` path out of the eight current-guidance docs and fails on a broken one unless a reason is recorded. It went red on its first real run over 157 references with 11 dead targets: 3 audits deleted in `e1f7352` (PR #513), 5 files that only ever existed in the parent repo, and 2 wrong names for live code. Fixed in prose rather than exempted, because a doc that sends a reader to a file that is not there is a defect whatever the test does. Mutation-proven three ways                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -181,20 +182,23 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 
 ## Verified gate
 
-- Vitest: 5,208 passed, 3 skipped (540 test files: 538 passed, 2 skipped). Read
-  from the `unit` job log on `main` at `2691a8d`, not from a local run: the same
+- Vitest: 5,241 passed, 3 skipped (544 test files: 542 passed, 2 skipped). Read
+  from the `unit` job log on `main` at `eb6fa1c`, not from a local run: the same
   job's `pnpm test` and `pnpm test:coverage` summaries agree, which is what the
-  coverage line below comes from. Before #595's tripwire test the count was
-  5,207, and the 2 skipped files are the two PDF/HTML render samples
-- Architecture: 892 passed (17 test files)
+  coverage line below comes from. Up from 5,208 across 540 files at `2691a8d`. This
+  line's two docs PRs (#600, #603) add four tests each; the other four files and the
+  remaining twenty-five tests came from the six merged PRs between them (#596, #597,
+  #598, #599, #601, #602), which is exactly why this line is re-read from CI instead
+  of computed from the old number
+- Architecture: 892 passed (17 test files), re-read at `eb6fa1c`: neither docs PR touched it
 - TypeScript: passed (0 errors)
-- ESLint: passed (0 errors, 3 warnings). The 3 are the pre-existing
+- ESLint: passed (0 errors, 3 warnings), re-counted at `eb6fa1c`. The 3 are the
   `<a>`-to-`<Link/>` route warnings at
   `src/components/ui/__tests__/MobileNavToggle.runtime.test.tsx:103`, reported
   three times by two matching rules; they are not new and no content PR touches
-  them. The earlier "0 warnings" line was stale.
+  them.
 - Production build: passed
-- Coverage: 82.28% statements / 74.37% branches / 82.52% functions / 83.91% lines
+- Coverage: 82.32% statements / 74.45% branches / 82.61% functions / 83.95% lines
 
 Two notes on running this locally. The Vitest, architecture and coverage figures
 above come from the CI jobs on `main`, not from a local pass, because a local run
@@ -205,12 +209,11 @@ locally, both in tests that shell out to a CLI and wait:
 `tests/integration/prisma-migration-contract.test.ts:159` (30s budget, measured
 70.8s under load) and the programmatic `tsc` fixture at
 `src/components/ui/__tests__/card-no-event-handler-props.test.ts:193` (5s
-default). CI runs both without complaint. Do not chase them as defects; re-run
+default). CI runs both without complaint. Do not chase them as defects; re-run alone first.
 
-The figures above were read from CI on `main` at `2691a8d`. #600 added 4 tests and
-the docs PR recorded below adds 4 more, so the next record pass should re-read this
-line from the `unit` job rather than carry these numbers forward.
-alone first.
+Every figure in this section was re-read from the CI run on the merge commit named
+above rather than inherited from the previous record, because #603 changed the test
+count twice over (its own four assertions, then two other lines landing under it).
 
 ## Remaining known limitations
 
