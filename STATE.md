@@ -2,17 +2,19 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `daeae42`
+**Main:** `cdc610c`
 
 ## Active branches of interest
 
-- `feat/module-minus-one-quiz` (STORY-152): the Module -1 knowledge check Ryan asked for, four
-  questions drawn from the primer's own lessons, so its 150 XP are no longer uncheckable. The
-  bank is 13 quizzes and 87 questions, and the quiz-count lines in both curriculum maps plus
-  five other documents are corrected in the same pass.
-- Main is at `daeae42` (`PR #555`, Module -1 in the curriculum maps plus the doc-count guard
-  test). The curriculum content chain #546 to #555 is in "Latest merged repairs" below; the
-  earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
+- `fix/lesson-arithmetic-audit` (STORY-153): seven confirmed arithmetic and unit errors in the 19
+  lessons that had never had a numeric pass (Modules 0, 5, 6, 7, 8, 10), including an unconverted
+  `$500` client budget in onboarding and two lessons whose own answer key contradicted the lesson.
+  Four further findings are reported to Ryan rather than edited, because they are teaching-policy
+  contradictions.
+- `feat/module-minus-one-quiz` merged as `PR #556`: the Module -1 knowledge check, four questions,
+  so the primer's 150 XP is no longer uncheckable. Bank is 13 quizzes and 87 questions.
+- Main is at `cdc610c`. The curriculum content chain #546 to #556 is in "Latest merged repairs"
+  below; the earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
 
 ## Current learning-experience priority
 
@@ -36,6 +38,7 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR | Commit | Result |
 | --- | --- | --- |
+| #556 | `cdc610c` | STORY-152 Module -1 knowledge check. The Amazon primer awarded 150 XP with nothing checkable behind it, so it is now four questions restating each lesson's Quick Check at module level: which level holds the daily budget, which surface a VA works in, where a clicked shopper lands and when the seller pays, and which two fees come off a 3P FBA sale. No code changed, because the seeder already maps `moduleNumber: -1` to Foundations and the course page maps whatever quizzes exist. Bank goes 12 to 13 quizzes, 83 to 87 questions, and the module and lesson counts #549 left stale in five more documents are corrected in the same commit |
 | #555 | `daeae42` | STORY-151 curriculum doc drift. Both human-facing curriculum maps still described the pre-#549 course (no Module -1, 12 modules, 42 lessons, 443 minutes, 3,580 XP, an 8-minute `0.1`). They now carry Module -1 and the real aggregates, `-1.3`'s objective says five levels instead of four, `4.3`'s diagram draws the three levels it names, and `CurriculumDocCounts.test.ts` pins both documents to the 45 lesson frontmatters row by row |
 | #554 | `506c25f` | STORY-150 peso conversion for the assessment layer. The module quiz bank (52 dollar amounts across 32 fields in 11 questions) and the four literal-`$` figures `PR #553`'s peso-only scan could not see are now in pesos, and lesson 1.4 is titled "Every Peso In, How Many Pesos Back? ROAS" in all seven places instead of contradicting its own body. New `CurriculumCurrency.test.ts` fails on a dollar sign in front of a digit in any lesson body or the quiz, diagnostic, glossary and capstone data, and is chained into `pnpm validate:learning-release` |
 | #553 | `1f8c988` | STORY-149 peso magnitude repair. Three of #549's conversions had divided correct peso answers by about 50 to meet stale dollar inputs. Whole examples scaled by 50 and every printed ratio re-derived across `1.1` to `1.5`, `2.1` to `2.4`, `3.3`, `4.3`, `9.2`, `11.4` and `-1.1` (18 files). `2.3`'s search-term rows now sum to the totals that were already scaled |
