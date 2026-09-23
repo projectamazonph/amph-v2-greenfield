@@ -214,6 +214,37 @@ popover, and now the curriculum inventory. A port, dataset or adapter is real, u
 script or a gate, and nothing in the UI ever reaches it. Checking whether a thing is *consumed* takes one
 grep and keeps coming out differently than checking whether it exists.
 
+## Two measurements that are not defects, but change a decision
+
+**The stored 70% pass threshold is never the bar a learner actually faces.**
+`content/curriculum/quiz-questions.json` carries `_meta.passThreshold: 70`, the seeder writes it to each quiz's
+`passingScore`, and `src/domain/entities/QuizAttempt.ts:153-154` scores with
+`Math.round((correctCount / totalQuestions) * 100)` then compares `score >= quiz.passingScore`. Because questions
+are whole, the achievable score jumps past 70 rather than landing on it, so no module quiz can be passed at
+exactly 70%:
+
+| questions | must get | real bar | modules |
+| --- | --- | --- | --- |
+| 4 | 3 | 75% | -1, 9, 10, 11 |
+| 5 | 4 | **80%** | 0 |
+| 7 | 5 | 71.4% | 5, 6 |
+| 8 | 6 | 75% | 2, 3, 4, 7, 8 |
+| 12 | 9 | 75% | 1 |
+
+Module 0, the first quiz a learner meets, is the strictest at 4 of 5. No quiz requires perfection, which was the
+thing worth ruling out. Nothing learner-facing prints a percentage, `passingScore` appears only in the admin quiz
+forms, so there is no visible contradiction to fix and no change is proposed. Recorded because adding or removing
+a question silently moves that module's bar without anyone editing a threshold, and because
+`content/CURRICULUM-INDEX.md:184` tells the content owner "the pass threshold is 70%".
+
+**The cost of surfacing the tool bridge is one string.** The open decision above is whether to link lessons to
+simulators. Each bridge record is `{ "kind": "simulator", "target": "<id>" }`, parsed as a typed union in
+`src/domain/curriculum/CurriculumInventory.ts:10-11`, and all five targets map one to one onto directories that
+already exist under `src/app/tools/`: `keyword-research`, `listing-audit`, `campaign-builder`, `bid-elevator`,
+`str-triage`. So the link is `/tools/${target}`, and the work is a render addition on the lesson page rather than
+a redesign or a new route. That is the cost side; whether the most-viewed surface should carry the link is still
+a product call.
+
 ## How to work through this list again
 
 The recomputations are cheap to reproduce. A read-only agent briefed with the scope, the ratio
