@@ -14,7 +14,7 @@
  * ```
  */
 
-import type { User, SubscriptionTier } from "@/domain/entities/User";
+import type { User, SubscriptionTier, Role } from "@/domain/entities/User";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import { Result } from "@/domain/shared/Result";
 import type { UserError } from "@/ports/repositories/UserRepository";
@@ -103,6 +103,7 @@ export class InMemoryUserRepository implements UserRepository {
       passwordHash: string;
       twoFactorEnabled: boolean;
       subscriptionTier: SubscriptionTier;
+      role: Role;
     }>,
   ): Promise<Result<User, UserError>> {
     const user = this.users.get(id);

@@ -4,6 +4,10 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Admin user management on /admin/users/[id]
+
+Admins can now manage accounts from the user detail page: edit a student name and role, set a password directly (revokes every active session, optional notification email), force sign-out, and permanently anonymize a delete. Four use cases (`AdminUpdateUser`, `AdminSetUserPassword`, `AdminDeleteUser`, `AdminForceSignOut`) with matching server actions on both containers, four new audit actions (`user.profile_updated`, `user.password_changed_by_admin`, `user.deleted_by_admin`, `user.sessions_revoked`), and `role` added to the `UserRepository.update()` patch. Guards: an admin cannot delete their own account or change their own role. Boundary suite at `src/app/actions/__tests__/adminUserManagement.action.test.ts`; STORY-155.
+
 ### STORY-146: First-run welcome walkthrough for new students
 
 Zero-experience students (especially new Filipino VAs) didn't know how to navigate the platform after signup. The slice adds a five-step `/welcome` page (URL fragment + localStorage for state), a `NewUserDashboard` variant for fresh free-tier students, a sidebar "?" badge that fades after 7 days, and a profile "Restart the welcome tour" link. No-tier signups now 303 to `/welcome` (was `/dashboard`); tier-selected signups still go to `/checkout`. New `welcomeCompletedAt` column on `User` with a backfill treating existing users as already-toured; two use cases (`CompleteWelcome`, `ResetWelcome`) enforce atomic idempotency at the DB layer via `updateMany + where: { ..., welcomeCompletedAt: null }` — same pattern as `markUsed` on email verification and `markRecordingWatched` on live-class registrations. E2E coverage at `tests/e2e/welcome.spec.ts`. Spec at `docs/superpowers/specs/2026-09-20-student-onboarding-design.md`, plan at `docs/superpowers/plans/2026-09-20-student-onboarding.md`. Post-merge follow-up quest opened for any remaining a11y debt (sidebar badge refactor is done in this PR as a `<button>` to avoid nested-`<a>` invalid HTML).

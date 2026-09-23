@@ -29,8 +29,13 @@ interface PageProps {
     role?: string;
     tier?: string;
     page?: string;
+    notice?: string;
   }>;
 }
+
+const NOTICE_MESSAGES: Record<string, string> = {
+  deleted: "Account deleted and anonymized.",
+};
 
 function parseRole(v: string | undefined): Role | undefined {
   if (v === "STUDENT" || v === "INSTRUCTOR" || v === "ADMIN") return v;
@@ -54,6 +59,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
   const role = parseRole(params.role);
   const tier = parseTier(params.tier);
   const page = parsePage(params.page);
+  const notice = params.notice ? (NOTICE_MESSAGES[params.notice] ?? null) : null;
 
   const container = buildContainer();
   const result = await container.listUsers.execute({
@@ -115,6 +121,12 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
         }
       />
 
+      {notice ? (
+        <p className={styles.notice} role="status">
+          {notice}
+        </p>
+      ) : null}
+
       {/* Filter form — GET submission updates URL params; server re-renders */}
       <form className={styles.filters} method="get">
         <input
@@ -155,10 +167,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
       {users.length === 0 && (
         <div style={{ textAlign: "center", padding: "var(--space-10)", color: "var(--ink-500)" }}>
           <p>No users found.</p>
-          <Link
-            href="/admin/users/new"
-            className={styles.addButton}
-          >
+          <Link href="/admin/users/new" className={styles.addButton}>
             + Create User
           </Link>
         </div>

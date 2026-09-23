@@ -173,6 +173,10 @@ import { GetUserDetail } from "@/usecases/GetUserDetail";
 import { ImpersonateUser } from "@/usecases/ImpersonateUser";
 import { AdminGrantSubscription } from "@/usecases/AdminGrantSubscription";
 import { AdminSetEnrollmentStatus } from "@/usecases/AdminSetEnrollmentStatus";
+import { AdminUpdateUser } from "@/usecases/AdminUpdateUser";
+import { AdminSetUserPassword } from "@/usecases/AdminSetUserPassword";
+import { AdminDeleteUser } from "@/usecases/AdminDeleteUser";
+import { AdminForceSignOut } from "@/usecases/AdminForceSignOut";
 import { GetAdminContentStats } from "@/usecases/GetAdminContentStats";
 // STORY-048a: admin courses CRUD
 import { AdminListCourses } from "@/usecases/AdminListCourses";
@@ -718,6 +722,19 @@ export function buildTestContainer(): TestContainer {
       clock,
       recordAuditLog,
     }),
+    adminUpdateUser: new AdminUpdateUser({ userRepo, recordAuditLog }),
+    adminSetUserPassword: new AdminSetUserPassword({
+      userRepo,
+      sessionRepo,
+      passwordHasher,
+      recordAuditLog,
+      emailSender,
+      passwordChangedEmailRenderer,
+      logger,
+      clock,
+    }),
+    adminDeleteUser: new AdminDeleteUser({ userRepo, sessionRepo, recordAuditLog }),
+    adminForceSignOut: new AdminForceSignOut({ sessionRepo, recordAuditLog }),
     getAdminContentStats: new GetAdminContentStats({ courseRepo, moduleRepo, lessonRepo }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),

@@ -129,7 +129,12 @@ export type AuditAction =
   | "announcement.create_failed"
   | "announcement.updated"
   | "announcement.update_failed"
-  | "announcement.toggled";
+  | "announcement.toggled"
+  // Admin user management
+  | "user.profile_updated"
+  | "user.password_changed_by_admin"
+  | "user.deleted_by_admin"
+  | "user.sessions_revoked";
 
 /**
  * STORY-061. All valid AuditAction values as an array.
@@ -242,6 +247,11 @@ export const ALL_ACTIONS: AuditAction[] = [
   "oauth_account.linked",
   "oauth_account.unlinked",
   "oauth_account.unlink_failed",
+  // Admin user management
+  "user.profile_updated",
+  "user.password_changed_by_admin",
+  "user.deleted_by_admin",
+  "user.sessions_revoked",
 ];
 
 /**
