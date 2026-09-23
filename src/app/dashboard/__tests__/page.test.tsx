@@ -36,14 +36,18 @@ vi.mock("@/lib/auth", () => ({
 // Mock the container so we can stub the enrollment + course + user queries.
 // STORY-146 / Task 10: the dashboard now also calls `userRepo.findById` to
 // decide whether to render the NewUserDashboard first-run variant.
+// STORY-157: the dashboard also calls `xpEventRepo.findByUserId` to render
+// the hero-stats strip (XP + 5-day streak dots).
 const mockEnrollments = vi.fn();
 const mockCourseFindById = vi.fn();
 const mockUserFindById = vi.fn();
+const mockXpFindByUserId = vi.fn();
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     enrollmentRepo: { findByUserId: mockEnrollments },
     courseRepo: { findById: mockCourseFindById },
     userRepo: { findById: mockUserFindById },
+    xpEventRepo: { findByUserId: mockXpFindByUserId },
   }),
 }));
 
@@ -121,6 +125,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     mockEnrollments.mockReset();
     mockCourseFindById.mockReset();
     mockUserFindById.mockReset();
+    mockXpFindByUserId.mockReset();
     mockRedirect.mockClear();
     // Default: the freshly-fetched user has already completed the welcome
     // tour, so the existing dashboard path renders. The
@@ -130,6 +135,9 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
       ok: true,
       value: makeUser({ welcomeCompletedAt: new Date("2026-01-01") }),
     });
+    // STORY-157: default empty XP feed so the hero-stats strip renders
+    // 0 XP and 0 active days without forcing every test to stub it.
+    mockXpFindByUserId.mockResolvedValue({ ok: true, value: [] });
   });
 
   it("exports a default async function (the page module is reachable)", () => {

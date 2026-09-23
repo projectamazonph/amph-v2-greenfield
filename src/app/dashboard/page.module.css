@@ -7,7 +7,17 @@
 }
 
 .hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
   margin-bottom: var(--space-10);
+}
+
+.heroText {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .heroTitle {
@@ -341,41 +351,131 @@
   flex-wrap: wrap;
 }
 
-/* Continue where you enrolled (dashboard hero card) */
+/* Continue where you enrolled (dashboard hero card — STORY-157 dominant variant) */
 
 .continueCard {
-  background: var(--surface-1);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 380px;
   margin-bottom: var(--space-8);
+  border: 1px solid var(--c-navy-4);
+  border-radius: var(--r-lg);
+  background: var(--c-navy-2);
+  color: var(--c-shell-ink);
+  box-shadow: var(--sh-3);
+  overflow: hidden;
 }
 
-.continueEyebrow {
-  font-family: var(--font-mono);
+.continueCardCover {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.continueCardCover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.28;
+}
+
+.continueCardScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--c-navy-2) 30%, transparent) 0%,
+    color-mix(in srgb, var(--c-navy-1) 92%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
+.continueCardBody {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: clamp(24px, 4vw, 40px);
+  max-width: 60ch;
+}
+
+.continueCardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.continueStatusPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--sp-2);
+  border-radius: var(--r-sm);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-family: var(--font-disp);
   font-size: 10px;
-  color: var(--accent-text);
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-2);
+}
+
+.continuePct {
+  color: var(--c-shell-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .continueTitle {
   margin: 0;
-  color: var(--ink-900);
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
+  color: var(--c-shell-ink);
+  font-family: var(--font-disp);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
   font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
 }
 
 .continueLesson {
-  margin: var(--space-2) 0 var(--space-4);
-  color: var(--ink-700);
-  font-size: var(--text-sm);
+  margin: 0;
+  color: var(--c-shell-dim);
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 1.5;
 }
 
 .continueLesson strong {
-  color: var(--ink-900);
+  color: var(--c-shell-ink);
+}
+
+.continueCardActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-top: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.continueProgressTrack {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: color-mix(in srgb, var(--c-shell-ink) 10%, transparent);
+  z-index: 2;
+}
+
+.continueProgressFill {
+  display: block;
+  height: 100%;
+  background: var(--c-orange);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Buttons */
@@ -384,42 +484,43 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-6);
   background: var(--accent);
   color: var(--accent-ink);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  border: none;
+  font-family: var(--font-disp);
+  font-size: var(--fs-14);
+  font-weight: 700;
+  border-radius: var(--r-md);
+  border: 1px solid var(--accent);
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: background-color var(--duration-base) var(--ease-out);
-  /* M-R28 fix: Amazon PH simulator §5 (docs/design-brief.md:142) — Button has no
-     box-shadow. The 1px border is the elevation; the previous
-     `, box-shadow var(--duration-base) var(--ease-out)` term was dead code
-     (no box-shadow declaration on the button) and the `box-shadow: none`
-     on hover was a freeze. Both are removed. */
-  margin-top: var(--space-3);
+  box-shadow: var(--sh-1);
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
 }
 
 .continueBtn:hover {
-  background: color-mix(in srgb, var(--accent) 90%, var(--ink-900));
+  background: var(--c-orange-h);
+  border-color: var(--c-orange-h);
+  transform: translateY(-1px);
+  box-shadow: var(--sh-2);
 }
 
 .portfolioLink {
   display: inline-block;
-  margin-top: var(--space-2);
-  margin-left: var(--space-3);
-  color: var(--accent-text);
-  font-size: var(--text-sm);
+  padding: 4px 0;
+  color: var(--c-shell-ink);
+  font-family: var(--font-disp);
+  font-size: var(--fs-13);
   font-weight: 600;
   text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--c-shell-ink) 30%, transparent);
+  transition: color var(--transition), border-color var(--transition);
 }
 
 .portfolioLink:hover {
-  text-decoration: underline;
+  color: var(--c-orange);
+  border-bottom-color: var(--c-orange);
 }
 
 .quickBtn {

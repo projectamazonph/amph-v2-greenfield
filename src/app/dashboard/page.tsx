@@ -16,6 +16,7 @@ import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
 import { NewUserDashboard } from "@/components/student/NewUserDashboard";
+import { DashboardHeroStats } from "@/components/student/DashboardHeroStats";
 import { nextIncompleteLesson } from "@/app/courses/[slug]/lessons/getLessonData";
 import { CourseCover } from "@/components/student/CourseCover";
 import { hasCompletedWelcome } from "@/domain/entities/User";
@@ -28,6 +29,11 @@ export const dynamic = "force-dynamic";
 interface CourseWithEnrollment {
   course: Course;
   enrollment: Enrollment;
+}
+
+interface HeroStats {
+  totalXp: number;
+  activeDaysOutOfFive: number;
 }
 
 async function loadEnrollmentsWithCourses(userId: string): Promise<CourseWithEnrollment[]> {
@@ -52,10 +58,45 @@ async function loadEnrollmentsWithCourses(userId: string): Promise<CourseWithEnr
   return results.filter((r): r is CourseWithEnrollment => r !== null);
 }
 
+async function loadDashboardHeroStats(userId: string): Promise<HeroStats> {
+  const container = buildContainer();
+  const fallback: HeroStats = { totalXp: 0, activeDaysOutOfFive: 0 };
+
+  const xpResult = await container.xpEventRepo.findByUserId(userId);
+  if (!xpResult.ok) return fallback;
+
+  const events = xpResult.value;
+  const totalXp = events.reduce((sum, e) => sum + e.amount, 0);
+
+  // Build the most-recent 5 days set from XP events. We bucket by UTC
+  // date so a learner crossing midnight in a single session still counts
+  // as one day; the streak service uses the same convention.
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const dayKeys: string[] = [];
+  for (let offset = 0; offset < 5; offset += 1) {
+    const d = new Date(today);
+    d.setUTCDate(today.getUTCDate() - offset);
+    dayKeys.push(d.toISOString().slice(0, 10));
+  }
+
+  const activeDays = new Set<string>();
+  for (const event of events) {
+    const key = new Date(event.createdAt).toISOString().slice(0, 10);
+    if (dayKeys.includes(key)) activeDays.add(key);
+  }
+
+  return {
+    totalXp,
+    activeDaysOutOfFive: activeDays.size,
+  };
+}
+
 export default async function DashboardPage() {
   const user = await requireAuth();
 
   const pairs = await loadEnrollmentsWithCourses(user.id);
+  const heroStats = await loadDashboardHeroStats(user.id);
 
   // "Continue learning" = in-progress (0 < progress < 100)
   const inProgress = pairs.filter(
@@ -106,36 +147,75 @@ export default async function DashboardPage() {
       <main id="main-content" tabIndex={-1} className={styles.page}>
         {/* Welcome */}
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>Welcome back, {user.firstName}.</h1>
-          <p className={styles.heroSubtitle}>
-            {allActive.length === 0
-              ? "You haven't started any courses yet."
-              : `You're enrolled in ${allActive.length} course${allActive.length === 1 ? "" : "s"}.`}
-          </p>
+          <div className={styles.heroText}>
+            <h1 className={styles.heroTitle}>Welcome back, {user.firstName}.</h1>
+            <p className={styles.heroSubtitle}>
+              {allActive.length === 0
+                ? "You haven't started any courses yet."
+                : `You're enrolled in ${allActive.length} course${allActive.length === 1 ? "" : "s"}.`}
+            </p>
+          </div>
+          <DashboardHeroStats
+            totalXp={heroStats.totalXp}
+            activeDaysOutOfFive={heroStats.activeDaysOutOfFive}
+          />
         </header>
 
         {resumePair && resumeLesson && (
           <section className={styles.continueCard} aria-labelledby="continue-learning-title">
-            <div className={styles.continueEyebrow}>
-              {resumePair.enrollment.progressPercent === 0
-                ? "Start your course"
-                : "Pick up where you left off"}
+            <div className={styles.continueCardCover} aria-hidden="true">
+              <CourseCover
+                title={resumePair.course.title}
+                slug={resumePair.course.slug}
+                coverImage={resumePair.course.coverImage}
+                width={1280}
+                height={420}
+              />
+              <span className={styles.continueCardScrim} />
             </div>
-            <h2 id="continue-learning-title" className={styles.continueTitle}>
-              {resumePair.course.title}
-            </h2>
-            <p className={styles.continueLesson}>
-              Next up: <strong>{resumeLesson.title}</strong>
-            </p>
-            <Link
-              href={`/courses/${resumePair.course.slug}/lessons/${resumeLesson.id}`}
-              className={styles.continueBtn}
+            <div className={styles.continueCardBody}>
+              <div className={styles.continueCardMeta}>
+                <span className={styles.continueStatusPill}>
+                  {resumePair.enrollment.progressPercent === 0 ? "Start here" : "In progress"}
+                </span>
+                <span className={styles.continuePct}>
+                  {resumePair.enrollment.progressPercent}% complete
+                </span>
+              </div>
+              <h2 id="continue-learning-title" className={styles.continueTitle}>
+                {resumePair.course.title}
+              </h2>
+              <p className={styles.continueLesson}>
+                Next up: <strong>{resumeLesson.title}</strong>
+              </p>
+              <div className={styles.continueCardActions}>
+                <Link
+                  href={`/courses/${resumePair.course.slug}/lessons/${resumeLesson.id}`}
+                  className={styles.continueBtn}
+                >
+                  {resumePair.enrollment.progressPercent === 0
+                    ? "Start lesson"
+                    : "Continue learning"}
+                </Link>
+                <Link href="/portfolio" className={styles.portfolioLink}>
+                  View portfolio
+                </Link>
+              </div>
+            </div>
+            <div
+              className={styles.continueProgressTrack}
+              role="progressbar"
+              aria-label={`Continue learning progress: ${resumePair.course.title} ${resumePair.enrollment.progressPercent}% complete`}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={resumePair.enrollment.progressPercent}
             >
-              {resumePair.enrollment.progressPercent === 0 ? "Start lesson" : "Continue learning"}
-            </Link>
-            <Link href="/portfolio" className={styles.portfolioLink}>
-              View portfolio
-            </Link>
+              <span
+                className={styles.continueProgressFill}
+                style={{ width: `${resumePair.enrollment.progressPercent}%` }}
+                aria-hidden="true"
+              />
+            </div>
           </section>
         )}
 
