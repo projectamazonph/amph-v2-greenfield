@@ -2,7 +2,7 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `994441b`
+**Main:** `c36b097`
 
 ## Active branches of interest
 
@@ -15,7 +15,7 @@
   finding left open and says which ones need a teaching decision rather than a correction.
 - `feat/module-minus-one-quiz` merged as `PR #556`: the Module -1 knowledge check, four questions,
   so the primer's 150 XP is no longer uncheckable. Bank is 13 quizzes and 87 questions.
-- The curriculum content chain #546 to #586 is in "Latest merged repairs"
+- The curriculum content chain #546 to #591 is in "Latest merged repairs"
   below; the earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
 - Four structural gates landed beside it. `QuizBankStructure.test.ts` (#575)
   checks the shape of `content/curriculum/quiz-questions.json`, which nothing
@@ -55,6 +55,11 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR | Commit | Result |
 | --- | --- | --- |
+| #591 | `c36b097` | fix(lesson): two Quick check answers stated rules their own lesson withholds. `7.2:95` answered a 45-click, ₱2,050, zero-order question "Yes" on the numbers alone, dropping the relevance test that `7.2:17`, the routing table at `:38` and the exercise at `:57` all make the actual discriminator, and which answer (2) four words later applies correctly; it now carries the condition and names the other outcome the lesson allows. `4.4:165` added "with budget reviewed throughout" to the build order, a clause that appears nowhere in the lesson, whose own `:112` says "negatives last" and whose Step 6 puts budget at the end; the clause is gone rather than the lesson amended, because whether budget belongs inside "last" is a teaching call and stays open. Found while quoting the routing table: `7.2:38` read "good CVR conversion rate", the only doubled expansion of that shape in all 45 lessons, now "good conversion rate", with CVR still spelled out earlier at `6.2:37` and `7.1:67` |
+| #590 | `465b49b` | fix(curriculum): `-1.2` told a zero-knowledge learner "Amazon's rules cap it at 200 characters" and `3.1:97` printed "200 chars" in its listing comparison table, while `3.2` refuses that number five times ("vary by category and change over time; check your current limit in Seller Central") at `:50`, `:178`, `:190`, its answer key `:229` and fact card `:240`. The course hands out a hard number in Module -1 and retracts the possibility of one 20 lessons later. Both numbers removed rather than replaced, because the position this course already holds is that the limit is per-category. After the change the only hard length left in `content/curriculum/` is `3.2:186` "Backend search terms filled (250 characters)", a different field no lesson retracts |
+| #589 | `e29e557` | fix(lesson): `2.4`'s Common Mistakes table sold theme separation as the way to "optimize ad copy ... per theme", the one line in the file that contradicts the rule it states at `:23`, `:187`, `:207` and fact card `:224`/`:225` that Sponsored Products has no per-ad-group copy at all. Now "Can't tune bids or read performance per theme", which is `:23`'s own framing ("bid control and reporting clarity"). The seven other `ad copy` uses in `5.3`, `8.1` and the quiz bank were checked and stand: they are about Sponsored Brands headlines or listing copy, not per-ad-group copy |
+| #588 | `996b4f9` | fix(lesson): `7.3`'s efficiency tip computed `spend x ACoS` and called the result waste ("A 50% ACoS on ₱5,000 of spend wastes ₱2,500"). The course defines `ACoS = ad spend ÷ ad sales × 100` at `1.3:21` and restates it in prose at `3.3:169`, so multiplying spend by that ratio names no quantity the course uses, and under the lesson's own reading the spend already *is* the ₱5,000, so the learner can reconstruct neither figure. Both printed results were correct and one input label was wrong: read as ad sales, 0.50 x ₱5,000 = ₱2,500 of spend. `wastes` became `is ... of ad spend`, because whether 50% is wasteful is precisely the judgement `7.3:17` teaches |
+| #587 | `0339b1d` | fix(lesson): `6.1:49` defined Fixed Bids as taking "No adjustments based on placement or conversion likelihood", which the same lesson contradicts at `:58`, `:73`, `:108` and `:209` and which the placement-multiplier math `6.2` is entirely built on. Its Quick check at `:218` then answered "Which strategy guarantees you never pay more than your set bid?" with "Dynamic Down Only guarantees your bid ceiling", while the comparison table at `:120` scores Fixed and Down Only identically on that axis and answers (3) and (4) of the very same block name both strategies. The definition now reads the way `:58` already reads and the answer names both strategies with the placement caveat |
 | #586 | `994441b` | test(curriculum): the voice guide's banned-phrase list now reaches content. `docs/voice-guide.md` credits ESLint for a rule that says these phrases never ship "Anywhere. UI copy, lessons", and for code that holds. For lessons it cannot: `eslint.config.mjs:15-21` puts the markdown, MDX and JSON globs in a global `ignores`, which flat config applies before any `files` matcher, so the voice block's own `**/*.md` entry is unreachable and 45 lesson bodies plus 87 quiz strings were unsupervised. A markdown parser is barred by the no-new-dependency spec, so `PublishedContentVoice.test.ts` parses the 94 phrases out of the guide instead of copying them, asserts it parsed at least 80 and scanned 46 files so a doc reformat cannot leave it enforcing nothing silently, and fails on any hit. Measured first: exactly 2 of the 94 were live in published content and both are fixed (`8.2:155` "the majority of clicks", quiz module 2 q1 `optionA`, the correct answer). The three phrases ESLint does ban scored zero content hits, which is what an unread rule predicts |
 | #585 | `289e346` | fix(quiz): 37 em dashes removed from the quiz bank across 36 strings (33 question and explanation fields, 3 descriptions), the one published surface still breaking `docs/voice-guide.md:148`. All 45 lesson files already carry zero occurrences, so the bank was the outlier. Substitutes measured rather than guessed: 28 became periods, 7 commas, 1 parentheses. Every `order` and `correctAnswer` byte-identical, so nothing re-keys and no historical attempt detaches. An 8th `QuizBankStructure` rule now holds the line, proved by re-injecting a single em dash and watching exactly that rule go red |
 | #584 | `ff75b38` | fix(quiz): module 6 q1's explanation called Down Only "the most conservative strategy" while the lesson that supposedly justifies it scores cost predictability Fixed = Highest and Down Only = High (`6.1:120`), and `6.1:141` and `:147` recommend "Fixed or Down Only" as a pair rather than ranking one above the other. The explanation now says what the table says: Fixed is the most predictable, Down Only adds the discount. Correct answer B, all four options and every `order` value unchanged, so the key and the re-key risk both stay where they were |
@@ -159,12 +164,26 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 
 ## Verified gate
 
-- Vitest: 3,901 passed, 3 skipped (377 test files; 4 new tests for S3 lock-step)
-- Architecture: 669 passed (16 test files)
+- Vitest: 5,207 passed, 3 skipped (540 test files, 2 files skipped)
+- Architecture: 892 passed (17 test files)
 - TypeScript: passed (0 errors)
-- ESLint: passed (0 errors, 0 warnings)
-- Production build: passed (52 routes)
-- Coverage: 80.42% statements / 74.19% branches / 80.71% functions / 81.80% lines
+- ESLint: passed (0 errors, 3 warnings). The 3 are the pre-existing
+  `<a>`-to-`<Link/>` route warnings at
+  `src/components/ui/__tests__/MobileNavToggle.runtime.test.tsx:103`, reported
+  three times by two matching rules; they are not new and no content PR touches
+  them. The earlier "0 warnings" line was stale.
+- Production build: passed
+- Coverage: 82.28% statements / 74.37% branches / 82.52% functions / 83.91% lines
+
+Two notes on running this locally. Both figures above come from one clean
+`pnpm test:coverage` pass. Re-running the suite while lint, typecheck, a build or
+another agent's work shares the machine produced two spurious failures, both in
+tests that shell out to a CLI and wait: `prisma validate` at
+`tests/integration/prisma-migration-contract.test.ts:159` (30s budget, measured
+70.8s under load) and the programmatic `tsc` fixture at
+`src/components/ui/__tests__/card-no-event-handler-props.test.ts:193` (5s
+default). CI runs both without complaint. Do not chase them as defects; re-run
+alone first.
 
 ## Remaining known limitations
 
