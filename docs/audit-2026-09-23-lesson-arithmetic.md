@@ -86,10 +86,10 @@ anywhere in either module. One ambiguity turned up, and it is the only thing cha
 
 ## Quiz bank cross-check, Modules 5 to 10
 
-The arithmetic passes compared quiz questions to their source lessons only for Modules -1 to 4, plus 9
-and 11. The quizzes for Modules 5, 6, 7, 8 and 10, which is 34 questions, had never been read against
-the lessons that are supposed to justify them. That pass found 31 consistent and three problems, two of
-them a wrong answer key.
+The arithmetic passes compared quiz questions to their source lessons only for Modules -1 and 1 to 4,
+plus 9 and 11. The quizzes for Modules 5, 6, 7, 8 and 10, which is 34 questions, had never been read
+against the lessons that are supposed to justify them. That pass found 31 consistent and three problems,
+two of them a wrong answer key.
 
 - Module 7 Q2 keyed "All of the above" as reasons to add a negative exact, and its explanation asserted
   that a term with ACoS above target justifies negating. `7.2:38` says the opposite ("Lower the bid, do
@@ -104,6 +104,26 @@ them a wrong answer key.
 - Module 6 Q4 keys a correct answer that no sentence in Module 6 states. Nothing contradicted it, which
   is exactly why a recompute pass misses this class of problem; the mechanism was simply never taught.
   `6.3`'s Common Bidding Mistakes now carries a bullet for it.
+
+Module 0's five questions had also never been checked, which this section's own first line hid: it said
+pass 2 covered "modules -1 to 4" when its file list was Modules -1, 1, 2, 3 and 4. Checked by hand
+against `0.1`, `0.3` and the Module -1 primer. Q1 to Q3 and Q5 are supported: `0.1:46` defines
+Pay-Per-Click for Q1, `0.1:44` and `-1.1:69` carry the ad-type and visibility claims behind Q2 and Q3,
+and `-1.2:94` carries the weak-listing rule behind Q5. Q4 is not, and it is left open deliberately:
+
+- Module 0 Q4 asks what a bid actually controls and keys the answer that your entered bid is the base,
+  which the bid strategy setting and placement adjustments then act on. Module 0 and Module -1 never say
+  that. The mechanism is taught in Module 6: `6.1:24` and `6.1:58` cover what the base bid does and does
+  not cap, and `6.1:93` is the placement-multiplier trap the option describes. `0.3:81` sends the learner
+  to Module 1 for "the bid math", which is the max-CPC calculation, not this. So the keyed answer is
+  correct and nobody is taught anything false, but the question sits six modules ahead of where the
+  course teaches it. Fixing that is a design call with two real answers, teach a watered-down version in
+  Module 0 or move the question into the Module 6 check, and moving it shifts those quizzes from 5 and 7
+  questions to 4 and 8, which `content/CURRICULUM-INDEX.md:186` and `STATE.md` count per module. So it is
+  not a silent edit.
+
+That closes the bank: all 13 quizzes and all 87 questions have now been read against the lessons that are
+supposed to justify them.
 
 The 2-click question is the third place the unresolved `7.1` 5+ versus `7.3` 10+ clash reaches, so the
 replacement figures were picked to clear both numbers instead of choosing a winner between them.
