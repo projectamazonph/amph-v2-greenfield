@@ -17,7 +17,7 @@ The following documents describe the current greenfield product and should be up
 
 ## Current product contract
 
-The synchronized curriculum contains **12 modules and 42 lessons** distributed across three courses: PPC Foundations contains modules 0–4, Accelerated Mastery contains modules 5–10, and Ultimate Transformation contains module 11. The learner-facing path is beginner-first: vocabulary and marketplace context come before evidence reading, listing readiness, targeting, campaign construction, controlled optimization, reporting, and capstone workflow.
+The synchronized curriculum contains **13 modules and 45 lessons** distributed across three courses: PPC Foundations contains modules -1–4, Accelerated Mastery contains modules 5–10, and Ultimate Transformation contains module 11. The learner-facing path is beginner-first: vocabulary and marketplace context come before evidence reading, listing readiness, targeting, campaign construction, controlled optimization, reporting, and capstone workflow.
 
 The course experience displays this order, locks future lessons until the preceding lesson is complete for entitled learners, gates module quizzes until the module lessons are complete, and preserves completed lessons for review. The greenfield implementation is native to the domain, use-case, route, and MDX layers.
 

@@ -8,7 +8,7 @@ This directory holds the curriculum content (lesson MDX files and quiz fixture) 
 content/
 ├── README.md                      # this file
 └── curriculum/
-    ├── modules/                   # 42 lesson MDX files across 12 modules
+    ├── modules/                   # 45 lesson MDX files across 13 modules
     │   ├── 0-onboarding/          # 3 lessons: welcome, platform tour, client brief
     │   ├── 1-foundations/         # 5 lessons: read PPC data, CPC/CTR, ACoS/TACoS, ROAS, metrics patterns
     │   ├── 2-keyword-research/    # 4 lessons: match types, workflow, negatives, grouping
@@ -23,7 +23,7 @@ content/
     │   └── 11-va-workflow-capstone/  # 4 lessons: cadence, permissions, SOPs, capstone
     ├── inventory.json              # checked-in course and lesson release contract
     ├── public-claims.json          # reviewed public counts, tiers, tools, and certificate wording
-    └── quiz-questions.json         # 12 module-final quizzes (knowledge checks)
+    └── quiz-questions.json         # 13 module-final quizzes (knowledge checks)
 ```
 
 ## Source & history
@@ -82,7 +82,7 @@ It:
 1. Read every `*.mdx` file under `content/curriculum/modules/<module-slug>/<lesson-slug>.mdx`.
 2. Parse the frontmatter (`title`, `slug`, `moduleNumber`, `lessonNumber`, `type`, `estimatedMinutes`, `xpReward`).
 3. Upsert `Module` and `Lesson` rows in the `Course` bound to `ppc-foundations` tier (modules 0–4), `accelerated-mastery` tier (modules 5–10), and `ultimate-transformation` tier (module 11).
-4. Read `content/curriculum/quiz-questions.json`, parse the 12 module quizzes, and attach each to the appropriate module's final lesson as a knowledge check.
+4. Read `content/curriculum/quiz-questions.json`, parse the 13 module quizzes, and attach each to the appropriate module's final lesson as a knowledge check.
 5. Be idempotent (re-running should not duplicate rows — use slug as natural key).
 
 The greenfield importer differs from the parent implementation in these important ways:
@@ -127,6 +127,6 @@ python3 -c "import json; json.load(open('content/curriculum/quiz-questions.json'
 # No legacy product references survive
 grep -rE "AdCraft|AI Mentor|Formula Calculator" content/  # (no output)
 
-# All 12 modules present
+# All 13 modules present
 ls content/curriculum/modules/   # 0-onboarding ... 11-va-workflow-capstone
 ```

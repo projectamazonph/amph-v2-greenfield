@@ -2,7 +2,7 @@
 
 ## Overview
 
-> **Status note — August 2026.** This document is a historical research baseline captured before curriculum synchronization. The current implementation has 12 modules and 42 lessons, including weekly optimization, reporting and troubleshooting, VA workflow, SOPs, client communication, and capstone content. For the current source of truth, use `CURRICULUM-SYLLABUS.md`, `content/CURRICULUM-INDEX.md`, and the migration artifacts under `content/migration/`.
+> **Status note — August 2026.** This document is a historical research baseline captured before curriculum synchronization. The current implementation has 13 modules and 45 lessons, including weekly optimization, reporting and troubleshooting, VA workflow, SOPs, client communication, and capstone content. For the current source of truth, use `CURRICULUM-SYLLABUS.md`, `content/CURRICULUM-INDEX.md`, and the migration artifacts under `content/migration/`.
 
 This report maps the gaps and improvement opportunities across four dimensions of the AMPH v2 curriculum — lesson content, practical exercises, quizzes, and downloadable resources — grounded in the pre-synchronization state of the platform's 9 modules and 31 lessons, benchmarked against what established competitors delivered at the time, and informed by e-learning design literature.
 

@@ -2,7 +2,7 @@
 
 **Source:** `content/curriculum/modules/`
 **Status:** Migrated 2026-07-18 from `projectamazonph/amph-v2` `content/curriculum/`
-**Total:** 13 modules · 45 lessons · 12 module-final quizzes
+**Total:** 13 modules · 45 lessons · 13 module-final quizzes
 
 This is the post-content-track version: legacy product references (AdCraft, AI Mentor, Formula Calculator, "three simulations") have been stripped, and 5 factual corrections have been applied with Amazon Ads Fact Cards.
 
@@ -180,11 +180,10 @@ This is the post-content-track version: legacy product references (AdCraft, AI M
 
 ## Quizzes (`curriculum/quiz-questions.json`)
 
-12 module-final quizzes, one for each of Modules 0 through 11. Module -1 has no quiz. Each
-quiz is a knowledge check attached to the module's final lesson. The pass threshold is 70%,
-with 100 XP per pass. Question counts vary by module: 5 for Module 0, 12 for Module 1, 8 for
-Modules 2, 3, 4, 7 and 8, 7 for Modules 5 and 6, and 4 for Modules 9, 10 and 11. That is 83
-questions in the bank.
+13 module-final quizzes, one for each of Modules -1 through 11. Each quiz is a knowledge check
+attached to the module's final lesson. The pass threshold is 70%, with 100 XP per pass. Question
+counts vary by module: 4 for Modules -1, 9, 10 and 11, 5 for Module 0, 12 for Module 1, 8 for
+Modules 2, 3, 4, 7 and 8, and 7 for Modules 5 and 6. That is 87 questions in the bank.
 
 ## Why this index exists
 
