@@ -149,6 +149,11 @@ Everything above is arithmetic and answer keys. Four more read-only checks ran a
   fails CI instead of quietly stranding a learner.
 - **Links.** No lesson body contains a markdown link or an `href` anywhere, so there are no in-lesson URLs to
   rot. The source URLs in the fact cards are bare `https://` text and are not clickable.
+- **Navigation promises.** 12 lessons say "Next up is X.Y" or similar, and all 12 name the lesson that actually
+  follows in published order, so no learner is pointed at the wrong place. Nothing guards this: the
+  cross-reference test requires the word "Lesson" before the number, so these sentences fall outside it. A
+  future insert or renumber has to update them by hand. The other 32 non-final lessons carry no such sentence,
+  which is a style variation rather than a defect, since the course UI supplies its own next step.
 - **Quiz bank shape.** Nothing validated `content/curriculum/quiz-questions.json`. Three tests read it and all
   three only count, so a malformed question would publish silently. `src/domain/curriculum/__tests__/QuizBankStructure.test.ts`
   (#575) now enforces seven rules, each traced to a line in `scripts/seed-all-content.mjs` rather than invented:
