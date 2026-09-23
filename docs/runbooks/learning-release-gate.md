@@ -27,8 +27,15 @@ Against the disposable or staging database only:
 
 ```bash
 SHADOW_DATABASE_URL= pnpm prisma:deploy
-pnpm import:content
+node scripts/seed-all-content.mjs
 ```
+
+`pnpm import:content` is named by an older revision of this runbook and does not
+run: the use case it imports was deleted in `915c7ca`, and
+`src/__tests__/scriptImportsResolve.test.ts` pins that gap so it cannot be
+forgotten again. `scripts/seed-all-content.mjs` is the script that writes lesson
+bodies and the quiz bank, and it is the one this step means. Its output is the
+only import summary you will get, so capture it.
 
 Record the importer summary and the resulting published course/module/lesson
 counts. Importing is a separate operation from changing public claims; do not

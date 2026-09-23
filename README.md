@@ -33,9 +33,11 @@ The source curriculum is under `content/curriculum/`. Import it after applying m
 
 ```bash
 pnpm prisma:deploy
-pnpm import:content
+node scripts/seed-all-content.mjs
 pnpm db:seed:tiers
 ```
+
+`pnpm import:content` appears in several older documents as the publish step. It does not run today, and `seed-all-content.mjs` is the script that writes lesson bodies and the quiz bank. See [content/README.md](content/README.md#content-import-workflow) before publishing.
 
 The public catalog and pricing pages show empty-state copy until published course rows and active pricing-tier rows exist in the database.
 
@@ -162,7 +164,8 @@ pnpm prisma:studio
 pnpm prisma:format
 
 # Content and seed data
-pnpm import:content
+# pnpm import:content does not run today; see "Curriculum and tools" above
+node scripts/seed-all-content.mjs
 pnpm db:seed:admin
 pnpm db:seed:tiers
 pnpm db:seed:policies

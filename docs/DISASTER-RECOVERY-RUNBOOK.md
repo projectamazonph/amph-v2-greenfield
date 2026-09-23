@@ -48,8 +48,11 @@ export DATABASE_URL="postgresql://..."
 # 2. Apply all migrations to the fresh database
 pnpm prisma:deploy
 
-# 3. Import curriculum content
-pnpm import:content
+# 3. Import curriculum content (lesson bodies + the 13 module quizzes).
+#    Do not use `pnpm import:content` here: it has been broken since 915c7ca
+#    (2026-07-31), when the use case it imports was deleted. It fails at module
+#    resolution before touching the database. See content/README.md.
+node scripts/seed-all-content.mjs
 
 # 4. Seed pricing tiers
 pnpm db:seed:tiers
@@ -130,15 +133,17 @@ If curriculum data is corrupted or missing:
 # 1. Apply any pending migrations
 pnpm prisma:deploy
 
-# 2. Re-import from content/curriculum/ directory
-pnpm import:content
+# 2. Re-import from content/curriculum/ (lesson bodies and the quiz bank)
+node scripts/seed-all-content.mjs
 
 # 3. Re-seed pricing tiers
 pnpm db:seed:tiers
 
-# 4. Verify course catalog
-curl -f https://your-domain.com/api/health
+# 4. Verify the catalog is live
+curl -f https://projectamazonph.vercel.app/api/health/ready
 ```
+
+Two things worth knowing before you reach for this section. The seeder deletes each quiz's question and option rows and recreates them on every run, so historical quiz attempts can lose their link to the question rows they were graded against. The lesson side is safe by comparison: a lesson id is derived from its module and its frontmatter slug, never from its body, so correcting lesson text and re-running does not move any id that a progress row points at.
 
 ---
 

@@ -56,7 +56,7 @@ As of 2026-07-27 (see `docs/audit-2026-07-27-completeness-review.md` and `SESSIO
 
 ## Curriculum and content
 
-`content/curriculum/` and `scripts/import-amph-content.ts` exist and are in active use — this is no longer aspirational. Voice rules: `docs/voice-guide.md` (enforced in part by the `no-restricted-syntax` ESLint rule that bans "leverage", "delve", etc.).
+`content/curriculum/` is real and in active use. **The publish path is not.** `scripts/import-amph-content.ts` (`pnpm import:content`) cannot run: commit `915c7ca` on 2026-07-31 deleted `src/usecases/ImportAmphContent.ts` and left the script importing it, so it fails at module resolution before opening a connection. `src/__tests__/scriptImportsResolve.test.ts` pins that gap, with the broken specifier listed as a documented exemption that fails the suite if it is ever fixed and left stale. The script that actually writes lesson bodies and the 13 module quizzes is `node scripts/seed-all-content.mjs`, which is not a `package.json` script and is not run by `vercel.json` (a production deploy runs only `prisma:deploy` and `db:seed:scenarios`). Consequence: a merged curriculum change is invisible to learners until someone runs that seeder against the intended database, which is why several runbooks and this file's older addenda name a command that no longer works. See the table in `content/README.md`. Voice rules: `docs/voice-guide.md` (enforced in part by the `no-restricted-syntax` ESLint rule that bans "leverage", "delve", etc.).
 
 ## Architecture in detail
 

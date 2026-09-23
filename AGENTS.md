@@ -97,7 +97,7 @@ Admin sections implemented:
 
 ## The Curriculum
 
-Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/curriculum/quiz-questions.json`. `scripts/import-amph-content.ts` reads from those paths (repo-relative, never device paths). Target structure: three courses (PPC Foundations, Accelerated Mastery, Ultimate Transformation) per `docs/CURRICULUM-REDESIGN.md`. Voice: `docs/voice-guide.md`. Reference lessons: `docs/0-1-welcome-to-amph.md`, `docs/1-1-read-ppc-data-before-you-change-it.md`.
+Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/curriculum/quiz-questions.json`. `scripts/seed-all-content.mjs`, run as `node scripts/seed-all-content.mjs`, is what writes those paths into the database, lessons and quizzes both. `scripts/import-amph-content.ts` and its `pnpm import:content` wrapper have been broken since `915c7ca` (2026-07-31), when the use case it imports was deleted; `src/__tests__/scriptImportsResolve.test.ts` pins it. Nothing publishes on deploy. So a committed content change is not live until the seeder runs against the intended database. Target structure: three courses (PPC Foundations, Accelerated Mastery, Ultimate Transformation) per `docs/CURRICULUM-REDESIGN.md`. Voice: `docs/voice-guide.md`. Reference lessons: `docs/0-1-welcome-to-amph.md`, `docs/1-1-read-ppc-data-before-you-change-it.md`.
 
 **Active lesson primitives** (Modules 0–5): `SelfCheck` (interactive radio-group), `TradeOffTable`, `ProcessDiagram`, `PitfallCallout` rendered via `:::trade-off{}`, `:::process{}`, `:::callout{}` MDX fences. Directive plugin in `src/lib/mdx/directive-plugin.ts`. Validation via `scripts/validate-lesson-production.ts --strict`.
 
