@@ -1,13 +1,26 @@
 /* SelfCheck — Amazon PH simulator learning checkpoint. */
 
 .selfCheck {
+  position: relative;
   margin: var(--space-6) 0;
-  padding: var(--space-6);
+  padding: var(--space-6) var(--space-6) var(--space-6) calc(var(--space-6) + 4px);
   border: 1px solid var(--border);
+  border-left: 3px solid var(--c-orange);
   border-radius: var(--radius-lg);
   background: var(--surface-1);
   box-shadow: var(--sh-1);
   font-family: var(--font-body);
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  color: var(--c-orange-d);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .prompt {

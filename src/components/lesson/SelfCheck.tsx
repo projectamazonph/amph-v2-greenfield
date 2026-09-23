@@ -90,6 +90,9 @@ export function SelfCheck(props: SelfCheckProps): ReactElement {
       aria-labelledby={`${id}-prompt`}
     >
       <form onSubmit={onSubmit}>
+        <span className={styles.eyebrow} aria-hidden="true">
+          Check your understanding
+        </span>
         <h3 id={`${id}-prompt`} className={styles.prompt}>
           {prompt}
         </h3>

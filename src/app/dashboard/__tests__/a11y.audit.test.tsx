@@ -15,6 +15,7 @@ const mockRequireAuth = vi.fn();
 const mockEnrollments = vi.fn();
 const mockCourseFindById = vi.fn();
 const mockUserFindById = vi.fn();
+const mockXpFindByUserId = vi.fn();
 
 vi.mock("@/lib/auth", () => ({
   requireAuth: () => mockRequireAuth(),
@@ -27,6 +28,8 @@ vi.mock("@/composition/container", () => ({
     // STORY-146 / Task 10: the dashboard now also calls `userRepo.findById`
     // to decide whether to render the NewUserDashboard first-run variant.
     userRepo: { findById: mockUserFindById },
+    // STORY-157: hero-stats strip reads XP totals via xpEventRepo.
+    xpEventRepo: { findByUserId: mockXpFindByUserId },
   }),
 }));
 
@@ -118,12 +121,16 @@ describe("student dashboard accessibility audit", () => {
     mockEnrollments.mockReset();
     mockCourseFindById.mockReset();
     mockUserFindById.mockReset();
+    mockXpFindByUserId.mockReset();
     mockRequireAuth.mockResolvedValue(makeUser());
     // Default: freshly-fetched user has already completed the welcome
     // tour, so the existing dashboard path renders (and not the
     // NewUserDashboard first-run variant, which would change the
     // a11y surface for this audit).
     mockUserFindById.mockResolvedValue({ ok: true, value: makeUser() });
+    // STORY-157: default empty XP feed so the hero-stats strip renders
+    // gracefully under the a11y audit.
+    mockXpFindByUserId.mockResolvedValue({ ok: true, value: [] });
   });
 
   it("has no axe violations in the empty dashboard state", async () => {
