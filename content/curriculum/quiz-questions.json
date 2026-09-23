@@ -588,7 +588,7 @@
           "optionC": "Sets all your bids to the same amount",
           "optionD": "Dynamically adjusts bids based on time of day",
           "correctAnswer": "B",
-          "explanation": "Dynamic Bids - Down Only tells Amazon to reduce your bid when the placement is unlikely to convert, saving you money on low-value clicks. It never raises your bid above your set amount, making it the most conservative strategy."
+          "explanation": "Dynamic Bids - Down Only tells Amazon to reduce your bid when the placement is unlikely to convert, saving you money on low-value clicks. It never raises your bid above your set amount, which is why 6.1 treats it and Fixed Bids as the two conservative options: Fixed Bids is the most predictable, Down Only adds the discount."
         },
         {
           "order": 2,
