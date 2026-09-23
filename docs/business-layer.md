@@ -27,7 +27,7 @@ If we ever need a second provider (e.g. Stripe for international expansion), it 
 
 ## Pricing Tiers
 
-Three tiers, matching ProjectAmazonPH's existing structure:
+Four tiers are seeded, in `scripts/seed-pricing-tiers.ts`. Three are sold as a ladder and the fourth is the bundle at the end of this section:
 
 | Tier                        | Price (minor) | Price (display) | Includes                                                                                                                                                                  |
 | --------------------------- | ------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -35,11 +35,20 @@ Three tiers, matching ProjectAmazonPH's existing structure:
 | **Accelerated Mastery**     | 599900        | ₱5,999          | Everything in Foundations + advanced modules (8 total), all scenario packs (kitchen, electronics, garden, fitness, beauty), downloadable resources, live class recordings |
 | **Ultimate Transformation** | 999900        | ₱9,999          | Everything in Mastery + weekly live classes with Ryan, 1-on-1 portfolio review (1×/month), private community channel, certificate priority review                         |
 
-Prices are stored on `Course.priceMinor` (integer centavos). Tier is a `CourseAccessTier` value object. Editing tier price is admin-only (see admin backend spec).
+Every figure in the table is a `PricingTier.priceMinor` value in integer centavos. There is also a `Course.priceMinor`, and a course attaches to a tier through the nullable `Course.pricingTierId`, but neither of those is what a learner is quoted: `/pricing` renders `effectivePrice(tier, now)` through `ListPricingTiers`, and `GetCheckoutSummary` charges the same `effectivePrice(tier)` when the request carries a `pricingTierSlug`. Tier is a `CourseAccessTier` value object. Editing tier price is admin-only (see admin backend spec).
 
-**Bundle option:** All-access pass = ₱12,999 (saves ₱6,997 vs buying Ultimate once + future updates). Admin-controlled. Sold only when admin sets `isActive = true`.
+**Bundle option:** All-Access Pass = ₱14,999 (`priceMinor` 1499900), the fourth seeded row, with no early-bird discount on it. The earlier text here said ₱12,999 and a savings of ₱6,997; that figure matches no seeded row and no code path, so it is dropped rather than corrected, and the saving it promised was arithmetic on a price nobody charges.
 
-**Early bird:** First 30 enrollments across all tiers pay ₱499. Implemented as a `PricingService` rule, not a discount code. Once the 30th enrollment completes, the early-bird price is gone forever. The rule lives in `src/infra/pricing/EarlyBirdPricingService.ts`, with tests.
+**What makes a tier buyable.** Two conditions, both checked in `src/usecases/GetCheckoutSummary.ts`, and neither is an `isActive` flag:
+
+1. `tier.status === "ACTIVE"`, otherwise `pricing_tier_unavailable`. Status is a lifecycle string, `DRAFT` (admin only) → `ACTIVE` (listed on `/pricing`) → `ARCHIVED`, defaulting to `DRAFT` in the schema. The repository lists only ACTIVE rows (`src/infra/repositories/PrismaPricingTierRepository.ts`), and `scripts/seed-pricing-tiers.ts` upserts with `status: "ACTIVE"`.
+2. The tier links to a course, and that course is `PUBLISHED`. `findLinkedCourseSlug()` returning nothing is also `pricing_tier_unavailable`.
+
+Consequence worth knowing before a launch: `--with-courses` defaults to false in that seeder, so an ACTIVE tier with no linked course passes the first check and fails the second, and checkout says `pricing_tier_unavailable` with no hint that the missing link is why. `SESSION-HANDOVER.md:877` records that the tiers in the deployed database were seeded without that flag, which this document cannot verify from here; confirm it against the live rows before treating a tier as purchasable. `pnpm db:seed:tiers --with-courses` is what closes a tier's path to checkout.
+
+**Early bird:** A tier may carry `earlyBirdPriceMinor` and `earlyBirdEndsAt`. While the window is open, the lower price is what `/pricing` shows (with a countdown) and what `GetCheckoutSummary` charges; once `earlyBirdEndsAt` passes, the regular price returns on its own. The rule is three pure functions on the entity, `effectivePrice()`, `earlyBirdIsActive()` and `earlyBirdMinutesRemaining()` in `src/domain/entities/PricingTier.ts`, consumed by `ListPricingTiers` and `GetCheckoutSummary`, and covered by `tests/unit/domain/entities/PricingTier.test.ts`. `pnpm db:seed:tiers` (`scripts/seed-pricing-tiers.ts`) seeds Accelerated Mastery at ₱4,999 down from ₱5,999 for 7 days and Ultimate Transformation at ₱7,999 down from ₱9,999 for 3 days; the Foundations and All-Access rows carry no early-bird. Those are seed defaults only: the live rows are `pricing_tiers` and an admin can change or clear them, and a deploy does not re-seed tiers, so treat any peso figure in this document as an example rather than the current price.
+
+**Not implemented:** an early-bird cap measured in enrollments. This section used to read "First 30 enrollments across all tiers pay ₱499", "implemented as a `PricingService` rule", "in `src/infra/pricing/EarlyBirdPricingService.ts`, with tests". None of that is in the repository: there is no `PricingService` symbol in `src/`, no `src/infra/pricing/` directory, no file by that name, nothing anywhere that counts enrollments to close a price, and no ₱499 tier. The window closes on a date. Whether a first-N-enrollments cap is also wanted is an open product decision, recorded in `../STATE.md`.
 
 **Discount codes:** Single-use and multi-use. Created by admin. Applied at checkout. Stored in `DiscountCode` table.
 
@@ -123,7 +132,7 @@ Until then, confirmation emails serve as the primary proof of purchase. BIR-comp
 
 ## Tier-Based Content Gating
 
-Implemented by the `IAccessPolicy` port (`src/ports/access/AccessPolicy.ts`).
+Implemented by the `IAccessPolicy` port (`src/ports/access/IAccessPolicy.ts`).
 
 ```ts
 export type AccessDecision =

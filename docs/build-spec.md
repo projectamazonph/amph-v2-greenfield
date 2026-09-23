@@ -497,6 +497,18 @@ export async function middleware(req: NextRequest) {
 
 Use cases and pages get the container via `container.get()`. No globals, no singletons.
 
+### As built, 2026-09-23
+
+The three names in this section are design, not code. There is no
+`requestContainer.ts`: the `AsyncLocalStorage` scope is `runWithContainer()` and
+`getContainer()` at the bottom of `src/composition/container.ts`. There is no
+`src/middleware.ts` either, because Next.js 16 renamed that entry point, and what
+ships is `src/proxy.ts`, which calls `buildContainer()` directly rather than
+opening a scope. And the sentence above is the one part of this design that the
+implementation contradicts on purpose: `buildContainer()` memoises one
+`AppContainer` in a module variable, which is a singleton. See ADR-017 in
+[`decisions.md`](decisions.md) for the full as-built note.
+
 ---
 
 ## 7. The SOLID Contract
