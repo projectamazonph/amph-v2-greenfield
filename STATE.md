@@ -197,4 +197,12 @@ alone first.
 
 ## Next action
 
-P4 PR-A (#485) and PR-B (#487) are merged on `main` (`cd41fad`). Close #486 once the PR-B close-out lands. Next is PR-C (prerequisites, assignments, resources polish, settings, email templates) then PR-D (OAuth) per #403. Operate from the canonical production URL, keep runbooks current after operator drills, and verify the relevant quality gates before every merge.
+The P4 sequence this section used to describe is finished and the text has been stale since the day it was written: `288ea41` landed it on 2026-09-11 as the close-out for PR-B, #487 merged the same day, and #403 closed 2026-09-10. `docs/sprint-plan.md` records PR-C (P1-01 to P1-06) and PR-D (OAuth) as shipped on `main`. Nothing here is waiting on a feature sprint.
+
+Current work is the content-quality loop. `main` is at `9d9d768` after twelve corrections merged on 2026-09-23 (#581 to #592). The verified gate above is green and no code defect is open against it. In priority order:
+
+1. **Run the content seeder.** `node scripts/seed-all-content.mjs`. Nine merged content PRs, #583 through #591, have not reached learners, because a deploy runs only `prisma:deploy` and `db:seed:scenarios`. Until this runs, the published lessons and module quizzes still carry the text those PRs corrected.
+2. **Supply the 29 `Last verified` dates.** `pnpm check:curriculum-sources` reports `0 dated, 29 pending text`. Every fact card still prints the placeholder `pending content-owner review`, and no date was invented on anyone's behalf.
+3. **Decide the open teaching questions.** They are itemised under "Also open from these passes, needs a decision" in `docs/audit-2026-09-23-lesson-arithmetic.md`, alongside the limitations below. The two with the widest reach are the broad-keyword budget share, where `2.4` says 40% and `4.1` says 10 to 15%, and the click threshold for negating a search term, where `7.1` and `7.2` say 5 while `7.3` and `9.3` say 10 and the STR Triage scenario data follows the latter.
+
+Keep operating from the canonical production URL, keep runbooks current after operator drills, and verify the relevant quality gates before every merge.

@@ -173,8 +173,9 @@ is valid JavaScript and invalid strict JSON, and they initially read as out-of-r
 
 ## Checks after the gates landed
 
-Six more read-only passes ran against the same 45 lessons and the 87-question bank,
-and five of them ended in a merged change. What each one checked, and what it found.
+Seven more read-only passes ran against the same 45 lessons and the 87-question bank,
+and five of them ended in a merged change. The other two found nothing actionable.
+What each one checked, and what it found.
 
 - **Every quiz explanation recomputed against its own lesson** (all 87 questions).
   Zero questions whose correct key is contradicted by its source lesson. Two
@@ -243,6 +244,45 @@ and five of them ended in a merged change. What each one checked, and what it fo
   comparison table as a sequence of ranges, and it modelled "Under 10" as inclusive of
   10. No second instance of the bug class exists. The scanner was discarded rather than
   shipped, because a gate that fires only on false positives is worse than no gate.
+- **Every number inside or required by a Quick check, re-derived from the lesson's own
+  printed figures** (11 lessons, modules -1, 0 and 1). Zero breaks. The arithmetic in
+  `1.2:205`, `1.3:211`, `1.4:161`, `1.5:212` and `1.1:107` reproduces exactly, including
+  the yoga-mat cost chain in `1.3`, both campaign comparisons and the margin and minimum
+  ROAS tables in `1.4`, and the kitchen-scale week-over-week table in `1.5`, whose every
+  row satisfies `ACoS = CPC ÷ (CVR × AOV)`. The modules -1 and 0 check items assert no
+  numbers at all. Two useful absences fell out of this: `1.3` and `1.5` print CTR values
+  with no impressions anywhere in either file, so those CTRs are observed report inputs a
+  learner cannot reproduce, which is correct for a metrics table but is not a derivation;
+  and `1.5:152` sets a 25% target ACoS against the 30% break-even printed at `:105`, which
+  is the cushion the same lesson teaches at `:144`, not an inconsistency.
+
+**Three reported findings from this pass were checked against source and dropped, which
+is the part worth carrying forward.** A delegated reader that is right about most of its
+recomputations can still produce specifics that do not exist, so each citation was
+re-opened before anything was edited:
+
+1. `1.4:167`'s client template says "above the 2.9x we need to stay profitable", reported
+   as a figure the lesson never derives. It does: `1.4:54` computes `1 ÷ 0.35 = 2.86x` for
+   the 35% margin the lesson uses as its running example, and 2.9x is that rounded.
+2. A heading in lesson `5.1` said "Five things to keep in proportion" above six list
+   items, with `:96` cited. No such heading exists. The read that produced it resolved a
+   path assembled from the lesson's topic rather than a directory listing, and returned
+   227 coherent lines for a file that is not in the tree; the real
+   `5.1-campaign-portfolios.mdx` is 280 lines and contains neither the heading nor the
+   quoted string. Nothing was changed for it, and both strings were then searched for in
+   the pending docs to confirm the phantom never reached a durable file.
+3. The same reader flagged `9.3:26` as a live overlapping ladder after #565 had already
+   fixed exactly that line, hours earlier the same day. The worktree had moved to an older
+   branch mid-read, and the reader reported what that branch held.
+
+The pattern across all three is the same: a confident citation, plausible numbers, and a
+file that either says something else or is not the file being described. A grep of a
+documented debt coming out clean is not evidence the debt is wrong, either. In one case a
+regex for `Last verified` matched all 29 fact cards and read as proof that the recorded
+debt was inverted; every match was the placeholder `Last verified: pending content-owner
+review`, and `pnpm check:curriculum-sources` reports `0 dated, 29 pending text, 0 bracket
+todo, 16 no field` in a single command. Where the repository has its own validator, run it
+before concluding that a measurement contradicts it.
 
 ## Rejected a fix
 
