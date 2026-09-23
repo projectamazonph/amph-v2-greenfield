@@ -149,6 +149,22 @@ Everything above is arithmetic and answer keys. Four more read-only checks ran a
   fails CI instead of quietly stranding a learner.
 - **Links.** No lesson body contains a markdown link or an `href` anywhere, so there are no in-lesson URLs to
   rot. The source URLs in the fact cards are bare `https://` text and are not clickable.
+- **Quiz bank shape.** Nothing validated `content/curriculum/quiz-questions.json`. Three tests read it and all
+  three only count, so a malformed question would publish silently. `src/domain/curriculum/__tests__/QuizBankStructure.test.ts`
+  (#575) now enforces seven rules, each traced to a line in `scripts/seed-all-content.mjs` rather than invented:
+  a `correctAnswer` outside A-D yields a question with no correct option, and a duplicated `order` collides the
+  primary key at `:348` and aborts the whole seeder mid-publish. On the bank as it stands, 13 quizzes and 87
+  questions cover 13 lesson-bearing modules one to one, with no gaps and no orphans.
+- **In-lesson self-checks.** `src/components/lesson/SelfCheck.tsx:55` decides correctness with a bare
+  `selected === answerIndex` and no range guard, so an out-of-range key is a mid-lesson question no learner can
+  pass. All 14 blocks are clean today. `src/domain/curriculum/__tests__/SelfCheckBlocks.test.ts` (#578) pins
+  answer range, option count and uniqueness, id uniqueness, and that each id is prefixed with the lesson it sits
+  in. The id rule is a prefix rather than an equality, because one lesson holding a second check is legitimate.
+
+Both new gates were mutation-tested rather than trusted. A scratch copy of the data was broken in each of the
+ways the rules claim to catch, each produced exactly one red test, and the edits were reverted. The first pass
+over the self-checks nearly produced a false finding: three lesson `options` arrays carry a trailing comma, which
+is valid JavaScript and invalid strict JSON, and they initially read as out-of-range answers.
 
 ## Unverified source citations, needs a person with Amazon access
 
@@ -158,7 +174,22 @@ also labelling its own 5-17% and 8-20% lift figures as seller-reported:
 
 `0.1`, `1.1`, `1.3`, `1.4`, `2.1`, `2.2`, `2.3`, `2.4`, `3.3`, `4.1`, `4.2`, `4.3`, `6.2`, `7.2`, `8.1`, `8.3`.
 
-This is the same class of gap as the missing `Last verified` dates. It is not closeable from here: the pages
+`pnpm check:curriculum-sources` measures the related gap and reports a sharper number than "some lessons hedge":
+of the 45 lessons, 29 carry a fact card with a `Last verified` line and **none of the 29 has a date** (`0 dated,
+29 pending text, 0 bracket todo, 16 no field`, after #576). The script only fails CI on a dead link, so this is a
+report a person has to read rather than a red build.
+
+Two follow-ups came out of reading it. Seven of the 30 fact cards, spread over six lessons because one lesson
+carries two, were rendering literal editing scaffolding to learners: `Last verified: [content owner to fill in at
+rewrite time]` and `Owner: [content owner]`, while the rest already used plain wording with the owner named. #576
+normalized those seven, and the per-lesson count of cards awaiting a date stayed exactly 29 both before and
+after, so nothing was hidden. Separately, the report grouped four correctly-unsourced cards with genuinely blank
+ones: `0.2` describes this app, `1.5` is labelled a teaching heuristic, `3.1` says its metric is an inference and
+not a documented Amazon metric, and `3.2` says listing limits are category-specific with no single page. #577
+split those into "states why", so the report stops implying that the fix for any of them is a link.
+
+What remains here is entirely for a person with Amazon access: the 29 dates, and the specific articles behind the
+hedges above. It is not closeable from here: the pages
 sit inside login-gated Seller Central help, and writing an invented article URL into a lesson would be worse
 than the honest "not verified" that is there now. `3.3` is the sharpest case, because it already concedes that
 no official source backs the 5-17% and 8-20% lift claims.

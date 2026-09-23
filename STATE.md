@@ -2,7 +2,7 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `d9c3bd5`
+**Main:** `ece9823`
 
 ## Active branches of interest
 
@@ -15,8 +15,15 @@
   finding left open and says which ones need a teaching decision rather than a correction.
 - `feat/module-minus-one-quiz` merged as `PR #556`: the Module -1 knowledge check, four questions,
   so the primer's 150 XP is no longer uncheckable. Bank is 13 quizzes and 87 questions.
-- The curriculum content chain #546 to #570 is in "Latest merged repairs"
+- The curriculum content chain #546 to #576 is in "Latest merged repairs"
   below; the earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
+- Two structural gates landed beside it. `QuizBankStructure.test.ts` (#575)
+  checks the shape of `content/curriculum/quiz-questions.json`, which nothing
+  validated before even though the seeder publishes it straight to the database,
+  and `SelfCheckBlocks.test.ts` (#578) does the same for the 14 in-lesson
+  `<SelfCheck>` blocks, whose component has no range guard on `answerIndex`. Both
+  were mutation-tested, and both are recorded in
+  `docs/audit-2026-09-23-lesson-arithmetic.md`.
 
 ## Current learning-experience priority
 
@@ -40,6 +47,7 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR | Commit | Result |
 | --- | --- | --- |
+| #576 | `163d5ab` | fix(content): seven of the 30 lesson fact cards rendered literal editing scaffolding to learners, `Last verified: [content owner to fill in at rewrite time]` and `Owner: [content owner]`, while the rest already used plain wording with the owner named. Six files, one of which carries two cards. No date was invented, and `pnpm check:curriculum-sources` counted exactly 29 lessons awaiting a content-owner verification date both before and after, so the tracked debt is unchanged |
 | #570 | `ff4226a` | fix(lesson): the `3.3` ACoS table header named the ₱38 CPC but not the price, so a copied row or a cropped screenshot read as if 58% held at any price. Both inputs now sit in the header. No figure changed |
 | #568 | `8867390` | fix(curriculum): three abbreviations reached learners before any lesson spelled them out. `SOP` in the Module 0 course table, eleven modules before `11.3` calls it a standard operating procedure; `STR` as the name of the required Module 7 artifact while `7.1` only ever wrote "search term report" in full; `AOV` in the maximum-CPC decision-flow steps of `1.2` and `1.5`. First use now carries the expansion. A token-frequency scan against `glossary.json` flagged far more, but reading first-use context showed the lessons already expand `CVR`, `SOV`, `SP`, `SD`, `SB`, `PAT` and `ABA` inline, so only these three were real |
 | #566 | `e524166` | fix(curriculum): cross-checked all 38 quiz questions of Modules 5 to 10 against the lessons that claim to justify them. Module 7 Q2 keyed a negative exact as correct while `7.2` teaches you to lower the bid rather than negate, so it is rekeyed to the bid answer with its explanation rewritten. Module 7 Q4 was unanswerable as written: 500 impressions and 2 clicks put its own CTR under the low-CTR line and under both click floors the module cites, so the stem is now 6,000 impressions, 12 clicks and ₱600 spend, clearing both floors and leaving no open question about the answer. Module 6 Q4's correct option was taught nowhere in Module 6, so `6.3` gained the bullet |
