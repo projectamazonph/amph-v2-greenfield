@@ -41,7 +41,8 @@ in the session that found it.
    over 4 weeks". ₱500 × 14 days is ₱7,000. Either the window is four weeks or the cost is half.
 4. `3.3:152` takeaway claims "₱30k/year PPC savings" while `:136` and the table at `:134` define
    that same ₱30,000 as the month-12 gap on ₱200,000 of monthly ad sales, which is ₱360k a year.
-   A 12x understatement in the lesson's own headline number.
+   A 12x understatement in the lesson's own headline number. **Fixed:** the bullet now calls it the
+   ₱30,000 monthly gap that the model above defines it as, and drops the annualized savings promise.
 5. `3.3:45` table prints 6%/8%/10% CVR against 50%/38%/30% ACoS with only a ₱38 CPC. The lesson's
    own formula at `:160` is ACoS = CPC ÷ (CVR × price), and no price is given in that section. The
    ₱1,000 to ₱4,000 boards referenced at `:90` yield 63% to 16%, not 50% to 30%.
