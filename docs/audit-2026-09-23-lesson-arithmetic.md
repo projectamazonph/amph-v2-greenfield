@@ -71,9 +71,23 @@ in the session that found it.
   Increase Bid.
 - `10.3:21` passes empty props to a `:::visual` block. Cosmetic, no learner-visible effect found.
 
+## Re-check of Modules 9 and 11
+
+These two modules were recomputed a second time, by a reader who had not seen pass 2's result, to test
+whether a second pass finds anything the first missed. Nothing numeric broke: 33% from one order on
+three clicks, 25% ACoS from ₱2,250 on ₱9,000, the change-log row that reviews exactly seven days after
+`2026-08-24`, and both calendar tables all reproduce from their own printed inputs, and no `$` survives
+anywhere in either module. One ambiguity turned up, and it is the only thing changed here.
+
+- `9.3:26` evidence ladder ran "Under 10", "10 to 20", "20 to 40", "40+", so a term at exactly 20 or
+  exactly 40 clicks matched two rows that recommend different actions. The ranges are now "10 to 19" and
+  "20 to 39". No worked example sits on either boundary (the example uses 15 clicks, the retrieval cue
+  asks about 40), so no other figure in the lesson moved.
+
 ## How to work through this list again
 
 The recomputations are cheap to reproduce. A read-only agent briefed with the scope, the ratio
 definitions, and the instruction to report only what the printed numbers themselves contradict,
-returns a list like this one in a single pass. Both passes used that shape and it is worth reusing
-after any future currency or figure change.
+returns a list like this one in a single pass. All three passes used that shape, and it is worth reusing
+after any future currency or figure change, including a pass pointed at one module rather than a whole
+band of them.
