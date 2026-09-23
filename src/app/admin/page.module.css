@@ -149,6 +149,183 @@
   color: var(--ink-900);
 }
 
+/**
+ * Story-160 · stat caption
+ *
+ * Small mono caption that sits under the big stat value to give the
+ * tile some context (e.g. "Across 13 modules" beneath Total Courses).
+ * Matches the eyebrow weight so it reads as a footnote, not a
+ * second value row.
+ */
+.statCaption {
+  margin-top: 2px;
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/**
+ * Story-160 · hero workbench band
+ *
+ * The full-width strip at the very top that names the operator and
+ * pins the single highest-stakes pending counter as a primary CTA.
+ * Sits between TopBar and the stat grid so the operator knows who
+ * they are and what to do before reading the dashboard.
+ */
+.heroBand {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-6);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+}
+
+.heroBandLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.heroBandEyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+
+.heroBandTitle {
+  margin: 0;
+  color: var(--ink-900);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.heroBandSubtitle {
+  margin: 0;
+  color: var(--ink-700);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  max-width: 56ch;
+}
+
+.heroBandRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.heroCtaPrimary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.heroCtaPrimary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--accent-ink);
+}
+
+.heroCtaGhost {
+  background: transparent;
+  color: var(--ink-700);
+}
+
+/**
+ * Story-160 · routine write paths (workbench grid)
+ *
+ * Replaces the prior 2-button Quick Actions row with a 4-card grid
+ * that surfaces every routine write path. Stacks on small viewports.
+ */
+.workbench {
+  margin-bottom: var(--space-8);
+}
+
+.workbenchTitle {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.workbenchLede {
+  margin: 0 0 var(--space-4);
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  max-width: 64ch;
+}
+
+.workbenchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workbenchCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.workbenchCard:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.workbenchIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.workbenchLabel {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.workbenchCaption {
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+  line-height: var(--leading-normal);
+}
+
 /* Lower section: two cards stacked vertically with a workbench feel.
    Stacked (not side-by-side) because the Card component's intrinsic
    min-width fights flex shrinking. A single column always wins; the
