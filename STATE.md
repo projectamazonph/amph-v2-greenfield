@@ -2,7 +2,7 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `d6673d5`
+**Main:** `60bb1e1`
 
 ## Active branches of interest
 
@@ -38,6 +38,7 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR | Commit | Result |
 | --- | --- | --- |
+| #558 | `60bb1e1` | STORY-154 second arithmetic recompute, covering the 26 lessons of Modules -1, 1, 2, 3, 4, 9 and 11 plus every quiz question for modules -1 to 4 against its source lesson. Five confirmed errors fixed, including `1.5` teaching that a launch week can show TACoS 40% while ACoS is 50% with no organic sales (the two ratios must be equal, and the Week 3 delta inherited it) and rounding a max-CPC ceiling up past break-even. Modules -1, 9 and 11 and the converted quiz bank recomputed clean. Seven findings recorded open in `docs/audit-2026-09-23-lesson-arithmetic.md` rather than edited, because they need a teaching decision or a longer pass |
 | #557 | `d6673d5` | STORY-153 recomputed every printed ratio and sum in the 19 lessons of Modules 0, 5, 6, 7, 8 and 10, which no earlier peso pass had ever checked. Seven confirmed errors fixed, including an unconverted ₱500-a-month client budget in onboarding (₱17 a day, below one click at any CPC the course teaches), a `6.3` example claiming two products have different max CPCs when the lesson's own formula makes them identical, and an `8.2` worked answer instructing the learner to pull a report the same lesson spends two sections saying does not exist. Four further findings reported rather than edited, because they are teaching-policy contradictions |
 | #556 | `cdc610c` | STORY-152 Module -1 knowledge check. The Amazon primer awarded 150 XP with nothing checkable behind it, so it is now four questions restating each lesson's Quick Check at module level: which level holds the daily budget, which surface a VA works in, where a clicked shopper lands and when the seller pays, and which two fees come off a 3P FBA sale. No code changed, because the seeder already maps `moduleNumber: -1` to Foundations and the course page maps whatever quizzes exist. Bank goes 12 to 13 quizzes, 83 to 87 questions, and the module and lesson counts #549 left stale in five more documents are corrected in the same commit |
 | #555 | `daeae42` | STORY-151 curriculum doc drift. Both human-facing curriculum maps still described the pre-#549 course (no Module -1, 12 modules, 42 lessons, 443 minutes, 3,580 XP, an 8-minute `0.1`). They now carry Module -1 and the real aggregates, `-1.3`'s objective says five levels instead of four, `4.3`'s diagram draws the three levels it names, and `CurriculumDocCounts.test.ts` pins both documents to the 45 lesson frontmatters row by row |
