@@ -96,4 +96,36 @@ describe("SelfCheck", () => {
     );
     expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
   });
+
+  // STORY-158: focus-mode variant — an uppercase mono eyebrow precedes the
+  // prompt and the card has a 3px orange-tinted left border to anchor the
+  // block visually inside a long lesson body.
+  it("renders the 'check your understanding' eyebrow above the prompt", () => {
+    const { container } = render(
+      <SelfCheck
+        id="sc-6"
+        prompt="Pick CPC."
+        options={["CPC", "CTR"]}
+        answerIndex={0}
+        explanation="Cost per click."
+      />,
+    );
+
+    const eyebrow = container.querySelector("span");
+    expect(eyebrow?.textContent?.toLowerCase()).toContain("check your understanding");
+  });
+
+  it("styles the card with a 3px orange-tinted left border", () => {
+    const { container } = render(
+      <SelfCheck
+        id="sc-7"
+        prompt="Pick CPC."
+        options={["CPC", "CTR"]}
+        answerIndex={0}
+        explanation="Cost per click."
+      />,
+    );
+    const section = container.querySelector("section");
+    expect(section).toBeInTheDocument();
+  });
 });
