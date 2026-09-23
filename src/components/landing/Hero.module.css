@@ -280,7 +280,11 @@
 .previewMetricKey {
   font-size: 9px;
   letter-spacing: 0.12em;
-  color: var(--c-shell-faint);
+  /* STORY-156 fix: --c-shell-faint (#6E7B8B) hit a 4.09 contrast on the
+     navy #131921 panel, below WCAG AA's 4.5 for small text. Stepping up
+     one tier in the shell hierarchy to --c-shell-dim still reads as
+     a secondary caption but lands at ~7:1 contrast. */
+  color: var(--c-shell-dim);
   text-transform: uppercase;
 }
 
