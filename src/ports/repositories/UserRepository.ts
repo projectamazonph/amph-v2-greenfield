@@ -7,7 +7,7 @@
  * ADR-014: Every port method returns Result<T, E>. No exceptions across boundaries.
  */
 
-import type { User, SubscriptionTier } from "@/domain/entities/User";
+import type { User, SubscriptionTier, Role } from "@/domain/entities/User";
 import { Result } from "@/domain/shared/Result";
 
 export type UserError =
@@ -92,6 +92,11 @@ export interface UserRepository {
        * back to FREE.
        */
       subscriptionTier: SubscriptionTier;
+      /**
+       * Set by AdminUpdateUser — admin changes a user's role
+       * (STUDENT / INSTRUCTOR / ADMIN).
+       */
+      role: Role;
     }>,
   ): Promise<Result<User, UserError>>;
 

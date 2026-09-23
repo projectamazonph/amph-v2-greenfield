@@ -98,7 +98,7 @@ Lesson completion is persisted idempotently and updates course progress. Quiz an
 The admin route tree is implemented and gated by `requireAdmin()`:
 
 - `/admin` dashboard
-- `/admin/users` and `/admin/users/[id]`
+- `/admin/users` and `/admin/users/[id]` (edit name and role, set password, force sign-out, delete)
 - `/admin/courses` and nested module and lesson editors
 - `/admin/payments` and `/admin/payments/[id]`
 - `/admin/refunds` and `/admin/refunds/[orderId]`

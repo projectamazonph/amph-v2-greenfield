@@ -48,15 +48,23 @@
   align-items: start;
 }
 
-.profileCard,
-.accessCard,
-.enrollmentCard {
+.leftColumn,
+.rightColumn {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
 }
-.profileCard {
-  grid-row: span 2;
+
+.profileCard,
+.accessCard,
+.enrollmentCard,
+.editProfileCard,
+.passwordCard,
+.signOutCard,
+.dangerCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
 .profileHeader {
@@ -289,12 +297,63 @@
   overflow-wrap: anywhere;
 }
 
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.fieldLabel {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-700);
+  margin-bottom: var(--space-1);
+}
+
+.select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  color: var(--ink-900);
+  font: var(--text-sm)/1 var(--font-body);
+}
+
+.formActions {
+  padding-top: var(--space-2);
+}
+
+.passwordForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  cursor: pointer;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 1fr;
   }
-  .profileCard {
-    grid-row: auto;
+  .leftColumn,
+  .rightColumn {
+    width: 100%;
   }
 }
 

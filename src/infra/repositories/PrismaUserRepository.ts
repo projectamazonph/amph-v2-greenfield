@@ -112,6 +112,7 @@ export class PrismaUserRepository implements UserRepository {
       passwordHash: string;
       twoFactorEnabled: boolean;
       subscriptionTier: SubscriptionTier;
+      role: Role;
     }>,
   ): Promise<Result<import("@/domain/entities/User").User, UserError>> {
     try {
