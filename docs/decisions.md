@@ -14,6 +14,7 @@ This document collects the ADRs that govern Project Amazon PH Academy's architec
 **Context:** Solo developer, early-stage product, unknown scale.
 **Decision:** Build as a single Next.js application. All features in one codebase, one deploy.
 **Consequences:**
+
 - Easier to develop alone (no service orchestration)
 - Cheaper to run (one Vercel deployment, one Postgres)
 - Code-level module boundaries enforced by directory structure
@@ -26,6 +27,7 @@ This document collects the ADRs that govern Project Amazon PH Academy's architec
 **Context:** Project Amazon PH Academy starts solo with low traffic. Postgres adds hosting cost and operational complexity.
 **Decision:** Use PostgreSQL everywhere (dev + production). Consistent environment eliminates provider-specific bugs. CI uses PostgreSQL service container, local dev uses local or remote PostgreSQL.
 **Consequences:**
+
 - Schema uses no SQLite-specific features
 - Use `prisma migrate dev` for local PostgreSQL, `prisma migrate deploy` for production
 - Local seed data is disposable — production data is the source of truth
@@ -37,6 +39,7 @@ This document collects the ADRs that govern Project Amazon PH Academy's architec
 **Context:** Product rule: no external AI APIs. Platform must work without AI dependencies.
 **Decision:** No `openai`, `anthropic`, `langchain`, or any LLM API in the codebase. All content is human-authored. All scoring is deterministic rule-based code.
 **Consequences:**
+
 - Simulator scoring is reproducible, testable, and fast.
 - No per-call cost surprises.
 - No dependency on third-party uptime.
@@ -49,6 +52,7 @@ This document collects the ADRs that govern Project Amazon PH Academy's architec
 **Context:** Audience is Filipino. Prices are quoted in Philippine peso. PayMongo is the payment provider.
 **Decision:** All prices in PHP. No currency conversion. `Money.currency` is a string-typed enum (`"PHP"`) for forward compatibility, but the only supported value today is PHP.
 **Consequences:**
+
 - `Money` value object carries an integer `minor` field (centavos), not a float.
 - PayMongo's `amount` field maps 1:1 to `Money.minor / 100`.
 - No FX risk, no fee on conversion, no exchange-rate drift.
@@ -60,6 +64,7 @@ This document collects the ADRs that govern Project Amazon PH Academy's architec
 **Context:** Audience mental model is "pay once, learn forever." Subscriptions would create churn anxiety and refund disputes.
 **Decision:** One-time payment per tier. Lifetime access. No recurring billing.
 **Consequences:**
+
 - PayMongo Checkout (one-time) is the only path. No `recurring` type, no `subscription` table.
 - All-access pass exists for the multi-course buyer; still one-time.
 - **Revisit when:** Retention data shows <30% of buyers return after 90 days.
@@ -70,6 +75,7 @@ This document collects the ADRs that govern Project Amazon PH Academy's architec
 **Context:** Audience is on phones between gigs. Native apps add build, release, and store-listing overhead.
 **Decision:** Web only. Mobile-first responsive. No React Native, no Flutter, no PWA install prompt in v2.
 **Consequences:**
+
 - Lighthouse CI enforces mobile perf budget.
 - All UI must work at 390px width.
 - **Revisit when:** MAU > 5,000 AND app-store demand exists.
@@ -80,6 +86,7 @@ This document collects the ADRs that govern Project Amazon PH Academy's architec
 **Context:** Building community features in-app is a separate product surface, not a learning feature.
 **Decision:** Use Discord for community. Link to it from the dashboard. No in-app forum, no comments, no DMs.
 **Consequences:**
+
 - One less product surface to build and moderate.
 - Discord already has the moderation tools Discord has.
 - **Revisit when:** Discord itself becomes a blocker (e.g. paid tier required for moderation).
@@ -90,6 +97,7 @@ This document collects the ADRs that govern Project Amazon PH Academy's architec
 **Context:** Cohort-based courses (with weekly assignments, peer review, etc.) are a different product.
 **Decision:** No cohorts. Live classes (Ultimate tier) are the only synchronous component. Everything else is self-paced.
 **Consequences:**
+
 - No cohort scheduling, no assignment submission, no peer review.
 - **Revisit when:** Ultimate retention is high AND alumni ask for it.
 
@@ -114,6 +122,7 @@ app/         → usecases/ → ports/ ← infra/
 - `src/composition/` — the DI container. The only file that knows concrete types.
 
 **Consequences:**
+
 - Adding a payment provider = new adapter in `src/infra/<provider>/` implementing `PaymentGateway`. No edits to use cases or the app.
 - Adding a simulator = one new module in `src/domain/simulators/` + one entry in the registry. No edits to the tools page, access policy, or API.
 - Adding an admin feature = one server action + one page; use cases are unchanged.
@@ -128,6 +137,7 @@ app/         → usecases/ → ports/ ← infra/
 **Context:** The legacy code threw exceptions across layers. Server actions caught and re-threw, error boundaries in RSC caught and rendered fallback UI, but the failure path was hard to test, hard to reason about, and easy to forget.
 **Decision:** Every port method returns `Promise<Result<T, E>>`. Use cases return `Promise<Result<T, E>>`. Server actions convert `Result` to a discriminated-union response for the client. Throw only for programmer errors (invariant violations), caught at the boundary.
 **Consequences:**
+
 - Failure paths are first-class. Every error case is enumerated in the type.
 - Tests are simpler: assert on `Result.ok(...)` vs `Result.err(...)` instead of `expect(() => ...).toThrow()`.
 - The boundary between server action and client is explicit: actions return `{ ok: true, value } | { ok: false, error }`.
@@ -141,6 +151,7 @@ app/         → usecases/ → ports/ ← infra/
 **Context:** Project Amazon PH Academy is one organization, not a SaaS for other training businesses.
 **Decision:** No `orgId` column. `User` is the only tenant boundary. The three roles (`STUDENT`, `ADMIN`, `SUPER_ADMIN`) are a column on `User`.
 **Consequences:**
+
 - Every per-user data access is guarded by `userId = currentUser.id` (or admin role).
 - The tenant-isolation audit (`docs/security/tenant-isolation.md`) is simpler — it documents one boundary, not many.
 - **Revisit when:** The platform is ever sold as a white-label product (it isn't, and probably won't be).
@@ -151,6 +162,7 @@ app/         → usecases/ → ports/ ← infra/
 **Context:** The five-layer architecture is a convention. Conventions drift. Code review catches drift late.
 **Decision:** ESLint blocks the wrong dependency direction mechanically. `src/domain/`, `src/ports/`, and `src/usecases/` cannot import from `next/*`, `@prisma/*`, `paymongo`, `resend`, `@sentry/*`, or `server-only`. `src/app/` cannot import from `@infra/*` or `@prisma/*`.
 **Consequences:**
+
 - The boundary is enforced at lint time, on every save (with `pnpm lint --fix --watch` if desired), on every commit (via husky pre-commit), and in CI.
 - A real need that the rule blocks is a signal to add a port, not to disable the rule.
 - **Revisit when:** The rule blocks three legitimate needs in a row — at that point the rule is misconfigured.
@@ -161,10 +173,13 @@ app/         → usecases/ → ports/ ← infra/
 **Context:** DI requires a container. Globals and singletons are tempting but make tests painful. Next.js has multiple runtimes per request (middleware, RSC, route handlers, server actions).
 **Decision:** `src/composition/container.ts` exports `buildContainer()` (real) and `buildTestContainer()` (fakes). `src/composition/requestContainer.ts` wraps it in `AsyncLocalStorage`. Middleware sets up the per-request container. Everything downstream reads via `container.get()`.
 **Consequences:**
+
 - No global singletons. The container is per-request.
 - Tests can swap individual adapters without rebuilding the whole graph.
 - The `AsyncLocalStorage` wrapper means `container.get()` works from server actions, RSC, route handlers — anywhere within a request.
 - **Revisit when:** Next.js provides a first-class request-context API that replaces `AsyncLocalStorage` (currently no plan for that).
+
+**As built (2026-09-23):** the mechanism exists, the file layout and the isolation claim do not. There is no `src/composition/requestContainer.ts`. The `AsyncLocalStorage` scope lives inside `src/composition/container.ts` itself as `runWithContainer()` and `getContainer()` (container.ts:1518-1524), and the file that replaced middleware, `src/proxy.ts`, does not open that scope: it calls `buildContainer()` directly (proxy.ts:106, :151, :273). `buildContainer()` returns a module-level cached container (container.ts:1582-1590), so "no global singletons, the container is per-request" describes the intent, not the running system. 196 files under `src/`, tests included, call `buildContainer()` by name, and only two enter the scoped path: `src/app/tools/keyword-research/actions.ts` and `src/app/tools/listing-audit/actions.ts`. Everywhere else, `getContainer()` would throw for want of a scope, which is why the direct call is the prevailing pattern. Changing this is a real piece of work, not a doc fix: it is recorded here so the next reader does not assume ADR-017 is in force.
 
 ## ADR-018: `Money` Value Object, Integer Minor Units
 
@@ -172,6 +187,7 @@ app/         → usecases/ → ports/ ← infra/
 **Context:** Money is the most common source of float-related bugs in payment systems. The legacy code mixed `number` and `string` and once lost ₱0.01 in a refund calculation.
 **Decision:** A `Money` value object. Constructor takes integer `minor` (centavos) and `currency` (string-typed enum). `Money.php(pesos)` rounds to centavos. Arithmetic (`add`, `subtract`, `multiply`) preserves integer. `format()` uses `Intl.NumberFormat`. No method on `Money` returns a `number`.
 **Consequences:**
+
 - Floats never cross the payment boundary.
 - PayMongo's centavos API maps 1:1 to `Money.minor`.
 - All prices in the database are stored as integer `priceMinor` columns, not floats.
@@ -184,10 +200,13 @@ app/         → usecases/ → ports/ ← infra/
 **Context:** The legacy `amph-v2` has 5 simulators. Adding a 6th required edits to the tools index page, the access policy, the API route, the engine registry, the scenarios loader, and the type unions. The shape of "what changes" was unpredictable.
 **Decision:** A `Simulator<TIn, TOut>` interface in `src/domain/simulators/Simulator.ts`. A `SimulatorRegistry` port that resolves simulators by ID. The tools page reads from the registry, not a hardcoded list. The access policy checks `simulator.requiredTier` from the registry, not a hardcoded mapping.
 **Consequences:**
+
 - Adding a 6th simulator is one new file in `src/domain/simulators/<name>/` (the domain logic) + one entry in the registry. The OCP showcase.
 - The tools page, access policy, and API route are unchanged for the 6th simulator.
 - Tests are uniform: every simulator's `run` is a pure function on a `SimContext`.
 - **Revisit when:** A simulator's behavior fundamentally doesn't fit the `Simulator<TIn, TOut>` shape (e.g. needs to spawn a long-running background job, or has a fundamentally non-pure engine). So far, all 5 fit.
+
+**As built (2026-09-23):** the registry half of this decision shipped, the tier half did not. The interface is `Simulator<TIn, TOut>` in `src/ports/simulator/Simulator.ts`, a port rather than `src/domain/simulators/Simulator.ts`, and its members are `simulatorId`, `name` and `run()`. Neither it nor `src/ports/simulator/SimulatorRegistry.ts` carries a `requiredTier`, and `src/ports/access` does not mention simulators at all, so the access policy never consults the registry for a tier. What a learner may actually do is decided per action: all five practice pages call `getSessionUserId()` in their server action and stop without a session, and the availability split a visitor sees on `src/app/tools/page.tsx` is a label set built in that file, not a registry field. `src/proxy.ts:28` protects `/dashboard/`, `/admin/`, `/enroll/` and `/order/`, and `/tools` is not on the list. Engines do live one directory per simulator, under `src/domain/simulator/` (singular), registered by `src/infra/simulator/buildSimulatorRegistry.ts`, so the open-closed part holds.
 
 ## ADR-020: English-Only UI, Filipino Cultural References in Copy
 
@@ -195,6 +214,7 @@ app/         → usecases/ → ports/ ← infra/
 **Context:** Audience is Filipino, but the working language for Amazon PPC is English. Translating UI to Tagalog would create two parallel string catalogs and slow every copy change.
 **Decision:** English UI. Filipino cultural references in copy (real ₱ amounts, real cities, real VA scenarios). No formal i18n framework. Strings live in `src/lib/copy/` keyed by `copyId`, so a future i18n is mechanical, not architectural.
 **Consequences:**
+
 - One copy catalog. One translator, one voice review.
 - Filipino context lives in the content (lessons, scenarios, examples), not the chrome.
 - v2.1 can add Tagalog without an architectural change — strings move to `src/lib/copy/tl/`.
@@ -206,6 +226,7 @@ app/         → usecases/ → ports/ ← infra/
 **Context:** Lesson completion, quiz attempts, simulator runs, and streak visits all need to be recorded. Storing only the latest state ("lesson X is complete") loses history; rebuilding state from the log later is the only honest way to support analytics, refunds, and certificate re-issuance.
 **Decision:** Every progress event is a `ProgressEvent` row (append-only). Denormalized counters on `Enrollment` (`lastLessonId`, `percentComplete`) are derived, rebuilt from the log by a daily job. The log is the source of truth.
 **Consequences:**
+
 - Analytics, fraud detection, and "did this user actually complete the course" questions are all answerable from the log.
 - Refund logic can recompute the user's effective access from the log at any point in time.
 - Storage is cheap; the log is bounded by user activity, not page views.
@@ -226,10 +247,12 @@ app/         → usecases/ → ports/ ← infra/
 **Decision (implemented, 2026-07-20 evening):** Added `output: 'standalone'` to `next.config.ts`. Updated the build job to upload `.next/standalone + .next/static + public`. Updated the lighthouse job to download the artifact, start `node .next/standalone/server.js`, wait for `/api/health`, and run `lhci autorun`. The job is currently a soft-pass (logs results, doesn't fail the build) until we have a stable baseline; tighten to hard-fail once the numbers stabilize.
 
 **Consequences (initial):**
+
 - Lighthouse checks didn't run on every PR. Performance and a11y regressions were caught by manual runs against the Vercel deployment.
 - The handoff was unblocked. PR #101 (E2E fix) merged cleanly.
 
 **Consequences (after fix):**
+
 - Lighthouse checks now run on every PR. Perf / a11y / SEO / best-practices regressions are caught automatically.
 - The CI artifact (`.next/standalone/`) is the same shape Vercel uses in production, so what we measure locally is what users see.
 - The job is soft-pass for now — false positives on a hard-fail job would be worse than no check. Once a baseline exists, the thresholds can be tightened.
