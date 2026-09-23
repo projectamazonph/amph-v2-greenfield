@@ -2,21 +2,24 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `c36b097`
+**Main:** `2691a8d`
 
 ## Active branches of interest
 
-- `docs/audit-2026-09-23-lesson-arithmetic.md`: both read-only arithmetic passes recorded, plus the
-  findings that came after them. Pass 1 covered the 19 lessons of Modules 0, 5, 6, 7, 8 and 10 that no
+- `docs/audit-2026-09-23-lesson-arithmetic.md`: the whole numeric record for the 45 lessons,
+  plus the findings that came after the checks. Pass 1 covered the 19 lessons of Modules 0, 5, 6, 7, 8 and 10 that no
   earlier peso pass had checked, and fixed 7 errors including an unconverted `$500` client budget in
   onboarding and two lessons whose own answer key contradicted the lesson. Pass 2 covered the 26 lessons
   of Modules -1, 1, 2, 3, 4, 9 and 11 plus every quiz question for modules -1 to 4, and fixed 5 more in
-  `1.5` and `3.1`. That is all 45 lessons with one independent numeric recompute each. The doc lists every
+  `1.5` and `3.1`. That is all 45 lessons with one independent numeric recompute each. Seven more checks
+  ran after the structural gates landed, and the last of them started the figure-by-figure re-derivation
+  that now covers all 45 a second time; five of its candidates became #594. The doc lists every
   finding left open and says which ones need a teaching decision rather than a correction.
 - `feat/module-minus-one-quiz` merged as `PR #556`: the Module -1 knowledge check, four questions,
   so the primer's 150 XP is no longer uncheckable. Bank is 13 quizzes and 87 questions.
-- The curriculum content chain #546 to #591 is in "Latest merged repairs"
-  below; the earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
+- The curriculum content chain #546 to #594 is in "Latest merged repairs"
+  below; the earlier `PR #545` / STORY-146 note lives in the CHANGELOG. #595 is
+  the CI build retry recorded in the same table, not a content change.
 - Four structural gates landed beside it. `QuizBankStructure.test.ts` (#575)
   checks the shape of `content/curriculum/quiz-questions.json`, which nothing
   validated before even though the seeder publishes it straight to the database,
@@ -55,6 +58,10 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR | Commit | Result |
 | --- | --- | --- |
+| #595 | `2691a8d` | ci(build): the two jobs that run `pnpm build` retry it three times, 20 seconds apart, clearing `.next` between attempts, after one Turbopack failure mode produced two red E2E runs with no code fault behind either: `Error while looking up import map: next/font/google queries have exactly one entry` and `Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'`. `src/app/layout.tsx:2` asks `next/font/google` for four families at build time, so the build reaches out to fonts.googleapis.com and a transient network failure fails every job downstream of it. `gh run rerun <id> --failed` cleared both runs, which is what the retry automates. Other jobs that do not build (unit, architecture, lint, typecheck) are untouched. A tripwire test in `src/__tests__/ci-workflow.test.ts` pins the retry count so a third building job cannot be added without one; mutation-checked by narrowing one loop to two attempts, which failed exactly that assertion, and restored to 8 passed |
+| #594 | `50e2262` | fix(lesson): five more figures and absolutes that the lesson's own text contradicts, from re-deriving every number behind every Quick check and Self-check in the 34 lessons of modules 2 to 11. `6.2:149` told the learner to cap a stacked placement bid "at or below ₱19" on the same line that computes ₱42 ÷ 2.24 = ₱18.75, and 19 x 2.24 = ₱42.56 is past the ₱42 ceiling named two lines earlier; now ₱18 with the reason inline, matching the round-down the adjacent bid already does (`:147`) and the rule `1.5:156` states outright. `6.2:56` "The adjustment is always additive" contradicted `:64`'s formula and `:24`'s own marked explanation, both multiplicative, so read literally it gives ₱550 on a question keyed to ₱1,000; `always` now scopes to a single adjustment. `6.1:24` "Only Up and Down raises above your base bid" was the third instance of the ceiling claim #587 fixed at `:218`, and got the same placement caveat. `5.2:144` said a midnight-to-midnight reset means a review "every 12 hours" where the file's own arithmetic (`:73`, `:80`, `:88`, `:215`) gives 11. `10.1:21` promised "the same five parts" while `:17`, `:23` and the table at `:30` all say four; the count was deleted rather than guessed, because the builder at `:26` does split the header into five fragments |
+| #593 | `83550dd` | docs(state): the Next action had pointed at a PR-C and a PR-D that had already landed as #587 to #591 the same day. It now lists the three things actually open. The audit doc gained the last of the seven checks under "Checks after the gates landed" (modules -1, 0 and 1, 11 files, 0 breaks) and three subagent claims dismissed against source, including a proposed fix to Module 0 Q2 that would have replaced an accurate statement with a false one |
+| #592 | `9d9d768` | docs(state): rows for #587 to #591, Verified gate numbers measured rather than inherited, and six checks recorded in the audit doc that had left no written trace, among them 87 quiz explanations recomputed and every Quick check answer in all 45 lessons read against the text that should justify it |
 | #591 | `c36b097` | fix(lesson): two Quick check answers stated rules their own lesson withholds. `7.2:95` answered a 45-click, ₱2,050, zero-order question "Yes" on the numbers alone, dropping the relevance test that `7.2:17`, the routing table at `:38` and the exercise at `:57` all make the actual discriminator, and which answer (2) four words later applies correctly; it now carries the condition and names the other outcome the lesson allows. `4.4:165` added "with budget reviewed throughout" to the build order, a clause that appears nowhere in the lesson, whose own `:112` says "negatives last" and whose Step 6 puts budget at the end; the clause is gone rather than the lesson amended, because whether budget belongs inside "last" is a teaching call and stays open. Found while quoting the routing table: `7.2:38` read "good CVR conversion rate", the only doubled expansion of that shape in all 45 lessons, now "good conversion rate", with CVR still spelled out earlier at `6.2:37` and `7.1:67` |
 | #590 | `465b49b` | fix(curriculum): `-1.2` told a zero-knowledge learner "Amazon's rules cap it at 200 characters" and `3.1:97` printed "200 chars" in its listing comparison table, while `3.2` refuses that number five times ("vary by category and change over time; check your current limit in Seller Central") at `:50`, `:178`, `:190`, its answer key `:229` and fact card `:240`. The course hands out a hard number in Module -1 and retracts the possibility of one 20 lessons later. Both numbers removed rather than replaced, because the position this course already holds is that the limit is per-category. After the change the only hard length left in `content/curriculum/` is `3.2:186` "Backend search terms filled (250 characters)", a different field no lesson retracts |
 | #589 | `e29e557` | fix(lesson): `2.4`'s Common Mistakes table sold theme separation as the way to "optimize ad copy ... per theme", the one line in the file that contradicts the rule it states at `:23`, `:187`, `:207` and fact card `:224`/`:225` that Sponsored Products has no per-ad-group copy at all. Now "Can't tune bids or read performance per theme", which is `:23`'s own framing ("bid control and reporting clarity"). The seven other `ad copy` uses in `5.3`, `8.1` and the quiz bank were checked and stand: they are about Sponsored Brands headlines or listing copy, not per-ad-group copy |
@@ -164,7 +171,11 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 
 ## Verified gate
 
-- Vitest: 5,207 passed, 3 skipped (540 test files, 2 files skipped)
+- Vitest: 5,208 passed, 3 skipped (540 test files: 538 passed, 2 skipped). Read
+  from the `unit` job log on `main` at `2691a8d`, not from a local run: the same
+  job's `pnpm test` and `pnpm test:coverage` summaries agree, which is what the
+  coverage line below comes from. Before #595's tripwire test the count was
+  5,207, and the 2 skipped files are the two PDF/HTML render samples
 - Architecture: 892 passed (17 test files)
 - TypeScript: passed (0 errors)
 - ESLint: passed (0 errors, 3 warnings). The 3 are the pre-existing
@@ -175,10 +186,12 @@ Manual grants are idempotent. STARTER grants published STARTER and PREVIEW cours
 - Production build: passed
 - Coverage: 82.28% statements / 74.37% branches / 82.52% functions / 83.91% lines
 
-Two notes on running this locally. Both figures above come from one clean
-`pnpm test:coverage` pass. Re-running the suite while lint, typecheck, a build or
-another agent's work shares the machine produced two spurious failures, both in
-tests that shell out to a CLI and wait: `prisma validate` at
+Two notes on running this locally. The Vitest, architecture and coverage figures
+above come from the CI jobs on `main`, not from a local pass, because a local run
+shares the machine with other work. Re-running the suite while lint, typecheck,
+a build or another agent's work shares the machine produced two spurious failures
+locally, both in tests that shell out to a CLI and wait:
+`prisma validate` at
 `tests/integration/prisma-migration-contract.test.ts:159` (30s budget, measured
 70.8s under load) and the programmatic `tsc` fixture at
 `src/components/ui/__tests__/card-no-event-handler-props.test.ts:193` (5s
@@ -199,9 +212,9 @@ alone first.
 
 The P4 sequence this section used to describe is finished and the text has been stale since the day it was written: `288ea41` landed it on 2026-09-11 as the close-out for PR-B, #487 merged the same day, and #403 closed 2026-09-10. `docs/sprint-plan.md` records PR-C (P1-01 to P1-06) and PR-D (OAuth) as shipped on `main`. Nothing here is waiting on a feature sprint.
 
-Current work is the content-quality loop. `main` is at `9d9d768` after twelve corrections merged on 2026-09-23 (#581 to #592). The verified gate above is green and no code defect is open against it. In priority order:
+Current work is the content-quality loop. `main` is at `2691a8d` after fifteen PRs merged on 2026-09-23, #581 to #595. The verified gate above is green and no code defect is open against it. In priority order:
 
-1. **Run the content seeder.** `node scripts/seed-all-content.mjs`. Nine merged content PRs, #583 through #591, have not reached learners, because a deploy runs only `prisma:deploy` and `db:seed:scenarios`. Until this runs, the published lessons and module quizzes still carry the text those PRs corrected.
+1. **Run the content seeder.** `node scripts/seed-all-content.mjs`. Ten merged content PRs, #583 through #591 plus #594, have not reached learners, because a deploy runs only `prisma:deploy` and `db:seed:scenarios`. Until this runs, the published lessons and module quizzes still carry the text those PRs corrected.
 2. **Supply the 29 `Last verified` dates.** `pnpm check:curriculum-sources` reports `0 dated, 29 pending text`. Every fact card still prints the placeholder `pending content-owner review`, and no date was invented on anyone's behalf.
 3. **Decide the open teaching questions.** They are itemised under "Also open from these passes, needs a decision" in `docs/audit-2026-09-23-lesson-arithmetic.md`, alongside the limitations below. The two with the widest reach are the broad-keyword budget share, where `2.4` says 40% and `4.1` says 10 to 15%, and the click threshold for negating a search term, where `7.1` and `7.2` say 5 while `7.3` and `9.3` say 10 and the STR Triage scenario data follows the latter.
 

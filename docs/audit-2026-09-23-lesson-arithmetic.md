@@ -284,6 +284,39 @@ review`, and `pnpm check:curriculum-sources` reports `0 dated, 29 pending text, 
 todo, 16 no field` in a single command. Where the repository has its own validator, run it
 before concluding that a measurement contradicts it.
 
+## The same re-derivation, run over the remaining 34 lessons
+
+The figure-by-figure sweep that started with modules -1, 0 and 1 (last bullet above)
+continued across every lesson it had not covered, same method: every peso amount, ratio,
+count, date range and array length that a Quick check, Self-check, table or worked example
+prints, recomputed from the figures printed in the same file.
+
+- Modules 2 to 5: 14 files.
+- Modules 6 to 8: 9 files.
+- Modules 9 to 11: 11 files and 13 check items. The report for this third sweep said 10
+  files in its prose while its own coverage table listed all 11, and the three module
+  directories measure 3 plus 4 plus 4. The table was right. Recording the slip because it
+  is how a coverage claim nearly came out understated in the wrong direction.
+
+Result across the 34: no wrong peso figure and no broken answer key in 33 of them. Six
+candidates came out of it, five fixed in #594 (`6.2:149` stacked ceiling, `6.2:56`
+"always additive", `6.1:24` bid-ceiling claim, `5.2:144` hours, `10.1:21` part count)
+and one left open below, because two defensible floors exist for the same decision. The
+three module 7 items added to the open list further down came out of the same reading.
+
+Two dismissals worth keeping, both raised by reports that sounded confident:
+
+- `8.2:94`'s Step 4, "Divide your Top of Search impressions by total impressions", was
+  flagged as dividing by a number the method only introduces at Step 5. On source it
+  is not: Step 5 estimates *category* impressions, while Step 4's denominator is the
+  learner's own total impressions from the campaign report in Step 1. The ordering
+  holds. What is true, and is not a defect, is that no later step uses the ratio Step 4
+  computes.
+- `11.3:31`'s change-log row negates a term after 8 clicks, which looks like it breaks
+  the "under 10" tier in `9.3`, but `9.3:23` allows it in the same lesson ("A clearly
+  wrong term may need a negative with fewer clicks") and the row names a product
+  mismatch.
+
 ## Rejected a fix
 
 Module 0 Q2 asks "Which Amazon ad type appears within search results and on product
@@ -327,6 +360,36 @@ these are new and do not duplicate them.
   simulator, or payment record lives", while the tour table at `:25` grants that Home
   shows "what to do next", and the question it answers is not inside that section at
   all. Weakest finding in the set, and left alone on purpose.
+- `7.3` sets the harvest floor at 15 to 20 clicks (`:24`, `:53`, and the Self-check at
+  `:218` keys "Harvest to Exact" as the action that needs them), while `7.1:128` says
+  adjust no bid below 30 clicks and `:130` treats 30 as the point a CVR estimate
+  becomes usable. Harvesting is a bid act in `7.3`'s own words ("moves the term into
+  its own campaign at a bid you set", `:24`; "direct bid control", `:49`), so the
+  learner is told to set a new bid on evidence the neighbouring lesson calls too
+  thin. The choice is not free in either direction: raising `7.3` to 30 turns its own
+  worked example wrong at `:192`, where a term with 24 clicks is keyed "Harvest to
+  Exact" because it is "past the 15–20 click minimum", while lowering `7.1` gives up the
+  patience argument that lesson exists to make.
+- `7.1:130` prints "Below 30 clicks, your CVR estimate has a margin of error of roughly
+  ±20%. Above 100 clicks, it drops to ±10%." Those are the worst-case values, and the
+  lesson does not say so: a 95% interval at p = 50% gives ±17.9 points at n = 30 and
+  ±9.8 points at n = 100, which is where the pair comes from. At the conversion rates
+  this course itself teaches, 6 to 10% in the `3.3:45` table, the absolute margin at
+  n = 30 is ±8.5 to ±10.7 points, as wide as the estimate it is attached to. Whether to
+  state the assumption, replace the pair, or keep a number that is only right for a coin
+  flip is a teaching call.
+- `7.3:148`, `:151` and `:188` print "ACoS 0%" on terms with clicks and no orders, where
+  the course's own definition at `1.3:21` divides ad spend by ad sales and ad sales is
+  zero, so the quantity is undefined rather than zero. It matters because the decision
+  flow at `:105`-`:108` asks "Is ACoS at or below target?" and sends a Yes that is not
+  already exact match to Harvest to Exact, and 0% is always at or below any target. The
+  keyed answers do not follow that route: (2) is Negative for irrelevance and (5) is
+  "Keep for now" on click count at `:153`, and the worked example at `:192` reaches its
+  answer the same way, on clicks and use case, never on the printed 0%. So the number is
+  inert only because every answer happens to be decided by a different fact, and no line
+  tells the learner that 0% here means no sales. Amazon's report UI does display 0.00% in
+  this case, so the fix depends on whether the row is meant to read like the console or
+  like the formula.
 
 ## Unverified source citations, needs a person with Amazon access
 
