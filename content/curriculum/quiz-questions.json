@@ -245,7 +245,7 @@
         {
           "order": 1,
           "question": "What's the main difference between broad match and exact match keywords?",
-          "optionA": "Broad match shows ads for a wide range of related searches; exact match shows ads only for the precise term or very close variants",
+          "optionA": "Broad match shows ads for many related searches; exact match shows ads only for the precise term or very close variants",
           "optionB": "Broad match is always cheaper per click than exact match",
           "optionC": "Exact match shows ads for related searches; broad match only matches the literal term",
           "optionD": "There is no functional difference, only a naming difference",

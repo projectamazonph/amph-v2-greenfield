@@ -32,7 +32,7 @@ The platform teaches a hard skill to people who may be tired, new to Amazon Ads,
 
 The shared simulator frame is: context, decision, action, feedback, next rep. Do not repeat the same explanation in the page header, form, and result panel.
 
-## Banned Phrases (enforced by ESLint)
+## Banned Phrases (enforced by ESLint in code, by test in content)
 
 These never ship. Anywhere. UI copy, lessons, error messages, marketing pages.
 
