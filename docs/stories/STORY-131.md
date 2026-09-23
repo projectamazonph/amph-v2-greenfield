@@ -1,5 +1,19 @@
 # STORY-131: LEARN-013 — Just-in-time glossary tooltips
 
+> [!WARNING]
+> Partially shipped, never wired. PR #522 (`5163f0f`) landed the data file and
+> the popover component, and `CHANGELOG.md:32` records the story as done, but the
+> renderer never mounted it. `GlossaryTermButton` is imported by no file outside
+> its own module, `loadGlossaryManifest` and `lookupGlossaryTerm` run only inside
+> `src/lib/__tests__/glossary.test.ts`, and the `data-amph-term` hook that the
+> implementation notes below say the directive plugin emits does not exist in the
+> code. Learners see
+> the inline parenthetical definition, which is the fallback described below, so no
+> lesson is broken today. The manifest also holds 31 terms now, not the seven this
+> story specified. Finishing the feature means adding a term directive to the
+> content pipeline and an a11y pass over the new controls, so it is an open
+> decision, not a bug fix.
+
 **Sprint:** Learning experience uplift, wave 1
 
 **Points:** 2
@@ -8,7 +22,7 @@
 
 **Owner:** Ryan
 
-**Status:** Planned.
+**Status:** Partially shipped. PR #522 landed the data and the component; the renderer wiring never landed. See the warning at the top.
 
 ## Context
 
