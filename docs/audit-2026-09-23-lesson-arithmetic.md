@@ -209,6 +209,23 @@ but no file under `src/app`, `src/components`, `src/composition` or `src/infra` 
 learner to open the Search Term Triage tool provides no clickable way to do it, while the data needed to
 build that link already exists and is already validated on every release.
 
+Two sibling fields in the same records are worth measuring before deciding what to surface, because they are
+not equal. `finalDeliverable` is populated on **45 of 45** lessons with a concrete artifact sentence: "A written
+Amazon PPC work goal" for `0.1`, "A first client-brief decision note" for `0.3`, "A one-line decision note" for
+`1.1`. It reaches no learner: `git grep` for `finalDeliverable` finds only the parser in
+`src/domain/curriculum/CurriculumInventory.ts` and its unit test, and it appears in no Prisma model, no `Lesson`
+entity, no repository, and not in `scripts/seed-all-content.mjs`, so it never even enters the database. A learner
+who finishes a lesson is never told what the lesson intended them to produce, while that sentence is authored,
+release-gated and discarded.
+
+`resourceRefs` is the opposite and should not be treated as a lost dataset: all 45 are the single value
+`mdx:<the same lesson's own slug>`, a self-pointer carrying nothing beyond what the row already knows. The
+count is honest only for `finalDeliverable`.
+
+The practical note for the open decision below is that both findings point at the same missing surface. A footer
+block on the lesson page showing the deliverable sentence, and the tool link where one exists, would consume two
+validated datasets in one change. Whether that belongs on the most-viewed surface is still a product call.
+
 This is the fourth instance of a pattern worth naming: email templates, progress events, the glossary
 popover, and now the curriculum inventory. A port, dataset or adapter is real, unit tested, and wired into a
 script or a gate, and nothing in the UI ever reaches it. Checking whether a thing is *consumed* takes one
