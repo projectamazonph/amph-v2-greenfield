@@ -27,6 +27,14 @@ const CONCURRENCY = 4;
 const MODULES_DIR = join(process.cwd(), "content", "curriculum", "modules");
 const URL_PATTERN = /https?:\/\/[^\s"')\]}<>]+/g;
 
+/**
+ * Phrasing that explains why a fact card has no link, as opposed to leaving the
+ * field blank. Matched positively, so a stub like "TBD" or an empty value stays
+ * in the needs-a-source bucket instead of being waved through.
+ */
+const STATED_NO_SOURCE_REASON =
+  /(no external source|no single official source|not a documented|not covered by|category-specific|first-party|teaching heuristic|inference from)/i;
+
 async function lessonFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
   const files = [];
@@ -120,16 +128,29 @@ const alive = results.filter((r) => r.ok);
 
 console.log("Curriculum source-link health");
 console.log(`Lessons scanned: ${lessonCount}`);
-console.log(`Distinct cited URLs: ${urls.length} (reachable ${alive.length}, not reachable ${dead.length})`);
+console.log(
+  `Distinct cited URLs: ${urls.length} (reachable ${alive.length}, not reachable ${dead.length})`,
+);
 for (const r of results.sort((a, b) => Number(a.ok) - Number(b.ok))) {
   const flag = r.ok ? "ok  " : "FAIL";
   console.log(`${flag} ${String(r.status ?? "-").padEnd(4)} ${r.url}  [${r.attempts.join(", ")}]`);
   for (const lesson of byUrl.get(r.url)) console.log(`       cited by ${lesson}`);
 }
 
+// A source line with no URL is only unfinished work if it does not say why.
+// Some cards correctly decline to cite one: the lesson describes this app, the
+// claim is a teaching heuristic, or the limit is category-specific and no single
+// page covers it. Listing those beside blank sources puts pressure on whoever
+// reads this report to invent a link to make the number go down, so split them
+// and keep both counts visible.
+const explained = noUrl.filter((entry) => STATED_NO_SOURCE_REASON.test(entry.text));
+const unexplained = noUrl.filter((entry) => !STATED_NO_SOURCE_REASON.test(entry.text));
 if (noUrl.length > 0) {
   console.log(`\nFact cards whose source line holds no URL (${noUrl.length}):`);
-  for (const entry of noUrl) console.log(`- ${entry.file}: ${entry.text}`);
+  console.log(`  states why there is no link, nothing to do (${explained.length}):`);
+  for (const entry of explained) console.log(`  - ${entry.file}: ${entry.text}`);
+  console.log(`  no reason given, needs a source or a reason (${unexplained.length}):`);
+  for (const entry of unexplained) console.log(`  - ${entry.file}: ${entry.text}`);
 }
 if (noFactCard.length > 0) {
   console.log(`\nLessons with no fact card (${noFactCard.length}/${lessonCount}):`);
@@ -140,7 +161,9 @@ if (noFactCard.length > 0) {
 // unfilled verification date, since that is the half only the content owner can do.
 const styles = new Map();
 for (const style of verification.values()) styles.set(style, (styles.get(style) ?? 0) + 1);
-const unverified = [...verification.entries()].filter(([, style]) => style === "pending-text" || style === "bracket-todo");
+const unverified = [...verification.entries()].filter(
+  ([, style]) => style === "pending-text" || style === "bracket-todo",
+);
 console.log(
   `\nLast verified field: ${styles.get("dated") ?? 0} dated, ` +
     `${styles.get("pending-text") ?? 0} pending text, ` +
@@ -148,7 +171,9 @@ console.log(
     `${styles.get("absent") ?? 0} no field`,
 );
 if (unverified.length > 0) {
-  console.log(`Fact cards still awaiting a content-owner verification date (${unverified.length}):`);
+  console.log(
+    `Fact cards still awaiting a content-owner verification date (${unverified.length}):`,
+  );
   for (const [file] of unverified.sort()) console.log(`- ${file}`);
 }
 
