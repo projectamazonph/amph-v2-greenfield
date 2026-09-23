@@ -2,18 +2,20 @@
 
 **Project:** Project Amazon PH Academy v2
 **Reviewed:** 2026-09-23
-**Main:** `60bb1e1`
+**Main:** `50b34e9`
 
 ## Active branches of interest
 
-- `docs/audit-2026-09-23-lesson-arithmetic.md`: both read-only arithmetic passes recorded. Five more errors fixed in `1.5` and `3.1`, seven findings left open because they need a teaching decision or a longer reading pass, and three carried over to Ryan. The module -1 to 4 quiz bank and Modules -1, 9 and 11 recomputed clean. arithmetic and unit errors in the 19
-  lessons that had never had a numeric pass (Modules 0, 5, 6, 7, 8, 10), including an unconverted
-  `$500` client budget in onboarding and two lessons whose own answer key contradicted the lesson.
-  Four further findings are reported to Ryan rather than edited, because they are teaching-policy
-  contradictions.
+- `docs/audit-2026-09-23-lesson-arithmetic.md`: both read-only arithmetic passes recorded, plus the
+  findings that came after them. Pass 1 covered the 19 lessons of Modules 0, 5, 6, 7, 8 and 10 that no
+  earlier peso pass had checked, and fixed 7 errors including an unconverted `$500` client budget in
+  onboarding and two lessons whose own answer key contradicted the lesson. Pass 2 covered the 26 lessons
+  of Modules -1, 1, 2, 3, 4, 9 and 11 plus every quiz question for modules -1 to 4, and fixed 5 more in
+  `1.5` and `3.1`. That is all 45 lessons with one independent numeric recompute each. The doc lists every
+  finding left open and says which ones need a teaching decision rather than a correction.
 - `feat/module-minus-one-quiz` merged as `PR #556`: the Module -1 knowledge check, four questions,
   so the primer's 150 XP is no longer uncheckable. Bank is 13 quizzes and 87 questions.
-- Main is at `cdc610c`. The curriculum content chain #546 to #556 is in "Latest merged repairs"
+- The curriculum content chain #546 to #563 is in "Latest merged repairs"
   below; the earlier `PR #545` / STORY-146 note lives in the CHANGELOG.
 
 ## Current learning-experience priority
@@ -38,6 +40,9 @@ job-readiness claims. Existing simulator scores remain formative.
 
 | PR | Commit | Result |
 | --- | --- | --- |
+| #563 | `50b34e9` | fix(lesson): `3.3`'s CVR table carried no unit price, so its break-even row claimed a 36% CVR loses money and two of three cells missed the lesson's own formula. The table now runs on the ₱1,100 the same lesson's case study uses, so it is reproducible from figures printed inside the lesson, and the headline "20 percentage points" became the 23 it actually is. An independent recomputation confirmed all three cells and found no other file, quiz or snapshot quoting the old figures |
+| #562 | `08625bf` | fix(lesson): `2.2` billed a two-week, ₱500-a-day research campaign as "₱14,000 over 4 weeks" in both the prose and the takeaway. The two-week window is what the same section instructs and what the order estimate assumes, so it stays and the cost becomes ₱7,000 |
+| #560 | `a5fa9c4` | fix(lesson): the `4.3` bid ladder printed a ₱40 bid whose label crossed the line it was annotating. The worked example computes ₱30, which is where its own arithmetic had always landed |
 | #558 | `60bb1e1` | STORY-154 second arithmetic recompute, covering the 26 lessons of Modules -1, 1, 2, 3, 4, 9 and 11 plus every quiz question for modules -1 to 4 against its source lesson. Five confirmed errors fixed, including `1.5` teaching that a launch week can show TACoS 40% while ACoS is 50% with no organic sales (the two ratios must be equal, and the Week 3 delta inherited it) and rounding a max-CPC ceiling up past break-even. Modules -1, 9 and 11 and the converted quiz bank recomputed clean. Seven findings recorded open in `docs/audit-2026-09-23-lesson-arithmetic.md` rather than edited, because they need a teaching decision or a longer pass |
 | #557 | `d6673d5` | STORY-153 recomputed every printed ratio and sum in the 19 lessons of Modules 0, 5, 6, 7, 8 and 10, which no earlier peso pass had ever checked. Seven confirmed errors fixed, including an unconverted ₱500-a-month client budget in onboarding (₱17 a day, below one click at any CPC the course teaches), a `6.3` example claiming two products have different max CPCs when the lesson's own formula makes them identical, and an `8.2` worked answer instructing the learner to pull a report the same lesson spends two sections saying does not exist. Four further findings reported rather than edited, because they are teaching-policy contradictions |
 | #556 | `cdc610c` | STORY-152 Module -1 knowledge check. The Amazon primer awarded 150 XP with nothing checkable behind it, so it is now four questions restating each lesson's Quick Check at module level: which level holds the daily budget, which surface a VA works in, where a clicked shopper lands and when the seller pays, and which two fees come off a 3P FBA sale. No code changed, because the seeder already maps `moduleNumber: -1` to Foundations and the course page maps whatever quizzes exist. Bank goes 12 to 13 quizzes, 83 to 87 questions, and the module and lesson counts #549 left stale in five more documents are corrected in the same commit |
