@@ -26,7 +26,16 @@ import { requireAdmin } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
 import { Card } from "@astryxdesign/core";
-import { Pulse, MegaphoneSimple, Receipt, Clock } from "@phosphor-icons/react/dist/ssr";
+import {
+  Pulse,
+  MegaphoneSimple,
+  Receipt,
+  Clock,
+  UserPlus,
+  MagnifyingGlass,
+  BookOpen,
+} from "@phosphor-icons/react/dist/ssr";
+import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 import { formatPhp } from "./_lib/formatPhp";
 import styles from "./page.module.css";
 
@@ -55,6 +64,12 @@ export default async function AdminDashboardPage() {
   const stats = statsResult.value;
   const recentActivity = activityResult.ok ? activityResult.value.entries : [];
 
+  // Story-160: small captions under stat values give the tile some
+  // context. Derived from the same reviewed claims contract that the
+  // public surface reads so the count never drifts from inventory.
+  const totalModuleCount = PUBLIC_CURRICULUM_CLAIMS.modules.length;
+  const simulatorCount = Object.keys(PUBLIC_CURRICULUM_CLAIMS.simulators).length;
+
   return (
     <div>
       <TopBar
@@ -68,10 +83,50 @@ export default async function AdminDashboardPage() {
         }
       />
 
+      {/* Story-160: hero workbench band — names the operator, surfaces the
+          single highest-stakes pending counter as a primary CTA, and offers
+          a quiet audit-log escape hatch. Renders only the pending-refunds
+          CTA when the count is non-zero so it stays meaningful. */}
+      <section className={styles.heroBand} aria-label="Admin hero">
+        <div className={styles.heroBandLeft}>
+          <span className={styles.heroBandEyebrow}>You are signed in as</span>
+          <p className={styles.heroBandTitle}>
+            Welcome back, <strong>{user.firstName}</strong>.
+          </p>
+          <p className={styles.heroBandSubtitle}>
+            {stats.pendingRefunds > 0
+              ? `${stats.pendingRefunds} refund request${stats.pendingRefunds === 1 ? "" : "s"} need a decision before the day ends.`
+              : "Nothing is waiting for you today. Audit log is up to date."}
+          </p>
+        </div>
+        <div className={styles.heroBandRight}>
+          {stats.pendingRefunds > 0 ? (
+            <Link href="/admin/refunds" className={`${styles.actionBtn} ${styles.heroCtaPrimary}`}>
+              <Receipt size={16} weight="bold" aria-hidden /> Review pending refunds
+            </Link>
+          ) : null}
+          <Link href="/admin/audit-log" className={`${styles.actionBtn} ${styles.heroCtaGhost}`}>
+            Open audit log <span aria-hidden>→</span>
+          </Link>
+        </div>
+      </section>
+
       <section className={styles.statGrid} aria-label="Platform statistics">
-        <StatTile label="Total Students" value={stats.totalStudents.toString()} />
-        <StatTile label="Total Courses" value={stats.totalCourses.toString()} />
-        <StatTile label="Active Enrollments" value={stats.activeEnrollments.toString()} />
+        <StatTile
+          label="Total Students"
+          value={stats.totalStudents.toString()}
+          caption="All accounts ever created"
+        />
+        <StatTile
+          label="Total Courses"
+          value={stats.totalCourses.toString()}
+          caption={`Across ${totalModuleCount} modules`}
+        />
+        <StatTile
+          label="Active Enrollments"
+          value={stats.activeEnrollments.toString()}
+          caption="Not yet completed"
+        />
         <StatTile
           label="Total Revenue"
           value={
@@ -80,19 +135,76 @@ export default async function AdminDashboardPage() {
               {formatPhp(stats.totalRevenuePhp).replace(/^₱\s?/, "")}
             </>
           }
+          caption="Lifetime, all tiers"
         />
-        <StatTile label="Certificates Issued" value={stats.certificatesIssued.toString()} />
-        <StatTile label="Pending Refunds" value={stats.pendingRefunds.toString()} />
+        <StatTile
+          label="Certificates Issued"
+          value={stats.certificatesIssued.toString()}
+          caption="From completed courses"
+        />
+        <StatTile
+          label="Pending Refunds"
+          value={stats.pendingRefunds.toString()}
+          caption={stats.pendingRefunds > 0 ? "Awaiting decision" : "All clear"}
+        />
       </section>
 
-      <div className={styles.quickActions}>
-        <Link href="/admin/courses/new" className={styles.actionBtn}>
-          + Create Course
-        </Link>
-        <Link href="/admin/users/new" className={styles.actionBtn}>
-          + Add User
-        </Link>
-      </div>
+      {/* Story-160: workbench grid replaces the two-button Quick Actions row
+          so the operator surfaces every routine write path. Cards are
+          static hrefs (no client state) since they all land on admin pages
+          that already enforce requireAdmin(). */}
+      <section className={styles.workbench} aria-label="Routine write paths">
+        <h2 className={styles.workbenchTitle}>Routine write paths</h2>
+        <p className={styles.workbenchLede}>
+          Start the changes you reach for most often. Each link lands on the admin area where the
+          change is reviewed.
+        </p>
+        <ul className={styles.workbenchGrid}>
+          <li>
+            <Link href="/admin/courses/new" className={styles.workbenchCard}>
+              <span className={styles.workbenchIcon} aria-hidden>
+                <BookOpen size={20} weight="bold" />
+              </span>
+              <span className={styles.workbenchLabel}>Create course</span>
+              <span className={styles.workbenchCaption}>Add a new course to the catalog</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/users/new" className={styles.workbenchCard}>
+              <span className={styles.workbenchIcon} aria-hidden>
+                <UserPlus size={20} weight="bold" />
+              </span>
+              <span className={styles.workbenchLabel}>Add user</span>
+              <span className={styles.workbenchCaption}>Invite an admin, mentor, or student</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/refunds" className={styles.workbenchCard}>
+              <span className={styles.workbenchIcon} aria-hidden>
+                <Receipt size={20} weight="bold" />
+              </span>
+              <span className={styles.workbenchLabel}>Review refunds</span>
+              <span className={styles.workbenchCaption}>
+                {stats.pendingRefunds > 0
+                  ? `${stats.pendingRefunds} request${stats.pendingRefunds === 1 ? "" : "s"} waiting`
+                  : "No requests waiting"}
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/audit-log" className={styles.workbenchCard}>
+              <span className={styles.workbenchIcon} aria-hidden>
+                <MagnifyingGlass size={20} weight="bold" />
+              </span>
+              <span className={styles.workbenchLabel}>Audit log</span>
+              <span className={styles.workbenchCaption}>
+                {recentActivity.length} recent entr{recentActivity.length === 1 ? "y" : "ies"} on
+                file
+              </span>
+            </Link>
+          </li>
+        </ul>
+      </section>
 
       <section className={styles.lowerSection}>
         <Card padding={6} className={styles.workflowCard}>
@@ -160,11 +272,20 @@ export default async function AdminDashboardPage() {
   );
 }
 
-function StatTile({ label, value }: { label: string; value: React.ReactNode }) {
+function StatTile({
+  label,
+  value,
+  caption,
+}: {
+  label: string;
+  value: React.ReactNode;
+  caption?: string;
+}) {
   return (
     <div className={styles.tile}>
       <div className={styles.statLabel}>{label}</div>
       <div className={styles.statValue}>{value}</div>
+      {caption ? <div className={styles.statCaption}>{caption}</div> : null}
     </div>
   );
 }
