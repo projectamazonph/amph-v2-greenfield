@@ -59,12 +59,15 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <TopBar
-        title="Payments"
-        subtitle={`${total} order${total === 1 ? "" : "s"}`}
-      />
+      <TopBar title="Payments" subtitle={`${total} order${total === 1 ? "" : "s"}`} />
 
       <PaymentFilters defaultStatus={params.status ?? ""} defaultEmail={params.email ?? ""} />
+
+      {email && (
+        <p className={styles.resultCount} role="status">
+          {total} result(s) for &quot;{email}&quot;
+        </p>
+      )}
 
       {/* Table — client component handles renderCell (function props) */}
       <Card padding={6}>

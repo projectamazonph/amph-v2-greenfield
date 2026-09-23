@@ -121,6 +121,7 @@ export function BidElevatorForm({ scenario, challengeUnlocked, scenarioName }: P
                       type="number"
                       step="0.10"
                       min="0"
+                      inputMode="decimal"
                       className={styles.input}
                       value={bids[k.keywordId] ?? k.currentBid}
                       onChange={(e) => onChange(k.keywordId, Number(e.target.value))}

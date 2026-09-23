@@ -27,9 +27,7 @@ export default async function AdminAnnouncementsPage() {
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>Announcements</h1>
-          <p className={styles.subtitle}>
-            Site-wide banners shown at the top of every page.
-          </p>
+          <p className={styles.subtitle}>Site-wide banners shown at the top of every page.</p>
         </div>
         <Link href="/admin/announcements/new" className={styles.newButton}>
           + New announcement
@@ -42,66 +40,60 @@ export default async function AdminAnnouncementsPage() {
             No announcements yet. Create the first one to display a banner.
           </p>
         ) : (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Level</th>
-                <th>State</th>
-                <th>Window</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {announcements.map((a) => {
-                const visible = announcementIsVisibleAt(a, now);
-                return (
-                  <tr key={a.id}>
-                    <td>
-                      <Link
-                        href={`/admin/announcements/${a.id}/edit`}
-                        className={styles.titleLink}
-                      >
-                        {a.title}
-                      </Link>
-                    </td>
-                    <td>
-                      <span className={`${styles.badge} ${styles[`level_${a.level}`]}`}>
-                        {a.level}
-                      </span>
-                    </td>
-                    <td>
-                      <ActiveToggle announcementId={a.id} isActive={a.isActive} />
-                    </td>
-                    <td className={styles.window}>
-                      {visible ? (
-                        <span className={styles.liveDot} aria-hidden />
-                      ) : null}
-                      {formatWindow(a.startsAt, a.endsAt)}
-                    </td>
-                    <td>
-                      <Link href={`/admin/announcements/${a.id}/edit`}>
-                        Edit
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="table-scroll">
+            <table className={styles.table}>
+              <caption className="sr-only">Site announcements</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Title</th>
+                  <th scope="col">Level</th>
+                  <th scope="col">State</th>
+                  <th scope="col">Window</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {announcements.map((a) => {
+                  const visible = announcementIsVisibleAt(a, now);
+                  return (
+                    <tr key={a.id}>
+                      <td>
+                        <Link
+                          href={`/admin/announcements/${a.id}/edit`}
+                          className={styles.titleLink}
+                        >
+                          {a.title}
+                        </Link>
+                      </td>
+                      <td>
+                        <span className={`${styles.badge} ${styles[`level_${a.level}`]}`}>
+                          {a.level}
+                        </span>
+                      </td>
+                      <td>
+                        <ActiveToggle announcementId={a.id} isActive={a.isActive} />
+                      </td>
+                      <td className={styles.window}>
+                        {visible ? <span className={styles.liveDot} aria-hidden /> : null}
+                        <span className="sr-only">{visible ? "Live now. " : "Not live. "}</span>
+                        {formatWindow(a.startsAt, a.endsAt)}
+                      </td>
+                      <td>
+                        <Link href={`/admin/announcements/${a.id}/edit`}>Edit</Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
     </main>
   );
 }
 
-function ActiveToggle({
-  announcementId,
-  isActive,
-}: {
-  announcementId: string;
-  isActive: boolean;
-}) {
+function ActiveToggle({ announcementId, isActive }: { announcementId: string; isActive: boolean }) {
   async function toggle() {
     "use server";
     await setAnnouncementActiveAction({

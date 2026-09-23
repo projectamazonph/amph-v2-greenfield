@@ -4,11 +4,10 @@
  * STORY-098. Server component.
  */
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { notFound, redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { updateResourceAction } from "@/app/actions/updateResource.action";
 import { deleteResourceAction } from "@/app/actions/deleteResource.action";
@@ -64,11 +63,12 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
 
   return (
     <div>
-      <Link href="/admin/resources" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to download center
-      </Link>
-
-      <TopBar title={`Edit: ${resource.title}`} subtitle={resource.id} />
+      <AdminSubPageHeader
+        title={`Edit: ${resource.title}`}
+        backHref="/admin/resources"
+        backLabel="Back to download center"
+        subtitle={resource.id}
+      />
 
       {errorMsg && (
         <Card padding={6} style={{ marginBottom: "1rem" }}>
@@ -146,7 +146,7 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
 
           <label className={styles.field}>
             <span className={styles.label}>Replace file</span>
-            <input type="file" name="file" className={styles.input} />
+            <input type="file" name="file" className={styles.input} aria-label="Resource file" />
             <span className={styles.hint}>
               {resource.fileKey
                 ? "This resource's current file was uploaded directly. Uploading a new one replaces it and deletes the old copy from storage."

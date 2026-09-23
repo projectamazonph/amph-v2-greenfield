@@ -6,12 +6,10 @@
  * `createAssignmentAction`.
  */
 
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { buildContainer } from "@/composition/container";
 import { requireAdmin } from "@/lib/auth";
-import { TopBar } from "@/components/admin/TopBar";
+import { AdminSubPageHeader } from "@/components/admin/AdminSubPageHeader";
 import { Card } from "@astryxdesign/core";
 import { NewAssignmentForm } from "./NewAssignmentForm";
 import styles from "../page.module.css";
@@ -32,12 +30,10 @@ export default async function NewAssignmentPage() {
 
   return (
     <div>
-      <Link href="/admin/assignments" className={styles.backLink}>
-        <ArrowLeft size={16} aria-hidden /> Back to assignments
-      </Link>
-
-      <TopBar
+      <AdminSubPageHeader
         title="Assign work"
+        backHref="/admin/assignments"
+        backLabel="Back to assignments"
         subtitle="The student sees this on their assignments page"
       />
 

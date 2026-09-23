@@ -25,6 +25,9 @@
 .link {
   color: var(--ink-500);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   transition: color var(--duration-base) var(--ease-out);
 }
 

@@ -137,7 +137,7 @@ export default async function ScenarioVersionsPage({ params, searchParams }: Pag
 
           {versions.length === 0 && (
             <p style={{ color: "var(--ink-500)", fontSize: "var(--text-sm)" }}>
-              No versions found.
+              No versions found. New drafts appear here when created from the simulator editor.
             </p>
           )}
         </div>

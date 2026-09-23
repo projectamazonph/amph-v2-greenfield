@@ -7,9 +7,7 @@ import { renderToString } from "react-dom/server";
 import { createElement } from "react";
 import { Input } from "../Input";
 
-function render(
-  props: Record<string, unknown> = {},
-) {
+function render(props: Record<string, unknown> = {}) {
   return renderToString(createElement(Input, props));
 }
 
@@ -58,7 +56,7 @@ describe("Input", () => {
   it("renders error when provided", () => {
     const html = render({ error: "Email is required" });
     expect(html).toContain("Email is required");
-    expect(html).toContain("role=\"alert\"");
+    expect(html).toContain('role="alert"');
   });
 
   it("applies error class to input when error present", () => {
@@ -121,6 +119,17 @@ describe("Input", () => {
       rightAdornment: createElement("span", null, "👁"),
     });
     expect(html).toContain("👁");
+  });
+
+  it("renders the required marker outside the label element", () => {
+    // Regression: a " *" inside <label> turns "Password" into
+    // "Password *" for getByLabel, breaking anchored E2E matchers
+    // like /^password$/i (journeys 3/4/5, 2026-09).
+    const html = render({ label: "Password", name: "password", required: true });
+    const labelMatch = html.match(/<label[^>]*>([\s\S]*?)<\/label>/);
+    expect(labelMatch).not.toBeNull();
+    expect(labelMatch![1]).not.toContain("*");
+    expect(html).toContain('aria-hidden="true"');
   });
 
   it("links hint via aria-describedby", () => {

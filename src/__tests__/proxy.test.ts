@@ -4,7 +4,7 @@
  * The proxy (`src/proxy.ts`) is Next 16's request-time handler. It
  * runs on every request before the page or API route, attaches
  * security headers, and redirects unauthenticated users away from
- * protected routes (/dashboard, /admin, /enroll, /order).
+ * protected routes (/dashboard, /admin).
  *
  * The original proxy also redirected `/` to `/signup` for any
  * visitor, which was a placeholder from the greenfield bootstrap
@@ -12,6 +12,10 @@
  * landing page shipped, the redirect made the page unreachable
  * and broke Lighthouse. This test pins the corrected behavior so
  * the redirect doesn't sneak back in.
+ *
+ * Stale `/enroll` + `/order` protected prefixes were removed in the
+ * UI polish pass: no such routes exist, so guarding them only
+ * produced login bounces that 404'd.
  *
  * We don't import `proxy` directly (it has Next.js runtime
  * dependencies); instead we assert the behavior via grep on the
@@ -37,13 +41,17 @@ describe("proxy (src/proxy.ts)", () => {
     expect(source).not.toMatch(/new URL\(["']\/signup["']/);
   });
 
-  it("still protects /dashboard, /admin, /enroll, /order from unauthenticated users", async () => {
+  it("still protects /dashboard and /admin from unauthenticated users", async () => {
     const source = await fs.readFile(PROXY_PATH, "utf8");
     // The proxy should still list these prefixes as protected.
     expect(source).toMatch(/\/dashboard/);
     expect(source).toMatch(/\/admin/);
-    expect(source).toMatch(/\/enroll/);
-    expect(source).toMatch(/\/order/);
+  });
+
+  it("does not guard phantom /enroll or /order prefixes", async () => {
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).not.toMatch(/\/enroll/);
+    expect(source).not.toMatch(/\/order/);
   });
 
   it("attaches the standard security headers on every response", async () => {

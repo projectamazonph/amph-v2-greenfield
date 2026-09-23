@@ -210,7 +210,11 @@ export default async function AdminUserDetailPage({ params, searchParams }: Page
           <form action={updateTier} className={styles.inlineForm}>
             <label className={styles.field}>
               <span>Tier</span>
-              <select name="subscriptionTier" defaultValue={user.subscriptionTier}>
+              <select
+                name="subscriptionTier"
+                defaultValue={user.subscriptionTier}
+                aria-label="Subscription tier"
+              >
                 <option value="FREE">Free</option>
                 <option value="STARTER">Starter</option>
                 <option value="PRO">Pro</option>
