@@ -97,7 +97,7 @@ Admin sections implemented:
 
 ## The Curriculum
 
-Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/curriculum/quiz-questions.json`. `scripts/seed-all-content.mjs`, run as `node scripts/seed-all-content.mjs`, is what writes those paths into the database, lessons and quizzes both. `scripts/import-amph-content.ts` and its `pnpm import:content` wrapper have been broken since `915c7ca` (2026-07-31), when the use case it imports was deleted; `src/__tests__/scriptImportsResolve.test.ts` pins it. Nothing publishes on deploy. So a committed content change is not live until the seeder runs against the intended database. Target structure: three courses (PPC Foundations, Accelerated Mastery, Ultimate Transformation) per `docs/CURRICULUM-REDESIGN.md`. Voice: `docs/voice-guide.md`. Reference lessons: `docs/0-1-welcome-to-amph.md`, `docs/1-1-read-ppc-data-before-you-change-it.md`.
+Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/curriculum/quiz-questions.json`. `scripts/seed-all-content.mjs`, run as `node scripts/seed-all-content.mjs`, is what writes those paths into the database, lessons and quizzes both. `scripts/import-amph-content.ts` and its `pnpm import:content` wrapper have been broken since `915c7ca` (2026-07-31), when the use case it imports was deleted; `src/__tests__/scriptImportsResolve.test.ts` pins it. Nothing publishes on deploy. So a committed content change is not live until the seeder runs against the intended database. Target structure: three courses (PPC Foundations, Accelerated Mastery, Ultimate Transformation), a framing inherited from the parent repo `projectamazonph/amph-v2`; what ships is inventoried in `content/CURRICULUM-INDEX.md` (13 modules, 45 lessons, 13 module quizzes). Voice: `docs/voice-guide.md`. Reference lessons as written today: `content/curriculum/modules/0-onboarding/0.1-welcome.mdx` and `content/curriculum/modules/1-foundations/1.1-read-ppc-data-before-you-change-it.mdx`. An earlier version of this paragraph pointed at `docs/CURRICULUM-REDESIGN.md`, `docs/0-1-welcome-to-amph.md` and `docs/1-1-read-ppc-data-before-you-change-it.md`, none of which was ever committed to this repository.
 
 **Active lesson primitives** (Modules 0–5): `SelfCheck` (interactive radio-group), `TradeOffTable`, `ProcessDiagram`, `PitfallCallout` rendered via `:::trade-off{}`, `:::process{}`, `:::callout{}` MDX fences. Directive plugin in `src/lib/mdx/directive-plugin.ts`. Validation via `scripts/validate-lesson-production.ts --strict`.
 
@@ -120,11 +120,11 @@ Lessons live in `content/curriculum/modules/` (MDX). Quiz fixtures in `content/c
 
 - Vitest for unit + integration.
 - Playwright for E2E.
-- Tests live next to the code they test: `foo.ts` → `foo.test.ts`. Use `buildTestContainer()` from `src/composition/testContainer.ts` for usecase tests.
-- Coverage thresholds enforced in CI: 70% on `src/domain`, `src/usecases`, and `src/lib`. Actual: ~80% statements, ~74% branches, ~81% functions, ~82% lines.
+- Tests are collected from `src/**/__tests__/**/*.test.ts(x)`, `tests/**/*.test.ts(x)` and `src/eslint-rules/**/*.test.js` only (see `vitest.config.ts:11-17`). A `foo.test.ts` left beside `foo.ts` outside a `__tests__/` folder is never run by `pnpm test` or CI, which is how the PayMongo adapter test sat uncollected until it moved into `src/infra/payment/__tests__/`. Use `buildTestContainer()` from `src/composition/container.test.ts` for usecase tests.
+- Coverage thresholds enforced in CI are global, not per-directory: 80% lines, 70% branches, 80% functions, 80% statements (`vitest.config.ts:29-32`). Measured on `main`, 2026-09-23: 83.91% lines, 74.37% branches, 82.52% functions, 82.28% statements.
 - Domain functions: 100% branch coverage. They are pure; there is no excuse.
 - Every use case has tests with a fake gateway, fake repos, and a `FixedClock`.
-- Current test counts: ~4,400+ unit/integration tests, 6 critical E2E journeys.
+- Current test counts: 5,208 unit and integration tests passing across 538 collected files, 3 skipped (2 of those files hold one skipped sample render each), measured on CI 2026-09-23. Playwright: 6 journeys in `tests/e2e/critical-journeys.spec.ts`, 20 `test()` blocks across 5 spec files.
 
 ## Commits
 
@@ -338,7 +338,7 @@ If all four pass, the feature ships. If 1-3 pass, build the missing pieces. If 0
 1. Run `grep -r '<keyword>' src/` for the implementation status.
 2. Read the story doc if one exists.
 3. Read `docs/STUDENT-FEATURE-GAP-ANALYSIS.md`.
-4. Read `docs/audit-2026-07-27-completeness-review.md`.
+4. Read the "Remaining known limitations" section of `STATE.md` and the "Known gaps" section of `CLAUDE.md`. (This step used to name `docs/audit-2026-07-27-completeness-review.md`, removed on 2026-09-14 by `e1f7352`.)
 5. Read `docs/sprint-plan.md`.
 6. Read `docs/decisions.md` (ADRs).
 7. Read `docs/SHIPPED-AND-REMAINING.md`.

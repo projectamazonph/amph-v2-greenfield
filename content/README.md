@@ -79,10 +79,10 @@ can work from an explicit gap list.
 
 There are two scripts in this repo that read `content/curriculum/`, and neither runs on deploy:
 
-| Script | What it writes | Status today |
-| --- | --- | --- |
-| `scripts/seed-all-content.mjs` | Courses, modules, lessons with their MDX body, the 13 quizzes from `quiz-questions.json`, badges, pricing tiers | The only script that publishes lesson text and quiz content. Run as `node scripts/seed-all-content.mjs`. Not registered as a `package.json` script. Verified to parse (`node --check`), never verified against the production database from a dev machine. |
-| `scripts/import-amph-content.ts`, exposed as `pnpm import:content` | Modules and lessons only (it wires a course, module and lesson repository, no quiz repository) | **Cannot run.** It imports `@/usecases/ImportAmphContent`, a file that `915c7ca` on 2026-07-31 deleted. It fails at module resolution before opening a connection. `src/__tests__/scriptImportsResolve.test.ts` pins this so the gap cannot hide again. |
+| Script                                                             | What it writes                                                                                                  | Status today                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/seed-all-content.mjs`                                     | Courses, modules, lessons with their MDX body, the 13 quizzes from `quiz-questions.json`, badges, pricing tiers | The only script that publishes lesson text and quiz content. Run as `node scripts/seed-all-content.mjs`. Not registered as a `package.json` script. Verified to parse (`node --check`), never verified against the production database from a dev machine. |
+| `scripts/import-amph-content.ts`, exposed as `pnpm import:content` | Modules and lessons only (it wires a course, module and lesson repository, no quiz repository)                  | **Cannot run.** It imports `@/usecases/ImportAmphContent`, a file that `915c7ca` on 2026-07-31 deleted. It fails at module resolution before opening a connection. `src/__tests__/scriptImportsResolve.test.ts` pins this so the gap cannot hide again.    |
 
 `vercel.json` runs `pnpm prisma:deploy` and `pnpm db:seed:scenarios` in production, then `pnpm build`. Neither reads `content/curriculum/`, so a deploy publishes schema and simulator scenarios but no lesson text and no quiz questions.
 
@@ -106,7 +106,7 @@ The greenfield importer differs from the parent implementation in these importan
 
 ## Content audit & corrections (carried forward from parent)
 
-The content in this folder has already been audited and corrected. The parent's `docs/CONTENT-AUDIT-2026-07-16.md` and `docs/CONTENT-UPDATE-PLAN.md` document the corrections. If the greenfield later needs to apply the same corrections (e.g., the parent releases a new audit pass), re-read those parent docs first.
+The content in this folder has already been audited and corrected. The corrections are listed in this section; the two parent-repository documents that described them, `docs/CONTENT-AUDIT-2026-07-16.md` and `docs/CONTENT-UPDATE-PLAN.md`, were never committed to this repository, so read the list below rather than looking for them. If a new audit pass arrives from `projectamazonph/amph-v2`, write it into this folder before acting on it.
 
 **Specific corrections that were already applied (and are in the files in this folder):**
 
