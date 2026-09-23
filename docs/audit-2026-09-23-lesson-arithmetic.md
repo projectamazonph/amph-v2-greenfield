@@ -16,13 +16,13 @@ permanently.
 
 ## Fixed in this pass
 
-| File | Was | Now |
-| --- | --- | --- |
-| `1.5:115` | Week 1 prints TACoS 40% with the note "no organic sales yet", while ACoS is 50% | With zero organic sales, total sales are ad sales, so TACoS equals ACoS. Now 50%, and the note says why |
-| `1.5:128` | Week 3 TACoS delta "↓ 38%" | 50% to 25% is ↓ 50% |
-| `1.5:154` | `₱1,250 × 0.11 × 0.25 = ₱35` | ₱34.38, and the next line now says to round a ceiling down because a ceiling you round up is no longer a ceiling |
-| `3.1:108` | "71% higher for B" for ₱26 to ₱45 | 19 ÷ 26 = 73%, corrected in the table and in the answer key |
-| `3.1:111` | Listing B ACoS 58% | ₱45 ÷ (₱1,250 × 6.1%) = 59%. Listing A checks at 17% |
+| File      | Was                                                                             | Now                                                                                                              |
+| --------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `1.5:115` | Week 1 prints TACoS 40% with the note "no organic sales yet", while ACoS is 50% | With zero organic sales, total sales are ad sales, so TACoS equals ACoS. Now 50%, and the note says why          |
+| `1.5:128` | Week 3 TACoS delta "↓ 38%"                                                      | 50% to 25% is ↓ 50%                                                                                              |
+| `1.5:154` | `₱1,250 × 0.11 × 0.25 = ₱35`                                                    | ₱34.38, and the next line now says to round a ceiling down because a ceiling you round up is no longer a ceiling |
+| `3.1:108` | "71% higher for B" for ₱26 to ₱45                                               | 19 ÷ 26 = 73%, corrected in the table and in the answer key                                                      |
+| `3.1:111` | Listing B ACoS 58%                                                              | ₱45 ÷ (₱1,250 × 6.1%) = 59%. Listing A checks at 17%                                                             |
 
 ## Open, needs a decision or a reading pass
 
@@ -38,7 +38,7 @@ in the session that found it.
    same lesson's rule at `:100` caps product targeting at 5-10% (₱70 to ₱140). `4.4:132` repeats
    the 15% figure, so this is a three-place disagreement, not a typo.
 3. `2.2:69` instructs "₱500/day budget and let it run for 2 weeks", then prices it as "The ₱14,000
-   over 4 weeks". ₱500 × 14 days is ₱7,000. Either the window is four weeks or the cost is half.
+   over 4 weeks". ₱500 × 14 days is ₱7,000. Either the window is four weeks or the cost is half. **Fixed:** the two-week instruction stands and the cost now reads ₱7,000.
 4. `3.3:152` takeaway claims "₱30k/year PPC savings" while `:136` and the table at `:134` define
    that same ₱30,000 as the month-12 gap on ₱200,000 of monthly ad sales, which is ₱360k a year.
    A 12x understatement in the lesson's own headline number. **Fixed:** the bullet now calls it the
