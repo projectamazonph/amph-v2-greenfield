@@ -127,6 +127,69 @@
   letter-spacing: 0.05em;
 }
 
+/**
+ * STORY-159: status-first card meta row.
+ *
+ * `cardMetaRow` lays out the skill tag (left) and the availability
+ * status pill (right) above the card name. The status pill uses
+ * tokens only — soft-orange for public preview, muted neutral for
+ * enrolled practice, red for the live ad console.
+ */
+.cardMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.skillTag {
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.skillTagLive {
+  color: var(--c-red);
+  opacity: 0.8;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statusPillPublic {
+  background: var(--c-orange-soft);
+  color: var(--c-orange-d);
+}
+
+.statusPillEnrolled {
+  background: var(--c-bg-2);
+  color: var(--ink-500);
+}
+
+.statusPillLive {
+  background: var(--c-red);
+  color: var(--c-card);
+}
+
+.cardNameLive {
+  color: var(--c-red);
+}
+
 .liveCard {
   border-color: var(--border-strong);
 }
