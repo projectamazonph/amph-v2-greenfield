@@ -1,0 +1,71 @@
+# Lesson arithmetic audit, 2026-09-23
+
+Two read-only passes recomputed every printed ratio, sum and derived figure in all 45 lessons,
+which the earlier peso conversions had never done. Each pass recalculated only from numbers
+displayed in the same repo, and made no judgment about whether a real-world Amazon figure is
+correct. That stays with the content owner.
+
+Pass 1 covered Modules 0, 5, 6, 7, 8 and 10 (19 lessons). Landed as STORY-153 in `PR #557`.
+Pass 2 covered Modules -1, 1, 2, 3, 4, 9 and 11 (26 lessons) plus every quiz question for
+modules -1 to 4 against its source lesson. That is the source of the open list below.
+
+Modules -1, 9 and 11 recomputed clean. The module -1 to 4 quiz bank is clean: every figure
+recomputes, and the garlic-press and campaign-builder questions match `4.3` and `4.4` exactly. No
+literal `$` before a digit in either pass, which `CurriculumCurrency.test.ts` now enforces
+permanently.
+
+## Fixed in this pass
+
+| File | Was | Now |
+| --- | --- | --- |
+| `1.5:115` | Week 1 prints TACoS 40% with the note "no organic sales yet", while ACoS is 50% | With zero organic sales, total sales are ad sales, so TACoS equals ACoS. Now 50%, and the note says why |
+| `1.5:128` | Week 3 TACoS delta "↓ 38%" | 50% to 25% is ↓ 50% |
+| `1.5:154` | `₱1,250 × 0.11 × 0.25 = ₱35` | ₱34.38, and the next line now says to round a ceiling down because a ceiling you round up is no longer a ceiling |
+| `3.1:108` | "71% higher for B" for ₱26 to ₱45 | 19 ÷ 26 = 73%, corrected in the table and in the answer key |
+| `3.1:111` | Listing B ACoS 58% | ₱45 ÷ (₱1,250 × 6.1%) = 59%. Listing A checks at 17% |
+
+## Open, needs a decision or a reading pass
+
+Each of these was reported by the audit and is arithmetically or internally verifiable, but fixing
+it either needs a judgment call about what the lesson should teach, or was beyond the context left
+in the session that found it.
+
+1. `2.4:103` says broad match gets 40% of budget and exact gets 25%. `4.1:97-100` says 50-60% on
+   exact and 10-15% on broad. Same lever, same account type, consecutive modules, no overlap. Broad
+   is out by 2.6 to 4x and exact by half. Someone has to decide which allocation the course teaches,
+   or state the condition that separates them.
+2. `4.1:120` answer key allocates product targeting "the remaining 15%, ₱210" of ₱1,400, while the
+   same lesson's rule at `:100` caps product targeting at 5-10% (₱70 to ₱140). `4.4:132` repeats
+   the 15% figure, so this is a three-place disagreement, not a typo.
+3. `2.2:69` instructs "₱500/day budget and let it run for 2 weeks", then prices it as "The ₱14,000
+   over 4 weeks". ₱500 × 14 days is ₱7,000. Either the window is four weeks or the cost is half.
+4. `3.3:152` takeaway claims "₱30k/year PPC savings" while `:136` and the table at `:134` define
+   that same ₱30,000 as the month-12 gap on ₱200,000 of monthly ad sales, which is ₱360k a year.
+   A 12x understatement in the lesson's own headline number.
+5. `3.3:45` table prints 6%/8%/10% CVR against 50%/38%/30% ACoS with only a ₱38 CPC. The lesson's
+   own formula at `:160` is ACoS = CPC ÷ (CVR × price), and no price is given in that section. The
+   ₱1,000 to ₱4,000 boards referenced at `:90` yield 63% to 16%, not 50% to 30%.
+6. `3.3:43` describes the CVR steps 6% → 8% → 10% as lifts matching ranges cited in the same
+   paragraph and at `:29` ("up to 8% Basic / 20% Premium", seller-reported 5-17%). The steps are
+   +33% and +67% relative, or +2 and +4 points, and neither reading follows from those ranges. This
+   one may need the content owner, since it is about what the claim is allowed to say.
+7. `4.3:43` hierarchy diagram labels the phrase target "exercise block · ₱40 bid", but the body at
+   `:69` assigns ₱40 to "yoga block" and ₱30 to "exercise block". The ₱75 exact and ₱18 broad
+   figures agree, so only this one label is crossed.
+
+## Carried over from pass 1, still with Ryan
+
+- `7.1:127` negates a search term at "5+ clicks and zero conversions"; `7.3` uses 10+ clicks in four
+  places including its decision grid. Opposite verdicts on near-identical data.
+- `0.2:34` calls Modules 0 to 8 "the full module lineup" and `8.3:269` closes with "That's the end
+  of the course", while Modules 9, 10 and 11 exist and `0.1` promises artifacts only they produce.
+  `0.2:58` also lists six triage actions and omits raising a bid, where `7.3` teaches five including
+  Increase Bid.
+- `10.3:21` passes empty props to a `:::visual` block. Cosmetic, no learner-visible effect found.
+
+## How to work through this list again
+
+The recomputations are cheap to reproduce. A read-only agent briefed with the scope, the ratio
+definitions, and the instruction to report only what the printed numbers themselves contradict,
+returns a list like this one in a single pass. Both passes used that shape and it is worth reusing
+after any future currency or figure change.
