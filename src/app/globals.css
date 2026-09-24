@@ -9,6 +9,13 @@
 @import "@astryxdesign/core/astryx.css";
 
 :root {
+  /* Self-hosted fonts (@fontsource). Alias to names used by 143 CSS/module files.
+     @fontsource uses @font-face with font-family names, not CSS custom properties. */
+  --font-display: 'Archivo', sans-serif;
+  --font-body: 'PT Sans', sans-serif;
+  --font-cond: 'Barlow Condensed', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
   /* Brand */
   --c-navy-1: #0f1419;
   --c-navy-2: #131921;
