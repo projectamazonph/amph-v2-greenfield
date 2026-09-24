@@ -90,6 +90,7 @@ export type AuditAction =
   | "quiz.update_failed"
   | "quiz.delete_failed"
   // Certificate (STORY-044 + STORY-092)
+  | "certificate.issued"
   | "certificate.revoked"
   // Resource / download center (STORY-098)
   | "resource.created"
@@ -214,6 +215,7 @@ export const ALL_ACTIONS: AuditAction[] = [
   "quiz.update_failed",
   "quiz.delete_failed",
   // STORY-044 + STORY-092: certificate revoke
+  "certificate.issued",
   "certificate.revoked",
   // STORY-098: download center resources
   "resource.created",

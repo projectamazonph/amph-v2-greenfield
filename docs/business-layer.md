@@ -225,6 +225,16 @@ exists in the code. Watching a recording takes the same access path plus a
 needs an enrollment plus a passed quiz; there is no coaching feature and no job board in the
 codebase.
 
+**Certificate issuance runs automatically on course completion.** `MarkLessonComplete` fires
+`IssueCertificate.execute()` exactly once when the lesson that just completed brings the course's
+`progressPercent` to 100. The use case does its own validation (active enrollment, no existing
+certificate for the same `(userId, courseId)` pair) and sends the certificate email; the hook
+then writes an audit row carrying `actorId: "system"`, `action: "certificate.issued"`, and a
+`trigger: "course_completion"` field so the trail distinguishes auto-issued from any future
+admin re-issue path. Failure to issue is best-effort: the lesson completion itself is the
+user-visible event and an admin can re-issue from `/admin/certificates` if the side effect
+ever fails. The manual `/admin/certificates` flow remains the operator path.
+
 `TierAccessPolicy` (`src/infra/access/TierAccessPolicy.ts`) is the implementation. It injects
 a user repository, a course repository and an enrollment repository. It never sees a
 simulator registry, an order, or a refund. In order:

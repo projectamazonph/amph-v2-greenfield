@@ -911,6 +911,23 @@ function buildProductionContainer(): AppContainer {
 
   const awardXp = new AwardXP({ xpAwardRepo, idGen, clock });
 
+  // STORY-041 + decision 5 (auto-issue on completion): IssueCertificate
+  // is a dependency of MarkLessonComplete, so it must be built before
+  // markLessonComplete in the returned object literal below.
+  const issueCertificate = new IssueCertificate({
+    enrollmentRepo,
+    courseRepo,
+    certificateRepo,
+    hashGen: certificateHashGen,
+    idGen,
+    clock,
+    userRepo,
+    emailSender,
+    certificateEmailRenderer,
+    logger,
+    emailTemplateRepo,
+  });
+
   return {
     clock,
     idGen,
@@ -960,6 +977,8 @@ function buildProductionContainer(): AppContainer {
       progressEventRepo,
       idGen,
       clock,
+      issueCertificate,
+      recordAuditLog,
     }),
     enrollStudent,
     discountCodeRepo,
@@ -1058,19 +1077,7 @@ function buildProductionContainer(): AppContainer {
     emailSender,
     receiptEmailRenderer,
     simulatorRegistry: buildSimulatorRegistry(),
-    issueCertificate: new IssueCertificate({
-      enrollmentRepo,
-      courseRepo,
-      certificateRepo,
-      hashGen: certificateHashGen,
-      idGen,
-      clock,
-      userRepo,
-      emailSender,
-      certificateEmailRenderer,
-      logger,
-      emailTemplateRepo,
-    }),
+    issueCertificate,
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
       userRepo,
