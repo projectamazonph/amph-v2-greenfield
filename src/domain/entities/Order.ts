@@ -26,8 +26,8 @@ export interface OrderCreateParams {
   readonly userId: string;
   readonly courseId: string;
   readonly subtotalMinor: number;
-  readonly discountMinor: number;
-  readonly totalMinor: number;
+  discountMinor: number;
+  totalMinor: number;
   readonly currency: string;
   readonly installmentMonths?: number | null;
   readonly installmentMonthlyMinor?: number | null;
@@ -60,8 +60,8 @@ export class Order {
   public readonly userId: string;
   public readonly courseId: string;
   public readonly subtotalMinor: number;
-  public readonly discountMinor: number;
-  public readonly totalMinor: number;
+  public discountMinor: number;
+  public totalMinor: number;
   public readonly currency: string;
 
   // ── Payment fields ──────────────────────────────────────────
@@ -228,6 +228,42 @@ export class Order {
     this.refundReason = reason;
     this.refundProcessedAt = new Date();
     this.refundAmountMinor = amountMinor;
+    this.updatedAt = new Date();
+    return Result.ok(undefined);
+  }
+
+  /**
+   * Apply a discount to a PAID order from the admin path. Adjusts
+   * `discountMinor` and recomputes `totalMinor` so the audit log
+   * records a consistent snapshot. Only valid on PAID orders; the
+   * use case that calls this rejects non-PAID orders upstream so the
+   * message here is defensive.
+   *
+   * STORY-024/050d: this is the only way a discount code reaches an
+   * order today. Checkout has no coupon field; CreatePaymentIntent
+   * writes `discountMinor: 0` for every checkout.
+   */
+  applyAdminDiscount(discountMinor: number): Result<void, OrderTransitionError> {
+    if (this.status !== "PAID") {
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot apply discount: order is ${this.status}. Can only apply to PAID.`,
+      });
+    }
+    if (discountMinor <= 0 || discountMinor > this.subtotalMinor) {
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot apply discount: ${discountMinor} is outside (0, ${this.subtotalMinor}].`,
+      });
+    }
+    if (this.discountMinor > 0) {
+      return Result.err({
+        kind: "invalid_transition",
+        message: `Cannot apply discount: order already has a ${this.discountMinor}-minor discount.`,
+      });
+    }
+    this.discountMinor = discountMinor;
+    this.totalMinor = this.subtotalMinor - discountMinor;
     this.updatedAt = new Date();
     return Result.ok(undefined);
   }

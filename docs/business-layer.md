@@ -287,20 +287,33 @@ considered (see Pricing Tiers), so the documented "early-bird cannot combine wit
 percentage code" behaviour has no mechanism behind it. Whether it should is part of the
 checkout decision below.
 
-**No learner can redeem a code today.** `CreatePaymentIntent` takes no code parameter and
-builds its line with `discountMinor: 0` (`src/usecases/CreatePaymentIntent.ts:147`).
-`ApplyDiscountCode` is imported, typed onto the container and constructed by the composition
-container (`src/composition/container.ts:244`, `:493`, `:963`), and imported by no page,
-action, component or route. There is no coupon field on the checkout form. The use case is complete, tested, and
-disconnected. **Whether checkout should accept codes is an open decision for Ryan.**
+**Discount codes are an operator-only lever.** `CreatePaymentIntent` takes no code parameter and
+builds its line with `discountMinor: 0` (`src/usecases/CreatePaymentIntent.ts:147`). There is
+no coupon field on the checkout form. The only path through which a discount code reaches an
+order today is the admin: from `/admin/payments/[id]`, an admin submits a code, the
+`AdminApplyDiscountCode` use case (`src/usecases/AdminApplyDiscountCode.ts`) validates the
+code against the same rules `ApplyDiscountCode` uses, mutates the matching PAID order via
+`Order.applyAdminDiscount()` (recomputes `totalMinor`), persists, audits
+`order.discount_applied`, and calls `IDiscountCodeRepository.incrementUsedCount()` so
+`maxUses` is finally reachable by real traffic. The student never sees a coupon field; codes
+are a marketing / support tool, not a self-service feature.
 
-What `ApplyDiscountCode` would check, in order, if it were called: `findByCode` on the
-normalised code (so lookup is case-insensitive), then `validUntil` in the past →
-`code_expired`, `validFrom` in the future → `code_not_started`, `usedCount >= maxUses` →
-`code_maxed_out`, and a non-empty `courseIds` that omits the course → `code_not_applicable`.
-It returns `{ discountMinor, discountCodeId }` and writes nothing. Note that it does **not**
-check `archivedAt`, so an archived code still validates through this path even though the
-repository hides it from other reads.
+What `AdminApplyDiscountCode` checks, in order: the order must be PAID (refused on
+DRAFT/PENDING/REFUNDED with `order_not_paid` so totals don't drift from the PayMongo
+session, and refunds keep their historical receipt); the order must not already have a
+discount applied (`discount_already_applied`, to keep the audit trail trivial); the code
+must exist (`code_not_found`), not be expired (`code_expired`), not be before its start
+date (`code_not_started`), not be at `maxUses` (`code_maxed_out`), and apply to the order's
+course (`code_not_applicable`); and the calculated discount must be in `(0, subtotalMinor]`.
+It then runs `Order.applyAdminDiscount()`, persists, audits, and increments
+`usedCount`. `ApplyDiscountCode.execute()` (the older use case) remains as a pure validator
+but has no caller; the admin path uses `AdminApplyDiscountCode` directly.
+
+Note that the standalone `ApplyDiscountCode` does **not** check `archivedAt`, so an archived
+code still validates through the public validator's rules even though the repository hides
+it from `listAll()` / `findById()`. The admin path enforces an additional course-applicability
+check that the validator also does, so the admin cannot accidentally apply a code the
+learner-facing path would have refused.
 
 The maths, from `calculateDiscount`: `PERCENTAGE` is `Math.floor(subtotalMinor * value / 100)`
 (floored, not rounded), and `FIXED` is `Math.min(value, subtotalMinor)`, so a fixed code can

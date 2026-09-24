@@ -34,6 +34,7 @@ export type AuditAction =
   // Payment / refund
   | "refund.processed"
   | "refund.overridden"
+  | "order.discount_applied"
   // User
   | "user.signed_up"
   | "user.impersonated"
@@ -163,6 +164,7 @@ export const ALL_ACTIONS: AuditAction[] = [
   "lesson.reorder_failed",
   "refund.processed",
   "refund.overridden",
+  "order.discount_applied",
   "user.signed_up",
   "user.impersonated",
   "user.stopped_impersonating",

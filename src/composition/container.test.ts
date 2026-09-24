@@ -148,6 +148,7 @@ import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
+import { AdminApplyDiscountCode } from "@/usecases/AdminApplyDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
@@ -585,6 +586,13 @@ export function buildTestContainer(): TestContainer {
     applyDiscountCode: new ApplyDiscountCode({
       discountCodeRepo,
       clock,
+    }),
+    adminApplyDiscountCode: new AdminApplyDiscountCode({
+      orderRepo,
+      discountCodeRepo,
+      clock,
+      recordAuditLog,
+      logger,
     }),
     quizRepo,
     quizAttemptRepo,

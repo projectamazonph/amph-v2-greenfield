@@ -15,6 +15,7 @@ import { Card } from "@astryxdesign/core";
 import { Badge } from "@astryxdesign/core";
 import { formatPhp } from "@/app/admin/_lib/formatPhp";
 import { processRefundAction } from "@/app/actions/processRefund.action";
+import { adminApplyDiscountCodeAction } from "@/app/actions/adminApplyDiscountCode.action";
 import styles from "./page.module.css";
 
 interface PageProps {
@@ -74,6 +75,21 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
     });
     if (r.ok) {
       redirect(`/admin/payments/${id}?refundId=${encodeURIComponent(r.value.refundId)}`);
+    }
+    redirect(`/admin/payments/${id}?error=${r.error.kind}`);
+  }
+
+  async function handleApplyDiscount(formData: FormData) {
+    "use server";
+    const code = String(formData.get("code") ?? "").trim();
+    if (!code) {
+      redirect(`/admin/payments/${id}?error=missing_code`);
+    }
+    const r = await adminApplyDiscountCodeAction({ orderId: id, code });
+    if (r.ok) {
+      redirect(
+        `/admin/payments/${id}?discountCodeId=${encodeURIComponent(r.value.discountCodeId)}`,
+      );
     }
     redirect(`/admin/payments/${id}?error=${r.error.kind}`);
   }
@@ -232,6 +248,40 @@ export default async function AdminPaymentDetailPage({ params, searchParams }: P
             </dd>
           </dl>
         </Card>
+
+        {isPaid && (
+          <Card padding={6}>
+            <h2 className={styles.sectionTitle}>Apply discount code</h2>
+            <p className={styles.muted}>
+              Apply a code to this order post-payment. The order total is reduced by the code's
+              value and <code>usedCount</code> on the code is incremented. Only valid on PAID
+              orders; the order already shows whether a discount is applied below.
+            </p>
+            <form action={handleApplyDiscount} className={styles.form}>
+              <label className={styles.field}>
+                <span className={styles.label}>Discount code</span>
+                <input
+                  type="text"
+                  name="code"
+                  required
+                  maxLength={64}
+                  className={styles.input}
+                  placeholder="e.g. WELCOME20"
+                  disabled={order.discountMinor > 0}
+                />
+              </label>
+              <button
+                type="submit"
+                className={styles.refundButton}
+                disabled={order.discountMinor > 0}
+              >
+                {order.discountMinor > 0
+                  ? `Discount already applied (${formatPhp(order.discountMinor)})`
+                  : "Apply discount code"}
+              </button>
+            </form>
+          </Card>
+        )}
 
         {isPaid && (
           <Card padding={6}>
