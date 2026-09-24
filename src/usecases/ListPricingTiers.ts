@@ -1,26 +1,16 @@
 /**
  * ListPricingTiers — public pricing page (STORY-015).
  *
- * Fetches all ACTIVE pricing tiers, enriched with:
- * - The effective (display) price: early-bird if window is open,
- *   otherwise the regular price.
- * - Whether the early-bird window is currently active.
- * - Minutes remaining in the early-bird window.
- *
- * The /pricing page uses this to render tier cards with countdown timers
- * and the correct price based on the time window.
- *
- * STORY-015.
+ * Fetches all ACTIVE pricing tiers. Decision 6 (2026-09-24): each
+ * tier has exactly one price now (early-bird is dropped), so the
+ * public tier shape is the same as the entity minus the early-bird
+ * surface. The /pricing page renders the regular price on every
+ * active tier card.
  */
 
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 import type { PricingTierRepositoryError } from "@/ports/repositories/IPricingTierRepository";
 import { Result } from "@/domain/shared/Result";
-import {
-  effectivePrice,
-  earlyBirdIsActive,
-  earlyBirdMinutesRemaining,
-} from "@/domain/entities/PricingTier";
 import type { Money } from "@/domain/values/Money";
 
 // ── Error helper ───────────────────────────────────────────────────────────────
@@ -37,15 +27,11 @@ export interface PublicPricingTier {
   readonly id: string;
   readonly slug: string;
   readonly name: string;
-  /** The price shown to the user: early-bird if window is open, otherwise regular. */
+  /** The price shown to the user. */
   readonly displayPrice: Money;
-  /** The original (non-discounted) price — only set when early-bird is active. */
-  readonly originalPrice: Money | null;
   readonly currency: string;
   readonly status: string;
   readonly displayOrder: number;
-  readonly isEarlyBird: boolean;
-  readonly earlyBirdMinutesRemaining: number;
   readonly courseSlug: string | null;
 }
 
@@ -71,38 +57,29 @@ export class ListPricingTiers {
       });
     }
 
-    const now = new Date();
-    const publicTiers: PublicPricingTier[] = [];
-
     const linkResults = await Promise.all(
       result.value.map((tier) => this._repo.findLinkedCourseSlug(tier.id)),
     );
 
+    const publicTiers: PublicPricingTier[] = [];
     for (let index = 0; index < result.value.length; index++) {
       const tier = result.value[index]!;
       const linkResult = linkResults[index]!;
       if (!linkResult.ok) {
         return Result.err({ kind: "db_error", message: tierErrorMsg(linkResult.error) });
       }
-      const isEarlyBird = earlyBirdIsActive(tier, now);
-      const displayPrice = effectivePrice(tier, now);
-
       publicTiers.push({
         id: tier.id,
         slug: tier.slug,
         name: tier.name,
-        displayPrice,
-        originalPrice: isEarlyBird ? tier.price : null,
+        displayPrice: tier.price,
         currency: tier.price.currency,
         status: tier.status,
         displayOrder: tier.displayOrder,
-        isEarlyBird,
-        earlyBirdMinutesRemaining: isEarlyBird ? earlyBirdMinutesRemaining(tier, now) : 0,
         courseSlug: linkResult.value,
       });
     }
 
-    // Sort by displayOrder (matches comparePricingTiers order)
     publicTiers.sort((a, b) => a.displayOrder - b.displayOrder);
 
     return Result.ok({ tiers: publicTiers });

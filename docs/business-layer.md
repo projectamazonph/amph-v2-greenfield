@@ -37,7 +37,7 @@ Four tiers are seeded, in `scripts/seed-pricing-tiers.ts`. Three are sold as a l
 
 Every figure in the table is a `PricingTier.priceMinor` value in integer centavos. There is also a `Course.priceMinor`, and a course attaches to a tier through the nullable `Course.pricingTierId`, but neither of those is what a learner is quoted: `/pricing` renders `effectivePrice(tier, now)` through `ListPricingTiers`, and `GetCheckoutSummary` charges the same `effectivePrice(tier)` when the request carries a `pricingTierSlug`. Tier is a `CourseAccessTier` value object. Editing tier price is admin-only (see admin backend spec).
 
-**Bundle option:** All-Access Pass = ₱14,999 (`priceMinor` 1499900), the fourth seeded row, with no early-bird discount on it. The earlier text here said ₱12,999 and a savings of ₱6,997; that figure matches no seeded row and no code path, so it is dropped rather than corrected, and the saving it promised was arithmetic on a price nobody charges.
+**Bundle option:** All-Access Pass = ₱14,999 (`priceMinor` 1499900), the fourth seeded row. The earlier text here said ₱12,999 and a savings of ₱6,997; that figure matches no seeded row and no code path, so it is dropped rather than corrected, and the saving it promised was arithmetic on a price nobody charges.
 
 **What makes a tier buyable.** Two conditions, both checked in `src/usecases/GetCheckoutSummary.ts`, and neither is an `isActive` flag:
 
@@ -45,10 +45,6 @@ Every figure in the table is a `PricingTier.priceMinor` value in integer centavo
 2. The tier links to a course, and that course is `PUBLISHED`. `findLinkedCourseSlug()` returning nothing is also `pricing_tier_unavailable`.
 
 Consequence worth knowing before a launch: `--with-courses` defaults to false in that seeder, so an ACTIVE tier with no linked course passes the first check and fails the second, and checkout says `pricing_tier_unavailable` with no hint that the missing link is why. `SESSION-HANDOVER.md:877` records that the tiers in the deployed database were seeded without that flag, which this document cannot verify from here; confirm it against the live rows before treating a tier as purchasable. `pnpm db:seed:tiers --with-courses` is what closes a tier's path to checkout.
-
-**Early bird:** A tier may carry `earlyBirdPriceMinor` and `earlyBirdEndsAt`. While the window is open, the lower price is what `/pricing` shows (with a countdown) and what `GetCheckoutSummary` charges; once `earlyBirdEndsAt` passes, the regular price returns on its own. The rule is three pure functions on the entity, `effectivePrice()`, `earlyBirdIsActive()` and `earlyBirdMinutesRemaining()` in `src/domain/entities/PricingTier.ts`, consumed by `ListPricingTiers` and `GetCheckoutSummary`, and covered by `tests/unit/domain/entities/PricingTier.test.ts`. `pnpm db:seed:tiers` (`scripts/seed-pricing-tiers.ts`) seeds Accelerated Mastery at ₱4,999 down from ₱5,999 for 7 days and Ultimate Transformation at ₱7,999 down from ₱9,999 for 3 days; the Foundations and All-Access rows carry no early-bird. Those are seed defaults only: the live rows are `pricing_tiers` and an admin can change or clear them, and a deploy does not re-seed tiers, so treat any peso figure in this document as an example rather than the current price.
-
-**Not implemented:** an early-bird cap measured in enrollments. This section used to read "First 30 enrollments across all tiers pay ₱499", "implemented as a `PricingService` rule", "in `src/infra/pricing/EarlyBirdPricingService.ts`, with tests". None of that is in the repository: there is no `PricingService` symbol in `src/`, no `src/infra/pricing/` directory, no file by that name, nothing anywhere that counts enrollments to close a price, and no ₱499 tier. The window closes on a date. Whether a first-N-enrollments cap is also wanted is an open product decision, recorded in `../STATE.md`.
 
 **Discount codes:** Single-use and multi-use. Created by admin. Applied at checkout. Stored in `DiscountCode` table.
 
@@ -59,8 +55,7 @@ use case: checkout runs through a server action and fulfillment is inline in the
 handler.
 
 ```
-1. Visitor browses /pricing. ListPricingTiers returns ACTIVE tiers and quotes each one
-   through effectivePrice(tier, now), so an open early-bird window is the displayed price.
+1. Visitor browses /pricing. ListPricingTiers returns ACTIVE tiers and their `priceMinor`.
 2. The checkout form posts to src/app/actions/checkout.action.ts, which runs
    CreatePaymentIntent. That creates a hosted Checkout Session through IPaymentGateway
    and creates the Order row locally at the same time.
@@ -289,13 +284,8 @@ The only code-shape rule is a character class, `/^[A-Z0-9_-]+$/`, plus a non-emp
 There is no length bound: "4-32 chars" is wrong in both directions, and `_` and `-` are
 allowed where "alphanumeric" said they were not.
 
-`singleUsePerUser` and `stacksWithEarlyBird` do not exist, under those names or any other.
-Per-user redemption is not implemented: nothing records who used which code. Nor is there a
-stacking rule, because there is nothing to stack against: `EARLY_BIRD` is not a discount
-type. The early-bird price is a field on `PricingTier`, applied before any code is
-considered (see Pricing Tiers), so the documented "early-bird cannot combine with a
-percentage code" behaviour has no mechanism behind it. Whether it should is part of the
-checkout decision below.
+`singleUsePerUser` does not exist, under that name or any other.
+Per-user redemption is not implemented: nothing records who used which code.
 
 **Discount codes are an operator-only lever.** `CreatePaymentIntent` takes no code parameter and
 builds its line with `discountMinor: 0` (`src/usecases/CreatePaymentIntent.ts:147`). There is

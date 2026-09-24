@@ -25,7 +25,7 @@
     "prisma:validate": "prisma validate",
     "astryx": "node node_modules/@astryxdesign/cli/bin/astryx.mjs",
     "gen:secret": "node scripts/gen-secret.js",
-    "import:content": "tsx scripts/import-amph-content.ts",
+    "import:content": "node scripts/seed-all-content.mjs",
     "validate:curriculum": "tsx scripts/validate-curriculum-inventory.ts",
     "validate:lesson-production": "tsx scripts/validate-lesson-production.ts",
     "validate:tool-bridges": "tsx scripts/validate-tool-bridges.ts",

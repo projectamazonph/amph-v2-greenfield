@@ -92,8 +92,6 @@ const PLACEHOLDER_SHAPE = /[<>*{}$?]|XXX|NNN/;
  * about an absence, so the reference must stay absent for the prose to be true.
  */
 const KNOWN_ABSENT: Record<string, string> = {
-  "src/usecases/ImportAmphContent.ts":
-    "deleted by 915c7ca; CLAUDE.md and STATE.md cite it to explain why pnpm import:content cannot run",
   "src/infra/payment/PayMongoAdapter.test.ts":
     "moved into __tests__/ by the 2026-08-02 session; CLAUDE.md names the old path to record that it was never collected",
   "docs/audit-2026-07-27-completeness-review.md":
@@ -108,8 +106,6 @@ const KNOWN_ABSENT: Record<string, string> = {
     "wrong directory and wrong layer; ADR-019's as-built note names the real port at src/ports/simulator/Simulator.ts",
   "src/middleware.ts":
     "renamed by Next.js 16; docs/build-spec.md's as-built note points at src/proxy.ts",
-  "src/infra/pricing/EarlyBirdPricingService.ts":
-    "never committed here; docs/business-layer.md names it only to record that the count-based early-bird rule it describes was never built",
   "docs/ULTRA-REVIEW-2026-08-14.md":
     "removed on 2026-09-14 by e1f7352; STATE.md cites it above the triage table that is its only surviving copy",
   "docs/CONTENT-AUDIT-2026-07-16.md":
