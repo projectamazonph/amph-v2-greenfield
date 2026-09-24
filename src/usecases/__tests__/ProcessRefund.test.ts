@@ -233,7 +233,7 @@ describe("ProcessRefund", () => {
       paymongoPaymentId: "cs_paid_1",
     });
     paymentGateway.refundShouldFail = {
-      kind: "gateway_error",
+      kind: "network_error",
       message: "PayMongo timed out",
     };
 
