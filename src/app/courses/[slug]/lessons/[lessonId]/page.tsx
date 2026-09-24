@@ -16,6 +16,7 @@ import { Clock, ListChecks, Play } from "@phosphor-icons/react/dist/ssr";
 import { buildContainer } from "@/composition/container";
 import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
+import { loadGlossaryManifest } from "@/lib/glossary";
 import { getLessonData, withCatalogCurriculum } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
 import type { Lesson as CatalogLesson } from "@/domain/entities/Course";
@@ -128,6 +129,14 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
     notFound();
   }
   const course = withCatalogCurriculum(courseResult.value, catalog, selectedLessonResult.value);
+
+  // ── Glossary manifest ──────────────────────────────────
+  let glossaryManifest: ReturnType<typeof loadGlossaryManifest> | undefined = undefined;
+  try {
+    glossaryManifest = loadGlossaryManifest();
+  } catch {
+    // Glossary file missing or unparseable — render without popovers
+  }
 
   // ── Find lesson ─────────────────────────────────────────
   const lessonData = getLessonData(course, lessonId);
@@ -285,7 +294,11 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
               <span>Lesson workspace</span>
               <p>Work through one idea, then use the evidence before your next move.</p>
             </div>
-            <LessonContent lesson={selectedLessonResult.value} courseSlug={slug} />
+            <LessonContent
+              lesson={selectedLessonResult.value}
+              courseSlug={slug}
+              glossaryManifest={glossaryManifest}
+            />
           </section>
 
           {completionStatus.completed === "1" ? (

@@ -381,3 +381,9 @@
 .quizCta:hover {
   background: color-mix(in srgb, var(--accent) 90%, var(--ink-900));
 }
+
+/* Fallback when a glossary slug has no matching entry in the manifest */
+.glossaryFallback {
+  font-style: italic;
+  color: var(--ink-700);
+}
