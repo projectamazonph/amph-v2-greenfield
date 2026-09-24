@@ -21,6 +21,7 @@ import { InMemoryCertificateRepository } from "@/infra/repositories/InMemoryCert
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
+import { TestLogger } from "@/infra/observability/TestLogger";
 import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { IssueCertificate } from "@/usecases/IssueCertificate";
 
@@ -170,11 +171,12 @@ describe("MarkLessonComplete", () => {
 
     const certificateRepo: ICertificateRepository = new InMemoryCertificateRepository();
     const auditLog = new InMemoryAuditLog();
+    const testLogger = new TestLogger();
     const recordAuditLog = new RecordAuditLog({
       auditLog,
       idGen,
       clock,
-      logger: { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} } as Logger,
+      logger: testLogger,
     });
     const issueCertificate = new IssueCertificate({
       enrollmentRepo,
@@ -188,17 +190,21 @@ describe("MarkLessonComplete", () => {
       } as unknown as UserRepository,
       emailSender: { send: async () => Result.ok(undefined) } as unknown as EmailSender,
       certificateEmailRenderer: { render: () => null } as unknown as CertificateEmailRenderer,
-      logger: { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} } as Logger,
+      logger: testLogger,
       emailTemplateRepo: {
         findByType: async () => Result.ok(null),
       } as unknown as IEmailTemplateRepository,
     });
 
+    const progressEvents: unknown[] = [];
     const useCase = new MarkLessonComplete({
       enrollmentRepo,
       courseRepo: courseRepo(),
       progressEventRepo: {
-        create: async (event) => Result.ok(event),
+        create: async (event: unknown) => {
+          progressEvents.push(event);
+          return Result.ok(event as never);
+        },
       } as unknown as IProgressEventRepository,
       idGen,
       clock,
