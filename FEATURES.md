@@ -38,7 +38,7 @@ Password-reset and transactional links use the configured application origin. Th
 - `/courses/[slug]/lessons/[lessonId]` renders MDX lesson content and navigation.
 - The shared lesson route presents every module through an outcome-first hero, course-progress route map, structured learning workspace, and explicit completion and next-step areas without changing the native MDX lesson inventory.
 - `/courses/[slug]/quizzes/[quizId]` is the canonical access-controlled quiz route. The legacy lesson quiz URL redirects to it, and both the page and mutation enforce course access.
-- `scripts/seed-all-content.mjs`, run as `node scripts/seed-all-content.mjs`, imports the MDX curriculum under `content/curriculum/` and the quiz bank into course, module, lesson, and quiz rows. `scripts/import-amph-content.ts` does not work: the use case it imports was deleted in `915c7ca` (2026-07-31), so `pnpm import:content` fails at module resolution. Neither runs on deploy.
+- `scripts/seed-all-content.mjs`, run as `node scripts/seed-all-content.mjs`, imports the MDX curriculum under `content/curriculum/` and the quiz bank into course, module, lesson, and quiz rows. Nothing runs on deploy.
 - Admin course, module, and lesson CRUD is available under `/admin/courses`.
 
 The public catalog and pricing pages deliberately render an empty-state message when no published course or active pricing rows have been seeded. `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01) — the placeholder is gone.
