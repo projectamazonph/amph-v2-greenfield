@@ -15,19 +15,13 @@ import * as path from "node:path";
 
 describe("P0-5: lesson page uses AuthorizeLessonAccess", () => {
   it("the lesson page imports container.authorizeLessonAccess", async () => {
-    const p = path.resolve(
-      process.cwd(),
-      "src/app/courses/[slug]/lessons/[lessonId]/page.tsx",
-    );
+    const p = path.resolve(process.cwd(), "src/app/courses/[slug]/lessons/[lessonId]/page.tsx");
     const source = await fs.readFile(p, "utf8");
     expect(source).toMatch(/container\.authorizeLessonAccess\.execute/);
   });
 
   it("uses a reason-specific student access notice instead of a generic lock screen", async () => {
-    const p = path.resolve(
-      process.cwd(),
-      "src/app/courses/[slug]/lessons/[lessonId]/page.tsx",
-    );
+    const p = path.resolve(process.cwd(), "src/app/courses/[slug]/lessons/[lessonId]/page.tsx");
     const source = await fs.readFile(p, "utf8");
     expect(source).toMatch(/CourseAccessNotice/);
     expect(source).toMatch(/verification_unavailable/);
@@ -36,10 +30,7 @@ describe("P0-5: lesson page uses AuthorizeLessonAccess", () => {
   });
 
   it("the lesson page no longer calls container.checkCourseAccess (the old broken path)", async () => {
-    const p = path.resolve(
-      process.cwd(),
-      "src/app/courses/[slug]/lessons/[lessonId]/page.tsx",
-    );
+    const p = path.resolve(process.cwd(), "src/app/courses/[slug]/lessons/[lessonId]/page.tsx");
     const source = await fs.readFile(p, "utf8");
     // The previous implementation branched on userId presence and called
     // either checkCourseAccess (for authed users) or computed the
@@ -50,29 +41,23 @@ describe("P0-5: lesson page uses AuthorizeLessonAccess", () => {
   });
 
   it("the AuthorizeLessonAccess use case exists at the expected path", async () => {
-    const p = path.resolve(
-      process.cwd(),
-      "src/usecases/AuthorizeLessonAccess.ts",
-    );
-    const exists = await fs.stat(p).then(() => true).catch(() => false);
+    const p = path.resolve(process.cwd(), "src/usecases/AuthorizeLessonAccess.ts");
+    const exists = await fs
+      .stat(p)
+      .then(() => true)
+      .catch(() => false);
     expect(exists).toBe(true);
   });
 
   it("AuthorizeLessonAccess is wired into AppContainer (production)", async () => {
-    const p = path.resolve(
-      process.cwd(),
-      "src/composition/container.ts",
-    );
+    const p = path.resolve(process.cwd(), "src/composition/container.ts");
     const source = await fs.readFile(p, "utf8");
     expect(source).toMatch(/authorizeLessonAccess:\s*AuthorizeLessonAccess/);
     expect(source).toMatch(/new AuthorizeLessonAccess\(/);
   });
 
   it("AuthorizeLessonAccess is wired into TestContainer", async () => {
-    const p = path.resolve(
-      process.cwd(),
-      "src/composition/container.test.ts",
-    );
+    const p = path.resolve(process.cwd(), "src/composition/container.test.ts");
     const source = await fs.readFile(p, "utf8");
     expect(source).toMatch(/new AuthorizeLessonAccess\(/);
   });
@@ -80,15 +65,15 @@ describe("P0-5: lesson page uses AuthorizeLessonAccess", () => {
 
 describe("shared lesson-view shell", () => {
   it("keeps the native lesson renderer inside an outcome-first workspace", async () => {
-    const p = path.resolve(
-      process.cwd(),
-      "src/app/courses/[slug]/lessons/[lessonId]/page.tsx",
-    );
+    const p = path.resolve(process.cwd(), "src/app/courses/[slug]/lessons/[lessonId]/page.tsx");
     const source = await fs.readFile(p, "utf8");
 
     expect(source).toMatch(/className=\{styles\.lessonHeader\}/);
     expect(source).toMatch(/className=\{styles\.lessonWorkspace\}/);
-    expect(source).toMatch(/<LessonContent lesson=\{selectedLessonResult\.value\} courseSlug=\{slug\} \/>/);
+    expect(source).toMatch(/<LessonContent\b/);
+    expect(source).toMatch(/lesson=\{selectedLessonResult\.value\}/);
+    expect(source).toMatch(/courseSlug=\{slug\}/);
+    expect(source).toMatch(/glossaryManifest=\{glossaryManifest\}/);
     expect(source).toMatch(/className=\{styles\.completionCard\}/);
   });
 });
