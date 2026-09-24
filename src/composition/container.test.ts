@@ -458,6 +458,22 @@ export function buildTestContainer(): TestContainer {
   // STORY-050a: audit log
   const auditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock, logger });
+  // STORY-041: certificate issuance is also a dependency of MarkLessonComplete
+  // (auto-issued on course completion), so it must be built before the
+  // markLessonComplete container entry below.
+  const issueCertificate = new IssueCertificate({
+    enrollmentRepo,
+    courseRepo,
+    certificateRepo,
+    hashGen: certificateHashGen,
+    idGen,
+    clock,
+    userRepo,
+    emailSender,
+    certificateEmailRenderer,
+    logger,
+    emailTemplateRepo,
+  });
   const webhookEventLog = new InMemoryWebhookEventLog();
   // STORY-061: audit log viewer + CSV export
   const listAuditLogs = new ListAuditLogs({ auditLog });
@@ -580,6 +596,8 @@ export function buildTestContainer(): TestContainer {
       progressEventRepo,
       idGen,
       clock,
+      issueCertificate,
+      recordAuditLog,
     }),
     enrollStudent,
     discountCodeRepo,
@@ -626,19 +644,7 @@ export function buildTestContainer(): TestContainer {
       logger,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
-    issueCertificate: new IssueCertificate({
-      enrollmentRepo,
-      courseRepo,
-      certificateRepo,
-      hashGen: certificateHashGen,
-      idGen,
-      clock,
-      userRepo,
-      emailSender,
-      certificateEmailRenderer,
-      logger,
-      emailTemplateRepo,
-    }),
+    issueCertificate,
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
       userRepo,
