@@ -244,3 +244,4 @@ Current work is the content-quality loop. `main` is at `20de792`, this line's tw
 4. **Decide the open teaching questions.** They are itemised under "Also open from these passes, needs a decision" in `docs/audit-2026-09-23-lesson-arithmetic.md`, alongside the limitations below. The two with the widest reach are the broad-keyword budget share, where `2.4` says 40% and `4.1` says 10 to 15%, and the click threshold for negating a search term, where `7.1` and `7.2` say 5 while `7.3` and `9.3` say 10 and the STR Triage scenario data follows the latter.
 
 Keep operating from the canonical production URL, keep runbooks current after operator drills, and verify the relevant quality gates before every merge.
+<!-- sentinel -->
