@@ -242,6 +242,7 @@ import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
+import { AdminApplyDiscountCode } from "@/usecases/AdminApplyDiscountCode";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
 import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
 import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
@@ -491,6 +492,7 @@ export interface AppContainer {
   markLessonComplete: MarkLessonComplete;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
+  adminApplyDiscountCode: AdminApplyDiscountCode;
   // STORY-050d: admin discount code CRUD
   adminListDiscountCodes: AdminListDiscountCodes;
   adminGetDiscountCode: AdminGetDiscountCode;
@@ -964,6 +966,13 @@ function buildProductionContainer(): AppContainer {
     applyDiscountCode: new ApplyDiscountCode({
       discountCodeRepo,
       clock,
+    }),
+    adminApplyDiscountCode: new AdminApplyDiscountCode({
+      orderRepo,
+      discountCodeRepo,
+      clock,
+      recordAuditLog,
+      logger,
     }),
     // STORY-050d: admin discount code CRUD
     adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
