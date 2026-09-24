@@ -1,18 +1,17 @@
-/**
- * OrderRefund — domain values and helpers for refund logic.
- *
- * STORY-025: RequestRefund use case + /api/refunds.
- */
-
 import type { Order } from "@/domain/entities/Order";
 
 /**
- * Refund window: 30 days from the original payment date.
+ * Refund window: 7 days from the original payment date.
+ *
+ * One source of truth for both the student path (RequestRefund) and
+ * the admin path (ProcessRefund). RefundOverride deliberately bypasses
+ * this constant.
  */
-export const REFUND_WINDOW_DAYS = 30;
+export const REFUND_WINDOW_DAYS = 7;
+export const REFUND_WINDOW_MS = REFUND_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 
 /**
- * Is a paid order within the 30-day refund window?
+ * Is a paid order within the 7-day refund window?
  *
  * The window is open from paymongoPaidAt (inclusive) up to
  * paymongoPaidAt + REFUND_WINDOW_DAYS days (exclusive).
