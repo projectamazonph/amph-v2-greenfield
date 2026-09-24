@@ -159,7 +159,7 @@ describe("ProcessRefund", () => {
     expect(r.error.kind).toBe("amount_exceeds_total");
   });
 
-  it("returns outside_refund_window when paid > 30 days ago", async () => {
+  it("returns outside_refund_window when paid > 7 days ago", async () => {
     await orderRepo.seedPaidOrder({
       id: "o1",
       userId: "u1",
@@ -167,11 +167,11 @@ describe("ProcessRefund", () => {
       totalMinor: 1000,
       paymongoPaymentId: "cs_paid_1",
     });
-    // The seed marks paid at `new Date()` (now). Use a fixed clock 31 days later.
+    // The seed marks paid at `new Date()` (now). Use a fixed clock 8 days later.
     useCase = new ProcessRefund({
       orderRepo,
       paymentGateway,
-      clock: new FixedClock(new Date(Date.now() + 31 * 24 * 60 * 60 * 1000)),
+      clock: new FixedClock(new Date(Date.now() + 8 * 24 * 60 * 60 * 1000)),
       courseRepo,
       userRepo,
       emailSender,

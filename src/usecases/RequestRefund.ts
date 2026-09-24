@@ -1,10 +1,9 @@
 import type { Order } from "@/domain/entities/Order";
+import { REFUND_WINDOW_MS } from "@/domain/values/OrderRefund";
 import { Result } from "@/domain/shared/Result";
 import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { IOrderRepository } from "@/ports/repositories/OrderRepository";
 import type { Clock } from "@/ports/system/Clock";
-
-const REFUND_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
 export type RequestRefundError =
   | { kind: "order_not_found" }

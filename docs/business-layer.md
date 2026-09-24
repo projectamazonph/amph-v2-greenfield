@@ -110,17 +110,17 @@ As built, 2026-09-23:
 
 ## Refund Flow
 
-### Two refund windows are live at once (open decision)
+### Refund window: 7 days, single source of truth
 
 ```text
 1. User opens `/profile/purchases` and submits the refund server action.
 2. RequestRefund use case:
    a. Loads order (IOrderRepository)
-   b. Checks the reason is 10-500 characters after trimming, then ownership, paid status, a 7-day window from `paymongoPaidAt`, and less than 25% course completion. The 7 days is a local constant in this use case: `const REFUND_WINDOW_MS = 7 * 24 * 60 * 60 * 1000` at `src/usecases/RequestRefund.ts:7`. The completion check reads the enrollment (`progressPercent >= 25` is refused) but never writes to it.
+   b. Checks the reason is 10-500 characters after trimming, then ownership, paid status, the 7-day window from `paymongoPaidAt`, and less than 25% course completion. The window is imported from `src/domain/values/OrderRefund.ts`, which exports `REFUND_WINDOW_DAYS = 7` and `REFUND_WINDOW_MS` derived from it. The completion check reads the enrollment (`progressPercent >= 25` is refused) but never writes to it.
    c. Stores the refund request for admin processing. It does not call PayMongo; no gateway is injected here.
 ```
 
-`src/domain/values/OrderRefund.ts` exports `REFUND_WINDOW_DAYS = 30` and `isWithinRefundWindow()`, and the only consumer is `src/usecases/ProcessRefund.ts:87`. So the student is told 7 days, and the admin-side processing step accepts 30. **Ryan to decide which one is the policy.** This document no longer describes the 7-day window as the refund rule, because as written it is only one of the two numbers in the flow.
+`isWithinRefundWindow()` is the same function the admin path uses (`ProcessRefund.ts:87`), so the student-side and admin-side checks now read from one constant. The admin override path (`RefundOverride.ts`) deliberately bypasses the window and is unchanged.
 
 ### Outside Window (Admin Override)
 
