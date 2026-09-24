@@ -92,8 +92,6 @@ const PLACEHOLDER_SHAPE = /[<>*{}$?]|XXX|NNN/;
  * about an absence, so the reference must stay absent for the prose to be true.
  */
 const KNOWN_ABSENT: Record<string, string> = {
-  "src/usecases/ImportAmphContent.ts":
-    "deleted by 915c7ca; CLAUDE.md and STATE.md cite it to explain why pnpm import:content cannot run",
   "src/infra/payment/PayMongoAdapter.test.ts":
     "moved into __tests__/ by the 2026-08-02 session; CLAUDE.md names the old path to record that it was never collected",
   "docs/audit-2026-07-27-completeness-review.md":
