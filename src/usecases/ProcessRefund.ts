@@ -1,22 +1,27 @@
 /**
  * ProcessRefund — admin issues a refund on a paid order.
  *
- * STORY-049. Standard path: validates 30-day window + no prior
+ * STORY-049. Standard path: validates the 7-day window + no prior
  * refund request. Bypasses both via RefundOverride.
  *
  * Flow:
  *  1. Find order
- *  2. Validate: order is PAID, amountMinor <= totalMinor, within 30 days, no existing refund request
+ *  2. Validate: order is PAID, amountMinor <= totalMinor, within the
+ *     7-day window, no existing refund request
  *  3. Call paymentGateway.refund()
  *  4. On success: order.markRefunded(reason, amountMinor) + persist
+ *  5. Cancel the matching enrollment and audit enrollment.revoked_by_refund
+ *  6. Send the refund email
  */
 
 import { Result } from "@/domain/shared/Result";
 import { buildAppUrl } from "@/domain/shared/AppUrl";
 import { interpolateEmailTemplate } from "@/domain/entities/EmailTemplate";
 import { isWithinRefundWindow } from "@/domain/values/OrderRefund";
+import { withEnrollmentStatus } from "@/domain/entities/Enrollment";
 import type { Order } from "@/domain/entities/Order";
 import type { IOrderRepository, OrderError } from "@/ports/repositories/OrderRepository";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import type { Clock } from "@/ports/system/Clock";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
@@ -25,9 +30,11 @@ import type { EmailSender } from "@/ports/email/EmailSender";
 import type { RefundRenderer } from "@/ports/email/RefundRenderer";
 import type { Logger } from "@/ports/observability/Logger";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
+import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
 
 export interface ProcessRefundInput {
   orderId: string;
+  actorId: string;
   amountMinor: number;
   reason: string;
 }
@@ -51,10 +58,12 @@ export interface ProcessRefundDeps {
   clock: Clock;
   courseRepo: CourseRepository;
   userRepo: UserRepository;
+  enrollmentRepo: IEnrollmentRepository;
   emailSender: EmailSender;
   refundEmailRenderer: RefundRenderer;
   logger: Logger;
   emailTemplateRepo: IEmailTemplateRepository;
+  recordAuditLog: RecordAuditLog;
 }
 
 export class ProcessRefund {
@@ -111,7 +120,15 @@ export class ProcessRefund {
       return Result.err(persistResult.error);
     }
 
-    // ── 5. Send the refund-processed email (best-effort) ───
+    // ── 5. Revoke access (best-effort) ─────────────────────
+    await revokeEnrollmentForRefund(
+      this.deps,
+      persistResult.value,
+      input.actorId,
+      "process_refund",
+    );
+
+    // ── 6. Send the refund-processed email (best-effort) ───
     await sendRefundEmail(this.deps, persistResult.value, input.reason);
 
     return Result.ok({
@@ -119,6 +136,65 @@ export class ProcessRefund {
       refundId: refundResult.value.refundId,
     });
   }
+}
+
+/**
+ * Shared by ProcessRefund and RefundOverride. Cancels the matching
+ * enrollment so the refunded student loses access, and writes an
+ * audit row so the cancel is distinguishable from an admin's manual
+ * `AdminSetEnrollmentStatus`. Best-effort: a missing enrollment is
+ * not an error (it predates the refund or was already cancelled), and
+ * a failed update is logged but does not roll back the refund, since
+ * the money has already gone back to the customer.
+ */
+export async function revokeEnrollmentForRefund(
+  deps: {
+    enrollmentRepo: IEnrollmentRepository;
+    recordAuditLog: RecordAuditLog;
+    logger: Logger;
+  },
+  order: Order,
+  actorId: string,
+  trigger: "process_refund" | "refund_override",
+): Promise<void> {
+  const enrollment = await deps.enrollmentRepo.findByUserIdAndCourseId(
+    order.userId,
+    order.courseId,
+  );
+  if (enrollment === null) {
+    deps.logger.warn("refund.enrollment_cancel_skipped_no_enrollment", {
+      orderId: order.id,
+      userId: order.userId,
+      courseId: order.courseId,
+    });
+    return;
+  }
+  if (enrollment.status !== "active") {
+    // Already cancelled / refunded / expired — leave it alone.
+    return;
+  }
+  const cancelled = withEnrollmentStatus(enrollment, "cancelled");
+  const updateResult = await deps.enrollmentRepo.update(cancelled);
+  if (!updateResult.ok) {
+    deps.logger.warn("refund.enrollment_cancel_failed", {
+      orderId: order.id,
+      userId: order.userId,
+      courseId: order.courseId,
+      error: updateResult.error,
+    });
+    return;
+  }
+  await deps.recordAuditLog.execute({
+    actorId,
+    action: "enrollment.revoked_by_refund",
+    targetType: "enrollment",
+    targetId: updateResult.value.id,
+    metadata: {
+      orderId: order.id,
+      reason: order.refundReason,
+      trigger,
+    },
+  });
 }
 
 /**

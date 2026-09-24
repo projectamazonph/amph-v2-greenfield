@@ -48,6 +48,7 @@ export type AuditAction =
   // Enrollment access
   | "enrollment.granted"
   | "enrollment.revoked"
+  | "enrollment.revoked_by_refund"
   | "enrollment.restored"
   // Discount code
   | "discount_code.created"
@@ -173,6 +174,7 @@ export const ALL_ACTIONS: AuditAction[] = [
   "user.subscription_changed",
   "enrollment.granted",
   "enrollment.revoked",
+  "enrollment.revoked_by_refund",
   "enrollment.restored",
   "discount_code.created",
   "discount_code.updated",

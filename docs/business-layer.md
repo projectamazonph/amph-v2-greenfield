@@ -139,22 +139,24 @@ Both admin surfaces exist, `src/app/admin/refunds/[orderId]/page.tsx` and
    d. Records the audited actor, target and reason, then sends the configured refund email.
 ```
 
-Refunding does **not** remove the learner's access. Neither `RefundOverride` nor
-`ProcessRefund` references an enrollment repository, and `AuthorizeLessonAccess.ts:105`
-grants entry whenever the enrollment status is `active`, which a refund leaves untouched.
-Access is cut by a separate deliberate action, `AdminSetEnrollmentStatus`, which moves an
-enrollment to `cancelled` and audits it as `enrollment.revoked`. That use case also refuses
-to restore an enrollment already marked `refunded`. So a refunded student keeps studying
-until the admin cancels the enrollment by hand.
+A successful refund now revokes the matching enrollment. Both `ProcessRefund` and
+`RefundOverride` share a helper, `revokeEnrollmentForRefund()` in
+`src/usecases/ProcessRefund.ts`, that runs after the gateway call and the order
+persist. The helper looks up the `(userId, courseId)` enrollment, transitions it
+to `cancelled` via `withEnrollmentStatus`, persists through `IEnrollmentRepository.update`,
+and writes a new audit row `enrollment.revoked_by_refund` (carrying the `orderId`,
+the refund `reason`, and a `trigger` discriminator of `process_refund` vs
+`refund_override`). The cancel is best-effort: a missing or already-non-active
+enrollment logs at `warn` and continues, since the money has already gone back to
+the customer and a rollback would not recover it.
 
-This is a genuine disagreement inside the code itself, not just with the old prose: the
-comment at `src/usecases/AuthorizeLessonAccess.ts:98` states that refunded, cancelled and
-expired enrollments are treated as not enrolled "intentional: a refund revokes access per
-the audit's P1-3". The access layer is therefore built on the assumption that a refund
-revokes access, while nothing in the refund path ever sets the status that assumption
-reads. One of the two is wrong. Whether a refund should revoke access automatically is
-**Ryan to decide**. `src/app/admin/users/[id]/page.tsx` is where an operator does it by
-hand today.
+`AuthorizeLessonAccess.ts:105` admits only `status === "active"` enrollments, so the
+refund-driven cancel closes the gap between the comment at
+`AuthorizeLessonAccess.ts:98` (which always described refunded access as revoked)
+and the actual data (which until now left the enrollment `active`). The
+manual-cancel path through `AdminSetEnrollmentStatus` still exists and now audits
+as `enrollment.revoked`, distinct from `enrollment.revoked_by_refund`, so the audit
+log can tell a refund-driven cancel from an admin-driven one.
 
 ## Receipts
 
