@@ -189,10 +189,7 @@ async function main() {
 
   if (dryRun) {
     for (const tier of TIERS) {
-      const eb = tier.earlyBirdPriceMinor
-        ? ` (early-bird ₱${tier.earlyBirdPriceMinor / 100} until ${tier.earlyBirdEndsAt?.slice(0, 10) ?? "?"})`
-        : "";
-      console.log(`  [DRY]   "${tier.slug}" → ₱${tier.priceMinor / 100}${eb}`);
+      console.log(`  [DRY]   "${tier.slug}" → ₱${tier.priceMinor / 100}`);
     }
     console.log("\n✅ Dry run complete.\n");
     return;
