@@ -14,7 +14,7 @@
 
 **In progress:**
 
-- PR #619 (docs/admin-backend.md rewrite): background worker reading all admin route files to produce a full rewrite. Known gaps in the old doc: `earlyBirdLimit`/`earlyBirdPriceMinor` fields no longer exist (removed in #612); `/admin/email-templates` DOES exist (old claim was wrong); new routes not in the tree: `resources/`, `maintenance/`, `content/`, `assignments/`, `announcements/`, `capstone/`, `courses.new/`, `simulators/[id]/[scenarioKey]/calibration/`, `simulators/[id]/versions/`.
+- PR #617 (docs/admin-backend.md rewrite): fully rewritten from code reads. Fixed: `earlyBirdLimit`/`earlyBirdPriceMinor` removed; `/admin/email-templates` EXISTS (old claim wrong); 9 missing routes added; dashboard corrected; audit action names updated. Branch `docs/admin-backend-rewrite`, commit `4f180719`, open at https://github.com/projectamazonph/amph-v2-greenfield/pull/617.
 
 **Blocked, waiting on Ryan:**
 
