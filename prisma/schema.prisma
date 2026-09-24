@@ -199,11 +199,6 @@ model PricingTier {
 
   displayOrder Int @default(0)
 
-  // Early-bird pricing: time-windowed discount shown on /pricing.
-  // STORY-015.
-  earlyBirdPriceMinor Int?
-  earlyBirdEndsAt     DateTime?
-
   // Relations
   courses Course[]
 

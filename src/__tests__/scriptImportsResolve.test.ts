@@ -31,9 +31,7 @@ const SCRIPTS_DIR = resolve(process.cwd(), "scripts");
 const SRC_DIR = resolve(process.cwd(), "src");
 
 /** Known-broken specifiers, per script, with the reason they are exempt. */
-const STILL_BROKEN: Record<string, string[]> = {
-  "import-amph-content.ts": ["@/usecases/ImportAmphContent"],
-};
+const STILL_BROKEN: Record<string, string[]> = {};
 
 const IMPORT_PATTERN = /from\s+["'](@\/[^"']+)["']|import\(\s*["'](@\/[^"']+)["']\s*\)/g;
 
@@ -60,7 +58,9 @@ function resolvesToDisk(specifier: string): boolean {
 
 function unresolvableByScript(): Record<string, string[]> {
   const result: Record<string, string[]> = {};
-  for (const name of readdirSync(SCRIPTS_DIR).filter((f) => f.endsWith(".ts")).sort()) {
+  for (const name of readdirSync(SCRIPTS_DIR)
+    .filter((f) => f.endsWith(".ts"))
+    .sort()) {
     const bad = aliasedSpecifiers(join(SCRIPTS_DIR, name)).filter((s) => !resolvesToDisk(s));
     if (bad.length > 0) result[name] = bad;
   }
@@ -72,7 +72,6 @@ describe("scripts/*.ts import graph", () => {
 
   it("finds the scripts directory", () => {
     expect(Object.keys(broken).length).toBeGreaterThanOrEqual(0);
-    expect(existsSync(join(SCRIPTS_DIR, "import-amph-content.ts"))).toBe(true);
   });
 
   it("has no `@/` import that fails to resolve, outside the documented exemptions", () => {

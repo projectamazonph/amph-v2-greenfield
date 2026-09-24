@@ -72,9 +72,6 @@ interface TierDef {
   name: string;
   priceMinor: number;
   displayOrder: number;
-  earlyBirdPriceMinor?: number;
-  /** ISO date string — when early-bird pricing expires. */
-  earlyBirdEndsAt?: string;
   /** Slug of the course that belongs to this tier (optional). */
   courseSlug?: string;
 }
@@ -94,8 +91,6 @@ const TIERS: TierDef[] = [
     name: "Accelerated Mastery",
     priceMinor: 599900,
     displayOrder: 2,
-    earlyBirdPriceMinor: 499900,
-    earlyBirdEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
     courseSlug: "ppc-mastery",
   },
   {
@@ -104,8 +99,6 @@ const TIERS: TierDef[] = [
     name: "Ultimate Transformation",
     priceMinor: 999900,
     displayOrder: 3,
-    earlyBirdPriceMinor: 799900,
-    earlyBirdEndsAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
     courseSlug: "ppc-ultimate",
   },
   {
@@ -132,8 +125,6 @@ async function upsertTier(def: TierDef): Promise<void> {
       ...existing.value,
       name: def.name,
       price: Result.unwrap(Money.of(def.priceMinor, "PHP")),
-      earlyBirdPriceMinor: def.earlyBirdPriceMinor,
-      earlyBirdEndsAt: def.earlyBirdEndsAt ? new Date(def.earlyBirdEndsAt) : undefined,
     };
     const result = await repo.update(updated);
     if (!result.ok) {
@@ -150,8 +141,6 @@ async function upsertTier(def: TierDef): Promise<void> {
       price: Result.unwrap(Money.of(def.priceMinor, "PHP")),
       status: "ACTIVE" as const,
       displayOrder: def.displayOrder,
-      earlyBirdPriceMinor: def.earlyBirdPriceMinor,
-      earlyBirdEndsAt: def.earlyBirdEndsAt ? new Date(def.earlyBirdEndsAt) : undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

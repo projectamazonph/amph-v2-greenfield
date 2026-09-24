@@ -2,8 +2,8 @@
  * /pricing — public pricing page.
  *
  * Fetches ACTIVE pricing tiers from the database and renders tier cards.
- * Early-bird pricing is resolved server-side so the correct price and
- * countdown timer are visible on first render.
+ * Decision 6 (2026-09-24): early-bird is dropped, so each tier shows
+ * exactly one price.
  *
  * STORY-015.
  */
@@ -12,21 +12,6 @@ import { buildContainer } from "@/composition/container";
 import { ListPricingTiers } from "@/usecases/ListPricingTiers";
 import { StudentShell } from "@/components/student/StudentShell";
 import styles from "./page.module.css";
-
-// ── Helpers ─────────────────────────────────────────────────────────────────
-
-/** Format minutes as "X days Y hrs Z min" or just "X min" if < 60 min. */
-function formatCountdown(minutes: number): string {
-  if (minutes <= 0) return "";
-  if (minutes < 60) return `${minutes} min`;
-  const days = Math.floor(minutes / 1440);
-  const hrs = Math.floor((minutes % 1440) / 60);
-  const mins = minutes % 60;
-  if (days > 0) {
-    return `${days}d ${hrs}h ${mins}m`;
-  }
-  return `${hrs}h ${mins}m`;
-}
 
 // ── Page ────────────────────────────────────────────────────────────────────
 
@@ -69,34 +54,12 @@ export default async function PricingPage() {
                   <span className={styles.ribbon}>Most students pick this</span>
                 ) : null}
 
-                {/* Early-bird badge */}
-                {tier.isEarlyBird && (
-                  <span className={styles.earlyBirdBadge}>
-                    Early Bird · {formatCountdown(tier.earlyBirdMinutesRemaining)} left
-                  </span>
-                )}
-
                 <h2 className={styles.tierName}>{tier.name}</h2>
 
                 <div className={styles.priceRow}>
-                  {tier.isEarlyBird && tier.originalPrice ? (
-                    <>
-                      <span className={styles.price}>{tier.displayPrice.format()}</span>
-                      <span className={styles.originalPrice}>{tier.originalPrice.format()}</span>
-                    </>
-                  ) : (
-                    <span className={styles.price}>{tier.displayPrice.format()}</span>
-                  )}
+                  <span className={styles.price}>{tier.displayPrice.format()}</span>
                   <span className={styles.priceSuffix}>one-time</span>
                 </div>
-
-                {/* Countdown timer for early-bird tiers */}
-                {tier.isEarlyBird && tier.earlyBirdMinutesRemaining > 0 && (
-                  <p className={styles.countdown}>
-                    Early-bird ends in{" "}
-                    <strong>{formatCountdown(tier.earlyBirdMinutesRemaining)}</strong>
-                  </p>
-                )}
 
                 {tier.courseSlug ? (
                   <a
