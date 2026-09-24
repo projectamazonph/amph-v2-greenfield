@@ -1,5 +1,42 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-09-24, PRs #612–#616 merged; admin-backend.md rewrite in progress)
+
+`main` HEAD is `2a7e8bdd` (PR #616, squash of `fix/glossary-popover-wired`).
+
+**PRs merged today (2026-09-24):**
+
+- PR #612 (`refactor/drop-early-bird-and-import`) — squash `374d818d`: dropped early-bird pricing feature and `earlyBirdPriceMinor`/`earlyBirdLimit` fields; folded `import-amph-content` into `seed-all-content`.
+- PR #613 (`fix/vercel-deploy-tiers-courses`) — squash `0051fb77`: `db:seed:tiers` script now seeds tier+course associations on production deploy (was dropping them on every `vercel.json` `prisma:deploy` without `db:seed:import`).
+- PR #614 (`refactor/self-host-fonts`) — squash `b548b4f4`: replaced `next/font/google` with `@fontsource/archivo`, `@fontsource/barlow-condensed`, `@fontsource/ibm-plex-mono`, `@fontsource/pt-sans`; defined `--font-display/body/cond/mono` as literal strings in `:root` in `globals.css`; removed stale `<html>` className with Tailwind-flagged font classes.
+- PR #615 (`fix/seed-pricing-tiers-dry-run`) — squash `1421a8c8`: removed stale `earlyBirdPriceMinor`/`earlyBirdEndsAt` reference from dry-run block in `scripts/seed-pricing-tiers.ts`.
+- PR #616 (`fix/glossary-popover-wired`) — squash `2a7e8bdd`: wired glossary popover into the lesson renderer. `buildDirectiveHtml` in `directive-plugin.ts` now emits `<span data-amph-block="glossary" data-amph-slug="...">`; `LessonContent.tsx` renders `GlossaryTermButton` from manifest; page loads `loadGlossaryManifest()` server-side and passes it down. Unit test fixed (multi-line JSX toMatch split into four individual assertions). All 8 CI gates green.
+
+**In progress:**
+
+- PR #619 (docs/admin-backend.md rewrite): background worker reading all admin route files to produce a full rewrite. Known gaps in the old doc: `earlyBirdLimit`/`earlyBirdPriceMinor` fields no longer exist (removed in #612); `/admin/email-templates` DOES exist (old claim was wrong); new routes not in the tree: `resources/`, `maintenance/`, `content/`, `assignments/`, `announcements/`, `capstone/`, `courses.new/`, `simulators/[id]/[scenarioKey]/calibration/`, `simulators/[id]/versions/`.
+
+**Blocked, waiting on Ryan:**
+
+- PR #617 (curriculum fixes): 7 open teaching decisions from `docs/audit-2026-09-23-lesson-arithmetic.md` "Also open from these passes" section. Summary of what Ryan needs to decide:
+  1. Broad/exact match budget allocation: `2.4:103` says 40%/25%; `4.1:97-100` says 50-60% exact / 10-15% broad. Someone picks which the course teaches.
+  2. Product targeting cap: `4.1:100` says 5-10%; `4.1:120` answer key uses 15%; `4.4:132` repeats 15%. Pick one.
+  3. Timezone for bid multiplier times: `5.2:126-130` lists "Morning/Evening" with no TZ; `5.2:134` says peak is 8PM-12AM PHT. Decide whether all times in the table are PHT or US.
+  4. Harvest floor: `7.1:127` says negate at 5+ clicks; `7.3` uses 10+ in four places. Pick a floor or state the condition.
+  5. CVR confidence interval framing: `7.1:130` prints ±20% at n=30 and ±10% at n=100 as if they're universal. They're the worst-case values at p=50%; at the 6-10% CVRs the course teaches, the absolute margin at n=30 is ±8.5 to ±10.7 points. Decide whether to qualify the numbers or leave them.
+  6. ACoS 0% on zero-sales terms: `7.3:148/151/188` prints "ACoS 0%" for terms with clicks but no orders. The course's own formula divides by zero here. Amazon's UI shows 0.00%. Decide whether to label it differently or keep the UI-compatible number.
+  7. "The 30-Minute Weekly Review" heading vs cadence table at `8.3:49` (Weekly = 10 min, 30 min reserved for Quarterly). Decide whether to rename the heading or update the table.
+- PR #618 (Last verified dates): `docs/audit-2026-09-23-lesson-arithmetic.md` §"Unverified source citations" lists 29 fact-card lessons that carry a `Last verified` line with no date. Ryan (or anyone with Seller Central access) needs to supply one date for all 29, or the specific articles behind the 16 that hedge with "not verified".
+
+**Also on deck (unblocked, not yet started):**
+
+- PR #620: add symbol/route existence guard to the doc cross-reference validator.
+- PR #621: record pass — update `STATE.md` with new `main` pointer `2a7e8bdd`, all 5 merged PRs, updated gate numbers.
+
+`CLAUDE.md` "Current addendum" updated to `2a7e8bdd`.
+
+---
+
 # Session update (2026-09-21, STORY-146 onboarding merged via PR #545)
 
 `main` HEAD is `918c532` (squash of branch `onboarding`, branch deleted). Implements STORY-146 (first-run welcome walkthrough for brand-new AMPH students — feedback that zero-experience VAs don't know how to navigate the platform).
@@ -11,10 +48,12 @@ Renumbered from STORY-129 to STORY-146 mid-flight because main already had `STOR
 The branch was originally cut from `cae71f1` (2026-07). Main had progressed through LEARN waves 1–4 (artefacts, portfolio, retrieval checks, notifications, capstone brief, scenario packs) since the fork. Rebased onto current `main` (5ccb37d) by cherry-picking the 13 production commits (Tasks 1–13) and the 3 post-review fixes (Tasks 11/12 fixes), dropping the docs-only commits that would conflict; the renumbering chain (`65c8de4`, `ff8c821`) was also dropped and replaced by a single end-commit that creates `STORY-146.md` directly. Final diff was 38 files focused on onboarding only, down from 32+ ahead of `cae71f1` plus 9 unmerged LEARN-wave files.
 
 Two CI regressions caught and fixed in flight:
+
 1. `prisma/schema.prisma` started with a UTF-8 BOM (`EF BB BF`) after a bulk rename via PowerShell `Set-Content -Encoding UTF8`. Prisma's schema parser rejected it with `P1012: This line is invalid. It does not start with any known Prisma schema keyword.` Stripped the BOM at the byte level.
 2. `src/app/welcome/loading.tsx` was missing — the cherry-pick from `70980ee` dropped it (or it was lost in the rebase walk). Architecture's public-a11y-gates test requires every non-admin route to have a `loading.tsx` with `<main aria-busy="true">`. Re-added using the same `SkeletonBlock` pattern as `src/app/dashboard/loading.tsx`. Also caught a separate `useRouter` mock gap in `StudentSidebar` tests after the badge refactor (Task 11 fix) added `useRouter()` calls; updated `StudentNavigation.test.tsx` and `dashboard/__tests__/a11y.audit.test.tsx` mocks to export `useRouter` alongside `usePathname`.
 
 All 8 CI gates green at merge time:
+
 - ✅ Typecheck + Lint
 - ✅ Architecture (TDD + SOLID compliance)
 - ✅ Unit + integration (5,132 passing)
