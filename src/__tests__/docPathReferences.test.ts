@@ -108,8 +108,6 @@ const KNOWN_ABSENT: Record<string, string> = {
     "wrong directory and wrong layer; ADR-019's as-built note names the real port at src/ports/simulator/Simulator.ts",
   "src/middleware.ts":
     "renamed by Next.js 16; docs/build-spec.md's as-built note points at src/proxy.ts",
-  "src/infra/pricing/EarlyBirdPricingService.ts":
-    "never committed here; docs/business-layer.md names it only to record that the count-based early-bird rule it describes was never built",
   "docs/ULTRA-REVIEW-2026-08-14.md":
     "removed on 2026-09-14 by e1f7352; STATE.md cites it above the triage table that is its only surviving copy",
   "docs/CONTENT-AUDIT-2026-07-16.md":
