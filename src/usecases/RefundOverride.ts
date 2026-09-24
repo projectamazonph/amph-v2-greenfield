@@ -3,9 +3,13 @@
  * window and already-requested checks.
  *
  * STORY-049. The override is for goodwill refunds, disputes, and
- * cases where the 30-day window has lapsed but we still want to
+ * cases where the 7-day window has lapsed but we still want to
  * refund. The override reason is mandatory and is stored on the
  * order via `refundReason` (alongside the user's refund reason).
+ *
+ * A successful override revokes the matching enrollment, exactly
+ * like the standard path. Both refund routes share the same
+ * `revokeEnrollmentForRefund()` helper.
  *
  * Flow:
  *  1. Find order
@@ -14,6 +18,8 @@
  *  4. Mark refunded with the user-facing reason (override reason
  *     is stored separately — see line ~85)
  *  5. Persist
+ *  6. Cancel the matching enrollment and audit it
+ *  7. Send the refund email
  *
  */
 
@@ -22,7 +28,8 @@ import type { Order } from "@/domain/entities/Order";
 import type { IOrderRepository, OrderError } from "@/ports/repositories/OrderRepository";
 import type { IPaymentGateway } from "@/ports/payment/IPaymentGateway";
 import type { RecordAuditLog } from "@/usecases/RecordAuditLog";
-import { sendRefundEmail } from "@/usecases/ProcessRefund";
+import { revokeEnrollmentForRefund, sendRefundEmail } from "@/usecases/ProcessRefund";
+import type { IEnrollmentRepository } from "@/ports/repositories/IEnrollmentRepository";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 import type { EmailSender } from "@/ports/email/EmailSender";
@@ -55,6 +62,7 @@ export interface RefundOverrideDeps {
   orderRepo: IOrderRepository;
   paymentGateway: IPaymentGateway;
   recordAuditLog: RecordAuditLog;
+  enrollmentRepo: IEnrollmentRepository;
   courseRepo: CourseRepository;
   userRepo: UserRepository;
   emailSender: EmailSender;
@@ -129,6 +137,15 @@ export class RefundOverride {
         reason: input.reason,
       },
     });
+
+    // Revoke the matching enrollment (best-effort) — shared with
+    // ProcessRefund so both refund paths revoke access the same way.
+    await revokeEnrollmentForRefund(
+      this.deps,
+      persistResult.value,
+      input.actorId,
+      "refund_override",
+    );
 
     // Refund-processed email (best-effort) — shares the send logic with
     // ProcessRefund so both refund paths notify the student the same way.

@@ -21,6 +21,7 @@ import { InMemoryIdGenerator } from "@/infra/system/InMemoryIdGenerator";
 import { FixedClock } from "@/ports/system/Clock";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
@@ -48,6 +49,7 @@ describe("AdminProcessRefund", () => {
       orderRepo,
       paymentGateway,
       recordAuditLog,
+      enrollmentRepo: new InMemoryEnrollmentRepository(),
       courseRepo: new InMemoryCourseRepository(),
       userRepo: new InMemoryUserRepository(),
       emailSender: new InMemoryEmailSender(),
