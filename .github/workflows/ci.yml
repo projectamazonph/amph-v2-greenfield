@@ -53,18 +53,16 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      # gitleaks computes the diff range as base^..HEAD using --first-parent.
-      # With a shallow clone, base^ may not exist if the PR branch tip was
-      # fetched with depth=1. --unshallow converts the shallow clone to a full
-      # one so the merge-base and its ancestors are available to gitleaks.
-      - name: Ensure main history available for gitleaks
-        run: git fetch --unshallow origin main
-
+      # gitleaks computes the diff range as base^..HEAD internally using
+      # --first-parent, which can fail on some PR branch shapes where the
+      # computed base is not in the local clone's history.
+      # Override --log-opts to use origin/main..HEAD directly instead.
       - name: gitleaks
         uses: gitleaks/gitleaks-action@v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml
+          GITLEAKS_LOG_OPTS: "--first-parent origin/main..HEAD"
 
   architecture:
     name: Architecture (TDD + SOLID compliance)
