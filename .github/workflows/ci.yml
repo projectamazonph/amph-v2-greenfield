@@ -55,10 +55,10 @@ jobs:
 
       # gitleaks computes the diff range as base^..HEAD using --first-parent.
       # With a shallow clone, base^ may not exist if the PR branch tip was
-      # fetched with depth=1. Explicitly fetch origin/main with full depth so
-      # the merge-base and its ancestors are available to gitleaks.
+      # fetched with depth=1. --unshallow converts the shallow clone to a full
+      # one so the merge-base and its ancestors are available to gitleaks.
       - name: Ensure main history available for gitleaks
-        run: git fetch origin main --depth=0
+        run: git fetch --unshallow origin main
 
       - name: gitleaks
         uses: gitleaks/gitleaks-action@v3.0.0
