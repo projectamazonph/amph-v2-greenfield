@@ -224,6 +224,11 @@ function buildDirectiveHtml(
     const dataAttr = `data-amph-rows='${JSON.stringify(rows).replace(/'/g, "&#39;")}'`;
     return `<div data-amph-block="${name}" ${attrsSerialized} ${dataAttr}></div>`;
   }
+  if (name === "glossary") {
+    // Inline glossary term reference: rendered as a span so it stays inline
+    // with the surrounding prose. The renderer replaces it with GlossaryTermButton.
+    return `<span data-amph-block="glossary" data-amph-slug="${attrs["slug"] ?? ""}"></span>`;
+  }
   // For process and callout, the inner body is just text. Pass through as
   // an inner div so the renderer can read it from children.
   const innerEscaped = inner
