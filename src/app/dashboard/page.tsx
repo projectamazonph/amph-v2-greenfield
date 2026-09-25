@@ -13,6 +13,7 @@
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { displayName } from "@/lib/displayName";
 import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
 import { NewUserDashboard } from "@/components/student/NewUserDashboard";
@@ -148,7 +149,7 @@ export default async function DashboardPage() {
         {/* Welcome */}
         <header className={styles.hero}>
           <div className={styles.heroText}>
-            <h1 className={styles.heroTitle}>Welcome back, {user.firstName}.</h1>
+            <h1 className={styles.heroTitle}>Welcome back, {displayName(user.firstName)}.</h1>
             <p className={styles.heroSubtitle}>
               {allActive.length === 0
                 ? "You haven't started any courses yet."
