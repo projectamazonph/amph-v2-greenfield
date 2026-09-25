@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then SHADOW_DATABASE_URL= pnpm prisma:deploy && pnpm db:seed:scenarios && pnpm db:seed:tiers -- --with-courses; fi && pnpm build",
+  "buildCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then SHADOW_DATABASE_URL= pnpm prisma:deploy && pnpm db:seed:scenarios && pnpm db:seed:tiers -- --with-courses && pnpm db:seed:policies; fi && pnpm build",
   "crons": [
     {
       "path": "/api/cron/live-class-reminders",

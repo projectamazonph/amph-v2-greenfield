@@ -60,6 +60,7 @@ import type { KeywordResearchOutput } from "@/domain/simulator/keyword-research/
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
 import { XPService } from "@/domain/services/XPService";
 import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
+import { friendlySimulatorError } from "@/lib/studentErrorCopy";
 
 const KEYWORD_INTENTS: readonly KeywordIntent[] = [
   "core",
@@ -280,7 +281,13 @@ export async function keywordResearchAttempt(
   });
 
   if (Result.isErr(startResult)) {
-    return { ok: false, error: { kind: "attempt_error", message: startResult.error.kind } };
+    return {
+      ok: false,
+      error: {
+        kind: "attempt_error",
+        message: friendlySimulatorError(startResult.error.kind, "attempt"),
+      },
+    };
   }
 
   const attemptId = startResult.value.attemptId;
@@ -338,7 +345,13 @@ export async function keywordResearchAttempt(
   // the attempt out of "in_progress".
   const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
   if (Result.isErr(submitResult)) {
-    return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
+    return {
+      ok: false,
+      error: {
+        kind: "attempt_error",
+        message: friendlySimulatorError(submitResult.error.kind, "attempt"),
+      },
+    };
   }
 
   // ── 9. GradeSimulatorAttempt ────────────────────────────────────────
@@ -351,7 +364,13 @@ export async function keywordResearchAttempt(
   });
 
   if (Result.isErr(gradeResult)) {
-    return { ok: false, error: { kind: "grading_error", message: gradeResult.error.kind } };
+    return {
+      ok: false,
+      error: {
+        kind: "grading_error",
+        message: friendlySimulatorError(gradeResult.error.kind, "grading"),
+      },
+    };
   }
 
   const grade = gradeResult.value;
@@ -359,7 +378,13 @@ export async function keywordResearchAttempt(
   // ── 10. ComposeAttemptFeedback ───────────────────────────────────────
   const feedbackResult = await container.composeAttemptFeedback.execute({ attemptId });
   if (Result.isErr(feedbackResult)) {
-    return { ok: false, error: { kind: "feedback_error", message: feedbackResult.error.kind } };
+    return {
+      ok: false,
+      error: {
+        kind: "feedback_error",
+        message: friendlySimulatorError(feedbackResult.error.kind, "feedback"),
+      },
+    };
   }
   const feedback = feedbackResult.value.feedback;
 
