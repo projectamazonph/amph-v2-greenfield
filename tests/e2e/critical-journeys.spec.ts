@@ -194,8 +194,10 @@ test.describe("Critical journeys", () => {
     const courseRow = page.getByText(scenario.courseTitle).locator("..").locator("..");
     await expect(courseRow.getByText("Active", { exact: true })).toBeVisible();
 
-    page.once("dialog", (dialog) => dialog.accept());
+    // ConfirmSubmitButton uses an Astryx React Dialog (not window.confirm),
+    // so page.on("dialog") never fires — click the dialog's Confirm button directly.
     await courseRow.getByRole("button", { name: /^revoke$/i }).click();
+    await page.getByRole("button", { name: "Confirm", exact: true }).click();
     await expect(page).toHaveURL(/notice=enrollment-revoked/, { timeout: 15_000 });
     // Re-resolve the notice locator after the redirect: the locator
     // captured on the previous page load is stale once the DOM re-renders.
