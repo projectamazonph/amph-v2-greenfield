@@ -23,11 +23,45 @@ import type { Lesson as CatalogLesson } from "@/domain/entities/Course";
 import type { Lesson } from "@/domain/entities/Lesson";
 import { LessonSidebar } from "../LessonSidebar";
 import { LessonNavButtons } from "../LessonNavButtons";
+import { LessonTopBar } from "../LessonTopBar";
+import { LessonToc } from "../LessonToc";
+import { LessonStickyComplete } from "../LessonStickyComplete";
 import { Button } from "@/components/ui/Button";
 import { CourseAccessNotice } from "@/components/student/CourseAccessNotice";
 import { Confetti } from "@/components/ui/Confetti";
 import { markLessonCompleteAction } from "@/app/actions/markLessonComplete.action";
 import styles from "./page.module.css";
+
+interface TocEntry {
+  id: string;
+  text: string;
+  level: 2 | 3;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+}
+
+/**
+ * Extract h2/h3 headings from a Markdown body string for use in the TOC.
+ * Runs on the server — no DOM needed.
+ */
+function extractHeadings(body: string): TocEntry[] {
+  const headingRe = /^(#{2,3})\s+(.+)$/gm;
+  const entries: TocEntry[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = headingRe.exec(body)) !== null) {
+    const level = match[1]!.length as 2 | 3;
+    const text = match[2]!.trim();
+    entries.push({ id: slugify(text), text, level });
+  }
+  return entries;
+}
 
 function estimateReadingMinutes(lesson: CatalogLesson): {
   minutes: number;
@@ -144,6 +178,15 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
     notFound();
   }
   const { lesson, sectionTitle } = lessonData;
+
+  // Extract headings for the TOC (server-side Markdown parsing)
+  const lessonBody =
+    typeof selectedLessonResult.value.content === "object" &&
+    selectedLessonResult.value.content !== null &&
+    "body" in selectedLessonResult.value.content
+      ? String(selectedLessonResult.value.content.body)
+      : "";
+  const tocHeadings = extractHeadings(lessonBody);
   const lessonTargets = course.curriculum.sections.flatMap((section) =>
     section.lessons.map((curriculumLesson) => ({
       id: curriculumLesson.id,
@@ -216,14 +259,19 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
   return (
     <div className={styles.layout}>
       {/* Sidebar navigation */}
-      <LessonSidebar
-        course={{ slug: course.slug, title: course.title, curriculum: course.curriculum }}
-        currentLessonId={lessonId}
-        completedLessonIds={completedLessonIds}
-      />
+      <div className="lesson-sidebar">
+        <LessonSidebar
+          course={{ slug: course.slug, title: course.title, curriculum: course.curriculum }}
+          currentLessonId={lessonId}
+          completedLessonIds={completedLessonIds}
+        />
+      </div>
 
       {/* Main content */}
       <main id="main-content" tabIndex={-1} className={styles.main}>
+        {/* Top utility bar */}
+        <LessonTopBar courseSlug={slug} />
+
         <div className={styles.content}>
           {/* Breadcrumb */}
           <nav className={styles.breadcrumb} aria-label="Breadcrumb">
@@ -256,7 +304,7 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           </Link>
 
           {/* Lesson header */}
-          <section className={styles.lessonHeader} aria-labelledby="lesson-title">
+          <section className={styles.lessonHeader} aria-labelledby="lesson-title" data-lesson-hero>
             <div className={styles.heroKicker}>
               <span>Learning step</span>
               <span>{sectionTitle}</span>
@@ -318,7 +366,11 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           ) : null}
 
           {hasActiveEnrollment ? (
-            <section className={styles.completionCard} aria-label="Lesson completion">
+            <section
+              className={styles.completionCard}
+              aria-label="Lesson completion"
+              data-completion-card
+            >
               <div>
                 <p className={styles.completionEyebrow}>Apply the learning</p>
                 <h2 className={styles.completionTitle}>
@@ -348,7 +400,17 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
             />
           </div>
         </div>
+
+        {/* Sticky floating completion CTA */}
+        {hasActiveEnrollment && (
+          <LessonStickyComplete action={completeLesson} isCompleted={isCompleted} />
+        )}
       </main>
+
+      {/* TOC column */}
+      <div className="lesson-toc">
+        <LessonToc headings={tocHeadings} />
+      </div>
     </div>
   );
 }

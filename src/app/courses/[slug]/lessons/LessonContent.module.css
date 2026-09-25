@@ -42,6 +42,13 @@
   border-top: 1px solid var(--border);
   font-size: var(--text-2xl);
 }
+
+/* Suppress top border on the first h2 so it doesn't read as a stray
+   divider right under the workspace heading. */
+.prose > h2:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
 .prose h3 {
   padding-left: var(--space-3);
   border-left: 3px solid var(--c-orange);
@@ -92,6 +99,48 @@
 .prose ol {
   margin: 0 0 var(--space-4) 0;
   padding-left: var(--space-6);
+  list-style: none;
+  counter-reset: ordered-list;
+}
+
+/* Ordered list: use CSS counter for stable numbering */
+.prose ol {
+  counter-reset: ordered-list;
+}
+
+.prose ol > li {
+  counter-increment: ordered-list;
+  position: relative;
+}
+
+.prose ol > li::before {
+  content: counter(ordered-list) ".";
+  position: absolute;
+  left: calc(-1 * var(--space-5));
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: inherit;
+  top: 2px;
+}
+
+/* Unordered list: small dot marker */
+.prose ul > li {
+  position: relative;
+  padding-left: var(--space-3);
+}
+
+.prose ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
 }
 
 /* GFM tables are common in the curriculum. Keep their columns aligned and
@@ -140,7 +189,7 @@
   border-left: 3px solid var(--accent);
   padding: var(--space-1) var(--space-4);
   margin: 0 0 var(--space-4) 0;
-  color: var(--ink-500);
+  color: var(--ink-700);
   font-style: italic;
   overflow-wrap: anywhere;
 }
