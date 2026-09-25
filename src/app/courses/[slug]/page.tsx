@@ -15,6 +15,7 @@
  */
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { StudentShell } from "@/components/student/StudentShell";
 import { notFound } from "next/navigation";
@@ -104,7 +105,8 @@ export default async function CourseDetailPage({ params }: PageProps) {
   const hours = Math.floor(totalEstimatedMinutes / 60);
   const minutes = totalEstimatedMinutes % 60;
   const priceMoney = Money.of(detail.priceMinor, "PHP");
-  const priceDisplay = detail.priceMinor === 0 ? "FREE" : priceMoney.ok ? priceMoney.value.format("en-PH") : "FREE";
+  const priceDisplay =
+    detail.priceMinor === 0 ? "FREE" : priceMoney.ok ? priceMoney.value.format("en-PH") : "FREE";
 
   // P1-01: surface course prerequisites before purchase so a gated
   // enrollment is never a surprise. Best-effort: a rule-list failure
@@ -285,8 +287,14 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <details key={mod.id} className={styles.section} open={si === 0}>
                   <summary className={styles.sectionSummary}>
                     {coverImage && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={coverImage} alt="" className={styles.sectionCoverImage} />
+                      <Image
+                        src={coverImage}
+                        alt=""
+                        width={1600}
+                        height={900}
+                        className={styles.sectionCoverImage}
+                        loading="lazy"
+                      />
                     )}
                     <span className={styles.sectionTitle}>
                       Section {si + 1}: {mod.title}

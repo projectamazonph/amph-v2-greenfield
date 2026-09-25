@@ -1,4 +1,4 @@
-import { BidElevator } from "./BidElevator";
+import { BidElevatorLazy } from "./BidElevatorLazy";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./SimulatorSection.module.css";
@@ -14,7 +14,8 @@ interface Tool {
 }
 
 const TOOL_DESCRIPTIONS: Record<string, string> = {
-  "bid-elevator": "Adjust bids on illustrative campaign data. See ACoS, sales, and spend update live.",
+  "bid-elevator":
+    "Adjust bids on illustrative campaign data. See ACoS, sales, and spend update live.",
   "campaign-builder": "Build a Sponsored Products campaign from a client brief.",
   "str-triage": "Sort search terms into keep, optimize, pause, or negate.",
   "listing-audit": "Flag listing issues, then write the reason for each fix.",
@@ -45,13 +46,13 @@ export function SimulatorSection() {
             This is a <b>public preview</b> of the Bid Elevator plus a search-term harvest. Drag the
             budget and bid, then triage the table: promote winners to exact match, cut the waste,
             and watch the projected ACoS (Advertising Cost of Sales) respond. The public preview is
-            illustrative. Enrolled tiers unlock the reviewed practice tools
-            listed below; simulator results remain formative, not job-readiness proof.
+            illustrative. Enrolled tiers unlock the reviewed practice tools listed below; simulator
+            results remain formative, not job-readiness proof.
           </p>
         </div>
 
         <Reveal>
-          <BidElevator />
+          <BidElevatorLazy />
         </Reveal>
 
         <div className={styles.roster}>

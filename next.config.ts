@@ -4,6 +4,9 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   typedRoutes: false,
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   // STORY-0026 follow-up: build a self-contained production artifact
   // so the lighthouse job (and any other consumer) can start the
   // server without the broken pnpm-store symlinks in .next/.

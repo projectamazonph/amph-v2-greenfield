@@ -33,14 +33,28 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
+  alternates: {
+    canonical: buildAppUrl("/"),
+  },
   openGraph: {
+    type: "website",
+    siteName: "AMPH Academy",
     title: "Project Amazon PH Academy",
     description: "Master Amazon PPC and seller central, built for Filipino VAs.",
+    images: [
+      {
+        url: buildAppUrl("/brand/photography/field-desk-hero.png"),
+        width: 1672,
+        height: 941,
+        alt: "AMPH Academy operator desk",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Project Amazon PH Academy",
     description: "Master Amazon PPC and seller central, built for Filipino VAs.",
+    images: [buildAppUrl("/brand/photography/field-desk-hero.png")],
   },
 };
 
@@ -55,10 +69,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      data-theme="light"
-    >
+    <html lang="en" data-theme="light">
       <body>
         <a href="#main-content" className="skip-link">
           Skip to main content
