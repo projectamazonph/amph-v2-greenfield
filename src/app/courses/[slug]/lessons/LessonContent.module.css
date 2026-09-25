@@ -117,7 +117,7 @@
   content: counter(ordered-list) ".";
   position: absolute;
   left: calc(-1 * var(--space-5));
-  color: var(--accent);
+  color: var(--accent-text);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: 700;
