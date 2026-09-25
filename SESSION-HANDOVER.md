@@ -1,24 +1,22 @@
 # SESSION-HANDOVER.md
 
-# Session update (2026-09-24, PRs #612–#616 merged; admin-backend.md rewrite in progress)
+# Session update (2026-09-24 / 2026-09-25, PRs #612–#618 merged; #619–#620 blocked on Ryan)
 
-`main` HEAD is `2a7e8bdd` (PR #616, squash of `fix/glossary-popover-wired`).
+`main` HEAD is `2af741a5` (PR #618, squash of `test/route-existence-guard`).
 
-**PRs merged today (2026-09-24):**
+**PRs merged (2026-09-24 and 2026-09-25):**
 
 - PR #612 (`refactor/drop-early-bird-and-import`) — squash `374d818d`: dropped early-bird pricing feature and `earlyBirdPriceMinor`/`earlyBirdLimit` fields; folded `import-amph-content` into `seed-all-content`.
 - PR #613 (`fix/vercel-deploy-tiers-courses`) — squash `0051fb77`: `db:seed:tiers` script now seeds tier+course associations on production deploy (was dropping them on every `vercel.json` `prisma:deploy` without `db:seed:import`).
 - PR #614 (`refactor/self-host-fonts`) — squash `b548b4f4`: replaced `next/font/google` with `@fontsource/archivo`, `@fontsource/barlow-condensed`, `@fontsource/ibm-plex-mono`, `@fontsource/pt-sans`; defined `--font-display/body/cond/mono` as literal strings in `:root` in `globals.css`; removed stale `<html>` className with Tailwind-flagged font classes.
 - PR #615 (`fix/seed-pricing-tiers-dry-run`) — squash `1421a8c8`: removed stale `earlyBirdPriceMinor`/`earlyBirdEndsAt` reference from dry-run block in `scripts/seed-pricing-tiers.ts`.
 - PR #616 (`fix/glossary-popover-wired`) — squash `2a7e8bdd`: wired glossary popover into the lesson renderer. `buildDirectiveHtml` in `directive-plugin.ts` now emits `<span data-amph-block="glossary" data-amph-slug="...">`; `LessonContent.tsx` renders `GlossaryTermButton` from manifest; page loads `loadGlossaryManifest()` server-side and passes it down. Unit test fixed (multi-line JSX toMatch split into four individual assertions). All 8 CI gates green.
-
-**In progress:**
-
-- PR #617 (docs/admin-backend.md rewrite): fully rewritten from code reads. Fixed: `earlyBirdLimit`/`earlyBirdPriceMinor` removed; `/admin/email-templates` EXISTS (old claim wrong); 9 missing routes added; dashboard corrected; audit action names updated. Branch `docs/admin-backend-rewrite`, commit `4f180719`, open at https://github.com/projectamazonph/amph-v2-greenfield/pull/617.
+- PR #617 (`docs/admin-backend-rewrite`) — squash `d8d3c8c2`: full rewrite of `docs/admin-backend.md` against the code. Removed `earlyBirdLimit`/`earlyBirdPriceMinor`, fixed dashboard description, extended layout tree with 9 missing routes (`resources/`, `maintenance/`, `content/`, `assignments/`, `announcements/`, `capstone/`, `courses/new/`, `simulators/[id]/versions/`, `simulators/[id]/[scenarioKey]/calibration/`), updated audit action names, confirmed `/admin/email-templates` route exists. Also carried CLAUDE.md addendum, STATE.md main pointer, and SESSION-HANDOVER.md updates.
+- PR #618 (`test/route-existence-guard`) — squash `2af741a5`: sibling guard to `docPathReferences.test.ts` at `src/__tests__/docSymbolAndRouteReferences.test.ts`. The path guard's regex required a source-root prefix, so URL-shaped routes like `/admin/users/[id]` were always out of its candidate set. New test extracts URL-shaped routes from the same eight guidance + fourteen reference docs, resolves each against `src/app/`, fails on missing `page.tsx` or `route.ts`. Same `KNOWN_ABSENT` discipline. Two exempt entries: `/admin/simulators/[id]` (named in `STATE.md` as an example of the shape this guard catches) and `/api/checkout` (illustrative). Mutation-tested by renaming `src/app/admin/users/page.tsx`. Symbol-existence guard (use cases, ports, server actions) deferred to a future PR — `build-spec.md` carries aspirational names that hit too many false positives; file header documents the deferred shape. All 8 CI gates green.
 
 **Blocked, waiting on Ryan:**
 
-- PR #617 (curriculum fixes): 7 open teaching decisions from `docs/audit-2026-09-23-lesson-arithmetic.md` "Also open from these passes" section. Summary of what Ryan needs to decide:
+- PR #619 (curriculum fixes): 7 open teaching decisions from `docs/audit-2026-09-23-lesson-arithmetic.md` "Also open from these passes" section. Summary of what Ryan needs to decide:
   1. Broad/exact match budget allocation: `2.4:103` says 40%/25%; `4.1:97-100` says 50-60% exact / 10-15% broad. Someone picks which the course teaches.
   2. Product targeting cap: `4.1:100` says 5-10%; `4.1:120` answer key uses 15%; `4.4:132` repeats 15%. Pick one.
   3. Timezone for bid multiplier times: `5.2:126-130` lists "Morning/Evening" with no TZ; `5.2:134` says peak is 8PM-12AM PHT. Decide whether all times in the table are PHT or US.
@@ -26,14 +24,9 @@
   5. CVR confidence interval framing: `7.1:130` prints ±20% at n=30 and ±10% at n=100 as if they're universal. They're the worst-case values at p=50%; at the 6-10% CVRs the course teaches, the absolute margin at n=30 is ±8.5 to ±10.7 points. Decide whether to qualify the numbers or leave them.
   6. ACoS 0% on zero-sales terms: `7.3:148/151/188` prints "ACoS 0%" for terms with clicks but no orders. The course's own formula divides by zero here. Amazon's UI shows 0.00%. Decide whether to label it differently or keep the UI-compatible number.
   7. "The 30-Minute Weekly Review" heading vs cadence table at `8.3:49` (Weekly = 10 min, 30 min reserved for Quarterly). Decide whether to rename the heading or update the table.
-- PR #618 (Last verified dates): `docs/audit-2026-09-23-lesson-arithmetic.md` §"Unverified source citations" lists 29 fact-card lessons that carry a `Last verified` line with no date. Ryan (or anyone with Seller Central access) needs to supply one date for all 29, or the specific articles behind the 16 that hedge with "not verified".
+- PR #620 (Last verified dates): `docs/audit-2026-09-23-lesson-arithmetic.md` §"Unverified source citations" lists 29 fact-card lessons that carry a `Last verified` line with no date. Ryan (or anyone with Seller Central access) needs to supply one date for all 29, or the specific articles behind the 16 that hedge with "not verified".
 
-**Also on deck (unblocked, not yet started):**
-
-- PR #620: add symbol/route existence guard to the doc cross-reference validator.
-- PR #621: record pass — update `STATE.md` with new `main` pointer `2a7e8bdd`, all 5 merged PRs, updated gate numbers.
-
-`CLAUDE.md` "Current addendum" updated to `2a7e8bdd`.
+`CLAUDE.md` "Current addendum" updated to `2af741a5`. `STATE.md` Main pointer updated to `2af741a5`, PR rows for #617 and #618 added, "Next action" reflects the two-blocked-on-Ryan state.
 
 ---
 
