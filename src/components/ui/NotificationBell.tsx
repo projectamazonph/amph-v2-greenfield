@@ -76,12 +76,18 @@ export function NotificationBell({ actions }: NotificationBellProps) {
     try {
       const result = await actions.markRead(id);
       if (result.ok) {
-        setState((current) => ({
-          notifications: current.notifications.map((n) =>
-            n.id === id ? { ...n, readAt: new Date().toISOString() } : n,
-          ),
-          unreadCount: Math.max(0, current.unreadCount - 1),
-        }));
+        setState((current) => {
+          // CLICK-PATH-004: only decrement when the item was actually
+          // unread. Clicking an already-read item must not move the badge.
+          const target = current.notifications.find((n) => n.id === id);
+          if (target?.readAt) return current;
+          return {
+            notifications: current.notifications.map((n) =>
+              n.id === id ? { ...n, readAt: new Date().toISOString() } : n,
+            ),
+            unreadCount: Math.max(0, current.unreadCount - 1),
+          };
+        });
       }
     } catch {
       // Silent: the server state is unchanged; next poll reconciles.

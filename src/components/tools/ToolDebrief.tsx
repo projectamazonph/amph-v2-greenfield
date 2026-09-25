@@ -63,25 +63,35 @@ export function ToolDebrief({
   const [rationale, setRationale] = useState("");
   const [saveState, setSaveState] = useState<SaveState>({ kind: "idle" });
   const textareaId = `debrief-rationale-${simulatorId}`;
+  // CLICK-PATH-008: editing after a save re-arms the button so v2 can be
+  // saved. The save handler stamps savedText; any divergence means unsaved
+  // edits exist and the button must come back.
+  const [savedText, setSavedText] = useState<string | null>(null);
+  const editedSinceSave =
+    saveState.kind === "saved" && savedText !== null && rationale.trim() !== savedText;
   const canSave =
     saveAction !== undefined &&
     artefactKind !== undefined &&
     rationale.trim().length > 0 &&
     saveState.kind !== "saving" &&
-    saveState.kind !== "saved";
+    (saveState.kind !== "saved" || editedSinceSave);
 
   async function onSave() {
     if (!saveAction || !artefactKind || rationale.trim().length === 0) return;
+    // Re-save after an edit starts from idle so the button copy resets.
+    if (editedSinceSave) setSaveState({ kind: "idle" });
     setSaveState({ kind: "saving" });
     try {
+      const trimmed = rationale.trim();
       const result = await saveAction.save({
         courseId: courseId ?? null,
         kind: artefactKind,
         title: `${simulatorId} rationale`,
         scenarioRef: scenarioRef ?? null,
-        rationale: rationale.trim(),
+        rationale: trimmed,
       });
       if (result.ok) {
+        setSavedText(trimmed);
         setSaveState({ kind: "saved" });
       } else {
         setSaveState({

@@ -172,16 +172,19 @@ test.describe("Critical journeys", () => {
 
     await page.getByRole("combobox", { name: /tier/i }).selectOption("PRO");
     await page.getByRole("button", { name: /save tier/i }).click();
-    // The page renders the success notice as a <p role="status">. Scope to
-    // <p> specifically: Astryx Button components (used by every Dialog
-    // close button, including the ConfirmSubmitButton's "Confirm action"
-    // header) ship a VisuallyHidden <span role="status" aria-live="polite">
-    // live region for loading announcements, which is always mounted. A
-    // bare getByRole("status") collides with that hidden span under
-    // Playwright's strict mode and the assertion trips before the
-    // redirect completes.
-    const notice = page.locator('main p[role="status"]');
-    await expect(notice).toContainText("Subscription tier updated");
+    // Stabilize the server-action redirect before checking the notice text.
+    // The form action redirects to ?notice=tier-updated; waiting for the
+    // URL resolves the race between the redirect landing and the page
+    // hydrating the success <p role="status">.
+    await expect(page).toHaveURL(
+      new RegExp(`/admin/users/\\${scenario.studentId}\\?notice=tier-updated`),
+      { timeout: 15_000 },
+    );
+    // Re-resolve the notice locator after the redirect (stale after DOM
+    // re-render). Scope to <p> specifically: Astryx Button components
+    // (used by every Dialog close button) ship a VisuallyHidden
+    // <span role="status"> that always collides with bare getByRole("status").
+    await expect(page.locator('main p[role="status"]')).toContainText("Subscription tier updated");
 
     // Granting a PRO tier auto-enrolls the student in every published
     // course their tier unlocks (STORY-105 follow-up to the admin-grant
@@ -191,12 +194,18 @@ test.describe("Critical journeys", () => {
     const courseRow = page.getByText(scenario.courseTitle).locator("..").locator("..");
     await expect(courseRow.getByText("Active", { exact: true })).toBeVisible();
 
-    page.once("dialog", (dialog) => dialog.accept());
+    // ConfirmSubmitButton uses an Astryx React Dialog (not window.confirm),
+    // so page.on("dialog") never fires — click the dialog's Confirm button directly.
     await courseRow.getByRole("button", { name: /^revoke$/i }).click();
-    await expect(notice).toContainText("Course access revoked");
+    await page.getByRole("button", { name: "Confirm", exact: true }).click();
+    await expect(page).toHaveURL(/notice=enrollment-revoked/, { timeout: 15_000 });
+    // Re-resolve the notice locator after the redirect: the locator
+    // captured on the previous page load is stale once the DOM re-renders.
+    await expect(page.locator('main p[role="status"]')).toContainText("Course access revoked");
 
     await courseRow.getByRole("button", { name: /^restore$/i }).click();
-    await expect(notice).toContainText("Course access restored");
+    await expect(page).toHaveURL(/notice=enrollment-restored/, { timeout: 15_000 });
+    await expect(page.locator('main p[role="status"]')).toContainText("Course access restored");
   });
 
   test("journey 6: public verifies certificate by hash", async ({ page }) => {
