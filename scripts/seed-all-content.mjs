@@ -59,7 +59,11 @@ function deriveTitle(dirSlug) {
 }
 
 function courseSlugForModule(n) {
-  if (n >= 0 && n <= 4) return "ppc-foundations";
+  // Module -1 ("Amazon and PPC Job") is pre-onboarding context for the
+  // foundations course. Quizzes already classify it as ppc-foundations
+  // (>= -1 && <= 4); keep module/lesson walks consistent so the curriculum
+  // isn't silently truncated.
+  if (n >= -1 && n <= 4) return "ppc-foundations";
   if (n >= 5 && n <= 10) return "accelerated-mastery";
   if (n === 11) return "ultimate-transformation";
   return null;
