@@ -5,6 +5,7 @@
  * the server.
  */
 
+import type { Metadata } from "next";
 import { PageTexture } from "@/components/landing/PageTexture";
 import shared from "@/components/landing/shared.module.css";
 import { TopBar } from "@/components/landing/TopBar";
@@ -22,10 +23,34 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { DarkCTA } from "@/components/landing/DarkCTA";
 import { Footer } from "@/components/landing/Footer";
 
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
+/**
+ * Organization structured data for rich snippets.
+ * The landing page has no dynamic data fetches, so Next.js
+ * auto-caches it as static at build time (no `dynamic` export needed).
+ */
+const ORGANIZATION_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  name: "Project Amazon PH Academy",
+  url: "https://projectamazonph.vercel.app",
+  description:
+    "Amazon PPC training for Filipino virtual assistants. Eleven modules, five scored simulators, and a live Ad Console.",
+  logo: "https://projectamazonph.vercel.app/icon-512.png",
+  sameAs: [],
+};
+
 export default function HomePage() {
   return (
     <>
       <PageTexture />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
+      />
       <div className={shared.contentLayer}>
         <TopBar />
         <Ticker />

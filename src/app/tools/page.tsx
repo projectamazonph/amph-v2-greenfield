@@ -25,7 +25,15 @@ import {
   PUBLIC_CURRICULUM_CLAIMS,
   type PublicSimulatorAvailability,
 } from "@/domain/curriculum/PublicCurriculumClaims";
+import type { Metadata } from "next";
 import styles from "./page.module.css";
+
+export const metadata: Metadata = {
+  title: "Practice Tools | Project Amazon PH Academy",
+  description:
+    "Five scored Amazon PPC simulators and a live Ad Console. Practice campaign decisions in a safe environment before touching real accounts.",
+  alternates: { canonical: "/tools" },
+};
 
 export const dynamic = "force-dynamic";
 

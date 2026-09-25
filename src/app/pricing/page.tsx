@@ -8,10 +8,18 @@
  * STORY-015.
  */
 
+import type { Metadata } from "next";
 import { buildContainer } from "@/composition/container";
 import { ListPricingTiers } from "@/usecases/ListPricingTiers";
 import { StudentShell } from "@/components/student/StudentShell";
 import styles from "./page.module.css";
+
+export const metadata: Metadata = {
+  title: "Pricing | Project Amazon PH Academy",
+  description:
+    "Three one-time payment tiers for Amazon PPC training. Pay once, get lifetime access. No subscription, no upsells.",
+  alternates: { canonical: "/pricing" },
+};
 
 // ── Page ────────────────────────────────────────────────────────────────────
 

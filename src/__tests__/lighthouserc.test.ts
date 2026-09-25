@@ -48,10 +48,10 @@ describe(".lighthouserc.json", () => {
     expect(urls).toContain("http://localhost:3000/");
     expect(urls).toContain("http://localhost:3000/courses");
     expect(urls).toContain("http://localhost:3000/pricing");
-    expect(urls).toContain("http://localhost:3000/login");
-    // The login page must be in the list — it's an auth-gated
-    // page in the funnel and we want to catch any a11y/SEO
-    // regression in the form fields.
+    expect(urls).toContain("http://localhost:3000/faq");
+    // The FAQ page is a public marketing page that exercises the
+    // same layout shell as /courses and /pricing — a better SEO
+    // target than /login, which is an auth form (robots: noindex).
     expect(urls.length).toBeGreaterThanOrEqual(4);
   });
 
