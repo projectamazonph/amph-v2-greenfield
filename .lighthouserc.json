@@ -6,7 +6,7 @@
         "http://localhost:3000/",
         "http://localhost:3000/courses",
         "http://localhost:3000/pricing",
-        "http://localhost:3000/login"
+        "http://localhost:3000/faq"
       ],
       "numberOfRuns": 1,
       "settings": {
