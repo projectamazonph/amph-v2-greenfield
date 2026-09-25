@@ -204,8 +204,10 @@ asks the policy, so every visitor reaches all five engines. The `User.simulatorA
 does exist (`NONE` / `FORMATIVE` / `CREDENTIAL`) and `PrismaUserRepository.ts:83` writes it on
 create, but nothing reads it, so it gates nothing. What the engines do check is per-mode and
 per-scenario: a formative run may use a draft scenario, a credential run requires a published
-one. That is a scenario-lifecycle rule, not a tier rule. **Whether the tools should be
-tier-gated is an open decision.**
+one. That scenario-lifecycle rule is the real security boundary -- tier gating would add a UI
+step that does not change what gets graded or persisted. Per decision 4 (option C), the
+tools stay open; credential-mode attempts against a non-published scenario is the wall that
+matters.
 
 **Why the live-class rows say "see note".** `RsvpLiveClass.ts:70` requires an enrollment in
 the class's linked course whose status is `active`, and returns `course_access_required`
