@@ -29,6 +29,7 @@ export const metadata: Metadata = {
   title: "Courses | Project Amazon PH Academy",
   description:
     "Expert-led Amazon PPC training for Filipino VAs. Agency-side ads work, taught in Filipino.",
+  alternates: { canonical: "/courses" },
 };
 
 export default async function CoursesPage() {

@@ -33,9 +33,6 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
-  alternates: {
-    canonical: buildAppUrl("/"),
-  },
   openGraph: {
     type: "website",
     siteName: "AMPH Academy",

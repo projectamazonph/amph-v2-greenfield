@@ -5,6 +5,7 @@
  * the server.
  */
 
+import type { Metadata } from "next";
 import { PageTexture } from "@/components/landing/PageTexture";
 import shared from "@/components/landing/shared.module.css";
 import { TopBar } from "@/components/landing/TopBar";
@@ -21,6 +22,10 @@ import { Proof } from "@/components/landing/Proof";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { DarkCTA } from "@/components/landing/DarkCTA";
 import { Footer } from "@/components/landing/Footer";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 /**
  * Organization structured data for rich snippets.

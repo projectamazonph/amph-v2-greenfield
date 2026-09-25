@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   title: "Pricing | Project Amazon PH Academy",
   description:
     "Three one-time payment tiers for Amazon PPC training. Pay once, get lifetime access. No subscription, no upsells.",
+  alternates: { canonical: "/pricing" },
 };
 
 // ── Page ────────────────────────────────────────────────────────────────────

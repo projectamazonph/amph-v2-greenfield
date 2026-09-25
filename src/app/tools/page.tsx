@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   title: "Practice Tools | Project Amazon PH Academy",
   description:
     "Five scored Amazon PPC simulators and a live Ad Console. Practice campaign decisions in a safe environment before touching real accounts.",
+  alternates: { canonical: "/tools" },
 };
 
 export const dynamic = "force-dynamic";
