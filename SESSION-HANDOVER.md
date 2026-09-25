@@ -1,8 +1,8 @@
 # SESSION-HANDOVER.md
 
-# Session update (2026-09-24 / 2026-09-25, PRs #612–#618 merged; #619–#620 blocked on Ryan)
+# Session update (2026-09-24 / 2026-09-25, PRs #612–#621 merged — entire in-scope series closed)
 
-`main` HEAD is `2af741a5` (PR #618, squash of `test/route-existence-guard`).
+`main` HEAD is `4f3688d0` (PR #621, squash of `fix/last-verified-dates`).
 
 **PRs merged (2026-09-24 and 2026-09-25):**
 
@@ -10,23 +10,20 @@
 - PR #613 (`fix/vercel-deploy-tiers-courses`) — squash `0051fb77`: `db:seed:tiers` script now seeds tier+course associations on production deploy (was dropping them on every `vercel.json` `prisma:deploy` without `db:seed:import`).
 - PR #614 (`refactor/self-host-fonts`) — squash `b548b4f4`: replaced `next/font/google` with `@fontsource/archivo`, `@fontsource/barlow-condensed`, `@fontsource/ibm-plex-mono`, `@fontsource/pt-sans`; defined `--font-display/body/cond/mono` as literal strings in `:root` in `globals.css`; removed stale `<html>` className with Tailwind-flagged font classes.
 - PR #615 (`fix/seed-pricing-tiers-dry-run`) — squash `1421a8c8`: removed stale `earlyBirdPriceMinor`/`earlyBirdEndsAt` reference from dry-run block in `scripts/seed-pricing-tiers.ts`.
-- PR #616 (`fix/glossary-popover-wired`) — squash `2a7e8bdd`: wired glossary popover into the lesson renderer. `buildDirectiveHtml` in `directive-plugin.ts` now emits `<span data-amph-block="glossary" data-amph-slug="...">`; `LessonContent.tsx` renders `GlossaryTermButton` from manifest; page loads `loadGlossaryManifest()` server-side and passes it down. Unit test fixed (multi-line JSX toMatch split into four individual assertions). All 8 CI gates green.
-- PR #617 (`docs/admin-backend-rewrite`) — squash `d8d3c8c2`: full rewrite of `docs/admin-backend.md` against the code. Removed `earlyBirdLimit`/`earlyBirdPriceMinor`, fixed dashboard description, extended layout tree with 9 missing routes (`resources/`, `maintenance/`, `content/`, `assignments/`, `announcements/`, `capstone/`, `courses/new/`, `simulators/[id]/versions/`, `simulators/[id]/[scenarioKey]/calibration/`), updated audit action names, confirmed `/admin/email-templates` route exists. Also carried CLAUDE.md addendum, STATE.md main pointer, and SESSION-HANDOVER.md updates.
-- PR #618 (`test/route-existence-guard`) — squash `2af741a5`: sibling guard to `docPathReferences.test.ts` at `src/__tests__/docSymbolAndRouteReferences.test.ts`. The path guard's regex required a source-root prefix, so URL-shaped routes like `/admin/users/[id]` were always out of its candidate set. New test extracts URL-shaped routes from the same eight guidance + fourteen reference docs, resolves each against `src/app/`, fails on missing `page.tsx` or `route.ts`. Same `KNOWN_ABSENT` discipline. Two exempt entries: `/admin/simulators/[id]` (named in `STATE.md` as an example of the shape this guard catches) and `/api/checkout` (illustrative). Mutation-tested by renaming `src/app/admin/users/page.tsx`. Symbol-existence guard (use cases, ports, server actions) deferred to a future PR — `build-spec.md` carries aspirational names that hit too many false positives; file header documents the deferred shape. All 8 CI gates green.
+- PR #616 (`fix/glossary-popover-wired`) — squash `2a7e8bdd`: wired glossary popover into the lesson renderer.
+- PR #617 (`docs/admin-backend-rewrite`) — squash `d8d3c8c2`: full rewrite of `docs/admin-backend.md` against the code.
+- PR #618 (`test/route-existence-guard`) — squash `2af741a5`: sibling route guard.
+- PR #619 (`docs/record-pass-618`) — squash `5acb78f2`: records update (CLAUDE.md, SESSION-HANDOVER.md, STATE.md) after #617 and #618.
+- PR #620 (`fix/curriculum-decisions`) — squash `f3979de9`: applied all 7 of Ryan's dashboard decisions. **Decision 1** (broad 40% / exact 25%): 4.1 body line 95-98 updated; 4.1 worked example restructured to 4 campaigns (added `SP-Broad-Discovery`) with the 25/25/40/10 split. **Decision 2** (cap product 5-10%): 4.4:132 worked example changed 15% (₱240) to 10% (₱160), phrase 30% (₱480) to 35% (₱560). **Decision 3** (PHT): 5.2:126-130 appended `PHT` to each row. **Decision 4** (5+ clicks): 7.3:76 and 7.3:111 changed 10+ to 5+. **Decision 5** (state assumption): 7.1:130 rewritten to qualify the ±20%/±10% headline as worst-case at 50% CVR. **Decision 6** (replace 0% with N/A): 7.3 quick practice rows 2 and 5 changed "ACoS 0%" to "ACoS N/A (no orders)". **Decision 7** (rename heading): 8.3 "The 30-Minute Weekly Review" → "The Weekly Check-in"; superpowers files updated to match. All 8 CI gates green.
+- PR #621 (`fix/last-verified-dates`) — squash `4f3688d0`: stamped `Last verified: 2026-09-25` on all 29 fact cards. `pnpm check:curriculum-sources` goes from `0 dated, 29 pending text` to `29 dated, 0 pending text`. The companion `Next review due:` field left untouched (Ryan did not pick a date for it). All 8 CI gates green.
 
-**Blocked, waiting on Ryan:**
+**Open follow-ups, not blocking the series:**
 
-- PR #619 (curriculum fixes): 7 open teaching decisions from `docs/audit-2026-09-23-lesson-arithmetic.md` "Also open from these passes" section. Summary of what Ryan needs to decide:
-  1. Broad/exact match budget allocation: `2.4:103` says 40%/25%; `4.1:97-100` says 50-60% exact / 10-15% broad. Someone picks which the course teaches.
-  2. Product targeting cap: `4.1:100` says 5-10%; `4.1:120` answer key uses 15%; `4.4:132` repeats 15%. Pick one.
-  3. Timezone for bid multiplier times: `5.2:126-130` lists "Morning/Evening" with no TZ; `5.2:134` says peak is 8PM-12AM PHT. Decide whether all times in the table are PHT or US.
-  4. Harvest floor: `7.1:127` says negate at 5+ clicks; `7.3` uses 10+ in four places. Pick a floor or state the condition.
-  5. CVR confidence interval framing: `7.1:130` prints ±20% at n=30 and ±10% at n=100 as if they're universal. They're the worst-case values at p=50%; at the 6-10% CVRs the course teaches, the absolute margin at n=30 is ±8.5 to ±10.7 points. Decide whether to qualify the numbers or leave them.
-  6. ACoS 0% on zero-sales terms: `7.3:148/151/188` prints "ACoS 0%" for terms with clicks but no orders. The course's own formula divides by zero here. Amazon's UI shows 0.00%. Decide whether to label it differently or keep the UI-compatible number.
-  7. "The 30-Minute Weekly Review" heading vs cadence table at `8.3:49` (Weekly = 10 min, 30 min reserved for Quarterly). Decide whether to rename the heading or update the table.
-- PR #620 (Last verified dates): `docs/audit-2026-09-23-lesson-arithmetic.md` §"Unverified source citations" lists 29 fact-card lessons that carry a `Last verified` line with no date. Ryan (or anyone with Seller Central access) needs to supply one date for all 29, or the specific articles behind the 16 that hedge with "not verified".
+- **Run the content seeder.** `node scripts/seed-all-content.mjs`. Ten merged content PRs (#612–#621) have not reached learners, because a deploy runs only `prisma:deploy` and `db:seed:scenarios`. Until this runs, the curriculum decisions and `Last verified` dates are invisible in production.
+- **Set `Next review due:` dates** on the 16 fact cards that still carry `pending content-owner review` for that field. The 16 are listed by `pnpm check:curriculum-sources` and are the same lessons #577 grouped under `states why`.
+- **`9.3` evidence ladder boundary overlap** recorded in the audit as a separate defect from #565. Separate fix; not blocking.
 
-`CLAUDE.md` "Current addendum" updated to `2af741a5`. `STATE.md` Main pointer updated to `2af741a5`, PR rows for #617 and #618 added, "Next action" reflects the two-blocked-on-Ryan state.
+`CLAUDE.md` "Current addendum" updated to `4f3688d0`. `STATE.md` Main pointer updated to `4f3688d0`, PR rows for #620 and #621 added, "Next action" reflects the seeder + `Next review due:` state.
 
 ---
 
