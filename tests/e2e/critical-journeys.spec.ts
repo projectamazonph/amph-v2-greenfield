@@ -172,6 +172,14 @@ test.describe("Critical journeys", () => {
 
     await page.getByRole("combobox", { name: /tier/i }).selectOption("PRO");
     await page.getByRole("button", { name: /save tier/i }).click();
+    // Stabilize the server-action redirect before checking the notice text.
+    // The form action redirects to ?notice=tier-updated; waiting for the
+    // URL resolves the race between the redirect landing and the page
+    // hydrating the success <p role="status">.
+    await expect(page).toHaveURL(
+      new RegExp(`/admin/users/\\${scenario.studentId}\\?notice=tier-updated`),
+      { timeout: 15_000 },
+    );
     // The page renders the success notice as a <p role="status">. Scope to
     // <p> specifically: Astryx Button components (used by every Dialog
     // close button, including the ConfirmSubmitButton's "Confirm action"
