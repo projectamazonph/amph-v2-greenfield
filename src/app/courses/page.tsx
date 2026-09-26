@@ -46,13 +46,17 @@ export default async function CoursesPage() {
   // only console method that ESLint's `no-console` rule allows.
   if (process.env.NODE_ENV !== "test") {
     if (!catalogResult.ok) {
-      console.warn("[courses] catalog load failed", catalogResult.error);
+      console.warn("[catalog:error] catalog load failed", catalogResult.error);
     } else {
-      console.warn(`[courses] catalog loaded: ${catalogResult.value.courses.length} course(s)`);
+      console.warn(
+        `[catalog:info] catalog loaded: ${catalogResult.value.courses.length} course(s)`,
+      );
     }
   }
 
   if (!catalogResult.ok) {
+    const dbError = catalogResult.error.kind === "db_error" ? catalogResult.error.message : null;
+
     return (
       <StudentShell requireAuth={false}>
         <main id="main-content" tabIndex={-1} className={styles.errorPage}>
@@ -61,6 +65,24 @@ export default async function CoursesPage() {
             We could not load the course catalog right now. Your account is unchanged. Refresh to
             try again.
           </p>
+          {process.env.NODE_ENV === "development" && dbError && (
+            <pre
+              style={{
+                marginTop: "var(--space-4)",
+                padding: "var(--space-3)",
+                background: "var(--surface-3)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius-sm)",
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-xs)",
+                color: "var(--ink-900)",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+              }}
+            >
+              {dbError}
+            </pre>
+          )}
         </main>
       </StudentShell>
     );
