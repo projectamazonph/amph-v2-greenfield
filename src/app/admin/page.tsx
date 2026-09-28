@@ -37,6 +37,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
 import { formatPhp } from "./_lib/formatPhp";
+import { displayName } from "@/lib/displayName";
 import styles from "./page.module.css";
 
 export default async function AdminDashboardPage() {
@@ -51,7 +52,7 @@ export default async function AdminDashboardPage() {
   if (!statsResult.ok) {
     return (
       <div>
-        <TopBar title="Admin Dashboard" subtitle={`Welcome, ${user.firstName}`} />
+        <TopBar title="Admin Dashboard" subtitle={`Welcome, ${displayName(user.firstName)}`} />
         <Card padding={6}>
           <p className={styles.error}>
             Failed to load dashboard stats: {statsResult.error.message}
@@ -74,7 +75,7 @@ export default async function AdminDashboardPage() {
     <div>
       <TopBar
         title="Admin Dashboard"
-        subtitle={`Welcome back, ${user.firstName}`}
+        subtitle={`Welcome back, ${displayName(user.firstName)}`}
         breadcrumb={
           <span className={styles.eyebrow}>
             <span className={styles.eyebrowMark} aria-hidden />
