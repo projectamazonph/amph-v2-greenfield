@@ -171,7 +171,11 @@ describe("WorksheetArtifact", () => {
       />,
     );
     fireEvent.blur(screen.getByLabelText("Product"));
-    await new Promise((r) => setTimeout(r, 0));
+    // The status transitions idle -> saving -> error across two
+    // microtasks. The previous setTimeout(0) was flaky under load
+    // on CI's Node 20 (microtask scheduling differs from local Node
+    // 26). waitFor retries until the error text appears.
+    await screen.findByText(/sign in/i, { selector: '[role="status"]' });
     expect(screen.getByRole("status")).toHaveTextContent(/sign in/i);
   });
 
