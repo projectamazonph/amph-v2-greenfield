@@ -16,7 +16,11 @@ export default defineConfig({
     // `--no-webstorage` to Node's worker keeps the slot free for vitest
     // to populate. See:
     // https://github.com/vitest-dev/vitest/issues/8757 (Node 25+ break)
-    execArgv: ["--no-webstorage"],
+    //
+    // The flag was added in Node 25. Node 20 (CI) does not have it
+    // and never shipped the native localStorage getter, so it would
+    // crash with "bad option: --no-webstorage". Gate on major version.
+    ...(Number(process.versions.node.split(".")[0]) >= 25 ? { execArgv: ["--no-webstorage"] } : {}),
     include: [
       "src/**/__tests__/**/*.test.ts",
       "src/**/__tests__/**/*.test.tsx",
