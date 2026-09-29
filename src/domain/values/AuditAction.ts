@@ -137,7 +137,11 @@ export type AuditAction =
   | "user.profile_updated"
   | "user.password_changed_by_admin"
   | "user.deleted_by_admin"
-  | "user.sessions_revoked";
+  | "user.sessions_revoked"
+  // STORY-163: student saves the Module 1 worksheet artifact. Treated as
+  // a tier-2 mutation: who changed what and when, no admin approval gate.
+  | "worksheet.saved"
+  | "worksheet.save_failed";
 
 /**
  * STORY-061. All valid AuditAction values as an array.
@@ -258,6 +262,9 @@ export const ALL_ACTIONS: AuditAction[] = [
   "user.password_changed_by_admin",
   "user.deleted_by_admin",
   "user.sessions_revoked",
+  // STORY-163: student saves the Module 1 worksheet artifact.
+  "worksheet.saved",
+  "worksheet.save_failed",
 ];
 
 /**

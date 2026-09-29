@@ -102,6 +102,9 @@ import { InMemoryArtefactRepository } from "@/infra/repositories/inmemory/InMemo
 import { SaveArtefact } from "@/usecases/SaveArtefact";
 import { SubmitArtefact } from "@/usecases/SubmitArtefact";
 import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
+import { InMemoryWorksheetRepository } from "@/infra/db/inmemory/InMemoryWorksheetRepository";
+import { GetWorksheet } from "@/usecases/GetWorksheet";
+import { SaveWorksheetEntry } from "@/usecases/SaveWorksheetEntry";
 import { InMemoryRetrievalCheckRepository } from "@/infra/repositories/inmemory/InMemoryRetrievalCheckRepository";
 import { RecordRetrievalCheck } from "@/usecases/RecordRetrievalCheck";
 import { InMemoryNotificationRepository } from "@/infra/repositories/inmemory/InMemoryNotificationRepository";
@@ -325,6 +328,10 @@ export interface TestContainer extends AppContainer {
   saveArtefact: SaveArtefact;
   submitArtefact: SubmitArtefact;
   listStudentArtefacts: ListStudentArtefacts;
+  // STORY-163: Module 1 worksheet artifact fakes
+  worksheetRepo: InMemoryWorksheetRepository;
+  getWorksheet: GetWorksheet;
+  saveWorksheetEntry: SaveWorksheetEntry;
   // LEARN-040 (STORY-138): retrieval-check fakes
   retrievalCheckRepo: InMemoryRetrievalCheckRepository;
   recordRetrievalCheck: RecordRetrievalCheck;
@@ -431,6 +438,8 @@ export function buildTestContainer(): TestContainer {
   const assignmentRepo = new InMemoryAssignmentRepository();
   // LEARN-033 (STORY-135): learner artefact fakes
   const artefactRepo = new InMemoryArtefactRepository();
+  // STORY-163: Module 1 worksheet artifact fakes
+  const worksheetRepo = new InMemoryWorksheetRepository();
   // LEARN-040 (STORY-138): retrieval-check fakes
   const retrievalCheckRepo = new InMemoryRetrievalCheckRepository();
   // P3-87 (STORY-139): notification fakes
@@ -1075,6 +1084,10 @@ export function buildTestContainer(): TestContainer {
     saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
     submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
     listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
+    // STORY-163: Module 1 worksheet artifact (in-memory)
+    worksheetRepo,
+    getWorksheet: new GetWorksheet({ worksheetRepo }),
+    saveWorksheetEntry: new SaveWorksheetEntry({ worksheetRepo, recordAuditLog, clock }),
     // LEARN-040 (STORY-138): retrieval-check tracking (in-memory)
     retrievalCheckRepo,
     recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),

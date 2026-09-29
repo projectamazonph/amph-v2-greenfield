@@ -146,6 +146,11 @@ import { PrismaArtefactRepository } from "@/infra/repositories/PrismaArtefactRep
 import { SaveArtefact } from "@/usecases/SaveArtefact";
 import { SubmitArtefact } from "@/usecases/SubmitArtefact";
 import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
+// STORY-163: Module 1 worksheet artifact
+import type { WorksheetRepository } from "@/ports/repositories/WorksheetRepository";
+import { PrismaWorksheetRepository } from "@/infra/repositories/PrismaWorksheetRepository";
+import { GetWorksheet } from "@/usecases/GetWorksheet";
+import { SaveWorksheetEntry } from "@/usecases/SaveWorksheetEntry";
 // LEARN-040 (STORY-138): retrieval-check tracking
 import type { IRetrievalCheckRepository } from "@/ports/repositories/IRetrievalCheckRepository";
 import { PrismaRetrievalCheckRepository } from "@/infra/repositories/PrismaRetrievalCheckRepository";
@@ -539,6 +544,10 @@ export interface AppContainer {
   saveArtefact: SaveArtefact;
   submitArtefact: SubmitArtefact;
   listStudentArtefacts: ListStudentArtefacts;
+  // STORY-163: Module 1 worksheet artifact
+  worksheetRepo: WorksheetRepository;
+  getWorksheet: GetWorksheet;
+  saveWorksheetEntry: SaveWorksheetEntry;
   // LEARN-040 (STORY-138): retrieval-check tracking
   retrievalCheckRepo: IRetrievalCheckRepository;
   recordRetrievalCheck: RecordRetrievalCheck;
@@ -817,6 +826,8 @@ function buildProductionContainer(): AppContainer {
   const assignmentRepo: IAssignmentRepository = new PrismaAssignmentRepository(prisma);
   // LEARN-033 (STORY-135): learner artefacts
   const artefactRepo: IArtefactRepository = new PrismaArtefactRepository(prisma);
+  // STORY-163: Module 1 worksheet artifact
+  const worksheetRepo: WorksheetRepository = new PrismaWorksheetRepository(prisma);
   // LEARN-040 (STORY-138): retrieval-check tracking
   const retrievalCheckRepo: IRetrievalCheckRepository = new PrismaRetrievalCheckRepository(prisma);
   // P3-87 (STORY-139): in-app notifications
@@ -1453,6 +1464,10 @@ function buildProductionContainer(): AppContainer {
     saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
     submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
     listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
+    // STORY-163: Module 1 worksheet artifact
+    worksheetRepo,
+    getWorksheet: new GetWorksheet({ worksheetRepo }),
+    saveWorksheetEntry: new SaveWorksheetEntry({ worksheetRepo, recordAuditLog, clock }),
     // LEARN-040 (STORY-138): retrieval-check tracking
     retrievalCheckRepo,
     recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),
