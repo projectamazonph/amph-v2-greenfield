@@ -72,6 +72,8 @@ const ALLOWED_DIRECTIVES = new Set([
   "callout",
   "visual",
   "slide",
+  // STORY-163: Module 1 worksheet artifact.
+  "worksheet",
   ...TRANCHE_ONE_DIRECTIVES,
   ...TRANCHE_TWO_DIRECTIVES,
 ]);

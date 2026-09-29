@@ -205,6 +205,9 @@ const JSON_LESSON_DIRECTIVES = new Set([
   "seasonal-calendar",
   "evidence-ledger",
   "sov-positioner",
+  // STORY-163: Module 1 worksheet artifact. Carries no body; the React
+  // component reads attributes (id, title, part, lesson) and hydrates.
+  "worksheet",
 ]);
 
 function buildDirectiveHtml(
@@ -228,6 +231,13 @@ function buildDirectiveHtml(
     // Inline glossary term reference: rendered as a span so it stays inline
     // with the surrounding prose. The renderer replaces it with GlossaryTermButton.
     return `<span data-amph-block="glossary" data-amph-slug="${attrs["slug"] ?? ""}"></span>`;
+  }
+  if (name === "worksheet") {
+    // STORY-163. Module 1 worksheet artifact directive. Carries no body;
+    // the WorksheetArtifact React component reads the data-amph-* attrs
+    // (id, title, part, lesson) and hydrates a labeled form per field.
+    // Kept in JSON_LESSON_DIRECTIVES so the renderer list is single-sourced.
+    return `<div data-amph-block="${name}" ${attrsSerialized}></div>`;
   }
   // For process and callout, the inner body is just text. Pass through as
   // an inner div so the renderer can read it from children.
