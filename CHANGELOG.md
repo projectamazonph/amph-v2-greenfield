@@ -4,6 +4,16 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-163: Module 1 worksheet as a tracked artifact (design only)
+
+Replaces the per-lesson "open a blank note or spreadsheet" worksheets in
+Lessons 1.1 to 1.5 with a single tracked artifact the learner fills in across
+all five lessons. Story doc captures the full architecture (domain entity,
+port, use case, adapter, MDX directive, React component, server action,
+audit log entry) and the 27-field inventory across the five parts.
+Implementation deferred to a separate work session so the architecture
+review can happen before the multi-layer build.
+
 ### Admin user management on /admin/users/[id]
 
 Admins can now manage accounts from the user detail page: edit a student name and role, set a password directly (revokes every active session, optional notification email), force sign-out, and permanently anonymize a delete. Four use cases (`AdminUpdateUser`, `AdminSetUserPassword`, `AdminDeleteUser`, `AdminForceSignOut`) with matching server actions on both containers, four new audit actions (`user.profile_updated`, `user.password_changed_by_admin`, `user.deleted_by_admin`, `user.sessions_revoked`), and `role` added to the `UserRepository.update()` patch. Guards: an admin cannot delete their own account or change their own role. Boundary suite at `src/app/actions/__tests__/adminUserManagement.action.test.ts`; STORY-155.
