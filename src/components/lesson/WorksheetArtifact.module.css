@@ -1,0 +1,65 @@
+/* WorksheetArtifact.module.css - STORY-163. Plain CSS, no Tailwind. */
+
+.worksheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 12px);
+  margin-block: var(--spacing-4, 16px);
+  padding: var(--spacing-4, 16px);
+}
+
+.title {
+  font-family: "Archivo", sans-serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.partLabel {
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground, #555);
+  margin: 0;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 12px);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1, 4px);
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.input {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9375rem;
+  padding: var(--spacing-2, 8px);
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--color-background, #fff);
+  color: var(--color-foreground, #111);
+}
+
+.input:focus {
+  outline: 2px solid var(--color-accent, #ff8a00);
+  outline-offset: 1px;
+}
+
+.hint {
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground, #555);
+}
+
+.status {
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground, #555);
+  margin: 0;
+}
