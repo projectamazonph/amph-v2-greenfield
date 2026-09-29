@@ -59,6 +59,10 @@ If you're consistently hitting your daily budget by midday, consider increasing 
 
 Your **burn rate** tells you how fast you're spending budget each hour. It's the single most useful metric for pacing.
 
+:::formula-ladder{id="budget-pacing-burn-rate-ladder" title="Read the burn rate before changing the budget"}
+{"steps":[{"label":"Total daily budget","expression":"Daily budget = ₱2,000"},{"label":"Spend by the current hour","expression":"₱1,400 spent by 3 PM (15 hours since reset)"},{"label":"Hourly burn rate","expression":"₱1,400 ÷ 15 ≈ ₱93 per hour","explanation":"Burn rate is the simple diagnostic. Compare it with the rate the day would need to stay under budget."},{"label":"Projected end-of-day spend","expression":"₱93 × 24 = ₱2,232","explanation":"At this pace the campaign will exceed the ₱2,000 budget. The over-delivery cap (25% or 100%) decides whether Amazon allows it."},{"label":"Decision boundary","expression":"₱2,000 × 1.25 = ₱2,500 monthly-average ceiling","explanation":"Daily overspend is allowed up to the cap because Amazon averages over the calendar month. Confirm the account setting before acting."}],"result":{"label":"Pacing call","value":"Hold, raise, or trim only after you know the cause","context":"A burn-rate spike is a signal, not a verdict. Check search terms and bids before changing the daily budget."},"note":"A burn-rate reading is one number on one day. Pair it with the search-term report before you change anything."}
+:::
+
 ### The Formula
 
 ```
@@ -234,6 +238,18 @@ For the phone-case campaign, a usable rationale is: "The campaign hits 80% of it
 Use this when a client asks why their ads seem to "turn off" partway through the day:
 
 > "Your campaign is hitting its daily spend limit around 2PM, that's Amazon pausing the ads once the day's budget cap is reached, not a technical problem. We're raising the daily budget so it stays live through the evening instead of stopping early."
+
+:::callout{id="lesson-5-2-pitfall" variant="pitfall" title="Doubling the budget without checking the cause"}
+Raising the daily budget on a campaign that hits its cap at 1 PM treats the symptom and ignores why the cap was hit. Often the budget is fine and a few keywords are eating the day.
+:::
+
+<SelfCheck
+  id="sc-5-2"
+  prompt="A campaign hits its daily budget at 1 PM. What is the safe first move?"
+  options={["Check the burn rate, search terms, and the day mix before any change.", "Double the daily budget so the campaign never hits the cap again.", "Pause the campaign until next week and review the report.", "Switch the bid strategy to dynamic bids up and down."]}
+  answerIndex={0}
+  explanation="Hitting budget mid-day is a signal, not a verdict. Read the burn rate and search mix before raising the budget, pooling portfolios, or trimming terms."
+/>
 
 ## Quick check
 
