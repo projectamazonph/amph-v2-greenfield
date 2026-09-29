@@ -14,7 +14,7 @@
  * the reader path; this one exercises the validator path.
  */
 import { execFile } from "node:child_process";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
 
@@ -25,7 +25,9 @@ const execFileAsync = promisify(execFile);
 // `.bin/tsx` shim is a batch file, not a native executable). Anchor
 // the binary at the project root, computed from this file's location.
 const REPO_ROOT = join(__dirname, "..", "..", "..");
-const TSX_BIN = join(REPO_ROOT, "node_modules", ".bin", "tsx.cmd");
+// On Windows the bin shim is `tsx.cmd`; on POSIX runners (CI) it's `tsx`.
+// Detect via the path separator so the test passes in both environments.
+const TSX_BIN = join(REPO_ROOT, "node_modules", ".bin", sep === "\\" ? "tsx.cmd" : "tsx");
 
 interface ValidatorResult {
   stdout: string;
