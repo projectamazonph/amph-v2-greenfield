@@ -271,6 +271,18 @@ Use this when a client asks why you're blocking search terms instead of just low
 
 > "This search term is unrelated to what you sell, so no bid would make it profitable. I've added it as a negative, which stops the wasted clicks entirely rather than just making them cheaper."
 
+:::callout{id="lesson-2-3-pitfall" variant="pitfall" title="Negating a term that has not earned the call yet"}
+Adding a search term as negative after only a handful of clicks locks in a verdict the data does not support. Wait for the click threshold to clear before negating, unless the relevance is clearly wrong.
+:::
+
+<SelfCheck
+  id="sc-2-3"
+  prompt="A search term has 4 clicks, 0 orders, and the product is a yoga mat. What is the safest first move?"
+  options={["Keep it under review until the click threshold is met or relevance is clearly wrong.", "Add it as a negative exact now to stop the small spend.", "Add it as a negative phrase to cover similar searches.", "Move it to exact match and increase the bid to learn more."]}
+  answerIndex={0}
+  explanation="Four clicks is below the lesson's threshold for a confident negative call, and the relevance is not clearly wrong yet. Keep watching until the threshold clears."
+/>
+
 ## Quick check
 
 1. In the before-and-after example, what did ACoS drop from and to after adding negatives?
