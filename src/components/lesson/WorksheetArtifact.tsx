@@ -18,7 +18,6 @@
  */
 
 import { useState, type FocusEvent, type ReactElement } from "react";
-import styles from "./WorksheetArtifact.module.css";
 
 export type WorksheetFieldDescriptor = Readonly<{
   key: string;
@@ -89,33 +88,31 @@ export function WorksheetArtifact(props: WorksheetArtifactProps): ReactElement {
       data-amph-lesson={lessonSlug}
       data-amph-part={partNumber}
       aria-label={title}
-      className={styles.worksheet}
       onBlur={(event: FocusEvent<HTMLFormElement>) => {
-        // Only fire save when focus actually leaves the form (not when
-        // it moves between two inputs inside the same form).
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
           void save();
         }
       }}
     >
-      <h3 className={styles.title}>{title}</h3>
-      <p className={styles.partLabel}>Part {partNumber} of your Profitability and Max-CPC Sheet</p>
-      <div className={styles.fields}>
+      <h3>{title}</h3>
+      <p>Part {partNumber} of your Profitability and Max-CPC Sheet</p>
+      <div>
         {fields.map((f) => (
-          <label key={f.key} className={styles.field}>
-            <span className={styles.label}>{f.label}</span>
+          <label key={f.key} style={{ display: "block" }}>
+            <span style={{ display: "block" }}>{f.label}</span>
             <input
               type="text"
-              className={styles.input}
               value={values[f.key] ?? ""}
               placeholder={f.placeholder}
               onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
             />
-            {f.hint !== undefined && f.hint !== "" && <span className={styles.hint}>{f.hint}</span>}
+            {f.hint !== undefined && f.hint !== "" && (
+              <span style={{ display: "block", fontSize: "0.85em" }}>{f.hint}</span>
+            )}
           </label>
         ))}
       </div>
-      <p className={styles.status} aria-live="polite" role="status">
+      <p aria-live="polite" role="status">
         {renderStatus(saveState, props.labels)}
       </p>
     </form>
