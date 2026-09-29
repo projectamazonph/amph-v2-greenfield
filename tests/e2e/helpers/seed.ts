@@ -335,6 +335,148 @@ export async function clearE2ESeedData(databaseUrl: string): Promise<void> {
   }
 }
 
+/**
+ * Seed a STUDENT user with an ACTIVE Enrollment on the foundations
+ * course (slug: "foundations"), directly via Prisma. Returns the
+ * user's id and email so the spec can authenticate as them via
+ * session cookie. STORY-163 worksheet e2e depends on this; the
+ * existing helper surface already returns null when DATABASE_URL
+ * is empty, which lets the gated spec stay gated until the env is
+ * wired.
+ *
+ * Idempotent on (email): re-running upserts the user and reuses
+ * the existing Enrollment if the (userId, courseId) pair is
+ * already present. clearE2EUsers() (called from afterEach) wipes
+ * the user row by email-pattern so the cleanup story stays simple.
+ *
+ * Why a new helper instead of piggybacking on
+ * seedAdminAccessScenario: that helper creates a course with a
+ * timestamped slug, which doesn't match the lesson URL the spec
+ * visits (`/courses/foundations/lessons/1.1-...`). The worksheet
+ * e2e needs the real foundations course so the lesson page
+ * exists in production.
+ */
+export async function seedStudentAndEnrollment(
+  databaseUrl: string,
+  overrides: { email?: string; password?: string; courseSlug?: string } = {},
+): Promise<{
+  studentId: string;
+  email: string;
+  password: string;
+  courseSlug: string;
+} | null> {
+  const email = overrides.email ?? `e2e-student-${Date.now()}@example.com`;
+  const password = overrides.password ?? "StudentStr0ngP@ss!";
+  const courseSlug = overrides.courseSlug ?? "foundations";
+  const conn = await connectForSeed(databaseUrl, "seedStudentAndEnrollment");
+  if (!conn) return null;
+  try {
+    const { createRequire } = await import("node:module");
+    const require = createRequire(import.meta.url);
+    const argon2 = require("argon2") as typeof import("argon2");
+    const passwordHash = await argon2.hash(password, {
+      type: argon2.argon2id,
+      memoryCost: 65_536,
+      timeCost: 3,
+      parallelism: 1,
+    });
+    const student = await conn.prisma.user.upsert({
+      where: { email },
+      create: {
+        id: `e2e-student-${Date.now()}`,
+        email,
+        password: passwordHash,
+        firstName: "E2E",
+        lastName: `Student${Date.now()}`,
+        role: "STUDENT",
+        verificationStatus: "VERIFIED",
+        // Skip the welcome stepper so the lesson page is reachable
+        // directly. Without this, the spec gets bounced from the
+        // lesson page to /welcome by STORY-146.
+        welcomeCompletedAt: new Date(),
+      },
+      update: {
+        password: passwordHash,
+        verificationStatus: "VERIFIED",
+        welcomeCompletedAt: new Date(),
+      },
+    });
+    const course = await conn.prisma.course.findUnique({
+      where: { slug: courseSlug },
+    });
+    if (!course) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[seedStudentAndEnrollment] course slug "${courseSlug}" not found; run \`pnpm import:content\` first`,
+      );
+      return null;
+    }
+    await conn.prisma.enrollment.upsert({
+      where: {
+        userId_courseId: {
+          userId: student.id,
+          courseId: course.id,
+        },
+      },
+      create: {
+        userId: student.id,
+        courseId: course.id,
+        status: "active",
+      },
+      update: {
+        status: "active",
+      },
+    });
+    return { studentId: student.id, email, password, courseSlug };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("[seedStudentAndEnrollment] failed (non-fatal):", err);
+    return null;
+  } finally {
+    await disconnect(conn);
+  }
+}
+
+/** Clean up only the worksheet rows for a given student. Best-effort. */
+export async function clearWorksheetEntries(databaseUrl: string, studentId: string): Promise<void> {
+  if (!databaseUrl) return;
+  process.env.DATABASE_URL = databaseUrl;
+  let prisma: import("@prisma/client").PrismaClient | undefined;
+  let pool: import("pg").Pool | undefined;
+  try {
+    const { PrismaClient } = await import("@prisma/client");
+    const { PrismaPg } = await import("@prisma/adapter-pg");
+    const { Pool } = await import("pg");
+    pool = new Pool({
+      connectionString: databaseUrl,
+      connectionTimeoutMillis: 5000,
+      query_timeout: 5000,
+      statement_timeout: 5000,
+    });
+    const adapter = new PrismaPg(pool);
+    prisma = new PrismaClient({ adapter });
+    await prisma.worksheetEntry.deleteMany({ where: { studentId } });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("[clearWorksheetEntries] cleanup failed (non-fatal):", err);
+  } finally {
+    if (prisma) {
+      try {
+        await prisma.$disconnect();
+      } catch {
+        // ignore
+      }
+    }
+    if (pool) {
+      try {
+        await pool.end();
+      } catch {
+        // ignore
+      }
+    }
+  }
+}
+
 export async function clearE2EUsers(databaseUrl: string): Promise<void> {
   if (!databaseUrl) {
     // eslint-disable-next-line no-console
