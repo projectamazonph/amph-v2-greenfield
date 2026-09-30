@@ -80,3 +80,18 @@
   outline: 2px solid var(--c-orange);
   outline-offset: 2px;
 }
+
+.twoFactorBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  background: var(--c-success-soft);
+  color: var(--c-success);
+  font-family: var(--font-disp);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
