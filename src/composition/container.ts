@@ -364,6 +364,10 @@ import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent"
 import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
 import { MarkLiveClassRecordingWatched } from "@/usecases/MarkLiveClassRecordingWatched";
+// ADR-026: SimGrid iframe progress sync
+import { RecordSimgridProgress } from "@/usecases/simgrid/RecordSimgridProgress";
+import { ListSimgridProgressForUser } from "@/usecases/simgrid/ListSimgridProgressForUser";
+import { GetBestSimgridScore } from "@/usecases/simgrid/GetBestSimgridScore";
 import { CreateResource } from "@/usecases/CreateResource";
 import { UpdateResource } from "@/usecases/UpdateResource";
 import { DeleteResource } from "@/usecases/DeleteResource";
@@ -440,6 +444,9 @@ export interface AppContainer {
   liveClassRegistrationRepo: ILiveClassRegistrationRepository;
   // ADR-026: SimGrid iframe progress sync
   simgridAttemptRepo: ISimgridAttemptRepository;
+  recordSimgridProgress: RecordSimgridProgress;
+  listSimgridProgressForUser: ListSimgridProgressForUser;
+  getBestSimgridScore: GetBestSimgridScore;
   // STORY-098: download center resources
   resourceRepo: IResourceRepository;
   // STORY-098.5: download center file upload/management
@@ -1347,6 +1354,13 @@ function buildProductionContainer(): AppContainer {
     listScenarioVersions: new ListScenarioVersions({ scenarioRepo }),
     // ADR-026: SimGrid iframe progress sync
     simgridAttemptRepo,
+    recordSimgridProgress: new RecordSimgridProgress({
+      simgridAttemptRepo,
+      idGen,
+      clock,
+    }),
+    listSimgridProgressForUser: new ListSimgridProgressForUser({ simgridAttemptRepo }),
+    getBestSimgridScore: new GetBestSimgridScore({ simgridAttemptRepo }),
     // STORY-050c
     liveClassRegistrationRepo,
     liveClassRepo,

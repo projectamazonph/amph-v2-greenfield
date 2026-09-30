@@ -277,6 +277,9 @@ import { MarkLiveClassRecordingWatched } from "@/usecases/MarkLiveClassRecording
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
 // ADR-026: SimGrid iframe progress sync
 import { InMemorySimgridAttemptRepository } from "@/infra/repositories/__tests__/InMemorySimgridAttemptRepository";
+import { RecordSimgridProgress } from "@/usecases/simgrid/RecordSimgridProgress";
+import { ListSimgridProgressForUser } from "@/usecases/simgrid/ListSimgridProgressForUser";
+import { GetBestSimgridScore } from "@/usecases/simgrid/GetBestSimgridScore";
 import { InMemoryResourceRepository } from "@/infra/repositories/InMemoryResourceRepository";
 import { CreateResource } from "@/usecases/CreateResource";
 import { UpdateResource } from "@/usecases/UpdateResource";
@@ -960,6 +963,13 @@ export function buildTestContainer(): TestContainer {
     liveClassRegistrationRepo,
     // ADR-026: SimGrid iframe progress sync
     simgridAttemptRepo,
+    recordSimgridProgress: new RecordSimgridProgress({
+      simgridAttemptRepo,
+      idGen,
+      clock,
+    }),
+    listSimgridProgressForUser: new ListSimgridProgressForUser({ simgridAttemptRepo }),
+    getBestSimgridScore: new GetBestSimgridScore({ simgridAttemptRepo }),
     pricingTierRepo,
     keywordDatasetRepo,
     sentReminderRepo,
