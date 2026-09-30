@@ -275,6 +275,8 @@ import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
 import { MarkLiveClassRecordingWatched } from "@/usecases/MarkLiveClassRecordingWatched";
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
+// ADR-026: SimGrid iframe progress sync
+import { InMemorySimgridAttemptRepository } from "@/infra/repositories/__tests__/InMemorySimgridAttemptRepository";
 import { InMemoryResourceRepository } from "@/infra/repositories/InMemoryResourceRepository";
 import { CreateResource } from "@/usecases/CreateResource";
 import { UpdateResource } from "@/usecases/UpdateResource";
@@ -368,6 +370,8 @@ export interface TestContainer extends AppContainer {
   feedbackRepo: InMemoryAttemptFeedbackRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   liveClassRegistrationRepo: InMemoryLiveClassRegistrationRepository;
+  // ADR-026: SimGrid iframe progress sync
+  simgridAttemptRepo: InMemorySimgridAttemptRepository;
   resourceRepo: InMemoryResourceRepository;
   fileStorage: InMemoryFileStorage;
   pricingTierRepo: InMemoryPricingTierRepository;
@@ -502,6 +506,8 @@ export function buildTestContainer(): TestContainer {
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
   const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
+  // ADR-026: SimGrid iframe progress sync
+  const simgridAttemptRepo = new InMemorySimgridAttemptRepository();
   // STORY-098: download center resources
   const resourceRepo = new InMemoryResourceRepository();
   const fileStorage = new InMemoryFileStorage();
@@ -952,6 +958,8 @@ export function buildTestContainer(): TestContainer {
     // STORY-050c
     liveClassRepo,
     liveClassRegistrationRepo,
+    // ADR-026: SimGrid iframe progress sync
+    simgridAttemptRepo,
     pricingTierRepo,
     keywordDatasetRepo,
     sentReminderRepo,

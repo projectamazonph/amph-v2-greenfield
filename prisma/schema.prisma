@@ -870,6 +870,25 @@ model SimulatorAttempt {
   @@map("simulator_attempts")
 }
 
+// ── STORY: SimGrid iframe progress sync ─────────────────────────────────
+model SimgridAttempt {
+  id              String   @id
+  userId          String
+  simulatorId     String
+  score           Int
+  passed          Boolean
+  completedAt     DateTime
+  scenarioVersion String
+  rubricVersion   String
+  scenarioId      String?
+  policyVersion   String?
+
+  @@index([userId])
+  @@index([userId, simulatorId])
+  @@index([simulatorId])
+  @@map("simgrid_attempts")
+}
+
 model SimulatorDecision {
   id           String           @id
   attemptId    String

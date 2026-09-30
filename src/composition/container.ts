@@ -69,6 +69,8 @@ import type { ISimulatorScenarioCalibrationRepository } from "@/ports/repositori
 import type { IAttemptFeedbackRepository } from "@/ports/repositories/IAttemptFeedbackRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiveClassRegistrationRepository";
+// ADR-026: SimGrid iframe progress sync
+import type { ISimgridAttemptRepository } from "@/ports/simgrid/ISimgridAttemptRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 import type { KeywordDatasetRepository } from "@/ports/repositories/KeywordDatasetRepository";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
@@ -104,6 +106,8 @@ import { PrismaSimulatorScenarioCalibrationRepository } from "@/infra/repositori
 import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAttemptFeedbackRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { PrismaLiveClassRegistrationRepository } from "@/infra/repositories/PrismaLiveClassRegistrationRepository";
+// ADR-026: SimGrid iframe progress sync
+import { PrismaSimgridAttemptRepository } from "@/infra/repositories/PrismaSimgridAttemptRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { PrismaUserStreakRepository } from "@/infra/repositories/PrismaUserStreakRepository";
@@ -434,6 +438,8 @@ export interface AppContainer {
   liveClassRepo: ILiveClassRepository;
   // STORY-091: live class RSVP for students
   liveClassRegistrationRepo: ILiveClassRegistrationRepository;
+  // ADR-026: SimGrid iframe progress sync
+  simgridAttemptRepo: ISimgridAttemptRepository;
   // STORY-098: download center resources
   resourceRepo: IResourceRepository;
   // STORY-098.5: download center file upload/management
@@ -782,6 +788,8 @@ function buildProductionContainer(): AppContainer {
   // adapter wins the merge since it also maps `watchedRecordingAt`.
   const liveClassRegistrationRepo: ILiveClassRegistrationRepository =
     new PrismaLiveClassRegistrationRepository(prisma);
+  // ADR-026: SimGrid iframe progress sync
+  const simgridAttemptRepo: ISimgridAttemptRepository = new PrismaSimgridAttemptRepository(prisma);
   // STORY-098: download center resources
   const resourceRepo: IResourceRepository = new PrismaResourceRepository(prisma);
   // STORY-098.5: Vercel Blob when a store is provisioned (BLOB_READ_WRITE_TOKEN set),
@@ -1337,6 +1345,8 @@ function buildProductionContainer(): AppContainer {
       clock,
     }),
     listScenarioVersions: new ListScenarioVersions({ scenarioRepo }),
+    // ADR-026: SimGrid iframe progress sync
+    simgridAttemptRepo,
     // STORY-050c
     liveClassRegistrationRepo,
     liveClassRepo,
