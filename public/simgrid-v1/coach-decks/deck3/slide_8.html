@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+.layout{display:grid;grid-template-columns:450px 1fr;gap:40px;margin-top:30px}
+
+/* Left Column: Steps */
+.step-list{display:flex;flex-direction:column;gap:16px}
+.step-list-title{font-size:22px;font-weight:700;color:#131921;margin-bottom:8px}
+.step-item{background:#fff;border:1px solid #d7dce2;border-left:6px solid #131921;padding-top:16px;padding-left:20px;padding-right:20px;padding-bottom:16px}
+.step-item.highlight{border-left-color:#ff9900;background:#fff8f0}
+.step-header{display:flex;align-items:center;margin-bottom:8px}
+.step-num{font-size:16px;font-weight:700;color:#ff9900;margin-right:12px;text-transform:uppercase;letter-spacing:1px}
+.step-item.highlight .step-num{color:#131921}
+.step-desc{font-size:18px;color:#131921;line-height:1.4;margin:0;font-weight:700}
+
+/* Right Column: Table & Tip */
+.right-col{display:flex;flex-direction:column;gap:24px}
+.table-wrap{background:#fff;border:1px solid #d7dce2;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px}
+.table-title{font-size:22px;font-weight:700;color:#131921;margin-top:0;margin-bottom:16px}
+.table{width:100%;border-collapse:collapse;font-size:18px;text-align:left}
+.table th{background:#131921;color:#fff;padding-top:12px;padding-left:14px;padding-right:14px;padding-bottom:12px}
+.table td{padding-top:14px;padding-left:14px;padding-right:14px;padding-bottom:14px;border-bottom:1px solid #d7dce2;color:#4b5563}
+.table td strong{color:#131921}
+.table tr:nth-child(even) td{background:#f1f3f5}
+
+.callout{background:#fff8f0;border-left:4px solid #ff9900;color:#8a5300;padding-top:18px;padding-left:18px;padding-right:18px;padding-bottom:18px;font-size:18px;line-height:1.4}
+.callout strong{color:#131921}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 8 · Lesson 8.1</div>
+  <div class="title">Reading the Search Term Report</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="step-list">
+      <div class="step-list-title">The 4-Step Reading Method</div>
+      <div class="step-item">
+        <div class="step-header">
+          <span class="step-num">Step 01</span>
+        </div>
+        <p class="step-desc">Download the report for the last 7–14 days</p>
+      </div>
+      <div class="step-item highlight">
+        <div class="step-header">
+          <span class="step-num">Step 02</span>
+        </div>
+        <p class="step-desc">Sort by spend, highest first</p>
+      </div>
+      <div class="step-item">
+        <div class="step-header">
+          <span class="step-num">Step 03</span>
+        </div>
+        <p class="step-desc">Read clicks, sales and ACOS per term</p>
+      </div>
+      <div class="step-item">
+        <div class="step-header">
+          <span class="step-num">Step 04</span>
+        </div>
+        <p class="step-desc">Mark each term: winner, waster or maybe</p>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="table-wrap">
+        <h2 class="table-title">Column Dictionary</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Question it answers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Search term</strong></td>
+              <td>What did the shopper type?</td>
+            </tr>
+            <tr>
+              <td><strong>Clicks</strong></td>
+              <td>How much attention did it buy?</td>
+            </tr>
+            <tr>
+              <td><strong>Spend</strong></td>
+              <td>What did it cost?</td>
+            </tr>
+            <tr>
+              <td><strong>Sales</strong></td>
+              <td>What came back?</td>
+            </tr>
+            <tr>
+              <td><strong>ACOS</strong></td>
+              <td>Was the trade worth it?</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="callout">
+        <strong>Coach tip:</strong> Start at the top of the spend column. That is where your money is deciding.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Search Terms & Negatives · 8.1 Reading the Search Term Report</div>
+  <div class="page">08 / 11</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,647 @@
+/* ============================================================
+   PROJECT AMAZON PH ACADEMY — RESPONSIVE LAYER (v1)
+   Loaded AFTER skin.css on every page (auto-injected by shell.js).
+   Provides:
+     - Mobile-first layout adjustments
+     - Hamburger nav (replaces horizontal-scroll nav below 720px)
+     - Fluid typography (via --fs-h1/h2/h3/body tokens)
+     - Touch-target enforcement (44px min on interactive elements)
+     - .stack-mobile utility (force 1-col at <768px)
+     - .table-scroll utility (horizontal scroll for dense data)
+     - .overflow-break utility (break long words)
+     - .truncate utility (ellipsis on overflow)
+     - prefers-reduced-motion respect
+   All rules are scoped to body.pha-skin OR body[data-pha-tool] so
+   the hub page (which opts out of pha-skin) is also covered.
+   ============================================================ */
+
+/* ---------- global: image + media safety ---------- */
+body.pha-skin img,
+body.pha-skin svg,
+body.pha-skin video,
+body.pha-skin iframe,
+body.pha-skin embed,
+body.pha-skin object,
+body[data-pha-tool] img,
+body[data-pha-tool] svg,
+body[data-pha-tool] video,
+body[data-pha-tool] iframe,
+body[data-pha-tool] embed,
+body[data-pha-tool] object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* prevent horizontal page scroll from overflowing children */
+body.pha-skin,
+body[data-pha-tool] {
+  overflow-x: hidden;
+}
+
+/* ---------- overflow protection utilities ---------- */
+/* Break long words that would overflow container */
+body.pha-skin .overflow-break,
+body[data-pha-tool] .overflow-break {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Truncate text with ellipsis (single line) */
+body.pha-skin .truncate,
+body[data-pha-tool] .truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Truncate text with ellipsis (multi-line) */
+body.pha-skin .line-clamp-2,
+body[data-pha-tool] .line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+body.pha-skin .line-clamp-3,
+body[data-pha-tool] .line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Card overflow protection */
+body.pha-skin .card,
+body[data-pha-tool] .card,
+body.pha-skin [class*="card"],
+body[data-pha-tool] [class*="card"] {
+  overflow: hidden;
+}
+
+/* Button overflow protection */
+body.pha-skin button,
+body.pha-skin .btn,
+body[data-pha-tool] button,
+body[data-pha-tool] .btn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- fluid body type ---------- */
+body.pha-skin,
+body[data-pha-tool] {
+  font-size: var(--fs-body);
+}
+
+body.pha-skin h1,
+body[data-pha-tool] h1 {
+  font-size: var(--fs-h1);
+  line-height: 1.1;
+  margin-block: 0.4em;
+}
+body.pha-skin h2,
+body[data-pha-tool] h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.2;
+  margin-block: 0.5em;
+}
+body.pha-skin h3,
+body[data-pha-tool] h3 {
+  font-size: var(--fs-h3);
+  line-height: 1.3;
+  margin-block: 0.6em;
+}
+
+/* ---------- hamburger button (mobile only) ---------- */
+.pha-burger {
+  display: none;
+  appearance: none;
+  background: var(--shell-bg-soft);
+  border: 1px solid var(--shell-line);
+  color: var(--shell-ink);
+  width: 48px;            /* PR #5: bumped from 44px (--tap) to 48px — Apple HIG recommended */
+  height: 48px;
+  border-radius: var(--shell-radius);
+  cursor: pointer;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  transition: border-color var(--d-fast) var(--ease),
+              background var(--d-fast) var(--ease),
+              transform var(--d-fast) var(--ease);
+}
+.pha-burger:hover,
+.pha-burger:focus-visible {
+  border-color: var(--shell-orange);
+  background: rgba(255, 153, 0, 0.08);
+  outline: 2px solid var(--shell-orange);
+  outline-offset: 2px;
+}
+.pha-burger:active { transform: scale(0.96); }   /* PR #5: tactile press feedback */
+.pha-burger svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--d-fast) var(--ease),
+              opacity var(--d-fast) var(--ease);
+}
+/* PR #5: smooth crossfade between bars and X — instead of display:none/block */
+.pha-burger .x { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+.pha-burger .bars { opacity: 1; transform: rotate(0deg) scale(1); }
+.pha-burger[aria-expanded="true"] .bars { opacity: 0; transform: rotate(90deg) scale(0.6); }
+.pha-burger[aria-expanded="true"] .x { opacity: 1; transform: rotate(0deg) scale(1); }
+/* keep the old display-based fallback as a no-JS safety net */
+.pha-burger .x { display: none; }
+.pha-burger[aria-expanded="true"] .bars { display: none; }
+.pha-burger[aria-expanded="true"] .x { display: block; }
+
+.pha-nav-scrim { display: none; }
+
+/* ---------- touch-target enforcement (44px) ----------
+   Applied to standard interactive elements. NOT applied to dense
+   simulator table cells (.dp-cell) to keep simulator tables usable
+   on small screens. */
+body.pha-skin button:not(.btn-sm):not(.dp-cell):not(.dp-grid *),
+body.pha-skin .btn:not(.btn-sm),
+body.pha-skin a.pha-tcard,
+body.pha-skin input[type="button"],
+body.pha-skin input[type="submit"],
+body.pha-skin input[type="reset"],
+body[data-pha-tool] button:not(.btn-sm):not(.dp-cell):not(.dp-grid *),
+body[data-pha-tool] .btn:not(.btn-sm),
+body[data-pha-tool] input[type="button"],
+body[data-pha-tool] input[type="submit"],
+body[data-pha-tool] input[type="reset"] {
+  min-height: var(--tap);
+}
+
+body.pha-skin input[type="text"],
+body.pha-skin input[type="search"],
+body.pha-skin input[type="number"],
+body.pha-skin input[type="email"],
+body.pha-skin input[type="url"],
+body.pha-skin input[type="password"],
+body.pha-skin select,
+body.pha-skin textarea,
+body[data-pha-tool] input[type="text"],
+body[data-pha-tool] input[type="search"],
+body[data-pha-tool] input[type="number"],
+body[data-pha-tool] input[type="email"],
+body[data-pha-tool] input[type="url"],
+body[data-pha-tool] input[type="password"],
+body[data-pha-tool] select,
+body[data-pha-tool] textarea {
+  min-height: var(--tap);
+  font-size: 16px; /* prevent iOS zoom on focus */
+}
+
+/* WCAG 2.5.8 minimum target size: checkboxes, radios and native range
+   sliders must expose at least a 24x24px hit area. */
+body.pha-skin input[type="checkbox"],
+body.pha-skin input[type="radio"],
+body[data-pha-tool] input[type="checkbox"],
+body[data-pha-tool] input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  min-width: 24px;
+  min-height: 24px;
+}
+body.pha-skin input[type="range"],
+body[data-pha-tool] input[type="range"] {
+  min-height: 24px;
+  min-width: 44px;
+}
+
+/* ---------- utility: .stack-mobile ----------
+   Wrap any block to force 1-col layout at <768px regardless of
+   its native grid/flex template. */
+.stack-mobile > * { min-width: 0; }
+@media (max-width: 767.98px) {
+  .stack-mobile {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+  .stack-mobile > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* ---------- utility: .table-scroll ----------
+   Wrap any wide table to get horizontal scroll on mobile instead
+   of overflowing the page. */
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--r-md);
+}
+.table-scroll > table,
+.table-scroll table {
+  min-width: 480px;
+  width: 100%;
+}
+.table-scroll-wrap {
+  position: relative;
+}
+.table-scroll-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 8px;
+  width: 24px;
+  background: linear-gradient(90deg, transparent, rgba(247,248,250,0.95));
+  pointer-events: none;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  opacity: 0;
+  transition: opacity var(--d-fast) var(--ease);
+}
+@media (max-width: 767.98px) {
+  .table-scroll-wrap.has-overflow::after { opacity: 1; }
+}
+
+/* ============================================================
+   BREAKPOINT: SMALL PHONES (< 480px)
+   ============================================================ */
+@media (max-width: 479.98px) {
+  .pha-skin-wrap {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* ============================================================
+   BREAKPOINT: MOBILE (< 768px) — primary responsive layer
+   ============================================================ */
+@media (max-width: 767.98px) {
+
+  .pha-topbar {
+    height: 72px;
+    min-height: 72px;
+    padding: 8px 14px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    position: sticky;
+  }
+  .pha-topbar .pha-status { display: none; }
+  .pha-topbar .pha-divider { display: none; }
+  .pha-topbar .pha-tool-name { display: none; }
+
+  .pha-burger {
+    display: inline-flex;
+    order: 4;
+    margin-left: auto;
+    width: 48px;
+    height: 48px;
+  }
+
+  .pha-topbar .pha-nav {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 12px;
+    right: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    width: auto;
+    margin: 0;
+    padding: 8px;
+    background: var(--shell-navy-2);
+    border: 1px solid var(--shell-line);
+    border-radius: var(--shell-radius);
+    max-height: min(72vh, 560px);
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-height var(--d-fast) var(--ease),   /* PR #5: was --d-base, now --d-fast */
+                opacity var(--d-fast) var(--ease),
+                padding var(--d-fast) var(--ease);
+  }
+  .pha-topbar .pha-nav.is-open {
+    display: flex;
+    max-height: min(72vh, 560px);
+    opacity: 1;
+    pointer-events: auto;
+    padding: 8px;
+  }
+  .pha-topbar .pha-nav a {
+    height: var(--tap);
+    padding: 0 12px;
+    font-size: 14px;
+    justify-content: flex-start;
+    border-left: 3px solid transparent;   /* PR #5: reserve space for active accent */
+    border-radius: 0 var(--shell-radius) var(--shell-radius) 0;
+  }
+  .pha-topbar .pha-nav a.is-current {   /* PR #5: active tool accent on mobile drawer */
+    border-left-color: var(--shell-orange);
+    background: rgba(255, 153, 0, 0.08);
+  }
+
+  .pha-nav-scrim.is-on {
+    display: block;
+    position: fixed;
+    inset: 0;
+    top: 72px;
+    background: rgba(15, 20, 25, 0.5);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 8999;
+    cursor: pointer;
+  }
+
+  .pha-topbar .pha-back { display: none; }
+
+  .pha-skin-wrap {
+    padding: 16px 14px 80px !important;
+  }
+  main.pha-skin-wrap {
+    padding-top: 16px !important;
+  }
+
+  /* PR #5: body scroll lock while drawer is open (mobile only) */
+  body.pha-skin.pha-burger-active,
+  body[data-pha-tool].pha-burger-active {
+    overflow: hidden;
+  }
+
+  .pha-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 20px 14px;
+    padding: 24px 18px 20px;
+    font-size: 12px;
+  }
+  .pha-footer .pha-foot-brand { grid-column: 1 / -1; }
+  .pha-footer .pha-foot-links {
+    display: grid;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .pha-footer .pha-foot-links::before,
+  .pha-footer .pha-foot-links.tools::before { content: attr(data-label); color: var(--shell-orange); font: 700 10px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 2px; }
+  .pha-footer .pha-foot-links a {
+    min-height: var(--tap);
+    display: inline-flex;
+    align-items: center;
+  }
+  .pha-footer .pha-foot-discovery {
+    gap: 14px;
+  }
+  .pha-footer .pha-foot-discovery a {
+    min-height: var(--tap);
+    display: inline-flex;
+    align-items: center;
+  }
+  .pha-footer .pha-foot-meta {
+    grid-column: 1 / -1;
+    margin-left: 0;
+    width: 100%;
+    padding-top: 14px;
+    border-top: 1px solid var(--shell-line);
+    font-size: 11px;
+  }
+
+  /* hub */
+  .pha-hero {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+  .pha-hero-main { padding: 24px 22px; }
+  .pha-hero-side { padding: 20px 22px; }
+  .pha-hero-meta {
+    flex-wrap: wrap;
+    gap: 16px 20px;
+  }
+  .pha-hero-stat {
+    flex: 1 1 calc(50% - 20px);
+    min-width: 120px;
+  }
+  .pha-tools {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  .pha-principles {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+  .pha-sec-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .pha-ribbon {
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 11px;
+  }
+  .pha-ribbon .pipe { display: none; }
+
+  /* simulator back-to-hub links reach the 44px touch target */
+  .sim-page a[href="index.html"],
+  .bd-back,
+  .ds-back {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+
+  /* legacy page shells: keep native rails and content inside the mobile viewport */
+  body.pha-skin .shell {
+    grid-template-columns: 1fr !important;
+    min-width: 0 !important;
+  }
+  body.pha-skin .shell > .side {
+    position: static !important;
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    box-sizing: border-box !important;
+  }
+  body.pha-skin .shell > .side .navbtn {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    white-space: nowrap !important;
+  }
+  body.pha-skin .shell > main {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  body.pha-skin .side-foot { display: none !important; }
+
+  /* Keyword Lab: allow grid children to shrink around scrollable tables. */
+  body.pha-skin .grid2 > *,
+  body.pha-skin .grid3 > *,
+  body.pha-skin .grid4 > *,
+  body.pha-skin .calc-grid > *,
+  body.pha-skin .gloss-grid > *,
+  body.pha-skin .tier-grid > *,
+  body.pha-skin .card {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  body.pha-skin .card {
+    box-sizing: border-box !important;
+  }
+
+  /* Campaign Architect: skin padding must stay inside the native layout. */
+  body.pha-skin .ca-header,
+  body.pha-skin .ca-layout,
+  body.pha-skin .ca-layout > *,
+  body.pha-skin .ca-canvas,
+  body.pha-skin .ca-palette,
+  body.pha-skin .ca-inspector,
+  body.pha-skin .ca-campaign {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Pacing Deck: the unified chip styling otherwise defeats the native hide rule. */
+  body.pha-skin .suite {
+    max-width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    overflow-x: auto;
+  }
+  body.pha-skin .suite .chip:not(.on) { display: none !important; }
+
+  /* generic simulator surfaces */
+  pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-scroll,
+  .table-scroll-wrap {
+    margin-left: -14px;
+    margin-right: -14px;
+    width: calc(100% + 28px);
+    border-radius: 0;
+  }
+}
+
+/* ============================================================
+   BREAKPOINT: TABLET (768px - 1023.98px)
+   ============================================================ */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .pha-topbar {
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .pha-burger { display: none; }
+
+  .pha-topbar .pha-nav {
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 1px;
+  }
+  .pha-topbar .pha-nav a {
+    font-size: 11.5px;
+    padding: 0 9px;
+    height: var(--tap);
+  }
+
+  .pha-tools {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px;
+  }
+  .pha-principles {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px;
+  }
+  .pha-hero {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 18px;
+  }
+  .pha-hero-main { padding: 30px 32px; }
+
+  .pha-footer {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 24px;
+    padding: 26px 24px 20px;
+  }
+  .pha-footer .pha-foot-brand { grid-column: 1 / -1; }
+  .pha-footer .pha-foot-links a { min-height: 40px; }
+  .pha-skin-wrap {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+}
+
+/* ============================================================
+   BREAKPOINT: DESKTOP (>= 1024px)
+   ============================================================ */
+@media (min-width: 1024px) {
+  .pha-burger { display: none; }
+}
+
+/* ============================================================
+   ACCESSIBILITY: reduced motion (re-affirm on top of shell + skin)
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .pha-burger,
+  .pha-topbar .pha-nav,
+  .pha-nav-scrim,
+  .pha-burger svg,
+  .table-scroll-wrap::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   PRINT — hide chrome, simplify layout
+   ============================================================ */
+@media print {
+  .pha-topbar,
+  .pha-footer,
+  .pha-nav-scrim,
+  .pha-burger { display: none !important; }
+  body.pha-skin,
+  body[data-pha-tool] {
+    background: #fff !important;
+    color: #000 !important;
+    overflow: visible !important;
+  }
+  .pha-skin-wrap {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .table-scroll { overflow: visible !important; }
+}
+
+/* ============================================================
+   JS HOOKS — classes added by shell.js to coordinate state
+   ============================================================
+   .pha-has-burger       — topbar has the hamburger button injected
+   .pha-burger-active    — body class while drawer is open
+   .is-open              — applied to .pha-nav when expanded
+   .has-overflow         — applied to .table-scroll-wrap when JS
+                            detects inner content is wider than
+                            its container (hint gradient visible)
+
+   PR #5 additions:
+   .pha-burger-active is also used as a body scroll-lock hook
+   .pha-burger .x / .bars get opacity+transform crossfade
+   .pha-burger:active gets a tactile scale(0.96)
+   .pha-topbar .pha-nav a gets a 3px transparent left border reserved
+   .pha-topbar .pha-nav a.is-current gets an orange left accent
+*/

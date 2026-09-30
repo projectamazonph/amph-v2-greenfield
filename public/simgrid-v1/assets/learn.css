@@ -1,0 +1,35 @@
+/* Shared documentation and learning-page layout. */
+.learn-main {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.learn-main a:focus-visible,
+.learn-main button:focus-visible,
+.learn-main input:focus-visible,
+.learn-main select:focus-visible,
+.learn-main textarea:focus-visible {
+  outline: 2px solid var(--c-orange);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .learn-wrap {
+    padding-inline: var(--sp-4);
+  }
+
+  .learn-main a,
+  .learn-main button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learn-main *,
+  .learn-main *::before,
+  .learn-main *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

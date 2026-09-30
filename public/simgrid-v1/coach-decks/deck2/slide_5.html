@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:9px}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+/* Definitions Section */
+.def-layout{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:24px}
+.def-panel{background:#fff;border:1px solid #d7dce2;padding-top:24px;padding-left:24px;padding-right:24px;padding-bottom:24px}
+.def-panel.keyword{border-top:5px solid #131921}
+.def-panel.search-term{border-top:5px solid #ff9900}
+.def-title{font-size:24px;font-weight:700;margin-bottom:12px;color:#131921}
+.def-desc{font-size:20px;color:#4b5563;line-height:1.4}
+
+/* Table Section */
+.table-wrap{background:#fff;border:1px solid #d7dce2;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px;margin-top:24px}
+.table{width:100%;border-collapse:collapse;font-size:18px}
+.table th{background:#131921;color:#fff;text-align:left;padding-top:12px;padding-left:14px;padding-right:14px;padding-bottom:12px}
+.table td{padding-top:14px;padding-left:14px;padding-right:14px;padding-bottom:14px;border-bottom:1px solid #d7dce2;color:#131921}
+.table tr:nth-child(even) td{background:#f1f3f5}
+.highlight-risk{color:#de350b;font-weight:700}
+
+/* Callout Section */
+.callout{margin-top:24px;background:#eef8f3;border-left:4px solid #00875a;color:#145c43;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px;font-size:18px;line-height:1.4}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 4 · Lesson 4.1</div>
+  <div class="title">Keyword vs Search Term</div>
+  <div class="rule"></div>
+  
+  <div class="def-layout">
+    <div class="def-panel keyword">
+      <div class="def-title">Keyword</div>
+      <div class="def-desc">What <strong>you</strong> choose. It is a hypothesis about a shopper's intention.</div>
+    </div>
+    <div class="def-panel search-term">
+      <div class="def-title">Search Term</div>
+      <div class="def-desc">What the <strong>customer</strong> actually typed. It exposes reality.</div>
+    </div>
+  </div>
+  
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Words</th>
+          <th>Whose are they?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>bamboo cutting board</strong></td>
+          <td>Your keyword</td>
+        </tr>
+        <tr>
+          <td><strong>large bamboo cutting board</strong></td>
+          <td>Customer search term</td>
+        </tr>
+        <tr>
+          <td><strong>plastic cutting board</strong></td>
+          <td>Customer search term — <span class="highlight-risk">and your problem</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="callout">
+    <b>Coach tip:</b> Your keyword "bamboo cutting board" can trigger searches you never imagined. The search term report is the only place where truth lives. Read it weekly.
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Keywords & Match Types · 4.1 Keyword vs Search Term</div>
+  <div class="page">05 / 12</div>
+</div>
+</body>
+</html>

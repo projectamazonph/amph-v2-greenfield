@@ -1,0 +1,133 @@
+{
+  "project_info": {
+    "title": "Project Amazon PH Academy",
+    "created": 1787338765.39,
+    "last_updated": 1787338973.125,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_1",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_2",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_3",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_4",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_5",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_6",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_7",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_8",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_9",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_10",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "slide_11",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "Project Amazon PH Academy",
+      "summary": "Instructor Deck 2: Structure, Keywords & Listing Readiness",
+      "image_plan": "/home/ubuntu/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg - Cover slide matches the Project Amazon PH Academy platform interface shown in Image 1"
+    },
+    {
+      "id": "slide_1",
+      "title": "Control beats complexity",
+      "summary": "Modules 3–5 focus on intentional traffic, account structure, and conversion risk."
+    },
+    {
+      "id": "slide_2",
+      "title": "The PPC hierarchy prevents chaos",
+      "summary": "Definitions of campaign, ad group, targeting, and bid levels with an exercise."
+    },
+    {
+      "id": "slide_3",
+      "title": "Naming is an operating system",
+      "summary": "Best practices for campaign naming taxonomy to reduce time-to-decision."
+    },
+    {
+      "id": "slide_4",
+      "title": "Start with Sponsored Products",
+      "summary": "Comparison of Sponsored Products, Brands, and Display, prioritizing Products for beginners."
+    },
+    {
+      "id": "slide_5",
+      "title": "Keywords are chosen; terms are revealed",
+      "summary": "The critical difference between advertiser keywords and shopper search terms."
+    },
+    {
+      "id": "slide_6",
+      "title": "Match types trade reach for control",
+      "summary": "Broad, phrase, and exact match types compared, plus a video watch prompt."
+    },
+    {
+      "id": "slide_7",
+      "title": "Negatives close waste loops",
+      "summary": "When and how to use negative keywords to block irrelevant terms."
+    },
+    {
+      "id": "slide_8",
+      "title": "Research for intent, not vanity volume",
+      "summary": "Building a keyword research set prioritizing relevance and long-tail intent."
+    },
+    {
+      "id": "slide_9",
+      "title": "Diagnose conversion before raising bids",
+      "summary": "Diagnostic matrix for CTR and conversion rate symptoms."
+    },
+    {
+      "id": "slide_10",
+      "title": "Simulator lab: build controlled traffic",
+      "summary": "Campaign Architect, Keyword Lab, and BuyBox Dojo activities."
+    },
+    {
+      "id": "slide_11",
+      "title": "Controlled traffic evidence gate",
+      "summary": "Assignment, assessment criteria, and exit question for the structure block."
+    }
+  ]
+}

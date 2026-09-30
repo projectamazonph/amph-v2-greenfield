@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: #f7f8fa; }
+.slide-container {
+    width: 1280px;
+    min-height: 720px;
+    background: #f7f8fa;
+    color: #131921;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    overflow: hidden;
+    padding-top: 42px;
+    padding-left: 60px;
+    padding-right: 60px;
+}
+.eyebrow {
+    font-size: 14px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #ff9900;
+    font-weight: 700;
+    margin-top: 0;
+}
+.title {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.08;
+    margin-top: 9px;
+}
+.rule {
+    height: 3px;
+    background: #131921;
+    margin-top: 18px;
+}
+.layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 30px;
+}
+.match-card {
+    background: #fff;
+    border: 1px solid #d7dce2;
+    padding-top: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    min-height: 380px;
+}
+.match-card.broad { border-top: 6px solid #ff9900; }
+.match-card.phrase { border-top: 6px solid #131921; }
+.match-card.exact { border-top: 6px solid #00875a; }
+
+.card-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #131921;
+    margin-top: 0;
+}
+.card-desc {
+    font-size: 18px;
+    color: #4b5563;
+    line-height: 1.4;
+    margin-top: 12px;
+    min-height: 50px;
+}
+.metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+    border-top: 1px solid #d7dce2;
+    padding-top: 16px;
+}
+.metric-label {
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+}
+.metric-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #131921;
+    margin-top: 4px;
+}
+.example-box {
+    background: #f1f3f5;
+    border-left: 4px solid #d7dce2;
+    padding-top: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-top: 20px;
+    min-height: 140px;
+}
+.ex-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #131921;
+}
+.ex-keyword {
+    font-size: 18px;
+    font-weight: 700;
+    color: #131921;
+    margin-top: 4px;
+}
+.ex-match {
+    font-size: 16px;
+    color: #00875a;
+    margin-top: 12px;
+    line-height: 1.3;
+}
+.ex-nomatch {
+    font-size: 16px;
+    color: #de350b;
+    margin-top: 8px;
+    line-height: 1.3;
+}
+.callout {
+    margin-top: 24px;
+    background: #eef8f3;
+    border-left: 4px solid #00875a;
+    color: #145c43;
+    padding-top: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+    font-size: 18px;
+    line-height: 1.4;
+}
+.footer {
+    position: absolute;
+    left: 60px;
+    top: 672px;
+    font-size: 13px;
+    color: #64748b;
+}
+.page {
+    position: absolute;
+    right: 60px;
+    top: 672px;
+    font-size: 13px;
+    color: #64748b;
+}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 4 · Lesson 4.2</div>
+  <div class="title">Match Types Deep Dive</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <!-- Broad Match -->
+    <div class="match-card broad">
+      <div class="card-title">Broad Match</div>
+      <div class="card-desc">Matches related searches, synonyms, and variations in any order.</div>
+      <div class="metrics">
+        <div>
+          <div class="metric-label">Reach</div>
+          <div class="metric-value" style="color: #ff9900;">High</div>
+        </div>
+        <div>
+          <div class="metric-label">Control</div>
+          <div class="metric-value" style="color: #de350b;">Low</div>
+        </div>
+      </div>
+      <div class="example-box">
+        <div class="ex-label">Your Keyword:</div>
+        <div class="ex-keyword">bamboo cutting board</div>
+        <div class="ex-match">✓ cutting board bamboo large</div>
+        <div class="ex-match">✓ bamboo kitchen board</div>
+      </div>
+    </div>
+    
+    <!-- Phrase Match -->
+    <div class="match-card phrase">
+      <div class="card-title">Phrase Match</div>
+      <div class="card-desc">Matches searches containing your exact phrase, with words before or after.</div>
+      <div class="metrics">
+        <div>
+          <div class="metric-label">Reach</div>
+          <div class="metric-value" style="color: #131921;">Medium</div>
+        </div>
+        <div>
+          <div class="metric-label">Control</div>
+          <div class="metric-value" style="color: #131921;">Medium</div>
+        </div>
+      </div>
+      <div class="example-box">
+        <div class="ex-label">Your Keyword:</div>
+        <div class="ex-keyword">"bamboo cutting board"</div>
+        <div class="ex-match">✓ large bamboo cutting board</div>
+        <div class="ex-nomatch">✗ bamboo serving tray</div>
+      </div>
+    </div>
+    
+    <!-- Exact Match -->
+    <div class="match-card exact">
+      <div class="card-title">Exact Match</div>
+      <div class="card-desc">Matches only very close variations of your exact keyword.</div>
+      <div class="metrics">
+        <div>
+          <div class="metric-label">Reach</div>
+          <div class="metric-value" style="color: #de350b;">Low</div>
+        </div>
+        <div>
+          <div class="metric-label">Control</div>
+          <div class="metric-value" style="color: #00875a;">High</div>
+        </div>
+      </div>
+      <div class="example-box">
+        <div class="ex-label">Your Keyword:</div>
+        <div class="ex-keyword">[bamboo cutting board]</div>
+        <div class="ex-match">✓ bamboo cutting board</div>
+        <div class="ex-nomatch">✗ bamboo cutting board set</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="callout">
+    <strong>Coach tip:</strong> Broad and Auto are scouts. Exact is the army. Scouts find, the army conquers. Start tight with Exact on proven words, and use Broad as a research net.
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Keywords & Match Types · 4.2 Match Types Deep Dive</div>
+  <div class="page">06 / 12</div>
+</div>
+</body>
+</html>

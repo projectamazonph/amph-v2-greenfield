@@ -1,0 +1,1532 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuyBox Dojo | Amazon Listing Readiness Practice</title>
+<link rel="icon" href="favicon.ico">
+
+
+<script src="assets/student-progress.js"></script>
+<script src="assets/simulator-attempt.js"></script>
+<script src="assets/shell.js" defer></script>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/simulator-foundation.css">
+<link rel="stylesheet" href="assets/listing.css">
+<link rel="stylesheet" href="assets/skin.css">
+<link rel="stylesheet" href="assets/shell.css">
+  <!-- PHA_DISCOVERY_START -->
+  <meta name="description" content="Practice checking Amazon listing readiness, Buy Box signals, stock, price, and shopper trust before changing ads.">
+  <meta name="keywords" content="Amazon listing readiness simulator, Buy Box practice">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://projectamazonph.github.io/amazon-ph-simulators/listing.html">
+  <link rel="describedby" type="text/markdown" href="https://projectamazonph.github.io/amazon-ph-simulators/llms.txt" title="AI-readable Project Amazon PH Academy guide">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Project Amazon PH Academy">
+  <meta property="og:title" content="BuyBox Dojo | Amazon Listing Readiness Practice">
+  <meta property="og:description" content="Practice checking Amazon listing readiness, Buy Box signals, stock, price, and shopper trust before changing ads.">
+  <meta property="og:url" content="https://projectamazonph.github.io/amazon-ph-simulators/listing.html">
+  <meta property="og:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+  <meta property="og:image:alt" content="Project Amazon PH Academy SimGrid learning hub">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BuyBox Dojo | Amazon Listing Readiness Practice">
+  <meta name="twitter:description" content="Practice checking Amazon listing readiness, Buy Box signals, stock, price, and shopper trust before changing ads.">
+  <meta name="twitter:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/listing.html",
+      "url": "https://projectamazonph.github.io/amazon-ph-simulators/listing.html",
+      "name": "BuyBox Dojo | Amazon Listing Readiness Practice",
+      "description": "Practice checking Amazon listing readiness, Buy Box signals, stock, price, and shopper trust before changing ads.",
+      "inLanguage": [
+        "en",
+        "fil"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Project Amazon PH Academy",
+        "url": "https://projectamazonph.github.io/amazon-ph-simulators/"
+      },
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Amazon listing readiness simulator"
+        },
+        {
+          "@type": "Thing",
+          "name": "Buy Box practice"
+        }
+      ],
+      "hasPart": {
+        "@id": "https://projectamazonph.github.io/amazon-ph-simulators/listing.html#footer-navigation"
+      }
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/listing.html#footer-navigation",
+      "name": "Project Amazon PH Academy footer navigation",
+      "description": "Visible footer links to Project Amazon PH Academy learning, practice, coaching, and project resources.",
+      "hasPart": [
+        {
+          "@type": "ItemList",
+          "name": "Learn footer links",
+          "numberOfItems": 4,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "VA Start Here",
+              "item": {
+                "@type": "WebPage",
+                "name": "VA Start Here",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/start-here.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "PPC Coach",
+              "item": {
+                "@type": "WebPage",
+                "name": "PPC Coach",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-coach.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Student Guide",
+              "item": {
+                "@type": "WebPage",
+                "name": "Student Guide",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/guide.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Module Decks",
+              "item": {
+                "@type": "WebPage",
+                "name": "Module Decks",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-decks.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Practice footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Simulator Library",
+              "item": {
+                "@type": "WebPage",
+                "name": "Simulator Library",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/index.html#simulator-library"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Campaign Architect",
+              "item": {
+                "@type": "WebPage",
+                "name": "Campaign Architect",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/campaign-architect.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Account Audit",
+              "item": {
+                "@type": "WebPage",
+                "name": "Account Audit",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/account-audit.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Coach footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Coach Tools",
+              "item": {
+                "@type": "WebPage",
+                "name": "Coach Tools",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-tools.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Resource Library",
+              "item": {
+                "@type": "WebPage",
+                "name": "Resource Library",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-resource-library.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Learning Docs",
+              "item": {
+                "@type": "WebPage",
+                "name": "Learning Docs",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/index.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Project footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Roadmap",
+              "item": {
+                "@type": "WebPage",
+                "name": "Roadmap",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/planned-simulators.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Source Repository",
+              "item": {
+                "@type": "WebPage",
+                "name": "Source Repository",
+                "url": "https://github.com/projectamazonph/amazon-ph-simulators"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Project Guide",
+              "item": {
+                "@type": "WebPage",
+                "name": "Project Guide",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/site-guide.md"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/listing.html#application",
+      "name": "BuyBox Dojo",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "description": "Practice checking Amazon listing readiness, Buy Box signals, stock, price, and shopper trust before changing ads.",
+      "isAccessibleForFree": true
+    }
+  ]
+}</script>
+  <!-- PHA_DISCOVERY_END -->
+</head>
+<body data-pha-tool="listing">
+
+<div class="ticker"><div class="tick-track" id="tickTrack"></div></div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="#1a1205"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg></div>
+    <div><h1>BuyBox Dojo</h1><p>Practice listings and PPC on the same ASIN.</p></div>
+  </div>
+  <div class="top-right">
+    <span class="simbadge">SIMULATED DATA</span>
+    <div class="xpwrap">
+      <span class="lvl" id="levelBadge">Trainee</span>
+      <div class="xpbar"><i id="xpFill"></i></div>
+      <span class="mono" id="xpText" style="color:#9db2c6;font-size:11px">0 XP</span>
+    </div>
+    <button type="button" class="iconbtn" id="resetBtn" title="Reset all progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8"/><path d="M3 3v5h5"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="side">
+    <button type="button" class="navbtn active" data-tab="sandbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Practice Sandbox</button>
+    <button type="button" class="navbtn" data-tab="keywords"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 12l-8 8-9-9V4h7z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>Keyword Lab</button>
+    <button type="button" class="navbtn" data-tab="simulator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M5 20v-6M11 20V6M17 20v-9"/><path d="M3 20h18"/></svg>Campaign Simulator</button>
+    <button type="button" class="navbtn" data-tab="drills"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".6" fill="currentColor"/></svg>Judgment Drills</button>
+    <button type="button" class="navbtn" data-tab="academy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19a2 2 0 002 2h13"/></svg>Academy &amp; SOPs</button>
+    <button type="button" class="navbtn" data-tab="quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 115 0c0 1.6-2.5 2-2.5 3.5"/><path d="M12 17h.01"/></svg>Knowledge Quiz</button>
+    <button type="button" class="navbtn" data-tab="glossary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Glossary</button>
+    <div class="side-foot">
+      <h5 id="footLevel">Trainee</h5>
+      <div class="mini"><i id="footFill" style="width:5%"></i></div>
+      <p id="footNext">Earn XP by fixing listings, running simulations, solving drills &amp; passing the quiz.</p>
+      <div class="badges" id="badgeRow"></div>
+    </div>
+  </aside>
+
+  <main>
+    <!-- ============ SANDBOX ============ -->
+    <section id="tab-sandbox" class="tab active">
+      <div class="pagehead">
+        <div>
+          <span class="crumb">Practice Sandbox</span>
+          <h2>Listing Optimizer</h2>
+          <p>Repair the flawed draft, watch the score climb, then pressure-test your PPC setup in the simulator.</p>
+        </div>
+        <div class="chips" id="scenChips"></div>
+      </div>
+      <div class="coach" id="coachCard">
+        <div class="coach-ic">💡</div>
+        <div id="coachTip"><b>Coach:</b> loading…</div>
+        <button type="button" class="coach-next" id="coachNext" title="Next tip">→</button>
+      </div>
+      <div id="briefCard"></div>
+      <div class="sandbox-grid">
+        <div class="col-editor">
+          <div class="card">
+            <div class="card-h">Listing editor <span class="hint">edits update the preview &amp; score live</span></div>
+            <div id="editor"></div>
+          </div>
+        </div>
+        <div class="col-preview">
+          <div class="preview-bar"><b>Live Amazon preview</b><label class="mv"><input type="checkbox" id="mvToggle"> Mobile view (78-char cutoff)</label></div>
+          <div class="card" style="padding:.6rem"><div id="preview"></div></div>
+        </div>
+        <div class="col-score">
+          <div class="card scorecard">
+            <div class="dialwrap">
+              <svg viewBox="0 0 120 120" width="118" height="118"><circle class="dial-bg" cx="60" cy="60" r="52"/><circle id="dialArc" cx="60" cy="60" r="52"/></svg>
+              <div class="dial-c"><b id="dialNum">0</b><span id="dialLabel">—</span></div>
+            </div>
+            <div class="dial-side"><h4>Optimization Score</h4><p>Weighted blend of keyword coverage, title quality, bullets, backend &amp; policy safety.</p></div>
+          </div>
+          <div class="card"><div class="card-h">Subscores</div><div id="subscores"></div></div>
+          <div class="card"><div class="card-h">Keyword coverage <span class="hint">● title ● bullets ● backend</span></div><div class="chips" id="covChips"></div></div>
+          <div class="card"><div class="card-h">Indexing check <span class="hint">search "ASIN + keyword"</span></div><div id="indexList"></div></div>
+          <div class="card"><div class="card-h">Policy flags</div><div id="flagList"></div></div>
+          <div class="card reco"><div class="card-h">Priority fixes</div><ol id="recList"></ol></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ KEYWORDS ============ -->
+    <section id="tab-keywords" class="tab">
+      <div class="pagehead">
+        <div>
+          <span class="crumb">Keyword Lab</span>
+          <h2>Research, Match Types &amp; Negatives</h2>
+          <p>Build the exact campaign you'll pressure-test in the simulator. Changes carry across tabs.</p>
+        </div>
+        <button type="button" class="btn" id="btnAuto">⚡ Auto-build starter campaign</button>
+      </div>
+      <div class="kw-grid">
+        <div class="card">
+          <div class="card-h">Campaign keywords — <span id="kwScenName" class="hint"></span></div>
+          <div class="tblwrap"><table class="tbl" id="kwTable"></table></div>
+          <p class="hint" style="margin-top:.7rem">Tip: exact = proven converters, phrase = controlled discovery, broad = the net. Set bids near the suggested bid to win auctions.</p>
+        </div>
+        <div class="kw-side">
+          <div class="card">
+            <div class="card-h">Negative keywords</div>
+            <div class="negrow"><input class="inp" id="negInput" placeholder='e.g. glass, used, repair, free'><button type="button" class="btn btn-dark" id="negAdd">Add</button></div>
+            <div class="chips" id="negList"></div>
+            <p class="hint" style="margin-top:.6rem">Each negative trims wasted spend in the simulation (up to −35%). Real campaigns: add from the search-term report.</p>
+          </div>
+          <div class="card">
+            <div class="card-h">Match-type playground</div>
+            <p class="hint">Focus keyword: <b id="pgKw" style="color:#1c2b3a"></b> — toggle a match type to see which shopper searches would trigger your ad.</p>
+            <div class="seg" id="pgSeg" style="margin:.6rem 0"></div>
+            <div id="pgTerms"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SIMULATOR ============ -->
+    <section id="tab-simulator" class="tab">
+      <div class="pagehead">
+        <div>
+          <span class="crumb">Campaign Simulator</span>
+          <h2>7-Day PPC Pressure Test</h2>
+          <p>Your listing score + bids + budget + negatives → projected results. Fix the listing first, then watch ACOS drop.</p>
+        </div>
+        <span class="tag orange" id="staleNote" hidden>Inputs changed — re-run</span>
+      </div>
+      <div class="card simctl">
+        <div class="ctl"><label for="ctlBudget">Daily budget</label><input type="range" id="ctlBudget" min="10" max="200" step="5"><b class="mono" id="ctlBudgetOut"></b></div>
+        <div class="ctl"><label for="ctlTarget">Target ACOS %</label><input type="number" class="inp" id="ctlTarget" min="5" max="80" style="width:78px"></div>
+        <div class="ctl"><label>Bid strategy</label><div class="seg" id="ctlStrat"></div></div>
+        <div class="ctl"><label>Active keywords</label><b class="mono" id="ctlActive"></b></div>
+        <button type="button" class="btn big" id="btnRun">▶ Run 7-day simulation</button>
+      </div>
+      <div id="simResults" aria-live="polite"></div>
+    </section>
+
+    <!-- ============ DRILLS ============ -->
+    <section id="tab-drills" class="tab">
+      <div class="pagehead">
+        <div>
+          <span class="crumb">Judgment Drills</span>
+          <h2>What Would You Do?</h2>
+          <p>Ten situations pulled from real VA shifts — read the data, pick the call, get coached on the reasoning.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:.7rem;min-width:200px"><div class="dprog"><i id="drillFill" style="width:0%"></i></div><span class="mono" id="drillScore" aria-live="polite" style="font-size:.8rem;color:var(--slate);white-space:nowrap">0/10</span></div>
+      </div>
+      <div id="drillList"></div>
+    </section>
+
+    <!-- ============ ACADEMY ============ -->
+    <section id="tab-academy" class="tab">
+      <div class="pagehead">
+        <div>
+          <span class="crumb">Academy &amp; SOPs</span>
+          <h2>The VA Playbook</h2>
+          <p>Repeatable routines, decision trees and the formulas your account lead expects you to know cold.</p>
+        </div>
+      </div>
+      <div class="acad-grid">
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">01</span>SOP — The Daily 20-Minute PPC Check</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <ol>
+              <li>Open <b>Campaign Manager</b>, set the date range to <b>Yesterday</b>. Scan spend vs. daily budget on every campaign.</li>
+              <li><b>Budget pacing:</b> any campaign that ran out before ~2pm? Raise its budget 20% or shift budget from campaigns that underspend.</li>
+              <li>Sort keywords by <b>Spend</b>. Open the top 10: ACOS &gt; 1.3× target → <b>lower bid 10–15%</b>. ACOS &lt; 0.5× target AND low impressions → <b>raise bid 10–20%</b>. Never move a bid more than 20% at once.</li>
+              <li>Download the <b>Search Term Report</b> (last 7 days). Two passes: (a) irrelevant terms with clicks → add as <b>negative exact</b>; (b) terms with 2+ orders in broad/phrase → <b>harvest into exact</b>.</li>
+              <li>Log every change in the client change log: <b>date · entity · old → new · reason</b>. A VA who logs is a VA who stays.</li>
+            </ol>
+            <p><b>Escalate immediately</b> if you see: ACOS &gt;100% for 3 days · CTR halved overnight (possible suppression or lost Buy Box) · $0 spend (policy block or budget bug).</p>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">02</span>SOP — Listing Audit Before Any PPC Spend</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <ul>
+              <li><b>Index check first:</b> search <span class="mono">B0XXXXXXXX + keyword</span>. No appearance = not indexed = fix the listing before spending a cent.</li>
+              <li><b>Title formula:</b> Brand + Core Keyword + Material/Attribute + Size/Count + Use Case + Differentiator. First 80 chars = the mobile title. ≤200 chars total.</li>
+              <li><b>Bullets:</b> all 5 filled, 100–250 chars, <b>BENEFIT — proof</b> structure, secondary keywords woven in naturally.</li>
+              <li><b>Backend:</b> 249 bytes, spaces only, no repeats of title words. Add misspellings + Spanish + synonyms. Never competitor brands.</li>
+              <li><b>Main image:</b> pure white (RGB 255,255,255), product fills ≥85% of the frame.</li>
+              <li><b>Price sanity:</b> within ~15% of the top 5 competitors, or your conversion rate bleeds no matter how good the ads are.</li>
+            </ul>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">03</span>Flowchart — ACOS Triage</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <div class="tree"><span class="q">ACOS ABOVE TARGET?</span>
+ <span class="y">├</span> Clicks &lt; 15  → not enough data. <b>Wait 72h.</b>
+ <span class="y">├</span> CVR below category avg → <b>listing problem</b> (price, images, reviews) — don't touch the bid.
+ <span class="y">├</span> CVR fine, CPC high → <b>lower bid 10–15%</b> or tighten to exact.
+ <span class="n">└</span> CVR fine, CPC fine, few sales → relevance mismatch → <b>negatives or pause</b>.
+
+<span class="q">ACOS LOW + impressions low?</span>
+ <span class="y">└</span> You're leaving money. <b>Raise bids 10–20%</b>, add broad.
+
+<span class="q">TACoS rising while ACOS is flat?</span>
+ <span class="n">└</span> Organic rank is slipping. <b>Escalate</b> to the account lead.</div>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">04</span>SOP — Weekly Negative-Keyword Mining</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <p>Pull the search-term report, filter <b>clicks ≥ 5 and 0 orders</b>, then read intent. Classic negatives:</p>
+            <ul>
+              <li>Intent mismatch: <span class="mono">free, used, repair, parts, manual, pdf, cheap</span></li>
+              <li>Competitor brand names</li>
+              <li>Wrong material: <span class="mono">glass, plastic</span> on a bamboo product</li>
+              <li>Wrong audience: <span class="mono">kids</span> on an adult product</li>
+            </ul>
+            <p>Add each as <b>negative exact</b> and keep a client-level shared negative list so the same junk never leaks across campaigns.</p>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">05</span>Concept — The Match-Type Ladder &amp; Harvesting</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <p><b>Auto → Broad → Phrase → Exact.</b> Reach shrinks, control grows as you move right. Rule of thumb:</p>
+            <ul>
+              <li><b>Exact</b> = proven converters with their own bid.</li>
+              <li><b>Phrase</b> = controlled discovery.</li>
+              <li><b>Broad</b> = the net that catches new winners.</li>
+              <li><b>Auto</b> = wildcard for product/category discovery.</li>
+            </ul>
+            <p><b>Harvesting</b> is the weekly loop: when a search term converts inside broad/auto, lift it into its own exact-match campaign and bid to it specifically. That's how a campaign matures from "spending" to "scaling".</p>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">06</span>Reference — Formula Cheat Sheet</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <table class="ftable">
+              <thead><tr><th>Metric</th><th>Formula</th><th>Healthy / example</th></tr></thead>
+              <tbody>
+                <tr><td>CTR</td><td>clicks ÷ impressions</td><td>0.3–0.6%+ on SP</td></tr>
+                <tr><td>CPC</td><td>spend ÷ clicks</td><td>below suggested bid</td></tr>
+                <tr><td>CVR</td><td>orders ÷ clicks</td><td>8–12% category avg</td></tr>
+                <tr><td>ACOS</td><td>spend ÷ ad sales</td><td>≤ your margin</td></tr>
+                <tr><td>ROAS</td><td>ad sales ÷ spend</td><td>1 ÷ ACOS (25% = 4×)</td></tr>
+                <tr><td>TACoS</td><td>spend ÷ total sales</td><td>watch the trend ↓</td></tr>
+                <tr><td>Break-even ACOS</td><td>profit margin %</td><td>$25 − $16.50 cost = 34%</td></tr>
+                <tr><td>Imp. Share</td><td>imps ÷ eligible imps</td><td>gap = lost demand</td></tr>
+              </tbody>
+            </table>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">07</span>Checklist — 12 Mistakes That Get VAs Fired</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <div class="mistakes">
+              <div class="mistake"><b>01</b>Changing bids &gt;20% at once without logging it.</div>
+              <div class="mistake"><b>02</b>Pausing a winning keyword instead of lowering the bid.</div>
+              <div class="mistake"><b>03</b>Never reading the search-term report.</div>
+              <div class="mistake"><b>04</b>ALL-CAPS titles &amp; "Best Seller" claims.</div>
+              <div class="mistake"><b>05</b>Competitor brand names in backend search terms.</div>
+              <div class="mistake"><b>06</b>Wasting backend bytes on commas &amp; title duplicates.</div>
+              <div class="mistake"><b>07</b>Running PPC on a listing with fewer than 4 bullets.</div>
+              <div class="mistake"><b>08</b>Ignoring budget pacing (campaign dark by 2pm).</div>
+              <div class="mistake"><b>09</b>Judging a keyword on fewer than 15 clicks.</div>
+              <div class="mistake"><b>10</b>Editing price during a Lightning Deal.</div>
+              <div class="mistake"><b>11</b>Zero negative keywords in any campaign.</div>
+              <div class="mistake"><b>12</b>"Set &amp; forget" auto campaigns — harvesting is the job.</div>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">08</span>Template — Weekly Client Report (copy-paste)</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <div class="tplbox" id="reportTpl">WEEKLY PPC REPORT — [Client] — [Dates]
+SPEND $___  |  SALES $___  |  ACOS __% (target __%)  |  ORDERS __
+
+WINS:    [top keyword, harvests, new exact winners]
+ISSUES:  [budget caps, ACOS offenders, suppressed ASINs]
+CHANGES: [entity | old -> new | reason]
+NEXT WK: [1-3 priorities]
+ESCALATE: [anything blocking — Buy Box, stock, policy]</div>
+            <div class="copyrow"><button type="button" class="btn btn-ghost" id="copyReport">📋 Copy template</button></div>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">09</span>SOP — New Product Launch: The 30-Day PPC Ramp</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <ul>
+              <li><b>Week 1 — Discovery:</b> one Auto campaign + 2–3 Broad campaigns on your best long-tail keywords. Bids ~110% of suggested. Budget sized to guarantee ≥15 clicks/day per campaign so you get data, not guesses.</li>
+              <li><b>Week 2 — Prune:</b> first search-term sweep. Kill irrelevant Auto targets and add your first negatives. Don't harvest yet — too early.</li>
+              <li><b>Week 3 — Harvest:</b> every search term with 2+ orders at or below target ACOS moves into its own Exact campaign with its own bid. Lower the Broad bid on harvested terms so they stop competing with themselves.</li>
+              <li><b>Week 4 — Scale:</b> raise winners 10–20%, cut losers, test a <b>+30–50% top-of-search placement</b> if CVR supports it, then lock the weekly cadence from SOP 01.</li>
+            </ul>
+            <p><b>Launch rules:</b> never judge a keyword before 15 clicks; log every change; keep <b>TACoS</b> in view — launch ACOS is allowed to run above break-even on purpose, because you are buying rank and velocity, not just today's profit.</p>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">10</span>Concept — Dynamic Bidding &amp; Placement Multipliers</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <table class="ftable">
+              <thead><tr><th>Strategy</th><th>What Amazon does</th><th>Use when</th></tr></thead>
+              <tbody>
+                <tr><td>Down only</td><td>Lowers your bid up to 100% when a conversion looks unlikely</td><td>Default for almost everything — safest</td></tr>
+                <tr><td>Up &amp; down</td><td>Also raises up to 100% at top of search / 50% elsewhere when conversion looks likely</td><td>Only with strong, stable CVR data</td></tr>
+                <tr><td>Fixed bids</td><td>No automatic changes</td><td>Testing, or when data is too thin to trust</td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:.7rem"><b>Placements</b> are where your ad lands. <b>Top of search</b> = first row above organic results → highest CTR <i>and</i> highest CPC. <b>Product pages</b> = cheaper, lower-intent browsing traffic. A placement multiplier stacks on the bid: a $1.00 bid with +50% top-of-search can pay up to $1.50 for that slot. Add the multiplier only when that placement's CVR earns it.</p>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">11</span>SOP — Listing Suppressed? The Recovery Sequence</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <ol>
+              <li><b>Account Health → Quality Alerts / policy notifications.</b> Read the exact violation — don't guess.</li>
+              <li>Common culprits: title over 200 chars, ALL-CAPS words, promotional phrases ("Best Seller", "Free Shipping"), restricted words, or a main image with text/badges.</li>
+              <li><b>Fix at the root</b> via the <b>flat file</b> (bulk upload template) — cleaner and more reliable than the Seller Central UI for style fixes.</li>
+              <li>Wait <b>15 minutes to 24 hours</b> for reindexing; verify with the <span class="mono">ASIN + keyword</span> search test.</li>
+              <li>Still suppressed? Open a case with the <b>alert ID + before/after screenshots</b> attached.</li>
+              <li><b>Log the incident</b> so the same offending claim never ships in a future listing again.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">12</span>Flowchart — Inventory &amp; Stock-Out Decisions</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <div class="tree"><span class="q">RESTOCK ETA vs DAYS OF STOCK?</span>
+ <span class="y">├</span> Stock &gt; gap + 7 days → run campaigns as normal.
+ <span class="y">├</span> Stock ≈ gap → <b>taper</b>: lower bids/budget 10–15% every 2–3 days.
+ <span class="y">├</span> Stock &lt; gap → <b>stretch</b>: small price lift + cut bids; plan a restock-day relaunch.
+ <span class="n">└</span> Already OOS? → <b>pause ads</b> (don't burn impressions on a dead page), then prep relaunch:
+
+<span class="q">RESTOCK DAY</span>
+ <span class="y">└</span> Re-enable at pre-OOS bids, add a coupon, expect 3–7 days to regain rank.
+     Never restart at 2× the old bid "to catch up" — that buys expensive, low-quality clicks.</div>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">13</span>Concept — Dayparting &amp; Seasonality</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <p><b>Dayparting</b> = shifting spend toward the hours and days that convert best (via bid rules or third-party tools — Sponsored Products has no native hour-level scheduler). It earns its keep only with <b>100+ clicks/week per campaign</b> and clear CVR peaks (e.g. B2B products on weekday mornings). <b>Never daypart a fresh campaign</b> — you need the data first.</p>
+            <p><b>Seasonality</b> raises CPCs across the board in Q4; Prime Day week brings a CPC spike <i>and</i> a hangover the week after. Pre-load budget for December, and don't panic-trim bids the Monday after a deal event — read the search-term report first.</p>
+          </div></div>
+        </div>
+
+        <div class="acc reveal">
+          <button type="button" class="acc-h"><span><span class="num">14</span>Templates — Escalations &amp; Client Requests</span><svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="acc-b"><div class="acc-inner">
+            <p>Four copy-paste messages every VA needs on speed-dial. Pick one, fill the brackets, send.</p>
+            <div class="seg tplseg" id="tplSeg"></div>
+            <div class="tplbox" id="tplBox"></div>
+            <div class="copyrow"><button type="button" class="btn btn-ghost" id="copyTpl">📋 Copy template</button></div>
+          </div></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ QUIZ ============ -->
+    <section id="tab-quiz" class="tab">
+      <div class="pagehead">
+        <div>
+          <span class="crumb">Knowledge Quiz</span>
+          <h2>Prove You Speak PPC</h2>
+          <p>Eighteen real-decision questions. Read every explanation — that's where the XP actually lives.</p>
+        </div>
+      </div>
+      <div class="card quizwrap"><div id="quizBox"></div></div>
+    </section>
+
+    <!-- ============ GLOSSARY ============ -->
+    <section id="tab-glossary" class="tab">
+      <div class="pagehead">
+        <div>
+          <span class="crumb">Glossary</span>
+          <h2>The PPC Dictionary</h2>
+          <p>Every term your account lead drops in a Slack thread, defined in plain English.</p>
+        </div>
+      </div>
+      <div class="gloss-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input class="inp" id="glossSearch" placeholder="Search terms — try 'ACOS', 'harvest' or 'TACoS'">
+      </div>
+      <div class="gloss-grid" id="glossGrid"></div>
+    </section>
+
+    <div class="foot">BuyBox Dojo · a training sandbox for Amazon VAs · all metrics simulated · not affiliated with Amazon.com · © 2026</div>
+  </main>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/* ===================== helpers ===================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+let simRandom=Math.random;
+function seededRandom(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+const rnd=(a,b)=>a+simRandom()*(b-a);
+const avg=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
+const money=v=>'$'+v.toFixed(2);
+const kfmt=v=>v>=1000?(v/1000).toFixed(v>=10000?0:1)+'k':String(Math.round(v));
+const pct=v=>(v*100).toFixed(2).replace(/\.?0+$/,'')+'%';
+const facos=v=>isFinite(v)?(v*100).toFixed(1)+'%':'∞';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);}}
+
+const IMG={
+ bamboo:'assets/img/product-bamboo.webp',
+ bottle:'assets/img/product-bottle.webp',
+ lamp:'assets/img/product-lamp.webp',
+ yoga:'assets/img/product-yoga.webp'
+};
+
+const BANNED=[['best seller','claim'],['#1','claim'],['top rated','claim'],['no.1','claim'],['guarantee','restricted'],['warranty','restricted'],['free shipping','prohibited'],['sale','prohibited'],['discount','prohibited'],['bonus','prohibited'],['cheap','off-brand'],['money back','restricted'],['buy now','prohibited'],['amazing','fluff'],['100%','claim']];
+const STOP=new Set(['for','with','the','and','of','to','in','on','a','an','at','or','&','your','you','is','it']);
+function wordsOf(s){return (s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').replace(/(\d)([a-z])/g,'$1 $2').split(/\s+/).filter(w=>w.length>1&&!STOP.has(w));}
+function fieldHas(text,kw){const ws=wordsOf(kw);if(!ws.length)return false;const tw=wordsOf(text);return ws.every(w=>tw.some(x=>x===w||(w.length>=4&&(x.startsWith(w)||w.startsWith(x)))));}
+
+/* ===================== scenarios ===================== */
+const SCENARIOS=[
+{
+ id:'bamboo',brand:'Verdant Home',product:'Bamboo Cutting Board — Extra Large with Juice Groove',
+ category:'Kitchen & Dining',image:IMG.bamboo,price:24.97,rating:4.4,reviews:1284,margin:34,
+ brief:{
+  goal:'Launch Sponsored Products for a new private-label bamboo board. Client margin is 34%, so break-even ACOS ≈ 34%. Target ACOS 30%.',
+  usps:['100% organic Moso bamboo','Extra-large 18″ × 12″ × 0.75″','Deep dual juice grooves','Pre-oiled, knife-friendly, easy-clean','Lifetime replacement promise (careful — "guarantee" is a restricted word in titles)'],
+  rules:['No "best / top / #1" claims in the title','No competitor brand names in backend','Title ≤ 200 chars; first 80 chars must carry the main keyword','Backend ≤ 249 bytes, spaces only'],
+  competitors:['BambooPro','ChefCore']
+ },
+ targetKeywords:[
+  {kw:'bamboo cutting board',vol:45200,comp:'High',sugBid:1.24,rel:1.0},
+  {kw:'cutting board for kitchen',vol:33100,comp:'High',sugBid:1.05,rel:.9},
+  {kw:'wood cutting board',vol:22400,comp:'High',sugBid:1.31,rel:.85},
+  {kw:'bamboo chopping board',vol:12800,comp:'Med',sugBid:.92,rel:.95},
+  {kw:'meat cutting board',vol:15600,comp:'High',sugBid:1.18,rel:.8},
+  {kw:'large cutting board with juice groove',vol:6400,comp:'Med',sugBid:1.10,rel:.95},
+  {kw:'vegetable chopping board',vol:8900,comp:'Med',sugBid:.87,rel:.85},
+  {kw:'eco friendly cutting board',vol:4200,comp:'Low',sugBid:.74,rel:.9}
+ ],
+ matchDemo:{kw:'bamboo cutting board',terms:[
+  {t:'bamboo cutting board',exact:1,phrase:1,broad:1},
+  {t:'large bamboo cutting board for kitchen',phrase:1,broad:1},
+  {t:'bamboo cutting board with juice groove',phrase:1,broad:1},
+  {t:'cutting board bamboo',broad:1},
+  {t:'bamboo chopping board',broad:1,note:'close variant / related'},
+  {t:'bamboo cutting board set of 3',phrase:1,broad:1},
+  {t:'wooden chopping board kitchen',broad:1,note:'related match'},
+  {t:'plastic cutting board',broad:1,neg:'plastic'},
+  {t:'glass cutting board',broad:1,neg:'glass'},
+  {t:'cutting board'}
+ ]},
+ defaultListing:{
+  title:'CUTTING BOARD - BEST SELLER!!! Large Wood Chopping Board for Kitchen Meat and Vegetables, Heavy Duty',
+  bullets:['BIG SIZE 18 x 12 inches','Made of bamboo. Good for meat and vegetables.','','Juice groove keeps counter clean',''],
+  description:'This is a great cutting board for your kitchen. Buy now and get FREE SHIPPING! 100% satisfaction guaranteed or your money back.',
+  backend:'bamboo, cutting, board, chopping, kitchen, BambooPro, ChefCore, wood, meat, veggie, best, cheap, sale, discount, ,,,',
+  price:24.97
+ },
+ modelListing:{
+  title:'Verdant Home Bamboo Cutting Board, Extra Large 18×12×0.75 Inch Organic Chopping Board with Deep Juice Groove, Pre-Oiled Wood Kitchen Board for Meat, Vegetables & Bread, Knife-Friendly',
+  bullets:[
+   'EXTRA-LARGE 18×12 WORK SURFACE — Room for a whole chicken, roast or family meal prep; the 0.75″ thick solid Moso bamboo won\'t warp, crack or dull your knives like glass or plastic boards.',
+   'DEEP DUAL JUICE GROOVES — Carved channels on both sides catch liquids from meat, citrus and tomatoes, keeping your counters dry and your prep station clean.',
+   'PRE-OILED & READY TO USE — Hand-finished with food-grade oil so this bamboo cutting board arrives ready for your kitchen; simply rinse with warm water and dry.',
+   'ORGANIC MOSO BAMBOO — Naturally dense, sustainably harvested and gentle on knife edges; a sturdy eco friendly cutting board for vegetables, fruit, bread and cheese.',
+   'BUILT FOR DAILY COOKS — Backed by the Verdant Home promise: if your board ever splits or warps under normal use, we replace it. Register on our site after purchase.'
+  ],
+  description:'Upgrade your prep station with the Verdant Home extra-large bamboo cutting board. Cut from a single slab of organic Moso bamboo and finished with a food-grade oil, it gives you a roomy, knife-friendly surface with deep juice grooves on both sides. Designed for cooks who prep meat, vegetables and bread every day.',
+  backend:'butcher block charcuterie heavy duty thick pre oiled knife friendly sustainable housewarming gift bread dough fruit cheese tabla de cortar bambu organica',
+  price:24.97
+ }
+},
+{
+ id:'bottle',brand:'PeakHydro',product:'32 oz Insulated Stainless Steel Water Bottle with Straw Lid',
+ category:'Sports & Outdoors',image:IMG.bottle,price:27.95,rating:4.6,reviews:3417,margin:38,
+ brief:{
+  goal:'Scale an established listing. Margin 38% → break-even ACOS ≈ 38%, target ACOS 30%. Push volume without wrecking efficiency.',
+  usps:['Cold 24h / hot 12h double-wall vacuum','100% leak-proof twist-lock straw lid','32 oz wide mouth fits full ice cubes','18/8 stainless steel, BPA-free','Powder-coated grip + carry loop'],
+  rules:['Lead with brand + core keyword + size','No "#1 / best / top rated" claims','No competitor brands (Hydro Flask, YETI) anywhere','Backend ≤ 249 bytes, spaces only'],
+  competitors:['Hydro Flask','YETI']
+ },
+ targetKeywords:[
+  {kw:'insulated water bottle 32 oz',vol:38400,comp:'High',sugBid:1.42,rel:1.0},
+  {kw:'stainless steel water bottle',vol:29700,comp:'High',sugBid:1.36,rel:.9},
+  {kw:'gym water bottle with straw',vol:14300,comp:'Med',sugBid:1.08,rel:.9},
+  {kw:'leak proof water bottle',vol:11900,comp:'Med',sugBid:.97,rel:.85},
+  {kw:'water bottle keeps cold 24 hours',vol:7600,comp:'Med',sugBid:1.02,rel:.95},
+  {kw:'sports water bottle for men women',vol:12600,comp:'High',sugBid:1.15,rel:.8},
+  {kw:'bpa free water bottle',vol:9400,comp:'Med',sugBid:.91,rel:.85},
+  {kw:'hiking water bottle 32oz',vol:6800,comp:'Low',sugBid:.88,rel:.9}
+ ],
+ matchDemo:{kw:'insulated water bottle',terms:[
+  {t:'insulated water bottle',exact:1,phrase:1,broad:1},
+  {t:'insulated water bottle 32 oz',phrase:1,broad:1},
+  {t:'stainless steel insulated water bottle',phrase:1,broad:1},
+  {t:'water bottle insulated',broad:1},
+  {t:'insulated flask bottle',broad:1,note:'related match'},
+  {t:'insulated water bottle with straw',phrase:1,broad:1},
+  {t:'cheap water bottle',broad:1,neg:'cheap'},
+  {t:'glass water bottle',broad:1,neg:'glass'},
+  {t:'water bottle'}
+ ]},
+ defaultListing:{
+  title:'WATER BOTTLE 32OZ STEEL - #1 RATED!!! Gym Bottle Leak Proof Hot Cold for Sports',
+  bullets:['Keeps drinks cold','32 oz size with straw lid. BPA free.','','Great for gym hiking and sports activities',''],
+  description:'The best water bottle on Amazon! Free shipping today. 100% leak proof guaranteed or your money back.',
+  backend:'hydroflask, yeti, water, bottle, steel, gym, leak, proof, cheap, sale, ,',
+  price:27.95
+ },
+ modelListing:{
+  title:'PeakHydro 32 oz Insulated Water Bottle with Straw Lid, Leak Proof Stainless Steel Gym Bottle, Keeps Cold 24h & Hot 12h, BPA-Free Double Wall Vacuum, Wide Mouth for Ice, Hiking & Sports',
+  bullets:[
+   'COLD FOR 24 HOURS, HOT FOR 12 — Double-wall vacuum insulation keeps ice frozen through a full day of work, trails or workouts; no sweating, no condensation on your desk or in your bag.',
+   'TRULY LEAK PROOF STRAW LID — Twist-lock silicone seal means this insulated water bottle rides sideways in any backpack or gym bag without a single drop escaping.',
+   '32 OZ OF HYDRATION, ZERO PLASTIC TASTE — Food-grade 18/8 stainless steel and a BPA-free straw keep every sip clean; the wide mouth fits full-size ice cubes and makes cleaning easy.',
+   'BUILT FOR THE GYM & THE TRAIL — Powder-coated grip survives drops, the carry loop clips to any pack, and the cup-holder-friendly base fits cars, strollers and treadmills.',
+   'PEAKHYDRO PROMISE — If your stainless steel water bottle ever leaks or loses its chill, we\'ll make it right. Designed for hikers, lifters and everyone in between.'
+  ],
+  description:'Stay hydrated all day with the PeakHydro 32 oz insulated water bottle. Double-wall vacuum insulation holds cold for 24 hours and hot for 12, while the twist-lock straw lid stays 100% leak proof in any position. Built from food-grade 18/8 stainless steel with a BPA-free straw and a powder-coated grip for the gym, the trail and the daily commute.',
+  backend:'thermos tumbler canteen flask vacuum double wall bpa free wide mouth ice hiking camping cycling office adult botella termica acero inoxidable',
+  price:27.95
+ }
+},
+{
+ id:'lamp',brand:'LumenDesk',product:'LED Desk Lamp with Wireless Charger & USB-C Port',
+ category:'Home & Office Lighting',image:IMG.lamp,price:39.99,rating:4.3,reviews:962,margin:41,
+ brief:{
+  goal:'Launch + defend a premium desk lamp. Margin 41% → break-even ACOS ≈ 41%, target ACOS 32%. Win the "with charger" niche.',
+  usps:['15W wireless charging pad + USB-C port','5 color temps × 10 brightness levels','Flicker-free eye-care LED panel','Fully adjustable aluminum arm','Touch controls with memory'],
+  rules:['Front-load "LED desk lamp" + the charger USP','No "amazing / best / gift" fluff in title','No competitor brands (TaoTronics) in backend','Backend ≤ 249 bytes, spaces only'],
+  competitors:['TaoTronics','BenQ']
+ },
+ targetKeywords:[
+  {kw:'led desk lamp with usb charging',vol:16800,comp:'High',sugBid:1.52,rel:1.0},
+  {kw:'desk lamp for home office',vol:21500,comp:'High',sugBid:1.33,rel:.85},
+  {kw:'desk lamp with wireless charger',vol:9800,comp:'Med',sugBid:1.61,rel:.95},
+  {kw:'adjustable desk lamp',vol:13400,comp:'Med',sugBid:1.12,rel:.8},
+  {kw:'eye caring desk lamp',vol:7200,comp:'Low',sugBid:.94,rel:.9},
+  {kw:'reading lamp for desk',vol:11100,comp:'Med',sugBid:1.05,rel:.8},
+  {kw:'modern desk lamp black',vol:6100,comp:'Low',sugBid:.98,rel:.85},
+  {kw:'task lighting for office desk',vol:5400,comp:'Low',sugBid:1.02,rel:.9}
+ ],
+ matchDemo:{kw:'desk lamp with wireless charger',terms:[
+  {t:'desk lamp with wireless charger',exact:1,phrase:1,broad:1},
+  {t:'led desk lamp with wireless charger',phrase:1,broad:1},
+  {t:'desk lamp wireless charging pad',phrase:1,broad:1},
+  {t:'wireless charger desk lamp',broad:1},
+  {t:'desk lamp with phone charger',broad:1,note:'related match'},
+  {t:'desk lamp with wireless charger black',phrase:1,broad:1},
+  {t:'cheap desk lamp',broad:1,neg:'cheap'},
+  {t:'floor lamp with wireless charger',broad:1,neg:'floor'},
+  {t:'desk lamp'}
+ ]},
+ defaultListing:{
+  title:'LED DESK LAMP BEST CHOICE!! Wireless Charging Light USB Office Lamp Amazing Gift for Reading',
+  bullets:['Has wireless charger and USB port','5 color modes. Touch control.','','Good for office home and reading at night',''],
+  description:'Amazing lamp! Best seller in office lighting. Buy now - free shipping & 100% money back guarantee.',
+  backend:'lamp, desk, led, office, reading, wireless, charger, usb, best, cheap, sale, TaoTronics, ,',
+  price:39.99
+ },
+ modelListing:{
+  title:'LumenDesk LED Desk Lamp with Wireless Charger & USB-C Port, Adjustable Eye-Care Task Lamp, 5 Color Modes × 10 Brightness Levels, Modern Black Reading Lamp for Home Office & Study',
+  bullets:[
+   'CHARGE WHILE YOU WORK — Drop your phone on the 15W wireless charging pad or plug into the USB-C port; this desk lamp with wireless charger clears cable clutter from your workspace.',
+   'EYE-CARE LIGHTING, ZERO FLICKER — A diffused LED panel delivers smooth, shadow-free light with 5 color temperatures × 10 brightness levels, so late-night reading and long screen sessions feel easier on your eyes.',
+   'FULLY ADJUSTABLE ARM & HEAD — Swing, tilt and fold the aluminum arm to aim light exactly where your task is; folds flat for storage or travel.',
+   'TOUCH CONTROLS + MEMORY — One tap sets brightness, a long press cycles color temperature; the lamp remembers your last setting every time you power on.',
+   'SLEEK MODERN FINISH — Matte black, a 1.2 lb weighted base, and a footprint smaller than a notebook make it the ideal desk lamp for home office, bedside tables and dorm rooms.'
+  ],
+  description:'Light your workspace and charge your phone at the same time with the LumenDesk LED desk lamp. A 15W wireless charging pad and USB-C port sit in the weighted base, while the flicker-free eye-care panel offers 5 color temperatures and 10 brightness levels. The fully adjustable aluminum arm folds flat when you\'re done.',
+  backend:'task lighting study dorm bedside night light dimmable touch control foldable portable eye protection lumina escritorio oficina lectura',
+  price:39.99
+ }
+},
+{
+ id:'yoga',brand:'ZenFlow',product:'Non-Slip Yoga Mat 6mm with Carry Strap',
+ category:'Sports & Fitness',image:IMG.yoga,price:29.95,rating:4.5,reviews:2103,margin:36,
+ brief:{
+  goal:'Relaunch a mat that stalled after a review dip. Margin 36% → break-even ACOS ≈ 36%, target 28%. Rebuild rank through exact-match volume.',
+  usps:['6mm cushioning — knees & wrists','Double-sided non-slip texture','72×26 in — fits 6ft+ users','TPE, latex-free, recyclable','Includes carry strap + alignment lines'],
+  rules:['Lead with "yoga mat" + thickness','No "best / #1 / top" claims','No competitor brands (Manduka, Gaiam) anywhere','Backend ≤ 249 bytes, spaces only'],
+  competitors:['Manduka','Gaiam']
+ },
+ targetKeywords:[
+  {kw:'yoga mat non slip',vol:27900,comp:'High',sugBid:1.28,rel:1.0},
+  {kw:'thick yoga mat 6mm',vol:13200,comp:'Med',sugBid:1.04,rel:.95},
+  {kw:'exercise mat for home workout',vol:18700,comp:'High',sugBid:1.19,rel:.85},
+  {kw:'yoga mat with strap',vol:8800,comp:'Med',sugBid:.93,rel:.9},
+  {kw:'pilates mat',vol:11400,comp:'Med',sugBid:1.01,rel:.85},
+  {kw:'fitness mat for stretching',vol:7300,comp:'Low',sugBid:.86,rel:.85},
+  {kw:'large yoga mat for tall people',vol:5900,comp:'Low',sugBid:.97,rel:.9},
+  {kw:'eco friendly yoga mat',vol:6600,comp:'Med',sugBid:.89,rel:.9}
+ ],
+ matchDemo:{kw:'yoga mat non slip',terms:[
+  {t:'yoga mat non slip',exact:1,phrase:1,broad:1},
+  {t:'non slip yoga mat thick',phrase:1,broad:1},
+  {t:'yoga mat non slip 6mm',phrase:1,broad:1},
+  {t:'non skid yoga mat',broad:1,note:'close variant'},
+  {t:'yoga mat with strap non slip',phrase:1,broad:1},
+  {t:'pilates mat non slip',phrase:1,broad:1},
+  {t:'cheap yoga mat',broad:1,neg:'cheap'},
+  {t:'yoga mat towel',broad:1,neg:'towel'},
+  {t:'yoga mat'}
+ ]},
+ defaultListing:{
+  title:'YOGA MAT BEST QUALITY!!! Non Slip Exercise Mat Thick 6MM Amazing Gift for Women Men Pilates Fitness',
+  bullets:['Non slip surface both sides','6mm thick. 72 x 26 inches.','','Great for yoga pilates and home workouts',''],
+  description:'The best yoga mat ever! Buy now with FREE SHIPPING. 100% money back guarantee. Amazing quality.',
+  backend:'yoga, mat, exercise, fitness, Manduka, Gaiam, non, slip, thick, pilates, cheap, sale, best, ,',
+  price:29.95
+ },
+ modelListing:{
+  title:'ZenFlow Non Slip Yoga Mat 6mm Thick, 72×26 inch Exercise Mat with Carry Strap & Alignment Lines, Double-Sided TPE Fitness Mat for Pilates, Stretching & Home Workouts, Latex-Free',
+  bullets:[
+   'GRIP THAT HOLDS EVERY POSE — Double-sided textured TPE grips the floor below and your hands above, so this non slip yoga mat stays planted through hot yoga, planks and sweaty HIIT sessions.',
+   '6MM OF JOINT-FRIENDLY CUSHION — Thick enough to protect knees, wrists and elbows on hard floors, yet firm enough to keep you stable in balance poses.',
+   'FULL-SIZE FOR TALL PRACTITIONERS — 72 × 26 inches gives 6ft+ users real room to stretch out; alignment lines keep your feet square in every flow.',
+   'LIGHTWEIGHT + CARRY STRAP INCLUDED — At just 2.4 lb with a woven strap, this exercise mat travels from living room to studio to park without the bulk.',
+   'SKIN-SAFE & EASY TO CLEAN — Latex-free, odorless TPE wipes clean with a damp cloth; a durable, eco friendlier yoga mat for daily practice.'
+  ],
+  description:'Flow further with the ZenFlow 6mm non slip yoga mat. Double-sided textured TPE grips floor and skin, while 6mm of cushioning protects your joints on hard surfaces. At 72×26 inches with printed alignment lines and an included carry strap, it\'s built for home workouts, pilates, stretching and studio practice — and wipes clean in seconds.',
+  backend:'hot bikram fitness stretching floor mat padded workout home gym travel lightweight tpe latex free esterilla yoga antideslizante gruesa',
+  price:29.95
+ }
+}
+];
+
+/* ===================== state ===================== */
+const LEVELS=[[0,'Trainee'],[150,'Junior VA'],[400,'PPC Specialist'],[800,'Campaign Manager'],[1500,'Account Strategist']];
+const BADGES=[
+ ['edit','🔧 First Fix'],['neg','🚫 Neg Ninja'],['sim','🧪 Lab Rat'],['master','🏆 Master'],
+ ['quiz-done','📝 Quiz'],['quiz-ace','🎯 Ace'],['drill','🧰 Driller'],['drill-all','🎖️ Sergeant']
+];
+function load(){try{const s=localStorage.getItem('bbdojo');return s?JSON.parse(s):null;}catch(e){return null;}}
+function save(){try{localStorage.setItem('bbdojo',JSON.stringify(state));}catch(e){}}
+let state=load()||{xp:0,awarded:{},scenarioId:'bamboo',per:{},drills:{}};
+state.drills=state.drills||{};
+function defaultCampaign(sc){return{budget:35,target:30,strategy:'balanced',negatives:[],
+  keywords:sc.targetKeywords.map((k,i)=>({id:i,kw:k.kw,vol:k.vol,comp:k.comp,sugBid:k.sugBid,rel:k.rel,active:i<6,match:i<2?'exact':i<5?'phrase':'broad',bid:+((i<2?1:i<5?.9:.8)*k.sugBid).toFixed(2)}))};}
+SCENARIOS.forEach(sc=>{if(!state.per[sc.id])state.per[sc.id]={listing:JSON.parse(JSON.stringify(sc.defaultListing)),campaign:defaultCampaign(sc),sim:null,mastered:false,edited:false,hintUsed:false};});
+
+let currentTab='sandbox', visited={}, pgMatch='broad', lastCov={};
+
+const cur=()=>SCENARIOS.find(s=>s.id===state.scenarioId);
+const per=()=>state.per[state.scenarioId];
+
+/* ===================== XP / toast / badges ===================== */
+function levelOf(xp){let l=LEVELS[0];for(const[t,n]of LEVELS){if(xp>=t)l=[t,n];}return l;}
+function nextLevel(xp){for(const[t,n]of LEVELS){if(xp<t)return[t,n];}return null;}
+function award(key,xp,label){if(state.awarded[key])return;state.awarded[key]=1;state.xp+=xp;save();renderXP();toast('+'+xp+' XP — '+label,'xp');}
+function renderXP(){
+  const[,name]=levelOf(state.xp);const nx=nextLevel(state.xp);const[prev]=levelOf(state.xp);
+  $('#levelBadge').textContent=name;$('#footLevel').textContent=name;$('#xpText').textContent=state.xp+' XP';
+  const w=nx?clamp((state.xp-prev)/(nx[0]-prev)*100,4,100):100;
+  $('#xpFill').style.width=w+'%';$('#footFill').style.width=w+'%';
+  $('#footNext').textContent=nx?(nx[1]+' at '+nx[0]+' XP — keep going.'):('Max level reached. You run the account now.');
+  renderBadges();
+}
+function renderBadges(){
+  const keys=Object.keys(state.awarded);
+  $('#badgeRow').innerHTML=BADGES.map(([k,l])=>{
+    const earned=keys.some(a=>a===k||a.startsWith(k+'-'));
+    return '<span class="badge '+(earned?'earned':'')+'" title="'+l+'">'+l+'</span>';
+  }).join('');
+}
+function toast(msg,type='xp'){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('#toasts').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400);},3200);}
+
+/* ===================== ticker ===================== */
+function renderTicker(){
+  const items=[
+   'BAMBOO BOARD · CPC <b class="dn">$0.94 ▼3%</b>','INSULATED BOTTLE · IMP SHARE <b class="up">41% ▲5</b>',
+   'DESK LAMP · ACOS <b class="up">27.8% ▼1.2</b>','TIP: harvest converting search terms every week',
+   'BAMBOO: "cutting board" CTR <b class="up">0.42% ▲</b>','TIP: backend = 249 bytes, spaces only',
+   'TACoS = spend ÷ total sales','BOTTLE: "leak proof" CVR <b class="up">11.4% ▲</b>',
+   'TIP: never judge a keyword on &lt;15 clicks','LAMP: "wireless charger" ACOS <b class="dn">39% ▲4</b>',
+   'YOGA MAT · "non slip" CVR <b class="up">12.1% ▲</b>','TIP: fix the listing before the bid',
+   'DRILLS: 10 judgment calls to sharpen your instincts','LAMP: +50% top-of-search placement test live',
+   'TIP: a coupon badge lifts CTR and CVR','BOTTLE: "free water bottle" → negative exact'
+  ];
+  $('#tickTrack').innerHTML=[...items,...items].map(i=>'<span class="tick-item">'+i+'</span>').join('<span class="tick-sep">◆</span>');
+}
+
+/* ===================== coach's corner ===================== */
+const TIPS=[
+ 'Fix the listing before the bid — a CVR problem is a listing problem.',
+ 'Never judge a keyword on fewer than 15 clicks.',
+ 'Backend bytes: 249 max, spaces only, zero commas.',
+ 'Harvest weekly: broad finds them, exact scales them.',
+ 'The first 80 chars of your title are the whole mobile title.',
+ 'ACOS is a margin conversation, not a vanity metric.',
+ 'Out of budget by 2pm? You\'re donating the afternoon to competitors.',
+ 'Log every change. A VA who logs is a VA who stays.',
+ 'Coupon + PPC: the badge does half the selling.',
+ 'Search "ASIN + keyword" — no result means not indexed.',
+ 'Rising TACoS with flat ACOS = organic rank is slipping. Escalate.',
+ 'No Buy Box? Hold the ads — you\'re paying to feed the hijacker.'
+];
+let tipIdx=0,tipTimer;
+function renderCoach(){$('#coachTip').innerHTML='<b>Coach:</b> '+TIPS[tipIdx];}
+function startCoach(){stopCoach();tipTimer=setInterval(()=>{tipIdx=(tipIdx+1)%TIPS.length;const el=$('#coachTip');el.style.opacity=0;setTimeout(()=>{renderCoach();el.style.opacity=1;},350);},9000);}
+function stopCoach(){if(tipTimer)clearInterval(tipTimer);}
+
+/* ===================== analysis ===================== */
+function bulletQ(b){b=(b||'').trim();if(!b)return null;let q=100;const L=b.length;
+  if(L<60)q-=45;else if(L<100)q-=18;else if(L>300)q-=22;
+  if(!/^[A-Z0-9]/.test(b))q-=15;
+  if(/!{2,}/.test(b))q-=15;
+  if(!/[—–:,]/.test(b.slice(0,70)))q-=12;
+  if(/[★♥✔✨]/.test(b))q-=15;
+  return clamp(q,5,100);}
+
+function analyzeListing(sc,ls){
+  const issues=[],flagSet=new Set(),flags=[];
+  const addFlag=(sev,msg)=>{if(flagSet.has(msg))return;flagSet.add(msg);flags.push([sev,msg]);};
+  const title=ls.title.trim(),lower=title.toLowerCase();
+  const mainKw=sc.targetKeywords[0].kw;
+  let t=100;
+  if(!title){t=5;issues.push(['high','Title is empty — nothing to index or click.']);}
+  else{
+    if(!fieldHas(title,mainKw)){t-=28;issues.push(['high','Primary keyword "'+mainKw+'" is missing from the title.']);}
+    else if(lower.indexOf(mainKw)>80){t-=12;issues.push(['med','"'+mainKw+'" starts at char '+lower.indexOf(mainKw)+' — front-load it inside the first 80 chars (mobile cutoff).']);}
+    const L=title.length;
+    if(L<80){t-=14;issues.push(['med','Title is only '+L+' chars — add size, material, pack count or use case (sweet spot 120–200).']);}
+    else if(L>200){t-=30;issues.push(['high','Title is '+L+' chars — over Amazon\'s 200-char limit; it will be suppressed from search.']);}
+    else if(L<120){t-=5;issues.push(['low',L+' chars used — you have room up to 200; pack in searchable attributes.']);}
+    if(!lower.includes(sc.brand.toLowerCase())){t-=12;issues.push(['med','Brand name missing — Amazon style requires Brand + product type in the title.']);}
+    const caps=title.split(/\s+/).filter(w=>/^[A-Z]{4,}[!?]*$/.test(w)&&w.toLowerCase()!==sc.brand.toLowerCase());
+    if(caps.length){t-=16;addFlag('high','ALL-CAPS words ("'+caps.slice(0,3).join(' ')+'") violate Amazon\'s title style guide.');}
+    if(/!{2,}|[★♥✔✨]/.test(title)){t-=12;addFlag('high','Symbols / repeated "!" are not allowed in titles.');}
+  }
+  const allText=(title+' '+ls.description+' '+ls.bullets.join(' ')).toLowerCase();
+  BANNED.forEach(([w,kind])=>{if(allText.includes(w)){const sev=(kind==='prohibited'||kind==='claim')?'high':kind==='restricted'?'med':'low';addFlag(sev,'"'+w+'" ('+kind+') found — '+(kind==='prohibited'?'will trigger suppression or a policy strike':kind==='claim'?'an unsupported claim Amazon discourages':'discouraged by the style guide')+'.');}});
+  t=clamp(t,5,100);
+
+  let bScore=0;const bq=[];
+  ls.bullets.forEach((b,i)=>{const q=bulletQ(b);if(q!==null){bq.push(q);if(q<55)issues.push(['med','Bullet '+(i+1)+' is weak ('+q+'/100) — lead with a benefit, add proof + a keyword.']);}});
+  const filled=bq.length;
+  if(filled===0){bScore=5;issues.push(['high','All bullets empty — this is the first thing shoppers skim.']);}
+  else{bScore=clamp(Math.round(filled/5*55+avg(bq)*.45),5,100);if(filled<5)issues.push(['med','Only '+filled+'/5 bullets used — fill all five; each one is indexed for search.']);}
+
+  const cov={};let cSum=0,cW=0;const allB=ls.bullets.join(' . ');
+  sc.targetKeywords.forEach(k=>{const s={title:fieldHas(title,k.kw),bullets:fieldHas(allB,k.kw),backend:fieldHas(ls.backend,k.kw)};cov[k.kw]=s;const v=s.title?.55:s.bullets?.35:s.backend?.2:0;cSum+=v*k.rel;cW+=k.rel;});
+  const coverage=clamp(Math.round(cSum/cW*100),0,100);
+  if(coverage<70)issues.push(['high','Keyword coverage '+coverage+'% — target keywords aren\'t in the listing, so ads index poorly and CTR suffers.']);
+
+  let bk=100;const be=new TextEncoder().encode(ls.backend).length;
+  if(!ls.backend.trim()){bk-=35;issues.push(['med','Backend search terms empty — free indexing left on the table.']);}
+  if(be>249){bk-=40;issues.push(['high','Backend is '+be+' bytes — over 249; Amazon ignores the entire field.']);}
+  if(/[,;]/.test(ls.backend)){bk-=15;issues.push(['med','Commas / semicolons in backend — use spaces only (commas waste bytes).']);}
+  sc.brief.competitors.forEach(c=>{if(ls.backend.toLowerCase().includes(c.toLowerCase())){bk-=20;addFlag('high','Competitor brand "'+c+'" in backend — a ToS violation that can get the listing removed.');}});
+  let promoHits=0;BANNED.forEach(([w])=>{if(ls.backend.toLowerCase().includes(w))promoHits++;});if(promoHits){bk-=Math.min(20,promoHits*8);}
+  const tw=new Set(wordsOf(title));const bws=wordsOf(ls.backend);
+  if(bws.length){const dup=bws.filter(w=>tw.has(w)).length/bws.length;if(dup>.45){bk-=10;issues.push(['low',Math.round(dup*100)+'% of backend words repeat the title — use synonyms, misspellings & Spanish terms instead.']);}}
+  bk=clamp(bk,5,100);
+
+  let policy=100;flags.forEach(f=>policy-=f[0]==='high'?16:f[0]==='med'?8:4);policy=clamp(policy,5,100);
+  const overall=clamp(Math.round(t*.28+coverage*.30+bScore*.20+bk*.12+policy*.10),3,100);
+  const sevRank={high:0,med:1,low:2};
+  issues.sort((a,b)=>sevRank[a[0]]-sevRank[b[0]]);
+  return{title:t,coverage,bullets:bScore,backend:bk,policy,overall,issues,flags,cov};
+}
+
+/* ===================== sandbox render ===================== */
+function renderBrief(){
+  const sc=cur();
+  $('#briefCard').innerHTML='<div class="brief">'+
+   '<div class="b-col b-main"><span class="tag orange">CLIENT BRIEF</span><h3>'+sc.brand+' · '+sc.product+'</h3>'+
+     '<div class="b-meta mono">'+sc.category+' · $'+sc.price.toFixed(2)+' · ★ '+sc.rating+' ('+sc.reviews.toLocaleString()+' ratings) · margin '+sc.margin+'%</div>'+
+     '<p>'+sc.brief.goal+'</p></div>'+
+   '<div class="b-col"><b>USPs to weave in</b><ul>'+sc.brief.usps.map(u=>'<li>'+u+'</li>').join('')+'</ul></div>'+
+   '<div class="b-col"><b>House rules</b><ul>'+sc.brief.rules.map(u=>'<li>'+u+'</li>').join('')+'</ul><b>Do NOT mention</b><p class="mono">'+sc.brief.competitors.join(' · ')+'</p></div>'+
+   '</div>';
+}
+function renderSandbox(){
+  const sc=cur(),ls=per().listing;
+  $('#scenChips').innerHTML=SCENARIOS.map(s=>'<button type="button" class="chip scen '+(s.id===sc.id?'on':'')+'" data-sc="'+s.id+'"><img src="'+s.image+'" alt="">'+s.brand+'</button>').join('');
+  renderBrief();
+  $('#editor').innerHTML=
+   '<div class="fld"><div class="fld-h"><label>Title</label><span class="cnt" id="cntTitle"></span></div>'+
+     '<textarea class="inp" id="fTitle" rows="2">'+esc(ls.title)+'</textarea>'+
+     '<div class="ruler"><div class="ruler-fill" id="rulerFill"></div><span class="ruler-m m80" style="left:32%"></span><span class="ruler-m m200" style="left:80%"></span></div>'+
+     '<div class="ruler-legend"><span>0</span><span>80 · mobile cutoff</span><span>200 · max</span></div></div>'+
+   [0,1,2,3,4].map(i=>'<div class="fld"><div class="fld-h"><label>Bullet '+(i+1)+'</label><span class="cnt" id="cntB'+i+'"></span></div><textarea class="inp" id="fB'+i+'" rows="2">'+esc(ls.bullets[i]||'')+'</textarea></div>').join('')+
+   '<div class="fld"><div class="fld-h"><label>Product description</label><span class="cnt" id="cntDesc"></span></div><textarea class="inp" id="fDesc" rows="3">'+esc(ls.description)+'</textarea></div>'+
+   '<div class="fld"><div class="fld-h"><label>Backend search terms</label><span class="cnt" id="cntBack"></span></div><textarea class="inp" id="fBackend" rows="2" placeholder="spaces only, no commas, no brand names">'+esc(ls.backend)+'</textarea></div>'+
+   '<div class="fld-row"><div class="fld"><label style="font-weight:600;font-size:.78rem;color:#33445c">Price ($)</label><input class="inp" id="fPrice" type="number" step="0.01" value="'+ls.price+'"></div>'+
+   '<div class="fld-actions"><button type="button" class="btn btn-ghost" id="btnModel">💡 Reveal model answer</button><button type="button" class="btn btn-ghost" id="btnFlaw">↺ Reset to flawed draft</button></div></div>';
+  bindEditor();
+}
+function bindEditor(){
+  const ids=['fTitle','fB0','fB1','fB2','fB3','fB4','fDesc','fBackend','fPrice'];
+  ids.forEach(id=>{const el=$('#'+id);if(el)el.addEventListener('input',debounce(onEdit,110));});
+  $('#btnModel').onclick=()=>{per().listing=JSON.parse(JSON.stringify(cur().modelListing));per().hintUsed=true;renderSandbox();updateSandbox();toast('Model answer loaded — dissect why each element scores.','ok');};
+  $('#btnFlaw').onclick=()=>{per().listing=JSON.parse(JSON.stringify(cur().defaultListing));renderSandbox();updateSandbox();toast('Back to the flawed draft — fix it yourself this time.','warn');};
+}
+function onEdit(){
+  const ls=per().listing;
+  ls.title=$('#fTitle').value;
+  for(let i=0;i<5;i++)ls.bullets[i]=$('#fB'+i).value;
+  ls.description=$('#fDesc').value;ls.backend=$('#fBackend').value;
+  ls.price=parseFloat($('#fPrice').value)||cur().price;
+  updateSandbox();
+  if(!per().edited){per().edited=true;award('edit-'+cur().id,5,'First edits on '+cur().brand);}
+  save();
+}
+function setCnt(sel,txt,cls){const el=$(sel);if(el){el.textContent=txt;el.className='cnt '+cls;}}
+function starsHTML(r){const w=clamp(r/5*100,0,100);return '<span class="stars"><span>★★★★★</span><span class="s-fg" style="width:'+w+'%">★★★★★</span></span>';}
+function previewHTML(sc,ls){
+  const mv=$('#mvToggle').checked;const pr=+ls.price||sc.price;const fl=Math.floor(pr);const ct=String(Math.round(pr*100)%100).padStart(2,'0');
+  let ttl=ls.title.trim();let titleHtml;
+  if(!ttl)titleHtml='<i class="dim">Title empty — nothing for shoppers to read.</i>';
+  else if(mv){const cut=78;titleHtml=ttl.length>cut?esc(ttl.slice(0,cut))+'<span class="cut">…</span>':esc(ttl);}
+  else titleHtml=esc(ttl);
+  const bullets=ls.bullets.filter(b=>b.trim());
+  return '<div class="amz"><div class="amz-ribbon">SIM</div>'+
+   '<div class="amz-head"><span>amazon<span class="smile">.sim</span></span><span class="mono">'+(mv?'MOBILE':'DESKTOP')+' PREVIEW</span></div>'+
+   '<div class="amz-body"><img class="amz-img" src="'+sc.image+'" alt="'+sc.brand+'">'+
+     '<div><div class="amz-title">'+titleHtml+'</div>'+
+       '<div class="amz-meta">'+starsHTML(sc.rating)+' <b class="mono">'+sc.rating.toFixed(1)+'</b> <span class="amz-link">'+sc.reviews.toLocaleString()+' ratings</span><span class="sep">|</span><span class="amz-link">'+kfmt(Math.round(sc.targetKeywords[0].vol))+' searches/mo</span></div>'+
+       '<div class="amz-price">$'+fl+'<sup>'+ct+'</sup><span class="amz-list">$'+(pr*1.25).toFixed(2)+'</span></div>'+
+       '<div class="amz-stock">In Stock</div></div></div>'+
+   '<div class="amz-bullets"><b>About this item</b><ul>'+(bullets.length?bullets.map(b=>'<li>'+esc(b)+'</li>').join(''):'<li class="dim">No bullets yet — shoppers skim these first.</li>')+'</ul></div>'+
+   (ls.description.trim()?'<div class="amz-desc">'+esc(ls.description)+'</div>':'')+
+   '<div class="amz-buy"><button type="button" class="amz-btn cart">Add to Cart</button><button type="button" class="amz-btn now">Buy Now</button>'+
+     '<div class="amz-ship">Ships from <span>Amazon PH</span> · Sold by <span>'+sc.brand+'</span></div></div></div>';
+}
+function setDial(v){const C=2*Math.PI*52;const arc=$('#dialArc');arc.style.strokeDasharray=C;arc.style.strokeDashoffset=C*(1-v/100);arc.style.stroke=v>=80?'var(--green)':v>=55?'var(--orange)':'var(--red)';$('#dialNum').textContent=Math.round(v);$('#dialLabel').textContent=v>=80?'Launch-ready':v>=55?'Getting there':'Needs work';}
+function subBar(label,v){const c=v>=70?'var(--green)':v>=45?'var(--orange)':'var(--red)';return '<div class="sub"><div class="sub-top"><span>'+label+'</span><b>'+v+'</b></div><div class="sub-bar"><i style="width:'+v+'%;background:'+c+'"></i></div></div>';}
+function updateSandbox(){
+  const sc=cur(),ls=per().listing;const a=analyzeListing(sc,ls);
+  const tL=ls.title.length;setCnt('#cntTitle',tL+' / 200 chars',tL>200?'bad':tL>=120?'ok':tL>=80?'warn':'bad');
+  $('#rulerFill').style.width=clamp(tL/250*100,0,100)+'%';$('#rulerFill').style.background=tL>200?'var(--red)':tL>=120?'var(--green)':'var(--orange)';
+  for(let i=0;i<5;i++){const L=(ls.bullets[i]||'').trim().length;setCnt('#cntB'+i,L?L+' chars':'empty',L>=100?'ok':L>=60?'warn':L?'bad':'');}
+  setCnt('#cntDesc',ls.description.trim().length+' chars',ls.description.trim().length>40?'ok':'warn');
+  const be=new TextEncoder().encode(ls.backend).length;setCnt('#cntBack',be+' / 249 bytes',be>249?'bad':be>200?'ok':be>0?'warn':'bad');
+  $('#preview').innerHTML=previewHTML(sc,ls);
+  setDial(a.overall);
+  $('#subscores').innerHTML=subBar('Title quality',a.title)+subBar('Keyword coverage',a.coverage)+subBar('Bullets',a.bullets)+subBar('Backend terms',a.backend)+subBar('Policy safety',a.policy);
+  const prev=lastCov[sc.id]||{};
+  $('#covChips').innerHTML=sc.targetKeywords.map(k=>{const s=a.cov[k.kw],p=prev[k.kw]||{};
+    const dot=(on,was)=>'<span class="d '+(on?'on':'')+(on&&!was?' pulse':'')+'" title="'+(on?'indexed':'missing')+'"></span>';
+    return '<span class="chip cov" title="'+k.kw+'"><b>'+k.kw+'</b>'+dot(s.title,p.title)+dot(s.bullets,p.bullets)+dot(s.backend,p.backend)+'</span>';}).join('');
+  lastCov[sc.id]=a.cov;
+  $('#indexList').innerHTML=sc.targetKeywords.map(k=>{const s=a.cov[k.kw];const ok=s.title||s.bullets||s.backend;const where=s.title?'title':s.bullets?'bullets':s.backend?'backend':'nowhere';return '<div class="idx '+(ok?'ok':'no')+'"><span>'+(ok?'✓':'✗')+'</span>'+k.kw+'<em>'+where+'</em></div>';}).join('');
+  $('#flagList').innerHTML=a.flags.length?a.flags.map(f=>'<div class="flag '+f[0]+'"><span class="dot"></span><span>'+f[1]+'</span></div>').join(''):'<div class="okbox">✓ No policy issues found — this listing won\'t trip Amazon\'s style or suppression filters.</div>';
+  $('#recList').innerHTML=a.issues.length?a.issues.slice(0,7).map(i=>'<li>'+i[1]+'</li>').join(''):'<div class="okbox">Listing looks launch-ready — run a simulation to pressure-test your PPC setup.</div>';
+  if(a.overall>=80&&!per().mastered){per().mastered=true;award('master-'+sc.id,per().hintUsed?10:25,'Scenario mastered: '+sc.brand);}
+  save();
+}
+
+/* ===================== keyword lab ===================== */
+function renderKeywords(){
+  const sc=cur(),camp=per().campaign;
+  $('#kwScenName').textContent=sc.brand;
+  $('#kwTable').innerHTML='<thead><tr><th style="width:30px"></th><th>Keyword</th><th>Vol/mo</th><th>Comp</th><th>Sug. bid</th><th>Match</th><th>Your bid</th></tr></thead><tbody>'+
+   camp.keywords.map(k=>'<tr>'+
+     '<td><input type="checkbox" class="kwtoggle" data-kw="'+k.id+'" '+(k.active?'checked':'')+'></td>'+
+     '<td><b>'+k.kw+'</b><div class="rel"><i style="width:'+Math.round(k.rel*100)+'%"></i></div></td>'+
+     '<td class="mono r">'+kfmt(k.vol)+'</td>'+
+     '<td><span class="comp '+k.comp.toLowerCase()+'">'+k.comp+'</span></td>'+
+     '<td class="mono r">$'+k.sugBid.toFixed(2)+'</td>'+
+     '<td><select class="inp sel mt" data-kw="'+k.id+'">'+['broad','phrase','exact'].map(m=>'<option '+(k.match===m?'selected':'')+'>'+m+'</option>').join('')+'</select></td>'+
+     '<td><span class="mono">$</span><input class="inp bid" type="number" step="0.05" min="0.1" value="'+k.bid+'" data-kw="'+k.id+'"></td>'+
+   '</tr>').join('')+'</tbody>';
+  renderNegatives();renderPlayground();
+}
+function renderNegatives(){
+  const camp=per().campaign;
+  $('#negList').innerHTML=camp.negatives.length?camp.negatives.map((n,i)=>'<span class="chip neg">'+esc(n)+'<button type="button" class="negx" data-n="'+i+'" title="Remove">×</button></span>').join(''):'<span class="dim hint">None yet — you are leaking spend on junk clicks.</span>';
+  $$('#negList .negx').forEach(b=>b.onclick=()=>{per().campaign.negatives.splice(+b.dataset.n,1);save();renderNegatives();markStale();});
+}
+function renderPlayground(){
+  const md=cur().matchDemo;$('#pgKw').textContent='"'+md.kw+'"';
+  $('#pgSeg').innerHTML=['broad','phrase','exact'].map(m=>'<button type="button" class="'+(m===pgMatch?'on':'')+'" data-m="'+m+'">'+m+'</button>').join('');
+  $$('#pgSeg button').forEach(b=>b.onclick=()=>{pgMatch=b.dataset.m;renderPlayground();});
+  $('#pgTerms').innerHTML=md.terms.map(t=>{const hit=t[pgMatch];
+    let extra='';if(t.note&&hit)extra='<em>'+t.note+'</em>';if(t.neg&&hit)extra='<em class="leak">spend leak → add negative "'+t.neg+'"</em>';
+    return '<div class="pgt '+(hit?'hit':'miss')+'"><span class="pgt-t">'+t.t+'</span><span class="pgt-b">'+(hit?'matches':'no match')+'</span>'+extra+'</div>';}).join('');
+}
+
+/* ===================== simulator ===================== */
+function renderSimulator(){
+  const camp=per().campaign;
+  $('#ctlBudget').value=camp.budget;$('#ctlBudgetOut').textContent='$'+camp.budget+'/day';
+  $('#ctlTarget').value=camp.target;
+  $('#ctlStrat').innerHTML=['conservative','balanced','aggressive'].map(s=>'<button type="button" class="'+(camp.strategy===s?'on':'')+'" data-s="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'</button>').join('');
+  $$('#ctlStrat button').forEach(b=>b.onclick=()=>{camp.strategy=b.dataset.s;save();renderSimulator();markStale();});
+  $('#ctlBudget').oninput=e=>{camp.budget=+e.target.value;$('#ctlBudgetOut').textContent='$'+camp.budget+'/day';save();markStale();};
+  $('#ctlTarget').oninput=e=>{camp.target=clamp(+e.target.value||30,5,80);save();markStale();};
+  const act=camp.keywords.filter(k=>k.active).length;$('#ctlActive').textContent=act+' / '+camp.keywords.length;
+  $('#btnRun').onclick=runClick;
+  if(per().sim)renderSimResults(false);else renderSimPlaceholder();
+  $('#staleNote').hidden=!per().simStale;
+}
+function renderSimPlaceholder(){
+  $('#simResults').innerHTML='<div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 20v-6M11 20V6M17 20v-9"/><path d="M3 20h18"/></svg><div>Configure budget, bids &amp; strategy, then run your first 7-day simulation.</div><div class="hint" style="margin-top:.4rem">Tip: run it once on the flawed draft, fix the listing, then run again — watch ACOS fall.</div></div>';
+}
+function runClick(){const b=$('#btnRun');b.disabled=true;b.innerHTML='<span class="spin"></span> Simulating auctions…';setTimeout(()=>{doSim();b.disabled=false;b.innerHTML='▶ Run 7-day simulation';},900);}
+function doSim(){
+  const sc=cur(),p=per(),camp=p.campaign,ls=p.listing;
+  const seedText=sc.id+'|'+camp.budget+'|'+camp.target+'|'+camp.strategy+'|'+camp.keywords.map(k=>k.keyword+':'+k.bid+':'+k.active).join('|');
+  let seed=0;for(let i=0;i<seedText.length;i++)seed=(seed*31+seedText.charCodeAt(i))|0;simRandom=seededRandom(seed);
+  const a=analyzeListing(sc,ls);const q=a.overall/100;const price=+ls.price||sc.price;
+  const strat={conservative:.85,balanced:1,aggressive:1.18}[camp.strategy];
+  const negFactor=Math.max(.65,1-camp.negatives.length*.04);
+  const rows=[];
+  camp.keywords.filter(k=>k.active).forEach(k=>{
+    const bid=k.bid*strat,bf=clamp(bid/k.sugBid,.15,2.2);
+    const reach={broad:1.3,phrase:.9,exact:.58}[k.match];
+    const ctrM={broad:.85,phrase:1,exact:1.22}[k.match];
+    const cvrM={broad:.8,phrase:1,exact:1.15}[k.match];
+    const cov=a.cov[k.kw]||{};const relBoost=cov.title?1.32:cov.bullets?1.08:.8;
+    const waste=k.match==='broad'?negFactor:1;
+    const share=clamp(.05+.33*(bf/2.2),.03,.6)*(.45+.65*q)*reach;
+    const imp=Math.max(0,Math.round(k.vol*(7/30)*share*rnd(.85,1.15)));
+    const ctr=clamp(.0042*k.rel*(.5+.95*q)*ctrM*relBoost*Math.pow(bf,.22),.0008,.022);
+    const clicks=Math.round(imp*ctr*rnd(.88,1.12)*waste);
+    const cpc=clamp(bid*rnd(.58,.92),.18,5.5);
+    const spend=clicks*cpc;
+    const cvr=clamp(.095*k.rel*(.4+1.2*q)*cvrM,.012,.3);
+    const orders=Math.round(clicks*cvr*rnd(.85,1.15));
+    rows.push({k,imp,clicks,ctr,cpc,spend,orders,sales:orders*price});
+  });
+  let totSpend=rows.reduce((s,r)=>s+r.spend,0);let capped=false;
+  const w=[...Array(7)].map(()=>rnd(.7,1.3));const ws=w.reduce((a,b)=>a+b,0);
+  const daily=w.map(x=>({spend:totSpend*x/ws,sales:totSales*x/ws}));
+  daily.forEach(d=>{if(d.spend>camp.budget){const f=camp.budget/d.spend;d.spend=camp.budget;d.sales*=f;capped=true;}});
+  if(capped){const served=daily.reduce((s,d)=>s+d.spend,0),f=totSpend?served/totSpend:0;rows.forEach(r=>{r.clicks=Math.round(r.clicks*f);r.spend*=f;r.orders=Math.round(r.orders*f);r.sales=r.orders*price;});totSpend=rows.reduce((s,r)=>s+r.spend,0);}
+  const totImp=rows.reduce((s,r)=>s+r.imp,0),totClicks=rows.reduce((s,r)=>s+r.clicks,0),totOrders=rows.reduce((s,r)=>s+r.orders,0),totSales=rows.reduce((s,r)=>s+r.sales,0);
+  const prev=p.sim?p.sim.totals:null;
+  p.sim={rows,daily,capped,target:camp.target,prev,
+    totals:{imp:totImp,clicks:totClicks,ctr:totClicks/totImp||0,cpc:totSpend/totClicks||0,spend:totSpend,sales:totSales,orders:totOrders,acos:totSales>0?totSpend/totSales:Infinity,roas:totSpend>0?totSales/totSpend:Infinity}};
+  p.simStale=false;
+  award('sim-'+sc.id,15,'First simulation run');
+  renderSimResults(true);
+}
+function tween(el,to,fmt,dur=700){const from=parseFloat(el.dataset.v||0);const t0=performance.now();
+  function f(t){const p=Math.min(1,(t-t0)/dur);const v=from+(to-from)*(1-Math.pow(1-p,3));el.textContent=fmt(v);if(p<1)requestAnimationFrame(f);else el.dataset.v=to;}requestAnimationFrame(f);}
+function dHtml(c,pv,invert){if(pv==null||!isFinite(pv)||!isFinite(c)||pv===0)return '<span class="kpi-d">—</span>';const d=(c-pv)/Math.abs(pv);if(Math.abs(d)<.01)return '<span class="kpi-d">—</span>';const up=d>0;const good=invert?!up:up;return '<span class="kpi-d '+(good?'gup':'gdn')+'">'+(up?'▲':'▼')+Math.abs(d*100).toFixed(0)+'%</span>';}
+function renderSimResults(animate){
+  const sc=cur(),p=per(),sim=p.sim,T=sim.totals,pv=sim.prev;
+  const cfg=[
+   ['Impressions',T.imp,v=>kfmt(Math.round(v)),false],
+   ['Clicks',T.clicks,v=>String(Math.round(v)),false],
+   ['CTR',T.ctr,v=>pct(v),false],
+   ['Avg CPC',T.cpc,v=>money(v),true],
+   ['Spend · 7d',T.spend,v=>money(v),true],
+   ['Sales · 7d',T.sales,v=>money(v),false],
+   ['Orders',T.orders,v=>String(Math.round(v)),false],
+   ['ACOS',T.acos,v=>facos(v),true],
+   ['ROAS',T.roas,v=>isFinite(v)?v.toFixed(2)+'×':'—',false]
+  ];
+  let tiles='';cfg.forEach((c,i)=>{const good=(i===7&&isFinite(T.acos)&&T.acos<=sim.target/100)||(i===8&&isFinite(T.roas)&&T.roas>=100/sim.target);const bad=(i===7&&(!isFinite(T.acos)||T.acos>sim.target/100*1.3));tiles+='<div class="kpi '+(good?'good':bad?'bad':'')+'"><span class="kpi-l">'+c[0]+'</span><b class="kpi-v mono" id="kv'+i+'">'+c[2](0)+'</b>'+dHtml(c[1],pv?pv[['imp','clicks','ctr','cpc','spend','sales','orders','acos','roas'][i]]:null,c[3])+'</div>';});
+  const blended=T.sales>0?T.spend/T.sales:Infinity;const blendedCls=blended<=sim.target/100?'ok':'bad';
+  $('#simResults').innerHTML=
+   '<div class="kpirow">'+tiles+'</div>'+
+   '<div class="sim-grid">'+
+     '<div class="card"><div class="card-h">Spend vs sales — 7 days</div>'+
+       '<div class="legend"><span><i style="background:var(--orange)"></i>Sales</span><span><i style="background:var(--ink3)"></i>Spend</span></div>'+
+       '<div class="chart" id="chart"></div>'+
+       (sim.capped?'<div class="capnote">⚠ Campaign hit the daily budget cap — ads stopped showing mid-day. Raise the budget or cut wasted spend to capture the lost demand.</div>':'')+
+       '<p class="hint" style="margin-top:.6rem">Blended ACOS <b style="color:'+(blendedCls==='ok'?'var(--green)':'var(--red)')+'">'+facos(blended)+'</b> vs '+sim.target+'% target · break-even ≈ '+Math.round(sc.margin||34)+'% margin.</p></div>'+
+     '<div class="card"><div class="card-h">Recommendations</div><div id="simRecs"></div></div>'+
+   '</div>'+
+   '<div class="card"><div class="card-h">Keyword breakdown</div><div class="tblwrap"><table class="tbl" id="simTable"></table></div></div>';
+  if(animate){cfg.forEach((c,i)=>{const el=$('#kv'+i);if(!isFinite(c[1])&&(i===7||i===8)){el.textContent=c[2](c[1]);el.dataset.v=0;}else tween(el,c[1],c[2]);});}
+  else cfg.forEach((c,i)=>{const el=$('#kv'+i);el.textContent=c[2](c[1]);el.dataset.v=c[1];});
+  const max=Math.max(...sim.daily.map(d=>Math.max(d.spend,d.sales)),1);
+  $('#chart').innerHTML=sim.daily.map((d,i)=>'<div class="cday" title="Day '+(i+1)+' — Spend '+money(d.spend)+' · Sales '+money(d.sales)+'"><div class="cbars"><i class="cb sale" style="height:0%"></i><i class="cb spend" style="height:0%"></i></div><span>D'+(i+1)+'</span></div>').join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{[...$('#chart').querySelectorAll('.cday')].forEach((el,i)=>{el.querySelector('.sale').style.height=(sim.daily[i].sales/max*100)+'%';el.querySelector('.spend').style.height=(sim.daily[i].spend/max*100)+'%';});}));
+  $('#simRecs').innerHTML=recommend(p,sim).map(r=>'<div class="rec p'+r[0]+'"><span class="ic">'+(r[0]===0?'▲':r[0]===1?'⚠':'■')+'</span><span>'+r[1]+'</span></div>').join('');
+  $('#simTable').innerHTML='<thead><tr><th>Keyword</th><th class="r">Imp</th><th class="r">Clicks</th><th class="r">CTR</th><th class="r">CPC</th><th class="r">Spend</th><th class="r">Orders</th><th class="r">Sales</th><th class="r">ACOS</th></tr></thead><tbody>'+
+   sim.rows.map(r=>{const ac=r.sales>0?r.spend/r.sales:Infinity;const col=ac<=sim.target/100?'var(--green)':ac<=sim.target/100*1.3?'var(--orange-d)':'var(--red)';
+     return '<tr><td><b>'+r.k.kw+'</b><span class="mtb '+r.k.match+'">'+r.k.match+'</span></td><td class="mono r">'+kfmt(r.imp)+'</td><td class="mono r">'+r.clicks+'</td><td class="mono r">'+pct(r.ctr)+'</td><td class="mono r">'+money(r.cpc)+'</td><td class="mono r">'+money(r.spend)+'</td><td class="mono r">'+r.orders+'</td><td class="mono r">'+money(r.sales)+'</td><td class="mono r" style="color:'+col+';font-weight:600">'+facos(ac)+'</td></tr>';}).join('')+
+   (sim.rows.length?'':'<tr><td colspan="9" class="dim" style="padding:1rem">No active keywords — enable some in the Keyword Lab.</td></tr>')+'</tbody>';
+}
+function recommend(p,sim){
+  const recs=[];const t=sim.target/100;
+  sim.rows.forEach(r=>{const ac=r.sales>0?r.spend/r.sales:Infinity;
+    if(r.imp<60)recs.push([1,'"'+r.k.kw+'" barely served ('+r.imp+' impressions) — $'+r.k.bid.toFixed(2)+' is below auction clearing; raise toward $'+(r.k.sugBid*1.05).toFixed(2)+'.']);
+    if(r.clicks>=8&&ac>t*1.4)recs.push([1,'"'+r.k.kw+'" ACOS '+facos(ac)+' vs '+sim.target+'% target — lower the bid ~15% or tighten the match type.']);
+    if(r.clicks>=8&&r.ctr<.0025)recs.push([2,'CTR '+pct(r.ctr)+' on "'+r.k.kw+'" — that\'s a listing-relevance problem, not a bid problem. Fix title/image before spending more.']);
+    if(r.k.match!=='exact'&&r.orders>=2&&ac<=t)recs.push([0,'Harvest: "'+r.k.kw+'" ('+r.k.match+') converted '+r.orders+' orders at '+facos(ac)+' — move the winning search terms into exact match.']);
+  });
+  if(sim.capped)recs.push([1,'Campaign hit the daily budget cap — you stopped showing mid-day. Raise the budget or cut wasted spend.']);
+  const tot=sim.totals;const ta=tot.sales>0?tot.spend/tot.sales:null;
+  if(ta&&ta<t*.6&&tot.spend>20)recs.push([0,'Blended ACOS '+facos(ta)+' is well under target — you\'re leaving profitable volume behind. Scale winners 10–15%.']);
+  if(!p.campaign.negatives.length)recs.push([2,'No negative keywords yet — add 3–5 from the search-term ideas in the Keyword Lab to stop the leaks.']);
+  if(!sim.rows.length)recs.push([2,'No active keywords — turn some on in the Keyword Lab before running.']);
+  if(!recs.length)recs.push([0,'Clean run. Document results in the client change log and re-check in 48–72h.']);
+  recs.sort((a,b)=>a[0]-b[0]);
+  return recs;
+}
+function markStale(){const p=per();if(p.sim){p.simStale=true;const n=$('#staleNote');if(n)n.hidden=false;}}
+
+/* ===================== judgment drills ===================== */
+const DRILLS=[
+{id:'d1',tag:'Bidding',title:'The Post-Prime-Day ACOS Hangover',
+ context:'Your client sells a stainless garlic press. During Prime Day week the campaign ran at 24% ACOS. Three days after the event it\'s 58%. Nothing changed on the listing, and the client is asking "what happened?"',
+ data:[['Metric','Prime Day wk','This wk'],['ACOS','24%','58%'],['Avg CPC','$0.82','$1.47'],['CVR','11.2%','10.8%'],['Impressions','41k','39k']],
+ hint:'CVR barely moved. Which line item actually exploded?',
+ options:['Trim bids 10–15% on the worst offenders and re-check in 48h','Pause every campaign until ACOS recovers','Raise the product price 15% to recover margin','Rewrite the title and bullets'],a:0,
+ explain:'CVR is stable — the listing is fine. CPC inflated after the event as competitors kept chasing deal traffic. Trim bids 10–15% on the offenders and monitor; pausing everything torches the organic rank you just bought with Prime Day velocity.'},
+{id:'d2',tag:'Troubleshooting',title:'The Campaign That Never Fired',
+ context:'You launched an exact-match campaign on "yoga mat non slip" for a new client. 48 hours later: 0 impressions, $0 spend. Budget is $25/day, your bid is $0.45, and the suggested bid range shows $1.10–$1.60.',
+ data:null,
+ hint:'You can\'t win an auction you can\'t afford to enter.',
+ options:['Raise the bid toward the suggested range and verify the keyword indexes (ASIN search test)','Add 20 negative keywords to "focus" the campaign','Switch the match type to broad so more searches qualify','Open an urgent case with Seller Support'],a:0,
+ explain:'A $0.45 bid against a ~$1.35 clearing price means you lose every auction — zero impressions is a bid problem first. Also confirm the ASIN actually indexes for the term. Negatives can\'t fix under-delivery, and a case is premature before you\'ve tested your own inputs.'},
+{id:'d3',tag:'Policy',title:'Vanished From Search',
+ context:'A client\'s desk lamp disappeared from search results. Account Health shows a Quality Alert: "Title violates style guide — promotional wording." The title reads "LED DESK LAMP BEST CHOICE!! Wireless Charging…".',
+ data:null,
+ hint:'Fix the root cause before you escalate anything.',
+ options:['Delete the listing and relist under a fresh ASIN','Remove the claim, re-save via flat file, then monitor reindexing — case only if it stays suppressed','Open an urgent case with Seller Support immediately','Move "BEST CHOICE!!" into the bullets instead'],a:1,
+ explain:'Style suppressions usually clear within minutes to 24 hours of a clean re-save. A new ASIN risks a duplicate-listing violation, moving the claim to the bullets just relocates the problem, and a case without a fix gets you a form response.'},
+{id:'d4',tag:'Inventory',title:'Running Dry in 10 Days',
+ context:'Your bottle client has 240 units left and sells ~24/day. The restock lands in 18 days. The campaign is profitable: 26% ACOS against a 30% target. The client asks how to handle the gap.',
+ data:[['Metric','Value'],['Units on hand','240'],['Sales velocity','~24/day'],['Restock ETA','18 days'],['Campaign ACOS','26% (target 30%)']],
+ hint:'A hard pause crashes rank. Maxing out creates a dead window. What\'s the middle path?',
+ options:['Pause all ads today to save inventory','Taper bids and budget down ~10–15% every few days to stretch stock across the gap','Raise the price 40% to slow sales','Increase the budget to bank as many sales as possible before stock-out'],a:1,
+ explain:'A sudden pause tells the algorithm the product is dead and you\'ll restart from a hole; maxing out leaves you dark for 8+ days at peak demand. A controlled taper (plus maybe a small price lift) keeps some velocity and rank alive, then you relaunch hard on restock day.'},
+{id:'d5',tag:'Negatives',title:'The $187 Word',
+ context:'Weekly search-term report for the bottle campaign. One line jumps out: "free water bottle" — 214 clicks, $187 spend, 0 orders. Everything else looks normal.',
+ data:[['Search term','Clicks','Spend','Orders'],['free water bottle','214','$187','0'],['insulated water bottle 32 oz','96','$81','11'],['gym water bottle','61','$49','6']],
+ hint:'What is the intent of someone searching that term?',
+ options:['Add "free" as a negative exact keyword','Lower the bid on the parent keyword by 50%','Add "free" to the title to capture more of this traffic','Do nothing — one bad term won\'t matter'],a:0,
+ explain:'A shopper hunting a free bottle was never going to buy — that\'s $187 of pure intent mismatch. Negative exact on "free" stops it permanently. Lowering the bid punishes the good traffic on the same keyword, and chasing "free" searchers with your title attracts more of them.'},
+{id:'d6',tag:'Structure',title:'Promote the Winner',
+ context:'Inside a broad "desk lamp" campaign, one search term keeps converting: "desk lamp with wireless charger" — 11 orders this month at 19% ACOS. Your target is 32%.',
+ data:null,
+ hint:'Winners deserve their own budget and their own bid.',
+ options:['Pause the broad campaign — it\'s done its job','Harvest the term into its own exact-match campaign with a dedicated bid','Move the keyword into an auto campaign for more reach','Cut the broad bid in half to lock in profit'],a:1,
+ explain:'That\'s harvesting: a proven converter gets promoted to exact match with its own bid so you can scale it deliberately instead of renting it inside a blended average. Leaving it buried means its budget fights with everything else in the broad campaign.'},
+{id:'d7',tag:'Account Health',title:'Clicks Up, Orders Gone',
+ context:'A client\'s ACOS tripled overnight. Clicks are up 40%, orders are near zero. Checking the live listing, a third-party seller is undercutting the price and holding the Buy Box.',
+ data:null,
+ hint:'Who receives the sale when an ad converts?',
+ options:['Raise bids to win back the traffic','Hold the ads, report the hijacker, and recover the Buy Box first','Add negative keywords to cut waste','Rewrite the bullets to convert better'],a:1,
+ explain:'Sponsored Products sales go to the Buy Box owner — right now you\'re paying to send customers to the hijacker. Stop the bleed, report the unauthorized seller, and restore the Box. Only then does ad spend make sense again.'},
+{id:'d8',tag:'Strategy',title:'The Quiet Erosion',
+ context:'Monthly review: ACOS has held steady at 28% all month (target 30%). But TACoS climbed from 9% to 15%, and organic orders are down 30%. The client only looks at ACOS and says "everything\'s great."',
+ data:[['Metric','Last month','This month'],['ACOS','28%','28%'],['TACoS','9%','15%'],['Organic orders','310','217']],
+ hint:'TACoS = spend ÷ total sales. If it rises while ACOS is flat, where did the total sales go?',
+ options:['Scale ad spend — the campaigns are efficient','Escalate: organic rank is slipping — audit price, reviews and listing freshness alongside the ads','Do nothing — ACOS is on target, that\'s the KPI','Pause the broad campaigns to protect margin'],a:1,
+ explain:'Flat ACOS with rising TACoS means ads are buying sales you used to win for free — organic rank is eroding underneath you. This is the classic "efficient campaigns, sick business" pattern, and it\'s exactly what a sharp VA flags before the client notices revenue falling.'},
+{id:'d9',tag:'Client Comms',title:'"I Can\'t See My Own Ad!"',
+ context:'Friday, 4:52pm. The client messages: "I searched \'bamboo cutting board\' ten times and my ad never showed up once. Are you even running my campaigns?!"',
+ data:null,
+ hint:'Impression share is rarely 100% — and there\'s a policy reason you never ask a client to click their own ad.',
+ options:['Ask them to keep searching until it appears so you can verify','Explain impression share and sampling — and never have them click their own ad','Immediately raise bids until the ad shows on every search','Send a screenshot of the campaign dashboard as proof'],a:1,
+ explain:'Even strong campaigns win a fraction of eligible impressions, and search results are sampled by location and history — not seeing your own ad is normal. Repeated self-searches without clicks actually teach Amazon your ad is irrelevant, and self-clicks violate policy. Share the impression share metric instead; it answers the real question.'},
+{id:'d10',tag:'Promotions',title:'The Velocity Play',
+ context:'Pre-Q4 planning. Your bottle campaign sits at 24% ACOS (target 30%) with a 9% CVR. The client wants more sales velocity to build rank before the holiday rush and asks for your recommendation.',
+ data:null,
+ hint:'What lever lifts both CTR and CVR at the same time — and shows up in the search results?',
+ options:['Stack a 10–15% coupon on top of the ads and monitor CVR/ACOS closely','Cut ad spend to save margin for Q4','Raise the price to increase per-unit profit','Move everything into an auto campaign for simplicity'],a:0,
+ explain:'A coupon badge in search results lifts CTR, and the lower effective price lifts CVR — a compounding velocity play that feeds organic rank. Since the discount eats margin, you watch ACOS against the new break-even, but with headroom from 24% to 30% this is exactly when you press the accelerator.'}
+];
+function drillSolved(){return Object.keys(state.drills).filter(id=>{const d=DRILLS.find(x=>x.id===id);return d&&state.drills[id]===d.a;}).length;}
+function renderDrills(){
+  const solved=drillSolved();
+  $('#drillScore').textContent=solved+' / '+DRILLS.length;
+  $('#drillFill').style.width=(solved/DRILLS.length*100)+'%';
+  $('#drillList').innerHTML=DRILLS.map((d,i)=>{
+    const picked=state.drills[d.id];const answered=picked!==undefined;const correct=picked===d.a;
+    const opts=d.options.map((o,oi)=>{let cls='opt dopt';if(answered){if(oi===d.a)cls+=' correct';else if(oi===picked)cls+=' wrong';}return '<button type="button" class="'+cls+'" data-d="'+d.id+'" data-i="'+oi+'" '+(answered?'disabled':'')+'><b>'+'ABCD'[oi]+'</b> '+o+'</button>';}).join('');
+    const dataTbl=d.data?'<table class="ftable drill-data"><thead><tr>'+d.data[0].map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+d.data.slice(1).map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'';
+    const exp=answered?'<div class="qexplain '+(correct?'ok':'no')+'"><b>'+(correct?'Right call.':'Not the move a senior VA makes.')+'</b> '+d.explain+'</div>':'';
+    return '<div class="card drill reveal in"><div class="drill-top"><span class="tag orange">DRILL '+(i+1)+'</span><span class="tag">'+d.tag+'</span>'+(answered?'<span class="tag '+(correct?'ok':'no')+'">'+(correct?'SOLVED ✓':'MISSED')+'</span>':'')+'</div>'+
+      '<h3 class="drill-title">'+d.title+'</h3><p class="drill-ctx">'+d.context+'</p>'+dataTbl+
+      '<button type="button" class="hintbtn" data-d="'+d.id+'">💡 Coach hint</button><div class="drillhint" id="hint-'+d.id+'" hidden>'+d.hint+'</div>'+
+      '<div class="dopts">'+opts+'</div>'+exp+'</div>';
+  }).join('');
+}
+function answerDrill(id,i){
+  if(state.drills[id]!==undefined)return;
+  state.drills[id]=i;const d=DRILLS.find(x=>x.id===id);
+  if(i===d.a){award('drill-'+id,8,'Drill solved: '+d.title);if(drillSolved()===DRILLS.length)award('drill-all',25,'All judgment drills solved');}
+  save();renderDrills();
+}
+
+/* ===================== quiz ===================== */
+const QUIZ=[
+ {q:'ACOS is calculated as…',o:['Ad spend ÷ ad-attributed sales','Ad sales ÷ ad spend','Clicks ÷ impressions','Ad spend ÷ total store revenue'],a:0,e:'ACOS = spend ÷ ad sales. $25 spend on $100 of ad sales = 25% ACOS. (Sales ÷ spend is ROAS — the inverse.)'},
+ {q:'What is the maximum size of backend search terms?',o:['249 bytes','250 words','500 characters','2,000 bytes'],a:0,e:'249 bytes. Go over and Amazon silently ignores the whole field. Use spaces (not commas) and never repeat words already in the title.'},
+ {q:'Which match type gives the tightest control over triggering searches?',o:['Broad','Phrase','Exact','Auto'],a:2,e:'Exact matches that search term (and close variants) only — highest control, lowest reach. Broad is the loosest net.'},
+ {q:'Click-through rate (CTR) is…',o:['Clicks ÷ impressions','Orders ÷ clicks','Spend ÷ clicks','Impressions ÷ clicks'],a:0,e:'CTR = clicks ÷ impressions. On Sponsored Products, below ~0.3% usually means a relevance problem with the title, image or price — not the bid.'},
+ {q:'A keyword has 42 clicks, 1 order, ACOS 95%. Best first move?',o:['Pause it immediately','Double the bid','Check the search terms & listing relevance before touching the bid','Delete the whole campaign'],a:2,e:'42 clicks is real data but the problem could be junk search terms or a weak listing. Read the search-term report first; pausing blind throws away learning.'},
+ {q:'Which of these in a title can get a listing suppressed?',o:['The brand name','"Best Seller"','A size like 18×12','A material like bamboo'],a:1,e:'Subjective claims like "Best Seller", "#1" or "Top Rated" violate Amazon\'s style guide and can suppress the listing. Brand, size and material are exactly what the title should contain.'},
+ {q:'Break-even ACOS equals…',o:['Your profit margin %','Half your ROAS','Amazon\'s referral fee %','CPC ÷ price'],a:0,e:'If your all-in margin is 34%, you can spend up to 34% of the sale on ads and still break even. Target below that to make profit.'},
+ {q:'You find "glass cutting board" in the search-term report for your bamboo board ad. You should…',o:['Add "glass" as a negative keyword','Raise the bid on the keyword','Add "glass" to the title','Do nothing'],a:0,e:'A shopper wanting glass will never buy bamboo — that click is pure waste. Add it as a negative exact so the money goes to real buyers.'},
+ {q:'A broad-match keyword has 3 orders at 22% ACOS (target 30%). Best next step?',o:['Pause it','Harvest the converting search term into an exact campaign','Move it to auto','Cut the bid in half'],a:1,e:'That\'s a winner. Lift the actual converting search term into exact match with its own bid — that\'s harvesting, and it\'s how campaigns mature.'},
+ {q:'TACoS differs from ACOS because it…',o:['Includes organic sales in the denominator','Excludes PPC spend','Only counts exact match','Is set by Amazon, not you'],a:0,e:'TACoS = ad spend ÷ total sales (ad + organic). If TACoS climbs while ACOS is flat, your organic rank is slipping and you\'re buying sales you used to win for free.'},
+ {q:'"Dynamic bidding — down only" means Amazon may…',o:['Raise your bid up to 100% at top of search','Lower your bid when a conversion seems unlikely','Never change your bid','Only bid on exact match'],a:1,e:'Down only lets Amazon reduce your bid (up to 100% lower) when it predicts a weak conversion. "Up & down" adds raises — use it only with solid CVR data.'},
+ {q:'Top-of-search placements usually come with…',o:['Lowest CTR and lowest CPC','Highest CTR and highest CPC','No CPC at all','Identical performance to product pages'],a:1,e:'Top of search is premium real estate: shoppers see it first, so CTR and CPC both run higher. Placement multipliers let you pay up for it deliberately.'},
+ {q:'A listing is suppressed for a style violation. First move?',o:['Delete it and create a new ASIN','Fix the violation and re-save (flat file), then monitor reindexing','Open an urgent case immediately','Move the offending phrase into the bullets'],a:1,e:'Fix the root cause first — most style suppressions clear within minutes to 24h of a clean re-save. A new ASIN risks a duplicate-listing violation, and a case without a fix goes nowhere.'},
+ {q:'Dayparting in PPC means…',o:['Splitting campaigns by product line','Shifting spend toward the hours/days that convert best','Running ads only during Lightning Deals','Matching competitor schedules'],a:1,e:'Dayparting = biasing spend to high-converting windows. It needs real data (100+ clicks/week) before it earns its keep — never on a fresh campaign.'},
+ {q:'Stacking a coupon on a product running Sponsored Products usually…',o:['Has no measurable effect','Lifts CTR and CVR via the green badge and price perception','Hurts organic rank','Is against policy'],a:1,e:'The coupon badge shows in search results, lifting CTR, and the effective price lifts CVR — a classic velocity play. Watch ACOS, since the discount eats margin.'},
+ {q:'"Close variants" in exact match include…',o:['Competitor brand names','Plurals, misspellings and stemming of your keyword','Any word in the same category','Only the exact word, character for character'],a:1,e:'Exact match also fires on close variants — plurals, misspellings, stems ("running" vs "run"). You can\'t opt out, so keep mining the search-term report.'},
+ {q:'Long-tail keywords typically offer…',o:['Highest volume and highest CPC','Lower volume, higher intent, cheaper CPCs','No impressions','Guaranteed conversions'],a:1,e:'"32 oz insulated water bottle with straw" converts better than "water bottle" — smaller audience, sharper intent, cheaper clicks. Long-tail is where new products win.'},
+ {q:'Your client lost the Buy Box to a hijacker. Their Sponsored Products ads will…',o:['Convert normally — ads bypass the Buy Box','Still show, but clicks convert for the Buy Box owner — pause ads and recover the Box first','Automatically pause','Double in CPC'],a:1,e:'The sale goes to whoever owns the Buy Box. Paying for clicks that convert for a hijacker is the worst possible spend — hold ads, report the hijacker, win the Box back.'}
+];
+let quizState={i:0,correct:0,answered:false};
+function renderQuiz(){
+  const q=QUIZ[quizState.i];
+  $('#quizBox').innerHTML='<div class="quiz-top"><span class="tag">QUESTION '+(quizState.i+1)+' / '+QUIZ.length+'</span><span class="mono" id="quizScore" style="color:var(--slate)">Score: '+quizState.correct+'</span></div>'+
+   '<div class="qdots">'+QUIZ.map((_,i)=>'<i class="qd '+(i<quizState.i?'done':'')+(i===quizState.i?' cur':'')+'"></i>').join('')+'</div>'+
+   '<h3 class="qtext">'+q.q+'</h3>'+
+   '<div id="qOpts">'+q.o.map((o,i)=>'<button type="button" class="opt" data-i="'+i+'"><b>'+'ABCD'[i]+'</b> '+o+'</button>').join('')+'</div>'+
+   '<div id="qExplain" class="qexplain" hidden></div>'+
+   '<div class="quiz-foot"><button type="button" class="btn" id="qNext" hidden>'+(quizState.i===QUIZ.length-1?'See results':'Next question →')+'</button></div>';
+  $$('#qOpts .opt').forEach(b=>b.onclick=()=>answerQ(+b.dataset.i));
+  $('#qNext').onclick=nextQ;
+}
+function answerQ(i){if(quizState.answered)return;quizState.answered=true;const q=QUIZ[quizState.i];const ok=i===q.a;
+  $$('#qOpts .opt').forEach((b,bi)=>{b.disabled=true;if(bi===q.a)b.classList.add('correct');else if(bi===i)b.classList.add('wrong');});
+  if(ok){quizState.correct++;$('#quizScore').textContent='Score: '+quizState.correct;}
+  const ex=$('#qExplain');ex.hidden=false;ex.innerHTML='<b>'+(ok?'Correct.':'Not quite.')+'</b> '+q.e;ex.className='qexplain '+(ok?'ok':'no');
+  $('#qNext').hidden=false;}
+function nextQ(){quizState.answered=false;quizState.i++;if(quizState.i>=QUIZ.length)renderQuizResults();else renderQuiz();}
+function renderQuizResults(){
+  const s=quizState.correct,tot=QUIZ.length,pass=s>=7;
+  award('quiz-done',s*5,'Quiz completed — '+s+'/'+tot);
+  if(s>=9)award('quiz-ace',20,'Quiz aced — ace level');
+  StudentProgress.createLocalProgressStore().recordAttempt(SimulatorAttempt.buildAttemptRecord({
+    scenario:{id:'buybox-knowledge-quiz',simulatorId:'listing',version:'1.0.0',rubricVersion:'1.0.0'},
+    result:{score:s,maxScore:tot,passed:pass},completedAt:new Date().toISOString()
+  }));
+  $('#quizBox').innerHTML='<div class="qres"><div class="qres-ring">'+s+'/'+tot+'</div><h3>'+(pass?'Passed — you speak PPC.':'Keep drilling — the Academy has your back.')+'</h3><p>'+(s>=9?'Ace level. You could run a client call on this material.':pass?'Solid foundation. Revisit the ones you missed in the Glossary.':'Spend 15 minutes in the Academy, then retake it — the explanations are the real lesson.')+'</p><button type="button" class="btn" id="qRetry">↺ Retake quiz</button></div>';
+  $('#qRetry').onclick=()=>{quizState={i:0,correct:0,answered:false};renderQuiz();};
+}
+
+/* ===================== glossary ===================== */
+const GLOSS=[
+ {t:'ACOS',tag:'Metric',d:'Advertising Cost of Sale = ad spend ÷ ad-attributed sales. The headline efficiency number in Amazon PPC; compare it against your break-even margin.'},
+ {t:'ROAS',tag:'Metric',d:'Return on Ad Spend = ad sales ÷ ad spend. The inverse of ACOS. ACOS 25% = ROAS 4×.'},
+ {t:'TACoS',tag:'Metric',d:'Total ACOS = ad spend ÷ total sales (ad + organic). Rising TACoS means you\'re buying sales you should be winning organically.'},
+ {t:'CTR',tag:'Metric',d:'Click-Through Rate = clicks ÷ impressions. Below ~0.3% on Sponsored Products usually signals a relevance problem (title, image, price).'},
+ {t:'CPC',tag:'Metric',d:'Cost Per Click. You pay per click, not per impression; average CPC should sit below your suggested bid.'},
+ {t:'CVR',tag:'Metric',d:'Conversion Rate = orders ÷ clicks. Category averages run 8–12%; below that, fix the listing before touching bids.'},
+ {t:'Break-even ACOS',tag:'Metric',d:'Your profit margin expressed as ACOS. Price $25, all-in cost $16.50 → 34% margin → you break even at 34% ACOS.'},
+ {t:'Impressions',tag:'Metric',d:'How many times your ad was shown. Zero impressions = bid too low, budget exhausted, or keyword not indexed.'},
+ {t:'Impression Share',tag:'Metric',d:'Your impressions ÷ eligible impressions. The gap shows how much demand you\'re losing to bids or budget.'},
+ {t:'Referral Fee',tag:'Metric',d:'Amazon\'s category commission on each sale (often 8–15%). It belongs in your margin math before you set an ACOS target.'},
+ {t:'Search Term vs Keyword',tag:'Concept',d:'The keyword is what you bid on; the search term is what the shopper actually typed. Mining the gap between them is the weekly job.'},
+ {t:'Match Types',tag:'Concept',d:'Broad (any order + related), Phrase (contains the phrase), Exact (that search, precisely). Control rises and reach falls down that ladder.'},
+ {t:'Negative Keywords',tag:'Concept',d:'Words you refuse to show for. "Glass" as a negative keeps your bamboo ad out of "glass cutting board" searches.'},
+ {t:'Harvesting',tag:'Concept',d:'Pulling converting search terms out of broad/auto campaigns into their own exact-match campaigns with their own bids.'},
+ {t:'Indexing',tag:'Concept',d:'Whether Amazon associates your listing with a search word. Test by searching "ASIN + keyword"; no result = not indexed.'},
+ {t:'Buy Box',tag:'Concept',d:'Ownership of the "Add to Cart" button. Losing it pauses your ads\' ability to convert — check it before blaming the campaign.'},
+ {t:'ASIN',tag:'Concept',d:'Amazon Standard Identification Number: the 10-character ID for every catalog product.'},
+ {t:'Search Term Report',tag:'Concept',d:'The record of what shoppers actually typed before clicking your ad. Source of your negatives and your next exact-match winners.'},
+ {t:'Close Variants',tag:'Concept',d:'Plurals, misspellings and stems that exact/phrase match still triggers. You can\'t exclude them — monitor them.'},
+ {t:'Long-tail Keywords',tag:'Concept',d:'Specific, multi-word searches ("32 oz insulated bottle with straw"). Lower volume, higher intent, cheaper CPCs.'},
+ {t:'Head Term',tag:'Concept',d:'The short, high-volume core keyword ("water bottle"). Expensive and vague — defend it, don\'t bet the budget on it.'},
+ {t:'Dayparting',tag:'Concept',d:'Biasing ad spend toward the hours and days that convert best. Requires 100+ clicks/week of data before it\'s trustworthy.'},
+ {t:'Coupon Badge',tag:'Concept',d:'The green deal badge in search results. Lifts CTR and CVR; a standard velocity lever during launches and Q4.'},
+ {t:'Lightning Deal',tag:'Concept',d:'A time-boxed promotional price with its own deal badge. Expect CPC inflation around the deal window.'},
+ {t:'Sales Velocity',tag:'Concept',d:'Units sold per day. Amazon\'s rank algorithm loves rising velocity — PPC exists partly to buy it.'},
+ {t:'Organic Rank',tag:'Concept',d:'Where you sit in unpaid results. PPC that drives sales velocity feeds rank; TACoS tells you if the flywheel is working.'},
+ {t:'Halo Effect',tag:'Concept',d:'Spillover benefit: ads on one ASIN lift brand searches, reviews and sales on your other products too.'},
+ {t:'FBA',tag:'Concept',d:'Fulfillment by Amazon — Amazon stores, packs and ships your inventory. Prime badge included; fees eat margin, so know your all-in cost.'},
+ {t:'Flat File',tag:'Concept',d:'Amazon\'s spreadsheet template for bulk listing edits. Cleaner than the UI for fixing suppressed or messy listings.'},
+ {t:'Auto Campaign',tag:'Campaign',d:'Amazon picks the search terms. Great for discovery; terrible as your only strategy.'},
+ {t:'Manual Campaign',tag:'Campaign',d:'You choose the keywords and bids. This is where real scaling happens.'},
+ {t:'Budget Pacing',tag:'Campaign',d:'How fast the daily budget is consumed. Out of budget by 2pm = leaving the afternoon market to competitors.'},
+ {t:'Dynamic Bidding',tag:'Campaign',d:'Amazon adjusts your bid per auction. "Down only" lowers when conversion looks unlikely; "up & down" can also raise (up to 100% top of search); "fixed" never changes.'},
+ {t:'Placement Multiplier',tag:'Campaign',d:'A % boost applied to bids for top-of-search or product-page placements. +50% on a $1.00 bid = up to $1.50 for that placement.'},
+ {t:'Top of Search',tag:'Campaign',d:'The first row of results above organic listings. Premium CTR, premium CPC — the placement most worth paying up for when CVR supports it.'},
+ {t:'Sponsored Brands',tag:'Campaign',d:'Headline-search ads featuring your brand logo, custom copy and up to 3 products. Requires Brand Registry.'},
+ {t:'Sponsored Display',tag:'Campaign',d:'Display ads on and off Amazon that retarget shoppers by behavior — the retargeting layer of a full funnel.'},
+ {t:'Suppression',tag:'Policy',d:'When Amazon hides a listing for style or policy violations (over-long titles, banned claims). A suppressed listing earns nothing, no matter the bid.'},
+ {t:'Keyword Stuffing',tag:'Policy',d:'Cramming irrelevant or repeated keywords into a listing. Hurts readability and can trigger suppression — Amazon indexes smarter than that.'},
+ {t:'Account Health',tag:'Policy',d:'Your seller compliance dashboard. Quality Alerts here explain suppressions — check it before opening any case.'}
+];
+function renderGlossary(){
+  const q=($('#glossSearch').value||'').toLowerCase();
+  const list=GLOSS.filter(g=>g.t.toLowerCase().includes(q)||g.d.toLowerCase().includes(q));
+  $('#glossGrid').innerHTML=list.length?list.map(g=>'<div class="gcard reveal in"><span class="gtag '+g.tag.toLowerCase()+'">'+g.tag+'</span><h4>'+g.t+'</h4><p>'+g.d+'</p></div>').join(''):'<p class="dim">No terms match "'+esc(q)+'".</p>';
+}
+
+/* ===================== message templates ===================== */
+const MSG_TPLS={
+ escalate:{label:'Escalation',text:`ESCALATION — [Client / ASIN] — [Date]
+ISSUE:   [one line — what broke]
+IMPACT:  [spend / sales / rank at risk, $ if possible]
+SINCE:   [when it started]
+ALREADY DONE: [steps you took + results]
+ASK:     [the decision you need + by when]`},
+ budget:{label:'Budget increase',text:`BUDGET REQUEST — [Client] — [Campaign]
+CURRENT: $__/day → runs out by ~__
+LAST 14D: ACOS __% (target __%) · __ orders
+PROPOSAL: raise to $__/day (+__%)
+EXPECTED: +__ orders/wk at ~__% ACOS
+REVIEW:  reassess in 7 days`},
+ pause:{label:'Pause rec',text:`PAUSE RECOMMENDATION — [Client] — [Date]
+KEYWORD / CAMPAIGN: __
+DATA: __ clicks · $__ spend · 0 orders · ACOS ∞
+ROOT CAUSE: [intent mismatch / listing issue / seasonality]
+ACTION: [pause / negative exact] — saves ~$__/wk
+REVISIT: [condition to re-enable]`},
+ onboard:{label:'Onboarding',text:`ONBOARDING — [Client]
+1. Top 3 ASINs + monthly revenue each?
+2. Margin % per ASIN (landed cost incl. FBA fees)?
+3. Current ACOS / TACoS + target?
+4. Inventory on hand + restock ETA?
+5. Access: Campaign Manager + Brand Analytics?
+6. Past agencies / VA — what worked, what didn't?
+7. Q4 / launch calendar?
+8. Approval chain + comms cadence?`}
+};
+let curTpl='escalate';
+function initTemplates(){
+  $('#tplSeg').innerHTML=Object.keys(MSG_TPLS).map(k=>'<button type="button" class="'+(k===curTpl?'on':'')+'" data-t="'+k+'">'+MSG_TPLS[k].label+'</button>').join('');
+  $$('#tplSeg button').forEach(b=>b.onclick=()=>{curTpl=b.dataset.t;initTemplates();});
+  $('#tplBox').textContent=MSG_TPLS[curTpl].text;
+  $('#copyTpl').onclick=()=>{const t=$('#tplBox').innerText;if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast('Template copied — paste into your client doc.','ok')).catch(()=>toast('Copy failed — select the text manually.','warn'));else toast('Clipboard blocked — select the text manually.','warn');};
+}
+
+/* ===================== academy bindings ===================== */
+function initAcademy(){
+  $$('#tab-academy .acc-h').forEach(h=>h.onclick=()=>{const b=h.nextElementSibling;const open=b.style.maxHeight&&b.style.maxHeight!=='0px';b.style.maxHeight=open?'0px':b.scrollHeight+'px';h.parentElement.classList.toggle('open',!open);});
+  $('#copyReport').onclick=()=>{const txt=$('#reportTpl').innerText;if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>toast('Template copied — paste into your client doc.','ok')).catch(()=>toast('Copy failed — select the text manually.','warn'));else toast('Clipboard blocked — select the text manually.','warn');};
+  initTemplates();
+  watchReveals();
+}
+
+/* ===================== reveal observer ===================== */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.08});
+function watchReveals(){$$('.reveal:not(.in)').forEach(el=>io.observe(el));}
+
+/* ===================== tabs ===================== */
+const renderers={sandbox:()=>{renderSandbox();updateSandbox();},keywords:renderKeywords,simulator:renderSimulator,drills:renderDrills,academy:initAcademy,quiz:renderQuiz,glossary:renderGlossary};
+function showTab(name){
+  currentTab=name;
+  $$('.tab').forEach(t=>t.classList.toggle('active',t.id==='tab-'+name));
+  $$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  if(!visited[name]){visited[name]=1;renderers[name]();}
+  else if(name==='sandbox'){updateSandbox();}
+  else if(name==='keywords'){renderKeywords();}
+  else if(name==='simulator'){renderSimulator();}
+  else if(name==='drills'){renderDrills();}
+  if(name==='academy'||name==='glossary')watchReveals();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===================== init ===================== */
+function init(){
+  renderTicker();renderXP();renderCoach();
+  $$('.navbtn').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+  $('#scenChips').addEventListener('click',e=>{const b=e.target.closest('[data-sc]');if(!b||b.dataset.sc===state.scenarioId)return;state.scenarioId=b.dataset.sc;save();renderSandbox();updateSandbox();visited.keywords=false;visited.simulator=false;if(currentTab==='keywords')renderKeywords();if(currentTab==='simulator')renderSimulator();toast('Switched to '+cur().brand+' scenario','ok');});
+  $('#mvToggle').addEventListener('change',updateSandbox);
+  // coach interactions
+  $('#coachNext').onclick=()=>{tipIdx=(tipIdx+1)%TIPS.length;const el=$('#coachTip');el.style.opacity=0;setTimeout(()=>{renderCoach();el.style.opacity=1;},250);startCoach();};
+  $('#coachCard').addEventListener('mouseenter',stopCoach);
+  $('#coachCard').addEventListener('mouseleave',startCoach);
+  // keyword lab static bindings
+  $('#btnAuto').onclick=()=>{const camp=per().campaign;camp.keywords.forEach((k,i)=>{k.active=i<7;k.match=i<2?'exact':i<5?'phrase':'broad';k.bid=+((i<2?1:i<5?.92:.82)*k.sugBid).toFixed(2);});save();renderKeywords();markStale();toast('Starter campaign configured — 2 exact / 3 phrase / 2 broad.','ok');};
+  const addNeg=()=>{const v=$('#negInput').value.trim().toLowerCase();if(!v)return;if(!per().campaign.negatives.includes(v))per().campaign.negatives.push(v);$('#negInput').value='';save();renderNegatives();markStale();award('neg-'+cur().id,5,'First negative keywords added');};
+  $('#negAdd').onclick=addNeg;$('#negInput').addEventListener('keydown',e=>{if(e.key==='Enter')addNeg();});
+  $('#kwTable').addEventListener('change',e=>{const k=per().campaign.keywords.find(x=>x.id===+e.target.dataset.kw);if(!k)return;if(e.target.classList.contains('kwtoggle'))k.active=e.target.checked;if(e.target.classList.contains('mt'))k.match=e.target.value;save();markStale();if(currentTab==='simulator'){$('#ctlActive').textContent=per().campaign.keywords.filter(x=>x.active).length+' / '+per().campaign.keywords.length;}});
+  $('#kwTable').addEventListener('input',e=>{if(e.target.classList.contains('bid')){const k=per().campaign.keywords.find(x=>x.id===+e.target.dataset.kw);if(k){k.bid=+e.target.value||0;save();markStale();}}});
+  // drills delegation
+  $('#drillList').addEventListener('click',e=>{const h=e.target.closest('.hintbtn');if(h){const el=$('#hint-'+h.dataset.d);el.hidden=!el.hidden;return;}const o=e.target.closest('.dopt');if(o&&!o.disabled)answerDrill(o.dataset.d,+o.dataset.i);});
+  // glossary search
+  $('#glossSearch').addEventListener('input',debounce(renderGlossary,150));
+  // reset
+  $('#resetBtn').onclick=()=>{if(confirm('Reset all XP, edits and progress? This cannot be undone.')){try{localStorage.removeItem('bbdojo');}catch(e){}location.reload();}};
+  // first render
+  visited.sandbox=1;renderSandbox();updateSandbox();startCoach();
+}
+init();
+</script>
+</body>
+</html>
+<!-- Project Amazon PH Academy shell: shared chrome injected by assets/shell.js -->

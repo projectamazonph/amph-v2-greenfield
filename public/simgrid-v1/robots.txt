@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://projectamazonph.github.io/amazon-ph-simulators/sitemap.xml

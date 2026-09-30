@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: #f7f8fa; }
+.slide-container { width: 1280px; min-height: 720px; background: #f7f8fa; color: #131921; font-family: Arial, Helvetica, sans-serif; position: relative; overflow: hidden; padding-top: 42px; padding-left: 60px; padding-right: 60px; }
+.eyebrow { font-size: 14px; letter-spacing: 1.8px; text-transform: uppercase; color: #ff9900; font-weight: 700; margin-top: 0; }
+.title { font-size: 40px; font-weight: 800; line-height: 1.08; margin-top: 9px; }
+.rule { height: 3px; background: #131921; margin-top: 18px; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
+.formula-box { background: #131921; color: #fff; padding-top: 24px; padding-left: 24px; padding-right: 24px; min-height: 180px; margin-top: 20px; }
+.formula-box.ctr { border-top: 6px solid #ff9900; }
+.formula-box.cvr { border-top: 6px solid #00875a; }
+.formula-title { font-size: 22px; color: #dbe2ea; margin-top: 0; font-weight: 400; }
+.formula { font-size: 36px; font-weight: 800; margin-top: 12px; }
+.ctr .formula { color: #ff9900; }
+.cvr .formula { color: #00875a; }
+.formula-desc { font-size: 18px; color: #94a3b8; margin-top: 12px; line-height: 1.4; }
+.table-wrap { background: #fff; border: 1px solid #d7dce2; padding-top: 12px; padding-left: 12px; padding-right: 12px; }
+.table { width: 100%; border-collapse: collapse; font-size: 18px; }
+.table th { background: #131921; color: #fff; text-align: left; padding-top: 12px; padding-left: 12px; padding-right: 12px; }
+.table td { padding-top: 12px; padding-left: 12px; padding-right: 12px; border-bottom: 1px solid #d7dce2; color: #4b5563; }
+.table td strong { color: #131921; }
+.table tr:nth-child(even) td { background: #f1f3f5; }
+.example-box { background: #fff; border: 1px solid #d7dce2; padding-top: 20px; padding-left: 20px; padding-right: 20px; margin-top: 20px; }
+.example-box h3 { font-size: 20px; margin-top: 0; color: #131921; }
+.example-box p { font-size: 18px; line-height: 1.4; margin-top: 12px; color: #4b5563; }
+.callout { margin-top: 20px; background: #eef8f3; border-left: 4px solid #00875a; color: #145c43; padding-top: 16px; padding-left: 16px; padding-right: 16px; font-size: 18px; line-height: 1.4; }
+.footer { position: absolute; left: 60px; top: 672px; font-size: 13px; color: #64748b; }
+.page { position: absolute; right: 60px; top: 672px; font-size: 13px; color: #64748b; }
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 2 · Lesson 2.2</div>
+  <div class="title">CTR and Conversion Rate</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="left-col">
+      <div style="font-size: 22px; font-weight: 700; color: #131921;">The two rates that tell you where the leak is:</div>
+      
+      <div class="formula-box ctr">
+        <div class="formula-title">Click-Through Rate (CTR)</div>
+        <div class="formula">CTR = Clicks ÷ Impressions</div>
+        <div class="formula-desc">Of the people who saw the ad, how many clicked? Measures the strength of your hook.</div>
+      </div>
+      
+      <div class="formula-box cvr">
+        <div class="formula-title">Conversion Rate</div>
+        <div class="formula">Conv. Rate = Orders ÷ Clicks</div>
+        <div class="formula-desc">Of the people who clicked, how many bought? Measures the strength of your page and targeting.</div>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>CTR Reading</th>
+              <th>Likely Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color: #de350b;">Under 0.3%</strong></td>
+              <td>Image, price, or title not appealing</td>
+            </tr>
+            <tr>
+              <td><strong>0.3% – 0.7%</strong></td>
+              <td>Decent hook</td>
+            </tr>
+            <tr>
+              <td><strong style="color: #00875a;">Over 0.7%</strong></td>
+              <td>Strong hook</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="example-box">
+        <h3>Worked Example</h3>
+        <p><strong>1,000 impressions</strong> and <strong>5 clicks</strong> is a <strong style="color: #ff9900;">0.5% CTR</strong>.<br>
+        <strong>5 clicks</strong> and <strong>1 order</strong> is a <strong style="color: #00875a;">20% conversion</strong>.</p>
+        <p><em>Story: Decent hook, good page.</em></p>
+      </div>
+      
+      <div class="callout">
+        <strong>Coach tip:</strong> Low CTR means fix the hook (image, price, title). Low conversion means fix the page or the targeting.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Money Math · 2.2 CTR and Conversion Rate</div>
+  <div class="page">09 / 12</div>
+</div>
+</body>
+</html>

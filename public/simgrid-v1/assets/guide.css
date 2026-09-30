@@ -1,0 +1,66 @@
+/* ============================================================
+   PROJECT AMAZON PH ACADEMY â€” GETTING STARTED HUB
+   Shared walk-through styles for getting-started.html plus
+   the per-simulator walk-through shells.  Simulator pages
+   continue to use their own card / panel patterns; this file
+   only adds styles the hub needs and a small set of .gs-*
+   helpers for the six overview cards.
+   ============================================================ */
+
+.gs-wrap{max-width:1100px;margin:0 auto;padding:54px 28px 72px;color:var(--c-ink)}
+.gs-wrap *,.gs-wrap *::before,.gs-wrap *::after{box-sizing:border-box}
+
+.gs-eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;color:var(--c-sub);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+.gs-eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--c-orange);box-shadow:0 0 0 3px var(--c-orange-soft)}
+.gs-eyebrow .sep{color:var(--c-faint);margin:0 6px}
+
+.gs-h1{font-family:var(--font-disp);font-weight:800;font-size:var(--fs-h1);letter-spacing:-.02em;line-height:1.1;margin:0 0 12px;color:var(--c-ink-2)}
+.gs-h1 em{font-style:normal;color:var(--c-orange-d);text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px}
+.gs-lede{font-size:17px;line-height:1.55;max-width:62ch;color:var(--c-ink-2);margin:0 0 28px}
+
+.gs-chips{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 36px;padding:0;list-style:none}
+.gs-chip{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--c-card);border:1px solid var(--c-border);border-radius:var(--r-md);padding:9px 13px;color:var(--c-ink)}
+.gs-chip b{color:var(--c-orange-d);margin-right:4px}
+
+.gs-back{display:inline-block;margin-top:36px;font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--c-ink-2);border:1px solid var(--c-border);border-radius:var(--r-md);padding:10px 14px;text-decoration:none;background:var(--c-card);transition:.15s}
+.gs-back:hover{border-color:var(--c-orange);color:var(--c-orange-d);box-shadow:var(--sh-1)}
+
+.gs-sec{margin-top:var(--sp-8);padding:24px 28px;background:var(--c-card);border:1px solid var(--c-border);border-radius:var(--r-xl);box-shadow:var(--sh-1)}
+.gs-sec-h{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.gs-num{font-family:var(--font-disp);font-weight:800;font-size:24px;color:var(--c-orange);line-height:1;flex:none}
+.gs-sec-h h2{font-family:var(--font-disp);font-weight:700;font-size:21px;margin:0;letter-spacing:-.01em;color:var(--c-ink-2);line-height:1.2}
+.gs-sec p{font-size:15px;line-height:var(--lh-normal);margin:10px 0 0;color:var(--c-ink-2)}
+.gs-sec p b{color:var(--c-ink-2)}
+.gs-sec p em{color:var(--c-orange-d);font-style:normal;font-weight:700}
+
+.gs-list{margin:14px 0 0;padding-left:1.1rem}
+.gs-list li{font-size:14.5px;line-height:1.6;margin-bottom:6px}
+.gs-list li b{color:var(--c-ink-2)}
+.gs-list li code,.gs-sec code{font-family:var(--font-mono);font-size:12.5px;background:var(--c-bg-2);border:1px solid var(--c-border);border-radius:4px;padding:1px 6px;color:var(--c-ink-2)}
+
+.gs-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px}
+.gs-table th,.gs-table td{padding:9px 10px;border-bottom:1px solid var(--c-line-soft);text-align:left;vertical-align:top;line-height:1.45}
+.gs-table th{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--c-sub);font-weight:700;background:var(--c-card-hi)}
+.gs-table td b{color:var(--c-orange-d)}
+.gs-table tr:last-child td{border-bottom:none}
+
+.gs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}
+.gs-card{display:block;text-decoration:none;color:inherit;background:var(--c-card);border:1px solid var(--c-border);border-radius:var(--r-xl);padding:18px 18px 16px;transition:transform .15s,border-color .15s,box-shadow .15s}
+.gs-card:hover{transform:translateY(-2px);border-color:var(--c-orange);box-shadow:var(--sh-2)}
+.gs-card-h{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.gs-card-ic{width:38px;height:38px;border-radius:8px;background:linear-gradient(140deg,var(--c-orange-h),var(--c-orange));color:var(--c-ink);font-family:var(--font-disp);font-weight:800;font-size:13px;display:grid;place-items:center;flex:none;letter-spacing:.04em}
+.gs-card-name{font-family:var(--font-disp);font-weight:700;font-size:17px;letter-spacing:-.01em;margin:0;color:var(--c-ink-2);line-height:1.15}
+.gs-card-tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c-sub);margin-top:2px}
+.gs-card p{font-size:13.5px;line-height:1.6;color:var(--c-sub);margin:6px 0 12px}
+.gs-card-arrow{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-orange-d)}
+
+.gs-toc{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 0;padding:18px 22px;background:var(--c-card-hi);border:1px dashed var(--c-border);border-radius:var(--r-lg)}
+.gs-toc a{font-size:13px;color:var(--c-ink-2);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:1px}
+.gs-toc a:hover{color:var(--c-orange-d);border-bottom-color:var(--c-orange-d)}
+
+@media(max-width:760px){
+  .gs-wrap{padding:36px 18px 56px}
+  .gs-grid{grid-template-columns:1fr}
+  .gs-sec{padding:18px 18px}
+  .gs-toc{grid-template-columns:repeat(2,1fr)}
+}

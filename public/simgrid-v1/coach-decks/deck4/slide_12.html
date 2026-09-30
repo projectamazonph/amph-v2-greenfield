@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+.slide-container {
+    width: 1280px;
+    min-height: 720px;
+    background: #f7f8fa;
+    color: #131921;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    overflow: hidden;
+    padding-top: 42px;
+    padding-left: 60px;
+    padding-right: 60px;
+}
+.eyebrow {
+    font-size: 14px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #ff9900;
+    font-weight: 700;
+    margin-top: 0;
+}
+.title {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.08;
+    margin-top: 9px;
+}
+.rule {
+    height: 3px;
+    background: #131921;
+    margin-top: 18px;
+}
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+}
+.card {
+    background: #fff;
+    border: 1px solid #d7dce2;
+    padding-top: 32px;
+    padding-left: 32px;
+    padding-right: 32px;
+    min-height: 420px;
+}
+.card.assignment {
+    border-top: 6px solid #131921;
+}
+.card.assessment {
+    border-top: 6px solid #00875a;
+}
+.card.exit-ticket {
+    background: #131921;
+    border-top: 6px solid #ff9900;
+    color: #fff;
+    border-color: #131921;
+}
+.card-label {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    font-weight: 700;
+    margin-top: 0;
+}
+.card.exit-ticket .card-label {
+    color: #ff9900;
+}
+.card-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-top: 12px;
+}
+.card.exit-ticket .card-title {
+    color: #fff;
+}
+.card-list {
+    list-style: none;
+    margin-top: 24px;
+}
+.card-list li {
+    font-size: 18px;
+    line-height: 1.4;
+    margin-top: 16px;
+    display: flex;
+    align-items: flex-start;
+}
+.card-list li::before {
+    content: "■";
+    margin-right: 12px;
+    font-size: 12px;
+    margin-top: 4px;
+}
+.card.assignment .card-list li::before {
+    color: #131921;
+}
+.card.assessment .card-list li::before {
+    color: #00875a;
+}
+.card.exit-ticket .card-list li::before {
+    color: #ff9900;
+}
+.card.exit-ticket .card-list li {
+    color: #dbe2ea;
+}
+.highlight-safe {
+    color: #00875a;
+    font-weight: 700;
+}
+.footer {
+    position: absolute;
+    left: 60px;
+    top: 672px;
+    font-size: 13px;
+    color: #64748b;
+}
+.page {
+    position: absolute;
+    right: 60px;
+    top: 672px;
+    font-size: 13px;
+    color: #64748b;
+}
+</style>
+</head>
+<body>
+<div class="slide-container">
+    <div class="eyebrow">Operations & Capstone Assessment</div>
+    <div class="title">Evidence Gate & Graduation</div>
+    <div class="rule"></div>
+    
+    <div class="layout">
+        <section class="card assignment">
+            <div class="card-label">Assignment</div>
+            <div class="card-title">Capstone Portfolio</div>
+            <ul class="card-list">
+                <li>Weekly routine log</li>
+                <li>5-sentence client report</li>
+                <li>Troubleshooting matrix application</li>
+                <li>Final SOP documentation</li>
+            </ul>
+        </section>
+        
+        <section class="card assessment">
+            <div class="card-label">Assessment</div>
+            <div class="card-title">Final Thresholds</div>
+            <ul class="card-list">
+                <li>Reporting & Routine: <span class="highlight-safe">80%+</span></li>
+                <li>Capstone Simulator: <span class="highlight-safe">85%+</span></li>
+                <li>Instructor Review: <span class="highlight-safe">Pass</span></li>
+            </ul>
+        </section>
+        
+        <section class="card exit-ticket">
+            <div class="card-label">Exit Ticket</div>
+            <div class="card-title">Defend the Routine</div>
+            <div style="font-size: 18px; color: #fff; margin-top: 24px; line-height: 1.4;">Answer before graduation:</div>
+            <ul class="card-list" style="margin-top: 12px;">
+                <li>"Why is one change at a time critical?"</li>
+                <li>"How do you translate a drop in ACOS to a client?"</li>
+            </ul>
+        </section>
+    </div>
+    
+    <div class="footer">Source: Project Amazon PH Simulators — Curriculum manifest and PPC Coach Modules 9–11.</div>
+    <div class="page">12 / 12</div>
+</div>
+</body>
+</html>

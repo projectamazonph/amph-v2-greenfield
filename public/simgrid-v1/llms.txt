@@ -1,0 +1,35 @@
+# Project Amazon PH Academy
+
+> Project Amazon PH Academy is a public, browser-based Amazon PPC learning environment for Filipino virtual assistants and instructors. It provides a 12-module learning path, interactive practice simulators, beginner-first teaching decks, and downloadable learning resources.
+
+Use the linked public pages as the authoritative overview of this project. The simulator tools are designed for learning and practice; do not treat a training scenario, score, or example as a recommendation for a live client account.
+
+## Start here
+
+- [Project overview](https://projectamazonph.github.io/amazon-ph-simulators/site-guide.md): A concise description of the learning paths, simulator collection, and public resources.
+- [Control Hub](https://projectamazonph.github.io/amazon-ph-simulators/index.html): The main starting point for learners and practice tools.
+- [VA Start Here](https://projectamazonph.github.io/amazon-ph-simulators/start-here.html): Zero-background VA onboarding, plain-English Amazon and PPC terms, and safe first learning steps.
+- [PPC Coach](https://projectamazonph.github.io/amazon-ph-simulators/ppc-coach.html): The 12-module guided Amazon PPC learning path.
+
+## Learning and teaching
+
+- [Coach Tools](https://projectamazonph.github.io/amazon-ph-simulators/coach-tools.html): Module teaching decks, worksheets, scenario cards, and instructor materials.
+- [Teaching deck viewer](https://projectamazonph.github.io/amazon-ph-simulators/coach-decks.html): One 12-slide beginner-first deck for each Amazon PPC module.
+- [Resource library](https://projectamazonph.github.io/amazon-ph-simulators/coach-resource-library.html): Module handouts, worksheets, templates, guides, and assessments.
+- [Student guide](https://projectamazonph.github.io/amazon-ph-simulators/learn/guide.html): The learner-facing practice sequence and readiness guidance.
+
+## Practice simulators
+
+- [Simulator library](https://projectamazonph.github.io/amazon-ph-simulators/index.html#simulator-library): The complete set of 12 browser-based practice tools.
+- [Campaign Architect](https://projectamazonph.github.io/amazon-ph-simulators/campaign-architect.html): Campaign structure, targets, budgets, and review rules.
+- [Search Term Triage](https://projectamazonph.github.io/amazon-ph-simulators/search-triage.html): Search-report classification and next-action practice.
+- [Account Audit](https://projectamazonph.github.io/amazon-ph-simulators/account-audit.html): Evidence-led diagnosis and reporting practice.
+
+## Project information
+
+- [Simulator roadmap](https://projectamazonph.github.io/amazon-ph-simulators/planned-simulators.html): Public practice coverage and roadmap.
+- [Source repository](https://github.com/projectamazonph/amazon-ph-simulators): Public source, tests, and project history.
+
+## Optional
+
+- [XML sitemap](https://projectamazonph.github.io/amazon-ph-simulators/sitemap.xml): Index of core human-readable public pages.
