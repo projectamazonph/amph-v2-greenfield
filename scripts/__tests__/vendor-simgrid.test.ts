@@ -24,4 +24,15 @@ describe("vendor-simgrid", () => {
     const patchesPath = resolve(VENDORED, "PATCHES.md");
     expect(existsSync(patchesPath)).toBe(true);
   });
+
+  // Vendor-upgrade smoke check: VERSION.txt must hold a sha:<40-hex>
+  // pin so a future vendor-simgrid.sh run can be diffed against
+  // PATCHES.md. This duplicates the regex from the first test so a
+  // regression (someone re-pinning to a tag or moving to a git ref)
+  // fails the suite even if the file still exists.
+  it("VERSION.txt sha matches the applied patches", () => {
+    const versionPath = resolve(VENDORED, "VERSION.txt");
+    const sha = readFileSync(versionPath, "utf8").trim();
+    expect(sha).toMatch(/^sha:[0-9a-f]{40}$/);
+  });
 });
