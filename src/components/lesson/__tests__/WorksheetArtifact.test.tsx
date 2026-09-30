@@ -151,7 +151,10 @@ describe("WorksheetArtifact", () => {
       />,
     );
     fireEvent.blur(screen.getByLabelText("Product"));
-    await new Promise((r) => setTimeout(r, 0));
+    // Same flake fix as the failed-save test: microtask scheduling
+    // under CI load doesn't always settle in setTimeout(0). findByText
+    // retries until the status transitions to "Saved at ...".
+    await screen.findByText(/saved at/i, { selector: '[role="status"]' });
     expect(screen.getByRole("status")).toHaveTextContent(/saved/i);
   });
 
