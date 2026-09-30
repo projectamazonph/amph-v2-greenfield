@@ -80,14 +80,21 @@ const tiers = Object.entries(claims.tierSimulatorTargets).map(([tier, simulatorT
 }));
 
 const lessons = inventoryResult.value.lessons
-  .filter((lesson) => lesson.toolBridge.kind === "simulator")
-  .map((lesson) => ({
-    slug: lesson.slug,
-    toolBridge: {
-      kind: "simulator" as const,
-      target: (lesson.toolBridge as { kind: "simulator"; target: string }).target,
-    },
-  }));
+  .filter(
+    (lesson) => lesson.toolBridge.kind === "simulator" || lesson.toolBridge.kind === "simgrid",
+  )
+  .map((lesson) => {
+    if (lesson.toolBridge.kind === "simulator") {
+      return {
+        slug: lesson.slug,
+        toolBridge: { kind: "simulator" as const, target: lesson.toolBridge.target },
+      };
+    }
+    return {
+      slug: lesson.slug,
+      toolBridge: { kind: "simgrid" as const, target: lesson.toolBridge.target },
+    };
+  });
 
 const errors = validateToolBridges({
   registeredSimulatorIds,
@@ -110,6 +117,11 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
+const simulatorBridgeCount = lessons.filter(
+  (lesson) => lesson.toolBridge.kind === "simulator",
+).length;
+const simgridBridgeCount = lessons.filter((lesson) => lesson.toolBridge.kind === "simgrid").length;
+
 console.log(
-  `Tool bridges valid: ${lessons.length} simulator bridges across ${registeredSimulatorIds.length} registered simulators.`,
+  `Tool bridges valid: ${simulatorBridgeCount} simulator bridges across ${registeredSimulatorIds.length} registered simulators, plus ${simgridBridgeCount} SimGrid drill bridges.`,
 );

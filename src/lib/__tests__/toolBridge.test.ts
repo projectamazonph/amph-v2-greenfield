@@ -98,3 +98,43 @@ describe("validateToolBridges", () => {
     expect(errors).toEqual([]);
   });
 });
+
+describe("validateToolBridges — simgrid branch", () => {
+  it("accepts a valid simgrid target", () => {
+    const errors = validateToolBridges({
+      registeredSimulatorIds: [],
+      publishedSimulatorKeys: [],
+      lessons: [
+        {
+          slug: "2.2-keyword-research-workflow",
+          toolBridge: { kind: "simgrid", target: "bid-decisions" },
+        },
+      ],
+      tiers: [],
+    });
+    expect(errors).toEqual([]);
+  });
+
+  it("rejects unknown simgrid target", () => {
+    const errors = validateToolBridges({
+      registeredSimulatorIds: [],
+      publishedSimulatorKeys: [],
+      lessons: [{ slug: "x", toolBridge: { kind: "simgrid", target: "not-a-simulator" } }],
+      tiers: [],
+    });
+    expect(errors).toEqual([
+      { kind: "bridge_target_unknown_simgrid", slug: "x", target: "not-a-simulator" },
+    ]);
+  });
+
+  it("simgrid targets do NOT require tier coverage", () => {
+    const errors = validateToolBridges({
+      registeredSimulatorIds: [],
+      publishedSimulatorKeys: [],
+      lessons: [{ slug: "x", toolBridge: { kind: "simgrid", target: "capstone-sequence" } }],
+      // empty tiers — would fail for simulator targets, must NOT fail for simgrid
+      tiers: [],
+    });
+    expect(errors).toEqual([]);
+  });
+});
