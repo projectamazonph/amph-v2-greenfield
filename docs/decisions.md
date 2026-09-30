@@ -258,3 +258,19 @@ app/         → usecases/ → ports/ ← infra/
 - The job is soft-pass for now — false positives on a hard-fail job would be worse than no check. Once a baseline exists, the thresholds can be tightened.
 
 **PR:** #116 (`fix(ci): re-enable Lighthouse CI via output: 'standalone' (STORY-0026 fix)`).
+
+## ADR-026: SimGrid Integration via Iframe + Auth Wrapper
+
+**Status:** Accepted (2026-09-30)
+**Context:** The coach maintains a separate static site, https://projectamazonph.github.io/amazon-ph-simulators/ (SimGrid), with 12 Amazon PPC practice simulators. AMPH ships 5 graded simulator engines (bid-elevator, campaign-builder, keyword-research, listing-audit, str-triage) — 5 of SimGrid's 12 map directly onto these; the other 7 (BuyBox Dojo, AdConsole Pro, Pacing Deck, Bulk File, SQP Studio, Client Onboarding, Capstone) have no AMPH equivalent. We want students to reach all 12 from the AMPH shell, with their SimGrid practice reflected in the AMPH dashboard, without rewriting any simulator.
+**Decision:** Adopt option 3 (iframe + auth wrapper + progress sync) for v1. Vendor SimGrid under public/simgrid-v1/ at a pinned commit SHA; host each page at /practice/simgrid/<file>.html behind AMPH auth; on round-complete, the iframe posts a simulator_attempt event via window.parent.postMessage; the AMPH host validates origin and records the attempt through a new server action into a new simgrid_attempts table. The 5 graded engines stay untouched; SimGrid drills sit beside them as low-stakes practice. If a future PRD demands unified grading, plan a full engine migration then.
+**Consequences:**
+
+- New simgrid_attempts Prisma table, ISimgridAttemptRepository port, PrismaSimgridAttemptRepository adapter, RecordSimgridProgress / ListSimgridProgressForUser / GetBestSimgridScore use cases, recordSimgridProgressAction server action.
+- Vendored SimGrid becomes a fork we own; pin and document every patch in public/simgrid-v1/PATCHES.md; one minimal patch today: extend the existing publishToSimHub bridge to also post to window.parent when framed (otherwise it only posts to window.opener).
+- SimGrid drills are free for any signed-in user. /practice/simgrid/* requires login but no course enrollment. The 5 graded engines retain their existing course-tier gating.
+- AMPH dashboard adds a SimgridProgressCard showing per-simulator best score. SimgridProgressCard labels every score as practice (formative-only) via the existing FormativeScoreNotice pattern.
+- Curriculum inventory.json toolBridge gains a kind: simgrid variant for the 7 unique simulators; scripts/validate-tool-bridges.ts is extended to accept and validate the new kind against isSimgridSimulatorId.
+- **Revisit when:** The vendored SimGrid diverges from AMPH UX enough that the iframe framing becomes user-confusing (then consider a native engine port, scoped per simulator).
+
+**Surfaced trade-off (coach decision recorded 2026-09-30):** SimGrid is unauthenticated today. Inside AMPH, /practice/simgrid/* requires login but no course enrollment. The coach confirmed this matches SimGrid's 'free, no account' philosophy while keeping AMPH's existing tier-gated graded paths intact. Plan: docs/superpowers/plans/2026-09-30-simgrid-integration.md.
