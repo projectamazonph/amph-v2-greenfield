@@ -4,6 +4,64 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-163: Module 1 worksheet as a tracked artifact (shipped)
+
+Implementation of the design doc landed in PR #639. The text-fence
+worksheets in Lessons 1.1 to 1.5 are now a single tracked artifact the
+learner fills in across all five lessons. Architecture per AGENTS.md
+"Adding a New Feature" recipe:
+
+- Domain entity `WorksheetEntry` (`src/domain/artifacts/worksheetEntry.ts`)
+  with `WORKSHEET_LESSON_SLUGS`, `WORKSHEET_FIELDS` (34 keys across 5
+  lessons), and `validateWorksheetValues` that rejects unknown keys
+  and fills missing keys with empty strings.
+- Port `WorksheetRepository` with `findByStudent` and `upsert`.
+- Use cases `GetWorksheet` and `SaveWorksheetEntry` (the latter
+  enforces `actorId === studentId`, validates the field inventory,
+  and emits a `worksheet.saved` audit row; audit failures are
+  swallowed per the RecordAuditLog contract).
+- Prisma adapter (`PrismaWorksheetRepository`) backed by a new
+  `worksheet_entries` table with 34 nullable string columns and
+  composite unique on `(studentId, lessonSlug)`. Migration at
+  `prisma/migrations/20260929180000_story_163_worksheet_entries/`.
+- In-memory fake at `src/infra/db/inmemory/InMemoryWorksheetRepository.ts`
+  matching the existing in-memory convention.
+- Composition wiring in both production and test containers.
+- MDX directive `:::worksheet{id="..." title="..." part="N" lesson="..."}`
+  added to `src/lib/mdx/directive-plugin.ts` and the production
+  validator's allowlist.
+- React component `WorksheetArtifact` that hydrates the directive,
+  holds local state per field, and saves the full row on form-blur
+  via the lazy-imported server action.
+- Server action `saveWorksheetEntryAction` in `src/app/actions/`
+  that calls `getSessionUserId()` and forwards to `SaveWorksheetEntry`.
+- Validator regression test at
+  `src/domain/curriculum/__tests__/WorksheetBlocks.test.ts` that
+  finds every `:::worksheet` directive, asserts one per Module 1
+  lesson, and checks each `part` number matches its lesson.
+- E2E spec at `tests/e2e/module1-worksheet.spec.ts` documenting the
+  full fill-all-27-fields-and-reload contract. Gated on
+  `DATABASE_URL` until a `seedStudentAndEnrollment` helper exists.
+
+Follow-ups planned but not in this PR:
+
+- Lesson 1.5 "one-page read view" component (would consume the
+  `getWorksheet` result to show a one-page summary across all 5 parts).
+- E2E spec gate: ship `seedStudentAndEnrollment` in
+  `tests/e2e/helpers/seed.ts` and drop the `DATABASE_URL` skip.
+
+### Pre-existing test infra fix: Node 25+ `localStorage` shadow
+
+Node 25+ ships a native `localStorage` getter on globalThis that
+silently shadows jsdom's copy in Vitest workers, causing 24 tests
+across `WelcomeStepper`, `StudentNavigation`, `StudentSidebar`, and
+the dashboard `a11y.audit` to fail with "Cannot read properties of
+undefined (reading 'clear')". Fix: pass `--no-webstorage` to Node
+worker processes via `vitest.config.ts execArgv`. Gated on
+`process.versions.node`'s major version because the flag was added
+in Node 25 and Node 20 (CI) does not recognize it. Verified: 24
+previously-failing tests now pass; no regressions on Node 20.
+
 ### STORY-163: Module 1 worksheet as a tracked artifact (design only)
 
 Replaces the per-lesson "open a blank note or spreadsheet" worksheets in
