@@ -1,0 +1,1608 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Term Triage | Amazon PPC Search Report Simulator</title>
+<link rel="icon" href="favicon.ico">
+
+<script src="assets/student-progress.js"></script>
+<script src="assets/simulator-attempt.js"></script>
+<script src="assets/search-triage-core.js"></script>
+
+<script src="assets/shell.js" defer></script>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/simulator-foundation.css">
+<link rel="stylesheet" href="assets/search-triage.css">
+<link rel="stylesheet" href="assets/skin.css">
+<link rel="stylesheet" href="assets/shell.css">
+  <!-- PHA_DISCOVERY_START -->
+  <meta name="description" content="Practice reading Amazon search terms, identifying winners and waste, and choosing clear next actions.">
+  <meta name="keywords" content="Amazon PPC search term report simulator, negative keywords">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://projectamazonph.github.io/amazon-ph-simulators/search-triage.html">
+  <link rel="describedby" type="text/markdown" href="https://projectamazonph.github.io/amazon-ph-simulators/llms.txt" title="AI-readable Project Amazon PH Academy guide">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Project Amazon PH Academy">
+  <meta property="og:title" content="Search Term Triage | Amazon PPC Search Report Simulator">
+  <meta property="og:description" content="Practice reading Amazon search terms, identifying winners and waste, and choosing clear next actions.">
+  <meta property="og:url" content="https://projectamazonph.github.io/amazon-ph-simulators/search-triage.html">
+  <meta property="og:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+  <meta property="og:image:alt" content="Project Amazon PH Academy SimGrid learning hub">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Search Term Triage | Amazon PPC Search Report Simulator">
+  <meta name="twitter:description" content="Practice reading Amazon search terms, identifying winners and waste, and choosing clear next actions.">
+  <meta name="twitter:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/search-triage.html",
+      "url": "https://projectamazonph.github.io/amazon-ph-simulators/search-triage.html",
+      "name": "Search Term Triage | Amazon PPC Search Report Simulator",
+      "description": "Practice reading Amazon search terms, identifying winners and waste, and choosing clear next actions.",
+      "inLanguage": [
+        "en",
+        "fil"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Project Amazon PH Academy",
+        "url": "https://projectamazonph.github.io/amazon-ph-simulators/"
+      },
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Amazon PPC search term report simulator"
+        },
+        {
+          "@type": "Thing",
+          "name": "negative keywords"
+        }
+      ],
+      "hasPart": {
+        "@id": "https://projectamazonph.github.io/amazon-ph-simulators/search-triage.html#footer-navigation"
+      }
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/search-triage.html#footer-navigation",
+      "name": "Project Amazon PH Academy footer navigation",
+      "description": "Visible footer links to Project Amazon PH Academy learning, practice, coaching, and project resources.",
+      "hasPart": [
+        {
+          "@type": "ItemList",
+          "name": "Learn footer links",
+          "numberOfItems": 4,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "VA Start Here",
+              "item": {
+                "@type": "WebPage",
+                "name": "VA Start Here",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/start-here.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "PPC Coach",
+              "item": {
+                "@type": "WebPage",
+                "name": "PPC Coach",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-coach.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Student Guide",
+              "item": {
+                "@type": "WebPage",
+                "name": "Student Guide",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/guide.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Module Decks",
+              "item": {
+                "@type": "WebPage",
+                "name": "Module Decks",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-decks.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Practice footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Simulator Library",
+              "item": {
+                "@type": "WebPage",
+                "name": "Simulator Library",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/index.html#simulator-library"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Campaign Architect",
+              "item": {
+                "@type": "WebPage",
+                "name": "Campaign Architect",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/campaign-architect.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Account Audit",
+              "item": {
+                "@type": "WebPage",
+                "name": "Account Audit",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/account-audit.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Coach footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Coach Tools",
+              "item": {
+                "@type": "WebPage",
+                "name": "Coach Tools",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-tools.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Resource Library",
+              "item": {
+                "@type": "WebPage",
+                "name": "Resource Library",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-resource-library.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Learning Docs",
+              "item": {
+                "@type": "WebPage",
+                "name": "Learning Docs",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/index.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Project footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Roadmap",
+              "item": {
+                "@type": "WebPage",
+                "name": "Roadmap",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/planned-simulators.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Source Repository",
+              "item": {
+                "@type": "WebPage",
+                "name": "Source Repository",
+                "url": "https://github.com/projectamazonph/amazon-ph-simulators"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Project Guide",
+              "item": {
+                "@type": "WebPage",
+                "name": "Project Guide",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/site-guide.md"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/search-triage.html#application",
+      "name": "Search Term Triage",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "description": "Practice reading Amazon search terms, identifying winners and waste, and choosing clear next actions.",
+      "isAccessibleForFree": true
+    }
+  ]
+}</script>
+  <!-- PHA_DISCOVERY_END -->
+</head>
+<body data-pha-tool="search-triage">
+<div class="bg-grid"></div><div class="bg-glow"></div><div class="bg-noise"></div>
+
+<header>
+  <div class="brand">
+    <div class="mark">07</div>
+    <div><b>OPSDECK</b><small>SELLER PRACTICE SUITE</small></div>
+  </div>
+  <span class="toolchip">TOOL 07 · SEARCH TERM TRIAGE</span>
+  <nav>
+    <button type="button" data-view="briefing" class="on">SIMULATOR</button>
+    <button type="button" data-view="exercises">EXERCISES</button>
+    <button type="button" data-view="guides">GUIDES</button>
+    <button type="button" data-view="tips">TIPS</button>
+    <button type="button" data-view="suite">SUITE</button>
+  </nav>
+  <div class="hstats">
+    <div class="stat"><i>STREAK</i><b id="streak-val">×0</b></div>
+    <div class="stat"><i>XP</i><b id="xp-val">0</b></div>
+    <div class="stat rk"><i>RANK</i><b id="rank-name">FIRST DAY</b></div>
+  </div>
+</header>
+
+<div class="ticker"><div class="ticker-inner" id="ticker-inner"></div></div>
+
+<main>
+
+<!-- BRIEFING -->
+<section id="view-briefing" class="view on">
+  <div class="kicker">PRACTICE SETUP // SEARCH TERM REPORT · LAST 14 DAYS</div>
+  <h1>Take a breath. <span class="hl">You've got this.</span></h1>
+  <p class="sub">Here's a fresh batch of search terms from your report. Some are quiet winners waiting to be found; some are gently leaking budget. Take your time with each one — <b style="color:var(--green)">harvest</b>, <b style="color:var(--blue)">keep</b>, <b style="color:var(--red)">negative exact</b> or <b style="color:var(--amber)">negative phrase</b>. Every call comes back with a friendly explanation, so each round teaches you something.</p>
+  <div class="brief-grid">
+    <div>
+      <div class="seg-row">
+        <label>ROUND SIZE</label>
+        <div class="seg" id="set-size">
+          <button type="button" data-v="8">8 TERMS</button>
+          <button type="button" data-v="12" class="on">12 TERMS</button>
+          <button type="button" data-v="16">16 TERMS</button>
+        </div>
+      </div>
+      <div class="seg-row">
+        <label>DIFFICULTY</label>
+        <div class="seg" id="set-diff">
+          <button type="button" data-v="rookie" class="on">ROOKIE</button>
+          <button type="button" data-v="pro">PRO</button>
+          <button type="button" data-v="surgeon">SURGEON</button>
+        </div>
+        <span class="diff-desc" id="diff-desc">Gentle pace · helper hints on · clear signals</span>
+      </div>
+      <div id="scen-list"></div>
+    </div>
+    <div>
+      <div class="panel orders reveal">
+        <h2>The Game Plan</h2>
+        <div class="rule-line"><span class="n">1</span><div><b>Read the intent first.</b> <span>Would this shopper happily buy your product? If not, a kind goodbye (negate) is best — exact for one term, phrase for a whole word family.</span></div></div>
+        <div class="rule-line"><span class="n">2</span><div><b>Under 10 clicks?</b> <span>Too early to tell. Let it gather a fair sample before judging.</span></div></div>
+        <div class="rule-line"><span class="n">3</span><div><b>20–39 clicks, relevant, no orders?</b> <span>Diagnose the listing, offer, and query fit before making a larger targeting decision.</span></div></div>
+        <div class="rule-line"><span class="n">4</span><div><b>40+ clicks, relevant, no orders?</b> <span>Lower the bid or pause the target after confirming tracking and listing health.</span></div></div>
+        <div class="rule-line"><span class="n">5</span><div><b>Selling under break-even ACOS with proof?</b> <span>Harvest it into Exact; do not scale from one lucky sale.</span></div></div>
+        <div class="rule-line"><span class="n">6</span><div><b>Selling, but above break-even?</b> <span>Don't negate it — ease the bid down 10–20% and check back in a week.</span></div></div>
+      </div>
+      <div class="panel career reveal">
+        <h2 style="font-size:15px;margin-bottom:10px">Your Progress</h2>
+        <div class="rank" id="c-rank">FIRST DAY</div>
+        <div class="xpline"><b id="c-xp">0</b> XP · <span id="c-next">500 XP to EAGER LEARNER</span></div>
+        <div class="bar"><i id="c-bar" style="width:0%"></i></div>
+        <div class="mini">
+          <div><b id="c-rounds">0</b>rounds practiced</div>
+          <div><b id="c-best">—</b>best accuracy</div>
+          <div><b id="c-caught">$0</b>budget protected</div>
+        </div>
+      </div>
+      <div class="start-row">
+        <button type="button" class="btn btn-orange" id="start-btn">Start practicing ▸</button>
+        <span class="hotkey-hint">shortcuts while you play: <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIAGE -->
+<section id="view-triage" class="view">
+  <div class="tr-top">
+    <div>
+      <div class="kicker" style="margin-bottom:2px">PRACTICE ROUND</div>
+      <div class="scenid" id="t-scen"></div>
+    </div>
+    <div class="tr-prog">TERM <span id="t-idx">01</span>/<span id="t-total">12</span></div>
+    <div class="tr-bar bar"><i id="t-bar" style="width:0%"></i></div>
+    <div class="tr-meta">
+      <div>TIME <b id="t-timer">00:00</b></div>
+      <div>STREAK <b id="t-streak">×0</b></div>
+    </div>
+    <button type="button" class="abandon" id="abandon-btn">pause for now</button>
+  </div>
+  <div class="tr-grid">
+    <div>
+      <div class="panel term-card" id="term-card"></div>
+      <div class="panel queue"><h4>UP NEXT</h4><div id="queue-list"></div></div>
+    </div>
+    <div>
+      <div class="panel dossier" id="dossier"></div>
+      <div class="actions" id="actions-wrap"></div>
+      <div class="panel rubric-mini">
+        <p><b>INTENT</b> <span class="arr">→</span> wrong shopper? a kind negate (exact / phrase)</p>
+        <p><b>DATA</b> <span class="arr">→</span> &lt;10 clicks? too early — keep it</p>
+        <p><b>SALES</b> <span class="arr">→</span> relevant + 20–39 clicks? diagnose · 40+? lower or pause</p>
+        <p><b>ACOS ≤ BE</b> <span class="arr">→</span> harvest it → exact</p>
+        <p><b>ACOS &gt; BE</b> <span class="arr">→</span> keep it, ease the bid, revisit in 7d</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEBRIEF -->
+<section id="view-debrief" class="view">
+  <div class="kicker">LET'S REVIEW YOUR ROUND</div>
+  <div class="panel deb-head">
+    <div class="deb-score">
+      <div class="lbl">YOUR SCORE</div>
+      <div class="num" id="d-score" aria-live="polite">0</div>
+      <div class="acc">accuracy <b id="d-acc">0%</b></div>
+    </div>
+    <div class="deb-right">
+      <h2 id="d-title">Round complete</h2>
+      <div id="d-rankup-wrap"></div>
+      <div class="deb-bonus" id="d-bonus"></div>
+      <p class="sub" id="d-line" style="margin-top:10px"></p>
+    </div>
+  </div>
+  <div class="deb-stats" id="d-stats"></div>
+  <div class="kicker" style="margin-bottom:10px">LET'S WALK THROUGH IT TOGETHER</div>
+  <div class="panel rev-wrap">
+    <table class="review">
+      <thead><tr><th>#</th><th>SEARCH TERM</th><th>SIGNAL</th><th>YOUR CALL</th><th>COACH'S CALL</th><th>WHY</th></tr></thead>
+      <tbody id="d-review"></tbody>
+    </table>
+  </div>
+  <div class="deb-actions">
+    <button type="button" class="btn btn-orange" id="d-again">Practice again ▸</button>
+    <button type="button" class="btn btn-ghost" id="d-new">Try a new scenario</button>
+    <button type="button" class="btn btn-ghost" id="d-guide">Revisit the rubric</button>
+  </div>
+</section>
+
+<!-- EXERCISES -->
+<section id="view-exercises" class="view">
+  <div class="kicker">PRACTICE NOOK // EXERCISES</div>
+  <h1>Practice makes <span class="hl">progress.</span></h1>
+  <p class="sub">Short, friendly reps on the three skills triage really is: spotting waste, spotting winners, and doing the little ACOS math without fear. Wrong answers teach you just as much as right ones — that's the whole point.</p>
+  <div id="drill-list" style="margin-top:30px"></div>
+  <div id="drill-stage" style="display:none;margin-top:26px"></div>
+</section>
+
+<!-- GUIDES -->
+<section id="view-guides" class="view">
+  <div class="kicker">STUDY CORNER // LEARNING GUIDES</div>
+  <h1>Learn at <span class="hl">your pace.</span></h1>
+  <p class="sub">Everything the simulator grades you on, explained the way a patient coach would on day one. Read once, skim twice, master whenever.</p>
+  <div style="margin-top:32px" id="guide-body">
+
+    <div class="panel guide-sec reveal">
+      <div class="gnum">01</div>
+      <h2>The five friendly questions</h2>
+      <p>Every search term follows the same decision sequence. <b>Intent comes first</b> — metrics on the wrong shopper can't tell you anything. Walk the flow from the top and stop as soon as you have an answer. No overthinking needed.</p>
+      <div class="flow">
+        <div class="fnode"><span class="fn">1</span><div><div class="fq">Would this shopper buy YOUR product?</div><div class="fh">Read the query itself. "glass cutting board" against a bamboo listing is a no — and that's fine, we just move on.</div></div><div class="fr" style="color:var(--red)">NO → LET IT GO<br><span style="color:var(--faint)">exact if specific · phrase if a word pattern</span></div></div>
+        <div class="farrow">▼ yes, right intent</div>
+        <div class="fnode"><span class="fn">2</span><div><div class="fq">Does it have at least ~10 clicks?</div><div class="fh">Small samples can mislead. That 4-click term might still become your next winner.</div></div><div class="fr" style="color:var(--blue)">NO → KEEP<br><span style="color:var(--faint)">feed it data, re-check next week</span></div></div>
+        <div class="farrow">▼ enough data</div>
+        <div class="fnode"><span class="fn">3</span><div><div class="fq">Did it sell?</div><div class="fh">Relevance doesn't guarantee conversion — right-intent terms can still lose on price, reviews or imagery.</div></div><div class="fr" style="color:var(--red)">0 ORDERS → NEG EXACT<br><span style="color:var(--faint)">it had a fair chance</span></div></div>
+        <div class="farrow">▼ it sold</div>
+        <div class="fnode"><span class="fn">4</span><div><div class="fq">Is ACOS at or below break-even?</div><div class="fh">Compare the term's ACOS to your margin %. Under the fence = profitable demand.</div></div><div class="fr" style="color:var(--green)">YES → HARVEST → EXACT<br><span style="color:var(--faint)">own campaign, controlled bid</span></div></div>
+        <div class="farrow">▼ selling, but above break-even</div>
+        <div class="fnode"><span class="fn">5</span><div><div class="fq">Keep it — and tune it.</div><div class="fh">A converting term above break-even gets a gentler bid, not a goodbye. Re-check in 7 days.</div></div><div class="fr" style="color:var(--blue)">→ KEEP + BID DOWN</div></div>
+      </div>
+    </div>
+
+    <div class="panel guide-sec reveal">
+      <div class="gnum">02</div>
+      <h2>Where search terms come from</h2>
+      <p>A <b>keyword</b> is what you bid on. A <b>search term</b> is what the shopper actually typed. Match type controls how loose that leash is — and the looser the leash, the more triage you'll do.</p>
+      <table class="gtable">
+        <thead><tr><th>MATCH TYPE</th><th>WHAT IT CATCHES</th><th>WHY TERMS SHOW UP</th><th>TRIAGE ROLE</th></tr></thead>
+        <tbody>
+          <tr><td class="mono"><b>AUTO</b></td><td>Whatever Amazon's model thinks fits your listing</td><td>Amazon goes fishing — close variants, loose complements, the occasional oddball</td><td><b>Biggest source of both winners and waste</b> — triage weekly, firmly but fairly.</td></tr>
+          <tr><td class="mono"><b>BROAD</b></td><td>Your keyword + extra words, reorderings, synonyms</td><td>"bamboo cutting board" also matches "large bamboo cutting board with handle"</td><td>Your long-tail goldmine — harvest winners the moment they prove out.</td></tr>
+          <tr><td class="mono"><b>PHRASE</b></td><td>Your keyword with words before/after, order locked</td><td>Same as broad but tighter — fewer surprises, fewer discoveries</td><td>Lighter triage. Mostly negatives and the occasional harvest.</td></tr>
+          <tr><td class="mono"><b>EXACT</b></td><td>The keyword itself (and near-identical variants)</td><td>You already chose this term</td><td><b>Nothing to harvest</b> — manage by bid and budget instead.</td></tr>
+        </tbody>
+      </table>
+      <p>The whole point of harvesting: broad and auto campaigns <b>discover</b> demand with a loose leash; exact campaigns <b>exploit</b> it with full control. Triage is the conveyor belt between the two — and you're the one running it.</p>
+    </div>
+
+    <div class="panel guide-sec reveal">
+      <div class="gnum">03</div>
+      <h2>The one number that matters: break-even ACOS</h2>
+      <p><b>Break-even ACOS = your margin %.</b> If every dollar of sale leaves you $0.34 after product, fees and shipping, then a 34% ACOS spends exactly that $0.34 back. Above the fence, every sale quietly costs you money — and you deserve better than that.</p>
+      <p><b>Worked example:</b> a $24.99 board with all-in costs of $16.49 leaves $8.50 → <b>34% margin → 34% break-even ACOS</b>. A term at 18% ACOS keeps roughly $4 of every sale in profit. A term at 48% burns $3.50 per order — "but it's getting sales" doesn't change that math, and now you know why.</p>
+      <div class="calc">
+        <h4>LIVE CALCULATOR — TRY YOUR OWN NUMBERS</h4>
+        <div class="calc-grid">
+          <div><label>PRICE $</label><input id="calc-price" type="number" value="24.99" step="0.01"></div>
+          <div><label>MARGIN %</label><input id="calc-margin" type="number" value="34" step="1"></div>
+          <div><label>CLICKS</label><input id="calc-clicks" type="number" value="26" step="1"></div>
+          <div><label>AVG CPC $</label><input id="calc-cpc" type="number" value="0.95" step="0.01"></div>
+          <div><label>ORDERS</label><input id="calc-orders" type="number" value="3" step="1"></div>
+        </div>
+        <div class="calc-out" id="calc-out"></div>
+      </div>
+    </div>
+
+    <div class="panel guide-sec reveal">
+      <div class="gnum">04</div>
+      <h2>Negative exact vs. negative phrase</h2>
+      <p>Both block traffic. The difference is <b>blast radius</b> — and getting it wrong either leaves leaks open or cuts off good traffic by mistake.</p>
+      <table class="gtable">
+        <thead><tr><th>TYPE</th><th>BLOCKS</th><th>USE WHEN</th><th>EXAMPLE</th></tr></thead>
+        <tbody>
+          <tr><td class="mono" style="color:var(--red)"><b>NEG EXACT</b></td><td>Only this exact query</td><td>One specific wrong-intent term. Surgical.</td><td class="mono">"glass cutting board" → block just that</td></tr>
+          <tr><td class="mono" style="color:var(--amber)"><b>NEG PHRASE</b></td><td>Any query containing the words</td><td>A rogue <b>modifier</b> contaminating a whole family of queries.</td><td class="mono">"free", "used", "repair", "wholesale", "refill", "jobs" → block the word</td></tr>
+        </tbody>
+      </table>
+      <p><b>Rule of thumb:</b> negate <b>products</b> at exact, negate <b>modifiers</b> at phrase. And never phrase-negative a core noun of your category — blocking "board" at phrase would hurt half your good traffic along with the junk.</p>
+    </div>
+
+    <div class="panel guide-sec reveal">
+      <div class="gnum">05</div>
+      <h2>Harvesting, step by step</h2>
+      <ol class="steps">
+        <li><b>Graduate the term</b> into a dedicated Exact campaign — one per product, or one per theme. Harvested terms shouldn't live with their parents.</li>
+        <li><b>Start the bid near the term's average CPC × 1.1.</b> You're paying for proven demand — a shy bid just starves it.</li>
+        <li><b>Give it its own budget</b> so a head term can't eat a long-tail winner's spend.</li>
+        <li><b>Decide on the source:</b> some managers negate the harvested term back out of broad/auto for clean data; others leave it and watch for overlap. Both work — pick one and stay consistent.</li>
+        <li><b>Re-check in 7–14 days.</b> Harvested terms can drift too — when ACOS crosses break-even, the same five friendly questions still apply.</li>
+      </ol>
+    </div>
+
+    <div class="panel guide-sec reveal">
+      <div class="gnum">06</div>
+      <h2>The little trap reel</h2>
+      <p>The traps we all step in — no shame, everyone does. Meeting them here, in practice, is how you make them harmless.</p>
+      <div class="trap"><div class="t-in"><span class="tl">TEMPTING THOUGHT</span><b>"It only has 4 clicks — negate it, it's dead."</b></div><div class="t-out"><span class="tl">COACH'S TAKE</span>4 clicks is a whisper, not a verdict. Keep it a little longer and judge at ~10.</div></div>
+      <div class="trap"><div class="t-in"><span class="tl">TEMPTING THOUGHT</span><b>"ACOS 46%?! Negate it now!"</b> — on a term with 4 orders.</div><div class="t-out"><span class="tl">COACH'S TAKE</span>It's converting — that's good news in disguise. Compare to break-even, ease the bid down, and check back in a week.</div></div>
+      <div class="trap"><div class="t-in"><span class="tl">TEMPTING THOUGHT</span><b>"One order on 'cutting board set of 2' — keep it, it sells!"</b></div><div class="t-out"><span class="tl">COACH'S TAKE</span>You sell one board, so that order will likely become a return. Negate the intent, kindly, and move on.</div></div>
+      <div class="trap"><div class="t-in"><span class="tl">TEMPTING THOUGHT</span><b>"bambo cutting board" looks like junk — skip it.</b></div><div class="t-out"><span class="tl">COACH'S TAKE</span>Typos convert! Shoppers mistype, Amazon doesn't always correct — harvest these little winners.</div></div>
+      <div class="trap"><div class="t-in"><span class="tl">TEMPTING THOUGHT</span><b>Phrase-negating "cheap"… then phrase-negating "board".</b></div><div class="t-out"><span class="tl">COACH'S TAKE</span>Modifiers at phrase, products at exact. Core nouns stay untouchable — you'll thank yourself.</div></div>
+      <div class="trap"><div class="t-in"><span class="tl">TEMPTING THOUGHT</span><b>"It's in Spanish or Taglish — just negate it, I can't read it."</b></div><div class="t-out"><span class="tl">COACH'S TAKE</span>"Para dormir" simply means "for sleep". Translate first, triage second — multi-lang terms often convert quietly under the radar.</div></div>
+      <div class="trap"><div class="t-in"><span class="tl">TEMPTING THOUGHT</span><b>Leaving the auto campaign alone for three months.</b></div><div class="t-out"><span class="tl">COACH'S TAKE</span>Auto is a scout, not a manager. Ten kind minutes a week beats one long purge after Prime Day.</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TIPS -->
+<section id="view-tips" class="view">
+  <div class="kicker">COACH'S NOTES // TIPS</div>
+  <h1>Notes from <span class="hl">your coach.</span></h1>
+  <p class="sub">Short, kind rules that hold up against real search term reports. Read one, try one, keep one.</p>
+  <div class="tip-banner" style="margin-top:30px">
+    <span class="tl">COACH'S TIP ▸</span>
+    <span class="tt" id="tip-rotator"></span>
+  </div>
+  <div class="dd-grid">
+    <div class="panel dd-col do reveal">
+      <h3>HABITS TO BUILD</h3>
+      <ul>
+        <li><b>Triage weekly, on a 7-day window.</b> A full week smooths out the noise for you — daily numbers jump around and can worry you for no reason.</li>
+        <li><b>Compare ACOS to break-even, never to a feeling.</b> Write your margin % somewhere you can see it.</li>
+        <li><b>Harvest the misspellings.</b> "bambo cutting board" converts like the real thing — and often costs less.</li>
+        <li><b>Keep a little swipe file of negative patterns per category.</b> "free / used / repair / wholesale / refill" shows up everywhere.</li>
+        <li><b>Re-triage kindly after Prime Day and BFCM.</b> Event traffic distorts everything, then settles back down.</li>
+        <li><b>Give harvested terms their own exact campaign and budget.</b> Winners shouldn't fight their parents for spend.</li>
+      </ul>
+    </div>
+    <div class="panel dd-col dont reveal">
+      <h3>TRAPS TO SKIP</h3>
+      <ul>
+        <li><b>Don't judge a term on 4 clicks.</b> Small samples make up heroes and villains that aren't real.</li>
+        <li><b>Don't negate a converting term just because the ACOS looks scary.</b> Above break-even means "bid down", not "goodbye".</li>
+        <li><b>Don't phrase-negative core category nouns.</b> Blocking "bottle" at phrase hurts good traffic too.</li>
+        <li><b>Don't leave auto campaigns alone for months.</b> They'll happily spend your Q4 budget on the word "jobs".</li>
+        <li><b>Don't harvest a head term at a long-tail bid.</b> "cutting board" needs its own budget and an honest CPC.</li>
+        <li><b>Don't skip negatives while scaling spend.</b> Scaling without negatives is just scaling the leak.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SUITE -->
+<section id="view-suite" class="view">
+  <div class="kicker">OPSDECK // THE BENCH</div>
+  <h1>Your practice <span class="hl">bench.</span></h1>
+  <p class="sub">Five simulators, one bench. Everything below is live — same scoring, same progress, no dead buttons. Take your time with each one.</p>
+  <div style="margin-top:30px">
+    <div class="panel suite-row reveal" data-go="autopsy">
+      <div class="tn">05</div>
+      <div><h3>LISTING AUTOPSY</h3><p>Paste a listing and we'll check its health together — title length, loud words, policy landmines and wasted backend bytes.</p></div>
+      <div class="sact"><span class="tag tag-g">LIVE</span><button type="button" class="btn btn-ghost" style="font-size:13px;padding:10px 18px">OPEN ▸</button></div>
+    </div>
+    <div class="panel suite-row reveal" data-go="bidladder">
+      <div class="tn">06</div>
+      <div><h3>BID LADDER DRILL</h3><p>Practice setting max CPC from AOV × CVR × target ACOS until it feels natural. Six rounds, graded gently.</p></div>
+      <div class="sact"><span class="tag tag-g">LIVE</span><button type="button" class="btn btn-ghost" style="font-size:13px;padding:10px 18px">OPEN ▸</button></div>
+    </div>
+    <div class="panel suite-row here reveal" data-go="briefing">
+      <div class="tn">07</div>
+      <div><h3>SEARCH TERM TRIAGE</h3><p>The one we started with. Harvest, keep, or negate a full 14-day report across six ASINs — at your own pace or against the clock.</p></div>
+      <div class="sact"><span class="tag tag-a">YOU ARE HERE</span><button type="button" class="btn btn-orange" style="font-size:13px;padding:10px 18px">OPEN ▸</button></div>
+    </div>
+    <div class="panel suite-row reveal" data-go="daypart">
+      <div class="tn">08</div>
+      <div><h3>DAYPART DECODER</h3><p>Read a 7×6 grid of hours. Ease off the quiet ones, feed the hungry ones — and remember the volume rule.</p></div>
+      <div class="sact"><span class="tag tag-g">LIVE</span><button type="button" class="btn btn-ghost" style="font-size:13px;padding:10px 18px">OPEN ▸</button></div>
+    </div>
+    <div class="panel suite-row reveal" data-go="radar">
+      <div class="tn">09</div>
+      <div><h3>REVIEW RADAR</h3><p>Read reviews together with a sentiment + pain-point scan, and find the aspect that's about to become a return reason.</p></div>
+      <div class="sact"><span class="tag tag-g">LIVE</span><button type="button" class="btn btn-ghost" style="font-size:13px;padding:10px 18px">OPEN ▸</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOL 05 : AUTOPSY -->
+<section id="view-autopsy" class="view">
+  <div class="kicker">TOOL 05 // LISTING AUTOPSY</div>
+  <h1>Let's check its <span class="hl">health.</span></h1>
+  <p class="sub">Paste a title, bullets and backend search terms. We'll score it 0–100 together and walk through every finding — including the policy landmines that quietly limit reach.</p>
+  <div class="au-grid">
+    <div class="panel au-form">
+      <label>TITLE</label>
+      <textarea id="a-title" rows="3" placeholder="Paste the product title…"></textarea>
+      <label>BULLET POINTS (ONE PER LINE)</label>
+      <textarea id="a-bullets" rows="7" placeholder="One bullet per line…"></textarea>
+      <label>BACKEND SEARCH TERMS</label>
+      <input type="text" id="a-backend" placeholder="Backend keywords…">
+      <div class="au-btns">
+        <button type="button" class="btn btn-ghost" id="a-sample-bad">LOAD A MESSY ONE</button>
+        <button type="button" class="btn btn-ghost" id="a-sample-good">LOAD A TIDY ONE</button>
+        <button type="button" class="btn btn-orange" id="a-run">RUN THE CHECKUP ▸</button>
+      </div>
+    </div>
+    <div class="panel" style="padding:24px 26px;min-height:420px">
+      <div id="a-report"><div class="report-empty"><span class="pulse">◉</span><br><br>READY WHEN YOU ARE<br>LOAD A SAMPLE OR PASTE YOUR OWN LISTING, THEN RUN THE CHECKUP</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOL 06 : BID LADDER -->
+<section id="view-bidladder" class="view">
+  <div class="kicker">TOOL 06 // BID LADDER DRILL</div>
+  <h1>Find the right bid, <span class="hl">step by step.</span></h1>
+  <p class="sub">Six rounds. I'll hand you the AOV, historical CVR and target ACOS — you tell me the highest CPC you'd pay. Within 15% counts as a hit, and the ladder shows you exactly where you landed, so every round teaches you something.</p>
+  <div class="bl-grid">
+    <div class="panel bl-sheet">
+      <h2 style="font-size:17px">The little formula</h2>
+      <div class="formula">MAX BID = <b>AOV</b> × <b>CVR</b> × <b>TARGET ACOS</b><br><br>$24.99 × 10% × 25%<br>= <b>$0.62</b> max CPC</div>
+      <p style="color:var(--dim);font-size:13px;margin:10px 0 16px">Swap target ACOS for <b style="color:var(--red)">break-even ACOS (= margin %)</b> and you'll find the wall — the bid where every order nets $0. We never want to bid past it.</p>
+      <h4 style="font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--orange);margin-bottom:10px">FREE-PLAY CALCULATOR</h4>
+      <div class="calc-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div><label>AOV $</label><input id="bl-fp-price" type="number" value="24.99" step="0.01"></div>
+        <div><label>CVR %</label><input id="bl-fp-cvr" type="number" value="10" step="0.5"></div>
+        <div><label>TARGET ACOS %</label><input id="bl-fp-target" type="number" value="25" step="1"></div>
+      </div>
+      <div class="calc-out"><div><span>MAX BID</span><b id="bl-fp-out" style="color:var(--orange)">$0.62</b></div><div><span>AT 10% CVR THAT'S</span><b id="bl-fp-out2">$6.20 / 10 clicks</b></div></div>
+    </div>
+    <div class="panel bl-q" id="bl-stage"></div>
+  </div>
+</section>
+
+<!-- TOOL 08 : DAYPART -->
+<section id="view-daypart" class="view">
+  <div class="kicker">TOOL 08 // DAYPART DECODER</div>
+  <h1>Find the hours that <span class="hl">need a change.</span></h1>
+  <p class="sub">Here are two weeks of delivery data on one grid — ACOS in each cell, orders underneath. Ease off the <b style="color:var(--red)">5 weakest blocks</b> and give the <b style="color:var(--green)">3 strongest</b> a little more. One gentle reminder: "strongest" means a low ACOS <i>with real volume</i> — a 9% ACOS on a single order is a whisper, not a signal.</p>
+  <div class="dp-wrap">
+    <div class="dp-ctrl">
+      <button type="button" class="dp-mode on-low" id="dp-m-low">▼ EASE OFF · <span id="dp-c-low">0</span>/5</button>
+      <button type="button" class="dp-mode" id="dp-m-high">▲ BOOST · <span id="dp-c-high">0</span>/3</button>
+      <button type="button" class="btn btn-orange" id="dp-check" style="font-size:14px;padding:10px 22px">CHECK MY READS ▸</button>
+      <button type="button" class="btn btn-ghost" id="dp-regen" style="font-size:13px;padding:10px 18px">NEW DATA ⟳</button>
+      <span class="stage-count" style="margin-left:auto">SCORE <b id="dp-score">—</b> / 320</span>
+    </div>
+    <div class="panel" style="padding:20px 22px">
+      <div class="dp-grid" id="dp-grid"></div>
+      <div class="dp-legend">
+        <span>■ GREEN = LOW ACOS (CHEAP SALES)</span><span>■ RED = HIGH ACOS (EXPENSIVE SALES)</span>
+        <span style="color:var(--red)">◌ DASHED = WORTH EASING OFF</span><span style="color:var(--green)">▰ GLOW = WORTH BOOSTING</span>
+      </div>
+    </div>
+    <div class="panel dp-result" id="dp-result" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- TOOL 09 : RADAR -->
+<section id="view-radar" class="view">
+  <div class="kicker">TOOL 09 // REVIEW RADAR</div>
+  <h1>Listen to <span class="hl">your buyers.</span></h1>
+  <p class="sub">Paste any review — or a whole batch — and we'll read it together: the mood, the words that carry weight, the little ouch moments, and which part of the product is asking for attention.</p>
+  <div class="rd-grid">
+    <div class="panel rd-form">
+      <label style="display:block;font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--faint);margin-bottom:8px">REVIEW TEXT</label>
+      <textarea id="r-input" placeholder="Paste review text here…"></textarea>
+      <div class="rd-samples">
+        <button type="button" data-s="furious">LOAD: UPSET ★1</button>
+        <button type="button" data-s="mixed">LOAD: MIXED ★3</button>
+        <button type="button" data-s="rave">LOAD: RAVE ★5</button>
+      </div>
+      <button type="button" class="btn btn-orange" id="r-run">READ IT TOGETHER ▸</button>
+    </div>
+    <div class="panel" style="padding:24px 26px;min-height:420px">
+      <div id="r-report"><div class="report-empty"><span class="pulse">◉</span><br><br>READY TO LISTEN<br>PASTE A REVIEW AND WE'LL READ IT TOGETHER</div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="foot-in">
+    <span class="fl">OPSDECK PRACTICE SUITE //</span>
+    <button type="button" class="tool-link" data-go="autopsy">TOOL 05 · LISTING AUTOPSY</button>
+    <button type="button" class="tool-link" data-go="bidladder">TOOL 06 · BID LADDER DRILL</button>
+    <button type="button" class="tool-link here" data-go="briefing">TOOL 07 · SEARCH TERM TRIAGE</button>
+    <button type="button" class="tool-link" data-go="daypart">TOOL 08 · DAYPART DECODER</button>
+    <button type="button" class="tool-link" data-go="radar">TOOL 09 · REVIEW RADAR</button>
+    <div class="foot-note">TRAINING SIMULATOR — ALL METRICS ARE SYNTHETIC · PROGRESS SAVES IN YOUR BROWSER · BE PATIENT WITH YOURSELF: EVERY ROUND COUNTS.</div>
+  </div>
+</footer>
+
+<script>
+/* ============ UTIL ============ */
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const rf=(a,b)=>Math.random()*(b-a)+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const money=v=>'$'+v.toFixed(2);
+
+/* ============ PERSISTENCE ============ */
+const KEY='opsdeck_triage_v2';
+let store={xp:0,rounds:0,bestAcc:null,caught:0,drillBest:{}};
+try{const s=localStorage.getItem(KEY);if(s)store=Object.assign(store,JSON.parse(s))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+const RANKS=[[0,'FIRST DAY'],[500,'EAGER LEARNER'],[1500,'STEADY HAND'],[3500,'SHARP EYE'],[7000,'CONFIDENT CALLER'],[12000,'TRIAGE COACH'],[20000,'MASTER MENTOR']];
+function rankOf(xp){let r=RANKS[0];for(const[t,n]of RANKS)if(xp>=t)r=[t,n];return r}
+function rankIdx(xp){let i=0;RANKS.forEach((r,k)=>{if(xp>=r[0])i=k});return i}
+
+/* ============ SCENARIOS ============ */
+const SCENARIOS=[
+{id:'bamboo',name:'Bamboo Cutting Board w/ Juice Grooves',cat:'KITCHEN & DINING',asin:'B0BXK7Q2LM',init:'CB',price:24.99,margin:34,target:22,
+ feats:['Single board — sold solo, no sets','Juice grooves + easy-grip handles','Premium bamboo at a $25 price point'],
+ pools:{
+  winner:['bamboo cutting board large','cutting board for kitchen big','chopping board with handle','organic bamboo cutting board','bambo cutting board','cutting board bamboo extra large','wood cutting board for kitchen'],
+  head:['cutting board','kitchen cutting board'],
+  starved:['extra thick bamboo cutting board','small chopping board for fruit','japanese style bamboo board','carving board bamboo'],
+  zero:['wooden chopping board','butcher block cutting board','large cutting board for meat','deep groove cutting board','serving and cutting board'],
+  irr:['plastic cutting board','glass cutting board','cutting board set of 3','cutting board with knife set','cutting board with built in scale'],
+  pat:[{w:'free',t:'free cutting board'},{w:'repair',t:'cutting board repair'},{w:'wholesale',t:'bamboo cutting board wholesale'}],
+  comp:['verdello cutting board','oakhaus chopping board'],
+  trap:['cutting board set of 2'],
+  early:['sushi cutting board bamboo','tabla de cortar bambú']}},
+{id:'bottle',name:'Insulated Stainless Water Bottle 32oz',cat:'SPORTS & OUTDOORS',asin:'B0CWM4T81Z',init:'WB',price:34.95,margin:30,target:20,
+ feats:['Premium $35 positioning — not a budget bottle','Leakproof flip lid — NO straw variant','Double-wall steel, 24h cold'],
+ pools:{
+  winner:['insulated water bottle 32 oz','stainless steel water bottle 32oz','thermos bottle 32 oz steel','metal water bottle for hiking','leak proof water bottle 32oz','steel water bottle with handle'],
+  head:['water bottle','insulated water bottle'],
+  starved:['metal water bottle for gym','matte black steel bottle 32 oz','steel bottle for office desk','insulated bottle gift','botella de agua insulated'],
+  zero:['insulated bottle for running','one liter steel water bottle','sports steel water bottle','heavy duty steel bottle','insulated bottle for yoga'],
+  irr:['glass water bottle','plastic water bottle','water bottle with straw','kids sippy bottle','1 gallon water jug'],
+  pat:[{w:'cheap',t:'cheap water bottle'},{w:'free',t:'free water bottles'},{w:'repair',t:'water bottle cap repair'}],
+  comp:['glacierpeak 32 oz bottle','polarcore flask 32oz'],
+  trap:['tumbler 32 oz insulated'],
+  early:['steel bottle for trail runs']}},
+{id:'lamp',name:'LED Desk Lamp with USB Charging Port',cat:'OFFICE & LIGHTING',asin:'B0D9PL6R2K',init:'DL',price:29.99,margin:28,target:18,
+ feats:['USB-A charging port — no wireless pad','3 brightness levels, adjustable arm','Sleek modern finish, $30 segment'],
+ pools:{
+  winner:['desk lamp with usb port','led desk lamp adjustable','office desk lamp modern','desk lamp for home office','desklamp led','reading lamp with usb charging'],
+  head:['desk lamp','led desk lamp'],
+  starved:['black desk lamp small','desk lamp warm light','slim led lamp for desk','foldable office lamp'],
+  zero:['study lamp for students','desk lamp for drafting table','architect desk lamp','lamp for sewing machine','vintage desk lamp brass'],
+  irr:['floor lamp led','bedside table lamp','ring light with stand','clamp lamp for desk','salt lamp'],
+  pat:[{w:'replacement',t:'desk lamp replacement bulb'},{w:'repair',t:'led lamp repair near me'},{w:'used',t:'used desk lamps'}],
+  comp:['lumitek desk lamp','brightline office lamp'],
+  trap:['desk lamp with wireless charger'],
+  early:['small led lamp for dorm desk']}},
+{id:'pet',name:'Pet Hair Remover Roller for Furniture',cat:'PET SUPPLIES',asin:'B0BTR9X4QN',init:'PH',price:16.99,margin:40,target:25,
+ feats:['Reusable roller — no refills, no batteries','Built for sofas, beds, car seats','High 40% margin — room to bid'],
+ pools:{
+  winner:['pet hair remover for couch','dog hair remover furniture','reusable lint roller pet hair','cat hair remover for sofa','pet hair remuver','dog hair remover for car seats'],
+  head:['pet hair remover','lint roller for pets'],
+  starved:['furniture hair remover roller','sofa cleaner roller','upholstery hair roller','pang-alis ng balahibo sa sofa'],
+  zero:['lint roller for clothes','carpet pet hair roller','sticky roller for blankets','fur remover for laundry','hair roller for comforters'],
+  irr:['vacuum for pet hair','pet grooming brush','carpet shampooer','dryer lint trap'],
+  pat:[{w:'refill',t:'lint roller refill packs'},{w:'free',t:'free lint rollers'},{w:'cheap',t:'cheap pet hair remover'}],
+  comp:['furfury roller','hairhog roller'],
+  trap:['vacuum attachment for pet hair'],
+  early:['roller for cat fur on sofa']}},
+{id:'ashwa',name:'Ashwagandha Gummies 60ct — Sugar-Free',cat:'HEALTH & HOUSEHOLD',asin:'B0DGH2V7MC',init:'AG',price:18.99,margin:45,target:28,multi:true,
+ feats:['60-count, sugar-free, vegan formula','Adults only — NOT a kids product','45% margin — highest on the bench'],
+ pools:{
+  winner:['ashwagandha gummies for sleep','ashwagandha gummies 60 count','stress relief gummies for adults','ashwaganda gummies','gummies para el estres','sugar free ashwagandha gummies'],
+  head:['ashwagandha gummies','sleep gummies for adults'],
+  starved:['ashwagandha gummies for men','vegan ashwagandha gummies','calming gummies for relaxation','non gmo ashwagandha gummies'],
+  zero:['ashwagandha gummies for energy','relaxation gummies for women','ashwagandha chewables','ashwagandha gummies 1000mg','cortisol manager gummies'],
+  irr:['ashwagandha capsules','ashwagandha powder','melatonin gummies','ashwagandha for dogs','cbd gummies for sleep','ashwagandha en polvo','ashwagandha gummies price in philippines'],
+  pat:[{w:'free',t:'free ashwagandha samples'},{w:'cheap',t:'cheap ashwagandha gummies'},{w:'wholesale',t:'ashwagandha gummies wholesale'}],
+  comp:['vedapure ashwagandha','calmwell gummies'],
+  trap:['ashwagandha gummies for kids'],
+  early:['ashwagandha gummies para dormir']}},
+{id:'buds',name:'Wireless Earbuds Bluetooth 5.3, 30H Case',cat:'ELECTRONICS',asin:'B0CZRN88TQ',init:'WE',price:39.99,margin:26,target:16,multi:true,
+ feats:['BT 5.3, ENC mic — NO active noise cancelling','IPX5 sweat-proof, 30-hour case','Thin 26% margin — ACOS discipline required'],
+ pools:{
+  winner:['wireless earbuds bluetooth 5.3','bluetooth earbuds with charging case','earbuds for iphone and android','sport wireless earbuds waterproof','wirless earbuds','ear buds for calls'],
+  head:['wireless earbuds','bluetooth earbuds'],
+  starved:['earbuds for small ears','wireless earbuds under 40 dollars','earbuds for iphone 15','lightweight earbuds for running'],
+  zero:['earbuds for gym','wireless earbuds with eq app','bluetooth earbuds for tv','earbuds with long battery life','wireless earbuds for android'],
+  irr:['wired earbuds','noise cancelling headphones','airpods pro case','usb c wired earbuds','hearing aid earbuds'],
+  pat:[{w:'cheap',t:'cheap wireless earbuds'},{w:'free',t:'free earbuds giveaway'},{w:'repair',t:'earbuds repair near me'}],
+  comp:['beatpods earbuds','auramax buds'],
+  trap:['noise cancelling earbuds'],
+  early:['earbuds para correr']}}
+];
+const CAMPAIGNS=[['SP-AUTO-RESEARCH','AUTO'],['SP-BROAD-CORE','BROAD'],['SP-BROAD-DISCOVERY','BROAD'],['SP-PHRASE-LONGTAIL','PHRASE']];
+const COMP={
+ rookie:{8:['winner','winner','winner','zero','zero','irr','irr','pat'],
+  12:['winner','winner','winner','winner','zero','zero','zero','irr','irr','irr','pat','starved'],
+  16:['winner','winner','winner','winner','zero','zero','zero','irr','irr','irr','pat','starved','winner','zero','irr','starved']},
+ pro:{8:['winner','winner','head','starved','zero','irr','pat','comp'],
+  12:['winner','winner','winner','head','head','starved','starved','zero','zero','irr','pat','comp'],
+  16:['winner','winner','winner','head','head','starved','starved','zero','zero','irr','pat','comp','winner','zero','starved','irr']},
+ surgeon:{8:['winner','head','starved','zero','pat','comp','trap','early'],
+  12:['winner','winner','head','head','starved','starved','zero','irr','pat','comp','trap','early'],
+  16:['winner','winner','head','head','starved','starved','zero','irr','pat','comp','trap','early','winner','zero','starved','irr']}
+};
+const DIFF_DESC={rookie:'Gentle pace · helper hints on · clear signals',pro:'A little trickier · borderline numbers · competitor noise',surgeon:'Full challenge · subtle traps · no hints — you are ready'};
+
+/* ============ METRICS + EXPERT ============ */
+function genMetrics(cls,sc,diff){
+  const be=sc.margin,price=sc.price,cc=v=>clamp(v,0.35,2.4);
+  let clicks,cpc,orders=0;
+  if(cls==='winner'){
+    clicks=ri(20,diff==='rookie'?44:38);cpc=cc(rf(.55,1.35));
+    let spend=clicks*cpc;
+    const cap=be*(diff==='rookie'?rf(.4,.68):diff==='pro'?rf(.5,.8):rf(.55,.92))/100;
+    orders=Math.max(2,Math.ceil(spend/(price*cap)));
+    if(orders>clicks*.26)clicks=Math.ceil(orders/.22);
+    spend=clicks*cpc;
+    if(spend/(orders*price)>be/100)orders=Math.ceil(spend/(price*be/100));
+  }else if(cls==='head'){
+    clicks=ri(24,55);cpc=cc(rf(.85,1.7));
+    const spend=clicks*cpc,mid=be*rf(1.25,1.8)/100;
+    orders=Math.max(2,Math.round(spend/(price*mid)));
+    const maxOrd=Math.floor(spend/(price*be/100));
+    if(orders>maxOrd)orders=Math.max(1,maxOrd);
+  }else if(cls==='starved'){clicks=ri(2,diff==='rookie'?6:9);cpc=cc(rf(.5,1.4));}
+  else if(cls==='zero'){clicks=ri(12,28);cpc=cc(rf(.7,1.6));}
+  else if(cls==='irr'){clicks=ri(6,30);cpc=cc(rf(.9,1.9));}
+  else if(cls==='pat'){clicks=ri(4,18);cpc=cc(rf(.6,1.5));}
+  else if(cls==='comp'){clicks=ri(8,26);cpc=cc(rf(.9,2.0));}
+  else if(cls==='trap'){
+    clicks=ri(10,20);cpc=cc(rf(.6,1.2));
+    const spend=clicks*cpc,good=be*rf(.4,.8)/100;
+    orders=clamp(Math.round(spend/(price*good)),1,3);
+    if(spend/(orders*price)>be/100)orders=Math.min(4,Math.ceil(spend/(price*be/100)));
+  }else if(cls==='early'){
+    clicks=ri(6,9);
+    cpc=Math.min(cc(rf(.5,1.0)),(be*.8/100)*price/clicks);
+    orders=1;
+  }
+  const spend=clicks*cpc,impr=Math.max(clicks+ri(20,80),Math.round(clicks/rf(.02,.09))),sales=orders*price;
+  return{clicks,cpc,orders,spend,impr,sales,acos:sales>0?spend/sales*100:null,ctr:clicks/impr*100,cvr:clicks>0?orders/clicks*100:0};
+}
+function expertFor(item,sc){
+  return SearchTriageCore.expertFor(item,sc);
+}
+
+/* ============ STATE / HEADER ============ */
+const ACTIONS={
+ HARVEST:{label:'HARVEST → EXACT',short:'HARVEST',key:'1',act:'act-harvest',st:'st-harvest',desc:'A proven winner — let it grow'},
+ KEEP:{label:'KEEP / MONITOR',short:'KEEP',key:'2',act:'act-keep',st:'st-keep',desc:'Not ready to judge yet'},
+ NEG_EXACT:{label:'NEGATIVE EXACT',short:'NEG EXACT',key:'3',act:'act-negx',st:'st-negx',desc:'Politely block this exact query'},
+ NEG_PHRASE:{label:'NEGATIVE PHRASE',short:'NEG PHRASE',key:'4',act:'act-negp',st:'st-negp',desc:'Block a whole word family'}
+};
+let S={scen:SCENARIOS[0],diff:'rookie',size:12,queue:[],idx:0,streak:0,lock:false,results:[],roundXP:0,roundStart:0,timerInt:null,active:false};
+function renderHeader(){
+  $('#xp-val').textContent=store.xp.toLocaleString();
+  $('#rank-name').textContent=rankOf(store.xp)[1];
+  const cur=rankOf(store.xp),ci=rankIdx(store.xp),next=RANKS[ci+1];
+  $('#c-rank').textContent=cur[1];
+  $('#c-xp').textContent=store.xp.toLocaleString();
+  $('#c-next').textContent=next?`${next[0].toLocaleString()} XP to ${next[1]}`:'MAX RANK — HOW PROUD';
+  const lo=cur[0],hi=next?next[0]:lo+1;
+  $('#c-bar').style.width=next?clamp((store.xp-lo)/(hi-lo)*100,0,100)+'%':'100%';
+  $('#c-rounds').textContent=store.rounds;
+  $('#c-best').textContent=store.bestAcc===null?'—':Math.round(store.bestAcc*100)+'%';
+  $('#c-caught').textContent='$'+Math.round(store.caught);
+}
+function bumpXP(n){
+  store.xp+=n;save();
+  const el=$('#xp-val');el.textContent=store.xp.toLocaleString();
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+  $('#rank-name').textContent=rankOf(store.xp)[1];
+  renderHeader();
+}
+
+/* ============ NAV ============ */
+function showView(name){
+  $$('.view').forEach(v=>v.classList.remove('on'));
+  $('#view-'+name).classList.add('on');
+  const tab=['triage','debrief'].includes(name)?'briefing':name;
+  $$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.view===tab));
+  window.scrollTo({top:0,behavior:'smooth'});
+  requestAnimationFrame(observeReveals);
+}
+$$('nav button').forEach(b=>b.addEventListener('click',()=>{
+  if(b.dataset.view==='briefing')showView(S.active?'triage':'briefing');
+  else showView(b.dataset.view);
+}));
+$$('.suite-row').forEach(r=>r.addEventListener('click',()=>showView(r.dataset.go)));
+$$('footer .tool-link').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.go)));
+
+/* ============ BRIEFING ============ */
+function renderScenList(){
+  $('#scen-list').innerHTML=SCENARIOS.map(s=>`
+   <div class="panel scen ${s.id===S.scen.id?'sel':''}" data-id="${s.id}">
+     <div class="init">${s.init}</div>
+     <div>
+       <h3>${s.name}</h3>
+       <div class="cat">${s.cat} · ASIN ${s.asin}${s.multi?' · <span class="tag tag-a" style="padding:1px 6px">MULTI-LANG POOL</span>':''}</div>
+       <div class="sstats">
+         <span>PRICE <b>${money(s.price)}</b></span>
+         <span>MARGIN <b>${s.margin}%</b></span>
+         <span>BE ACOS <b style="color:var(--orange)">${s.margin}%</b></span>
+         <span>POOL <b>${Object.values(s.pools).flat().length} terms</b></span>
+       </div>
+     </div>
+     <div class="radio"></div>
+   </div>`).join('');
+  $$('.scen').forEach(el=>el.addEventListener('click',()=>{
+    S.scen=SCENARIOS.find(s=>s.id===el.dataset.id);renderScenList();
+  }));
+}
+$('#set-size').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  S.size=+b.dataset.v;$$('#set-size button').forEach(x=>x.classList.toggle('on',x===b));
+});
+$('#set-diff').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  S.diff=b.dataset.v;$$('#set-diff button').forEach(x=>x.classList.toggle('on',x===b));
+  $('#diff-desc').textContent=DIFF_DESC[S.diff];
+});
+$('#start-btn').addEventListener('click',startRound);
+
+/* ============ ROUND ============ */
+function buildQueue(){
+  const comp=shuffle(COMP[S.diff][S.size]),used=new Set();
+  const take=cls=>{
+    const pool=S.scen.pools[cls].filter(t=>!used.has(typeof t==='string'?t:t.t));
+    const src=pool.length?pool:S.scen.pools[cls];
+    const c=pick(src);used.add(typeof c==='string'?c:c.t);return c;
+  };
+  return comp.map(cls=>{
+    const raw=take(cls),isPat=cls==='pat';
+    const item={cls,term:isPat?raw.t:raw,word:isPat?raw.w:null};
+    item.m=genMetrics(cls,S.scen,S.diff);
+    const[camp,mt]=pick(CAMPAIGNS);
+    item.camp=camp;item.mt=mt;
+    item.expert=expertFor(item,S.scen);
+    return item;
+  });
+}
+function startRound(){
+  S.queue=buildQueue();S.idx=0;S.streak=0;S.results=[];S.roundXP=0;S.lock=false;S.active=true;
+  S.roundStart=Date.now();
+  clearInterval(S.timerInt);
+  S.timerInt=setInterval(()=>{
+    const s=Math.floor((Date.now()-S.roundStart)/1000);
+    $('#t-timer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  },500);
+  $('#t-scen').innerHTML=`<b>${S.scen.name}</b> · ${S.scen.asin} · ${S.diff.toUpperCase()} · ${S.size} TERMS`;
+  $('#t-total').textContent=S.queue.length;
+  updateStreak();renderDossier();renderActions();
+  showView('triage');renderTerm();
+}
+$('#abandon-btn').addEventListener('click',()=>{clearInterval(S.timerInt);S.active=false;showView('briefing')});
+function renderDossier(){
+  const s=S.scen;
+  $('#dossier').innerHTML=`
+    <h4>PRODUCT CARD</h4>
+    <div class="pname">${s.name}</div>
+    <div class="asin">ASIN ${s.asin} · ${s.cat}</div>
+    <div class="drow"><span>SELL PRICE</span><b>${money(s.price)}</b></div>
+    <div class="drow"><span>MARGIN</span><b>${s.margin}%</b></div>
+    <div class="drow"><span>BREAK-EVEN ACOS</span><b class="be">${s.margin}%</b></div>
+    <div class="drow"><span>TARGET ACOS</span><b style="color:var(--green)">${s.target}%</b></div>
+    <ul class="feats">${s.feats.map(f=>`<li>${f}</li>`).join('')}</ul>`;
+}
+function renderActions(){
+  $('#actions-wrap').innerHTML=Object.entries(ACTIONS).map(([k,a])=>`
+    <button type="button" class="act ${a.act}" data-act="${k}">
+      <span class="key">${a.key}</span>
+      <span><span class="lb">${a.label}</span><br><span class="ds">${a.desc}</span></span>
+    </button>`).join('');
+  $$('#actions-wrap .act').forEach(b=>b.addEventListener('click',()=>act(b.dataset.act)));
+}
+function updateStreak(){
+  $('#t-streak').textContent='×'+S.streak;
+  const h=$('#streak-val');h.textContent='×'+S.streak;
+  h.classList.toggle('hot',S.streak>=3);
+}
+function helperChips(item){
+  const m=item.m,be=S.scen.margin;
+  if(S.diff==='surgeon')return '';
+  const chips=[];
+  if(m.clicks<10)chips.push(`<span class="chip tag-a">🌱 STILL A SMALL SAMPLE · ${m.clicks} CLICKS</span>`);
+  if(m.orders>0)chips.push(`<span class="chip ${m.acos<=be?'tag-g':'tag-r'}">ACOS ${m.acos.toFixed(1)}% ${m.acos<=be?'UNDER':'OVER'} BE ${be}%</span>`);
+  else if(m.clicks>=10)chips.push(`<span class="chip tag-r">NO ORDERS YET @ ${m.clicks} CLICKS</span>`);
+  return chips.length?`<div class="chips">${chips.join('')}</div>`:'';
+}
+function renderTerm(){
+  const item=S.queue[S.idx],m=item.m;
+  $('#t-idx').textContent=String(S.idx+1).padStart(2,'0');
+  $('#t-bar').style.width=(S.idx/S.queue.length*100)+'%';
+  const card=$('#term-card');
+  card.classList.remove('out');
+  card.innerHTML=`
+    <div class="src-line"><span class="camp">${item.camp}</span><span class="mt">${item.mt} MATCH</span><span>· 14-DAY WINDOW</span></div>
+    <div class="term-word">${item.term}</div>
+    <div class="mgrid">
+      <div class="mcell"><i>IMPRESSIONS</i><b>${m.impr.toLocaleString()}</b></div>
+      <div class="mcell"><i>CLICKS</i><b>${m.clicks}</b></div>
+      <div class="mcell"><i>CTR</i><b>${m.ctr.toFixed(2)}%</b></div>
+      <div class="mcell"><i>AVG CPC</i><b>${money(m.cpc)}</b></div>
+      <div class="mcell"><i>SPEND</i><b>${money(m.spend)}</b></div>
+      <div class="mcell"><i>ORDERS</i><b>${m.orders}</b></div>
+      <div class="mcell"><i>CVR</i><b>${m.cvr.toFixed(1)}%</b></div>
+      <div class="mcell"><i>ACOS</i><b>${m.acos===null?'—':m.acos.toFixed(1)+'%'}</b></div>
+    </div>${helperChitsSafe(item)}`;
+  const upcoming=S.queue.slice(S.idx+1,S.idx+6);
+  $('#queue-list').innerHTML=upcoming.length?
+    upcoming.map((q,i)=>`<div class="q-item ${i===0?'next':''}"><span class="qi">${String(S.idx+2+i).padStart(2,'0')}</span>${q.term}</div>`).join('')
+    :'<div class="q-item" style="color:var(--faint)">that\u2019s the last one — finish strong!</div>';
+}
+function helperChitsSafe(item){return helperChips(item)}
+function act(a){
+  if(S.lock||!S.active)return;
+  S.lock=true;
+  const item=S.queue[S.idx],ex=item.expert;
+  const ok=a===ex.a,altOk=!ok&&ex.alt&&a===ex.alt,good=ok||altOk;
+  let pts=0;
+  if(good){S.streak++;pts=100+Math.min(S.streak-1,5)*10}else S.streak=0;
+  updateStreak();
+  S.roundXP+=pts;if(good)bumpXP(pts);
+  S.results.push({item,you:a,ok,altOk,pts,why:ex.why,expert:ex});
+  const card=$('#term-card');
+  const st=document.createElement('div');
+  st.className='stamp '+ACTIONS[a].st;
+  st.innerHTML=`<span>${ACTIONS[a].short}</span>`;
+  card.appendChild(st);
+  const v=document.createElement('div');
+  v.className='verdict '+(good?'v-ok':'v-bad');
+  v.textContent=good?(altOk?`+${pts} · THAT WORKS TOO!`:`+${pts} · NICE CALL!`):`GOOD TRY — COACH SAYS ${ACTIONS[ex.a].short}`;
+  card.appendChild(v);
+  setTimeout(()=>{
+    card.classList.add('out');
+    setTimeout(()=>{
+      S.idx++;
+      if(S.idx>=S.queue.length)finishRound();
+      else{renderTerm();S.lock=false}
+    },260);
+  },640);
+}
+document.addEventListener('keydown',e=>{
+  if(!$('#view-triage').classList.contains('on'))return;
+  const map={'1':'HARVEST','2':'KEEP','3':'NEG_EXACT','4':'NEG_PHRASE'};
+  if(map[e.key])act(map[e.key]);
+});
+
+/* ============ DEBRIEF ============ */
+function finishRound(){
+  clearInterval(S.timerInt);S.active=false;
+  const total=S.queue.length;
+  const correct=S.results.filter(r=>r.ok||r.altOk).length;
+  const acc=correct/total;
+  let bonus=0,bonusTxt='';
+  if(acc===1){bonus=500;bonusTxt='★ FLAWLESS ROUND · +500 XP BONUS'}
+  else if(acc>=.9){bonus=250;bonusTxt='★ NEAT & TIDY · +250 XP BONUS'}
+  if(bonus)bumpXP(bonus);
+  const caught=S.results.filter(r=>r.ok&&(r.expert.a==='NEG_EXACT'||r.expert.a==='NEG_PHRASE')).reduce((s,r)=>s+r.item.m.spend,0);
+  store.rounds++;store.caught+=caught;
+  if(store.bestAcc===null||acc>store.bestAcc)store.bestAcc=acc;
+  save();renderHeader();
+  const elapsed=Math.floor((Date.now()-S.roundStart)/1000);
+  const time=String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(elapsed%60).padStart(2,'0');
+  const score=S.roundXP+bonus;
+  const before=rankIdx(store.xp-score),after=rankIdx(store.xp);
+  $('#d-rankup-wrap').innerHTML=after>before?`<span class="rankup">⬆ LEVEL UP · ${rankOf(store.xp)[1]}</span>`:'';
+  $('#d-title').textContent=acc===1?'A perfect round. Take a bow!':acc>=.8?'Really solid work — I mean it.':acc>=.5?'Good reps. The misses are just lessons in disguise.':'A tough one — and that\u2019s how we learn. Let\u2019s walk through it.';
+  $('#d-bonus').textContent=bonusTxt;
+  $('#d-line').textContent=`${S.scen.name} · ${S.diff.toUpperCase()} · ${total} terms · ${time} taken — no rush, ever`;
+  $('#d-stats').innerHTML=`
+    <div class="panel dstat g"><i>CORRECT CALLS</i><b>${correct}/${total}</b></div>
+    <div class="panel dstat r"><i>BUDGET PROTECTED</i><b>${money(caught)}</b></div>
+    <div class="panel dstat a"><i>TIME TAKEN</i><b>${time}</b></div>
+    <div class="panel dstat b"><i>XP EARNED</i><b>+${score}</b></div>`;
+  $('#d-review').innerHTML=S.results.map((r,i)=>{
+    const m=r.item.m,cls=r.ok?'row-ok':r.altOk?'row-alt':'row-bad';
+    const youCol=r.ok?'var(--green)':r.altOk?'var(--blue)':'var(--amber)';
+    return `<tr class="${cls}">
+      <td class="mono" style="color:var(--faint)">${String(i+1).padStart(2,'0')}</td>
+      <td class="tw">${r.item.term}</td>
+      <td class="sig">${m.clicks} clk · ${m.orders} ord · ${m.acos===null?'∞':m.acos.toFixed(0)+'%'} ac</td>
+      <td class="mono" style="color:${youCol};font-weight:600">${ACTIONS[r.you].short}${r.altOk?' *':''}</td>
+      <td class="mono" style="font-weight:600">${ACTIONS[r.expert.a].short}</td>
+      <td class="why">${r.why}</td></tr>`;
+  }).join('');
+  const progressScenario={id:'search-triage-'+S.scen.id+'-'+S.diff+'-'+S.size,simulatorId:'search-triage',version:'1.0.0',rubricVersion:'1.0.0'};
+  const progressResult={score:Math.round(acc*100),maxScore:100,passed:acc>=.75};
+  StudentProgress.createLocalProgressStore().recordAttempt(SimulatorAttempt.buildAttemptRecord({
+    scenario:progressScenario,result:progressResult,completedAt:new Date().toISOString()
+  }));
+  showView('debrief');
+  const el=$('#d-score'),t0=performance.now();
+  (function tick(t){const p=clamp((t-t0)/900,0,1);
+    el.textContent=Math.round(score*(1-Math.pow(1-p,3))).toLocaleString();
+    if(p<1)requestAnimationFrame(tick)})(t0);
+  $('#d-acc').textContent=Math.round(acc*100)+'%';
+}
+$('#d-again').addEventListener('click',startRound);
+$('#d-new').addEventListener('click',()=>showView('briefing'));
+$('#d-guide').addEventListener('click',()=>showView('guides'));
+
+/* ============ EXERCISES ============ */
+const DRILLS=[
+ {id:'waste',n:'01',title:'Waste Hunt',skill:'tag-r',skillT:'NEGATIVES',
+  desc:'Three of these eight terms on the Bamboo Cutting Board are spending without returning. Can you find all three? Take your time — a wrong click just costs a few points.',best:300,
+  perfect:'All three, with zero false flags — beautifully done. That\u2019s exactly the eye a real report needs.',
+  miss:'All targets found, with MISSES false flag(s) — no worries at all. Re-read the intent for a beat before you click.',
+  run:runChipHunt.bind(null,{id:'waste',title:'Waste Hunt',goal:3,cls:'done-neg',
+    bad:['plastic cutting board','free cutting board','cutting board repair'],
+    items:[['bamboo cutting board large','22 clk · 3 ord · 18% ac'],['plastic cutting board','19 clk · 0 ord',1],
+     ['cutting board for kitchen','31 clk · 4 ord · 21% ac'],['free cutting board','9 clk · 0 ord',1],
+     ['chopping board with handle','14 clk · 2 ord · 24% ac'],['cutting board repair','7 clk · 0 ord',1],
+     ['bambo cutting board','11 clk · 2 ord · 19% ac'],['organic bamboo cutting board','17 clk · 2 ord · 22% ac']]})},
+ {id:'harvest',n:'02',title:'Harvest Hunt',skill:'tag-g',skillT:'HARVESTING',
+  desc:'Three of these eight terms on the Insulated Bottle are proven winners, ready for their own Exact campaign. Pick them out — starved and leaky terms are little traps.',best:300,
+  perfect:'Three for three — you spotted real demand through the noise. Lovely work.',
+  miss:'Winners found, with MISSES false flag(s). Remember: starved terms need time, not a harvest.',
+  run:runChipHunt.bind(null,{id:'harvest',title:'Harvest Hunt',goal:3,cls:'done-harv',
+    bad:['insulated water bottle 32 oz','stainless steel water bottle 32oz','thermos bottle 32 oz steel'],
+    items:[['insulated water bottle 32 oz','28 clk · 5 ord · 14% ac',1],['glass water bottle','16 clk · 0 ord'],
+     ['stainless steel water bottle 32oz','19 clk · 3 ord · 17% ac',1],['glacierpeak 32 oz bottle','21 clk · 0 ord'],
+     ['metal water bottle for gym','5 clk · 0 ord'],['thermos bottle 32 oz steel','13 clk · 2 ord · 16% ac',1],
+     ['cheap water bottle','8 clk · 0 ord'],['water bottle','44 clk · 4 ord · 46% ac']]})},
+ {id:'acos',n:'03',title:'ACOS Verdict',skill:'tag-b',skillT:'MATH',
+  desc:'Five little math moments. No rush — work through each one at your own pace, and a full explanation meets you after every answer.',best:300,run:runAcosQuiz},
+ {id:'negtype',n:'04',title:'Exact or Phrase?',skill:'tag-a',skillT:'NEGATIVES',
+  desc:'Six junk queries. Choose the negative type a kind-but-firm campaign manager would use — blast radius matters.',best:300,run:runExactPhrase}
+];
+function renderDrillList(){
+  $('#drill-list').innerHTML=DRILLS.map(d=>`
+   <div class="panel drill reveal" data-id="${d.id}">
+     <div class="dn">${d.n}</div>
+     <div><h3>${d.title}</h3><p>${d.desc}</p>
+       <div class="dmeta"><span class="tag ${d.skill}">${d.skillT}</span><span class="tag" style="color:var(--dim);border-color:var(--line2)">~2 MIN</span></div>
+     </div>
+     <div><div class="best">BEST <b>${store.drillBest[d.id]!=null?store.drillBest[d.id]:'—'}</b> / ${d.best}</div>
+       <button type="button" class="btn btn-ghost" style="font-size:13px;padding:10px 18px">START ▸</button></div>
+   </div>`).join('');
+  $$('.drill').forEach(el=>el.addEventListener('click',()=>{
+    const d=DRILLS.find(x=>x.id===el.dataset.id);
+    $('#drill-list').style.display='none';
+    const stage=$('#drill-stage');stage.style.display='block';
+    d.run(stage,d);requestAnimationFrame(observeReveals);
+  }));
+}
+function exitDrill(){$('#drill-stage').style.display='none';$('#drill-stage').innerHTML='';$('#drill-list').style.display='block'}
+function drillScore(id,score){if(store.drillBest[id]==null||score>store.drillBest[id]){store.drillBest[id]=score;save()}bumpXP(Math.round(score/3))}
+function stageHead(title,counterHTML){
+  return `<div class="stage-head"><button type="button" class="backlink" onclick="exitDrill()">◂ ALL DRILLS</button><h2 style="font-size:20px">${title}</h2><div class="stage-count">${counterHTML}</div></div>`;
+}
+function stageResult(stage,score,max,msg,id){
+  drillScore(id,score);
+  stage.innerHTML=`<div class="panel stage-result">
+    <div class="big">${score}<span style="font-size:22px;color:var(--dim)">/${max}</span></div>
+    <p>${msg}</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button type="button" class="btn btn-orange" style="font-size:14px;padding:11px 22px" onclick="DRILLS.find(d=>d.id==='${id}').run($('#drill-stage'),DRILLS.find(d=>d.id==='${id}'))">TRY AGAIN ▸</button>
+      <button type="button" class="btn btn-ghost" style="font-size:14px;padding:11px 22px" onclick="exitDrill()">ALL DRILLS</button>
+    </div></div>`;
+}
+function runChipHunt(cfg,drillDef,stage){
+  let found=0,misses=0;
+  const items=shuffle(cfg.items);
+  const render=()=>{
+    stage.innerHTML=stageHead(cfg.title,`FOUND <b>${found}/${cfg.goal}</b> · MISSES <b style="color:${misses?'var(--amber)':'var(--ink)'}">${misses}</b>`)+
+      `<div class="chipgrid">${items.map((it,i)=>`
+        <button type="button" class="tchip ${it.found?cfg.cls:''}" data-i="${i}" ${it.found?'disabled':''}>
+          <div class="ct">「${it[0]}」</div><div class="cm">${it[1]}</div></button>`).join('')}</div>`;
+    stage.querySelectorAll('.tchip').forEach(ch=>{
+      ch.addEventListener('click',()=>{
+        const it=items[+ch.dataset.i];
+        if(it.found)return;
+        if(it[2]){
+          it.found=true;found++;ch.classList.add(cfg.cls);ch.disabled=true;
+          if(found>=cfg.goal){
+            setTimeout(()=>{
+              const score=Math.max(0,cfg.goal*100-misses*60);
+              const msg=misses===0?drillDef.perfect:drillDef.miss.replace('MISSES',misses);
+              stageResult(stage,score,cfg.goal*100,msg,cfg.id);
+            },450);
+          }else render();
+        }else{misses++;ch.classList.add('miss');setTimeout(()=>{render()},420);}
+      });
+    });
+  };
+  render();
+}
+const ACOS_QS=[
+ {p:'A search term just printed: $18 spend, $75 in sales. Product price $25, margin 32%.',
+  opts:['ACOS 24% — under the 32% break-even. Scale it.','ACOS 24% — over the break-even. Cut it.','ACOS 32% — exactly break-even.','Not enough information.'],c:0,
+  exp:'Let\u2019s do the math together: ACOS = 18 ÷ 75 = 24%. Break-even ACOS = margin = 32%. Since 24% < 32%, every order keeps profit — this term earns its spend.'},
+ {p:'Same product family: $30 spend, $60 sales, margin 30%, and the term has 3 orders.',
+  opts:['ACOS 50% — negate it immediately.','ACOS 50% — over break-even, but it converts: keep it and trim the bid.','ACOS 20% — scale it.','Break-even, so do nothing.'],c:1,
+  exp:'ACOS = 50% against a 30% break-even, so each order loses a little. But the term clearly converts — so the kind move is a bid reduction and a 7-day re-check, never a negation of proven demand.'},
+ {p:'Your all-in margin on a product is 40%. What ACOS exactly breaks even?',
+  opts:['20%','40%','60%','Depends on CPC.'],c:1,
+  exp:'Break-even ACOS = margin %, so 40%. At a 40% ACOS you spend back exactly the $0.40 of every dollar you keep. CPC affects where you land — not where the fence is.'},
+ {p:'$9.90 spend, 1 order at $29.99, margin 33%.',
+  opts:['ACOS 33% — exactly break-even: $0 profit. Keep it and push for a better CVR or bid.','ACOS 33% — profitable, scale hard.','ACOS 67% — negate it.','ACOS 10% — harvest it.'],c:0,
+  exp:'9.90 ÷ 29.99 = 33% ACOS, and break-even is 33% — you made exactly nothing. It\u2019s not a loser, it\u2019s a coin flip. Keep it, tune it, and watch conversion.'},
+ {p:'A term shows 6 clicks, 0 orders, $5.40 spent. Margin 30%. What would you do?',
+  opts:['Negate exact — zero orders is zero orders.','Keep it — 6 clicks is not a verdict yet.','Harvest it — cheap clicks.','Negate phrase — block the whole family.'],c:1,
+  exp:'Six clicks is just noise. Our rubric waits for ~10 clicks before any data-based verdict — negating now is how future winners slip away.'}
+];
+function runAcosQuiz(stage){
+  let qi=0,correct=0;
+  const render=()=>{
+    if(qi>=ACOS_QS.length){
+      stageResult(stage,correct*60,300,
+        correct===5?'Five for five! The math is becoming a reflex — take that confidence into Surgeon difficulty.':'You got '+correct+'/5 — and that\u2019s real progress. Break-even ACOS = margin %. Say it, drill it, and it\u2019ll be second nature.','acos');
+      return;
+    }
+    const q=ACOS_QS[qi];
+    stage.innerHTML=stageHead('ACOS Verdict',`QUESTION <b>${qi+1}/${ACOS_QS.length}</b> · CORRECT <b style="color:var(--green)">${correct}</b>`)+
+     `<div class="panel qcard"><div class="qn">SCENARIO ${String(qi+1).padStart(2,'0')}</div>
+       <div class="qp">${q.p}</div><div class="qd">REMEMBER: MARGIN = BREAK-EVEN ACOS. TAKE THE DIVISION ONE STEP AT A TIME.</div>
+       ${q.opts.map((o,i)=>`<button type="button" class="qopt" data-i="${i}">${o}</button>`).join('')}
+       <div class="qexp" id="qexp">${q.exp}</div>
+       <button type="button" class="btn btn-orange" id="qnext" style="display:none;font-size:14px;padding:11px 22px">NEXT ▸</button></div>`;
+    stage.querySelectorAll('.qopt').forEach(b=>b.addEventListener('click',()=>{
+      const i=+b.dataset.i;
+      stage.querySelectorAll('.qopt').forEach(x=>{x.disabled=true;if(+x.dataset.i===q.c)x.classList.add('right')});
+      if(i===q.c)correct++;else b.classList.add('wrong');
+      $('#qexp').classList.add('show');
+      const nx=$('#qnext');nx.style.display='inline-flex';
+      nx.addEventListener('click',()=>{qi++;render()});
+    }));
+  };
+  render();
+}
+const EP_ITEMS=[
+ {t:'free cutting board',a:'NEG_PHRASE',w:'"Free" riders appear in dozens of queries — one phrase negative tidies the whole family at once.'},
+ {t:'glass water bottle',a:'NEG_EXACT',w:'One specific wrong product. A surgical exact negative — a phrase here would be overkill.'},
+ {t:'used desk lamps',a:'NEG_PHRASE',w:'"Used" is a rogue modifier that contaminates every query it touches. Block the word itself.'},
+ {t:'glacierpeak 32 oz bottle',a:'NEG_EXACT',w:'A specific competitor query. Block it exactly — we\u2019re not bidding on their name.'},
+ {t:'lint roller refill packs',a:'NEG_PHRASE',w:'"Refill" implies a consumable you don\u2019t sell. Every refill query is junk — phrase it.'},
+ {t:'plastic cutting board',a:'NEG_EXACT',w:'A specific wrong material. Exact negative, no collateral damage.'}
+];
+function runExactPhrase(stage){
+  let i=0,correct=0;
+  const render=()=>{
+    if(i>=EP_ITEMS.length){
+      stageResult(stage,correct*50,300,
+        correct===6?'Perfect blast-radius control — modifiers at phrase, products at exact. You\u2019ve truly got it.':'You got '+correct+'/6. The gentle rule: negate products at exact, rogue modifiers at phrase.','negtype');
+      return;
+    }
+    const q=EP_ITEMS[i];
+    stage.innerHTML=stageHead('Exact or Phrase?',`TERM <b>${i+1}/${EP_ITEMS.length}</b> · CORRECT <b style="color:var(--green)">${correct}</b>`)+
+     `<div class="panel qcard"><div class="qn">JUNK QUERY ${String(i+1).padStart(2,'0')}</div>
+       <div class="qp mono" style="font-size:19px">「${q.t}」</div><div class="qd">HOW WOULD YOU BLOCK IT?</div>
+       <div class="ep-btns">
+         <button type="button" class="act act-negx" data-v="NEG_EXACT"><span class="key">E</span><span><span class="lb">NEGATIVE EXACT</span><br><span class="ds">Block only this query</span></span></button>
+         <button type="button" class="act act-negp" data-v="NEG_PHRASE"><span class="key">P</span><span><span class="lb">NEGATIVE PHRASE</span><br><span class="ds">Block the word family</span></span></button>
+       </div>
+       <div class="qexp" id="qexp"></div>
+       <button type="button" class="btn btn-orange" id="qnext" style="display:none;font-size:14px;padding:11px 22px;margin-top:14px">NEXT ▸</button></div>`;
+    stage.querySelectorAll('.ep-btns .act').forEach(b=>b.addEventListener('click',()=>{
+      const right=b.dataset.v===q.a;
+      if(right)correct++;
+      stage.querySelectorAll('.ep-btns .act').forEach(x=>{
+        x.style.pointerEvents='none';
+        if(x.dataset.v===q.a)x.style.boxShadow='0 0 0 2px var(--green)';
+        else if(x===b&&!right)x.style.boxShadow='0 0 0 2px var(--amber)';
+      });
+      const ex=$('#qexp');
+      ex.innerHTML=(right?'<b style="color:var(--green)">That\u2019s it.</b> ':'<b style="color:var(--amber)">Close — here\u2019s the read.</b> ')+q.w;
+      ex.classList.add('show');
+      const nx=$('#qnext');nx.style.display='inline-flex';
+      nx.addEventListener('click',()=>{i++;render()});
+    }));
+  };
+  render();
+}
+
+/* ============ TOOL 05 : AUTOPSY ============ */
+const PROMO=['best','#1','no.1','top rated','amazing','perfect','sale','discount','free shipping','money back','guarantee','cure','fda approved','bestseller','best seller'];
+const BRANDS=['nordic','zwoco','verdello','oakhaus','glacierpeak','polarcore','vedapure','calmwell','beatpods','auramax','himalaya'];
+const BEN=['easy','no more','so you','without','helps','finally','instant','simple','worry','effortless','keep','stay'];
+const SAMPLE_BAD={
+ title:'BEST EVER Bamboo Cutting Board Set - FREE SHIPPING!!! Large BAMBOO Chopping Board With Juice Groove, Amazing Kitchen Gift Idea SALE',
+ bullets:'SUPERIOR PREMIUM QUALITY bamboo that will last forever\nGood board.\nOUR BOARDS ARE THE BEST CHOICE FOR YOUR KITCHEN because they are amazing and perfect for any home chef who wants a great experience',
+ backend:'cutting board, bamboo, chopping, board, kitchen, nordic ware, best cutting board, free shipping,,,, tabla de cortar, cutting board'};
+const SAMPLE_GOOD={
+ title:'BambuHaus Cutting Board Bamboo, Large Chopping Board with Juice Groove and Easy-Grip Handles, 18 x 12 Inch Kitchen Board for Meat, Vegetables and Bread',
+ bullets:'STAYS SHARP-FRIENDLY — the dense bamboo surface is kind to knife edges, so your blades keep their edge through years of daily prep\nDEEP JUICE GROOVES catch every drop from roasts, tomatoes and citrus, keeping counters dry and carving mess-free\nEASY-GRIP HANDLES on both ends make it simple to move a loaded board from counter to table without wobbling\n18 X 12 INCH SURFACE gives a full cutting zone for large roasts, meal-prep batches and family dinners\nSIMPLE CARE — hand wash in seconds, and the board arrives pre-oiled so you can start cooking the day it lands',
+ backend:'chopping block butcher carving serving cheese vegetable fruit prep surface eco sustainable gift housewarming tabla cortar bambu'};
+$('#a-sample-bad').addEventListener('click',()=>{$('#a-title').value=SAMPLE_BAD.title;$('#a-bullets').value=SAMPLE_BAD.bullets;$('#a-backend').value=SAMPLE_BAD.backend});
+$('#a-sample-good').addEventListener('click',()=>{$('#a-title').value=SAMPLE_GOOD.title;$('#a-bullets').value=SAMPLE_GOOD.bullets;$('#a-backend').value=SAMPLE_GOOD.backend});
+function auCheck(st,label,note){return{st,label,note}}
+function runAutopsy(){
+  const title=$('#a-title').value.trim(),bullets=$('#a-bullets').value.split('\n').map(b=>b.trim()).filter(Boolean),backend=$('#a-backend').value.trim();
+  if(!title&&!bullets.length){$('#a-report').innerHTML='<div class="report-empty">NOTHING TO CHECK YET.<br>PASTE A LISTING OR LOAD A SAMPLE FIRST.</div>';return}
+  const checks={TITLE:[],BULLETS:[],BACKEND:[],'POLICY CHECK':[]};
+  const all=(title+'\n'+bullets.join('\n')+'\n'+backend).toLowerCase();
+  const tl=title.length;
+  if(tl<80)checks.TITLE.push(auCheck('fail','Length: '+tl+' chars','A little short — there\u2019s room to add more helpful keywords.'));
+  else if(tl<120)checks.TITLE.push(auCheck('warn','Length: '+tl+' chars','Functional, with room to grow. 120–180 chars is a comfortable range for most categories.'));
+  else if(tl<=200)checks.TITLE.push(auCheck('pass','Length: '+tl+' chars','Nicely inside the 120–200 working range — indexed and mobile-survivable.'));
+  else checks.TITLE.push(auCheck('warn','Length: '+tl+' chars','Over 200 — Amazon trims long titles. A little pruning will help.'));
+  const caps=title.split(/\s+/).filter(w=>w.length>2&&w===w.toUpperCase()&&/[A-Z]/.test(w));
+  if(caps.length>1)checks.TITLE.push(auCheck('fail','Raised voices: '+caps.length+' all-caps words','All-caps words can feel like shouting. One strong word is plenty.'));
+  else checks.TITLE.push(auCheck('pass','Caps discipline','No shouting detected — a calm, confident title.'));
+  if(/\d/.test(title))checks.TITLE.push(auCheck('pass','Quantity / size signal','Numbers in the title anchor expectations and cut returns.'));
+  else checks.TITLE.push(auCheck('warn','No size or count in title','Shoppers can\u2019t tell what they\u2019re getting. Add dimensions, count or weight.'));
+  if(/[!]{2,}|★|✅|🔥|✔/.test(title))checks.TITLE.push(auCheck('warn','Extra punctuation','Multiple !!! and symbols can look a little frantic — and may raise style flags.'));
+  const bc=bullets.length;
+  if(bc>=5)checks.BULLETS.push(auCheck('pass','Bullet count: '+bc,'All five slots used — every one is an indexable benefit slot.'));
+  else if(bc===4)checks.BULLETS.push(auCheck('warn','Bullet count: '+bc,'Four of five. One empty slot is one small opportunity missed.'));
+  else checks.BULLETS.push(auCheck('fail','Bullet count: '+bc,'Under four bullets — this is the most-read real estate on the page.'));
+  const avg=bc?Math.round(bullets.join('').length/bc):0;
+  if(avg<80)checks.BULLETS.push(auCheck('warn','Average length: '+avg+' chars','A little thin — try expanding each into benefit + evidence.'));
+  else if(avg<=260)checks.BULLETS.push(auCheck('pass','Average length: '+avg+' chars','Dense but scannable. Just the right weight.'));
+  else checks.BULLETS.push(auCheck('warn','Average length: '+avg+' chars','A bit long — lead with the payoff and trim the rest for mobile readers.'));
+  const benCount=bullets.filter(b=>{const lb=b.toLowerCase();return BEN.some(w=>lb.includes(w))}).length;
+  if(benCount>=3)checks.BULLETS.push(auCheck('pass','Benefit density: '+benCount+'/'+bc,'The bullets speak to the buyer, not just the spec sheet.'));
+  else if(benCount>=1)checks.BULLETS.push(auCheck('warn','Benefit density: '+benCount+'/'+bc,'Mostly features — try turning specs into outcomes. \u201CSo you…\u201D works wonders.'));
+  else checks.BULLETS.push(auCheck('fail','Benefit density: 0/'+bc,'Let\u2019s add some buyer-facing warmth — benefits over specs.'));
+  const bl=new Blob([backend]).size;
+  if(bl>250)checks.BACKEND.push(auCheck('fail','Byte length: '+bl+' / 250','Over 250 bytes — Amazon quietly drops the extra, so trim to fit.'));
+  else checks.BACKEND.push(auCheck('pass','Byte length: '+bl+' / 250','Comfortably inside the 250-byte budget.'));
+  if(backend.includes(','))checks.BACKEND.push(auCheck('warn','Commas found','Commas use up bytes without helping — simple spaces work just as well.'));
+  const titleWords=new Set(title.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>4));
+  const dup=backend.toLowerCase().split(/[^a-z0-9]+/).filter(w=>titleWords.has(w)).length;
+  if(dup>4)checks.BACKEND.push(auCheck('warn',dup+' words repeat the title','Your title is already indexed — use this space for fresh words instead.'));
+  else checks.BACKEND.push(auCheck('pass','Low title duplication','The backend is doing new work, not echoing the title.'));
+  const brandHits=BRANDS.filter(b=>all.includes(b));
+  if(brandHits.length)checks.BACKEND.push(auCheck('fail','Competitor brands: '+brandHits.join(', '),'Other brands\u2019 names here can cause policy trouble — safest to remove them.'));
+  const promoHits=PROMO.filter(p=>all.includes(p));
+  if(promoHits.length)checks['POLICY CHECK'].push(auCheck('fail','Claims to revisit',promoHits.map(p=>`"${p}"`).join(' · ')+' — these phrases can trip listing policy and limit your reach. Worth removing.'));
+  else checks['POLICY CHECK'].push(auCheck('pass','No risky claims','Clean sweep — no policy landmines in title, bullets or backend.'));
+  let fails=0,warns=0;
+  Object.values(checks).forEach(arr=>arr.forEach(c=>{if(c.st==='fail')fails++;if(c.st==='warn')warns++}));
+  const score=clamp(100-fails*12-warns*6,0,100);
+  const grade=score>=90?'A':score>=80?'B+':score>=70?'B':score>=60?'C':score>=45?'D':'F';
+  const gcol=score>=80?'var(--green)':score>=60?'var(--amber)':'var(--red)';
+  const verdict=score>=80?'This listing is in good health — ship it with confidence and keep an eye on conversion.':score>=60?'Good bones! Start with the red items — they matter most for reach.':'It needs some care, and that\u2019s okay — work through the red items one by one.';
+  drillScore('autopsy',score);
+  $('#a-report').innerHTML=`
+    <div class="au-score">
+      <div class="g" style="color:${gcol}">${grade}</div>
+      <div class="s"><b>${score} / 100</b>${fails} item${fails===1?'':'s'} to fix · ${warns} worth a look<br>${verdict}</div>
+    </div>
+    ${Object.entries(checks).map(([sec,arr])=>`
+      <div class="au-sec"><h4>${sec}</h4>
+        ${arr.map(c=>`<div class="au-check"><div class="ic st-${c.st}">${c.st==='pass'?'✓':c.st==='warn'?'⚠':'✕'}</div><div><b>${c.label}</b><span>${c.note}</span></div></div>`).join('')}
+      </div>`).join('')}
+    ${promoHits.length?`<div class="au-sec"><h4>WORDS TO REVISIT</h4>${promoHits.map(p=>`<span class="flagchip">${p}</span>`).join('')}${brandHits.map(b=>`<span class="flagchip">${b} ⚠ brand</span>`).join('')}</div>`:''}`;
+}
+$('#a-run').addEventListener('click',runAutopsy);
+
+/* ============ TOOL 06 : BID LADDER ============ */
+let BL={qs:[],i:0,correct:0};
+function genBidQs(){
+  BL={qs:[],i:0,correct:0};
+  const prices=[16.99,19.95,24.99,29.99,34.95,39.99,49.99];
+  for(let k=0;k<6;k++){
+    const price=pick(prices),margin=ri(24,45);
+    const target=pick([15,18,20,22,25].filter(t=>t<margin));
+    const cvr=Math.round(rf(5,14)*10)/10;
+    BL.qs.push({price,margin,target,cvr,correct:price*(cvr/100)*(target/100)});
+  }
+}
+function blLadder(q,user){
+  const cons=q.correct*.8,agg=q.correct*1.25,wall=q.price*(q.cvr/100)*(q.margin/100);
+  const max=wall*1.05;
+  const bar=(lbl,val,col)=>`<div class="lad-row"><span>${lbl}</span><div class="lad-track"><i style="width:${clamp(val/max*100,3,100)}%;background:${col}"></i>${user!=null&&lbl==='IDEAL (TARGET)'?`<span class="lad-user" style="left:${clamp(user/max*100,0,100)}%" title="your bid"></span>`:''}</div><b style="color:var(--ink)">${money(val)}</b></div>`;
+  return bar('CONSERVATIVE',cons,'var(--blue)')+bar('IDEAL (TARGET)',q.correct,'var(--orange)')+bar('AGGRESSIVE',agg,'var(--amber)')+bar('WALL (BE)',wall,'var(--red)');
+}
+function renderBL(){
+  const st=$('#bl-stage');
+  if(BL.i>=6){
+    const score=BL.correct*50;
+    drillScore('bidladder',score);
+    st.innerHTML=`<div class="stage-result" style="padding:20px 0">
+      <div class="big">${score}<span style="font-size:22px;color:var(--dim)">/300</span></div>
+      <p>${BL.correct===6?'Six for six — the ladder is second nature now. Lovely work.':'You landed '+BL.correct+'/6 inside tolerance. The formula is AOV × CVR × target ACOS — run it again; it clicks faster than you think.'}</p>
+      <button type="button" class="btn btn-orange" style="font-size:14px;padding:11px 22px" onclick="genBidQs();renderBL()">NEW LADDER ▸</button></div>`;
+    return;
+  }
+  const q=BL.qs[BL.i];
+  st.innerHTML=`
+    <div class="qn mono" style="font-size:11px;letter-spacing:.2em;color:var(--orange)">ROUND ${BL.i+1} OF 6 · HITS <b style="color:var(--green)">${BL.correct}</b></div>
+    <h2 style="font-size:21px;margin-top:8px">What's the max CPC you'd bid here?</h2>
+    <div class="bl-stats">
+      <div><i>AOV</i><b>${money(q.price)}</b></div>
+      <div><i>HIST. CVR</i><b>${q.cvr}%</b></div>
+      <div><i>TARGET ACOS</i><b style="color:var(--green)">${q.target}%</b></div>
+      <div><i>MARGIN (BE)</i><b style="color:var(--red)">${q.margin}%</b></div>
+    </div>
+    <div class="bl-in">
+      <span class="mono" style="font-size:20px;color:var(--faint)">$</span>
+      <input id="bl-bid" type="number" step="0.01" min="0" placeholder="0.00">
+      <button type="button" class="btn btn-orange" id="bl-submit" style="font-size:14px;padding:11px 22px">PLACE BID</button>
+    </div>
+    <div class="bl-fb" id="bl-fb"></div>
+    <div id="bl-ladder" style="margin-top:14px"></div>`;
+  const inp=$('#bl-bid');
+  const submit=()=>{
+    const user=parseFloat(inp.value);
+    if(isNaN(user)||user<=0)return;
+    const tol=Math.max(0.05,q.correct*0.15);
+    const ok=Math.abs(user-q.correct)<=tol;
+    if(ok)BL.correct++;
+    const fb=$('#bl-fb');
+    fb.className='bl-fb show '+(ok?'ok':'bad');
+    fb.innerHTML=ok?`<b style="color:var(--green)">Right on!</b> The math says ${money(q.correct)} — you bid ${money(user)}.`
+      :`<b style="color:var(--amber)">Close, but not quite.</b> The math says ${money(q.correct)} (±${money(tol)}). You bid ${money(user)} — ${user>q.correct?'a touch generous; the same clicks would have cost less.':'a touch shy; that bid would starve the term into silence.'}`;
+    $('#bl-ladder').innerHTML=blLadder(q,user);
+    $('#bl-submit').outerHTML=`<button type="button" class="btn btn-ghost" id="bl-next" style="font-size:14px;padding:11px 22px">NEXT TERM ▸</button>`;
+    inp.disabled=true;
+    $('#bl-next').addEventListener('click',()=>{BL.i++;renderBL()});
+  };
+  $('#bl-submit').addEventListener('click',submit);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit()});
+  inp.focus();
+}
+genBidQs();renderBL();
+function blFP(){
+  const p=+$('#bl-fp-price').value||0,c=+$('#bl-fp-cvr').value||0,t=+$('#bl-fp-target').value||0;
+  const bid=p*(c/100)*(t/100);
+  $('#bl-fp-out').textContent=money(bid);
+  $('#bl-fp-out2').textContent=money(bid*10)+' / 10 clicks';
+}
+['bl-fp-price','bl-fp-cvr','bl-fp-target'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)blFP()}));
+blFP();
+
+/* ============ TOOL 08 : DAYPART ============ */
+const DP_DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const DP_BLOCKS=['00–04','04–08','08–12','12–16','16–20','20–24'];
+let DP={cells:[],lower:new Set(),boost:new Set(),mode:'low',truthLow:new Set(),truthHigh:new Set(),done:false};
+function genDaypart(){
+  DP={cells:[],lower:new Set(),boost:new Set(),mode:'low',truthLow:new Set(),truthHigh:new Set(),done:false};
+  const acBase=[46,38,24,22,19,27],ordBase=[3,6,11,13,15,10];
+  DP_DAYS.forEach((d,di)=>{
+    const dayF=(di>=5)?rf(.78,.88):(di===4?.95:rf(.98,1.12));
+    const dayO=(di>=5)?rf(1.05,1.25):rf(.9,1.1);
+    DP_BLOCKS.forEach((b,bi)=>{
+      const acos=clamp(Math.round(acBase[bi]*dayF*rf(.85,1.25)),8,70);
+      const orders=Math.max(1,Math.round(ordBase[bi]*dayO*rf(.75,1.3)));
+      DP.cells.push({d,b,di,bi,acos,orders,spend:orders*25*acos/100});
+    });
+  });
+  const byAcos=[...DP.cells].sort((a,b)=>b.acos-a.acos);
+  byAcos.slice(0,5).forEach(c=>DP.truthLow.add(c.di*6+c.bi));
+  const vol=DP.cells.filter(c=>c.orders>=10).sort((a,b)=>a.acos-b.acos);
+  vol.slice(0,3).forEach(c=>DP.truthHigh.add(c.di*6+c.bi));
+}
+function dpHue(a){return clamp(150-(a-8)*2.7,0,150)}
+function renderDaypart(){
+  const g=$('#dp-grid');
+  let html='<div></div>'+DP_BLOCKS.map(b=>`<div class="dp-h">${b}</div>`).join('');
+  DP_DAYS.forEach((d,di)=>{
+    html+=`<div class="dp-d">${d}</div>`;
+    DP_BLOCKS.forEach((b,bi)=>{
+      const c=DP.cells[di*6+bi],i=di*6+bi,h=dpHue(c.acos);
+      const selL=DP.lower.has(i),selH=DP.boost.has(i);
+      let cls='dp-cell';
+      if(selL)cls+=' sel-low';if(selH)cls+=' sel-high';
+      if(DP.done){if(DP.truthLow.has(i))cls+=' truth-low';if(DP.truthHigh.has(i))cls+=' truth-high';
+        if((selL&&!DP.truthLow.has(i))||(selH&&!DP.truthHigh.has(i)))cls+=' wrong-pick';}
+      html+=`<div class="${cls}" data-i="${i}" style="background:hsl(${h} 55% 15%);border-color:hsl(${h} 55% 32%)">
+        ${selL?'<span class="badge">▼</span>':selH?'<span class="badge">▲</span>':''}
+        <b>${c.acos}%</b><i>${c.orders} ord</i></div>`;
+    });
+  });
+  g.innerHTML=html;
+  $('#dp-c-low').textContent=DP.lower.size;
+  $('#dp-c-high').textContent=DP.boost.size;
+  g.querySelectorAll('.dp-cell').forEach(el=>el.addEventListener('click',()=>{
+    if(DP.done)return;
+    const i=+el.dataset.i;
+    if(DP.mode==='low'){
+      if(DP.lower.has(i))DP.lower.delete(i);
+      else{if(DP.lower.size>=5){el.classList.add('deny');setTimeout(()=>el.classList.remove('deny'),380);return}
+        DP.lower.add(i);DP.boost.delete(i);}
+    }else{
+      if(DP.boost.has(i))DP.boost.delete(i);
+      else{if(DP.boost.size>=3){el.classList.add('deny');setTimeout(()=>el.classList.remove('deny'),380);return}
+        DP.boost.add(i);DP.lower.delete(i);}
+    }
+    renderDaypart();
+  }));
+}
+$('#dp-m-low').addEventListener('click',()=>{DP.mode='low';$('#dp-m-low').className='dp-mode on-low';$('#dp-m-high').className='dp-mode'});
+$('#dp-m-high').addEventListener('click',()=>{DP.mode='high';$('#dp-m-high').className='dp-mode on-high';$('#dp-m-low').className='dp-mode'});
+$('#dp-regen').addEventListener('click',()=>{genDaypart();renderDaypart();$('#dp-result').className='panel dp-result';$('#dp-score').textContent='—'});
+$('#dp-check').addEventListener('click',()=>{
+  if(DP.done)return;
+  if(DP.lower.size<5||DP.boost.size<3){
+    const c=$('#dp-check');c.style.boxShadow='0 0 0 3px rgba(255,176,32,.5)';
+    setTimeout(()=>c.style.boxShadow='',500);return;
+  }
+  DP.done=true;
+  let hitL=0,hitH=0;
+  DP.lower.forEach(i=>{if(DP.truthLow.has(i))hitL++});
+  DP.boost.forEach(i=>{if(DP.truthHigh.has(i))hitH++});
+  const score=Math.max(0,hitL*40-(5-hitL)*15+hitH*40-(3-hitH)*15);
+  $('#dp-score').textContent=score;
+  drillScore('daypart',score);
+  renderDaypart();
+  const r=$('#dp-result');
+  r.className='panel dp-result show';
+  r.innerHTML=`<h2 style="font-size:20px">GRID CHECKED — ${score}/320</h2>
+    <p style="color:var(--dim);font-size:13.5px;margin-top:8px">
+    Ease-offs: <b style="color:var(--red)">${hitL}/5</b> on target · Boosts: <b style="color:var(--green)">${hitH}/3</b> on target.
+    ${score>=280?' A lovely read of the grid — these calls would work in a real campaign.':score>=180?' Solid instincts! Remember the volume rule: a boost needs real orders behind it, not just a pretty ACOS.':' Good try — follow the outlines for a moment. Dashed red is where budget was leaking; the green glow is where demand was waiting for more.'}</p>`;
+});
+genDaypart();renderDaypart();
+
+/* ============ TOOL 09 : REVIEW RADAR ============ */
+const RD_SAMPLES={
+ furious:'Broke after two weeks. The handle cracked and the board started to smell weird. For $25 this feels like a total scam. I want a refund, already contacted the seller, no response. Garbage. Do not buy. The juice groove is useless and it arrived damaged with a chunk missing.',
+ mixed:'Decent board, sturdy and looks beautiful on the counter. But it arrived with a small crack on the edge and shipping took three weeks. The grooves work well for meat juices. Not sure I would buy again at this price, but it does the job. Easy to clean though.',
+ rave:'Absolutely love this board! Sturdy, beautiful grain, and the juice grooves are perfect for carving. Arrived fast, well packaged, and it is easy to clean. Best cutting board I have owned — worth every penny. Highly recommend, already ordered a second one as a gift.'};
+$$('.rd-samples button').forEach(b=>b.addEventListener('click',()=>{$('#r-input').value=RD_SAMPLES[b.dataset.s]}));
+const POS=new Set(['love','loved','great','excellent','perfect','amazing','sturdy','solid','easy','comfortable','fast','beautiful','quality','recommend','recommended','worth','happy','impressed','smooth','sharp','nice','good','best','awesome','reliable','premium','effective','gentle','convenient','durable','well','enjoy','enjoyed','favorite']);
+const NEG=new Set(['broke','broken','cheap','flimsy','cracked','crack','stopped','refund','return','returned','waste','terrible','awful','disappointed','disappointing','leak','leaks','smell','smells','weird','missing','damaged','wrong','fake','died','overheats','useless','garbage','junk','regret','scratched','defective','loud','slow','weak','peeling','rust','rusted','wobbly','splinter','scam','chunk']);
+const STOP=new Set(['the','a','an','and','it','is','was','to','of','for','i','this','that','with','on','but','not','are','be','have','has','my','at','in','so','do','does','did','you','your','its','as','or','if','than','then','them','they','we','us','our','out','up','down','no','yes','very','just','too','can','will','would','could','should','one','two','after','before','from','by','about','into','over','under','again','more','most','some','any','all','each','which','what','when','while','who','why','how','been','being','am','me','him','her','his','she','he','there','here','these','those','such','own','same','already','though']);
+const ASPECTS={BUILD:['sturdy','flimsy','quality','material','cracked','crack','broke','broken','grain','solid','chunk','wobbly'],SIZE:['size','big','small','large','inch','fits','edge'],CLEAN:['clean','wash','stain','odor','smell','smells'],SHIPPING:['shipping','shipped','delivery','arrived','packaged','package','fast','weeks'],PRICE:['price','expensive','cheap','worth','penny','value','scam'],DESIGN:['groove','grooves','handle','handles','board','design','beautiful','counter']};
+function rdTokens(t){return t.toLowerCase().replace(/[^a-z'\s-]/g,' ').split(/\s+/).filter(w=>w.length>2&&!STOP.has(w))}
+function rdHit(w,set){return set.has(w)||set.has(w.replace(/(s|ed|ing)$/,''))}
+$('#r-run').addEventListener('click',()=>{
+  const text=$('#r-input').value.trim();
+  if(!text){$('#r-report').innerHTML='<div class="report-empty">THE RADAR NEEDS SOMETHING TO READ.<br>PASTE A REVIEW FIRST — ANY REVIEW.</div>';return}
+  const toks=rdTokens(text);
+  let pos=0,neg=0;
+  toks.forEach((w,i)=>{
+    const negated=[toks[i-1],toks[i-2]].some(x=>x&&(x==='not'||x==='no'||x==='never'||x.includes("n't")||x==='without'));
+    if(rdHit(w,POS)){negated?neg++:pos++}
+    if(rdHit(w,NEG)){negated?pos++:neg++}
+  });
+  const score=(pos+neg)===0?0:Math.round((pos-neg)/(pos+neg)*100);
+  const freq={};
+  toks.forEach(w=>{const k=w.replace(/(s|ed|ing)$/,'');if(k.length>3)freq[k]=(freq[k]||0)+1});
+  const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,9);
+  const painHits=[...NEG].filter(w=>toks.includes(w)||toks.includes(w+'s')||toks.includes(w+'ed'));
+  const aspects=Object.entries(ASPECTS).map(([name,words])=>({name,count:toks.filter(t=>words.some(w=>t===w||t===w+'s')).length})).filter(a=>a.count>0).sort((a,b)=>b.count-a.count);
+  const verdict=score<-20?['NEEDS A KIND HAND','var(--red)','This buyer is genuinely hurt. A quick, caring public reply plus a batch check usually turns this around — the root cause is almost always fixable.']
+    :score<=20?['MIXED FEELINGS','var(--amber)','Real praise and real disappointment in the same breath — that\u2019s useful! The negative noun is usually an ops hiccup (packaging, QC, shipping), not a product flaw.']
+    :['ON SOLID GROUND','var(--green)','Notice the exact phrases this buyer used? Borrow them into your bullets and backend — shoppers trust shopper language more than brand language.'];
+  drillScore('radar',clamp(Math.round((score+100)/2),0,100));
+  $('#r-report').innerHTML=`
+    <h4 style="font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--orange);margin-bottom:6px">SENTIMENT GAUGE</h4>
+    <div class="gauge"><div class="needle" style="left:${(score+100)/200*100}%"></div></div>
+    <div class="gauge-lbl"><span>UPSET</span><span style="color:var(--ink)">${score>0?'+':''}${score}</span><span>RAVING</span></div>
+    <div style="display:flex;gap:20px;font-family:var(--mono);font-size:12px;margin-top:14px">
+      <span style="color:var(--green)">▲ ${pos} positive</span><span style="color:var(--red)">▼ ${neg} negative</span><span style="color:var(--faint)">${toks.length} words read</span>
+    </div>
+    <h4 style="font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--orange);margin:20px 0 10px">WORDS CARRYING WEIGHT</h4>
+    <div class="kw-cloud">${top.map(([w,c])=>{
+      const cls=painHits.includes(w)?'neg':rdHit(w,POS)?'pos':'';
+      return `<span class="kw ${cls}" style="font-size:${11+c*2}px">${w} ×${c}</span>`}).join('')}</div>
+    ${painHits.length?`<h4 style="font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--red);margin:20px 0 10px">OUCH MOMENTS</h4><div>${painHits.slice(0,10).map(w=>`<span class="flagchip">${w}</span>`).join('')}</div>`:''}
+    ${aspects.length?`<h4 style="font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--blue);margin:20px 0 10px">ASPECTS MENTIONED</h4><div>${aspects.map(a=>`<span class="tag tag-b" style="margin:0 6px 6px 0">${a.name} ×${a.count}</span>`).join('')}</div>`:''}
+    <div class="rd-verdict" style="border-color:${verdict[1]};background:color-mix(in srgb,${verdict[1]} 8%,transparent)">
+      <div class="vt" style="color:${verdict[1]}">${verdict[0]}</div><p>${verdict[2]}</p></div>`;
+  requestAnimationFrame(()=>{const n=$('#r-report .needle');if(n)n.style.left=(score+100)/200*100+'%'});
+});
+
+/* ============ GUIDES CALC ============ */
+function calcUpdate(){
+  const price=+$('#calc-price').value||0,margin=+$('#calc-margin').value||0;
+  const clicks=+$('#calc-clicks').value||0,cpc=+$('#calc-cpc').value||0,orders=+$('#calc-orders').value||0;
+  const spend=clicks*cpc,sales=orders*price,acos=sales>0?spend/sales*100:null;
+  let verdict='',vc='';
+  if(orders===0)verdict=clicks>=10?'0 ORDERS @ 10+ CLICKS → TIME TO LET IT GO':'SMALL SAMPLE → KEEP & WATCH';
+  else if(acos<=margin){verdict='UNDER BREAK-EVEN → HARVEST → EXACT';vc='verdict-ok'}
+  else{verdict='OVER BREAK-EVEN → KEEP + EASE BID DOWN';vc='verdict-bad'}
+  $('#calc-out').innerHTML=`
+    <div><span>SPEND</span><b>${money(spend)}</b></div>
+    <div><span>SALES</span><b>${money(sales)}</b></div>
+    <div><span>ACOS</span><b>${acos===null?'∞':acos.toFixed(1)+'%'}</b></div>
+    <div><span>BREAK-EVEN</span><b style="color:var(--orange)">${margin.toFixed(0)}%</b></div>
+    <div class="${vc}"><span>VERDICT</span><b style="font-size:13px;line-height:1.4">${verdict}</b></div>`;
+}
+['calc-price','calc-margin','calc-clicks','calc-cpc','calc-orders'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)calcUpdate()}));
+
+/* ============ TIPS / TICKER / REVEAL ============ */
+const TIPS=[
+ 'Give every term a full week before you judge it — daily numbers jump around and can worry you for no reason.',
+ 'Misspellings convert beautifully. "bambo cutting board" is still a real shopper with a real wallet.',
+ 'One lucky order on a junk term is usually a refund in disguise. Negate the intent, not the accident.',
+ 'Your break-even ACOS is a friendly fence, not a hurdle. Stay under it and everything is profit.',
+ 'Ten gentle minutes of negatives a week beats one exhausting purge after Prime Day.',
+ 'Harvested terms deserve their own campaign and budget — let the winners grow up in their own room.',
+ 'When a whole word family is junk, one phrase negative tidies them all. Work smart, not long.',
+ 'Auto campaigns are scouts, not managers. They find the terms; you make the thoughtful calls.',
+ 'Spanish and Taglish queries convert too. "Pang-alis ng balahibo" is just hair removal in Tagalog — translate first, then triage.',
+ 'On thin margins (under 30%), every call counts double. Be extra gentle with your budget there.'
+];
+let tipI=0;
+$('#tip-rotator').textContent=TIPS[0];
+setInterval(()=>{
+  const el=$('#tip-rotator');
+  el.classList.add('fade');
+  setTimeout(()=>{tipI=(tipI+1)%TIPS.length;el.textContent=TIPS[tipI];el.classList.remove('fade')},400);
+},6000);
+const TICKS=[
+ ['「nike water bottle」','tk-neg','negated — not our product, no hard feelings'],
+ ['「bamboo cutting board large」','tk-harv','harvested — 3 orders @ 18%, lovely'],
+ ['「free cutting board」','tk-ph','phrase-blocked — the whole family, tidied'],
+ ['「desk lamp」','tk-keep','kept — bid eased down 15%, we\u2019ll re-check soon'],
+ ['「glass water bottle」','tk-neg','negated — wrong material, easy call'],
+ ['「pet hair remover for couch」','tk-harv','harvested — ACOS 12%, a quiet winner'],
+ ['「used desk lamps」','tk-ph','phrase-blocked — \u201Cused\u201D was the culprit'],
+ ['「bambo cutting board」','tk-harv','harvested — typos convert too!'],
+ ['「ashwagandha gummies para dormir」','tk-harv','harvested — \u201Cpara dormir\u201D = for sleep'],
+ ['「earbuds para correr」','tk-harv','harvested — multi-lang winners are real'],
+ ['「free ashwagandha samples」','tk-ph','phrase-blocked — \u201Cfree\u201D never buys'],
+ ['「vacuum for pet hair」','tk-neg','negated — different product entirely'],
+ ['「water bottle」','tk-keep','kept — 46% ACOS, bid down + a week of patience']
+];
+(function(){
+  const half=TICKS.map(t=>`<span>「<em style="color:var(--ink)">${t[0].slice(1)}</em> <em class="${t[1]}">→ ${t[2]}</em></span>`).join('');
+  $('#ticker-inner').innerHTML=half+half;
+})();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08});
+function observeReveals(){$$('.reveal:not(.in)').forEach(el=>io.observe(el))}
+
+/* ============ INIT ============ */
+renderScenList();renderHeader();renderDrillList();calcUpdate();observeReveals();
+</script>
+</body>
+</html>
+<!-- Project Amazon PH Academy shell: shared chrome injected by assets/shell.js -->

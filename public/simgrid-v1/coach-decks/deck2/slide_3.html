@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+/* Example Section */
+.example-section{background:#fff;border:1px solid #d7dce2;padding-top:24px;padding-left:30px;padding-right:30px;padding-bottom:24px;margin-top:24px}
+.example-title{font-size:20px;font-weight:700;color:#131921;margin-bottom:20px}
+.name-comparison{display:grid;grid-template-columns:1fr 2fr;gap:20px}
+.bad-name{background:#fef2f2;border-left:4px solid #de350b;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px;font-size:20px}
+.good-name{background:#eef8f3;border-left:4px solid #00875a;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px;font-size:20px;font-weight:700}
+.name-breakdown{margin-top:12px;font-size:16px;color:#4b5563;display:flex;gap:12px}
+.name-part{background:#f1f3f5;padding-top:4px;padding-bottom:4px;padding-left:8px;padding-right:8px;border:1px solid #d7dce2}
+
+/* Split Section */
+.split-layout{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:24px}
+.split-panel{background:#fff;border:1px solid #d7dce2;padding-top:24px;padding-left:24px;padding-right:24px;padding-bottom:24px;min-height:220px}
+.split-panel.do{border-top:5px solid #00875a}
+.split-panel.dont{border-top:5px solid #de350b}
+.split-title{font-size:22px;font-weight:700;margin-bottom:16px}
+.split-panel.do .split-title{color:#00875a}
+.split-panel.dont .split-title{color:#de350b}
+.split-list{list-style:none;padding-left:0;margin:0}
+.split-list li{font-size:18px;margin-bottom:12px;display:flex;align-items:flex-start}
+.split-list li::before{content:"•";margin-right:10px;font-weight:bold}
+.split-panel.do .split-list li::before{color:#00875a}
+.split-panel.dont .split-list li::before{color:#de350b}
+
+.callout{margin-top:24px;background:#fff8f0;border-left:4px solid #ff9900;color:#8a5300;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px;font-size:18px;line-height:1.4}
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 3 · Lesson 3.2</div>
+  <div class="title">Naming and Organization</div>
+  <div class="rule"></div>
+  
+  <div class="example-section">
+    <div class="example-title">Build an account your future self can read</div>
+    <div class="name-comparison">
+      <div class="bad-name">
+        <span style="color:#de350b;font-weight:700;display:block;margin-bottom:8px;font-size:14px;text-transform:uppercase">Ambiguous</span>
+        test1
+      </div>
+      <div class="good-name">
+        <span style="color:#00875a;font-weight:700;display:block;margin-bottom:8px;font-size:14px;text-transform:uppercase">Decision-Ready</span>
+        SP | Auto | Bamboo Board | Research
+        <div class="name-breakdown">
+          <span class="name-part">Ad Type</span>
+          <span class="name-part">Targeting</span>
+          <span class="name-part">Product</span>
+          <span class="name-part">Purpose</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="split-layout">
+    <div class="split-panel do">
+      <div class="split-title">✅ Do</div>
+      <ul class="split-list">
+        <li>Include the ad type (SP, SB, SD)</li>
+        <li>Include the targeting type (Auto, Exact, etc.)</li>
+        <li>Include the product name</li>
+        <li>Include the purpose (Research, Core, etc.)</li>
+      </ul>
+    </div>
+    
+    <div class="split-panel dont">
+      <div class="split-title">🚫 Don't</div>
+      <ul class="split-list">
+        <li>Use names like "test1", "final2", "new-new"</li>
+        <li>Use names only you can guess</li>
+        <li>Put everything into one giant campaign</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="callout">
+    <b>Coach tip:</b> Good naming is not cosmetic. It is how you move fast without breaking things.
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Campaign Structure · 3.2 Naming and Organization</div>
+  <div class="page">03 / 12</div>
+</div>
+</body>
+</html>

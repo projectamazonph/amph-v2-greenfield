@@ -1,0 +1,55 @@
+/**
+ * SimgridFrame styles — Task 8 of the 2026-09-30 SimGrid integration
+ * plan.
+ *
+ * Mirrors the iframe shell used by /tools/ad-console
+ * (src/app/tools/ad-console/page.module.css:115-133) so the embedded
+ * simulator feels native to the rest of the student app, and reuses
+ * the project-wide design tokens defined in src/app/globals.css.
+ *
+ * Height:
+ *   - Desktop: calc(100dvh - 220px) leaves room for the StudentShell
+ *     sidebar (240px - it collapses under 1024px), the top
+ *     page chrome (header + status line), and a small margin.
+ *   - Floor: min(600px, calc(100dvh - 240px)) so the iframe is
+ *     usable on shorter laptop screens.
+ *   - Mobile (<768px): a fixed 420px floor — same as ad-console.
+ */
+
+.frame {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--sh-2);
+  height: calc(100dvh - 220px);
+  min-height: min(600px, calc(100dvh - 240px));
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .frame {
+    min-height: 420px;
+  }
+}
+
+.iframe {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border: 0;
+  display: block;
+}
+
+.status {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  padding: var(--space-2) var(--space-4);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

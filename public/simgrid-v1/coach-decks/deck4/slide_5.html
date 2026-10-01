@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+.layout{display:grid;grid-template-columns:450px 1fr;gap:40px;margin-top:30px}
+
+/* Left Column: Framework */
+.framework-list{display:flex;flex-direction:column;gap:12px}
+.framework-item{background:#fff;border:1px solid #d7dce2;border-left:6px solid #131921;padding-top:16px;padding-left:20px;padding-right:20px;padding-bottom:16px;display:flex;align-items:flex-start}
+.item-num{font-size:22px;font-weight:800;color:#ff9900;margin-right:16px;min-width:24px;margin-top:2px}
+.item-content h3{font-size:20px;font-weight:700;color:#131921;margin-top:0;margin-bottom:6px}
+.item-content p{font-size:16px;color:#4b5563;line-height:1.4;margin:0}
+
+/* Right Column: Examples */
+.right-col{display:flex;flex-direction:column;gap:24px}
+.example-box{background:#fff;border:1px solid #d7dce2;padding-top:24px;padding-left:24px;padding-right:24px;padding-bottom:24px}
+.example-box.bad{border-top:6px solid #de350b}
+.example-box.good{border-top:6px solid #00875a}
+
+.box-title{font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:0;margin-bottom:12px;display:flex;align-items:center}
+.example-box.bad .box-title{color:#de350b}
+.example-box.good .box-title{color:#00875a}
+.box-title::before{margin-right:10px;font-size:18px}
+.example-box.bad .box-title::before{content:"✕"}
+.example-box.good .box-title::before{content:"✓"}
+
+.box-text{font-size:18px;color:#131921;line-height:1.5;margin:0;font-style:italic}
+.box-text strong{font-style:normal;font-weight:700}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 10 · Lesson 10.1</div>
+  <div class="title">Simple Report Structure</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="framework-list">
+      <div class="framework-item">
+        <div class="item-num">1</div>
+        <div class="item-content">
+          <h3>The Headline</h3>
+          <p>Spend, sales, and ACOS summary.</p>
+        </div>
+      </div>
+      <div class="framework-item">
+        <div class="item-num">2</div>
+        <div class="item-content">
+          <h3>The "Why"</h3>
+          <p>What drove the change in performance.</p>
+        </div>
+      </div>
+      <div class="framework-item">
+        <div class="item-num">3</div>
+        <div class="item-content">
+          <h3>The Action</h3>
+          <p>What we did about it this week.</p>
+        </div>
+      </div>
+      <div class="framework-item">
+        <div class="item-num">4</div>
+        <div class="item-content">
+          <h3>The Next Step</h3>
+          <p>What we are watching for next week.</p>
+        </div>
+      </div>
+      <div class="framework-item">
+        <div class="item-num">5</div>
+        <div class="item-content">
+          <h3>The Ask</h3>
+          <p>Do we need anything from the client?</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="example-box bad">
+        <div class="box-title">Data Dump (Forces client to do the math)</div>
+        <p class="box-text">
+          "Spend was $500. Sales were $2000. ACOS is 25%. Impressions went up 10%. Clicks were 500. CPC is $1.00."
+        </p>
+      </div>
+      
+      <div class="example-box good">
+        <div class="box-title">Narrative Report (Tells the story)</div>
+        <p class="box-text">
+          "We spent $500 to make $2,000 at a profitable 25% ACOS. <strong>[1]</strong> Sales grew because our new exact match campaign for 'bamboo board' found traction. <strong>[2]</strong> We increased its budget by 15% to scale. <strong>[3]</strong> Next week, we will monitor if the ACOS holds steady at the new budget. <strong>[4]</strong> No action needed from you. <strong>[5]</strong>"
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Client Reporting · 10.1 Simple Report Structure</div>
+  <div class="page">05 / 12</div>
+</div>
+</body>
+</html>

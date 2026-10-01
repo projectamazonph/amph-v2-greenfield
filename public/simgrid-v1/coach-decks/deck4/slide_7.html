@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:10px}
+
+/* Diagnostic Cards */
+.diag-card{background:#fff;border:1px solid #d7dce2;padding-top:20px;padding-left:24px;padding-right:24px;min-height:340px;display:flex;flex-direction:column}
+.diag-card.blocker{border-top:6px solid #de350b}
+.diag-card.leak{border-top:6px solid #ff9900}
+
+.card-title{font-size:26px;font-weight:700;color:#131921;margin-top:0;margin-bottom:20px}
+
+.section-label{font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:700;margin-bottom:8px;margin-top:16px}
+.section-label:first-of-type{margin-top:0}
+
+.symptom-text{font-size:20px;font-weight:700;color:#131921;margin-bottom:16px}
+.diag-card.blocker .symptom-text{color:#de350b}
+.diag-card.leak .symptom-text{color:#ff9900}
+
+.diag-list{list-style:none;padding-left:0;margin:0;margin-bottom:12px}
+.diag-list li{font-size:18px;color:#4b5563;line-height:1.4;margin-bottom:10px;display:flex;align-items:flex-start}
+.diag-list li::before{content:"■";color:#131921;font-size:12px;margin-right:12px;margin-top:4px}
+
+.fix-box{background:#eef8f3;border-left:4px solid #00875a;padding-top:10px;padding-left:12px;padding-right:12px;padding-bottom:10px;margin-top:auto;margin-bottom:16px}
+.fix-title{font-size:16px;font-weight:700;color:#00875a;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.fix-text{font-size:18px;color:#131921;line-height:1.4;margin:0}
+
+/* Bottom Callout */
+.callout{margin-top:20px;background:#131921;border-left:6px solid #ff9900;color:#fff;padding-top:12px;padding-left:24px;padding-right:24px;padding-bottom:12px;font-size:20px;line-height:1.4}
+.callout strong{color:#ff9900}
+
+.footer{position:absolute;left:60px;top:661px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:661px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 10 · Lesson 10.3</div>
+  <div class="title">Troubleshooting Top of Funnel</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <!-- No Impressions Card -->
+    <div class="diag-card blocker">
+      <div class="card-title">No Impressions</div>
+      
+      <div class="section-label">Symptom</div>
+      <div class="symptom-text">0 Impressions, 0 Clicks</div>
+      
+      <div class="section-label">Diagnosis (Why it happens)</div>
+      <ul class="diag-list">
+        <li>Bid is too low to win the auction.</li>
+        <li>Campaign is out of budget.</li>
+        <li>Listing does not have the Buy Box.</li>
+      </ul>
+      
+      <div class="fix-box">
+        <div class="fix-title">The Fix</div>
+        <p class="fix-text">Check Buy Box and inventory first. If healthy, raise the bid slightly and wait 48 hours.</p>
+      </div>
+    </div>
+    
+    <!-- Low CTR Card -->
+    <div class="diag-card leak">
+      <div class="card-title">Low Click-Through Rate</div>
+      
+      <div class="section-label">Symptom</div>
+      <div class="symptom-text">High Impressions, CTR &lt; 0.3%</div>
+      
+      <div class="section-label">Diagnosis (Why it happens)</div>
+      <ul class="diag-list">
+        <li>Main image is weak or blends in.</li>
+        <li>Price is uncompetitive vs. neighbors.</li>
+        <li>Review count/rating is too low.</li>
+      </ul>
+      
+      <div class="fix-box">
+        <div class="fix-title">The Fix</div>
+        <p class="fix-text">Improve the listing hook (image, price, coupon). Do not raise bids — you will just buy more ignores.</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="callout">
+    <strong>Coach tip:</strong> Troubleshoot in order. If they don't see it, they can't click it. If they don't click it, they can't buy it. Fix the top of the funnel first.
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Reporting & Troubleshooting · 10.3 Troubleshooting Top of Funnel</div>
+  <div class="page">07 / 12</div>
+</div>
+</body>
+</html>

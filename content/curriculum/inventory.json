@@ -17,9 +17,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:0.1-welcome"
-      ],
+      "resourceRefs": ["mdx:0.1-welcome"],
       "finalDeliverable": "A written Amazon PPC work goal"
     },
     {
@@ -27,9 +25,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:0.2-platform-tour"
-      ],
+      "resourceRefs": ["mdx:0.2-platform-tour"],
       "finalDeliverable": "A saved map of the platform work loop"
     },
     {
@@ -37,9 +33,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:0.3-first-simulation"
-      ],
+      "resourceRefs": ["mdx:0.3-first-simulation"],
       "finalDeliverable": "A first client-brief decision note"
     },
     {
@@ -47,9 +41,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:1.1-read-ppc-data-before-you-change-it"
-      ],
+      "resourceRefs": ["mdx:1.1-read-ppc-data-before-you-change-it"],
       "finalDeliverable": "A one-line decision note"
     },
     {
@@ -57,9 +49,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:1.2-cpc-ctr"
-      ],
+      "resourceRefs": ["mdx:1.2-cpc-ctr"],
       "finalDeliverable": "A CPC and CTR interpretation"
     },
     {
@@ -67,9 +57,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:1.3-acos-tacos-profitability"
-      ],
+      "resourceRefs": ["mdx:1.3-acos-tacos-profitability"],
       "finalDeliverable": "A profitability calculation"
     },
     {
@@ -77,9 +65,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:1.4-roas-measuring-return"
-      ],
+      "resourceRefs": ["mdx:1.4-roas-measuring-return"],
       "finalDeliverable": "A ROAS calculation"
     },
     {
@@ -87,9 +73,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:1.5-metrics-in-practice"
-      ],
+      "resourceRefs": ["mdx:1.5-metrics-in-practice"],
       "finalDeliverable": "A metrics-based account decision"
     },
     {
@@ -97,9 +81,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:2.1-match-types"
-      ],
+      "resourceRefs": ["mdx:2.1-match-types"],
       "finalDeliverable": "A match-type choice with a reason"
     },
     {
@@ -108,9 +90,7 @@
         "kind": "simulator",
         "target": "keyword-research"
       },
-      "resourceRefs": [
-        "mdx:2.2-keyword-research-workflow"
-      ],
+      "resourceRefs": ["mdx:2.2-keyword-research-workflow"],
       "finalDeliverable": "A first keyword research shortlist"
     },
     {
@@ -118,9 +98,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:2.3-negative-keywords"
-      ],
+      "resourceRefs": ["mdx:2.3-negative-keywords"],
       "finalDeliverable": "A negative keyword list"
     },
     {
@@ -128,9 +106,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:2.4-keyword-grouping"
-      ],
+      "resourceRefs": ["mdx:2.4-keyword-grouping"],
       "finalDeliverable": "A grouped keyword plan"
     },
     {
@@ -139,19 +115,16 @@
         "kind": "simulator",
         "target": "listing-audit"
       },
-      "resourceRefs": [
-        "mdx:3.1-listing-quality-score"
-      ],
+      "resourceRefs": ["mdx:3.1-listing-quality-score"],
       "finalDeliverable": "A listing relevance finding"
     },
     {
       "slug": "3.2-listing-anatomy",
       "toolBridge": {
-        "kind": "none"
+        "kind": "simgrid",
+        "target": "listing"
       },
-      "resourceRefs": [
-        "mdx:3.2-listing-anatomy"
-      ],
+      "resourceRefs": ["mdx:3.2-listing-anatomy"],
       "finalDeliverable": "A listing anatomy checklist"
     },
     {
@@ -159,9 +132,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:3.3-aplus-content"
-      ],
+      "resourceRefs": ["mdx:3.3-aplus-content"],
       "finalDeliverable": "An A+ content improvement note"
     },
     {
@@ -169,19 +140,16 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:4.1-sponsored-products"
-      ],
+      "resourceRefs": ["mdx:4.1-sponsored-products"],
       "finalDeliverable": "A Sponsored Products format choice"
     },
     {
       "slug": "4.2-sponsored-brands-display",
       "toolBridge": {
-        "kind": "none"
+        "kind": "simgrid",
+        "target": "ad-console"
       },
-      "resourceRefs": [
-        "mdx:4.2-sponsored-brands-display"
-      ],
+      "resourceRefs": ["mdx:4.2-sponsored-brands-display"],
       "finalDeliverable": "An ad-format recommendation"
     },
     {
@@ -189,9 +157,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:4.3-campaign-structure"
-      ],
+      "resourceRefs": ["mdx:4.3-campaign-structure"],
       "finalDeliverable": "A campaign naming and structure plan"
     },
     {
@@ -200,9 +166,7 @@
         "kind": "simulator",
         "target": "campaign-builder"
       },
-      "resourceRefs": [
-        "mdx:4.4-campaign-architecture-practice"
-      ],
+      "resourceRefs": ["mdx:4.4-campaign-architecture-practice"],
       "finalDeliverable": "A completed campaign architecture"
     },
     {
@@ -210,19 +174,16 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:5.1-campaign-portfolios"
-      ],
+      "resourceRefs": ["mdx:5.1-campaign-portfolios"],
       "finalDeliverable": "A portfolio organization plan"
     },
     {
       "slug": "5.2-budget-pacing",
       "toolBridge": {
-        "kind": "none"
+        "kind": "simgrid",
+        "target": "pacing-deck"
       },
-      "resourceRefs": [
-        "mdx:5.2-budget-pacing"
-      ],
+      "resourceRefs": ["mdx:5.2-budget-pacing"],
       "finalDeliverable": "A budget pacing decision"
     },
     {
@@ -230,9 +191,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:5.3-seasonal-strategy"
-      ],
+      "resourceRefs": ["mdx:5.3-seasonal-strategy"],
       "finalDeliverable": "A seasonal planning note"
     },
     {
@@ -240,9 +199,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:6.1-bid-strategies"
-      ],
+      "resourceRefs": ["mdx:6.1-bid-strategies"],
       "finalDeliverable": "A bid strategy recommendation"
     },
     {
@@ -250,9 +207,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:6.2-placement-adjustments"
-      ],
+      "resourceRefs": ["mdx:6.2-placement-adjustments"],
       "finalDeliverable": "A placement adjustment decision"
     },
     {
@@ -261,9 +216,7 @@
         "kind": "simulator",
         "target": "bid-elevator"
       },
-      "resourceRefs": [
-        "mdx:6.3-bid-elevator-prep"
-      ],
+      "resourceRefs": ["mdx:6.3-bid-elevator-prep"],
       "finalDeliverable": "A completed bid decision"
     },
     {
@@ -271,9 +224,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:7.1-search-term-analysis"
-      ],
+      "resourceRefs": ["mdx:7.1-search-term-analysis"],
       "finalDeliverable": "A search-term performance finding"
     },
     {
@@ -281,9 +232,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:7.2-negative-keywords"
-      ],
+      "resourceRefs": ["mdx:7.2-negative-keywords"],
       "finalDeliverable": "An advanced negative keyword decision"
     },
     {
@@ -292,9 +241,7 @@
         "kind": "simulator",
         "target": "str-triage"
       },
-      "resourceRefs": [
-        "mdx:7.3-str-triage-prep"
-      ],
+      "resourceRefs": ["mdx:7.3-str-triage-prep"],
       "finalDeliverable": "A completed search-term triage"
     },
     {
@@ -302,9 +249,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:8.1-brand-analytics"
-      ],
+      "resourceRefs": ["mdx:8.1-brand-analytics"],
       "finalDeliverable": "A Brand Analytics finding"
     },
     {
@@ -312,19 +257,16 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:8.2-share-of-voice"
-      ],
+      "resourceRefs": ["mdx:8.2-share-of-voice"],
       "finalDeliverable": "A share-of-voice comparison"
     },
     {
       "slug": "8.3-competitor-benchmarking",
       "toolBridge": {
-        "kind": "none"
+        "kind": "simgrid",
+        "target": "bulk-file"
       },
-      "resourceRefs": [
-        "mdx:8.3-competitor-benchmarking"
-      ],
+      "resourceRefs": ["mdx:8.3-competitor-benchmarking"],
       "finalDeliverable": "A competitor benchmark action"
     },
     {
@@ -332,19 +274,16 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:9.1-weekly-routine"
-      ],
+      "resourceRefs": ["mdx:9.1-weekly-routine"],
       "finalDeliverable": "A cadence plan and weekly review date"
     },
     {
       "slug": "9.2-one-change-at-a-time",
       "toolBridge": {
-        "kind": "none"
+        "kind": "simgrid",
+        "target": "sqp-studio"
       },
-      "resourceRefs": [
-        "mdx:9.2-one-change-at-a-time"
-      ],
+      "resourceRefs": ["mdx:9.2-one-change-at-a-time"],
       "finalDeliverable": "A one-variable test log"
     },
     {
@@ -352,9 +291,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:9.3-how-much-data-is-enough"
-      ],
+      "resourceRefs": ["mdx:9.3-how-much-data-is-enough"],
       "finalDeliverable": "A data sufficiency decision"
     },
     {
@@ -362,9 +299,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:10.1-simple-report-structure"
-      ],
+      "resourceRefs": ["mdx:10.1-simple-report-structure"],
       "finalDeliverable": "A client-ready weekly report"
     },
     {
@@ -372,9 +307,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:10.2-explaining-numbers"
-      ],
+      "resourceRefs": ["mdx:10.2-explaining-numbers"],
       "finalDeliverable": "A plain-language metric readout"
     },
     {
@@ -382,9 +315,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:10.3-no-impressions-low-ctr"
-      ],
+      "resourceRefs": ["mdx:10.3-no-impressions-low-ctr"],
       "finalDeliverable": "A top-of-funnel diagnostic note"
     },
     {
@@ -392,9 +323,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:10.4-clicks-no-sales-high-acos"
-      ],
+      "resourceRefs": ["mdx:10.4-clicks-no-sales-high-acos"],
       "finalDeliverable": "A bottom-of-funnel diagnostic note"
     },
     {
@@ -402,19 +331,16 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:11.1-tasks-by-cadence"
-      ],
+      "resourceRefs": ["mdx:11.1-tasks-by-cadence"],
       "finalDeliverable": "A cadence plan"
     },
     {
       "slug": "11.2-permissions-ladder",
       "toolBridge": {
-        "kind": "none"
+        "kind": "simgrid",
+        "target": "client-onboarding"
       },
-      "resourceRefs": [
-        "mdx:11.2-permissions-ladder"
-      ],
+      "resourceRefs": ["mdx:11.2-permissions-ladder"],
       "finalDeliverable": "An approval note"
     },
     {
@@ -422,19 +348,16 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:11.3-sops-change-log"
-      ],
+      "resourceRefs": ["mdx:11.3-sops-change-log"],
       "finalDeliverable": "An SOP and change-log row"
     },
     {
       "slug": "11.4-client-communication-capstone",
       "toolBridge": {
-        "kind": "none"
+        "kind": "simgrid",
+        "target": "capstone-sequence"
       },
-      "resourceRefs": [
-        "mdx:11.4-client-communication-capstone"
-      ],
+      "resourceRefs": ["mdx:11.4-client-communication-capstone"],
       "finalDeliverable": "A client update and capstone evidence pack"
     },
     {
@@ -442,9 +365,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:-1.1-what-amazon-is"
-      ],
+      "resourceRefs": ["mdx:-1.1-what-amazon-is"],
       "finalDeliverable": "A one-paragraph plain-language explanation of what Amazon is and why ads exist there"
     },
     {
@@ -452,9 +373,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:-1.2-surfaces"
-      ],
+      "resourceRefs": ["mdx:-1.2-surfaces"],
       "finalDeliverable": "A short map of the four surfaces a PPC VA uses and what lives on each"
     },
     {
@@ -462,9 +381,7 @@
       "toolBridge": {
         "kind": "none"
       },
-      "resourceRefs": [
-        "mdx:-1.3-ad-object-model"
-      ],
+      "resourceRefs": ["mdx:-1.3-ad-object-model"],
       "finalDeliverable": "A labeled diagram or sentence describing the five-level Amazon ads hierarchy"
     }
   ]

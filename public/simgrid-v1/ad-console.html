@@ -1,0 +1,1856 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AdConsole Pro | Amazon PPC Campaign Practice Simulator</title>
+<link rel="icon" href="favicon.ico">
+<script src="assets/vendor/chart.umd.min.js"></script>
+<script src="assets/student-progress.js"></script>
+<script src="assets/simulator-attempt.js"></script>
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/simulator-foundation.css">
+<link rel="stylesheet" href="assets/ad-console.css">
+<link rel="stylesheet" href="assets/skin.css">
+<link rel="stylesheet" href="assets/shell.css">
+  <!-- PHA_DISCOVERY_START -->
+  <meta name="description" content="Practice Amazon PPC campaign operations, keyword actions, bidding, and reporting decisions in AdConsole Pro.">
+  <meta name="keywords" content="Amazon PPC campaign simulator, ad operations practice">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://projectamazonph.github.io/amazon-ph-simulators/ad-console.html">
+  <link rel="describedby" type="text/markdown" href="https://projectamazonph.github.io/amazon-ph-simulators/llms.txt" title="AI-readable Project Amazon PH Academy guide">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Project Amazon PH Academy">
+  <meta property="og:title" content="AdConsole Pro | Amazon PPC Campaign Practice Simulator">
+  <meta property="og:description" content="Practice Amazon PPC campaign operations, keyword actions, bidding, and reporting decisions in AdConsole Pro.">
+  <meta property="og:url" content="https://projectamazonph.github.io/amazon-ph-simulators/ad-console.html">
+  <meta property="og:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+  <meta property="og:image:alt" content="Project Amazon PH Academy SimGrid learning hub">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AdConsole Pro | Amazon PPC Campaign Practice Simulator">
+  <meta name="twitter:description" content="Practice Amazon PPC campaign operations, keyword actions, bidding, and reporting decisions in AdConsole Pro.">
+  <meta name="twitter:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ad-console.html",
+      "url": "https://projectamazonph.github.io/amazon-ph-simulators/ad-console.html",
+      "name": "AdConsole Pro | Amazon PPC Campaign Practice Simulator",
+      "description": "Practice Amazon PPC campaign operations, keyword actions, bidding, and reporting decisions in AdConsole Pro.",
+      "inLanguage": [
+        "en",
+        "fil"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Project Amazon PH Academy",
+        "url": "https://projectamazonph.github.io/amazon-ph-simulators/"
+      },
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Amazon PPC campaign simulator"
+        },
+        {
+          "@type": "Thing",
+          "name": "ad operations practice"
+        }
+      ],
+      "hasPart": {
+        "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ad-console.html#footer-navigation"
+      }
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ad-console.html#footer-navigation",
+      "name": "Project Amazon PH Academy footer navigation",
+      "description": "Visible footer links to Project Amazon PH Academy learning, practice, coaching, and project resources.",
+      "hasPart": [
+        {
+          "@type": "ItemList",
+          "name": "Learn footer links",
+          "numberOfItems": 4,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "VA Start Here",
+              "item": {
+                "@type": "WebPage",
+                "name": "VA Start Here",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/start-here.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "PPC Coach",
+              "item": {
+                "@type": "WebPage",
+                "name": "PPC Coach",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-coach.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Student Guide",
+              "item": {
+                "@type": "WebPage",
+                "name": "Student Guide",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/guide.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Module Decks",
+              "item": {
+                "@type": "WebPage",
+                "name": "Module Decks",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-decks.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Practice footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Simulator Library",
+              "item": {
+                "@type": "WebPage",
+                "name": "Simulator Library",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/index.html#simulator-library"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Campaign Architect",
+              "item": {
+                "@type": "WebPage",
+                "name": "Campaign Architect",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/campaign-architect.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Account Audit",
+              "item": {
+                "@type": "WebPage",
+                "name": "Account Audit",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/account-audit.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Coach footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Coach Tools",
+              "item": {
+                "@type": "WebPage",
+                "name": "Coach Tools",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-tools.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Resource Library",
+              "item": {
+                "@type": "WebPage",
+                "name": "Resource Library",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-resource-library.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Learning Docs",
+              "item": {
+                "@type": "WebPage",
+                "name": "Learning Docs",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/index.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Project footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Roadmap",
+              "item": {
+                "@type": "WebPage",
+                "name": "Roadmap",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/planned-simulators.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Source Repository",
+              "item": {
+                "@type": "WebPage",
+                "name": "Source Repository",
+                "url": "https://github.com/projectamazonph/amazon-ph-simulators"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Project Guide",
+              "item": {
+                "@type": "WebPage",
+                "name": "Project Guide",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/site-guide.md"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ad-console.html#application",
+      "name": "AdConsole Pro",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "description": "Practice Amazon PPC campaign operations, keyword actions, bidding, and reporting decisions in AdConsole Pro.",
+      "isAccessibleForFree": true
+    }
+  ]
+}</script>
+  <!-- PHA_DISCOVERY_END -->
+</head>
+<body>
+
+<header id="topbar">
+  <div class="tb-left">
+    <button type="button" class="tb-icon" data-act="burger" aria-label="Toggle navigation">
+      <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M1 1h16M1 7h16M1 13h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button type="button" class="logo" data-act="nav" data-view="dashboard" aria-label="Open advertising dashboard">
+      <span class="logo-t">amazon<b>&nbsp;ads</b></span>
+      <svg class="smile" width="46" height="12" viewBox="0 0 46 12"><path d="M2 2c8 8 26 8 36-1" stroke="#FF9900" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M38 1l5 .5-2.6 4.2" stroke="#FF9900" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <span class="tb-tag">Campaign Manager<em>PPC Operator</em></span>
+  </div>
+  <div class="tb-search">
+    <input id="globalSearch" aria-label="Search campaigns, keywords, and search terms" placeholder="Search campaigns, keywords, search terms…  (press Enter)">
+    <button type="button" data-act="global-search" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.8"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </div>
+  <div class="tb-right">
+    <select id="marketplace" data-act="market" aria-label="Marketplace">
+      <option>Amazon.com · US</option><option>Amazon.co.uk · UK</option><option>Amazon.de · DE</option><option>Amazon.ca · CA</option><option>Amazon.co.jp · JP</option>
+    </select>
+    <button type="button" class="tb-icon" data-act="nav" data-view="glossary" data-tip="Glossary of PPC terms" aria-label="Open PPC glossary">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><circle cx="8.5" cy="8.5" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M6.6 6.6a2 2 0 1 1 2.7 1.9c-.6.25-.8.7-.8 1.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="8.5" cy="12.4" r="1" fill="currentColor"/></svg>
+    </button>
+    <button type="button" class="tb-icon" data-act="nav" data-view="dashboard" data-tip="Activity feed" aria-label="Open activity feed">
+      <svg width="17" height="18" viewBox="0 0 17 18" fill="none"><path d="M8.5 2a5 5 0 0 0-5 5v3.5L2 13.5h13L13.5 10.5V7a5 5 0 0 0-5-5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6.5 15.5a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span id="bellBadge" style="display:none">0</span>
+    </button>
+    <div class="acct"><div class="avatar">DS</div><div class="acct-t"><b>Demo Seller</b><span>Acme Storefront</span></div></div>
+  </div>
+</header>
+
+<div id="shell">
+  <aside id="sidenav">
+    <div class="nv-sec">Advertising</div>
+    <button type="button" class="nv" data-act="nav" data-view="dashboard"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.6"/></svg><span class="nv-l">Dashboard</span></button>
+    <button type="button" class="nv" data-act="nav" data-view="campaigns"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6v4l8 3V3L2 6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.5 5.5a2.5 2.5 0 0 1 0 5M4 10.5V13h2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nv-l">Campaigns</span><span class="nv-badge" id="nvCampN">0</span></button>
+    <button type="button" class="nv" data-act="nav" data-view="adgroups"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2 14 5l-6 3-6-3 6-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 8l6 3 6-3M2 11l6 3 6-3" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="nv-l">Ad groups</span></button>
+    <button type="button" class="nv" data-act="nav" data-view="keywords"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="5.5" cy="5.5" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 8l6 6M11 11l2-2M12.5 12.5l1.5-1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nv-l">Keywords</span><span class="nv-badge" id="nvKwN">0</span></button>
+    <button type="button" class="nv" data-act="nav" data-view="searchterms"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v6a1.5 1.5 0 0 1-1.5 1.5H8l-3.5 3v-3h-.5A1.5 1.5 0 0 1 2 9.5v-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 6h6M5 8.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="nv-l">Search terms</span><span class="nv-badge" id="nvTermN">0</span></button>
+    <button type="button" class="nv" data-act="nav" data-view="reports"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 1.5h6L13 4.5v10H4v-13Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 8h4M6 10.5h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="nv-l">Reports</span></button>
+    <button type="button" class="nv" data-act="nav" data-view="rules"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h8M13 4h1M2 12h1M6 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="11.5" cy="4" r="1.8" stroke="currentColor" stroke-width="1.6"/><circle cx="4.5" cy="12" r="1.8" stroke="currentColor" stroke-width="1.6"/></svg><span class="nv-l">Budget rules</span></button>
+    <button type="button" class="nv" data-act="nav" data-view="portfolios"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 4A1.5 1.5 0 0 1 3 2.5h3L8 4.5h5A1.5 1.5 0 0 1 14.5 6v6A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="nv-l">Portfolios</span></button>
+    <div class="nv-sec">Learning</div>
+    <button type="button" class="nv" data-act="nav" data-view="academy"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2 1.5 5 8 8l6.5-3L8 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 6.5V10c0 1 1.8 2 4 2s4-1 4-2V6.5M14.5 5v3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nv-l">PPC Academy</span><span class="nv-badge" id="nvLesN">0/10</span></button>
+    <button type="button" class="nv" data-act="nav" data-view="glossary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2.5h10v11H3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 2.5v11M8 6h3M8 8.5h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="nv-l">Glossary</span></button>
+    <div class="nv-sim"><b><span class="dot" id="nvDot"></span><span id="nvSimDay">Day 15</span></b><span id="nvSimSub">Paused · press play to run time</span></div>
+  </aside>
+  <div id="main-col">
+    <div id="wire-slot"></div>
+    <main id="content"></main>
+  </div>
+</div>
+
+<div id="simbar">
+  <div class="sim-live"><span class="dot" id="simDot"></span>
+  <div class="sim-time"><b id="simDate">—</b><span id="simClock">—</span></div>
+  <div class="sim-progress"><i id="simProg"></i></div></div>
+  <div class="sim-sep"></div>
+  <button type="button" class="sim-play" id="simPlay" data-act="sim-toggle" data-tip="Play / pause (Space)" aria-label="Play or pause simulation"></button>
+  <div class="sim-speed">
+    <button type="button" data-act="sim-speed" data-v="1" class="on">1×</button>
+    <button type="button" data-act="sim-speed" data-v="2">2×</button>
+    <button type="button" data-act="sim-speed" data-v="5">5×</button>
+    <button type="button" data-act="sim-speed" data-v="10">10×</button>
+  </div>
+  <button type="button" class="sim-skip" data-act="sim-skip" data-tip="Skip 24 hours (S)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l6 5-6 5V2Z" fill="currentColor"/><path d="M11 2v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Skip day</span></button>
+  <span class="live-chip">LIVE</span>
+  <span class="scen-chip" id="scenChip"></span>
+  <span class="kbd-hints"><kbd>Space</kbd> play <kbd>S</kbd> skip <kbd>C</kbd> create</span>
+  <button type="button" class="sim-skip" data-act="tour" data-tip="Guided tour">🎓<span>Tour</span></button>
+</div>
+
+<div id="toasts"></div>
+<div id="modal-root"></div>
+<div id="menu-root"></div>
+<div id="tour-root"></div>
+
+<script>
+/* =====================================================================
+   CORE
+   ===================================================================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd=(a=1,b)=> b===undefined? Math.random()*a : a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const stoch=x=>{const f=Math.floor(x);return f+(Math.random()<x-f?1:0);};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const r2=v=>Math.round(v*100)/100;
+const money=n=>'$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const kfmt=n=>{n=Number(n)||0;return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(Math.round(n));};
+const pctf=(n,d=2)=>(isFinite(n)?(n*100).toFixed(d):'0.00')+'%';
+const hash=s=>{let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0;}return Math.abs(h);};
+let _uid=1000; const uid=()=>'e'+(_uid++);
+const START=new Date(2026,6,11);
+const dayDate=d=>new Date(START.getTime()+d*864e5);
+const fmtDay=d=>dayDate(d).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const fmtDayFull=d=>dayDate(d).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+
+const bus=(()=>{const m=new Map();return{
+ on(ev,fn){(m.get(ev)||m.set(ev,new Set()).get(ev)).add(fn);},
+ off(ev,fn){const s=m.get(ev);if(s)s.delete(fn);},
+ emit(ev,a){const s=m.get(ev);if(s)s.forEach(fn=>{try{fn(a);}catch(err){console.error('[bus]',ev,err);}});}
+};})();
+
+/* =====================================================================
+   DATA
+   ===================================================================== */
+const PRODUCTS=[
+ {id:'p1',name:'Aurora Wireless Earbuds Pro',short:'Aurora Earbuds',price:89.99,emoji:'🎧',color:'#E8F0FB',cat:'earbuds'},
+ {id:'p2',name:'Nimbus Portable Bluetooth Speaker',short:'Nimbus Speaker',price:49.99,emoji:'🔊',color:'#FDF0E3',cat:'speakers'},
+ {id:'p3',name:'VoltEdge 65W GaN USB-C Charger',short:'VoltEdge Charger',price:29.99,emoji:'🔌',color:'#E9F7EF',cat:'chargers'},
+ {id:'p4',name:'TrailBlaze 40L Hiking Backpack',short:'TrailBlaze Pack',price:79.99,emoji:'🎒',color:'#F1EEE8',cat:'backpack'},
+ {id:'p5',name:'LumiGlow LED Desk Lamp',short:'LumiGlow Lamp',price:39.99,emoji:'💡',color:'#FFF9E3',cat:'lamp'},
+ {id:'p6',name:'PureBrew Cold Brew Coffee Maker',short:'PureBrew Maker',price:59.99,emoji:'☕',color:'#F5EBE4',cat:'coffee'},
+ {id:'p7',name:'FlexFit Resistance Bands Set',short:'FlexFit Bands',price:24.99,emoji:'🏋️',color:'#FDECEF',cat:'bands'},
+ {id:'p8',name:'SkyView 4K Action Camera',short:'SkyView Camera',price:129.99,emoji:'📷',color:'#E8F4F6',cat:'camera'},
+];
+const prod=id=>PRODUCTS.find(p=>p.id===id)||{id:id||'?',name:'Unknown product',short:'Product',price:49.99,emoji:'📦',color:'#F0F2F2',cat:'earbuds'};
+const POOLS={
+ earbuds:[
+  {t:'wireless earbuds',m:1.30,v:5200,ctr:.0065,cvr:.11,q:1},
+  {t:'bluetooth earbuds',m:1.20,v:6100,ctr:.0060,cvr:.10,q:.95},
+  {t:'noise cancelling earbuds',m:1.55,v:3400,ctr:.0070,cvr:.12,q:.9},
+  {t:'earbuds for iphone',m:1.05,v:2900,ctr:.0055,cvr:.09,q:.8},
+  {t:'running earbuds',m:.95,v:2600,ctr:.0060,cvr:.10,q:.85},
+  {t:'workout earbuds sweatproof',m:.90,v:1500,ctr:.0060,cvr:.11,q:.85},
+  {t:'usb c earbuds',m:.85,v:1900,ctr:.0050,cvr:.09,q:.8},
+  {t:'earbuds with mic',m:.90,v:2200,ctr:.0050,cvr:.08,q:.75},
+  {t:'cheap wireless earbuds',m:.80,v:4300,ctr:.0070,cvr:.05,q:.45},
+  {t:'earbuds under 50',m:.80,v:2000,ctr:.0060,cvr:.05,q:.5},
+  {t:'free earbuds',m:.40,v:1600,ctr:.0080,cvr:.008,q:.1},
+  {t:'wired earbuds',m:.45,v:1400,ctr:.0050,cvr:.012,q:.15},
+  {t:'airpods pro 2',m:1.10,v:3800,ctr:.0060,cvr:.015,q:.15},
+  {t:'sony earbuds',m:1.00,v:2100,ctr:.0050,cvr:.015,q:.15},
+  {t:'earbuds repair',m:.35,v:700,ctr:.0040,cvr:.01,q:.1},
+ ],
+ speakers:[
+  {t:'bluetooth speaker',m:1.00,v:5600,ctr:.0055,cvr:.09,q:.95},
+  {t:'portable speaker',m:.95,v:3300,ctr:.0050,cvr:.09,q:.9},
+  {t:'waterproof bluetooth speaker',m:1.05,v:2100,ctr:.0060,cvr:.11,q:.9},
+  {t:'party speaker',m:.90,v:1800,ctr:.0050,cvr:.07,q:.7},
+  {t:'small speaker with bass',m:.85,v:1200,ctr:.0060,cvr:.10,q:.85},
+  {t:'shower speaker',m:.80,v:1500,ctr:.0055,cvr:.09,q:.8},
+  {t:'used speakers',m:.40,v:900,ctr:.0040,cvr:.012,q:.12},
+  {t:'speaker stand',m:.45,v:600,ctr:.0035,cvr:.015,q:.15},
+ ],
+ chargers:[
+  {t:'usb c charger',m:.95,v:4800,ctr:.0060,cvr:.10,q:.95},
+  {t:'65w fast charger',m:1.05,v:2100,ctr:.0065,cvr:.12,q:.95},
+  {t:'usb c wall charger',m:.90,v:2600,ctr:.0055,cvr:.10,q:.9},
+  {t:'macbook charger',m:1.10,v:3900,ctr:.0050,cvr:.07,q:.6},
+  {t:'iphone fast charger',m:.90,v:5200,ctr:.0050,cvr:.06,q:.55},
+  {t:'laptop usb c charger',m:1.00,v:1800,ctr:.0060,cvr:.11,q:.9},
+  {t:'gan charger',m:1.15,v:1400,ctr:.0070,cvr:.13,q:.95},
+  {t:'wireless charger',m:.85,v:3600,ctr:.0050,cvr:.02,q:.15},
+  {t:'car charger',m:.70,v:2800,ctr:.0045,cvr:.02,q:.15},
+  {t:'lightning cable',m:.60,v:3100,ctr:.0045,cvr:.015,q:.12},
+ ],
+ backpack:[
+  {t:'hiking backpack',m:.95,v:3200,ctr:.0055,cvr:.09,q:.9},
+  {t:'40l backpack',m:.90,v:1600,ctr:.0060,cvr:.11,q:.95},
+  {t:'travel backpack',m:1.00,v:2900,ctr:.0050,cvr:.08,q:.85},
+  {t:'camping gear',m:.70,v:2200,ctr:.0040,cvr:.03,q:.3},
+ ],
+ lamp:[
+  {t:'desk lamp',m:.85,v:3000,ctr:.0055,cvr:.10,q:.9},
+  {t:'led desk lamp',m:.85,v:2200,ctr:.0060,cvr:.11,q:.95},
+  {t:'desk lamp with usb port',m:.80,v:1300,ctr:.0060,cvr:.12,q:.9},
+  {t:'reading light',m:.70,v:1500,ctr:.0045,cvr:.07,q:.6},
+ ],
+ coffee:[
+  {t:'cold brew maker',m:1.00,v:2400,ctr:.0060,cvr:.11,q:.95},
+  {t:'cold brew coffee maker',m:1.05,v:1900,ctr:.0065,cvr:.12,q:.95},
+  {t:'iced coffee maker',m:.95,v:1700,ctr:.0055,cvr:.09,q:.85},
+  {t:'coffee grinder',m:.80,v:2000,ctr:.0040,cvr:.03,q:.25},
+ ],
+ bands:[
+  {t:'resistance bands',m:.90,v:3400,ctr:.0055,cvr:.10,q:.9},
+  {t:'workout bands',m:.85,v:1900,ctr:.0060,cvr:.11,q:.9},
+  {t:'exercise bands set',m:.85,v:1400,ctr:.0060,cvr:.12,q:.95},
+  {t:'gym equipment',m:.75,v:2600,ctr:.0040,cvr:.03,q:.3},
+ ],
+ camera:[
+  {t:'action camera 4k',m:1.25,v:2600,ctr:.0060,cvr:.10,q:.95},
+  {t:'waterproof action camera',m:1.20,v:1500,ctr:.0065,cvr:.11,q:.9},
+  {t:'gopro alternative',m:1.10,v:1800,ctr:.0055,cvr:.06,q:.5},
+  {t:'vlogging camera',m:1.15,v:1600,ctr:.0050,cvr:.07,q:.7},
+ ],
+};
+const MOD_PRE=['best','buy','top rated',''];
+const MOD_SUF=['online','reviews','2026','near me','for sale',''];
+
+const SCENARIOS=[
+ {id:'prime',name:'Prime Day surge',icon:'⚡',dur:24,vol:2.0,cpc:1.35,cvr:1.25,ctr:1.2,desc:'Shopper traffic doubles, conversion lifts +25%, but CPCs climb +35% for 24h. Can you scale without blowing ACOS?'},
+ {id:'war',name:'Competitor bid war',icon:'⚔️',dur:12,vol:1.1,cpc:1.6,cvr:1.0,ctr:1.0,desc:'A rival raises bids aggressively: market CPCs +60% for 12h. Impression share drops unless you bid up or retreat.'},
+ {id:'slump',name:'Seasonal slump',icon:'📉',dur:24,vol:.5,cpc:.85,cvr:.8,ctr:.9,desc:'Traffic halves and conversion dips for 24h. Practice tightening budgets and pausing weak keywords.'},
+ {id:'deal',name:'Lightning Deal boost',icon:'🏷️',dur:8,vol:1.2,cpc:1.0,cvr:1.8,ctr:1.4,desc:'Your product is featured: CTR +40% and conversion +80% for 8h. Raise budgets to catch the wave.'},
+];
+
+/* =====================================================================
+   MODEL
+   ===================================================================== */
+const state={
+ day:0, hour:0, running:false, speed:1, silent:true,
+ rangeDays:7, view:{name:'dashboard'}, tab:'overview', heatMode:'sp',
+ campaigns:[], terms:{}, logs:[], unread:0, ticker:[], scen:null, welcomed:false,
+ portfolios:[{id:'p1',name:'Core Search'},{id:'p2',name:'Discovery & Testing'}],
+ rules:[], report:null,
+ filters:{campaigns:{q:'',status:'',type:'',tgt:''},keywords:{q:'',camp:'',match:'',status:''},terms:{q:''}},
+ sort:{}, selCamps:new Set(), selKws:new Set(),
+ lessonsDone:new Set(['explore']), animateNext:true, day0:14,
+};
+let kwById={},campById={},agById={};
+function indexEntities(){kwById={};campById={};agById={};
+ state.campaigns.forEach(c=>{campById[c.id]=c;c.adGroups.forEach(ag=>{agById[ag.id]=ag;ag.keywords.forEach(k=>{kwById[k.id]=k;});});});}
+const campOfAg=id=>state.campaigns.find(c=>c.adGroups.some(a=>a.id===id));
+
+function mkKw(text,match,bid,entry,price,pool){
+ return {id:uid(),text,match,bid,status:'enabled',hidden:false,
+  market:entry?entry.m:(.7+(hash(text)%90)/100),
+  vol:entry?entry.v:(700+hash(text)%2400),
+  ctr:entry?entry.ctr:.0055, cvr:entry?entry.cvr:.08,
+  rel:entry?Math.max(.35,Math.min(1,entry.q+.05)):.6,
+  price, pool:pool||[], daily:[]};
+}
+function seed(){
+ const eb=POOLS.earbuds, ch=POOLS.chargers, sp=POOLS.speakers;
+ const find=(p,t)=>p.find(e=>e.t===t);
+ const c1={id:uid(),name:'SP | Earbuds | Core Exact',type:'SP',portfolio:'p1',targeting:'manual',strategy:'down',budget:60,status:'enabled',startDay:0,spendToday:0,outToday:false,daily:[],negatives:[{t:'free earbuds',m:'ne'}],
+  adGroups:[{id:uid(),name:'Earbuds – Core Keywords',status:'enabled',products:['p1'],defaultBid:1.2,daily:[],keywords:[
+    mkKw('wireless earbuds','exact',1.35,find(eb,'wireless earbuds'),89.99,eb),
+    mkKw('bluetooth earbuds','exact',1.25,find(eb,'bluetooth earbuds'),89.99,eb),
+    mkKw('noise cancelling earbuds','exact',1.60,find(eb,'noise cancelling earbuds'),89.99,eb),
+    mkKw('earbuds for iphone','phrase',1.05,find(eb,'earbuds for iphone'),89.99,eb),
+    mkKw('running earbuds','broad',0.95,find(eb,'running earbuds'),89.99,eb),
+    mkKw('cheap wireless earbuds','broad',0.80,find(eb,'cheap wireless earbuds'),89.99,eb),
+  ]}]};
+ const autoPool=[...eb,...sp];
+ const c2={id:uid(),name:'SP | Auto | Product Research',type:'SP',portfolio:'p2',targeting:'auto',strategy:'down',budget:40,status:'enabled',startDay:0,spendToday:0,outToday:false,daily:[],negatives:[],
+  adGroups:[{id:uid(),name:'Automatic targeting',status:'enabled',products:['p1','p2'],defaultBid:0.9,daily:[],keywords:[
+    {id:uid(),text:'Automatic targeting',match:'auto',bid:0.90,status:'enabled',hidden:true,market:1.05,vol:9000,ctr:.005,cvr:.085,rel:.78,price:69.99,pool:autoPool,daily:[]}]}]};
+ const c3={id:uid(),name:'SP | Charger | Broad Discovery',type:'SP',portfolio:'p2',targeting:'manual',strategy:'updown',budget:35,status:'enabled',startDay:0,spendToday:0,outToday:false,daily:[],negatives:[],
+  adGroups:[{id:uid(),name:'Charger – Discovery',status:'enabled',products:['p3'],defaultBid:1.0,daily:[],keywords:[
+    mkKw('usb c charger','broad',0.95,find(ch,'usb c charger'),29.99,ch),
+    mkKw('65w fast charger','phrase',1.10,find(ch,'65w fast charger'),29.99,ch),
+    mkKw('macbook charger','broad',1.15,find(ch,'macbook charger'),29.99,ch),
+    mkKw('gan charger','exact',1.20,find(ch,'gan charger'),29.99,ch),
+  ]}]};
+ const c4={id:uid(),name:'SB | Brand | Headline Search',type:'SB',portfolio:'p1',targeting:'manual',strategy:'down',budget:25,status:'enabled',startDay:0,spendToday:0,outToday:false,daily:[],negatives:[],
+  adGroups:[{id:uid(),name:'Brand headline',status:'enabled',products:['p1'],defaultBid:0.9,daily:[],keywords:[
+    mkKw('aurora earbuds','exact',0.75,{t:'aurora earbuds',m:.7,v:900,ctr:.008,cvr:.16,q:1},89.99,eb),
+    mkKw('wireless earbuds','broad',1.00,find(eb,'wireless earbuds'),89.99,eb),
+  ]}]};
+ const c5={id:uid(),name:'SD | Speaker | Retargeting',type:'SD',portfolio:'p2',targeting:'auto',strategy:'fixed',budget:20,status:'paused',startDay:0,spendToday:0,outToday:false,daily:[],negatives:[],
+  adGroups:[{id:uid(),name:'Product targeting',status:'enabled',products:['p2'],defaultBid:0.6,daily:[],keywords:[
+    {id:uid(),text:'Product targeting',match:'auto',bid:0.60,status:'enabled',hidden:true,market:.7,vol:3000,ctr:.0035,cvr:.07,rel:.7,price:49.99,pool:sp,daily:[]}]}]};
+ state.campaigns=[c1,c2,c3,c4,c5];
+ state.campaigns.forEach(c=>{c.places={top:0,prod:0,rest:0};c.placeStats=[];c.hourly=[];});
+ indexEntities();
+}
+
+/* =====================================================================
+   SIM
+   ===================================================================== */
+const emptyM=()=>({imp:0,clk:0,sp:0,sal:0,ord:0});
+function addR(arr,d,r){arr[d]=arr[d]||emptyM();const t=arr[d];t.imp+=r.imp;t.clk+=r.clk;t.sp+=r.sp;t.sal+=r.sal;t.ord+=r.ord;return arr;}
+function sumDaily(arr,from,to){const a=emptyM();for(let d=Math.max(0,from);d<=to;d++){const r=arr&&arr[d];if(r){a.imp+=r.imp||0;a.clk+=r.clk||0;a.sp+=r.sp||0;a.sal+=r.sal||0;a.ord+=r.ord||0;}}return a;}
+function derive(m){m.ctr=m.imp?m.clk/m.imp:0;m.cpc=m.clk?m.sp/m.clk:0;m.cvr=m.clk?m.ord/m.clk:0;m.acos=m.sal?m.sp/m.sal:null;m.roas=m.sp?m.sal/m.sp:null;return m;}
+function rangeBounds(){const rd=state.rangeDays;const to=state.day;const from=rd?Math.max(0,to-rd+1):0;return{from,to};}
+function priorBounds(){const b=rangeBounds();const len=b.to-b.from+1;const pTo=b.from-1;const pFrom=pTo-len+1;if(pTo<0)return null;return{from:Math.max(0,pFrom),to:pTo};}
+function campMetrics(c,b){b=b||rangeBounds();return derive(sumDaily(c.daily,b.from,b.to));}
+function kwMetrics(k,b){b=b||rangeBounds();return derive(sumDaily(k.daily,b.from,b.to));}
+function agMetrics(ag,b){b=b||rangeBounds();return derive(ag.keywords.reduce((acc,k)=>{const d=sumDaily(k.daily,b.from,b.to);acc.imp+=d.imp;acc.clk+=d.clk;acc.sp+=d.sp;acc.sal+=d.sal;acc.ord+=d.ord;return acc;},emptyM()));}
+function allMetrics(b){b=b||rangeBounds();const m=emptyM();state.campaigns.forEach(c=>{const x=sumDaily(c.daily,b.from,b.to);m.imp+=x.imp;m.clk+=x.clk;m.sp+=x.sp;m.sal+=x.sal;m.ord+=x.ord;});return derive(m);}
+function deltaChip(cur,prev,goodDown){if(prev===null||prev===undefined||!isFinite(prev)||prev===0)return'<span class="kpi-d na">—</span>';const d=(cur-prev)/Math.abs(prev);const up=d>=0;const good=goodDown?!up:up;return'<span class="kpi-d '+(good?'up':'dn')+'">'+(up?'▲':'▼')+' '+Math.abs(d*100).toFixed(1)+'%</span>';}
+function daySeries(metric,b){const out=[];for(let d=b.from;d<=b.to;d++){out.push(allMetrics({from:d,to:d})[metric]);}return out;}
+function campDaySeries(c,metric,b){const out=[];for(let d=b.from;d<=b.to;d++){out.push(derive(sumDaily(c.daily,d,d))[metric]);}return out;}
+
+function campRow(c){return {c:c, m:campMetrics(c), s:statusOf(c)};}
+function agRow(ag,c){return {ag:ag, c:c, m:agMetrics(ag)};}
+function kwRow(k,ag,c){return {k:k, ag:ag, c:c, m:kwMetrics(k)};}
+function termRow(t){return {t:t, m:derive(Object.assign({},t))};}
+
+const HOUR_W=[.35,.25,.2,.2,.22,.3,.45,.65,.85,1,1.05,1.05,1,1,1.05,1.1,1.2,1.3,1.35,1.3,1.15,1,.75,.55];
+function log(type,msg){if(state.silent)return;state.logs.unshift({id:uid(),type,msg,t:fmtDay(state.day)+' '+String(state.hour).padStart(2,'0')+':00'});if(state.logs.length>90)state.logs.pop();state.unread++;updateBell();}
+function updateBell(){const b=$('#bellBadge');if(!b)return;if(state.unread>0&&state.view.name!=='dashboard'){b.style.display='grid';b.textContent=state.unread>99?'99':state.unread;}else b.style.display='none';}
+function pushTicker(html,warn){state.ticker.unshift({id:uid(),html,warn,t:String(state.hour).padStart(2,'0')+':00'});if(state.ticker.length>10)state.ticker.pop();}
+function negated(c,t){return (c.negatives||[]).some(n=>n.m==='ne'?t===n.t:t.includes(n.t));}
+function scenMods(){
+ if(!state.scen)return{vol:1,cpc:1,cvr:1,ctr:1};
+ const t=state.day*24+state.hour;
+ if(t>=state.scen.ends){const sc=SCENARIOS.find(s=>s.id===state.scen.id);state.scen=null;
+  if(sc){log('info','Market event ended: <b>'+sc.name+'</b>. Conditions back to normal.');toast('Market normalized',sc.name+' has ended.','info');}
+  updateSimBar();return{vol:1,cpc:1,cvr:1,ctr:1};}
+ return SCENARIOS.find(x=>x.id===state.scen.id)||{vol:1,cpc:1,cvr:1,ctr:1};
+}
+function pickTerm(kw){
+ const pool=kw.pool&&kw.pool.length?kw.pool:POOLS.earbuds;
+ const tot=pool.reduce((s,e)=>s+e.v,0);let r=Math.random()*tot;
+ for(const e of pool){r-=e.v;if(r<=0)return e;}
+ return pool[0];
+}
+function attributeTerms(c,ag,kw,imp,clk,cpc,cvrM){
+ let list;
+ if(kw.hidden||kw.match==='exact'){list=[{t:kw.text.toLowerCase(),q:kw.hidden?.8:1}];}
+ else{
+  const n=Math.random()<.7?1:2;list=[];
+  for(let i=0;i<n;i++){
+   if(kw.match==='phrase'&&Math.random()<.5){
+    const pre=pick(MOD_PRE),suf=pick(MOD_SUF);
+    list.push({t:((pre?pre+' ':'')+kw.text+(suf?' '+suf:'')).trim(),q:.9});
+   }else{const e=pickTerm(kw);list.push({t:e.t,q:e.q});}
+  }
+ }
+ const ws=list.map(()=>.6+Math.random()*.8);const wsum=ws.reduce((a,b)=>a+b,0);
+ const out=emptyM();out.cpc=cpc;
+ list.forEach((tm,i)=>{
+  const ti=Math.round(imp*ws[i]/wsum);const tc=stoch(clk*ws[i]/wsum);
+  if(negated(c,tm.t))return;
+  const sp=tc*cpc;
+  const cvr=kw.cvr*kw.rel*tm.q*rnd(.8,1.25)*cvrM;
+  const ord=stoch(tc*cvr);const sal=ord*kw.price;
+  const key=c.id+'|'+ag.id+'|'+tm.t;
+  let rec=state.terms[key];
+  if(!rec&&Object.keys(state.terms).length<500){rec=state.terms[key]={id:uid(),text:tm.t,campId:c.id,agId:ag.id,kwText:kw.text,q:tm.q,firstDay:state.day,status:'none',imp:0,clk:0,sp:0,sal:0,ord:0};}
+  if(rec){rec.imp+=ti;rec.clk+=tc;rec.sp+=sp;rec.sal+=sal;rec.ord+=ord;}
+  out.imp+=ti;out.clk+=tc;out.sp+=sp;out.sal+=sal;out.ord+=ord;
+ });
+ return out;
+}
+function simHour(){
+ const h=state.hour,w=HOUR_W[h]/24;
+ const mods=scenMods();
+ for(const c of state.campaigns){
+  if(c.status!=='enabled')continue;
+  if(c.spendToday>=c.budget)continue;
+  c.hourly[state.day]=c.hourly[state.day]||Array.from({length:24},()=>({sp:0,sal:0}));
+  c.placeStats[state.day]=c.placeStats[state.day]||{top:emptyM(),prod:emptyM(),rest:emptyM()};
+  for(const ag of c.adGroups){
+   if(ag.status!=='enabled')continue;
+   for(const kw of ag.keywords){
+    if(kw.status!=='enabled')continue;
+    const effM=kw.market*mods.cpc;
+    const bf=1/(1+Math.exp(-(kw.bid/effM-1)*3));
+    const typeF=c.type==='SB'?.55:c.type==='SD'?.5:1;
+    const imp=Math.round(kw.vol*mods.vol*w*(0.25+0.75*bf)*rnd(.7,1.3)*typeF);
+    if(imp<=0)continue;
+    const ctr=kw.ctr*(0.8+0.4*bf)*rnd(.85,1.15)*(mods.ctr||1)*(c.type==='SB'?.8:1);
+    const stratF=c.strategy==='fixed'?1:c.strategy==='down'?(0.7+0.3*kw.rel):(0.65+0.7*kw.rel);
+    const cpc=clamp(effM*rnd(.8,1.2)*stratF*(c.type==='SB'?1.25:1),.15,kw.bid*(c.strategy==='updown'?1.5:1));
+    const pl=c.places||{top:0,prod:0,rest:0};
+    const bfT=1/(1+Math.exp(-((kw.bid*(1+pl.top/100))/effM-1)*3));
+    const shTop=clamp(.12+.5*bfT,.05,.62),shProd=.35,shRest=Math.max(.03,1-shTop-shProd);
+    const segs=[['top',shTop,1.6,1.25,1.15],['prod',shProd,1.1,1.0,1.05],['rest',shRest,.7,.8,.9]];
+    const termBefore=Object.fromEntries(Object.entries(state.terms).map(([key,term])=>[key,{imp:term.imp,clk:term.clk,sp:term.sp,sal:term.sal,ord:term.ord}]));
+    const tot=emptyM();const segOut=[];
+    for(const sg of segs){
+      const impi=Math.round(imp*sg[1]);
+      if(impi<=0){segOut.push(null);continue;}
+      const clki=stoch(impi*ctr*sg[2]);
+      const cpci=clamp(cpc*sg[3],.15,kw.bid*(1+pl[sg[0]]/100)*(c.strategy==='updown'?1.5:1));
+      const res=attributeTerms(c,ag,kw,impi,clki,cpci,mods.cvr*sg[4]);
+      segOut.push(res);
+      tot.imp+=res.imp;tot.clk+=res.clk;tot.sp+=res.sp;tot.sal+=res.sal;tot.ord+=res.ord;
+    }
+    if(tot.imp<=0)continue;
+    const rem=c.budget-c.spendToday;
+    let capped=false;
+    if(tot.sp>rem){
+      capped=true;const f=rem>0?rem/tot.sp:0;
+      segOut.forEach(s=>{if(!s)return;s.imp=Math.floor(s.imp*f);s.clk=Math.floor(s.clk*f);s.ord=Math.floor(s.ord*f);s.sp=s.clk*(s.cpc||cpc);s.sal=s.ord*kw.price;});
+      tot.imp=Math.floor(tot.imp*f);tot.clk=Math.floor(tot.clk*f);tot.ord=Math.floor(tot.ord*f);
+      tot.sp=Math.min(rem,tot.sp*f);tot.sal=tot.ord*kw.price;
+      Object.entries(state.terms).forEach(([key,term])=>{
+        const before=termBefore[key]||{imp:0,clk:0,sp:0,sal:0,ord:0};
+        term.imp=before.imp+Math.floor((term.imp-before.imp)*f);
+        term.clk=before.clk+Math.floor((term.clk-before.clk)*f);
+        term.sp=before.sp+(term.sp-before.sp)*f;
+        term.sal=before.sal+Math.floor((term.sal-before.sal)*f);
+        term.ord=before.ord+Math.floor((term.ord-before.ord)*f);
+      });
+    }
+    addR(kw.daily,state.day,tot);
+    addR(c.daily,state.day,tot);
+    c.spendToday+=tot.sp;
+    c.hourly[state.day][h].sp+=tot.sp;c.hourly[state.day][h].sal+=tot.sal;
+    segs.forEach((sg,i)=>{const s=segOut[i];if(!s)return;const ps=c.placeStats[state.day][sg[0]];ps.imp+=s.imp;ps.clk+=s.clk;ps.sp+=s.sp;ps.sal+=s.sal;ps.ord+=s.ord;});
+    if(capped&&!c.outToday){c.outToday=true;log('warn','<b>'+esc(c.name)+'</b> hit its daily budget ('+money(c.budget)+') at '+h+':00 — ads paused until tomorrow.');}
+    if(Math.random()<.07&&tot.clk>0)pushTicker('Won <b>'+kfmt(tot.imp)+'</b> impressions on “'+esc(kw.text)+'” @ <b>'+money(tot.sp/Math.max(1,tot.clk))+'</b> CPC',false);
+    else if(bf<.32&&Math.random()<.1)pushTicker('Losing share on “'+esc(kw.text)+'” — bid '+money(kw.bid)+' vs market '+money(effM),true);
+   }
+  }
+ }
+}
+function applyRules(){
+ for(const rule of state.rules){
+  if(!rule.enabled)continue;
+  const targets=state.campaigns.filter(c=>rule.apply==='all'||rule.camps.includes(c.id));
+  for(const c of targets){
+   const m=derive(sumDaily(c.daily,state.day-7,state.day-1));
+   let hit=false;
+   if(rule.metric==='acos'&&m.sp>0&&m.sal>0&&m.acos*100<rule.value)hit=true;
+   if(rule.metric==='roas'&&m.sp>0&&m.roas>rule.value)hit=true;
+   if(hit){
+    const nb=r2(Math.min(c.budget*(1+rule.pct/100),rule.cap||Infinity));
+    if(nb>c.budget){c.budget=nb;rule.lastDay=state.day;log('success','Budget rule <b>'+esc(rule.name)+'</b> raised <b>'+esc(c.name)+'</b> budget to '+money(nb)+'.');}
+   }
+  }
+ }
+}
+function newDay(){
+ state.day++;
+ state.campaigns.forEach(c=>{c.spendToday=0;c.outToday=false;});
+ applyRules();
+ if(state.day-state.day0>=3)markLesson('sim3');
+ log('info','Daily budgets reset — <b>'+fmtDayFull(state.day)+'</b> begins.');
+ bus.emit('sim:day');
+}
+function tick(){
+ state.hour++;
+ if(state.hour>=24){state.hour=0;newDay();}
+ simHour();
+ updateSimBar();
+ bus.emit('render');
+ bus.emit('sim:tick');
+}
+const SPEEDS={1:1100,2:500,5:200,10:80};
+let acc=0,lastT=performance.now();
+setInterval(()=>{const now=performance.now();acc+=now-lastT;lastT=now;if(!state.running){acc=0;return;}const iv=SPEEDS[state.speed];let n=0;while(acc>=iv&&n<6){acc-=iv;tick();n++;}},60);
+
+/* =====================================================================
+   UI SHELL
+   ===================================================================== */
+function toast(title,sub,type){
+ type=type||'success';
+ const t=document.createElement('div');t.className='toast '+type;
+ t.innerHTML='<div><b>'+title+'</b>'+(sub?'<span>'+sub+'</span>':'')+'</div>';
+ $('#toasts').appendChild(t);
+ setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),260);},3600);
+}
+function openModal(html,wide){$('#modal-root').innerHTML='<div class="mroot" data-act="mroot"><div class="modal '+(wide?'wide':'')+'">'+html+'</div></div>';}
+function closeModal(){$('#modal-root').innerHTML='';wz=null;}
+function closeMenu(){$('#menu-root').innerHTML='';}
+document.addEventListener('mousedown',e=>{if(!e.target.closest('#menu-root .pop')&&!e.target.closest('[data-act="status-menu"]'))closeMenu();});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){if($('#tour-root').innerHTML){endTour();return;}closeModal();closeMenu();return;}
+ const t=e.target;
+ if(t.classList&&t.classList.contains('inline-edit')){
+  if(e.key==='Enter')commitInline(t);
+  if(e.key==='Escape'){t.dataset.cancel='1';render();}
+  return;
+ }
+ if(/INPUT|SELECT|TEXTAREA/.test(t.tagName)||t.tagName==='BUTTON')return;
+ if($('#modal-root').innerHTML!=='')return;
+ if(e.code==='Space'){e.preventDefault();toggleSim();}
+ else if(e.key==='s'||e.key==='S')skipDay();
+ else if(e.key==='c'||e.key==='C')startWizard();
+});
+document.addEventListener('focusout',e=>{const el=e.target;if(el.classList&&el.classList.contains('inline-edit')&&!el.dataset.cancel)commitInline(el);});
+window.addEventListener('error',e=>{if(e&&e.message)toast('⚠️ '+e.message,'Open the browser console for details. Data intact.','err');});
+
+/* =====================================================================
+   LESSONS
+   ===================================================================== */
+const LESSONS=[
+ {id:'explore',t:'Tour the Dashboard',how:'The Dashboard shows account-level KPIs — Spend, Sales, ACOS and ROAS — across every campaign, with sparklines and a live auction wire. Hover any metric label for a definition.',go:'dashboard',goL:'Open Dashboard'},
+ {id:'create',t:'Launch your first campaign',how:'Click Create campaign. Choose an ad type (Sponsored Products is the classic PPC format), set a daily budget and bid strategy, pick products, then add keywords with bids. Your campaign enters the auction immediately.',go:'create',goL:'Create campaign'},
+ {id:'bid',t:'Adjust a keyword bid',how:'Your bid is the max you pay per click. Higher bids win more impressions at a higher CPC — hover any bid to see the suggested range. Click a bid to edit it inline and watch impressions respond within the hour.',go:'keywords',goL:'Go to Keywords'},
+ {id:'pause',t:'Pause an underperformer',how:'Find a keyword with high ACOS and weak sales (try "cheap wireless earbuds"). Open its status menu and pause it. The wasted spend stops instantly — a core optimization habit.',go:'keywords',goL:'Go to Keywords'},
+ {id:'harvest',t:'Harvest a converting search term',how:'In Search terms you see what shoppers actually typed. Find a term with orders, then Add as exact keyword to control its bid directly. This is the classic harvesting workflow.',go:'searchterms',goL:'Go to Search terms'},
+ {id:'negative',t:'Add a negative keyword',how:'Terms like "free earbuds" burn budget without converting. Click Negative on a bad term (or add one in a campaign’s Negatives tab) and your ads stop showing for it.',go:'searchterms',goL:'Go to Search terms'},
+ {id:'placement',t:'Tune placements',how:'Open a campaign → Placements tab. Raise the Top of Search multiplier: you pay more per click there, but CTR and conversion usually rise. Compare placement ACOS before scaling.',go:'placements',goL:'Open Placements'},
+ {id:'rule',t:'Automate with a budget rule',how:'Budget rules scale winners while you sleep: e.g. if 7-day ACOS is under 25%, raise budget 20% (cap $120). Rules evaluate at midnight in the simulator.',go:'rules',goL:'Create a budget rule'},
+ {id:'scenario',t:'Survive a market shock',how:'From the Dashboard, inject Prime Day or a competitor bid war. CPCs, traffic and conversion shift live — adjust bids and budgets to protect ACOS through the event.',go:'dashboard',goL:'Open Market events'},
+ {id:'sim3',t:'Run the simulator for 3 days',how:'Press play (bottom bar) and let time flow. Auctions run hourly, budgets cap out, search terms accumulate, and rules fire at daybreak. Try 10× speed.',go:'play',goL:'Press play'},
+];
+function markLesson(id){
+ if(state.lessonsDone.has(id))return;
+ const l=LESSONS.find(x=>x.id===id);if(!l)return;
+ state.lessonsDone.add(id);
+ toast('🎓 Lesson complete',l.t,'info');
+ $('#nvLesN').textContent=state.lessonsDone.size+'/'+LESSONS.length;
+ if(state.lessonsDone.size===LESSONS.length)setTimeout(celebrate,700);
+}
+function celebrate(){
+ StudentProgress.createLocalProgressStore().recordAttempt(SimulatorAttempt.buildAttemptRecord({
+  scenario:{id:'ad-console-academy',simulatorId:'ad-console',version:'1.0.0',rubricVersion:'1.0.0'},
+  result:{score:100,maxScore:100,passed:true},completedAt:new Date().toISOString()
+ }));
+ const colors=['#FF9900','#067D62','#007185','#E47911','#2BB673','#B12704'];
+ const pieces=Array.from({length:38},()=>'<i style="left:'+rnd(0,100)+'%;background:'+pick(colors)+';animation-delay:'+rnd(0,.9)+'s;animation-duration:'+rnd(1.6,2.7)+'s"></i>').join('');
+ openModal('<div class="confetti">'+pieces+'</div><div class="m-h"><h2>🏆 All missions complete!</h2><button type="button" class="x" data-act="modal-close">✕</button></div>'+
+ '<div class="m-b" style="text-align:center;padding:26px 20px">'+
+ '<div style="font-size:46px">🎓</div>'+
+ '<h3 style="font-size:19px;margin:8px 0 6px">All '+LESSONS.length+' missions complete</h3>'+
+ '<p style="color:var(--sub);font-size:13px;max-width:400px;margin:0 auto 16px;line-height:1.55">You&apos;ve launched campaigns, harvested terms, blocked waste, tuned placements, survived market shocks and automated budgets — the full PPC operator loop, end to end.</p>'+
+ '<button type="button" class="btn btn-p" data-act="modal-close">Keep optimizing →</button></div>');
+}
+
+/* =====================================================================
+   UI FRAGMENTS
+   ===================================================================== */
+const I={
+ pencil:'<svg class="pen" width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5l2 2L4 10l-2.7.7L2 8l6.5-6.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+ caret:'<svg width="9" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+ play:'<svg width="17" height="17" viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5-9-5.5Z" fill="currentColor"/></svg>',
+ pause:'<svg width="16" height="16" viewBox="0 0 16 16"><rect x="3" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/><rect x="9.4" y="2.5" width="3.6" height="11" rx="1" fill="currentColor"/></svg>',
+};
+function statusOf(c){
+ if(c.status==='archived')return{k:'archived',l:'Archived',cls:'ch-gray'};
+ if(c.status==='paused')return{k:'paused',l:'Paused',cls:'ch-amber'};
+ if(c.outToday)return{k:'oob',l:'Out of budget',cls:'ch-red'};
+ return{k:'enabled',l:'Delivering',cls:'ch-green'};
+}
+function statusChip(c){const s=statusOf(c);return'<button type="button" class="stbtn" data-act="status-menu" data-kind="camp" data-id="'+c.id+'"><span class="chip '+s.cls+'">'+s.l+'</span>'+I.caret+'</button>';}
+function kwStatusChip(k){
+ if(k.status==='paused')return'<button type="button" class="stbtn" data-act="status-menu" data-kind="kw" data-id="'+k.id+'"><span class="chip ch-amber">Paused</span>'+I.caret+'</button>';
+ if(k.status==='archived')return'<button type="button" class="stbtn" data-act="status-menu" data-kind="kw" data-id="'+k.id+'"><span class="chip ch-gray">Archived</span>'+I.caret+'</button>';
+ return'<button type="button" class="stbtn" data-act="status-menu" data-kind="kw" data-id="'+k.id+'"><span class="chip ch-green">Enabled</span>'+I.caret+'</button>';
+}
+function agStatusChip(ag){
+ const s=ag.status==='paused'?['Paused','ch-amber']:['Enabled','ch-green'];
+ return'<button type="button" class="stbtn" data-act="status-menu" data-kind="ag" data-id="'+ag.id+'"><span class="chip '+s[1]+'">'+s[0]+'</span>'+I.caret+'</button>';
+}
+const STRAT_L={fixed:'Fixed bids',down:'Dynamic · down only',updown:'Dynamic · up & down'};
+const TYPE_L={SP:'Sponsored Products',SB:'Sponsored Brands',SD:'Sponsored Display'};
+const PLACE_L={top:'Top of Search',prod:'Product pages',rest:'Rest of search'};
+function ptile(p,lg){p=p||prod(null);return'<span class="ptile '+(lg?'lg':'')+'" style="background:'+p.color+'">'+p.emoji+'</span>';}
+function rangeSelect(){return'<select class="rsel" data-act="range">'+[[1,'Today'],[7,'Last 7 days'],[14,'Last 14 days'],[30,'Last 30 days'],[0,'All time']].map(o=>'<option value="'+o[0]+'" '+(state.rangeDays===o[0]?'selected':'')+'>'+o[1]+'</option>').join('')+'</select>';}
+function pageHead(t,sub,actions){return'<div class="phead"><div><h1>'+t+'</h1>'+(sub?'<p class="psub">'+sub+'</p>':'')+'</div><div class="phead-a">'+(actions||'')+'</div></div>';}
+function kpiCard(label,val,deltaHtml,tip,spark){return'<div class="kpi"><div class="kpi-l"><span class="tipd" data-tip="'+tip+'">'+label+'</span></div><div class="kpi-v num">'+val+'</div>'+(deltaHtml||'')+(spark||'')+'</div>';}
+function sparkSVG(vals,color){
+ if(!vals||vals.length<2)return'';
+ const w=96,h=24;const mx=Math.max.apply(null,vals.concat([1e-9])),mn=Math.min.apply(null,vals);
+ const pts=vals.map((v,i)=>((i/(vals.length-1)*w).toFixed(1))+','+((h-3-((v-mn)/(mx-mn||1))*(h-7)).toFixed(1)));
+ const last=pts[pts.length-1].split(',');
+ return'<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><polygon points="0,'+h+' '+pts.join(' ')+' '+w+','+h+'" fill="'+color+'" opacity=".1"></polygon><polyline points="'+pts.join(' ')+'" fill="none" stroke="'+color+'" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="'+last[0]+'" cy="'+last[1]+'" r="2.4" fill="'+color+'"/></svg>';
+}
+function sugRange(kw){const m=scenMods().cpc;return[r2(kw.market*m*.75),r2(kw.market*m*1.3)];}
+
+const MCOL={
+ imp:{k:'imp',l:'Impressions',tip:'Times your ad appeared on a search results or product page.',g:function(r){return r&&r.m?r.m.imp:0;}},
+ clk:{k:'clk',l:'Clicks',tip:'Shopper clicks on your ad.',g:function(r){return r&&r.m?r.m.clk:0;}},
+ ctr:{k:'ctr',l:'CTR',tip:'Click-through rate = Clicks ÷ Impressions. Measures ad relevance.',g:function(r){return r&&r.m?r.m.ctr:0;}},
+ cpc:{k:'cpc',l:'Avg CPC',tip:'Average cost per click = Spend ÷ Clicks.',g:function(r){return r&&r.m?r.m.cpc:0;}},
+ sp:{k:'sp',l:'Spend',tip:'Total ad spend in the selected period.',g:function(r){return r&&r.m?r.m.sp:0;}},
+ sal:{k:'sal',l:'Sales',tip:'Attributed sales within 7 days of a click.',g:function(r){return r&&r.m?r.m.sal:0;}},
+ acos:{k:'acos',l:'ACOS',tip:'Advertising Cost of Sales = Spend ÷ Sales. Lower is better.',g:function(r){return r&&r.m?r.m.acos:0;}},
+ roas:{k:'roas',l:'ROAS',tip:'Return on Ad Spend = Sales ÷ Spend. Higher is better.',g:function(r){return r&&r.m?r.m.roas:0;}},
+ ord:{k:'ord',l:'Orders',tip:'Attributed orders.',g:function(r){return r&&r.m?r.m.ord:0;}},
+};
+function buildTable(tid,cols,rows,rowHtml,defSort){
+ rows=Array.isArray(rows)?rows.slice():[];
+ const s=state.sort[tid]||(state.sort[tid]=defSort||{key:null,dir:-1});
+ if(s.key){
+  const col=cols.find(x=>x.k===s.key);
+  if(col&&col.g){
+   try{rows.sort((a,b)=>{const va=col.g(a),vb=col.g(b);return(typeof va==='string'?String(va).localeCompare(String(vb)):(Number(va)||0)-(Number(vb)||0))*s.dir;});}
+   catch(err){console.warn('sort fallback',err);}
+  }
+ }
+ const th=cols.map(col=>{
+  if(col.k)return'<th class="srt '+(s.key===col.k?'s-on ':'')+(s.key===col.k&&s.dir===1?'asc':'desc')+'" data-act="sort" data-tid="'+tid+'" data-k="'+col.k+'" '+(col.tip?'data-tip="'+col.tip+'"':'')+'>'+col.l+'<span class="arr">▲</span></th>';
+  return'<th>'+(col.l||'')+'</th>';
+ }).join('');
+ const body=rows.map((r,i)=>{try{return rowHtml(r,i);}catch(err){console.error('row render',err);return'<tr><td colspan="'+cols.length+'"><div class="empty">Row render error</div></td></tr>';}}).join('');
+ return'<div class="twrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+(body||'<tr><td colspan="'+cols.length+'"><div class="empty"><span class="big">🔍</span>No rows match the current filters.</div></td></tr>')+'</tbody></table></div>';
+}
+
+/* =====================================================================
+   CHARTS
+   ===================================================================== */
+const charts={};
+function destroyCharts(){Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});for(const k in charts)delete charts[k];}
+function seriesFor(campId,b){
+ const labels=[],sal=[],sp=[],acos=[];
+ for(let d=b.from;d<=b.to;d++){labels.push(fmtDay(d));const m=campId?sumDaily(campById[campId].daily,d,d):allMetrics({from:d,to:d});sal.push(r2(m.sal));sp.push(r2(m.sp));acos.push(m.sal?r2(m.sp/m.sal*100):null);}
+ return{labels,sal,sp,acos};
+}
+function perfChart(id,campId){
+ const cv=document.getElementById(id);if(!cv)return;
+ const b=rangeBounds();const s=seriesFor(campId,b);
+ const ds=[
+  {label:'Sales',data:s.sal,borderColor:'#067D62',backgroundColor:'rgba(6,125,98,.10)',yAxisID:'y',fill:true},
+  {label:'Spend',data:s.sp,borderColor:'#E47911',backgroundColor:'rgba(228,121,17,.08)',yAxisID:'y'},
+  {label:'ACOS %',data:s.acos,borderColor:'#007185',borderDash:[5,4],yAxisID:'y1',pointStyle:'line'},
+ ];
+ charts[id]=new Chart(cv,{type:'line',data:{labels:s.labels,datasets:ds.map(d=>Object.assign({},d,{borderWidth:2,pointRadius:0,pointHitRadius:8,tension:.35,spanGaps:true}))},
+ options:{responsive:true,maintainAspectRatio:false,animation:{duration:__structural?250:0},interaction:{mode:'index',intersect:false},
+ plugins:{legend:{display:false},tooltip:{backgroundColor:'#131921',padding:10,titleFont:{family:'Archivo'},bodyFont:{family:'Archivo',size:12},callbacks:{label:c=>' '+c.dataset.label+': '+(c.dataset.label==='ACOS %'?(c.parsed.y==null?'—':c.parsed.y+'%'):'$'+c.parsed.y)}}},
+ scales:{x:{grid:{display:false},ticks:{font:{family:'Archivo',size:10},color:'#767B7B',maxTicksLimit:10}},
+ y:{grid:{color:'#F0F2F2'},ticks:{font:{family:'Archivo',size:10},color:'#767B7B',callback:v=>'$'+kfmt(v)}},
+ y1:{position:'right',grid:{display:false},ticks:{font:{family:'Archivo',size:10},color:'#007185',callback:v=>v+'%'}}}}});
+}
+function donut(id){
+ const cv=document.getElementById(id);if(!cv)return;
+ const b=rangeBounds();const by={SP:0,SB:0,SD:0};
+ state.campaigns.forEach(c=>{by[c.type]+=sumDaily(c.daily,b.from,b.to).sp;});
+ charts[id]=new Chart(cv,{type:'doughnut',data:{labels:['Sponsored Products','Sponsored Brands','Sponsored Display'],datasets:[{data:[by.SP,by.SB,by.SD],backgroundColor:['#FF9900','#007185','#5F7FBF'],borderColor:'#fff',borderWidth:3}]},
+ options:{responsive:true,maintainAspectRatio:false,animation:{duration:__structural?300:0},cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:9,boxHeight:9,font:{family:'Archivo',size:11},color:'#565959'}},tooltip:{callbacks:{label:c=>' $'+r2(c.parsed).toLocaleString()}}}}});
+}
+function toggleDs(chartId,idx,btn){const ch=charts[chartId];if(!ch)return;ch.setDatasetVisibility(idx,!ch.isDatasetVisible(idx));btn.classList.toggle('off');ch.update();}
+
+/* =====================================================================
+   DASHBOARD PIECES
+   ===================================================================== */
+function tickerHTML(){
+ const items=state.ticker.length?state.ticker.slice().reverse().map(t=>'<span class="tk-i '+(t.warn?'warn':'')+'"><span class="tt">'+t.t+'</span>'+t.html+'</span>').join(''):'';
+ if(!items)return'<div class="tickerbar rise"><span class="tk-label cond">◉ AUCTION WIRE</span><div class="tk-wrap"><span class="tk-i" style="padding:9px 0">Press ▶ play — winning and losing auctions will stream here in real time.</span></div></div>';
+ let base=items;const n=state.ticker.length;if(n<6)base=Array.from({length:Math.ceil(6/n)},()=>items).join('');
+ return'<div class="tickerbar rise"><span class="tk-label cond">◉ AUCTION WIRE</span><div class="tk-wrap"><div class="tk-track">'+base+base+'</div></div></div>';
+}
+function scenCard(){
+ const t=state.day*24+state.hour;
+ const active=state.scen&&state.scen.ends>t?SCENARIOS.find(s=>s.id===state.scen.id):null;
+ return'<div class="card rise d3"><div class="card-h"><h3>Market events</h3><span class="sub">inject a shock, then react</span>'+(active?'<span class="chip ch-amber" style="margin-left:auto">'+active.icon+' '+Math.max(0,state.scen.ends-t)+'h left</span>':'')+'</div>'+
+ '<div class="card-b" style="padding:12px">'+
+ (active?'<div class="scen-active"><b style="font-family:Archivo;font-size:13px">'+active.icon+' '+active.name+'</b><button type="button" class="btn btn-xs btn-danger" style="margin-left:auto" data-act="scen-cancel">End event</button><p>'+active.desc+'</p></div>':'')+
+ '<div class="scengrid">'+SCENARIOS.map(s=>'<button type="button" class="scenbtn" data-act="scen-run" data-id="'+s.id+'" '+(active?'disabled':'')+' data-tip="'+esc(s.desc)+'"><span class="sic">'+s.icon+'</span><b>'+s.name+'</b><span class="sds">'+s.dur+'h · traffic ×'+s.vol+' · CPC ×'+s.cpc+' · CVR ×'+s.cvr+'</span></button>').join('')+'</div>'+
+ '</div></div>';
+}
+function heatCard(c){
+ const days=[];for(let d=Math.max(0,state.day-6);d<=state.day;d++)days.push(d);
+ const mode=state.heatMode;
+ let max=0;days.forEach(d=>{(c.hourly[d]||[]).forEach(hh=>{if(hh)max=Math.max(max,hh.sp||0);});});
+ const cell=(d,h)=>{const v=(c.hourly[d]&&c.hourly[d][h])||{sp:0,sal:0};
+  let bg='rgba(15,17,17,.045)',tip=fmtDay(d)+' '+String(h).padStart(2,'0')+':00 — spend '+money(v.sp);
+  if(mode==='sp'){const a=max?clamp((v.sp||0)/max,.03,1):.03;bg=a>.78?'rgba(177,39,4,'+a.toFixed(2)+')':'rgba(228,121,17,'+(a*.85+.06).toFixed(2)+')';}
+  else{const ac=v.sal?v.sp/v.sal:(v.sp?1.2:0);const a=clamp(ac/.6,0,1);
+   bg=v.sp?'rgba('+Math.round(214*a+6*(1-a))+','+Math.round(69*a+125*(1-a))+','+Math.round(65*a+98*(1-a))+',.88)':'rgba(15,17,17,.045)';
+   tip+=' · ACOS '+(v.sal?pctf(ac):'—');}
+  return'<span class="hcell" data-tip="'+tip+'" style="background:'+bg+'"></span>';};
+ const rows=days.map(d=>'<div class="hrow"><span class="hlab">'+fmtDay(d)+'</span>'+Array.from({length:24},(_,h)=>cell(d,h)).join('')+'</div>').join('');
+ return'<div class="card"><div class="card-h"><h3>Dayparting — hourly pattern</h3><span class="sub">last 7 days</span>'+
+  '<div class="pillset" style="margin-left:auto"><button type="button" class="'+(mode==='sp'?'on':'')+'" data-act="heat-mode" data-v="sp">Spend</button><button type="button" class="'+(mode==='acos'?'on':'')+'" data-act="heat-mode" data-v="acos">ACOS</button></div></div>'+
+  '<div class="card-b"><div class="heat">'+rows+'</div>'+
+  '<div class="haxis"><span>0h</span><span>4h</span><span>8h</span><span>12h</span><span>16h</span><span>20h</span><span>23h</span></div>'+
+  '<div class="fhint" style="margin-top:8px">Evening peaks drive most spend — the simulator runs hourly auctions with a realistic traffic curve.</div></div></div>';
+}
+function placementsTab(c){
+ const b=rangeBounds();
+ const ps={top:emptyM(),prod:emptyM(),rest:emptyM()};
+ for(let d=b.from;d<=b.to;d++){const day=c.placeStats[d];if(day)['top','prod','rest'].forEach(k=>{['imp','clk','sp','sal','ord'].forEach(f=>{ps[k][f]+=(day[k]&&day[k][f])||0;});});}
+ const totSp=ps.top.sp+ps.prod.sp+ps.rest.sp||1;
+ const defs=[['top','🎯','Top of Search','First row of search results — highest CTR & CPC.'],
+  ['prod','📦','Product pages','Ads on competitor & related product detail pages.'],
+  ['rest','🌐','Rest of search','Lower search positions — cheaper, thinner traffic.']];
+ const rows=defs.map(r=>{
+  const k=r[0],m=derive(ps[k]),share=ps[k].sp/totSp;
+  return'<div class="placerow">'+
+   '<div class="pl-head"><span class="plic">'+r[1]+'</span><div><b>'+r[2]+'</b><span class="pld">'+r[3]+'</span></div>'+
+    '<span class="chip '+(m.acos>.35?'ch-red':m.acos>.22?'ch-amber':'ch-green')+'" style="margin-left:auto">'+(m.sal?'ACOS '+pctf(m.acos):'—')+'</span></div>'+
+   '<div class="pl-ctl"><input type="range" min="0" max="900" step="10" value="'+(c.places[k]||0)+'" data-act="place-sl" data-key="'+k+'" data-camp="'+c.id+'" aria-label="'+p.label+' placement bid adjustment">'+
+    '<span class="plv" id="plv-'+k+'">+'+(c.places[k]||0)+'%</span></div>'+
+   '<div class="plbar"><i style="width:'+(share*100).toFixed(1)+'%"></i></div>'+
+   '<div class="pl-nums"><span>Spend '+money(ps[k].sp)+' ('+(share*100).toFixed(0)+'%)</span><span>Clicks '+kfmt(ps[k].clk)+'</span><span>Sales '+money(ps[k].sal)+'</span><span>Impressions '+kfmt(ps[k].imp)+'</span></div>'+
+  '</div>';}).join('');
+ return'<div class="card"><div class="card-h"><h3>Placement bid adjustments</h3><span class="sub">raise bids up to +900% per placement</span></div>'+
+  '<div class="card-b">'+rows+'<div class="fhint" style="margin-top:10px">💡 Example: +50% on Top of Search turns a $1.00 bid into $1.50 in top-of-page auctions. Check placement ACOS before scaling.</div></div></div>';
+}
+
+/* =====================================================================
+   CAMPAIGN TABS
+   ===================================================================== */
+function campOverviewTab(c){
+ const b=rangeBounds();
+ const sr=metric=>sparkSVG(campDaySeries(c,metric,b).slice(-10),{sp:'#E47911',sal:'#067D62',clk:'#007185',cpc:'#B12704',acos:'#B12704',roas:'#067D62'}[metric]||'#E47911');
+ const m=campMetrics(c,b);
+ return '<div class="kpis">'+
+   kpiCard('Spend',money(m.sp),'','Total spend for this campaign in range.',sr('sp'))+
+   kpiCard('Sales',money(m.sal),'','Attributed sales.',sr('sal'))+
+   kpiCard('ACOS',m.sal?pctf(m.acos):'—','','Spend ÷ Sales.',sr('acos'))+
+   kpiCard('ROAS',m.sp?m.roas.toFixed(2)+'×':'—','','Sales ÷ Spend.',sr('roas'))+
+   kpiCard('Clicks',kfmt(m.clk),'','Ad clicks.',sr('clk'))+
+   kpiCard('Avg CPC',money(m.cpc),'','Spend ÷ Clicks.',sr('cpc'))+'</div>'+
+  '<div class="card"><div class="card-h"><h3>Performance</h3><span class="sub">'+fmtDay(b.from)+' – '+fmtDay(b.to)+'</span><span class="chip ch-green livechip">LIVE</span></div><div class="chartbox"><canvas id="chCamp" data-chart="perf" data-camp="'+c.id+'"></canvas></div></div>'+
+  '<div style="margin-top:14px">'+heatCard(c)+'</div>';
+}
+function campAdgroupsRow(r,i){
+ const m=r.m,ag=r.ag;
+ const tiles=ag.products.map(pid=>{const p=prod(pid);return'<span title="'+esc(p.name)+'">'+ptile(p)+'</span>';}).join('');
+ return '<tr class="click" data-act="nav" data-view="adgroup" data-id="'+ag.id+'" style="animation-delay:'+Math.min(i,10)*30+'ms">'+
+  '<td><span class="cname">'+esc(ag.name)+'</span></td>'+
+  '<td><div style="display:flex;gap:4px">'+tiles+'</div></td>'+
+  '<td class="r editable" data-act="edit-agbid" data-id="'+ag.id+'">'+money(ag.defaultBid)+I.pencil+'</td>'+
+  '<td>'+agStatusChip(ag)+'</td>'+
+  '<td class="r">'+kfmt(m.imp)+'</td><td class="r">'+kfmt(m.clk)+'</td><td class="r">'+pctf(m.ctr)+'</td><td class="r">'+money(m.sp)+'</td><td class="r">'+money(m.sal)+'</td><td class="r">'+(m.sal?pctf(m.acos):'—')+'</td></tr>';
+}
+function campAdgroupsTab(c){
+ const rows=c.adGroups.map(ag=>agRow(ag,c));
+ const cols=[{l:'Ad group'},{l:'Products'},{l:'Default bid',k:'bid',g:function(r){return r.ag.defaultBid;}},{l:'Status'},MCOL.imp,MCOL.clk,MCOL.ctr,MCOL.sp,MCOL.sal,MCOL.acos];
+ return '<div class="card">'+buildTable('ags',cols,rows,campAdgroupsRow,{key:'sp',dir:-1})+'</div>';
+}
+function campKeywordsTab(c){
+ const rows=[];
+ c.adGroups.forEach(ag=>ag.keywords.forEach(k=>rows.push({k:k,ag:ag,c:c})));
+ return kwTableHTML(rows,{scope:'camp',campId:c.id,addBtn:'<button type="button" class="btn btn-p btn-sm" data-act="add-kw" data-camp="'+c.id+'">+ Add keyword</button>'});
+}
+function campNegativesTab(c){
+ const negs=c.negatives||[];
+ const rowsHtml=negs.map((n,i)=>'<tr><td><b>'+esc(n.t)+'</b></td><td><span class="mchip">'+(n.m==='ne'?'Negative exact':'Negative phrase')+'</span></td><td class="r"><button type="button" class="btn btn-xs btn-danger" data-act="del-neg" data-camp="'+c.id+'" data-i="'+i+'">Remove</button></td></tr>').join('');
+ return '<div class="card"><div class="card-b">'+
+  '<div style="display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap">'+
+   '<input class="inp" id="negInput" placeholder="Add negative keyword e.g. free, used, repair" style="max-width:320px">'+
+   '<select class="sel" id="negMatch" style="width:auto"><option value="ne">Negative exact</option><option value="np">Negative phrase</option></select>'+
+   '<button type="button" class="btn btn-p" data-act="add-neg" data-camp="'+c.id+'">Add negative</button></div>'+
+  (negs.length?'<div class="twrap"><table class="tbl nomw"><thead><tr><th>Negative keyword</th><th>Match type</th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'
+   :'<div class="empty"><span class="big">🚫</span>No negative keywords yet. Block irrelevant queries to stop wasted spend.</div>')+
+  '</div></div>';
+}
+function campSettingsTab(c){
+ return '<div class="card"><div class="card-b" style="max-width:560px">'+
+  '<label class="fld">Campaign name</label><input class="inp" id="setName" value="'+esc(c.name)+'" style="margin-bottom:14px">'+
+  '<label class="fld">Daily budget</label><input class="inp num" id="setBudget" type="number" step="1" min="1" value="'+c.budget+'" style="margin-bottom:14px">'+
+  '<label class="fld">Bidding strategy</label><select class="sel" id="setStrat" style="margin-bottom:14px">'+Object.entries(STRAT_L).map(o=>'<option value="'+o[0]+'" '+(c.strategy===o[0]?'selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+  '<label class="fld">Portfolio</label><select class="sel" id="setPort" style="margin-bottom:18px"><option value="">No portfolio</option>'+state.portfolios.map(p=>'<option value="'+p.id+'" '+(c.portfolio===p.id?'selected':'')+'>'+esc(p.name)+'</option>').join('')+'</select>'+
+  '<button type="button" class="btn btn-p" data-act="save-settings" data-id="'+c.id+'">Save changes</button>'+
+  '<div style="margin-top:22px;padding-top:16px;border-top:1px dashed var(--border)">'+
+   '<b style="font-family:Archivo;font-size:13px;color:var(--red)">Danger zone</b>'+
+   '<p class="fhint" style="margin:4px 0 10px">Archiving permanently removes the campaign from delivery.</p>'+
+   '<button type="button" class="btn btn-danger" data-act="archive-camp" data-id="'+c.id+'">Archive campaign</button>'+
+  '</div></div></div>';
+}
+function campTabBody(c){
+ const fn=CAMP_TABS[state.tab||'overview']||CAMP_TABS.overview;
+ return fn(c);
+}
+
+/* =====================================================================
+   VIEWS
+   ===================================================================== */
+function errorCard(err){
+ const msg=String(err&&(err.stack||err.message)||err);
+ return '<div class="card rise" style="margin-top:30px;border-left:4px solid var(--red)">'+
+  '<div class="card-h"><h3>⚠️ Rendering hiccup</h3><span class="sub">the auction engine is still running</span></div>'+
+  '<div class="card-b">'+
+   '<p style="font-size:13px;color:var(--sub);margin-bottom:10px">Something went wrong while drawing this view. Jump back to the Dashboard or reload — your simulation data is intact.</p>'+
+   '<code style="display:block;background:#F7F8F8;border:1px solid var(--border2);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--red);margin-bottom:12px;word-break:break-word;white-space:pre-wrap">'+esc(msg)+'</code>'+
+   '<div style="display:flex;gap:9px"><button type="button" class="btn btn-p" data-act="err-dashboard">Back to Dashboard</button><button type="button" class="btn" data-act="err-reload">Reload console</button></div>'+
+  '</div></div>';
+}
+function buildView(){
+ const fn=VIEWS[state.view.name]||VIEWS.dashboard;
+ return fn();
+}
+
+let pendingTickRender=false, __structural=true, _wireSig='';
+function renderWire(){
+ const slot=$('#wire-slot'); if(!slot)return;
+ const onDash=state.view.name==='dashboard';
+ document.body.classList.toggle('has-wire',onDash);
+ if(!onDash){ if(slot.innerHTML){slot.innerHTML='';_wireSig='';} return; }
+ const first=state.ticker[0];
+ const sig=(state.ticker.length)+'|'+(first?first.id:'')+'|'+(__structural?1:0);
+ if(sig===_wireSig)return;
+ _wireSig=sig;
+ slot.innerHTML=tickerHTML();
+}
+function render(){
+ const structural=!pendingTickRender; pendingTickRender=false;
+ __structural=structural;
+ document.body.classList.toggle('anim-on',structural);
+ destroyCharts();
+ const v=state.view;const el=$('#content');
+ let html='';
+ try{html=buildView();}
+ catch(err){html=errorCard(err);console.error(err);}
+ let savedScroll=0;
+ if(!structural){try{savedScroll=el.scrollTop;}catch(e){}}
+ el.innerHTML=html;
+ if(!structural){try{el.scrollTop=savedScroll;}catch(e){}}
+ renderWire();
+ // Chart rendering can fail independently per canvas (bad data, a blocked
+ // CDN, a Chart.js quirk) — isolate it so one bad chart can't also take
+ // down the sidebar badges/highlighting/bell below.
+ $$('#content canvas[data-chart]').forEach(cv=>{
+  try{if(cv.dataset.chart==='perf')perfChart(cv.id,cv.dataset.camp||null);else donut(cv.id);}
+  catch(chartErr){console.error('chart render failed',chartErr);}
+ });
+ try{
+  $$('.nv').forEach(n=>n.classList.toggle('on',n.dataset.view===((v.name==='campaign'||v.name==='adgroup')?'campaigns':v.name)));
+  $('#nvCampN').textContent=state.campaigns.filter(c=>c.status!=='archived').length;
+  $('#nvKwN').textContent=Object.keys(kwById).length;
+  $('#nvTermN').textContent=Object.keys(state.terms).length;
+  $('#nvLesN').textContent=state.lessonsDone.size+'/'+LESSONS.length;
+  if(v.name==='dashboard'){state.unread=0;updateBell();}
+ }catch(err2){console.error(err2);}
+ state.animateNext=false;
+}
+let _frameQueued=false;
+function onRenderRequest(){
+ if(_frameQueued)return;
+ _frameQueued=true;
+ requestAnimationFrame(()=>{
+  _frameQueued=false;
+  if($('#modal-root').innerHTML!=='')return;
+  const ae=document.activeElement;
+  if(ae&&ae.matches&&ae.matches('#content input, #content select, #content textarea'))return;
+  pendingTickRender=true;
+  render();
+ });
+}
+
+function vDashboard(){
+ const b=rangeBounds(),p=priorBounds();
+ const cur=allMetrics(b),prev=p?allMetrics(p):null;
+ const d=k=>prev?deltaChip(cur[k],prev[k],k==='acos'||k==='cpc'):'';
+ const sr=metric=>sparkSVG(daySeries(metric,b).slice(-10),{sp:'#E47911',sal:'#067D62',ord:'#007185',acos:'#B12704',roas:'#067D62',clk:'#007185',ctr:'#5F7FBF',cpc:'#B12704'}[metric]);
+ const feed=state.logs.slice(0,40).map(l=>'<div class="fi '+l.type+'"><span class="fdot"></span><div>'+l.msg+'</div><span class="ft">'+l.t+'</span></div>').join('')||'<div class="empty">No activity yet — press play to run the simulator.</div>';
+ const rows=state.campaigns.map(c=>campRow(c)).sort((a,b2)=>b2.m.sp-a.m.sp).slice(0,5);
+ const trows=rows.map((r,i)=>'<tr class="click" data-act="nav" data-view="campaign" data-id="'+r.c.id+'" style="animation-delay:'+i*40+'ms"><td><span class="cname">'+esc(r.c.name)+'</span><div class="csub"><span class="tchip t-'+r.c.type+'">'+r.c.type+'</span>'+statusOf(r.c).l+'</div></td><td class="r">'+kfmt(r.m.clk)+'</td><td class="r">'+money(r.m.sp)+'</td><td class="r">'+money(r.m.sal)+'</td><td class="r" style="color:'+(r.m.acos>.35?'var(--red)':r.m.acos>.22?'var(--amber)':'var(--green)')+';font-weight:700">'+(r.m.sal?pctf(r.m.acos):'—')+'</td></tr>').join('');
+ return pageHead('Advertising Dashboard','Acme Storefront · Amazon.com · <span class="tipd" data-tip="All metrics reflect the selected date range. Hover labels for definitions.">demo data</span>',
+  rangeSelect()+'<button type="button" class="btn btn-p" data-act="create">+ Create campaign</button>')+
+ '<div class="kpis rise">'+
+   kpiCard('Spend',money(cur.sp),d('sp'),'Total ad spend across all campaigns.',sr('sp'))+
+   kpiCard('Sales',money(cur.sal),d('sal'),'Attributed sales within 7 days of a click.',sr('sal'))+
+   kpiCard('Orders',String(cur.ord),d('ord'),'Attributed orders.',sr('ord'))+
+   kpiCard('ACOS',cur.sal?pctf(cur.acos):'—',d('acos'),'Advertising Cost of Sales = Spend ÷ Sales. The headline efficiency metric — lower is better.',sr('acos'))+
+   kpiCard('ROAS',cur.sp?cur.roas.toFixed(2)+'×':'—',prev?deltaChip(cur.roas,prev.roas,false):'','Return on Ad Spend = Sales ÷ Spend.',sr('roas'))+
+   kpiCard('Clicks',kfmt(cur.clk),d('clk'),'Total ad clicks.',sr('clk'))+
+   kpiCard('CTR',pctf(cur.ctr),d('ctr'),'Click-through rate = Clicks ÷ Impressions.',sr('ctr'))+
+   kpiCard('Avg CPC',money(cur.cpc),d('cpc'),'Average cost per click = Spend ÷ Clicks.',sr('cpc'))+
+  '</div>'+
+  '<div class="dgrid">'+
+   '<div class="card rise d1"><div class="card-h"><h3>Performance over time</h3><span class="sub">'+fmtDay(b.from)+' – '+fmtDay(b.to)+'</span><span class="chip ch-green livechip">LIVE</span>'+
+     '<div class="legend">'+
+      '<button type="button" class="lchip" data-act="toggle-ds" data-chart="chDash" data-idx="0"><i style="background:#067D62"></i>Sales</button>'+
+      '<button type="button" class="lchip" data-act="toggle-ds" data-chart="chDash" data-idx="1"><i style="background:#E47911"></i>Spend</button>'+
+      '<button type="button" class="lchip" data-act="toggle-ds" data-chart="chDash" data-idx="2"><i style="background:#007185"></i>ACOS</button>'+
+     '</div></div>'+
+    '<div class="chartbox"><canvas id="chDash" data-chart="perf"></canvas></div></div>'+
+   '<div style="display:flex;flex-direction:column;gap:14px;min-width:0">'+
+    '<div class="card rise d2"><div class="card-h"><h3>Live activity</h3><span class="chip '+(state.running?'ch-green':'ch-gray')+'">'+(state.running?'Streaming':'Paused')+'</span></div><div class="feed">'+feed+'</div></div>'+
+    scenCard()+
+   '</div>'+
+  '</div>'+
+  '<div class="dgrid2">'+
+   '<div class="card rise d3"><div class="card-h"><h3>Top campaigns by spend</h3><button type="button" class="btn btn-sm" style="margin-left:auto" data-act="nav" data-view="campaigns">View all</button></div>'+
+    '<div class="twrap"><table class="tbl nomw"><thead><tr><th>Campaign</th><th class="r">Clicks</th><th class="r">Spend</th><th class="r">Sales</th><th class="r">ACOS</th></tr></thead><tbody>'+trows+'</tbody></table></div></div>'+
+   '<div class="card rise d4"><div class="card-h"><h3>Spend by ad type</h3></div><div class="chartbox" style="height:250px"><canvas id="chDonut" data-chart="donut"></canvas></div></div>'+
+  '</div>';
+}
+
+function vCampaigns(){
+ const f=state.filters.campaigns;const b=rangeBounds();
+ let rows=state.campaigns.map(c=>campRow(c));
+ if(f.q)rows=rows.filter(r=>r.c.name.toLowerCase().includes(f.q.toLowerCase()));
+ if(f.status)rows=rows.filter(r=>f.status==='oob'?r.s.k==='oob':r.c.status===f.status);
+ if(f.type)rows=rows.filter(r=>r.c.type===f.type);
+ if(f.tgt)rows=rows.filter(r=>r.c.targeting===f.tgt);
+ const cols=[{l:'',k:null},{l:'Campaign'},{l:'Status'},{l:'Budget',tip:'Daily budget — click to edit inline.',k:'budget',g:function(r){return r.c.budget;}},{l:'Strategy'},{l:'Targeting'},MCOL.imp,MCOL.clk,MCOL.ctr,MCOL.cpc,MCOL.sp,MCOL.sal,MCOL.acos,MCOL.roas];
+ const rowHtml=(r,i)=>{
+  const port=r.c.portfolio?(state.portfolios.find(p=>p.id===r.c.portfolio)||{}).name:'';
+  return '<tr class="click" data-act="nav" data-view="campaign" data-id="'+r.c.id+'" style="animation-delay:'+Math.min(i,12)*25+'ms">'+
+  '<td><input type="checkbox" class="ckb" data-act="ck-camp" data-id="'+r.c.id+'" '+(state.selCamps.has(r.c.id)?'checked':'')+'></td>'+
+  '<td><span class="cname">'+esc(r.c.name)+'</span><div class="csub"><span class="tchip t-'+r.c.type+'">'+r.c.type+'</span><span>'+TYPE_L[r.c.type]+'</span>'+(port?'<span>· '+esc(port)+'</span>':'')+'</div></td>'+
+  '<td>'+statusChip(r.c)+'</td>'+
+  '<td class="r editable" data-act="edit-budget" data-id="'+r.c.id+'">'+money(r.c.budget)+I.pencil+'</td>'+
+  '<td style="font-size:12px;color:var(--sub)">'+STRAT_L[r.c.strategy].split('·')[0].trim()+'</td>'+
+  '<td style="font-size:12px;color:var(--sub);text-transform:capitalize">'+(r.c.targeting==='auto'?'Automatic':'Manual')+'</td>'+
+  '<td class="r">'+kfmt(r.m.imp)+'</td><td class="r">'+kfmt(r.m.clk)+'</td><td class="r">'+pctf(r.m.ctr)+'</td><td class="r">'+money(r.m.cpc)+'</td><td class="r" style="font-weight:700">'+money(r.m.sp)+'</td><td class="r" style="font-weight:700">'+money(r.m.sal)+'</td>'+
+  '<td class="r" style="color:'+(r.m.acos>.35?'var(--red)':r.m.acos>.22?'var(--amber)':'var(--green)')+';font-weight:700">'+(r.m.sal?pctf(r.m.acos):'—')+'</td>'+
+  '<td class="r">'+(r.m.sp?r.m.roas.toFixed(2)+'×':'—')+'</td></tr>';};
+ const bulk=state.selCamps.size?'<div class="bulkbar"><b>'+state.selCamps.size+' selected</b>'+
+   '<button type="button" class="btn btn-sm" data-act="bulk-camp" data-v="enabled">Enable</button>'+
+   '<button type="button" class="btn btn-sm" data-act="bulk-camp" data-v="paused">Pause</button>'+
+   '<button type="button" class="btn btn-sm" data-act="bulk-camp" data-v="archived">Archive</button>'+
+   '<button type="button" class="btn btn-sm" data-act="bulk-budget" data-v="1.2">Budget +20%</button>'+
+   '<button type="button" class="btn btn-sm" data-act="bulk-budget" data-v="0.8">Budget −20%</button>'+
+   '<span class="sp"></span><button type="button" class="btn btn-sm" data-act="bulk-clear">Clear</button></div>':'';
+ return pageHead('Campaigns',rows.length+' of '+state.campaigns.length+' campaigns',rangeSelect()+'<button type="button" class="btn btn-p" data-act="create">+ Create campaign</button>')+
+ '<div class="card rise" style="margin-bottom:12px"><div class="fbar">'+
+   '<input class="inp" placeholder="Search campaigns…" value="'+esc(f.q)+'" data-act="f-camp-q">'+
+   '<select class="sel" data-act="f-camp-status"><option value="">Status: All</option><option value="enabled" '+(f.status==='enabled'?'selected':'')+'>Delivering</option><option value="paused" '+(f.status==='paused'?'selected':'')+'>Paused</option><option value="oob" '+(f.status==='oob'?'selected':'')+'>Out of budget</option><option value="archived" '+(f.status==='archived'?'selected':'')+'>Archived</option></select>'+
+   '<select class="sel" data-act="f-camp-type"><option value="">Type: All</option><option value="SP" '+(f.type==='SP'?'selected':'')+'>Sponsored Products</option><option value="SB" '+(f.type==='SB'?'selected':'')+'>Sponsored Brands</option><option value="SD" '+(f.type==='SD'?'selected':'')+'>Sponsored Display</option></select>'+
+   '<select class="sel" data-act="f-camp-tgt"><option value="">Targeting: All</option><option value="auto" '+(f.tgt==='auto'?'selected':'')+'>Automatic</option><option value="manual" '+(f.tgt==='manual'?'selected':'')+'>Manual</option></select>'+
+   '<span class="fcount">Period: '+fmtDay(b.from)+' – '+fmtDay(b.to)+'</span>'+
+  '</div></div>'+bulk+
+  '<div class="card rise d1">'+buildTable('camps',cols,rows,rowHtml,{key:'sp',dir:-1})+'</div>';
+}
+
+function vCampaign(){
+ const c=campById[state.view.id];
+ if(!c)return '<div class="empty"><span class="big">🗂</span>Campaign not found.<br><br><button type="button" class="btn btn-p" data-act="nav" data-view="campaigns">Back to campaigns</button></div>';
+ const terms=Object.values(state.terms).filter(t=>t.campId===c.id);
+ const negs=c.negatives||[];
+ const kwCount=c.adGroups.reduce((s,a)=>s+a.keywords.length,0);
+ const tabs=[['overview','Overview'],['adgroups','Ad groups',c.adGroups.length],['keywords','Keywords',kwCount],['placements','Placements'],['searchterms','Search terms',terms.length],['negatives','Negatives',negs.length],['settings','Settings']];
+ const tabsHtml=tabs.map(t=>'<button type="button" class="tab '+(state.tab===t[0]?'on':'')+'" data-act="tab" data-tab="'+t[0]+'">'+t[1]+(t[2]!==undefined?'<span class="n">'+t[2]+'</span>':'')+'</button>').join('');
+ return '<button type="button" class="backlink" data-act="nav" data-view="campaigns">← All campaigns</button>'+
+ pageHead(esc(c.name),'Started '+fmtDayFull(c.startDay)+' · '+TYPE_L[c.type],
+  c.status==='paused'?'<button type="button" class="btn" data-act="quick-status" data-id="'+c.id+'" data-v="enabled">▶ Enable</button>':'<button type="button" class="btn" data-act="quick-status" data-id="'+c.id+'" data-v="paused">❚❚ Pause</button>')+
+ '<div class="sumgrid rise">'+
+   '<div class="sumcell"><label>Daily budget</label><div class="v editable" data-act="edit-budget" data-id="'+c.id+'">'+money(c.budget)+I.pencil+'</div></div>'+
+   '<div class="sumcell"><label>Today’s spend</label><div class="v num">'+money(c.spendToday)+' <span style="font-size:11px;color:var(--faint);font-weight:400">/ '+money(c.budget)+'</span></div><div style="height:4px;background:#EEF1F1;border-radius:2px;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:'+clamp(c.spendToday/c.budget*100,0,100)+'%;background:'+(c.outToday?'#D64541':'#FF9900')+';transition:width .4s"></i></div></div>'+
+   '<div class="sumcell"><label>Bid strategy</label><div class="v" style="font-size:13px">'+STRAT_L[c.strategy]+'</div></div>'+
+   '<div class="sumcell"><label>Targeting</label><div class="v" style="font-size:13px;text-transform:capitalize">'+(c.targeting==='auto'?'Automatic':'Manual')+'</div></div>'+
+   '<div class="sumcell"><label>Status</label><div class="v">'+statusChip(c)+'</div></div>'+
+  '</div>'+
+  '<div class="tabs rise d1">'+tabsHtml+'</div>'+
+  '<div class="rise d2">'+campTabBody(c)+'</div>';
+}
+
+function kwRowHtml(opts){
+ return function(r,i){
+  const m=r.m||kwMetrics(r.k);const sg=sugRange(r.k);
+  const marketNow=(r.k.market*scenMods().cpc).toFixed(2);
+  const clickAttr=opts.scope==='global'?' class="click" data-act="nav" data-view="campaign" data-id="'+r.c.id+'"':'';
+  const campCell=opts.scope==='global'?'<td><span class="cname" style="font-size:12.5px">'+esc(r.c.name)+'</span></td>':'';
+  const kwCell=r.k.hidden
+   ?'<td><span style="color:var(--sub);font-style:italic">'+esc(r.k.text)+'</span><div class="csub">targets shoppers automatically</div></td>'
+   :'<td><b style="font-size:13px">'+esc(r.k.text)+'</b></td>';
+  return '<tr'+clickAttr+' style="animation-delay:'+Math.min(i,14)*22+'ms">'+
+   '<td><input type="checkbox" class="ckb" data-act="ck-kw" data-id="'+r.k.id+'" '+(state.selKws.has(r.k.id)?'checked':'')+'></td>'+
+   kwCell+
+   '<td><span class="mchip m-'+r.k.match+'">'+r.k.match+'</span></td>'+
+   campCell+
+   '<td class="r editable" data-act="edit-bid" data-id="'+r.k.id+'" data-tip="Suggested $'+sg[0].toFixed(2)+'–$'+sg[1].toFixed(2)+' · market ~$'+marketNow+'">'+money(r.k.bid)+I.pencil+'</td>'+
+   '<td class="r">'+kfmt(m.imp)+'</td><td class="r">'+kfmt(m.clk)+'</td><td class="r">'+pctf(m.ctr)+'</td><td class="r">'+money(m.cpc)+'</td><td class="r" style="font-weight:700">'+money(m.sp)+'</td><td class="r" style="font-weight:700">'+money(m.sal)+'</td>'+
+   '<td class="r" style="color:'+(m.acos>.35?'var(--red)':m.acos>.22?'var(--amber)':'var(--green)')+';font-weight:700">'+(m.sal?pctf(m.acos):'—')+'</td><td class="r">'+m.ord+'</td></tr>';
+ };
+}
+function kwTableHTML(rows,opts){
+ opts=opts||{};
+ rows=(Array.isArray(rows)?rows:[]).map(r=>(r&&r.m)?r:kwRow(r.k,r.ag,r.c));
+ const f=state.filters.keywords;
+ if(opts.scope==='global'){
+  if(f.q)rows=rows.filter(r=>r.k.text.toLowerCase().includes(f.q.toLowerCase()));
+  if(f.camp)rows=rows.filter(r=>r.c.id===f.camp);
+  if(f.match)rows=rows.filter(r=>r.k.match===f.match);
+  if(f.status)rows=rows.filter(r=>r.k.status===f.status);
+ }
+ const cols=[{l:'',k:null},{l:'Keyword',k:'kw',g:function(r){return r.k.text;}},{l:'Match'}];
+ if(opts.scope==='global')cols.push({l:'Campaign'});
+ cols.push({l:'Bid',tip:'Your max cost-per-click. Click to edit — the simulator reacts within the hour. Hover for the suggested range.',k:'bid',g:function(r){return r.k.bid;}});
+ cols.push(MCOL.imp,MCOL.clk,MCOL.ctr,MCOL.cpc,MCOL.sp,MCOL.sal,MCOL.acos,MCOL.ord);
+ const toolbar='<div class="fbar" style="border-bottom:1px solid var(--border2)">'+
+  (opts.scope==='global'
+   ?'<input class="inp" placeholder="Search keywords…" value="'+esc(f.q)+'" data-act="f-kw-q">'+
+    '<select class="sel" data-act="f-kw-camp"><option value="">Campaign: All</option>'+state.campaigns.map(c=>'<option value="'+c.id+'" '+(f.camp===c.id?'selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select>'+
+    '<select class="sel" data-act="f-kw-match"><option value="">Match: All</option><option value="exact" '+(f.match==='exact'?'selected':'')+'>Exact</option><option value="phrase" '+(f.match==='phrase'?'selected':'')+'>Phrase</option><option value="broad" '+(f.match==='broad'?'selected':'')+'>Broad</option><option value="auto" '+(f.match==='auto'?'selected':'')+'>Auto</option></select>'+
+    '<select class="sel" data-act="f-kw-status"><option value="">Status: All</option><option value="enabled" '+(f.status==='enabled'?'selected':'')+'>Enabled</option><option value="paused" '+(f.status==='paused'?'selected':'')+'>Paused</option></select>'
+   :'<span style="font-size:12.5px;color:var(--sub)">Click any <b>bid</b> to edit it inline · hover a bid for its suggested range. Pausing stops spend instantly.</span>')+
+  '<span class="fcount">'+rows.length+' keywords</span>'+(opts.addBtn||'')+'</div>';
+ const bulk=(opts.scope==='global'&&state.selKws.size)?'<div class="bulkbar"><b>'+state.selKws.size+' selected</b>'+
+  '<button type="button" class="btn btn-sm" data-act="bulk-kw" data-v="enabled">Enable</button>'+
+  '<button type="button" class="btn btn-sm" data-act="bulk-kw" data-v="paused">Pause</button>'+
+  '<button type="button" class="btn btn-sm" data-act="bulk-kwbid" data-v="1.1">Bids +10%</button>'+
+  '<button type="button" class="btn btn-sm" data-act="bulk-kwbid" data-v="0.9">Bids −10%</button>'+
+  '<span class="sp"></span><button type="button" class="btn btn-sm" data-act="bulk-clear">Clear</button></div>':'';
+ const tid=opts.scope==='global'?'kwsG':'kws'+(opts.campId||opts.agId||'');
+ const html=buildTable(tid,cols,rows,kwRowHtml(opts),{key:'sp',dir:-1});
+ return '<div class="card">'+toolbar+bulk+html+'</div>';
+}
+function vKeywords(){
+ const rows=[];
+ state.campaigns.forEach(c=>c.adGroups.forEach(ag=>ag.keywords.forEach(k=>rows.push({k:k,ag:ag,c:c}))));
+ return pageHead('Keywords','All targeting across '+state.campaigns.length+' campaigns',rangeSelect())+kwTableHTML(rows,{scope:'global'});
+}
+
+function termsTableHTML(list,cfg){
+ cfg=cfg||{};const campScope=!!cfg.campScope;
+ const f=state.filters.terms;
+ let rows=list.map(t=>termRow(t));
+ if(f.q)rows=rows.filter(r=>r.t.text.toLowerCase().includes(f.q.toLowerCase()));
+ rows.sort((a,b2)=>b2.t.sp-a.t.sp);
+ const body=rows.slice(0,120).map((r,i)=>{
+  const c=campById[r.t.campId];
+  const act=r.t.status==='added'?'<span class="chip ch-blue">Added ✓</span>'
+   :r.t.status==='negated'?'<span class="chip ch-gray">Negated</span>'
+   :'<button type="button" class="btn btn-xs btn-p" data-act="term-add" data-id="'+r.t.id+'">+ Exact KW</button> <button type="button" class="btn btn-xs btn-danger" data-act="term-neg" data-id="'+r.t.id+'">Negative</button>';
+  return '<tr style="animation-delay:'+Math.min(i,14)*20+'ms">'+
+   '<td><b style="font-size:13px">'+esc(r.t.text)+'</b><div class="csub">matched: '+esc(r.t.kwText)+(r.t.q<.3?' · <span style="color:var(--red);font-weight:700">low intent</span>':r.t.q>.85?' · <span style="color:var(--green);font-weight:700">high intent</span>':'')+'</div></td>'+
+   (campScope?'':'<td><span style="font-size:12px;color:var(--sub)">'+esc(c?c.name:'')+'</span></td>')+
+   '<td class="r">'+kfmt(r.t.imp)+'</td><td class="r">'+kfmt(r.t.clk)+'</td><td class="r">'+money(r.t.sp)+'</td><td class="r" style="font-weight:700">'+money(r.t.sal)+'</td>'+
+   '<td class="r" style="color:'+(r.t.acos>.35?'var(--red)':r.t.acos>.22?'var(--amber)':'var(--green)')+';font-weight:700">'+(r.t.sal?pctf(r.t.acos):'—')+'</td><td class="r">'+r.t.ord+'</td>'+
+   '<td class="r" style="white-space:nowrap">'+act+'</td></tr>';}).join('');
+ return '<div class="card"><div class="fbar" style="border-bottom:1px solid var(--border2)">'+
+   '<input class="inp" placeholder="Search terms…" value="'+esc(f.q)+'" data-act="f-term-q" style="max-width:280px">'+
+   '<span class="fcount">'+rows.length+' terms · sorted by spend</span></div>'+
+  '<div class="hintbar">💡 <span><b>Pro tip:</b> terms marked <span style="color:var(--red);font-weight:700">low intent</span> rarely convert — negate them. Terms with orders and healthy ACOS should be harvested into exact-match keywords.</span></div>'+
+  (rows.length?'<div class="twrap"><table class="tbl"><thead><tr><th>Search term</th>'+(campScope?'':'<th>Campaign</th>')+'<th class="r">Impressions</th><th class="r">Clicks</th><th class="r">Spend</th><th class="r">Sales</th><th class="r">ACOS</th><th class="r">Orders</th><th class="r">Action</th></tr></thead><tbody>'+body+'</tbody></table></div>'
+   :'<div class="empty"><span class="big">🕵️</span>No search terms recorded yet. Run the simulator — real shopper queries will appear here.</div>')+'</div>';
+}
+function vTerms(){
+ return pageHead('Search terms','What shoppers actually typed before clicking your ads',rangeSelect())+termsTableHTML(Object.values(state.terms),{});
+}
+
+function vAdgroups(){
+ const rows=state.campaigns.flatMap(c=>c.adGroups.map(ag=>agRow(ag,c)));
+ const cols=[{l:'Ad group'},{l:'Campaign'},{l:'Products'},{l:'Default bid',k:'bid',g:function(r){return r.ag.defaultBid;}},{l:'Status'},MCOL.sp,MCOL.sal,MCOL.acos];
+ const rowHtml=(r,i)=>{
+  const m=r.m;
+  return '<tr class="click" data-act="nav" data-view="adgroup" data-id="'+r.ag.id+'" style="animation-delay:'+i*25+'ms">'+
+   '<td><span class="cname">'+esc(r.ag.name)+'</span></td>'+
+   '<td><span style="font-size:12px;color:var(--sub)">'+esc(r.c.name)+'</span></td>'+
+   '<td><div style="display:flex;gap:4px">'+r.ag.products.map(pid=>ptile(prod(pid))).join('')+'</div></td>'+
+   '<td class="r editable" data-act="edit-agbid" data-id="'+r.ag.id+'">'+money(r.ag.defaultBid)+I.pencil+'</td>'+
+   '<td>'+agStatusChip(r.ag)+'</td>'+
+   '<td class="r">'+money(m.sp)+'</td><td class="r">'+money(m.sal)+'</td><td class="r">'+(m.sal?pctf(m.acos):'—')+'</td></tr>';};
+ return pageHead('Ad groups','Containers for products and keywords',rangeSelect())+
+  '<div class="card rise">'+buildTable('agsG',cols,rows,rowHtml,{key:'sp',dir:-1})+'</div>';
+}
+function vAdgroup(){
+ const ag=agById[state.view.id];
+ if(!ag)return '<div class="empty"><span class="big">🗂</span>Ad group not found.<br><br><button type="button" class="btn btn-p" data-act="nav" data-view="adgroups">Back to ad groups</button></div>';
+ const c=campOfAg(ag.id)||{id:'?',name:'—'};
+ const prods=ag.products.map(pid=>{const p=prod(pid);return '<div class="prow">'+ptile(p,true)+'<div><b>'+esc(p.name)+'</b><span class="num" style="color:var(--sub);font-size:12px">'+money(p.price)+' · ASIN B0'+(hash(pid)%900000+100000)+'</span></div></div>';}).join('');
+ const kwRows=ag.keywords.map(k=>({k:k,ag:ag,c:c}));
+ return '<button type="button" class="backlink" data-act="nav" data-view="campaign" data-id="'+c.id+'">← '+esc(c.name)+'</button>'+
+ pageHead(esc(ag.name),'Ad group',agStatusChip(ag))+
+ '<div class="card rise" style="margin-bottom:14px"><div class="card-h"><h3>Advertised products</h3></div><div class="card-b"><div class="pgrid">'+prods+'</div></div></div>'+
+ '<div class="rise d1">'+kwTableHTML(kwRows,{agId:ag.id,addBtn:'<button type="button" class="btn btn-p btn-sm" data-act="add-kw" data-ag="'+ag.id+'">+ Add keyword</button>'})+'</div>';
+}
+
+function vReports(){
+ const reps=[
+  {id:'searchterm',ic:'🕵️',bg:'#FFF4E5',t:'Search term report',d:'Every query that triggered your ads, with spend, sales and ACOS — the harvesting goldmine.'},
+  {id:'campaign',ic:'📣',bg:'#E7F3F4',t:'Campaign performance',d:'Period summary per campaign: impressions through ROAS, plus budget levels.'},
+  {id:'keyword',ic:'🔑',bg:'#E9F7EF',t:'Keyword placement report',d:'Per-keyword metrics with match type and current bid, ready for bid optimization.'},
+ ];
+ let out='';
+ if(state.report){
+  const rp=state.report;
+  out='<div class="card rise" style="margin-top:14px"><div class="card-h"><h3>'+rp.title+'</h3><span class="sub">Generated '+rp.when+' · '+(rp.rows.length-1)+' rows</span><button type="button" class="btn btn-sm" style="margin-left:auto" data-act="csv">⬇ Download CSV</button></div>'+
+   '<div class="twrap" style="max-height:420px;overflow-y:auto"><table class="tbl"><thead><tr>'+rp.rows[0].map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rp.rows.slice(1).map(r=>'<tr>'+r.map((v,i)=>'<td class="'+(i>1?'r':'')+'">'+v+'</td>').join('')+'</tr>').join('')+'</tbody></table></div></div>';
+ }
+ return pageHead('Reports','Generate downloadable performance reports')+
+ '<div class="repgrid rise">'+reps.map(r=>'<div class="repcard"><div class="ric" style="background:'+r.bg+'">'+r.ic+'</div><b>'+r.t+'</b><p>'+r.d+'</p><button class="btn btn-p btn-sm" data-act="report" data-type="'+r.id+'">Generate report</button></div>').join('')+'</div>'+out;
+}
+function genReport(type){
+ const b=rangeBounds();const per=fmtDay(b.from)+' – '+fmtDay(b.to);let rows,title;
+ if(type==='searchterm'){
+  title='Search term report · '+per;
+  rows=[['Search term','Campaign','Matched keyword','Impressions','Clicks','Spend','Sales','ACOS','Orders','Status']];
+  Object.values(state.terms).sort((a,b2)=>b2.sp-a.sp).forEach(t=>rows.push([t.text,(campById[t.campId]||{}).name||'',t.kwText,t.imp,t.clk,money(t.sp),money(t.sal),t.sal?pctf(t.sp/t.sal):'—',t.ord,t.status]));
+ }else if(type==='campaign'){
+  title='Campaign performance · '+per;
+  rows=[['Campaign','Type','Status','Budget','Impressions','Clicks','CTR','Avg CPC','Spend','Sales','ACOS','ROAS']];
+  state.campaigns.forEach(c=>{const m=campMetrics(c,b);rows.push([c.name,c.type,statusOf(c).l,money(c.budget),m.imp,m.clk,pctf(m.ctr),money(m.cpc),money(m.sp),money(m.sal),m.sal?pctf(m.acos):'—',m.sp?m.roas.toFixed(2)+'x':'—']);});
+ }else{
+  title='Keyword report · '+per;
+  rows=[['Keyword','Match type','Campaign','Bid','Impressions','Clicks','Spend','Sales','ACOS','Orders']];
+  state.campaigns.forEach(c=>c.adGroups.forEach(ag=>ag.keywords.forEach(k=>{const m=kwMetrics(k,b);rows.push([k.text,k.match,c.name,money(k.bid),m.imp,m.clk,money(m.sp),money(m.sal),m.sal?pctf(m.acos):'—',m.ord]);})));
+ }
+ state.report={type:type,title:title,rows:rows,when:fmtDayFull(state.day)+' '+String(state.hour).padStart(2,'0')+':00'};
+ toast('Report generated',title,'info');
+ render();
+}
+function downloadCSV(){
+ const rp=state.report;if(!rp)return;
+ const csv=rp.rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=rp.title.replace(/[^\w]+/g,'_')+'.csv';a.click();
+ toast('CSV downloaded','Check your downloads folder.');
+}
+
+function vRules(){
+ const rowsHtml=state.rules.map(r=>'<tr>'+
+   '<td><b>'+esc(r.name)+'</b></td>'+
+   '<td style="font-size:12.5px">'+r.metric.toUpperCase()+' '+(r.metric==='acos'?'&lt;':'&gt;')+' '+r.value+'% <span style="color:var(--faint)">(7 days)</span></td>'+
+   '<td style="font-size:12.5px">Increase budget '+r.pct+'%'+(r.cap?' · cap '+money(r.cap):'')+'</td>'+
+   '<td style="font-size:12.5px;color:var(--sub)">'+(r.apply==='all'?'All campaigns':r.camps.length+' campaigns')+'</td>'+
+   '<td><button type="button" class="stbtn" data-act="rule-toggle" data-id="'+r.id+'"><span class="chip '+(r.enabled?'ch-green':'ch-gray')+'">'+(r.enabled?'Active':'Off')+'</span></button></td>'+
+   '<td style="font-size:12px;color:var(--faint)">'+(r.lastDay!=null?fmtDay(r.lastDay):'Never')+'</td>'+
+   '<td class="r"><button type="button" class="btn btn-xs btn-danger" data-act="rule-del" data-id="'+r.id+'">Delete</button></td></tr>').join('');
+ return pageHead('Budget rules','Automatically scale budgets on campaigns beating your targets','<button type="button" class="btn btn-p" data-act="rule-new">+ Create rule</button>')+
+ '<div class="hintbar rise">⚙️ Rules evaluate at <b>midnight</b> each simulator day using the trailing 7 days of data.</div>'+
+ '<div class="card rise d1">'+(state.rules.length?'<div class="twrap"><table class="tbl"><thead><tr><th>Rule</th><th>Condition</th><th>Action</th><th>Applies to</th><th>Status</th><th>Last triggered</th><th></th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'
+  :'<div class="empty"><span class="big">📏</span>No rules yet. Example: “If ACOS &lt; 25% for 7 days, raise budget 20% (max $120)”.</div>')+'</div>';
+}
+function ruleModal(){
+ openModal('<div class="m-h"><h2>Create budget rule</h2><button type="button" class="x" data-act="modal-close">✕</button></div>'+
+ '<div class="m-b">'+
+  '<label class="fld">Rule name</label><input class="inp" id="ruleName" value="Scale winners" style="margin-bottom:13px">'+
+  '<div class="wz2col" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:13px">'+
+   '<div><label class="fld">When…</label><select class="sel" id="ruleMetric"><option value="acos">ACOS is below</option><option value="roas">ROAS is above</option></select></div>'+
+   '<div><label class="fld">…value (%)</label><input class="inp num" id="ruleValue" type="number" value="25" min="1"></div>'+
+   '<div><label class="fld">Increase budget by</label><input class="inp num" id="rulePct" type="number" value="20" min="1" max="200"><div class="fhint">percent, daily</div></div>'+
+  '</div>'+
+  '<label class="fld">Maximum budget cap (optional)</label><input class="inp num" id="ruleCap" type="number" placeholder="e.g. 120" style="margin-bottom:13px">'+
+  '<label class="fld">Apply to</label>'+
+  '<div style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;max-height:170px;overflow-y:auto">'+
+   '<label style="display:flex;gap:8px;align-items:center;padding:5px 0;font-size:13px"><input type="radio" name="ruleApply" value="all" checked> All campaigns</label>'+
+   '<label style="display:flex;gap:8px;align-items:center;padding:5px 0;font-size:13px"><input type="radio" name="ruleApply" value="sel"> Specific campaigns:</label>'+
+   state.campaigns.filter(c=>c.status!=='archived').map(c=>'<label style="display:flex;gap:8px;align-items:center;padding:4px 0 4px 24px;font-size:12.5px;color:var(--sub)"><input type="checkbox" class="ruleCamp" value="'+c.id+'"> '+esc(c.name)+'</label>').join('')+
+  '</div>'+
+ '</div>'+
+ '<div class="m-f"><button type="button" class="btn" data-act="modal-close">Cancel</button><button type="button" class="btn btn-p" data-act="rule-save">Create rule</button></div>');
+}
+
+function vPortfolios(){
+ const b=rangeBounds();
+ const cards=state.portfolios.map(p=>{
+  const mem=state.campaigns.filter(c=>c.portfolio===p.id);
+  const m=derive(mem.reduce((acc,c)=>{const x=sumDaily(c.daily,b.from,b.to);acc.imp+=x.imp;acc.clk+=x.clk;acc.sp+=x.sp;acc.sal+=x.sal;acc.ord+=x.ord;return acc;},emptyM()));
+  const memRows=mem.map(c=>{const cm=campMetrics(c,b);return '<tr class="click" data-act="nav" data-view="campaign" data-id="'+c.id+'"><td><span class="cname">'+esc(c.name)+'</span></td><td>'+statusChip(c)+'</td><td class="r">'+money(cm.sp)+'</td><td class="r">'+money(cm.sal)+'</td><td class="r">'+(cm.sal?pctf(cm.acos):'—')+'</td></tr>';}).join('');
+  return '<div class="card rise" style="margin-bottom:14px"><div class="card-h"><h3>📁 '+esc(p.name)+'</h3><span class="sub">'+mem.length+' campaigns</span>'+
+   '<div style="margin-left:auto;display:flex;gap:18px;font-family:Archivo;font-size:12.5px;flex-wrap:wrap">'+
+    '<span>Spend <b class="num">'+money(m.sp)+'</b></span><span>Sales <b class="num" style="color:var(--green)">'+money(m.sal)+'</b></span>'+
+    '<span>ACOS <b class="num" style="color:'+(m.acos>.3?'var(--red)':'var(--green)')+'">'+(m.sal?pctf(m.acos):'—')+'</b></span><span>ROAS <b class="num">'+(m.sp?m.roas.toFixed(2)+'×':'—')+'</b></span>'+
+   '</div></div>'+
+   (mem.length?'<div class="twrap"><table class="tbl nomw"><tbody>'+memRows+'</tbody></table></div>':'<div class="empty" style="padding:20px">No campaigns assigned. Assign from a campaign’s Settings tab.</div>')+'</div>';
+ }).join('');
+ const un=state.campaigns.filter(c=>!c.portfolio);
+ const unRows=un.map(c=>'<tr class="click" data-act="nav" data-view="campaign" data-id="'+c.id+'"><td><span class="cname">'+esc(c.name)+'</span></td><td>'+statusChip(c)+'</td><td class="r">'+money(campMetrics(c,b).sp)+'</td></tr>').join('');
+ return pageHead('Portfolios','Group campaigns to monitor them together','<button type="button" class="btn btn-p" data-act="port-new">+ Create portfolio</button>')+
+ cards+(un.length?'<div class="card rise d2"><div class="card-h"><h3>Unassigned campaigns</h3></div><div class="twrap"><table class="tbl nomw"><tbody>'+unRows+'</tbody></table></div></div>':'');
+}
+
+function vAcademy(){
+ const done=state.lessonsDone.size;const pctv=Math.round(done/LESSONS.length*100);
+ const lessonsHtml=LESSONS.map((l,i)=>{const isDone=state.lessonsDone.has(l.id);
+  return '<div class="lesson '+(isDone?'done':'')+' rise" style="animation-delay:'+i*40+'ms">'+
+   '<div class="ls-h" data-act="lesson-open" data-id="'+l.id+'">'+
+    '<span class="ls-n">'+(isDone?'✓':i+1)+'</span>'+
+    '<div><b>'+l.t+'</b></div><span class="st">'+(isDone?'Completed':'In progress →')+'</span>'+
+   '</div>'+
+   '<div class="ls-b"><p>'+l.how+'</p><div style="margin-top:9px"><button type="button" class="btn btn-sm btn-p" data-act="lesson-go" data-go="'+l.go+'" data-view="'+(l.view||'')+'">'+l.goL+'</button></div></div>'+
+  '</div>';}).join('');
+ return pageHead('PPC Academy','Complete each mission inside the simulator')+
+ '<div class="acgrid">'+
+  '<div>'+
+   '<div class="card rise" style="text-align:center;padding:18px 16px">'+
+    '<div class="ring" style="background:conic-gradient(var(--orange) '+(pctv*3.6)+'deg,#EEF1F1 0)"><b>'+done+'/'+LESSONS.length+'</b><span>COMPLETE</span></div>'+
+    '<b style="font-family:Archivo;font-size:15px">'+(pctv===100?'🏆 Course complete!':'Your progress')+'</b>'+
+    '<p style="font-size:12px;color:var(--sub);margin:6px 0 12px">'+(pctv===100?'You have mastered the core PPC workflow. Keep optimizing!':'Work through the missions left — each one teaches a core PPC skill.')+'</p>'+
+    '<button type="button" class="btn btn-sm" data-act="lessons-reset">Reset progress</button>'+
+   '</div>'+
+   '<div class="card rise d1" style="margin-top:12px;padding:14px 16px;font-size:12.5px;color:var(--sub);line-height:1.6">'+
+    '<b style="font-family:Archivo;color:var(--ink);display:block;margin-bottom:5px">How this simulator works</b>'+
+    'Time advances hourly when you press play. Every keyword competes in a miniature auction where your <b>bid</b>, the keyword’s <b>competition</b> and <b>relevance</b> determine impressions, CPC and conversions. Budgets cap out, search terms accumulate, placement multipliers reshape where you appear, and budget rules fire at midnight.'+
+   '</div>'+
+  '</div>'+
+  '<div>'+lessonsHtml+'</div>'+
+ '</div>';
+}
+
+const GLOSS=[
+ ['Impressions','The number of times your ad was displayed on a search results page or product page.',''],
+ ['Clicks','How many times shoppers clicked your ad.',''],
+ ['CTR','Click-through rate. The share of impressions that became clicks — a signal of ad relevance.','Clicks ÷ Impressions'],
+ ['CPC','Cost per click. What you actually pay for each click (usually below your max bid).','Spend ÷ Clicks'],
+ ['ACOS','Advertising Cost of Sales. The percentage of ad-attributed revenue spent on ads. The core efficiency metric.','Spend ÷ Sales'],
+ ['ROAS','Return on Ad Spend. Revenue generated per dollar of ad spend. The inverse of ACOS.','Sales ÷ Spend'],
+ ['Conversion rate','The share of clicks that turned into orders.','Orders ÷ Clicks'],
+ ['Daily budget','The most a campaign can spend per day. When exhausted, ads stop until tomorrow (“Out of budget”).',''],
+ ['Bid','Your maximum willingness to pay for a click. Higher bids win more auctions at higher cost.',''],
+ ['Match types','Exact: query must match precisely. Phrase: query must contain the phrase. Broad: loose variations, greatest reach, most waste risk.',''],
+ ['Negative keyword','A query you block. Negative exact blocks that term; negative phrase blocks anything containing it.',''],
+ ['Search term harvesting','Promoting a converting shopper query into an exact-match keyword so you control its bid directly.',''],
+ ['Top of Search','The first ad slots at the top of search results. Premium CTR and CPC — placement multipliers target it.',''],
+ ['Placement multiplier','A percentage bid increase applied per placement (top / product pages / rest). +50% on a $1 bid means $1.50 in those auctions.',''],
+ ['Dayparting','Analyzing performance by hour of day. The simulator runs hourly auctions with realistic evening traffic peaks.',''],
+ ['Dynamic bids – down only','Amazon lowers your bid up to 100% when a click seems unlikely to convert.',''],
+ ['Dynamic bids – up & down','Amazon raises your bid (up to 100%) when conversion looks likely, lowers it when not.',''],
+ ['Fixed bids','Your bid is used as-is in every auction.',''],
+ ['Portfolio','A folder grouping campaigns for combined budget monitoring and reporting.',''],
+];
+function vGlossary(){
+ return pageHead('Glossary','Every metric and concept used in this console')+
+ '<div class="gloss">'+GLOSS.map((g,i)=>'<div class="gcard rise" style="animation-delay:'+Math.min(i,10)*30+'ms"><b>'+g[0]+'</b><p>'+g[1]+'</p>'+(g[2]?'<span class="fx">'+g[2]+'</span>':'')+'</div>').join('')+'</div>';
+}
+
+/* =====================================================================
+   WIZARD
+   ===================================================================== */
+let wz=null;
+const AD_TYPES=[
+ ['SP','🛒','#FFF4E5','Sponsored Products','Keyword & product targeting that appears in search results. The workhorse of Amazon PPC.',true],
+ ['SB','🏷️','#E7F3F4','Sponsored Brands','Headline banner at the very top of search. Builds brand visibility at a premium CPC.',false],
+ ['SD','🎯','#EDEFF7','Sponsored Display','Audience & product retargeting on and off Amazon. Great for remarketing.',false],
+];
+function startWizard(){
+ wz={step:1,type:'SP',name:'',budget:50,strategy:'down',targeting:'manual',products:new Set(),sugs:[],custom:[],autoBid:0.85,prodsKey:''};
+ renderWizard();
+}
+function sugBidFor(text){const all=Object.values(POOLS).flat();const hit=all.find(e=>e.t===text);return r2(hit?hit.m*1.1:(0.6+(hash(text)%100)/100));}
+function buildSugs(){
+ const pool=[];
+ wz.products.forEach(pid=>{const cat=prod(pid).cat;(POOLS[cat]||[]).filter(e=>e.q>=.8).forEach(e=>{if(!pool.find(x=>x.t===e.t))pool.push(e);});});
+ pool.sort((a,b)=>b.v-a.v);
+ wz.sugs=pool.slice(0,7).map(e=>({text:e.t,match:'exact',bid:r2(e.m*1.1),on:true}));
+}
+function captureWz(){
+ if(!wz)return;
+ const nm=$('#wzName');if(nm)wz.name=nm.value;
+ const bg=$('#wzBudget');if(bg&&parseFloat(bg.value)>0)wz.budget=parseFloat(bg.value);
+ const ab=$('#wzAutoBid');if(ab&&parseFloat(ab.value)>0)wz.autoBid=parseFloat(ab.value);
+ $$('.wz-sug').forEach(row=>{const s=wz.sugs[+row.dataset.i];if(!s)return;s.on=row.querySelector('input').checked;s.match=row.querySelector('select').value;const bv=parseFloat(row.querySelector('.wz-bid').value);if(bv>0)s.bid=bv;});
+ $$('.wz-custom').forEach(row=>{const c=wz.custom[+row.dataset.i];if(!c)return;c.text=row.querySelector('.wz-ct').value;c.match=row.querySelector('select').value;const bv=parseFloat(row.querySelector('.wz-bid').value);if(bv>0)c.bid=bv;});
+ const st=document.querySelector('input[name="wzStrat"]:checked');if(st)wz.strategy=st.value;
+ const tg=document.querySelector('input[name="wzTgt"]:checked');if(tg)wz.targeting=tg.value;
+}
+function wzStepBody(){
+ if(wz.step===1){
+  return '<div class="typecards">'+AD_TYPES.map(t=>
+   '<div class="tcard '+(wz.type===t[0]?'sel':'')+'" data-act="wz-type" data-v="'+t[0]+'">'+
+   (t[5]?'<span class="rec">RECOMMENDED</span>':'')+
+   '<div class="tico" style="background:'+t[2]+'">'+t[1]+'</div><h4>'+t[3]+'</h4><p>'+t[4]+'</p></div>').join('')+'</div>';
+ }
+ if(wz.step===2){
+  const autoOk=wz.type!=='SB';
+  const strats=[['down','Dynamic bids – down only','Lowers bids up to 100% when a click is unlikely to convert. Safe default.'],
+   ['updown','Dynamic bids – up & down','Raises bids up to 100% when conversion looks likely, lowers otherwise. Aggressive.'],
+   ['fixed','Fixed bids','Uses your exact bid in every auction. Full control.']];
+  const tgts=[['manual','Manual targeting','You choose keywords and set bids per keyword. Recommended for learning.'],
+   ['auto','Automatic targeting','Amazon matches your ad to relevant queries. Great for discovery — harvest winners later.']];
+  return '<label class="fld">Campaign name</label>'+
+   '<input class="inp" id="wzName" value="'+esc(wz.name)+'" placeholder="e.g. SP | Earbuds | Exact - Core" style="margin-bottom:14px">'+
+   '<div class="wz2col">'+
+    '<div><label class="fld">Daily budget ($)</label><input class="inp num" id="wzBudget" type="number" min="1" step="1" value="'+wz.budget+'"><div class="fhint">Campaigns pause when the daily budget runs out.</div></div>'+
+    '<div><label class="fld">Start date</label><input class="inp" value="'+fmtDayFull(state.day)+' (today)" disabled style="background:#F7F8F8;color:var(--sub)"></div>'+
+   '</div>'+
+   '<label class="fld">Bidding strategy</label>'+
+   strats.map(o=>'<label class="radioc '+(wz.strategy===o[0]?'sel':'')+'"><input type="radio" name="wzStrat" value="'+o[0]+'" '+(wz.strategy===o[0]?'checked':'')+'><div><b>'+o[1]+'</b><span>'+o[2]+'</span></div></label>').join('')+
+   (autoOk?'<label class="fld" style="margin-top:6px">Targeting</label>'+
+    tgts.map(o=>'<label class="radioc '+(wz.targeting===o[0]?'sel':'')+'"><input type="radio" name="wzTgt" value="'+o[0]+'" '+(wz.targeting===o[0]?'checked':'')+'><div><b>'+o[1]+'</b><span>'+o[2]+'</span></div></label>').join(''):'');
+ }
+ if(wz.step===3){
+  return '<p style="font-size:12.5px;color:var(--sub);margin-bottom:11px">Select the products this campaign will advertise.</p><div class="pgrid">'+
+   PRODUCTS.map(p=>'<div class="pcard '+(wz.products.has(p.id)?'sel':'')+'" data-act="wz-prod" data-id="'+p.id+'"><span class="tick">✓</span>'+ptile(p,true)+'<div><b>'+esc(p.name)+'</b><span class="num">'+money(p.price)+'</span><span style="display:block;margin-top:2px">'+p.cat+'</span></div></div>').join('')+'</div>';
+ }
+ if(wz.step===4){
+  if(wz.targeting==='auto'){
+   return '<div class="hintbar">🤖 <span><b>Automatic targeting</b> — the simulator matches your ad against the full query pool for your products, including junk queries. Watch the Search terms tab and harvest winners / negate losers.</span></div>'+
+    '<label class="fld">Default bid ($)</label><input class="inp num" id="wzAutoBid" type="number" step="0.05" min="0.1" value="'+wz.autoBid+'" style="max-width:160px"><div class="fhint">Suggested range: $0.60 – $1.10 for this catalog.</div>';
+  }
+  const sugRows=wz.sugs.map((s,i)=>'<div class="kwrow wz-sug" data-i="'+i+'"><input type="checkbox" class="ckb" '+(s.on?'checked':'')+'><b style="font-size:13px">'+esc(s.text)+'</b><select class="sel"><option value="exact" '+(s.match==='exact'?'selected':'')+'>Exact</option><option value="phrase" '+(s.match==='phrase'?'selected':'')+'>Phrase</option><option value="broad" '+(s.match==='broad'?'selected':'')+'>Broad</option></select><input class="inp num wz-bid" type="number" step="0.05" min="0.1" value="'+s.bid+'"></div>').join('');
+  const cusRows=wz.custom.map((c,i)=>'<div class="kwrow wz-custom" data-i="'+i+'"><span></span><input class="inp wz-ct" placeholder="Your keyword…" value="'+esc(c.text)+'"><select class="sel"><option value="broad" '+(c.match==='broad'?'selected':'')+'>Broad</option><option value="phrase" '+(c.match==='phrase'?'selected':'')+'>Phrase</option><option value="exact" '+(c.match==='exact'?'selected':'')+'>Exact</option></select><input class="inp num wz-bid" type="number" step="0.05" min="0.1" value="'+c.bid+'"></div>').join('');
+  return '<p style="font-size:12.5px;color:var(--sub);margin-bottom:8px">Suggested keywords based on your products. Adjust match type and bid, or add your own.</p>'+
+   '<div style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:12px">'+
+    '<div class="kwrow kwh" style="font-family:Archivo;font-size:10.5px;font-weight:600;color:var(--faint);text-transform:uppercase;border-bottom:1px solid var(--border2)"><span></span><span>Keyword</span><span>Match type</span><span>Bid ($)</span></div>'+
+    sugRows+cusRows+
+   '</div>'+
+   '<button type="button" class="btn btn-sm" data-act="wz-addkw">+ Add custom keyword</button>';
+ }
+ const prods=[...wz.products].map(pid=>prod(pid).short).join(', ');
+ const kws=wz.targeting==='auto'
+  ?[['Automatic targeting','auto',wz.autoBid]]
+  :wz.sugs.filter(s=>s.on).map(s=>[s.text,s.match,s.bid]).concat(wz.custom.filter(c=>c.text.trim()).map(c=>[c.text.trim(),c.match,c.bid||sugBidFor(c.text)]));
+ const kwChips=kws.map(k=>'<span class="mchip m-'+k[1]+'" style="margin:2px">'+esc(k[0])+' · $'+(+k[2]).toFixed(2)+'</span>').join(' ')||'<b>Automatic</b>';
+ return '<div class="revrow"><span>Ad type</span><b>'+TYPE_L[wz.type]+'</b></div>'+
+  '<div class="revrow"><span>Campaign name</span><b>'+esc(wz.name||autoName())+'</b></div>'+
+  '<div class="revrow"><span>Daily budget</span><b class="num">'+money(wz.budget)+'</b></div>'+
+  '<div class="revrow"><span>Bid strategy</span><b>'+STRAT_L[wz.strategy]+'</b></div>'+
+  '<div class="revrow"><span>Targeting</span><b style="text-transform:capitalize">'+(wz.targeting==='auto'?'Automatic':'Manual')+'</b></div>'+
+  '<div class="revrow"><span>Products</span><b style="text-align:right;max-width:60%">'+esc(prods)+'</b></div>'+
+  '<div class="revrow" style="align-items:flex-start"><span>Keywords ('+kws.length+')</span><span style="text-align:right;max-width:65%">'+kwChips+'</span></div>';
+}
+function renderWizard(){
+ if(!wz)return;
+ const stepNames=['Ad type','Settings','Products','Targeting','Review'];
+ const steps='<div class="steps">'+stepNames.map((s,i)=>'<div class="step '+(wz.step===i+1?'on':'')+' '+(wz.step>i+1?'done':'')+'"><i>'+(wz.step>i+1?'✓':i+1)+'</i><div>'+s+'</div></div>').join('')+'</div>';
+ const canNext=wz.step<5;
+ openModal('<div class="m-h"><h2>Create campaign</h2><span class="sub" style="color:var(--faint);font-size:12px">Step '+wz.step+' of 5 · '+TYPE_L[wz.type]+'</span><button type="button" class="x" data-act="modal-close">✕</button></div>'+
+  '<div class="m-b">'+steps+'<div class="wzbody">'+wzStepBody()+'</div></div>'+
+  '<div class="m-f">'+(wz.step>1?'<button type="button" class="btn" data-act="wz-back">← Back</button>':'')+'<span style="flex:1"></span>'+
+  (canNext?'<button type="button" class="btn btn-p" data-act="wz-next">Continue →</button>':'<button type="button" class="btn btn-p" data-act="wz-launch">🚀 Launch campaign</button>')+'</div>',true);
+}
+function autoName(){const p=[...wz.products].map(pid=>prod(pid).short.split(' ')[0]).join(' & ')||'New';return wz.type+' | '+p+' | '+(wz.targeting==='auto'?'Auto':'Manual')+' '+String(state.campaigns.length+1);}
+function wzNext(){
+ captureWz();
+ if(wz.step===2){if(!(wz.budget>0)){toast('Enter a daily budget','Minimum $1/day.','warn');return;}if(wz.type==='SB')wz.targeting='manual';}
+ if(wz.step===3){
+  if(!wz.products.size){toast('Select at least one product','','warn');return;}
+  const key=[...wz.products].sort().join(',');
+  if(wz.targeting==='manual'&&(wz.sugs.length===0||wz.prodsKey!==key)){buildSugs();wz.prodsKey=key;}
+ }
+ if(wz.step===4&&wz.targeting==='manual'){
+  const live=wz.sugs.filter(s=>s.on).concat(wz.custom.filter(c=>c.text.trim()));
+  if(!live.length){toast('Select or add at least one keyword','','warn');return;}
+ }
+ wz.step++;renderWizard();
+}
+function launchCampaign(){
+ if(!wz){toast('Wizard closed','Please try Create campaign again.','warn');return;}
+ captureWz();
+ const name=wz.name.trim()||autoName();
+ const budget=wz.budget;
+ const type=wz.type,targeting=wz.targeting,strategy=wz.strategy;
+ const productIds=[...wz.products];
+ const poolAll=productIds.flatMap(pid=>POOLS[prod(pid).cat]||[]);
+ const avgPrice=r2(productIds.reduce((s,pid)=>s+prod(pid).price,0)/Math.max(1,productIds.length));
+ let kws;
+ if(targeting==='auto'){
+  kws=[{id:uid(),text:'Automatic targeting',match:'auto',bid:wz.autoBid,status:'enabled',hidden:true,market:r2(poolAll.reduce((s,e)=>s+e.m,0)/(poolAll.length||1)),vol:productIds.reduce((s,pid)=>s+(POOLS[prod(pid).cat]||[]).reduce((a,e)=>a+e.v,0),0)*.35,ctr:.005,cvr:.085,rel:.78,price:avgPrice,pool:poolAll,daily:[]}];
+ }else{
+  const live=wz.sugs.filter(s=>s.on).map(s=>({text:s.text,match:s.match,bid:s.bid})).concat(wz.custom.filter(c=>c.text.trim()).map(c=>({text:c.text.trim(),match:c.match,bid:c.bid||sugBidFor(c.text)})));
+  kws=live.map(k=>{const e=poolAll.find(x=>x.t===k.text);return mkKw(k.text,k.match,k.bid,e,avgPrice,poolAll);});
+ }
+ const nkw=kws.length;
+ const c={id:uid(),name:name,type:type,portfolio:'',targeting:targeting,strategy:strategy,budget:budget,status:'enabled',startDay:state.day,spendToday:0,outToday:false,daily:[],negatives:[],places:{top:0,prod:0,rest:0},placeStats:[],hourly:[],
+  adGroups:[{id:uid(),name:'Ad group 1',status:'enabled',products:productIds,defaultBid:kws[0].bid,daily:[],keywords:kws}]};
+ state.campaigns.push(c);indexEntities();
+ closeModal();
+ toast('🚀 Campaign launched',name+' is now live in the auction.');
+ log('success','Campaign <b>'+esc(name)+'</b> launched — '+money(budget)+'/day, '+nkw+' keyword'+(nkw>1?'s':'')+'.');
+ markLesson('create');
+ setView('campaign',c.id);
+ render();
+}
+
+/* =====================================================================
+   TOUR & WELCOME
+   ===================================================================== */
+const TOURA=[
+ {sel:'#simbar',t:'Time machine',txt:'Press play to run hourly auctions. Speed up to 10× or skip whole days. Budgets reset at midnight and rules fire at daybreak.'},
+ {sel:'[data-act="create"]',t:'Launch campaigns',txt:'Build SP / SB / SD campaigns with budgets, bid strategies, products and keywords — just like the real console.'},
+ {sel:'.nv[data-view="searchterms"]',t:'Harvest & negate',txt:'Real shopper queries stream in as time runs. Promote winners to exact match, block wasteful terms.'},
+ {sel:'.nv[data-view="academy"]',t:'PPC Academy',txt:'Ten missions walk you through the operator workflow. Progress saves as you go.'},
+];
+let tourI=0;
+function startTour(){
+ closeModal();
+ setView('dashboard');render();tourI=0;
+ $('#tour-root').innerHTML='<div class="tour-spot" id="tSpot"></div><div class="tour-card" id="tCard"></div>';
+ setTimeout(showTourStep,120);
+}
+function showTourStep(){
+ const st=TOURA[tourI];const el=document.querySelector(st.sel);
+ if(!el){endTour();return;}
+ el.scrollIntoView({block:'center',behavior:'smooth'});
+ setTimeout(()=>{
+  const r=el.getBoundingClientRect();const cardH=175;
+  const below=r.bottom+cardH+24<innerHeight;
+  const top=below?r.bottom+14:Math.max(10,r.top-cardH-14);
+  const left=clamp(r.left+r.width/2-160,10,innerWidth-330);
+  const sp=$('#tSpot');if(!sp)return;
+  sp.style.left=(r.left-6)+'px';sp.style.top=(r.top-6)+'px';sp.style.width=(r.width+12)+'px';sp.style.height=(r.height+12)+'px';
+  const cd=$('#tCard');cd.style.top=top+'px';cd.style.left=left+'px';
+  cd.innerHTML='<span class="tour-n cond">STEP '+(tourI+1)+' OF '+TOURA.length+'</span><b>'+st.t+'</b><p>'+st.txt+'</p>'+
+   '<div class="tour-a"><button type="button" class="btn btn-sm" data-act="tour-skip">Skip</button><button type="button" class="btn btn-sm btn-p" data-act="tour-next">'+(tourI===TOURA.length-1?'Finish ✓':'Next →')+'</button></div>';
+ },380);
+}
+function endTour(){$('#tour-root').innerHTML='';}
+function welcomeHTML(){
+ const feats=[['⏱️','#FFF4E5','Run time','Play, 10× speed, or skip whole days. Budget rules fire at midnight.'],
+  ['⚡','#FDEDED','Inject market shocks','Prime Day surges and competitor bid wars test reaction skills.'],
+  ['🎓','#E6F4F0','Follow the Academy','Ten auto-graded missions, from first campaign to full automation.']];
+ return '<div class="wel">'+
+ '<div class="wel-l"><div style="font-family:Archivo;font-weight:700;font-size:17px">amazon<span style="color:var(--orange)"> ads</span></div>'+
+ '<span class="cond" style="letter-spacing:2.5px;font-size:11px;color:#99A5B4">TRAINING CONSOLE · v2.4</span>'+
+ '<div style="margin-top:auto;display:flex;flex-direction:column;gap:7px;font-size:11px;color:#C8D0DA;font-family:Archivo;letter-spacing:.6px">'+
+ '<span><i style="color:var(--orange)">▸</i> LIVE AUCTION ENGINE</span><span><i style="color:var(--orange)">▸</i> '+LESSONS.length+' GUIDED MISSIONS</span><span><i style="color:var(--orange)">▸</i> MARKET SHOCK EVENTS</span><span><i style="color:var(--orange)">▸</i> PLACEMENT & DAYPART DATA</span></div></div>'+
+ '<div style="padding:22px">'+
+ '<h2 style="font-family:Archivo;font-size:20px;margin-bottom:6px">Welcome.</h2>'+
+ '<p style="font-size:13px;color:var(--sub);line-height:1.55;margin-bottom:12px">This is a faithful, living replica of the Amazon PPC console. Time runs hourly, auctions clear against real bid math, budgets cap out, and search terms stream in — so you learn by doing, not by slides.</p>'+
+ feats.map(r=>'<div class="welrow"><span style="width:32px;height:32px;border-radius:8px;background:'+r[1]+';display:grid;place-items:center;font-size:15px;flex:none">'+r[0]+'</span><div><b style="font-family:Archivo;font-size:13px">'+r[2]+'</b><span style="font-size:12px;color:var(--sub)"> — '+r[3]+'</span></div></div>').join('')+
+ '<div style="display:flex;gap:9px;margin-top:16px;flex-wrap:wrap"><button type="button" class="btn btn-p" data-act="wel-tour">▶ Take the 60-second tour</button><button type="button" class="btn" data-act="wel-play">Just start playing</button><button type="button" class="btn" data-act="modal-close" style="border:none;color:var(--sub)">Skip</button></div>'+
+ '</div></div>';
+}
+
+/* =====================================================================
+   SETTERS
+   ===================================================================== */
+function setView(name,id){
+ state.view={name:name,id:id};
+ state.tab=(name==='campaign')?'overview':state.tab;
+ state.selCamps.clear();state.selKws.clear();
+ state.animateNext=true;
+}
+function setTab(t){state.tab=t;}
+function setBid(id,v){const k=kwById[id];if(!k)return false;k.bid=r2(v);return true;}
+function setBudget(id,v){const c=campById[id];if(!c)return false;c.budget=r2(v);c.outToday=c.spendToday>=c.budget;return true;}
+function setAgBid(id,v){const ag=agById[id];if(!ag)return false;ag.defaultBid=r2(v);return true;}
+function setStatus(kind,id,v){
+ if(kind==='camp'){const c=campById[id];if(!c)return;c.status=v;c.outToday=false;log(v==='paused'?'warn':v==='enabled'?'info':'danger','Campaign <b>'+esc(c.name)+'</b> '+(v==='paused'?'paused':v==='enabled'?'enabled':'archived')+'.');}
+ if(kind==='ag'){const ag=agById[id];if(ag)ag.status=v;}
+ if(kind==='kw'){const k=kwById[id];if(!k)return;k.status=v;if(v==='paused')markLesson('pause');log(v==='paused'?'warn':'info','Keyword <b>'+esc(k.text)+'</b> '+v+'.');}
+ closeMenu();render();
+}
+
+function editInline(el,act){
+ const td=el;
+ const cur=act==='edit-bid'?(kwById[td.dataset.id]||{}).bid:act==='edit-budget'?(campById[td.dataset.id]||{}).budget:(agById[td.dataset.id]||{}).defaultBid;
+ if(cur===undefined)return;
+ td.innerHTML='<input class="inline-edit num" type="number" step="0.05" min="0.1" value="'+cur+'">';
+ const inp=td.querySelector('input');inp.focus();inp.select();
+ inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')commitInline(inp);if(ev.key==='Escape'){inp.dataset.cancel='1';render();}});
+}
+function commitInline(el){
+ const td=el.closest('[data-act]');if(!td)return;
+ const act=td.dataset.act,id=td.dataset.id;
+ const val=parseFloat(el.value);
+ el.dataset.cancel='1';
+ if(!isFinite(val)||val<=0){render();return;}
+ if(act==='edit-bid'){if(setBid(id,val)){const k=kwById[id];toast('Bid updated','“'+k.text+'” → '+money(k.bid)+'. The next auction hour will react.');markLesson('bid');}}
+ else if(act==='edit-budget'){if(setBudget(id,val)){const c=campById[id];toast('Budget updated',esc(c.name)+' → '+money(c.budget)+'/day.');}}
+ else if(act==='edit-agbid'){if(setAgBid(id,val)){const ag=agById[id];toast('Default bid updated',esc(ag.name)+' → '+money(ag.defaultBid));}}
+ render();
+}
+function openStatusMenu(kind,id,anchor){
+ closeMenu();
+ const rect=anchor.getBoundingClientRect();
+ let items='';
+ if(kind==='camp'){const c=campById[id];if(!c)return;
+  items=(c.status!=='enabled'?'<button type="button" data-act="set-status" data-kind="camp" data-id="'+id+'" data-v="enabled">▶ Enable</button>':'')+
+   (c.status!=='paused'?'<button type="button" data-act="set-status" data-kind="camp" data-id="'+id+'" data-v="paused">❚❚ Pause</button>':'')+
+   '<div class="pdiv"></div><button type="button" class="dngr" data-act="set-status" data-kind="camp" data-id="'+id+'" data-v="archived">🗄 Archive</button>';
+ }else if(kind==='ag'){const ag=agById[id];if(!ag)return;
+  items=ag.status==='paused'?'<button type="button" data-act="set-status" data-kind="ag" data-id="'+id+'" data-v="enabled">▶ Enable</button>':'<button type="button" data-act="set-status" data-kind="ag" data-id="'+id+'" data-v="paused">❚❚ Pause</button>';
+ }else{const k=kwById[id];if(!k)return;
+  items=k.status==='paused'?'<button type="button" data-act="set-status" data-kind="kw" data-id="'+id+'" data-v="enabled">▶ Enable</button>':'<button type="button" data-act="set-status" data-kind="kw" data-id="'+id+'" data-v="paused">❚❚ Pause</button>';
+ }
+ $('#menu-root').innerHTML='<div class="pop" style="left:'+clamp(rect.left,8,innerWidth-190)+'px;top:'+Math.min(rect.bottom+5,innerHeight-170)+'px">'+items+'</div>';
+}
+function addKeywordModal(campId,agId){
+ const ag=agId?agById[agId]:(campById[campId]&&campById[campId].adGroups[0]);
+ if(!ag)return;
+ const c=campOfAg(ag.id)||{name:'—'};
+ openModal('<div class="m-h"><h2>Add keyword</h2><button type="button" class="x" data-act="modal-close">✕</button></div>'+
+ '<div class="m-b">'+
+  '<div class="fhint" style="margin:-4px 0 12px">Adding to <b>'+esc(ag.name)+'</b> in <b>'+esc(c.name)+'</b></div>'+
+  '<label class="fld">Keyword text</label><input class="inp" id="nkText" placeholder="e.g. bluetooth earbuds noise cancelling" style="margin-bottom:12px">'+
+  '<div class="wz2col">'+
+   '<div><label class="fld">Match type</label><select class="sel" id="nkMatch"><option value="exact">Exact — precise queries</option><option value="phrase">Phrase — contains phrase</option><option value="broad" selected>Broad — widest reach</option></select></div>'+
+   '<div><label class="fld">Bid ($)</label><input class="inp num" id="nkBid" type="number" step="0.05" min="0.1" value="0.90"></div>'+
+  '</div>'+
+  '<div class="fhint" id="nkHint" style="margin-top:10px">💡 Suggested bid appears as you type.</div>'+
+ '</div>'+
+ '<div class="m-f"><button type="button" class="btn" data-act="modal-close">Cancel</button><button type="button" class="btn btn-p" data-act="nk-save" data-ag="'+ag.id+'">Add keyword</button></div>');
+ const inp=$('#nkText');
+ inp.addEventListener('input',()=>{const v=inp.value.trim();if(v.length>2){$('#nkHint').innerHTML='💡 Suggested bid for “'+esc(v)+'”: <b>$'+sugBidFor(v).toFixed(2)+'</b> (based on competition).';$('#nkBid').value=sugBidFor(v);}});
+ inp.focus();
+}
+function toggleSim(){state.running=!state.running;document.body.classList.toggle('running',state.running);updateSimBar();
+ toast(state.running?'▶ Simulation running':'❚❚ Simulation paused',state.running?'Auctions clear every hour.':'Time is frozen.',state.running?'success':'info');render();}
+function skipDay(){for(let i=0;i<24;i++){state.hour++;if(state.hour>=24){state.hour=0;newDay();}simHour();}updateSimBar();toast('⏭ Skipped 24 hours',fmtDayFull(state.day)+' · budgets reset.');render();}
+
+/* =====================================================================
+   REGISTRIES
+   ===================================================================== */
+const VIEWS={
+ dashboard:vDashboard, campaigns:vCampaigns, campaign:vCampaign, adgroup:vAdgroup,
+ adgroups:vAdgroups, keywords:vKeywords, searchterms:vTerms, reports:vReports,
+ rules:vRules, portfolios:vPortfolios, academy:vAcademy, glossary:vGlossary
+};
+const CAMP_TABS={
+ overview:campOverviewTab, adgroups:campAdgroupsTab, keywords:campKeywordsTab,
+ placements:placementsTab, searchterms:c=>termsTableHTML(Object.values(state.terms).filter(t=>t.campId===c.id),{campScope:true}),
+ negatives:campNegativesTab, settings:campSettingsTab
+};
+const ACTIONS={
+ 'nav':(el)=>{document.body.classList.remove('nav-open');setView(el.dataset.view,el.dataset.id);render();},
+ 'burger':()=>{if(matchMedia('(max-width:900px)').matches)document.body.classList.toggle('nav-open');else document.body.classList.toggle('nav-mini');},
+ 'market':()=>toast('Marketplace switched','Demo only — data stays on Amazon.com.','info'),
+ 'global-search':()=>{const q=$('#globalSearch').value;state.filters.campaigns.q=q;setView('campaigns');render();},
+ 'sim-toggle':toggleSim,
+ 'sim-speed':(el)=>{state.speed=+el.dataset.v;$$('.sim-speed button').forEach(b=>b.classList.toggle('on',+b.dataset.v===state.speed));},
+ 'sim-skip':skipDay,
+ 'tour':startTour,
+ 'tour-next':()=>{tourI++;if(tourI>=TOURA.length){endTour();toast('Tour complete','You are ready. Check the Academy for missions.','info');}else showTourStep();},
+ 'tour-skip':endTour,
+ 'wel-tour':startTour,
+ 'wel-play':()=>{closeModal();toggleSim();},
+ 'create':startWizard,
+ 'modal-close':closeModal,
+ 'mroot':(el,e)=>{if(e.target===el)closeModal();},
+ 'err-dashboard':()=>{setView('dashboard');state.tab='overview';render();},
+ 'err-reload':()=>location.reload(),
+ 'wz-type':(el)=>{wz.type=el.dataset.v;renderWizard();},
+ 'scen-run':(el)=>{const s=SCENARIOS.find(x=>x.id===el.dataset.id);if(!s)return;state.scen={id:s.id,ends:state.day*24+state.hour+s.dur};log('warn','⚠️ Market event started: <b>'+s.name+'</b> — '+s.dur+'h ahead.');toast(s.icon+' '+s.name,'Traffic ×'+s.vol+' · CPC ×'+s.cpc+' · CVR ×'+s.cvr+' for '+s.dur+'h. React!','warn');markLesson('scenario');updateSimBar();render();},
+ 'scen-cancel':()=>{const s=SCENARIOS.find(x=>x.id===state.scen.id);state.scen=null;if(s){log('info','Market event ended early: <b>'+s.name+'</b>.');toast('Event ended',s.name+' cancelled.','info');}updateSimBar();render();},
+ 'heat-mode':(el)=>{state.heatMode=el.dataset.v;render();},
+ 'sort':(el)=>{const s=state.sort[el.dataset.tid]||(state.sort[el.dataset.tid]={key:null,dir:-1});if(s.key===el.dataset.k)s.dir*=-1;else{s.key=el.dataset.k;s.dir=-1;}render();},
+ 'tab':(el)=>{setTab(el.dataset.tab);render();},
+ 'status-menu':(el)=>openStatusMenu(el.dataset.kind,el.dataset.id,el),
+ 'set-status':(el)=>setStatus(el.dataset.kind,el.dataset.id,el.dataset.v),
+ 'quick-status':(el)=>setStatus('camp',el.dataset.id,el.dataset.v),
+ 'edit-bid':(el)=>editInline(el,el.dataset.act),
+ 'edit-budget':(el)=>editInline(el,el.dataset.act),
+ 'edit-agbid':(el)=>editInline(el,el.dataset.act),
+ 'ck-camp':(el)=>{const id=el.dataset.id;el.checked?state.selCamps.add(id):state.selCamps.delete(id);render();},
+ 'ck-kw':(el)=>{const id=el.dataset.id;el.checked?state.selKws.add(id):state.selKws.delete(id);render();},
+ 'bulk-clear':()=>{state.selCamps.clear();state.selKws.clear();render();},
+ 'bulk-camp':(el)=>{state.selCamps.forEach(id=>{if(campById[id])campById[id].status=el.dataset.v;});toast(state.selCamps.size+' campaigns → '+el.dataset.v);state.selCamps.clear();render();},
+ 'bulk-budget':(el)=>{state.selCamps.forEach(id=>{const c=campById[id];if(c)c.budget=r2(c.budget*+el.dataset.v);});toast('Budgets adjusted');state.selCamps.clear();render();},
+ 'bulk-kw':(el)=>{state.selKws.forEach(id=>{if(kwById[id])kwById[id].status=el.dataset.v;});toast(state.selKws.size+' keywords → '+el.dataset.v);state.selKws.clear();render();},
+ 'bulk-kwbid':(el)=>{state.selKws.forEach(id=>{const k=kwById[id];if(k)k.bid=r2(Math.max(.1,k.bid*+el.dataset.v));});toast('Bids adjusted by '+(+el.dataset.v>1?'+10%':'−10%'));state.selKws.clear();markLesson('bid');render();},
+ 'term-add':(el)=>{const t=Object.values(state.terms).find(x=>x.id===el.dataset.id);if(!t)return;const ag=agById[t.agId];const c=campById[t.campId];if(!ag||!c)return;
+   const bid=r2(Math.max(.3,t.clk?(t.sp/t.clk)*1.1:sugBidFor(t.text)));
+   const firstProd=ag.products.length?prod(ag.products[0]):prod(null);
+   const nk=mkKw(t.text,'exact',bid,null,firstProd.price,POOLS[firstProd.cat]||POOLS.earbuds);
+   nk.rel=Math.max(.3,Math.min(1,t.q));
+   ag.keywords.push(nk);t.status='added';indexEntities();markLesson('harvest');
+   log('success','Harvested “<b>'+esc(t.text)+'</b>” into <b>'+esc(c.name)+'</b> as exact match @ '+money(bid)+'.');
+   toast('Keyword added','“'+t.text+'” is now an exact-match keyword at '+money(bid)+'.');render();},
+ 'term-neg':(el)=>{const t=Object.values(state.terms).find(x=>x.id===el.dataset.id);if(!t)return;const c=campById[t.campId];if(!c)return;
+   c.negatives.push({t:t.text,m:'ne'});t.status='negated';markLesson('negative');
+   log('warn','Negated “<b>'+esc(t.text)+'</b>” in <b>'+esc(c.name)+'</b> — no more spend on this query.');
+   toast('Negative keyword added','“'+t.text+'” is blocked.','warn');render();},
+ 'add-neg':(el)=>{const c=campById[el.dataset.camp];if(!c)return;const v=$('#negInput').value.trim().toLowerCase();if(!v){toast('Type a negative keyword first','','warn');return;}
+   c.negatives.push({t:v,m:$('#negMatch').value});markLesson('negative');log('warn','Negated “<b>'+esc(v)+'</b>” in <b>'+esc(c.name)+'</b>.');toast('Negative added',v,'warn');render();},
+ 'del-neg':(el)=>{const c=campById[el.dataset.camp];if(!c)return;c.negatives.splice(+el.dataset.i,1);toast('Negative removed');render();},
+ 'add-kw':(el)=>addKeywordModal(el.dataset.camp,el.dataset.ag),
+ 'nk-save':(el)=>{const ag=agById[el.dataset.ag];if(!ag)return;const c=campOfAg(ag.id)||{name:'—'};const text=$('#nkText').value.trim().toLowerCase();
+   if(!text){toast('Enter keyword text','','warn');return;}
+   const firstProd=ag.products.length?prod(ag.products[0]):prod(null);
+   const k=mkKw(text,$('#nkMatch').value,parseFloat($('#nkBid').value)||sugBidFor(text),null,firstProd.price,POOLS[firstProd.cat]||POOLS.earbuds);
+   ag.keywords.push(k);indexEntities();closeModal();log('info','Keyword <b>'+esc(text)+'</b> added to <b>'+esc(c.name)+'</b>.');toast('Keyword added',text);render();},
+ 'save-settings':(el)=>{const c=campById[el.dataset.id];if(!c)return;c.name=$('#setName').value.trim()||c.name;c.budget=Math.max(1,parseFloat($('#setBudget').value)||c.budget);c.strategy=$('#setStrat').value;c.portfolio=$('#setPort').value;toast('Settings saved',esc(c.name));render();},
+ 'archive-camp':(el)=>{const c=campById[el.dataset.id];if(!c)return;c.status='archived';log('danger','Campaign <b>'+esc(c.name)+'</b> archived.');toast('Campaign archived',esc(c.name),'warn');setView('campaigns');render();},
+ 'report':(el)=>genReport(el.dataset.type),
+ 'csv':downloadCSV,
+ 'rule-new':ruleModal,
+ 'rule-save':()=>{const name=$('#ruleName').value.trim()||'Untitled rule';
+   const apply=document.querySelector('input[name="ruleApply"]:checked').value;
+   const camps=$$('.ruleCamp').filter(x=>x.checked).map(x=>x.value);
+   if(apply==='sel'&&!camps.length){toast('Select at least one campaign','','warn');return;}
+   state.rules.push({id:uid(),name:name,metric:$('#ruleMetric').value,value:parseFloat($('#ruleValue').value)||25,pct:parseFloat($('#rulePct').value)||20,cap:parseFloat($('#ruleCap').value)||null,apply:apply,camps:camps,enabled:true,lastDay:null});
+   markLesson('rule');closeModal();log('success','Budget rule <b>'+esc(name)+'</b> created.');toast('Rule created',name);render();},
+ 'rule-toggle':(el)=>{const r=state.rules.find(x=>x.id===el.dataset.id);if(r)r.enabled=!r.enabled;render();},
+ 'rule-del':(el)=>{state.rules=state.rules.filter(x=>x.id!==el.dataset.id);toast('Rule deleted','','warn');render();},
+ 'port-new':()=>{openModal('<div class="m-h"><h2>Create portfolio</h2><button type="button" class="x" data-act="modal-close">✕</button></div><div class="m-b"><label class="fld">Portfolio name</label><input class="inp" id="portName" placeholder="e.g. Q3 Launch"></div><div class="m-f"><button type="button" class="btn" data-act="modal-close">Cancel</button><button type="button" class="btn btn-p" data-act="port-save">Create</button></div>');$('#portName').focus();},
+ 'port-save':()=>{const n=$('#portName').value.trim();if(!n){toast('Enter a name','','warn');return;}state.portfolios.push({id:uid(),name:n});closeModal();toast('Portfolio created',n);render();},
+ 'lesson-open':(el)=>el.closest('.lesson').classList.toggle('open'),
+ 'lesson-go':(el)=>{const go=el.dataset.go;
+   if(go==='create'){startWizard();return;}
+   if(go==='play'){if(!state.running)toggleSim();toast('▶ Simulation running','Let it run — then observe the results.');return;}
+   if(go==='placements'){const c=state.campaigns.find(x=>x.status!=='archived');if(c){setView('campaign',c.id);state.tab='placements';render();}return;}
+   setView(el.dataset.view||'dashboard');render();},
+ 'lessons-reset':()=>{state.lessonsDone=new Set(['explore']);toast('Progress reset','All missions available again.','info');render();},
+ 'toggle-ds':(el)=>toggleDs(el.dataset.chart,+el.dataset.idx,el),
+ 'wz-prod':(el)=>{const id=el.dataset.id;wz.products.has(id)?wz.products.delete(id):wz.products.add(id);renderWizard();},
+ 'wz-addkw':()=>{captureWz();wz.custom.push({text:'',match:'broad',bid:''});renderWizard();},
+ 'wz-back':()=>{captureWz();wz.step--;renderWizard();},
+ 'wz-next':wzNext,
+ 'wz-launch':launchCampaign
+};
+
+/* =====================================================================
+   LISTENERS
+   ===================================================================== */
+document.addEventListener('click',e=>{
+ if(document.body.classList.contains('nav-open')&&!e.target.closest('#sidenav')&&!e.target.closest('[data-act="burger"]'))document.body.classList.remove('nav-open');
+ const el=e.target.closest('[data-act]');if(!el)return;
+ const fn=ACTIONS[el.dataset.act];
+ if(fn){try{fn(el,e);}catch(err){console.error('[action]',el.dataset.act,err);toast('⚠️ '+err.message,'Action "'+el.dataset.act+'" failed. Data intact.','err');}}
+ else console.warn('unknown action',el.dataset.act);
+});
+document.addEventListener('change',e=>{
+ const el=e.target;
+ if(el.matches&&el.matches('input[name="wzStrat"],input[name="wzTgt"]')){
+  $$('.radioc').forEach(rc=>{const ri=rc.querySelector('input[type="radio"]');if(ri)rc.classList.toggle('sel',ri.checked);});
+ }
+ const act=el.dataset.act;if(!act)return;
+ if(act==='place-sl'){const c=campById[el.dataset.camp];const k=el.dataset.key;if(c&&c.places){c.places[k]=+el.value;markLesson('placement');toast('Placement updated',PLACE_L[k]+' bids now +'+el.value+'% in those auctions.');render();}return;}
+ if(act==='range'){state.rangeDays=+el.value;render();return;}
+ if(act.indexOf('f-camp-')===0){const k={q:'q',status:'status',type:'type',tgt:'tgt'}[act.split('-')[2]];state.filters.campaigns[k]=el.value;render();return;}
+ if(act.indexOf('f-kw-')===0){const k={q:'q',camp:'camp',match:'match',status:'status'}[act.split('-')[2]];state.filters.keywords[k]=el.value;render();return;}
+ if(act==='f-term-q'){state.filters.terms.q=el.value;render();return;}
+});
+document.addEventListener('input',e=>{
+ const el=e.target;const act=el.dataset.act;if(!act)return;
+ if(act==='place-sl'){const lv=$('#plv-'+el.dataset.key);if(lv)lv.textContent='+'+el.value+'%';return;}
+ if(act==='f-camp-q'||act==='f-kw-q'||act==='f-term-q'){
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{
+   const v=el.value;
+   if(act==='f-camp-q')state.filters.campaigns.q=v;
+   if(act==='f-kw-q')state.filters.keywords.q=v;
+   if(act==='f-term-q')state.filters.terms.q=v;
+   const pos=el.selectionStart;render();
+   const again=document.querySelector('[data-act="'+act+'"]');if(again){again.focus();try{again.setSelectionRange(pos,pos);}catch(err){}}
+  },350);
+ }
+});
+document.getElementById('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){state.filters.campaigns.q=e.target.value;setView('campaigns');render();}});
+addEventListener('resize',()=>{if(innerWidth>900)document.body.classList.remove('nav-open');if($('#tour-root').innerHTML)showTourStep();});
+
+bus.on('render',onRenderRequest);
+
+/* =====================================================================
+   SIM BAR
+   ===================================================================== */
+function updateSimBar(){
+ const d=$('#simDate');if(!d)return;
+ d.textContent=fmtDayFull(state.day);
+ $('#simClock').textContent=String(state.hour).padStart(2,'0')+':00 · Day '+(state.day+1);
+ $('#simProg').style.width=((state.hour+1)/24*100)+'%';
+ $('#simPlay').innerHTML=state.running?I.pause:I.play;
+ $('#simDot').classList.toggle('live',state.running);
+ $('#nvDot').classList.toggle('live',state.running);
+ $('#nvSimDay').textContent='Day '+(state.day+1)+' · '+String(state.hour).padStart(2,'0')+':00';
+ $('#nvSimSub').textContent=state.running?'Live · running at '+state.speed+'×':'Paused · press play to run time';
+ const chip=$('#scenChip');const t=state.day*24+state.hour;
+ if(state.scen&&state.scen.ends>t){const s=SCENARIOS.find(x=>x.id===state.scen.id);if(s){chip.style.display='inline-flex';chip.innerHTML=s.icon+' '+s.name+' · '+(state.scen.ends-t)+'h left';}else chip.style.display='none';}
+ else chip.style.display='none';
+}
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+seed();
+state.silent=true;
+for(let d=0;d<14;d++){for(let h=0;h<24;h++){state.hour=h;simHour();}state.day++;state.campaigns.forEach(c=>{c.spendToday=0;c.outToday=false;});}
+state.day0=state.day;
+for(let h=0;h<=9;h++){state.hour=h;simHour();}
+state.silent=false;
+log('info','Welcome to the <b>AdConsole Pro</b>. Press play to run live auctions, or start with the Tour.');
+log('info','<b>5 campaigns</b> imported with 14 days of history. “SP | Earbuds | Core Exact” is trending near its budget cap.');
+updateSimBar();
+render();
+setTimeout(()=>{if(!state.welcomed){state.welcomed=true;openModal(welcomeHTML());}},600);
+</script>
+<script src="assets/shell.js" defer></script>
+<!-- Project Amazon PH Academy shell: shared chrome injected by assets/shell.js -->
+</body>
+</html>

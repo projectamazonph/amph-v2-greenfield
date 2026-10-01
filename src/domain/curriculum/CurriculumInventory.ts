@@ -1,14 +1,12 @@
 import type { Result } from "@/domain/shared/Result";
 import { Result as ResultFactory } from "@/domain/shared/Result";
 
-export type CurriculumTier =
-  | "pp-foundations"
-  | "accelerated-mastery"
-  | "ultimate-transformation";
+export type CurriculumTier = "pp-foundations" | "accelerated-mastery" | "ultimate-transformation";
 
 export type CurriculumToolBridge =
   | Readonly<{ kind: "none" }>
-  | Readonly<{ kind: "simulator"; target: string }>;
+  | Readonly<{ kind: "simulator"; target: string }>
+  | Readonly<{ kind: "simgrid"; target: string }>;
 
 export interface CurriculumLessonContract {
   readonly slug: string;
@@ -164,7 +162,12 @@ export function parseCurriculumInventoryManifest(
       seenSlugs.add(slug);
 
       const toolBridge = value.toolBridge;
-      if (!isRecord(toolBridge) || (toolBridge.kind !== "none" && toolBridge.kind !== "simulator")) {
+      if (
+        !isRecord(toolBridge) ||
+        (toolBridge.kind !== "none" &&
+          toolBridge.kind !== "simulator" &&
+          toolBridge.kind !== "simgrid")
+      ) {
         errors.push(invalidManifest(`Lesson "${slug}" needs a toolBridge kind`, slug));
         continue;
       }
@@ -176,12 +179,12 @@ export function parseCurriculumInventoryManifest(
         if (!isNonEmptyString(toolTarget)) {
           errors.push({
             kind: "missing_tool_target",
-            message: `Lesson "${slug}" has a simulator bridge without a target`,
+            message: `Lesson "${slug}" has a ${toolBridge.kind} bridge without a target`,
             slug,
           });
           continue;
         }
-        normalizedToolBridge = { kind: "simulator", target: toolTarget.trim() };
+        normalizedToolBridge = { kind: toolBridge.kind, target: toolTarget.trim() };
       }
 
       const rawResourceRefs = value.resourceRefs;
@@ -207,8 +210,7 @@ export function parseCurriculumInventoryManifest(
         slug,
         toolBridge: normalizedToolBridge,
         resourceRefs,
-        finalDeliverable:
-          finalDeliverable === null ? null : finalDeliverable.trim(),
+        finalDeliverable: finalDeliverable === null ? null : finalDeliverable.trim(),
       });
     }
   }
@@ -284,10 +286,13 @@ export function buildCurriculumInventory(
       continue;
     }
 
-    if (contract.toolBridge.kind === "simulator" && !contract.toolBridge.target.trim()) {
+    if (
+      (contract.toolBridge.kind === "simulator" || contract.toolBridge.kind === "simgrid") &&
+      !contract.toolBridge.target.trim()
+    ) {
       errors.push({
         kind: "missing_tool_target",
-        message: `Lesson "${slug}" has a simulator bridge without a target`,
+        message: `Lesson "${slug}" has a ${contract.toolBridge.kind} bridge without a target`,
         slug,
       });
     }

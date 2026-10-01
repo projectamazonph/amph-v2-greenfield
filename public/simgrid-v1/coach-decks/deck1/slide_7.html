@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08}
+.rule{height:3px;background:#131921;margin-top:18px}
+.layout{display:grid;grid-template-columns:450px 1fr;gap:30px;margin-top:30px}
+.funnel-container{background:#fff;border:1px solid #d7dce2;padding-top:30px;padding-left:20px;padding-right:20px;min-height:420px;text-align:center}
+.funnel-title{font-size:20px;font-weight:700;color:#131921;margin-bottom:30px}
+.funnel-stage{height:50px;margin-left:auto;margin-right:auto;margin-bottom:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
+.stage-1{width:380px;background:#131921}
+.stage-2{width:280px;background:#4f8c9a}
+.stage-3{width:200px;background:#ff9900}
+.stage-4{width:120px;background:#00875a}
+.table-wrap{background:#fff;border:1px solid #d7dce2;padding-top:20px;padding-left:20px;padding-right:20px;min-height:420px}
+.table-title{font-size:20px;font-weight:700;color:#131921;margin-bottom:20px}
+.table{width:100%;border-collapse:collapse;font-size:18px}
+.table th{background:#131921;color:#fff;text-align:left;padding-top:12px;padding-left:12px;padding-right:12px;padding-bottom:12px}
+.table td{padding-top:12px;padding-left:12px;padding-right:12px;padding-bottom:12px;border-bottom:1px solid #d7dce2}
+.table tr:nth-child(even) td{background:#f1f3f5}
+.callout{margin-top:20px;background:#eef8f3;border-left:4px solid #00875a;color:#145c43;padding-top:14px;padding-left:14px;padding-right:14px;padding-bottom:14px;font-size:18px;line-height:1.4}
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 1 · Lesson 1.3</div>
+  <div class="title">The Click Journey and the Funnel</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <section class="funnel-container">
+      <div class="funnel-title">The PPC Funnel</div>
+      <div class="funnel-stage stage-1">Impressions (100)</div>
+      <div class="funnel-stage stage-2">Clicks (45)</div>
+      <div class="funnel-stage stage-3">Page Views (40)</div>
+      <div class="funnel-stage stage-4">Orders (8)</div>
+      <div style="margin-top:30px;font-size:15px;color:#64748b;line-height:1.4">
+        Every stage leaks. Your job is to find the biggest leak and fix that one first.
+      </div>
+    </section>
+    
+    <section class="table-wrap">
+      <div class="table-title">Diagnosing Funnel Leaks</div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>What can go wrong</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Impressions</strong></td>
+            <td>Bid too low, targeting too narrow</td>
+          </tr>
+          <tr>
+            <td><strong>Clicks</strong></td>
+            <td>Weak main image, price, or title</td>
+          </tr>
+          <tr>
+            <td><strong>Page Views</strong></td>
+            <td>Out of stock, slow page load</td>
+          </tr>
+          <tr>
+            <td><strong>Orders</strong></td>
+            <td>Bad reviews, high price, weak bullets</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <b>Coach tip:</b> Read the funnel top to bottom: impressions, CTR, conversion, ACOS. Do not change many things at once, or nothing can be learned.
+      </div>
+    </section>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · What is PPC? · 1.3 The Click Journey and the Funnel</div>
+  <div class="page">07 / 12</div>
+</div>
+</body>
+</html>

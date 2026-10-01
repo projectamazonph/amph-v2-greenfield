@@ -38,16 +38,23 @@ vi.mock("@/lib/auth", () => ({
 // decide whether to render the NewUserDashboard first-run variant.
 // STORY-157: the dashboard also calls `xpEventRepo.findByUserId` to render
 // the hero-stats strip (XP + 5-day streak dots).
+// Simgrid Task 9: the dashboard also mounts <SimgridProgressCard /> which
+// calls container.getBestSimgridScore.execute({ userId, simulatorId }) per
+// simulator. Stub it so future render-coupled regressions surface as test
+// failures here rather than being silently swallowed by the try/catch wrappers
+// below.
 const mockEnrollments = vi.fn();
 const mockCourseFindById = vi.fn();
 const mockUserFindById = vi.fn();
 const mockXpFindByUserId = vi.fn();
+const mockGetBestSimgridScore = vi.fn();
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     enrollmentRepo: { findByUserId: mockEnrollments },
     courseRepo: { findById: mockCourseFindById },
     userRepo: { findById: mockUserFindById },
     xpEventRepo: { findByUserId: mockXpFindByUserId },
+    getBestSimgridScore: { execute: mockGetBestSimgridScore },
   }),
 }));
 
@@ -58,6 +65,20 @@ const mockRedirect = vi.fn((url: string) => {
 });
 vi.mock("next/navigation", () => ({
   redirect: (url: string) => mockRedirect(url),
+}));
+
+// Simgrid Task 9: SimgridProgressCard is an async server component. In jsdom
+// (no Next.js server pipeline) React 19 rejects async components used as JSX
+// elements with "async Client Component". Replace it with a sync stub so the
+// dashboard's render can resolve cleanly. The card's own contract is covered
+// by its dedicated test file. The stub still mounts a section + heading so
+// any future render-coupled regression in this file would surface.
+vi.mock("@/components/simgrid/SimgridProgressCard", () => ({
+  SimgridProgressCard: () => (
+    <section aria-labelledby="simgrid-progress-heading">
+      <h2 id="simgrid-progress-heading">SimGrid practice</h2>
+    </section>
+  ),
 }));
 
 import DashboardPage from "../page";
@@ -126,6 +147,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     mockCourseFindById.mockReset();
     mockUserFindById.mockReset();
     mockXpFindByUserId.mockReset();
+    mockGetBestSimgridScore.mockReset();
     mockRedirect.mockClear();
     // Default: the freshly-fetched user has already completed the welcome
     // tour, so the existing dashboard path renders. The
@@ -138,6 +160,9 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     // STORY-157: default empty XP feed so the hero-stats strip renders
     // 0 XP and 0 active days without forcing every test to stub it.
     mockXpFindByUserId.mockResolvedValue({ ok: true, value: [] });
+    // Simgrid Task 9: default "no attempts" so SimgridProgressCard renders
+    // its 12 "Not started" rows under the existing try/catch wrappers below.
+    mockGetBestSimgridScore.mockResolvedValue({ ok: true, value: null });
   });
 
   it("exports a default async function (the page module is reachable)", () => {

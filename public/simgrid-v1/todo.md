@@ -1,0 +1,33 @@
+# Project TODO
+
+- [x] Define a beginner-language standard: plain English, one new term at a time, short sentences, and explicit next actions.
+- [x] Audit all 144 module-deck slides for unexplained jargon, dense copy, assumed Amazon knowledge, and unclear learner prompts.
+- [x] Rewrite every module deck using familiar ecommerce examples, plain-language definitions, and progressive disclosure without reducing curriculum coverage.
+- [x] Add a plain-language glossary cue whenever an essential Amazon PPC term first appears.
+- [x] Validate all twelve decks for beginner clarity, motion safety, slide count, readable layout, assessment gates, and viewer routing.
+- [x] Publish the simplified twelve-module series to GitHub Pages and verify the live Coach Tools experience.
+- [x] Do not create a retrospective pull request: the verified beginner-first deck rewrite is already the live default-branch release.
+- [x] Do not create an artificial merge workflow: the release is already included in `master` and GitHub Pages.
+- [x] Record and verify the selected direct-release state on the default branch and public GitHub Pages site.
+- [x] Audit the current reusable footer, canonical metadata, robots guidance, sitemap coverage, and public page structure.
+- [x] Build a clearer reusable footer with grouped learner, simulator, coach, and project links.
+- [x] Add accurate title, description, canonical, Open Graph, and social metadata to primary public pages.
+- [x] Add structured data and a maintained XML sitemap for core public resources.
+- [x] Add AI-readable project guidance and crawl directives without making unsupported discoverability claims.
+- [x] Validate metadata, public discovery files, footer links, and static-site regressions before publishing.
+- [x] Review the organized footer at phone, tablet, and desktop viewport sizes for wrapping, spacing, and readable hierarchy.
+- [x] Adjust responsive footer styling where the viewport QA identifies layout or touch-target issues.
+- [x] Rerun the footer and static regression checks, publish any responsive fix, and verify the live result.
+- [x] Map the visible footer groups and links to accurate structured-data navigation entities.
+- [x] Add footer navigation structured data to the core public pages without duplicating or contradicting existing page schema.
+- [x] Validate footer structured data, run regressions, publish the update, and verify the live markup.
+- [x] Audit all module slides for missing visual aids, worked examples, learning tables, illustrations, and learner interaction.
+- [x] Create a module-by-module enrichment storyboard that preserves each lesson objective and adds a clear visual aid plus learner action.
+- [x] Build enriched diagrams, comparison tables, worked examples, and interactive exercises into the twelve module decks.
+- [x] Validate enriched slides for beginner clarity, lesson coverage, layout safety, motion accessibility, and simulator-aligned practice.
+- [x] Publish and verify the enriched teaching-deck series on GitHub Pages.
+- [x] Audit current learning paths and beginner language to define the onboarding glossary entry point.
+- [x] Write the plain-English Amazon and PPC quick glossary with module and simulator references.
+- [x] Build the onboarding glossary page and connect it to the shared navigation, footer, Coach Tools, sitemap, and AI-readable guide.
+- [x] Validate glossary accuracy, beginner readability, responsive layout, local links, structured discovery metadata, and regressions.
+- [x] Publish and verify the beginner onboarding glossary on GitHub Pages.

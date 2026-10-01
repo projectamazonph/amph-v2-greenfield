@@ -1,0 +1,133 @@
+{
+  "project_info": {
+    "title": "Project Amazon PH Academy",
+    "created": 1787339407.644,
+    "last_updated": 1787339788.944,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_1",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_2",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_3",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_4",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_5",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_6",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_7",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_8",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_9",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_10",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "slide_11",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "Project Amazon PH Academy",
+      "summary": "Instructor Deck 4: Reporting, Workflow & Capstone",
+      "image_plan": "/home/ubuntu/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg - Cover slide matches the Project Amazon PH Academy platform interface shown in Image 1"
+    },
+    {
+      "id": "slide_1",
+      "title": "Operate, report, escalate, improve",
+      "summary": "Modules 10–11 focus on professional operating discipline, communication, and safe handoffs."
+    },
+    {
+      "id": "slide_2",
+      "title": "A useful report tells a story",
+      "summary": "Transforming raw metrics into a narrative with context and next steps."
+    },
+    {
+      "id": "slide_3",
+      "title": "Fix the top of the funnel first",
+      "summary": "Troubleshooting low impressions and low CTR before changing strategy."
+    },
+    {
+      "id": "slide_4",
+      "title": "Diagnose the bottom of the funnel",
+      "summary": "Troubleshooting clicks without sales, high ACOS, and sudden sales drops."
+    },
+    {
+      "id": "slide_5",
+      "title": "Cadence prevents chaos",
+      "summary": "Daily, weekly, and monthly required work rhythms."
+    },
+    {
+      "id": "slide_6",
+      "title": "Permission protects the client",
+      "summary": "The VA permissions ladder: what to do alone vs what requires manager approval."
+    },
+    {
+      "id": "slide_7",
+      "title": "SOPs turn judgment into process",
+      "summary": "Using change logs and standard procedures to build a record of decisions."
+    },
+    {
+      "id": "slide_8",
+      "title": "Client communication should be short and true",
+      "summary": "Structuring updates and escalation messages."
+    },
+    {
+      "id": "slide_9",
+      "title": "The capstone is a sequence",
+      "summary": "The full workflow: research to handoff, requiring evidence at every stage."
+    },
+    {
+      "id": "slide_10",
+      "title": "Supervised readiness has evidence",
+      "summary": "The final graduation checklist and assessment thresholds."
+    },
+    {
+      "id": "slide_11",
+      "title": "Run a predictable teaching lab",
+      "summary": "Instructor facilitation toolkit and media resource links."
+    }
+  ]
+}

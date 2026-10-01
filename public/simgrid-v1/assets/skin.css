@@ -1,0 +1,1372 @@
+/* ============================================================
+   PROJECT AMAZON PH ACADEMY — UNIFIED SKIN (v3)
+   Loaded AFTER each tool's native CSS. Forces every page onto
+   the unified Amazon Pro theme.
+
+   Strategy: override visual styling (colors, fonts, borders,
+   spacing) on common component patterns. PRESERVE the tool's
+   own layout (display, position, height, grid/flex templates).
+   ============================================================ */
+
+/* ---------- accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  body.pha-skin *,
+  body.pha-skin *::before,
+  body.pha-skin *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* global focus-visible — keyboard navigation indicator */
+body.pha-skin a:focus-visible,
+body.pha-skin button:focus-visible,
+body.pha-skin [tabindex]:focus-visible,
+body.pha-skin input:focus-visible,
+body.pha-skin select:focus-visible,
+body.pha-skin textarea:focus-visible,
+body.pha-skin label:focus-visible {
+  outline: 2px solid var(--c-orange) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+/* cursor pointer on all clickable elements */
+body.pha-skin a,
+body.pha-skin button,
+body.pha-skin [role="button"],
+body.pha-skin [role="tab"],
+body.pha-skin [role="link"],
+body.pha-skin [onclick],
+body.pha-skin label,
+body.pha-skin select,
+body.pha-skin .cursor-pointer,
+body.pha-skin [class*="btn"],
+body.pha-skin [class*="card"]:not(input):not(textarea),
+body.pha-skin [class*="clickable"] {
+  cursor: pointer;
+}
+body.pha-skin input[type="text"],
+body.pha-skin input[type="number"],
+body.pha-skin input[type="search"],
+body.pha-skin input[type="email"],
+body.pha-skin textarea {
+  cursor: text;
+}
+body.pha-skin input[type="radio"],
+body.pha-skin input[type="checkbox"] {
+  cursor: pointer;
+}
+
+/* ---------- global: typography, color, scrollbar ---------- */
+body.pha-skin,
+body.pha-skin * {
+  font-family: var(--font-body) !important;
+}
+
+body.pha-skin {
+  background: var(--c-bg) !important;
+  color: var(--c-ink) !important;
+  font-size: var(--fs-14) !important;
+  line-height: var(--lh-normal) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-y: auto !important;
+  height: auto !important;
+  min-height: 100vh !important;
+}
+
+body.pha-skin h1,
+body.pha-skin h2,
+body.pha-skin h3,
+body.pha-skin h4,
+body.pha-skin h5,
+body.pha-skin h6 {
+  font-family: var(--font-disp) !important;
+  color: var(--c-ink-2) !important;
+  font-weight: var(--fw-bold) !important;
+  letter-spacing: -0.2px;
+  line-height: var(--lh-tight) !important;
+}
+
+body.pha-skin code,
+body.pha-skin pre,
+body.pha-skin kbd,
+body.pha-skin samp {
+  font-family: var(--font-mono) !important;
+  color: var(--c-ink-2) !important;
+  font-size: 0.92em;
+}
+
+body.pha-skin ::-webkit-scrollbar { width: 10px; height: 10px; }
+body.pha-skin ::-webkit-scrollbar-thumb { background: var(--c-border) !important; border-radius: 6px; border: 2px solid var(--c-bg) !important; }
+body.pha-skin ::-webkit-scrollbar-track { background: transparent !important; }
+body.pha-skin ::-moz-selection { background: var(--c-orange-soft); }
+body.pha-skin ::selection { background: var(--c-orange-soft) !important; color: var(--c-ink-2) !important; }
+
+/* ---------- hide tool-native chrome (PHA chrome takes over) ---------- */
+body.pha-skin #topbar,
+body.pha-skin .topbar,
+body.pha-skin .top-bar,
+body.pha-skin .toolbar-app,
+body.pha-skin .amazon-bar,
+body.pha-skin .app-bar,
+body.pha-skin header[role="banner"]:not(.pha-topbar):not(.corners),
+body.pha-skin header.aph-header,
+body.pha-skin header.app-header,
+body.pha-skin header.ac-topbar,
+body.pha-skin .app-header,
+body.pha-skin .app-top,
+body.pha-skin .navy-bar,
+body.pha-skin .nav-bar,
+body.pha-skin .navbar,
+body.pha-skin .phh-head,
+body.pha-skin .bbd-head,
+body.pha-skin .bf-head,
+body.pha-skin .kl-header,
+body.pha-skin .triage-head,
+body.pha-skin .pd-head,
+body.pha-skin .sim-head,
+body.pha-skin .topbar-strip,
+body.pha-skin .amazon-ads,
+body.pha-skin .ama-bar,
+body.pha-skin .ac-topbar,
+body.pha-skin .ac-logo,
+body.pha-skin .ac-bar,
+body.pha-skin .kl-head,
+body.pha-skin .kl-top,
+body.pha-skin .bf-top,
+body.pha-skin .bbd-top,
+body.pha-skin .st-head,
+body.pha-skin .pd-bar,
+body.pha-skin .brand,
+body.pha-skin .smile-wm,
+body.pha-skin .ambient,
+body.pha-skin .drift,
+body.pha-skin .header,
+body.pha-skin .phh-bar,
+body.pha-skin .bf-bar,
+body.pha-skin .kl-bar,
+body.pha-skin .pd-bar,
+body.pha-skin .st-bar,
+body.pha-skin .bbd-bar,
+body.pha-skin .ac-bar {
+  display: none !important;
+}
+
+/* hide tool-native ticker / news strip */
+body.pha-skin .ticker,
+body.pha-skin .tape,
+body.pha-skin .news-tape,
+body.pha-skin .scroller,
+body.pha-skin .marquee,
+body.pha-skin .headline-tape,
+body.pha-skin [class*="ticker"] {
+  display: none !important;
+}
+
+/* hide tool-native footer */
+body.pha-skin footer:not(.pha-footer),
+body.pha-skin .app-foot,
+body.pha-skin .foot,
+body.pha-skin .bf-foot,
+body.pha-skin .kl-foot,
+body.pha-skin .pd-foot,
+body.pha-skin .st-foot,
+body.pha-skin .bbd-foot,
+body.pha-skin .statusbar,
+body.pha-skin .sb-foot,
+body.pha-skin .ac-foot,
+body.pha-skin .kl-stat,
+body.pha-skin .bf-stat,
+body.pha-skin .pd-stat {
+  display: none !important;
+}
+
+/* hide decorative backgrounds the tool may have set */
+body.pha-skin .bg,
+body.pha-skin .scan,
+body.pha-skin .noise,
+body.pha-skin .grid-bg,
+body.pha-skin .grain,
+body.pha-skin .decor,
+body.pha-skin [class*="background"],
+body.pha-skin [class*="backdrop"] {
+  display: none !important;
+}
+
+/* override any tool-internal dark header/title bars */
+body.pha-skin .p-head,
+body.pha-skin .p-body,
+body.pha-skin .panel-head,
+body.pha-skin .panel-body,
+body.pha-skin .phh-bar,
+body.pha-skin .bbd-bar,
+body.pha-skin .stage-top,
+body.pha-skin .controls-head,
+body.pha-skin [class*="p-head"],
+body.pha-skin [class*="p-body"],
+body.pha-skin [class*="panel-head"] {
+  background: var(--c-card) !important;
+  border-color: var(--c-line-soft) !important;
+  color: var(--c-ink-2) !important;
+}
+
+/* override the MISSION PARAMETERS and FLIGHT LOG inner panels in Pacing Deck */
+body.pha-skin .panel.controls,
+body.pha-skin .panel.stage,
+body.pha-skin .panel.controls *,
+body.pha-skin .panel.stage * {
+  color: var(--c-ink) !important;
+}
+body.pha-skin .panel.controls h2,
+body.pha-skin .panel.stage h2,
+body.pha-skin .panel.controls h3,
+body.pha-skin .panel.stage h3 {
+  color: var(--c-ink-2) !important;
+}
+
+/* big stat values inside tool */
+body.pha-skin .big-val,
+body.pha-skin .m-val,
+body.pha-skin [class*="big-val"],
+body.pha-skin [class*="m-val"] {
+  color: var(--c-ink-2) !important;
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-bold) !important;
+}
+
+/* ---------- kill tool-internal dark containers (Keyword Lab, etc) ---------- */
+body.pha-skin .hdr,
+body.pha-skin .hdr-in,
+body.pha-skin .console,
+body.pha-skin .hero,
+body.pha-skin .pulse-card,
+body.pha-skin .hero-wrap,
+body.pha-skin .section,
+body.pha-skin .grid,
+body.pha-skin .container,
+body.pha-skin .stage,
+body.pha-skin .main-stage,
+body.pha-skin [class*="hero"],
+body.pha-skin [class*="console-"],
+body.pha-skin [class*="stage-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* make tool hero text readable on light */
+body.pha-skin .h1,
+body.pha-skin .hero h1,
+body.pha-skin .hero h2,
+body.pha-skin .eyebrow,
+body.pha-skin .lede,
+body.pha-skin [class*="h1"] {
+  color: var(--c-ink-2) !important;
+}
+body.pha-skin .lede,
+body.pha-skin .h1 + p,
+body.pha-skin p {
+  color: var(--c-sub) !important;
+}
+
+/* keyword lab hero highlight */
+body.pha-skin .hl {
+  color: var(--c-orange-d) !important;
+}
+
+/* tab nav (Simulator, Academy, etc) - clean light style */
+body.pha-skin .tabnav,
+body.pha-skin .tabnav-in,
+body.pha-skin [class*="tabnav"] {
+  background: var(--c-card) !important;
+  border-bottom: 1px solid var(--c-border) !important;
+}
+body.pha-skin .tab-btn,
+body.pha-skin [class*="tab-btn"] {
+  color: var(--c-sub) !important;
+  background: transparent !important;
+  border-bottom: 3px solid transparent !important;
+  padding: 12px 16px !important;
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-semibold) !important;
+  font-size: 13px !important;
+  border-radius: 0 !important;
+}
+body.pha-skin .tab-btn:hover,
+body.pha-skin [class*="tab-btn"]:hover {
+  color: var(--c-ink-2) !important;
+}
+body.pha-skin .tab-btn.active,
+body.pha-skin [class*="tab-btn"][class*="active"] {
+  color: var(--c-ink-2) !important;
+  border-bottom-color: var(--c-orange) !important;
+  background: transparent !important;
+}
+
+/* card pads */
+body.pha-skin .card,
+body.pha-skin [class*="card"]:not(.pha-card):not(.pha-tcard) {
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--sh-1) !important;
+  color: var(--c-ink) !important;
+}
+body.pha-skin .card.pad,
+body.pha-skin [class*="card"][class*="pad"] {
+  padding: 20px !important;
+}
+
+/* metric card */
+body.pha-skin .metric-card,
+body.pha-skin .metric-val,
+body.pha-skin .metric-sub,
+body.pha-skin [class*="metric"] {
+  background: var(--c-card) !important;
+  color: var(--c-ink-2) !important;
+}
+body.pha-skin .metric-val {
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-bold) !important;
+  color: var(--c-ink-2) !important;
+}
+body.pha-skin .metric-sub {
+  color: var(--c-faint) !important;
+  font-family: var(--font-disp) !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+}
+
+/* sub-section heads */
+body.pha-skin .sec-head,
+body.pha-skin [class*="sec-head"] {
+  color: var(--c-ink-2) !important;
+}
+body.pha-skin .sec-num,
+body.pha-skin .sec-title,
+body.pha-skin .sec-tag,
+body.pha-skin .sec-sub {
+  color: var(--c-ink-2) !important;
+  font-family: var(--font-disp) !important;
+}
+
+/* coach tip / hint bars */
+body.pha-skin .coach,
+body.pha-skin .tipbar,
+body.pha-skin [class*="coach"],
+body.pha-skin [class*="tipbar"] {
+  background: var(--c-amber-bg) !important;
+  color: var(--c-amber-text) !important;
+  border-color: rgba(196, 85, 0, 0.25) !important;
+  border-radius: var(--r-md) !important;
+  padding: 12px 16px !important;
+  border-left: 3px solid var(--c-amber) !important;
+}
+
+/* input wrapper for tool forms */
+body.pha-skin .inp,
+body.pha-skin .sel,
+body.pha-skin .lbl,
+body.pha-skin [class*="inp"],
+body.pha-skin [class*="sel"] {
+  color: var(--c-ink) !important;
+}
+body.pha-skin .lbl,
+body.pha-skin [class*="lbl"] {
+  color: var(--c-sub) !important;
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-semibold) !important;
+  font-size: 11.5px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* match type buttons */
+body.pha-skin .match-type-btn,
+body.pha-skin [class*="match-type"] {
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-ink) !important;
+}
+body.pha-skin .match-type-btn.on,
+body.pha-skin [class*="match-type"][class*="on"] {
+  background: var(--c-orange) !important;
+  border-color: var(--c-orange) !important;
+  color: var(--c-navy-2) !important;
+}
+
+/* stat chips */
+body.pha-skin .stat-chips,
+body.pha-skin [class*="stat-chips"] {
+  background: transparent !important;
+}
+body.pha-skin .schip,
+body.pha-skin [class*="schip"] {
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-ink) !important;
+  border-radius: var(--r-md) !important;
+  padding: 6px 10px !important;
+}
+
+/* key takeaway: any remaining navy/charcoal tool backgrounds get forced light */
+body.pha-skin [class*="card"][class*="rv"],
+body.pha-skin .card.rv,
+body.pha-skin .lift,
+body.pha-skin .rv {
+  background: var(--c-card) !important;
+}
+
+/* ============================================================
+   CONTRAST FIXES — text that pops on dark / disappears on light
+   ============================================================ */
+
+/* any element with an explicit dark background (set inline or via class)
+   must use a light text color for readability */
+body.pha-skin [style*="background:#"],
+body.pha-skin [style*="background: #"],
+body.pha-skin [style*="background:rgb(15"],
+body.pha-skin [style*="background: rgb(15"] {
+  color: var(--c-shell-ink);
+}
+body.pha-skin [style*="background:#fff"]:not([class*="btn"]),
+body.pha-skin [style*="background: #fff"]:not([class*="btn"]),
+body.pha-skin [style*="background:white"]:not([class*="btn"]),
+body.pha-skin [style*="background: white"]:not([class*="btn"]),
+body.pha-skin [style*="background:#FFF"]:not([class*="btn"]),
+body.pha-skin [style*="background: #FFF"]:not([class*="btn"]) {
+  color: var(--c-ink);
+}
+
+/* Pacing Deck — metric cards (SPEND, CLICKS, SALES, ACOS) have dark bg */
+body.pha-skin .meter,
+body.pha-skin [class*="meter"]:not([class*="meters"]),
+body.pha-skin .bbar,
+body.pha-skin [class*="bbar"] {
+  background: var(--c-card) !important;
+  color: var(--c-ink) !important;
+  border: 1px solid var(--c-border) !important;
+}
+body.pha-skin .meter .m-lab,
+body.pha-skin [class*="m-lab"],
+body.pha-skin .m-val,
+body.pha-skin [class*="m-val"] {
+  color: var(--c-ink-2) !important;
+}
+body.pha-skin .m-lab {
+  color: var(--c-faint) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  font-size: 11px !important;
+  font-weight: var(--fw-semibold) !important;
+  font-family: var(--font-disp) !important;
+}
+body.pha-skin .m-val {
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-bold) !important;
+  font-size: 22px !important;
+  color: var(--c-ink-2) !important;
+  letter-spacing: -0.4px !important;
+}
+
+/* Pacing Deck — day-parting grid hour cells (24 buttons) */
+body.pha-skin .dp-cell,
+body.pha-skin [class*="dp-cell"],
+body.pha-skin .hour-cell,
+body.pha-skin [class*="hour-cell"],
+body.pha-skin .day-part-cell,
+body.pha-skin .bbar-cell,
+body.pha-skin [class*="bbar-cell"] {
+  color: var(--c-shell-ink) !important;
+  background-color: var(--c-navy-2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+body.pha-skin .dp-cell.on,
+body.pha-skin [class*="dp-cell"].on,
+body.pha-skin [class*="hour-cell"].on,
+body.pha-skin [class*="bbar-cell"].on {
+  background-color: var(--c-orange) !important;
+  color: var(--c-navy-2) !important;
+  font-weight: var(--fw-bold) !important;
+}
+/* Pacing Deck uses generic button styling on day-part cells */
+body.pha-skin .dp-grid button,
+body.pha-skin #dpGrid button,
+body.pha-skin [class*="dp-grid"] button,
+body.pha-skin [class*="dpwrap"] button,
+body.pha-skin .dp-wrap button,
+body.pha-skin #dpGrid > * {
+  color: var(--c-shell-ink) !important;
+  background-color: var(--c-navy-2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+body.pha-skin #dpGrid .on,
+body.pha-skin #dpGrid .active,
+body.pha-skin .dp-grid .on,
+body.pha-skin .dp-grid .active {
+  background-color: var(--c-orange) !important;
+  color: var(--c-navy-2) !important;
+}
+
+/* Day-parting cells — make sure text is always readable, boost size */
+body.pha-skin .dp-cell {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  min-height: 32px !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+body.pha-skin .dp-cell.l0 { color: #FFB3A8 !important; background: rgba(177, 39, 4, 0.18) !important; border-color: rgba(255, 107, 87, 0.4) !important; }
+body.pha-skin .dp-cell.l1 { color: #B8C4D1 !important; background: #1B2530 !important; border-color: var(--c-shell-line) !important; }
+body.pha-skin .dp-cell.l2 { color: var(--c-shell-ink) !important; background: #22303F !important; border-color: var(--c-navy-4) !important; font-weight: 700 !important; }
+body.pha-skin .dp-cell.l3 { color: #FFD9A0 !important; background: #8A5500 !important; border-color: var(--c-orange-d) !important; }
+body.pha-skin .dp-cell.l4 { color: var(--c-navy-1) !important; background: var(--c-orange) !important; border-color: #FFC24D !important; font-weight: 700 !important; box-shadow: 0 0 8px rgba(255, 153, 0, 0.4); }
+
+/* Pacing Deck — clock dial (dark face, light text) */
+body.pha-skin .stage-mid,
+body.pha-skin #dialWrap,
+body.pha-skin [class*="dial"],
+body.pha-skin .dial {
+  color: var(--c-shell-ink) !important;
+}
+body.pha-skin #dialWrap {
+  background: var(--c-navy-2) !important;
+  border: 1px solid var(--c-navy-3) !important;
+  border-radius: 50% !important;
+  padding: 24px !important;
+}
+body.pha-skin .stage-mid .dial-label,
+body.pha-skin .stage-mid [class*="dial-label"],
+body.pha-skin .dial-lab,
+body.pha-skin [class*="dial-lab"],
+body.pha-skin .dial-tick,
+body.pha-skin [class*="dial-tick"],
+body.pha-skin .dial-time,
+body.pha-skin [class*="dial-time"],
+body.pha-skin .dial-val,
+body.pha-skin [class*="dial-val"],
+body.pha-skin .dial-sub,
+body.pha-skin [class*="dial-sub"],
+body.pha-skin .dial-subVal,
+body.pha-skin [class*="dial-subVal"] {
+  color: var(--c-shell-ink) !important;
+  fill: var(--c-shell-ink) !important;
+}
+/* keep stage-mid's background so the clock face stays dark */
+body.pha-skin .stage-mid {
+  background: transparent !important;
+}
+/* but the inner dialWrap needs to stay dark — already set above */
+
+/* 24-hour clock time display — usually white on dark dial */
+body.pha-skin #clockTime,
+body.pha-skin [class*="clock-time"],
+body.pha-skin [class*="time-display"] {
+  color: var(--c-shell-ink) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Pacing Deck — Flight Log dark text (was light on dark) */
+body.pha-skin .log,
+body.pha-skin [class*="log"]:not([class*="logic"]) {
+  color: var(--c-ink) !important;
+}
+body.pha-skin .log .lt,
+body.pha-skin .log .lv,
+body.pha-skin [class*="log"] [class*="lt"],
+body.pha-skin [class*="log"] [class*="lv"] {
+  color: var(--c-faint) !important;
+}
+body.pha-skin .log .lm,
+body.pha-skin [class*="log"] [class*="lm"] {
+  color: var(--c-ink) !important;
+}
+body.pha-skin .log .ls,
+body.pha-skin [class*="log"] [class*="ls"] {
+  color: var(--c-faint) !important;
+}
+
+/* AdConsole — bottom time controls bar (dark) */
+body.pha-skin .wire-slot,
+body.pha-skin #wire-slot,
+body.pha-skin .playbar,
+body.pha-skin [class*="playbar"],
+body.pha-skin .controls,
+body.pha-skin .timebar,
+body.pha-skin [class*="timebar"],
+body.pha-skin [class*="sim-bar"],
+body.pha-skin [class*="run-bar"] {
+  background: var(--c-navy-2) !important;
+  color: var(--c-shell-ink) !important;
+  border: 1px solid var(--c-line) !important;
+}
+body.pha-skin .playbar button,
+body.pha-skin .controls button,
+body.pha-skin [class*="playbar"] button,
+body.pha-skin [class*="timebar"] button,
+body.pha-skin [class*="sim-bar"] button {
+  color: var(--c-shell-ink) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+body.pha-skin .playbar button:hover,
+body.pha-skin .controls button:hover {
+  background: rgba(255, 153, 0, 0.15) !important;
+  border-color: var(--c-orange) !important;
+  color: var(--c-orange) !important;
+}
+
+/* BuyBox Dojo — Trainee progress panel (dark navy card) */
+body.pha-skin .trainee-card,
+body.pha-skin .trainee,
+body.pha-skin [class*="trainee"] {
+  background: var(--c-navy-2) !important;
+  color: var(--c-shell-ink) !important;
+}
+body.pha-skin .trainee-card *,
+body.pha-skin [class*="trainee"] * {
+  color: var(--c-shell-ink) !important;
+}
+body.pha-skin [class*="trainee"] [class*="lvl"],
+body.pha-skin [class*="trainee"] [class*="xp"],
+body.pha-skin [class*="trainee"] [class*="lbl"] {
+  color: var(--c-shell-dim) !important;
+}
+
+/* Common tool labels — make sure uppercase small labels stay readable */
+body.pha-skin .mono-xs,
+body.pha-skin [class*="mono-xs"] {
+  color: var(--c-faint) !important;
+}
+body.pha-skin .lbl,
+body.pha-skin [class*="lbl"]:not([class*="table"]) {
+  color: var(--c-sub) !important;
+}
+
+/* tooltips, toasts — typically dark bg with light text */
+body.pha-skin [class*="tooltip"]:not([class*="pha"]),
+body.pha-skin .tooltip,
+body.pha-skin [role="tooltip"] {
+  background: var(--c-navy-2) !important;
+  color: var(--c-shell-ink) !important;
+  border: 1px solid var(--c-line) !important;
+}
+body.pha-skin .toast,
+body.pha-skin [class*="toast"] {
+  background: var(--c-navy-2) !important;
+  color: var(--c-shell-ink) !important;
+  border-left-color: var(--c-cyan) !important;
+}
+
+/* Reset any specific class with white text that was for dark theme */
+body.pha-skin [style*="color:white"]:not([class*="btn"]):not(button),
+body.pha-skin [style*="color: white"]:not([class*="btn"]):not(button),
+body.pha-skin [style*="color:#fff"]:not([class*="btn"]):not(button),
+body.pha-skin [style*="color: #fff"]:not([class*="btn"]):not(button) {
+  color: var(--c-ink) !important;
+}
+
+/* axis labels, chart annotations — usually small dim text */
+body.pha-skin .axis-label,
+body.pha-skin [class*="axis-label"],
+body.pha-skin .tick-label,
+body.pha-skin [class*="tick-label"] {
+  color: var(--c-faint) !important;
+  fill: var(--c-faint) !important;
+}
+
+/* tabs inside tools - if any got stuck as dark pills */
+body.pha-skin .nav-tabs a,
+body.pha-skin [class*="nav-tabs"] a,
+body.pha-skin [class*="tab-item"] {
+  color: var(--c-sub) !important;
+}
+body.pha-skin .nav-tabs a.active,
+body.pha-skin [class*="nav-tabs"] a.active,
+body.pha-skin [class*="tab-item"].active {
+  color: var(--c-ink-2) !important;
+}
+
+/* selected item indicators - checkboxes, radio */
+body.pha-skin input[type="radio"]:checked + label,
+body.pha-skin input[type="checkbox"]:checked + label {
+  color: var(--c-ink-2) !important;
+}
+
+/* ---------- PHA page shell — wraps tool body ---------- */
+.pha-skin-wrap {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 1480px !important;
+  margin: 0 auto !important;
+  padding: 20px var(--content-px) 96px !important;
+  background: var(--c-bg) !important;
+  min-height: 60vh;
+  position: relative;
+  z-index: 1;
+  overflow-x: hidden;
+}
+
+/* ---------- neutralize tool body wrapper backgrounds ---------- */
+body.pha-skin > div:not(.pha-topbar):not(.pha-footer):not(.pha-skin-wrap):not(script):not(style) {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit;
+}
+
+/* ---------- sidebars (tool's left nav) ---------- */
+body.pha-skin aside,
+body.pha-skin .sidebar,
+body.pha-skin .sidenav,
+body.pha-skin #sidenav,
+body.pha-skin .left,
+body.pha-skin .leftbar,
+body.pha-skin .nav-left,
+body.pha-skin .side,
+body.pha-skin .left-rail,
+body.pha-skin .col-side,
+body.pha-skin .col-l,
+body.pha-skin .col-left,
+body.pha-skin [class*="sidebar"],
+body.pha-skin [class*="side-nav"],
+body.pha-skin [class*="sideNav"] {
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--sh-1) !important;
+  color: var(--c-ink) !important;
+  padding: var(--sp-4) !important;
+  font-family: var(--font-body) !important;
+  overflow: visible;
+}
+
+/* sidebar section labels */
+body.pha-skin aside [class*="sec"] b,
+body.pha-skin aside [class*="section"] b,
+body.pha-skin aside [class*="head"] b,
+body.pha-skin aside [class*="label"],
+body.pha-skin aside [class*="title"],
+body.pha-skin .sidebar [class*="label"],
+body.pha-skin .sidebar [class*="title"],
+body.pha-skin #sidenav [class*="label"] {
+  font-family: var(--font-disp) !important;
+  color: var(--c-faint) !important;
+  text-transform: uppercase !important;
+  font-size: 11px !important;
+  letter-spacing: 0.12em !important;
+  font-weight: var(--fw-semibold) !important;
+}
+
+/* sidebar nav items */
+body.pha-skin aside a,
+body.pha-skin aside button,
+body.pha-skin .sidebar a,
+body.pha-skin .sidebar button,
+body.pha-skin .sidenav a,
+body.pha-skin .sidenav button,
+body.pha-skin #sidenav a,
+body.pha-skin #sidenav button,
+body.pha-skin [class*="sidebar"] a,
+body.pha-skin [class*="sidenav"] a,
+body.pha-skin [class*="side-nav"] a {
+  color: var(--c-ink) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--r-sm) !important;
+  font-family: var(--font-body) !important;
+  font-size: var(--fs-13) !important;
+  font-weight: var(--fw-medium) !important;
+  padding: 7px 10px !important;
+  margin: 1px 0 !important;
+  transition: background var(--d-fast) var(--ease), color var(--d-fast) var(--ease);
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  text-align: left !important;
+}
+body.pha-skin aside a:hover,
+body.pha-skin aside button:hover,
+body.pha-skin .sidebar a:hover,
+body.pha-skin .sidenav a:hover,
+body.pha-skin #sidenav a:hover {
+  background: var(--c-bg-2) !important;
+  color: var(--c-ink) !important;
+}
+body.pha-skin aside a.on,
+body.pha-skin aside a.active,
+body.pha-skin aside a.selected,
+body.pha-skin aside a[aria-current="page"],
+body.pha-skin aside button.on,
+body.pha-skin aside button.active,
+body.pha-skin .sidebar a.on,
+body.pha-skin .sidebar a.active,
+body.pha-skin .sidenav a.on,
+body.pha-skin .sidenav a.active,
+body.pha-skin #sidenav a.on,
+body.pha-skin #sidenav a.active {
+  background: var(--c-orange-soft) !important;
+  color: var(--c-ink-2) !important;
+  border-color: var(--c-orange-tint) !important;
+  font-weight: var(--fw-bold) !important;
+}
+body.pha-skin aside a.on::before,
+body.pha-skin aside a.active::before,
+body.pha-skin .sidebar a.on::before,
+body.pha-skin .sidenav a.on::before,
+body.pha-skin #sidenav a.on::before {
+  content: '' !important;
+  display: inline-block !important;
+  width: 3px !important;
+  height: 16px !important;
+  background: var(--c-orange) !important;
+  border-radius: 2px !important;
+  margin-right: 4px !important;
+  margin-left: -8px !important;
+}
+body.pha-skin aside a svg,
+body.pha-skin .sidebar a svg,
+body.pha-skin .sidenav a svg,
+body.pha-skin #sidenav a svg {
+  color: var(--c-faint) !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex: none !important;
+}
+body.pha-skin aside a.on svg,
+body.pha-skin aside a.active svg,
+body.pha-skin .sidenav a.on svg,
+body.pha-skin #sidenav a.on svg {
+  color: var(--c-orange-d) !important;
+}
+
+/* ---------- cards / panels ---------- */
+body.pha-skin .card,
+body.pha-skin .panel,
+body.pha-skin .kpi,
+body.pha-skin .stat,
+body.pha-skin .metric,
+body.pha-skin .surface,
+body.pha-skin [class*="card"]:not(.pha-card),
+body.pha-skin [class*="panel"]:not(.pha-panel),
+body.pha-skin [class*="stat-card"],
+body.pha-skin [class*="kpi-card"] {
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--sh-1) !important;
+  color: var(--c-ink) !important;
+  padding: var(--sp-4) !important;
+  font-family: var(--font-body) !important;
+}
+
+/* card heads */
+body.pha-skin .card-h,
+body.pha-skin .card-head,
+body.pha-skin .panel-head,
+body.pha-skin .phead,
+body.pha-skin [class*="card-h"],
+body.pha-skin [class*="card-head"],
+body.pha-skin [class*="panel-h"] {
+  background: var(--c-card) !important;
+  border-bottom: 1px solid var(--c-line-soft) !important;
+  padding: 12px 18px !important;
+  color: var(--c-ink) !important;
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-bold) !important;
+  font-size: var(--fs-15) !important;
+  letter-spacing: -0.1px !important;
+  text-transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+body.pha-skin .card-h h3,
+body.pha-skin .panel-head h3,
+body.pha-skin .card-head h3,
+body.pha-skin .phead h3 {
+  color: var(--c-ink-2) !important;
+  font-size: var(--fs-15) !important;
+}
+
+/* ---------- buttons ---------- */
+body.pha-skin button,
+body.pha-skin .btn,
+body.pha-skin [class*="btn"],
+body.pha-skin [class^="btn-"] {
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-semibold) !important;
+  font-size: var(--fs-13) !important;
+  letter-spacing: 0.02em !important;
+  border-radius: var(--r-md) !important;
+  padding: 9px 16px !important;
+  border: 1px solid var(--c-border) !important;
+  background: var(--c-card) !important;
+  color: var(--c-ink) !important;
+  cursor: pointer !important;
+  transition: background var(--d-fast) var(--ease), border-color var(--d-fast) var(--ease), color var(--d-fast) var(--ease), transform var(--d-fast) var(--ease), box-shadow var(--d-fast) var(--ease);
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  text-transform: none !important;
+  min-height: 36px !important;
+  line-height: 1.2 !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+body.pha-skin button:hover,
+body.pha-skin .btn:hover,
+body.pha-skin [class*="btn"]:hover {
+  background: var(--c-bg-2) !important;
+  border-color: var(--c-faint) !important;
+  color: var(--c-ink) !important;
+}
+body.pha-skin button:focus-visible,
+body.pha-skin .btn:focus-visible {
+  outline: none !important;
+  box-shadow: var(--sh-focus) !important;
+  border-color: var(--c-orange) !important;
+}
+
+body.pha-skin .btn-primary,
+body.pha-skin button.primary,
+body.pha-skin button.btn-acc,
+body.pha-skin button.btnAcc,
+body.pha-skin [class*="btn-primary"],
+body.pha-skin [class*="btnAccent"],
+body.pha-skin [class*="primary"] {
+  background: var(--c-orange) !important;
+  border-color: var(--c-orange) !important;
+  color: var(--c-navy-2) !important;
+}
+body.pha-skin .btn-primary:hover,
+body.pha-skin button.primary:hover,
+body.pha-skin [class*="btn-primary"]:hover {
+  background: var(--c-orange-h) !important;
+  border-color: var(--c-orange-h) !important;
+  color: var(--c-navy-2) !important;
+}
+
+body.pha-skin .btn-ghost,
+body.pha-skin [class*="btn-ghost"],
+body.pha-skin [class*="btnGhost"] {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--c-link) !important;
+}
+body.pha-skin .btn-ghost:hover,
+body.pha-skin [class*="btn-ghost"]:hover {
+  background: var(--c-bg-2) !important;
+  color: var(--c-link-h) !important;
+}
+
+body.pha-skin .btn-danger,
+body.pha-skin button.danger,
+body.pha-skin [class*="btn-danger"],
+body.pha-skin [class*="danger"] {
+  background: var(--c-card) !important;
+  border-color: var(--c-red) !important;
+  color: var(--c-red) !important;
+}
+body.pha-skin .btn-danger:hover,
+body.pha-skin button.danger:hover {
+  background: var(--c-red-bg) !important;
+  color: var(--c-red-text) !important;
+}
+
+body.pha-skin .btn-sm,
+body.pha-skin .btn.s,
+body.pha-skin .sm,
+body.pha-skin [class*="btn-sm"],
+body.pha-skin [class*="btn-s"] {
+  font-size: 11.5px !important;
+  padding: 5px 10px !important;
+  border-radius: var(--r-sm) !important;
+  min-height: 28px !important;
+}
+
+/* ---------- inputs ---------- */
+body.pha-skin input[type="text"],
+body.pha-skin input[type="search"],
+body.pha-skin input[type="number"],
+body.pha-skin input[type="email"],
+body.pha-skin input[type="password"],
+body.pha-skin input[type="url"],
+body.pha-skin input[type="date"],
+body.pha-skin input[type="time"],
+body.pha-skin input[type="file"],
+body.pha-skin select,
+body.pha-skin textarea,
+body.pha-skin .input,
+body.pha-skin [class*="input"] {
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--r-md) !important;
+  color: var(--c-ink) !important;
+  font-family: var(--font-body) !important;
+  font-size: var(--fs-14) !important;
+  padding: 7px 11px !important;
+  height: auto !important;
+  min-height: 34px;
+  transition: border-color var(--d-fast) var(--ease), box-shadow var(--d-fast) var(--ease);
+}
+body.pha-skin textarea {
+  min-height: 70px;
+  font-family: var(--font-body) !important;
+}
+body.pha-skin input:focus,
+body.pha-skin select:focus,
+body.pha-skin textarea:focus {
+  outline: none !important;
+  border-color: var(--c-orange) !important;
+  box-shadow: var(--sh-focus) !important;
+}
+
+body.pha-skin label {
+  font-family: var(--font-body) !important;
+  color: var(--c-ink-2) !important;
+  font-size: var(--fs-13) !important;
+  font-weight: var(--fw-medium) !important;
+}
+
+/* range / slider */
+body.pha-skin input[type="range"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background: linear-gradient(var(--c-border), var(--c-border)) no-repeat center / 100% 4px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  min-width: 44px !important;
+  border-radius: 2px !important;
+  border: none !important;
+  padding: 0 !important;
+}
+body.pha-skin input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 14px !important;
+  height: 14px !important;
+  background: var(--c-orange) !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 0 2px var(--c-card), 0 0 0 3px var(--c-border);
+}
+body.pha-skin input[type="range"]::-moz-range-thumb {
+  width: 14px !important;
+  height: 14px !important;
+  background: var(--c-orange) !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  border: 2px solid var(--c-card) !important;
+}
+
+/* ---------- tables ---------- */
+body.pha-skin table {
+  background: var(--c-card) !important;
+  border-collapse: collapse !important;
+  width: 100% !important;
+  font-family: var(--font-body) !important;
+  font-size: var(--fs-13) !important;
+  color: var(--c-ink) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--r-md) !important;
+  overflow: hidden !important;
+}
+body.pha-skin th,
+body.pha-skin thead th,
+body.pha-skin thead td {
+  background: var(--c-bg-2) !important;
+  color: var(--c-sub) !important;
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-semibold) !important;
+  font-size: 11.5px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  padding: 10px 12px !important;
+  border-bottom: 1px solid var(--c-border) !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+/* Column alignment (left/center/right) is a per-table content decision —
+   every table in this app already declares its own explicit th/td
+   text-align (numeric columns centered or right-aligned, label columns
+   left). Do not force it here, or headers stop lining up with their
+   own data (this used to happen to Keyword Lab's grid tables). */
+body.pha-skin td {
+  background: var(--c-card) !important;
+  color: var(--c-ink) !important;
+  padding: 10px 12px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid var(--c-line-soft) !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+body.pha-skin tbody tr:hover td,
+body.pha-skin tr:hover td {
+  background: var(--c-orange-soft) !important;
+}
+body.pha-skin tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* ---------- chips / badges / tags ---------- */
+body.pha-skin .chip,
+body.pha-skin .badge,
+body.pha-skin .tag,
+body.pha-skin [class*="chip"],
+body.pha-skin [class*="badge"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-semibold) !important;
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+  border-radius: var(--r-pill) !important;
+  background: var(--c-bg-2) !important;
+  color: var(--c-sub) !important;
+  border: 1px solid var(--c-border) !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.4 !important;
+}
+body.pha-skin .chip.primary,
+body.pha-skin .chip.accent,
+body.pha-skin [class*="chip"][class*="primary"],
+body.pha-skin [class*="chip"][class*="orange"],
+body.pha-skin [class*="chip"][class*="accent"] {
+  background: var(--c-orange-soft) !important;
+  color: var(--c-amber-text) !important;
+  border-color: var(--c-orange-tint) !important;
+}
+body.pha-skin .chip.ok,
+body.pha-skin .chip.success,
+body.pha-skin .chip.green,
+body.pha-skin [class*="ok"] {
+  background: var(--c-green-bg) !important;
+  color: var(--c-green-text) !important;
+  border-color: rgba(6, 125, 98, 0.25) !important;
+}
+body.pha-skin .chip.warn,
+body.pha-skin .chip.amber,
+body.pha-skin [class*="warn"] {
+  background: var(--c-amber-bg) !important;
+  color: var(--c-amber-text) !important;
+  border-color: rgba(196, 85, 0, 0.25) !important;
+}
+body.pha-skin .chip.err,
+body.pha-skin .chip.danger,
+body.pha-skin .chip.red,
+body.pha-skin [class*="err"] {
+  background: var(--c-red-bg) !important;
+  color: var(--c-red-text) !important;
+  border-color: rgba(177, 39, 4, 0.25) !important;
+}
+
+/* ---------- headings ---------- */
+body.pha-skin h1 {
+  font-size: var(--fs-24) !important;
+  color: var(--c-ink-2) !important;
+  font-weight: var(--fw-bold) !important;
+  letter-spacing: -0.4px !important;
+}
+body.pha-skin h2 {
+  font-size: var(--fs-20) !important;
+  color: var(--c-ink-2) !important;
+  font-weight: var(--fw-bold) !important;
+}
+body.pha-skin h3 {
+  font-size: var(--fs-15) !important;
+  color: var(--c-ink-2) !important;
+  font-weight: var(--fw-semibold) !important;
+}
+
+body.pha-skin p {
+  color: var(--c-ink) !important;
+  line-height: 1.65 !important;
+  max-width: 70ch !important;
+}
+body.pha-skin a {
+  color: var(--c-link) !important;
+  text-decoration: none !important;
+  transition: color var(--d-fast) var(--ease);
+}
+body.pha-skin a:hover {
+  color: var(--c-link-h) !important;
+  text-decoration: underline !important;
+}
+
+/* ---------- KPI numbers ---------- */
+body.pha-skin .kpi b,
+body.pha-skin .stat b,
+body.pha-skin .num,
+body.pha-skin [class*="kpi"] b,
+body.pha-skin [class*="stat"] b,
+body.pha-skin [class*="num"] {
+  font-family: var(--font-disp) !important;
+  font-weight: var(--fw-bold) !important;
+  color: var(--c-ink-2) !important;
+  font-size: var(--fs-24) !important;
+  letter-spacing: -0.5px !important;
+}
+body.pha-skin .kpi .label,
+body.pha-skin .kpi .l,
+body.pha-skin .stat .label,
+body.pha-skin [class*="kpi"] [class*="label"],
+body.pha-skin [class*="kpi"] [class*="-l"] {
+  font-family: var(--font-disp) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  font-size: 10px !important;
+  color: var(--c-faint) !important;
+  font-weight: var(--fw-semibold) !important;
+}
+
+/* ---------- modals ---------- */
+body.pha-skin .modal,
+body.pha-skin [class*="modal"] {
+  background: rgba(15, 20, 25, 0.6) !important;
+  backdrop-filter: blur(2px) !important;
+  color: var(--c-ink) !important;
+}
+/* AdConsole Pro wizard: white card on dimmed page.
+   The wizard is the only modal where the modal element itself
+   is the visible card; everywhere else the dim is just the
+   backdrop. Override just the wizard so the card stays white. */
+body.pha-skin #modal-root .mroot .modal {
+  background: var(--c-card) !important;
+  color: var(--c-ink) !important;
+  backdrop-filter: none !important;
+}
+body.pha-skin .modal .mbox,
+body.pha-skin .modal .box,
+body.pha-skin .modal .dialog,
+body.pha-skin [class*="modal"] [class*="box"],
+body.pha-skin [class*="modal-content"] {
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--sh-4) !important;
+  color: var(--c-ink) !important;
+}
+
+/* ---------- neutralize aggressive dark backgrounds on tool containers ---------- */
+body.pha-skin [style*="background: #0a"],
+body.pha-skin [style*="background:#0a"],
+body.pha-skin [style*="background: #0F"],
+body.pha-skin [style*="background:#0F"],
+body.pha-skin [style*="background: #13"],
+body.pha-skin [style*="background:#13"] {
+  background: var(--c-card) !important;
+}
+
+/* ---------- responsive safeguard ---------- */
+@media (max-width: 900px) {
+  .pha-skin-wrap { padding: 16px 14px 96px !important; }
+}
+
+/* ============================================================
+   SUB-PAGE POLISH — fixes found during full audit (v3.1)
+   - search-triage Tips: dim body text (--dim) on light surface
+   - search-triage Game Plan: dim helper text still readable
+   - listing/buybox: dim side-foot paragraph + rank badges
+   ============================================================ */
+
+/* search-triage was built for a dark theme. Its --ink and --dim
+   are light blue-grays that fall below 4.5:1 on the light surface.
+   Override them at the root scope when wrapped in pha-skin. */
+body.pha-skin {
+  --ink: var(--c-ink);        /* deep ink for primary text */
+  --dim: var(--c-sub);        /* 4.5:1+ on F7F8FA — readable helper text */
+  --faint: var(--c-faint);    /* hints + meta */
+  --line: var(--c-border-2);  /* borders */
+  --line2: var(--c-border);    /* subtle dividers */
+}
+
+/* search-triage "HABITS / TRAPS" panels: the body text used --dim
+   which was too light. Force solid readable colors. */
+body.pha-skin .dd-col li {
+  color: var(--c-navy-4) !important;  /* 4.5:1+ on FFFFFF */
+}
+body.pha-skin .dd-col li b {
+  color: var(--c-navy-1) !important;  /* brand ink for emphasis */
+}
+body.pha-skin .dd-col h3 {
+  color: var(--c-navy-1) !important;
+}
+
+/* search-triage "Game Plan" panel: previously too dim.
+   Keep subtle (it's helper text) but make it pass 3:1 minimum. */
+body.pha-skin .game-plan,
+body.pha-skin [class*="plan"] {
+  color: var(--c-sub) !important;
+}
+
+/* buybox-dojo side-foot "Trainee" panel + rank badges:
+   the card was rendering on top of the PHA chrome with light text. */
+body.pha-skin .side-foot {
+  background: var(--c-card) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-ink) !important;
+  padding: 14px 16px !important;
+  border-radius: 12px !important;
+  margin-top: 16px !important;
+}
+body.pha-skin .side-foot h5 {
+  color: var(--c-ink) !important;
+}
+body.pha-skin .side-foot p {
+  color: var(--c-ink-2) !important;
+}
+body.pha-skin .side-foot .mini {
+  background: var(--c-line) !important;
+}
+body.pha-skin .side-foot .mini i {
+  background: var(--c-orange) !important;
+}
+body.pha-skin .badges {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  margin-top: 10px !important;
+}
+body.pha-skin .badges > * {
+  background: var(--c-line) !important;
+  color: var(--c-ink) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 999px !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  border-radius: 999px !important;
+}
+body.pha-skin .badges > * svg,
+body.pha-skin .badges > * img {
+  display: none !important;
+}
+
+/* hide duplicate trailing footer chips that visually overlapped
+   the badge wheel — keep only the badge row. */
+body.pha-skin #footLevel,
+body.pha-skin #footNext {
+  display: block !important;
+  color: var(--c-ink) !important;
+}
+
+/* generic: any [.muted] or .dim helper in tool CSS */
+body.pha-skin .muted,
+body.pha-skin [class*="-muted"],
+body.pha-skin [class*="muted"] {
+  color: var(--c-ink-2) !important;
+}

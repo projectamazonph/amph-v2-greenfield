@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:40px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:16px}
+
+.layout{display:grid;grid-template-columns:2fr 1fr;gap:32px;margin-top:24px}
+
+/* Left Column: Table */
+.table-wrap{background:#fff;border:1px solid #d7dce2;padding-top:12px;padding-left:12px;padding-right:12px;padding-bottom:12px}
+.table{width:100%;border-collapse:collapse;font-size:18px;text-align:left}
+.table th{background:#131921;color:#fff;padding-top:12px;padding-left:12px;padding-right:12px;padding-bottom:12px}
+.table td{padding-top:12px;padding-left:12px;padding-right:12px;padding-bottom:12px;border-bottom:1px solid #d7dce2;color:#4b5563}
+.table td strong{color:#131921}
+.table tr:nth-child(even) td{background:#f1f3f5}
+
+/* Right Column: Content */
+.right-col{display:flex;flex-direction:column;gap:20px}
+.goal-text{font-size:24px;font-weight:700;color:#131921;line-height:1.4;margin-top:0;margin-bottom:0}
+
+.warning-box{background:#fef2f2;border-left:4px solid #de350b;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px}
+.warning-title{font-size:18px;font-weight:700;color:#de350b;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.warning-text{font-size:20px;color:#131921;line-height:1.4;margin:0}
+
+.callout{background:#fff8f0;border-left:4px solid #ff9900;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px}
+.callout-title{font-size:18px;font-weight:700;color:#8a5300;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.callout-text{font-size:20px;color:#131921;line-height:1.4;margin:0}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 5 · Lesson 5.2</div>
+  <div class="title">The Readiness Checklist</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Check</th>
+            <th>Passes if...</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Main image</strong></td>
+            <td>Crisp, white background, fills the frame</td>
+          </tr>
+          <tr>
+            <td><strong>Title</strong></td>
+            <td>Says what it is in the first five words</td>
+          </tr>
+          <tr>
+            <td><strong>Price</strong></td>
+            <td>Inside the normal band for the category</td>
+          </tr>
+          <tr>
+            <td><strong>Reviews</strong></td>
+            <td>Enough count and 4+ stars</td>
+          </tr>
+          <tr>
+            <td><strong>Bullets</strong></td>
+            <td>Benefits, not just specs</td>
+          </tr>
+          <tr>
+            <td><strong>Stock</strong></td>
+            <td>30+ days of cover</td>
+          </tr>
+          <tr>
+            <td><strong>Buy Box</strong></td>
+            <td>You win it</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="right-col">
+      <p class="goal-text">Score a listing honestly before spending.</p>
+      
+      <div class="warning-box">
+        <div class="warning-title">The Cost of Failure</div>
+        <p class="warning-text">Every failed check is a leak you pay for per click.</p>
+      </div>
+      
+      <div class="callout">
+        <div class="callout-title">Coach Tip</div>
+        <p class="callout-text">Three or more failed checks means pause scaling, fix, then relaunch.</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Listing Readiness · 5.2 The Readiness Checklist</div>
+  <div class="page">10 / 12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+/* learn/handouts.html — page-specific learning content styles. */
+.learn-wrap { max-width: 920px; margin: 0 auto; padding: 28px 24px 64px; }
+  .learn-eyebrow { font-family:var(--font-cond); font-weight: 600; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-amber-text); margin-bottom: 8px; }
+  .learn-h1 { font-family:var(--font-disp); font-weight: 700; font-size: var(--fs-h1); color: var(--c-ink); margin: 0 0 10px; line-height: 1.1; }
+  .learn-lede { font-size: 16px; line-height: 1.6; color: var(--c-sub); max-width: 720px; margin-bottom: 24px; }
+  .print-hint { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 10px; border: 1px solid var(--c-border-2); border-radius: 999px; background: #fff; color: var(--c-sub); margin-bottom: 16px; }
+  .learn-toc { padding: 18px; border: 1px solid var(--c-border-2); border-radius: 10px; background: #fff; margin-bottom: 28px; }
+  .learn-toc h2 { font-family:var(--font-cond); font-weight: 700; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-faint); margin: 0 0 10px; }
+  .learn-toc ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  .learn-toc a { display: block; padding: 6px 8px; border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--c-ink); }
+  .learn-toc a:hover { background: var(--c-amber-bg); color: #B36B00; }
+  .learn-toc .h-oneliner { font-weight: 400; color: var(--c-sub); }
+  .ho { border: 2px solid var(--c-border-2); border-radius: 12px; background: #fff; padding: 22px 24px; margin: 22px 0; break-inside: avoid; }
+  .ho-h { border-bottom: 1px solid var(--c-border-2); padding-bottom: 10px; margin-bottom: 14px; }
+  .ho-h2 { font-family:var(--font-disp); font-weight: 700; font-size: 22px; color: var(--c-ink); margin: 0; }
+  .ho-oneliner { font-size: 14px; color: var(--c-sub); margin: 4px 0 0; }
+  .formula { border: 2px solid #FFD9A8; background: var(--c-amber-bg); border-radius: 10px; padding: 14px; text-align: center; margin: 12px 0; }
+  .formula .f-f { font-family:var(--font-disp); font-weight: 700; font-size: 18px; color: #6B3A00; }
+  .formula .f-n { font-size: 12px; color: #8B5A1E; margin-top: 4px; }
+  .ho table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0; }
+  .ho th { background: var(--c-navy-2); color: #fff; text-align: left; padding: 8px 12px; font-family:var(--font-cond); font-weight: 700; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .ho td { padding: 8px 12px; border-bottom: 1px solid var(--c-border-2); color: var(--c-ink); vertical-align: top; }
+  .ho tr:nth-child(even) td { background: #F8FAFC; }
+  .ho ol, .ho ul { margin: 10px 0 10px 22px; padding: 0; }
+  .ho li { font-size: 14px; line-height: 1.7; color: var(--c-ink); margin-bottom: 4px; }
+  .ho p { font-size: 14px; line-height: 1.7; color: var(--c-ink); margin: 10px 0; }
+  .ho b { color: var(--c-ink); }
+  .end-note { text-align: center; font-size: 12px; color: var(--c-faint); margin-top: 28px; }
+  @media (max-width: 720px) { .learn-toc ul { grid-template-columns: 1fr; } }
+  @media print { .ho { break-inside: avoid; box-shadow: none; } .learn-toc { display: none; } .print-hint { display: none; } }

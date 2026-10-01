@@ -1,0 +1,133 @@
+{
+  "project_info": {
+    "title": "Project Amazon PH Academy",
+    "created": 1787338995.322,
+    "last_updated": 1787339381.9,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_1",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_2",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_3",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_4",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_5",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_6",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_7",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_8",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_9",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_10",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "slide_11",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "Project Amazon PH Academy",
+      "summary": "Instructor Deck 3: Launch, Bids & Optimization",
+      "image_plan": "/home/ubuntu/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg - Cover slide matches the Project Amazon PH Academy platform interface shown in Image 1"
+    },
+    {
+      "id": "slide_1",
+      "title": "Launch small, learn fast",
+      "summary": "Modules 6–9 frame launch as a learning process, protecting budget through evidence-based decisions."
+    },
+    {
+      "id": "slide_2",
+      "title": "Auto discovers; Manual controls",
+      "summary": "The roles of Auto (research) vs Manual (control) campaigns."
+    },
+    {
+      "id": "slide_3",
+      "title": "Build a safe starter skeleton",
+      "summary": "Budget allocation across Auto, Exact core, and Product targeting with a defense exercise."
+    },
+    {
+      "id": "slide_4",
+      "title": "Learn before you scale",
+      "summary": "The four-week launch plan: Learn, Control, Clean, Scale."
+    },
+    {
+      "id": "slide_5",
+      "title": "Budget is pacing; bid is price",
+      "summary": "The relationship between daily budget and CPC, and diagnosing early budget exhaustion."
+    },
+    {
+      "id": "slide_6",
+      "title": "Bid rules protect the account",
+      "summary": "Safe responses to common evidence patterns (e.g., no impressions, clicks/no sales)."
+    },
+    {
+      "id": "slide_7",
+      "title": "Cut waste, not sales",
+      "summary": "A worked example of a controlled bid reduction preserving sales while dropping ACOS."
+    },
+    {
+      "id": "slide_8",
+      "title": "Harvest the report every week",
+      "summary": "The weekly loop: download, sort, mark, promote, block, and log. Plus a video prompt."
+    },
+    {
+      "id": "slide_9",
+      "title": "Optimize like a scientist",
+      "summary": "Daily/weekly/monthly cadence and click thresholds for confidence."
+    },
+    {
+      "id": "slide_10",
+      "title": "Simulator lab: operate the loop",
+      "summary": "Pacing Deck, Bid Decisions, Search Term Triage, and Bulk File activities."
+    },
+    {
+      "id": "slide_11",
+      "title": "Launch-and-optimize evidence gate",
+      "summary": "Assignment, assessment criteria, and exit prompt for the launch block."
+    }
+  ]
+}

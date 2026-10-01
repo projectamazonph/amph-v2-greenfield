@@ -27,6 +27,11 @@ export default defineConfig({
       "tests/**/*.test.ts",
       "tests/**/*.test.tsx",
       "src/eslint-rules/**/*.test.js",
+      // SimGrid vendor regression test (Task 2 of the 2026-09-30
+      // integration plan) lives next to the vendor script it asserts
+      // on. Including the path here so `pnpm vitest run` and the
+      // broader `pnpm test` both pick it up.
+      "scripts/__tests__/**/*.test.ts",
     ],
     coverage: {
       provider: "v8",

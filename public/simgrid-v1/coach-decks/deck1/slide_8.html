@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding:42px 60px 0}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08}
+.rule{height:3px;background:#131921;margin-top:18px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px}
+.table-wrap{background:#fff;border:1px solid #d7dce2;padding:12px}
+.table{width:100%;border-collapse:collapse;font-size:18px}
+.table th{background:#131921;color:#fff;text-align:left;padding:14px}
+.table td{padding:14px;border-bottom:1px solid #d7dce2;color:#4b5563}
+.table td strong{color:#131921}
+.table tr:nth-child(even) td{background:#f1f3f5}
+.formula-box{background:#131921;color:#fff;padding:36px 30px;text-align:center;border-top:6px solid #ff9900}
+.formula-box h3{font-size:22px;color:#dbe2ea;margin:0 0 16px;font-weight:400}
+.formula-box .formula{font-size:52px;font-weight:800;color:#ff9900;margin:0}
+.example-box{background:#fff;border:1px solid #d7dce2;padding:28px;margin-top:24px}
+.example-box h3{font-size:22px;margin:0 0 16px;color:#131921}
+.example-box p{font-size:20px;line-height:1.4;margin:0;color:#4b5563}
+.example-box .highlight{font-size:28px;font-weight:700;color:#00875a;display:block;margin-top:16px}
+.callout{margin-top:24px;background:#eef8f3;border-left:4px solid #00875a;color:#145c43;padding:18px;font-size:18px;line-height:1.4}
+.footer{position:absolute;left:60px;bottom:28px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;bottom:28px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 2 · Lesson 2.1</div>
+  <div class="title">Spend, Sales and CPC</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="left-col">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Plain meaning</th>
+              <th>Formula</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Spend</strong></td>
+              <td>Money the ads consumed</td>
+              <td>Total cost</td>
+            </tr>
+            <tr>
+              <td><strong>Sales</strong></td>
+              <td>Revenue the ads produced</td>
+              <td>Attributed sales</td>
+            </tr>
+            <tr>
+              <td><strong>CPC</strong></td>
+              <td>Average price of one click</td>
+              <td>Spend ÷ Clicks</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <strong>Coach tip:</strong> Spend alone tells you nothing. Always compare spend against sales and clicks to understand performance.
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="formula-box">
+        <h3>Cost Per Click (CPC)</h3>
+        <div class="formula">CPC = Spend ÷ Clicks</div>
+      </div>
+      
+      <div class="example-box">
+        <h3>Worked Example</h3>
+        <p>If your campaign has <strong>$30 spend</strong>, generates <strong>$120 in sales</strong>, and receives <strong>30 clicks</strong>:</p>
+        <span class="highlight">$30 ÷ 30 clicks = $1.00 per click</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Money Math · 2.1 Spend, Sales and CPC</div>
+  <div class="page">08 / 12</div>
+</div>
+</body>
+</html>

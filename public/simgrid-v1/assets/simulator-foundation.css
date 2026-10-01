@@ -1,0 +1,63 @@
+/* Shared interaction and responsive utilities. Layout remains simulator-owned. */
+:where(.sim-page) {
+  width: min(100% - 28px, 1180px);
+  margin-inline: auto;
+  padding-block: var(--sp-6) var(--sp-16);
+}
+
+:where(.sim-eyebrow, .sim-data, .sim-score) { font-family: var(--font-mono); }
+:where(.sim-eyebrow) {
+  color: var(--c-orange-d);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+:where(.sim-title) { font-family: var(--font-disp); }
+:where(.sim-muted) { color: var(--c-sub); }
+:where(.sim-panel) {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
+}
+:where(.sim-button, .sim-choice, .sim-select) { min-height: 44px; }
+:where(.sim-button, .sim-choice) { cursor: pointer; }
+:where(.sim-button, .sim-choice, .sim-select, a, input, select, button):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--c-orange) 72%, white);
+  outline-offset: 3px;
+}
+:where(.sim-button) {
+  border: 1px solid var(--c-navy-3);
+  border-radius: var(--r-md);
+  padding: 10px 16px;
+  background: var(--c-navy-3);
+  color: var(--c-card);
+  font: 700 .8rem var(--font-mono);
+}
+:where(.sim-button.is-secondary) {
+  background: var(--c-card);
+  color: var(--c-ink);
+}
+:where(.sim-actions) { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+:where(.sim-scroll) {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+}
+:where([aria-live]) { scroll-margin-top: 96px; }
+
+@media (max-width: 600px) {
+  :where(.sim-page) { width: min(100% - 20px, 1180px); padding-top: var(--sp-4); }
+  :where(.sim-actions) > * { flex: 1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
