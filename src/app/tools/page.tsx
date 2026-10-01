@@ -1,10 +1,10 @@
 /**
  * /tools — student-facing tools index.
  *
- * Lists the 5 registered simulators (from the registry) plus the
- * embedded Amazon Ad Console, with names, descriptions, and a link
- * to open each one. ad-console is added manually — it isn't a
- * simulator, so it has no registry entry.
+ * Lists the 5 graded AMPH simulators (from the registry), the 12-simulator
+ * SimGrid practice library (linked to /practice/simgrid, which renders the
+ * full grid), and the embedded Amazon Ad Console. ad-console is added
+ * manually — it isn't a simulator, so it has no registry entry.
  *
  * Each simulator card carries a status pill (Public preview vs
  * Enrolled practice) sourced from PUBLIC_CURRICULUM_CLAIMS so the
@@ -31,7 +31,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Practice Tools | Project Amazon PH Academy",
   description:
-    "Five scored Amazon PPC simulators and a live Ad Console. Practice campaign decisions in a safe environment before touching real accounts.",
+    "Five graded AMPH simulators, the free 12-simulator SimGrid library, and a live Amazon Ad Console. Practice campaign decisions in a safe environment before touching real accounts.",
   alternates: { canonical: "/tools" },
 };
 
@@ -115,7 +115,11 @@ export default async function ToolsIndexPage() {
             are ready to make real account changes.
           </p>
           <div className={styles.headerMeta} aria-label="Tool library summary">
-            <span>5 simulators</span>
+            <span>5 graded simulators</span>
+            <span className={styles.headerDivider} aria-hidden="true">
+              ·
+            </span>
+            <span>12 SimGrid sims</span>
             <span className={styles.headerDivider} aria-hidden="true">
               ·
             </span>
@@ -184,6 +188,24 @@ export default async function ToolsIndexPage() {
               </Link>
             </li>
           </ul>
+        </section>
+        <section aria-labelledby="simgrid-library-title">
+          <div className={styles.sectionHeading}>
+            <h2 id="simgrid-library-title" className={styles.sectionTitle}>
+              SimGrid library
+            </h2>
+            <span className={styles.sectionCount}>Free practice for any signed-in student</span>
+          </div>
+          <p className={styles.subhead}>
+            Twelve additional simulators from Project Amazon PH's SimGrid library cover listing
+            fundamentals, the live Ad Console, pacing, bulk file operations, SQP analytics, account
+            audit, client onboarding, and the capstone workflow. These are free for any signed-in
+            student and do not gate course progression. Round-completion scores sync into your
+            dashboard.
+          </p>
+          <Link href="/practice/simgrid" className={styles.cardLink}>
+            Browse SimGrid library <ArrowRight size={16} weight="bold" aria-hidden="true" />
+          </Link>
         </section>
       </main>
     </StudentShell>
