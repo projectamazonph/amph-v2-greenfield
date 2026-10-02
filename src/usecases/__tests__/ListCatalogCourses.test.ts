@@ -103,8 +103,8 @@ function makeLesson(
           : {
               questions: [{ id: "q1", prompt: "Q1?", options: ["A", "B"], correctOptionIndex: 0 }],
             },
-      displayOrder: overrides.displayOrder ?? 1,
-      plannedMinutes: overrides.plannedMinutes,
+    displayOrder: overrides.displayOrder ?? 1,
+    plannedMinutes: overrides.plannedMinutes,
   });
   if (!result.ok) throw new Error(`Test setup error: createLesson failed: ${result.error.kind}`);
   return result.value;
@@ -294,5 +294,108 @@ describe("ListCatalogCourses", () => {
     expect(result.value.courses[0]!.estimatedMinutes).toBe(0);
     expect(result.value.courses[0]!.modules[0]!.lessonCount).toBe(0);
     expect(result.value.courses[0]!.modules[0]!.estimatedMinutes).toBe(0);
+  });
+
+  // ── Per-course degradation ─────────────────────────────────────────────
+  //
+  // A single unreadable row used to blank the entire catalog: the corrupt
+  // Module row for ppc-foundations took /courses down in production while
+  // the other two courses were fine. Enrichment must fail per course.
+
+  it("drops only the course whose modules fail to load", async () => {
+    const good = makeCourse({ id: "good-course", slug: "good-course", title: "Good Course" });
+    const bad = makeCourse({ id: "bad-course", slug: "bad-course", title: "Bad Course" });
+    courseRepo.seed([good, bad]);
+
+    const mod = makeModule({ id: "good-mod", courseId: "good-course", title: "Good Module" });
+    await moduleRepo.create(mod);
+
+    const stubModuleRepo = Object.assign({}, moduleRepo, {
+      findByCourseId: async (courseId: string) =>
+        courseId === "bad-course"
+          ? Result.err({ kind: "db_error", message: "corrupt module row" })
+          : moduleRepo.findByCourseId(courseId),
+    });
+
+    const stubUseCase = new ListCatalogCourses({
+      courseRepo,
+      moduleRepo: stubModuleRepo as InMemoryModuleRepository,
+      lessonRepo,
+    });
+
+    const result = await stubUseCase.execute();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.value.courses.map((c) => c.course.id)).toEqual(["good-course"]);
+    expect(result.value.skipped).toEqual(["bad-course"]);
+  });
+
+  it("drops only the course whose lessons fail to load", async () => {
+    const good = makeCourse({ id: "lesson-good", slug: "lesson-good", title: "Good" });
+    const bad = makeCourse({ id: "lesson-bad", slug: "lesson-bad", title: "Bad" });
+    courseRepo.seed([good, bad]);
+
+    await moduleRepo.create(
+      makeModule({ id: "lesson-good-mod", courseId: "lesson-good", title: "Module A" }),
+    );
+    await moduleRepo.create(
+      makeModule({ id: "lesson-bad-mod", courseId: "lesson-bad", title: "Module B" }),
+    );
+
+    const stubLessonRepo = Object.assign({}, lessonRepo, {
+      findByModuleId: async (moduleId: string) =>
+        moduleId === "lesson-bad-mod"
+          ? Result.err({ kind: "db_error", message: "DB timeout" })
+          : lessonRepo.findByModuleId(moduleId),
+    });
+
+    const stubUseCase = new ListCatalogCourses({
+      courseRepo,
+      moduleRepo,
+      lessonRepo: stubLessonRepo as InMemoryLessonRepository,
+    });
+
+    const result = await stubUseCase.execute();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.value.courses.map((c) => c.course.id)).toEqual(["lesson-good"]);
+    expect(result.value.skipped).toEqual(["lesson-bad"]);
+  });
+
+  it("still returns db_error when every course fails to load", async () => {
+    courseRepo.seed([
+      makeCourse({ id: "all-bad-1", slug: "all-bad-1", title: "One" }),
+      makeCourse({ id: "all-bad-2", slug: "all-bad-2", title: "Two" }),
+    ]);
+
+    const stubModuleRepo = Object.assign({}, moduleRepo, {
+      findByCourseId: async () => Result.err({ kind: "db_error", message: "Connection lost" }),
+    });
+
+    const stubUseCase = new ListCatalogCourses({
+      courseRepo,
+      moduleRepo: stubModuleRepo as InMemoryModuleRepository,
+      lessonRepo,
+    });
+
+    const result = await stubUseCase.execute();
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe("db_error");
+    expect((result.error as { message: string }).message).toBe("Connection lost");
+  });
+
+  it("does not report skipped courses when everything loads", async () => {
+    courseRepo.seed([makeCourse({ id: "clean", slug: "clean", title: "Clean" })]);
+    await moduleRepo.create(
+      makeModule({ id: "clean-mod", courseId: "clean", title: "Clean Module" }),
+    );
+
+    const result = await useCase.execute();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.skipped).toBeUndefined();
   });
 });

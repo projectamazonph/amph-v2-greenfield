@@ -106,3 +106,30 @@ describe("/courses/[slug] page — course quizzes", () => {
     expect(source).toMatch(/\/quizzes\/\$\{quiz\.id\}/);
   });
 });
+
+describe("/courses/[slug] page — load failure vs missing course", () => {
+  // A corrupt Module row made GetCatalogCourse return db_error, and the page
+  // turned every error into notFound(). A real outage then looked identical
+  // to a typoed slug: same 200, same "Course Not Found" title, no log line.
+  const readPage = () =>
+    fs.readFile(path.resolve(process.cwd(), "src/app/courses/[slug]/page.tsx"), "utf8");
+
+  it("does not collapse every failure into notFound()", async () => {
+    const source = await readPage();
+    expect(source).not.toMatch(/if \(!result\.ok\) notFound\(\);/);
+    expect(source).toMatch(/result\.error\.kind === "db_error"/);
+    expect(source).toMatch(/Course unavailable/);
+    expect(source).toMatch(/\[course:error\]/);
+  });
+
+  it("still calls notFound() for a course that genuinely does not exist", async () => {
+    const source = await readPage();
+    expect(source).toMatch(/notFound\(\);/);
+  });
+
+  it("titles a load failure as unavailable, not as not found", async () => {
+    const source = await readPage();
+    expect(source).toMatch(/Course Unavailable \| Project Amazon PH Academy/);
+    expect(source).toMatch(/Course Not Found \| Project Amazon PH Academy/);
+  });
+});

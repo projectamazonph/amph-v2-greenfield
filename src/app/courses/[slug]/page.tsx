@@ -40,7 +40,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const container = buildContainer();
   const result = await container.getCatalogCourse.execute(slug);
-  if (!result.ok) return { title: "Course Not Found | Project Amazon PH Academy" };
+  if (!result.ok) {
+    // A load failure is not a missing course. Keeping the two titles apart is
+    // what lets an operator tell a corrupt row from a typoed slug in logs and
+    // in the browser tab.
+    return {
+      title:
+        result.error.kind === "db_error"
+          ? "Course Unavailable | Project Amazon PH Academy"
+          : "Course Not Found | Project Amazon PH Academy",
+    };
+  }
   const detail = result.value;
   return {
     title: `${detail.title} | Project Amazon PH Academy`,
@@ -53,7 +63,29 @@ export default async function CourseDetailPage({ params }: PageProps) {
   const container = buildContainer();
   const result = await container.getCatalogCourse.execute(slug);
 
-  if (!result.ok) notFound();
+  if (!result.ok) {
+    if (result.error.kind === "db_error") {
+      // Same operational signal the catalog page logs: a load failure must be
+      // distinguishable from a real missing course in Vercel logs.
+      if (process.env.NODE_ENV !== "test") {
+        console.warn("[course:error] course load failed", result.error);
+      }
+
+      return (
+        <StudentShell requireAuth={false}>
+          <main id="main-content" tabIndex={-1} className={styles.errorPage}>
+            <h1 className={styles.errorTitle}>Course unavailable</h1>
+            <p className={styles.errorText}>
+              We could not load this course right now. Your account is unchanged.{" "}
+              <Link href="/courses">Go back to the catalog</Link> and try again.
+            </p>
+          </main>
+        </StudentShell>
+      );
+    }
+
+    notFound();
+  }
 
   const detail = result.value;
   const [user, quizzesResult] = await Promise.all([

@@ -33,12 +33,13 @@ Password-reset and transactional links use the configured application origin. Th
 
 ### Courses and curriculum
 
-- `/courses` lists published catalog rows from Postgres.
-- `/courses/[slug]` renders course detail and module metadata.
+- `/courses` lists published catalog rows from Postgres. A course whose module or lesson rows cannot be read is dropped from the list and named under `[catalog:error]` instead of blanking the page; `db_error` is reported only when nothing loads at all (STORY-165).
+- `/courses/[slug]` renders course detail and module metadata. A load failure renders "Course unavailable" and logs `[course:error]`; only a course that genuinely does not exist renders "Course Not Found" (STORY-165).
 - `/courses/[slug]/lessons/[lessonId]` renders MDX lesson content and navigation.
 - The shared lesson route presents every module through an outcome-first hero, course-progress route map, structured learning workspace, and explicit completion and next-step areas without changing the native MDX lesson inventory.
 - `/courses/[slug]/quizzes/[quizId]` is the canonical access-controlled quiz route. The legacy lesson quiz URL redirects to it, and both the page and mutation enforce course access.
-- `scripts/seed-all-content.mjs`, run as `node scripts/seed-all-content.mjs`, imports the MDX curriculum under `content/curriculum/` and the quiz bank into course, module, lesson, and quiz rows. Nothing runs on deploy.
+- `scripts/seed-all-content.mjs`, run as `node scripts/seed-all-content.mjs`, imports the MDX curriculum under `content/curriculum/` and the quiz bank into course, module, lesson, and quiz rows. The production `buildCommand` in `vercel.json` runs `pnpm import:content` before `pnpm build`, so a committed content change does reach production on deploy; the seeder upserts curriculum rows and never publishes a course (STORY-165).
+- Module `displayOrder` is 1-indexed within each course, derived from `COURSE_MODULE_RANGES` in the seeder rather than the global module number, because module -1 would otherwise persist as 0 and fail `createModule` validation on read (STORY-165).
 - Admin course, module, and lesson CRUD is available under `/admin/courses`.
 
 The public catalog and pricing pages deliberately render an empty-state message when no published course or active pricing rows have been seeded. `LessonContent.tsx` routes quiz lessons to the dedicated quiz page (STORY-094, 2026-08-01) — the placeholder is gone.
