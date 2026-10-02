@@ -4,6 +4,28 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-165: Catalog survives a corrupt course row (shipped)
+
+Production `/courses` rendered the "Courses unavailable" fallback on every
+request while `/api/health/ready` stayed 200. Vercel runtime logs gave the
+actual cause: `Module ef4fb0dc922e5f30dc200bdeeb9eea40 failed validation on
+read: invalid_input`, the `md5("module:ppc-foundations:-1")` row that
+`scripts/seed-all-content.mjs` persisted with `displayOrder: 0` because it
+computed `moduleNumber + 1`. The `Module` factory requires 1-indexed ordering.
+Three changes:
+
+- The seeder derives `displayOrder` from the course's own module range
+  (`COURSE_MODULE_RANGES`), so module -1 seeds as 1 and the `upsert` corrects
+  the existing production row on the next build.
+- `ListCatalogCourses` enriches per course and drops the ones that fail,
+  returning them in `skipped` so `/courses` logs the slugs under
+  `[catalog:error]`. `db_error` is returned only when nothing loads.
+- `/courses/[slug]` renders "Course unavailable" for `db_error` and keeps
+  `notFound()` for a genuine miss, with separate metadata titles and a
+  `[course:error]` log line.
+
+Story: `docs/stories/STORY-165-catalog-degradation.md`.
+
 ### STORY-163: Module 1 worksheet as a tracked artifact (shipped)
 
 Implementation of the design doc landed in PR #639. The text-fence

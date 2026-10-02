@@ -51,6 +51,13 @@ export default async function CoursesPage() {
       console.warn(
         `[catalog:info] catalog loaded: ${catalogResult.value.courses.length} course(s)`,
       );
+      if (catalogResult.value.skipped?.length) {
+        // Same tag as the full-failure branch so one log filter catches both
+        // a blank catalog and a partial one.
+        console.warn("[catalog:error] dropped course(s) that failed to load", {
+          skipped: catalogResult.value.skipped,
+        });
+      }
     }
   }
 
