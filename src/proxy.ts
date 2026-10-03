@@ -24,6 +24,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { buildContainer } from "@/composition/container";
+import { isReadOnlyPreviewRequest } from "@/lib/preview-read-only";
 
 const PROTECTED_PREFIXES = ["/dashboard/", "/admin/", "/enroll/", "/order/"];
 const PROTECTED_EXACT = ["/dashboard", "/enroll", "/order"];
@@ -73,9 +74,7 @@ function isMaintenancePagePath(pathname: string): boolean {
  * Any DB read failure degrades to "site is up" -- a transient DB
  * outage must not lock everyone out via a hard 503.
  */
-async function checkMaintenanceMode(
-  request: NextRequest,
-): Promise<NextResponse | null> {
+async function checkMaintenanceMode(request: NextRequest): Promise<NextResponse | null> {
   // The maintenance page itself is always reachable so the user
   // sees the explanation.
   if (isMaintenancePagePath(request.nextUrl.pathname)) return null;
@@ -92,12 +91,8 @@ async function checkMaintenanceMode(
   //    is disabled -- matching the dev default.
   const bypassToken = process.env.MAINTENANCE_BYPASS_TOKEN ?? "";
   if (bypassToken.length > 0) {
-    const cookieValue =
-      request.cookies.get("amph_maintenance_bypass")?.value ?? "";
-    if (
-      cookieValue.length > 0 &&
-      timingSafeEqual(cookieValue, bypassToken)
-    ) {
+    const cookieValue = request.cookies.get("amph_maintenance_bypass")?.value ?? "";
+    if (cookieValue.length > 0 && timingSafeEqual(cookieValue, bypassToken)) {
       return null;
     }
   }
@@ -158,6 +153,20 @@ async function readRoleFromCookie(request: NextRequest): Promise<string | null> 
 }
 
 export async function proxy(request: NextRequest) {
+  // Read-only preview, checked first so a rejected write never reaches the
+  // database and never waits on the maintenance query below. Same reasoning
+  // as the production-only gate on vercel.json's buildCommand: preview and
+  // production share one DATABASE_URL. See src/lib/preview-read-only.ts.
+  if (isReadOnlyPreviewRequest(request.method, process.env.VERCEL_ENV)) {
+    return NextResponse.json(
+      {
+        error: "preview_read_only",
+        message: "Preview deployments are read-only. Writes run in production only.",
+      },
+      { status: 405, headers: { Allow: "GET, HEAD" } },
+    );
+  }
+
   const { pathname } = request.nextUrl;
 
   // ── Security headers ──────────────────────────────────────

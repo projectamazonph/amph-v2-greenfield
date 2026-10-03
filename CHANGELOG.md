@@ -4,6 +4,24 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Preview deployments are read-only (shipped)
+
+Preview, production, and development all resolve to the same `DATABASE_URL`
+(one Config variable scoped to all three), so a PR's preview deployment ran
+against real student data. Build-time work was already gated on
+`$VERCEL_ENV = "production"` in `vercel.json`, so migrations and seeds never
+ran on a preview, but nothing gated the runtime: 7 of the 13 API routes and
+14 server actions with no auth gate (signup, password reset, simulator
+submissions) could persist to production from a preview URL.
+
+`src/proxy.ts` now refuses mutating requests when `VERCEL_ENV` is `preview`,
+answering 405 with `Allow: GET, HEAD` and `error: "preview_read_only"`.
+Reads pass through untouched so preview pages still render, and the check
+runs before the maintenance query and the route-protection block. Local dev,
+CI, and `next start` leave `VERCEL_ENV` unset and keep the full write
+surface. The policy lives in `src/lib/preview-read-only.ts` (unit tested);
+the wiring is pinned by tripwires in `src/__tests__/proxy.test.ts`.
+
 ### STORY-165: Catalog survives a corrupt course row (shipped)
 
 Production `/courses` rendered the "Courses unavailable" fallback on every
