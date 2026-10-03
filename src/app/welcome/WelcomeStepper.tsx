@@ -38,8 +38,8 @@ const STEPS = [
     body: "Browse the catalog, pick a course, watch short lessons, finish a quick quiz. Each lesson is 5–15 minutes. Your progress saves automatically.",
   },
   {
-    title: "Simulators — practice without burning real ad spend",
-    body: "Five free tools: bid elevator, campaign builder, listing audit, STR triage, keyword research. Each gives you a score so you know where to focus.",
+    title: "Practice tools — repeat the job without burning real ad spend",
+    body: "Twelve free simulators across two libraries. The five graded AMPH engines score your decisions: bid elevator, campaign builder, listing audit, STR triage, keyword research. Seven more live in the SimGrid library at /practice/simgrid: ad console, pacing deck, bulk file, SQP studio, client onboarding, capstone, plus BuyBox Dojo for listing. Open the same simulator as many times as you need. Your best score per simulator shows on your dashboard.",
   },
   {
     title: "You're ready to start",
