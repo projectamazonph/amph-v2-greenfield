@@ -65,7 +65,9 @@ test.describe("Welcome tour (STORY-146)", () => {
 
     // ── 5. Step 3 → 4 ─────────────────────────────────────────────────
     await page.getByRole("button", { name: /^next$/i }).click();
-    await expect(page.getByText(/practice without burning real ad spend/i)).toBeVisible();
+    await expect(
+      page.getByText(/Practice tools .* repeat the job without burning real ad spend/i),
+    ).toBeVisible();
     await expect(page.getByText(/Step 4 of 5/i)).toBeVisible();
 
     // ── 6. Step 4 → 5 ─────────────────────────────────────────────────

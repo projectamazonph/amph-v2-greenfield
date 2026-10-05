@@ -29,17 +29,52 @@ The curriculum is divided into **three connected courses**:
 
 ---
 
+## 🛠 Practice Tools
+
+Every lesson that asks you to "make the call yourself" ends with one of these twelve practice surfaces. Five are graded AMPH engines that score against explicit evidence thresholds. Seven more are free SimGrid sims that cover listing, the live Ad Console, pacing, bulk file operations, SQP analytics, account audit, client onboarding, and the capstone workflow. SimGrid sims are free for any signed-in student and do not gate course progression. Round-completion scores sync into your dashboard.
+
+### Graded AMPH simulators
+
+| Tool                 | What it drills                                                                         | Surface                   |
+| -------------------- | -------------------------------------------------------------------------------------- | ------------------------- |
+| **Bid Elevator**     | Tune bids against per-keyword economics, evidence thresholds, and the campaign budget. | `/tools/bid-elevator`     |
+| **Campaign Builder** | Structure campaigns, allocate budget, route negatives, name conventions.               | `/tools/campaign-builder` |
+| **Listing Audit**    | Triage listing findings by urgency and safest next action.                             | `/tools/listing-audit`    |
+| **STR Triage**       | Sort search-term reports into keep, negate, isolate.                                   | `/tools/str-triage`       |
+| **Keyword Research** | Rank keywords before you spend a cent.                                                 | `/tools/keyword-research` |
+
+### SimGrid library (free, no enrollment gate)
+
+| Sim                    | What it drills                                                          | Surface                                     |
+| ---------------------- | ----------------------------------------------------------------------- | ------------------------------------------- |
+| **BuyBox Dojo**        | Optimize a listing and run a 7-day PPC pressure test.                   | `/practice/simgrid/listing.html`            |
+| **AdConsole Pro**      | Full Sponsored Ads console, hour-by-hour auction.                       | `/practice/simgrid/ad-console.html`         |
+| **Keyword Lab**        | Research, build a hit list, rank keywords.                              | `/practice/simgrid/keyword-lab.html`        |
+| **Campaign Architect** | Turn a product brief into structure, targets, guardrails.               | `/practice/simgrid/campaign-architect.html` |
+| **Search Term Triage** | 8, 12, or 16 terms a round; defend each decision.                       | `/practice/simgrid/search-triage.html`      |
+| **Bid Decisions**      | Read clicks, spend, sales, ACOS, ROAS, confidence before moving.        | `/practice/simgrid/bid-decisions.html`      |
+| **Pacing Deck**        | Set day-parting and watch the daily-budget flight log.                  | `/practice/simgrid/pacing-deck.html`        |
+| **Bulk File**          | Upload, validate, get graded the way Amazon grades uploads.             | `/practice/simgrid/bulk-file.html`          |
+| **SQP Studio**         | Read search-query performance and conversion signals.                   | `/practice/simgrid/sqp-studio.html`         |
+| **Account Audit**      | Rank urgency and pick the safest next action for waste, scale, listing. | `/practice/simgrid/account-audit.html`      |
+| **Client Onboarding**  | Turn a handoff into access, KPI, product facts, approval rules.         | `/practice/simgrid/client-onboarding.html`  |
+| **Capstone**           | Run the full PPC workflow end-to-end.                                   | `/practice/simgrid/capstone-sequence.html`  |
+
+Hub page with status pills: `/practice/simgrid`.
+
+---
+
 ## 📖 Module Breakdown
 
 ### **Module -1: Amazon and the PPC job** (3 lessons, ~28 minutes, 150 XP)
 
 **Purpose:** The zero-knowledge starting point for a learner who has never bought from or sold on Amazon.
 
-| #    | Lesson                                        | Type    | Duration | XP  | Learning Objectives                                                          |
-| ---- | --------------------------------------------- | ------- | -------- | --- | ---------------------------------------------------------------------------- |
-| -1.1 | What Amazon Is and How It Makes Money         | Reading | 10 min   | 50  | Explain what Amazon is, who shops and sells there, and where its revenue comes from |
-| -1.2 | Surfaces You Will Use                         | Reading | 8 min    | 50  | Name the four surfaces a PPC VA touches, describe each one, and find each one |
-| -1.3 | The Ad Object Model                           | Reading | 10 min   | 50  | Describe the five levels of the ads hierarchy and read a campaign structure on screen |
+| #    | Lesson                                | Type    | Duration | XP  | Learning Objectives                                                                   |
+| ---- | ------------------------------------- | ------- | -------- | --- | ------------------------------------------------------------------------------------- |
+| -1.1 | What Amazon Is and How It Makes Money | Reading | 10 min   | 50  | Explain what Amazon is, who shops and sells there, and where its revenue comes from   |
+| -1.2 | Surfaces You Will Use                 | Reading | 8 min    | 50  | Name the four surfaces a PPC VA touches, describe each one, and find each one         |
+| -1.3 | The Ad Object Model                   | Reading | 10 min   | 50  | Describe the five levels of the ads hierarchy and read a campaign structure on screen |
 
 ---
 
