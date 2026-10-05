@@ -25,11 +25,13 @@ import type { ContentReadError } from "@/domain/ports/content/IAmphContentReader
  *   -1–4 → "ppc-foundations"
  *   5–10 → "accelerated-mastery"
  *   11 → "ultimate-transformation"
+ *   12 → "simgrid-workflows"
  */
 function courseSlugForModule(moduleNumber: number): string | null {
   if (moduleNumber >= -1 && moduleNumber <= 4) return "ppc-foundations";
   if (moduleNumber >= 5 && moduleNumber <= 10) return "accelerated-mastery";
   if (moduleNumber === 11) return "ultimate-transformation";
+  if (moduleNumber === 12) return "simgrid-workflows";
   return null;
 }
 

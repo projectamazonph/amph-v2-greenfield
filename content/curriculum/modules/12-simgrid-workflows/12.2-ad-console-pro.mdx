@@ -1,0 +1,78 @@
+---
+title: "AdConsole Pro: The Operator's Surface, Hour by Hour"
+slug: "12.2-ad-console-pro"
+moduleNumber: 12
+lessonNumber: 2
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the operator surface AdConsole Pro emulates, name the four navigation layers a real Sponsored Ads operator works in, and read the simulator's pacing and auction feedback before you touch a bid or budget.
+
+## Why this workflow exists
+
+A real Amazon Ads operator spends most of their day inside Campaign Manager. They move between four layers: the campaigns list, the ad group, the keyword or product targeting list, and the search-term report. Each layer answers a different question.
+
+The AdConsole Pro sim is the practice surface. The lesson is the navigation logic: which layer you open depends on what you are trying to protect or improve, and the same account will look different at 9 AM, at noon, and at 6 PM.
+
+## What the workflow looks like end to end
+
+A production operator who runs this surface for real does four things, in order:
+
+1. **Open the campaigns layer.** Read yesterday's pacing, account-level ACoS, TACoS, and the day's spend rate. Flag campaigns that are pacing too fast or too slow against the daily budget.
+2. **Drill into the ad group.** Compare each ad group's performance against its own brief. A healthy campaign at the account level can still hide a single ad group that is bleeding spend.
+3. **Read the keyword and search-term layers.** Sort by spend, then by ACoS. Identify the search terms that need a bid change, a pause, or a negative match.
+4. **Check the auction layer.** Look at placement modifiers, hour-of-day, and impression share. A bid that wins cheap placements does not always win the placement that converts.
+
+The pacing decision is hourly in a launch week. Outside launch week, the same decisions happen on a daily or weekly cadence, depending on spend volume.
+
+## How to read the simulator's feedback
+
+AdConsole Pro scores you against four signals:
+
+- **Layer choice.** Did you open the right layer first for the question you were trying to answer?
+- **Pacing read.** Did you spot the campaigns that were over- or under-pacing against the daily budget?
+- **Search-term action.** Did you pick the right keep / negate / pause action for the term?
+- **Auction interpretation.** Did you distinguish a placement problem from a relevance problem?
+
+A high score means your navigation matched the question you were trying to answer. A low score usually means you opened the keyword layer when the budget layer had the answer.
+
+## Your turn
+
+Open AdConsole Pro at `/practice/simgrid/ad-console.html`. Pick one account snapshot, work the workflow from the campaigns layer down to the search-term layer, and write your next action in one sentence. Name the layer you opened first and the signal that drove the call.
+
+## Fact card
+
+```text
+Product or feature: AdConsole Pro, full Sponsored Ads console emulation (SimGrid `ad-console` simulator)
+What the learner can do: Read pacing and auction data before making a bid or budget change
+Who can access it: Any signed-in student on the simgrid-workflows tier
+Retailer or marketplace scope: Amazon Sponsored Products console UX is country-localized; the navigation logic transfers across regions
+Official source URL: https://advertising.amazon.com
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-12-2-pitfall" variant="pitfall" title="Opening the keyword layer first every time"}
+If you open keywords before budgets, you can lose an hour optimizing a campaign that should have been paused at the daily-budget layer. Start at the campaigns layer, always.
+:::
+
+<SelfCheck
+  id="sc-12-2"
+  prompt="Spend is 70% of daily budget at 9 AM. What is the first layer to open?"
+  options={["The keyword layer, to pause the worst-converting keyword.", "The campaigns layer, to read pacing and decide whether to act.", "The placement layer, to drop top-of-search.", "The search-term layer, to add negatives."]}
+  answerIndex={1}
+  explanation="Spend rate is a pacing question. Open the campaigns layer first, read the pacing data, then decide whether to lower the daily budget, raise the bid on winners, or wait it out."
+/>
+
+## Check
+
+A strong answer names the layer they opened first and the signal that pointed them to the next layer. A weak answer treats every question as a keyword question, which is how real operators lose hours in the account.
+
+## Key takeaway
+
+The campaigns layer is for pacing. The ad group layer is for diagnosis. The keyword and search-term layers are for action. The auction layer is for placement strategy. Open the right layer first, every time.

@@ -4,39 +4,30 @@
     "ppc-foundations": {
       "label": "PPC Foundations",
       "tier": "pp-foundations",
-      "moduleNumbers": [
-        -1,
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
+      "moduleNumbers": [-1, 0, 1, 2, 3, 4],
       "lessonCount": 22,
       "plannedMinutes": 263
     },
     "accelerated-mastery": {
       "label": "Accelerated Mastery",
       "tier": "accelerated-mastery",
-      "moduleNumbers": [
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ],
+      "moduleNumbers": [5, 6, 7, 8, 9, 10],
       "lessonCount": 19,
       "plannedMinutes": 181
     },
     "ultimate-transformation": {
       "label": "Ultimate Transformation",
       "tier": "ultimate-transformation",
-      "moduleNumbers": [
-        11
-      ],
+      "moduleNumbers": [11],
       "lessonCount": 4,
       "plannedMinutes": 31
+    },
+    "simgrid-workflows": {
+      "label": "SimGrid Workflows",
+      "tier": "simgrid-workflows",
+      "moduleNumbers": [12],
+      "lessonCount": 12,
+      "plannedMinutes": 120
     }
   },
   "modules": [
@@ -130,6 +121,13 @@
       "courseSlug": "ultimate-transformation",
       "lessonCount": 4,
       "plannedMinutes": 31
+    },
+    {
+      "moduleNumber": 12,
+      "name": "SimGrid workflow training",
+      "courseSlug": "simgrid-workflows",
+      "lessonCount": 12,
+      "plannedMinutes": 120
     }
   ],
   "simulators": {
@@ -155,11 +153,7 @@
     }
   },
   "tierSimulatorTargets": {
-    "pp-foundations": [
-      "campaign-builder",
-      "bid-elevator",
-      "str-triage"
-    ],
+    "pp-foundations": ["campaign-builder", "bid-elevator", "str-triage"],
     "accelerated-mastery": [
       "campaign-builder",
       "bid-elevator",
@@ -173,6 +167,20 @@
       "str-triage",
       "listing-audit",
       "keyword-research"
+    ],
+    "simgrid-workflows": [
+      "account-audit",
+      "ad-console",
+      "bid-decisions",
+      "bulk-file",
+      "campaign-architect",
+      "capstone-sequence",
+      "client-onboarding",
+      "keyword-lab",
+      "listing",
+      "pacing-deck",
+      "search-triage",
+      "sqp-studio"
     ]
   },
   "certificate": {

@@ -1,0 +1,78 @@
+---
+title: "SQP Studio: Rank What the Data Proves, Flag What It Only Hints"
+slug: "12.9-sqp-studio"
+moduleNumber: 12
+lessonNumber: 9
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow a real operator runs on a Search Query Performance (SQP) report, name the four ranks the data supports, and read the simulator's grade for "proved" vs "hinted" signals before you turn a hint into a bid or budget change.
+
+## Why this workflow exists
+
+A Search Query Performance report tells you how shoppers find your product and how each query converts. A real operator reads it the same way a doctor reads a chart: rank the most important signals, ignore the noise, and act only on what the data proves.
+
+The SQP Studio sim is the practice surface. The lesson is the rank: by impressions, by clicks, by conversion rate, then by priority. The fourth rank is the one that protects you from acting on a hint.
+
+## What the workflow looks like end to end
+
+A production operator who reads SQP for a real account runs four ranks, in order:
+
+1. **Rank by impressions.** Which queries get the most visibility? These are the queries Amazon already thinks are about your product. They are the ones to optimize first, because the data is already there.
+2. **Rank by clicks.** Of those high-impression queries, which ones do shoppers actually click? The click-through rate separates "seen" from "considered."
+3. **Rank by conversion.** Of those clicked queries, which ones turn into orders? A high-CTR, low-converting query is a listing problem, not a targeting problem. A low-CTR, high-converting query is an attention problem.
+4. **Prioritize.** Decide which queries deserve a bid change, which deserve a negative, and which are noise. A query with high impressions, low clicks, and zero orders is a hint, not a fact. A query with high impressions, high clicks, and zero orders is closer to a fact.
+
+The difference between a hint and a fact is the data behind it. A query with 4 clicks and 0 orders is a hint. A query with 60 clicks and 0 orders is a fact.
+
+## How to read the simulator's feedback
+
+SQP Studio grades you against four signals:
+
+- **Impression rank.** Did you spot the queries Amazon already thinks are about your product?
+- **Click rank.** Did you separate seen from considered?
+- **Conversion rank.** Did you separate listing problems from targeting problems?
+- **Hint vs fact.** Did you protect yourself from acting on a low-data signal?
+
+A high score with no hint-vs-fact discipline is a long list of bid changes based on noise. A high score with explicit discipline is a short list of defensible actions.
+
+## Your turn
+
+Open SQP Studio at `/practice/simgrid/sqp-studio.html`. Pick one SQP report. Run the four ranks. At the end, write one query you would act on (and why) and one query you would not act on (and why).
+
+## Fact card
+
+```text
+Product or feature: SQP Studio, Search Query Performance ranked by impression, click, and conversion (SimGrid `sqp-studio` simulator)
+What the learner can do: Separate what the SQP data proves from what it only hints
+Who can access it: Any signed-in student on the simgrid-workflows tier
+Retailer or marketplace scope: Brand-Registry-only feature in real accounts; the workflow transfers to any analytics report that has the same three signals
+Official source URL: https://advertising.amazon.com (SQP entry; Brand Registry required for live data)
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-12-9-pitfall" variant="pitfall" title="Acting on a 4-click signal"}
+Four clicks is the start of a signal. Sixty clicks is a fact. Match the action strength to the evidence strength.
+:::
+
+<SelfCheck
+  id="sc-12-9"
+  prompt="A query has 200 impressions, 6 clicks, and 0 orders. What is the move?"
+  options={["Negate it immediately.", "Raise the bid to win more impressions.", "Hold and wait for 30+ clicks before acting.", "Move it to a Sponsored Brands campaign."]}
+  answerIndex={2}
+  explanation="Six clicks is a hint, not a fact. The right move is to wait for enough data to act on. Ninety percent of "obvious" negations made at six clicks would have been wrong."
+/>
+
+## Check
+
+A strong answer ranks by impression, then click, then by conversion, and labels each query as a fact or a hint. A weak answer turns every observation into a change.
+
+## Key takeaway
+
+Rank, then act. Match the action strength to the evidence strength. The SQP report is most useful when it tells you what you should not change.

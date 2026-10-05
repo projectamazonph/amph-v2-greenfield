@@ -1,0 +1,78 @@
+---
+title: "Bulk File: Scope the Change, Build the Sheet, Dry-Run, Ship"
+slug: "12.8-bulk-file"
+moduleNumber: 12
+lessonNumber: 8
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow a real operator runs to ship a bulk upload to Amazon, name the four stages of a safe bulk change, and read the simulator's grade on validation errors before you upload a sheet to a live account.
+
+## Why this workflow exists
+
+A Sponsored Products bulk upload can change hundreds of bids, keywords, or ad groups in a single file. Done well, it is the fastest way to update a portfolio. Done poorly, it breaks an account in one click.
+
+The Bulk File sim is the practice surface. The lesson is the workflow: scope the change to a single question, build the sheet, dry-run it through Amazon's validation, then ship.
+
+## What the workflow looks like end to end
+
+A production operator who runs a real bulk change works in four stages:
+
+1. **Scope the change.** Write one sentence that says what the sheet will and will not change. A bulk upload that touches two unrelated intents is a sheet that will fail validation or break an unrelated campaign.
+3. **Build the sheet.** Use the template Amazon provides. Match the column names exactly. Check the entity types (campaign, ad group, keyword, product targeting). Use the action field correctly (create, update, delete).
+4. **Dry-run.** Validate the sheet before you upload. Amazon grades the upload the same way the simulator does. A row with the wrong entity type, a missing required field, or an invalid action will fail.
+2. **Ship.** Upload, then read the result row by row. Log the rows that failed and the rows that succeeded. The failed rows tell you what to fix before the next upload.
+
+A common pitfall is uploading a sheet that mixes update and create actions. A row with an existing campaign entity ID and the create action will reject. A row with the delete action but no entity ID will reject. Read the result, do not assume success.
+
+## How to read the simulator's feedback
+
+Bulk File grades you against four signals:
+
+- **Scope discipline.** Did you scope the change to one question?
+- **Sheet structure.** Did the column names and entity types match Amazon's template?
+- **Validation result.** Did you catch the rows that would have failed a real upload?
+- **Action mix.** Did you keep update, create, and delete in separate sheets?
+
+A high score with a mixed action set is a sheet that will reject some rows on the way in. A high score with a clear action set is a sheet that ships clean.
+
+## Your turn
+
+Open Bulk File at `/practice/simgrid/bulk-file.html`. Pick one change. Scope it, build the sheet, dry-run, and read the result. At the end, write the scope sentence, the action set, and the rows that needed a fix.
+
+## Fact card
+
+```text
+Product or feature: Bulk File, bulk upload, validated the way Amazon validates (SimGrid `bulk-file` simulator)
+What the learner can do: Ship a Sponsored Products bulk change that passes Amazon's validation on the first upload
+Who can access it: Any signed-in student on the simgrid-workflows tier
+Retailer or marketplace scope: Sponsored Products bulk operations; the column names and template are documented at advertising.amazon.com
+Official source URL: https://advertising.amazon.com (bulk operations documentation)
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-12-8-pitfall" variant="pitfall" title="Mixing update and create in one sheet"}
+A bulk upload that mixes create and update actions will reject rows unpredictably. Keep one sheet per action set, every time.
+:::
+
+<SelfCheck
+  id="sc-12-8"
+  prompt="Your sheet has 100 bid changes. Twenty rows have a typo in the campaign entity ID. What is the right move?"
+  options={["Upload the sheet and fix the 20 failed rows after.", "Fix the 20 rows in the sheet, re-validate, then upload.", "Split the sheet into a good one and a bad one.", "Upload twice, once for each half."]}
+  answerIndex={1}
+  explanation="Validate dry-runs are for catching the typos before the upload. Fix the sheet, re-validate, then ship. The post-upload fix loop is what turns one mistake into a long evening."
+/>
+
+## Check
+
+A strong answer scopes the change to one sentence, uses the right template, separates action sets, and validates before upload. A weak answer uploads and hopes.
+
+## Key takeaway
+
+Scope, build, dry-run, ship. Read the validation result before you call it done. The bulk file is the fastest tool in the account, and the fastest way to break one.

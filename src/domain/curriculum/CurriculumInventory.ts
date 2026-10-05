@@ -1,7 +1,8 @@
 import type { Result } from "@/domain/shared/Result";
 import { Result as ResultFactory } from "@/domain/shared/Result";
 
-export type CurriculumTier = "pp-foundations" | "accelerated-mastery" | "ultimate-transformation";
+export type CurriculumTier =
+  "pp-foundations" | "accelerated-mastery" | "ultimate-transformation" | "simgrid-workflows";
 
 export type CurriculumToolBridge =
   | Readonly<{ kind: "none" }>
@@ -85,6 +86,7 @@ const CURRICULUM_TIERS: readonly CurriculumTier[] = [
   "pp-foundations",
   "accelerated-mastery",
   "ultimate-transformation",
+  "simgrid-workflows",
 ];
 
 function isRecord(value: unknown): value is Record<string, unknown> {

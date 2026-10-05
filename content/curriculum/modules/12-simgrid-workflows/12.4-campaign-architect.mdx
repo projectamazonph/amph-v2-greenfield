@@ -1,0 +1,79 @@
+---
+title: "Campaign Architect: From Product Brief to Operable Structure"
+slug: "12.4-campaign-architect"
+moduleNumber: 12
+lessonNumber: 4
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow that turns a product brief into a campaign structure a junior operator can run six months later, name the five questions the structure has to answer, and read the simulator's grade on structure before you launch.
+
+## Why this workflow exists
+
+A campaign structure built for day-one speed usually collapses by month three. Ad groups with mixed intents, campaigns with overlapping keywords, and bid defaults that assume a launch week all decay as the account grows.
+
+The Campaign Architect sim is the practice surface. The lesson is the structure logic: how many campaigns, what match types, what bid defaults, what negatives, and what review cadence. Every decision has a reason that the next operator can read.
+
+## What the workflow looks like end to end
+
+A production operator who builds structure for real answers five questions, in order:
+
+1. **How many campaigns?** One per intent cluster (auto for discovery, exact for known winners, phrase for in-between, branded for the client's own brand terms). Each campaign has one purpose and one review cadence.
+2. **What match types?** Auto at low bid for discovery, exact at the calculated maximum CPC for known winners, phrase for the middle band. Avoid putting the same keyword stem in multiple match types inside one campaign.
+3. **What bid defaults?** Bid at the calculated maximum CPC for the keyword, not at Amazon's suggested bid. Suggested bid is what the auction pays, not what your economics support.
+5. **What negatives?** Start with the obvious ones (wrong product, wrong use case, wrong audience, competitor brands if the client does not want them). Build the rest from the first week of search-term data.
+4. **What review cadence?** Daily for budget and stock, weekly for bids and negatives, monthly for structure. Tie the review cadence to the campaign's purpose.
+
+The output is a structure document that names each campaign, its match types, its bid defaults, its negative list, and its review date.
+
+## How to read the simulator's feedback
+
+Campaign Architect scores you against four signals:
+
+- **Campaign count and purpose.** Did each campaign have one purpose, or did several intents share one campaign?
+- **Match-type fit.** Did the match types match the keyword intent for each ad group?
+- **Bid defaults.** Did the bids respect the calculated maximum CPC, or did you accept Amazon's suggested bid by default?
+- **Review cadence.** Did each campaign have a named review cadence, or did everything default to "weekly"?
+
+A high score with no review cadence is a structure that will rot in three months. A high score with explicit cadence and explicit purpose is a structure that survives the next operator change.
+
+## Your turn
+
+Open Campaign Architect at `/practice/simgrid/campaign-architect.html`. Pick one product brief. Build a structure that answers the five questions above. At the end, write one sentence per campaign that says its purpose, its match type, its bid default, and its review cadence.
+
+## Fact card
+
+```text
+Product or feature: Campaign Architect, turn a product brief into structure (SimGrid `campaign-architect` simulator)
+What the learner can do: Produce a campaign structure that is operable six months later, not just on launch day
+Who can access it: Any signed-in student on the simgrid-workflows tier
+Retailer or marketplace scope: General Amazon Sponsored Products structure practice
+Official source URL: https://advertising.amazon.com
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-12-4-pitfall" variant="pitfall" title="One campaign with five match types"}
+A single campaign with broad, phrase, and exact running the same keyword stems will cannibalize, leave the launch showing up for the wrong searches, and make weekly triage a nightmare.
+:::
+
+<SelfCheck
+  id="sc-12-4"
+  prompt="How many campaigns does a clean Sponsored Products structure need at launch?"
+  options={["One campaign with every match type and every keyword.", "One campaign per intent cluster, each with one purpose and one review cadence.", "Five campaigns per ASIN, one per match type, plus an auto campaign."]}
+  answerIndex={1}
+  explanation="Structure follows purpose. One campaign per intent cluster keeps each campaign operable and each review surface predictable."
+/>
+
+## Check
+
+A strong answer names each campaign's purpose, the match types inside it, the bid default, the negative list, and the review cadence. A weak answer leaves any of those five pieces blank.
+
+## Key takeaway
+
+Structure is what survives the next operator. Build it once, with all five questions answered, and the weekly work becomes a triage loop rather than a rescue operation.

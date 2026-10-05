@@ -1,0 +1,80 @@
+---
+title: "Client Onboarding: Access, KPI, Facts, Approval Rules, Launch Blockers"
+slug: "12.11-client-onboarding"
+moduleNumber: 12
+lessonNumber: 11
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow a real operator runs on a client handoff, name the five questions that have to be answered before work starts, and read the simulator's grade on access, KPI, facts, approval rules, and launch blockers before you touch the account.
+
+## Why this workflow exists
+
+A client handoff that does not name the rights, the rules, and the launch blockers is a handoff that ends in a lost weekend. A PPC operator who starts work without these five answers is a PPC operator who will guess the rest of the account.
+
+The Client Onboarding sim is the practice surface. The lesson is the handoff checklist. Every new client starts with the same five questions, even the ones who say "just turn on ads."
+
+## What the workflow looks like end to end
+
+A production operator who onboards a real account for the first time runs five steps, in order:
+
+1. **Access.** Confirm Seller Central delegated access and Amazon Ads console access with the right permission level. A read-only access is not enough for an ads operator. Document the login, the MFA, and the person to escalate to if the access breaks.
+2. **KPI.** Confirm the objective and the success metric. Is the client optimizing for ACoS, TACoS, ROAS, sales volume, or something else? "Make it work" is not a KPI.
+3. **Product facts.** Confirm the ASIN list, the price, the stock, the offer, and any planned promotions. The launch calendar drives the campaign calendar.
+4. **Approval rules.** Confirm what you can change without asking (current plan = routine bid and negative changes) and what requires approval (budget step ups, structure changes, anything that changes spend by more than a small threshold).
+5. **Launch blockers.** Flag anything that prevents launch: missing access, no budget, no approved offer, listing in stock issue, missing KPI. Do not turn anything on while a blocker is open.
+
+The output is a one-page onboarding doc that the client signs (or replies "approved" to). The doc is the audit trail that protects both sides if the work goes wrong.
+
+## How to read the simulator's feedback
+
+Client Onboarding grades you against five signals:
+
+- **Access.** Did you confirm access at the right permission level?
+- **KPI.** Did you name a success metric, not "make it work"?
+- **Facts.** Did you confirm ASIN, price, stock, offer, calendar?
+- **Approval rules.** Did you separate routine from approval-required?
+- **Launch blockers.** Did you flag anything that prevents a safe launch?
+
+A high score with no approval rules is a handoff that produces "I thought you said yes" later. A high score with explicit rules is a handoff that survives the first disagreement.
+
+## Your turn
+
+Open Client Onboarding at `/practice/simgrid/client-onboarding.html`. Pick one client handoff. Run the five steps. At the end, write your one-page onboarding doc with the five answers and the launch-blocker list.
+
+## Fact card
+
+```text
+Product or feature: Client Onboarding, turn a handoff into access, KPI, product facts, approval rules, launch blockers (SimGrid `client-onboarding` simulator)
+What the learner can do: Start a new client engagement without losing access, KPI, or approval boundaries
+Who can access it: Any signed-in student on the simgrid-workflows tier
+Retailer or marketplace scope: General Amazon PPC operator workflow, applies to any client engagement
+Official source URL: https://sellercentral.amazon.com (delegated user permissions)
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-12-11-pitfall" variant="pitfall" title="Starting work before the approval rules are clear"}
+The first thing you change without asking is the first thing the client will reverse. Get the rules in the doc before the change is in the account.
+:::
+
+<SelfCheck
+  id="sc-12-11"
+  prompt="A client says, 'Just turn on ads and we'll figure it out later.' What is the first move?"
+  options={["Turn on a small auto campaign to show progress.", "Pause and ask for the five onboarding answers before turning anything on.", "Set a default budget and start a manual campaign.", "Wait for the client to send a written brief, then start."]}
+  answerIndex={1}
+  explanation="Without the five answers, every action is guesswork. Pause and ask. The handoff doc is what makes the work reviewable."
+/>
+
+## Check
+
+A strong answer names the access level, the KPI, the product facts, the approval rules, and the launch blockers. A weak answer skips any of the five.
+
+## Key takeaway
+
+Five questions, five answers, one approval. The handoff doc is the audit trail. Do not turn on ads before the doc is signed.

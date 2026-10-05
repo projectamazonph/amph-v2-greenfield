@@ -9,6 +9,9 @@
     },
     "ultimate-transformation": {
       "tier": "ultimate-transformation"
+    },
+    "simgrid-workflows": {
+      "tier": "simgrid-workflows"
     }
   },
   "lessons": [
@@ -383,6 +386,114 @@
       },
       "resourceRefs": ["mdx:-1.3-ad-object-model"],
       "finalDeliverable": "A labeled diagram or sentence describing the five-level Amazon ads hierarchy"
+    },
+    {
+      "slug": "12.1-buybox-dojo",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "listing"
+      },
+      "resourceRefs": ["mdx:12.1-buybox-dojo"],
+      "finalDeliverable": "A listing-readiness memo: research sources, match-type mix, negative list, and a 7-day PPC pressure-test plan"
+    },
+    {
+      "slug": "12.2-ad-console-pro",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "ad-console"
+      },
+      "resourceRefs": ["mdx:12.2-ad-console-pro"],
+      "finalDeliverable": "An AdConsole navigation log: which layer you opened first, the pacing or auction signal you found, and the action you took next"
+    },
+    {
+      "slug": "12.3-keyword-lab",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "keyword-lab"
+      },
+      "resourceRefs": ["mdx:12.3-keyword-lab"],
+      "finalDeliverable": "A hit list of 5 ranked terms with intent, est CPC, est CVR, target ACoS, and the ad group each belongs to"
+    },
+    {
+      "slug": "12.4-campaign-architect",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "campaign-architect"
+      },
+      "resourceRefs": ["mdx:12.4-campaign-architect"],
+      "finalDeliverable": "A structure doc: one purpose, one match type, one bid default, one negative list, one review cadence per campaign"
+    },
+    {
+      "slug": "12.5-search-triage",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "search-triage"
+      },
+      "resourceRefs": ["mdx:12.5-search-triage"],
+      "finalDeliverable": "A triage log: cluster, rule per cluster, batch action, and the one-line defense for each cluster"
+    },
+    {
+      "slug": "12.6-bid-decisions",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "bid-decisions"
+      },
+      "resourceRefs": ["mdx:12.6-bid-decisions"],
+      "finalDeliverable": "A bid-decision memo: the six numbers you read, the move you picked (raise / hold / lower / investigate), and the step size you chose"
+    },
+    {
+      "slug": "12.7-pacing-deck",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "pacing-deck"
+      },
+      "resourceRefs": ["mdx:12.7-pacing-deck"],
+      "finalDeliverable": "A pacing log: yesterday's curve, today's day-parting modifier, hour-6 and hour-18 verification, and the next review time"
+    },
+    {
+      "slug": "12.8-bulk-file",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "bulk-file"
+      },
+      "resourceRefs": ["mdx:12.8-bulk-file"],
+      "finalDeliverable": "A bulk-sheet record: scope sentence, action set, dry-run result, and the fix loop for any failed rows"
+    },
+    {
+      "slug": "12.9-sqp-studio",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "sqp-studio"
+      },
+      "resourceRefs": ["mdx:12.9-sqp-studio"],
+      "finalDeliverable": "An SQP memo: ranks by impression, click, and conversion, plus one query you'd defend acting on and one you'd defend waiting on"
+    },
+    {
+      "slug": "12.10-account-audit",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "account-audit"
+      },
+      "resourceRefs": ["mdx:12.10-account-audit"],
+      "finalDeliverable": "An audit list: top three findings with defenses, ranked waste first, scale second, listing third, thin data last"
+    },
+    {
+      "slug": "12.11-client-onboarding",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "client-onboarding"
+      },
+      "resourceRefs": ["mdx:12.11-client-onboarding"],
+      "finalDeliverable": "A one-page onboarding doc: access level, KPI, product facts, approval rules, launch blockers"
+    },
+    {
+      "slug": "12.12-capstone",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "capstone-sequence"
+      },
+      "resourceRefs": ["mdx:12.12-capstone"],
+      "finalDeliverable": "An integration run: six artifacts, the onboarding doc, structure doc, launch log, optimization log, audit list, and report"
     }
   ]
 }

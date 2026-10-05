@@ -14,7 +14,7 @@ import type { Result } from "@/domain/shared/Result";
 export interface MdxFrontmatter {
   readonly title: string;
   readonly slug: string; // e.g. "1.1-read-ppc-data-before-you-change-it"
-  readonly moduleNumber: number; // 0–11
+  readonly moduleNumber: number; // 0–12
   readonly lessonNumber: number; // 1–N
   readonly type: string; // "reading" → TEXT, "video" → VIDEO, etc.
   readonly estimatedMinutes: number;
@@ -44,6 +44,7 @@ export interface IAmphContentReader {
    *   -1–4 → "ppc-foundations"
    *   5–10 → "accelerated-mastery"
    *   11 → "ultimate-transformation"
+   *   12 → "simgrid-workflows"
    *
    * Files whose moduleNumber falls outside these ranges are skipped
    * (they are not an error — future content may add later modules).

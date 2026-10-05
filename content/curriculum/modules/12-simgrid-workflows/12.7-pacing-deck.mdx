@@ -1,0 +1,78 @@
+---
+title: "Pacing Deck: Read the Day, Set the Modifiers, Verify at Hour 6 and Hour 18"
+slug: "12.7-pacing-deck"
+moduleNumber: 12
+lessonNumber: 7
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow a real operator runs to pace a Sponsored Products daily budget, name the three places pacing is set, and read the simulator's flight-log feedback before you ship a day-parting change.
+
+## Why this workflow exists
+
+A Sponsored Products campaign that blows its daily budget by 11 AM is not pacing. A campaign that has spent 30% of budget by 6 PM is also not pacing. Pacing means the spend fits the budget across the day in a way that lines up with the conversion pattern.
+
+The Pacing Deck sim is the practice surface. The lesson is the workflow: read yesterday's pacing, set today's modifiers, verify at hour 6 and hour 18, and record the call.
+
+## What the workflow looks like end to end
+
+A production operator who paces a real campaign runs four steps, in order:
+
+1. **Read yesterday's pacing.** Look at the spend curve. Did the campaign hit its daily budget before peak conversion? Is the factor wrong?
+2. **Set today's modifiers.** Day-parting is available where Amazon offers it. Adjust the bid modifier (up or down) on each hour-of-day or day-of-week group based on yesterday's conversion pattern.
+3. **Verify at hour 6 and hour 18.** Check the spend curve at the halfway mark and again late in the day. A campaign on track at hour 6 can still blow its budget by 9 PM. A campaign under-pacing at hour 6 might still need to recover.
+4. **Record.** Log the modifier set, the spend at each checkpoint, and the next review time.
+
+Day-parting is not the same as budget cap. Day-parting is a bid modifier that turns spend up or down by hour-of-day or day-of-week. The budget cap is the daily ceiling. Both matter; they are different tools.
+
+## How to read the simulator's feedback
+
+Pacing Deck grades you against four signals:
+
+- **Yesterday's curve read.** Did you spot the over- or under-spend?
+- **Modifier decision.** Did the bid modifier line up with the conversion pattern?
+- **Checkpoint verification.** Did you verify at hour 6 and hour 18, or did you set and forget?
+- **Record.** Did you log the modifier and the spend at each checkpoint?
+
+A high score with no checkpoint verification is a setting that might be right today and wrong tomorrow. A high score with explicit checkpoints is a pacing rhythm that survives the next handover.
+
+## Your turn
+
+Open Pacing Deck at `/practice/simgrid/pacing-deck.html`. Read yesterday's curve, set today's modifiers, verify at hour 6 and hour 18, and record. Write your modifier decision in one sentence, naming the conversion signal that drove it.
+
+## Fact card
+
+```text
+Product or feature: Pacing Deck, set day-parting, watch the flight log (SimGrid `pacing-deck` simulator)
+What the learner can do: Pace a Sponsored Products daily budget across the hours that actually convert
+Who can access it: Any signed-in student on the simgrid-workflows tier
+Retailer or marketplace scope: Day-parting availability and the specific controls vary by marketplace; the workflow transfers
+Official source URL: https://advertising.amazon.com
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-12-7-pitfall" variant="pitfall" title="Setting day-parting once and forgetting it"}
+Conversion patterns shift with season, day-of-week, and auction pressure. Re-verify the curve every week, not just once.
+:::
+
+<SelfCheck
+  id="sc-12-7"
+  prompt="A campaign hits 95% of its daily budget by 11 AM. What is the first thing to check?"
+  options={["Pause the campaign for the rest of the day.", "Lower the daily budget.", "Read yesterday's pacing and the conversion curve before changing either bid or budget.", "Raise the bid so the campaign wins more."]}
+  answerIndex={2}
+  explanation="An early blow-out is a symptom, not the diagnosis. Read the curve and the conversion pattern before changing anything."
+/>
+
+## Check
+
+A strong answer reads the curve, sets a modifier aligned with the conversion pattern, verifies at hour 6 and hour 18, and records the call. A weak answer changes the budget without checking the curve.
+
+## Key takeaway
+
+Pacing is the daily rhythm. Read, set, verify, record. Day-parting is the modifier that lines the spend up with the hours that actually convert.

@@ -155,7 +155,14 @@ describe("quiz bank structure", () => {
   it("matches the modules that actually have lessons", async () => {
     const lessonModules = await modulesWithLessons();
     const quizModules = new Set(bank.map((q) => q.moduleNumber));
-    const quizless = [...lessonModules].filter((m) => !quizModules.has(m));
+    // Module 12 (SimGrid workflow training) is a free practice tier without a
+    // module-final quiz. Its formative signal comes from SimGrid round scores,
+    // which sync into the dashboard. Allow module 12 to have lessons without a
+    // quiz; every other lesson-bearing module must have one.
+    const QUIZ_OPT_OUT_MODULES = new Set<number>([12]);
+    const quizless = [...lessonModules].filter(
+      (m) => !QUIZ_OPT_OUT_MODULES.has(m) && !quizModules.has(m),
+    );
     const orphaned = [...quizModules].filter((m) => !lessonModules.has(m));
     expect(quizless, `modules with lessons but no quiz: ${quizless.join(", ")}`).toEqual([]);
     expect(orphaned, `quizzes for modules with no lessons: ${orphaned.join(", ")}`).toEqual([]);

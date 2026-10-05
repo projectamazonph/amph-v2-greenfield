@@ -1,9 +1,9 @@
 # Project Amazon PH Academy v2 — Comprehensive Curriculum Syllabus
 
-**Last Updated:** 2026-09-07
+**Last Updated:** 2026-10-05
 **Based On:** `content/CURRICULUM-INDEX.md` and `content/curriculum/modules/`
-**Total Planned Reading Time:** 475 minutes (~7 hours 55 minutes)
-**Total XP:** 3,880 points, excluding optional practice time
+**Total Planned Reading Time:** 595 minutes (~9 hours 55 minutes)
+**Total XP:** 4,480 points, excluding optional practice time
 
 ---
 
@@ -15,17 +15,20 @@ The Project Amazon PH Academy provides comprehensive Amazon PPC (Pay-Per-Click) 
 
 **Target Audience:** Filipino virtual assistants, eCommerce teams, and Amazon sellers seeking to master Amazon PPC advertising.
 
+The fourth tier (SimGrid Workflows) is free for any signed-in user and adds Module 12, twelve lessons walking the workflow a real PPC operator runs in production, one per SimGrid simulator. It does not gate progression through the three paid courses.
+
 ---
 
 ## 📚 Course Structure
 
-The curriculum is divided into **three connected courses**:
+The curriculum is divided into **three connected paid courses plus one free practice tier**:
 
 | Course                      | Tier                      | Modules | Lessons | Total XP | Planned reading |
 | --------------------------- | ------------------------- | ------- | ------: | -------: | --------------: |
 | **PPC Foundations**         | `ppc-foundations`         | -1–4    |      22 |    1,725 |     263 minutes |
 | **Accelerated Mastery**     | `accelerated-mastery`     | 5–10    |      19 |    1,755 |     181 minutes |
 | **Ultimate Transformation** | `ultimate-transformation` | 11      |       4 |      400 |      31 minutes |
+| **SimGrid Workflows**       | `simgrid-workflows`       | 12      |      12 |      600 |     120 minutes |
 
 ---
 
@@ -283,6 +286,33 @@ Hub page with status pills: `/practice/simgrid`.
 
 ---
 
+### **Module 12: SimGrid Workflow Training** (12 lessons, 120 minutes, 600 XP) → `simgrid-workflows` course (free for any signed-in user)
+
+**Purpose:** Walk the workflow a real PPC operator runs in production, one SimGrid simulator at a time. Each lesson teaches the operator-side workflow the sim emulates, not the sim's UX. Module 12 is free for any signed-in student and does not gate progression through Modules 0–11.
+
+| #     | Lesson                                                           | Type    | Duration | XP  | Learning Objectives                                                               |
+| ----- | ---------------------------------------------------------------- | ------- | -------- | --- | --------------------------------------------------------------------------------- |
+| 12.1  | BuyBox Dojo: Listing Fundamentals and the 7-Day Pressure Test    | Reading | 10 min   | 50  | Run a listing-readiness + 7-day PPC pressure-test workflow                        |
+| 12.2  | AdConsole Pro: The Operator's Surface, Hour by Hour              | Reading | 10 min   | 50  | Navigate the Sponsored Ads console layers (campaigns, ad group, keyword, auction) |
+| 12.3  | Keyword Lab: Research, Rank, and Rank Before You Spend           | Reading | 10 min   | 50  | Seed, expand, score, dedupe, and group a hit list before bidding                  |
+| 12.4  | Campaign Architect: From Product Brief to Operable Structure     | Reading | 10 min   | 50  | Build a campaign structure with one purpose, one match type, one cadence per item |
+| 12.5  | Search Term Triage: Cluster, Rule, Apply, Record                 | Reading | 10 min   | 50  | Turn a search-term report into a batched, defended set of keep / negate actions   |
+| 12.6  | Bid Decisions: Read Six Numbers, Pick One of Four Moves          | Reading | 10 min   | 50  | Read Clicks, spend, sales, ACoS, ROAS, and confidence before changing a bid       |
+| 12.7  | Pacing Deck: Read the Day, Set the Modifiers, Verify             | Reading | 10 min   | 50  | Set day-parting modifiers and verify at hour 6 and hour 18                        |
+| 12.8  | Bulk File: Scope the Change, Build the Sheet, Dry-Run, Ship      | Reading | 10 min   | 50  | Ship a bulk upload that passes Amazon's validation on the first attempt           |
+| 12.9  | SQP Studio: Rank What the Data Proves, Flag What It Only Hints   | Reading | 10 min   | 50  | Rank Search Query Performance by impression, click, and conversion                |
+| 12.10 | Account Audit: Rank Urgency, Pick the Safest Next Action         | Reading | 10 min   | 50  | Audit an account, rank waste first, scale second, listing third, thin data last   |
+| 12.11 | Client Onboarding: Access, KPI, Facts, Approval, Launch Blockers | Reading | 10 min   | 50  | Turn a client handoff into a one-page onboarding doc before any work begins       |
+| 12.12 | Capstone: Run the Full PPC Workflow, End to End                  | Reading | 10 min   | 50  | Demonstrate the integration exam: six stages, six artifacts, one report           |
+
+**Key Concepts:**
+
+- **Workflow over interface.** Each SimGrid sim is the practice surface. The lesson is the operator-side workflow the sim emulates.
+- **Free practice without progression gates.** SimGrid drills are free for any signed-in student and do not gate progression through the three paid courses.
+- **Round scores are formative.** SimGrid round-completion scores sync to the dashboard as practice evidence. They are not a hiring or certification signal.
+
+---
+
 ## 🎓 Learning Methodology
 
 ### **Work Loop**
@@ -297,19 +327,20 @@ Every lesson follows the **"Read → Decide → Change → Explain"** methodolog
 ### **Assessment Methods**
 
 - **Module Quizzes:** 13 module-final quizzes with a 70% pass threshold
-- **Practical Simulations:** 5 interactive tools for hands-on practice
+- **Practical Simulations:** 5 interactive AMPH tools plus 12 free SimGrid drills
 - **XP System:** Experience points for engagement and progress tracking
 - **Badges:** Achievement recognition for milestone completion
 
 ### **Simulation Tools**
 
-| Tool             | Purpose                       | Status      |
-| ---------------- | ----------------------------- | ----------- |
-| Bid Elevator     | Practice bid optimization     | Implemented |
-| STR Triage       | Search term analysis practice | Implemented |
-| Campaign Builder | Campaign structure practice   | Implemented |
-| Listing Audit    | Listing optimization practice | Implemented |
-| Keyword Research | Keyword discovery practice    | Implemented |
+| Tool                      | Purpose                                    | Status            |
+| ------------------------- | ------------------------------------------ | ----------------- |
+| Bid Elevator              | Practice bid optimization                  | Implemented       |
+| STR Triage                | Search term analysis practice              | Implemented       |
+| Campaign Builder          | Campaign structure practice                | Implemented       |
+| Listing Audit             | Listing optimization practice              | Implemented       |
+| Keyword Research          | Keyword discovery practice                 | Implemented       |
+| SimGrid library (12 sims) | Workflow drills (listing through capstone) | Implemented, free |
 
 **Note:** Simulator scores are formative only and should not be used for certification or hiring evidence.
 
@@ -325,10 +356,11 @@ Every lesson follows the **"Read → Decide → Change → Explain"** methodolog
 4. **Weeks 7-8:** Modules 7-8 (Search Term Triage, Competitive Intelligence)
 5. **Weeks 9-10:** Modules 9-10 (Weekly Optimization, Reporting and Troubleshooting)
 6. **Week 11:** Module 11 (VA Workflow and Capstone)
+7. **Free practice, any time:** Module 12 (SimGrid Workflow Training, 12 lessons + 12 free sims)
 
 ### **Time Investment**
 
-- **Reading baseline:** 475 planned minutes, plus simulations, worksheets, and review
+- **Reading baseline:** 595 planned minutes, plus simulations, worksheets, and review
 - **With Practice:** The actual time depends on scenario attempts, evidence quality, and feedback cycles
 - **Mastery:** Ongoing supervised practice, not a claim guaranteed by course completion
 
@@ -348,6 +380,7 @@ Every lesson follows the **"Read → Decide → Change → Explain"** methodolog
 - **Intermediate:** Modules 3-5 completed, campaign management skills
 - **Advanced:** Modules 6-10 completed, strategic optimization, reporting, and troubleshooting abilities
 - **Supervised-work capstone:** Module 11 completed with reviewable evidence and client communication practice
+- **Free SimGrid practice:** Module 12 drills the workflow behind each sim; round scores sync to the dashboard as practice evidence
 
 ---
 
@@ -380,11 +413,11 @@ Every lesson follows the **"Read → Decide → Change → Explain"** methodolog
 1. **Persistent learner artefacts:** Save and export decision logs, reports, SOPs, and capstone evidence.
 2. **Targeted remediation:** Link quiz misses and simulator feedback to the exact lesson and practice item to revisit.
 3. **Localization:** Tagalog or Filipino versions of selected lessons.
-4. **Further specialization:** Future modules beyond Module 11, only after the core evidence path is stable.
+4. **Further specialization:** Future modules beyond Module 12, only after the core evidence path is stable.
 
 ### **Content Roadmap**
 
-- **Current:** 45 lessons across 13 modules, with 13 module quizzes and five formative simulators.
+- **Current:** 57 lessons across 14 modules, with 13 module quizzes, five formative AMPH simulators, and twelve free SimGrid drills.
 - **Next:** Connect the new operational lessons to saved learner-owned artefacts and the portfolio view.
 - **Later:** Add specialization tracks only after the Foundations-to-Capstone path is measured with beginner evidence.
 
@@ -419,7 +452,7 @@ The platform tracks:
 
 ---
 
-**Curriculum Version:** 2.0 (Post-Content-Track)  
-**Last Audit:** 2026-07-27  
+**Curriculum Version:** 2.1 (Post-Content-Track, SimGrid workflow training added)  
+**Last Audit:** 2026-10-05  
 **Status:** Active and being taught  
 **Maintainer:** Project Amazon PH Team

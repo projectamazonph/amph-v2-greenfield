@@ -2,7 +2,7 @@
 
 **Source:** `content/curriculum/modules/`
 **Status:** Migrated 2026-07-18 from `projectamazonph/amph-v2` `content/curriculum/`
-**Total:** 13 modules · 45 lessons · 13 module-final quizzes
+**Total:** 14 modules · 57 lessons · 13 module-final quizzes
 
 This is the post-content-track version: legacy product references (AdCraft, AI Mentor, Formula Calculator, "three simulations") have been stripped, and 5 factual corrections have been applied with Amazon Ads Fact Cards.
 
@@ -10,11 +10,11 @@ This is the post-content-track version: legacy product references (AdCraft, AI M
 
 ## Module -1 — Amazon and the PPC job (`-1-amazon-and-ppc-job/`)
 
-| #    | Lesson                                                            | Type    | Min | XP |
-| ---- | ----------------------------------------------------------------- | ------- | --- | -- |
-| -1.1 | What Amazon Is and How It Makes Money                             | reading | 10  | 50 |
-| -1.2 | Surfaces You Will Use                                             | reading | 8   | 50 |
-| -1.3 | The Ad Object Model                                               | reading | 10  | 50 |
+| #    | Lesson                                | Type    | Min | XP  |
+| ---- | ------------------------------------- | ------- | --- | --- |
+| -1.1 | What Amazon Is and How It Makes Money | reading | 10  | 50  |
+| -1.2 | Surfaces You Will Use                 | reading | 8   | 50  |
+| -1.3 | The Ad Object Model                   | reading | 10  | 50  |
 
 **Purpose:** the zero-knowledge starting point, for a learner who has never bought from or sold on Amazon. What the company is and how it makes money, the four surfaces a PPC VA actually works in, and the five levels of the ads hierarchy, before any metric is defined.
 
@@ -170,6 +170,27 @@ This is the post-content-track version: legacy product references (AdCraft, AI M
 
 ---
 
+## Module 12 — SimGrid Workflow Training (`12-simgrid-workflows/`) → `simgrid-workflows` course (free for any signed-in user)
+
+| #     | Lesson                                                           | Type    | Min | XP  |
+| ----- | ---------------------------------------------------------------- | ------- | --- | --- |
+| 12.1  | BuyBox Dojo: Listing Fundamentals and the 7-Day Pressure Test    | reading | 10  | 50  |
+| 12.2  | AdConsole Pro: The Operator's Surface, Hour by Hour              | reading | 10  | 50  |
+| 12.3  | Keyword Lab: Research, Rank, and Rank Before You Spend           | reading | 10  | 50  |
+| 12.4  | Campaign Architect: From Product Brief to Operable Structure     | reading | 10  | 50  |
+| 12.5  | Search Term Triage: Cluster, Rule, Apply, Record                 | reading | 10  | 50  |
+| 12.6  | Bid Decisions: Read Six Numbers, Pick One of Four Moves          | reading | 10  | 50  |
+| 12.7  | Pacing Deck: Read the Day, Set the Modifiers, Verify             | reading | 10  | 50  |
+| 12.8  | Bulk File: Scope the Change, Build the Sheet, Dry-Run, Ship      | reading | 10  | 50  |
+| 12.9  | SQP Studio: Rank What the Data Proves, Flag What It Only Hints   | reading | 10  | 50  |
+| 12.10 | Account Audit: Rank Urgency, Pick the Safest Next Action         | reading | 10  | 50  |
+| 12.11 | Client Onboarding: Access, KPI, Facts, Approval, Launch Blockers | reading | 10  | 50  |
+| 12.12 | Capstone: Run the Full PPC Workflow, End to End                  | reading | 10  | 50  |
+
+**Purpose:** walk the workflow a real operator runs in production, one SimGrid sim at a time. Each lesson teaches the workflow the sim emulates, not the sim's UX. Free for any signed-in student on the simgrid-workflows tier; does not gate course progression.
+
+---
+
 ## Course → Tier mapping
 
 | Course                    | Tier                | Modules | Lessons | Planned minutes |
@@ -177,13 +198,14 @@ This is the post-content-track version: legacy product references (AdCraft, AI M
 | `ppc-foundations`         | pp-foundations      | -1–4    |      22 |             263 |
 | `accelerated-mastery`     | accelerated-mastery | 5–10    |      19 |             181 |
 | `ultimate-transformation` | ultimate            | 11      |       4 |              31 |
+| `simgrid-workflows`       | simgrid-workflows   | 12      |      12 |             120 |
 
 ## Quizzes (`curriculum/quiz-questions.json`)
 
 13 module-final quizzes, one for each of Modules -1 through 11. Each quiz is a knowledge check
 attached to the module's final lesson. The pass threshold is 70%, with 100 XP per pass. Question
 counts vary by module: 4 for Modules -1, 9, 10 and 11, 5 for Module 0, 12 for Module 1, 8 for
-Modules 2, 3, 4, 7 and 8, and 7 for Modules 5 and 6. That is 87 questions in the bank.
+Modules 2, 3, 4, 7 and 8, and 7 for Modules 5 and 6. That is 87 questions in the bank. Module 12 (SimGrid workflow training) is a free practice tier without a module-final quiz; its simulator round-completion scores provide the formative signal.
 
 ## Why this index exists
 
@@ -195,6 +217,6 @@ When you're building STORY-013 (the import script) or STORY-026 (the lesson page
 
 ## What's not in this curriculum yet
 
-- **Future modules beyond 11** for the ultimate-transformation tier are not authored yet.
+- **Module 12 is now authored** as 12 lessons walking the workflow behind each of the 12 SimGrid sims. The simgrid-workflows tier sits alongside the three paid tiers and is free for any signed-in student.
 - **Localization**: all content is English. Tagalog/Filipino versions are a separate, larger scope.
 - **Full saved-artifact workflow**: lesson evidence is now specified and recorded in content, while persistent learner-owned artifact storage and export remain a separate platform workstream.

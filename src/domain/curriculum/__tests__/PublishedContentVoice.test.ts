@@ -45,9 +45,7 @@ function bannedPhrases(): string[] {
 }
 
 function phraseRegex(phrase: string): RegExp {
-  const body = phrase
-    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-    .replace(/\s+/g, "\\s+");
+  const body = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
   const lead = /^\w/.test(phrase) ? "\\b" : "";
   const tail = /\w$/.test(phrase) ? "\\b" : "";
   return new RegExp(lead + body + tail, "i");
@@ -101,9 +99,11 @@ describe("published content voice rules", () => {
   });
 
   it("scans every lesson plus the quiz bank", () => {
-    // 45 lesson files + 1 quiz bank. A drop here means the walk broke, which
-    // would otherwise show up as a clean run over a smaller corpus.
-    expect(publishedFiles()).toHaveLength(46);
+    // 57 lesson files (modules -1 through 12) + 1 quiz bank. A drop here means
+    // the walk broke, which would otherwise show up as a clean run over a
+    // smaller corpus. The Module 12 lessons ship alongside the SimGrid library
+    // and are part of the published content surface.
+    expect(publishedFiles()).toHaveLength(58);
   });
 
   it("ships none of the phrases the voice guide bans", () => {

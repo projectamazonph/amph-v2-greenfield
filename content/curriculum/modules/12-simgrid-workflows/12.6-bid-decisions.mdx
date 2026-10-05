@@ -1,0 +1,85 @@
+---
+title: "Bid Decisions: Read Six Numbers, Pick One of Four Moves"
+slug: "12.6-bid-decisions"
+moduleNumber: 12
+lessonNumber: 6
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow a real operator runs before touching a bid, name the six numbers the decision depends on, and read the simulator's grade on raise / hold / lower / investigate moves before you ship a bid change.
+
+## Why this workflow exists
+
+A bid change is the cheapest change to make and the easiest one to regret. Raise on a term that did not have it, and the bid falls past zero at the next weekly review. Lower on a term that was just learning, and you kill a winner before its first 30 clicks.
+
+The Bid Decisions sim is the practice surface. The lesson is the read: six numbers in front of you, four moves available, one of them correct.
+
+## What the workflow looks like end to end
+
+A production operator who decides on a real bid reads six numbers first:
+
+1. **Clicks.** How many real auctions has this term been in?
+2. **Spend.** What did the term cost across those clicks?
+3. **Sales.** What did the term produce in attributed revenue?
+4. **ACoS.** Spend divided by sales, for this term.
+5. **ROAS.** Sales divided by spend, for this term.
+6. **Confidence.** How many clicks does it have? A term with 8 clicks and 1 order is not a winner; it is noise.
+
+Then pick one of four moves:
+
+- **Raise.** Confidence is high, performance is above target, and the term has headroom in the budget. Raise in a small step (5-10%), not in a jump.
+- **Hold.** Performance is on target, and a change would risk breaking the data. Document the hold and the next review date.
+- **Lower.** Confidence is high, performance is below target, and the term is consuming spend that could go to winners. Lower in a small step, then review at the next observation window.
+- **Investigate.** Confidence is high and the signal is mixed (high CTR, weak CVR; or low CTR, good CVR). Do not change the bid until the underlying question is answered.
+
+## How to read the simulator's feedback
+
+Bid Decisions grades you against four signals:
+
+- **Read depth.** Did you read all six numbers, or did you act on one?
+- **Move selection.** Did you pick raise / hold / lower / investigate based on the data?
+- **Confidence handling.** Did you act on a low-confidence signal, or did you flag it as noise?
+- **Step size.** Did you change the bid in a defensible step, or did you make a jump?
+
+A high score with a jump-sized change is a change you will regret. A high score with a small, defensible step is a change that compounds.
+
+## Your turn
+
+Open Bid Decisions at `/practice/simgrid/bid-decisions.html`. Pick one term. Read the six numbers, pick one of the four moves, and write a one-line defense that names the signal and the step size.
+
+## Fact card
+
+```text
+Product or feature: Bid Decisions, read six numbers, pick raise / hold / lower / investigate (SimGrid `bid-decisions` simulator)
+What the learner can do: Make a bid change that is supported by evidence rather than by guesswork
+Who can access it: Any signed-in student on the simgrid-workflows tier
+Retailer or marketplace scope: General Amazon Sponsored Products bid workflow
+Official source URL: https://advertising.amazon.com
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-12-6-pitfall" variant="pitfall" title="Acting on a 6-click signal"}
+Six clicks is not a signal. It is the start of one. The first 30 clicks are the learning window, not the bidding window.
+:::
+
+<SelfCheck
+  id="sc-12-6"
+  prompt="A term has 40 clicks, 0 orders, and ACoS undefined. What is the move?"
+  options={["Raise the bid and let it run.", "Hold the bid and let it learn a third time.", "Lower the bid by 50% to save the budget.", "Investigate the listing or the relevance before changing the bid."]}
+  answerIndex={3}
+  explanation="Zero orders at 40 clicks is past the noise threshold. The move is to investigate (listing, relevance, intent), not to keep paying for clicks that do not convert."
+/>
+
+## Check
+
+A strong answer reads all six numbers, names the move, and states the step size. A weak answer acts on one number or one intuition.
+
+## Key takeaway
+
+Six numbers, four moves. The read is the work. The bid change is a small, defensible step that follows from the read.
