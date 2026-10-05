@@ -33,6 +33,54 @@ const TOOLS: Tool[] = Object.entries(PUBLIC_CURRICULUM_CLAIMS.simulators).map(
   }),
 );
 
+const SIMGRID_TOOLS: { name: string; desc: string }[] = [
+  {
+    name: "BuyBox Dojo",
+    desc: "Listing fundamentals: research, match types, negatives, 7-day PPC pressure test.",
+  },
+  {
+    name: "AdConsole Pro",
+    desc: "Full Sponsored Ads console. Campaigns, ad groups, keywords, search terms, daily pacing.",
+  },
+  {
+    name: "Keyword Lab",
+    desc: "Research, build a hit list, and rank keywords before you spend a cent.",
+  },
+  {
+    name: "Campaign Architect",
+    desc: "Turn a product brief into structure, core targets, negative guardrails, and a first review rule.",
+  },
+  {
+    name: "Search Term Triage",
+    desc: "8, 12, or 16 terms a round. Read the report, pick the action, defend it.",
+  },
+  {
+    name: "Bid Decisions",
+    desc: "Read clicks, spend, sales, ACOS, ROAS, confidence. Choose before you touch the bid.",
+  },
+  { name: "Pacing Deck", desc: "Set day-parting. Watch the daily-budget flight log respond." },
+  {
+    name: "Bulk File",
+    desc: "Upload a sheet. Validate. Get graded the way Amazon grades uploads.",
+  },
+  {
+    name: "SQP Studio",
+    desc: "Compare search-query performance and conversion signals. Separate data from hint.",
+  },
+  {
+    name: "Account Audit",
+    desc: "Rank urgency and pick the safest next action for waste, scale, listing.",
+  },
+  {
+    name: "Client Onboarding",
+    desc: "Turn a handoff into access, KPI, product facts, approval rules, launch blockers.",
+  },
+  {
+    name: "Capstone",
+    desc: "Run the full PPC workflow from research to setup, optimization, and reporting.",
+  },
+];
+
 export function SimulatorSection() {
   return (
     <section className={[shared.sec, styles.sectionTint].join(" ")} id="simulator">
@@ -57,7 +105,7 @@ export function SimulatorSection() {
 
         <div className={styles.roster}>
           <div className={styles.rosterHead}>
-            <span className={styles.rosterTitle}>All {TOOLS.length} practice tools</span>
+            <span className={styles.rosterTitle}>All {TOOLS.length} AMPH practice tools</span>
             <span className={styles.rosterNote}>
               Availability follows the reviewed curriculum claim contract · public preview and
               enrolled practice are labelled separately
@@ -86,6 +134,39 @@ export function SimulatorSection() {
                 </div>
               ),
             )}
+          </div>
+        </div>
+
+        <div className={styles.roster}>
+          <div className={styles.rosterHead}>
+            <span className={styles.rosterTitle}>
+              SimGrid library — {SIMGRID_TOOLS.length} free simulators
+            </span>
+            <span className={styles.rosterNote}>
+              Free for any signed-in student · no enrollment gate · round scores sync to the
+              dashboard
+            </span>
+          </div>
+          <div className={styles.tools}>
+            {SIMGRID_TOOLS.map((tool) => (
+              <div key={tool.name} className={styles.tool}>
+                <span className={styles.status}>Free practice</span>
+                <span className={styles.toolName}>{tool.name}</span>
+                <span className={styles.toolDesc}>{tool.desc}</span>
+              </div>
+            ))}
+            <a
+              key="simgrid-cta"
+              className={[styles.tool, styles.toolLive].join(" ")}
+              href="/practice/simgrid"
+              aria-label="Browse the SimGrid library"
+            >
+              <span className={styles.status}>Open library</span>
+              <span className={styles.toolName}>SimGrid hub</span>
+              <span className={styles.toolDesc}>
+                Browse all 12 simulators, pick a workflow, drill until it sticks.
+              </span>
+            </a>
           </div>
         </div>
       </div>
