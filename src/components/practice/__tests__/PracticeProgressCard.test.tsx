@@ -1,8 +1,8 @@
-// src/components/simgrid/__tests__/SimgridProgressCard.test.tsx
+// src/components/practice/__tests__/PracticeProgressCard.test.tsx
 // @vitest-environment jsdom
 
 /**
- * SimgridProgressCard.test.tsx — Task 9 of the 2026-09-30 SimGrid
+ * PracticeProgressCard.test.tsx — Task 9 of the 2026-09-30 SimGrid
  * integration plan.
  *
  * Locks the dashboard card contract for SimGrid practice:
@@ -37,16 +37,16 @@ vi.mock("@/lib/auth", () => ({
   getSessionUserId: async () => "u1",
 }));
 
-import { SimgridProgressCard } from "@/components/simgrid/SimgridProgressCard";
+import { PracticeProgressCard } from "@/components/practice/PracticeProgressCard";
 
-describe("SimgridProgressCard", () => {
+describe("PracticeProgressCard", () => {
   it("renders all 12 simulators", async () => {
-    const card = await SimgridProgressCard();
+    const card = await PracticeProgressCard();
     render(card);
     // Title assertions use the heading element because the Capstone
     // simulator's tag is also "Capstone" (per the manifest) — a plain
     // getByText would double-match on that single row. Same pattern as
-    // SimgridPracticeGrid.test.tsx.
+    // PracticeGrid.test.tsx.
     expect(screen.getByText("AdConsole Pro", { selector: "h3" })).toBeDefined();
     expect(screen.getByText("Bid Decisions", { selector: "h3" })).toBeDefined();
     expect(screen.getByText("Capstone", { selector: "h3" })).toBeDefined();
@@ -55,7 +55,7 @@ describe("SimgridProgressCard", () => {
   });
 
   it("shows 'Not started' when the user has no attempts", async () => {
-    const card = await SimgridProgressCard();
+    const card = await PracticeProgressCard();
     render(card);
     expect(screen.getAllByText("Not started").length).toBeGreaterThanOrEqual(12);
   });

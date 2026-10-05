@@ -1,4 +1,4 @@
-﻿// @vitest-environment jsdom
+// @vitest-environment jsdom
 /// <reference types="@testing-library/jest-dom" />
 
 import "vitest-axe/extend-expect";
@@ -16,7 +16,7 @@ const mockEnrollments = vi.fn();
 const mockCourseFindById = vi.fn();
 const mockUserFindById = vi.fn();
 const mockXpFindByUserId = vi.fn();
-// Simgrid Task 9: dashboard now mounts <SimgridProgressCard /> which calls
+// Simgrid Task 9: dashboard now mounts <PracticeProgressCard /> which calls
 // container.getBestSimgridScore.execute({ userId, simulatorId }). Stub it
 // here so the audit's render of the page resolves to the dashboard DOM
 // instead of crashing on an undefined port.
@@ -35,7 +35,7 @@ vi.mock("@/composition/container", () => ({
     userRepo: { findById: mockUserFindById },
     // STORY-157: hero-stats strip reads XP totals via xpEventRepo.
     xpEventRepo: { findByUserId: mockXpFindByUserId },
-    // Simgrid Task 9: SimgridProgressCard on the dashboard calls
+    // Simgrid Task 9: PracticeProgressCard on the dashboard calls
     // getBestSimgridScore.execute({ userId, simulatorId }) once per
     // simulator. Stub with a "no attempts" payload so the card renders
     // a row of "Not started" without crashing the dashboard render.
@@ -53,17 +53,17 @@ vi.mock("@/components/student/CourseCover", () => ({
   CourseCover: ({ title }: { title: string }) => <div aria-label={`${title} cover`} role="img" />,
 }));
 
-// Simgrid Task 9: SimgridProgressCard is an async server component — calling
+// Simgrid Task 9: PracticeProgressCard is an async server component � calling
 // it inside JSX in jsdom makes it "an async Client Component", which React 19
 // rejects. Replace it with a sync stub that renders the same landmark
 // surface so the dashboard's render succeeds and the audit can scan the
 // resulting DOM. The card's own contract is covered by its dedicated test
-// (`src/components/simgrid/__tests__/SimgridProgressCard.test.tsx`); here
+// (`src/components/practice/__tests__/PracticeProgressCard.test.tsx`); here
 // we just need the dashboard to mount it cleanly.
-vi.mock("@/components/simgrid/SimgridProgressCard", () => ({
-  SimgridProgressCard: () => (
-    <section aria-labelledby="simgrid-progress-heading">
-      <h2 id="simgrid-progress-heading">SimGrid practice</h2>
+vi.mock("@/components/practice/PracticeProgressCard", () => ({
+  PracticeProgressCard: () => (
+    <section aria-labelledby="practice-progress-heading">
+      <h2 id="practice-progress-heading">Practice progress</h2>
     </section>
   ),
 }));
@@ -157,7 +157,7 @@ describe("student dashboard accessibility audit", () => {
     // STORY-157: default empty XP feed so the hero-stats strip renders
     // gracefully under the a11y audit.
     mockXpFindByUserId.mockResolvedValue({ ok: true, value: [] });
-    // Simgrid Task 9: default "no attempts" payload so SimgridProgressCard
+    // Simgrid Task 9: default "no attempts" payload so PracticeProgressCard
     // renders its 12 "Not started" rows without each row needing its own stub.
     mockGetBestSimgridScore.mockResolvedValue({ ok: true, value: null });
   });
@@ -223,15 +223,16 @@ describe("student dashboard accessibility audit", () => {
     expect(source).toContain('aria-labelledby="quick-actions-title"');
   });
 
-  // Simgrid Task 9: lock the dashboard's "SimGrid practice" landmark so a
-  // future mount regression (e.g. accidentally removing the section or
-  // dropping the labelledby) trips a test rather than silently regressing
-  // the landmark surface.
-  it("exposes the SimGrid practice landmark on the rendered dashboard", async () => {
+  // Simgrid Task 9 (Task 14: renamed to "Practice progress"): lock the
+  // dashboard's "Practice progress" landmark so a future mount
+  // regression (e.g. accidentally removing the section or dropping the
+  // labelledby) trips a test rather than silently regressing the
+  // landmark surface.
+  it("exposes the Practice progress landmark on the rendered dashboard", async () => {
     mockEnrollments.mockResolvedValue({ ok: true, value: [] });
     render(await DashboardPage());
 
-    expect(screen.getByRole("region", { name: "SimGrid practice" })).toBeDefined();
+    expect(screen.getByRole("region", { name: "Practice progress" })).toBeDefined();
   });
 
   it("provides a visible focus contract for all dashboard action paths", () => {

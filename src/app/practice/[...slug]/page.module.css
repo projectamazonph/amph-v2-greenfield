@@ -1,0 +1,31 @@
+/**
+ * /practice/[...slug] page styles — Task 14 (simulator UI refactor).
+ *
+ * Page chrome only. The iframe + status bar live in
+ * PracticeFrame.module.css (the component owns its own surface so it
+ * can be reused in any future route that hosts a vendored SimGrid
+ * simulator). Reuses design tokens from src/app/globals.css.
+ *
+ * Layout strategy from Task 14: the page main sets a min-height so
+ * PracticeFrame fills the visible area. The iframe inside drives its
+ * own scroll. The previous fixed-calc iframe height was clipping tall
+ * simulators (BuyBox Dojo, Ad Console) and showing empty space on
+ * shorter ones.
+ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--side-pad) var(--space-12);
+  max-width: var(--max-content);
+  margin: 0 auto;
+  width: 100%;
+  min-height: calc(100dvh - 180px);
+}
+
+@media (max-width: 767px) {
+  .page {
+    min-height: calc(100dvh - 120px);
+  }
+}

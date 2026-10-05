@@ -1,23 +1,27 @@
 /**
  * /tools — student-facing tools index.
  *
- * Lists the 5 graded AMPH simulators (from the registry), the 12-simulator
- * SimGrid practice library (linked to /practice/simgrid, which renders the
- * full grid), and the embedded Amazon Ad Console. ad-console is added
- * manually — it isn't a simulator, so it has no registry entry.
+ * Task 14 (simulator UI refactor): shows all 12 practice simulators in
+ * a single unified 4-col grid (5 graded AMPH engines + 7 free practice
+ * sims from the SimGrid library + 1 live Amazon Ad Console card).
+ * No workflow overlap; all cards share the same status-pill
+ * treatment.
  *
- * Each simulator card carries a status pill (Public preview vs
- * Enrolled practice) sourced from PUBLIC_CURRICULUM_CLAIMS so the
- * availability distinction surfaces before the learner clicks in.
+ * The 5 AMPH engines link to /tools/<id> (their existing server-rendered
+ * pages). The 7 free practice sims link to /practice/<file> (the
+ * iframe-wrapper route that hosts the vendored static site).
+ *
+ * Status badges: "Graded" for AMPH engines (enrolled practice),
+ * "Free practice" for the 7 free sims, "Live account" for the
+ * Amazon Ad Console.
+ *
+ * Each card carries a status pill sourced from PUBLIC_CURRICULUM_CLAIMS
+ * so the availability distinction surfaces before the learner clicks
+ * in.
  */
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  PlayCircle,
-  ShieldWarning,
-} from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { buildContainer } from "@/composition/container";
 import { StudentShell } from "@/components/student/StudentShell";
 import { getSimulatorCopy } from "@/lib/copy/simulatorCopy";
@@ -25,31 +29,29 @@ import {
   PUBLIC_CURRICULUM_CLAIMS,
   type PublicSimulatorAvailability,
 } from "@/domain/curriculum/PublicCurriculumClaims";
+import { SIMGRID_SIMULATOR_META } from "@/lib/simgrid/manifest";
 import type { Metadata } from "next";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Practice Tools | Project Amazon PH Academy",
   description:
-    "Five graded AMPH simulators, the free 12-simulator SimGrid library, and a live Amazon Ad Console. Practice campaign decisions in a safe environment before touching real accounts.",
+    "Twelve practice simulators plus a live Amazon Ad Console. Practice campaign decisions in a safe environment before touching real accounts.",
   alternates: { canonical: "/tools" },
 };
 
 export const dynamic = "force-dynamic";
 
-interface ToolInfo {
-  name: string;
-  href: string;
-  /**
-   * Short skill-track label rendered as a 10px mono caption above the
-   * card name. Kept here (page-local) rather than in PublicCurriculumClaims
-   * because the tracks are an internal curriculum taxonomy, not a
-   * public-facing claim that needs the same review contract.
-   */
-  skillTag: string;
+interface SimCard {
+  readonly id: string;
+  readonly name: string;
+  readonly href: string;
+  readonly description: string;
+  readonly skillTag: string;
+  readonly status: "graded" | "free" | "live";
 }
 
-const SIMULATOR_SKILL_TAG: Record<string, string> = {
+const AMPH_SIMULATOR_SKILL_TAGS: Record<string, string> = {
   "bid-elevator": "Pricing & bids",
   "str-triage": "Search intent",
   "campaign-builder": "Campaign architecture",
@@ -57,48 +59,83 @@ const SIMULATOR_SKILL_TAG: Record<string, string> = {
   "keyword-research": "Keyword discovery",
 };
 
-const TOOL_INFO: Record<string, ToolInfo> = {
-  "bid-elevator": {
+const AMPH_CARDS: SimCard[] = [
+  {
+    id: "bid-elevator",
     name: "Bid Elevator",
     href: "/tools/bid-elevator",
-    skillTag: SIMULATOR_SKILL_TAG["bid-elevator"] ?? "Simulator",
+    description:
+      "Tune bids against per-keyword economics, evidence thresholds, and the campaign budget.",
+    skillTag: AMPH_SIMULATOR_SKILL_TAGS["bid-elevator"] ?? "Simulator",
+    status: "graded",
   },
-  "str-triage": {
-    name: "Search Term Triage",
-    href: "/tools/str-triage",
-    skillTag: SIMULATOR_SKILL_TAG["str-triage"] ?? "Simulator",
-  },
-  "campaign-builder": {
+  {
+    id: "campaign-builder",
     name: "Campaign Builder",
     href: "/tools/campaign-builder",
-    skillTag: SIMULATOR_SKILL_TAG["campaign-builder"] ?? "Simulator",
+    description:
+      "Build a Sponsored Products campaign from a client brief: structure, naming, negatives, review cadence.",
+    skillTag: AMPH_SIMULATOR_SKILL_TAGS["campaign-builder"] ?? "Simulator",
+    status: "graded",
   },
-  "listing-audit": {
+  {
+    id: "listing-audit",
     name: "Listing Audit",
     href: "/tools/listing-audit",
-    skillTag: SIMULATOR_SKILL_TAG["listing-audit"] ?? "Simulator",
+    description: "Triage listing findings by urgency and write the reason for each fix.",
+    skillTag: AMPH_SIMULATOR_SKILL_TAGS["listing-audit"] ?? "Simulator",
+    status: "graded",
   },
-  "keyword-research": {
+  {
+    id: "str-triage",
+    name: "Search Term Triage",
+    href: "/tools/str-triage",
+    description:
+      "Sort search-term reports into keep, optimize, pause, or negate. Defend each call.",
+    skillTag: AMPH_SIMULATOR_SKILL_TAGS["str-triage"] ?? "Simulator",
+    status: "graded",
+  },
+  {
+    id: "keyword-research",
     name: "Keyword Research",
     href: "/tools/keyword-research",
-    skillTag: SIMULATOR_SKILL_TAG["keyword-research"] ?? "Simulator",
+    description:
+      "Categorize a generated keyword list by intent, filter, and rank before you spend a cent.",
+    skillTag: AMPH_SIMULATOR_SKILL_TAGS["keyword-research"] ?? "Simulator",
+    status: "graded",
   },
-};
+];
 
-const STATUS_LABEL: Record<PublicSimulatorAvailability, string> = {
-  "public-preview": "Public preview",
-  "enrolled-practice": "Enrolled practice",
-};
+// 7 free practice sims from the vendored SimGrid library that have no
+// workflow overlap with the 5 AMPH engines above. Each card links to
+// the AMPH wrapper route /practice/<file> (the catch-all under
+// src/app/practice/[...slug]).
+const PRACTICE_CARDS: SimCard[] = SIMGRID_SIMULATOR_META.filter((entry) => {
+  // Skip the 5 that mirror AMPH engines — those are already shown
+  // above as the graded path. Keeping only the 7 SimGrid-unique
+  // workflows avoids workflow overlap.
+  const mirrorIds = new Set([
+    "listing",
+    "keyword-lab",
+    "campaign-architect",
+    "search-triage",
+    "bid-decisions",
+  ]);
+  return !mirrorIds.has(entry.id);
+}).map((entry) => ({
+  id: entry.id,
+  name: entry.title,
+  href: entry.href,
+  description: entry.description,
+  skillTag: entry.tag,
+  status: "free" as const,
+}));
 
-function availabilityFor(simulatorId: string): PublicSimulatorAvailability | null {
-  // Sourced from the same reviewed claims contract that the rest of
-  // the public surface uses; never invent, always read.
-  const entry =
-    PUBLIC_CURRICULUM_CLAIMS.simulators[
-      simulatorId as keyof typeof PUBLIC_CURRICULUM_CLAIMS.simulators
-    ];
-  return entry?.availability ?? null;
-}
+const STATUS_LABEL: Record<SimCard["status"], string> = {
+  graded: "Graded",
+  free: "Free practice",
+  live: "Live account",
+};
 
 export default async function ToolsIndexPage() {
   const container = buildContainer();
@@ -115,11 +152,11 @@ export default async function ToolsIndexPage() {
             are ready to make real account changes.
           </p>
           <div className={styles.headerMeta} aria-label="Tool library summary">
-            <span>5 graded simulators</span>
+            <span>{AMPH_CARDS.length} graded</span>
             <span className={styles.headerDivider} aria-hidden="true">
               ·
             </span>
-            <span>12 SimGrid sims</span>
+            <span>{PRACTICE_CARDS.length} free practice</span>
             <span className={styles.headerDivider} aria-hidden="true">
               ·
             </span>
@@ -131,42 +168,47 @@ export default async function ToolsIndexPage() {
             <h2 id="practice-library-title" className={styles.sectionTitle}>
               Practice library
             </h2>
-            <span className={styles.sectionCount}>Choose a bounded exercise</span>
+            <span className={styles.sectionCount}>
+              {AMPH_CARDS.length + PRACTICE_CARDS.length + 1} tools, choose a bounded exercise
+            </span>
           </div>
           <ul className={styles.grid}>
-            {registered.map((sim) => {
-              const info = TOOL_INFO[sim.simulatorId];
-              if (!info) return null;
-              const availability = availabilityFor(sim.simulatorId);
-              const statusLabel = availability ? STATUS_LABEL[availability] : null;
-              return (
-                <li key={sim.simulatorId} className={styles.card}>
-                  <div className={styles.cardMetaRow}>
-                    <span className={styles.skillTag} aria-hidden="true">
-                      {info.skillTag}
-                    </span>
-                    {statusLabel ? (
-                      <span
-                        className={`${styles.statusPill} ${
-                          availability === "public-preview"
-                            ? styles.statusPillPublic
-                            : styles.statusPillEnrolled
-                        }`}
-                      >
-                        {statusLabel}
-                      </span>
-                    ) : null}
-                  </div>
-                  <h2 className={styles.cardName}>{info.name}</h2>
-                  <p className={styles.cardBlurb}>{getSimulatorCopy(sim.simulatorId).outcome}</p>
-                  <Link href={info.href} className={styles.cardLink} prefetch>
-                    Start practice <ArrowRight size={16} weight="bold" aria-hidden="true" />
-                  </Link>
-                </li>
-              );
-            })}
-            {/* Amazon Ad Console — embedded external tool, not a registered simulator */}
-            <li key="ad-console" className={`${styles.card} ${styles.liveCard}`}>
+            {[...AMPH_CARDS, ...PRACTICE_CARDS].map((card) => (
+              <li key={card.id} className={card.status === "live" ? styles.liveCard : styles.card}>
+                <div className={styles.cardMetaRow}>
+                  <span className={styles.skillTag} aria-hidden="true">
+                    {card.skillTag}
+                  </span>
+                  <span
+                    className={`${styles.statusPill} ${
+                      card.status === "free"
+                        ? styles.statusPillFree
+                        : card.status === "live"
+                          ? styles.statusPillLive
+                          : styles.statusPillGraded
+                    }`}
+                  >
+                    {STATUS_LABEL[card.status]}
+                  </span>
+                </div>
+                <h2 className={card.status === "live" ? styles.cardNameLive : styles.cardName}>
+                  {card.name}
+                </h2>
+                <p className={styles.cardBlurb}>{card.description}</p>
+                <Link href={card.href} className={styles.cardLink} prefetch>
+                  {card.status === "live" ? (
+                    <>
+                      Open live console <ArrowUpRight size={16} weight="bold" aria-hidden="true" />
+                    </>
+                  ) : (
+                    <>
+                      Start practice <ArrowRight size={16} weight="bold" aria-hidden="true" />
+                    </>
+                  )}
+                </Link>
+              </li>
+            ))}
+            <li className={`${styles.card} ${styles.liveCard}`}>
               <div className={styles.cardMetaRow}>
                 <span className={`${styles.skillTag} ${styles.skillTagLive}`} aria-hidden="true">
                   Production environment
@@ -188,24 +230,6 @@ export default async function ToolsIndexPage() {
               </Link>
             </li>
           </ul>
-        </section>
-        <section aria-labelledby="simgrid-library-title">
-          <div className={styles.sectionHeading}>
-            <h2 id="simgrid-library-title" className={styles.sectionTitle}>
-              SimGrid library
-            </h2>
-            <span className={styles.sectionCount}>Free practice for any signed-in student</span>
-          </div>
-          <p className={styles.subhead}>
-            Twelve additional simulators from Project Amazon PH's SimGrid library cover listing
-            fundamentals, the live Ad Console, pacing, bulk file operations, SQP analytics, account
-            audit, client onboarding, and the capstone workflow. These are free for any signed-in
-            student and do not gate course progression. Round-completion scores sync into your
-            dashboard.
-          </p>
-          <Link href="/practice/simgrid" className={styles.cardLink}>
-            Browse SimGrid library <ArrowRight size={16} weight="bold" aria-hidden="true" />
-          </Link>
         </section>
       </main>
     </StudentShell>

@@ -39,7 +39,7 @@ const STEPS = [
   },
   {
     title: "Practice tools — repeat the job without burning real ad spend",
-    body: "Twelve free simulators across two libraries. The five graded AMPH engines score your decisions: bid elevator, campaign builder, listing audit, STR triage, keyword research. Seven more live in the SimGrid library at /practice/simgrid: ad console, pacing deck, bulk file, SQP studio, client onboarding, capstone, plus BuyBox Dojo for listing. Open the same simulator as many times as you need. Your best score per simulator shows on your dashboard.",
+    body: "Twelve free practice simulators, split between five graded AMPH engines and seven free library sims. The graded engines score your decisions: bid elevator, campaign builder, listing audit, STR triage, keyword research. Seven more sit in the practice library at /practice: ad console, pacing deck, bulk file, SQP studio, client onboarding, capstone, plus BuyBox Dojo for listing. Open the same simulator as many times as you need. Your best score per simulator shows on your dashboard.",
   },
   {
     title: "You're ready to start",

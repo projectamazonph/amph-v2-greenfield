@@ -18,7 +18,7 @@ import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
 import { NewUserDashboard } from "@/components/student/NewUserDashboard";
 import { DashboardHeroStats } from "@/components/student/DashboardHeroStats";
-import { SimgridProgressCard } from "@/components/simgrid/SimgridProgressCard";
+import { PracticeProgressCard } from "@/components/practice/PracticeProgressCard";
 import { nextIncompleteLesson } from "@/app/courses/[slug]/lessons/getLessonData";
 import { CourseCover } from "@/components/student/CourseCover";
 import { hasCompletedWelcome } from "@/domain/entities/User";
@@ -334,7 +334,7 @@ export default async function DashboardPage() {
             after the existing tool cards and before the page footer
             so students see their practice without leaving the
             dashboard. */}
-        <SimgridProgressCard />
+        <PracticeProgressCard />
       </main>
     </StudentShell>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * SimgridFrame — Task 8 of the 2026-09-30 SimGrid integration plan.
+ * PracticeFrame — Task 14 (simulator UI refactor).
  *
  * Client component. Hosts the vendored SimGrid static site in an
  * iframe and mirrors the round-completion postMessage into AMPH via
@@ -45,6 +45,13 @@
  * announce the last-attempt summary once the iframe finishes a
  * round. It never includes a score-as-certification framing
  * (STORY-078); the only verbs are "scored" and "in progress".
+ *
+ * Layout: the wrapper page (src/app/practice/[...slug]/page.tsx) sets
+ * min-height on its main; this frame fills the page width and
+ * `flex: 1` so the iframe height is driven by the page's
+ * min-height, not by a fixed viewport calc. The previous
+ * `height: calc(100dvh - 220px)` was clipping tall simulators like
+ * BuyBox Dojo and showing empty space on shorter ones.
  */
 
 import { useEffect, useState } from "react";
@@ -53,15 +60,15 @@ import { recordSimgridProgressAction } from "@/app/actions/simgridProgress.actio
 import { SIMGRID_BRIDGE_TOKEN, isSimgridBridgeMessage } from "@/lib/simgrid/protocol";
 import type { SimgridSimulatorId } from "@/domain/simgrid";
 
-import styles from "./SimgridFrame.module.css";
+import styles from "./PracticeFrame.module.css";
 
-export interface SimgridFrameProps {
+export interface PracticeFrameProps {
   readonly simulatorId: SimgridSimulatorId;
   readonly src: string;
   readonly title: string;
 }
 
-export function SimgridFrame(props: SimgridFrameProps) {
+export function PracticeFrame(props: PracticeFrameProps) {
   const [lastEvent, setLastEvent] = useState<{
     readonly simulatorId: SimgridSimulatorId;
     readonly score: number;
@@ -92,7 +99,7 @@ export function SimgridFrame(props: SimgridFrameProps) {
   }, [props.simulatorId]);
 
   return (
-    <div className={styles.frame} data-testid="simgrid-frame">
+    <div className={styles.frame} data-testid="practice-frame">
       <iframe
         src={props.src}
         title={props.title}
@@ -103,7 +110,7 @@ export function SimgridFrame(props: SimgridFrameProps) {
       <p className={styles.status} aria-live="polite">
         {lastEvent
           ? `Last attempt: ${lastEvent.simulatorId} scored ${lastEvent.score} (${lastEvent.passed ? "passed" : "in progress"})`
-          : "SimGrid running. Progress saves to your AMPH dashboard automatically."}
+          : "Practice running. Your best score shows on your dashboard."}
       </p>
     </div>
   );

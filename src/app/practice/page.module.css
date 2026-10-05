@@ -1,12 +1,8 @@
 /**
- * /practice/simgrid page styles — Task 7.
+ * /practice page styles — Task 14 (simulator UI refactor).
  *
- * Header layout mirrors src/app/tools/page.module.css so the SimGrid
- * hub feels native to the rest of the student app, and reuses the
- * project-wide design tokens defined in src/app/globals.css.
- *
- * Card styling lives in SimgridPracticeGrid.module.css (the component
- * owns its own card surface) — this file is page-chrome only.
+ * Mirrors the existing /tools/page.module.css header treatment and
+ * reuses the project-wide design tokens defined in src/app/globals.css.
  */
 
 .page {
@@ -15,13 +11,14 @@
   padding: var(--space-8) var(--side-pad) var(--space-12);
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--space-6);
 }
 
 .header {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
 .eyebrow {
@@ -31,11 +28,6 @@
   letter-spacing: 0.08em;
   color: var(--ink-500);
   text-transform: uppercase;
-  padding: 2px 8px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  align-self: flex-start;
   margin: 0;
 }
 
