@@ -1,0 +1,90 @@
+﻿---
+title: "Keyword Lab: Research, Rank, and Rank Before You Spend"
+slug: "2.5-keyword-lab"
+moduleNumber: 2
+lessonNumber: 5
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the seed-to-ship keyword research workflow a real operator runs in production, name the four steps of the workflow, and read the simulator's scoring for keyword readiness before you commit a single peso to a campaign.
+
+## Why this workflow exists
+
+A campaign that goes live without a ranked keyword list burns spend on traffic that is unlikely to convert. The cheapest work in Amazon PPC is the work that happens before the campaign is on.
+
+The Keyword Lab sim is the practice surface. The lesson is the workflow: seed the list from the listing and the offer, expand it with the data Amazon already gives you, score each term on intent and economics, dedupe to prevent internal competition, then group so the campaign matches.
+
+## The decision in one sentence
+
+Rank terms on intent and economics, not on volume. The hit list with explicit intent and target ACoS is what makes the campaign operable.
+
+## What the workflow looks like end to end
+
+A production operator who does this for real runs four steps, in order:
+
+1. **Seed.** Pull the obvious terms from the product itself: the title, the bullets, the A+ content, the backend keywords, and the reviews. Each review phrase is a hint at how real shoppers describe the product.
+2. **Expand.** Use Brand Analytics (if available), Helium 10 or similar tools, and the Amazon search suggestions. Add competitor ASIN targeting where it makes sense.
+3. **Score.** Rank each term by intent (transactional vs browsing), by estimated CPC against your target ACoS, and by fit with the listing. A high-volume term that does not match the listing is a waste term.
+4. **Dedupe and group.** Strip duplicate stems, normalize match types, and group by intent so each ad group has one purpose. A campaign with five intents will serve none of them well.
+
+The output is a hit list with a column for term, intent, est CPC, est CVR, target ACoS, and the ad group it belongs to.
+
+## Worked example
+
+The workflow above is the walkthrough a real operator runs in production. Step through it once on the sim, name each step in your own words, and record the deliverable you would hand to the client.
+
+## How to read the simulator's feedback
+
+Keyword Lab scores you against four signals:
+
+- **Seed coverage.** Did you cover the obvious terms from the listing and the offer?
+- **Expansion depth.** Did you pull from sources beyond the listing (Brand Analytics, search suggestions, competitor ASINs)?
+- **Scoring quality.** Did you rank terms on intent and economics, not just on volume?
+- **Grouping.** Did you group by intent so each ad group has one purpose?
+
+A high score with a vague intent column means you wrote a hit list that no campaign can use. A high score with explicit intent and economics means the next step is straightforward.
+
+## Your turn
+
+Open Keyword Lab at `/practice/simgrid/keyword-lab.html`. Run the workflow on one product brief. At the end, write your top five ranked terms in a single table with intent, est CPC, and target ACoS for each.
+
+## Fact card
+
+```text
+Product or feature: Keyword Lab, research, build a hit list, rank before bidding (SimGrid `keyword-lab` simulator)
+What the learner can do: Produce a hit list that a Sponsored Products campaign can run against on day one
+Who can access it: Any signed-in student; the sim is free and has no enrollment gate
+Retailer or marketplace scope: General Amazon Sponsored Products keyword workflow
+Official source URL: https://advertising.amazon.com (Sponsored Products entry)
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-2-5-pitfall" variant="pitfall" title="Ranking by volume alone"}
+A high-volume term that does not match the listing will spend fast and convert worse than a mid-volume term that matches perfectly. Rank on intent and economics first, volume second.
+:::
+
+<SelfCheck
+  id="sc-2-5"
+  prompt="You have 50 seed terms and an hour. What is the first thing you do?"
+  options={["Add all 50 to one auto campaign and let Amazon sort it out.", "Score each term on intent and economics, then group by intent.", "Pick the top 10 by volume and put them in exact match.", "Move all 50 to phrase match and bid aggressively."]}
+  answerIndex={1}
+  explanation="Scoring on intent and economics is what separates a hit list from a word cloud. The grouping makes the campaign operable."
+/>
+
+## Evidence
+
+The Check section below names the artifact that proves the workflow ran end to end. Bring that artifact to the next client review so the work is reviewable, not just the round score.
+
+## Check
+
+A strong answer names the seed sources, the expansion sources, the ranking columns (intent, est CPC, est CVR, target ACoS), and the ad-group grouping that came out of the workflow. A weak answer stops at "I have a list."
+
+## Key takeaway
+
+Seed, expand, score, group. The hour you spend here saves the week you would otherwise spend cleaning up a campaign that went live without a real hit list.

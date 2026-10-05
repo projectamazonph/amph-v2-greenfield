@@ -4,39 +4,23 @@
     "ppc-foundations": {
       "label": "PPC Foundations",
       "tier": "pp-foundations",
-      "moduleNumbers": [
-        -1,
-        0,
-        1,
-        2,
-        3,
-        4
-      ],
-      "lessonCount": 22,
-      "plannedMinutes": 263
+      "moduleNumbers": [-1, 0, 1, 2, 3, 4],
+      "lessonCount": 27,
+      "plannedMinutes": 313
     },
     "accelerated-mastery": {
       "label": "Accelerated Mastery",
       "tier": "accelerated-mastery",
-      "moduleNumbers": [
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ],
-      "lessonCount": 19,
-      "plannedMinutes": 181
+      "moduleNumbers": [5, 6, 7, 8, 9, 10],
+      "lessonCount": 24,
+      "plannedMinutes": 231
     },
     "ultimate-transformation": {
       "label": "Ultimate Transformation",
       "tier": "ultimate-transformation",
-      "moduleNumbers": [
-        11
-      ],
-      "lessonCount": 4,
-      "plannedMinutes": 31
+      "moduleNumbers": [11],
+      "lessonCount": 6,
+      "plannedMinutes": 51
     }
   },
   "modules": [
@@ -51,8 +35,8 @@
       "moduleNumber": 0,
       "name": "Onboarding",
       "courseSlug": "ppc-foundations",
-      "lessonCount": 3,
-      "plannedMinutes": 30
+      "lessonCount": 5,
+      "plannedMinutes": 50
     },
     {
       "moduleNumber": 1,
@@ -65,22 +49,22 @@
       "moduleNumber": 2,
       "name": "Keyword Research",
       "courseSlug": "ppc-foundations",
-      "lessonCount": 4,
-      "plannedMinutes": 48
+      "lessonCount": 5,
+      "plannedMinutes": 58
     },
     {
       "moduleNumber": 3,
       "name": "Listing Optimization",
       "courseSlug": "ppc-foundations",
-      "lessonCount": 3,
-      "plannedMinutes": 36
+      "lessonCount": 4,
+      "plannedMinutes": 46
     },
     {
       "moduleNumber": 4,
       "name": "Campaign Architecture",
       "courseSlug": "ppc-foundations",
-      "lessonCount": 4,
-      "plannedMinutes": 52
+      "lessonCount": 5,
+      "plannedMinutes": 62
     },
     {
       "moduleNumber": 5,
@@ -93,15 +77,15 @@
       "moduleNumber": 6,
       "name": "Bidding Lab",
       "courseSlug": "accelerated-mastery",
-      "lessonCount": 3,
-      "plannedMinutes": 36
+      "lessonCount": 4,
+      "plannedMinutes": 46
     },
     {
       "moduleNumber": 7,
       "name": "Search Term Triage",
       "courseSlug": "accelerated-mastery",
-      "lessonCount": 3,
-      "plannedMinutes": 27
+      "lessonCount": 4,
+      "plannedMinutes": 37
     },
     {
       "moduleNumber": 8,
@@ -114,22 +98,22 @@
       "moduleNumber": 9,
       "name": "Weekly Optimization",
       "courseSlug": "accelerated-mastery",
-      "lessonCount": 3,
-      "plannedMinutes": 20
+      "lessonCount": 5,
+      "plannedMinutes": 40
     },
     {
       "moduleNumber": 10,
       "name": "Reporting and Troubleshooting",
       "courseSlug": "accelerated-mastery",
-      "lessonCount": 4,
-      "plannedMinutes": 31
+      "lessonCount": 5,
+      "plannedMinutes": 41
     },
     {
       "moduleNumber": 11,
       "name": "VA Workflow and Capstone",
       "courseSlug": "ultimate-transformation",
-      "lessonCount": 4,
-      "plannedMinutes": 31
+      "lessonCount": 6,
+      "plannedMinutes": 51
     }
   ],
   "simulators": {
@@ -155,11 +139,7 @@
     }
   },
   "tierSimulatorTargets": {
-    "pp-foundations": [
-      "campaign-builder",
-      "bid-elevator",
-      "str-triage"
-    ],
+    "pp-foundations": ["campaign-builder", "bid-elevator", "str-triage"],
     "accelerated-mastery": [
       "campaign-builder",
       "bid-elevator",

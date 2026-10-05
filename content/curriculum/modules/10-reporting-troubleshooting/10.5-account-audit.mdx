@@ -1,0 +1,90 @@
+﻿---
+title: "Account Audit: Rank Urgency, Pick the Safest Next Action"
+slug: "10.5-account-audit"
+moduleNumber: 10
+lessonNumber: 5
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow a real operator runs on an account audit, name the four finding categories the audit produces, and read the simulator's grade on urgency ranking before you ship a recommendation to a client.
+
+## Why this workflow exists
+
+An account audit can surface fifty findings in one pass. A real operator does not act on all fifty. The job is to rank them by urgency, pick the safest next action for each finding, and ship a short list to the client.
+
+The Account Audit sim is the practice surface. The lesson is the ranking: waste first, scale second, listing third, thin data last. The order is the same on every audit, but the specific findings change with the account.
+
+## The decision in one sentence
+
+Rank waste first, scale second, listing third, thin data last. The audit is a short defended list, not a long list of observations.
+
+## What the workflow looks like end to end
+
+A production operator who audits a real account runs four passes, in order:
+
+1. **Waste.** Find the spend that is producing no orders. Pause it or lower the bid until you have a clear reason to restart. Waste is urgent because it is money leaving the account today.
+2. **Scale.** Find the campaigns or terms that are working and have headroom in the budget. A winning term with a low bid is leaving conversions on the table. Scale is the second priority because it pays for the rest of the work.
+3. **Listing.** Find the products whose conversion is weaker than their traffic. Listing fixes are usually not an urgent action for the ads account, but they are a clear handoff to the client.
+4. **Thin data.** Flag the campaigns, terms, or products that do not have enough data to act on. Thin data is not a finding; it is a "wait" instruction with a re-check date.
+
+Each finding gets one of four actions: stop (pause), hold (do nothing now, review later), scale (raise bid or budget), or fix (a listing change that goes to the client, not the ads account).
+
+## Worked example
+
+The workflow above is the walkthrough a real operator runs in production. Step through it once on the sim, name each step in your own words, and record the deliverable you would hand to the client.
+
+## How to read the simulator's feedback
+
+Account Audit grades you against four signals:
+
+- **Urgency rank.** Did you rank waste first and thin data last?
+- **Action selection.** Did you pick stop / hold / scale / fix correctly for each finding?
+- **Defense.** Did you name the data that drove each call?
+- **Hand-off.** Did you separate the findings that go to the client (listing) from the findings that go to the ads account?
+
+A high score with no defense is a long list of actions with no audit trail. A high score with a one-line defense per finding is an audit a client can read and approve.
+
+## Your turn
+
+Open Account Audit at `/practice/simgrid/account-audit.html`. Pick one account snapshot. Run the four passes. At the end, write your top three findings with one-line defenses, and the one finding you flagged as thin data.
+
+## Fact card
+
+```text
+Product or feature: Account Audit, read a synthetic account, rank urgency, pick the safest next action (SimGrid `account-audit` simulator)
+What the learner can do: Turn an account audit into a short, defended list of client-ready actions
+Who can access it: Any signed-in student; the sim is free and has no enrollment gate
+Retailer or marketplace scope: General Amazon Sponsored Products audit workflow
+Official source URL: https://advertising.amazon.com
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-10-5-pitfall" variant="pitfall" title="Treating every finding as urgent"}
+An audit that treats thin data and waste with the same urgency produces a long list that no client will read. Rank first, then act.
+:::
+
+<SelfCheck
+  id="sc-10-5"
+  prompt="An audit flags a term with 8 clicks, 0 orders, and 12 days of data. What is the call?"
+  options={["Stop it now; it's clearly a waste.", "Hold and wait for 30+ clicks; flag it as thin data.", "Scale it up; the click count is rising.", "Fix the listing behind it."]}
+  answerIndex={1}
+  explanation="Eight clicks is thin data, not a fact. Hold, flag as thin data, and re-check at 30 clicks. The audit protects the account from acting on noise."
+/>
+
+## Evidence
+
+The Check section below names the artifact that proves the workflow ran end to end. Bring that artifact to the next client review so the work is reviewable, not just the round score.
+
+## Check
+
+A strong answer ranks waste first and thin data last, picks the right stop / hold / scale / fix action for each finding, and separates the listing hand-off from the ads-account actions. A weak answer treats all findings the same.
+
+## Key takeaway
+
+Rank, then act. Waste first, scale second, listing third, thin data last. The audit is a short list of defended actions, not a long list of observations.

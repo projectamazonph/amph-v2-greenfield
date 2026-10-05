@@ -2,7 +2,7 @@
  * Regression test for scripts/validate-lesson-production.ts.
  *
  * Runs the validator as a subprocess against the live curriculum tree
- * and asserts it reports the expected contract: 45/45 lessons
+ * and asserts it reports the expected contract: 57/57 lessons
  * complete and no active-practice block issues. A failure here means
  * a future change to either the lesson bodies or the validator logic
  * has broken the build's lesson-production invariant.
@@ -48,8 +48,8 @@ describe("validate-lesson-production.ts (subprocess smoke)", () => {
     }));
     const combined = (result.stdout ?? "") + (result.stderr ?? "");
 
-    // The lesson-count line must report all 45 lessons complete.
-    expect(combined).toMatch(/Lesson production contract: 45\/45 lessons complete/);
+    // The lesson-count line must report all 57 lessons complete.
+    expect(combined).toMatch(/Lesson production contract: 57\/57 lessons complete/);
     // No block-issue summary line with a non-zero count. The
     // validator only prints this line when issues exist.
     expect(combined).not.toMatch(/Active-practice block issues: [1-9]/);
