@@ -38,7 +38,7 @@ const ORGANIZATION_JSON_LD = {
   name: "Project Amazon PH Academy",
   url: "https://projectamazonph.vercel.app",
   description:
-    "Amazon PPC training for Filipino virtual assistants. Eleven modules, five scored simulators, and a live Ad Console.",
+    "Amazon PPC training for Filipino virtual assistants. Thirteen modules, five graded AMPH simulators, the free 12-simulator SimGrid library, and a live Ad Console.",
   logo: "https://projectamazonph.vercel.app/icon-512.png",
   sameAs: [],
 };
