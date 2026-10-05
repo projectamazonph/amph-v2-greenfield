@@ -37,6 +37,24 @@
       "finalDeliverable": "A first client-brief decision note"
     },
     {
+      "slug": "0.4-ad-console-pro",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "ad-console"
+      },
+      "resourceRefs": ["mdx:0.4-ad-console-pro"],
+      "finalDeliverable": "An AdConsole navigation log: which layer you opened first, the pacing or auction signal you found, and the action you took next"
+    },
+    {
+      "slug": "0.5-client-onboarding",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "client-onboarding"
+      },
+      "resourceRefs": ["mdx:0.5-client-onboarding"],
+      "finalDeliverable": "A one-page onboarding doc: access level, KPI, product facts, approval rules, launch blockers"
+    },
+    {
       "slug": "1.1-read-ppc-data-before-you-change-it",
       "toolBridge": {
         "kind": "none"
@@ -110,6 +128,15 @@
       "finalDeliverable": "A grouped keyword plan"
     },
     {
+      "slug": "2.5-keyword-lab",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "keyword-lab"
+      },
+      "resourceRefs": ["mdx:2.5-keyword-lab"],
+      "finalDeliverable": "A hit list of 5 ranked terms with intent, est CPC, est CVR, target ACoS, and the ad group each belongs to"
+    },
+    {
       "slug": "3.1-listing-quality-score",
       "toolBridge": {
         "kind": "simulator",
@@ -134,6 +161,15 @@
       },
       "resourceRefs": ["mdx:3.3-aplus-content"],
       "finalDeliverable": "An A+ content improvement note"
+    },
+    {
+      "slug": "3.4-buybox-dojo",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "listing"
+      },
+      "resourceRefs": ["mdx:3.4-buybox-dojo"],
+      "finalDeliverable": "A listing-readiness memo: research sources, match-type mix, negative list, and a 7-day PPC pressure-test plan"
     },
     {
       "slug": "4.1-sponsored-products",
@@ -168,6 +204,15 @@
       },
       "resourceRefs": ["mdx:4.4-campaign-architecture-practice"],
       "finalDeliverable": "A completed campaign architecture"
+    },
+    {
+      "slug": "4.5-campaign-architect",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "campaign-architect"
+      },
+      "resourceRefs": ["mdx:4.5-campaign-architect"],
+      "finalDeliverable": "A structure doc: one purpose, one match type, one bid default, one negative list, one review cadence per campaign"
     },
     {
       "slug": "5.1-campaign-portfolios",
@@ -220,6 +265,15 @@
       "finalDeliverable": "A completed bid decision"
     },
     {
+      "slug": "6.4-bid-decisions",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "bid-decisions"
+      },
+      "resourceRefs": ["mdx:6.4-bid-decisions"],
+      "finalDeliverable": "A bid-decision memo: the six numbers you read, the move you picked (raise / hold / lower / investigate), and the step size you chose"
+    },
+    {
       "slug": "7.1-search-term-analysis",
       "toolBridge": {
         "kind": "none"
@@ -243,6 +297,15 @@
       },
       "resourceRefs": ["mdx:7.3-str-triage-prep"],
       "finalDeliverable": "A completed search-term triage"
+    },
+    {
+      "slug": "7.4-search-triage",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "search-triage"
+      },
+      "resourceRefs": ["mdx:7.4-search-triage"],
+      "finalDeliverable": "A triage log: cluster, rule per cluster, batch action, and the one-line defense for each cluster"
     },
     {
       "slug": "8.1-brand-analytics",
@@ -295,6 +358,24 @@
       "finalDeliverable": "A data sufficiency decision"
     },
     {
+      "slug": "9.4-pacing-deck",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "pacing-deck"
+      },
+      "resourceRefs": ["mdx:9.4-pacing-deck"],
+      "finalDeliverable": "A pacing log: yesterday's curve, today's day-parting modifier, hour-6 and hour-18 verification, and the next review time"
+    },
+    {
+      "slug": "9.5-sqp-studio",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "sqp-studio"
+      },
+      "resourceRefs": ["mdx:9.5-sqp-studio"],
+      "finalDeliverable": "An SQP memo: ranks by impression, click, and conversion, plus one query you'd defend acting on and one you'd defend waiting on"
+    },
+    {
       "slug": "10.1-simple-report-structure",
       "toolBridge": {
         "kind": "none"
@@ -325,6 +406,15 @@
       },
       "resourceRefs": ["mdx:10.4-clicks-no-sales-high-acos"],
       "finalDeliverable": "A bottom-of-funnel diagnostic note"
+    },
+    {
+      "slug": "10.5-account-audit",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "account-audit"
+      },
+      "resourceRefs": ["mdx:10.5-account-audit"],
+      "finalDeliverable": "An audit list: top three findings with defenses, ranked waste first, scale second, listing third, thin data last"
     },
     {
       "slug": "11.1-tasks-by-cadence",
@@ -359,6 +449,24 @@
       },
       "resourceRefs": ["mdx:11.4-client-communication-capstone"],
       "finalDeliverable": "A client update and capstone evidence pack"
+    },
+    {
+      "slug": "11.5-bulk-file",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "bulk-file"
+      },
+      "resourceRefs": ["mdx:11.5-bulk-file"],
+      "finalDeliverable": "A bulk-sheet record: scope sentence, action set, dry-run result, and the fix loop for any failed rows"
+    },
+    {
+      "slug": "11.6-capstone",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "capstone-sequence"
+      },
+      "resourceRefs": ["mdx:11.6-capstone"],
+      "finalDeliverable": "An integration run: six artifacts, the onboarding doc, structure doc, launch log, optimization log, audit list, and report"
     },
     {
       "slug": "-1.1-what-amazon-is",

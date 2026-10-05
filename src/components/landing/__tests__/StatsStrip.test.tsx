@@ -9,7 +9,7 @@ describe("StatsStrip truthful initial state", () => {
 
     expect(html).toContain(">13</span>");
     expect(html).toContain(">5</span>");
-    expect(html).toContain(">475</span>");
+    expect(html).toContain(">595</span>");
     expect(html).toContain(">2,500</span>");
     expect(html).not.toContain(">0</span>");
   });
