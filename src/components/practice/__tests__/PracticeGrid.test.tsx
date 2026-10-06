@@ -8,7 +8,7 @@
  * Locks the structural contract for the practice hub index card grid:
  * - One card per allowlisted SimgridSimulatorId (12 total).
  * - Each card renders its simulator title as a heading.
- * - Each card links to /practice/simgrid/<file>.html where <file>
+ * - Each card links to /practice/<file>.html where <file>
  *   matches a vendored HTML file under public/simgrid-v1/.
  *
  * Title assertions use getByRole("heading") rather than getByText
@@ -37,12 +37,12 @@ describe("PracticeGrid", () => {
     }
   });
 
-  it("each card links to /practice/simgrid/<file>", () => {
+  it("each card links to /practice/<file>", () => {
     render(<PracticeGrid />);
     const links = screen.getAllByRole("link", { name: /Open simulator/i });
     expect(links.length).toBe(SIMGRID_SIMULATOR_META.length);
     for (const link of links) {
-      expect(link.getAttribute("href")).toMatch(/^\/practice\/simgrid\/.+\.html$/);
+      expect(link.getAttribute("href")).toMatch(/^\/practice\/.+\.html$/);
     }
   });
 });
