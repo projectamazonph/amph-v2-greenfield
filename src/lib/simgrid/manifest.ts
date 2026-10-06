@@ -3,7 +3,7 @@
  *
  * Task 7 of the 2026-09-30 SimGrid integration plan: the 12 browser
  * simulators that AMPH hosts via the vendored static site at
- * public/simgrid-v1/ are surfaced to students on /practice/simgrid.
+ * public/simgrid-v1/ are surfaced to students on /practice.
  *
  * The canonical ordering, titles, tags, and descriptions are sourced
  * from the vendored catalog — see public/simgrid-v1/index.html
@@ -22,7 +22,7 @@
  * @/domain/simgrid (Task 3, commit 946c64a4); the `file` field is the
  * vendored HTML filename, and `href` is the route the AMPH wrapper
  * page mounts for that simulator. Both fields stay in sync — the
- * SIMGRID_SIMULATOR_META shape and the wrapper route /practice/simgrid
+ * SIMGRID_SIMULATOR_META shape and the wrapper route /practice
  * are wired together by the entry page.
  */
 
@@ -33,7 +33,7 @@ export interface SimgridSimulatorMeta {
   readonly title: string;
   readonly tag: string;
   readonly description: string;
-  /** Wrapped page route under the AMPH origin (e.g. /practice/simgrid/listing.html). */
+  /** Wrapped page route under the AMPH origin (e.g. /practice/listing.html). */
   readonly href: string;
   /** Vendored HTML filename served from /simgrid-v1/ (e.g. listing.html). */
   readonly file: string;
@@ -46,7 +46,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Listing + PPC",
     description:
       "Optimize a listing: research, match types, negatives, then run a 7-day PPC pressure test.",
-    href: "/practice/simgrid/listing.html",
+    href: "/practice/listing.html",
     file: "listing.html",
   },
   {
@@ -55,7 +55,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Ad Operations",
     description:
       "Full Sponsored Ads console. Campaigns, ad groups, keywords, search terms, daily pacing, hour-by-hour auction.",
-    href: "/practice/simgrid/ad-console.html",
+    href: "/practice/ad-console.html",
     file: "ad-console.html",
   },
   {
@@ -64,7 +64,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Keyword Research",
     description:
       "Win the auction before you spend a cent. Research, build a hit list, and rank your keywords.",
-    href: "/practice/simgrid/keyword-lab.html",
+    href: "/practice/keyword-lab.html",
     file: "keyword-lab.html",
   },
   {
@@ -73,7 +73,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Planning",
     description:
       "Turn a product brief into campaign structure, core targets, negative guardrails, and a first review rule.",
-    href: "/practice/simgrid/campaign-architect.html",
+    href: "/practice/campaign-architect.html",
     file: "campaign-architect.html",
   },
   {
@@ -81,7 +81,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     title: "Search Term Triage",
     tag: "Triage",
     description: "8, 12, or 16 terms a round. Read the report, pick the action, defend it.",
-    href: "/practice/simgrid/search-triage.html",
+    href: "/practice/search-triage.html",
     file: "search-triage.html",
   },
   {
@@ -90,7 +90,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Optimization",
     description:
       "Read clicks, spend, sales, ACOS, ROAS, and confidence. Choose whether to raise, hold, lower, or investigate before touching the bid.",
-    href: "/practice/simgrid/bid-decisions.html",
+    href: "/practice/bid-decisions.html",
     file: "bid-decisions.html",
   },
   {
@@ -99,7 +99,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Budget + Pacing",
     description:
       "Set day-parting. Watch the flight log. See how Amazon burns through a daily budget.",
-    href: "/practice/simgrid/pacing-deck.html",
+    href: "/practice/pacing-deck.html",
     file: "pacing-deck.html",
   },
   {
@@ -108,7 +108,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Bulk Operations",
     description:
       "Upload a sheet. Validate. Get graded the way Amazon actually grades bulk uploads.",
-    href: "/practice/simgrid/bulk-file.html",
+    href: "/practice/bulk-file.html",
     file: "bulk-file.html",
   },
   {
@@ -117,7 +117,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Analytics",
     description:
       "Compare search-query visibility and conversion signals. Separate what the data proves from what it only hints.",
-    href: "/practice/simgrid/sqp-studio.html",
+    href: "/practice/sqp-studio.html",
     file: "sqp-studio.html",
   },
   {
@@ -126,7 +126,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Audit",
     description:
       "Read a synthetic account snapshot, rank urgency, and pick the safest next action for waste, scale, listing, and thin-data findings.",
-    href: "/practice/simgrid/account-audit.html",
+    href: "/practice/account-audit.html",
     file: "account-audit.html",
   },
   {
@@ -135,7 +135,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "VA Workflow",
     description:
       "Turn a client handoff into access, KPI, product facts, approval rules, and launch blockers before work starts.",
-    href: "/practice/simgrid/client-onboarding.html",
+    href: "/practice/client-onboarding.html",
     file: "client-onboarding.html",
   },
   {
@@ -144,7 +144,7 @@ export const SIMGRID_SIMULATOR_META: readonly SimgridSimulatorMeta[] = [
     tag: "Capstone",
     description:
       "Practice the full PPC workflow from research to setup, optimization, and evidence-based client reporting.",
-    href: "/practice/simgrid/capstone-sequence.html",
+    href: "/practice/capstone-sequence.html",
     file: "capstone-sequence.html",
   },
 ] as const;
