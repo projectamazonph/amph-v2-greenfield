@@ -1,10 +1,12 @@
-// src/app/practice/simgrid/__tests__/[slug].test.ts
 /**
- * /practice/simgrid/[...slug] — Task 8 of the 2026-09-30 SimGrid
- * integration plan.
+ * /practice/[...slug] — Task 14 (simulator UI refactor).
  *
  * Locks the auth-gate + manifest-lookup contract for the wrapper
- * page that mounts the vendored SimGrid iframe:
+ * page that mounts the vendored SimGrid iframe. Path renamed from
+ * /practice/simgrid/[...slug] (Task 8) to /practice/[...slug] as part
+ * of the simulator UI refactor; the same redirect / notFound /
+ * authenticated-render contract holds.
+ *
  *   - Unauthenticated request → NEXT_REDIRECT to /login?redirect=...
  *     (the project convention; src/lib/auth.ts:160-167 uses
  *     `redirect`, not `returnTo` — see also
@@ -13,7 +15,7 @@
  *   - Unknown simulator file → notFound() (Next 16 throws an Error
  *     whose message + digest is "NEXT_HTTP_ERROR_FALLBACK;404").
  *   - Authenticated + known file → renders a React element
- *     containing the <SimgridFrame /> the page defines (mocked as
+ *     containing the <PracticeFrame /> the page defines (mocked as
  *     a sentinel here).
  *
  * The redirect path is verified by catching the NEXT_REDIRECT throw
@@ -26,9 +28,9 @@
  * so the test stays focused on the page's auth-gate + manifest-
  * lookup behavior (its sidebar pulls in command-palette and
  * notification actions that would need their own stubs). The
- * sentinel <SimgridFrame /> mock makes the "renders when
+ * sentinel <PracticeFrame /> mock makes the "renders when
  * authenticated" assertion structural — the real client component
- * lives under src/components/simgrid/__tests__/SimgridFrame.test.tsx.
+ * lives under src/components/practice/__tests__/PracticeFrame.test.tsx.
  *
  * Note on vitest 4.x + asymmetric matchers: `toHaveBeenCalledWith(
  * expect.stringContaining(...))` doesn't always unwrap cleanly
@@ -53,10 +55,10 @@ vi.mock("@/lib/auth", () => ({
 // Stub out the client component the page mounts. The real
 // component (and its postMessage listener behavior) is covered by
 // its own test suite at
-// src/components/simgrid/__tests__/SimgridFrame.test.tsx; this file
+// src/components/practice/__tests__/PracticeFrame.test.tsx; this file
 // only proves the page wires it up when authenticated.
-vi.mock("@/components/simgrid/SimgridFrame", () => ({
-  SimgridFrame: ({
+vi.mock("@/components/practice/PracticeFrame", () => ({
+  PracticeFrame: ({
     simulatorId,
     src,
     title,
@@ -64,7 +66,7 @@ vi.mock("@/components/simgrid/SimgridFrame", () => ({
     simulatorId: string;
     src: string;
     title: string;
-  }) => ({ __sentinel: "SimgridFrame", simulatorId, src, title }),
+  }) => ({ __sentinel: "PracticeFrame", simulatorId, src, title }),
 }));
 
 vi.mock("@/components/student/StudentShell", () => ({
@@ -77,20 +79,20 @@ vi.mock("next/navigation", async (importOriginal) => {
 });
 
 import { getSessionUserId } from "@/lib/auth";
-import PracticeSimgridSimulatorPage from "../[...slug]/page";
+import PracticeSimulatorPage from "../[...slug]/page";
 
 beforeEach(() => {
   redirect.mockClear();
   (getSessionUserId as unknown as ReturnType<typeof vi.fn>).mockReset();
 });
 
-describe("/practice/simgrid/[...slug] auth gate", () => {
+describe("/practice/[...slug] auth gate", () => {
   it("redirects to /login when no session", async () => {
     (getSessionUserId as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(null);
 
     const params = Promise.resolve({ slug: ["bid-decisions.html"] });
 
-    await expect(PracticeSimgridSimulatorPage({ params })).rejects.toThrow(/NEXT_REDIRECT/);
+    await expect(PracticeSimulatorPage({ params })).rejects.toThrow(/NEXT_REDIRECT/);
 
     // Inspect the redirect call args directly — vitest 4.x's
     // toHaveBeenCalledWith(expect.stringContaining(...)) doesn't
@@ -104,7 +106,7 @@ describe("/practice/simgrid/[...slug] auth gate", () => {
     // (%2F) don't defeat a plain substring match.
     const redirectParam = target.split("redirect=")[1] ?? "";
     const decoded = decodeURIComponent(redirectParam);
-    expect(decoded).toBe("/practice/simgrid/bid-decisions.html");
+    expect(decoded).toBe("/practice/bid-decisions.html");
     // Defensive: the path must NOT be double-suffixed with .html.
     expect(target).not.toContain(".html.html");
   });
@@ -113,7 +115,7 @@ describe("/practice/simgrid/[...slug] auth gate", () => {
     (getSessionUserId as unknown as ReturnType<typeof vi.fn>).mockResolvedValue("u1");
 
     const params = Promise.resolve({ slug: ["bid-decisions.html"] });
-    const element = await PracticeSimgridSimulatorPage({ params });
+    const element = await PracticeSimulatorPage({ params });
 
     expect(element).toBeTruthy();
     expect(redirect).not.toHaveBeenCalled();
@@ -128,7 +130,7 @@ describe("/practice/simgrid/[...slug] auth gate", () => {
     // digest property are both "NEXT_HTTP_ERROR_FALLBACK;404"
     // (see node_modules/next/dist/client/components/not-found.js).
     // The brief's NEXT_NOT_FOUND digest is the Next 13 era format.
-    await expect(PracticeSimgridSimulatorPage({ params })).rejects.toThrow(
+    await expect(PracticeSimulatorPage({ params })).rejects.toThrow(
       /NEXT_HTTP_ERROR_FALLBACK.*404/,
     );
   });

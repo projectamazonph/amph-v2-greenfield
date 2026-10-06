@@ -1,7 +1,7 @@
-// src/components/simgrid/__tests__/SimgridFrame.test.tsx
+// src/components/practice/__tests__/PracticeFrame.test.tsx
 // @vitest-environment jsdom
 /**
- * SimgridFrame.test.tsx — Task 8 of the 2026-09-30 SimGrid
+ * PracticeFrame.test.tsx — Task 8 of the 2026-09-30 SimGrid
  * integration plan.
  *
  * Locks the postMessage listener contract for the iframe host
@@ -34,7 +34,7 @@ vi.mock("@/app/actions/simgridProgress.action", () => ({
 }));
 
 import { recordSimgridProgressAction } from "@/app/actions/simgridProgress.action";
-import { SimgridFrame } from "@/components/simgrid/SimgridFrame";
+import { PracticeFrame } from "@/components/practice/PracticeFrame";
 
 beforeEach(() => {
   (recordSimgridProgressAction as unknown as ReturnType<typeof vi.fn>).mockClear();
@@ -72,10 +72,10 @@ function validAttempt(
   };
 }
 
-describe("SimgridFrame postMessage listener", () => {
+describe("PracticeFrame postMessage listener", () => {
   it("ignores messages with the wrong origin", () => {
     render(
-      <SimgridFrame
+      <PracticeFrame
         simulatorId="bid-decisions"
         src="/simgrid-v1/bid-decisions.html?x=1"
         title="x"
@@ -95,7 +95,7 @@ describe("SimgridFrame postMessage listener", () => {
 
   it("ignores messages with the wrong source", () => {
     render(
-      <SimgridFrame
+      <PracticeFrame
         simulatorId="bid-decisions"
         src="/simgrid-v1/bid-decisions.html?x=1"
         title="x"
@@ -112,7 +112,7 @@ describe("SimgridFrame postMessage listener", () => {
 
   it("ignores messages for a different simulator id", () => {
     render(
-      <SimgridFrame
+      <PracticeFrame
         simulatorId="bid-decisions"
         src="/simgrid-v1/bid-decisions.html?x=1"
         title="x"
@@ -129,7 +129,7 @@ describe("SimgridFrame postMessage listener", () => {
 
   it("calls the server action on a valid message", () => {
     render(
-      <SimgridFrame
+      <PracticeFrame
         simulatorId="bid-decisions"
         src="/simgrid-v1/bid-decisions.html?x=1"
         title="x"

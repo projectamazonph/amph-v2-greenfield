@@ -1,8 +1,8 @@
 /**
- * SimgridProgressCard — Task 9 of the 2026-09-30 SimGrid integration plan.
+ * PracticeProgressCard — Task 14 (simulator UI refactor).
  *
  * Async server component mounted on /dashboard. Lists every
- * SimGrid simulator alongside the viewer's best score so students
+ * practice simulator alongside the viewer's best score so students
  * see their practice progress without leaving the dashboard.
  *
  * Data flow:
@@ -42,9 +42,9 @@ import { getSessionUserId } from "@/lib/auth";
 import { SIMGRID_SIMULATOR_META } from "@/lib/simgrid/manifest";
 import { FormativeScoreNotice } from "@/components/tools/FormativeScoreNotice";
 
-import styles from "./SimgridProgressCard.module.css";
+import styles from "./PracticeProgressCard.module.css";
 
-export async function SimgridProgressCard() {
+export async function PracticeProgressCard() {
   const userId = await getSessionUserId();
   const container = buildContainer();
 
@@ -60,13 +60,13 @@ export async function SimgridProgressCard() {
   );
 
   return (
-    <section className={styles.card} aria-labelledby="simgrid-progress-heading">
+    <section className={styles.card} aria-labelledby="practice-progress-heading">
       <header className={styles.head}>
-        <h2 id="simgrid-progress-heading" className={styles.title}>
-          SimGrid practice
+        <h2 id="practice-progress-heading" className={styles.title}>
+          Practice progress
         </h2>
-        <Link href="/practice/simgrid" className={styles.cta}>
-          Open SimGrid →
+        <Link href="/practice" className={styles.cta}>
+          Open practice →
         </Link>
       </header>
       <FormativeScoreNotice />

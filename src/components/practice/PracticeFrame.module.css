@@ -1,19 +1,25 @@
 /**
- * SimgridFrame styles — Task 8 of the 2026-09-30 SimGrid integration
- * plan.
+ * PracticeFrame styles — Task 14 (simulator UI refactor).
  *
  * Mirrors the iframe shell used by /tools/ad-console
  * (src/app/tools/ad-console/page.module.css:115-133) so the embedded
  * simulator feels native to the rest of the student app, and reuses
  * the project-wide design tokens defined in src/app/globals.css.
  *
- * Height:
- *   - Desktop: calc(100dvh - 220px) leaves room for the StudentShell
- *     sidebar (240px - it collapses under 1024px), the top
- *     page chrome (header + status line), and a small margin.
- *   - Floor: min(600px, calc(100dvh - 240px)) so the iframe is
- *     usable on shorter laptop screens.
- *   - Mobile (<768px): a fixed 420px floor — same as ad-console.
+ * Height strategy:
+ *   The wrapper page (src/app/practice/[...slug]/page.tsx) sets a
+ *   min-height on its main. This frame fills the page width and
+ *   `flex: 1`, so the iframe height is driven by the page's
+ *   min-height — NOT by a fixed viewport calc. The previous
+ *   `height: calc(100dvh - 220px)` was clipping tall simulators
+ *   (BuyBox Dojo's listing form, the full Ad Console layout) and
+ *   showing empty space on shorter ones (Bulk File, SQP Studio).
+ *   Letting the wrapper set the min-height keeps the iframe content
+ *   visible without skewing the simulator view.
+ *
+ *   The 600px floor covers short laptop viewports where the wrapper
+ *   page is shorter than the sim. The mobile 420px floor matches
+ *   /tools/ad-console's mobile iframe floor.
  */
 
 .frame {
@@ -21,10 +27,10 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--sh-2);
-  height: calc(100dvh - 220px);
-  min-height: min(600px, calc(100dvh - 240px));
+  min-height: 600px;
   display: flex;
   flex-direction: column;
+  background: var(--surface-0);
 }
 
 @media (max-width: 767px) {

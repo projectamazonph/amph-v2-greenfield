@@ -1,5 +1,5 @@
-﻿/**
- * dashboard page — module + data-layer test.
+/**
+ * dashboard page � module + data-layer test.
  *
  * P0-4: Successful login/signup must not 404. The /dashboard route
  * must exist and render a useful, auth-gated landing page.
@@ -38,7 +38,7 @@ vi.mock("@/lib/auth", () => ({
 // decide whether to render the NewUserDashboard first-run variant.
 // STORY-157: the dashboard also calls `xpEventRepo.findByUserId` to render
 // the hero-stats strip (XP + 5-day streak dots).
-// Simgrid Task 9: the dashboard also mounts <SimgridProgressCard /> which
+// Simgrid Task 9: the dashboard also mounts <PracticeProgressCard /> which
 // calls container.getBestSimgridScore.execute({ userId, simulatorId }) per
 // simulator. Stub it so future render-coupled regressions surface as test
 // failures here rather than being silently swallowed by the try/catch wrappers
@@ -67,16 +67,16 @@ vi.mock("next/navigation", () => ({
   redirect: (url: string) => mockRedirect(url),
 }));
 
-// Simgrid Task 9: SimgridProgressCard is an async server component. In jsdom
+// Simgrid Task 9: PracticeProgressCard is an async server component. In jsdom
 // (no Next.js server pipeline) React 19 rejects async components used as JSX
 // elements with "async Client Component". Replace it with a sync stub so the
 // dashboard's render can resolve cleanly. The card's own contract is covered
 // by its dedicated test file. The stub still mounts a section + heading so
 // any future render-coupled regression in this file would surface.
-vi.mock("@/components/simgrid/SimgridProgressCard", () => ({
-  SimgridProgressCard: () => (
-    <section aria-labelledby="simgrid-progress-heading">
-      <h2 id="simgrid-progress-heading">SimGrid practice</h2>
+vi.mock("@/components/practice/PracticeProgressCard", () => ({
+  PracticeProgressCard: () => (
+    <section aria-labelledby="practice-progress-heading">
+      <h2 id="practice-progress-heading">Practice progress</h2>
     </section>
   ),
 }));
@@ -160,7 +160,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     // STORY-157: default empty XP feed so the hero-stats strip renders
     // 0 XP and 0 active days without forcing every test to stub it.
     mockXpFindByUserId.mockResolvedValue({ ok: true, value: [] });
-    // Simgrid Task 9: default "no attempts" so SimgridProgressCard renders
+    // Simgrid Task 9: default "no attempts" so PracticeProgressCard renders
     // its 12 "Not started" rows under the existing try/catch wrappers below.
     mockGetBestSimgridScore.mockResolvedValue({ ok: true, value: null });
   });
@@ -221,7 +221,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     mockEnrollments.mockResolvedValue({ ok: false, error: { kind: "db_error", message: "down" } });
     mockCourseFindById.mockResolvedValue({ ok: true, value: makeCourse() });
 
-    // The page now degrades gracefully — no enrollments rendered, no crash.
+    // The page now degrades gracefully � no enrollments rendered, no crash.
     const result = await DashboardPage();
     expect(result).toBeDefined();
 
@@ -250,7 +250,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
 
     // Source-level assertion: the variant switch + NewUserDashboard
     // import live in the page module. This is the lowest-fragility way
-    // to prove the variant branch was wired in — the rendered React
+    // to prove the variant branch was wired in � the rendered React
     // tree is awkward to inspect in jsdom-free node tests.
     const pagePath = path.resolve(process.cwd(), "src/app/dashboard/page.tsx");
     const source = await fs.readFile(pagePath, "utf8");
@@ -259,7 +259,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     expect(source).toMatch(/hasCompletedWelcome/);
 
     // Behavior assertion: the page must NOT call courseRepo when there
-    // are no enrollments — the variant short-circuits before the
+    // are no enrollments � the variant short-circuits before the
     // "resume lesson" branch.
     expect(mockCourseFindById).not.toHaveBeenCalled();
     // And it did look up the fresh user to decide the variant.

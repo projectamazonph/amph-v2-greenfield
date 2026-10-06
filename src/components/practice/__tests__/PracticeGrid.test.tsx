@@ -1,14 +1,14 @@
-// src/components/simgrid/__tests__/SimgridPracticeGrid.test.tsx
+// src/components/practice/__tests__/PracticeGrid.test.tsx
 // @vitest-environment jsdom
 
 /**
- * SimgridPracticeGrid.test.tsx — Task 7 of the 2026-09-30 SimGrid
+ * PracticeGrid.test.tsx — Task 7 of the 2026-09-30 SimGrid
  * integration plan.
  *
  * Locks the structural contract for the practice hub index card grid:
  * - One card per allowlisted SimgridSimulatorId (12 total).
  * - Each card renders its simulator title as a heading.
- * - Each card links to /practice/simgrid/<file>.html where <file>
+ * - Each card links to /practice/<file>.html where <file>
  *   matches a vendored HTML file under public/simgrid-v1/.
  *
  * Title assertions use getByRole("heading") rather than getByText
@@ -26,23 +26,23 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { SimgridPracticeGrid } from "@/components/simgrid/SimgridPracticeGrid";
+import { PracticeGrid } from "@/components/practice/PracticeGrid";
 import { SIMGRID_SIMULATOR_META } from "@/lib/simgrid/manifest";
 
-describe("SimgridPracticeGrid", () => {
+describe("PracticeGrid", () => {
   it("renders a card for every simulator", () => {
-    render(<SimgridPracticeGrid />);
+    render(<PracticeGrid />);
     for (const entry of SIMGRID_SIMULATOR_META) {
       expect(screen.getByRole("heading", { name: entry.title, level: 2 })).toBeDefined();
     }
   });
 
-  it("each card links to /practice/simgrid/<file>", () => {
-    render(<SimgridPracticeGrid />);
+  it("each card links to /practice/<file>", () => {
+    render(<PracticeGrid />);
     const links = screen.getAllByRole("link", { name: /Open simulator/i });
     expect(links.length).toBe(SIMGRID_SIMULATOR_META.length);
     for (const link of links) {
-      expect(link.getAttribute("href")).toMatch(/^\/practice\/simgrid\/.+\.html$/);
+      expect(link.getAttribute("href")).toMatch(/^\/practice\/.+\.html$/);
     }
   });
 });
