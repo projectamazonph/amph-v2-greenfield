@@ -1,9 +1,14 @@
 # STORY-161 — Auth forms: hide TOTP until needed + signup terms note
 
 **Type:** UI/UX refinement (UI/UX-6 of 7 surfaces)
-**Status:** In progress
+**Status:** Shipped. The student login form no longer renders the TOTP input
+on first paint; it appears only after a `totp_required` or
+`invalid_totp_code` round-trip so accounts without 2FA never see the noise.
+The signup form gains a small token-only terms + PayMongo payment-method
+line above the submit so the action reads in context. PR #601
+(commit `1a49fe60`, 2026-09-23).
 **Owner:** TBD
-**Branch:** `uiux/auth`
+**Branch:** `uiux/auth` (superseded by main; closed in doc-hygiene PR)
 
 ## Why
 
@@ -48,13 +53,13 @@ involved), so the fixes are small and surgical.
 
 ## Acceptance criteria
 
-- [ ] First-paint `/login` does not contain the TOTP input.
-- [ ] Reloading `/login?error=totp_required` shows the TOTP input and focuses it.
-- [ ] Reloading `/login?error=invalid_credentials` (or null) does not show the TOTP input.
-- [ ] `/signup` shows the terms + payment-method line above the submit button for both
+- [x] First-paint `/login` does not contain the TOTP input.
+- [x] Reloading `/login?error=totp_required` shows the TOTP input and focuses it.
+- [x] Reloading `/login?error=invalid_credentials` (or null) does not show the TOTP input.
+- [x] `/signup` shows the terms + payment-method line above the submit button for both
       the no-tier and the tier-flow (`tier=mastery`) renders.
-- [ ] Tokens only; no hex / raw spacing / raw radius values appear in the new CSS rules.
-- [ ] `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test src/app/login src/app/signup` all green.
+- [x] Tokens only; no hex / raw spacing / raw radius values appear in the new CSS rules.
+- [x] `pnpm tsc --noEmit`, `pnpm lint`, `pnpm test src/app/login src/app/signup` all green.
 
 ## Files
 

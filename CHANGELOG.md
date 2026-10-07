@@ -17,6 +17,10 @@ practice`. The live console uses a red `Live account` pill with a
 claims contract; no hex or raw spacing. Tokens only. Story:
 `docs/stories/STORY-159.md`.
 
+### STORY-161: Auth forms hide TOTP until needed + signup terms note (shipped)
+
+The student `/login` form used to render a TOTP input on every visit, including first paint for the more than 90% of accounts that never enroll two-factor authentication. The route handler silently ignored the empty field, so the always-visible TOTP field was pure noise. PR #601 moves the TOTP `<Input>` behind `errorKind === "totp_required" || "invalid_totp_code"`, with `autoFocus` so the next-step box lands where the eye is. The `/signup` form gains a small token-only terms + PayMongo payment-method line above the submit so the action reads in context; tier-aware submit copy was already present. New `src/app/login/__tests__/LoginForm.test.tsx` (six contracts covering TOTP visibility across `null`, `invalid_credentials`, `totp_required`, `invalid_totp_code`, and `redirectTo` pass-through) and three added contracts in `src/app/signup/__tests__/page.test.tsx` lock the new copy. Admin login keeps its own form and always renders TOTP since seeded admins are fully enrolled (PR #601 deliberately kept that split). Story: `docs/stories/STORY-161.md`.
+
 ### Preview deployments are read-only (shipped)
 
 Preview, production, and development all resolve to the same `DATABASE_URL`
