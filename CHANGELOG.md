@@ -4,6 +4,19 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-134: Mark LEARN-030 lesson-to-tool bridge registry shipped (doc hygiene)
+
+STORY-134 has shipped via PR #525 (commit `d2b860a`). The story doc still
+listed the work as `Planned`, which contradicts `CHANGELOG.md:174`,
+`STATE.md:123`, `FEATURES.md:144` (Learning-experience uplift row already
+names STORY-134), `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md:16` (Wave 3
+"Done for the planned slice"), `docs/sprint-plan.md:268` (LEARN-030 done
+via STORY-134), and `CLAUDE.md:27` (validator description). The story
+doc's `## Status` block now reads "Shipped via PR #525" and the
+acceptance criteria checkboxes are ticked, with case pointers to the
+nine Vitest cases in `src/lib/__tests__/toolBridge.test.ts`. No source
+change.
+
 ### STORY-159: Status-first cards on the /tools index (shipped)
 
 The `/tools` index listed five graded simulators plus one live ad console but
