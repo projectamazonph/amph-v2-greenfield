@@ -27,7 +27,7 @@ Pure business model. The most valuable code in the repo, because it's the only c
 
 ### What goes here
 
-- **Entities.** `Course`, `Module`, `Lesson`, `Enrollment`, `Payment`, `Refund`, `User`, `Certificate`, `Simulator`, `Scenario`. Plain classes or `readonly` interfaces with constructor validation.
+- **Entities.** `Course`, `Module`, `Lesson`, `Enrollment`, `Payment`, Refund, `User`, `Certificate`, `Simulator`, `Scenario`. Plain classes or `readonly` interfaces with constructor validation.
 - **Value objects.** `Money`, `Email`, `Tier`, `Slug`, `QuizAttempt`, `ProgressEvent`, `BidRecommendation`. Always immutable, always validated at construction.
 - **Pure functions.** `recommendBids(rows, rules)`, `canAccessCourse(user, course)`, `canRequestRefund(payment, now)`, `quotePricing(course, user, coupon, opts)`, `computeLevel(xp)`, `evaluateQuiz(answers, key)`. No IO, no `Date.now()`, no `Math.random()`.
 - **State machines.** Refund states, enrollment states, payment states. Discriminated unions, exhaustive `switch`.
@@ -169,7 +169,7 @@ Orchestration. One class per use case. Constructor-injected ports. The use case 
 
 ### What goes here
 
-- One class per use case, in its own file. `StartCheckout`, `HandlePaymentWebhook`, `EnrollStudent`, `IssueCertificate`, `RunBidElevator`, etc.
+- One class per use case, in its own file. `CreatePaymentIntent`, `HandlePaymentWebhook`, `EnrollStudent`, `IssueCertificate`, `RunBidElevator`, etc.
 - Constructor takes ports. No field setters, no service locators.
 - `async exec(input): Promise<Result<Output, Error>>` is the only public method.
 - Internal flow: validate → load → check policy → execute side effects via ports → return Result.

@@ -146,7 +146,7 @@ Each action should parse untrusted input, obtain the request container, call a u
 | Authentication              | `SignUp`, `Login`, `Logout`, `VerifyEmail`, `ResendVerification`, `RequestPasswordReset`, `ResetPassword`                                                                                                                                                                            |
 | Checkout and access         | `CreatePaymentIntent`, `ApplyDiscountCode`, `EnrollStudent`, `CheckCourseAccess`, `AuthorizeLessonAccess`, `ProcessRefund` _(moved to `refund/`: `RequestRefund`)_                                                                                                                   |
 | Curriculum                  | `ListCatalogCourses`, `GetCatalogCourse`, `ListCourses`, `GetCourse`, `CreateCourse`, `UpdateCourse`, `ArchiveCourse`, `CreateModule`, `UpdateModule`, `DeleteModule`, `ReorderModules`, `CreateLesson`, `UpdateLesson`, `DeleteLesson`, `ReorderLessons`, `RebuildCourseCurriculum` |
-| Learning                    | `RecordQuizAttempt`, `AwardXP`, `AwardBadge`, `ListUserBadges` _(moved to `progress/`: `RecordStreakVisit`, `MarkLessonComplete`)_                                                                                                                                                   |
+| Learning                    | `RecordQuizAttempt`, `AwardXP`, `AwardBadge`, `ListUserBadges` _(moved to `progress/`: `RecordStreakVisit`, `MarkLessonComplete`)_ <!-- doc-symbol-opt-out: RecordStreakVisit -->                                                                                                    |
 | Certificates                | `IssueCertificate`, `RenderCertificatePdf`, `VerifyCertificate`, `RevokeCertificate`                                                                                                                                                                                                 |
 | Simulator infrastructure    | `StartSimulatorAttempt`, `SaveSimulatorDecision`, `SubmitSimulatorAttempt`, `GradeSimulatorAttempt`, `ComposeAttemptFeedback`                                                                                                                                                        |
 | Simulator administration    | `AdminListScenarios`, `GetSimulatorScenario`, `CreateSimulatorScenario`, `UpdateSimulatorScenario`, `ArchiveSimulatorScenario`                                                                                                                                                       |
@@ -191,7 +191,7 @@ Request guards consult the `sessions` table when the JWT carries a `sessionId`, 
 
 `POST /api/webhooks/paymongo` obtains the production container, verifies the PayMongo signature, records a durable `WebhookEvent`, and processes the event through the configured order, enrollment, and audit ports. The old documentation claim that the route creates in-memory repositories is obsolete.
 
-The current repository contains no separate public `Checkout`, `Payment`, `Refund`, or `Receipt` Prisma models from the original target design. Payment state is represented by `Order` and related fields. Confirm model names in `prisma/schema.prisma` before writing integrations.
+The current repository contains no separate public Checkout, Payment, Refund, or Receipt Prisma models from the original target design. Payment state is represented by the `Order` entity and related fields. Confirm model names in `prisma/schema.prisma` before writing integrations.
 
 ## Scheduled reminders
 

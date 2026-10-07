@@ -253,7 +253,7 @@ The MDX editor is a textarea with live preview (client component). On save, the 
 
 ## Payments (Orders)
 
-> **Terminology note:** There are no separate `Payment` or `Refund` tables. The `Order` entity is the single source of truth. The admin section is named "Payments" in the nav but all data comes from `Order`.
+> **Terminology note:** There are no separate Payment or Refund tables. The `Order` entity is the single source of truth. The admin section is named "Payments" in the nav but all data comes from `Order`.
 
 ### List page (`/admin/payments`)
 
@@ -431,7 +431,7 @@ The form has a checkbox (enabled flag) and an optional message textarea (up to 5
 
 The page is split into four cards:
 
-- **Site settings** — dynamic key/value editor. Any key can be created or replaced. The value field accepts JSON; plain strings are wrapped in quotes automatically. Lists all existing rows with their key, value, and description. Saving a key replaces its value. Uses `listSettings` (read) and `setSettingAction` (write) via `SetSettingForm`.
+- **Site settings** — dynamic key/value editor. Any key can be created or replaced. The value field accepts JSON; plain strings are wrapped in quotes automatically. Lists all existing rows with their key, value, and description. Saving a key replaces its value. Uses `listSettings` (read) and `setSettingAction` (write) via `SiteSettingsForm`.
 - **Environment** — read-only table of four required env vars: `DATABASE_URL`, `JWT_SECRET`, `PAYMONGO_SECRET`, `RESEND_API_KEY`. Shows Set / Missing status only, never the actual values.
 - **Actor** — the current admin's id, email, and role.
 - **Two-factor authentication** — opt-in TOTP enrollment. Admins can enable 2FA via an authenticator app using the `enableTwoFactorAction` flow, or disable it via `DisableTwoFactorForm` (password-confirmed). There is no enforcement that all admins must use 2FA.
@@ -484,15 +484,15 @@ Every admin mutation. The use case writes the entry; the adapter persists it. Th
 
 ## What Lives Where
 
-| Concern                | Domain                                      | Port                       | Use case                                    | Adapter                         |
-| ---------------------- | ------------------------------------------- | -------------------------- | ------------------------------------------- | ------------------------------- |
-| Role check             | `src/domain/entities/User.ts`               | `IAccessPolicy`            | every admin use case                        | `TierAccessPolicy`              |
-| Impersonation logic    | `src/domain/entities/User.ts`               | —                          | `AdminImpersonate`, `AdminEndImpersonation` | —                               |
-| Audit-log write        | —                                           | `IAuditLog`                | every admin use case                        | `PrismaAuditLog`                |
-| CSV export             | `src/domain/shared/`                        | —                          | `AdminExportAuditLog`, `ExportPayments`     | —                               |
-| Settings read/write    | `src/domain/values/`                        | `IPricingTierRepository`   | `AdminUpdateSettings`                       | `PrismaPricingTierRepository`   |
-| Email template storage | `src/domain/entities/EmailTemplate.ts`      | `IEmailTemplateRepository` | `UpdateEmailTemplate`                       | `PrismaEmailTemplateRepository` |
-| Maintenance toggle     | —                                           | —                          | `AdminToggleMaintenance`                    | —                               |
-| Capstone review        | `src/domain/entities/CapstoneSubmission.ts` | —                          | `PassCapstone`, `ReturnCapstone`            | —                               |
+| Concern                | Domain                                      | Port                       | Use case                                        | Adapter                         |
+| ---------------------- | ------------------------------------------- | -------------------------- | ----------------------------------------------- | ------------------------------- |
+| Role check             | `src/domain/entities/User.ts`               | `IAccessPolicy`            | every admin use case                            | `TierAccessPolicy`              |
+| Impersonation logic    | `src/domain/entities/User.ts`               | —                          | `ImpersonateUser`, `stopImpersonatingAction`    | —                               |
+| Audit-log write        | —                                           | `IAuditLog`                | every admin use case                            | `PrismaAuditLog`                |
+| CSV export             | `src/domain/shared/`                        | —                          | `ExportAuditLogs`, `ExportPayments`             | —                               |
+| Settings read/write    | `src/domain/values/`                        | `IPricingTierRepository`   | `SetSetting`                                    | `PrismaPricingTierRepository`   |
+| Email template storage | `src/domain/entities/EmailTemplate.ts`      | `IEmailTemplateRepository` | `UpdateEmailTemplate`                           | `PrismaEmailTemplateRepository` |
+| Maintenance toggle     | —                                           | —                          | `AdminToggleMaintenance`                        | —                               |
+| Capstone review        | `src/domain/entities/CapstoneSubmission.ts` | —                          | `PassCapstoneReview`, `ReturnCapstoneForReview` | —                               |
 
 The admin panel is the place where the SOLID architecture pays the most: every admin action is a use case that tests with `buildTestContainer()`, no mocking the real Prisma, no mocking the real PayMongo. The cost of adding a new admin section is one server action + one page + one use case + (sometimes) one repository method. No edits to the layout, the auth gate, or the audit log infrastructure.
