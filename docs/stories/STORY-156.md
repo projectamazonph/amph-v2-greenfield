@@ -1,7 +1,7 @@
 # STORY-156 — Landing page conversion polish
 
 **Type:** UI/UX refinement (UI/UX-1 of 7 surfaces)
-**Status:** In progress
+**Status:** ✅ Done (PR #596, commit `765b9ff5` — `UI/UX refinement: Landing + Dashboard + Lesson reader (STORY-156/157/158)`)
 **Owner:** TBD
 **Branch:** `uiux/landing-conversion-polish`
 **Canvas:** https://superdesign.dev/teams/b799fd2d-4abb-489d-9f9a-33fc85e0d291/projects/d3cd32f1-bff7-4fb1-a0b4-f0ac84b0313c
