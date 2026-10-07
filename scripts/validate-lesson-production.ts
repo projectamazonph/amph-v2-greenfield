@@ -431,6 +431,48 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
     }
   }
 
+  // Pass 2.5: dual-ladder overlap guard. Lessons that teach a decision
+  // about *how much evidence is enough* must not stack a click-count
+  // comparison-table next to an evidence-kind evidence-ledger without
+  // explicitly ordering the two. Lesson 9.3 shipped this defect
+  // (STATE.md, "9.3 evidence ladder boundary overlap"): the comparison
+  // table bucketed by click count and the evidence-ledger bucketed by
+  // kind of evidence both recommended actions on the same term, and a
+  // learner could not tell which governed.
+  //
+  // The signature of the defect is specific, not "any two adjacent
+  // tables". We flag only when:
+  //   - the lesson has a `comparison-table` whose id matches /ladder/i, AND
+  //   - the lesson has an `evidence-ledger` whose id matches
+  //     /evidence|sufficiency|safety|kind/i, AND
+  //   - the body of either directive does not declare its position in
+  //     the ordered sequence.
+  // Other lessons (6.2, 10.1) carry both primitives but on different
+  // axes (placement tradeoffs, report shape), so their ids do not match
+  // the ladder/evidence pattern and they are out of scope here.
+  //
+  // We require the ordering to live in the directive's `title`
+  // attribute (e.g. `title="Step 1: ..."` and `title="Step 2: ..."`),
+  // not in free prose, because prose can say "first" and "then" in
+  // unrelated contexts and still leave the two ladders ambiguous.
+  const DUAL_LADDER_TABLE_RE = /:::comparison-table\{[^}]*\bid="[^"]*ladder[^"]*"[^}]*\}/i;
+  const DUAL_LADGER_LEDGER_RE =
+    /:::evidence-ledger\{[^}]*\bid="[^"]*(?:evidence|sufficiency|safety|kind)[^"]*"[^}]*\}/i;
+  if (DUAL_LADDER_TABLE_RE.test(source) && DUAL_LADGER_LEDGER_RE.test(source)) {
+    const tableTitle = DUAL_LADDER_TABLE_RE.exec(source)?.[0] ?? "";
+    const ledgerTitle = DUAL_LADGER_LEDGER_RE.exec(source)?.[0] ?? "";
+    const tableHasStep = /title="[^"]*Step\s*[12][^"]*"/i.test(tableTitle);
+    const ledgerHasStep = /title="[^"]*Step\s*[12][^"]*"/i.test(ledgerTitle);
+    if (!tableHasStep || !ledgerHasStep) {
+      issues.push({
+        file,
+        line: 1,
+        message:
+          'Lesson has a click-count comparison-table ladder and an evidence-kind evidence-ledger; mark them as ordered questions in the directive titles (e.g. `title="Step 1: ..."` on the evidence-ledger and `title="Step 2: ..."` on the comparison-table) so the learner knows which governs a recommendation.',
+      });
+    }
+  }
+
   // Pass 2: <SelfCheck ... /> JSX blocks. Parse via a simple regex — we don't
   // need a real JSX parser to validate shape.
   const SELF_CHECK_RE = /<SelfCheck\b([^>]*?)\/>/gs;
