@@ -4,6 +4,32 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-132: Close LEARN-014 first-decision story doc (shipped via PR #523)
+
+Pre-flight grep showed the work ships on main via PR #523 (commit
+`bc9307ad`, 2026-09-16):
+
+- `content/curriculum/first-decision.json` (the LEARN-014 brief:
+  scenario context, decision rule, result explanation).
+- `src/lib/firstDecision.ts` (pure parser and loader).
+- `src/app/dashboard/first-decision/page.tsx`, `loading.tsx`,
+  `page.module.css` (auth-gated server page that renders the brief
+  and links to the existing Bid Elevator tool).
+- `src/components/tools/FirstDecisionResultNotice.tsx` and matching
+  module CSS (client-island reminder that renders at the top of the
+  Bid Elevator form when the learner arrives from
+  `/dashboard/first-decision?from=first-decision`).
+- `src/lib/__tests__/firstDecision.test.ts` (four Vitest cases: load,
+  non-object rejection, missing schemaVersion rejection, missing
+  required field rejection).
+
+CHANGELOG.md, FEATURES.md, and `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`
+already record LEARN-014 as shipped; the story doc was the only stale
+surface. Marked Planned -> Shipped, ticked every acceptance-criteria
+checkbox with a code pointer, and confirmed the route is
+recommendation-only with no entitlement or grading change. No source
+change.
+
 ### STORY-130: Close LEARN-010 diagnostic story doc (shipped via PR #521)
 
 Pre-flight grep showed the work ships on main via PR #521 (commit
