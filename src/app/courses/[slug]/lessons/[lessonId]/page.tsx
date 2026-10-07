@@ -201,6 +201,16 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
     ? (lessonTargets.find((target) => target.id === lessonData.nextLessonId) ?? null)
     : null;
 
+  // Centered module-position label for the sticky nav footer band.
+  // Curriculum is 1-based in user copy; sectionIndex/lessonIndex are 0-based.
+  const currentSection = course.curriculum.sections[lessonData.sectionIndex];
+  const totalSections = course.curriculum.sections.length;
+  const totalLessonsInSection = currentSection?.lessons.length ?? 0;
+  const positionLabel =
+    totalSections > 0 && totalLessonsInSection > 0
+      ? `Module ${lessonData.sectionIndex + 1} of ${totalSections} · Lesson ${lessonData.lessonIndex + 1} of ${totalLessonsInSection}`
+      : null;
+
   // ── Access check (P0-5) ─────────────────────────────
   // Single source of truth: AuthorizeLessonAccess decides per-lesson
   // for every user state (anonymous, authed-preview, enrolled,
@@ -391,12 +401,13 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           ) : null}
 
           {/* Prev / Next navigation */}
-          <div className={styles.navFooter}>
+          <div className={styles.navFooter} data-lesson-nav-footer="true">
             <p className={styles.navFooterLabel}>Continue your pathway</p>
             <LessonNavButtons
               courseSlug={slug}
               prevLesson={previousLesson}
               nextLesson={nextLesson}
+              positionLabel={positionLabel}
             />
           </div>
         </div>
