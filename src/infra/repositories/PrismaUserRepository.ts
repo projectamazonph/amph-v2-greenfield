@@ -265,6 +265,69 @@ export class PrismaUserRepository implements UserRepository {
     }
   }
 
+  async recordDiagnostic(
+    userId: string,
+    result: import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult,
+  ): Promise<
+    Result<
+      import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult,
+      UserError
+    >
+  > {
+    try {
+      const payload = {
+        outcome: result.outcome,
+        completedAt: result.completedAt.toISOString(),
+      };
+      await this.db.user.update({
+        where: { id: userId },
+        data: { diagnostic: payload },
+      });
+      return Result.ok(result);
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "P2025"
+      ) {
+        return Result.err({ kind: "not_found" });
+      }
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
+  async getLatestDiagnostic(
+    userId: string,
+  ): Promise<
+    Result<
+      import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult | null,
+      UserError
+    >
+  > {
+    try {
+      const row = await this.db.user.findUnique({
+        where: { id: userId },
+        select: { diagnostic: true },
+      });
+      if (!row) return Result.err({ kind: "not_found" });
+      if (!row.diagnostic || typeof row.diagnostic !== "object") {
+        return Result.ok(null);
+      }
+      const raw = row.diagnostic as Record<string, unknown>;
+      const { createDiagnosticResult } =
+        await import("@/domain/learning/diagnostic/UserDiagnosticResult");
+      const outcome = raw.outcome;
+      const completedAt =
+        typeof raw.completedAt === "string" || typeof raw.completedAt === "number"
+          ? new Date(raw.completedAt)
+          : new Date();
+      return Result.ok(createDiagnosticResult(outcome, completedAt));
+    } catch (err) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   // ── Private helpers ────────────────────────────────────────
 
   async updateTotalXp(
