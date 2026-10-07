@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PrismaUserRepository.welcome.test.ts — STORY-146.
  *
  * Scoped to the welcome-completion surface added to PrismaUserRepository

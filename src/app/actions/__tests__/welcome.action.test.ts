@@ -1,4 +1,4 @@
-﻿/**
+/**
  * welcome.action.test.ts — STORY-146.
  *
  * Tests the thin server-action wrappers around `CompleteWelcome` and

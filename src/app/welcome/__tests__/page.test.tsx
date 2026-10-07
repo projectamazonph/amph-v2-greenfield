@@ -1,4 +1,4 @@
-﻿/**
+/**
  * page.test.tsx — /welcome server-component domain tests (STORY-146).
  *
  * Mirrors the Option B pattern from `src/app/dashboard/__tests__/page.test.tsx`:

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * User entity — the canonical representation of an AMPH student or instructor.
  *
  * This is a **domain object** — no framework annotations, no database mapping.

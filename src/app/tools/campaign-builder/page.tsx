@@ -16,22 +16,34 @@ import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
 import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { SimulatorUnavailableNotice } from "@/components/tools/SimulatorUnavailableNotice";
 import { campaignBuilderScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
+const brItems = [{ href: "/tools", label: "Tools" }, { label: "Campaign Builder" }];
+
 export default async function CampaignBuilderPage() {
   const container = buildContainer();
   const sim = container.simulatorRegistry.get("campaign-builder");
-  if (!sim) {
-    throw new Error("Campaign Builder simulator not registered");
+  const scenarioResult = await container.scenarioRepo.findPublished("campaign-builder");
+  if (!sim || !scenarioResult.ok || !scenarioResult.value) {
+    if (process.env.NODE_ENV !== "test") {
+      console.warn(
+        "[simulator:error] campaign-builder unavailable (not registered, or no published scenario)",
+      );
+    }
+    return (
+      <StudentShell>
+        <main id="main-content" tabIndex={-1} className={styles.page}>
+          <Breadcrumb items={brItems} />
+          <SimulatorUnavailableNotice simulatorName="Campaign Builder" />
+        </main>
+      </StudentShell>
+    );
   }
 
-  const scenarioResult = await container.scenarioRepo.findPublished("campaign-builder");
-  if (!scenarioResult.ok || !scenarioResult.value) {
-    throw new Error("No published campaign-builder scenario found");
-  }
   const scenario = scenarioResult.value;
   const content = campaignBuilderScenarioContentSchema.parse(scenario.inputSchema);
 

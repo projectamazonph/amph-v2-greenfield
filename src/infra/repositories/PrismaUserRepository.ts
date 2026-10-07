@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PrismaUserRepository — Story 002.
  *
  * The production adapter for the UserRepository port.

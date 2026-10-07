@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 /**
  * WelcomeStepper — client-side 5-step first-run walkthrough (STORY-146).
