@@ -22,6 +22,12 @@ CI, and `next start` leave `VERCEL_ENV` unset and keep the full write
 surface. The policy lives in `src/lib/preview-read-only.ts` (unit tested);
 the wiring is pinned by tripwires in `src/__tests__/proxy.test.ts`.
 
+### STORY-156: Landing page conversion polish (shipped)
+
+The public marketing landing page (`/`) is rebuilt with a conversion-focused hero: a conversion chip linking to pricing, a 3-up price ladder (₱2,999 / ₱5,999 / ₱9,999 with the middle tier marked "Most picked"), refreshed CTAs ("Get Instant Access \u2192" / "Try Demo Simulator"), and a LIVE PREVIEW badge replacing the single-metric ACoS chip. The price ladder re-uses the Pricing section's tier data so both surfaces stay in sync. All new components consume design tokens only; no hardcoded colors, spacing, or radii. Accessibility contracts preserved (aria-labelledby, focus-visible, 44px+ touch targets). The `PUBLIC_CURRICULUM_CLAIMS` contract test guards landing page counts. Follow-up: bumped preview-badge key contrast to WCAG AA via `--c-shell-dim` (commit `65cdbc13`).
+
+Story: `docs/stories/STORY-156.md`.
+
 ### STORY-165: Catalog survives a corrupt course row (shipped)
 
 Production `/courses` rendered the "Courses unavailable" fallback on every

@@ -31,6 +31,12 @@ The session guard validates the JWT, then checks the `sessions` table server-sid
 
 Password-reset and transactional links use the configured application origin. The exact retired origin `amph-v2-greenfield.vercel.app`, with or without a scheme, is normalized to `https://projectamazonph.vercel.app`; custom and local origins remain unchanged. Admin login plants the session cookie on its redirect response before navigating to `/admin`.
 
+### Marketing / Landing
+
+- `/` (root) renders the public marketing landing page with TopBar, Hero (conversion chip, 3-up price ladder, refreshed CTAs, LIVE PREVIEW badge), StatsStrip, Method, SimulatorSection, Curriculum, WhoFor, Pricing, Mentor, Proof, FAQSection, DarkCTA, and Footer — all built on Astryx primitives and `globals.css` design tokens (PR #596, STORY-156).
+- The Hero price ladder surfaces the three pricing tiers (₱2,999 / ₱5,999 / ₱9,999) above the fold with the middle tier marked "Most picked". The ladder re-uses the Pricing section's tier data so the two surfaces stay in sync.
+- Landing page counts (modules, lessons, simulators) are guarded by the `PUBLIC_CURRICULUM_CLAIMS` contract test.
+
 ### Courses and curriculum
 
 - `/courses` lists published catalog rows from Postgres. A course whose module or lesson rows cannot be read is dropped from the list and named under `[catalog:error]` instead of blanking the page; `db_error` is reported only when nothing loads at all (STORY-165).
