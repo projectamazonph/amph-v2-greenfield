@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import { getVoiceGuideData } from "@/lib/voice-guide";
 
 /**
  * `docs/voice-guide.md` says its banned phrases "never ship. Anywhere. UI copy,
@@ -16,32 +17,15 @@ import { join, relative } from "node:path";
  * because the build spec forbids new dependencies, so the only thing that can
  * cover the largest copy surface in the course is a test that reads the files.
  *
- * The list is parsed from the guide rather than copied into this file, so the
- * doc is the single source of truth and cannot drift from what CI enforces. Two
- * consequences, both intended: adding a bullet to the guide starts enforcing it
- * on content immediately, and reformatting the guide so the bullets stop
- * parsing fails the coverage assertion below instead of quietly enforcing
- * nothing.
+ * The list is parsed from `src/lib/voice-guide.ts` which reads the guide, so
+ * the doc is the single source of truth and cannot drift from what CI enforces.
  *
  * Scope is the two surfaces `scripts/seed-all-content.mjs` publishes: lesson
  * bodies and the quiz bank.
  */
 
-const ARROW = "\u2192";
-
 function bannedPhrases(): string[] {
-  const guide = readFileSync(join(process.cwd(), "docs", "voice-guide.md"), "utf8");
-  const start = guide.indexOf("## Banned Phrases");
-  if (start === -1) throw new Error("docs/voice-guide.md lost its 'Banned Phrases' heading");
-  const next = guide.indexOf("\n## ", start + 5);
-  const section = guide.slice(start, next === -1 ? guide.length : next);
-  const phrases: string[] = [];
-  for (const line of section.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    const m = /^-\s+"([^"]+)"\s*/.exec(trimmed);
-    if (m && trimmed.includes(ARROW) && m[1]) phrases.push(m[1].trim());
-  }
-  return phrases;
+  return getVoiceGuideData().bannedPhrases.map((b) => b.phrase);
 }
 
 function phraseRegex(phrase: string): RegExp {
