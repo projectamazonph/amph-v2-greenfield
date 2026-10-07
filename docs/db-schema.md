@@ -72,7 +72,7 @@ The schema defines four enums: `Role`, `SubscriptionTier`, `VerificationStatus`,
 
 ### Payments and access
 
-The current schema uses `Order` for checkout and payment state. It does not contain the separate `Checkout`, `Payment`, `Refund`, or `Receipt` models described in the original target design. Confirm the `Order` fields and related course/user relations before writing a payment integration.
+The current schema uses `Order` for checkout and payment state. It does not contain the separate Checkout, Payment, Refund, or Receipt models described in the original target design. Confirm the `Order` fields and related course/user relations before writing a payment integration.
 
 `PricingTier` stores base price, lifecycle status, display order, and optional early-bird values. Pricing-tier rows must be seeded before `/pricing` can show cards. Course rows must be published and linked before `/courses` can show catalog cards.
 

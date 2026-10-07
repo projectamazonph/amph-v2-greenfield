@@ -4,6 +4,50 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Symbol-existence half of the docPathReferences guard (shipped)
+
+`src/__tests__/docPathReferences.test.ts` is a path-only guard, and the
+sibling route guard (`src/__tests__/docSymbolAndRouteReferences.test.ts`,
+PR #618) only catches URL-shaped references. Neither guard could see a
+backticked identifier like `AdminSetLiveClassRecording`: a name that
+points at a use case that does not exist anywhere in `src/`. The
+sibling guard now has a symbol half that:
+
+- Builds a use case class index by reading every `export class X` in
+  `src/usecases/**/*.ts` (test fixtures excluded).
+- Builds a layer-aware symbol index by reading every exported
+  class/interface/type/function/const from `src/domain/`, `src/ports/`,
+  `src/infra/`, `src/components/`, and `src/app/`. A name that exists
+  in any layer is treated as a real symbol reference, not a use case
+  claim, and passes the guard. This is what lets `ResendEmailSender`
+  (infra), `ProcessDiagram` (components), and `DisableTwoFactorForm`
+  (app) coexist with use case class names without false positives.
+- Scans the eight guidance docs plus the fourteen reference docs for
+  backticked CamelCase identifiers whose first PascalCase segment
+  matches a use case verb prefix. Anything not in either index fails.
+- Accepts an inline opt-out marker for historical references:
+  `<!-- doc-symbol-opt-out: Name1, Name2 -->` on the same line as the
+  backticked name. If a marked name later lands in `src/usecases/`,
+  the marker is flagged as stale and the doc should drop it. If a
+  marker exempts no backticked identifier on its line, the marker is
+  flagged as dead syntax.
+
+The same pass fixed 15 stale claims the new guard caught across
+`STATE.md`, `docs/api-reference.md`, `docs/admin-backend.md`,
+`docs/business-layer.md`, `docs/db-schema.md`, and `docs/build-spec.md`:
+use case names that had been renamed (`AdminImpersonate` to
+`ImpersonateUser`, `AdminExportAuditLog` to `ExportAuditLogs`,
+`AdminUpdateSettings` to `SetSetting`, `PassCapstone` to
+`PassCapstoneReview`, `ReturnCapstone` to `ReturnCapstoneForReview`,
+`StartCheckout` to `CreatePaymentIntent`), the wrong component name
+(`SetSettingForm` to `SiteSettingsForm`), and the
+`There is no Refund table` prose in six places where the backticks
+made the absent concept look like a symbol claim. Two genuinely
+historical references (the `AdminSetLiveClassRecording` example in
+`STATE.md`'s Remaining-known-limitations, and the `RecordStreakVisit`
+redirect note in `docs/api-reference.md`) carry the new opt-out marker
+so the doc is honest about being historical rather than current.
+
 ### STORY-159: Status-first cards on the /tools index (shipped)
 
 The `/tools` index listed five graded simulators plus one live ad console but

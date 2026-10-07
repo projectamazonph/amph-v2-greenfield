@@ -11,7 +11,7 @@
 
 The business layer is what turns Project Amazon PH Academy from "free course site" into "paid product business." It covers pricing tiers, the enrollment flow, payment processing via PayMongo, refunds, and tier-based content gating.
 
-**Note on entities:** There is no `Refund` table, but there **is** a `Payment` model (`prisma/schema.prisma:1035`, keyed by `orderId`, with a unique `providerPaymentId` and its own `status` string), so `Order` is not the only place payment state can sit. `Order.status` tracks the lifecycle documented at `prisma/schema.prisma:382` as `DRAFT | PENDING | PAID | FAILED | EXPIRED | REFUNDED`, defaulting to `DRAFT`; `Order.paymongoStatus` mirrors PayMongo's raw status. Receipt PDF generation is implemented (see Receipts). The `BusinessProfile` table for BIR compliance is not implemented.
+**Note on entities:** There is no Refund table, but there **is** a `Payment` model (`prisma/schema.prisma:1035`, keyed by `orderId`, with a unique `providerPaymentId` and its own `status` string), so `Order` is not the only place payment state can sit. `Order.status` tracks the lifecycle documented at `prisma/schema.prisma:382` as `DRAFT | PENDING | PAID | FAILED | EXPIRED | REFUNDED`, defaulting to `DRAFT`; `Order.paymongoStatus` mirrors PayMongo's raw status. Receipt PDF generation is implemented (see Receipts). The `BusinessProfile` table for BIR compliance is not implemented.
 
 This spec assumes PayMongo as the payment provider, behind the `IPaymentGateway` port. PayMongo is the right choice because:
 
@@ -352,7 +352,7 @@ after about 24 hours. `Order.status` is a plain String and would accept either w
 
 Refund state lives on `Order.status` plus `refundReason`, `refundRequestedAt`,
 `refundProcessedAt` and `refundAmountMinor` (`prisma/schema.prisma:410-413`). There is no
-`Refund` table. `Payment` is a separate model, but nothing in the refund path writes it.
+Refund table. `Payment` is a separate model, but nothing in the refund path writes it.
 
 ### Enrollment
 
