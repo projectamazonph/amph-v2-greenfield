@@ -25,6 +25,61 @@ live caption (refunds waiting count, audit-log recent count) rather than a
 hardcoded string. Tokens only; no hex, raw spacing, or raw radius. Story:
 `docs/stories/STORY-160.md`.
 
+### STORY-132: Close LEARN-014 first-decision story doc (shipped via PR #523)
+
+Pre-flight grep showed the work ships on main via PR #523 (commit
+`bc9307ad`, 2026-09-16):
+
+- `content/curriculum/first-decision.json` (the LEARN-014 brief:
+  scenario context, decision rule, result explanation).
+- `src/lib/firstDecision.ts` (pure parser and loader).
+- `src/app/dashboard/first-decision/page.tsx`, `loading.tsx`,
+  `page.module.css` (auth-gated server page that renders the brief
+  and links to the existing Bid Elevator tool).
+- `src/components/tools/FirstDecisionResultNotice.tsx` and matching
+  module CSS (client-island reminder that renders at the top of the
+  Bid Elevator form when the learner arrives from
+  `/dashboard/first-decision?from=first-decision`).
+- `src/lib/__tests__/firstDecision.test.ts` (four Vitest cases: load,
+  non-object rejection, missing schemaVersion rejection, missing
+  required field rejection).
+
+CHANGELOG.md, FEATURES.md, and `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`
+already record LEARN-014 as shipped; the story doc was the only stale
+surface. Marked Planned -> Shipped, ticked every acceptance-criteria
+checkbox with a code pointer, and confirmed the route is
+recommendation-only with no entitlement or grading change. No source
+change.
+
+### STORY-130: Close LEARN-010 diagnostic story doc (shipped via PR #521)
+
+Pre-flight grep showed the work ships on main via PR #521 (commit
+`7d419a1a`, 2026-09-16):
+
+- `content/curriculum/diagnostic.json` (81 lines: three questions, three
+  outcomes, fallback rubric).
+- `src/lib/diagnostic.ts` (pure scoring function and manifest loader,
+  no framework dependency on the test surface).
+- `src/app/dashboard/diagnostic/page.tsx`, `DiagnosticForm.tsx`,
+  `loading.tsx`, `page.module.css` (auth-gated form + outcome card).
+- `src/app/actions/diagnostic.action.ts` (server action shim).
+- `src/app/actions/__tests__/diagnostic.action.test.ts` (six Vitest
+  cases: manifest load, three outcomes, partial-answer fallback,
+  no-match fallback).
+
+CHANGELOG.md, FEATURES.md, and `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`
+already record STORY-130 as shipped via PR #526 (commit `63cd8ea8a`,
+2026-09-16). The story doc was the only stale surface. Marked Planned
+-> Shipped, ticked the acceptance-criteria checkboxes with case
+pointers, split Scope into shipped and deferred-to-LEARN-052 lists,
+and pointed Dependencies at the LEARN-052 follow-up. No source change.
+
+Persistence to a Prisma `UserDiagnosticResult` row, the
+`20260915000000_add_user_diagnostic` migration, the dashboard
+recommendation card above the continue-learning surface, and the
+structured-logger wiring of `learning_event:diagnostic_completed` all
+remain on the LEARN-052 backlog.
+
 ### STORY-159: Status-first cards on the /tools index (shipped)
 
 The `/tools` index listed five graded simulators plus one live ad console but
@@ -55,6 +110,20 @@ runs before the maintenance query and the route-protection block. Local dev,
 CI, and `next start` leave `VERCEL_ENV` unset and keep the full write
 surface. The policy lives in `src/lib/preview-read-only.ts` (unit tested);
 the wiring is pinned by tripwires in `src/__tests__/proxy.test.ts`.
+
+### STORY-157: Dashboard focus-mode polish (shipped)
+
+The student dashboard (`/dashboard`) gains a focus-mode hero header: a 5-day activity strip (filled / unfilled dots sourced from `XPEvent.createdAt` over the most-recent 5 UTC days) and a total XP chip (sum of `XPEvent.amount` for the user). Both ride alongside the existing welcome copy, fail soft to 0 when the `xpEventRepo.findByUserId` query returns no rows or an error, and surface only the data the existing `IXPEventRepository` already returns. No new domain entities or use cases.
+
+The "Continue learning" card is reframed as the day's primary action: a 380px+ navy panel (`--c-navy-2`) with a faded `CourseCover` background, an orange "Start here" or "In progress" pill, a clamped 32px Archivo course title, a "Next up: <lesson>" line, a primary orange "Continue learning" CTA, a ghost "View portfolio" link, and a 1.5px orange progress track pinned to the very bottom of the card. ARIA contracts preserved: progressbar with `aria-valuenow`, aria-labelledby on the section, focus-visible on the CTA. All new CSS consumes design tokens only. The new `DashboardHeroStats` component ships with a dedicated regression test (5 cases, 76 lines). The two pre-existing dashboard tests gained `xpEventRepo` mocks with a default empty XP feed so unaffected tests do not need to stub XP data.
+
+Story: `docs/stories/STORY-157.md`.
+
+### STORY-158: Lesson reader SelfCheck restyle (shipped)
+
+The in-lesson `<SelfCheck>` block ships with the focus-mode variant: a 3px orange-tinted left border, a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt, and the question / options / feedback area visually grouped inside the same card panel. The existing component logic (`useState` for selected answer + feedback) is unchanged. The sticky Previous / Next footer band originally scoped to this PR was not implemented; it is tracked as a follow-up under the same story.
+
+Story: `docs/stories/STORY-158.md`.
 
 ### STORY-165: Catalog survives a corrupt course row (shipped)
 

@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-20 for the status rows below, against the branch that became the lesson primitives (since merged). Header pointers refreshed 2026-09-23 against `main` at `b2e7fe3` without re-verifying individual rows.
+**Last reviewed:** 2026-08-20 for the status rows below, against the branch that became the lesson primitives (since merged). Header pointers refreshed 2026-09-23 against `main` at `b2e7fe3` without re-verifying individual rows. STORY-132 doc-closure sweep 2026-10-08 confirmed the LEARN-014 guided first-decision route is live on main via PR #523 (commit `bc9307ad`) and the "Learning-experience uplift" row's Wave 1 enumeration matches the shipped code.
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md`, removed on 2026-09-14 by `e1f7352`; `CLAUDE.md`'s "Known gaps" section and `STATE.md`'s limitations carry what survived of it. The 2026-08-20 follow-up umbrella lives at `.audit-2026-08-20/UMBRELLA.md` and its findings shipped through PR #415 (merged 2026-08-21).
 
@@ -84,13 +84,14 @@ The five registered simulators share the attempt, scoring, and feedback infrastr
 
 ### Learning progress and credentials
 
-- Dashboard route: `/dashboard`.
+- Dashboard route: `/dashboard` — focus-mode variant (PR #596, STORY-157) renders a hero header with a 5-day activity strip and total XP (sourced from `IXPEventRepository.findByUserId`), followed by a dominant navy-gradient Continue learning card (380px+ min-height) with a faded course-cover background, an orange "In progress" or "Start here" pill, a 32px Archivo course title, a "Next up: <lesson>" line, a primary "Continue learning" CTA, a ghost "View portfolio" link, and a 1.5px orange progress track pinned to the bottom. The card below the hero (in-progress grid, My courses list, Quick Actions, Practice progress) keeps the existing layout.
 - Profile and badge display: `/profile`.
 - XP, progress events, streaks, quiz attempts, and badge awards have domain entities, repositories, use cases, and tests.
 - Student certificate list: `/certificates`.
 - Certificate verification: `/certificates/[hash]`.
 - Certificate PDF route: `/certificates/[hash]/pdf`.
 - Admin certificate revocation action is available and records the revocation state.
+- Lesson reader `SelfCheck` block (PR #596, STORY-158) renders with a 3px orange-tinted left border and a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt. The sticky Previous / Next footer band was not implemented in this PR; tracked as a follow-up.
 
 Lesson completion is persisted idempotently and updates course progress. Quiz and simulator attempts are access-controlled and exported with the student's other account data. Credential claims still require seeded production data and operational review.
 

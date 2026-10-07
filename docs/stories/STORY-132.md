@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** Planned.
+**Status:** Shipped via PR #523 (commit `bc9307ad`, 2026-09-16).
 
 ## Context
 
@@ -48,18 +48,31 @@ to the onboarding route so the result view stays in the same flow.
 
 ## Acceptance criteria
 
-- [ ] An unauthenticated visitor to `/dashboard/first-decision` is
-      redirected to `/login`.
-- [ ] The page renders the brief content from
-      `content/curriculum/first-decision.json`.
-- [ ] The "Start the practice decision" button links to
-      `/tools/bid-elevator`.
-- [ ] Arriving at `/tools/bid-elevator?from=first-decision` shows
-      the `FirstDecisionResultNotice` reminder.
-- [ ] The brief is plain language; no job-readiness or
-      certification wording is introduced.
-- [ ] Typecheck, lint, unit, architecture, build, E2E, and
-      Lighthouse checks are required in CI.
+- [x] An unauthenticated visitor to `/dashboard/first-decision` is
+      redirected to `/login`. (Verified by `requireAuth()` call in
+      `src/app/dashboard/first-decision/page.tsx:20`.)
+- [x] The page renders the brief content from
+      `content/curriculum/first-decision.json`. (Verified by
+      `loadFirstDecisionBrief()` in `src/lib/firstDecision.ts` and the
+      `Card` rendering in `src/app/dashboard/first-decision/page.tsx`.)
+- [x] The "Start the practice decision" button links to
+      `/tools/bid-elevator`. (Verified by the `Link` to
+      `/tools/bid-elevator?from=first-decision` in
+      `src/app/dashboard/first-decision/page.tsx:46`.)
+- [x] Arriving at `/tools/bid-elevator?from=first-decision` shows
+      the `FirstDecisionResultNotice` reminder. (Verified by the
+      `fromFirstDecision` derivation and `<FirstDecisionResultNotice
+      visible={fromFirstDecision} />` render in
+      `src/app/tools/bid-elevator/page.tsx:68-84`.)
+- [x] The brief is plain language; no job-readiness or
+      certification wording is introduced. (Verified by the
+      `first-decision.json` content: "make a defensible decision",
+      "Strong/Mixed/Keep practising" framing, no certified or
+      hiring-ready language.)
+- [x] Typecheck, lint, unit, architecture, build, E2E, and
+      Lighthouse checks are required in CI. (Verified by CI status
+      on PR #523; `src/lib/__tests__/firstDecision.test.ts` covers
+      the loader and parser.)
 
 ## Non-goals
 
