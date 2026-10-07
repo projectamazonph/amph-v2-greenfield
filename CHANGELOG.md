@@ -33,6 +33,42 @@ recommendation card above the continue-learning surface, and the
 structured-logger wiring of `learning_event:diagnostic_completed` all
 remain on the LEARN-052 backlog.
 
+### STORY-133: Close LEARN-015 onboarding completion view story doc (shipped via PR #524)
+
+Pre-flight grep showed the work ships on main via PR #524 (commit
+`0d46987d`, 2026-09-16):
+
+- `src/app/dashboard/onboarding-complete/page.tsx` (129 lines):
+  auth-gated server component that reads the PPC Foundations
+  enrollment, runs the pure helper, and either renders the four
+  `Card` sections (pathway summary, next action, expected time, help
+  link) or `redirect()`s back to `/dashboard` with a plain-language
+  query string.
+- `src/app/dashboard/onboarding-complete/loading.tsx`: five
+  `SkeletonCard` lines (heading, intro, three body cards, two footer
+  lines) per the 64/64 loading-skeleton coverage target.
+- `src/app/dashboard/onboarding-complete/page.module.css`: AMPH
+  navy-shell styles (header, intro, sectionHeading, primary action,
+  secondary action, footer).
+- `src/lib/onboardingComplete.ts`: pure `resolveOnboardingStatus`
+  helper. Discriminated `OnboardingStatus` union with `complete |
+  missing_module_zero | module_zero_incomplete | no_next_module`.
+  Module 0 is the smallest-`moduleNumber` module; the next module's
+  first lesson is the smallest-`displayOrder` lesson.
+- `src/lib/__tests__/onboardingComplete.test.ts`: five Vitest cases
+  (empty modules, partial completion, full completion, no Module 1,
+  out-of-order module numbers).
+
+CHANGELOG.md (line 146), FEATURES.md (line 143), and
+`docs/STUDENT-FEATURE-GAP-ANALYSIS.md` line 3 already record
+STORY-133 as shipped via the 2026-09-16 Wave 1 closure
+(PRs #519-#526). The story doc was the only stale surface. Marked
+Planned -> Shipped, ticked the acceptance-criteria checkboxes with
+file:line pointers, split Scope into shipped and
+deferred-to-LEARN-060 lists, and pointed Dependencies at the
+already-shipped STORY-132 (PR #523, commit `bc9307ad`). No source
+change.
+
 ### STORY-159: Status-first cards on the /tools index (shipped)
 
 The `/tools` index listed five graded simulators plus one live ad console but
