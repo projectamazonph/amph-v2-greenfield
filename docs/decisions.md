@@ -274,3 +274,30 @@ app/         → usecases/ → ports/ ← infra/
 - **Revisit when:** The vendored SimGrid diverges from AMPH UX enough that the iframe framing becomes user-confusing (then consider a native engine port, scoped per simulator).
 
 **Surfaced trade-off (coach decision recorded 2026-09-30):** SimGrid is unauthenticated today. Inside AMPH, /practice/simgrid/* requires login but no course enrollment. The coach confirmed this matches SimGrid's 'free, no account' philosophy while keeping AMPH's existing tier-gated graded paths intact. Plan: docs/superpowers/plans/2026-09-30-simgrid-integration.md.
+
+---
+
+## ADR-027: SimGrid Lessons Distributed Across Modules, Not Module 12
+
+**Status:** Accepted (2026-10-07)
+**Context:** Two competing branches from the same base commit (`dc11435d0`) implemented the same 12 SimGrid practice drills:
+
+| Branch                             | Shape                                                                                                                                          | Tip Commit |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `feat/module-12-simgrid-workflows` | New `12-simgrid-workflows/` module directory (12.1–12.12)                                                                                      | `2f72f28e` |
+| `feat/simgrid-lessons-distributed` | 12 lessons distributed into existing modules at workflow-appropriate positions (0.4, 0.5, 2.5, 3.4, 4.5, 6.4, 7.4, 9.4, 9.5, 10.5, 11.5, 11.6) | `24ff8ca3` |
+
+Both branches shared 596 files including `public/simgrid-v1/` (518 vendored simulator assets), Prisma schema/migration for `simgrid_attempts`, and 50+ app code files. They conflicted directly on `content/curriculum/public-claims.json`.
+
+The curriculum syllabus (`CURRICULUM-SYLLABUS.md`) already documented the distributed model as the learner journey: each SimGrid drill sits inside the module whose topic it practices (e.g., AdConsole Pro in Onboarding, BuyBox Dojo in Listing Optimization, Bulk File + Capstone in VA Workflow). A dedicated "Module 12" would duplicate content, break the "practice where you learn" principle, and add a 13th module with no new conceptual material — only repackaged practice drills.
+
+**Decision:** Accept the distributed variant (PR #648, merged 2026-10-05). Close the module-12 branch (PR #647, closed 2026-10-05). The `public/simgrid-v1/` assets remain checked-in (518 files) and are served at `/practice/[...slug]/` via the Simulator Registry (ADR-019). The `public-claims.json` module array stops at module 11 (6 lessons); no module 12 entry exists. The `simulators` object in `public-claims.json` enumerates the 5 graded AMPH engines plus the 7 free SimGrid drills as a flat catalog; tier mapping is unchanged.
+
+**Consequences:**
+
+- No new module directory created. Learner journey stays "read → decide → change → explain" within each module.
+- `public/simgrid-v1/` (518 HTML/JS/CSS assets) stays in repo — it is a vendored runtime dependency, not build output. Moving it to a separate package would add operational overhead with no immediate benefit.
+- The SimGrid term was dropped in PR #649 ("fold 12 sims into /tools"); user-facing paths are `/tools` (hub) and `/practice/[simulator]` (individual drills). Internal type names (`SimgridSimulatorId`, `simgrid_attempts`) preserved to avoid churn.
+- Contract test `validate-lesson-production.ts --strict` validates lesson count matches `public-claims.json` (57 lessons on main, matching distributed shape).
+
+**Revisit when:** If SimGrid assets diverge enough that iframe framing becomes user-confusing (then consider a native engine port, scoped per simulator) — same revisit as ADR-026.
