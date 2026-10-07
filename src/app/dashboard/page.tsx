@@ -12,6 +12,8 @@
 
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
+import { Card } from "@/components/ui/Card";
+import { loadDiagnosticManifest } from "@/lib/diagnostic";
 import { buildContainer } from "@/composition/container";
 import { displayName } from "@/lib/displayName";
 import { requireAuth } from "@/lib/auth";
@@ -94,11 +96,26 @@ async function loadDashboardHeroStats(userId: string): Promise<HeroStats> {
   };
 }
 
+async function loadUserDiagnostic(userId: string) {
+  const container = buildContainer();
+  const res = await container.userRepo.getLatestDiagnostic(userId);
+  if (!res.ok || !res.value) return null;
+
+  try {
+    const manifest = loadDiagnosticManifest();
+    const outcomeView = manifest.rubric.outcomes.find((o) => o.id === res.value?.outcome);
+    return outcomeView ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function DashboardPage() {
   const user = await requireAuth();
 
   const pairs = await loadEnrollmentsWithCourses(user.id);
   const heroStats = await loadDashboardHeroStats(user.id);
+  const diagnosticView = await loadUserDiagnostic(user.id);
 
   // "Continue learning" = in-progress (0 < progress < 100)
   const inProgress = pairs.filter(
@@ -162,6 +179,28 @@ export default async function DashboardPage() {
             activeDaysOutOfFive={heroStats.activeDaysOutOfFive}
           />
         </header>
+
+        {diagnosticView && (
+          <section className={styles.section} aria-labelledby="diagnostic-recommendation-title">
+            <Card padding="comfortable" className={styles.diagnosticCard}>
+              <div className={styles.diagnosticCardHeader}>
+                <span className={styles.diagnosticBadge}>Diagnostic Recommendation</span>
+                <h2 id="diagnostic-recommendation-title" className={styles.diagnosticTitle}>
+                  {diagnosticView.label}
+                </h2>
+              </div>
+              <p className={styles.diagnosticSummary}>{diagnosticView.summary}</p>
+              <p className={styles.diagnosticEmphasis}>
+                <strong>Starting emphasis:</strong> {diagnosticView.startingEmphasis}
+              </p>
+              <div className={styles.diagnosticActions}>
+                <Link href="/dashboard/diagnostic" className={styles.retakeLink}>
+                  Retake diagnostic
+                </Link>
+              </div>
+            </Card>
+          </section>
+        )}
 
         {resumePair && resumeLesson && (
           <section className={styles.continueCard} aria-labelledby="continue-learning-title">

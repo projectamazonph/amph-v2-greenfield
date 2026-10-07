@@ -1,5 +1,26 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { loadDiagnosticManifest, scoreDiagnostic } from "@/lib/diagnostic";
+
+const mockRequireAuth = vi.fn();
+vi.mock("@/lib/auth", () => ({
+  requireAuth: () => mockRequireAuth(),
+}));
+
+const mockRecordDiagnosticResult = vi.fn();
+vi.mock("@/composition/container", () => ({
+  buildContainer: () => ({
+    recordDiagnosticResult: { execute: mockRecordDiagnosticResult },
+  }),
+}));
+
+const mockRedirect = vi.fn((url: string) => {
+  throw Object.assign(new Error(`NEXT_REDIRECT: ${url}`), { digest: `NEXT_REDIRECT: ${url}` });
+});
+vi.mock("next/navigation", () => ({
+  redirect: (url: string) => mockRedirect(url),
+}));
+
+import { submitDiagnosticAction } from "../diagnostic.action";
 
 describe("loadDiagnosticManifest", () => {
   it("loads the published diagnostic question set", () => {
@@ -57,5 +78,63 @@ describe("scoreDiagnostic", () => {
       "explain-bid": "lower-bid",
     });
     expect(outcome.id).toBe(manifest.rubric.fallbackOutcome);
+  });
+});
+
+describe("submitDiagnosticAction", () => {
+  beforeEach(() => {
+    mockRequireAuth.mockReset();
+    mockRecordDiagnosticResult.mockReset();
+    mockRedirect.mockClear();
+
+    mockRequireAuth.mockResolvedValue({ id: "user_action_01", email: "action@example.com" });
+    mockRecordDiagnosticResult.mockResolvedValue({
+      ok: true,
+      value: { outcome: "experienced", completedAt: new Date() },
+    });
+  });
+
+  it("persists the result via RecordDiagnosticResult and redirects to /dashboard/diagnostic?outcome=...", async () => {
+    const formData = new FormData();
+    formData.set("have-managed-ads", "ran-many");
+    formData.set("read-reports", "train-others");
+    formData.set("explain-bid", "compare-benchmarks");
+
+    await expect(submitDiagnosticAction(null, formData)).rejects.toThrow(
+      "NEXT_REDIRECT: /dashboard/diagnostic?outcome=experienced",
+    );
+
+    expect(mockRecordDiagnosticResult).toHaveBeenCalledWith({
+      userId: "user_action_01",
+      outcome: "experienced",
+    });
+  });
+
+  it("returns an error if any question is missing", async () => {
+    const formData = new FormData();
+    formData.set("have-managed-ads", "ran-many");
+
+    const result = await submitDiagnosticAction(null, formData);
+    expect(result).toEqual({
+      kind: "error",
+      error:
+        "Please answer: How comfortable are you reading ACoS, CPC, CTR, and conversion-rate reports?",
+    });
+    expect(mockRecordDiagnosticResult).not.toHaveBeenCalled();
+  });
+
+  it("returns an error if an invalid option value is submitted", async () => {
+    const formData = new FormData();
+    formData.set("have-managed-ads", "invalid_value");
+    formData.set("read-reports", "train-others");
+    formData.set("explain-bid", "compare-benchmarks");
+
+    const result = await submitDiagnosticAction(null, formData);
+    expect(result).toEqual({
+      kind: "error",
+      error:
+        "Please pick one of the options for: Have you ever managed a Sponsored Products, Sponsored Brands, or Sponsored Display campaign?",
+    });
+    expect(mockRecordDiagnosticResult).not.toHaveBeenCalled();
   });
 });
