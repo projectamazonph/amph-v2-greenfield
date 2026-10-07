@@ -1,9 +1,16 @@
 # STORY-160 — Admin dashboard workbench polish
 
 **Type:** UI/UX refinement (UI/UX-5 of 7 surfaces)
-**Status:** In progress
+**Status:** Shipped. The `/admin` dashboard renders a hero workbench band (operator name,
+highest-stakes pending counter as a primary CTA, and a quiet audit-log escape hatch),
+6 stat tiles each with a mono caption sourced from `PUBLIC_CURRICULUM_CLAIMS` (so module
+and simulator counts cannot drift from the public surface), and a 4-card routine
+write-path grid (Create course, Add user, Review refunds, Audit log) replacing the
+old 2-button Quick Actions row. The pending-refunds hero CTA renders only when
+`pendingRefunds > 0`; the "Pending Refunds" caption flips between "Awaiting
+decision" and "All clear" so the tile never contradicts the refunds table. PR #599.
 **Owner:** TBD
-**Branch:** `uiux/admin`
+**Branch:** `uiux/admin` (superseded by main; closed in doc-hygiene PR)
 **Canvas:** https://superdesign.dev/teams/b799fd2d-4abb-489d-9f9a-33fc85e0d291/projects/d3cd32f1-bff7-4fb1-a0b4-f0ac84b0313c
 **Selected variant:** Workbench Focus (`2936fd8b-bd7b-475d-ac0d-d2a0aaaed285`)
 
