@@ -7,10 +7,20 @@
 
 ## Status
 
-**Status:** Planned — deferred from the 2026-08-20 audit follow-up umbrella
-(`.audit-2026-08-20/UMBRELLA.md`, "Product & architecture gaps" item 4).
-Mentioned in the original feature brief but no story doc, no registry
-entry, and no code on `main` as of 2026-08-20.
+**Status:** Deferred (no code, awaiting external decision). Re-verified
+2026-10-08 against `main` at `6c45b96e`. No `ConnectedAccountSimulator`
+domain module exists under `src/domain/simulators/`. No entry in
+`src/infra/simulator/buildSimulatorRegistry.ts` (the registry still
+holds exactly five simulators: Bid Elevator, Search Term Triage,
+Campaign Builder, Listing Audit, Keyword Research). The tools page
+renders the same five AMPH cards plus the live `/tools/ad-console`
+iframe that points at the student's real Amazon Advertising account.
+No `/admin/simulators/connected-account` route. No published
+`SimulatorScenario` row keyed off a `connected-account` `SimulatorId`.
+
+The 2026-08-20 audit follow-up umbrella
+(`.audit-2026-08-20/UMBRELLA.md`, "Product & architecture gaps" item 4)
+continues to list STORY-089 as the largest still-open product gap.
 
 ## Why this is open
 
@@ -25,8 +35,39 @@ domain module, and at least one published `SimulatorScenario` row.
 
 This is the largest of the still-open audit items. Triage decision:
 defer to a dedicated sprint once the simulator accuracy remediation
-plan (`docs/simulator-remediation-decisions.md`) is closed. Until then,
-no `feat(simulators):` work should introduce a sixth `SimulatorId`.
+plan (`docs/simulator-remediation-decisions.md`, referenced from
+STORY-079 / STORY-083 / the Listing Audit domain module; confirm the
+file exists on disk before quoting it) is closed. Until then, no
+`feat(simulators):` work should introduce a sixth `SimulatorId`.
+
+## What blocks un-deferral
+
+A real product decision is required before this can be picked up by an
+agent:
+
+- **Demo credential ownership.** Does AMPH partner with Amazon
+  Advertising for a sandbox app registration, or does the simulator
+  stand entirely behind a fabricated endpoint? The former requires
+  credentials that no agent can provision; the latter needs explicit
+  product sign-off so the academy is not promising a student experience
+  that diverges from the real API.
+- **Auth shape.** PR #494 hand-rolled Google OAuth2 + PKCE for
+  student sign-in. Reusing that infra for an Amazon Advertising
+  connection is plausible but unconfirmed; a third-party OAuth flow
+  against the Amazon Advertising API has different scope semantics
+  (`ads:read`, `ads:write`) that the existing `ConnectedAccount` profile
+  surface does not model.
+- **Scope envelope.** The acceptance criteria below already rule out
+  "real API calls" and "multi-account switching", which means the
+  artifact is a fifth-and-a-half-tier experience (a mock endpoint
+  that exists only to teach the *shape* of a connected account). The
+  cost-benefit case against the five existing simulators has not been
+  made.
+
+Until those three questions get a written answer from the owner,
+this story remains Deferred. The kanban task will block on
+`kind='capability'` rather than build a mock and present it as done,
+per the kanban rule in the parent card.
 
 ## Acceptance criteria
 

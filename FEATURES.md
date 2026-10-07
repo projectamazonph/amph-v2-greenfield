@@ -82,6 +82,8 @@ An audited manual tier grant also creates the course enrollments required by the
 
 The five registered simulators share the attempt, scoring, and feedback infrastructure. Their scores are formative only. The simulator accuracy audit documents free dimensions, policy gaps, and a Listing Audit click-through strategy; scores must not be used as certification, hiring, or job-readiness evidence yet.
 
+A sixth engine, the connected-account simulator mirroring the Amazon Advertising API (STORY-089), is not built: AGENTS.md Rule 5 blocks a sixth registry entry without a domain module and a published scenario, and the underlying product question (whether the academy holds real Amazon Advertising sandbox credentials, or stands behind a fabricated endpoint) has no written answer. The kanban card stays open and blocks on a capability decision rather than ship a mock labeled as a real connector. The `/tools/ad-console` iframe already exists for the live-account use case.
+
 ### Learning progress and credentials
 
 - Dashboard route: `/dashboard` — focus-mode variant (PR #596, STORY-157) renders a hero header with a 5-day activity strip and total XP (sourced from `IXPEventRepository.findByUserId`), followed by a dominant navy-gradient Continue learning card (380px+ min-height) with a faded course-cover background, an orange "In progress" or "Start here" pill, a 32px Archivo course title, a "Next up: <lesson>" line, a primary "Continue learning" CTA, a ghost "View portfolio" link, and a 1.5px orange progress track pinned to the bottom. The card below the hero (in-progress grid, My courses list, Quick Actions, Practice progress) keeps the existing layout.

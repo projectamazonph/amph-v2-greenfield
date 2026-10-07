@@ -4,6 +4,34 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-089: Connected-account simulator re-affirmed as Deferred (no code, awaiting external decision)
+
+Pre-flight grep against `main` at `6c45b96e` confirmed no code or
+configuration claims a sixth simulator:
+
+- `src/infra/simulator/buildSimulatorRegistry.ts` registers exactly
+  five engines: Bid Elevator, Search Term Triage, Campaign Builder,
+  Listing Audit, Keyword Research.
+- `src/domain/simulators/` has no `connected-account/` subdirectory
+  and no `ConnectedAccountSimulator` domain class.
+- `src/app/tools/page.tsx` renders the same five AMPH cards plus the
+  live `/tools/ad-console` iframe (a student-owned real account, not
+  a simulator).
+- No `/admin/simulators/connected-account` route exists; the admin
+  simulators tree covers the five registered engines only.
+- No `SimulatorScenario` row is keyed off a `connected-account`
+  `SimulatorId` (the value is not in the union, so it cannot exist).
+
+The story doc was honest about the deferral but listed three external
+questions (demo credential ownership, OAuth scope shape against
+`ads:read`/`ads:write`, and the cost-benefit case vs. the five
+existing simulators) that block a real build. The kanban card now
+blocks on `kind='capability'` rather than ship a mock labeled as a
+real connector. The umbrella entry
+(`.audit-2026-08-20/UMBRELLA.md`, item 4) remains open by design.
+FEATURES.md adds a paragraph under the practice-tools row that names
+STORY-089 and points at the blocker.
+
 ### STORY-130: Close LEARN-010 diagnostic story doc (shipped via PR #521)
 
 Pre-flight grep showed the work ships on main via PR #521 (commit
