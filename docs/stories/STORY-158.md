@@ -1,7 +1,7 @@
 # STORY-158 — Lesson reader focus-mode polish
 
 **Type:** UI/UX refinement (UI/UX-3 of 7 surfaces)
-**Status:** ◐ Partial. PR #596, commit `765b9ff5` — `UI/UX refinement: Landing + Dashboard + Lesson reader (STORY-156/157/158)` shipped the SelfCheck card restyle (eyebrow + orange left border). Sticky Previous / Next footer band was not implemented. Tracked as a follow-up under `STORY-158-sticky-nav` (to be filed).
+**Status:** Done. PR #596, commit `765b9ff5` shipped the SelfCheck card restyle (eyebrow + orange left border). This follow-up PR closed the sticky Previous / Next footer band scope that originally did not ship with PR #596. The lesson reader now exposes Previous, a centered module-position label (`Module X of Y · Lesson A of B`), and Next as a single sticky-positioned footer band pinned to the bottom of the reading column. The band drops sticky below 640 px so it does not eat the viewport on phones, and the existing floating completion pill hides when the band is in view so the two sticky surfaces do not double up.
 **Owner:** TBD
 **Branch:** `uiux/refinement` (worktree at `D:/Projects/.minimax/worktrees/uiux-refinement`)
 **Canvas:** https://superdesign.dev/teams/b799fd2d-4abb-489d-9f9a-33fc85e0d291/projects/d3cd32f1-bff7-4fb1-a0b4-f0ac84b0313c
