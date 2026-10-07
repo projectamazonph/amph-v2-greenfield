@@ -35,7 +35,7 @@ interface ValidatorResult {
 }
 
 describe("validate-lesson-production.ts (subprocess smoke)", () => {
-  it("reports 45/45 lessons complete with no active-practice block issues", async () => {
+  it("reports 57/57 lessons complete with no active-practice block issues", async () => {
     // Pass the whole command as a single string so `shell: true` is
     // safe (no user-controlled input). Avoids Node 20's deprecation
     // warning about unsanitized args with shell.
@@ -57,5 +57,11 @@ describe("validate-lesson-production.ts (subprocess smoke)", () => {
     expect(combined).not.toMatch(/SelfCheck is missing required/);
     expect(combined).not.toMatch(/callout id '\S+' must be lowercase/);
     expect(combined).not.toMatch(/SelfCheck answerIndex must be in/);
+    // Dual-ladder overlap guard. Lesson 9.3 pairs a click-count
+    // comparison-table with an evidence-kind evidence-ledger, and the
+    // fix orders them as Step 1 / Step 2 in each directive's title
+    // attribute. Any future re-introduction of the parallel-ladders
+    // defect must trip this check.
+    expect(combined).not.toMatch(/mark them as ordered questions in the directive titles/);
   }, 120_000);
 });
