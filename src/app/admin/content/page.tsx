@@ -4,6 +4,8 @@ import { Card } from "@astryxdesign/core";
 import { requireAdmin } from "@/lib/auth";
 import { buildContainer } from "@/composition/container";
 import { TopBar } from "@/components/admin/TopBar";
+import { VoiceGuideTable } from "@/components/admin/VoiceGuideTable";
+import { getVoiceGuideData } from "@/lib/voice-guide";
 import styles from "./page.module.css";
 
 const numberFormat = new Intl.NumberFormat("en-US");
@@ -11,6 +13,7 @@ const numberFormat = new Intl.NumberFormat("en-US");
 export default async function AdminContentPage() {
   await requireAdmin();
   const result = await buildContainer().getAdminContentStats.execute();
+  const voiceGuideData = getVoiceGuideData();
 
   return (
     <div>
@@ -54,6 +57,8 @@ export default async function AdminContentPage() {
           description="Upload and manage guides, templates, handouts, and access tiers."
         />
       </section>
+
+      <VoiceGuideTable entries={voiceGuideData.entries} />
 
       <Card padding={6}>
         <h2 className={styles.sectionTitle}>How curriculum content is stored</h2>

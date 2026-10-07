@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 // "/config" subpath. v10 still re-exports it at the root, so importing
 // from "@sentry/nextjs/config" works for both — but doing so requires v10.40+,
 // which this repo has been on since 10.66.
-import { withSentryConfig } from "@sentry/nextjs/config";
+import { withSentryConfig } from "@sentry/nextjs";
 import bundleAnalyzer from "@next/bundle-analyzer";
 
 const withBundleAnalyzer = bundleAnalyzer({
