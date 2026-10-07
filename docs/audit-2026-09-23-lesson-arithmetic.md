@@ -215,7 +215,7 @@ What each one checked, and what it found.
      (3) and (4) of the same block name both strategies. #587.
   2. `7.3:127` computed `spend x ACoS` and called the result waste: "A 50% ACoS on
      ₱5,000 of spend wastes ₱2,500". The course defines `ACoS = ad spend ÷ ad sales ×
-     100` at `1.3:21`, so multiplying spend by the ratio names no quantity the course
+100` at `1.3:21`, so multiplying spend by the ratio names no quantity the course
      uses, and under the lesson's own reading the spend already is the ₱5,000. The
      figures were right and the label was wrong: read as ad sales, 0.50 x ₱5,000 is
      ₱2,500 of spend. #588.
@@ -241,8 +241,7 @@ What each one checked, and what it found.
 - **Overlapping numeric ladders, a negative result worth recording.** A scanner written
   to hunt the boundary-overlap class #565 fixed in `9.3` reported 13 candidates across
   the corpus. All 13 were the scanner's fault: it treated adjacent columns of a
-  comparison table as a sequence of ranges, and it modelled "Under 10" as inclusive of
-  10. No second instance of the bug class exists. The scanner was discarded rather than
+  comparison table as a sequence of ranges, and it modelled "Under 10" as inclusive of 10. No second instance of the bug class exists. The scanner was discarded rather than
   shipped, because a gate that fires only on false positives is worse than no gate.
 - **Every number inside or required by a Quick check, re-derived from the lesson's own
   printed figures** (11 lessons, modules -1, 0 and 1). Zero breaks. The arithmetic in
@@ -308,7 +307,7 @@ Two dismissals worth keeping, both raised by reports that sounded confident:
 
 - `8.2:94`'s Step 4, "Divide your Top of Search impressions by total impressions", was
   flagged as dividing by a number the method only introduces at Step 5. On source it
-  is not: Step 5 estimates *category* impressions, while Step 4's denominator is the
+  is not: Step 5 estimates _category_ impressions, while Step 4's denominator is the
   learner's own total impressions from the campaign report in Step 1. The ordering
   holds. What is true, and is not a defect, is that no later step uses the ratio Step 4
   computes.
@@ -448,7 +447,7 @@ validated datasets in one change. Whether that belongs on the most-viewed surfac
 
 This is the fourth instance of a pattern worth naming: email templates, progress events, the glossary
 popover, and now the curriculum inventory. A port, dataset or adapter is real, unit tested, and wired into a
-script or a gate, and nothing in the UI ever reaches it. Checking whether a thing is *consumed* takes one
+script or a gate, and nothing in the UI ever reaches it. Checking whether a thing is _consumed_ takes one
 grep and keeps coming out differently than checking whether it exists.
 
 ## Two measurements that are not defects, but change a decision
@@ -460,13 +459,13 @@ grep and keeps coming out differently than checking whether it exists.
 are whole, the achievable score jumps past 70 rather than landing on it, so no module quiz can be passed at
 exactly 70%:
 
-| questions | must get | real bar | modules |
-| --- | --- | --- | --- |
-| 4 | 3 | 75% | -1, 9, 10, 11 |
-| 5 | 4 | **80%** | 0 |
-| 7 | 5 | 71.4% | 5, 6 |
-| 8 | 6 | 75% | 2, 3, 4, 7, 8 |
-| 12 | 9 | 75% | 1 |
+| questions | must get | real bar | modules       |
+| --------- | -------- | -------- | ------------- |
+| 4         | 3        | 75%      | -1, 9, 10, 11 |
+| 5         | 4        | **80%**  | 0             |
+| 7         | 5        | 71.4%    | 5, 6          |
+| 8         | 6        | 75%      | 2, 3, 4, 7, 8 |
+| 12        | 9        | 75%      | 1             |
 
 Module 0, the first quiz a learner meets, is the strictest at 4 of 5. No quiz requires perfection, which was the
 thing worth ruling out. Nothing learner-facing prints a percentage, `passingScore` appears only in the admin quiz
@@ -489,3 +488,24 @@ definitions, and the instruction to report only what the printed numbers themsel
 returns a list like this one in a single pass. All four passes used that shape, and it is worth reusing
 after any future currency or figure change, including a pass pointed at one module rather than a whole
 band of them.
+
+## 9.3 evidence-ladder boundary overlap, since resolved
+
+The audit flagged the two adjacent primitives in `9.3` as a separate defect from the
+boundary-range fix in #565, and `STATE.md` carried it under _Remaining known limitations_
+as item 3 of the Next action list. The lesson stacked a click-count `comparison-table` next
+to a kind-of-evidence `evidence-ledger` without saying which governed a recommendation. A
+term with 12 clicks and a clear relevance problem fit "Small tweaks or obvious negatives" in
+one table and "Act on the bounded safety issue" in the other.
+
+The resolution reframes the two primitives as ordered questions. `:::evidence-ledger`
+becomes Step 1 (kind-of-evidence gate, titled `Step 1: pick the kind of evidence first`),
+and `:::comparison-table` becomes Step 2 (click-count ladder, titled `Step 2: size the
+action to the click count`). The directive titles carry the step number, the section
+headings repeat it, the worked example walks both steps in order, and the lesson copy says
+"only after Step 1 has picked the kind of evidence, use the click count to size the
+action." A new dual-ladder overlap guard in `scripts/validate-lesson-production.ts` fails
+any future lesson that pairs a `comparison-table` whose id contains `ladder` with an
+`evidence-ledger` whose id contains `evidence|sufficiency|safety|kind` without
+`Step 1` / `Step 2` in the directive titles. The defect is closed and the regression is
+guarded. Validator: `57/57 lessons complete`, no active-practice block issues.
