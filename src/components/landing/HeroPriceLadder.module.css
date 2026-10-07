@@ -1,0 +1,97 @@
+/* HeroPriceLadder.module.css — compact three-tier price strip for the hero.
+   Tokens only — no hardcoded color / spacing / radius values. */
+
+.ladder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+  margin-bottom: var(--sp-8);
+}
+
+@media (min-width: 760px) {
+  .ladder {
+    flex-direction: row;
+    gap: var(--sp-4);
+  }
+}
+
+.card {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  background: var(--c-card-hi);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition),
+    background var(--transition);
+}
+
+.card:hover {
+  border-color: var(--c-orange-tint);
+  background: var(--c-card);
+  box-shadow: var(--sh-2);
+  transform: translateY(-1px);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--c-orange);
+  outline-offset: 2px;
+}
+
+.cardFeatured {
+  border: 2px solid var(--c-orange);
+  background: var(--c-card);
+  box-shadow: var(--sh-2);
+}
+
+.featuredBadge {
+  position: absolute;
+  top: calc(var(--sp-2) * -1);
+  right: var(--sp-3);
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-sm);
+  background: var(--c-orange);
+  color: var(--c-navy-2);
+  font-family: var(--font-disp);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.flag {
+  color: var(--c-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cardFeatured .flag {
+  color: var(--c-orange-d);
+  font-weight: 700;
+}
+
+.priceLine {
+  color: var(--c-ink-2);
+  font-family: var(--font-disp);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cur {
+  margin-right: 2px;
+  font-size: 14px;
+  font-weight: 600;
+}

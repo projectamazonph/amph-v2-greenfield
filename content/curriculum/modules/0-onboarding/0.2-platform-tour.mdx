@@ -99,6 +99,31 @@ Use this when a client asks how you're learning the platform:
 
 Choose the first place you would go for each task: (1) see what lesson comes next, (2) replay a bid decision, and (3) check your payment history. Write the section name and the reason for each choice.
 
+## Fact card
+
+```text
+Product or feature: This learning platform: the Home, Courses, Tools, and Profile sections, plus the XP and badge system
+What the learner can do: Find the next lesson, reopen a simulator run, and check payment history unaided
+Who can access it: Any signed-in student. Course and lesson content is limited by what the account is enrolled in; the practice tools unlock module by module
+Retailer or marketplace scope: This platform only. Nothing here is an Amazon product or live Amazon data, and the ads console preview is a description, not a connected view
+Official source URL: No external source (first-party product; the behavior is defined by this app itself)
+Last verified: 2026-09-25
+Next review due: 2026-01-25
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-0-2-pitfall" variant="pitfall" title="Treating the platform like a live Amazon Ads console"}
+The platform's Tools section is a simulator with scenario data, not a live account. Acting as if a Tool scenario is a live client run skips the safety layer the simulator exists to provide.
+:::
+
+<SelfCheck
+  id="sc-0-2"
+  prompt="You want to test whether a search term should be negated. Where do you go?"
+  options={["Tools, then open Search Term Triage from the module that unlocked it.", "Home, then click the next lesson on the dashboard.", "Profile, then check your XP and badges.", "A live client's Amazon Ads console, since the simulator is for reading only."]}
+  answerIndex={0}
+  explanation="Search Term Triage is a practice tool in Tools, unlocked when Module 7 finishes. Live account changes require the work loop from Lesson 0.1 first."
+/>
+
 ## Quick check
 
 The answers are (1) Courses, (2) Tools, and (3) Profile. The Home section is the starting summary, not the place where the lesson, simulator, or payment record lives.

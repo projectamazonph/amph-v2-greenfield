@@ -16,9 +16,20 @@ Explain why you confirm facts before changing a live account, and fill out a cli
 
 Before you touch bids, budgets, or targeting on a client's account, you need the brief that tells you what "safe" and "successful" mean for this specific product.
 
+## What a "campaign" actually is
+
+A campaign is the container Amazon Ads uses to group your paid advertising. A Sponsored Products campaign has four nested pieces:
+
+- Campaign: the top-level container. Holds the daily budget, the bid strategy, and the campaign status (paused, enabled, or archived).
+- Ad group: a subset of the campaign. Has its own keywords or product targets and its own bid.
+- Keyword or product target: what you are bidding on. A keyword is a word or phrase; a product target is an ASIN you want to show your ad alongside.
+- Ad: the creative the shopper sees. Title, image, brand.
+
+When a client says "turn on ads," they mean change the campaign status from paused to enabled. Until you do that, Amazon does not serve the ad and does not charge the campaign.
+
 ## Why this matters before Module 1
 
-A client's Amazon Ads account spends real money the moment a campaign goes live. A wrong bid, an unapproved budget increase, or a campaign turned on before stock arrives can cost a client hundreds of dollars in a single day. None of that is reversible after the fact. You can pause a campaign, but you can't get the ad spend back.
+A client's Amazon Ads account spends real money the moment a campaign goes live. A wrong bid, an unapproved budget increase, or a campaign turned on before stock arrives can cost a client tens of thousands of pesos in a single day. None of that is reversible after the fact. You can pause a campaign, but you can't get the ad spend back.
 
 This is why the work loop from Lesson 0.1 starts with **Read**, not **Change**. Before any decision, you read the objective and the data. Before you can even do that, you need the client to have told you what the objective and the limits are.
 
@@ -37,7 +48,7 @@ This is the required artifact for Module 0. Use it at the start of any new clien
 | Approved limits on bids, budgets, or campaign changes | Tells you what you can change yourself versus what needs sign-off first. |
 
 :::simulation-brief{id="client-brief-builder" title="Build the brief before you build the campaign"}
-{"note":"A checked field means the fact is confirmed, not merely requested. Do not start a live change while a required field is still unknown.","fields":[{"id":"product","label":"Product or ASIN","prompt":"What exactly are we advertising?","example":"Bamboo cutting board","required":true},{"id":"objective","label":"Business objective","prompt":"What does success mean for this product?","example":"Grow profitable sales, not just traffic","required":true},{"id":"budget","label":"Budget ceiling","prompt":"What daily and campaign spend is approved?","example":"$500 monthly ceiling with a daily limit","required":true},{"id":"economics","label":"Target ACoS or profit rule","prompt":"What boundary keeps the decision economically safe?","example":"Target ACoS or break-even margin","required":true},{"id":"readiness","label":"Stock, price, and offer","prompt":"Can the listing convert the traffic we buy?","example":"In stock, current price, promotion plan","required":true},{"id":"approval","label":"Approval boundary","prompt":"What can you change without sign-off?","example":"Bids and budgets require client approval","required":true}]}
+{"note":"A checked field means the fact is confirmed, not merely requested. Do not start a live change while a required field is still unknown.","fields":[{"id":"product","label":"Product or ASIN","prompt":"What exactly are we advertising?","example":"Bamboo cutting board","required":true},{"id":"objective","label":"Business objective","prompt":"What does success mean for this product?","example":"Grow profitable sales, not just traffic","required":true},{"id":"budget","label":"Budget ceiling","prompt":"What daily and campaign spend is approved?","example":"₱25,000 monthly ceiling with a daily limit","required":true},{"id":"economics","label":"Target ACoS or profit rule","prompt":"What boundary keeps the decision economically safe?","example":"Target ACoS or break-even margin","required":true},{"id":"readiness","label":"Stock, price, and offer","prompt":"Can the listing convert the traffic we buy?","example":"In stock, current price, promotion plan","required":true},{"id":"approval","label":"Approval boundary","prompt":"What can you change without sign-off?","example":"Bids and budgets require client approval","required":true}]}
 :::
 
 :::simulation-brief{id="first-simulation-brief" title="Turn a client brief into a first safe move"}
@@ -48,13 +59,15 @@ This is the required artifact for Module 0. Use it at the start of any new clien
 
 Read this sample exchange with a client:
 
-> "Hi, I need help with my bamboo cutting board listing. It's been live for two months but sales are slow. I have about ₱500 a month I can put toward ads. Let me know what you need from me."
+> "Hi, I need help with my bamboo cutting board listing. It's been live for two months but sales are slow. I have about ₱25,000 a month I can put toward ads. Let me know what you need from me."
 
-Using the checklist above, list which facts the client already gave you, and which facts you still need to ask for before you could safely start work. Write your answer before reading further.
+Using the checklist above, list the facts the client already gave you. Then list the facts you still need to ask for before you could safely start work.
 
-**What the client gave you:** the product (bamboo cutting board), that it's an existing listing (not a brand-new launch), and a monthly budget ceiling (₱500).
+Write your answer before reading further.
 
-**What's still missing:** the business objective (is "slow sales" about visibility, conversion, or both?), the approved daily budget within that ₱500 monthly ceiling, a target ACoS or profitability rule, current stock position, any price or promotion plans, and whether you have approval to change bids and budgets yourself or need sign-off first.
+**What the client gave you:** the product (bamboo cutting board), that it's an existing listing (not a brand-new launch), and a monthly budget ceiling (₱25,000).
+
+**What's still missing:** the business objective (is "slow sales" about visibility, conversion, or both?), the approved daily budget within that ₱25,000 monthly ceiling, a target ACoS or profitability rule, current stock position, any price or promotion plans, and whether you have approval to change bids and budgets yourself or need sign-off first.
 
 That gap is normal. Most clients don't know which facts you need until you ask. Asking well is part of the job.
 
@@ -63,6 +76,18 @@ That gap is normal. Most clients don't know which facts you need until you ask. 
 Use this the first time you take on a new product from a client:
 
 > "Before I start, I need a few things from you: your target ACoS or profit margin, your daily budget, current stock levels, and whether you'd like me to make bid and budget changes directly or send them to you for approval first. This keeps your account safe while I work."
+
+:::callout{id="lesson-0-3-pitfall" variant="pitfall" title="Starting a campaign because the client said 'turn on ads'"}
+Pausing on a client request and asking for the four facts (objective, budget rule, stock and offer, approval boundary) is not slow. It is the difference between a VA who protects an account and one who spends real money on guesses.
+:::
+
+<SelfCheck
+  id="sc-0-3"
+  prompt="A client gives you the product name, that it has been live for two months, and a ₱25,000 monthly budget. What is still missing before you touch the account?"
+  options={["The business objective, target ACoS or profit rule, current stock, and approval boundary.", "Just the ACoS target. The rest can be inferred from the listing.", "A list of competitors to research.", "Nothing. The monthly budget is enough to start."]}
+  answerIndex={0}
+  explanation="The four intake facts are the minimum safe start. Without them you cannot set bids, judge spend, or know which changes need sign-off."
+/>
 
 ## Check
 

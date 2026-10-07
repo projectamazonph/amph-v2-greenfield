@@ -1,0 +1,68 @@
+/**
+ * LessonStickyComplete.module.css
+ * Sticky floating completion CTA pill.
+ * Uses design tokens. No Tailwind classes.
+ */
+
+.sticky {
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  animation: slideUp 280ms var(--ease-out) both;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.copy {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .sticky {
+    left: var(--space-4);
+    right: var(--space-4);
+    transform: none;
+  }
+
+  .inner {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

@@ -12,6 +12,7 @@ import {
   userInitials,
   isAdmin,
   isInstructor,
+  hasCompletedWelcome,
   type User,
 } from "@/domain/entities/User";
 
@@ -140,6 +141,18 @@ describe("User entity", () => {
       expect(isInstructor(makeUser({ role: "INSTRUCTOR" }))).toBe(true);
       expect(isInstructor(makeUser({ role: "ADMIN" }))).toBe(true);
       expect(isInstructor(makeUser({ role: "STUDENT" }))).toBe(false);
+    });
+  });
+
+  describe("hasCompletedWelcome", () => {
+    it("returns true when welcomeCompletedAt is set", () => {
+      const user = makeUser({ welcomeCompletedAt: new Date("2026-01-01T00:00:00Z") });
+      expect(hasCompletedWelcome(user)).toBe(true);
+    });
+
+    it("returns false when welcomeCompletedAt is null", () => {
+      const user = makeUser({ welcomeCompletedAt: null });
+      expect(hasCompletedWelcome(user)).toBe(false);
     });
   });
 });

@@ -1,0 +1,147 @@
+/* ppc-coach.html — simulator-specific layout and components.
+   Brand primitives come from tokens.css; skin.css provides the shared visual layer. */
+
+/* ─────────────────────────────────────────────────────────────
+   Module identity palette — category colours for the 12 learning
+   modules.  Three are aliases to existing tokens; the remaining
+   five are standalone category colours because they represent
+   module identity, not brand semantics.  Centralising them here
+   replaces hard-coded hex strings scattered through the inline JS.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --mc-blue:     #0EA5E9;  /* Module 2,6,7,9  — data/teal         */
+  --mc-emerald:  #10B981;  /* Module 3,10 — growth/green          */
+  --mc-violet:   #8B5CF6;  /* Module 4,11 — strategy/purple       */
+  --mc-pink:     #EC4899;  /* Module 5     — automation/pink         */
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Tailwind-to-token bridge
+   ppc-coach.html loads the Tailwind CDN for utility classes.
+   These overrides route Tailwind's default colour palette and the
+   page's custom nav/brand palette through the central token
+   system so the visual language stays consistent across SimGrid.
+   Loaded AFTER Tailwind's runtime stylesheet, these selectors win.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Fonts ── */
+.font-sans   { font-family: var(--font-body) !important; }
+.font-display{ font-family: var(--font-disp) !important; }
+
+/* ── Navy (custom config — now aligned to --c-navy-* tokens) ── */
+.bg-navy       { background-color: var(--c-navy-1) !important; }
+.bg-navy-800   { background-color: var(--c-navy-2) !important; }
+.text-navy     { color: var(--c-navy-1) !important; }
+.border-navy   { border-color: var(--c-navy-1) !important; }
+
+/* ── Brand (custom config — orange family) ── */
+.bg-brand-50   { background-color: var(--c-orange-soft) !important; }
+.bg-brand-100  { background-color: var(--c-orange-tint) !important; }
+.bg-brand-200  { background-color: var(--c-orange-tint) !important; }
+.bg-brand-500  { background-color: var(--c-orange) !important; }
+.bg-brand-600  { background-color: var(--c-orange-d) !important; }
+.text-brand-400{ color: var(--c-orange-h) !important; }
+.text-brand-500{ color: var(--c-orange) !important; }
+.text-brand-600{ color: var(--c-orange-d) !important; }
+.text-brand-700{ color: var(--c-amber-text) !important; }
+.border-brand-200{ border-color: var(--c-orange-tint) !important; }
+.border-brand-500{ border-color: var(--c-orange) !important; }
+.border-brand-400{ border-color: var(--c-orange-h) !important; }
+
+/* ── Slate → neutral token aliases ── */
+.text-slate-50  { color: var(--c-bg) !important; }
+.text-slate-100 { color: var(--c-bg-2) !important; }
+.text-slate-200 { color: var(--c-border-2) !important; }
+.text-slate-300 { color: var(--c-sub) !important; }
+.text-slate-400 { color: var(--c-sub) !important; }
+.text-slate-500 { color: var(--c-faint) !important; }
+.text-slate-600 { color: var(--c-sub) !important; }
+.text-slate-700 { color: var(--c-navy-3) !important; }
+.text-slate-800 { color: var(--c-navy-2) !important; }
+
+.bg-slate-50  { background-color: var(--c-bg-2) !important; }
+.bg-slate-100 { background-color: var(--c-bg-2) !important; }
+.bg-slate-200 { background-color: var(--c-border-2) !important; }
+.bg-slate-500 { background-color: var(--c-faint) !important; }
+
+.border-slate-100{ border-color: var(--c-border-2) !important; }
+.border-slate-200{ border-color: var(--c-border-2) !important; }
+.border-slate-300{ border-color: var(--c-sub) !important; }
+
+/* ── Emerald → success (green) ── */
+.text-emerald-400{ color: var(--c-green) !important; }
+.text-emerald-500{ color: var(--c-green) !important; }
+.text-emerald-600{ color: var(--c-green-text) !important; }
+.text-emerald-700{ color: var(--c-green-text) !important; }
+.text-emerald-800{ color: var(--c-green-text) !important; }
+.bg-emerald-50   { background-color: var(--c-green-bg) !important; }
+.bg-emerald-100  { background-color: var(--c-green-bg) !important; }
+.bg-emerald-500  { background-color: var(--c-green) !important; }
+.bg-emerald-600  { background-color: var(--c-green) !important; }
+.border-emerald-200{ border-color: var(--c-green-bg) !important; }
+
+/* ── Red → error ── */
+.text-red-500{ color: var(--c-red) !important; }
+.text-red-600{ color: var(--c-red-text) !important; }
+.text-red-700{ color: var(--c-red-text) !important; }
+.bg-red-50   { background-color: var(--c-red-bg) !important; }
+.bg-red-100  { background-color: var(--c-red-bg) !important; }
+.bg-red-500  { background-color: var(--c-red) !important; }
+.bg-red-600  { background-color: var(--c-red) !important; }
+.border-red-200{ border-color: var(--c-red-bg) !important; }
+
+/* ── Amber → warning ── */
+.text-amber-700 { color: var(--c-amber-text) !important; }
+.text-amber-800 { color: var(--c-amber-text) !important; }
+.bg-amber-50    { background-color: var(--c-amber-bg) !important; }
+.bg-amber-100   { background-color: var(--c-amber-bg) !important; }
+.bg-amber-500   { background-color: var(--c-amber) !important; }
+.border-amber-200{ border-color: var(--c-amber-bg) !important; }
+
+/* ── Sky → info (blue) ── */
+.text-sky-700{ color: var(--c-blue-text) !important; }
+.text-sky-800{ color: var(--c-blue-text) !important; }
+.bg-sky-50   { background-color: var(--c-blue-bg) !important; }
+.bg-sky-100  { background-color: var(--c-blue-bg) !important; }
+.bg-sky-500  { background-color: var(--c-blue) !important; }
+.border-sky-200{ border-color: var(--c-blue-bg) !important; }
+
+/* ── White utility ── */
+.bg-white      { background-color: var(--c-card) !important; }
+.text-white    { color: var(--c-card) !important; }
+
+/* ── Focus rings ── */
+.focus\:ring-brand-500:focus{--tw-ring-color: var(--c-orange); ring-color: var(--c-orange)}
+
+/* ─────────────────────────────────────────────────────────────
+   Component styles
+   ───────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--c-sub);border-radius:8px}::-webkit-scrollbar-track{background:transparent}
+  .view{animation:fadeUp .35s ease both}@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+  @keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+  @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+  @keyframes growW{from{width:0}}
+  .toast{animation:slideIn .3s ease both}.pop{animation:popIn .35s ease both}
+  .dot{width:6px;height:6px;border-radius:9999px;background:var(--c-sub);animation:blink 1s infinite}
+  .dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+  .bar{transition:width .7s cubic-bezier(.22,1,.36,1)}
+  .funnelbar{animation:growW .8s cubic-bezier(.22,1,.36,1) both}
+  .navbtn.active{background:linear-gradient(90deg,var(--c-orange),color-mix(in srgb,var(--c-orange) 60%,var(--c-card)));color:var(--c-navy-1);font-weight:700;box-shadow:0 6px 16px rgba(255,153,0,.35)}
+  .navbtn.active svg{stroke:var(--c-navy-1)}
+  .statcard{transition:transform .25s ease, box-shadow .25s ease}.statcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(15,17,17,.12)}
+  .gloss{transition:all .25s ease}.gloss:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,17,17,.12)}
+  .lessonblock table{width:100%;border-collapse:collapse;font-size:.85rem}
+  .lessonblock th{background:var(--c-navy-1);color:var(--c-card);text-align:left;padding:.5rem .75rem}
+  .lessonblock td{padding:.5rem .75rem;border-bottom:1px solid var(--c-border-2)}
+  .lessonblock tr:nth-child(even) td{background:var(--c-bg-2)}
+  .chatmsg{animation:fadeUp .3s ease both}
+  .diagstep{transition:transform .2s ease}.diagstep:hover{transform:scale(1.04)}
+  /* Lesson body: give sequential <p> blocks a sequence, not a wall.
+     Visual rhythm: bigger gap between <p>s, a touch of lead-in on the
+     first paragraph, and hyphens so lines wrap cleanly on mobile. */
+  .lessonblock .lessonprose{font-size:15.5px;line-height:1.7;color:var(--c-ink-2);margin:0 0 1.1rem 0;hyphens:auto;-webkit-hyphens:auto}
+  .lessonblock .lessonprose + .lessonprose{margin-top:1.35rem}
+  .lessonblock > .lessonprose:first-of-type{font-size:1.0625rem;line-height:1.75;color:var(--c-ink)}
+  .lessonblock .lessonprose + div{margin-top:.25rem}

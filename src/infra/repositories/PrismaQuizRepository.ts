@@ -4,7 +4,7 @@
  * STORY-031: Quiz + QuizAttempt models + repositories.
  */
 
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Result } from "@/domain/shared/Result";
 import type { IQuizRepository, QuizRepositoryError } from "@/ports/repositories/IQuizRepository";
 import type { Quiz } from "@/domain/entities/Quiz";
@@ -37,6 +37,7 @@ export class PrismaQuizRepository implements IQuizRepository {
             quizId: q.id,
             questionText: question.questionText,
             explanation: question.explanation,
+            remediationRefs: question.remediationRefs as unknown as Prisma.InputJsonValue,
             order: qIndex,
           },
         });
@@ -71,13 +72,20 @@ export class PrismaQuizRepository implements IQuizRepository {
       });
 
       const questionsWithOptions = await Promise.all(
-        questions.map(async (q: { id: string; questionText: string; explanation: string }) => {
-          const options = await this.db.quizOption.findMany({
-            where: { questionId: q.id },
-            orderBy: { order: "asc" },
-          });
-          return { ...q, options };
-        }),
+        questions.map(
+          async (q: {
+            id: string;
+            questionText: string;
+            explanation: string;
+            remediationRefs: unknown;
+          }) => {
+            const options = await this.db.quizOption.findMany({
+              where: { questionId: q.id },
+              orderBy: { order: "asc" },
+            });
+            return { ...q, options };
+          },
+        ),
       );
 
       return Result.ok(this.mapQuiz(quiz, questionsWithOptions));
@@ -102,7 +110,12 @@ export class PrismaQuizRepository implements IQuizRepository {
             });
             const questionsWithOptions = await Promise.all(
               questions.map(
-                async (q: { id: string; questionText: string; explanation: string }) => {
+                async (q: {
+                  id: string;
+                  questionText: string;
+                  explanation: string;
+                  remediationRefs: unknown;
+                }) => {
                   const options = await this.db.quizOption.findMany({
                     where: { questionId: q.id },
                     orderBy: { order: "asc" },
@@ -136,7 +149,12 @@ export class PrismaQuizRepository implements IQuizRepository {
             });
             const questionsWithOptions = await Promise.all(
               questions.map(
-                async (q: { id: string; questionText: string; explanation: string }) => {
+                async (q: {
+                  id: string;
+                  questionText: string;
+                  explanation: string;
+                  remediationRefs: unknown;
+                }) => {
                   const options = await this.db.quizOption.findMany({
                     where: { questionId: q.id },
                     orderBy: { order: "asc" },
@@ -185,6 +203,7 @@ export class PrismaQuizRepository implements IQuizRepository {
               quizId: quiz.id,
               questionText: question.questionText,
               explanation: question.explanation,
+              remediationRefs: question.remediationRefs as unknown as Prisma.InputJsonValue,
               order: qIndex,
             },
           }),
@@ -230,6 +249,7 @@ export class PrismaQuizRepository implements IQuizRepository {
       id: string;
       questionText: string;
       explanation: string;
+      remediationRefs: unknown;
       options: { id: string; optionText: string; isCorrect: boolean }[];
     }[],
   ): Quiz {
@@ -242,6 +262,7 @@ export class PrismaQuizRepository implements IQuizRepository {
         id: q.id,
         questionText: q.questionText,
         explanation: q.explanation,
+        remediationRefs: this.parseRemediationRefs(q.remediationRefs),
         options: q.options.map((o) => ({
           id: o.id,
           optionText: o.optionText,
@@ -249,5 +270,16 @@ export class PrismaQuizRepository implements IQuizRepository {
         })),
       })),
     };
+  }
+
+  private parseRemediationRefs(raw: unknown): readonly string[] {
+    if (!Array.isArray(raw)) return [];
+    const slugs: string[] = [];
+    for (const value of raw) {
+      if (typeof value !== "string") continue;
+      const slug = value.trim();
+      if (slug.length > 0) slugs.push(slug);
+    }
+    return slugs;
   }
 }

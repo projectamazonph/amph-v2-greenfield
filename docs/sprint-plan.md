@@ -242,6 +242,8 @@ exists to remove.
 
 ## Next planning track — Learning experience 8.5
 
+**Reviewed:** 2026-09-17 against `aea7e2a`. Wave 0 (LEARN-001 to LEARN-006) and Wave 1 (LEARN-010 to LEARN-015) are done. Wave 3 LEARN-030, LEARN-032 to LEARN-035, and LEARN-034 are done; LEARN-031 remains planned. Wave 4 LEARN-040 to LEARN-042 are done; LEARN-043 to LEARN-045 remain planned.
+
 The completed Sprint 16 work establishes simulator and assessment foundations.
 STORY-085, STORY-086, STORY-087, and STORY-088 are done. STORY-089 (connected-account
 simulator) remains planned.
@@ -255,6 +257,19 @@ then builds beginner onboarding, consistent active lessons, saved learner
 evidence, a capstone, and a measured beta. STORY-107 and STORY-108 remain
 inputs to this track; STORY-109 is already shipped. Formative simulator scores
 remain outside certificate and job-readiness claims.
+
+### 8.5 Build plan progress (2026-09-16)
+
+| Wave   | Range                  | Status                                                                                                                                              |
+| ------ | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wave 0 | LEARN-001 to LEARN-006 | Done (STORY-111 to STORY-116, STORY-129)                                                                                                            |
+| Wave 1 | LEARN-010 to LEARN-015 | Done (STORY-130 to STORY-133)                                                                                                                       |
+| Wave 2 | LEARN-020 to LEARN-029 | Partial (Modules 0 to 5 done via STORY-117 to STORY-121, STORY-127, STORY-128; Modules 6 to 8 not started)                                          |
+| Wave 3 | LEARN-030 to LEARN-035 | Partial (LEARN-030 done via STORY-134; LEARN-032 to LEARN-035 done via STORY-135 to STORY-137; LEARN-034 done via STORY-140; LEARN-031 not started) |
+| Wave 4 | LEARN-040 to LEARN-045 | Partial (LEARN-040 done via STORY-138; LEARN-041 done via STORY-141; LEARN-042 done via STORY-142; LEARN-043 to LEARN-045 not started)              |
+| Wave 4 | LEARN-040 to LEARN-045 | Planned                                                                                                                                             |
+| Wave 5 | LEARN-050 to LEARN-053 | Planned                                                                                                                                             |
+| Wave 6 | LEARN-060 to LEARN-063 | Planned                                                                                                                                             |
 
 ## Student-facing gap closure (2026-08-01/02, see docs/STUDENT-FEATURE-GAP-ANALYSIS.md)
 

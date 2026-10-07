@@ -297,6 +297,7 @@ describe("Login", () => {
           createdAt: clock.now(),
           totalXp: 0,
           emailVerifiedAt: null,
+          welcomeCompletedAt: null,
         },
       })) as never;
 

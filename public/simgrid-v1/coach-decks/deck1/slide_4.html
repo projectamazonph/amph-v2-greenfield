@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; }
+.slide-container {
+    width: 1280px;
+    min-height: 720px;
+    background: #f7f8fa;
+    color: #131921;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+.content-wrapper {
+    padding-top: 42px; /* keep title top padding */
+    padding-left: 40px;
+    padding-right: 40px;
+}
+.eyebrow {
+    font-size: 14px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #ff9900;
+    font-weight: 700;
+    margin-top: 0;
+}
+.title {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.08;
+    margin-top: 9px;
+}
+.rule {
+    height: 3px;
+    background: #131921;
+    margin-top: 12px;
+}
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 18px;
+}
+.panel {
+    background: #fff;
+    border: 1px solid #d7dce2;
+    padding-top: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    min-height: 380px;
+}
+.panel h2 {
+    font-size: 24px;
+    margin-top: 0;
+    color: #131921;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    margin-top: 12px;
+}
+.table th {
+    background: #131921;
+    color: #fff;
+    text-align: left;
+    padding-top: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.table td {
+    padding-top: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-bottom: 1px solid #d7dce2;
+}
+.table tr:nth-child(even) td {
+    background: #f1f3f5;
+}
+.buy-box-alert {
+    background: #fef2f2;
+    border-left: 4px solid #de350b;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 16px;
+    font-size: 16px;
+    line-height: 1.4;
+}
+.flow-list {
+    list-style: none;
+    margin-top: 12px;
+    padding-left: 0;
+}
+.flow-list li {
+    font-size: 18px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+}
+.flow-list li::before {
+    content: "→";
+    color: #ff9900;
+    font-weight: bold;
+    margin-right: 10px;
+}
+.callout {
+    margin-top: 16px;
+    background: #eef8f3;
+    border-left: 4px solid #00875a;
+    color: #145c43;
+    padding-top: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 16px;
+    line-height: 1.3;
+}
+.footer {
+    position: absolute;
+    left: 40px;
+    top: 660px;
+    font-size: 13px;
+    color: #64748b;
+}
+.page {
+    position: absolute;
+    right: 40px;
+    top: 660px;
+    font-size: 13px;
+    color: #64748b;
+}
+</style>
+</head>
+<body>
+<div class="slide-container">
+    <div class="content-wrapper">
+        <div class="eyebrow">Module 0 · Lesson 0.3</div>
+        <div class="title">Organic vs Paid and the Buy Box</div>
+        <div class="rule"></div>
+        
+        <div class="layout">
+            <section class="panel">
+                <h2>Visibility Types</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Meaning</th>
+                            <th>How you get it</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Organic</strong></td>
+                            <td>Free result</td>
+                            <td>Earned by relevance, sales and reviews</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Paid (Sponsored)</strong></td>
+                            <td>Ad result</td>
+                            <td>You pay per click</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="buy-box-alert">
+                    <strong>The Buy Box Constraint:</strong> The Buy Box is where the "Add to Cart" button lives. Most sales go through it. If you don't win it, your ads can send shoppers to a competitor.
+                </div>
+                
+                <div class="callout">
+                    <strong>Why use ads?</strong> Appear faster than waiting for organic rank, discover which search words sell, protect your page from competitor ads, and grow sales velocity.
+                </div>
+            </section>
+            
+            <section class="panel">
+                <h2>The Visibility Loop</h2>
+                <ul class="flow-list">
+                    <li>Shopper searches</li>
+                    <li>Results page: organic + sponsored</li>
+                    <li>Shopper clicks</li>
+                    <li>Landing page convinces (or not)</li>
+                    <li>Buy or leave</li>
+                </ul>
+                
+                <div class="callout" style="margin-top: 28px;">
+                    <strong>Coach tip:</strong> Ads buy visibility. The listing earns the sale. Both must work.
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="footer">Source: PPC Coach · Amazon Basics · 0.3 Organic vs Paid and the Buy Box</div>
+    <div class="page">04 / 12</div>
+</div>
+</body>
+</html>

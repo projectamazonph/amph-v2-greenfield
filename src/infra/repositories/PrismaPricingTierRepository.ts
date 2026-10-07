@@ -33,8 +33,6 @@ interface PrismaPricingTierRow {
   currency: string;
   status: string;
   displayOrder: number;
-  earlyBirdPriceMinor: number | null;
-  earlyBirdEndsAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -202,8 +200,6 @@ export class PrismaPricingTierRepository implements IPricingTierRepository {
     currency: string;
     status: string;
     displayOrder: number;
-    earlyBirdPriceMinor: number | null;
-    earlyBirdEndsAt: Date | null;
   } {
     return {
       id: tier.id,
@@ -213,8 +209,6 @@ export class PrismaPricingTierRepository implements IPricingTierRepository {
       currency: tier.price.currency,
       status: tier.status,
       displayOrder: tier.displayOrder,
-      earlyBirdPriceMinor: tier.earlyBirdPriceMinor ?? null,
-      earlyBirdEndsAt: tier.earlyBirdEndsAt ?? null,
     };
   }
 
@@ -226,8 +220,6 @@ export class PrismaPricingTierRepository implements IPricingTierRepository {
       price: Result.unwrap(Money.of(row.priceMinor, row.currency as "PHP" | "USD")),
       status: row.status as PricingTierStatus,
       displayOrder: row.displayOrder,
-      earlyBirdPriceMinor: row.earlyBirdPriceMinor ?? undefined,
-      earlyBirdEndsAt: row.earlyBirdEndsAt ?? undefined,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

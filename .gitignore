@@ -80,3 +80,15 @@ package-lock.json
 
 # git worktrees (created by AI agents working in isolation)
 .worktrees/
+
+# agent debug helpers + scratch archives (never tracked; archived instead of
+# deleted so logs stay available for postmortem use)
+.superdesign/
+.e2e-failure-log.txt
+.e2e-log.zip
+.e2e-log2.zip
+scripts/ci-debug.ps1
+scripts/get-ci-steps.ps1
+scripts/.archive-pr-prep-*/
+scripts/.archive-stale-*/
+

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+.layout{display:grid;grid-template-columns:450px 1fr;gap:40px;margin-top:30px}
+
+/* Left Column: Ladder */
+.ladder-wrap{display:flex;flex-direction:column;gap:16px;margin-top:10px}
+.ladder-tier{padding-top:24px;padding-left:24px;padding-right:24px;padding-bottom:24px;border:1px solid #d7dce2;min-height:130px;display:flex;flex-direction:column;justify-content:center}
+
+.tier-3{background:#131921;border-left:8px solid #de350b;color:#fff}
+.tier-2{background:#f1f3f5;border-left:8px solid #ff9900;color:#131921}
+.tier-1{background:#fff;border-left:8px solid #00875a;color:#131921}
+
+.tier-label{font-size:16px;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px}
+.tier-3 .tier-label{color:#de350b}
+.tier-2 .tier-label{color:#8a5300}
+.tier-1 .tier-label{color:#00875a}
+
+.tier-title{font-size:24px;font-weight:800;margin-bottom:8px}
+.tier-desc{font-size:18px;line-height:1.4}
+.tier-3 .tier-desc{color:#dbe2ea}
+.tier-2 .tier-desc{color:#4b5563}
+.tier-1 .tier-desc{color:#4b5563}
+
+/* Right Column: Table & Tip */
+.right-col{display:flex;flex-direction:column;gap:24px}
+.table-wrap{background:#fff;border:1px solid #d7dce2;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px}
+.table-title{font-size:22px;font-weight:700;color:#131921;margin-top:0;margin-bottom:16px}
+.table{width:100%;border-collapse:collapse;font-size:18px;text-align:left}
+.table th{background:#131921;color:#fff;padding-top:12px;padding-left:14px;padding-right:14px;padding-bottom:12px}
+.table td{padding-top:14px;padding-left:14px;padding-right:14px;padding-bottom:14px;border-bottom:1px solid #d7dce2;color:#131921}
+.table tr:nth-child(even) td{background:#f1f3f5}
+
+.badge{display:inline-block;padding-top:4px;padding-bottom:4px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-l1{background:#eef8f3;color:#00875a;border:1px solid #00875a}
+.badge-l2{background:#fff8f0;color:#8a5300;border:1px solid #ff9900}
+.badge-l3{background:#fef2f2;color:#de350b;border:1px solid #de350b}
+
+.callout{background:#eef8f3;border-left:4px solid #00875a;color:#145c43;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px;font-size:20px;line-height:1.4;margin-top:auto}
+.callout strong{color:#131921}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 11 · Lesson 11.2</div>
+  <div class="title">The Permissions Ladder</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="ladder-wrap">
+      <div class="ladder-tier tier-3">
+        <div class="tier-label">Level 3: Stop & Ask</div>
+        <div class="tier-title">Strategy & Budget</div>
+        <div class="tier-desc">Requires manager approval before execution.</div>
+      </div>
+      
+      <div class="ladder-tier tier-2">
+        <div class="tier-label">Level 2: Do & Notify</div>
+        <div class="tier-title">Structural Changes</div>
+        <div class="tier-desc">Execute the task, but flag it in the weekly report.</div>
+      </div>
+      
+      <div class="ladder-tier tier-1">
+        <div class="tier-label">Level 1: Independent</div>
+        <div class="tier-title">Routine Optimization</div>
+        <div class="tier-desc">Execute silently as part of the standard SOP.</div>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="table-wrap">
+        <h2 class="table-title">Task Mapping</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Permission Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Adding negative keywords</td>
+              <td><span class="badge badge-l1">Level 1</span></td>
+            </tr>
+            <tr>
+              <td>Micro bid adjustments (±10%)</td>
+              <td><span class="badge badge-l1">Level 1</span></td>
+            </tr>
+            <tr>
+              <td>Launching new exact campaigns</td>
+              <td><span class="badge badge-l2">Level 2</span></td>
+            </tr>
+            <tr>
+              <td>Pausing a core campaign</td>
+              <td><span class="badge badge-l3">Level 3</span></td>
+            </tr>
+            <tr>
+              <td>Increasing budget by >20%</td>
+              <td><span class="badge badge-l3">Level 3</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="callout">
+        <strong>Coach tip:</strong> Trust is earned through transparency. Never guess on a Level 3 task. A good VA knows exactly where their authority ends.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Professional Operations · 11.2 The Permissions Ladder</div>
+  <div class="page">09 / 12</div>
+</div>
+</body>
+</html>

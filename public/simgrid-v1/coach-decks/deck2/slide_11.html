@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:40px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:16px}
+
+.layout{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;margin-top:24px}
+
+/* Left Column: Matrix */
+.matrix-container{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;background:#fff;border:1px solid #d7dce2;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px;min-height:400px}
+.quadrant{padding-top:12px;padding-left:12px;padding-right:12px;padding-bottom:12px;background:#f1f3f5;border-top:4px solid #131921;display:flex;flex-direction:column}
+.quadrant.q-tl{border-top-color:#ff9900} /* Low CTR, High Conv */
+.quadrant.q-tr{border-top-color:#00875a;background:#eef8f3} /* High CTR, High Conv */
+.quadrant.q-bl{border-top-color:#de350b;background:#fef2f2} /* Low CTR, Low Conv */
+.quadrant.q-br{border-top-color:#ff9900} /* High CTR, Low Conv */
+
+.q-symptom{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:700;margin-bottom:6px}
+.q-suspect{font-size:18px;font-weight:700;color:#131921;margin-bottom:8px}
+.q-fix{font-size:15px;color:#4b5563;line-height:1.4;margin-top:auto}
+
+/* Right Column: Mistakes & Tip */
+.right-col{display:flex;flex-direction:column;gap:20px}
+
+.mistakes-box{background:#fff;border:1px solid #d7dce2;border-top:6px solid #de350b;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px}
+.mistakes-title{font-size:20px;font-weight:700;color:#131921;margin-top:0;margin-bottom:12px;display:flex;align-items:center}
+.mistakes-title::before{content:"⚠️";margin-right:10px}
+.mistakes-list{list-style:none;padding-left:0;margin:0}
+.mistakes-list li{font-size:17px;color:#131921;line-height:1.4;margin-bottom:10px;display:flex;align-items:flex-start}
+.mistakes-list li::before{content:"✕";color:#de350b;font-weight:bold;margin-right:12px}
+
+.callout{background:#eef8f3;border-left:4px solid #00875a;color:#145c43;padding-top:16px;padding-left:16px;padding-right:16px;padding-bottom:16px;font-size:17px;line-height:1.4}
+.callout strong{color:#131921}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 5 · Lesson 5.3</div>
+  <div class="title">Diagnosing Conversion Leaks</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="matrix-container">
+      <div class="quadrant q-tl">
+        <div class="q-symptom">Low CTR + High Conv</div>
+        <div class="q-suspect">Weak hook, strong page</div>
+        <div class="q-fix"><strong>Fix:</strong> Better main image and title to attract more clicks.</div>
+      </div>
+      <div class="quadrant q-tr">
+        <div class="q-symptom">High CTR + High Conv</div>
+        <div class="q-suspect" style="color:#00875a">It works</div>
+        <div class="q-fix"><strong>Fix:</strong> Scale carefully. Increase budget or bids slightly.</div>
+      </div>
+      <div class="quadrant q-bl">
+        <div class="q-symptom">Low CTR + Low Conv</div>
+        <div class="q-suspect" style="color:#de350b">Wrong targeting or offer</div>
+        <div class="q-fix"><strong>Fix:</strong> Refine keywords and improve the page content.</div>
+      </div>
+      <div class="quadrant q-br">
+        <div class="q-symptom">High CTR + Low Conv</div>
+        <div class="q-suspect">Page or price issue</div>
+        <div class="q-fix"><strong>Fix:</strong> Improve reviews, price, or A+ content. Do not raise bids.</div>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="mistakes-box">
+        <h2 class="mistakes-title">Common Mistakes</h2>
+        <ul class="mistakes-list">
+          <li>Raising bids to fix a listing problem.</li>
+          <li>Adding more keywords to a page that cannot convert.</li>
+          <li>Copying a competitor's price without having their review count.</li>
+        </ul>
+      </div>
+      
+      <div class="callout">
+        <strong>Coach tip:</strong> The symptom table is your stethoscope. Use symptoms to find the leak before prescribing fixes. Diagnose, then prescribe.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Listing Readiness · 5.3 Diagnosing Conversion Leaks</div>
+  <div class="page">11 / 12</div>
+</div>
+</body>
+</html>

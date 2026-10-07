@@ -1,22 +1,25 @@
-/**
+﻿/**
  * signup.test.ts — TDD coverage for /api/auth/signup route (STORY-066 follow-up).
  *
  * The route is a thin shell that:
  * 1. Parses formData (email, password, firstName, lastName)
  * 2. Calls performSignUp with the production container
  * 3. Sets the auth cookie on the redirect response
- * 4. Returns 303 to /dashboard
+ * 4. Returns 303 to /welcome (no tier) or /checkout?pricingTier=<tier>
+ *    (tier selected) — STORY-146 moved the no-tier destination from
+ *    /dashboard to /welcome so new students are routed through the
+ *    onboarding wizard.
  *
  * The hard part — and the part that has been broken since the STORY-066
  * refactor — is step 3. `setAuthCookie` (via `cookies().set()` from
  * `next/headers`) attaches the cookie to the *implicit* response, but the
  * route returns a fresh `NextResponse.redirect()`. That new response does
- * not inherit the cookies. The user ends up on /dashboard without a
+ * not inherit the cookies. The user ends up on /welcome without a
  * session cookie, gets redirected by the proxy to /login, and the E2E
  * "happy path" test in tests/e2e/signup.spec.ts fails with:
  *
- *   Expected pattern: /\/dashboard$/
- *   Received string:  "http://localhost:3000/login?redirect=%2Fdashboard"
+ *   Expected pattern: /\/welcome$/
+ *   Received string:  "http://localhost:3000/login?redirect=%2Fwelcome"
  *
  * The fix: set the cookie on the response we return (response.cookies.set),
  * not on the implicit response. This file pins the contract.
@@ -104,7 +107,9 @@ beforeEach(() => {
 });
 
 describe("POST /api/auth/signup — happy path", () => {
-  it("returns 303 to /dashboard on success", async () => {
+  it("returns 303 to /welcome on success when no tier is selected", async () => {
+    // STORY-146: no-tier signups are routed through the onboarding
+    // wizard at /welcome instead of straight into the dashboard.
     const request = makeSignupRequest({
       email: "u@example.com",
       password: "Str0ngP@ss123!",
@@ -113,14 +118,31 @@ describe("POST /api/auth/signup — happy path", () => {
     });
     const response = await POST(request);
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toContain("/dashboard");
+    expect(response.headers.get("location")).toBe("https://example.com/welcome");
+  });
+
+  it("returns 303 to /checkout?pricingTier=<tier> when a tier is selected", async () => {
+    // Tier-selected signups continue to bypass /welcome and land on
+    // the purchase-intent /checkout page, unchanged by STORY-146.
+    const request = makeSignupRequest({
+      email: "buyer@example.com",
+      password: "Str0ngP@ss123!",
+      firstName: "Buyer",
+      lastName: "User",
+      tier: "starter",
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/checkout?pricingTier=starter",
+    );
   });
 
   it("sets the amph_session cookie on the redirect response", async () => {
     // The bug we're fixing: cookies set via cookies().set() are LOST when
     // the route returns NextResponse.redirect(). The fix is to set the
     // cookie on the response itself, so it travels with the 303 back to
-    // the browser. Without this, the user lands on /dashboard without a
+    // the browser. Without this, the user lands on /welcome without a
     // session and gets bounced to /login by the proxy.
     const request = makeSignupRequest({
       email: "u@example.com",

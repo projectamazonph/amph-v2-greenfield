@@ -71,6 +71,7 @@ import type {
 } from "@/domain/simulator/campaign-builder/CampaignBuilderOutput";
 import { XPService } from "@/domain/services/XPService";
 import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
+import { friendlySimulatorError } from "@/lib/studentErrorCopy";
 import { campaignBuilderScenarioContentSchema } from "./scenarioContent";
 
 // ── Input types ─────────────────────────────────────────────────────────
@@ -213,7 +214,10 @@ export async function campaignBuilderAttempt(
   if (Result.isErr(startResult)) {
     return {
       ok: false,
-      error: { kind: "attempt_error", message: startResult.error.kind },
+      error: {
+        kind: "attempt_error",
+        message: friendlySimulatorError(startResult.error.kind, "attempt"),
+      },
     };
   }
 
@@ -273,7 +277,10 @@ export async function campaignBuilderAttempt(
     if (Result.isErr(submitResult)) {
       return {
         ok: false,
-        error: { kind: "attempt_error", message: submitResult.error.kind },
+        error: {
+          kind: "attempt_error",
+          message: friendlySimulatorError(submitResult.error.kind, "attempt"),
+        },
       };
     }
 
@@ -297,8 +304,8 @@ export async function campaignBuilderAttempt(
           kind: "grading_error",
           message:
             gradeResult.error.kind === "invalid_dimensions"
-              ? `invalid dimensions: ${gradeResult.error.missing.join(", ")}`
-              : gradeResult.error.kind,
+              ? `We couldn't score this attempt — missing dimensions: ${gradeResult.error.missing.join(", ")}`
+              : friendlySimulatorError(gradeResult.error.kind, "grading"),
         },
       };
     }
@@ -308,7 +315,10 @@ export async function campaignBuilderAttempt(
     if (Result.isErr(feedbackResult)) {
       return {
         ok: false,
-        error: { kind: "feedback_error", message: feedbackResult.error.kind },
+        error: {
+          kind: "feedback_error",
+          message: friendlySimulatorError(feedbackResult.error.kind, "feedback"),
+        },
       };
     }
     feedback = {

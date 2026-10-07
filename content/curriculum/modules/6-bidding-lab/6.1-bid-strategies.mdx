@@ -16,13 +16,25 @@ After this lesson, you can pick Fixed Bids, Dynamic Up and Down, or Dynamic Down
 
 Match the bid strategy to how much conversion data and margin cushion you have. Less data or thinner margin points to Fixed Bids or Dynamic Down Only. More data and healthier margin points to Dynamic Up and Down.
 
+:::callout{id="lesson-6-1-pitfall" variant="pitfall" title="Trusting Fixed Bids to control CPC under volatile competition"}
+Fixed Bids cap what you pay per click, but they also cap how aggressively you bid in a competitive auction. Under volatile competitor pressure, Dynamic Bids, Up and Down lets Amazon adjust up to capture high-conversion traffic and down on the rest, while Fixed Bids holds the cap regardless.
+:::
+
+<SelfCheck
+  id="sc-6-1"
+  prompt="Which bid strategy can make your actual cost per click exceed the bid you typed in?"
+  options={["Fixed Bids", "Dynamic Bids, Down Only", "Dynamic Bids, Up and Down", "All three equally"]}
+  answerIndex={2}
+  explanation="Of the three strategies, only Up and Down raises above your base bid, up to 100% at top of search and up to 50% at other placements. Down Only can only move your bid down from the number you set. A placement adjustment you set yourself is a separate control and still applies to either."
+/>
+
 Your bid is the maximum you're willing to pay for a click. But what actually happens in the auction depends on your **bid strategy**, the rule Amazon follows when deciding how much to charge you. Choose the right strategy and you'll win more profitable clicks. Choose wrong and you'll either overspend or miss opportunities.
 
 Think of Amazon's three bid strategies like three ways to pay for a taxi:
 
 - **Fixed Bids** = flat-rate ride share. You know the price upfront. No surprises.
 - **Dynamic Up and Down** = surge pricing. When demand is high (high chance of conversion), the price goes up. When it's slow, the price drops.
-- **Dynamic Down Only** = flat-rate with a smart discount. The price never exceeds your set rate, but the driver might knock a few dollars off during slow periods.
+- **Dynamic Down Only** = flat-rate with a smart discount. The price never exceeds your set rate, but the driver might knock a few pesos off during slow periods.
 
 ## How Amazon's Auction Actually Works
 
@@ -38,7 +50,7 @@ The actionable version: set a defensible maximum bid based on your maximum-CPC m
 
 ## Strategy 1: Fixed Bids (The Flat-Rate Taxi)
 
-**What it does**: Amazon uses your exact bid amount. No adjustments based on placement or conversion likelihood.
+**What it does**: Amazon uses your exact bid amount. It never raises your bid based on conversion likelihood. A placement adjustment you set yourself is a separate control and still applies, as it does with every strategy.
 
 **When to use it**:
 - You're just starting and want predictable costs
@@ -207,7 +219,7 @@ Use this when a client asks why a brand-new product's campaign is set to the con
 3. You have a new campaign with zero data. Which two strategies are safest?
 4. Your product has a razor-thin 15% margin and a 14% ACoS. Which strategy fits best?
 
-**Answers:** (1) Dynamic Down Only guarantees your bid ceiling. (2) Dynamic Up and Down can increase your bid up to 100% at standard placements. (3) Fixed Bids or Dynamic Down Only are safest for new campaigns. (4) Down Only or Fixed, since you can't afford CPC above your ceiling.
+**Answers:** (1) Fixed Bids or Dynamic Down Only. Neither lets the bid strategy raise your set bid, though a placement adjustment you layer on top still applies to either. (2) Dynamic Up and Down can raise your bid up to 100% at top of search but only up to 50% at other placements, so there is no single ceiling. (3) Fixed Bids or Dynamic Down Only are safest for new campaigns. (4) Down Only or Fixed, since you can't afford CPC above your ceiling.
 
 ## What to read next
 
@@ -223,7 +235,7 @@ What the learner can do: Set a maximum bid and choose a bid strategy (Fixed, Dyn
 Who can access it: All Sponsored Products advertisers
 Retailer or marketplace scope: Amazon Advertising Console. Exact auction mechanics are not publicly documented and are not identical across marketplaces
 Official source URL: https://advertising.amazon.com/help/GCU2BUWJH2W3A8Z7
-Last verified: [content owner to fill in at rewrite time]
-Next review due: [content owner to fill in at rewrite time]
-Owner: [content owner]
+Last verified: 2026-09-25
+Next review due: 2026-01-25
+Owner: Ryan Roland Dabao
 ```

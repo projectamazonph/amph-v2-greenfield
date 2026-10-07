@@ -1,0 +1,19 @@
+.notice {
+  padding: 12px 14px;
+  background: var(--success-soft);
+  color: var(--ink-900);
+  border: 1px solid var(--success-hover);
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.notice p {
+  margin: 0;
+}
+
+.link {
+  color: var(--success);
+  font-weight: 600;
+  text-decoration: underline;
+}

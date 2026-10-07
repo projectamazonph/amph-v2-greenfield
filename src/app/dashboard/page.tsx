@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /dashboard — authenticated student dashboard.
  *
  * P0-4 fix: this route did not exist; signup/login redirects to
@@ -13,10 +13,15 @@
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { buildContainer } from "@/composition/container";
+import { displayName } from "@/lib/displayName";
 import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
+import { NewUserDashboard } from "@/components/student/NewUserDashboard";
+import { DashboardHeroStats } from "@/components/student/DashboardHeroStats";
+import { PracticeProgressCard } from "@/components/practice/PracticeProgressCard";
 import { nextIncompleteLesson } from "@/app/courses/[slug]/lessons/getLessonData";
 import { CourseCover } from "@/components/student/CourseCover";
+import { hasCompletedWelcome } from "@/domain/entities/User";
 import type { Course } from "@/domain/entities/Course";
 import type { Enrollment } from "@/domain/entities/Enrollment";
 import styles from "./page.module.css";
@@ -26,6 +31,11 @@ export const dynamic = "force-dynamic";
 interface CourseWithEnrollment {
   course: Course;
   enrollment: Enrollment;
+}
+
+interface HeroStats {
+  totalXp: number;
+  activeDaysOutOfFive: number;
 }
 
 async function loadEnrollmentsWithCourses(userId: string): Promise<CourseWithEnrollment[]> {
@@ -50,10 +60,45 @@ async function loadEnrollmentsWithCourses(userId: string): Promise<CourseWithEnr
   return results.filter((r): r is CourseWithEnrollment => r !== null);
 }
 
+async function loadDashboardHeroStats(userId: string): Promise<HeroStats> {
+  const container = buildContainer();
+  const fallback: HeroStats = { totalXp: 0, activeDaysOutOfFive: 0 };
+
+  const xpResult = await container.xpEventRepo.findByUserId(userId);
+  if (!xpResult.ok) return fallback;
+
+  const events = xpResult.value;
+  const totalXp = events.reduce((sum, e) => sum + e.amount, 0);
+
+  // Build the most-recent 5 days set from XP events. We bucket by UTC
+  // date so a learner crossing midnight in a single session still counts
+  // as one day; the streak service uses the same convention.
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const dayKeys: string[] = [];
+  for (let offset = 0; offset < 5; offset += 1) {
+    const d = new Date(today);
+    d.setUTCDate(today.getUTCDate() - offset);
+    dayKeys.push(d.toISOString().slice(0, 10));
+  }
+
+  const activeDays = new Set<string>();
+  for (const event of events) {
+    const key = new Date(event.createdAt).toISOString().slice(0, 10);
+    if (dayKeys.includes(key)) activeDays.add(key);
+  }
+
+  return {
+    totalXp,
+    activeDaysOutOfFive: activeDays.size,
+  };
+}
+
 export default async function DashboardPage() {
   const user = await requireAuth();
 
   const pairs = await loadEnrollmentsWithCourses(user.id);
+  const heroStats = await loadDashboardHeroStats(user.id);
 
   // "Continue learning" = in-progress (0 < progress < 100)
   const inProgress = pairs.filter(
@@ -61,6 +106,25 @@ export default async function DashboardPage() {
   );
   // "All my courses" includes everything (active, in-progress, completed)
   const allActive = pairs.filter((p) => p.enrollment.status === "active");
+
+  // STORY-146 / Task 10: students who haven't completed the welcome tour
+  // AND have no active enrollments get a first-run variant instead of the
+  // regular dashboard. The session-loaded `User` already carries
+  // `welcomeCompletedAt`, but we re-fetch via `userRepo.findById` to keep
+  // parity with `/welcome` (Task 9) and to surface a stale-cookie /
+  // deleted-account case as "fall through to the regular dashboard"
+  // rather than rendering the variant with phantom data.
+  const foundFresh = await buildContainer().userRepo.findById(user.id);
+  const effectiveUser = foundFresh.ok ? foundFresh.value : user;
+  const isNewUser = !hasCompletedWelcome(effectiveUser) && allActive.length === 0;
+
+  if (isNewUser) {
+    return (
+      <StudentShell user={user}>
+        <NewUserDashboard user={user} />
+      </StudentShell>
+    );
+  }
 
   // Resume the newest active course at its next incomplete lesson. If a
   // learner has not completed anything yet, this deliberately becomes a
@@ -70,8 +134,7 @@ export default async function DashboardPage() {
     .slice()
     .sort(
       (a, b) =>
-        new Date(b.enrollment.createdAt).getTime() -
-        new Date(a.enrollment.createdAt).getTime(),
+        new Date(b.enrollment.createdAt).getTime() - new Date(a.enrollment.createdAt).getTime(),
     )[0];
   const resumeLesson = resumePair
     ? nextIncompleteLesson(
@@ -86,33 +149,75 @@ export default async function DashboardPage() {
       <main id="main-content" tabIndex={-1} className={styles.page}>
         {/* Welcome */}
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>Welcome back, {user.firstName}.</h1>
-          <p className={styles.heroSubtitle}>
-            {allActive.length === 0
-              ? "You haven't started any courses yet."
-              : `You're enrolled in ${allActive.length} course${allActive.length === 1 ? "" : "s"}.`}
-          </p>
+          <div className={styles.heroText}>
+            <h1 className={styles.heroTitle}>Welcome back, {displayName(user.firstName)}.</h1>
+            <p className={styles.heroSubtitle}>
+              {allActive.length === 0
+                ? "You haven't started any courses yet."
+                : `You're enrolled in ${allActive.length} course${allActive.length === 1 ? "" : "s"}.`}
+            </p>
+          </div>
+          <DashboardHeroStats
+            totalXp={heroStats.totalXp}
+            activeDaysOutOfFive={heroStats.activeDaysOutOfFive}
+          />
         </header>
 
         {resumePair && resumeLesson && (
           <section className={styles.continueCard} aria-labelledby="continue-learning-title">
-            <div className={styles.continueEyebrow}>
-              {resumePair.enrollment.progressPercent === 0
-                ? "Start your course"
-                : "Pick up where you left off"}
+            <div className={styles.continueCardCover} aria-hidden="true">
+              <CourseCover
+                title={resumePair.course.title}
+                slug={resumePair.course.slug}
+                coverImage={resumePair.course.coverImage}
+                width={1280}
+                height={420}
+              />
+              <span className={styles.continueCardScrim} />
             </div>
-            <h2 id="continue-learning-title" className={styles.continueTitle}>
-              {resumePair.course.title}
-            </h2>
-            <p className={styles.continueLesson}>
-              Next up: <strong>{resumeLesson.title}</strong>
-            </p>
-            <Link
-              href={`/courses/${resumePair.course.slug}/lessons/${resumeLesson.id}`}
-              className={styles.continueBtn}
+            <div className={styles.continueCardBody}>
+              <div className={styles.continueCardMeta}>
+                <span className={styles.continueStatusPill}>
+                  {resumePair.enrollment.progressPercent === 0 ? "Start here" : "In progress"}
+                </span>
+                <span className={styles.continuePct}>
+                  {resumePair.enrollment.progressPercent}% complete
+                </span>
+              </div>
+              <h2 id="continue-learning-title" className={styles.continueTitle}>
+                {resumePair.course.title}
+              </h2>
+              <p className={styles.continueLesson}>
+                Next up: <strong>{resumeLesson.title}</strong>
+              </p>
+              <div className={styles.continueCardActions}>
+                <Link
+                  href={`/courses/${resumePair.course.slug}/lessons/${resumeLesson.id}`}
+                  className={styles.continueBtn}
+                >
+                  {resumePair.enrollment.progressPercent === 0
+                    ? "Start lesson"
+                    : "Continue learning"}
+                </Link>
+                <Link href="/portfolio" className={styles.portfolioLink}>
+                  View portfolio
+                </Link>
+              </div>
+            </div>
+            <div
+              className={styles.continueProgressTrack}
+              role="progressbar"
+              aria-label={`Continue learning progress: ${resumePair.course.title} ${resumePair.enrollment.progressPercent}% complete`}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={resumePair.enrollment.progressPercent}
             >
-              {resumePair.enrollment.progressPercent === 0 ? "Start lesson" : "Continue learning"}
-            </Link>
+              <span
+                className={styles.continueProgressFill}
+                style={{ width: `${resumePair.enrollment.progressPercent}%` }}
+                aria-hidden="true"
+              />
+            </div>
           </section>
         )}
 
@@ -167,7 +272,9 @@ export default async function DashboardPage() {
         {/* My courses */}
         <section className={styles.section} aria-labelledby="my-courses-title">
           <div className={styles.sectionHeader}>
-            <h2 id="my-courses-title" className={styles.sectionTitle}>My courses</h2>
+            <h2 id="my-courses-title" className={styles.sectionTitle}>
+              My courses
+            </h2>
             <Link href="/courses" className={styles.browseLink}>
               Browse the catalog <ArrowRight size={16} aria-hidden />
             </Link>
@@ -206,7 +313,9 @@ export default async function DashboardPage() {
 
         {/* Quick Actions */}
         <section className={styles.section} aria-labelledby="quick-actions-title">
-          <h2 id="quick-actions-title" className={styles.sectionTitle}>Quick Actions</h2>
+          <h2 id="quick-actions-title" className={styles.sectionTitle}>
+            Quick Actions
+          </h2>
           <div className={styles.quickActions}>
             <Link href="/courses" className={styles.quickBtn}>
               Browse Catalog
@@ -219,6 +328,13 @@ export default async function DashboardPage() {
             </Link>
           </div>
         </section>
+
+        {/* SimGrid practice (Task 9) — async server component; lists
+            every simulator alongside the viewer's best score. Placed
+            after the existing tool cards and before the page footer
+            so students see their practice without leaving the
+            dashboard. */}
+        <PracticeProgressCard />
       </main>
     </StudentShell>
   );

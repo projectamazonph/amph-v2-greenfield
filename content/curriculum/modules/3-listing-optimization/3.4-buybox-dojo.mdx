@@ -1,0 +1,94 @@
+﻿---
+title: "BuyBox Dojo: Listing Fundamentals and the 7-Day Pressure Test"
+slug: "3.4-buybox-dojo"
+moduleNumber: 3
+lessonNumber: 4
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow a listing-focused PPC operator runs in production, name the four facts the pressure test depends on, and read the simulator's grade for listing readiness before you spend real money.
+
+## Why this workflow exists
+
+In a real Amazon Ads account, the cheapest way to lose money is to turn on ads against a listing that cannot carry the traffic. A weak listing burns spend on clicks that never order. A strong listing makes the same clicks profitable.
+
+The BuyBox Dojo simulates the workflow a senior PPC operator runs before turning a campaign on. The sim is the practice surface. The lesson is the workflow: research the product, pick the right match types, write the negatives that protect the launch, then put the listing under a 7-day PPC pressure test to see if it can carry traffic at the bid and budget you have.
+
+## The decision in one sentence
+
+A listing that cannot carry traffic will not be saved by better bidding. The decision is to run the 7-day pressure test before scaling, not after.
+
+## What the workflow looks like end to end
+
+A production operator who runs this workflow for real does four things, in order:
+
+1. **Research the product.** Confirm the ASIN, the price, the offer, the stock, the reviews, and the category. If any of those facts is missing, the pressure test is guesswork.
+2. **Pick the match types.** Auto campaign for discovery, plus exact and phrase campaigns for the search terms you already know convert. The mix depends on the launch stage and the data you have.
+3. **Write the negatives.** Start with the obvious ones for the category (wrong product, wrong use case, wrong audience). Add more after the first week of search-term data.
+4. **Run a 7-day pressure test.** Spend at the daily budget the client approved. Watch impressions, clicks, CTR, CVR, and ACoS, plus the listing-side signals (review velocity, BSR, sessions). At day 7, decide whether the listing can carry the next budget step.
+
+The decision at day 7 is one of three:
+
+- **Scale.** The listing converts at or below target ACoS, with enough volume to justify a budget step up.
+- **Hold.** The listing is fine but the data is not enough yet. Stay at the current budget and review in another 7 days.
+- **Fix the listing.** Conversion is weak despite relevant traffic. Pause the budget step, hand the listing back to the client, and document the specific finding (image, price, reviews, offer).
+
+## Worked example
+
+The workflow above is the walkthrough a real operator runs in production. Step through it once on the sim, name each step in your own words, and record the deliverable you would hand to the client.
+
+## How to read the simulator's feedback
+
+BuyBox Dojo scores you against four signals:
+
+- **Research quality.** Did you confirm the four intake questions (product, objective, budget, approval) before you turned anything on?
+- **Match-type mix.** Did you pick a mix that fits the launch stage?
+- **Negative list.** Did you protect the launch from the obvious waste?
+- **Pressure test decision.** At day 7, did you make the right Scale / Hold / Fix call given the data?
+
+A high score with a weak listing is still a weak listing. The sim cannot fix a bad product page. What it can do is show whether you recognized the listing problem before you burned more spend.
+
+## Your turn
+
+Open the BuyBox Dojo at `/practice/simgrid/listing.html`. Pick one product brief and run the workflow end to end. At day 7, write your Scale, Hold, or Fix decision in one sentence, name the signal that drove the call, and the one action you would take next.
+
+## Fact card
+
+```text
+Product or feature: BuyBox Dojo, listing readiness + 7-day PPC pressure test (SimGrid `listing` simulator)
+What the learner can do: Confirm listing readiness before turning on a Sponsored Products campaign at scale
+Who can access it: Any signed-in student; the sim is free and has no enrollment gate (no enrollment gate)
+Retailer or marketplace scope: General Amazon Sponsored Products practice; the 7-day window is a teaching heuristic, not an Amazon-defined review cadence
+Official source URL: https://advertising.amazon.com (Campaign Manager entry; review flow surfaces in later lessons)
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-3-4-pitfall" variant="pitfall" title="Treating a high sim score as proof the listing is ready"}
+The simulator grades your workflow, not the listing itself. A listing that scores well in the sim can still fail on price, reviews, or stock in a real account.
+:::
+
+<SelfCheck
+  id="sc-3-4"
+  prompt="At day 7 of the pressure test, CTR is healthy but CVR is below category average. What is the right next move?"
+  options={["Raise the budget and push for more impressions.", "Step back, fix the listing surface (image, price, reviews), and hold the budget step.", "Pause every keyword in the ad group and wait.", "Move to a Sponsored Brands campaign instead."]}
+  answerIndex={1}
+  explanation="Healthy CTR with weak CVR points to a listing problem, not a targeting problem. The right move is to fix the conversion surface, not to buy more traffic."
+/>
+
+## Evidence
+
+The Check section below names the artifact that proves the workflow ran end to end. Bring that artifact to the next client review so the work is reviewable, not just the round score.
+
+## Check
+
+A strong answer names the research facts first, the match-type mix that fits the launch stage, the negative list that protects the launch, and the day-7 Scale / Hold / Fix call with the signal that drove it. If any of those pieces is missing, the workflow is grounded in guesswork rather than evidence.
+
+## Key takeaway
+
+A listing that cannot carry traffic will not be saved by better bidding. The workflow is research, match types, negatives, then a 7-day pressure test. The decision at day 7 is the one that protects the client's spend.

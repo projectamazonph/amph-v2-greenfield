@@ -1,0 +1,61 @@
+/**
+ * PracticeFrame styles — Task 14 (simulator UI refactor).
+ *
+ * Mirrors the iframe shell used by /tools/ad-console
+ * (src/app/tools/ad-console/page.module.css:115-133) so the embedded
+ * simulator feels native to the rest of the student app, and reuses
+ * the project-wide design tokens defined in src/app/globals.css.
+ *
+ * Height strategy:
+ *   The wrapper page (src/app/practice/[...slug]/page.tsx) sets a
+ *   min-height on its main. This frame fills the page width and
+ *   `flex: 1`, so the iframe height is driven by the page's
+ *   min-height — NOT by a fixed viewport calc. The previous
+ *   `height: calc(100dvh - 220px)` was clipping tall simulators
+ *   (BuyBox Dojo's listing form, the full Ad Console layout) and
+ *   showing empty space on shorter ones (Bulk File, SQP Studio).
+ *   Letting the wrapper set the min-height keeps the iframe content
+ *   visible without skewing the simulator view.
+ *
+ *   The 600px floor covers short laptop viewports where the wrapper
+ *   page is shorter than the sim. The mobile 420px floor matches
+ *   /tools/ad-console's mobile iframe floor.
+ */
+
+.frame {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--sh-2);
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-0);
+}
+
+@media (max-width: 767px) {
+  .frame {
+    min-height: 420px;
+  }
+}
+
+.iframe {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border: 0;
+  display: block;
+}
+
+.status {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  padding: var(--space-2) var(--space-4);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

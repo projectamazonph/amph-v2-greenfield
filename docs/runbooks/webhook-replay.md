@@ -26,7 +26,7 @@ This means a stored `rawPayload` cannot be replayed with its **original** signat
 
 ## Diagnosis
 
-1. Find the event to replay. Every inbound webhook (including ones that failed signature verification) is persisted — see `docs/audit-2026-07-26-hardening-review.md` and the `WebhookEvent` Prisma model:
+1. Find the event to replay. Every inbound webhook (including ones that failed signature verification) is persisted, by `src/infra/repositories/PrismaWebhookEventLog.ts` into the `WebhookEvent` Prisma model. (This step used to point at `docs/audit-2026-07-26-hardening-review.md`, the review that first recorded the gap; that file was removed on 2026-09-14 by `e1f7352`.):
    ```sql
    SELECT id, provider, "eventType", "providerEventId", "signatureValid",
           "processedAt", "processingError", "createdAt"

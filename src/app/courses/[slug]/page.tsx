@@ -15,6 +15,7 @@
  */
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { StudentShell } from "@/components/student/StudentShell";
 import { notFound } from "next/navigation";
@@ -39,7 +40,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const container = buildContainer();
   const result = await container.getCatalogCourse.execute(slug);
-  if (!result.ok) return { title: "Course Not Found | Project Amazon PH Academy" };
+  if (!result.ok) {
+    // A load failure is not a missing course. Keeping the two titles apart is
+    // what lets an operator tell a corrupt row from a typoed slug in logs and
+    // in the browser tab.
+    return {
+      title:
+        result.error.kind === "db_error"
+          ? "Course Unavailable | Project Amazon PH Academy"
+          : "Course Not Found | Project Amazon PH Academy",
+    };
+  }
   const detail = result.value;
   return {
     title: `${detail.title} | Project Amazon PH Academy`,
@@ -52,7 +63,29 @@ export default async function CourseDetailPage({ params }: PageProps) {
   const container = buildContainer();
   const result = await container.getCatalogCourse.execute(slug);
 
-  if (!result.ok) notFound();
+  if (!result.ok) {
+    if (result.error.kind === "db_error") {
+      // Same operational signal the catalog page logs: a load failure must be
+      // distinguishable from a real missing course in Vercel logs.
+      if (process.env.NODE_ENV !== "test") {
+        console.warn("[course:error] course load failed", result.error);
+      }
+
+      return (
+        <StudentShell requireAuth={false}>
+          <main id="main-content" tabIndex={-1} className={styles.errorPage}>
+            <h1 className={styles.errorTitle}>Course unavailable</h1>
+            <p className={styles.errorText}>
+              We could not load this course right now. Your account is unchanged.{" "}
+              <Link href="/courses">Go back to the catalog</Link> and try again.
+            </p>
+          </main>
+        </StudentShell>
+      );
+    }
+
+    notFound();
+  }
 
   const detail = result.value;
   const [user, quizzesResult] = await Promise.all([
@@ -104,7 +137,8 @@ export default async function CourseDetailPage({ params }: PageProps) {
   const hours = Math.floor(totalEstimatedMinutes / 60);
   const minutes = totalEstimatedMinutes % 60;
   const priceMoney = Money.of(detail.priceMinor, "PHP");
-  const priceDisplay = detail.priceMinor === 0 ? "FREE" : priceMoney.ok ? priceMoney.value.format("en-PH") : "FREE";
+  const priceDisplay =
+    detail.priceMinor === 0 ? "FREE" : priceMoney.ok ? priceMoney.value.format("en-PH") : "FREE";
 
   // P1-01: surface course prerequisites before purchase so a gated
   // enrollment is never a surprise. Best-effort: a rule-list failure
@@ -285,8 +319,14 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <details key={mod.id} className={styles.section} open={si === 0}>
                   <summary className={styles.sectionSummary}>
                     {coverImage && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={coverImage} alt="" className={styles.sectionCoverImage} />
+                      <Image
+                        src={coverImage}
+                        alt=""
+                        width={1600}
+                        height={900}
+                        className={styles.sectionCoverImage}
+                        loading="lazy"
+                      />
                     )}
                     <span className={styles.sectionTitle}>
                       Section {si + 1}: {mod.title}

@@ -109,6 +109,14 @@ export function SignupForm({
             <p className={styles.hint}>8+ chars, uppercase, number, and symbol recommended.</p>
           </div>
 
+          {/* Story-161: small terms + payment-method copy so the submit
+              button doesn't read like it does something the user didn't
+              agree to. Token-only copy. */}
+          <p className={styles.terms}>
+            By creating an account you accept the platform terms and the one-time payment for your
+            selected tier. PayMongo handles card and GCash payments.
+          </p>
+
           <Button type="submit" variant="primary" size="lg" style={{ width: "100%" }}>
             {tierSlug ? "Create account and continue" : "Create account"}
           </Button>

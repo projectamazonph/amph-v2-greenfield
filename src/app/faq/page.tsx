@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   title: "FAQ | Project Amazon PH Academy",
   description:
     "Ten honest questions to ask before you pay for Project Amazon PH Academy, answered plainly, including what still isn't finished.",
+  alternates: { canonical: "/faq" },
 };
 
 export default function FaqPage() {

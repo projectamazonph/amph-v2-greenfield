@@ -2,8 +2,12 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const ADMIN_ACTIONS = [
+  "adminDeleteUser",
+  "adminForceSignOut",
   "adminGrantSubscription",
   "adminSetEnrollmentStatus",
+  "adminSetUserPassword",
+  "adminUpdateUser",
   "archiveBadge",
   "archiveCourse",
   "archiveDiscountCode",

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+.layout{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;margin-top:40px}
+
+/* Left Column: Ladder */
+.ladder-wrap{display:flex;flex-direction:column;gap:16px;padding-top:20px}
+.ladder-title{font-size:24px;font-weight:700;color:#131921;margin-bottom:16px}
+
+.ladder-step{padding-top:20px;padding-left:24px;padding-right:24px;padding-bottom:20px;border:1px solid #d7dce2;min-height:110px;display:flex;flex-direction:column;justify-content:center}
+.step-1{width:70%;background:#f1f3f5;border-left:6px solid #64748b}
+.step-2{width:85%;background:#fff8f0;border-left:6px solid #ff9900}
+.step-3{width:100%;background:#fef2f2;border-left:6px solid #de350b}
+
+.step-clicks{font-size:22px;font-weight:800;margin-bottom:8px}
+.step-1 .step-clicks{color:#131921}
+.step-2 .step-clicks{color:#8a5300}
+.step-3 .step-clicks{color:#de350b}
+
+.step-action{font-size:18px;color:#4b5563;line-height:1.4}
+.step-3 .step-action{color:#131921;font-weight:700}
+
+/* Right Column: Explanation & Tip */
+.right-col{display:flex;flex-direction:column;gap:24px}
+
+.text-panel{background:#fff;border:1px solid #d7dce2;border-top:6px solid #131921;padding-top:30px;padding-left:30px;padding-right:30px;padding-bottom:30px}
+.panel-title{font-size:22px;font-weight:700;color:#131921;margin-top:0;margin-bottom:16px}
+.panel-text{font-size:20px;color:#4b5563;line-height:1.5;margin-bottom:16px}
+.panel-text:last-child{margin-bottom:0}
+.panel-text strong{color:#131921}
+
+.callout{background:#eef8f3;border-left:4px solid #00875a;color:#145c43;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px;font-size:20px;line-height:1.4;margin-top:auto}
+.callout strong{color:#131921}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 9 · Lesson 9.3</div>
+  <div class="title">How Much Data is Enough?</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="ladder-wrap">
+      <div class="ladder-title">The Click-Confidence Ladder</div>
+      
+      <div class="ladder-step step-1">
+        <div class="step-clicks">1–5 Clicks</div>
+        <div class="step-action">Noise. Do nothing.</div>
+      </div>
+      
+      <div class="ladder-step step-2">
+        <div class="step-clicks">10–15 Clicks</div>
+        <div class="step-action">Emerging pattern. Watch closely.</div>
+      </div>
+      
+      <div class="ladder-step step-3">
+        <div class="step-clicks">20+ Clicks (0 Sales)</div>
+        <div class="step-action">Clear failure. Negate or lower bid.</div>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="text-panel">
+        <h2 class="panel-title">Premature Optimization</h2>
+        <p class="panel-text">
+          Reacting to 2 or 3 clicks is reacting to randomness. 
+        </p>
+        <p class="panel-text">
+          A normal conversion rate is <strong>10%</strong>. That means <strong>9 out of 10 clicks will not buy</strong>. 
+        </p>
+        <p class="panel-text">
+          If you pause a keyword after 3 clicks, you kill potential winners before the math has a chance to work.
+        </p>
+      </div>
+      
+      <div class="callout">
+        <strong>Coach tip:</strong> Patience saves profit. Wait for statistical significance (usually 15–20 clicks) before declaring a keyword a waster.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Weekly Optimization · 9.3 How Much Data is Enough?</div>
+  <div class="page">04 / 12</div>
+</div>
+</body>
+</html>

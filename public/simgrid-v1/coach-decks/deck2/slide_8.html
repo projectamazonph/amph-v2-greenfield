@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+.layout{display:grid;grid-template-columns:450px 1fr;gap:30px;margin-top:30px}
+
+/* Left Column: Process Steps */
+.process-list{display:flex;flex-direction:column;gap:16px}
+.process-step{background:#fff;border:1px solid #d7dce2;border-left:6px solid #131921;padding-top:16px;padding-left:20px;padding-right:20px;padding-bottom:16px}
+.step-header{display:flex;align-items:center;margin-bottom:8px}
+.step-num{font-size:16px;font-weight:700;color:#ff9900;margin-right:12px;text-transform:uppercase;letter-spacing:1px}
+.step-title{font-size:20px;font-weight:700;color:#131921}
+.step-desc{font-size:18px;color:#4b5563;line-height:1.4;margin:0}
+
+/* Right Column: Table & Tip */
+.right-col{display:flex;flex-direction:column;gap:24px}
+.table-wrap{background:#fff;border:1px solid #d7dce2;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px}
+.table-title{font-size:22px;font-weight:700;color:#131921;margin-top:0;margin-bottom:16px}
+.table{width:100%;border-collapse:collapse;font-size:17px;text-align:left}
+.table th{background:#131921;color:#fff;padding-top:12px;padding-left:12px;padding-right:12px;padding-bottom:12px}
+.table td{padding-top:14px;padding-left:12px;padding-right:12px;padding-bottom:14px;border-bottom:1px solid #d7dce2;color:#131921}
+.table tr:nth-child(even) td{background:#f1f3f5}
+.risk{color:#de350b;font-weight:700}
+.safe{color:#00875a;font-weight:700}
+
+.callout{background:#fff8f0;border-left:4px solid #ff9900;color:#8a5300;padding-top:18px;padding-left:18px;padding-right:18px;padding-bottom:18px;font-size:18px;line-height:1.4}
+.callout strong{color:#131921}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 4 · Lesson 4.4</div>
+  <div class="title">Keyword Research Starter Process</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="process-list">
+      <div class="process-step">
+        <div class="step-header">
+          <span class="step-num">Step 01</span>
+          <span class="step-title">Write seed words</span>
+        </div>
+        <p class="step-desc">Identify the core product, material, use case, and size.</p>
+      </div>
+      <div class="process-step">
+        <div class="step-header">
+          <span class="step-num">Step 02</span>
+          <span class="step-title">Think like the shopper</span>
+        </div>
+        <p class="step-desc">Consider specific problems, gift recipients, or rooms.</p>
+      </div>
+      <div class="process-step">
+        <div class="step-header">
+          <span class="step-num">Step 03</span>
+          <span class="step-title">Prefer long-tail</span>
+        </div>
+        <p class="step-desc">More words mean clearer intent and less competition.</p>
+      </div>
+      <div class="process-step">
+        <div class="step-header">
+          <span class="step-num">Step 04</span>
+          <span class="step-title">Prioritize relevance</span>
+        </div>
+        <p class="step-desc">Relevance always comes first, then search volume.</p>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="table-wrap">
+        <h2 class="table-title">Short-tail vs. Long-tail Economics</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Example</th>
+              <th>Volume</th>
+              <th>Cost</th>
+              <th>Intent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Short-tail</strong></td>
+              <td>"cutting board"</td>
+              <td>Huge</td>
+              <td class="risk">Expensive</td>
+              <td class="risk">Vague</td>
+            </tr>
+            <tr>
+              <td><strong>Long-tail</strong></td>
+              <td>"bamboo cutting board for vegetables"</td>
+              <td>Small</td>
+              <td class="safe">Cheap</td>
+              <td class="safe">Clear buyer</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="callout">
+        <strong>Coach tip:</strong> A small budget should buy only clear intent. "Cutting board" burns budget on browsers. "Large bamboo cutting board for kitchen" finds buyers.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Keywords & Match Types · 4.4 Keyword Research Starter Process</div>
+  <div class="page">08 / 12</div>
+</div>
+</body>
+</html>

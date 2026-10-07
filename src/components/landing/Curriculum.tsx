@@ -43,7 +43,7 @@ export function Curriculum() {
             <h2 className={shared.secTitle}>{CURRICULUM_HEADLINE}</h2>
           </div>
           <p className={shared.secLede}>
-            Modules 0&ndash;4 are <b>Foundations</b>; 5&ndash;10 are <b>Mastery</b>; 11 is the{" "}
+            Module &minus;1 is the <b>Amazon primer</b>; modules 0&ndash;4 are <b>Foundations</b>; 5&ndash;10 are <b>Mastery</b>; 11 is the{" "}
             <b>Capstone</b>. The tier you pick decides how far you go. No jumping around, no hidden
             &ldquo;advanced&rdquo; paywall mid-course.
           </p>
@@ -94,7 +94,7 @@ export function Curriculum() {
             <tfoot>
               <tr>
                 <td colSpan={3}>
-                  {PUBLIC_CURRICULUM_CLAIMS.modules.length} modules · Foundations (0–4) + Mastery
+                  {PUBLIC_CURRICULUM_CLAIMS.modules.length} modules · Primer (-1) + Foundations (0–4) + Mastery
                   (5–10) + Capstone (11)
                 </td>
                 <td className={styles.right}>

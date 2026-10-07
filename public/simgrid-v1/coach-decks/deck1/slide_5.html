@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding:42px 60px 0}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08}
+.rule{height:3px;background:#131921;margin-top:18px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:24px}
+.def-list{display:flex;flex-direction:column;gap:16px}
+.def-item{background:#fff;border:1px solid #d7dce2;padding:20px;border-left:5px solid #131921;opacity:0;animation:fade-in .5s ease-out forwards}
+.def-item:nth-child(1){animation-delay:.1s;border-left-color:#4b5563}
+.def-item:nth-child(2){animation-delay:.2s;border-left-color:#ff9900}
+.def-item:nth-child(3){animation-delay:.3s;border-left-color:#00875a}
+.def-title{font-size:22px;font-weight:700;margin-bottom:8px;color:#131921}
+.def-desc{font-size:18px;color:#4b5563;line-height:1.4}
+.formula-box{background:#131921;color:#fff;padding:30px;text-align:center;opacity:0;animation:fade-in .5s ease-out .4s forwards}
+.formula-title{font-size:20px;color:#ff9900;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;font-weight:700}
+.formula{font-size:42px;font-weight:800;margin-bottom:12px}
+.formula-desc{font-size:18px;color:#dbe2ea}
+.example{margin-top:20px;padding:20px;border-left:4px solid #00875a;background:#eef8f3;font-size:18px;line-height:1.4;opacity:0;animation:fade-in .5s ease-out .5s forwards}
+.coach{margin-top:20px;padding:20px;border-left:4px solid #ff9900;background:#fff7e6;font-size:18px;line-height:1.4;opacity:0;animation:fade-in .5s ease-out .6s forwards}
+.footer{position:absolute;left:60px;bottom:28px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;bottom:28px;font-size:13px;color:#64748b}
+@keyframes fade-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important;transform:none!important}}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 1 · Lesson 1.1</div>
+  <div class="title">Pay Per Click in Plain Words</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="def-list">
+      <div class="def-item">
+        <div class="def-title">Impression</div>
+        <div class="def-desc">The ad was shown to a shopper. This is free.</div>
+      </div>
+      <div class="def-item">
+        <div class="def-title">Click</div>
+        <div class="def-desc">A shopper clicked your ad. This is what you pay for.</div>
+      </div>
+      <div class="def-item">
+        <div class="def-title">Bid</div>
+        <div class="def-desc">The maximum amount you are willing to pay for one click.</div>
+      </div>
+    </div>
+    
+    <div>
+      <div class="formula-box">
+        <div class="formula-title">Cost Per Click (CPC)</div>
+        <div class="formula">CPC = Spend ÷ Clicks</div>
+        <div class="formula-desc">The average price you actually paid for one click.</div>
+      </div>
+      
+      <div class="example">
+        <b>Worked example:</b> You spend $20 on 20 clicks, so your average CPC is $1.00 per click. If 2 of those clicks buy your $25 product, those clicks produced $50 of sales.
+      </div>
+      
+      <div class="coach">
+        <b>Coach tip:</b> Clicks cost money whether they buy or not. That is why targeting and listing quality decide profit.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · What is PPC? · 1.1 Pay Per Click in Plain Words</div>
+  <div class="page">05 / 12</div>
+</div>
+</body>
+</html>

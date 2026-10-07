@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "title": "Foundations capstone: run one product end-to-end",
+  "intro": "Pick one real-style product brief and carry it through every Foundations skill: audit the listing, plan the keywords, map the campaign, set the bid guardrail, triage the search terms, and write the weekly client update. Each deliverable below maps to one saved portfolio artefact. Submit when all six are SUBMITTED; a reviewer scores each one 0 to 2 and you pass at 9 of 12.",
+  "deliverables": [
+    {
+      "id": "listing-audit",
+      "label": "Listing readiness audit",
+      "artefactKind": "listing-audit",
+      "summary": "Score the product page for paid-traffic readiness and name the three fixes that matter most, with evidence for each."
+    },
+    {
+      "id": "keyword-plan",
+      "label": "Keyword plan",
+      "artefactKind": "keyword-plan",
+      "summary": "Group the target keywords by intent, mark negatives, and explain what each group is for."
+    },
+    {
+      "id": "campaign-map",
+      "label": "Campaign map",
+      "artefactKind": "campaign-map",
+      "summary": "Draw the campaign structure: which campaigns exist, what each one buys, and the budget each one gets."
+    },
+    {
+      "id": "bid-guardrail",
+      "label": "Bid guardrail",
+      "artefactKind": "decision-log",
+      "summary": "Write the bid rule you will follow (when to raise, when to lower, when to wait) with the ACoS boundary that triggers each move."
+    },
+    {
+      "id": "triage-decision",
+      "label": "Search-term triage decision",
+      "artefactKind": "triage-report",
+      "summary": "Take one search-term report and decide keep, harvest, lower bid, negate, or watch for every row, with one line of reason each."
+    },
+    {
+      "id": "weekly-readout",
+      "label": "Weekly client update",
+      "artefactKind": "weekly-readout",
+      "summary": "Write the one-page update you would send the client: what changed, what it cost, what you recommend next, and when you will review."
+    }
+  ],
+  "rubric": {
+    "pointsPerCriterion": 2,
+    "passThreshold": 9,
+    "criteria": [
+      {
+        "id": "listing-audit",
+        "label": "Listing readiness audit",
+        "artefactKind": "listing-audit",
+        "goodLooksLike": "Every finding names the evidence (screenshot row, metric, or listing section) and the fix is specific enough that another VA could apply it without asking."
+      },
+      {
+        "id": "keyword-plan",
+        "label": "Keyword plan",
+        "artefactKind": "keyword-plan",
+        "goodLooksLike": "Groups match buyer intent, negatives are named before launch, and each group has one sentence saying what it is for."
+      },
+      {
+        "id": "campaign-map",
+        "label": "Campaign map",
+        "artefactKind": "campaign-map",
+        "goodLooksLike": "No two campaigns buy the same traffic for the same reason; budgets add up to the agreed ceiling."
+      },
+      {
+        "id": "bid-guardrail",
+        "label": "Bid guardrail",
+        "artefactKind": "decision-log",
+        "goodLooksLike": "The rule names the ACoS boundary, the evidence window, and what to do when evidence is too thin to call."
+      },
+      {
+        "id": "triage-decision",
+        "label": "Search-term triage decision",
+        "artefactKind": "triage-report",
+        "goodLooksLike": "No row is left undecided; each action has one line of reason tied to the report numbers."
+      },
+      {
+        "id": "weekly-readout",
+        "label": "Weekly client update",
+        "artefactKind": "weekly-readout",
+        "goodLooksLike": "A non-technical client can read it in two minutes and knows what changed, what it cost, and what happens next."
+      }
+    ]
+  }
+}

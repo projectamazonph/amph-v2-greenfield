@@ -58,11 +58,31 @@ function deriveTitle(dirSlug) {
     .join(" ");
 }
 
+// Module numbers are global across the curriculum, not per course.
+// Module -1 ("Amazon and PPC Job") is pre-onboarding context for the
+// foundations course. Quizzes already classify it as ppc-foundations
+// (>= -1 && <= 4); keep module/lesson walks consistent so the curriculum
+// isn't silently truncated.
+const COURSE_MODULE_RANGES = {
+  "ppc-foundations": [-1, 4],
+  "accelerated-mastery": [5, 10],
+  "ultimate-transformation": [11, 11],
+};
+
 function courseSlugForModule(n) {
-  if (n >= 0 && n <= 4) return "ppc-foundations";
-  if (n >= 5 && n <= 10) return "accelerated-mastery";
-  if (n === 11) return "ultimate-transformation";
+  for (const [slug, [min, max]] of Object.entries(COURSE_MODULE_RANGES)) {
+    if (n >= min && n <= max) return slug;
+  }
   return null;
+}
+
+// The Module entity requires a 1-indexed displayOrder (src/domain/entities/
+// Module.ts rejects 0). Ranking against the course's own range start keeps
+// every seeded module valid; using the raw global number would persist
+// displayOrder 0 for module -1 and fail validation on read.
+function moduleDisplayOrder(courseSlug, moduleNumber) {
+  const range = COURSE_MODULE_RANGES[courseSlug];
+  return range ? moduleNumber - range[0] + 1 : moduleNumber + 1;
 }
 
 function mapLessonType(t) {
@@ -204,16 +224,17 @@ for (const dirName of moduleDirs.sort()) {
   const moduleId = md5("module", courseSlug, String(moduleNumber));
   const moduleTitle = deriveTitle(dirName);
   const courseId = courseIds[courseSlug];
+  const displayOrder = moduleDisplayOrder(courseSlug, moduleNumber);
 
   // Upsert module
   await prisma.module.upsert({
     where: { id: moduleId },
-    update: { title: moduleTitle, displayOrder: moduleNumber + 1 },
+    update: { title: moduleTitle, displayOrder },
     create: {
       id: moduleId,
       courseId,
       title: moduleTitle,
-      displayOrder: moduleNumber + 1,
+      displayOrder,
     },
   });
   modulesCreated++;
@@ -305,7 +326,7 @@ if (!existsSync(quizPath)) {
 
   for (const quizDef of quizData.quizzes) {
     const courseSlug =
-      quizDef.moduleNumber >= 0 && quizDef.moduleNumber <= 4
+      quizDef.moduleNumber >= -1 && quizDef.moduleNumber <= 4
         ? "ppc-foundations"
         : quizDef.moduleNumber >= 5 && quizDef.moduleNumber <= 10
           ? "accelerated-mastery"

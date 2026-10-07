@@ -2,7 +2,7 @@
 
 ## Instructions for Use
 
-> **Current curriculum contract — August 2026.** The learner experience now uses 12 modules and 42 lessons across three course tiers, with a guided zero-knowledge order and sequential lesson and quiz prerequisites. Any older mockup copy in this design-prompt archive should be treated as a visual placeholder and reconciled with the canonical syllabus and runtime before reuse.
+> **Current curriculum contract — August 2026.** The learner experience now uses 13 modules and 45 lessons across three course tiers, with a guided zero-knowledge order and sequential lesson and quiz prerequisites. Any older mockup copy in this design-prompt archive should be treated as a visual placeholder and reconciled with the canonical syllabus and runtime before reuse.
 
 This document contains Stitch prompts for every page/screen of Project Amazon PH Academy v2. Feed each prompt section into Google Stitch (stitch.withgoogle.com) individually. Stitch generates HTML/CSS with Tailwind — we will convert the output to CSS Modules + design tokens for the Next.js project.
 

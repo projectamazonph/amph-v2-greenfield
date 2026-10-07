@@ -247,7 +247,7 @@
 - ## The decision in one sentence
 - ## The Why
 - ## Building a Competitive Benchmarking Workflow
-- ### The 30-Minute Weekly Review
+- ### The Weekly Check-in
 - ## Step 1: Identify Your Key Competitors
 - ### Maintain a Competitor Watchlist
 - ## Step 2: Gap Analysis

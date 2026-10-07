@@ -1,0 +1,604 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; form-action 'self'">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPC Profitability Lab | Amazon PPC Profitability Simulator</title>
+    <link rel="icon" href="favicon.ico">
+
+    <script src="assets/student-progress.js"></script>
+    <script src="assets/simulator-attempt.js"></script>
+    <script src="assets/ppc-profitability-core.js"></script>
+
+    <script src="assets/shell.js" defer></script>
+    <link rel="stylesheet" href="assets/fonts.css">
+    <link rel="stylesheet" href="assets/tokens.css">
+    <link rel="stylesheet" href="assets/ppc-profitability-lab.css">
+    <link rel="stylesheet" href="assets/skin.css">
+    <link rel="stylesheet" href="assets/shell.css">
+
+    <!-- PHA_DISCOVERY_START -->
+    <meta name="description" content="Practice break-even ACOS, allowable CPC, ROAS, and TACoS calculations for Amazon PPC profitability.">
+    <meta name="keywords" content="Amazon PPC profitability simulator, break-even ACOS, allowable CPC, ROAS, TACoS">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <link rel="canonical" href="https://projectamazonph.github.io/amazon-ph-simulators/ppc-profitability-lab.html">
+    <link rel="describedby" type="text/markdown" href="https://projectamazonph.github.io/amazon-ph-simulators/llms.txt" title="AI-readable Project Amazon PH Academy guide">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Project Amazon PH Academy">
+    <meta property="og:title" content="PPC Profitability Lab | Amazon PPC Profitability Simulator">
+    <meta property="og:description" content="Practice break-even ACOS, allowable CPC, ROAS, and TACoS calculations for Amazon PPC profitability.">
+    <meta property="og:url" content="https://projectamazonph.github.io/amazon-ph-simulators/ppc-profitability-lab.html">
+    <meta property="og:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+    <meta property="og:image:alt" content="Project Amazon PH Academy SimGrid learning hub">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PPC Profitability Lab | Amazon PPC Profitability Simulator">
+    <meta name="twitter:description" content="Practice break-even ACOS, allowable CPC, ROAS, and TACoS calculations for Amazon PPC profitability.">
+    <meta name="twitter:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-profitability-lab.html",
+          "url": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-profitability-lab.html",
+          "name": "PPC Profitability Lab | Amazon PPC Profitability Simulator",
+          "description": "Practice break-even ACOS, allowable CPC, ROAS, and TACoS calculations for Amazon PPC profitability.",
+          "inLanguage": ["en", "fil"],
+          "isPartOf": {
+            "@type": "WebSite",
+            "name": "Project Amazon PH Academy",
+            "url": "https://projectamazonph.github.io/amazon-ph-simulators/"
+          },
+          "about": [
+            {"@type": "Thing", "name": "Amazon PPC profitability simulator"},
+            {"@type": "Thing", "name": "break-even ACOS"},
+            {"@type": "Thing", "name": "allowable CPC"},
+            {"@type": "Thing", "name": "ROAS"},
+            {"@type": "Thing", "name": "TACoS"}
+          ],
+          "hasPart": {
+            "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-profitability-lab.html#footer-navigation"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-profitability-lab.html#application",
+          "name": "PPC Profitability Lab",
+          "applicationCategory": "EducationalApplication",
+          "operatingSystem": "Web",
+          "description": "Practice break-even ACOS, allowable CPC, ROAS, and TACoS calculations for Amazon PPC profitability.",
+          "isAccessibleForFree": true
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-profitability-lab.html#footer-navigation",
+          "name": "Project Amazon PH Academy footer navigation",
+          "description": "Visible footer links to Project Amazon PH Academy learning, practice, coaching, and project resources.",
+          "hasPart": [
+            {
+              "@type": "ItemList",
+              "name": "Learn footer links",
+              "numberOfItems": 4,
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "VA Start Here",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "VA Start Here",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/start-here.html"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "PPC Coach",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "PPC Coach",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-coach.html"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": "Student Guide",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Student Guide",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/guide.html"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 4,
+                  "name": "Module Decks",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Module Decks",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-decks.html"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "ItemList",
+              "name": "Practice footer links",
+              "numberOfItems": 3,
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Simulator Library",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Simulator Library",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/index.html#simulator-library"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Campaign Architect",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Campaign Architect",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/campaign-architect.html"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": "Account Audit",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Account Audit",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/account-audit.html"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "ItemList",
+              "name": "Coach footer links",
+              "numberOfItems": 3,
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Coach Tools",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Coach Tools",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-tools.html"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Resource Library",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Resource Library",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-resource-library.html"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": "Learning Docs",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Learning Docs",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/index.html"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "ItemList",
+              "name": "Project footer links",
+              "numberOfItems": 3,
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Roadmap",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Roadmap",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/planned-simulators.html"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Source Repository",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Source Repository",
+                    "url": "https://github.com/projectamazonph/amazon-ph-simulators"
+                  }
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": "Project Guide",
+                  "item": {
+                    "@type": "WebPage",
+                    "name": "Project Guide",
+                    "url": "https://projectamazonph.github.io/amazon-ph-simulators/site-guide.md"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "LearningResource",
+          "@id": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-profitability-lab.html#resource",
+          "name": "PPC Profitability Lab",
+          "description": "Practice break-even ACOS, allowable CPC, ROAS, and TACoS calculations for Amazon PPC profitability.",
+          "learningResourceType": "Interactive learning resource",
+          "isAccessibleForFree": true
+        }
+      ]
+    }
+    </script>
+    <!-- PHA_DISCOVERY_END -->
+</head>
+
+<body data-pha-tool="ppc-profitability-lab">
+    <main data-profitability-lab>
+        <div class="pha-skin-wrap">
+            <div class="profitability-lab-container">
+                <header class="lab-header">
+                    <h1>PPC Profitability Lab</h1>
+                    <p class="lab-description">
+                        Practice break-even ACOS, allowable CPC, ROAS, and TACoS calculations.
+                        Understand the numbers that drive profitable Amazon PPC campaigns.
+                    </p>
+                </header>
+
+                <div class="scenario-selector">
+                    <h2>Select Difficulty</h2>
+                    <div class="scenario-options">
+                        <button type="button" class="scenario-btn active" data-scenario="beginner">Beginner</button>
+                        <button type="button" class="scenario-btn" data-scenario="intermediate">Intermediate</button>
+                        <button type="button" class="scenario-btn" data-scenario="advanced">Advanced</button>
+                    </div>
+                </div>
+
+                <div class="quiz-container" id="quizContainer">
+                    <!-- Questions will be loaded here -->
+                </div>
+
+                <div class="results-panel hidden" id="resultsPanel">
+                    <h2>Results</h2>
+                    <div class="score-summary" id="scoreSummary"></div>
+                    <div class="detailed-results" id="detailedResults"></div>
+                    <button type="button" class="btn-primary retry-btn" id="retryBtn">Try Again</button>
+                    <button type="button" class="btn-secondary next-scenario-btn" id="nextScenarioBtn">Next Difficulty</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    (function () {
+        'use strict';
+
+        var PpcProfitabilityCore = window.PpcProfitabilityCore || require('./assets/ppc-profitability-core.js');
+        var scenarios = PpcProfitabilityCore.PROFITABILITY_SCENARIOS;
+        var gradeAttempt = PpcProfitabilityCore.gradeAttempt;
+
+        var currentScenarioId = 'beginner';
+        var currentScenario = scenarios[currentScenarioId];
+        var currentQuestionIndex = 0;
+        var userAnswers = {};
+
+        // DOM elements
+        var quizContainer = document.getElementById('quizContainer');
+        var resultsPanel = document.getElementById('resultsPanel');
+        var scoreSummary = document.getElementById('scoreSummary');
+        var detailedResults = document.getElementById('detailedResults');
+        var retryBtn = document.getElementById('retryBtn');
+        var nextScenarioBtn = document.getElementById('nextScenarioBtn');
+        var scenarioBtns = document.querySelectorAll('.scenario-btn');
+
+        // Initialize
+        function init() {
+            loadScenario(currentScenarioId);
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Scenario selection
+            scenarioBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    scenarioBtns.forEach(function (b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    currentScenarioId = this.getAttribute('data-scenario');
+                    currentScenario = scenarios[currentScenarioId];
+                    currentQuestionIndex = 0;
+                    userAnswers = {};
+                    loadScenario(currentScenarioId);
+                });
+            });
+
+            // Retry button
+            retryBtn.addEventListener('click', function () {
+                currentQuestionIndex = 0;
+                userAnswers = {};
+                quizContainer.classList.remove('hidden');
+                resultsPanel.classList.add('hidden');
+                renderQuestion(currentScenario.questions[currentQuestionIndex]);
+            });
+
+            // Next scenario button
+            nextScenarioBtn.addEventListener('click', function () {
+                var currentIndex = Object.keys(scenarios).indexOf(currentScenarioId);
+                var nextIndex = (currentIndex + 1) % Object.keys(scenarios).length;
+                var nextId = Object.keys(scenarios)[nextIndex];
+                
+                currentScenarioId = nextId;
+                currentScenario = scenarios[currentScenarioId];
+                currentQuestionIndex = 0;
+                userAnswers = {};
+                
+                scenarioBtns.forEach(function (b) { b.classList.remove('active'); });
+                document.querySelector('[data-scenario="' + nextId + '"]').classList.add('active');
+                
+                quizContainer.classList.remove('hidden');
+                resultsPanel.classList.add('hidden');
+                loadScenario(currentScenarioId);
+            });
+        }
+
+        function loadScenario(scenarioId) {
+            currentScenario = scenarios[scenarioId];
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            quizContainer.classList.remove('hidden');
+            resultsPanel.classList.add('hidden');
+            renderQuestion(currentScenario.questions[currentQuestionIndex]);
+        }
+
+        function renderQuestion(question) {
+            var html = '';
+            var questionNum = currentQuestionIndex + 1;
+            var totalQuestions = currentScenario.questions.length;
+
+            html += '<div class="question-card" data-question-id="' + question.id + '">';
+            html += '<div class="question-header">';
+            html += '<span class="question-number">Question ' + questionNum + ' of ' + totalQuestions + '</span>';
+            html += '</div>';
+            html += '<h3 class="question-text">' + question.question + '</h3>';
+
+            // Context
+            if (question.context) {
+                html += '<div class="question-context">';
+                html += '<strong>Context:</strong> ';
+                if (typeof question.context === 'string') {
+                    html += question.context;
+                } else {
+                    html += JSON.stringify(question.context, null, 2);
+                }
+                html += '</div>';
+            }
+
+            // Input based on question type
+            html += '<div class="answer-input">';
+            
+            switch (question.type) {
+                case 'numeric':
+                    html += '<label>';
+                    html += '<input type="number" step="0.01" placeholder="Enter value" data-answer>';
+                    if (question.units) {
+                        html += '<span class="unit">' + question.units + '</span>';
+                    }
+                    html += '</label>';
+                    break;
+                case 'boolean':
+                    html += '<div class="boolean-options">';
+                    html += '<label><input type="radio" name="bool-answer" value="true" data-answer> Yes</label>';
+                    html += '<label><input type="radio" name="bool-answer" value="false" data-answer> No</label>';
+                    html += '</div>';
+                    break;
+                case 'multiple-choice':
+                    html += '<div class="multiple-choice-options">';
+                    question.options.forEach(function (option, idx) {
+                        html += '<label class="choice-label">';
+                        html += '<input type="radio" name="mc-answer" value="' + option + '" data-answer>';
+                        html += '<span>' + formatOption(option) + '</span>';
+                        html += '</label>';
+                    });
+                    html += '</div>';
+                    break;
+                default:
+                    html += '<input type="text" placeholder="Enter answer" data-answer>';
+            }
+
+            html += '</div>';
+
+            // Hint
+            html += '<div class="hint-container">';
+            html += '<button type="button" class="hint-btn" data-act="toggle-hint">Show Hint</button>';
+            html += '<span class="hint-text hidden">' + question.hint + '</span>';
+            html += '</div>';
+
+            // Navigation
+            html += '<div class="question-nav">';
+            if (currentQuestionIndex > 0) {
+                html += '<button type="button" class="btn-secondary prev-btn" data-act="prev-question">Previous</button>';
+            }
+            if (currentQuestionIndex < currentScenario.questions.length - 1) {
+                html += '<button type="button" class="btn-primary next-btn" data-act="next-question">Next</button>';
+            } else {
+                html += '<button type="button" class="btn-primary submit-btn" data-act="submit-quiz">Submit</button>';
+            }
+            html += '</div>';
+
+            html += '</div>';
+
+            quizContainer.innerHTML = html;
+
+            // Load saved answer if exists
+            if (userAnswers[question.id]) {
+                var input = quizContainer.querySelector('[data-answer]');
+                if (input) {
+                    if (input.type === 'radio') {
+                        var radio = quizContainer.querySelector('[value="' + userAnswers[question.id] + '"]');
+                        if (radio) radio.checked = true;
+                    } else {
+                        input.value = userAnswers[question.id];
+                    }
+                }
+            }
+        }
+
+        function formatOption(option) {
+            var labels = {
+                'campaign_a': 'Campaign A',
+                'campaign_b': 'Campaign B',
+                'neither': 'Neither',
+                'they_are_equal': 'They are equal',
+                true: 'Yes',
+                false: 'No'
+            };
+            return labels[option] || option.replace(/_/g, ' ');
+        }
+
+        function getCurrentAnswer() {
+            var input = quizContainer.querySelector('[data-answer]');
+            if (!input) return null;
+
+            if (input.type === 'radio') {
+                var checked = quizContainer.querySelector('[name="' + input.name + '"]:checked');
+                return checked ? checked.value : null;
+            }
+            return input.value;
+        }
+
+        function saveCurrentAnswer() {
+            var currentQuestion = currentScenario.questions[currentQuestionIndex];
+            var answer = getCurrentAnswer();
+            if (answer !== null && answer !== '') {
+                userAnswers[currentQuestion.id] = answer;
+            }
+        }
+
+        function nextQuestion() {
+            saveCurrentAnswer();
+            if (currentQuestionIndex < currentScenario.questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion(currentScenario.questions[currentQuestionIndex]);
+            }
+        }
+
+        function prevQuestion() {
+            saveCurrentAnswer();
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion(currentScenario.questions[currentQuestionIndex]);
+            }
+        }
+
+        function submitQuiz() {
+            saveCurrentAnswer();
+            
+            var result = gradeAttempt(currentScenarioId, userAnswers);
+            
+            // Store attempt for progress tracking
+            if (window.recordSimulatorAttempt) {
+                window.recordSimulatorAttempt({
+                    simulatorId: 'ppc-profitability-lab',
+                    scenarioId: currentScenarioId,
+                    score: result.score,
+                    maxScore: result.maxScore,
+                    passed: result.passed,
+                    difficulty: currentScenario.difficulty
+                });
+            }
+
+            // Display results
+            displayResults(result);
+        }
+
+        function displayResults(result) {
+            quizContainer.classList.add('hidden');
+            resultsPanel.classList.remove('hidden');
+
+            var scorePercent = Math.round((result.score / result.maxScore) * 100);
+            
+            scoreSummary.innerHTML = '';
+            scoreSummary.innerHTML += '<div class="score-circle">';
+            scoreSummary.innerHTML += '<span class="score-value">' + result.score + '/' + result.maxScore + '</span>';
+            scoreSummary.innerHTML += '<span class="score-percent">' + scorePercent + '%</span>';
+            scoreSummary.innerHTML += '</div>';
+            scoreSummary.innerHTML += '<p class="score-message">' + result.summary + '</p>';
+            scoreSummary.innerHTML += '<p>Difficulty: <strong>' + formatOption(result.difficulty) + '</strong></p>';
+
+            // Detailed results
+            detailedResults.innerHTML = '';
+            result.items.forEach(function (item) {
+                var className = item.correct ? 'result-correct' : 'result-incorrect';
+                detailedResults.innerHTML += '<div class="result-item ' + className + '">';
+                detailedResults.innerHTML += '<div class="result-question">' + item.question + '</div>';
+                detailedResults.innerHTML += '<div class="result-answer">Your answer: <strong>' + formatAnswer(item.answer) + '</strong></div>';
+                detailedResults.innerHTML += '<div class="result-expected">Correct answer: <strong>' + formatAnswer(item.expectedAnswer) + '</strong></div>';
+                if (!item.correct) {
+                    detailedResults.innerHTML += '<div class="result-explanation">' + item.explanation + '</div>';
+                }
+                detailedResults.innerHTML += '</div>';
+            });
+        }
+
+        function formatAnswer(answer) {
+            if (answer === null || answer === undefined || answer === '') {
+                return '<em>No answer</em>';
+            }
+            if (typeof answer === 'boolean') {
+                return answer ? 'Yes' : 'No';
+            }
+            return String(answer);
+        }
+
+        function toggleHint(btn) {
+            var hintText = btn.nextElementSibling;
+            hintText.classList.toggle('hidden');
+            btn.textContent = hintText.classList.contains('hidden') ? 'Show Hint' : 'Hide Hint';
+        }
+
+        // Centralized event delegation — no inline onclick handlers.
+        // Matches the data-act dispatch pattern used across all simulators.
+        document.addEventListener('click', function (e) {
+            var act = e.target.closest('[data-act]');
+            if (!act) return;
+            var action = act.getAttribute('data-act');
+            switch (action) {
+                case 'toggle-hint':
+                    toggleHint(act);
+                    break;
+                case 'prev-question':
+                    prevQuestion();
+                    break;
+                case 'next-question':
+                    nextQuestion();
+                    break;
+                case 'submit-quiz':
+                    submitQuiz();
+                    break;
+            }
+        });
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    })();
+    </script>
+</body>
+</html>

@@ -69,6 +69,8 @@ describe("EnrollStudent", () => {
       anonymizeAndDelete: vi.fn(),
       findByIds: vi.fn(),
       recordLoginAttempt: vi.fn(),
+      markWelcomeCompleted: vi.fn(),
+      resetWelcome: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),
@@ -352,10 +354,7 @@ describe("EnrollStudent", () => {
 
   // ── P1-01 prerequisite gate ────────────────────────────────
 
-  function makeEnrollmentFixture(
-    courseId: string,
-    completedLessonIds: string[],
-  ) {
+  function makeEnrollmentFixture(courseId: string, completedLessonIds: string[]) {
     return {
       id: `enroll_${courseId}`,
       userId: USER_ID,

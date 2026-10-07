@@ -4,6 +4,150 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Preview deployments are read-only (shipped)
+
+Preview, production, and development all resolve to the same `DATABASE_URL`
+(one Config variable scoped to all three), so a PR's preview deployment ran
+against real student data. Build-time work was already gated on
+`$VERCEL_ENV = "production"` in `vercel.json`, so migrations and seeds never
+ran on a preview, but nothing gated the runtime: 7 of the 13 API routes and
+14 server actions with no auth gate (signup, password reset, simulator
+submissions) could persist to production from a preview URL.
+
+`src/proxy.ts` now refuses mutating requests when `VERCEL_ENV` is `preview`,
+answering 405 with `Allow: GET, HEAD` and `error: "preview_read_only"`.
+Reads pass through untouched so preview pages still render, and the check
+runs before the maintenance query and the route-protection block. Local dev,
+CI, and `next start` leave `VERCEL_ENV` unset and keep the full write
+surface. The policy lives in `src/lib/preview-read-only.ts` (unit tested);
+the wiring is pinned by tripwires in `src/__tests__/proxy.test.ts`.
+
+### STORY-165: Catalog survives a corrupt course row (shipped)
+
+Production `/courses` rendered the "Courses unavailable" fallback on every
+request while `/api/health/ready` stayed 200. Vercel runtime logs gave the
+actual cause: `Module ef4fb0dc922e5f30dc200bdeeb9eea40 failed validation on
+read: invalid_input`, the `md5("module:ppc-foundations:-1")` row that
+`scripts/seed-all-content.mjs` persisted with `displayOrder: 0` because it
+computed `moduleNumber + 1`. The `Module` factory requires 1-indexed ordering.
+Three changes:
+
+- The seeder derives `displayOrder` from the course's own module range
+  (`COURSE_MODULE_RANGES`), so module -1 seeds as 1 and the `upsert` corrects
+  the existing production row on the next build.
+- `ListCatalogCourses` enriches per course and drops the ones that fail,
+  returning them in `skipped` so `/courses` logs the slugs under
+  `[catalog:error]`. `db_error` is returned only when nothing loads.
+- `/courses/[slug]` renders "Course unavailable" for `db_error` and keeps
+  `notFound()` for a genuine miss, with separate metadata titles and a
+  `[course:error]` log line.
+
+Story: `docs/stories/STORY-165-catalog-degradation.md`.
+
+### STORY-163: Module 1 worksheet as a tracked artifact (shipped)
+
+Implementation of the design doc landed in PR #639. The text-fence
+worksheets in Lessons 1.1 to 1.5 are now a single tracked artifact the
+learner fills in across all five lessons. Architecture per AGENTS.md
+"Adding a New Feature" recipe:
+
+- Domain entity `WorksheetEntry` (`src/domain/artifacts/worksheetEntry.ts`)
+  with `WORKSHEET_LESSON_SLUGS`, `WORKSHEET_FIELDS` (34 keys across 5
+  lessons), and `validateWorksheetValues` that rejects unknown keys
+  and fills missing keys with empty strings.
+- Port `WorksheetRepository` with `findByStudent` and `upsert`.
+- Use cases `GetWorksheet` and `SaveWorksheetEntry` (the latter
+  enforces `actorId === studentId`, validates the field inventory,
+  and emits a `worksheet.saved` audit row; audit failures are
+  swallowed per the RecordAuditLog contract).
+- Prisma adapter (`PrismaWorksheetRepository`) backed by a new
+  `worksheet_entries` table with 34 nullable string columns and
+  composite unique on `(studentId, lessonSlug)`. Migration at
+  `prisma/migrations/20260929180000_story_163_worksheet_entries/`.
+- In-memory fake at `src/infra/db/inmemory/InMemoryWorksheetRepository.ts`
+  matching the existing in-memory convention.
+- Composition wiring in both production and test containers.
+- MDX directive `:::worksheet{id="..." title="..." part="N" lesson="..."}`
+  added to `src/lib/mdx/directive-plugin.ts` and the production
+  validator's allowlist.
+- React component `WorksheetArtifact` that hydrates the directive,
+  holds local state per field, and saves the full row on form-blur
+  via the lazy-imported server action.
+- Server action `saveWorksheetEntryAction` in `src/app/actions/`
+  that calls `getSessionUserId()` and forwards to `SaveWorksheetEntry`.
+- Validator regression test at
+  `src/domain/curriculum/__tests__/WorksheetBlocks.test.ts` that
+  finds every `:::worksheet` directive, asserts one per Module 1
+  lesson, and checks each `part` number matches its lesson.
+- E2E spec at `tests/e2e/module1-worksheet.spec.ts` documenting the
+  full fill-all-27-fields-and-reload contract. Gated on
+  `DATABASE_URL` until a `seedStudentAndEnrollment` helper exists.
+
+Follow-ups planned but not in this PR:
+
+- Lesson 1.5 "one-page read view" component (would consume the
+  `getWorksheet` result to show a one-page summary across all 5 parts).
+- E2E spec gate: ship `seedStudentAndEnrollment` in
+  `tests/e2e/helpers/seed.ts` and drop the `DATABASE_URL` skip.
+
+### Pre-existing test infra fix: Node 25+ `localStorage` shadow
+
+Node 25+ ships a native `localStorage` getter on globalThis that
+silently shadows jsdom's copy in Vitest workers, causing 24 tests
+across `WelcomeStepper`, `StudentNavigation`, `StudentSidebar`, and
+the dashboard `a11y.audit` to fail with "Cannot read properties of
+undefined (reading 'clear')". Fix: pass `--no-webstorage` to Node
+worker processes via `vitest.config.ts execArgv`. Gated on
+`process.versions.node`'s major version because the flag was added
+in Node 25 and Node 20 (CI) does not recognize it. Verified: 24
+previously-failing tests now pass; no regressions on Node 20.
+
+### STORY-163: Module 1 worksheet as a tracked artifact (design only)
+
+Replaces the per-lesson "open a blank note or spreadsheet" worksheets in
+Lessons 1.1 to 1.5 with a single tracked artifact the learner fills in across
+all five lessons. Story doc captures the full architecture (domain entity,
+port, use case, adapter, MDX directive, React component, server action,
+audit log entry) and the 27-field inventory across the five parts.
+Implementation deferred to a separate work session so the architecture
+review can happen before the multi-layer build.
+
+### Admin user management on /admin/users/[id]
+
+Admins can now manage accounts from the user detail page: edit a student name and role, set a password directly (revokes every active session, optional notification email), force sign-out, and permanently anonymize a delete. Four use cases (`AdminUpdateUser`, `AdminSetUserPassword`, `AdminDeleteUser`, `AdminForceSignOut`) with matching server actions on both containers, four new audit actions (`user.profile_updated`, `user.password_changed_by_admin`, `user.deleted_by_admin`, `user.sessions_revoked`), and `role` added to the `UserRepository.update()` patch. Guards: an admin cannot delete their own account or change their own role. Boundary suite at `src/app/actions/__tests__/adminUserManagement.action.test.ts`; STORY-155.
+
+### STORY-146: First-run welcome walkthrough for new students
+
+Zero-experience students (especially new Filipino VAs) didn't know how to navigate the platform after signup. The slice adds a five-step `/welcome` page (URL fragment + localStorage for state), a `NewUserDashboard` variant for fresh free-tier students, a sidebar "?" badge that fades after 7 days, and a profile "Restart the welcome tour" link. No-tier signups now 303 to `/welcome` (was `/dashboard`); tier-selected signups still go to `/checkout`. New `welcomeCompletedAt` column on `User` with a backfill treating existing users as already-toured; two use cases (`CompleteWelcome`, `ResetWelcome`) enforce atomic idempotency at the DB layer via `updateMany + where: { ..., welcomeCompletedAt: null }` — same pattern as `markUsed` on email verification and `markRecordingWatched` on live-class registrations. E2E coverage at `tests/e2e/welcome.spec.ts`. Spec at `docs/superpowers/specs/2026-09-20-student-onboarding-design.md`, plan at `docs/superpowers/plans/2026-09-20-student-onboarding.md`. Post-merge follow-up quest opened for any remaining a11y debt (sidebar badge refactor is done in this PR as a `<button>` to avoid nested-`<a>` invalid HTML).
+
+### 2026-09-17: LEARN-041 targeted remediation + LEARN-042 capstone brief (PRs #536-#537)
+
+- `LEARN-041` (STORY-141, PR #536): quiz questions carry `remediationRefs` lesson slugs (Prisma JSON column + migration). A pure plan builder in domain services joins missed answers to slugs. `RecordQuizAttempt` exposes the plan; the quiz player renders a "What to revisit" list with lesson links. Tags optional; empty tags contribute nothing.
+- `LEARN-042` (STORY-142, PR #537): machine-readable Foundations capstone brief (`content/curriculum/capstone.json`) with six deliverables mapped to artefact kinds, plus a six-criterion 0–2 rubric passing at 9 of 12. A pure readiness checker maps SUBMITTED artefact kinds to required kinds. No DB, no UI.
+
+### 2026-09-16: LEARN-034 save-from-debrief wiring (PR #534)
+
+- `LEARN-034` (STORY-140): `ToolDebrief` gains optional `saveAction` bindings passed down from the server shell. The Bid Elevator result view now drills `artefactKind="decision-log"`, the published scenario name as `scenarioRef`, and `saveArtefactAction` through to the debrief. A learner who types a rationale and clicks "Save to portfolio" produces a DRAFT artefact visible on `/portfolio`; failed saves keep the typed text and show an inline error. Eight component tests cover the disabled-button guard, success, error, and the LEARN-032 prompt-only fallback. The other four simulators adopt the same props in follow-ups.
+- Server-action shim tests now cover `saveArtefactAction`, `submitArtefactAction`, and `listArtefactsAction` end-to-end.
+
+### 2026-09-16: Learning-experience 8.5 Wave 3 evidence slice + P3-87 bell (PRs #528-#532)
+
+- `LEARN-033` (STORY-135, PR #528): learner artefact domain. `LearnerArtefact` entity with six kinds and a DRAFT/SUBMITTED lifecycle (100% branch coverage); `IArtefactRepository` port with Prisma + InMemory adapters; `SaveArtefact`, `SubmitArtefact`, `ListStudentArtefacts` use cases on both containers; server actions for save/submit/list; artefacts included in the account-data export. Migration adds the `learner_artefacts` table.
+- `LEARN-032` (STORY-136, PR #529): tool debrief pattern. `ToolDebrief` client component with five sections (result, why-it-matters, lesson revisit, retry, rationale prompt), wired into the Bid Elevator result view as the reference implementation. Four component tests; no certification wording.
+- `LEARN-035` (STORY-137, PR #530): student portfolio page. `/portfolio` lists the caller's artefacts with kind and status; `/portfolio/[id]` renders one artefact or 404s for another student; `/portfolio/export` downloads the caller's set as JSON. Dashboard links to the portfolio.
+- `LEARN-040` (STORY-138, PR #531): tracked mid-lesson retrieval check. `RetrievalCheckAttempt` log row with Prisma + InMemory adapters; `RecordRetrievalCheck` on both containers; `SelfCheck` fires a best-effort record on submit (failures swallowed, never blocks); `LessonContent` injects the lesson id into every check. Attempts included in the account-data export. Migration adds the `retrieval_check_attempts` table.
+- `P3-87` (STORY-139, PR #532): in-app notifications, the last deferred P3 feature. `Notification` entity with five types (100% branch coverage); `INotificationRepository` with Prisma + InMemory adapters; `NotifyUser`, `ListNotifications`, `MarkNotificationRead`, `MarkAllNotificationsRead` on both containers; bell polls every 30s with dropdown and mark-read on click, mounted in the student sidebar (server actions passed as props so unit tests never import a use-server module); course-complete emit from `markLessonCompleteAction` at 100% progress, best-effort. Migration adds the `notifications` table.
+
+### 2026-09-16: Learning-experience 8.5 Wave 1 closed + P3-83 drag-and-drop (PRs #519-#526)
+
+- `LEARN-010` (STORY-130, PR #521): optional pre-course diagnostic at `/dashboard/diagnostic`. Three fixed outcomes (new, familiar, experienced) with a fallback rubric; recommendation-only, never changes entitlement or gates paid content; pure scoring function in `src/lib/diagnostic.ts` with six Vitest tests.
+- `LEARN-013` (STORY-131, PR #522): just-in-time glossary data + inline term button. `content/curriculum/glossary.json` covers the seven Module 0 terms (PPC, ACoS, TACoS, ROAS, CPC, CTR, conversion rate); `src/components/lesson/GlossaryTerm.tsx` opens a focus-and-click popover with Escape-to-close. Plain MDX remains readable without JavaScript because the parenthesised definition the author already wrote is the fallback.
+- `LEARN-014` (STORY-132, PR #523): guided first-decision route at `/dashboard/first-decision`. The static brief in `content/curriculum/first-decision.json` describes the scenario context, the decision rule, and the result interpretation; a "Start the practice decision" button links to `/tools/bid-elevator?from=first-decision` and the Bid Elevator tool renders a `FirstDecisionResultNotice` reminder to read the result explanation back on the onboarding route.
+- `LEARN-015` (STORY-133, PR #524): onboarding completion view at `/dashboard/onboarding-complete`. Reads the learner's PPC Foundations enrollment, asks the pure helper whether they have finished Module 0, and renders the four-section summary (pathway, next action, expected time, help link) when Module 0 is done; redirects back to the dashboard with a plain-language query string when it is not. Never grants XP, awards badges, or changes entitlement.
+- `LEARN-030` (STORY-134, PR #525): lesson-to-tool bridge validator in `src/lib/toolBridge.ts` joined to the existing curriculum inventory, public-claim tier allowlist, and registered simulator ids. `pnpm validate:learning-release` now fails the release gate when a lesson points at an unregistered simulator, when a bridge target is not in any tier, or when a registered simulator is not unlocked by any tier. Filesystem-only; the published-scenario signal stays at `/api/health/ready`. Five Vitest tests cover the validator.
+- `P3-83` drag-and-drop module reorder (PR #519): `DraggableModuleList` component (`@dnd-kit/core` + `@dnd-kit/sortable` + `@dnd-kit/utilities`) replaces the up/down buttons in `/admin/courses/[id]` with a drag handle. The reorder persists through the existing `reorderModulesAction` server action and the `reorderModules` use case.
+- `STORY-129` (PR #520): link LEARN-001 to the existing STORY-111 inventory work in the build-plan atomic backlog. No code change.
+
 ### Production UI rules adopted in the design brief
 
 Reviewed the user-supplied "Full-Featured Sites and Apps: Complete UI Rules" reference against source and encoded it in `docs/design-brief.md` as a normative checklist: pinned families (navigation, mobile, forms, modals, loading, search, tables, color, type, spacing, motion, icons, a11y, performance, security, resilience) with AMPH mappings, deliberate exceptions (brand font stack, drawer over bottom nav, no PWA/RTL/i18n/virtualization), and one recorded gap (no sitemap/robots/canonical coverage yet). Docs only, no product code changes.

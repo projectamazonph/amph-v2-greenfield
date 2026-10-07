@@ -1,6 +1,6 @@
 # STORY-013 — Content Import Script
 
-> **Historical snapshot.** This story records the original two-course import scope. The current implementation supports three courses and maps modules 0–4, 5–10, and 11 through `NodeContentReader` and the current seed scripts.
+> **Historical snapshot.** This story records the original two-course import scope. The current implementation supports three courses and maps modules 0–4, 5–10, and 11 through `NodeContentReader` and the current seed scripts. Status as of 2026-09-23: the `pnpm import:content` entry point described here no longer runs, because `915c7ca` deleted `src/usecases/ImportAmphContent.ts` while leaving the script that imports it. So the DoD line below that says the command runs without errors no longer holds. `node scripts/seed-all-content.mjs` is the path that publishes content today; see `content/README.md`.
 
 ## Goal
 

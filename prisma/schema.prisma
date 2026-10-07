@@ -57,6 +57,11 @@ model User {
   emailVerifiedAt        DateTime?
   verificationStatus     VerificationStatus @default(UNVERIFIED)
 
+  // STORY-146: first-run welcome walkthrough. Null until the student
+  // completes the guided tour; backfilled to createdAt for existing
+  // users so the dashboard variant doesn't appear retroactively.
+  welcomeCompletedAt     DateTime?
+
   // Subscription
   subscriptionTier             SubscriptionTier @default(FREE)
   subscriptionEndsAt           DateTime?
@@ -103,6 +108,11 @@ model User {
   emailVerifications     EmailVerification[]
   passwordResets         PasswordReset[]
   liveClassRegistrations LiveClassRegistration[]
+  learnerArtefacts       LearnerArtefact[]
+  retrievalCheckAttempts RetrievalCheckAttempt[]
+  notifications          Notification[]
+  capstoneSubmissions    CapstoneSubmission[]
+  worksheetEntries       WorksheetEntry[]
 
   @@index([email])
   @@index([paymongoCustomerId])
@@ -189,11 +199,6 @@ model PricingTier {
   status String @default("DRAFT") // DRAFT | ACTIVE | ARCHIVED
 
   displayOrder Int @default(0)
-
-  // Early-bird pricing: time-windowed discount shown on /pricing.
-  // STORY-015.
-  earlyBirdPriceMinor Int?
-  earlyBirdEndsAt     DateTime?
 
   // Relations
   courses Course[]
@@ -653,13 +658,16 @@ model Quiz {
 }
 
 model QuizQuestion {
-  id           String       @id @default(cuid())
-  quizId       String
-  quiz         Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  questionText String
-  explanation  String       @default("")
-  options      QuizOption[]
-  order        Int          @default(0)
+  id              String       @id @default(cuid())
+  quizId          String
+  quiz            Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionText    String
+  explanation     String       @default("")
+  // LEARN-041: lesson slugs to revisit when this question is missed.
+  // Empty array = no remediation authored; the question still scores.
+  remediationRefs Json         @default("[]")
+  options         QuizOption[]
+  order           Int          @default(0)
 
   deletedAt   DateTime?
   createdById String?
@@ -860,6 +868,25 @@ model SimulatorAttempt {
   @@index([status])
   @@index([userId, simulatorId, status])
   @@map("simulator_attempts")
+}
+
+// ── STORY: SimGrid iframe progress sync ─────────────────────────────────
+model SimgridAttempt {
+  id              String   @id
+  userId          String
+  simulatorId     String
+  score           Int
+  passed          Boolean
+  completedAt     DateTime
+  scenarioVersion String
+  rubricVersion   String
+  scenarioId      String?
+  policyVersion   String?
+
+  @@index([userId])
+  @@index([userId, simulatorId])
+  @@index([simulatorId])
+  @@map("simgrid_attempts")
 }
 
 model SimulatorDecision {
@@ -1480,4 +1507,170 @@ model SkillProgress {
   @@unique([userId, skillMapId])
   @@index([userId])
   @@map("skill_progress")
+}
+
+// LEARN-033: structured learner output (decision log, listing audit,
+// keyword plan, campaign map, triage report, weekly readout). Private
+// to the owner by default; read by the owner and by admins reviewing
+// a capstone (LEARN-044). DRAFT rows are revisable; SUBMITTED rows
+// are locked.
+model LearnerArtefact {
+  id String @id @default(cuid())
+
+  userId   String
+  courseId String?
+
+  kind  String // decision-log | listing-audit | keyword-plan | campaign-map | triage-report | weekly-readout
+  title String
+  scenarioRef String?
+  payload Json // { rationale, scenarioRef?, fields? }
+
+  status      String    @default("DRAFT") // DRAFT | SUBMITTED
+  submittedAt DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, kind])
+  @@index([status])
+  @@map("learner_artefacts")
+}
+
+// LEARN-040: mid-lesson retrieval check attempts. Append-only log;
+// the SelfCheck UI never blocks on a write. Read by LEARN-041
+// (targeted remediation) and LEARN-060 (learning events).
+model RetrievalCheckAttempt {
+  id String @id @default(cuid())
+
+  userId     String
+  lessonSlug String
+  checkId    String
+  correct    Boolean
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, lessonSlug])
+  @@map("retrieval_check_attempts")
+}
+
+// P3-87: in-app notifications. Owner-scoped reads; the bell polls list.
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  type String
+  title String
+  body String
+  href String?
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdById String?
+  updatedById String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@map("notifications")
+}
+
+// LEARN-043: capstone submission lifecycle. DRAFT rows are revisable;
+// SUBMITTED rows are locked for review; PASSED rows are completion evidence.
+model CapstoneSubmission {
+  id String @id @default(cuid())
+  userId String
+  courseId String?
+  status String @default("DRAFT")
+  artefactIds String[] @default([])
+  reviewerNote String?
+  submittedAt DateTime?
+  decidedAt DateTime?
+  decidedById String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdById String?
+  updatedById String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@map("capstone_submissions")
+}
+
+// STORY-163: per-student, per-lesson worksheet artifact. One row per
+// (studentId, lessonSlug); 34 nullable string columns (11 + 7 + 6 + 5 + 5)
+// carry the Profitability and Max-CPC Sheet fields across Module 1.
+// The wide-row shape lets Lesson 1.5's read view run as one SELECT, and
+// the field inventory is frozen by the curriculum polish work, so adding
+// a column is a deliberate decision rather than an open-ended surface
+// area. Same soft-delete + audit shape as LearnerArtefact.
+model WorksheetEntry {
+  id        String  @id @default(cuid())
+  studentId String
+  lessonSlug String // one of WORKSHEET_LESSON_SLUGS in src/domain/artifacts/worksheetEntry.ts
+  user      User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  // Part 1 (Lesson 1.1) — 11 columns
+  productName               String?
+  price                     String?
+  campaignObjective         String?
+  weeklyImpressions         String?
+  weeklyClicks              String?
+  weeklyAdSpend             String?
+  weeklyOrders              String?
+  weeklyAdSales             String?
+  weeklyTotalSales          String?
+  dataWindow                String?
+  firstQuestionToInvestigate String?
+
+  // Part 2 (Lesson 1.2) — 7 columns
+  productCvr                String?
+  targetAcos                String?
+  maxCpc                    String?
+  actualCpc                 String?
+  aboveOrBelowMax           String?
+  weeklyCtr                 String?
+  firstCheckIfAboveMax      String?
+
+  // Part 3 (Lesson 1.3) — 6 columns
+  totalCostToSell           String?
+  profitMarginBeforeAds     String?
+  breakEvenAcos             String?
+  weeklyActualAcos          String?
+  profitOrLossPerAdSale     String?
+  weeklyTacos               String?
+
+  // Part 4 (Lesson 1.4) — 5 columns
+  productProfitMargin       String?
+  minimumRoas               String?
+  targetRoasWithCushion     String?
+  weeklyActualRoas          String?
+  aboveOrBelowMinimum       String?
+
+  // Part 5 (Lesson 1.5) — 5 columns
+  weeklyPattern             String?
+  bottleneckMetric          String?
+  rootCauseToCheckFirst     String?
+  oneActionThisWeek         String?
+  nextReviewDate            String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  createdById String?
+  updatedById String?
+
+  @@unique([studentId, lessonSlug])
+  @@index([studentId])
+  @@map("worksheet_entries")
 }

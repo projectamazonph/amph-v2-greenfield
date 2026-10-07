@@ -87,7 +87,7 @@ for (const path of mdxFiles) {
   const slug = source.match(/^slug:\s*["']([^"']+)["']/m)?.[1] ?? path.split("/").pop()?.replace(/\.mdx$/, "");
   if (slug) targetLessonFiles.set(slug, relative(TARGET_ROOT, path));
 }
-if (targetLessonFiles.size !== 42) errors.push(`target lesson inventory must contain 42 lessons, found ${targetLessonFiles.size}`);
+if (targetLessonFiles.size !== 45) errors.push(`target lesson inventory must contain 45 lessons, found ${targetLessonFiles.size}`);
 for (const slug of targetSlugs) if (!targetLessonFiles.has(slug)) errors.push(`mapped target lesson does not exist: ${slug}`);
 const unassignedTargetLessons = [...targetLessonFiles.keys()].filter((slug) => !targetSlugs.has(slug)).sort();
 if (unassignedTargetLessons.length > 0) warnings.push(`target lessons without a direct source-slide assignment: ${unassignedTargetLessons.join(", ")}`);

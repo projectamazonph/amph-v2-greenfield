@@ -7,14 +7,14 @@ A row is marked **authored** only when the corresponding file exists. The remain
 
 ## Authored runbooks
 
-| File                       | Status                           | Use when                                                          |
-| -------------------------- | -------------------------------- | ----------------------------------------------------------------- |
-| `paymongo-outage.md`       | Reviewed 2026-08-12              | PayMongo is degraded or a paid order did not produce access       |
-| `webhook-replay.md`        | Reviewed 2026-08-12              | A PayMongo event needs inspection or replay                       |
-| `db-backup-restore.md`     | Reviewed 2026-08-12, not drilled | A Neon database restore is required                               |
-| `admin-access-recovery.md` | Reviewed 2026-08-12              | No usable admin account exists or an admin account is compromised |
-| `simulator-scenario-missing.md` | Reviewed 2026-08-16          | `/api/health/ready` returns 503 `missing_scenarios`; simulators render "Something went wrong" |
-| `learning-release-gate.md` | Reviewed 2026-08-16              | A curriculum or public-claim change is being promoted |
+| File                            | Status                           | Use when                                                                                      |
+| ------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------- |
+| `paymongo-outage.md`            | Reviewed 2026-08-12              | PayMongo is degraded or a paid order did not produce access                                   |
+| `webhook-replay.md`             | Reviewed 2026-08-12              | A PayMongo event needs inspection or replay                                                   |
+| `db-backup-restore.md`          | Reviewed 2026-08-12, not drilled | A Neon database restore is required                                                           |
+| `admin-access-recovery.md`      | Reviewed 2026-08-12              | No usable admin account exists or an admin account is compromised                             |
+| `simulator-scenario-missing.md` | Reviewed 2026-08-16              | `/api/health/ready` returns 503 `missing_scenarios`; simulators render "Something went wrong" |
+| `learning-release-gate.md`      | Reviewed 2026-08-16              | A curriculum or public-claim change is being promoted                                         |
 
 The database restore procedure has not been exercised against a real backup. Treat its timing and operator commands as unverified until a staging drill is completed.
 
@@ -72,7 +72,8 @@ Every new runbook must be followed in staging or a local disposable environment 
 
 ## Related documents
 
-- `docs/audit-2026-07-27-completeness-review.md`
+- `STATE.md`, "Remaining known limitations"
+- `CLAUDE.md`, "Known gaps"
 - `docs/sprint-plan.md`
 - `docs/security/tenant-isolation.md`
 - `docs/decisions.md`

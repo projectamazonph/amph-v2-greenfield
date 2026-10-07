@@ -29,6 +29,7 @@ export const metadata: Metadata = {
   title: "Courses | Project Amazon PH Academy",
   description:
     "Expert-led Amazon PPC training for Filipino VAs. Agency-side ads work, taught in Filipino.",
+  alternates: { canonical: "/courses" },
 };
 
 export default async function CoursesPage() {
@@ -45,13 +46,24 @@ export default async function CoursesPage() {
   // only console method that ESLint's `no-console` rule allows.
   if (process.env.NODE_ENV !== "test") {
     if (!catalogResult.ok) {
-      console.warn("[courses] catalog load failed", catalogResult.error);
+      console.warn("[catalog:error] catalog load failed", catalogResult.error);
     } else {
-      console.warn(`[courses] catalog loaded: ${catalogResult.value.courses.length} course(s)`);
+      console.warn(
+        `[catalog:info] catalog loaded: ${catalogResult.value.courses.length} course(s)`,
+      );
+      if (catalogResult.value.skipped?.length) {
+        // Same tag as the full-failure branch so one log filter catches both
+        // a blank catalog and a partial one.
+        console.warn("[catalog:error] dropped course(s) that failed to load", {
+          skipped: catalogResult.value.skipped,
+        });
+      }
     }
   }
 
   if (!catalogResult.ok) {
+    const dbError = catalogResult.error.kind === "db_error" ? catalogResult.error.message : null;
+
     return (
       <StudentShell requireAuth={false}>
         <main id="main-content" tabIndex={-1} className={styles.errorPage}>
@@ -60,6 +72,24 @@ export default async function CoursesPage() {
             We could not load the course catalog right now. Your account is unchanged. Refresh to
             try again.
           </p>
+          {process.env.NODE_ENV === "development" && dbError && (
+            <pre
+              style={{
+                marginTop: "var(--space-4)",
+                padding: "var(--space-3)",
+                background: "var(--surface-3)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius-sm)",
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-xs)",
+                color: "var(--ink-900)",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+              }}
+            >
+              {dbError}
+            </pre>
+          )}
         </main>
       </StudentShell>
     );

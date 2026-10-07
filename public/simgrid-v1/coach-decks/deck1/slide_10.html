@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.slide-container { width: 1280px; min-height: 720px; background: #f7f8fa; color: #131921; font-family: Arial, Helvetica, sans-serif; position: relative; overflow: hidden; padding-top: 42px; padding-left: 60px; padding-right: 60px; }
+.eyebrow { font-size: 14px; letter-spacing: 1.8px; text-transform: uppercase; color: #ff9900; font-weight: 700; margin-top: 0; }
+.title { font-size: 40px; font-weight: 800; line-height: 1.08; margin-top: 9px; }
+.rule { height: 3px; background: #131921; margin-top: 18px; }
+.layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; margin-top: 30px; }
+.formula-box { background: #131921; color: #fff; padding-top: 36px; padding-left: 30px; padding-right: 30px; padding-bottom: 36px; text-align: center; border-top: 6px solid #ff9900; }
+.formula-box h3 { font-size: 22px; color: #dbe2ea; margin-top: 0; margin-bottom: 16px; font-weight: 400; }
+.formula-box .formula { font-size: 46px; font-weight: 800; color: #ff9900; margin-top: 0; margin-bottom: 0; }
+.example-box { background: #fff; border: 1px solid #d7dce2; padding-top: 28px; padding-left: 28px; padding-right: 28px; padding-bottom: 28px; margin-top: 24px; }
+.example-box h3 { font-size: 22px; margin-top: 0; margin-bottom: 16px; color: #131921; }
+.example-box p { font-size: 20px; line-height: 1.4; margin-top: 0; margin-bottom: 0; color: #4b5563; }
+.example-box .highlight { font-size: 28px; font-weight: 700; color: #131921; display: block; margin-top: 16px; }
+.table-wrap { background: #fff; border: 1px solid #d7dce2; padding-top: 12px; padding-left: 12px; padding-right: 12px; padding-bottom: 12px; }
+.table-title { font-size: 22px; font-weight: 700; color: #131921; margin-top: 10px; margin-bottom: 16px; margin-left: 10px; }
+.table { width: 100%; border-collapse: collapse; font-size: 18px; }
+.table th { background: #131921; color: #fff; text-align: left; padding-top: 14px; padding-left: 14px; padding-right: 14px; padding-bottom: 14px; }
+.table td { padding-top: 14px; padding-left: 14px; padding-right: 14px; padding-bottom: 14px; border-bottom: 1px solid #d7dce2; color: #131921; font-weight: 700; }
+.table tr:nth-child(even) td { background: #f1f3f5; }
+.status-profit { color: #00875a; }
+.status-break { color: #ff9900; }
+.status-loss { color: #de350b; }
+.callout { margin-top: 24px; background: #eef8f3; border-left: 4px solid #00875a; color: #145c43; padding-top: 18px; padding-left: 18px; padding-right: 18px; padding-bottom: 18px; font-size: 18px; line-height: 1.4; }
+.footer { position: absolute; left: 60px; top: 672px; font-size: 13px; color: #64748b; }
+.page { position: absolute; right: 60px; top: 672px; font-size: 13px; color: #64748b; }
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 2 · Lesson 2.3</div>
+  <div class="title">ACOS & Break-even</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="left-col">
+      <div class="formula-box">
+        <h3>Advertising Cost of Sales (ACOS)</h3>
+        <div class="formula">ACOS = Spend ÷ Sales × 100</div>
+      </div>
+      
+      <div class="example-box">
+        <h3>Worked Example</h3>
+        <p>If you spend <strong>$20</strong> on ads and generate <strong>$100</strong> in sales:</p>
+        <span class="highlight">$20 ÷ $100 × 100 = 20% ACOS</span>
+        <p style="margin-top: 16px; font-size: 18px;">For every dollar of ad sales, 20 cents went to paying for ads.</p>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="table-wrap">
+        <div class="table-title">ACOS vs 30% Profit Margin</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ACOS</th>
+              <th>Reading</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>15%</td>
+              <td class="status-profit">Profitable</td>
+              <td>Room to scale</td>
+            </tr>
+            <tr>
+              <td>30%</td>
+              <td class="status-break">Break-even</td>
+              <td>Ads pay for themselves</td>
+            </tr>
+            <tr>
+              <td>45%</td>
+              <td class="status-loss">Losing money</td>
+              <td>Fix bids or targeting</td>
+            </tr>
+            <tr>
+              <td>No sales</td>
+              <td class="status-loss">Emergency</td>
+              <td>Check relevance & listing</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="callout">
+        <strong>Coach tip:</strong> Never say "good ACOS" without asking: good compared to which margin? Break-even ACOS equals your profit margin. Below it is profit; above it is loss.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Money Math · 2.3 ACOS Deep Dive</div>
+  <div class="page">10 / 12</div>
+</div>
+</body>
+</html>

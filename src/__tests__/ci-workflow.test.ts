@@ -89,4 +89,18 @@ describe("ci.yml — standalone build contract", () => {
     expect(ci).toMatch(/--config=\.\/\.lighthouserc\.json/);
     expect(ci).not.toMatch(/--collect\.staticDistDir/);
   });
+
+  it("retries the build so a failed Google Fonts fetch is not read as a code break", async () => {
+    // next/font/google fetches from fonts.gstatic.com during the build.
+    // When that request fails on a runner, Turbopack reports an
+    // unresolvable internal font module, which looks like a broken import
+    // in application code. Both jobs that run `pnpm build` must retry it,
+    // so the count is pinned rather than the step name.
+    const ci = await loadCI();
+    expect(ci.match(/if pnpm build; then/g)).toHaveLength(2);
+    expect(ci.match(/for attempt in 1 2 3; do/g)).toHaveLength(2);
+    // The retry must stay bounded, or a genuinely broken build hangs the
+    // job until the runner timeout.
+    expect(ci).toMatch(/build failed after 3 attempts/);
+  });
 });

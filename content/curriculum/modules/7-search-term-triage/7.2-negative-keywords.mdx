@@ -16,6 +16,18 @@ After this recap, you can quickly re-check a search term report against the nega
 
 Zero orders on real spend with no relevance to your product means negative it now; if a term is relevant but expensive, lower the bid instead of negating it.
 
+:::callout{id="lesson-7-2-pitfall" variant="pitfall" title="Adding negative-phrase matches for an obviously-irrelevant exact-match term"}
+Negating a clearly irrelevant search term at the phrase level blocks legitimate variants. Negative exact is the right scope when the term is unambiguous; reserve phrase for cases where the term is broad.
+:::
+
+<SelfCheck
+  id="sc-7-2"
+  prompt="A term is relevant and converts, but its CPC pushes ACoS past target. What is the correct action?"
+  options={["Add it as a negative exact", "Lower the bid", "Pause the campaign", "Raise the target ACoS to match"]}
+  answerIndex={1}
+  explanation="Relevance plus orders means the term earns its place, only the price is wrong. Negating a converter deletes demand you already own, so lower the bid and watch ACoS."
+/>
+
 ## Recap: What 2.3 Already Covers
 
 The full negative-keyword lesson lives in 2.3 (Negative Keywords: Stopping Wasted Spend). This lesson is a 5-minute check-in before you take the STR Triage tool live in 7.3.
@@ -27,7 +39,7 @@ From 2.3, the rules that matter most when triaging a search term report:
 | Real spend, zero sales, no relevance to your product | Negative phrase at campaign level |
 | A competitor brand you can't out-convert | Negative exact |
 | A pattern you'll never serve (cheap, free, used, how to, parts) | Negative phrase at campaign level |
-| Relevant but expensive (good CVR conversion rate, high CPC) | Lower the bid, do not negate |
+| Relevant but expensive (good conversion rate, high CPC) | Lower the bid, do not negate |
 | Already served by your exact match campaign | Negative exact in the broad campaign, cross-campaign block |
 
 ## The Cross-Campaign Pattern (Worth Restating)
@@ -67,8 +79,8 @@ What the learner can do: Pick negative exact for surgical blocks and negative ph
 Who can access it: All Sponsored Products advertisers
 Retailer or marketplace scope: Amazon Advertising Console
 Official source URL: https://advertising.amazon.com/help, specific negative-keyword article not verified; content owner to confirm and link at rewrite time
-Last verified: pending content-owner review
-Next review due: pending content-owner review
+Last verified: 2026-09-25
+Next review due: 2026-01-25
 Owner: Ryan Roland Dabao
 ```
 
@@ -84,7 +96,7 @@ Use this when a client asks why spend went down but sales barely moved:
 2. A term converts well but its CPC is high, pushing ACoS above target. Should you negative it?
 3. Why does the cross-campaign negative belong in the broad match campaign, not the exact match campaign?
 
-**Answers:** (1) Yes. Zero orders on real spend with no conversions is a classic negative candidate. (2) No. The term is relevant, just expensive. Lower the bid instead of negating it. (3) The exact campaign is the one you want to keep serving that search; the broad campaign is the one that should stop bidding on the same search.
+**Answers:** (1) Yes, provided the term is also irrelevant to your product. Zero orders on real spend is a classic negative candidate; a relevant term that is merely expensive gets a lower bid instead. (2) No. The term is relevant, just expensive. Lower the bid instead of negating it. (3) The exact campaign is the one you want to keep serving that search; the broad campaign is the one that should stop bidding on the same search.
 
 ## What to read next
 

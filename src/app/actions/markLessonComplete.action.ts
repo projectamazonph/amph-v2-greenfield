@@ -36,6 +36,24 @@ export async function markLessonCompleteAction(
     redirect(`${lessonPath}?completeError=${result.error.kind}`);
   }
 
+  // P3-87: course-completion notification. Best-effort — a failed
+  // notify never fails the completion or changes the redirect.
+  if (result.value.progressPercent >= 100) {
+    try {
+      const container = buildContainer();
+      await container.notifyUser.execute({
+        actorId: userId,
+        userId,
+        type: "course_complete",
+        title: "Course complete",
+        body: "You finished every lesson. Your certificate is ready on the certificates page.",
+        href: "/certificates",
+      });
+    } catch {
+      // Swallowed by design.
+    }
+  }
+
   revalidatePath(`/courses/${input.courseSlug}`);
   revalidatePath(lessonPath);
   revalidatePath("/dashboard");

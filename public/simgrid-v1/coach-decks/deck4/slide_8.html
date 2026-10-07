@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+.layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-top:30px}
+
+.trouble-card{background:#fff;border:1px solid #d7dce2;padding-top:24px;padding-left:24px;padding-right:24px;padding-bottom:24px;min-height:360px}
+.trouble-card.clicks{border-top:6px solid #de350b}
+.trouble-card.acos{border-top:6px solid #ff9900}
+.trouble-card.drops{border-top:6px solid #131921}
+
+.card-title{font-size:22px;font-weight:700;color:#131921;margin-top:0;margin-bottom:20px}
+.trouble-card.clicks .card-title{color:#de350b}
+.trouble-card.acos .card-title{color:#8a5300}
+
+.section-label{font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:700;margin-bottom:8px}
+.section-text{font-size:18px;color:#131921;line-height:1.4;margin-top:0;margin-bottom:20px}
+.section-text:last-child{margin-bottom:0}
+
+.callout{margin-top:30px;background:#eef8f3;border-left:4px solid #00875a;color:#145c43;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px;font-size:20px;line-height:1.4}
+.callout strong{color:#131921}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 10 · Lesson 10.4</div>
+  <div class="title">Troubleshooting Bottom of Funnel</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="trouble-card clicks">
+      <div class="card-title">Clicks, No Sales</div>
+      <div class="section-label">Diagnosis</div>
+      <p class="section-text">Shoppers are interested enough to click, but the page or offer fails to convince them.</p>
+      <div class="section-label">The Fix</div>
+      <p class="section-text">Check your price against competitors. Improve reviews and listing quality. Add negative keywords if the traffic is irrelevant.</p>
+    </div>
+    
+    <div class="trouble-card acos">
+      <div class="card-title">High ACOS</div>
+      <div class="section-label">Diagnosis</div>
+      <p class="section-text">You are getting sales, but you are paying too much for each one relative to your margin.</p>
+      <div class="section-label">The Fix</div>
+      <p class="section-text">Lower bids on expensive, broad terms. Shift budget toward high-converting, long-tail exact match keywords.</p>
+    </div>
+    
+    <div class="trouble-card drops">
+      <div class="card-title">Sudden Sales Drop</div>
+      <div class="section-label">Diagnosis</div>
+      <p class="section-text">A previously stable campaign suddenly stops producing orders.</p>
+      <div class="section-label">The Fix</div>
+      <p class="section-text">Check external factors first: Did you lose the Buy Box? Are you out of stock? Did a recent bid cut kill your visibility?</p>
+    </div>
+  </div>
+  
+  <div class="callout">
+    <strong>Coach tip:</strong> Bottom-of-funnel problems are usually listing problems or bid problems. Do not try to fix a conversion leak by adding more keywords.
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Reporting & Troubleshooting · 10.4 Troubleshooting Bottom of Funnel</div>
+  <div class="page">08 / 12</div>
+</div>
+</body>
+</html>

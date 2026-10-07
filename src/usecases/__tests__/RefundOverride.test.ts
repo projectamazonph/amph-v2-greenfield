@@ -11,17 +11,23 @@ import { InMemoryAuditLog } from "@/infra/repositories/InMemoryAuditLog";
 import { RecordAuditLog } from "@/usecases/RecordAuditLog";
 import { InMemoryCourseRepository } from "@/infra/repositories/InMemoryCourseRepository";
 import { InMemoryUserRepository } from "@/infra/repositories/InMemoryUserRepository";
+import { InMemoryEnrollmentRepository } from "@/infra/repositories/InMemoryEnrollmentRepository";
 import { InMemoryEmailSender } from "@/infra/email/InMemoryEmailSender";
 import { RefundTemplateRenderer } from "@/infra/email/templates/RefundTemplateRenderer";
 import { InMemoryEmailTemplateRepository } from "@/infra/repositories/InMemoryEmailTemplateRepository";
+import { createEnrollment } from "@/domain/entities/Enrollment";
 import { TestLogger } from "@/infra/observability/TestLogger";
+
+const ADMIN_ID = "admin_1";
 
 describe("RefundOverride", () => {
   let orderRepo: InMemoryOrderRepository;
   let paymentGateway: StubPaymentGateway;
   let courseRepo: InMemoryCourseRepository;
   let userRepo: InMemoryUserRepository;
+  let enrollmentRepo: InMemoryEnrollmentRepository;
   let emailSender: InMemoryEmailSender;
+  let auditLog: InMemoryAuditLog;
   let useCase: RefundOverride;
 
   beforeEach(() => {
@@ -29,8 +35,9 @@ describe("RefundOverride", () => {
     paymentGateway = new StubPaymentGateway();
     courseRepo = new InMemoryCourseRepository();
     userRepo = new InMemoryUserRepository();
+    enrollmentRepo = new InMemoryEnrollmentRepository();
     emailSender = new InMemoryEmailSender();
-    const auditLog = new InMemoryAuditLog();
+    auditLog = new InMemoryAuditLog();
     const recordAuditLog = new RecordAuditLog({
       auditLog,
       idGen: { newId: () => `ale_${Date.now()}`, paymentRef: () => "x", receiptNumber: () => "x" },
@@ -41,6 +48,7 @@ describe("RefundOverride", () => {
       orderRepo,
       paymentGateway,
       recordAuditLog,
+      enrollmentRepo,
       courseRepo,
       userRepo,
       emailSender,
@@ -48,7 +56,6 @@ describe("RefundOverride", () => {
       logger: new TestLogger(),
       emailTemplateRepo: new InMemoryEmailTemplateRepository(),
     });
-    // Ensure clock exists (used by ProcessRefund, not RefundOverride — for type compat only)
     void new SystemClock();
   });
 
@@ -63,7 +70,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 1000,
       reason: "Goodwill",
       overrideReason: "Customer escalated; support approved",
@@ -75,12 +82,7 @@ describe("RefundOverride", () => {
     expect(r.value.refundId).toMatch(/^re_test_/);
   });
 
-  it("bypasses the 30-day window", async () => {
-    // Seed a paid order (paidAt = now), but use a use case with a clock 31 days out.
-    // We don't have a clock on RefundOverride, but the order's paymongoPaidAt is
-    // `new Date()` from the seed, so this test verifies the behavior indirectly:
-    // ProcessRefund would fail with `outside_refund_window` here, but RefundOverride
-    // succeeds.
+  it("bypasses the 7-day window", async () => {
     await orderRepo.seedPaidOrder({
       id: "o1",
       userId: "u1",
@@ -88,15 +90,9 @@ describe("RefundOverride", () => {
       totalMinor: 1000,
       paymongoPaymentId: "cs_paid_1",
     });
-
-    // Force a stale paidAt
     const order = (await orderRepo.findById("o1")) as {
       ok: true;
-      value: {
-        paymongoPaidAt: Date | null;
-        paymongoStatus: string | null;
-        status: string;
-      };
+      value: { paymongoPaidAt: Date | null };
     };
     if (order.ok) {
       order.value.paymongoPaidAt = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000);
@@ -104,7 +100,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 1000,
       reason: "Goodwill",
       overrideReason: "Old order, customer dispute",
@@ -126,7 +122,7 @@ describe("RefundOverride", () => {
 
     await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 1000,
       reason: "Goodwill",
       overrideReason: "Customer escalated",
@@ -150,7 +146,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 1000,
       reason: "x",
       overrideReason: "   ",
@@ -163,7 +159,7 @@ describe("RefundOverride", () => {
   it("returns order_not_found when the order doesn't exist", async () => {
     const r = await useCase.execute({
       orderId: "missing",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 100,
       reason: "x",
       overrideReason: "y",
@@ -184,7 +180,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 100,
       reason: "x",
       overrideReason: "y",
@@ -205,14 +201,14 @@ describe("RefundOverride", () => {
 
     await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 1000,
       reason: "x",
       overrideReason: "y",
     });
     const r = await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 1000,
       reason: "x",
       overrideReason: "y",
@@ -233,7 +229,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 2000,
       reason: "x",
       overrideReason: "y",
@@ -258,7 +254,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 1000,
       reason: "x",
       overrideReason: "y",
@@ -305,7 +301,7 @@ describe("RefundOverride", () => {
 
     const r = await useCase.execute({
       orderId: "o1",
-      actorId: "admin_1",
+      actorId: ADMIN_ID,
       amountMinor: 1000,
       reason: "Goodwill",
       overrideReason: "Customer escalated; support approved",
@@ -314,5 +310,49 @@ describe("RefundOverride", () => {
     expect(r.ok).toBe(true);
     expect(emailSender.sent).toHaveLength(1);
     expect(emailSender.sent[0]?.to).toBe("student@example.com");
+  });
+
+  it("revokes the matching enrollment and audits enrollment.revoked_by_refund", async () => {
+    await orderRepo.seedPaidOrder({
+      id: "o1",
+      userId: "u1",
+      courseId: "c1",
+      totalMinor: 1000,
+      paymongoPaymentId: "cs_paid_1",
+    });
+    const seeded = createEnrollment({
+      id: "e1",
+      userId: "u1",
+      courseId: "c1",
+      source: "direct",
+      couponCode: null,
+      couponDiscount: null,
+      createdAt: new Date(),
+    });
+    if (!seeded.ok) throw new Error("seed");
+    const created = await enrollmentRepo.create(seeded.value);
+    if (!created.ok) throw new Error("seed");
+
+    const r = await useCase.execute({
+      orderId: "o1",
+      actorId: ADMIN_ID,
+      amountMinor: 1000,
+      reason: "Goodwill",
+      overrideReason: "Customer escalated",
+    });
+    expect(r.ok).toBe(true);
+
+    const after = await enrollmentRepo.findByUserIdAndCourseId("u1", "c1");
+    expect(after?.status).toBe("cancelled");
+
+    const auditPage = await auditLog.list({ limit: 100 });
+    expect(auditPage.ok).toBe(true);
+    if (!auditPage.ok) return;
+    const revoke = auditPage.value.entries.find((a) => a.action === "enrollment.revoked_by_refund");
+    expect(revoke).toBeDefined();
+    expect(revoke?.actorId).toBe(ADMIN_ID);
+    expect(revoke?.targetType).toBe("enrollment");
+    expect(revoke?.targetId).toBe("e1");
+    expect(revoke?.metadata).toMatchObject({ orderId: "o1", trigger: "refund_override" });
   });
 });

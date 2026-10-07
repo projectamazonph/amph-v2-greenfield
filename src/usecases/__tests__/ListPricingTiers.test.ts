@@ -2,8 +2,8 @@
  * Tests for ListPricingTiers.
  *
  * STORY-015. Uses InMemoryPricingTierRepository to test the use case
- * in isolation. Tests cover: happy path (no early-bird), early-bird
- * active, early-bird expired, empty catalog, DB error, sort order.
+ * in isolation. Tests cover: happy path, sort order, empty catalog,
+ * draft exclusion, DB error, and multi-tier enrichment.
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -24,8 +24,6 @@ function makeTier(
     priceMinor: number;
     status: "DRAFT" | "ACTIVE" | "ARCHIVED";
     displayOrder: number;
-    earlyBirdPriceMinor: number;
-    earlyBirdEndsAt: Date;
   }> = {},
 ): PricingTier {
   const result = createPricingTier({
@@ -35,8 +33,6 @@ function makeTier(
     priceMinor: overrides.priceMinor ?? 299900,
     status: overrides.status ?? "ACTIVE",
     displayOrder: overrides.displayOrder ?? 0,
-    earlyBirdPriceMinor: overrides.earlyBirdPriceMinor,
-    earlyBirdEndsAt: overrides.earlyBirdEndsAt,
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
   });
@@ -66,6 +62,7 @@ describe("ListPricingTiers", () => {
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value.tiers[0]?.courseSlug).toBe("ppc-foundations");
   });
+
   let repo: InMemoryPricingTierRepository;
   let useCase: ListPricingTiers;
 
@@ -74,9 +71,7 @@ describe("ListPricingTiers", () => {
     useCase = new ListPricingTiers({ pricingTierRepo: repo });
   });
 
-  // ── Happy path: no early-bird ──────────────────────────────────────────────
-
-  it("returns tiers with no early-bird pricing", async () => {
+  it("returns tiers", async () => {
     const tier = makeTier({
       id: "tier-1",
       slug: "foundations",
@@ -93,74 +88,7 @@ describe("ListPricingTiers", () => {
     expect(result.value.tiers).toHaveLength(1);
     expect(result.value.tiers[0]!.id).toBe("tier-1");
     expect(result.value.tiers[0]!.slug).toBe("foundations");
-    expect(result.value.tiers[0]!.isEarlyBird).toBe(false);
-    expect(result.value.tiers[0]!.originalPrice).toBeNull();
-    expect(result.value.tiers[0]!.earlyBirdMinutesRemaining).toBe(0);
   });
-
-  // ── Early-bird window ──────────────────────────────────────────────────────
-
-  it("shows early-bird price and countdown when window is open", async () => {
-    // Use a future date relative to when the test actually runs so
-    // ListPricingTiers.execute()'s internal `now` is always before endsAt.
-    const endsAt = new Date(Date.now() + 90 * 60_000);
-
-    const tier = makeTier({
-      id: "tier-2",
-      slug: "mastery",
-      name: "Accelerated Mastery",
-      priceMinor: 599900,
-      earlyBirdPriceMinor: 499900,
-      earlyBirdEndsAt: endsAt,
-      displayOrder: 2,
-    });
-    repo.seed(tier);
-
-    const result = await useCase.execute();
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.tiers).toHaveLength(1);
-
-    const t = result.value.tiers[0]!;
-    expect(t.isEarlyBird).toBe(true);
-    // Allow for clock skew between test setup and use case execution (~1–2 s drift).
-    expect(t.earlyBirdMinutesRemaining).toBeGreaterThanOrEqual(89);
-    expect(t.earlyBirdMinutesRemaining).toBeLessThanOrEqual(90);
-    // displayPrice is the early-bird price
-    expect(t.displayPrice.minor).toBe(499900);
-    // originalPrice is the regular price
-    expect(t.originalPrice!.minor).toBe(599900);
-  });
-
-  it("returns regular price when early-bird has expired", async () => {
-    // earlyBirdEndsAt is 30 minutes in the past relative to test run time
-    const endsAt = new Date(Date.now() - 30 * 60_000);
-
-    const tier = makeTier({
-      id: "tier-3",
-      slug: "ultimate",
-      name: "Ultimate Transformation",
-      priceMinor: 999900,
-      earlyBirdPriceMinor: 799900,
-      earlyBirdEndsAt: endsAt,
-      displayOrder: 3,
-    });
-    repo.seed(tier);
-
-    const result = await useCase.execute();
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-
-    const t = result.value.tiers[0]!;
-    expect(t.isEarlyBird).toBe(false);
-    expect(t.earlyBirdMinutesRemaining).toBe(0);
-    expect(t.displayPrice.minor).toBe(999900);
-    expect(t.originalPrice).toBeNull();
-  });
-
-  // ── Sort order ─────────────────────────────────────────────────────────────
 
   it("sorts tiers by displayOrder ascending", async () => {
     const tier3 = makeTier({ id: "t3", slug: "c", name: "C", displayOrder: 3 });
@@ -174,8 +102,6 @@ describe("ListPricingTiers", () => {
     if (!result.ok) return;
     expect(result.value.tiers.map((t) => t.displayOrder)).toEqual([1, 2, 3]);
   });
-
-  // ── Empty catalog ───────────────────────────────────────────────────────────
 
   it("returns empty list when no active tiers exist", async () => {
     const result = await useCase.execute();
@@ -206,10 +132,7 @@ describe("ListPricingTiers", () => {
     expect(result.value.tiers[0]!.id).toBe("active");
   });
 
-  // ── Error propagation ──────────────────────────────────────────────────────
-
   it("returns db_error when repo.listActive throws", async () => {
-    // Swap in a stub that always errors
     const stubRepo: IPricingTierRepository = {
       listAll: async () => Result.err({ kind: "db_error", message: "Connection refused" }),
       listActive: async () => Result.err({ kind: "db_error", message: "Connection refused" }),
@@ -231,60 +154,38 @@ describe("ListPricingTiers", () => {
     expect(result.error.message).toBe("Connection refused");
   });
 
-  // ── Multiple tiers ────────────────────────────────────────────────────────
-
   it("enriches multiple tiers independently", async () => {
-    const now = new Date(); // test run time
-    const endsSoon = new Date(now.getTime() + 60 * 60_000); // 1 hour from now
-
-    const noEarlyBird = makeTier({
-      id: "no-eb",
+    const tier1 = makeTier({
+      id: "t1",
       slug: "foundations",
       name: "Foundations",
       priceMinor: 299900,
       displayOrder: 1,
     });
-    const withEarlyBird = makeTier({
-      id: "with-eb",
+    const tier2 = makeTier({
+      id: "t2",
       slug: "mastery",
       name: "Mastery",
       priceMinor: 599900,
-      earlyBirdPriceMinor: 499900,
-      earlyBirdEndsAt: endsSoon,
       displayOrder: 2,
     });
-    const expired = makeTier({
-      id: "expired",
+    const tier3 = makeTier({
+      id: "t3",
       slug: "ultimate",
       name: "Ultimate",
       priceMinor: 999900,
-      earlyBirdPriceMinor: 899900,
-      earlyBirdEndsAt: new Date(now.getTime() - 5 * 60_000), // expired 5 min ago
       displayOrder: 3,
     });
 
-    repo.seedMany([withEarlyBird, expired, noEarlyBird]);
+    repo.seedMany([tier1, tier2, tier3]);
 
     const result = await useCase.execute();
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.tiers).toHaveLength(3);
 
-    const foundations = result.value.tiers[0]!;
-    const mastery = result.value.tiers[1]!;
-    const ultimate = result.value.tiers[2]!;
-
-    expect(foundations.isEarlyBird).toBe(false);
-    expect(foundations.originalPrice).toBeNull();
-
-    expect(mastery.isEarlyBird).toBe(true);
-    // Allow for a few seconds of clock skew between test setup and use case execution.
-    expect(mastery.earlyBirdMinutesRemaining).toBeGreaterThanOrEqual(59);
-    expect(mastery.earlyBirdMinutesRemaining).toBeLessThanOrEqual(60);
-    expect(mastery.displayPrice.minor).toBe(499900);
-
-    expect(ultimate.isEarlyBird).toBe(false);
-    expect(ultimate.earlyBirdMinutesRemaining).toBe(0);
-    expect(ultimate.displayPrice.minor).toBe(999900);
+    expect(result.value.tiers[0]!.displayPrice.minor).toBe(299900);
+    expect(result.value.tiers[1]!.displayPrice.minor).toBe(599900);
+    expect(result.value.tiers[2]!.displayPrice.minor).toBe(999900);
   });
 });

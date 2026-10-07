@@ -32,6 +32,7 @@ const TEST_USER: User = {
   createdAt: new Date(),
   totalXp: 0,
   emailVerifiedAt: null,
+  welcomeCompletedAt: null,
 };
 
 function render() {

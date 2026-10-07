@@ -20,13 +20,15 @@ import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
 import { ImpersonationBanner } from "../ImpersonationBanner";
 
 describe("admin event controls", () => {
-  it("renders a submit control for server-action forms with an accessible Dialog", () => {
+  it("renders a gated control for server-action forms with an accessible Dialog", () => {
     const markup = renderToString(
       <ConfirmSubmitButton confirmMessage="Archive this course?" className="danger">
         Archive
       </ConfirmSubmitButton>,
     );
-    expect(markup).toContain('type="submit"');
+    // CLICK-PATH-001: the trigger is type="button" so the enclosing form
+    // only submits via Confirm -> requestSubmit(), never on first click.
+    expect(markup).toContain('type="button"');
     expect(markup).toContain("Archive");
 
     const source = readFileSync(new URL("../ConfirmSubmitButton.tsx", import.meta.url), "utf8");

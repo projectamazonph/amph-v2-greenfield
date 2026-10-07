@@ -81,6 +81,18 @@
   text-align: center;
 }
 
+/* Story-161: small terms and payment-method copy that sits just above
+   the Create account button so the submit is read in context. Token-only. */
+.terms {
+  margin: 0;
+  padding-top: var(--sp-2);
+  color: var(--c-faint);
+  font-size: var(--fs-12);
+  line-height: var(--leading-normal);
+  text-align: center;
+  border-top: 1px solid var(--c-border-2);
+}
+
 .link {
   color: var(--c-link);
   font-weight: 600;

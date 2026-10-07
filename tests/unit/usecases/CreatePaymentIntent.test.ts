@@ -82,8 +82,6 @@ describe("CreatePaymentIntent", () => {
       slug: "mastery",
       name: "Accelerated Mastery",
       priceMinor: 599900,
-      earlyBirdPriceMinor: 499900,
-      earlyBirdEndsAt: new Date(Date.now() + 60_000),
       status: "ACTIVE",
     });
     if (!tier.ok) throw new Error("tier seed failed");
@@ -93,8 +91,8 @@ describe("CreatePaymentIntent", () => {
     const result = await useCase.execute({ userId: USER_ID, pricingTierSlug: "mastery" });
 
     expect(result.ok).toBe(true);
-    expect(orderRepo.getAll()[0]?.totalMinor).toBe(499900);
-    expect(paymentGateway.calls[0]?.params.amountMinor).toBe(499900);
+    expect(orderRepo.getAll()[0]?.totalMinor).toBe(599900);
+    expect(paymentGateway.calls[0]?.params.amountMinor).toBe(599900);
     expect(paymentGateway.calls[0]?.params.metadata.pricingTierSlug).toBe("mastery");
   });
 

@@ -32,6 +32,7 @@ interface UserRow {
   createdAt: Date;
   totalXp: number;
   emailVerifiedAt: Date | null;
+  welcomeCompletedAt: Date | null;
 }
 
 function makeRow(overrides: Partial<UserRow> = {}): UserRow {
@@ -49,6 +50,7 @@ function makeRow(overrides: Partial<UserRow> = {}): UserRow {
     createdAt: new Date("2026-07-26T00:00:00Z"),
     totalXp: 0,
     emailVerifiedAt: null,
+    welcomeCompletedAt: null,
     ...overrides,
   };
 }

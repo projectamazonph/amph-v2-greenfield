@@ -1,0 +1,76 @@
+/* /admin/capstone/[id] — reviewer forms. Amazon PH simulator tokens only. */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-4);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  margin: 0;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.primary {
+  padding: var(--space-2) var(--space-4);
+  background: var(--success);
+  color: var(--ink-inverse);
+  border: 1px solid var(--success-hover);
+  border-radius: var(--r-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--success-hover);
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondary {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  color: var(--accent-text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--text-sm);
+}

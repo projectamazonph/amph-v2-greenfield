@@ -81,6 +81,16 @@
 .error { font-size: var(--text-sm); color: var(--danger); margin: 0; }
 .feedback { font-size: var(--text-sm); color: var(--ink-700); margin: 0; }
 
+/* CLICK-PATH-005: stage progress line above the form fields. */
+.progress {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-500);
+  margin: 0;
+}
+
 .xpBanner { font-size: var(--text-sm); font-weight: 600; color: var(--success); margin: 0; }
 
 .footer {

@@ -1,262 +1,496 @@
 {
   "schemaVersion": 1,
   "courses": {
-    "ppc-foundations": { "tier": "pp-foundations" },
-    "accelerated-mastery": { "tier": "accelerated-mastery" },
-    "ultimate-transformation": { "tier": "ultimate-transformation" }
+    "ppc-foundations": {
+      "tier": "pp-foundations"
+    },
+    "accelerated-mastery": {
+      "tier": "accelerated-mastery"
+    },
+    "ultimate-transformation": {
+      "tier": "ultimate-transformation"
+    }
   },
   "lessons": [
     {
       "slug": "0.1-welcome",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:0.1-welcome"],
       "finalDeliverable": "A written Amazon PPC work goal"
     },
     {
       "slug": "0.2-platform-tour",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:0.2-platform-tour"],
       "finalDeliverable": "A saved map of the platform work loop"
     },
     {
       "slug": "0.3-first-simulation",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:0.3-first-simulation"],
       "finalDeliverable": "A first client-brief decision note"
     },
     {
+      "slug": "0.4-ad-console-pro",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "ad-console"
+      },
+      "resourceRefs": ["mdx:0.4-ad-console-pro"],
+      "finalDeliverable": "An AdConsole navigation log: which layer you opened first, the pacing or auction signal you found, and the action you took next"
+    },
+    {
+      "slug": "0.5-client-onboarding",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "client-onboarding"
+      },
+      "resourceRefs": ["mdx:0.5-client-onboarding"],
+      "finalDeliverable": "A one-page onboarding doc: access level, KPI, product facts, approval rules, launch blockers"
+    },
+    {
       "slug": "1.1-read-ppc-data-before-you-change-it",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:1.1-read-ppc-data-before-you-change-it"],
       "finalDeliverable": "A one-line decision note"
     },
     {
       "slug": "1.2-cpc-ctr",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:1.2-cpc-ctr"],
       "finalDeliverable": "A CPC and CTR interpretation"
     },
     {
       "slug": "1.3-acos-tacos-profitability",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:1.3-acos-tacos-profitability"],
       "finalDeliverable": "A profitability calculation"
     },
     {
       "slug": "1.4-roas-measuring-return",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:1.4-roas-measuring-return"],
       "finalDeliverable": "A ROAS calculation"
     },
     {
       "slug": "1.5-metrics-in-practice",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:1.5-metrics-in-practice"],
       "finalDeliverable": "A metrics-based account decision"
     },
     {
       "slug": "2.1-match-types",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:2.1-match-types"],
       "finalDeliverable": "A match-type choice with a reason"
     },
     {
       "slug": "2.2-keyword-research-workflow",
-      "toolBridge": { "kind": "simulator", "target": "keyword-research" },
+      "toolBridge": {
+        "kind": "simulator",
+        "target": "keyword-research"
+      },
       "resourceRefs": ["mdx:2.2-keyword-research-workflow"],
       "finalDeliverable": "A first keyword research shortlist"
     },
     {
       "slug": "2.3-negative-keywords",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:2.3-negative-keywords"],
       "finalDeliverable": "A negative keyword list"
     },
     {
       "slug": "2.4-keyword-grouping",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:2.4-keyword-grouping"],
       "finalDeliverable": "A grouped keyword plan"
     },
     {
+      "slug": "2.5-keyword-lab",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "keyword-lab"
+      },
+      "resourceRefs": ["mdx:2.5-keyword-lab"],
+      "finalDeliverable": "A hit list of 5 ranked terms with intent, est CPC, est CVR, target ACoS, and the ad group each belongs to"
+    },
+    {
       "slug": "3.1-listing-quality-score",
-      "toolBridge": { "kind": "simulator", "target": "listing-audit" },
+      "toolBridge": {
+        "kind": "simulator",
+        "target": "listing-audit"
+      },
       "resourceRefs": ["mdx:3.1-listing-quality-score"],
       "finalDeliverable": "A listing relevance finding"
     },
     {
       "slug": "3.2-listing-anatomy",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "listing"
+      },
       "resourceRefs": ["mdx:3.2-listing-anatomy"],
       "finalDeliverable": "A listing anatomy checklist"
     },
     {
       "slug": "3.3-aplus-content",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:3.3-aplus-content"],
       "finalDeliverable": "An A+ content improvement note"
     },
     {
+      "slug": "3.4-buybox-dojo",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "listing"
+      },
+      "resourceRefs": ["mdx:3.4-buybox-dojo"],
+      "finalDeliverable": "A listing-readiness memo: research sources, match-type mix, negative list, and a 7-day PPC pressure-test plan"
+    },
+    {
       "slug": "4.1-sponsored-products",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:4.1-sponsored-products"],
       "finalDeliverable": "A Sponsored Products format choice"
     },
     {
       "slug": "4.2-sponsored-brands-display",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "ad-console"
+      },
       "resourceRefs": ["mdx:4.2-sponsored-brands-display"],
       "finalDeliverable": "An ad-format recommendation"
     },
     {
       "slug": "4.3-campaign-structure",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:4.3-campaign-structure"],
       "finalDeliverable": "A campaign naming and structure plan"
     },
     {
       "slug": "4.4-campaign-architecture-practice",
-      "toolBridge": { "kind": "simulator", "target": "campaign-builder" },
+      "toolBridge": {
+        "kind": "simulator",
+        "target": "campaign-builder"
+      },
       "resourceRefs": ["mdx:4.4-campaign-architecture-practice"],
       "finalDeliverable": "A completed campaign architecture"
     },
     {
+      "slug": "4.5-campaign-architect",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "campaign-architect"
+      },
+      "resourceRefs": ["mdx:4.5-campaign-architect"],
+      "finalDeliverable": "A structure doc: one purpose, one match type, one bid default, one negative list, one review cadence per campaign"
+    },
+    {
       "slug": "5.1-campaign-portfolios",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:5.1-campaign-portfolios"],
       "finalDeliverable": "A portfolio organization plan"
     },
     {
       "slug": "5.2-budget-pacing",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "pacing-deck"
+      },
       "resourceRefs": ["mdx:5.2-budget-pacing"],
       "finalDeliverable": "A budget pacing decision"
     },
     {
       "slug": "5.3-seasonal-strategy",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:5.3-seasonal-strategy"],
       "finalDeliverable": "A seasonal planning note"
     },
     {
       "slug": "6.1-bid-strategies",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:6.1-bid-strategies"],
       "finalDeliverable": "A bid strategy recommendation"
     },
     {
       "slug": "6.2-placement-adjustments",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:6.2-placement-adjustments"],
       "finalDeliverable": "A placement adjustment decision"
     },
     {
       "slug": "6.3-bid-elevator-prep",
-      "toolBridge": { "kind": "simulator", "target": "bid-elevator" },
+      "toolBridge": {
+        "kind": "simulator",
+        "target": "bid-elevator"
+      },
       "resourceRefs": ["mdx:6.3-bid-elevator-prep"],
       "finalDeliverable": "A completed bid decision"
     },
     {
+      "slug": "6.4-bid-decisions",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "bid-decisions"
+      },
+      "resourceRefs": ["mdx:6.4-bid-decisions"],
+      "finalDeliverable": "A bid-decision memo: the six numbers you read, the move you picked (raise / hold / lower / investigate), and the step size you chose"
+    },
+    {
       "slug": "7.1-search-term-analysis",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:7.1-search-term-analysis"],
       "finalDeliverable": "A search-term performance finding"
     },
     {
       "slug": "7.2-negative-keywords",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:7.2-negative-keywords"],
       "finalDeliverable": "An advanced negative keyword decision"
     },
     {
       "slug": "7.3-str-triage-prep",
-      "toolBridge": { "kind": "simulator", "target": "str-triage" },
+      "toolBridge": {
+        "kind": "simulator",
+        "target": "str-triage"
+      },
       "resourceRefs": ["mdx:7.3-str-triage-prep"],
       "finalDeliverable": "A completed search-term triage"
     },
     {
+      "slug": "7.4-search-triage",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "search-triage"
+      },
+      "resourceRefs": ["mdx:7.4-search-triage"],
+      "finalDeliverable": "A triage log: cluster, rule per cluster, batch action, and the one-line defense for each cluster"
+    },
+    {
       "slug": "8.1-brand-analytics",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:8.1-brand-analytics"],
       "finalDeliverable": "A Brand Analytics finding"
     },
     {
       "slug": "8.2-share-of-voice",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:8.2-share-of-voice"],
       "finalDeliverable": "A share-of-voice comparison"
     },
     {
       "slug": "8.3-competitor-benchmarking",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "bulk-file"
+      },
       "resourceRefs": ["mdx:8.3-competitor-benchmarking"],
       "finalDeliverable": "A competitor benchmark action"
     },
     {
       "slug": "9.1-weekly-routine",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:9.1-weekly-routine"],
       "finalDeliverable": "A cadence plan and weekly review date"
     },
     {
       "slug": "9.2-one-change-at-a-time",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "sqp-studio"
+      },
       "resourceRefs": ["mdx:9.2-one-change-at-a-time"],
       "finalDeliverable": "A one-variable test log"
     },
     {
       "slug": "9.3-how-much-data-is-enough",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:9.3-how-much-data-is-enough"],
       "finalDeliverable": "A data sufficiency decision"
     },
     {
+      "slug": "9.4-pacing-deck",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "pacing-deck"
+      },
+      "resourceRefs": ["mdx:9.4-pacing-deck"],
+      "finalDeliverable": "A pacing log: yesterday's curve, today's day-parting modifier, hour-6 and hour-18 verification, and the next review time"
+    },
+    {
+      "slug": "9.5-sqp-studio",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "sqp-studio"
+      },
+      "resourceRefs": ["mdx:9.5-sqp-studio"],
+      "finalDeliverable": "An SQP memo: ranks by impression, click, and conversion, plus one query you'd defend acting on and one you'd defend waiting on"
+    },
+    {
       "slug": "10.1-simple-report-structure",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:10.1-simple-report-structure"],
       "finalDeliverable": "A client-ready weekly report"
     },
     {
       "slug": "10.2-explaining-numbers",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:10.2-explaining-numbers"],
       "finalDeliverable": "A plain-language metric readout"
     },
     {
       "slug": "10.3-no-impressions-low-ctr",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:10.3-no-impressions-low-ctr"],
       "finalDeliverable": "A top-of-funnel diagnostic note"
     },
     {
       "slug": "10.4-clicks-no-sales-high-acos",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:10.4-clicks-no-sales-high-acos"],
       "finalDeliverable": "A bottom-of-funnel diagnostic note"
     },
     {
+      "slug": "10.5-account-audit",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "account-audit"
+      },
+      "resourceRefs": ["mdx:10.5-account-audit"],
+      "finalDeliverable": "An audit list: top three findings with defenses, ranked waste first, scale second, listing third, thin data last"
+    },
+    {
       "slug": "11.1-tasks-by-cadence",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:11.1-tasks-by-cadence"],
       "finalDeliverable": "A cadence plan"
     },
     {
       "slug": "11.2-permissions-ladder",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "client-onboarding"
+      },
       "resourceRefs": ["mdx:11.2-permissions-ladder"],
       "finalDeliverable": "An approval note"
     },
     {
       "slug": "11.3-sops-change-log",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "none"
+      },
       "resourceRefs": ["mdx:11.3-sops-change-log"],
       "finalDeliverable": "An SOP and change-log row"
     },
     {
       "slug": "11.4-client-communication-capstone",
-      "toolBridge": { "kind": "none" },
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "capstone-sequence"
+      },
       "resourceRefs": ["mdx:11.4-client-communication-capstone"],
       "finalDeliverable": "A client update and capstone evidence pack"
+    },
+    {
+      "slug": "11.5-bulk-file",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "bulk-file"
+      },
+      "resourceRefs": ["mdx:11.5-bulk-file"],
+      "finalDeliverable": "A bulk-sheet record: scope sentence, action set, dry-run result, and the fix loop for any failed rows"
+    },
+    {
+      "slug": "11.6-capstone",
+      "toolBridge": {
+        "kind": "simgrid",
+        "target": "capstone-sequence"
+      },
+      "resourceRefs": ["mdx:11.6-capstone"],
+      "finalDeliverable": "An integration run: six artifacts, the onboarding doc, structure doc, launch log, optimization log, audit list, and report"
+    },
+    {
+      "slug": "-1.1-what-amazon-is",
+      "toolBridge": {
+        "kind": "none"
+      },
+      "resourceRefs": ["mdx:-1.1-what-amazon-is"],
+      "finalDeliverable": "A one-paragraph plain-language explanation of what Amazon is and why ads exist there"
+    },
+    {
+      "slug": "-1.2-surfaces",
+      "toolBridge": {
+        "kind": "none"
+      },
+      "resourceRefs": ["mdx:-1.2-surfaces"],
+      "finalDeliverable": "A short map of the four surfaces a PPC VA uses and what lives on each"
+    },
+    {
+      "slug": "-1.3-ad-object-model",
+      "toolBridge": {
+        "kind": "none"
+      },
+      "resourceRefs": ["mdx:-1.3-ad-object-model"],
+      "finalDeliverable": "A labeled diagram or sentence describing the five-level Amazon ads hierarchy"
     }
   ]
 }

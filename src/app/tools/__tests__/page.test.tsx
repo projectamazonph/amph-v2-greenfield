@@ -49,7 +49,7 @@ describe("/tools index — domain layer", () => {
     const simulators = container.simulatorRegistry.list();
 
     expect(simulators).toContainEqual(
-      expect.objectContaining({ simulatorId: "bid-elevator", name: "Bid Elevator" })
+      expect.objectContaining({ simulatorId: "bid-elevator", name: "Bid Elevator" }),
     );
   });
 
@@ -88,5 +88,48 @@ describe("/tools index — domain layer", () => {
     const names = simulators.map((s: { name: string }) => s.name);
 
     expect(names.join(" ")).toMatch(/practice tools|bid|elevator|triage/i);
+  });
+
+  // STORY-159: STATUS-FIRST cards. The /tools index surfaces
+  // PUBLIC_CURRICULUM_CLAIMS availability per simulator so learners can
+  // tell "I can try this without an account" from "I need to enroll first".
+  describe("STORY-159 status-first tooling", () => {
+    it("PUBLIC_CURRICULUM_CLAIMS reports bid-elevator as public-preview", async () => {
+      const { PUBLIC_CURRICULUM_CLAIMS } =
+        await import("@/domain/curriculum/PublicCurriculumClaims");
+      expect(PUBLIC_CURRICULUM_CLAIMS.simulators["bid-elevator"]?.availability).toBe(
+        "public-preview",
+      );
+    });
+
+    it("PUBLIC_CURRICULUM_CLAIMS reports listing-audit as enrolled-practice", async () => {
+      // Variant draft swapped this to public-preview by mistake; the
+      // reviewed claims contract is authoritative, so the page must
+      // follow the contract.
+      const { PUBLIC_CURRICULUM_CLAIMS } =
+        await import("@/domain/curriculum/PublicCurriculumClaims");
+      expect(PUBLIC_CURRICULUM_CLAIMS.simulators["listing-audit"]?.availability).toBe(
+        "enrolled-practice",
+      );
+    });
+
+    it("simulator page component enumerates all five simulators", async () => {
+      // Pin the registry contract used by the page so a regression in
+      // the registry quickly surfaces a clear failure here.
+      const { buildContainer } = await import("@/composition/container");
+      const container = buildContainer();
+      const simulators = container.simulatorRegistry.list();
+      const ids = simulators.map((s: { simulatorId: string }) => s.simulatorId).sort();
+
+      expect(ids).toEqual(
+        [
+          "bid-elevator",
+          "campaign-builder",
+          "keyword-research",
+          "listing-audit",
+          "str-triage",
+        ].sort(),
+      );
+    });
   });
 });

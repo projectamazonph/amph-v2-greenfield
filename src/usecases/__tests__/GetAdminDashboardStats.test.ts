@@ -53,6 +53,7 @@ function makeUser(id: string, role: User["role"] = "STUDENT"): User {
     createdAt: new Date(),
     totalXp: 0,
     emailVerifiedAt: null,
+    welcomeCompletedAt: null,
   };
 }
 

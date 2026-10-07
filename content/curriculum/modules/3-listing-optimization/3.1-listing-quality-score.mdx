@@ -94,7 +94,7 @@ Let's look at two identical products with different listing quality:
 
 | Factor | Listing A (Optimized) | Listing B (Weak) |
 |--------|----------------------|-------------------|
-| Title | Full, keyword-rich, 200 chars | Short, missing keywords |
+| Title | Full, keyword-rich, inside the category limit | Short, missing keywords |
 | Bullet Points | 5 detailed benefits | 3 generic sentences |
 | Images | 7 high-res, infographic, video | 3 photos, no zoom |
 | A+ Content | Yes | No |
@@ -105,10 +105,10 @@ Let's look at two identical products with different listing quality:
 
 | Metric | Listing A | Listing B | Difference |
 |--------|-----------|-----------|------------|
-| Average CPC | ₱26 | ₱45 | **71% higher for B** |
+| Average CPC | ₱26 | ₱45 | **73% higher for B** |
 | CTR | 0.45% | 0.22% | B gets half the clicks |
 | Conversion Rate | 12.5% | 6.1% | B converts at half the rate |
-| ACoS (advertising cost of sales) | 17% | 58% | **B's ACoS is about 3.5x higher** |
+| ACoS (advertising cost of sales) | 17% | 59% | **B's ACoS is about 3.5x higher** |
 
 Listing A spent **₱26 per click** and converted at 12.5%. Listing B paid **₱45 per click** and converted at 6.1%. The combined effect means Listing A gets **about 3.5x more sales per ad peso** than Listing B.
 
@@ -225,15 +225,27 @@ Use this when a client asks why raising the bid isn't the first step:
 
 > "Right now our cost per click is high because shoppers aren't clicking or buying at the rate that earns cheaper clicks from Amazon. Before we spend more on bids, let's fix the listing itself (photos, bullets, reviews) so the same ad budget works harder, then revisit bids once those numbers improve."
 
+:::callout{id="lesson-3-1-pitfall" variant="pitfall" title="Raising bids on a listing that cannot convert"}
+Bidding higher on a listing with weak images, vague bullets, or low review count pays more for the same weak conversion. The bid lever cannot fix a conversion-side problem.
+:::
+
+<SelfCheck
+  id="sc-3-1"
+  prompt="A campaign has 0.4% CTR, 4% CVR, and a 75% ACoS. What is the first move?"
+  options={["Pull the search-term report and audit the listing's images, title, and bullets.", "Lower the bid by 30% to bring ACoS back into target.", "Move the campaign to a different match type.", "Add more keywords to widen the audience and lift CTR."]}
+  answerIndex={0}
+  explanation="Both CTR and CVR are weak, so the bottleneck is the listing, not the bid. Audit the listing first, then revisit the bid once the page can earn the click and the order."
+/>
+
 ## Quick check
 
 1. Does Amazon publish a single, checkable "Quality Score" for a listing?
 2. In the Listing A vs. Listing B example, which listing pays more per click, and by roughly how much?
-3. Listing A converts at 12.5% and Listing B at 6.1%. Which one has the healthier ACoS, 17% or 58%?
+3. Listing A converts at 12.5% and Listing B at 6.1%. Which one has the healthier ACoS, 17% or 59%?
 4. Which two signals feed the ad auction directly, according to this lesson?
 5. True or false: raising your bid is the first fix for a weak listing.
 
-**Answers:** (1) No. Amazon doesn't publish a named Quality Score. That's teaching shorthand for CTR, CVR, and the other observable signals in this lesson. (2) Listing B pays more, ₱45 vs. ₱26, about 71% higher. (3) Listing A, at 17% ACoS versus Listing B's 58%. (4) CTR (click-through rate) and CVR (conversion rate). (5) False. Fix the listing first. Bidding higher on a weak listing just burns money faster.
+**Answers:** (1) No. Amazon doesn't publish a named Quality Score. That's teaching shorthand for CTR, CVR, and the other observable signals in this lesson. (2) Listing B pays more, ₱45 vs. ₱26, about 73% higher. (3) Listing A, at 17% ACoS versus Listing B's 59%. (4) CTR (click-through rate) and CVR (conversion rate). (5) False. Fix the listing first. Bidding higher on a weak listing just burns money faster.
 
 ## What to read next
 
@@ -249,7 +261,7 @@ What the learner can do: Diagnose observable inputs (CTR, CVR, listing completen
 Who can access it: All sellers and advertisers (these are listing/catalog attributes, not a gated feature)
 Retailer or marketplace scope: General Amazon retail and advertising practice; Amazon does not publish a formula
 Official source URL: No single official source (this is an inference from Amazon's public retail readiness and advertising relevance guidance, not a documented metric)
-Last verified: [content owner to fill in at rewrite time]
-Next review due: [content owner to fill in at rewrite time]
-Owner: [content owner]
+Last verified: 2026-09-25
+Next review due: 2026-01-25
+Owner: Ryan Roland Dabao
 ```

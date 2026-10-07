@@ -24,6 +24,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { buildContainer } from "@/composition/container";
+import { isReadOnlyPreviewRequest } from "@/lib/preview-read-only";
 
 const PROTECTED_PREFIXES = ["/dashboard/", "/admin/", "/enroll/", "/order/"];
 const PROTECTED_EXACT = ["/dashboard", "/enroll", "/order"];
@@ -73,9 +74,7 @@ function isMaintenancePagePath(pathname: string): boolean {
  * Any DB read failure degrades to "site is up" -- a transient DB
  * outage must not lock everyone out via a hard 503.
  */
-async function checkMaintenanceMode(
-  request: NextRequest,
-): Promise<NextResponse | null> {
+async function checkMaintenanceMode(request: NextRequest): Promise<NextResponse | null> {
   // The maintenance page itself is always reachable so the user
   // sees the explanation.
   if (isMaintenancePagePath(request.nextUrl.pathname)) return null;
@@ -92,12 +91,8 @@ async function checkMaintenanceMode(
   //    is disabled -- matching the dev default.
   const bypassToken = process.env.MAINTENANCE_BYPASS_TOKEN ?? "";
   if (bypassToken.length > 0) {
-    const cookieValue =
-      request.cookies.get("amph_maintenance_bypass")?.value ?? "";
-    if (
-      cookieValue.length > 0 &&
-      timingSafeEqual(cookieValue, bypassToken)
-    ) {
+    const cookieValue = request.cookies.get("amph_maintenance_bypass")?.value ?? "";
+    if (cookieValue.length > 0 && timingSafeEqual(cookieValue, bypassToken)) {
       return null;
     }
   }
@@ -158,6 +153,20 @@ async function readRoleFromCookie(request: NextRequest): Promise<string | null> 
 }
 
 export async function proxy(request: NextRequest) {
+  // Read-only preview, checked first so a rejected write never reaches the
+  // database and never waits on the maintenance query below. Same reasoning
+  // as the production-only gate on vercel.json's buildCommand: preview and
+  // production share one DATABASE_URL. See src/lib/preview-read-only.ts.
+  if (isReadOnlyPreviewRequest(request.method, process.env.VERCEL_ENV)) {
+    return NextResponse.json(
+      {
+        error: "preview_read_only",
+        message: "Preview deployments are read-only. Writes run in production only.",
+      },
+      { status: 405, headers: { Allow: "GET, HEAD" } },
+    );
+  }
+
   const { pathname } = request.nextUrl;
 
   // ── Security headers ──────────────────────────────────────
@@ -202,6 +211,22 @@ export async function proxy(request: NextRequest) {
   // Production builds tree-shake the dev eval() shim, so the directive
   // is omitted there to keep the strict Proposal 2 CSP intact.
   const isDev = process.env.NODE_ENV !== "production";
+  // SimGrid integration fix wave (I1): the vendored static site under
+  // /simgrid-v1/ is loaded inside an AMPH iframe (see
+  // src/app/practice/simgrid/[...slug]/page.tsx + SimgridFrame). The
+  // default AMPH CSP sets `frame-ancestors 'none'` and the proxy sets
+  // `X-Frame-Options: DENY` on every response, which causes the browser
+  // to refuse to render the iframe at all. We relax only those two
+  // framing directives for /simgrid-v1/ requests — every other
+  // security header (nosniff, Referrer-Policy, Permissions-Policy, the
+  // rest of the CSP) still applies. Note that the proxy matcher still
+  // matches /simgrid-v1/ paths (they are NOT excluded like _next/static)
+  // precisely so these headers still get applied — we just override the
+  // framing ones for this single origin. The vendored HTML files
+  // themselves also declare `frame-ancestors 'none'` in a <meta> tag,
+  // but per the CSP spec frame-ancestors is ignored when delivered via
+  // <meta>, so it doesn't contribute to blocking.
+  const isVendoredSimgrid = pathname.startsWith("/simgrid-v1/");
   const cspHeaderValue = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""}`,
@@ -218,7 +243,9 @@ export async function proxy(request: NextRequest) {
     // and the YouTube/Vimeo lesson-video embeds (LessonContent.tsx)
     // included.
     "frame-src 'self' https://amazon-ad-console.vercel.app https://www.youtube.com https://player.vimeo.com",
-    "frame-ancestors 'none'",
+    // SimGrid I1: relax to 'self' for vendored pages so they can be
+    // framed by the AMPH wrapper route. AMPH pages keep 'none'.
+    isVendoredSimgrid ? "frame-ancestors 'self'" : "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "object-src 'none'",
@@ -231,7 +258,9 @@ export async function proxy(request: NextRequest) {
 
   const res = NextResponse.next({ request: { headers: requestHeaders } });
 
-  res.headers.set("X-Frame-Options", "DENY");
+  // SimGrid I1: SAMEORIGIN allows AMPH to frame /simgrid-v1/ while
+  // keeping cross-origin framing blocked. AMPH pages still get DENY.
+  res.headers.set("X-Frame-Options", isVendoredSimgrid ? "SAMEORIGIN" : "DENY");
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");

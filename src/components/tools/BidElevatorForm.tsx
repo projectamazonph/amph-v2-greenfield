@@ -32,9 +32,10 @@ import { studentErrorCopy } from "@/lib/studentErrorCopy";
 interface Props {
   scenario: BidElevatorScenarioContent;
   challengeUnlocked: boolean;
+  scenarioName?: string | null;
 }
 
-export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
+export function BidElevatorForm({ scenario, challengeUnlocked, scenarioName }: Props) {
   const [bids, setBids] = useState<Record<string, number>>(() =>
     Object.fromEntries(scenario.keywords.map((k) => [k.keywordId, k.currentBid])),
   );
@@ -43,14 +44,20 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [simResult, setSimResult] = useState<BidElevatorOutput | null>(null);
   const [xpAwarded, setXpAwarded] = useState<number | null>(null);
+  const [resultMode, setResultMode] = useState<PracticeOrChallengeMode | null>(null);
 
   const onChange = (keywordId: string, value: number) => {
     setBids((prev) => ({ ...prev, [keywordId]: value }));
   };
 
+  const onModeChange = (next: PracticeOrChallengeMode) => {
+    setMode(next);
+  };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    const submittedMode = mode;
     startTransition(async () => {
       try {
         const response = await bidElevatorAttempt({ userBidAdjustments: bids, mode });
@@ -68,6 +75,10 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           estimatedRoas: response.value.estimatedRoas,
         });
         setXpAwarded(response.value.xpAwarded ?? null);
+        // CLICK-PATH-006: stamp which mode produced this result. If the
+        // student flips the toggle afterward, the stale badge below is
+        // hidden instead of describing the wrong mode.
+        setResultMode(submittedMode);
       } catch {
         setError(studentErrorCopy.simulatorRun);
       }
@@ -76,7 +87,10 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
 
   return (
     <form className={styles.form} onSubmit={onSubmit}>
-      <SimulatorModeToggle mode={mode} onChange={setMode} unlocked={challengeUnlocked} />
+      {/* CLICK-PATH-006: toggling mode after a run hides the stale result
+          (resultMode !== mode) instead of letting a Practice score pose as
+          a Challenge score. Re-running stamps the new mode. */}
+      <SimulatorModeToggle mode={mode} onChange={onModeChange} unlocked={challengeUnlocked} />
       <div className={styles.metaRow}>
         <span className={styles.metaItem}>
           <span className={styles.metaLabel}>Daily budget</span>
@@ -96,9 +110,15 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           <thead>
             <tr>
               <th scope="col">Keyword</th>
-              <th scope="col" className={styles.thNum}>Impr/day</th>
-              <th scope="col" className={styles.thNum}>Benchmark CPC</th>
-              <th scope="col" className={styles.thNum}>Your bid</th>
+              <th scope="col" className={styles.thNum}>
+                Impr/day
+              </th>
+              <th scope="col" className={styles.thNum}>
+                Benchmark CPC
+              </th>
+              <th scope="col" className={styles.thNum}>
+                Your bid
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -131,20 +151,21 @@ export function BidElevatorForm({ scenario, challengeUnlocked }: Props) {
           {error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        className={styles.submit}
-        disabled={pending}
-        aria-busy={pending}
-      >
-        {pending ? "Running…" : "Run simulation"}
+      <button type="submit" className={styles.submit} disabled={pending} aria-busy={pending}>
+        {pending ? "Running…" : simResult ? "Run again" : "Run simulation"}
       </button>
-      {simResult ? (
+      {simResult && resultMode === mode ? (
         <BidElevatorResult
           result={simResult}
           targetRoas={scenario.targetRoas}
           xpAwarded={xpAwarded}
+          scenarioName={scenarioName ?? null}
         />
+      ) : null}
+      {simResult && resultMode !== mode ? (
+        <p className={styles.staleResult} role="status">
+          Mode changed to {mode}. Run again to score this mode.
+        </p>
       ) : null}
     </form>
   );

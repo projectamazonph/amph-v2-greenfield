@@ -16,7 +16,7 @@ describe("Landing page", () => {
       "Amazon ads,", // Hero
       "Reading isn\u2019t enough", // Method
       "Move a bid. Watch the account breathe.", // SimulatorSection
-      "12 modules, in order. No hidden gates.", // Curriculum
+      "13 modules, in order. No hidden gates.", // Curriculum
       "A paid course.", // WhoFor
       "Three tiers, one-time payment.", // Pricing
       "Direct, grounded in real account work.", // Mentor

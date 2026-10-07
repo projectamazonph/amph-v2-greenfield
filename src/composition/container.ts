@@ -69,6 +69,8 @@ import type { ISimulatorScenarioCalibrationRepository } from "@/ports/repositori
 import type { IAttemptFeedbackRepository } from "@/ports/repositories/IAttemptFeedbackRepository";
 import type { ILiveClassRepository } from "@/ports/repositories/ILiveClassRepository";
 import type { ILiveClassRegistrationRepository } from "@/ports/repositories/ILiveClassRegistrationRepository";
+// ADR-026: SimGrid iframe progress sync
+import type { ISimgridAttemptRepository } from "@/ports/simgrid/ISimgridAttemptRepository";
 import type { IPricingTierRepository } from "@/ports/repositories/IPricingTierRepository";
 import type { KeywordDatasetRepository } from "@/ports/repositories/KeywordDatasetRepository";
 import type { IEmailTemplateRepository } from "@/ports/repositories/IEmailTemplateRepository";
@@ -104,6 +106,8 @@ import { PrismaSimulatorScenarioCalibrationRepository } from "@/infra/repositori
 import { PrismaAttemptFeedbackRepository } from "@/infra/repositories/PrismaAttemptFeedbackRepository";
 import { PrismaLiveClassRepository } from "@/infra/live-class/PrismaLiveClassRepository";
 import { PrismaLiveClassRegistrationRepository } from "@/infra/repositories/PrismaLiveClassRegistrationRepository";
+// ADR-026: SimGrid iframe progress sync
+import { PrismaSimgridAttemptRepository } from "@/infra/repositories/PrismaSimgridAttemptRepository";
 import { PrismaPricingTierRepository } from "@/infra/repositories/PrismaPricingTierRepository";
 import { PrismaEmailTemplateRepository } from "@/infra/repositories/PrismaEmailTemplateRepository";
 import { PrismaUserStreakRepository } from "@/infra/repositories/PrismaUserStreakRepository";
@@ -140,6 +144,37 @@ import { SubmitAssignment } from "@/usecases/SubmitAssignment";
 import { GradeAssignment } from "@/usecases/GradeAssignment";
 import { ListStudentAssignments } from "@/usecases/ListStudentAssignments";
 import { AdminListAssignments } from "@/usecases/AdminListAssignments";
+// LEARN-033 (STORY-135): learner artefacts
+import type { IArtefactRepository } from "@/ports/repositories/IArtefactRepository";
+import { PrismaArtefactRepository } from "@/infra/repositories/PrismaArtefactRepository";
+import { SaveArtefact } from "@/usecases/SaveArtefact";
+import { SubmitArtefact } from "@/usecases/SubmitArtefact";
+import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
+// STORY-163: Module 1 worksheet artifact
+import type { WorksheetRepository } from "@/ports/repositories/WorksheetRepository";
+import { PrismaWorksheetRepository } from "@/infra/repositories/PrismaWorksheetRepository";
+import { GetWorksheet } from "@/usecases/GetWorksheet";
+import { SaveWorksheetEntry } from "@/usecases/SaveWorksheetEntry";
+// LEARN-040 (STORY-138): retrieval-check tracking
+import type { IRetrievalCheckRepository } from "@/ports/repositories/IRetrievalCheckRepository";
+import { PrismaRetrievalCheckRepository } from "@/infra/repositories/PrismaRetrievalCheckRepository";
+import { RecordRetrievalCheck } from "@/usecases/RecordRetrievalCheck";
+// P3-87 (STORY-139): in-app notifications
+import type { INotificationRepository } from "@/ports/repositories/INotificationRepository";
+import { PrismaNotificationRepository } from "@/infra/repositories/PrismaNotificationRepository";
+import { NotifyUser } from "@/usecases/NotifyUser";
+import { ListNotifications } from "@/usecases/ListNotifications";
+import { MarkNotificationRead } from "@/usecases/MarkNotificationRead";
+import { MarkAllNotificationsRead } from "@/usecases/MarkAllNotificationsRead";
+// LEARN-043 (STORY-143): capstone submission
+import type { ICapstoneRepository } from "@/ports/repositories/ICapstoneRepository";
+import { PrismaCapstoneRepository } from "@/infra/repositories/PrismaCapstoneRepository";
+import { SubmitCapstone } from "@/usecases/SubmitCapstone";
+import { GetCapstoneStatus } from "@/usecases/GetCapstoneStatus";
+// LEARN-044 (STORY-144): capstone reviewer workflow
+import { ListCapstoneReviewQueue } from "@/usecases/ListCapstoneReviewQueue";
+import { ReturnCapstoneForReview } from "@/usecases/ReturnCapstoneForReview";
+import { PassCapstoneReview } from "@/usecases/PassCapstoneReview";
 // P1-05 (PR-C slice 3): site settings
 import type { ISettingRepository } from "@/ports/repositories/ISettingRepository";
 import { PrismaSettingRepository } from "@/infra/repositories/PrismaSettingRepository";
@@ -189,6 +224,9 @@ import { Logout } from "@/usecases/Logout";
 import { EnableTwoFactor } from "@/usecases/EnableTwoFactor";
 import { ConfirmTwoFactor } from "@/usecases/ConfirmTwoFactor";
 import { DisableTwoFactor } from "@/usecases/DisableTwoFactor";
+// STORY-146: welcome step completion + reset (used by student onboarding)
+import { CompleteWelcome } from "@/usecases/CompleteWelcome";
+import { ResetWelcome } from "@/usecases/ResetWelcome";
 import { VerifyEmail } from "@/usecases/auth/VerifyEmail";
 import { ResendVerification } from "@/usecases/auth/ResendVerification";
 import type { EmailVerificationRepository } from "@/ports/repositories/EmailVerificationRepository";
@@ -213,6 +251,7 @@ import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
+import { AdminApplyDiscountCode } from "@/usecases/AdminApplyDiscountCode";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
 import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
 import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
@@ -260,6 +299,10 @@ import { GetUserDetail } from "@/usecases/GetUserDetail";
 import { ImpersonateUser } from "@/usecases/ImpersonateUser";
 import { AdminGrantSubscription } from "@/usecases/AdminGrantSubscription";
 import { AdminSetEnrollmentStatus } from "@/usecases/AdminSetEnrollmentStatus";
+import { AdminUpdateUser } from "@/usecases/AdminUpdateUser";
+import { AdminSetUserPassword } from "@/usecases/AdminSetUserPassword";
+import { AdminDeleteUser } from "@/usecases/AdminDeleteUser";
+import { AdminForceSignOut } from "@/usecases/AdminForceSignOut";
 import { GetAdminContentStats } from "@/usecases/GetAdminContentStats";
 // STORY-048a: admin courses CRUD
 import { AdminListCourses } from "@/usecases/AdminListCourses";
@@ -321,6 +364,10 @@ import { ListLiveClassesForStudent } from "@/usecases/ListLiveClassesForStudent"
 import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
 import { MarkLiveClassRecordingWatched } from "@/usecases/MarkLiveClassRecordingWatched";
+// ADR-026: SimGrid iframe progress sync
+import { RecordSimgridProgress } from "@/usecases/simgrid/RecordSimgridProgress";
+import { ListSimgridProgressForUser } from "@/usecases/simgrid/ListSimgridProgressForUser";
+import { GetBestSimgridScore } from "@/usecases/simgrid/GetBestSimgridScore";
 import { CreateResource } from "@/usecases/CreateResource";
 import { UpdateResource } from "@/usecases/UpdateResource";
 import { DeleteResource } from "@/usecases/DeleteResource";
@@ -395,6 +442,11 @@ export interface AppContainer {
   liveClassRepo: ILiveClassRepository;
   // STORY-091: live class RSVP for students
   liveClassRegistrationRepo: ILiveClassRegistrationRepository;
+  // ADR-026: SimGrid iframe progress sync
+  simgridAttemptRepo: ISimgridAttemptRepository;
+  recordSimgridProgress: RecordSimgridProgress;
+  listSimgridProgressForUser: ListSimgridProgressForUser;
+  getBestSimgridScore: GetBestSimgridScore;
   // STORY-098: download center resources
   resourceRepo: IResourceRepository;
   // STORY-098.5: download center file upload/management
@@ -447,6 +499,9 @@ export interface AppContainer {
   enableTwoFactor: EnableTwoFactor;
   confirmTwoFactor: ConfirmTwoFactor;
   disableTwoFactor: DisableTwoFactor;
+  // STORY-146: welcome step completion + reset
+  completeWelcome: CompleteWelcome;
+  resetWelcome: ResetWelcome;
   createPaymentIntent: CreatePaymentIntent;
   getCheckoutSummary: GetCheckoutSummary;
   checkCourseAccess: CheckCourseAccess;
@@ -455,6 +510,7 @@ export interface AppContainer {
   markLessonComplete: MarkLessonComplete;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
+  adminApplyDiscountCode: AdminApplyDiscountCode;
   // STORY-050d: admin discount code CRUD
   adminListDiscountCodes: AdminListDiscountCodes;
   adminGetDiscountCode: AdminGetDiscountCode;
@@ -496,6 +552,32 @@ export interface AppContainer {
   gradeAssignment: GradeAssignment;
   listStudentAssignments: ListStudentAssignments;
   adminListAssignments: AdminListAssignments;
+  // LEARN-033 (STORY-135): learner artefacts
+  artefactRepo: IArtefactRepository;
+  saveArtefact: SaveArtefact;
+  submitArtefact: SubmitArtefact;
+  listStudentArtefacts: ListStudentArtefacts;
+  // STORY-163: Module 1 worksheet artifact
+  worksheetRepo: WorksheetRepository;
+  getWorksheet: GetWorksheet;
+  saveWorksheetEntry: SaveWorksheetEntry;
+  // LEARN-040 (STORY-138): retrieval-check tracking
+  retrievalCheckRepo: IRetrievalCheckRepository;
+  recordRetrievalCheck: RecordRetrievalCheck;
+  // P3-87 (STORY-139): in-app notifications
+  notificationRepo: INotificationRepository;
+  notifyUser: NotifyUser;
+  listNotifications: ListNotifications;
+  markNotificationRead: MarkNotificationRead;
+  markAllNotificationsRead: MarkAllNotificationsRead;
+  // LEARN-043 (STORY-143): capstone submission
+  capstoneRepo: ICapstoneRepository;
+  submitCapstone: SubmitCapstone;
+  getCapstoneStatus: GetCapstoneStatus;
+  // LEARN-044 (STORY-144): capstone reviewer workflow
+  listCapstoneReviewQueue: ListCapstoneReviewQueue;
+  returnCapstoneForReview: ReturnCapstoneForReview;
+  passCapstoneReview: PassCapstoneReview;
   // P1-05 (PR-C slice 3): site settings
   settingRepo: ISettingRepository;
   getSetting: GetSetting;
@@ -523,6 +605,10 @@ export interface AppContainer {
   impersonateUser: ImpersonateUser;
   adminGrantSubscription: AdminGrantSubscription;
   adminSetEnrollmentStatus: AdminSetEnrollmentStatus;
+  adminUpdateUser: AdminUpdateUser;
+  adminSetUserPassword: AdminSetUserPassword;
+  adminDeleteUser: AdminDeleteUser;
+  adminForceSignOut: AdminForceSignOut;
   getAdminContentStats: GetAdminContentStats;
   // STORY-048a: admin courses CRUD
   adminListCourses: AdminListCourses;
@@ -709,6 +795,8 @@ function buildProductionContainer(): AppContainer {
   // adapter wins the merge since it also maps `watchedRecordingAt`.
   const liveClassRegistrationRepo: ILiveClassRegistrationRepository =
     new PrismaLiveClassRegistrationRepository(prisma);
+  // ADR-026: SimGrid iframe progress sync
+  const simgridAttemptRepo: ISimgridAttemptRepository = new PrismaSimgridAttemptRepository(prisma);
   // STORY-098: download center resources
   const resourceRepo: IResourceRepository = new PrismaResourceRepository(prisma);
   // STORY-098.5: Vercel Blob when a store is provisioned (BLOB_READ_WRITE_TOKEN set),
@@ -751,6 +839,16 @@ function buildProductionContainer(): AppContainer {
   const prerequisiteRepo: IPrerequisiteRepository = new PrismaPrerequisiteRepository(prisma);
   // P1-02 (PR-C slice 2): assignments
   const assignmentRepo: IAssignmentRepository = new PrismaAssignmentRepository(prisma);
+  // LEARN-033 (STORY-135): learner artefacts
+  const artefactRepo: IArtefactRepository = new PrismaArtefactRepository(prisma);
+  // STORY-163: Module 1 worksheet artifact
+  const worksheetRepo: WorksheetRepository = new PrismaWorksheetRepository(prisma);
+  // LEARN-040 (STORY-138): retrieval-check tracking
+  const retrievalCheckRepo: IRetrievalCheckRepository = new PrismaRetrievalCheckRepository(prisma);
+  // P3-87 (STORY-139): in-app notifications
+  const notificationRepo: INotificationRepository = new PrismaNotificationRepository(prisma);
+  // LEARN-043 (STORY-143): capstone submission
+  const capstoneRepo: ICapstoneRepository = new PrismaCapstoneRepository(prisma);
   // P1-05 (PR-C slice 3): site settings
   const settingRepo: ISettingRepository = new PrismaSettingRepository(prisma);
   // P1-04 (PR-D): OAuth social login. Google only; the broker map
@@ -828,6 +926,7 @@ function buildProductionContainer(): AppContainer {
     orderRepo,
     paymentGateway,
     recordAuditLog,
+    enrollmentRepo,
     courseRepo,
     userRepo,
     emailSender,
@@ -837,6 +936,23 @@ function buildProductionContainer(): AppContainer {
   });
 
   const awardXp = new AwardXP({ xpAwardRepo, idGen, clock });
+
+  // STORY-041 + decision 5 (auto-issue on completion): IssueCertificate
+  // is a dependency of MarkLessonComplete, so it must be built before
+  // markLessonComplete in the returned object literal below.
+  const issueCertificate = new IssueCertificate({
+    enrollmentRepo,
+    courseRepo,
+    certificateRepo,
+    hashGen: certificateHashGen,
+    idGen,
+    clock,
+    userRepo,
+    emailSender,
+    certificateEmailRenderer,
+    logger,
+    emailTemplateRepo,
+  });
 
   return {
     clock,
@@ -862,6 +978,9 @@ function buildProductionContainer(): AppContainer {
     enableTwoFactor: new EnableTwoFactor({ userRepo, totpService }),
     confirmTwoFactor: new ConfirmTwoFactor({ userRepo, totpService, recordAuditLog }),
     disableTwoFactor: new DisableTwoFactor({ userRepo, hasher: passwordHasher, recordAuditLog }),
+    // STORY-146: welcome step completion + reset
+    completeWelcome: new CompleteWelcome(userRepo, clock),
+    resetWelcome: new ResetWelcome(userRepo),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       pricingTierRepo,
@@ -884,12 +1003,21 @@ function buildProductionContainer(): AppContainer {
       progressEventRepo,
       idGen,
       clock,
+      issueCertificate,
+      recordAuditLog,
     }),
     enrollStudent,
     discountCodeRepo,
     applyDiscountCode: new ApplyDiscountCode({
       discountCodeRepo,
       clock,
+    }),
+    adminApplyDiscountCode: new AdminApplyDiscountCode({
+      orderRepo,
+      discountCodeRepo,
+      clock,
+      recordAuditLog,
+      logger,
     }),
     // STORY-050d: admin discount code CRUD
     adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
@@ -934,6 +1062,8 @@ function buildProductionContainer(): AppContainer {
       progressEventRepo,
       quizAttemptRepo,
       simulatorAttemptRepo,
+      artefactRepo,
+      retrievalCheckRepo,
       clock,
     }),
     // STORY-091: admin quiz CRUD
@@ -973,19 +1103,7 @@ function buildProductionContainer(): AppContainer {
     emailSender,
     receiptEmailRenderer,
     simulatorRegistry: buildSimulatorRegistry(),
-    issueCertificate: new IssueCertificate({
-      enrollmentRepo,
-      courseRepo,
-      certificateRepo,
-      hashGen: certificateHashGen,
-      idGen,
-      clock,
-      userRepo,
-      emailSender,
-      certificateEmailRenderer,
-      logger,
-      emailTemplateRepo,
-    }),
+    issueCertificate,
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
       userRepo,
@@ -1077,6 +1195,19 @@ function buildProductionContainer(): AppContainer {
       clock,
       recordAuditLog,
     }),
+    adminUpdateUser: new AdminUpdateUser({ userRepo, recordAuditLog }),
+    adminSetUserPassword: new AdminSetUserPassword({
+      userRepo,
+      sessionRepo,
+      passwordHasher,
+      recordAuditLog,
+      emailSender,
+      passwordChangedEmailRenderer,
+      logger,
+      clock,
+    }),
+    adminDeleteUser: new AdminDeleteUser({ userRepo, sessionRepo, recordAuditLog }),
+    adminForceSignOut: new AdminForceSignOut({ sessionRepo, recordAuditLog }),
     getAdminContentStats: new GetAdminContentStats({ courseRepo, moduleRepo, lessonRepo }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
@@ -1136,10 +1267,12 @@ function buildProductionContainer(): AppContainer {
       clock,
       courseRepo,
       userRepo,
+      enrollmentRepo,
       emailSender,
       refundEmailRenderer,
       logger,
       emailTemplateRepo,
+      recordAuditLog,
     }),
     refundOverride,
     // STORY-062: admin refund request list + process
@@ -1219,6 +1352,15 @@ function buildProductionContainer(): AppContainer {
       clock,
     }),
     listScenarioVersions: new ListScenarioVersions({ scenarioRepo }),
+    // ADR-026: SimGrid iframe progress sync
+    simgridAttemptRepo,
+    recordSimgridProgress: new RecordSimgridProgress({
+      simgridAttemptRepo,
+      idGen,
+      clock,
+    }),
+    listSimgridProgressForUser: new ListSimgridProgressForUser({ simgridAttemptRepo }),
+    getBestSimgridScore: new GetBestSimgridScore({ simgridAttemptRepo }),
     // STORY-050c
     liveClassRegistrationRepo,
     liveClassRepo,
@@ -1341,6 +1483,36 @@ function buildProductionContainer(): AppContainer {
     gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
     listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
     adminListAssignments: new AdminListAssignments({ assignmentRepo }),
+    // LEARN-033 (STORY-135): learner artefacts
+    artefactRepo,
+    saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
+    submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
+    listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
+    // STORY-163: Module 1 worksheet artifact
+    worksheetRepo,
+    getWorksheet: new GetWorksheet({ worksheetRepo }),
+    saveWorksheetEntry: new SaveWorksheetEntry({ worksheetRepo, recordAuditLog, clock }),
+    // LEARN-040 (STORY-138): retrieval-check tracking
+    retrievalCheckRepo,
+    recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),
+    // P3-87 (STORY-139): in-app notifications
+    notificationRepo,
+    notifyUser: new NotifyUser({ notificationRepo, idGen, clock }),
+    listNotifications: new ListNotifications({ notificationRepo }),
+    markNotificationRead: new MarkNotificationRead({ notificationRepo, clock }),
+    markAllNotificationsRead: new MarkAllNotificationsRead({ notificationRepo, clock }),
+    // LEARN-043 (STORY-143): capstone submission
+    capstoneRepo,
+    submitCapstone: new SubmitCapstone({ capstoneRepo, artefactRepo, idGen, clock }),
+    getCapstoneStatus: new GetCapstoneStatus({ capstoneRepo, artefactRepo }),
+    // LEARN-044 (STORY-144): capstone reviewer workflow
+    listCapstoneReviewQueue: new ListCapstoneReviewQueue({ capstoneRepo }),
+    returnCapstoneForReview: new ReturnCapstoneForReview({
+      capstoneRepo,
+      clock,
+      recordAuditLog,
+    }),
+    passCapstoneReview: new PassCapstoneReview({ capstoneRepo, clock, recordAuditLog }),
     // P1-05 (PR-C slice 3): site settings
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),

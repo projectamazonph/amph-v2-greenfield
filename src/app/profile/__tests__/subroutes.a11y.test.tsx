@@ -134,4 +134,91 @@ describe("student profile subroutes accessibility", () => {
 
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  // STORY-162 · profile/security surface
+  describe("STORY-162 · profile/security surface", () => {
+    it("renders the account-at-a-glance summary with the operator's email", async () => {
+      mockRequireAuth.mockResolvedValue(
+        makeUser({ email: "student@example.com", emailVerifiedAt: new Date("2025-01-01") }),
+      );
+      const { container } = render(
+        await StudentSecurityPage({ searchParams: Promise.resolve({}) }),
+      );
+
+      expect(container.textContent).toContain("student@example.com");
+      expect(container.textContent).toContain("Signed-in email");
+      expect(container.textContent).toContain("Verified by AMPH");
+    });
+
+    it("uses the enabled badge variant when two-factor is on", async () => {
+      mockRequireAuth.mockResolvedValue(makeUser({ twoFactorEnabled: true }));
+      const { container } = render(
+        await StudentSecurityPage({ searchParams: Promise.resolve({}) }),
+      );
+
+      // Two "Enabled" hits: one in the at-a-glance summary cell, one
+      // below the H2. Both must render with the green-tinted hashed
+      // CSS-module class. We match on the suffix so the test survives
+      // CSS-module hash renames.
+      const enabledCells = Array.from(container.querySelectorAll("span")).filter(
+        (el) => el.textContent === "Enabled",
+      );
+      expect(enabledCells.length).toBeGreaterThanOrEqual(2);
+      const anyEnabledClass = enabledCells.some((el) =>
+        Array.from(el.classList).some((c) => c.includes("statusBadgeEnabled")),
+      );
+      expect(anyEnabledClass).toBe(true);
+    });
+
+    it("uses the disabled badge variant when two-factor is off", async () => {
+      mockRequireAuth.mockResolvedValue(makeUser({ twoFactorEnabled: false }));
+      const { container } = render(
+        await StudentSecurityPage({ searchParams: Promise.resolve({}) }),
+      );
+
+      const disabledCells = Array.from(container.querySelectorAll("span")).filter(
+        (el) => el.textContent === "Disabled",
+      );
+      expect(disabledCells.length).toBeGreaterThanOrEqual(2);
+      const anyDisabledClass = disabledCells.some((el) =>
+        Array.from(el.classList).some((c) => c.includes("statusBadgeDisabled")),
+      );
+      expect(anyDisabledClass).toBe(true);
+    });
+
+    it("renders the Connected accounts count in the at-a-glance summary", async () => {
+      mockListOAuthLinks.mockResolvedValue({
+        ok: true,
+        value: [
+          { provider: "google", userId: "user_01", providerAccountId: "p_01" },
+          { provider: "github", userId: "user_01", providerAccountId: "p_02" },
+        ],
+      });
+      const { container } = render(
+        await StudentSecurityPage({ searchParams: Promise.resolve({}) }),
+      );
+
+      // Count renders as a bare number "2" inside the cell, and the
+      // summary line below says "2 sign-in methods linked".
+      expect(container.textContent).toContain("2");
+      expect(container.textContent).toContain("2 sign-in methods linked");
+    });
+
+    it("attaches a data-confirm to OAuth Remove buttons for wired-up confirm UIs", async () => {
+      mockListOAuthLinks.mockResolvedValue({
+        ok: true,
+        value: [{ provider: "google", userId: "user_01", providerAccountId: "p_01" }],
+      });
+      const { container } = render(
+        await StudentSecurityPage({ searchParams: Promise.resolve({}) }),
+      );
+
+      const removeButtons = Array.from(container.querySelectorAll("button")).filter(
+        (btn) => btn.textContent === "Remove",
+      );
+      expect(removeButtons.length).toBe(1);
+      const dataConfirm = removeButtons[0]?.getAttribute("data-confirm");
+      expect(dataConfirm).toMatch(/Remove Google sign-in\?/);
+    });
+  });
 });

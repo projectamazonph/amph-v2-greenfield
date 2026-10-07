@@ -28,15 +28,17 @@ function countSections(body: string): number {
 }
 
 function hasAppliedArtifact(body: string): boolean {
-  return /^(:::|<SelfCheck)/m.test(body) ||
-    /\b(your turn|independent|practice|worksheet|simulation|try this|apply)\b/i.test(body);
+  return (
+    /^(:::|<SelfCheck)/m.test(body) ||
+    /\b(your turn|independent|practice|worksheet|simulation|try this|apply)\b/i.test(body)
+  );
 }
 
 describe("lesson learning-flow coverage", () => {
   it("keeps every native lesson visibly sectioned and immediately applied", async () => {
     const lessons = await loadLessonBodies();
 
-    expect(lessons).toHaveLength(42);
+    expect(lessons).toHaveLength(57);
 
     const lessonsWithTooFewSections = lessons
       .filter((lesson) => countSections(lesson.body) < 3)

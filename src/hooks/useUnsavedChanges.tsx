@@ -12,8 +12,9 @@
  *   // After successful save:
  *   markClean()
  *
- *   // In your JSX:
- *   {dirty && <LeaveDialog onConfirm={router.back} onCancel={() => {}} />}
+ *   // In your JSX (always rendered; it opens itself when a link
+ *   // click is blocked while dirty):
+ *   <LeaveDialog />
  *
  * The component uses an Astryx Dialog instead of window.confirm() for
  * accessibility (WCAG 4.1.2 / WebAIM 2023 dialog frustration survey).
@@ -121,6 +122,10 @@ export function useUnsavedChanges() {
   const router = useRouter();
   const dirtyRef = useRef(false);
   const pendingCallbackRef = useRef<(() => void) | null>(null);
+  // CLICK-PATH-002: dirtyRef alone never re-renders, so consumers could
+  // never show a dialog after a click was blocked. blockedHref is the
+  // reactive half: set on intercept, cleared on stay/leave/unmount.
+  const [blockedHref, setBlockedHref] = useState<string | null>(null);
 
   const markDirty = useCallback(() => {
     dirtyRef.current = true;
@@ -128,6 +133,8 @@ export function useUnsavedChanges() {
 
   const markClean = useCallback(() => {
     dirtyRef.current = false;
+    pendingCallbackRef.current = null;
+    setBlockedHref(null);
   }, []);
 
   // Warn on tab close / refresh
@@ -143,8 +150,8 @@ export function useUnsavedChanges() {
     return () => window.removeEventListener("beforeunload", handler);
   }, []);
 
-  // Intercept link clicks — mark the pending callback so the consumer
-  // can render the LeaveDialog when a navigation is attempted.
+  // Intercept link clicks — store the navigation intent and open the
+  // LeaveDialog. Confirming runs router.push; cancelling drops the intent.
   // S11 fix: use an AbortController singleton so the listener is always
   // removed and re-registered when the router instance changes. This
   // prevents double-registration in React 18 strict mode (double-mount
@@ -163,23 +170,33 @@ export function useUnsavedChanges() {
       e.preventDefault();
       e.stopPropagation();
 
-      // Store the navigation intent; the consumer's LeaveDialog calls
-      // pendingCallbackRef.current() to execute it after confirmation.
       pendingCallbackRef.current = () => {
         router.push(href);
       };
+      setBlockedHref(href);
     };
 
     document.addEventListener("click", handleClick, true);
     return () => {
       ac.abort();
       document.removeEventListener("click", handleClick, true);
+      setBlockedHref(null);
     };
   }, [router]);
 
-  function showLeaveDialog(onConfirm: () => void, onCancel: () => void) {
-    pendingCallbackRef.current = onConfirm;
-  }
+  const handleLeaveConfirm = useCallback(() => {
+    if (pendingCallbackRef.current) {
+      pendingCallbackRef.current();
+      pendingCallbackRef.current = null;
+      dirtyRef.current = false;
+    }
+    setBlockedHref(null);
+  }, []);
+
+  const handleLeaveCancel = useCallback(() => {
+    pendingCallbackRef.current = null;
+    setBlockedHref(null);
+  }, []);
 
   function executePendingNavigation() {
     if (pendingCallbackRef.current) {
@@ -187,13 +204,41 @@ export function useUnsavedChanges() {
       pendingCallbackRef.current = null;
       dirtyRef.current = false;
     }
+    setBlockedHref(null);
+  }
+
+  // Stable identity: defining the gate inline without useCallback would
+  // create a new component type on every parent render, remounting the
+  // dialog (focus loss, isOpen reset) while it is open.
+  const LeaveGate = useCallback(
+    function LeaveGate({ onConfirm, onCancel }: Partial<LeaveDialogProps> = {}) {
+      if (blockedHref === null) return null;
+      return (
+        <LeaveDialog
+          onConfirm={() => {
+            onConfirm?.();
+            handleLeaveConfirm();
+          }}
+          onCancel={() => {
+            onCancel?.();
+            handleLeaveCancel();
+          }}
+        />
+      );
+    },
+    [blockedHref, handleLeaveConfirm, handleLeaveCancel],
+  );
+
+  function showLeaveDialog(onConfirm: () => void) {
+    pendingCallbackRef.current = onConfirm;
+    setBlockedHref((current) => current ?? "");
   }
 
   return {
     markDirty,
     markClean,
     isDirty: dirtyRef.current,
-    LeaveDialog,
+    LeaveDialog: LeaveGate,
     showLeaveDialog,
     executePendingNavigation,
   };

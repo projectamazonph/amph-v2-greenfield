@@ -16,6 +16,18 @@ After this lesson, you can triage a batch of search terms at speed. For each one
 
 Relevance decides between negating and everything else, then ACoS (advertising cost of sales) versus target decides whether to harvest, hold, increase, or decrease the bid.
 
+:::callout{id="lesson-7-3-pitfall" variant="pitfall" title="Deciding on too little data"}
+Acting on 3 clicks and 0 orders turns noise into policy. Wait for the threshold the lesson names (5+ clicks for negatives, 15+ for exact-match decisions) before negating, harvesting, or pausing.
+:::
+
+<SelfCheck
+  id="sc-7-3"
+  prompt="Of the five triage actions, which one needs the most data before you take it?"
+  options={["Add a negative keyword on an irrelevant term", "Harvest a term into exact match", "Hold the term and monitor", "Lower the bid on an expensive term"]}
+  answerIndex={1}
+  explanation="Harvesting moves the term into its own campaign at a bid you set, so you want 15 to 20 clicks of proof first. Negating something clearly irrelevant needs far less evidence."
+/>
+
 You've learned how to read search term data and how to use negative keywords. Now it's time to put it together: the **Search Term Triage** tool, where you'll analyze real search terms and make a decision for each one.
 
 Triage is what emergency room doctors do when multiple patients arrive at once. They quickly assess who needs immediate care, who can wait, and who doesn't need treatment at all. You're doing the same thing with search terms, quickly deciding which ones deserve budget, which need adjustment, and which should be cut.
@@ -65,7 +77,7 @@ When you harvest, also consider adding the term as a negative in the broad/phras
 **When to use**: The term is irrelevant and generating wasted spend with no prospect of improvement.
 
 **Decision criteria**:
-- Zero orders after 10+ clicks
+- Zero orders after 5+ clicks
 - Clearly irrelevant to your product
 - Low CTR (below 0.3%)
 - No strategic reason to keep
@@ -100,7 +112,7 @@ For each search term, work through this:
      - No → Harvest to Exact
    - No → Is it generating orders?
      - Yes → Decrease Bid
-     - No → After 10+ clicks? → Negative. Under 10 clicks? → Monitor.
+     - No → After 5+ clicks? → Negative. Under 5 clicks? → Monitor.
 
 When in doubt, look at relevance first. A term with terrible ACoS but high relevance just needs a lower bid. A term with great ACoS but low relevance is a ticking time bomb. It'll waste money as volume grows.
 
@@ -116,7 +128,7 @@ In the tool, you'll see a batch of search terms with metrics. Here's how to tria
 
 Think of it like sorting laundry. First you pull out the obvious darks and whites (easy negatives and clear winners). Then you sort the colors (the nuanced middle). Don't try to sort everything at once. Batch similar decisions.
 
-**Efficiency tip**: Start with highest-spend terms. A 50% ACoS on ₱5,000 of spend wastes ₱2,500. A 50% ACoS on ₱500 only wastes ₱250. Prioritize where the money is.
+**Efficiency tip**: Start with highest-spend terms. A 50% ACoS on ₱5,000 of ad sales is ₱2,500 of ad spend. The same 50% on ₱500 of ad sales is only ₱250 of spend. Prioritize where the money is.
 
 ## Common Triage Mistakes
 
@@ -137,10 +149,10 @@ Think of it like sorting laundry. First you pull out the obvious darks and white
 You have 5 seconds per term. What's your action?
 
 1. "stainless steel milk frother," ACoS 18%, 25 clicks, 4 orders, target ACoS 25%
-2. "cheap milk frother," ACoS 0%, 12 clicks, 0 orders, target ACoS 25%
+2. "cheap milk frother," ACoS N/A (no orders), 12 clicks, 0 orders, target ACoS 25%
 3. "milk frother," ACoS 35%, 40 clicks, 5 orders, target ACoS 25%, not exact match
 4. "electric milk frother," ACoS 8%, 30 clicks, 8 orders, target ACoS 25%
-5. "milk frother for kids," ACoS 0%, 6 clicks, 0 orders, target ACoS 25%
+5. "milk frother for kids," ACoS N/A (no orders), 6 clicks, 0 orders, target ACoS 25%
 
 **Answers:** (1) Keep (or harvest if not exact, performing well). (2) Negative (irrelevant, zero conversions). (3) Decrease bid (relevant but ACoS above target). (4) Harvest to exact (strong performer, low ACoS). (5) Keep for now (under 10 clicks, monitor before negativing).
 

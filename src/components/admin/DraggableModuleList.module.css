@@ -1,0 +1,84 @@
+.moduleList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.moduleItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-shell-line);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--c-shell-ink);
+  transition: background var(--transition), border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+.moduleItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 153, 0, 0.2);
+}
+
+.moduleItem.dragging {
+  box-shadow: var(--sh-2);
+  border-color: var(--c-orange);
+  background: rgba(255, 153, 0, 0.08);
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--c-shell-faint);
+  cursor: grab;
+  transition: color var(--transition), border-color var(--transition),
+    background var(--transition);
+}
+
+.dragHandle:hover {
+  color: var(--c-orange);
+  border-color: var(--c-orange);
+  background: rgba(255, 153, 0, 0.1);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.moduleOrder {
+  flex-shrink: 0;
+  width: 28px;
+  text-align: right;
+  color: var(--c-shell-dim);
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  font-weight: 600;
+}
+
+.moduleTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-13);
+  font-weight: 500;
+}
+
+.empty {
+  padding: var(--sp-6);
+  text-align: center;
+  color: var(--c-shell-faint);
+  font-size: var(--fs-13);
+}

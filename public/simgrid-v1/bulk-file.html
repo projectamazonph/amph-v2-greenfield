@@ -1,0 +1,1491 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Bulk File Simulator | Amazon PPC Bulk Operations Practice</title>
+<link rel="icon" href="favicon.ico">
+<script src="assets/student-progress.js"></script>
+<script src="assets/simulator-attempt.js"></script>
+
+
+<script src="assets/shell.js" defer></script>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/simulator-foundation.css">
+<link rel="stylesheet" href="assets/bulk-file.css">
+<link rel="stylesheet" href="assets/skin.css">
+<link rel="stylesheet" href="assets/shell.css">
+  <!-- PHA_DISCOVERY_START -->
+  <meta name="description" content="Practice Amazon PPC bulk-file structure, controlled updates, and safe operational checks.">
+  <meta name="keywords" content="Amazon PPC bulk file simulator, bulk operations practice">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://projectamazonph.github.io/amazon-ph-simulators/bulk-file.html">
+  <link rel="describedby" type="text/markdown" href="https://projectamazonph.github.io/amazon-ph-simulators/llms.txt" title="AI-readable Project Amazon PH Academy guide">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Project Amazon PH Academy">
+  <meta property="og:title" content="Bulk File Simulator | Amazon PPC Bulk Operations Practice">
+  <meta property="og:description" content="Practice Amazon PPC bulk-file structure, controlled updates, and safe operational checks.">
+  <meta property="og:url" content="https://projectamazonph.github.io/amazon-ph-simulators/bulk-file.html">
+  <meta property="og:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+  <meta property="og:image:alt" content="Project Amazon PH Academy SimGrid learning hub">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bulk File Simulator | Amazon PPC Bulk Operations Practice">
+  <meta name="twitter:description" content="Practice Amazon PPC bulk-file structure, controlled updates, and safe operational checks.">
+  <meta name="twitter:image" content="https://projectamazonph.github.io/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg">
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/bulk-file.html",
+      "url": "https://projectamazonph.github.io/amazon-ph-simulators/bulk-file.html",
+      "name": "Bulk File Simulator | Amazon PPC Bulk Operations Practice",
+      "description": "Practice Amazon PPC bulk-file structure, controlled updates, and safe operational checks.",
+      "inLanguage": [
+        "en",
+        "fil"
+      ],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Project Amazon PH Academy",
+        "url": "https://projectamazonph.github.io/amazon-ph-simulators/"
+      },
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Amazon PPC bulk file simulator"
+        },
+        {
+          "@type": "Thing",
+          "name": "bulk operations practice"
+        }
+      ],
+      "hasPart": {
+        "@id": "https://projectamazonph.github.io/amazon-ph-simulators/bulk-file.html#footer-navigation"
+      }
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/bulk-file.html#footer-navigation",
+      "name": "Project Amazon PH Academy footer navigation",
+      "description": "Visible footer links to Project Amazon PH Academy learning, practice, coaching, and project resources.",
+      "hasPart": [
+        {
+          "@type": "ItemList",
+          "name": "Learn footer links",
+          "numberOfItems": 4,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "VA Start Here",
+              "item": {
+                "@type": "WebPage",
+                "name": "VA Start Here",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/start-here.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "PPC Coach",
+              "item": {
+                "@type": "WebPage",
+                "name": "PPC Coach",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/ppc-coach.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Student Guide",
+              "item": {
+                "@type": "WebPage",
+                "name": "Student Guide",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/guide.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Module Decks",
+              "item": {
+                "@type": "WebPage",
+                "name": "Module Decks",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-decks.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Practice footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Simulator Library",
+              "item": {
+                "@type": "WebPage",
+                "name": "Simulator Library",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/index.html#simulator-library"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Campaign Architect",
+              "item": {
+                "@type": "WebPage",
+                "name": "Campaign Architect",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/campaign-architect.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Account Audit",
+              "item": {
+                "@type": "WebPage",
+                "name": "Account Audit",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/account-audit.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Coach footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Coach Tools",
+              "item": {
+                "@type": "WebPage",
+                "name": "Coach Tools",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-tools.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Resource Library",
+              "item": {
+                "@type": "WebPage",
+                "name": "Resource Library",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/coach-resource-library.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Learning Docs",
+              "item": {
+                "@type": "WebPage",
+                "name": "Learning Docs",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/learn/index.html"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Project footer links",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Roadmap",
+              "item": {
+                "@type": "WebPage",
+                "name": "Roadmap",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/planned-simulators.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Source Repository",
+              "item": {
+                "@type": "WebPage",
+                "name": "Source Repository",
+                "url": "https://github.com/projectamazonph/amazon-ph-simulators"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Project Guide",
+              "item": {
+                "@type": "WebPage",
+                "name": "Project Guide",
+                "url": "https://projectamazonph.github.io/amazon-ph-simulators/site-guide.md"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://projectamazonph.github.io/amazon-ph-simulators/bulk-file.html#application",
+      "name": "Bulk File Simulator",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "description": "Practice Amazon PPC bulk-file structure, controlled updates, and safe operational checks.",
+      "isAccessibleForFree": true
+    }
+  ]
+}</script>
+  <!-- PHA_DISCOVERY_END -->
+</head>
+<body data-pha-tool="bulk-file">
+
+<header class="topbar">
+  <div class="wrap">
+    <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#FF6B35"/><path d="M10 25V7h7.2a5.8 5.8 0 0 1 0 11.6h-2.8" stroke="#FAFAF7" stroke-width="3.6" fill="none"/><path d="M20.5 25l3.2-6 3.2 6M21.9 22.5h3.6" stroke="#FAFAF7" stroke-width="2.4" fill="none"/></svg>
+    <div class="brand"><div>Bulk File Simulator<small>PROJECT AMAZON PH · ACADEMY TOOLS</small></div></div>
+    <nav class="topnav"><a href="#lessons">Lessons</a><a href="#simulator">Simulator</a><a href="#harvest">Harvest lab</a><a href="#drill">Drill</a><a href="#reference">Reference</a></nav>
+    <div class="top-chips">
+      <span class="tchip hide-s">TRAINING SCHEMA v1.0</span>
+      <span class="tchip"><span class="dot"></span>MODE: SANDBOX · NO REAL AD SPEND</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="opening">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Field manual · Sponsored Products bulk operations</div>
+      <h1>A bulk file is a spreadsheet of instructions.</h1>
+      <p class="lede">Every row is a command — create this campaign, raise that bid, block that search term. Dito ka mag-practice: i-load, i-edit, i-upload, at tingnan kung tatanggapin ng validator bago ka mag-touch ng client account.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn solid" href="#lessons">Start the lessons</a>
+        <a class="btn ghost" href="#simulator">Open the simulator</a>
+      </div>
+      <div class="stat-line">32 COLUMNS · 9 ENTITIES · 3 OPERATIONS · 1 RULE: PARENTS FIRST</div>
+    </div>
+    <div>
+      <div class="sheet">
+        <div class="sheet-bar"><span><b>sp-bulk-launch.xlsx</b> — Sponsored Products</span><span>ROW 2</span></div>
+        <div class="sgrid sheet-cols"><div></div><div>A</div><div>B</div><div>C</div><div>D</div><div>E</div><div>F</div><div>G</div></div>
+        <div class="sgrid">
+          <div class="sheet-gutter">2</div>
+          <div class="spec-cell" data-col="PRODUCT" data-note="Always &quot;Sponsored Products&quot; for SP files. Ito ang nagse-set kung anong ad product ang tinatrato."><span class="v">Sponsored Products</span></div>
+          <div class="spec-cell" data-col="ENTITY" data-note="Which object this row acts on. 9 entities — Campaign, Ad Group, Keyword, and the rest."><span class="mini-chip">Campaign</span></div>
+          <div class="spec-cell" data-col="OPERATION" data-note="What to do: Create, Update, or Delete. One row, one instruction."><span class="v mono" style="color:var(--grn)">Create</span></div>
+          <div class="spec-cell" data-col="CAMPAIGN ID" data-note="Temporary ID on Create — ikaw ang nagpapangalan (tmp-camp-101). Child rows reference this. Amazon swaps in real IDs after processing."><span class="v mono id">tmp-camp-101</span></div>
+          <div class="spec-cell" data-col="CAMPAIGN NAME" data-note="Human-readable name. Keep it unique and follow a naming convention."><span class="v">THP-Bamboo-SP-Auto</span></div>
+          <div class="spec-cell" data-col="DAILY BUDGET" data-note="Campaign-level daily spend cap. Positive number, max two decimals — 25.00, never ₱25."><span class="v mono money">25.00</span></div>
+          <div class="spec-cell" data-col="STATE" data-note="enabled, paused, or archived. Paused keeps history; archived is out of the way."><span class="v"><span class="st st-en mono">enabled</span></span></div>
+        </div>
+        <div class="sgrid spec-ann"><div></div><div>Product</div><div>Entity</div><div>Operation</div><div>Campaign ID</div><div>Campaign Name</div><div>Daily Budget</div><div>State</div></div>
+      </div>
+      <p class="cell-note" id="cellNote" aria-live="polite">Focus or tap any cell — <b>bawat column may kwento.</b></p>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal">
+  <div class="wrap">
+    <div class="eyebrow">Why bulk ops</div>
+    <h2>The console is for looking. The bulk file is for moving.</h2>
+    <p class="sec-lede">Agencies don't click through the Ads Console for 500 keywords. They write one file, upload it, and let Amazon process every row top to bottom.</p>
+    <div class="hiw">
+      <div class="steps">
+        <div class="step"><div class="n">01</div><div><h3>Download</h3><p>Get the bulk template from the Ads Console or your manager. It reflects the account's current campaigns and IDs.</p></div></div>
+        <div class="step"><div class="n">02</div><div><h3>Edit</h3><p>Add rows for new entities, change values for updates. Parents muna, children after — laging ganito.</p></div></div>
+        <div class="step"><div class="n">03</div><div><h3>Upload</h3><p>Upload the file. Amazon validates every row — ang isang maling row ay pwedeng mag-fail ng buong group.</p></div></div>
+        <div class="step"><div class="n">04</div><div><h3>Process</h3><p>Amazon applies the operations. Your temporary IDs are replaced with real account IDs.</p></div></div>
+        <div class="step"><div class="n">05</div><div><h3>Verify</h3><p>Download again and confirm the change landed. Hindi tapos ang trabaho hangga't hindi verified.</p></div></div>
+      </div>
+      <div class="tree">
+        <div class="tnode root"><span class="tag" data-note="Groups campaigns for reporting and budget caps. Optional — pero malaking tulong sa organization.">PORTFOLIO</span>
+          <div class="tnode"><span class="tag" data-note="Owns the daily budget, bidding strategy, and targeting type. The root of everything you'll build.">CAMPAIGN</span>
+            <div class="tnode"><span class="tag" data-note="Blocks a search term across the whole campaign — lahat ng ad groups.">CAMPAIGN NEGATIVE KEYWORD</span></div>
+            <div class="tnode"><span class="tag" data-note="Bid adjustment for Top of search, Product pages, or Rest of search. Percentage, 0–900.">PLACEMENT</span></div>
+            <div class="tnode"><span class="tag" data-note="Organizes product ads inside a campaign. Carries the default bid.">AD GROUP</span>
+              <div class="tnode"><span class="tag" data-note="The SKU/ASIN that actually serves the ad. Exists in both auto and manual campaigns.">PRODUCT AD</span></div>
+              <div class="tnode"><span class="tag" data-note="A search term you bid on. Manual campaigns only — bawal sa auto.">KEYWORD</span></div>
+              <div class="tnode"><span class="tag" data-note="Blocks a term inside one ad group. Never takes a bid — kailanman.">NEGATIVE KEYWORD</span></div>
+              <div class="tnode"><span class="tag" data-note="Product (ASIN) or category targeting. Manual campaigns only. Quote marks are part of the syntax.">TARGETING</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="node-note" id="nodeNote" aria-live="polite">Focus or tap a node — <b>ito ang mapa ng bawat bulk file.</b></p>
+      </div>
+    </div>
+    <div class="fnotes">
+      <div class="fnote"><div class="n">FN-01</div><h3>Row order is law</h3><p>Amazon processes top to bottom. A keyword row above its ad group fails with "parent not found." Structure: Portfolio → Campaign → Ad Group → children.</p></div>
+      <div class="fnote"><div class="n">FN-02</div><h3>Temporary IDs on Create</h3><p>Amazon doesn't know the new campaign yet, so you name it yourself — <span class="mono">tmp-camp-101</span>. Child rows reference it. After processing, Amazon swaps in real IDs.</p></div>
+      <div class="fnote"><div class="n">FN-03</div><h3>Update &amp; Delete need real IDs</h3><p>Never by name. Download the current file first, copy the IDs, then write your update rows. Ito ang pinaka-common na pagkakamali ng bagong VA.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="lessons">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><div class="eyebrow">Mini-lessons</div><h2>Read these before you touch a client account.</h2></div>
+      <span class="chip-progress" id="lessonProgress"><b>0/6</b> READ</span>
+    </div>
+    <p class="sec-lede">Six short lessons. Basahin sa order — bawat isa ay may "Try it" na nakadugtong mismo sa simulator sa baba.</p>
+
+    <div class="lesson" data-id="1">
+      <button type="button" class="l-head" aria-expanded="false"><span class="l-num">01</span><span class="l-title">What a bulk file actually is<small>Foundation · 3 min</small></span><span class="l-check"></span><span class="l-chev">▸</span></button>
+      <div class="l-body"><div class="l-inner"><div class="l-content">
+        <p>A bulk file is a spreadsheet where <b>every row is one instruction</b>: create this, change that, delete this. Sa console, isa-isang click. Sa bulk file, <mark>500 keywords in one upload</mark>.</p>
+        <p>The training file has 32 columns, but most rows use only a few. Empty cells are normal. Ang importante: tama ang required fields para sa entity ng row.</p>
+        <pre class="snippet">Entity      Operation   Campaign ID      Campaign Name            Daily Budget
+Campaign    Create      tmp-camp-101     THP-Bamboo-SP-Auto       25.00
+Ad Group    Create      tmp-adg-101      THP-Bamboo-Auto          —
+Keyword     Create      tmp-kw-101       (manual campaign only)   —</pre>
+        <button type="button" class="tryit" data-set="sample"><span>TRY IT</span> Load the clean sample file →</button>
+      </div></div></div>
+    </div>
+
+    <div class="lesson" data-id="2">
+      <button type="button" class="l-head" aria-expanded="false"><span class="l-num">02</span><span class="l-title">Hierarchy and row order<small>Structure · 4 min</small></span><span class="l-check"></span><span class="l-chev">▸</span></button>
+      <div class="l-body"><div class="l-inner"><div class="l-content">
+        <p>Sponsored Products is a tree: <b>Portfolio → Campaign → Ad Group → children</b>. The rule that never bends: <mark>parents appear before children</mark>. Pag nauna ang anak, "parent not found" ang sagot.</p>
+        <p>On Create, rows are linked by <b>temporary IDs</b> — <span class="mono">tmp-camp-101</span>. After upload, Amazon replaces them with real IDs. Kaya sa susunod mong download, iba na ang mga ID.</p>
+        <pre class="snippet">✓  Portfolio → Campaign → Ad Group → Keyword        (tanggap)
+✗  Keyword → Ad Group → Campaign                    ("parent not found")</pre>
+        <button type="button" class="tryit" data-set="broken"><span>TRY IT</span> Load the broken file — may ad group na nauna sa campaign →</button>
+      </div></div></div>
+    </div>
+
+    <div class="lesson" data-id="3">
+      <button type="button" class="l-head" aria-expanded="false"><span class="l-num">03</span><span class="l-title">Create, Update, Delete<small>Operations · 3 min</small></span><span class="l-check"></span><span class="l-chev">▸</span></button>
+      <div class="l-body"><div class="l-inner"><div class="l-content">
+        <p><b>Create</b> — temporary ID. <b>Update</b> — fill only what changes and reference the entity by its <mark>real ID from your latest download</mark>, never by name. <b>Delete</b> — permanent; i-double-check ang ID.</p>
+        <p>Bulk files don't move keywords: create it in the new campaign, negative it in the old one.</p>
+        <pre class="snippet">Create   →  temporary ID        tmp-camp-101
+Update   →  real ID             1001        (from latest download)
+Delete   →  real ID             double-checked</pre>
+        <button type="button" class="tryit" data-set="update"><span>TRY IT</span> Load the update sample — real IDs lang →</button>
+      </div></div></div>
+    </div>
+
+    <div class="lesson" data-id="4">
+      <button type="button" class="l-head" aria-expanded="false"><span class="l-num">04</span><span class="l-title">Auto vs manual — where things live<small>Rules · 4 min</small></span><span class="l-check"></span><span class="l-chev">▸</span></button>
+      <div class="l-body"><div class="l-inner"><div class="l-content">
+        <p>Hard rules: <mark>Keywords and targeting expressions exist only in manual campaigns.</mark> Product Ads exist in both. Negative keywords exist in both.</p>
+        <p>The classic VA mistake: harvested terms nilagay pabalik sa auto campaign. The right flow: converters become <b>exact keywords in a new manual campaign</b>, and the auto campaign gets <b>negatives</b> para hindi na maulit.</p>
+        <pre class="snippet">AUTO campaign      →  Product Ad ✓   Keyword ✗   Targeting ✗
+MANUAL campaign    →  Product Ad ✓   Keyword ✓   Targeting ✓</pre>
+        <button type="button" class="tryit" data-set="broken"><span>TRY IT</span> Broken file, row 6 — keyword inside an auto campaign →</button>
+      </div></div></div>
+    </div>
+
+    <div class="lesson" data-id="5">
+      <button type="button" class="l-head" aria-expanded="false"><span class="l-num">05</span><span class="l-title">Bids, budgets, and states<small>Money · 3 min</small></span><span class="l-check"></span><span class="l-chev">▸</span></button>
+      <div class="l-body"><div class="l-inner"><div class="l-content">
+        <p>Money lives at <b>three levels</b>: Daily Budget (campaign), Ad Group Default Bid (ad group), Bid (keyword/target). A keyword's own bid overrides the default. Format: <mark>25.00</mark> — hindi ₱25.</p>
+        <p>States: <b>enabled, paused, archived</b>. Pro move: upload a new campaign as paused, review, then enable with a second upload.</p>
+        <pre class="snippet">Campaign      Daily Budget       25.00
+Ad Group      Default Bid         0.95
+Keyword       Bid                 1.25   ← overrides the default</pre>
+        <button type="button" class="tryit" data-set="sample"><span>TRY IT</span> Load the sample, click a keyword row, trace the three money levels →</button>
+      </div></div></div>
+    </div>
+
+    <div class="lesson" data-id="6">
+      <button type="button" class="l-head" aria-expanded="false"><span class="l-num">06</span><span class="l-title">Negative keywords &amp; targeting syntax<small>Defense · 4 min</small></span><span class="l-check"></span><span class="l-chev">▸</span></button>
+      <div class="l-body"><div class="l-inner"><div class="l-content">
+        <p>Negative keywords don't bid — <b>they block</b>. Ad Group negatives block within one ad group; Campaign negatives block across the whole campaign. <mark>Walang bid column — kailanman.</mark></p>
+        <p>Targeting expressions are exact syntax, quote marks included. Every manual campaign ships with negatives from day one — <span class="mono">free, cheap, used, jobs</span>.</p>
+        <pre class="snippet">asin="B0COMPET01"
+category="home &amp; kitchen &gt; kitchen &amp; dining &gt; coffee makers"</pre>
+        <button type="button" class="tryit" data-set="broken"><span>TRY IT</span> Broken file — may negative keyword na may bid. Alisin. →</button>
+      </div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block sim-band" id="simulator">
+  <div class="wrap">
+    <div class="eyebrow">The simulator</div>
+    <h2>Upload a file. The validator grades it like a real bulk upload.</h2>
+    <p class="sec-lede">Everything runs locally in your browser — walang totoong ad spend, walang connected na account. Errors and warnings map to exact rows; click any row to learn why.</p>
+    <div class="howto reveal">
+      <div><b>STEP 01</b>Load a sample or download the template</div>
+      <div><b>STEP 02</b>Edit in Sheets or Excel</div>
+      <div><b>STEP 03</b>Upload the file here</div>
+      <div><b>STEP 04</b>Read the report, click red rows</div>
+      <div><b>STEP 05</b>Fix and re-upload until clean</div>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="btn ghost sm" id="loadSample">Load clean sample</button>
+      <button type="button" class="btn solid sm" id="loadBroken">Load broken file <span class="ex-tag">EXERCISE</span></button>
+      <button type="button" class="btn ghost sm" id="loadUpdate">Load update sample</button>
+      <span class="sep"></span>
+      <button type="button" class="btn ghost sm" id="dlTemplate">Download template</button>
+      <button type="button" class="btn ghost sm" id="dlSample">Download sample</button>
+      <button type="button" class="btn ghost sm" id="dlBroken">Download broken</button>
+      <span class="sep"></span>
+      <label class="btn solid sm file-label">Upload file (.csv / .xlsx)<input id="file" type="file" accept=".csv,.xlsx,.xls"></label>
+    </div>
+    <div class="mission" id="mission" hidden></div>
+    <div class="console" id="console" aria-live="polite"></div>
+    <div class="scorebar">
+      <div class="score-num"><span id="scoreNum">—</span><small>/100</small></div>
+      <div class="score-track"><div class="score-fill" id="scoreFill"></div></div>
+      <div class="score-meta">
+        <div class="sm">ERRORS<b class="bad" id="errCount">—</b></div>
+        <div class="sm">WARNINGS<b class="mid" id="warnCount">—</b></div>
+      </div>
+      <span class="pill okp" id="statusPill">—</span>
+    </div>
+    <div class="ws-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="t">FILE VIEWER</span>
+          <span class="hint">Click any row for an explanation · click a column header for the field guide</span>
+          <button type="button" class="btn ghost sm" id="openGuide">Field guide</button>
+        </div>
+        <div class="viewer-scroll">
+          <table class="vw"><thead><tr id="vwHead"></tr></thead><tbody id="vwBody"></tbody></table>
+        </div>
+      </div>
+      <div class="panel explain" id="explain">
+        <p class="ex-empty">Walang piniling row. Click any row in the file viewer — ipo-paliwanag nito ang entity, operation, parent chain, at kung may issue.</p>
+      </div>
+    </div>
+    <div class="report-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="t" style="color:var(--red)">BLOCKING ERRORS</span><span class="hint">upload will fail</span></div>
+        <div id="errBox"><p class="none">None.</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="t" style="color:var(--amb)">WARNINGS</span><span class="hint">upload passes, discipline fails</span></div>
+        <div id="warnBox"><p class="none">None.</p></div>
+      </div>
+    </div>
+    <div class="acct-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="t">OPERATIONS IN THIS FILE</span></div>
+        <div id="opsBox" style="overflow-x:auto"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="t">SIMULATED ACCOUNT — CAMPAIGNS</span><span class="hint">seed + created</span></div>
+        <div id="acctBox" style="overflow-x:auto"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="harvest">
+  <div class="wrap">
+    <div class="eyebrow">Judgment lab</div>
+    <h2>Search terms in. Bulk file out.</h2>
+    <p class="sec-lede">The weekly bread-and-butter ng PPC VA: triage ang search term report, decide kung ano ang i-promote at i-block, tapos isulat bilang bulk rows. Dito sinusukat ang judgment — hindi ang bilis ng clicking.</p>
+    <div class="harvest-grid">
+      <div class="math-card">
+        <div class="lbl">Bid math — transparent, laging may kasamang formula</div>
+        <div class="math-row">
+          <label>PRICE $<input class="math-in" id="mPrice" type="number" step="0.01" value="19.99"></label>
+          <label>MARGIN %<input class="math-in" id="mMargin" type="number" step="1" value="32"></label>
+          <label>TARGET ACOS %<input class="math-in" id="mTacos" type="number" step="1" value="30"></label>
+        </div>
+        <div id="mathOut"></div>
+      </div>
+      <div class="sit-card">
+        <div class="lbl o">The situation</div>
+        <p>Week 3 ng auto campaign <b>THP-BambooOrganizer-SP-Auto-Research</b>. Eight search terms have spend na — $140.25 total. Your job: tawagan bawat term. Promote, block, or wait for more data. Every call must survive a client review.</p>
+        <div class="kv">PRODUCT <b>THP-BDO-001 · B0THPBDO01</b> — Bamboo Desk Organizer<br>PRICE <b>$19.99</b> · MARGIN <b>32%</b> · TARGET ACOS <b>30%</b></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="t">SEARCH TERM REPORT — WEEK 3</span>
+        <span class="chip-progress" id="hvCount"><b>0/8</b> DECIDED</span>
+        <button type="button" class="btn ghost sm" id="mentorToggle">Show mentor's calls</button>
+      </div>
+      <div class="hv-wrap">
+        <table class="hv" id="hvTable">
+          <thead><tr><th>Search term</th><th>Impr.</th><th>Clicks</th><th>Spend</th><th>Orders</th><th>ACOS</th><th>Conv.</th><th>Your call</th><th>Details</th><th>Feedback</th></tr></thead>
+          <tbody id="hvBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <button type="button" class="btn solid" id="hvGenerate">Generate bulk file →</button>
+      <button type="button" class="btn ghost" id="hvReset">Reset calls</button>
+    </div>
+    <div class="hv-out" id="hvOut" hidden></div>
+  </div>
+</section>
+
+<section class="block reveal" id="drill">
+  <div class="wrap">
+    <div class="eyebrow">Practice drill</div>
+    <h2>Build a launch file from a blank sheet.</h2>
+    <p class="sec-lede">Walang turo sa console — ang file ang artifact. Build the launch offline in Sheets or Excel, upload it sa simulator, then score it against the rubric. The scorecard is what you screenshot for your portfolio.</p>
+    <div class="drill-grid">
+      <div class="brief">
+        <div class="lbl o">Drill brief — fictional client</div>
+        <h3>Kape Trail · Pour-Over Kettle launch</h3>
+        <div class="kv">
+          CLIENT <b>Kape Trail</b><br>
+          PRODUCT <b>Pour-Over Kettle · KT-KTL-001 · B0KAPEKTL1</b><br>
+          PRICE <b>$29.99</b> · MARGIN <b>28%</b> · TARGET ACOS <b>35%</b><br>
+          BID CEILING <span class="mo">$2.94</span> <b>= 29.99 × 0.28 × 0.35</b>
+        </div>
+        <div class="rules">Deliver one bulk file: auto research campaign + manual exact campaign + product ads + negatives. Naming convention required. Zero blocking errors required. Kapag handa ka, i-upload sa simulator at i-score.</div>
+        <div class="btn-row">
+          <button type="button" class="btn solid sm" id="drillScoreBtn">Score current file</button>
+          <button type="button" class="btn ghost sm" id="drillModel">Load model answer</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="t">DRILL SCORECARD</span><span class="hint">rubric: 30 / 40 / 15 / 15</span></div>
+        <div style="padding:16px">
+          <div id="drillChecks"></div>
+          <div id="drillScore"><p class="drill-empty">Scorecard appears here after scoring. Upload your file sa simulator, or load the model answer to see what 100/100 looks like.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="reference">
+  <div class="wrap">
+    <div class="eyebrow">Reference</div>
+    <h2>Keep these beside you habang nagbubuild.</h2>
+    <div style="margin-top:26px">
+      <span class="pattern">{BRAND}<i>-</i>{PRODUCT}<i>-</i>SP<i>-</i>{TYPE}<i>-</i>{GOAL}</span>
+      <div class="ex-names" style="margin-top:16px">
+        <b>THP</b>-BambooOrganizer-SP-<b>Auto</b>-Research<br>
+        <b>THP</b>-BambooOrganizer-SP-<b>Exact</b>-Convert<br>
+        <b>KT</b>-PourOverKettle-SP-<b>ASIN</b>-Competitor
+      </div>
+    </div>
+    <div class="ref-grid">
+      <div class="ref-card">
+        <h3>Common mistakes, decoded</h3>
+        <table class="rt">
+          <thead><tr><th>Mistake</th><th>What happens</th><th>The fix</th></tr></thead>
+          <tbody>
+            <tr><td>Keyword row above its ad group</td><td>"Parent not found" — row fails</td><td>Sort: Portfolio → Campaign → Ad Group → children</td></tr>
+            <tr><td>Keyword inside an auto campaign</td><td>Whole group rejected</td><td>Harvested terms go to a manual exact campaign</td></tr>
+            <tr><td>Update by campaign name</td><td>Update misses — Amazon needs IDs</td><td>Download the current file first, copy real IDs</td></tr>
+            <tr><td>Bid on a negative keyword</td><td>Flagged — negatives never bid</td><td>Leave the Bid column empty</td></tr>
+            <tr><td>Currency symbols in money fields</td><td>Validation fails</td><td>Numbers only: 25.00, not ₱25</td></tr>
+            <tr><td>Phrase-negative a winning root term</td><td>Blocks your own converters</td><td>Check substrings: "desk organizer" ⊂ "bamboo desk organizer"</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ref-card">
+        <h3>Glossary</h3>
+        <dl class="gloss">
+          <div><dt>Bulk file</dt><dd>A spreadsheet of Create/Update/Delete operations uploaded to Amazon Ads.</dd></div>
+          <div><dt>Entity</dt><dd>The object a row acts on: campaign, ad group, keyword, etc.</dd></div>
+          <div><dt>Temporary ID</dt><dd>Placeholder ID (tmp-…) used on Create so child rows can reference parents.</dd></div>
+          <div><dt>SKU</dt><dd>The seller's own catalog code for a product.</dd></div>
+          <div><dt>ASIN</dt><dd>Amazon's 10-character product code. Format: B + 9 characters.</dd></div>
+          <div><dt>Match type</dt><dd>How closely a search must match: exact, phrase, or broad.</dd></div>
+          <div><dt>Negative keyword</dt><dd>A term you block instead of bidding on.</dd></div>
+          <div><dt>Targeting expression</dt><dd>Exact syntax for targets: asin="…", category="…".</dd></div>
+          <div><dt>Placement</dt><dd>Where an ad shows: top of search, product pages, rest of search.</dd></div>
+          <div><dt>ACOS</dt><dd>Ad spend ÷ ad sales. The efficiency number clients ask about first.</dd></div>
+          <div><dt>Guardrail bid</dt><dd>Price × target ACOS × conversion rate — the bid the math supports.</dd></div>
+          <div><dt>Harvest</dt><dd>Moving converting auto search terms into a manual exact campaign.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="guide" id="guide" aria-hidden="true">
+  <div class="guide-head">
+    <span class="t">FIELD GUIDE — 32 COLUMNS</span>
+    <button type="button" class="g-close" id="closeGuide" aria-label="Close field guide">✕</button>
+  </div>
+  <div class="guide-body">
+    <div class="g-detail" id="gDetail"></div>
+    <div class="g-list" id="gList"></div>
+  </div>
+</aside>
+
+<footer>
+  <div class="wrap">
+    <div class="f-brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#FF6B35"/><path d="M10 25V7h7.2a5.8 5.8 0 0 1 0 11.6h-2.8" stroke="#1A1A1A" stroke-width="3.6" fill="none"/><path d="M20.5 25l3.2-6 3.2 6M21.9 22.5h3.6" stroke="#1A1A1A" stroke-width="2.4" fill="none"/></svg>
+      <div>Project Amazon PH Academy<small>Practice-first Amazon PPC training for Filipino VAs.</small></div>
+    </div>
+    <div class="f-notes">
+      <b>SANDBOX</b> — NOT CONNECTED TO AMAZON ADS<br>
+      TRAINING SCHEMA v1.0 — LOCK TO THE OFFICIAL TEMPLATE BEFORE PUBLISHING<br>
+      BUILD PORTFOLIO-READY SKILLS. NO HYPE, NO FAKE RECEIPTS.
+    </div>
+  </div>
+</footer>
+
+<script>
+const COLUMNS=["Product","Entity","Operation","Campaign ID","Ad Group ID","Portfolio ID","Ad ID","Keyword ID","Negative Keyword ID","Campaign Negative Keyword ID","Targeting ID","Campaign Name","Ad Group Name","Portfolio Name","Start Date","End Date","Campaign Targeting Type","State","Daily Budget","SKU","ASIN","Ad Group Default Bid","Bid","Keyword Text","Match Type","Targeting Expression","Targeting Text","Targeting Type","Bidding Strategy","Placement","Percentage","Base Bid"];
+const ENTITIES=new Set(["Portfolio","Campaign","Ad Group","Product Ad","Keyword","Negative Keyword","Campaign Negative Keyword","Targeting","Placement"]);
+const OPS=new Set(["Create","Update","Delete"]);
+const STATES=new Set(["enabled","paused","archived"]);
+const CTYPES=new Set(["auto","manual"]);
+const MATCHES=new Set(["exact","phrase","broad"]);
+const TTYPES=new Set(["product","category"]);
+const BIDS=new Set(["Dynamic bids - down only","Dynamic bids - up and down","Fixed bids"]);
+const PLACES=new Set(["top of search (first page)","product pages","rest of search"]);
+const ID_COL={"Portfolio":"Portfolio ID","Campaign":"Campaign ID","Ad Group":"Ad Group ID","Product Ad":"Ad ID","Keyword":"Keyword ID","Negative Keyword":"Negative Keyword ID","Campaign Negative Keyword":"Campaign Negative Keyword ID","Targeting":"Targeting ID","Placement":"Campaign ID"};
+const PARENT_COL={"Portfolio":null,"Campaign":"Portfolio ID","Ad Group":"Campaign ID","Product Ad":"Ad Group ID","Keyword":"Ad Group ID","Negative Keyword":"Ad Group ID","Campaign Negative Keyword":"Campaign ID","Targeting":"Ad Group ID","Placement":"Campaign ID"};
+const NAME_COL={"Portfolio":"Portfolio Name","Campaign":"Campaign Name","Ad Group":"Ad Group Name"};
+const SEED_NAMES={"9001":"Seed Portfolio","1001":"SEED-SP-Manual-Exact","1002":"SEED-SP-Auto-Research","2001":"Seed Manual Ad Group","2002":"Seed Auto Ad Group","3001":"seed keyword"};
+
+const SAMPLE_ROWS=[
+{Entity:"Portfolio",Operation:"Create","Portfolio ID":"tmp-port-thp","Portfolio Name":"Tropical Home PH",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-thp-auto","Portfolio ID":"tmp-port-thp","Campaign Name":"THP-BambooOrganizer-SP-Auto-Research","Start Date":"2026-07-27","Campaign Targeting Type":"auto",State:"enabled","Daily Budget":"25.00","Bidding Strategy":"Dynamic bids - down only"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-thp-auto","Campaign ID":"tmp-camp-thp-auto","Ad Group Name":"THP-BambooOrganizer-Auto","Ad Group Default Bid":"0.75",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-thp-auto","Ad Group ID":"tmp-adg-thp-auto",SKU:"THP-BDO-001",ASIN:"B0THPBDO01",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-thp-exact","Portfolio ID":"tmp-port-thp","Campaign Name":"THP-BambooOrganizer-SP-Manual-Exact","Start Date":"2026-07-27","Campaign Targeting Type":"manual",State:"enabled","Daily Budget":"30.00","Bidding Strategy":"Fixed bids"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-thp-exact","Campaign ID":"tmp-camp-thp-exact","Ad Group Name":"THP-BambooOrganizer-Exact","Ad Group Default Bid":"0.95",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-thp-exact","Ad Group ID":"tmp-adg-thp-exact",SKU:"THP-BDO-001",ASIN:"B0THPBDO01",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-thp-1","Ad Group ID":"tmp-adg-thp-exact","Keyword Text":"bamboo desk organizer","Match Type":"exact",Bid:"1.25",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-thp-2","Ad Group ID":"tmp-adg-thp-exact","Keyword Text":"desk organizer bamboo","Match Type":"exact",Bid:"1.15",State:"enabled"},
+{Entity:"Negative Keyword",Operation:"Create","Negative Keyword ID":"tmp-nkw-thp-1","Ad Group ID":"tmp-adg-thp-exact","Keyword Text":"free","Match Type":"exact",State:"enabled"},
+{Entity:"Campaign Negative Keyword",Operation:"Create","Campaign Negative Keyword ID":"tmp-cnk-thp-1","Campaign ID":"tmp-camp-thp-exact","Keyword Text":"cheap","Match Type":"phrase",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-thp-asin","Portfolio ID":"tmp-port-thp","Campaign Name":"THP-BambooOrganizer-SP-ASIN-Competitor","Start Date":"2026-07-27","Campaign Targeting Type":"manual",State:"enabled","Daily Budget":"20.00","Bidding Strategy":"Dynamic bids - down only"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-thp-asin","Campaign ID":"tmp-camp-thp-asin","Ad Group Name":"THP-BambooOrganizer-ASIN","Ad Group Default Bid":"0.85",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-thp-asin","Ad Group ID":"tmp-adg-thp-asin",SKU:"THP-BDO-001",ASIN:"B0THPBDO01",State:"enabled"},
+{Entity:"Targeting",Operation:"Create","Targeting ID":"tmp-target-thp-1","Ad Group ID":"tmp-adg-thp-asin","Targeting Type":"product","Targeting Expression":'asin="B0COMPET01"',"Targeting Text":"B0COMPET01",Bid:"0.90",State:"enabled"},
+{Entity:"Portfolio",Operation:"Create","Portfolio ID":"tmp-port-kape","Portfolio Name":"Kape Trail",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-kape-brand","Portfolio ID":"tmp-port-kape","Campaign Name":"KT-PourOverKettle-SP-Brand-Defense","Start Date":"2026-07-27","Campaign Targeting Type":"manual",State:"enabled","Daily Budget":"15.00","Bidding Strategy":"Fixed bids"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-kape-brand","Campaign ID":"tmp-camp-kape-brand","Ad Group Name":"KT-PourOverKettle-Brand","Ad Group Default Bid":"0.80",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-kape-brand","Ad Group ID":"tmp-adg-kape-brand",SKU:"KT-KTL-001",ASIN:"B0KAPEKTL1",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-kape-1","Ad Group ID":"tmp-adg-kape-brand","Keyword Text":"kape trail pour over kettle","Match Type":"exact",Bid:"1.05",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-kape-cat","Portfolio ID":"tmp-port-kape","Campaign Name":"KT-PourOverKettle-SP-Category-Catchall","Start Date":"2026-07-27","Campaign Targeting Type":"manual",State:"enabled","Daily Budget":"12.00","Bidding Strategy":"Dynamic bids - down only"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-kape-cat","Campaign ID":"tmp-camp-kape-cat","Ad Group Name":"KT-PourOverKettle-Category","Ad Group Default Bid":"0.70",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-kape-cat","Ad Group ID":"tmp-adg-kape-cat",SKU:"KT-KTL-001",ASIN:"B0KAPEKTL1",State:"enabled"},
+{Entity:"Targeting",Operation:"Create","Targeting ID":"tmp-target-kape-1","Ad Group ID":"tmp-adg-kape-cat","Targeting Type":"category","Targeting Expression":'category="home & kitchen > kitchen & dining > coffee makers"',"Targeting Text":"Coffee Makers",Bid:"0.70",State:"enabled"},
+{Entity:"Portfolio",Operation:"Create","Portfolio ID":"tmp-port-fit","Portfolio Name":"FitGear PH",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-fit-broad","Portfolio ID":"tmp-port-fit","Campaign Name":"FG-ResistanceBands-SP-Broad-Discovery","Start Date":"2026-07-27","Campaign Targeting Type":"manual",State:"enabled","Daily Budget":"18.00","Bidding Strategy":"Dynamic bids - up and down"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-fit-broad","Campaign ID":"tmp-camp-fit-broad","Ad Group Name":"FG-ResistanceBands-Broad","Ad Group Default Bid":"0.65",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-fit-broad","Ad Group ID":"tmp-adg-fit-broad",SKU:"FG-RSB-001",ASIN:"B0FITRSB01",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-fit-1","Ad Group ID":"tmp-adg-fit-broad","Keyword Text":"resistance bands","Match Type":"broad",Bid:"0.85",State:"enabled"},
+{Entity:"Negative Keyword",Operation:"Create","Negative Keyword ID":"tmp-nkw-fit-1","Ad Group ID":"tmp-adg-fit-broad","Keyword Text":"free workout","Match Type":"phrase",State:"enabled"}
+].map(r=>({Product:"Sponsored Products",...r}));
+
+const UPDATE_ROWS=[
+{Entity:"Campaign",Operation:"Update","Campaign ID":"1001",State:"paused","Daily Budget":"35.00"},
+{Entity:"Keyword",Operation:"Update","Keyword ID":"3001",Bid:"1.35"},
+{Entity:"Campaign Negative Keyword",Operation:"Create","Campaign Negative Keyword ID":"tmp-cnk-seed-1","Campaign ID":"1002","Keyword Text":"cheap","Match Type":"phrase",State:"enabled"}
+].map(r=>({Product:"Sponsored Products",...r}));
+
+const BROKEN_ROWS=[
+{Entity:"Portfolio",Operation:"Create","Portfolio ID":"tmp-port-thp","Portfolio Name":"Tropical Home PH",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-auto","Portfolio ID":"tmp-port-thp","Campaign Name":"THP-BambooOrganizer-SP-Auto-Research","Start Date":"2026-07-27","Campaign Targeting Type":"auto",State:"enabled","Bidding Strategy":"Dynamic bids - down only"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-auto","Campaign ID":"tmp-camp-auto","Ad Group Name":"THP-BambooOrganizer-Auto","Ad Group Default Bid":"0.75",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-auto","Ad Group ID":"tmp-adg-auto",SKU:"THP-BDO-001",ASIN:"B0BAMBOO",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-bad-1","Ad Group ID":"tmp-adg-auto","Keyword Text":"bamboo desk organizer","Match Type":"exact",Bid:"1.25",State:"enabled"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-exact","Campaign ID":"tmp-camp-exact","Ad Group Name":"THP-BambooOrganizer-Exact","Ad Group Default Bid":"0.95",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-bad-2","Ad Group ID":"tmp-adg-exact","Keyword Text":"desk organizer","Match Type":"broad exact",Bid:"1.10",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-exact","Portfolio ID":"tmp-port-thp","Campaign Name":"THP-BambooOrganizer-SP-Manual-Exact","Start Date":"2026-07-27","Campaign Targeting Type":"manual",State:"on","Daily Budget":"30.00","Bidding Strategy":"Fixed bids"},
+{Entity:"Negative Keyword",Operation:"Create","Negative Keyword ID":"tmp-nkw-bad-1","Ad Group ID":"tmp-adg-auto","Keyword Text":"free","Match Type":"exact",Bid:"0.50",State:"enabled"},
+{Entity:"Keyword",Operation:"Update","Keyword ID":"9999",Bid:"1.50"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-broad","Portfolio ID":"tmp-port-thp","Campaign Name":"THP-BambooOrganizer-SP-Broad-Discovery","Start Date":"2026-08-15","End Date":"2026-08-01","Campaign Targeting Type":"manual",State:"enabled","Daily Budget":"18.00","Bidding Strategy":"Dynamic bids - up and down"}
+].map(r=>({Product:"Sponsored Products",...r}));
+
+const KT_LAUNCH=[
+{Entity:"Portfolio",Operation:"Create","Portfolio ID":"tmp-port-kt","Portfolio Name":"Kape Trail",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-kt-auto","Portfolio ID":"tmp-port-kt","Campaign Name":"KT-PourOverKettle-SP-Auto-Research","Start Date":"2026-07-27","Campaign Targeting Type":"auto",State:"enabled","Daily Budget":"20.00","Bidding Strategy":"Dynamic bids - down only"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-kt-auto","Campaign ID":"tmp-camp-kt-auto","Ad Group Name":"KT-PourOverKettle-Auto","Ad Group Default Bid":"0.70",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-kt-auto","Ad Group ID":"tmp-adg-kt-auto",SKU:"KT-KTL-001",ASIN:"B0KAPEKTL1",State:"enabled"},
+{Entity:"Campaign Negative Keyword",Operation:"Create","Campaign Negative Keyword ID":"tmp-cnk-kt-1","Campaign ID":"tmp-camp-kt-auto","Keyword Text":"cheap","Match Type":"phrase",State:"enabled"},
+{Entity:"Campaign Negative Keyword",Operation:"Create","Campaign Negative Keyword ID":"tmp-cnk-kt-2","Campaign ID":"tmp-camp-kt-auto","Keyword Text":"used","Match Type":"exact",State:"enabled"},
+{Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-kt-exact","Portfolio ID":"tmp-port-kt","Campaign Name":"KT-PourOverKettle-SP-Exact-Convert","Start Date":"2026-07-27","Campaign Targeting Type":"manual",State:"enabled","Daily Budget":"25.00","Bidding Strategy":"Fixed bids"},
+{Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-kt-exact","Campaign ID":"tmp-camp-kt-exact","Ad Group Name":"KT-PourOverKettle-Exact","Ad Group Default Bid":"0.85",State:"enabled"},
+{Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-kt-exact","Ad Group ID":"tmp-adg-kt-exact",SKU:"KT-KTL-001",ASIN:"B0KAPEKTL1",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-kt-1","Ad Group ID":"tmp-adg-kt-exact","Keyword Text":"kape trail pour over kettle","Match Type":"exact",Bid:"1.10",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-kt-2","Ad Group ID":"tmp-adg-kt-exact","Keyword Text":"pour over kettle","Match Type":"exact",Bid:"0.95",State:"enabled"},
+{Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-kt-3","Ad Group ID":"tmp-adg-kt-exact","Keyword Text":"gooseneck kettle pour over","Match Type":"exact",Bid:"0.90",State:"enabled"},
+{Entity:"Negative Keyword",Operation:"Create","Negative Keyword ID":"tmp-nkw-kt-1","Ad Group ID":"tmp-adg-kt-exact","Keyword Text":"drip","Match Type":"exact",State:"enabled"},
+{Entity:"Negative Keyword",Operation:"Create","Negative Keyword ID":"tmp-nkw-kt-2","Ad Group ID":"tmp-adg-kt-exact","Keyword Text":"electric","Match Type":"phrase",State:"enabled"},
+{Entity:"Campaign Negative Keyword",Operation:"Create","Campaign Negative Keyword ID":"tmp-cnk-kt-3","Campaign ID":"tmp-camp-kt-exact","Keyword Text":"free","Match Type":"exact",State:"enabled"}
+].map(r=>({Product:"Sponsored Products",...r}));
+
+function SEED_STATE(){return{
+  Portfolio:new Map([["9001",{name:"Seed Portfolio"}]]),
+  Campaign:new Map([["1001",{name:"SEED-SP-Manual-Exact",targeting:"manual"}],["1002",{name:"SEED-SP-Auto-Research",targeting:"auto"}]]),
+  "Ad Group":new Map([["2001",{campaignId:"1001",name:"Seed Manual Ad Group"}],["2002",{campaignId:"1002",name:"Seed Auto Ad Group"}]]),
+  "Product Ad":new Map(),
+  Keyword:new Map([["3001",{adGroupId:"2001",text:"seed keyword",match:"exact"}]]),
+  "Negative Keyword":new Map(),"Campaign Negative Keyword":new Map(),Targeting:new Map(),Placement:new Map()
+};}
+
+function validate(rows){
+  const errors=[],warnings=[],counts={},state=SEED_STATE();
+  const names=new Set([...state.Campaign.values()].map(v=>v.name).filter(Boolean));
+  const seen=new Set();
+  const asinRe=/^B[0-9A-Z]{9}$/i,moneyRe=/^\d+(\.\d{1,2})?$/;
+  const ok$=v=>moneyRe.test(v)&&+v>0;
+  const okD=v=>/^\d{4}-\d{2}-\d{2}$/.test(v)&&!isNaN(new Date(v+"T00:00:00"));
+  rows.forEach((row,idx)=>{
+    const stateBefore=new Map(Object.entries(state).map(([key,value])=>[key,new Map(value)]));
+    const namesBefore=new Set(names),seenBefore=new Set(seen);
+    const errorsBefore=errors.length;
+    const r={};COLUMNS.forEach(c=>r[c]=String(row[c]==null?"":row[c]).trim());
+    if(COLUMNS.every(c=>!r[c]))return;
+    const line=idx+2,E=r.Entity,O=r.Operation;
+    const bad=(f,m)=>errors.push({line,entity:E||"Row",field:f,message:m});
+    const meh=(f,m)=>warnings.push({line,entity:E||"Row",field:f,message:m});
+    if(!r.Product)bad("Product","Product is required. Use Sponsored Products.");
+    else if(r.Product.toLowerCase()!=="sponsored products")bad("Product","This simulator only supports Sponsored Products.");
+    if(!ENTITIES.has(E)){bad("Entity","Entity must be Portfolio, Campaign, Ad Group, Product Ad, Keyword, Negative Keyword, Campaign Negative Keyword, Targeting, or Placement.");return;}
+    if(!OPS.has(O)){bad("Operation","Operation must be Create, Update, or Delete.");return;}
+    counts[E]=counts[E]||{Create:0,Update:0,Delete:0};counts[E][O]++;
+    const idCol=ID_COL[E];let id="";
+    if(E==="Placement"){
+      id=r["Campaign ID"]&&r.Placement?r["Campaign ID"]+"::"+r.Placement.toLowerCase():"";
+      if(O==="Create"&&!id)bad("Placement","Placement requires Campaign ID and Placement.");
+      if(O!=="Create"&&!id)bad("Placement","Update/Delete requires Campaign ID and Placement.");
+      if(O!=="Create"&&id&&!state.Placement.has(id))bad("Placement","Placement adjustment does not exist in the simulated account.");
+      if(O==="Create"&&id&&state.Placement.has(id))bad("Placement","Duplicate placement adjustment for this campaign and placement.");
+    }else{
+      id=r[idCol];
+      if(O==="Create"){
+        if(!id)bad(idCol,"Create requires a temporary ID in "+idCol+".");
+        else if(state[E].has(id))bad(idCol,"Duplicate "+E+" ID "+id+". Temporary IDs must be unique.");
+      }else{
+        if(!id)bad(idCol,O+" requires "+idCol+".");
+        else if(!state[E].has(id))bad(idCol,E+" ID "+id+" does not exist in the simulated account.");
+      }
+    }
+    const existing=id?state[E].get(id):undefined;
+    if(r.State&&!STATES.has(r.State.toLowerCase()))bad("State","State must be enabled, paused, or archived.");
+    if(O==="Create"&&!r.State&&E!=="Placement")meh("State","State is empty. Use enabled, paused, or archived.");
+    if(E==="Portfolio"){
+      if(O==="Create"&&!r["Portfolio Name"])bad("Portfolio Name","Portfolio Name is required for Create.");
+      if(O==="Create"&&id&&!state.Portfolio.has(id))state.Portfolio.set(id,{name:r["Portfolio Name"]});
+    }
+    if(E==="Campaign"){
+      const t=r["Campaign Targeting Type"].toLowerCase();
+      if(O==="Create"){
+        if(!r["Campaign Name"])bad("Campaign Name","Campaign Name is required for Create.");
+        if(!okD(r["Start Date"]))bad("Start Date","Start Date is required and must be YYYY-MM-DD.");
+        if(!ok$(r["Daily Budget"]))bad("Daily Budget","Daily Budget is required and must be a positive number, e.g. 25.00.");
+        if(!CTYPES.has(t))bad("Campaign Targeting Type","Campaign Targeting Type must be auto or manual.");
+        if(!BIDS.has(r["Bidding Strategy"]))bad("Bidding Strategy","Bidding Strategy is required and must be Dynamic bids - down only, Dynamic bids - up and down, or Fixed bids.");
+        if(r["Portfolio ID"]&&!state.Portfolio.has(r["Portfolio ID"]))bad("Portfolio ID","Portfolio must be created before campaign.");
+        if(r["Campaign Name"]){
+          if(names.has(r["Campaign Name"]))meh("Campaign Name","Duplicate campaign name. Use a unique naming convention.");
+          else names.add(r["Campaign Name"]);
+        }
+      }
+      if(O==="Update"){
+        if(r["Daily Budget"]&&!ok$(r["Daily Budget"]))bad("Daily Budget","Daily Budget must be a positive number.");
+        if(r["Campaign Targeting Type"]&&!CTYPES.has(t))bad("Campaign Targeting Type","Campaign Targeting Type must be auto or manual.");
+        if(r["Bidding Strategy"]&&!BIDS.has(r["Bidding Strategy"]))bad("Bidding Strategy","Invalid Bidding Strategy.");
+      }
+      if(r["End Date"]){
+        if(!okD(r["End Date"]))bad("End Date","End Date must be YYYY-MM-DD.");
+        else if(okD(r["Start Date"])&&new Date(r["End Date"]+"T00:00:00")<new Date(r["Start Date"]+"T00:00:00"))bad("End Date","End Date cannot be before Start Date.");
+      }
+      if(O==="Create"&&id&&!state.Campaign.has(id))state.Campaign.set(id,{name:r["Campaign Name"],targeting:CTYPES.has(t)?t:"manual"});
+    }
+    if(E==="Ad Group"){
+      let cId=r["Campaign ID"];
+      if(O==="Create"){
+        if(!cId)bad("Campaign ID","Ad Group requires Campaign ID.");
+        else if(!state.Campaign.has(cId))bad("Campaign ID","Campaign must be created before ad group.");
+        if(!r["Ad Group Name"])bad("Ad Group Name","Ad Group Name is required for Create.");
+        if(!ok$(r["Ad Group Default Bid"]))bad("Ad Group Default Bid","Ad Group Default Bid is required and must be a positive number.");
+      }else{
+        if(cId&&!state.Campaign.has(cId))bad("Campaign ID","Campaign ID does not exist.");
+        if(!cId&&existing)cId=existing.campaignId;
+        if(O==="Update"&&r["Ad Group Default Bid"]&&!ok$(r["Ad Group Default Bid"]))bad("Ad Group Default Bid","Ad Group Default Bid must be a positive number.");
+      }
+      if(O==="Create"&&id&&!state["Ad Group"].has(id))state["Ad Group"].set(id,{campaignId:cId,name:r["Ad Group Name"]});
+    }
+    if(E==="Product Ad"){
+      let agId=r["Ad Group ID"];
+      if(O==="Create"){
+        if(!agId)bad("Ad Group ID","Product Ad requires Ad Group ID.");
+        else if(!state["Ad Group"].has(agId))bad("Ad Group ID","Ad Group must be created before product ad.");
+        if(!r.SKU&&!r.ASIN)bad("SKU","Product Ad requires SKU and/or ASIN.");
+        if(!r.SKU)meh("SKU","Include SKU for catalog accuracy.");
+        if(!r.ASIN)meh("ASIN","Include ASIN for catalog accuracy.");
+      }else{
+        if(agId&&!state["Ad Group"].has(agId))bad("Ad Group ID","Ad Group ID does not exist.");
+        if(!agId&&existing)agId=existing.adGroupId;
+      }
+      if(r.ASIN&&!asinRe.test(r.ASIN))bad("ASIN","ASIN should match B plus 9 alphanumeric characters, e.g. B0THPBDO01.");
+      if(O==="Create"&&id&&!state["Product Ad"].has(id))state["Product Ad"].set(id,{adGroupId:agId,sku:r.SKU,asin:r.ASIN});
+    }
+    if(E==="Keyword"){
+      let agId=r["Ad Group ID"];
+      if(O==="Create"){
+        if(!agId)bad("Ad Group ID","Keyword requires Ad Group ID.");
+        else if(!state["Ad Group"].has(agId))bad("Ad Group ID","Ad Group must be created before keyword.");
+        if(!r["Keyword Text"])bad("Keyword Text","Keyword Text is required for Create.");
+        if(!MATCHES.has(r["Match Type"].toLowerCase()))bad("Match Type","Match Type must be exact, phrase, or broad.");
+        if(!ok$(r.Bid))bad("Bid","Bid is required and must be a positive number.");
+      }else{
+        if(agId&&!state["Ad Group"].has(agId))bad("Ad Group ID","Ad Group ID does not exist.");
+        if(!agId&&existing)agId=existing.adGroupId;
+        if(r["Match Type"]&&!MATCHES.has(r["Match Type"].toLowerCase()))bad("Match Type","Match Type must be exact, phrase, or broad.");
+        if(r.Bid&&!ok$(r.Bid))bad("Bid","Bid must be a positive number.");
+      }
+      if(agId&&state["Ad Group"].has(agId)){
+        const ag=state["Ad Group"].get(agId),camp=state.Campaign.get(ag.campaignId);
+        if(camp&&camp.targeting==="auto")bad("Ad Group ID","Keywords cannot be added to an auto campaign. Use a manual campaign.");
+      }
+      if(O==="Create"){
+        const key=[agId,r["Keyword Text"].toLowerCase(),r["Match Type"].toLowerCase()].join("|");
+        if(seen.has(key))meh("Keyword Text","Duplicate keyword in the same ad group and match type.");
+        else seen.add(key);
+      }
+      if(O==="Create"&&id&&!state.Keyword.has(id))state.Keyword.set(id,{adGroupId:agId,text:r["Keyword Text"],match:r["Match Type"]});
+    }
+    if(E==="Negative Keyword"){
+      let agId=r["Ad Group ID"];
+      if(O==="Create"){
+        if(!agId)bad("Ad Group ID","Negative Keyword requires Ad Group ID.");
+        else if(!state["Ad Group"].has(agId))bad("Ad Group ID","Ad Group must be created before negative keyword.");
+        if(!r["Keyword Text"])bad("Keyword Text","Keyword Text is required for Create.");
+        if(!MATCHES.has(r["Match Type"].toLowerCase()))bad("Match Type","Match Type must be exact, phrase, or broad.");
+      }else{
+        if(agId&&!state["Ad Group"].has(agId))bad("Ad Group ID","Ad Group ID does not exist.");
+        if(!agId&&existing)agId=existing.adGroupId;
+        if(r["Match Type"]&&!MATCHES.has(r["Match Type"].toLowerCase()))bad("Match Type","Match Type must be exact, phrase, or broad.");
+      }
+      if(r.Bid)meh("Bid","Negative keywords do not use bids.");
+      if(O==="Create"&&id&&!state["Negative Keyword"].has(id))state["Negative Keyword"].set(id,{adGroupId:agId,text:r["Keyword Text"],match:r["Match Type"]});
+    }
+    if(E==="Campaign Negative Keyword"){
+      let cId=r["Campaign ID"];
+      if(O==="Create"){
+        if(!cId)bad("Campaign ID","Campaign Negative Keyword requires Campaign ID.");
+        else if(!state.Campaign.has(cId))bad("Campaign ID","Campaign must be created before campaign negative keyword.");
+        if(!r["Keyword Text"])bad("Keyword Text","Keyword Text is required for Create.");
+        if(!MATCHES.has(r["Match Type"].toLowerCase()))bad("Match Type","Match Type must be exact, phrase, or broad.");
+      }else{
+        if(cId&&!state.Campaign.has(cId))bad("Campaign ID","Campaign ID does not exist.");
+        if(!cId&&existing)cId=existing.campaignId;
+        if(r["Match Type"]&&!MATCHES.has(r["Match Type"].toLowerCase()))bad("Match Type","Match Type must be exact, phrase, or broad.");
+      }
+      if(r.Bid)meh("Bid","Campaign negative keywords do not use bids.");
+      if(O==="Create"&&id&&!state["Campaign Negative Keyword"].has(id))state["Campaign Negative Keyword"].set(id,{campaignId:cId,text:r["Keyword Text"],match:r["Match Type"]});
+    }
+    if(E==="Targeting"){
+      let agId=r["Ad Group ID"];
+      const tt=r["Targeting Type"].toLowerCase();
+      if(O==="Create"){
+        if(!agId)bad("Ad Group ID","Targeting requires Ad Group ID.");
+        else if(!state["Ad Group"].has(agId))bad("Ad Group ID","Ad Group must be created before targeting.");
+        if(!r["Targeting Type"])bad("Targeting Type","Targeting Type is required for Create.");
+        else if(!TTYPES.has(tt))bad("Targeting Type","Targeting Type must be product or category.");
+        if(!r["Targeting Expression"]&&!r["Targeting Text"])bad("Targeting Expression","Targeting Expression or Targeting Text is required.");
+        if(!ok$(r.Bid))bad("Bid","Bid is required and must be a positive number.");
+      }else{
+        if(agId&&!state["Ad Group"].has(agId))bad("Ad Group ID","Ad Group ID does not exist.");
+        if(!agId&&existing)agId=existing.adGroupId;
+        if(r["Targeting Type"]&&!TTYPES.has(tt))bad("Targeting Type","Targeting Type must be product or category.");
+        if(r.Bid&&!ok$(r.Bid))bad("Bid","Bid must be a positive number.");
+      }
+      if(agId&&state["Ad Group"].has(agId)){
+        const ag=state["Ad Group"].get(agId),camp=state.Campaign.get(ag.campaignId);
+        if(camp&&camp.targeting==="auto")bad("Ad Group ID","Targeting expressions cannot be added to an auto campaign. Use a manual campaign.");
+      }
+      if(tt==="product"&&r["Targeting Expression"]&&!/^asin="B[0-9A-Z]{9}"$/i.test(r["Targeting Expression"]))bad("Targeting Expression",'Product targeting expression should look like asin="B0COMPET01".');
+      if(tt==="category"&&r["Targeting Expression"]&&!/^category=".+"$/i.test(r["Targeting Expression"]))bad("Targeting Expression",'Category targeting expression should look like category="home & kitchen > coffee makers".');
+      if(O==="Create"&&id&&!state.Targeting.has(id))state.Targeting.set(id,{adGroupId:agId,type:tt,expression:r["Targeting Expression"],text:r["Targeting Text"]});
+    }
+    if(E==="Placement"){
+      let cId=r["Campaign ID"];
+      if(O==="Create"){
+        if(!cId)bad("Campaign ID","Placement requires Campaign ID.");
+        else if(!state.Campaign.has(cId))bad("Campaign ID","Campaign must exist before placement adjustment.");
+        if(!r.Placement)bad("Placement","Placement is required.");
+        else if(!PLACES.has(r.Placement.toLowerCase()))bad("Placement","Use Top of search (first page), Product pages, or Rest of search.");
+        const p=Number(r.Percentage);
+        if(r.Percentage===""||!Number.isFinite(p)||p<0||p>900)bad("Percentage","Percentage must be 0-900.");
+      }else{
+        if(cId&&!state.Campaign.has(cId))bad("Campaign ID","Campaign ID does not exist.");
+        if(!cId&&existing)cId=existing.campaignId;
+        if(r.Placement&&!PLACES.has(r.Placement.toLowerCase()))bad("Placement","Use Top of search (first page), Product pages, or Rest of search.");
+        if(r.Percentage!==""){const p=Number(r.Percentage);if(!Number.isFinite(p)||p<0||p>900)bad("Percentage","Percentage must be 0-900.");}
+      }
+      if(O==="Create"&&id&&!state.Placement.has(id))state.Placement.set(id,{campaignId:cId,placement:r.Placement,percentage:r.Percentage});
+    }
+    if(O==="Update"){
+      const mutable=["State","Daily Budget","Ad Group Default Bid","Bid","Percentage","Campaign Name","Ad Group Name","Bidding Strategy","Start Date","End Date","SKU","ASIN","Keyword Text","Match Type","Targeting Expression","Targeting Text"];
+      if(!mutable.some(f=>r[f]!==""))meh("Operation","Update row has no editable field filled.");
+    }
+    if(errors.length>errorsBefore){
+      Object.keys(state).forEach(key=>{state[key]=stateBefore.get(key);});
+      names.clear();namesBefore.forEach(value=>names.add(value));
+      seen.clear();seenBefore.forEach(value=>seen.add(value));
+    }
+  });
+  const score=Math.max(0,100-errors.length*10-warnings.length*2);
+  return{errors,warnings,score,counts,state};
+}
+
+const COLUMN_GUIDE={
+"Product":{d:"Which ad product this row belongs to.",u:"All rows",v:"Sponsored Products"},
+"Entity":{d:"The object this row acts on. Decides which columns are required.",u:"All rows",v:"Portfolio · Campaign · Ad Group · Product Ad · Keyword · Negative Keyword · Campaign Negative Keyword · Targeting · Placement"},
+"Operation":{d:"What to do with the entity. One row, one instruction.",u:"All rows",v:"Create · Update · Delete"},
+"Campaign ID":{d:"Temporary ID (tmp-…) on Create; real ID on Update/Delete. Child rows use this to point at their parent campaign.",u:"Campaign + children",v:"tmp-camp-101 or 1001"},
+"Ad Group ID":{d:"Keywords, negatives, product ads, and targeting reference their parent through this column.",u:"Ad Group + children",v:"tmp-adg-101 or 2001"},
+"Portfolio ID":{d:"Campaigns optionally reference their parent portfolio here.",u:"Portfolio, Campaign",v:"tmp-port-1 or 9001"},
+"Ad ID":{d:"Product ad identifier. Temporary on Create.",u:"Product Ad",v:"tmp-ad-101"},
+"Keyword ID":{d:"Keyword identifier. Temporary on Create; real ID on Update/Delete.",u:"Keyword",v:"tmp-kw-101 or 3001"},
+"Negative Keyword ID":{d:"Ad group negative keyword identifier.",u:"Negative Keyword",v:"tmp-nkw-101"},
+"Campaign Negative Keyword ID":{d:"Campaign-level negative keyword identifier.",u:"Campaign Negative Keyword",v:"tmp-cnk-101"},
+"Targeting ID":{d:"Targeting identifier for product/category targets.",u:"Targeting",v:"tmp-target-101"},
+"Campaign Name":{d:"Required on Create. Follow {BRAND}-{PRODUCT}-SP-{TYPE}-{GOAL}.",u:"Campaign",v:"THP-BambooOrganizer-SP-Auto-Research"},
+"Ad Group Name":{d:"Required on Create. Usually the product or theme of the group.",u:"Ad Group",v:"THP-BambooOrganizer-Exact"},
+"Portfolio Name":{d:"Required on Create for portfolios.",u:"Portfolio",v:"Tropical Home PH"},
+"Start Date":{d:"When the campaign becomes eligible to serve. Required on campaign Create.",u:"Campaign",v:"YYYY-MM-DD · 2026-07-27"},
+"End Date":{d:"Optional stop date. Must be after the start date.",u:"Campaign",v:"YYYY-MM-DD"},
+"Campaign Targeting Type":{d:"Decides which children are allowed: auto campaigns cannot hold keywords or targeting expressions.",u:"Campaign",v:"auto · manual"},
+"State":{d:"Paused keeps all history; archived is out of the way.",u:"All entities except Placement",v:"enabled · paused · archived"},
+"Daily Budget":{d:"Campaign-level daily spend cap. Positive number, max two decimals. No currency symbols.",u:"Campaign",v:"25.00"},
+"SKU":{d:"Your catalog code. Best practice: include both SKU and ASIN.",u:"Product Ad",v:"THP-BDO-001"},
+"ASIN":{d:"Amazon's 10-character product code.",u:"Product Ad, Targeting",v:"B + 9 chars · B0THPBDO01"},
+"Ad Group Default Bid":{d:"Fallback bid for keywords without their own bid.",u:"Ad Group",v:"0.95"},
+"Bid":{d:"Keyword/target-level bid. Overrides the default. Never used on negatives.",u:"Keyword, Targeting",v:"1.25"},
+"Keyword Text":{d:"The search term you're targeting (keywords) or blocking (negatives).",u:"Keyword, negatives",v:"bamboo desk organizer"},
+"Match Type":{d:"How closely a search must match.",u:"Keyword, negatives",v:"exact · phrase · broad"},
+"Targeting Expression":{d:"Exact syntax. Quote marks are part of the syntax.",u:"Targeting",v:'asin="B0COMPET01" · category="…"'},
+"Targeting Text":{d:"Human-readable label for the target.",u:"Targeting",v:"B0COMPET01 · Coffee Makers"},
+"Targeting Type":{d:"What kind of target the expression describes.",u:"Targeting",v:"product · category"},
+"Bidding Strategy":{d:"How Amazon adjusts your bids in the auction. Required on campaign Create.",u:"Campaign",v:"Dynamic bids - down only · Dynamic bids - up and down · Fixed bids"},
+"Placement":{d:"Which placement gets the bid adjustment.",u:"Placement",v:"Top of search (first page) · Product pages · Rest of search"},
+"Percentage":{d:"Bid increase for the placement.",u:"Placement",v:"0–900 · e.g. 25"},
+"Base Bid":{d:"Optional reference bid. Rarely used in training.",u:"Placement",v:"0.85"},
+"_id":{d:"Every entity has its own ID column. On Create use a temporary ID (tmp-…). On Update/Delete use the real ID from your latest download.",u:"All entities",v:"tmp-camp-101 · 1001"},
+"_parent":{d:"Child rows reference their parent through the parent's ID column. The parent row must appear first.",u:"All child entities",v:"parents before children"}
+};
+const FIELD_NOTES={
+"Portfolio":"Portfolios group campaigns for reporting and budget caps. Hindi required — pero malaking tulong sa organization.",
+"Campaign":"Ang campaign ang may budget at bidding strategy. Dito nagsisimula ang lahat ng structure.",
+"Ad Group":"Ad groups organize products. The default bid applies kapag walang sariling bid ang keyword.",
+"Product Ad":"SKU = your catalog code. ASIN = Amazon's code. Dalawa-dalawa ang pinakamainam.",
+"Keyword":"Match type controls how closely a search must match. Exact = pinakamataas ang kontrol.",
+"Negative Keyword":"Block, don't bid. Walang bid ang negative — kailanman.",
+"Campaign Negative Keyword":"Blocks the term sa buong campaign — lahat ng ad groups.",
+"Targeting":'asin="…" or category="…" — ang quote marks ay bahagi ng syntax, hindi decoration.',
+"Placement":"Percentage raises bids on that placement. Max 900%."
+};
+function describeRow(row){
+  const e=row.Entity,o=row.Operation;
+  if(o==="Update")return "Edits an existing "+e.toLowerCase()+" using its real ID. Only filled fields change — everything else stays untouched.";
+  if(o==="Delete")return "Removes this "+e.toLowerCase()+" from the account. The ID must exist. Permanent ito — i-double-check bago mag-upload.";
+  return({"Portfolio":"Creates a portfolio — the folder that groups campaigns for reporting and budget control.",
+  "Campaign":"Creates a campaign: name, start date, daily budget, targeting type, bidding strategy. The temporary Campaign ID lets child rows point to it.",
+  "Ad Group":"Creates an ad group inside a campaign. The campaign row must appear above this one.",
+  "Product Ad":"Attaches a product (SKU + ASIN) to an ad group so it can serve ads.",
+  "Keyword":"Adds a keyword with match type and bid. Only allowed inside manual campaigns.",
+  "Negative Keyword":"Blocks a search term inside one ad group. Negatives never take a bid.",
+  "Campaign Negative Keyword":"Blocks a search term across the whole campaign — every ad group.",
+  "Targeting":"Adds product or category targeting. Manual campaigns only. Quote marks in the expression are part of the syntax.",
+  "Placement":"Adds a placement bid adjustment to a campaign."})[e]||"";
+}
+
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const ECLS={"Portfolio":"e-portfolio","Campaign":"e-campaign","Ad Group":"e-adgroup","Product Ad":"e-productad","Keyword":"e-keyword","Negative Keyword":"e-neg","Campaign Negative Keyword":"e-neg","Targeting":"e-targeting","Placement":"e-placement"};
+let currentRows=[],currentResult=null,currentIssues={},currentSet="sample",selectedRow=-1,consoleTimers=[];
+const lessonsRead=new Set();
+
+function normalizeRows(rows){
+  return rows.map(row=>{
+    const cleaned={};Object.entries(row).forEach(([k,v])=>cleaned[k.trim()]=v);
+    const o={};COLUMNS.forEach(c=>o[c]=String(cleaned[c]==null?"":cleaned[c]).trim());return o;
+  }).filter(row=>COLUMNS.some(c=>row[c]!==""));
+}
+function csvEscape(v){const s=String(v==null?"":v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function toCSV(rows){return[COLUMNS.join(","),...rows.map(r=>COLUMNS.map(c=>csvEscape(r[c]==null?"":r[c])).join(","))].join("\n");}
+function download(name,text){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"text/csv;charset=utf-8;"}));a.download=name;a.click();URL.revokeObjectURL(a.href);}
+function issuesByLine(res){
+  const m={};
+  res.errors.forEach(e=>{(m[e.line]=m[e.line]||{errors:[],warnings:[]}).errors.push(e);});
+  res.warnings.forEach(w=>{(m[w.line]=m[w.line]||{errors:[],warnings:[]}).warnings.push(w);});
+  return m;
+}
+
+function run(rows,setName){
+  currentSet=setName||"upload";currentRows=rows;selectedRow=-1;
+  currentResult=validate(rows);currentIssues=issuesByLine(currentResult);
+  renderViewer();renderExplainDefault();
+  playConsole(rows,currentResult,()=>{
+    renderScore(currentResult);renderReport(currentResult);renderAccount(currentResult);renderMission(currentResult);
+  });
+}
+function playConsole(rows,res,done){
+  consoleTimers.forEach(clearTimeout);consoleTimers=[];
+  const el=document.getElementById("console");el.innerHTML="";
+  const e=res.errors.length,w=res.warnings.length;
+  const lines=[
+    ["> parsing "+rows.length+" rows from sheet…",""],
+    ["> checking Entity and Operation values…",""],
+    ["> walking hierarchy — parents must come first…",""],
+    ["> validating money, dates, states, ASINs…",""],
+    ["> cross-checking auto vs manual rules…",""],
+    ["> done. "+e+" blocking error"+(e===1?"":"s")+" · "+w+" warning"+(w===1?"":"s"),e?"c-err":(w?"c-warn":"c-ok")]
+  ];
+  lines.forEach((l,i)=>consoleTimers.push(setTimeout(()=>{
+    const d=document.createElement("div");d.className="c-line "+l[1];d.textContent=l[0];el.appendChild(d);
+  },i*170)));
+  consoleTimers.push(setTimeout(done,lines.length*170+160));
+}
+
+function renderScore(res){
+  document.getElementById("scoreNum").textContent=res.score;
+  document.getElementById("errCount").textContent=res.errors.length;
+  document.getElementById("warnCount").textContent=res.warnings.length;
+  const fill=document.getElementById("scoreFill");
+  fill.style.width="0%";
+  fill.style.background=res.errors.length?"var(--red)":res.warnings.length?"var(--amb)":"var(--grn)";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>fill.style.width=res.score+"%"));
+  const pill=document.getElementById("statusPill");
+  if(res.errors.length){pill.className="pill fail";pill.textContent="FAIL — UPLOAD REJECTED";}
+  else if(res.warnings.length){pill.className="pill warnp";pill.textContent="PASS WITH WARNINGS";}
+  else{pill.className="pill okp";pill.textContent="CLEAN — UPLOAD ACCEPTED";}
+}
+function renderMission(res){
+  const el=document.getElementById("mission");
+  if(currentSet!=="broken"){el.hidden=true;return;}
+  el.hidden=false;
+  if(res.errors.length===0&&res.warnings.length===0){
+    el.className="mission ok";
+    el.innerHTML="<b>FIXED.</b> Clean file — 100/100. Ganito ang standard bago ka mag-touch ng client account.";
+  }else{
+    el.className="mission";
+    el.innerHTML="<b>MISSION:</b> This file has 9 planted problems — 8 blocking errors, 1 warning. Score: <b>"+res.score+"/100</b>. Download it, fix in Sheets or Excel, then re-upload. Hint: click any red row to learn why it failed.";
+  }
+}
+function issueRows(items){
+  return '<table class="rt"><thead><tr><th>Line</th><th>Entity</th><th>Field</th><th>Message</th></tr></thead><tbody>'+
+    items.map(i=>'<tr><td class="ln">'+i.line+'</td><td>'+esc(i.entity)+'</td><td class="ln">'+esc(i.field)+'</td><td>'+esc(i.message)+'</td></tr>').join("")+
+    '</tbody></table>';
+}
+function renderReport(res){
+  document.getElementById("errBox").innerHTML=res.errors.length?issueRows(res.errors):'<p class="none">None. Upload would be accepted.</p>';
+  document.getElementById("warnBox").innerHTML=res.warnings.length?issueRows(res.warnings):'<p class="none">None. Malinis ang discipline.</p>';
+}
+function renderAccount(res){
+  document.getElementById("opsBox").innerHTML='<table class="rt"><thead><tr><th>Entity</th><th>Create</th><th>Update</th><th>Delete</th></tr></thead><tbody>'+
+    [...ENTITIES].map(e=>'<tr><td>'+esc(e)+'</td><td class="ln">'+((res.counts[e]||{}).Create||0)+'</td><td class="ln">'+((res.counts[e]||{}).Update||0)+'</td><td class="ln">'+((res.counts[e]||{}).Delete||0)+'</td></tr>').join("")+
+    '</tbody></table>';
+  const camps=[...res.state.Campaign.entries()].map(([id,c])=>({id,name:c.name||"(unnamed)",targeting:c.targeting||"manual"}));
+  document.getElementById("acctBox").innerHTML='<table class="rt"><thead><tr><th>Campaign ID</th><th>Name</th><th>Targeting</th></tr></thead><tbody>'+
+    camps.map(c=>'<tr><td class="ln">'+esc(c.id)+'</td><td>'+esc(c.name)+'</td><td class="ln">'+esc(c.targeting)+'</td></tr>').join("")+
+    '</tbody></table>';
+}
+
+const VIEW_COLS=[
+  {key:"Entity",label:"Entity",g:"Entity"},{key:"Operation",label:"Op",g:"Operation"},
+  {key:"_id",label:"ID",g:"_id"},{key:"_parent",label:"Parent ref",g:"_parent"},
+  {key:"_name",label:"Name",g:"Campaign Name"},{key:"Campaign Targeting Type",label:"Targeting",g:"Campaign Targeting Type"},
+  {key:"State",label:"State",g:"State"},{key:"Daily Budget",label:"Budget",g:"Daily Budget"},
+  {key:"Ad Group Default Bid",label:"Def. bid",g:"Ad Group Default Bid"},{key:"Bid",label:"Bid",g:"Bid"},
+  {key:"_text",label:"Keyword / Target",g:"Keyword Text"},{key:"Match Type",label:"Match",g:"Match Type"},
+  {key:"_catalog",label:"SKU · ASIN",g:"ASIN"},{key:"Bidding Strategy",label:"Bidding",g:"Bidding Strategy"}
+];
+function cellHTML(row,key){
+  switch(key){
+    case "Entity":return '<span class="chip '+(ECLS[row.Entity]||"")+'">'+esc(row.Entity||"—")+'</span>';
+    case "Operation":{const v=row.Operation;const c=v==="Create"?"op-c":v==="Update"?"op-u":v==="Delete"?"op-d":"";return '<span class="mono op '+c+'">'+esc(v||"—")+'</span>';}
+    case "_id":{const idc=ID_COL[row.Entity];const v=idc?row[idc]:"";return v?'<span class="mono id">'+esc(v)+'</span>':'<span class="dim">—</span>';}
+    case "_parent":{const pc=PARENT_COL[row.Entity];if(!pc)return '<span class="dim">—</span>';const v=row[pc];return v?'<span class="mono id" title="'+esc(pc)+'">'+esc(v)+'</span>':'<span class="dim">—</span>';}
+    case "_name":{const v=row["Campaign Name"]||row["Ad Group Name"]||row["Portfolio Name"];return v?esc(v):'<span class="dim">—</span>';}
+    case "State":{const v=row.State;if(!v)return '<span class="dim">—</span>';const c=v==="enabled"?"st-en":v==="paused"?"st-pa":"st-ar";return '<span class="st mono '+c+'">'+esc(v)+'</span>';}
+    case "_text":{const kw=row["Keyword Text"];const te=row["Targeting Expression"]||row["Targeting Text"];if(kw)return '<span class="kw">'+esc(kw)+'</span>';if(te)return '<span class="mono te">'+esc(te)+'</span>';return '<span class="dim">—</span>';}
+    case "_catalog":{const s=row.SKU,a=row.ASIN;if(!s&&!a)return '<span class="dim">—</span>';return '<span class="mono">'+esc(s||"")+(s&&a?" · ":"")+esc(a||"")+'</span>';}
+    default:{const v=row[key];if(!v)return '<span class="dim">—</span>';const money=["Daily Budget","Ad Group Default Bid","Bid"].includes(key);return money?'<span class="mono money">'+esc(v)+'</span>':esc(v);}
+  }
+}
+function renderViewer(){
+  document.getElementById("vwHead").innerHTML='<th style="cursor:default">#</th>'+VIEW_COLS.map(c=>'<th data-g="'+c.g+'">'+c.label+'</th>').join("");
+  document.getElementById("vwBody").innerHTML=currentRows.map((row,i)=>{
+    const line=i+2,cell=currentIssues[line];
+    const cls=cell?(cell.errors.length?"r-err":"r-warn"):"r-ok";
+    const icon=cell?(cell.errors.length?'<span class="gi-e">✕</span>':'<span class="gi-w">⚠</span>'):'<span class="gi-o">✓</span>';
+    return '<tr class="'+cls+(i===selectedRow?" r-sel":"")+'" data-idx="'+i+'" tabindex="0"><td class="gutter">'+icon+' '+line+'</td>'+
+      VIEW_COLS.map(c=>'<td>'+cellHTML(row,c.key)+'</td>').join("")+'</tr>';
+  }).join("");
+}
+document.getElementById("vwBody").addEventListener("click",e=>{
+  const tr=e.target.closest("tr[data-idx]");if(!tr)return;
+  selectedRow=+tr.dataset.idx;
+  document.querySelectorAll("#vwBody tr").forEach(r=>r.classList.toggle("r-sel",+r.dataset.idx===selectedRow));
+  renderExplain(selectedRow);
+});
+document.getElementById("vwBody").addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  const tr=e.target.closest("tr[data-idx]");if(!tr)return;
+  e.preventDefault();tr.click();
+});
+document.getElementById("vwHead").addEventListener("click",e=>{
+  const th=e.target.closest("th[data-g]");if(th)openGuide(th.dataset.g);
+});
+
+function resolveChain(row){
+  const parts=[];let cur=row,guard=0;
+  while(cur&&guard<6){
+    const pc=PARENT_COL[cur.Entity];if(!pc)break;
+    const pid=cur[pc];if(!pid)break;
+    const pe={"Portfolio ID":"Portfolio","Campaign ID":"Campaign","Ad Group ID":"Ad Group"}[pc];
+    const def=currentRows.find(r=>r.Entity===pe&&r[ID_COL[pe]]===pid);
+    const name=def?(def[NAME_COL[pe]]||""):(SEED_NAMES[pid]||"");
+    parts.push(pe+": <b>"+esc(pid)+"</b>"+(name?' <span class="dim">('+esc(name)+')</span>':""));
+    cur=def||null;guard++;
+  }
+  return parts.length?esc(row.Entity)+" → "+parts.join(" → "):"";
+}
+function renderExplainDefault(){
+  document.getElementById("explain").innerHTML='<p class="ex-empty">Walang piniling row. Click any row in the file viewer — ipo-paliwanag nito ang entity, operation, parent chain, at kung may issue.</p>';
+}
+function renderExplain(i){
+  const row=currentRows[i],line=i+2,cell=currentIssues[line];
+  const issues=cell?[...cell.errors.map(x=>({cls:"err",m:x})),...cell.warnings.map(x=>({cls:"warn",m:x}))]:[];
+  const fields=COLUMNS.filter(c=>row[c]!==""&&c!=="Product");
+  const chain=resolveChain(row);
+  document.getElementById("explain").innerHTML=
+    '<div class="ex-top"><span class="ex-line">LINE '+line+'</span><span class="chip '+(ECLS[row.Entity]||"")+'">'+esc(row.Entity)+'</span><span class="mono op '+(row.Operation==="Create"?"op-c":row.Operation==="Update"?"op-u":"op-d")+'">'+esc(row.Operation)+'</span></div>'+
+    (issues.length?issues.map(x=>'<div class="ex-issue '+x.cls+'"><b class="mono" style="font-size:10px;letter-spacing:.08em">'+(x.cls==="err"?"ERROR":"WARNING")+' · '+esc(x.m.field)+'</b><br>'+esc(x.m.message)+'</div>').join(""):'<div class="ex-issue" style="background:var(--grns);color:var(--grn)">No issues on this row.</div>')+
+    '<p class="ex-blurb">'+describeRow(row)+'</p>'+
+    (chain?'<div class="ex-chain">'+chain+'</div>':"")+
+    '<dl class="ex-fields">'+fields.map(f=>'<dt>'+esc(f)+'</dt><dd>'+esc(row[f])+'</dd>').join("")+'</dl>'+
+    '<div class="ex-note"><b>FIELD NOTE</b>'+(FIELD_NOTES[row.Entity]||"")+'</div>';
+}
+
+const guide=document.getElementById("guide"),scrim=document.getElementById("scrim");
+function renderGuide(col){
+  const g=COLUMN_GUIDE[col]||COLUMN_GUIDE["Entity"];
+  const title=col==="_id"?"ID columns":col==="_parent"?"Parent reference":col;
+  document.getElementById("gDetail").innerHTML='<h4>'+esc(title)+'</h4><p>'+esc(g.d)+'</p><p class="mono" style="font-size:10px;letter-spacing:.08em;color:var(--ink2)">USED BY: '+esc(g.u)+'</p><span class="gv">'+esc(g.v)+'</span>';
+  document.getElementById("gList").innerHTML=COLUMNS.map(c=>'<button type="button" class="g-item'+(c===col?" active":"")+'" data-col="'+esc(c)+'">'+esc(c)+'</button>').join("");
+}
+function openGuide(col){renderGuide(col||"Entity");guide.classList.add("open");scrim.classList.add("show");guide.setAttribute("aria-hidden","false");}
+function closeGuide(){guide.classList.remove("open");scrim.classList.remove("show");guide.setAttribute("aria-hidden","true");}
+document.getElementById("openGuide").addEventListener("click",()=>openGuide("Entity"));
+document.getElementById("closeGuide").addEventListener("click",closeGuide);
+scrim.addEventListener("click",closeGuide);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeGuide();});
+document.getElementById("gList").addEventListener("click",e=>{const b=e.target.closest(".g-item");if(b)renderGuide(b.dataset.col);});
+
+document.querySelectorAll(".lesson").forEach(l=>{
+  const head=l.querySelector(".l-head");
+  head.addEventListener("click",()=>{
+    const open=l.classList.toggle("open");
+    head.setAttribute("aria-expanded",open);
+    if(open){lessonsRead.add(l.dataset.id);l.classList.add("read");
+      document.getElementById("lessonProgress").innerHTML="<b>"+lessonsRead.size+"/6</b> READ";}
+  });
+});
+document.querySelectorAll(".tryit").forEach(b=>{
+  b.addEventListener("click",()=>{
+    const set=b.dataset.set;
+    if(set==="sample")run(normalizeRows(SAMPLE_ROWS),"sample");
+    if(set==="broken")run(normalizeRows(BROKEN_ROWS),"broken");
+    if(set==="update")run(normalizeRows(UPDATE_ROWS),"update");
+    document.getElementById("simulator").scrollIntoView({behavior:"smooth"});
+  });
+});
+
+document.querySelectorAll(".spec-cell").forEach(c=>{
+  c.tabIndex=0;
+  c.setAttribute("role","button");
+  c.setAttribute("aria-label",c.dataset.col+": "+c.dataset.note);
+  const showSpecNote=()=>{
+    document.querySelectorAll(".spec-cell").forEach(x=>x.classList.remove("hot"));
+    c.classList.add("hot");
+    document.getElementById("cellNote").innerHTML='<b>'+c.dataset.col+'</b> — '+c.dataset.note;
+  };
+  c.addEventListener("mouseenter",showSpecNote);
+  c.addEventListener("focus",showSpecNote);
+  c.addEventListener("click",showSpecNote);
+});
+document.querySelectorAll(".tag").forEach(t=>{
+  t.tabIndex=0;
+  const showNodeNote=()=>{
+    document.getElementById("nodeNote").innerHTML="<b>"+esc(t.textContent)+"</b> — "+esc(t.dataset.note);
+  };
+  t.addEventListener("mouseenter",showNodeNote);
+  t.addEventListener("focus",showNodeNote);
+  t.addEventListener("click",showNodeNote);
+});
+
+const HP={price:19.99,margin:0.32,tacos:0.30};
+const HARVEST=[
+  {t:"bamboo desk organizer",imp:2400,clk:38,spend:31.20,ord:4,sales:79.96,call:"promote",note:"4 orders, ACOS 39% — ito ang winner. Bid near guardrail, watch a week."},
+  {t:"desk organizer bamboo",imp:1100,clk:22,spend:18.40,ord:2,sales:39.98,call:"promote",note:"Same intent, different word order. Exact it."},
+  {t:"bamboo desk tray",imp:900,clk:15,spend:11.25,ord:1,sales:19.99,call:"promote",note:"1 order — prove it at a cheaper bid first."},
+  {t:"desk organizer",imp:5200,clk:61,spend:52.10,ord:1,sales:19.99,call:"leave",note:"Don't negative this as phrase — ma-block mo rin ang 'bamboo desk organizer.' Watch one more week."},
+  {t:"free desk organizer",imp:800,clk:12,spend:6.40,ord:0,sales:0,call:"negative",note:"Zero purchase intent sa 'free.' Block exact."},
+  {t:"cheap desk organizer",imp:650,clk:9,spend:4.05,ord:0,sales:0,call:"negative",note:"'Cheap' shoppers don't convert at $19.99."},
+  {t:"wooden desk organizer",imp:1500,clk:18,spend:13.80,ord:0,sales:0,call:"leave",note:"0 orders pero $13.80 lang ang spend — kulang pa sa data."},
+  {t:"bamboo storage",imp:400,clk:5,spend:3.10,ord:0,sales:0,call:"leave",note:"5 clicks — hindi pa makapag-conclude. Give it a week."}
+].map(t=>({...t,action:"",match:"exact",bid:null,level:"campaign",nmatch:"exact"}));
+
+const crOf=t=>t.clk?t.ord/t.clk:0;
+const guardOf=t=>HP.price*HP.tacos*crOf(t);
+const f2=n=>(+n).toFixed(2);
+
+function fbChip(i){
+  const t=HARVEST[i];
+  if(!t.action)return '<span class="fb-chip fb-mut">PICK A CALL</span>';
+  if(t.action==="leave")return t.spend>40
+    ?'<span class="fb-chip fb-warn">OK — WATCH IT, $'+f2(t.spend)+' SPENT NA</span>'
+    :'<span class="fb-chip fb-ok">OK — NEEDS MORE DATA</span>';
+  if(t.action==="negative"){
+    if(t.nmatch==="phrase"){
+      const victim=HARVEST.find(x=>x.ord>=2&&x.t.includes(t.t)&&x.t!==t.t);
+      if(victim)return '<span class="fb-chip fb-bad">PHRASE TRAP — BLOCKS "'+esc(victim.t)+'"</span>';
+    }
+    return '<span class="fb-chip fb-ok">BLOCK IT</span>';
+  }
+  if(t.ord===0)return '<span class="fb-chip fb-bad">0 ORDERS on $'+f2(t.spend)+' — promoting burns margin</span>';
+  const g=guardOf(t);
+  if(Number(t.bid)>g+0.001)return '<span class="fb-chip fb-warn">ABOVE GUARDRAIL $'+f2(g)+' — defend it or lower</span>';
+  return '<span class="fb-chip fb-ok">PROMOTE @ $'+f2(Number(t.bid)||g)+' — inside guardrail</span>';
+}
+function renderHarvest(){
+  document.getElementById("hvBody").innerHTML=HARVEST.map((t,i)=>{
+    const cr=crOf(t),acos=t.sales?t.spend/t.sales*100:null;
+    const a=t.action;
+    const bidVal=(t.bid!=null?t.bid:guardOf(t));
+    let details="";
+    if(a==="promote"){
+      details='<span class="hv-opts"><select class="hv-sel" data-k="match">'+
+        '<option value="exact"'+(t.match==="exact"?" selected":"")+'>exact</option>'+
+        '<option value="phrase"'+(t.match==="phrase"?" selected":"")+'>phrase</option>'+
+        '<option value="broad"'+(t.match==="broad"?" selected":"")+'>broad</option></select>'+
+        '<input class="hv-in" data-k="bid" type="number" step="0.05" min="0.05" style="width:76px" value="'+f2(bidVal)+'"></span>';
+    }else if(a==="negative"){
+      details='<span class="hv-opts"><select class="hv-sel" data-k="level">'+
+        '<option value="campaign"'+(t.level==="campaign"?" selected":"")+'>campaign</option>'+
+        '<option value="adgroup"'+(t.level==="adgroup"?" selected":"")+'>ad group</option></select>'+
+        '<select class="hv-sel" data-k="nmatch">'+
+        '<option value="exact"'+(t.nmatch==="exact"?" selected":"")+'>exact</option>'+
+        '<option value="phrase"'+(t.nmatch==="phrase"?" selected":"")+'>phrase</option></select></span>';
+    }else{
+      details='<span class="dim mono" style="font-size:10.5px">—</span>';
+    }
+    return '<tr data-i="'+i+'">'+
+      '<td><span class="hv-term">'+esc(t.t)+'</span><div class="mentor-note">'+esc(t.note)+' <span class="mc">MENTOR\'S CALL: '+t.call.toUpperCase()+'</span></div></td>'+
+      '<td class="hv-m">'+t.imp.toLocaleString()+'</td><td class="hv-m">'+t.clk+'</td>'+
+      '<td class="hv-m">$'+f2(t.spend)+'</td><td class="hv-m">'+t.ord+'</td>'+
+      '<td class="hv-m">'+(acos===null?"—":Math.round(acos)+"%")+'</td>'+
+      '<td class="hv-m">'+(cr*100).toFixed(1)+'%</td>'+
+      '<td><select class="hv-sel" data-k="action">'+
+        '<option value="">— pick —</option>'+
+        '<option value="promote"'+(a==="promote"?" selected":"")+'>Promote</option>'+
+        '<option value="negative"'+(a==="negative"?" selected":"")+'>Negative</option>'+
+        '<option value="leave"'+(a==="leave"?" selected":"")+'>Leave alone</option></select></td>'+
+      '<td>'+details+'</td>'+
+      '<td>'+fbChip(i)+'</td></tr>';
+  }).join("");
+  document.getElementById("hvCount").innerHTML="<b>"+HARVEST.filter(t=>t.action).length+"/8</b> DECIDED";
+}
+document.getElementById("hvBody").addEventListener("change",e=>{
+  const tr=e.target.closest("tr");if(!tr)return;
+  const t=HARVEST[+tr.dataset.i];
+  tr.querySelectorAll("[data-k]").forEach(el=>{
+    const k=el.dataset.k;
+    t[k]=el.type==="number"?Number(el.value):el.value;
+  });
+  renderHarvest();
+});
+document.getElementById("mentorToggle").addEventListener("click",e=>{
+  const on=document.getElementById("hvTable").classList.toggle("show-mentor");
+  e.currentTarget.textContent=on?"Hide mentor's calls":"Show mentor's calls";
+});
+function renderMath(){
+  const p=+document.getElementById("mPrice").value||0;
+  const m=(+document.getElementById("mMargin").value||0)/100;
+  const ta=(+document.getElementById("mTacos").value||0)/100;
+  const cr=crOf(HARVEST[0]);
+  document.getElementById("mathOut").innerHTML=
+    'BREAKEVEN ACOS = MARGIN = <b>'+(m*100).toFixed(0)+'%</b><br>'+
+    'TERM CR (bamboo desk organizer) = <b>'+(cr*100).toFixed(1)+'%</b><br>'+
+    'GUARDRAIL BID = '+p.toFixed(2)+' × '+(ta*100).toFixed(0)+'% × '+(cr*100).toFixed(1)+'% = <b class="mo">$'+(p*ta*cr).toFixed(2)+'</b><br>'+
+    'BREAKEVEN CPC = '+p.toFixed(2)+' × '+(m*100).toFixed(0)+'% × '+(cr*100).toFixed(1)+'% = <b class="mo">$'+(p*m*cr).toFixed(2)+'</b>';
+}
+["mPrice","mMargin","mTacos"].forEach(id=>document.getElementById(id).addEventListener("input",renderMath));
+
+document.getElementById("hvGenerate").addEventListener("click",()=>{
+  const out=document.getElementById("hvOut");
+  const undecided=HARVEST.filter(t=>!t.action).length;
+  if(undecided){
+    out.hidden=false;out.className="hv-out";
+    out.innerHTML="<b>HOLD.</b> "+undecided+" term(s) walang call. Decide all 8 — walang skip sa totoong triage.";
+    return;
+  }
+  const P={Product:"Sponsored Products"};
+  const rows=[];
+  rows.push({...P,Entity:"Portfolio",Operation:"Create","Portfolio ID":"tmp-port-h","Portfolio Name":"Tropical Home PH",State:"enabled"});
+  rows.push({...P,Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-h-auto","Portfolio ID":"tmp-port-h","Campaign Name":"THP-BambooOrganizer-SP-Auto-Research","Start Date":"2026-07-27","Campaign Targeting Type":"auto",State:"enabled","Daily Budget":"25.00","Bidding Strategy":"Dynamic bids - down only"});
+  rows.push({...P,Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-h-auto","Campaign ID":"tmp-camp-h-auto","Ad Group Name":"THP-BambooOrganizer-Auto","Ad Group Default Bid":"0.75",State:"enabled"});
+  rows.push({...P,Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-h-auto","Ad Group ID":"tmp-adg-h-auto",SKU:"THP-BDO-001",ASIN:"B0THPBDO01",State:"enabled"});
+  let n=1;
+  HARVEST.forEach(t=>{
+    if(t.action!=="negative")return;
+    if(t.level==="campaign")rows.push({...P,Entity:"Campaign Negative Keyword",Operation:"Create","Campaign Negative Keyword ID":"tmp-cnk-h-"+n,"Campaign ID":"tmp-camp-h-auto","Keyword Text":t.t,"Match Type":t.nmatch,State:"enabled"});
+    else rows.push({...P,Entity:"Negative Keyword",Operation:"Create","Negative Keyword ID":"tmp-nkw-h-"+n,"Ad Group ID":"tmp-adg-h-auto","Keyword Text":t.t,"Match Type":t.nmatch,State:"enabled"});
+    n++;
+  });
+  rows.push({...P,Entity:"Campaign",Operation:"Create","Campaign ID":"tmp-camp-h-exact","Portfolio ID":"tmp-port-h","Campaign Name":"THP-BambooOrganizer-SP-Exact-Harvest","Start Date":"2026-07-27","Campaign Targeting Type":"manual",State:"enabled","Daily Budget":"20.00","Bidding Strategy":"Fixed bids"});
+  rows.push({...P,Entity:"Ad Group",Operation:"Create","Ad Group ID":"tmp-adg-h-exact","Campaign ID":"tmp-camp-h-exact","Ad Group Name":"THP-BambooOrganizer-Harvest","Ad Group Default Bid":"0.70",State:"enabled"});
+  rows.push({...P,Entity:"Product Ad",Operation:"Create","Ad ID":"tmp-ad-h-exact","Ad Group ID":"tmp-adg-h-exact",SKU:"THP-BDO-001",ASIN:"B0THPBDO01",State:"enabled"});
+  let k=1;
+  HARVEST.forEach(t=>{
+    if(t.action!=="promote")return;
+    const bid=(t.bid>0?t.bid:(guardOf(t)>0?guardOf(t):0.50));
+    rows.push({...P,Entity:"Keyword",Operation:"Create","Keyword ID":"tmp-kw-h-"+k,"Ad Group ID":"tmp-adg-h-exact","Keyword Text":t.t,"Match Type":t.match||"exact",Bid:f2(bid),State:"enabled"});
+    k++;
+  });
+  const match=HARVEST.filter(t=>t.action===t.call).length;
+  const flags=[];
+  HARVEST.forEach(t=>{
+    if(t.action==="promote"&&t.ord===0)flags.push('You promoted "'+t.t+'" with 0 orders — defend that spend sa client review.');
+    if(t.action==="promote"&&Number(t.bid)>guardOf(t)+0.001)flags.push('"'+t.t+'" bid $'+f2(Number(t.bid))+' is above the $'+f2(guardOf(t))+' guardrail.');
+    if(t.action==="negative"&&t.nmatch==="phrase"){
+      const v=HARVEST.find(x=>x.ord>=2&&x.t.includes(t.t)&&x.t!==t.t);
+      if(v)flags.push('PHRASE TRAP: negativing "'+t.t+'" as phrase also blocks your winner "'+v.t+'."');
+    }
+  });
+  out.hidden=false;out.className="hv-out"+(flags.length?"":" ok");
+  out.innerHTML='<b>FILE GENERATED — '+rows.length+' rows.</b> Your calls match the mentor\'s on <b>'+match+'/8</b>. '+
+    (match===8?"Tumpak.":match>=6?"Solid — defend the differences with numbers.":"Review the mentor notes — may pagkakaiba ang calls mo.")+
+    (flags.length?'<br><span class="mono" style="font-size:11px">⚠ '+flags.map(esc).join('<br>⚠ ')+'</span>':"");
+  run(rows,"harvest");
+  document.getElementById("simulator").scrollIntoView({behavior:"smooth"});
+});
+document.getElementById("hvReset").addEventListener("click",()=>{
+  HARVEST.forEach(t=>{t.action="";t.bid=null;t.match="exact";t.level="campaign";t.nmatch="exact";});
+  renderHarvest();
+  document.getElementById("hvOut").hidden=true;
+});
+
+const KT_CEIL=29.99*0.28*0.35;
+const NAME_RE=/^[A-Z]{2,4}-[A-Za-z0-9]+-SP-[A-Za-z]+-[A-Za-z]+$/;
+const DRILL_CHECKS=[
+  "Portfolio row present",
+  "Auto research campaign, budget ≥ $15",
+  "Manual campaign for keywords",
+  "≥ 3 exact keywords inside the manual campaign",
+  "Product ads in the structure (≥ 2)",
+  "≥ 2 ad group negative keywords",
+  "≥ 1 campaign negative keyword",
+  "All campaign names follow {BRAND}-{PRODUCT}-SP-{TYPE}-{GOAL}"
+];
+function renderChecksNeutral(){
+  document.getElementById("drillChecks").innerHTML=DRILL_CHECKS.map(t=>'<div class="ck"><span class="ck-dot"></span><span>'+esc(t)+'</span></div>').join("");
+}
+function evaluateDrill(){
+  const rows=currentRows,res=currentResult;
+  const created=e=>rows.filter(r=>r.Entity===e&&r.Operation==="Create");
+  const camps=created("Campaign");
+  const agMap={};created("Ad Group").forEach(r=>agMap[r["Ad Group ID"]]=r["Campaign ID"]);
+  const auto=camps.find(c=>(c["Campaign Targeting Type"]||"").toLowerCase()==="auto"&&Number(c["Daily Budget"])>=15);
+  const manual=camps.find(c=>(c["Campaign Targeting Type"]||"").toLowerCase()==="manual");
+  const kws=created("Keyword").filter(r=>(r["Match Type"]||"").toLowerCase()==="exact"&&manual&&agMap[r["Ad Group ID"]]===manual["Campaign ID"]);
+  const names=camps.map(c=>c["Campaign Name"]).filter(Boolean);
+  const naming=names.length&&names.every(nm=>NAME_RE.test(nm));
+  const bids=created("Keyword").map(r=>Number(r.Bid)).filter(b=>b>0);
+  const clean=res.errors.length===0;
+  const checks=[
+    ["Portfolio row present",created("Portfolio").length>0],
+    ["Auto research campaign, budget ≥ $15",!!auto],
+    ["Manual campaign for keywords",!!manual],
+    ["≥ 3 exact keywords inside the manual campaign",kws.length>=3],
+    ["Product ads in the structure (≥ 2)",created("Product Ad").length>=2],
+    ["≥ 2 ad group negative keywords",created("Negative Keyword").length>=2],
+    ["≥ 1 campaign negative keyword",created("Campaign Negative Keyword").length>=1],
+    ["All campaign names follow {BRAND}-{PRODUCT}-SP-{TYPE}-{GOAL}",naming]
+  ];
+  const accuracy=Math.max(0,30-res.errors.length*10-res.warnings.length*2);
+  const structure=checks.filter(c=>c[1]).length*5;
+  const commercial=bids.length&&bids.every(b=>b<=KT_CEIL)?15:(bids.length?7:0);
+  const namingPts=naming?15:(names.length?7:0);
+  const total=accuracy+structure+commercial+namingPts;
+  let verdict,cls;
+  if(!clean){verdict="NOT YET — fix blocking errors first";cls="fail";}
+  else if(total>=85){verdict="CLIENT-READY WITH REVIEW";cls="okp";}
+  else if(total>=65){verdict="PORTFOLIO-READY";cls="okp";}
+  else{verdict="NOT YET — run the lessons again";cls="fail";}
+  return{checks,cats:[["File accuracy",accuracy,30],["Structure",structure,40],["Commercial discipline",commercial,15],["Naming",namingPts,15]],total,verdict,cls};
+}
+function renderDrillCard(d){
+  document.getElementById("drillChecks").innerHTML=d.checks.map(c=>'<div class="ck '+(c[1]?"pass":"fail")+'"><span class="ck-dot"></span><span>'+esc(c[0])+'</span></div>').join("");
+  const ts=new Date().toISOString().slice(0,16).replace("T"," ")+" UTC";
+  const sc=document.getElementById("drillScore");
+  sc.innerHTML=
+    '<div style="display:flex;align-items:baseline;gap:14px;margin:18px 0 8px;flex-wrap:wrap">'+
+      '<span class="score-num">'+d.total+'<small>/100</small></span>'+
+      '<span class="pill '+d.cls+'">'+esc(d.verdict)+'</span></div>'+
+    d.cats.map(c=>'<div class="sc-row"><span>'+esc(c[0])+'</span><div class="sc-track"><div class="sc-fill" data-w="'+(c[2]?Math.round(c[1]/c[2]*100):0)+'"></div></div><span class="sc-pts">'+c[1]+'/'+c[2]+'</span></div>').join("")+
+    '<p class="mono" style="font-size:10px;letter-spacing:.1em;color:var(--mut);margin:14px 0 0">SCORED '+ts+' · SAVE THE SCREENSHOT FOR YOUR PORTFOLIO</p>';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>sc.querySelectorAll(".sc-fill").forEach(f=>f.style.width=f.dataset.w+"%")));
+  StudentProgress.createLocalProgressStore().recordAttempt(SimulatorAttempt.buildAttemptRecord({
+    scenario:{id:'bulk-file-drill',simulatorId:'bulk-file',version:'1.0.0',rubricVersion:'1.0.0'},
+    result:{score:d.total,maxScore:100,passed:d.total>=75},completedAt:new Date().toISOString()
+  }));
+}
+document.getElementById("drillScoreBtn").addEventListener("click",()=>renderDrillCard(evaluateDrill()));
+document.getElementById("drillModel").addEventListener("click",()=>{
+  run(normalizeRows(KT_LAUNCH),"model");
+  renderDrillCard(evaluateDrill());
+});
+
+document.getElementById("loadSample").addEventListener("click",()=>run(normalizeRows(SAMPLE_ROWS),"sample"));
+document.getElementById("loadBroken").addEventListener("click",()=>run(normalizeRows(BROKEN_ROWS),"broken"));
+document.getElementById("loadUpdate").addEventListener("click",()=>run(normalizeRows(UPDATE_ROWS),"update"));
+document.getElementById("dlTemplate").addEventListener("click",()=>download("amazon-sp-bulk-template.csv",toCSV([])));
+document.getElementById("dlSample").addEventListener("click",()=>download("amazon-sp-bulk-sample.csv",toCSV(normalizeRows(SAMPLE_ROWS))));
+document.getElementById("dlBroken").addEventListener("click",()=>download("amazon-sp-bulk-broken-exercise.csv",toCSV(normalizeRows(BROKEN_ROWS))));
+// SheetJS is 945 KB and only two lines need it, both in this handler. Injecting it here means a
+// learner who never uploads a file never downloads it; under file:// the request is a local read.
+let sheetPromise=null;
+function loadSheetJS(){
+  if(sheetPromise)return sheetPromise;
+  sheetPromise=new Promise((res,rej)=>{
+    if(window.XLSX)return res(window.XLSX);
+    const s=document.createElement("script");
+    s.src="assets/vendor/xlsx.full.min.js";
+    s.onload=()=>window.XLSX?res(window.XLSX):rej(new Error("SheetJS evaluated but XLSX is undefined"));
+    s.onerror=()=>rej(new Error("SheetJS request failed"));
+    document.head.appendChild(s);
+  });
+  return sheetPromise;
+}
+document.getElementById("file").addEventListener("change",async e=>{
+  const f=e.target.files[0];if(!f)return;
+  let XLSX;
+  try{XLSX=await loadSheetJS();}
+  catch(err){alert("The spreadsheet reader could not load. Use a .csv sample instead.");return;}
+  const wb=XLSX.read(await f.arrayBuffer());
+  const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
+  run(normalizeRows(json),"upload");
+});
+
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target);}}),{threshold:.1});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+renderHarvest();
+renderMath();
+renderChecksNeutral();
+run(normalizeRows(SAMPLE_ROWS),"sample");
+</script>
+</body>
+</html>
+<!-- Project Amazon PH Academy shell: shared chrome injected by assets/shell.js -->

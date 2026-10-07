@@ -140,6 +140,7 @@ export default async function QuizPage({ params }: Props) {
           title={quiz.title}
           passingScore={quiz.passingScore}
           courseHref={`/courses/${slug}`}
+          courseSlug={slug}
           questions={quiz.questions.map((question) => ({
             id: question.id,
             questionText: question.questionText,

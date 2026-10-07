@@ -129,6 +129,8 @@ describe("AuthorizeLessonAccess (P0-5: preview-leak fix)", () => {
       anonymizeAndDelete: vi.fn(),
       findByIds: vi.fn(),
       recordLoginAttempt: vi.fn(),
+      markWelcomeCompleted: vi.fn(),
+      resetWelcome: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),

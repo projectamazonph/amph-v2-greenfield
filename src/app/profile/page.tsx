@@ -1,4 +1,4 @@
-/**
+﻿/**
  * /profile — student profile page.
  *
  * Shows the user's profile fields, earned badges, and a link
@@ -8,11 +8,19 @@
  * The /proxy.ts already redirects unauthenticated users away
  * from /profile to /login. The page assumes `getSessionUser()`
  * returns a non-null user.
+ *
+ * STORY-146 / Task 12: a "Guided tour" section appears near the
+ * bottom of the visible content for users who have already completed
+ * the first-run welcome. Submitting the form fires
+ * `resetWelcomeAction`, which clears the welcome timestamp and
+ * redirects to `/welcome` so the user can re-take the tour.
  */
 
 import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
 import { StudentShell } from "@/components/student/StudentShell";
+import { resetWelcomeAction } from "@/app/actions/welcome.action";
+import { hasCompletedWelcome } from "@/domain/entities/User";
 import Link from "next/link";
 import styles from "./page.module.css";
 import { Flame, Medal, Star, Trophy } from "@phosphor-icons/react/dist/ssr";
@@ -48,6 +56,15 @@ export default async function ProfilePage() {
   const container = buildContainer();
   const badgesResult = await container.listUserBadges.execute({ userId: user.id });
   const badges = badgesResult.ok ? badgesResult.value.badges : [];
+
+  // STORY-146 / Task 12: re-fetch the user so the restart-section
+  // visibility check reads the freshest `welcomeCompletedAt`. Mirrors
+  // `/welcome` (Task 9) and `/dashboard` (Task 10), where a stale
+  // session would otherwise show the tour badge/button out of sync
+  // with the database truth.
+  const freshResult = await container.userRepo.findById(user.id);
+  const effectiveUser = freshResult.ok ? freshResult.value : user;
+  const showRestart = hasCompletedWelcome(effectiveUser);
 
   return (
     <StudentShell user={user}>
@@ -106,6 +123,21 @@ export default async function ProfilePage() {
             Purchases and refunds <span aria-hidden="true">→</span>
           </Link>
         </nav>
+        {showRestart && (
+          <section className={styles.section} aria-labelledby="restart-tour-title">
+            <h2 id="restart-tour-title" className={styles.sectionTitle}>
+              Guided tour
+            </h2>
+            <p className={styles.sectionBody}>
+              You can re-take the first-run welcome tour any time.
+            </p>
+            <form action={resetWelcomeAction}>
+              <button type="submit" className={styles.btnSecondary}>
+                Restart the welcome tour
+              </button>
+            </form>
+          </section>
+        )}
       </main>
     </StudentShell>
   );

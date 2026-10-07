@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-top:0;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08;margin-top:0;margin-bottom:0}
+.rule{height:3px;background:#131921;margin-top:18px}
+
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:30px}
+
+/* Split Panels */
+.split-panel{background:#fff;border:1px solid #d7dce2;padding-top:30px;padding-left:30px;padding-right:30px;padding-bottom:30px;min-height:280px}
+.split-panel.do{border-top:6px solid #00875a}
+.split-panel.dont{border-top:6px solid #de350b}
+
+.split-title{font-size:26px;font-weight:700;margin-top:0;margin-bottom:20px;display:flex;align-items:center}
+.split-panel.do .split-title{color:#00875a}
+.split-panel.dont .split-title{color:#de350b}
+
+.split-list{list-style:none;padding-left:0;margin:0}
+.split-list li{font-size:20px;color:#131921;line-height:1.4;margin-bottom:16px;display:flex;align-items:flex-start}
+.split-list li:last-child{margin-bottom:0}
+.split-list li::before{margin-right:16px;font-weight:bold;font-size:20px}
+.split-panel.do .split-list li::before{content:"✓";color:#00875a}
+.split-panel.dont .split-list li::before{content:"✕";color:#de350b}
+
+/* Bottom Example Box */
+.example-box{background:#fff;border:1px solid #d7dce2;border-left:6px solid #ff9900;padding-top:24px;padding-left:30px;padding-right:30px;padding-bottom:24px;margin-top:40px}
+.example-title{font-size:20px;font-weight:700;color:#ff9900;margin-top:0;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
+.example-text{font-size:22px;color:#131921;line-height:1.5;margin:0}
+.example-text strong{color:#de350b}
+.coach-conclusion{font-size:22px;font-weight:700;color:#00875a;margin-top:16px}
+
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 9 · Lesson 9.2</div>
+  <div class="title">One Change at a Time</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="split-panel do">
+      <div class="split-title">Do</div>
+      <ul class="split-list">
+        <li>Change one variable at a time</li>
+        <li>Wait about a week for data to settle</li>
+        <li>Compare before and after metrics</li>
+        <li>Log the change and the reason</li>
+      </ul>
+    </div>
+    
+    <div class="split-panel dont">
+      <div class="split-title">Don't</div>
+      <ul class="split-list">
+        <li>Make 20 bid changes on a Monday</li>
+        <li>Add keywords + change bids + increase budget on the same day</li>
+        <li>Judge performance on overnight data</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="example-box">
+    <div class="example-title">The Confounded Change Problem</div>
+    <p class="example-text">
+      You raise bids and add new keywords on the same day. Sales jump. <strong>Which change worked?</strong> Nobody knows — and that is the problem.
+    </p>
+    <div class="coach-conclusion">
+      Coach tip: Science beats vibes. One variable, one verdict.
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Weekly Optimization · 9.2 One Change at a Time</div>
+  <div class="page">03 / 12</div>
+</div>
+</body>
+</html>

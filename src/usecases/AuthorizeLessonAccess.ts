@@ -96,8 +96,11 @@ export class AuthorizeLessonAccess {
     }
 
     // 6. Active enrollment → full access. Refunded/cancelled/expired
-    //    are treated as "not enrolled" (intentional: a refund revokes
-    //    access per the audit's P1-3).
+    //    are treated as "not enrolled". Both refund paths (ProcessRefund
+    //    and RefundOverride) move the matching enrollment to "cancelled"
+    //    on a successful refund, so a refunded student is no longer
+    //    admitted here. See revokeEnrollmentForRefund() in
+    //    src/usecases/ProcessRefund.ts.
     const enrollment = await this.deps.enrollmentRepo.findByUserIdAndCourseId(
       input.userId,
       input.courseId,

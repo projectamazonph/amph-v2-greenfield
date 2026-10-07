@@ -98,6 +98,26 @@ import { SubmitAssignment } from "@/usecases/SubmitAssignment";
 import { GradeAssignment } from "@/usecases/GradeAssignment";
 import { ListStudentAssignments } from "@/usecases/ListStudentAssignments";
 import { AdminListAssignments } from "@/usecases/AdminListAssignments";
+import { InMemoryArtefactRepository } from "@/infra/repositories/inmemory/InMemoryArtefactRepository";
+import { SaveArtefact } from "@/usecases/SaveArtefact";
+import { SubmitArtefact } from "@/usecases/SubmitArtefact";
+import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
+import { InMemoryWorksheetRepository } from "@/infra/db/inmemory/InMemoryWorksheetRepository";
+import { GetWorksheet } from "@/usecases/GetWorksheet";
+import { SaveWorksheetEntry } from "@/usecases/SaveWorksheetEntry";
+import { InMemoryRetrievalCheckRepository } from "@/infra/repositories/inmemory/InMemoryRetrievalCheckRepository";
+import { RecordRetrievalCheck } from "@/usecases/RecordRetrievalCheck";
+import { InMemoryNotificationRepository } from "@/infra/repositories/inmemory/InMemoryNotificationRepository";
+import { NotifyUser } from "@/usecases/NotifyUser";
+import { ListNotifications } from "@/usecases/ListNotifications";
+import { MarkNotificationRead } from "@/usecases/MarkNotificationRead";
+import { MarkAllNotificationsRead } from "@/usecases/MarkAllNotificationsRead";
+import { InMemoryCapstoneRepository } from "@/infra/repositories/inmemory/InMemoryCapstoneRepository";
+import { SubmitCapstone } from "@/usecases/SubmitCapstone";
+import { GetCapstoneStatus } from "@/usecases/GetCapstoneStatus";
+import { ListCapstoneReviewQueue } from "@/usecases/ListCapstoneReviewQueue";
+import { ReturnCapstoneForReview } from "@/usecases/ReturnCapstoneForReview";
+import { PassCapstoneReview } from "@/usecases/PassCapstoneReview";
 import { InMemorySettingRepository } from "@/infra/repositories/inmemory/InMemorySettingRepository";
 import { GetSetting } from "@/usecases/GetSetting";
 import { SetSetting } from "@/usecases/SetSetting";
@@ -121,6 +141,9 @@ import { Logout } from "@/usecases/Logout";
 import { EnableTwoFactor } from "@/usecases/EnableTwoFactor";
 import { ConfirmTwoFactor } from "@/usecases/ConfirmTwoFactor";
 import { DisableTwoFactor } from "@/usecases/DisableTwoFactor";
+// STORY-146: welcome step completion + reset (used by student onboarding)
+import { CompleteWelcome } from "@/usecases/CompleteWelcome";
+import { ResetWelcome } from "@/usecases/ResetWelcome";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { GetCheckoutSummary } from "@/usecases/GetCheckoutSummary";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
@@ -128,6 +151,7 @@ import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
+import { AdminApplyDiscountCode } from "@/usecases/AdminApplyDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
@@ -153,6 +177,10 @@ import { GetUserDetail } from "@/usecases/GetUserDetail";
 import { ImpersonateUser } from "@/usecases/ImpersonateUser";
 import { AdminGrantSubscription } from "@/usecases/AdminGrantSubscription";
 import { AdminSetEnrollmentStatus } from "@/usecases/AdminSetEnrollmentStatus";
+import { AdminUpdateUser } from "@/usecases/AdminUpdateUser";
+import { AdminSetUserPassword } from "@/usecases/AdminSetUserPassword";
+import { AdminDeleteUser } from "@/usecases/AdminDeleteUser";
+import { AdminForceSignOut } from "@/usecases/AdminForceSignOut";
 import { GetAdminContentStats } from "@/usecases/GetAdminContentStats";
 // STORY-048a: admin courses CRUD
 import { AdminListCourses } from "@/usecases/AdminListCourses";
@@ -247,6 +275,11 @@ import { RsvpLiveClass } from "@/usecases/RsvpLiveClass";
 import { CancelLiveClassRsvp } from "@/usecases/CancelLiveClassRsvp";
 import { MarkLiveClassRecordingWatched } from "@/usecases/MarkLiveClassRecordingWatched";
 import { InMemoryLiveClassRegistrationRepository } from "@/infra/repositories/inmemory/InMemoryLiveClassRegistrationRepository";
+// ADR-026: SimGrid iframe progress sync
+import { InMemorySimgridAttemptRepository } from "@/infra/repositories/__tests__/InMemorySimgridAttemptRepository";
+import { RecordSimgridProgress } from "@/usecases/simgrid/RecordSimgridProgress";
+import { ListSimgridProgressForUser } from "@/usecases/simgrid/ListSimgridProgressForUser";
+import { GetBestSimgridScore } from "@/usecases/simgrid/GetBestSimgridScore";
 import { InMemoryResourceRepository } from "@/infra/repositories/InMemoryResourceRepository";
 import { CreateResource } from "@/usecases/CreateResource";
 import { UpdateResource } from "@/usecases/UpdateResource";
@@ -295,6 +328,32 @@ export interface TestContainer extends AppContainer {
   prerequisiteRepo: InMemoryPrerequisiteRepository;
   // P1-02 (PR-C slice 2): assignment fakes
   assignmentRepo: InMemoryAssignmentRepository;
+  // LEARN-033 (STORY-135): learner artefact fakes
+  artefactRepo: InMemoryArtefactRepository;
+  saveArtefact: SaveArtefact;
+  submitArtefact: SubmitArtefact;
+  listStudentArtefacts: ListStudentArtefacts;
+  // STORY-163: Module 1 worksheet artifact fakes
+  worksheetRepo: InMemoryWorksheetRepository;
+  getWorksheet: GetWorksheet;
+  saveWorksheetEntry: SaveWorksheetEntry;
+  // LEARN-040 (STORY-138): retrieval-check fakes
+  retrievalCheckRepo: InMemoryRetrievalCheckRepository;
+  recordRetrievalCheck: RecordRetrievalCheck;
+  // P3-87 (STORY-139): notification fakes
+  notificationRepo: InMemoryNotificationRepository;
+  notifyUser: NotifyUser;
+  listNotifications: ListNotifications;
+  markNotificationRead: MarkNotificationRead;
+  markAllNotificationsRead: MarkAllNotificationsRead;
+  // LEARN-043 (STORY-143): capstone fakes
+  capstoneRepo: InMemoryCapstoneRepository;
+  submitCapstone: SubmitCapstone;
+  getCapstoneStatus: GetCapstoneStatus;
+  // LEARN-044 (STORY-144): capstone reviewer fakes
+  listCapstoneReviewQueue: ListCapstoneReviewQueue;
+  returnCapstoneForReview: ReturnCapstoneForReview;
+  passCapstoneReview: PassCapstoneReview;
   // P1-05 (PR-C slice 3): site setting fakes
   settingRepo: InMemorySettingRepository;
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -314,6 +373,8 @@ export interface TestContainer extends AppContainer {
   feedbackRepo: InMemoryAttemptFeedbackRepository;
   liveClassRepo: InMemoryLiveClassRepository;
   liveClassRegistrationRepo: InMemoryLiveClassRegistrationRepository;
+  // ADR-026: SimGrid iframe progress sync
+  simgridAttemptRepo: InMemorySimgridAttemptRepository;
   resourceRepo: InMemoryResourceRepository;
   fileStorage: InMemoryFileStorage;
   pricingTierRepo: InMemoryPricingTierRepository;
@@ -382,6 +443,16 @@ export function buildTestContainer(): TestContainer {
   const prerequisiteRepo = new InMemoryPrerequisiteRepository();
   // P1-02 (PR-C slice 2): assignment fakes
   const assignmentRepo = new InMemoryAssignmentRepository();
+  // LEARN-033 (STORY-135): learner artefact fakes
+  const artefactRepo = new InMemoryArtefactRepository();
+  // STORY-163: Module 1 worksheet artifact fakes
+  const worksheetRepo = new InMemoryWorksheetRepository();
+  // LEARN-040 (STORY-138): retrieval-check fakes
+  const retrievalCheckRepo = new InMemoryRetrievalCheckRepository();
+  // P3-87 (STORY-139): notification fakes
+  const notificationRepo = new InMemoryNotificationRepository();
+  // LEARN-043 (STORY-143): capstone fakes
+  const capstoneRepo = new InMemoryCapstoneRepository();
   // P1-05 (PR-C slice 3): site setting fakes
   const settingRepo = new InMemorySettingRepository();
   // P1-04 (PR-D): OAuth fakes (stub broker always wired in tests)
@@ -403,6 +474,22 @@ export function buildTestContainer(): TestContainer {
   // STORY-050a: audit log
   const auditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock, logger });
+  // STORY-041: certificate issuance is also a dependency of MarkLessonComplete
+  // (auto-issued on course completion), so it must be built before the
+  // markLessonComplete container entry below.
+  const issueCertificate = new IssueCertificate({
+    enrollmentRepo,
+    courseRepo,
+    certificateRepo,
+    hashGen: certificateHashGen,
+    idGen,
+    clock,
+    userRepo,
+    emailSender,
+    certificateEmailRenderer,
+    logger,
+    emailTemplateRepo,
+  });
   const webhookEventLog = new InMemoryWebhookEventLog();
   // STORY-061: audit log viewer + CSV export
   const listAuditLogs = new ListAuditLogs({ auditLog });
@@ -422,6 +509,8 @@ export function buildTestContainer(): TestContainer {
   // STORY-050c: live class repo
   const liveClassRepo = new InMemoryLiveClassRepository();
   const liveClassRegistrationRepo = new InMemoryLiveClassRegistrationRepository();
+  // ADR-026: SimGrid iframe progress sync
+  const simgridAttemptRepo = new InMemorySimgridAttemptRepository();
   // STORY-098: download center resources
   const resourceRepo = new InMemoryResourceRepository();
   const fileStorage = new InMemoryFileStorage();
@@ -464,6 +553,7 @@ export function buildTestContainer(): TestContainer {
     orderRepo,
     paymentGateway,
     recordAuditLog,
+    enrollmentRepo,
     courseRepo,
     userRepo,
     emailSender,
@@ -499,6 +589,9 @@ export function buildTestContainer(): TestContainer {
     enableTwoFactor: new EnableTwoFactor({ userRepo, totpService }),
     confirmTwoFactor: new ConfirmTwoFactor({ userRepo, totpService, recordAuditLog }),
     disableTwoFactor: new DisableTwoFactor({ userRepo, hasher: passwordHasher, recordAuditLog }),
+    // STORY-146: welcome step completion + reset
+    completeWelcome: new CompleteWelcome(userRepo, clock),
+    resetWelcome: new ResetWelcome(userRepo),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       pricingTierRepo,
@@ -521,12 +614,21 @@ export function buildTestContainer(): TestContainer {
       progressEventRepo,
       idGen,
       clock,
+      issueCertificate,
+      recordAuditLog,
     }),
     enrollStudent,
     discountCodeRepo,
     applyDiscountCode: new ApplyDiscountCode({
       discountCodeRepo,
       clock,
+    }),
+    adminApplyDiscountCode: new AdminApplyDiscountCode({
+      orderRepo,
+      discountCodeRepo,
+      clock,
+      recordAuditLog,
+      logger,
     }),
     quizRepo,
     quizAttemptRepo,
@@ -560,19 +662,7 @@ export function buildTestContainer(): TestContainer {
       logger,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
-    issueCertificate: new IssueCertificate({
-      enrollmentRepo,
-      courseRepo,
-      certificateRepo,
-      hashGen: certificateHashGen,
-      idGen,
-      clock,
-      userRepo,
-      emailSender,
-      certificateEmailRenderer,
-      logger,
-      emailTemplateRepo,
-    }),
+    issueCertificate,
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
       userRepo,
@@ -665,6 +755,19 @@ export function buildTestContainer(): TestContainer {
       clock,
       recordAuditLog,
     }),
+    adminUpdateUser: new AdminUpdateUser({ userRepo, recordAuditLog }),
+    adminSetUserPassword: new AdminSetUserPassword({
+      userRepo,
+      sessionRepo,
+      passwordHasher,
+      recordAuditLog,
+      emailSender,
+      passwordChangedEmailRenderer,
+      logger,
+      clock,
+    }),
+    adminDeleteUser: new AdminDeleteUser({ userRepo, sessionRepo, recordAuditLog }),
+    adminForceSignOut: new AdminForceSignOut({ sessionRepo, recordAuditLog }),
     getAdminContentStats: new GetAdminContentStats({ courseRepo, moduleRepo, lessonRepo }),
     // STORY-048a: admin courses CRUD
     adminListCourses: new AdminListCourses({ courseRepo }),
@@ -724,10 +827,12 @@ export function buildTestContainer(): TestContainer {
       clock,
       courseRepo,
       userRepo,
+      enrollmentRepo,
       emailSender,
       refundEmailRenderer,
       logger,
       emailTemplateRepo,
+      recordAuditLog,
     }),
     refundOverride,
     // STORY-062: admin refund request list + process
@@ -776,6 +881,8 @@ export function buildTestContainer(): TestContainer {
       progressEventRepo,
       quizAttemptRepo,
       simulatorAttemptRepo,
+      artefactRepo,
+      retrievalCheckRepo,
       clock,
     }),
     // STORY-091: admin quiz CRUD
@@ -854,6 +961,15 @@ export function buildTestContainer(): TestContainer {
     // STORY-050c
     liveClassRepo,
     liveClassRegistrationRepo,
+    // ADR-026: SimGrid iframe progress sync
+    simgridAttemptRepo,
+    recordSimgridProgress: new RecordSimgridProgress({
+      simgridAttemptRepo,
+      idGen,
+      clock,
+    }),
+    listSimgridProgressForUser: new ListSimgridProgressForUser({ simgridAttemptRepo }),
+    getBestSimgridScore: new GetBestSimgridScore({ simgridAttemptRepo }),
     pricingTierRepo,
     keywordDatasetRepo,
     sentReminderRepo,
@@ -981,6 +1097,36 @@ export function buildTestContainer(): TestContainer {
     gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
     listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
     adminListAssignments: new AdminListAssignments({ assignmentRepo }),
+    // LEARN-033 (STORY-135): learner artefacts (in-memory)
+    artefactRepo,
+    saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
+    submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
+    listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
+    // STORY-163: Module 1 worksheet artifact (in-memory)
+    worksheetRepo,
+    getWorksheet: new GetWorksheet({ worksheetRepo }),
+    saveWorksheetEntry: new SaveWorksheetEntry({ worksheetRepo, recordAuditLog, clock }),
+    // LEARN-040 (STORY-138): retrieval-check tracking (in-memory)
+    retrievalCheckRepo,
+    recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),
+    // P3-87 (STORY-139): in-app notifications (in-memory)
+    notificationRepo,
+    notifyUser: new NotifyUser({ notificationRepo, idGen, clock }),
+    listNotifications: new ListNotifications({ notificationRepo }),
+    markNotificationRead: new MarkNotificationRead({ notificationRepo, clock }),
+    markAllNotificationsRead: new MarkAllNotificationsRead({ notificationRepo, clock }),
+    // LEARN-043 (STORY-143): capstone submission (in-memory)
+    capstoneRepo,
+    submitCapstone: new SubmitCapstone({ capstoneRepo, artefactRepo, idGen, clock }),
+    getCapstoneStatus: new GetCapstoneStatus({ capstoneRepo, artefactRepo }),
+    // LEARN-044 (STORY-144): capstone reviewer workflow (in-memory)
+    listCapstoneReviewQueue: new ListCapstoneReviewQueue({ capstoneRepo }),
+    returnCapstoneForReview: new ReturnCapstoneForReview({
+      capstoneRepo,
+      clock,
+      recordAuditLog,
+    }),
+    passCapstoneReview: new PassCapstoneReview({ capstoneRepo, clock, recordAuditLog }),
     // P1-05 (PR-C slice 3): site settings (in-memory)
     settingRepo,
     getSetting: new GetSetting({ settingRepo }),

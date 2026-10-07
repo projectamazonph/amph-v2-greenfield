@@ -282,6 +282,86 @@
   text-transform: uppercase;
 }
 
+/**
+ * STORY-162 · semantic status-badge variants.
+ *
+ * Two-factor enabled vs disabled reads identically in monochrome —
+ * a color-blind operator would have to read the text to tell.
+ * Encoding the same information in colour *plus* the existing text
+ * makes the state legible to all operators regardless of how
+ * they perceive colour (WCAG SC 1.4.1).
+ */
+.statusBadgeEnabled {
+  background: var(--c-green-bg);
+  border-color: var(--c-green);
+  color: var(--c-green-text);
+}
+
+.statusBadgeDisabled {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--ink-500);
+}
+
+/**
+ * STORY-162 · account-at-a-glance summary row.
+ *
+ * Three semantic cells (email/2FA/OAuth count) above the section list
+ * so the operator can see their account posture without scrolling.
+ * Definiton list semantic so screen-readers still announce cell-by-cell.
+ */
+.atGlance {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface-0);
+}
+
+.atGlanceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+}
+
+.atGlanceCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.atGlanceLabel {
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.atGlanceValue {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--ink-900);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.atGlanceSub {
+  color: var(--ink-500);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 400;
+}
+
 @media (max-width: 767px) {
   .page {
     padding-left: var(--side-pad);

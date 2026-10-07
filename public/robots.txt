@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+# Auth and account pages — no crawl value
+Disallow: /login
+Disallow: /signup
+Disallow: /verify-email
+Disallow: /reset-password
+Disallow: /welcome
+Disallow: /admin-login
+
+# Logged-in areas — no crawl value, wastes budget
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /checkout
+Disallow: /order
+Disallow: /portfolio
+Disallow: /live-classes
+Disallow: /resources
+
+# Utility
+Disallow: /maintenance
+Disallow: /api/
+
+Sitemap: https://projectamazonph.vercel.app/sitemap.xml

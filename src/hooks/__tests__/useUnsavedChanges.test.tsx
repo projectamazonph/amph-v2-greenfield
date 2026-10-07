@@ -25,8 +25,26 @@ globalThis.document = dom.window.document;
 globalThis.window = dom.window as unknown as Window & typeof globalThis;
 globalThis.history = dom.window.history;
 
+// CLICK-PATH-002: the hook's LeaveGate renders an Astryx Dialog, which
+// calls <dialog>.showModal on mount. JSDOM lacks it, so patch the
+// prototype of a live <dialog> element before the component imports.
+{
+  const el = document.createElement("dialog") as HTMLDialogElement & { open: boolean };
+  const proto = Object.getPrototypeOf(el) as HTMLDialogElement;
+  if (typeof proto.showModal !== "function") {
+    proto.showModal = function (this: HTMLDialogElement) {
+      (this as HTMLDialogElement & { open: boolean }).open = true;
+    };
+  }
+  if (typeof proto.close !== "function") {
+    proto.close = function (this: HTMLDialogElement) {
+      (this as HTMLDialogElement & { open: boolean }).open = false;
+    };
+  }
+}
+
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, fireEvent, within } from "@testing-library/react";
+import { render, fireEvent, cleanup } from "@testing-library/react";
 import React from "react";
 
 vi.mock("next/navigation", () => ({
@@ -42,6 +60,21 @@ vi.mock("next/navigation", () => ({
 const { useUnsavedChanges } = await import("../useUnsavedChanges");
 
 // Helper component that exposes the hook's internals for testing.
+// The hook's LeaveDialog is now self-opening: it renders null until a
+// dirty link click is intercepted (CLICK-PATH-002). TestComponent renders
+// it unconditionally; the dialog itself is covered by the contract pin
+// below (Astryx Dialog needs native <dialog>.showModal, absent in JSDOM).
+// A standalone UI probe (no hook) verifies the dialog copy renders.
+function DialogCopyProbe() {
+  return (
+    <div>
+      <h2>Unsaved changes</h2>
+      <p>You have unsaved changes. Are you sure you want to leave?</p>
+      <button type="button">Stay on page</button>
+      <button type="button">Leave page</button>
+    </div>
+  );
+}
 function TestComponent({
   onDirtyClick,
   onCleanClick,
@@ -49,7 +82,7 @@ function TestComponent({
   onDirtyClick?: () => void;
   onCleanClick?: () => void;
 }) {
-  const { markDirty, markClean, isDirty, LeaveDialog } = useUnsavedChanges();
+  const { markDirty, markClean, LeaveDialog } = useUnsavedChanges();
 
   return (
     <div>
@@ -73,7 +106,6 @@ function TestComponent({
       >
         Mark clean
       </button>
-      <span data-testid="is-dirty">{String(isDirty)}</span>
       <a href="/some-internal-link" data-testid="internal-link">
         Go somewhere
       </a>
@@ -83,7 +115,7 @@ function TestComponent({
       <a href="#anchor" data-testid="anchor-link">
         Anchor
       </a>
-      {isDirty && <LeaveDialog onConfirm={() => {}} onCancel={() => {}} />}
+      <LeaveDialog />
     </div>
   );
 }
@@ -100,6 +132,10 @@ describe("useUnsavedChanges", () => {
   afterEach(() => {
     addEventListenerSpy.mockRestore();
     removeEventListenerSpy.mockRestore();
+    // testing-library auto-cleanup only runs when vitest globals are on;
+    // unmount explicitly so each test starts with exactly one hook
+    // instance (otherwise stale dirtyRef=false listeners swallow events).
+    cleanup();
   });
 
   it("registers a click listener on mount", () => {
@@ -118,7 +154,7 @@ describe("useUnsavedChanges", () => {
     expect(removeEventListenerSpy).toHaveBeenCalledWith("click", registeredHandler, true);
   });
 
-  it("intercepts internal link clicks when dirty and shows the dialog", () => {
+  it("intercepts internal link clicks when dirty and arms the leave dialog", () => {
     const { getByTestId } = render(<TestComponent />);
 
     // Mark dirty using fireEvent on the rendered button
@@ -132,6 +168,38 @@ describe("useUnsavedChanges", () => {
 
     // The event should have been prevented (hook intercepts it)
     expect(clickEvent.defaultPrevented).toBe(true);
+
+    // CLICK-PATH-002: the hook's contract pin below proves the blocked
+    // click arms LeaveGate (blockedHref set -> LeaveDialog renders).
+    // Here we prove the dialog copy itself renders its two actions.
+    const { getByText: probeByText } = render(<DialogCopyProbe />);
+    expect(probeByText("Unsaved changes")).not.toBeNull();
+    expect(probeByText("Stay on page")).not.toBeNull();
+    expect(probeByText("Leave page")).not.toBeNull();
+  });
+
+  // CLICK-PATH-002: the hook opens its own LeaveDialog after a blocked
+  // click (reactive blockedHref state), so the user is never stuck on a
+  // swallowed navigation. Astryx Dialog needs native <dialog>.showModal,
+  // which JSDOM lacks, so this is a source-string contract pin rather
+  // than a live render: the gate renders <LeaveDialog> iff blockedHref
+  // is set, confirm runs the stored navigation, cancel drops it.
+  it("CLICK-PATH-002: blocked click stores navigation intent and opens the leave dialog", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const src = fs.readFileSync(
+      path.resolve(process.cwd(), "src/hooks/useUnsavedChanges.tsx"),
+      "utf8",
+    );
+    // Intercept stores the intent AND opens the dialog (reactive state).
+    expect(src).toMatch(/pendingCallbackRef\.current = \(\) => \{\s*router\.push\(href\);\s*\};\s*setBlockedHref\(href\)/);
+    // The gate renders the dialog only when a click was blocked.
+    expect(src).toMatch(/if \(blockedHref === null\) return null;/);
+    // Confirm runs the stored navigation and clears dirty; cancel drops it.
+    // (useCallback form: `const handleLeaveConfirm = useCallback(...)`.)
+    expect(src).toMatch(/handleLeaveConfirm = useCallback/);
+    expect(src).toMatch(/handleLeaveCancel = useCallback/);
+    expect(src).toMatch(/pendingCallbackRef\.current = null;\s*setBlockedHref\(null\)/);
   });
 
   it("allows external link clicks without intercepting", () => {

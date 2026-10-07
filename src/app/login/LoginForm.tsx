@@ -95,23 +95,24 @@ export function LoginForm({
             size="md"
           />
 
-          {/* Only accounts that went through EnableTwoFactor/ConfirmTwoFactor
-              (opt-in) have twoFactorEnabled=true — this field is silently
-              ignored by Login for every other account, so it's safe to
-              always render rather than needing a two-step form. */}
-          <Input
-            name="totpCode"
-            label="Two-factor code"
-            type="text"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            placeholder="123456"
-            hint={
-              needsTotp ? undefined : "Only needed if you've enabled two-factor authentication."
-            }
-            autoFocus={needsTotp}
-            size="md"
-          />
+          {/* Story-161: only render the TOTP field when the route handler
+              has already told us the account uses 2FA (errorKind in
+              `totp_required` or `invalid_totp_code`). Otherwise it's pure
+              noise on the most common case (no 2FA enrolled) — the route
+              silently ignores the missing field, which is now safe by
+              design rather than by omission. */}
+          {needsTotp ? (
+            <Input
+              name="totpCode"
+              label="Two-factor code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="123456"
+              autoFocus={needsTotp}
+              size="md"
+            />
+          ) : null}
 
           <div className={styles.forgotRow}>
             <Link href="/reset-password" className={styles.forgotLink}>

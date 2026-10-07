@@ -77,3 +77,48 @@ describe("/signup", () => {
     expect(signupFormSpy).toHaveBeenCalledWith(expect.objectContaining({ tierSlug: "mastery" }));
   });
 });
+
+// Story-161: the new terms + payment-method line and the tier-aware
+// submit copy are tested by inspecting the SignupForm directly. The
+// `vi.mock("../SignupForm")` above intercepts the dynamic import
+// path too, so we use `vi.importActual` to grab the real module
+// without disturbing the page-level mock.
+async function loadRealSignupForm(): Promise<{ default: unknown }> {
+  return vi.importActual("../SignupForm") as Promise<{ default: unknown }>;
+}
+
+async function renderRealSignupForm(props: {
+  errorKind: string | null;
+  tierSlug: string | null;
+}): Promise<string> {
+  const { SignupForm } = (await loadRealSignupForm()) as unknown as {
+    SignupForm: (p: { errorKind: string | null; tierSlug: string | null }) => Promise<unknown>;
+  };
+  const stream = await renderToReadableStream(createElement(SignupForm as never, props));
+  const reader = stream.getReader();
+  let html = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    html += new TextDecoder().decode(value);
+  }
+  return html;
+}
+
+describe("SignupForm · STORY-161", () => {
+  it("renders the terms + payment-method line above the submit button", async () => {
+    const html = await renderRealSignupForm({ errorKind: null, tierSlug: null });
+    expect(html).toContain("By creating an account you accept the platform terms");
+    expect(html).toContain("PayMongo handles card");
+  });
+
+  it("uses the tier-aware submit copy when a tierSlug is present", async () => {
+    const html = await renderRealSignupForm({ errorKind: null, tierSlug: "mastery" });
+    expect(html).toContain("Create account and continue");
+  });
+
+  it("uses the plain submit copy when no tierSlug is present", async () => {
+    const html = await renderRealSignupForm({ errorKind: null, tierSlug: null });
+    expect(html).toContain("Create account");
+  });
+});

@@ -1,0 +1,73 @@
+/* DashboardHeroStats.module.css — tokens-only. */
+
+.strip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 10px 14px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  background: var(--c-card);
+  box-shadow: var(--sh-1);
+  color: var(--c-ink);
+  font-family: var(--font-disp);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.strip:hover {
+  border-color: var(--c-orange-tint);
+  box-shadow: var(--sh-2);
+}
+
+.dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dotFilled,
+.dotEmpty {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+}
+
+.dotFilled {
+  background: var(--c-orange);
+}
+
+.dotEmpty {
+  background: var(--c-bg-2);
+  border: 1px solid var(--c-border);
+}
+
+.divider {
+  width: 1px;
+  height: 16px;
+  background: var(--c-border);
+}
+
+.xp {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.xpIcon {
+  color: var(--c-orange);
+}
+
+.xpNumber {
+  color: var(--c-ink);
+}
+
+.xpLabel {
+  color: var(--c-faint);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

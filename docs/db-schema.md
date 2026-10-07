@@ -80,7 +80,7 @@ The current schema uses `Order` for checkout and payment state. It does not cont
 
 `SimulatorScenario`, `SimulatorAttempt`, `SimulatorDecision`, `ScorePolicy`, and `AttemptFeedback` support the five registered simulators, including Keyword Research (STORY-081). Keyword Research's `KeywordDataset` is a plain in-code repository (`StaticKeywordDatasetRepository`), not a Prisma model — there is no DB table or admin CRUD for keyword datasets yet.
 
-The simulator scoring configuration has known integrity and subject-matter limitations. Do not use attempt scores for certification or hiring decisions; see `docs/audit-2026-07-26-simulator-accuracy-review.md`.
+The simulator scoring configuration has known integrity and subject-matter limitations. Do not use attempt scores for certification or hiring decisions. The audit that catalogued them, `docs/audit-2026-07-26-simulator-accuracy-review.md`, was removed on 2026-09-14 by `e1f7352`, so the surviving record is the simulator bullet in `../CLAUDE.md`'s "Known gaps" section and the limitations list in `../STATE.md`.
 
 ### Operations
 

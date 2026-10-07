@@ -27,8 +27,15 @@ Against the disposable or staging database only:
 
 ```bash
 SHADOW_DATABASE_URL= pnpm prisma:deploy
-pnpm import:content
+node scripts/seed-all-content.mjs
 ```
+
+`pnpm import:content` is named by an older revision of this runbook and does not
+run: the use case it imports was deleted in `915c7ca`, and
+`src/__tests__/scriptImportsResolve.test.ts` pins that gap so it cannot be
+forgotten again. `scripts/seed-all-content.mjs` is the script that writes lesson
+bodies and the quiz bank, and it is the one this step means. Its output is the
+only import summary you will get, so capture it.
 
 Record the importer summary and the resulting published course/module/lesson
 counts. Importing is a separate operation from changing public claims; do not
@@ -43,8 +50,10 @@ pnpm validate:learning-release
 ```
 
 Confirm that the landing page, tier cards, planned time, simulator availability,
-and certificate wording match the reviewed claim config. Attach the output to
-the release record.
+and certificate wording match the reviewed claim config. The same run checks the
+currency contract: every money amount a lesson body or the quiz bank states must
+carry a peso sign, never a dollar sign in front of a digit (STORY-149,
+STORY-150). Attach the output to the release record.
 
 ## 4. Run the logged-in learner smoke
 
@@ -64,21 +73,25 @@ report link, and timestamp. A public-only check is not sufficient evidence.
 
 The release operator signs off the following checklist:
 
-| Evidence | Recorded value |
-| --- | --- |
-| Commit SHA |  |
-| Source contract output |  |
-| Staging import output and row counts |  |
-| Public-claim validation output |  |
-| Logged-in smoke URL/report |  |
-| Operator + timestamp |  |
+| Evidence                             | Recorded value |
+| ------------------------------------ | -------------- |
+| Commit SHA                           |                |
+| Source contract output               |                |
+| Staging import output and row counts |                |
+| Public-claim validation output       |                |
+| Logged-in smoke URL/report           |                |
+| Operator + timestamp                 |                |
 
 Only after all rows are complete may the production deploy run. If any step
 fails, fix or roll back the source/import in staging and restart at step 1.
 
 ## CI relationship
 
-The `Learning release gate` CI job runs source inventory and public-claim
-validation after the quality, unit, and Playwright jobs pass. CI proves the
-checked-in contract; the staging import output and logged-in URL above remain
-release evidence that must be attached by the operator.
+The `Learning release gate` CI job runs source inventory, tool-bridge
+validation, and public-claim validation after the quality, unit, and
+Playwright jobs pass. `pnpm validate:learning-release` chains
+`validate:curriculum` (LEARN-001), `validate:tool-bridges` (LEARN-030),
+the public-claim contract test, and the curriculum currency contract test.
+CI proves the checked-in contract;
+the staging import output and logged-in URL above remain release
+evidence that must be attached by the operator.

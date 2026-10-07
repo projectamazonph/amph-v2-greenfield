@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CheckIcon } from "./Icons";
 import { Reveal } from "./Reveal";
+import { HeroPriceLadder } from "./HeroPriceLadder";
 import shared from "./shared.module.css";
 import styles from "./Hero.module.css";
 import { PUBLIC_CURRICULUM_CLAIMS } from "@/domain/curriculum/PublicCurriculumClaims";
@@ -11,6 +12,10 @@ export function Hero() {
     <section className={styles.hero} id="top" aria-labelledby="hero-headline">
       <div className={[shared.wrap, styles.grid].join(" ")}>
         <Reveal className={styles.left}>
+          <a href="#pricing" className={styles.chipCta} aria-label="Jump to the three pricing tiers">
+            <span className={styles.chipCtaArrow} aria-hidden="true">→</span>
+            See the three tiers
+          </a>
           <span className={[shared.label, styles.eyebrow].join(" ")}>
             Amazon ads training · for Filipino VAs
           </span>
@@ -23,6 +28,7 @@ export function Hero() {
             {PUBLIC_CURRICULUM_CLAIMS.modules.length} modules and {Object.keys(PUBLIC_CURRICULUM_CLAIMS.simulators).length} practice
             tools. You work with illustrative campaign shapes before a client sees your work.
           </p>
+          <HeroPriceLadder />
           <p className={styles.hook}>
             If you&rsquo;re at <b>₱25k / month now</b>, the next step is ₱60k&ndash;₱80k. This is the path.
           </p>
@@ -71,9 +77,19 @@ export function Hero() {
             <figcaption className={shared.plateCap}>
               FIG. 01: operator&rsquo;s desk / live campaign view
             </figcaption>
-            <div className={styles.stat}>
-              <small>Sample ACoS</small>
-              <b>24.3%</b> <span className={styles.statDelta}>▼ on target</span>
+            <div className={styles.previewBadge} role="group" aria-label="Sample live preview">
+              <small className={styles.previewBadgeLabel}>Live preview</small>
+              <div className={styles.previewBadgeRow}>
+                <div className={styles.previewMetric}>
+                  <span className={styles.previewMetricKey}>Sample daily sales</span>
+                  <span className={styles.previewMetricVal}>$2,482</span>
+                </div>
+                <span className={styles.previewMetricDivider} aria-hidden="true" />
+                <div className={styles.previewMetric}>
+                  <span className={styles.previewMetricKey}>Sample ACoS</span>
+                  <span className={styles.previewMetricVal}>18.4%</span>
+                </div>
+              </div>
             </div>
           </figure>
         </Reveal>
@@ -81,3 +97,5 @@ export function Hero() {
     </section>
   );
 }
+
+Hero.displayName = "Hero";

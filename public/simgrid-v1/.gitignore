@@ -1,0 +1,12 @@
+node_modules/
+release/
+dist/
+*.log
+
+# Scratch artifacts from agent sessions
+.tmp-*
+!.tmp-archive-*/
+.tmp-edge-profile*/
+.tmp-edge-profile-ppc/
+.ijfw/
+.poolside/

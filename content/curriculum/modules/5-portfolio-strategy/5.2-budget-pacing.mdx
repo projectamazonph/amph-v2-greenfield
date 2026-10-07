@@ -59,6 +59,10 @@ If you're consistently hitting your daily budget by midday, consider increasing 
 
 Your **burn rate** tells you how fast you're spending budget each hour. It's the single most useful metric for pacing.
 
+:::formula-ladder{id="budget-pacing-burn-rate-ladder" title="Read the burn rate before changing the budget"}
+{"steps":[{"label":"Total daily budget","expression":"Daily budget = ₱2,000"},{"label":"Spend by the current hour","expression":"₱1,400 spent by 3 PM (15 hours since reset)"},{"label":"Hourly burn rate","expression":"₱1,400 ÷ 15 ≈ ₱93 per hour","explanation":"Burn rate is the simple diagnostic. Compare it with the rate the day would need to stay under budget."},{"label":"Projected end-of-day spend","expression":"₱93 × 24 = ₱2,232","explanation":"At this pace the campaign will exceed the ₱2,000 budget. The over-delivery cap (25% or 100%) decides whether Amazon allows it."},{"label":"Decision boundary","expression":"₱2,000 × 1.25 = ₱2,500 monthly-average ceiling","explanation":"Daily overspend is allowed up to the cap because Amazon averages over the calendar month. Confirm the account setting before acting."}],"result":{"label":"Pacing call","value":"Hold, raise, or trim only after you know the cause","context":"A burn-rate spike is a signal, not a verdict. Check search terms and bids before changing the daily budget."},"note":"A burn-rate reading is one number on one day. Pair it with the search-term report before you change anything."}
+:::
+
 ### The Formula
 
 ```
@@ -123,11 +127,11 @@ Amazon traffic is not uniform. Here's a typical pattern:
 
 Where your account has access to scheduled bidding or budget rules by time of day, use them to align spend with traffic patterns. This control isn't available or configured the same way on every account, so confirm it's there before you plan around it:
 
-- **Morning (6-9AM):** Increase bids 10-20%, commuters browsing on mobile
-- **Work hours (9AM-3PM):** Standard bids, office workers and parents
-- **Afternoon (3-6PM):** Decrease bids 10%, low conversion window
-- **Evening (7-11PM):** Increase bids 15-25%, peak shopping time
-- **Late night (11PM-6AM):** Decrease bids 30-50%, low conversion, wasted spend
+- **Morning (6-9AM PHT):** Increase bids 10-20%, commuters browsing on mobile
+- **Work hours (9AM-3PM PHT):** Standard bids, office workers and parents
+- **Afternoon (3-6PM PHT):** Decrease bids 10%, low conversion window
+- **Evening (7-11PM PHT):** Increase bids 15-25%, peak shopping time
+- **Late night (11PM-6AM PHT):** Decrease bids 30-50%, low conversion, wasted spend
 
 If your account doesn't have scheduled bid rules available, the fallback is manual. Check performance by hour in your reports. Adjust bids by hand at known peak and low-traffic windows.
 
@@ -137,11 +141,11 @@ For most Filipino VA-managed accounts (Philippine time, serving US market), the 
 
 ## What to Do When You Hit Budget Mid-Day
 
-This is the #1 pacing problem. Here's your playbook:
+This is the #1 pacing problem, and it shows up across most accounts. Here is your playbook:
 
 ```
 PROBLEM: Campaign hits daily budget at 1PM.
-         Losing 12 hours of potential traffic.
+         Losing 11 hours of potential traffic.
 
 OPTIONS:
 ├── OPTION A: Increase daily budget (+20-30%)
@@ -193,7 +197,7 @@ Keep this tracker in a spreadsheet. Update daily. It takes 2 minutes and saves y
 - **Burn rate** tells you how fast you're spending per hour. Check it daily.
 - **Scheduled bid rules, where available,** align your bids with peak shopping hours (8PM-12AM PHT). Confirm the control exists on your account, and fall back to manual bid checks if it doesn't.
 - If you hit budget by midday, **increase the budget or use portfolio pooling**.
-- **Weekly patterns matter.** Friday may need 30% more budget than Sunday.
+- **Weekly patterns matter.** In the table above, Friday runs 30% above a normal weekday and more than double what Sunday needs (₱1,300 against ₱500).
 - Track daily pacing in a **simple spreadsheet**. Two minutes a day saves thousands.
 
 ## Your turn
@@ -202,7 +206,7 @@ Work this through before checking the answer.
 
 Your client's phone-case campaign has a ₱1,500 daily budget. It's 11AM and the dashboard already shows ₱1,200 spent, 80% of the day's budget. This is the third day in a row the campaign has paused by around 2PM. The client has a promo launching this Friday and doesn't want it shut out early. Before reading further: what does this burn rate pattern tell you, and what would you actually change before Friday?
 
-**Work it through:** A good pacing target is 80 to 90% of the daily budget spent by end of day. Hitting 80% by 11AM, three days running, is nowhere near that: this campaign is burning through its budget in a few hours and going dark for the rest of the day, which is the classic "budget too low for demand" pattern, not a one-off spike. The fix is to raise the daily budget, roughly 20 to 30% as a starting point, so it can run further into the evening instead of pausing at 2PM. Check pacing again after the change, and be ready to pair it with bid cuts or pausing low-performing keywords if it's still exhausting before the peak PHT evening window (8PM to 12AM). Do this before Friday, not on Friday: a promo day is when you most want the campaign live through that window, not paused since early afternoon.
+**Work it through:** A good pacing target is 80 to 90% of the daily budget spent by end of day. Hitting 80% by 11AM three days running is nowhere near that. This campaign is burning through its budget in a few hours and going dark for the rest of the day, which is the classic "budget too low for demand" pattern, not a one-off spike. The fix is to raise the daily budget, roughly 20 to 30% as a starting point, so it can run further into the evening instead of pausing at 2PM. Check pacing again after the change, and be ready to pair it with bid cuts or pausing low-performing keywords if it's still exhausting before the peak PHT evening window (8PM to 12AM). Do this before Friday, not on Friday: a promo day is when you most want the campaign live through that window, not paused since early afternoon.
 
 ## Add to your worksheet
 
@@ -235,6 +239,18 @@ Use this when a client asks why their ads seem to "turn off" partway through the
 
 > "Your campaign is hitting its daily spend limit around 2PM, that's Amazon pausing the ads once the day's budget cap is reached, not a technical problem. We're raising the daily budget so it stays live through the evening instead of stopping early."
 
+:::callout{id="lesson-5-2-pitfall" variant="pitfall" title="Doubling the budget without checking the cause"}
+Raising the daily budget on a campaign that hits its cap at 1 PM treats the symptom and ignores why the cap was hit. Often the budget is fine and a few keywords are eating the day.
+:::
+
+<SelfCheck
+  id="sc-5-2"
+  prompt="A campaign hits its daily budget at 1 PM. What is the safe first move?"
+  options={["Check the burn rate, search terms, and the day mix before any change.", "Double the daily budget so the campaign never hits the cap again.", "Pause the campaign until next week and review the report.", "Switch the bid strategy to dynamic bids up and down."]}
+  answerIndex={0}
+  explanation="Hitting budget mid-day is a signal, not a verdict. Read the burn rate and search mix before raising the budget, pooling portfolios, or trimming terms."
+/>
+
 ## Quick check
 
 1. In the sample week, the sum of daily budgets was ₱7,000. What was the sum of daily spend shown on the dashboard?
@@ -259,9 +275,9 @@ What the learner can do: Expect some days to show spend above the set daily budg
 Who can access it: Any Sponsored Products or Sponsored Brands advertiser; exact mechanics can change and should be verified in-console
 Retailer or marketplace scope: Amazon Advertising Console; do not assume parity across marketplaces
 Official source URL: https://advertising.amazon.com/help/GTGPQGUXNCTHE2DS
-Last verified: [content owner to fill in at rewrite time]
-Next review due: [content owner to fill in at rewrite time]
-Owner: [content owner]
+Last verified: 2026-09-25
+Next review due: 2026-01-25
+Owner: Ryan Roland Dabao
 ```
 
 ## Amazon Ads Fact Card
@@ -272,7 +288,7 @@ What the learner can do: Where available, schedule bid or budget changes by time
 Who can access it: Availability and exact controls vary by account and campaign type, verify in-console
 Retailer or marketplace scope: Amazon Advertising Console; do not assume parity across marketplaces
 Official source URL: https://advertising.amazon.com/help/GTGPQGUXNCTHE2DS
-Last verified: [content owner to fill in at rewrite time]
-Next review due: [content owner to fill in at rewrite time]
-Owner: [content owner]
+Last verified: 2026-09-25
+Next review due: 2026-01-25
+Owner: Ryan Roland Dabao
 ```

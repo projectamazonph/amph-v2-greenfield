@@ -8,7 +8,7 @@ This directory holds the curriculum content (lesson MDX files and quiz fixture) 
 content/
 ├── README.md                      # this file
 └── curriculum/
-    ├── modules/                   # 42 lesson MDX files across 12 modules
+    ├── modules/                   # 45 lesson MDX files across 13 modules
     │   ├── 0-onboarding/          # 3 lessons: welcome, platform tour, client brief
     │   ├── 1-foundations/         # 5 lessons: read PPC data, CPC/CTR, ACoS/TACoS, ROAS, metrics patterns
     │   ├── 2-keyword-research/    # 4 lessons: match types, workflow, negatives, grouping
@@ -23,7 +23,7 @@ content/
     │   └── 11-va-workflow-capstone/  # 4 lessons: cadence, permissions, SOPs, capstone
     ├── inventory.json              # checked-in course and lesson release contract
     ├── public-claims.json          # reviewed public counts, tiers, tools, and certificate wording
-    └── quiz-questions.json         # 12 module-final quizzes (knowledge checks)
+    └── quiz-questions.json         # 13 module-final quizzes (knowledge checks)
 ```
 
 ## Source & history
@@ -75,14 +75,27 @@ can work from an explicit gap list.
 
 ## Content import workflow
 
-The importer is `scripts/import-amph-content.ts` (STORY-013). It reads the same repo-relative source that the inventory validator checks.
+**Read this section first if you are trying to publish content.** What is actually wired up today is not what the paragraphs below describe, and the difference is the reason a merged content fix can sit invisible to learners for weeks.
+
+There are two scripts in this repo that read `content/curriculum/`, and neither runs on deploy:
+
+| Script                                                      | What it writes                                                                                                  | Status today                                                                                                                                                                                                                                               |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/seed-all-content.mjs`                              | Courses, modules, lessons with their MDX body, the 13 quizzes from `quiz-questions.json`, badges, pricing tiers | The only script that publishes lesson text and quiz content. Run as `node scripts/seed-all-content.mjs`. Not registered as a `package.json` script. Verified to parse (`node --check`), never verified against the production database from a dev machine. |
+| `pnpm import:content` → `node scripts/seed-all-content.mjs` | Courses, modules, lessons with their MDX body, the 13 quizzes from `quiz-questions.json`, badges, pricing tiers | Runs `node scripts/seed-all-content.mjs`. The earlier `import-amph-content.ts` (STORY-013) was deleted in PR #612.                                                                                                                                         |
+
+`vercel.json` runs `pnpm prisma:deploy` and `pnpm db:seed:scenarios` in production, then `pnpm build`. Neither reads `content/curriculum/`, so a deploy publishes schema and simulator scenarios but no lesson text and no quiz questions.
+
+The section below is the STORY-013 design note. It is kept because it explains the intended structure and because its future tense is the tell: step 4 assigns it the quiz bank, which the script never did, and three bullets say what the importer "will" do.
+
+The current seeder is `scripts/seed-all-content.mjs`. It reads the same repo-relative source that the inventory validator checks.
 
 It:
 
 1. Read every `*.mdx` file under `content/curriculum/modules/<module-slug>/<lesson-slug>.mdx`.
 2. Parse the frontmatter (`title`, `slug`, `moduleNumber`, `lessonNumber`, `type`, `estimatedMinutes`, `xpReward`).
 3. Upsert `Module` and `Lesson` rows in the `Course` bound to `ppc-foundations` tier (modules 0–4), `accelerated-mastery` tier (modules 5–10), and `ultimate-transformation` tier (module 11).
-4. Read `content/curriculum/quiz-questions.json`, parse the 12 module quizzes, and attach each to the appropriate module's final lesson as a knowledge check.
+4. Read `content/curriculum/quiz-questions.json`, parse the 13 module quizzes, and attach each to the appropriate module's final lesson as a knowledge check.
 5. Be idempotent (re-running should not duplicate rows — use slug as natural key).
 
 The greenfield importer differs from the parent implementation in these important ways:
@@ -93,7 +106,7 @@ The greenfield importer differs from the parent implementation in these importan
 
 ## Content audit & corrections (carried forward from parent)
 
-The content in this folder has already been audited and corrected. The parent's `docs/CONTENT-AUDIT-2026-07-16.md` and `docs/CONTENT-UPDATE-PLAN.md` document the corrections. If the greenfield later needs to apply the same corrections (e.g., the parent releases a new audit pass), re-read those parent docs first.
+The content in this folder has already been audited and corrected. The corrections are listed in this section; the two parent-repository documents that described them, `docs/CONTENT-AUDIT-2026-07-16.md` and `docs/CONTENT-UPDATE-PLAN.md`, were never committed to this repository, so read the list below rather than looking for them. If a new audit pass arrives from `projectamazonph/amph-v2`, write it into this folder before acting on it.
 
 **Specific corrections that were already applied (and are in the files in this folder):**
 
@@ -110,7 +123,7 @@ Each fix added an Amazon Ads Fact Card (source URL, scope, owner/date placeholde
 - **At migration, no additional content rewrites** were made beyond the parent's content track. Later changes, including STORY-109, are documented in their story files and the changelog.
 - **No slugs renamed.** Even where a lesson's framing changed (e.g., `3.1-listing-quality-score.mdx`, `0.3-first-simulation.mdx`), only the frontmatter `title` field was updated, not the filename. Renaming the slug would break `Lesson.slug`-keyed upserts.
 - **No complete lesson-production standard pass.** STORY-107 and STORY-108 remain planned content work. The target standard and implementation order are in `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`.
-- **Source and database are separate states.** Running `pnpm import:content` against the intended database is required after approved content changes. Do not treat a committed MDX change as automatically published.
+- **Source and database are separate states.** A committed content change is not published by a deploy. Publishing needs `node scripts/seed-all-content.mjs` run against the intended database, for the reason given in "Content import workflow" above: `pnpm import:content` does not currently run. Do not treat a committed MDX or quiz change as automatically live.
 
 ## Verification
 
@@ -127,6 +140,6 @@ python3 -c "import json; json.load(open('content/curriculum/quiz-questions.json'
 # No legacy product references survive
 grep -rE "AdCraft|AI Mentor|Formula Calculator" content/  # (no output)
 
-# All 12 modules present
+# All 13 modules present
 ls content/curriculum/modules/   # 0-onboarding ... 11-va-workflow-capstone
 ```

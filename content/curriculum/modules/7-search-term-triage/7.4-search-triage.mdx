@@ -1,0 +1,90 @@
+﻿---
+title: "Search Term Triage: Cluster, Rule, Apply, Record"
+slug: "7.4-search-triage"
+moduleNumber: 7
+lessonNumber: 4
+type: "reading"
+estimatedMinutes: 10
+xpReward: 50
+---
+
+## What you can do after this lesson
+
+Explain the workflow a real operator runs on a search-term report, name the four steps of triage, and read the simulator's grade for keep / negate / isolate decisions before you ship them to the live account.
+
+## Why this workflow exists
+
+A live Sponsored Products account produces a search-term report every week. The report can be hundreds of terms long. The job is not to read every row. The job is to make the right call on each cluster of terms and record the reasoning.
+
+The Search Term Triage sim is the practice surface. The lesson is the triage workflow: cluster the terms by intent, set a rule for each cluster, apply the action, and record the decision so the next operator can audit it.
+
+## The decision in one sentence
+
+Cluster by intent, set a rule per cluster, apply in batches, and record the defense. Triage is a batch workflow, not a row-by-row read.
+
+## What the workflow looks like end to end
+
+A production operator who triages a real report runs four steps, in order:
+
+1. **Cluster by intent.** Group the report's terms into clusters like "exact product variant," "wrong product," "wrong audience," "informational," and "competitor brand." Use the term itself and the page it landed on.
+2. **Set a rule per cluster.** Decide the action (keep, optimize, pause, negate) and the threshold (clicks, spend, ACoS, conversion rate). A cluster with no clear rule will absorb hours of debate.
+3. **Apply.** Make the change in the account or in the bulk file. Apply in batches that share a rule, not one term at a time.
+4. **Record.** Log the rule, the cluster, the action, the date, and the expected signal. The log is what makes the next triage faster and what proves the work to the client.
+
+The decision at each step is one of four: keep (the term is working), optimize (lower bid, change match type), pause (the term does not convert and is not worth the spend), negate (the term is irrelevant and should never trigger again).
+
+## Worked example
+
+The workflow above is the walkthrough a real operator runs in production. Step through it once on the sim, name each step in your own words, and record the deliverable you would hand to the client.
+
+## How to read the simulator's feedback
+
+Search Term Triage scores you against four signals:
+
+- **Clustering.** Did you group by intent, or did you read terms one at a time?
+- **Rule definition.** Did you set a rule per cluster before you acted?
+- **Action correctness.** Did you pick keep / optimize / pause / negate based on the data?
+- **Record.** Did you log the cluster, the rule, the action, and the expected signal?
+
+A high score with no defense is a lot of changes with no audit trail. A high score with a one-line defense per cluster is a triage another operator can review and learn from.
+
+## Your turn
+
+Open Search Term Triage at `/practice/simgrid/search-triage.html`. Pick one report of 8, 12, or 16 terms. Cluster them, set a rule per cluster, apply, then record. At the end, write your defense for each cluster in one sentence.
+
+## Fact card
+
+```text
+Product or feature: Search Term Triage, keep / optimize / pause / negate (SimGrid `search-triage` simulator)
+What the learner can do: Turn a weekly search-term report into a defensible batch of changes
+Who can access it: Any signed-in student; the sim is free and has no enrollment gate
+Retailer or marketplace scope: General Amazon Sponsored Products search-term workflow
+Official source URL: https://advertising.amazon.com
+Last verified: 2026-10-05
+Next review due: 2027-01-05
+Owner: Ryan Roland Dabao
+```
+
+:::callout{id="lesson-7-4-pitfall" variant="pitfall" title="Reading the report row by row"}
+Reading row by row makes the triage take three hours and produces no consistent rule. Cluster first, then act on the cluster.
+:::
+
+<SelfCheck
+  id="sc-7-4"
+  prompt="A cluster of 6 terms all show 50+ clicks and zero orders. What is the right action?"
+  options={["Keep all six and raise the bid.", "Pause or negate the cluster, then record the defense.", "Move them to a new auto campaign.", "Wait another week for more data."]}
+  answerIndex={1}
+  explanation="Six terms with 50+ clicks and no orders is enough evidence to act. Cluster, rule, apply, record."
+/>
+
+## Evidence
+
+The Check section below names the artifact that proves the workflow ran end to end. Bring that artifact to the next client review so the work is reviewable, not just the round score.
+
+## Check
+
+A strong answer clusters before it acts, sets a rule per cluster, applies in batches, and records each decision with the expected signal. A weak answer treats the report as a list of one-off decisions.
+
+## Key takeaway
+
+Triage is a batch workflow. Cluster by intent, set a rule per cluster, apply in batches, and record so the next operator can audit. The defense is what turns the work into evidence.

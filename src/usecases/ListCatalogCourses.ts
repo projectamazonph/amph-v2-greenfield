@@ -59,7 +59,17 @@ export type ListCatalogCoursesError = { kind: "db_error"; message: string } | { 
 
 export interface ListCatalogCoursesResult {
   readonly courses: readonly CatalogCourse[];
+  /** Slugs of published courses dropped because their rows could not be read. */
+  readonly skipped?: readonly string[];
 }
+
+/**
+ * Per-course enrichment outcome. The slug rides along on the failure so a
+ * dropped course can be named instead of only its error text.
+ */
+type EnrichmentOutcome =
+  | { readonly slug: string; readonly ok: true; readonly course: CatalogCourse }
+  | { readonly slug: string; readonly ok: false; readonly message: string };
 
 // ── Use case ─────────────────────────────────────────────────────────────────
 
@@ -88,87 +98,93 @@ export class ListCatalogCourses {
       return Result.ok({ courses: [] });
     }
 
-    // Fetch all modules in parallel for all courses
-    const moduleResults = await Promise.all(
-      courses.map((c: Course) => this._moduleRepo.findByCourseId(c.id)),
-    );
+    const outcomes = await Promise.all(courses.map((course) => this.enrich(course)));
 
     const catalogCourses: CatalogCourse[] = [];
+    const skipped: string[] = [];
+    const failures: string[] = [];
+    for (const outcome of outcomes) {
+      if (outcome.ok) {
+        catalogCourses.push(outcome.course);
+      } else {
+        skipped.push(outcome.slug);
+        failures.push(outcome.message);
+      }
+    }
 
-    for (let i = 0; i < courses.length; i++) {
-      const course = courses[i]!;
-      const moduleResult = moduleResults[i];
+    // One unreadable course must not blank the whole catalog: a single
+    // corrupt Module row used to take /courses down. Degrade per course, and
+    // only report db_error when nothing loaded at all so the page still
+    // surfaces the real cause instead of the "no courses yet" empty state.
+    if (catalogCourses.length === 0) {
+      return Result.err({ kind: "db_error", message: failures[0]! });
+    }
 
-      if (!moduleResult) {
-        // Should not happen — Promise.all returns one result per input
-        return Result.err({ kind: "db_error", message: "Unexpected: missing module result" });
+    return skipped.length > 0
+      ? Result.ok({ courses: catalogCourses, skipped })
+      : Result.ok({ courses: catalogCourses });
+  }
+
+  private async enrich(course: Course): Promise<EnrichmentOutcome> {
+    const slug = course.slug;
+    const modulesResult = await this._moduleRepo.findByCourseId(course.id);
+    if (Result.isErr(modulesResult)) {
+      return { slug, ok: false, message: moduleErrorMsg(modulesResult.error as ModuleError) };
+    }
+
+    const modules: Module[] = [...modulesResult.value];
+
+    // Fetch lessons for each module in parallel
+    const lessonResults = await Promise.all(
+      modules.map((m: Module) => this._lessonRepo.findByModuleId(m.id)),
+    );
+
+    const moduleSummaries: CatalogModuleSummary[] = [];
+    let totalLessons = 0;
+    let totalMinutes = 0;
+
+    for (let j = 0; j < modules.length; j++) {
+      const mod = modules[j]!;
+      const lessonResult = lessonResults[j];
+
+      if (!lessonResult) {
+        return { slug, ok: false, message: "Unexpected: missing lesson result" };
       }
 
-      if (Result.isErr(moduleResult)) {
-        return Result.err({
-          kind: "db_error",
-          message: moduleErrorMsg(moduleResult.error as ModuleError),
-        });
+      if (Result.isErr(lessonResult)) {
+        return { slug, ok: false, message: lessonErrorMsg(lessonResult.error as LessonError) };
       }
 
-      const modules: Module[] = [...moduleResult.value];
-      let totalLessons = 0;
-      let totalMinutes = 0;
+      const lessons: Lesson[] = [...lessonResult.value];
+      totalLessons += lessons.length;
 
-      const moduleSummaries: CatalogModuleSummary[] = [];
-
-      // Fetch lessons for each module in parallel
-      const lessonResults = await Promise.all(
-        modules.map((m: Module) => this._lessonRepo.findByModuleId(m.id)),
-      );
-
-      for (let j = 0; j < modules.length; j++) {
-        const mod = modules[j]!;
-        const lessonResult = lessonResults[j];
-
-        if (!lessonResult) {
-          return Result.err({
-            kind: "db_error",
-            message: "Unexpected: missing lesson result",
-          });
-        }
-
-        if (Result.isErr(lessonResult)) {
-          return Result.err({
-            kind: "db_error",
-            message: lessonErrorMsg(lessonResult.error as LessonError),
-          });
-        }
-
-        const lessons: Lesson[] = [...lessonResult.value];
-        totalLessons += lessons.length;
-
-        // Sum planned learner time across every lesson type.
-        let moduleMinutes = 0;
-        for (const lesson of lessons) {
-          moduleMinutes += lesson.plannedMinutes;
-        }
-        totalMinutes += moduleMinutes;
-
-        moduleSummaries.push({
-          id: mod.id,
-          title: mod.title,
-          displayOrder: mod.displayOrder,
-          lessonCount: lessons.length,
-          estimatedMinutes: moduleMinutes,
-        });
+      // Sum planned learner time across every lesson type.
+      let moduleMinutes = 0;
+      for (const lesson of lessons) {
+        moduleMinutes += lesson.plannedMinutes;
       }
+      totalMinutes += moduleMinutes;
 
-      catalogCourses.push({
+      moduleSummaries.push({
+        id: mod.id,
+        title: mod.title,
+        displayOrder: mod.displayOrder,
+        lessonCount: lessons.length,
+        estimatedMinutes: moduleMinutes,
+      });
+    }
+
+    return {
+      slug,
+      ok: true,
+      course: {
         course,
         moduleCount: modules.length,
         lessonCount: totalLessons,
         estimatedMinutes: totalMinutes,
         modules: moduleSummaries,
-      });
-    }
-
-    return Result.ok({ courses: catalogCourses });
+      },
+    };
   }
 
   private readonly _courseRepo: CourseRepository;

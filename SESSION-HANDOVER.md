@@ -1,5 +1,62 @@
 # SESSION-HANDOVER.md
 
+# Session update (2026-09-24 / 2026-09-25, PRs #612–#621 merged — entire in-scope series closed)
+
+`main` HEAD is `4f3688d0` (PR #621, squash of `fix/last-verified-dates`).
+
+**PRs merged (2026-09-24 and 2026-09-25):**
+
+- PR #612 (`refactor/drop-early-bird-and-import`) — squash `374d818d`: dropped early-bird pricing feature and `earlyBirdPriceMinor`/`earlyBirdLimit` fields; folded `import-amph-content` into `seed-all-content`.
+- PR #613 (`fix/vercel-deploy-tiers-courses`) — squash `0051fb77`: `db:seed:tiers` script now seeds tier+course associations on production deploy (was dropping them on every `vercel.json` `prisma:deploy` without `db:seed:import`).
+- PR #614 (`refactor/self-host-fonts`) — squash `b548b4f4`: replaced `next/font/google` with `@fontsource/archivo`, `@fontsource/barlow-condensed`, `@fontsource/ibm-plex-mono`, `@fontsource/pt-sans`; defined `--font-display/body/cond/mono` as literal strings in `:root` in `globals.css`; removed stale `<html>` className with Tailwind-flagged font classes.
+- PR #615 (`fix/seed-pricing-tiers-dry-run`) — squash `1421a8c8`: removed stale `earlyBirdPriceMinor`/`earlyBirdEndsAt` reference from dry-run block in `scripts/seed-pricing-tiers.ts`.
+- PR #616 (`fix/glossary-popover-wired`) — squash `2a7e8bdd`: wired glossary popover into the lesson renderer.
+- PR #617 (`docs/admin-backend-rewrite`) — squash `d8d3c8c2`: full rewrite of `docs/admin-backend.md` against the code.
+- PR #618 (`test/route-existence-guard`) — squash `2af741a5`: sibling route guard.
+- PR #619 (`docs/record-pass-618`) — squash `5acb78f2`: records update (CLAUDE.md, SESSION-HANDOVER.md, STATE.md) after #617 and #618.
+- PR #620 (`fix/curriculum-decisions`) — squash `f3979de9`: applied all 7 of Ryan's dashboard decisions. **Decision 1** (broad 40% / exact 25%): 4.1 body line 95-98 updated; 4.1 worked example restructured to 4 campaigns (added `SP-Broad-Discovery`) with the 25/25/40/10 split. **Decision 2** (cap product 5-10%): 4.4:132 worked example changed 15% (₱240) to 10% (₱160), phrase 30% (₱480) to 35% (₱560). **Decision 3** (PHT): 5.2:126-130 appended `PHT` to each row. **Decision 4** (5+ clicks): 7.3:76 and 7.3:111 changed 10+ to 5+. **Decision 5** (state assumption): 7.1:130 rewritten to qualify the ±20%/±10% headline as worst-case at 50% CVR. **Decision 6** (replace 0% with N/A): 7.3 quick practice rows 2 and 5 changed "ACoS 0%" to "ACoS N/A (no orders)". **Decision 7** (rename heading): 8.3 "The 30-Minute Weekly Review" → "The Weekly Check-in"; superpowers files updated to match. All 8 CI gates green.
+- PR #621 (`fix/last-verified-dates`) — squash `4f3688d0`: stamped `Last verified: 2026-09-25` on all 29 fact cards. `pnpm check:curriculum-sources` goes from `0 dated, 29 pending text` to `29 dated, 0 pending text`. The companion `Next review due:` field left untouched (Ryan did not pick a date for it). All 8 CI gates green.
+
+**Open follow-ups, not blocking the series:**
+
+- **Run the content seeder.** `node scripts/seed-all-content.mjs`. Ten merged content PRs (#612–#621) have not reached learners, because a deploy runs only `prisma:deploy` and `db:seed:scenarios`. Until this runs, the curriculum decisions and `Last verified` dates are invisible in production.
+- **Set `Next review due:` dates** on the 16 fact cards that still carry `pending content-owner review` for that field. The 16 are listed by `pnpm check:curriculum-sources` and are the same lessons #577 grouped under `states why`.
+- **`9.3` evidence ladder boundary overlap** recorded in the audit as a separate defect from #565. Separate fix; not blocking.
+
+`CLAUDE.md` "Current addendum" updated to `4f3688d0`. `STATE.md` Main pointer updated to `4f3688d0`, PR rows for #620 and #621 added, "Next action" reflects the seeder + `Next review due:` state.
+
+---
+
+# Session update (2026-09-21, STORY-146 onboarding merged via PR #545)
+
+`main` HEAD is `918c532` (squash of branch `onboarding`, branch deleted). Implements STORY-146 (first-run welcome walkthrough for brand-new AMPH students — feedback that zero-experience VAs don't know how to navigate the platform).
+
+The slice adds `welcomeCompletedAt` (User + migration with backfill), `CompleteWelcome`/`ResetWelcome` use cases enforcing atomic idempotency at the DB layer via `updateMany + where: { ..., welcomeCompletedAt: null }` (same pattern as `PrismaEmailVerificationRepository.markUsed` and `PrismaLiveClassRegistrationRepository.markWatchedRecording`), `welcome.action.ts` server actions, `/welcome` page with `WelcomeStepper` client component (5 steps, URL fragment + localStorage), `NewUserDashboard` variant for fresh free-tier students, sidebar "?" badge (7-day window), profile "Restart the welcome tour" link, signup no-tier redirect from `/dashboard` to `/welcome`, and Playwright E2E coverage at `tests/e2e/welcome.spec.ts`.
+
+Renumbered from STORY-129 to STORY-146 mid-flight because main already had `STORY-129` (LEARN-001, merged in #520) and `STORY-145` (LEARN-031, merged in #543) — picked the next free number on the LEARN-numbering track so this stays out of the way of any future LEARN-145/146 picks.
+
+The branch was originally cut from `cae71f1` (2026-07). Main had progressed through LEARN waves 1–4 (artefacts, portfolio, retrieval checks, notifications, capstone brief, scenario packs) since the fork. Rebased onto current `main` (5ccb37d) by cherry-picking the 13 production commits (Tasks 1–13) and the 3 post-review fixes (Tasks 11/12 fixes), dropping the docs-only commits that would conflict; the renumbering chain (`65c8de4`, `ff8c821`) was also dropped and replaced by a single end-commit that creates `STORY-146.md` directly. Final diff was 38 files focused on onboarding only, down from 32+ ahead of `cae71f1` plus 9 unmerged LEARN-wave files.
+
+Two CI regressions caught and fixed in flight:
+
+1. `prisma/schema.prisma` started with a UTF-8 BOM (`EF BB BF`) after a bulk rename via PowerShell `Set-Content -Encoding UTF8`. Prisma's schema parser rejected it with `P1012: This line is invalid. It does not start with any known Prisma schema keyword.` Stripped the BOM at the byte level.
+2. `src/app/welcome/loading.tsx` was missing — the cherry-pick from `70980ee` dropped it (or it was lost in the rebase walk). Architecture's public-a11y-gates test requires every non-admin route to have a `loading.tsx` with `<main aria-busy="true">`. Re-added using the same `SkeletonBlock` pattern as `src/app/dashboard/loading.tsx`. Also caught a separate `useRouter` mock gap in `StudentSidebar` tests after the badge refactor (Task 11 fix) added `useRouter()` calls; updated `StudentNavigation.test.tsx` and `dashboard/__tests__/a11y.audit.test.tsx` mocks to export `useRouter` alongside `usePathname`.
+
+All 8 CI gates green at merge time:
+
+- ✅ Typecheck + Lint
+- ✅ Architecture (TDD + SOLID compliance)
+- ✅ Unit + integration (5,132 passing)
+- ✅ E2E (Playwright)
+- ✅ Build
+- ✅ Learning release gate
+- ✅ Lighthouse CI
+- ✅ Vercel preview
+
+Follow-ups (deferred, not blocking): `STORY-146.1` for any remaining a11y debt (the nested-`<Link>` fix is now in this PR); auto-redirect logged-in users with `welcomeCompletedAt === null` from `/dashboard` to `/welcome` (proxy/auth-layer hook); i18n for the welcome copy; reduced-motion variant for step transitions.
+
+`STATE.md` updated to reflect: `_None._ STORY-146 merged at 918c532`; `Main: 918c532`; `Reviewed: 2026-09-21`. `CHANGELOG.md` `[Unreleased]` entry was added before merge. `docs/stories/STORY-146.md` `Status` line updated to `Done.`.
+
 # Session update (2026-08-21, PR #420 Unit+integration failure blocks merge)
 
 `feat/active-lesson-primitives` PR #420 (`4282448`) cannot be merged in its current state. CI is GREEN on Typecheck + Lint, Architecture (TDD + SOLID), E2E (Playwright), Vercel preview, and CodeRabbit. CI is RED on Unit + integration: 70 failed assertions across 13 test files (4171 passed). The same Suite was RED on the branch's first push (`75cb14f`, run 32390575868); the failure set has not changed between the original state and the follow-up commit `4282448`.

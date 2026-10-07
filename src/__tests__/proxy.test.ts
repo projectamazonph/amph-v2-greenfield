@@ -124,4 +124,29 @@ describe("proxy (src/proxy.ts)", () => {
     expect(lower).toContain("landing");
     expect(lower).toContain("unauthenticated");
   });
+
+  it("refuses write requests on preview deployments (previews are read-only)", async () => {
+    // Preview and production share one DATABASE_URL, so a PR preview that
+    // accepts a write persists to production data. The policy itself is
+    // unit-tested in src/lib/__tests__/preview-read-only.test.ts; this is
+    // the tripwire that keeps the proxy wired to it.
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    expect(source).toMatch(
+      /isReadOnlyPreviewRequest\(request\.method,\s*process\.env\.VERCEL_ENV\)/,
+    );
+    expect(source).toMatch(/status:\s*405/);
+    expect(source).toMatch(/preview_read_only/);
+    expect(source).toMatch(/Allow:\s*"GET, HEAD"/);
+  });
+
+  it("runs the read-only guard before maintenance mode and route protection", async () => {
+    // Ordering matters: a rejected preview write must not wait on the
+    // maintenance DB read, and must not be turned into a login redirect
+    // by the protection block below it.
+    const source = await fs.readFile(PROXY_PATH, "utf8");
+    const guard = source.indexOf("isReadOnlyPreviewRequest(");
+    expect(guard).toBeGreaterThan(-1);
+    expect(guard).toBeLessThan(source.indexOf("checkMaintenanceMode(request)"));
+    expect(guard).toBeLessThan(source.indexOf("isProtectedPath(pathname)"));
+  });
 });

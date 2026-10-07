@@ -16,6 +16,18 @@ After this lesson, you can pull the price, CVR, and target ACoS out of a scenari
 
 If the market CPC range sits above your calculated max CPC for the target ACoS, don't bid at that target. Accept a higher ACoS, improve CVR, or walk away from the keyword instead.
 
+:::callout{id="lesson-6-3-pitfall" variant="pitfall" title="Starting the Bid Elevator at your floor bid"}
+The Bid Elevator's safe range starts at your maximum CPC, not your current bid. Setting the floor too low means every scenario starts from a position Amazon cannot show your ad in, and the practice is meaningless.
+:::
+
+<SelfCheck
+  id="sc-6-3"
+  prompt="Market CPC for a keyword runs ₱60 to ₱125 and your calculated max CPC is ₱40. What is the right move?"
+  options={["Bid ₱40 and wait for cheaper auctions", "Bid ₱125 so the impression is guaranteed", "Leave the term, or justify it with a higher target ACoS or a better CVR", "Switch the campaign to Dynamic Up and Down"]}
+  answerIndex={2}
+  explanation="The market sits above your ceiling, so the term loses money at the current target. Bidding ₱40 mostly buys you no volume, and bidding ₱125 buys you losses. Change the target, the conversion rate, or the keyword."
+/>
+
 You've learned about bid strategies and placement adjustments. Now it's time to put that knowledge into action. The **Bid Elevator** tool will test your ability to make smart bidding decisions under realistic conditions, one scenario at a time, each with different products, margins, and market dynamics.
 
 ## What the Bid Elevator Tests
@@ -103,9 +115,11 @@ For each scenario, follow this flow:
 
 **Bidding without calculating max CPC.** If you don't know your ceiling, you're guessing. Always do the math first.
 
-**Using the same bid for every scenario.** A ₱1,500 product with 10% CVR and a ₱750 product with 20% CVR have very different max CPCs. Adjust per scenario.
+**Using the same bid for every scenario.** The ceiling comes from price × conversion rate, not from the price alone. A ₱1,500 product that converts at 10% and a ₱750 product that converts at 20% both earn ₱150 of sales per click, so their ceilings really do match. Change one input and they stop matching: that same ₱1,500 product at 5% earns only ₱75 per click, half the ceiling. Set the bid per scenario.
 
 **Bidding above max CPC because "competition is high."** If you can't afford to win profitably, don't win. A sale at a loss is worse than no sale.
+
+**Setting the default bid high to buy more volume.** A higher bid enters you in more auctions, and the extra auctions you win are the ones cheaper bidders let go of: search terms that fit your product badly, at a price above your ceiling. The daily budget runs out on that traffic before the sales show up, and the report reads like a demand problem when it was a bid problem.
 
 **Ignoring bid strategy context.** The scenario may specify which strategy is in use. Fixed bids = your bid is your CPC ceiling. Dynamic Up and Down = your actual CPC could be 2x your bid.
 
@@ -142,7 +156,7 @@ You've got everything you need:
 Launch the Bid Elevator when you're ready. Good luck!
 
 :::formula-ladder{id="bid-elevator-ceiling" title="Calculate the ceiling before you elevate the bid"}
-{"steps":[{"label":"Start with selling price","expression":"Price = $40","explanation":"The product economics set the outer boundary."},{"label":"Apply conversion rate","expression":"$40 × 8% = $3.20 expected ad sales per click","explanation":"A click is valuable only when it has a realistic path to an order."},{"label":"Apply target ACoS","expression":"$3.20 × 25% = $0.80 maximum CPC","explanation":"This is the target ceiling, not an instruction to bid the full amount."}],"result":{"label":"Maximum CPC","value":"$0.80","context":"Compare realized CPC to the ceiling before deciding whether to scale."},"note":"A higher bid can buy more volume, but it cannot repair irrelevant traffic or a weak listing."}
+{"steps":[{"label":"Start with selling price","expression":"Price = ₱2,000","explanation":"The product economics set the outer boundary."},{"label":"Apply conversion rate","expression":"₱2,000 × 8% = ₱160 expected ad sales per click","explanation":"A click is valuable only when it has a realistic path to an order."},{"label":"Apply target ACoS","expression":"₱160 × 25% = ₱40 maximum CPC","explanation":"This is the target ceiling, not an instruction to bid the full amount."}],"result":{"label":"Maximum CPC","value":"₱40","context":"Compare realized CPC to the ceiling before deciding whether to scale."},"note":"A higher bid can buy more volume, but it cannot repair irrelevant traffic or a weak listing."}
 :::
 
 ## Your turn

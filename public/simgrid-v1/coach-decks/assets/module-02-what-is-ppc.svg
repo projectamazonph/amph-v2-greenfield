@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="797" viewBox="0 0 1440 797">
+  <rect width="1440" height="797" fill="#F4F5FA"/>
+  <rect width="260" height="797" fill="#0F172A"/>
+  <rect x="0" y="0" width="260" height="92" fill="#111C34"/>
+  <rect x="24" y="24" width="42" height="42" rx="12" fill="#FFFFFF"/>
+  <circle cx="45" cy="45" r="14" fill="#0EA5E9" fill-opacity=".88"/>
+  <path d="M38 47h14M41 41h8M41 53h8" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="80" y="43" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">PPC Coach</text>
+  <text x="80" y="63" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8">Amazon PPC Teaching Companion</text>
+  <circle cx="31" cy="121" r="4" fill="#64748B"/><text x="48" y="126" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#CBD5E1">Dashboard</text><rect x="12" y="145" width="236" height="36" rx="10" fill="#0EA5E9"/><circle cx="31" cy="163" r="4" fill="#0F172A"/><text x="48" y="168" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#0F172A">Lessons</text><circle cx="31" cy="205" r="4" fill="#64748B"/><text x="48" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#CBD5E1">Glossary</text><circle cx="31" cy="247" r="4" fill="#64748B"/><text x="48" y="252" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#CBD5E1">Search Term Trainer</text><circle cx="31" cy="289" r="4" fill="#64748B"/><text x="48" y="294" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#CBD5E1">Campaign Builder</text><circle cx="31" cy="331" r="4" fill="#64748B"/><text x="48" y="336" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#CBD5E1">Report Builder</text><circle cx="31" cy="373" r="4" fill="#64748B"/><text x="48" y="378" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#CBD5E1">Quiz Arena</text><circle cx="31" cy="415" r="4" fill="#64748B"/><text x="48" y="420" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#CBD5E1">AI Coach</text><circle cx="31" cy="457" r="4" fill="#64748B"/><text x="48" y="462" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#CBD5E1">Cohort (Teacher)</text>
+  <rect x="16" y="637" width="228" height="70" rx="14" fill="#FFFFFF" fill-opacity=".06" stroke="#FFFFFF" stroke-opacity=".1"/>
+  <text x="30" y="663" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8">YOUR JOURNEY</text>
+  <text x="30" y="687" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#0EA5E9">Trainee</text>
+  <rect x="30" y="696" width="196" height="6" rx="3" fill="#FFFFFF" fill-opacity=".12"/><rect x="30" y="696" width="36" height="6" rx="3" fill="#0EA5E9"/>
+  <text x="30" y="722" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8">0 XP</text>
+  <rect x="260" width="1180" height="72" fill="#FFFFFF" fill-opacity=".86" stroke="#E2E8F0"/>
+  <text x="300" y="44" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Lessons</text>
+  <rect x="1250" y="23" width="82" height="28" rx="14" fill="#0F172A"/><text x="1291" y="42" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">🎓 Trainee</text>
+  <text x="320" y="126" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#64748B">12 MODULES · 40 LESSONS · QUIZ AFTER EVERY MODULE</text>
+  <rect x="320" y="151" width="1030" height="214" rx="22" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="320" y="151" width="9" height="214" rx="4" fill="#0EA5E9"/>
+  <circle cx="392" cy="221" r="42" fill="#0EA5E9" fill-opacity=".14"/>
+  <text x="392" y="233" text-anchor="middle" font-family="Arial, sans-serif" font-size="32">🖱️</text>
+  <text x="468" y="211" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0EA5E9">MODULE 02</text>
+  <text x="468" y="246" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#0F172A">What is PPC?</text>
+  <text x="468" y="280" font-family="Arial, sans-serif" font-size="16" fill="#64748B"><tspan x="468" dy="0">Pay per click, the auction, and the click journey.</tspan></text>
+  <rect x="1174" y="192" width="126" height="126" rx="20" fill="#0EA5E9" fill-opacity=".1"/>
+  <text x="1237" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="42">🖱️</text>
+  <text x="1237" y="278" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#0EA5E9">3 LESSONS</text>
+  <text x="320" y="402" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">Module lessons</text>
+  <rect x="320" y="425" width="1030" height="60" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/><circle cx="350" cy="455" r="15" fill="#0EA5E9" fill-opacity=".14"/><text x="350" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0EA5E9">1</text><text x="382" y="452" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0F172A"><tspan x="382" dy="0">Pay Per Click in Plain Words</tspan></text><text x="1288" y="459" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#94A3B8">LESSON 1</text><rect x="320" y="501" width="1030" height="60" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/><circle cx="350" cy="531" r="15" fill="#0EA5E9" fill-opacity=".14"/><text x="350" y="536" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0EA5E9">2</text><text x="382" y="528" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0F172A"><tspan x="382" dy="0">The Auction</tspan></text><text x="1288" y="535" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#94A3B8">LESSON 2</text><rect x="320" y="577" width="1030" height="60" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/><circle cx="350" cy="607" r="15" fill="#0EA5E9" fill-opacity=".14"/><text x="350" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0EA5E9">3</text><text x="382" y="604" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0F172A"><tspan x="382" dy="0">The Click Journey and the Funnel</tspan></text><text x="1288" y="611" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#94A3B8">LESSON 3</text>
+  <rect x="320" y="679" width="1030" height="84" rx="18" fill="#0F172A"/>
+  <text x="350" y="713" font-family="Arial, sans-serif" font-size="24">🧠</text>
+  <text x="394" y="710" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Module 2 quiz</text>
+  <text x="394" y="734" font-family="Arial, sans-serif" font-size="12" fill="#CBD5E1">Test your understanding after completing the lessons · pass mark 70%</text>
+  <rect x="1190" y="702" width="120" height="38" rx="10" fill="#0EA5E9"/><text x="1250" y="726" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0F172A">Take quiz →</text>
+</svg>

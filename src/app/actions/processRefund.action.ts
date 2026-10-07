@@ -11,8 +11,16 @@
 import { Result } from "@/domain/shared/Result";
 import { buildContainer } from "@/composition/container";
 import { getSessionUserId } from "@/lib/auth";
-import type { ProcessRefund, ProcessRefundInput, ProcessRefundError } from "@/usecases/ProcessRefund";
-import type { RefundOverride, RefundOverrideInput, RefundOverrideError } from "@/usecases/RefundOverride";
+import type {
+  ProcessRefund,
+  ProcessRefundInput,
+  ProcessRefundError,
+} from "@/usecases/ProcessRefund";
+import type {
+  RefundOverride,
+  RefundOverrideInput,
+  RefundOverrideError,
+} from "@/usecases/RefundOverride";
 import type { UserRepository } from "@/ports/repositories/UserRepository";
 
 export interface ProcessRefundFormInput {
@@ -35,9 +43,7 @@ export async function performProcessRefund(
     refundOverride: RefundOverride;
   },
   input: ProcessRefundFormInput,
-  getCurrentAdminId: (
-    container: { userRepo: UserRepository },
-  ) => Promise<string | null>,
+  getCurrentAdminId: (container: { userRepo: UserRepository }) => Promise<string | null>,
 ): Promise<ProcessRefundActionResult> {
   const adminId = await getCurrentAdminId(container);
   if (!adminId) {
@@ -58,6 +64,7 @@ export async function performProcessRefund(
 
   const r = await container.processRefund.execute({
     orderId: input.orderId,
+    actorId: adminId,
     amountMinor: input.amountMinor,
     reason: input.reason,
   } satisfies ProcessRefundInput);

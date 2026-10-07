@@ -105,6 +105,8 @@ describe("EnrollStudent", () => {
       anonymizeAndDelete: vi.fn(),
       findByIds: vi.fn(),
       recordLoginAttempt: vi.fn(),
+      markWelcomeCompleted: vi.fn(),
+      resetWelcome: vi.fn(),
     };
     mockCourseRepo = {
       findById: vi.fn(),

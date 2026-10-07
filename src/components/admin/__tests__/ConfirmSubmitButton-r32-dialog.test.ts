@@ -57,17 +57,23 @@ describe("M-R32: ConfirmSubmitButton uses Astryx Dialog, not window.confirm (WCA
 
   it("Cancel and Confirm buttons are type=\"button\" so they never submit the form unintentionally", () => {
     const src = readComponent();
-    // Both action buttons inside the dialog must carry type="button".
+    // All buttons (trigger + cancel + confirm) must carry an explicit type.
+    // CLICK-PATH-001: the trigger is type="button" with preventDefault so
+    // the enclosing form only submits via Confirm -> requestSubmit().
     const buttonMatches = src.match(/<button\b[^>]*>/g) ?? [];
     expect(buttonMatches.length).toBeGreaterThanOrEqual(3); // trigger + cancel + confirm
     for (const m of buttonMatches) {
-      // The trigger is type="submit"; the two dialog buttons are type="button".
-      if (m.includes('type="button"') || m.includes('type="submit"')) continue;
-      // Any button without an explicit type is a regression risk.
+      if (m.includes('type="button"')) continue;
+      // Any button without type="button" is a regression risk.
       throw new Error(
-        `Button missing explicit type attribute: ${m}`,
+        `Button missing type="button": ${m}`,
       );
     }
+  });
+
+  it("trigger click prevents the implicit form submit (CLICK-PATH-001)", () => {
+    const src = readComponent();
+    expect(src).toMatch(/preventDefault\(\)/);
   });
 
   it("calls form.requestSubmit() to defer the submit to the enclosing <form action=...>", () => {

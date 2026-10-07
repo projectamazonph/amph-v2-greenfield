@@ -4,12 +4,11 @@ This folder is the handoff for UI-heavy stories (Sprint 10 admin panel, future d
 
 ## Files
 
-| File | What it is |
-|---|---|
-| `DESIGN-SPEC.md` | **Start here.** The distilled design system: tokens, components, motion, layout patterns, page composition, accessibility. **No marketing copy** — design only. |
+| File                | What it is                                                                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DESIGN-SPEC.md`    | **Start here.** The distilled design system: tokens, components, motion, layout patterns, page composition, accessibility. **No marketing copy** — design only.                            |
 | `STITCH-PROMPTS.md` | The original 1555-line Stitch prompt from the parent `amph-v2` repo. Kept for archive; contains brand-specific copy that was stripped from `DESIGN-SPEC.md`. Use for layout patterns only. |
-| `refs/` | React/TS reference files pulled from the parent `amph-v2` repo (admin/users page, dashboard page, home page, etc.). Reference code patterns when building components. |
-| `wireframes/` | Low-fidelity, self-contained HTML wireframes for every planned screen (public, student, tools, admin), each tagged built/ready/planned against the actual repo state. Open directly in a browser. See `wireframes/README.md`. |
+| `refs/`             | React/TS reference files pulled from the parent `amph-v2` repo (admin/users page, dashboard page, home page, etc.). Reference code patterns when building components.                      |
 
 ## How to use it
 

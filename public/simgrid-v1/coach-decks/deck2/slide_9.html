@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; }
+html,body{margin:0}
+.slide-container {
+    width: 1280px;
+    min-height: 720px;
+    background: #f7f8fa;
+    color: #131921;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    overflow: hidden;
+    padding-top: 40px; /* slightly reduced */
+    padding-left: 60px;
+    padding-right: 60px;
+    transform: translateY(-1px); /* shift up 1px so total <720px */
+}
+.eyebrow {
+    font-size: 14px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #ff9900;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 9px;
+}
+.title {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.08;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.rule {
+    height: 3px;
+    background: #131921;
+    margin-top: 16px; /* tightened */
+}
+.layout {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 28px; /* tightened */
+    margin-top: 20px; /* tightened */
+}
+
+/* Left Column */
+.visual-box {
+    background: #fff;
+    border: 1px solid #d7dce2;
+    padding-top: 12px; /* reduced */
+    padding-left: 12px;
+    padding-right: 12px;
+}
+.visual-box img {
+    width: 386px;
+    height: 180px; /* reduced */
+    object-fit: contain;
+    display: block;
+}
+.principle-box {
+    background: #131921;
+    color: #fff;
+    padding-top: 20px; /* reduced */
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 20px; /* reduced */
+    min-height: 160px; /* reduced */
+    border-left: 6px solid #ff9900;
+}
+.principle-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ff9900;
+    margin-bottom: 12px;
+}
+.principle-text {
+    font-size: 20px;
+    line-height: 1.4;
+    color: #dbe2ea;
+}
+
+/* Right Column */
+.right-col {
+    display: flex;
+    flex-direction: column;
+}
+.example-box {
+    background: #fff;
+    border: 1px solid #d7dce2;
+    border-top: 6px solid #de350b;
+    padding-top: 20px; /* reduced */
+    padding-left: 20px;
+    padding-right: 20px;
+    min-height: 140px; /* reduced */
+}
+.example-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #131921;
+    margin-bottom: 12px;
+}
+.example-text {
+    font-size: 18px;
+    line-height: 1.4;
+    color: #4b5563;
+}
+.example-highlight {
+    font-size: 22px;
+    font-weight: 700;
+    color: #de350b;
+    margin-top: 12px;
+}
+
+.list-box {
+    background: #fff;
+    border: 1px solid #d7dce2;
+    padding-top: 20px; /* reduced */
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 20px; /* reduced */
+    min-height: 160px; /* reduced */
+}
+.list-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #131921;
+    margin-bottom: 12px; /* tightened */
+}
+.shopper-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+.shopper-list li {
+    font-size: 18px;
+    color: #131921;
+    margin-bottom: 10px; /* tightened */
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.4;
+}
+.shopper-list li::before {
+    content: "■";
+    color: #131921;
+    font-size: 12px;
+    margin-right: 12px;
+    margin-top: 4px;
+}
+
+.callout {
+    background: #eef8f3;
+    border-left: 4px solid #00875a;
+    color: #145c43;
+    padding-top: 12px; /* reduced */
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-top: 20px; /* reduced */
+    font-size: 18px;
+    line-height: 1.4;
+    min-height: 50px; /* reduced */
+}
+
+.footer {
+    position: absolute;
+    left: 60px;
+    top: 670px; /* moved up slightly */
+    font-size: 13px;
+    color: #64748b;
+}
+.page {
+    position: absolute;
+    right: 60px;
+    top: 670px; /* moved up slightly */
+    font-size: 13px;
+    color: #64748b;
+}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 5 · Lesson 5.1</div>
+  <div class="title">The Listing Does the Selling</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="left-col">
+      <div class="visual-box">
+        <img src="../assets/module-06-listing-readiness.svg" alt="Listing Readiness Visual">
+      </div>
+      <div class="principle-box">
+        <div class="principle-title">The First Law of PPC</div>
+        <div class="principle-text">
+          Ads rent attention, listings convert it. A weak page turns ad budget into tuition. You pay for clicks that never had a chance.
+        </div>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="example-box">
+        <div class="example-title">Worked Example</div>
+        <div class="example-text">
+          100 clicks at $1.00 = $100 spend. One sale of $25.
+        </div>
+        <div class="example-highlight">
+          Before touching bids, ask: would a stranger buy from this page?
+        </div>
+      </div>
+      
+      <div class="list-box">
+        <div class="list-title">How Shoppers Judge</div>
+        <ul class="shopper-list">
+          <li>Shoppers compare you with 15 other results in seconds.</li>
+          <li>Reviews are borrowed trust.</li>
+          <li>Price is judged relative to neighbors, not in absolute terms.</li>
+        </ul>
+      </div>
+      
+      <div class="callout">
+        <strong>Coach tip:</strong> Fix the page first. Then advertise. Always in that order.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Listing Readiness · 5.1 The Listing Does the Selling</div>
+  <div class="page">09 / 12</div>
+</div>
+</body>
+</html>

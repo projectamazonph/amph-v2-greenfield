@@ -18,7 +18,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode, HTMLAttributes } from "react";
 import {
   TradeOffTable,
   ProcessDiagram,
@@ -51,6 +51,8 @@ import type {
   VideoContent,
   TextContent,
 } from "@/domain/entities/Lesson";
+import { GlossaryTermButton } from "@/components/lesson/GlossaryTerm";
+import type { GlossaryManifest } from "@/lib/glossary";
 import styles from "./LessonContent.module.css";
 import { Play, CheckSquare, ChatCircleText } from "@phosphor-icons/react/dist/ssr";
 
@@ -586,6 +588,24 @@ function renderAmphDiv(props: AmphBlockProps): ReactElement | null {
 const markdownComponents = {
   div: renderAmphDiv,
   SelfCheck,
+  h2: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => {
+    const text = typeof children === "string" ? children : "";
+    const id = slugify(text) || undefined;
+    return (
+      <h2 id={id} {...props}>
+        {children}
+      </h2>
+    );
+  },
+  h3: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => {
+    const text = typeof children === "string" ? children : "";
+    const id = slugify(text) || undefined;
+    return (
+      <h3 id={id} {...props}>
+        {children}
+      </h3>
+    );
+  },
 } as const;
 
 function stripDuplicateLeadingTitle(body: string, title: string): string {
@@ -601,15 +621,66 @@ function stripDuplicateLeadingTitle(body: string, title: string): string {
   });
 }
 
-function TextContent({ body, title }: { body: string; title: string }) {
+/** Convert heading text to a stable URL-safe slug. */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+}
+
+function GlossaryWrapper({ slug, manifest }: { slug: string; manifest: GlossaryManifest }) {
+  const term = manifest.terms.find((t) => t.slug === slug) ?? null;
+  if (!term) return <span className={styles.glossaryFallback}>{slug}</span>;
+  return <GlossaryTermButton term={term}>{term.term}</GlossaryTermButton>;
+}
+
+function TextContent({
+  body,
+  title,
+  lessonSlug,
+  glossaryManifest,
+}: {
+  body: string;
+  title: string;
+  lessonSlug: string;
+  glossaryManifest?: GlossaryManifest;
+}) {
   const bodyWithoutDuplicateTitle = stripDuplicateLeadingTitle(body, title);
+  // LEARN-040: inject the lesson identifier into every SelfCheck so
+  // answers are tracked best-effort without changing MDX content.
+  const components = {
+    ...markdownComponents,
+    h2: markdownComponents.h2,
+    h3: markdownComponents.h3,
+    SelfCheck: (props: React.ComponentProps<typeof SelfCheck>) => (
+      <SelfCheck {...props} lessonSlug={lessonSlug} />
+    ),
+    span: (
+      props: {
+        "data-amph-block"?: string;
+        "data-amph-slug"?: string;
+      } & HTMLAttributes<HTMLSpanElement>,
+    ) => {
+      const block = props["data-amph-block"];
+      if (block === "glossary" && glossaryManifest) {
+        const slug = props["data-amph-slug"];
+        if (typeof slug === "string") {
+          return <GlossaryWrapper slug={slug} manifest={glossaryManifest} />;
+        }
+      }
+      return <span {...props} />;
+    },
+  };
 
   return (
-    <div className={styles.prose}>
+    <div className={styles.prose} data-prose>
       <ReactMarkdown
         remarkPlugins={[directivePlugin, remarkGfm]}
         rehypePlugins={[rehypeRaw]}
-        components={markdownComponents}
+        components={components}
       >
         {bodyWithoutDuplicateTitle}
       </ReactMarkdown>
@@ -733,9 +804,10 @@ function QuizCountIcon() {
 export interface LessonContentProps {
   lesson: Lesson;
   courseSlug: string;
+  glossaryManifest?: GlossaryManifest;
 }
 
-export function LessonContent({ lesson, courseSlug }: LessonContentProps) {
+export function LessonContent({ lesson, courseSlug, glossaryManifest }: LessonContentProps) {
   const quizHref = `/courses/${courseSlug}/lessons/${lesson.id}/quiz`;
   const rawContent = lesson.content as unknown;
 
@@ -768,7 +840,14 @@ export function LessonContent({ lesson, courseSlug }: LessonContentProps) {
   }
 
   if (renderable.type === "TEXT") {
-    return <TextContent body={renderable.body} title={lesson.title} />;
+    return (
+      <TextContent
+        body={renderable.body}
+        title={lesson.title}
+        lessonSlug={lesson.id}
+        glossaryManifest={glossaryManifest}
+      />
+    );
   }
 
   if (renderable.type === "VIDEO") {

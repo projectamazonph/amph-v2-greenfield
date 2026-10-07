@@ -1,0 +1,133 @@
+{
+  "project_info": {
+    "title": "Project Amazon PH Academy",
+    "created": 1787338304.137,
+    "last_updated": 1787338678.435,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_1",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_2",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_3",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_4",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_5",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_6",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_7",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_8",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_9",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_10",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "slide_11",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "Project Amazon PH Academy",
+      "summary": "Instructor Deck 1: Foundations & Money Math",
+      "image_plan": "/home/ubuntu/amazon-ph-simulators/docs/screenshots/simgrid-hub.jpg - Cover slide matches the Project Amazon PH Academy platform interface shown in Image 1"
+    },
+    {
+      "id": "slide_1",
+      "title": "Learn, simulate, explain, log",
+      "summary": "Course philosophy: safe PPC judgment, 12 modules, and evidence-based changes."
+    },
+    {
+      "id": "slide_2",
+      "title": "Visibility creates the first chance to sell",
+      "summary": "Shopper journey, organic vs sponsored traffic, and prerequisites like Buy Box."
+    },
+    {
+      "id": "slide_3",
+      "title": "The listing earns the sale",
+      "summary": "Ads rent attention, the page converts it. Seven readiness checks and a quick exercise."
+    },
+    {
+      "id": "slide_4",
+      "title": "PPC pays for the click",
+      "summary": "Impressions vs clicks, bids, auction mechanics, and a video watch prompt."
+    },
+    {
+      "id": "slide_5",
+      "title": "Funnel leaks explain performance",
+      "summary": "Impressions to orders funnel, diagnosing low impressions, CTR, and conversion."
+    },
+    {
+      "id": "slide_6",
+      "title": "Master the metric stack",
+      "summary": "Definitions for CPC, CTR, Conversion, and ACOS."
+    },
+    {
+      "id": "slide_7",
+      "title": "Metrics become decisions",
+      "summary": "Definitions for ROAS, TACoS, and Break-even ACOS. Good economics vs lower bids."
+    },
+    {
+      "id": "slide_8",
+      "title": "Same product, different economics",
+      "summary": "Broad vs long-tail keyword economics example and a debrief question."
+    },
+    {
+      "id": "slide_9",
+      "title": "Guided calculation drill",
+      "summary": "Calculation exercise for CPC, CTR, Conversion, ACOS, ROAS, and Break-even ACOS."
+    },
+    {
+      "id": "slide_10",
+      "title": "Simulator lab: from page to economics",
+      "summary": "BuyBox Dojo and Keyword Lab activities, emphasizing evidence, action, risk, and next check."
+    },
+    {
+      "id": "slide_11",
+      "title": "Foundation evidence gate",
+      "summary": "Assignment, assessment criteria, and exit question for the foundations block."
+    }
+  ]
+}

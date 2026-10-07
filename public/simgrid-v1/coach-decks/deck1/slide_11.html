@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#f7f8fa}
+.slide-container{width:1280px;min-height:720px;background:#f7f8fa;color:#131921;font-family:Arial,Helvetica,sans-serif;position:relative;overflow:hidden;padding-top:42px;padding-left:60px;padding-right:60px}
+.eyebrow{font-size:14px;letter-spacing:1.8px;text-transform:uppercase;color:#ff9900;font-weight:700;margin-bottom:9px}
+.title{font-size:40px;font-weight:800;line-height:1.08}
+.rule{height:3px;background:#131921;margin-top:18px}
+.layout{display:grid;grid-template-columns:480px 1fr;gap:30px;margin-top:24px}
+.left-col{display:flex;flex-direction:column;gap:16px}
+.formula-box{background:#131921;color:#fff;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px;border-left:6px solid #ff9900}
+.formula-title{font-size:20px;color:#ff9900;font-weight:700;margin-bottom:8px}
+.formula{font-size:24px;font-weight:800;margin-bottom:8px}
+.formula-desc{font-size:16px;color:#dbe2ea;line-height:1.4}
+.table-wrap{background:#fff;border:1px solid #d7dce2;padding-top:12px;padding-left:12px;padding-right:12px;padding-bottom:12px}
+.table{width:100%;border-collapse:collapse;font-size:16px}
+.table th{background:#131921;color:#fff;text-align:left;padding-top:10px;padding-left:10px;padding-right:10px;padding-bottom:10px}
+.table td{padding-top:10px;padding-left:10px;padding-right:10px;padding-bottom:10px;border-bottom:1px solid #d7dce2;color:#131921}
+.table tr:nth-child(even) td{background:#f1f3f5}
+.right-col{display:flex;flex-direction:column;gap:16px}
+.scenario-box{background:#fff;border:1px solid #d7dce2;padding-top:20px;padding-left:20px;padding-right:20px;padding-bottom:20px}
+.scenario-title{font-size:22px;font-weight:700;color:#131921;margin-bottom:12px}
+.scenario-desc{font-size:18px;color:#4b5563;line-height:1.4;margin-bottom:16px}
+.scenario-table{width:100%;border-collapse:collapse;font-size:16px;text-align:center}
+.scenario-table th{background:#f1f3f5;color:#4b5563;padding-top:10px;padding-left:10px;padding-right:10px;padding-bottom:10px;border-bottom:2px solid #d7dce2}
+.scenario-table td{padding-top:12px;padding-left:10px;padding-right:10px;padding-bottom:12px;border-bottom:1px solid #d7dce2;font-weight:700}
+.scenario-table td:first-child{text-align:left}
+.risk{color:#de350b}
+.safe{color:#00875a}
+.callout{background:#eef8f3;border-left:4px solid #00875a;color:#145c43;padding-top:14px;padding-left:14px;padding-right:14px;padding-bottom:14px;font-size:18px;line-height:1.4}
+.footer{position:absolute;left:60px;top:672px;font-size:13px;color:#64748b}
+.page{position:absolute;right:60px;top:672px;font-size:13px;color:#64748b}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">Module 2 · Lesson 2.4</div>
+  <div class="title">ROAS, TACoS & Full Worked Example</div>
+  <div class="rule"></div>
+  
+  <div class="layout">
+    <div class="left-col">
+      <div class="formula-box">
+        <div class="formula-title">Return on Ad Spend (ROAS)</div>
+        <div class="formula">ROAS = Sales ÷ Spend</div>
+        <div class="formula-desc">The mirror of ACOS. Higher is better.</div>
+      </div>
+      
+      <div class="formula-box" style="border-left-color: #4f8c9a;">
+        <div class="formula-title" style="color: #4f8c9a;">Total ACOS (TACoS)</div>
+        <div class="formula">TACoS = Ad Spend ÷ Total Revenue</div>
+        <div class="formula-desc">Ads compared to the whole business, including organic sales.</div>
+      </div>
+      
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Use it when...</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ACOS</strong></td>
+              <td>Judging individual campaigns</td>
+            </tr>
+            <tr>
+              <td><strong>ROAS</strong></td>
+              <td>Quick comparisons</td>
+            </tr>
+            <tr>
+              <td><strong>TACoS</strong></td>
+              <td>Checking whether ads grow the whole brand</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="scenario-box">
+        <div class="scenario-title">Worked Example: Keyword Economics</div>
+        <div class="scenario-desc">
+          <strong>Product:</strong> Bamboo board ($25)<br>
+          <strong>Profit after costs:</strong> $7.50<br>
+          <strong>Profit Margin (Break-even ACOS):</strong> 30%
+        </div>
+        
+        <table class="scenario-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Scenario</th>
+              <th>CPC</th>
+              <th>Conversion</th>
+              <th>Cost per sale</th>
+              <th>ACOS</th>
+              <th>Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Broad keyword</td>
+              <td>$1.00</td>
+              <td>10%</td>
+              <td>$10.00</td>
+              <td class="risk">40%</td>
+              <td class="risk">Loses money</td>
+            </tr>
+            <tr>
+              <td>Long-tail keyword</td>
+              <td>$0.60</td>
+              <td>15%</td>
+              <td>$4.00</td>
+              <td class="safe">16%</td>
+              <td class="safe">Profitable</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div style="margin-top:16px;font-size:16px;color:#4b5563;line-height:1.4">
+          Same product, same page — different keyword economics. That is why choosing keywords is money management.
+        </div>
+      </div>
+      
+      <div class="callout">
+        <b>Coach tip:</b> When ACOS is too high, do not only cut bids. A more specific keyword is often the cheaper fix.
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">Source: PPC Coach · Money Math · 2.4 ROAS, TACoS and a Full Worked Example</div>
+  <div class="page">11 / 12</div>
+</div>
+</body>
+</html>

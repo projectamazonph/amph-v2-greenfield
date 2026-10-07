@@ -1,0 +1,130 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.bell:hover,
+.bell:focus-visible {
+  background: var(--surface-2);
+  outline: 0;
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--danger);
+  color: var(--ink-inverse);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.dropdown {
+  position: absolute;
+  z-index: 20;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(15, 17, 17, 0.12);
+}
+
+.dropdownHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.markAll {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.markAll:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  margin: 0;
+  padding: 16px 12px;
+  color: var(--ink-700);
+  font-size: 14px;
+  text-align: center;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.unread {
+  background: var(--accent-soft);
+}
+
+.read {
+  background: transparent;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.itemTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.itemBody {
+  font-size: 13px;
+  color: var(--ink-700);
+}

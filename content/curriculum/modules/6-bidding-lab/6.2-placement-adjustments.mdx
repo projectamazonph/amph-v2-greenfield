@@ -16,6 +16,18 @@ After this lesson, you can calculate a product's maximum effective CPC (cost per
 
 Before setting a placement adjustment, divide your maximum CPC for your target ACoS (advertising cost of sales) by the placement and dynamic-bid multipliers combined. Treat whatever base bid that leaves as your ceiling, not the maximum CPC number itself.
 
+:::callout{id="lesson-6-2-pitfall" variant="pitfall" title="Layering placement adjustments on top of Dynamic Bids without checking realized CPC"}
+Placement adjustments stack with Dynamic Bids. A +50% top-of-search adjustment on a +100% dynamic increase is 3x your base bid, which can blow past your max CPC. Check realized CPC against the ceiling before adding adjustments.
+:::
+
+<SelfCheck
+  id="sc-6-2"
+  prompt="Base bid ₱50, Dynamic Up and Down at its maximum increase, and a +900% top-of-search adjustment. What is the effective bid at top of search?"
+  options={["₱100", "₱500", "₱1,000", "₱1,500"]}
+  answerIndex={2}
+  explanation="The multipliers stack instead of adding: ₱50 × 2.0 × 10.0 = ₱1,000. That is why you divide your maximum CPC by the combined multipliers before choosing a base bid."
+/>
+
 Not all ad spots on Amazon are equal. The top of page 1 is prime real estate: shoppers see it first, click more, and buy more. Product detail pages are a different game entirely. Placement adjustments let you bid more aggressively for the spots that work best for your products.
 
 But here's the catch: these adjustments stack with your bid strategy, creating multiplicative effects that can blow through your budget if you're not careful.
@@ -45,7 +57,7 @@ A placement adjustment is a **percentage increase** on top of your base bid. It 
 - Effective bid at Product Pages: ₱50 (unchanged)
 - Effective bid at Rest of Search: ₱50 (unchanged)
 
-The adjustment is always additive. You can set it from 0% to 900% for top-of-search and product pages.
+A single placement adjustment adds to your base bid. You can set it from 0% to 900% for top-of-search and product pages. Two adjustments stacked on each other do not add; they multiply, as The Multiplier Trap below shows.
 
 **Key Takeaway.** Placement adjustments make your bid MORE expensive for specific spots. They don't make other spots cheaper. They only make targeted spots pricier.
 
@@ -67,13 +79,13 @@ That is a 20x multiplier. One click could cost ₱1,000 when you expected ₱50.
 - Base bid: ₱38
 - Dynamic Up and Down: +30% (typical)
 - Top of Search: +50%
-- Effective bid: ₱38 × 1.3 × 1.5 = **₱73**
+- Effective bid: ₱38 × 1.3 × 1.5 = **₱74.10**
 
 Still nearly 2x your base bid. Calculate before you set.
 
 ## Try This: Calculate Your Maximum CPC
 
-Your product sells for ₱1,750, converts at 12%, and you want a 25% ACoS (advertising cost of sales). You plan to use Dynamic Down Only with a +50% top-of-search adjustment.
+Your product sells for ₱1,750. It converts at 12%. Your target ACoS is 25%. You plan to use Dynamic Down Only with a +50% top-of-search adjustment.
 
 **Step 1**: Calculate your maximum CPC for that 25% target ACoS.
 `₱1,750 × 0.12 × 0.25 = ₱53`
@@ -81,7 +93,7 @@ Your product sells for ₱1,750, converts at 12%, and you want a 25% ACoS (adver
 **Step 2**: Account for the placement adjustment.
 `₱53 ÷ 1.5 = ₱35` (your max base bid)
 
-**Step 3**: If using Dynamic Up and Down instead, account for that too.
+**Step 3**: If you used Dynamic Up and Down instead, assume the same typical +30% raise from the safer scenario above and account for it too.
 `₱53 ÷ 1.3 ÷ 1.5 = ₱27` (your max base bid with dynamic + placement)
 
 If your base bid exceeds ₱27, your top-of-search CPC could push above the 25% target. (This is your maximum CPC for that target, not necessarily the product's true break-even margin. Confirm the two are the same before treating this as a profit line, not just a target line.)
@@ -138,7 +150,7 @@ Work this through before checking the answer.
 
 You manage a pet water fountain campaign: price ₱2,100, CVR 9%, target ACoS 22%. The client wants to test Dynamic Up and Down (typical +40% increase) together with a +60% top-of-search placement adjustment. Before reading further: what's the max CPC at the 22% ACoS target, and what base bid keeps you under that ceiling? Both the dynamic increase and the placement adjustment are stacked on top.
 
-**Work it through.** Max CPC = ₱2,100 × 0.09 × 0.22 = ₱42 (rounded). If only the placement adjustment applies, the max base bid is ₱42 ÷ 1.60 = ₱26. With both the +40% dynamic increase and the +60% placement adjustment stacked together, the max base bid drops to ₱42 ÷ (1.40 × 1.60) = ₱42 ÷ 2.24 = about ₱19. Set the base bid at or below ₱19 if both multipliers can be live at the same time. Otherwise, a top-of-search click can push past the 22% target. Remember this ₱42 is the ceiling for that target ACoS, not necessarily the product's actual break-even margin, so confirm the two line up before treating it as a profit line.
+**Work it through.** Max CPC = ₱2,100 × 0.09 × 0.22 = ₱42 (rounded). If only the placement adjustment applies, the max base bid is ₱42 ÷ 1.60 = ₱26. With both the +40% dynamic increase and the +60% placement adjustment stacked together, the max base bid drops to ₱42 ÷ (1.40 × 1.60) = ₱42 ÷ 2.24 = ₱18.75, so ₱18. Round a ceiling down, not up: ₱19 × 2.24 is ₱42.56, already past the ₱42 this product can support. Set the base bid at or below ₱18 if both multipliers can be live at the same time. Otherwise, a top-of-search click can push past the 22% target. Remember this ₱42 is the ceiling for that target ACoS, not necessarily the product's actual break-even margin, so confirm the two line up before treating it as a profit line.
 
 ## Add to your worksheet
 
@@ -159,8 +171,8 @@ What the learner can do: Check whether the account has Rest of Search bid adjust
 Who can access it: Sponsored Products advertisers, availability may vary by account
 Retailer or marketplace scope: Amazon Advertising Console
 Official source URL: https://advertising.amazon.com/help, specific placement-adjustment article not verified; content owner to confirm and link at rewrite time
-Last verified: pending content-owner review
-Next review due: pending content-owner review
+Last verified: 2026-09-25
+Next review due: 2026-01-25
 Owner: Ryan Roland Dabao
 ```
 

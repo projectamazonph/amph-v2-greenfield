@@ -4,16 +4,40 @@
  */
 
 .layout {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   min-height: 100vh;
   background: var(--surface-0);
   font-family: var(--font-body);
+  grid-template-areas:
+    "sidebar main toc";
 }
 
 .main {
-  flex: 1;
+  grid-area: main;
   min-width: 0;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar occupies its own grid column */
+:global(.lesson-sidebar) {
+  grid-area: sidebar;
+}
+
+/* TOC column */
+:global(.lesson-toc) {
+  grid-area: toc;
+  width: 0; /* hidden by default; LessonToc handles its own visibility */
+  overflow: hidden;
+}
+
+@media (min-width: 1280px) {
+  :global(.lesson-toc) {
+    width: 220px;
+    overflow: visible;
+  }
 }
 
 .content {
@@ -315,7 +339,11 @@
    an unusable width on a phone. Stack them instead. */
 @media (max-width: 767px) {
   .layout {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "sidebar"
+      "main"
+      "toc";
   }
 
   .main {
@@ -346,13 +374,5 @@
 
   .completionForm {
     width: 100%;
-  }
-
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    max-height: 40vh;
-    overflow-y: auto;
   }
 }

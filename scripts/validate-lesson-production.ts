@@ -6,7 +6,14 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { parseDirectiveAttrs } from "../src/lib/mdx/directive-plugin";
 
-type Block = "outcome" | "decision" | "workedExample" | "activeAttempt" | "feedback" | "evidence" | "retrieval";
+type Block =
+  | "outcome"
+  | "decision"
+  | "workedExample"
+  | "activeAttempt"
+  | "feedback"
+  | "evidence"
+  | "retrieval";
 
 const REQUIRED: Record<Block, RegExp> = {
   outcome: /^##\s+What you can do after this lesson\s*$/im,
@@ -38,16 +45,58 @@ interface BlockIssue {
 const FENCE_OPEN = /^:::([a-z-]+)(?:\{([^}]*)\})?\s*$/;
 const FENCE_CLOSE = /^:::\s*$/;
 const ID_PATTERN = /^[a-z][a-z0-9-]*$/;
-const TRANCHE_ONE_DIRECTIVES = new Set(["comparison-table", "formula-ladder", "classification-board", "decision-flow", "simulation-rubric"]);
-const TRANCHE_TWO_DIRECTIVES = new Set(["annotated-listing", "hierarchy-builder", "funnel-canvas", "timeline-calendar", "competitive-gap-matrix", "insight-router", "lesson-pathway", "simulation-brief", "portfolio-map", "seasonal-calendar", "evidence-ledger", "sov-positioner"]);
-const ALLOWED_DIRECTIVES = new Set(["trade-off", "process", "callout", "visual", "slide", ...TRANCHE_ONE_DIRECTIVES, ...TRANCHE_TWO_DIRECTIVES]);
+const TRANCHE_ONE_DIRECTIVES = new Set([
+  "comparison-table",
+  "formula-ladder",
+  "classification-board",
+  "decision-flow",
+  "simulation-rubric",
+]);
+const TRANCHE_TWO_DIRECTIVES = new Set([
+  "annotated-listing",
+  "hierarchy-builder",
+  "funnel-canvas",
+  "timeline-calendar",
+  "competitive-gap-matrix",
+  "insight-router",
+  "lesson-pathway",
+  "simulation-brief",
+  "portfolio-map",
+  "seasonal-calendar",
+  "evidence-ledger",
+  "sov-positioner",
+]);
+const ALLOWED_DIRECTIVES = new Set([
+  "trade-off",
+  "process",
+  "callout",
+  "visual",
+  "slide",
+  // STORY-163: Module 1 worksheet artifact.
+  "worksheet",
+  ...TRANCHE_ONE_DIRECTIVES,
+  ...TRANCHE_TWO_DIRECTIVES,
+]);
 const ALLOWED_CALLOUT_VARIANTS = new Set(["info", "warning", "pitfall"]);
 const EM_DASH = "\u2014";
 
 // Extract JSX attributes from a SelfCheck body. Handles name="..." (double-quoted),
 // name='...' (single-quoted), and name={...} (brace-delimited expression, up to
 // 2 levels of nested braces). The brace value is returned WITHOUT the outer braces.
-const JSX_ATTR_RE = /([a-zA-Z][\w-]*)\s*=\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\{(?:[^{}]|\{[^{}]*\})*\})/g;
+// Match a JSX attribute value. Three forms:
+//   name="..."          double-quoted string
+//   name='...'          single-quoted string
+//   name={EXPR}         brace-delimited expression; EXPR may contain
+//                       brackets and braces at up to 2 levels of nesting.
+// The brace alternative below must be permissive enough to match
+// `options={["a", "b"]}` and `answerIndex={4}` -- prior versions
+// (e.g. `\{(?:[^{}]|\{[^{}]*\})*\}`) failed in the V8/JS regex engine
+// when the body contained `[` or `]` even though both characters are
+// in the negated class. The fix uses `\{[^}]*\}` (greedy non-`}`
+// run, then closing brace) for the captured group, with the trailing
+// whitespace OUTSIDE the group so slice(1, -1) correctly strips the
+// braces and leaves the inner expression untouched.
+const JSX_ATTR_RE = /([a-zA-Z][\w-]*)\s*=\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\{[^}]*\})\s*/g;
 
 function extractJsxAttrs(body: string): Record<string, string> {
   const out: Record<string, string> = {};
@@ -99,9 +148,17 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
 
     const id = attrs.id;
     if (!id) {
-      issues.push({ file, line: lineNo, message: `${name} block is missing required 'id' attribute` });
+      issues.push({
+        file,
+        line: lineNo,
+        message: `${name} block is missing required 'id' attribute`,
+      });
     } else if (!ID_PATTERN.test(id)) {
-      issues.push({ file, line: lineNo, message: `${name} id '${id}' must be lowercase kebab-case` });
+      issues.push({
+        file,
+        line: lineNo,
+        message: `${name} id '${id}' must be lowercase kebab-case`,
+      });
     } else if (seenIds.has(id)) {
       issues.push({ file, line: lineNo, message: `Duplicate block id '${id}' in lesson` });
     } else if (id) {
@@ -117,7 +174,11 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
       const dataRows = tableLines.filter((l) => !/^\|?\s*[-:|\s]+\s*\|?\s*$/.test(l));
       // Subtract 1 for the header row itself.
       if (dataRows.length - 1 < 2) {
-        issues.push({ file, line: lineNo, message: "trade-off needs at least 2 data rows in its markdown table" });
+        issues.push({
+          file,
+          line: lineNo,
+          message: "trade-off needs at least 2 data rows in its markdown table",
+        });
       }
       if (closeIdx !== -1) i = closeIdx;
       continue;
@@ -130,7 +191,10 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
       if (!attrs.steps) {
         issues.push({ file, line: lineNo, message: "process requires a 'steps' attribute" });
       } else {
-        const steps = attrs.steps.split("|").map((s) => s.trim()).filter(Boolean);
+        const steps = attrs.steps
+          .split("|")
+          .map((s) => s.trim())
+          .filter(Boolean);
         if (steps.length < 2) {
           issues.push({ file, line: lineNo, message: "process needs at least 2 steps" });
         }
@@ -173,55 +237,150 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
       } else {
         try {
           const value = JSON.parse(payload) as Record<string, unknown>;
-          if (name === "comparison-table" && (!Array.isArray(value.columns) || value.columns.length < 2 || !Array.isArray(value.rows) || value.rows.length < 2)) {
-            issues.push({ file, line: lineNo, message: "comparison-table needs at least 2 columns and 2 rows" });
+          if (
+            name === "comparison-table" &&
+            (!Array.isArray(value.columns) ||
+              value.columns.length < 2 ||
+              !Array.isArray(value.rows) ||
+              value.rows.length < 2)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "comparison-table needs at least 2 columns and 2 rows",
+            });
           }
-          if (name === "formula-ladder" && (!Array.isArray(value.steps) || value.steps.length < 2)) {
+          if (
+            name === "formula-ladder" &&
+            (!Array.isArray(value.steps) || value.steps.length < 2)
+          ) {
             issues.push({ file, line: lineNo, message: "formula-ladder needs at least 2 steps" });
           }
-          if (name === "classification-board" && (!Array.isArray(value.categories) || value.categories.length < 2 || !Array.isArray(value.items) || value.items.length < 1)) {
-            issues.push({ file, line: lineNo, message: "classification-board needs at least 2 categories and 1 item" });
+          if (
+            name === "classification-board" &&
+            (!Array.isArray(value.categories) ||
+              value.categories.length < 2 ||
+              !Array.isArray(value.items) ||
+              value.items.length < 1)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "classification-board needs at least 2 categories and 1 item",
+            });
           }
           if (name === "decision-flow" && (!Array.isArray(value.steps) || value.steps.length < 2)) {
             issues.push({ file, line: lineNo, message: "decision-flow needs at least 2 steps" });
           }
-          if (name === "simulation-rubric" && (typeof value.scenario !== "string" || !Array.isArray(value.criteria) || value.criteria.length < 2)) {
-            issues.push({ file, line: lineNo, message: "simulation-rubric needs a scenario and at least 2 criteria" });
+          if (
+            name === "simulation-rubric" &&
+            (typeof value.scenario !== "string" ||
+              !Array.isArray(value.criteria) ||
+              value.criteria.length < 2)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "simulation-rubric needs a scenario and at least 2 criteria",
+            });
           }
-          if (name === "annotated-listing" && (!Array.isArray(value.sections) || value.sections.length < 2)) {
-            issues.push({ file, line: lineNo, message: "annotated-listing needs at least 2 sections" });
+          if (
+            name === "annotated-listing" &&
+            (!Array.isArray(value.sections) || value.sections.length < 2)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "annotated-listing needs at least 2 sections",
+            });
           }
           if (name === "hierarchy-builder" && (!value.root || typeof value.root !== "object")) {
             issues.push({ file, line: lineNo, message: "hierarchy-builder needs a root node" });
           }
-          if (name === "funnel-canvas" && (!Array.isArray(value.stages) || value.stages.length < 2)) {
+          if (
+            name === "funnel-canvas" &&
+            (!Array.isArray(value.stages) || value.stages.length < 2)
+          ) {
             issues.push({ file, line: lineNo, message: "funnel-canvas needs at least 2 stages" });
           }
-          if (name === "timeline-calendar" && (!Array.isArray(value.periods) || value.periods.length < 2 || !Array.isArray(value.rows) || value.rows.length < 1)) {
-            issues.push({ file, line: lineNo, message: "timeline-calendar needs at least 2 periods and 1 row" });
+          if (
+            name === "timeline-calendar" &&
+            (!Array.isArray(value.periods) ||
+              value.periods.length < 2 ||
+              !Array.isArray(value.rows) ||
+              value.rows.length < 1)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "timeline-calendar needs at least 2 periods and 1 row",
+            });
           }
-          if (name === "competitive-gap-matrix" && (!Array.isArray(value.dimensions) || value.dimensions.length < 2 || !Array.isArray(value.competitors) || value.competitors.length < 2)) {
-            issues.push({ file, line: lineNo, message: "competitive-gap-matrix needs at least 2 dimensions and 2 competitors" });
+          if (
+            name === "competitive-gap-matrix" &&
+            (!Array.isArray(value.dimensions) ||
+              value.dimensions.length < 2 ||
+              !Array.isArray(value.competitors) ||
+              value.competitors.length < 2)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "competitive-gap-matrix needs at least 2 dimensions and 2 competitors",
+            });
           }
-          if (name === "insight-router" && (!Array.isArray(value.routes) || value.routes.length < 2)) {
+          if (
+            name === "insight-router" &&
+            (!Array.isArray(value.routes) || value.routes.length < 2)
+          ) {
             issues.push({ file, line: lineNo, message: "insight-router needs at least 2 routes" });
           }
-          if (name === "lesson-pathway" && (!Array.isArray(value.steps) || value.steps.length < 2)) {
+          if (
+            name === "lesson-pathway" &&
+            (!Array.isArray(value.steps) || value.steps.length < 2)
+          ) {
             issues.push({ file, line: lineNo, message: "lesson-pathway needs at least 2 steps" });
           }
-          if (name === "simulation-brief" && (!Array.isArray(value.fields) || value.fields.length < 2)) {
-            issues.push({ file, line: lineNo, message: "simulation-brief needs at least 2 fields" });
+          if (
+            name === "simulation-brief" &&
+            (!Array.isArray(value.fields) || value.fields.length < 2)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "simulation-brief needs at least 2 fields",
+            });
           }
-          if (name === "portfolio-map" && (!Array.isArray(value.groups) || value.groups.length < 2)) {
+          if (
+            name === "portfolio-map" &&
+            (!Array.isArray(value.groups) || value.groups.length < 2)
+          ) {
             issues.push({ file, line: lineNo, message: "portfolio-map needs at least 2 groups" });
           }
-          if (name === "seasonal-calendar" && (!Array.isArray(value.phases) || value.phases.length < 2)) {
-            issues.push({ file, line: lineNo, message: "seasonal-calendar needs at least 2 phases" });
+          if (
+            name === "seasonal-calendar" &&
+            (!Array.isArray(value.phases) || value.phases.length < 2)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "seasonal-calendar needs at least 2 phases",
+            });
           }
-          if (name === "evidence-ledger" && (!Array.isArray(value.entries) || value.entries.length < 2)) {
-            issues.push({ file, line: lineNo, message: "evidence-ledger needs at least 2 entries" });
+          if (
+            name === "evidence-ledger" &&
+            (!Array.isArray(value.entries) || value.entries.length < 2)
+          ) {
+            issues.push({
+              file,
+              line: lineNo,
+              message: "evidence-ledger needs at least 2 entries",
+            });
           }
-          if (name === "sov-positioner" && (!Array.isArray(value.bands) || value.bands.length < 2)) {
+          if (
+            name === "sov-positioner" &&
+            (!Array.isArray(value.bands) || value.bands.length < 2)
+          ) {
             issues.push({ file, line: lineNo, message: "sov-positioner needs at least 2 bands" });
           }
         } catch {
@@ -235,7 +394,11 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
     if (name === "callout") {
       const variant = attrs.variant ?? "info";
       if (!ALLOWED_CALLOUT_VARIANTS.has(variant)) {
-        issues.push({ file, line: lineNo, message: `callout variant must be info|warning|pitfall, got ${variant}` });
+        issues.push({
+          file,
+          line: lineNo,
+          message: `callout variant must be info|warning|pitfall, got ${variant}`,
+        });
       }
       const { closeIdx, body } = findFenceBody(lines, i + 1);
       const nonEmptyBody = body.some((l) => l.trim().length > 0);
@@ -260,7 +423,11 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
       continue;
     }
     if (insideFence && lines[i].includes(EM_DASH)) {
-      issues.push({ file, line: i + 1, message: "Block content uses em-dash; voice guide forbids it" });
+      issues.push({
+        file,
+        line: i + 1,
+        message: "Block content uses em-dash; voice guide forbids it",
+      });
     }
   }
 
@@ -276,7 +443,11 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
     if (!id) {
       issues.push({ file, line: offset, message: "SelfCheck is missing required 'id' attribute" });
     } else if (!ID_PATTERN.test(id)) {
-      issues.push({ file, line: offset, message: `SelfCheck id '${id}' must be lowercase kebab-case` });
+      issues.push({
+        file,
+        line: offset,
+        message: `SelfCheck id '${id}' must be lowercase kebab-case`,
+      });
     } else if (seenIds.has(id)) {
       issues.push({ file, line: offset, message: `Duplicate block id '${id}' in lesson` });
     } else {
@@ -284,19 +455,35 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
     }
 
     if (!attrs.prompt) {
-      issues.push({ file, line: offset, message: "SelfCheck is missing required 'prompt' attribute" });
+      issues.push({
+        file,
+        line: offset,
+        message: "SelfCheck is missing required 'prompt' attribute",
+      });
     }
 
     if (!attrs.options) {
-      issues.push({ file, line: offset, message: "SelfCheck is missing required 'options' attribute" });
+      issues.push({
+        file,
+        line: offset,
+        message: "SelfCheck is missing required 'options' attribute",
+      });
     } else {
       const optsMatch = attrs.options.match(/^\s*\[\s*([\s\S]*?)\s*\]\s*$/);
       if (!optsMatch) {
-        issues.push({ file, line: offset, message: "SelfCheck options must be a string[] literal" });
+        issues.push({
+          file,
+          line: offset,
+          message: "SelfCheck options must be a string[] literal",
+        });
       } else {
         const optCount = countStringLiterals(optsMatch[1]);
         if (optCount < 2 || optCount > 5) {
-          issues.push({ file, line: offset, message: `SelfCheck options.length must be in [2,5], got ${optCount}` });
+          issues.push({
+            file,
+            line: offset,
+            message: `SelfCheck options.length must be in [2,5], got ${optCount}`,
+          });
         }
         const answerIdx = Number(attrs.answerIndex);
         if (!Number.isFinite(answerIdx) || answerIdx < 0 || answerIdx >= optCount) {
@@ -310,7 +497,11 @@ function validateActivePracticeBlocks(source: string, file: string): BlockIssue[
     }
 
     if (!attrs.explanation) {
-      issues.push({ file, line: offset, message: "SelfCheck is missing required 'explanation' attribute" });
+      issues.push({
+        file,
+        line: offset,
+        message: "SelfCheck is missing required 'explanation' attribute",
+      });
     } else if (attrs.explanation.length < 12) {
       issues.push({
         file,
@@ -352,10 +543,14 @@ const report = {
 };
 
 if (reportPath) await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
-console.log(`Lesson production contract: ${report.completeLessonCount}/${report.lessonCount} lessons complete`);
-for (const lesson of missingLessons) console.log(`- ${lesson.file}: missing ${lesson.missing.join(", ")}`);
+console.log(
+  `Lesson production contract: ${report.completeLessonCount}/${report.lessonCount} lessons complete`,
+);
+for (const lesson of missingLessons)
+  console.log(`- ${lesson.file}: missing ${lesson.missing.join(", ")}`);
 for (const lesson of lessons) {
-  for (const issue of lesson.blockIssues) console.error(`[${issue.file}:${issue.line}] ${issue.message}`);
+  for (const issue of lesson.blockIssues)
+    console.error(`[${issue.file}:${issue.line}] ${issue.message}`);
 }
 if (report.activePracticeBlockIssueCount > 0) {
   console.log(`Active-practice block issues: ${report.activePracticeBlockIssueCount}`);

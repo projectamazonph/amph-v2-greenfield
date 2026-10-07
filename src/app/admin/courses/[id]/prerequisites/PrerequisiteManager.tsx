@@ -73,6 +73,10 @@ export function PrerequisiteManager({ courseId, rules, otherCourses }: Props) {
   const [selectedCourseId, setSelectedCourseId] = useState(
     otherCourses[0]?.id ?? "",
   );
+  // CLICK-PATH-003: the scope select is uncontrolled, so keep it keyed to
+  // the course. Changing course remounts the select at "Whole course"
+  // instead of posting a stale lesson id from the previous course.
+  const [scopeKey, setScopeKey] = useState(selectedCourseId);
   const selectedCourse = otherCourses.find((c) => c.id === selectedCourseId) ?? null;
 
   const errorText = state?.kind === "error" ? (state.message ?? state.error) : null;
@@ -112,7 +116,10 @@ export function PrerequisiteManager({ courseId, rules, otherCourses }: Props) {
           <select
             name="requiresCourseId"
             value={selectedCourseId}
-            onChange={(e) => setSelectedCourseId(e.target.value)}
+            onChange={(e) => {
+              setSelectedCourseId(e.target.value);
+              setScopeKey(e.target.value);
+            }}
             className={styles.select}
             disabled={isPending || otherCourses.length === 0}
           >
@@ -125,7 +132,13 @@ export function PrerequisiteManager({ courseId, rules, otherCourses }: Props) {
         </label>
         <label className={styles.field}>
           <span className={styles.label}>Scope</span>
-          <select name="requiresLessonId" className={styles.select} disabled={isPending}>
+          <select
+            key={scopeKey}
+            name="requiresLessonId"
+            className={styles.select}
+            disabled={isPending}
+            defaultValue=""
+          >
             <option value="">Whole course (finish every lesson)</option>
             {(selectedCourse?.lessons ?? []).map((lesson) => (
               <option key={lesson.id} value={lesson.id}>

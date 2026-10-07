@@ -1,4 +1,4 @@
-/**
+﻿/**
  * UserRepository port — the interface for persisting and retrieving users.
  *
  * Defined in src/ports/ so the domain and use-case layers can depend on
@@ -7,7 +7,7 @@
  * ADR-014: Every port method returns Result<T, E>. No exceptions across boundaries.
  */
 
-import type { User, SubscriptionTier } from "@/domain/entities/User";
+import type { User, SubscriptionTier, Role } from "@/domain/entities/User";
 import { Result } from "@/domain/shared/Result";
 
 export type UserError =
@@ -92,6 +92,11 @@ export interface UserRepository {
        * back to FREE.
        */
       subscriptionTier: SubscriptionTier;
+      /**
+       * Set by AdminUpdateUser — admin changes a user's role
+       * (STUDENT / INSTRUCTOR / ADMIN).
+       */
+      role: Role;
     }>,
   ): Promise<Result<User, UserError>>;
 
@@ -174,4 +179,16 @@ export interface UserRepository {
     outcome:
       { kind: "success" } | { kind: "failure"; maxAttempts: number; lockUntil: Date; now: Date },
   ): Promise<Result<{ lockedUntil: Date | null }, UserError>>;
+
+  /**
+   * STORY-146: stamp the user's welcome walkthrough as complete.
+   * Idempotent — calling twice keeps the first timestamp.
+   */
+  markWelcomeCompleted(userId: string, completedAt: Date): Promise<Result<User, UserError>>;
+
+  /**
+   * STORY-146: clear the welcome timestamp so the user can re-take
+   * the tour from the profile page.
+   */
+  resetWelcome(userId: string): Promise<Result<User, UserError>>;
 }

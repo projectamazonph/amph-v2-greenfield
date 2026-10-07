@@ -1,9 +1,17 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   typedRoutes: false,
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   // STORY-0026 follow-up: build a self-contained production artifact
   // so the lighthouse job (and any other consumer) can start the
   // server without the broken pnpm-store symlinks in .next/.
@@ -18,7 +26,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withBundleAnalyzer(nextConfig), {
   // Source map upload is disabled when auth token is missing so that
   // local and CI builds succeed without real Sentry credentials.
   authToken: process.env.SENTRY_AUTH_TOKEN,

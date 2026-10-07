@@ -1,12 +1,22 @@
 # Learning Experience 8.5 Build Plan
 
-**Status:** Planned
+**Status:** Wave 0 done, Wave 1 done, Wave 3 partial (LEARN-030, LEARN-032 to LEARN-035, LEARN-034 done), Wave 4 partial (LEARN-040 to LEARN-042 done)
 
 **Owner:** Ryan Roland Dabao
 
-**Date:** 2026-08-16
+**Date:** 2026-08-16 (last reviewed 2026-09-17 against `aea7e2a`)
 
 **Decision:** Build a zero-to-one, evidence-producing learning journey before adding breadth. The Academy should help a complete beginner make and explain safe PPC decisions, then leave with reviewable client-work artefacts. It must not represent formative simulator scores as job-readiness proof.
+
+## Wave progress (reconciled against `main` on 2026-09-22)
+
+- **Wave 0 (Truth and release contract):** Done. LEARN-001 (STORY-111, STORY-129), LEARN-002 (STORY-112), LEARN-003 (STORY-113), LEARN-004, LEARN-005, LEARN-006 all shipped.
+- **Wave 1 (Zero-to-one onboarding):** Done. LEARN-010 (STORY-130), LEARN-011 to LEARN-013 (STORY-131), LEARN-014 (STORY-132), LEARN-015 (STORY-133) all shipped.
+- **Wave 2 (Consistent lesson delivery):** Done. LEARN-020 production schema shipped. LEARN-021 to LEARN-026 (Modules 0 to 5) shipped via STORY-117 to STORY-121, STORY-127, STORY-128. LEARN-027 to LEARN-029 (Modules 6 to 8) shipped via STORY-148: persisted retrieval checks in all nine lessons. The module worksheets and tool bridges for 6 to 8 were already in place.
+- **Wave 3 (Tool practice and saved evidence):** Done for the planned slice. LEARN-030 (STORY-134), LEARN-032 (STORY-136), LEARN-033 (STORY-135), LEARN-034 (STORY-140), LEARN-035 (STORY-137), LEARN-031 scenario packs (STORY-145) shipped.
+- **Wave 4 (Assessment, capstone, support):** Partial. LEARN-040 (STORY-138), LEARN-041 (STORY-141), LEARN-042 (STORY-142), LEARN-043 capstone submission and readiness (STORY-143), LEARN-044 reviewer queue (STORY-144) shipped. LEARN-045 (help route) not started.
+- **Wave 5 (Job-ready resource pack and learning home):** Planned.
+- **Wave 6 (Measurement, beta, release):** Planned.
 
 ## Why this plan exists
 

@@ -28,6 +28,10 @@ const config = [
       "playwright-report/**",
       "test-results/**",
       ".worktrees/**",
+      // Vendored SimGrid site at public/simgrid-v1/. Third-party
+      // static assets; we patch only the bridge file (PATCHES.md). Lint
+      // and typecheck are not appropriate for unmodified vendored code.
+      "public/simgrid-v1/**",
       // Compile-time fixtures: deliberately broken source that exists so
       // a programmatic tsc check can prove the type system rejects the
       // bad usage. The fixture files are excluded from tsconfig.json

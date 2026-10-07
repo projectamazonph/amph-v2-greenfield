@@ -1,4 +1,4 @@
-/**
+﻿/**
  * User entity — the canonical representation of an AMPH student or instructor.
  *
  * This is a **domain object** — no framework annotations, no database mapping.
@@ -54,6 +54,13 @@ export interface User {
    */
   readonly emailVerifiedAt: Date | null;
   /**
+   * STORY-146: timestamp of when the student completed the first-run
+   * welcome walkthrough. Null until then. Once set, the dashboard
+   * stops rendering the NewUserDashboard variant and the sidebar
+   * "?" badge fades out.
+   */
+  readonly welcomeCompletedAt: Date | null;
+  /**
    * Proposal 1 (account lockout): set once a consecutive-failed-login
    * streak crosses the threshold; cleared on the next successful
    * login. Optional so existing call sites that build a `User` literal
@@ -85,6 +92,7 @@ export function createUser(params: {
   createdAt?: Date;
   totalXp?: number;
   emailVerifiedAt?: Date | null;
+  welcomeCompletedAt?: Date | null;
   lockedUntil?: Date | null;
 }): Result<User, { kind: "invalid_input"; message: string }> {
   if (!params.firstName.trim()) {
@@ -108,6 +116,7 @@ export function createUser(params: {
       createdAt: params.createdAt ?? new Date(),
       totalXp: params.totalXp ?? 0,
       emailVerifiedAt: params.emailVerifiedAt ?? null,
+      welcomeCompletedAt: params.welcomeCompletedAt ?? null,
       lockedUntil: params.lockedUntil ?? null,
     }),
   );
@@ -131,4 +140,9 @@ export function isAdmin(user: User): boolean {
 /** Is the user an instructor? */
 export function isInstructor(user: User): boolean {
   return user.role === "INSTRUCTOR" || user.role === "ADMIN";
+}
+
+/** STORY-146: has this student finished the first-run welcome? */
+export function hasCompletedWelcome(user: User): boolean {
+  return user.welcomeCompletedAt !== null;
 }

@@ -21,6 +21,7 @@ const ADMIN: User = {
   createdAt: new Date(),
   totalXp: 0,
   emailVerifiedAt: null,
+  welcomeCompletedAt: null,
 };
 
 const SINGLE_NAME: User = { ...ADMIN, firstName: "Cher", lastName: "" };

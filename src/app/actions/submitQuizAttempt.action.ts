@@ -28,6 +28,19 @@ interface ReviewItem {
   explanation: string;
 }
 
+export interface RemediationItem {
+  questionId: string;
+  questionText: string;
+  lessonSlugs: readonly string[];
+}
+
+export interface RemediationPlan {
+  missedCount: number;
+  totalCount: number;
+  items: readonly RemediationItem[];
+  distinctLessonSlugs: readonly string[];
+}
+
 export type SubmitQuizAttemptResult =
   | {
       ok: true;
@@ -37,6 +50,7 @@ export type SubmitQuizAttemptResult =
       correctCount: number | null;
       totalQuestions: number | null;
       review: readonly ReviewItem[] | null;
+      remediation: RemediationPlan | null;
     }
   | {
       ok: false;
@@ -87,5 +101,6 @@ export async function submitQuizAttemptAction(
     correctCount: result.value.correctCount,
     totalQuestions: result.value.totalQuestions,
     review: result.value.review,
+    remediation: result.value.remediation,
   };
 }

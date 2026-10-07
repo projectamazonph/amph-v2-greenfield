@@ -37,6 +37,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import type { User } from "@/domain/entities/User";
 import { UserCard } from "./UserCard";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import styles from "./NavSidebar.module.css";
 import type { ComponentType, SVGProps } from "react";
 
@@ -155,6 +156,9 @@ export function NavSidebar({ user }: NavSidebarProps) {
 
       <div className={styles.footer}>
         <UserCard user={user} />
+        <div className={styles.themeToggleWrapper}>
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   );

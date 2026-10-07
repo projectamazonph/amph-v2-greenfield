@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Container wiring tests — STORY-033 / STORY-036.
  *
  * Ensures RecordQuizAttempt and SimulatorRegistry are registered on both
@@ -485,5 +485,23 @@ simDescribe("container — simulator registry wiring", () => {
     const c = buildTestContainer();
     simExpect(c.keywordDatasetRepo).toBeDefined();
     simExpect(typeof c.keywordDatasetRepo.findByNiche).toBe("function");
+  });
+});
+
+// ─── STORY-146: welcome step wiring ─────────────────────────────────────────
+
+import { describe as welcomeDescribe, it as welcomeIt, expect as welcomeExpect } from "vitest";
+import { CompleteWelcome } from "@/usecases/CompleteWelcome";
+import { ResetWelcome } from "@/usecases/ResetWelcome";
+
+welcomeDescribe("container — completeWelcome / resetWelcome wiring", () => {
+  welcomeIt("test container exposes completeWelcome as a CompleteWelcome instance", () => {
+    const c = buildTestContainer();
+    welcomeExpect(c.completeWelcome).toBeInstanceOf(CompleteWelcome);
+  });
+
+  welcomeIt("test container exposes resetWelcome as a ResetWelcome instance", () => {
+    const c = buildTestContainer();
+    welcomeExpect(c.resetWelcome).toBeInstanceOf(ResetWelcome);
   });
 });
