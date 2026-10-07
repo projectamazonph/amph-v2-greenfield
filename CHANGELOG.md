@@ -4,6 +4,29 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Lesson 9.3 evidence-ladder boundary overlap (shipped)
+
+`9.3` previously taught two ladders in adjacent primitives without saying
+which governed a recommendation: `:::comparison-table` bucketed by click
+count, and `:::evidence-ledger` bucketed by kind of evidence (safety,
+learning, optimization). A 12-click term with a clear relevance problem
+fit "Small tweaks or obvious negatives" in one table and "Act on the
+bounded safety issue" in the other, so the learner could not tell which
+won.
+
+The two primitives are now framed as ordered questions. Step 1 is the
+kind-of-evidence gate (which lives in `:::evidence-ledger` and is titled
+`Step 1: pick the kind of evidence first`); Step 2 is the click-count
+ladder (which lives in `:::comparison-table` and is titled `Step 2: size
+the action to the click count`). The directive titles carry the step
+number, the worked example at line 31 walks both steps, and the lesson
+copy makes the order explicit. A new dual-ladder overlap guard in
+`scripts/validate-lesson-production.ts` fails any future lesson that
+pairs a `comparison-table` whose id contains `ladder` with an
+`evidence-ledger` whose id contains `evidence|sufficiency|safety|kind`
+without `Step 1` / `Step 2` in the directive titles. Validator run:
+`57/57 lessons complete`, no active-practice block issues.
+
 ### STORY-159: Status-first cards on the /tools index (shipped)
 
 The `/tools` index listed five graded simulators plus one live ad console but

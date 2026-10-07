@@ -48,6 +48,8 @@ Curriculum voice stabilization: Phase 3 first half (STORY-107, 2026-08-17) drops
 
 Active lesson primitives (STORY-122, STORY-123, branch `feat/active-lesson-primitives`): Module 1 lessons 1.1-1.5 receive `SelfCheck` (interactive radio-group), `TradeOffTable`, `ProcessDiagram`, and `PitfallCallout` blocks. The directive plugin renders `:::trade-off{...}`, `:::process{...}`, and `:::callout{...}` fences without a new dependency. `scripts/validate-lesson-production.ts` gains Section 5.3 rules (`--strict` exits non-zero on any fence / SelfCheck violation). Totals: 5 TradeOffTable, 4 ProcessDiagram, 4 PitfallCallout, 5 SelfCheck. No session state, no grading call, no new domain entity. PR not yet opened; design spec is at `docs/superpowers/specs/2026-08-19-active-lesson-primitives-design.md`.
 
+Lesson 9.3 (STORY-160/audited defect): the evidence-ladder boundary overlap is closed by reframing the two primitives as ordered questions. `:::evidence-ledger` carries the kind-of-evidence gate as Step 1 (safety/learning/optimization) and `:::comparison-table` carries the click-count ladder as Step 2 (under 10 / 10-19 / 20-39 / 40+). The directive titles declare the step number, and a new dual-ladder overlap guard in `scripts/validate-lesson-production.ts` fails any future lesson that pairs a `comparison-table` whose id contains `ladder` with an `evidence-ledger` whose id contains `evidence|sufficiency|safety|kind` without `Step 1` / `Step 2` in the directive titles.
+
 Student-facing actions, routes, and event controls have direct boundary tests.
 See `docs/STUDENT-EVENT-COVERAGE.md` for the inventory and future test contract.
 
