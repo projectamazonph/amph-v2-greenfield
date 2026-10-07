@@ -15,10 +15,13 @@ on:
           - L1
           - L2
 
-# L1 report loop — read-only, no write permissions needed
+# L1 report loop — reads project state, posts a daily triage issue, and
+# commits the STATE.md timestamp update. The GitHub App needs write
+# access for the issue creation (issues: write) and the auto-commit
+# step that pushes STATE.md (contents: write).
 permissions:
-  contents: read
-  issues: read
+  contents: write
+  issues: write
   pull-requests: read
 
 env:
