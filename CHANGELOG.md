@@ -4,6 +4,27 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-160: Admin dashboard workbench polish (shipped)
+
+The `/admin` dashboard already had a Stat-Led + Workbench macrostructure (6 stat
+tiles, two workflow cards) but the operator's first action was a click on the
+TopBar greeting, and the most consequential pending counter (`pendingRefunds`)
+was buried in a side card. Only two routine write paths (Create course, Add user)
+were reachable from the dashboard; Review refunds and Audit log required
+remembering their direct URLs. PR #599 replaces the 2-button Quick Actions row
+with a 4-card grid, lifts a hero band under the TopBar that names the operator
+and surfaces `pendingRefunds` as a primary CTA when the count is non-zero
+(rendered only when `pendingRefunds > 0`, so the CTA stays meaningful), and adds
+a 10px mono caption under every stat tile. The "Total Courses" caption reads
+`Across N modules` from `PUBLIC_CURRICULUM_CLAIMS.modules.length` so the count
+never drifts from the public surface inventory; the "Pending Refunds" caption
+flips between "Awaiting decision" and "All clear" so the tile cannot contradict
+the refunds table. The 4-card workbench exposes the previously hidden write
+paths (Create course, Add user, Review refunds, Audit log), each card showing a
+live caption (refunds waiting count, audit-log recent count) rather than a
+hardcoded string. Tokens only; no hex, raw spacing, or raw radius. Story:
+`docs/stories/STORY-160.md`.
+
 ### STORY-159: Status-first cards on the /tools index (shipped)
 
 The `/tools` index listed five graded simulators plus one live ad console but
