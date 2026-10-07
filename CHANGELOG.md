@@ -35,6 +35,20 @@ CI, and `next start` leave `VERCEL_ENV` unset and keep the full write
 surface. The policy lives in `src/lib/preview-read-only.ts` (unit tested);
 the wiring is pinned by tripwires in `src/__tests__/proxy.test.ts`.
 
+### STORY-157: Dashboard focus-mode polish (shipped)
+
+The student dashboard (`/dashboard`) gains a focus-mode hero header: a 5-day activity strip (filled / unfilled dots sourced from `XPEvent.createdAt` over the most-recent 5 UTC days) and a total XP chip (sum of `XPEvent.amount` for the user). Both ride alongside the existing welcome copy, fail soft to 0 when the `xpEventRepo.findByUserId` query returns no rows or an error, and surface only the data the existing `IXPEventRepository` already returns. No new domain entities or use cases.
+
+The "Continue learning" card is reframed as the day's primary action: a 380px+ navy panel (`--c-navy-2`) with a faded `CourseCover` background, an orange "Start here" or "In progress" pill, a clamped 32px Archivo course title, a "Next up: <lesson>" line, a primary orange "Continue learning" CTA, a ghost "View portfolio" link, and a 1.5px orange progress track pinned to the very bottom of the card. ARIA contracts preserved: progressbar with `aria-valuenow`, aria-labelledby on the section, focus-visible on the CTA. All new CSS consumes design tokens only. The new `DashboardHeroStats` component ships with a dedicated regression test (5 cases, 76 lines). The two pre-existing dashboard tests gained `xpEventRepo` mocks with a default empty XP feed so unaffected tests do not need to stub XP data.
+
+Story: `docs/stories/STORY-157.md`.
+
+### STORY-158: Lesson reader SelfCheck restyle (shipped)
+
+The in-lesson `<SelfCheck>` block ships with the focus-mode variant: a 3px orange-tinted left border, a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt, and the question / options / feedback area visually grouped inside the same card panel. The existing component logic (`useState` for selected answer + feedback) is unchanged. The sticky Previous / Next footer band originally scoped to this PR was not implemented; it is tracked as a follow-up under the same story.
+
+Story: `docs/stories/STORY-158.md`.
+
 ### STORY-165: Catalog survives a corrupt course row (shipped)
 
 Production `/courses` rendered the "Courses unavailable" fallback on every

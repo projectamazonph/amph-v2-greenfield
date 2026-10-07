@@ -84,13 +84,14 @@ The five registered simulators share the attempt, scoring, and feedback infrastr
 
 ### Learning progress and credentials
 
-- Dashboard route: `/dashboard`.
+- Dashboard route: `/dashboard` — focus-mode variant (PR #596, STORY-157) renders a hero header with a 5-day activity strip and total XP (sourced from `IXPEventRepository.findByUserId`), followed by a dominant navy-gradient Continue learning card (380px+ min-height) with a faded course-cover background, an orange "In progress" or "Start here" pill, a 32px Archivo course title, a "Next up: <lesson>" line, a primary "Continue learning" CTA, a ghost "View portfolio" link, and a 1.5px orange progress track pinned to the bottom. The card below the hero (in-progress grid, My courses list, Quick Actions, Practice progress) keeps the existing layout.
 - Profile and badge display: `/profile`.
 - XP, progress events, streaks, quiz attempts, and badge awards have domain entities, repositories, use cases, and tests.
 - Student certificate list: `/certificates`.
 - Certificate verification: `/certificates/[hash]`.
 - Certificate PDF route: `/certificates/[hash]/pdf`.
 - Admin certificate revocation action is available and records the revocation state.
+- Lesson reader `SelfCheck` block (PR #596, STORY-158) renders with a 3px orange-tinted left border and a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt. The sticky Previous / Next footer band was not implemented in this PR; tracked as a follow-up.
 
 Lesson completion is persisted idempotently and updates course progress. Quiz and simulator attempts are access-controlled and exported with the student's other account data. Credential claims still require seeded production data and operational review.
 
