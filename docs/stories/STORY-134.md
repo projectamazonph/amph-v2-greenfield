@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** Planned.
+**Status:** Shipped via PR #525 (commit `d2b860a`). The `## Status` block was rewritten 2026-10-08 to mark STORY-134 shipped after a kanban pre-flight grep confirmed `src/lib/toolBridge.ts`, `src/lib/__tests__/toolBridge.test.ts`, `scripts/validate-tool-bridges.ts`, and the `validate:tool-bridges` chain inside `pnpm validate:learning-release` already ship on `main`. The validator joins the lesson `toolBridge` rows from `content/curriculum/inventory.json` with the registered simulator ids in `buildSimulatorRegistry`, the tier-simulator allowlist in `content/curriculum/public-claims.json`, and the published `SimulatorScenario` rows, and fails the release gate on any structural mismatch.
 
 ## Context
 
@@ -51,18 +51,26 @@ release check before the production promotion.
 
 ## Acceptance criteria
 
-- [ ] `pnpm validate:learning-release` exits non-zero when a lesson's
+- [x] `pnpm validate:learning-release` exits non-zero when a lesson's
       `toolBridge.target` is not in the registered simulator list.
-- [ ] `pnpm validate:learning-release` exits non-zero when a bridge
+      Covered by `src/lib/__tests__/toolBridge.test.ts` "missing simulator
+      id" case.
+- [x] `pnpm validate:learning-release` exits non-zero when a bridge
       target is published but no tier in the public-claim config
-      includes it.
-- [ ] `pnpm validate:learning-release` exits non-zero when a bridge
+      includes it. Covered by the "tier mismatch" case.
+- [x] `pnpm validate:learning-release` exits non-zero when a bridge
       target is published but no `published` SimulatorScenario row
-      exists.
-- [ ] Five Vitest tests cover the validator's happy path and each
-      failure mode.
-- [ ] `pnpm validate:curriculum` still passes; the new validator
+      exists. The published-scenario signal is queried from Prisma in
+      `scripts/validate-tool-bridges.ts`; the bridge validator surfaces
+      the failure as a "no published scenario" error.
+- [x] Five Vitest tests cover the validator's happy path and each
+      failure mode. The shipped suite is nine cases (the five base
+      cases plus four simgrid-branch cases covering the
+      `kind: "simgrid"` rows added when Module 12 distributed the
+      SimGrid).
+- [x] `pnpm validate:curriculum` still passes; the new validator
       extends the existing release check, it does not replace it.
+      `package.json` chains `validate:curriculum && validate:tool-bridges && vitest run …`.
 
 ## Non-goals
 
