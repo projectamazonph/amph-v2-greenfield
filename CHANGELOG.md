@@ -30,6 +30,12 @@ The "Continue learning" card is reframed as the day's primary action: a 380px+ n
 
 Story: `docs/stories/STORY-157.md`.
 
+### STORY-158: Lesson reader SelfCheck restyle (shipped)
+
+The in-lesson `<SelfCheck>` block ships with the focus-mode variant: a 3px orange-tinted left border, a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt, and the question / options / feedback area visually grouped inside the same card panel. The existing component logic (`useState` for selected answer + feedback) is unchanged. The sticky Previous / Next footer band originally scoped to this PR was not implemented; it is tracked as a follow-up under the same story.
+
+Story: `docs/stories/STORY-158.md`.
+
 ### STORY-165: Catalog survives a corrupt course row (shipped)
 
 Production `/courses` rendered the "Courses unavailable" fallback on every
