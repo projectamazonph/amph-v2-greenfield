@@ -1,9 +1,13 @@
 # STORY-159 — Tools index status-first cards
 
 **Type:** UI/UX refinement (UI/UX-4 of 7 surfaces)
-**Status:** In progress
+**Status:** Shipped. The `/tools` index cards each carry a skill tag (left) and
+an availability status pill (right) sourced from
+`PUBLIC_CURRICULUM_CLAIMS.simulators[id].availability`. Bid Elevator shows
+`Public preview`; the other four graded simulators show `Enrolled practice`.
+The Amazon Ad Console card uses the red `Live account` pill. PR #598.
 **Owner:** TBD
-**Branch:** `uiux/simulators`
+**Branch:** `uiux/simulators` (superseded by main; closed in doc-hygiene PR)
 **Canvas:** https://superdesign.dev/teams/b799fd2d-4abb-489d-9f9a-33fc85e0d291/projects/d3cd32f1-bff7-4fb1-a0b4-f0ac84b0313c
 **Selected variant:** Status-First (`e1ae861c-7f9c-4f0b-acba-5579928e9775`)
 

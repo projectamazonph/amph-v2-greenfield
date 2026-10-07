@@ -4,6 +4,19 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-159: Status-first cards on the /tools index (shipped)
+
+The `/tools` index listed five graded simulators plus one live ad console but
+did not surface the public-preview vs enrolled-practice distinction the rest
+of the public surface documents. PR #598 adds a `cardMetaRow` per card with
+a 10px mono `skillTag` (left) and a `statusPill` (right) whose variant
+class derives from `PUBLIC_CURRICULUM_CLAIMS.simulators[id].availability`.
+`bid-elevator` shows `Public preview`; the other four show `Enrolled
+practice`. The live console uses a red `Live account` pill with a
+`Production environment` skill tag. All values come from the reviewed
+claims contract; no hex or raw spacing. Tokens only. Story:
+`docs/stories/STORY-159.md`.
+
 ### Preview deployments are read-only (shipped)
 
 Preview, production, and development all resolve to the same `DATABASE_URL`
