@@ -92,3 +92,7 @@ scripts/get-ci-steps.ps1
 scripts/.archive-pr-prep-*/
 scripts/.archive-stale-*/
 
+# one-shot path-mutator scripts and other root-level scratch files
+/0
+/fix-paths.py
+
