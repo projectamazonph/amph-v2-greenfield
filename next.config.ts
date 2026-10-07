@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
-import { withSentryConfig } from "@sentry/nextjs";
+// Sentry v11 moved withSentryConfig from the package root to the
+// "/config" subpath. v10 still re-exports it at the root, so importing
+// from "@sentry/nextjs/config" works for both — but doing so requires v10.40+,
+// which this repo has been on since 10.66.
+import { withSentryConfig } from "@sentry/nextjs/config";
 import bundleAnalyzer from "@next/bundle-analyzer";
 
 const withBundleAnalyzer = bundleAnalyzer({
