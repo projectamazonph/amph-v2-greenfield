@@ -1,6 +1,6 @@
 # Feature inventory
 
-**Last reviewed:** 2026-08-20 for the status rows below, against the branch that became the lesson primitives (since merged). Header pointers refreshed 2026-09-23 against `main` at `b2e7fe3` without re-verifying individual rows.
+**Last reviewed:** 2026-08-20 for the status rows below, against the branch that became the lesson primitives (since merged). Header pointers refreshed 2026-09-23 against `main` at `b2e7fe3` without re-verifying individual rows. STORY-132 doc-closure sweep 2026-10-08 confirmed the LEARN-014 guided first-decision route is live on main via PR #523 (commit `bc9307ad`) and the "Learning-experience uplift" row's Wave 1 enumeration matches the shipped code.
 **Ground truth:** `src/`, `prisma/schema.prisma`, `scripts/`, and the current test suite.
 **Related audit:** `docs/audit-2026-07-27-completeness-review.md`, removed on 2026-09-14 by `e1f7352`; `CLAUDE.md`'s "Known gaps" section and `STATE.md`'s limitations carry what survived of it. The 2026-08-20 follow-up umbrella lives at `.audit-2026-08-20/UMBRELLA.md` and its findings shipped through PR #415 (merged 2026-08-21).
 
