@@ -22,6 +22,12 @@ interface LessonStickyCompleteProps {
   isCompleted: boolean;
   /** Selector or element of the completion card — hide when near it */
   completionCardSelector?: string;
+  /**
+   * Selector for the sticky lesson navigation footer band. The pill hides
+   * when the band is in view so the two sticky surfaces never double up
+   * and occlude the same reading area.
+   */
+  navFooterSelector?: string;
 }
 
 function SubmitButton({ isCompleted }: { isCompleted: boolean }) {
@@ -56,12 +62,14 @@ export function LessonStickyComplete({
   action,
   isCompleted,
   completionCardSelector = "[data-completion-card]",
+  navFooterSelector = "[data-lesson-nav-footer]",
 }: LessonStickyCompleteProps) {
   const [visible, setVisible] = useState(false);
 
   const update = useCallback(() => {
     const hero = document.querySelector("[data-lesson-hero]");
     const card = document.querySelector(completionCardSelector);
+    const navFooter = document.querySelector(navFooterSelector);
     const scrollY = window.scrollY;
     const viewportH = window.innerHeight;
 
@@ -75,8 +83,17 @@ export function LessonStickyComplete({
       nearCard = cardRect.top < viewportH + 200;
     }
 
-    setVisible(pastHero && !nearCard && !isCompleted);
-  }, [isCompleted, completionCardSelector]);
+    // Hide when the sticky nav footer band is in view. The band already
+    // exposes the primary lesson-exit controls, so a floating CTA that
+    // occludes them would be a regression.
+    let navFooterInView = false;
+    if (navFooter) {
+      const navRect = navFooter.getBoundingClientRect();
+      navFooterInView = navRect.top < viewportH && navRect.bottom > 0;
+    }
+
+    setVisible(pastHero && !nearCard && !navFooterInView && !isCompleted);
+  }, [isCompleted, completionCardSelector, navFooterSelector]);
 
   useEffect(() => {
     window.addEventListener("scroll", update, { passive: true });

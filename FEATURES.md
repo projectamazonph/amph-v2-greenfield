@@ -91,7 +91,8 @@ The five registered simulators share the attempt, scoring, and feedback infrastr
 - Certificate verification: `/certificates/[hash]`.
 - Certificate PDF route: `/certificates/[hash]/pdf`.
 - Admin certificate revocation action is available and records the revocation state.
-- Lesson reader `SelfCheck` block (PR #596, STORY-158) renders with a 3px orange-tinted left border and a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt. The sticky Previous / Next footer band was not implemented in this PR; tracked as a follow-up.
+- Lesson reader `SelfCheck` block (PR #596, STORY-158) renders with a 3px orange-tinted left border and a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt.
+- Lesson reader Previous / Next navigation (follow-up, STORY-158) renders as a sticky-positioned footer band pinned to the bottom of the lesson reading column while a lesson is being read. The band shows the Previous button, a centered module-position label (`Module X of Y · Lesson A of B`), and the Next button. The band drops sticky below 640 px and stacks into a single column so it does not eat the viewport on phones; the existing floating completion pill hides when the band is in view so the two sticky surfaces do not double up. Tokens-only CSS, `prefers-reduced-motion` honored.
 
 Lesson completion is persisted idempotently and updates course progress. Quiz and simulator attempts are access-controlled and exported with the student's other account data. Credential claims still require seeded production data and operational review.
 

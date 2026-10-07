@@ -4,6 +4,28 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-158: Sticky Previous / Next footer band on the lesson reader (shipped)
+
+The lesson reader's Previous / Next navigation is now a sticky-positioned
+footer band pinned to the bottom of the lesson reading column while a
+learner scrolls through a lesson. The band carries the Previous button,
+a centered `Module X of Y · Lesson A of B` position label (computed
+from `getLessonData`'s `sectionIndex` / `lessonIndex` and the
+authoritative catalog read model), and the Next button in a single
+three-column grid. The band drops sticky below 640 px and stacks into
+a single column so it does not eat the viewport on phones, and the
+existing floating completion pill now hides when the band is in view
+so the two sticky surfaces never double up.
+
+`LessonNavButtons` gains a `positionLabel` prop and a `data-sticky`
+attribute so the regression tests can pin the contract. ARIA labels on
+both action buttons are retained, focus-visible styling is preserved,
+and `prefers-reduced-motion` is honored. Tokens-only CSS; no hardcoded
+colors, spacing, or radii. Closes the follow-up noted under
+STORY-158's original PR #596 (`765b9ff5`).
+
+Story: `docs/stories/STORY-158.md`.
+
 ### STORY-159: Status-first cards on the /tools index (shipped)
 
 The `/tools` index listed five graded simulators plus one live ad console but
@@ -45,7 +67,7 @@ Story: `docs/stories/STORY-157.md`.
 
 ### STORY-158: Lesson reader SelfCheck restyle (shipped)
 
-The in-lesson `<SelfCheck>` block ships with the focus-mode variant: a 3px orange-tinted left border, a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt, and the question / options / feedback area visually grouped inside the same card panel. The existing component logic (`useState` for selected answer + feedback) is unchanged. The sticky Previous / Next footer band originally scoped to this PR was not implemented; it is tracked as a follow-up under the same story.
+The in-lesson `<SelfCheck>` block ships with the focus-mode variant: a 3px orange-tinted left border, a small mono `CHECK YOUR UNDERSTANDING` eyebrow above the prompt, and the question / options / feedback area visually grouped inside the same card panel. The existing component logic (`useState` for selected answer + feedback) is unchanged. The sticky Previous / Next footer band originally scoped to this PR was implemented in a follow-up; see the entry above.
 
 Story: `docs/stories/STORY-158.md`.
 
