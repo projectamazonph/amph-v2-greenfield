@@ -4,6 +4,35 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-130: Close LEARN-010 diagnostic story doc (shipped via PR #521)
+
+Pre-flight grep showed the work ships on main via PR #521 (commit
+`7d419a1a`, 2026-09-16):
+
+- `content/curriculum/diagnostic.json` (81 lines: three questions, three
+  outcomes, fallback rubric).
+- `src/lib/diagnostic.ts` (pure scoring function and manifest loader,
+  no framework dependency on the test surface).
+- `src/app/dashboard/diagnostic/page.tsx`, `DiagnosticForm.tsx`,
+  `loading.tsx`, `page.module.css` (auth-gated form + outcome card).
+- `src/app/actions/diagnostic.action.ts` (server action shim).
+- `src/app/actions/__tests__/diagnostic.action.test.ts` (six Vitest
+  cases: manifest load, three outcomes, partial-answer fallback,
+  no-match fallback).
+
+CHANGELOG.md, FEATURES.md, and `docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md`
+already record STORY-130 as shipped via PR #526 (commit `63cd8ea8a`,
+2026-09-16). The story doc was the only stale surface. Marked Planned
+-> Shipped, ticked the acceptance-criteria checkboxes with case
+pointers, split Scope into shipped and deferred-to-LEARN-052 lists,
+and pointed Dependencies at the LEARN-052 follow-up. No source change.
+
+Persistence to a Prisma `UserDiagnosticResult` row, the
+`20260915000000_add_user_diagnostic` migration, the dashboard
+recommendation card above the continue-learning surface, and the
+structured-logger wiring of `learning_event:diagnostic_completed` all
+remain on the LEARN-052 backlog.
+
 ### STORY-159: Status-first cards on the /tools index (shipped)
 
 The `/tools` index listed five graded simulators plus one live ad console but
