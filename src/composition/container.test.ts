@@ -144,6 +144,7 @@ import { DisableTwoFactor } from "@/usecases/DisableTwoFactor";
 // STORY-146: welcome step completion + reset (used by student onboarding)
 import { CompleteWelcome } from "@/usecases/CompleteWelcome";
 import { ResetWelcome } from "@/usecases/ResetWelcome";
+import { RecordDiagnosticResult } from "@/usecases/learning/RecordDiagnosticResult";
 import { CreatePaymentIntent } from "@/usecases/CreatePaymentIntent";
 import { GetCheckoutSummary } from "@/usecases/GetCheckoutSummary";
 import { CheckCourseAccess } from "@/usecases/CheckCourseAccess";
@@ -592,6 +593,7 @@ export function buildTestContainer(): TestContainer {
     // STORY-146: welcome step completion + reset
     completeWelcome: new CompleteWelcome(userRepo, clock),
     resetWelcome: new ResetWelcome(userRepo),
+    recordDiagnosticResult: new RecordDiagnosticResult({ userRepo, logger, clock }),
     createPaymentIntent: new CreatePaymentIntent({
       courseRepo,
       pricingTierRepo,
