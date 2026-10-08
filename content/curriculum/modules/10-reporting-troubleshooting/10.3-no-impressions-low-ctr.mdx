@@ -30,9 +30,17 @@ No impressions means the ad is not showing. Low click-through rate means shopper
 
 For no impressions, check campaign status, review state, budget, stock, and target eligibility. For low CTR, check the main image, title, price, rating, and whether the result appears for the right search. Keep the diagnosis tied to the broken stage.
 
+:::worksheet{id="first-checks-by-symptom" title="First checks by symptom" lesson="10.3-no-impressions-low-ctr"}
+{"fields":[{"key":"note","label":"The first check for no impressions, before changing any bid. One sentence."}]}
+:::
+
 ## Worked example
 
 A campaign shows no impressions and the status says In Review. The correct first action is to save the status, confirm product eligibility and budget, and wait for the review to clear. Do not double the bid while the ad cannot serve.
+
+:::worksheet{id="worked-example" title="Worked example" lesson="10.3-no-impressions-low-ctr"}
+{"fields":[{"key":"note","label":"The action you will deliberately not take while eligibility is unresolved. One sentence."}]}
+:::
 
 :::simulation-rubric{id="top-funnel-diagnosis-submission" title="Submit a top-of-funnel diagnosis"}
 {"scenario":"A campaign has no impressions or low CTR. Diagnose the first broken handoff before recommending a bid or budget change.","criteria":[{"id":"eligibility","label":"Eligibility checked","lookFor":"Status, schedule, budget, stock, offer, and policy state are checked first.","commonError":"Raising the bid before confirming the campaign can serve."},{"id":"relevance","label":"Relevance checked","lookFor":"Search intent, targeting, title, main image, price, and reviews are compared.","commonError":"Calling low CTR a bid problem when the query is a poor fit."},{"id":"action","label":"Action is bounded","lookFor":"The recommendation names one lever, owner, expected signal, and review window.","commonError":"Changing targeting, listing, bid, and budget together."}],"submission":"Submit the symptom, evidence, first action, and next review date in the troubleshooting log."}
@@ -41,18 +49,6 @@ A campaign shows no impressions and the status says In Review. The correct first
 ## Your turn
 
 An ad has no impressions and the campaign is still in review. Write the first check, the action you will not take yet, and the evidence you will wait for.
-
-:::callout{id="lesson-10-3-pitfall" variant="pitfall" title="Raising the bid on an ad that cannot serve"}
-Doubling the bid on a campaign that is still In Review, paused, or out of stock wastes time and creates a fake data point.
-:::
-
-<SelfCheck
-  id="sc-10-3"
-  prompt="An ad has no impressions and the campaign status is In Review. What is the first move?"
-  options={["Wait for review and confirm eligibility before any bid change.", "Raise the bid to force the ad past the review queue.", "Add new keywords to widen targeting.", "Pause the ad and move the budget to another campaign."]}
-  answerIndex={0}
-  explanation="No impressions means the ad cannot serve. A bid change is premature until eligibility is confirmed."
-/>
 
 ## Quick check
 

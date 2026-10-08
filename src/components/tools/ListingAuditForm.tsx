@@ -94,10 +94,9 @@ export function ListingAuditForm({
           return;
         }
         setFindings(r.value.audit.findings);
-        // CLICK-PATH-005: no silent default verdict. Every finding starts
-        // unchosen (""), the select shows "Choose an action", and submit
-        // stays disabled until each finding has an explicit decision.
-        setFindingActions({});
+        setFindingActions(
+          Object.fromEntries(r.value.audit.findings.map((f) => [f.id, "skip" as FindingAction])),
+        );
         setStage("reviewing");
       } catch {
         setError(studentErrorCopy.simulatorRun);
@@ -107,10 +106,6 @@ export function ListingAuditForm({
 
   const onSubmitForGrading = () => {
     setError(null);
-    // CLICK-PATH-005 guard: the button is disabled until every finding
-    // has an explicit decision, but narrow here too so a partially
-    // decided row can never be silently graded.
-    if (stage !== "reviewing" || !allDecided) return;
     startTransition(async () => {
       try {
         const r = await listingAuditAttempt({
@@ -141,8 +136,6 @@ export function ListingAuditForm({
   };
 
   const isEditing = stage === "editing";
-  const decidedCount = findings.filter((f) => findingActions[f.id] !== undefined).length;
-  const allDecided = findings.length > 0 && decidedCount === findings.length;
   const gradedFindingsById =
     gradeResult && gradeResult.ok
       ? new Map(gradeResult.value.gradedFindings.map((f) => [f.id, f]))
@@ -156,13 +149,6 @@ export function ListingAuditForm({
         unlocked={challengeUnlocked}
         disabled={stage === "graded"}
       />
-      <p className={styles.progress} role="status">
-        {stage === "editing"
-          ? "Step 1 of 3: revise the listing, then run the audit."
-          : stage === "reviewing"
-            ? `Step 2 of 3: decide each finding (${decidedCount}/${findings.length}).`
-            : "Step 3 of 3: review your score."}
-      </p>
       <div className={styles.field}>
         <label className={styles.label} htmlFor="la-title">
           Title
@@ -213,12 +199,7 @@ export function ListingAuditForm({
       ) : null}
       <div className={styles.footer}>
         {isEditing ? (
-          <button
-            type="submit"
-            className={styles.submit}
-            disabled={pending}
-            aria-busy={pending}
-          >
+          <button type="submit" className={styles.submit} disabled={pending} aria-busy={pending}>
             {pending ? "Auditing…" : "Run audit"}
           </button>
         ) : (
@@ -228,9 +209,8 @@ export function ListingAuditForm({
                 type="button"
                 className={styles.submit}
                 onClick={onSubmitForGrading}
-                disabled={pending || !allDecided}
+                disabled={pending}
                 aria-busy={pending}
-                title={allDecided ? undefined : `Decide all ${findings.length} findings first (${decidedCount}/${findings.length})`}
               >
                 {pending ? "Checking…" : "Check my audit decisions"}
               </button>
@@ -300,14 +280,10 @@ export function ListingAuditForm({
                   ) : (
                     <select
                       className={styles.select}
-                      value={findingActions[f.id] ?? ""}
+                      value={findingActions[f.id] ?? "skip"}
                       onChange={(e) => setFindingAction(f.id, e.target.value as FindingAction)}
                       aria-label={`Action for finding: ${f.message}`}
-                      required
                     >
-                      <option value="" disabled>
-                        Choose an action
-                      </option>
                       {FINDING_ACTIONS.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}

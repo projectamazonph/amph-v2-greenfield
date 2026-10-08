@@ -64,7 +64,6 @@ export async function performProcessRefund(
 
   const r = await container.processRefund.execute({
     orderId: input.orderId,
-    actorId: adminId,
     amountMinor: input.amountMinor,
     reason: input.reason,
   } satisfies ProcessRefundInput);

@@ -16,10 +16,6 @@ After this lesson, you can triage a batch of search terms at speed. For each one
 
 Relevance decides between negating and everything else, then ACoS (advertising cost of sales) versus target decides whether to harvest, hold, increase, or decrease the bid.
 
-:::callout{id="lesson-7-3-pitfall" variant="pitfall" title="Deciding on too little data"}
-Acting on 3 clicks and 0 orders turns noise into policy. Wait for the threshold the lesson names (5+ clicks for negatives, 15+ for exact-match decisions) before negating, harvesting, or pausing.
-:::
-
 <SelfCheck
   id="sc-7-3"
   prompt="Of the five triage actions, which one needs the most data before you take it?"
@@ -31,6 +27,10 @@ Acting on 3 clicks and 0 orders turns noise into policy. Wait for the threshold 
 You've learned how to read search term data and how to use negative keywords. Now it's time to put it together: the **Search Term Triage** tool, where you'll analyze real search terms and make a decision for each one.
 
 Triage is what emergency room doctors do when multiple patients arrive at once. They quickly assess who needs immediate care, who can wait, and who doesn't need treatment at all. You're doing the same thing with search terms, quickly deciding which ones deserve budget, which need adjustment, and which should be cut.
+
+:::worksheet{id="the-five-actions" title="The Five Actions" lesson="7.3-str-triage-prep"}
+{"fields":[{"key":"note","label":"The action you would choose when a relevant term is profitable but volume is limited. One sentence."}]}
+:::
 
 ## The Five Actions
 
@@ -77,7 +77,7 @@ When you harvest, also consider adding the term as a negative in the broad/phras
 **When to use**: The term is irrelevant and generating wasted spend with no prospect of improvement.
 
 **Decision criteria**:
-- Zero orders after 5+ clicks
+- Zero orders after 10+ clicks
 - Clearly irrelevant to your product
 - Low CTR (below 0.3%)
 - No strategic reason to keep
@@ -98,6 +98,10 @@ When you harvest, also consider adding the term as a negative in the broad/phras
 
 **Key Takeaway.** Five actions cover every situation. The hard part isn't knowing what the actions are. It's reading the data quickly and choosing the right one. That's what practice builds.
 
+:::worksheet{id="the-decision-flowchart" title="The Decision Flowchart" lesson="7.3-str-triage-prep"}
+{"fields":[{"key":"note","label":"The first question you ask about any search term before any ACoS comparison. One sentence."}]}
+:::
+
 ## The Decision Flowchart
 
 For each search term, work through this:
@@ -112,9 +116,13 @@ For each search term, work through this:
      - No → Harvest to Exact
    - No → Is it generating orders?
      - Yes → Decrease Bid
-     - No → After 5+ clicks? → Negative. Under 5 clicks? → Monitor.
+     - No → After 10+ clicks? → Negative. Under 10 clicks? → Monitor.
 
 When in doubt, look at relevance first. A term with terrible ACoS but high relevance just needs a lower bid. A term with great ACoS but low relevance is a ticking time bomb. It'll waste money as volume grows.
+
+:::worksheet{id="reading-the-data-grid-efficiently" title="Reading the Data Grid Efficiently" lesson="7.3-str-triage-prep"}
+{"fields":[{"key":"note","label":"The first filter you'd apply in the tool to find the easiest cost-savings wins. One sentence."}]}
+:::
 
 ## Reading the Data Grid Efficiently
 
@@ -142,6 +150,10 @@ Think of it like sorting laundry. First you pull out the obvious darks and white
 
 **Ignoring the ACoS target.** A 20% ACoS is great if your target is 25%, but terrible if your target is 15%. Always evaluate relative to the scenario's stated target.
 
+:::worksheet{id="common-triage-mistakes" title="Common Triage Mistakes" lesson="7.3-str-triage-prep"}
+{"fields":[{"key":"note","label":"The mistake you would catch earliest in your own batches. One sentence."}]}
+:::
+
 **Reserve negatives for genuinely irrelevant traffic.** A term that converts but costs too much is a bid problem, not a relevance problem.
 
 ## Try This: Quick Triage Practice
@@ -149,12 +161,16 @@ Think of it like sorting laundry. First you pull out the obvious darks and white
 You have 5 seconds per term. What's your action?
 
 1. "stainless steel milk frother," ACoS 18%, 25 clicks, 4 orders, target ACoS 25%
-2. "cheap milk frother," ACoS N/A (no orders), 12 clicks, 0 orders, target ACoS 25%
+2. "cheap milk frother," ACoS 0%, 12 clicks, 0 orders, target ACoS 25%
 3. "milk frother," ACoS 35%, 40 clicks, 5 orders, target ACoS 25%, not exact match
 4. "electric milk frother," ACoS 8%, 30 clicks, 8 orders, target ACoS 25%
-5. "milk frother for kids," ACoS N/A (no orders), 6 clicks, 0 orders, target ACoS 25%
+5. "milk frother for kids," ACoS 0%, 6 clicks, 0 orders, target ACoS 25%
 
 **Answers:** (1) Keep (or harvest if not exact, performing well). (2) Negative (irrelevant, zero conversions). (3) Decrease bid (relevant but ACoS above target). (4) Harvest to exact (strong performer, low ACoS). (5) Keep for now (under 10 clicks, monitor before negativing).
+
+:::worksheet{id="try-this-quick-triage-practice" title="Try This: Quick Triage Practice" lesson="7.3-str-triage-prep"}
+{"fields":[{"key":"note","label":"The single rule you'd use to pick the right action in under five seconds. One sentence."}]}
+:::
 
 ## Ready to Triage
 
@@ -167,6 +183,10 @@ You've got everything you need:
 - You know to triage by highest-spend terms first
 
 **Key Takeaway.** Search Term Triage is the most data-intensive tool on the platform. It tests everything you've learned: metrics, analysis, bid math, and judgment. Master this and you're ready to manage real Amazon PPC campaigns.
+
+:::worksheet{id="ready-to-triage" title="Ready to Triage" lesson="7.3-str-triage-prep"}
+{"fields":[{"key":"note","label":"The first thing you'll do when the first batch loads in the tool. One sentence."}]}
+:::
 
 Open the Search Term Triage tool when you're ready. Triage each term with purpose.
 

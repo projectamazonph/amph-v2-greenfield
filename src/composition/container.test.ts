@@ -91,6 +91,9 @@ import { StaticInvoiceRenderer } from "@/infra/pdf/StaticInvoiceRenderer";
 import { InMemoryInvoiceRepository } from "@/infra/repositories/inmemory/InMemoryInvoiceRepository";
 import { InMemoryPrerequisiteRepository } from "@/infra/repositories/inmemory/InMemoryPrerequisiteRepository";
 import { InMemoryAssignmentRepository } from "@/infra/repositories/inmemory/InMemoryAssignmentRepository";
+import { InMemoryWorksheetRepository } from "@/infra/repositories/InMemoryWorksheetRepository";
+import { GetWorksheet } from "@/usecases/GetWorksheet";
+import { SaveWorksheetH2 } from "@/usecases/SaveWorksheetH2";
 import { SetCoursePrerequisite } from "@/usecases/SetCoursePrerequisite";
 import { RemoveCoursePrerequisite } from "@/usecases/RemoveCoursePrerequisite";
 import { CreateAssignment } from "@/usecases/CreateAssignment";
@@ -102,9 +105,6 @@ import { InMemoryArtefactRepository } from "@/infra/repositories/inmemory/InMemo
 import { SaveArtefact } from "@/usecases/SaveArtefact";
 import { SubmitArtefact } from "@/usecases/SubmitArtefact";
 import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
-import { InMemoryWorksheetRepository } from "@/infra/db/inmemory/InMemoryWorksheetRepository";
-import { GetWorksheet } from "@/usecases/GetWorksheet";
-import { SaveWorksheetEntry } from "@/usecases/SaveWorksheetEntry";
 import { InMemoryRetrievalCheckRepository } from "@/infra/repositories/inmemory/InMemoryRetrievalCheckRepository";
 import { RecordRetrievalCheck } from "@/usecases/RecordRetrievalCheck";
 import { InMemoryNotificationRepository } from "@/infra/repositories/inmemory/InMemoryNotificationRepository";
@@ -152,7 +152,6 @@ import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
-import { AdminApplyDiscountCode } from "@/usecases/AdminApplyDiscountCode";
 import { RecordQuizAttempt } from "@/usecases/RecordQuizAttempt";
 import { AwardXP } from "@/usecases/AwardXP";
 import { AwardBadge } from "@/usecases/AwardBadge";
@@ -329,15 +328,15 @@ export interface TestContainer extends AppContainer {
   prerequisiteRepo: InMemoryPrerequisiteRepository;
   // P1-02 (PR-C slice 2): assignment fakes
   assignmentRepo: InMemoryAssignmentRepository;
+  // Per-H2 worksheet entries
+  worksheetRepo: InMemoryWorksheetRepository;
+  getWorksheet: GetWorksheet;
+  saveWorksheetH2: SaveWorksheetH2;
   // LEARN-033 (STORY-135): learner artefact fakes
   artefactRepo: InMemoryArtefactRepository;
   saveArtefact: SaveArtefact;
   submitArtefact: SubmitArtefact;
   listStudentArtefacts: ListStudentArtefacts;
-  // STORY-163: Module 1 worksheet artifact fakes
-  worksheetRepo: InMemoryWorksheetRepository;
-  getWorksheet: GetWorksheet;
-  saveWorksheetEntry: SaveWorksheetEntry;
   // LEARN-040 (STORY-138): retrieval-check fakes
   retrievalCheckRepo: InMemoryRetrievalCheckRepository;
   recordRetrievalCheck: RecordRetrievalCheck;
@@ -444,10 +443,9 @@ export function buildTestContainer(): TestContainer {
   const prerequisiteRepo = new InMemoryPrerequisiteRepository();
   // P1-02 (PR-C slice 2): assignment fakes
   const assignmentRepo = new InMemoryAssignmentRepository();
+  const worksheetRepo = new InMemoryWorksheetRepository();
   // LEARN-033 (STORY-135): learner artefact fakes
   const artefactRepo = new InMemoryArtefactRepository();
-  // STORY-163: Module 1 worksheet artifact fakes
-  const worksheetRepo = new InMemoryWorksheetRepository();
   // LEARN-040 (STORY-138): retrieval-check fakes
   const retrievalCheckRepo = new InMemoryRetrievalCheckRepository();
   // P3-87 (STORY-139): notification fakes
@@ -475,22 +473,6 @@ export function buildTestContainer(): TestContainer {
   // STORY-050a: audit log
   const auditLog = new InMemoryAuditLog();
   const recordAuditLog = new RecordAuditLog({ auditLog, idGen, clock, logger });
-  // STORY-041: certificate issuance is also a dependency of MarkLessonComplete
-  // (auto-issued on course completion), so it must be built before the
-  // markLessonComplete container entry below.
-  const issueCertificate = new IssueCertificate({
-    enrollmentRepo,
-    courseRepo,
-    certificateRepo,
-    hashGen: certificateHashGen,
-    idGen,
-    clock,
-    userRepo,
-    emailSender,
-    certificateEmailRenderer,
-    logger,
-    emailTemplateRepo,
-  });
   const webhookEventLog = new InMemoryWebhookEventLog();
   // STORY-061: audit log viewer + CSV export
   const listAuditLogs = new ListAuditLogs({ auditLog });
@@ -554,7 +536,6 @@ export function buildTestContainer(): TestContainer {
     orderRepo,
     paymentGateway,
     recordAuditLog,
-    enrollmentRepo,
     courseRepo,
     userRepo,
     emailSender,
@@ -616,21 +597,12 @@ export function buildTestContainer(): TestContainer {
       progressEventRepo,
       idGen,
       clock,
-      issueCertificate,
-      recordAuditLog,
     }),
     enrollStudent,
     discountCodeRepo,
     applyDiscountCode: new ApplyDiscountCode({
       discountCodeRepo,
       clock,
-    }),
-    adminApplyDiscountCode: new AdminApplyDiscountCode({
-      orderRepo,
-      discountCodeRepo,
-      clock,
-      recordAuditLog,
-      logger,
     }),
     quizRepo,
     quizAttemptRepo,
@@ -664,7 +636,19 @@ export function buildTestContainer(): TestContainer {
       logger,
     }),
     listUserBadges: new ListUserBadges({ badgeRepo, badgeAwardRepo }),
-    issueCertificate,
+    issueCertificate: new IssueCertificate({
+      enrollmentRepo,
+      courseRepo,
+      certificateRepo,
+      hashGen: certificateHashGen,
+      idGen,
+      clock,
+      userRepo,
+      emailSender,
+      certificateEmailRenderer,
+      logger,
+      emailTemplateRepo,
+    }),
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
       userRepo,
@@ -829,12 +813,10 @@ export function buildTestContainer(): TestContainer {
       clock,
       courseRepo,
       userRepo,
-      enrollmentRepo,
       emailSender,
       refundEmailRenderer,
       logger,
       emailTemplateRepo,
-      recordAuditLog,
     }),
     refundOverride,
     // STORY-062: admin refund request list + process
@@ -1099,15 +1081,19 @@ export function buildTestContainer(): TestContainer {
     gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
     listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
     adminListAssignments: new AdminListAssignments({ assignmentRepo }),
+    // Per-H2 worksheet entries
+    worksheetRepo,
+    getWorksheet: new GetWorksheet({ worksheetRepo }),
+    saveWorksheetH2: new SaveWorksheetH2({
+      worksheetRepo,
+      recordAuditLog,
+      clock: () => clock.now(),
+    }),
     // LEARN-033 (STORY-135): learner artefacts (in-memory)
     artefactRepo,
     saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
     submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
     listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
-    // STORY-163: Module 1 worksheet artifact (in-memory)
-    worksheetRepo,
-    getWorksheet: new GetWorksheet({ worksheetRepo }),
-    saveWorksheetEntry: new SaveWorksheetEntry({ worksheetRepo, recordAuditLog, clock }),
     // LEARN-040 (STORY-138): retrieval-check tracking (in-memory)
     retrievalCheckRepo,
     recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),

@@ -1,4 +1,4 @@
-import { BidElevatorLazy } from "./BidElevatorLazy";
+import { BidElevator } from "./BidElevator";
 import { Reveal } from "./Reveal";
 import shared from "./shared.module.css";
 import styles from "./SimulatorSection.module.css";
@@ -100,7 +100,7 @@ export function SimulatorSection() {
         </div>
 
         <Reveal>
-          <BidElevatorLazy />
+          <BidElevator />
         </Reveal>
 
         <div className={styles.roster}>

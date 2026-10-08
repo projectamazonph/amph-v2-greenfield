@@ -70,10 +70,9 @@ describe("shared lesson-view shell", () => {
 
     expect(source).toMatch(/className=\{styles\.lessonHeader\}/);
     expect(source).toMatch(/className=\{styles\.lessonWorkspace\}/);
-    expect(source).toMatch(/<LessonContent\b/);
-    expect(source).toMatch(/lesson=\{selectedLessonResult\.value\}/);
-    expect(source).toMatch(/courseSlug=\{slug\}/);
-    expect(source).toMatch(/glossaryManifest=\{glossaryManifest\}/);
+    expect(source).toMatch(
+      /<LessonContent lesson=\{selectedLessonResult\.value\} courseSlug=\{slug\} \/>/,
+    );
     expect(source).toMatch(/className=\{styles\.completionCard\}/);
   });
 });

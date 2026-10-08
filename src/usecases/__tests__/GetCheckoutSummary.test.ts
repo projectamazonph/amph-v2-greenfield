@@ -39,6 +39,8 @@ describe("GetCheckoutSummary", () => {
       slug: "mastery",
       name: "Accelerated Mastery",
       priceMinor: 599900,
+      earlyBirdPriceMinor: 499900,
+      earlyBirdEndsAt: new Date(Date.now() + 60_000),
       status: "ACTIVE",
     });
     if (!tier.ok) throw new Error("tier seed failed");
@@ -49,7 +51,7 @@ describe("GetCheckoutSummary", () => {
       pricingTierSlug: "mastery",
     });
 
-    expect(result.ok && result.value.price.minor).toBe(599900);
+    expect(result.ok && result.value.price.minor).toBe(499900);
     expect(result.ok && result.value.price.currency).toBe("PHP");
   });
 

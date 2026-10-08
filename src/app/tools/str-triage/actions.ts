@@ -60,7 +60,6 @@ import type {
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
 import { XPService } from "@/domain/services/XPService";
 import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
-import { friendlySimulatorError } from "@/lib/studentErrorCopy";
 import { strTriageScenarioContentSchema } from "./scenarioContent";
 
 const TRIAGE_ACTIONS: readonly TriageAction[] = [
@@ -168,13 +167,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   });
 
   if (Result.isErr(startResult)) {
-    return {
-      ok: false,
-      error: {
-        kind: "attempt_error",
-        message: friendlySimulatorError(startResult.error.kind, "attempt"),
-      },
-    };
+    return { ok: false, error: { kind: "attempt_error", message: startResult.error.kind } };
   }
 
   const attemptId = startResult.value.attemptId;
@@ -258,13 +251,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   // decision saved, which step 4 above already did).
   const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
   if (Result.isErr(submitResult)) {
-    return {
-      ok: false,
-      error: {
-        kind: "attempt_error",
-        message: friendlySimulatorError(submitResult.error.kind, "attempt"),
-      },
-    };
+    return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
   }
 
   // ── 8. GradeSimulatorAttempt ────────────────────────────────────────
@@ -277,13 +264,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   });
 
   if (Result.isErr(gradeResult)) {
-    return {
-      ok: false,
-      error: {
-        kind: "grading_error",
-        message: friendlySimulatorError(gradeResult.error.kind, "grading"),
-      },
-    };
+    return { ok: false, error: { kind: "grading_error", message: gradeResult.error.kind } };
   }
 
   const grade = gradeResult.value;
@@ -291,13 +272,7 @@ export async function strTriageAttempt(input: unknown): Promise<StrTriageAttempt
   // ── 9. ComposeAttemptFeedback ───────────────────────────────────────
   const feedbackResult = await container.composeAttemptFeedback.execute({ attemptId });
   if (Result.isErr(feedbackResult)) {
-    return {
-      ok: false,
-      error: {
-        kind: "feedback_error",
-        message: friendlySimulatorError(feedbackResult.error.kind, "feedback"),
-      },
-    };
+    return { ok: false, error: { kind: "feedback_error", message: feedbackResult.error.kind } };
   }
   const feedback = feedbackResult.value.feedback;
 

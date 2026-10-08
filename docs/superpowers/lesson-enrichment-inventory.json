@@ -155,10 +155,7 @@
       "Client language",
       "Key takeaways"
     ],
-    "directives": [
-      "trade-off",
-      "callout"
-    ],
+    "directives": ["trade-off", "callout"],
     "hasSelfCheck": true,
     "hasWorkedExample": true,
     "hasPractice": true,
@@ -189,11 +186,7 @@
       "Client language",
       "Key takeaways"
     ],
-    "directives": [
-      "trade-off",
-      "process",
-      "callout"
-    ],
+    "directives": ["trade-off", "process", "callout"],
     "hasSelfCheck": true,
     "hasWorkedExample": true,
     "hasPractice": true,
@@ -223,10 +216,7 @@
       "Client language",
       "Key takeaways"
     ],
-    "directives": [
-      "trade-off",
-      "callout"
-    ],
+    "directives": ["trade-off", "callout"],
     "hasSelfCheck": true,
     "hasWorkedExample": true,
     "hasPractice": true,
@@ -259,11 +249,7 @@
       "Fact card",
       "Module 1 complete"
     ],
-    "directives": [
-      "process",
-      "trade-off",
-      "callout"
-    ],
+    "directives": ["process", "trade-off", "callout"],
     "hasSelfCheck": true,
     "hasWorkedExample": true,
     "hasPractice": true,
@@ -1049,7 +1035,7 @@
       "The decision in one sentence",
       "The Why",
       "Building a Competitive Benchmarking Workflow",
-      "The Weekly Check-in",
+      "The 30-Minute Weekly Review",
       "Step 1: Identify Your Key Competitors",
       "Maintain a Competitor Watchlist",
       "Step 2: Gap Analysis",

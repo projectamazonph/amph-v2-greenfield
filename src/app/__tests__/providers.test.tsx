@@ -3,11 +3,7 @@ import { renderToString } from "react-dom/server";
 import { Providers } from "@/app/providers";
 
 describe("Providers", () => {
-  it("defaults to light mode on SSR so Astryx surfaces match the light AMPH shell", () => {
-    // SSR runs before localStorage is available, so useTheme() always
-    // reports "light" on the server. The client's useTheme() then takes
-    // over after hydration and may flip to "dark" if the user has selected
-    // it — see useTheme.ts.
+  it("pins Astryx to light mode so its surfaces match the light AMPH shell", () => {
     const html = renderToString(
       <Providers>
         <p>Admin content</p>

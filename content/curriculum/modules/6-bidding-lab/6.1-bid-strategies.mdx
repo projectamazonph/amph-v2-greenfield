@@ -16,10 +16,6 @@ After this lesson, you can pick Fixed Bids, Dynamic Up and Down, or Dynamic Down
 
 Match the bid strategy to how much conversion data and margin cushion you have. Less data or thinner margin points to Fixed Bids or Dynamic Down Only. More data and healthier margin points to Dynamic Up and Down.
 
-:::callout{id="lesson-6-1-pitfall" variant="pitfall" title="Trusting Fixed Bids to control CPC under volatile competition"}
-Fixed Bids cap what you pay per click, but they also cap how aggressively you bid in a competitive auction. Under volatile competitor pressure, Dynamic Bids, Up and Down lets Amazon adjust up to capture high-conversion traffic and down on the rest, while Fixed Bids holds the cap regardless.
-:::
-
 <SelfCheck
   id="sc-6-1"
   prompt="Which bid strategy can make your actual cost per click exceed the bid you typed in?"
@@ -35,6 +31,10 @@ Think of Amazon's three bid strategies like three ways to pay for a taxi:
 - **Fixed Bids** = flat-rate ride share. You know the price upfront. No surprises.
 - **Dynamic Up and Down** = surge pricing. When demand is high (high chance of conversion), the price goes up. When it's slow, the price drops.
 - **Dynamic Down Only** = flat-rate with a smart discount. The price never exceeds your set rate, but the driver might knock a few pesos off during slow periods.
+
+:::worksheet{id="how-amazons-auction-actually-works" title="How Amazon's Auction Actually Works" lesson="6.1-bid-strategies"}
+{"fields":[{"key":"note","label":"One thing the lesson asks you to stop trying to predict, and what to do instead. One sentence."}]}
+:::
 
 ## How Amazon's Auction Actually Works
 
@@ -72,6 +72,10 @@ Fixed Bids is like ordering a flat-rate airport shuttle. You know exactly what y
 
 **Rule of thumb**: Use Fixed Bids when learning, when margins are razor-thin, or when you want maximum control.
 
+:::worksheet{id="strategy-1-fixed-bids-the-flat-rate-taxi" title="Strategy 1: Fixed Bids (The Flat-Rate Taxi)" lesson="6.1-bid-strategies"}
+{"fields":[{"key":"note","label":"The single campaign type where you would start with Fixed Bids by default. One sentence."}]}
+:::
+
 ## Strategy 2: Dynamic Bids, Up and Down (The Surge Pricing)
 
 **What it does**: Amazon adjusts your bid both up AND down based on conversion likelihood. If a click looks highly likely to convert, the dynamic strategy itself can increase your bid, up to 100% at top-of-search and up to 50% at other placements. If the click looks unlikely to convert, Amazon reduces your bid. This is separate from placement adjustments (a manual multiplier of up to 900% you can layer on top for any bid strategy), which stack with whatever the dynamic strategy does.
@@ -98,6 +102,10 @@ Fixed Bids is like ordering a flat-rate airport shuttle. You know exactly what y
 
 **Quick check**: Before enabling Dynamic Up and Down, ask yourself: "Am I comfortable with my actual CPC potentially being 2–3x my set bid?" If no, start with Dynamic Down Only.
 
+:::worksheet{id="strategy-2-dynamic-bids-up-and-down-the-surge-pricing" title="Strategy 2: Dynamic Bids, Up and Down (The Surge Pricing)" lesson="6.1-bid-strategies"}
+{"fields":[{"key":"note","label":"One signal that says this campaign can tolerate Dynamic Up and Down. One sentence."}]}
+:::
+
 ## Strategy 3: Dynamic Bids, Down Only (The Smart Discount Taxi)
 
 **What it does**: Amazon can decrease your bid when it predicts a click won't convert, but it will **never** increase your bid above your set amount. Think of it as Fixed Bids with a safety net.
@@ -120,6 +128,10 @@ Fixed Bids is like ordering a flat-rate airport shuttle. You know exactly what y
 
 Dynamic Down Only is like a taxi driver who never charges surge prices, but might give you a discount during slow hours. You'll never pay more than the meter says, but you might pay less.
 
+:::worksheet{id="strategy-3-dynamic-bids-down-only-the-smart-discount-taxi" title="Strategy 3: Dynamic Bids, Down Only (The Smart Discount Taxi)" lesson="6.1-bid-strategies"}
+{"fields":[{"key":"note","label":"The one guarantee Dynamic Down Only makes about your set bid. One sentence."}]}
+:::
+
 :::comparison-table{id="bid-strategy-control-matrix" title="Compare bid strategies by control and risk"}
 {"caption":"The right strategy is the one whose risk profile fits the campaign's evidence and margin.","columns":["Fixed Bids","Dynamic Down Only","Dynamic Up and Down"],"rows":[{"label":"Can raise your set bid?","values":["No","No","Yes, based on conversion likelihood"]},{"label":"Cost predictability","values":["Highest","High","Lowest"],"emphasis":"positive"},{"label":"Best fit","values":["New data or thin margin","Safe optimization","Proven data and growth appetite"]},{"label":"Primary risk","values":["Missed auctions","Slower volume","Actual CPC exceeds set bid"],"emphasis":"warning"}]}
 :::
@@ -130,6 +142,10 @@ Dynamic Down Only is like a taxi driver who never charges surge prices, but migh
 
 :::decision-flow{id="bid-strategy-routing" title="Choose the bid strategy from evidence" reveal-mode="after-choice"}
 {"initialStep":0,"steps":[{"id":"data","label":"Check data maturity","question":"Do you have enough conversion history to trust the algorithm?","evidence":"Weeks of history, conversion volume, and stability of the campaign.","action":"With little data, prefer Fixed Bids or Down Only while you establish a baseline."},{"id":"margin","label":"Check margin cushion","question":"Can the product tolerate CPC variability?","evidence":"Break-even ACoS, maximum CPC, realized CPC, and return risk.","action":"With thin margin, keep the strategy from pushing bids above the ceiling."},{"id":"goal","label":"Name the goal","question":"Are you protecting profit or buying more qualified volume?","evidence":"Launch, steady-state efficiency, defense, or seasonal growth objective.","action":"Use Up and Down only when the objective and risk tolerance justify its variability."},{"id":"review","label":"Set a review rule","question":"What evidence would make you switch strategy?","evidence":"ACoS, CVR, realized CPC, volume, and placement performance over a fixed window.","action":"Write the review date and walk-away condition before enabling the strategy."}]}
+:::
+
+:::worksheet{id="what-would-you-do" title="What Would YOU Do?" lesson="6.1-bid-strategies"}
+{"fields":[{"key":"note","label":"The scenario from these three where you would reach for Dynamic Up and Down first. One sentence."}]}
 :::
 
 ## What Would YOU Do?
@@ -156,6 +172,10 @@ Before looking at the framework below, think about these scenarios yourself:
 | Brand defense | Dynamic Up and Down | Win at all costs on your own brand terms |
 | Seasonal/holiday push | Dynamic Up and Down | Capture every conversion during peak demand |
 
+:::worksheet{id="the-decision-framework" title="The Decision Framework" lesson="6.1-bid-strategies"}
+{"fields":[{"key":"note","label":"The column in the framework table that decides the strategy for you. One sentence."}]}
+:::
+
 ## How Bid Strategy Affects ACoS
 
 Your strategy directly impacts your ACoS:
@@ -167,6 +187,10 @@ Your strategy directly impacts your ACoS:
 **Dynamic Up and Down** → ACoS can go either way. More sales (good) but higher average CPC. If additional sales come from high-converting placements, ACoS improves. If from marginal placements, ACoS worsens.
 
 Start with Fixed Bids for 2 weeks to gather baseline data. Switch to Dynamic Down Only for 2 more weeks to let Amazon reduce waste. Graduate to Dynamic Up and Down once you have at least a month of conversion history.
+
+:::worksheet{id="how-bid-strategy-affects-acos" title="How Bid Strategy Affects ACoS" lesson="6.1-bid-strategies"}
+{"fields":[{"key":"note","label":"The strategy that adds the most upside AND the most ACoS variability. One sentence."}]}
+:::
 
 ## Key Takeaways
 
@@ -235,7 +259,7 @@ What the learner can do: Set a maximum bid and choose a bid strategy (Fixed, Dyn
 Who can access it: All Sponsored Products advertisers
 Retailer or marketplace scope: Amazon Advertising Console. Exact auction mechanics are not publicly documented and are not identical across marketplaces
 Official source URL: https://advertising.amazon.com/help/GCU2BUWJH2W3A8Z7
-Last verified: 2026-09-25
-Next review due: 2026-01-25
+Last verified: pending content-owner review
+Next review due: pending content-owner review
 Owner: Ryan Roland Dabao
 ```

@@ -22,6 +22,10 @@ Amazon's search-results page ranks ads by a formula that combines your bid, the 
 
 The three placement tiers, from highest to lowest typical CPC, are: top of search (the slots above the organic results on page one), product pages (ads shown on competing product detail pages), and the rest of search (further down the organic results). Lesson 4 covers the campaign settings that control placement.
 
+:::worksheet{id="how-an-amazon-search-ad-auction-works" title="How an Amazon search ad auction works" lesson="1.2-cpc-ctr"}
+{"fields":[{"key":"auctionNote","label":"One sentence on how the auction actually ranks your ad"}]}
+:::
+
 ## CPC: what's a click actually worth?
 
 CPC, cost per click, is what you pay each time a shopper clicks your ad: `CPC = ad spend ÷ clicks`.
@@ -62,6 +66,10 @@ Always calculate the **maximum CPC** a target can support before judging whether
 
 :::formula-ladder{id="max-cpc-formula" title="Calculate the maximum CPC before changing the bid"}
 {"steps":[{"label":"Start with the selling price","expression":"₱1,250"},{"label":"Apply expected conversion rate","expression":"₱1,250 × 10% = ₱125 expected ad sales per click","explanation":"A click is valuable only when it has a realistic path to an order."},{"label":"Apply the target ACoS","expression":"₱125 × 30% = ₱37.50 (≈ ₱38) maximum CPC","explanation":"This is the ceiling for the target, not a claim about profit."}],"result":{"label":"Maximum CPC","value":"₱38","context":"Compare the actual CPC to this ceiling before deciding whether the bid is the problem."},"note":"The formula gives you a decision boundary: it does not tell you to bid the full ceiling."}
+:::
+
+:::worksheet{id="cpc-whats-a-click-actually-worth" title="CPC: what's a click actually worth?" lesson="1.2-cpc-ctr"}
+{"fields":[{"key":"productCvr","label":"Product's CVR"},{"key":"targetAcos","label":"Target ACoS"},{"key":"maxCpc","label":"Maximum CPC (price × CVR × target ACoS)"},{"key":"actualCpc","label":"Actual CPC this week"},{"key":"aboveOrBelowMax","label":"Above or below maximum?"}]}
 :::
 
 ## CTR: are people clicking?
@@ -106,6 +114,10 @@ You sell a silicone baking mat for ₱1,000.
 
 Fewer but more relevant impressions, plus more clicks, means a better CTR. You don't want to be seen by everyone. You want to be seen by the shoppers who are actually looking for your product.
 
+:::worksheet{id="ctr-are-people-clicking" title="CTR: are people clicking?" lesson="1.2-cpc-ctr"}
+{"fields":[{"key":"weeklyCtr","label":"CTR this week"},{"key":"ctrDiagnosis","label":"Your one-line diagnosis (relevant / too broad / weak surface / unknown)"}]}
+:::
+
 ## The CPC-CTR relationship
 
 Ad relevance signals connect CPC and CTR. Amazon doesn't publish a single inspectable "quality score" a VA can check, but the pattern is observable in your own reports:
@@ -147,6 +159,10 @@ A high CTR with a low conversion rate means the ad attracts clicks but doesn't b
 {"initialStep":0,"steps":[{"id":"attention","label":"Check attention","question":"Is CTR weak for the placement and search intent?","evidence":"Impressions, clicks, placement, title, main image, and query relevance.","action":"If CTR is weak, fix the relevance or listing surface before calling CPC the problem."},{"id":"economics","label":"Check economics","question":"Is actual CPC above the maximum-CPC ceiling?","evidence":"Actual CPC compared with AOV × CVR × target ACoS.","action":"If CPC is above the ceiling, lower the bid or move budget toward terms with better conversion economics."},{"id":"conversion","label":"Check conversion","question":"Does the click become an order at a believable rate?","evidence":"Orders, CVR, detail-page quality, price, reviews, and offer fit.","action":"If CVR is weak, improve the listing or offer before buying more traffic."},{"id":"change","label":"Choose one lever","question":"What is the smallest change that tests the diagnosis?","evidence":"One metric, one hypothesis, one review window.","action":"Change one lever, record the reason, and review after enough clicks to avoid reacting to noise."}]}
 :::
 
+:::worksheet{id="the-cpc-ctr-relationship" title="The CPC-CTR relationship" lesson="1.2-cpc-ctr"}
+{"fields":[{"key":"firstCheck","label":"If CPC is above the maximum and CTR is low, do you check the bid or the targeting first?"},{"key":"oneChange","label":"The single change you'd commit to this week"}]}
+:::
+
 ## Independent calculation
 
 Work this case without copying the numbers from either worked example. Write the formula, substitute the values, and then explain the safest next step.
@@ -170,7 +186,16 @@ Answer these before reading further:
 
 Part 2 of your Profitability and Max-CPC Sheet from Lesson 1.1. Add these fields and fill them in for the same product:
 
-:::worksheet{id="mod1-2-profitability-sheet" title="Part 2 of your Profitability and Max-CPC Sheet" part="2" lesson="1.2-cpc-ctr"}
+```text
+Product's CVR: ____________________
+Target ACoS: ____________________
+Maximum CPC (price × CVR × target ACoS): ____________________
+Actual CPC this week: ____________________
+Above or below maximum?: ____________________
+CTR this week: ____________________
+If CPC is above maximum, is the first check the bid or the targeting?: ____________________
+```
+
 ## Fact card
 
 ```text
@@ -179,8 +204,8 @@ What the learner can do: use CTR, CVR, and search-term relevance as observable p
 Who can access it: any Sponsored Products advertiser, through standard performance reports
 Retailer or marketplace scope: Amazon Advertising, Sponsored Products (US price bands converted to pesos for Philippine readers)
 Official source URL: https://advertising.amazon.com/help/GCU2BUWJH2W3A8Z7
-Last verified: 2026-09-25
-Next review due: 2026-01-25
+Last verified: pending content-owner review
+Next review due: pending content-owner review
 Owner: Ryan Roland Dabao
 ```
 

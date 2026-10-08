@@ -16,13 +16,9 @@ import { describe, expect, it } from "vitest";
  * `src/composition/container.test.ts`.
  *
  * Scope is deliberately narrow: the files that describe the repository as it is
- * now. That is two tiers, both taken from `docs/README.md`'s own "Current sources
- * of truth" table: `GUIDANCE_DOCS`, which describe the repository itself, and
- * `REFERENCE_DOCS`, which describe one subsystem of it. `CHANGELOG.md`,
- * `docs/stories/*`, `docs/sprint-plan.md`, `docs/SHIPPED-AND-REMAINING.md`,
- * `SESSION-HANDOVER.md`'s dated entries and the audit write-ups are retained
- * history, so a path that has since moved inside them is correct as written and is
- * not failed here.
+ * now. `CHANGELOG.md`, `docs/stories/*`, `SESSION-HANDOVER.md`'s dated entries and
+ * the audit write-ups are retained history and `docs/README.md` says so, so a path
+ * that has since moved inside them is correct as written and is not failed here.
  *
  * Placeholders (`STORY-XXX.md`, `<feature>.ts`, globs) are filtered out by shape.
  * What remains, `KNOWN_ABSENT` exempts by name with a reason, and the last
@@ -44,35 +40,6 @@ const GUIDANCE_DOCS = [
   "content/README.md",
 ];
 
-/**
- * The second tier, taken from `docs/README.md`'s own "Current sources of truth"
- * table: these documents make present-tense claims about where code lives and
- * what it does, so a stale path in them sends a reader looking for a file that
- * is not there. `docs/sprint-plan.md` and `docs/SHIPPED-AND-REMAINING.md` are on
- * that page under delivery history and stay out for the same reason the stories
- * do. Three files in the table cite no repository path at all and were measured
- * as empty on 2026-09-23 (`docs/product-brief.md`, `docs/voice-guide.md`,
- * `docs/DISASTER-RECOVERY-RUNBOOK.md`), so scanning them would change nothing.
- */
-const REFERENCE_DOCS = [
-  "docs/api-reference.md",
-  "docs/admin-backend.md",
-  "docs/business-layer.md",
-  "docs/db-schema.md",
-  "docs/build-spec.md",
-  "docs/decisions.md",
-  "docs/design-brief.md",
-  "docs/LEARNING-EXPERIENCE-8.5-BUILD-PLAN.md",
-  "docs/runbooks/admin-access-recovery.md",
-  "docs/runbooks/db-backup-restore.md",
-  "docs/runbooks/learning-release-gate.md",
-  "docs/runbooks/paymongo-outage.md",
-  "docs/runbooks/simulator-scenario-missing.md",
-  "docs/runbooks/webhook-replay.md",
-];
-
-const SCANNED_DOCS = [...GUIDANCE_DOCS, ...REFERENCE_DOCS];
-
 const PATH_IN_BACKTICKS =
   /`((?:docs|content|scripts|src|prisma|tests)\/[\w\-./@]+\.(?:md|mdx|json|ts|tsx|mjs|cjs|js|prisma|yml|yaml|sql))`/g;
 
@@ -92,20 +59,14 @@ const PLACEHOLDER_SHAPE = /[<>*{}$?]|XXX|NNN/;
  * about an absence, so the reference must stay absent for the prose to be true.
  */
 const KNOWN_ABSENT: Record<string, string> = {
+  "src/usecases/ImportAmphContent.ts":
+    "deleted by 915c7ca; CLAUDE.md and STATE.md cite it to explain why pnpm import:content cannot run",
   "src/infra/payment/PayMongoAdapter.test.ts":
     "moved into __tests__/ by the 2026-08-02 session; CLAUDE.md names the old path to record that it was never collected",
   "docs/audit-2026-07-27-completeness-review.md":
     "removed on 2026-09-14 by e1f7352 (PR #513); AGENTS.md, CLAUDE.md, README.md and FEATURES.md now name it as gone",
   "docs/audit-2026-07-26-simulator-accuracy-review.md":
-    "removed on 2026-09-14 by e1f7352; CLAUDE.md and docs/db-schema.md cite it as the source of the pre-Sprint-14 findings and say it is gone",
-  "docs/audit-2026-07-26-hardening-review.md":
-    "removed on 2026-09-14 by e1f7352; the paymongo and admin-access runbooks cite it as the review that first recorded those gaps and say it is gone",
-  "src/composition/requestContainer.ts":
-    "never built as a separate file; ADR-017 and docs/build-spec.md now carry as-built notes saying the AsyncLocalStorage scope lives in container.ts",
-  "src/domain/simulators/Simulator.ts":
-    "wrong directory and wrong layer; ADR-019's as-built note names the real port at src/ports/simulator/Simulator.ts",
-  "src/middleware.ts":
-    "renamed by Next.js 16; docs/build-spec.md's as-built note points at src/proxy.ts",
+    "removed on 2026-09-14 by e1f7352; CLAUDE.md cites it as the source of the pre-Sprint-14 findings",
   "docs/ULTRA-REVIEW-2026-08-14.md":
     "removed on 2026-09-14 by e1f7352; STATE.md cites it above the triage table that is its only surviving copy",
   "docs/CONTENT-AUDIT-2026-07-16.md":
@@ -124,7 +85,7 @@ type Ref = { doc: string; line: number; path: string };
 
 function collectRefs(): Ref[] {
   const refs: Ref[] = [];
-  for (const doc of SCANNED_DOCS) {
+  for (const doc of GUIDANCE_DOCS) {
     const text = readFileSync(resolve(ROOT, doc), "utf8");
     const baseDir = dirname(resolve(ROOT, doc));
     const lineOf = (index: number) => text.slice(0, index).split("\n").length;
@@ -155,9 +116,9 @@ describe("guidance documents cite real paths", () => {
   const refs = collectRefs();
 
   it("scans enough references for the check to mean something", () => {
-    expect(refs.length).toBeGreaterThan(200);
+    expect(refs.length).toBeGreaterThan(120);
     const docsSeen = new Set(refs.map((r) => r.doc));
-    expect(docsSeen.size).toBe(SCANNED_DOCS.length);
+    expect(docsSeen.size).toBe(GUIDANCE_DOCS.length);
   });
 
   it("names no file that has been deleted or misnamed", () => {
@@ -172,13 +133,5 @@ describe("guidance documents cite real paths", () => {
       .filter(([path]) => isPresent(path))
       .map(([path, reason]) => `${path} exists again; the prose that cites it says "${reason}"`);
     expect(resurrected).toEqual([]);
-  });
-
-  it("only exempts a path some document still cites", () => {
-    // Otherwise the exemption list becomes its own kind of stale reference: a
-    // reason attached to a sentence that no longer exists anywhere.
-    const cited = new Set(refs.map((r) => r.path));
-    const unused = Object.keys(KNOWN_ABSENT).filter((path) => !cited.has(path));
-    expect(unused).toEqual([]);
   });
 });

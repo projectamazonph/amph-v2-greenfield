@@ -138,6 +138,7 @@ import { SetCoursePrerequisite } from "@/usecases/SetCoursePrerequisite";
 import { RemoveCoursePrerequisite } from "@/usecases/RemoveCoursePrerequisite";
 // P1-02 (PR-C slice 2): assignments
 import type { IAssignmentRepository } from "@/ports/repositories/IAssignmentRepository";
+import type { IWorksheetRepository } from "@/ports/repositories/IWorksheetRepository";
 import { PrismaAssignmentRepository } from "@/infra/repositories/PrismaAssignmentRepository";
 import { CreateAssignment } from "@/usecases/CreateAssignment";
 import { SubmitAssignment } from "@/usecases/SubmitAssignment";
@@ -147,14 +148,12 @@ import { AdminListAssignments } from "@/usecases/AdminListAssignments";
 // LEARN-033 (STORY-135): learner artefacts
 import type { IArtefactRepository } from "@/ports/repositories/IArtefactRepository";
 import { PrismaArtefactRepository } from "@/infra/repositories/PrismaArtefactRepository";
+import { PrismaWorksheetRepository } from "@/infra/repositories/PrismaWorksheetRepository";
+import { GetWorksheet } from "@/usecases/GetWorksheet";
+import { SaveWorksheetH2 } from "@/usecases/SaveWorksheetH2";
 import { SaveArtefact } from "@/usecases/SaveArtefact";
 import { SubmitArtefact } from "@/usecases/SubmitArtefact";
 import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
-// STORY-163: Module 1 worksheet artifact
-import type { WorksheetRepository } from "@/ports/repositories/WorksheetRepository";
-import { PrismaWorksheetRepository } from "@/infra/repositories/PrismaWorksheetRepository";
-import { GetWorksheet } from "@/usecases/GetWorksheet";
-import { SaveWorksheetEntry } from "@/usecases/SaveWorksheetEntry";
 // LEARN-040 (STORY-138): retrieval-check tracking
 import type { IRetrievalCheckRepository } from "@/ports/repositories/IRetrievalCheckRepository";
 import { PrismaRetrievalCheckRepository } from "@/infra/repositories/PrismaRetrievalCheckRepository";
@@ -252,7 +251,6 @@ import { EnrollStudent } from "@/usecases/EnrollStudent";
 import { AuthorizeLessonAccess } from "@/usecases/AuthorizeLessonAccess";
 import { MarkLessonComplete } from "@/usecases/MarkLessonComplete";
 import { ApplyDiscountCode } from "@/usecases/ApplyDiscountCode";
-import { AdminApplyDiscountCode } from "@/usecases/AdminApplyDiscountCode";
 import { AdminListDiscountCodes } from "@/usecases/AdminListDiscountCodes";
 import { AdminGetDiscountCode } from "@/usecases/AdminGetDiscountCode";
 import { AdminCreateDiscountCode } from "@/usecases/AdminCreateDiscountCode";
@@ -512,7 +510,6 @@ export interface AppContainer {
   markLessonComplete: MarkLessonComplete;
   enrollStudent: EnrollStudent;
   applyDiscountCode: ApplyDiscountCode;
-  adminApplyDiscountCode: AdminApplyDiscountCode;
   // STORY-050d: admin discount code CRUD
   adminListDiscountCodes: AdminListDiscountCodes;
   adminGetDiscountCode: AdminGetDiscountCode;
@@ -554,15 +551,15 @@ export interface AppContainer {
   gradeAssignment: GradeAssignment;
   listStudentAssignments: ListStudentAssignments;
   adminListAssignments: AdminListAssignments;
+  // Per-H2 worksheet entries (replaces deleted Module 1 wide-row)
+  worksheetRepo: IWorksheetRepository;
+  getWorksheet: GetWorksheet;
+  saveWorksheetH2: SaveWorksheetH2;
   // LEARN-033 (STORY-135): learner artefacts
   artefactRepo: IArtefactRepository;
   saveArtefact: SaveArtefact;
   submitArtefact: SubmitArtefact;
   listStudentArtefacts: ListStudentArtefacts;
-  // STORY-163: Module 1 worksheet artifact
-  worksheetRepo: WorksheetRepository;
-  getWorksheet: GetWorksheet;
-  saveWorksheetEntry: SaveWorksheetEntry;
   // LEARN-040 (STORY-138): retrieval-check tracking
   retrievalCheckRepo: IRetrievalCheckRepository;
   recordRetrievalCheck: RecordRetrievalCheck;
@@ -841,10 +838,10 @@ function buildProductionContainer(): AppContainer {
   const prerequisiteRepo: IPrerequisiteRepository = new PrismaPrerequisiteRepository(prisma);
   // P1-02 (PR-C slice 2): assignments
   const assignmentRepo: IAssignmentRepository = new PrismaAssignmentRepository(prisma);
+  // Per-H2 worksheet entries (replaces deleted Module 1 wide-row)
+  const worksheetRepo: IWorksheetRepository = new PrismaWorksheetRepository(prisma);
   // LEARN-033 (STORY-135): learner artefacts
   const artefactRepo: IArtefactRepository = new PrismaArtefactRepository(prisma);
-  // STORY-163: Module 1 worksheet artifact
-  const worksheetRepo: WorksheetRepository = new PrismaWorksheetRepository(prisma);
   // LEARN-040 (STORY-138): retrieval-check tracking
   const retrievalCheckRepo: IRetrievalCheckRepository = new PrismaRetrievalCheckRepository(prisma);
   // P3-87 (STORY-139): in-app notifications
@@ -928,7 +925,6 @@ function buildProductionContainer(): AppContainer {
     orderRepo,
     paymentGateway,
     recordAuditLog,
-    enrollmentRepo,
     courseRepo,
     userRepo,
     emailSender,
@@ -938,23 +934,6 @@ function buildProductionContainer(): AppContainer {
   });
 
   const awardXp = new AwardXP({ xpAwardRepo, idGen, clock });
-
-  // STORY-041 + decision 5 (auto-issue on completion): IssueCertificate
-  // is a dependency of MarkLessonComplete, so it must be built before
-  // markLessonComplete in the returned object literal below.
-  const issueCertificate = new IssueCertificate({
-    enrollmentRepo,
-    courseRepo,
-    certificateRepo,
-    hashGen: certificateHashGen,
-    idGen,
-    clock,
-    userRepo,
-    emailSender,
-    certificateEmailRenderer,
-    logger,
-    emailTemplateRepo,
-  });
 
   return {
     clock,
@@ -1006,21 +985,12 @@ function buildProductionContainer(): AppContainer {
       progressEventRepo,
       idGen,
       clock,
-      issueCertificate,
-      recordAuditLog,
     }),
     enrollStudent,
     discountCodeRepo,
     applyDiscountCode: new ApplyDiscountCode({
       discountCodeRepo,
       clock,
-    }),
-    adminApplyDiscountCode: new AdminApplyDiscountCode({
-      orderRepo,
-      discountCodeRepo,
-      clock,
-      recordAuditLog,
-      logger,
     }),
     // STORY-050d: admin discount code CRUD
     adminListDiscountCodes: new AdminListDiscountCodes({ discountCodeRepo }),
@@ -1106,7 +1076,19 @@ function buildProductionContainer(): AppContainer {
     emailSender,
     receiptEmailRenderer,
     simulatorRegistry: buildSimulatorRegistry(),
-    issueCertificate,
+    issueCertificate: new IssueCertificate({
+      enrollmentRepo,
+      courseRepo,
+      certificateRepo,
+      hashGen: certificateHashGen,
+      idGen,
+      clock,
+      userRepo,
+      emailSender,
+      certificateEmailRenderer,
+      logger,
+      emailTemplateRepo,
+    }),
     renderCertificatePdf: new RenderCertificatePdf({
       certificateRepo,
       userRepo,
@@ -1270,12 +1252,10 @@ function buildProductionContainer(): AppContainer {
       clock,
       courseRepo,
       userRepo,
-      enrollmentRepo,
       emailSender,
       refundEmailRenderer,
       logger,
       emailTemplateRepo,
-      recordAuditLog,
     }),
     refundOverride,
     // STORY-062: admin refund request list + process
@@ -1486,15 +1466,19 @@ function buildProductionContainer(): AppContainer {
     gradeAssignment: new GradeAssignment({ assignmentRepo, clock, recordAuditLog }),
     listStudentAssignments: new ListStudentAssignments({ assignmentRepo, clock }),
     adminListAssignments: new AdminListAssignments({ assignmentRepo }),
+    // Per-H2 worksheet entries
+    worksheetRepo,
+    getWorksheet: new GetWorksheet({ worksheetRepo }),
+    saveWorksheetH2: new SaveWorksheetH2({
+      worksheetRepo,
+      recordAuditLog,
+      clock: () => clock.now(),
+    }),
     // LEARN-033 (STORY-135): learner artefacts
     artefactRepo,
     saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
     submitArtefact: new SubmitArtefact({ artefactRepo, clock }),
     listStudentArtefacts: new ListStudentArtefacts({ artefactRepo }),
-    // STORY-163: Module 1 worksheet artifact
-    worksheetRepo,
-    getWorksheet: new GetWorksheet({ worksheetRepo }),
-    saveWorksheetEntry: new SaveWorksheetEntry({ worksheetRepo, recordAuditLog, clock }),
     // LEARN-040 (STORY-138): retrieval-check tracking
     retrievalCheckRepo,
     recordRetrievalCheck: new RecordRetrievalCheck({ retrievalCheckRepo, idGen, clock }),

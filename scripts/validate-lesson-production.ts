@@ -72,7 +72,6 @@ const ALLOWED_DIRECTIVES = new Set([
   "callout",
   "visual",
   "slide",
-  // STORY-163: Module 1 worksheet artifact.
   "worksheet",
   ...TRANCHE_ONE_DIRECTIVES,
   ...TRANCHE_TWO_DIRECTIVES,
@@ -83,20 +82,8 @@ const EM_DASH = "\u2014";
 // Extract JSX attributes from a SelfCheck body. Handles name="..." (double-quoted),
 // name='...' (single-quoted), and name={...} (brace-delimited expression, up to
 // 2 levels of nested braces). The brace value is returned WITHOUT the outer braces.
-// Match a JSX attribute value. Three forms:
-//   name="..."          double-quoted string
-//   name='...'          single-quoted string
-//   name={EXPR}         brace-delimited expression; EXPR may contain
-//                       brackets and braces at up to 2 levels of nesting.
-// The brace alternative below must be permissive enough to match
-// `options={["a", "b"]}` and `answerIndex={4}` -- prior versions
-// (e.g. `\{(?:[^{}]|\{[^{}]*\})*\}`) failed in the V8/JS regex engine
-// when the body contained `[` or `]` even though both characters are
-// in the negated class. The fix uses `\{[^}]*\}` (greedy non-`}`
-// run, then closing brace) for the captured group, with the trailing
-// whitespace OUTSIDE the group so slice(1, -1) correctly strips the
-// braces and leaves the inner expression untouched.
-const JSX_ATTR_RE = /([a-zA-Z][\w-]*)\s*=\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\{[^}]*\})\s*/g;
+const JSX_ATTR_RE =
+  /([a-zA-Z][\w-]*)\s*=\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\{(?:[^{}]|\{[^{}]*\})*\})/g;
 
 function extractJsxAttrs(body: string): Record<string, string> {
   const out: Record<string, string> = {};

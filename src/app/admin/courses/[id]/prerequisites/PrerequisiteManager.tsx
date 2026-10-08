@@ -40,19 +40,12 @@ interface Props {
 const initialState: PrerequisiteFormResult | null = null;
 
 function RemoveRuleButton({ rule }: { rule: PrerequisiteRuleView }) {
-  const [state, formAction, isPending] = useActionState(
-    removePrerequisiteAction,
-    initialState,
-  );
+  const [state, formAction, isPending] = useActionState(removePrerequisiteAction, initialState);
   return (
     <form action={formAction} className={styles.removeForm}>
       <input type="hidden" name="courseId" value={rule.courseId} />
       <input type="hidden" name="requiresCourseId" value={rule.requiresCourseId} />
-      <input
-        type="hidden"
-        name="requiresLessonId"
-        value={rule.requiresLessonId ?? ""}
-      />
+      <input type="hidden" name="requiresLessonId" value={rule.requiresLessonId ?? ""} />
       <button type="submit" className={styles.remove} disabled={isPending}>
         {isPending ? "Removing..." : "Remove"}
       </button>
@@ -66,17 +59,8 @@ function RemoveRuleButton({ rule }: { rule: PrerequisiteRuleView }) {
 }
 
 export function PrerequisiteManager({ courseId, rules, otherCourses }: Props) {
-  const [state, formAction, isPending] = useActionState(
-    setPrerequisiteAction,
-    initialState,
-  );
-  const [selectedCourseId, setSelectedCourseId] = useState(
-    otherCourses[0]?.id ?? "",
-  );
-  // CLICK-PATH-003: the scope select is uncontrolled, so keep it keyed to
-  // the course. Changing course remounts the select at "Whole course"
-  // instead of posting a stale lesson id from the previous course.
-  const [scopeKey, setScopeKey] = useState(selectedCourseId);
+  const [state, formAction, isPending] = useActionState(setPrerequisiteAction, initialState);
+  const [selectedCourseId, setSelectedCourseId] = useState(otherCourses[0]?.id ?? "");
   const selectedCourse = otherCourses.find((c) => c.id === selectedCourseId) ?? null;
 
   const errorText = state?.kind === "error" ? (state.message ?? state.error) : null;
@@ -85,19 +69,20 @@ export function PrerequisiteManager({ courseId, rules, otherCourses }: Props) {
     <div>
       <h2 className={styles.sectionTitle}>Live rules ({rules.length})</h2>
       {rules.length === 0 ? (
-        <p className={styles.empty}>
-          No prerequisites. Anyone eligible can enroll right away.
-        </p>
+        <p className={styles.empty}>No prerequisites. Anyone eligible can enroll right away.</p>
       ) : (
         <ul className={styles.ruleList}>
           {rules.map((rule) => (
-            <li key={`${rule.requiresCourseId}:${rule.requiresLessonId ?? "course"}`} className={styles.ruleRow}>
+            <li
+              key={`${rule.requiresCourseId}:${rule.requiresLessonId ?? "course"}`}
+              className={styles.ruleRow}
+            >
               <span className={styles.ruleText}>
-                Requires{" "}
-                <strong>{rule.requiresCourseTitle}</strong>
+                Requires <strong>{rule.requiresCourseTitle}</strong>
                 {rule.requiresLessonTitle !== null && (
                   <>
-                    {" "}lesson <strong>{rule.requiresLessonTitle}</strong>
+                    {" "}
+                    lesson <strong>{rule.requiresLessonTitle}</strong>
                   </>
                 )}
                 {rule.requiresLessonTitle === null && " (whole course)"}
@@ -116,10 +101,7 @@ export function PrerequisiteManager({ courseId, rules, otherCourses }: Props) {
           <select
             name="requiresCourseId"
             value={selectedCourseId}
-            onChange={(e) => {
-              setSelectedCourseId(e.target.value);
-              setScopeKey(e.target.value);
-            }}
+            onChange={(e) => setSelectedCourseId(e.target.value)}
             className={styles.select}
             disabled={isPending || otherCourses.length === 0}
           >
@@ -132,13 +114,7 @@ export function PrerequisiteManager({ courseId, rules, otherCourses }: Props) {
         </label>
         <label className={styles.field}>
           <span className={styles.label}>Scope</span>
-          <select
-            key={scopeKey}
-            name="requiresLessonId"
-            className={styles.select}
-            disabled={isPending}
-            defaultValue=""
-          >
+          <select name="requiresLessonId" className={styles.select} disabled={isPending}>
             <option value="">Whole course (finish every lesson)</option>
             {(selectedCourse?.lessons ?? []).map((lesson) => (
               <option key={lesson.id} value={lesson.id}>

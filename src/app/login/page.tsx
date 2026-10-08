@@ -11,12 +11,7 @@
  * awaited. In Next 16 with React 19, the page is async by default.
  */
 
-export const metadata = {
-  title: "Login — AMPH Academy",
-  description: "Sign in to your Project Amazon PH Academy student account.",
-  robots: { index: false, follow: false },
-  alternates: { canonical: "/login" },
-};
+export const metadata = { title: "Login — AMPH Academy" };
 
 import { LoginForm } from "./LoginForm";
 
