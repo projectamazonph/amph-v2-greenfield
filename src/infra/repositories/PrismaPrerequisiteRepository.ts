@@ -81,6 +81,18 @@ export class PrismaPrerequisiteRepository implements IPrerequisiteRepository {
     }
   }
 
+  async listAll(): Promise<Result<readonly Prerequisite[], PrerequisiteQueryError>> {
+    try {
+      const rows = await this.db.prerequisite.findMany({
+        where: { deletedAt: null },
+        orderBy: { createdAt: "asc" },
+      });
+      return Result.ok(rows.map((row) => this.mapRow(row)));
+    } catch (err: unknown) {
+      return Result.err({ kind: "db_error", message: String(err) });
+    }
+  }
+
   async update(prereq: Prerequisite): Promise<Result<Prerequisite, PrerequisiteRepoError>> {
     try {
       const row = await this.db.prerequisite.update({

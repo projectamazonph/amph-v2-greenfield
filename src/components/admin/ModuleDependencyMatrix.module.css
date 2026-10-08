@@ -1,0 +1,170 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+
+.legendTitle {
+  font-weight: 600;
+  color: var(--ink-700, #334155);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+}
+
+.toggleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+}
+
+.toggleButton {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 500;
+  border: 1px solid var(--border, #cbd5e1);
+  background: var(--surface-1, #ffffff);
+  color: var(--ink-700, #334155);
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toggleButtonActive {
+  background: var(--accent, #f08c1f);
+  color: #ffffff;
+  border-color: var(--accent, #f08c1f);
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-1, #ffffff);
+}
+
+.matrixTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.matrixTable th,
+.matrixTable td {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border, #e2e8f0);
+}
+
+.headerCell {
+  background: var(--surface-2, #f1f5f9);
+  font-weight: 600;
+  color: var(--ink-900, #1e293b);
+  white-space: nowrap;
+}
+
+.rowHeader {
+  text-align: left;
+  background: var(--surface-2, #f8fafc);
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 180px;
+}
+
+.rowCode {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: var(--accent, #f08c1f);
+  margin-right: 0.4rem;
+}
+
+.courseBadge {
+  display: inline-block;
+  font-size: 0.7rem;
+  color: var(--ink-500, #64748b);
+  margin-left: 0.4rem;
+}
+
+.cellPrereq {
+  background: #fef3c7; /* Subtle amber/orange */
+  color: #92400e;
+  font-weight: 600;
+  cursor: help;
+}
+
+.cellDependent {
+  background: #e0f2fe; /* Subtle blue */
+  color: #075985;
+  font-weight: 600;
+  cursor: help;
+}
+
+.cellSelf {
+  background: var(--surface-2, #f1f5f9);
+  color: var(--ink-500, #94a3b8);
+}
+
+.cellNone {
+  color: var(--ink-300, #cbd5e1);
+}
+
+.emptyState {
+  padding: var(--space-6, 1.5rem);
+  text-align: center;
+  background: var(--surface-1, #ffffff);
+  border: 1px dashed var(--border, #cbd5e1);
+  border-radius: var(--radius-md, 8px);
+}
+
+.emptyTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-2, 0.5rem) 0;
+  color: var(--ink-900, #1e293b);
+}
+
+.emptyDesc {
+  font-size: 0.9rem;
+  color: var(--ink-500, #64748b);
+  margin: 0 0 var(--space-4, 1rem) 0;
+}
+
+.manageLink {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--accent, #f08c1f);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: var(--radius-md, 8px);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.manageLink:hover {
+  opacity: 0.9;
+}

@@ -15,7 +15,12 @@ import type {
   PrerequisiteRepoError,
 } from "@/ports/repositories/IPrerequisiteRepository";
 
-function sameTriple(a: Prerequisite, courseId: string, requiresCourseId: string, requiresLessonId: string | null): boolean {
+function sameTriple(
+  a: Prerequisite,
+  courseId: string,
+  requiresCourseId: string,
+  requiresLessonId: string | null,
+): boolean {
   return (
     a.courseId === courseId &&
     a.requiresCourseId === requiresCourseId &&
@@ -64,9 +69,18 @@ export class InMemoryPrerequisiteRepository implements IPrerequisiteRepository {
     return Result.ok(null);
   }
 
-  async listByCourseId(courseId: string): Promise<Result<readonly Prerequisite[], PrerequisiteQueryError>> {
+  async listByCourseId(
+    courseId: string,
+  ): Promise<Result<readonly Prerequisite[], PrerequisiteQueryError>> {
     const rules = Array.from(this.rows.values())
       .filter((prereq) => prereq.courseId === courseId && prereq.deletedAt === null)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    return Result.ok(rules);
+  }
+
+  async listAll(): Promise<Result<readonly Prerequisite[], PrerequisiteQueryError>> {
+    const rules = Array.from(this.rows.values())
+      .filter((prereq) => prereq.deletedAt === null)
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     return Result.ok(rules);
   }

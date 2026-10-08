@@ -94,6 +94,7 @@ describe("EnrollStudent", () => {
       create: vi.fn(),
       findRule: vi.fn(),
       listByCourseId: vi.fn().mockResolvedValue(Result.ok([])),
+      listAll: vi.fn().mockResolvedValue(Result.ok([])),
       update: vi.fn(),
     };
     useCase = new EnrollStudent({

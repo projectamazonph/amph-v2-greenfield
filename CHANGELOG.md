@@ -4,6 +4,11 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### Admin Module Dependency Matrix (t_94861779)
+
+Built admin-only module dependency matrix at `/admin/courses/dependencies` and `/admin/courses/[id]/dependencies`.
+Visualizes prerequisite and dependent relationships across all curriculum modules in a dense 9×9 core or 13×13 full matrix grid. Includes course and lesson prerequisite rule badges, legend, hover tooltips, and empty-state configuration prompts. Powered by `GetModuleDependencyMatrix` usecase and `IPrerequisiteRepository.listAll()`.
+
 ### STORY-132: Close LEARN-014 first-decision story doc (shipped via PR #523)
 
 Pre-flight grep showed the work ships on main via PR #523 (commit

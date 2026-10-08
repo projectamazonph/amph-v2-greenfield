@@ -310,6 +310,7 @@ import { AdminGetCourse } from "@/usecases/AdminGetCourse";
 import { CreateCourse } from "@/usecases/CreateCourse";
 import { UpdateCourse } from "@/usecases/UpdateCourse";
 import { ArchiveCourse } from "@/usecases/ArchiveCourse";
+import { GetModuleDependencyMatrix } from "@/usecases/GetModuleDependencyMatrix";
 // STORY-048b: admin modules CRUD + reorder
 import { AdminListModules } from "@/usecases/AdminListModules";
 import { AdminGetModule } from "@/usecases/AdminGetModule";
@@ -616,6 +617,7 @@ export interface AppContainer {
   createCourse: CreateCourse;
   updateCourse: UpdateCourse;
   archiveCourse: ArchiveCourse;
+  getModuleDependencyMatrix: GetModuleDependencyMatrix;
   // STORY-048b: admin modules CRUD + reorder
   adminListModules: AdminListModules;
   adminGetModule: AdminGetModule;
@@ -1215,6 +1217,12 @@ function buildProductionContainer(): AppContainer {
     createCourse: new CreateCourse({ courseRepo, recordAuditLog }),
     updateCourse: new UpdateCourse({ courseRepo, recordAuditLog }),
     archiveCourse: new ArchiveCourse({ courseRepo, recordAuditLog }),
+    getModuleDependencyMatrix: new GetModuleDependencyMatrix({
+      courseRepo,
+      moduleRepo,
+      prerequisiteRepo,
+      lessonRepo,
+    }),
     // STORY-048b: admin modules CRUD + reorder
     adminListModules: new AdminListModules({ moduleRepo }),
     adminGetModule: new AdminGetModule({ moduleRepo }),

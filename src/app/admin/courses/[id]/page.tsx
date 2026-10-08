@@ -109,6 +109,9 @@ export default async function AdminCourseDetailPage({ params }: PageProps) {
             <Link href={`/admin/courses/${course.id}/prerequisites`} className={styles.editButton}>
               Prerequisites
             </Link>
+            <Link href={`/admin/courses/${course.id}/dependencies`} className={styles.editButton}>
+              Dependencies
+            </Link>
             {course.status !== "ARCHIVED" && (
               <form action={handleArchive}>
                 <ConfirmSubmitButton

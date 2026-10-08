@@ -97,6 +97,17 @@ describe("InMemoryPrerequisiteRepository", () => {
     expect(listed).toEqual(Result.ok([first, second]));
   });
 
+  it("lists all live rules across courses via listAll", async () => {
+    const repo = new InMemoryPrerequisiteRepository();
+    const p1 = mustCreate({ id: "p1", courseId: "b", requiresCourseId: "a" });
+    const p2 = mustCreate({ id: "p2", courseId: "c", requiresCourseId: "b" });
+    await repo.create(p1);
+    await repo.create(p2);
+
+    const all = await repo.listAll();
+    expect(all).toEqual(Result.ok([p1, p2]));
+  });
+
   it("returns not_found when updating a missing id", async () => {
     const repo = new InMemoryPrerequisiteRepository();
 

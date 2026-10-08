@@ -15,9 +15,7 @@
 import type { Result } from "@/domain/shared/Result";
 import type { Prerequisite } from "@/domain/entities/Prerequisite";
 
-export type PrerequisiteRepoError =
-  | { kind: "not_found" }
-  | { kind: "db_error"; message: string };
+export type PrerequisiteRepoError = { kind: "not_found" } | { kind: "db_error"; message: string };
 
 /**
  * Queries and creates never report `not_found`: a missing rule is a
@@ -51,7 +49,15 @@ export interface IPrerequisiteRepository {
    * All live rules gating a course, in creation order.
    * Soft-deleted rows are excluded.
    */
-  listByCourseId(courseId: string): Promise<Result<readonly Prerequisite[], PrerequisiteQueryError>>;
+  listByCourseId(
+    courseId: string,
+  ): Promise<Result<readonly Prerequisite[], PrerequisiteQueryError>>;
+
+  /**
+   * All live rules across all courses, in creation order.
+   * Soft-deleted rows are excluded.
+   */
+  listAll(): Promise<Result<readonly Prerequisite[], PrerequisiteQueryError>>;
 
   /**
    * Persist changes on an existing rule (soft-delete flag, actor stamp).

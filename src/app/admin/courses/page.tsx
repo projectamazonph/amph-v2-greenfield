@@ -85,9 +85,22 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
         title="Courses"
         subtitle={`${totalCount} total`}
         actions={
-          <Link href="/admin/courses/new" className={styles.addButton}>
-            + Add course
-          </Link>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <Link
+              href="/admin/courses/dependencies"
+              className={styles.addButton}
+              style={{
+                background: "var(--surface-2)",
+                color: "inherit",
+                border: "1px solid var(--border)",
+              }}
+            >
+              Dependency Matrix
+            </Link>
+            <Link href="/admin/courses/new" className={styles.addButton}>
+              + Add course
+            </Link>
+          </div>
         }
       />
 
