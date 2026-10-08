@@ -8,7 +8,7 @@
 
 **Owner:** Ryan
 
-**Status:** Shipped (PR #521, commit `7d419a1a`, 2026-09-16). Persistence to a Prisma `UserDiagnosticResult` row and wiring the result into the dashboard next-action card are deferred to LEARN-052, which is its own story.
+**Status:** Shipped (PR #521, commit `7d419a1a`, 2026-09-16). LEARN-052 follow-up closed via task t_bde1f8a3 (persisted `User.diagnostic` JSON column, `RecordDiagnosticResult` use case, structured logger event `learning_event:diagnostic_completed`, and `/dashboard` recommendation card).
 
 ## Context
 
@@ -49,7 +49,7 @@ What shipped in PR #521:
   exercises the manifest loader and the pure scoring rubric across the
   three outcomes, the partial-answer fallback, and the no-match fallback.
 
-Deferred to LEARN-052 (separate story):
+Completed in LEARN-052:
 
 - The `User.diagnostic` JSON column and the `20260915000000_add_user_diagnostic`
   migration that persists the result on the user row.
@@ -57,9 +57,8 @@ Deferred to LEARN-052 (separate story):
   the continue-learning card.
 - Routing the diagnostic completion through the structured
   `learning_event:diagnostic_completed` logger event (LEARN-060). The
-  shipped slice emits a `console.error('[learning_event] ...')` line;
-  that is a known gap to be lifted to the structured logger in the
-  LEARN-052 follow-up so the analytics adapter picks it up.
+  `console.error('[learning_event] ...')` call was lifted to `PinoLogger`
+  via `RecordDiagnosticResult` use case.
 
 ## Acceptance criteria
 
@@ -83,21 +82,17 @@ Deferred to LEARN-052 (separate story):
 - [x] The result is shown on the diagnostic page itself once the action
       redirects back with `?outcome=<id>`. Persistence on the user row
       plus the dashboard recommendation above the continue-learning card
-      is LEARN-052, tracked separately.
+      is shipped in LEARN-052 (`User.diagnostic` column, `UserRepository`,
+      `/dashboard` page card).
 - [x] The diagnostic completion emits an event line tagged
       `learning_event:diagnostic_completed` with the outcome but no
-      answer-level content. The shipped slice logs it via
-      `console.error`; LEARN-052 lifts this to the structured logger.
-      The rubric itself is published in `diagnostic.json`; the answers
-      stay in the FormData and are never written to a database row in
-      this story.
+      answer-level content. Lifted to the structured logger (`Logger`/`PinoLogger`)
+      in LEARN-052 via `RecordDiagnosticResult`.
 - [x] Domain unit tests cover the three-outcome rubric
-      (`src/app/actions/__tests__/diagnostic.action.test.ts`, 6 cases:
-      manifest load, new outcome, experienced outcome, familiar outcome,
-      partial-answer fallback, no-match fallback).
-- [x] `pnpm typecheck && pnpm lint && pnpm test` green on `main` after
-      PR #521 (test count after PR #521 was recorded at 5,208 passing).
-      E2E Playwright coverage is not required for this first slice.
+      (`src/app/actions/__tests__/diagnostic.action.test.ts`, 9 cases;
+      `src/domain/learning/diagnostic/__tests__/UserDiagnosticResult.test.ts`, 7 cases;
+      `src/usecases/learning/__tests__/RecordDiagnosticResult.test.ts`, 3 cases).
+- [x] `pnpm typecheck && pnpm lint && pnpm test` green.
 
 ## Non-goals
 
@@ -113,22 +108,16 @@ Deferred to LEARN-052 (separate story):
 - LEARN-001 is already shipped (STORY-111, STORY-129); the dashboard
   reads the same `content/curriculum/` source-of-truth.
 - LEARN-015 (onboarding completion view) and LEARN-052 (next-incomplete
-  action on the dashboard) will reuse this diagnostic result. The
-  result is currently held only in the redirect query string; LEARN-052
-  is the story that adds the `User.diagnostic` column, the persistence
-  path, the dashboard recommendation card, and the structured-logger
-  wiring for `learning_event:diagnostic_completed`.
+  action on the dashboard) reuse this diagnostic result. LEARN-052 added
+  the `User.diagnostic` column, the persistence path, the dashboard
+  recommendation card, and the structured-logger wiring for
+  `learning_event:diagnostic_completed`.
 
 ## Verification
 
-- `pnpm test src/app/actions/__tests__/diagnostic.action.test.ts` is
-  green: 6 tests, 1 file (verified on `main` after this doc-hygiene
-  pass).
-- The `/dashboard/diagnostic` route renders the form when no outcome
-  is present in the URL and renders the plain-language result card
-  when `?outcome=<id>` is set, with a "Back to dashboard" link to
-  `/dashboard`.
-- Manual smoke (not in CI): sign in, open `/dashboard/diagnostic`,
-  submit three answers, follow the redirect, and confirm the result
-  card renders with the expected emphasis text. The dashboard-level
-  recommendation card is the LEARN-052 deliverable.
+- `pnpm test src/domain/learning/diagnostic/__tests__/UserDiagnosticResult.test.ts`: 7 tests passing.
+- `pnpm test src/usecases/learning/__tests__/RecordDiagnosticResult.test.ts`: 3 tests passing.
+- `pnpm test src/app/actions/__tests__/diagnostic.action.test.ts`: 9 tests passing.
+- `pnpm test src/app/dashboard/__tests__/page.test.tsx`: 9 tests passing.
+- The `/dashboard` route renders the diagnostic recommendation card above the
+  continue-learning surface when a stored result exists, and hides it otherwise.

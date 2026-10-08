@@ -4,6 +4,17 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-130 / LEARN-052: Persist pre-course diagnostic result and wire recommendation card
+
+Completed the LEARN-052 diagnostic persistence follow-up for STORY-130:
+
+- Added optional `diagnostic` JSON column to `User` via Prisma migration `20260915000000_add_user_diagnostic`.
+- Added `UserDiagnosticResult` domain value object and `createDiagnosticResult` pure helper with 100% branch coverage.
+- Updated `UserRepository` port with `recordDiagnostic(userId, result)` and `getLatestDiagnostic(userId)`, implemented in both `PrismaUserRepository` and `InMemoryUserRepository`.
+- Added `RecordDiagnosticResult` use case under `src/usecases/learning/` and wired it into `buildContainer()` and `buildTestContainer()`.
+- Updated `submitDiagnosticAction` server action to persist results on the user row and emit the structured analytics log event `learning_event:diagnostic_completed` via `Logger` (`PinoLogger`).
+- Wired `/dashboard` to load the stored result via `getLatestDiagnostic` and render a recommendation card above the continue-learning surface when a result exists, and hide it when absent.
+
 ### STORY-132: Close LEARN-014 first-decision story doc (shipped via PR #523)
 
 Pre-flight grep showed the work ships on main via PR #523 (commit
