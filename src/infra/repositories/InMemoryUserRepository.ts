@@ -25,6 +25,10 @@ export class InMemoryUserRepository implements UserRepository {
   private passwordHashes = new Map<string, string>(); // userId → hash
   private twoFactorSecrets = new Map<string, string>(); // userId → TOTP secret
   private failedLoginCounts = new Map<string, number>(); // userId → count
+  private diagnostics = new Map<
+    string,
+    import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult
+  >();
 
   async findById(id: string): Promise<Result<User, UserError>> {
     const user = this.users.get(id);
@@ -169,6 +173,36 @@ export class InMemoryUserRepository implements UserRepository {
     this.passwordHashes.clear();
     this.twoFactorSecrets.clear();
     this.failedLoginCounts.clear();
+    this.diagnostics.clear();
+  }
+
+  async recordDiagnostic(
+    userId: string,
+    result: import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult,
+  ): Promise<
+    Result<
+      import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult,
+      UserError
+    >
+  > {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    this.diagnostics.set(userId, result);
+    return Result.ok(result);
+  }
+
+  async getLatestDiagnostic(
+    userId: string,
+  ): Promise<
+    Result<
+      import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult | null,
+      UserError
+    >
+  > {
+    const user = this.users.get(userId);
+    if (!user) return Result.err({ kind: "not_found" });
+    const stored = this.diagnostics.get(userId) ?? null;
+    return Result.ok(stored);
   }
 
   async getTwoFactorSecret(id: string): Promise<Result<string | null, UserError>> {

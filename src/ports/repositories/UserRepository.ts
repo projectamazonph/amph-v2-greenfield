@@ -191,4 +191,30 @@ export interface UserRepository {
    * the tour from the profile page.
    */
   resetWelcome(userId: string): Promise<Result<User, UserError>>;
+
+  /**
+   * LEARN-052 (STORY-130 follow-up): persist the user's pre-course diagnostic result.
+   */
+  recordDiagnostic(
+    userId: string,
+    result: import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult,
+  ): Promise<
+    Result<
+      import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult,
+      UserError
+    >
+  >;
+
+  /**
+   * LEARN-052 (STORY-130 follow-up): retrieve the latest stored diagnostic result for a user,
+   * or null if no diagnostic result has been recorded.
+   */
+  getLatestDiagnostic(
+    userId: string,
+  ): Promise<
+    Result<
+      import("@/domain/learning/diagnostic/UserDiagnosticResult").UserDiagnosticResult | null,
+      UserError
+    >
+  >;
 }

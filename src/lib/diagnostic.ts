@@ -9,8 +9,13 @@
 
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  isDiagnosticOutcome,
+  type DiagnosticOutcome,
+} from "@/domain/learning/diagnostic/UserDiagnosticResult";
 
-export type DiagnosticOutcome = "new" | "familiar" | "experienced";
+export type { DiagnosticOutcome };
+export { isDiagnosticOutcome };
 
 export interface DiagnosticOutcomeView {
   readonly id: DiagnosticOutcome;
@@ -52,12 +57,6 @@ export interface DiagnosticManifest {
 export interface DiagnosticManifestError {
   readonly kind: "manifest_invalid";
   readonly message: string;
-}
-
-const OUTCOME_IDS: readonly DiagnosticOutcome[] = ["new", "familiar", "experienced"];
-
-export function isDiagnosticOutcome(value: unknown): value is DiagnosticOutcome {
-  return typeof value === "string" && (OUTCOME_IDS as readonly string[]).includes(value);
 }
 
 export function parseDiagnosticManifest(

@@ -166,6 +166,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -205,6 +207,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -245,6 +249,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     useCase = new ImpersonateUser({ ...deps, userRepo: mockUserRepo });
 
@@ -309,6 +315,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     useCase = new ImpersonateUser({
       ...buildDeps({ userRepo: new InMemoryUserRepository() }),
@@ -383,6 +391,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
 
@@ -417,6 +427,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });
 
@@ -453,6 +465,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     const mockSessionRepo: SessionRepository = {
       findById: async () => ({ ok: false, error: { kind: "not_found" } }),
@@ -502,6 +516,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     const failingJwt: JwtService = {
       sign: async () => ({ ok: false, error: new Error("sign failed") }),
@@ -546,6 +562,8 @@ describe("ImpersonateUser", () => {
       recordLoginAttempt: async () => ({ ok: true, value: { lockedUntil: null } }),
       markWelcomeCompleted: async () => ({ ok: false, error: { kind: "not_found" } }),
       resetWelcome: async () => ({ ok: false, error: { kind: "not_found" } }),
+      recordDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
+      getLatestDiagnostic: async () => ({ ok: false, error: { kind: "not_found" } }),
     };
     const sessionSpy = vi.spyOn(deps.sessionRepo, "create");
     useCase = new ImpersonateUser({ ...buildDeps(), userRepo: mockUserRepo });

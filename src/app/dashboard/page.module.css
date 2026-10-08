@@ -40,6 +40,66 @@
   margin-bottom: var(--space-10);
 }
 
+.diagnosticCard {
+  border-left: 4px solid var(--accent-text, #ff9900);
+  background: var(--surface-1);
+}
+
+.diagnosticCardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.diagnosticBadge {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-text, #ff9900);
+  font-weight: 700;
+}
+
+.diagnosticTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--ink-900);
+  margin: 0;
+}
+
+.diagnosticSummary {
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  margin: 0 0 var(--space-3) 0;
+  line-height: 1.5;
+}
+
+.diagnosticEmphasis {
+  font-size: var(--text-sm);
+  color: var(--ink-900);
+  margin: 0 0 var(--space-4) 0;
+  line-height: 1.5;
+}
+
+.diagnosticActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.retakeLink {
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+  text-decoration: underline;
+  transition: color var(--transition);
+}
+
+.retakeLink:hover {
+  color: var(--accent-text);
+}
+
 .sectionHeader {
   display: flex;
   align-items: baseline;

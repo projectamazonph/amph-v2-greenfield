@@ -4,19 +4,17 @@ import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
 import { loadDiagnosticManifest, scoreDiagnostic } from "@/lib/diagnostic";
 import type { DiagnosticOutcomeView } from "@/lib/diagnostic";
+import { buildContainer } from "@/composition/container";
 
 export type SubmitDiagnosticResult =
   { kind: "success"; outcome: DiagnosticOutcomeView } | { kind: "error"; error: string };
 
 /**
- * Server action for the optional pre-course diagnostic (LEARN-010).
+ * Server action for the optional pre-course diagnostic (LEARN-010 / LEARN-052).
  *
- * The action only reads the answered FormData and the static manifest,
- * then renders the matching outcome as a plain-language recommendation.
- * It does not write to the database, change entitlement, or skip
- * required content. The dashboard reads the latest result from the
- * user's stored profile in a follow-up story; this slice surfaces the
- * result inline so the UI is shippable.
+ * Reads the answered FormData, scores against the rubric, persists the
+ * result on the user row via RecordDiagnosticResult use case, emits the
+ * structured analytics log event, and redirects to render the outcome card.
  */
 export async function submitDiagnosticAction(
   _prevState: SubmitDiagnosticResult | null,
@@ -43,7 +41,11 @@ export async function submitDiagnosticAction(
 
   const outcome = scoreDiagnostic(manifest, answers);
 
-  console.error(`[learning_event] diagnostic_completed userId=${user.id} outcome=${outcome.id}`);
+  const container = buildContainer();
+  await container.recordDiagnosticResult.execute({
+    userId: user.id,
+    outcome: outcome.id,
+  });
 
   redirect(`/dashboard/diagnostic?outcome=${outcome.id}`);
 }

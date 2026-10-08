@@ -46,13 +46,17 @@ vi.mock("@/lib/auth", () => ({
 const mockEnrollments = vi.fn();
 const mockCourseFindById = vi.fn();
 const mockUserFindById = vi.fn();
+const mockGetLatestDiagnostic = vi.fn();
 const mockXpFindByUserId = vi.fn();
 const mockGetBestSimgridScore = vi.fn();
 vi.mock("@/composition/container", () => ({
   buildContainer: () => ({
     enrollmentRepo: { findByUserId: mockEnrollments },
     courseRepo: { findById: mockCourseFindById },
-    userRepo: { findById: mockUserFindById },
+    userRepo: {
+      findById: mockUserFindById,
+      getLatestDiagnostic: mockGetLatestDiagnostic,
+    },
     xpEventRepo: { findByUserId: mockXpFindByUserId },
     getBestSimgridScore: { execute: mockGetBestSimgridScore },
   }),
@@ -146,6 +150,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     mockEnrollments.mockReset();
     mockCourseFindById.mockReset();
     mockUserFindById.mockReset();
+    mockGetLatestDiagnostic.mockReset();
     mockXpFindByUserId.mockReset();
     mockGetBestSimgridScore.mockReset();
     mockRedirect.mockClear();
@@ -157,6 +162,7 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
       ok: true,
       value: makeUser({ welcomeCompletedAt: new Date("2026-01-01") }),
     });
+    mockGetLatestDiagnostic.mockResolvedValue({ ok: true, value: null });
     // STORY-157: default empty XP feed so the hero-stats strip renders
     // 0 XP and 0 active days without forcing every test to stub it.
     mockXpFindByUserId.mockResolvedValue({ ok: true, value: [] });
@@ -266,5 +272,31 @@ describe("DashboardPage (P0-4: post-auth destination)", () => {
     expect(mockUserFindById).toHaveBeenCalledWith("user_01");
     // result should be defined on the happy path; tolerate throws above.
     void result;
+  });
+
+  it("queries the user's latest diagnostic result when rendering the dashboard", async () => {
+    mockGetSessionUser.mockResolvedValue(makeUser());
+    mockEnrollments.mockResolvedValue({ ok: true, value: [] });
+    mockGetLatestDiagnostic.mockResolvedValue({
+      ok: true,
+      value: { outcome: "experienced", completedAt: new Date("2026-09-15") },
+    });
+
+    try {
+      await DashboardPage();
+    } catch {
+      // Async server component rendering under node/jsdom
+    }
+
+    expect(mockGetLatestDiagnostic).toHaveBeenCalledWith("user_01");
+  });
+
+  it("wires diagnostic recommendation rendering in the page module source", async () => {
+    const pagePath = path.resolve(process.cwd(), "src/app/dashboard/page.tsx");
+    const source = await fs.readFile(pagePath, "utf8");
+    expect(source).toContain("loadUserDiagnostic");
+    expect(source).toContain("getLatestDiagnostic");
+    expect(source).toContain("Diagnostic Recommendation");
+    expect(source).toContain("diagnosticView");
   });
 });

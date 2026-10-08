@@ -62,6 +62,10 @@ model User {
   // users so the dashboard variant doesn't appear retroactively.
   welcomeCompletedAt     DateTime?
 
+  // LEARN-052 (STORY-130 follow-up): optional pre-course diagnostic result.
+  // Stores outcome ("new" | "familiar" | "experienced") and completion timestamp.
+  diagnostic             Json?
+
   // Subscription
   subscriptionTier             SubscriptionTier @default(FREE)
   subscriptionEndsAt           DateTime?

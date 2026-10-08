@@ -32,7 +32,11 @@ vi.mock("@/composition/container", () => ({
     courseRepo: { findById: mockCourseFindById },
     // STORY-146 / Task 10: the dashboard now also calls `userRepo.findById`
     // to decide whether to render the NewUserDashboard first-run variant.
-    userRepo: { findById: mockUserFindById },
+    userRepo: {
+      findById: mockUserFindById,
+      getLatestDiagnostic: async () => ({ ok: true, value: null }),
+      recordDiagnostic: vi.fn(),
+    },
     // STORY-157: hero-stats strip reads XP totals via xpEventRepo.
     xpEventRepo: { findByUserId: mockXpFindByUserId },
     // Simgrid Task 9: PracticeProgressCard on the dashboard calls
