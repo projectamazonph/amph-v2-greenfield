@@ -41,7 +41,7 @@
 }
 
 .diagnosticCard {
-  border-left: 4px solid var(--accent-orange, #ff9900);
+  border-left: 4px solid var(--accent-text, #ff9900);
   background: var(--surface-1);
 }
 
@@ -53,7 +53,7 @@
 }
 
 .diagnosticBadge {
-  font-family: var(--font-label, sans-serif);
+  font-family: var(--font-display, sans-serif);
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;

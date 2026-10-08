@@ -3,7 +3,13 @@
  * pre-course diagnostic outcome and completion timestamp.
  */
 
-import { isDiagnosticOutcome, type DiagnosticOutcome } from "@/lib/diagnostic";
+export type DiagnosticOutcome = "new" | "familiar" | "experienced";
+
+const OUTCOME_IDS: readonly DiagnosticOutcome[] = ["new", "familiar", "experienced"];
+
+export function isDiagnosticOutcome(value: unknown): value is DiagnosticOutcome {
+  return typeof value === "string" && (OUTCOME_IDS as readonly string[]).includes(value);
+}
 
 export interface UserDiagnosticResult {
   readonly outcome: DiagnosticOutcome;
