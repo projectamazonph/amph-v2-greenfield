@@ -1,25 +1,39 @@
 import type { Metadata, Viewport } from "next";
-// self-hosted fonts via @fontsource — no Google Fonts CDN fetch at build time
-// weights match the original next/font/google config: Archivo 400/500/600/700,
-// PT_Sans 400/700, Barlow_Condensed 500/600/700, IBM_Plex_Mono 400/500/600
-import "@fontsource/archivo/latin-400.css";
-import "@fontsource/archivo/latin-500.css";
-import "@fontsource/archivo/latin-600.css";
-import "@fontsource/archivo/latin-700.css";
-import "@fontsource/barlow-condensed/latin-500.css";
-import "@fontsource/barlow-condensed/latin-600.css";
-import "@fontsource/barlow-condensed/latin-700.css";
-import "@fontsource/ibm-plex-mono/latin-400.css";
-import "@fontsource/ibm-plex-mono/latin-500.css";
-import "@fontsource/ibm-plex-mono/latin-600.css";
-import "@fontsource/pt-sans/latin-400.css";
-import "@fontsource/pt-sans/latin-700.css";
+import { Archivo, Barlow_Condensed, IBM_Plex_Mono, PT_Sans } from "next/font/google";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { SiteAnnouncementBanner } from "@/components/announcements/SiteAnnouncementBanner";
 import { WebVitalsReporter } from "./WebVitalsReporter";
 import { Providers } from "./providers";
 import { buildAppUrl } from "@/domain/shared/AppUrl";
 import "./globals.css";
+
+const archivo = Archivo({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const ptSans = PT_Sans({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-cond",
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(buildAppUrl("/")),
@@ -34,24 +48,13 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    type: "website",
-    siteName: "AMPH Academy",
     title: "Project Amazon PH Academy",
     description: "Master Amazon PPC and seller central, built for Filipino VAs.",
-    images: [
-      {
-        url: buildAppUrl("/brand/photography/field-desk-hero.png"),
-        width: 1672,
-        height: 941,
-        alt: "AMPH Academy operator desk",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Project Amazon PH Academy",
     description: "Master Amazon PPC and seller central, built for Filipino VAs.",
-    images: [buildAppUrl("/brand/photography/field-desk-hero.png")],
   },
 };
 
@@ -66,7 +69,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="light">
+    <html
+      lang="en"
+      data-theme="light"
+      className={`${archivo.variable} ${ptSans.variable} ${barlowCondensed.variable} ${ibmPlexMono.variable}`}
+    >
       <body>
         <a href="#main-content" className="skip-link">
           Skip to main content

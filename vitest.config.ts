@@ -8,19 +8,6 @@ export default defineConfig({
     environment: "node",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
-    // STORY-163 fix: Node 26 ships a native `localStorage` getter on
-    // globalThis that returns undefined by default. Vitest copies the
-    // jsdom environment's localStorage onto globalThis, but Node's
-    // getter occupies the key first, so vitest's copy is skipped and
-    // jsdom's localStorage is silently shadowed. Passing
-    // `--no-webstorage` to Node's worker keeps the slot free for vitest
-    // to populate. See:
-    // https://github.com/vitest-dev/vitest/issues/8757 (Node 25+ break)
-    //
-    // The flag was added in Node 25. Node 20 (CI) does not have it
-    // and never shipped the native localStorage getter, so it would
-    // crash with "bad option: --no-webstorage". Gate on major version.
-    ...(Number(process.versions.node.split(".")[0]) >= 25 ? { execArgv: ["--no-webstorage"] } : {}),
     include: [
       "src/**/__tests__/**/*.test.ts",
       "src/**/__tests__/**/*.test.tsx",

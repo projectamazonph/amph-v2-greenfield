@@ -29,16 +29,7 @@ import {
   PUBLIC_CURRICULUM_CLAIMS,
   type PublicSimulatorAvailability,
 } from "@/domain/curriculum/PublicCurriculumClaims";
-import { SIMGRID_SIMULATOR_META } from "@/lib/simgrid/manifest";
-import type { Metadata } from "next";
 import styles from "./page.module.css";
-
-export const metadata: Metadata = {
-  title: "Practice Tools | Project Amazon PH Academy",
-  description:
-    "Twelve practice simulators plus a live Amazon Ad Console. Practice campaign decisions in a safe environment before touching real accounts.",
-  alternates: { canonical: "/tools" },
-};
 
 export const dynamic = "force-dynamic";
 

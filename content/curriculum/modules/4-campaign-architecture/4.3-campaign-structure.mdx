@@ -39,6 +39,10 @@ Each level serves a purpose:
 **Ad Group**: Groups related keywords together. You can set different default bids per ad group.
 **Keywords**: The actual search terms you're targeting. Each can have its own bid.
 
+:::worksheet{id="the-hierarchy" title="The Hierarchy" lesson="4.3-campaign-structure"}
+{"fields":[{"key":"note","label":"Why each campaign in the filing cabinet gets its own budget instead of sharing one. One sentence."}]}
+:::
+
 :::hierarchy-builder{id="campaign-filing-cabinet" title="Build the campaign filing cabinet"}
 {"note":"Separate proven exact traffic from phrase discovery, broad research, and product targeting so each budget and bid logic stays visible.","root":{"id":"account","label":"Amazon PPC account","type":"account","detail":"Owns the course of the work","children":[{"id":"exact","label":"YB-Exact-Proven","type":"campaign","detail":"Highest confidence · highest bid","children":[{"id":"exact-group","label":"Best Keywords","type":"ad-group","detail":"Exact match","children":[{"id":"exact-target","label":"yoga block · ₱75 bid","type":"target"}]}]},{"id":"phrase","label":"YB-Phrase-Discovery","type":"campaign","detail":"Find new terms","children":[{"id":"phrase-group","label":"Category Terms","type":"ad-group","detail":"Phrase match","children":[{"id":"phrase-target","label":"exercise block · ₱30 bid","type":"target"}]}]},{"id":"broad","label":"YB-Broad-Research","type":"campaign","detail":"Lowest bid · widest net","children":[{"id":"broad-group","label":"Broad Terms","type":"ad-group","detail":"Broad match","children":[{"id":"broad-target","label":"yoga prop · ₱18 bid","type":"target"}]}]},{"id":"pat","label":"YB-PAT-Competitors","type":"campaign","detail":"Product targeting","children":[{"id":"pat-group","label":"Competitor ASINs","type":"ad-group","detail":"Product targets","children":[{"id":"pat-target","label":"Competitor product page","type":"target"}]}]}]}}
 :::
@@ -55,7 +59,7 @@ Campaign: "Yoga Block"
               "fitness block", "yoga accessories" (10 keywords, all in one group)
 ```
 
-**The problem**: Even though each keyword can technically carry its own bid, dumping them all into one ad group makes that control hard to use well. "Yoga block" (high intent, converts at 15%) and "yoga accessories" (broad, converts at 3%) share one default bid you'd have to override keyword by keyword. There is no clean way to see which theme is actually working, so most sellers end up overpaying the broad term or underbidding the high-converting one.
+**The problem**: Even though each keyword can technically carry its own bid, dumping them all into one ad group makes that control hard to use well. "Yoga block" (high intent, converts at 15%) and "yoga accessories" (broad, converts at 3%) get lost in the same report, sharing one default bid you'd have to override keyword by keyword, with no clean way to see which theme is actually working. In practice, most sellers end up overpaying for the broad term or underbidding on the high-converting one, not because Amazon prevents separate bids, but because a messy structure makes it too hard to manage them properly.
 
 Now here's a **good** structure:
 
@@ -85,6 +89,10 @@ Now you can:
 
 A good naming convention makes your campaigns instantly recognizable. Use a system like `[Product]-[MatchType]-[Purpose]`. Examples: `YB-Exact-Proven`, `YB-Phrase-Discovery`, `YB-Broad-Research`.
 
+:::worksheet{id="why-structure-matters-a-real-example" title="Why Structure Matters: A Real Example" lesson="4.3-campaign-structure"}
+{"fields":[{"key":"note","label":"The single concrete risk of the 'bad' 10-keyword ad group. One sentence."}]}
+:::
+
 ## The Campaign Structure Template
 
 For a single product, here's the structure most PPC managers use:
@@ -108,6 +116,10 @@ For a single product, here's the structure most PPC managers use:
 - Contains broad match keywords
 - Lowest bids, you're researching, not investing heavily
 - Aggressive negative keyword list to cut waste
+
+:::worksheet{id="the-campaign-structure-template" title="The Campaign Structure Template" lesson="4.3-campaign-structure"}
+{"fields":[{"key":"note","label":"Your naming pattern for a single product's three match-type campaigns. One sentence."}]}
+:::
 - Small daily budget
 
 ### Product Targeting Campaign
@@ -125,6 +137,10 @@ A consistent naming system helps you:
 
 **Recommended format**: `[Abbreviated Product]-[Match Type]-[Purpose]`
 
+:::worksheet{id="naming-conventions-that-save-time" title="Naming Conventions That Save Time" lesson="4.3-campaign-structure"}
+{"fields":[{"key":"note","label":"One element of your campaign name that lets you sort by purpose in a single click. One sentence."}]}
+:::
+
 | Campaign Name | Product | Match | Purpose |
 |--------------|---------|-------|---------|
 | YB-Exact-Proven | Yoga Block | Exact | High-converting keywords |
@@ -134,6 +150,10 @@ A consistent naming system helps you:
 | WB-Exact-Proven | Water Bottle | Exact | High-converting keywords |
 
 Plan your campaign names before you publish. The campaign you call "Campaign 1" today becomes impossible to identify when you have 15 campaigns next quarter.
+
+:::worksheet{id="negative-keywords-the-unsung-hero" title="Negative Keywords: The Unsung Hero" lesson="4.3-campaign-structure"}
+{"fields":[{"key":"note","label":"One cross-campaign negative you would add so the broad campaign stops stealing from the exact campaign. One sentence."}]}
+:::
 
 ## Negative Keywords: The Unsung Hero
 
@@ -197,8 +217,8 @@ What the learner can do: Set budget and bid strategy at the campaign level, a de
 Who can access it: All Sponsored Products advertisers
 Retailer or marketplace scope: Amazon Advertising Console
 Official source URL: https://advertising.amazon.com/help, specific article not verified; content owner to confirm and link at rewrite time
-Last verified: 2026-09-25
-Next review due: 2026-01-25
+Last verified: pending content-owner review
+Next review due: pending content-owner review
 Owner: Ryan Roland Dabao
 ```
 
@@ -207,18 +227,6 @@ Owner: Ryan Roland Dabao
 Use this when a client asks why they're bidding against themselves in the reports:
 
 > "Two of your own campaigns were set up to catch different kinds of searches, but one of them was also catching a search the other campaign already owns. We added a negative keyword so only the campaign built for that exact search can win it, and the other campaign is now free to spend its budget finding new search terms instead."
-
-:::callout{id="lesson-4-3-pitfall" variant="pitfall" title="Letting structure drift into one mega-ad-group"}
-An ad group that mixes proven exact-match and broad-match discovery terms makes reporting harder and dilutes bid pressure. One theme per ad group, one ad group per bid intent.
-:::
-
-<SelfCheck
-  id="sc-4-3"
-  prompt="An ad group holds 'yoga mat,' 'yoga block,' and 'yoga towel.' What is the safest move?"
-  options={["Split into three ad groups, one per shopper intent, with separate bids.", "Leave them together because they all relate to yoga and the report sorts it out.", "Move 'yoga towel' to negatives since towels are not the product.", "Set a single high bid and let the report tell you which converts."]}
-  answerIndex={0}
-  explanation="A 'yoga mat' shopper, a 'yoga block' shopper, and a 'yoga towel' shopper have different intents. Each intent needs its own ad group, its own bid, and its own negative list."
-/>
 
 ## Quick check
 

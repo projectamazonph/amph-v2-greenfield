@@ -60,7 +60,6 @@ import type {
 } from "@/domain/simulator/bid-elevator/BidElevatorOutput";
 import type { FeedbackVerdict } from "@/domain/entities/AttemptFeedback";
 import { XPService } from "@/domain/services/XPService";
-import { friendlySimulatorError } from "@/lib/studentErrorCopy";
 import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
 import { bidElevatorScenarioContentSchema } from "./scenarioContent";
 
@@ -116,12 +115,6 @@ const bidElevatorAttemptSchema = z.object({
   userBidAdjustments: z.record(z.string(), z.number().nonnegative()).optional(),
 });
 
-// Friendly messages for raw error kinds that used to leak to the UI.
-// Mapped in src/lib/studentErrorCopy.ts — see `friendlySimulatorError`.
-function friendly(context: "attempt" | "grading" | "feedback", kind: string): string {
-  return friendlySimulatorError(kind, context);
-}
-
 export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAttemptResponse> {
   // ── 1. Validate ────────────────────────────────────────────────────
   const parseResult = bidElevatorAttemptSchema.safeParse(input);
@@ -165,10 +158,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
   if (Result.isErr(startResult)) {
     return {
       ok: false,
-      error: {
-        kind: "attempt_error",
-        message: friendly("attempt", startResult.error.kind),
-      },
+      error: { kind: "attempt_error", message: startResult.error.kind },
     };
   }
 
@@ -224,10 +214,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
     if (Result.isErr(submitResult)) {
       return {
         ok: false,
-        error: {
-          kind: "attempt_error",
-          message: friendly("attempt", submitResult.error.kind),
-        },
+        error: { kind: "attempt_error", message: submitResult.error.kind },
       };
     }
 
@@ -243,8 +230,8 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
           kind: "grading_error",
           message:
             gradeResult.error.kind === "invalid_dimensions"
-              ? `We couldn't score this attempt — missing dimensions: ${gradeResult.error.missing.join(", ")}`
-              : friendly("grading", gradeResult.error.kind),
+              ? `invalid dimensions: ${gradeResult.error.missing.join(", ")}`
+              : gradeResult.error.kind,
         },
       };
     }
@@ -258,10 +245,7 @@ export async function bidElevatorAttempt(input: unknown): Promise<BidElevatorAtt
     if (Result.isErr(feedbackResult)) {
       return {
         ok: false,
-        error: {
-          kind: "feedback_error",
-          message: friendly("feedback", feedbackResult.error.kind),
-        },
+        error: { kind: "feedback_error", message: feedbackResult.error.kind },
       };
     }
     feedback = {

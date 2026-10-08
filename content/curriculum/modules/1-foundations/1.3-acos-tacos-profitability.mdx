@@ -32,6 +32,10 @@ Work through this with a real scenario. You manage ads for a seller with a premi
 
 This means the break-even ACoS is about 46%. Any ACoS above that and the seller loses money on every ad-driven sale. (Lesson glossary: *margin* is (price minus total cost to sell) divided by price; *break-even ACoS* is the ACoS at which ad-driven profit becomes zero.)
 
+:::worksheet{id="acos-the-scorecard" title="ACoS: the scorecard" lesson="1.3-acos-tacos-profitability"}
+{"fields":[{"key":"weeklyActualAcos","label":"This week's actual ACoS"},{"key":"profitMarginBeforeAds","label":"Profit margin before ads (price − total cost, ÷ price)"}]}
+:::
+
 **Week 1 ad data:**
 - Ad spend: ₱2,500
 - Ad sales: ₱5,000
@@ -61,6 +65,10 @@ Total sales means ad sales plus organic sales, sales that happen without ads.
 
 The ads are profitable, and the business isn't over-dependent on them.
 
+:::worksheet{id="tacos-the-big-picture" title="TACoS: the big picture" lesson="1.3-acos-tacos-profitability"}
+{"fields":[{"key":"weeklyTacos","label":"This week's TACoS"}]}
+:::
+
 **Now imagine total sales drop to ₱48,000** with ad spend and ACoS unchanged:
 - TACoS: ₱8,000 ÷ ₱48,000 × 100 = **16.7%**.
 
@@ -78,6 +86,10 @@ For the yoga mat:
 
 The swing from 40% to 50% ACoS is the swing from making ₱150 to losing ₱100 on every ad sale, a ₱250 swing per order, or ₱25,000 over 100 orders.
 
+:::worksheet{id="the-profitability-equation" title="The profitability equation" lesson="1.3-acos-tacos-profitability"}
+{"fields":[{"key":"totalCostToSell","label":"Total cost to sell (manufacturing + shipping + fees)"},{"key":"breakEvenAcos","label":"Break-even ACoS (the margin itself)"}]}
+:::
+
 ## When ACoS is misleading
 
 ACoS can mislead in a few situations:
@@ -89,6 +101,10 @@ ACoS can mislead in a few situations:
 **Returns.** If 20% of orders come back, the real ACoS is worse than the reported number. Factor expected returns into any profitability calculation for a category with high return rates.
 
 When a client is worried about high ACoS during a launch, the useful question isn't "is ACoS high." It's "is ACoS trending down week over week." If yes, the campaign is on track.
+
+:::worksheet{id="when-acos-is-misleading" title="When ACoS is misleading" lesson="1.3-acos-tacos-profitability"}
+{"fields":[{"key":"misleadingCase","label":"Which 'misleading ACoS' pattern is closest to a campaign you support right now?"}]}
+:::
 
 Here is the same three lenses side by side:
 
@@ -150,11 +166,15 @@ A 5% ACoS on a campaign that drives 1% of total sales is vanity. Always check TA
 | TACoS | 25.9% | borderline high |
 | ROAS | 2.57x | below the 3.0x target |
 
-**Diagnosis:** ACoS is above the 35% break-even margin, so the campaign is losing money on every ad sale. CTR and CVR are both healthy, so the ad is relevant and the listing converts. The likely lever is CPC: the campaign is paying too much per click.
+**Diagnosis:** ACoS is above the 35% break-even margin, so the campaign is losing money on every ad sale. CTR and CVR are both healthy, so the ad is relevant and the listing converts. The likely lever is CPC. The campaign is paying too much per click.
 
 **Action:** lower bids on the highest-CPC keywords by 15 to 20%, concentrate spend on exact-match keywords with a known strong conversion rate, and add negative keywords for irrelevant terms still consuming budget.
 
 **Expected result:** lowering average CPC from ₱70 to ₱57.50 (about an 18% cut) while holding clicks at 150 drops spend from ₱10,500 to ₱8,625. With ad sales unchanged at ₱27,000 ACoS falls to about 32%, now profitable.
+
+:::worksheet{id="worked-example-full-week-analysis" title="Worked example: full week analysis" lesson="1.3-acos-tacos-profitability"}
+{"fields":[{"key":"profitOrLossPerAdSale","label":"Profit or loss per ad sale at the worked example's 38.9% ACoS"}]}
+:::
 
 ## Independent calculation
 
@@ -180,7 +200,15 @@ Answer these before reading further:
 
 Part 3 of your Profitability and Max-CPC Sheet from Lesson 1.1. Add these fields:
 
-:::worksheet{id="mod1-3-profitability-sheet" title="Part 3 of your Profitability and Max-CPC Sheet" part="3" lesson="1.3-acos-tacos-profitability"}
+```text
+Manufacturing + shipping + fees (total cost to sell): ____________________
+Profit margin before ads (price − total cost, ÷ price): ____________________
+Break-even ACoS (same number as the margin): ____________________
+This week's actual ACoS: ____________________
+Profit or loss per ad sale at that ACoS: ____________________
+This week's TACoS: ____________________
+```
+
 ## Fact card
 
 ```text
@@ -189,8 +217,8 @@ What the learner can do: Look up a product's actual referral fee percentage and 
 Who can access it: Any seller with Seller Central access (Revenue Calculator, fee schedules)
 Retailer or marketplace scope: Amazon Seller Central, US marketplace. Referral fee percentage varies by category, and FBA fees vary by size tier and weight
 Official source URL: https://sellercentral.amazon.com/help, specific fee-schedule article not verified; content owner to confirm and link at rewrite time
-Last verified: 2026-09-25
-Next review due: 2026-01-25
+Last verified: pending content-owner review
+Next review due: pending content-owner review
 Owner: Ryan Roland Dabao
 ```
 

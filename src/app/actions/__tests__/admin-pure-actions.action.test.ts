@@ -296,7 +296,6 @@ describe("admin pure action workflows", () => {
     });
     expect(processRefund).toHaveBeenCalledWith({
       orderId: "order-1",
-      actorId: "admin-1",
       amountMinor: 1000,
       reason: "duplicate",
     });

@@ -1,32 +1,38 @@
 /**
- * GetWorksheet — read the per-student worksheet rows for Module 1.
+ * GetWorksheet — read every per-H2 worksheet value for one student in
+ * one lesson.
  *
- * STORY-163. Returns every row the student has touched, up to five
- * (one per lesson). Rows are returned in the order the port gives them;
- * the React side sorts them by lessonSlug if a specific order matters.
+ * Pass-through to the repository. Returns the sparse list of
+ * WorksheetFieldValue rows; the renderer joins them by (h2Anchor,
+ * fieldKey) to render one input per field.
  *
- * The use case is a thin pass-through: the port is responsible for
- * shape, the use case layer adds nothing. Read-only; no audit log row
- * is emitted (per AGENTS.md "Every admin mutation logs" — reads are
- * not mutations).
+ * No actor check: any caller with the studentId may read; the route
+ * layer enforces that callers can only see their own rows. There is
+ * no admin review path for worksheet entries.
  */
 
 import type { Result } from "@/domain/shared/Result";
-import type { WorksheetEntry } from "@/domain/artifacts/worksheetEntry";
-import type { WorksheetRepository, WorksheetError } from "@/ports/repositories/WorksheetRepository";
+import type { WorksheetFieldValue, WorksheetLessonSlug } from "@/domain/artifacts/worksheetEntry";
+import type {
+  IWorksheetRepository,
+  WorksheetQueryError,
+} from "@/ports/repositories/IWorksheetRepository";
 
-export type GetWorksheetError = WorksheetError;
+export interface GetWorksheetInput {
+  readonly studentId: string;
+  readonly lessonSlug: WorksheetLessonSlug;
+}
+
+export type GetWorksheetResult = Result<readonly WorksheetFieldValue[], WorksheetQueryError>;
 
 export interface GetWorksheetDeps {
-  worksheetRepo: WorksheetRepository;
+  worksheetRepo: IWorksheetRepository;
 }
 
 export class GetWorksheet {
   constructor(private readonly deps: GetWorksheetDeps) {}
 
-  async execute(input: {
-    studentId: string;
-  }): Promise<Result<readonly WorksheetEntry[], GetWorksheetError>> {
-    return this.deps.worksheetRepo.findByStudent(input.studentId);
+  async execute(input: GetWorksheetInput): Promise<GetWorksheetResult> {
+    return this.deps.worksheetRepo.findByStudentAndLesson(input.studentId, input.lessonSlug);
   }
 }

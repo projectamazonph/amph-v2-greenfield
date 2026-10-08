@@ -179,8 +179,6 @@ app/         → usecases/ → ports/ ← infra/
 - The `AsyncLocalStorage` wrapper means `container.get()` works from server actions, RSC, route handlers — anywhere within a request.
 - **Revisit when:** Next.js provides a first-class request-context API that replaces `AsyncLocalStorage` (currently no plan for that).
 
-**As built (2026-09-23):** the mechanism exists, the file layout and the isolation claim do not. There is no `src/composition/requestContainer.ts`. The `AsyncLocalStorage` scope lives inside `src/composition/container.ts` itself as `runWithContainer()` and `getContainer()` (container.ts:1518-1524), and the file that replaced middleware, `src/proxy.ts`, does not open that scope: it calls `buildContainer()` directly (proxy.ts:106, :151, :273). `buildContainer()` returns a module-level cached container (container.ts:1582-1590), so "no global singletons, the container is per-request" describes the intent, not the running system. 196 files under `src/`, tests included, call `buildContainer()` by name, and only two enter the scoped path: `src/app/tools/keyword-research/actions.ts` and `src/app/tools/listing-audit/actions.ts`. Everywhere else, `getContainer()` would throw for want of a scope, which is why the direct call is the prevailing pattern. Changing this is a real piece of work, not a doc fix: it is recorded here so the next reader does not assume ADR-017 is in force.
-
 ## ADR-018: `Money` Value Object, Integer Minor Units
 
 **Status:** Accepted (2026-07-17)
@@ -205,8 +203,6 @@ app/         → usecases/ → ports/ ← infra/
 - The tools page, access policy, and API route are unchanged for the 6th simulator.
 - Tests are uniform: every simulator's `run` is a pure function on a `SimContext`.
 - **Revisit when:** A simulator's behavior fundamentally doesn't fit the `Simulator<TIn, TOut>` shape (e.g. needs to spawn a long-running background job, or has a fundamentally non-pure engine). So far, all 5 fit.
-
-**As built (2026-09-23):** the registry half of this decision shipped, the tier half did not. The interface is `Simulator<TIn, TOut>` in `src/ports/simulator/Simulator.ts`, a port rather than `src/domain/simulators/Simulator.ts`, and its members are `simulatorId`, `name` and `run()`. Neither it nor `src/ports/simulator/SimulatorRegistry.ts` carries a `requiredTier`, and `src/ports/access` does not mention simulators at all, so the access policy never consults the registry for a tier. What a learner may actually do is decided per action: all five practice pages call `getSessionUserId()` in their server action and stop without a session, and the availability split a visitor sees on `src/app/tools/page.tsx` is a label set built in that file, not a registry field. `src/proxy.ts:28` protects `/dashboard/`, `/admin/`, `/enroll/` and `/order/`, and `/tools` is not on the list. Engines do live one directory per simulator, under `src/domain/simulator/` (singular), registered by `src/infra/simulator/buildSimulatorRegistry.ts`, so the open-closed part holds.
 
 ## ADR-020: English-Only UI, Filipino Cultural References in Copy
 

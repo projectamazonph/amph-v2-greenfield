@@ -70,9 +70,9 @@ const COURSE_MODULE_RANGES = {
 };
 
 function courseSlugForModule(n) {
-  for (const [slug, [min, max]] of Object.entries(COURSE_MODULE_RANGES)) {
-    if (n >= min && n <= max) return slug;
-  }
+  if (n >= 0 && n <= 4) return "ppc-foundations";
+  if (n >= 5 && n <= 10) return "accelerated-mastery";
+  if (n === 11) return "ultimate-transformation";
   return null;
 }
 

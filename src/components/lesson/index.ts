@@ -4,6 +4,8 @@
 // from "@/components/lesson" outside the renderer if needed.
 
 export { SelfCheck } from "./SelfCheck";
+export { WorksheetEntry } from "./WorksheetEntry";
+export type { WorksheetEntryProps, WorksheetFieldSpec } from "./WorksheetEntry";
 export { TradeOffTable } from "./TradeOffTable";
 export { ProcessDiagram } from "./ProcessDiagram";
 export { PitfallCallout } from "./PitfallCallout";

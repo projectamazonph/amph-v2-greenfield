@@ -28,6 +28,10 @@ You now know all six PPC metrics individually. In the real account, you never lo
 
 **What not to do:** don't lower bids or pause keywords before checking the search terms. If the terms are relevant, the listing is the more likely problem.
 
+:::worksheet{id="pattern-1-high-ctr-low-cvr-high-acos" title="Pattern 1: high CTR, low CVR, high ACoS" lesson="1.5-metrics-in-practice"}
+{"fields":[{"key":"diagnosis","label":"Which part of the pattern matches a real account you support right now? One sentence."}]}
+:::
+
 ## Pattern 2: low CTR, good CVR, low ACoS
 
 **The symptoms:** few clicks, but the ones you get convert well, and ACoS looks healthy. You're barely selling anything.
@@ -37,6 +41,10 @@ You now know all six PPC metrics individually. In the real account, you never lo
 **What to do:** check impression volume first. If impressions are low, the campaign may need a higher bid or wider targeting coverage to win more auctions. If impressions are high but CTR is still low, check keyword relevance instead.
 
 **What not to do:** don't assume the ads are "fine" just because ACoS looks good. A low ACoS at low volume means money is being left on the table.
+
+:::worksheet{id="pattern-2-low-ctr-good-cvr-low-acos" title="Pattern 2: low CTR, good CVR, low ACoS" lesson="1.5-metrics-in-practice"}
+{"fields":[{"key":"diagnosis","label":"If you saw this pattern in your account, what would you check first? One sentence."}]}
+:::
 
 ## Pattern 3: high CPC, low CVR, critical ACoS
 
@@ -48,15 +56,23 @@ You now know all six PPC metrics individually. In the real account, you never lo
 
 This is the most urgent pattern. It loses money every day it goes unfixed.
 
+:::worksheet{id="pattern-3-high-cpc-low-cvr-critical-acos" title="Pattern 3: high CPC, low CVR, critical ACoS" lesson="1.5-metrics-in-practice"}
+{"fields":[{"key":"diagnosis","label":"The first thing you'd pull from the search-term report when this pattern shows up. One sentence."}]}
+:::
+
 ## Pattern 4: good CTR, good CVR, rising TACoS
 
 **The symptoms:** the ads look healthy on every ad-level metric, but TACoS (total advertising cost of sales) keeps climbing.
 
-**The diagnosis:** a rising TACoS with a steady ACoS means the business is leaning more on paid traffic than before. Don't assume organic sales are shrinking until you've pulled the actual ad-sales and organic-sales split. A rising TACoS can also come from total sales being flat while spend grows, or a seasonal dip.
+**The diagnosis:** a rising TACoS with a steady ACoS means the business is leaning more on paid traffic than before, but don't assume organic sales are shrinking until you've pulled the actual ad-sales and organic-sales split. A rising TACoS can also come from total sales being flat while spend grows, or a seasonal dip.
 
-**What to do:** if organic sales are genuinely falling, check organic keyword rankings and optimize the listing's title, bullets, and backend keywords (search terms the seller lists in Seller Central, hidden from the customer-facing page, so Amazon's algorithm can match the listing to more shopper searches) for organic search. Build reviews only through Amazon's own tools. The "Request a Review" button sends a neutral review request from the order page. The Vine program sends your product to vetted reviewers in exchange for an honest review, and it requires brand registry, fewer than 30 reviews on the listing, and stock in an FBA warehouse. Never offer an incentive for a positive review or ask a customer to change one. That risks the listing's standing far more than a slow review count does. Consider a temporary ad-spend increase while the organic fix takes hold.
+**What to do:** if organic sales are genuinely falling, check organic keyword rankings and optimize the listing's title, bullets, and backend keywords (search terms the seller lists in Seller Central, hidden from the customer-facing page, so Amazon's algorithm can match the listing to more shopper searches) for organic search. Build reviews only through Amazon's own tools, like the "Request a Review" button (an order-page button the seller can click to email a neutral review request to the buyer) or the Vine program (Amazon's program that sends your product to vetted reviewers in exchange for an honest review; enrollment requires brand registry, fewer than 30 reviews on the listing, and stock in an FBA warehouse). Never offer an incentive for a positive review or ask a customer to change one. That risks the listing's standing far more than a slow review count does. Consider a temporary ad-spend increase while the organic fix takes hold.
 
 **What not to do:** don't ignore a rising TACoS just because ACoS looks fine. It's a slow leak, not a false alarm.
+
+:::worksheet{id="pattern-4-good-ctr-good-cvr-rising-tacos" title="Pattern 4: good CTR, good CVR, rising TACoS" lesson="1.5-metrics-in-practice"}
+{"fields":[{"key":"diagnosis","label":"What you'd split (ad sales vs organic sales) before naming a cause. One sentence."}]}
+:::
 
 ## The diagnostic framework
 
@@ -64,6 +80,10 @@ This is the most urgent pattern. It loses money every day it goes unfixed.
 2. **Find the root cause.** Use the search-term report, placement data, and competitive comparison to understand why the bottleneck exists. Don't just treat the symptom.
 3. **Take one action at a time.** Resist changing everything at once. Make one adjustment, wait 3–7 days for data, then evaluate.
 4. **Measure the impact.** Compare before-and-after metrics. Did the bottleneck metric improve without degrading the others?
+
+:::worksheet{id="the-diagnostic-framework" title="The diagnostic framework" lesson="1.5-metrics-in-practice"}
+{"fields":[{"key":"weeklyPattern","label":"This week's pattern (1, 2, 3, or 4)"},{"key":"bottleneckMetric","label":"The bottleneck metric"}]}
+:::
 
 The weekly cadence that ties it together:
 
@@ -145,6 +165,10 @@ ACoS is now below break-even (24% vs. 30%), and TACoS at 12% shows the business 
 
 PPC optimization isn't a one-time fix. It's reading metrics, diagnosing the pattern, making one targeted change, and measuring the result. Week over week, small improvements compound.
 
+:::worksheet{id="scenario-walkthrough-kitchen-scale" title="Scenario walkthrough: kitchen scale" lesson="1.5-metrics-in-practice"}
+{"fields":[{"key":"rootCauseToCheckFirst","label":"Root cause you'd check first in a real account with this pattern"}]}
+:::
+
 ## The maximum-CPC formula
 
 Before any bid decision, calculate this: `maximum CPC = average order value (AOV) × CVR × target ACoS`.
@@ -154,6 +178,10 @@ For the kitchen scale at week 6: average order value ₱1,250, CVR 11% (0.11), t
 `₱1,250 × 0.11 × 0.25 = ₱34.38`
 
 Round that down, not up: a ceiling you round up is no longer a ceiling. Treat ₱34 as the maximum average CPC this product can support at a 25% target, not a hard per-click cap: your entered bid, placement adjustments, and bid strategy settings decide what any single click actually costs, and dynamic bidding can push individual auctions higher. What matters is your realized CPC over time. If Amazon's suggested bid range is ₱40 to ₱60, treat that as a signal to compare against your maximum, not a bid to accept by default.
+
+:::worksheet{id="the-maximum-cpc-formula" title="The maximum-CPC formula" lesson="1.5-metrics-in-practice"}
+{"fields":[{"key":"maxCpcRecap","label":"The maximum CPC formula in one line, and the rounding rule."}]}
+:::
 
 ## Independent calculation
 
@@ -186,8 +214,13 @@ Answer these before reading further:
 
 Part 5, the last piece of your Profitability and Max-CPC Sheet from Lessons 1.1 through 1.4. Add this final section:
 
-:::worksheet{id="mod1-5-profitability-sheet" title="Part 5 of your Profitability and Max-CPC Sheet" part="5" lesson="1.5-metrics-in-practice"}
-Your sheet now has five parts: the raw metrics and objective from 1.1, max CPC from 1.2, break-even ACoS from 1.3, minimum ROAS from 1.4, and this week's diagnosis from 1.5. Keep it somewhere you can find it. It's your evidence you can do this math on a real product, not just this lesson's examples.
+```text
+This week's pattern (1, 2, 3, or 4 from this lesson): ____________________
+Bottleneck metric: ____________________
+Root cause to check first: ____________________
+One action to take this week: ____________________
+Next review date: ____________________
+```
 
 Your sheet now has five parts: the raw metrics and objective from 1.1, max CPC from 1.2, break-even ACoS from 1.3, minimum ROAS from 1.4, and this week's diagnosis from 1.5. Keep it somewhere you can find it. It's your evidence you can do this math on a real product, not just this lesson's examples.
 
@@ -214,8 +247,8 @@ What the learner can do: Treat "pause after 30+ clicks with no conversions" as a
 Who can access it: N/A, this is guidance, not a platform feature
 Retailer or marketplace scope: General Amazon Advertising practice; no official minimum-data policy is published
 Official source URL: No single official source (teaching heuristic, not a documented Amazon policy)
-Last verified: 2026-09-25
-Next review due: 2026-01-25
+Last verified: pending content-owner review
+Next review due: pending content-owner review
 Owner: Ryan Roland Dabao
 ```
 

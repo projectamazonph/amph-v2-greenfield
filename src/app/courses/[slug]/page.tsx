@@ -15,7 +15,6 @@
  */
 
 import Link from "next/link";
-import Image from "next/image";
 
 import { StudentShell } from "@/components/student/StudentShell";
 import { notFound } from "next/navigation";
@@ -319,14 +318,8 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 <details key={mod.id} className={styles.section} open={si === 0}>
                   <summary className={styles.sectionSummary}>
                     {coverImage && (
-                      <Image
-                        src={coverImage}
-                        alt=""
-                        width={1600}
-                        height={900}
-                        className={styles.sectionCoverImage}
-                        loading="lazy"
-                      />
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={coverImage} alt="" className={styles.sectionCoverImage} />
                     )}
                     <span className={styles.sectionTitle}>
                       Section {si + 1}: {mod.title}

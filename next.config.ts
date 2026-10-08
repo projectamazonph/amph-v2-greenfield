@@ -1,21 +1,9 @@
 import type { NextConfig } from "next";
-// Sentry v11 moved withSentryConfig from the package root to the
-// "/config" subpath. v10 still re-exports it at the root, so importing
-// from "@sentry/nextjs/config" works for both — but doing so requires v10.40+,
-// which this repo has been on since 10.66.
-import { withSentryConfig } from "@sentry/nextjs/config";
-import bundleAnalyzer from "@next/bundle-analyzer";
-
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-});
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   typedRoutes: false,
-  images: {
-    formats: ["image/avif", "image/webp"],
-  },
   // STORY-0026 follow-up: build a self-contained production artifact
   // so the lighthouse job (and any other consumer) can start the
   // server without the broken pnpm-store symlinks in .next/.
@@ -30,7 +18,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+export default withSentryConfig(nextConfig, {
   // Source map upload is disabled when auth token is missing so that
   // local and CI builds succeed without real Sentry credentials.
   authToken: process.env.SENTRY_AUTH_TOKEN,

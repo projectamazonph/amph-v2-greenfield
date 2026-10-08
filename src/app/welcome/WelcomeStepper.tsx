@@ -137,11 +137,7 @@ export function WelcomeStepper({ firstName }: WelcomeStepperProps) {
 
       <div className={styles.controls}>
         {step > 0 && (
-          <button
-            type="button"
-            className={styles.back}
-            onClick={() => setStep((s) => Math.max(s - 1, 0))}
-          >
+          <button type="button" className={styles.back} onClick={() => setStep(step - 1)}>
             Back
           </button>
         )}
@@ -149,29 +145,20 @@ export function WelcomeStepper({ firstName }: WelcomeStepperProps) {
           <button
             type="button"
             className={styles.primary}
-            onClick={() => void handleFinish()}
+            onClick={handleFinish}
             disabled={submitting}
           >
             {submitting ? "Finishing…" : "Take me to my dashboard"}
           </button>
         ) : (
-          <button
-            type="button"
-            className={styles.primary}
-            onClick={() => setStep((s) => Math.min(s + 1, total - 1))}
-          >
+          <button type="button" className={styles.primary} onClick={() => setStep(step + 1)}>
             {step === 0 ? "Start the tour" : "Next"}
           </button>
         )}
       </div>
 
       {!isLast && (
-        <button
-          type="button"
-          className={styles.skip}
-          onClick={() => void handleFinish()}
-          disabled={submitting}
-        >
+        <button type="button" className={styles.skip} onClick={handleFinish}>
           Skip tour
         </button>
       )}

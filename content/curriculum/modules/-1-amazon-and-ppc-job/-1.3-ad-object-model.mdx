@@ -32,6 +32,10 @@ Ads account (the seller's whole ads presence)
 
 A small account might have one campaign with one ad group with ten keywords and one ad. A large account might have 30 campaigns with hundreds of ad groups each. The shape varies, but the levels are always the same.
 
+:::worksheet{id="the-hierarchy-at-a-glance" title="The hierarchy at a glance" lesson="-1.3-ad-object-model"}
+{"fields":[{"key":"note","label":"In your own words: what does each lower level inherit from the level above it?"}]}
+:::
+
 ## Level 1: the ads account
 
 The ads account is the top-level container. There is one account per seller. Your client owns it. You log into it using their credentials (or a delegated user account, depending on the seller's setup).
@@ -43,6 +47,10 @@ The account holds:
 - A list of all campaigns.
 
 You will rarely make changes at the account level. The seller sets up billing. You work inside campaigns.
+
+:::worksheet{id="level-1-the-ads-account" title="Level 1: the ads account" lesson="-1.3-ad-object-model"}
+{"fields":[{"key":"note","label":"Which account-level detail should a PPC VA confirm before touching any campaign? One sentence."}]}
+:::
 
 ## Level 2: the campaign
 
@@ -56,6 +64,10 @@ The campaign is the most important level for a PPC VA. Every change that affects
 
 Changing the campaign's daily budget affects every ad group and keyword inside it. Changing the bid strategy affects how Amazon bids for every keyword inside it. This is why campaign-level changes are the most powerful and the most dangerous.
 
+:::worksheet{id="level-2-the-campaign" title="Level 2: the campaign" lesson="-1.3-ad-object-model"}
+{"fields":[{"key":"note","label":"Which campaign-level setting most decides how every keyword inside gets bid? One sentence."}]}
+:::
+
 ## Level 3: the ad group
 
 Inside a campaign, ad groups let you group related keywords together. A common pattern is one ad group per match type (exact, phrase, broad) or one ad group per product. The ad group has:
@@ -65,6 +77,10 @@ Inside a campaign, ad groups let you group related keywords together. A common p
 - A list of ads: which ads Amazon can serve when the ad group wins an auction.
 
 A campaign can have one ad group or many. A common beginner pattern is one campaign with one ad group with all the keywords. That works for small accounts but limits control as the account grows.
+
+:::worksheet{id="level-3-the-ad-group" title="Level 3: the ad group" lesson="-1.3-ad-object-model"}
+{"fields":[{"key":"note","label":"Why putting every keyword in one ad group is a common beginner trap. One sentence."}]}
+:::
 
 ## Level 4: the keyword or product target
 
@@ -83,6 +99,10 @@ Three match types control how loosely a keyword can match a shopper's search:
 
 Lesson 2.1 covers match types in detail.
 
+:::worksheet{id="level-4-the-keyword-or-product-target" title="Level 4: the keyword or product target" lesson="-1.3-ad-object-model"}
+{"fields":[{"key":"note","label":"When would you use a product target instead of a keyword? One sentence."}]}
+:::
+
 ## Level 5: the ad
 
 The ad is what the shopper sees. For Sponsored Products, an ad is built from the product listing itself (the main image, the title, the price). You do not write the ad copy for a Sponsored Products ad; the listing does. You choose which products to advertise.
@@ -93,11 +113,19 @@ For Sponsored Display, the ad is an image or product card that runs both on Amaz
 
 The same keyword can have multiple ads. Amazon rotates them and shows the one that historically performs best for that search. This is "dynamic creative optimization," and it happens automatically.
 
+:::worksheet{id="level-5-the-ad" title="Level 5: the ad" lesson="-1.3-ad-object-model"}
+{"fields":[{"key":"note","label":"Which Sponsored Products ad surface does a PPC VA write, and which does the listing itself write? One sentence."}]}
+:::
+
 ## How a click happens
 
 When a shopper searches for "bamboo cutting board," Amazon runs an internal auction. Every ad whose keyword matches the search term (per its match type) enters the auction. Amazon scores each ad by a formula that combines the bid, the ad's relevance, and the predicted conversion rate. The winners get placed in the sponsored slots on the search results page.
 
 You will not see the auction. You see only the result: some clicks, some spend, some sales. The auction is what determines whether you pay ₱20 per click or ₱80 per click for the same keyword.
+
+:::worksheet{id="how-a-click-happens" title="How a click happens" lesson="-1.3-ad-object-model"}
+{"fields":[{"key":"note","label":"Name the three inputs Amazon's auction uses to score an ad. One short line."}]}
+:::
 
 ## Why the hierarchy matters
 
@@ -108,6 +136,10 @@ A common beginner mistake is to make changes at the wrong level. Examples:
 - Raising the daily budget when the issue is the listing converting poorly. More spend will just buy more clicks that do not convert.
 
 The fix is to pick the right level before you pick the lever. Module 4 covers campaign architecture in detail.
+
+:::worksheet{id="why-the-hierarchy-matters" title="Why the hierarchy matters" lesson="-1.3-ad-object-model"}
+{"fields":[{"key":"note","label":"Why lowering one keyword's bid rarely fixes a campaign-level problem. One sentence."}]}
+:::
 
 ## Your turn
 
@@ -136,7 +168,7 @@ What the learner can do: Read a campaign structure on screen, identify which lev
 Who can access it: Any Sponsored Products, Sponsored Brands, or Sponsored Display advertiser
 Retailer or marketplace scope: Amazon Advertising Console, all marketplaces
 Official source URL: https://advertising.amazon.com/help - the campaign-structure article for Sponsored Products, which covers the same hierarchy
-Last verified: 2026-09-25
-Next review due: 2026-01-25
+Last verified: pending content-owner review
+Next review due: pending content-owner review
 Owner: Ryan Roland Dabao
 ```

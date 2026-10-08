@@ -1,4 +1,5 @@
 import type { Course } from "@/domain/entities/Course";
+import { effectivePrice } from "@/domain/entities/PricingTier";
 import { Money } from "@/domain/values/Money";
 import { Result } from "@/domain/shared/Result";
 import type { CourseRepository } from "@/ports/repositories/CourseRepository";
@@ -48,7 +49,7 @@ export async function resolveCheckoutOffer(
       return Result.err({ kind: "pricing_tier_unavailable" });
     }
     courseSlug = linkResult.value;
-    tierPrice = tierResult.value.price;
+    tierPrice = effectivePrice(tierResult.value);
     offerName = tierResult.value.name;
   }
 

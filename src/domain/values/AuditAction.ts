@@ -34,7 +34,6 @@ export type AuditAction =
   // Payment / refund
   | "refund.processed"
   | "refund.overridden"
-  | "order.discount_applied"
   // User
   | "user.signed_up"
   | "user.impersonated"
@@ -49,7 +48,6 @@ export type AuditAction =
   // Enrollment access
   | "enrollment.granted"
   | "enrollment.revoked"
-  | "enrollment.revoked_by_refund"
   | "enrollment.restored"
   // Discount code
   | "discount_code.created"
@@ -90,7 +88,6 @@ export type AuditAction =
   | "quiz.update_failed"
   | "quiz.delete_failed"
   // Certificate (STORY-044 + STORY-092)
-  | "certificate.issued"
   | "certificate.revoked"
   // Resource / download center (STORY-098)
   | "resource.created"
@@ -116,6 +113,9 @@ export type AuditAction =
   | "assignment.submit_failed"
   | "assignment.graded"
   | "assignment.grade_failed"
+  // Per-H2 worksheet entries (replaces deleted Module 1 wide-row)
+  | "worksheet.saved"
+  | "worksheet.save_failed"
   // P1-05 (PR-C slice 3): admin saves a site setting
   | "setting.saved"
   | "setting.save_failed"
@@ -137,11 +137,7 @@ export type AuditAction =
   | "user.profile_updated"
   | "user.password_changed_by_admin"
   | "user.deleted_by_admin"
-  | "user.sessions_revoked"
-  // STORY-163: student saves the Module 1 worksheet artifact. Treated as
-  // a tier-2 mutation: who changed what and when, no admin approval gate.
-  | "worksheet.saved"
-  | "worksheet.save_failed";
+  | "user.sessions_revoked";
 
 /**
  * STORY-061. All valid AuditAction values as an array.
@@ -169,7 +165,6 @@ export const ALL_ACTIONS: AuditAction[] = [
   "lesson.reorder_failed",
   "refund.processed",
   "refund.overridden",
-  "order.discount_applied",
   "user.signed_up",
   "user.impersonated",
   "user.stopped_impersonating",
@@ -181,7 +176,6 @@ export const ALL_ACTIONS: AuditAction[] = [
   "user.subscription_changed",
   "enrollment.granted",
   "enrollment.revoked",
-  "enrollment.revoked_by_refund",
   "enrollment.restored",
   "discount_code.created",
   "discount_code.updated",
@@ -219,7 +213,6 @@ export const ALL_ACTIONS: AuditAction[] = [
   "quiz.update_failed",
   "quiz.delete_failed",
   // STORY-044 + STORY-092: certificate revoke
-  "certificate.issued",
   "certificate.revoked",
   // STORY-098: download center resources
   "resource.created",
@@ -245,6 +238,9 @@ export const ALL_ACTIONS: AuditAction[] = [
   "assignment.submit_failed",
   "assignment.graded",
   "assignment.grade_failed",
+  // Per-H2 worksheet entries (replaces deleted Module 1 wide-row)
+  "worksheet.saved",
+  "worksheet.save_failed",
   // P1-05 (PR-C slice 3): admin saves a site setting
   "setting.saved",
   "setting.save_failed",
@@ -262,9 +258,6 @@ export const ALL_ACTIONS: AuditAction[] = [
   "user.password_changed_by_admin",
   "user.deleted_by_admin",
   "user.sessions_revoked",
-  // STORY-163: student saves the Module 1 worksheet artifact.
-  "worksheet.saved",
-  "worksheet.save_failed",
 ];
 
 /**

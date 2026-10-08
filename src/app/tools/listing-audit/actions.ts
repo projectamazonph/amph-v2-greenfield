@@ -69,7 +69,6 @@ import type {
 } from "@/domain/simulator/listing-audit/ListingAuditOutput";
 import { XPService } from "@/domain/services/XPService";
 import { hasEverPassedSimulatorInMode } from "@/usecases/CheckChallengeModeUnlocked";
-import { friendlySimulatorError } from "@/lib/studentErrorCopy";
 import { listingAuditScenarioContentSchema } from "./scenarioContent";
 
 async function resolvePublishedScenario(container: AppContainer) {
@@ -284,10 +283,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
   if (Result.isErr(startResult)) {
     return {
       ok: false,
-      error: {
-        kind: "attempt_error",
-        message: friendlySimulatorError(startResult.error.kind, "attempt"),
-      },
+      error: { kind: "attempt_error", message: startResult.error.kind },
     };
   }
 
@@ -362,13 +358,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
   // which step 5 above already did).
   const submitResult = await container.submitSimulatorAttempt.execute({ attemptId });
   if (Result.isErr(submitResult)) {
-    return {
-      ok: false,
-      error: {
-        kind: "attempt_error",
-        message: friendlySimulatorError(submitResult.error.kind, "attempt"),
-      },
-    };
+    return { ok: false, error: { kind: "attempt_error", message: submitResult.error.kind } };
   }
 
   // ── 8. GradeSimulatorAttempt ────────────────────────────────────────
@@ -383,10 +373,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
   if (Result.isErr(gradeResult)) {
     return {
       ok: false,
-      error: {
-        kind: "grading_error",
-        message: friendlySimulatorError(gradeResult.error.kind, "grading"),
-      },
+      error: { kind: "grading_error", message: gradeResult.error.kind },
     };
   }
 
@@ -400,10 +387,7 @@ export async function listingAuditAttempt(input: unknown): Promise<ListingAuditA
   if (Result.isErr(feedbackResult)) {
     return {
       ok: false,
-      error: {
-        kind: "feedback_error",
-        message: friendlySimulatorError(feedbackResult.error.kind, "feedback"),
-      },
+      error: { kind: "feedback_error", message: feedbackResult.error.kind },
     };
   }
 
