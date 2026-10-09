@@ -25,6 +25,7 @@ import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { buildContainer } from "@/composition/container";
 import { StudentShell } from "@/components/student/StudentShell";
 import { getSimulatorCopy } from "@/lib/copy/simulatorCopy";
+import { SIMGRID_SIMULATOR_META } from "@/lib/simgrid/manifest";
 import {
   PUBLIC_CURRICULUM_CLAIMS,
   type PublicSimulatorAvailability,

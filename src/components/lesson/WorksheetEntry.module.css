@@ -1,9 +1,9 @@
 .worksheet {
   margin: 2rem 0;
   padding: 1.5rem;
-  border: 1px solid var(--ink-200, #e2e5e7);
-  border-radius: 12px;
-  background: var(--surface-1, #f8f9fa);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
   font-family: inherit;
 }
 
@@ -19,23 +19,23 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ink-500, #626a6a);
+  color: var(--ink-500);
 }
 
 .title {
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--ink-900, #0f1111);
+  color: var(--ink-900);
 }
 
 .readOnlyNotice {
   margin: 0 0 1rem;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  background: var(--ink-100, #eff1f1);
+  background: var(--surface-2);
   border-radius: 8px;
-  color: var(--ink-700, #404747);
+  color: var(--ink-700);
 }
 
 .fields {
@@ -54,7 +54,7 @@
 .label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--ink-900, #0f1111);
+  color: var(--ink-900);
 }
 
 .input {
@@ -62,22 +62,22 @@
   padding: 0.5rem 0.75rem;
   font-size: 0.95rem;
   font-family: inherit;
-  border: 1px solid var(--ink-200, #e2e5e7);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--surface-0, #ffffff);
-  color: var(--ink-900, #0f1111);
+  background: var(--surface-0);
+  color: var(--ink-900);
   resize: vertical;
   min-height: 4.5rem;
 }
 
 .input:focus {
-  border-color: var(--accent-primary, #1f8fff);
-  outline: 2px solid var(--accent-focus, rgba(31, 143, 255, 0.3));
+  border-color: var(--accent);
+  outline: 2px solid var(--accent-soft);
   outline-offset: 0;
 }
 
 .input:disabled {
-  background: var(--ink-100, #eff1f1);
+  background: var(--surface-2);
   cursor: not-allowed;
 }
 
@@ -107,15 +107,15 @@
   font-size: 0.875rem;
   font-weight: 600;
   font-family: inherit;
-  background: var(--accent-primary, #1f8fff);
-  color: white;
+  background: var(--accent);
+  color: var(--accent-ink);
   border: none;
   border-radius: 8px;
   cursor: pointer;
 }
 
 .submit:hover:not(:disabled) {
-  background: var(--accent-primary-hover, #0f7fef);
+  background: var(--accent-hover);
 }
 
 .submit:disabled {
@@ -128,7 +128,7 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.8125rem;
-  color: var(--ink-700, #404747);
+  color: var(--ink-700);
 }
 
 .status > svg {
