@@ -62,7 +62,7 @@ export default async function CertificatePage({ params }: PageProps) {
 
   const { certificate, user, course } = result.value;
   const fullName = `${user.firstName} ${user.lastName}`.trim() || "Anonymous";
-  const issuedDate = certificate.issuedAt.toLocaleDateString("en-US", {
+  const issuedDate = certificate.issuedAt.toLocaleDateString("en-PH", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -138,7 +138,7 @@ export default async function CertificatePage({ params }: PageProps) {
                   {certificate.revokedAt ? (
                     <p className={styles.certRevokedDate}>
                       Revoked on{" "}
-                      {certificate.revokedAt.toLocaleDateString("en-US", {
+                      {certificate.revokedAt.toLocaleDateString("en-PH", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
@@ -159,10 +159,7 @@ export default async function CertificatePage({ params }: PageProps) {
                 href={`/certificates/${certificate.verificationHash}/pdf`}
                 className={[buttonStyles.btn, buttonStyles.primary, buttonStyles.lg].join(" ")}
               >
-                <svg
-                  className={styles.actionIcon}
-                  aria-hidden="true"
-                >
+                <svg className={styles.actionIcon} aria-hidden="true">
                   <DownloadSimple size={20} weight="regular" />
                 </svg>
                 Download PDF

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NewUserDashboard — first-run dashboard variant (STORY-146).
  *
  * Server component: renderToString covers the static markup and

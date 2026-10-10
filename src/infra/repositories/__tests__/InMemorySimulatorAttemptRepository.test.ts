@@ -1,4 +1,4 @@
-﻿/**
+/**
  * InMemorySimulatorAttemptRepository tests.
  *
  * STORY-064: Simulator Attempt Infrastructure.

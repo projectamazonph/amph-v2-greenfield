@@ -1,4 +1,4 @@
-﻿/**
+/**
  * welcome.action.ts — STORY-146.
  *
  * Thin server-action wrappers around the `CompleteWelcome` and
@@ -36,14 +36,9 @@ import { Result } from "@/domain/shared/Result";
  * concern.
  */
 export type CompleteWelcomeActionError =
-  | { kind: "not_authenticated" }
-  | { kind: "not_found" }
-  | { kind: "repo_error"; message: string };
+  { kind: "not_authenticated" } | { kind: "not_found" } | { kind: "repo_error"; message: string };
 
-export type CompleteWelcomeActionResult = Result<
-  { completedAt: Date },
-  CompleteWelcomeActionError
->;
+export type CompleteWelcomeActionResult = Result<{ completedAt: Date }, CompleteWelcomeActionError>;
 
 export async function completeWelcomeAction(): Promise<CompleteWelcomeActionResult> {
   const user = await getSessionUser();

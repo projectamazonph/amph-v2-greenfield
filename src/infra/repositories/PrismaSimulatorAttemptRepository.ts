@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PrismaSimulatorAttemptRepository ΓÇö production adapter for ISimulatorAttemptRepository.
  *
  * STORY-064: Simulator Attempt Infrastructure.

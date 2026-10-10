@@ -99,14 +99,14 @@ export default async function LiveClassesPage() {
                 <li key={liveClass.id} className={styles.row}>
                   <div className={styles.cellDate}>
                     <time dateTime={liveClass.scheduledAt.toISOString()} className={styles.date}>
-                      {liveClass.scheduledAt.toLocaleString("en-US", {
+                      {liveClass.scheduledAt.toLocaleString("en-PH", {
                         month: "short",
                         day: "numeric",
                       })}
                     </time>
                     <span className={styles.time}>
                       <Clock size={13} weight="bold" aria-hidden="true" />
-                      {liveClass.scheduledAt.toLocaleString("en-US", {
+                      {liveClass.scheduledAt.toLocaleString("en-PH", {
                         hour: "numeric",
                         minute: "2-digit",
                         timeZone: "UTC",
@@ -150,7 +150,7 @@ export default async function LiveClassesPage() {
 
 function formatSessionDate(date: Date): string {
   return (
-    date.toLocaleString("en-US", {
+    date.toLocaleString("en-PH", {
       weekday: "long",
       month: "short",
       day: "numeric",

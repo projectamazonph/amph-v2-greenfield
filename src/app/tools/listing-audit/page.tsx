@@ -16,22 +16,34 @@ import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
 import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { SimulatorUnavailableNotice } from "@/components/tools/SimulatorUnavailableNotice";
 import { listingAuditScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
+const brItems = [{ href: "/tools", label: "Tools" }, { label: "Listing Audit" }];
+
 export default async function ListingAuditPage() {
   const container = buildContainer();
   const sim = container.simulatorRegistry.get("listing-audit");
-  if (!sim) {
-    throw new Error("Listing Audit simulator not registered");
+  const scenarioResult = await container.scenarioRepo.findPublished("listing-audit");
+  if (!sim || !scenarioResult.ok || !scenarioResult.value) {
+    if (process.env.NODE_ENV !== "test") {
+      console.warn(
+        "[simulator:error] listing-audit unavailable (not registered, or no published scenario)",
+      );
+    }
+    return (
+      <StudentShell>
+        <main id="main-content" tabIndex={-1} className={styles.page}>
+          <Breadcrumb items={brItems} />
+          <SimulatorUnavailableNotice simulatorName="Listing Audit" />
+        </main>
+      </StudentShell>
+    );
   }
 
-  const scenarioResult = await container.scenarioRepo.findPublished("listing-audit");
-  if (!scenarioResult.ok || !scenarioResult.value) {
-    throw new Error("No published listing-audit scenario found");
-  }
   const scenario = scenarioResult.value;
   const content = listingAuditScenarioContentSchema.parse(scenario.inputSchema);
 

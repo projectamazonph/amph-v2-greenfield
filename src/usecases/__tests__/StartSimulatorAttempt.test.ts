@@ -1,4 +1,4 @@
-﻿/**
+/**
  * StartSimulatorAttempt ΓÇö opens an in_progress attempt for a student.
  * STORY-064.
  *

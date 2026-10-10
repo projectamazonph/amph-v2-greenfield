@@ -43,7 +43,12 @@ export function CourseAccessNotice({
   });
 
   return (
-    <main className={styles.page} aria-labelledby="course-access-title">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className={styles.page}
+      aria-labelledby="course-access-title"
+    >
       <section className={styles.card}>
         <div className={styles.iconWrap} aria-hidden="true">
           <LockKey size={28} weight="bold" />

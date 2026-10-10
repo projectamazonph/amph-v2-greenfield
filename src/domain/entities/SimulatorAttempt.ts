@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SimulatorAttempt ΓÇö entity representing a student's attempt at a simulator scenario.
  *
  * STORY-064: Simulator Attempt Infrastructure.

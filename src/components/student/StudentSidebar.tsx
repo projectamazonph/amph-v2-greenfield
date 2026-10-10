@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 /**
  * StudentSidebar — student-facing navigation sidebar.
@@ -127,9 +127,7 @@ export function StudentSidebar({ user, notificationActions }: StudentSidebarProp
       setShowNewUserBadge(false);
       return;
     }
-    setShowNewUserBadge(
-      Date.now() - new Date(user.createdAt).getTime() < SEVEN_DAYS_MS,
-    );
+    setShowNewUserBadge(Date.now() - new Date(user.createdAt).getTime() < SEVEN_DAYS_MS);
   }, [user.welcomeCompletedAt, user.createdAt]);
 
   function performSignOut() {

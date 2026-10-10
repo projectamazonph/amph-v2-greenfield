@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PrismaSimulatorAttemptRepository adapter tests.
  *
  * STORY-064: Simulator Attempt Infrastructure.

@@ -21,22 +21,34 @@ import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
 import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { SimulatorUnavailableNotice } from "@/components/tools/SimulatorUnavailableNotice";
 import { strTriageScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
+const brItems = [{ href: "/tools", label: "Tools" }, { label: "Search Term Triage" }];
+
 export default async function StrTriagePage() {
   const container = buildContainer();
   const sim = container.simulatorRegistry.get("str-triage");
-  if (!sim) {
-    throw new Error("STR Triage simulator not registered");
+  const scenarioResult = await container.scenarioRepo.findPublished("str-triage");
+  if (!sim || !scenarioResult.ok || !scenarioResult.value) {
+    if (process.env.NODE_ENV !== "test") {
+      console.warn(
+        "[simulator:error] str-triage unavailable (not registered, or no published scenario)",
+      );
+    }
+    return (
+      <StudentShell>
+        <main id="main-content" tabIndex={-1} className={styles.page}>
+          <Breadcrumb items={brItems} />
+          <SimulatorUnavailableNotice simulatorName="Search Term Triage" />
+        </main>
+      </StudentShell>
+    );
   }
 
-  const scenarioResult = await container.scenarioRepo.findPublished("str-triage");
-  if (!scenarioResult.ok || !scenarioResult.value) {
-    throw new Error("No published str-triage scenario found");
-  }
   const scenario = scenarioResult.value;
   const content = strTriageScenarioContentSchema.parse(scenario.inputSchema);
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ISimulatorAttemptRepository ΓÇö port for persisting simulator attempts and decisions.
  *
  * STORY-064: Simulator Attempt Infrastructure.

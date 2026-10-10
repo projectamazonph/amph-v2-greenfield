@@ -1,4 +1,4 @@
-﻿// @vitest-environment jsdom
+// @vitest-environment jsdom
 /// <reference types="@testing-library/jest-dom" />
 
 import "vitest-axe/extend-expect";

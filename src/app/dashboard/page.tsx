@@ -1,4 +1,4 @@
-﻿/**
+/**
  * /dashboard — authenticated student dashboard.
  *
  * P0-4 fix: this route did not exist; signup/login redirects to
