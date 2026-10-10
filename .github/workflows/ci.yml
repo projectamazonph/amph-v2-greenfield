@@ -121,7 +121,7 @@ jobs:
       - run: pnpm prisma generate
       - run: pnpm test
       - run: pnpm test:coverage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: coverage
@@ -220,7 +220,7 @@ jobs:
           echo "build failed after 3 attempts"
           exit 1
       - run: pnpm test:e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: playwright-report
@@ -243,7 +243,7 @@ jobs:
         run: pnpm validate:learning-release
       - name: Report lesson production contract
         run: pnpm validate:lesson-production -- --report=lesson-production-report.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: lesson-production-report
           path: lesson-production-report.json
@@ -341,7 +341,7 @@ jobs:
           cp -r .next/static .next/standalone/.next/static
           mkdir -p .next/standalone/public
           if [ -d public ]; then cp -r public/. .next/standalone/public/; fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: build
