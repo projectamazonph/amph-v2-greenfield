@@ -15,7 +15,7 @@
 
 .readView {
   margin-top: var(--space-10);
-  padding: var(--space-7) var(--space-6) var(--space-8);
+  padding: var(--space-6) var(--space-6) var(--space-8);
   background: var(--surface-0);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -101,7 +101,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-4);
-  margin-bottom: var(--space-7);
+  margin-bottom: var(--space-6);
 }
 
 .snapshotCard {
