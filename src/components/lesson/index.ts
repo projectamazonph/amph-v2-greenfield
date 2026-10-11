@@ -6,6 +6,8 @@
 export { SelfCheck } from "./SelfCheck";
 export { WorksheetEntry } from "./WorksheetEntry";
 export type { WorksheetEntryProps, WorksheetFieldSpec } from "./WorksheetEntry";
+export { Module1WorksheetReadView } from "./Module1WorksheetReadView";
+export type { Module1WorksheetReadViewProps } from "./Module1WorksheetReadView";
 export { TradeOffTable } from "./TradeOffTable";
 export { ProcessDiagram } from "./ProcessDiagram";
 export { PitfallCallout } from "./PitfallCallout";

@@ -151,6 +151,7 @@ import { PrismaArtefactRepository } from "@/infra/repositories/PrismaArtefactRep
 import { PrismaWorksheetRepository } from "@/infra/repositories/PrismaWorksheetRepository";
 import { GetWorksheet } from "@/usecases/GetWorksheet";
 import { SaveWorksheetH2 } from "@/usecases/SaveWorksheetH2";
+import { GetModule1WorksheetSummary } from "@/usecases/GetModule1WorksheetSummary";
 import { SaveArtefact } from "@/usecases/SaveArtefact";
 import { SubmitArtefact } from "@/usecases/SubmitArtefact";
 import { ListStudentArtefacts } from "@/usecases/ListStudentArtefacts";
@@ -555,6 +556,8 @@ export interface AppContainer {
   worksheetRepo: IWorksheetRepository;
   getWorksheet: GetWorksheet;
   saveWorksheetH2: SaveWorksheetH2;
+  // STORY-164: Lesson 1.5 one-page read view of the Module 1 worksheet.
+  getModule1WorksheetSummary: GetModule1WorksheetSummary;
   // LEARN-033 (STORY-135): learner artefacts
   artefactRepo: IArtefactRepository;
   saveArtefact: SaveArtefact;
@@ -1474,6 +1477,8 @@ function buildProductionContainer(): AppContainer {
       recordAuditLog,
       clock: () => clock.now(),
     }),
+    // STORY-164: Lesson 1.5 one-page read view of the Module 1 worksheet.
+    getModule1WorksheetSummary: new GetModule1WorksheetSummary({ worksheetRepo }),
     // LEARN-033 (STORY-135): learner artefacts
     artefactRepo,
     saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),

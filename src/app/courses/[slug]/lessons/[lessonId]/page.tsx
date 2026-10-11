@@ -18,6 +18,7 @@ import { courseIsAvailable } from "@/domain/entities/Course";
 import { getSessionUserId } from "@/lib/auth";
 import { getLessonData, withCatalogCurriculum } from "../getLessonData";
 import { LessonContent } from "../LessonContent";
+import { Module1WorksheetReadView } from "@/components/lesson/Module1WorksheetReadView";
 import type { Lesson as CatalogLesson } from "@/domain/entities/Course";
 import type { Lesson } from "@/domain/entities/Lesson";
 import { LessonSidebar } from "../LessonSidebar";
@@ -288,6 +289,14 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
             <LessonContent lesson={selectedLessonResult.value} courseSlug={slug} />
           </section>
 
+          {/* STORY-164: Lesson 1.5 one-page read view of the Module 1
+              worksheet. Only mounted for the recap lesson, only when
+              the learner has an active enrollment — read view is
+              student-self data, not preview-tier material. */}
+          {hasActiveEnrollment && lessonId === "1.5-metrics-in-practice" ? (
+            <Module1WorksheetReadViewAsync studentId={userId ?? ""} />
+          ) : null}
+
           {completionStatus.completed === "1" ? (
             <>
               <Confetti trigger />
@@ -338,4 +347,21 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
       </main>
     </div>
   );
+}
+
+/**
+ * STORY-164 async wrapper around the read view. Renders nothing
+ * when the use case fails, so a partial summary never reaches the
+ * learner. The wrapper keeps the page itself a server component.
+ */
+async function Module1WorksheetReadViewAsync({
+  studentId,
+}: {
+  readonly studentId: string;
+}) {
+  if (!studentId) return null;
+  const container = buildContainer();
+  const result = await container.getModule1WorksheetSummary.execute({ studentId });
+  if (!result.ok) return null;
+  return <Module1WorksheetReadView summary={result.value} />;
 }

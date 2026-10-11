@@ -381,3 +381,35 @@
 .quizCta:hover {
   background: color-mix(in srgb, var(--accent) 90%, var(--ink-900));
 }
+
+/* LEARN-045: footer link to /help. Lives below the lesson body so
+   a stuck learner does not have to back out to find support. */
+.helpFooter {
+  margin-top: var(--space-10);
+  padding-top: var(--space-5);
+  border-top: 1px dashed var(--border);
+  display: flex;
+  justify-content: center;
+}
+
+.helpFooterLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--c-orange);
+  text-decoration: none;
+  border: 1px solid var(--c-orange-tint);
+  border-radius: var(--radius-sm);
+  background: var(--c-orange-soft);
+  transition:
+    background var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+.helpFooterLink:hover {
+  background: #ffffff;
+  border-color: var(--c-orange);
+}
