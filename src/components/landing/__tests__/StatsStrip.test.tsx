@@ -8,7 +8,11 @@ describe("StatsStrip truthful initial state", () => {
     const html = renderToString(createElement(StatsStrip));
 
     expect(html).toContain(">13</span>");
-    expect(html).toContain(">5</span>");
+    // STORY-089 added the 6th simulator (connected-account) so the
+    // landing page now advertises 6 practice tools, not 5. This
+    // number must match PUBLIC_CURRICULUM_CLAIMS.simulators, which
+    // is the source of truth.
+    expect(html).toContain(">6</span>");
     expect(html).toContain(">595</span>");
     expect(html).toContain(">2,500</span>");
     expect(html).not.toContain(">0</span>");
