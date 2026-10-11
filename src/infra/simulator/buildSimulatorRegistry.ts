@@ -1,7 +1,8 @@
 /**
- * buildSimulatorRegistry — creates a SimulatorRegistry with all 4 simulator stubs.
+ * buildSimulatorRegistry — creates a SimulatorRegistry with all 6 simulators.
  *
- * STORY-036: Simulator infrastructure.
+ * STORY-036: Simulator infrastructure. STORY-089: Connected-Account
+ * Simulator joins the registry as the sixth entry.
  *
  * Called by both the production and test containers.
  * Real implementations (STORY-037+) replace individual stubs via the registry
@@ -15,6 +16,7 @@ import { StrTriageSimulator } from "@/domain/simulator/str-triage/StrTriageSimul
 import { CampaignBuilderSimulator } from "@/domain/simulator/campaign-builder/CampaignBuilderSimulator";
 import { ListingAuditSimulator } from "@/domain/simulator/listing-audit/ListingAuditSimulator";
 import { KeywordResearchSimulator } from "@/domain/simulator/keyword-research/KeywordResearchSimulator";
+import { ConnectedAccountSimulator } from "@/domain/simulator/connected-account/ConnectedAccountSimulator";
 import type { SimulatorRegistry } from "@/ports/simulator/SimulatorRegistry";
 
 export function buildSimulatorRegistry(): SimulatorRegistry {
@@ -27,6 +29,10 @@ export function buildSimulatorRegistry(): SimulatorRegistry {
   // STORY-081: Keyword Research is its own registry entry, no longer a
   // page-level alias reusing ListingAuditSimulator's keyword generator.
   registry.register(new KeywordResearchSimulator());
+  // STORY-089: Connected-Account Simulator — sixth registry entry.
+  // Always reads from the published scenario, never a live Amazon
+  // account, so there is nothing to forge and nothing to leak.
+  registry.register(new ConnectedAccountSimulator());
 
   return registry;
 }

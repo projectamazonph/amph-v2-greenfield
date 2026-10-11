@@ -81,14 +81,17 @@ test.describe("Simulator access from root UX", () => {
     // were bounced to /login here, the heading would not render.
     await expect(page.getByRole("heading", { name: "Tools", exact: true })).toBeVisible();
 
-    // All 5 registered simulators MUST be listed. The ad-console is
+    // All 6 registered simulators MUST be listed. The ad-console is
     // listed too but is not a registered simulator (it's an embed).
+    // STORY-089 added "Connected Account" as the sixth registry entry;
+    // the readiness probe and this list must agree on the count.
     const expectedSimulators = [
       "Bid Elevator",
       "Search Term Triage",
       "Campaign Builder",
       "Listing Audit",
       "Keyword Research",
+      "Connected Account",
     ];
     for (const name of expectedSimulators) {
       await expect(page.getByRole("heading", { name, level: 2 })).toBeVisible();
@@ -106,6 +109,8 @@ test.describe("Simulator access from root UX", () => {
       { path: "/tools/campaign-builder", actionLabel: /check my campaign/i },
       { path: "/tools/listing-audit", actionLabel: /run audit/i },
       { path: "/tools/keyword-research", actionLabel: /generate keywords/i },
+      // STORY-089: sixth simulator, "Run scenario" submit button.
+      { path: "/tools/connected-account", actionLabel: /run scenario/i },
     ];
 
     for (const { path, actionLabel } of expectedForms) {

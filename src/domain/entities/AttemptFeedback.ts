@@ -308,8 +308,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
       "Before adding a keyword, check it actually contains a word describing the product niche, not just a related category.",
     fair: () =>
       "Re-read the product niche description and cut any keyword that doesn't clearly relate to it.",
-    poor: () =>
-      "Build your keyword list from the niche's own words, then expand outward.",
+    poor: () => "Build your keyword list from the niche's own words, then expand outward.",
   },
   negativeRouting: {
     excellent: () =>
@@ -378,8 +377,7 @@ const DIMENSION_RECOMMENDATIONS: Record<string, Record<FeedbackVerdict, Dimensio
       "Before marking a keyword as relevant, ask whether it could also describe a completely different product.",
     fair: () =>
       "Build a checklist of what makes a keyword irrelevant for this niche, and run every keyword against it.",
-    poor: () =>
-      "Focus on negatives next attempt. Look for terms that do not belong.",
+    poor: () => "Focus on negatives next attempt. Look for terms that do not belong.",
   },
   direction: {
     excellent: () =>
@@ -424,6 +422,13 @@ const OVERALL_PASS_COMMENT = {
     "You found the listing issues that matter most. Review the remaining misses before making the changes.",
   "keyword-research":
     "Your intent calls are mostly clear. Review the terms that could send spend to the wrong audience.",
+  // STORY-089: sixth simulator's pass-comment placeholder. The
+  // Connected-Account action does not go through this code path
+  // today (no attempt lifecycle, no feedback composer call) but
+  // the SimulatorId-keyed Record needs an entry to satisfy the
+  // type contract when a future PR wires the lifecycle in.
+  "connected-account":
+    "Your bids and triage calls landed where they should. Review the off-target rows before you repeat with another scenario.",
 };
 
 const OVERALL_FAIL_COMMENT = {
@@ -437,6 +442,10 @@ const OVERALL_FAIL_COMMENT = {
     "Start with the highest-impact listing issues. Review the evidence, then run the audit again.",
   "keyword-research":
     "Start with search intent and obvious negatives. Review the misses, then run the research again.",
+  // STORY-089: sixth simulator's fail-comment placeholder. See the
+  // matching pass-comment above for why this entry exists.
+  "connected-account":
+    "Start with the keywords furthest off-target, then revisit the search-term rows you marked as keep or optimize.",
 };
 
 const REMEDIATION_LINKS: Record<FeedbackVerdict, readonly string[]> = {

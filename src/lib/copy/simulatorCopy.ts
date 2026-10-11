@@ -3,7 +3,9 @@ export type SimulatorCopyId =
   | "str-triage"
   | "campaign-builder"
   | "listing-audit"
-  | "keyword-research";
+  | "keyword-research"
+  // STORY-089: sixth registered simulator's coach guide copy.
+  | "connected-account";
 
 export interface SimulatorCopy {
   readonly label: string;
@@ -36,14 +38,16 @@ export const SIMULATOR_COPY = {
     label: "Campaign structure practice",
     outcome: "Build a campaign structure that gives each targeting job a clear home.",
     task: "Start with the campaign roles, then add ad groups, keywords, bids, and negatives.",
-    coachNote: "A clean structure makes later optimization easier. Do not solve every problem in one ad group.",
+    coachNote:
+      "A clean structure makes later optimization easier. Do not solve every problem in one ad group.",
     nextRep: "On your next run, name the campaign role before adding its keywords.",
   },
   "listing-audit": {
     label: "Listing review practice",
     outcome: "Find the listing issues that can limit paid-traffic performance.",
     task: "Review the listing, run the audit, then choose the first action for each finding.",
-    coachNote: "Fix the issue that can change the buyer's decision before polishing low-impact details.",
+    coachNote:
+      "Fix the issue that can change the buyer's decision before polishing low-impact details.",
     nextRep: "On your next run, sort findings by impact before you choose an action.",
   },
   "keyword-research": {
@@ -52,6 +56,17 @@ export const SIMULATOR_COPY = {
     task: "Classify each keyword, then flag the terms you would keep out of the campaign.",
     coachNote: "Ask what the shopper wants before you decide where the keyword belongs.",
     nextRep: "On your next run, mark the obvious irrelevant terms before sorting the harder ones.",
+  },
+  // STORY-089: sixth simulator's shared coach-guide copy. The
+  // scenario-specific brief still comes from the SimulatorScenario
+  // row's `name` and `description` fields.
+  "connected-account": {
+    label: "Connected-account practice",
+    outcome: "Bid tune and triage a mock Amazon Advertising API snapshot.",
+    task: "Set the bid for each keyword, then triage every search term.",
+    coachNote:
+      "A keyword with no clicks or sales is the right place to leave the bid alone — do nothing is a valid answer.",
+    nextRep: "On your next run, triage the highest-spend search terms first.",
   },
 } satisfies Record<SimulatorCopyId, SimulatorCopy>;
 

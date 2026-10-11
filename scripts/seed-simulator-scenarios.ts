@@ -1032,6 +1032,113 @@ const SCENARIOS: ReadonlyArray<{
       defaultNicheId: "wireless-earbuds-case",
     },
   },
+  // STORY-089: starter scenario for the Connected-Account Simulator.
+  // The input schema mirrors the campaign + STR shape the mock Amazon
+  // Advertising API would return. The student adjusts each keyword's
+  // bid and triages each search term; gradeAttempt() compares the
+  // response to the per-keyword optimal bid and the per-term
+  // winner/bleeder ground truth baked into the scenario.
+  {
+    id: "connected-account-scenario-default",
+    simulatorId: "connected-account",
+    name: "Mock Sponsored Products campaign — bid tune + STR triage",
+    description:
+      "Review a mock Amazon Advertising API snapshot for a 4-keyword Sponsored Products campaign at 38% ACoS against a 25% target. Adjust bids and triage the 5-row Search Term Report.",
+    difficulty: "beginner",
+    estimatedMinutes: 12,
+    inputSchema: {
+      campaignName: "SP-ACME-WATERBOTTLE-32OZ-EXACT",
+      currencyCode: "PHP",
+      dailyBudgetMinor: 50000,
+      targetAcosPct: 25,
+      breakEvenAcosPct: 35,
+      revenuePerOrderMinor: 145000,
+      keywords: [
+        {
+          keywordId: "kw-1",
+          keyword: "stainless water bottle 32oz",
+          matchType: "exact",
+          impressions: 12000,
+          clicks: 312,
+          spendMinor: 28000,
+          salesMinor: 145000,
+          currentBidMinor: 1800,
+        },
+        {
+          keywordId: "kw-2",
+          keyword: "insulated bottle 32oz",
+          matchType: "phrase",
+          impressions: 8000,
+          clicks: 168,
+          spendMinor: 16500,
+          salesMinor: 87000,
+          currentBidMinor: 1400,
+        },
+        {
+          keywordId: "kw-3",
+          keyword: "kids water bottle",
+          matchType: "broad",
+          impressions: 4200,
+          clicks: 64,
+          spendMinor: 7400,
+          salesMinor: 0,
+          currentBidMinor: 1200,
+        },
+        {
+          keywordId: "kw-4",
+          keyword: "glass water bottle 32oz",
+          matchType: "exact",
+          impressions: 0,
+          clicks: 0,
+          spendMinor: 0,
+          salesMinor: 0,
+          currentBidMinor: 900,
+        },
+      ],
+      searchTerms: [
+        {
+          termId: "st-1",
+          term: "stainless water bottle 32oz",
+          clicks: 88,
+          spendMinor: 7900,
+          salesMinor: 43500,
+          orders: 3,
+        },
+        {
+          termId: "st-2",
+          term: "leak proof water bottle",
+          clicks: 41,
+          spendMinor: 4150,
+          salesMinor: 0,
+          orders: 0,
+        },
+        {
+          termId: "st-3",
+          term: "kids water bottle plastic",
+          clicks: 12,
+          spendMinor: 980,
+          salesMinor: 0,
+          orders: 0,
+        },
+        {
+          termId: "st-4",
+          term: "insulated bottle 32oz",
+          clicks: 22,
+          spendMinor: 2050,
+          salesMinor: 14500,
+          orders: 1,
+        },
+        {
+          termId: "st-5",
+          term: "cheap water bottle",
+          clicks: 5,
+          spendMinor: 320,
+          salesMinor: 0,
+          orders: 0,
+        },
+      ],
+    },
+  },
 ];
 
 // ── Main ─────────────────────────────────────────────────────────────────
