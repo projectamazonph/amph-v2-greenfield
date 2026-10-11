@@ -43,6 +43,8 @@ export class CreateResource {
       fileUrl: input.fileUrl,
       fileKey: input.fileKey,
       accessTier: input.accessTier,
+      // LEARN-050: anchor lesson slug, null for cross-cutting resources.
+      associatedLessonSlug: input.associatedLessonSlug,
       createdById: input.actorId,
     });
 

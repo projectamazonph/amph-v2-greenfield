@@ -14,11 +14,12 @@
  */
 
 import Link from "next/link";
-import { ArrowUpRight, DownloadSimple, FileText, LockKey } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUpRight, DownloadSimple, FileText, GraduationCap, LockKey } from "@phosphor-icons/react/dist/ssr";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Card, Badge } from "@astryxdesign/core";
 import { buildContainer } from "@/composition/container";
 import { requireAuth } from "@/lib/auth";
+import { lessonPath } from "@/lib/lessonPath";
 import type { ResourceCategory } from "@/domain/entities/Resource";
 import type { ResourceWithAccess } from "@/usecases/ListAvailableResources";
 import styles from "./page.module.css";
@@ -138,6 +139,37 @@ export default async function ResourcesPage() {
                     <div className={styles.cellBody}>
                       <h3 className={styles.resourceTitle}>{resource.title}</h3>
                       <p className={styles.resourceDescription}>{resource.description}</p>
+                      {/* LEARN-050: anchor-lesson chip. Renders only when
+                          the resource declares one. The chip is a link
+                          when the slug maps to a known course lesson
+                          (lessonPath returns a path); otherwise it
+                          renders as plain text so a malformed slug does
+                          not silently navigate off-origin. */}
+                      {resource.associatedLessonSlug ? (
+                        (() => {
+                          const path = lessonPath(resource.associatedLessonSlug).path;
+                          const label = `Supports Lesson: ${resource.associatedLessonSlug}`;
+                          return path ? (
+                            <Link
+                              href={path}
+                              className={styles.lessonChip}
+                              aria-label={label}
+                            >
+                              <GraduationCap size={12} weight="bold" aria-hidden="true" />
+                              <span>Supports: {resource.associatedLessonSlug}</span>
+                            </Link>
+                          ) : (
+                            <span
+                              className={styles.lessonChip}
+                              data-no-link="true"
+                              aria-label={label}
+                            >
+                              <GraduationCap size={12} weight="bold" aria-hidden="true" />
+                              <span>Supports: {resource.associatedLessonSlug}</span>
+                            </span>
+                          );
+                        })()
+                      ) : null}
                     </div>
                     <div className={styles.cellMeta}>
                       <span className={styles.fileType}>{resource.fileType}</span>

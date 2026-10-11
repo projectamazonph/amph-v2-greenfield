@@ -57,6 +57,28 @@ describe("CreateResource", () => {
     expect(found.ok && found.value?.createdById).toBe("admin_7");
   });
 
+  // LEARN-050: anchor-lesson slug is persisted end-to-end.
+  it("persists associatedLessonSlug when provided", async () => {
+    await useCase.execute(
+      makeInput({
+        id: "res_with_anchor",
+        associatedLessonSlug: "4.3-campaign-structure",
+      }),
+    );
+    const found = await repo.findById("res_with_anchor");
+    expect(found.ok).toBe(true);
+    if (!found.ok) return;
+    expect(found.value?.associatedLessonSlug).toBe("4.3-campaign-structure");
+  });
+
+  it("persists associatedLessonSlug as null when omitted (cross-cutting resource)", async () => {
+    await useCase.execute(makeInput({ id: "res_cross_cutting" }));
+    const found = await repo.findById("res_cross_cutting");
+    expect(found.ok).toBe(true);
+    if (!found.ok) return;
+    expect(found.value?.associatedLessonSlug).toBeNull();
+  });
+
   it("fails validation when title is empty", async () => {
     const r = await useCase.execute(makeInput({ title: "   " }));
     expect(r.ok).toBe(false);

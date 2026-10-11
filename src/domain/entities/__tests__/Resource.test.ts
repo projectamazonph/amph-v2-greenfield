@@ -49,6 +49,36 @@ describe("Resource entity", () => {
       expect(r.value.updatedById).toBeNull();
     });
 
+    // LEARN-050: anchor-lesson slug.
+    it("defaults associatedLessonSlug to null when omitted", () => {
+      const r = createResource(baseInput);
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.associatedLessonSlug).toBeNull();
+    });
+
+    it("records associatedLessonSlug when provided", () => {
+      const r = createResource({
+        ...baseInput,
+        associatedLessonSlug: "4.3-campaign-structure",
+      });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.associatedLessonSlug).toBe("4.3-campaign-structure");
+    });
+
+    it("normalizes whitespace and explicit null to null (cross-cutting resource)", () => {
+      const r1 = createResource({ ...baseInput, associatedLessonSlug: "   " });
+      expect(r1.ok).toBe(true);
+      if (!r1.ok) return;
+      expect(r1.value.associatedLessonSlug).toBeNull();
+
+      const r2 = createResource({ ...baseInput, associatedLessonSlug: null });
+      expect(r2.ok).toBe(true);
+      if (!r2.ok) return;
+      expect(r2.value.associatedLessonSlug).toBeNull();
+    });
+
     it("accepts a root-relative fileUrl into public/ (pre-installed static assets)", () => {
       const r = createResource({ ...baseInput, fileUrl: "/downloads/guides/quick-start.pdf" });
       expect(r.ok).toBe(true);
@@ -175,7 +205,9 @@ describe("Resource entity", () => {
         "cheat_sheet",
         "handout",
       ] as const;
-      const fileTypes = ["pdf", "xlsx", "gsheet", "docx", "zip", "link"] as const;
+      // LEARN-050: "md" added so the job-ready resource pack ships
+      // markdown files without forcing a PDF generator dependency.
+      const fileTypes = ["pdf", "xlsx", "gsheet", "docx", "zip", "link", "md"] as const;
       for (const category of categories) {
         expect(createResource({ ...baseInput, category }).ok).toBe(true);
       }
@@ -233,6 +265,31 @@ describe("Resource entity", () => {
       expect(r.value.fileKey).toBe(resource.fileKey);
       expect(r.value.accessTier).toBe(resource.accessTier);
       expect(r.value.isPublished).toBe(resource.isPublished);
+      expect(r.value.associatedLessonSlug).toBe(resource.associatedLessonSlug);
+    });
+
+    // LEARN-050: anchor-lesson slug patch application.
+    it("applies a new associatedLessonSlug from the patch", () => {
+      const r = updateResource(resource, { associatedLessonSlug: "2.2-keyword-research-workflow" });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.associatedLessonSlug).toBe("2.2-keyword-research-workflow");
+    });
+
+    it("clears associatedLessonSlug when patched to null (cross-cutting resource)", () => {
+      const seeded = updateResource(resource, { associatedLessonSlug: "1.5-metrics-in-practice" });
+      if (!seeded.ok) throw new Error("fixture setup failed");
+      const cleared = updateResource(seeded.value, { associatedLessonSlug: null });
+      expect(cleared.ok).toBe(true);
+      if (!cleared.ok) return;
+      expect(cleared.value.associatedLessonSlug).toBeNull();
+    });
+
+    it("normalizes whitespace to null when patching associatedLessonSlug", () => {
+      const r = updateResource(resource, { associatedLessonSlug: "   " });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.value.associatedLessonSlug).toBeNull();
     });
 
     it("updates fileKey when replacing an uploaded file", () => {

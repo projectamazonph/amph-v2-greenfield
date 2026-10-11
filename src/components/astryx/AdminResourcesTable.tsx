@@ -28,6 +28,8 @@ export interface ResourceRow extends Record<string, unknown> {
   accessTier: CourseAccessTier;
   isPublished: boolean;
   downloadCount: number;
+  /** LEARN-050: anchor lesson slug, null for cross-cutting resources. */
+  associatedLessonSlug: string | null;
 }
 
 interface AdminResourcesTableProps {
@@ -112,6 +114,19 @@ const COLUMNS: TableColumn<ResourceRow>[] = [
         label={row.isPublished ? "published" : "unpublished"}
       />
     ),
+  },
+  {
+    key: "associatedLessonSlug",
+    header: "Lesson",
+    width: { type: "proportional", value: 1 },
+    renderCell: (row) =>
+      row.associatedLessonSlug ? (
+        <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
+          {row.associatedLessonSlug}
+        </code>
+      ) : (
+        <span style={{ color: "var(--ink-500)", fontSize: "var(--text-xs)" }}>cross-cutting</span>
+      ),
   },
   {
     key: "downloadCount",

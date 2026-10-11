@@ -40,7 +40,14 @@ const ALL_RESOURCE_CATEGORIES: readonly ResourceCategory[] = [
   "handout",
 ];
 
-export type ResourceFileType = "pdf" | "xlsx" | "gsheet" | "docx" | "zip" | "link";
+export type ResourceFileType =
+  | "pdf"
+  | "xlsx"
+  | "gsheet"
+  | "docx"
+  | "zip"
+  | "link"
+  | "md";
 
 const ALL_RESOURCE_FILE_TYPES: readonly ResourceFileType[] = [
   "pdf",
@@ -49,6 +56,11 @@ const ALL_RESOURCE_FILE_TYPES: readonly ResourceFileType[] = [
   "docx",
   "zip",
   "link",
+  // LEARN-050: markdown source for the job-ready resource pack. .md is
+  // a browser-rendered download, no PDF generator dependency needed.
+  // Same `isValidUrl` rule applies — root-relative `/downloads/...`
+  // into public/ or an absolute http(s) URL.
+  "md",
 ];
 
 const ALL_ACCESS_TIERS: readonly CourseAccessTier[] = ["STARTER", "PRO", "PREVIEW"];
@@ -252,6 +264,15 @@ export function updateResource(
 
   const isPublished = patch.isPublished !== undefined ? patch.isPublished : original.isPublished;
 
+  // LEARN-050: anchor lesson slug. Pass null to clear (cross-cutting
+  // resources); pass a string to set/replace. `undefined` keeps the
+  // original. The trim before the use rounds an accidental whitespace
+  // entry to null, mirroring how `createResource` handles the field.
+  const associatedLessonSlug =
+    patch.associatedLessonSlug !== undefined
+      ? patch.associatedLessonSlug?.trim() || null
+      : original.associatedLessonSlug;
+
   if (errors.length > 0) return { ok: false, error: errors[0]! };
 
   return {
@@ -266,6 +287,7 @@ export function updateResource(
       fileKey,
       accessTier,
       isPublished,
+      associatedLessonSlug,
       updatedAt: new Date(),
       updatedById: updatedById?.trim() || original.updatedById,
     }),

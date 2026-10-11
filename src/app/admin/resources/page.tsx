@@ -93,6 +93,7 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
     accessTier: resource.accessTier,
     isPublished: resource.isPublished,
     downloadCount: resource.downloadCount,
+    associatedLessonSlug: resource.associatedLessonSlug,
   }));
 
   return (

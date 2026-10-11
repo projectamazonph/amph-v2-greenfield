@@ -4,7 +4,7 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
-### STORY-089 Connected-Account Simulator (sixth registry entry)
+### LEARN-050 first job-ready resource pack (3 of 6 shipped)
 
 Wave 5 closes with the sixth simulator on `/tools`. Connected-Account mirrors a mock Amazon Advertising API: the published scenario carries a campaign snapshot (per-keyword economics) and a recent Search Term Report, the student adjusts bids and triages, and `gradeAttempt()` scores the response against ground truth baked into the scenario. No live Amazon account is ever touched — the scenario is the only source of truth for what the student sees, so there is nothing to forge and nothing to leak.
 
@@ -20,6 +20,17 @@ Wave 5 closes with the sixth simulator on `/tools`. Connected-Account mirrors a 
 - Architecture suite 916/916 (was 912).
 
 Intentionally out of scope: persistence (no SimulatorAttempt row, no XP award, no debrief), multi-account switching, real Amazon API tokens. Per AGENTS.md Rule 5 the sixth entry is gated by the registry, the entity union, the published scenario, and the validator — all four now exist and are pinned by tests.
+
+### LEARN-050 first job-ready resource pack (3 of 6 shipped)
+
+Wave 5 of the zero-to-one student journey opens with the first three of six LEARN-050 resources, each carrying a real worked example and a real blank working copy under `public/downloads/job-ready-pack/`: Campaign Pre-Flight Checklist (`4.3-campaign-structure`), Keyword Scoring Worksheet (`2.2-keyword-research-workflow`), and Weekly Client Report (cross-cutting). The remaining three (negative keyword log, ACoS/bid calculator, PPC account onboarding SOP) list on `/resources` with the right title, description, and tier but ship with a short "in progress" `.md` body so the listing is honest about what is there now versus what is coming.
+
+- New `associatedLessonSlug` field on the `Resource` entity (was already added in the scaffolding commit `af79a89`): nullable bare slug, no FK, cross-cutting resources stay null. `updateResource` now applies the patch (the scaffolding had the field on the type but was missing the patch application, so edits would have silently dropped the anchor).
+- New `"md"` `ResourceFileType`: LEARN-050 ships markdown rather than pulling in a PDF generator dependency. Same `isValidUrl` rule applies — root-relative `/downloads/...` into `public/` or an absolute http(s) URL.
+- Student `/resources` page renders a "Supports Lesson: <slug>" chip on each row when the resource has an anchor. The chip links to the lesson route when `lessonPath()` resolves a course; otherwise it stays as plain text with `data-no-link="true"` so a malformed slug never silently navigates off-origin. Pure helper at `src/lib/lessonPath.ts` uses the same module-to-course mapping the seeder already uses.
+- Admin `/admin/resources` table gains a "Lesson" column showing the slug or `cross-cutting` for resources without an anchor. `/admin/resources/new` and `/admin/resources/[id]/edit` forms gain the corresponding input and include `"md"` in the file type list.
+- New idempotent seeder `scripts/seed-learn-050-resources.ts` (`pnpm db:seed:learn-050-resources`) writes the six rows through `createResource` + `updateResource` so field-level validation runs end to end, with `--dry-run` for safe previews and `createdById: "system:learn-050"` for audit consistency. Namespaced `res_jrp_*` ids keep the new entries separate from the STORY-098/099 resources.
+- 18 new unit tests across the resource entity, the CreateResource use case, the lesson path helper, the resources page test, and the seed-script smoke test. Architecture suite unchanged at 912/912.
 
 ### LEARN-045 help route + STORY-164 Lesson 1.5 worksheet read view
 

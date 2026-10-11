@@ -69,6 +69,12 @@ Pricing tier rows link to course rows through `PricingTierCourse`. Signup preser
 
 An audited manual tier grant also creates the course enrollments required by the dashboard and lesson access checks. STARTER grants published STARTER and PREVIEW courses, PRO grants all eligible published courses, and FREE creates no new enrollment. The operation is idempotent and does not create an Order row.
 
+### Download center
+
+`/resources` lists every published resource grouped by category and gated by `accessTier` the same way courses are: a resource above the viewer's subscription tier still shows (so they know what upgrading unlocks) but the `/api/resources/[id]/download` route re-checks access server-side. Admins create, edit, and purge resources at `/admin/resources`. STORY-098 shipped the 26 pre-installed guides, templates, automation tools, cheat sheets, and handouts; STORY-099 expanded the library to 26; STORY-098.5 added the admin-upload path.
+
+**LEARN-050 first job-ready resource pack (3 of 6 shipped)** (2026-10-11): the download center gained a new optional `associatedLessonSlug` field on `Resource` (nullable bare slug, no FK — the curriculum lives in MDX, not the Prisma schema) plus a student-facing "Supports Lesson: <slug>" chip on each row that links to the lesson route when `lessonPath()` resolves a course. The first three of six LEARN-050 resources ship with real worked examples and real blank working copies: Campaign Pre-Flight Checklist (`4.3-campaign-structure`), Keyword Scoring Worksheet (`2.2-keyword-research-workflow`), and Weekly Client Report (cross-cutting). The remaining three (negative keyword log, ACoS/bid calculator, PPC account onboarding SOP) list on `/resources` with the right title, description, and tier but ship with a short "in progress" `.md` body so the listing is honest about what is there now versus what is coming. Idempotent seeder at `scripts/seed-learn-050-resources.ts` (`pnpm db:seed:learn-050-resources`).
+
 ### Practice tools
 
 | URL                        | Status                  | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |

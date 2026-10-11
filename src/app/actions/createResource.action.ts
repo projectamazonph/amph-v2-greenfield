@@ -62,6 +62,11 @@ export async function createResourceAction(
     accessTier: input.accessTier,
     fileUrl,
     fileKey,
+    // LEARN-050: anchor lesson slug, null for cross-cutting resources.
+    // Empty string is treated as null inside the domain factory so a
+    // blank `<input>` from the form does not accidentally pin a row to
+    // an empty slug.
+    associatedLessonSlug: input.associatedLessonSlug,
     id,
     actorId: session.id,
   });
