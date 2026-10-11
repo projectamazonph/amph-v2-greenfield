@@ -430,15 +430,18 @@ simDescribe("container — simulator registry wiring", () => {
     simExpect(typeof c.simulatorRegistry.get).toBe("function");
   });
 
-  simIt("test container has all 5 simulators registered", () => {
+  simIt("test container has all 6 simulators registered", () => {
     const c = buildTestContainer();
     const simulators = c.simulatorRegistry.list();
-    simExpect(simulators).toHaveLength(5);
+    // STORY-089: 6th simulator (connected-account) added. The registry
+    // is the source of truth for which simulators are available.
+    simExpect(simulators).toHaveLength(6);
     simExpect(c.simulatorRegistry.get("bid-elevator")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("str-triage")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("campaign-builder")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("listing-audit")).not.toBeNull();
     simExpect(c.simulatorRegistry.get("keyword-research")).not.toBeNull();
+    simExpect(c.simulatorRegistry.get("connected-account")).not.toBeNull();
   });
 
   simIt("bid-elevator simulator is the real BidElevatorSimulator, not a stub", () => {
