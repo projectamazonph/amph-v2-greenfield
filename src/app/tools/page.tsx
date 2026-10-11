@@ -223,6 +223,20 @@ export default async function ToolsIndexPage() {
             </li>
           </ul>
         </section>
+
+        {/*
+          LEARN-045: the tools index is the home for every practice
+          surface, so the help route is one click away. Stays out of
+          the practice library so the count and grid stay clean.
+        */}
+        <aside className={styles.toolsHelp} aria-label="Tools help">
+          <p className={styles.toolsHelpText}>
+            Stuck on a simulator decision, or not sure how grading works?
+          </p>
+          <Link href="/help" className={styles.toolsHelpLink}>
+            Open the help page <ArrowRight size={14} weight="bold" aria-hidden="true" />
+          </Link>
+        </aside>
       </main>
     </StudentShell>
   );

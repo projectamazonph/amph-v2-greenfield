@@ -24,6 +24,7 @@ import {
   SignOut,
   DownloadSimple,
   VideoCamera,
+  Lifebuoy,
 } from "@phosphor-icons/react/dist/ssr";
 import type { ComponentType, SVGProps } from "react";
 import { useEffect, useState } from "react";
@@ -63,7 +64,12 @@ const NAV_SECTIONS: readonly NavSection[] = [
   },
   {
     label: "Connect",
-    items: [{ href: "/live-classes", label: "Live classes", icon: VideoCamera }],
+    items: [
+      { href: "/live-classes", label: "Live classes", icon: VideoCamera },
+      // LEARN-045: a /help link lives in the sidebar so a stuck
+      // learner can find it from any page, without backtracking.
+      { href: "/help", label: "Help", icon: Lifebuoy },
+    ],
   },
   {
     label: "Resources",

@@ -1,0 +1,348 @@
+/**
+ * Module1WorksheetReadView — STORY-164 read view styles.
+ *
+ * Aesthetic: operational summary card, not a marketing page. Dense
+ * data table feel, navy section frames, orange used only for the
+ * "drift" status, cool-gray for the "unknown / not enough data"
+ * state, green for "ok". Uses the AMPH token system only.
+ *
+ * Layout:
+ *   - Header
+ *   - Snapshot grid (3-col on desktop, 1-col on mobile)
+ *   - Consistency check card
+ *   - Footer with links back to each lesson
+ */
+
+.readView {
+  margin-top: var(--space-10);
+  padding: var(--space-6) var(--space-6) var(--space-8);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* ---- Header ------------------------------------------------- */
+
+.header {
+  text-align: left;
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-orange);
+  margin-bottom: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--c-orange-tint);
+  border-radius: var(--radius-sm);
+  background: var(--c-orange-soft);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-3);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.subtitle {
+  font-size: var(--text-base);
+  color: var(--ink-700);
+  margin: 0;
+  max-width: 60ch;
+  line-height: var(--leading-normal);
+}
+
+/* ---- Empty state ------------------------------------------- */
+
+.emptyLinks {
+  list-style: none;
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.emptyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--ink-900);
+  text-decoration: none;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.emptyLink:hover {
+  color: var(--c-orange);
+  border-color: var(--c-orange-tint);
+}
+
+/* ---- Snapshot grid ----------------------------------------- */
+
+.snapshotGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.snapshotCard {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.snapshotCardTitle {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-navy-3);
+  margin: 0;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px dashed var(--border);
+}
+
+.snapshotList {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.snapshotRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-1) 0;
+}
+
+.snapshotLabel {
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  margin: 0;
+}
+
+.snapshotValue {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink-900);
+  margin: 0;
+  text-align: right;
+  min-width: 6ch;
+}
+
+.snapshotValue[data-empty="true"] {
+  color: var(--ink-500);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ---- Consistency card -------------------------------------- */
+
+.consistency {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--c-orange);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.consistencyHead {
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.consistencyTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--ink-900);
+  margin: 0 0 var(--space-1);
+}
+
+.consistencySubtitle {
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.consistencyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.consistencyItem {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.consistencyItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.consistencyLabel {
+  font-size: var(--text-sm);
+  color: var(--ink-900);
+  line-height: 1.4;
+}
+
+.consistencyBadge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--ink-700);
+  white-space: nowrap;
+  max-width: 32ch;
+  text-align: right;
+}
+
+.consistencyBadgeOk {
+  border-color: var(--success, #067d62);
+  background: color-mix(in srgb, #067d62 8%, var(--surface-1));
+  color: var(--success, #067d62);
+}
+
+.consistencyBadgeDrift {
+  border-color: var(--c-orange);
+  background: var(--c-orange-soft);
+  color: var(--c-orange-d);
+  font-weight: 600;
+}
+
+.consistencyBadgeUnknown {
+  color: var(--ink-500);
+  font-style: italic;
+}
+
+/* ---- Footer with lesson links ------------------------------ */
+
+.readViewFooter {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.readViewFooterNote {
+  font-size: var(--text-sm);
+  color: var(--ink-700);
+  margin: 0 0 var(--space-3);
+  line-height: 1.5;
+}
+
+.lessonLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.lessonLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--ink-900);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  transition: border-color 0.15s ease;
+}
+
+.lessonLink[data-empty="true"] {
+  color: var(--ink-500);
+  border-style: dashed;
+  font-style: italic;
+}
+
+.lessonLink:hover {
+  border-color: var(--c-orange-tint);
+}
+
+.lessonLinkEmpty {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+  padding-left: var(--space-1);
+}
+
+/* ---- Responsive -------------------------------------------- */
+
+@media (max-width: 960px) {
+  .snapshotGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .readView {
+    padding: var(--space-5) var(--space-4) var(--space-6);
+  }
+  .title {
+    font-size: var(--text-xl);
+  }
+  .snapshotGrid {
+    grid-template-columns: 1fr;
+  }
+  .consistency {
+    padding: var(--space-4);
+  }
+  .consistencyItem {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+  .consistencyBadge {
+    justify-self: start;
+    max-width: 100%;
+  }
+}

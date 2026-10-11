@@ -806,14 +806,41 @@ export function LessonContent({ lesson, courseSlug }: LessonContentProps) {
     );
   }
 
+  // LEARN-045: every lesson ships a route to /help so a stuck learner
+  // does not have to back out to the dashboard to find support.
   if (renderable.type === "TEXT") {
-    return <TextContent body={renderable.body} title={lesson.title} lessonSlug={lesson.id} />;
+    return (
+      <>
+        <TextContent body={renderable.body} title={lesson.title} lessonSlug={lesson.id} />
+        <LessonHelpFooter />
+      </>
+    );
   }
 
   if (renderable.type === "VIDEO") {
-    return <VideoContent content={renderable} />;
+    return (
+      <>
+        <VideoContent content={renderable} />
+        <LessonHelpFooter />
+      </>
+    );
   }
 
   // renderable.type === "QUIZ"
-  return <QuizContent content={renderable} quizHref={renderable.quizHref} />;
+  return (
+    <>
+      <QuizContent content={renderable} quizHref={renderable.quizHref} />
+      <LessonHelpFooter />
+    </>
+  );
+}
+
+function LessonHelpFooter(): ReactElement {
+  return (
+    <footer className={styles.helpFooter} aria-label="Lesson help">
+      <Link href="/help" className={styles.helpFooterLink}>
+        Stuck on this lesson? Open the help page.
+      </Link>
+    </footer>
+  );
 }

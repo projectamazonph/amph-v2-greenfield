@@ -94,6 +94,7 @@ import { InMemoryAssignmentRepository } from "@/infra/repositories/inmemory/InMe
 import { InMemoryWorksheetRepository } from "@/infra/repositories/InMemoryWorksheetRepository";
 import { GetWorksheet } from "@/usecases/GetWorksheet";
 import { SaveWorksheetH2 } from "@/usecases/SaveWorksheetH2";
+import { GetModule1WorksheetSummary } from "@/usecases/GetModule1WorksheetSummary";
 import { SetCoursePrerequisite } from "@/usecases/SetCoursePrerequisite";
 import { RemoveCoursePrerequisite } from "@/usecases/RemoveCoursePrerequisite";
 import { CreateAssignment } from "@/usecases/CreateAssignment";
@@ -332,6 +333,7 @@ export interface TestContainer extends AppContainer {
   worksheetRepo: InMemoryWorksheetRepository;
   getWorksheet: GetWorksheet;
   saveWorksheetH2: SaveWorksheetH2;
+  getModule1WorksheetSummary: GetModule1WorksheetSummary;
   // LEARN-033 (STORY-135): learner artefact fakes
   artefactRepo: InMemoryArtefactRepository;
   saveArtefact: SaveArtefact;
@@ -1089,6 +1091,8 @@ export function buildTestContainer(): TestContainer {
       recordAuditLog,
       clock: () => clock.now(),
     }),
+    // STORY-164: Lesson 1.5 one-page read view
+    getModule1WorksheetSummary: new GetModule1WorksheetSummary({ worksheetRepo }),
     // LEARN-033 (STORY-135): learner artefacts (in-memory)
     artefactRepo,
     saveArtefact: new SaveArtefact({ artefactRepo, idGen, clock }),
