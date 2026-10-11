@@ -85,6 +85,14 @@ export interface Resource {
   readonly createdAt: Date;
   readonly updatedAt: Date;
   /**
+   * LEARN-050: anchor lesson the resource supports, when the resource
+   * is for one specific lesson. Null for cross-cutting resources like
+   * the weekly client report. Bare slug, no FK relation — the
+   * curriculum lives in MDX and is not in this schema, so the value
+   * is informational, not enforced.
+   */
+  readonly associatedLessonSlug: string | null;
+  /**
    * Soft-delete marker column, added in review alongside createdById/
    * updatedById. Deliberately NOT wired into `delete()` or `hardDelete()`
    * (see `PrismaResourceRepository`'s docblock for why) — `delete()`
@@ -117,6 +125,14 @@ export interface CreateResourceInput {
   /** Storage key if this file was uploaded via IFileStorage. Omit/null for static assets and external links. */
   fileKey?: string | null;
   accessTier: CourseAccessTier;
+  /**
+   * LEARN-050: anchor lesson the resource supports. Omit/null for
+   * cross-cutting resources that do not have a single anchor lesson.
+   * Slug format matches `WorksheetLessonSlug` (e.g. `1.2-cpc-ctr`)
+   * but is not validated here because the curriculum lives in MDX,
+   * not in this schema.
+   */
+  associatedLessonSlug?: string | null;
   /** Actor id of the admin creating this resource. Omit/null when unknown. */
   createdById?: string | null;
 }
@@ -132,6 +148,7 @@ export type UpdateResourcePatch = Partial<
     | "fileKey"
     | "accessTier"
     | "isPublished"
+    | "associatedLessonSlug"
   >
 >;
 
@@ -195,6 +212,9 @@ export function createResource(input: CreateResourceInput): Result<Resource, Res
       downloadCount: 0,
       createdAt: now,
       updatedAt: now,
+      // LEARN-050: anchor lesson the resource supports. Cross-cutting
+      // resources (like the weekly client report) pass null here.
+      associatedLessonSlug: input.associatedLessonSlug?.trim() || null,
       deletedAt: null,
       createdById: input.createdById?.trim() || null,
       updatedById: null,

@@ -48,6 +48,8 @@ interface ResourceRow {
   downloadCount: number;
   createdAt: Date;
   updatedAt: Date;
+  // LEARN-050: bare slug of the anchor lesson, no FK relation.
+  associatedLessonSlug: string | null;
   deletedAt: Date | null;
   createdById: string | null;
   updatedById: string | null;
@@ -193,6 +195,9 @@ export class PrismaResourceRepository implements IResourceRepository {
       downloadCount: row.downloadCount,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
+      // LEARN-050: anchor lesson slug. Null for cross-cutting resources
+      // and for any row that pre-dates the migration.
+      associatedLessonSlug: row.associatedLessonSlug ?? null,
       deletedAt: row.deletedAt,
       createdById: row.createdById,
       updatedById: row.updatedById,
