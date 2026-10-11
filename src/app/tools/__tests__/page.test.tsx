@@ -20,6 +20,8 @@ const mockSimulators = [
   { simulatorId: "campaign-builder", name: "Campaign Builder" },
   { simulatorId: "listing-audit", name: "Listing Audit" },
   { simulatorId: "keyword-research", name: "Keyword Research" },
+  // STORY-089: sixth simulator in the registry.
+  { simulatorId: "connected-account", name: "Connected Account" },
 ];
 
 vi.mock("@/composition/container", () => ({
@@ -34,13 +36,13 @@ vi.mock("@/composition/container", () => ({
 // No need to import or render the page component in domain tests.
 
 describe("/tools index — domain layer", () => {
-  it("registry lists 5 simulators", async () => {
+  it("registry lists 6 simulators", async () => {
     // Import lazily so mocks are already in place
     const { buildContainer } = await import("@/composition/container");
     const container = buildContainer();
     const simulators = container.simulatorRegistry.list();
 
-    expect(simulators).toHaveLength(5);
+    expect(simulators).toHaveLength(6);
   });
 
   it("registry includes bid elevator", async () => {
@@ -113,9 +115,11 @@ describe("/tools index — domain layer", () => {
       );
     });
 
-    it("simulator page component enumerates all five simulators", async () => {
+    it("simulator page component enumerates all six simulators", async () => {
       // Pin the registry contract used by the page so a regression in
-      // the registry quickly surfaces a clear failure here.
+      // the registry quickly surfaces a clear failure here. STORY-089
+      // added "connected-account" as the sixth registry entry; the
+      // readiness probe and this list must agree on the count.
       const { buildContainer } = await import("@/composition/container");
       const container = buildContainer();
       const simulators = container.simulatorRegistry.list();
@@ -125,6 +129,7 @@ describe("/tools index — domain layer", () => {
         [
           "bid-elevator",
           "campaign-builder",
+          "connected-account",
           "keyword-research",
           "listing-audit",
           "str-triage",

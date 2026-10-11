@@ -4,6 +4,23 @@ All notable changes to Project Amazon PH Academy v2 are documented here.
 
 ## [Unreleased]
 
+### STORY-089 Connected-Account Simulator (sixth registry entry)
+
+Wave 5 closes with the sixth simulator on `/tools`. Connected-Account mirrors a mock Amazon Advertising API: the published scenario carries a campaign snapshot (per-keyword economics) and a recent Search Term Report, the student adjusts bids and triages, and `gradeAttempt()` scores the response against ground truth baked into the scenario. No live Amazon account is ever touched — the scenario is the only source of truth for what the student sees, so there is nothing to forge and nothing to leak.
+
+- New `SimulatorId` `"connected-account"` added to the union and to `buildSimulatorRegistry()`, satisfying AGENTS.md Rule 5.
+- New domain module `src/domain/simulator/connected-account/` with `ConnectedAccountSimulator` (pure function, two score dimensions: `bidAccuracy` and `triageAccuracy`), the typed scenario input/output shapes, and a public `gradeAttempt()` helper.
+- New student-facing route at `/tools/connected-account` with `ConnectedAccountForm` (the mock campaign snapshot + STR triage rows) and `ConnectedAccountResult` (per-keyword outcome + per-search-term triage outcome). `FormativeScoreNotice` mounts so the score is unambiguously formative per STORY-078.
+- New published `SimulatorScenario` row `connected-account-scenario-default` added to `scripts/seed-simulator-scenarios.ts` (4-keyword, 5-search-term starter scenario). The existing `/api/health/ready` probe's `missing_scenarios` check now requires this row.
+- New `pnpm validate:simulator-registry` script (and matching 10-case Vitest spec) asserts the registry and the seed list agree on six simulator ids. Catches future drift between `buildSimulatorRegistry`, the entity union, and `seed-simulator-scenarios.ts`.
+- New `Loading.tsx` for the route (matches the bid-elevator skeleton pattern).
+- The existing admin simulator routes (`/admin/simulators`, `/admin/simulators/new`, `/admin/simulators/[id]/edit`, `/admin/simulators/[id]/versions`) are generic and already drive by simulatorId — no new admin page needed.
+- E2E spec `tests/e2e/simulator-access.spec.ts` extended to expect 6 simulators on `/tools` and to navigate to `/tools/connected-account` for the "form renders" check.
+- 19 new unit tests across the connected-account domain module, the validator suite, the simulator copy contract, and the `/tools` index page registry count.
+- Architecture suite 916/916 (was 912).
+
+Intentionally out of scope: persistence (no SimulatorAttempt row, no XP award, no debrief), multi-account switching, real Amazon API tokens. Per AGENTS.md Rule 5 the sixth entry is gated by the registry, the entity union, the published scenario, and the validator — all four now exist and are pinned by tests.
+
 ### LEARN-045 help route + STORY-164 Lesson 1.5 worksheet read view
 
 - **LEARN-045** (`/help`): a public help page covering common blockers (account, lesson, worksheet, simulator, quiz, payment), a numbered escalation timeline (read the page, ask in live class, email support), and the approved support path (`support@projectamazonph.online`, two business days, "what to include" checklist). Reads the support email from site settings with the same fallback `/maintenance` uses. Linked from every lesson's footer, the `/tools` index, and the sidebar's Connect section. No real-time support is promised; the test suite asserts the copy does not mention `24/7`, `live chat`, or `instant reply`.

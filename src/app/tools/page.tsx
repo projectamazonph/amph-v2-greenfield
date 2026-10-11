@@ -49,6 +49,8 @@ const AMPH_SIMULATOR_SKILL_TAGS: Record<string, string> = {
   "campaign-builder": "Campaign architecture",
   "listing-audit": "Listing compliance",
   "keyword-research": "Keyword discovery",
+  // STORY-089: sixth simulator's skill tag.
+  "connected-account": "API-driven practice",
 };
 
 const AMPH_CARDS: SimCard[] = [
@@ -94,6 +96,20 @@ const AMPH_CARDS: SimCard[] = [
     description:
       "Categorize a generated keyword list by intent, filter, and rank before you spend a cent.",
     skillTag: AMPH_SIMULATOR_SKILL_TAGS["keyword-research"] ?? "Simulator",
+    status: "graded",
+  },
+  // STORY-089: sixth simulator's tools-index card. The card is
+  // intentionally a graded entry (same status as the other 5) so the
+  // readiness probe and the e2e simulator-access spec see a coherent
+  // AMPH surface; the per-simulator grading is still formative-only
+  // per STORY-078 and the FormativeScoreNotice on the result view.
+  {
+    id: "connected-account",
+    name: "Connected Account",
+    href: "/tools/connected-account",
+    description:
+      "Practice against a mock Amazon Advertising API snapshot: bid tune a 4-keyword campaign and triage the Search Term Report.",
+    skillTag: AMPH_SIMULATOR_SKILL_TAGS["connected-account"] ?? "Simulator",
     status: "graded",
   },
 ];

@@ -136,6 +136,10 @@
     "keyword-research": {
       "label": "Keyword Research",
       "availability": "enrolled-practice"
+    },
+    "connected-account": {
+      "label": "Connected Account",
+      "availability": "enrolled-practice"
     }
   },
   "tierSimulatorTargets": {
@@ -145,14 +149,16 @@
       "bid-elevator",
       "str-triage",
       "listing-audit",
-      "keyword-research"
+      "keyword-research",
+      "connected-account"
     ],
     "ultimate-transformation": [
       "campaign-builder",
       "bid-elevator",
       "str-triage",
       "listing-audit",
-      "keyword-research"
+      "keyword-research",
+      "connected-account"
     ]
   },
   "certificate": {

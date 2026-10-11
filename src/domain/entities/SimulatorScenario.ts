@@ -15,9 +15,16 @@ import { Result } from "@/domain/shared/Result";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
-/** IDs for the five registered simulators. */
+/** IDs for the six registered simulators. */
 export type SimulatorId =
-  "bid-elevator" | "str-triage" | "campaign-builder" | "listing-audit" | "keyword-research";
+  | "bid-elevator"
+  | "str-triage"
+  | "campaign-builder"
+  | "listing-audit"
+  | "keyword-research"
+  // STORY-089: sixth simulator. Mock Amazon Advertising API mirror;
+  // always reads from the published scenario, never a live account.
+  | "connected-account";
 
 export type SimulatorScenarioError =
   { kind: "invalid_simulator_id" } | { kind: "invalid_difficulty" };
@@ -64,6 +71,8 @@ const VALID_SIMULATOR_IDS: readonly SimulatorId[] = [
   "campaign-builder",
   "listing-audit",
   "keyword-research",
+  // STORY-089: sixth registered simulator.
+  "connected-account",
 ];
 
 const VALID_DIFFICULTIES: readonly Difficulty[] = ["beginner", "intermediate", "advanced"];

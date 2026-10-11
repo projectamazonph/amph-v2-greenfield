@@ -335,7 +335,8 @@
     {
       "slug": "9.1-weekly-routine",
       "toolBridge": {
-        "kind": "none"
+        "kind": "simulator",
+        "target": "connected-account"
       },
       "resourceRefs": ["mdx:9.1-weekly-routine"],
       "finalDeliverable": "A cadence plan and weekly review date"
