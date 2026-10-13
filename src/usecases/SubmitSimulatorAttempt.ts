@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SubmitSimulatorAttempt ΓÇö transitions an attempt from in_progress to submitted.
  *
  * STORY-064: Simulator Attempt Infrastructure.

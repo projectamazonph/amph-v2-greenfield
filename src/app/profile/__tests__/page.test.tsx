@@ -1,4 +1,4 @@
-﻿/**
+/**
  * /profile — page domain tests.
  *
  * Option B: tests the domain layer (getSessionUser, listUserBadges use case,

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * src/composition/container.ts
  *
  * Composition root for the production container.

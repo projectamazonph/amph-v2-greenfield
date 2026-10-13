@@ -1,4 +1,4 @@
-﻿// @vitest-environment jsdom
+// @vitest-environment jsdom
 
 /**
  * WelcomeStepper.test.tsx — STORY-146.

@@ -60,7 +60,7 @@ export default async function CertificatesPage() {
                     <Field label="Issued" value={certificate.issuedAt.toISOString().slice(0, 10)} />
                   </dl>
                   {certificate.status === "revoked" ? (
-                    <p className="alert alert-error">
+                    <p className={styles.revoked} role="alert">
                       This certificate was revoked
                       {certificate.revokedReason ? `: ${certificate.revokedReason}` : "."}
                     </p>

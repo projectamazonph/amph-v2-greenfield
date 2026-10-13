@@ -1,4 +1,4 @@
-﻿/**
+/**
  * UserRepository port — the interface for persisting and retrieving users.
  *
  * Defined in src/ports/ so the domain and use-case layers can depend on

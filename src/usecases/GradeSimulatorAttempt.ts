@@ -1,4 +1,4 @@
-﻿/**
+/**
  * GradeSimulatorAttempt — scores a submitted attempt against its ScorePolicy.
  *
  * STORY-065: Scoring Engine + Dimensional Policies.

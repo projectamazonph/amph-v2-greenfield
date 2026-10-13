@@ -21,22 +21,34 @@ import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
 import { KeywordResearchForm } from "@/components/tools/KeywordResearchForm";
 import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { SimulatorUnavailableNotice } from "@/components/tools/SimulatorUnavailableNotice";
 import { keywordResearchScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
+const brItems = [{ href: "/tools", label: "Tools" }, { label: "Keyword Research" }];
+
 export default async function KeywordResearchPage() {
   const container = buildContainer();
   const sim = container.simulatorRegistry.get("keyword-research");
-  if (!sim) {
-    throw new Error("Keyword Research simulator not registered");
+  const scenarioResult = await container.scenarioRepo.findPublished("keyword-research");
+  if (!sim || !scenarioResult.ok || !scenarioResult.value) {
+    if (process.env.NODE_ENV !== "test") {
+      console.warn(
+        "[simulator:error] keyword-research unavailable (not registered, or no published scenario)",
+      );
+    }
+    return (
+      <StudentShell>
+        <main id="main-content" tabIndex={-1} className={styles.page}>
+          <Breadcrumb items={brItems} />
+          <SimulatorUnavailableNotice simulatorName="Keyword Research" />
+        </main>
+      </StudentShell>
+    );
   }
 
-  const scenarioResult = await container.scenarioRepo.findPublished("keyword-research");
-  if (!scenarioResult.ok || !scenarioResult.value) {
-    throw new Error("No published keyword-research scenario found");
-  }
   const scenario = scenarioResult.value;
   const content = keywordResearchScenarioContentSchema.parse(scenario.inputSchema);
 

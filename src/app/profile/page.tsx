@@ -1,4 +1,4 @@
-﻿/**
+/**
  * /profile — student profile page.
  *
  * Shows the user's profile fields, earned badges, and a link

@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   return {
     title: `${r.value.title} | Live class | Project Amazon PH Academy`,
-    description: `${r.value.durationMinutes} minute live class on ${r.value.scheduledAt.toLocaleString("en-US", { dateStyle: "long" })}.`,
+    description: `${r.value.durationMinutes} minute live class on ${r.value.scheduledAt.toLocaleString("en-PH", { dateStyle: "long" })}.`,
   };
 }
 
@@ -56,7 +56,17 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
     return (
       <StudentShell user={user}>
         <main id="main-content" tabIndex={-1} className={styles.page}>
-          <p>Failed to load class. Please try again.</p>
+          <div className={styles.breadcrumb}>
+            <Link href="/live-classes" className={styles.breadcrumbLink}>
+              <ArrowLeft size={16} aria-hidden /> All live classes
+            </Link>
+          </div>
+          <Card padding={6}>
+            <p className={styles.loadError} role="alert">
+              We couldn&apos;t load this class right now. Your enrollment and RSVP status are
+              unchanged. Refresh to try again.
+            </p>
+          </Card>
         </main>
       </StudentShell>
     );
@@ -127,7 +137,7 @@ export default async function LiveClassDetailPage({ params }: PageProps) {
               <dd className={styles.metaValue}>
                 <time dateTime={liveClass.scheduledAt.toISOString()}>
                   <CalendarBlank size={16} weight="bold" aria-hidden="true" />
-                  {liveClass.scheduledAt.toLocaleString("en-US", {
+                  {liveClass.scheduledAt.toLocaleString("en-PH", {
                     dateStyle: "full",
                     timeStyle: "short",
                     timeZone: "UTC",

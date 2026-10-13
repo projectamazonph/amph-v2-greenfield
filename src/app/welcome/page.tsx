@@ -1,4 +1,4 @@
-﻿/**
+/**
  * /welcome — first-run welcome walkthrough (STORY-146).
  *
  * No-tier signups land here from `/api/auth/signup` (Task 8). The page is

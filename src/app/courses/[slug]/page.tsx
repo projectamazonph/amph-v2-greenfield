@@ -92,8 +92,10 @@ export default async function CourseDetailPage({ params }: PageProps) {
     container.quizRepo.findByCourseId(detail.courseId),
   ]);
   if (!quizzesResult.ok) {
-    // Use empty array as fallback
-    const quizzes = [];
+    // Quiz load failure degrades to "no quizzes listed"; the page still renders.
+    if (process.env.NODE_ENV !== "test") {
+      console.warn("[course:error] quiz load failed", quizzesResult.error);
+    }
   }
   const quizzes = quizzesResult.ok ? quizzesResult.value : [];
   const enrollment = user

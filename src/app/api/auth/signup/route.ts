@@ -1,4 +1,4 @@
-﻿/**
+/**
  * /api/auth/signup — STORY-066.
  *
  * Plain HTTP POST endpoint for new account registration. Same pattern

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * InMemorySimulatorAttemptRepository ΓÇö fast, synchronous fake for unit tests.
  *
  * STORY-064: Simulator Attempt Infrastructure.

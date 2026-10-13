@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NewUserDashboard — first-run dashboard variant (STORY-146).
  *
  * Renders for students who have just signed up and not yet completed the
@@ -39,7 +39,9 @@ export function NewUserDashboard({ user }: { user: NewUserDashboardUser }) {
         </Link>
         <Link href="/dashboard" className={styles.card}>
           <h2 className={styles.cardTitle}>Dashboard</h2>
-          <p className={styles.cardBody}>Your home base — progress, what to do next, quick links.</p>
+          <p className={styles.cardBody}>
+            Your home base — progress, what to do next, quick links.
+          </p>
         </Link>
         <Link href="/tools" className={styles.card}>
           <h2 className={styles.cardTitle}>Simulators</h2>

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * signup.test.ts — TDD coverage for /api/auth/signup route (STORY-066 follow-up).
  *
  * The route is a thin shell that:

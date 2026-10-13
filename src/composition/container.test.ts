@@ -1,4 +1,4 @@
-﻿/**
+/**
  * src/composition/container.test.ts
  *
  * The test container builder. Lives in its own file so that

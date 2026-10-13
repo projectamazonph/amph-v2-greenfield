@@ -1,4 +1,4 @@
-﻿// @vitest-environment jsdom
+// @vitest-environment jsdom
 
 /**
  * StudentSidebar — new-user "?" badge tests (STORY-146).
@@ -56,9 +56,7 @@ describe("StudentSidebar new-user badge", () => {
       />,
     );
 
-    const badge = await waitFor(() =>
-      screen.getByLabelText(/restart the welcome tour/i),
-    );
+    const badge = await waitFor(() => screen.getByLabelText(/restart the welcome tour/i));
     expect(badge).toBeInTheDocument();
     // The badge is a <button>, not an <a> — clicking it routes via
     // router.push. Verify the navigation side effect on click.

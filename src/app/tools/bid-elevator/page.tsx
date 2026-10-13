@@ -31,6 +31,7 @@ import { SimulatorCoachGuide } from "@/components/tools/SimulatorCoachGuide";
 import { SimulatorPageHeader } from "@/components/tools/SimulatorPageHeader";
 import { StudentShell } from "@/components/student/StudentShell";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { SimulatorUnavailableNotice } from "@/components/tools/SimulatorUnavailableNotice";
 import { bidElevatorScenarioContentSchema } from "./scenarioContent";
 import styles from "./page.module.css";
 
@@ -40,17 +41,28 @@ interface BidElevatorPageProps {
   readonly searchParams?: Promise<{ from?: string }> | { from?: string };
 }
 
+const brItems = [{ href: "/tools", label: "Tools" }, { label: "Bid Elevator" }];
+
 export default async function BidElevatorPage({ searchParams }: BidElevatorPageProps) {
   const container = buildContainer();
   const sim = container.simulatorRegistry.get("bid-elevator");
-  if (!sim) {
-    throw new Error("Bid Elevator simulator not registered");
+  const scenarioResult = await container.scenarioRepo.findPublished("bid-elevator");
+  if (!sim || !scenarioResult.ok || !scenarioResult.value) {
+    if (process.env.NODE_ENV !== "test") {
+      console.warn(
+        "[simulator:error] bid-elevator unavailable (not registered, or no published scenario)",
+      );
+    }
+    return (
+      <StudentShell>
+        <main id="main-content" tabIndex={-1} className={styles.page}>
+          <Breadcrumb items={brItems} />
+          <SimulatorUnavailableNotice simulatorName="Bid Elevator" />
+        </main>
+      </StudentShell>
+    );
   }
 
-  const scenarioResult = await container.scenarioRepo.findPublished("bid-elevator");
-  if (!scenarioResult.ok || !scenarioResult.value) {
-    throw new Error("No published bid-elevator scenario found");
-  }
   const scenario = scenarioResult.value;
   const content = bidElevatorScenarioContentSchema.parse(scenario.inputSchema);
 

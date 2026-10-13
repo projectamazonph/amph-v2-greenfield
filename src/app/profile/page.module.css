@@ -279,3 +279,12 @@
     transition: none;
   }
 }
+
+.revoked {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--c-red) 25%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--c-red-bg);
+  color: var(--c-red-text);
+  font-size: var(--text-sm);
+}

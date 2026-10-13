@@ -1,4 +1,4 @@
-﻿/**
+/**
  * StartSimulatorAttempt ΓÇö begins a new simulator attempt for a student.
  *
  * STORY-064: Simulator Attempt Infrastructure.
