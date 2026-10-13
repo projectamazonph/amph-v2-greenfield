@@ -25,7 +25,7 @@ const CATEGORIES: { value: ResourceCategory; label: string }[] = [
   { value: "handout", label: "Student handout" },
 ];
 
-const FILE_TYPES: ResourceFileType[] = ["pdf", "xlsx", "gsheet", "docx", "zip", "link"];
+const FILE_TYPES: ResourceFileType[] = ["pdf", "xlsx", "gsheet", "docx", "zip", "link", "md"];
 const ACCESS_TIERS: CourseAccessTier[] = ["PREVIEW", "STARTER", "PRO"];
 
 interface PageProps {
@@ -199,6 +199,22 @@ export default async function EditResourcePage({ params, searchParams }: PagePro
             </select>
           </label>
 
+          <label className={styles.field}>
+            <span className={styles.label}>Associated lesson slug</span>
+            <input
+              type="text"
+              name="associatedLessonSlug"
+              maxLength={120}
+              defaultValue={resource.associatedLessonSlug ?? ""}
+              className={styles.input}
+              placeholder="e.g. 4.3-campaign-structure (leave blank for cross-cutting)"
+            />
+            <span className={styles.hint}>
+              LEARN-050: the lesson this resource supports, when it has one. Leave blank for
+              cross-cutting resources like the weekly client report.
+            </span>
+          </label>
+
           <p className={styles.hint}>{resource.downloadCount} downloads so far.</p>
 
           <div className={styles.actions}>
@@ -292,12 +308,27 @@ function handleUpdate(id: string) {
     const fileUrl = String(formData.get("fileUrl") ?? "").trim();
     const accessTier = String(formData.get("accessTier") ?? "") as CourseAccessTier;
     const isPublished = String(formData.get("isPublished") ?? "true") === "true";
+    const associatedLessonSlugRaw = String(formData.get("associatedLessonSlug") ?? "").trim();
+    // LEARN-050: blank string clears the anchor. Null means "no anchor"
+    // (cross-cutting resource like the weekly client report). We do not
+    // pass `undefined` — that would mean "do not change", which is the
+    // wrong signal here because the form always carries the value.
+    const associatedLessonSlug = associatedLessonSlugRaw ? associatedLessonSlugRaw : null;
     const fileEntry = formData.get("file");
     const file = fileEntry instanceof File && fileEntry.size > 0 ? fileEntry : null;
 
     const r = await updateResourceAction({
       id,
-      patch: { title, description, category, fileType, fileUrl, accessTier, isPublished },
+      patch: {
+        title,
+        description,
+        category,
+        fileType,
+        fileUrl,
+        accessTier,
+        isPublished,
+        associatedLessonSlug,
+      },
       file,
     });
 

@@ -40,7 +40,14 @@ const ALL_RESOURCE_CATEGORIES: readonly ResourceCategory[] = [
   "handout",
 ];
 
-export type ResourceFileType = "pdf" | "xlsx" | "gsheet" | "docx" | "zip" | "link";
+export type ResourceFileType =
+  | "pdf"
+  | "xlsx"
+  | "gsheet"
+  | "docx"
+  | "zip"
+  | "link"
+  | "md";
 
 const ALL_RESOURCE_FILE_TYPES: readonly ResourceFileType[] = [
   "pdf",
@@ -49,6 +56,11 @@ const ALL_RESOURCE_FILE_TYPES: readonly ResourceFileType[] = [
   "docx",
   "zip",
   "link",
+  // LEARN-050: markdown source for the job-ready resource pack. .md is
+  // a browser-rendered download, no PDF generator dependency needed.
+  // Same `isValidUrl` rule applies — root-relative `/downloads/...`
+  // into public/ or an absolute http(s) URL.
+  "md",
 ];
 
 const ALL_ACCESS_TIERS: readonly CourseAccessTier[] = ["STARTER", "PRO", "PREVIEW"];
@@ -85,6 +97,14 @@ export interface Resource {
   readonly createdAt: Date;
   readonly updatedAt: Date;
   /**
+   * LEARN-050: anchor lesson the resource supports, when the resource
+   * is for one specific lesson. Null for cross-cutting resources like
+   * the weekly client report. Bare slug, no FK relation — the
+   * curriculum lives in MDX and is not in this schema, so the value
+   * is informational, not enforced.
+   */
+  readonly associatedLessonSlug: string | null;
+  /**
    * Soft-delete marker column, added in review alongside createdById/
    * updatedById. Deliberately NOT wired into `delete()` or `hardDelete()`
    * (see `PrismaResourceRepository`'s docblock for why) — `delete()`
@@ -117,6 +137,14 @@ export interface CreateResourceInput {
   /** Storage key if this file was uploaded via IFileStorage. Omit/null for static assets and external links. */
   fileKey?: string | null;
   accessTier: CourseAccessTier;
+  /**
+   * LEARN-050: anchor lesson the resource supports. Omit/null for
+   * cross-cutting resources that do not have a single anchor lesson.
+   * Slug format matches `WorksheetLessonSlug` (e.g. `1.2-cpc-ctr`)
+   * but is not validated here because the curriculum lives in MDX,
+   * not in this schema.
+   */
+  associatedLessonSlug?: string | null;
   /** Actor id of the admin creating this resource. Omit/null when unknown. */
   createdById?: string | null;
 }
@@ -132,6 +160,7 @@ export type UpdateResourcePatch = Partial<
     | "fileKey"
     | "accessTier"
     | "isPublished"
+    | "associatedLessonSlug"
   >
 >;
 
@@ -195,6 +224,9 @@ export function createResource(input: CreateResourceInput): Result<Resource, Res
       downloadCount: 0,
       createdAt: now,
       updatedAt: now,
+      // LEARN-050: anchor lesson the resource supports. Cross-cutting
+      // resources (like the weekly client report) pass null here.
+      associatedLessonSlug: input.associatedLessonSlug?.trim() || null,
       deletedAt: null,
       createdById: input.createdById?.trim() || null,
       updatedById: null,
@@ -232,6 +264,15 @@ export function updateResource(
 
   const isPublished = patch.isPublished !== undefined ? patch.isPublished : original.isPublished;
 
+  // LEARN-050: anchor lesson slug. Pass null to clear (cross-cutting
+  // resources); pass a string to set/replace. `undefined` keeps the
+  // original. The trim before the use rounds an accidental whitespace
+  // entry to null, mirroring how `createResource` handles the field.
+  const associatedLessonSlug =
+    patch.associatedLessonSlug !== undefined
+      ? patch.associatedLessonSlug?.trim() || null
+      : original.associatedLessonSlug;
+
   if (errors.length > 0) return { ok: false, error: errors[0]! };
 
   return {
@@ -246,6 +287,7 @@ export function updateResource(
       fileKey,
       accessTier,
       isPublished,
+      associatedLessonSlug,
       updatedAt: new Date(),
       updatedById: updatedById?.trim() || original.updatedById,
     }),

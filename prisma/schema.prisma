@@ -1016,6 +1016,11 @@ model Resource {
   downloadCount Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  // LEARN-050: anchor lesson the resource supports. Bare slug, no FK
+  // (curriculum lives in MDX, not in this schema). Nullable for
+  // cross-cutting resources like the weekly client report that do
+  // not have a single anchor lesson.
+  associatedLessonSlug String?
   // Audit fields added in review. Bare String actor ids, no @relation —
   // same treatment as EmailTemplate.updatedById, the only existing
   // precedent in this schema for a "who did this" column; there's no
@@ -1028,6 +1033,7 @@ model Resource {
   @@index([category])
   @@index([isPublished])
   @@index([accessTier])
+  @@index([associatedLessonSlug])
   @@map("resources")
 }
 

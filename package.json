@@ -40,6 +40,7 @@
     "db:seed:policies": "tsx scripts/seed-simulator-policies.ts",
     "db:seed:scenarios": "tsx scripts/seed-simulator-scenarios.ts",
     "db:seed:resources": "tsx scripts/seed-resources.ts",
+    "db:seed:learn-050-resources": "tsx scripts/seed-learn-050-resources.ts",
     "format": "prettier --write .",
     "prepare": "husky",
     "postinstall": "prisma generate"

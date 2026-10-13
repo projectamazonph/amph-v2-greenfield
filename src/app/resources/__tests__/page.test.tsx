@@ -30,4 +30,31 @@ describe("/resources student download center", () => {
     expect(css).toMatch(/\.row\s*\{[\s\S]*?grid-template-columns:/);
     expect(css).toContain(".resourceIcon");
   });
+
+  // LEARN-050: anchor-lesson chip wiring.
+  it("imports the lesson path resolver", () => {
+    expect(source).toContain('from "@/lib/lessonPath"');
+  });
+
+  it("renders a lesson chip block only when associatedLessonSlug is set", () => {
+    // The chip's JSX is gated on resource.associatedLessonSlug so
+    // resources with null anchor render nothing.
+    expect(source).toContain("resource.associatedLessonSlug");
+    // The chip shows the slug verbatim, prefixed with "Supports:".
+    expect(source).toContain("Supports: {resource.associatedLessonSlug}");
+    // When lessonPath resolves a course, the chip becomes a link; when
+    // it does not, the chip stays as plain text (data-no-link) so a
+    // malformed slug never silently navigates.
+    expect(source).toContain("lessonPath(resource.associatedLessonSlug)");
+    expect(source).toContain('data-no-link="true"');
+  });
+
+  it("styles the lesson chip with a design-system pill", () => {
+    expect(css).toContain(".lessonChip");
+    expect(css).toContain("var(--accent-soft)");
+    expect(css).toContain("var(--radius-full)");
+    expect(css).toContain("var(--font-mono)");
+    // The no-link state must keep cursor default so it does not look clickable.
+    expect(css).toContain('[data-no-link="true"]');
+  });
 });
