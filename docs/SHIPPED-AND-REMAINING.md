@@ -4,6 +4,8 @@
 **Head:** `7617fe8` — `docs: mark P3-85 csv export as implemented (36/40) (#498)`
 **Branch:** `main`
 
+**Revision note (2026-10-14):** the ship-status tables in §2.5 and §4 were re-verified against `docs/stories/`, `STATE.md`, and the code on current `main`, and updated in place. The narrative sections remain the 2026-09-12 snapshot; `STATE.md` is the canonical current-state document.
+
 This document is the single source of truth for what shipped recently and where every audit recommendation currently stands. It replaces the scattered "updates since" sections in each audit doc with one place to check.
 
 ---
@@ -225,18 +227,18 @@ This audit "holds up" -- every substantive claim was accurate. Three sequenced r
 | STORY-077 | Add dimension-coverage tests                   | Sprint 14 | Done               |
 | STORY-078 | Mark all simulator results formative           | Sprint 14 | Shipped 2026-08-02 |
 
-**Phase 1 -- Subject-matter accuracy (STORY-079 through STORY-084): ALL OPEN -- needs Ryan's PPC expertise**
+**Phase 1 -- Subject-matter accuracy (STORY-079 through STORY-084): SHIPPED (Ryan's 2026-07-29 decision pass)**
 
-Do NOT assign to an agent. These require Amazon PPC domain input.
+All six stories were implemented against Ryan's third and authoritative decision pass (2026-07-29), recorded in each `docs/stories/STORY-079..084.md` doc. Only content follow-ups remain (STORY-080's last acceptance criterion and STORY-081b/c niche curation).
 
 | Story     | Title                                                     | Status |
 | --------- | --------------------------------------------------------- | ------ |
-| STORY-079 | Rewrite Bid Elevator economic model                       | OPEN   |
-| STORY-080 | Replace length-based listing scoring with real rubric     | OPEN   |
-| STORY-081 | Replace hardcoded keyword volumes with versioned datasets | OPEN   |
-| STORY-082 | Expand STR Triage: click thresholds, relevance, etc.      | OPEN   |
-| STORY-083 | Non-binary Listing Audit ground truth                     | OPEN   |
-| STORY-084 | Campaign Builder strategic scoring                        | OPEN   |
+| STORY-079 | Rewrite Bid Elevator economic model                       | DONE -- PR #244 (Ryan's final pass) |
+| STORY-080 | Replace length-based listing scoring with real rubric     | DONE -- PR #245; one acceptance criterion still open |
+| STORY-081 | Replace hardcoded keyword volumes with versioned datasets | DONE -- PR #246; 4 of 12 niches curated, all `synthetic_calibrated`; follow-up STORY-081b/c open (issue #411) |
+| STORY-082 | Expand STR Triage: click thresholds, relevance, etc.      | DONE -- PR #247 (Ryan's final pass) |
+| STORY-083 | Non-binary Listing Audit ground truth                     | DONE -- 2026-08-04; `resolveExpectedAction(finding, ctx)` in `ListingAuditSimulator.ts` replaces the binary severity rule; regressions in `tests/unit/domain/simulator/listing-audit/` |
+| STORY-084 | Campaign Builder strategic scoring                        | DONE -- 2026-08-04 |
 
 **Phase 2 -- Assessment platform maturity (STORY-085 through STORY-089):**
 
@@ -246,9 +248,9 @@ Do NOT assign to an agent. These require Amazon PPC domain input.
 | STORY-086 | Instructor calibration and acceptable-answer ranges | DONE (Sprint 16)                       |
 | STORY-087 | Explicit business-impact feedback                   | DONE (Sprint 16)                       |
 | STORY-088 | Challenge progression                               | DONE (Sprint 16)                       |
-| STORY-089 | Connected-account simulator                         | PLANNED (Sprint 16) -- not yet started |
+| STORY-089 | Connected-account simulator                         | DONE -- merged PR #684 (sixth registry entry, formative-only, mock Amazon Ads API; no live account) |
 
-**Bottom line:** Phase 0 closes scoring-integrity defects but does NOT make Listing Audit results trustworthy. Bypass survives until STORY-080 + STORY-083 land. STORY-078 keeps results away from credential/hiring signals until then.
+**Bottom line (updated 2026-10):** Phase 0 and Phase 1 are closed and Phase 2 is complete through STORY-089. The binary Listing Audit bypass is gone (STORY-080 + STORY-083 both landed). STORY-078 still holds: all simulator scores remain formative-only and must not be used as credential or hiring signals.
 
 ---
 
@@ -301,15 +303,15 @@ From `docs/REMAINING-P3-FEATURES.md`. P3 total: 36/40 implemented.
 | P3-84 | Dark mode toggle              | L      | None                                 |
 | P3-87 | In-app notifications          | XL     | Schema migration                     |
 
-### 3.5 Simulator subject-matter (Phase 1 -- needs Ryan)
+### 3.5 Simulator subject-matter (Phase 1 -- shipped, follow-ups remain)
 
-STORY-079 through STORY-084 are OPEN. Do NOT assign to an agent. These need Ryan's PPC expertise per the simulator accuracy audit -- the audit's central finding is that agents inventing plausible-looking answers is the exact failure mode being prevented.
+STORY-079 through STORY-084 shipped against Ryan's 2026-07-29 decision pass. Remaining content work: STORY-080's last acceptance criterion, and STORY-081b/c real seller-export datasets for credential mode (issue #411) -- the dataset picker still resolves every niche to `synthetic_calibrated` and coverage is 4 of 12 launch niches.
 
 ---
 
 ## 4. Next sprint (Sprint 17) planning guide
 
-Per `docs/sprint-plan.md`, Sprints 1–15 complete; Sprint 16 had STORY-085–088 complete, STORY-089 planned.
+Per `docs/sprint-plan.md`, Sprints 1–16 complete; Sprint 16 closed with STORY-085–088 plus STORY-089 (PR #684).
 
 **Candidate work:**
 
@@ -317,9 +319,9 @@ Per `docs/sprint-plan.md`, Sprints 1–15 complete; Sprint 16 had STORY-085–08
 2. **P2–P3 -- Documentation refresh:** api-reference.md, db-schema.md, sprint-plan.md, CLAUDE.md, SESSION-HANDOVER.md.
 3. **P2 -- Token lint:** Stylelint rule for CSS variables. Catches H-01/H-05 regressions.
 4. **P2 -- Voice guide CI check:** Extend `local/no-ai-slop` for em-dashes, emoji, banned phrases.
-5. **STORY-089:** Only remaining Phase 2 story. Can proceed if Phase 1 blocked on Ryan.
+5. **STORY-081b:** Real seller-export keyword datasets (issue #411) -- the only remaining simulator subject-matter follow-up.
 
-**Do NOT schedule Phase 1 (STORY-079–084) for agent work.**
+Phase 1 (STORY-079–084) and Phase 2 (STORY-085–089) are both closed; no agent-scheduling restriction remains beyond ordinary review of new engine rules.
 
 ---
 
